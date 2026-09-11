@@ -134,9 +134,9 @@ def test_the_acquired_plane_is_never_redacted():
 
 
 def test_an_empty_ruleset_writes_no_state(tmp_path):
-    from fux.ingest.run import _pii_ruleset_moved
+    from fux.ingest.run import _record_pii_digest
 
-    _pii_ruleset_moved(tmp_path, ())
+    _record_pii_digest(tmp_path, ())
     assert not (tmp_path / ".fux" / "runtime" / "pii-digest").exists()
 
 
@@ -148,29 +148,48 @@ def test_the_first_run_with_rules_reports_moved(tmp_path):
 
 
 def test_an_unchanged_ruleset_reports_NOT_moved(tmp_path):
-    from fux.ingest.run import _pii_ruleset_moved
+    from fux.ingest.run import _pii_ruleset_moved, _record_pii_digest
 
     rules = pii.parse({"rule": [{"name": "e", "pattern": "a+"}]}, origin="<t>")
-    _pii_ruleset_moved(tmp_path, rules)
+    _record_pii_digest(tmp_path, rules)
+    assert _pii_ruleset_moved(tmp_path, rules) is False
+
+
+def test_asking_does_not_record(tmp_path):
+    """The 2026-09-11 fix, as a test.
+
+    `_pii_ruleset_moved` used to write the digest, so a run interrupted between
+    the question and `write_index` had already claimed the new ruleset — and the
+    next delta run reused terms built under the old one, forever. Asking twice
+    must give the same answer until somebody records it.
+    """
+    from fux.ingest.run import _pii_ruleset_moved, _record_pii_digest
+
+    rules = pii.parse({"rule": [{"name": "e", "pattern": "a+"}]}, origin="<t>")
+    assert _pii_ruleset_moved(tmp_path, rules) is True
+    assert _pii_ruleset_moved(tmp_path, rules) is True
+    assert not (tmp_path / ".fux" / "runtime" / "pii-digest").exists()
+    _record_pii_digest(tmp_path, rules)
     assert _pii_ruleset_moved(tmp_path, rules) is False
 
 
 def test_editing_a_rule_reports_moved_again(tmp_path):
     """The whole point: bytes did not change, but what should be indexed did."""
-    from fux.ingest.run import _pii_ruleset_moved
+    from fux.ingest.run import _pii_ruleset_moved, _record_pii_digest
 
     first = pii.parse({"rule": [{"name": "e", "pattern": "a+"}]}, origin="<t>")
-    _pii_ruleset_moved(tmp_path, first)
+    _record_pii_digest(tmp_path, first)
     second = pii.parse({"rule": [{"name": "e", "pattern": "b+"}]}, origin="<t>")
     assert _pii_ruleset_moved(tmp_path, second) is True
 
 
 def test_removing_every_rule_reports_moved_and_clears_the_state(tmp_path):
-    from fux.ingest.run import _pii_ruleset_moved
+    from fux.ingest.run import _pii_ruleset_moved, _record_pii_digest
 
     rules = pii.parse({"rule": [{"name": "e", "pattern": "a+"}]}, origin="<t>")
-    _pii_ruleset_moved(tmp_path, rules)
+    _record_pii_digest(tmp_path, rules)
     assert _pii_ruleset_moved(tmp_path, ()) is True
+    _record_pii_digest(tmp_path, ())
     assert not (tmp_path / ".fux" / "runtime" / "pii-digest").exists()
 
 

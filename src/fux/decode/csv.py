@@ -38,9 +38,10 @@ EXTENSIONS = (".csv", ".tsv")
 #: nobody diffs it. Found by a lab harness that planted answers past the limit
 #: and could not find them (`work/regression/2026-09-06-csv-chunk-granularity/`).
 #:
-#: Now `[decode] max_table_rows` in `fux.toml`, defaulting to 20 000. Config
-#: rather than a `.fux/tune.toml` knob because it changes what is **indexed**,
-#: not how results are **ordered** — ADR-TUNE decision 7's line.
+#: Now `.fux/tune.toml [index] max_table_rows`, defaulting to 20 000 (in
+#: `fux.toml [decode]` from 2026-09-06 until Arpit moved it on 2026-09-11).
+#: `[index]` is tune.toml's one table that changes what is **indexed** —
+#: ADR-TUNE decision 13.
 from fux.decode._limits import max_table_rows
 
 #: Guards against a malformed quote turning one line into one enormous field.

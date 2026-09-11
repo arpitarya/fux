@@ -73,13 +73,13 @@ def test_a_reason_distinguishes_a_missing_decoder_from_an_unreadable_document():
     """The queue's whole value is that difference: one is someone could write a
     decoder, the other is only a model will help.
 
-    `.png` stopped being an example of "no decoder" on 2026-08-29 — `imagedoc`
+    `.png` stopped being an example of "no decoder" on 2026-08-29 — `image`
     is now built in and claims it. `.webp` has no fux decoder.
     """
     from fux.decode import reason
 
     assert "no decoder" in reason("a.webp")
-    assert "pdfdoc" in reason("scan.pdf")
+    assert "pdf" in reason("scan.pdf")
 
 
 def test_a_malformed_row_is_skipped_not_fatal(repo):

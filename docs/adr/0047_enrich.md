@@ -347,6 +347,23 @@ not a fixable style of prose; it is what prose is. A question is a narrower
 object: a retrieval claim about **one** document, which `fux enrich --check`
 can put to the index and test.
 
+🔴 **This decision is BUILT AND UNPROVEN, and that is the whole of its
+evidential standing.** It ships on the argument above — prose measured no net
+gain, and a question is checkable where prose is not — **not** on a gate it
+cleared. The four-arm run
+([`2026-09-05-doc2query`](../../work/regression/2026-09-05-doc2query/report.md))
+was voided on Arpit's ruling of 2026-09-06
+([`W110-DOC2QUERY`](../../work/regression/2026-09-05-doc2query/VERDICT.md)):
+its bar said *net ≥ 6 on `recall@k`* and **never named `k`**, so it ruled
+neither way ([ADR-QUALITY](0051_quality-contract.md) decision 2a).
+
+**What that run does support, and it is not nothing:** the `placebo` arm —
+matched length, file count, frontmatter and vocabulary pool — moved **0
+queries at every `k`**, so whatever the `real` arm gained is **the content of
+the questions**, not more bytes or more files; and across four arms **no query
+regressed**. ⚠ **Do not cite `net +7 at recall@1` as a pass.** It is one
+reading of a bar that had four, and the verdict says so.
+
 **16. `--check` refuses a question that does not retrieve its own document in
 the top `SELF_RETRIEVAL_K = 3`** (ratified by Arpit, 2026-09-05). doc2query−−
 (arXiv 2301.03266) filters generated questions with a separate relevance
@@ -371,6 +388,11 @@ a human decides.
 ⚠ **A prose body written before this decision stays valid.** The filter checks
 lines that end in `?`; a body with none has nothing to check. No existing
 enrichment is invalidated by this record.
+
+⚠ **The filter's own value is UNPROVEN, on the same run.** It refused **2 of
+98** questions and moved **no** recall number at any `k` — a **2 %** treatment,
+too small to see. *Did not hurt* is the honest statement; *works* is not
+available yet.
 
 **17. `superseded_by:` in an enrichment's frontmatter retires its document, and
 it is the ONE key here that reaches the ranking.** Everything else in that

@@ -135,7 +135,7 @@ def test_a_types_line_carries_the_decoder_that_reads_it(repo, monkeypatch):
     """
     _add(repo, monkeypatch, _args("*.pdf", types=True))
     types = (repo / ".fux" / "sources" / "types").read_text(encoding="utf-8")
-    assert "\n*.pdf decoder=pdfdoc\n" in types
+    assert "\n*.pdf decoder=pdf\n" in types
 
 
 def test_a_prose_type_carries_no_binding_because_no_decoder_reads_it(repo, monkeypatch):

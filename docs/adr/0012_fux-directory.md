@@ -4,6 +4,7 @@ name: ADR-DOTFUX
 title: ADR-DOTFUX (0012) — the .fux/ directory
 description: "Every child of .fux/ is declared committed, derived or acquired; the ignore rule is narrow by construction and asserted by doctor against git itself."
 status: accepted
+amended: 2026-09-11
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
 owns: [src/fux/store/fuxdir.py, src/fux/doctor.py, src/fux/setup.py]
@@ -65,7 +66,7 @@ flowchart TD
     +-- fetchers/     COMMITTED   your code, fux never rewrites it
     +-- decoders/     COMMITTED   your code; THESE COPIES RUN, not the package's
     +-- enrich/       COMMITTED   pinned enrichment text + queue.tsv
-    +-- tune.toml     COMMITTED   how results are ORDERED (write-if-missing)
+    +-- tune.toml     COMMITTED   how results are ORDERED, + [index] (write-if-missing)
     +-- output.toml   COMMITTED   how a result is SHOWN (write-if-missing)
     +-- .fuxignore    COMMITTED   what is NOT indexed, .gitignore's grammar
     +-- refusals.toml COMMITTED   what a REFUSAL looks like here (ADR-REFUSAL)
@@ -166,7 +167,7 @@ table is the reasoning.
 | `fetchers/` | committed | consumer code — decision 4 |
 | `decoders/` | committed | consumer code — decision 5 |
 | `enrich/` | committed | pinned enrichment text, one file per **source content sha**, plus `queue.tsv`. It cannot be re-derived: a model wrote it, in an agent, once, and [ADR-ENRICH](0047_enrich.md) decision 1 refuses to call one. Committed also means **every clone has identical coverage**, so L3 holds with a wider input rather than a weaker property. Keying by source sha means editing a document orphans its enrichment automatically — staleness is structural rather than a check someone has to remember |
-| `tune.toml` | committed | how results are **ordered**, never what is indexed. A preference that does not travel with the clone is not one: two clones would rank the same corpus differently, which is the surprise this split exists to remove |
+| `tune.toml` | committed | how results are **ordered** — plus `[index]` (`max_phrases`, `max_table_rows`), the one table that changes what is indexed ([ADR-TUNE](0045_tuning.md) decision 13, 2026-09-11). A preference that does not travel with the clone is not one: two clones would rank the same corpus differently, which is the surprise this split exists to remove |
 | `.fuxignore` | committed | what is **not** indexed, in `.gitignore`'s grammar — the one home for exclusion, read before the source lists and outranking them in both directions ([ADR-FUXIGNORE](0055_fuxignore.md)). Committed for the same reason `tune.toml` is: a corpus that differed by clone is the surprise this split removes. Written header-only by `fux setup`, and never rewritten |
 | `README.md` · `.gitignore` | committed | generated, write-if-missing |
 | `refusals.toml` | committed | what a **refusal** looks like in this organisation — the sign-in walls, paywalls and viewer shells a server returns instead of the document ([ADR-REFUSAL](0058_refusals.md)). Consumer-owned and additive; the engine ships no vendor knowledge, and the always-on magic-byte floor is not configurable from it. Committed because *"what does a login page look like here"* is a team fact, exactly like `.fuxignore` |
@@ -286,6 +287,35 @@ mechanism for a file that is **simply absent** — because absence is the
 expected state of every repo older than the file, and there are always more of
 those than there are new ones. Decision 19 applied the first mechanism to the
 second situation.
+
+⚠ **A FIFTH worked instance, 2026-09-11 — and this one is the ⚠ running
+BACKWARDS, which is why it is recorded rather than assumed symmetric.** Every
+instance above is a template that **gained** something a new repo gets and an
+old one does not. Here the `fux.toml` template **lost** a table: `[decode]
+max_table_rows` moved to `.fux/tune.toml [index]` on Arpit's ruling
+([ADR-TUNE](0045_tuning.md) decision 13, [ADR-CONFIG](0023_config.md)
+decision 10). `fux setup` never rewrites a `fux.toml`, so **every repo set up
+between 2026-09-06 and 2026-09-11 still carries the table**, and nothing in this
+directory will take it out.
+
+**The mechanism is a loader refusal, and by this decision's own distinction that
+is the right one:** the file **exists and is wrong** — `types list usable`'s
+situation, not `output.toml`'s absence. Running on would honour a row limit no
+decoder reads any more, which is a value its author believes is in force and is
+not.
+
+- ✅ **`fux doctor` still runs**, which is the property decision 19 lost and
+  which had to be checked here rather than assumed. Verified 2026-09-11 on a
+  scratch repo carrying `[decode] max_table_rows = 500`: `fux ingest` exits 1
+  naming the move, and `fux doctor` completes every other row.
+- 🔴 **But `doctor` does not NAME it.** It degrades to `fetcher optional
+  functions: skipped (no readable fux.toml)` and reports that as `[OK]` — so a
+  repo whose `fux.toml` refuses to load gets a **green doctor beside a broken
+  ingest**, the wrong way round for the verb whose job is to name the fix. It is
+  the same shape as decision 19, one step milder: there the refusal took
+  `doctor` out, here it leaves `doctor` running and uninformative. Filed as open
+  work rather than patched in this change, because the fix is a new `doctor` row
+  and this record does not own `doctor`'s row set.
 
 **7. `fetchers/` is consumer code and fux never rewrites it.** It is loaded by
 path, and only under the two fenced paths — `fux add <URL>` and `fux update`.
@@ -459,9 +489,12 @@ that had already finished, and one was reachable from nowhere at all:
   a true table under a false sentence, which is the failure mode this record's
   own template rules exist to prevent, arriving in generated output instead of
   in a record. Both halves now come from the same change.
-- **Nothing under `tune.toml` reaches the maintenance path.** `ingest`, `build`
-  and the hooks never open it, which is what keeps a committed file out of the
-  byte-identity argument L3 rests on.
+- **Nothing in `tune.toml` outside `[index]` reaches the maintenance path.**
+  `ingest`, `build` and the hooks read no ranking key. `[index]` is read by
+  ingest, so that committed table IS inside the byte-identity argument L3 rests
+  on — as `fux.toml` already was. `fux setup`'s `fux.toml` template lost its
+  `[decode]` table and the tune.toml specimen gained `[index]` in the same
+  change ([ADR-TUNE](0045_tuning.md) decision 13).
 
 ### Alternatives considered
 

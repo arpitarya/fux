@@ -24,6 +24,10 @@ So the workflow for adding a rule is: write it, probe it, read the matches,
 
 - **A rule that never fires.** It is not protecting you; it is a rule someone
   will trust. Either the pattern is wrong or the risk is not in this corpus.
+- **A checksum rule whose shape matches all fail.** `validate = "luhn"` on a
+  pattern that captures the wrong span (a label with a digit in it, say) turns
+  every match away. The probe prints the rejected count beside the replaced
+  one, so *"0 matches, 40 failed luhn"* reads as the mistake it is.
 - **A rule firing far more often than the corpus can explain.** Usually it is
   matching text an earlier rule inserted — rules run top to bottom and a
   replacement is ordinary text to the rules below it.

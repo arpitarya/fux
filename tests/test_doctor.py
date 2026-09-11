@@ -803,12 +803,12 @@ def test_a_hand_written_binding_that_matches_nothing_is_reported(tmp_path):
     _git_repo(tmp_path)
     types = tmp_path / ".fux" / "sources" / "types"
     types.parent.mkdir(parents=True, exist_ok=True)
-    types.write_text("*.md\n*.jsno decoder=jsondoc\n", encoding="utf-8")
+    types.write_text("*.md\n*.jsno decoder=json\n", encoding="utf-8")
     write_index(tmp_path, [_record()])
     check = _check(doctor.run(tmp_path), "decoder bindings")
     assert not check.ok
     assert check.level == "warn"
-    assert ".jsno=jsondoc" in check.detail
+    assert ".jsno=json" in check.detail
 
 
 def test_a_hand_written_binding_with_documents_is_quiet(tmp_path):
@@ -817,7 +817,7 @@ def test_a_hand_written_binding_with_documents_is_quiet(tmp_path):
     _git_repo(tmp_path)
     types = tmp_path / ".fux" / "sources" / "types"
     types.parent.mkdir(parents=True, exist_ok=True)
-    types.write_text("*.md\n*.geojson decoder=jsondoc\n", encoding="utf-8")
+    types.write_text("*.md\n*.geojson decoder=json\n", encoding="utf-8")
     write_index(tmp_path, [_record(doc_id="file:a.geojson", loc="a.geojson")])
     check = _check(doctor.run(tmp_path), "decoder bindings")
     assert check.ok

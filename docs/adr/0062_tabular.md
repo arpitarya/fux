@@ -5,6 +5,7 @@ title: "ADR-TABULAR (0062) — a table is a list of rows, and a row is the unit 
 description: "How .csv, .tsv, .xlsx and .xlsm are read and cited: one passage per row, how much of a table is admitted, and the two silent data losses this record was written to close."
 status: accepted
 date: 2026-09-06
+amended: 2026-09-11
 feature: tabular documents — row granularity, the admitted-row limit, and what a table citation is
 owns: [src/fux/decode/csv.py, src/fux/decode/xlsx.py, src/fux/decode/_limits.py]
 laws: [L1, L2, L3]
@@ -24,8 +25,8 @@ someone went looking with a harness.
 was hard-coded in `csv.py` and again in `xlsx.py`. A 754-row file decoded to
 500 rows: a fact in row 600 was **not decoded, not indexed, and not citable in
 any configuration**, and the only trace was a `*(table truncated)*` line that
-nobody diffs. It is now `[decode] max_table_rows` in `fux.toml`, default
-**20 000**.
+nobody diffs. It is now `max_table_rows`, default **20 000** — in
+`.fux/tune.toml [index]` since 2026-09-11 (it began in `fux.toml [decode]`).
 
 **The second was how a table was cited.** The chunker split on headings and
 blank lines; a table has neither, so a whole sheet arrived as one passage. A
@@ -69,18 +70,32 @@ names is a citation nobody can read.
   carries the section — the sheet name, for `.xlsx` — and losing that costs
   more than the duplication does.
 
-**3. `[decode] max_table_rows`, default 20 000, counting DATA rows.** The
+**3. `max_table_rows`, default 20 000, counting DATA rows** — `.fux/tune.toml
+[index] max_table_rows` since 2026-09-11. The
 header is always kept and never counted: a consumer who writes 20 000 means
 twenty thousand records. Per **sheet** for `.xlsx`, because a sheet is the
 document's own division and truncating the fifth because the first four were
 long would be arbitrary.
 
-**4. It is config, not a tunable.** `.fux/tune.toml` holds knobs that change
-how results are **ordered** and none that change what is **indexed**
-([ADR-TUNE](0045_tuning.md) decision 7). A row limit decides which rows *exist*
-as far as the index is concerned, so it belongs in the committed `fux.toml`,
-and L3 reads `same sources + same committed config -> same index` — the shape
-`.fux/sources/` already has.
+**4. ⚠ REVERSED 2026-09-11 (Arpit): it lives in `.fux/tune.toml [index]`, not
+`fux.toml [decode]`.** As shipped, this decision said a row limit changes what is
+**indexed**, so it could not be a tunable ([ADR-TUNE](0045_tuning.md) decision 7)
+and belonged in `fux.toml`. It also added a **fourth** top-level table to
+`fux.toml`, which is [ADR-CONFIG](0023_config.md)'s veto, unnoticed for five
+days. Arpit moved it beside `max_phrases` into tune.toml's `[index]` — the
+declared exception to ADR-TUNE's boundary rule, ADR-TUNE decision 13. What
+survives unchanged: it still changes what is indexed, the file is still
+committed, and L3 still reads `same sources + same committed [index] -> same
+index`. `fux.toml [decode]` is now refused by name.
+
+**4a. A changed limit now reaches an unchanged table.** 🔴 **From 2026-09-06 to
+2026-09-11 it did not:** delta ingest reuses extraction keyed on a document's
+sha, which the limit does not move, so raising `max_table_rows` left every
+unchanged CSV indexed at the old limit until `--full` — and a delta run was no
+longer byte-identical to a full one. Ingest now keeps a digest of `[index]` and
+re-extracts when it changes ([ADR-INGEST](0016_ingest.md)).
+`tests/ingest/test_delta.py::test_changing_max_table_rows_is_not_carried_forward`
+fails with the digest removed.
 
 **5. A decoder reads it through `decode/_limits.py`, and the protocol does not
 grow a parameter.** A decoder is `EXTENSIONS` plus `decode(raw, rel_path)` and
@@ -91,12 +106,13 @@ whichever decoder wants it. A `ContextVar` rather than a module global because
 nothing here promises to stay single-threaded, and a cross-document bleed that
 only appears under concurrency is the worst kind of defect to leave behind.
 
-**6. A malformed `fux.toml` does not fail the decode.** `max_table_rows()`
+**6. A malformed `[index]` does not fail the decode.** `max_table_rows()`
 falls back to the default rather than raising: a decoder runs inside a walk over
-thousands of documents, and the paths that read configuration properly already
-report a bad file. Turning one bad line into an unreadable corpus is a worse
-failure than an ignored setting — and this is the ONE place that rule applies,
-because `config.load` is loud everywhere else.
+thousands of documents, and `fux ingest` reads `tune.index_limits()` loudly
+before any decoder runs, so a bad value has already stopped the run. Turning one
+bad line into an unreadable corpus is a worse failure than an ignored setting —
+and this is the ONE place that rule applies. (Written for `fux.toml`; the
+reader moved on 2026-09-11 and the rule did not.)
 
 ### The measurement
 
@@ -154,7 +170,8 @@ cannot do the work. The correct row outranks the next-best in **42/48
   seconds per document per query; a multi-document `ask --refer` multiplies
   it. **Ruled by Arpit
   2026-09-06** over the alternative of degrading to bands past a threshold.
-  `[decode] max_table_rows` is the lever a consumer with big sheets turns.
+  `.fux/tune.toml [index] max_table_rows` is the lever a consumer with big
+  sheets turns — and, unlike every other tune.toml key, turning it re-extracts.
   Latency is Linux x86_64 and not comparable across machines (TEST-PLAN §2).
 
 - **A token pre-filter does not rescue it.** Dropping passages that share no
@@ -175,8 +192,8 @@ cannot do the work. The correct row outranks the next-best in **42/48
   `hit@1` 0.292 against 0.875.
 - **Degrade to bands past a row threshold.** The recommended option, and
   **declined by Arpit** in favour of per-row at every size with the latency
-  stated. Recorded because it is the first thing to reach for if the 3.7 s ever
-  becomes a complaint.
+  stated. Recorded because it is the first thing to reach for if the ~2.6 s
+  ever becomes a complaint.
 - **Header in `Passage.heading`.** Scored identically; costs the sheet name.
 - **Leave `MAX_ROWS` at 500.** It was never a decision, only a constant, and it
   silently dropped data.
@@ -189,7 +206,7 @@ python -c "
 from fux.decode import decode
 rows = b'col\n' + b''.join(b'value %d\n' % i for i in range(50))
 print(decode(rows, 'a.csv', __import__('pathlib').Path('.')).count(chr(10) + '| value '))"
-# expect: 50 with the default; the configured number when [decode] sets one
+# expect: 50 with the default; the configured number when .fux/tune.toml [index] sets one
 
 # one passage per row
 python -c "
@@ -206,8 +223,16 @@ print(len(chunk(md)))"
 than an 11-row band on a `blind` run, decision 1 loses its evidence** — the
 measurement behind it is `informed` and supplies no delta.
 
-**If the 3.7 s at 20 000 rows is reported as a blocker by anyone actually using
-it**, the declined alternative above is the answer, and it is one constant.
+**If the ~2.6 s at 20 000 rows is reported as a blocker by anyone actually
+using it**, the declined alternative above is the answer, and it is one
+constant.
+
+⚠ **Both of these said `3.7 s` until 2026-09-11, while the table in §1 above
+said `~2.6 s`.** 3.7 s was a single unrepeated observation; the table's figure
+is the median of three repeats (2 498 / 2 596 / 2 780 ms) and was corrected on
+2026-09-06 in `fux.toml`, `setup.py` and `_chunk.py` — **and missed here, in
+the veto condition, which is the one place a wrong number changes what somebody
+does.** Found by re-reading the record rather than by any check.
 
 ## References
 
@@ -215,4 +240,21 @@ it**, the declined alternative above is the answer, and it is one constant.
 - [ADR-REFER](0037_refer-plane.md) decisions 25–26 — the chunker this rests on
 - [ADR-TUNE](0045_tuning.md) decision 7 — why this is config and not a knob
 - [ADR-TYPES](0038_types-list.md) — verdict G, and why `.csv` is opt-in
-- `work/regression/2026-09-06-csv-chunk-granularity/` — the run
+- [`work/regression/2026-09-06-csv-chunk-granularity/report.md`](../../work/regression/2026-09-06-csv-chunk-granularity/report.md) — the run
+
+**Papers and specifications** *(consulted 2026-09-06, filed 2026-09-11)*
+
+- **Chroma, *Evaluating Chunking Strategies for Retrieval*** — independent
+  corroboration of decision 1's direction. On token-level metrics, 200-token
+  chunks scored **8.0 precision and IoU against 1.5 at 800 tokens, with recall
+  roughly flat**: smaller passages bought precision and cost almost no recall,
+  which is the shape of this record's 0.229 → 0.875.
+  <https://www.trychroma.com/research/evaluating-chunking>
+
+  🔴 **This does NOT discharge the veto condition above.** It is a different
+  corpus, and its retrieval is embedding-based where fux's is lexical BM25F, so
+  it agrees about the *direction* and predicts nothing about the magnitudes
+  here. The bar stays what it was: per-row beating an 11-row band on a `blind`
+  run. **An outside paper agreeing with an `informed` run does not make it a
+  blind one**, and treating it that way is how a pre-registered threshold moves
+  without anybody deciding to move it.

@@ -216,7 +216,7 @@ def test_acquired_max_bytes_refuses_zero_and_points_at_the_real_knob(tmp_path):
         load(tmp_path)
 
 
-# -- [decode] max_table_rows -------------------------------------------------
+# -- [decode] moved to .fux/tune.toml [index] (2026-09-11) -------------------
 
 
 def _repo(tmp_path, extra: str = "") -> Path:
@@ -226,48 +226,26 @@ def _repo(tmp_path, extra: str = "") -> Path:
     return tmp_path
 
 
-def test_max_table_rows_defaults_to_twenty_thousand(tmp_path):
-    """Was a hard-coded 500 in the decoders until 2026-09-06, and that number
-    silently dropped the tail of every larger table."""
-    from fux.config import DEFAULT_MAX_TABLE_ROWS, load
-
-    assert load(_repo(tmp_path)).max_table_rows == DEFAULT_MAX_TABLE_ROWS == 20_000
-
-
-def test_max_table_rows_is_read_from_fux_toml(tmp_path):
+def test_a_decode_table_refuses_and_names_its_new_home(tmp_path):
+    """`[decode] max_table_rows` lived here 2026-09-06 -> 2026-09-11. A key that
+    is quietly not read is a setting its author believes is in force."""
     from fux.config import load
 
-    assert load(_repo(tmp_path, "\n[decode]\nmax_table_rows = 250\n")).max_table_rows == 250
+    with pytest.raises(FuxError, match=r"\[decode\] moved to \.fux/tune\.toml"):
+        load(_repo(tmp_path, "\n[decode]\nmax_table_rows = 250\n"))
 
 
-@pytest.mark.parametrize("bad", ["0", "-5", '"lots"', "true", "12.5"])
-def test_a_nonsense_row_limit_refuses_rather_than_being_ignored(tmp_path, bad):
-    """A key that is quietly not read is worse than one that errors, because
-    the reader believes their setting is in force — `config.py`'s own rule."""
+def test_config_no_longer_carries_the_index_limits(tmp_path):
     from fux.config import load
 
-    with pytest.raises(FuxError, match="max_table_rows"):
-        load(_repo(tmp_path, f"\n[decode]\nmax_table_rows = {bad}\n"))
+    config = load(_repo(tmp_path))
+    for gone in ("max_table_rows", "max_phrases"):
+        assert not hasattr(config, gone), f"{gone} should live in tune.toml [index]"
 
 
-def test_a_decoder_reads_the_configured_limit(tmp_path):
-    """The whole point of `decode/_limits.py`: a two-name decoder seeing
-    committed config without growing a third parameter."""
-    from fux.decode import decode
+def test_the_scaffolded_fux_toml_has_no_decode_table():
+    import tomllib
 
-    root = _repo(tmp_path, "\n[decode]\nmax_table_rows = 3\n")
-    rows = b"col\n" + b"".join(b"value %d\n" % i for i in range(50))
-    out = decode(rows, "a.csv", root)
-    assert out.count("\n| value ") == 3
-    assert "table truncated" in out
+    from fux import setup
 
-
-def test_the_limit_is_not_leaked_between_documents(tmp_path):
-    """`bound_root` is a ContextVar with a reset token, not a global that the
-    next document inherits."""
-    from fux.decode import decode
-    from fux.decode._limits import max_table_rows
-
-    root = _repo(tmp_path, "\n[decode]\nmax_table_rows = 3\n")
-    decode(b"col\nv1\nv2\nv3\nv4\nv5\n", "a.csv", root)
-    assert max_table_rows() == 20_000  # unbound again
+    assert "decode" not in tomllib.loads(setup._CONFIG)

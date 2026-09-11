@@ -181,7 +181,7 @@ Start from [`TEMPLATE.md`](TEMPLATE.md).
 | [0020](0020_accelerator.md) | **ADR-T1-ACCELERATOR** | The derived T1 accelerator — disposable, term-major, and forbidden from changing an answer | accepted | yes |
 | [0021](0021_ranking.md) | **ADR-RANKING** | How documents are scored and ordered — BM25F, weight-then-saturate once, one scorer and one rounded sort | accepted | yes |
 | [0022](0022_postings.md) | **ADR-POSTINGS** | The postings in two shapes — doc-major in git for diffs, term-major in the runtime plane for queries | accepted | yes |
-| [0023](0023_config.md) | **ADR-CONFIG** | `fux.toml` and every property in it — three tables read, two refused by name, one passed through unread | accepted | yes |
+| [0023](0023_config.md) | **ADR-CONFIG** | `fux.toml` and every property in it — three tables read, three refused by name, one passed through unread | accepted | yes |
 | [0024](0024_port-list.md) | **ADR-PORT-LIST** | Port, don't rewrite — a closed list, each module with its tests, and a port earns its place by having a caller | accepted | partial |
 | [0025](0025_extracted-mode.md) | **ADR-EXTRACTED** | The `extracted` ingest mode — everything taken from the document, nothing invented; the mode every guarantee is stated for | accepted | yes |
 | [0026](0026_url-list.md) | **ADR-URL-LIST** | The committed URL list — one per line so it merges at scale; loader-sorted so config order can never change committed bytes; one grammar for all three lists | accepted | yes |
@@ -203,7 +203,7 @@ Start from [`TEMPLATE.md`](TEMPLATE.md).
 | [0042](0042_agent-policy.md) | **ADR-AGENT-POLICY** | Fux ships the policy its consumers need to read it correctly — one canonical policy carried as a **verbatim block** into each vendor's native format, from a declaration and never from detection | accepted | yes |
 | [0043](0043_predictions.md) | **ADR-RS** | The R predictions — a claim frozen before measurement, four ways one can end (**FAIL is a success of the method**), and the blind/informed split on the runs that measure them | accepted | partial |
 | [0044](0044_archived-content.md) | **ADR-ARCHIVED-CONTENT** | What a document declared `archived=true` does once indexed — a record property, a marker, a disclaimer that states the fact and refuses to interpret it, and a demotion nobody takes by default | accepted | yes |
-| [0045](0045_tuning.md) | **ADR-TUNE** | `.fux/tune.toml` — every knob that changes ordering and none that changes the index, decided by one mechanical test; plus per-source priority in either direction | accepted | yes |
+| [0045](0045_tuning.md) | **ADR-TUNE** | `.fux/tune.toml` — every knob that changes ordering, decided by one mechanical test, plus `[index]` (`max_phrases`, `max_table_rows`), the declared exception that changes the index; plus per-source priority in either direction | accepted | yes |
 | [0046](0046_mcp.md) | **ADR-MCP** | `fux mcp` — the stdio JSON-RPC server for coding agents. Three tools rather than the whole verb surface, stdlib-only, and **`answer` is deliberately absent** | accepted | yes |
 | [0047](0047_enrich.md) | **ADR-ENRICH** | Enrichment as an **agent skill, not an API call** — fux plans and validates, a coding agent generates, and partial coverage is the steady state | accepted | yes |
 | [0048](0048_rerank.md) | **ADR-RERANK** | Proximity reranking over the refer plane's own passages — and the cross-encoder refused on cross-machine determinism, not on cost | accepted | yes |
@@ -220,12 +220,13 @@ Start from [`TEMPLATE.md`](TEMPLATE.md).
 | [0059](0059_url-freshness.md) | **ADR-URL-FRESHNESS** | Six verdicts that never collapse into each other — `as-ingested` is a real comparison against retained bytes, and is neither `current` nor `unverified`. Plus `ttl=` as a per-URL bound that **narrows** the caller's policy and can never widen it | accepted | **no** |
 | [0060](0060_pii.md) | **ADR-PII** | **Redact what gets committed; leave alone what stays local.** A consumer-owned `.fux/pii.toml` redacts the index and nothing else — acquired bytes, refer passages and `fux answer` quotes stay as they are. The sha is taken **before** redaction, or every redacted document verifies as `stale` against its own unchanged source. **No built-in floor**, unlike ADR-REFUSAL: a format signature is a fact, a PII definition is a policy | accepted | **no** |
 | [0061](0061_expand.md) | **ADR-EXPAND** | The caller supplies the vocabulary (`--expand`, scored at `expand_weight`) and fuses its own phrasings (`-q`, RRF in rank space); a document matching only supplied terms is never returned | accepted | yes |
-| [0062](0062_tabular.md) | **ADR-TABULAR** | Tabular documents — one passage per row, `[decode] max_table_rows` (500 -> 20 000), and the two silent data losses that hid behind both | accepted | yes |
+| [0062](0062_tabular.md) | **ADR-TABULAR** | Tabular documents — one passage per row, `max_table_rows` (500 -> 20 000; `.fux/tune.toml [index]` since 2026-09-11), and the two silent data losses that hid behind both | accepted | yes |
+| [0063](0063_chunking.md) | **ADR-CHUNKING** | A chunk does three jobs and one span cannot do all three — the one fold rule that derives every unit from heading depth with nothing declared, the boundary ladder that makes every document quotable, and why small-to-big was rejected | accepted | yes |
 | [0002](0002_LAW-0-authority.md) | **ADR-LAW-0** | L0 — a rule is stated in exactly one ADR and every other artifact links to it; the Law records outrank every other record and a conflicting record is void in the conflicting part; a Law changes only on Arpit's ruling | accepted | yes |
 
 > ## The number line was renumbered on 2026-09-06, and W-82 ruling 7 was overridden
 >
-> **`0001`–`0061`, contiguous, no holes.** `0001` is the router
+> **`0001`–`0063`, contiguous, no holes.** `0001` is the router
 > [ADR-LAWS](0001_LAWS.md); `0002`–`0009` are the eight law records; `0010`
 > upward is every other record, in its previous order.
 >
@@ -346,7 +347,7 @@ table does not grant.
 | `src/fux/ingest/pii.py` | ADR-PII | the redaction matcher, the ruleset digest, and the plane table stating that redaction reaches the committed index and nothing else. Carved out of ADR-INGEST's directory claim on `fuxignore.py`'s precedent — a *policy over* the walk, not a step in it |
 | `src/fux/ingest/refusals.py` | ADR-REFUSAL | the refusal matcher — six byte-pure conditions and the always-on magic-byte floor. **Carved out of ADR-INGEST's directory claim on `fuxignore.py`'s precedent**: everything else under `ingest/` is a step in the walk, and this is a *refusal rule* over it |
 | `src/fux/decode/` | ADR-DECODE | bytes → Markdown, in one place: the built-in decoders, the registry, the override precedence and the `.fux/decoders/` consumer seam. Separate from ADR-INGEST's claim because the record it carries is a **boundary** — where consumer-supplied dependencies become legal — not a step in the walk |
-| `src/fux/decode/csv.py` | ADR-TABULAR | how much of a `.csv`/`.tsv` is read — `[decode] max_table_rows`. Carved out of ADR-DECODE's directory claim on `freshness.py`'s precedent: the record is about **tabular documents**, which reaches past `decode/` into how `refer` cites them |
+| `src/fux/decode/csv.py` | ADR-TABULAR | how much of a `.csv`/`.tsv` is read — `.fux/tune.toml [index] max_table_rows`. Carved out of ADR-DECODE's directory claim on `freshness.py`'s precedent: the record is about **tabular documents**, which reaches past `decode/` into how `refer` cites them |
 | `src/fux/decode/xlsx.py` | ADR-TABULAR | the same limit, applied per SHEET — a sheet is the workbook's own division, so truncating the fifth because the first four were long would be arbitrary |
 | `src/fux/decode/_limits.py` | ADR-TABULAR | the `ContextVar` seam that lets a two-name decoder read committed config without the protocol growing a third parameter (decision 5) |
 | `src/fux/derive/` | ADR-T1-ACCELERATOR | T1 build, block maxima, skipping, and the declared runtime shapes |
@@ -368,6 +369,7 @@ table does not grant.
 | `src/fux/maintain/` | ADR-MAINTENANCE | the git hooks and their installer, the deferring runner, the write lock, the daemon and the local state files. **L5's write-time check is deliberately NOT here** — it lives in `store/writer.py`, because a check beside the thing it guards cannot be skipped |
 | `src/fux/maintain/mergedriver.py` | ADR-MERGE-DRIVER | the merge driver itself — carved out because its failure mode and its gate are its own |
 | `src/fux/refer/` | ADR-REFER | source · freshness · chunk · rescore · assemble. **Imports no transport**: the consumer's fetcher is injected |
+| `src/fux/refer/_chunk.py` | ADR-CHUNKING | what a passage IS — the fold rule that derives row/unit/section/file from heading depth, the universal table rule and the paragraph→line→word ladder. Carved out of ADR-REFER's directory claim on `freshness.py`'s precedent: the subject reaches past `refer/` into what decoders EMIT |
 | `src/fux/refer/freshness.py` | ADR-URL-FRESHNESS | the six verdicts and the policy object — the **claim-strength vocabulary**, which now reaches past `refer/` into the output schema and `fux verify`. Carved out of ADR-REFER's directory claim on `arc.py`'s precedent |
 | `src/fux/refer/arc.py` | ADR-CACHE | the content cache, keyed `(loc, sha)` so a hit cannot change an answer |
 | `src/fux/refer/fetchcache.py` | ADR-CACHE | the TTL fetch store — the only place in the engine that reads a wall clock |

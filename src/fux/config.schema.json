@@ -9,8 +9,8 @@
     "  fux.toml       policy -- where things live, how to reach them",
     "  .fux/sources/  the CORPUS -- one entry per line, so 5k entries diff and",
     "                 merge line by line instead of as one TOML array",
-    "  .fux/tune.toml every knob that changes ORDERING and none that changes the",
-    "                 index, decided by one mechanical test",
+    "  .fux/tune.toml every knob that changes ORDERING, plus [index] -- the two",
+    "                 keys that change the index (max_phrases, max_table_rows)",
     "",
     "[sources.url.config] IS DELIBERATELY OPAQUE AND IS NOT DECLARED FIELD BY",
     "FIELD. Fux validates that it is a table and never reads a key inside it --",
@@ -119,47 +119,17 @@
       ]
     }
   },
-  "decode": {
-    "_doc": [
-      "The `[decode]` table -- limits applied while a document is turned into",
-      "Markdown.",
-      "",
-      "WHY THIS IS HERE AND NOT IN .fux/tune.toml. tune.toml holds every knob",
-      "that changes how results are ORDERED and none that changes what is",
-      "INDEXED (ADR-TUNE decision 7). A row limit decides which rows EXIST as",
-      "far as the index is concerned, so it is committed config, and",
-      "`same sources + same committed config -> same index` is the L3 that",
-      "holds.",
-      "",
-      "IT COUNTS DATA ROWS. A header is always kept and never counted -- 20 000",
-      "means twenty thousand records, not 19 999 plus a header.",
-      "",
-      "RAISED 500 -> 20 000 ON 2026-09-06. The old hard-coded 500 was a silent",
-      "data loss: a 754-row CSV decoded to 500 rows, so a fact in row 600 was",
-      "not decoded, not indexed and not citable, with a `*(table truncated)*`",
-      "line as the only signal."
-    ],
-    "fields": {
-      "max_table_rows": {
-        "type": "int",
-        "required": "never",
-        "doc": "data rows admitted from one table (per SHEET for .xlsx). Default 20000; must be >= 1. Higher costs query latency: refer chunks one passage per row, and rescore is O(passages)"
-      }
-    },
-    "example": {
-      "max_table_rows": 20000
-    }
-  },
   "_retired_keys": {
     "_doc": [
       "Keys that once existed and now STOP THE RUN with instructions rather than",
       "being ignored. A silently-ignored key is a config a person believes is in",
       "force and is not.",
       "",
-      "Both were breaking changes taken deliberately while they were cheapest."
+      "Each was a breaking change taken deliberately while it was cheapest."
     ],
     "middleware": "renamed to `fetcher`; the file also moved from .fux/middleware/ to .fux/fetchers/",
     "sources.dirs": "the corpus left fux.toml for `.fux/sources/dirs`, one entry per line",
-    "ranking": "moved to `.fux/tune.toml` -- it changes ordering, not the index"
+    "ranking": "moved to `.fux/tune.toml` -- it changes ordering, not the index",
+    "decode": "moved to `.fux/tune.toml [index]` on 2026-09-11 -- `max_table_rows` sits beside `max_phrases`, the two keys there that change the index"
   }
 }

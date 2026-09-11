@@ -58,8 +58,10 @@ __all__ = ["Passage", "chunk"]
 _TABLE_ROW_RE = re.compile(r"^\s*\|")
 _TABLE_SEP_RE = re.compile(r"^\s*\|[\s:|-]+\|?\s*$")
 
-#: Below this, a section is folded into the next one rather than standing
-#: alone. A two-line passage is a citation nobody can read in isolation.
+#: Below this, a section MAY be folded forward — but only into a section
+#: NESTED INSIDE it (`_fold`). Size alone was never the right test: a two-line
+#: stub heading is a citation nobody can read in isolation, and a two-line
+#: slide is a whole slide. Depth is what separates them.
 MIN_PASSAGE_BYTES = 120
 
 #: Above this, a section is split on paragraph boundaries. A single 40 KB
@@ -80,15 +82,9 @@ MAX_PASSAGE_BYTES = 4000
 #:
 #: ⚠ **The cost is real and was accepted with the number in hand.** `rescore`
 #: is O(passages), so a 20 000-row sheet costs ~2.6 s per document per
-#: query. `[decode] max_table_rows` is the lever a consumer with big sheets
+#: query. `.fux/tune.toml [index] max_table_rows` is the lever a consumer with big sheets
 #: turns.
 TABLE_ROWS_PER_PASSAGE = 1
-
-#: The heading level a `page` decoder uses to mark one page, slide or message.
-#: Two, because that is what `pptx`, `mail` and `drawio` already emit — the
-#: `#` above it is the document's own title.
-PAGE_LEVEL = 2
-
 
 @dataclass(frozen=True)
 class Passage:
@@ -110,6 +106,13 @@ class Passage:
     ordinal: int
     line_start: int = 0
     line_end: int = 0
+    #: Which rung of `_descend`'s ladder cut this passage, or `""` when it ends
+    #: at a boundary the author wrote. `"line"` and `"word"` are progressively
+    #: less honest places to stop, and a reader is told which — a span cut
+    #: between two words is a real citation and must not pretend to be a
+    #: paragraph. ⚠ Several `"word"` passages can share one line range, because
+    #: they all came from the same line; `ordinal` is what separates them.
+    cut: str = ""
 
     @property
     def nbytes(self) -> int:
@@ -122,9 +125,13 @@ def chunk(
     min_passage_bytes: int = MIN_PASSAGE_BYTES,
     max_passage_bytes: int = MAX_PASSAGE_BYTES,
     line_numbers: bool = True,
-    strategy: str = "heading",
 ) -> list[Passage]:
-    """Split into heading-delimited passages, in document order.
+    """Split into passages, in document order.
+
+    **There is no strategy parameter and no `CHUNK` to declare.** What a
+    passage is — a table row, an atomic unit, a prose section, the whole file —
+    is derived from the document's own heading depth by `_fold`. A caller
+    cannot get it wrong because there is nothing to get wrong.
 
     Deterministic and total: every byte of the input lands in exactly one
     passage, and the same input always produces the same list. Text before the
@@ -150,18 +157,11 @@ def chunk(
     `line_numbers=False` suppresses `line_start`/`line_end` for a document
     whose text was generated rather than read — see the module docstring.
     """
-    if strategy == "page":
-        # A page is atomic: it is never merged into a neighbour, and a heading
-        # INSIDE it does not start a new passage. Both halves matter — see
-        # `_pages` for the two defects each one closes.
-        merged = _pages(content)
-    else:
-        sections = _sections(content)
-        merged = _merge_runts(sections, min_passage_bytes=min_passage_bytes)
+    merged = _fold(_sections(content), min_passage_bytes=min_passage_bytes)
 
     passages: list[Passage] = []
-    for heading, text, start, end in merged:
-        for piece, offset, span in _pieces(text, max_passage_bytes):
+    for heading, _level, text, start, end in merged:
+        for piece, offset, span, rung in _pieces(text, max_passage_bytes):
             piece_start = start + offset
             passages.append(
                 Passage(
@@ -170,49 +170,21 @@ def chunk(
                     ordinal=len(passages),
                     line_start=piece_start if line_numbers else 0,
                     line_end=min(end, piece_start + span - 1) if line_numbers else 0,
+                    cut=rung,
                 )
             )
     return passages
 
 
-def _pages(content: str) -> list[tuple[str, str, int, int]]:
-    """`(heading, text, line_start, line_end)` per PAGE, for `strategy="page"`.
+def _sections(content: str) -> list[tuple[str, int, str, int, int]]:
+    """`(heading, level, text, line_start, line_end)`, 1-based and inclusive.
 
-    A page — a slide, an mbox message, a diagram page — is a complete unit, and
-    the heading strategy got it wrong in two directions at once. Both were
-    measured on 2026-09-06 before this was written:
-
-    **1. Pages were absorbed by their neighbours.** `_merge_runts` folds a
-    short section forward, and `_sibling_run` only exempts a RUN of short ones.
-    A short slide between two long ones is not a run, so on a three-slide deck
-    `## Slide 1`'s content was cited as `deck.pptx` and `## Slide 3`'s as
-    `Slide 2` — **systematically the wrong attribution**, which is worse than a
-    coarse citation because it is confidently wrong.
-
-    **2. Pages were shattered from inside.** An `.mbox` message whose body is
-    HTML emits that body's own `<h1>` as a level-1 heading, **outranking** the
-    `## Subject` above it: one email became four passages, two of them cited as
-    though they were top-level units of the archive. `mail.py` now demotes an
-    embedded body's headings, and this function ignores anything deeper than
-    `PAGE_LEVEL` regardless — belt and braces, because the decoder is consumer-
-    replaceable and this invariant is not.
-
-    Text before the first page heading is its own section, so a document title
-    (`# archive.mbox`) is not lost.
-    """
-    starts = {h.lineno: h for h in _headings(content) if h.level <= PAGE_LEVEL}
-    lines = content.split("\n")
-    sections: list[tuple[str, list[str], int]] = [("", [], 1)]
-    for lineno, line in enumerate(lines, start=1):
-        if lineno in starts:
-            sections.append((starts[lineno].text, [line], lineno))
-        else:
-            sections[-1][1].append(line)
-    return _spans(sections)
-
-
-def _sections(content: str) -> list[tuple[str, str, int, int]]:
-    """`(heading, text, line_start, line_end)`, 1-based and inclusive.
+    **The LEVEL is what makes a unit a unit.** It is carried out of here rather
+    than discarded because `_fold` needs one fact and only one: is the next
+    section *nested inside* this one, or *standing beside* it? That single
+    question separates a slide from a subsection, a JSONL record from a stub
+    heading, and an `[auth]` block from a paragraph — with no format knowledge
+    anywhere in this module and nothing for a decoder to declare.
 
     The line numbers are tracked here rather than recovered later because the
     text is `strip`ped: once leading blank lines are gone, the offset that
@@ -223,26 +195,27 @@ def _sections(content: str) -> list[tuple[str, str, int, int]]:
     # list exactly. `splitlines()` also breaks on \r, \v, \f and U+2028, any
     # one of which would desynchronise the two and cite the wrong lines.
     lines = content.split("\n")
-    starts = {h.lineno: h.text for h in _headings(content)}
-    sections: list[tuple[str, list[str], int]] = [("", [], 1)]
+    starts = {h.lineno: h for h in _headings(content)}
+    # Level 0 is the preamble: text before any heading. It is not a heading of
+    # level 0 in Markdown, it is the absence of one — which is exactly the
+    # right value here, because nothing can be nested inside it.
+    sections: list[tuple[str, int, list[str], int]] = [("", 0, [], 1)]
     for lineno, line in enumerate(lines, start=1):
-        if lineno in starts:
-            sections.append((starts[lineno], [line], lineno))
+        found = starts.get(lineno)
+        if found is not None:
+            sections.append((found.text, found.level, [line], lineno))
         else:
-            sections[-1][1].append(line)
+            sections[-1][2].append(line)
 
     return _spans(sections)
 
 
-def _spans(sections: list[tuple[str, list[str], int]]) -> list[tuple[str, str, int, int]]:
-    """`(heading, lines, start)` -> `(heading, text, line_start, line_end)`.
-
-    Shared by `_sections` and `_pages` so the two strategies cannot disagree
-    about what a span's line range means — the drift that cost this file its
-    two private heading regexes.
-    """
-    out: list[tuple[str, str, int, int]] = []
-    for heading, lines, start in sections:
+def _spans(
+    sections: list[tuple[str, int, list[str], int]],
+) -> list[tuple[str, int, str, int, int]]:
+    """`(heading, level, lines, start)` -> `(heading, level, text, start, end)`."""
+    out: list[tuple[str, int, str, int, int]] = []
+    for heading, level, lines, start in sections:
         joined = "\n".join(lines)
         if not joined.strip():
             continue
@@ -251,92 +224,142 @@ def _spans(sections: list[tuple[str, list[str], int]]) -> list[tuple[str, str, i
         leading = len(lines) - len(joined.lstrip("\n").split("\n"))
         text = joined.strip("\n")
         real_start = start + max(0, leading)
-        out.append((heading, text, real_start, real_start + text.count("\n")))
+        out.append((heading, level, text, real_start, real_start + text.count("\n")))
     return out
 
 
-def _merge_runts(
-    sections: list[tuple[str, str, int, int]],
+def _title_index(sections: list[tuple[str, int, str, int, int]]) -> int:
+    """Index of the document TITLE section, or -1 if the document has none.
+
+    Three conditions, all structural — no format knowledge, no filenames:
+
+    1. it is the **first** headed section;
+    2. it is **strictly shallower** than every other heading;
+    3. it has **no body of its own** — the section is its heading line and
+       nothing else.
+
+    Condition 3 is the one that does the work. `# deck.pptx` above a run of
+    slides is a name for the file; `## Notes` above `### Detail` is a real
+    section that happens to be short, and calling it a title would cite its
+    content under `Detail` — naming a subsection as though it were the thing.
+    A heading with prose under it is a section, whatever its depth.
+
+    ⚠ **A titled document whose title carries a preface is not detected**, and
+    that is correct rather than a gap: a title with prose under it *is* a
+    section, so it names its own passage like any other.
+    """
+    headed = [i for i, s in enumerate(sections) if s[0]]
+    if len(headed) < 2:
+        return -1
+    first = headed[0]
+    heading, level, text, _, _ = sections[first]
+    if text.strip() != text.strip().split("\n")[0].strip():
+        return -1  # it has a body: a section, not a title
+    return first if all(sections[i][1] > level for i in headed[1:]) else -1
+
+
+def _fold(
+    sections: list[tuple[str, int, str, int, int]],
     *,
     min_passage_bytes: int = MIN_PASSAGE_BYTES,
-) -> list[tuple[str, str, int, int]]:
-    """Fold a too-short section forward into the next one.
+) -> list[tuple[str, int, str, int, int]]:
+    """Fold a short section forward **only into a section nested inside it**.
 
-    Forward rather than backward: a stub heading almost always introduces what
-    follows it, so `## Notes` + the paragraph under the *next* heading reads
-    correctly, while appending it to the previous section reads as a non
-    sequitur.
+    ## This one rule is the whole chunking vocabulary
+
+    There is no `CHUNK` to declare and no strategy to pick. What a passage is
+    falls out of the document's own heading depth:
+
+    | the document says | what falls out | example |
+    |---|---|---|
+    | short section, next one is DEEPER | they fold — the stub introduces it | `## Notes` then `### Detail` |
+    | sections at the SAME level | each stands alone, whatever its size | `## Slide 1`, `## Slide 2` |
+    | one heading, no siblings | the whole file is one passage | `.svg`, an image's metadata |
+    | a Markdown table | one row per passage (`_table_bands`) | `.csv`, a table inside a `.docx` |
+
+    A slide, an mbox message, a PDF page, a JSONL record, an `[auth]` section
+    and a top-level JSON key are **the same object**: each is one of a set of
+    siblings, so none of them can fold, so each stands alone. That is what the
+    retired `page` strategy was buying, bought instead by asking the document.
+
+    🔴 **What the old rule got wrong, measured 2026-09-06.** It folded on size
+    alone, exempting only a *run* of short headed sections.
+    A short slide between two long ones is not a run, so on a three-slide deck
+    `## Slide 1`'s content was cited as `deck.pptx` and `## Slide 3`'s as
+    `Slide 2` — **systematically the wrong attribution**, which is worse than a
+    coarse citation because it is confidently wrong. The same defect hit a
+    two-record `.jsonl` and every multi-page `.pdf`. Depth answers all of them
+    at once: siblings never fold, so a lone short sibling cannot be absorbed.
+
+    ⚠ **Forward, and the PARENT\'s heading survives the fold** — a subsection
+    belongs to the section enclosing it, so `## Subject one` swallowing its own
+    `### Body head` is still cited as `Subject one`. Labelling by the deepest
+    heading instead would cite a whole email as `Deeper`, naming a detail of
+    the body rather than the message.
+
+    🔴 **...with ONE exception, and without it the original defect survives.**
+    The **document title** — the first heading, when it is strictly shallower
+    than every other heading in the document — is not a section. It is the
+    name of the whole file, it usually has no body of its own, and it is short,
+    so it always folds. Letting it supply the merged heading is how
+    `# deck.pptx` came to be cited as the source of slide 1\'s content. It
+    folds like anything else, carrying its text as context, but **it never
+    names a passage that contains something else**.
     """
-    out: list[tuple[str, str, int, int]] = []
+    out: list[tuple[str, int, str, int, int]] = []
     carry: list[str] = []
     carry_heading = ""
+    carry_level = 0
     carry_start = 0
-    for index, (heading, text, start, end) in enumerate(sections):
-        if len(text.encode("utf-8")) < min_passage_bytes and (heading or carry) and not _sibling_run(
-            sections, index, min_passage_bytes
-        ):
+    title = _title_index(sections)
+    for index, (heading, level, text, start, end) in enumerate(sections):
+        nxt = sections[index + 1] if index + 1 < len(sections) else None
+        short = len(text.encode("utf-8")) < min_passage_bytes
+        # Strictly deeper: `>` and never `>=`, because `>=` is the sibling case
+        # and the sibling case is the defect.
+        nested = nxt is not None and nxt[1] > level
+        if short and nested:
             if not carry:
-                carry_heading = heading
                 carry_start = start
+            # The title carries its TEXT but not its NAME, so the FIRST real
+            # section in the fold gets to name it. Guarding on `carry` instead
+            # would let the title's empty name win for the whole run, and
+            # `carry_heading or heading` would then fall through to the
+            # DEEPEST heading — citing a whole email as `Deeper`.
+            if not carry_heading and index != title:
+                carry_heading, carry_level = heading, level
             carry.append(text)
             continue
         if carry:
             # A merged passage spans from the first fragment's first line to
             # this section's last: the merge is contiguous in the source, so
             # the range stays a real range rather than a union of holes.
-            out.append((carry_heading or heading, "\n\n".join(carry + [text]), carry_start, end))
+            #
+            out.append(
+                (
+                    carry_heading or heading,
+                    carry_level or level,
+                    "\n\n".join(carry + [text]),
+                    carry_start,
+                    end,
+                )
+            )
             carry = []
             carry_heading = ""
+            carry_level = 0
         else:
-            out.append((heading, text, start, end))
+            out.append((heading, level, text, start, end))
     if carry:
-        if out:  # nothing left to fold into: fold back rather than drop
-            last_heading, last_text, last_start, _ = out[-1]
-            out[-1] = (last_heading, "\n\n".join([last_text] + carry), last_start, sections[-1][3])
-        else:
-            out.append((carry_heading, "\n\n".join(carry), carry_start or 1, sections[-1][3]))
+        # Unreachable: a section only carries when a DEEPER one follows it, so
+        # the last section can never be carrying. Kept total rather than
+        # asserted — a chunker that raises loses the document.
+        out.append(
+            (carry_heading, carry_level, "\n\n".join(carry), carry_start or 1, sections[-1][4])
+        )
     return out
 
 
-def _sibling_run(
-    sections: list[tuple[str, str, int, int]], index: int, min_passage_bytes: int
-) -> bool:
-    """Whether this section is one of a RUN of short headed sections.
-
-    ## Why the floor needed an exception, and why this is the shape of it
-
-    `MIN_PASSAGE_BYTES` exists because *"a two-line passage is a citation nobody
-    can read in isolation"*. That is true of a stub heading — `## Notes` with one
-    line under it — and false of a **complete short unit**: a slide, a JSONL
-    record, a band of table rows. Three instances were measured before this was
-    written, which is what turned it from a tuning question into a defect:
-
-    * a `.pptx` slide with a title and two bullets merged into the next slide,
-      so a citation headed `Slide 3` carried slide 4's content;
-    * six small `.jsonl` records emitted six `## Record` headings and came back
-      as **one** passage, only `Record 1` surviving — and a log line is exactly
-      the small case;
-    * the same fate awaited any short band of a small table.
-
-    The distinguishing property is not size, it is **company**. A stub heading is
-    followed by something substantial; a record in a run is surrounded by other
-    records. So a headed section stands alone when either neighbour is also a
-    short headed section, and folds otherwise — which leaves the original rule
-    doing exactly the job it was written for.
-    """
-    if not sections[index][0]:
-        return False  # a preamble is never a sibling; the old rule governs it
-
-    def short_and_headed(other: int) -> bool:
-        if not 0 <= other < len(sections):
-            return False
-        heading, text, _, _ = sections[other]
-        return bool(heading) and len(text.encode("utf-8")) < min_passage_bytes
-
-    return short_and_headed(index - 1) or short_and_headed(index + 1)
-
-
-def _pieces(text: str, max_passage_bytes: int = MAX_PASSAGE_BYTES) -> list[tuple[str, int, int]]:
+def _pieces(text: str, max_passage_bytes: int = MAX_PASSAGE_BYTES) -> list[tuple[str, int, int, str]]:
     """`(piece, line_offset, source_lines)` — the oversized split, with each
     piece's position and reach in the source.
 
@@ -355,7 +378,7 @@ def _pieces(text: str, max_passage_bytes: int = MAX_PASSAGE_BYTES) -> list[tuple
     to use. That is a bound the assembler then enforces by not seating it,
     rather than a passage cut mid-sentence and cited as if it were the author's.
     """
-    out: list[tuple[str, int, int]] = []
+    out: list[tuple[str, int, int, str]] = []
     # ⚠ **No early return for a small section**, and that is deliberate. It used
     # to short-circuit whenever the section fitted the ceiling, which meant a
     # ten-row table — the common case — never reached the row split at all and
@@ -372,7 +395,7 @@ def _pieces(text: str, max_passage_bytes: int = MAX_PASSAGE_BYTES) -> list[tuple
             return
         piece = "\n\n".join(current)
         span = piece.count("\n") + 1
-        out.append((piece, cursor, span))
+        out.append((piece, cursor, span, ""))
         cursor += span + 1  # the blank line that separated this piece from the next
         current, size = [], 0
 
@@ -395,15 +418,93 @@ def _pieces(text: str, max_passage_bytes: int = MAX_PASSAGE_BYTES) -> list[tuple
                 bands[0] = (pending + "\n\n" + head, pending.count("\n") + 1 + 1 + span)
                 current, size = [], 0
             for band, span in bands:
-                out.append((band, cursor, span))
+                out.append((band, cursor, span, ""))
                 cursor += span  # bands are contiguous rows: no blank line between
             cursor += 1  # ...but a blank line does follow the table itself
+            continue
+        if paragraph_size > max_passage_bytes:
+            # Not a table, and too big for the ceiling: descend the ladder
+            # rather than hand the assembler something it will refuse.
+            flush()
+            for piece, span, rung in _descend(paragraph, max_passage_bytes):
+                out.append((piece, cursor, span, rung))
+                cursor += span
+            cursor += 1
             continue
         if current and size + paragraph_size > max_passage_bytes:
             flush()
         current.append(paragraph)
         size += paragraph_size
     flush()
+    return out
+
+
+def _descend(paragraph: str, max_passage_bytes: int) -> list[tuple[str, int, str]]:
+    """One oversized paragraph -> `(piece, source_lines, rung)`, cut at the best
+    boundary available.
+
+    ## Why there is no sentence rung
+
+    The obvious ladder is paragraph -> **sentence** -> word, and
+    [UAX #29](http://www.unicode.org/reports/tr29/), the standard for exactly
+    this, refuses it: *"Plain text provides inadequate information for
+    determining good sentence boundaries. Periods can signal the end of a
+    sentence, indicate abbreviations, or be used for decimal points… Without
+    analyzing the text semantically, it is impossible to be certain."* Doing it
+    properly needs CLDR locale data for boundary suppressions — **a dependency
+    (L1)** — and doing it improperly cuts inside `e.g.`, `Dr.` and `3.5`, which
+    is the mid-sentence cut this module already refuses.
+
+    So the ladder uses only boundaries that need no knowledge of any language:
+
+    | rung | boundary | reaches it |
+    |---|---|---|
+    | `""` | blank line | the only rung before 2026-09-06 |
+    | `line` | a single newline | nearly all real prose |
+    | `word` | a space | only a paragraph that is also one unbroken line |
+
+    ## What it fixes
+
+    🔴 A 12 KB document with no blank line came back as **one 10 889-byte
+    passage**, over the ceiling and over the whole caller's budget, so the
+    assembler seated **zero citations**: the document ranked and could not be
+    quoted. Returning nothing is strictly worse than returning a span that says
+    where it was cut.
+    """
+    lines = paragraph.split("\n")
+    if len(lines) > 1:
+        out: list[tuple[str, int, str]] = []
+        current: list[str] = []
+        size = 0
+        for line in lines:
+            line_size = len(line.encode("utf-8")) + 1
+            if current and size + line_size > max_passage_bytes:
+                out.append(("\n".join(current), len(current), "line"))
+                current, size = [], 0
+            current.append(line)
+            size += line_size
+        if current:
+            out.append(("\n".join(current), len(current), "line"))
+        if len(out) > 1:
+            return out
+        # One line's worth after all -- fall through to the word rung rather
+        # than returning the same oversized piece under a different name.
+        paragraph = out[0][0] if out else paragraph
+
+    words = paragraph.split(" ")
+    if len(words) < 2:
+        return [(paragraph, paragraph.count("\n") + 1, "")]  # nothing to cut on
+    out = []
+    current, size = [], 0
+    for word in words:
+        word_size = len(word.encode("utf-8")) + 1
+        if current and size + word_size > max_passage_bytes:
+            out.append((" ".join(current), 1, "word"))
+            current, size = [], 0
+        current.append(word)
+        size += word_size
+    if current:
+        out.append((" ".join(current), 1, "word"))
     return out
 
 

@@ -229,39 +229,38 @@ def test_a_very_long_array_is_truncated_and_says_so():
     assert "*(array truncated)*" in out
 
 
-# -- the page strategy, declared by the decoders that need it ----------------
+# -- the unit falls out of the headings a decoder emits ----------------------
 
 
-def test_the_three_page_decoders_declare_it():
-    """`CHUNK` is opt-in on the `WANTS_PATH` precedent, so a decoder that says
-    nothing still means `heading`."""
+def test_no_decoder_declares_a_chunk_strategy():
+    """🔴 `CHUNK` was removed on 2026-09-06. It existed because the chunker
+    folded short sections into their neighbours regardless of depth, so a
+    format whose units are small had to opt out. Depth answers that without a
+    declaration, and a name nobody needs is a name that can be typo'd."""
     from fux.decode import registry
 
     r = registry()
-    assert r[".pptx"].chunk == "page"
-    assert r[".mbox"].chunk == "page" and r[".eml"].chunk == "page"
-    assert r[".drawio"].chunk == "page"
-    assert r[".csv"].chunk == "heading"
-    assert r[".md"] if ".md" in r else True
+    for decoder in r.values():
+        assert not hasattr(decoder, "chunk"), decoder.name
 
 
-def test_an_unknown_chunk_strategy_is_a_hard_error(tmp_path):
-    """A typo that silently fell back to `heading` would be a citation defect
-    with no signal — the shape decision 7 refuses for a missing dependency."""
-    import pytest
+def test_the_page_shaped_decoders_still_emit_sibling_headings():
+    """What replaced the declaration. `pptx`, `mail` and `drawio` get atomic
+    passages because each unit is one of a run of SIBLINGS under the file's
+    title — a structural fact `_chunk._fold` can see, not a claim it must be
+    told. This pins the emission the guarantee now rests on."""
+    from fux.decode._markdown import headings
+    from fux.refer._chunk import chunk
 
-    from fux.decode import _chunk_strategy
-    from fux.errors import FuxError
-
-    class Bad:
-        CHUNK = "pages"
-
-    with pytest.raises(FuxError, match="pages"):
-        _chunk_strategy(Bad, "baddoc")
+    out = decode(MBOX, "archive.mbox")
+    levels = [h.level for h in headings(out)]
+    assert levels[0] == 1, "the file's own title"
+    assert set(levels[1:]) == {2}, "every message a sibling of every other"
+    assert [p.heading for p in chunk(out)] == ["First thread", "Second thread"]
 
 
 def test_an_html_email_body_cannot_outrank_its_own_subject():
-    """🔴 `htmldoc` maps `<h1>` to `#`, so a message body emitted a LEVEL-1
+    """🔴 `html` maps `<h1>` to `#`, so a message body emitted a LEVEL-1
     heading under its own `## Subject`. One email became four passages, two
     cited as top-level units of the archive."""
     mbox = (

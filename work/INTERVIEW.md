@@ -27,8 +27,28 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-09-05**.* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-09-11**.* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
+
+### `[index]` in tune.toml: `max_phrases` (12 -> 32) and `max_table_rows` (2026-09-11, latest — uncommitted)
+
+- **Ruling (Arpit):** both index limits live in `.fux/tune.toml [index]`, not
+  `fux.toml`. It is the **declared exception** to ADR-TUNE decision 1 — ingest
+  reads it via `tune.index_limits()` only, `--no-tune` does not reach it, and
+  the boundary test asserts it DOES move bytes. ADR-TUNE decision 13.
+- **Default `max_phrases = 32`** — display only; measured on this repo's 563
+  markdown docs (ADR-EXTRACTED decision 9). Dedup of repeated headings was
+  **declined** on numbers (0.24 % of the index) and on reuse/shard grounds.
+- **A changed `[index]` re-extracts** via `runtime/extract-config-digest`,
+  written after `write_index`. This closed a live hole: `max_table_rows` never
+  reached unchanged CSVs on delta runs since 2026-09-06.
+- **Not done, and why:** uncommitted (the freshness gate will also want
+  ADR-ACQUIRED / ADR-URL-FRESHNESS, which describe `config.py`); `pii-digest`'s
+  write-before-extract exposure filed, not fixed; this repo's index needs one
+  `fux ingest` on a Python ≥ 3.11 machine.
+- **Lesson:** a recommended fux.toml table was checked against the code and
+  not against ADR-CONFIG's veto list — the veto was already breached. **Read the
+  veto conditions of the record that owns a file before proposing a new key in it.**
 
 ### W-101 landed: `fux doctor` closed FIVE gaps, and two accepted vetoes can now be run (2026-09-05, latest)
 

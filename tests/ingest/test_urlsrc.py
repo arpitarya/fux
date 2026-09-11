@@ -658,7 +658,7 @@ def test_no_surviving_record_points_at_an_id_this_run_does_not_hold(tmp_path):
 # --- The skip reason must say which of two very different things happened ----
 #
 # Measured 2026-08-27 against `https://httpbin.org/uuid` in the fux-lab daemon
-# environment: fux reported `no decoder for application/json` while `jsondoc`
+# environment: fux reported `no decoder for application/json` while `json`
 # was built in, claimed `.json`, ran, and correctly dropped a bare UUID —
 # leaving nothing to index. The message sent a reader looking for a decoder
 # that was already there. `decode.reason()` has always drawn this distinction
@@ -673,15 +673,15 @@ def test_a_decoder_that_ran_and_found_nothing_is_not_reported_as_missing():
 
     assert markdown is None
     assert "no decoder" not in why, (
-        "jsondoc is built in and claims .json — saying there is no decoder is false"
+        "json is built in and claims .json — saying there is no decoder is false"
     )
-    assert why == "jsondoc: nothing readable in .json"
+    assert why == "json: nothing readable in .json"
 
 
 def test_a_type_nothing_claims_still_says_no_decoder():
     """The other half. Narrowing the message must not remove the true case.
 
-    `image/png` stopped being an example of this on 2026-08-29 — `imagedoc`
+    `image/png` stopped being an example of this on 2026-08-29 — `image`
     is now built in and claims `.png`. `image/webp` has no fux decoder.
     """
     from fux.ingest.urlsrc import _decode_fetched

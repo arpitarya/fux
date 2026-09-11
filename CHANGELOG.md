@@ -8,7 +8,91 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Changed
+
+- **`phrases` keeps up to 32 headings, and the cap is `.fux/tune.toml [index]
+  max_phrases`** (Arpit, 2026-09-11). It was a hard-coded 12: on fux's own
+  corpus 87 of 563 markdown documents lost 1 055 headings, and 262 of the slots
+  that survived held template headings (`Context`, `Decision`). At 32, 98.2 %
+  keep every heading for ~0.3 % more index. **Display only** — ranking already
+  read every heading. [ADR-EXTRACTED](docs/adr/0025_extracted-mode.md) decision 9.
+- ⚠ **BREAKING: `fux.toml [decode]` is refused.** `max_table_rows` moved to
+  `.fux/tune.toml [index]`, beside `max_phrases`. `[index]` is tune.toml's one
+  declared exception to "nothing here changes the index": `fux ingest` reads it,
+  `--no-tune` does not undo it, and changing it re-extracts.
+  [ADR-TUNE](docs/adr/0045_tuning.md) decision 13.
+- **Fixed: a changed `max_table_rows` never reached an unchanged CSV on a delta
+  ingest** (since 2026-09-06), so delta and `--full` disagreed. Ingest now keeps
+  a digest of `[index]` in `.fux/runtime/` and re-extracts when it moves —
+  recorded only after the index is written, so a stopped run cannot hide it.
+  [ADR-INGEST](docs/adr/0016_ingest.md) decision 15b. **The first ingest after
+  upgrading re-extracts every document once.**
+
 ### Added
+
+- **`tests/test_open_work_is_not_stale.py` — the work queue now checks itself.**
+  Five checks over `work/OPEN-WORK.md`'s *Blocked on Arpit* table: an age is
+  arithmetic against `filed`; every link resolves; no tombstone sits in the
+  inbox; a row's subject id has no `## W-nn` landing record in
+  `IMPLEMENTATION.md`; and the header's overdue count matches the table beneath
+  it. 🔴 **It catches the mechanical half of staleness and says so in its own
+  docstring** — the two rows cleaned the same day were false *in their
+  sentences*, with live links and correct ages, and nothing here would have
+  caught them. Guessing at claim truth would pass on exactly those. ⚠ **The
+  rules it enforces live in `CLAUDE.md` and `OPEN-WORK.md`'s footer and in no
+  ADR**, so the test is an unowned guard — filed to W-122 Phase 1.
+
+- **ADR-RS — a FIFTH way a prediction can end: `VOID`** (Arpit, 2026-09-06),
+  for a bar that could not be applied at all. 🔴 **Distinct from
+  `INCONCLUSIVE`, and conflating them destroys the finding:** INCONCLUSIVE is
+  *the instrument could not discriminate*; VOID is *the measurement was fine
+  and the bar was not a bar*. ⚠ It is **not a soft FAIL** — a bar that could
+  not be applied did not rule against what it measured, and only the
+  adjudication is withdrawn, never the controls. **Only Arpit may void a bar**,
+  on the same rule that sends an ambiguous result to him. `tests/test_regression_runs.py`
+  accepts the value.
+
+- **ADR-QUALITY decision 2a — a bar on `recall@k` names its `k`, or it is
+  VOID** (Arpit ruled, 2026-09-06). `recall@k` is a curve, so a bar that omits
+  `k` is four bars whose verdicts can disagree, and whoever supplies the
+  missing `k` afterwards picks the verdict — a moving threshold wearing an
+  omission instead of an edit. Such a bar has **not failed and has not
+  passed**. A `k` justified by a ceiling effect must be justified **in the
+  pre-registration**, against the clean-arm curve the record publishes.
+
+### Changed
+
+- 🔴 **W-110's gate is VOID, and `fux enrich`'s questions body is now recorded
+  as BUILT AND UNPROVEN**
+  ([`W110-DOC2QUERY`](work/regression/2026-09-05-doc2query/VERDICT.md)). Its
+  bar — *net ≥ 6 on `recall@k`* — never named `k`: the run is **+7 at `k = 1`**
+  and **+3 / +2 / +1** at `3 / 5 / 10`, because `recall@10` is already
+  `0.9884` with no enrichment at all. **No behaviour changed** — the feature
+  stays shipped on ADR-ENRICH decision 15's own argument (prose measured
+  `+1 / −1`; a question is a checkable object) — but the record no longer
+  reads as *measured and passing*. ✅ **The placebo control is not voided with
+  it**: 0 discordant queries at every `k`, so the gain is the content of the
+  questions rather than more bytes or more files, and **no query regressed in
+  any arm**. ⚠ The doc2query−− filter is **unproven, not disproven** — 2 of 98
+  questions, a 2 % treatment.
+
+- **ADR-RANKING decision 8a — `round(score, 9)` is the cross-runtime contract
+  for the score; the ORDER stays byte-equal** (Arpit ruled, 2026-09-06).
+  Two runtimes reading one committed index agree on `round(score, 9)`, not
+  necessarily on the score's last bit: `log` is the one transcendental in
+  `score_record`, and two IEEE-conforming libms disagree by one ulp on ~7 % of
+  the arguments fux can hand it. Measured on **darwin/arm64 and glibc 2.39 /
+  x86-64**, with `idf`'s argument domain **enumerated rather than sampled** —
+  all 10 939 arguments `df = 1..n` at `n ∈ {101, 838, 10 000}`, of which
+  **841 (7.69 %) differ bit-for-bit and 0 differ at `round(9)`**
+  ([the run](work/regression/2026-09-05-node-log-divergence/ADDENDUM-GLIBC.md)).
+  **Nine places is not a tolerance invented to pass a test** — it is the
+  resolution `rank.py`'s sort key already uses, seven orders of magnitude above
+  the largest divergence measured. ⚠ **Nothing about the ORDER is licensed**: a
+  discordant top-5 is a defect under this decision. No Python behaviour
+  changed, no golden was re-derived, and no portable `log` was added.
+  `work/benchmark/PRE-REGISTRATION-NODE.md` is now **frozen in full**
+  (sha `0e3b4c8`), which unblocks **W-107 Phase 1**.
 
 - 🔴 **L0 — ADRs are the only source of truth, and the Law records outrank
   every other record** (Arpit, 2026-09-06).

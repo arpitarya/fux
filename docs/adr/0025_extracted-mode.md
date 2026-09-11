@@ -5,6 +5,7 @@ title: "ADR-EXTRACTED (0025) — the extracted ingest mode"
 description: "The deterministic ingest mode, ratified by name. Everything is taken from the document; nothing is invented; every guarantee in the paper is stated for this mode and no other."
 status: accepted
 date: 2026-08-19
+amended: 2026-09-11
 feature: the `extracted` ingest mode — the value in every committed record's `mode` property, and the contract it asserts
 owns: [src/fux/ingest/extract.py]
 laws: [L1, L2, L3, L4]
@@ -153,8 +154,9 @@ first.
 the committed value of the `mode` property.
 
 **2. `extracted` asserts a contract, not a label.** A record in this mode
-guarantees: every property is a pure function of the document's bytes, its path
-and the corpus's link structure; no model was consulted at any point; no network
+guarantees: every property is a pure function of the document's bytes, its path,
+the corpus's link structure and the two committed extraction limits in
+`.fux/tune.toml [index]` (decision 9); no model was consulted at any point; no network
 was touched (L4's fenced paths fetch *bytes*, and extraction is still
 deterministic over them); the run is byte-reproducible.
 
@@ -239,8 +241,36 @@ and landed anyway on Arpit's 2026-09-06 ruling that a defect fix does not wait
 on a measurement to tell it a shell comment was never a heading. Recorded as
 unmeasured in `work/OPEN-WORK.md`.
 
+**9. `phrases` holds a document's first `max_phrases` headings, in document
+order, and the cap is committed configuration** — `.fux/tune.toml [index]
+max_phrases`, default **32** (Arpit, 2026-09-11; it was a hard-coded `12`).
+
+- **Display only.** `heading` tf and `flen` are built from **every** heading, so
+  the cap never hides a document from search; it bounds what `fux ask` can show
+  as `§` sections and what `fux answer --no-refer` prints. `tests/ingest/
+  test_extract.py::test_the_cap_truncates_display_never_ranking` holds that.
+- **Why 32, measured on this repository's 563 markdown documents** (median 7
+  headings, p95 19, p99 39, max 338). At **12**, 87 documents were truncated and
+  1 055 headings lost, and **262 of the 1 584 slots in truncated documents held
+  template headings** (`Context`, `Decision`, `Definition of done`) — the
+  headings that told documents apart were the ones cut. At **32**, 98.2 % of
+  documents keep every heading and 91 % of all headings survive, for ~28 KB
+  (~0.3 %) more committed index. Unlimited was declined: +63 KB, and one
+  document alone would print 338 lines under `answer --no-refer`.
+- ⚠ **Post-hoc and single-corpus**, and it is not a ranking claim: no query
+  result changes order, only what is displayed beside it. **The repeat is not
+  deduplicated** — a corpus-wide phrase table would make a record depend on
+  other documents, breaking sha-keyed reuse and single-shard reads, to save
+  ~0.24 % of the index.
+- **Why tune.toml** — [ADR-TUNE](0045_tuning.md) decision 13. **Why a changed
+  cap reaches unchanged documents** — [ADR-INGEST](0016_ingest.md)'s
+  `[index]` digest.
+
 ### Consequences
 
+- ⚠ **Decision 9 changes committed bytes on the next ingest of every existing
+  corpus**: any document with more than 12 headings gains up to 20 `phrases`.
+  No ranking moves. The first ingest after upgrading re-extracts everything once.
 - **The word is load-bearing in two vocabularies at once**, deliberately: the
   mode and the edge grade agree. A change to either is a change to both.
 - **Renaming later is a format change**, not a rename — `_format`/`analyzer`

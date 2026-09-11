@@ -1,0 +1,25 @@
+python 3.11.15 x86_64 ('glibc', '2.39')
+node v22.22.2 x64 linux
+--- logprobe (corpus-sampled idf + wide) ---
+idf arguments (distinct): 84
+wide sample             : 100000
+node v22.22.2 on linux/x64
+idf  : 5/84 differ (5.9524 %)  max rel 1.595e-16  differing at round(9): 0
+wide : 722/100000 differ (0.7220 %)  max rel 2.211e-16  differing at round(9): 0
+--- score.mjs + compare.py (end-to-end BM25F) ---
+node v22.22.2: scored 9647 documents
+documents scored          : 9647
+scores differing bit-for-bit: 428  (4.437 %)
+scores differing at round(9): 0  (0.000 %)
+max relative difference     : 5.211e-16
+queries with a different top-5 (exact sort)   : 0
+queries with a different top-5 (round(9) sort): 0
+per-query rows -> /tmp/per-query-self-glibc.csv
+--- idfdomain (exhaustive idf argument domain) ---
+n=   101: 101 arguments (exhaustive, df=1..n)
+n=   838: 838 arguments (exhaustive, df=1..n)
+n= 10000: 10000 arguments (exhaustive, df=1..n)
+node v22.22.2 on linux/x64
+n=101     : 6/101 differ (5.9406 %)  max rel 1.997e-16  differing at round(9): 0
+n=838     : 61/838 differ (7.2792 %)  max rel 2.135e-16  differing at round(9): 0
+n=10000   : 774/10000 differ (7.7400 %)  max rel 2.208e-16  differing at round(9): 0

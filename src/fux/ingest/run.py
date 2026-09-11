@@ -76,6 +76,7 @@ from dataclasses import dataclass, field, replace
 from pathlib import Path
 
 from .. import store as store_mod
+from .. import tune as tune_mod
 from ..config import DEFAULT_TYPES_FILE as TYPES_FILE
 from ..config import DEFAULT_URLS_FILE
 from ..config import load as load_config
@@ -161,6 +162,10 @@ def run(
 
     covered = dirty_mod.read(root)
     config = load_config(root)
+    # `[index]` alone, never `tune.load()`: a bad ranking knob must not fail an
+    # ingest or a hook, and `--no-tune` does not reach these (ADR-TUNE
+    # decision 13). Read up front so a bad value stops the run before any work.
+    limits = tune_mod.index_limits(root)
     store_mod.ensure_layout(root)  # `.fux/` README + .gitignore, write-if-missing (ADR-DOTFUX)
     files, skipped = walk_sources(
         root,
@@ -317,7 +322,18 @@ def run(
     # lives in `runtime/` -- derived, gitignored, and rebuilt by being wrong once.
     pii_rules = pii_mod.load(root)
     pii_moved = _pii_ruleset_moved(root, pii_rules)
-    reusable = {} if (full or pii_moved) else _reusable(root, existing, file_shas)
+    # ⚠ **The same hole, for committed tune.toml [index]** (2026-09-11).
+    # `max_phrases` decides how many headings a record commits, and
+    # `max_table_rows` decides which rows a table's body holds. Neither moves a
+    # document's sha, so a reuse keyed on the sha alone would carry a record
+    # extracted under the OLD value forward, and a delta run would stop being
+    # byte-identical to a full one (L3). One digest, both keys.
+    # The new digest is RECORDED only after `write_index` (below): a run
+    # stopped before then left the old records in the shards, and a digest
+    # already claiming the new value would let the next delta run reuse them.
+    extract_digest = _extract_config_digest(limits)
+    extract_moved = extract_digest != _read_extract_config_digest(root)
+    reusable = {} if (full or pii_moved or extract_moved) else _reusable(root, existing, file_shas)
     # 🔴 **W-110. An enrichment is a second input to extraction, and reuse was
     # keyed on the DOCUMENT's sha alone.** So a newly written `.fux/enrich/`
     # file changed nothing until the document itself changed or `--full` ran:
@@ -404,6 +420,7 @@ def run(
                 _loc_of(doc_id),
                 parsed[doc_id],
                 ctx,
+                max_phrases=limits.max_phrases,
             )
             p.update(1, detail=_loc_of(doc_id))
     # Re-resolved every run (M5): a new document can resolve a link that
@@ -573,6 +590,8 @@ def run(
     # `covered` and stays pending (ADR-MAINTENANCE decision 1d). A run that
     # was stopped or died never reaches this line, so the list survives it.
     dirty_mod.discard(root, covered)
+    _record_extract_config_digest(root, extract_digest)
+    _record_pii_digest(root, pii_rules)
 
     # W-101 item 4. **Written here and nowhere earlier**: a run that was
     # stopped or that failed never redacted the whole corpus, and a partial
@@ -758,18 +777,69 @@ def _existing_index(root: Path, *, full: bool) -> dict[str, dict]:
 #: "unchanged") would silently keep terms built under retired rules.
 PII_DIGEST_FILE = "pii-digest"
 
+#: The committed inputs to extraction beyond a document's own bytes, from the
+#: last completed run — `.fux/tune.toml [index] max_phrases` and
+#: `max_table_rows`. Derived, gitignored,
+#: and rebuilt by being wrong once, exactly like `pii-digest`: a missing file
+#: reads as "moved" and costs one full extraction.
+EXTRACT_CONFIG_DIGEST_FILE = "extract-config-digest"
+
 #: W-110. `doc_id -> sha of that document's enrichment file`, from the last
 #: run. **Derived and gitignored**, and rebuilt by being wrong once — the
 #: `pii-digest` precedent, per document because enrichment is per document.
 ENRICH_DIGEST_FILE = "enrich-digests.json"
 
 
-def _pii_ruleset_moved(root: Path, rules) -> bool:
-    """Has `.fux/pii.toml` changed since the last run? Records the new answer.
+def _extract_config_digest(limits) -> str:
+    """`[index]`'s values, as one comparable string."""
+    return f"max_phrases={limits.max_phrases}\nmax_table_rows={limits.max_table_rows}"
 
-    A repo with no rules writes no state and behaves exactly as it did before
-    this feature existed -- the empty digest is compared against an absent
-    file, both read as "", and nothing is created.
+
+def _read_extract_config_digest(root: Path) -> str:
+    """The digest the last COMPLETED run recorded, or `""`.
+
+    **Unlike `pii-digest` there is no "feature off" state that writes nothing**:
+    a cap always has a value, so a missing file always reads as moved. That is
+    the point on upgrade — the first run after the phrases default went
+    12 -> 32 (2026-09-11) is exactly the run that must re-extract. Wasteful
+    once on a fresh clone, never wrong.
+    """
+    from ..store import fuxdir
+
+    try:
+        return (fuxdir.fux_dir(root) / "runtime" / EXTRACT_CONFIG_DIGEST_FILE).read_text(
+            encoding="utf-8"
+        ).strip()
+    except OSError:
+        return ""
+
+
+def _record_extract_config_digest(root: Path, digest: str) -> None:
+    """Remember `digest` — called only once `write_index` has returned."""
+    from ..store import fuxdir
+
+    try:
+        fuxdir.derived_dir(root, "runtime")
+        path = fuxdir.fux_dir(root) / "runtime" / EXTRACT_CONFIG_DIGEST_FILE
+        if not path.is_file() or path.read_text(encoding="utf-8").strip() != digest:
+            path.write_text(digest + "\n", encoding="utf-8")
+    except OSError:
+        pass  # the next run re-extracts too; never a reason to fail an ingest
+
+
+def _pii_ruleset_moved(root: Path, rules) -> bool:
+    """Has `.fux/pii.toml` changed since the last run? **Asks only.**
+
+    A repo with no rules has no state -- the empty digest is compared against
+    an absent file, both read as "", and the answer is "not moved".
+
+    ⚠ **This function used to record the new digest as well, and that was the
+    defect** (fixed 2026-09-11). Recording it here meant a run that was
+    interrupted between this call and `write_index` had already claimed the new
+    ruleset, so the next delta run reused terms built under the OLD one and
+    nothing ever re-extracted them. `_record_pii_digest` is now called after
+    `write_index` returns, which is `extract-config-digest`'s ordering and the
+    reason the two are siblings (ADR-PII decision 11, ADR-INGEST decision 15b).
     """
     from ..store import fuxdir
 
@@ -779,21 +849,33 @@ def _pii_ruleset_moved(root: Path, rules) -> bool:
         previous = path.read_text(encoding="utf-8").strip()
     except OSError:
         previous = ""
-    if current == previous:
-        return False
+    # ⚠ An empty previous digest with rules present is a repo that has never
+    # run with redaction on, which genuinely needs the full pass.
+    return current != previous
+
+
+def _record_pii_digest(root: Path, rules) -> None:
+    """Remember the ruleset -- called only once `write_index` has returned.
+
+    A repo with no rules writes no state and behaves exactly as it did before
+    this feature existed; a repo that just deleted its last rule has its state
+    removed, so the pair round-trips.
+    """
+    from ..store import fuxdir
+
+    current = pii_mod.digest(rules)
+    path = fuxdir.fux_dir(root) / "runtime" / PII_DIGEST_FILE
     try:
         if current:
             fuxdir.derived_dir(root, "runtime")
-            path.write_text(current + "\n", encoding="utf-8")
+            if not path.is_file() or path.read_text(encoding="utf-8").strip() != current:
+                path.write_text(current + "\n", encoding="utf-8")
         elif path.exists():
             path.unlink()
     except OSError:
         # A digest we could not record means the next run re-extracts too.
         # Wasteful, never wrong -- and never a reason to fail an ingest.
         pass
-    # ⚠ An empty previous digest with rules present is a repo that has never
-    # run with redaction on, which genuinely needs the full pass.
-    return True
 
 
 def _drop_changed_enrichment(

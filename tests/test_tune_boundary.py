@@ -24,7 +24,7 @@ import pytest
 from fux.derive import accel, build, format as fmt
 from fux.query import scan
 from fux.store import iter_shard_paths, term_hash, write_index
-from fux.tune import TUNE_NAME, _SCHEMA, load
+from fux.tune import INDEX_TABLE, TUNE_NAME, _SCHEMA, load
 
 TOPS = (1, 5, 20)
 
@@ -77,6 +77,14 @@ MUTATIONS: dict[str, dict[str, str]] = {
     },
     "priority": {'"alpha.md"': "6.0", '"beta.md"': "0.2"},
 }
+
+#: ⚠ **The declared exception to decision 1** (Arpit, 2026-09-11, ADR-TUNE
+#: decision 13). `[index]` keys are read by `fux ingest` and DO change
+#: committed bytes, so they are NOT run through the byte-identical test —
+#: and instead `test_an_index_key_does_change_the_index` proves the opposite,
+#: so this table cannot become a quiet home for an index decision that
+#: merely happens to be listed here.
+INDEX_MUTATIONS: dict[str, str] = {"max_phrases": "1", "max_table_rows": "1"}
 
 
 def _rec(doc_id, title, flen, terms) -> dict:
@@ -200,12 +208,37 @@ def test_every_key_is_exercised():
     missing = [
         f"[{table}] {key}"
         for table, keys in _SCHEMA.items()
-        if table != "priority"
+        if table not in ("priority", INDEX_TABLE)
         for key in keys
         if key not in MUTATIONS.get(table, {})
     ]
     assert not missing, f"add these to MUTATIONS: {missing}"
-    assert set(MUTATIONS) == set(_SCHEMA), (set(MUTATIONS), set(_SCHEMA))
+    assert set(MUTATIONS) | {INDEX_TABLE} == set(_SCHEMA), (set(MUTATIONS), set(_SCHEMA))
+    assert INDEX_TABLE not in MUTATIONS, "an [index] key can never pass the byte-identical test"
+    assert set(INDEX_MUTATIONS) == set(_SCHEMA[INDEX_TABLE])
+
+
+@pytest.mark.parametrize(("key", "value"), sorted(INDEX_MUTATIONS.items()))
+def test_an_index_key_does_change_the_index(tmp_path, key, value):
+    """The exception, proved rather than asserted: after a re-ingest, mutating
+    an `[index]` key moves a committed byte. If this ever passes vacuously the
+    key does nothing and belongs nowhere."""
+    from fux.ingest.run import run
+
+    listing = tmp_path / ".fux" / "sources" / "dirs"
+    listing.parent.mkdir(parents=True, exist_ok=True)
+    listing.write_text("docs\n", encoding="utf-8")
+    (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "docs" / "a.md").write_text(
+        "# A\n\n## One\n\nx\n\n## Two\n\ny\n", encoding="utf-8"
+    )
+    (tmp_path / "docs" / "t.csv").write_text("col\nrowa\nrowb\nrowc\n", encoding="utf-8")
+    run(tmp_path)
+    before = _index_bytes(tmp_path)
+    _write_tune(tmp_path, INDEX_TABLE, key, value)
+    run(tmp_path)
+    assert _index_bytes(tmp_path) != before, f"[{INDEX_TABLE}] {key} moved no committed byte"
 
 
 def test_mutating_a_key_needs_no_rebuild(corpus):

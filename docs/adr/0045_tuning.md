@@ -2,10 +2,10 @@
 type: ADR
 name: ADR-TUNE
 title: "ADR-TUNE (0045) — the tunables file, and per-source priority"
-description: "`.fux/tune.toml` — a committed, setup-written, never-rewritten file holding every knob that changes ordering and none that changes the index; plus a per-source preference weight in either direction, where fux states the cost and refuses only what is broken."
+description: "`.fux/tune.toml` — a committed, setup-written, never-rewritten file holding every knob that changes ordering, plus one declared exception (`[index]`: `max_phrases`, `max_table_rows`) that changes the index; plus a per-source preference weight in either direction, where fux states the cost and refuses only what is broken."
 status: accepted
 date: 2026-08-22
-amended: 2026-08-28
+amended: 2026-09-11
 feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error contract, and per-source preference weights
 owns: [src/fux/tune.py]
 laws: [L1, L3, L7]
@@ -29,7 +29,14 @@ matter of taste:
 That single sentence is what keeps a ranking file from becoming a second ingest
 config. It also buys a guarantee worth more than the file: **you cannot break
 your maintenance path by editing your ranking.** `ingest`, the source verbs and
-the hooks never open `tune.toml`.
+the hooks never read a ranking key.
+
+⚠ **One declared exception since 2026-09-11 (Arpit): the `[index]` table.** Its
+two keys — `max_phrases` (headings committed per document, default **32**) and
+`max_table_rows` (rows admitted per table, default 20 000) — **do** change the
+index. `fux ingest` reads that table and nothing else in the file; changing a
+key re-extracts every document; `--no-tune` does not undo it. Decision 13 is the
+ruling and what it cost.
 
 The file also carries **per-source priority** — prefer `docs/` over `vendor/`,
 by name, for one source or for all of them. A weight may go **above** `1.0` or
@@ -47,10 +54,10 @@ flowchart TD
     end
     SRC --> ING["ingest / add / remove / update / hooks"]
     CFG --> ING
-    ING --> IDX["`.fux/index/`<br/>byte-identical for the same sources"]
+    ING --> IDX["`.fux/index/`<br/>byte-identical for the same sources + [index]"]
     IDX --> READ["ask · find · answer"]
     TUNE --> READ
-    TUNE -. "never read here" .-> ING
+    TUNE -- "[index] ONLY — max_phrases · max_table_rows" --> ING
 ```
 
 <details>
@@ -65,17 +72,18 @@ flowchart TD
              |                        |                         |
              +-----------+------------+                         |
                          v                                      |
-       ingest / add / remove / update / hooks                    |
-                         |                                      |
-                         v                                      |
+       ingest / add / remove / update / hooks  <-- [index] ONLY ----+
+                         |                    (max_phrases,     |
+                         v                     max_table_rows)  |
               .fux/index/  (byte-identical                      |
-               for the same sources)                            |
+               for the same sources + [index])                  |
                          |                                      |
                          v                                      v
                     ask  .  find  .  answer  <-------------------
 
-  tune.toml is NEVER read on the ingest path. That is the boundary rule,
-  and it is why a broken ranking file cannot break your index.
+  No RANKING key is read on the ingest path. That is the boundary rule,
+  and it is why a broken ranking file cannot break your index. [index] is
+  the one declared exception (decision 13): it changes what is indexed.
 ```
 
 </details>
@@ -123,15 +131,25 @@ ordered. Membership is decided by one question:
 > **Does changing this value change a byte in `.fux/index/`? Yes → it is not a
 > tune key.**
 
-**1a.** `tune.toml` is **never read on the maintenance path.** Not by `ingest`,
-not by `add`/`remove`/`update`, not by the hooks, not by `build`. Only the read
-verbs open it.
+⚠ **Amended 2026-09-11 (Arpit, decision 13): the rule holds for every table
+except `[index]`**, which exists to hold the two keys that change the index. The
+exception is declared, named and tested in both directions — decision 13.
+
+**1a.** No key outside `[index]` is **read on the maintenance path.** Not by
+`ingest`, not by `add`/`remove`/`update`, not by the hooks, not by `build`.
+`[index]` is read by ingest through `tune.index_limits()`, which parses that one
+table and ignores the rest of the file — so a bad ranking value still cannot
+fail an ingest or a hook.
 
 **1b. The rule is enforced, not asserted.**
 [`tests/test_tune_boundary.py`](../../tests/test_tune_boundary.py) mutates
 **every** key in the loader's schema — and fails if a key is added to the loader
 and not to the mutation list — exercises the read path so a merely-parsed key
-cannot pass, then asserts the committed shards are byte-identical.
+cannot pass, then asserts the committed shards are byte-identical. **`[index]` is
+held out of that loop and put through the opposite assertion** —
+`test_an_index_key_does_change_the_index` re-ingests after mutating each key and
+requires a committed byte to move, so the exception cannot quietly become a
+home for an index decision that merely happens to be listed there.
 
 **2. `.fux/tune.toml` is COMMITTED.** A declared child of `.fux/`. Three
 reasons, and the third decides it:
@@ -306,7 +324,11 @@ dangerous. Nothing inside the range is refused — decision 9's rule, and `0.0` 
 inside it.
 
 **6. No committed field may be a function of a tunable.** This is the general
-rule, and it is the reason the field weights *can* be keys at all.
+rule, and it is the reason the field weights *can* be keys at all. ⚠ *Except
+`[index]` (decision 13): `phrases` and a truncated table's terms are functions
+of it by design. That is safe for the reason this decision cares about — no
+query-time weight is fused into a stored value; `[index]` decides what is
+extracted, and a change re-extracts rather than leaving stale halves behind.*
 
 ⚠ **The defect it prevents is fux's own LUCENE-6819, and it was real.** `wlen`
 is BM25F's length term:
@@ -352,7 +374,9 @@ index-for-index with the committed field order is the new one**, because a
 misaligned tuple weights body as heading with nothing erroring.
 
 **7. Ordering keys moved out of `fux.toml`, and the old table is retired with a
-loud error naming its new home.** **Two homes for one concept is exactly what
+loud error naming its new home.** ⚠ *Its corollary — that an index-changing key
+therefore belongs in `fux.toml` — was reversed for two keys on 2026-09-11;
+decision 13.* **Two homes for one concept is exactly what
 decision 1 exists to prevent**, and a silently ignored key in the old file is
 worse than an error ([ADR-CONFIG](0023_config.md) decision 10).
 
@@ -475,6 +499,8 @@ at the boundary.
 three times: it is the *"is it me or the config?"* switch when a ranking looks
 wrong, it is how CI compares against engine defaults, and **`fux tune` needs the
 off-arm internally** to compute every off-vs-on number in decision 9b.
+⚠ *It does not reach `[index]` (decision 13b) — those keys built the index being
+read, so there is no query-time "off" for them.*
 
 **12. A per-document weight must reach the accelerator's BOUND, not only its
 scorer.** Block skipping is safe on one property:
@@ -562,8 +588,49 @@ The slot is kept because it is what Arpit ratified and it costs nothing. **If
 reachable** — and `tests/query/test_ties_and_filters.py` fails that day, on
 purpose.
 
+**13. `[index]` — the two keys that change the index live here too** (Arpit,
+2026-09-11). `max_phrases` and `max_table_rows` sit in one table of
+`.fux/tune.toml`, and that table is the declared exception to decision 1.
+
+- **What moved.** `max_table_rows` left `fux.toml [decode]`, where
+  [ADR-TABULAR](0062_tabular.md) put it on 2026-09-06. `max_phrases` is new: it
+  was a hard-coded `12` in `ingest/extract.py` until this ruling, and its default
+  is now **32** ([ADR-EXTRACTED](0025_extracted-mode.md)). `fux.toml [decode]`
+  is refused by name, naming the new home ([ADR-CONFIG](0023_config.md)).
+- **Why here, stated as it was ruled.** The alternative on the table was
+  `fux.toml [index]`, which kept decision 1 whole. Arpit was shown that moving
+  them amends decision 1 and its test, and that `--no-tune` would not undo them,
+  and chose tune.toml: the file where a consumer turns numeric knobs.
+- **13a. Ingest reads `[index]` alone** — `tune.index_limits(root)`, never
+  `load()`. A bad `[bm25f]` value is still `ask`'s error only; a bad `[index]`
+  value stops an ingest. Both readers share one validator (`_index_values`), so
+  they cannot disagree about a legal value.
+- **13b. `--no-tune` does not reach `[index]`.** The keys are not fields of
+  `Tune`; they are `IndexLimits`, and `index_limits()` takes no `enabled`. The
+  index was built under them and `refer` decodes fetched tables under
+  `max_table_rows` too, so "ignore my tunables" at query time would disagree
+  with the index it is reading.
+- **13c. Changing a key re-extracts.** Delta ingest reuses extraction keyed on
+  a document's sha, which neither key moves, so ingest keeps a digest of
+  `[index]` in `.fux/runtime/` and re-extracts the corpus when it changes
+  ([ADR-INGEST](0016_ingest.md)). ⚠ **`max_table_rows` had this hole from
+  2026-09-06 until this change** — a changed row limit was never applied to an
+  unchanged CSV on a delta run.
+- **13d. L3 is unchanged in substance.** The file is committed, so `same
+  sources + same committed [index] -> same index` holds exactly as `same
+  sources + same fux.toml` held for `[decode]`. What changed is which committed
+  file carries the input.
+
 ### Consequences
 
+- ⚠ **Veto conditions 1 and 4 fired on 2026-09-11, by ruling** — a tune key
+  reaches the index, and a committed field (`phrases`, and every term of a
+  truncated table) is a function of one. Both are amended below to exclude
+  `[index]`; the ruling is decision 13, and **this is the record saying so rather
+  than the conditions being quietly narrowed.**
+- ⚠ **"Delete the file and nothing changes" is no longer true of `[index]` for
+  a repo that set non-default values** — deleting it re-extracts at the defaults.
+  The specimen's header says so.
 - **The constants become decisions with a provenance**, in a file a reviewer can
   read, instead of values a reader must trust.
 - **A consumer whose `vendor/` outranks their `docs/` on volume has a one-line
@@ -627,7 +694,9 @@ purpose.
 ### Reference (required)
 
 - The loader, the closed key set, the two refusals and the `[priority]`
-  resolution — [`src/fux/tune.py`](../../src/fux/tune.py); the writer —
+  resolution — [`src/fux/tune.py`](../../src/fux/tune.py); `[index]`'s reader,
+  `index_limits()`, and its re-extract digest in
+  [`src/fux/ingest/run.py`](../../src/fux/ingest/run.py) (decision 13); the writer —
   [`src/fux/setup.py`](../../src/fux/setup.py); the boundary and differential
   tests — [`tests/test_tune_boundary.py`](../../tests/test_tune_boundary.py) and
   [`tests/test_tune.py`](../../tests/test_tune.py).
@@ -667,9 +736,15 @@ purpose.
 
 **Reopen this decision if any of the following becomes true:**
 
-**1 — a tune key reaches the index.** Mutating any key in `.fux/tune.toml` and
-re-ingesting produces a committed byte different from the unmutated run.
-Decision 1 is then false and the file is a second ingest config.
+**1 — a tune key OUTSIDE `[index]` reaches the index.** Mutating any such key
+in `.fux/tune.toml` and re-ingesting produces a committed byte different from
+the unmutated run. Decision 1 is then false and the file is a second ingest
+config. ⚠ *Amended 2026-09-11 (decision 13) — it fired, by ruling, for `[index]`.*
+**1b — a third key joins `[index]`, or an `[index]` key stops moving the index.**
+The exception is then either growing or vestigial.
+*Check:* `tests/test_tune_boundary.py::test_every_key_is_exercised` pins
+`[index]` to exactly two keys; `::test_an_index_key_does_change_the_index`
+fails for a key that moves nothing.
 *Check:* `uv run pytest -q tests/test_tune_boundary.py`. By hand: set a key,
 `fux ingest --full`, `git diff --stat .fux/index/`.
 
@@ -689,8 +764,8 @@ consumer's comments are fux's to delete.
 *Check:* `grep -rn "tune.toml" src/fux/` shows no write path outside
 `setup.py`'s write-if-missing.
 
-**4 — a committed field becomes a function of a tunable.** Decision 6 is then
-false.
+**4 — a committed field becomes a function of a tunable outside `[index]`.**
+Decision 6 is then false. ⚠ *Amended 2026-09-11 (decision 13).*
 *Check:* no constant is read by both `src/fux/ingest/` and `src/fux/query/` such
 that a committed value depends on it — plus `bm25f.py`'s
 `assert len(FIELD_WEIGHTS) == len(TF_FIELDS)`, which guards the alignment that

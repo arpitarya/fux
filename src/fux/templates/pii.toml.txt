@@ -45,6 +45,11 @@
 #   group         optional.  Replace only this capture group and keep the rest
 #                            of the match. How a rule holds its own context:
 #                            "card ending 4242" -> "card ending [PII:card]".
+#   validate      optional.  A checksum the value must pass before it is
+#                            replaced: "luhn" (payment cards) or "verhoeff"
+#                            (Aadhaar). Runs over the ASCII digits of what
+#                            `group` names, separators ignored. A shape match
+#                            that fails the checksum is LEFT IN the index.
 #
 # Rules run TOP TO BOTTOM, each a full pass. Order is observable: a later rule
 # can match text an earlier rule inserted. Put narrow rules before broad ones.
@@ -115,26 +120,38 @@ replacement = "[PII:pan]"
 # A bare 12-digit run is also an order id, a timestamp in milliseconds, a
 # phone number with a country code, and a row count. This regex requires the
 # conventional 4-4-4 spacing, which cuts the false-positive rate hugely and
-# misses every unspaced one. There is no shape-only rule here that is both
-# safe and complete -- Aadhaar has a Verhoeff checksum, and a checksum is not
-# something a regex can do.
+# misses every unspaced one.
+#
+# `validate = "verhoeff"` checks Aadhaar's last digit, which a regex cannot.
+# ⚠ It is a 1-in-10 filter, not proof: one random 12-digit run in ten still
+# passes. With it on, relaxing `\s` to `\s?` to catch unspaced numbers becomes
+# a reasonable trade -- probe it first and read what the extra matches are.
+#
+# The two guards refuse a 4-4-4 window INSIDE a longer digit group. Without
+# them this rule, which runs first, reads the first twelve digits of a spaced
+# card number -- and one card in ten passes Verhoeff there and is eaten.
 #
 # [[rule]]
 # name        = "aadhaar"
-# pattern     = '''\b[2-9][0-9]{3}\s[0-9]{4}\s[0-9]{4}\b'''
+# pattern     = '''(?<![0-9][\s-])\b[2-9][0-9]{3}\s[0-9]{4}\s[0-9]{4}\b(?![\s-][0-9])'''
 # replacement = "[PII:aadhaar]"
+# validate    = "verhoeff"
 
 
 # --- payment card ----------------------------------------------------------
 # ⚠ COMMENTED OUT. Same problem, worse: a 16-digit run is an order number, a
-# tracking id, a hash prefix. Cards have a Luhn checksum and a regex cannot
-# compute one. This pattern requires separators, which real pasted card numbers
-# often have and real order ids usually do not.
+# tracking id, a hash prefix. This pattern requires separators, which real
+# pasted card numbers often have and real order ids usually do not.
+#
+# `validate = "luhn"` checks the card's last digit. ⚠ Same caveat as Aadhaar:
+# one random 16-digit run in ten passes Luhn. The checksum narrows the rule; it
+# does not make an order-id-heavy corpus safe to redact blind.
 #
 # [[rule]]
 # name        = "card"
 # pattern     = '''\b(?:4[0-9]{3}|5[1-5][0-9]{2}|3[47][0-9]{2}|6(?:011|5[0-9]{2}))[ -][0-9]{4}[ -][0-9]{4}[ -][0-9]{4}\b'''
 # replacement = "[PII:card]"
+# validate    = "luhn"
 
 
 # --- phone numbers ---------------------------------------------------------

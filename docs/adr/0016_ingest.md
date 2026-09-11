@@ -4,6 +4,7 @@ name: ADR-INGEST
 title: ADR-INGEST (0016) — how ingest works
 description: "Re-resolve every edge every run; carry unchanged documents' extraction forward. Write only shards whose bytes changed. Skips are reported once, counted by class, and recorded in the committed `.fux/.fuxignore`; deletions honoured, output byte-identical."
 status: accepted
+amended: 2026-09-11
 date: 2026-08-18
 feature: the `fux ingest` pipeline — sources to committed records
 owns: [src/fux/ingest, src/fux/ingest/priors.py]
@@ -420,6 +421,35 @@ found nowhere but the enrichment body — still ranks in both arms.
 rule, and `runtime/pii-digest` does not cover it.** Decision 15's digest fires
 when the **ruleset** moves; here the ruleset did not move, its **reach** did. A
 consumer sees one full pass on upgrade and the release note says so.
+
+**15b. …and on `.fux/tune.toml [index]`** (2026-09-11). `max_phrases` decides
+how many headings a record commits and `max_table_rows` which rows a table's
+body holds ([ADR-TUNE](0045_tuning.md) decision 13). Neither moves a document's
+sha, so the same hole decision 15 closed for the PII ruleset was open for both.
+
+- `run()` reads `tune.index_limits(root)` **once, up front, and never
+  `tune.load()`** — a bad ranking knob cannot fail an ingest or a hook; a bad
+  `[index]` value stops the run before any work.
+- The digest is `.fux/runtime/extract-config-digest`, derived and gitignored.
+  **Unlike `pii-digest` it is always written** — a cap always has a value, and
+  the first run after the phrases default went 12 -> 32 is exactly the run that
+  must re-extract. A missing file reads as moved: one full extraction on a fresh
+  clone, never a wrong one.
+- 🔴 **Recorded only after `write_index` returns.** A run stopped earlier left
+  the old records in the shards; a digest already claiming the new value would
+  let the next delta run reuse them.
+  ✅ **`pii-digest` was written before extraction and now is not** (same day).
+  Decision 15's digest was recorded by the very call that asked the question, so
+  a run interrupted between that call and `write_index` had already claimed the
+  new ruleset and every later delta run reused terms built under the old one.
+  `_pii_ruleset_moved` asks; `_record_pii_digest` records, beside
+  `_record_extract_config_digest`. **Both invalidation inputs now have one
+  ordering**, which is the property that made the defect visible: it was found
+  by writing the second one next to the first, never by a check.
+- ⚠ **`max_table_rows` carried this hole from 2026-09-06 until this change**:
+  raising it never reached an unchanged CSV on a delta run, so a delta run was
+  not byte-identical to a full one. `tests/ingest/test_delta.py` holds both
+  keys and the stopped-run case; all three fail with the digest removed.
 
 **16. The acquisition bound is passed in, never reached for.** `run()` hands
 `config.url.acquired_max_bytes` to `urlsrc.fetch_all` explicitly

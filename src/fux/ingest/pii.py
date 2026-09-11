@@ -46,6 +46,16 @@ as PII* is a policy question that differs by jurisdiction, industry and
 corpus, and a floor fux imposed would be both wrong somewhere and impossible
 to switch off.
 
+## Checksums are the engine's, and the set is closed
+
+A regex sees shape. A payment card and an Aadhaar number also carry a check
+digit, and a regex cannot compute one, so a shape-only rule for either is full
+of order ids and timestamps. `validate = "luhn"` or `validate = "verhoeff"`
+makes a rule replace **only the matches whose digits pass**. The set is closed
+and engine-owned rather than a consumer hook: a hook is consumer code running
+inside ingest, and determinism would stop being this engine's guarantee and
+become each consumer's (ADR-PII decision 16).
+
 ## Determinism
 
 Same bytes plus same rules gives the same output, always — no clock, no
@@ -69,6 +79,7 @@ import hashlib
 import json
 import re
 import tomllib
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -86,8 +97,101 @@ _FLAGS: dict[str, int] = {
     "verbose": re.VERBOSE,
 }
 
+# -- checksum validators ------------------------------------------------------
+#
+# ⚠ **A checksum is a 1-in-10 filter, not an identity.** A random run of digits
+# passes Luhn, and passes Verhoeff, one time in ten. `validate` cuts a
+# shape-only rule's false positives by about an order of magnitude and never to
+# zero -- which is why the starter still ships both checksum rules commented
+# out (ADR-PII decision 12).
+
+_ASCII_DIGITS = "0123456789"
+
+
+def _digits(text: str) -> list[int]:
+    """Every ASCII digit in `text`, in order; everything else is ignored.
+
+    Separators (`4111 1111`, `2345-6789`) drop out, which is the point. A
+    non-ASCII digit (`²`, `٣`) is not a digit here: neither scheme is defined
+    over one, and `str.isdigit` would quietly let it in.
+    """
+    return [ord(ch) - 48 for ch in text if ch in _ASCII_DIGITS]
+
+
+def luhn(text: str) -> bool:
+    """The Luhn mod-10 check (ISO/IEC 7812-1 Annex B) — payment cards, IMEI.
+
+    Catches every single-digit error and most adjacent transpositions, but not
+    `09` <-> `90`. Fewer than two digits is never valid: a check digit needs a
+    payload to check.
+    """
+    digits = _digits(text)
+    if len(digits) < 2:
+        return False
+    total = 0
+    for position, digit in enumerate(reversed(digits)):
+        if position % 2:
+            digit *= 2
+            if digit > 9:
+                digit -= 9
+        total += digit
+    return total % 10 == 0
+
+
+#: Verhoeff's multiplication table for the dihedral group D5.
+_VERHOEFF_D = (
+    (0, 1, 2, 3, 4, 5, 6, 7, 8, 9),
+    (1, 2, 3, 4, 0, 6, 7, 8, 9, 5),
+    (2, 3, 4, 0, 1, 7, 8, 9, 5, 6),
+    (3, 4, 0, 1, 2, 8, 9, 5, 6, 7),
+    (4, 0, 1, 2, 3, 9, 5, 6, 7, 8),
+    (5, 9, 8, 7, 6, 0, 4, 3, 2, 1),
+    (6, 5, 9, 8, 7, 1, 0, 4, 3, 2),
+    (7, 6, 5, 9, 8, 2, 1, 0, 4, 3),
+    (8, 7, 6, 5, 9, 3, 2, 1, 0, 4),
+    (9, 8, 7, 6, 5, 4, 3, 2, 1, 0),
+)
+
+#: Verhoeff's position permutation; row `i` is applied at position `i mod 8`.
+_VERHOEFF_P = (
+    (0, 1, 2, 3, 4, 5, 6, 7, 8, 9),
+    (1, 5, 7, 6, 2, 8, 3, 0, 9, 4),
+    (5, 8, 0, 3, 7, 9, 6, 1, 4, 2),
+    (8, 9, 1, 6, 0, 4, 3, 5, 2, 7),
+    (9, 4, 5, 3, 1, 2, 7, 6, 8, 0),
+    (4, 2, 8, 6, 5, 7, 3, 9, 0, 1),
+    (2, 7, 9, 3, 8, 0, 6, 4, 1, 5),
+    (7, 0, 4, 6, 9, 1, 3, 2, 5, 8),
+)
+
+
+def verhoeff(text: str) -> bool:
+    """The Verhoeff (1969) dihedral check — the last digit of an Aadhaar number.
+
+    Catches every single-digit error and every adjacent transposition,
+    including the `09` <-> `90` that Luhn misses. Fewer than two digits is
+    never valid, for the same reason as `luhn`.
+    """
+    digits = _digits(text)
+    if len(digits) < 2:
+        return False
+    check = 0
+    for position, digit in enumerate(reversed(digits)):
+        check = _VERHOEFF_D[check][_VERHOEFF_P[position % 8][digit]]
+    return check == 0
+
+
+#: Checksum validators a rule may name. A CLOSED set, like `_FLAGS`: an
+#: unknown name raises at load. ⚠ **Not a plugin point, on purpose** — a
+#: consumer-supplied function would be consumer code inside ingest (ADR-PII
+#: decision 16). A new scheme is added here, with its test vectors, or not at all.
+_VALIDATORS: dict[str, Callable[[str], bool]] = {
+    "luhn": luhn,
+    "verhoeff": verhoeff,
+}
+
 #: The keys a rule may declare. Anything else raises.
-_KEYS = ("name", "pattern", "replacement", "flags", "group")
+_KEYS = ("name", "pattern", "replacement", "flags", "group", "validate")
 _REQUIRED = ("name", "pattern")
 
 
@@ -105,23 +209,48 @@ class Rule:
     #: ("card ending 4242" -> "card ending [PII:card]") without needing a
     #: variable-width lookbehind Python does not support.
     group: int = 0
+    #: A checksum the replaced value must pass, named from `_VALIDATORS`, or
+    #: `""` for none. It narrows WHICH matches are replaced and never changes
+    #: WHAT replaces them.
+    validate: str = ""
 
     def compiled(self) -> re.Pattern:
         return _compile(self)
 
+    def accepts(self, match: re.Match) -> bool:
+        """Would this match be replaced?
+
+        The target is what `group` names -- the whole match for `0` -- and a
+        checksum runs over the target's ASCII digits only. So a rule that keeps
+        its context (`card ending ([0-9 ]{19})`, `group = 1`) validates the
+        captured value and never the label around it, and a whole-match rule
+        whose pattern swallows a stray digit of context will fail its checksum.
+        """
+        target = match.group(self.group)
+        if target is None:
+            return False
+        if not self.validate:
+            return True
+        return _VALIDATORS[self.validate](target)
+
     def apply(self, text: str) -> tuple[str, int]:
         """Redacted text, and how many values were replaced."""
         rx = self.compiled()
-        if self.group == 0:
+        if self.group == 0 and not self.validate:
             return rx.subn(self.replacement, text)
 
         count = 0
 
         def _sub(match: re.Match) -> str:
             nonlocal count
-            if match.group(self.group) is None:
+            if not self.accepts(match):
                 return match.group(0)
             count += 1
+            if self.group == 0:
+                # `expand`, not the bare string: the template semantics `subn`
+                # gives the no-checksum path above, so adding `validate` to a
+                # rule changes which values go and never what replaces them.
+                return match.expand(self.replacement)
             start, end = match.span(self.group)
             offset = match.start()
             whole = match.group(0)
@@ -213,6 +342,7 @@ def _rule(entry, *, origin: str, index: int, seen: set[str]) -> Rule:
 
     flags = _flags(entry, where)
     group = _group(entry, where)
+    validate = _validate(entry, where)
     # ⚠ The default is derived from the name rather than being a constant, so
     # a reader of a redacted index can see WHICH rule fired without opening
     # the rules file. A single `[REDACTED]` everywhere destroys that.
@@ -226,6 +356,7 @@ def _rule(entry, *, origin: str, index: int, seen: set[str]) -> Rule:
         replacement=replacement,
         flags=flags,
         group=group,
+        validate=validate,
     )
 
     rx = _compile(rule)  # fail at LOAD time, never mid-ingest
@@ -267,6 +398,17 @@ def _group(entry: dict, where: str) -> int:
     return value
 
 
+def _validate(entry: dict, where: str) -> str:
+    if "validate" not in entry:
+        return ""
+    value = entry["validate"]
+    if not isinstance(value, str) or value not in _VALIDATORS:
+        raise FuxError(
+            f"{where}: unknown validator {value!r} — known: {', '.join(sorted(_VALIDATORS))}"
+        )
+    return value
+
+
 # -- applying ---------------------------------------------------------------
 
 
@@ -300,6 +442,9 @@ def digest(rules: tuple[Rule, ...]) -> str:
     document that did not also change, and the index would hold terms built
     under two different policies with nothing to say which.
 
+    **The digest covers `validate` too**: a checksum changes which values reach
+    the index exactly as a pattern edit does.
+
     Empty ruleset gives the empty string, so a repo with no rules writes no
     state and behaves exactly as it did before this feature existed.
     """
@@ -315,7 +460,13 @@ def digest(rules: tuple[Rule, ...]) -> str:
         h.update(b"\0")
         h.update(",".join(rule.flags).encode("utf-8"))
         h.update(b"\0")
-        h.update(str(rule.group).encode("utf-8"))
+        # ⚠ `validate` rides in the group slot as `"<group>:<name>"`, and only
+        # when set. The slot is otherwise digits alone, so no checksum-free
+        # ruleset can spell one that has a checksum -- and every ruleset written
+        # before checksums existed keeps its digest, so upgrading fux forces no
+        # full re-extract that no edit of the consumer's caused.
+        slot = f"{rule.group}:{rule.validate}" if rule.validate else str(rule.group)
+        h.update(slot.encode("utf-8"))
         h.update(b"\0")
     return h.hexdigest()
 

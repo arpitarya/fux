@@ -55,7 +55,7 @@ committed index, and that is L3. `fetch=` is a routing decision, never a
 property of the document.
 
 If you are editing this file to change how a page becomes markdown, you are in
-the wrong file: write `.fux/decoders/htmldoc.py` instead.
+the wrong file: write `.fux/decoders/html.py` instead.
 """
 
 from __future__ import annotations

@@ -45,8 +45,6 @@ EXTENSIONS = (".eml", ".mbox")
 
 #: A message is a complete unit. Its BODY may carry headings of its own
 #: (see `_demote`), which used to shatter one email into four passages.
-#: ADR-REFER's `page` strategy; ADR-DECODE decision 19 for the opt-in name.
-CHUNK = "page"
 
 #: The headers worth indexing. Everything else is routing metadata — `Received`
 #: chains, DKIM signatures, `Message-ID` — which is pure `df` noise and, in the
@@ -174,15 +172,20 @@ def _body(message) -> str:
 def _demote(body: str) -> str:
     """Push an HTML body's own headings below the message's.
 
-    🔴 **Without this a message is shattered from the inside.** `htmldoc` maps
+    🔴 **Without this a message is shattered from the inside.** `html` maps
     `<h1>` to `#`, so an `.mbox` message whose body is HTML emitted a LEVEL-1
     heading underneath its own `## Subject` — outranking it. One email became
     four passages, two of them cited as though they were top-level units of the
     archive rather than parts of a thread. Measured 2026-09-06.
 
-    Three levels down, so a body heading is always deeper than
-    `_chunk.PAGE_LEVEL` for both spellings: a `.eml` subject is `#` and an
-    `.mbox` subject is `##`.
+    Three levels down, so a body heading is always DEEPER than the subject
+    heading for both spellings — a `.eml` subject is `#` and an `.mbox` subject
+    is `##`. ⚠ **Depth is now load-bearing, not cosmetic.** `_chunk._fold`
+    derives what a passage is from heading depth alone: a body heading deeper
+    than its subject is a child, so a short one folds back into the message; a
+    body heading at the SAME level would be a sibling of the message, and
+    siblings never fold, so the message would split into standalone passages
+    attributed as though they were separate emails.
 
     Fence-aware, through the one grammar in `decode/_markdown.py` — a `#`
     comment inside a fenced code block in an email is not a heading and must

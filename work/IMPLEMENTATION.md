@@ -21,6 +21,49 @@ Rules:
 
 ---
 
+## `[index]` lands, and the queue's environment blockers evaporate (2026-09-11)
+
+**Asked:** *"implement everything you possibly can and close out the items."*
+**What actually unblocked it was a shell** — the third time rule 4's
+environment-blocker failure has fired (2026-08-27, 2026-08-28, 2026-09-11).
+
+| what landed | where |
+|---|---|
+| `.fux/tune.toml [index]` — `max_phrases` (12 → **32**, previously hard-coded) and `max_table_rows`, moved out of `fux.toml [decode]` | [ADR-TUNE](../docs/adr/0045_tuning.md) 13 · [ADR-CONFIG](../docs/adr/0023_config.md) 10 · [ADR-EXTRACTED](../docs/adr/0025_extracted-mode.md) · [ADR-INGEST](../docs/adr/0016_ingest.md) 15b |
+| **`pii-digest` is no longer recorded before extraction** — `_pii_ruleset_moved` asks, `_record_pii_digest` records after `write_index`. An interrupted run used to claim the new ruleset and leave every later delta run reusing pre-change terms, silently and permanently | [ADR-PII](../docs/adr/0060_pii.md) 11 · [`test_asking_does_not_record`](../tests/ingest/test_pii_wiring.py) |
+| `ask`'s three-heading display cap stated as **independent** of `max_phrases`, so an indexing knob cannot silently redesign the output | [ADR-ASK](../docs/adr/0013_ask.md) 8 |
+| the ⚠ *"a template change reaches new repos only"* pattern recorded **running backwards** for the first time — a template that LOST a table, reached by a loader refusal | [ADR-DOTFUX](../docs/adr/0012_fux-directory.md) 6, fifth instance |
+| why `acquired_max_bytes` stays in `fux.toml` while `max_table_rows` left — it changes no committed byte | [ADR-ACQUIRED](../docs/adr/0057_acquired-plane.md) 8a |
+| the `W110-DOC2QUERY` **VOID** verdict gains its register row — it had a filed verdict and no registration, which is the R9 failure | §Feature gates, above |
+| the corpus re-ingested once under the new caps: **932 docs, 0 carried forward**, then a second run **0 changed / 932 carried forward / 0 shards written** | `.fux/index/`, 231 shards |
+
+**Verified on the MacBook, which is the whole point of the row:** `pytest -q
+tests` **3 131 passed**, `pytest -q tests_e2e` **78 passed**, one failure —
+`test_adr_freshness::test_no_behaviour_change_landed_without_its_adr`, on
+`94231b2bf`, which is **not this session's commit and not this session's call**.
+
+🔴 **That failure is a GATE defect, diagnosed here for the first time.** The
+commit changed `config.py` only to add `"codex"` to `[agents] install`. The
+three records it is convicted of missing *describe* that file for
+`keep`/`acquired_max_bytes`, `enrich` and `ttl` — **none of which it touched**.
+`describes` is file-scoped; the descriptions are key-scoped. Every available fix
+(rebase, narrow the relation, move `RULE-SINCE`) is a ruling, and the second is
+the moving-threshold failure in another costume. Left red, in the inbox.
+
+🔴 **A new defect found, not fixed:** `fux doctor` reports `[OK]` for a
+`fux.toml` that will not load. Filed in OPEN-WORK with the one-row fix.
+
+⚠ **`ruff` was named as an unrun gate by two queue rows and is not a gate** —
+it is in neither `[dev]` nor `.github/workflows/ci.yml`.
+
+⚠ **Stale `__pycache__` from the Cowork container was executing instead of the
+source** — pytest printed `>   ???` for every assertion and `/sessions/rcw-…`
+paths, and the freshness check reported a **different, larger** set of missing
+records than the real one. A session inheriting a tree another machine ran in
+clears bytecode before believing a test result.
+
+---
+
 ## W-122 (partial) — L0, and the law records renamed (2026-09-06)
 
 **Arpit's ruling, 2026-09-06.** *"ADRs are the only source of truth… if there
@@ -2012,6 +2055,7 @@ it closed by ratification, not by landing; see the W-27 row above.
 | C5 | **PASS** (2026-08-28) — the null control and halt gate, run first: arm A twice on one corpus, **380/380 substantive rows identical**. Everything else in the run depends on it | [C5](regression/2026-08-28-benchmark-contested/VERDICT-C5.md) |
 | P-SUPERSEDE | **FAIL** (2026-08-25) — `[ranking] superseded_weight` against a frozen **>= 1 fixed / 0 broken** bar. **The prior FIRED for the first time since it shipped** (it needs a frontmatter `supersedes:` key; the playground declared supersession in prose only, so the flag had never set). At `0.5`: **fixes `q015`** — the canonical failure — and breaks `q022`/`q033`. At `0.25`: four breaks. **The control is clean**: the frontmatter edit alone fixes 0, breaks 0. **Every broken query has the SUPERSEDED document as its correct answer**, so the diagnosis is one cause, not four: **supersession belongs to the QUERY'S INTENT, not the document**, and a per-document multiplier cannot express it. ⚠ `informed`; ±2 on 50 queries is below decision 14's floor — the **direction** carries, the magnitude does not | [P-SUPERSEDE](regression/2026-08-25-supersession-and-reranker-default/VERDICT.md) |
 | DENSE-CHUNK | **FAIL** (2026-08-24) — the per-chunk dense lane against its own **>= 3-fixed / 0-broken** bar: measured **0 fixed, 2 broken**, at every setting that fires. **0 fixed is the number that matters**; the bar needs 3. The cause is structural rather than tuning: `embed/model.py` **mean-pools static token vectors** (no layers, no attention), so the lane is **as order-blind as BM25F** — and `always` mode breaks **`q015`**, the current-vs-superseded query a semantic lane was most expected to rescue. **Phase 7 was right that per-chunk beats per-document and wrong that the unit was the binding constraint** — the pooling is. `[dense] mode` stays `off`; the committed vectors stay, because they cost nothing at rest and a better pooling reuses them unchanged | [DENSE-CHUNK](regression/2026-08-24-dense-lane-gate/VERDICT.md) ⚠ **2026-08-25: the verdict STANDS and its subject is GONE.** The lane, the model, the committed `vectors` and `[dense]` were deleted on Arpit's instruction. The clause *"the committed vectors stay, because they cost nothing at rest"* was wrong on its own terms — they were **23.0 % of the committed index** ([measured](regression/2026-08-25-model-removal/report.md)) — and it is moot either way. **The verdict itself is frozen and unedited**; its frozen pre-registration is mirrored into the run, since the module carrying it was deleted (ADR-RS decision 16). |
+| W-110 definition-of-done gate | **VOID** (ruled 2026-09-06, Arpit) — questions-instead-of-prose enrichment, against W-110's own definition of done: *net ≥ 6 on `recall@k`*. 🔴 **The bar never fixed `k`**, and the run clears it at `k=1` (+7) and at no other `k`, so the instrument decided and the **bar** could not rule. `VOID` is the fifth outcome, added to [ADR-RS](../docs/adr/0043_predictions.md) for this ruling — not PASS, not FAIL, not INCONCLUSIVE. ⚠ **The second finding is where the bar lived**: a definition of done inside a work item is edited alongside the work it governs, so nothing ever forced it to be complete first. [ADR-QUALITY](../docs/adr/0051_quality-contract.md) decision 2a is written so this cannot recur. The feature stays shipped on its defect argument and is recorded as **BUILT AND UNPROVEN** | [W110-DOC2QUERY](regression/2026-09-05-doc2query/VERDICT.md) |
 | W44-SIGNAL | **WARRANTED** (2026-08-22) — live-intent contamination@5 **32.00 pts** against a 25 pt bar; findability guard **93.33 %** against a 60 % floor. Discharged [ADR-ARCHIVED-CONTENT](../docs/adr/0044_archived-content.md) decision 5's gate, which Arpit **also** lifted by instruction the same session — the pre-registration was frozen first, so the number is evidence rather than a formality. Licenses the marker and disclaimer only; the demotion default stays [W-52](../archive/open/W-52-df-over-the-union.md)'s | [W44-SIGNAL](regression/2026-08-22-archived-signal/VERDICT.md) |
 | P1 | **FAIL** — full postings, permanently | [P1-RERUN](regression/2026-08-09-pruning-rerun/VERDICT.md) |
 | P2–P7 | retired with plan revision 1; successors are R3–R7 | [the ADR register](../docs/adr/README.md) |

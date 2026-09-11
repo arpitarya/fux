@@ -481,31 +481,64 @@ tidy-up.
   both would have kept passing and proved nothing — the vacuous-pass shape this
   repo has recorded before. They run on `.docx` now.
 
-**19. A decoder may declare `CHUNK`, from a closed vocabulary.** Optional, on
-decision 4's `WANTS_PATH` precedent: a decoder is still `EXTENSIONS` plus
-`decode()`, and one that says nothing means `"heading"`.
+**19. A decoder declares NOTHING about chunking. The protocol is still two
+names.** ⚠ **`CHUNK` was added and retired on the same day, 2026-09-06** — a
+closed two-value vocabulary (`heading` | `page`), validated at load time,
+declared by `pptx`, `mail` and `drawio`. It is recorded rather than erased
+because the reason it failed is the reusable part.
 
-```python
-EXTENSIONS = (".pptx", ".pptm")
-CHUNK = "page"          # optional; "heading" | "page"
-```
+**Why it was added:** the chunker folded a short section forward into whatever
+came next, so formats whose units are small — a slide, a message, a diagram
+page — were absorbed and cited under their neighbour's name. A declaration let
+those three opt out.
 
-- **Because the decoder is the only thing that knows the format's
-  semantics.** The chunker knows a regex. Every format-specific need was
-  becoming another branch in `refer/_chunk.py` — that already happened once for
-  tables, and `pptx`, `mail` and `drawio` were queued behind it. Format
-  knowledge belongs in the format's module.
-- **Data, not a callback.** A function here would put arbitrary code on the
-  citation path and make a consumer override meaningless — the same reasoning
-  that makes `EXTENSIONS` a tuple.
-- **An unknown value is a HARD ERROR at load time**, not a silent fallback. A
-  consumer who writes `CHUNK = "pages"` and gets heading-splitting has a
-  citation defect with no signal, which is what decision 7 refuses for a
-  missing dependency and decision 13 for an unknown `decoder=`.
-- **`pptx`, `mail` and `drawio` declare `"page"`** (Arpit, 2026-09-06). What it
-  fixes is in [ADR-REFER](0037_refer-plane.md) decision 27; both defects were
-  measured before the change.
-- ⚠ **`mail` also gained `_demote`.** `htmldoc` maps `<h1>` to `#`, so a
+🔴 **Why it went:** the fold rule, not the vocabulary, was the defect. `_fold`
+now folds a short section **only into a section nested inside it**, so
+siblings never merge and every atomic unit stands alone with nothing declared
+([ADR-CHUNKING](0063_chunking.md) decision 1). The evidence is that **`pdf`,
+`json` and `jsonl` were fixed by the removal**: all three emitted the right
+headings, none had declared `CHUNK`, and all three were measurably
+mis-attributing. A knob the three most-broken formats had not set was not
+carrying the guarantee — the merge rule was.
+
+**What this says about the protocol, and it is decision 1 restated with a
+scar:** a decoder controls chunking by controlling **what it emits**, not by
+describing what it emits. Emission is checkable by reading the output;
+a declaration is a claim that can be absent, stale or typo'd — and was.
+
+**The mapping — what each built-in emits, and what falls out.** ⚠ The rule is
+DEFINED in [ADR-CHUNKING](0063_chunking.md) and deliberately not restated here;
+two records defining one thing is the drift this plane has paid for twice.
+
+| decoder | extensions | what it emits | a passage is |
+|---|---|---|---|
+| `csv` | .csv .tsv | `# <file>` + one table | **row** — one row + its header |
+| `xlsx` | .xlsm .xlsx | `# <file>`, `## <sheet>` + tables | **row** — one row + its header |
+| `pdf` | .pdf | `# <file>`, `## Page N` | **unit** — one page |
+| `pptx` | .pptm .pptx | `# <file>`, `## Slide N` | **unit** — one slide |
+| `mail` | .eml .mbox | `# <file>`, `## <subject>`, body demoted 3 | **unit** — one message |
+| `drawio` | .dio .drawio | `# <file>`, `## <page>` | **unit** — one diagram page |
+| `jsonl` | .jsonl | `# <file>`, `## Record N` | **unit** — one record |
+| `json` | .json | `## Item N` (record array) or `## <key>` | **unit** — one item or top-level key |
+| `ini` | .cfg .ini .properties | `# <file>`, `## [section]` | **unit** — one section |
+| `toml` | .toml | `# <file>`, `## <table>` | **unit** — one table |
+| `yaml` | .yaml .yml | `# <file>`, `## <top-level key>` | **unit** — one key |
+| `xml` | .xml | `# <file>`, `## <container>` | **unit** — one container element |
+| `docx` | .docm .docx | Word's own heading outline | **section**, tables row-split |
+| `html` | .htm .html .xhtml | `h1`–`h6` | **section**, tables row-split |
+| `rtf` | .rtf | `\outlinelevel` | **section** |
+| `svg` | .svg | at most one heading | **file** |
+| `image` | .gif .jpeg .jpg .png | at most one heading | **file** |
+
+**Nothing in the `CHUNK` column, because there is no column.** The three
+"⚠ shape-dependent" formats — `json`, `yaml`, `xml` — resolve themselves:
+`users.json` (a record array) emits `## Item N` and `tsconfig.json` (a config
+object) emits `## <key>`, and both are runs of siblings, so both get one
+passage per unit **without the decoder deciding which kind of file it is
+looking at**. A per-decoder declaration could not have expressed that at all;
+it is a property of the instance, not the format.
+
+- ⚠ **`mail` also gained `_demote`.** `html` maps `<h1>` to `#`, so a
   message whose body is HTML emitted a level-1 heading *underneath* its own
   `## Subject`. Demoting the body three levels is a decoder fix and correct
   independently of any strategy — the chunker's own level check is belt and
@@ -634,7 +667,8 @@ evidence.*
 [ADR-EXTRACTED](0025_extracted-mode.md) ·
 [ADR-CDP-FETCHER](0028_cdp-fetcher.md) ·
 [ADR-HTTP-FETCHER](0029_http-fetcher.md) · [ADR-TYPES](0038_types-list.md) ·
-[ADR-AGENT-POLICY](0042_agent-policy.md) · [ADR-ENRICH](0047_enrich.md)
+[ADR-AGENT-POLICY](0042_agent-policy.md) · [ADR-ENRICH](0047_enrich.md) ·
+[ADR-CHUNKING](0063_chunking.md)
 
 **Code**
 
@@ -647,3 +681,21 @@ evidence.*
 **Project docs**
 
 - [`work/proposals/structure-aware-extraction.md`](../../work/proposals/structure-aware-extraction.md)
+
+**Papers and specifications** *(consulted 2026-09-06, filed 2026-09-11)*
+
+- **Docling, `HierarchicalChunker` / `HybridChunker`** — the outside support for
+  decision 19's **removal**, and the reason it is filed here rather than only in
+  ADR-CHUNKING: Docling chunks a document by its *elements* and treats headings
+  as **context prepended to a chunk, never as something a format declares**.
+  A mature implementation of exactly this problem has no per-format chunking
+  declaration at all. That is the case for *a decoder controls chunking by what
+  it EMITS* stated by someone else's design rather than by this record's
+  argument alone.
+  <https://deepwiki.com/docling-project/docling/8.2-document-chunking>
+
+  ⚠ **Convergent design, not a measurement.** It is evidence that the shape is
+  reasonable and that the trade-offs were considered elsewhere; it is not
+  evidence that fux's version is correct. What makes decision 19 safe to remove
+  is `pdf`, `json` and `jsonl` becoming correct without being touched — a fact
+  about this codebase, verified here.

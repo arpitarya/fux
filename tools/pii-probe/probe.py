@@ -72,13 +72,22 @@ def main(argv: list[str]) -> int:
 
     counts: Counter[str] = Counter()
     docs: Counter[str] = Counter()
+    #: Shape matches a `validate` checksum turned away. Counted, never shown:
+    #: they stay in the index, and a count is enough to see a checksum doing
+    #: its job -- or a rule whose every match fails it, which never fires.
+    kept: Counter[str] = Counter()
     examples: dict[str, list[str]] = {r.name: [] for r in rules}
     total_docs = 0
 
     for loc, text in _documents(args.root):
         total_docs += 1
         for rule in rules:
-            found = list(rule.compiled().finditer(text))
+            shaped = list(rule.compiled().finditer(text))
+            # `accepts` is the one definition of "would be replaced" -- the
+            # same call `Rule.apply` makes -- so the probe cannot drift from
+            # what ingest actually removes.
+            found = [m for m in shaped if rule.accepts(m)]
+            kept[rule.name] += len(shaped) - len(found)
             if not found:
                 continue
             counts[rule.name] += len(found)
@@ -94,8 +103,14 @@ def main(argv: list[str]) -> int:
     print(f"{total_docs} document(s) scanned\n")
     for rule in rules:
         n, d = counts[rule.name], docs[rule.name]
-        print(f"{rule.name}  ->  {rule.replacement}")
+        checksum = f"  (validate = {rule.validate})" if rule.validate else ""
+        print(f"{rule.name}  ->  {rule.replacement}{checksum}")
         print(f"  {n} match(es) across {d} document(s)")
+        if kept[rule.name]:
+            print(
+                f"  {kept[rule.name]} more matched the shape and failed "
+                f"{rule.validate} -- kept in the index"
+            )
         if n and not args.counts_only:
             for line in examples[rule.name]:
                 print(f"    {line[:160]}")

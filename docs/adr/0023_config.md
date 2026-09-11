@@ -2,7 +2,7 @@
 type: ADR
 name: ADR-CONFIG
 title: ADR-CONFIG (0023) — fux.toml and every property in it
-description: "A deliberately tiny config: what each key does, why the surface is three tables, why two are refused by name, and why one table is passed through unread."
+description: "A deliberately tiny config: what each key does, why the surface is three tables, why three more are refused by name, and why one table is passed through unread."
 status: accepted
 date: 2026-08-18
 feature: "`fux.toml` — discovery, schema, validation, and the keys that are refused rather than ignored"
@@ -32,9 +32,10 @@ stops one fetcher's vocabulary — `cdp_port`, `settle_ms` — from leaking into
 fux's schema and turning the adapter cap into a formality. Same discipline as
 PEP 518's `[tool.*]` tables.
 
-**Two tables are refused by name rather than ignored.** `[ranking]` and
-`[dense]` moved to `.fux/tune.toml`, and a config carrying either stops the run
-with the new home in the message. A key that is quietly not read is worse than
+**Three tables are refused by name rather than ignored.** `[ranking]` and
+`[dense]` moved to `.fux/tune.toml`, and `[decode]` followed on 2026-09-11 (its
+`max_table_rows` now sits in tune.toml's `[index]`). A config carrying any of
+them stops the run with the new home in the message. A key that is quietly not read is worse than
 one that stops the run, because the reader believes their setting is in force
 and diagnoses a ranking problem instead of a config one.
 
@@ -53,7 +54,7 @@ flowchart TD
     I --> SH["shards = 256<br/>documents the value, cannot set it"]
     F --> AG["[agents]"]
     AG --> AI["install — claude · copilot · kiro<br/>absent = all three, [] = none"]
-    F -.->|"REFUSED by name<br/>at any value"| RT["[ranking] · [dense]"]
+    F -.->|"REFUSED by name<br/>at any value"| RT["[ranking] · [dense] · [decode]"]
     RT ==>|"the keys moved"| TU[".fux/tune.toml<br/>ORDERING — ADR-TUNE"]
     CF -.->|"verbatim"| MW["your fetcher's configure()"]
 ```
@@ -85,9 +86,10 @@ flowchart TD
      |
      +-- [ranking]  REFUSED --+   an ERROR naming the new home,
      +-- [dense]    REFUSED --+   at any value, never ignored
+     +-- [decode]   REFUSED --+
                               |
                               v
-                 .fux/tune.toml   ORDERING ONLY -- ADR-TUNE
+                 .fux/tune.toml   ORDERING, plus [index] -- ADR-TUNE
 ```
 
 </details>
@@ -269,6 +271,7 @@ exists.
 | `[sources.url] middleware` | renamed to `fetcher`; move the file to `.fux/fetchers/` ([ADR-FETCHER](0027_fetcher.md) decision 7) |
 | `[sources] dirs` | put one directory per line in `.fux/sources/dirs`; a line may carry `archived=true` ([ADR-DIR-LIST](0030_dir-list.md) decision 1) |
 | `[ranking]` (whole table) | moved to `.fux/tune.toml`; run `fux setup` to write the file, move the keys across, delete the table ([ADR-TUNE](0045_tuning.md) decision 7) |
+| `[decode]` (whole table) | moved to `.fux/tune.toml [index]` on 2026-09-11 (Arpit), beside `max_phrases`; move `max_table_rows` across and delete the table ([ADR-TUNE](0045_tuning.md) decision 13) |
 | `[dense]` (whole table) | **removed**, not relocated — the lane it configured no longer exists ([ADR-ASK](0013_ask.md) decision 9). The error states the removal, the verdict behind it, and that ranking does not move, because `mode` defaulted to `off` |
 
 ⚠ **`[dense]` is the case worth noting.** It was retired to `tune.toml` and
@@ -276,6 +279,14 @@ then the lane was deleted, so a config old enough to carry it is old enough to
 be forwarded twice — and **the second hop would have landed on nothing.** A
 forwarding address must point at something that exists, or it is worse than a
 plain refusal.
+
+⚠ **`[decode]` is the case that tripped this record's veto without reopening it.**
+[ADR-TABULAR](0062_tabular.md) added it on 2026-09-06 as a **fourth** top-level
+table — veto condition 2 below — and nothing here was amended. It was found on
+2026-09-11 while a fifth (`[extract] max_phrases`) was being proposed, and
+Arpit's ruling moved both keys to tune.toml, which puts the surface back at
+three. **The veto was breached for five days and is now satisfied, not
+narrowed.**
 
 **The cost of the table retirements, said out loud: this breaks every repo that
 set one of the keys.** Nothing migrates automatically, because a migrator would

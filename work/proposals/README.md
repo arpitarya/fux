@@ -41,6 +41,17 @@ part of it is still to do. `search-v3.md` is the worked example.
 *Newest first. Every `.md` in this directory has a row; a file with no row is
 the defect this ordering exists to make visible.*
 
+## Filed 2026-09-11
+
+* [Positioning — documents around the code, not the code](positioning-documents-not-code.md)
+  — why fux is filed next to AST/code-graph tools. **Fux parses no code and, by
+  default, indexes none** (`.py` → *not an indexed file type*); the misfiling
+  traces to v0.1–v0.26, which did, plus *"AI-assisted codebases"*, the
+  `codebase` keyword, the *Quality Assurance* classifier and the paper's
+  non-existent *symbol edges*. Exact before/after wording per surface, and the
+  OKF bundle scan (94 of 314 files lack `type`). **Nothing applied.**
+  **Graduates when Arpit accepts or strikes each line in §4.**
+
 ## Filed 2026-09-05
 
 * [Unblock 2026-09-05 — a proposed ruling for every row in the inbox](unblock-2026-09-05.md)

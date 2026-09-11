@@ -1,3 +1,10 @@
+---
+type: Run Report
+run: 2026-09-06-csv-chunk-granularity
+classification: informed
+date: 2026-09-06
+---
+
 # 2026-09-06 — CSV chunk granularity: row vs band
 
 **Run class: `informed`.** One author wrote the corpus generator and the
@@ -9,6 +16,27 @@ grades, and a number is not a grade.
 not comparable to the `Darwin arm64` figures elsewhere in the lab (§2).
 **Corpus:** seeded, `sha256[:16] = 29cb743d8dfe252b`, 12 files, 6 998 rows.
 **Reproduce:** `fux-lab/2026-09-06-csv-chunk-granularity/`.
+
+## Authorship — classification `informed`
+
+| artifact | author | could reach |
+|---|---|---|
+| `corpus.py` — the seeded corpus generator | Claude Code, this session | the shape of the questions it was about to be asked |
+| `pairs.jsonl` (set A) and `pairs_b.jsonl` (set B) — the evaluation queries | Claude Code, this session | the corpus it had just generated |
+| `run.py` — the harness | Claude Code, this session | **both of the above** |
+| this report and `ANALYSIS.md` | Claude Code | everything |
+
+**`informed`, and every row is the same author.** One author wrote the corpus,
+the queries and the instrument that scores them, so under RUN-CLASSIFICATION
+this **supplies no delta** and is not a generalisation estimate. The numbers
+below are a measurement of a mechanism, not an estimate of how fux will behave
+on a corpus nobody wrote for it.
+
+🔴 **Set A is the evidence for that caution, not an aside.** Its queries planted
+a token unique in the whole corpus, and every arm scored `hit@1 = 1.000` — a
+result that would have been reported as *chunk size does not matter*. Set B
+exists because the author, knowing how set A was built, could see what it could
+not measure. A blind author would not have known to write it.
 
 ## Question
 

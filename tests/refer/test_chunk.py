@@ -192,27 +192,43 @@ def test_a_run_of_short_headed_sections_is_not_folded_together():
     assert [p.heading for p in passages] == [f"Record {i}" for i in range(1, 7)]
 
 
-def test_a_lone_stub_heading_still_folds_forward():
-    """The rule the floor was written for, unchanged: `## Notes` followed by
-    something substantial is not a citation on its own."""
-    doc = f"## Notes\n\nsee below.\n\n## Detail\n\n{_body('beta')}"
+def test_a_stub_heading_folds_into_its_own_SUBSECTION():
+    """The rule the floor was written for, kept: `## Notes` with one line under
+    it is not a citation on its own — but it may only be absorbed by something
+    NESTED INSIDE it."""
+    doc = f"## Notes\n\nsee below.\n\n### Detail\n\n{_body('beta')}"
     passages = chunk(doc)
     assert len(passages) == 1
     assert "see below." in passages[0].text and "beta" in passages[0].text
+    assert passages[0].heading == "Notes", "the enclosing section names the fold"
 
 
-def test_a_short_preamble_is_still_governed_by_the_old_rule():
-    """A preamble has no heading, so `_sibling_run` returns early and the
-    original rule decides — and that rule never folded a headless preamble
-    (`heading or carry` is false for the first section). Unchanged, and pinned
-    here because the new exception must not reach it."""
+def test_two_SIBLING_stubs_never_fold_into_each_other():
+    """🔴 The defect the strategy knob used to work around. Under the old rule
+    a short section folded forward into whatever came next, sibling or not, so
+    a short slide, record or page was absorbed by the next one and cited under
+    its name. Depth is the whole fix: siblings are not nested."""
+    doc = "## Record 1\n\nbroker timeout\n\n## Record 2\n\nqueue drained\n"
+    assert [p.heading for p in chunk(doc)] == ["Record 1", "Record 2"]
+    assert "queue drained" not in chunk(doc)[0].text
+
+
+def test_a_short_preamble_folds_into_the_first_section():
+    """A preamble is level 0, so every heading is nested inside it. It carries
+    its text forward and the first real heading names the passage."""
     doc = f"tiny.\n\n# A\n\n{_body('alpha')}"
     passages = chunk(doc)
-    assert [p.heading for p in passages] == ["", "A"]
-    assert passages[0].text == "tiny."
+    assert [p.heading for p in passages] == ["A"]
+    assert "tiny." in passages[0].text
 
 
-# -- strategy="page": a slide, a message, a diagram page is atomic -----------
+def test_a_document_with_no_heading_at_all_is_one_passage():
+    """Totality: nothing to fold into, so the floor cannot strand it."""
+    passages = chunk("just prose, no heading anywhere\n")
+    assert len(passages) == 1 and passages[0].heading == ""
+
+
+# -- the unit: a slide, a message, a page, a record ---------------------------
 
 
 def _deck(short_slide: int = 2) -> str:
@@ -224,40 +240,121 @@ def _deck(short_slide: int = 2) -> str:
     return "\n".join(parts)
 
 
-def test_a_page_is_never_absorbed_by_a_neighbour():
-    """🔴 Under `heading` this deck cited Slide 1's content as `deck.pptx` and
-    Slide 3's as `Slide 2` — confidently the WRONG attribution, which is worse
-    than a coarse citation. `_sibling_run` does not save it: a short slide
-    between two long ones is not a run."""
-    assert [p.heading for p in chunk(_deck(), strategy="page")] == [
-        "deck.pptx", "Slide 1", "Slide 2", "Slide 3",
-    ]
+def test_a_unit_is_never_absorbed_by_a_neighbour():
+    """🔴 Measured 2026-09-06: this deck cited Slide 1's content as `deck.pptx`
+    and Slide 3's as `Slide 2` — confidently the WRONG attribution, which is
+    worse than a coarse citation. Nothing is declared to fix it; the slides are
+    siblings, and siblings do not fold."""
+    for short in (1, 2, 3):
+        assert [p.heading for p in chunk(_deck(short))] == ["Slide 1", "Slide 2", "Slide 3"], short
 
 
-def test_each_page_carries_its_own_content():
-    pages = {p.heading: p.text for p in chunk(_deck(), strategy="page")}
+def test_each_unit_carries_only_its_own_content():
+    pages = {p.heading: p.text for p in chunk(_deck())}
     assert "two words" in pages["Slide 2"]
     assert "two words" not in pages["Slide 3"]
-    assert "two words" not in pages["deck.pptx"]
+    assert "two words" not in pages["Slide 1"]
 
 
-def test_a_heading_inside_a_page_does_not_split_it():
-    """The other direction: an mbox message whose body is HTML carries that
-    body's headings, and they must not open a new passage."""
-    doc = "# archive.mbox\n\n## Subject one\n\n### Body head\n\ntext here\n\n#### Deeper\n\nmore\n\n## Subject two\n\nlast\n"
-    passages = chunk(doc, strategy="page")
-    assert [p.heading for p in passages] == ["archive.mbox", "Subject one", "Subject two"]
-    assert "Deeper" in passages[1].text
+def test_the_document_title_never_names_a_unit():
+    """`# deck.pptx` is short and every slide is nested inside it, so it folds.
+    If it also supplied the heading, slide 1's content would be cited as
+    `deck.pptx` — the original defect arriving by a different route."""
+    first = chunk(_deck(short_slide=1))[0]
+    assert first.heading == "Slide 1"
+    assert "# deck.pptx" in first.text, "the title is context, not a lost byte"
 
 
-def test_page_line_ranges_stay_contiguous():
-    passages = chunk(_deck(), strategy="page")
+def test_a_heading_INSIDE_a_unit_does_not_rename_it():
+    """An mbox message whose body is HTML carries that body's headings. They
+    are nested, so they fold back in — and the MESSAGE names the passage, not
+    the deepest thing in its body."""
+    doc = (
+        "# archive.mbox\n\n## Subject one\n\n### Body head\n\ntext here\n\n"
+        "#### Deeper\n\nmore\n\n## Subject two\n\nlast\n"
+    )
+    passages = chunk(doc)
+    assert [p.heading for p in passages] == ["Subject one", "Subject two"]
+    assert "Deeper" in passages[0].text
+
+
+def test_unit_line_ranges_stay_contiguous():
+    passages = chunk(_deck())
     for earlier, later in zip(passages, passages[1:]):
         assert later.line_start > earlier.line_end
 
 
-def test_the_heading_strategy_is_untouched():
-    """`page` is opt-in. Prose must chunk exactly as before."""
+def test_prose_still_chunks_at_its_headings():
     doc = f"# A\n\n{_body('alpha')}\n\n## B\n\n{_body('beta')}"
-    assert [p.heading for p in chunk(doc)] == [p.heading for p in chunk(doc, strategy="heading")]
     assert [p.heading for p in chunk(doc)] == ["A", "B"]
+
+
+def test_there_is_no_strategy_parameter():
+    """The knob is gone, and its absence is pinned. What a passage is derives
+    from the document's own heading depth, so there is nothing for a caller or
+    a decoder to set — and nothing for either to set WRONG."""
+    import inspect
+
+    assert "strategy" not in inspect.signature(chunk).parameters
+
+
+# -- the fallback ladder: paragraph -> line -> word --------------------------
+
+
+def test_a_wall_of_text_can_be_quoted_at_all():
+    """🔴 A 12 KB document with no blank line came back as ONE 10 889-byte
+    passage — over the ceiling and over the whole budget — so the assembler
+    seated ZERO citations. The document ranked and could not be quoted."""
+    from fux.refer._assemble import DEFAULT_BUDGET, assemble
+    from fux.refer._rescore import rescore
+
+    wall = "# Notes\n\n" + " ".join(
+        f"sentence number {i} about the broker retention policy." for i in range(200)
+    )
+    passages = chunk(wall)
+    assert len(passages) > 1
+    assert max(p.nbytes for p in passages) <= MAX_PASSAGE_BYTES
+    seated = assemble(
+        rescore("broker retention policy", [("d", "n.md", "s", passages)]),
+        budget=DEFAULT_BUDGET, k=5, source="fetched",
+    )
+    assert seated.citations, "a document that ranks must be quotable"
+
+
+def test_the_line_rung_is_preferred_over_the_word_rung():
+    """A word cut is the floor, not the first resort. Nearly all real prose has
+    newlines and never gets past the line rung."""
+    doc = "# Log\n\n" + "\n".join(
+        f"2026-09-06 event {i} in the broker pipeline with detail" for i in range(400)
+    )
+    rungs = {p.cut for p in chunk(doc)}
+    assert "line" in rungs
+    assert "word" not in rungs
+
+
+def test_a_passage_records_which_rung_cut_it():
+    """A span cut between two words is a real citation and must not pretend to
+    be a paragraph."""
+    wall = "# Notes\n\n" + " ".join(f"word{i}" for i in range(4000))
+    assert {p.cut for p in chunk(wall)} == {"", "word"}
+
+
+def test_an_author_boundary_is_recorded_as_no_cut():
+    doc = f"# A\n\n{_body('alpha')}\n\n## B\n\n{_body('beta')}"
+    assert all(p.cut == "" for p in chunk(doc))
+
+
+def test_no_word_is_ever_split():
+    wall = "# N\n\n" + " ".join(f"token{i:05d}" for i in range(3000))
+    joined = " ".join(p.text for p in chunk(wall) if p.cut == "word")
+    for i in range(3000):
+        assert f"token{i:05d}" in joined
+
+
+def test_a_single_unbreakable_token_comes_back_whole():
+    """No rung can cut it, and inventing one would corrupt the content. The
+    assembler refuses it downstream — which is correct, and now it is the ONLY
+    case that reaches that."""
+    blob = "# N\n\n" + "x" * 9000
+    passages = chunk(blob)
+    assert any(p.nbytes > MAX_PASSAGE_BYTES for p in passages)

@@ -18,8 +18,12 @@ from ..decode._markdown import strip_headings as _md_strip_headings
 from ..query.tokenize import tokenize
 from .parse import ParsedDoc
 
-MAX_PHRASES = 12  # headings only, not headings + first-sentence — the simpler
-# of the handoff's two open options (§10), picked and recorded here / ADR-RECORD.
+#: The cap on `phrases` is `.fux/tune.toml [index] max_phrases` (default
+#: `tune.DEFAULT_MAX_PHRASES`, 32), passed in by `ingest/run.py`. It was a
+#: hard-coded 12 until 2026-09-11. Headings only, not headings + first
+#: sentence — the simpler of the original handoff's two options (ADR-EXTRACTED).
+#: ⚠ **The cap truncates DISPLAY, never ranking**: `heading` tf below is built
+#: from every heading, so a heading past the cap still ranks.
 
 #: Markdown is NOT here. Its grammar moved to `decode/_markdown.py` on
 #: 2026-09-06, because a regex cannot see a code fence and this one did not:
@@ -116,13 +120,24 @@ class Extracted:
     flen: tuple[int, ...]
 
 
-def extract_fields(rel_path: str, doc: ParsedDoc, enrichment: str = "") -> Extracted:
+def extract_fields(
+    rel_path: str,
+    doc: ParsedDoc,
+    enrichment: str = "",
+    max_phrases: int | None = None,
+) -> Extracted:
+    # `None` is the default rather than the constant so this module does not
+    # import `fux.tune` (and through it the query package) at import time.
+    if max_phrases is None:
+        from ..tune import DEFAULT_MAX_PHRASES
+
+        max_phrases = DEFAULT_MAX_PHRASES
     # W-86 P0: the heading grammar follows the file type. A decoded document
     # always arrives as Markdown (ADR-DECODE decision 2), so only an
     # already-prose `.rst`/`.adoc`/`.org` takes a different pattern.
     headings, stripped_body = _headings_and_body(rel_path, doc.body)
     title = _title(doc.meta, headings, rel_path)
-    phrases = headings[:MAX_PHRASES]
+    phrases = headings[:max_phrases]
 
     # `title` now has its own field, so it is no longer folded into the
     # heading tokens. Under two fields it had to be (there was nowhere else to

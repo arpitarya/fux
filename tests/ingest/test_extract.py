@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 
 from fux.ingest.extract import extract_fields
-from fux.ingest.parse import parse
+from fux.ingest.parse import ParsedDoc, parse
 from fux.query.bm25f import derive_wlen
 from fux.query.tokenize import tokenize
 
@@ -23,11 +23,15 @@ def test_title_falls_back_to_filename():
     assert extract_fields("docs/notes.md", doc).title == "notes.md"
 
 
-def test_phrases_are_headings_only_capped_at_12():
-    body = "\n".join(f"## Heading {i}" for i in range(20))
+def test_phrases_are_headings_only_capped_at_the_default():
+    """The cap was a hard-coded 12 until 2026-09-11; it is `.fux/tune.toml
+    [index] max_phrases` now, default `DEFAULT_MAX_PHRASES` (32)."""
+    from fux.tune import DEFAULT_MAX_PHRASES
+
+    body = "\n".join(f"## Heading {i}" for i in range(DEFAULT_MAX_PHRASES + 8))
     doc = parse(body.encode("utf-8"))
     fields = extract_fields("a.md", doc)
-    assert fields.phrases == [f"Heading {i}" for i in range(12)]
+    assert fields.phrases == [f"Heading {i}" for i in range(DEFAULT_MAX_PHRASES)]
 
 
 def test_terms_split_heading_and_body_tf():
@@ -132,3 +136,33 @@ def test_a_real_heading_is_still_kept_out_of_the_body_field():
     (term,) = tokenize("retention")
     assert out.terms[term][heading_i] == 1
     assert out.terms[term][body_i] == 0
+
+
+# -- [extract] max_phrases ---------------------------------------------------
+
+
+def _many_headings(n: int) -> ParsedDoc:
+    return ParsedDoc(meta={}, body="".join(f"## Section zeta{i}\n\nbody {i}\n\n" for i in range(n)))
+
+
+def test_phrases_default_cap_is_the_config_default():
+    from fux.tune import DEFAULT_MAX_PHRASES
+
+    fields = extract_fields("a.md", _many_headings(DEFAULT_MAX_PHRASES + 8))
+    assert len(fields.phrases) == DEFAULT_MAX_PHRASES
+    assert fields.phrases[0] == "Section zeta0"  # document order, not reordered
+
+
+def test_phrases_honour_an_explicit_cap():
+    fields = extract_fields("a.md", _many_headings(10), max_phrases=3)
+    assert fields.phrases == ["Section zeta0", "Section zeta1", "Section zeta2"]
+
+
+def test_the_cap_truncates_display_never_ranking():
+    """A heading past the cap is not in `phrases` but still counts as heading tf.
+    `flen`'s heading slot is the token count of EVERY heading."""
+    capped = extract_fields("a.md", _many_headings(10), max_phrases=3)
+    uncapped = extract_fields("a.md", _many_headings(10), max_phrases=100)
+    assert capped.terms == uncapped.terms
+    assert capped.flen == uncapped.flen
+    assert "Section zeta9" not in capped.phrases

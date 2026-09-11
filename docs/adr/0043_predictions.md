@@ -58,14 +58,37 @@ flowchart LR
 
 </details>
 
-### The four ways an R can end
+### The five ways an R can end
 
 | | means | example |
 |---|---|---|
 | **PASS** | met its frozen threshold | R3, R4, R9 |
 | **FAIL** | did not — **and this is a success of the method** | R5, P1 |
-| **INCONCLUSIVE** | the instrument could not decide, and said so | R6 |
+| **INCONCLUSIVE** | **the instrument** could not decide, and said so | R6 |
+| **VOID** | **the bar** could not decide — it was incomplete, so it ruled neither way | W110-DOC2QUERY |
 | **RETIRED** | the question stopped being asked | R7, R8 |
+
+🔴 **VOID and INCONCLUSIVE are different failures and conflating them destroys
+the finding.** INCONCLUSIVE says *the measurement came back unable to
+discriminate* — the bar was sound and the world was noisy. VOID says *the
+measurement was fine and the bar was not a bar*: it left a free variable, so
+it names more than one verdict and whoever fills the variable in afterwards
+picks which. Filing a void bar as INCONCLUSIVE would blame the instrument for
+the threshold's defect and would quietly leave the defect in place for the
+next run to inherit.
+
+⚠ **VOID is not a soft FAIL and may never be used as one.** A bar that could
+not be applied did not rule *against* what it was measuring; the run is still
+cited for everything it actually measured — its controls especially — and only
+its adjudication is withdrawn. The worked instance is
+[`W110-DOC2QUERY`](../../work/regression/2026-09-05-doc2query/VERDICT.md): the
+bar said *net ≥ 6 on `recall@k`* and never named `k`, so it was four bars whose
+verdicts disagree, while the run's placebo control cleared its own null
+untouched.
+
+⚠ **Only Arpit voids a bar**, on the same rule that sends an ambiguous result
+to him rather than to whoever ran it — a session that may void its own
+threshold has a way out of every measurement it dislikes.
 
 **FAIL is not failure.** P1 ended the pruning design and R5 rewrote how the git
 hook works. **A recorded negative that stops months of building is the most

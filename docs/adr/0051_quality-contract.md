@@ -109,6 +109,29 @@ problem, which is the reason decision 5 is not negotiable.
    larger window is not recall earned. It is described as the most directly
    actionable RAG metric
    ([Benchmarking IR Models](https://arxiv.org/pdf/2509.07253)).
+2a. **A BAR ON `recall@k` NAMES ITS `k`, OR IT IS VOID.** `recall@k` is not one
+   number — it is a curve, and a bar that omits `k` is **four different bars**
+   whose verdicts can disagree. Whoever supplies the missing `k` afterwards
+   picks the verdict, which is
+   [ADR-RS](0043_predictions.md)'s moving threshold wearing an omission instead
+   of an edit.
+
+   **The consequence is stated so it cannot be softened later: such a bar has
+   not FAILED, it has not PASSED — it is VOID**, and the run against it is
+   cited for what it measured and for nothing it adjudicated. The worked
+   instance is
+   [`W110-DOC2QUERY`](../../work/regression/2026-09-05-doc2query/VERDICT.md)
+   (Arpit, 2026-09-06): net **+7** at `k = 1` and **+3 / +2 / +1** at
+   `3 / 5 / 10`, against *net ≥ 6*.
+
+   ⚠ **A `k` justified by a ceiling must be justified IN the pre-registration.**
+   Where the clean arm already sits near 1.0 at large `k` — this corpus is
+   `recall@10 = 0.9884` with no enrichment at all — only the top of the ranking
+   can move, and that is a legitimate reason to pre-register `recall@1`. It is
+   legitimate **before** the numbers and is a fitted rationalisation after
+   them, and the clean-arm curve that settles it is published in the
+   consequences below, so nothing has to be re-run to check the claim.
+
 3. **`nDCG` and `MRR` are diagnostics, not the headline**, and the demotion is
    structural rather than stylistic. Two conditions both hold in fux: a
    **reranker follows retrieval** ([ADR-RERANK](0048_rerank.md)), so the

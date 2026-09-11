@@ -93,6 +93,22 @@ None is solved by the two caches that already exist, and `refer/fetchcache.py` s
 6. **The order is `_unpack` → refusal check → persist → decode.** A refusal is never stored. Retaining a login page would keep the wrong bytes *and* make them look authoritative.
 7. **The plane holds no wall clock.** Ordering is by `run_seq`, read from `maintain/urlstate.py` rather than started here — two run counters would drift, and the one that drifts would be the one deciding what gets deleted. Wall clock lives in `runtime/fetch-cache/` and nowhere else.
 8. **The store is bounded by `[sources.url] acquired_max_bytes` (default 2 GiB), and eviction is by `run_seq`, oldest first** — never by `mtime`, which would be a clock. **A blob whose URL has `fail_streak > 0` is never evicted**: that is precisely the copy that cannot be re-acquired. `fail_streak > 0`, not `>= FAILING_STREAK` — that constant is the threshold for *reporting* a URL as dead; here one failure already means "may not be re-acquirable", and the cost of protecting it is one blob of disk.
+8a. ⚠ **`acquired_max_bytes` stays in `fux.toml` while `max_table_rows` left it**
+    (2026-09-11). On that day `[decode] max_table_rows` moved to
+    `.fux/tune.toml [index]` ([ADR-TUNE](0045_tuning.md) decision 13), taking
+    `fux.toml`'s top-level table set back to three, and the obvious next
+    question is whether this key should follow it. **It should not, and the
+    reason is the test that decided the move rather than a preference.**
+    `[index]`'s subject is *what a document contributes to the index* — change
+    either key and the committed bytes change, which is why that table is
+    ingest-read and `--no-tune` cannot reach it. **`acquired_max_bytes` changes
+    no committed byte at all.** It bounds a gitignored blob store on the disk
+    this clone happens to sit on, and two clones of one repo can legitimately
+    disagree about it, which is the opposite of what a committed index value may
+    do. Same file, different question — and it is `fux.toml`'s question, because
+    `fux.toml` is where policy about *reaching* sources already lives (`fetcher`,
+    `max_parallel`, `meta`).
+
 9. **Sweeping and eviction are different acts.** `sweep()` removes blobs no URL points at — unreachable by construction, so nothing citable is lost. `evict()` removes something still referenced. Keeping them apart is what makes the second one safe to reason about.
 10. **Only `url:` documents are retained.** A `file:` document is already on disk; a second copy would be nonsense.
 11. **The manifest is written once, at the end of `fetch_all`.** Fetches run under a thread pool, and a per-fetch write is a corruption.

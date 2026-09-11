@@ -329,3 +329,83 @@ def test_an_unset_confidence_table_is_the_engine_floors(tmp_path):
     tune = load(tmp_path)
     assert tune.separation_floor == SEPARATION_FLOOR
     assert tune.doc_coverage_floor == DOC_COVERAGE_FLOOR
+
+
+# -- [index]: the two keys that DO change the index (2026-09-11) ---------------
+
+
+def test_index_limits_default_when_there_is_no_file(tmp_path):
+    from fux.tune import DEFAULT_MAX_PHRASES, DEFAULT_MAX_TABLE_ROWS, index_limits
+
+    limits = index_limits(tmp_path)
+    assert (limits.max_phrases, limits.max_table_rows) == (DEFAULT_MAX_PHRASES, DEFAULT_MAX_TABLE_ROWS)
+    assert (DEFAULT_MAX_PHRASES, DEFAULT_MAX_TABLE_ROWS) == (32, 20_000)
+
+
+def test_index_limits_are_read_from_the_index_table(tmp_path):
+    from fux.tune import index_limits
+
+    _write(tmp_path, "[index]\nmax_phrases = 5\nmax_table_rows = 250\n")
+    limits = index_limits(tmp_path)
+    assert (limits.max_phrases, limits.max_table_rows) == (5, 250)
+
+
+@pytest.mark.parametrize("key", ["max_phrases", "max_table_rows"])
+@pytest.mark.parametrize("bad", ["0", "-1", '"all"', "true", "12.5"])
+def test_a_nonsense_index_limit_refuses_on_both_readers(tmp_path, key, bad):
+    """`fux ingest` and `fux ask` share one validator, so they cannot disagree."""
+    from fux.tune import index_limits
+
+    _write(tmp_path, f"[index]\n{key} = {bad}\n")
+    with pytest.raises(FuxError, match=key):
+        index_limits(tmp_path)
+    with pytest.raises(FuxError, match=key):
+        load(tmp_path)
+
+
+def test_ingest_never_fails_on_a_bad_ranking_knob(tmp_path):
+    """`index_limits` reads `[index]` alone — a typo elsewhere is `ask`'s to report."""
+    from fux.tune import index_limits
+
+    _write(tmp_path, "[bm25f]\nk1 = -4\n\n[index]\nmax_phrases = 7\n")
+    assert index_limits(tmp_path).max_phrases == 7
+    with pytest.raises(FuxError, match="k1"):
+        load(tmp_path)
+
+
+def test_an_unknown_index_key_is_a_loud_error(tmp_path):
+    from fux.tune import index_limits
+
+    _write(tmp_path, "[index]\nmax_phrase = 7\n")
+    with pytest.raises(FuxError, match="max_phrase"):
+        index_limits(tmp_path)
+
+
+def test_no_tune_does_not_reach_the_index_limits(tmp_path):
+    """The index was built under these; `--no-tune` cannot un-build it."""
+    from fux.tune import IndexLimits, index_limits
+
+    _write(tmp_path, "[index]\nmax_phrases = 7\n")
+    assert load(tmp_path, enabled=False) == DEFAULT_TUNE
+    assert index_limits(tmp_path).max_phrases == 7
+    assert not any(f in Tune.__dataclass_fields__ for f in IndexLimits.__dataclass_fields__)
+
+
+def test_a_decoder_reads_the_configured_row_limit(tmp_path):
+    """`decode/_limits.py`: a two-name decoder seeing committed config."""
+    from fux.decode import decode
+
+    _write(tmp_path, "[index]\nmax_table_rows = 3\n")
+    rows = b"col\n" + b"".join(b"value %d\n" % i for i in range(50))
+    out = decode(rows, "a.csv", tmp_path)
+    assert out.count("\n| value ") == 3
+    assert "table truncated" in out
+
+
+def test_the_row_limit_is_not_leaked_between_documents(tmp_path):
+    from fux.decode import decode
+    from fux.decode._limits import max_table_rows
+
+    _write(tmp_path, "[index]\nmax_table_rows = 3\n")
+    decode(b"col\nv1\nv2\nv3\nv4\nv5\n", "a.csv", tmp_path)
+    assert max_table_rows() == 20_000  # unbound again

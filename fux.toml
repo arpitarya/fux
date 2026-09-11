@@ -66,18 +66,5 @@ shards = 256
 # Delete a name to stop installing it; `install = []` installs none. Editing a
 # file that is already there is safe -- fux never rewrites one.
 
-# HOW MUCH OF A TABLE IS READ. Data rows per table -- per SHEET for .xlsx --
-# with the header always kept and never counted. Rows past this are not
-# decoded, not indexed and NOT CITABLE.
-#
-# Config, not a .fux/tune.toml knob: it changes what is INDEXED rather than how
-# results are ORDERED (ADR-TUNE decision 7).
-#
-# RAISING IT COSTS QUERY LATENCY -- refer splits a table one passage per row and
-# rescore is O(passages): ~63 ms/doc/query at 500 rows, ~0.65 s at 5 000, ~2.6 s
-# at 20 000 (Linux x86_64; not comparable across machines).
-[decode]
-max_table_rows = 20000
-
 [agents]
 install = ["claude", "codex", "copilot", "kiro"]

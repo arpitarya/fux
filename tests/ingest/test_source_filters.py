@@ -124,8 +124,13 @@ def test_the_default_admits_prose_and_every_decodable_format():
     types = TypeFilter(allow=DEFAULT_TYPES)
     for name in ("a.md", "a.markdown", "a.txt", "a.rst", "a.adoc", "a.org"):
         assert types.accepts(f"docs/{name}"), name
-    for name in ("a.json", "a.html", "a.docx", "a.pdf", "a.yaml", "a.eml", "a.ipynb"):
+    for name in ("a.json", "a.html", "a.docx", "a.pdf", "a.yaml", "a.eml", "a.rtf"):
         assert types.accepts(f"docs/{name}"), name
+    # `.ipynb` and the ODF family left the default when their decoders were
+    # removed on 2026-09-06. A format whose decoder is gone must leave
+    # DEFAULT_TYPES with it -- a glob with no reader indexes raw bytes.
+    for name in ("a.ipynb", "a.odt", "a.ods", "a.odp", "a.fodt"):
+        assert not types.accepts(f"docs/{name}"), name
     for name in ("a.svg", "a.png", "a.jpg", "a.jpeg", "a.gif", "a.jsonl"):
         assert types.accepts(f"docs/{name}"), name
     for name in ("a.sh", "a.py", "a.mermaid", "LICENSE", "Makefile"):

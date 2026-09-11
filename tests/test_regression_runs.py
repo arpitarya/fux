@@ -33,7 +33,11 @@ from fux import frontmatter as fm  # noqa: E402
 
 REGRESSION = ROOT / "work" / "regression"
 INDEX = REGRESSION / "README.md"
-VERDICTS = {"PASS", "FAIL", "INCONCLUSIVE"}
+# ADR-RS: the five ways an R can end. `VOID` was added 2026-09-06 (Arpit) for a
+# bar that could not be applied at all -- distinct from INCONCLUSIVE, which is
+# an instrument that could not discriminate. `RETIRED` is not here because a
+# retired question files no verdict.
+VERDICTS = {"PASS", "FAIL", "INCONCLUSIVE", "VOID"}
 
 # ADR-RS decision 11, ruled by Arpit 2026-08-25. Runs filed before this date are
 # exempt by BASELINE, not by exception: their reports are frozen, and turning a

@@ -147,3 +147,76 @@ def test_a_first_ingest_reuses_nothing(tmp_path):
     _init(tmp_path)
     (tmp_path / "docs" / "a.md").write_text(_doc(0), encoding="utf-8")
     assert run(tmp_path).reused_count == 0
+
+
+# -- tune.toml [index]: committed inputs extraction reads (2026-09-11) -------
+
+
+def _tune(root, text: str) -> None:
+    path = root / ".fux" / "tune.toml"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+
+
+def _with_headings(root, n_headings: int, cap: int) -> None:
+    _tune(root, f"[index]\nmax_phrases = {cap}\n")
+    body = "".join(f"## Part {i}\n\ntext {i}\n\n" for i in range(n_headings))
+    (root / "docs" / "long.md").write_text("# Long\n\n" + body, encoding="utf-8")
+
+
+def test_changing_max_phrases_is_not_carried_forward(corpus):
+    """`max_phrases` moves no document's sha, so a sha-keyed reuse would keep
+    the old `phrases` — and a delta run would stop matching a full one (L3)."""
+    _with_headings(corpus, 20, cap=4)
+    run(corpus)
+    assert len(read_index(corpus)["file:docs/long.md"]["phrases"]) == 4
+
+    _with_headings(corpus, 20, cap=10)  # same bytes for every document
+    report = run(corpus)
+    after_delta = _digest(corpus)
+    assert report.reused_count == 0
+    assert len(read_index(corpus)["file:docs/long.md"]["phrases"]) == 10
+    run(corpus, full=True)
+    assert _digest(corpus) == after_delta
+
+
+def test_an_unchanged_cap_still_reuses(corpus):
+    _with_headings(corpus, 20, cap=4)
+    run(corpus)
+    assert run(corpus).reused_count == 7
+
+
+def test_a_ranking_knob_change_still_reuses(corpus):
+    """Only `[index]` is an extraction input; the rest of tune.toml is not."""
+    _tune(corpus, "[bm25f]\nk1 = 2.0\n")
+    assert run(corpus).reused_count == 6
+
+
+def test_a_stopped_run_does_not_record_the_new_cap(corpus):
+    """The digest is written after `write_index`, never before: a run stopped
+    earlier left the OLD records in the shards, so the next run must still see
+    the cap as moved."""
+    _with_headings(corpus, 20, cap=4)
+    run(corpus)
+    _with_headings(corpus, 20, cap=10)
+    assert run(corpus, should_stop=lambda: True) is None
+    assert run(corpus).reused_count == 0
+    assert len(read_index(corpus)["file:docs/long.md"]["phrases"]) == 10
+
+
+def test_changing_max_table_rows_is_not_carried_forward(corpus):
+    """The hole `max_table_rows` had since ADR-TABULAR shipped (2026-09-06):
+    the CSV's bytes do not change, only which of its rows are decoded."""
+    rows = "col\n" + "".join(f"rowword{i}\n" for i in range(12))
+    (corpus / "docs" / "t.csv").write_text(rows, encoding="utf-8")
+    _tune(corpus, "[index]\nmax_table_rows = 3\n")
+    run(corpus)
+    assert "file:docs/t.csv" in read_index(corpus), ".csv must be an admitted type here"
+    before = read_index(corpus)["file:docs/t.csv"]["flen"]
+
+    _tune(corpus, "[index]\nmax_table_rows = 12\n")
+    run(corpus)
+    after_delta = _digest(corpus)
+    assert read_index(corpus)["file:docs/t.csv"]["flen"] != before
+    run(corpus, full=True)
+    assert _digest(corpus) == after_delta

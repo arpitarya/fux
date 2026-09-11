@@ -158,6 +158,18 @@ CLAUDE.md block and its test, the config consolidation, and the key-tree gate.
 
 - [ ] **Phase 1 — the inventory** (§3) written into this file as a checklist
       with one row per CLAUDE.md section. Nothing moves before it exists.
+      🔴 **The inventory has a section nobody had listed: the WORK-QUEUE
+      DISCIPLINE.** `work/OPEN-WORK.md`'s rules 1–4, the 5-day threshold, the
+      lane tags and *ages are recomputed, never copied* are stated in
+      `CLAUDE.md` and in that file's own footer — **and in no ADR at all**, so
+      under L0 they are stated twice and owned nowhere. Surfaced 2026-09-06 by
+      [`tests/test_open_work_is_not_stale.py`](../../tests/test_open_work_is_not_stale.py),
+      which enforces four of those rules and **can name no owning record**.
+      ⚠ **Pre-existing, not introduced by that test** — it is the gap becoming
+      visible. The inventory row is *needs-a-record*, and the candidate name is
+      `ADR-WORK-QUEUE`. **Arpit rules whether that record gets written**; until
+      then the test is an unowned guard, which the ownership table permits and
+      L0 does not.
 - [x] **Phase 2 — L0 lands.** `0002_LAW-0-authority.md` created with §1's
       text; ADR-LAWS restructured to **meta-rules + index** (precedence,
       entrenchment, the restatement test) and **stops carrying law text**;

@@ -52,11 +52,16 @@ def test_a_preamble_before_the_first_heading_round_trips():
 def test_merged_runts_span_from_the_first_fragment_to_the_last():
     """A merge is contiguous in the source, so its range is a real range.
 
-    `_merge_runts` folds a too-short section FORWARD into the next one. The
-    resulting passage must cite from the stub heading's line through the end
-    of the section it merged into — not just the larger half.
+    `_fold` folds a too-short section forward into a section NESTED INSIDE it.
+    The resulting passage must cite from the stub heading's line through the
+    end of the section it merged into — not just the larger half.
+
+    ⚠ **The fixture must be nested (`##` then `###`), not two siblings.** It
+    was `## Stub` + `## Real` until 2026-09-06; siblings no longer merge, so
+    the assertion below passed while testing nothing — the stub was simply its
+    own passage starting at line 1 either way.
     """
-    doc = "## Stub\n\n## Real\n\n" + ("content " * 120)
+    doc = "## Stub\n\n### Real\n\n" + ("content " * 120)
     passages = _assert_every_passage_round_trips(doc)
     first = passages[0]
     assert first.line_start == 1, "the merged passage must start at the stub it folded from"

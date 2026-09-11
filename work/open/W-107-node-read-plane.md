@@ -2,7 +2,7 @@
 type: OpenItem
 id: W-107
 title: "W-107 — the Node read plane: ask / find / answer / explain / graph / path / mcp from Node.js, zero dependencies, byte-equal to Python"
-description: "A read-only port of the seven query verbs to one ESM file (npm: fux-search) so a Node-only host reads an index Python wrote. Four phases behind a pre-registered third arm of the differential law. Phase 0 is Arpit's decision on log(): V8 and glibc disagree in the last ulp on ~1 % of inputs, so byte identity needs one portable log in both runtimes."
+description: "A read-only port of the seven query verbs to one ESM file (npm: fux-search) so a Node-only host reads an index Python wrote. Four phases behind a pre-registered third arm of the differential law. Phase 0 CLOSED 2026-09-06: Arpit ruled option (b), scores equal after round(9) and ordering byte-equal; measured on darwin and glibc, with idf's argument domain enumerated exhaustively."
 status: open
 lane: agent
 timestamp: 2026-09-04T00:00:00Z
@@ -46,22 +46,52 @@ produces: same ids, order, locs, headings, band; scores equal after
       10-document corpus and a synthetic 10 000-document one, not of fux), and
       **glibc — what CI runs — was not measured**, because this machine has no
       Linux.
-- [x] **WRITTEN 2026-09-05, and deliberately NOT FROZEN.**
+- [x] ✅ **BOTH LIMITS CLOSED 2026-09-06.**
+      [`ADDENDUM-IDF`](../regression/2026-09-05-node-log-divergence/ADDENDUM-IDF.md)
+      widened the `idf` population on this repo's own 838-document index
+      (13 → 182 distinct, **7.69 % diverge**, 8.98 % of real BM25F scores
+      differ bit-for-bit, **0 at `round(9)`**), and
+      [`ADDENDUM-GLIBC`](../regression/2026-09-05-node-log-divergence/ADDENDUM-GLIBC.md)
+      measured **glibc 2.39 / x86-64 / Node 22** — 722/100 000 wide,
+      4.44 % of scores bit-different, **0 at `round(9)`, 0 top-5 moves** — and
+      went further than the clause asked: the `idf` argument domain is
+      **enumerated, not sampled**. `idf`'s argument is
+      `(n - df + 0.5)/(df + 0.5) + 1` with `df ∈ 1..n`, so at a given corpus
+      size it is finite; **all 10 939 arguments at `n ∈ {101, 838, 10 000}`**
+      were checked, **841 (7.69 %) differ, 0 differ at `round(9)`**.
+      ⚠ **Still unmeasured: musl, Windows, Node 20**, and
+      [`log-probe.yml`](../../.github/workflows/log-probe.yml) **has still not
+      been run** — the glibc figure came from a Linux container, not from CI.
+- [x] **WRITTEN 2026-09-05, deliberately NOT FROZEN, and FROZEN IN FULL
+      2026-09-06** (sha `0e3b4c80bf9e6a3ad122cb4e0db4f81adf04693fd47047fa24dd9edc7cb037a7`).
       [`../benchmark/PRE-REGISTRATION-NODE.md`](../benchmark/PRE-REGISTRATION-NODE.md)
       — ids `N0`–`N4`, the byte-equal field table, both corpora, all three
       OS/libm pairs, and `N4`'s **p95 ≤ 150 ms** (3× the measured Python
       figure: a fence against an *algorithmic* divergence, not against a
       constant factor). 🔴 **§2's score-comparison cell is blank** and is the
-      bullet below. **The document is not frozen and Phase 1 does not start
-      until Arpit fills it in.**
-- [ ] 🔴 **ARPIT PICKS — the only thing blocking Phases 1–4.** (a) or (b),
-      one word, with the numbers above beside them: **(a) portable `log`** — `src/fux/query/portable_math.py`
-      (range reduction via `math.frexp`, atanh-series polynomial, basic ops
-      only) used by `bm25f.idf`, mirrored bit-for-bit in JS via `DataView`;
-      ADR-RANKING amended; differential law + goldens re-run in Python first;
-      **or (b) tolerance** — no Python change, the arm compares scores at
-      `round(9)` and accepts ordering flips it can explain.
-- [ ] Decision recorded in ADR-NODE-SEARCH decision 1 and in ADR-RANKING.
+      bullet below. **The document was not frozen and Phase 1 did not start
+      until Arpit filled it in.**
+- [x] ✅ **ARPIT RULED 2026-09-06 — option (b), tolerance at `round(9)`.**
+      No Python change, no golden re-derivation, no hand-rolled transcendental:
+      the arm compares the score *field* at `round(9)`, which is the resolution
+      `rank.py`'s sort key already uses. **(a)** — `src/fux/query/portable_math.py`
+      mirrored bit-for-bit in JS — was declined; it bought bit-identity at the
+      price of a corpus-wide ranking change to fix a difference seven orders of
+      magnitude below the sort key.
+      🔴 **This file previously described (b) as accepting "ordering flips it
+      can explain". That was wrong and is corrected here**: under
+      [PRE-REG-NODE §2](../benchmark/PRE-REGISTRATION-NODE.md) the ordering
+      assertion is **byte-equal under either option**, and a discordant top-5
+      fails the arm. (b) tolerates a difference in the printed score, never a
+      different ranking.
+- [x] Decision recorded in
+      **[ADR-RANKING decision 8a](../../docs/adr/0021_ranking.md)** — the sort
+      key's resolution is the cross-runtime contract for the score, the order
+      is byte-equal, and a divergence above `~1e-9` relative on any platform
+      pair voids it.
+- [ ] Decision restated as **ADR-NODE-SEARCH decision 1** when that record is
+      created — owed at Phase 4, **as a link to ADR-RANKING 8a, never a second
+      statement of the rule** (L0).
 
 ## Phase 1 — `find`
 
@@ -108,9 +138,9 @@ produces: same ids, order, locs, headings, band; scores equal after
 ## Blockers
 
 - ~~`arpit`: ratification~~ — **ratified 2026-09-05.**
-- 🔴 `arpit`: **the Phase 0 `log()` pick.** The measurement is filed; the
-  pre-registration is written with that one cell blank. Nothing else blocks
-  Phases 1–4.
+- ~~🔴 `arpit`: the Phase 0 `log()` pick~~ — **ruled 2026-09-06: (b),
+  tolerance at `round(9)`.** The pre-registration is frozen in full.
+  ▶ **Nothing blocks Phases 1–4. Phase 1 starts.**
 - ~~W-108 should land first so Phase 2 ports one rescore, not two~~ —
   **W-108 landed 2026-09-05.** Phase 2 ports the rescore **with** its proximity
   multiplier, per-passage locators, and the URL-keyed fetcher dispatch. ⚠ Node

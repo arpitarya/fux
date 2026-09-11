@@ -1,7 +1,7 @@
 ---
 type: PreRegistration
 name: PRE-REG-NODE
-description: "Frozen before node/ gets a line. The third arm of the differential law: a Node reader of an index Python committed must produce what Python produces. Fixes what must be byte-equal, the corpora, the runtimes and ISAs, the p95 fence at 10 000 documents, and the per-query rows. Ids N0-N4. ONE cell is deliberately unfrozen and is Arpit's."
+description: "Frozen before node/ gets a line, and FULLY frozen since 2026-09-06 when Arpit ruled option (b). The third arm of the differential law: a Node reader of an index Python committed must produce what Python produces. Fixes what must be byte-equal, the corpora, the runtimes and ISAs, the p95 fence at 10 000 documents, and the per-query rows. Ids N0-N4. The one deliberately-unfrozen cell (score comparison) is filled: (b), equal after round(9)."
 timestamp: 2026-09-05T00:00:00Z
 ---
 
@@ -22,16 +22,20 @@ meanings. **This is not a version comparison**: one index, two readers.
 
 ---
 
-## 0 · 🔴 ONE CELL IS NOT FROZEN, AND IT IS ARPIT'S
+## 0 · ✅ THE LAST CELL IS FILLED — THIS DOCUMENT IS FROZEN
 
-**§2's score-comparison mode is blank on purpose.** W-107 Phase 0's third
-bullet is his call and the ratification of 2026-09-05 left both options
-unstruck; **nothing in this document defaults it**, and **this pre-registration
-is not frozen until he fills it in**. Phase 1 does not start before then — not
-because the code cannot be written, but because a threshold written after a
-number exists is not a pre-registration.
+**§2's score-comparison mode was blank on purpose.** W-107 Phase 0's third
+bullet was Arpit's call; nothing in this document defaulted it.
 
-Everything else below **is** frozen and does not depend on the pick.
+**He ruled on 2026-09-06: option (b), equal after `round(9)`.** The cell in §2
+carries it. **This pre-registration is now frozen in full**, and §3's bars, the
+comparison table and §6's kill clauses may not move again — a threshold edited
+after a number exists is not a pre-registration.
+
+⚠ **What the ruling did NOT do.** It did not weaken the ordering assertion,
+which stays byte-equal (§2, last paragraph), and it did not touch §6's first
+bullet: a `log` divergence above `~1e-9` relative on any platform pair still
+kills option (b) and supersedes this document.
 
 ---
 
@@ -57,14 +61,21 @@ until this document says otherwise.
 | `band`, `missing`, `answerable` | **byte-equal** | a claim fux makes out loud |
 | `source`, `freshness` | **byte-equal** | the claim-strength vocabulary ([ADR-URL-FRESHNESS](../../docs/adr/0059_url-freshness.md)) |
 | `graph.json` plane digest | **byte-equal** | one digest or the arm proves nothing |
-| **`score`** | 🔴 **`________________`** — **(a)** byte-equal, on one portable `log` in both runtimes · **(b)** equal after `round(9)` | **Arpit's, per §0** |
+| **`score`** | ✅ **(b) — equal after `round(9)`.** Arpit, 2026-09-06. `round(9)` is `rank.py`'s own sort-key resolution, not a tolerance invented to pass a test; **(a)** (byte-equal on one portable `log`) was declined | **his call, per §0** |
 
-**The measurement he picks from, in one line:** `Math.log` and `math.log`
-differ on **655 / 100 000** wide doubles on darwin/arm64 — **every difference
-one ulp** (max rel `2.211e-16`), **none surviving `round(9)`** — and over the
-two corpora themselves, **0 discordant scores and 0 discordant top-5 on 197 233
-scored documents**. ⚠ **Two limits bound that**: the `idf` argument population
-in those corpora is **13 distinct values**, and **glibc was not measured**.
+**The measurement behind the ruling, in one line:** `Math.log` and `math.log`
+genuinely differ — **655 / 100 000** wide doubles on darwin/arm64 and
+**722 / 100 000** on **glibc 2.39 / x86_64** — but **every difference is one
+ulp** (max rel `2.211e-16`) and **none survives `round(9)`**. Both limits that
+bounded the first run are now closed: the `idf` argument domain is
+**exhausted, not sampled** — all **10 939** arguments `df = 1..n` at
+`n ∈ {101, 838, 10 000}`, of which **841 (7.69 %) differ and 0 differ at
+`round(9)`**
+([`ADDENDUM-GLIBC`](../regression/2026-09-05-node-log-divergence/ADDENDUM-GLIBC.md),
+[`ADDENDUM-IDF`](../regression/2026-09-05-node-log-divergence/ADDENDUM-IDF.md))
+— and **glibc is measured**. End to end, **0 discordant scores and 0 discordant
+top-5 across 249 141 scored documents** on the three corpora, under both the
+exact and the rounded sort.
 
 **Whichever he picks, the ORDERING assertion is byte-equal and is not
 negotiable.** Option (b) tolerates a difference in the printed score field; it
@@ -139,8 +150,11 @@ Per `CLAUDE.md` §Conformance runs, and none of it is optional:
 - **If `_format` bumps in Python between the Python sha and the Node sha**, the
   arm is comparing two contracts and every number in it is void. The version
   policy is Phase 4's, and until it exists both shas are pinned by hand above.
-- **If the `idf` argument population stays narrow**, `N0`/`N1` passing means
+- ~~**If the `idf` argument population stays narrow**, `N0`/`N1` passing means
   *"these corpora did not reach a divergent argument"* and not *"the readers
-  agree"*. Widening it is
-  [the ANALYSIS's §3 improvement](../regression/2026-09-05-node-log-divergence/ANALYSIS.md)
-  and should land before N0 is judged.
+  agree"*.~~ ✅ **Discharged 2026-09-06, and further than asked.** The clause
+  wanted a wider sample; what landed is the **whole domain** — `idf`'s argument
+  is `(n - df + 0.5)/(df + 0.5) + 1` with `df ∈ 1..n`, so it is enumerable, and
+  [`evidence/idfdomain.py`](../regression/2026-09-05-node-log-divergence/evidence/idfdomain.py)
+  enumerates it at three corpus sizes. **The clause is struck, not deleted, and
+  its bar was never lowered to discharge it.**

@@ -1,4 +1,4 @@
-"""`.fux/tune.toml` — every knob that changes ORDER, and none that changes the index.
+"""`.fux/tune.toml` — every knob that changes ORDER, plus `[index]`: the two that change the index.
 
 [ADR-TUNE](../../docs/adr/0038_tuning.md) is the record. What this module is:
 
@@ -15,7 +15,23 @@
 
 A value belongs here if and only if changing it leaves `.fux/index/`
 **byte-identical** (decision 1). That is a test, not a judgement, and
-`tests/test_tune_boundary.py` runs it over every key.
+`tests/test_tune_boundary.py` runs it over every key — **except the keys of
+`[index]`, which are the rule's one declared exception.**
+
+⚠ **`[index]` — `max_phrases` and `max_table_rows` — DOES change the index.**
+Ruled by Arpit 2026-09-11, moving both out of `fux.toml` (ADR-TUNE decision 13).
+Three things follow and none is optional:
+
+1. **`fux ingest` reads `[index]`, through `index_limits()` and nothing else.**
+   It never calls `load()`, so a bad `[bm25f]` value cannot fail an ingest or a
+   hook; a bad `[index]` value does, loudly.
+2. **`--no-tune` does not reach `[index]`.** `load(enabled=False)` still skips
+   the file, but the index was built under these values, and `refer` decodes
+   fetched bytes under them too (`decode/_limits.py`), so "ignore my tunables"
+   cannot un-build what was built. `index_limits()` takes no `enabled`.
+3. **The boundary test proves the exception is real** — it asserts that
+   mutating an `[index]` key DOES move a committed byte after a re-ingest,
+   so the table cannot quietly become a hiding place for index decisions.
 
 ⚠ **`[confidence]` is the first table that changes no ORDER either** — it moves
 the *band*, which is what fux says *about* an answer, never which documents come
@@ -26,10 +42,11 @@ decision 7). **The knob it exposes is a real one:** a floor low enough turns
 every `weak` into `grounded`, and the guard is publication (the block emits the
 floor it was judged under) plus `--no-tune`, not a clamp.
 
-**Nothing here is read on the maintenance path.** Not by `ingest`, not by
-`build`, not by the hooks. `fux ingest` never imports this module — L3 says no
-maintenance output may depend on anything but the sources, and a tunable is by
-definition not a source.
+**Nothing outside `[index]` is read on the maintenance path.** Not by
+`ingest`, not by `build`, not by the hooks. `[index]` is read by ingest because
+it has to be: the file is committed, so `same sources + same committed tune.toml
+[index] -> same index` is the L3 that holds — the shape `[decode]
+max_table_rows` had while it lived in `fux.toml`.
 
 ## Why `k1`, `b` and the field weights arrive as one `Scoring` object
 
@@ -62,6 +79,11 @@ __all__ = [
     "TUNE_NAME",
     "Tune",
     "DEFAULT_TUNE",
+    "DEFAULT_MAX_PHRASES",
+    "DEFAULT_MAX_TABLE_ROWS",
+    "INDEX_TABLE",
+    "IndexLimits",
+    "index_limits",
     "load",
     "specimen",
 ]
@@ -89,6 +111,25 @@ _FIELD_KEYS = tuple(TF_FIELDS)
 #: far enough back that nobody is carrying a file written against it.
 _LEGACY_FIELD_KEYS = {f"{name}_weight": name for name in TF_FIELDS}
 
+#: `[index] max_phrases` — how many of a document's headings are committed as
+#: its `phrases`, in document order. **Display only**: `heading` tf is built
+#: from every heading whatever this is (ADR-EXTRACTED). **Raised 12 -> 32 on
+#: 2026-09-11 (Arpit)**: at 12, 87 of 563 markdown documents in fux's own corpus
+#: lost 1 055 headings, and 262 of their 1 584 slots held template headings
+#: (`Context`, `Decision`) — the headings that told documents apart were the
+#: ones cut. At 32, 98.2 % keep every heading for ~0.3 % more index.
+DEFAULT_MAX_PHRASES = 32
+
+#: `[index] max_table_rows` — data rows admitted from one table (per SHEET for
+#: `.xlsx`). Rows past it are not decoded, not indexed and not citable
+#: (ADR-TABULAR). Raised 500 -> 20 000 on 2026-09-06; moved here from
+#: `fux.toml [decode]` on 2026-09-11.
+DEFAULT_MAX_TABLE_ROWS = 20_000
+
+#: The one table whose keys change `.fux/index/`. Named so the boundary test
+#: and `index_limits()` refer to the same thing.
+INDEX_TABLE = "index"
+
 #: The closed key set. Table -> keys. Adding a key here is a change to
 #: ADR-TUNE, not a convenience (decision 5).
 _SCHEMA: dict[str, tuple[str, ...]] = {
@@ -110,6 +151,9 @@ _SCHEMA: dict[str, tuple[str, ...]] = {
     ),
     "refer": ("budget", "per_doc_fraction", "min_passage_bytes", "max_passage_bytes"),
     "confidence": ("separation_floor", "doc_coverage_floor"),
+    # ⚠ THE EXCEPTION TO DECISION 1 — read by ingest, changes committed bytes,
+    # untouched by `--no-tune`. See the module docstring.
+    INDEX_TABLE: ("max_phrases", "max_table_rows"),
     # `[priority]` is the one open table: its keys are the consumer's own
     # source entries, which fux cannot know in advance (decision 8).
     "priority": (),
@@ -190,6 +234,16 @@ class Tune:
 DEFAULT_TUNE = Tune()
 
 
+@dataclass(frozen=True)
+class IndexLimits:
+    """`[index]`, resolved. Deliberately NOT a field of `Tune`: `Tune` is what
+    `--no-tune` replaces with the defaults, and these cannot be replaced at
+    query time without disagreeing with the index they built."""
+
+    max_phrases: int = DEFAULT_MAX_PHRASES
+    max_table_rows: int = DEFAULT_MAX_TABLE_ROWS
+
+
 class _Collector:
     """Gathers semantic errors so a hand-edited file reports them together."""
 
@@ -254,6 +308,59 @@ def _at_least(c: _Collector, table: str, key: str, value: object, default: int, 
         c.add(f"[{table}] {key} must be at least {floor} (got {value})")
         return default
     return value
+
+
+def _index_values(c: _Collector, table: object) -> IndexLimits:
+    """Validate `[index]`'s values. Shared by `load()` and `index_limits()`, so
+    `fux ask` and `fux ingest` cannot disagree about what a legal value is."""
+    t = table if isinstance(table, dict) else {}
+    max_phrases = (
+        _at_least(c, INDEX_TABLE, "max_phrases", t["max_phrases"], DEFAULT_MAX_PHRASES, 1)
+        if "max_phrases" in t
+        else DEFAULT_MAX_PHRASES
+    )
+    max_table_rows = (
+        _at_least(c, INDEX_TABLE, "max_table_rows", t["max_table_rows"], DEFAULT_MAX_TABLE_ROWS, 1)
+        if "max_table_rows" in t
+        else DEFAULT_MAX_TABLE_ROWS
+    )
+    return IndexLimits(max_phrases=max_phrases, max_table_rows=max_table_rows)
+
+
+def _read_text(path: Path) -> str:
+    text = path.read_bytes().decode("utf-8-sig")
+    _reject_conflict_markers(path, text)
+    return text
+
+
+def index_limits(root: Path) -> IndexLimits:
+    """`[index]` alone — what `fux ingest` and the decoders read.
+
+    **Reads only `[index]`**: a typo in `[bm25f]` is `fux ask`'s error to
+    report, never a reason an ingest or a git hook fails. **Takes no
+    `enabled`**: `--no-tune` does not reach these keys (module docstring).
+    Absent file, absent table, absent key -> the defaults.
+    """
+    path = root / TUNE_NAME
+    if not path.is_file():
+        return IndexLimits()
+    try:
+        data = tomllib.loads(_read_text(path))
+    except tomllib.TOMLDecodeError as exc:
+        raise FuxError(f"{path}: invalid TOML ({exc})") from exc
+    table = data.get(INDEX_TABLE, {})
+    if not isinstance(table, dict):
+        raise FuxError(f"{path}: `{INDEX_TABLE}` must be a table (a `[{INDEX_TABLE}]` section), not a bare key")
+    unknown = [k for k in table if k not in _SCHEMA[INDEX_TABLE]]
+    if unknown:
+        raise FuxError(
+            f"{path}: [{INDEX_TABLE}] has unknown key(s) {sorted(unknown)} — "
+            f"known: {list(_SCHEMA[INDEX_TABLE])}"
+        )
+    c = _Collector(path)
+    limits = _index_values(c, table)
+    c.raise_if_any()
+    return limits
 
 
 def _reject_conflict_markers(path: Path, text: str) -> None:
@@ -321,8 +428,8 @@ def load(root: Path, *, enabled: bool = True) -> Tune:
         raise FuxError(
             f"{path}: unknown table(s) {sorted(unknown_tables)} — known: {sorted(_SCHEMA)}. "
             "The key set is closed on purpose: this is the one file that can change "
-            "every answer without changing a byte of the index, so a typo here must "
-            "not fail silently"
+            "every answer without changing a byte of the index (all but [index]), so a "
+            "typo here must not fail silently"
         )
     for name, value in data.items():
         if not isinstance(value, dict):
@@ -423,6 +530,10 @@ def load(root: Path, *, enabled: bool = True) -> Tune:
         if "doc_coverage_floor" in conf
         else DOC_COVERAGE_FLOOR
     )
+
+    # Validated here too, so `fux ask` reports a bad `[index]` value, but NOT
+    # carried on `Tune` — see `IndexLimits`.
+    _index_values(c, data.get(INDEX_TABLE, {}))
 
     refer = data.get("refer", {})
     budget = _at_least(c, "refer", "budget", refer["budget"], 8000, 1) if "budget" in refer else 8000
@@ -531,18 +642,20 @@ def specimen() -> str:
         f"{key:<23} = {FIELD_WEIGHTS[i]}" for i, key in enumerate(_FIELD_KEYS)
     )
     return f"""\
-# .fux/tune.toml -- HOW results are ordered. Never WHAT is indexed.
+# .fux/tune.toml -- HOW results are ordered, plus [index]: how much of a
+# document is indexed.
 #
 # Written once by `fux setup`; fux never rewrites it. Every value here is the
 # engine's own default, spelled out rather than implied: delete the file and
 # nothing changes, edit a line and exactly that line changes.
 #
-# The rule for what may live here is mechanical: changing any value below
-# leaves `.fux/index/` byte-identical. Nothing here is read by `ingest`,
+# The rule for every table EXCEPT [index] is mechanical: changing a value
+# leaves `.fux/index/` byte-identical, and nothing in it is read by `ingest`,
 # `build` or the hooks.
 #
-# `fux ask --no-tune` ignores this file entirely, which is the
-# "is it me or the config?" switch.
+# `fux ask --no-tune` ignores this file, which is the "is it me or the
+# config?" switch -- for everything EXCEPT [index], which built the index and
+# cannot be un-built at query time.
 
 [bm25f]
 k1                      = {K1}      # term-frequency saturation
@@ -592,6 +705,22 @@ max_passage_bytes = {d.max_passage_bytes}
 # floor judged it. `fux ask --no-tune` recomputes the band at the defaults.
 separation_floor   = {d.separation_floor}
 doc_coverage_floor = {d.doc_coverage_floor}
+
+[index]                         # ⚠ CHANGES THE INDEX -- read by `fux ingest`
+# The one table here that changes `.fux/index/`. Changing either key
+# re-extracts every document on the next `fux ingest`, and `--no-tune` does
+# not undo it.
+#
+# max_phrases: how many of a document's headings are committed as its
+#   `phrases` -- what `fux ask` shows as sections. DISPLAY ONLY: ranking reads
+#   every heading regardless. Was a hard-coded 12 until 2026-09-11; at 12,
+#   template headings like `Context` filled the slots.
+# max_table_rows: data rows admitted per table (per SHEET for .xlsx), header
+#   never counted. Rows past it are not indexed and NOT CITABLE. Raising it
+#   costs query latency: refer splits a table one passage per row, and rescore
+#   is O(passages) -- ~63 ms/doc/query at 500 rows, ~2.6 s at 20 000.
+max_phrases    = {DEFAULT_MAX_PHRASES}
+max_table_rows = {DEFAULT_MAX_TABLE_ROWS}
 
 [priority]
 # ⚠ THE ONE TABLE THAT STAYS COMMENTED, and not for consistency's sake: these

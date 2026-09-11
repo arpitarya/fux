@@ -142,7 +142,7 @@ class Decoder:
     with libraries that will not accept a buffer, and nothing else.
     """
 
-    __slots__ = ("name", "extensions", "_fn", "wants_path", "chunk", "origin")
+    __slots__ = ("name", "extensions", "_fn", "wants_path", "origin")
 
     def __init__(
         self,
@@ -151,18 +151,12 @@ class Decoder:
         fn: Callable,
         *,
         wants_path: bool,
-        chunk: str = "heading",
         origin: str,
     ) -> None:
         self.name = name
         self.extensions = extensions
         self._fn = fn
         self.wants_path = wants_path
-        #: How `refer/_chunk.py` should split this format's output — the
-        #: module's optional `CHUNK`. Carried on the decoder because the
-        #: decoder is the only thing that knows the format's semantics; the
-        #: chunker knows a regex.
-        self.chunk = chunk
         self.origin = origin
 
     def __call__(self, raw: bytes, rel_path: str) -> str | None:
@@ -235,36 +229,6 @@ def _load_consumer(path: Path, name: str) -> Decoder:
     return decoder
 
 
-#: The chunk strategies a decoder may declare. **Closed, and validated at load
-#: time**, for the reason `EXTENSIONS` is a tuple rather than a callback: a
-#: strategy is DATA. A function here would put arbitrary code on the citation
-#: path and make a consumer override meaningless.
-CHUNK_STRATEGIES = ("heading", "page")
-
-
-def _chunk_strategy(module, name: str) -> str:
-    """The module's optional `CHUNK`, defaulting to `heading`.
-
-    **Optional, on the `WANTS_PATH` precedent.** A decoder is `EXTENSIONS` plus
-    `decode()` and [ADR-DECODE](../../../docs/adr/0049_decode.md) decision 1
-    keeps it that way; `WANTS_PATH` established that an *opt-in* third name
-    costs nothing to a decoder that ignores it. This is the second.
-
-    A typo is a **hard error**, not a silent fallback to the default: a
-    consumer who writes `CHUNK = "pages"` and gets heading-splitting has a
-    citation defect with no signal, which is the shape decision 7 refuses for a
-    missing dependency and decision 13 refuses for an unknown `decoder=`.
-    """
-    declared = getattr(module, "CHUNK", "heading")
-    if declared not in CHUNK_STRATEGIES:
-        raise FuxError(
-            f"decoder {name} declares CHUNK = {declared!r}, which is not one of "
-            f"{', '.join(CHUNK_STRATEGIES)}. The vocabulary is closed so that a "
-            f"typo fails here rather than silently citing the wrong spans"
-        )
-    return declared
-
-
 def _from_module(module, name: str, *, origin: str) -> Decoder | None:
     fn = getattr(module, "decode", None)
     extensions = getattr(module, "EXTENSIONS", None)
@@ -275,7 +239,6 @@ def _from_module(module, name: str, *, origin: str) -> Decoder | None:
         extensions=tuple(sorted(str(e).lower() for e in extensions)),
         fn=fn,
         wants_path=bool(getattr(module, "WANTS_PATH", False)),
-        chunk=_chunk_strategy(module, name),
         origin=origin,
     )
 

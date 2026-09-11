@@ -33,7 +33,7 @@ _WORKBOOK = "xl/workbook.xml"
 #: Per SHEET, not per workbook — a five-sheet workbook admits the limit five
 #: times, because a sheet is the document's own division and truncating the
 #: fifth because the first four were long would be arbitrary.
-#: Was a hard-coded 500; now `[decode] max_table_rows` (see `csv.py` for the
+#: Was a hard-coded 500; now `.fux/tune.toml [index] max_table_rows` (see `csv.py` for the
 #: data-loss this hid).
 from fux.decode._limits import max_table_rows
 

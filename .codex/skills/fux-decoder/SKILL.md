@@ -68,6 +68,25 @@ def decode(path, rel_path: str) -> str | None:   # a real file, removed after
 Prefer bytes. It is testable from memory, cannot read anything it was not
 handed, and works for content that never had a path.
 
+**Your headings ARE your chunking. There is nothing to declare.**
+
+`refer/_chunk.py` derives what a citable passage is from the heading depth you
+emit, with one rule: *a short section folds forward only into a section nested
+inside it.* So:
+
+| you emit | you get |
+|---|---|
+| a run of siblings — `## Slide 1`, `## Slide 2`, … | one passage each, never merged, however short |
+| a heading with nested subheadings | one passage per section, stubs folded into the enclosing one |
+| a Markdown table | one passage per row, header repeated |
+| one heading | the whole file, one passage |
+
+⚠ **If your format's unit is a slide, message, page or record, emit them as
+SIBLINGS at one level under a `# <filename>` title.** That is the whole
+mechanism — a short unit beside a long one is safe because they are siblings,
+not because anything was declared. See
+[ADR-CHUNKING](../../../docs/adr/0063_chunking.md).
+
 **Files starting with `_` are helpers, not decoders** — the loader skips them.
 Put shared code there.
 
@@ -76,7 +95,7 @@ Put shared code there.
 ## 3 · Write it
 
 ```python
-# .fux/decoders/srtdoc.py
+# .fux/decoders/srt.py
 """SubRip and WebVTT subtitles -> Markdown.
 
 Meeting recordings are transcripts, and a transcript is prose nobody can
@@ -177,12 +196,12 @@ relative import raises and the decoder is dead on arrival.
 
 | your format looks like | read |
 |---|---|
-| a zip of XML (Office, OpenDocument) | `docxdoc.py`, then `_ooxml.py` |
-| markup or tags | `htmldoc.py` |
-| nested key/value (JSON, TOML, config) | `jsondoc.py` — especially `_prose`, which drops UUIDs, hashes, timestamps and bare numbers |
-| line-oriented text | `yamldoc.py`, `csvdoc.py` |
-| a binary container | `pdfdoc.py` — and read its stated limits before copying its approach |
-| headers plus a body | `maildoc.py` |
+| a zip of XML (Office, OpenDocument) | `docx.py`, then `_ooxml.py` |
+| markup or tags | `html.py` |
+| nested key/value (JSON, TOML, config) | `json.py` — especially `_prose`, which drops UUIDs, hashes, timestamps and bare numbers |
+| line-oriented text | `yaml.py`, `csv.py` |
+| a binary container | `pdf.py` — and read its stated limits before copying its approach |
+| headers plus a body | `mail.py` |
 
 ---
 
@@ -209,7 +228,7 @@ each already cost a defect in the shipped set:
 | you want | go to |
 |---|---|
 | the decision of record | `docs/adr/0042_decode.md` — §1 for the shape, §2 for the protocol and every per-format judgement |
-| the sixteen shipped decoders | `.fux/decoders/` in this repo |
+| the seventeen shipped decoders | `.fux/decoders/` in this repo |
 | the loader, the override rule, the registry | `fux.decode.__init__` — read its module docstring |
 | where decoding joins ingest | `fux.ingest.parse.parse_document` |
 | which files are walked at all | `.fux/sources/types`, and `docs/adr/0031_types-list.md` |

@@ -351,11 +351,11 @@ def test_yaml_block_scalars_are_dedented_by_their_own_indent():
     assert "restart after draining\nthen verify" in out
 
 def test_csv_truncates_rather_than_indexing_a_dataset():
-    """The limit is `[decode] max_table_rows`, default 20 000 since 2026-09-06.
+    """The limit is `.fux/tune.toml [index] max_table_rows`, default 20 000 since 2026-09-06.
     It was a hard-coded 500, and that number silently dropped the tail of every
     file over it — a fact in row 600 was not decoded, not indexed and not
     citable, with only this notice as the signal."""
-    from fux.config import DEFAULT_MAX_TABLE_ROWS
+    from fux.tune import DEFAULT_MAX_TABLE_ROWS
 
     rows = b"col\n" + b"".join(b"value %d\n" % i for i in range(DEFAULT_MAX_TABLE_ROWS + 400))
     out = decode(rows, "a.csv")

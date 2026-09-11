@@ -254,6 +254,17 @@ still answer. Nothing in this record's arithmetic changed — `min(policy,
 declared)` and the six labels are untouched — but the vocabulary is now used
 several times per answer, and a bundle can carry three different labels at once.
 
+⚠ **`strategy` in `_obtain` means SOURCE strategy — `GIT` or `URL` — and
+nothing else, as of 2026-09-06.** For part of one day the same module also
+carried a *chunk* strategy threaded from the decoder through `_readable`, so
+`refer/__init__.py` had two unrelated variables spelled `strategy`, one of them
+this record's. The chunk one is gone
+([ADR-CHUNKING](0063_chunking.md) decision 1 — what a passage is is derived,
+not declared), and `_readable` returns two values rather than three. **No
+verdict, no label and no arithmetic in this record changed**; the note exists
+because a reader of `_obtain` who met the collision would have had a live
+reason to misread it, and that reason should not be rediscovered from a diff.
+
 🔴 **Consequence a caller must not get wrong:** `citation.freshness` in
 `--json` is the verdict for **the winning passage's** document. It was
 `documents[0]`'s until W-108, which was the same object while there was one

@@ -417,8 +417,8 @@ them.
   each band's cited range past the rows it actually contains.
 - **A pending fragment joins the first band rather than being flushed beside
   it.** A section that is a heading plus one big table would otherwise emit
-  `## Sheet1` as a nine-byte passage of its own — a runt `_merge_runts` never
-  sees, because merging happens before splitting.
+  `## Sheet1` as a nine-byte passage of its own — a runt the fold never sees,
+  because folding happens before splitting.
 - ⚠ **The repeated header is scored.** Every band of a table carries the header's
   terms, so a table's bands gain a small uniform uplift against non-table
   passages in `_rescore`. Uniform within the table, so no band outranks another
@@ -433,8 +433,8 @@ whether CSV and Excel should chunk line by line).
   numbers are why it is recorded rather than just rejected.** On a 500-row CSV
   an average row is 58 bytes against `_assemble.CITATION_OVERHEAD`'s 80, so
   **58 % of the caller's budget would be locators** and only 57 rows would seat
-  in the 8000-byte default; and every row is under `MIN_PASSAGE_BYTES`, so
-  `_merge_runts` folds them back before the assembler ever sees them. A lone row
+  in the 8000-byte default; and every row is under `MIN_PASSAGE_BYTES`, so the
+  fold put them back before the assembler ever saw them. A lone row
   is also unreadable without its header, and repeating a 30-byte header onto a
   60-byte row makes every row score alike on any header term.
 - **`MAX_TABLE_BAND_BYTES = 900` instead.** A table has no narrative
@@ -453,28 +453,41 @@ whether CSV and Excel should chunk line by line).
   `## Record` headings and came back as ONE passage with only `Record 1`
   surviving** — which made decision 15's JSONL fix inert for the small records
   that are most of a log; and any short band of a small table faced the same.
-- **The rule is company, not size.** `_sibling_run`: a headed section stands
-  alone when either neighbour is also a short headed section, and folds
-  otherwise. A stub heading is followed by something substantial; a record in a
-  run is surrounded by other records. **A headless preamble is explicitly out of
-  scope** — the original rule never folded one, and the exception returns early
-  rather than reaching it.
+- **The rule is DEPTH, not size and not company.** A short section folds
+  forward only into a section **nested inside it**; siblings never fold into
+  each other ([ADR-CHUNKING](0063_chunking.md) decision 1).
+
+  ⚠ **This replaced `_sibling_run` on 2026-09-06, hours after it shipped, and
+  the reason is worth more than the rule.** `_sibling_run` asked whether a
+  section had *company* — whether a neighbour was also short and headed — which
+  is true of a run of records and false of **one** short slide between two long
+  ones. It fixed the three measured cases and left the general one open, so
+  `pdf`, `json` and `jsonl` stayed broken and were filed as W-124. Depth answers
+  every case at once, and the `page` strategy decision 27 introduced to work
+  around it was removed with it. **A rule derived from the instances that
+  prompted it will fit those instances and nothing else** — that is the
+  transferable part.
 - ⚠ **This supersedes W-117**, which this record's author filed as *"a tuning
   question… doing nothing is legitimate"*. With three instances that judgement
   was wrong, and the row is closed here rather than left to look like a live
   option.
 
-**27. `strategy="page"` — a slide, a message, a diagram page is atomic.**
-Threaded from the decoder's `CHUNK` ([ADR-DECODE](0049_decode.md) decision 19),
-read off the registry rather than from a table here: a second place for format
-knowledge is the first one to drift.
+**27. A slide, a message, a diagram page, a record and a PDF page are atomic —
+and nothing declares it.** `refer` passes no strategy to `chunk()` and reads
+nothing off the registry, because there is nothing to read: `_chunk._fold`
+derives the unit from the heading depth the decoder emits
+([ADR-CHUNKING](0063_chunking.md) decision 1). ⚠ **This decision shipped on
+2026-09-06 as `strategy="page"`, threaded from a decoder's `CHUNK`, and the
+knob was removed the same day** — the derivation covers every case the knob
+covered plus the three formats that had never declared it. The measurements
+below are what motivated both, and they still stand.
 
-**The heading strategy was wrong in both directions at once, and both were
+**The old merge rule was wrong in both directions at once, and both were
 measured on 2026-09-06 before this was written.**
 
 - 🔴 **Pages were absorbed by their neighbours, and cited under the wrong
-  name.** `_merge_runts` folds a short section forward and `_sibling_run` only
-  exempts a *run* of short ones — a short slide between two long ones is not a
+  name.** The rule then in force folded a short section forward and exempted
+  only a *run* of short ones — and a short slide between two long ones is not a
   run. On a three-slide deck, **`Slide 1`'s content was cited as `deck.pptx`
   and `Slide 3`'s as `Slide 2`**. That is worse than a coarse citation: it is
   confidently the wrong attribution, and nothing about the output looks wrong.
@@ -484,17 +497,28 @@ measured on 2026-09-06 before this was written.**
   `## Subject` above it: **one email became four passages**, two of them cited
   as though they were top-level units of the archive.
 
-**A page section is therefore never merged, and headings deeper than
-`PAGE_LEVEL` (2) inside it do not split it.** Text before the first page
-heading is still its own section, so a document title is not lost.
+**Both are answered by ONE fact about the document rather than by a strategy:
+these units are SIBLINGS.** A short section folds only into something nested
+inside it, so a slide beside a slide can never be absorbed; a body heading
+demoted below its subject is a child, so it folds back in rather than splitting
+the message. `mail._demote` is what guarantees the second half, and its depth
+is now load-bearing rather than cosmetic.
 
-- **`PAGE_LEVEL = 2` because that is what the three decoders already emit** —
-  the `#` above it is the document's own title.
-- **`_spans` is shared with `_sections`**, so the two strategies cannot
-  disagree about what a line range means. That is the drift this file already
-  paid for once with two private heading regexes.
-- **`heading` is unchanged and remains the default.** Pinned by
-  `test_the_heading_strategy_is_untouched`.
+- **`PAGE_LEVEL` is gone**, with the strategy it served. Depth is compared
+  between neighbours, so no level is privileged and nothing needs to agree with
+  what a decoder happens to emit.
+- **The document title is excluded from naming a passage** — see
+  [ADR-CHUNKING](0063_chunking.md) decision 1a. Without that, `# deck.pptx`
+  absorbs slide 1 and the original defect survives the fix.
+- **`_spans` is shared by every path**, so nothing can disagree about what a
+  line range means. That is the drift this file already paid for once with two
+  private heading regexes.
+
+⚠ **Decisions 25–27 are history now.** `src/fux/refer/_chunk.py` moved to
+[ADR-CHUNKING](0063_chunking.md) on 2026-09-06, which owns what a passage IS —
+the fold rule, the universal table rule and the boundary ladder. They are kept
+here because they record why each behaviour exists; the current statement of it
+is there.
 
 ### Consequences
 

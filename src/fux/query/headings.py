@@ -56,7 +56,8 @@ from .tokenize import tokenize
 
 #: How many matched headings a single result may show. Three, because the
 #: point is to aim a reader at a section, not to reproduce the outline —
-#: `ingest/extract.py` commits up to twelve.
+#: `ingest/extract.py` commits up to `.fux/tune.toml [index] max_phrases`
+#: (default 32).
 MAX_HEADINGS = 3
 
 __all__ = ["MAX_HEADINGS", "headings_for"]

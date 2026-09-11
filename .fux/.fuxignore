@@ -25,6 +25,7 @@ work/regression/2026-08-23-fork3-per-field-bound/evidence/diff10k.log           
 work/regression/2026-08-23-fork3-per-field-bound/evidence/real-corpus-10k.log              # not an indexed file type
 work/regression/2026-08-23-r5-rerun-after-code-removal/evidence/scaling-after-phase7.log   # not an indexed file type
 work/regression/2026-08-23-r5-rerun-after-code-removal/evidence/scaling-run.log            # not an indexed file type
+work/regression/2026-09-05-node-log-divergence/evidence/idfdomain.mjs                      # not an indexed file type
 work/regression/2026-09-05-node-log-divergence/evidence/logprobe.mjs                       # not an indexed file type
 work/regression/2026-09-05-node-log-divergence/evidence/score.mjs                          # not an indexed file type
 # <<< fux: not indexed <<<

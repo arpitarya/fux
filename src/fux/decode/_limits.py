@@ -22,12 +22,13 @@ kind of defect to leave for someone else.
 
 ## L3 holds
 
-`fux.toml` is **committed**, so `same sources -> same index` becomes `same
-sources + same committed config -> same index`, which is the shape
-`.fux/sources/` already has. This is not a tunable: `.fux/tune.toml` holds
-knobs that change how results are **ordered**, and this one changes what is
-**indexed**. ADR-TUNE decision 7 draws that line, and a row limit is on the
-config side of it.
+The value lives in `.fux/tune.toml [index]` (moved from `fux.toml [decode]` on
+2026-09-11, Arpit — ADR-TUNE decision 13). That file is **committed**, so `same
+sources -> same index` becomes `same sources + same committed [index] -> same
+index`. `[index]` is the one tune.toml table that changes what is **indexed**,
+and it is read through `tune.index_limits()`, which `--no-tune` never reaches:
+`refer` decodes fetched bytes here too, and must decode them under the value the
+index was built with.
 """
 
 from __future__ import annotations
@@ -38,9 +39,9 @@ from pathlib import Path
 
 __all__ = ["bound_root", "max_table_rows"]
 
-#: ⚠ The default lives in `config.py`, not here, because `fux.decode` imports
-#: that module and the reverse would be a cycle. Read lazily below so this file
-#: stays importable from a consumer decoder loaded by path.
+#: ⚠ The default lives in `tune.py`, not here, and is read lazily below:
+#: `fux.tune` pulls in the query package, and this file must stay cheap to
+#: import from a consumer decoder loaded by path.
 
 _ROOT: ContextVar[Path | None] = ContextVar("fux_decode_root", default=None)
 
@@ -56,19 +57,19 @@ def bound_root(root: Path | None):
 
 
 def max_table_rows() -> int:
-    """`[decode] max_table_rows`, or the default.
+    """`.fux/tune.toml [index] max_table_rows`, or the default.
 
     Never raises: a decoder runs inside a walk over thousands of documents, and
-    a malformed `fux.toml` is reported by `config.load` on the paths that read
-    configuration properly — failing the decode of every document as well would
-    turn one bad line into an unreadable corpus.
+    a malformed `[index]` is reported by `tune.index_limits()` where ingest
+    reads it first — failing the decode of every document as well would turn
+    one bad line into an unreadable corpus (ADR-TABULAR decision 6).
     """
-    from ..config import DEFAULT_MAX_TABLE_ROWS, load
+    from ..tune import DEFAULT_MAX_TABLE_ROWS, index_limits
 
     root = _ROOT.get()
     if root is None:
         return DEFAULT_MAX_TABLE_ROWS
     try:
-        return load(root).max_table_rows
+        return index_limits(root).max_table_rows
     except Exception:
         return DEFAULT_MAX_TABLE_ROWS

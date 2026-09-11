@@ -276,6 +276,22 @@ the order stable across paths; `id` makes ties deterministic. Both halves are
 load-bearing — the accelerator's skip test is written against exactly this
 comparison ([ADR-T1-ACCELERATOR](0020_accelerator.md)).
 
+**8a. `round(score, 9)` IS THE CROSS-RUNTIME CONTRACT for the score, and the
+ordering is byte-equal regardless.** Two runtimes reading one committed index
+agree on `round(score, 9)`, not necessarily on the score's last bit: `log` is
+the one transcendental in `score_record`, and two IEEE-conforming
+implementations of it disagree by one ulp on roughly 7 % of the arguments fux
+can hand it. Measured, exhaustively over `idf`'s whole argument domain
+(`df = 1..n`) on darwin/arm64 and glibc/x86-64:
+[`work/regression/2026-09-05-node-log-divergence/`](../../work/regression/2026-09-05-node-log-divergence/ADDENDUM-GLIBC.md).
+**Nine places is not a tolerance chosen to make a comparison pass — it is the
+resolution decision 8 already sorts at**, seven orders of magnitude above the
+largest divergence measured. ⚠ **This licenses nothing about the ORDER**, which
+stays byte-equal across runtimes: a different top-5 is a defect under this
+decision, not a rounding difference. Arpit ruled this on 2026-09-06
+([PRE-REG-NODE §2](../../work/benchmark/PRE-REGISTRATION-NODE.md)); a
+divergence above `~1e-9` relative on any platform pair voids it.
+
 **9. One analyzer, shared by ingest and query.** Split identifiers, lowercase,
 drop a fixed English stopword list, Porter-stem, then hash — **in that order**,
 and two of the positions are easy to get backwards:
