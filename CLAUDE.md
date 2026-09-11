@@ -159,7 +159,7 @@ its milestone needs it. Nothing else comes back.
 restating it — and no record may restate one. Changing a law changes this
 section *and* ADR-LAWS' table, in the same commit.
 
-⚠ **Since 2026-09-06 each law also has its own record, `0002`–`0009` and `0062`** — L1's is
+⚠ **Each law also has its own record, `0002`–`0011`** (since 2026-09-06; `0011` is L9, 2026-09-11) — L1's is
 [ADR-LAW-1](docs/adr/0003_LAW-1-zero-cost.md), and ADR-LAWS' table routes to the rest.
 **Those records are RATIONALE, never the law**: they carry why it exists, what it
 has cost, how its wording has moved, and what would reopen it. **This section is
@@ -239,6 +239,21 @@ no-restatement rule exists to prevent.
   **the transmission clause** were all in earlier forms and none survives;
   [ADR-LAWS](docs/adr/0001_LAWS.md) decision 8 carries each pass and what it
   traded away — **including the gap the last one leaves open.**
+- **L9** · **Each sibling environment has one job** (Arpit, 2026-09-11).
+  - **`fux-playground` is Arpit's alone**, for trying things by hand. No agent,
+    script, test, measurement or benchmark ever reads, ingests, grades against,
+    copies or files a number from it.
+  - **`fux-lab` runs every measurement and evaluation**, on the **golden test data
+    only** (`work/golden/`), **at most 10 000 documents**. fux's own `tests/` and
+    `tests_e2e/` keep their built-in fixtures.
+  - **`fux-benchmark` runs benchmarks only**: how fast each query returns, and the
+    ranked list it returned, **kept so the next run is compared against it** —
+    always across **two fux versions**, the current build and the newest release of
+    the previous major. Its corpora are folders of **100, 200, 500, 1 000, 2 000,
+    5 000 and 10 000** documents; each document about **1 000 lines**, lines up to
+    about **300 characters**, with tables, charts, bullet points and Mermaid
+    diagrams, written to read as machine-made or by several authors, professional
+    or amateur. [ADR-LAW-9](docs/adr/0011_LAW-9-environments.md).
 
 ## Litmus for any new work
 
@@ -386,7 +401,7 @@ Then, on completion:
    change. Full convention: [`docs/adr/README.md`](docs/adr/README.md).
    **The live numbering runs on two ranges since 2026-09-11** (Arpit):
    `docs/adr/0001`–`0100` is the **Law** range — `0001` ADR-LAWS and
-   `0002`–`0010` ADR-LAW-0…ADR-LAW-8, with `0011`–`0100` reserved and **empty,
+   `0002`–`0011` ADR-LAW-0…ADR-LAW-9, with `0012`–`0100` reserved and **empty,
    no placeholder files** — and `0101`– is every other record, today
    `0101` ADR-CLI through `0154` ADR-DOCTOR. A new record takes the next free
    number in its own range.
@@ -624,7 +639,7 @@ The register, the convention and the ownership table are in
   executable twin exists.
 - **A record that restates a cross-cutting principle is a bug, not
   redundancy.** The non-negotiable constraints have exactly one home — this
-  file — and are named L1–L8 by
+  file — and are named L0–L9 by
   [ADR-LAWS](docs/adr/0001_LAWS.md). Every other record cites `ADR-LAWS` and
   the number; none paraphrases. Paraphrases drift, and a drifted paraphrase in
   an accepted record reads as authority.

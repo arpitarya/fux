@@ -16,7 +16,7 @@ Before anything else, stop and ask Arpit, and wait for his answer:
 you paste it here in the chat?" Do not open or create that file until he says (1).
 Then:
 1. Verify every work/golden/ladder/rung-NNNNN.sha256 against its own directory
-   ~/my_programs/fux-benchmark/corpora/golden/rung-NNNNN/ (hashes match; each
+   ~/my_programs/fux-lab/corpora/golden/rung-NNNNN/ (hashes match; each
    rung's documents contain the previous rung's byte for byte; seed/ files present
    in every rung; a work/golden/ladder/rung-NNNNN.index exists). Report mismatches and
    stop if any.

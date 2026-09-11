@@ -20,7 +20,7 @@ under work/golden/. Never open, list, grep or hash golden-answer/. If any tool
 output ever shows you a question or an answer, stop and report it.
 
 Build ONE SELF-CONTAINED DIRECTORY PER RUNG under
-~/my_programs/fux-benchmark/corpora/golden/: rung-00010, rung-00100, rung-00200,
+~/my_programs/fux-lab/corpora/golden/: rung-00010, rung-00100, rung-00200,
 rung-00500, rung-01000, rung-02000, rung-05000, rung-10000. Each is a git repo
 with real copies (no links): seed files at seed/NN-….md exactly as named in
 work/golden/seed/, new files under ext/<category>/. Content is nested — each

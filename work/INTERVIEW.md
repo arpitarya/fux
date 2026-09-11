@@ -30,6 +30,12 @@ valuable judgement, but not the state of play.
 *Updated **2026-09-11**.* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
+### L9 — each sibling environment has one job (2026-09-11, Cowork)
+
+- 🔴 **`fux-playground` is Arpit's hands only** — no agent, tool, test or run uses it. **`fux-lab`** runs every measurement on golden test data ≤ 10 000. **`fux-benchmark`** only times queries and keeps ranked lists, current build vs newest previous-major release. Law text: CLAUDE.md L9; rationale ADR-LAW-9 (`0011`).
+- Reconciliation is W-138 (~40 artifacts + guard test); the benchmark build is W-139. Filed playground runs stand.
+- **OPEN-WORK ratified against L9:** W-115, W-97, the heading control, W-106, W-112 and W-107's measured arms all wait on W-136's golden ladder. **W-136 phase 1 (Arpit runs Codex) is the single biggest unblock.**
+
 ### W-137 — the ADR renumber LANDED (2026-09-11, Claude Code)
 
 - **Laws own `0001`–`0100`**; `0011`–`0100` is reserved and **empty — no placeholder files**. **Every other record starts at `0101`**: ADR-CLI `0011` → `0101` through ADR-DOCTOR `0064` → `0154`, 54 records +90. The one-shot script is deleted; the scheme is stated in [the register](../docs/adr/README.md) §The convention.

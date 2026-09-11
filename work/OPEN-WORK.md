@@ -15,7 +15,7 @@ The two run **concurrently**; never order one against the other.
 
 *Named here so a session leads with it instead of burying it. **Ages are
 recomputed against the reading date, never copied** — a queue that copies its
-ages stops flagging its own oldest item. As of **2026-09-11, two rows are past
+ages stops flagging its own oldest item. As of **2026-09-11, one row is past
 CLAUDE.md's 5-day threshold**, and a session names each, with its age, in its
 first output.*
 
@@ -38,16 +38,31 @@ failure mode here with a perfect record.
 
 | what he decides | filed | age |
 |---|---|---|
-| 🔴 **Does the abstention result gate anything?** **Re-run done, and the answer is the same: 20 of 20 `answerable: true`, 0 ids flipped** — fourteen days and five ranking changes later ([the run](regression/2026-09-11-blind-unanswerable-rerun/report.md)). Band, separation and the `separation_floor` are each **demonstrated not to be the lever**. No threshold is proposed and R10 stays unmeasured — picking a floor from these 20 fits it to the set that exposed the problem | 2026-08-28 | 14d |
-| 🔴 **The four no-op priors — pick an instrument, or close the knob.** The remeasure you ordered **cannot run**: three of the four priors move **0 of 50** goldens at every value including `0.0`, because the playground declares no `supersedes:` key on any branch of its history ([the run](regression/2026-09-11-four-priors-headroom/report.md)). **(a)** declare it (one frontmatter line — changes the committed index and every number filed against it), **(b)** build a purpose-made corpus, or **(c)** close the knob on the structural argument, which needs no corpus | 2026-09-11 | 0d |
-| **W-136 phase 1 — run prompt 1 in Codex.** Codex writes the 10 seed documents into `work/golden/seed/` and ~100 questions with answers — **the key goes where you say**: Codex first asks *file (`golden-answer/answers.jsonl`) or chat?* (Claude never reads it). Prompt: [`golden/prompts/1-codex-seed.md`](golden/prompts/1-codex-seed.md) · process: [`golden/README.md`](golden/README.md) | 2026-09-11 | 0d |
-| **W-87 Part B — accept R-11?** Retarget Part B at the two corpora that exist — the repaired `fux-playground` (10 docs, 50 goldens) and `fux-benchmark` `t10000` — and retire the dependency on `acme`/`orbit`, which were wiped with their generator. Proposal: [`proposals/unblock-2026-09-05.md`](proposals/unblock-2026-09-05.md) R-11 | 2026-08-27 | 15d |
+| 🔴 **Does the abstention result gate anything?** **Re-run done, and the answer is the same: 20 of 20 `answerable: true`, 0 ids flipped** — fourteen days and five ranking changes later ([the run](regression/2026-09-11-blind-unanswerable-rerun/report.md)). Band, separation and the `separation_floor` are each **demonstrated not to be the lever**. No threshold is proposed and R10 stays unmeasured — picking a floor from these 20 fits it to the set that exposed the problem. Under [L9](../docs/adr/0011_LAW-9-environments.md) any further abstention test runs in fux-lab on the golden set's `unanswerable` questions (W-136), never the playground | 2026-08-28 | 14d |
+| 🔴 **The four no-op priors — pick an instrument, or close the knob.** The remeasure you ordered **cannot run**: three of the four priors move **0 of 50** goldens at every value including `0.0`, because the playground declares no `supersedes:` key on any branch of its history ([the run](regression/2026-09-11-four-priors-headroom/report.md)). **Two options left under [L9](../docs/adr/0011_LAW-9-environments.md)** (declaring it in the playground is void): **(b)** put declared supersession, `archived=true` sources, dated documents and intent-split questions into the golden test data (W-136) and remeasure in fux-lab, or **(c)** close the knob on the structural argument, which needs no corpus | 2026-09-11 | 0d |
+| **W-136 phase 1 — did the answer key get written?** **The ten seed documents landed** (`work/golden/seed/`, committed 2026-09-11) — the half Claude can see. **The other half no Claude session can ever verify**: whether Codex wrote the ~100 questions and answers, and where. Say yes and **phase 2 is agent work, runnable at once**; say no and prompt 1 is re-run. Prompt: [`golden/prompts/1-codex-seed.md`](golden/prompts/1-codex-seed.md) · process: [`golden/README.md`](golden/README.md) | 2026-09-11 | 0d |
 
 ---
 
 ## Open items
 
 ### fux build
+
+- 🔴 **W-138 — reconcile every artifact with L9.** `agent` · *(records: [ADR-LAW-9](../docs/adr/0011_LAW-9-environments.md) ·
+  ADR-RS · ADR-QUALITY · ADR-ACCELERATOR · ADR-CONFIDENCE · ADR-ANSWER)* · **Arpit's L9,
+  2026-09-11:** the playground is his hands only; the lab runs every measurement on
+  golden test data ≤ 10 000; the benchmark only times queries and keeps ranked lists,
+  current build vs previous major. ~40 docs, tools, tests and plans still use the
+  playground as an instrument or mix the roles — rewrite them, and add a guard test
+  that nothing under `src/ tools/ tests/ scripts/` reads the playground. —
+  [detail](open/W-138-reconcile-with-l9.md) `filed: 2026-09-11`
+
+- 🟠 **W-139 — build fux-benchmark to L9.** `agent`, after W-138 · *(record:
+  [ADR-LAW-9](../docs/adr/0011_LAW-9-environments.md))* · seven corpus folders
+  (100 → 10 000 docs of ~1 000 lines with tables, charts, bullets and Mermaid), a
+  fixed query set, every run timing each query and keeping its ranked list across
+  the current build and the newest `1.x`, diffed against the previous run. —
+  [detail](open/W-139-benchmark-per-l9.md) `filed: 2026-09-11`
 
 - 🔴 **W-122 — the remainder of L0: the generated `CLAUDE.md` block, the config
   consolidation, and the gate.** `agent` · *(records: ADR-LAW-0 · ADR-LAWS ·
@@ -80,36 +95,36 @@ failure mode here with a perfect record.
   *(spec: [`proposals/search-v3.md`](proposals/search-v3.md) §8 · one detail
   file each under [`open/`](open/README.md))* · **Opus** executes, in Arpit's
   ratified order: **W-107 Phases 1–4** → **W-112**. `ratified: 2026-09-05`
-  - **[W-107](open/W-107-node-read-plane.md)** · `agent` · *(**ADR-NODE-SEARCH** new · ADR-RANKING · ADR-MCP)* · the Node read plane — `npx fux-search ask|find|answer|explain|graph|path|mcp`, zero deps, one contract, a third arm of the differential law. ▶ **Phase 1 starts; nothing blocks it.** Phase 0's `log()` question is settled and the rule lives in [ADR-RANKING decision 8a](../docs/adr/0111_ranking.md) — scores equal after `round(9)`, ordering byte-equal; [`PRE-REGISTRATION-NODE.md`](benchmark/PRE-REGISTRATION-NODE.md) is frozen in full, sha `0e3b4c80bf9e6a3ad122cb4e0db4f81adf04693fd47047fa24dd9edc7cb037a7`, and Phases 1–4 build against it. ⚠ **§4 still requires all three OSes before an arm is called green**, and only glibc/arm64 has been touched — [`log-probe.yml`](../.github/workflows/log-probe.yml) is **unrun**, so musl, Windows and Node 20 are unmeasured. `filed: 2026-09-04`
-  - **[W-106](open/W-106-vector-gate.md)** · `agent` · *(no record — a run)* · **the gate is measured and closed without a verdict** (Arpit's ruling — DENSE-CHUNK's frozen bar could not be tested: the playground's index was `fux.index.v1` and it carries no enrichment). 🔴 **What it found instead, and what W-112 has to answer: a pinned committed vector is an artefact of one implementation.** Two implementations of one model agree to **cosine 0.9964** and share **0 of 125** int8 vectors, with 41/50 top-5 orderings discordant ([the run](regression/2026-09-05-vector-gate/report.md)). ⚠ **The DoD's `pooling: mean` is wrong for BGE** and the misconfigured arm scored best. **Still owed: the two-architecture arm** (arm64 only so far) **and a corpus.** `filed: 2026-09-04`
-  - **[W-112](open/W-112-vector-plane.md)** · `arpit` · *(**ADR-VECTORS** new · ADR-DOTFUX · ADR-INGEST · ADR-ASK · ADR-PROVENANCE)* · the vector plane — `fux embed`, pinned `.fux/vectors/`, `--qvec`, rank-space fusion; fux never computes a vector. 🔴 **Blocked on three things:** a restored corpus (W-87 Part B), a re-run gate, and a compare doc Arpit must rule on. ⚠ **The determinism claim the design can actually make is *"same clone + same embedder build"*, never *"same model"*** — W-106's `0 of 125` is why. `filed: 2026-09-04`
+  - **[W-107](open/W-107-node-read-plane.md)** · `agent` · *(**ADR-NODE-SEARCH** new · ADR-RANKING · ADR-MCP)* · the Node read plane — `npx fux-search ask|find|answer|explain|graph|path|mcp`, zero deps, one contract, a third arm of the differential law. ▶ **Phase 1 starts; nothing blocks it.** Phase 0's `log()` question is settled and the rule lives in [ADR-RANKING decision 8a](../docs/adr/0111_ranking.md) — scores equal after `round(9)`, ordering byte-equal; [`PRE-REGISTRATION-NODE.md`](benchmark/PRE-REGISTRATION-NODE.md) is frozen in full, sha `0e3b4c80bf9e6a3ad122cb4e0db4f81adf04693fd47047fa24dd9edc7cb037a7`, and Phases 1–4 build against it. ⚠ **§4 still requires all three OSes before an arm is called green**, and only glibc/arm64 has been touched — [`log-probe.yml`](../.github/workflows/log-probe.yml) is **unrun**, so musl, Windows and Node 20 are unmeasured. ⚠ **[L9](../docs/adr/0011_LAW-9-environments.md): its frozen pre-registration names the playground** — the build (Phases 1–4) is unaffected, but any measured arm runs on fux-lab golden data under a superseding pre-registration ([W-138](open/W-138-reconcile-with-l9.md)). `filed: 2026-09-04`
+  - **[W-106](open/W-106-vector-gate.md)** · `agent` · *(no record — a run)* · **the gate is measured and closed without a verdict** (Arpit's ruling — DENSE-CHUNK's frozen bar could not be tested: the playground's index was `fux.index.v1` and it carries no enrichment). 🔴 **What it found instead, and what W-112 has to answer: a pinned committed vector is an artefact of one implementation.** Two implementations of one model agree to **cosine 0.9964** and share **0 of 125** int8 vectors, with 41/50 top-5 orderings discordant ([the run](regression/2026-09-05-vector-gate/report.md)). ⚠ **The DoD's `pooling: mean` is wrong for BGE** and the misconfigured arm scored best. **Still owed: the two-architecture arm** (arm64 only so far) **and a corpus — under [L9](../docs/adr/0011_LAW-9-environments.md), fux-lab's golden test data (W-136).** `filed: 2026-09-04`
+  - **[W-112](open/W-112-vector-plane.md)** · `arpit` · *(**ADR-VECTORS** new · ADR-DOTFUX · ADR-INGEST · ADR-ASK · ADR-PROVENANCE)* · the vector plane — `fux embed`, pinned `.fux/vectors/`, `--qvec`, rank-space fusion; fux never computes a vector. 🔴 **Blocked on three things:** a corpus — **under [L9](../docs/adr/0011_LAW-9-environments.md) the golden ladder in fux-lab (W-136)**, a re-run gate, and a compare doc Arpit rules on **once it is written** (not yet — nothing to decide today). ⚠ **The determinism claim the design can actually make is *"same clone + same embedder build"*, never *"same model"*** — W-106's `0 of 125` is why. `filed: 2026-09-04`
 
 ### testing
 
 - 🟠 **W-136 — the sealed golden benchmark.** `arpit` (Codex phases), then `agent` ·
   *(records: [ADR-RS](../docs/adr/0133_predictions.md) · [ADR-QUALITY](../docs/adr/0141_quality-contract.md) ·
-  setup: [fux-benchmark](setup/fux-benchmark.md), [fux-lab](setup/fux-lab.md))* · **Arpit, 2026-09-11.**
+  setup: [fux-lab](setup/fux-lab.md))* · **Arpit, 2026-09-11.**
   Codex writes 10 seed documents and ~100 questions with answers in
   `work/golden/golden-answer/` — **Claude never reads it**. Claude grows the corpus
   **10 → 10 000** without seeing a question; Codex freezes it and releases questions
   only; Claude runs fux per rung; Codex scores and returns per-query results with no
-  answers. One test set for fux-benchmark and fux-lab. Process:
+  answers. The test data for fux-lab ([L9](../docs/adr/0011_LAW-9-environments.md)). Process:
   [`golden/README.md`](golden/README.md) — [detail](open/W-136-golden-benchmark.md)
   `filed: 2026-09-11`
 
 - 🔴 **W-115 is STILL UNMEASURED FOR QUALITY, and now it is known why.** `agent`,
-  **needs a corpus decision** · *(records: [ADR-RS](../docs/adr/0133_predictions.md) ·
+  **blocked on W-136** · *(records: [ADR-RS](../docs/adr/0133_predictions.md) ·
   [ADR-DECODE](../docs/adr/0139_decode.md))* · **The question has no instrument.**
   The corpus with goldens (**playground**) produces a **byte-identical index across
   the arms** — zero headroom, proven — and the corpus that can see the change
   (**fux's own repo**) has **no goldens**. So *"did ranking get better?"* cannot be
   asked today, and **no document may cite W-115 as measured.**
   ⚠ **Do not point this at the playground again** — that has been tried and it was
-  wrong. **The likely instrument is [W-136](open/W-136-golden-benchmark.md)**, whose
-  whole purpose is a graded corpus at scale.
+  wrong. **Ratified by [L9](../docs/adr/0011_LAW-9-environments.md): the instrument is [W-136](open/W-136-golden-benchmark.md)'s
+  golden ladder in fux-lab** — the corpus decision is made, the corpus is not yet built.
   `filed: 2026-09-06` · `re-scoped: 2026-09-11`
 
-- **W-97** · `agent` · *(record: [ADR-TUNE](../docs/adr/0135_tuning.md) ·
+- **W-97** · `agent`, blocked on W-136 · *(record: [ADR-TUNE](../docs/adr/0135_tuning.md) ·
   [ADR-RS](../docs/adr/0133_predictions.md))* · **the knob sweep — which
   `.fux/tune.toml` defaults are defensible, measured rather than argued.**
   Pre-registered as [`benchmark/PRE-REGISTRATION-TUNER.md`](benchmark/PRE-REGISTRATION-TUNER.md)
@@ -123,15 +138,18 @@ failure mode here with a perfect record.
   weights and recency have no instrument with headroom (§6 lists the generator
   kinds owed).
 
-  ▶ **T1 (`rerank_weight`) is runnable now** — 13/37 proven headroom on this
-  corpus, and both of its tooling blockers are gone (`bench.py quality --tune
-  TABLE.KEY=VALUE`, and per-query rows via `check.py --rows`).
+  🔴 **Under [L9](../docs/adr/0011_LAW-9-environments.md), nothing here is runnable today.** T1's 13/37 headroom was
+  measured on the playground, which is no longer an instrument, and the generated
+  selection suite is not golden test data. **Every leg moves to fux-lab golden data
+  (W-136) under a new pre-registration that supersedes the frozen one** — the
+  latency fence may run in fux-benchmark, which is its job. The tooling
+  (`bench.py quality --tune`, per-query rows) carries over.
 
   🔴 **T2 (`superseded_weight`) cannot run**: the knob moves **0 of 50** goldens
   at every value on that corpus, because it declares no `supersedes:` key
   ([the run](regression/2026-09-11-four-priors-headroom/report.md)). **The named
   veto queries `q022`/`q033` cannot be broken by a knob that reaches neither.**
-  T2 waits on the same instrument decision as the four-priors item below.
+  T2 waits on the same decision as the four-priors item below — (b) or (c).
 
   ⚠ **`rerank_weight` moves TWO mechanisms, not one** — since W-108 it also
   scales the refer plane's passage proximity, which this sweep's design assumed
@@ -141,26 +159,29 @@ failure mode here with a perfect record.
   [W-109's gate](regression/2026-09-05-expand/report.md) ran every arm at that one
   value. It is in §1's defaults table and §6's out-of-scope table, and **it cannot
   join this sweep: no suite here passes `--expand`**, so no query can move it. —
-  [detail](open/W-97-tuner-knob-sweep.md) `filed: 2026-08-28`
+  — [detail](open/W-97-tuner-knob-sweep.md) `filed: 2026-08-28`
 
-- **The `heading` negative control is saturated and must be rebuilt.** `agent` ·
+- **The `heading` negative control is saturated and must be rebuilt.** `agent`, blocked on W-136 ·
   *(record: [ADR-RS](../docs/adr/0133_predictions.md))* ·
   [C4](regression/2026-08-28-benchmark-contested/VERDICT-C4.md) returned its
   predicted null at **100 % in both arms with zero headroom**, so it returned
   the right answer for the wrong reason and **did not discharge its job**. Until
   it does, C1 and C3 rest on generator assertions rather than a live control.
   The fix is a control with headroom by construction — e.g. distractors that are
-  *also* heading-matched. `filed: 2026-08-28`
+  *also* heading-matched. **Under [L9](../docs/adr/0011_LAW-9-environments.md) it is rebuilt inside the golden ladder**
+  (heading-matched `sibling` documents in W-136 phase 2), not on a generated suite —
+  agent work, blocked on W-136. `filed: 2026-08-28`
 
-- **W-87** · `agent` (the `judged` series) **and** `arpit` (Part B) ·
+- **W-87** · `agent`, blocked on W-136 ·
   *(record: [ADR-QUALITY](../docs/adr/0141_quality-contract.md))* · **what
   "good" means, then measure.** ⚠ **Two things keep it open:**
   - **The `judged` series has never been exercised** — no judged run exists.
-    ▶ **This is `agent` work and is runnable now**; its input (a playground with
-    a current index and per-query rows) is in place.
+    ⚠ **Its input moves under L9** (2026-09-11): not the playground but fux-lab's
+    golden test data — blocked on W-136.
   - 🔴 **Part B cannot run.** `acme` and `orbit` went in the 2026-08-20 wipe with
-    their generator, and `tools/pruning-eval/` hard-codes reading them. **Part B
-    is Arpit's ruling on R-11** (inbox). —
+    their generator, and `tools/pruning-eval/` hard-codes reading them. **R-11's
+    retarget at the playground is void under L9**; Part B runs in fux-lab on the
+    golden ladder — agent work, blocked on W-136 (W-138 repoints the harness). —
   [detail](open/W-87-what-good-means.md) `filed: 2026-08-27`
 
 ### adr update
@@ -212,12 +233,11 @@ failure mode here with a perfect record.
   ✅ `rerank_weight` is the one prior with headroom; net `+4` at `1.0`, 0 broken,
   **below the floor**, so the hold stands unchanged.
 
-  🔴 **BACK TO ARPIT — the instrument needs a decision, and it is his:**
-  **(a)** declare the supersession the corpus already states in prose (one
-  frontmatter line; **changes the committed index and every golden number filed
-  against it**), **(b)** build a purpose-made corpus with declared supersession
-  and a query set split by intent, or **(c)** close the knob on the structural
-  argument, which needs no corpus at all. The item's own text says a NO is a
+  🔴 **BACK TO ARPIT — two options left.** **(a)**, declaring the supersession in
+  the playground, is **void under [L9](../docs/adr/0011_LAW-9-environments.md)**. **(b)** put declared supersession,
+  `archived=true` sources, dated documents and a query set split by intent into the
+  golden test data (W-136) and remeasure in fux-lab, or **(c)** close the knob on the
+  structural argument, which needs no corpus at all. The item's own text says a NO is a
   success; this is not a NO, it is *cannot ask*.
 
   **What the remeasure still needs:**

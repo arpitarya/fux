@@ -2,7 +2,7 @@
 type: OpenItem
 id: W-136
 title: "W-136 — the sealed golden benchmark"
-description: "Arpit, 2026-09-11: Codex writes 10 seed documents and ~100 questions with answers Claude never sees; Claude grows the corpus 10 → 10 000 blind; Claude runs fux per rung; Codex scores without revealing answers. One test set for fux-benchmark and fux-lab."
+description: "Arpit, 2026-09-11: Codex writes 10 seed documents and ~100 questions with answers Claude never sees; Claude grows the corpus 10 → 10 000 blind; Claude runs fux per rung; Codex scores without revealing answers. The test data for fux-lab (L9)."
 status: open
 lane: arpit
 timestamp: 2026-09-11T00:00:00Z
@@ -17,8 +17,8 @@ once; this file carries only state. Prompts: [`work/golden/prompts/`](../golden/
 
 | phase | who | lane | state |
 |---|---|---|---|
-| 1. Seed + answer key | Codex | `arpit` — run prompt 1 | ⏳ **next** |
-| 2. Extend 10 → 10 000, blind | Claude Code (Opus) | `agent` | waits on 1 |
+| 1. Seed + answer key | Codex | `arpit` — run prompt 1 | 🟡 **seed landed, key unverifiable** |
+| 2. Extend 10 → 10 000, blind | Claude Code (Opus) | `agent` | ⏳ **next**, once Arpit confirms the key exists |
 | 3. Freeze ladder, release questions | Codex | `arpit` — run prompt 3 | waits on 2 |
 | 4. Run each rung | Claude Code | `agent` | waits on 3 · pre-registered, and reported under [ADR-RS](../../docs/adr/0133_predictions.md) decision 22 (where W-135 landed) |
 | 5. Score each rung | Codex | `arpit` — run prompt 5 | waits on 4 |
@@ -30,6 +30,16 @@ once; this file carries only state. Prompts: [`work/golden/prompts/`](../golden/
 - Guards: `.gitignore`, `!work/golden` in `.fux/sources/dirs`, Claude Code
   `permissions.deny` + `.claude/hooks/guard-golden-answer.sh`, CLAUDE.md §Golden
   answer key.
+
+## Phase 1, as far as Claude can see it (2026-09-11)
+
+- **Ten seed documents are in `work/golden/seed/`** and committed — Quillfern Cold
+  Logistics, in the six shapes the brief asked for (`.md` with and without
+  frontmatter, `.yaml`, `.txt`, `.eml`, `.html`).
+- ⚠ **Whether the questions and answers exist is outside any Claude session's
+  reach**, by construction — the key is never read, listed or hashed. **Only Arpit
+  can close phase 1**, and the inbox row asks him to.
+- Phase 2 needs `seed/` and nothing else, so it is runnable the moment he confirms.
 
 ## The seed brief (2026-09-11)
 
@@ -51,7 +61,7 @@ once; this file carries only state. Prompts: [`work/golden/prompts/`](../golden/
 - **Questions stay inside the key until the ladder is frozen.** An extender that
   has seen them makes every rung `informed`.
 - **Ladder stops at 10 000** — the 2026-08-22 ceiling.
-- **Corpus lives in `~/my_programs/fux-benchmark/corpora/golden/`**; only manifests
+- **Corpus lives in `~/my_programs/fux-lab/corpora/golden/`**; only manifests
   are committed here.
 - **One directory and one index per rung** (Arpit, 2026-09-11) — `rung-00010` …
   `rung-10000`, real copies, each its own git repo with a committed `.fux/` index built

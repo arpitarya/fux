@@ -34,10 +34,10 @@ New records are written here, from [`TEMPLATE.md`](TEMPLATE.md).
 
 | range | holds | a new record takes |
 |---|---|---|
-| `0001`–`0100` | the **Law** records only — `0001` ADR-LAWS, `0002`–`0010` ADR-LAW-0 … ADR-LAW-8 | the next free number **from `0011`** |
+| `0001`–`0100` | the **Law** records only — `0001` ADR-LAWS, `0002`–`0011` ADR-LAW-0 … ADR-LAW-9 | the next free number **from `0012`** |
 | `0101`– | **every other record**, sequentially | the next free number **after the highest** |
 
-**`0011`–`0100` are reserved and EMPTY — there are no placeholder files.** A
+**`0012`–`0100` are reserved and EMPTY — there are no placeholder files.** A
 gap in that range is the reservation, not a missing record; nothing scans for
 one and nothing should create one to fill it. **If the laws ever pass 100,
 renumber again** — Arpit's words, and deliberately not a pre-built rule.
@@ -179,6 +179,7 @@ Start from [`TEMPLATE.md`](TEMPLATE.md).
 | [0007](0007_LAW-5-hashed-meta.md) | **ADR-LAW-5** | **L5** — hashed meta for non-git sources, enforced at write time. The ACL-mismatch leak it closes, and the channel it reduces rather than closes | accepted | yes |
 | [0008](0008_LAW-6-say-index.md) | **ADR-LAW-6** | **L6** — say "index", not "db". Load-bearing vocabulary: the noun governs the inferences, and every *"why not cache the bodies"* conversation starts with the wrong one | accepted | yes |
 | [0009](0009_LAW-7-python-311.md) | **ADR-LAW-7** | **L7** — Python ≥ 3.11. The floor that made refusing dependencies affordable, and the justification that narrowed on 2026-09-06 without the floor moving | accepted | yes |
+| [0011](0011_LAW-9-environments.md) | **ADR-LAW-9** | **L9** — each sibling environment has one job: `fux-playground` is Arpit's hands only; `fux-lab` runs every measurement on golden test data ≤ 10 000 documents; `fux-benchmark` only times queries and keeps their ranked lists, always current build vs the previous major | accepted | yes |
 | [0010](0010_LAW-8-use-record.md) | **ADR-LAW-8** | **L8** — a use record is never committed. Written, reverted and re-narrowed in one day; gitignored is the test, not `.fux/`; and the transmission clause that did not survive | accepted | yes |
 | [0101](0101_cli-surface.md) | **ADR-CLI** | The command-line surface — flat verbs in seven groups, one error boundary, three output modes, every command captured verbatim | accepted | yes |
 | [0102](0102_fux-directory.md) | **ADR-DOTFUX** | The `.fux/` directory — every child declared committed or derived; the ignore rule asserted against git itself | accepted | yes |
@@ -250,7 +251,7 @@ Start from [`TEMPLATE.md`](TEMPLATE.md).
 > law set contiguous permanently, at the price of one mechanical rename.
 >
 > ⚠ **The first new law will take `0011`, which was ADR-CLI's ordinal until
-> today.** That is exactly the vacated-ordinal hazard W-82 ruling 7 named, and
+> today** — and it did, the same day: [ADR-LAW-9](0011_LAW-9-environments.md). That is exactly the vacated-ordinal hazard W-82 ruling 7 named, and
 > it is being accepted a second time rather than avoided: the alternative is
 > reserving from `0065` and leaving the laws non-contiguous, which is the
 > problem. **A frozen document citing `0011` means ADR-CLI; a document written

@@ -16,7 +16,7 @@ Read CLAUDE.md §Golden answer key and §Conformance runs first. Never open
 work/golden/golden-answer/. You may read work/golden/questions.jsonl.
 1. Commit work/regression/<date>-golden-<RUNG>/PRE-REGISTRATION.md before any
    number: engine sha, rung, metrics with k named, headroom disclosure per ADR-RS.
-2. Work in ~/my_programs/fux-benchmark/corpora/golden/<RUNG>/ with the
+2. Work in ~/my_programs/fux-lab/corpora/golden/<RUNG>/ with the
    pinned engine. Verify documents against work/golden/ladder/<RUNG>.sha256.
    Use the rung's own index — DO NOT re-ingest — unless the engine version differs
    from work/golden/ladder/<RUNG>.index; then re-ingest once, update the record,

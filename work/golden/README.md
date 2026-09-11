@@ -1,6 +1,6 @@
 # `work/golden/` — the sealed golden benchmark
 
-**One test set for `fux-benchmark` and `fux-lab`: ten seed documents written by
+**The test data for `fux-lab` — and only for `fux-lab`, per [L9](../../docs/adr/0011_LAW-9-environments.md): ten seed documents written by
 Codex, ~100 questions with answers Claude never sees, and a corpus ladder Claude
 grows from 10 to 10 000 documents without ever seeing a question.**
 
@@ -56,7 +56,7 @@ work/golden/
   prompts/                  the five paste-ready prompts, one per phase
 ```
 
-**The ladder corpus itself lives in `~/my_programs/fux-benchmark/corpora/golden/`**,
+**The ladder corpus itself lives in `~/my_programs/fux-lab/corpora/golden/`**,
 not in this repo — 10 000 documents would bloat fux's git history. Only the
 manifests are committed here, so every rung is verifiable byte for byte.
 
@@ -67,7 +67,7 @@ rung is tested by asking, never by re-ingesting — and a 100-document run never
 waits on 10 000.
 
 ```
-~/my_programs/fux-benchmark/corpora/golden/
+~/my_programs/fux-lab/corpora/golden/
   rung-00010/   seed/ (10)                          .fux/  ← its own index
   rung-00100/   seed/ + ext/ (100)                  .fux/
   rung-00200/   seed/ + ext/ (200)                  .fux/
@@ -97,7 +97,7 @@ waits on 10 000.
 | phase | who | reads | writes | prompt |
 |---|---|---|---|---|
 | **1. Seed** | Codex | nothing from fux | `seed/` (10 docs) + the key, **where Arpit says** | [`prompts/1-codex-seed.md`](prompts/1-codex-seed.md) |
-| **2. Extend** | Claude Code | `seed/` **only** | corpus in fux-benchmark + `ladder/*.sha256` | [`prompts/2-claude-extend.md`](prompts/2-claude-extend.md) |
+| **2. Extend** | Claude Code | `seed/` **only** | corpus in fux-lab + `ladder/*.sha256` | [`prompts/2-claude-extend.md`](prompts/2-claude-extend.md) |
 | **3. Freeze & release** | Codex | the manifests + the key | `questions.jsonl`; marks the sealed subset in the key | [`prompts/3-codex-release.md`](prompts/3-codex-release.md) |
 | **4. Run** | Claude Code | the ladder + `questions.jsonl` | `predictions.jsonl` per rung | [`prompts/4-claude-run.md`](prompts/4-claude-run.md) |
 | **5. Score** | Codex | predictions + the key | per-query results **without answers** | [`prompts/5-codex-score.md`](prompts/5-codex-score.md) |
