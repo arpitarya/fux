@@ -36,7 +36,6 @@ then refresh this repo's renderings.
 | 14 | **`fux update --check` always exits 0** and has no `--json`. **(guide: INDEX, MAINTAIN)** | `sources.py` | ADR-CLI |
 | 15 | **No fetch timeout is enforced** — `timeout_seconds` is recorded and read nowhere. | `refer/freshness.py` ~44 | ADR-REFER |
 | 16 | **URL documents keep old redactions after a `pii.toml` change** until re-fetched, `--full` included — the record says this only for `update=never`. **(guide: PII)** | `ingest/run.py` ~187 | ADR-PII |
-| 17 | **Starter refusal rules refuse real wiki pages** (`viewpage.action`, `.aspx`, `.php`); `suspiciously-small-document`'s comment says *warn* but it refuses. **(guide: FETCHER)** | `templates/refusals.toml.txt` | ADR-REFUSAL |
 | 20 | ⚠ **The freshness gate's `describes` relation is per FILE, so a change to one function in `ingest/run.py` demands a line in three records that do not describe it.** Twice in one session (2026-09-11) that produced a record edit whose only content was *nothing here changed*. Per-symbol describes, or an explicit exemption, would fix it | `tests/test_adr_freshness.py`, `docs/adr/README.md` §Ownership | ADR-OWNERSHIP |
 
 ## 2 · Records that disagree with the code
@@ -174,6 +173,18 @@ then refresh this repo's renderings.
   redaction note stop pointing at `tools/pii-probe/probe.py`, which is in the
   repository and not in the wheel. ADR-DOTFUX, ADR-PII decision 20, ADR-DOCTOR.
   2026-09-11.
+
+- **Row 17 — the shipped refusal policy refused real wiki pages, and promised a
+  warning that does not exist.** `requested_suffix_not` means *this URL asked
+  for a web page* and listed only `.html`/`.htm`, so the file's highest-value
+  rule refused every `viewpage.action`, `Page.aspx`, `index.php` and `.jsp`
+  document. Both suffix rules carry the server-page extensions now, and the
+  cases they exist for are pinned unchanged (a `.xlsx` answered in HTML; a
+  216-byte stub at a share link). **There is no warn level** — the comment
+  claiming one is gone, and a test pins that no `warn` field exists so the
+  prose cannot drift back before the code does.
+  [ADR-REFUSAL](../../docs/adr/0148_refusals.md). ⚠ Write-if-missing, so no
+  existing repo gets the fix. 2026-09-11.
 
 ## Definition of done
 

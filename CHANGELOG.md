@@ -61,6 +61,17 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Fixed
 
+- 🔴 **The starter refusal rules refused real wiki pages.**
+  `requested_suffix_not` means *this URL asked for a web page* and listed only
+  `.html`/`.htm` — so `document-request-returned-a-web-page`, the file's
+  highest-value rule, refused every `viewpage.action`, `Page.aspx`,
+  `index.php` and `.jsp` document a corpus had. Both suffix rules now carry the
+  server-page extensions ([ADR-REFUSAL](docs/adr/0148_refusals.md)). The
+  starter also promised that a short page "warns instead of indexing silently";
+  **there is no warn level** and never was — every rule refuses, and the
+  comment says so now. **Existing repos keep their `refusals.toml`**: add the
+  suffixes by hand.
+
 - **Four things `fux setup` shipped that were not true.** `.fux/.gitignore`
   carries `__pycache__/`, so the bytecode beside a consumer's committed decoder
   and fetcher stops showing as untracked. A re-run no longer re-prints the whole

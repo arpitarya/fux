@@ -167,13 +167,16 @@ body_contains = ["login.action", "aui-message-warning"]   # substrings; any one 
 malformed file, an unknown key, a rule with no conditions, a duplicate name, or
 `""` inside `content_type`/`body_contains` stops the run before any fetch.
 
-⚠ **Two shipped starter rules refuse real pages on common wikis:**
+**The two suffix-based starter rules know the common wiki extensions** —
+`.action`, `.aspx`, `.asp`, `.php`, `.jsp` alongside `.html`/`.htm`. A wiki
+serving `viewpage.action` or `Page.aspx` is serving a document, not a sign-in
+wall. **If yours uses another extension, add it to `requested_suffix_not` on
+both rules** — that list is what "this URL asked for a web page" means.
 
-- `document-request-returned-a-web-page` refuses HTML from any URL whose path has
-  an extension other than `.html`/`.htm` — **`viewpage.action`, `Page.aspx`,
-  `index.php` included.** Add those suffixes to its `requested_suffix_not`.
-- `suspiciously-small-document` refuses any response under 1 KiB from a URL with
-  no extension or a non-`.html`/`.htm`/`.txt`/`.md` one. Short stub pages hit it.
+⚠ **`suspiciously-small-document` still refuses any response under 1 KiB from an
+extensionless URL**, which is the share-link case it exists for. A genuinely
+tiny real page there is lost: raise `max_bytes` or delete the rule. **There is
+no warn level** — every rule in this file refuses.
 
 ## 6 · Verify on one URL before claiming it works
 

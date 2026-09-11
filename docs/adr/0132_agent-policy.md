@@ -562,7 +562,11 @@ existed only because `path` did not check its own arguments.
 Row 9 took `MAINTAIN-SKILL.md`'s *"even though the refusal message says to
 re-run it"* — a guide explaining that fux's own error was wrong.
 
-⚠ **Seven guide edits in one day, every one of them deleting a workaround.** That
+Row 17 took `FETCHER-SKILL.md`'s *"two shipped starter rules refuse real pages
+on common wikis"* — a guide warning consumers about fux's own shipped policy,
+which is the clearest possible statement that the policy was wrong.
+
+⚠ **Eight guide edits in one day, every one of them deleting a workaround.** That
 is 15g working, and it is also the measurement of how much of a freshly written
 guide is describing defects rather than behaviour. **`fux setup` does not rewrite a rendering that already
 exists**, so refreshing them is a copy, not a re-run of setup; a session that

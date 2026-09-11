@@ -401,3 +401,69 @@ def test_the_shipped_starter_file_parses(tmp_path):
 
 
 from pathlib import Path  # noqa: E402  (used only by the template test above)
+
+
+# -- W-140 row 17: the starter refused real pages, and promised a warning ----
+
+
+def _starter_rules():
+    from pathlib import Path
+    import tomllib
+
+    from fux.ingest import refusals
+
+    text = (
+        Path(__file__).resolve().parents[2]
+        / "src" / "fux" / "templates" / "refusals.toml.txt"
+    ).read_text(encoding="utf-8")
+    return refusals.parse(tomllib.loads(text), origin="refusals.toml.txt")
+
+
+def test_the_starter_does_not_refuse_a_short_wiki_page():
+    """A wiki serves real documents at `viewpage.action`, `.aspx`, `.php`, `.jsp`.
+
+    `suspiciously-small-document` excludes the URLs that plainly asked for a
+    page — and listed only the static extensions, so a short Confluence or
+    SharePoint page was refused as a redirect stub.
+    """
+    rule = next(r for r in _starter_rules() if r.name == "suspiciously-small-document")
+    body = b"<html><body><p>Short but real.</p></body></html>"
+    for suffix in (".action", ".aspx", ".php", ".jsp"):
+        assert not rule.matches(
+            suffix=suffix, mime="text/html", raw=body, text=body.decode()
+        ), f"a short page at a {suffix} URL is refused"
+
+
+def test_the_starter_does_not_refuse_the_wiki_page_it_asked_for():
+    """`document-request-returned-a-web-page` is the file's highest-value rule
+    and it refused every Confluence and SharePoint page in the corpus.
+
+    Its list means *this URL asked for a web page*; HTML back from
+    `viewpage.action` is the document, not an auth wall.
+    """
+    rule = next(r for r in _starter_rules() if r.name == "document-request-returned-a-web-page")
+    page = b"<html><body>" + b"<p>real wiki content</p>" * 200 + b"</body></html>"
+    for suffix in (".action", ".aspx", ".php", ".jsp"):
+        assert not rule.matches(suffix=suffix, mime="text/html", raw=page, text=page.decode())
+    # The case it exists for is untouched: a spreadsheet request answered in HTML.
+    assert rule.matches(suffix=".xlsx", mime="text/html", raw=page, text=page.decode())
+
+
+def test_the_starter_still_refuses_a_stub_at_a_share_link():
+    """The case the rule exists for: an extensionless share URL, 216 bytes."""
+    rule = next(r for r in _starter_rules() if r.name == "suspiciously-small-document")
+    stub = b"<html><head><meta http-equiv=refresh content='0;url=/login'></head></html>"
+    assert rule.matches(suffix="", mime="text/html", raw=stub, text=stub.decode())
+
+
+def test_no_rule_in_this_engine_can_warn_instead_of_refusing():
+    """The starter's comment promised a warning for three months.
+
+    There is no warn: `matches()` returns a bool and a match is a skip. Pinned
+    so the comment cannot drift back — if a warn level is ever added, this test
+    is the thing that says the starter's prose has to change with it.
+    """
+    from fux.ingest import refusals
+
+    assert not hasattr(refusals.Rule, "level")
+    assert "warn" not in {f for f in refusals.Rule.__dataclass_fields__}

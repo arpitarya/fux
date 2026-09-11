@@ -333,6 +333,31 @@ started serving a login page stays indexed**, with a citation that says
 `as-ingested`, and no refusal counter moves. The rules never fired, so nothing
 in `fux doctor`'s never-fired list is evidence either way for a pinned URL.
 
+**The two suffix-based starter rules know the server-page extensions** (W-140
+row 17, 2026-09-11). `requested_suffix_not` means *this URL plainly asked for a
+web page*, and it listed only `.html`/`.htm` — so **the file's highest-value
+rule refused every Confluence and SharePoint document in a corpus**:
+`viewpage.action`, `Page.aspx`, `index.php`, `.jsp`. HTML back from one of
+those is the document, not an auth wall. `.action`, `.aspx`, `.asp`, `.php` and
+`.jsp` are in both lists now, and the comment says to add your own.
+
+- **The rules they protect are unchanged**: a `.xlsx` request answered in HTML
+  still refuses, and an extensionless share link under 1 KiB still refuses,
+  which is the 216-byte redirect stub this file was extended for.
+- 🔴 **The starter also promised a warning that does not exist.**
+  `suspiciously-small-document`'s comment read *"a short real page now warns
+  instead of indexing silently"* — **there is no warn level**: `matches()`
+  returns a bool and a match is a skip. A consumer reading that comment expects
+  to see the page reported and instead loses it. The comment says refuse now,
+  and names the two ways out (raise `max_bytes`, delete the rule). A test pins
+  that no `warn` field exists, so the prose cannot drift back without the code
+  moving first.
+- ⚠ **Write-if-missing, so no existing repo gets any of this.** A repo set up
+  before today keeps the rules that refuse its wiki, and nothing tells it —
+  [ADR-DOTFUX](0102_fux-directory.md) decision 6's standing problem, and
+  `doctor`'s `refusal rules` row (which counts hits per rule) is where a
+  consumer would notice.
+
 ### Consequences
 
 **Easier.** A refusal that used to become a record now becomes a skip with a
