@@ -30,10 +30,22 @@ valuable judgement, but not the state of play.
 *Updated **2026-09-11**.* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### Operating guides on four vendors — ADR-AGENT-POLICY decision 15 (2026-09-11, Cowork, uncommitted)
+### W-140 — twelve defects closed, and what the closing taught (2026-09-11, Claude Code)
+
+- **Both 🔴 are gone**: no `url:` citation had *ever* been verified live (the refer plane rejected the fetcher contract's tuple and fell back to honest-looking verdicts), and a frontmatter `title:` carried PII into the committed index while the body beside it read `[PII:email]`. Twelve rows closed in nine commits; **6 code rows and all 13 record/code disagreements remain**.
+- 🔴 **The pattern worth carrying:** the defects that survived longest were the ones whose failure mode *looked like a working feature* — a fallback verdict, a true status report, a true summary of the wrong selection, a number stamped into every receipt and read by nothing. **A test that asserts an outcome cannot see these; only a test that asserts the mechanism can.**
+- ⚠ **I was wrong once and the record says so.** Row 19's first gate blamed a background re-index; the test was actually asserting `ver == 2`, a count of re-index passes, not a property of the merge. Two sessions suspected the merge driver because the failing assertion sat under it.
+- **Row 8 moved to W-122** rather than being fixed: unknown-`fux.toml`-key rejection needs a key set, which is W-122's gate R-2, and a second hand-written set is the duplicate that item exists to remove.
+- **Row 20 filed:** the freshness gate's `describes` relation is per-file, so changing one function demanded no-op lines in three unrelated records — twice in one session.
+
+### Four priors ruled (b); ADR-RS decision 23 (2026-09-11, Cowork)
+
+- **Test data must contain the input a feature acts on** (ADR-RS d23). For the priors: Codex prompt 1b adds superseding pairs, `seed/archive/`, `seed-dates.tsv` and intent-split questions; phase 2 declares archived dirs, commits at the dates, checks coverage counts. First rung is now `rung-seed`.
+
+### Operating guides on four vendors — ADR-AGENT-POLICY decision 15 (2026-09-11, Cowork; committed `4d243e3`)
 
 - **`fux setup` now writes 84 agent files, not 18**: ten guide skills × four skill surfaces, 21 path-scoped pointers (Kiro/Claude/Copilot), five Kiro auto guides. Roster: `setup.GUIDE_SKILLS`, `PATH_SCOPED_TOPICS`, `AUTO_GUIDE_TOPICS`. Gates: `tests/test_setup_agents_guides.py`.
-- 🔴 **Guides name workarounds for defects** (W-140). Fixing a defect without editing its guide ships a lie in the wheel — 15g, unenforced.
+- 🔴 **Guides name workarounds for defects** (W-140). Fixing a defect without editing its guide ships a lie in the wheel — 15g, unenforced, and **exercised nine times on 2026-09-11**: every closed row deleted a workaround from a shipped skill.
 - **Codex reads `.agents/skills/` now** (W-141, Arpit's ruling) — until then fux's Codex skills may not load.
 
 ### L9 — each sibling environment has one job (2026-09-11, Cowork)
@@ -1815,6 +1827,10 @@ constraints and named L1–L7 by
 rule ADR-LAWS exists to enforce. What follows are the constraints *on the work*,
 which are not laws:
 
+- **OPEN-WORK rows are one or two lines, always** (Arpit, 2026-09-11). Status,
+  evidence, records and rulings go in the item's file under [`open/`](open/README.md).
+  An item with no file gets one and an id first. Gated by
+  `tests/test_open_work_rows_are_short.py` (OPEN-WORK rule 10).
 - **There is no handoff directory.** Retired 2026-08-18 on Arpit's
   instruction and moved wholesale to `archive/handoff/`. **A spec for open work
   lives in that item's detail file under [`open/`](open/README.md)** — spec and

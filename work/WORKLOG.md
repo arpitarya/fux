@@ -24,6 +24,26 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-11 — OPEN-WORK row marks: 🔥 for broken or worsening, 🔴 retired  ·  Cowork (Opus)
+- **Asked:** what the red and orange balls mean, because no legend existed. Then: broken or worse-every-day needs its own symbol, not a red ball.
+- **Did:** added a **Marks** legend to OPEN-WORK's header and rule 6: 🔥 broken, or worse every day it waits · 🟠 important, not getting worse · no mark, normal. Fixed rule 6's "former" to "latter". **CLAUDE.md edited** (§OPEN-WORK point 8, recording the ruling). Added the gate `test_every_open_item_uses_a_legend_mark`: it passes, and fails on a 🔴 row.
+- **Re-marked by the new definition (judgment):** W-140 🟠→🔥, because 12 live code defects are broken, even with none critical; the row text now says "none critical" instead of "none 🔴". W-115 🔴→🟠, because it is unmeasured, not broken and not worsening. W-138 and W-122 🔴→🔥.
+- **Decided / open:** no ADR affected. 🔴 inside detail files and prose is untouched; the rule covers row marks only.
+- **Next:** Arpit confirms the key and runs prompt 1b; `uv run pytest -q tests` on the Mac.
+
+## 2026-09-11 — OPEN-WORK cut to one-to-two-line rows; the detail moved into work/open/  ·  Cowork (Opus)
+- **Asked:** first, trim *Blocked on Arpit* to a line or two per blocker. Then the same for every open item: detail into the work document, always.
+- **Did:** the inbox is two short rows now. Each of the 14 open items was appended verbatim to its `work/open/` file under *From OPEN-WORK (moved 2026-09-11)*, with links rewritten. The two items with no file or id became **W-142** (`heading` negative control) and **W-143** (four no-op priors). OPEN-WORK: 373 → 135 lines. Added **rule 10** and changed rule 8 so the record is named in the detail file. CLAUDE.md §OPEN-WORK gains point 8, and its `filed` / "names inline" wording follows (**CLAUDE.md edited: recording Arpit's ruling**). Updated `work/open/README.md` contract 1.
+- **Gate:** `tests/test_open_work_rows_are_short.py`. Second ask on one day, and the README's *"one line per item"* was already there and ignored. It passes on the new file and fails on the old one. It ran as plain functions, because the bridge has no pytest. Not yet run under `uv run pytest`.
+- **Decided / open:** no ADR affected. The rules and standing obligations (~70 lines) still sit at OPEN-WORK's foot.
+- **Next:** run `uv run pytest -q tests` on the Mac.
+
+## 2026-09-11 — four priors ruled (b): the test data is built so they can be tested  ·  Cowork (Opus)
+- **Asked:** set up test data with documents that supersede older ones and documents archived and marked archived, so the priors can be tested; and whenever such scenarios are tested, set up the data so they can be.
+- **Did:** **ADR-RS decision 23** (23a–d) records the standing rule — test data must contain the input the feature acts on and questions that depend on it; missing input is a data defect, not a null; the data declares a coverage table; answer-bearing data is the key author's (Codex), answer-free mechanics may be Claude's. Re-derived fux's inputs from code: `supersedes:` in the successor's frontmatter (repo-root paths), `archived=true` on a sources line (nested dirs work via `is_archived_loc`), `mtime` from git commit time. Wrote **prompt 1b** (Codex, asks key location first): ≥4 superseding pairs, ≥4 `seed/archive/` documents, `seed-dates.tsv`, re-check of every existing question, ≥22 intent-split questions tagged `intent`/`exercises`. Golden README gains §Feature coverage (file names and counts only) and phase-2 mechanics (sources lines, commit dates, no `supersedes:` on seeds, `rung-NNNNN.coverage` counts must match); `rung-00010` → `rung-seed`. OPEN-WORK: four-priors inbox row deleted; item ruled (b); W-97 T2 points at 1b; W-136 row asks for 1b after confirming the key. Project memory saved.
+- **Decided / open:** the seed set grows past 10, so the first rung is named `rung-seed`. Power: ≥8 questions per prior only clears the net-6 floor on a large effect.
+- **Next:** Arpit confirms the key, then runs prompt 1b in Codex.
+
 ## 2026-09-11 — operating guides for every fux job, on four vendors  ·  Cowork (Opus)
 - **Asked:** Kiro steering documents and skills for fux usage, decoder, enrich, ask, answer, graph and every other CLI command — and anything else that helps — for Claude, Codex and Copilot too.
 - **Did:** ADR-AGENT-POLICY **decision 15** (+ amendments to 9, vetoes 5b/6/6a/7) and ADR-DOTFUX decision 9. Ten new skill templates (`fux-search`, `-answer`, `-graph`, `-index`, `-maintain`, `-mcp`, `-sources`, `-config`, `-fetcher`, `-pii`) on all four skill surfaces; 21 path-scoped pointers (Kiro `fileMatch`, Claude `.claude/rules/`, Copilot `applyTo:`) for seven planes; five Kiro `inclusion: auto` guides; `fux-usage` gains a router. `setup.py` roster + `tests/test_setup_agents_guides.py` (byte bound, never always-on, one body per topic, committed-write topics never auto, description ≤ 500). This repo's renderings refreshed. Suite in a cloud copy: 3 403 passed; the 6 failures match the pre-change baseline (archive excluded from the copy, one env-only CLI test). CHANGELOG under Unreleased. **Not committed.**
@@ -35,6 +55,13 @@ play: the worklog is the granular, per-exchange trail.
 - **Did:** filed [`proposals/abstention-gate.md`](proposals/abstention-gate.md) — the finding (20 of 20, twice; band/separation/floor not the lever), the mechanism (ADR-CONFIDENCE d3: abstains only when nothing scores), the `weak`-says-don't-answer vs `answerable: true` contradiction, options A disclose / B gate quality claims / C build abstention in fux-lab on golden data (C1 doc_coverage gate, C2 weak ⇒ not answerable, C3 passage check), recommendation **B then C**, graduation trigger. Inbox row deleted; the row's content now lives in the proposal (rule 3's only-home check). Proposals index row added.
 - **Decided / open:** parked, not decided. Power caveat recorded: ~10 golden unanswerable questions only detect large effects.
 - **Next:** Arpit picks A/B/C whenever he reads the proposal.
+
+## 2026-09-11 — W-140: twelve defects closed, one by one  ·  Claude Code (Opus)
+
+- **Asked:** commit everything, then work the open queue and close items one by one.
+- **Did:** committed the L9 tree and the ten operating guides (`4d243e3`, 124 files) after ADR-PII gained the decision the freshness gate was owed. Then **W-140, twelve rows, nine commits** — both 🔴 (no `url:` citation was ever verified live; a frontmatter `title:` carried PII into the index), plus rows 3, 4, 5, 9, 10, 11, 12, 13, 15, 17, 18, with row 8 **moved to W-122** because its fix is that item's key-tree gate and a second hand-written key set would be the duplicate this repo is removing. Each row: reproduce on the Mac, fix, test, record, delete the guide's workaround, re-render four surfaces. 3 542 unit + 81 e2e green.
+- **Decided / open:** row 12's `--hops` third is restated as a **fork** (cap the argument, warn, or bound the walk) rather than settled inside a defect fix. Row 19's first gate was **wrong and I said so**: the merge-driver test asserted `ver == 2`, a number that counts re-index passes, not a property of the merge — it asserts the merged file's content sha now, and the driver was never the defect. Row 20 filed: the freshness gate's `describes` relation is per-file, so one function's change demanded no-op lines in three records, twice in one session.
+- **Next:** W-140's remaining 6 code rows and 13 record/code disagreements; Arpit still owes the two inbox answers.
 
 ## 2026-09-11 — the L9 tree committed, in two commits  ·  Claude Code (Opus)
 

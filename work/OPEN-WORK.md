@@ -4,6 +4,8 @@
 
 **Lanes:** `agent` — an agent closes it alone · `arpit` — only Arpit can. Both run concurrently.
 
+**Marks:** 🔥 broken, or worse every day it waits · 🟠 important, not getting worse · no mark — normal.
+
 ---
 
 ## Blocked on Arpit
@@ -19,10 +21,10 @@
 
 ### fux build
 
-- 🟠 **W-140** · `agent` — 12 code defects and 13 record/code disagreements left, none 🔴; six closed and one moved to W-122 on 2026-09-11. [detail](open/W-140-guide-authoring-defects.md)
-- 🔴 **W-138** · `agent` — rewrite the ~40 artifacts that still use the playground as an instrument, and add the guard test. [detail](open/W-138-reconcile-with-l9.md)
+- 🟠 **W-140** · `agent` — **6 code rows left** (6, 7, 12's `--hops` fork, 14, 16, 20) and the 13 record/code disagreements, none critical; 12 closed and one moved to W-122 on 2026-09-11. [detail](open/W-140-guide-authoring-defects.md)
+- 🔥 **W-138** · `agent` — rewrite the ~40 artifacts that still use the playground as an instrument, and add the guard test. [detail](open/W-138-reconcile-with-l9.md)
 - 🟠 **W-139** · `agent`, after W-138 — build fux-benchmark: seven corpora, two versions, latency and ranked lists kept. [detail](open/W-139-benchmark-per-l9.md)
-- 🔴 **W-122** · `agent` — generate CLAUDE.md's law section, consolidate the doc-only schemas, gate ADR-CONFIG against `config.py`. [detail](open/W-122-adrs-are-the-source.md)
+- 🔥 **W-122** · `agent` — generate CLAUDE.md's law section, consolidate the doc-only schemas, gate ADR-CONFIG against `config.py`. [detail](open/W-122-adrs-are-the-source.md)
 - 🟠 **W-107** · `agent` — the Node read plane (`npx fux-search`), Phases 1–4; nothing blocks Phase 1. [detail](open/W-107-node-read-plane.md)
 - 🟠 **W-106** · `agent`, blocked on W-136 — the vector gate still owes the two-architecture arm and a golden corpus. [detail](open/W-106-vector-gate.md)
 - 🟠 **W-112** · `arpit`, after W-106 — the vector plane: needs a golden corpus, a re-run gate, then a compare doc to rule on. [detail](open/W-112-vector-plane.md)
@@ -30,7 +32,7 @@
 ### testing
 
 - 🟠 **W-136** · `arpit` (Codex phases), then `agent` — the sealed golden benchmark, grown 10 → 10 000. [detail](open/W-136-golden-benchmark.md)
-- 🔴 **W-115** · `agent`, blocked on W-136 — the chunking change is unmeasured for quality; no document may cite it as measured. [detail](open/W-115-chunking-quality-unmeasured.md)
+- 🟠 **W-115** · `agent`, blocked on W-136 — the chunking change is unmeasured for quality; no document may cite it as measured. [detail](open/W-115-chunking-quality-unmeasured.md)
 - **W-97** · `agent`, blocked on W-136 — the knob sweep (`rerank_weight`, `superseded_weight`), rerun on golden data under a new pre-registration. [detail](open/W-97-tuner-knob-sweep.md)
 - **W-142** · `agent`, blocked on W-136 — rebuild the saturated `heading` negative control with headroom. [detail](open/W-142-heading-negative-control.md)
 - **W-87** · `agent`, blocked on W-136 — the first `judged` run, and Part B, both on the golden ladder. [detail](open/W-87-what-good-means.md)
@@ -94,7 +96,9 @@ session needs first.*
 6. **Priority is damage that accrues with elapsed time**, above damage that is
    merely present-but-static. A wrong constant that is the same size next month
    can wait; an unratified record that more code ships under every day cannot.
-   Only the former gets worse by waiting.
+   Only the latter gets worse by waiting.
+   **Marks (Arpit, 2026-09-11):** 🔥 — broken, or worse every day it waits ·
+   🟠 — important, not getting worse · no mark — normal. **🔴 is not a row mark.**
 7. **No separate prioritization or sequencing document.** Ordering lives here.
    A second document naming what to do next is always the stale one.
 8. **Grouped by what closing it takes — `fux build` (code), `testing`

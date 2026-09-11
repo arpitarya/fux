@@ -22,6 +22,34 @@ Rules:
 ---
 
 
+## 2026-09-11 — W-140: twelve of the guide-authoring defects closed
+
+**Nine commits. 3 542 unit + 81 e2e green** after the last one. Every row was
+re-derived on macOS before it was touched (rule 4); every one held up as filed.
+
+| item | what landed | evidence |
+|---|---|---|
+| 🔴 **Row 1** | **No `url:` citation was ever verified live.** `refer/source.py` still demanded `fetch(url) -> str` while the contract has returned `(bytes, content type)` since 2026-08-26, so every verification raised internally and fell back to `as-ingested`/`unverified` — honest verdicts, which is why a feature with its network half dead reported itself as working | `b04a7cb` · [ADR-URL-FRESHNESS](../docs/adr/0149_url-freshness.md) decision 6a · `tests/refer/test_source.py` asserts the decode identity, not just `sanitize`'s |
+| 🔴 **Row 2** | **A frontmatter `title:` carried PII into the committed index.** Only the body was redacted and `_title` prefers `meta["title"]`, so a document could read `[PII:email]` in its body and carry the address in its title and title terms. **A path cannot be redacted** — `loc` is an address, `id` is the index's key — so ingest names the documents whose path matches a rule | `0312e7f` · [ADR-PII](../docs/adr/0150_pii.md) decision 19 · the pinned *exactly two redaction sites* test is what caught the title as a third source |
+| **Rows 3, 4** | `fux add <URL> --no-update` **never fetched** (three artifacts promised one fetch; the pin filter knew nothing about an add) and `fux update --failed` was **parsed and never read** — it fetched the *stale* set and reported that as success | `cccef9b` · ADR-URL-LIST decision 14 · ADR-CLI |
+| **Row 5** | **`fux add` wrote the engine's defaults over the repo's own `[sources.url]`** — `ttl=24h` onto every line in a repo configured for `7d`. The middle layer of a three-layer resolution was dead for every CLI-written line | `e2543c3` · ADR-URL-LIST |
+| **Rows 9, 10** | The merge driver's refusal **named a fix that cannot work** (`fux ingest` cannot read the file the refusal just wrote), and `[cli.json] enabled = true` turned `fux hooks` into a **status report that installed nothing** | `62931a7` · ADR-MERGE-DRIVER · ADR-INDEX-LIFECYCLE · ADR-MAINTENANCE · ADR-OUTPUT |
+| **Row 11** | The background re-index **left the accelerator stale** after every pass — the job that keeps a repo current skipped the one derived plane | `be5799e` · ADR-MAINTENANCE |
+| **Row 12** | `fux path` **validated neither end**: a typo printed *No route within N hops* and exited 0, byte-identical to the honest answer. `explain` was fixed for this in W-63 and the verb beside it kept it. A `tag:` id was never checked on either | `f857650` · ADR-GRAPH · the `--hops` third stays open as a fork |
+| **Row 13** | **A broken `tune.toml` left `doctor` green** — ingest reads only `[index]`, so the index was clean while every query in the repo refused | `4be982c` · [ADR-DOCTOR](../docs/adr/0154_doctor.md) decision 10 |
+| **Row 15** | **`timeout_seconds` was recorded everywhere and enforced nowhere** — stamped into every bundle, printed by `--audit`, read by nothing | `baf6acc` · ADR-REFER |
+| **Row 17** | **The shipped refusal policy refused the documents it was pointed at** — `requested_suffix_not` listed only `.html`/`.htm`, so the file's highest-value rule refused every `viewpage.action`, `.aspx`, `.php` and `.jsp` page. It also promised a *warn* level that has never existed | `610644a` · ADR-REFUSAL |
+| **Row 18** | Four statements `fux setup` shipped into consumer repos that were untrue: no `__pycache__/` ignore beside the committed Python, the `AGENTS.md` snippet re-printed on every run, a `urls` header claiming *two attributes* of seven, and a probe path that is in the repository and not the wheel | `009b3f1` · ADR-DOTFUX · ADR-PII decision 20 |
+| **Row 8** | **Moved to W-122, not fixed.** Rejecting an unknown `fux.toml` key needs a key set to validate against — which is W-122's gate R-2. A second hand-written set would build the duplicate source of truth that item exists to remove | `4be982c` · W-122's detail file carries it |
+| 🔴 **Row 19, and the correction** | The merge-driver e2e test failed twice, got a gate, **failed again**, and the third failure gave the real answer: it asserted `ver == 2`, which counts sha changes against whichever checked-out index a pass compared with — observed at 1 and at 4. It asserts the merged file's content sha now. **The merge driver was never the defect** | `009b3f1` · two sessions' suspicion pointed at the driver because the failing assertion sat under it |
+| **What is left** | **6 code rows** — 6, 7, 12's `--hops` fork, 14, 16, 20 — **and all 13 record/code disagreements**, none critical | [`work/open/W-140-guide-authoring-defects.md`](open/W-140-guide-authoring-defects.md) |
+
+⚠ **Nine of the twelve had a guide describing the defect as behaviour.** Every
+fix deleted a workaround from a skill `fux setup` ships, which is
+ADR-AGENT-POLICY 15g working — and a measurement of how much of a freshly
+written guide was documenting bugs.
+
+
 ## 2026-09-11 — W-137: the ADR number line was split in two
 
 One commit. **3 274 unit + 81 e2e green** after it.
