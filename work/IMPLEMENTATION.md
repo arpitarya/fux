@@ -63,6 +63,32 @@ commit with W-129 rather than two.
 
 ---
 
+## W-131 — US and Canadian identifiers in the PII starter (2026-09-11)
+
+**Arpit, 2026-09-11:** *"in pii.toml by default add us and canada identifiers"*.
+
+| what landed | where |
+|---|---|
+| **on:** `us-ssn`, `us-itin` (incl. ATIN), `us-mbi`, `ca-sin` (`validate = "luhn"`) · **off, commented:** `us-ein`, `ca-postal-code`, `phone-nanp` | [`src/fux/templates/pii.toml.txt`](../src/fux/templates/pii.toml.txt) |
+| decision 12's on/off list, decision 12a (the table, what is not shipped and why), decision 17's upgrade note, four sources | [ADR-PII](../docs/adr/0060_pii.md) |
+| the template's ownership row | [the register](../docs/adr/README.md) |
+| 16 test cases: every enabled rule on both separators, 14 lookalikes kept, and **every commented-out rule parsed** | [`tests/ingest/test_pii.py`](../tests/ingest/test_pii.py) |
+| this repo's `.fux/pii.toml` re-copied from the new template (it was the untouched starter) | `.fux/pii.toml` |
+
+**Evidence.** `test_pii.py` · `test_setup.py` · `test_pii_wiring.py`: **111
+passed** in the Cowork container. **False-positive scan:** all seven rules
+enabled over this repository's 1 934 text files (30 MB) hit only the examples
+written into the template and its tests; the probe over the 932 indexed
+documents found nothing. ⚠ That is one technical corpus with no real
+identifiers in it — it bounds over-matching here and says nothing about recall.
+
+Formats grounded in the SSA randomization FAQ, CMS's MBI format sheet, and two
+secondary sources (Intuit ProConnect for ITIN ranges, DataVeil for the SIN) —
+named as secondary in ADR-PII.
+
+⚠ **Not committed.** A concurrent session had already staged the W-129
+template; this change sits on top of it unstaged.
+
 ## W-129 — `.fux/pii.toml` is required: `fux setup` writes it, every command refuses without it (2026-09-11)
 
 **Arpit, 2026-09-11:** *"fux setup should write pii.toml and should always use
@@ -142,6 +168,33 @@ is missing"* and **nothing ever has** — no commit has put `pii.toml` in
 `setup.py`, so the starter ships in the wheel and reaches no repo. Filed as **W-129** in
 [`OPEN-WORK.md`](OPEN-WORK.md), as a decision, because wiring it turns email and
 credential redaction on by default for every new repo.
+
+## W-115 · W-117 · W-119 · W-120 · W-121 — the chunking change, committed (2026-09-11)
+
+**Written 2026-09-06 in Cowork and unverifiable there; run and committed on the
+MacBook on 2026-09-11 in `fa47760`.** The ids are recorded separately from the
+`[index]` row below because their queue rows were deleted against this entry.
+
+| id | what landed | record |
+|---|---|---|
+| **W-115** | one heading grammar (`decode/_markdown.py`, **fence-aware** — a `# comment` in a bash block was being read as a heading), decoding on the citation path, table banding, heading skeletons for pdf/rtf/csv/jsonl/mbox. 27 files | [ADR-DECODE](../docs/adr/0049_decode.md) 14–16 · [ADR-REFER](../docs/adr/0037_refer-plane.md) 23–25 · [ADR-EXTRACTED](../docs/adr/0025_extracted-mode.md) 8 |
+| **W-117** | 🔴 **closed by REVERSAL, and its own filing was the error.** It called the `.pptx` slide floor *"a tuning question… doing nothing is legitimate"*. Two more instances of the same shape then appeared — six small `.jsonl` records collapsing to one passage, and any short band of a small table — and **three instances of one shape is a defect, not a knob** | [ADR-REFER](../docs/adr/0037_refer-plane.md) 26 |
+| **W-120** | the fix W-117 turned into: a table bands at its own ceiling (`MAX_TABLE_BAND_BYTES = 900`) and a run of short headed sections is never folded | [ADR-REFER](../docs/adr/0037_refer-plane.md) 26 |
+| **W-119** | the decoder rename — `csvdoc.py` → `csv.py` for all nineteen, verified not to shadow the stdlib on either load path. **38 stale files deleted**; until they went, the stale consumer copies **won** over the new ones and this repo decoded with the old modules | [ADR-DECODE](../docs/adr/0049_decode.md) 17 |
+| **W-121** | CSV/XLSX row-granularity chunking, committed earlier in `5cf30bc` | [ADR-TABULAR](../docs/adr/0062_tabular.md) |
+
+⚠ **W-116 is NOT closed by this and must not be read as measured.** The change
+re-ranked two populations — every document containing a fenced code block, and
+every document of the formats whose decoder gained a heading skeleton — and
+**nothing was measured.** Arpit ruled 2026-09-06 that these land as defect
+fixes rather than wait on a measurement; that ruling is recorded in all three
+records, and it does not make them measured. W-116 stays open behind W-56.
+
+⚠ **No migration exists for anyone else**, by Arpit's ruling of the same day —
+[ADR-DECODE](../docs/adr/0049_decode.md) decision 17 records that rather than
+implying the upgrade is passive.
+
+---
 
 ## `[index]` lands, and the queue's environment blockers evaporate (2026-09-11)
 

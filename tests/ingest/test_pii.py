@@ -450,3 +450,57 @@ def test_the_starters_disabled_checksum_rules_are_valid_once_enabled():
     # twelve and leaves the card rule nothing to match.
     assert pii.verhoeff("4000 0000 0005") and pii.luhn("4000 0000 0005 0007")
     assert pii.redact(loaded, "card 4000 0000 0005 0007") == ("card [PII:card]", {"card": 1})
+
+
+# -- the starter's US and Canadian identifiers (W-131) ------------------------
+
+
+def test_the_starter_redacts_us_and_canadian_identifiers():
+    text = (
+        "ssn 123-45-6789 or 123 45 6789; itin 912-70-1234; atin 900-93-0000; "
+        "mbi 1EG4-TE5-MK73 or 1EG4TE5MK73; sin 130 692 544 or 130-692-544"
+    )
+    out, hits = pii.redact(_starter(), text)
+    for value in ("123-45-6789", "123 45 6789", "912-70-1234", "900-93-0000",
+                  "1EG4-TE5-MK73", "1EG4TE5MK73", "130 692 544", "130-692-544"):
+        assert value not in out, value
+    assert hits == {"us-ssn": 2, "us-itin": 2, "us-mbi": 2, "ca-sin": 2}
+
+
+@pytest.mark.parametrize(
+    "lookalike",
+    [
+        "000-12-3456",       # SSA never assigns area 000
+        "666-12-3456",       # ... or 666
+        "123-00-4567",       # ... or group 00
+        "123-45-0000",       # ... or serial 0000
+        "912-34-5678",       # a 9xx area is never an SSN; group 34 is no ITIN range
+        "123-45 6789",       # two different separators
+        "ref 123-45-6789-01",  # a 3-2-4 window inside a longer digit group
+        "123456789",         # unseparated: indistinguishable from any nine digits
+        "046 454 286",       # Luhn-valid, but a SIN never starts with 0
+        "130 692 545",       # a SIN shape that fails Luhn
+        "1BG4-TE5-MK73",     # an MBI never uses B
+        "1eg4-te5-mk73",     # MBIs are uppercase
+        "call 416-555-0123", # a phone number: the NANP rule ships disabled
+        "released 2026-09-11, build 12.345.678",
+    ],
+)
+def test_the_starter_leaves_us_and_canadian_lookalikes_alone(lookalike):
+    assert pii.redact(_starter(), lookalike) == (lookalike, {})
+
+
+def test_every_disabled_rule_in_the_starter_loads_once_enabled():
+    """A commented-out rule nobody parses is a rule that fails the day it is enabled."""
+    import re
+    import tomllib
+    from pathlib import Path
+
+    template = (
+        Path(__file__).resolve().parents[2] / "src" / "fux" / "templates" / "pii.toml.txt"
+    ).read_text(encoding="utf-8")
+    blocks = re.findall(r"^# \[\[rule\]\]\n(?:# \w+\s*=.*\n)+", template, re.MULTILINE)
+    text = "".join(re.sub(r"^# ", "", b, flags=re.MULTILINE) + "\n" for b in blocks)
+    names = {r.name for r in pii.parse(tomllib.loads(text), origin="<disabled>")}
+    assert {"us-ein", "ca-postal-code", "phone-nanp", "aadhaar", "card"} <= names
+

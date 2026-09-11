@@ -34,7 +34,7 @@ valuable judgement, but not the state of play.
 
 - **Every command but `setup`/`tune`/`output` refuses in a repo without it**; `doctor` runs and fails the row. Rule and exemptions: [ADR-PII](../docs/adr/0060_pii.md) decision 17 — do not restate them.
 - **Writing a test that builds a repo by hand?** Write `.fux/pii.toml` (empty is fine) or ingest and every CLI verb refuse.
-- **Rules may name a checksum** (`validate = "luhn" | "verhoeff"`), a closed engine set — decision 16. Allowlists, shared packs and path scoping were offered and not chosen.
+- **Rules may name a checksum** (`validate = "luhn" | "verhoeff"`), a closed engine set — decision 16. **The starter covers US and Canadian identifiers** (SSN, ITIN, MBI, SIN on; EIN, postal code, NANP phone off) — decision 12a. Allowlists, shared packs and path scoping were offered and not chosen.
 - ⚠ W-128's code rode into `fa47760` unannounced; its records and all of W-129 are uncommitted.
 
 ### W-130 filed: the types file as TOML is a proposal, not a build (2026-09-11, Cowork)

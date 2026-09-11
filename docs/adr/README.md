@@ -374,7 +374,7 @@ table does not grant.
 | `src/fux/refer/arc.py` | ADR-CACHE | the content cache, keyed `(loc, sha)` so a hit cannot change an answer |
 | `src/fux/refer/fetchcache.py` | ADR-CACHE | the TTL fetch store — the only place in the engine that reads a wall clock |
 | `src/fux/templates/` | ADR-FETCHER | the two shipped fetchers as package data; **bytes, never imported** |
-| `src/fux/templates/pii.toml.txt` | ADR-PII | the shipped starter rules, written into every repo by `fux setup` — the safe ones enabled, `aadhaar` and `card` commented out with their `validate` checksum and what each still over-matches |
+| `src/fux/templates/pii.toml.txt` | ADR-PII | the shipped starter rules, written into every repo by `fux setup` — the safe ones enabled (credentials, email, PAN, US SSN/ITIN/MBI, Canadian SIN), the risky ones commented out with what each still over-matches (decisions 12 and 12a) |
 | `src/fux/templates/refusals.toml.txt` | ADR-REFUSAL | the six shipped starter rules. Carved out of ADR-FETCHER's `templates/` claim on `ENRICH-SKILL.md`'s precedent — it is data a consumer edits, not a fetcher |
 | `src/fux/templates/agents/` | ADR-AGENT-POLICY | the canonical agent policy and its per-vendor renderings, shipped as wheel package data (`setup.py` itself stays with ADR-DOTFUX — one component, one owner) |
 | `src/fux/templates/agents/ENRICH-SKILL.md` | ADR-ENRICH | the generation half — a skill rather than code, because a model call may not live under `src/` |

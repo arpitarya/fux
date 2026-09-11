@@ -633,6 +633,64 @@ belongs to. That is not a defect in the fallback — it is what a build gated on
 falsifiable predictions looks like from the ownership table's side.
 
 
+**21. Four facts about measurement that are RECORDED rather than actioned.**
+All four moved out of [`OPEN-WORK.md`](../../work/OPEN-WORK.md) on 2026-09-11.
+**None of them is a task**, and a queue holding permanent facts stops being the
+signal of what is pending — which is that file's own rule 2. They are here, in
+the record that owns measurement discipline, so a run can be checked against
+them.
+
+**21a. No run filed before 2026-08-28 has per-query rows, so no paired result
+from before that date can be re-tested by anybody — including its own author.**
+Decision 15's rule (*every measured run records one row per query per arm*) was
+ruled by Arpit on 2026-08-28 and is not retroactive, because the rows were never
+written. The discordant count, `b`, `c` and every test decision 19's floor needs
+are derivable **from per-query rows and from nothing else**, so a summary count
+is not a weaker record of a paired result — it is not a record of one at all.
+**This is unfixable, and it is stated so nobody re-derives it as a surprise and
+tries to "recover" a `p` from a total.**
+
+**21b. The gate that enforces 21a checks for a `.jsonl`, not for rows.**
+`tests/test_regression_runs.py::test_measured_run_files_its_per_query_rows`
+passes on **any** `.jsonl` under `evidence/` —
+[`2026-09-05-answer-top3`](../../work/regression/2026-09-05-answer-top3/report.md)
+satisfied it on a **copy of the goldens file**, before its real rows were
+written. 🔴 **This is the W-83 shape again**: a check that proves a file exists,
+never that it is the right file.
+
+⚠ **Recorded rather than patched, deliberately.** A cleverer check — *is it one
+row per query? per arm?* — cannot be written without knowing each run's arm
+structure in advance, and shipping an approximation that passes is the
+moving-threshold failure in another costume. **Whether a second recorded
+instance of the W-83 shape triggers CLAUDE.md's two-strikes gate is Arpit's
+call**, and it sits in the queue as a ruling rather than as a task.
+
+**21c. A paired comparison must assert that both arms resolved the SAME
+`separation_floor`.** The floor is repo-configurable
+([ADR-CONFIDENCE](0052_confidence.md) decision 13), so **a repo can make its own
+answers read `grounded` without touching the ranking at all** — and nothing
+mechanical catches it. The guard that record ships is *publication*: the block
+emits the floor it was judged under. **The measurement-side half is this one:**
+comparing an arm judged at `0.10` with an arm judged at `0.02` is a
+**pre-registered threshold moving inside a comparison**, which §"A pre-registered
+threshold may never move" forbids outright. Differing floors is also decision
+13's own reopen trigger, so a run that finds them is reporting a defect, not
+just a caveat.
+
+**21d. A cross-seed "null control" is a RATE check, not a determinism check —
+and B9 was read as one.** Query ids in the generated suites are **positional**,
+so arm A on seed 12 paired against arm A on seed 13 compares **different
+questions**; a discordant count across seeds says how often the engine disagrees
+with itself on *unrelated* queries. **The determinism check is the same-corpus
+repeat**, which is why
+[C5](../../work/regression/2026-08-28-benchmark-contested/VERDICT-C5.md) was
+ruled on the repeat. ⚠ **The 2026-08-28 v1-vs-HEAD run's B9 carries the same
+weakness**: its *"0 discordant of 240"* across two seeds is the rate check, and
+its *"300/300 identical rows on one corpus"* is the half that does the work.
+**The verdict is not edited** — nothing supersedes a measurement except a better
+measurement — so this is how B9 is to be READ, and it is why a null control's
+design belongs in the pre-registration rather than in its write-up.
+
 ### Consequences
 
 - **The prediction system is guardable.** A change to the discipline updates

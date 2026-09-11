@@ -15,9 +15,18 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   starter, and **every command except `setup`, `tune` and `output` stops with an
   error in a repo without it**; `fux doctor` runs and reports it as a failing
   row. A file with every rule commented out is legal and redacts nothing.
-  **Upgrading:** run `fux setup` once per repo. That turns the starter's six rules
-  on (email, JWT, AWS key, GitHub token, bearer token, PAN), and the next ingest
-  re-extracts in full.
+  **Upgrading:** run `fux setup` once per repo. That turns the starter's enabled
+  rules on (email, JWT, AWS key, GitHub token, bearer token, PAN, US SSN, ITIN,
+  Medicare MBI, Canadian SIN), and the next ingest re-extracts in full.
+
+- **The PII starter covers US and Canadian identifiers** (W-131,
+  [ADR-PII](docs/adr/0060_pii.md) decision 12a). **On:** US SSN and ITIN/ATIN
+  in their written shape, excluding numbers the SSA and IRS never issue; the
+  Medicare MBI; the Canadian SIN with a Luhn check. **Off, commented with what
+  each over-matches:** US EIN, Canadian postal code, NANP phone numbers.
+  ⚠ Unseparated nine-digit SSNs and SINs are deliberately not caught. A repo
+  that already has `.fux/pii.toml` keeps its file — copy the new sections in
+  by hand if you want them.
 
 - **`phrases` keeps up to 32 headings, and the cap is `.fux/tune.toml [index]
   max_phrases`** (Arpit, 2026-09-11). It was a hard-coded 12: on fux's own
