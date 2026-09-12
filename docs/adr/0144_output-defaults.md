@@ -647,6 +647,32 @@ keys`.
     - Found 2026-09-12 re-deriving [W-140](../../work/open/W-140-guide-authoring-defects.md)
       row 3 against the code.
 
+**22. Both readers fold this file in, at the same place, since 2026-09-12.**
+
+The Node reader read no `.fux/output.toml`, so `fux find rollback` with no
+flags returned `[cli] top` results under Python and five under Node — and
+worse, a **present** file is the sole source of every key (decision 19), so a
+repository whose file omits a key makes Python refuse and Node answer. That is
+a divergence in which repositories *work*, which is harder to notice than a
+divergence in what they return.
+
+`node/src/config/output.mjs` carries the precedence chain, both closed key
+sets, the by-name refusals and decision 20's absent-file sentinel;
+`node/fux.mjs` applies it **once, before dispatch**, exactly where
+`cli.py::_apply_output_defaults` does — so no Node verb handler knows the chain
+exists either.
+
+⚠ **`[mcp] top` reached the Node MCP server at the same time**, and decisions
+16 and 17 now hold on both: the resolved `top` is what `tools/list` advertises,
+and it is resolved **once at start-up** rather than per search, in a warm
+process whose premise is staying resident.
+
+⚠ **A key set here is now transcribed as well as authored.**
+`tests/test_node_config_parity.py` holds `CLI_VERBS`, `MCP_KEYS` and
+`BUILT_IN` equal across the two runtimes. The differential arm cannot: a
+drifted **refusal** produces an error on one side and an answer on the other,
+which a harness reports as a crash rather than as a finding.
+
 ### Consequences
 
 ⚠ **Two defects this build produced and caught, recorded because neither was

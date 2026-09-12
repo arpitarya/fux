@@ -360,6 +360,84 @@ conditions; the third is pinned as a direct property because no corpus shape
 found it. That is recorded in the file itself — a differential test that cannot
 fail is worse than none.
 
+**12. The differential harness takes a CORPUS, not a repo — and a golden rung
+is resolved through its committed manifest.** Added 2026-09-12 (W-107).
+
+`node_arm.py`, `graph_arm.py` and `adversarial_corpus.py` each did
+`sys.path.insert(0, ROOT / "src")` on the *same* argument they read the index
+from, so the only corpus any of them could run on was a fux checkout. A golden
+rung is a repo of documents with no `src/`. Engine root and corpus root are now
+two different things, and that is what let the arm run on the ladder at all.
+
+`rungs.py` resolves a rung name to `fux-lab`'s corpus and **verifies it against
+`work/golden/ladder/rung-NNNNN.{index,sha256}` before a byte is read** — every
+document hash and the index root hash — refusing on drift.
+
+🔴 **This is the one failure a differential arm structurally cannot catch about
+itself.** Two readers on a drifted corpus agree perfectly; the run is green and
+names a corpus it did not measure. Verification is external to the comparison
+or it is absent. `ladder_check.py` is the same argument with no corpus at all:
+the eight manifests' counts, their `seed/`+`ext/`-only paths, and the nesting
+`work/golden/README.md` called *"verified, not asserted"*.
+
+**13. Two arms, because a discordance has to be attributable.** Added
+2026-09-12 (W-107), and it is a correction, not an addition.
+
+The Node arm called `scan.ask` directly. **`fux find` does not** — it calls
+`run_query`, which applies `.fux/tune.toml`, the archived weighting and the
+reranker. So the arm compared Node against a Python path no user reaches, and
+was green because both sides ignored the same things — the failure
+`queryset.py`'s own docstring names: a harness authored after the thing it
+checks gets authored to pass.
+
+| `--python-tune on` (default) | the **contract** — what `fux find` answers on this corpus |
+| `--python-tune off` | the **transcription** — `--no-tune` ([ADR-TUNE](0135_tuning.md) decision 11), the engine's own answer |
+
+**They are the same run on a corpus whose tune is all-defaults**, which is
+every golden rung. They differ on fux's own repo — 90 of 174 comparisons
+against 0 — because **Node reads no `tune.toml` at all**
+([ADR-NODE-SEARCH](0155_node-search.md) decision 8 records that gap; it is
+that record's to close, not this one's).
+
+⚠ **This is the diagnostic-arm pattern this repo already learned once** —
+`CLAUDE.md` §"Hard-won build knowledge", M1: keep an arm that *does* borrow the
+baseline's statistics, because it is how a loss gets attributed to the right
+cause. A single arm reports a number; two arms report a diagnosis.
+
+**14. The third arm compares FIVE surfaces, and compared one until 2026-09-12.**
+
+Decision 13 recorded the find that the arm's Python side called `scan.ask`
+while `fux find` calls `run_query`, so **both readers were ignoring the same
+files**. Closing that exposed the more general version of the same defect: the
+arm compared `find` and `ask` and nothing else, so every other surface was
+transcribed and never checked.
+
+| surface | how it is compared | what it found on the first run |
+|---|---|---|
+| `find` · `ask` | the field table, per PRE-REG-NODE-2 §3 | — (already covered) |
+| `explain` · `graph` · `path` | **whole parsed payloads**, both CLIs | different key names in all three, and a hand-rolled breadth-first walk where Python runs a PPR expansion |
+| `mcp` | both servers, one stdio session each | handlers reading `args.id` where the advertised schema says `path` — in a package already on npm |
+| `fux.api` vs `node/src/index.mjs` | all six methods | `api.py` ranking without its tune file; Node dropping `ordinal` from every passage |
+
+**Whole payloads rather than a field list, for the graph lane**, because those
+verbs carry no score to tolerance: every byte of meaning is in the structure,
+and comparing a field list is exactly what would let two readers emit different
+key names indefinitely.
+
+⚠ **Two exclusions, both by NAME and neither by a loosened comparison** —
+`ranked_by` (ADR-NODE-SEARCH decision 10: Python's MCP surface opts into the
+accelerator and Node has none, and the differential law is what makes the label
+the only difference), and `answer` equality where Python cited a document Node
+cannot decode (decision 11: the two then rescore over different passage
+populations, so comparing would be meaningless rather than merely weak — what
+is asserted instead is the invariant that Node cites no decoded document, on
+every answer).
+
+⚠ **The graph lane is SKIPPED, loudly, on a corpus with no fresh derived
+plane.** Python's graph verbs refuse without `fux build` and Node's do not
+(ADR-NODE-SEARCH decision 9), so there is nothing to compare there — and a lane
+that silently does not run is the failure decision 13 is about.
+
 ### Consequences
 
 - **The differential law now covers the confidence block too.** `accel.ask`
@@ -567,12 +645,17 @@ evidence.*
 - [`tests/derive/test_bounds.py`](../../tests/derive/test_bounds.py)
 - [`tests/test_tune_boundary.py`](../../tests/test_tune_boundary.py)
 - [`tools/differential/run.py`](../../tools/differential/run.py)
+- [`tools/differential/node_arm.py`](../../tools/differential/node_arm.py)
+- [`tools/differential/rungs.py`](../../tools/differential/rungs.py)
+- [`tools/differential/ladder_check.py`](../../tools/differential/ladder_check.py)
 
 **Measured evidence**
 
 - [`work/regression/2026-08-12-m2-accelerator/report.md`](../../work/regression/2026-08-12-m2-accelerator/report.md)
 - [`work/regression/2026-08-18-ingest-and-index/report.md`](../../work/regression/2026-08-18-ingest-and-index/report.md)
 - [`work/regression/2026-08-19-w54/report.md`](../../work/regression/2026-08-19-w54/report.md)
+- [`work/regression/2026-09-12-node-arm-rungs/report.md`](../../work/regression/2026-09-12-node-arm-rungs/report.md)
+  — the harness's first run on the golden ladder, and the tune gap it found
 
 **Papers and specifications**
 

@@ -135,6 +135,27 @@ where timing runs touch it.
   Never a mean — one scheduler hiccup owns it.
 - **Ingest and build are timed separately** and are not part of a query number.
 
+## 🔴 Inherited 2026-09-12: the Node scan's latency fence
+
+**This environment now owns a bar it did not set**, and it is recorded here
+because a moved fence that lands nowhere is a dropped fence.
+
+| | |
+|---|---|
+| the bar | **p95 ≤ 150 ms**, warm, in-process, scan path, at **10 000 documents** |
+| on | the Node reader (`node/`) |
+| came from | `PRE-REGISTRATION-NODE`'s `N4`, frozen 2026-09-06 |
+| why it moved | Arpit, 2026-09-12: [L9](../../docs/adr/0011_LAW-9-environments.md) gives latency to `fux-benchmark` by name, and [PRE-REG-NODE-2](../benchmark/PRE-REGISTRATION-NODE-2.md) asks whether two readers **agree**, which is a different claim from how fast one is |
+
+⚠ **It is a fence against an ALGORITHMIC divergence, not a performance
+target.** 150 ms is 3× Python's measured p95 (50.2 ms at 10 000 documents), so
+it catches a Node transcription that is correct and quadratic — it says nothing
+about a constant factor, and must never be reported as one.
+
+🔴 **Until `fux-benchmark` is built, NOTHING measures Node's latency.** There
+is no open item carrying it: W-139 was removed from the queue on 2026-09-12.
+That is a stated gap, which is the whole reason this section exists.
+
 ## Standing rules
 
 **0. Never delete it, never start a fourth harness.** Same rule as the lab, same

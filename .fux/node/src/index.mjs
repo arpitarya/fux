@@ -1,5 +1,7 @@
 /** The library surface — the half of `fux-engine` that is not a CLI.
  *
+ * Twin of `src/fux/api.py`.
+ *
  * Mirrors `fux.api` in Python method for method, argument for argument, and
  * returns the same shapes the `--json` payload carries (W-107 R3). A frontend
  * project wants this; shelling out to a binary is the fallback, not the point.

@@ -645,18 +645,80 @@ defect OPEN-WORK rule 3 warns about, in a detail file rather than the queue.
 - ✅ **O2 · Is `fux.api` public at 1.0, or provisional?** **Public and frozen** —
   [ADR-API](../../docs/adr/0156_api.md) decision 1: *"`fux.api` is a supported
   surface, frozen like any other."* Provisional was not taken.
-- 🟡 **O3 · `PRE-REGISTRATION-NODE-2` — DRAFTED 2026-09-12, NOT FROZEN.**
-  [`../benchmark/PRE-REGISTRATION-NODE-2.md`](../benchmark/PRE-REGISTRATION-NODE-2.md).
+- ✅ **O3 · `PRE-REGISTRATION-NODE-2` — WRITTEN AND FROZEN 2026-09-12**
+  ([`../benchmark/PRE-REGISTRATION-NODE-2.md`](../benchmark/PRE-REGISTRATION-NODE-2.md),
+  sha `2ea403035d24eef14d0dafb2c4349d9382cda479cc02bafc2674e3b76acfb560`).
   Supersedes rather than edits (H3), moves the corpora to the committed golden
-  ladder, states H2's parsed-not-bytes comparison, and carries **Arpit's ruling
-  of 2026-09-12**: the arm is **standing, not a gate** — every change to either
-  reader, in fux-lab, and both must give the same results. Ids **N5–N9**;
-  N0–N4 retired with the document that froze them and never reused.
-  🔴 **Two cells are his and the document does not freeze until they are
-  filled** — §7: (1) does the latency fence `N9` belong in an equivalence
-  document or in `fux-benchmark` under L9, and (2) all eight rungs on every
-  push, or the two ends on every push and all eight nightly? **No number may
-  be measured against it until then**, and no arm may be reported.
+  ladder, and states H2's parsed-not-bytes comparison. **Arpit's ruling of
+  2026-09-12 is its §2: the arm is STANDING, not a gate** — every change to
+  either reader, in fux-lab, and both must give the same results. Ids
+  **N5–N8**; N0–N4 retired with their document and never reused. Both open
+  cells filled by him the same day: the **latency fence moved to
+  `fux-benchmark`** (§5 → [SETUP-BENCHMARK](../setup/fux-benchmark.md)), and
+  the cadence is **`rung-00100` + `rung-10000` per push, all eight nightly and
+  before a release** (§4).
+
+## What W-107 still owes
+
+- [x] ✅ **THE ARM RUNS ON THE LADDER — 2026-09-12.**
+      [`work/regression/2026-09-12-node-arm-rungs/`](../regression/2026-09-12-node-arm-rungs/report.md).
+      The old sentence here said *"the ladder rungs are `.index` files, so a run
+      needs a step that materialises a repo around a rung"* — **that was wrong
+      about the corpus.** A rung is a full git repo with its own committed
+      index, in `fux-lab`; what this repo holds is its *manifest*. Nothing had
+      to be materialised. What had to be split was **the engine root from the
+      corpus root**: all three arms did `sys.path.insert(0, ROOT / "src")` on
+      the same argument they read the index from, so the only corpus any of
+      them could run on was a fux checkout, and a rung has no `src/`.
+      - `tools/differential/rungs.py` resolves a rung and **verifies it against
+        `work/golden/ladder/rung-NNNNN.{index,sha256}` before a byte is read**.
+        🔴 A drifted corpus is the one failure a differential arm structurally
+        cannot catch about itself — **both readers agree perfectly on it.**
+      - `tools/differential/ladder_check.py` checks all eight manifests with no
+        corpus at all, including the nesting `work/golden/README.md` called
+        *"verified, not asserted"* and which nothing ran outside the session
+        that built the ladder.
+      - **`rung-00100` and `rung-10000`: 750 comparisons each, 0 discordant;
+        graph plane digests identical.** 3 s and 1 m 47 s.
+      - ⚠ **No number here is an N5–N8 result**, and the report says why three
+        times over (the golden questions are not released; the OS/Node matrix is
+        one machine on Node 24; §2 says a green arm is filed, not announced).
+      - [ADR-T1-ACCELERATOR](../../docs/adr/0110_accelerator.md) decisions 12–13.
+
+- [ ] 🔴 **NEW, and it is the find of that run: `node/` reads no `tune.toml`.**
+      The arm was green because **its Python side called `scan.ask`, and
+      `fux find` calls `run_query`** — which applies `.fux/tune.toml`, the
+      archived weighting and the reranker. Both sides were ignoring the same
+      things. Aimed at the path the CLI uses, fux's own repo goes **90 of 174
+      discordant**, and **0 of 174** with `--no-tune`.
+      **R5's read path lists `.fux/tune.toml` and that row is unbuilt**:
+      `node/src/config/` holds `root.mjs` and nothing else. Owed:
+      - `node/src/config/tune.mjs` — the *reader* half of `src/fux/tune.py`
+        (not its 739 lines of validation), plus R5's loud refusal on a
+        malformed file. `config/toml.mjs` already exists.
+      - `node/src/query/rerank.mjs` — Phase 2, and the harder half: it reads
+        document content, so it lands with the refer plane, not before it.
+      ⚠ **Every golden rung's tune is all-defaults**, so the ladder runs above
+      are unaffected — and that is exactly why nothing surfaced this until the
+      instrument was pointed at it.
+      [ADR-NODE-SEARCH](../../docs/adr/0155_node-search.md) decision 8.
+
+- [ ] 🟠 **CI cannot meet §4's per-push cadence, and now says so out loud.**
+      [`node-arm.yml`](../../.github/workflows/node-arm.yml) gains a `ladder`
+      job: it runs `ladder_check.py` (manifests only, no corpus) always, and
+      runs the arm on both ends **the moment `FUX_GOLDEN_CORPORA` points at a
+      checkout that has them**. A GitHub runner does not: the corpus is not
+      committed, `rung-10000` is 120 MB, and `build_golden_rung.py` hard-codes
+      two absolute paths on Arpit's machine. So the cadence is met **in
+      fux-lab, on one OS**. The routes out — a self-hosted runner, a committed
+      small rung, a portable builder — are each a decision and none is taken.
+- [ ] 🟠 **Nothing measures Node's latency.** N4's fence moved to
+      `fux-benchmark`, which is unbuilt and carried by **no open item** —
+      W-139 was removed from the queue on 2026-09-12. The bar is written into
+      [SETUP-BENCHMARK](../setup/fux-benchmark.md) so it is stated, not
+      silently dropped.
+- [ ] 🟠 [`log-probe.yml`](../../.github/workflows/log-probe.yml) is still
+      unrun — musl, Windows and Node 20 unmeasured.
 
 ## Out of scope
 

@@ -21,7 +21,13 @@ at that moment, and nothing was watching. The register's renumbering of
   was, and repairing its links would make the record false.
 - `work/regression/**` are **frozen measurements**. A filed verdict is never
   edited (CLAUDE.md §"A pre-registered threshold may never move").
-- `tools/**` holds **frozen pre-registrations**, same rule.
+- **`PRE-REGISTRATION-*.md`, wherever it lives**, same rule. ⚠ The list used to
+  say *"`tools/**` holds frozen pre-registrations"*, which was true when they
+  all lived under `tools/pruning-eval/`; `PRE-REGISTRATION-NODE.md` and its
+  successor are in `work/benchmark/`, and a rule that exempted them by
+  DIRECTORY would also exempt that directory's live runbooks. The exemption is
+  by filename because the freeze is a property of the document, not of where it
+  was filed.
 - `archive/**` is frozen and its links are never repaired
   (`tests/test_archive_law.py` states this).
 - `CHANGELOG.md` is a **historical record** of released versions.
@@ -50,6 +56,12 @@ _SKIP_DIRS = {
 # Frozen-by-law trees: never edited, so never repaired.
 _FROZEN_PREFIXES = ("work/regression/", "archive/", "tools/")
 
+# Frozen-by-law by NAME, wherever they live: a pre-registration is never edited
+# (CLAUDE.md §"A pre-registered threshold may never move"), so its links are
+# never repaired either — including when an item it names retires into
+# `archive/`, which is exactly the case that surfaced this.
+_FROZEN_GLOBS = ("PRE-REGISTRATION-",)
+
 # Frozen-by-law single files.
 _FROZEN_FILES = {
     "work/WORKLOG.md",       # append-only session log
@@ -70,6 +82,8 @@ def _live_markdown() -> list[Path]:
         if any(part in _SKIP_DIRS for part in Path(rel).parts):
             continue
         if rel in _FROZEN_FILES or rel.startswith(_FROZEN_PREFIXES):
+            continue
+        if path.name.startswith(_FROZEN_GLOBS):
             continue
         out.append(path)
     return out

@@ -59,6 +59,12 @@ export function assemble(scored, {
     const citation = {
       doc_id: s.doc_id, locator: s.locator, sha: s.sha,
       heading: s.passage.heading, text, score: s.score, source,
+      // The passage's position in ITS OWN document, carried so `answer` can
+      // report it — ADR-REFER decision 17 / ADR-ANSWER decision 9 promised it
+      // and the payload did not carry it on either side (W-140 row 2 fixed the
+      // Python half; this is the Node half, found 2026-09-12 by comparing the
+      // two library surfaces).
+      ordinal: s.passage.ordinal,
       // ⚠ The overhead is part of a citation's OWN size, not a separate line
       // item: the locator line and separator will be rendered around every
       // passage, so the budget bounds the rendered answer rather than the

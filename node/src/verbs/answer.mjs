@@ -15,15 +15,31 @@ import { rescore } from "../refer/rescore.mjs";
 import { assemble, CITATION_OVERHEAD } from "../refer/assemble.mjs";
 import { Verdict } from "../refer/freshness.mjs";
 import { resolve, readLocal, fromAcquired, GIT } from "../refer/source.mjs";
+import { passageBoost } from "../query/rerank.mjs";
+import { alreadyTextGlobs, isAlreadyText } from "../decode/registry.mjs";
 
 /** `answer` refers the top 3 — W-108. One question and no `-q`: an RRF score
  *  would make the three incomparable. */
 export const ANSWER_TOP = 3;
 
-function obtain(root, record) {
+function obtain(root, record, textGlobs) {
   const indexedSha = record.sha || "";
   const [kind, target] = resolve(record.id);
   if (kind === GIT) {
+    // 🔴 **A document Node cannot DECODE is declined, not guessed at.** Python
+    // runs the bytes back through the decoder plane before chunking, so a
+    // `.csv` is re-scored as the Markdown table ingest indexed; Node has no
+    // decoders and would chunk the raw bytes, producing a `path:L20-L28` that
+    // points into text the index never held. Declining is the same move the
+    // never-fetch rule makes for an unreachable URL, for the same reason —
+    // `decode/registry.mjs`, ADR-NODE-SEARCH decision 11.
+    if (!isAlreadyText(root, target, textGlobs)) {
+      return {
+        text: null,
+        verdict: Verdict.unverified(indexedSha, "node has no decoder for this type"),
+        lineNumbers: true,
+      };
+    }
     try {
       const [raw, sha] = readLocal(root, target);
       // Decoded documents carry no line numbers — a `.docx`'s Markdown exists
@@ -44,16 +60,34 @@ function obtain(root, record) {
   };
 }
 
-export function runAnswer(root, args) {
+/** `answer`'s payload, assembled and NOT printed.
+ *
+ * Split out so `src/index.mjs` can return the object rather than parse the
+ * CLI's own stdout back — which is what `api.py::_answer_from` still has to do
+ * on the Python side, and is why [ADR-API](../../../docs/adr/0156_api.md)
+ * records the renderer split as deliberately staged. This verb is small
+ * enough that the split costs nothing, so it is taken here.
+ *
+ * Returns `{ payload, freshness, results }`; the renderer decides what a
+ * person sees. */
+export function answerPayload(root, args) {
   const query = args._.join(" ");
-  const { results, confidence } = runQuery(root, query, ANSWER_TOP, { wantConfidence: true });
+  // ⚠ **`answer` takes ONE question and no `-q`** (ADR-ANSWER decision 4): the
+  // verb means one answer. `--expand` applies exactly as it does to `ask`,
+  // because expanding a question is not asking a second one.
+  const { results, confidence, tune } = runQuery(root, query, ANSWER_TOP, {
+    useTune: args.noTune !== true, wantConfidence: true, expand: args.expand ?? "",
+  });
+  const band = (block, freshness) => {
+    if (!block || !args.band) return undefined;
+    return freshness ? block.withVerified(freshness).asDict() : block.asDict();
+  };
 
   if (!results.length) {
     const payload = { answer: null, citation: null, source: "index" };
-    if (confidence && args.band) payload.confidence = confidence.asDict();
-    if (args.json) process.stdout.write(JSON.stringify(payload, null, 2) + "\n");
-    else process.stdout.write("No confident matches.\n");
-    return 0;
+    const b = band(confidence);
+    if (b) payload.confidence = b;
+    return { payload, freshness: null, results };
   }
 
   // --no-refer: skip reading the source entirely. `verified` STAYS
@@ -67,21 +101,28 @@ export function runAnswer(root, args) {
       citation: { id: top.id, loc: top.loc, sha: record?.sha ?? "", freshness: "unverified" },
       source: "index",
     };
-    if (confidence && args.band) payload.confidence = confidence.asDict();
-    process.stdout.write(JSON.stringify(payload, null, 2) + "\n");
-    return 0;
+    const b = band(confidence);
+    if (b) payload.confidence = b;
+    return { payload, freshness: "unverified", results };
   }
 
   const candidates = [];
   const verdicts = new Map();
+  // Resolved ONCE per answer, not once per candidate: it is a committed file
+  // read, and three candidates is three reads of the same bytes.
+  const textGlobs = alreadyTextGlobs(root);
   for (const r of results) {
     const record = recordFor(root, r.id);
     if (!record) continue;
-    const got = obtain(root, record);
+    const got = obtain(root, record, textGlobs);
     verdicts.set(r.id, got.verdict);
     if (got.text === null) continue;
     candidates.push([r.id, r.loc, record.sha || "",
-                     chunk(got.text, { lineNumbers: got.lineNumbers })]);
+                     chunk(got.text, {
+                       lineNumbers: got.lineNumbers,
+                       minPassageBytes: tune.minPassageBytes,
+                       maxPassageBytes: tune.maxPassageBytes,
+                     })]);
   }
 
   if (!candidates.length) {
@@ -90,17 +131,23 @@ export function runAnswer(root, args) {
       answer: null, citation: { id: top.id, loc: top.loc, sha: "", freshness: "unverified" },
       source: "index",
     };
-    if (confidence && args.band) payload.confidence = confidence.asDict();
-    process.stdout.write(JSON.stringify(payload, null, 2) + "\n");
-    return 0;
+    const b = band(confidence);
+    if (b) payload.confidence = b;
+    return { payload, freshness: "unverified", results };
   }
 
-  const scored = rescore(query, candidates);
-  const bundle = assemble(scored, { overhead: CITATION_OVERHEAD });
+  // `[ranking] rerank_weight`, not a second `[refer]` knob — the same constant
+  // that reordered the DOCUMENTS now scores their passages, and neither may be
+  // turned on without the other (`refer/_rescore.py::rescore`).
+  const scored = rescore(query, candidates, {
+    weight: tune.rerankWeight, boostFn: passageBoost,
+  });
+  const bundle = assemble(scored, {
+    overhead: CITATION_OVERHEAD, budget: tune.budget, perDocFraction: tune.perDocFraction,
+  });
 
   if (!bundle.citations.length) {
-    process.stdout.write(JSON.stringify({ answer: null, citation: null, source: "refer" }, null, 2) + "\n");
-    return 0;
+    return { payload: { answer: null, citation: null, source: "refer" }, freshness: null, results };
   }
 
   // The verdict of the document behind the WINNING citation, not documents[0].
@@ -113,6 +160,9 @@ export function runAnswer(root, args) {
       passages: bundle.citations.map((c) => ({
         id: c.doc_id, loc: c.locator, sha: c.sha,
         heading: c.heading, text: c.text, score: c.score,
+        // ADR-REFER decision 17 / ADR-ANSWER decision 9. Additive: no key
+        // removed or repurposed.
+        ordinal: c.ordinal,
       })),
     },
     citation: { id: winner.doc_id, loc: winner.locator, sha: winner.sha, freshness },
@@ -120,7 +170,8 @@ export function runAnswer(root, args) {
   };
   // The band is raised to the winning document's verdict — one function, one
   // place, because the printer and the receipt disagreed once in production.
-  if (confidence && args.band) payload.confidence = confidence.withVerified(freshness).asDict();
+  const b = band(confidence, freshness);
+  if (b) payload.confidence = b;
   if (args.audit) {
     payload.audit = {
       documents: [...verdicts].map(([id, v]) => ({
@@ -130,15 +181,25 @@ export function runAnswer(root, args) {
       budget: bundle.budget, used: bundle.used, dropped: bundle.dropped,
     };
   }
+  return { payload, freshness, results };
+}
 
-  if (args.json) {
-    process.stdout.write(JSON.stringify(payload, null, 2) + "\n");
-  } else {
-    for (const p of payload.answer.passages) {
-      process.stdout.write(`${p.loc}  [${freshness}]\n`);
-      if (p.heading) process.stdout.write(`§ ${p.heading}\n`);
-      process.stdout.write(p.text + "\n\n");
+export function runAnswer(root, args) {
+  const { payload, freshness } = answerPayload(root, args);
+
+  if (args.json || payload.answer === null) {
+    if (!args.json && payload.answer === null) {
+      process.stdout.write("No confident matches.\n");
+      return 0;
     }
+    process.stdout.write(JSON.stringify(payload, null, 2) + "\n");
+    return 0;
+  }
+
+  for (const p of payload.answer.passages) {
+    process.stdout.write(`${p.loc}  [${freshness}]\n`);
+    if (p.heading) process.stdout.write(`§ ${p.heading}\n`);
+    process.stdout.write(p.text + "\n\n");
   }
   return 0;
 }

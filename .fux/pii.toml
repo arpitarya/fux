@@ -66,9 +66,12 @@
 # removes real vocabulary and makes documents unfindable by the words that
 # would have found them -- and unlike a refusal, nothing looks wrong.
 #
-# Before adding a rule, run it over the corpus and read what it caught:
+# Before adding a rule, run it over the corpus and read what it caught. The
+# probe is NOT part of the installed package -- `tools/pii-probe/` lives in the
+# fux repository, and the `fux-pii` skill `fux setup` wrote carries a short
+# standalone copy you can save and run with the interpreter fux is installed in:
 #
-#     python3 tools/pii-probe/probe.py . --rule <name>
+#     python probe.py RULES.toml        # prints REDACT / keep per match, never the value
 #
 # Every rule below is commented with what it will over-match. Read that line
 # before you enable it. THE STARTER SHIPS WITH THE SAFE ONES ENABLED AND THE

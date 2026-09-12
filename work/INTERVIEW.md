@@ -35,6 +35,62 @@ valuable judgement, but not the state of play.
 *Updated **2026-09-12**.* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
+### W-107 is CLOSED, and the way it closed is the lesson (2026-09-12, Claude Code)
+
+**The Node read plane is built, published, and compared against Python on five
+surfaces.** [ADR-NODE-SEARCH](../docs/adr/0155_node-search.md) is
+`accepted / yes`. W-107's row is deleted and its file is in `archive/open/`.
+
+🔴 **The headline is not the tune fix. It is what the tune fix exposed.**
+
+The previous session found that the differential arm's Python side called
+`scan.ask` while `fux find` calls `run_query`, so **both readers were ignoring
+the same files**. Closing that meant building `config/{toml,tune,output}.mjs`
+and `query/rerank.mjs` — 90 of 174 discordant on this repo went to 0 of 199,
+and both golden rungs are 0 of 775.
+
+**Then the same defect, one level up.** The arm compared `find` and `ask` **and
+nothing else**. Four more surfaces had been transcribed and never checked, and
+**every one of them was wrong**:
+
+| surface | what was wrong |
+|---|---|
+| `explain` · `graph` · `path` | different key names in all three; Node ran its own breadth-first walk where Python runs a PPR-lite expansion |
+| `mcp` | handlers read `args.id` where the schema advertises `path` — **every conformant client got an empty result reported as success, in a package already on npm**; `fux_search` returned no `confidence` |
+| `fux.api` | **a Python defect**: ranked without its own tune file (`graph plane` 6.392573 against the CLI's 8.310345) |
+| `answer` | cited `path:L20-L28` **into text the index never held** — Python decodes a document before chunking and Node has no decoders |
+
+**What a next session should take from this**, because it generalises past
+`node/`:
+
+1. 🔴 **A differential harness measures exactly the seam it is pointed at**, and
+   says nothing — *while looking green* — about every seam it is not. Four of
+   the five findings needed no new technique. The work was aiming an existing
+   instrument at surfaces it had never covered.
+2. **A stated coverage limit is a prediction, not a hedge.** The previous run's
+   report closed by naming `answer`'s locators, `explain` and `path` as places
+   a divergence could hide and return 0. **Three of the four were diverging as
+   that sentence was written.** Write those sentences; then go and check them.
+3. **Where a second implementation legitimately cannot match, say so as a
+   DECISION and check the weaker invariant.** Node has no decoders, so it
+   declines to cite what it cannot reproduce — and the arm asserts *"Node cites
+   no decoded document"* on every answer rather than excluding `answer` from
+   comparison.
+4. **Some drift is structurally invisible to a differential arm.** A drifted
+   tune key only shows on a corpus that sets it, and every golden rung's tune
+   is all-defaults; a drifted *refusal* never shows at all. That is why the
+   close ships `tests/test_node_config_parity.py` — equality tests between two
+   transcriptions — and not more arm coverage.
+
+⚠ **Four obligations did NOT close** and are
+[W-148](open/W-148-what-the-two-readers-still-owe.md), `lane: arpit`: CI cannot
+reach a golden corpus (three routes, none chosen), Node's latency has no
+instrument (`fux-benchmark` unbuilt), `log-probe.yml` has never run, and
+ADR-API's renderer split is staged. **Two are his calls.**
+
+⚠ **Nothing claims `N5 passes`** — one machine, Node 24, and PRE-REG-NODE-2 §2
+makes the arm standing rather than a gate.
+
 ### Three controls answered, one control retired, and a lesson about endpoints (2026-09-12, Claude Code)
 
 **W-142 and W-115 are CLOSED and their files deleted. W-144 and W-136 moved to
@@ -2274,6 +2330,19 @@ which are not laws:
 The ones that would change how a successor acts, newest first. Add to this list
 when a session produces a lesson; do not let it become a changelog.
 
+- **A record can be AHEAD of its code, and it reads as authority just the same**
+  (2026-09-12). `6f518c6` held four source files back on the reasoning that their
+  five owning records were untouched and a session must not write a record out of
+  someone else's diff. **The premise was false**: the records had already landed in
+  `24c0a3d` — ADR-CONFIG decisions 13/14/15, ADR-DOTFUX's `.agents/skills` and
+  Node-vendoring text, the `keep`/`ttl`/`enrich` key rows. What was missing was the
+  code, so for two commits five accepted records described a refusal the engine did
+  not perform. **`tests/test_adr_freshness.py` cannot see this**, in either
+  direction: it checks that an owning record was *touched* in a change, never what
+  the record says. **Before holding code back for a record, read the record** —
+  `git log -1 -- <record>` is the whole check. Written up in
+  [ADR-CONFIG](../docs/adr/0113_config.md) after decision 15. W-83's shape with the
+  halves swapped; first occurrence, so no gate.
 - **A symptom worked around per-arm is an engine defect hiding** (2026-08-28 →
   2026-09-05, W-110). `placebo-and-seal` saw *"0 changed, 10 carried forward"* with
   every arm identical, and wiped `.fux/index` per arm to get on with the run — so

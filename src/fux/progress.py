@@ -41,13 +41,35 @@ _BAR_WIDTH = 20
 _FULL = "█"  # █
 _EMPTY = "░"  # ░
 
-#: The widest a whole painted line may be. `\r` returns to the start of the
-#: *terminal* line, so a line that wrapped cannot be erased — the tail stays
-#: on screen and the "no partial line" guarantee quietly stops holding. 80 is
-#: the narrowest terminal anyone still uses; staying inside it needs no
-#: `os.get_terminal_size` call and behaves the same when there is no terminal
-#: to ask (a pipe under `--progress`, a Windows console that reports 0).
-_MAX_LINE = 80
+#: The width assumed when the terminal cannot be asked — a pipe under
+#: `--progress`, a Windows console that reports 0, a test's fake stream. `\r`
+#: returns to the start of the *terminal* line, so a line that wrapped cannot
+#: be erased and the "no partial line" guarantee quietly stops holding; 80 is
+#: the narrowest terminal anyone still uses, so it is the safe guess when
+#: there is nothing to measure.
+_FALLBACK_LINE = 80
+
+
+def _terminal_width(stream) -> int:
+    """The painted line's budget: the real terminal width, less one column.
+
+    Measured once per `Progress`, not per paint — a resize mid-run would
+    break `\r` repainting whatever this returned, and 100 000 `ioctl`s on the
+    ingest path buy nothing for it. `COLUMNS` wins when set, because that is
+    the knob a user reaches for and the one a harness sets.
+
+    The last column is left empty on purpose. Writing into it puts most
+    terminals in the *pending wrap* state, where the next character lands on
+    the following row — the wrapped line `\r` cannot erase.
+    """
+    raw = os.environ.get("COLUMNS", "")
+    if raw.isdigit() and int(raw) > 0:
+        return int(raw) - 1
+    try:
+        return os.get_terminal_size(stream.fileno()).columns - 1
+    except (AttributeError, ValueError, OSError):
+        # No `fileno` (a StringIO), a closed fd, or not a terminal at all.
+        return _FALLBACK_LINE
 
 
 def _clean(detail: str) -> str:
@@ -90,6 +112,7 @@ class Progress:
         else:
             enabled = bool(getattr(self._stream, "isatty", lambda: False)())
         self._enabled = enabled
+        self._width = _terminal_width(self._stream) if enabled else _FALLBACK_LINE
         self._painted = False
         self._last_len = 0
 
@@ -120,11 +143,11 @@ class Progress:
             # of a path identifies a document and its leading directories do
             # not. Ellipsis first, so a clipped path cannot be misread as a
             # real one.
-            room = _MAX_LINE - len(line) - 2
+            room = self._width - len(line) - 2
             clean = _clean(detail)
             if room >= 4:
                 line = f"{line}  {clean if len(clean) <= room else '…' + clean[-(room - 1):]}"
-        line = line[:_MAX_LINE]
+        line = line[:self._width]
         pad = " " * max(0, self._last_len - len(line))
         self._stream.write(f"\r{line}{pad}")
         self._stream.flush()

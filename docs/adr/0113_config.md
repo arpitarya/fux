@@ -435,6 +435,20 @@ test holds equal to the code **enforces**, and ADR-LAW-0 decision 4 permits an
 enforcement. Deleting it would have removed a live gate to satisfy a rule it
 already satisfies.
 
+⚠ **Decisions 13–15 were recorded two commits before their code, which is the
+inverse of the failure Law zero guards.** `24c0a3d` (2026-09-12) landed this
+record; `6f518c6` then held `src/fux/config.py` and the deletion of
+`config.schema.json` back, on the reasoning that a session should not write a
+record out of someone else's diff. But the record was already written — so what
+the holdback produced was two commits in which **this record described a refusal
+the engine did not perform**: a reader checking `dirs_fil` against decision 14
+was told it errors, and it did not. The code lands with this line.
+
+⚠ **A record ahead of its code reads as authority exactly as a record behind it
+does**, and `tests/test_adr_freshness.py` sees neither — it checks that an owning
+record was *touched* in a change, never what the record says. This is the W-83
+shape with the two halves swapped, and it is unguarded for the same reason.
+
 ### Consequences
 
 - **The config fits on a screen**, so a new consumer reads all of it.

@@ -47,8 +47,25 @@ jobs:
         working-directory: node
         run: node --test
 
-      - name: the differential arm
-        run: python tools/differential/node_arm.py .
+      - name: the differential arm — TRANSCRIPTION (this repo)
+        # ⚠ `--python-tune off` is deliberate and is not a loosened bar.
+        #
+        # This repo's own `.fux/tune.toml` sets `rerank_weight = 0.3`, and
+        # **Node reads no tune.toml at all** — `node/src/config/` holds
+        # `root.mjs` and nothing else, so W-107 R5's tune row is unbuilt and
+        # `rerank.mjs` is still owed by Phase 2. Against a tuned Python the two
+        # readers differ on 90 of 174 comparisons here, every one of them the
+        # same missing multiplier.
+        #
+        # So CI runs the arm that can attribute a failure: `--no-tune` on the
+        # Python side is *the engine's own answer* (ADR-TUNE decision 11),
+        # which is exactly what Node implements. A discordance in this step is
+        # a Node transcription defect and nothing else.
+        #
+        # 🔴 The CONTRACT arm — tune applied — runs on the golden rungs, whose
+        # tune is all-defaults, so there the two arms are the same run. See the
+        # `ladder` job below.
+        run: python tools/differential/node_arm.py . --python-tune off
 
       - name: the adversarial corpus, then the arm again
         # W-107 H1 and H2 are invisible on ordinary data: H1 needs two
@@ -56,7 +73,7 @@ jobs:
         # and no real corpus has been written to contain one.
         run: |
           python tools/differential/adversarial_corpus.py .
-          python tools/differential/node_arm.py .
+          python tools/differential/node_arm.py . --python-tune off
 
       - name: N2 — the graph plane digest
         # ⚠ Runs against the ADVERSARIAL index the step above wrote, not the
@@ -64,3 +81,53 @@ jobs:
         # either way, so the digest comparison is still a comparison — and the
         # adversarial corpus is where an id above U+FFFF actually exists.
         run: python tools/differential/graph_arm.py .
+
+  ladder:
+    # PRE-REG-NODE-2 §4's cadence: `rung-00100` and `rung-10000` on every push,
+    # all eight nightly and before a release.
+    #
+    # 🔴 **A GitHub runner cannot meet it, and this job says so rather than
+    # pretending.** The ladder *corpus* is not in this repo — only its
+    # manifests are (`work/golden/ladder/*.{index,sha256}`, 2.2 MB); the rungs
+    # themselves live in `fux-lab` because [L9] gives every measurement to that
+    # environment, and rung-10000 alone is 120 MB. Regenerating one here would
+    # mean running `build_golden_rung.py`, which hard-codes two absolute paths
+    # on Arpit's machine.
+    #
+    # What this job does have is the manifests, so it proves the *instrument*
+    # is wired: `rungs.py` resolves and verifies, and the arm runs the moment a
+    # corpus is present. Where `FUX_GOLDEN_CORPORA` points at one — a lab
+    # checkout, a self-hosted runner — the same command is the real thing.
+    #
+    # [L9]: docs/adr/0011_LAW-9-environments.md
+    name: golden ladder (fux-lab corpora)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: install fux
+        run: pip install -e .
+
+      - name: the ladder manifests are readable and self-consistent
+        run: python tools/differential/ladder_check.py
+
+      - name: the arm on rung-00100 and rung-10000, when the corpora are here
+        env:
+          FUX_GOLDEN_CORPORA: ${{ vars.FUX_GOLDEN_CORPORA }}
+        run: |
+          if [ -z "$FUX_GOLDEN_CORPORA" ] || [ ! -d "$FUX_GOLDEN_CORPORA" ]; then
+            echo "::notice::the ladder corpus is not on this runner — PRE-REG-NODE-2 §4's"
+            echo "::notice::per-push cadence is met in fux-lab, not here. See W-107."
+            exit 0
+          fi
+          for rung in rung-00100 rung-10000; do
+            python tools/differential/node_arm.py --rung "$rung"
+            python tools/differential/graph_arm.py --rung "$rung"
+          done

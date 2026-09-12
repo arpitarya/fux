@@ -22,8 +22,6 @@ description: "The single live work queue, two lanes, plus the Blocked-on-Arpit i
 | ↳ **blocks:** **W-87's Part B**, which needs a key nobody has contaminated. Nothing else — it governs what a phase-5 number may *claim*, not whether phase 5 runs | | |
 | 🔴 **W-146** — two rulings: is `ADR-WORK-QUEUE` written (OPEN-WORK's rules are stated twice, owned nowhere), and does *never restates* reach into docstrings? [detail](open/W-146-the-rest-of-l0.md) | 2026-09-12 | 0d |
 | ↳ **blocks:** nothing else in the queue — they decide whether two named exposures get closed, not whether work runs | | |
-| 🔴 **W-107** — **`PRE-REGISTRATION-NODE-2` is drafted; §7's two cells are yours**: does the latency fence `N9` live here or in fux-benchmark, and all eight rungs per push or two? [draft](benchmark/PRE-REGISTRATION-NODE-2.md) | 2026-09-12 | 0d |
-| ↳ **blocks:** W-107's closure, and every differential-arm number — H3 bars calling any arm green until it exists | | |
 | 🔴 **W-112** — W-106 closed **without a PASS and cannot produce one** (no corpus carries DENSE-CHUNK's bar). Proceed on the narrowed claim, wait for an instrument, or close? [detail](open/W-112-vector-plane.md) | 2026-09-12 | 0d |
 | ↳ **blocks:** nothing else in the queue — search-v3's last item, and the only one left of §5 | | |
 | 🔴 **W-147** — `.fux/output.toml` can switch the answer journal on, and ADR-PROVENANCE decision 10 says only the flag can — a fork that decision reserved and that shipped through a different record. [detail](open/W-147-the-journal-consent-surface.md) | 2026-09-12 | 0d |
@@ -36,6 +34,10 @@ description: "The single live work queue, two lanes, plus the Blocked-on-Arpit i
 | ↳ **blocks:** nothing else in the queue — the measurement is filed and the code is written; what is missing is the call | | |
 | 🔴 **W-97** — the candidate table is filed with no recommendation, as pre-registered; the `superseded_weight` and `rerank_weight` defaults are an ADR-TUNE amendment only he makes. [detail](open/W-97-tuner-knob-sweep.md) | 2026-09-12 | 0d |
 | ↳ **blocks:** nothing else in the queue | | |
+| 🔴 **W-148** — two calls left over from W-107: how CI reaches a golden corpus (self-hosted runner / commit `rung-00100` / portable builder), and whether `fux-benchmark` gets built or Node's latency stays unmeasured. [detail](open/W-148-what-the-two-readers-still-owe.md) | 2026-09-12 | 0d |
+| ↳ **blocks:** nothing else in the queue — the Node plane is built and measured; these decide where a future measurement runs and what it may CLAIM | | |
+| 🔴 **W-149** — the consumer's `.fux/node/` gets no `src/`: which shape is the default (committed bundle · `npx` · workspace stub), and do the *no build step* line and the offline promise survive? [detail](open/W-149-the-consumer-gets-no-source.md) | 2026-09-12 | 0d |
+| ↳ **blocks:** nothing else in the queue — the vendoring works today; this decides what a consumer commits, and what two records may keep claiming | | |
 
 ---
 
@@ -44,8 +46,9 @@ description: "The single live work queue, two lanes, plus the Blocked-on-Arpit i
 ### fux build
 
 - 🟡 **W-140** · `agent`, waiting on Arpit's `--hops` ruling — **1 code row left**: a runner-race flake **not reproduced in 11 attempts**, deliberately unchanged. 20 closed. [detail](open/W-140-guide-authoring-defects.md)
-- 🔴 **W-107** · `agent` — the Node read plane: every agent-closable item is done. **O3 is drafted, not frozen** — `PRE-REGISTRATION-NODE-2` §7 has two cells only Arpit fills. [detail](open/W-107-node-read-plane.md)
+- 🔴 **W-148** · `arpit` — what the two readers still owe: CI cannot reach the golden corpora, Node's latency has no instrument, and the renderer split is staged. [detail](open/W-148-what-the-two-readers-still-owe.md)
 - 🔴 **W-112** · `arpit` — the vector plane. W-106 closed without a PASS **and cannot produce one**: no corpus carries DENSE-CHUNK's bar. Determinism narrowed to *same embedder build*. [detail](open/W-112-vector-plane.md)
+- 🔴 **W-149** · `arpit` — the consumer gets no source: `.fux/node/` ships bundled code, run by `npx` or as a monorepo workspace. Three shapes, one call; decision 6 and the offline promise both bear on it. [detail](open/W-149-the-consumer-gets-no-source.md)
 
 ### testing
 

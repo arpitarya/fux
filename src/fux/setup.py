@@ -144,6 +144,28 @@ def _guide_skills(surface: str) -> tuple[tuple[str, str], ...]:
     return tuple((f"{surface}/{name}/SKILL.md", tpl) for name, tpl in GUIDE_SKILLS)
 
 
+#: The one skill directory **Codex and Copilot both read** (ADR-AGENT-POLICY
+#: decision 16, Arpit 2026-09-12). Codex reads repository skills from
+#: `.agents/skills` and nowhere else; Copilot reads `.github/skills`,
+#: `.claude/skills` and `.agents/skills`.
+#: <https://developers.openai.com/codex/skills> ·
+#: <https://docs.github.com/en/copilot/concepts/agents/about-agent-skills>
+SHARED_SKILL_SURFACE = ".agents/skills"
+
+#: ⚠ **ONE tuple, used by both vendors' rows** -- so the two rosters cannot drift
+#: apart, which is decision 10's agreement-by-construction applied to a row
+#: rather than to bytes. Everything a vendor needs is still in its own row:
+#: `install = ["codex"]` and `install = ["copilot"]` each get the full set.
+#: `fux-archived-results` is deliberately absent -- it is ambient policy, and
+#: reaches Codex through `AGENTS.md` and Copilot through `instructions/`.
+SHARED_SKILLS: tuple[tuple[str, str], ...] = (
+    (f"{SHARED_SKILL_SURFACE}/fux-enrich/SKILL.md", "ENRICH-SKILL.md"),
+    (f"{SHARED_SKILL_SURFACE}/fux-usage/SKILL.md", "USAGE-SKILL.md"),
+    (f"{SHARED_SKILL_SURFACE}/fux-decoder/SKILL.md", "DECODER-SKILL.md"),
+    *_guide_skills(SHARED_SKILL_SURFACE),
+)
+
+
 AGENT_FILES: dict[str, tuple[tuple[str, str], ...]] = {
     # `fux-enrich` is **INVOKED, never ambient** (W-76 Phase 8) -- and the rule
     # is *never ambient*, which was never the same thing as *claude only*.
@@ -156,9 +178,9 @@ AGENT_FILES: dict[str, tuple[tuple[str, str], ...]] = {
     #
     # ⚠ **It shipped to Claude ALONE until 2026-09-06, and that was an
     # omission, not the rule.** Every skill surface below is
-    # progressive-disclosure -- `.claude/skills`, `.kiro/skills`,
-    # `.codex/skills` and now `.github/skills` -- so the risk class the rule
-    # names is absent from all four. ADR-ENRICH decision 10 had **flagged the
+    # progressive-disclosure -- `.claude/skills`, `.kiro/skills` and the
+    # `.agents/skills` Codex and Copilot share (decision 16) -- so the risk
+    # class the rule names is absent from every one of them. ADR-ENRICH decision 10 had **flagged the
     # gap in its own text** rather than leaving it to be discovered
     # (*"the reasoning that admits a Kiro skill elsewhere would admit one
     # here"*), and `fux-decoder` -- named in the SAME sentence, in the same
@@ -192,18 +214,17 @@ AGENT_FILES: dict[str, tuple[tuple[str, str], ...]] = {
             "fux-archived-results.instructions.md",
         ),
         (".github/instructions/fux-usage.instructions.md", "fux-usage.instructions.md"),
-        # ⚠ **`.github/skills/` is Copilot's FIRST non-ambient surface**, and it
-        # is what makes this row legal under the rule above. Until Copilot
-        # supported Agent Skills its only non-agent rendering was
-        # `instructions/` (`applyTo: "**"`), which the rule refuses outright.
+        # ⚠ **`.agents/skills/` is Copilot's non-ambient skill surface, and it is
+        # SHARED with Codex** (ADR-AGENT-POLICY decision 16, Arpit 2026-09-12).
+        # Copilot reads project skills from `.github/skills`, `.claude/skills`
+        # **and** `.agents/skills`; Codex reads `.agents/skills` **only**. One
+        # directory both read, instead of `.github/skills` for Copilot and a
+        # second for Codex, keeps Copilot at TWO same-name copies (this one plus
+        # the `.claude/skills` cross-read, decision 13) instead of three.
         #
-        # ⚠ **Copilot ALSO reads `.claude/skills`** (ADR-AGENT-POLICY decision
-        # 13), so in a default install it sees this skill twice, from two
-        # folders, under one `name:`. **The bytes are identical by
-        # construction** -- one template, N destinations -- so a double-load is
-        # idempotent and the residual risk is a hard duplicate-name error, not
-        # divergent instructions. Written anyway because `install =
-        # ["copilot"]` **alone** must not silently get nothing.
+        # ⚠ **Written for Copilot as well as Codex**, although the paths are the
+        # same: `install = ["copilot"]` **alone** must not silently get nothing
+        # (decision 14). `_write_agents` writes a shared path once.
         #
         # ⚠ **`fux-usage` also reaches Copilot AMBIENTLY**, one line above, as
         # `instructions/fux-usage.instructions.md`. The skill is **additive, not
@@ -211,10 +232,7 @@ AGENT_FILES: dict[str, tuple[tuple[str, str], ...]] = {
         # says *resolve the binary, read the JSON*; the skill is the
         # progressive-disclosure operating manual Claude, Kiro and Codex get.
         # Removing either would make Copilot the one vendor missing one of them.
-        (".github/skills/fux-enrich/SKILL.md", "ENRICH-SKILL.md"),
-        (".github/skills/fux-usage/SKILL.md", "USAGE-SKILL.md"),
-        (".github/skills/fux-decoder/SKILL.md", "DECODER-SKILL.md"),
-        *_guide_skills(".github/skills"),
+        *SHARED_SKILLS,
         *(
             (f".github/instructions/fux-{t}-files.instructions.md", f"fux-{t}-files.instructions.md")
             for t in PATH_SCOPED_TOPICS
@@ -238,8 +256,10 @@ AGENT_FILES: dict[str, tuple[tuple[str, str], ...]] = {
     ),
     # **Codex is decision 3 EXERCISED, not amended** — *"adding a fourth is a
     # template plus a rendering plus a row, not a new decision"*. It costs no
-    # new template: Codex CLI reads project skills from
-    # `.codex/skills/<name>/SKILL.md`, the same open Agent Skills standard
+    # new template: Codex reads repository skills from
+    # `.agents/skills/<name>/SKILL.md` (decision 16 -- it was `.codex/skills`
+    # here until 2026-09-12, a path Codex's docs no longer list), the same open
+    # Agent Skills standard
     # Claude and Kiro implement, so the identical `USAGE-SKILL.md` and
     # `DECODER-SKILL.md` bytes are valid here. That is decision 10's
     # agreement-by-construction for a third and fourth mapping.
@@ -248,17 +268,12 @@ AGENT_FILES: dict[str, tuple[tuple[str, str], ...]] = {
     # mode. Its always-on context is the repo-root `AGENTS.md` and nothing
     # else. So the archived-results policy reaches Codex through `AGENTS.md`,
     # which already carries the verbatim block, and there is deliberately **no**
-    # `.codex/skills/fux-archived-results/`: decision 9's test is *does an agent
+    # `.agents/skills/fux-archived-results/`: decision 9's test is *does an agent
     # that has never heard of Fux still need this sentence to avoid being
     # wrong?* — yes, and a skill has to be loaded to apply.
     # **`AGENTS_MD_VENDORS` below is the consequence**, and it is not optional.
     #
-    "codex": (
-        (".codex/skills/fux-usage/SKILL.md", "USAGE-SKILL.md"),
-        (".codex/skills/fux-decoder/SKILL.md", "DECODER-SKILL.md"),
-        (".codex/skills/fux-enrich/SKILL.md", "ENRICH-SKILL.md"),
-        *_guide_skills(".codex/skills"),
-    ),
+    "codex": SHARED_SKILLS,
 }
 
 #: Vendors whose ONLY always-on surface is the repo-root `AGENTS.md`.
@@ -427,88 +442,46 @@ _FUXIGNORE = """\
 
 
 _CONFIG = """\
-# fux.toml -- POLICY, not corpus. What gets indexed is `.fux/sources/dirs`
-# and `.fux/sources/urls`, one entry per line, so a 5k-entry corpus diffs and
-# merges line by line. Every key below has a default; they are here to be seen
-# rather than to be required.
+# fux.toml -- POLICY, not corpus. What gets indexed is `.fux/sources/dirs` and
+# `.fux/sources/urls`, one entry per line.
+#
+# EVERY KEY, WHAT IT MEANS AND WHAT IT DEFAULTS TO IS IN ONE PLACE:
+#   https://github.com/arpitarya/fux/blob/main/docs/adr/0113_config.md
+# Ranking knobs are not here at all -- they live in .fux/tune.toml (ADR-TUNE):
+#   https://github.com/arpitarya/fux/blob/main/docs/adr/0135_tuning.md
+#
+# This file does not explain its own keys, deliberately: a comment that
+# describes a key can drift from the record that decides it while both still
+# look correct (ADR-LAW-0 decision 4). A key fux does not know is REFUSED by
+# name, so a typo here fails loudly instead of sitting inert.
 
 [sources]
 dirs_file = ".fux/sources/dirs"
 
-# URL ingestion through YOUR fetcher files. Nothing is fetched until a URL is
-# listed in .fux/sources/urls, and the only thing that lists one is an explicit
-# `fux add <URL>` -- fux is offline by default, and THAT is the gate.
+# Presence of this table enables URL ingestion. Nothing is fetched until a URL
+# is listed in .fux/sources/urls, and only `fux add <URL>` lists one.
 [sources.url]
-fetcher      = ".fux/fetchers/http.py"  # the file a line with no `fetch=` uses,
-                                        # and the directory `fetch=cdp` resolves in
+fetcher      = ".fux/fetchers/http.py"
 urls_file    = ".fux/sources/urls"
-meta         = "hashed"                 # the floor; a line may loosen it to plain
-
-# WHETHER `fux update` GOES OUT FOR THESE URLs AT ALL. "auto" (the default) is
-# today's behaviour; "never" pins every URL from this source -- no socket is
-# opened for it and your fetcher file is not even imported on its account.
-# A line's own `update=` wins, so one wiki can be pinned and one page exempted.
-#
-# THIS IS NOT `ttl`, AND IT TAKES NO DURATION. `ttl=` is ASK-time: how long
-# `fux answer` may cite a document without re-checking it. `update=` is
-# UPDATE-time: whether fux ever goes and looks again. Two words, never a clock.
-#
-# It buys BANDWIDTH by giving up FRESHNESS. Pair it with `keep=true` (the
-# default) and the retained bytes still verify every citation offline; pair it
-# with `keep=false` and the document is frozen at its last statistics with
-# nothing to check against. `fux doctor` reports that combination.
+meta         = "hashed"
 #update      = "auto"
 
-# HOW MANY URLs MAY BE IN FLIGHT AT ONCE, across `fux add <URL>`, `fux update`
-# and `fux ingest --refresh-urls`. (`fux ask` verifies cited URLs one at a time,
-# and `fux build` opens no socket at all -- neither is affected.)
-#
-# THIS KEY IS REQUIRED AND MAY NOT BE COMMENTED OUT. Every other key above has
-# a default; this one does not, on purpose. A repo that CAN fetch has to say how
-# hard, in a number a person can read, because the failure it prevents -- a
-# hundred connections opened at your own intranet -- is not one you find out
-# about by reading code. Comment it out and fux refuses to load and tells you so.
-#
-# THE EFFECTIVE VALUE IS min(this, what your fetcher declares). Your fetcher
-# declares what is SAFE -- `MAX_PARALLEL` in the module, 8 for the shipped
-# http.py, 1 for cdp.py because it reuses one WebSocket. This key is what is
-# POLITE, and it is the one your intranet cares about.
-#
-# Raising it is honoured, never clamped: a bigger number is merely rude, and at
-# 16+ fux says so on stderr rather than quietly reducing it. Below 1 refuses.
+# REQUIRED, and may not be commented out: a repo that CAN fetch has to say how
+# hard, in a number a person can read. Comment it out and fux refuses to load.
 max_parallel = {default}
 
-# Fetcher tunables. Fux passes this table to the fetcher's optional
-# `configure(config)` VERBATIM and never reads a key inside it -- the keys mean
-# something to your fetcher, nothing to fux.
+# Passed to your fetcher's configure() verbatim; fux never reads a key inside.
 #[sources.url.config]
 #cdp_port  = 9222
 #timeout_s = 30
 
 [index]
-# Fixed at 256 (shard = blake2b(id, digest_size=1) -> 00..ff); this key
-# documents the value rather than setting it.
 shards = 256
 
-# Fux marks retired documents `archived` and states no conclusion. These files
-# teach your agents how to READ that mark -- they are the difference between an
-# agent citing a retired design confidently and one that says it is retired.
-#
-# THEY ARE WRITTEN OUTSIDE .fux/, into directories GitHub, AWS and Anthropic
-# own, which is why the default is spelled out here rather than left implicit:
-#
-#   claude   -> .claude/skills/fux-archived-results/SKILL.md
-#   codex    -> AGENTS.md at the repo root (its ONLY always-on surface)
-#               + .codex/skills/ for the operating manual and the decoder guide
-#   copilot  -> .github/agents/fux.agent.md
-#               .github/instructions/fux-archived-results.instructions.md
-#   kiro     -> .kiro/steering/fux-archived-results.md
-#
-# Two of them are AMBIENT (`applyTo: "**"`, `inclusion: always`) and enter every
-# request in this repo, for every developer, whether or not they are using fux.
-# The repo-root AGENTS.md is ambient for everyone, which is why it stays short.
-# Delete a name to stop installing it; `install = []` installs none. Editing a
-# file that is already there is safe -- fux never rewrites one.
+# Which agent vendors `fux setup` writes archived-results policy for. These
+# files land OUTSIDE .fux/ -- in .claude/, .github/, .kiro/ and AGENTS.md at the
+# repo root -- which is why the default is spelled out rather than left
+# implicit. Delete a name to stop installing it; [] installs none.
 [agents]
 install = ["claude", "codex", "copilot", "kiro"]
 """.format(default=DEFAULT_MAX_PARALLEL)
@@ -790,8 +763,16 @@ def _agents_to_install(root: Path, requested: bool) -> tuple[str, ...]:
 
 
 def _write_agents(root: Path, report: SetupReport, agents: tuple[str, ...]) -> None:
+    # ⚠ **A path two vendors share is written ONCE** (`SHARED_SKILLS`,
+    # ADR-AGENT-POLICY decision 16). Without this, Copilot's pass finds the file
+    # Codex's pass wrote a moment earlier and reports it as `kept ... (yours;
+    # never rewritten)` -- a claim about a file fux itself just wrote.
+    seen: set[str] = set()
     for vendor in agents:
         for rel, template in AGENT_FILES[vendor]:
+            if rel in seen:
+                continue
+            seen.add(rel)
             path = root / rel
             before = len(report.written)
             _write_if_missing(path, agent_template_bytes(template), report, root)

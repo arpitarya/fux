@@ -184,3 +184,40 @@ def test_the_null_progress_is_inert():
     """`progress=None` everywhere means silent — every existing caller."""
     with NULL.phase("extract", 10_000, "shards") as p:
         p.update(500, detail="anything")
+
+
+def test_a_wide_terminal_shows_a_path_the_80_column_fallback_would_elide(monkeypatch):
+    """The bar followed the narrowest terminal anyone still uses, not the one
+    in front of the user: a 44-character path came out `…/compare/keyspace…`
+    on a 200-column window. The fallback is for when there is nothing to ask.
+    """
+    monkeypatch.delenv("FUX_NO_PROGRESS", raising=False)
+    path = "archive/compare/keyspace-unification.compare"
+
+    monkeypatch.setenv("COLUMNS", "200")
+    wide = _Tty()
+    with Progress(stream=wide).phase("extract", _big()) as p:
+        p.update(1, detail=path)
+    assert path in wide.getvalue()
+    assert "…" not in wide.getvalue()
+
+    monkeypatch.setenv("COLUMNS", "80")
+    narrow = _Tty()
+    with Progress(stream=narrow).phase("extract", _big()) as p:
+        p.update(1, detail=path)
+    assert "…" in narrow.getvalue()
+
+
+def test_the_line_never_outgrows_the_terminal_it_is_painted_on(monkeypatch):
+    """Whatever the width, `\\r` has to be able to take the line back — so the
+    budget tracks the terminal and always leaves its last column empty.
+    """
+    monkeypatch.delenv("FUX_NO_PROGRESS", raising=False)
+    deep = "docs/" + "very-long-directory-name/" * 12 + "the-actual-document.md"
+    for columns in (60, 80, 120, 200):
+        monkeypatch.setenv("COLUMNS", str(columns))
+        stream = _Tty()
+        with Progress(stream=stream).phase("extract", _big()) as p:
+            p.update(1, detail=deep)
+        for frame in stream.getvalue().split("\r"):
+            assert len(frame.rstrip("\n")) <= columns - 1, columns

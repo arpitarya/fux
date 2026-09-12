@@ -1,20 +1,21 @@
 ---
 type: PreRegistration
 name: PRE-REG-NODE-2
-description: "DRAFT, NOT FROZEN — supersedes PRE-REG-NODE, which L9 voided in part by making fux-playground Arpit's hands only. Arpit ruled 2026-09-12 that the Python/Node equivalence is measured in fux-lab, on the golden ladder, on EVERY change to either reader, and that both must give the same results. Fixes the corpora, the comparison, the bar and what is filed. Ids N5-N9. Two cells are deliberately unfrozen and are Arpit's."
+description: "FROZEN 2026-09-12. Supersedes PRE-REG-NODE, which L9 voided in part by making fux-playground Arpit's hands only. Arpit ruled that the Python/Node equivalence is measured in fux-lab, on the committed golden ladder, on EVERY change to either reader, and that both must give the same results. Fixes the corpora, the cadence, the comparison, the bar and what is filed. Ids N5-N8; the latency fence moved to fux-benchmark."
 timestamp: 2026-09-12T00:00:00Z
 ---
 
 # The Node read plane, arm 2 — a STANDING equivalence check, not a phase gate
 
-🔴 **DRAFT. This document is NOT frozen and no number may be measured against
-it yet.** PRE-REG-NODE was written unfrozen, Arpit filled its one open cell,
-and only then did Phase 1 start. This one follows the same path: §7 lists what
-is still his, and the freeze happens in the change that fills them.
+## 0 · ✅ BOTH CELLS ARE FILLED — THIS DOCUMENT IS FROZEN
+
+**Written unfrozen, as PRE-REG-NODE was; Arpit filled both open cells on
+2026-09-12 (§7) and it froze in that change.** From here it is never edited —
+a successor supersedes it, the way this one supersedes PRE-REG-NODE.
 
 **Filed against W-107** ([`../open/W-107-node-read-plane.md`](../open/W-107-node-read-plane.md)) O3.
 
-## 0 · Why this exists rather than an edit
+## 0a · Why this exists rather than an edit
 
 **A frozen pre-registration is never edited** (`CLAUDE.md` §"A pre-registered
 threshold may never move"). [PRE-REG-NODE](PRE-REGISTRATION-NODE.md) stays
@@ -92,6 +93,21 @@ the arm even when every score agrees at `round(9)`.
 | Node | **20 and 22**, the LTS pair the CI matrix names |
 | OS / libm | **ubuntu (glibc)**, **macOS arm64 (Apple libm)**, **windows** — all three |
 
+### Cadence — ✅ ruled by Arpit 2026-09-12
+
+| when | rungs |
+|---|---|
+| **every push**, both readers, full OS × Node matrix | **`rung-00100` and `rung-10000`** — the two ends |
+| **nightly, and before any release** | **all eight** |
+
+**Why the ends and not all eight per push.** The 100 rung exercises every code
+path cheaply; the 10 000 rung is the only one that can expose anything
+scale-dependent. The six in between differ from those two in size, not in
+kind — so per push they buy coverage that is nearly free to get nightly, at
+**48 arm runs instead of 12**. ⚠ **The cost that decided it is not the bill,
+it is the latency: slow CI is what teaches people to skip CI**, and an arm
+people route around is worth less than one that runs on two rungs.
+
 ✅ **The ladder is committed to this repo** (2.2 MB, 8 rungs, tracked), so CI
 can run the same rungs fux-lab runs. **fux-lab is where a measurement is
 *filed* from; it is not a place the data only exists.**
@@ -101,7 +117,7 @@ session.** The arm compares **two readers against each other**, never against
 an answer key — so it needs no ground truth and must not acquire a reason to
 open one.
 
-## 5 · The bar — `N5`–`N9`
+## 5 · The bar — `N5`–`N8`
 
 **New ids. `N0`–`N4` are retired with the document that froze them and are
 never reused** — the same rule that retired R7/R8 rather than reviving them at
@@ -109,16 +125,23 @@ a smaller size.
 
 | id | supersedes | what it fixes | the bar |
 |---|---|---|---|
-| **N5** | N0 | `find --json` over every golden, every rung | **0 discordant** on §3 |
-| **N6** | N1 | `ask` + `answer --json` over every golden, every rung | **0 discordant** on §3 |
-| **N7** | N2 | the graph plane | Node's in-memory digest **equals** Python's `graph.json` digest, every rung |
+| **N5** | N0 | `find --json` over every golden, on every rung the run covers (§4) | **0 discordant** on §3 |
+| **N6** | N1 | `ask` + `answer --json` over every golden, on every rung the run covers (§4) | **0 discordant** on §3 |
+| **N7** | N2 | the graph plane | Node's in-memory digest **equals** Python's `graph.json` digest, on every rung the run covers (§4) |
 | **N8** | N3 | the analyzer and the hash, **pinned not sampled** | **every distinct term of the 10 000 rung** analyzed and hashed identically |
-| **N9** | N4 | the Node scan's latency at 10 000 documents | **p95 ≤ 150 ms**, warm, in-process, scan path |
 
-⚠ **N9 is an equivalence document carrying a latency fence, which is a
-different kind of claim.** It is kept because dropping it would silently
-retire a bar, not because speed is what this arm is for. §7 asks whether it
-belongs here or in `fux-benchmark` under L9.
+🔴 **N4's latency fence is NOT here — Arpit moved it to `fux-benchmark`,
+2026-09-12.** [L9](../../docs/adr/0011_LAW-9-environments.md) gives latency to
+that environment by name, and this document asks whether two readers *agree*,
+which is a different kind of claim from how fast one of them is.
+
+⚠ **A moved fence is not a kept fence until it has a home.** The bar —
+**p95 ≤ 150 ms at 10 000 documents, warm, in-process, scan path** — is written
+into [SETUP-BENCHMARK](../setup/fux-benchmark.md) §"Inherited 2026-09-12",
+which is the spec of record for that environment. 🔴 **`fux-benchmark` is not
+built and no open item carries it** — W-139 was removed from the queue on
+2026-09-12 — so **nothing measures Node's latency today.** Stated, not
+silent.
 
 ## 6 · What is filed, per run
 
@@ -131,19 +154,23 @@ per-query rule:
   else.
 - **`blind` or `informed`, declared in the report's frontmatter**, with who
   authored each artifact and what they could reach.
-- **A `VERDICT.md`** when a run adjudicates one of `N5`–`N9`.
+- **A `VERDICT.md`** when a run adjudicates one of `N5`–`N8`.
 - ⚠ **A green arm is filed, not announced** (§2). Nothing writes *"N5 passes"*
   into a record as an achievement.
 
-## 7 · 🔴 The cells that are Arpit's — this document freezes when they are filled
+## 7 · ✅ The two open cells, filled — Arpit, 2026-09-12
 
-1. **Does `N9` (latency) belong here at all?** [L9](../../docs/adr/0011_LAW-9-environments.md)
-   gives latency to `fux-benchmark`, and this arm is about equivalence. Keep
-   it here, move it, or retire the fence.
-2. **Every rung, or the ends?** §4 says all eight on every change. Eight rungs
-   × 2 Node versions × 3 OSes is the honest reading of *"whenever we make any
-   changes"*, and it is also a CI bill. The alternative is **100 + 10 000 on
-   every push, all eight nightly and before a release.**
+1. **Does the latency fence belong here?** **No — moved to `fux-benchmark`.**
+   L9 gives latency to that environment; equivalence and speed are different
+   claims and one document asserting both makes neither easy to check. §5
+   carries the obligation W-139 inherits, so the fence is moved rather than
+   dropped.
+2. **Every rung, or the ends?** **The ends per push; all eight nightly and
+   before a release.** §4's cadence table. The middle six differ in size, not
+   in kind, and CI that is slow enough to route around is worth less than CI
+   that runs.
+
+**With both answered, this document is frozen** (§0).
 
 ## 8 · What would make this pre-registration wrong
 

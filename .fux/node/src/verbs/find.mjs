@@ -1,5 +1,6 @@
 /** `fux find` — ranked document locations, one per line, for pipes.
- *  A projection of `ask`, not a second strategy: same scan, same rank(). */
+ *  A projection of `ask`, not a second strategy: same scan, same rank().
+ *  Twin of `src/fux/query/__init__.py`'s `find` half (R4's one-to-many). */
 import { ask } from "../query/scan.mjs";
 import { pyRepr } from "../compat/pyfloat.mjs";
 

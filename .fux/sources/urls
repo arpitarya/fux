@@ -1,13 +1,20 @@
 # The URLs fux indexes. One per line. `#` starts a comment at the start of a
 # line or after whitespace -- NOT inside a URL, so a fragment survives.
 #
-# Two attributes, and the set is closed:
-#   fetch=http|cdp    which file under .fux/fetchers/ retrieves this URL
-#   meta=hashed|plain whether the index may hold readable display text
+# 7 attributes, and the set is closed:
+#   fetch=http|cdp       default http
+#   meta=plain|hashed    default hashed
+#   keep=true|false      default true
+#   ttl=<duration>       default 24h
+#   enrich=true|false    default false
+#   archived=true|false  default false
+#   update=auto|never    default auto
 #
 #   https://example.com/handbook/oncall    fetch=http meta=hashed
-#   https://wiki.corp/display/ENG/runbook  fetch=cdp  meta=hashed
+#   https://wiki.corp/display/ENG/runbook  fetch=cdp  meta=hashed ttl=7d
 #
 # `fux add <URL>` writes a line here with every attribute stated, and fetches
-# that one URL. `fux update` re-fetches every line. Those are the engine's two
-# networked paths; every other command is offline. See ADR-URL-LIST.
+# that one URL once. `fux update` re-fetches the lines known to be stale --
+# `--all` every line, `--failed` the ones whose last run failed, and never a
+# line that says `update=never`. Those are the engine's two networked paths;
+# every other command is offline. See ADR-URL-LIST.

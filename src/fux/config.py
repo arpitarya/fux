@@ -25,6 +25,50 @@ CONFIG_NAME = "fux.toml"
 
 FIXED_SHARDS = 256  # not yet configurable — shard = blake2b(id, digest_size=1); see ADR-RECORD
 
+#: Every key `fux.toml` may carry, as dotted paths.
+#:
+#: ⚠ **This is the IMPLEMENTATION, not a description of one.** `load()` refuses a
+#: key that is not here (ADR-CONFIG decision 14), so a wrong entry fails rather
+#: than merely reading wrong — which is what ADR-LAW-0 decision 4 permits an
+#: artifact beside a record to do. `tests/test_adr_config_keys.py` asserts these
+#: three tuples equal ADR-CONFIG's declared key block **in both directions**, so
+#: a key cannot exist in the code and not in the record, or the reverse.
+KNOWN_KEYS: tuple[str, ...] = (
+    "sources.dirs_file",
+    "sources.url.fetcher",
+    "sources.url.urls_file",
+    "sources.url.meta",
+    "sources.url.keep",
+    "sources.url.ttl",
+    "sources.url.enrich",
+    "sources.url.update",
+    "sources.url.max_parallel",
+    "sources.url.sweep_minutes",
+    "sources.url.acquired_max_bytes",
+    "index.shards",
+    "agents.install",
+)
+
+#: Tables fux accepts and does not look inside. **One entry, and it stays one.**
+#: `[sources.url.config]` belongs to the consumer's fetcher, and declaring its
+#: keys would put one fetcher's vocabulary into fux's config surface — the
+#: adapter cap breached through the back door (ADR-CONFIG decision 8).
+OPAQUE_TABLES: tuple[str, ...] = ("sources.url.config",)
+
+#: Spellings refused **by name, at any value**, each with an error naming where
+#: the setting went. A key quietly not read is worse than one that errors,
+#: because its author believes their setting is in force — the `[ranking]`
+#: precedent, applied to every retirement since.
+REFUSED_KEYS: tuple[str, ...] = (
+    "sources.dirs",
+    "sources.types_file",
+    "sources.url.urls",
+    "sources.url.middleware",
+    "ranking",
+    "dense",
+    "decode",
+)
+
 
 def find_root(start: Path | None = None) -> Path | None:
     here = (start or Path.cwd()).resolve()
@@ -169,7 +213,8 @@ def load(root: Path) -> Config:
             "`archived=true`. See ADR-DIR-LIST"
         )
     if "types_file" in sources:
-        # Advertised by config.schema.json until 2026-09-11 and read by nothing:
+        # Advertised by config.schema.json until 2026-09-11 and read by nothing
+        # (that file was deleted on 2026-09-12 — ADR-CONFIG decision 15):
         # every caller used DEFAULT_TYPES_FILE, so the key was silently ignored.
         # Refused by name rather than ignored (ADR-CONFIG; ADR-TYPES decision 12).
         raise FuxError(
@@ -220,6 +265,14 @@ def load(root: Path) -> Config:
             f"[decode] from here (ADR-TUNE decision 13, 2026-09-11)"
         )
 
+    # ADR-CONFIG decision 14. Last, so that every key retired **by name** above
+    # keeps its own error: those messages say where the setting went, and a
+    # generic "unknown key" would be a worse answer to a better-understood
+    # question. `[sources.url]`'s two retirements are checked inside
+    # `_load_url_source`, which runs after this call — hence the `REFUSED_KEYS`
+    # skip in the walk rather than an ordering trick.
+    _refuse_unknown_keys(path, data)
+
     return Config(
         root=root,
         dirs_file=dirs_file.strip(),
@@ -227,6 +280,69 @@ def load(root: Path) -> Config:
         agents=_load_agents(path, data.get("agents")),
         url=_load_url_source(path, sources.get("url")),
     )
+
+
+#: Every legal table path, derived from the keys rather than listed again — a
+#: second list would be the duplicate `KNOWN_KEYS` exists to avoid.
+_TABLES: frozenset[str] = frozenset(
+    k.rsplit(".", 1)[0] for k in KNOWN_KEYS if "." in k
+) | frozenset(OPAQUE_TABLES)
+
+
+def _refuse_unknown_keys(path: Path, data: dict) -> None:
+    """Refuse a key `fux.toml` does not have. ADR-CONFIG decision 14.
+
+    **Why refusing beats ignoring.** `dirs_fil = "docs"` used to parse fine and
+    do nothing: the consumer's setting was inert and nothing said so. That is the
+    same defect as a key documented and never parsed, approached from the other
+    end, and `.fux/tune.toml` has refused unknown keys by name since it existed.
+
+    ⚠ **A key in `REFUSED_KEYS` is skipped here**, because it has a bespoke error
+    naming its new home and that answer is strictly better than this one.
+    `tests/test_adr_config_keys.py` asserts every one of them still errors, so
+    the skip cannot become a hole.
+    """
+    known = frozenset(KNOWN_KEYS)
+    opaque = frozenset(OPAQUE_TABLES)
+    refused = frozenset(REFUSED_KEYS)
+
+    def legal_in(prefix: str) -> list[str]:
+        """What a reader may type at this level — keys and tables together, so
+        the message never omits half the answer."""
+        depth = prefix.count(".") + 1 if prefix else 0
+        here = [
+            k.split(".")[depth]
+            for k in (*known, *opaque)
+            if (not prefix or k.startswith(prefix + ".")) and k.count(".") >= depth
+        ]
+        tables = [
+            t.split(".")[depth]
+            for t in _TABLES
+            if (not prefix or t.startswith(prefix + ".")) and t.count(".") == depth
+        ]
+        return sorted(set(here) | set(tables))
+
+    def walk(table: dict, prefix: str) -> None:
+        for key, value in table.items():
+            dotted = f"{prefix}.{key}" if prefix else key
+            if dotted in refused or dotted in opaque or dotted in known:
+                continue
+            if dotted in _TABLES:
+                # A legal table holding the wrong type is not an unknown key;
+                # its own loader says so in words that fit the value.
+                if isinstance(value, dict):
+                    walk(value, dotted)
+                continue
+            where = f"[{prefix}] " if prefix else ""
+            raise FuxError(
+                f"{path}: {where}{key} is not a fux.toml key — fux refuses a key it "
+                f"does not read rather than ignoring it, because an ignored key is a "
+                f"setting you believe is in force. Legal here: {legal_in(prefix)}. "
+                f"Ranking knobs live in .fux/tune.toml (ADR-TUNE); the full key list "
+                f"is ADR-CONFIG decision 13"
+            )
+
+    walk(data, "")
 
 
 #: The vendors `[agents] install` may name. Closed, and validated, because a

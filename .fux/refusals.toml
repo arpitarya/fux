@@ -99,8 +99,18 @@ reason = "asked for a document and got a web page - you are probably signed out;
 # Nearly every auth wall, paywall and error shell presents as HTML, so "I
 # requested a .xlsx and was handed text/html" catches most of them without
 # naming anybody -- and without asking where the response came from.
+#
+# ⚠ **The suffix list is "URLs that ASK FOR A WEB PAGE", and it was missing
+# every server-page extension until 2026-09-11.** A wiki serves its documents
+# at `viewpage.action`, `Page.aspx`, `index.php` and `.jsp` URLs; HTML back
+# from one of those is the document, not a sign-in wall, and this rule refused
+# all of them. If your wiki uses another extension, add it here -- that is
+# what this list is for.
 content_type         = ["text/html", "application/xhtml+xml"]
-requested_suffix_not = [".html", ".htm", ""]
+requested_suffix_not = [
+    ".html", ".htm", "",
+    ".action", ".aspx", ".asp", ".php", ".jsp",
+]
 
 [[rule]]
 name   = "password-form-in-response"
@@ -123,9 +133,22 @@ reason = "the response is too small to be the document - likely an error shell o
 #
 # The other rule keeps `""` excluded because a bare URL genuinely asks for a
 # page. This one does not, because sub-1 KiB of HTML is a `<head>` and little
-# else -- not a document anyone wrote. A short real page now warns instead of
-# indexing silently, which is the direction this file says to err in.
-requested_suffix_not = [".html", ".htm", ".txt", ".md"]
+# else -- not a document anyone wrote.
+#
+# ⚠ **A MATCH HERE IS A REFUSAL, NOT A WARNING.** This comment said "a short
+# real page now warns instead of indexing silently" until 2026-09-11, and there
+# is no warn: every rule in this file refuses, and the document is skipped. If
+# you would rather see a tiny page than lose it, raise `max_bytes` or delete
+# this rule -- do not expect a warning that does not exist.
+#
+# The suffix list is "a URL that plainly asked for a PAGE", which is why the
+# server-page extensions are here beside the static ones: a wiki serves
+# `viewpage.action`, `.aspx`, `.php` and `.jsp` URLs that are real documents,
+# and a short one is short prose, not a redirect stub.
+requested_suffix_not = [
+    ".html", ".htm", ".txt", ".md",
+    ".action", ".aspx", ".asp", ".php", ".jsp",
+]
 max_bytes            = 1024
 
 # ═════════════════════════════════════════════════════════════════════════════

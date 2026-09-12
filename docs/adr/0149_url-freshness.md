@@ -405,6 +405,14 @@ describe `ttl` as a byte count and the gate would stay green.
 so a misspelled `tll = "1h"` fails loudly instead of leaving the source at the
 built-in default with nothing said.
 
+⚠ **2026-09-12 — `[sources.url] ttl` is now a *declared* key.** It is enumerated
+in `config.py`'s `KNOWN_KEYS`, and an undeclared spelling beside it is refused by
+name rather than ignored ([ADR-CONFIG](0113_config.md) decisions 13–14). The
+duration grammar is unchanged — `ttl = "1x"` still fails through the source
+list's own parser, and now `tlt = "1d"` fails too instead of leaving the source
+on its default freshness. ⚠ The record said so from `24c0a3d` and the code landed
+two commits later — see ADR-CONFIG after decision 15.
+
 ### Consequences
 
 **Easier.** An offline or signed-out corpus keeps answering, with citations that

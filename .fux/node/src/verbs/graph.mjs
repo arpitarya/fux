@@ -1,4 +1,5 @@
 /** `explain` · `graph` · `path` — the group that does NOT rank.
+ *  Twin of `src/fux/query/__init__.py`'s explain/graph/path half (R4's one-to-many).
  *
  * `ask`/`find`/`answer` return documents ordered by relevance; these return
  * **relationships the documents themselves stated**. That is why they are a

@@ -1,4 +1,5 @@
 /** `fux answer` — one passage, cited, with its footing stated every time.
+ *  Twin of `src/fux/query/__init__.py`'s `answer` half (R4's one-to-many).
  *
  * Ranks exactly as `ask` does with `top = 3`, then reads the cited documents
  * back from the source and says whether they still say what the index thinks.

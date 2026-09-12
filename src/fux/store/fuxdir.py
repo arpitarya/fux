@@ -41,6 +41,8 @@ COMMITTED: dict[str, str] = {
     # caught rather than shipped.
     "decoders": "consumer-owned code, one module per format. THESE COPIES ARE WHAT RUN, not the ones inside the installed package (ADR-DECODE)",
     "enrich": "pinned enrichment text, one file per source content sha, plus `queue.tsv` (W-86 P6: what fux could NOT read and a model must). Committed, because a backlog is a team fact",
+    # ASCII only, like every other value in these tables.
+    "node": "the vendored Node read plane (`fux-engine`), engine-owned and REWRITTEN on a version change -- not write-if-missing, because nobody edits it and a stale copy is a wrong answer (ADR-NODE-SEARCH)",
 }
 
 #: Gitignored like DERIVED, and NOT rebuildable -- which is exactly why it is
@@ -79,6 +81,8 @@ COMMITTED_FILES: dict[str, str] = {
     # ASCII only, like every other value in these tables.
     "pii.toml": "REQUIRED - every command refuses without it. What is REDACTED from the committed index - and ONLY from it. The acquired bytes, the refer plane and every answer quote still see the document as it is (ADR-PII)",
     "refusals.toml": "what a REFUSAL looks like here - the sign-in walls, paywalls and error shells a server returns INSTEAD of the document. Consumer-owned; fux ships no vendor knowledge (ADR-REFUSAL)",
+    # ASCII only, like every other value in these tables.
+    "fux": "a 3-line shim: `.fux/fux find rollback` in a clone with nothing installed. Runs `node .fux/node/fux.mjs` (ADR-NODE-SEARCH)",
 }
 
 #: Everything legally found directly under `.fux/`; anything else is a warning.
@@ -169,6 +173,175 @@ def _readme() -> str:
         "- Fux writes `README.md` and `.gitignore` **only if missing**. Your",
         "  edits survive every ingest.",
         "",
+        "---",
+        "",
+        "# What fux is",
+        "",
+        "A search index for your written knowledge - decisions, runbooks,",
+        "specs, wiki pages - committed to git and read by agents.",
+        "",
+        "- **The index is committed; the content is not.** `index/` holds",
+        "  statistics about your documents, never the documents. That is why",
+        "  it diffs like code and why no second copy of anything exists.",
+        "- **Ranking is arithmetic.** BM25F, one scorer, one sort. The same",
+        "  sources build the same index, byte for byte, on any machine.",
+        "- **No server, no vector database, no API key, and no model anywhere",
+        "  on the path.** `fux ask` is a local process reading local files.",
+        "- **It does not read your code.** No parser runs over source files,",
+        "  and no source extension is on the default type list. Fux is about",
+        "  what you wrote down, not what you compiled.",
+        "- **Answers are re-read before they are quoted.** `fux answer` fetches",
+        "  the cited lines from the source and tells you whether they still",
+        "  say what the index thinks they say.",
+        "",
+        "# The commands",
+        "",
+        "Flat verbs, no subcommand tree. `fux <verb> --help` for any of them.",
+        "",
+        "| group | verbs | what the group does |",
+        "|---|---|---|",
+        "| lifecycle | `setup` `doctor` | set the repo up, then check it |",
+        "| write | `ingest` `build` | `ingest` writes the committed index; `build` derives the local accelerator from it |",
+        "| sources | `add` `remove` `update` `enrich` | maintain what is indexed. `add`/`remove` write lines; `update` re-fetches and writes none; `enrich` writes no committed byte at all |",
+        "| read | `ask` `find` `answer` | the same question, differing only in how much each commits to |",
+        "| graph | `explain` `graph` `path` | answer with relationships the documents stated, never with a ranking |",
+        "| serve | `mcp` `daemon` | the only verbs that do not return |",
+        "| maintenance | `hooks` `tune` `output` `verify` | wire git to keep the index in step; print or set the tunables; re-run a receipt |",
+        "",
+        "**The three read verbs differ in how much they commit to.** `find`",
+        "gives locations and stays out of the way. `ask` gives a ranked list",
+        "with scores, which is what you want when judging the engine. `answer`",
+        "commits to one passage with a line range and a freshness verdict,",
+        "which is what an agent wants when it needs a value and not a menu.",
+        "",
+        "```console",
+        "$ fux setup                 # write the consumer-owned files here",
+        "$ fux add docs/             # index a directory",
+        "$ fux add https://wiki/...  # index a URL through a fetcher you own",
+        "$ fux ingest                # walk the sources into the committed index",
+        "$ fux doctor                # is this repo healthy, and why not",
+        "",
+        "$ fux find rollback                       # one line per hit, for pipes",
+        "$ fux ask 'how do we roll back a release' # ranked, with scores",
+        "$ fux answer 'what is the RTO' --band     # one passage, cited and checked",
+        "```",
+        "",
+        "# Calling fux from a script, in any language",
+        "",
+        "**There is no SDK, and that is the design.** Fux is a normal",
+        "command-line program: it reads files, writes to stdout, and exits with",
+        "a status. Anything that can start a process can drive it, which is why",
+        "there is no binding to install, version, or wait for.",
+        "",
+        "**Three things are the whole contract:**",
+        "",
+        "1. **`--json` on every read verb.** `ask`, `find`, `answer`, `explain`,",
+        "   `graph`, `path`, `doctor`, `update`. Never parse the prose output -",
+        "   it is for humans and it is allowed to change.",
+        "2. **Exit codes.** `0` ok - `1` error - `2` blocking (strict mode) -",
+        "   `130` interrupted. Errors go to stderr as `error: <message>`.",
+        "3. **It is offline and deterministic.** No network on a read path, so a",
+        "   call is fast enough to make inline and safe to make in a loop.",
+        "",
+        "**The JSON shape you will actually use:**",
+        "",
+        "```json",
+        "{ \"results\": [ { \"id\": \"docs/runbook.md\",",
+        "                 \"title\": \"Release runbook\",",
+        "                 \"score\": 12.41,",
+        "                 \"headings\": [\"Rollback\"] } ],",
+        "  \"confidence\": { \"band\": \"high\", \"answerable\": true, \"missing\": [] } }",
+        "```",
+        "",
+        "`confidence` is present only when you pass `--band`. **Absent means",
+        "not asked for; it is never a claim about the answer.**",
+        "",
+        "## Shell",
+        "",
+        "```bash",
+        "fux ask 'retention policy' --json | jq -r '.results[0].id'",
+        "",
+        "# exit code first, output second",
+        "if ! fux doctor --json > health.json; then",
+        "  echo \"index unhealthy\" >&2; exit 1",
+        "fi",
+        "```",
+        "",
+        "## Python",
+        "",
+        "```python",
+        "import json, subprocess",
+        "",
+        "def ask(question, top=5):",
+        "    p = subprocess.run(",
+        "        [\"fux\", \"ask\", question, \"--json\", \"--top\", str(top), \"--band\"],",
+        "        capture_output=True, text=True,",
+        "    )",
+        "    if p.returncode != 0:",
+        "        raise RuntimeError(p.stderr.strip())",
+        "    return json.loads(p.stdout)",
+        "",
+        "hits = ask(\"how do we roll back a release\")",
+        "if hits.get(\"confidence\", {}).get(\"answerable\"):",
+        "    print(hits[\"results\"][0][\"id\"])",
+        "```",
+        "",
+        "Import `fux` as a library only if you accept that the Python API is",
+        "not a supported surface. **The CLI is the contract; the modules are",
+        "not.**",
+        "",
+        "## Node / TypeScript",
+        "",
+        "```js",
+        "import { execFile } from 'node:child_process';",
+        "import { promisify } from 'node:util';",
+        "const run = promisify(execFile);",
+        "",
+        "export async function ask(question, top = 5) {",
+        "  const { stdout } = await run('fux',",
+        "    ['ask', question, '--json', '--top', String(top), '--band']);",
+        "  return JSON.parse(stdout);",
+        "}",
+        "```",
+        "",
+        "A non-zero exit rejects the promise and carries `stderr`, so the error",
+        "path needs no special handling.",
+        "",
+        "## Go, Ruby, Rust, anything else",
+        "",
+        "Same three steps every time, because there is nothing language-",
+        "specific to learn:",
+        "",
+        "1. Spawn `fux` with the verb, the query, and `--json`.",
+        "2. Check the exit status; read `stderr` when it is non-zero.",
+        "3. Parse `stdout` as JSON.",
+        "",
+        "```go",
+        "out, err := exec.Command(\"fux\", \"ask\", q, \"--json\").Output()",
+        "// err is *exec.ExitError on a non-zero status; out is the payload",
+        "```",
+        "",
+        "## For an AI agent",
+        "",
+        "Two ways in, and they differ in who owns the loop:",
+        "",
+        "- **`fux mcp`** - serves the index over the Model Context Protocol",
+        "  (`fux_search`, `fux_passage`, `fux_related`). The client calls the",
+        "  tools; you configure the server once and write no glue.",
+        "- **A skill or instruction file** - `fux setup` installs guides for",
+        "  Claude Code, Codex, Copilot and Kiro that tell the agent to query",
+        "  the index rather than grep. The agent shells out to the CLI.",
+        "",
+        "Use MCP when the client speaks it. Use the CLI everywhere else; it is",
+        "the same engine either way.",
+        "",
+        "## One rule for every caller",
+        "",
+        "**`fux answer` re-reads the source before it quotes.** Its verdict",
+        "field says `current`, `stale`, `as-ingested`, `cached` or `unverified`",
+        "- and a script that ignores that field has thrown away the only thing",
+        "separating fux from a stale cache with good manners.",
+        "",
     ]
     return "\n".join(rows)
 
@@ -191,6 +364,141 @@ def ensure_layout(root: Path) -> list[Path]:
         if not path.exists():
             path.write_bytes(text.encode("ascii"))
             written.append(path)
+    written.extend(ensure_node_reader(root))
+    return written
+
+
+# ---------------------------------------------------------------------------
+# The vendored Node reader -- W-107 R2, ADR-NODE-SEARCH.
+#
+# **The fourth shape under ADR-DOTFUX**: committed, engine-owned, and
+# OVERWRITTEN -- not write-if-missing. `fetchers/` and `decoders/` are
+# write-if-missing because a consumer EDITS them; nobody edits a vendored
+# reader, and a stale one against a bumped `_format` is a WRONG ANSWER rather
+# than an old preference.
+#
+# The evidence this is the right call is in this repo: `.fux/decoders/` is
+# write-if-missing, and the `doc`-suffix rename (2026-09-06) shipped with no
+# migration -- a repo set up before it still holds stale `<name>doc.py` files
+# that claim the same extensions and WIN.
+# ---------------------------------------------------------------------------
+
+#: The vendored Node reader. Committed (a clone with no Python still answers)
+#: and rewritten whenever the engine version differs, so a `_format` mismatch
+#: cannot happen: the copy is always written by the Python that wrote the index.
+NODE_DIR = "node"
+NODE_ENTRY = "fux.mjs"
+NODE_SHIM = "fux"
+
+#: `chmod` bits for the shim -- readable and executable by everyone who can read
+#: the repo, which is the same set that can read the index it queries.
+_SHIM_MODE = 0o755
+
+_SHIM = """#!/bin/sh
+# Vendored by `fux setup`. Runs the Node read plane against this repository.
+# The command is `fux`; the npm package is `fux-engine` (`fux` was taken in
+# 2016). This shim exists so a clone needs nothing installed at all.
+#
+# The entry point is `node/fux.mjs`, NOT `fux.mjs` beside this file. W-107 R2
+# was written when the reader was to be one file at `.fux/fux.mjs`; R4 made it
+# a directory, and this line was the half that did not follow -- caught by
+# running the shim in a scratch clone, which is the only thing that could.
+exec node "$(dirname "$0")/node/fux.mjs" "$@"
+"""
+
+
+def _node_source():
+    """The directory the vendored reader is copied FROM.
+
+    Two locations, one source. The wheel carries `node/` at
+    `fux/templates/node/` via hatchling `force-include` (`pyproject.toml`), so
+    an installed fux reads it as package data -- the same contract `templates/`
+    has, bytes and never an import.
+
+    ⚠ **An EDITABLE install has no such payload**, because `force-include` maps
+    the directory at BUILD time and an editable install never builds one. The
+    fallback is the checkout's own `node/`, which is the directory the wheel is
+    built from -- one source read two ways, never a second copy. Measured
+    2026-09-12: 37 files present in the wheel, absent under `uv pip install -e`.
+    """
+    from importlib import resources
+
+    packaged = resources.files("fux") / "templates" / NODE_DIR
+    if packaged.is_dir():
+        return packaged
+    checkout = Path(__file__).resolve().parents[3] / NODE_DIR
+    if checkout.is_dir():
+        return checkout
+    from ..errors import FuxError
+
+    raise FuxError(
+        "the Node read plane is missing from this installation: neither "
+        "`fux/templates/node/` (the wheel) nor a `node/` directory beside "
+        "`src/` was found. Reinstall fux, or run from a checkout."
+    )
+
+
+def _packaged_node_files() -> "list[tuple[str, bytes]]":
+    """`(relative path, bytes)` for every file of the Node reader."""
+    out: list[tuple[str, bytes]] = []
+
+    def walk(node, prefix: str = "") -> None:
+        for child in sorted(node.iterdir(), key=lambda c: c.name):
+            rel = f"{prefix}{child.name}"
+            if child.is_dir():
+                walk(child, rel + "/")
+            else:
+                out.append((rel, child.read_bytes()))
+
+    walk(_node_source())
+    return out
+
+
+def node_version(directory: Path) -> "str | None":
+    """The version of the vendored reader, or `None` when it is absent.
+
+    Read from `package.json` rather than from a sidecar: one file, and it is
+    the file npm would read too, so a consumer who vendored by hand and a
+    consumer who ran `fux setup` are compared the same way.
+    """
+    import json
+
+    path = directory / NODE_DIR / "package.json"
+    if not path.is_file():
+        return None
+    try:
+        return json.loads(path.read_text(encoding="utf-8")).get("version")
+    except (OSError, ValueError):
+        return None
+
+
+def ensure_node_reader(root: Path) -> "list[Path]":
+    """Write `.fux/node/` and the `.fux/fux` shim; return what changed.
+
+    ⚠ **Overwrites, and only on a version difference.** Rewriting
+    unconditionally would dirty the working tree on every ingest -- this
+    directory is COMMITTED, so a no-op ingest must produce a no-op diff.
+    """
+    from .. import __version__
+
+    directory = fux_dir(root)
+    if node_version(directory) == __version__:
+        return []
+
+    written: list[Path] = []
+    target = directory / NODE_DIR
+    for rel, data in _packaged_node_files():
+        path = target / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        if not path.exists() or path.read_bytes() != data:
+            path.write_bytes(data)
+            written.append(path)
+
+    shim = directory / NODE_SHIM
+    if not shim.exists() or shim.read_bytes() != _SHIM.encode("ascii"):
+        shim.write_bytes(_SHIM.encode("ascii"))
+        written.append(shim)
+    shim.chmod(_SHIM_MODE)
     return written
 
 

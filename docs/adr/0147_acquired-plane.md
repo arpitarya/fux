@@ -187,6 +187,13 @@ undefined name — a `NameError` on every retaining fetch. **Prose in this recor
 can no longer create a key**; the declared block can, because a parser reads it.
 Naming a key here and nowhere else now fails a test instead of failing a user.
 
+⚠ **2026-09-12 — `keep` and `acquired_max_bytes` are now *declared* keys.** Both
+are enumerated in `config.py`'s `KNOWN_KEYS`, and an undeclared spelling beside
+them is refused by name rather than ignored ([ADR-CONFIG](0113_config.md)
+decisions 13–14) — so a typo in the store's bound fails loudly instead of
+silently restoring the default. ⚠ The record said so from `6f518c6` and the code
+landed one commit later — see ADR-CONFIG after decision 15.
+
 ### Consequences
 
 **Easier.** A citation can be checked offline against the exact bytes that produced it — a stronger claim than comparing two fetches, which is why `refer/source.py` verifies with the same fetcher a document was ingested with: *a document fetched two ways is two documents*. A retained original removes that whole class of false staleness, and the browser-session fetcher stops being needed at answer time.

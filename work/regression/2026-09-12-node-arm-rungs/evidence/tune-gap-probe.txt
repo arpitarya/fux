@@ -1,0 +1,94 @@
+# The tune gap, reproduced in isolation on a copy of rung-00100
+# Only change from the frozen rung: [ranking] rerank_weight 0.0 -> 0.3
+
+$ node_arm.py <copy> --queries fixed --tops 5
+corpus   : /private/tmp/claude-501/-Users-arpitarya-my-programs-fux/c2d49058-3e88-4e96-aaa5-a95aeb20bb6f/scratchpad/rerank-probe
+arm      : contract (tune applied)
+tune     : rerank_weight: default 0.0 -> 0.3
+queries  : 29 (fixed) x tops [5] x 2 verbs = 58 comparisons
+discordant: 20 of 58
+   find 'index format' [0] score at round(9): python=3.924738566 node=3.769256726 (raw python=3.924738565585513 node=3.7692567256523537)
+   find 'index format' [1] score at round(9): python=3.897806432 node=3.743391532 (raw python=3.8978064322603254 node=3.7433915315825455)
+   find 'index format' [2] score at round(9): python=3.549815619 node=3.409186669 (raw python=3.5498156191270125 node=3.409186669029544)
+   ask 'index format' [0] score at round(9): python=3.924738566 node=3.769256726 (raw python=3.924738565585513 node=3.7692567256523537)
+   ask 'index format' [1] score at round(9): python=3.897806432 node=3.743391532 (raw python=3.8978064322603254 node=3.7433915315825455)
+   ask 'index format' [2] score at round(9): python=3.549815619 node=3.409186669 (raw python=3.5498156191270125 node=3.409186669029544)
+   find 'confidence band' [0] score at round(9): python=2.973961785 node=2.856145771 (raw python=2.973961784565641 node=2.856145771491612)
+   find 'confidence band' [1] score at round(9): python=2.383248508 node=2.288834101 (raw python=2.3832485081256976 node=2.288834101441246)
+   find 'confidence band' [2] score at round(9): python=2.341421061 node=2.248663684 (raw python=2.3414210611358417 node=2.2486636841640735)
+   find 'confidence band' [3] score at round(9): python=2.203799035 node=2.116493671 (raw python=2.2037990354236423 node=2.1164936714752867)
+   ask 'confidence band' [0] score at round(9): python=2.973961785 node=2.856145771 (raw python=2.973961784565641 node=2.856145771491612)
+   ask 'confidence band' [1] score at round(9): python=2.383248508 node=2.288834101 (raw python=2.3832485081256976 node=2.288834101441246)
+   ask 'confidence band' [2] score at round(9): python=2.341421061 node=2.248663684 (raw python=2.3414210611358417 node=2.2486636841640735)
+   ask 'confidence band' [3] score at round(9): python=2.203799035 node=2.116493671 (raw python=2.2037990354236423 node=2.1164936714752867)
+   find 'getUserName' [0] score at round(9): python=6.375856404 node=6.310776521 (raw python=6.375856404227964 node=6.310776521351526)
+   find 'getUserName' [1] id: python='file:ext/sibling/a07-halberd-dock-wiki.html' node='file:seed/10-new-joiner-faq.md'
+   find 'getUserName' [1] loc: python='ext/sibling/a07-halberd-dock-wiki.html' node='seed/10-new-joiner-faq.md'
+   find 'getUserName' [1] title: python='Halberd Wiki - Dock scheduling rules' node='New joiner FAQ'
+   ask 'getUserName' [0] score at round(9): python=6.375856404 node=6.310776521 (raw python=6.375856404227964 node=6.310776521351526)
+   ask 'getUserName' [1] id: python='file:ext/sibling/a07-halberd-dock-wiki.html' node='file:seed/10-new-joiner-faq.md'
+   ask 'getUserName' [1] loc: python='ext/sibling/a07-halberd-dock-wiki.html' node='seed/10-new-joiner-faq.md'
+   ask 'getUserName' [1] title: python='Halberd Wiki - Dock scheduling rules' node='New joiner FAQ'
+   find 'archived results' [0] score at round(9): python=4.859844813 node=4.667317947 (raw python=4.8598448126267195 node=4.667317947300571)
+   find 'archived results' [1] id: python='file:ext/filler/00022-release-notes.md' node='file:ext/filler/00028-release-notes.md'
+   find 'archived results' [1] loc: python='ext/filler/00022-release-notes.md' node='ext/filler/00028-release-notes.md'
+   find 'archived results' [1] score at round(9): python=4.596185529 node=4.41410375 (raw python=4.596185529206451 node=4.414103749538008)
+   ask 'archived results' [0] score at round(9): python=4.859844813 node=4.667317947 (raw python=4.8598448126267195 node=4.667317947300571)
+   ask 'archived results' [1] id: python='file:ext/filler/00022-release-notes.md' node='file:ext/filler/00028-release-notes.md'
+   ask 'archived results' [1] loc: python='ext/filler/00022-release-notes.md' node='ext/filler/00028-release-notes.md'
+   ask 'archived results' [1] score at round(9): python=4.596185529 node=4.41410375 (raw python=4.596185529206451 node=4.414103749538008)
+   find 'how do we roll back a release' [0] score at round(9): python=6.176261737 node=5.581198191 (raw python=6.176261736548932 node=5.581198190807445)
+   find 'how do we roll back a release' [1] score at round(9): python=5.023512385 node=4.811505427 (raw python=5.0235123849851435 node=4.8115054271034)
+   find 'how do we roll back a release' [2] score at round(9): python=4.101030686 node=4.05917049 (raw python=4.101030685610747 node=4.05917048993331)
+   find 'how do we roll back a release' [3] score at round(9): python=3.410019915 node=3.269042459 (raw python=3.4100199151128088 node=3.2690424590656044)
+   ask 'how do we roll back a release' [0] score at round(9): python=6.176261737 node=5.581198191 (raw python=6.176261736548932 node=5.581198190807445)
+   ask 'how do we roll back a release' [1] score at round(9): python=5.023512385 node=4.811505427 (raw python=5.0235123849851435 node=4.8115054271034)
+   ask 'how do we roll back a release' [2] score at round(9): python=4.101030686 node=4.05917049 (raw python=4.101030685610747 node=4.05917048993331)
+   ask 'how do we roll back a release' [3] score at round(9): python=3.410019915 node=3.269042459 (raw python=3.4100199151128088 node=3.2690424590656044)
+   find 'L1 zero cost' [0] score at round(9): python=4.012548232 node=3.94030923 (raw python=4.012548232348534 node=3.940309229802161)
+   find 'L1 zero cost' [1] score at round(9): python=3.290338932 node=3.231102061 (raw python=3.2903389323582752 node=3.2311020612356223)
+   find 'L1 zero cost' [2] score at round(9): python=2.012019868 node=1.975796925 (raw python=2.0120198684981143 node=1.9757969248753986)
+   find 'L1 zero cost' [3] score at round(9): python=1.758872016 node=1.727206562 (raw python=1.7588720158134623 node=1.7272065621736128)
+   ask 'L1 zero cost' [0] score at round(9): python=4.012548232 node=3.94030923 (raw python=4.012548232348534 node=3.940309229802161)
+   ask 'L1 zero cost' [1] score at round(9): python=3.290338932 node=3.231102061 (raw python=3.2903389323582752 node=3.2311020612356223)
+   ask 'L1 zero cost' [2] score at round(9): python=2.012019868 node=1.975796925 (raw python=2.0120198684981143 node=1.9757969248753986)
+   ask 'L1 zero cost' [3] score at round(9): python=1.758872016 node=1.727206562 (raw python=1.7588720158134623 node=1.7272065621736128)
+   find 'regression evidence' [0] score at round(9): python=4.444352008 node=4.268285242 (raw python=4.444352007838872 node=4.268285241621966)
+   find 'regression evidence' [1] score at round(9): python=2.953495109 node=2.836489901 (raw python=2.953495109280839 node=2.836489900869953)
+   find 'regression evidence' [2] score at round(9): python=2.581401671 node=2.479137259 (raw python=2.581401671107384 node=2.4791372591667553)
+   find 'regression evidence' [3] score at round(9): python=2.503769043 node=2.404580113 (raw python=2.5037690426805517 node=2.404580113018537)
+   ask 'regression evidence' [0] score at round(9): python=4.444352008 node=4.268285242 (raw python=4.444352007838872 node=4.268285241621966)
+   ask 'regression evidence' [1] score at round(9): python=2.953495109 node=2.836489901 (raw python=2.953495109280839 node=2.836489900869953)
+   ask 'regression evidence' [2] score at round(9): python=2.581401671 node=2.479137259 (raw python=2.581401671107384 node=2.4791372591667553)
+   ask 'regression evidence' [3] score at round(9): python=2.503769043 node=2.404580113 (raw python=2.5037690426805517 node=2.404580113018537)
+   find 'node read plane' [0] score at round(9): python=3.07366216 node=3.01832618 (raw python=3.073662159807388 node=3.018326179843589)
+   find 'node read plane' [1] score at round(9): python=3.070354539 node=3.015078107 (raw python=3.0703545385722126 node=3.0150781066175574)
+   find 'node read plane' [2] score at round(9): python=2.062687515 node=2.025552388 (raw python=2.062687515394273 node=2.025552388275882)
+   find 'node read plane' [3] score at round(9): python=2.058223575 node=2.021168814 (raw python=2.0582235753075757 node=2.02116881372266)
+   ask 'node read plane' [0] score at round(9): python=3.07366216 node=3.01832618 (raw python=3.073662159807388 node=3.018326179843589)
+   ask 'node read plane' [1] score at round(9): python=3.070354539 node=3.015078107 (raw python=3.0703545385722126 node=3.0150781066175574)
+   ask 'node read plane' [2] score at round(9): python=2.062687515 node=2.025552388 (raw python=2.062687515394273 node=2.025552388275882)
+   ask 'node read plane' [3] score at round(9): python=2.058223575 node=2.021168814 (raw python=2.0582235753075757 node=2.02116881372266)
+   find 'docs/adr' [0] score at round(9): python=5.136754384 node=4.933257512 (raw python=5.136754384088777 node=4.933257511729916)
+   find 'docs/adr' [1] score at round(9): python=4.893193914 node=4.699345896 (raw python=4.89319391404606 node=4.699345895842555)
+   find 'docs/adr' [2] score at round(9): python=4.373535247 node=4.200273946 (raw python=4.373535246715461 node=4.200273946425413)
+   find 'docs/adr' [3] score at round(9): python=3.239786373 node=3.111439494 (raw python=3.23978637264852 node=3.1114394935399954)
+   ask 'docs/adr' [0] score at round(9): python=5.136754384 node=4.933257512 (raw python=5.136754384088777 node=4.933257511729916)
+   ask 'docs/adr' [1] score at round(9): python=4.893193914 node=4.699345896 (raw python=4.89319391404606 node=4.699345895842555)
+   ask 'docs/adr' [2] score at round(9): python=4.373535247 node=4.200273946 (raw python=4.373535246715461 node=4.200273946425413)
+   ask 'docs/adr' [3] score at round(9): python=3.239786373 node=3.111439494 (raw python=3.23978637264852 node=3.1114394935399954)
+   find 'answer verdict freshness' [0] id: python='file:ext/adjacent/00001-finance-close.md' node='file:ext/adjacent/00047-finance-close.md'
+   find 'answer verdict freshness' [0] loc: python='ext/adjacent/00001-finance-close.md' node='ext/adjacent/00047-finance-close.md'
+   find 'answer verdict freshness' [0] score at round(9): python=5.110808746 node=5.018797459 (raw python=5.110808745977025 node=5.018797459224574)
+   find 'answer verdict freshness' [1] id: python='file:ext/adjacent/00047-finance-close.md' node='file:ext/adjacent/00001-finance-close.md'
+   ask 'answer verdict freshness' [0] id: python='file:ext/adjacent/00001-finance-close.md' node='file:ext/adjacent/00047-finance-close.md'
+   ask 'answer verdict freshness' [0] loc: python='ext/adjacent/00001-finance-close.md' node='ext/adjacent/00047-finance-close.md'
+   ask 'answer verdict freshness' [0] score at round(9): python=5.110808746 node=5.018797459 (raw python=5.110808745977025 node=5.018797459224574)
+   ask 'answer verdict freshness' [1] id: python='file:ext/adjacent/00047-finance-close.md' node='file:ext/adjacent/00001-finance-close.md'
+
+$ node_arm.py <copy> --queries fixed --tops 5 --python-tune off
+corpus   : /private/tmp/claude-501/-Users-arpitarya-my-programs-fux/c2d49058-3e88-4e96-aaa5-a95aeb20bb6f/scratchpad/rerank-probe
+arm      : transcription (--no-tune)
+tune     : rerank_weight: default 0.0 -> 0.3
+queries  : 29 (fixed) x tops [5] x 2 verbs = 58 comparisons
+discordant: 0 of 58

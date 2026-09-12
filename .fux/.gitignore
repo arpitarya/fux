@@ -10,4 +10,5 @@
 runtime/
 acquired/
 
+__pycache__/
 .doctor-probe

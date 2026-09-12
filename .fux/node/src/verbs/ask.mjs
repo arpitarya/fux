@@ -1,5 +1,6 @@
 /** `fux ask` — a ranked list with scores, which is what you want when you are
- *  judging the engine. A projection of `run_query`, never a second strategy. */
+ *  judging the engine. A projection of `run_query`, never a second strategy.
+ *  Twin of `src/fux/query/__init__.py`'s `ask` half (R4's one-to-many). */
 import { runFused } from "../query/run.mjs";
 import { headingsFor } from "../query/headings.mjs";
 import { recordFor } from "../store/reader.mjs";

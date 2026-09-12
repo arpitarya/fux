@@ -9,5 +9,8 @@
   "files": ["fux.mjs", "src", "mcp-tools.json", "README.md"],
   "license": "MIT",
   "repository": { "type": "git", "url": "git+https://github.com/arpitarya/fux.git" },
-  "keywords": ["knowledge", "documentation", "search", "index", "bm25", "adr", "runbook"]
+  "homepage": "https://github.com/arpitarya/fux#readme",
+  "bugs": { "url": "https://github.com/arpitarya/fux/issues" },
+  "keywords": ["knowledge", "documentation", "search", "index", "bm25", "adr", "runbook"],
+  "publishConfig": { "access": "public", "tag": "alpha" }
 }

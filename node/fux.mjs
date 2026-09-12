@@ -12,6 +12,8 @@ import { runAsk } from "./src/verbs/ask.mjs";
 import { runAnswer } from "./src/verbs/answer.mjs";
 import { runExplain, runGraph, runPath } from "./src/verbs/graph.mjs";
 import { runMcp } from "./src/verbs/mcp.mjs";
+import { FuxError } from "./src/errors.mjs";
+import { applyOutputDefaults, loadOutput } from "./src/config/output.mjs";
 
 const VERSION = "2.0.0-alpha.7";
 
@@ -57,7 +59,9 @@ const WRITE_VERBS = {
 };
 
 function parseArgs(argv) {
-  const out = { _: [], json: false, top: null };
+  // `undefined` means THE FLAG WAS NOT PASSED, which is what lets
+  // `.fux/output.toml` supply the default. `false` here would be a claim.
+  const out = { _: [] };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--json") out.json = true;
@@ -67,6 +71,13 @@ function parseArgs(argv) {
     else if (a === "--all") out.all = true;
     else if (a === "--band") out.band = true;
     else if (a === "--no-sections") out.sections = false;
+    // ADR-TUNE decision 11: `.fux/tune.toml` is not read AT ALL, so the answer
+    // is the engine's own. The "is it me or the config?" switch, and it has to
+    // exist in both runtimes or the question can only be asked of one of them.
+    else if (a === "--no-tune") out.noTune = true;
+    // The same loop one level up: `.fux/output.toml` may not decide whether
+    // `.fux/output.toml` is read, so this is a flag and never a key.
+    else if (a === "--no-output-config") out.noOutputConfig = true;
     else if (a === "-q") (out.q ||= []).push(argv[++i]);
     else if (a === "--expand") out.expand = argv[++i];
     else if (a === "--no-refer") out.noRefer = true;
@@ -115,24 +126,50 @@ function main(argv) {
   // `cli.py::main` puts it, so no verb handler has to remember.
   if (!requirePiiRules(root)) return 1;
 
-  switch (verb) {
-    case "find":
-      return runFind(root, args);
-    case "ask":
-      return runAsk(root, args);
-    case "answer":
-      return runAnswer(root, args);
-    case "explain":
-      return runExplain(root, args);
-    case "graph":
-      return runGraph(root, args);
-    case "path":
-      return runPath(root, args);
-    case "mcp":
-      return runMcp(root, args);
-    default:
-      process.stderr.write(`error: unknown verb \`${verb}\`. Try \`fux --help\`.\n`);
-      return 1;
+  // `.fux/output.toml` is folded into `args` ONCE, here, before dispatch —
+  // exactly where `cli.py::_apply_output_defaults` does it, so no verb handler
+  // has to know the precedence chain exists (W-107 R5).
+  try {
+    const cfg = loadOutput(root, { enabled: args.noOutputConfig !== true });
+    applyOutputDefaults(verb, args, cfg);
+    args.outputConfig = cfg;
+  } catch (err) {
+    if (err instanceof FuxError) {
+      process.stderr.write(`error: ${err.message}\n`);
+      return err.exitCode;
+    }
+    throw err;
+  }
+
+  // The error contract: internals keep throwing, and the BOUNDARY renders.
+  // One `catch` here rather than a `try` per verb — a malformed `.fux/tune.toml`
+  // must print the same one-line refusal whichever verb tripped over it.
+  try {
+    switch (verb) {
+      case "find":
+        return runFind(root, args);
+      case "ask":
+        return runAsk(root, args);
+      case "answer":
+        return runAnswer(root, args);
+      case "explain":
+        return runExplain(root, args);
+      case "graph":
+        return runGraph(root, args);
+      case "path":
+        return runPath(root, args);
+      case "mcp":
+        return runMcp(root, args);
+      default:
+        process.stderr.write(`error: unknown verb \`${verb}\`. Try \`fux --help\`.\n`);
+        return 1;
+    }
+  } catch (err) {
+    if (err instanceof FuxError) {
+      process.stderr.write(`error: ${err.message}\n`);
+      return err.exitCode;
+    }
+    throw err;
   }
 }
 

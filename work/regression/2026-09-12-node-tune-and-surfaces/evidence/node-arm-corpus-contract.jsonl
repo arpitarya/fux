@@ -1,0 +1,200 @@
+{"_condition": {"corpus": "/Users/arpitarya/my_programs/fux", "rung": null, "arm": "contract", "tune_vs_defaults": "rerank_weight: default 0.0 -> 0.3", "queries": "fixed", "node_entry": "/Users/arpitarya/my_programs/fux/node/fux.mjs"}}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "rollback", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "rollback", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "rollback", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "rollback", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "rollback", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "rollback", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "ranking", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "ranking", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "ranking", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "ranking", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "ranking", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "ranking", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "index format", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "index format", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "index format", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "index format", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "index format", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "index format", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "confidence band", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "confidence band", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "confidence band", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "confidence band", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "confidence band", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "confidence band", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "the", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "the", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "the", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "the", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "the", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "the", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "decoder", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "decoder", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "decoder", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "decoder", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "decoder", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "decoder", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "pii redaction", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "pii redaction", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "pii redaction", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "pii redaction", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "pii redaction", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "pii redaction", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "graph plane", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "graph plane", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "graph plane", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "graph plane", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "graph plane", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "graph plane", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "accelerator", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "accelerator", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "accelerator", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "accelerator", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "accelerator", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "accelerator", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "refer", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "refer", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "refer", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "refer", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "refer", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "refer", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "getUserName", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "getUserName", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "getUserName", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "getUserName", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "getUserName", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "getUserName", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "BM25F", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "BM25F", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "BM25F", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "BM25F", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "BM25F", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "BM25F", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "sha256", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "sha256", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "sha256", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "sha256", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "sha256", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "sha256", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "fux-engine", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "fux-engine", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "fux-engine", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "fux-engine", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "fux-engine", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "fux-engine", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "archived results", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "archived results", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "archived results", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "archived results", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "archived results", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "archived results", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "how do we roll back a release", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "how do we roll back a release", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "how do we roll back a release", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "how do we roll back a release", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "how do we roll back a release", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "how do we roll back a release", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "L1 zero cost", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "L1 zero cost", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "L1 zero cost", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "L1 zero cost", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "L1 zero cost", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "L1 zero cost", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "tune.toml", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "tune.toml", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "tune.toml", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "tune.toml", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "tune.toml", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "tune.toml", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "chunking", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "chunking", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "chunking", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "chunking", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "chunking", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "chunking", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "regression evidence", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "regression evidence", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "regression evidence", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "regression evidence", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "regression evidence", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "regression evidence", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "supersedes", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "supersedes", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "supersedes", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "supersedes", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "supersedes", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "supersedes", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "node read plane", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "node read plane", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "node read plane", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "node read plane", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "node read plane", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "node read plane", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "docs/adr", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "docs/adr", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "docs/adr", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "docs/adr", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "docs/adr", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "docs/adr", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "answer verdict freshness", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "answer verdict freshness", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "answer verdict freshness", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "answer verdict freshness", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "answer verdict freshness", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "answer verdict freshness", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "zzqq", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "zzqq", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "zzqq", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "zzqq", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "zzqq", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "zzqq", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "nonascii", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "nonascii", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "nonascii", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "nonascii", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "nonascii", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "nonascii", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "   ", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "   ", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "   ", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "   ", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "   ", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "   ", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "zzzzzznomatch", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "zzzzzznomatch", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "zzzzzznomatch", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "zzzzzznomatch", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "zzzzzznomatch", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "zzzzzznomatch", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "explain", "top": null, "query": ["file:CHANGELOG.md"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "explain", "top": null, "query": ["file:archive/v0.1/README.md"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "explain", "top": null, "query": ["file:archive/v0.26-implemented/v0.24.0-debug-observability-handoff.md"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "explain", "top": null, "query": ["file:archive/v0.30-rev1-planning/v0.30.0-m1-rerun-prompt.md"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "explain", "top": null, "query": ["file:work/compare/refer-fetch-cache.compare.md"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "explain", "top": null, "query": ["file:work/regression/2026-08-24-blind-enrichment-regrade/evidence/blind-enrichment/c7f89e49fcd5643cbb8e90679e6d5f505d0f79be.md"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "explain", "top": null, "query": ["file:work/regression/2026-08-28-benchmark-v1-vs-head/evidence/eval/t1000/decoys.jsonl"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "explain", "top": null, "query": ["file:work/regression/2026-09-06-csv-chunk-granularity/evidence/pairs_b.jsonl"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "graph", "top": null, "query": ["rollback"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "graph", "top": null, "query": ["ranking"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "graph", "top": null, "query": ["index format"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "graph", "top": null, "query": ["confidence band"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "graph", "top": null, "query": ["the"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "graph", "top": null, "query": ["decoder"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "graph", "top": null, "query": ["pii redaction"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "graph", "top": null, "query": ["graph plane"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "path", "top": null, "query": ["file:CHANGELOG.md", "file:archive/v0.1/README.md"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "path", "top": null, "query": ["file:archive/v0.1/README.md", "file:archive/v0.26-implemented/v0.24.0-debug-observability-handoff.md"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "path", "top": null, "query": ["file:archive/v0.26-implemented/v0.24.0-debug-observability-handoff.md", "file:archive/v0.30-rev1-planning/v0.30.0-m1-rerun-prompt.md"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "path", "top": null, "query": ["file:archive/v0.30-rev1-planning/v0.30.0-m1-rerun-prompt.md", "file:work/compare/refer-fetch-cache.compare.md"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "path", "top": null, "query": ["file:work/compare/refer-fetch-cache.compare.md", "file:work/regression/2026-08-24-blind-enrichment-regrade/evidence/blind-enrichment/c7f89e49fcd5643cbb8e90679e6d5f505d0f79be.md"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "path", "top": null, "query": ["file:work/regression/2026-08-24-blind-enrichment-regrade/evidence/blind-enrichment/c7f89e49fcd5643cbb8e90679e6d5f505d0f79be.md", "file:work/regression/2026-08-28-benchmark-v1-vs-head/evidence/eval/t1000/decoys.jsonl"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "path", "top": null, "query": ["file:work/regression/2026-08-28-benchmark-v1-vs-head/evidence/eval/t1000/decoys.jsonl", "file:work/regression/2026-09-06-csv-chunk-granularity/evidence/pairs_b.jsonl"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "mcp", "top": null, "query": ["{\"jsonrpc\": \"2.0\", \"id\": 0, \"method\": \"tools/list\"}", "{\"jsonrpc\": \"2.0\", \"id\": 1, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"rollback\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 2, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"ranking\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 3, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"index format\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 4, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"confidence band\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 5, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"the\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 6, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"decoder\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 7, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"pii redaction\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 8, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"graph plane\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 9, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"CHANGELOG.md\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 10, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"CHANGELOG.md\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 11, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"archive/v0.1/README.md\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 12, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"archive/v0.1/README.md\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 13, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"archive/v0.26-implemented/v0.24.0-debug-observability-handoff.md\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 14, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"archive/v0.26-implemented/v0.24.0-debug-observability-handoff.md\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 15, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"archive/v0.30-rev1-planning/v0.30.0-m1-rerun-prompt.md\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 16, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"archive/v0.30-rev1-planning/v0.30.0-m1-rerun-prompt.md\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 17, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"work/compare/refer-fetch-cache.compare.md\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 18, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"work/compare/refer-fetch-cache.compare.md\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 19, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"work/regression/2026-08-24-blind-enrichment-regrade/evidence/blind-enrichment/c7f89e49fcd5643cbb8e90679e6d5f505d0f79be.md\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 20, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"work/regression/2026-08-24-blind-enrichment-regrade/evidence/blind-enrichment/c7f89e49fcd5643cbb8e90679e6d5f505d0f79be.md\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 21, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"work/regression/2026-08-28-benchmark-v1-vs-head/evidence/eval/t1000/decoys.jsonl\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 22, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"work/regression/2026-08-28-benchmark-v1-vs-head/evidence/eval/t1000/decoys.jsonl\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 23, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"work/regression/2026-09-06-csv-chunk-granularity/evidence/pairs_b.jsonl\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 24, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"work/regression/2026-09-06-csv-chunk-granularity/evidence/pairs_b.jsonl\", \"line_start\": 1, \"line_end\": 20}}}"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "api", "top": null, "query": ["rollback", "file:CHANGELOG.md", "file:archive/v0.1/README.md"], "status": "pass", "discordances": 0, "detail": []}

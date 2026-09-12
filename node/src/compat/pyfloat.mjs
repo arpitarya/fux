@@ -5,6 +5,10 @@
 
 /** Python's `round(x, ndigits)` — round-HALF-EVEN on the exact binary value.
  *
+ * ⚠ **`ndigits` is a parameter because `mcp.py` rounds scores to SIX** and a
+ * second rounding routine for the second resolution is how two roundings
+ * drift. `pyRound9` below is the sort key's, and is the overwhelming caller.
+ *
  * ⚠ `Number(x.toFixed(9))` agrees on ~200 000 random doubles and **fails on
  * exact binary ties**, where `toFixed` rounds half-UP and Python rounds
  * half-even. `round(score, 9)` is the sort key's own resolution
@@ -16,22 +20,28 @@
  * everything past the 9th digit is exactly `5` followed by zeros, the value
  * sits on the boundary and the winner is the even neighbour.
  */
-export function pyRound9(x) {
+export function pyRound(x, ndigits) {
   if (!Number.isFinite(x)) return x;
-  const s = x.toFixed(20);                 // enough digits to see the tie exactly
+  const s = x.toFixed(20);                        // enough digits to see the tie
   const dot = s.indexOf(".");
-  const tail = s.slice(dot + 1 + 9);       // digits past the 9th decimal
-  const naive = Number(x.toFixed(9));
-  if (!/^50*$/.test(tail)) return naive;   // not a tie — toFixed is already right
+  const tail = s.slice(dot + 1 + ndigits);        // digits past the nth decimal
+  const naive = Number(x.toFixed(ndigits));
+  if (!/^50*$/.test(tail)) return naive;          // not a tie — toFixed is right
 
-  // Exact tie: choose the even neighbour.
-  const keep = s.slice(0, dot + 1 + 9);
+  // Exact tie: choose the even neighbour. `ndigits === 0` keeps no decimal
+  // point at all — slicing to `dot + 1` there would leave a trailing `.`, whose
+  // last character is not a digit, and every half-integer would round AWAY from
+  // even. Python's `round(0.5)` is `0`.
+  const keep = ndigits === 0 ? s.slice(0, dot) : s.slice(0, dot + 1 + ndigits);
   const lower = Number(keep);
-  const step = 1e-9;
+  const step = 10 ** -ndigits;
   const lastDigit = Number(keep[keep.length - 1]);
   if (lastDigit % 2 === 0) return lower;
-  return Number((lower + (x < 0 ? -step : step)).toFixed(9));
+  return Number((lower + (x < 0 ? -step : step)).toFixed(ndigits));
 }
+
+/** `round(x, 9)` — the sort key's own resolution, and the overwhelming caller. */
+export function pyRound9(x) { return pyRound(x, 9); }
 
 /** Python's `repr(float)` layout, which differs from `String(Number)`.
  *

@@ -645,6 +645,22 @@ decides it now — the same marker `tests/test_agent_policy_agreement.py`
 compares on, so the two cannot disagree about what *fux's policy is in this
 file* means.
 
+### Amendment 2026-09-12 — the code for two decisions landed two commits late
+
+**What happened.** `setup.py`'s move to the shared `.agents/skills/`
+([ADR-AGENT-POLICY](0132_agent-policy.md) decision 16, above) and
+`store/fuxdir.py`'s Node vendoring — `ensure_node_reader`, `node_version`,
+`_node_source`, `_packaged_node_files`, owned in the narrow by
+[ADR-NODE-SEARCH](0155_node-search.md) — were recorded in `24c0a3d` and
+`6f518c6` while both files were deliberately held out of those commits. The code
+lands here.
+
+**Why it is written down.** For two commits this record described a `.fux/`
+generator and a skill surface the package did not yet produce.
+[ADR-CONFIG](0113_config.md), after its decision 15, carries the general form:
+a record ahead of its code is as misleading as one behind it, and the freshness
+check can see neither.
+
 ### Consequences
 
 - **The dotdir is safe to explain in one table.** A newcomer's first question —

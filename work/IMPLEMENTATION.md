@@ -27,6 +27,47 @@ Rules:
 ---
 
 
+## 2026-09-12 — W-107 CLOSED: the Node reader reads its config, and four surfaces nobody was comparing were all wrong
+
+**Shipped.** [ADR-NODE-SEARCH](../docs/adr/0155_node-search.md) goes
+`partial -> yes`. Measured:
+[`2026-09-12-node-tune-and-surfaces`](regression/2026-09-12-node-tune-and-surfaces/report.md),
+`blind`, **1 748 per-query rows**.
+
+| | |
+|---|---|
+| **decision 8 closed** | the Node reader reads `.fux/tune.toml` and `.fux/output.toml`. fux's own repo: **90 of 174 discordant -> 0 of 199**; `rung-00100` and `rung-10000`: **0 of 775 each** |
+| **the general defect** | the differential arm compared `find` and `ask` **and nothing else**, so four more surfaces were transcribed and never checked. **Every one was wrong** |
+| **`explain`/`graph`/`path`** | different key names in all three, and Node ran its own breadth-first walk where Python runs a PPR-lite expansion. `node/src/graph/walk.mjs` is the port that closed it |
+| 🔴 **`mcp`** | the handlers read `args.id` where `mcp-tools.json` advertises `path`, so every conformant client got **an empty result reported as success** — in a package already on npm. `fux_search` returned no `confidence` at all, the one key ADR-CONFIDENCE decision 11 makes unconditional there |
+| 🔴 **`fux.api`** | **a Python defect, not a Node one**: `find`/`ask` called `scan.ask`, so the library ranked without its own tune file (`graph plane` 6.392573 against the CLI's 8.310345). Decision 8 again, in the third of R3's three surfaces. [ADR-API](../docs/adr/0156_api.md) decision 6 |
+| 🔴 **`answer`** | cited `path:L20-L28` **into text the index never held** — Python decodes a document before chunking it and Node has no decoders. Node now **declines**, the same shape its never-fetch rule takes (decision 11) |
+
+**What holds it.** The arm compares five surfaces now
+([ADR-T1-ACCELERATOR](../docs/adr/0110_accelerator.md) decision 14);
+`tests/test_node_config_parity.py` holds the transcribed constants equal,
+because **the arm structurally cannot** — a drifted key set only shows on a
+corpus that sets it, and every golden rung's tune is all-defaults; a drifted
+refusal never shows at all. 21 new Python assertions, 18 new Node tests.
+
+**Both suites run whole**: `tests` 3 927 pass, 2 skipped, `tests_e2e` 85 pass.
+⚠ `test_adr_freshness::test_working_tree_is_not_mid_violation` is red for the
+**same five records** `c5fa869` held back (ADR-ACQUIRED / ADR-CONFIG /
+ADR-DOTFUX / ADR-PII / ADR-URL-FRESHNESS) and **none of them owns anything this
+change touched** — re-derived, not assumed.
+
+⚠ **Four obligations did NOT close and are carried, not dropped** —
+[W-148](open/W-148-what-the-two-readers-still-owe.md): CI cannot reach a golden
+corpus (three routes, none chosen), Node's latency has no instrument
+(`fux-benchmark` unbuilt), `log-probe.yml` has never run (not on
+`origin/main`), and ADR-API's renderer split is staged. **Two are Arpit's
+calls.**
+
+⚠ **Nothing here claims `N5 passes`.** One machine, Node 24;
+PRE-REG-NODE-2 §2 makes the arm standing rather than a gate, and §4 wants the
+OS/Node matrix.
+
+
 ## 2026-09-12 — W-142 retired, W-115 measured, W-144 answered: three instruments built before the first number
 
 **The run:** [`2026-09-12-reaim-and-instruments`](regression/2026-09-12-reaim-and-instruments/report.md) ·

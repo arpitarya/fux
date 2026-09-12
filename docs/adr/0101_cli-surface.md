@@ -338,6 +338,40 @@ to switch off.
     default-on flag needs — a lone `store_true` can only ever turn the lines
     back on, never off against a file that says `false`.
 
+12. **The progress bar's line budget is the terminal's width, less one
+    column — not a constant.** `progress.py` assumed **80** and never asked,
+    so on a wide window a path that fits comfortably was still elided:
+    `archive/compare/keyspace-unification.compare` painted as
+    `…/compare/keyspace-unification.compare`, with the leading `…mpare/` left
+    as a fragment that reads like a directory and is not one.
+
+    - **What the constant was protecting is real, and is kept.** `\r` returns
+      to the start of the *terminal* line, so a line that wrapped cannot be
+      erased and the "no partial line" guarantee stops holding. **80 stays as
+      the fallback** for when there is nothing to measure — a pipe under
+      `--progress`, a Windows console reporting 0, a test's fake stream.
+    - **`COLUMNS` wins over the `ioctl`**, because it is the knob a user
+      reaches for and the one a harness sets.
+    - **The last column is deliberately left empty.** Writing into it puts
+      most terminals in the *pending wrap* state, where the next character
+      lands on the following row — the wrapped line `\r` cannot take back.
+    - **Measured once per `Progress`, never per paint.** A resize mid-run
+      breaks `\r` repainting whatever was returned, so re-measuring buys
+      nothing — and it would put 100 000 `ioctl`s on the ingest path R5 timed
+      at 44.4 s.
+    - ⚠ **This does not touch a committed byte.** The bar is stderr-only and
+      TTY-gated (decision 9), so stdout stays byte-identical with it on or
+      off and [ADR-LAWS](0001_LAWS.md) L3 is not in play. Terminal width is an
+      output-shaping input, not an index input.
+    - ⚠ **Still unguarded: display width ≠ `len()`.** A path holding a CJK
+      character or an emoji counts as one per character and renders as two
+      columns, so it can still wrap. No corpus here has hit it and no test
+      covers it; it is named rather than fixed.
+
+    Reference: [`src/fux/progress.py`](../../src/fux/progress.py)
+    `_terminal_width`, and the two width tests in
+    [`tests/test_progress.py`](../../tests/test_progress.py).
+
 ---
 
 ### The commands

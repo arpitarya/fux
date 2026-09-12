@@ -524,6 +524,14 @@ off-arm internally** to compute every off-vs-on number in decision 9b.
 ⚠ *It does not reach `[index]` (decision 13b) — those keys built the index being
 read, so there is no query-time "off" for them.*
 
+⚠ **It is a TWO-RUNTIME flag since 2026-09-12, and it had to become one.** The
+Node reader read no `.fux/tune.toml` at all ([ADR-NODE-SEARCH](0155_node-search.md)
+decision 8), so this switch could only ask *"is it me or the config?"* of the
+half that had a config to ignore. `node/fux.mjs` parses it, `config/tune.mjs`
+honours it, and `tools/differential/node_arm.py` passes it **to both readers or
+to neither** — flipping one side compares a tuned reader against an untuned one
+and reports this file as a transcription defect.
+
 **12. A per-document weight must reach the accelerator's BOUND, not only its
 scorer.** Block skipping is safe on one property:
 

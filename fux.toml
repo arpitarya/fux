@@ -1,84 +1,42 @@
-# fux.toml -- POLICY, not corpus. What gets indexed is `.fux/sources/dirs`
-# and `.fux/sources/urls`, one entry per line, so a 5k-entry corpus diffs and
-# merges line by line. Every key below has a default; they are here to be seen
-# rather than to be required.
+# fux.toml -- POLICY, not corpus. What gets indexed is `.fux/sources/dirs` and
+# `.fux/sources/urls`, one entry per line.
+#
+# EVERY KEY, WHAT IT MEANS AND WHAT IT DEFAULTS TO IS IN ONE PLACE:
+#   https://github.com/arpitarya/fux/blob/main/docs/adr/0113_config.md
+# Ranking knobs are not here at all -- they live in .fux/tune.toml (ADR-TUNE):
+#   https://github.com/arpitarya/fux/blob/main/docs/adr/0135_tuning.md
+#
+# This file does not explain its own keys, deliberately: a comment that
+# describes a key can drift from the record that decides it while both still
+# look correct (ADR-LAW-0 decision 4). A key fux does not know is REFUSED by
+# name, so a typo here fails loudly instead of sitting inert.
 
 [sources]
 dirs_file = ".fux/sources/dirs"
 
-# URL ingestion through YOUR fetcher files. Nothing is fetched until a URL is
-# listed in .fux/sources/urls, and the only thing that lists one is an explicit
-# `fux add <URL>` -- fux is offline by default, and THAT is the gate.
+# Presence of this table enables URL ingestion. Nothing is fetched until a URL
+# is listed in .fux/sources/urls, and only `fux add <URL>` lists one.
 [sources.url]
-fetcher      = ".fux/fetchers/http.py"  # the file a line with no `fetch=` uses,
-                                        # and the directory `fetch=cdp` resolves in
+fetcher      = ".fux/fetchers/http.py"
 urls_file    = ".fux/sources/urls"
-meta         = "hashed"                 # the floor; a line may loosen it to plain
-
-# WHETHER `fux update` GOES OUT FOR THESE URLs AT ALL. "auto" (the default) is
-# today's behaviour; "never" pins every URL from this source -- no socket is
-# opened for it and your fetcher file is not even imported on its account.
-# A line's own `update=` wins, so one wiki can be pinned and one page exempted.
-#
-# THIS IS NOT `ttl`, AND IT TAKES NO DURATION. `ttl=` is ASK-time: how long
-# `fux answer` may cite a document without re-checking it. `update=` is
-# UPDATE-time: whether fux ever goes and looks again. Two words, never a clock.
-#
-# It buys BANDWIDTH by giving up FRESHNESS. Pair it with `keep=true` (the
-# default) and the retained bytes still verify every citation offline; pair it
-# with `keep=false` and the document is frozen at its last statistics with
-# nothing to check against. `fux doctor` reports that combination.
+meta         = "hashed"
 #update      = "auto"
 
-# HOW MANY URLs MAY BE IN FLIGHT AT ONCE, across `fux add <URL>`, `fux update`
-# and `fux ingest --refresh-urls`. (`fux ask` verifies cited URLs one at a time,
-# and `fux build` opens no socket at all -- neither is affected.)
-#
-# THIS KEY IS REQUIRED AND MAY NOT BE COMMENTED OUT. Every other key above has
-# a default; this one does not, on purpose. A repo that CAN fetch has to say how
-# hard, in a number a person can read, because the failure it prevents -- a
-# hundred connections opened at your own intranet -- is not one you find out
-# about by reading code. Comment it out and fux refuses to load and tells you so.
-#
-# THE EFFECTIVE VALUE IS min(this, what your fetcher declares). Your fetcher
-# declares what is SAFE -- `MAX_PARALLEL` in the module, 8 for the shipped
-# http.py, 1 for cdp.py because it reuses one WebSocket. This key is what is
-# POLITE, and it is the one your intranet cares about.
-#
-# Raising it is honoured, never clamped: a bigger number is merely rude, and at
-# 16+ fux says so on stderr rather than quietly reducing it. Below 1 refuses.
+# REQUIRED, and may not be commented out: a repo that CAN fetch has to say how
+# hard, in a number a person can read. Comment it out and fux refuses to load.
 max_parallel = 4
 
-# Fetcher tunables. Fux passes this table to the fetcher's optional
-# `configure(config)` VERBATIM and never reads a key inside it -- the keys mean
-# something to your fetcher, nothing to fux.
+# Passed to your fetcher's configure() verbatim; fux never reads a key inside.
 [sources.url.config]
 cdp_port  = 9222
 #timeout_s = 30
 
 [index]
-# Fixed at 256 (shard = blake2b(id, digest_size=1) -> 00..ff); this key
-# documents the value rather than setting it.
 shards = 256
 
-# Fux marks retired documents `archived` and states no conclusion. These files
-# teach your agents how to READ that mark -- they are the difference between an
-# agent citing a retired design confidently and one that says it is retired.
-#
-# THEY ARE WRITTEN OUTSIDE .fux/, into directories GitHub, AWS and Anthropic
-# own, which is why the default is spelled out here rather than left implicit:
-#
-#   claude   -> .claude/skills/fux-archived-results/SKILL.md
-#   codex    -> AGENTS.md at the repo root (its ONLY always-on surface)
-#               + .agents/skills/ for the skills (shared with copilot)
-#   copilot  -> .github/agents/fux.agent.md
-#               .github/instructions/fux-archived-results.instructions.md
-#   kiro     -> .kiro/steering/fux-archived-results.md
-#
-# Two of them are AMBIENT (`applyTo: "**"`, `inclusion: always`) and enter every
-# request in this repo, for every developer, whether or not they are using fux.
-# The repo-root AGENTS.md is ambient for everyone, which is why it stays short.
-# Delete a name to stop installing it; `install = []` installs none. Editing a
-# file that is already there is safe -- fux never rewrites one.
+# Which agent vendors `fux setup` writes archived-results policy for. These
+# files land OUTSIDE .fux/ -- in .claude/, .github/, .kiro/ and AGENTS.md at the
+# repo root -- which is why the default is spelled out rather than left
+# implicit. Delete a name to stop installing it; [] installs none.
 [agents]
 install = ["claude", "codex", "copilot", "kiro"]

@@ -9,6 +9,7 @@
 import { DEFAULT_SCORING, deriveWlen, scoreRecord } from "./bm25f.mjs";
 import { displayTitle } from "../store/format.mjs";
 import { recencyMultiplier } from "../ingest/priors.mjs";
+import { isArchivedLoc } from "../ingest/gitdir.mjs";
 import { pyRound9, cmpCodePoints } from "../compat/pyfloat.mjs";
 
 export class Corpus {
@@ -18,13 +19,10 @@ export class Corpus {
   get avgWlen() { return this.n ? this.totalWlen / this.n : 0.0; }
 }
 
-/** `loc` is under one of the declared archived directories. */
-export function isArchivedLoc(loc, archivedDirs) {
-  for (const d of archivedDirs) {
-    if (loc === d || loc.startsWith(d.endsWith("/") ? d : d + "/")) return true;
-  }
-  return false;
-}
+// `isArchivedLoc` is `ingest/gitdir.mjs`'s, imported rather than copied — the
+// same single definition `rank.py` imports from `ingest.gitdir`, so the marker
+// and the demotion cannot disagree about one document.
+export { isArchivedLoc };
 
 function recordIsArchived(record, archivedDirs) {
   if (record.archived) return true;

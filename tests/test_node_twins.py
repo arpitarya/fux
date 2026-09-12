@@ -22,7 +22,8 @@ Three ways a Node module may be accounted for, in order:
    `index.mjs` (`api.py`), `query/run.mjs` and `verbs/*.mjs` (the deliberate
    one-to-many off `query/__init__.py`) are all in this class. **The file
    declares itself; this test only checks the declaration resolves.**
-3. **Exempt** — no Python twin exists by design. Two files, listed below.
+3. **Exempt** — no Python twin exists by design. Three files, listed below;
+   each reproduces something CPython supplies from its runtime or stdlib.
 """
 
 from __future__ import annotations
@@ -37,14 +38,35 @@ ROOT = Path(__file__).resolve().parent.parent
 NODE_SRC = ROOT / "node" / "src"
 PY_SRC = ROOT / "src" / "fux"
 
-#: The ONLY hand-maintained part. Both are declared exempt by W-107 R4 — they
-#: have no Python twin because they exist to reproduce behaviour the Python
-#: half gets from its own runtime, and that is exactly where the divergence
-#: risk concentrates. Naming them is the point; letting them be an unexplained
-#: gap is what R4 refused.
+#: The ONLY hand-maintained part. All three are declared exempt by W-107 R4 —
+#: they have no Python twin because they exist to reproduce behaviour the
+#: Python half gets **from its own runtime or standard library**, and that is
+#: exactly where the divergence risk concentrates. Naming them is the point;
+#: letting them be an unexplained gap is what R4 refused.
 EXEMPT = {
     "compat/pyfloat.mjs",  # Python's repr layout + round-half-even; CPython IS the twin
     "hash/blake2b.mjs",  # RFC 7693 by hand, because hashlib is not there
+    "config/toml.mjs",  # CPython's `tomllib` IS the twin, and it is stdlib (W-107 R4)
+}
+
+#: NARROWED twins — the Node file mirrors ONE symbol of a much larger Python
+#: module, so "the twin file changed" is the wrong freshness question for it.
+#: `config.py` is the case: `root.mjs` is a `find_root`-only slice (W-107 R4),
+#: and `config.py` moves constantly for reasons `find_root` never sees. The
+#: freshness check narrows to the named symbol using git's own hunk context —
+#: the same narrowing `docs/adr/README.md`'s `describes` table applies to
+#: records. **The twin must still EXIST**; only the freshness half narrows.
+NARROWED = {
+    "config/root.mjs": "find_root",
+    # `gitdir.py` is the git-backed WALK — what ingest visits, what it excludes,
+    # a document's `mtime`. Node does not ingest; what crosses is the pair of
+    # functions the QUERY plane calls, and the walk moves constantly for
+    # reasons `archived_dirs` never sees.
+    "ingest/gitdir.mjs": "archived_dirs",
+    # `priors.py` carries the git half (`git_commit_times`) as well, which is
+    # an ingest concern with no Node twin — `recency_multiplier` is the whole
+    # of what the query plane reads.
+    "ingest/priors.mjs": "recency_multiplier",
 }
 
 _DECLARED = re.compile(r"`?(src/fux/[A-Za-z0-9_/]+\.py)`?")
@@ -107,6 +129,15 @@ def test_every_declared_twin_actually_exists():
     )
 
 
+def test_every_narrowed_twin_names_a_real_module():
+    """A narrowing is only honest if the module and the symbol both exist."""
+    for rel, symbol in NARROWED.items():
+        twin = twin_map().get(rel)
+        assert twin, f"{rel} is NARROWED but has no twin at all"
+        src = (ROOT / twin).read_text(encoding="utf-8")
+        assert f"def {symbol}" in src, f"{twin} has no `def {symbol}` — the narrowing is stale"
+
+
 def test_no_exemption_hides_a_real_twin():
     """An exemption is a claim that no twin exists. Check the claim."""
     wrong = [rel for rel in sorted(EXEMPT) if _derived(rel)]
@@ -127,6 +158,27 @@ def _git(*args: str) -> str:
     ).stdout
 
 
+def _symbol_touched(py_path: str, symbol: str | None) -> bool:
+    """For a narrowed twin, did the change actually reach the mirrored symbol?
+
+    Uses git's hunk-context header (`@@ ... @@ def find_root(`), which names the
+    enclosing definition. A module-level or other-function change reports a
+    different context and is correctly ignored. Unnarrowed twins always answer
+    True — the whole file is the twin.
+    """
+    if symbol is None:
+        return True
+    try:
+        diff = _git("diff", "-U0", "HEAD", "--", py_path)
+    except (OSError, subprocess.CalledProcessError):  # pragma: no cover
+        return True  # cannot narrow -> do not silently pass
+    return any(
+        symbol in line
+        for line in diff.splitlines()
+        if line.startswith("@@") or line.startswith(("+", "-"))
+    )
+
+
 def test_working_tree_does_not_change_a_python_module_behind_its_node_twin():
     """The freshness half — the same shape `test_adr_freshness` uses for records.
 
@@ -144,7 +196,9 @@ def test_working_tree_does_not_change_a_python_module_behind_its_node_twin():
     behind = [
         f"{twin} changed, node/src/{rel} did not"
         for rel, twin in twin_map().items()
-        if twin in changed and f"node/src/{rel}" not in changed
+        if twin in changed
+        and f"node/src/{rel}" not in changed
+        and _symbol_touched(twin, NARROWED.get(rel))
     ]
     assert not behind, (
         "the Python half moved and its Node twin did not:\n  "

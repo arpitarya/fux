@@ -1,0 +1,7 @@
+rung         : rung-10000 at /Users/arpitarya/my_programs/fux-lab/corpora/golden/rung-10000 (manifest verified)
+records      : 10000
+nodes/edges  : 2004 / 1002
+communities  : 1002
+python digest: a7bcc8245f83b8c5962e5564dd1923d6bbd87b53fcdfbbb2663b106cbbcb4207
+node digest  : a7bcc8245f83b8c5962e5564dd1923d6bbd87b53fcdfbbb2663b106cbbcb4207
+N2           : IDENTICAL

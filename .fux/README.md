@@ -21,12 +21,14 @@ of THREE kinds:
 | `fetchers/` | committed | consumer-owned code (`cdp.py`, `http.py`), edit freely |
 | `decoders/` | committed | consumer-owned code, one module per format. THESE COPIES ARE WHAT RUN, not the ones inside the installed package (ADR-DECODE) |
 | `enrich/` | committed | pinned enrichment text, one file per source content sha, plus `queue.tsv` (W-86 P6: what fux could NOT read and a model must). Committed, because a backlog is a team fact |
+| `node/` | committed | the vendored Node read plane (`fux-engine`), engine-owned and REWRITTEN on a version change -- not write-if-missing, because nobody edits it and a stale copy is a wrong answer (ADR-NODE-SEARCH) |
 | `tune.toml` | committed | the tunables: HOW results are ordered, never what is indexed (ADR-TUNE) |
 | `output.toml` | committed | the output defaults: HOW a result is SHOWN, never which documents come back (ADR-OUTPUT) |
 | `formats.toml` | committed | which files are documents (`include`) and which decoder reads each extension (`[decoders]`). Optional - absent means the built-in default. Replaced .fux/sources/types on 2026-09-11 (ADR-TYPES) |
 | `.fuxignore` | committed | what is NOT indexed, in .gitignore's grammar. The one place exclusions belong, read before the source lists (ADR-FUXIGNORE) |
 | `pii.toml` | committed | REQUIRED - every command refuses without it. What is REDACTED from the committed index - and ONLY from it. The acquired bytes, the refer plane and every answer quote still see the document as it is (ADR-PII) |
 | `refusals.toml` | committed | what a REFUSAL looks like here - the sign-in walls, paywalls and error shells a server returns INSTEAD of the document. Consumer-owned; fux ships no vendor knowledge (ADR-REFUSAL) |
+| `fux` | committed | a 3-line shim: `.fux/fux find rollback` in a clone with nothing installed. Runs `node .fux/node/fux.mjs` (ADR-NODE-SEARCH) |
 | `runtime/` | derived | M2 accelerator segments, M4's fetch cache at `runtime/fetch-cache/`, the write lock, and `enrich-progress.tsv` (W-86 P6: which queued documents THIS machine has handled - local by design, so two people's progress cannot conflict on a pull); carries `CACHEDIR.TAG` |
 | `acquired/` | acquired | the bytes a fetch actually returned, for URLs whose line says keep=true. Gitignored and NOT rebuildable - re-acquirable only, and only while the source is still reachable; carries CACHEDIR.TAG |
 
@@ -109,15 +111,10 @@ $ fux answer 'what is the RTO' --band     # one passage, cited and checked
 
 # Calling fux from a script, in any language
 
-**Fux is a normal command-line program**: it reads files, writes to
-stdout, and exits with a status. Anything that can start a process can
-drive it, which is why there is no binding to install, version, or wait
-for.
-
-**Two languages can also call it in-process, with no subprocess at
-all** - Python via `from fux import open`, and Node via the vendored
-reader in `.fux/node/`. Same method names, same arguments, same return
-shape as `--json`, because all three validate against one schema file.
+**There is no SDK, and that is the design.** Fux is a normal
+command-line program: it reads files, writes to stdout, and exits with
+a status. Anything that can start a process can drive it, which is why
+there is no binding to install, version, or wait for.
 
 **Three things are the whole contract:**
 
@@ -172,49 +169,11 @@ if hits.get("confidence", {}).get("answerable"):
     print(hits["results"][0]["id"])
 ```
 
-### In-process, with no subprocess
-
-```python
-from fux import open as fux_open
-
-ix = fux_open(".")                        # root, gate, tune, output - once
-ix.find("rollback", top=5)                # -> list[Result]
-ix.ask("how do we roll back a release")   # -> AskAnswer(results, confidence)
-ix.answer("what is the RTO")              # -> Answer(passages, citation, ...)
-ix.explain("file:docs/x.md"); ix.graph(q); ix.path(a, b)
-```
-
-**The CLI and `fux.api` are the contract.** Every other module is
-internal and may change without notice. The read verbs are the whole
-surface: nothing that writes - `ingest`, `build`, `add`, `remove`,
-`update`, `enrich`, `setup` - is importable this way, by design.
+Import `fux` as a library only if you accept that the Python API is
+not a supported surface. **The CLI is the contract; the modules are
+not.**
 
 ## Node / TypeScript
-
-**There is a Node reader, and it needs no Python.** `fux setup` writes
-it into `.fux/node/` and leaves a shim beside it, so a fresh clone
-answers with nothing installed:
-
-```console
-$ node .fux/node/fux.mjs find rollback    # a clone, nothing installed
-$ .fux/fux find rollback                  # the shim setup writes
-$ npx fux-engine find rollback            # from npm
-```
-
-It reads an index Python wrote and never writes one: `ingest`, `build`,
-`add`, `remove`, `update`, `enrich` and `setup` are absent and say so
-when you type them. It is held byte-equal to Python by a third arm of
-the differential law.
-
-In-process, the same shape as the Python API:
-
-```js
-import { open } from 'fux-engine'
-const ix = await open('.')
-await ix.find('rollback', { top: 5 })
-```
-
-Or over a subprocess, from any Node without the reader vendored:
 
 ```js
 import { execFile } from 'node:child_process';

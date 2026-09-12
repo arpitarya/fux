@@ -1,0 +1,751 @@
+{"_condition": {"corpus": "/Users/arpitarya/my_programs/fux-lab/corpora/golden/rung-10000", "rung": "rung-10000", "arm": "contract", "tune_vs_defaults": "all defaults \u2014 the contract and transcription arms are the same run", "queries": "corpus", "node_entry": "/Users/arpitarya/my_programs/fux/node/fux.mjs"}}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "owner", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "owner", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "owner", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "owner", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "owner", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "owner", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "effect", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "effect", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "effect", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "effect", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "effect", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "effect", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "4", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "4", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "4", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "4", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "4", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "4", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "no", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "no", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "no", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "no", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "no", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "no", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "forc", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "forc", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "forc", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "forc", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "forc", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "forc", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "after", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "after", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "after", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "after", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "after", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "after", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "reefer", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "reefer", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "reefer", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "reefer", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "reefer", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "reefer", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "patient", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "patient", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "patient", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "patient", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "patient", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "patient", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "work", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "work", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "work", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "work", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "work", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "work", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "depart", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "depart", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "depart", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "depart", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "depart", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "depart", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "recoveri", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "recoveri", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "recoveri", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "recoveri", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "recoveri", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "recoveri", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "end", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "end", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "end", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "end", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "end", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "end", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "monthli", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "monthli", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "monthli", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "monthli", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "monthli", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "monthli", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "notif", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "notif", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "notif", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "notif", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "notif", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "notif", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "next", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "next", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "next", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "next", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "next", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "next", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "audit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "audit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "audit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "audit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "audit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "audit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "surcharg", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "surcharg", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "surcharg", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "surcharg", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "surcharg", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "surcharg", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "move", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "move", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "move", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "move", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "move", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "move", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "us", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "us", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "us", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "us", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "us", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "us", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "diesel", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "diesel", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "diesel", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "diesel", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "diesel", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "diesel", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "insid", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "insid", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "insid", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "insid", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "insid", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "insid", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "retir", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "retir", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "retir", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "retir", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "retir", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "retir", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "limit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "limit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "limit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "limit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "limit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "limit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "edit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "edit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "edit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "edit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "edit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "edit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "1727", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "1727", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "1727", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "1727", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "1727", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "1727", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "1758", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "1758", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "1758", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "1758", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "1758", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "1758", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "1835", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "1835", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "1835", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "1835", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "1835", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "1835", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "2047", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "2047", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "2047", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "2047", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "2047", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "2047", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "2167", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "2167", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "2167", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "2167", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "2167", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "2167", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "2273", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "2273", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "2273", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "2273", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "2273", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "2273", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "2385", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "2385", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "2385", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "2385", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "2385", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "2385", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "2495", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "2495", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "2495", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "2495", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "2495", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "2495", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "2572", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "2572", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "2572", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "2572", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "2572", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "2572", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "2837", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "2837", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "2837", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "2837", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "2837", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "2837", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "2903", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "2903", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "2903", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "2903", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "2903", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "2903", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "3006", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "3006", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "3006", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "3006", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "3006", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "3006", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "3055", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "3055", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "3055", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "3055", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "3055", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "3055", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "3122", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "3122", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "3122", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "3122", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "3122", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "3122", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "3149", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "3149", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "3149", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "3149", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "3149", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "3149", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "458", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "458", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "458", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "458", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "458", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "458", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "617", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "617", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "617", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "617", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "617", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "617", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "653", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "653", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "653", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "653", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "653", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "653", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "726", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "726", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "726", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "726", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "726", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "726", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "805", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "805", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "805", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "805", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "805", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "805", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "822", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "822", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "822", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "822", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "822", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "822", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "848", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "848", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "848", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "848", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "848", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "848", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "878", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "878", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "878", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "878", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "878", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "878", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "901", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "901", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "901", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "901", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "901", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "901", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00005", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00005", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00005", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00005", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00005", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00005", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00055", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00055", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00055", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00055", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00055", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00055", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00105", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00105", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00105", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00105", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00105", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00105", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00155", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00155", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00155", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00155", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00155", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00155", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00205", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00205", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00205", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00205", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00205", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00205", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00255", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00255", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00255", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00255", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00255", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00255", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00305", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00305", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00305", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00305", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00305", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00305", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00355", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00355", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00355", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00355", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00355", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00355", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00405", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00405", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00405", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00405", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00405", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00405", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00455", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00455", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00455", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00455", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00455", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00455", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00505", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00505", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00505", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00505", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00505", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00505", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00555", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00555", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00555", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00555", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00555", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00555", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00605", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00605", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00605", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00605", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00605", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00605", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00655", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00655", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00655", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00655", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00655", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00655", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00705", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00705", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00705", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00705", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00705", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00705", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00755", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00755", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00755", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00755", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00755", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00755", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00805", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00805", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00805", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00805", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00805", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00805", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00855", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00855", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00855", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00855", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00855", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00855", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00905", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00905", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00905", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00905", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00905", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00905", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00955", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00955", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00955", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00955", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00955", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00955", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "01005", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "01005", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "01005", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "01005", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "01005", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "01005", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "01055", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "01055", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "01055", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "01055", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "01055", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "01055", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "01105", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "01105", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "01105", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "01105", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "01105", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "01105", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "01155", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "01155", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "01155", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "01155", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "01155", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "01155", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00005 owner", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00005 owner", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00005 owner", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00005 owner", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00005 owner", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00005 owner", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00355 effect", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00355 effect", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00355 effect", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00355 effect", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00355 effect", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00355 effect", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00705 4", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00705 4", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00705 4", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00705 4", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00705 4", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00705 4", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "01055 no", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "01055 no", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "01055 no", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "01055 no", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "01055 no", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "01055 no", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00205 forc", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00205 forc", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00205 forc", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00205 forc", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00205 forc", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00205 forc", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00555 after", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00555 after", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00555 after", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00555 after", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00555 after", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00555 after", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00905 reefer", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00905 reefer", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00905 reefer", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00905 reefer", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00905 reefer", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00905 reefer", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00055 patient", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00055 patient", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00055 patient", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00055 patient", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00055 patient", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00055 patient", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00405 work", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00405 work", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00405 work", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00405 work", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00405 work", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00405 work", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00755 depart", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00755 depart", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00755 depart", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00755 depart", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00755 depart", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00755 depart", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "01105 recoveri", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "01105 recoveri", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "01105 recoveri", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "01105 recoveri", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "01105 recoveri", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "01105 recoveri", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00255 end", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00255 end", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00255 end", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00255 end", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00255 end", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00255 end", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00605 monthli", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00605 monthli", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00605 monthli", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00605 monthli", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00605 monthli", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00605 monthli", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00955 notif", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00955 notif", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00955 notif", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00955 notif", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00955 notif", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00955 notif", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00105 next", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00105 next", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00105 next", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00105 next", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00105 next", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00105 next", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00455 audit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00455 audit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00455 audit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00455 audit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00455 audit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00455 audit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00805 surcharg", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00805 surcharg", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00805 surcharg", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00805 surcharg", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00805 surcharg", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00805 surcharg", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "01155 move", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "01155 move", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "01155 move", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "01155 move", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "01155 move", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "01155 move", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00305 us", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00305 us", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00305 us", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00305 us", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00305 us", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00305 us", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00655 diesel", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00655 diesel", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00655 diesel", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00655 diesel", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00655 diesel", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00655 diesel", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "01005 insid", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "01005 insid", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "01005 insid", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "01005 insid", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "01005 insid", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "01005 insid", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00155 retir", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00155 retir", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00155 retir", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00155 retir", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00155 retir", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00155 retir", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00505 limit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00505 limit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00505 limit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00505 limit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00505 limit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00505 limit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00855 edit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00855 edit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00855 edit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00855 edit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00855 edit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00855 edit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "owner titl", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "owner titl", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "owner titl", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "owner titl", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "owner titl", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "owner titl", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "effect befor", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "effect befor", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "effect befor", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "effect befor", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "effect befor", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "effect befor", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "4 12", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "4 12", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "4 12", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "4 12", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "4 12", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "4 12", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "no than", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "no than", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "no than", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "no than", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "no than", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "no than", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "forc need", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "forc need", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "forc need", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "forc need", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "forc need", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "forc need", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "after manag", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "after manag", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "after manag", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "after manag", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "after manag", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "after manag", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "reefer night", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "reefer night", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "reefer night", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "reefer night", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "reefer night", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "reefer night", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "patient quot", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "patient quot", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "patient quot", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "patient quot", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "patient quot", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "patient quot", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "work titl", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "work titl", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "work titl", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "work titl", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "work titl", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "work titl", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "depart befor", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "depart befor", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "depart befor", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "depart befor", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "depart befor", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "depart befor", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "recoveri 12", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "recoveri 12", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "recoveri 12", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "recoveri 12", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "recoveri 12", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "recoveri 12", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "end than", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "end than", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "end than", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "end than", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "end than", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "end than", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "monthli need", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "monthli need", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "monthli need", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "monthli need", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "monthli need", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "monthli need", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "notif manag", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "notif manag", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "notif manag", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "notif manag", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "notif manag", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "notif manag", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "next night", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "next night", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "next night", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "next night", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "next night", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "next night", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "audit quot", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "audit quot", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "audit quot", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "audit quot", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "audit quot", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "audit quot", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "surcharg titl", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "surcharg titl", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "surcharg titl", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "surcharg titl", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "surcharg titl", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "surcharg titl", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "move befor", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "move befor", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "move befor", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "move befor", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "move befor", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "move befor", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "us 12", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "us 12", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "us 12", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "us 12", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "us 12", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "us 12", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "diesel than", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "diesel than", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "diesel than", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "diesel than", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "diesel than", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "diesel than", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00005 1727 owner", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00005 1727 owner", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00005 1727 owner", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00005 1727 owner", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00005 1727 owner", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00005 1727 owner", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00255 3006 notif", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00255 3006 notif", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00255 3006 notif", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00255 3006 notif", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00255 3006 notif", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00255 3006 notif", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00505 878 4", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00505 878 4", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00505 878 4", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00505 878 4", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00505 878 4", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00505 878 4", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "00755 2837 audit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "00755 2837 audit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "00755 2837 audit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "00755 2837 audit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "00755 2837 audit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "00755 2837 audit", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "zzqq", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "zzqq", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "zzqq", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "zzqq", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "zzqq", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "zzqq", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "nonascii", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "nonascii", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "nonascii", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "nonascii", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "nonascii", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "nonascii", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "   ", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "   ", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "   ", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "   ", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "   ", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "   ", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 1, "query": "zzzzzznomatch", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 1, "query": "zzzzzznomatch", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 5, "query": "zzzzzznomatch", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 5, "query": "zzzzzznomatch", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "find", "top": 20, "query": "zzzzzznomatch", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "rung-10000", "verb": "ask", "top": 20, "query": "zzzzzznomatch", "status": "pass", "discordances": 0, "detail": []}

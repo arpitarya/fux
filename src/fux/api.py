@@ -176,13 +176,32 @@ class Index:
     # -- read verbs -------------------------------------------------------
 
     def find(self, query: str, *, top: int = 5, under: str | None = None) -> list[Result]:
-        """Ranked document locations. The cheapest verb: no band, no headings."""
-        from .query.scan import ask as scan_ask
+        """Ranked document locations. The cheapest verb: no band, no headings.
+
+        🔴 **Through `run_query`, not `scan_ask`** (fixed 2026-09-12, W-107).
+        Calling the scan directly skipped `.fux/tune.toml`, the archived
+        weighting and the reranker — so `from fux import open` returned a
+        DIFFERENT RANKING from `fux find` on the same index at the same
+        version, silently. Measured on this repo, whose tune sets
+        `rerank_weight = 0.3`: `graph plane` scored 6.392573 here against the
+        CLI's 8.310345.
+
+        It is the same defect ADR-NODE-SEARCH decision 8 records for the Node
+        reader, in the third of R3's three surfaces — and it was found the same
+        way, by aiming an instrument at the seam the CLI actually uses.
+
+        ⚠ **`under` is a prefix PLUS a component boundary here, and a bare
+        prefix on the CLI** (`query/__init__.py::_filtered`): `under="docs/a"`
+        matches `docs/ab.md` there and not here. Stated rather than quietly
+        changed — `fux.api` is frozen (ADR-API decision 1), so which of the two
+        is right is a ruling, not a cleanup. ADR-API decision 6.
+        """
+        from .query import run_query
 
         results = [
             Result(id=r.id, loc=r.loc, title=r.title, score=r.score,
                    archived=r.archived, tie=r.tie)
-            for r in scan_ask(self.root, query, top)
+            for r in run_query(self.root, query, top)[0]
         ]
         if under is not None:
             prefix = under if under.endswith("/") else under + "/"
@@ -199,21 +218,27 @@ class Index:
         caller in Python has already decided to read the object, and the block
         is the part that says whether to trust it.
         """
-        from .query import confidence as conf_mod
+        from .query import run_query
         from .query.headings import headings_for
-        from .query.scan import ask as scan_ask, query_term_hashes
-        from .query.tokenize import tokenize_pairs
+        from .tune import load as load_tune
 
         arms = list(dict.fromkeys([query, *(queries or [])]))
-        stats: dict = {}
-        first = scan_ask(self.root, arms[0], top, stats_out=stats)
+        # 🔴 `run_query`, not `scan_ask` — see `find`. Loaded ONCE and handed to
+        # every arm, the same discipline `_run_fused` applies: two loads could
+        # disagree if the file changed between them, and a band explained by a
+        # different floor than the one that produced it is worse than none.
+        tune = load_tune(self.root)
+        signals: dict = {}
+        first, _path = run_query(
+            self.root, arms[0], top, tune=tune, confidence_out=signals,
+        )
 
         fused = False
         results = first
         if len(arms) > 1:
             from .query.fuse import fuse_results
 
-            others = [scan_ask(self.root, q, top) for q in arms[1:]]
+            others = [run_query(self.root, q, top, tune=tune)[0] for q in arms[1:]]
             results = fuse_results([first, *others], top)
             fused = True
 
@@ -229,11 +254,13 @@ class Index:
             # calibrated against BM25F and a fused top-2 differs by ~0.0003, so
             # a band over fused scores measures a different quantity under the
             # same name.
-            block = conf_mod.signals(
-                tokenize_pairs(arms[0]), query_term_hashes(arms[0]),
-                stats.get("df", {}), stats.get("n", 0), [r.score for r in first],
-                top_doc_hashes=stats.get("top_doc_hashes"),
-            ).as_dict()
+            #
+            # 🔴 It comes from `run_query`'s own out-parameter now, so the two
+            # `[confidence]` FLOORS reach it — the block was being built here
+            # at the engine's defaults while the ranking beside it used the
+            # repo's, which is one answer described by two configurations.
+            resolved = signals.get("confidence")
+            block = resolved.as_dict() if resolved is not None else None
         return AskAnswer(results=rows, confidence=block, fused=fused)
 
     def _record(self, doc_id: str) -> dict | None:

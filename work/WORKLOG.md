@@ -29,6 +29,120 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-12 — the held-back code lands, and the records were AHEAD of it  ·  Claude Code (Opus)
+- **Asked:** "commit everything."
+- **Did:** committed the whole tree, including the four files `6f518c6` held
+  back — `src/fux/config.py`, the deletion of `config.schema.json`,
+  `src/fux/setup.py`, `src/fux/store/fuxdir.py`. **The holdback's premise was
+  wrong.** It reasoned that their five owning records were untouched and that a
+  session must not write a record out of someone else's diff. Re-derived: the
+  records were **already written and already committed** — ADR-CONFIG decisions
+  13/14/15, ADR-DOTFUX's `.agents/skills` and Node-vendoring text, and the
+  `keep`/`ttl`/`enrich` key rows — in `24c0a3d` and `6f518c6`. What was missing
+  was the code. Each of the five gains a dated line recording the gap; DOC-REGISTRY
+  bumped.
+- **Decided / open:** `no ADR affected` would have been false here — the change
+  implements five recorded decisions — so the records were touched with the one
+  thing they actually got wrong, which is that they had been true for two commits
+  while the engine was not. ⚠ **Recorded in ADR-CONFIG after decision 15 as a
+  general shape: a record AHEAD of its code reads as authority exactly as one
+  behind it does, and `tests/test_adr_freshness.py` sees neither — it checks that
+  an owning record was *touched*, never what it says.** This is W-83 with the two
+  halves swapped. First occurrence; not gated.
+- **Next:** nothing agent-side is unblocked by this. The queue is ten 🔴 rows,
+  all filed 2026-09-12, all waiting on Arpit — W-143 and the `weak`/`answerable`
+  ruling unblock the most.
+
+## 2026-09-12 — W-107 closed: the Node reader's config, and four surfaces nobody was comparing  ·  Claude Code (Opus)
+
+- **Asked:** implement W-107 until it is closed.
+- **Did:**
+  - **Closed [ADR-NODE-SEARCH](../docs/adr/0155_node-search.md) decision 8** —
+    the Node reader now reads `.fux/tune.toml` and `.fux/output.toml`. Six new
+    modules (`config/{toml,tune,output}.mjs`, `ingest/{sourcelist,gitdir}.mjs`,
+    `query/rerank.mjs`) and `query/run.mjs` rewritten as the one seam every
+    verb and both library methods go through. **90 of 174 discordant -> 0 of
+    199** on this repo; **0 of 775** on each golden rung.
+  - **Then found the general version of the same defect**: the arm compared
+    `find` and `ask` and nothing else. Extended it to `explain`/`graph`/`path`
+    (whole parsed payloads), `mcp` (both servers over a real stdio session) and
+    `fux.api` vs `node/src/index.mjs`. **All four were wrong.**
+  - 🔴 **A shipped npm defect**: Node's MCP handlers read `args.id` where the
+    advertised schema says `path`, so every conformant client got an empty
+    result reported as success; `fux_search` returned no `confidence`.
+  - 🔴 **A Python defect**: `fux.api` ranked without its own tune file.
+    [ADR-API](../docs/adr/0156_api.md) decision 6.
+  - 🔴 **A correctness defect**: Node's `answer` cited `path:L20-L28` into text
+    the index never held, because Python decodes a document before chunking and
+    Node has no decoders. Node now declines (decision 11).
+  - Ported `graph/walk.mjs` (lazy PPR + route enumeration); generalised
+    `pyRound` to take `ndigits`; carried `ordinal` through Node's refer plane.
+  - **Records amended in the same change**: ADR-NODE-SEARCH (8 closed, 9-12
+    new, `partial -> yes`), ADR-API (6), ADR-T1-ACCELERATOR (14), ADR-MCP (12),
+    ADR-TUNE (11 is two-runtime now), ADR-OUTPUT (22).
+  - **Tests**: `tests/test_node_config_parity.py` (21 assertions) and
+    `node/test/config.test.mjs` (18) — both for the things the differential arm
+    **structurally cannot** catch. Twin map updated; `test_doc_links.py`'s
+    frozen-file rule corrected to exempt `PRE-REGISTRATION-*.md` by name rather
+    than `tools/**` by directory, which was stale.
+  - **`CLAUDE.md` was NOT edited this session.**
+- **Decided / open:** W-107's row is **deleted** and its detail file retired to
+  `archive/open/`. Four obligations it could not close are carried to
+  **[W-148](open/W-148-what-the-two-readers-still-owe.md)** — CI reach, the
+  latency fence, `log-probe.yml`, the renderer split. **Two are Arpit's calls**
+  and the item is in the inbox. Nothing here claims `N5 passes`: one machine,
+  Node 24.
+- ⚠ **Suites run whole**: `tests` 3 927 pass, 2 skipped, `tests_e2e` 85 pass.
+  `test_adr_freshness::test_working_tree_is_not_mid_violation` stays red for
+  the same five records `c5fa869` held back — re-derived, and **none owns
+  anything this change touched**.
+- **Next:** Arpit reads W-148 rows 1 and 2; nothing agent-side proceeds on
+  either.
+
+## 2026-09-12 — the progress bar was measuring a terminal nobody has  ·  Claude Code (Opus)
+
+**Asked:** Arpit pasted a `fux ingest` transcript and said to find and fix the
+issue in it.
+
+**Done:** `progress.py` hard-coded `_MAX_LINE = 80` and never asked the
+terminal how wide it was, so paths were elided on a window with room to spare —
+`archive/compare/keyspace-unification.compare` painted as
+`…/compare/keyspace-unification.compare`, the leading `…mpare/` reading like a
+directory that does not exist. The budget now follows the real width (`COLUMNS`,
+else `os.get_terminal_size` on the stream's own fd), less one column so no
+terminal enters pending wrap; **80 is kept as the fallback** for a pipe, a
+Windows console reporting 0, or a test's fake stream. **ADR-CLI decision 12** in
+the same change; two tests added.
+
+⚠ **Two things I got wrong first, recorded because the second is the one that
+matters.** (1) I twice asked what "it" meant instead of reading the paste
+closely — the elision is visible in the very first `extract` line. (2) I ran
+`git stash push --keep-index` on a tree a concurrent session was writing,
+**which is the exact failure the NOW.md in front of me warned about**. Mine was
+path-scoped to my own three files and popped immediately, and `stash@{0}` (the
+other session's 218 files) is verified intact — but the scoping is what saved
+it, not the judgment. The tree is shared; `git stash` is a whole-tree verb even
+when you hand it paths.
+
+**Open:** nothing from this. The red
+`test_adr_freshness::test_working_tree_is_not_mid_violation` is unchanged and
+still belongs to the eight files `c5fa869` held back — reproduced with my edits
+stashed, same five records, none of them ADR-CLI.
+
+**Next:** the inbox is unchanged — eight 🔴 rows, all 0d, all waiting on Arpit.
+
+
+## 2026-09-12 — the Node arm reaches the ladder, and finds it had been testing the wrong Python  ·  Claude Code (Opus)
+- **Asked:** implement W-107.
+- **Did:** built what its owed list named — `tools/differential/rungs.py` (resolve a golden rung and **verify it against its committed manifest before a byte is read**) and `ladder_check.py` (all eight manifests, counts, `seed/`+`ext/`-only paths and the **nesting** `work/golden/README.md` called *"verified, not asserted"* and which nothing outside the building session ran). Split **engine root from corpus root** in all three arms — every one did `sys.path.insert(0, ROOT / "src")` on the same argument it read the index from, so the only corpus any of them could run on was a fux checkout, and a rung has no `src/`. Filed [`2026-09-12-node-arm-rungs`](regression/2026-09-12-node-arm-rungs/report.md).
+- **Ran:** `rung-00100` and `rung-10000` — PRE-REG-NODE-2 §4's per-push ends — **750 comparisons each, 0 discordant, graph plane digests identical.** 1 500 per-query JSONL rows. `blind`; the answer key was not opened and the arm has no reason to open one. **No verdict and nothing claims `N5 passes`**: the golden questions are unreleased (W-145), §4 wants three OS/libm pairs and Node 20+22 against this run's one machine on **Node 24**, and §2 says a green arm is filed, not announced.
+- 🔴 **Found — the arm was green because its Python side called `scan.ask`, and `fux find` calls `run_query`.** Tune, archived weighting and the reranker were skipped on *both* sides. Aimed at the path the CLI uses, fux's own repo goes **90 of 174 discordant**, **0 of 174** with `--no-tune`. **Cause: `node/` reads no `tune.toml` at all** — `node/src/config/` is `root.mjs` and nothing else, R5's tune row is unbuilt and `rerank.mjs` is owed by Phase 2. `fux-engine` is on npm and `fux setup` vendors the reader, so a consumer who runs `fux tune` gets a different ranked list from Node **at the same engine version**. Reproduced in isolation on a rung copy with one key flipped: 20 of 58 against 0 of 58.
+- **Fixed the instrument rather than the symptom:** `node_arm.py --python-tune on|off` — the **contract** arm and the **transcription** arm, with the corpus's tune delta printed as a run condition and written into the evidence header. CI runs the transcription arm on this repo (a failure there is a Node defect and nothing else); the contract arm runs on the rungs, whose tune is all-defaults. `node-arm.yml` gains a `ladder` job that always checks the manifests and runs the arm the moment `FUX_GOLDEN_CORPORA` has a corpus.
+- **Records:** ADR-T1-ACCELERATOR decisions **12–13** (corpus ≠ repo; two arms, because a discordance has to be attributable) and ADR-NODE-SEARCH decision **8** (the tune gap, stated as a gap). W-107, OPEN-WORK, regression README and DOC-REGISTRY in the same change.
+- 🔴 **My error, said out loud: I ran `git stash --keep-index` to check whether a red test was mine, in a tree a concurrent session was actively writing.** It reverted that session's unstaged `.fux/` rewrite — its `fux setup` output, and the 253 index-shard deletions it had made. **Nothing is lost: it is all in `stash@{0}`**, and the index is back at HEAD. I did not pop it, because the stash also holds my own edits and popping would conflict on every one of them. **The lesson is the one this file already carries and I did not apply: on a shared tree, read-only commands only.**
+- **Decided / open:** both suites run — **3 892 unit + 85 e2e**. One unit failure, `test_adr_freshness::test_working_tree_is_not_mid_violation`, and it is **not this session's**: it names ADR-CONFIG, ADR-DOTFUX, ADR-PII, ADR-ACQUIRED and ADR-URL-FRESHNESS, which are the eight files a previous session held back deliberately. **Nothing committed** — the tree carries three sessions' work and another session has staged it.
+- **Next:** W-107's remaining owed item is now `node/src/config/tune.mjs` + `node/src/query/rerank.mjs`. The reader half is small; the reranker reads document content and lands with the refer plane.
+
 ## 2026-09-12 — W-139's first run filed, and a run-id collision destroyed a corpus  ·  Claude Code (Opus)
 - **Asked:** the same prompt as the entry below — this is its second half, after the timing sweep finished.
 - **Did:** filed [`2026-09-12-benchmark-l9`](regression/2026-09-12-benchmark-l9/report.md) — **five corpora, two versions, 6 000 measured timings and 600 ranked lists.** W-139 closed and archived; `bench.py` gained `rankdiff`'s *where does it first diverge* table and an **owner lock**.
@@ -99,7 +213,9 @@ play: the worklog is the granular, per-exchange trail.
 - **Then ruled (Arpit, verbatim):** *"It will always be tested in fux-lab. Whenever we make any changes, both through Python and through Node, it'll be tested, and it should be giving same results."* 🔴 **This converts the differential arm from a PHASE GATE into a STANDING check** — every change to either reader, forever; a green arm is the floor and is never reported as an achievement; only a red one is information. A Python-only change is not exempt, which is the case the arm exists for.
 - **Drafted:** [`work/benchmark/PRE-REGISTRATION-NODE-2.md`](benchmark/PRE-REGISTRATION-NODE-2.md) — **NOT FROZEN**, following PRE-REG-NODE's own precedent (written open, Arpit fills the cells, then frozen). Supersedes rather than edits: PRE-REG-NODE names `fux-playground`, which L9 made unusable as an instrument, and a frozen pre-registration is never edited. Corpora move to the **committed golden ladder** (8 rungs, 100–10 000, 2.2 MB, tracked — so CI runs what fux-lab runs). Comparison stated on **parsed values, never stdout bytes** (H2). Ids **N5–N9**; N0–N4 retired with their document and never reused, the same rule that retired R7/R8. Score row **links** ADR-RANKING 8a rather than restating it (L0). The arm compares two readers against each other, so it needs **no answer key** — `work/golden/golden-answer/` stays unopened.
 - **🔴 Two cells left open on purpose, and they are his:** (1) does the latency fence `N9` belong in an equivalence document or in `fux-benchmark` under L9 — kept only so that dropping it would not silently retire a bar; (2) all eight rungs × 2 Node × 3 OSes on every push, which is the honest reading of *"whenever we make any changes"* and also a CI bill, versus 100 + 10 000 per push with all eight nightly.
-- **Next:** Arpit fills PRE-REG-NODE-2 §7. Until then no number may be measured against it and no arm may be reported. The harness change that follows — `node_arm.py` takes a repo root, the rungs are `.index` files — is not written, deliberately: the instrument is frozen before the thing that feeds it.
+- **Then ruled, both cells, same day:** (1) **the latency fence leaves** — L9 gives latency to `fux-benchmark`, so N4's `p95 ≤ 150 ms at 10 000` is written into [SETUP-BENCHMARK](setup/fux-benchmark.md) instead. ⚠ **That environment is unbuilt and carried by NO open item** — W-139 was removed from the queue today — so **nothing measures Node latency right now**; stated rather than silently dropped. (2) **cadence: `rung-00100` + `rung-10000` on every push, all eight nightly and before a release.** The middle six differ in size, not in kind; 12 arm runs a push instead of 48, and the reason that decided it is latency not bill — **slow CI is what teaches people to skip CI**. `PRE-REGISTRATION-NODE-2` **FROZEN**, sha `2ea403035d24eef14d0dafb2c4349d9382cda479cc02bafc2674e3b76acfb560`, ids **N5–N8**.
+- ⚠ **Incident, worth the entry:** a slice-based `str.replace` on `work/open/W-107-node-read-plane.md` **duplicated its tail 37 908 times — 677 lines to 986 285, 65 MB.** Recovered with `git show :<path> > <path>`; `git checkout --` does **not** work through the device bridge, which cannot unlink (`Operation not permitted`), and overwrite-in-place is the recovery that does. **Nothing was lost**: every earlier edit of the session was already staged by a concurrent session, so only the one failed edit needed redoing. **Lesson: replace on an exact bounded string with an asserted count, never on a computed slice.**
+- **Next:** W-107's remaining item is agent work — point `node_arm.py`/`node-arm.yml` at `rung-00100` and `rung-10000`. The arm takes a repo root and the rungs are `.index` files, so a run needs a step that materialises a repo around a rung. Until that lands, **no N5–N8 number exists.**
 
 ## 2026-09-12 — W-107 Phase 4: the Node read plane wired into the repo's own rules  ·  Claude Code (Opus)
 - **Asked:** finish W-107 — the register, the wheel, `fux setup`, CI and the doc discipline for an engine that was already written and green. *Do not rewrite the engine.*
