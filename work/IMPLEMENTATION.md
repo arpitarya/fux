@@ -27,6 +27,30 @@ Rules:
 ---
 
 
+## 2026-09-12 — W-143 answered NO; three controls learn what they test
+
+**Five items measured on the frozen golden ladder, every endpoint key-free.**
+3 777 unit tests green (one pre-existing red from another session's staged
+`tools/differential/` files).
+
+| what | outcome | evidence |
+|---|---|---|
+| **W-143 — the four ranking priors** | 🔴 **NO.** No single global value clears `0 broken`, on any knob, on any rung. Every value that perfects current-seeking destroys history-seeking one probe for one; `recency_half_life_days` at a year or less takes it to **0/13**. Three near-candidates each break on another rung with a net of +1/+2 against a floor of 6. **Both directions have headroom — a measured negative, not Inconclusive** | [VERDICT-W143](regression/2026-09-12-priors-and-tables/VERDICT-W143.md) · [ADR-TUNE](../docs/adr/0135_tuning.md) decision 13 |
+| **W-97 — the knob sweep** | Candidate table filed **with no recommendation**, superseding the frozen `PRE-REGISTRATION-TUNER` for both in-scope knobs. Endpoint named: the document plane | [report §1](regression/2026-09-12-priors-and-tables/report.md) |
+| **W-142 — the `heading` control** | 🔴 **C4's premise is unsupported.** With the heading field off *entirely* the distractor count moves a net of **5** — below the floor. They win on **body similarity** | [report §2](regression/2026-09-12-priors-and-tables/report.md) |
+| **W-144 — tables and `flen`** | Mechanism **confirmed**: 31 % of documents table-bearing, 16/124 top-1 changes, **41 of 44 in the predicted direction**. ⚠ Quality endpoint **saturates** → Inconclusive; the item does **not** close | [report §3](regression/2026-09-12-priors-and-tables/report.md) |
+| **W-115 — chunking quality** | 🔴 **0 of 994 documents differ** between `94231b2` and HEAD on the ladder, de-confounded from `max_phrases`. **Third corpus that cannot see it** — reason now named | [report §4](regression/2026-09-12-priors-and-tables/report.md) |
+| **W-87 — P2** | `unanswerable` gate measured (0/124 on five rungs); recall and Part B still need an uncontaminated key. **Moved 🟢 → 🟡** | [ladder run §4.1](regression/2026-09-12-golden-ladder/report.md) |
+| **Three controls built** | intent-split prior probes · the rebuilt `heading` control · the table-`flen` counterfactual | [ADR-RS](../docs/adr/0133_predictions.md) decision 15 |
+
+⚠ **`informed`, no delta stated.** No default changed: W-143 and W-97 are now
+`arpit`-lane. ⚠ **The probe set was committed after its first number** — the bar
+was Arpit's and predates the session; the gap is recorded in the
+pre-registration's §0 rather than left implicit.
+
+---
+
+
 ## 2026-09-12 — W-136 phases 2 and 4: the sealed golden ladder, five rungs to 1 000
 
 **Built blind, frozen, then run.** The ladder was committed (`92f5bff`) *before*

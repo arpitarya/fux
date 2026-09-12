@@ -35,6 +35,48 @@ valuable judgement, but not the state of play.
 *Updated **2026-09-12**.* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
+### The four ranking priors are answered, and the answer is structural (2026-09-12, Claude Code)
+
+**W-143 is done and it says NO** — no single global value of `superseded_weight`,
+`archived_weight`, `recency_half_life_days` or `rerank_weight` clears a
+`0 broken` bar, on any of three rungs.
+[The verdict](regression/2026-09-12-priors-and-tables/VERDICT-W143.md).
+
+**Why a successor needs this before touching anything ranking-related:**
+
+1. 🔴 **The knob is not mis-tuned; it is the wrong shape.** A **per-document
+   multiplier** is being asked to carry a **per-query** distinction. *"What do we
+   do now?"* and *"what did we do before?"* want opposite orderings out of one
+   corpus, and every value that perfects one slice destroys the other, one probe
+   for one. **Do not widen the grid** — `0.0` was swept and the answer is not in
+   a gap between points.
+2. 🔴 **A candidate that clears on one rung has found a corpus, not a default.**
+   All three near-candidates cleared on exactly one rung and broke on another, on
+   a different probe each time. The every-rung rule was fixed in the
+   pre-registration before the numbers existed, because this is the loophole a
+   post-hoc reading takes.
+3. **The floor still bites.** Every clearing net was +1 or +2 against decision
+   19's floor of 6. Even read alone, none of them is a result.
+4. ✅ **Key-free endpoints are the lever this repo was missing.** The probes'
+   truth is read off the corpus's own declarations, so they need no answer key
+   and do not wait on W-145. **When a question can be posed against a
+   declaration rather than a judgement, pose it that way** — it is the difference
+   between a result today and a result after someone else's quota returns.
+5. ⚠ **Name your endpoint.** The document plane (`fux ask`'s ranked list) and the
+   passage plane (`fux answer`) disagree about supersession. A sweep that does
+   not say which it measures averages two different things.
+6. ⚠ **Two controls turned out to test the wrong mechanism, and that is the
+   session's most transferable finding.** W-142's heading control: turning the
+   heading field off *entirely* barely moves the distractor count — they win on
+   **body similarity**. W-144's prose probe: a `df == 1` term saturates at 12/12
+   in both arms at every dilution. **Build the off arm first and look at what it
+   moves**, before believing a control tests what its name says.
+7. ⚠ **The probe set was committed AFTER its first number.** The bar was Arpit's
+   and predates the session, so the threshold was safe — but the ladder could
+   prove its ordering in `git log` and this could not. **Commit the instrument
+   before running it.** It cost nothing here only because the answer went the way
+   the authorship bias did not.
+
 ### The sealed golden benchmark is real test data now — five frozen rungs (2026-09-12, Claude Code)
 
 **W-136 phases 2 and 4 are done to rung 1 000.** `work/golden/ladder/` carries
