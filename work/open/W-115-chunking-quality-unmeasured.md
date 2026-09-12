@@ -137,3 +137,14 @@ a **new corpus** and it needs its own graded set.
 
 🔴 **No document may cite W-115 as measured.** Unchanged, and now for the third
 recorded reason.
+
+## 🧨 cleared 2026-09-12
+
+The row carried 🧨 — *broken, or getting worse every day it waits*. **It is
+neither.** The code shipped and is stable; what is open is a **measurement gap**
+with a named, measured cause and a specified fix. That damage is present and
+static, not accruing, and OPEN-WORK rule 6 puts static damage below the kind
+that compounds.
+
+⚠ **The standing prohibition is unchanged and is not what 🧨 was marking:**
+**no document may cite W-115 as measured.**

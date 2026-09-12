@@ -29,6 +29,19 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-12 — OPEN-WORK cleaned by re-derivation, and three stale blockers fall  ·  Claude Code (Opus)
+- **Asked:** *"To a cleanup of open work file based on the above status."*
+- **Did — reconciled every row against the repo rather than against the file** (rule 4). Nothing was closable: W-136 owes phase 5, W-143/W-97 owe a ruling, W-142/W-144/W-115 each returned a finding that does not meet their definition of done. **A queue that shrinks is not the goal; a queue that is true is.**
+- 🔴 **W-145's `↳ blocks:` line was FALSE.** It said *"nothing else in the queue"*; **W-87's Part B waits on it** — Part B's whole point is a corpus whose key its measurer cannot have contaminated, and the ladder's key is Claude-authored. So W-87 re-balls 🟡 → 🔴 (red wins) and joins that sub-row.
+- 🔴 **Two of W-106's recorded blockers are stale, and a session with a shell could have cleared either at any point** — the rule-4 failure mode, a third time:
+  - §Blockers says it waits on *"ratification of search-v3 §8"*. **It was ratified 2026-09-05**; `search-v3.md` carries `status: graduated`.
+  - The DoD says *"NOT RUN — arm64 only on this machine"*. **`arch -x86_64 uname -m` returns `x86_64` here** and Rosetta is running. ⚠ Recorded with the caveat that translation is a stand-in for native x86-64 and the run must say which it is.
+- **Did — grouping and balls:** W-97 and W-146 moved to `adr update` (both need only a ruling, which is what the group means). W-144 stays 🟢 **deliberately** — the cheap route waits on phase 5 but an unblocked route exists, and 🟡 would hide runnable work from an agent that picks from 🟢 only. W-115 loses 🧨: its damage is present and static, not accruing.
+- **Did — W-138's count re-derived**: 42 files still name `fux-playground` outside `regression/`. ⚠ That is files that *name* it, not units of work; several are correct as they stand. One dependency is already discharged — `PRE-REGISTRATION-TUNER` was superseded, not edited.
+- **Learned, and folded into rule 6:** the ball gate builds the red set from **four verbs** — `blocked on` · `after` · `waiting on` · `waits on`. My first wording said *"through W-145"*, which names a real blocker the check cannot see and fails as an unexplained 🔴. The rule now says so.
+- 🔴 **Not mine, and not touched:** a concurrent session has `work/handoff/` (untracked, created 12:10 today) — **CLAUDE.md retired that directory on 2026-08-18** — plus staged `docs/adr/0155_node-search.md` and `0156_api.md` missing `type:`, and staged `tools/differential/` files without ADR-T1-ACCELERATOR updated. **Four of the six red tests are theirs.** Left alone: deleting another session's in-flight work is not a cleanup.
+- **Next:** nothing in this change unblocks work. The 🟢 lane is W-140, W-138, W-107, W-106, W-115, W-142, W-144, W-136's remaining rungs.
+
 ## 2026-09-12 — the four priors answer NO, and three controls learn what they were testing  ·  Claude Code (Opus)
 - **Asked:** *"implement w one one five w nine seven w one four two w eight seven w one four four w one four three"* — the six items the golden ladder had just unblocked.
 - **Did — W-143, the one Arpit ordered.** Built a 26-probe set, **balanced 13 current-seeking / 13 history-seeking**, whose truth is read off the corpus's own `supersedes:` and `archived=true` declarations — so **no answer key is involved** and it does not wait on W-145. Swept all four priors × 7 values × 3 rungs. **[The answer is NO](regression/2026-09-12-priors-and-tables/VERDICT-W143.md)**, on every knob and every rung.

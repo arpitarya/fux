@@ -90,3 +90,13 @@ movers at `rung-01000` are named in
 the ladder (W-136 phase 5) those ids can be read off directly — **no new run and
 no new corpus**. Only if 16 is too few to clear the floor does this need a
 purpose-built graded set.
+
+## Ball, 2026-09-12 — 🟢, and deliberately not 🟡
+
+The cheapest way to finish this waits on W-136 phase 5 (grade the 16 named
+top-1 movers, no new run). **That is not the same as being blocked**, and
+balling it 🟡 would hide runnable work from an agent, which picks from 🟢 only.
+
+**The unblocked path:** build a graded set over table-heavy documents and answer
+*"is the new order better"* without waiting for anybody. It costs more than
+reading 16 ids off phase 5; it is available today.

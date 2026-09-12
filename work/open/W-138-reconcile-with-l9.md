@@ -64,3 +64,20 @@ Commit only your own paths; do not push. Finish with the close-out list.
   playground as an instrument or mix the roles — rewrite them, and add a guard test
   that nothing under `src/ tools/ tests/ scripts/` reads the playground. —
   [detail](W-138-reconcile-with-l9.md) `filed: 2026-09-11`
+
+## Re-derived 2026-09-12 — the count, so the next session need not guess
+
+```
+grep -rl fux-playground docs work tools tests scripts src | grep -v '^work/regression/'
+```
+
+**42 files**, at 2026-09-12. ⚠ **That is the count of files that NAME it, not the
+count of work.** Several are correct as they stand — [ADR-LAW-9](../../docs/adr/0011_LAW-9-environments.md)
+defines the playground's role, [`setup/fux-playground.md`](../setup/fux-playground.md)
+documents it, and `WORKLOG`/`DOC-REGISTRY`/`IMPLEMENTATION` record history that
+is never rewritten. **The work is the subset that uses it as an INSTRUMENT.**
+
+✅ **One dependency in the *Plans* row is already discharged**:
+`PRE-REGISTRATION-TUNER.md` was **superseded** for both in-scope knobs on
+2026-09-12 by [the priors run](../regression/2026-09-12-priors-and-tables/PRE-REGISTRATION.md)
+§3 — the frozen file was not edited, which is what that row asked for.

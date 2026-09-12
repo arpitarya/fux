@@ -19,7 +19,7 @@ description: "The single live work queue, two lanes, plus the Blocked-on-Arpit i
 | what he decides | filed | age |
 |---|---|---|
 | 🔴 **W-145** — Codex re-runs [prompt 1](golden/prompts/1-codex-seed.md) part B and replaces the Claude-authored stopgap key, once his quota is back. [detail](open/W-145-codex-regenerates-the-key.md) | 2026-09-12 | 0d |
-| ↳ **blocks:** nothing else in the queue — it governs what a phase-5 number may claim, not whether work runs | | |
+| ↳ **blocks:** **W-87's Part B**, which needs a key nobody has contaminated. Nothing else — it governs what a phase-5 number may *claim*, not whether phase 5 runs | | |
 | 🔴 **W-146** — two rulings: is `ADR-WORK-QUEUE` written (OPEN-WORK's rules are stated twice, owned nowhere), and does *never restates* reach into docstrings? [detail](open/W-146-the-rest-of-l0.md) | 2026-09-12 | 0d |
 | ↳ **blocks:** nothing else in the queue — they decide whether two named exposures get closed, not whether work runs | | |
 | 🔴 **W-143** — the four ranking priors answered **NO** ([verdict](regression/2026-09-12-priors-and-tables/VERDICT-W143.md)): close the knobs, move the mechanism query-side, or leave them at their no-op defaults. [detail](open/W-143-four-no-op-priors.md) | 2026-09-12 | 0d |
@@ -34,26 +34,26 @@ description: "The single live work queue, two lanes, plus the Blocked-on-Arpit i
 ### fux build
 
 - 🟢 🧨 **W-140** · `agent` — **2 code rows left** (12's `--hops` fork; an unreproduced runner-race flake) plus 13 record/code disagreements, none critical; 18 closed, row 8 inside W-122. [detail](open/W-140-guide-authoring-defects.md)
-- 🟢 🧨 **W-138** · `agent` — rewrite the ~40 artifacts that still use the playground as an instrument, and add the guard test. [detail](open/W-138-reconcile-with-l9.md)
+- 🟢 🧨 **W-138** · `agent` — **42 files still name `fux-playground`** (`grep -rl` outside `regression/`); rewrite the subset that uses it as an *instrument*, then add the guard test. [detail](open/W-138-reconcile-with-l9.md)
 - 🟡 **W-139** · `agent`, after W-138 — build fux-benchmark: seven corpora, two versions, latency and ranked lists kept. [detail](open/W-139-benchmark-per-l9.md)
-- 🔴 **W-146** · `arpit` — L0's remainder: eleven unhoused `CLAUDE.md` sections want records, and two rulings are owed. [detail](open/W-146-the-rest-of-l0.md)
 - 🟢 **W-107** · `agent` — the Node read plane (`npx fux-search`), Phases 1–4; nothing blocks Phase 1. [detail](open/W-107-node-read-plane.md)
-- 🟢 **W-106** · `agent` — the golden corpus now exists to rung 1 000; the gate still owes its two-architecture arm. [detail](open/W-106-vector-gate.md)
+- 🟢 **W-106** · `agent` — **both of its recorded blockers are stale**: search-v3 §8 was ratified 2026-09-05, and the x86-64 arm is reachable here (`arch -x86_64`). Only the arm is owed. [detail](open/W-106-vector-gate.md)
 - 🟡 **W-112** · `arpit`, waiting on W-106 — the vector plane: needs a golden corpus, a re-run gate, then a compare doc to rule on. [detail](open/W-112-vector-plane.md)
 
 ### testing
 
 - 🟢 **W-136** · `agent` — phases 2 and 4 done to rung 1 000; **rungs 2 000 / 5 000 / 10 000 are unbuilt**, and phase 5 scoring is Codex's. [detail](open/W-136-golden-benchmark.md)
 - 🔴 **W-145** · `arpit` — Codex regenerates the golden answer key; until then every golden number is `informed`. [detail](open/W-145-codex-regenerates-the-key.md)
-- 🟢 🧨 **W-115** · `agent` — **measured 2026-09-12: the ladder moves 0 of 994 documents**, the third corpus that cannot see it. Needs a corpus carrying `.jsonl`/`.csv`/`.rst` **with goldens**. [detail](open/W-115-chunking-quality-unmeasured.md)
-- 🔴 **W-97** · `arpit` — swept 2026-09-12 on golden data; **no value of either knob clears `0 broken`**. The candidate table is filed and the call on the defaults is his. [detail](open/W-97-tuner-knob-sweep.md)
+- 🟢 **W-115** · `agent` — three corpora cannot see it (the ladder moves **0 of 994**); build one carrying `.jsonl`/`.csv`/`.rst` **with goldens**. [detail](open/W-115-chunking-quality-unmeasured.md)
 - 🟢 **W-142** · `agent` — rebuilt 2026-09-12 with its own off arm: **net 5, below the floor — C4's premise is unsupported.** Re-aim it at body similarity, or retire it. [detail](open/W-142-heading-negative-control.md)
-- 🟡 **W-87** · `agent`, waiting on W-136 phase 5 — P2's `unanswerable` gate is measured (0/124); clean-corpus recall and Part B still need a key nobody has contaminated. [detail](open/W-87-what-good-means.md)
-- 🟢 **W-144** · `agent` — **tables do inflate `flen` and it moves ranking** (41 of 44 top-1 changes in the predicted direction); whether it *improves* it waits on phase 5 grading 16 named ids. [detail](open/W-144-structure-aware-extraction.md)
+- 🔴 **W-87** · `agent`, waiting on W-145 — P2's `unanswerable` gate is measured (0/124); recall needs phase 5 and **Part B needs an uncontaminated key**. [detail](open/W-87-what-good-means.md)
+- 🟢 **W-144** · `agent` — mechanism measured; *is it better* is open. Grade the **16 named movers** (free once phase 5 lands) or build a graded set now. [detail](open/W-144-structure-aware-extraction.md)
 
 ### adr update
 
 - 🔴 **W-143** · `arpit` — **answered 2026-09-12: NO**, no single global value clears `0 broken` on any of the four priors. Close the knobs, move it query-side, or leave them. [detail](open/W-143-four-no-op-priors.md)
+- 🔴 **W-97** · `arpit` — the candidate table is filed with no recommendation; the two defaults are an ADR-TUNE amendment. [detail](open/W-97-tuner-knob-sweep.md)
+- 🔴 **W-146** · `arpit` — L0's remainder: eleven unhoused `CLAUDE.md` sections want records, and two rulings are owed. [detail](open/W-146-the-rest-of-l0.md)
 
 ---
 
@@ -117,6 +117,11 @@ session needs first.*
    - 🟡 **waiting on another item, or on Codex, whose chain does not end at Arpit** — the row names what.
    - 🟢 **no blockers, good to go.**
    - **Red wins:** an item waiting on several things is 🔴 if any chain ends at Arpit. When a state changes, re-ball that row and every row waiting on it.
+   - ⚠ **The chain is read from the row's own words, by a fixed verb list** —
+     `blocked on` · `after` · `waiting on` · `waits on`, followed by the id.
+     `tests/test_open_work_rows_are_short.py` builds the whole red set from
+     those four; a row that says *"through W-145"* names a real blocker the
+     check cannot see, and fails as an unexplained 🔴. Use one of the four.
 
    **Then optional, in this order after the ball:**
    - 🧨 **broken, or getting worse every day it waits.** Any session sets or clears it, on any ball.

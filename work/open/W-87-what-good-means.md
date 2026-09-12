@@ -634,3 +634,17 @@ unwritten.
   ladder**, which is why the rungs were committed before the questions were opened.
 
 🟡 **Waiting on W-136 phase 5**, not on a ruling and not on an environment.
+
+## 🔴 Re-balled 2026-09-12 — this is red, through W-145
+
+This item was 🟡 *waiting on W-136 phase 5*. **That is half true and the half it
+missed is the one that matters.**
+
+- **Clean-corpus `recall@k`** waits on phase 5, which is Codex's — 🟡 on its own.
+- 🔴 **Part B waits on [W-145](W-145-codex-regenerates-the-key.md)**, which is a
+  decision sitting with Arpit. Part B's whole point is a corpus with a key its
+  measurer cannot have contaminated, and the ladder's key is Claude-authored.
+
+**Red wins** (OPEN-WORK rule 6): an item waiting on several things is 🔴 if any
+chain ends at Arpit. So this row is 🔴, and it belongs in **W-145's `↳ blocks:`
+sub-row** — which said *"nothing else in the queue"* until this was re-derived.

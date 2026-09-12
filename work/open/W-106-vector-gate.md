@@ -120,3 +120,26 @@ is still owed and nothing here supplies it.**
 
 ⚠ Rungs 2 000, 5 000 and 10 000 are **not built** — Arpit capped the session at
 1 000 — so a gate that needs a larger corpus needs those rungs built first.
+
+## 🔴 Re-derived 2026-09-12 — BOTH recorded blockers are stale
+
+OPEN-WORK rule 4 says re-derive rather than read, and this file had two blockers
+that a session with a shell could have cleared at any point.
+
+1. **§Blockers says *"`arpit` lane: ratification of search-v3 §8"*.** ⚠ **It was
+   ratified on 2026-09-05** — [`search-v3.md`](../proposals/search-v3.md) carries
+   `status: graduated` and *"RATIFIED 2026-09-05 — Arpit ratified §8 item by
+   item"*. **That blocker has been satisfied for a week and nothing here said so.**
+2. **The definition of done says *"NOT RUN — arm64 only on this machine"*.**
+   ⚠ **An x86-64 arm IS reachable here**: `arch -x86_64 uname -m` returns
+   `x86_64` and Rosetta's `oahd` is running. Checked 2026-09-12.
+
+⚠ **What the second one does NOT settle, and the run must say so.** Rosetta
+*translates* x86-64 instructions on arm64 hardware. For *"does the x86-64 build
+of this library produce different vectors"* it is a legitimate arm; for a
+floating-point determinism claim about **native** x86-64 it is a stand-in, and
+the report states which it is rather than leaving a reader to assume. If the
+distinction turns out to matter, that is a finding, not a reason not to run.
+
+**So the only thing actually owed is the arm itself** — the two-architecture
+discordant count on top-5 query-vector orderings — and it is agent work today.
