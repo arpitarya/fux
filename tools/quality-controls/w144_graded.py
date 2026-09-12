@@ -83,19 +83,34 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 PY = ROOT / ".venv" / "bin" / "python"
+FUX = ROOT / ".venv" / "bin" / "fux"
 sys.path.insert(0, str(ROOT / "tools" / "quality-controls"))
 
-#: ADR-RS decision 19 — the floor of all floors. Never lowered to fit a result.
-FLOOR = 6
+from verdict import FLOOR_OF_ALL_FLOORS, line as vline, rule as vrule  # noqa: E402
+
 SEED = 20260912
 
-#: 24 probe terms. Nonsense, so `df` is the generator's choice and not English's.
-TERMS = [
-    "zolfrane", "quendrix", "marbeth", "vintaro", "kelspar", "oridune",
-    "thalmet", "pyrrocol", "bexwald", "cindrol", "nyquath", "sperrin",
-    "drovane", "ashkeld", "morrivan", "telquist", "havorne", "brendisk",
-    "orsalis", "wickmare", "galdreth", "olmivar", "syrentha", "dunmarok",
-]
+#: Probe terms are COMPOSED, not listed, so the set can be widened without a
+#: hand-written list drifting out of alphabetical or unique. Deterministic and
+#: seedless: the same N terms for the same N, on any machine.
+_A = ("zol", "quen", "mar", "vin", "kel", "ori", "thal", "pyr", "bex", "cin",
+      "nyq", "sper", "dro", "ash", "mor", "tel", "hav", "bren", "ors", "wick",
+      "gal", "olm", "syr", "dun", "fen", "lor", "tav", "esk", "rud", "pil")
+_B = ("frane", "drix", "beth", "taro", "spar", "dune", "met", "rocol", "wald",
+      "drol", "uath", "rin", "vane", "keld", "ivan", "quist", "orne", "disk",
+      "alis", "mare")
+
+
+def terms(n: int) -> list[str]:
+    """`n` distinct nonsense tokens. 600 available before any repeat."""
+    out = [a + b for b in _B for a in _A]
+    assert len(set(out)) == len(out)
+    return out[:n]
+
+
+#: 90 probes, 30 per family. Wide enough that the exact test has room to
+#: resolve: decision 19 needs a net of 12 at 30 discordant pairs.
+TERMS = terms(90)
 
 PROSE_WORDS = (
     "consignment despatch tolerance interval calibration schedule handover "
@@ -142,13 +157,42 @@ def _doc(title: str, prose: str, table: str | None) -> str:
     return "\n".join(out) + "\n"
 
 
+
+def scaffold(dest: Path, types: list[str]) -> None:
+    """Let `fux setup` write the repo, then declare the corpus.
+
+    ⚠ **Hand-writing `fux.toml` was wrong and failed loudly, which is the point.**
+    `[sources] dirs` stopped being a TOML key when ADR-DIR-LIST landed, and a
+    generator carrying its own copy of the config shape is a second source of
+    truth that drifts silently. `fux setup` is the one that cannot.
+    """
+    # 🔴 `git init` FIRST, and it is not optional. The repo root is resolved by
+    # walking up, and `~/my_programs/fux-lab/` carries its own `fux.toml` — so
+    # without a root here `fux setup` silently adopts the LAB as the repo and
+    # writes nothing in the corpus. It exits 0 while doing it.
+    subprocess.run(["git", "init", "-q"], cwd=str(dest), check=True)
+    r = subprocess.run([str(FUX), "setup", "--no-agents"], cwd=str(dest),
+                       text=True, capture_output=True, check=False)
+    if r.returncode != 0:
+        sys.stderr.write(r.stdout + r.stderr)
+        raise SystemExit("fux setup failed")
+    (dest / ".fux" / "sources" / "dirs").write_text(
+        "# The generated corpus. Declared, never derived (ADR-DIR-LIST).\ndocs\n",
+        encoding="utf-8")
+    # ⚠ **No types file is written, and the argument is kept only to document
+    # that.** The list moved to `.fux/formats.toml` (ADR-TYPES decision 12) and
+    # `setup` writes the built-in default there — which already admits every
+    # format these corpora use. A second list here is refused by name, which is
+    # how this was found rather than guessed at.
+    assert types, "the corpus must name the formats it depends on"
+
+
 def cmd_gen(a) -> int:
     dest = Path(a.dest)
     if dest.exists():
         shutil.rmtree(dest)
     (dest / "docs").mkdir(parents=True)
-    (dest / ".fux").mkdir(parents=True, exist_ok=True)
-    (dest / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    scaffold(dest, ['.md'])
 
     rng = random.Random(SEED)
     files: dict[str, str] = {}
@@ -198,8 +242,6 @@ def cmd_gen(a) -> int:
         p.write_text(body, encoding="utf-8")
     (dest / "probes.jsonl").write_text(
         "".join(json.dumps(p, sort_keys=True) + "\n" for p in probes), encoding="utf-8")
-    (dest / "fux.toml").write_text('[sources]\ndirs = ["docs"]\ntypes = [".md"]\n',
-                                   encoding="utf-8")
     for fam in ("main", "inverse", "placebo"):
         print(f"  {fam:<8} {sum(1 for p in probes if p['family'] == fam)}")
     print(f"{len(files)} documents, {len(probes)} probes -> {dest}")
@@ -210,11 +252,8 @@ def cmd_gen(a) -> int:
 # run
 # ---------------------------------------------------------------------------
 
-def cmd_run(a) -> int:
-    corpus = Path(a.corpus)
-    probes = [json.loads(l) for l in (corpus / "probes.jsonl").read_text().splitlines()
-              if l.strip()]
-
+def _score(corpus: Path, probes: list[dict], quiet: bool = False):
+    """Ingest, build, and rank every probe in both arms. Returns per-probe rows."""
     r = subprocess.run([str(PY), "-c",
                         "import sys;from fux.cli import main;"
                         "sys.argv=['fux','ingest','--full'];rc=main();"
@@ -227,12 +266,13 @@ def cmd_run(a) -> int:
     import table_flen as T
     rows = T.measure(corpus)
     bad = [r_["loc"] for r_ in rows if not r_["agrees"]]
-    print(f"verification gate: recomputed body length equals the committed value on "
-          f"{len(rows) - len(bad)} / {len(rows)} documents")
+    if not quiet:
+        print(f"verification gate: recomputed body length equals the committed value "
+              f"on {len(rows) - len(bad)} / {len(rows)} documents")
     if bad:
-        print(f"🔴 GATE FAILED on {len(bad)} documents — this tool is not measuring the "
-              f"shipped pipeline. First few: {bad[:5]}")
-        return 1
+        raise SystemExit(
+            f"GATE FAILED on {len(bad)} documents - this tool is not measuring the "
+            f"shipped pipeline. First few: {bad[:5]}")
 
     from fux.query.bm25f import DEFAULT_SCORING, derive_wlen, score_record
     from fux.query.scan import query_term_hashes
@@ -254,7 +294,8 @@ def cmd_run(a) -> int:
         tot_cf += derive_wlen(cf)
         prepared.append((rec, flen, cf))
     avg, cf_avg = tot / n, tot_cf / n
-    print(f"corpus n={n}   avg_wlen {avg:.1f} -> {cf_avg:.1f} with table tokens out")
+    if not quiet:
+        print(f"corpus n={n}   avg_wlen {avg:.1f} -> {cf_avg:.1f} with table tokens out")
 
     out = []
     for p in probes:
@@ -281,6 +322,14 @@ def cmd_run(a) -> int:
                     "hit1_cf": bool(rank_b) and rank_b[0] == p["relevant"],
                     "rival1_shipped": bool(rank_a) and rank_a[0] == p["rival"],
                     "rival1_cf": bool(rank_b) and rank_b[0] == p["rival"]})
+    return out
+
+
+def cmd_run(a) -> int:
+    corpus = Path(a.corpus)
+    probes = [json.loads(l) for l in (corpus / "probes.jsonl").read_text().splitlines()
+              if l.strip()]
+    out = _score(corpus, probes)
 
     print(f"\nprobe-term df: {min(r_['df'] for r_ in out)}-{max(r_['df'] for r_ in out)} "
           f"(the 2026-09-12 endpoint saturated at df == 1)")
@@ -299,7 +348,8 @@ def cmd_run(a) -> int:
               f"{b + w:>11}  {b - w:>+5}")
 
     nq, s, c, b, w = res["main"]
-    disc, net = b + w, abs(b - w)
+    v = vrule(b, w, better="EXCLUDING table tokens from `flen` RANKS BETTER",
+              worse="the SHIPPED `flen` RANKS BETTER")
     imp = sum(1 for r_ in out if r_["family"] == "main"
               and not (r_["hit1_shipped"] and r_["hit1_cf"]))
     reg = sum(1 for r_ in out if r_["family"] == "main"
@@ -308,15 +358,15 @@ def cmd_run(a) -> int:
     print(f"[main] headroom improvement {imp}/{nq} · regression {reg}/{nq} "
           f"(ADR-RS 22b; PROVEN under 22c(a) — the counterfactual arm is the "
           f"feature-off/on arm and the `inverse` family is its positive control)")
-    if disc == 0:
-        print(f"[main] INCONCLUSIVE (22d): not one probe moved between the arms.")
-    elif net >= FLOOR:
-        which = "EXCLUDING table tokens from `flen`" if b > w else "the SHIPPED `flen`"
-        print(f"[main] {which} RANKS BETTER: discordant {disc}, net {net} against a "
-              f"floor of {FLOOR}.")
+    print(f"[main] {vline(v)}")
+    if v["outcome"] == "inconclusive":
+        print("[main] INCONCLUSIVE (22d): not one probe moved between the arms.")
+    elif v["outcome"] == "no detected change":
+        print(f"[main] NO DETECTED CHANGE. The floor of all floors is "
+              f"{FLOOR_OF_ALL_FLOORS}; at {v['discordant']} discordant pairs the bar "
+              f"is a net of {v['net_needed']}. Do not lower it.")
     else:
-        print(f"[main] NO DETECTED CHANGE: discordant {disc}, net {net}, below the "
-              f"floor of {FLOOR}. Do not lower the floor.")
+        print(f"[main] {v['outcome']}.")
 
     inq, is_, ic, ib, iw = res["inverse"]
     print()
@@ -343,6 +393,55 @@ def cmd_run(a) -> int:
     return 0
 
 
+def cmd_sweep(a) -> int:
+    """Dose-response: at what table share does the shipped ranker start losing?
+
+    🔴 **This exists because a single point is engineered and says so.** The
+    `main` family's headline is measured at one table size, chosen by the author
+    — so *"the counterfactual wins 30-0"* is partly a statement about that
+    choice. A curve is not: it reports the share at which the defect begins to
+    bite, which can be read against a real corpus's measured distribution
+    (`rung-01000`: 31 % of documents at a table share >= 10 %, median 0.34).
+
+    Everything but the table size is held fixed, and the corpus is regenerated
+    from the same seed at each step, so the probes and the prose are identical
+    across the sweep.
+    """
+    rows = []
+    print(f"{'table tokens':>13}  {'share':>7}  {'hit@1 shipped':>14}  "
+          f"{'hit@1 no-table':>15}  {'p':>9}  outcome")
+    for tbl in a.sizes:
+        ns = argparse.Namespace(dest=a.corpus, filler=a.filler, prose=a.prose, table=tbl)
+        import io, contextlib
+        with contextlib.redirect_stdout(io.StringIO()):
+            cmd_gen(ns)
+        corpus = Path(a.corpus)
+        probes = [json.loads(l) for l in (corpus / "probes.jsonl").read_text().splitlines()
+                  if l.strip()]
+        out = _score(corpus, probes, quiet=True)
+        main = [r for r in out if r["family"] == "main"]
+        s = sum(1 for r in main if r["hit1_shipped"])
+        c = sum(1 for r in main if r["hit1_cf"])
+        b = sum(1 for r in main if r["hit1_cf"] and not r["hit1_shipped"])
+        w = sum(1 for r in main if r["hit1_shipped"] and not r["hit1_cf"])
+        v = vrule(b, w, better="no-table better", worse="shipped better")
+        share = tbl / (tbl + a.prose)
+        print(f"{tbl:>13}  {share:>7.2f}  {s:>9} /{len(main):<3}  {c:>10} /{len(main):<3}  "
+              f"{v['p']:>9.4f}  {v['outcome']}")
+        rows.append({"table_tokens": tbl, "prose_tokens": a.prose,
+                     "table_share_nominal": round(share, 4),
+                     "n": len(main), "hit1_shipped": s, "hit1_no_table_flen": c, **v})
+    print()
+    print("The share at which the shipped arm starts losing is the number to read, "
+          "not the 30-0 at one size. Compare it against the corpus you care about.")
+    if a.json:
+        dest = Path(a.json); dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_text("".join(json.dumps(r, sort_keys=True) + "\n" for r in rows),
+                        encoding="utf-8")
+        print(f"\nsweep rows ({len(rows)}) -> {a.json}")
+    return 0
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     sub = ap.add_subparsers(dest="verb", required=True)
@@ -353,6 +452,12 @@ def main() -> int:
     g.set_defaults(fn=cmd_gen)
     r = sub.add_parser("run"); r.add_argument("--corpus", required=True)
     r.add_argument("--json"); r.set_defaults(fn=cmd_run)
+    s = sub.add_parser("sweep"); s.add_argument("--corpus", required=True)
+    s.add_argument("--sizes", type=int, nargs="+",
+                   default=[0, 50, 100, 200, 400, 700, 1200, 2000])
+    s.add_argument("--filler", type=int, default=150)
+    s.add_argument("--prose", type=int, default=400)
+    s.add_argument("--json"); s.set_defaults(fn=cmd_sweep)
     a = ap.parse_args()
     return a.fn(a)
 

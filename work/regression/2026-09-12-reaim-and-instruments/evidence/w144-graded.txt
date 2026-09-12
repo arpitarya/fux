@@ -1,0 +1,18 @@
+verification gate: recomputed body length equals the committed value on 330 / 330 documents
+corpus n=330   avg_wlen 457.6 -> 293.0 with table tokens out
+
+probe-term df: 4-23 (the 2026-09-12 endpoint saturated at df == 1)
+
+   family    n   hit@1 shipped   hit@1 no-table   discordant    net
+     main   30         0 /30           30 /30             30    +30
+  inverse   30        30 /30           30 /30              0     +0
+  placebo   30        30 /30           30 /30              0     +0
+
+[main] headroom improvement 30/30 · regression 30/30 (ADR-RS 22b; PROVEN under 22c(a) — the counterfactual arm is the feature-off/on arm and the `inverse` family is its positive control)
+[main] b=30 c=0 discordant=30 net=30 p=0.0000 (net needed 12, alpha=0.05) -> EXCLUDING TABLE TOKENS FROM `FLEN` RANKS BETTER
+[main] EXCLUDING table tokens from `flen` RANKS BETTER.
+
+[inverse] CONTROL HOLDS: both arms answer 30/30. The counterfactual is not simply promoting table-heavy documents.
+[placebo] CONTROL HOLDS: both arms score 30/30.
+
+per-probe rows (90) -> work/regression/2026-09-12-reaim-and-instruments/evidence/w144-graded.jsonl

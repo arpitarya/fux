@@ -1,0 +1,8 @@
+documents read in both arms:                         180 / 180
+decoys whose heading set differs between the arms:    60 / 90
+subjects whose heading set differs between the arms:  0 / 90
+  depth    30 / 30
+  fence    30 / 30
+  placebo  0 / 30
+
+SELFTEST PASSES (ADR-RS 22c(b)): every TREATED decoy is separable by the property under test, no placebo decoy is, and no subject is. Headroom is PROVEN, not observed.

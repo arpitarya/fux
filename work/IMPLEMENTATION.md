@@ -27,6 +27,194 @@ Rules:
 ---
 
 
+## 2026-09-12 — W-142 retired, W-115 measured, W-144 answered: three instruments built before the first number
+
+**The run:** [`2026-09-12-reaim-and-instruments`](regression/2026-09-12-reaim-and-instruments/report.md) ·
+`informed` · 766 per-probe/per-query rows + 28 sweep rows.
+
+**Committed at `aff3c82` before any measurement existed**, instruments and bars
+together — the habit [the priors run](regression/2026-09-12-priors-and-tables/ANALYSIS.md) §7
+named as owed and could not claim for itself. `git log` proves the ordering.
+
+### ✅ W-115 — measured for quality, six days after it was owed. **CLOSED**
+
+[VERDICT-W115](regression/2026-09-12-reaim-and-instruments/VERDICT-W115.md).
+Three corpora could not see this change and each was filed as a different
+reason. **The third reason was wrong**: `.rst`/`.adoc`/`.org` predate W-115 and
+were untouched by it, while Markdown — which it did change — is the default
+grammar for every other extension. The golden ladder had the **right formats and
+the wrong content**: 1 of 800 `.md`/`.txt` documents carries a `#` inside a code
+fence.
+
+- **`fence`: `hit@1` 0/30 → 30/30, `p ≈ 0`.** The pre-W-115 engine ranks a
+  document whose *only* mention of the term is a fenced shell comment **first in
+  all 30 probes, at every prose weight from tf 1 to 8**.
+- **`depth`: Inconclusive (22d)** — the key cap provably changes what is mined
+  and changes no ranking here. ADR-DECODE 16 justifies it as noise reduction, so
+  nothing is amended to claim otherwise.
+- **Headroom PROVEN under 22c(b)** by a selftest: 60/60 treated decoys
+  separable, **0/30 placebo decoys**, 0/90 subjects.
+- 🔴 **The prohibition is lifted for the heading half only.** `refer/_chunk.py`
+  stays unmeasured and the verdict says so.
+- Records: [ADR-EXTRACTED](../docs/adr/0115_extracted-mode.md) ·
+  [ADR-DECODE](../docs/adr/0139_decode.md) decisions 14-16.
+
+### 🔴 W-142 — the control is RETIRED, and not for the expected reason. **CLOSED**
+
+[VERDICT-W142](regression/2026-09-12-reaim-and-instruments/VERDICT-W142.md).
+The pre-registration took the re-aim at body similarity. **It failed too.**
+
+- `bm25f.body` 1.0 → 0.0 moves the distractor count by a **net of 1 over 83
+  discordant pairs, `p = 1.0000`**.
+- **The endpoint is pinned at the corpus base rate.** 392 of 1 001 documents are
+  `ext/sibling/`; a random top-5 holds **1.96**; every arm of **both** fields
+  observes **2.06–2.14**, off arms included.
+- ⚠ **The arms work** — seed hits fall **272 → 158** with `body` off. The
+  endpoint is inert, not the configuration.
+- 🔴 **C1 and C3 rest on generator assertions and no live control backs them.**
+  Recorded in [ADR-RS](../docs/adr/0133_predictions.md) rather than carried as an
+  item, because the fault is the endpoint and there is no third field to try.
+- **The mechanical lesson shipped**: `body_control.py` prints its endpoint's
+  corpus base rate **before** it runs an arm.
+
+### ✅ W-144 — the counterfactual ranks better, and it is NOT authorized
+
+[VERDICT-W144](regression/2026-09-12-reaim-and-instruments/VERDICT-W144.md).
+The 2026-09-12 endpoint saturated because its probe terms had `df == 1`; terms
+at `df` 4-23 unsaturate it in one generator change.
+
+- **`hit@1` 0/30 → 30/30, `p ≈ 0`, both pre-declared controls holding.**
+- **The threshold is the transferable result**: the shipped ranker starts losing
+  between a table share of **0.26 and 0.29**, and the ladder's median share among
+  table-bearing documents is **0.344**.
+- 🔴 **Nothing ships.** One synthetic corpus may not move a ranking default, so
+  it is [`compare/table-tokens-in-flen.compare.md`](compare/table-tokens-in-flen.compare.md),
+  status `proposed`, with the gap named: no probe has a table that **is** the
+  answer.
+- **W-144 does not close** — it becomes a ruling.
+
+### ✅ Decision 19's bar is computed, not compared by hand
+
+All three instruments independently reached for *"net >= 6"*, which is the
+**floor of all floors** and not the bar. A net of 8 on 30 discordant pairs
+clears 6 and fails decision 19's own table, which asks 12.
+`tools/quality-controls/verdict.py` returns the **exact two-sided binomial
+p-value**, reusing `resolution.py`. **No filed verdict changes** — every
+conclusion the flat comparison supported was *no detected change*, and those
+losses are one-sided. ADR-RS decision 19a.
+
+---
+
+## 2026-09-12 — W-107 Phases 1a-4: a second reader, and an importable Python surface
+
+**Shipped, unreleased** (`2.0.0-alpha.7`, no version bump — nothing published).
+Records: [ADR-NODE-SEARCH](../docs/adr/0155_node-search.md) ·
+[ADR-API](../docs/adr/0156_api.md), with amendments to
+[ADR-DOTFUX](../docs/adr/0102_fux-directory.md) (decision 6a),
+[ADR-DOCTOR](../docs/adr/0154_doctor.md), [ADR-MCP](../docs/adr/0136_mcp.md)
+(decision 11) and [ADR-T1-ACCELERATOR](../docs/adr/0110_accelerator.md).
+
+**What landed.** `node/` — 36 shipped files, no `dependencies` key and no build
+step — reads an index Python wrote, from `find` through `mcp`. `fux setup` and
+every `fux ingest` vendor it into `.fux/node/` with a `.fux/fux` shim, and
+**rewrite it when the engine version differs**: the fourth `.fux/` shape.
+`from fux import open` makes the read verbs importable, and
+`query/output.schema.json` is now the contract for three surfaces.
+
+**Outcome — measured on the real 253-shard / 959-record index**, which is the
+first time either arm ran on anything but a 15-shard fixture:
+
+| arm | result |
+|---|---|
+| `node_arm.py .` | **174 comparisons, 0 discordant** |
+| `graph_arm.py .` | **N2 IDENTICAL** — `3cefd48d…d4e6b6`, 738 nodes / 4 446 edges / 9 communities |
+| both, on the adversarial corpus (ids straddling U+FFFF), in a copy | **0 discordant**, digest identical |
+| `node --test` in `node/` | **9/9** |
+| clean-venv wheel install → `fux setup` → `fux ingest` → `.fux/fux find` in a scratch repo | answers, with no Python on the path |
+
+🔴 **N4 is NOT passed and is not claimed.** Node's scan p95 is **76.2 ms**
+(max 134.0) against a 150 ms fence — but on **959 documents**, a tenth of the
+design point, and Python measures **78.1 ms** on the same queries and corpus.
+**The ratio is 0.98, so there is no algorithmic divergence**, which is the only
+thing that fence was built to catch. What the number does say is that the
+fence's baseline — Phase 0's 50.2 ms at 10 000 documents — does not reproduce
+here. **Nothing was tuned.** A real N4 needs the superseding pre-registration
+(W-138 / H3), which does not exist yet.
+
+⚠ **No arm is reported green in any record.**
+[PRE-REGISTRATION-NODE](benchmark/PRE-REGISTRATION-NODE.md) §4 names
+`fux-playground`, which [L9](../docs/adr/0011_LAW-9-environments.md) voided as
+an instrument. The numbers above are a session's measurements, filed here and
+in the WORKLOG, and they adjudicate nothing.
+
+**Four defects, all shipped before this change and all fixed in it:** the
+library's PII gate imported every decoder (**50.2 ms → 2.6 ms**); the `.fux/fux`
+shim pointed at a path the reader stopped using two rulings ago; `mcp-tools.json`
+was missing from npm's `files`, so `fux mcp` would have broken in the published
+package; and Node advertised a **string** `"5"` default on a property declaring
+`"type": "integer"`.
+
+**Still open on W-107:** npm publication, the global bin, the renderer split,
+and the `doctor` PATH row. The item stays in `open/`.
+
+---
+
+## 2026-09-12 — W-106: the two-architecture arm, and what it inverts
+
+**The last thing the vector gate owed.** One embedder build, two instruction
+sets, every version pinned identically.
+
+| what | outcome | evidence |
+|---|---|---|
+| **The arm** | **Zero divergence at every level.** arm64 vs x86-64 (Rosetta), `torch 2.2.2` / `sentence-transformers 2.7.0` / `numpy 1.26.4` / `BAAI/bge-small-en-v1.5`: cosine **1.000000** minimum, **119/119** chunk and **124/124** query int8 vectors byte-identical, **0 of 93 312** codes differing, **0/124** top-5 orderings discordant | [the run](regression/2026-09-12-vector-gate-crossarch/report.md) |
+| **What it means** | 🔴 **It inverts where 2026-09-05 pointed.** Two *implementations* on one architecture: 0 of 125 identical, 41/50 discordant. Two *architectures* running one implementation: nothing. **The variable is the implementation, not the machine** — W-112's determinism claim narrows from *same clone + same build + same CPU* to **same build** | [W-112](open/W-112-vector-plane.md) |
+| **Corpus** | the golden ladder's `rung-seed` — 11 markdown documents → 119 chunks, all 124 questions. L9's data, not the playground's | [`work/golden/`](golden/README.md) |
+| 🔴 **What it does NOT do** | **It does not revive the vector plane.** DENSE-CHUNK's bar was untestable in 2026-09-05 (unreadable index) and is untestable now for a *new* reason: **the ladder's questions carry no rank contract**, because their key is sealed. A corpus that can carry the bar does not exist | [W-112](open/W-112-vector-plane.md) |
+| ⚠ **The caveat, stated not buried** | Rosetta runs the x86-64 **build** translated onto arm64. It answers *does the x86-64 build differ* — no — and only **stands in** for *does native x86-64 hardware differ*: under it the x86 kernels see no AVX-512, the exact mechanism that would break bit-equality. **Not quotable for a Linux/x86 runner** | [report §What this changes](regression/2026-09-12-vector-gate-crossarch/report.md) |
+
+⚠ **`informed`, and no delta stated against 2026-09-05** — different corpus,
+different query set, and one of them is the retired playground. The two are read
+side by side as two measurements, never subtracted.
+
+⚠ **Two silent traps, recorded because both cost time:** `torch 2.2.2` with
+`numpy>=2` raises *"Numpy is not available"* from inside `encode()`, naming
+neither version; and `arch -x86_64 uv` fails outright (Homebrew's `uv` is
+arm64-only), so the environments are built with the universal `/usr/bin/python3`.
+
+---
+
+
+## 2026-09-12 — W-138: every artifact reconciled with L9, and the guard that keeps it
+
+**The law landed on 2026-09-11; ~40 artifacts still used `fux-playground` as an
+instrument.** Reconciled forward only — no filed run was re-graded, no number
+edited.
+
+| what | outcome | evidence |
+|---|---|---|
+| **The three setup docs** | rewritten to link [L9](../docs/adr/0011_LAW-9-environments.md) and never restate it. SETUP-PLAYGROUND stops saying *grades* (its graded contract is a collapsed history block); SETUP-LAB names the golden ladder as its corpus and closes the 2026-08-22 five-repo redesign; **SETUP-BENCHMARK is rewritten as the spec W-139 builds against** | [`setup/`](setup/README.md) |
+| **The guard** | [`tests/test_l9_environments.py`](../tests/test_l9_environments.py) — **two rules, both mechanical**: no non-docstring string literal under `src/ tools/ tests/ scripts/` may name the environment (a path is built from literals; a comment recording history is not), and **every remaining mention is named in the test with a reason**, checked in both directions so the list cannot rot | ADR-LAW-9 veto 1 |
+| **The instrument that survived** | `tools/differential/playground_grade.py` → **`goldens_grade.py`**: `--corpus`/`--goldens` required, no default, grading logic byte-unchanged so its filed count is still reproducible | [ADR-ACCELERATOR](../docs/adr/0110_accelerator.md) |
+| **Five records** | ADR-RS · ADR-QUALITY · ADR-ACCELERATOR · ADR-CONFIDENCE · ADR-ANSWER, plus `GLOSSARY`. Four gained `L9` in `laws:`; ADR-ANSWER got a provenance note instead, because its mention is a citation of a filed run and not a procedure the law governs | the records |
+| **Two plans marked void in part** | [RUNBOOK-TUNER](benchmark/RUNBOOK-TUNER.md) and [the 2026-09-05 unblock](proposals/unblock-2026-09-05.md) — banners naming which legs died and what each needs now | L0: void in the conflicting part |
+| 🔴 **W-97's veto leg has no instrument, and cannot get one** | its blocker is not *unblocked*, it is **dead**: a veto needs a per-query rank contract, the ladder's questions carry none because the key is sealed, and authoring one inside the run that uses it is the contamination the whole scheme exists to stop | [W-97](open/W-97-tuner-knob-sweep.md) |
+| 🔴 **`recall@k` went backwards, not forwards** | ADR-QUALITY said the blocker was *migration* of an annotated file. That file is out of reach, so the blocker is now **no golden set that declares a relevance set at all** | [ADR-QUALITY](../docs/adr/0141_quality-contract.md) |
+
+⚠ **The item's DoD 1 was not met as written, deliberately.** It asked that
+`grep -rn fux-playground` return only L9, ADR-LAW-9, SETUP-PLAYGROUND and the
+guard. **That is unreachable without deleting measured provenance** — a dozen
+records, tests and comments name the corpus a filed number was taken on, and
+ADR-LAW-9 decision 4 (*forward only*) protects exactly those. The bar actually
+met: **nothing uses it as an instrument, and the four code roots are gated.**
+
+⚠ **18 unit tests were already red on arrival** from another session's
+uncommitted staged work (`src/fux/api.py`, ADR-0155/0156, a handoff pair written
+into the retired handoff directory, `Claude outputs/`). None is this item's and none was fixed here; `work/NOW.md`'s
+frontmatter was broken by this session and restored.
+
+---
+
+
 ## 2026-09-12 — W-143 answered NO; three controls learn what they test
 
 **Five items measured on the frozen golden ladder, every endpoint key-free.**

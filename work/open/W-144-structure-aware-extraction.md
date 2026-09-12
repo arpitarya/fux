@@ -2,9 +2,9 @@
 type: OpenItem
 id: W-144
 title: "W-144 — structure-aware extraction: does a table inflate `flen`?"
-description: "The graduation trigger on proposals/structure-aware-extraction.md fired when W-86's P4 (OOXML) landed — docx.py, pptx.py and xlsx.py all ship. The proposal's claim is that table cells inflate a document's field lengths, so BM25 length normalisation reads a table-heavy document as denser than it is. Unmeasured."
+description: "MEASURED 2026-09-12 and the answer is yes: excluding table-row tokens from flen ranks better, hit@1 0/30 -> 30/30 at p = 0 with both controls holding, above a table share of ~0.29 that a third of the golden ladder exceeds. One synthetic corpus may not ship a ranking change, so what is left is Arpit accepting or overriding the compare doc."
 status: open
-lane: agent
+lane: arpit
 timestamp: 2026-09-12T00:00:00Z
 ---
 
@@ -100,3 +100,66 @@ balling it 🟡 would hide runnable work from an agent, which picks from 🟢 on
 **The unblocked path:** build a graded set over table-heavy documents and answer
 *"is the new order better"* without waiting for anybody. It costs more than
 reading 16 ids off phase 5; it is available today.
+
+---
+
+## ✅ ANSWERED 2026-09-12 — and what remains is one ruling, not one task
+
+[VERDICT-W144](../regression/2026-09-12-reaim-and-instruments/VERDICT-W144.md) ·
+[the run](../regression/2026-09-12-reaim-and-instruments/report.md) §2.
+
+**The endpoint that saturated is fixed by one change: probe terms at `df` 4-23
+instead of `df == 1`.** A `df == 1` term's idf is unreachable by length
+normalisation, which is why the 2026-09-12 probe scored 12/12 in both arms at
+every dilution.
+
+| family | n | hit@1 shipped | hit@1 no-table | p |
+|---|---:|---:|---:|---:|
+| **main** | 30 | **0 / 30** | **30 / 30** | **0.0000** |
+| `inverse` (roles swapped) | 30 | 30 / 30 | 30 / 30 | — |
+| `placebo` (no table) | 30 | 30 / 30 | 30 / 30 | — |
+
+**Both pre-declared controls hold.** Verification gate passes on 330/330
+documents. Ground truth is **prose density** — the subject says the term 6 times
+in ~400 prose tokens, the rival 3 times in ~400 — which is the annotator's
+judgement, not the feature under test.
+
+### The threshold is the transferable result, not the 30-0
+
+| nominal table share | ≤ 0.26 | **0.29** | ≥ 0.33 |
+|---|---|---|---|
+| shipped wins | ✅ 30/30 | 🔴 **0/30** | 🔴 0/30 |
+
+**The ladder's median table share among table-bearing documents is 0.344**, and
+31 % of `rung-01000` carries a share ≥ 10 %. **The defect bites at shares real
+documents actually have.**
+
+⚠ The transition is a cliff because all 30 probes are built identically. A real
+corpus gives a gradient; the cliff **locates** the threshold.
+
+## 🔴 What is left: Arpit accepts or overrides the compare doc
+
+**This item's clause 2 — *"a null closes this item"* — is not reached.** Clause 3
+applies: *a compare doc for the field design, then an ADR amendment, then the
+change.*
+
+**The compare doc is filed:**
+[`work/compare/table-tokens-in-flen.compare.md`](../compare/table-tokens-in-flen.compare.md),
+status `proposed`, recommending **(b) exclude table-row tokens from `flen[body]`
+only**, with a reopen-trigger.
+
+🔴 **No session may implement it first.** `CLAUDE.md` §Conformance runs: *never
+ship a ranking/behaviour change off a single synthetic corpus*, and this is one.
+
+**The gap in the recommendation, stated because it is the thing to press on:**
+every probe's table is an **appendix**. There is no probe where the table *is*
+the answer — a rate card whose subject is its rows. Option (b) makes such a
+document shorter than it reads and gives its rare cell terms more idf leverage.
+**Not measured.**
+
+**If (b) is accepted**, the work is small and mostly done: `split_body`'s rule
+moves from `tools/quality-controls/table_flen.py` into `ingest/extract.py` (it
+already agrees with the committed index on 330/330 and 994/994 documents), then
+[ADR-EXTRACTED](../../docs/adr/0115_extracted-mode.md) is amended in the same
+change, then an L3 determinism check, then the re-measurement the
+reopen-trigger names.

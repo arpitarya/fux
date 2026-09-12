@@ -93,21 +93,31 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 PY = ROOT / ".venv" / "bin" / "python"
+FUX = ROOT / ".venv" / "bin" / "fux"
 
-#: ADR-RS decision 19 — the floor of all floors. Never lowered to fit a result.
-FLOOR = 6
+sys.path.insert(0, str(ROOT / "tools" / "quality-controls"))
+from verdict import FLOOR_OF_ALL_FLOORS, line as vline, rule as vrule  # noqa: E402
 
 SEED = 20260912
 
-#: Nonsense topic tokens: `df` is controlled by the generator rather than by
-#: whatever English happens to be common, so a probe's difficulty is a property
-#: of the corpus and not of the language.
-TOPICS = [
-    "zolfrane", "quendrix", "marbeth", "vintaro", "kelspar", "oridune",
-    "thalmet", "pyrrocol", "bexwald", "cindrol", "nyquath", "sperrin",
-    "drovane", "ashkeld", "morrivan", "telquist", "havorne", "brendisk",
-    "orsalis", "wickmare",
-]
+#: Probe topics are COMPOSED, not listed, for the same reason W-144's are:
+#: `df` becomes the generator's choice rather than English's, and the set can be
+#: widened without a hand-written list drifting out of unique.
+_A = ("zol", "quen", "mar", "vin", "kel", "ori", "thal", "pyr", "bex", "cin",
+      "nyq", "sper", "dro", "ash", "mor", "tel", "hav", "bren", "ors", "wick",
+      "gal", "olm", "syr", "dun", "fen", "lor", "tav", "esk", "rud", "pil")
+_B = ("frane", "drix", "beth", "taro", "spar", "dune", "met", "rocol", "wald",
+      "drol")
+#: 🔴 **Ninety topics, THIRTY probes — one disjoint slice per family, and this
+#: was a defect before it was a design.** The first version reused one topic
+#: across all three families, so a query for it matched the `fence` subject,
+#: the `depth` subject AND the `placebo` subject at once. The three pairs
+#: competed with each other, `hit@1` was 0 in both arms on two families, and the
+#: whole endpoint read as Inconclusive for a reason that had nothing to do with
+#: W-115. A probe that shares its query with another probe is not a probe.
+TOPICS = [a + b for b in _B for a in _A][:90]
+assert len(set(TOPICS)) == 90
+N_PROBES = 30
 
 #: The subjects the decoys are genuinely about, so a decoy is a real document
 #: rather than a sentence with a code block stapled to it.
@@ -117,7 +127,11 @@ DECOY_SUBJECTS = [
     "backup verification", "socket tuning", "batch replay", "mirror sync",
     "quota audit", "shard rebalance", "trace sampling", "alert routing",
     "image pruning", "session eviction", "route reload", "credential vaulting",
+    "snapshot pruning", "lease renewal", "digest rebuild", "watchdog restart",
+    "cursor replay", "bucket lifecycle", "endpoint drain", "secret rollover",
+    "journal compaction", "cluster cordon",
 ]
+assert len(DECOY_SUBJECTS) >= N_PROBES
 
 FILLER_TOPICS = [
     "dock scheduling", "reefer maintenance", "driver rostering", "fuel reconciliation",
@@ -125,75 +139,115 @@ FILLER_TOPICS = [
 ]
 
 
+def scaffold(dest: Path, types: list[str]) -> None:
+    """Let `fux setup` write the repo, then declare the corpus.
+
+    ⚠ **Hand-writing `fux.toml` was wrong and failed loudly, which is the point.**
+    `[sources] dirs` stopped being a TOML key when ADR-DIR-LIST landed, and a
+    generator carrying its own copy of the config shape is a second source of
+    truth that drifts silently. `fux setup` is the one that cannot.
+    """
+    # 🔴 `git init` FIRST, and it is not optional. The repo root is resolved by
+    # walking up, and `~/my_programs/fux-lab/` carries its own `fux.toml` — so
+    # without a root here `fux setup` silently adopts the LAB as the repo and
+    # writes nothing in the corpus. It exits 0 while doing it.
+    subprocess.run(["git", "init", "-q"], cwd=str(dest), check=True)
+    r = subprocess.run([str(FUX), "setup", "--no-agents"], cwd=str(dest),
+                       text=True, capture_output=True, check=False)
+    if r.returncode != 0:
+        sys.stderr.write(r.stdout + r.stderr)
+        raise SystemExit("fux setup failed")
+    (dest / ".fux" / "sources" / "dirs").write_text(
+        "# The generated corpus. Declared, never derived (ADR-DIR-LIST).\ndocs\n",
+        encoding="utf-8")
+    # ⚠ **No types file is written, and the argument is kept only to document
+    # that.** The list moved to `.fux/formats.toml` (ADR-TYPES decision 12) and
+    # `setup` writes the built-in default there — which already admits every
+    # format these corpora use. A second list here is refused by name, which is
+    # how this was found rather than guessed at.
+    assert types, "the corpus must name the formats it depends on"
+
+
 # ---------------------------------------------------------------------------
 # gen
 # ---------------------------------------------------------------------------
 
-def _subject_md(topic: str, i: int) -> str:
-    """A document that IS about `topic`: title, headings and prose all say so."""
+#: 🔴 **The first version of these documents saturated at 30/30 in both arms,
+#: and the reason is worth keeping.** The subject carried the topic in its
+#: TITLE, its H1 and a dozen prose sentences, so it outranked its decoy
+#: whatever the decoy's fenced comment counted as. The selftest passed — the
+#: arms really did extract different headings — and the ranking still could not
+#: move, which is decision 22d's Inconclusive arriving through the back door:
+#: the endpoint had no headroom even though the corpus did.
+#:
+#: **The pair is now built so the contested field is the ONLY thing deciding.**
+#: A subject is about its topic in PROSE, at a tf the caller sets; a decoy
+#: mentions it `FENCE_HITS` times and only inside a code fence. Pre-W-115 those
+#: fenced lines are headings at `bm25f.heading` (3.0 shipped) and are removed
+#: from the body; post-W-115 they are ordinary body text at 1.0.
+
+#: How many times a decoy names the topic inside its fence.
+FENCE_HITS = 3
+
+PROSE_FILLER = (
+    "consignment despatch tolerance interval calibration schedule handover "
+    "register escalation supervisor ambient variance corridor threshold "
+    "inspection clearance dispatch reconciliation allocation checkpoint"
+).split()
+
+
+def _pad(rng: random.Random, n: int) -> str:
+    words = [rng.choice(PROSE_FILLER) for _ in range(n)]
+    return "\n".join(" ".join(words[i:i + 14]) + "." for i in range(0, len(words), 14))
+
+
+def _subject_md(rng: random.Random, topic: str, subject: str, i: int, tf: int) -> str:
+    """About `topic` in PROSE only. Its title and headings never name the topic,
+    so the whole of its case is body evidence — which is the half the fence
+    change does not touch."""
+    hits = "\n".join(
+        f"The {topic} reading is logged against the register before the shift closes."
+        for _ in range(tf))
     return (
-        f"---\ntitle: {topic.title()} handling procedure\n---\n\n"
-        f"# {topic.title()} handling procedure\n\n"
-        f"This procedure covers {topic} end to end. Every {topic} event is logged\n"
-        f"against the {topic} register before the shift closes.\n\n"
-        f"## When {topic} is detected\n\n"
-        f"- Raise a {topic} ticket within fifteen minutes.\n"
-        f"- Record the {topic} reading and the ambient reading together.\n"
-        f"- A second {topic} reading is taken thirty minutes later.\n\n"
-        f"## Escalation for {topic}\n\n"
-        f"If two consecutive {topic} readings exceed the band, escalate to the duty\n"
-        f"supervisor. The supervisor owns the {topic} decision from that point.\n\n"
-        f"## Records\n\n"
-        f"The {topic} register is retained for seven years. Reference {i:04d}.\n"
-    )
+        f"---\ntitle: {subject.title()} procedure\n---\n\n"
+        f"# {subject.title()} procedure\n\n"
+        f"{hits}\n\n"
+        f"## Detail\n\n{_pad(rng, 60)}\n\n"
+        f"## Records\n\nRetained for seven years. Reference {i:04d}.\n")
 
 
-def _decoy_md(topic: str, subject: str, i: int) -> str:
-    """A document about `subject` whose ONLY link to `topic` is a fenced shell
-    comment — incidental, not a section, and not what the document is about."""
+def _decoy_md(rng: random.Random, topic: str, subject: str, i: int) -> str:
+    """About `subject`. Its ONLY mention of `topic` is inside a code fence."""
+    fence = "\n\n".join(
+        f"# {topic.title()} step {k + 1}\nopsctl run --stage {k + 1}"
+        for k in range(FENCE_HITS))
     return (
         f"---\ntitle: {subject.title()} runbook\n---\n\n"
         f"# {subject.title()} runbook\n\n"
-        f"This runbook covers {subject}. Run it from the operations host after the\n"
-        f"nightly window closes.\n\n"
-        f"## Procedure\n\n"
-        f"```bash\n"
-        f"# {topic.title()} check before we start\n"
-        f"opsctl preflight --stage {subject.split()[0]}\n"
-        f"\n"
-        f"# {topic.title()} threshold, do not edit\n"
-        f"opsctl set-threshold --value 4\n"
-        f"\n"
-        f"# {topic.title()} teardown\n"
-        f"opsctl teardown --force\n"
-        f"```\n\n"
-        f"## Rollback\n\n"
-        f"Re-run the preflight and stop. Reference {i:04d}.\n"
-    )
+        f"Run this from the operations host after the nightly window closes.\n\n"
+        f"## Procedure\n\n```bash\n{fence}\n```\n\n"
+        f"## Detail\n\n{_pad(rng, 60)}\n\n"
+        f"## Rollback\n\nRe-run the preflight and stop. Reference {i:04d}.\n")
 
 
-def _subject_yaml(topic: str, i: int) -> str:
-    """`topic` as a TOP-LEVEL key — a heading in both arms."""
-    return (
-        f"{topic}:\n"
-        f"  owner: duty supervisor\n"
-        f"  window: nightly\n"
-        f"  note: the {topic} policy is reviewed each quarter\n"
-        f"reference: R{i:04d}\n"
-    )
+def _subject_yaml(rng: random.Random, topic: str, subject: str, i: int, tf: int) -> str:
+    """`topic` in VALUES only — prose to every arm, never a key."""
+    notes = "\n".join(f"  note_{k}: the {topic} reading is logged before handover"
+                       for k in range(tf))
+    return (f"{subject.replace(' ', '_')}_procedure:\n{notes}\n"
+            f"  detail: {' '.join(rng.choice(PROSE_FILLER) for _ in range(30))}\n"
+            f"reference: R{i:04d}\n")
 
 
-def _decoy_yaml(topic: str, subject: str, i: int) -> str:
-    """`topic` buried at depth 5 — a heading in the OLD arm, bold body in the new."""
-    return (
-        f"{subject.replace(' ', '_')}:\n"
-        f"  stages:\n"
-        f"    preflight:\n"
-        f"      checks:\n"
-        f"        {topic}: threshold four, do not edit\n"
-        f"      note: the {subject} preflight runs first\n"
-        f"  reference: R{i:04d}\n"
-    )
+def _decoy_yaml(rng: random.Random, topic: str, subject: str, i: int) -> str:
+    """`topic` as a depth-5 KEY, `FENCE_HITS` times over. A heading at every
+    depth in the old arm; bold body text past depth 2 in the shipped one."""
+    blocks = "\n".join(
+        f"    stage_{k}:\n      checks:\n        {topic}: threshold four, do not edit"
+        for k in range(FENCE_HITS))
+    return (f"{subject.replace(' ', '_')}_pipeline:\n  stages:\n{blocks}\n"
+            f"  detail: {' '.join(rng.choice(PROSE_FILLER) for _ in range(30))}\n"
+            f"reference: R{i:04d}\n")
 
 
 def _filler(rng: random.Random, i: int) -> tuple[str, str]:
@@ -212,44 +266,52 @@ def cmd_gen(a) -> int:
     if dest.exists():
         shutil.rmtree(dest)
     (dest / "docs").mkdir(parents=True)
-    (dest / ".fux").mkdir(parents=True, exist_ok=True)
-    (dest / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    scaffold(dest, ['.md', '.txt', '.yaml', '.json', '.jsonl', '.csv'])
 
     rng = random.Random(SEED)
     probes: list[dict] = []
     files: dict[str, str] = {}
 
-    for i, (topic, subject) in enumerate(zip(TOPICS, DECOY_SUBJECTS)):
-        # -- family `fence`: markdown, a shell comment that looks like a heading
-        s = f"docs/{i:03d}-{topic}-procedure.md"
-        d = f"docs/{i:03d}-{subject.replace(' ', '-')}-runbook.md"
-        files[s] = _subject_md(topic, i)
-        files[d] = _decoy_md(topic, subject, i)
+    for i in range(N_PROBES):
+        subject = DECOY_SUBJECTS[i]
+        tf = a.tf
+        slug = subject.replace(" ", "-")
+
+        # -- family `fence`: a shell comment that looks like a heading
+        topic = TOPICS[i]
+        s = f"docs/{i:03d}-{slug}-procedure.md"
+        d = f"docs/{i:03d}-{slug}-runbook.md"
+        files[s] = _subject_md(rng, topic, subject, i, tf)
+        files[d] = _decoy_md(rng, topic, subject, i)
         probes.append({"id": f"f{i:02d}", "family": "fence", "query": topic,
-                       "relevant": s, "decoy": d,
+                       "relevant": s, "decoy": d, "subject_tf": tf,
                        "why": f"the runbook's only {topic} is a fenced shell comment"})
 
-        # -- family `depth`: yaml, a fifth-level key
-        sy = f"docs/{i:03d}-{topic}-policy.yaml"
-        dy = f"docs/{i:03d}-{subject.replace(' ', '-')}-pipeline.yaml"
-        files[sy] = _subject_yaml(topic, i)
-        files[dy] = _decoy_yaml(topic, subject, i)
-        probes.append({"id": f"d{i:02d}", "family": "depth", "query": f"{topic} policy",
-                       "relevant": sy, "decoy": dy,
+        # -- family `depth`: a fifth-level config key
+        topic = TOPICS[N_PROBES + i]
+        sy = f"docs/{i:03d}-{slug}-policy.yaml"
+        dy = f"docs/{i:03d}-{slug}-pipeline.yaml"
+        files[sy] = _subject_yaml(rng, topic, subject, i, tf)
+        files[dy] = _decoy_yaml(rng, topic, subject, i)
+        probes.append({"id": f"d{i:02d}", "family": "depth", "query": topic,
+                       "relevant": sy, "decoy": dy, "subject_tf": tf,
                        "why": f"the pipeline's only {topic} is a depth-5 key"})
 
-        # -- family `placebo`: the same question shape with NO decoy mechanism.
-        #    Both arms must score it identically; if they do not, something
-        #    other than the feature is moving and the run is void.
-        sp = f"docs/{i:03d}-{topic}-charter.md"
-        files[sp] = (
-            f"---\ntitle: {topic.title()} charter\n---\n\n"
-            f"# {topic.title()} charter\n\n"
-            f"The {topic} charter states who owns {topic} and who reviews it.\n"
-            f"There is no code in this document. Reference C{i:04d}.\n")
-        probes.append({"id": f"p{i:02d}", "family": "placebo", "query": f"{topic} charter",
-                       "relevant": sp, "decoy": None,
-                       "why": "no fence and no deep key — neither arm can differ"})
+        # -- family `placebo`: the same shape with NO fence and NO deep key, so
+        #    neither arm can differ. If it moves, the run is void.
+        topic = TOPICS[2 * N_PROBES + i]
+        sp = f"docs/{i:03d}-{slug}-charter.md"
+        dp = f"docs/{i:03d}-{slug}-note.md"
+        files[sp] = _subject_md(rng, topic, subject, i, tf)
+        files[dp] = (
+            f"---\ntitle: {subject.title()} note\n---\n\n"
+            f"# {subject.title()} note\n\n"
+            + "\n".join(f"A {topic} item was raised and closed."
+                        for _ in range(FENCE_HITS))
+            + f"\n\n## Detail\n\n{_pad(rng, 60)}\n")
+        probes.append({"id": f"p{i:02d}", "family": "placebo", "query": topic,
+                       "relevant": sp, "decoy": dp, "subject_tf": tf,
+                       "why": "the decoy's mentions are plain prose — neither arm can differ"})
 
     for i in range(a.filler):
         rel, body = _filler(rng, i)
@@ -262,10 +324,6 @@ def cmd_gen(a) -> int:
 
     (dest / "probes.jsonl").write_text(
         "".join(json.dumps(p, sort_keys=True) + "\n" for p in probes), encoding="utf-8")
-    (dest / "fux.toml").write_text(
-        '[sources]\ndirs = ["docs"]\n'
-        'types = [".md", ".txt", ".yaml", ".json", ".jsonl", ".csv"]\n',
-        encoding="utf-8")
     print(f"{len(files)} documents, {len(probes)} probes -> {dest}")
     print(f"  fence   {sum(1 for p in probes if p['family'] == 'fence')}")
     print(f"  depth   {sum(1 for p in probes if p['family'] == 'depth')}")
@@ -277,38 +335,49 @@ def cmd_gen(a) -> int:
 # the two arms
 # ---------------------------------------------------------------------------
 
+#: The two seams, patched identically by the arm driver and by the selftest so
+#: they can never disagree about what "old" means.
+#:
+#: ⚠ **`_label` has to be patched on FOUR modules, not one.** `yaml`, `jsonl`
+#: and `xml` each do `from fux.decode.json import _label`, so each holds its own
+#: reference and rebinding `json._label` alone leaves three decoders on the
+#: shipped behaviour. The first selftest did exactly that and reported 30 of 60
+#: decoys separable — which is what a selftest is for.
+PATCH_OLD = r"""
+import re as _re
+
+_OLD_MD = _re.compile(r"^(#{1,6})\s+(?P<text>.+?)\s*$", _re.MULTILINE)
+
+
+def patch_old():
+    import fux.decode.json as _J
+    import fux.decode.jsonl as _JL
+    import fux.decode.xml as _XM
+    import fux.decode.yaml as _YA
+    import fux.ingest.extract as _E
+
+    def _old_headings_and_body(rel_path, body):
+        g = _E._grammar(rel_path) or _OLD_MD
+        return ([m.group("text").strip() for m in g.finditer(body)], g.sub("", body))
+
+    def _old_label(label, depth):
+        return "#" * min(depth, 6) + " " + label
+
+    _E._headings_and_body = _old_headings_and_body
+    for _m in (_J, _JL, _XM, _YA):
+        _m._label = _old_label
+"""
+
 #: Run inside a fresh interpreter so the `old` arm's patches cannot leak into
 #: the `new` arm through a warm module cache.
-ARM_DRIVER = r'''
-import json, re, sys
+ARM_DRIVER = PATCH_OLD + r'''
+import json, sys
 from pathlib import Path
 
 arm, root, probes_path, out_path = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
 
 if arm == "old":
-    import fux.ingest.extract as E
-    import fux.decode.json as J
-
-    # The pre-W-115 grammar, verbatim from 94231b2: one regex, no fence
-    # awareness, applied to every extension without its own pattern.
-    _OLD = re.compile(r"^(#{1,6})\s+(?P<text>.+?)\s*$", re.MULTILINE)
-
-    def _old_headings_and_body(rel_path, body):
-        grammar = E._grammar(rel_path)
-        if grammar is None:
-            grammar = _OLD
-        return ([m.group("text").strip() for m in grammar.finditer(body)],
-                grammar.sub("", body))
-
-    E._headings_and_body = _old_headings_and_body
-
-    # The pre-W-115 label: a container key is a heading at EVERY depth.
-    J._label = lambda label, depth: "#" * min(depth, 6) + " " + label
-
-import fux.decode.jsonl as JL, fux.decode.yaml as YA, fux.decode.xml as XM
-for mod in (JL, YA, XM):
-    if hasattr(mod, "_label"):
-        mod._label = J._label if arm == "old" else mod._label
+    patch_old()
 
 from fux.cli import main
 
@@ -365,75 +434,109 @@ def _run_arm(arm: str, corpus: Path, probes: Path, out: Path) -> None:
 
 def cmd_selftest(a) -> int:
     """ADR-RS 22c(b): the arms must disagree about the decoys and about nothing
-    else. Asserted on extraction, before any ranking number exists."""
+    else. Asserted on extraction, in two fresh processes, before any ranking
+    number exists.
+
+    🔴 **Two processes, not two calls.** `patch_old()` rebinds module globals,
+    and a decoder's output is produced inside `parse_document` — so an in-process
+    "unpatch" would be a second implementation of the thing under test. Each arm
+    gets its own interpreter and the parent only diffs the two dumps.
+    """
     corpus = Path(a.corpus)
-    probes = [json.loads(l) for l in (corpus / "probes.jsonl").read_text().splitlines() if l.strip()]
-    script = r'''
-import json, re, sys
-from pathlib import Path
-sys.path.insert(0, "")
-import fux.ingest.extract as E
-import fux.decode.json as J
-from fux.ingest.parse import parse_document
-from fux.decode import decode
-
-_OLD = re.compile(r"^(#{1,6})\s+(?P<text>.+?)\s*$", re.MULTILINE)
-def old_h(rel, body):
-    g = E._grammar(rel) or _OLD
-    return [m.group("text").strip() for m in g.finditer(body)], g.sub("", body)
-
-corpus = Path(sys.argv[1])
-out = {}
-for rel in sorted(json.loads(sys.argv[2])):
-    p = corpus / rel
-    raw = p.read_bytes()
-    try:
-        text = decode(p.name, raw)
-    except Exception:
-        text = raw.decode("utf-8", "replace")
-    doc = parse_document(text)
-    new = E._headings_and_body(rel, doc.body)[0]
-    old = old_h(rel, doc.body)[0]
-    out[rel] = {"new": new, "old": old, "differs": new != old}
-print(json.dumps(out))
-'''
+    probes = [json.loads(l) for l in (corpus / "probes.jsonl").read_text().splitlines()
+              if l.strip()]
     rels = sorted({p["relevant"] for p in probes} | {p["decoy"] for p in probes if p["decoy"]})
+
+    script = PATCH_OLD + r"""
+import json, sys
+from pathlib import Path
+
+arm, corpus = sys.argv[1], Path(sys.argv[2])
+if arm == "old":
+    patch_old()
+
+import fux.ingest.extract as E
+from fux.ingest.parse import parse_document
+
+out = {}
+for rel in json.loads(sys.argv[3]):
+    doc = parse_document((corpus / rel).read_bytes(), rel, corpus)
+    out[rel] = None if doc is None else E._headings_and_body(rel, doc.body)[0]
+print(json.dumps(out))
+"""
     drv = corpus / "_selftest.py"
     drv.write_text(script, encoding="utf-8")
-    r = subprocess.run([str(PY), str(drv), str(corpus), json.dumps(rels)],
-                       cwd=str(corpus), text=True, capture_output=True, check=False)
-    if r.returncode != 0:
-        sys.stderr.write(r.stderr)
-        return 1
-    got = json.loads(r.stdout)
+    dumps = {}
+    for arm in ("old", "new"):
+        r = subprocess.run([str(PY), str(drv), arm, str(corpus), json.dumps(rels)],
+                           cwd=str(corpus), text=True, capture_output=True, check=False)
+        if r.returncode != 0:
+            sys.stderr.write(r.stderr)
+            return 1
+        dumps[arm] = json.loads(r.stdout)
+
+    unreadable = [rel for rel in rels if dumps["new"][rel] is None]
     decoys = {p["decoy"] for p in probes if p["decoy"]}
-    relevant = {p["relevant"] for p in probes}
-    d_differ = sum(1 for rel in decoys if got[rel]["differs"])
-    r_differ = sum(1 for rel in relevant if got[rel]["differs"])
-    print(f"decoys whose heading set differs between the arms:   {d_differ} / {len(decoys)}")
-    print(f"subjects whose heading set differs between the arms: {r_differ} / {len(relevant)}")
-    ok = d_differ == len(decoys) and r_differ == 0
+    subjects = {p["relevant"] for p in probes}
+    differs = {rel for rel in rels if dumps["old"][rel] != dumps["new"][rel]}
+
+    d_diff = len(decoys & differs)
+    s_diff = len(subjects & differs)
+    print(f"documents read in both arms:                         "
+          f"{len(rels) - len(unreadable)} / {len(rels)}")
+    print(f"decoys whose heading set differs between the arms:    {d_diff} / {len(decoys)}")
+    print(f"subjects whose heading set differs between the arms:  {s_diff} / {len(subjects)}")
+    by_fam = {}
+    for p in probes:
+        if p["decoy"]:
+            by_fam.setdefault(p["family"], [0, 0])
+            by_fam[p["family"]][1] += 1
+            if p["decoy"] in differs:
+                by_fam[p["family"]][0] += 1
+    for fam, (d, n) in sorted(by_fam.items()):
+        print(f"  {fam:<8} {d} / {n}")
+    # 🔴 **The placebo family must be INSEPARABLE — that is its entire job**,
+    # so a blanket "every decoy differs" is the wrong assertion and said so the
+    # first time it ran. Three conditions, one per role.
+    treated = {f: by_fam.get(f, [0, 0]) for f in ("fence", "depth")}
+    pl_d, pl_n = by_fam.get("placebo", [0, 0])
+    ok = (all(d == n and n for d, n in treated.values())
+          and pl_d == 0 and s_diff == 0 and not unreadable)
     print()
     if ok:
-        print("SELFTEST PASSES (ADR-RS 22c(b)): every decoy is separable by the "
-              "property under test and no subject is. Headroom is PROVEN, not observed.")
+        print("SELFTEST PASSES (ADR-RS 22c(b)): every TREATED decoy is separable "
+              "by the property under test, no placebo decoy is, and no subject is. "
+              "Headroom is PROVEN, not observed.")
     else:
         print("SELFTEST FAILS: the arms do not isolate the property under test. "
               "Any number from this corpus measures something else.")
+        if s_diff:
+            print(f"  {s_diff} SUBJECT documents also differ — the arms are moving "
+                  f"documents the probe does not control for.")
+        for fam, (d, n) in sorted(treated.items()):
+            if d != n:
+                print(f"  treated family `{fam}`: only {d} of {n} decoys are separable.")
+        if pl_d:
+            print(f"  placebo family: {pl_d} of {pl_n} decoys ARE separable, and none "
+                  f"may be — the control cannot vouch for anything.")
     return 0 if ok else 1
+
+
+def _both_arms(corpus: Path):
+    probes_path = corpus / "probes.jsonl"
+    probes = [json.loads(l) for l in probes_path.read_text().splitlines() if l.strip()]
+    out = {}
+    for arm in ("old", "new"):
+        dest = corpus.parent / f"{corpus.name}-rows-{arm}.jsonl"
+        _run_arm(arm, corpus, probes_path, dest)
+        out[arm] = {json.loads(l)["id"]: json.loads(l)
+                    for l in dest.read_text().splitlines() if l.strip()}
+    return probes, out
 
 
 def cmd_run(a) -> int:
     corpus = Path(a.corpus)
-    probes_path = corpus / "probes.jsonl"
-    probes = [json.loads(l) for l in probes_path.read_text().splitlines() if l.strip()]
-    scratch = corpus.parent
-    out = {}
-    for arm in ("old", "new"):
-        dest = scratch / f"rows-{arm}.jsonl"
-        _run_arm(arm, corpus, probes_path, dest)
-        out[arm] = {json.loads(l)["id"]: json.loads(l)
-                    for l in dest.read_text().splitlines() if l.strip()}
+    probes, out = _both_arms(corpus)
 
     fams = ["fence", "depth", "placebo"]
     print()
@@ -455,23 +558,23 @@ def cmd_run(a) -> int:
     print()
     for fam in ("fence", "depth"):
         nq, o, n, do, dn, b, c = verdicts[fam]
-        disc, net = b + c, abs(b - c)
+        v = vrule(b, c, better="the SHIPPED arm (W-115) ranks better",
+                  worse="the PRE-W-115 arm ranks better")
         head_imp = sum(1 for p in probes if p["family"] == fam
                        and not (out["old"][p["id"]]["hit1"] and out["new"][p["id"]]["hit1"]))
         head_reg = sum(1 for p in probes if p["family"] == fam
                        and (out["old"][p["id"]]["hit1"] or out["new"][p["id"]]["hit1"]))
         print(f"[{fam}] headroom improvement {head_imp}/{nq} · regression {head_reg}/{nq} "
               f"(ADR-RS 22b, PROVEN by --selftest under 22c(b))")
-        if disc == 0:
+        print(f"[{fam}] {vline(v)}")
+        if v["outcome"] == "inconclusive":
             print(f"[{fam}] INCONCLUSIVE (22d): not one probe moved between the arms.")
-        elif net >= FLOOR:
-            better = "NEW (shipped W-115)" if b > c else "OLD (pre-W-115)"
-            print(f"[{fam}] {better} RANKS BETTER: discordant {disc}, net {net}, "
-                  f"floor {FLOOR}. b={b} probes the shipped arm gets right and the "
-                  f"old arm does not; c={c} the other way.")
+        elif v["outcome"] == "no detected change":
+            print(f"[{fam}] NO DETECTED CHANGE. The floor of all floors is "
+                  f"{FLOOR_OF_ALL_FLOORS}; at {v['discordant']} discordant pairs the "
+                  f"bar is a net of {v['net_needed']}. Do not lower it.")
         else:
-            print(f"[{fam}] NO DETECTED CHANGE: discordant {disc}, net {net}, below "
-                  f"the floor of {FLOOR}. Do not lower the floor.")
+            print(f"[{fam}] {v['outcome']}.")
     nq, o, n, *_ = verdicts["placebo"]
     print()
     if o == n:
@@ -493,15 +596,76 @@ def cmd_run(a) -> int:
     return 0
 
 
+def cmd_sweep(a) -> int:
+    """Dose-response over the subject's prose `tf`: at what weight of ordinary
+    body evidence does a mis-mined heading stop deciding the answer?
+
+    🔴 **This exists because a single `tf` is the author's choice and says so.**
+    `hit@1` flipping 0/30 -> 30/30 at one `tf` is partly a statement about that
+    `tf`. The curve is not: it reports how much genuine prose evidence a correct
+    document needs before a decoy's fenced comment — weighted `bm25f.heading`
+    3.0 in the pre-W-115 arm — stops outranking it.
+
+    It is also the diagnostic. A family that is Inconclusive at every `tf` has an
+    endpoint that cannot move, which is decision 22d and not a null.
+    """
+    import contextlib
+    import io
+    rows = []
+    print(f"{'subject tf':>10}  {'family':>8}  {'hit@1 old':>10}  {'hit@1 new':>10}  "
+          f"{'decoy@1 o->n':>12}  {'p':>9}  outcome")
+    for tf in a.tf_values:
+        ns = argparse.Namespace(dest=a.corpus, filler=a.filler, tf=tf)
+        with contextlib.redirect_stdout(io.StringIO()):
+            cmd_gen(ns)
+        corpus = Path(a.corpus)
+        with contextlib.redirect_stdout(io.StringIO()):
+            probes, out = _both_arms(corpus)
+        for fam in ("fence", "depth", "placebo"):
+            ids = [p["id"] for p in probes if p["family"] == fam]
+            o = sum(1 for i in ids if out["old"][i]["hit1"])
+            n = sum(1 for i in ids if out["new"][i]["hit1"])
+            do = sum(1 for i in ids if out["old"][i]["decoy_at_1"])
+            dn = sum(1 for i in ids if out["new"][i]["decoy_at_1"])
+            # ⚠ **Secondary, and it is NOT the pre-registered endpoint.** The
+            # bar is on `hit@1`. `decoy@1` was already in the instrument when it
+            # was committed, and it is the more sensitive question — *does a
+            # document whose only mention is an incidental shell comment take
+            # the top slot* — so it is reported and labelled, never adjudicated.
+            b = sum(1 for i in ids if out["new"][i]["hit1"] and not out["old"][i]["hit1"])
+            c = sum(1 for i in ids if out["old"][i]["hit1"] and not out["new"][i]["hit1"])
+            v = vrule(b, c, better="shipped better", worse="pre-W-115 better")
+            print(f"{tf:>10}  {fam:>8}  {o:>5} /{len(ids):<4}  {n:>5} /{len(ids):<4}  "
+                  f"{do:>6} -> {dn:<4}  {v['p']:>9.4f}  {v['outcome']}")
+            rows.append({"subject_tf": tf, "family": fam, "n": len(ids),
+                         "hit1_old": o, "hit1_new": n,
+                         "decoy1_old": do, "decoy1_new": dn, **v})
+        print()
+    if a.json:
+        dest = Path(a.json); dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_text("".join(json.dumps(r, sort_keys=True) + "\n" for r in rows),
+                        encoding="utf-8")
+        print(f"sweep rows ({len(rows)}) -> {a.json}")
+    return 0
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     sub = ap.add_subparsers(dest="verb", required=True)
     g = sub.add_parser("gen"); g.add_argument("--dest", required=True)
-    g.add_argument("--filler", type=int, default=120); g.set_defaults(fn=cmd_gen)
+    g.add_argument("--filler", type=int, default=120)
+    g.add_argument("--tf", type=int, default=4,
+                   help="how many times a SUBJECT names its topic in prose")
+    g.set_defaults(fn=cmd_gen)
     s = sub.add_parser("selftest"); s.add_argument("--corpus", required=True)
     s.set_defaults(fn=cmd_selftest)
     r = sub.add_parser("run"); r.add_argument("--corpus", required=True)
     r.add_argument("--json"); r.set_defaults(fn=cmd_run)
+    w = sub.add_parser("sweep"); w.add_argument("--corpus", required=True)
+    w.add_argument("--tf-values", type=int, nargs="+", dest="tf_values",
+                   default=[1, 2, 3, 4, 6, 8])
+    w.add_argument("--filler", type=int, default=120)
+    w.add_argument("--json"); w.set_defaults(fn=cmd_sweep)
     a = ap.parse_args()
     return a.fn(a)
 

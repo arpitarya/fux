@@ -236,10 +236,27 @@ one call, so whatever counted as a heading is exactly what left the body — the
 can no longer disagree.
 
 ⚠ **This re-ranks every document containing a fenced code block**, which in this
-repository is most of them. **Unmeasured** — `fux-lab` does not exist (W-56) —
-and landed anyway on Arpit's 2026-09-06 ruling that a defect fix does not wait
-on a measurement to tell it a shell comment was never a heading. Recorded as
-unmeasured in `work/OPEN-WORK.md`.
+repository is most of them. It landed **unmeasured**, on Arpit's 2026-09-06
+ruling that a defect fix does not wait on a measurement to tell it a shell
+comment was never a heading.
+
+✅ **MEASURED 2026-09-12, and the ruling was right.**
+[VERDICT-W115](../../work/regression/2026-09-12-reaim-and-instruments/VERDICT-W115.md):
+on 30 probes where a document's *only* mention of the query term is a `#` line
+inside a ```bash block, the **pre-change engine puts that document at rank 1 in
+all 30** — and at every level of prose evidence the correct document has, from
+one sentence to eight. The shipped grammar puts it at rank 1 in **none**.
+`hit@1` 0/30 → 30/30, `p ≈ 0`, with headroom **proven** under
+[ADR-RS](0133_predictions.md) decision 22c(b) and a placebo family that does not
+move.
+
+⚠ **Three corpora could not see this before, and the stated reason was wrong.**
+It was recorded as *"not one of the formats W-115 touches"*; `.rst`, `.adoc` and
+`.org` in fact predate this change and were untouched by it, while **Markdown —
+which this decision governs — is the default for every extension without its own
+pattern**. The golden ladder had the right formats and the wrong content: **1 of
+800** `.md`/`.txt` documents carries a `#` inside a fence. A corpus cannot show
+you a change it never triggers (ADR-RS decision 23b).
 
 **9. `phrases` holds a document's first `max_phrases` headings, in document
 order, and the cap is committed configuration** — `.fux/tune.toml [index]

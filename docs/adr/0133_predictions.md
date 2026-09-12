@@ -7,7 +7,7 @@ status: accepted
 date: 2026-08-22
 feature: the prediction system — the R ids, their register, the rules that make a frozen claim mean something, and the classification of the runs those claims are measured by
 owns: [tests/test_regression_runs.py, tools/t2-eval, tools/quality-controls, tools/vector-gate]
-laws: [L3]
+laws: [L3, L9]
 timestamp: 2026-08-22T00:00:00Z
 ---
 
@@ -327,8 +327,27 @@ ruled its power tension.
 | decoy query set | ✅ **built** — 15 domain-plausible questions the corpus cannot answer. ⚠ **The one kind of evaluation material an agent may author**: no correct answer exists, so there is nothing to fit |
 | **sealed subset** | ✅ **built 2026-08-28** — 15 of 50, split by `sha256(id)`: deterministic, seedless, order-independent |
 | **intent-split prior probes** | ✅ **built 2026-09-12** — 26 probes, 13 current-seeking / 13 history-seeking, over the golden ladder's declared `supersedes:` pairs and `archived=true` directories. ⚠ **Truth is MECHANICAL, read off a declaration**, which is what lets an agent author them: there is a correct answer, but nobody chose it. Adjudicated W-143 the day it was built |
-| **`heading` negative control, rebuilt** | ✅ **built 2026-09-12**, and it reports its own headroom as **not established**: switching `bm25f.heading` off entirely moves the distractor count by a net of 5 across 124 queries, below decision 19's floor. **C4's premise is unsupported** — the distractors win on body similarity, not on headings |
+| **`heading` negative control, rebuilt** | 🔴 **RETIRED 2026-09-12**, after a second arm. The rebuild found `bm25f.heading` 3.0 → 0.0 moves the distractor count by a net of 5, and read that as *they win on body similarity*. **They do not.** `bm25f.body` 1.0 → 0.0 moves it by a net of **1** over 83 discordant pairs, `p = 1.0000`. See the row below — the endpoint was never a ranking measurement |
+| **the distractor count, as an ENDPOINT** | 🔴 **UNUSABLE, measured 2026-09-12.** 392 of 1 001 documents at `rung-01000` are `ext/sibling/`, so a top-5 drawn at random holds **1.96** of them — and every arm of **both** fields observes **2.06–2.14**, the off arms included. **The count measures corpus composition, not ranking**, and a third field would reproduce it. ⚠ The arms work: seed hits fall 272 → 158 with `body` off. [VERDICT-W142](../../work/regression/2026-09-12-reaim-and-instruments/VERDICT-W142.md) |
+| **W-115 fence/depth two-arm corpus** | ✅ **built 2026-09-12** — 300 documents, three families on disjoint topic vocabularies, both arms HEAD with the pre-W-115 grammar patched at two seams. Carries a `--selftest` that is decision 22c(b)'s proof: 60/60 treated decoys separable, **0/30 placebo decoys separable**, 0/90 subjects. [VERDICT-W115](../../work/regression/2026-09-12-reaim-and-instruments/VERDICT-W115.md) |
+| **W-144 prose-density graded set** | ✅ **built 2026-09-12** — 90 probes whose truth is *more about the term in the same amount of prose*, with an `inverse` positive control and a `placebo`. **Probe terms sit at `df` 4–23**, which is the one change that unsaturated the endpoint a `df == 1` probe could not move. [VERDICT-W144](../../work/regression/2026-09-12-reaim-and-instruments/VERDICT-W144.md) |
 | **table-`flen` counterfactual** | ✅ **built 2026-09-12** — recomputes `flen` with table tokens out of the body length and re-ranks, recomputing `avg_wlen` in BOTH arms. Carries a gate that refuses to report unless its recomputed `flen[body]` equals the committed one for every document |
+
+🔴 **What C1 and C3 rest on, said plainly (2026-09-12).** They have rested on
+**generator assertions** since 2026-08-28, and the control that was going to
+replace that has now been retired as unusable. **No live control backs them.**
+That is recorded here rather than carried as an open item, because the item that
+would have closed it cannot: the fault is the endpoint, and there is no third
+field to aim it at. A replacement would have to ask a different *question* —
+*does the correct seed document rank above every sibling* — which is a `hit@1`
+question against a key, and therefore
+[W-136](../../work/open/W-136-golden-benchmark.md) phase 5's job rather than a
+control's.
+
+⚠ **The mechanical half of the lesson IS shipped**, so this cannot recur
+silently: `tools/quality-controls/body_control.py` computes its endpoint's
+**corpus base rate and prints it before it runs an arm**. A distractor control
+that cannot beat its base rate now says so in its first two lines.
 
 ⚠ **The decoys found something on their FIRST run**, which is the argument for
 controls in one line: **one of fifteen unanswerable questions is reported
@@ -425,9 +444,18 @@ exact document set, mean Jaccard 0.943 — and **both name the same 25**.
 two fields, belongs to whoever owns the golden format. The evidence is filed.
 
 ⚠ **Running the placebo is not the same as building it.** A placebo arm produces
-its value as a **delta between arms**, which decision 12 governs — so grading the
-playground three ways needs the blind/informed question answered before any
-number from it may be cited.
+its value as a **delta between arms**, which decision 12 governs — so grading a
+corpus three ways needs the blind/informed question answered before any number
+from it may be cited.
+
+🔴 **And the corpus it was run on is gone.** Every number in this decision was
+produced on `fux-playground`, which [L9](0011_LAW-9-environments.md) made
+Arpit's hands alone on 2026-09-11. **The filed numbers stand exactly as
+measured** (ADR-LAW-9 decision 4, forward only); **a re-run does not exist**
+until the control is rebuilt on a golden rung in `fux-lab`
+([`work/golden/`](../../work/golden/README.md)). A session that re-runs any of
+the three controls against the old corpus is breaking a law, not reproducing a
+number.
 
 **Two more `tools/quality-controls/` artifacts landed 2026-08-28, outside the
 three-control table above** — neither is a control on an enrichment arm; both
@@ -488,8 +516,12 @@ legal, complete state — `pre-registered, not yet measured`.** Added 2026-08-27
 
 - **The situation.** R10's threshold was frozen and committed to
   `work/regression/2026-08-27-r10-separation-floor/evidence/PRE-REGISTRATION.md`
-  and the measurement cannot start — it needs `fux-playground`, which does not
-  exist on the build machine. The per-run contract demanded a `report.md`, an
+  and the measurement could not start — it needed `fux-playground`, which did
+  not exist on the build machine. ⚠ **Since 2026-09-11 it needs something
+  else**: [L9](0011_LAW-9-environments.md) put every measurement on the golden
+  ladder, so R10 is measured on a rung or re-registered, never restarted where
+  it was frozen. The frozen file is not edited to say so — that is condition 2
+  below. The per-run contract demanded a `report.md`, an
   `ANALYSIS.md`, an `evidence/` directory and a `blind`/`informed`
   classification, so the directory failed **four checks** for having done
   nothing wrong.
@@ -610,6 +642,25 @@ set"* implies the bar tracks the set size; **it tracks the flips.** Replacing
 - **The losses are one-sided.** A *"no detected change"* ruling made under a
   loose bar stays true under a stricter one; the exposure is entirely on the
   claims of **improvement**.
+- ✅ **19a. The bar is COMPUTED now, not compared against by hand** (2026-09-12).
+  `tools/quality-controls/verdict.py` returns the **exact two-sided binomial
+  p-value on the discordant pairs** and every control imports it; it reuses
+  `resolution.py`'s arithmetic rather than adding a second implementation of the
+  same table.
+
+  **Why it was needed, in one sentence.** Three instruments built on 2026-09-12
+  each began by hard-coding *"net >= 6"* — and **a net of 8 on 30 discordant
+  pairs clears 6 while failing this table**, which asks for 12. *"The floor of
+  all floors"* is the bar **before the count is known**; using it **as** the bar
+  is a silent loosening, and three tools reached for it independently, which is
+  what makes it a shape problem rather than a slip.
+
+  ⚠ **No filed verdict changes.** Every conclusion the flat comparison supported
+  was *no detected change*, and the losses are one-sided (above): a null under a
+  loose bar stays a null under a strict one. Re-read through the exact test, the
+  `heading` control's `b=16 c=21` is **p = 0.5114** — the same conclusion, now
+  with a number attached to it.
+
 - **`α = 0.05` is conventional and stated, not derived.**
 - ⚠ **Detectability is not generalisation.** Clearing this says a result is
   unlikely to be chance and says nothing about 10 000 documents; `CLAUDE.md`

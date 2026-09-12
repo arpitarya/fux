@@ -230,10 +230,10 @@ measured failure.
 write a decoder* had lived only in a module docstring and in §2 — **the
 agent-facing half of a record, which is not where a consumer looks.**
 
-- **Rendered to all four skill surfaces** — `.claude/skills/`, `.kiro/skills/`,
-  `.codex/skills/` and, since Arpit's ruling of 2026-09-11,
-  `.github/skills/fux-decoder/` ([ADR-AGENT-POLICY](0132_agent-policy.md)
-  decision 14a). **Never to an ambient surface**: it writes committed Python
+- **Rendered to every vendor's skill surface** — `.claude/skills/`,
+  `.kiro/skills/`, and `.agents/skills/fux-decoder/`, which Codex and Copilot
+  share since 2026-09-12 ([ADR-AGENT-POLICY](0132_agent-policy.md) decisions
+  14a and 16; it was `.codex/skills/` and `.github/skills/` before). **Never to an ambient surface**: it writes committed Python
   that changes what is indexed (decision 9a). Every skill surface is
   progressive-disclosure, which is what admits a fourth without touching that
   rule — the exclusion that survives is the ambient one, and only that one.
@@ -619,12 +619,29 @@ which is exactly why it was built that way — the note in `doctor.py` says
   UTF-8 mojibake of a zip archive — every heading skeleton above reached
   `extract.py` and nothing else. See [ADR-REFER](0127_refer-plane.md)
   decision 23.
-- ⚠ **Decisions 15 and 16 re-rank every document of the formats they touch**,
-  and decision 14 re-ranks every document containing a fenced code block.
-  **Unmeasured**: `fux-lab` does not exist (W-56), and Arpit ruled on 2026-09-06
-  that these land as defect fixes rather than waiting on it — a `# comment` in a
-  bash block was never a heading, and no measurement was needed to know that.
-  Recorded as unmeasured in `work/OPEN-WORK.md` rather than claimed as measured.
+- **Decisions 15 and 16 re-rank every document of the formats they touch**, and
+  decision 14 re-ranks every document containing a fenced code block. They
+  landed **unmeasured**, on Arpit's 2026-09-06 ruling that these are defect
+  fixes — a `# comment` in a bash block was never a heading.
+
+  ✅ **Decision 14 is MEASURED as of 2026-09-12 and it improves ranking.**
+  [VERDICT-W115](../../work/regression/2026-09-12-reaim-and-instruments/VERDICT-W115.md):
+  `hit@1` **0/30 → 30/30**, `p ≈ 0`, headroom **proven** under
+  [ADR-RS](0133_predictions.md) 22c(b). The pre-change engine ranked the
+  fenced-comment document **first in all 30 probes at every prose weight tested**
+  — heading weight 3.0 on three fenced lines beat eight prose sentences.
+
+  🔴 **Decision 16 is INCONCLUSIVE, not a null, and that is the honest word.**
+  The same run proves the cap changes what is mined as a heading on 30 of 30
+  decoys and finds it changes **no ranking** on that endpoint at any prose
+  weight. ⚠ **This is not a defect in the cap**: decision 16 justifies itself as
+  **noise reduction** — a 200-key payload becoming 200 sections, `phrases` slots
+  filling with fifth-level keys — never as a ranking win, so a null on a ranking
+  endpoint contradicts nothing here and nothing above is amended to claim one.
+
+  ⚠ **Decision 15 remains unmeasured.** No endpoint in that run touches
+  `pdf`/`rtf`/`csv`/`jsonl` heading emission, and the verdict says so rather than
+  letting the decision list absorb a result that was not about it.
 - ⚠ **A consumer decoder can break L4 and no gate reaches it.** An import fence
   cannot see code loaded by path. This is the same asymmetry
   [ADR-ENRICH](0137_enrich.md) decision 3 owns about `model:` being a claim fux

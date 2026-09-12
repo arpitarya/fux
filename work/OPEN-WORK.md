@@ -22,8 +22,14 @@ description: "The single live work queue, two lanes, plus the Blocked-on-Arpit i
 | ↳ **blocks:** **W-87's Part B**, which needs a key nobody has contaminated. Nothing else — it governs what a phase-5 number may *claim*, not whether phase 5 runs | | |
 | 🔴 **W-146** — two rulings: is `ADR-WORK-QUEUE` written (OPEN-WORK's rules are stated twice, owned nowhere), and does *never restates* reach into docstrings? [detail](open/W-146-the-rest-of-l0.md) | 2026-09-12 | 0d |
 | ↳ **blocks:** nothing else in the queue — they decide whether two named exposures get closed, not whether work runs | | |
+| 🔴 **W-112** — W-106 closed **without a PASS and cannot produce one** (no corpus carries DENSE-CHUNK's bar). Proceed on the narrowed claim, wait for an instrument, or close? [detail](open/W-112-vector-plane.md) | 2026-09-12 | 0d |
+| ↳ **blocks:** nothing else in the queue — search-v3's last item, and the only one left of §5 | | |
+| 🔴 **W-147** — `.fux/output.toml` can switch the answer journal on, and ADR-PROVENANCE decision 10 says only the flag can — a fork that decision reserved and that shipped through a different record. [detail](open/W-147-the-journal-consent-surface.md) | 2026-09-12 | 0d |
+| ↳ **blocks:** nothing — but one record is false and another is silent until he rules | | |
 | 🔴 **W-143** — the four ranking priors answered **NO** ([verdict](regression/2026-09-12-priors-and-tables/VERDICT-W143.md)): close the knobs, move the mechanism query-side, or leave them at their no-op defaults. [detail](open/W-143-four-no-op-priors.md) | 2026-09-12 | 0d |
 | ↳ **blocks:** W-97, whose candidate table is the same measurement and whose defaults are the same call | | |
+| 🔴 **W-144** — excluding table cells from `flen` **ranks better** ([verdict](regression/2026-09-12-reaim-and-instruments/VERDICT-W144.md)); one synthetic corpus may not ship a ranking change, so accept or override [the compare doc](compare/table-tokens-in-flen.compare.md). | 2026-09-12 | 0d |
+| ↳ **blocks:** nothing else in the queue — the measurement is filed and the code is written; what is missing is the call | | |
 | 🔴 **W-97** — the candidate table is filed with no recommendation, as pre-registered; the `superseded_weight` and `rerank_weight` defaults are an ADR-TUNE amendment only he makes. [detail](open/W-97-tuner-knob-sweep.md) | 2026-09-12 | 0d |
 | ↳ **blocks:** nothing else in the queue | | |
 
@@ -34,22 +40,20 @@ description: "The single live work queue, two lanes, plus the Blocked-on-Arpit i
 ### fux build
 
 - 🟢 🧨 **W-140** · `agent` — **2 code rows left** (12's `--hops` fork; an unreproduced runner-race flake) plus 13 record/code disagreements, none critical; 18 closed, row 8 inside W-122. [detail](open/W-140-guide-authoring-defects.md)
-- 🟢 🧨 **W-138** · `agent` — **42 files still name `fux-playground`** (`grep -rl` outside `regression/`); rewrite the subset that uses it as an *instrument*, then add the guard test. [detail](open/W-138-reconcile-with-l9.md)
-- 🟡 **W-139** · `agent`, after W-138 — build fux-benchmark: seven corpora, two versions, latency and ranked lists kept. [detail](open/W-139-benchmark-per-l9.md)
-- 🟢 **W-107** · `agent` — the Node read plane (`npx fux-search`), Phases 1–4; nothing blocks Phase 1. [detail](open/W-107-node-read-plane.md)
-- 🟢 **W-106** · `agent` — **both of its recorded blockers are stale**: search-v3 §8 was ratified 2026-09-05, and the x86-64 arm is reachable here (`arch -x86_64`). Only the arm is owed. [detail](open/W-106-vector-gate.md)
-- 🟡 **W-112** · `arpit`, waiting on W-106 — the vector plane: needs a golden corpus, a re-run gate, then a compare doc to rule on. [detail](open/W-112-vector-plane.md)
+- 🟢 **W-139** · `agent` — build fux-benchmark to [SETUP-BENCHMARK](setup/fux-benchmark.md): seven corpora, two versions, latency and ranked lists kept. [detail](open/W-139-benchmark-per-l9.md)
+- 🟢 **W-107** · `agent` — the Node read plane: Phases 1–4 landed 2026-09-12; what is left is npm publication and the renderer split. [detail](open/W-107-node-read-plane.md)
+- 🔴 **W-112** · `arpit` — the vector plane. W-106 closed without a PASS **and cannot produce one**: no corpus carries DENSE-CHUNK's bar. Determinism narrowed to *same embedder build*. [detail](open/W-112-vector-plane.md)
 
 ### testing
 
-- 🟢 **W-136** · `agent` — phases 2 and 4 done to rung 1 000; **rungs 2 000 / 5 000 / 10 000 are unbuilt**, and phase 5 scoring is Codex's. [detail](open/W-136-golden-benchmark.md)
+- 🟢 **W-136** · `agent`, then Codex — phase 2 extended to **rung 2 000 and rung 5 000** (2026-09-12); `rung-10000` is the last one, then phase 5 is Codex's. [detail](open/W-136-golden-benchmark.md)
 - 🔴 **W-145** · `arpit` — Codex regenerates the golden answer key; until then every golden number is `informed`. [detail](open/W-145-codex-regenerates-the-key.md)
-- 🟢 **W-115** · `agent` — three corpora cannot see it (the ladder moves **0 of 994**); build one carrying `.jsonl`/`.csv`/`.rst` **with goldens**. [detail](open/W-115-chunking-quality-unmeasured.md)
-- 🟢 **W-142** · `agent` — rebuilt 2026-09-12 with its own off arm: **net 5, below the floor — C4's premise is unsupported.** Re-aim it at body similarity, or retire it. [detail](open/W-142-heading-negative-control.md)
 - 🔴 **W-87** · `agent`, waiting on W-145 — P2's `unanswerable` gate is measured (0/124); recall needs phase 5 and **Part B needs an uncontaminated key**. [detail](open/W-87-what-good-means.md)
-- 🟢 **W-144** · `agent` — mechanism measured; *is it better* is open. Grade the **16 named movers** (free once phase 5 lands) or build a graded set now. [detail](open/W-144-structure-aware-extraction.md)
+- 🔴 **W-144** · `arpit` — **answered 2026-09-12: the counterfactual ranks better** above a table share of ~0.29. One ruling: accept or override [the compare doc](compare/table-tokens-in-flen.compare.md). [detail](open/W-144-structure-aware-extraction.md)
 
 ### adr update
+
+- 🔴 **W-147** · `arpit` — one ruling: is a committed `[cli.answer] journal = true` the explicit consent decision 10 asks for, or does `output.toml` refuse the key? [detail](open/W-147-the-journal-consent-surface.md)
 
 - 🔴 **W-143** · `arpit` — **answered 2026-09-12: NO**, no single global value clears `0 broken` on any of the four priors. Close the knobs, move it query-side, or leave them. [detail](open/W-143-four-no-op-priors.md)
 - 🔴 **W-97** · `arpit` — the candidate table is filed with no recommendation; the two defaults are an ADR-TUNE amendment. [detail](open/W-97-tuner-knob-sweep.md)

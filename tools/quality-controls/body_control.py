@@ -61,7 +61,10 @@ import shutil
 import subprocess
 from pathlib import Path
 
+import sys
+
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "tools" / "quality-controls"))
 LAB = Path.home() / "my_programs" / "fux-lab" / "corpora" / "golden"
 SCRATCH = Path.home() / "my_programs" / "fux-lab" / "corpora" / "golden-sweep"
 FUX = ROOT / ".venv" / "bin" / "fux"
@@ -70,9 +73,7 @@ QUESTIONS = ROOT / "work" / "golden" / "questions" / "questions.jsonl"
 #: The arms. The first is shipped; the last is the mechanism switched off.
 BODY_WEIGHTS = [1.0, 0.5, 0.25, 0.0]
 
-#: ADR-RS decision 19: a net below this cannot clear a = 0.05 at any discordant
-#: count, so it is the floor of all floors and is never lowered to fit a result.
-FLOOR = 6
+from verdict import FLOOR_OF_ALL_FLOORS, line as vline, rule as vrule  # noqa: E402
 
 
 def write_tune(root: Path, body: float) -> None:
@@ -121,6 +122,20 @@ def main() -> int:
         shutil.rmtree(root)
     shutil.copytree(src, root)
 
+    # 🔴 **The base rate, computed BEFORE any arm runs, and it is the thing to
+    # read.** If 39 % of a corpus is `ext/sibling/`, a top-5 drawn at random
+    # holds ~2 of them. An endpoint that counts them is measuring corpus
+    # COMPOSITION unless a treatment can pull it away from that number — so the
+    # expectation is printed beside every arm rather than left for a reader to
+    # work out.
+    all_docs = [p for p in src.rglob("*") if p.is_file()
+                and ".fux" not in p.parts and ".git" not in p.parts]
+    n_sib = sum(1 for p in all_docs if "sibling" in str(p.relative_to(src)))
+    base = n_sib / len(all_docs)
+    print(f"corpus {len(all_docs)} documents, {n_sib} ext/sibling = {base:.3f}")
+    print(f"a top-{a.k} drawn at the corpus base rate holds {a.k * base:.2f} "
+          f"siblings per query\n")
+
     questions = [json.loads(l) for l in QUESTIONS.read_text().splitlines() if l.strip()]
     rows, summary = [], []
     for weight in BODY_WEIGHTS:
@@ -143,11 +158,14 @@ def main() -> int:
     print(f"rung {a.rung}   k={a.k}   {n} questions   arms: bm25f.body "
           + ", ".join(str(w) for w in BODY_WEIGHTS))
     print()
-    print(f"{'body':>6}  {'sibling hits':>13}  {'seed hits':>10}  "
+    print(f"{'body':>6}  {'sibling hits':>13}  {'per query':>10}  {'seed hits':>10}  "
           f"{'queries with >=1 sibling':>25}  {'empty':>6}")
     for s in summary:
-        print(f"{s['weight']:>6}  {s['distractors']:>13}  {s['seeds']:>10}  "
+        print(f"{s['weight']:>6}  {s['distractors']:>13}  "
+              f"{s['distractors'] / n:>10.2f}  {s['seeds']:>10}  "
               f"{s['queries_with']:>21} /{n:>3}  {s['empty']:>6}")
+    print(f"{'base':>6}  {'':>13}  {a.k * base:>10.2f}   <- expected from corpus "
+          f"composition alone")
 
     # The paired unit is the QUERY, never the corpus-wide sum — decision 19 is
     # stated on the discordant count for exactly this reason.
@@ -156,26 +174,42 @@ def main() -> int:
     b = sum(1 for i in on if off[i]["sibling_in_topk"] > on[i]["sibling_in_topk"])
     c = sum(1 for i in on if off[i]["sibling_in_topk"] < on[i]["sibling_in_topk"])
     discordant, net = b + c, abs(b - c)
+    v = vrule(b, c)
     print()
-    print(f"paired over queries, body {BODY_WEIGHTS[0]} vs {BODY_WEIGHTS[-1]}:")
-    print(f"  more siblings with the field OFF: b = {b}")
-    print(f"  more siblings with the field ON:  c = {c}")
-    print(f"  discordant = {discordant}   net = {net}   (floor of all floors: {FLOOR})")
+    print(f"paired over queries, body {BODY_WEIGHTS[0]} vs {BODY_WEIGHTS[-1]}"
+          f"  (b = more siblings with the FIELD OFF):")
+    print(f"  {vline(v)}")
     print()
-    if net >= FLOOR:
-        print(f"HEADROOM IS PROVEN (ADR-RS 22c(a)): bm25f.body moves the "
-              f"heading-matched distractor count on {discordant} queries, net {net}. "
-              f"BODY SIMILARITY is the mechanism putting those documents in the "
-              f"window, so the re-aimed control can adjudicate and C1/C3 no longer "
-              f"rest on generator assertions alone.")
+    observed = [s["distractors"] / n for s in summary]
+    pinned = max(observed) - min(observed) < 0.5 and abs(observed[0] - a.k * base) < 0.5
+    if v["outcome"] not in ("b", "c"):
+        if pinned:
+            print(f"🔴 THE ENDPOINT IS PINNED AT THE CORPUS BASE RATE. Expected "
+                  f"{a.k * base:.2f} siblings per query from composition alone; observed "
+                  f"{min(observed):.2f}-{max(observed):.2f} across EVERY arm, including "
+                  f"the field switched off entirely. {discordant} queries move and the "
+                  f"net is {net}.\n\n"
+                  f"   So the count is not measuring ranking, it is measuring how much "
+                  f"of the corpus is `ext/sibling/`. A control whose endpoint cannot "
+                  f"leave its base rate cannot discharge anything, and re-aiming it at "
+                  f"another field will reproduce this result — because the field is not "
+                  f"what is being measured.\n\n"
+                  f"   ⚠ The ARM works: seed hits fall {summary[0]['seeds']} -> "
+                  f"{summary[-1]['seeds']} with the field off, so the weight really is "
+                  f"being applied. It is the ENDPOINT that is inert.")
+        else:
+            print(f"HEADROOM IS NOT ESTABLISHED: {discordant} queries move, net {net}, "
+                  f"which does not clear alpha. The floor of all floors is "
+                  f"{FLOOR_OF_ALL_FLOORS}; here the bar is a net of {v['net_needed']}. "
+                  f"Do not lower it.")
     elif discordant == 0:
         print(f"HEADROOM IS ZERO: not one query changes its sibling count when the "
-              f"body field is switched off. Neither headings nor lexical body put "
-              f"those documents there. Inconclusive (22d), and the distractor "
-              f"design is what needs re-examining.")
+              f"body field is switched off. Inconclusive (22d).")
     else:
-        print(f"HEADROOM IS NOT ESTABLISHED: {discordant} queries move, net {net}, "
-              f"below the floor of {FLOOR}. Do not lower the floor.")
+        print(f"HEADROOM IS PROVEN (ADR-RS 22c(a)): bm25f.body moves the "
+              f"heading-matched distractor count on {discordant} queries, net {net}, "
+              f"p = {v['p']:.4f}. BODY SIMILARITY is the mechanism, so the re-aimed "
+              f"control can adjudicate.")
 
     if a.json:
         dest = Path(a.json)

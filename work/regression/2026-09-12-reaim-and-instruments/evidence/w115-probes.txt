@@ -1,0 +1,22 @@
+ingested 300 docs (300 changed, 0 carried forward), 0 not indexed, 0 skipped, 177 shards written
+accelerator: 478 terms, 509 blocks, 9368 postings (derived, not committed)
+accelerator rebuilt from the committed index: 300 docs, 478 terms, 509 blocks, 9368 postings
+arm old: 90 probes
+ingested 300 docs (300 changed, 0 carried forward), 0 not indexed, 0 skipped, 177 shards written
+accelerator: 478 terms, 509 blocks, 9368 postings (derived, not committed)
+accelerator rebuilt from the committed index: 300 docs, 478 terms, 509 blocks, 9368 postings
+arm new: 90 probes
+
+   family     n   hit@1 old   hit@1 new   decoy@1 old   decoy@1 new   discordant   net
+    fence    30       0 /30       30 /30             30             0           30   +30
+    depth    30      30 /30       30 /30              0             0            0    +0
+  placebo    30      30 /30       30 /30              0             0            0    +0
+
+[fence] headroom improvement 30/30 · regression 30/30 (ADR-RS 22b, PROVEN by --selftest under 22c(b))
+[fence] b=30 c=0 discordant=30 net=30 p=0.0000 (net needed 12, alpha=0.05) -> THE SHIPPED ARM (W-115) RANKS BETTER
+[fence] the SHIPPED arm (W-115) ranks better.
+[depth] headroom improvement 0/30 · regression 30/30 (ADR-RS 22b, PROVEN by --selftest under 22c(b))
+[depth] b=0 c=0 discordant=0 net=0 p=1.0000 (no net difference can clear alpha at this count, alpha=0.05) -> INCONCLUSIVE
+[depth] INCONCLUSIVE (22d): not one probe moved between the arms.
+
+[placebo] CONTROL HOLDS: both arms score 30/30. Nothing but the feature is moving.

@@ -183,3 +183,47 @@ item stays open with a fourth named reason.
 - It says nothing about corpora above 10 000 documents, and measures none.
 - **No arm reads the sealed answer key**, by any means. Every endpoint here is
   key-free and mechanically true from the generator's own declarations.
+
+---
+
+## 5. Amendments — both made BEFORE the first number, both in git
+
+⚠ **This section is appended, never a rewrite.** The file above is as committed
+at `aff3c82`. Two things changed between that commit and the first measurement,
+and each is recorded here rather than edited into the text it contradicts.
+
+### 5a. The verdict rule is the exact test, not a flat floor
+
+**As registered:** *"`net >= 6`"*, §0.
+
+**As run:** the **exact two-sided binomial p-value on the discordant pairs**,
+clearing α = 0.05 — `tools/quality-controls/verdict.py`, which reuses
+`resolution.py`'s arithmetic.
+
+**Why.** `net >= 6` is
+[ADR-RS](../../../docs/adr/0133_predictions.md) decision 19's **floor of all
+floors** — the bar that applies *before* the discordant count is known. The real
+bar **rises with the flips**: 20 flips need a net of 10, 50 need 16. A tool
+comparing against 6 alone would have **passed a net of 8 on 30 discordant
+pairs**, which decision 19's own table refuses.
+
+🔴 **This is strictly stricter, which is the only direction an amendment may
+go.** At every discordant count above 6 the exact test demands at least what the
+flat floor demanded and usually more. **α did not move**, and no threshold was
+loosened.
+
+### 5b. The probe sets were widened
+
+**As registered:** 24 probe pairs (W-144), 20 probe triples (W-115).
+
+**As run:** 30 probes per family in both — 90 probes each.
+
+**Why.** Eight probes per family cannot clear the bar except by a total sweep,
+which makes a null uninformative for the reason decision 22d exists. The topics
+are composed rather than listed so widening is mechanical.
+
+⚠ **A larger `n` makes a given net easier to reach, and that is exactly why 5a
+had to land with it.** Under a flat floor of 6, widening would have loosened the
+test. Under the exact test the bar tracks the discordant count, so it does not.
+
+**Neither change is a threshold move.** No number existed when either was made.
