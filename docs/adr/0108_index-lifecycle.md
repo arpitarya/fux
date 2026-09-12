@@ -216,6 +216,29 @@ thing in the index that is not a function of a committed file.
   genuinely cannot proceed across analyzers.
 - **`read_index` still refuses a foreign shard**, unchanged.
 
+⚠ **And the shard-header error pointed at the delete anyway, until 2026-09-12**
+(W-140 row 9). It read *"delete `.fux/index/` and run `fux ingest`, which is safe
+because the index holds statistics, never content"* — the exact remedy this
+decision exists to prevent, with a reassurance that is false for every `url:`
+record. **A reader meets that message with a repo that will not answer a query,
+and does what it says.** It now names `fux ingest --full` and warns off the
+delete by name; pinned by
+`tests/store/test_foreign_index.py::test_the_version_mismatch_error_names_full_and_warns_off_the_delete`,
+which also asserts the reassuring sentence is gone.
+
+🔴 **And the corrected message then crashed on Windows, for one character**
+(2026-09-12). It opened its warning with `⚠`, which `cp1252` cannot encode, so
+`print()` raises `UnicodeEncodeError` and the **command dies instead of
+rendering the remedy** — on exactly the platform-first fleet this project treats
+as a design input. The remedy a reader most needs is the one they would never
+have seen. It reads `WARNING:` now.
+
+⚠ **The general shape, worth more than the fix.** `tests/test_windows_console_safe.py`
+already existed and already forbade this; the character arrived with the W-140
+row 9 correction and rode in on an uncommitted tree, so nothing was red until the
+suite ran. **A message that names a remedy has to be printable wherever the
+error it explains can happen** — being *correct* is not enough.
+
 This does not weaken *"nothing tries to migrate"* — it is what makes the
 sentence true, because the alternative in practice was a consumer deleting the
 directory by hand and never being told what went with it. Pinned by

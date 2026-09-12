@@ -73,12 +73,22 @@ def raw_record_lines(path: Path) -> tuple[dict, list[bytes]]:
                 f"is not a fux index shard, or the file is truncated. A shard's "
                 f"first line is always {HEADER['_format']!r}."
             )
+        # 🔴 **This used to say *delete `.fux/index/` and run `fux ingest`*,
+        # "which is safe because the index holds statistics, never content"**
+        # (W-140 row 9, fixed 2026-09-12). It is not safe, and
+        # [ADR-INDEX-LIFECYCLE] decision 10a exists BECAUSE it is not: a `url:`
+        # record is the one thing in the index that is not a function of a
+        # committed file, so deleting the directory destroys it and an offline
+        # re-ingest cannot bring it back. `--full` was built to be this path and
+        # the error pointed away from it.
         raise FuxError(
             f"shard {path} declares _format {found!r}, this engine writes "
             f"{HEADER['_format']!r} — the index was written by a different "
-            f"version of fux. There is no in-place migration: delete "
-            f"`.fux/index/` and run `fux ingest` to rewrite it from the sources, "
-            f"which is safe because the index holds statistics, never content."
+            f"version of fux. There is no in-place migration: run "
+            f"`fux ingest --full` to rewrite it from the sources. "
+            f"WARNING: do NOT delete `.fux/index/` by hand: `url:` records are the one "
+            f"thing in it that no re-extraction can rebuild, and `--full` refuses "
+            f"rather than stranding them, naming each one."
         )
     if header.get("analyzer") != HEADER["analyzer"]:
         raise FuxError(

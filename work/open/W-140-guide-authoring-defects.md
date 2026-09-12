@@ -28,11 +28,71 @@ then refresh this repo's renderings.
 
 | # | defect | where | record |
 |---|---|---|---|
-| 12 | **`fux path --hops` is unbounded** — `--hops 7` runs over a minute on ~960 documents, because simple-path enumeration grows steeply and one shared tag makes a thousand documents mutually two hops apart. **Three answers, none obviously right: cap the argument, warn above a threshold, or bound the walk's work.** A fork, so it needs a compare doc — [ADR-GRAPH](../../docs/adr/0126_graph.md) §Consequences states it | `graph/walk.py`, `cli.py` | ADR-GRAPH |
+| 12 | ✅ **HANDED OVER 2026-09-12 — the compare doc exists and the fork is Arpit's.** [`compare/path-hops-bound.compare.md`](../compare/path-hops-bound.compare.md), with the measurement the row lacked: **0.65 s at `--hops 2`, 84.6 s at `--hops 6`**, ~11× per hop above 4, on a 738-node / 4 446-edge index with hubs at out-degree 260 and in-degree 152. Proposed verdict **(c) bound the walk's work**, with `truncated` in every rendering including `--json` and MCP. **Nothing is implemented and nothing should be until he rules** | `graph/walk.py`, `cli.py` | ADR-GRAPH |
 
-| 21 | ⚠ **A SECOND e2e maintenance test races the background runner.** `test_two_commits_in_quick_succession_produce_one_runner_and_one_index` failed once in a combined `tests tests_e2e` run on 2026-09-12 and passed in isolation and on four consecutive runs of its own file. Row 19 was the first instance and its gate (`quiesce` before reading a shard) does not cover this one — this test is *about* the runner, so quiescing would defeat it; it waits through `_drain`, which polls `doctor --json` for `running=false, pending=0`. **Not reproduced, so not diagnosed** — row 19's first diagnosis was wrong and cost two sessions, so this is filed rather than guessed. **Capture the failure output before changing anything** | `tests_e2e/test_maintenance.py` `_drain` | ADR-MAINTENANCE |
+| 21 | ⚠ **A SECOND e2e maintenance test races the background runner — STILL NOT REPRODUCED, after 11 attempts.** `test_two_commits_in_quick_succession_produce_one_runner_and_one_index` failed once in a combined `tests tests_e2e` run on 2026-09-12 and has not failed since. **Nothing has been changed**, because the row's own instruction is *capture the failure output before changing anything* and row 19's first diagnosis was wrong and cost two sessions | `tests_e2e/test_maintenance.py` `_drain` | ADR-MAINTENANCE |
+
+### Row 21 — what was tried on 2026-09-12, and why nothing was changed
+
+**11 attempts, 0 reproductions**, on the machine and tree where it first failed:
+
+| attempt | shape | result |
+|---|---|---|
+| 1 | `tests_e2e/test_maintenance.py` alone | 13 passed, 1 skipped |
+| 2-9 | `tests tests_e2e -k "two_commits… or post_commit_defers or maintenance"` ×8 | all green |
+| 10-12 | the **full** combined `tests tests_e2e` ×3 — the shape it failed in | all green (3 unrelated failures, none this test) |
+
+⚠ **Attempts 10-12 ran while a 10 000-document corpus was being generated and
+indexed in another process**, so the machine was loaded — the condition row 19
+records as making its own race *more* likely, not less. It still did not fire.
+
+**A hypothesis is recorded and deliberately NOT acted on.** `_drain` polls
+`doctor --json` for `running == false and pending == 0` — and **both are true in
+the window before a detached runner has started**, between `post-commit`
+returning and the runner taking the lock. A `_drain` that lands in that window
+returns `True` having waited for nothing. That would explain a load-dependent
+one-in-many failure exactly.
+
+🔴 **It is a hypothesis, and row 19 is why it stays one.** Row 19's first
+diagnosis was confident, wrong, and cost two sessions; its gate did not hold and
+the third failure gave the real answer. **Changing `_drain` now would be the same
+mistake in the same file** — and a `_drain` that waits for a runner to *appear*
+would hang forever in the legitimate case where the hook found nothing to do.
+
+**What would settle it, cheaply:** have `_drain` record the runner's `last_run`
+before it starts polling and refuse to return `True` until that value has
+changed. That is a *stronger* wait with no new failure mode — but it is still a
+change to the thing under suspicion, so it waits for one captured failure.
 
 ## 2 · Records that disagree with the code
+
+✅ **ALL THIRTEEN CLOSED 2026-09-12**, each re-derived against `src/fux` on the
+Mac first (rule 4). **Seven were the record's fault and six were the code's** —
+which is the reason this section was worth working through rather than
+rubber-stamping: the guess *"the code is right, fix the docs"* would have been
+wrong half the time.
+
+| # | verdict | what landed |
+|---|---|---|
+| freshness states | **record** | ADR-REFER d19 and ADR-ASK said **SIX** and then listed five; `Verdict.label` returns five and the schema enum has five. An off-by-one from the day `as-ingested` joined a four-state set. `freshness.py`'s *"SIXTH position"* corrected too |
+| `passage.ordinal` | **both, opposite ways** | **`--json` was the CODE's fault** — two accepted records promised the field and the payload never carried it; `Citation` gains `ordinal` and `answer.passages[]` emits it, pinned through `subprocess` because a unit test on the dataclass would have passed all along. **MCP was the RECORD's fault**: `fux_passage` reads a line span off disk and has no ordinal to carry; the clause is withdrawn |
+| `digest.sha256` | **code** | A fux `sha` is a **40-hex blake2b-160**, and the in-toto attestation labelled it `sha256`. in-toto's `DigestSet` is keyed **by algorithm**, so an external verifier would hash with SHA-256, get 64 characters, and report a mismatch **on a perfectly good receipt** — a failure landing off this machine with no route back. Emits `blake2b-160`; **reads `sha256` forever**, because every receipt already in a ticket carries it |
+| `--journal` | **record, and a fork filed** | d10 said *"only `--journal` WRITES"*; `[cli.answer] journal = true` writes too, and d10 had explicitly reserved always-on journalling as a fork *"no session may pick"*. **Not picked here** — ADR-PROVENANCE and ADR-OUTPUT both now say what is true, and [W-147](W-147-the-journal-consent-surface.md) asks Arpit the one question |
+| ADR-FIND veto 4 | **record** | It grepped `^\[band\]`; the line is `confidence: …`. **A veto check that cannot fire reads as passing**, which is worse than no check |
+| graph schema | **record** | `graph.schema.json` described a plane that has never existed: kinds `supersedes`/`links` (really `ref`/`code`/`tag`), `grade` as a string (an int, 10/8/6), community labels as ints (strings, `c0`). ⚠ `plane.load()` **validates against that file**, so the fiction was one type check from refusing every real graph |
+| stale graph plane | **code** | ADR-GRAPH and `plane.py` both said a stale plane *"is refused"* and **nothing checked**. An `ingest` with no `build` left `explain`/`graph`/`path` answering from edges the records no longer carry. `load()` now calls `accel.is_fresh` — reused, not reimplemented |
+| ADR-MCP | **record, three claims** | The server does **not** hold the index open (it re-reads per call) — and the consequence was stated **backwards**, telling an operator to restart a server that did not need it. `fux_passage` does not fetch or re-score. `fux_related` is one hop, not routes. Mermaid **and** its ASCII twin updated together |
+| doctor levels | **record** | `refusal rules`, `decoder bindings` and `fuxignore usable` are `warn` on content and **`error` on a parse failure**; the table said `warn`. The code is right — a policy file the engine cannot read is what `tune.toml` taught (d10) |
+| doctor writes | **code** | `fux doctor` **created `.fux/` and `.fux/runtime/CACHEDIR.TAG`** on a repo that had never seen fux — read-only is its first sentence. Two causes two modules apart: the writability probe `mkdir`'d, and `maintain/daemon.py`'s path helper called `derived_dir` **from a pure read**. The test asserts on the **whole tree**, because the second cause was nowhere near the check that exposed it |
+| `.fuxignore` | **record** | ADR-DOTFUX said *"never rewritten"*; `fux ingest` rewrites two delimited blocks at its top, above every hand-written line. It is the one committed file under `.fux/` a verb edits — exactly the fact that table exists to carry |
+| version-mismatch error | **code** | It said *delete `.fux/index/` and run `fux ingest`*, *"safe because the index holds statistics, never content"* — **the one remedy ADR-INDEX-LIFECYCLE d10a exists to prevent**, with a reassurance that is false for every `url:` record. Names `--full` now and warns off the delete |
+| `meta` / bare `fetch=` | **record, twice** | A line's `meta=hashed` **does** win over a source-wide `plain` — the claimed "no way to be stricter" was never implemented (and nothing leaks either way). And a bare line takes **whatever `[sources.url] fetcher` names**, not `http` — ADR-CONFIG d5 contradicted its own next paragraph, the W-83 shape |
+| `[agents]` / ADR-TUNE / ADR-OUTPUT | **record** | The config diagram and its twin said **three** vendors (`codex` missing) where the code has four. ADR-TUNE said **six** tables — `[index]`, the one table that is the declared exception, was missing; *"measured — `fux tune`"* named a verb that only prints the specimen; **d10a's `[priority]` orphan warning is UNBUILT** and now says so. ADR-OUTPUT §1 still drew a `[defaults]`/`[verb]` file that has not existed since the three-root rewrite |
+| doctor & never-fetched URLs | **code** | ADR-MAINTENANCE d5a forbids hooks touching the network and pays for it with *"that is a delay, not a silence — `fux doctor` reports them"*. **It did not.** Every line of the row came from `url:` records **in the index**, and an unfetched line has none. Built as *listed minus indexed*, loudest in the `none indexed` branch where *"no URLs"* and *"five waiting on a fetch"* had read identically |
+
+<details>
+<summary>The original list, kept verbatim — what was claimed before any of it was re-derived</summary>
+
 
 - **ADR-ASK / ADR-REFER d19 / `output.schema.json`** say six freshness states; `Verdict.label` has five.
 - **ADR-ANSWER d9, ADR-REFER d17**: `passage.ordinal` in `--json`/MCP — absent.
@@ -48,7 +108,25 @@ then refresh this repo's renderings.
 - **ADR-TUNE**: `fux tune` prints defaults and measures nothing; `[priority]` warnings are unbuilt; seven tables, not six. **ADR-OUTPUT §1** still shows the old `[defaults]` layout.
 - **ADR-MAINTENANCE 5a**: doctor does not report never-fetched hand-added URL lines.
 
+</details>
+
 ## Closed so far
+
+- **Row 22 — row 9's own correction crashed on Windows, for one character.**
+  Found 2026-09-12 by running the suite, not by reading. The fixed
+  version-mismatch message opened its warning with `⚠`; `cp1252` cannot encode
+  it, so `print()` raises `UnicodeEncodeError` and **the command dies instead of
+  rendering the remedy** — on the Windows-first fleet `CLAUDE.md` §Litmus names
+  as a design input. The remedy a reader most needs is the one they would never
+  have seen. `WARNING:` now.
+  [ADR-INDEX-LIFECYCLE](../../docs/adr/0108_index-lifecycle.md) decision 10a
+  carries it, with the general shape: **a message that names a remedy has to be
+  printable wherever the error it explains can happen.**
+  ⚠ **`tests/test_windows_console_safe.py` already forbade this and was already
+  red** — the character arrived with row 9's fix on an uncommitted tree, so
+  nothing was failing in CI because nothing had been committed. No guide change.
+  2026-09-12.
+
 
 - **Row 1 — URL citations were never verified live.** Reproduced on macOS by
   reading the contract on both sides and asserting it, fixed in

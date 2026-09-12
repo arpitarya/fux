@@ -39,9 +39,9 @@ description: "The single live work queue, two lanes, plus the Blocked-on-Arpit i
 
 ### fux build
 
-- 🟢 🧨 **W-140** · `agent` — **2 code rows left** (12's `--hops` fork; an unreproduced runner-race flake) plus 13 record/code disagreements, none critical; 18 closed, row 8 inside W-122. [detail](open/W-140-guide-authoring-defects.md)
+- 🟡 **W-140** · `agent`, waiting on Arpit's `--hops` ruling — **1 code row left**: a runner-race flake **not reproduced in 11 attempts**, deliberately unchanged. 20 closed. [detail](open/W-140-guide-authoring-defects.md)
 - 🟢 **W-139** · `agent` — build fux-benchmark to [SETUP-BENCHMARK](setup/fux-benchmark.md): seven corpora, two versions, latency and ranked lists kept. [detail](open/W-139-benchmark-per-l9.md)
-- 🟢 **W-107** · `agent` — the Node read plane: Phases 1–4 landed 2026-09-12; what is left is npm publication and the renderer split. [detail](open/W-107-node-read-plane.md)
+- 🟢 **W-107** · `agent` — the Node read plane: published to npm 2026-09-12 **with the global bin** (R1a amended, Arpit); what is left is the `fux doctor` PATH row that amendment now owes, and the renderer split. [detail](open/W-107-node-read-plane.md)
 - 🔴 **W-112** · `arpit` — the vector plane. W-106 closed without a PASS **and cannot produce one**: no corpus carries DENSE-CHUNK's bar. Determinism narrowed to *same embedder build*. [detail](open/W-112-vector-plane.md)
 
 ### testing
