@@ -170,3 +170,15 @@ produces: same ids, order, locs, headings, band; scores equal after
 `ingest`, `build`, `add/remove/update`, `enrich`, `embed`, `doctor`,
 `setup`, the accelerator, any fetcher. A Node-side cache (`--fast`) until
 the scan p95 is measured at 10 000 documents.
+
+## From OPEN-WORK (moved 2026-09-11)
+
+*Moved here verbatim when OPEN-WORK became one-to-two-line rows (Arpit, 2026-09-11). Links are rewritten for this directory.*
+
+*This is what the queue said at the move. Re-derive it before believing it (OPEN-WORK rule 4).*
+
+- 🟠 **Search v3 — what is left of it: W-107 Phases 1–4, then W-112.** ·
+  *(spec: [`proposals/search-v3.md`](../proposals/search-v3.md) §8 · one detail
+  file each under [`open/`](README.md))* · **Opus** executes, in Arpit's
+  ratified order: **W-107 Phases 1–4** → **W-112**. `ratified: 2026-09-05`
+  - **[W-107](W-107-node-read-plane.md)** · `agent` · *(**ADR-NODE-SEARCH** new · ADR-RANKING · ADR-MCP)* · the Node read plane — `npx fux-search ask|find|answer|explain|graph|path|mcp`, zero deps, one contract, a third arm of the differential law. ▶ **Phase 1 starts; nothing blocks it.** Phase 0's `log()` question is settled and the rule lives in [ADR-RANKING decision 8a](../../docs/adr/0111_ranking.md) — scores equal after `round(9)`, ordering byte-equal; [`PRE-REGISTRATION-NODE.md`](../benchmark/PRE-REGISTRATION-NODE.md) is frozen in full, sha `0e3b4c80bf9e6a3ad122cb4e0db4f81adf04693fd47047fa24dd9edc7cb037a7`, and Phases 1–4 build against it. ⚠ **§4 still requires all three OSes before an arm is called green**, and only glibc/arm64 has been touched — [`log-probe.yml`](../../.github/workflows/log-probe.yml) is **unrun**, so musl, Windows and Node 20 are unmeasured. ⚠ **[L9](../../docs/adr/0011_LAW-9-environments.md): its frozen pre-registration names the playground** — the build (Phases 1–4) is unaffected, but any measured arm runs on fux-lab golden data under a superseding pre-registration ([W-138](W-138-reconcile-with-l9.md)). `filed: 2026-09-04`

@@ -1,3 +1,8 @@
+---
+type: Milestone Log
+description: "What shipped, when, and the outcome. The evidence store OPEN-WORK reconciles against."
+---
+
 # IMPLEMENTATION — the milestone log
 
 **How to use this file.** This is the **evidence store**: what shipped, when,
@@ -18,6 +23,48 @@ Rules:
    package. Do not copy a status from another doc.
 5. This file is **not** a changelog. `CHANGELOG.md` is per release, for users;
    this is per milestone, for the next session.
+
+---
+
+
+## 2026-09-12 — W-136 phases 2 and 4: the sealed golden ladder, five rungs to 1 000
+
+**Built blind, frozen, then run.** The ladder was committed (`92f5bff`) *before*
+`work/golden/questions/` was opened — the questions had been released early, so
+the commit order in `git log` is what makes these rungs blind. 3 758 unit tests
+green.
+
+| what | outcome | evidence |
+|---|---|---|
+| **The ladder** | `rung-seed` (20) · `rung-00100` · `rung-00200` · `rung-00500` · `rung-01000`, each its own git repo with its own committed index. Nesting, 40/30/20/10 category mix, `archived=true` declarations, `supersedes:` closure and **1 000/1 000 `mtime`** all read back out of the built indexes | [`work/golden/ladder/`](golden/ladder/) · [report §2](regression/2026-09-12-golden-ladder/report.md) |
+| **The run** | 124 questions × 5 rungs, one ask each, no retry, under a pre-registration committed first. **620 per-query rows**, 0 failures | [`evidence/`](regression/2026-09-12-golden-ladder/evidence/) · [`ANSWERS-FOR-REVIEW.md`](regression/2026-09-12-golden-ladder/ANSWERS-FOR-REVIEW.md) |
+| **Abstention** | 🔴 **0 of 124 on every rung**, against 12 `unanswerable` in the key → `abstain_correct` 0/12 **without scoring**. Third occurrence; the two-strikes gate is **owed and unwritten**, because what it should assert is undecided | [report §4.1](regression/2026-09-12-golden-ladder/report.md) |
+| **Supersession** | 🔴 Retired above successor in **74 of 145** co-ranked pairs at `rung-seed`. ⚠ **`fux answer` recovers what `fux ask` inverts** — the endpoint decides whether the defect is visible | [analysis §2](regression/2026-09-12-golden-ladder/ANALYSIS.md) |
+| **Recall ceiling** | 30 of 124 have no `seed/` path in the top 5 at rung 1 000 → **`hit@5` ≤ 94/124 by structure**. Cannot be separated from the `heading` control working, and says so | [report §5](regression/2026-09-12-golden-ladder/report.md) |
+| **W-143's corpus** | ✅ **Exists.** 145 co-ranked pairs, 102 declared `superseded` records, 103 archived, every document dated. The inversion count is a **key-free** endpoint | [W-143](open/W-143-four-no-op-priors.md) |
+| **Not done** | Rungs **2 000 / 5 000 / 10 000 are not built** — Arpit capped the session at 1 000. Scoring is Codex's, phase 5 | [W-136](open/W-136-golden-benchmark.md) |
+
+⚠ **`informed`, and no delta is stated in any direction** — the key is the
+Claude-authored stopgap ([W-145](open/W-145-codex-regenerates-the-key.md)). No
+verdict, no threshold, no prediction closed.
+
+---
+
+
+## 2026-09-12 — W-141: Codex and Copilot skills share `.agents/skills/`
+
+**Ruled by Arpit 2026-09-12, after the vendor docs were re-read the same day.**
+Uncommitted at the time of writing; 3 479 unit (2 failures, both
+`test_open_work_is_not_stale` age rows, a UTC-vs-IST date in the Linux runner,
+unrelated) and 85 e2e green on the bridge.
+
+| what | outcome | evidence |
+|---|---|---|
+| **Codex's skill directory** | Codex's docs list `.agents/skills` only; fux had written all 13 Codex skills to `.codex/skills`. **Veto 3 fired, second time** | <https://developers.openai.com/codex/skills> · [ADR-AGENT-POLICY](../docs/adr/0132_agent-policy.md) decision 16 |
+| **The move** | `setup.SHARED_SKILLS` — one tuple in both the `codex` and `copilot` rows, at `.agents/skills/`. `.github/skills/` and `.codex/` are no longer written. `_write_agents` writes a shared path once. Outside set 84 → 71 files | `src/fux/setup.py` · ADR-DOTFUX · five new tests in `tests/test_setup_agents.py` |
+| **Copilot's copies** | a default install shows Copilot two same-name copies (`.claude/skills` + `.agents/skills`), not the three option (a) would have | <https://docs.github.com/en/copilot/concepts/agents/about-agent-skills> |
+| **This repo** | `.agents/skills/` written from the templates; `.codex/skills/` and `.github/skills/` deleted after all 26 files were checked equal to their templates; `fux-index` refreshed on every surface | `test_this_repos_own_agent_files_still_match_the_templates_that_ship` |
+| ⚠ **Not handled** | existing consumer repos keep their old folders — `fux setup` never deletes. Stated in CHANGELOG; nothing flags it | CHANGELOG *Unreleased/Changed* |
 
 ---
 
@@ -423,10 +470,60 @@ plain `mv` was used. **Arpit or the Claude Code session commits.**
 ⚠ **Filed as W-114, renumbered to W-122** — W-114 was already spent on the
 Codex-vendor work above, and ids are never reused.
 
-**Still open (W-122 phases 1, 4, 5, 6):** the CLAUDE.md section inventory; the
-generated law block and its test; the config consolidation (`config.schema.json`
-and `derive/runtime.schema.json` deleted, the four live keys moved into
-ADR-CONFIG's tree); the key-tree gate.
+**Phases 1, 4, 5 and 6 landed 2026-09-12** — the section below.
+
+---
+
+## W-122 (completed) — the laws come home, and the gate becomes a parser (2026-09-12)
+
+**The remaining four phases of Arpit's 2026-09-06 ruling.** `CLAUDE.md` stopped
+being normative; each law is stated in its own record; the check R-2 asked for is
+a parser, because there is now one source to parse.
+
+| what landed | where |
+|---|---|
+| **all ten laws' normative text moved into their own records**, each fenced by `LAW-TEXT` markers in §2, each record's §1 rewritten from *"this is the RATIONALE, not the law"* to *"this record is the HOME"*, and each §1 diagram (Mermaid **and** its ASCII twin) redrawn | [`docs/adr/0002_LAW-0-…`](../docs/adr/0002_LAW-0-authority.md) … [`0011_LAW-9-…`](../docs/adr/0011_LAW-9-environments.md) |
+| the generator — reads the ten blocks, rewrites link targets from record-relative to repo-root-relative (**the only transform**), `--write` / `--check` | [`scripts/gen-laws.py`](../scripts/gen-laws.py) |
+| **§Non-negotiable constraints is now a GENERATED block** between markers, under a heading that says so, with the regenerate command | [`CLAUDE.md`](../CLAUDE.md) |
+| the bind decision 5's permission depends on: byte-equality, one home per handle, **no verbatim third copy in any live document**, ADR-LAWS routes every handle, the section declares itself generated | [`tests/test_claude_md_laws.py`](../tests/test_claude_md_laws.py) — 8 tests |
+| decision 1 struck through (**kept, so live citations resolve**), 3 and 4 amended, decision 9's ⚠ block dated, §1 + both diagrams redrawn, and **the veto recorded as FIRED with its remedy declared wrong** | [ADR-LAWS](../docs/adr/0001_LAWS.md) |
+| decision 7 (the migration landed) + the two factual corrections it made on the way; veto 2 now names the test file | [ADR-LAW-0](../docs/adr/0002_LAW-0-authority.md) |
+| decisions 13 (**the declared key block**), 14 (an unknown key is REFUSED, not ignored), 15 (`config.schema.json` deleted); the §1 key tree and the annotated example gained the six missing `[sources.url]` keys | [ADR-CONFIG](../docs/adr/0113_config.md) |
+| decision 14 — its own declared key block, `[priority]` as the one open table | [ADR-TUNE](../docs/adr/0135_tuning.md) |
+| `KNOWN_KEYS` / `OPAQUE_TABLES` / `REFUSED_KEYS` and `_refuse_unknown_keys()` — the error names the key and lists what is legal at that level | [`src/fux/config.py`](../src/fux/config.py) |
+| **the gate R-2 wanted**: ADR-CONFIG ↔ `config.py` and ADR-TUNE ↔ `tune.py`'s `_SCHEMA`, both directions, plus *every refused spelling still errors* and *`tune.specimen()` names no undeclared key* | [`tests/test_adr_config_keys.py`](../tests/test_adr_config_keys.py) — 22 tests |
+| `fux setup`'s `fux.toml` comments reduced to pointers at ADR-CONFIG and ADR-TUNE | [`src/fux/setup.py`](../src/fux/setup.py) |
+| `config.schema.json` **deleted** — every field was a `doc:` string | `src/fux/config.schema.json` |
+| L8 repointed off `CLAUDE.md` onto ADR-LAW-8 | [`docs/GLOSSARY.md`](../docs/GLOSSARY.md) · [ADR-PROVENANCE](../docs/adr/0143_provenance.md) · `INTERVIEW.md` |
+
+🔴 **`derive/runtime.schema.json` was NOT deleted, and the plan was wrong about
+it.** W-122 §5 and ADR-LAW-0's Consequences both called it documentation-only;
+[`tests/derive/test_runtime_schema.py`](../tests/derive/test_runtime_schema.py)
+asserts its struct string, its field codes, its doc-table field set and its
+runtime version against `derive/format.py` **in both directions**. A declaration a
+test holds equal to the code **enforces**, which ADR-LAW-0 decision 4 permits —
+so deleting it would have removed a live gate to satisfy a rule it already
+satisfies. Both documents now record the correction. ⚠ **The five remaining
+schemas are exactly the "five declared planes" `schema.py` has always claimed**,
+so `test_schemas.py`'s `>= 5` is no longer slack.
+
+**W-140 row 8 closed with it** — *unknown `fux.toml` keys are silently ignored*.
+It could not be fixed alone: rejecting a key needs a set of real keys, and
+hand-writing one in `config.py` would have built the duplicate source L0 exists
+to remove. **One set, in the record, bound by a parser.**
+
+**Evidence.** `tests/` **3 740 passed, 2 skipped**, and the three failures are a
+concurrent session's in-flight deletion of
+`work/golden/prompts/1b-codex-feature-coverage.md` (one `test_doc_links`, two
+`test_okf_bundle`) — verified by the paths, none in this change's blast radius.
+`python scripts/gen-laws.py --check` is in sync.
+
+**Still open (Arpit, two rows):** whether `ADR-WORK-QUEUE` is written for
+`OPEN-WORK.md`'s rules, which are stated twice and owned nowhere; and how far
+*never restates* reaches into docstrings — this session applied the narrow reading
+and touched no docstring. Both are named in
+[`work/open/W-146-the-rest-of-l0.md`](open/W-146-the-rest-of-l0.md), which carries
+W-122's inventory verbatim.
 
 ## W-114 — the fourth vendor, and `fux-enrich` on every skill surface (2026-09-06)
 
@@ -1997,15 +2094,18 @@ Three shapes were on the table — stretch L2, write a new law, or leave it a
 product decision. **He chose the new law.**
 
 **Evidence:** [ADR-LAWS](../docs/adr/0001_LAWS.md) decision 8 and its table row;
-the normative text is in [`CLAUDE.md`](../CLAUDE.md) §Non-negotiable constraints,
-edited in the same change as required by ADR-LAWS decision 4.
+the normative text went into [`CLAUDE.md`](../CLAUDE.md) §Non-negotiable
+constraints in the same change, as ADR-LAWS decision 4 then required. ⚠ **It
+moved on 2026-09-12** — L8 is now stated by
+[ADR-LAW-8](../docs/adr/0010_LAW-8-use-record.md) and `CLAUDE.md` carries a
+generated view (W-122).
 [ADR-QUALITY](../docs/adr/0141_quality-contract.md) decision 11 — the record that
 declined to settle it — now names the answer. **No measured run: this is a
 decision, not a measurement.**
 
 > **L8** · *A use record never leaves the machine.*
 >
-> ⚠ **This handle changed on 2026-08-27, the day L8 was written**: it read *"What fux retains about use is hashed, bounded, and local"* until Arpit reverted the hashing, the size bound and the stdout prohibition hours later. Plaintext queries and answers are legal; what survives is the confinement. Read the law at its one home, `CLAUDE.md` §Non-negotiable constraints.
+> ⚠ **This handle changed on 2026-08-27, the day L8 was written**: it read *"What fux retains about use is hashed, bounded, and local"* until Arpit reverted the hashing, the size bound and the stdout prohibition hours later. Plaintext queries and answers are legal; what survives is the confinement. Read the law where it is stated — [ADR-LAW-8](../docs/adr/0010_LAW-8-use-record.md) §2 (it lived in `CLAUDE.md` until 2026-09-12).
 
 **What forced it.** The prohibition already existed as one ADR decision, and an
 ADR is a thing another ADR may supersede. Two facts made that too thin:

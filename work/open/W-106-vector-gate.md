@@ -99,3 +99,24 @@ exists on this machine), and a corpus that can carry the bar
 
 Any fux code. Any default. The Node reader. A compare doc (that is the
 PASS outcome's next step, not this item).
+
+## From OPEN-WORK (moved 2026-09-11)
+
+*Moved here verbatim when OPEN-WORK became one-to-two-line rows (Arpit, 2026-09-11). Links are rewritten for this directory.*
+
+*This is what the queue said at the move. Re-derive it before believing it (OPEN-WORK rule 4).*
+
+- 🟠 **Search v3 — what is left of it: W-107 Phases 1–4, then W-112.** ·
+  *(spec: [`proposals/search-v3.md`](../proposals/search-v3.md) §8 · one detail
+  file each under [`open/`](README.md))* · **Opus** executes, in Arpit's
+  ratified order: **W-107 Phases 1–4** → **W-112**. `ratified: 2026-09-05`
+  - **[W-106](W-106-vector-gate.md)** · `agent` · *(no record — a run)* · **the gate is measured and closed without a verdict** (Arpit's ruling — DENSE-CHUNK's frozen bar could not be tested: the playground's index was `fux.index.v1` and it carries no enrichment). 🔴 **What it found instead, and what W-112 has to answer: a pinned committed vector is an artefact of one implementation.** Two implementations of one model agree to **cosine 0.9964** and share **0 of 125** int8 vectors, with 41/50 top-5 orderings discordant ([the run](../regression/2026-09-05-vector-gate/report.md)). ⚠ **The DoD's `pooling: mean` is wrong for BGE** and the misconfigured arm scored best. **Still owed: the two-architecture arm** (arm64 only so far) **and a corpus — under [L9](../../docs/adr/0011_LAW-9-environments.md), fux-lab's golden test data (W-136).** `filed: 2026-09-04`
+
+## 2026-09-12 — the golden corpus exists; the arm does not
+
+Five rungs (20 → 1 000 documents) are built, frozen and indexed. That closes the
+*"and a golden corpus"* half of what this gate owed. **The two-architecture arm
+is still owed and nothing here supplies it.**
+
+⚠ Rungs 2 000, 5 000 and 10 000 are **not built** — Arpit capped the session at
+1 000 — so a gate that needs a larger corpus needs those rungs built first.

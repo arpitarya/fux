@@ -30,6 +30,8 @@ then refresh this repo's renderings.
 |---|---|---|---|
 | 12 | **`fux path --hops` is unbounded** — `--hops 7` runs over a minute on ~960 documents, because simple-path enumeration grows steeply and one shared tag makes a thousand documents mutually two hops apart. **Three answers, none obviously right: cap the argument, warn above a threshold, or bound the walk's work.** A fork, so it needs a compare doc — [ADR-GRAPH](../../docs/adr/0126_graph.md) §Consequences states it | `graph/walk.py`, `cli.py` | ADR-GRAPH |
 
+| 21 | ⚠ **A SECOND e2e maintenance test races the background runner.** `test_two_commits_in_quick_succession_produce_one_runner_and_one_index` failed once in a combined `tests tests_e2e` run on 2026-09-12 and passed in isolation and on four consecutive runs of its own file. Row 19 was the first instance and its gate (`quiesce` before reading a shard) does not cover this one — this test is *about* the runner, so quiescing would defeat it; it waits through `_drain`, which polls `doctor --json` for `running=false, pending=0`. **Not reproduced, so not diagnosed** — row 19's first diagnosis was wrong and cost two sessions, so this is filed rather than guessed. **Capture the failure output before changing anything** | `tests_e2e/test_maintenance.py` `_drain` | ADR-MAINTENANCE |
+
 ## 2 · Records that disagree with the code
 
 - **ADR-ASK / ADR-REFER d19 / `output.schema.json`** say six freshness states; `Verdict.label` has five.
@@ -116,7 +118,8 @@ then refresh this repo's renderings.
 
 - **Row 8 — unknown `fux.toml` keys are silently ignored — MOVED to W-122, not
   fixed here.** The fix is a key set to validate against, and
-  [W-122](W-122-adrs-are-the-source.md) already owns exactly that as gate R-2:
+  W-122 already owned exactly that as gate R-2, and **landed it on 2026-09-12**
+  ([IMPLEMENTATION](../IMPLEMENTATION.md) §W-122):
   *ADR-CONFIG's fenced key tree ↔ `config.py`, both directions, so a key is
   real only if it is in the tree*. Hand-writing a second key set here would
   create the duplicate source of truth W-122 exists to remove — and this defect

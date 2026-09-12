@@ -73,3 +73,15 @@ compare doc (*vectors* vs *doc2query*) has Arpit's verdict.
 ## Out of scope
 
 Fux computing any vector. A bundled model. Score-space fusion.
+
+## From OPEN-WORK (moved 2026-09-11)
+
+*Moved here verbatim when OPEN-WORK became one-to-two-line rows (Arpit, 2026-09-11). Links are rewritten for this directory.*
+
+*This is what the queue said at the move. Re-derive it before believing it (OPEN-WORK rule 4).*
+
+- 🟠 **Search v3 — what is left of it: W-107 Phases 1–4, then W-112.** ·
+  *(spec: [`proposals/search-v3.md`](../proposals/search-v3.md) §8 · one detail
+  file each under [`open/`](README.md))* · **Opus** executes, in Arpit's
+  ratified order: **W-107 Phases 1–4** → **W-112**. `ratified: 2026-09-05`
+  - **[W-112](W-112-vector-plane.md)** · `arpit` · *(**ADR-VECTORS** new · ADR-DOTFUX · ADR-INGEST · ADR-ASK · ADR-PROVENANCE)* · the vector plane — `fux embed`, pinned `.fux/vectors/`, `--qvec`, rank-space fusion; fux never computes a vector. 🔴 **Blocked on three things:** a corpus — **under [L9](../../docs/adr/0011_LAW-9-environments.md) the golden ladder in fux-lab (W-136)**, a re-run gate, and a compare doc Arpit rules on **once it is written** (not yet — nothing to decide today). ⚠ **The determinism claim the design can actually make is *"same clone + same embedder build"*, never *"same model"*** — W-106's `0 of 125` is why. `filed: 2026-09-04`

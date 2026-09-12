@@ -1,3 +1,8 @@
+---
+type: Index
+description: "Index of the open work items, one detail file each."
+---
+
 # `work/open/` — one file per open work item
 
 [`../OPEN-WORK.md`](../OPEN-WORK.md) is an **index**: one line per item, no
@@ -8,6 +13,12 @@ detail. The detail lives here, one file per `W-nn`, named
 
 1. An item's file is created in the same change that opens the item, and
    its one-line row is added to `OPEN-WORK.md` in that same change.
+   **The row is one or two lines, always; every other word about the item lives
+   in this file** (Arpit, 2026-09-11 — OPEN-WORK rule 10, gated by
+   `tests/test_open_work_rows_are_short.py`). **The row opens with its ball** —
+   🔴 blocked on Arpit (directly or through another item) · 🟡 waiting · 🟢 no
+   blockers — then optional 🧨 broken or worsening and 🔺, which only Arpit adds
+   (OPEN-WORK rule 6).
 2. When an item closes, **delete its index row and move its file to
    [`archive/open/`](../../archive/open/)** — in the same change as the work.
    *(Arpit, 2026-08-19: archive the file rather than delete it. The row still

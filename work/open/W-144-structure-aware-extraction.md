@@ -56,3 +56,11 @@ and every format inherits it free.
 measured on is the golden ladder in fux-lab ([L9](../../docs/adr/0011_LAW-9-environments.md)),
 and the proposal asks for a verdict at 10 000 documents, which is the ceiling
 and therefore the right size.
+
+## Unblocked 2026-09-12 — table-heavy documents are in the ladder
+
+The golden ladder carries rate cards, notification matrices, grace tables and
+preventive-maintenance schedules — markdown tables inside otherwise short
+documents, which is the exact shape this item asks about. Five rungs are frozen
+with committed indexes, so `flen` can be read per document without ingesting
+anything.

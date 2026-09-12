@@ -1,3 +1,8 @@
+---
+type: Handoff
+description: "Cold-start state of play for a successor session: in-flight work, constraints, lessons."
+---
+
 # Model handoff — the agent-succession record
 
 *The premise: the departing model answers for the record, so whatever succeeds it —
@@ -27,8 +32,149 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-09-11**.* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-09-12**.* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
+
+### The sealed golden benchmark is real test data now — five frozen rungs (2026-09-12, Claude Code)
+
+**W-136 phases 2 and 4 are done to rung 1 000.** `work/golden/ladder/` carries
+the manifests; the corpora live in `~/my_programs/fux-lab/corpora/golden/`, one
+self-contained git repo per rung with its own committed index.
+
+**Why this matters more than the numbers it produced.** Before this, every
+ranking prior that reads a *declaration* was being measured on a corpus that
+declared nothing: the playground has no `supersedes:` on any branch of its
+history, no `archived=true`, and ten files from one commit. Three of the four
+priors were therefore no-ops at **every value including 0.0**, and that is what
+the open blocker is about. The ladder declares all of it — **102 `superseded`
+records, 103 archived, and 1 000 of 1 000 documents carrying an `mtime`** — and
+the counts are read back out of the built index, not asserted from the sources.
+
+**What a successor most needs to know:**
+
+1. 🔴 **The ladder was committed BEFORE the questions were opened** (`92f5bff`).
+   The questions were released early on Arpit's instruction, so phase 2 ran on
+   its honour and `git log` is the only durable proof. **Do not rebuild or extend
+   a frozen rung** — a rung touched after the release is `informed` permanently.
+2. 🔴 **Every number scored against the current key is `informed` and NO DELTA
+   may be stated** — the key is Claude-authored, W-145. The three findings in
+   [the report](regression/2026-09-12-golden-ladder/report.md) are stated because
+   they are **key-free**: they read ranked lists and corpus structure.
+3. **The key-free endpoint is the useful thing here.** The supersession-inversion
+   count needs no answers at all, so W-143's remeasure can run today and is not
+   contaminated. That is the one measurement this ladder produces that nobody
+   has to caveat.
+4. ⚠ **Name your endpoint before you sweep `superseded_weight`.** The document
+   plane inverts a declared pair about half the time; `fux answer` recovers the
+   same question. They are different answers to different questions and averaging
+   them measures neither.
+5. ⚠ **`rung-seed` saturates** — with only seed documents present, every top-1 is
+   trivially a seed path, so the improvement direction has zero headroom and is
+   **Inconclusive**, not *no detected change*. Start ranking endpoints at
+   `rung-00100`. This is the 2026-08-28 `heading` control failure again.
+6. **Rungs 2 000 / 5 000 / 10 000 are NOT built.** Arpit capped the session at
+   1 000. Building them is the obvious next agent-lane run and needs no ruling;
+   `build_golden_rung.py --rung rung-02000 --count 2000` is the whole command.
+7. **The lab commits nothing**, so the generator and the twenty hand-authored
+   hard negatives are filed under the run's `evidence/generator/`. That is what
+   makes the corpus reproducible; do not let it drift from the lab copy.
+
+### The diagrams are now drawn from the code -- and reading them surfaced four live contradictions (2026-09-12, Cowork)
+
+**Five diagrams replace four**, all authored against `src/`, never against the
+paper: `architecture-{high-level,detailed,decoders,ask,answer}.svg`.
+`architecture-search-v3.svg` became `proposal-search-v3-target.svg` -- it draws
+a proposal's target state, so it is deliberately outside that namespace.
+
+🔴 **Four contradictions were found and NOT fixed.** Each is its own change
+under law zero. A session that touches one of these files fixes the one it
+touches; none of them is waiting on a sweep:
+
+1. **The paper's §4 keyspace does not exist.** `L/ P/ D/ V/ E/ M/` in a
+   content-addressed MST, BIC postings, MPH+EF, 32-byte vectors -- none of it
+   shipped. What exists is `.fux/index/{00..ff}.jsonl`, flat and doc-major.
+   **Nothing at the point of reading says so.** The new detailed diagram says
+   it; the paper still does not.
+2. **ADR-RANKING §1's diagram shows the pre-W-111 two-key sort**
+   `(-round(score,9), id)` while its own later section states the 5-key order.
+   `rank.py:349` is authoritative; the record contradicts itself.
+3. **ADR-REFER decision 6 still says "the verdict is four-state"** while a later
+   decision in the same record adds `as-ingested` (shipped 2026-09-01).
+   `Confidence.verified`'s docstring carries the same omission.
+4. **ADR-DOTFUX's Mermaid says `sources/ -- dirs - urls - types`** while its own
+   ASCII twin says `formats.toml`. The two halves of a diagram whose stated rule
+   is *update both, always, together* have drifted.
+
+**Two more things that are true and will surprise you:** the **ARC cache is
+implemented, tested, and never constructed on the shipped path** --
+`answer_via_refer` passes no `cache=`, so the TTL fetch cache is what actually
+runs. And `_assemble.py` still says `refer()` gets "exactly one candidate
+document"; W-108 made it three, so the per-doc cap it claims does not bind now
+does. The code is right in both cases; the prose is not.
+
+**The rule the new set follows:** every diagram names what is **not** built, in
+its own band, rather than leaving a reader to assume the picture is the product.
+The old set's *"PROPOSED -- NOTHING IN THIS BAND IS BUILT"* footer had four
+shipped features in it, which is exactly the failure this rule exists to stop.
+
+### Positioning is settled, and the proposal's own framing was the defect (2026-09-12, Cowork)
+
+**What fux is, in the words that shipped:** *A search index for your written
+knowledge — decisions, runbooks, specs, wiki pages — committed to git and read
+by agents.*
+
+- **Do not reintroduce *code*, *codebase*, or *organization* into the pitch.**
+  All three are struck, by Arpit, on the record.
+  - *code* — fux's corpus is written knowledge; a repository is one place it can
+    live, **not what fux is about**. Even the fix *"the documents around your
+    code"* was rejected: it keeps code as the reference point, which is the same
+    misfiling in a quieter voice.
+  - *organization* — *"I want even people who are not part of an organization to
+    use it as well."* Second person covers a solo user and a company at once.
+- **The counterweight has exactly two homes**, deliberately: the last *Why fux*
+  bullet in `README.md` (**It indexes documents, not code**) and the
+  **Documents, not code** glossary entry. It is not in the tagline and not in
+  the lede — a denial in the opening sentence keeps the association alive.
+- **The OKF bar is now a test, not a claim.** `tests/test_okf_bundle.py`, 237
+  documents, 0 failures. The ALL-CAPS `type` exemption is gone — it was a repo
+  convention the spec never had, and it is why the tree and the conformance
+  claim disagreed for a month. Bundle scope lives in `docs/index.md`; the test
+  enforces it.
+- ⚠ **Three things stayed deliberately unfixed, and each has a reason you should
+  not re-litigate blind:** pre-2026-08-25 regression artifacts are **frozen**
+  (same baseline as `test_regression_runs.py`); `work/golden/seed|golden-answer`
+  is **sealed test data**; the `code`→`path` edge-kind rename is **declined** in
+  favour of a glossary definition and remains ADR-GRAPH's.
+- 🔴 **On Arpit's hands:** `pytest -q` on the Mac (the device VM is 3.10, no
+  pytest), and the **GitHub About + topics**, which still carry the old
+  positioning and are a strong classifier signal.
+- **Full record:** [`proposals/positioning-documents-not-code.md`](proposals/positioning-documents-not-code.md),
+  graduation block at the top.
+
+### The golden key is Claude's, and that is a known defect (2026-09-12, Cowork)
+
+**Read this before you touch anything under `work/golden/`.**
+
+- Arpit's Codex quota ran out mid-phase-1. He ruled that Claude write the
+  feature-coverage documents and the **124-question answer key** so phase 2 is not
+  blocked, and that [W-145](open/W-145-codex-regenerates-the-key.md) be filed in
+  the same breath for Codex to regenerate it.
+- **The key is in the chat, not on disk.** He chose option (2). There is no
+  `golden-answer/answers.jsonl` on this machine, and the one-rule prohibition is
+  unchanged and still binding — **do not go looking for the key, and if a question
+  or answer reaches your context, stop and say so.**
+- 🔴 **Nothing leaked. The defect is upstream of leakage:** the same model family
+  authored the questions and will grow the corpus and run the engine. The README's
+  *"Claude wrote the brief but no facts"* property is now false for the key and for
+  documents `11`–`15` and `seed/archive/`. The base ten are still Codex's.
+- **Binding consequence:** every run scored against this key is `informed`, and
+  **no delta measured against it may be stated.** It exercises the plumbing. It
+  does not produce a number anyone may cite.
+- **Prompt 1b no longer exists** — merged into `prompts/1-codex-seed.md`, which now
+  has part A (corpus, skip if `seed/` is populated) and part B (the key).
+- **Phase 2 is runnable now** and reads `seed/` only. Twenty documents,
+  `seed-dates.tsv` complete, four superseding pairs and five archived documents, so
+  `superseded_weight`, `archived_weight` and `recency` finally have inputs to read.
 
 ### W-140 — twelve defects closed, and what the closing taught (2026-09-11, Claude Code)
 
@@ -44,9 +190,9 @@ valuable judgement, but not the state of play.
 
 ### Operating guides on four vendors — ADR-AGENT-POLICY decision 15 (2026-09-11, Cowork; committed `4d243e3`)
 
-- **`fux setup` now writes 84 agent files, not 18**: ten guide skills × four skill surfaces, 21 path-scoped pointers (Kiro/Claude/Copilot), five Kiro auto guides. Roster: `setup.GUIDE_SKILLS`, `PATH_SCOPED_TOPICS`, `AUTO_GUIDE_TOPICS`. Gates: `tests/test_setup_agents_guides.py`.
+- **`fux setup` now writes 71 agent files, not 18** (84 until W-141 merged Codex's and Copilot's skills): ten guide skills on every vendor's skill surface, 21 path-scoped pointers (Kiro/Claude/Copilot), five Kiro auto guides. Roster: `setup.GUIDE_SKILLS`, `PATH_SCOPED_TOPICS`, `AUTO_GUIDE_TOPICS`. Gates: `tests/test_setup_agents_guides.py`.
 - 🔴 **Guides name workarounds for defects** (W-140). Fixing a defect without editing its guide ships a lie in the wheel — 15g, unenforced, and **exercised nine times on 2026-09-11**: every closed row deleted a workaround from a shipped skill.
-- **Codex reads `.agents/skills/` now** (W-141, Arpit's ruling) — until then fux's Codex skills may not load.
+- **Codex and Copilot share `.agents/skills/`** (W-141, closed 2026-09-12, ADR-AGENT-POLICY decision 16) — one tuple, `setup.SHARED_SKILLS`, in both rows; `.codex/skills/` and `.github/skills/` are no longer written, so the outside set is **71** files, not 84. ⚠ Consumer repos set up earlier keep their old folders; `fux setup` never deletes.
 
 ### L9 — each sibling environment has one job (2026-09-11, Cowork)
 
@@ -842,7 +988,7 @@ Ruled by Arpit on 2026-08-27, closing W-89.
 
 > **L8** · *A use record never leaves the machine.*
 >
-> ⚠ **This handle changed on 2026-08-27, the day L8 was written**: it read *"What fux retains about use is hashed, bounded, and local"* until Arpit reverted the hashing, the size bound and the stdout prohibition hours later. Plaintext queries and answers are legal; what survives is the confinement. Read the law at its one home, `CLAUDE.md` §Non-negotiable constraints.
+> ⚠ **This handle changed on 2026-08-27, the day L8 was written**: it read *"What fux retains about use is hashed, bounded, and local"* until Arpit reverted the hashing, the size bound and the stdout prohibition hours later. Plaintext queries and answers are legal; what survives is the confinement. Read the law where it is stated — [ADR-LAW-8](../docs/adr/0010_LAW-8-use-record.md) §2 (it lived in `CLAUDE.md` until 2026-09-12).
 
 - **Every one of L1–L7 governs what fux does to documents.** L8 is the first law
   about what fux retains of *people using it*. L2 governs **corpus content**, and
@@ -1485,7 +1631,35 @@ the reason is that the measuring environments are gone.**
 
 ## 2 · In flight, and the immediate next step
 
-*Updated **2026-09-11** (Claude Code, Opus) — maintainer line: this session.*
+*Updated **2026-09-12** (Claude Code, Opus) — maintainer line: this session.*
+
+### 🔴 READ THIS FIRST: `CLAUDE.md` is no longer where a law lives (2026-09-12)
+
+**W-122 landed in full.** Each law is **stated in its own record** —
+[`ADR-LAW-0`](../docs/adr/0002_LAW-0-authority.md) …
+[`ADR-LAW-9`](../docs/adr/0011_LAW-9-environments.md), in a `LAW-TEXT`-fenced block
+at the top of §2. `CLAUDE.md` §Non-negotiable constraints carries a **generated**
+copy, rendered by [`scripts/gen-laws.py`](../scripts/gen-laws.py) and held
+byte-equal by [`tests/test_claude_md_laws.py`](../tests/test_claude_md_laws.py).
+
+**What this changes for you, concretely:**
+
+- **To amend a law:** edit its record, then `python scripts/gen-laws.py --write`.
+  Editing `CLAUDE.md`'s block by hand fails a test and is reverted by the next
+  generation. A law still changes **only on Arpit's ruling, named in the record**.
+- **Reading a law record's §2 prose is now correct**, and before 2026-09-12 it was
+  the mistake ADR-LAWS existed to prevent. Both sentences are true of their dates.
+- **`ADR-LAWS` is the router** — handles and the table, nothing normative. Its
+  decision 1 is struck through and kept, because live citations point at it.
+- **A key is real only if it is in its record's declared `keys` block.**
+  [`tests/test_adr_config_keys.py`](../tests/test_adr_config_keys.py) holds
+  ADR-CONFIG ↔ `config.py` and ADR-TUNE ↔ `tune.py` equal in both directions, and
+  **an unknown `fux.toml` key is now refused by name** rather than ignored.
+- **[W-146](open/W-146-the-rest-of-l0.md) is what is left**, and it is Arpit's: the
+  26-row inventory naming eleven `CLAUDE.md` sections that are technical and
+  unhoused, plus two rulings — whether `ADR-WORK-QUEUE` is written, and how far
+  *never restates* reaches into docstrings. ⚠ **This session applied the narrow
+  reading and touched no docstring.** The unguarded exposure is named there.
 
 ### Where the queue stands, 2026-09-11
 
@@ -1831,6 +2005,11 @@ which are not laws:
   evidence, records and rulings go in the item's file under [`open/`](open/README.md).
   An item with no file gets one and an id first. Gated by
   `tests/test_open_work_rows_are_short.py` (OPEN-WORK rule 10).
+- **Every OPEN-WORK row opens with one ball, always** (Arpit, 2026-09-11): 🔴 blocked on
+  Arpit, directly or through another item · 🟡 waiting on another item · 🟢 no blockers.
+  Optional after it: 🧨 broken or worsening · 🔺 do first, **Arpit's alone**. Legend and pick order: OPEN-WORK rule 6.
+- **Every *Blocked on Arpit* row has a `↳ blocks:` sub-row** naming every item
+  that decision holds up, directly or through another item (OPEN-WORK rule 10, gated).
 - **There is no handoff directory.** Retired 2026-08-18 on Arpit's
   instruction and moved wholesale to `archive/handoff/`. **A spec for open work
   lives in that item's detail file under [`open/`](open/README.md)** — spec and

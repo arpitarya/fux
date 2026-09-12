@@ -580,3 +580,32 @@ on *"prove the daemon runs in a real repo"* — **the hold was right.**
 - **The rule it extends:** [ADR-RS](../../docs/adr/0133_predictions.md)
 - **The two caught failures:** [P1-GATE](../regression/2026-08-09-pruning-eval/VERDICT.md) ·
   [budget sweep](../regression/2026-08-22-budget-sweep/ANALYSIS.md)
+
+## From OPEN-WORK (moved 2026-09-11)
+
+*Moved here verbatim when OPEN-WORK became one-to-two-line rows (Arpit, 2026-09-11). Links are rewritten for this directory.*
+
+*This is what the queue said at the move. Re-derive it before believing it (OPEN-WORK rule 4).*
+
+- **W-87** · `agent`, blocked on W-136 ·
+  *(record: [ADR-QUALITY](../../docs/adr/0141_quality-contract.md))* · **what
+  "good" means, then measure.** ⚠ **Two things keep it open:**
+  - **The `judged` series has never been exercised** — no judged run exists.
+    ⚠ **Its input moves under L9** (2026-09-11): not the playground but fux-lab's
+    golden test data — blocked on W-136.
+  - 🔴 **Part B cannot run.** `acme` and `orbit` went in the 2026-08-20 wipe with
+    their generator, and `tools/pruning-eval/` hard-codes reading them. **R-11's
+    retarget at the playground is void under L9**; Part B runs in fux-lab on the
+    golden ladder — agent work, blocked on W-136 (W-138 repoints the harness). —
+  [detail](W-87-what-good-means.md) `filed: 2026-08-27`
+
+## Unblocked 2026-09-12 — five frozen rungs to judge on
+
+W-136 phases 2 and 4 are done to rung 1 000, with 620 per-query rows filed at
+[`work/regression/2026-09-12-golden-ladder/`](../regression/2026-09-12-golden-ladder/report.md).
+
+⚠ **Part B's contamination question is not settled by this.** The ladder's key
+is Claude-authored ([W-145](W-145-codex-regenerates-the-key.md)), so it is *not*
+yet the uncontaminable Part B corpus this item hoped for. It becomes one when
+Codex regenerates the key against the **same frozen ladder** — which is why the
+rungs were committed before the questions were opened.

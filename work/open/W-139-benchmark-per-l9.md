@@ -40,3 +40,16 @@ wrong answer to which still produces clean-looking numbers.
 ## Blocked on
 
 - **W-138** (SETUP-BENCHMARK rewritten) — the spec it builds against.
+
+## From OPEN-WORK (moved 2026-09-11)
+
+*Moved here verbatim when OPEN-WORK became one-to-two-line rows (Arpit, 2026-09-11). Links are rewritten for this directory.*
+
+*This is what the queue said at the move. Re-derive it before believing it (OPEN-WORK rule 4).*
+
+- 🟠 **W-139 — build fux-benchmark to L9.** `agent`, after W-138 · *(record:
+  [ADR-LAW-9](../../docs/adr/0011_LAW-9-environments.md))* · seven corpus folders
+  (100 → 10 000 docs of ~1 000 lines with tables, charts, bullets and Mermaid), a
+  fixed query set, every run timing each query and keeping its ranked list across
+  the current build and the newest `1.x`, diffed against the previous run. —
+  [detail](W-139-benchmark-per-l9.md) `filed: 2026-09-11`

@@ -89,3 +89,57 @@ observed / proven / unproven. **0 headroom in a direction is Inconclusive, not
 ## Out of scope
 
 Changing any default. Editing `tune.py`. Anything in pre-registration §6.
+
+## From OPEN-WORK (moved 2026-09-11)
+
+*Moved here verbatim when OPEN-WORK became one-to-two-line rows (Arpit, 2026-09-11). Links are rewritten for this directory.*
+
+*This is what the queue said at the move. Re-derive it before believing it (OPEN-WORK rule 4).*
+
+- **W-97** · `agent`, blocked on W-136 · *(record: [ADR-TUNE](../../docs/adr/0135_tuning.md) ·
+  [ADR-RS](../../docs/adr/0133_predictions.md))* · **the knob sweep — which
+  `.fux/tune.toml` defaults are defensible, measured rather than argued.**
+  Pre-registered as [`benchmark/PRE-REGISTRATION-TUNER.md`](../benchmark/PRE-REGISTRATION-TUNER.md)
+  (ids **T0–T5**, a third id space), procedure in
+  [`benchmark/RUNBOOK-TUNER.md`](../benchmark/RUNBOOK-TUNER.md). Three legs per
+  knob — the generated suite **selects**, the hand-graded playground **vetoes**
+  (bar: 0 broken; `q022`/`q033` named in advance for `superseded_weight`), a
+  latency fence **prices**. Output is a **candidate table with no
+  recommendation**; the change stays an ADR-TUNE amendment Arpit ratifies.
+  Scope is `rerank_weight` and `superseded_weight` only — `k1`/`b`, field
+  weights and recency have no instrument with headroom (§6 lists the generator
+  kinds owed).
+
+  🔴 **Under [L9](../../docs/adr/0011_LAW-9-environments.md), nothing here is runnable today.** T1's 13/37 headroom was
+  measured on the playground, which is no longer an instrument, and the generated
+  selection suite is not golden test data. **Every leg moves to fux-lab golden data
+  (W-136) under a new pre-registration that supersedes the frozen one** — the
+  latency fence may run in fux-benchmark, which is its job. The tooling
+  (`bench.py quality --tune`, per-query rows) carries over.
+
+  🔴 **T2 (`superseded_weight`) cannot run**: the knob moves **0 of 50** goldens
+  at every value on that corpus, because it declares no `supersedes:` key
+  ([the run](../regression/2026-09-11-four-priors-headroom/report.md)). **The named
+  veto queries `q022`/`q033` cannot be broken by a knob that reaches neither.**
+  T2 waits on the golden data's superseding pairs — [prompt 1](../golden/prompts/1-codex-seed.md) part A §3, which absorbed prompt 1b on 2026-09-12 (Arpit ruled **(b)**, 2026-09-11).
+
+  ⚠ **`rerank_weight` moves TWO mechanisms, not one** — since W-108 it also
+  scales the refer plane's passage proximity, which this sweep's design assumed
+  it did not. T1.a/T1.c read `ask` rows and do not fetch, so **T1.d's veto is the
+  exposed leg**; the bar is unchanged and the verdict owes that sentence.
+  ⚠ **`expand_weight` ships at `0.2` (Query2doc's 1:5) and is untested** —
+  [W-109's gate](../regression/2026-09-05-expand/report.md) ran every arm at that one
+  value. It is in §1's defaults table and §6's out-of-scope table, and **it cannot
+  join this sweep: no suite here passes `--expand`**, so no query can move it. —
+  — [detail](W-97-tuner-knob-sweep.md) `filed: 2026-08-28`
+
+## Unblocked 2026-09-12 — and the endpoint now has to be named
+
+The golden ladder is built to rung 1 000. Before sweeping `superseded_weight`,
+read [the run's analysis](../regression/2026-09-12-golden-ladder/ANALYSIS.md) §2:
+**the document plane inverts a declared supersession about half the time while
+`fux answer` recovers it on the same question.** A sweep that does not name its
+endpoint measures two different things and averages them.
+
+The inversion count is **key-free**, so that arm is not contaminated by
+[W-145](W-145-codex-regenerates-the-key.md). Anything scored against the key is.

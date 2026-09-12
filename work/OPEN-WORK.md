@@ -34,22 +34,22 @@ description: "The single live work queue, two lanes, plus the Blocked-on-Arpit i
 - 🟡 **W-139** · `agent`, after W-138 — build fux-benchmark: seven corpora, two versions, latency and ranked lists kept. [detail](open/W-139-benchmark-per-l9.md)
 - 🔴 **W-146** · `arpit` — L0's remainder: eleven unhoused `CLAUDE.md` sections want records, and two rulings are owed. [detail](open/W-146-the-rest-of-l0.md)
 - 🟢 **W-107** · `agent` — the Node read plane (`npx fux-search`), Phases 1–4; nothing blocks Phase 1. [detail](open/W-107-node-read-plane.md)
-- 🟡 **W-106** · `agent`, waiting on W-136 phase 2 — the vector gate still owes the two-architecture arm and a golden corpus. [detail](open/W-106-vector-gate.md)
+- 🟢 **W-106** · `agent` — the golden corpus now exists to rung 1 000; the gate still owes its two-architecture arm. [detail](open/W-106-vector-gate.md)
 - 🟡 **W-112** · `arpit`, waiting on W-106 — the vector plane: needs a golden corpus, a re-run gate, then a compare doc to rule on. [detail](open/W-112-vector-plane.md)
 
 ### testing
 
 - 🟢 **W-136** · `agent` — phases 2 and 4 done to rung 1 000; **rungs 2 000 / 5 000 / 10 000 are unbuilt**, and phase 5 scoring is Codex's. [detail](open/W-136-golden-benchmark.md)
 - 🔴 **W-145** · `arpit` — Codex regenerates the golden answer key; until then every golden number is `informed`. [detail](open/W-145-codex-regenerates-the-key.md)
-- 🟡 **W-115** · `agent`, waiting on W-136 phase 2 — the chunking change is unmeasured for quality; no document may cite it as measured. [detail](open/W-115-chunking-quality-unmeasured.md)
-- 🟡 **W-97** · `agent`, waiting on W-136 phase 2 — the knob sweep (`rerank_weight`, `superseded_weight`), rerun on golden data under a new pre-registration. [detail](open/W-97-tuner-knob-sweep.md)
-- 🟡 **W-142** · `agent`, waiting on W-136 phase 2 — rebuild the saturated `heading` negative control with headroom. [detail](open/W-142-heading-negative-control.md)
-- 🟡 **W-87** · `agent`, waiting on W-136 phase 2 — the first `judged` run, and Part B, both on the golden ladder. [detail](open/W-87-what-good-means.md)
-- 🟡 **W-144** · `agent`, waiting on W-136 phase 2 — does a table inflate `flen` and mis-rank a table-heavy document? The `structure-aware-extraction` proposal's trigger fired when OOXML landed. [detail](open/W-144-structure-aware-extraction.md)
+- 🟢 **W-115** · `agent` — the golden ladder exists (5 rungs to 1 000), so the quality measurement can run; until it does, no document may cite the chunking change as measured. [detail](open/W-115-chunking-quality-unmeasured.md)
+- 🟢 **W-97** · `agent` — the knob sweep (`rerank_weight`, `superseded_weight`) on the golden ladder, under a new pre-registration that names its endpoint. [detail](open/W-97-tuner-knob-sweep.md)
+- 🟢 **W-142** · `agent` — the ladder's `ext/sibling/` documents ARE heading-matched distractors (392 at rung 1 000); what is owed is the control's headroom proof. [detail](open/W-142-heading-negative-control.md)
+- 🟢 **W-87** · `agent` — the first `judged` run, and Part B, both runnable on the golden ladder now that five rungs are frozen. [detail](open/W-87-what-good-means.md)
+- 🟢 **W-144** · `agent` — does a table inflate `flen` and mis-rank a table-heavy document? The ladder carries table-heavy rate cards and matrices to test it on. [detail](open/W-144-structure-aware-extraction.md)
 
 ### adr update
 
-- 🟡 **W-143** · `agent` after W-136 phase 2, then `arpit` — remeasure the four no-op ranking priors: does any single value clear 0 broken? [detail](open/W-143-four-no-op-priors.md)
+- 🟢 **W-143** · `agent`, then `arpit` — the corpus it was blocked for exists: 145 co-ranked supersession pairs at `rung-seed`, and the inversion count is a key-free endpoint. [detail](open/W-143-four-no-op-priors.md)
 
 ---
 

@@ -49,3 +49,18 @@ or past WORKLOG entries; supersede a frozen pre-registration, never edit it.
 Records link to L9 and never restate it. Add the guard test. Run both suites.
 Commit only your own paths; do not push. Finish with the close-out list.
 ```
+
+## From OPEN-WORK (moved 2026-09-11)
+
+*Moved here verbatim when OPEN-WORK became one-to-two-line rows (Arpit, 2026-09-11). Links are rewritten for this directory.*
+
+*This is what the queue said at the move. Re-derive it before believing it (OPEN-WORK rule 4).*
+
+- 🔴 **W-138 — reconcile every artifact with L9.** `agent` · *(records: [ADR-LAW-9](../../docs/adr/0011_LAW-9-environments.md) ·
+  ADR-RS · ADR-QUALITY · ADR-ACCELERATOR · ADR-CONFIDENCE · ADR-ANSWER)* · **Arpit's L9,
+  2026-09-11:** the playground is his hands only; the lab runs every measurement on
+  golden test data ≤ 10 000; the benchmark only times queries and keeps ranked lists,
+  current build vs previous major. ~40 docs, tools, tests and plans still use the
+  playground as an instrument or mix the roles — rewrite them, and add a guard test
+  that nothing under `src/ tools/ tests/ scripts/` reads the playground. —
+  [detail](W-138-reconcile-with-l9.md) `filed: 2026-09-11`

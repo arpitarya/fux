@@ -68,3 +68,35 @@ corpus existing.
   the M1 pruning gate is the worked example of this exact error.
 - ⚠ **A paired comparison's floor tracks the discordant count, never the set
   size** (ADR-RS decision 19). A net of 6 is the floor of all floors.
+
+## From OPEN-WORK (moved 2026-09-11)
+
+*Moved here verbatim when OPEN-WORK became one-to-two-line rows (Arpit, 2026-09-11). Links are rewritten for this directory.*
+
+*This is what the queue said at the move. Re-derive it before believing it (OPEN-WORK rule 4).*
+
+- 🔴 **W-115 is STILL UNMEASURED FOR QUALITY, and now it is known why.** `agent`,
+  **blocked on W-136** · *(records: [ADR-RS](../../docs/adr/0133_predictions.md) ·
+  [ADR-DECODE](../../docs/adr/0139_decode.md))* · **The question has no instrument.**
+  The corpus with goldens (**playground**) produces a **byte-identical index across
+  the arms** — zero headroom, proven — and the corpus that can see the change
+  (**fux's own repo**) has **no goldens**. So *"did ranking get better?"* cannot be
+  asked today, and **no document may cite W-115 as measured.**
+  ⚠ **Do not point this at the playground again** — that has been tried and it was
+  wrong. **Ratified by [L9](../../docs/adr/0011_LAW-9-environments.md): the instrument is [W-136](W-136-golden-benchmark.md)'s
+  golden ladder in fux-lab** — the corpus decision is made, the corpus is not yet built.
+  `filed: 2026-09-06` · `re-scoped: 2026-09-11`
+
+## Unblocked 2026-09-12 — the ladder exists
+
+W-136 phase 2 built and froze five rungs (`rung-seed` … `rung-01000`) under
+`~/my_programs/fux-lab/corpora/golden/`, manifests in
+[`work/golden/ladder/`](../golden/ladder/). The corpus this item was waiting for
+is there, and its formats include the `.jsonl`/`.json` records the W-115 defect
+was found in only if a rung is extended to carry them — **it is not**, so read
+[the run's report](../regression/2026-09-12-golden-ladder/report.md) §2 for what
+the ladder does and does not contain before pre-registering.
+
+⚠ Any number scored against the golden **answer key** is `informed` until
+[W-145](W-145-codex-regenerates-the-key.md) closes. A chunking measurement that
+uses a key-free endpoint is not.
