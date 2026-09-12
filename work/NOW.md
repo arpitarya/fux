@@ -1,1 +1,1 @@
-✓ W-140: 12 rows closed in 9 commits (both 🔴 gone) · 🔴 next: Arpit confirms the golden answer key, and rules W-141
+✓ proposals + compare reviewed — 1 archived, 3 stale docs fixed, W-144 filed · 🔴 next: Arpit confirms the golden answer key (blocks nine items)

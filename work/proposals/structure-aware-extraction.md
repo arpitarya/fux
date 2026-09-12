@@ -70,6 +70,18 @@ derives `phrases` from `^#{1,6}` headings alone. Everything else is body.
 (OOXML), because that is the point at which most documents in a real corpus
 contain a table fux can see.
 
+✅ **THE TRIGGER FIRED, and this file did not move until 2026-09-12.**
+`src/fux/decode/docx.py`, `pptx.py` and `xlsx.py` all ship. Graduated into
+**[W-144](../open/W-144-structure-aware-extraction.md)**, blocked on W-136's
+golden corpus because the proposal's own text asks for a pre-registration and a
+verdict at 10 000 documents rather than an argument.
+
+⚠ **[ADR-TABULAR](../../docs/adr/0152_tabular.md) did not answer this**, and it
+is the nearest thing that might look like it had. It decided how a tabular
+document is **chunked** — one passage per row — which is a retrieval decision
+about passages. The suspicion below is about **ranking**: what a table
+contributes to `flen`. Both can be true and neither implies the other.
+
 ---
 
 ## 4 · Reference (required)

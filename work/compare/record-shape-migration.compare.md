@@ -1,7 +1,7 @@
 ---
 type: Compare Doc
 title: "The record shape under five fields — encoding, `wlen`, and the block bound"
-status: proposed
+status: accepted
 filed: 2026-08-23
 gates: W-76 Phase 1 (second half), and therefore Phases 2, 5, 7 and 8
 ---
@@ -176,14 +176,29 @@ wearing different clothes.
 
 The growth in W-76 comes from Phase 7's committed vectors, not from here.
 
-## Owed before this is accepted
+## Owed before this is accepted — ✅ ALL FOUR DISCHARGED
 
-1. **The `wlen` equality gate** (fork 2) — one line, and it is the proof the
-   migration moved no ranking.
-2. **A p95 measurement with per-field extrema** (fork 3) at 10 000 documents,
-   pre-registered under ADR-RS, against R3's 150 ms bar.
-3. **`ENTRY_STRUCT` is a packed binary format and `RUNTIME_SCHEMA` must bump
-   with it** — it is already at `fux.runtime.v2` from W-73; this takes it to
-   v3.
-4. Fork 3 has **no proposed verdict from Arpit yet** and it is the one with a
-   real trade in it. The other three are close to forced.
+⚠ **This section read as outstanding until 2026-09-12, three weeks after the
+last of it was done**, while the doc's frontmatter still said `proposed` and
+its own row in [`README.md`](README.md) said *all four B, and all four shipped*.
+**The index was right and the document was wrong** — which is the direction
+that matters, because a reader opening this file to see what a fork still owes
+was told four things that were finished.
+
+1. ✅ **The `wlen` equality gate** (fork 2) — `flen` replaced `wlen` entirely;
+   `store/format.py` records the substitution at the point of use.
+2. ✅ **A p95 measurement with per-field extrema** (fork 3) —
+   [2026-08-23](../regression/2026-08-23-fork3-per-field-bound/report.md):
+   **64.54 ms warm p95 against R3's 150 ms bar, PASS**, with the reference scan
+   at 207.28 ms. Roughly 2.3× of margin.
+3. ✅ **`ENTRY_STRUCT` / `RUNTIME_SCHEMA` bump** — shipped with the record
+   shape in `v2.0.0-alpha.0`; `ENTRY_SIZE` went 40 → 62 for the per-field
+   `mx`/`mnw`.
+4. ✅ **Fork 3's verdict** — answered by the measurement above rather than by
+   argument, which is what §the lifecycle asks for when a fork has a real trade
+   in it.
+
+⚠ **One thing in this document is NOT live and never shipped:** the phase table
+above lists **Phase 7's committed per-chunk `int8` vectors**. They were built
+and then **deleted at `2.0.0-alpha.1`** — the dense lane is gone. Read that row
+as history.

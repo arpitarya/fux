@@ -2,9 +2,15 @@
 type: Proposal
 title: "Claude Code prompt — execute Search v3"
 description: "The paste-ready prompt that ratified search-v3.md's seven items and flipped them to the agent lane. Arpit handed it over on 2026-09-05; W-108, W-109, W-110, W-111 and two measurements landed through it."
-status: graduated
+status: implemented
 timestamp: 2026-09-04T00:00:00Z
 ---
+
+⚠ **ARCHIVED 2026-09-12.** Executed in full on 2026-09-05; nothing in it is
+still to do, and no live document cites it. What remains of Search v3 lives in
+[`work/proposals/search-v3.md`](../../work/proposals/search-v3.md) and in W-107
+and W-112. **Archive is not evidence**: this may be named as the instrument
+that authorised those items, never cited as backing a live claim.
 
 ⚠ **Frontmatter added 2026-09-05**, and `status: graduated` rather than
 `proposed`: **this prompt was handed over and executed.** Arpit ratified

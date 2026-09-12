@@ -10,7 +10,7 @@ timestamp: 2026-09-04T00:00:00Z
 
 > ✅ **RATIFIED 2026-09-05 — `status: graduated`, updated 2026-09-05.** Arpit
 > ratified §8 item by item through
-> [the prompt beside this file](search-v3-claude-code-prompt.md), and **five of
+> [the prompt beside this file](../../archive/proposals/search-v3-claude-code-prompt.md), and **five of
 > the seven items have closed**: W-108, W-109, W-110 and W-111 landed, and
 > W-107 Phase 0 and W-106 were measured. **W-107 Phases 1–4 and W-112 remain**,
 > both on Arpit — which is why this file is `graduated` and not archived.

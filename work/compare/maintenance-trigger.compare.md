@@ -29,6 +29,27 @@ timestamp: 2026-08-20T00:00:00Z
 > **Reopen when:** R5 (20-doc commit < 1 s) or R6 (three-tier merge harness)
 > fails once measured — see W-25's DoD — or a hook is found to leave a
 > half-written committed shard on failure.
+>
+> 🔴 **THE TRIGGER FIRED ON 2026-08-20, THE DAY THIS WAS ACCEPTED, AND NOBODY
+> WROTE IT DOWN HERE.** R5 was measured and **FAILED**: 44.4 s for a 20-document
+> commit at the pre-registered judged size, against a 1 s bound — 44× over
+> ([R5-HOOK](../regression/2026-08-20-r5-hook-latency/VERDICT.md)). Noticed
+> 2026-09-12 while reviewing this directory.
+>
+> **The fork WAS revisited; only this document was not.** The answer is
+> [ADR-MAINTENANCE](../../docs/adr/0129_hooks.md) decision 1d: `post-commit`
+> **defers** — it records the changed paths and spawns a detached re-index, so
+> the commit returns at once and the re-index cost stops sitting on the
+> developer's keystroke. **Verdict A survived in substance** — hooks still
+> drive delta ingest, and CI/watch-daemon/manual were not revisited — but *"a
+> hook re-emits the changed lines"* now means *a hook asks for that to happen*.
+>
+> ⚠ **What this cost, and why it is written here rather than quietly fixed:**
+> for twenty-three days the accepted verdict in this file described a hook that
+> re-indexed inline, which is the thing R5 proved unaffordable. A reader
+> checking *has the trigger fired?* — the one question this block exists to
+> answer — would have been told no. **The trigger is now spent for R5** and
+> remains live for R6 and for the half-written-shard case.
 
 ## Context
 
@@ -115,7 +136,11 @@ only by `fux doctor` or a stale-answer fallback if someone thinks to check.
 
 **R5 or R6, once measured, fails** — the 20-doc-commit-under-1s target
 misses, or the three-tier merge harness shows machine planes conflicting or a
-human conflict silently resolved instead of preserved. Separately, **not a
+human conflict silently resolved instead of preserved.
+
+🔴 **R5's half is SPENT: it fired 2026-08-20 and was answered by the deferring
+hook** (ADR-MAINTENANCE decision 1d) — see the annotation under the verdict.
+R6's half and the half-written-shard case are still live. Separately, **not a
 reopen, a revisit**: once the hook exists, decide the `fux build`
 sub-question above and fold it into `ADR-MAINTENANCE` rather than letting it
 default silently.

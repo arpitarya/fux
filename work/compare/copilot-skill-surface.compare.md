@@ -13,6 +13,13 @@ timestamp: 2026-09-06T00:00:00Z
 > **widened by him on 2026-09-11** to cover `fux-decoder` and `fux-usage` as
 > well. The 2026-09-06 ruling shipped `fux-enrich` alone because that is what
 > was asked about; the 2026-09-11 ruling closes the roster.
+>
+> ⚠ **Moved to B — `.agents/skills/` — by Arpit on 2026-09-12** (W-141,
+> [ADR-AGENT-POLICY](../../docs/adr/0132_agent-policy.md) decision 16). Codex's
+> docs list `.agents/skills` as its only repository skill directory, so Copilot
+> and Codex now share it and `.github/skills/` is not written. **A's argument —
+> write Copilot its own copy, because `["copilot"]` alone must get skills —
+> stands; only the directory changed.** The reopen-trigger below is unchanged.
 > **Confidence:** medium-high — see *The crux, corrected* below: the collision
 > this doc called *unknown* is bounded much more tightly than it was written,
 > because the copies are **byte-identical by construction**.

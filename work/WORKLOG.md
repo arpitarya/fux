@@ -24,6 +24,79 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-12 — W-141 closed: Codex and Copilot share `.agents/skills/`  ·  Cowork (Opus)
+- **Asked:** check the Codex and Copilot docs for the right skill directory, get Arpit's confirmation, implement it, and cite the vendor docs in the ADR.
+- **Verified (2026-09-12):** Codex reads repo skills from `.agents/skills` only. `.codex/skills` is not listed ([Codex skills](https://developers.openai.com/codex/skills)). Copilot reads `.github/skills`, `.claude/skills` and `.agents/skills` ([GitHub docs](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills), [Copilot CLI](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-skills), [VS Code](https://code.visualstudio.com/docs/copilot/customization/agent-skills)).
+- **Ruled by Arpit:** use one shared `.agents/skills/` for both vendors and drop `.github/skills/`. He picked this over (a) moving Codex only, which would show Copilot three copies, and (b) writing both.
+- **Did:**
+  - Code: `setup.SHARED_SKILLS` is now used in both the `codex` and `copilot` rows. `_write_agents` writes a shared path once.
+  - Tests: five new tests. `SKILL_SURFACES` is now keyed by (vendor, directory).
+  - Records: ADR-AGENT-POLICY gains **decision 16**, with the vendor docs cited, plus amendments to 9a/11/13/14/14a/15a, veto 3, the alternatives and the references. ADR-DOTFUX, ADR-ENRICH and ADR-DECODE were fixed on contact. The `copilot-skill-surface` verdict now notes the move to B.
+  - Other docs: `INDEX-SKILL.md`, CHANGELOG and the `fux.toml` comment.
+  - This repo: `.agents/skills/` written; `.codex/skills/` and `.github/skills/` deleted after all 26 copies matched their templates.
+  - Queue: W-141 row and detail file removed; IMPLEMENTATION, INTERVIEW and DOC-REGISTRY updated.
+- **Tests (bridge, Linux):** 3 479 unit passed, 2 failed, 85 e2e passed. Both failures are `test_open_work_is_not_stale` age rows: the runner's UTC date is a day behind IST.
+- **Decided / open:**
+  - ⚠ Consumer repos set up earlier keep their old folders, because `fux setup` never deletes. CHANGELOG says so; nothing flags it.
+  - Nothing committed. Another session has 48 staged paths, including `.codex/skills/fux-answer` and `.github/skills/fux-answer`, which this change deleted.
+- **Next:** Arpit commits. The commit message must include ADR-AGENT-POLICY and ADR-DOTFUX, which the change already touches.
+
+## 2026-09-11 — what is W-141 blocked on (chat-only)  ·  Cowork (Opus)
+- **Asked:** what W-141 is blocked on.
+- **Did:** read OPEN-WORK and `work/open/W-141-codex-skill-directory.md`; answered. No code or queue change.
+- **Decided / open:** no ADR affected. W-141 still waits on Arpit's (a)/(b)/(c) ruling.
+- **Next:** Arpit rules W-141.
+
+## 2026-09-11 — balls are primary; 🧨 and 🔺 are optional modifiers; red is transitive  ·  Cowork (Opus)
+- **Asked:** every row always has one ball, and the balls are the primary legend. 🧨 and 🔺 are optional add-ons used with a ball. An item blocked on another item that is blocked on Arpit's decision is 🔴 too.
+- **Did:** **rule 6** is rewritten:
+  - a ball always: 🔴 means blocked on Arpit directly or through any chain; 🟡 means waiting on something whose chain does not end at Arpit; 🟢 means no blockers. Red wins.
+  - then optional 🧨 (any session) and 🔺 (Arpit only), in that order.
+  - agents pick from 🟢 only: 🟢🧨🔺 → 🟢🔺 → 🟢🧨 → 🟢.
+  - a 🔺 item waiting on an item without 🔺 is flagged to Arpit.
+  Header and rule 10 changed to match. **CLAUDE.md edited** (§OPEN-WORK point 8, recording the ruling), plus `work/open/README.md` and INTERVIEW.
+- **Re-balled:** W-140, W-138 and W-122 are 🟢 🧨. W-107 is 🟢. W-139 is 🟡 (after W-138, which is not blocked). W-106, W-112 (through W-106), W-115, W-97, W-142, W-87, W-143, W-136 and W-141 are 🔴.
+- **Gate:** the test now requires ball → 🧨? → 🔺? order, and checks that 🔴 is exactly the inbox decisions plus everything that transitively waits on one. 🟢 may not name a wait, and any 🔺 on an item waiting on an item without 🔺 is flagged. It passes on the real file, and every broken copy failed the right check: transitive 🟡, stray 🔴, wrong order, 🧨 alone, 🔺 on a plain blocker, 🟢 with "after". 🟢🧨🔺 and 🔴🧨 pass.
+- **Decided / open:** no ADR affected.
+- **Next:** Arpit rules W-136 phase 1 (it unblocks 8) and W-141; `uv run pytest -q tests` on the Mac.
+
+## 2026-09-11 — status marks final: 🔴 · 🧨 · 🟡 · 🟢, priority 🔺  ·  Cowork (Opus)
+- **Asked:** a non-ball symbol for broken or getting worse. After seeing about 20 options in chat, Arpit picked 🧨. He also wanted the priority sign swapped for an Obsidian sign, and chose 🔺 (Obsidian Tasks' highest priority) over keeping ⏫.
+- **Did:** replaced 🟣 with 🧨 and ⏫ with 🔺 in OPEN-WORK (header, rows, rules 6 and 10), CLAUDE.md, `work/open/README.md`, INTERVIEW and the gate test. "Ball" became "status mark" wherever 🧨 made "ball" untrue. This supersedes the balls entry below. Meanings, precedence (🔴 > 🧨 > 🟡 > 🟢), pick order and "🔺 is Arpit's alone" are unchanged. **CLAUDE.md edited**, recording the ruling.
+- **Gate:** all tests pass on the real file. A 🟣 row or a ⏫ row now fails; 🧨 🔺 passes; 🟡 🔺 waiting on a plain row fails. The stale and doc-links tests pass.
+- **Decided / open:** no ADR affected. Older DOC-REGISTRY notes and WORKLOG entries still show 🟣/⏫ as history, and are not edited.
+- **Next:** Arpit rules W-136 phase 1 and W-141, and adds 🔺 where he wants it; `uv run pytest -q tests` on the Mac.
+
+## 2026-09-11 — every Blocked-on-Arpit row names what it holds up (`↳ blocks:` sub-row)  ·  Cowork (Opus)
+- **Asked:** each *Blocked on Arpit* row should have a sub-row listing every work item that decision blocks.
+- **Did:** added a `| ↳ **blocks:** … | | |` sub-row under each inbox row. **W-136 phase 1** blocks W-136 phase 2, W-106, W-112, W-115, W-97, W-142, W-87 and W-143 (re-derived from each row and detail file; W-138 and W-107 are not blocked). **W-141** blocks nothing else in the queue.
+  - OPEN-WORK rule 10 requires the sub-row, and a new 🟡 row joins it in the same edit. The rule 6 🔴 bullet points to it. The CLAUDE.md triage/inbox bullet names it, and I fixed a garbled sentence I left there earlier.
+  - `test_open_work_is_not_stale` now skips `↳` sub-rows, since they have no date.
+- **Gate:** `test_open_work_rows_are_short` gained two tests: a sub-row under every decision, and the sub-row names exactly the open items that wait on it, directly or through a chain, as the rows' *blocked on / after* text says.
+  - It passes on the real file and fails on each broken copy: an item removed, a stale id, the sub-row deleted, the sub-row emptied, or a new item waiting on W-141 left out.
+  - The stale test and doc-links test also pass.
+- **Decided / open:** no ADR affected.
+- **Next:** Arpit rules W-136 phase 1 and W-141; `uv run pytest -q tests` on the Mac.
+
+## 2026-09-11 — OPEN-WORK balls: 🔴 blocked on Arpit · 🟣 broken · 🟡 waiting · 🟢 go · ⏫ Arpit's  ·  Cowork (Opus)
+- **Asked:** replace 🔥 with a purple ball. Red means blocked on Arpit, green means good to go, and a separate symbol shows priority. Arpit saw the proposal and a combination example in chat, approved it, and asked that every future item follow it.
+- **Did:** this supersedes the 🔥/🟠 entry below. OPEN-WORK header and **rule 6** carry the legend:
+  - one ball per row: 🔴 blocked on Arpit, 🟣 broken or worsening, 🟡 waiting on another item or Codex, 🟢 good to go. When two apply, the first wins.
+  - **⏫ do first** is optional and set only by Arpit.
+  - pick order: 🟣⏫/🟢⏫ → 🟣 → 🟢; 🟡 waits.
+  - a session names every 🔴 first, ⏫ first. A 🟡⏫ waiting on a plain row is flagged to Arpit.
+- **Rule 10** now requires the ball on a row from the day it is filed. **Inbox rows now carry 🔴.** **CLAUDE.md edited:** §OPEN-WORK point 8 and the triage line, recording the ruling. Also updated `work/open/README.md` contract 1 and an INTERVIEW standing constraint.
+- **Re-marked:** W-140, W-138, W-122 🟣 · W-107 🟢 · W-136, W-141 🔴 · the other eight 🟡. No ⏫ was added, because that is Arpit's.
+- **Gate:** `tests/test_open_work_rows_are_short.py` gains four checks:
+  - one ball per row
+  - 🔴 ⇔ inbox
+  - 🟡 names its wait, and 🟢 is not blocked
+  - no 🟡⏫ waiting on a plain row
+  It passes on the real file, and each check fails on a mutated copy. The existing stale, doc-links and doc-registry checks pass. Not checkable: whether 🟣 is true, and who added a ⏫.
+- **⚠ Concurrent session:** another session is editing W-140 and set its mark to 🟠 twice today. That mark is now invalid and the gate fails on it.
+- **Decided / open:** no ADR affected.
+- **Next:** Arpit adds ⏫ where he wants it; `uv run pytest -q tests` on the Mac.
+
 ## 2026-09-11 — OPEN-WORK row marks: 🔥 for broken or worsening, 🔴 retired  ·  Cowork (Opus)
 - **Asked:** what the red and orange balls mean, because no legend existed. Then: broken or worse-every-day needs its own symbol, not a red ball.
 - **Did:** added a **Marks** legend to OPEN-WORK's header and rule 6: 🔥 broken, or worse every day it waits · 🟠 important, not getting worse · no mark, normal. Fixed rule 6's "former" to "latter". **CLAUDE.md edited** (§OPEN-WORK point 8, recording the ruling). Added the gate `test_every_open_item_uses_a_legend_mark`: it passes, and fails on a 🔴 row.
@@ -55,6 +128,13 @@ play: the worklog is the granular, per-exchange trail.
 - **Did:** filed [`proposals/abstention-gate.md`](proposals/abstention-gate.md) — the finding (20 of 20, twice; band/separation/floor not the lever), the mechanism (ADR-CONFIDENCE d3: abstains only when nothing scores), the `weak`-says-don't-answer vs `answerable: true` contradiction, options A disclose / B gate quality claims / C build abstention in fux-lab on golden data (C1 doc_coverage gate, C2 weak ⇒ not answerable, C3 passage check), recommendation **B then C**, graduation trigger. Inbox row deleted; the row's content now lives in the proposal (rule 3's only-home check). Proposals index row added.
 - **Decided / open:** parked, not decided. Power caveat recorded: ~10 golden unanswerable questions only detect large effects.
 - **Next:** Arpit picks A/B/C whenever he reads the proposal.
+
+## 2026-09-12 — the proposals and compare docs reviewed; one archived, three stale  ·  Claude Code (Opus)
+
+- **Asked:** review `work/proposals/` and `work/compare/`, archive the ones already implemented. (Before that, W-140 rows 6, 7, 14, 16 and 20 closed — 4 code rows left, none critical.)
+- **Did:** read all 17 proposals and 20 compare docs against the repo rather than against their index rows. **One archived:** `search-v3-claude-code-prompt.md` — executed in full 2026-09-05, cited by no live document, and it said so itself. **Three were stale rather than archivable:** `maintenance-trigger.compare.md`'s reopen-trigger (*R5 fails once measured*) **fired on the day it was accepted** — R5 FAILED at 44.4 s against a 1 s bound — and nothing recorded it here for 23 days, though the fork *was* answered by the deferring hook (ADR-MAINTENANCE 1d); `record-shape-migration.compare.md` still said `proposed` with four items *owed before this is accepted*, all four discharged by 2026-08-23; `structure-aware-extraction.md`'s graduation trigger fired when OOXML landed, so it graduated into **W-144**.
+- **Decided / open:** **most compare docs are NOT archivable and that is correct** — `archive/compare/README.md` sets the bar at *the trigger can no longer fire*, not *implemented*, and nearly every trigger is still checkable. **`ranking-tuning.md` stays**: ADR-LAWS and ADR-TUNE both ground Reference-block claims in its §8 survey, and its index row misread its trigger as unfireable — corrected. W-144 is 🔴, blocked on W-136 like everything else that needs a corpus.
+- **Next:** W-140's last four rows (12's `--hops` fork, plus the 13 record/code disagreements); W-138 and W-122 are the other two purple rows.
 
 ## 2026-09-11 — W-140: twelve defects closed, one by one  ·  Claude Code (Opus)
 

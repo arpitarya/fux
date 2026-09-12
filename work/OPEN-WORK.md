@@ -14,9 +14,7 @@
 | what he decides | filed | age |
 |---|---|---|
 | 🔴 **W-136 phase 1** — did Codex write the ~100 answer-key questions? No → re-run [prompt 1](golden/prompts/1-codex-seed.md). Yes → run [prompt 1b](golden/prompts/1b-codex-feature-coverage.md), then phase 2. | 2026-09-11 | 1d |
-| ↳ **blocks:** W-136 phase 2 · W-106 · W-112 · W-115 · W-97 · W-142 · W-87 · W-143 | | |
-| 🔴 **W-141** — Codex reads `.agents/skills/`, fux writes `.codex/skills/`. Move, write both, or wait? [detail](open/W-141-codex-skill-directory.md) | 2026-09-11 | 1d |
-| ↳ **blocks:** nothing else in the queue — only W-141's own roster edit | | |
+| ↳ **blocks:** W-136 phase 2 · W-106 · W-112 · W-115 · W-97 · W-142 · W-87 · W-143 · W-144 | | |
 
 ---
 
@@ -39,10 +37,10 @@
 - 🔴 **W-97** · `agent`, blocked on W-136 — the knob sweep (`rerank_weight`, `superseded_weight`), rerun on golden data under a new pre-registration. [detail](open/W-97-tuner-knob-sweep.md)
 - 🔴 **W-142** · `agent`, blocked on W-136 — rebuild the saturated `heading` negative control with headroom. [detail](open/W-142-heading-negative-control.md)
 - 🔴 **W-87** · `agent`, blocked on W-136 — the first `judged` run, and Part B, both on the golden ladder. [detail](open/W-87-what-good-means.md)
+- 🔴 **W-144** · `agent`, blocked on W-136 — does a table inflate `flen` and mis-rank a table-heavy document? The `structure-aware-extraction` proposal's trigger fired when OOXML landed. [detail](open/W-144-structure-aware-extraction.md)
 
 ### adr update
 
-- 🔴 **W-141** · `arpit` — Codex skill directory: move to `.agents/skills/`, write both, or wait. [detail](open/W-141-codex-skill-directory.md)
 - 🔴 **W-143** · `agent` after W-136, then `arpit` — remeasure the four no-op ranking priors: does any single value clear 0 broken? [detail](open/W-143-four-no-op-priors.md)
 
 ---

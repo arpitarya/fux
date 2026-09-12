@@ -320,6 +320,7 @@ index row, and four of them should not have been in a live directory at all.
 
 | archived | date | live successor |
 |---|---|---|
+| [`proposals/search-v3-claude-code-prompt.md`](proposals/search-v3-claude-code-prompt.md) | 2026-09-12 | **Executed in full on 2026-09-05** — the instrument Arpit ratified `search-v3.md` §8 through; five of its seven items closed. Nothing in it was still to do and no live document cited it. Live successors: [`work/proposals/search-v3.md`](../work/proposals/search-v3.md) for what remains of the plan, and **W-107** and **W-112**, which are the two items still open |
 | [`proposals/node-search-port.md`](proposals/node-search-port.md) | 2026-09-05 | **Superseded 2026-09-04** by [`work/proposals/search-v3.md`](../work/proposals/search-v3.md), which folded it in whole. Live successor: **W-107**, the Node read plane — its phases, its gate and [`PRE-REGISTRATION-NODE.md`](../work/benchmark/PRE-REGISTRATION-NODE.md) |
 | [`proposals/agent-run-embeddings.md`](proposals/agent-run-embeddings.md) | 2026-09-05 | **Superseded 2026-09-04** by `search-v3.md`. Live successor: **W-112**, the vector plane — still blocked, and the shape it must take is now measured rather than argued ([the vector gate](../work/regression/2026-09-05-vector-gate/report.md): two correct implementations of one model share **0 of 125** int8 vectors) |
 | [`proposals/retrieval-quality-per-verb.md`](proposals/retrieval-quality-per-verb.md) | 2026-09-05 | **Superseded 2026-09-04** by `search-v3.md`. Live successor: **W-108 … W-111**, four of which have landed |
