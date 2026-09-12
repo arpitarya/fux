@@ -35,6 +35,153 @@ valuable judgement, but not the state of play.
 *Updated **2026-09-12**.* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
+### Three controls answered, one control retired, and a lesson about endpoints (2026-09-12, Claude Code)
+
+**W-142 and W-115 are CLOSED and their files deleted. W-144 and W-136 moved to
+the `arpit` lane.** [The run](regression/2026-09-12-reaim-and-instruments/report.md),
+three verdicts, 766 rows.
+
+**The thing to carry forward is not any one result. It is this:**
+
+> **All three items had a confirmed mechanism and no endpoint that could carry a
+> quality question, and each failed in a different way that looked like a null.**
+
+- **W-144's endpoint had truth and no headroom.** `df == 1` probe terms: 12/12
+  in both arms at every dilution, because a `df == 1` term's idf is unreachable
+  by length normalisation. **Fixed by one line** — probe terms at `df` 4-23.
+- **W-115's corpus had the right formats and the wrong content.** 1 of 800
+  `.md`/`.txt` documents on `rung-01000` carries a `#` inside a code fence. The
+  previous run recorded the reason as *"not one of the formats W-115 touches"*,
+  which is **false** — `.rst`/`.adoc`/`.org` predate W-115, and Markdown, which
+  it did change, is the default grammar for every other extension. **A statement
+  about a corpus's formats is not a statement about its content.**
+- 🔴 **W-142's endpoint could not move at all, and three designs missed it.**
+  392 of 1 001 documents at `rung-01000` are `ext/sibling/`, so a random top-5
+  holds **1.96** of them — and every arm of **both** `bm25f.heading` and
+  `bm25f.body`, off arms included, observes **2.06-2.14**. The count was
+  measuring **corpus composition**. C4's boolean, the count rebuild and the
+  re-aim all measured the same inert number.
+
+**So: compute your endpoint's base rate before you run an arm.** `body_control.py`
+prints it in its first two lines now. An endpoint that cannot leave its base rate
+is not a measurement, and a control built on one returns a stable number about
+nothing.
+
+🔴 **What this leaves unguarded, and it is not an item.** C1 and C3 have rested
+on **generator assertions** since 2026-08-28 and no live control backs them.
+That is recorded in [ADR-RS](../docs/adr/0133_predictions.md) rather than carried
+as work, because the fault is the endpoint and there is no third field to aim at.
+A replacement would have to ask *does the correct seed document rank above every
+sibling*, which is a `hit@1` question against a key — **W-136 phase 5's job**.
+
+**Two process changes landed with it, and both are mechanical:**
+
+1. **The bar is computed, not compared by hand** (ADR-RS decision 19a).
+   All three tools independently hard-coded *"net >= 6"*, which is the **floor of
+   all floors** — the bar *before* the discordant count is known. A net of 8 on
+   30 discordant pairs clears 6 and **fails decision 19's own table**, which asks
+   12. `tools/quality-controls/verdict.py` returns the exact two-sided binomial.
+   **No filed verdict changes**; those losses are one-sided.
+2. **The instruments were committed before the first number** (`aff3c82`), which
+   the priors run could not claim. It cost ten minutes. Two amendments were then
+   made *before* any measurement and **appended** to the pre-registration rather
+   than edited into the text they contradict.
+
+**What W-144 is now.** The counterfactual **ranks better** — `hit@1` 0/30 →
+30/30, `p ≈ 0`, both controls holding — and the threshold is the transferable
+part: the shipped ranker starts losing between a table share of **0.26 and
+0.29**, against a ladder median of **0.344**. 🔴 **It does not ship**: one
+synthetic corpus may not move a ranking default, so it is
+[a compare doc](compare/table-tokens-in-flen.compare.md) with a proposed verdict
+and a gap named out loud — **no probe has a table that IS the answer**, so a rate
+card whose subject is its rows is untested and is what a reviewer should press on.
+
+**And the golden ladder is complete** — eight rungs, 20 → 10 000, nesting
+verified byte-for-byte. ⚠ The top three were built **after** `questions/` was
+opened, so what protects them is the **generator's determinism**, not the commit
+ordering that covers the first five. **Phase 4 covers five rungs, not eight.**
+
+---
+
+### Fux has a second reader, and an importable Python surface (2026-09-12, Claude Code)
+
+**W-107 Phases 1a-4 landed.** `node/` reads an index Python wrote — 36 files,
+no dependencies, no build step — and `from fux import open` makes the read
+verbs importable. Both are recorded:
+[ADR-NODE-SEARCH](../docs/adr/0155_node-search.md) and
+[ADR-API](../docs/adr/0156_api.md).
+
+**The shape to carry forward, in four sentences.**
+
+1. **`.fux/node/` is the FOURTH `.fux/` shape** — committed, engine-owned, and
+   **overwritten on a version difference**, not write-if-missing
+   ([ADR-DOTFUX](../docs/adr/0102_fux-directory.md) decision 6a). Nobody edits
+   a vendored reader; a stale one is a wrong answer.
+2. **`ensure_layout` writes it, so every `fux ingest` does** — which is why the
+   overwrite is conditional on the version: a committed directory must produce
+   a no-op diff on a no-op run.
+3. **The wheel carries `node/` by hatchling `force-include`, file by file.**
+   There is no second copy in `src/fux/templates/`. ⚠ **It does not surface in
+   an editable install**, so `fuxdir._node_source()` falls back to the
+   checkout's `node/`.
+4. **Node enforces the `.fux/pii.toml` gate** (O1, Arpit 2026-09-12). A reader
+   that answered where the CLI refuses is a divergence in the product.
+
+🔴 **The one thing to read before touching N4.** Node's scan measures **p95
+76.2 ms / max 134.0 ms** against a 150 ms fence — but Python measures **78.1 ms**
+on the same queries and the same corpus, so **the ratio is 0.98 and there is no
+algorithmic divergence**. The corpus is **959 documents**, a tenth of the design
+point, and Phase 0's baseline (50.2 ms at 10 000) does not reproduce on this
+machine. **Nothing was tuned, and no arm is called green anywhere** — the
+superseding pre-registration (H3 / W-138) still does not exist, and
+PRE-REGISTRATION-NODE §4 names an instrument L9 voided.
+
+**The lesson worth keeping.** Every one of the four defects this change found
+was invisible to the suite and visible the moment something real ran: the
+library's 50 ms decoder import (the handoff said it was already fixed), a shim
+pointing at a path two rulings out of date, `mcp-tools.json` missing from npm's
+`files`, and a `"5"` where a `5` belonged. **Three of the four were found by
+running the thing in a scratch clone and a clean venv, not by reading it.**
+
+### L9 is reconciled, the benchmark is being rebuilt, and W-140 is down to one row (2026-09-12, Claude Code)
+
+**Four items in one session: W-138 closed, W-139 in flight, W-106's arm, W-140's
+thirteen record/code disagreements.** What a successor needs, in order of how
+much it would cost to rediscover:
+
+1. 🔴 **`fux-playground` is gone as an instrument, and its replacement does not
+   exist yet.** W-138 rewrote ~40 artifacts to L9. The honest state: the golden
+   ladder is the only quality instrument, **its questions carry no rank
+   contract**, so `recall@k`, W-97's veto leg and the differential law's graded
+   check all have **no set to run against at all** — not a smaller one. Three
+   accepted records now say so in those words. Do not go looking for the
+   hand-graded corpus; it is not coming back.
+2. ⚠ **`tests/test_l9_environments.py` is the guard, and it names every
+   exception.** A new mention of the sandbox anywhere under `src/ tools/ tests/
+   scripts/` fails until someone writes down why. A string literal naming it
+   fails outright. That is deliberate: the veto's own `grep` cannot tell naming
+   from reading, and half the remaining mentions are measured provenance that
+   `forward only` protects.
+3. **The benchmark is being rebuilt to L9's shape in `~/my_programs/fux-benchmark`** —
+   its own generator (`bin/gen_corpus.py`, deterministic, verified byte-identical
+   from a clean tree), seven **nested, hardlinked** corpora 100 → 10 000 of
+   ~1 000-line documents, a 60-query fixed set **with no answer key**, and
+   `bin/bench.py prepare | nullcontrol | latency | rankdiff | file`. **Arm A is
+   `fux-engine==1.0.0` from PyPI; arm B is the live tree, editable.**
+4. ⚠ **W-140's thirteen record/code disagreements are closed, and the split is
+   the lesson: SEVEN were the record's fault and SIX were the code's.** Anyone
+   assuming *"the code is right, fix the docs"* would have been wrong half the
+   time. Two of the six could only fail off this machine — an in-toto
+   attestation labelling a blake2b digest `sha256`, and a shard-header error
+   telling a reader to delete the one thing no re-ingest can rebuild.
+5. 🔴 **One row of W-140 is left and it is not closable by reading:** an e2e
+   maintenance test that raced the background runner once and has not
+   reproduced. Row 19's first diagnosis was wrong and cost two sessions. **Do
+   not guess it.**
+6. 🔴 **W-147 is new and it is Arpit's**: `.fux/output.toml` can turn the answer
+   journal on, and ADR-PROVENANCE decision 10 says only a flag can — a fork that
+   decision explicitly reserved and that shipped through a different record.
+
 ### The four ranking priors are answered, and the answer is structural (2026-09-12, Claude Code)
 
 **W-143 is done and it says NO** — no single global value of `superseded_weight`,
@@ -1674,6 +1821,30 @@ the reason is that the measuring environments are gone.**
 ## 2 · In flight, and the immediate next step
 
 *Updated **2026-09-12** (Claude Code, Opus) — maintainer line: this session.*
+
+### IN FLIGHT RIGHT NOW: the benchmark timing sweep (2026-09-12, Claude Code)
+
+🔴 **`fux-benchmark`'s scan-path latency sweep is RUNNING in the background** —
+`bin/bench.py latency --run 2026-09-12-l9 --corpus docs-NNNNN --path scan`, seven
+corpora, smallest first, 60 queries × (3 warm-up + 10 measured) × 2 arms each.
+**It takes hours**, dominated by `docs-10000` where one `fux ask` is ~4 s.
+
+- **Rows land as it goes** in `~/my_programs/fux-benchmark/runs/2026-09-12-l9/rows/`
+  — `latency-<corpus>-scan.csv` and `ranked-<corpus>-scan.jsonl`. A partial
+  sweep is still filable: it is a curve with fewer points, not a broken run.
+- ⚠ **`docs-00100`'s timing is contaminated and must be re-run.** A busy-wait
+  poll loop of mine burned a core during part of it. Re-run that one corpus at
+  the end, on a quiet machine, and use the second set.
+- **`--path fast` was not run.** Time, not a decision. Say so in the report
+  rather than implying the accelerator was measured.
+- **Already established, before any query timing:** arm B (`2.0.0-alpha.7`)
+  ingests ~**2× faster** than arm A (`1.0.0`) at every tier — 37.7 s → 17.3 s at
+  1 000 documents, 445.3 s → 341.1 s at 10 000 — and writes a ~5 % smaller index.
+  That is in `rows/prepare-*.json` and does not depend on the sweep finishing.
+
+**The next step after it lands:** `bench.py rankdiff --run 2026-09-12-l9`, then
+`bench.py file --run 2026-09-12-l9 --dest work/regression/2026-09-12-benchmark-l9`,
+then the report + ANALYSIS + a `regression/README.md` row.
 
 ### 🔴 READ THIS FIRST: `CLAUDE.md` is no longer where a law lives (2026-09-12)
 
