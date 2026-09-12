@@ -86,7 +86,7 @@ def raw_record_lines(path: Path) -> tuple[dict, list[bytes]]:
             f"{HEADER['_format']!r} — the index was written by a different "
             f"version of fux. There is no in-place migration: run "
             f"`fux ingest --full` to rewrite it from the sources. "
-            f"WARNING: do NOT delete `.fux/index/` by hand: `url:` records are the one "
+            f"WARNING: Do NOT delete `.fux/index/` by hand: `url:` records are the one "
             f"thing in it that no re-extraction can rebuild, and `--full` refuses "
             f"rather than stranding them, naming each one."
         )
