@@ -1,0 +1,27 @@
+Quillfern Cold Logistics - new joiner induction checklist
+Version 3, June 2020. Retired 2024. Kept in the archive because HR audits ask for it.
+
+Day 1
+ [ ] gate photo and temporary pass
+ [ ] licence, PAN card copy, bank details, two photos
+ [ ] sign the 2019 driver hours acknowledgement
+ [ ] Kalpa Fleet Systems app installed on the depot tablet
+ [ ] learn the KLP trip number format, you will write it on every audit packet
+ [ ] shown the qa-shared mailbox, this is where every temperature alarm lands
+
+Day 2
+ [ ] cold room walkthrough, C2 vaccines, C3 insulin, D1 milk, F1 frozen
+ [ ] red sleeve packet contents, ask Stores if a packet is short
+ [ ] dock desk email booking, before 18:00 previous day
+ [ ] paper dock board is the truth, the wiki page is a copy
+
+Day 3
+ [ ] ride along on a Nagpur city dairy route
+ [ ] hand-held probe use and calibration sticker check
+ [ ] escalation is night lead, then DC manager, then QA in the morning
+ [ ] there is no separate pharma escalation group
+
+Notes for the HR file
+ - Induction is three days for drivers and two days for office staff.
+ - New joiners are not rostered on night shift in the first 30 days.
+ - This checklist does not cover Guwahati or Coimbatore; those sites run their own.

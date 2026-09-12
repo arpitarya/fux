@@ -1,0 +1,47 @@
+# golden-ext: sibling 2026-05-11 ext/sibling/a04-okapi-night-handover.txt
+MYSURU NIGHT SHIFT HANDOVER LOG — OKAPI FROZEN LOGISTICS
+Shift lead: Tanmay Joshi
+Night of 2026-05-11 into 2026-05-12
+Register: OKF-NIGHT-REG-7
+
+21:40  Handover taken from evening shift. 11 reefers on yard, 2 hired.
+       Two pallets still on hold in OKF-Q3 from Saturday, paperwork with Quality.
+
+22:05  Room OKF-F2 (ice cream) alarm, -17.4 C against a -20.0 C target.
+       Placed spare logger next to the stock. Original sensor LEFT IN PLACE.
+       Called Leela Nambiar. She said watch for 20 min before calling Quality.
+
+22:31  Recovered to -20.6 C. Duration 26 min, which is over our 15 min rule for
+       the hardening room, so I opened a quality event anyway. OKF-F-11 number
+       is 2026-0214.
+
+23:15  Truck OKF-482 door-open event on the Hunsur road. Driver says he stopped
+       for the toll queue and the seal is intact. Told him NOT to touch the
+       telematics unit while moving. He parked at the plaza and called back.
+
+00:20  Dock 3 leveller sticking again. Third time this month. Raised with the
+       workshop, they will look at it Wednesday. Dairy loads moved to dock 2.
+
+01:05  Guard cabin tablet lost network for 40 min. Wrote readings by hand in the
+       register as per the procedure. IT ticket OKF-IT-3391.
+
+02:50  Ammonia plant defrost check ran late because the fitter was on the other
+       site. No unloading 02:50 to 03:25.
+
+04:10  Quality called back on 2026-0214. Disposition pending, stock stays in
+       OKF-Q3, do not release on day shift without her signature.
+
+05:45  Yard walk. All seals checked against the dispatch notes. One mismatch on
+       a hired truck — seal number written as 88431, actual 88481. Corrected on
+       the note, both signed, gate informed.
+
+06:20  Handover to day shift (Kavya Reddy). Outstanding:
+         - quality event 2026-0214, stock on hold in OKF-Q3
+         - dock 3 leveller
+         - guard cabin tablet ticket OKF-IT-3391
+         - seal correction on the hired truck, both copies signed
+
+NOTE PINNED TO THIS REGISTER SINCE LAST YEAR:
+  Do not troubleshoot a telematics device while the vehicle is moving. Park
+  first. If a manager says "just reach", call Fleet Control and ask them to
+  record the instruction.

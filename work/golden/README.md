@@ -1,6 +1,11 @@
+---
+type: Index
+description: "Index of the sealed golden benchmark: seed corpus, prompts, and the one rule."
+---
+
 # `work/golden/` — the sealed golden benchmark
 
-**The test data for `fux-lab` — and only for `fux-lab`, per [L9](../../docs/adr/0011_LAW-9-environments.md): ten seed documents written by
+**The test data for `fux-lab` — and only for `fux-lab`, per [L9](../../docs/adr/0011_LAW-9-environments.md): seed documents written by
 Codex, ~100 questions with answers Claude never sees, and a corpus ladder Claude
 grows from 10 to 10 000 documents without ever seeing a question.**
 
@@ -31,6 +36,21 @@ subagent — not to check the format, not to count lines, not by `grep -r`.
 
 ⚠ **Back the key up yourself.** It is gitignored, so git will not keep it.
 
+### ⚠ The key in use today is Claude-authored and provisional (2026-09-12)
+
+**Arpit's Codex quota ran out with phase 1 half done**, so he ruled that Claude
+write the feature-coverage documents and the key rather than leave phase 2
+blocked. **Nothing leaked** — no Claude session read a key it was not meant to.
+The defect is upstream: the same model family authored the questions and will
+grow the corpus and run the engine, so the *"Claude wrote the brief but no facts"*
+property below is **false for the key and for documents 11–15 and `seed/archive/`**.
+The base ten documents are still Codex's.
+
+**Consequence, binding:** every run scored against this key is `informed`, and
+**no delta measured against it may be stated**. Codex regenerates the key under
+[W-145](../open/W-145-codex-regenerates-the-key.md); the stopgap is destroyed
+when it does.
+
 ### Where the key lives — Arpit decides, every time (2026-09-11)
 
 - **No agent puts the key in this directory by default.** Every agent that would
@@ -48,9 +68,12 @@ subagent — not to check the format, not to count lines, not by `grep -r`.
 ```
 work/golden/
   README.md                 this file — the process
-  seed/                     the 10 seed documents (Codex writes; Claude may read)
+  seed/                     the seed documents (Codex writes; Claude may read)
+  seed/archive/             seed documents that are history — each rung declares it archived=true
+  seed-dates.tsv            one date per seed document; each rung commits the file at that date
   golden-answer/answers.jsonl   🔒 questions + answers — ONLY if Arpit chose "file" (see Where the key lives)
-  questions.jsonl           released by Codex AFTER the ladder is frozen — ids + text only
+  questions/questions.jsonl     ids + text only — the phase-4 input; see questions/README.md
+  questions/README.md           what it omits, and the cost of it existing before the freeze
   ladder/rung-NNNNN.sha256      frozen manifests: which files make each rung, by hash
   ladder/rung-NNNNN.index       the engine version and index root hash each rung was built with
   prompts/                  the five paste-ready prompts, one per phase
@@ -68,7 +91,7 @@ waits on 10 000.
 
 ```
 ~/my_programs/fux-lab/corpora/golden/
-  rung-00010/   seed/ (10)                          .fux/  ← its own index
+  rung-seed/    seed/ (every seed document)         .fux/  ← its own index
   rung-00100/   seed/ + ext/ (100)                  .fux/
   rung-00200/   seed/ + ext/ (200)                  .fux/
   rung-00500/   …                                   .fux/
@@ -96,7 +119,7 @@ waits on 10 000.
 
 | phase | who | reads | writes | prompt |
 |---|---|---|---|---|
-| **1. Seed** | Codex | nothing from fux | `seed/` (10 docs) + the key, **where Arpit says** | [`prompts/1-codex-seed.md`](prompts/1-codex-seed.md) |
+| **1. Seed** (incl. feature coverage) | Codex | nothing from fux | `seed/`, `seed/archive/`, `seed-dates.tsv` + the key, **where Arpit says** | [`prompts/1-codex-seed.md`](prompts/1-codex-seed.md) |
 | **2. Extend** | Claude Code | `seed/` **only** | corpus in fux-lab + `ladder/*.sha256` | [`prompts/2-claude-extend.md`](prompts/2-claude-extend.md) |
 | **3. Freeze & release** | Codex | the manifests + the key | `questions.jsonl`; marks the sealed subset in the key | [`prompts/3-codex-release.md`](prompts/3-codex-release.md) |
 | **4. Run** | Claude Code | the ladder + `questions.jsonl` | `predictions.jsonl` per rung | [`prompts/4-claude-run.md`](prompts/4-claude-run.md) |
@@ -105,6 +128,11 @@ waits on 10 000.
 **Order is load-bearing.** Questions are released only after **every** rung is
 frozen. A rung built after release was built by a session that could have seen
 the questions, so it is `informed` for good.
+
+⚠ **That order is broken on purpose since 2026-09-12** (Arpit): `questions/` exists
+before the ladder does, so a chat agent can read it instead of asking him. **Phase 2
+is therefore on its honour** — the session extending the corpus reads `seed/` and
+nothing else, and says so in its report. Nothing mechanical enforces this.
 
 ---
 
@@ -121,7 +149,13 @@ the questions, so it is `informed` for good.
 - ⚠ **Claude wrote the brief — the company, the cast and the document roster —
   but no facts.** Every number, date, threshold, incident and decision is Codex's
   invention, so the answer-bearing details were never authored by Claude.
-- **~100 questions**, roughly:
+- **Feature coverage is part of prompt 1 (Arpit, 2026-09-12; it was prompt 1b
+  until then):** superseding pairs with `supersedes:` in frontmatter, archived
+  documents under `seed/archive/`, a date per seed in `seed-dates.tsv`, and
+  intent-split questions that depend on them — see *Feature coverage* below.
+  `1b-codex-feature-coverage.md` was merged into prompt 1 and deleted.
+
+- **~120–125 questions**, roughly:
 
 | type | share | tests |
 |---|---:|---|
@@ -147,15 +181,36 @@ the questions, so it is `informed` for good.
 
 ---
 
+## Feature coverage — what this data can test
+
+**[ADR-RS](../../docs/adr/0133_predictions.md) decision 23: a feature is measured only
+on data that contains the input it acts on.** This table is that declaration.
+**File names and counts only — never question text, ids or answers.**
+
+| feature | input fux reads | set up by | documents that exercise it | questions |
+|---|---|---|---|---:|
+| `superseded_weight` | `supersedes:` in the newer doc's frontmatter | Codex, [prompt 1](prompts/1-codex-seed.md) part A §3 | 4 pairs: `11-decision-telematics-vendor-2026.md` → `05-…-2023.md` · `12-rate-card-2026-h2.md` → `07-rate-card-and-surcharges.md` · `13-dock-scheduling-rules-2026.md` → `09-dock-scheduling-wiki-export.html` · `15-customer-notification-matrix-2026.md` → `14-…-2025.md` | 12 |
+| `archived_weight` | a directory declared `archived=true` | Codex places files in `seed/archive/`; each rung declares it (phase 2) | 5 docs in `seed/archive/`: `a01-sop-temperature-excursion-rev2.md` · `a02-kalpa-alert-routing-guide-2021.md` · `a03-dock-scheduling-wiki-2021.html` · `a04-driver-hours-policy-2019.md` · `a05-induction-checklist-2020.txt` | 9 |
+| `recency_half_life_days` | commit time per file | Codex writes `seed-dates.tsv`; each rung commits at those dates (phase 2) | all 20 seed documents, dated 2019-08-12 → 2026-07-01 | 7 |
+| abstention | unanswerable questions | Codex, prompt 1 | — | ~10 % of the key |
+| `heading` negative control | heading-matched distractors | Claude, phase 2 `sibling` documents | 32 at rung 100, rising to 392 at rung 1 000 — `ext/sibling/` documents reusing the seed documents' **headings and document types** (Temperature Excursion Response SOP, Rate card and surcharges, Customer notification matrix, Dock scheduling rules, …) with a different company, people, facilities and every number changed | — |
+
+A feature with no row, or a row still showing *(filled by …)*, **is not measurable
+yet** — say so in the pre-registration instead of running.
+
+---
+
 ## Phase 2 — Extend the ladder (Claude Code, blind)
 
-**Rungs: 10 → 100 → 200 → 500 → 1 000 → 2 000 → 5 000 → 10 000.** Nested: each
+**Rungs: seed → 100 → 200 → 500 → 1 000 → 2 000 → 5 000 → 10 000.** Nested: each
 rung is the previous one plus new files, so the seed documents are in every rung.
 
 ⚠ **10 000 is the ceiling.** Arpit's 2026-08-22 ruling forbids measuring above it
 until he reopens it; *"and so on"* past 10 000 is a separate, later decision.
 
-- **Claude reads `seed/` and nothing else** from this directory.
+- 🔴 **Claude reads `seed/` and nothing else** from this directory — **not**
+  `questions/`, which now exists before the ladder does and would make the rung
+  `informed` permanently.
 - **Mix per rung, recorded per file in the manifest (`category`):**
 
 | category | share | what it is |
@@ -178,6 +233,16 @@ until he reopens it; *"and so on"* past 10 000 is a separate, later decision.
 - **Index each rung** once it is complete: `fux setup` (sources `seed` + `ext`),
   `fux ingest --full`, commit inside the rung. Indexing needs no questions, so it
   happens here, blind. Write `ladder/rung-NNNNN.index`: engine version, index root hash.
+- 🔴 **Declare and date, so the priors can move** (decision 23d — answer-free mechanics):
+  - each rung's `.fux/sources/dirs`: `seed`, `seed/archive archived=true`, `ext`,
+    `ext/archive archived=true`;
+  - commit every seed file with `GIT_AUTHOR_DATE` / `GIT_COMMITTER_DATE` from
+    `seed-dates.tsv`; `ext/` files get deterministic dates spread over the same years;
+  - `ext/` may hold superseding pairs and archived documents **among `ext/` files
+    only** — **never `supersedes:` a seed**, which would change the key's truth;
+  - after ingest, write `ladder/rung-NNNNN.coverage`: counts of records flagged
+    `superseded`, `archived`, and carrying `mtime` — **they must match the
+    declarations**, or the rung is not frozen.
 - 🔴 **Every seed file must be indexed.** The seeds are `.md`, `.txt`, `.yaml`,
   `.eml` and `.html` on purpose; the rung's `.fux/formats.toml` must include every
   extension present, and the ingest skip list must name **no** `seed/` file. A seed
@@ -188,6 +253,36 @@ until he reopens it; *"and so on"* past 10 000 is a separate, later decision.
 
 ---
 
+### Built on 2026-09-12 — five rungs, to 1 000
+
+**Arpit capped this session's ladder at rung 1 000**; `rung-02000`, `rung-05000`
+and `rung-10000` are a later session and are **not** built, not frozen and not
+measurable.
+
+| rung | documents | archived | superseded | carrying `mtime` |
+|---|---:|---:|---:|---:|
+| `rung-seed` | 20 | 5 | 4 | 20 / 20 |
+| `rung-00100` | 100 | 13 | 12 | 100 / 100 |
+| `rung-00200` | 200 | 23 | 22 | 200 / 200 |
+| `rung-00500` | 500 | 53 | 52 | 500 / 500 |
+| `rung-01000` | 1 000 | 103 | 102 | 1 000 / 1 000 |
+
+- **Every rung nests**: rung N's manifest contains rung N-1's documents with
+  identical hashes, and all twenty seed documents are in every rung. Checked
+  against the manifests, not asserted.
+- **The `ext/` corpus is reproducible from committed bytes.** The generator and
+  the twenty hand-authored hard negatives are filed under
+  [`work/regression/2026-09-12-golden-ladder/evidence/generator/`](../regression/2026-09-12-golden-ladder/evidence/generator/);
+  the lab itself commits nothing.
+- **No `ext/` document names a seed entity.** The generator carries the
+  blacklist and refuses to write rather than emit one; the twenty authored
+  documents pass the same check.
+- **No `ext/` document declares `supersedes:` on a seed.** Every ext
+  supersession pair is `ext/archive/…` retired ← `ext/sibling/…` current, and
+  both halves enter the ladder at the same rung.
+
+---
+
 ## Phase 3 — Freeze and release (Codex)
 
 1. Check every manifest against its rung directory (hashes match; each rung's
@@ -195,8 +290,12 @@ until he reopens it; *"and so on"* past 10 000 is a separate, later decision.
 2. **Sealed holdout:** mark **20 %** of ids `sealed: true`, spread across types.
    Their results are only ever reported **in aggregate** — a clean holdout that
    survives Claude seeing per-query scores for the rest.
-3. Write `questions.jsonl` — `{"id", "question"}` **only**. No type, no
-   `answerable`, no difficulty, no sealed flag.
+3. Write `questions/questions.jsonl` — `{"id", "question"}` **only**. No type, no
+   `answerable`, no difficulty, no sealed flag. **Ids must carry no type signal** —
+   permute the rows before numbering them, or the `unanswerable` slice can be
+   abstained on by arithmetic. ⚠ **Since 2026-09-12 this file is written in phase 1,
+   not phase 3** (Arpit), so a chat agent can run a rung without being handed the
+   questions; [`questions/README.md`](questions/README.md) carries what that costs.
 4. Record the key's SHA-256 in `ladder/KEY.sha256`. Any later change to the key
    changes the hash, and a changed key is a new `key_version`, never an edit.
 

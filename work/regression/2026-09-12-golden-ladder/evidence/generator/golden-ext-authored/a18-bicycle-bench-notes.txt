@@ -1,0 +1,31 @@
+# golden-ext: filler 2024-11-30 ext/filler/a18-bicycle-bench-notes.txt
+BENCH NOTES — SECOND SHELF CYCLES
+Mechanic: R. Whitbourne
+
+2024-11-12
+  Touring frame, 1987, steel. Rear hub had play; re-cupped, new bearings,
+  re-greased. Freehub body replaced. Chain measured at 0.9% — replaced, and the
+  cassette with it. Told the customer why: a new chain on a worn cassette skips
+  under load within a week and we end up doing the job twice.
+
+2024-11-18
+  Hydraulic discs bled front and rear. Pads glazed rather than worn — sanded
+  and refitted, advised replacement at the next service. Rotor run-out 0.15 mm,
+  within tolerance, left alone.
+
+2024-11-21
+  Creak traced to the seatpost, not the bottom bracket. It usually is. Cleaned,
+  light grease on a steel post in a steel frame, torque to spec.
+
+2024-11-26
+  Wheel build: 32 hole, three cross, 1,286 mm spokes drive side. Tension within
+  12% across the drive side, dished to 0.3 mm, trued to 0.2 mm. Stress-relieved
+  twice and re-trued after the second.
+
+2024-11-30
+  Child's bike, free service. Brake levers moved in to fit small hands, stem
+  lowered, tyres to 35 psi. No charge, as always.
+
+STANDING NOTE ON THE WALL:
+  We do not fit a new chain to a worn cassette and call it a service.
+  Tell the customer the true price, or refuse the job.

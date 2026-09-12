@@ -1,3 +1,8 @@
+---
+type: Queue
+description: "The single live work queue, two lanes, plus the Blocked-on-Arpit inbox."
+---
+
 # OPEN-WORK — what is still open
 
 *One or two lines per item. Everything else lives in the item's file under [`open/`](open/README.md). Rules are at the foot.*
@@ -13,8 +18,10 @@
 
 | what he decides | filed | age |
 |---|---|---|
-| 🔴 **W-136 phase 1** — did Codex write the ~100 answer-key questions? No → re-run [prompt 1](golden/prompts/1-codex-seed.md). Yes → run [prompt 1b](golden/prompts/1b-codex-feature-coverage.md), then phase 2. | 2026-09-11 | 1d |
-| ↳ **blocks:** W-136 phase 2 · W-106 · W-112 · W-115 · W-97 · W-142 · W-87 · W-143 · W-144 | | |
+| 🔴 **W-145** — Codex re-runs [prompt 1](golden/prompts/1-codex-seed.md) part B and replaces the Claude-authored stopgap key, once his quota is back. [detail](open/W-145-codex-regenerates-the-key.md) | 2026-09-12 | 0d |
+| ↳ **blocks:** nothing else in the queue — it governs what a phase-5 number may claim, not whether work runs | | |
+| 🔴 **W-146** — two rulings: is `ADR-WORK-QUEUE` written (OPEN-WORK's rules are stated twice, owned nowhere), and does *never restates* reach into docstrings? [detail](open/W-146-the-rest-of-l0.md) | 2026-09-12 | 0d |
+| ↳ **blocks:** nothing else in the queue — they decide whether two named exposures get closed, not whether work runs | | |
 
 ---
 
@@ -22,26 +29,27 @@
 
 ### fux build
 
-- 🟢 🧨 **W-140** · `agent` — **6 code rows left** (6, 7, 12's `--hops` fork, 14, 16, 20) and the 13 record/code disagreements, none critical; 12 closed and one moved to W-122 on 2026-09-11. [detail](open/W-140-guide-authoring-defects.md)
+- 🟢 🧨 **W-140** · `agent` — **2 code rows left** (12's `--hops` fork; an unreproduced runner-race flake) plus 13 record/code disagreements, none critical; 18 closed, row 8 inside W-122. [detail](open/W-140-guide-authoring-defects.md)
 - 🟢 🧨 **W-138** · `agent` — rewrite the ~40 artifacts that still use the playground as an instrument, and add the guard test. [detail](open/W-138-reconcile-with-l9.md)
 - 🟡 **W-139** · `agent`, after W-138 — build fux-benchmark: seven corpora, two versions, latency and ranked lists kept. [detail](open/W-139-benchmark-per-l9.md)
-- 🟢 🧨 **W-122** · `agent` — generate CLAUDE.md's law section, consolidate the doc-only schemas, gate ADR-CONFIG against `config.py`. [detail](open/W-122-adrs-are-the-source.md)
+- 🔴 **W-146** · `arpit` — L0's remainder: eleven unhoused `CLAUDE.md` sections want records, and two rulings are owed. [detail](open/W-146-the-rest-of-l0.md)
 - 🟢 **W-107** · `agent` — the Node read plane (`npx fux-search`), Phases 1–4; nothing blocks Phase 1. [detail](open/W-107-node-read-plane.md)
-- 🔴 **W-106** · `agent`, blocked on W-136 — the vector gate still owes the two-architecture arm and a golden corpus. [detail](open/W-106-vector-gate.md)
-- 🔴 **W-112** · `arpit`, after W-106 — the vector plane: needs a golden corpus, a re-run gate, then a compare doc to rule on. [detail](open/W-112-vector-plane.md)
+- 🟡 **W-106** · `agent`, waiting on W-136 phase 2 — the vector gate still owes the two-architecture arm and a golden corpus. [detail](open/W-106-vector-gate.md)
+- 🟡 **W-112** · `arpit`, waiting on W-106 — the vector plane: needs a golden corpus, a re-run gate, then a compare doc to rule on. [detail](open/W-112-vector-plane.md)
 
 ### testing
 
-- 🔴 **W-136** · `arpit` (Codex phases), then `agent` — the sealed golden benchmark, grown 10 → 10 000. [detail](open/W-136-golden-benchmark.md)
-- 🔴 **W-115** · `agent`, blocked on W-136 — the chunking change is unmeasured for quality; no document may cite it as measured. [detail](open/W-115-chunking-quality-unmeasured.md)
-- 🔴 **W-97** · `agent`, blocked on W-136 — the knob sweep (`rerank_weight`, `superseded_weight`), rerun on golden data under a new pre-registration. [detail](open/W-97-tuner-knob-sweep.md)
-- 🔴 **W-142** · `agent`, blocked on W-136 — rebuild the saturated `heading` negative control with headroom. [detail](open/W-142-heading-negative-control.md)
-- 🔴 **W-87** · `agent`, blocked on W-136 — the first `judged` run, and Part B, both on the golden ladder. [detail](open/W-87-what-good-means.md)
-- 🔴 **W-144** · `agent`, blocked on W-136 — does a table inflate `flen` and mis-rank a table-heavy document? The `structure-aware-extraction` proposal's trigger fired when OOXML landed. [detail](open/W-144-structure-aware-extraction.md)
+- 🟢 **W-136** · `agent` — phases 2 and 4 done to rung 1 000; **rungs 2 000 / 5 000 / 10 000 are unbuilt**, and phase 5 scoring is Codex's. [detail](open/W-136-golden-benchmark.md)
+- 🔴 **W-145** · `arpit` — Codex regenerates the golden answer key; until then every golden number is `informed`. [detail](open/W-145-codex-regenerates-the-key.md)
+- 🟡 **W-115** · `agent`, waiting on W-136 phase 2 — the chunking change is unmeasured for quality; no document may cite it as measured. [detail](open/W-115-chunking-quality-unmeasured.md)
+- 🟡 **W-97** · `agent`, waiting on W-136 phase 2 — the knob sweep (`rerank_weight`, `superseded_weight`), rerun on golden data under a new pre-registration. [detail](open/W-97-tuner-knob-sweep.md)
+- 🟡 **W-142** · `agent`, waiting on W-136 phase 2 — rebuild the saturated `heading` negative control with headroom. [detail](open/W-142-heading-negative-control.md)
+- 🟡 **W-87** · `agent`, waiting on W-136 phase 2 — the first `judged` run, and Part B, both on the golden ladder. [detail](open/W-87-what-good-means.md)
+- 🟡 **W-144** · `agent`, waiting on W-136 phase 2 — does a table inflate `flen` and mis-rank a table-heavy document? The `structure-aware-extraction` proposal's trigger fired when OOXML landed. [detail](open/W-144-structure-aware-extraction.md)
 
 ### adr update
 
-- 🔴 **W-143** · `agent` after W-136, then `arpit` — remeasure the four no-op ranking priors: does any single value clear 0 broken? [detail](open/W-143-four-no-op-priors.md)
+- 🟡 **W-143** · `agent` after W-136 phase 2, then `arpit` — remeasure the four no-op ranking priors: does any single value clear 0 broken? [detail](open/W-143-four-no-op-priors.md)
 
 ---
 

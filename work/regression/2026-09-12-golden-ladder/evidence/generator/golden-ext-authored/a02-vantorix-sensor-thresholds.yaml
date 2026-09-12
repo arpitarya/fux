@@ -1,0 +1,93 @@
+# golden-ext: sibling 2025-11-04 ext/sibling/a02-vantorix-sensor-thresholds.yaml
+# Vantorix legacy sensor threshold documentation
+# Author: Rustom Contractor
+# Later edit: Ayesha Kalra, 2025-11-04
+# This file is documentation only; the telematics platform is configured elsewhere.
+schema_version: "0.9"
+document_status: "legacy-doc"
+company: "Vantorix Cold Storage LLP"
+sample_every_seconds: 120
+default_alarm_repeat_minutes: 20
+default_recovery_minutes: 8
+
+contacts:
+  quality_day_ext: 512
+  fleet_control_ext: 377
+  surat_night_ext: 604
+  escalation_group: "Vantorix-Amber"
+  old_sms_group: "cold-desk"        # deprecated, do not use for pharma
+
+source_order:
+  after_2025_04_01:
+    - kavach_api_alarm_feed
+    - usb_logger
+    - handheld_probe
+  before_2025_04_01:
+    - northgate_trip_export
+    - usb_logger
+
+deprecated:
+  old_vendor_code: "NGT-2016"
+  old_trip_prefix: "NG"
+  old_room_alarm_email: "cold-desk@vantorix.example"
+  old_freezer_rule: "warmer_than_minus_14_for_45_min"
+  staging_override_allowed: true
+
+facilities:
+  surat_dc:
+    aliases:
+      - "Surat DC"
+      - "VTX hub"
+    rooms:
+      VTX-A1:
+        product: "vaccine"
+        unit: "C"
+        low_celsius: 2.0
+        low_minutes: 15
+        high_celsius: 8.0
+        high_minutes: 25
+        quarantine_bay: "VTX-Q1"
+      VTX-B2:
+        product: "curd"
+        unit: "C"
+        low_celsius: 0.0
+        low_minutes: 0
+        high_celsius: 6.0
+        high_minutes: 20
+        staging_minutes: 20
+      VTX-F3:
+        product: "ice_cream"
+        unit: "C"
+        target_celsius: -25.0
+        high_celsius: -20.0
+        high_minutes: 15
+        alarm_label: "hardening_room_warm"
+  rajkot_dc:
+    aliases:
+      - "Rajkot DC"
+    rooms:
+      VTX-R1:
+        product: "mango_pulp"
+        unit: "C"
+        target_celsius: -20.0
+        high_celsius: -18.0
+        high_minutes: 30
+
+truck_profiles:
+  owned_reefer_chilled:
+    unit: "C"
+    logger_poll_seconds: 120
+    door_open_warn_seconds: 240
+    allowed_manual_ack: true
+    manual_ack_note: "Acknowledge only after containment starts."
+  hired_truck_frozen_import:
+    unit: "F"
+    # Fahrenheit block kept for imported reefers; convert before comparing with the SOP.
+    target_fahrenheit: -4
+    high_fahrenheit: 2
+    high_minutes: 15
+
+notes:
+  - "Do not open new trips on the retired platform."
+  - "Keep the original sensor in place even when adding a spare logger."
+  - "Auditors ask how the previous vendor was configured, which is why old values stay."
