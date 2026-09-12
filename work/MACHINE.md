@@ -284,16 +284,45 @@ survived. The harness's own rule says it: *every timing in one run comes from on
 machine in one session.* A second session breaks the second half of that sentence
 while looking like it only broke the first.
 
+🔴 **3. And contention does not merely inflate a number — it MANUFACTURES A
+PLAUSIBLE ENGINE FINDING.** Reconstructed from both sides after the fact: the
+timing session's whole window (13:29–14:23) sat inside the indexing session's
+(≈13:00–15:10), so *no* corpus in that run was clean, and the split into "five
+good tiers and two bad ones" was itself an artefact.
+
+**The sharp case is the one that nearly got filed.** The 10 000-document tier's
+**ingest ratio came out at 0.77 against ~0.46 at every other tier** — a clean,
+specific, tier-localised anomaly, exactly the shape a real regression takes. It
+was the run's one unresolved item. That tier was ingested 12:58–13:17, **inside
+the other session's load**, and the honest reading is the machine.
+
+**So the failure mode is not "the numbers look noisy".** Noise is visible and
+gets distrusted. **This produced a quiet, internally-consistent result that
+pointed at the engine**, and only a disclosure from the other session — *a
+conversation, not a mechanism* — kept it off the record.
+
+⚠ **Nothing detects this.** An owner-lock on `runs/<id>/` sees a neighbour in the
+same run directory; **nothing sees a neighbour indexing ten thousand documents
+next door.** That gap is real, unguarded, and larger than the collision that
+exposed it. `SETUP-BENCHMARK` carries it as an unguarded gap rather than a solved
+problem.
+
 **What follows, and the ordering matters:**
 
 - **A distinct run id fixes the file collision and NOT the contention.** It is
   the obvious fix and it is half a fix; a session that takes a fresh id and keeps
-  timing is still sharing a CPU.
+  timing is still sharing a CPU. ✅ **`bench.py` now opens its row files with
+  `"x"`**, so a second run into the same id **fails by name** instead of
+  replacing anything — the lock's own failure mode was silent, and a stale lock
+  someone clears by hand put you straight back here.
 - **Before timing anything, check for another `bench.py`** — `pgrep -f bench.py`
   — and for other heavy local work. Killing your own build is not enough if a
   peer is running one.
 - **A killed run's partial rows are deleted, never kept.** They are contaminated
   in both directions and worth nothing.
+- **Say what you were running, and when, to anyone who shares the machine.** The
+  only thing that caught the false ingest finding was one session volunteering
+  its load window to the other. Cheap, and there is no substitute for it.
 - **The corpus is never touched.** Stop the **run**, delete its **rows**. Arpit,
   2026-09-12: the built corpora are kept and reused.
 
