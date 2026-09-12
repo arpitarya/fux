@@ -39,10 +39,10 @@ New records are written here, from [`TEMPLATE.md`](TEMPLATE.md).
 
 | range | holds | a new record takes |
 |---|---|---|
-| `0001`–`0100` | the **Law** records only — `0001` ADR-LAWS, `0002`–`0011` ADR-LAW-0 … ADR-LAW-9 | the next free number **from `0012`** |
+| `0001`–`0100` | the **Law** records only — `0001` ADR-LAWS, `0002`–`0012` ADR-LAW-0 … ADR-LAW-10 | the next free number **from `0013`** |
 | `0101`– | **every other record**, sequentially | the next free number **after the highest** |
 
-**`0012`–`0100` are reserved and EMPTY — there are no placeholder files.** A
+**`0013`–`0100` are reserved and EMPTY — there are no placeholder files.** A
 gap in that range is the reservation, not a missing record; nothing scans for
 one and nothing should create one to fill it. **If the laws ever pass 100,
 renumber again** — Arpit's words, and deliberately not a pre-built rule.
@@ -191,6 +191,7 @@ Start from [`TEMPLATE.md`](TEMPLATE.md).
 | [0009](0009_LAW-7-python-311.md) | **ADR-LAW-7** | **L7** — Python ≥ 3.11. The floor that made refusing dependencies affordable, and the justification that narrowed on 2026-09-06 without the floor moving | accepted | yes |
 | [0011](0011_LAW-9-environments.md) | **ADR-LAW-9** | **L9** — each sibling environment has one job: `fux-playground` is Arpit's hands only; `fux-lab` runs every measurement on golden test data ≤ 10 000 documents; `fux-benchmark` only times queries and keeps their ranked lists, always current build vs the previous major | accepted | yes |
 | [0010](0010_LAW-8-use-record.md) | **ADR-LAW-8** | **L8** — a use record is never committed. Written, reverted and re-narrowed in one day; gitignored is the test, not `.fux/`; and the transmission clause that did not survive | accepted | yes |
+| [0012](0012_LAW-10-bundled-output.md) | **ADR-LAW-10** | **L10** — the consumer is served build output, never source. One generated artifact per plane in someone else’s repository; `.fux/decoders/` and `.fux/fetchers/` excepted because there source IS the contract; bundled ≠ minified | accepted | yes |
 | [0101](0101_cli-surface.md) | **ADR-CLI** | The command-line surface — flat verbs in seven groups, one error boundary, three output modes, every command captured verbatim | accepted | yes |
 | [0102](0102_fux-directory.md) | **ADR-DOTFUX** | The `.fux/` directory — every child declared committed or derived; the ignore rule asserted against git itself | accepted | yes |
 | [0103](0103_ask.md) | **ADR-ASK** | The `ask` verb — one scorer, one sort; the path that answers can never change the answer | accepted | yes |
@@ -403,6 +404,7 @@ table does not grant.
 | `src/fux/setup.py` | ADR-DOTFUX | the second scaffolding moment — the consumer-owned files, write-if-missing |
 | `src/fux/store/` | ADR-INDEX-LIFECYCLE | canonical bytes, shard addressing, writer/reader, collisions, and the declared record shape |
 | `src/fux/store/fuxdir.py` | ADR-DOTFUX | the `.fux/` layout generator — and the **three** kind declarations (`COMMITTED`, `DERIVED`, `ACQUIRED`) the generated README table is built from |
+| `src/fux/store/nodebundle.py` | ADR-NODE-SEARCH | the Node plane's bundler — one generated `.mjs` per plane, built at publish (L10). **Carved out of `store/`'s claim for a different DECISION**, on `acquired.py`'s precedent: everything else under `store/` is the committed index, and this is a build-time tool that never reads or writes one. It is the only place a change to how the reader is SHIPPED can land, which is what makes the freshness gate reach this record |
 | `src/fux/store/acquired.py` | ADR-ACQUIRED | the retained-bytes plane — content-addressed blobs, the advisory manifest, `sweep` and `evict`. **Carved out of `store/`'s claim for a different DECISION, not a different concern**: everything else under `store/` is the committed index, and this is the one plane that is neither committed nor rebuildable |
 | `src/fux/ingest/` | ADR-INGEST | git-dir walk, parse, edges — writes the committed plane |
 | `src/fux/ingest/priors.py` | ADR-INGEST | ⚠ **covered by the directory claim, and described by no record's decisions.** It computes the supersession and recency priors and writes `mtime` and `superseded` into the committed record; ADR-RECORD documents the properties and ADR-TUNE the weights, but the module's own behaviour is unrecorded |
@@ -460,7 +462,7 @@ table does not grant.
 | `tools/quality/` | ADR-QUALITY | the frozen quality contract — the declared query mix and the published cost of an error — **and `goldens.py`, the schema that keeps the rank contract and the relevance set apart** (decision 12). The mix and the cost are a **frozen instrument, not a harness**; `goldens.py` is the one executable thing here, and it exists because decision 12's rules are mechanical: an undeclared relevance list, or a `doc` outside its own relevance set, is refused rather than trusted |
 | `tools/vector-gate/` | ADR-RS | W-106's instrument — does a **contextual** embedder fused by RRF reach DENSE-CHUNK's frozen bar, and **do two implementations of one model produce the same vector**. ⚠ Held here by **decision 10's fallback**, the `tools/t2-eval/` precedent: the record it belongs to (`ADR-VECTORS`) **does not exist** — W-112 is blocked on this instrument's own result, and a proposal is not a valid owner. It moves to `ADR-VECTORS` if and when that record is accepted |
 | `tools/t2-eval/` | ADR-RS | a harness whose feature record was retired, held here by ADR-RS decision 10's fallback. **A retired record cannot own anything, and a proposal is not a valid owner** |
-| `node/` | ADR-NODE-SEARCH | the Node read plane — 37 files, no `dependencies` key and no build step. **The only owned component outside `src/` and `tools/`**, so `test_adr_ownership.py::components()` does not demand it; the row is what makes the freshness gate demand this record when a `.mjs` file changes. `compat/` and `hash/` have no Python twin and are exempt by decision |
+| `node/` | ADR-NODE-SEARCH | the Node read plane — 44 `.mjs` files as AUTHORED, shipped as ONE bundled file (L10, decision 13); no `dependencies` key, and no build step **for the consumer**. **The only owned component outside `src/` and `tools/`**, so `test_adr_ownership.py::components()` does not demand it; the row is what makes the freshness gate demand this record when a `.mjs` file changes. `compat/` and `hash/` have no Python twin and are exempt by decision |
 
 <!-- OWNERSHIP-TABLE-END -->
 
@@ -536,6 +538,9 @@ rows narrowed so far were each verified by reading every mention in the file
 | `src/fux/ingest/sourcelist.py` | ADR-ARCHIVED-CONTENT | `archived` on both lists — `dirs` since 2026-08-22 and `urls` since 2026-09-11 (decision 1a), the same name, values and default on each. ⚠ **Added because this record OWNED NOTHING in `src/` and could therefore never be opened by the freshness gate** — the [ADR-ANSWER](0105_answer.md) precedent above, exactly: W-126 amended this record and the gate demanded seven others instead |
 | `src/fux/ingest/urlsrc.py` | ADR-ARCHIVED-CONTENT | `UrlEntry.archived`, and `resolve_urls` applying **two** layers to it where `keep` and `ttl` take three — the absence of a source-wide layer is decision 1a's call, not an omission |
 | `src/fux/ingest/run.py` | ADR-ARCHIVED-CONTENT | `_archived_url_ids` and `_with_archived` — the declaration reaching a record, including a CARRIED one, which is the half that makes a retired page declarable at all. Owned by ADR-INGEST for the walk |
-| `src/fux/store/fuxdir.py::ensure_node_reader,node_version,_node_source,_packaged_node_files` | ADR-NODE-SEARCH | the vendoring half of R2 — which files are written into `.fux/node/` and the version comparison that decides whether to overwrite. **The `.fux/` SHAPE is still ADR-DOTFUX's subject** (it is the fourth shape there); what this record decides is that the vendored thing is a reader and that a stale one is a wrong answer |
+| `src/fux/setup.py::detect_workspace,wire_workspace,_yarn_berry_linker` | ADR-NODE-SEARCH | the monorepo half of decision 15 — which signals mean a workspace, and the format-preserving splice into a manifest fux does not own. **It lives in `setup.py` rather than in `fuxdir.py` by structure, not by convention**: `ensure_layout` runs at the head of every ingest and must never edit a consumer's `package.json`. Owned by ADR-DOTFUX as scaffolding |
+| `src/fux/doctor.py::_node_reader,_installed_reader` | ADR-NODE-SEARCH | the `node reader` row — the version, the shape, a stale `src/` tree still in the consumer's repo, and a shape-C manifest with nothing installed to resolve it. Owned by ADR-DOCTOR, which decides what a row IS |
+| `tools/differential/node_arm.py::bundle_entry,Arm` | ADR-NODE-SEARCH | the sixth surface — the published bundle against the module tree it was built from (`bundle_entry` builds it per run; `Arm.compare_bundle`, `compare_bundle_api` and `compare_bundle_mcp` compare it). ⚠ **Narrowed to the top-level symbols the gate can resolve** — a method name here would switch the gate off silently, which `tests/test_adr_freshness.py::test_the_narrowing_is_recorded_where_the_gate_can_read_it` catches. Owned by ADR-T1-ACCELERATOR, which owns the harness |
+| `src/fux/store/fuxdir.py::ensure_node_reader,node_version,node_shape,_node_source,_packaged_node_files,_prune_node_reader,_workspace_manifest` | ADR-NODE-SEARCH | the vendoring half of R2 — which files are written into `.fux/node/` and the version comparison that decides whether to overwrite. **The `.fux/` SHAPE is still ADR-DOTFUX's subject** (it is the fourth shape there); what this record decides is that the vendored thing is a reader and that a stale one is a wrong answer |
 <!-- DESCRIBES-TABLE-END -->
 

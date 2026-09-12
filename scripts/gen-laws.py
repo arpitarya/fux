@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render `CLAUDE.md` §Non-negotiable constraints from the nine Law records.
+"""Render `CLAUDE.md` §Non-negotiable constraints from the eleven Law records.
 
 **Why this exists.** [ADR-LAW-0](../docs/adr/0002_LAW-0-authority.md) decision 1
 says every rule is *stated* in exactly one ADR and every other artifact links to
@@ -21,7 +21,7 @@ permission is the test, not the generation.
       - **L3** · **Deterministic — no model in the maintenance path.** ...
       <!-- LAW-TEXT:END L3 -->
 
-- The nine blocks are concatenated in `L0 … L9` order between `CLAUDE.md`'s
+- The eleven blocks are concatenated in `L0 … L10` order between `CLAUDE.md`'s
   `<!-- LAWS:BEGIN … -->` / `<!-- LAWS:END -->` markers.
 - **Link targets are rewritten, and that is the only transform.** A record lives
   at `docs/adr/`, `CLAUDE.md` at the repo root, so the same law text needs two
@@ -44,9 +44,9 @@ ROOT = Path(__file__).resolve().parents[1]
 ADR_DIR = ROOT / "docs" / "adr"
 CLAUDE_MD = ROOT / "CLAUDE.md"
 
-#: The nine handles, in the order the block renders them. L0 first because it is
-#: the law that governs the others; L9 last because it is the newest.
-LAW_ORDER = tuple(f"L{i}" for i in range(10))
+#: The eleven handles, in the order the block renders them. L0 first because it
+#: is the law that governs the others; L10 last because it is the newest.
+LAW_ORDER = tuple(f"L{i}" for i in range(11))
 
 BEGIN = "<!-- LAWS:BEGIN"
 END = "<!-- LAWS:END -->"
@@ -91,7 +91,7 @@ def law_records() -> dict[str, Path]:
     found: dict[str, Path] = {}
     for path in sorted(ADR_DIR.glob("*_LAW-*.md")):
         text = path.read_text(encoding="utf-8")
-        handles = re.findall(r"<!-- LAW-TEXT:BEGIN (L\d) -->", text)
+        handles = re.findall(r"<!-- LAW-TEXT:BEGIN (L\d+) -->", text)
         if not handles:
             raise SystemExit(f"{path.name}: no <!-- LAW-TEXT:BEGIN Ln --> marker")
         if len(handles) > 1:
@@ -127,7 +127,7 @@ def render() -> str:
     if missing:
         raise SystemExit(f"no record declares {', '.join(missing)}")
         # An extra handle is impossible: LAW_ORDER is the closed set and a
-        # record declaring L10 would fail `_ORDER` lookup below, loudly.
+        # record declaring L11 would fail the `extra` check below, loudly.
     extra = [h for h in records if h not in LAW_ORDER]
     if extra:
         raise SystemExit(f"unknown law handle(s) {extra} — add them to LAW_ORDER first")

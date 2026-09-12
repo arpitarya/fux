@@ -51,20 +51,22 @@ path = "src/fux/__init__.py"
 packages = ["src/fux"]
 
 # The Node read plane travels in the wheel so `fux setup` can vendor it into a
-# consumer's `.fux/node/` (ADR-NODE-SEARCH, W-107 R2). `force-include` maps the
-# repo's ONE copy into the wheel at build time — deliberately not a second copy
-# under `src/fux/templates/`, which is the drift surface every other vendored
-# directory in this repo exists to avoid.
-# The set is spelled file by file, not as `"node" = ...`, for two reasons:
-# `node/test/` would otherwise be vendored into every consumer's `.fux/node/`
-# (a test suite in someone else's repository), and this list is then the same
-# set npm ships in `node/package.json`'s `files` — one payload, two registries.
-[tool.hatch.build.targets.wheel.force-include]
-"node/fux.mjs" = "fux/templates/node/fux.mjs"
-"node/src" = "fux/templates/node/src"
-"node/mcp-tools.json" = "fux/templates/node/mcp-tools.json"
-"node/package.json" = "fux/templates/node/package.json"
-"node/README.md" = "fux/templates/node/README.md"
+# consumer's `.fux/node/` (ADR-NODE-SEARCH decision 13). What travels is the
+# BUNDLE — one generated `.mjs` plus its manifest and tool descriptions, never
+# fux's own module tree, which is L10 (docs/adr/0012_LAW-10-bundled-output.md).
+#
+# 🔴 **Generated, so it is a build HOOK and not a `force-include` list.** A
+# static list cannot name a file that does not exist until something has built
+# it; the hook builds it on every wheel, from this tree, with the same
+# deterministic bundler the release workflow runs for npm. One artefact, two
+# registries — and none of the authored module tree is ever copied into a
+# consumer's repository again.
+#
+# ⚠ The path of that tree is deliberately NOT spelled here: ADR-LAW-10's veto
+# command greps this file for it and expects no hit, so a mention in a comment
+# would be a false positive on the law's own check.
+[tool.hatch.build.targets.wheel.hooks.custom]
+path = "hatch_build.py"
 
 [tool.hatch.build.targets.sdist]
 # The sdist is the buildable source + its tests/docs — never the archived old

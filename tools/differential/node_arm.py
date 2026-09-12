@@ -65,6 +65,15 @@ from pathlib import Path
 ENGINE = Path(__file__).resolve().parents[2]
 NODE_ENTRY = ENGINE / "node" / "fux.mjs"
 
+#: 🔴 **The sixth surface, and it is the one a CONSUMER runs.** Every other
+#: surface here reads `node/fux.mjs` and its module tree; what `fux setup`
+#: vendors and npm publishes is the BUNDLE (ADR-NODE-SEARCH decisions 13-14,
+#: L10). Shipping one artefact and measuring another is decisions 9-12 in a new
+#: costume — *a transcription is only as true as the surface the instrument is
+#: aimed at* — so the arm builds the bundle and compares it against the tree it
+#: was built from, on whole parsed payloads.
+_BUNDLE: "Path | None" = None
+
 sys.path.insert(0, str(ENGINE / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
@@ -105,6 +114,25 @@ REPO_QUERIES = (
 )
 
 
+def bundle_entry() -> Path:
+    """Build the published bundle once per run and return its path.
+
+    Built rather than found: a bundle on disk could be from another checkout,
+    and the question this surface answers is whether the artefact THIS tree
+    publishes answers what THIS tree's modules answer.
+    """
+    global _BUNDLE
+    if _BUNDLE is None:
+        import tempfile
+
+        from fux.store import nodebundle
+
+        out = Path(tempfile.mkdtemp(prefix="fux-arm-bundle-"))
+        nodebundle.write(ENGINE / "node", out)
+        _BUNDLE = out / nodebundle.ENTRY
+    return _BUNDLE
+
+
 class Arm:
     """One corpus, both readers, and the record map they are compared over."""
 
@@ -118,7 +146,8 @@ class Arm:
 
     # -- the two readers ------------------------------------------------------
 
-    def node(self, verb: str, query: str, top: int, extra: tuple[str, ...] = ()) -> dict:
+    def node(self, verb: str, query: str, top: int, extra: tuple[str, ...] = (),
+             entry: "Path | None" = None) -> dict:
         # 🔴 `--no-tune` goes to BOTH sides or to neither. Since 2026-09-12 Node
         # reads `.fux/tune.toml` too (ADR-NODE-SEARCH decision 8, closed), so a
         # transcription arm that flipped only the Python side would compare a
@@ -131,7 +160,7 @@ class Arm:
         depth = ("--top", str(top)) if top is not None else ()
         no_tune = () if (self.use_tune or top is None) else ("--no-tune",)
         proc = subprocess.run(
-            ["node", str(NODE_ENTRY), verb, query, "--json", *depth, *no_tune, *extra],
+            ["node", str(entry or NODE_ENTRY), verb, query, "--json", *depth, *no_tune, *extra],
             capture_output=True, text=True, cwd=self.root,
         )
         if proc.returncode != 0:
@@ -358,6 +387,70 @@ print(json.dumps({
                            f"node={json.dumps(nd_v, sort_keys=True)[:300]}")
         return out
 
+    # -- the BUNDLE surface ---------------------------------------------------
+    #
+    # 🔴 **What a consumer actually executes.** `.fux/node/fux.mjs` and the npm
+    # tarball's entry point are one generated file; `node/src/**` never leaves
+    # this repository (L10). The bundler is deterministic, which makes the
+    # bytes reproducible — it does NOT make them right, and "the concatenation
+    # compiled" is not the same claim as "it answers the same".
+
+    #: Verbs compared through both Node entry points, as whole payloads. Whole
+    #: rather than field-wise for `compare_verb`'s reason: a renamed key is
+    #: exactly the kind of thing a bundling mistake could produce.
+    BUNDLE_VERBS = ("find", "ask", "answer")
+
+    def compare_bundle(self, verb: str, query: str, top: "int | None") -> list[str]:
+        """One verb, the module tree against the bundle built from it."""
+        extra = ("--band",) if verb == "ask" else ()
+        tree = self.node(verb, query, top, extra)
+        built = self.node(verb, query, top, extra, entry=bundle_entry())
+        if tree == built:
+            return []
+        return [f"bundle {verb} {query!r}: tree={json.dumps(tree, sort_keys=True)[:300]} "
+                f"bundle={json.dumps(built, sort_keys=True)[:300]}"]
+
+    def compare_bundle_api(self, query: str, doc: str, doc2: str) -> list[str]:
+        """The LIBRARY surface through the bundle — `exports` names it now.
+
+        `node/package.json`'s `exports` left `./src/index.mjs` for the bundle
+        with W-149, so `import { open } from "fux-engine"` resolves to this
+        file for every npm consumer. An arm that only imported the module tree
+        would be testing a path nobody's `node_modules` contains.
+        """
+        out = []
+        for entry in (ENGINE / "node" / "src" / "index.mjs", bundle_entry()):
+            subs = {
+                "entry": json.dumps(str(entry)), "root": json.dumps(str(self.root)),
+                "q": json.dumps(query), "doc": json.dumps(doc), "doc2": json.dumps(doc2),
+            }
+            proc = subprocess.run(
+                ["node", "--input-type=module", "-e", self.API_JS % subs],
+                capture_output=True, text=True, cwd=self.root,
+            )
+            if proc.returncode != 0:
+                return [f"bundle api ({entry.name}) exited {proc.returncode}: "
+                        f"{proc.stderr.strip()[:300]}"]
+            out.append(json.loads(proc.stdout.strip().splitlines()[-1]))
+        if out[0] == out[1]:
+            return []
+        return [f"bundle api: tree and bundle disagree on "
+                f"{sorted(k for k in out[0] if out[0][k] != out[1].get(k))}"]
+
+    def compare_bundle_mcp(self, calls: list[dict]) -> list[str]:
+        """Both Node MCP servers — module tree and bundle — over one session each.
+
+        The bundle resolves `mcp-tools.json` from a different directory shape
+        than the tree does, and a wrong answer there is an `ENOENT` at the
+        first `tools/list` on a consumer's machine and nowhere else.
+        """
+        tree = self.mcp(["node", str(NODE_ENTRY), "mcp"], calls)
+        built = self.mcp(["node", str(bundle_entry()), "mcp"], calls)
+        if tree == built:
+            return []
+        return [f"bundle mcp: {len(tree)} tree responses vs {len(built)} bundle, first "
+                f"difference at {next((i for i, (a, b) in enumerate(zip(tree, built)) if a != b), None)}"]
+
     def _decoded_citations(self, payload: dict) -> set[str]:
         """The cited documents in `payload` that a DECODER produced.
 
@@ -473,6 +566,10 @@ def main() -> int:
                     help="parallel comparisons; each costs one Node process")
     ap.add_argument("--evidence", type=Path, default=None,
                     help="directory for the per-query rows PRE-REG-NODE-2 §6 requires")
+    ap.add_argument("--bundle-cap", type=int, default=8,
+                    help="how many queries to run through the PUBLISHED BUNDLE as well as "
+                         "the module tree (0 = skip). The bundle is what `fux setup` "
+                         "vendors and npm ships, so it is the surface a consumer runs")
     ap.add_argument("--graph-cap", type=int, default=8,
                     help="how many explain/graph/path comparisons to run (0 = none). "
                          "Both sides rebuild the plane per call, so this is capped "
@@ -537,6 +634,17 @@ def main() -> int:
         jobs += [("graph", (q,), None) for q in queries[: args.graph_cap] if q.strip()]
         jobs += [("path", (a, b), None) for a, b in zip(picked, picked[1:])]
 
+    # 🔴 The sixth surface, added 2026-09-12 with W-149. The arm read the module
+    # tree; consumers run the bundle. Cheap, because CI builds it anyway — and
+    # the reason it is not merely a byte comparison is that a bundler can emit
+    # something that parses, runs, and answers differently.
+    if args.bundle_cap:
+        picked_q = [q for q in queries if q.strip()][: args.bundle_cap]
+        jobs += [("bundle", (verb, q), top)
+                 for q in picked_q for top in tops[:1] for verb in arm.BUNDLE_VERBS]
+        print(f"bundle   : {len(picked_q)} queries x {len(arm.BUNDLE_VERBS)} verbs "
+              f"through the published artefact as well as the tree")
+
     if args.graph_cap:
         ids = sorted(arm.records)
         step = max(1, len(ids) // args.graph_cap)
@@ -553,16 +661,26 @@ def main() -> int:
                           "params": {"name": "fux_passage",
                                      "arguments": {"path": loc, "line_start": 1, "line_end": 20}}})
         jobs.append(("mcp", tuple(json.dumps(c) for c in calls), None))
+        if args.bundle_cap:
+            jobs.append(("bundle-mcp", tuple(json.dumps(c) for c in calls), None))
         if len(picked) >= 2:
             jobs.append(("api", (queries[0], picked[0], picked[1]), None))
+            if args.bundle_cap:
+                jobs.append(("bundle-api", (queries[0], picked[0], picked[1]), None))
 
     def run(job):
         verb, query, top = job
         try:
             if verb == "mcp":
                 return job, arm.compare_mcp([json.loads(c) for c in query])
+            if verb == "bundle-mcp":
+                return job, arm.compare_bundle_mcp([json.loads(c) for c in query])
             if verb == "api":
                 return job, arm.compare_api(*query)
+            if verb == "bundle-api":
+                return job, arm.compare_bundle_api(*query)
+            if verb == "bundle":
+                return job, arm.compare_bundle(query[0], query[1], top)
             if top is None:
                 return job, arm.compare_verb(verb, query, tunable=verb != "explain")
             fn = arm.compare_find if verb == "find" else arm.compare_ask

@@ -48,7 +48,7 @@ table. ⚠ **A handle is not the law**; read the law in §2 below.
 ```mermaid
 flowchart LR
     R["ADR-LAW-2<br/>(THIS RECORD — states law L2)"]
-    N["ADR-LAWS<br/>(the handles L0..L9 — routes, never states)"]
+    N["ADR-LAWS<br/>(the handles L0..L10 — routes, never states)"]
     C["CLAUDE.md §Non-negotiable constraints<br/>(GENERATED from the records · test-bound)"]
     B["records bound by L2<br/>(cite the number, never restate)"]
     R --> C
@@ -69,7 +69,7 @@ flowchart LR
         (GENERATED -- not the source)
 
                ADR-LAWS
-     (the handles L0..L9 -- routes, never states)
+     (the handles L0..L10 -- routes, never states)
                    |
           +--------+---------+
           v                  v

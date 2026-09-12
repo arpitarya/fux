@@ -4,8 +4,9 @@
  * npm package `fux-engine`, command `fux`, vendored by `fux setup` into
  * `.fux/fux.mjs` so a clone with no Python still answers (W-107 R1/R2).
  */
-import { existsSync, statSync } from "node:fs";
+import { existsSync, realpathSync, statSync } from "node:fs";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { findRoot } from "./src/config/root.mjs";
 import { runFind } from "./src/verbs/find.mjs";
 import { runAsk } from "./src/verbs/ask.mjs";
@@ -14,6 +15,13 @@ import { runExplain, runGraph, runPath } from "./src/verbs/graph.mjs";
 import { runMcp } from "./src/verbs/mcp.mjs";
 import { FuxError } from "./src/errors.mjs";
 import { applyOutputDefaults, loadOutput } from "./src/config/output.mjs";
+// 🔴 **The library surface travels with the CLI, and that is what makes ONE
+// bundle possible** (L10, docs/adr/0012_LAW-10-bundled-output.md). `exports`
+// and `bin` in `package.json` both name this file, so `import { open } from
+// "fux-engine"` and `fux ask` reach the same artefact. The twin of this
+// re-export is `src/fux/__init__.py`'s, and it is deliberately thin: the
+// shapes are authored in `src/index.mjs`, which stays `api.py`'s twin.
+import { open, Index } from "./src/index.mjs";
 
 const VERSION = "2.0.0-alpha.7";
 
@@ -173,4 +181,28 @@ function main(argv) {
   }
 }
 
-process.exitCode = main(process.argv.slice(2));
+/** Run the CLI only when this file IS the program.
+ *
+ * 🔴 **Unconditional invocation was safe while the library lived in a separate
+ * file and became a BUG the moment one bundle served both** — `import
+ * "fux-engine"` would have parsed a caller's `process.argv` and set their exit
+ * code. The check is the standard ESM one: compare the resolved entry path
+ * with this module's own, through `realpath` so a package manager's `.bin`
+ * symlink (npm, pnpm and yarn all make one) resolves to the same file.
+ */
+function invokedDirectly() {
+  const entry = process.argv[1];
+  if (entry === undefined) return false;
+  const real = (p) => {
+    try {
+      return realpathSync(p);
+    } catch {
+      return p;
+    }
+  };
+  return real(entry) === real(fileURLToPath(import.meta.url));
+}
+
+if (invokedDirectly()) process.exitCode = main(process.argv.slice(2));
+
+export { open, Index };

@@ -35,6 +35,122 @@ valuable judgement, but not the state of play.
 *Updated **2026-09-12**.* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
+### The consumer gets no source — BUILT and CLOSED (2026-09-12, Claude Code)
+
+✅ **W-149 is closed and [L10](../docs/adr/0012_LAW-10-bundled-output.md) is
+satisfied.** What a consumer's `.fux/node/` holds is **one generated `fux.mjs`**
+plus `package.json`, `mcp-tools.json` and a README (shape A), or a **workspace
+manifest alone** (shape C); the bundler is
+[`src/fux/store/nodebundle.py`](../src/fux/store/nodebundle.py), the wheel gets
+it from [`hatch_build.py`](../hatch_build.py), npm gets the same artefact from
+one build in `publish.yml`, and `fux setup` **prunes** whatever an older engine
+left behind. Outcome and evidence: [`IMPLEMENTATION.md`](IMPLEMENTATION.md).
+
+**The two things a next session should carry from it, neither of them code:**
+
+1. 🔴 **Building the record found two defects reading it could not.** Decision
+   15's detection table contradicted its own Berry warning — an accepted record
+   self-contradicting inside one file, the **W-83 class**, invisible to every
+   mechanical check here. And the Berry fallback was broader than the evidence
+   needed. **Both were found by implementing the table, not by reviewing it.**
+2. ⚠ **A bundler's determinism is the WEAK claim.** Reproducible bytes can
+   still compile, run and answer differently, so the gate is
+   `tests/test_node_bundle.py` + the arm's sixth surface, both comparing
+   **answers** through both entry points. *A transcription is only as true as
+   the surface the instrument is aimed at* now applies to the artefact as well
+   as to the reader.
+
+The section below is the ruling as it stood, kept because the reasoning is what
+makes the shape make sense.
+
+### The rulings, as they were made (2026-09-12, Cowork)
+
+**Arpit, 2026-09-12, two rulings in one exchange.** A consumer's `.fux/node/`
+carries **no `src/` tree** — it gets bundled executable code, run by `npx` or by
+adding `.fux` as a monorepo workspace. And the load-bearing half: **the bundling
+happens when fux publishes, never on the consumer's machine** — one artefact,
+shipped inside both the PyPI wheel and the npm tarball.
+
+**Why that second sentence settles rather than forces three collisions:**
+
+- `node/README.md`'s *"no build step — a build step is a dependency"* survives,
+  narrowed to **the consumer's end**. Fux's release has a bundler; the person
+  running `fux setup` does not.
+- The offline promise — *"a clone with nothing installed still answers"*, which
+  [ADR-NODE-SEARCH](../docs/adr/0155_node-search.md) decision 2 leans on —
+  survives under shape A.
+- **Decision 6 stands as written.** `node/` stays many files, one per Python
+  module; `tests/test_node_twins.py` is untouched. The amendment adds one
+  sentence: **what ships is not what is authored.**
+
+✅ **What shipped until 2026-09-12 was the whole module tree — 47 files,
+223 KB, 5 484 lines into a consumer's git, with `ensure_node_reader` pruning
+nothing.** Both halves are gone: four files in shape A, and the prune deletes
+the old tree on the version difference (`node_modules/` excepted, because in
+shape C that holds the installed reader).
+
+✅ **Third ruling, same exchange: the monorepo is AUTO-DETECTED and wired up** —
+`.fux/node` added to the consumer's workspace list, `fux-engine@<version>`
+declared in `.fux/node/package.json`. **Built 2026-09-12** — detection is
+`setup.py::detect_workspace`, and the manifest edit is a format-preserving
+splice that lives in `setup.py` so `ensure_layout` structurally cannot reach it.
+
+⚠ **The item had proposed *declared, never detected* and was wrong on the
+precedent** — worth knowing, because the wrong version of this rule is easy to
+inherit. [ADR-FETCHER](../docs/adr/0117_fetcher.md) decision 5 and W-86 fork E
+govern **ingest**, where detection makes the *index* a function of the
+environment and [L3](../docs/adr/0005_LAW-3-deterministic.md) forbids it.
+**`fux setup`'s scaffolding is not the index.** Neither precedent reached this,
+and the ruling trades away nothing a law protects.
+
+✅ **MEASURED the same day** —
+[`2026-09-12-workspace-dotpath-probe`](regression/2026-09-12-workspace-dotpath-probe/report.md),
+four throwaway monorepos, one per package manager, two arms each.
+
+🔴 **The hazard this was gated on was WRONG, and that is the lesson worth
+keeping.** It predicted dot-directory globbing would break a `.fux/node`
+workspace. **All four accept it when declared** — pnpm says so itself
+(`Scope: all 3 workspace projects` against `all 2` on the control). A hazard
+written from plausibility budgeted a session's caution against nothing; **the
+two real findings only appeared because it was probed rather than reasoned
+about:**
+
+1. **`packages/*` picks `.fux/node` up in NONE of the four.** An existing
+   monorepo does not acquire the reader by having workspaces, so `fux setup`
+   writing the entry is required — Arpit's *"set it up as well"* is the
+   decision, not a courtesy.
+2. **npm and yarn hoist the `fux` bin to the workspace root; pnpm and bun do
+   not.** So `.fux/fux` becomes a **three-rung resolver** and is the only entry
+   point correct in every shape. Documenting `node_modules/.bin/fux` would be
+   right for half the ecosystem.
+
+✅ **Yarn Berry is MEASURED — the owed second probe is filed**
+([`2026-09-12-yarn-berry-probe`](regression/2026-09-12-yarn-berry-probe/report.md),
+Yarn 4.1.0). `.fux/node` links in Berry too, so the dot path is fine in **five
+of five** managers; the boundary is the **linker**. `nodeLinker: node-modules`
+hoists the `fux` bin to the workspace root — rung 3, shape C works. **PnP has no
+`node_modules` at all, and PnP is Berry's default**, so an unset key must be
+read as PnP or fux would wire a workspace nothing can resolve.
+
+⚠ **And still true:** `ensure_node_reader` runs at the head of **every** ingest
+via `ensure_layout` ([ADR-DOTFUX](../docs/adr/0102_fux-directory.md)), so the
+manifest edit belongs to `setup` alone or a no-op ingest starts rewriting a file
+fux does not own.
+
+✅ **The records were AHEAD of the code for one day, and the markers are now
+flipped.** ADR-NODE-SEARCH decisions 13-16 said **RULED / NOT BUILT**; they say
+BUILT, in the change that built them, along with ADR-DOTFUX's three rows,
+ADR-LAW-10's decision 8, ADR-DOCTOR's `node reader` row,
+ADR-T1-ACCELERATOR's decision 14 (five surfaces → six) and notes in
+ADR-ACQUIRED and ADR-PII. ⚠ **The exposure `643305b` recorded stands as a
+lesson** — a record ahead of its code reads as authority exactly as one behind
+it does, and `tests/test_adr_freshness.py` sees neither. The window was one day
+because the build followed immediately; nothing guarantees the next one is.
+
+**And the one that is easy to skip: the differential arm must gain the bundle as
+a fifth surface** — shipping one artefact and measuring another is decisions
+9-12 in a new costume.
+
 ### W-107 is CLOSED, and the way it closed is the lesson (2026-09-12, Claude Code)
 
 **The Node read plane is built, published, and compared against Python on five
@@ -327,7 +443,7 @@ the counts are read back out of the built index, not asserted from the sources.
 ### The diagrams are now drawn from the code -- and reading them surfaced four live contradictions (2026-09-12, Cowork)
 
 **Five diagrams replace four**, all authored against `src/`, never against the
-paper: `architecture-{high-level,detailed,decoders,ask,answer}.svg`.
+paper: `architecture-{high-level,detailed,decoders,ask,answer,two-readers}.svg`.
 `architecture-search-v3.svg` became `proposal-search-v3-target.svg` -- it draws
 a proposal's target state, so it is deliberately outside that namespace.
 

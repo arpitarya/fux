@@ -169,11 +169,16 @@ lines and names the ones with no retained bytes. It is coherent for a document
 that genuinely never changes and surprising to have chosen by accident, which is
 a warning's shape rather than a refusal's.
 
-⚠ **Touched 2026-09-11 by a change to `.fux/.gitignore`'s generator that this
-record does not describe.** `__pycache__/` joined the file
-([ADR-DOTFUX](0102_fux-directory.md)); `acquired/`'s line, and the reason it is
-gitignored-but-not-derived, are unchanged. Recorded here because the freshness
-gate reads whole files and a reader deserves to know which half moved.
+⚠ **Touched twice by changes to `.fux/.gitignore`'s generator that this record
+does not describe.** `__pycache__/` joined the file on 2026-09-11, and
+`node/node_modules/` on 2026-09-12 — the package manager's install directory,
+which exists only in the monorepo shape where `.fux/node` is a workspace member
+([ADR-NODE-SEARCH](0155_node-search.md) decision 13). Both are
+[ADR-DOTFUX](0102_fux-directory.md)'s. **`acquired/`'s line, and the reason it
+is gitignored-but-not-derived, are unchanged** — and neither newcomer is a
+plane, so the three kinds this record turned into four are still three kinds.
+Recorded here because the freshness gate reads whole files and a reader
+deserves to know which half moved.
 
 **9. `keep` and `acquired_max_bytes` are DECLARED in
 [ADR-CONFIG](0113_config.md) decision 13's key block** (2026-09-12, W-122), and

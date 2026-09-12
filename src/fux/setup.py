@@ -29,6 +29,9 @@ would be circular. Every other verb errors without one.
 
 from __future__ import annotations
 
+import json
+import os
+import re
 from dataclasses import dataclass, field
 from importlib import resources
 from pathlib import Path
@@ -551,6 +554,24 @@ class SetupReport:
     converted_types: bool = False
     #: `!` patterns that moved from the old types file into `.fux/.fuxignore`.
     moved_exclusions: list[str] = field(default_factory=list)
+    #: Paths this run DELETED — the Node reader's prune, and nothing else
+    #: today. Separate from `written` because a consumer reading "wrote
+    #: .fux/node/src/query/rank.mjs" about a file that is now gone would be
+    #: told the opposite of what happened (ADR-NODE-SEARCH decision 13).
+    removed: list[str] = field(default_factory=list)
+    #: Which shape `.fux/node/` was written in — `"A"` (the vendored bundle) or
+    #: `"C"` (a workspace member). ADR-NODE-SEARCH decision 13.
+    node_shape: str = fuxdir.SHAPE_VENDORED
+    #: The consumer manifest this run EDITED, repo-relative, or `None`.
+    #: **Announced always** — decision 15 constraint 3: a silent write to a
+    #: tracked file a team reviews is how trust goes.
+    wired_manifest: "str | None" = None
+    #: Why shape A was written where a monorepo was detected anyway. Printed,
+    #: because "half-configured is not a state" is only honest if the fallback
+    #: says which state it chose (decision 15 constraint 4).
+    workspace_note: "str | None" = None
+    #: The package manager whose install command the consumer now has to run.
+    workspace_manager: "str | None" = None
 
 
 def template_bytes(name: str) -> bytes:
@@ -830,6 +851,303 @@ def _write_root_agents(root: Path, report: SetupReport) -> None:
         report.outside.append(AGENTS_FILE)
 
 
+# ---------------------------------------------------------------------------
+# The monorepo shape -- ADR-NODE-SEARCH decision 15, ruled by Arpit 2026-09-12
+# ("Auto detect. Auto detect and set it up as well.").
+#
+# 🔴 **This is fux's FIRST write to a file it does not own and a team reviews.**
+# `fux hooks` writes `.git/`, which is machinery; a root `package.json` is
+# source, and a one-line addition arriving as a whole-file reformat is a bad
+# diff in somebody's pull request. Hence: text edits, never a re-serialize.
+#
+# ⚠ **It lives in `setup.py` and NOT in `fuxdir.py` on purpose.**
+# `fuxdir.ensure_layout` runs at the head of every ingest; a manifest edit
+# reachable from there would rewrite the consumer's `package.json` on a no-op
+# ingest (decision 15 constraint 1). Structure, rather than a comment asking
+# nobody to call it.
+#
+# ⚠ **Why detection does not conflict with "declared, never detected"**:
+# ADR-FETCHER decision 5 and W-86 fork E govern INGEST, where detection makes
+# the INDEX a function of the environment and L3 forbids it. Scaffolding is not
+# the index; no law reaches it.
+# ---------------------------------------------------------------------------
+
+#: The workspace path fux asks for. MEASURED to link in npm, pnpm, yarn 1 and
+#: bun (work/regression/2026-09-12-workspace-dotpath-probe) — the dot prefix
+#: breaks nothing — and MEASURED not to be picked up by a `packages/*` glob in
+#: any of the four, which is why the wiring is required rather than convenient.
+WORKSPACE_MEMBER = ".fux/node"
+
+
+@dataclass(frozen=True)
+class Workspace:
+    """A monorepo fux found, and the one file it would have to edit."""
+
+    #: `pnpm` / `npm` / `yarn` / `bun` — used for the install command printed
+    #: at the end, and for nothing else. The SHAPE does not depend on it.
+    manager: str
+    #: The manifest carrying the workspace list.
+    manifest: Path
+    #: `"pnpm-yaml"` or `"package-json"` — which editor applies.
+    kind: str
+
+
+def _package_manager(root: Path) -> str:
+    """Whose install command to print, from the lockfile that is actually here."""
+    for name, manager in (
+        ("pnpm-lock.yaml", "pnpm"),
+        ("bun.lockb", "bun"),
+        ("bun.lock", "bun"),
+        ("yarn.lock", "yarn"),
+        ("package-lock.json", "npm"),
+    ):
+        if (root / name).is_file():
+            return manager
+    return "npm"
+
+
+def _yarn_berry_linker(root: Path) -> "str | None":
+    """Yarn 2+'s `nodeLinker`, or `None` when this is not a Berry repository.
+
+    🔴 **MEASURED on 2026-09-12, and the answer splits on this one key**
+    ([probe 2](../../work/regression/2026-09-12-yarn-berry-probe/report.md), Yarn
+    4.1.0):
+
+    | `nodeLinker` | `.fux/node` links | where `fux` lands | shape |
+    |---|---|---|---|
+    | `node-modules` | yes | the workspace ROOT's `node_modules/.bin` | **C** |
+    | `pnp` (Berry's default) | yes | nowhere — there is no `node_modules` | **A** |
+
+    So the dot path was never the problem in Berry either; **the linker is.**
+    Under PnP a binary is reached through Yarn's own resolver, which a
+    three-line `/bin/sh` shim cannot do, and shape A is both correct and
+    offline. `None` means *not Berry* and the ordinary detection continues.
+
+    ⚠ **Checked BEFORE the `workspaces` array, which is not the order
+    ADR-NODE-SEARCH decision 15's table was written in — and the table was
+    wrong.** A Berry repository declares `workspaces` in `package.json` exactly
+    like npm does, so a literal first-hit reading of that table gave every
+    Berry repo shape C, including the PnP ones the record's own warning says
+    must not have it. The record is amended with this change.
+    """
+    rc = next((root / n for n in (".yarnrc.yml", ".yarnrc.yaml") if (root / n).is_file()), None)
+    manifest = root / "package.json"
+    berry = rc is not None
+    shape_object = False
+    if manifest.is_file():
+        try:
+            meta = json.loads(manifest.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            meta = {}
+        declared = meta.get("packageManager")
+        if isinstance(declared, str) and declared.startswith("yarn@"):
+            major = declared[len("yarn@") :].split(".")[0]
+            berry = berry or (major.isdigit() and int(major) >= 2)
+        # The object form (`workspaces: {packages: [...]}`) is Berry's own and
+        # is not a list the array splicer can extend.
+        shape_object = isinstance(meta.get("workspaces"), dict)
+    if not berry:
+        return None
+    if shape_object:
+        return "object-form"
+    linker = None
+    if rc is not None:
+        m = re.search(r"^nodeLinker\s*:\s*[\"']?([\w-]+)", rc.read_text(encoding="utf-8"), re.M)
+        linker = m.group(1) if m else None
+    # Berry's default is PnP, so an unset key means PnP — never "assume the
+    # convenient one". Getting this backwards would wire a workspace whose
+    # reader nothing can resolve, which is the state decision 15 forbids.
+    return linker or "pnp"
+
+
+def detect_workspace(root: Path) -> "Workspace | None":
+    """The monorepo shape, or `None` when there is no monorepo here.
+
+    ⚠ **Yarn Berry comes back as a workspace fux will NOT wire**, rather than
+    as `None`. The difference is what the consumer is told: `None` means "no
+    monorepo", and saying that to somebody who has one would be false. The
+    refusal path prints the real reason and writes shape A.
+    """
+    linker = _yarn_berry_linker(root)
+    if linker is not None and linker != "node-modules":
+        return Workspace(manager="yarn", manifest=root / "package.json", kind=f"yarn-{linker}")
+    for name in ("pnpm-workspace.yaml", "pnpm-workspace.yml"):
+        path = root / name
+        if path.is_file() and re.search(r"^packages\s*:", path.read_text(encoding="utf-8"), re.M):
+            return Workspace(manager="pnpm", manifest=path, kind="pnpm-yaml")
+    manifest = root / "package.json"
+    if manifest.is_file():
+        try:
+            text = manifest.read_text(encoding="utf-8")
+        except OSError:
+            return None
+        try:
+            meta = json.loads(text)
+        except ValueError:
+            # ⚠ **A manifest fux cannot parse but that CLAIMS workspaces is
+            # still a monorepo**, and returning `None` here would write shape A
+            # with nothing said about it. It comes back as a workspace the
+            # refusal path declines, so the run prints the reason (constraint 4).
+            if '"workspaces"' in text:
+                return Workspace(
+                    manager=_package_manager(root), manifest=manifest, kind="package-json"
+                )
+            return None
+        if isinstance(meta.get("workspaces"), list):
+            return Workspace(
+                manager=_package_manager(root), manifest=manifest, kind="package-json"
+            )
+    return None
+
+
+def _matching_bracket(text: str, start: int) -> int:
+    """Index of the `]` closing the `[` at `start`, skipping string contents."""
+    depth = 0
+    i = start
+    while i < len(text):
+        ch = text[i]
+        if ch == '"':
+            i += 1
+            while i < len(text) and text[i] != '"':
+                i += 2 if text[i] == "\\" else 1
+        elif ch == "[":
+            depth += 1
+        elif ch == "]":
+            depth -= 1
+            if depth == 0:
+                return i
+        i += 1
+    return -1
+
+
+def _insert_into_json_array(text: str, key: str, member: str) -> "str | None":
+    """Add `member` to the array at `key`, preserving the file's shape.
+
+    Returns the new text, or `None` when the edit is not safe to make — which
+    is a fallback to shape A, never a best-effort write (decision 15
+    constraint 4). Indentation, key order and the trailing newline survive
+    because nothing is re-serialized: this is a splice.
+
+    The key may be quoted (`"workspaces":`, JSON) or bare (`packages:`, a
+    pnpm flow sequence) — one splicer, because the bracket shapes are identical
+    and a second copy would be the drift this repo keeps paying for.
+    """
+    m = re.search(r'"?%s"?\s*:\s*' % re.escape(key), text)
+    if m is None:
+        return None
+    open_at = text.find("[", m.end())
+    if open_at == -1 or text[m.end() : open_at].strip():
+        return None
+    close_at = _matching_bracket(text, open_at)
+    if close_at == -1:
+        return None
+    inner = text[open_at + 1 : close_at]
+    if f'"{member}"' in inner:
+        return text  # already wired; idempotent (constraint 3)
+    quoted = f'"{member}"'
+    if "\n" not in inner:
+        spliced = quoted if not inner.strip() else f"{inner.rstrip()}, {quoted}"
+        return text[: open_at + 1] + spliced + text[close_at:]
+    # Multi-line: copy the last element's own indentation, and give it the comma
+    # it did not need while it was last. The line holding the closing bracket's
+    # indentation is part of `inner` and is left exactly as it was.
+    lines = inner.splitlines()
+    filled = [i for i, line in enumerate(lines) if line.strip()]
+    if not filled:
+        return None
+    at = filled[-1]
+    last = lines[at].rstrip()
+    indent = lines[at][: len(lines[at]) - len(lines[at].lstrip())]
+    lines[at] = last if last.endswith(",") else last + ","
+    lines.insert(at + 1, indent + quoted)
+    return text[: open_at + 1] + "\n".join(lines) + text[close_at:]
+
+
+def _insert_into_pnpm_yaml(text: str, member: str) -> "str | None":
+    """Add `member` to `pnpm-workspace.yaml`'s `packages:` list.
+
+    Handles the block form (`- 'packages/*'`) and the flow form
+    (`packages: ["packages/*"]`), matching the quoting style already there.
+    Anything else returns `None` and falls back to shape A.
+    """
+    m = re.search(r"^packages\s*:(?P<rest>.*)$", text, re.M)
+    if m is None:
+        return None
+    if m.group("rest").strip().startswith("["):
+        # The flow form is JSON enough for the array splicer, applied to the
+        # tail so an earlier `[` in a comment cannot be matched by mistake.
+        spliced = _insert_into_json_array(text[m.start() :], "packages", member)
+        return None if spliced is None else text[: m.start()] + spliced
+    lines = text.splitlines(keepends=True)
+    start = text[: m.start()].count("\n")
+    items: list[int] = []
+    for i in range(start + 1, len(lines)):
+        stripped = lines[i].strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        if re.match(r"^\s+-\s", lines[i]):
+            items.append(i)
+            continue
+        break  # the next key -- the list is over
+    if not items:
+        return None
+    sample = lines[items[-1]]
+    if member in sample or any(member in lines[i] for i in items):
+        return text  # already wired
+    indent = sample[: len(sample) - len(sample.lstrip())]
+    quote = '"' if '"' in sample else ("'" if "'" in sample else "")
+    ending = "\n" if sample.endswith("\n") else ""
+    lines.insert(items[-1] + 1, f"{indent}- {quote}{member}{quote}{ending or chr(10)}")
+    return "".join(lines)
+
+
+def wire_workspace(root: Path, workspace: Workspace) -> "tuple[bool, str | None]":
+    """Declare `.fux/node` in the consumer's manifest.
+
+    Returns `(edited, refusal)`. `edited` is False with a `refusal` string when
+    the manifest cannot be changed safely — comments in the JSON, an unknown
+    list shape, a read-only file. **Half-configured is not a state**: the caller
+    then writes shape A and says why.
+    """
+    path = workspace.manifest
+    try:
+        before = path.read_text(encoding="utf-8")
+    except OSError as exc:
+        return False, f"{path.name} could not be read ({exc.strerror})"
+    if not os.access(path, os.W_OK):
+        return False, f"{path.name} is read-only"
+
+    if workspace.kind == "yarn-pnp":
+        return False, (
+            "this is a Yarn Berry repository using PnP, which has NO node_modules for "
+            "`.fux/fux` to resolve a binary from - measured, not assumed "
+            "(ADR-NODE-SEARCH decision 15). Set `nodeLinker: node-modules` and re-run "
+            "`fux setup` if you would rather have the workspace shape"
+        )
+    if workspace.kind == "yarn-object-form":
+        return False, (
+            "this manifest declares `workspaces` as an object, which fux will not edit by "
+            "guess (ADR-NODE-SEARCH decision 15 constraint 4)"
+        )
+    if workspace.kind == "pnpm-yaml":
+        after = _insert_into_pnpm_yaml(before, WORKSPACE_MEMBER)
+    else:
+        try:
+            json.loads(before)
+        except ValueError:
+            return False, f"{path.name} is not plain JSON (comments or trailing commas?)"
+        after = _insert_into_json_array(before, "workspaces", WORKSPACE_MEMBER)
+    if after is None:
+        return False, f"{path.name}'s workspace list is in a shape fux will not edit by guess"
+    if after == before:
+        return True, None  # already declared -- idempotent, and still shape C
+    try:
+        path.write_text(after, encoding="utf-8")
+    except OSError as exc:
+        return False, f"{path.name} could not be written ({exc.strerror})"
+    return True, None
+
+
 def run(root: Path, *, agents: bool = True) -> SetupReport:
     """Write the consumer-owned files, write-if-missing. Returns what happened.
 
@@ -847,8 +1165,26 @@ def run(root: Path, *, agents: bool = True) -> SetupReport:
     from .output_config import OUTPUT_NAME, specimen as output_specimen
 
     report = SetupReport()
-    for path in fuxdir.ensure_layout(root):
-        report.written.append(path.relative_to(root).as_posix())
+    # 🔴 **The monorepo shape is decided ONCE, here.** `ensure_layout` runs at
+    # the head of every ingest and must never edit a consumer manifest
+    # (ADR-NODE-SEARCH decision 15 constraint 1); what it gets is the answer,
+    # already decided, as a keyword.
+    workspace = detect_workspace(root)
+    if workspace is not None:
+        wired, refusal = wire_workspace(root, workspace)
+        if wired:
+            report.node_shape = fuxdir.SHAPE_WORKSPACE
+            report.wired_manifest = workspace.manifest.relative_to(root).as_posix()
+            report.workspace_manager = workspace.manager
+        else:
+            # Half-configured is not a state (constraint 4): shape A, and the
+            # reason travels to the consumer rather than into a log nobody reads.
+            report.workspace_note = refusal
+    for path in fuxdir.ensure_layout(root, node_shape=report.node_shape):
+        rel = path.relative_to(root).as_posix()
+        # `ensure_node_reader` returns what it wrote AND what it pruned; at this
+        # moment, existence is exactly the difference between the two.
+        (report.written if path.exists() else report.removed).append(rel)
 
     directory = fuxdir.fux_dir(root)
     for name, template in FETCHERS.items():
@@ -936,6 +1272,22 @@ def cmd_setup(args) -> int:
         print(f"  wrote {rel}")
     for rel in report.kept:
         print(f"  kept  {rel} (yours; never rewritten)")
+    for rel in report.removed:
+        print(f"  removed {rel} (stale: the reader ships as one bundle now)")
+    if report.wired_manifest:
+        # Announced, always. Decision 15 constraint 3: a silent write to a
+        # tracked file a team reviews is how trust goes.
+        print()
+        print(f"  monorepo detected: declared {WORKSPACE_MEMBER} in {report.wired_manifest}")
+        print(
+            f"        .fux/node/ holds a manifest only; run `{report.workspace_manager} install`"
+            " and then `.fux/fux ask ...`"
+        )
+    elif report.workspace_note:
+        print()
+        print("  note: a monorepo was detected, and fux vendored the offline bundle")
+        print("        into .fux/node/ rather than wiring a workspace, because:")
+        print(f"        {report.workspace_note}")
     if not report.written:
         print("setup: nothing to do - every consumer-owned file is already here")
     else:

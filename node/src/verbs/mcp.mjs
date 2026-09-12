@@ -32,10 +32,33 @@ import { FuxError } from "../errors.mjs";
 export const PROTOCOL_VERSION = "2024-11-05";
 const HERE = dirname(fileURLToPath(import.meta.url));
 
+/** `mcp-tools.json`, found from whichever shape this code is running in.
+ *
+ * 🔴 **Two shapes, one source file, so the path cannot be a constant.** In this
+ * repository the module sits at `node/src/verbs/` and the descriptions are two
+ * directories up; in the published bundle everything is one file at the package
+ * root and they are beside it (L10 — the consumer gets build output). Hard-coding
+ * either spelling makes `fux mcp` work in one shape and throw `ENOENT` in the
+ * other, and the bundle is the shape a consumer actually runs.
+ *
+ * Candidates in order, first hit wins; the list is short and closed on purpose —
+ * an upward search would find another package's file in a monorepo.
+ */
+function toolsPath() {
+  for (const candidate of [join(HERE, "mcp-tools.json"), join(HERE, "..", "..", "mcp-tools.json")]) {
+    try {
+      if (statSync(candidate).isFile()) return candidate;
+    } catch {
+      // not here; try the next shape
+    }
+  }
+  throw new FuxError("mcp-tools.json is missing from this installation of the Node reader");
+}
+
 let TOOLS = null;
 function tools(top) {
   if (TOOLS === null) {
-    TOOLS = JSON.parse(readFileSync(join(HERE, "..", "..", "mcp-tools.json"), "utf8")).tools;
+    TOOLS = JSON.parse(readFileSync(toolsPath(), "utf8")).tools;
   }
   // The only per-connection substitution: the resolved `[mcp] top` appears in
   // the `top` property's description so an agent sees the real default.

@@ -1,5 +1,13 @@
-"""`fux setup` vendors the Node read plane — ADR-NODE-SEARCH R2, the fourth
-`.fux/` shape.
+"""`fux setup` vendors the Node read plane — ADR-NODE-SEARCH decisions 13-16,
+the fourth `.fux/` shape.
+
+🔴 **Since 2026-09-12 what is vendored is BUILD OUTPUT, in one of two shapes**
+([L10](../docs/adr/0012_LAW-10-bundled-output.md)): the bundle plus its data
+sidecars (shape A, offline, the default), or a manifest declaring
+`fux-engine@<version>` when a monorepo was detected (shape C). The 47-file
+module tree is gone, and `ensure_node_reader` **prunes** it from a repository
+that still has one — see `test_setup_PRUNES_a_module_tree_left_by_an_older_engine`,
+which is the test that used to assert the opposite.
 
 **Committed, engine-owned, and OVERWRITTEN on a version difference.** Not
 write-if-missing, and the distinction is the whole point:
@@ -51,17 +59,126 @@ def test_setup_writes_the_reader_at_the_engine_version(tmp_path):
     assert "build" not in meta.get("scripts", {})
 
 
-def test_setup_writes_the_whole_tree_not_just_the_entry_point(tmp_path):
+def test_setup_writes_the_bundle_and_NO_source_tree(tmp_path):
+    """🔴 **L10, at the only place it can be checked: a consumer's repository.**
+
+    This test asserted the opposite until 2026-09-12 — *"writes the whole tree,
+    not just the entry point"*, 47 files including `src/query/bm25f.mjs`. That
+    was W-107 R4's decision and it is now the violation ADR-LAW-10 was written
+    for: fux's own ranker, editable in place, in a repository fux was asked to
+    index. What a consumer gets is ONE generated file and its data sidecars.
+    """
     _setup(tmp_path)
     target = tmp_path / ".fux" / "node"
-    assert (target / "fux.mjs").is_file()
-    assert (target / "src" / "index.mjs").is_file()
-    assert (target / "src" / "query" / "bm25f.mjs").is_file()
-    # Every file the wheel carries, not a subset — a partial vendoring is a
-    # reader that imports a module that is not there.
-    expected = {rel for rel, _ in fuxdir._packaged_node_files()}
     found = {p.relative_to(target).as_posix() for p in target.rglob("*") if p.is_file()}
-    assert found == expected
+    assert found == {"fux.mjs", "package.json", "mcp-tools.json", "README.md"}
+    assert not (target / "src").exists()
+    # And the payload is exactly what the wheel carries — a partial vendoring
+    # is a reader whose `fux mcp` cannot find its own tool descriptions.
+    assert found == {rel for rel, _ in fuxdir._packaged_node_files()}
+    # The file really is the bundle, not the entry module wearing its name.
+    assert "the Node read plane, bundled" in (target / "fux.mjs").read_text(encoding="utf-8")
+
+
+def test_setup_PRUNES_a_module_tree_left_by_an_older_engine(tmp_path):
+    """⚠ **The half that did not exist**, and without which every repository
+    that ever ran `fux setup` keeps its stale `.mjs` files for good
+    (ADR-NODE-SEARCH decision 13). A stale `src/` is not inert: it is a
+    complete second ranker sitting beside the bundle.
+    """
+    _setup(tmp_path)
+    target = tmp_path / ".fux" / "node"
+    # Recreate the world before the bundle: a module tree at an older version.
+    (target / "src" / "query").mkdir(parents=True)
+    (target / "src" / "index.mjs").write_text("// old\n", encoding="utf-8")
+    (target / "src" / "query" / "bm25f.mjs").write_text("// old\n", encoding="utf-8")
+    stale = json.loads((target / "package.json").read_text(encoding="utf-8"))
+    stale["version"] = "0.0.1-stale"
+    (target / "package.json").write_text(json.dumps(stale), encoding="utf-8")
+
+    changed = fuxdir.ensure_node_reader(tmp_path)
+
+    assert not (target / "src").exists(), "the stale module tree survived"
+    assert {p.relative_to(target).as_posix() for p in target.rglob("*") if p.is_file()} == {
+        "fux.mjs", "package.json", "mcp-tools.json", "README.md"
+    }
+    assert any("src/query/bm25f.mjs" in str(p) for p in changed), (
+        "the prune must be reported, not done silently"
+    )
+
+
+def test_a_stale_tree_at_the_SAME_version_is_still_pruned(tmp_path):
+    """🔴 **A real defect, found by running the migration on fux's own repo.**
+
+    `ensure_node_reader` gated on `package.json`'s version alone, so a
+    `.fux/node/` written by *this* version before the payload changed shape kept
+    its module tree — the version matched, so nothing was rewritten and the
+    prune never ran. A consumer upgrading across a release is covered by the
+    version test; anyone tracking one alpha from git is not, and neither was
+    this repository, whose `.fux/node/` held 44 stale modules after the code
+    that was supposed to remove them had landed.
+
+    The fix is a name-set comparison against the shape's declared layout
+    (`_layout_is_stale`), which is cheap enough to run at the head of every
+    ingest — it builds nothing.
+    """
+    _setup(tmp_path)
+    target = tmp_path / ".fux" / "node"
+    (target / "src" / "query").mkdir(parents=True)
+    (target / "src" / "query" / "rank.mjs").write_text("// a hand-edited ranker\n", encoding="utf-8")
+    # The version is left exactly as setup wrote it — that is the whole point.
+    assert fuxdir.node_version(tmp_path / ".fux") == __version__
+
+    changed = fuxdir.ensure_node_reader(tmp_path)
+
+    assert changed, "a stale layout at the current version must still be repaired"
+    assert not (target / "src").exists()
+    assert fuxdir.ensure_node_reader(tmp_path) == [], "and then it must be a no-op again"
+
+
+def test_the_prune_never_touches_an_installed_node_modules(tmp_path):
+    """Shape C installs the reader under `.fux/node/node_modules/`. Deleting it
+    would leave a manifest pointing at nothing — decision 15's
+    "half-configured is not a state", arriving through the back door."""
+    _setup(tmp_path)
+    target = tmp_path / ".fux" / "node"
+    bin_dir = target / "node_modules" / ".bin"
+    bin_dir.mkdir(parents=True)
+    (bin_dir / "fux").write_text("#!/bin/sh\n", encoding="utf-8")
+    stale = json.loads((target / "package.json").read_text(encoding="utf-8"))
+    stale["version"] = "0.0.1-stale"
+    (target / "package.json").write_text(json.dumps(stale), encoding="utf-8")
+
+    fuxdir.ensure_node_reader(tmp_path)
+
+    assert (bin_dir / "fux").is_file()
+
+
+def test_the_workspace_shape_writes_a_manifest_and_nothing_else(tmp_path):
+    """Shape C: `package.json` only, declaring the published reader."""
+    _setup(tmp_path)
+    written = fuxdir.ensure_node_reader(tmp_path, shape=fuxdir.SHAPE_WORKSPACE)
+    target = tmp_path / ".fux" / "node"
+    assert written, "a shape change must rewrite"
+    assert {p.relative_to(target).as_posix() for p in target.rglob("*") if p.is_file()} == {
+        "package.json"
+    }
+    meta = json.loads((target / "package.json").read_text(encoding="utf-8"))
+    assert meta["dependencies"] == {"fux-engine": __version__}
+    assert meta["private"] is True
+    # The shape is readable BACK off the directory — no fifth config file.
+    assert fuxdir.node_shape(tmp_path / ".fux") == fuxdir.SHAPE_WORKSPACE
+    # ...and it is stable across an ingest, which passes no shape at all.
+    assert fuxdir.ensure_node_reader(tmp_path) == []
+
+
+def test_an_ingest_never_changes_the_shape_a_setup_chose(tmp_path):
+    """`ensure_layout` runs at the head of every ingest and must not flip a
+    consumer's repository between shapes (decision 15 constraint 1)."""
+    _setup(tmp_path)
+    fuxdir.ensure_node_reader(tmp_path, shape=fuxdir.SHAPE_WORKSPACE)
+    fuxdir.ensure_layout(tmp_path)
+    assert fuxdir.node_shape(tmp_path / ".fux") == fuxdir.SHAPE_WORKSPACE
 
 
 def test_setup_writes_an_executable_shim(tmp_path):
@@ -76,6 +193,11 @@ def test_setup_writes_an_executable_shim(tmp_path):
     # running it in a scratch clone; asserted here so it cannot come back.
     assert "node/fux.mjs" in text
     assert (shim.parent / "node" / "fux.mjs").is_file()
+    # 🔴 Three rungs since 2026-09-12, because the installed bin is NOT in one
+    # place: npm and yarn hoist it to the workspace root, pnpm and bun leave it
+    # in the member (ADR-NODE-SEARCH decision 16, measured).
+    assert "node/node_modules/.bin/fux" in text
+    assert "node_modules/.bin/fux" in text.split("node/node_modules/.bin/fux", 1)[1]
     if os.name != "nt":
         assert shim.stat().st_mode & stat.S_IXUSR
 

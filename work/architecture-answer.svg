@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 1400" width="1180" height="1400" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 1490" width="1180" height="1490" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
 <defs>
 <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
 <path d="M0,0 L10,5 L0,10" fill="none" stroke="#3d6df2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
@@ -9,7 +9,7 @@
 <marker id="o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
 <path d="M0,0 L10,5 L0,10" fill="none" stroke="#c2410c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
 </defs>
-<rect width="1180" height="1400" fill="#fcfcfb"/>
+<rect width="1180" height="1490" fill="#fcfcfb"/>
 <text x="46" y="52" font-size="23" font-weight="600" fill="#14181f">How `fux answer` works</text>
 <text x="46" y="76" font-size="13" fill="#626b78">Rank like ask, then go and read the source. The only verb that can say a citation is still true.</text>
 <rect x="800" y="34" width="340" height="54" rx="8" fill="#fcfcfb" stroke="#e4e4e0" stroke-width="1.2"/>
@@ -125,6 +125,11 @@
 <rect x="46" y="1298" width="1090" height="54" rx="8" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.8"/>
 <text x="66" y="1322" font-size="12.5" fill="#1d8a5e" font-weight="600">The one rule for every caller</text>
 <text x="66" y="1340" font-size="11" fill="#4a5260">A script that reads the answer and ignores the verdict field has thrown away the only thing separating fux from a stale cache with good manners.</text>
-<line x1="46" y1="1370" x2="1136" y2="1370" stroke="#e4e4e0" stroke-width="1"/>
-<text x="46" y="1384" font-size="10.5" fill="#8a93a0">Drawn from src/fux/query/__init__.py, src/fux/query/refer_answer.py and src/fux/refer/, 2026-09-12. ADR-ANSWER - ADR-REFER - ADR-PROVENANCE.</text>
+<text x="46" y="1376" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">NODE ANSWERS TOO, AND ITS VERDICT SET IS DELIBERATELY NARROWER</text>
+<line x1="46" y1="1386" x2="1136" y2="1386" stroke="#e4e4e0" stroke-width="1"/>
+<text x="46" y="1408" font-size="11.5" fill="#4a5260">Node never fetches -- there is no transport in it and no seam to inject one. file: reads the working tree; url: reads .fux/acquired/ if the blob was kept, else it falls back to source: "index".</text>
+<text x="46" y="1428" font-size="10.5" fill="#8a93a0">So current and stale are file:-only there, and cached can NEVER appear -- a TTL fetch cache requires fetching. as-ingested and unverified mean exactly what they mean here.</text>
+<text x="46" y="1446" font-size="10.5" fill="#c2410c">And Node has no decoders: rather than chunk the raw bytes of a document the index holds as decoded Markdown, it declines to refer what it cannot decode.</text>
+<line x1="46" y1="1460" x2="1136" y2="1460" stroke="#e4e4e0" stroke-width="1"/>
+<text x="46" y="1474" font-size="10.5" fill="#8a93a0">Drawn from src/fux/query/__init__.py, src/fux/query/refer_answer.py and src/fux/refer/, 2026-09-12. ADR-ANSWER - ADR-REFER - ADR-PROVENANCE.</text>
 </svg>

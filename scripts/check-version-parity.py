@@ -54,6 +54,35 @@ SITES = {
 }
 
 
+#: The BUNDLE is not a site — it is a DERIVATION, and that distinction is the
+#: whole reason it is checked separately. `node/dist/fux.mjs` is generated from
+#: `node/`, so nobody can forget to bump it; what can go wrong is the
+#: derivation itself — a bundler that emitted a stale header, or a bundle built
+#: from a different checkout than the wheel beside it in the same release.
+#: Two places inside it must agree with the source: the generated header and
+#: the `VERSION` constant the CLI prints.
+_BUNDLE_HEADER = re.compile(r"^// fux-engine (\S+) — the Node read plane, bundled\.", re.M)
+_BUNDLE_CONST = re.compile(r'^\s*const VERSION\s*=\s*"([^"]+)"', re.M)
+
+
+def bundle_problems(path: Path, want: str) -> list[str]:
+    """Problems with a BUILT bundle, or `[]`. Called by the release workflow
+    with `--with-bundle`, and by `tests/test_version_parity.py` on a bundle it
+    builds itself — so the check runs on every push as well as at the one
+    moment a mismatch would ship."""
+    if not path.is_file():
+        return [f"{path}: no bundle there — run `python -m fux.store.nodebundle node node/dist`"]
+    text = path.read_text(encoding="utf-8")
+    problems = []
+    for label, pattern in (("header", _BUNDLE_HEADER), ("VERSION", _BUNDLE_CONST)):
+        m = pattern.search(text)
+        if m is None:
+            problems.append(f"{path}: the bundle's {label} version is unreadable")
+        elif m.group(1) != want:
+            problems.append(f"{path}: the bundle's {label} says {m.group(1)!r}, not {want!r}")
+    return problems
+
+
 def check(root: Path = ROOT) -> list[str]:
     """Return a list of problems; empty means the tree agrees."""
     found: dict[str, str | None] = {name: read(root) for name, read in SITES.items()}
@@ -74,6 +103,16 @@ def check(root: Path = ROOT) -> list[str]:
 
 def main() -> int:
     problems = check()
+    # `--with-bundle <path>`: also check a bundle that has already been built.
+    # Positional-free and optional on purpose — the push-time caller has no
+    # bundle on disk and builds its own (see `tests/test_version_parity.py`).
+    if "--with-bundle" in sys.argv:
+        at = sys.argv.index("--with-bundle")
+        if at + 1 >= len(sys.argv):
+            print("✗ --with-bundle needs a path", file=sys.stderr)
+            return 1
+        want = SITES[str(SOURCE)](ROOT)
+        problems += bundle_problems(Path(sys.argv[at + 1]), want)
     if problems:
         print("✗ version parity:", file=sys.stderr)
         for p in problems:

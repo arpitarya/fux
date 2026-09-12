@@ -1,0 +1,22 @@
+Yarn Berry 4.1.0 via corepack, macOS 25.6.0 (darwin arm64), Node 24.13.0.
+Run 2026-09-12 on Arpit's Mac, in Claude Code, by the session that built W-149.
+
+ARM 1 — nodeLinker: node-modules
+  yarn workspaces list           .  /  .fux/node  /  packages/app     <- member LINKED
+  install                        Fetch + Link completed, 1s 055ms
+  node_modules/.bin/fux          PRESENT   -> ../fux-engine/fux.mjs   (hoisted to ROOT)
+  .fux/node/node_modules/.bin    absent
+  shim rung that resolves        3  (the ancestor walk)
+
+ARM 0 — does the dot path link at all (no dependency declared)
+  nodeLinker: node-modules       .  /  .fux/node  /  packages/app     <- LINKED
+  nodeLinker: pnp                .  /  .fux/node  /  packages/app     <- LINKED
+  => the dot prefix is NOT a problem in Berry either, in either linker.
+
+ARM 2 — nodeLinker: pnp  (Berry's DEFAULT when the key is unset)
+  install                        Completed with warnings ("ESM support for PnP
+                                 uses the experimental loader API")
+  node_modules anywhere          NONE (find . -name node_modules -maxdepth 4 -> empty)
+  .pnp.cjs                       present
+  `corepack yarn fux --version`  did not resolve as a runnable script
+  shim rung that resolves        NONE

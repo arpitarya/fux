@@ -29,6 +29,7 @@ key, and no model anywhere on the path.
 
 The whole idea in one picture: [`work/architecture-high-level.svg`](work/architecture-high-level.svg).
 How a verb actually works: [`ask`](work/architecture-ask.svg) · [`answer`](work/architecture-answer.svg) · [decoders](work/architecture-decoders.svg).
+Python versus Node, component for component: [two readers](work/architecture-two-readers.svg).
 
 ## Install
 
@@ -39,16 +40,19 @@ pip install --pre fux-engine    # Python ≥ 3.11 · Linux, macOS, Windows
 `--pre` is needed while fux is in alpha. The command is `fux`.
 
 **You can also read an index without Python.** `fux setup` vendors a
-zero-dependency Node reader into `.fux/node/`, so a clone answers with nothing
-installed at all:
+zero-dependency Node reader into `.fux/node/` — **one generated file**, not
+fux's source tree — so a clone answers with nothing installed at all:
 
 ```bash
-node .fux/node/fux.mjs find rollback   # or: .fux/fux find rollback
-npx fux-engine find rollback           # from npm
+.fux/fux find rollback        # the shim: correct in every shape, so it is the one to use
+npx fux-engine find rollback  # from npm, without a repository
 ```
 
 It only reads — `ingest`, `build` and every other writing verb stay with Python
 — and it is held byte-equal to Python by a third arm of the differential law.
+In a monorepo `fux setup` detects the workspace instead and declares
+`.fux/node` as a member, so the reader comes from your lockfile; either way
+`.fux/fux` is the command.
 
 **And fux is importable**, not only spawnable:
 
@@ -159,7 +163,7 @@ Claims ship with a pre-registered bar and a published run — including the ones
 
 ## Design rules
 
-Fux is built under nine laws, each with its own record in the
+Fux is built under eleven laws, each with its own record in the
 [ADR register](docs/adr/README.md) ([ADR-LAWS](docs/adr/0001_LAWS.md)):
 [L0 ADRs are the source of truth](docs/adr/0002_LAW-0-authority.md) ·
 [L1 `$0`, FOSS-only](docs/adr/0003_LAW-1-zero-cost.md) ·
@@ -169,7 +173,9 @@ Fux is built under nine laws, each with its own record in the
 [L5 hashed meta](docs/adr/0007_LAW-5-hashed-meta.md) ·
 [L6 say "index"](docs/adr/0008_LAW-6-say-index.md) ·
 [L7 Python ≥ 3.11](docs/adr/0009_LAW-7-python-311.md) ·
-[L8 use record never committed](docs/adr/0010_LAW-8-use-record.md).
+[L8 use record never committed](docs/adr/0010_LAW-8-use-record.md) ·
+[L9 one job per environment](docs/adr/0011_LAW-9-environments.md) ·
+[L10 build output, never source](docs/adr/0012_LAW-10-bundled-output.md).
 
 ## Reading order
 

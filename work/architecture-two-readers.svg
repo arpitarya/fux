@@ -1,0 +1,260 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 2220" width="1180" height="2220" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" xmlns:c2pa="http://c2pa.org/manifest"><metadata><c2pa:manifest>AAAWgmp1bWIAAAAeanVtZGMycGEAEQAQgAAAqgA4m3EDYzJwYQAAABZcanVtYgAAAEdqdW1kYzJtYQARABCAAACqADibcQN1cm46YzJwYTowMTFhMWIwYy01MzkzLTQ1YzQtYTQxNS1jZTBiOTAzZDk4MmIAAAADl2p1bWIAAAApanVtZGMyYXMAEQAQgAAAqgA4m3EDYzJwYS5hc3NlcnRpb25zAAAAALxqdW1iAAAARGp1bWRjYm9yABEAEIAAAKoAOJtxE2MycGEuaW5ncmVkaWVudC52MwAAAAAYYzJzaLTOPVQKuW/dFy4dy1xC4Z0AAABwY2JvcqNpZGM6Zm9ybWF0bWltYWdlL3N2Zyt4bWxqaW5zdGFuY2VJRHgseG1wOmlpZDo5ZGNkZmVkZS0xZGQ2LTRiN2EtOWE2YS0zNWI4NTVhZTk5ZGJscmVsYXRpb25zaGlwaHBhcmVudE9mAAAB4mp1bWIAAABBanVtZGNib3IAEQAQgAAAqgA4m3ETYzJwYS5hY3Rpb25zLnYyAAAAABhjMnNoF/YoRzgHawhAmUBYkRsl3AAAAZljYm9yomdhY3Rpb25zgqJmYWN0aW9ua2MycGEub3BlbmVkanBhcmFtZXRlcnOha2luZ3JlZGllbnRzgaJjdXJseC1zZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmluZ3JlZGllbnQudjNkaGFzaFggaJM3H/YeVEKTd1ApFW6arLKRcc3dnurt/0shaLj67QGkZmFjdGlvbngdY29tLmFudGhyb3BpYy5jbGF1ZGUucHJvdmlkZWRqcGFyYW1ldGVyc6F4H2NvbS5hbnRocm9waWMub3JpZ2luLWNvbmZpZGVuY2VndW5rbm93bmtkZXNjcmlwdGlvbnhmQ2xhdWRlIHByb3ZpZGVkIHRoaXMgZmlsZSBhdCB0aGUgcmVxdWVzdCBvZiBhIHVzZXIgYW5kIG1heSBoYXZlIGNyZWF0ZWQgb3IgbW9kaWZpZWQgdGhlIGZpbGUgY29udGVudHMubXNvZnR3YXJlQWdlbnShZG5hbWVmQ2xhdWRlcmFsbEFjdGlvbnNJbmNsdWRlZPUAAADIanVtYgAAAEBqdW1kY2JvcgARABCAAACqADibcRNjMnBhLmhhc2guZGF0YQAAAAAYYzJzaCevUjLZFZf74IXkcnkrqt0AAACAY2JvcqVjYWxnZnNoYTI1NmNwYWRNAAAAAAAAAAAAAAAAAGRoYXNoWCBzVw8QFVnQLRF2deZAdhMKo/ivew/GH1yTC9BjnznaX2RuYW1lbmp1bWJmIG1hbmlmZXN0amV4Y2x1c2lvbnOBomVzdGFydBjhZmxlbmd0aBkeBAAAAj5qdW1iAAAAJ2p1bWRjMmNsABEAEIAAAKoAOJtxA2MycGEuY2xhaW0udjIAAAACD2Nib3KlY2FsZ2ZzaGEyNTZpc2lnbmF0dXJleE1zZWxmI2p1bWJmPS9jMnBhL3VybjpjMnBhOjAxMWExYjBjLTUzOTMtNDVjNC1hNDE1LWNlMGI5MDNkOTgyYi9jMnBhLnNpZ25hdHVyZWppbnN0YW5jZUlEeCx4bXA6aWlkOmJjNWQ5ZGRlLWNjY2ItNGVlMy04YjdkLTQwZWY0Y2Q5Y2ZiMnJjcmVhdGVkX2Fzc2VydGlvbnODomN1cmx4LXNlbGYjanVtYmY9YzJwYS5hc3NlcnRpb25zL2MycGEuaW5ncmVkaWVudC52M2RoYXNoWCBokzcf9h5UQpN3UCkVbpqsspFxzd2e6u3/SyFouPrtAaJjdXJseCpzZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmFjdGlvbnMudjJkaGFzaFggySRIJ6HxkM62i0sQ6cYwgrRvgLAC8qXXKJv25jYki5eiY3VybHgpc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5oYXNoLmRhdGFkaGFzaFggzFF7FKDL9JJSDEdI8FUDmi5F8KhB2qusFtEo2bnlzi90Y2xhaW1fZ2VuZXJhdG9yX2luZm+jZG5hbWVvQW50aHJvcGljIEZpbGVzZ3ZlcnNpb25lMS4wLjBrc3BlY1ZlcnNpb25lMi40LjAAABA4anVtYgAAAChqdW1kYzJjcwARABCAAACqADibcQNjMnBhLnNpZ25hdHVyZQAAABAIY2JvctKEWQISogEmGCFZAgowggIGMIIBjaADAgECAhRA5aAK7sI50L64g/oGQgU9Z1UTADAKBggqhkjOPQQDAzBJMRcwFQYDVQQKEw5BbnRocm9waWMsIFBCQzEuMCwGA1UEAxMlQW50aHJvcGljIENvbnRlbnQgQ3JlZGVudGlhbHMgUm9vdCBDQTAeFw0yNjA4MDcxODQzNTZaFw0yODA4MDYxOTQzNTZaMEQxFzAVBgNVBAoTDkFudGhyb3BpYywgUEJDMSkwJwYDVQQDEyBBbnRocm9waWMgQ2xhdWRlIENvbnRlbnQgU2lnbmluZzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABJh6CmvLUBgFFNU0vUKlOVtE6djd17L5SuwX0LemFisBM3dkd/3cyjxFA3Qo5S46fX0/ihY0VZ7mfb9KF703t5OjWDBWMA4GA1UdDwEB/wQEAwIHgDAVBgNVHSUEDjAMBgorBgEEAYPoXgIBMAwGA1UdEwEB/wQCMAAwHwYDVR0jBBgwFoAUzlHiBIFOZFsj+OPEz5o+nMHXXMIwCgYIKoZIzj0EAwMDZwAwZAIwMXMdFJ4BetLLVY7ORuE9noqbbAZOZn/aArXyTwFAZfKrPzxF2vPoJNf1+UCdg1XGAjBwX1zd9WGqYkqmL5SFqw1QySjr1zJfpJM9+1rdDwSPLMOPOjKuiXjoU/pUUeG9RwmhY3BhZFkNngAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPZYQDDNBDieyrIGCuBsb85cLsF/82NSpopmPzYY8sSOwVg/qoPWFde6gLZQzuYGtiP91P5FoPj6eNH5WzBFksuGW9Y=</c2pa:manifest></metadata>
+<defs>
+<marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10" fill="none" stroke="#3d6df2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10" fill="none" stroke="#1d8a5e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10" fill="none" stroke="#8a93a0" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10" fill="none" stroke="#c2410c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
+</defs>
+<rect width="1180" height="2220" fill="#fcfcfb"/>
+<text x="46" y="52" font-size="23" fill="#14181f" font-weight="600">How search works in Python vs Node</text>
+<text x="46" y="76" font-size="13" fill="#626b78">One index, two readers. Same ids, same order, same band -- and three places Node is a SUBSET on purpose.</text>
+<rect x="800" y="34" width="340" height="68" rx="8" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<rect x="812" y="44" width="11" height="11" rx="2.5" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.4"/>
+<text x="830" y="53" font-size="10.5" fill="#626b78">a twin module -- both runtimes</text>
+<rect x="812" y="59" width="11" height="11" rx="2.5" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.4"/>
+<text x="830" y="68" font-size="10.5" fill="#626b78">PYTHON ONLY -- no Node twin</text>
+<rect x="812" y="74" width="11" height="11" rx="2.5" fill="#fff4ec" stroke="#c2410c" stroke-width="1.4"/>
+<text x="830" y="83" font-size="10.5" fill="#626b78">deliberate asymmetry, not a gap</text>
+<rect x="812" y="89" width="11" height="11" rx="2.5" fill="#f3f4f2" stroke="#8a93a0" stroke-width="1.4"/>
+<text x="830" y="98" font-size="10.5" fill="#626b78">neither runtime -- unbuilt</text>
+<text x="46" y="126" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">0 - ONE INDEX. THE COMMITTED BYTES ARE THE WHOLE CONTRACT.</text>
+<line x1="46" y1="136" x2="1136" y2="136" stroke="#e4e4e0" stroke-width="1"/>
+<rect x="46" y="146" width="1090" height="74" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="66" y="172" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">.fux/index/*.jsonl shards  +  sources/dirs  +  formats.toml  +  tune.toml  +  output.toml  +  pii.toml  +  acquired/objects/</text>
+<text x="66" y="192" font-size="11.5" fill="#4a5260">Statistics about documents, never the documents. Python writes every one of these files; both readers read these and nothing else.</text>
+<text x="66" y="209" font-size="11" fill="#8a93a0">No server, no model, no clock, no network on the query path in either runtime.</text>
+<path d="M300,224 L300,250" fill="none" stroke="#8a93a0" stroke-width="1.6" marker-end="url(#m)" stroke-linecap="round"/>
+<path d="M880,224 L880,250" fill="none" stroke="#8a93a0" stroke-width="1.6" marker-end="url(#m)" stroke-linecap="round"/>
+<rect x="46" y="254" width="520" height="96" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="66" y="280" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">Python  `fux`   --   pip install fux-engine</text>
+<text x="66" y="300" font-size="11.5" fill="#4a5260">32 094 lines. 20 verbs; Node implements 7 of them.</text>
+<text x="66" y="317" font-size="11.5" fill="#4a5260">THE REFERENCE IMPLEMENTATION: when the two disagree,</text>
+<text x="66" y="334" font-size="11.5" fill="#4a5260">this one is right by definition.</text>
+<rect x="616" y="254" width="520" height="96" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="636" y="280" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">Node  `fux`   --   npm i fux-engine, vendored to .fux/node/</text>
+<text x="636" y="300" font-size="11.5" fill="#4a5260">7 read verbs: find ask answer explain graph path mcp.</text>
+<text x="636" y="317" font-size="11.5" fill="#4a5260">The other 13 REFUSE BY NAME and say who owns them.</text>
+<text x="636" y="334" font-size="11" fill="#8a93a0">Zero dependencies, no build step. Answers a clone with no Python.</text>
+<text x="46" y="384" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">1 - THE SHARED QUERY PIPELINE: TEN TWINS, ONE PER MODULE, AT THE SAME RELATIVE PATH  (x/y.mjs -&gt; src/fux/x/y.py)</text>
+<line x1="46" y1="394" x2="1136" y2="394" stroke="#e4e4e0" stroke-width="1"/>
+<rect x="370" y="410" width="440" height="44" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="388" y="432" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">tokenize.py / tokenize.mjs</text>
+<text x="388" y="449" font-size="10.5" fill="#4a5260">39 / 11 lines. The one place a query becomes terms.</text>
+<rect x="370" y="462" width="440" height="44" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="388" y="484" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">stem.py / stem.mjs</text>
+<text x="388" y="501" font-size="10.5" fill="#4a5260">204 / 172. Suffix rules, transcribed rule for rule.</text>
+<path d="M590.0,454 L590.0,461" fill="none" stroke="#3d6df2" stroke-width="1.8" marker-end="url(#a)" stroke-linecap="round"/>
+<rect x="370" y="514" width="440" height="44" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="388" y="536" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">analyzer.py / analyzer.mjs</text>
+<text x="388" y="553" font-size="10.5" fill="#4a5260">124 / 81. Term hashes, order PRESERVED -- rank() sums in it.</text>
+<path d="M590.0,506 L590.0,513" fill="none" stroke="#3d6df2" stroke-width="1.8" marker-end="url(#a)" stroke-linecap="round"/>
+<rect x="370" y="566" width="440" height="44" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="388" y="588" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">expand.py / expand.mjs</text>
+<text x="388" y="605" font-size="10.5" fill="#4a5260">--expand: the CALLER's words. Fux never invents a term.</text>
+<path d="M590.0,558 L590.0,565" fill="none" stroke="#3d6df2" stroke-width="1.8" marker-end="url(#a)" stroke-linecap="round"/>
+<rect x="370" y="618" width="440" height="62" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="388" y="640" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">scan.py / scan.mjs</text>
+<text x="388" y="657" font-size="10.5" fill="#4a5260">THE DEFAULT PATH. Every shard line read as raw bytes; flen and</text>
+<text x="388" y="672" font-size="10.5" fill="#4a5260">mtime by regex; a line is parsed only if it substring-matches a hash.</text>
+<path d="M590.0,610 L590.0,617" fill="none" stroke="#3d6df2" stroke-width="1.8" marker-end="url(#a)" stroke-linecap="round"/>
+<rect x="370" y="688" width="440" height="62" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="388" y="710" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">bm25f.py + rank.py  /  .mjs</text>
+<text x="388" y="727" font-size="10.5" fill="#4a5260">guard  -&gt;  BM25F  -&gt;  multipliers  -&gt;  sort. Scoring lives here in both,</text>
+<text x="388" y="742" font-size="10.5" fill="#4a5260">never in the candidate generator, so the two cannot drift.</text>
+<path d="M590.0,680 L590.0,687" fill="none" stroke="#3d6df2" stroke-width="1.8" marker-end="url(#a)" stroke-linecap="round"/>
+<rect x="370" y="758" width="440" height="44" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="388" y="780" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">fuse.py / fuse.mjs</text>
+<text x="388" y="797" font-size="10.5" fill="#4a5260">-q  -&gt;  reciprocal rank fusion.</text>
+<path d="M590.0,750 L590.0,757" fill="none" stroke="#3d6df2" stroke-width="1.8" marker-end="url(#a)" stroke-linecap="round"/>
+<rect x="370" y="810" width="440" height="44" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="388" y="832" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">rerank.py / rerank.mjs</text>
+<text x="388" y="849" font-size="10.5" fill="#4a5260">Proximity rerank -- OFF unless rerank_weight &gt; 0.</text>
+<path d="M590.0,802 L590.0,809" fill="none" stroke="#3d6df2" stroke-width="1.8" marker-end="url(#a)" stroke-linecap="round"/>
+<rect x="370" y="862" width="440" height="44" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="388" y="884" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">headings.py / headings.mjs</text>
+<text x="388" y="901" font-size="10.5" fill="#4a5260">Section paths for the cited lines.</text>
+<path d="M590.0,854 L590.0,861" fill="none" stroke="#3d6df2" stroke-width="1.8" marker-end="url(#a)" stroke-linecap="round"/>
+<rect x="370" y="914" width="440" height="44" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="388" y="936" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">confidence.py / confidence.mjs</text>
+<text x="388" y="953" font-size="10.5" fill="#4a5260">The band: grounded | weak | partial | none. Plus answerable, missing.</text>
+<path d="M590.0,906 L590.0,913" fill="none" stroke="#3d6df2" stroke-width="1.8" marker-end="url(#a)" stroke-linecap="round"/>
+<rect x="370" y="966" width="440" height="40" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="388" y="991" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">one ranked, banded list  --  identical in both runtimes</text>
+<path d="M590.0,958 L590.0,965" fill="none" stroke="#3d6df2" stroke-width="1.8" marker-end="url(#a)" stroke-linecap="round"/>
+<rect x="46" y="410" width="300" height="104" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.8"/>
+<text x="64" y="434" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">ingest/pii.py  (618 lines)</text>
+<text x="64" y="453" font-size="11" fill="#4a5260">The redaction engine runs at INGEST, so</text>
+<text x="64" y="468" font-size="11" fill="#4a5260">both readers inherit redacted bytes.</text>
+<text x="64" y="483" font-size="11" fill="#4a5260">Python owns the rules, the luhn and</text>
+<text x="64" y="498" font-size="11" fill="#4a5260">verhoeff validators, and PII_EXEMPT.</text>
+<path d="M346,460 L368,434" fill="none" stroke="#1d8a5e" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#g)"/>
+<rect x="834" y="410" width="302" height="104" rx="10" fill="#fff4ec" stroke="#c2410c" stroke-width="1.8"/>
+<text x="852" y="434" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">Node's gate is a STAT, not a parse.</text>
+<text x="852" y="453" font-size="11" fill="#4a5260">.fux/pii.toml must exist or every verb</text>
+<text x="852" y="468" font-size="11" fill="#4a5260">refuses. There is no Node twin of</text>
+<text x="852" y="483" font-size="11" fill="#4a5260">PII_EXEMPT and none is needed: all four</text>
+<text x="852" y="498" font-size="11" fill="#4a5260">exempt verbs are write verbs here.</text>
+<path d="M832,460 L812,434" fill="none" stroke="#c2410c" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#o)"/>
+<rect x="46" y="618" width="300" height="132" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.8"/>
+<text x="64" y="642" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">derive/accel.py  (520 lines)</text>
+<text x="64" y="661" font-size="11.5" fill="#4a5260">THE ACCELERATOR, and it has no Node twin.</text>
+<text x="64" y="679" font-size="11" fill="#4a5260">.fux/runtime/ postings, rarest-first, exact</text>
+<text x="64" y="695" font-size="11" fill="#4a5260">theta, block-max bound, skip test. Taken only</text>
+<text x="64" y="711" font-size="11" fill="#4a5260">on --fast AND a fresh stamp; else it falls</text>
+<text x="64" y="727" font-size="11" fill="#4a5260">through to the scan -- never a wrong answer.</text>
+<text x="64" y="744" font-size="10.5" fill="#8a93a0" font-family="ui-monospace, Menlo, monospace">measured: 4.2 s scan -&gt; 27.2 ms warm p95</text>
+<path d="M346,684 L368,648" fill="none" stroke="#1d8a5e" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#g)"/>
+<rect x="46" y="908" width="300" height="114" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.8"/>
+<text x="64" y="932" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">query/provenance.py  (771 lines)</text>
+<text x="64" y="951" font-size="11.5" fill="#4a5260">--why, --receipt, --journal, and the whole</text>
+<text x="64" y="968" font-size="11.5" fill="#4a5260">verify verdict set (reproduced | drifted |</text>
+<text x="64" y="985" font-size="11.5" fill="#4a5260">unverifiable). NO NODE TWIN AT ALL.</text>
+<text x="64" y="1004" font-size="11" fill="#8a93a0">A stated absence (W-107 R6) -- these four</text>
+<text x="64" y="1018" font-size="11" fill="#8a93a0">surfaces are uncovered by the arm, openly.</text>
+<path d="M346,954 L368,936" fill="none" stroke="#1d8a5e" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#g)"/>
+<rect x="834" y="618" width="302" height="132" rx="10" fill="#fff4ec" stroke="#c2410c" stroke-width="1.8"/>
+<text x="852" y="642" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">Node ALWAYS scans.</text>
+<text x="852" y="661" font-size="11.5" fill="#4a5260">There is no accelerator and no --fast/--scan</text>
+<text x="852" y="678" font-size="11.5" fill="#4a5260">flag to choose one. Python's MCP reports</text>
+<text x="852" y="695" font-size="11.5" fill="#4a5260">ranked_by: "accelerator" on a fresh build;</text>
+<text x="852" y="712" font-size="11.5" fill="#4a5260">Node reports "scan".</text>
+<text x="852" y="731" font-size="11" fill="#8a93a0">Same documents, same order -- the LABEL is the</text>
+<text x="852" y="745" font-size="11" fill="#8a93a0">only difference; the arm excludes it BY NAME.</text>
+<path d="M832,684 L812,648" fill="none" stroke="#c2410c" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#o)"/>
+<rect x="834" y="908" width="302" height="114" rx="10" fill="#fff4ec" stroke="#c2410c" stroke-width="1.8"/>
+<text x="852" y="932" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">Node reads tune.toml + output.toml.</text>
+<text x="852" y="951" font-size="11.5" fill="#4a5260">Closed 2026-09-12. Before it, a tuned repo</text>
+<text x="852" y="968" font-size="11.5" fill="#4a5260">ranked DIFFERENTLY in the two readers with</text>
+<text x="852" y="985" font-size="11.5" fill="#4a5260">nothing saying so: 90 of 174 discordant.</text>
+<text x="852" y="1004" font-size="11" fill="#8a93a0">After: 0 of 199. --no-tune is a two-runtime</text>
+<text x="852" y="1018" font-size="11" fill="#8a93a0">flag now, or it is not the switch it claims.</text>
+<path d="M832,954 L812,936" fill="none" stroke="#c2410c" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#o)"/>
+<text x="46" y="1070" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">2 - THREE PYTHON SEMANTICS THE NODE READER REIMPLEMENTS  --  each one is a correctness fix, not a nicety</text>
+<line x1="46" y1="1080" x2="1136" y2="1080" stroke="#e4e4e0" stroke-width="1"/>
+<rect x="46" y="1090" width="348" height="104" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="64" y="1114" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">round(x, 9) is half-EVEN</text>
+<text x="64" y="1133" font-size="10.5" fill="#4a5260">on the exact binary value. toFixed(9)</text>
+<text x="64" y="1148" font-size="10.5" fill="#4a5260">is half-UP and fails exactly on ties --</text>
+<text x="64" y="1163" font-size="10.5" fill="#4a5260">and a tie resolved the other way is a</text>
+<text x="64" y="1178" font-size="10.5" fill="#4a5260">DIFFERENT ORDER.</text>
+<rect x="410" y="1090" width="348" height="104" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="428" y="1114" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">repr(float) exponent thresholds</text>
+<text x="428" y="1133" font-size="10.5" fill="#4a5260">Python switches at e &lt; -4 or e &gt;= 16;</text>
+<text x="428" y="1148" font-size="10.5" fill="#4a5260">JS at -6 / 21. Both shortest-round-trip,</text>
+<text x="428" y="1163" font-size="10.5" fill="#4a5260">so only the printed layout differs.</text>
+<rect x="774" y="1090" width="348" height="104" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="792" y="1114" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">cmpCodePoints on every id</text>
+<text x="792" y="1133" font-size="10.5" fill="#4a5260">Python compares by CODE POINT, JS by</text>
+<text x="792" y="1148" font-size="10.5" fill="#4a5260">UTF-16 code UNIT. The sort key ends in id,</text>
+<text x="792" y="1163" font-size="10.5" fill="#4a5260">so one emoji reorders results: 30 of 324</text>
+<text x="792" y="1178" font-size="10.5" fill="#4a5260">ordered pairs disagreed, measured.</text>
+<text x="46" y="1216" font-size="11" fill="#8a93a0">Three Node files therefore have NO Python twin, and the exemption list is short on purpose -- it is exactly where divergence risk concentrates:</text>
+<text x="46" y="1232" font-size="11" fill="#8a93a0">hash/blake2b.mjs (hashlib cannot be reached from node:crypto)  |  compat/pyfloat.mjs  |  config/toml.mjs (CPython tomllib IS the twin, and it is stdlib).</text>
+<text x="46" y="1264" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">3 - THE REFER PLANE (`fux answer`)  --  where the two readers genuinely part company</text>
+<line x1="46" y1="1274" x2="1136" y2="1274" stroke="#e4e4e0" stroke-width="1"/>
+<text x="46" y="1298" font-size="11.5" fill="#4a5260">Shared twins -- ranking has already chosen the documents before any of this runs, so nothing here changes WHICH document is cited, only which passage:</text>
+<rect x="46" y="1310" width="204" height="46" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="62" y="1332" font-size="11.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">chunk.py / .mjs</text>
+<text x="62" y="1348" font-size="10.5" fill="#8a93a0" font-family="ui-monospace, Menlo, monospace">556/263 lines</text>
+<rect x="266" y="1310" width="204" height="46" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="282" y="1332" font-size="11.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">rescore.py / .mjs</text>
+<text x="282" y="1348" font-size="10.5" fill="#8a93a0" font-family="ui-monospace, Menlo, monospace">190/106 lines</text>
+<rect x="486" y="1310" width="204" height="46" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="502" y="1332" font-size="11.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">assemble.py / .mjs</text>
+<text x="502" y="1348" font-size="10.5" fill="#8a93a0" font-family="ui-monospace, Menlo, monospace">205/88 lines</text>
+<rect x="706" y="1310" width="204" height="46" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="722" y="1332" font-size="11.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">source.py / .mjs</text>
+<text x="722" y="1348" font-size="10.5" fill="#8a93a0" font-family="ui-monospace, Menlo, monospace">172/45 lines</text>
+<rect x="926" y="1310" width="204" height="46" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="942" y="1332" font-size="11.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">freshness.py / .mjs</text>
+<text x="942" y="1348" font-size="10.5" fill="#8a93a0" font-family="ui-monospace, Menlo, monospace">252/51 lines</text>
+<rect x="46" y="1370" width="540" height="200" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.8"/>
+<text x="66" y="1396" font-size="11" fill="#1d8a5e" font-weight="600" letter-spacing="1.1">IN PYTHON ONLY</text>
+<text x="66" y="1418" font-size="11.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">decode/  --  17 built-in decoders + .fux/decoders/*.py</text>
+<text x="66" y="1435" font-size="11" fill="#4a5260">pdf, image, html, mail, json, xlsx, docx ... A consumer decoder is</text>
+<text x="66" y="1450" font-size="11" fill="#4a5260">arbitrary Python; there can be no Node twin of it, ever.</text>
+<text x="66" y="1472" font-size="11.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">refer/arc.py  --  the (loc, sha) ARC content cache</text>
+<text x="66" y="1489" font-size="11.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">refer/fetchcache.py  --  the TTL url cache</text>
+<text x="66" y="1506" font-size="11.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">ingest fetchers  --  http.py, the signed-in-Chrome cdp.py, refusals.toml</text>
+<text x="66" y="1530" font-size="11" fill="#8a93a0">Node's decode/ is TWO files: a registry that answers one question,</text>
+<text x="66" y="1545" font-size="11" fill="#8a93a0">and markdown.mjs. Nothing else, and nothing planned.</text>
+<rect x="616" y="1370" width="520" height="200" rx="10" fill="#fff4ec" stroke="#c2410c" stroke-width="1.8"/>
+<text x="636" y="1396" font-size="11" fill="#c2410c" font-weight="600" letter-spacing="1.1">WHAT NODE DOES INSTEAD</text>
+<text x="636" y="1418" font-size="11.5" fill="#4a5260">Node has NO TRANSPORT. Not off by default -- there is no</text>
+<text x="636" y="1435" font-size="11.5" fill="#4a5260">fetcher seam and nothing to inject one through.</text>
+<text x="636" y="1454" font-size="11" fill="#4a5260">file:  reads the working tree (your own checkout is not a fetch).</text>
+<text x="636" y="1469" font-size="11" fill="#4a5260">url:   reads .fux/acquired/, else falls back to source: "index".</text>
+<text x="636" y="1491" font-size="11.5" fill="#14181f" font-weight="600">A document that needs a DECODER is DECLINED, not guessed at.</text>
+<text x="636" y="1508" font-size="11" fill="#4a5260">The question asked is never "does a decoder claim this extension?"</text>
+<text x="636" y="1523" font-size="11" fill="#4a5260">but "is this ALREADY TEXT?" -- which formats.toml's include list</text>
+<text x="636" y="1538" font-size="11" fill="#4a5260">answers in committed bytes both runtimes read. Under-claiming is the</text>
+<text x="636" y="1553" font-size="11" fill="#4a5260">only safe direction: a wrong citation vs the next candidate.</text>
+<rect x="46" y="1590" width="1090" height="120" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="66" y="1616" font-size="12.5" fill="#14181f" font-weight="600">So the url: freshness verdict set is ASYMMETRIC, deliberately</text>
+<text x="66" y="1638" font-size="10.5" fill="#9aa3af" font-weight="600" letter-spacing="1.1">verdict</text>
+<text x="216" y="1638" font-size="10.5" fill="#9aa3af" font-weight="600" letter-spacing="1.1">PYTHON</text>
+<text x="356" y="1638" font-size="10.5" fill="#9aa3af" font-weight="600" letter-spacing="1.1">NODE</text>
+<text x="476" y="1638" font-size="10.5" fill="#9aa3af" font-weight="600" letter-spacing="1.1">why</text>
+<text x="66" y="1656" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">current / stale</text>
+<text x="216" y="1656" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">file: and url:</text>
+<text x="356" y="1656" font-size="10.5" fill="#c2410c" font-weight="600" font-family="ui-monospace, Menlo, monospace">file: ONLY</text>
+<text x="476" y="1656" font-size="10.5" fill="#8a93a0">Node cannot look at a URL</text>
+<text x="66" y="1671" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">as-ingested</text>
+<text x="216" y="1671" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">yes</text>
+<text x="356" y="1671" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">yes</text>
+<text x="476" y="1671" font-size="10.5" fill="#8a93a0">the acquired blob is local</text>
+<text x="66" y="1686" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">unverified</text>
+<text x="216" y="1686" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">yes</text>
+<text x="356" y="1686" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">yes</text>
+<text x="476" y="1686" font-size="10.5" fill="#8a93a0">we did not look</text>
+<text x="66" y="1701" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">cached</text>
+<text x="216" y="1701" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">yes</text>
+<text x="356" y="1701" font-size="10.5" fill="#c2410c" font-weight="600" font-family="ui-monospace, Menlo, monospace">NEVER</text>
+<text x="476" y="1701" font-size="10.5" fill="#8a93a0">a TTL fetch cache requires fetching</text>
+<text x="722" y="1640" font-size="11" fill="#4a5260">Node reporting `current` for a URL it never</text>
+<text x="722" y="1656" font-size="11" fill="#4a5260">checked would make the claim-strength vocabulary</text>
+<text x="722" y="1672" font-size="11" fill="#4a5260">mean different things in two runtimes -- the one</text>
+<text x="722" y="1688" font-size="11" fill="#4a5260">thing ADR-URL-FRESHNESS exists to prevent.</text>
+<text x="722" y="1704" font-size="11" fill="#c2410c" font-weight="600">A DECISION. NOT A GAP.</text>
+<text x="46" y="1730" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">4 - THE THIRD ASYMMETRY: THE DERIVED GRAPH PLANE  --  and here it is PYTHON that refuses</text>
+<line x1="46" y1="1740" x2="1136" y2="1740" stroke="#e4e4e0" stroke-width="1"/>
+<rect x="46" y="1750" width="540" height="96" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.8"/>
+<text x="66" y="1776" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">Python: graph/plane.py::load</text>
+<text x="66" y="1796" font-size="11.5" fill="#4a5260">Reads the derived .fux/runtime/graph.json and REFUSES</text>
+<text x="66" y="1813" font-size="11.5" fill="#4a5260">when it is absent or stale. explain / graph / path</text>
+<text x="66" y="1830" font-size="11.5" fill="#4a5260">all need a fresh `fux build`.</text>
+<rect x="616" y="1750" width="520" height="96" rx="10" fill="#fff4ec" stroke="#c2410c" stroke-width="1.8"/>
+<text x="636" y="1776" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">Node: graph/plane.mjs</text>
+<text x="636" y="1796" font-size="11.5" fill="#4a5260">Rebuilds the same plane IN MEMORY from the committed</text>
+<text x="636" y="1813" font-size="11.5" fill="#4a5260">records and answers either way. .fux/runtime/ is gitignored</text>
+<text x="636" y="1830" font-size="10.5" fill="#8a93a0">and Python-written -- requiring it would refuse where Node is the only reader.</text>
+<text x="46" y="1872" font-size="11" fill="#8a93a0">It follows that explain / graph / path cannot be COMPARED on a corpus with no fresh build, and node_arm.py::graph_lane_ready says so out loud rather than skipping quietly.</text>
+<text x="46" y="1904" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">5 - WHAT HOLDS THEM EQUAL  --  a second implementation is a second thing to keep true</text>
+<line x1="46" y1="1914" x2="1136" y2="1914" stroke="#e4e4e0" stroke-width="1"/>
+<rect x="46" y="1924" width="1090" height="116" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="66" y="1950" font-size="11.5" fill="#14181f" font-weight="600">The differential arm, SIX surfaces since 2026-09-12 -- it covered ONE before, and all three defects found that day lived on a surface it did not reach</text>
+<text x="66" y="1972" font-size="11" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">1 find   2 ask   3 explain / graph / path, whole parsed payloads   4 the MCP server, a real stdio session   5 fux.api vs node/src/index.mjs   6 the BUNDLE vs the module tree</text>
+<text x="66" y="1994" font-size="11" fill="#4a5260">tests/test_node_twins.py maps every .mjs to its .py and fails when a Python twin changes and its .mjs does not -- which the arm structurally cannot catch.</text>
+<text x="66" y="2011" font-size="11" fill="#4a5260">tests/test_node_config_parity.py asserts the key sets and the REFUSALS, because a drifted refusal never shows up as a finding, only as a crash on one side.</text>
+<text x="66" y="2028" font-size="11" fill="#4a5260">Tolerance: scores equal after round(9), the sort key's own resolution. ORDERING is byte-equal and has no tolerance -- a discordant top-5 fails the arm.</text>
+<text x="46" y="2060" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">6 - IN NEITHER RUNTIME  --  named so that absence is not mistaken for coverage</text>
+<line x1="46" y1="2070" x2="1136" y2="2070" stroke="#e4e4e0" stroke-width="1"/>
+<rect x="46" y="2080" width="348" height="88" rx="10" fill="#f3f4f2" stroke="#8a93a0" stroke-width="1.4"/>
+<text x="64" y="2104" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">the vector plane</text>
+<text x="64" y="2123" font-size="10.5" fill="#4a5260">W-112, open. No embeddings anywhere</text>
+<text x="64" y="2138" font-size="10.5" fill="#4a5260">on either query path.</text>
+<rect x="410" y="2080" width="348" height="88" rx="10" fill="#f3f4f2" stroke="#8a93a0" stroke-width="1.4"/>
+<text x="428" y="2104" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">Node's latency</text>
+<text x="428" y="2123" font-size="10.5" fill="#4a5260">W-148 row 2. fux-benchmark is unbuilt, so</text>
+<text x="428" y="2138" font-size="10.5" fill="#4a5260">the number is stated as UNMEASURED.</text>
+<rect x="774" y="2080" width="348" height="88" rx="10" fill="#f3f4f2" stroke="#8a93a0" stroke-width="1.4"/>
+<text x="792" y="2104" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">verify --why --receipt</text>
+<text x="792" y="2123" font-size="10.5" fill="#4a5260">W-107 R6. No Node twin at all, so the</text>
+<text x="792" y="2138" font-size="10.5" fill="#4a5260">arm does not pretend to cover them --</text>
+<text x="792" y="2153" font-size="10.5" fill="#4a5260">a stated absence, not a gap.</text>
+<text x="46" y="2198" font-size="11" fill="#8a93a0">Drawn from the code 2026-09-12; surface 6 and the bundle added the same day (W-149).  Authority: docs/adr/0155_node-search.md (ADR-NODE-SEARCH), decisions 1-16.  Every difference not on this page is a defect.</text>
+</svg>

@@ -42,7 +42,7 @@ COMMITTED: dict[str, str] = {
     "decoders": "consumer-owned code, one module per format. THESE COPIES ARE WHAT RUN, not the ones inside the installed package (ADR-DECODE)",
     "enrich": "pinned enrichment text, one file per source content sha, plus `queue.tsv` (W-86 P6: what fux could NOT read and a model must). Committed, because a backlog is a team fact",
     # ASCII only, like every other value in these tables.
-    "node": "the vendored Node read plane (`fux-engine`), engine-owned and REWRITTEN on a version change -- not write-if-missing, because nobody edits it and a stale copy is a wrong answer (ADR-NODE-SEARCH)",
+    "node": "the Node read plane (`fux-engine`) as ONE BUNDLED FILE plus its manifest -- build output, never fux's source (L10). Engine-owned and REWRITTEN on a version change, not write-if-missing, because nobody edits it and a stale copy is a wrong answer. In a monorepo it is a workspace member holding only a manifest (ADR-NODE-SEARCH)",
 }
 
 #: Gitignored like DERIVED, and NOT rebuildable -- which is exactly why it is
@@ -82,7 +82,7 @@ COMMITTED_FILES: dict[str, str] = {
     "pii.toml": "REQUIRED - every command refuses without it. What is REDACTED from the committed index - and ONLY from it. The acquired bytes, the refer plane and every answer quote still see the document as it is (ADR-PII)",
     "refusals.toml": "what a REFUSAL looks like here - the sign-in walls, paywalls and error shells a server returns INSTEAD of the document. Consumer-owned; fux ships no vendor knowledge (ADR-REFUSAL)",
     # ASCII only, like every other value in these tables.
-    "fux": "a 3-line shim: `.fux/fux find rollback` in a clone with nothing installed. Runs `node .fux/node/fux.mjs` (ADR-NODE-SEARCH)",
+    "fux": "the shim: `.fux/fux find rollback` in a clone with nothing installed. Resolves the reader in three rungs -- the vendored bundle, this member's `node_modules/.bin`, then every ancestor's -- because npm and yarn hoist that bin and pnpm and bun do not (ADR-NODE-SEARCH)",
 }
 
 #: Everything legally found directly under `.fux/`; anything else is a warning.
@@ -117,6 +117,13 @@ _GITIGNORE = (
     # just told them to commit. By NAME, like everything else here, and
     # matching at any depth under `.fux/` is exactly the scope wanted.
     + "__pycache__/\n"
+    # ⚠ **Not a plane either -- a package manager's install directory**, which
+    # only exists in the monorepo shape, where `.fux/node` is a workspace member
+    # and the reader is INSTALLED rather than vendored (ADR-NODE-SEARCH
+    # decision 13, shape C). By path rather than by name: `node_modules/` alone
+    # would also ignore one a consumer keeps elsewhere under `.fux/`, and this
+    # file's whole discipline is that nothing is ignored by accident.
+    + "node/node_modules/\n"
 )
 
 
@@ -350,11 +357,17 @@ def fux_dir(root: Path) -> Path:
     return root / FUX_DIR
 
 
-def ensure_layout(root: Path) -> list[Path]:
+def ensure_layout(root: Path, *, node_shape: "str | None" = None) -> list[Path]:
     """Create `.fux/` and its generated files if absent; return what was written.
 
     Idempotent and non-destructive: an existing `README.md`/`.gitignore` is
     left exactly as the consumer edited it.
+
+    ⚠ **`node_shape` is `setup`'s to pass and nobody else's.** This function
+    runs at the head of **every ingest**, and the shape is decided by looking at
+    the consumer's repository — a detection that must happen once, in `setup`,
+    not on every run (ADR-NODE-SEARCH decision 15 constraint 1). Left `None`,
+    the shape already on disk is kept.
     """
     directory = fux_dir(root)
     directory.mkdir(parents=True, exist_ok=True)
@@ -364,12 +377,12 @@ def ensure_layout(root: Path) -> list[Path]:
         if not path.exists():
             path.write_bytes(text.encode("ascii"))
             written.append(path)
-    written.extend(ensure_node_reader(root))
+    written.extend(ensure_node_reader(root, shape=node_shape))
     return written
 
 
 # ---------------------------------------------------------------------------
-# The vendored Node reader -- W-107 R2, ADR-NODE-SEARCH.
+# The vendored Node reader -- ADR-NODE-SEARCH decisions 13-16, L10.
 #
 # **The fourth shape under ADR-DOTFUX**: committed, engine-owned, and
 # OVERWRITTEN -- not write-if-missing. `fetchers/` and `decoders/` are
@@ -381,6 +394,19 @@ def ensure_layout(root: Path) -> list[Path]:
 # write-if-missing, and the `doc`-suffix rename (2026-09-06) shipped with no
 # migration -- a repo set up before it still holds stale `<name>doc.py` files
 # that claim the same extensions and WIN.
+#
+# 🔴 **What a consumer gets is BUILD OUTPUT, and since 2026-09-12 that is a
+# law** ([L10](../../../docs/adr/0012_LAW-10-bundled-output.md)). The 47-file
+# module tree this code used to write is gone, in two shapes:
+#
+#   A  the bundle, vendored   -- `package.json`, `fux.mjs`, `mcp-tools.json`,
+#                                `README.md`. Offline, no install, the default.
+#   C  a workspace member     -- `package.json` only, declaring
+#                                `fux-engine@<version>`; the reader resolves
+#                                out of `node_modules` after an install.
+#
+# **The prune is part of the decision, not a follow-up.** Without it every
+# repository that ever ran `fux setup` keeps its stale `src/**` for good.
 # ---------------------------------------------------------------------------
 
 #: The vendored Node reader. Committed (a clone with no Python still answers)
@@ -389,6 +415,19 @@ def ensure_layout(root: Path) -> list[Path]:
 NODE_DIR = "node"
 NODE_ENTRY = "fux.mjs"
 NODE_SHIM = "fux"
+
+#: The two shapes of `.fux/node/`. Spelled "A" and "C" because those are the
+#: labels the ruling used and the record carries (ADR-NODE-SEARCH decision 13);
+#: B was a third option nobody chose and the letters are not renumbered, so a
+#: reader of the record and a reader of this file are talking about one thing.
+SHAPE_VENDORED = "A"
+SHAPE_WORKSPACE = "C"
+
+#: What `node_modules/` is called, and the ONE thing the prune never touches.
+#: In shape C it holds the installed reader; deleting it would leave a manifest
+#: pointing at nothing, which is decision 15's "half-configured is not a state"
+#: arriving through the back door.
+_NODE_MODULES = "node_modules"
 
 #: `chmod` bits for the shim -- readable and executable by everyone who can read
 #: the repo, which is the same set that can read the index it queries.
@@ -399,27 +438,55 @@ _SHIM = """#!/bin/sh
 # The command is `fux`; the npm package is `fux-engine` (`fux` was taken in
 # 2016). This shim exists so a clone needs nothing installed at all.
 #
-# The entry point is `node/fux.mjs`, NOT `fux.mjs` beside this file. W-107 R2
-# was written when the reader was to be one file at `.fux/fux.mjs`; R4 made it
-# a directory, and this line was the half that did not follow -- caught by
-# running the shim in a scratch clone, which is the only thing that could.
-exec node "$(dirname "$0")/node/fux.mjs" "$@"
+# **Three rungs, because the binary is not in one place.** MEASURED across
+# npm, pnpm, yarn 1 and bun (work/regression/2026-09-12-workspace-dotpath-probe):
+# npm and yarn HOIST `fux` to the workspace root's `node_modules/.bin`, pnpm and
+# bun leave it in the member's own. A shim naming either one would be right for
+# half the ecosystem and silently wrong for the other half, so it tries, in
+# order: the vendored bundle, this member's bin, then every ancestor's.
+dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+
+# 1 - shape A: the bundle `fux setup` vendored. Offline, nothing installed.
+if [ -f "$dir/node/fux.mjs" ]; then
+  exec node "$dir/node/fux.mjs" "$@"
+fi
+
+# 2 - shape C under pnpm or bun: the bin stays in the member.
+if [ -x "$dir/node/node_modules/.bin/fux" ]; then
+  exec "$dir/node/node_modules/.bin/fux" "$@"
+fi
+
+# 3 - shape C under npm or yarn: the bin is hoisted to the workspace root.
+d=$dir
+while [ "$d" != "/" ]; do
+  if [ -x "$d/node_modules/.bin/fux" ]; then
+    exec "$d/node_modules/.bin/fux" "$@"
+  fi
+  d=$(dirname -- "$d")
+done
+
+echo "fux: no Node reader here. This repository declares .fux/node as a" >&2
+echo "     workspace member (shape C), so run your package manager's install" >&2
+echo "     first -- or run 'fux setup' outside a monorepo to vendor the bundle." >&2
+exit 1
 """
 
 
 def _node_source():
     """The directory the vendored reader is copied FROM.
 
-    Two locations, one source. The wheel carries `node/` at
-    `fux/templates/node/` via hatchling `force-include` (`pyproject.toml`), so
-    an installed fux reads it as package data -- the same contract `templates/`
-    has, bytes and never an import.
+    Two locations, one source. The wheel carries the BUNDLE at
+    `fux/templates/node/` (built at publish -- `pyproject.toml`'s build hook),
+    so an installed fux reads it as package data: the same contract
+    `templates/` has, bytes and never an import.
 
-    ⚠ **An EDITABLE install has no such payload**, because `force-include` maps
-    the directory at BUILD time and an editable install never builds one. The
-    fallback is the checkout's own `node/`, which is the directory the wheel is
-    built from -- one source read two ways, never a second copy. Measured
-    2026-09-12: 37 files present in the wheel, absent under `uv pip install -e`.
+    ⚠ **An EDITABLE install has no such payload**, because the hook maps the
+    directory at BUILD time and an editable install never builds one. The
+    fallback is the checkout's own `node/`, which is the module tree the bundle
+    is built FROM -- and there `_packaged_node_files` builds it rather than
+    copying, because *"silently vendoring `node/src/**` in development and the
+    bundle in release is two products wearing one version"*
+    (ADR-NODE-SEARCH decision 14).
     """
     from importlib import resources
 
@@ -439,7 +506,26 @@ def _node_source():
 
 
 def _packaged_node_files() -> "list[tuple[str, bytes]]":
-    """`(relative path, bytes)` for every file of the Node reader."""
+    """`(relative path, bytes)` for shape A's payload -- the bundle + sidecars.
+
+    Two cases, and the difference is deliberate rather than incidental:
+
+    - **A release install** carries the already-built payload at
+      `fux/templates/node/`. Four files, copied.
+    - **A checkout** carries the module tree, which is NOT what a consumer may
+      be served (L10). The bundle is BUILT here, from those sources, so `fux
+      setup` in development writes exactly what a release writes.
+
+    🔴 **It never falls back to copying `src/**`.** A checkout whose sources the
+    bundler cannot read raises out of `nodebundle`, with the reason -- decision
+    14's *"builds the bundle or refuses with a message saying so"*.
+    """
+    source = _node_source()
+    if isinstance(source, Path) and (source / "src").is_dir():
+        from . import nodebundle
+
+        return nodebundle.bundle_files(source)
+
     out: list[tuple[str, bytes]] = []
 
     def walk(node, prefix: str = "") -> None:
@@ -450,8 +536,42 @@ def _packaged_node_files() -> "list[tuple[str, bytes]]":
             else:
                 out.append((rel, child.read_bytes()))
 
-    walk(_node_source())
+    walk(source)
+    if any(rel.startswith("src/") for rel, _ in out):
+        from ..errors import FuxError
+
+        raise FuxError(
+            "this installation of fux carries the Node reader as a module tree rather than "
+            "the published bundle, so `fux setup` would write fux's source into your "
+            "repository (L10). Reinstall `fux-engine` from a release, or run from a checkout."
+        )
     return out
+
+
+def _workspace_manifest(version: str) -> bytes:
+    """Shape C's whole payload: a manifest naming the published reader.
+
+    ⚠ **This is the one `package.json` fux writes that HAS a `dependencies`
+    key**, and it is not an L1 problem: the dependency is fux itself, pinned to
+    the exact version that wrote the index -- the same guarantee shape A gets by
+    carrying the bundle. `private: true` so a `npm publish` at the workspace
+    root can never push a consumer's reader stub to the registry.
+    """
+    import json
+
+    return json.dumps(
+        {
+            "name": "fux-reader",
+            "private": True,
+            "version": version,
+            "description": (
+                "This repository's fux read plane, resolved from npm. Written by `fux setup`, "
+                "which detected a monorepo. Run it through ../fux, never by path."
+            ),
+            "dependencies": {"fux-engine": version},
+        },
+        indent=2,
+    ).encode("utf-8") + b"\n"
 
 
 def node_version(directory: Path) -> "str | None":
@@ -472,33 +592,141 @@ def node_version(directory: Path) -> "str | None":
         return None
 
 
-def ensure_node_reader(root: Path) -> "list[Path]":
-    """Write `.fux/node/` and the `.fux/fux` shim; return what changed.
+def node_shape(directory: Path) -> "str | None":
+    """Which shape `.fux/node/` is in, read off the directory itself.
 
-    ⚠ **Overwrites, and only on a version difference.** Rewriting
-    unconditionally would dirty the working tree on every ingest -- this
-    directory is COMMITTED, so a no-op ingest must produce a no-op diff.
+    **Self-describing state, rather than a fifth config file.** Shape C's
+    manifest declares `fux-engine` as a dependency and shape A's never does, so
+    the payload answers the question — and a consumer who switches by hand gets
+    the shape they actually created, not one a sidecar remembers.
+    """
+    import json
+
+    path = directory / NODE_DIR / "package.json"
+    if not path.is_file():
+        return None
+    try:
+        meta = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    deps = meta.get("dependencies")
+    if isinstance(deps, dict) and "fux-engine" in deps:
+        return SHAPE_WORKSPACE
+    return SHAPE_VENDORED
+
+
+def _prune_node_reader(target: Path, keep: "set[str]") -> "list[Path]":
+    """Delete everything under `.fux/node/` that the declared shape does not
+    name, `node_modules/` excepted. Returns what was removed.
+
+    🔴 **The half that did not exist until 2026-09-12.** `ensure_node_reader`
+    wrote on a version difference and deleted nothing, so a repository set up
+    before this change keeps its 37-47 stale `.mjs` files — and they are not
+    inert: `.fux/node/src/query/rank.mjs` is a complete, editable ranker that
+    the old entry point would import.
+    """
+    removed: list[Path] = []
+    if not target.is_dir():
+        return removed
+    for path in sorted(target.rglob("*"), key=lambda p: len(p.parts), reverse=True):
+        rel = path.relative_to(target).as_posix()
+        if rel == _NODE_MODULES or rel.startswith(_NODE_MODULES + "/"):
+            continue
+        if path.is_dir():
+            if not any(path.iterdir()):
+                path.rmdir()
+                removed.append(path)
+        elif rel not in keep:
+            path.unlink()
+            removed.append(path)
+    return removed
+
+
+def _expected_layout(shape: str) -> "set[str]":
+    """The file names the declared shape should hold — WITHOUT building anything.
+
+    Named from `nodebundle`'s constants rather than from a built payload,
+    because this is asked on every ingest and bundling to answer it would put a
+    build on the maintenance path.
+    """
+    if shape == SHAPE_WORKSPACE:
+        return {"package.json"}
+    from . import nodebundle
+
+    return {nodebundle.ENTRY, *nodebundle.SIDECARS}
+
+
+def _layout_is_stale(target: Path, shape: str) -> bool:
+    """Does `.fux/node/` hold something other than what its shape declares?
+
+    🔴 **The version is NOT a sufficient test, and this repository is the proof.**
+    `ensure_node_reader` compared `package.json`'s version against the engine's,
+    so a directory written by *this* version before the payload changed shape
+    kept its 44-file module tree and the prune never ran — the version matched.
+    A real consumer upgrading across a release is covered by the version; anyone
+    tracking a single alpha from git is not, and neither was fux itself. Found by
+    running the migration on this repo rather than by reading the code.
+
+    A name-set comparison, never a byte comparison: the bytes are checked
+    per-file when a write is actually happening.
+    """
+    if not target.is_dir():
+        return True
+    found = {
+        p.relative_to(target).as_posix()
+        for p in target.rglob("*")
+        if p.is_file() and not p.relative_to(target).as_posix().startswith(_NODE_MODULES + "/")
+    }
+    return found != _expected_layout(shape)
+
+
+def ensure_node_reader(root: Path, *, shape: "str | None" = None) -> "list[Path]":
+    """Write `.fux/node/` in its declared shape and the `.fux/fux` shim.
+
+    Returns every path written OR removed, which is what `fux setup` prints and
+    what `ensure_layout`'s callers treat as "something changed".
+
+    ⚠ **Overwrites only when the version, the shape, or the LAYOUT differs.**
+    The layout test is what makes an in-place migration work at all — see
+    `_layout_is_stale`, which exists because the version test alone left this
+    repository's own `.fux/node/` holding 44 stale modules. Rewriting
+    unconditionally would dirty the working tree on every ingest — this
+    directory is COMMITTED, so a no-op ingest must produce a no-op diff. The
+    shim is compared by bytes on every call for the same reason: it is three
+    lines, and a stale one sends `fux` at a file that no longer exists.
     """
     from .. import __version__
 
     directory = fux_dir(root)
-    if node_version(directory) == __version__:
-        return []
+    current = node_shape(directory)
+    declared = shape or current or SHAPE_VENDORED
 
     written: list[Path] = []
     target = directory / NODE_DIR
-    for rel, data in _packaged_node_files():
-        path = target / rel
-        path.parent.mkdir(parents=True, exist_ok=True)
-        if not path.exists() or path.read_bytes() != data:
-            path.write_bytes(data)
-            written.append(path)
+    if (
+        node_version(directory) != __version__
+        or current != declared
+        or _layout_is_stale(target, declared)
+    ):
+        if declared == SHAPE_WORKSPACE:
+            payload = [("package.json", _workspace_manifest(__version__))]
+        else:
+            payload = _packaged_node_files()
+
+        for rel, data in payload:
+            path = target / rel
+            path.parent.mkdir(parents=True, exist_ok=True)
+            if not path.exists() or path.read_bytes() != data:
+                path.write_bytes(data)
+                written.append(path)
+        written.extend(_prune_node_reader(target, {rel for rel, _ in payload}))
 
     shim = directory / NODE_SHIM
     if not shim.exists() or shim.read_bytes() != _SHIM.encode("ascii"):
         shim.write_bytes(_SHIM.encode("ascii"))
         written.append(shim)
-    shim.chmod(_SHIM_MODE)
+    if shim.exists():
+        shim.chmod(_SHIM_MODE)
     return written
 
 

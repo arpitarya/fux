@@ -6,7 +6,7 @@ one exception: **a generated view is permitted, and only while a test asserts
 equality.** This file is that test.
 
 🔴 **Delete this file and `CLAUDE.md`'s block becomes an illegal restatement** —
-a second normative-looking copy of ten laws that can drift from the records while
+a second normative-looking copy of eleven laws that can drift from the records while
 both still look correct, which is the exact failure L0 exists to end. The
 permission is the test, not the generation. ADR-LAW-0's veto condition 2 names
 this file's absence as a reopen trigger.
@@ -14,7 +14,7 @@ this file's absence as a reopen trigger.
 **What is checked, and why each one:**
 
 1. the block in `CLAUDE.md` equals what the records render — the drift itself
-2. every handle `L0`–`L9` has exactly one record, and no record has two — a law
+2. every handle `L0`–`L10` has exactly one record, and no record has two — a law
    with no home, or two homes, is the same defect as drift one step earlier
 3. no *other* live document carries a law's block verbatim — the residue check,
    so a third copy cannot appear somewhere nobody greps. ⚠ It catches a COPY,
@@ -120,7 +120,7 @@ def test_only_law_records_declare_law_text():
         p.relative_to(ROOT)
         for p in _live_markdown()
         if "<!-- LAW-TEXT:BEGIN " in p.read_text(encoding="utf-8")
-        and not re.match(r"\d{4}_LAW-\d-", p.name)
+        and not re.match(r"\d{4}_LAW-\d+-", p.name)
     ]
     assert not offenders, f"LAW-TEXT markers outside the law records: {offenders}"
 

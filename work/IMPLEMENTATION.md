@@ -27,6 +27,51 @@ Rules:
 ---
 
 
+
+## 2026-09-12 — W-149 CLOSED: L10 is satisfied — the consumer is served ONE generated file, built at publish
+
+**Shipped.** [ADR-LAW-10](../docs/adr/0012_LAW-10-bundled-output.md) decision 8
+goes *not satisfied* → **satisfied, the same day the law was written**;
+[ADR-NODE-SEARCH](../docs/adr/0155_node-search.md) decisions **13-16 go RULED /
+NOT BUILT → BUILT**. Measured (the part that was measurable):
+[`2026-09-12-yarn-berry-probe`](regression/2026-09-12-yarn-berry-probe/report.md),
+a surface capture — the second probe decision 15 owed.
+
+| | |
+|---|---|
+| **the bundler** | `src/fux/store/nodebundle.py` — stdlib, deterministic, each source module an IIFE returning its exports, emitted in topological order. **It REFUSES rather than skipping**: `export default`, `export … from`, a bare package import, an import cycle and a builtin name bound two ways all raise with the offending line |
+| **the payload** | `.fux/node/` is **4 files / 244 KB** (shape A) or **1** (shape C), against **47 files / 223 KB** of fux's own module tree before. `fux setup` **PRUNES** what an older engine left, `node_modules/` excepted |
+| **a defect the build found** | the prune was gated on the **version**, so a `.fux/node/` written by the same version before the shape changed kept its tree — **fux's own repo was exactly that case**, 44 stale modules after the fix had landed. The trigger is now version **or shape or layout** (`_layout_is_stale`, a name-set comparison that builds nothing). Regression test: `test_a_stale_tree_at_the_SAME_version_is_still_pruned` |
+| **both registries, one build** | `publish.yml` bundles once in the `build` job, uploads it, and stages npm from `node/dist`; the wheel gets the same artefact from `hatch_build.py`. `pyproject.toml` no longer names `node/src` at all. **Verified end to end**: the wheel's vendored bundle is byte-identical to a local build |
+| **the npm surface** | `exports` and `files` both name `fux.mjs` and drop `"src"`; `node/fux.mjs` re-exports `open`/`Index` and runs `main()` only when it IS the program, so one artefact carries the CLI and the library |
+| **the monorepo shape** | auto-detected and wired — npm / pnpm / yarn 1 / bun / **Berry with `nodeLinker: node-modules`**; a format-preserving splice into a manifest fux does not own (indent, key order, trailing newline), idempotent, announced, `setup`-only |
+| **the shim** | `.fux/fux` resolves in three rungs — vendored bundle, member bin, ancestor bin — because npm and yarn hoist that bin and pnpm and bun do not |
+| **the sixth surface** | `node_arm.py --bundle-cap` compares the **published artefact** against the module tree it came from (`find`/`ask`/`answer` + MCP + the library). **0 discordant** on this repo's index |
+| **doctor** | the `node reader` row reports the shape, a stale `src/` tree, and a shape-C manifest with nothing installed to resolve it |
+
+🔴 **Two record defects found by building, not by reading.**
+
+1. **Decision 15's detection table contradicted its own warning.** It put
+   *"`workspaces` array → C"* above *"Berry → A"*, and a Berry repository
+   declares `workspaces` exactly as npm does — so a literal first-hit reading
+   gave every Berry repo shape C, including the PnP ones the warning excluded.
+   **This is the W-83 class**: an accepted record self-contradicting inside one
+   file, which no mechanical check here can see. Corrected in the same change.
+2. **The Berry fallback was broader than the evidence needed.** The probe shows
+   `.fux/node` links in Berry too, and that the boundary is the **linker**:
+   `node-modules` hoists the bin to the root (shape C works), PnP has no
+   `node_modules` at all (shape A required, and Berry's default is PnP).
+
+**Tests.** `tests/test_node_bundle.py` (new, 24 cases — **equal ANSWERS through
+both entry points**, not equal bytes), `tests/test_setup_workspace.py` (new, 17
+— the detection table and the manifest diff), `tests/test_setup_node.py`
+rewritten, `tests/test_version_parity.py` and `tests/test_cli.py`'s PII-gate
+test extended to the built bundle. **Both suites whole: 3 994 + 85 pass.**
+
+⚠ **What is NOT closed.** A consumer who never upgrades keeps their old module
+tree — the prune runs on a version difference. `.fux/decoders/` and
+`.fux/fetchers/` stay exempt by design. And the arm's bundle surface has run on
+this repo only; no golden rung has been through it.
 ## 2026-09-12 — W-107 CLOSED: the Node reader reads its config, and four surfaces nobody was comparing were all wrong
 
 **Shipped.** [ADR-NODE-SEARCH](../docs/adr/0155_node-search.md) goes

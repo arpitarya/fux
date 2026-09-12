@@ -3,8 +3,34 @@
 # The command is `fux`; the npm package is `fux-engine` (`fux` was taken in
 # 2016). This shim exists so a clone needs nothing installed at all.
 #
-# The entry point is `node/fux.mjs`, NOT `fux.mjs` beside this file. W-107 R2
-# was written when the reader was to be one file at `.fux/fux.mjs`; R4 made it
-# a directory, and this line was the half that did not follow -- caught by
-# running the shim in a scratch clone, which is the only thing that could.
-exec node "$(dirname "$0")/node/fux.mjs" "$@"
+# **Three rungs, because the binary is not in one place.** MEASURED across
+# npm, pnpm, yarn 1 and bun (work/regression/2026-09-12-workspace-dotpath-probe):
+# npm and yarn HOIST `fux` to the workspace root's `node_modules/.bin`, pnpm and
+# bun leave it in the member's own. A shim naming either one would be right for
+# half the ecosystem and silently wrong for the other half, so it tries, in
+# order: the vendored bundle, this member's bin, then every ancestor's.
+dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+
+# 1 - shape A: the bundle `fux setup` vendored. Offline, nothing installed.
+if [ -f "$dir/node/fux.mjs" ]; then
+  exec node "$dir/node/fux.mjs" "$@"
+fi
+
+# 2 - shape C under pnpm or bun: the bin stays in the member.
+if [ -x "$dir/node/node_modules/.bin/fux" ]; then
+  exec "$dir/node/node_modules/.bin/fux" "$@"
+fi
+
+# 3 - shape C under npm or yarn: the bin is hoisted to the workspace root.
+d=$dir
+while [ "$d" != "/" ]; do
+  if [ -x "$d/node_modules/.bin/fux" ]; then
+    exec "$d/node_modules/.bin/fux" "$@"
+  fi
+  d=$(dirname -- "$d")
+done
+
+echo "fux: no Node reader here. This repository declares .fux/node as a" >&2
+echo "     workspace member (shape C), so run your package manager's install" >&2
+echo "     first -- or run 'fux setup' outside a monorepo to vendor the bundle." >&2
+exit 1

@@ -404,7 +404,7 @@ that record's to close, not this one's).
 baseline's statistics, because it is how a loss gets attributed to the right
 cause. A single arm reports a number; two arms report a diagnosis.
 
-**14. The third arm compares FIVE surfaces, and compared one until 2026-09-12.**
+**14. The third arm compares SIX surfaces, and compared one until 2026-09-12.**
 
 Decision 13 recorded the find that the arm's Python side called `scan.ask`
 while `fux find` calls `run_query`, so **both readers were ignoring the same
@@ -418,6 +418,16 @@ transcribed and never checked.
 | `explain` · `graph` · `path` | **whole parsed payloads**, both CLIs | different key names in all three, and a hand-rolled breadth-first walk where Python runs a PPR expansion |
 | `mcp` | both servers, one stdio session each | handlers reading `args.id` where the advertised schema says `path` — in a package already on npm |
 | `fux.api` vs `node/src/index.mjs` | all six methods | `api.py` ranking without its tune file; Node dropping `ordinal` from every passage |
+| **the published BUNDLE vs the module tree** (`--bundle-cap`, 2026-09-12) | `find`/`ask`/`answer`, one MCP session, and the library export — whole payloads, both Node entry points | nothing: **0 discordant on this repo's index**. It was added because the arm read `node/fux.mjs` while a consumer runs the generated `.fux/node/fux.mjs` (L10, ADR-NODE-SEARCH decisions 13-14) |
+
+🔴 **The bundle row is decisions 9-12's own lesson applied to the instrument
+itself** — *a transcription is only as true as the surface the instrument is
+aimed at.* Once `fux setup` and npm ship a generated artefact, an arm that
+compares the module tree is measuring a thing nobody executes. ⚠ **And the
+bundler being deterministic does not cover it**: reproducible bytes can still
+compile, run and answer differently, so the comparison is on **answers**. The
+bundle is BUILT per run (`node_arm.bundle_entry`) rather than read off disk,
+because a bundle on disk could be from another checkout.
 
 **Whole payloads rather than a field list, for the graph lane**, because those
 verbs carry no score to tolerance: every byte of meaning is in the structure,

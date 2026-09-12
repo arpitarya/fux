@@ -259,6 +259,7 @@ to its record; that is all it does now.
     about **300 characters**, with tables, charts, bullet points and Mermaid
     diagrams, written to read as machine-made or by several authors, professional
     or amateur. [ADR-LAW-9](docs/adr/0011_LAW-9-environments.md).
+- **L10** · **The consumer is served build output, never source.** Code fux puts in front of a consumer — `.py`, `.mjs`, `.js`, `.ts`, vendored into their tree or exported by a published package — is ONE generated artefact per plane, bundled at publish and never on their machine. The only exceptions are the consumer's own extension points, [`.fux/decoders/`](docs/adr/0139_decode.md) and [`.fux/fetchers/`](docs/adr/0117_fetcher.md), where readable source IS the contract. Bundled ≠ minified.
 
 <!-- LAWS:END -->
 
@@ -834,8 +835,8 @@ work/               THE SHARED MEMORY between sessions — start at work/README.
   MACHINE.md        environment/tooling quirks per surface (local · bridge · cloud · CI)
   DOC-REGISTRY.md   doc freshness tracker (triggers + last-verified)
   paper/            the architecture of record + figures + predictions
-  architecture-{high-level,detailed,decoders,ask,answer}.svg   the five diagrams,
-                    redrawn from the code 2026-09-12. proposal-search-v3-target.svg is
+  architecture-{high-level,detailed,decoders,ask,answer,two-readers}.svg   the six
+                    diagrams, redrawn from the code 2026-09-12. proposal-search-v3-target.svg is
                     a PROPOSAL's target state, deliberately outside that namespace.
   open/             one detail file per open W-nn; deleted with its row
   setup/            the three siblings — playground · lab · benchmark (L9) — outside this repo
@@ -895,7 +896,18 @@ deliberately. Both jobs hang off one `release: published` trigger in
 uv sync --extra dev
 uv run pytest -q tests        # fast unit
 uv run pytest -q tests_e2e    # the package as a user
+node --test node/test/*.test.mjs               # the Node reader's own units
+python -m fux.store.nodebundle node node/dist  # the published bundle (L10)
 ```
+
+**What a consumer is served is BUILD OUTPUT, and since 2026-09-12 that is
+[L10](docs/adr/0012_LAW-10-bundled-output.md).** `node/` is 44 authored `.mjs`
+files; what `fux setup` vendors and npm publishes is **one generated
+`fux.mjs`** — built by `src/fux/store/nodebundle.py`, into the wheel by
+[`hatch_build.py`](hatch_build.py) and into the npm tarball by `publish.yml`,
+from one build. ⚠ **`node --test node/test` (no glob) is not the invocation** —
+it resolves as a module path and fails with `MODULE_NOT_FOUND`, which reads like
+a test failure and is not one.
 
 **A test that builds a repo by hand writes `.fux/pii.toml`** (an empty file is
 enough), or ingest and every CLI verb refuse — [ADR-PII](docs/adr/0150_pii.md)
@@ -944,7 +956,12 @@ archive/v0.26/.venv/bin/python tools/pruning-eval/run.py --corpus acme orbit syn
   **`scripts/check-version-parity.py` is now the enforcement**, run by
   `tests/test_version_parity.py` on every push and by `publish.yml` before a
   release builds. Add a site to that script's `SITES` the moment a fifth copy
-  appears. See `CHANGELOG.md` for the full list.
+  appears.
+  ⚠ **The Node BUNDLE is not a fifth site — it is a DERIVATION**, and what is
+  checked is the derivation: `check-version-parity.py --with-bundle <path>`
+  asserts the built bundle's generated header and its `VERSION` constant against
+  `src/fux/__init__.py`. The release workflow runs it on the very artefact it is
+  about to ship, and `tests/test_version_parity.py` builds one on every push. See `CHANGELOG.md` for the full list.
 
 ## Merge wall — what actually blocks a merge
 

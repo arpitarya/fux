@@ -42,7 +42,7 @@ So for non-git sources, human-readable metadata — the title, the headings — 
 ```mermaid
 flowchart LR
     R["ADR-LAW-5<br/>(THIS RECORD — states law L5)"]
-    N["ADR-LAWS<br/>(the handles L0..L9 — routes, never states)"]
+    N["ADR-LAWS<br/>(the handles L0..L10 — routes, never states)"]
     C["CLAUDE.md §Non-negotiable constraints<br/>(GENERATED from the records · test-bound)"]
     B["records bound by L5<br/>(cite the number, never restate)"]
     R --> C
@@ -63,7 +63,7 @@ flowchart LR
         (GENERATED -- not the source)
 
                ADR-LAWS
-     (the handles L0..L9 -- routes, never states)
+     (the handles L0..L10 -- routes, never states)
                    |
           +--------+---------+
           v                  v

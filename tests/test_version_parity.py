@@ -34,6 +34,47 @@ def test_every_version_site_agrees():
     assert not problems, "version parity broken:\n  " + "\n  ".join(problems)
 
 
+def test_the_built_bundle_carries_the_engines_version(tmp_path):
+    """The bundle is a DERIVATION, not a fifth hand-written site (W-149 §3.7).
+
+    So what is checked is the derivation: build it here, and assert both places
+    the version appears inside it — the generated header and the `VERSION`
+    constant `fux --version` prints — say what `src/fux/__init__.py` says.
+    The release workflow runs the same check with `--with-bundle`, on the very
+    bundle it is about to ship.
+    """
+    sys.path.insert(0, str(ROOT / "src"))
+    from fux import __version__
+    from fux.store import nodebundle
+
+    nodebundle.write(ROOT / "node", tmp_path)
+    problems = _mod.bundle_problems(tmp_path / "fux.mjs", __version__)
+    assert not problems, "the bundle disagrees with the engine:\n  " + "\n  ".join(problems)
+
+
+def test_the_bundle_check_fails_on_a_doctored_bundle(tmp_path):
+    """A check that cannot fail is not a check — the same argument as below."""
+    sys.path.insert(0, str(ROOT / "src"))
+    from fux import __version__
+    from fux.store import nodebundle
+
+    nodebundle.write(ROOT / "node", tmp_path)
+    bundle = tmp_path / "fux.mjs"
+    bundle.write_text(
+        bundle.read_text(encoding="utf-8").replace(
+            f'const VERSION = "{__version__}"', 'const VERSION = "0.0.0-doctored"', 1
+        ),
+        encoding="utf-8",
+    )
+    problems = _mod.bundle_problems(bundle, __version__)
+    assert problems and "VERSION" in problems[0]
+
+
+def test_the_bundle_check_says_so_when_there_is_no_bundle(tmp_path):
+    problems = _mod.bundle_problems(tmp_path / "fux.mjs", "1.2.3")
+    assert problems and "no bundle there" in problems[0]
+
+
 def test_the_check_actually_fails_on_a_mismatch(tmp_path):
     """A parity check that cannot fail is not a check.
 

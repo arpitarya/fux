@@ -1,0 +1,35 @@
+=== yarn --version:
+4.1.0
+=== yarn workspaces list:
+➤ YN0000: .
+➤ YN0000: .fux/node
+➤ YN0000: packages/app
+➤ YN0000: Done in 0s
+=== yarn install (node-modules linker):
+➤ YN0000: ┌ Fetch step
+➤ YN0000: └ Completed
+➤ YN0000: ┌ Link step
+➤ YN0000: └ Completed
+➤ YN0000: · Done in 0s 15ms
+=== bins:
+=== now PnP:
+➤ YN0000: ┌ Fetch step
+➤ YN0000: └ Completed
+➤ YN0000: ┌ Link step
+➤ YN0000: └ Completed
+➤ YN0000: · Done in 0s 12ms
+➤ YN0000: .
+➤ YN0000: .fux/node
+➤ YN0000: packages/app
+➤ YN0000: Done in 0s
+.
+..
+.fux
+.pnp.cjs
+.yarn
+.yarnrc.yml
+package.json
+packages
+yarn.lock
+
+[exited with code 0]

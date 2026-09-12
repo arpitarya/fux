@@ -198,6 +198,16 @@ def test_the_node_reader_gates_on_the_same_file(tmp_path):
     )
     assert pii.rules_path(tmp_path) == tmp_path / ".fux" / "pii.toml"
 
+    # 🔴 **And in the artefact a consumer actually runs** (2026-09-12, L10).
+    # `.fux/node/fux.mjs` and the npm entry point are the BUNDLE, generated from
+    # the source above — so the literal travels by construction. Asserted on the
+    # built bytes anyway, because "aimed at the source while the consumer runs
+    # something else" is exactly the class of defect ADR-NODE-SEARCH decisions
+    # 9-12 were all instances of.
+    from fux.store import nodebundle
+
+    assert '".fux", "pii.toml"' in nodebundle.bundle(ROOT / "node")
+
 
 def test_a_gated_verb_stops_before_dispatch_with_exit_1(tmp_path, monkeypatch, capsys):
     (tmp_path / ".git").mkdir()

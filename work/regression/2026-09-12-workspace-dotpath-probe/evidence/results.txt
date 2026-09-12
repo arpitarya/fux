@@ -1,0 +1,114 @@
+# W-149 hazard-3 probe — raw results, 2026-09-12
+# node v22.22.2 npm 10.9.7 pnpm 10.28.0 yarn 1.22.22 bun 1.3.13
+
+## table
+MGR    ARM       MEMBER  BIN     DEP    
+npm    explicit  yes     yes     yes    
+npm    glob      no      no      no     
+pnpm   explicit  no      yes     yes    
+pnpm   glob      no      no      no     
+yarn   explicit  yes     yes     yes    
+yarn   glob      no      no      no     
+bun    explicit  no      yes     yes    
+bun    glob      no      no      no     
+
+## bin/member layout, explicit arm
+[npm]
+  node_modules/.bin/fux                    present
+  .fux/node/node_modules/.bin/fux          absent
+  node_modules/fux-workspace-reader        present
+  node_modules/fux-engine                  present
+  .fux/node/node_modules/fux-engine        absent
+[pnpm]
+  node_modules/.bin/fux                    absent
+  .fux/node/node_modules/.bin/fux          present
+  node_modules/fux-workspace-reader        absent
+  node_modules/fux-engine                  absent
+  .fux/node/node_modules/fux-engine        present
+[yarn]
+  node_modules/.bin/fux                    present
+  .fux/node/node_modules/.bin/fux          present
+  node_modules/fux-workspace-reader        present
+  node_modules/fux-engine                  present
+  .fux/node/node_modules/fux-engine        absent
+[bun]
+  node_modules/.bin/fux                    absent
+  .fux/node/node_modules/.bin/fux          present
+  node_modules/fux-workspace-reader        absent
+  node_modules/fux-engine                  absent
+  .fux/node/node_modules/fux-engine        present
+
+## version check through each located bin
+  npm node_modules/.bin/fux -> fux 2.0.0-alpha.7 (node 22.22.2)
+  pnpm .fux/node/node_modules/.bin/fux -> fux 2.0.0-alpha.7 (node 22.22.2)
+  yarn node_modules/.bin/fux -> fux 2.0.0-alpha.7 (node 22.22.2)
+  yarn .fux/node/node_modules/.bin/fux -> fux 2.0.0-alpha.7 (node 22.22.2)
+  bun .fux/node/node_modules/.bin/fux -> fux 2.0.0-alpha.7 (node 22.22.2)
+
+## install logs
+--- npm / explicit ---
+
+added 3 packages in 516ms
+
+--- npm / glob ---
+
+added 1 package in 297ms
+
+--- pnpm / explicit ---
+Scope: all 3 workspace projects
+
+   ╭─────────────────────────────────────────╮
+   │                                         │
+   │   Update available! 10.28.0 → 12.4.1.   │
+   │   Changelog: https://pnpm.io/v/12.4.1   │
+   │    To update, run: pnpm add -g pnpm     │
+   │                                         │
+   ╰─────────────────────────────────────────╯
+
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Packages: +1
++
+Progress: resolved 1, reused 0, downloaded 1, added 1, done
+
+Done in 940ms using pnpm v10.28.0
+
+--- pnpm / glob ---
+Scope: all 2 workspace projects
+Already up to date
+
+Done in 411ms using pnpm v10.28.0
+
+--- yarn / explicit ---
+yarn install v1.22.22
+info No lockfile found.
+[1/4] Resolving packages...
+[2/4] Fetching packages...
+[3/4] Linking dependencies...
+[4/4] Building fresh packages...
+success Saved lockfile.
+Done in 1.11s.
+
+--- yarn / glob ---
+yarn install v1.22.22
+info No lockfile found.
+[1/4] Resolving packages...
+[2/4] Fetching packages...
+[3/4] Linking dependencies...
+[4/4] Building fresh packages...
+success Saved lockfile.
+Done in 0.10s.
+
+--- bun / explicit ---
+bun install v1.3.13 (bf2e2cec)
+Resolving dependencies
+Resolved, downloaded and extracted [4]
+Saved lockfile
+
+2 packages installed [240.00ms]
+
+--- bun / glob ---
+bun install v1.3.13 (bf2e2cec)
+Saved lockfile
+
+Done! Checked 2 packages (no changes) [3.00ms]
+

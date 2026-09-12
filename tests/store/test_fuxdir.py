@@ -63,6 +63,13 @@ def test_gitignore_lists_the_derived_planes_the_blobs_and_the_bytecode(tmp_path)
     `.fux/decoders/` and `.fux/fetchers/`, which ingest imports. Without the
     line, a repo whose own `.gitignore` lacks the Python entry shows untracked
     bytecode inside the directory fux just told it to commit.
+
+    ⚠ **`node/node_modules/` is a FIFTH** (W-149, 2026-09-12): a package
+    manager's install directory, which exists only in the monorepo shape where
+    `.fux/node` is a workspace member and the reader is installed rather than
+    vendored (ADR-NODE-SEARCH decision 13). Listed by PATH rather than by name
+    — `node_modules/` alone would also ignore one a consumer keeps elsewhere
+    under `.fux/`, and nothing here is ignored by accident.
     """
     fuxdir.ensure_layout(tmp_path)
     text = (tmp_path / ".fux" / ".gitignore").read_text(encoding="utf-8")
@@ -70,6 +77,7 @@ def test_gitignore_lists_the_derived_planes_the_blobs_and_the_bytecode(tmp_path)
     assert entries == [
         *(f"{name}/" for name in (*fuxdir.DERIVED, *fuxdir.ACQUIRED)),
         "__pycache__/",
+        "node/node_modules/",
     ]
     assert "*" not in entries
     for committed in fuxdir.COMMITTED:  # a committed plane must never be listed

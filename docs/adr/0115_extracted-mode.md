@@ -139,8 +139,10 @@ IDENTICAL
 
 The naming collided head-on with the ported edge-grade vocabulary, where
 `EXTRACTED` already means deterministic and `INFERRED` already means
-model-derived. The fork was worked in
-[`work/compare/ingest-mode-naming.compare.md`](../../work/compare/ingest-mode-naming.compare.md).
+model-derived. The fork was worked in `ingest-mode-naming.compare.md`, **retired to
+[`archive/compare/`](../../archive/compare/README.md) on 2026-09-12** once its
+reopen-trigger was spent; its matrix is folded into this record below, so the
+decision is grounded here and not in an archive.
 
 It stopped being a taste call the moment `mode` entered the committed wire
 format. A rename now costs a format bump and a re-ingest of every corpus that
@@ -321,8 +323,20 @@ max_phrases`, default **32** (Arpit, 2026-09-11; it was a hard-coded `12`).
   decision 7, on a measured gate rather than on principle — but the principle is
   what makes the removal a simplification rather than a loss.
 
-Full matrix:
-[`work/compare/ingest-mode-naming.compare.md`](../../work/compare/ingest-mode-naming.compare.md).
+Full matrix, folded in from the retired compare doc (H/M/L are the weights as
+they were set before the options were scored):
+
+| criterion (weight) | **`extracted`/`enriched`** | `derived`/`enriched` | `inferred`/`enriched` | `inferred`/`extracted` | `advanced` |
+|---|---|---|---|---|---|
+| collision-free (H) | **yes** | **yes** | no (`inferred`) | no (`inferred`) | no (overloads fidelity) |
+| *agrees with* the ported edge grades (H) | **yes** | no (neutral) | no | no | no |
+| uses the original vocabulary (M) | **yes** (other tier) | no | partly | **yes** (as assigned) | no |
+| migration cost (M) | **zero** | **zero** | zero | edge-grade rename record + ports | zero |
+| visually distinct pair (L) | no | **yes** | yes | yes | yes |
+
+The two high-weight criteria are the whole decision: only `extracted`/`enriched`
+and `derived`/`enriched` clear the collision, and only the first one *agrees*
+with the edge grades rather than sidestepping them.
 
 ### Reference (required)
 
@@ -334,8 +348,9 @@ Full matrix:
   [`src/fux/ingest/edges.py`](../../src/fux/ingest/edges.py).
 - Determinism, captured —
   [`work/regression/2026-08-18-ingest-and-index/`](../../work/regression/2026-08-18-ingest-and-index/report.md) §4.
-- The fork and its matrix —
-  [`work/compare/ingest-mode-naming.compare.md`](../../work/compare/ingest-mode-naming.compare.md).
+- The fork and its matrix — **folded into this record above.** The compare doc
+  is retired; it is named in [`archive/compare/README.md`](../../archive/compare/README.md)
+  and may not be cited as backing this decision.
 - How ingest runs, as distinct from what extraction promises —
   [ADR-INGEST](0106_ingest.md).
 
@@ -396,4 +411,4 @@ evidence.*
 
 **Project docs**
 
-- [`work/compare/ingest-mode-naming.compare.md`](../../work/compare/ingest-mode-naming.compare.md)
+- [`docs/GLOSSARY.md`](../GLOSSARY.md) — `extracted` and `enriched` as terms

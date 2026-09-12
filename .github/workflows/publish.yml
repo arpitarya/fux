@@ -37,6 +37,25 @@ jobs:
           fi
           echo "✔ tag v$tag matches __version__ $pkg"
 
+      - name: Bundle the Node read plane — ONE build, two registries
+        # 🔴 **Built here, before either registry job exists**, because the two
+        # halves are not symmetric: PyPI publishes automatically via OIDC and npm
+        # STAGES and waits for a human. A bundle built per-job could ship two
+        # registries disagreeing about what `2.x.y` is (ADR-NODE-SEARCH
+        # decision 14). The wheel gets the same artefact from `hatch_build.py`,
+        # which runs the same deterministic bundler over the same sources.
+        run: PYTHONPATH=src python -m fux.store.nodebundle node node/dist
+
+      - name: The bundle's version must be the engine's
+        # Derived, not hand-written — so this asserts the derivation rather than
+        # a fifth copy (W-149 §3.7).
+        run: python scripts/check-version-parity.py --with-bundle node/dist/fux.mjs
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: node-bundle
+          path: node/dist/
+
       - name: Install build tooling
         run: pip install build twine
 
@@ -93,6 +112,24 @@ jobs:
           node-version: "22"
           registry-url: https://registry.npmjs.org
 
+      - name: Take the bundle the build job made — never rebuild it here
+        uses: actions/download-artifact@v4
+        with:
+          name: node-bundle
+          path: node/dist/
+
+      - name: The staged tarball is the bundle, and nothing else
+        # `node/dist/` holds exactly what `package.json`'s `files` names:
+        # `fux.mjs` (generated), `mcp-tools.json`, `README.md`. Asserted rather
+        # than assumed — a missing sidecar publishes a reader whose `fux mcp`
+        # throws ENOENT on its own tool descriptions.
+        run: |
+          for f in fux.mjs package.json mcp-tools.json README.md; do
+            test -f "node/dist/$f" || { echo "✗ node/dist/$f is missing" >&2; exit 1; }
+          done
+          test ! -d node/dist/src || { echo "✗ node/dist/src exists — L10" >&2; exit 1; }
+          echo "✔ node/dist carries the bundle and its sidecars"
+
       - name: npm >= 11.19 (trusted publishing needs 11.5.1; `npm stage` needs 11.19)
         # setup-node ships whatever npm came with the Node line, which is a 10.x
         # on Node 22 — old enough that `npm stage publish` is not a command and
@@ -104,7 +141,11 @@ jobs:
           npm --version
 
       - name: Stage the tarball
-        working-directory: node
+        # `node/dist`, NOT `node`: the published package is the BUNDLE, and the
+        # repository's `node/` is the module tree it was built from. Publishing
+        # from the source directory would put `node/src/**` on npm again, which
+        # is the violation L10 was written for.
+        working-directory: node/dist
         # STAGED, not direct: the trusted publisher on npmjs.com has
         # `Allow npm publish` unchecked, which is npm's own recommendation.
         # CI uploads; a human approves at npmjs.com (or `npm stage approve

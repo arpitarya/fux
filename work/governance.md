@@ -35,12 +35,12 @@ none of them currently is.
 | `NOW.md` (a handful of lines; overwritten every session) | one-line current-state pointer | both | none | every session transition |
 | `MACHINE.md` | environment/surface quirks (4 surfaces) | agent | none | a surface breaks in a new way |
 | `DOC-REGISTRY.md` (62 KB) | per-doc freshness table for **live** docs | both | `tests/test_doc_registry.py` | any registered doc is touched |
-| `compare/*.md` (**18 docs + README**, recounted 2026-08-25 — four moved to `archive/compare/`) | live forks — verdict + reopen-trigger | both | none | fork opens/closes/reopen-trigger fires |
-| `proposals/*.md` (**13 docs + README**, recounted 2026-08-25 — the `ideal/` set and one proposal archived) | parked, undecided ideas | both | none | filed, graduates, or rejected |
+| `compare/*.md` (**21 docs + README**, recounted 2026-09-12 — seven now in `archive/compare/`) | live forks — verdict + reopen-trigger | both | none | fork opens/closes/reopen-trigger fires |
+| `proposals/*.md` (**16 docs + README**, recounted 2026-09-12 — none of the 16 met the archive bar; the `ideal/` set and eight proposals are already archived) | parked, undecided ideas | both | none | filed, graduates, or rejected |
 | `regression/<date>-<run>/` (**29 runs**, recounted 2026-08-25) | measured evidence other docs cite | both | `tests/test_regression_runs.py` | every measurement run |
 | `setup/*.md` (3 docs + README) | how the three siblings are stood up; their jobs are [L9](../docs/adr/0011_LAW-9-environments.md)'s | human (mostly) | `tests/test_setup_docs.py`, `tests/test_l9_environments.py` | any sibling changes |
 | `paper/the-fux-index-paper.md` | architecture of record + falsifiable predictions | both | none | architecture changes / a prediction is measured |
-| `architecture*.svg` (2 diagrams) | visual architecture | human | none | tier/component changes |
+| `architecture-*.svg` (**5 diagrams**, recounted 2026-09-12 — plus `proposal-search-v3-target.svg`, which is a proposal's target and deliberately outside the namespace) | visual architecture; `docs/architecture-*.png` are rendered from them | human | none | the plane, verb, reader or record shape one draws changes |
 
 ## 3. `docs/` — what the project *is*
 

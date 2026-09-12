@@ -36,8 +36,6 @@ description: "The single live work queue, two lanes, plus the Blocked-on-Arpit i
 | ↳ **blocks:** nothing else in the queue | | |
 | 🔴 **W-148** — two calls left over from W-107: how CI reaches a golden corpus (self-hosted runner / commit `rung-00100` / portable builder), and whether `fux-benchmark` gets built or Node's latency stays unmeasured. [detail](open/W-148-what-the-two-readers-still-owe.md) | 2026-09-12 | 0d |
 | ↳ **blocks:** nothing else in the queue — the Node plane is built and measured; these decide where a future measurement runs and what it may CLAIM | | |
-| 🔴 **W-149** — the consumer's `.fux/node/` gets no `src/`: which shape is the default (committed bundle · `npx` · workspace stub), and do the *no build step* line and the offline promise survive? [detail](open/W-149-the-consumer-gets-no-source.md) | 2026-09-12 | 0d |
-| ↳ **blocks:** nothing else in the queue — the vendoring works today; this decides what a consumer commits, and what two records may keep claiming | | |
 
 ---
 
@@ -48,7 +46,6 @@ description: "The single live work queue, two lanes, plus the Blocked-on-Arpit i
 - 🟡 **W-140** · `agent`, waiting on Arpit's `--hops` ruling — **1 code row left**: a runner-race flake **not reproduced in 11 attempts**, deliberately unchanged. 20 closed. [detail](open/W-140-guide-authoring-defects.md)
 - 🔴 **W-148** · `arpit` — what the two readers still owe: CI cannot reach the golden corpora, Node's latency has no instrument, and the renderer split is staged. [detail](open/W-148-what-the-two-readers-still-owe.md)
 - 🔴 **W-112** · `arpit` — the vector plane. W-106 closed without a PASS **and cannot produce one**: no corpus carries DENSE-CHUNK's bar. Determinism narrowed to *same embedder build*. [detail](open/W-112-vector-plane.md)
-- 🔴 **W-149** · `arpit` — the consumer gets no source: `.fux/node/` ships bundled code, run by `npx` or as a monorepo workspace. Three shapes, one call; decision 6 and the offline promise both bear on it. [detail](open/W-149-the-consumer-gets-no-source.md)
 
 ### testing
 

@@ -2,13 +2,13 @@
 type: ADR
 name: ADR-NODE-SEARCH
 title: "ADR-NODE-SEARCH (0155) — the Node read plane: one index, two readers, three arms"
-description: "Why a Node reader exists, what it may and may not do, and the decisions that keep it from becoming a second product: the _format version policy, the never-fetch rule, the url: verdict asymmetry, the shared tool-description file, and the three places where Node is deliberately a SUBSET of Python rather than a copy — the derived graph plane, the accelerator label, and the decoder boundary."
+description: "Why a Node reader exists, what it may and may not do, and the decisions that keep it from becoming a second product: the _format version policy, the never-fetch rule, the url: verdict asymmetry, the shared tool-description file, and the three places where Node is deliberately a SUBSET of Python rather than a copy — the derived graph plane, the accelerator label, and the decoder boundary. Decisions 13-16 carry the SHIPPING shape, ruled AND BUILT on 2026-09-12: the consumer gets a published artefact rather than source, the bundle is built at publish time into both registries, a monorepo is auto-detected and wired up, and the .fux/fux shim resolves the binary across five package managers."
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node]
+owns: [node, src/fux/store/nodebundle.py]
 laws: [L1, L3, L4, L6]
-ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md)"
+ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
 ---
 
@@ -109,6 +109,11 @@ connection's resolved `[mcp] top`.
 Superseding `search-v3.md` §6.4's *one ESM file*. Phase 4's freshness test maps
 each Python module to its Node twin, which needs more than one file, and a
 6 000-line `.mjs` is unreviewable.
+
+⚠ **This decision governs what is AUTHORED, and since 2026-09-12 that is no
+longer the same thing as what SHIPS** — see decision 13. `node/` stays many
+files and `tests/test_node_twins.py` is unchanged; the consumer receives one
+bundled artefact. The rule stands; its reach narrowed.
 
 ✅ **That test landed 2026-09-12: `tests/test_node_twins.py`.** The map is
 derived three ways in order — the path rule (`x/y.mjs` → `src/fux/x/y.py`, or
@@ -277,6 +282,255 @@ internally consistent, and the shared descriptions file held only the
 descriptions, not the handlers. `node_arm.py::compare_mcp` now drives both over
 one stdio session per run.
 
+**13. 🔴 The consumer gets NO SOURCE. `.fux/node/` carries a published
+artefact, never a copy of `node/`.** RULED by Arpit 2026-09-12 and **BUILT the
+same day** (W-149, closed).
+
+> *"`src` is not needed for the consumer. It should just be the bundled code
+> which needs to be executed on the system."*
+
+Two shapes, both shipping, consuming the same published artefact:
+
+| | `.fux/node/` holds | offline | how it runs |
+|---|---|---|---|
+| **A**, the default | `package.json` · the bundled `fux.mjs` · `mcp-tools.json` · `README.md` | **yes** | the `.fux/fux` shim — decision 16 |
+| **C**, a monorepo | `package.json` only, declaring `fux-engine@<version>` | after install | the shim, which resolves the installed bin |
+
+**What shipped.** `fuxdir._packaged_node_files` returns the four-file payload;
+`ensure_node_reader(root, shape=...)` writes the declared shape and
+`_prune_node_reader` deletes everything else under `.fux/node/`, **`node_modules/`
+excepted** — that directory holds shape C's installed reader, and deleting it
+would leave a manifest pointing at nothing. **The shape is read back OFF the
+directory** (`node_shape`: shape C's manifest declares a `fux-engine`
+dependency and shape A's never does), so there is no fifth config file and a
+consumer who switches by hand gets the shape they actually created.
+
+**What it replaces:** `_packaged_node_files` walked the whole packaged tree, so
+`fux setup` wrote **47 files, 223 KB, 5 484 lines** into a consumer's git, and
+`ensure_node_reader` **pruned nothing** — every version bump re-diffed all of
+them. The consequence block below recorded the growth and asked no question of
+it; this is the answer.
+
+⚠ **The prune is part of the decision, not a follow-up.** Without it, every
+repository that ever ran `fux setup` keeps its 37-47 stale files for good.
+
+🔴 **And the VERSION is not a sufficient trigger for it — found by running the
+migration on fux's own repository, not by reading the code.**
+`ensure_node_reader` rewrote on a version difference, so a `.fux/node/` written
+by *this* version before the payload changed shape kept its 44 modules: the
+version matched, nothing was rewritten, and the prune never ran. A consumer
+upgrading across a release is covered; **anyone tracking one alpha from git is
+not, and fux itself was not.** So the trigger is version **or shape or LAYOUT** —
+`_layout_is_stale` compares the file-name set against the shape's declared one,
+which is cheap enough for the head of every ingest because it builds nothing.
+✅
+It ships with the rest, and `tests/test_setup_node.py` asserts both halves — the
+tree goes and `node_modules/` stays. **The test that used to assert the opposite**
+(*"writes the whole tree, not just the entry point"*, naming
+`src/query/bm25f.mjs` by hand) **is the same file, rewritten**, which is the only
+honest way to record that a decision reversed.
+
+**14. 🔴 The bundle is built when fux PUBLISHES, and ships inside BOTH
+distributions.** RULED by Arpit 2026-09-12 and **BUILT the same day**.
+
+> *"It should be bundled and then published in Python as well as in the npm
+> package."* — *"It shouldn't be bundled at the consumer end."*
+
+- **One build, two registries.** The bundle exists before either job in
+  [`publish.yml`](../../.github/workflows/publish.yml) runs, off the single
+  `release: published` trigger. ⚠ The halves are not symmetric — PyPI is
+  automatic via OIDC, npm **stages and waits for a human** — so a bundle built
+  per-job could ship two registries disagreeing.
+- ✅ **This is why *"no build step — a build step is a dependency"* survives.**
+  The line narrows to **the consumer's end**, which is the end it was ever
+  about. Fux's release has a bundler; nobody running `fux setup` does.
+- **The bundler is fux's own, zero-dependency, and deterministic** — same
+  sources, byte-identical bundle. [L1](0003_LAW-1-zero-cost.md) would permit a
+  third-party one; nothing needs it. ⚠ **Determinism here is a promise adopted
+  voluntarily, not [L3](0005_LAW-3-deterministic.md) reaching a build
+  artefact** — L3 binds the index. Stated so nobody later cites the wrong
+  authority for it.
+  ✅ **What it is:** [`src/fux/store/nodebundle.py`](../../src/fux/store/nodebundle.py),
+  ~300 lines of stdlib. Each source module becomes an **IIFE returning its
+  exports**, emitted in topological order with a path tie-break; `node:` imports
+  are hoisted and deduplicated; the entry's shebang moves to line 1.
+  🔴 **It is not a parser, and it REFUSES rather than skipping.** A flat
+  concatenation would have to rename — `signals`, `isArchivedLoc`, `STOPWORDS`,
+  `DEPTH` and `K` are each exported by two different modules — and a renaming
+  bundler without a real JS parser is a silent-wrong-answer machine. So every
+  form the tree does not use (`export default`, `export … from`, a bare package
+  import, a cycle, a builtin name bound two ways) raises `FuxError` **with the
+  offending line in it**. A dropped statement compiles and answers differently,
+  which is the one failure mode a build step may never have.
+  ✅ **And the test is on ANSWERS, not bytes** (`tests/test_node_bundle.py`):
+  the bundle and the module tree are run through `find`, `ask`, `answer`,
+  `--version` and a real MCP session and must agree exactly. Byte-identity
+  across builds is asserted too, but it is the weaker claim.
+- 🔴 **A checkout has no bundle, and must not quietly fall back to the module
+  tree.** `_node_source()` resolves `node/` beside `src/` when the wheel's
+  template is absent; there, `fux setup` **builds the bundle or refuses with a
+  message saying so.** Silently vendoring `node/src/**` in development and the
+  bundle in release is two products wearing one version.
+  ✅ **Built both ways round.** In a checkout `_packaged_node_files` calls the
+  bundler; in a release install it copies the payload — and if that payload ever
+  contains a `src/` file it **refuses**, naming L10, rather than writing fux's
+  source into a repository.
+  ✅ **The wheel gets it from a hatchling build HOOK**
+  ([`hatch_build.py`](../../hatch_build.py)), not a static `force-include`: a
+  generated file cannot be named in an include list without somebody having
+  remembered to generate it first. `pyproject.toml` no longer mentions
+  `node/src` at all, which is this record's own veto check.
+- **The npm package's own shape changes with it** — `exports` leaves
+  `./src/index.mjs`, `files` drops `"src"`. A published-surface change, so it
+  lands in the next alpha rather than being back-fitted to `2.0.0-alpha.7`.
+  ✅ **Both now name `fux.mjs`, and one file therefore carries two surfaces.**
+  `node/fux.mjs` re-exports `open` and `Index` from `src/index.mjs` and runs
+  `main()` **only when it is the program** — the standard ESM entry check,
+  through `realpath` so a package manager's `.bin` symlink resolves to the same
+  file. 🔴 **Unconditional invocation was safe while the library lived in a
+  separate file and became a bug the moment one bundle served both**: `import
+  "fux-engine"` would have parsed the caller's `process.argv` and set their exit
+  code. Asserted directly, because nothing else would notice.
+  ✅ **`mcp-tools.json` is now RESOLVED rather than addressed.** It sits two
+  directories above `src/verbs/mcp.mjs` in this repo and beside the bundle in a
+  consumer's, so a constant path works in one shape and throws `ENOENT` in the
+  other — and the other is the one people run.
+  ✅ **`publish.yml` builds it ONCE**, in the `build` job before either
+  registry job exists, uploads it as an artifact, and stages npm from
+  `node/dist` rather than from `node/`. `scripts/check-version-parity.py
+  --with-bundle` asserts the built bundle's header and `VERSION` against
+  `src/fux/__init__.py` — the bundle is a **derivation**, so what is checked is
+  the derivation and not a fifth hand-written site.
+
+**15. 🔴 A monorepo is AUTO-DETECTED and wired up — and the dot path is
+MEASURED to work.** RULED by Arpit 2026-09-12 (*"Auto detect. Auto detect and
+set it up as well."*) and **BUILT the same day**. Grounded in
+[`2026-09-12-workspace-dotpath-probe`](../../work/regression/2026-09-12-workspace-dotpath-probe/report.md)
+and [`2026-09-12-yarn-berry-probe`](../../work/regression/2026-09-12-yarn-berry-probe/report.md).
+
+Detected in this order, first hit wins — `setup.py::detect_workspace`:
+
+| signal | shape |
+|---|---|
+| Yarn Berry (`.yarnrc.yml`, or `packageManager: yarn@≥2`) with `nodeLinker` **unset or `pnp`** | **A** — no `node_modules` exists to resolve from |
+| Yarn Berry with `nodeLinker: node-modules` | **C**, yarn — the bin hoists to the root, MEASURED |
+| `workspaces` declared as an **object** (`{packages: […]}`) | **A** — an array splicer cannot extend an object |
+| `pnpm-workspace.yaml` with `packages:` | **C**, pnpm |
+| root `package.json` `workspaces` array | **C**, npm / yarn 1 / bun |
+| none of the above | **A** |
+
+Then `.fux/node` is added to that manifest's workspace list and
+`.fux/node/package.json` declares `fux-engine@<version>`.
+
+🔴 **THE ORDER ABOVE IS NOT THE ORDER THIS DECISION FIRST CARRIED, AND THE
+FIRST ONE WAS WRONG.** It read *"`workspaces` array → C"* **above** *"Berry →
+A"*, and a Berry repository declares `workspaces` in `package.json` exactly as
+npm does — so a literal first-hit reading gave every Berry repo shape C,
+including the PnP ones this decision's own warning said must not have it. **The
+record contradicted itself inside one file, which is the W-83 class of failure
+and no mechanical check here can see it** (`CLAUDE.md` §Law zero). Corrected in
+the change that built it: the Berry test runs **first**, and
+`tests/test_setup_workspace.py` pins the order.
+
+✅ **The probe settles the question this was gated on, and refutes the hazard as
+it was written.** *"Several package managers' glob handling skips
+dot-directories"* was **wrong**: npm, pnpm, yarn 1 and bun all accept
+`.fux/node` as a workspace project when it is declared — pnpm says so itself
+(`Scope: all 3 workspace projects` against `all 2` on the control).
+
+🔴 **And the control is what makes the wiring load-bearing:** a root manifest
+declaring only `packages/*` picks `.fux/node` up in **none** of the four. An
+existing monorepo does not acquire the reader by having workspaces. *"Set it up
+as well"* is the decision, not a courtesy.
+
+⚠ **Why detection does not conflict with *declared, never detected*.**
+[ADR-FETCHER](0117_fetcher.md) decision 5, and W-86 fork E's refusal of decoder
+auto-detection, both govern **ingest** — where detection would make **the
+index** a function of the environment, which is what
+[L3](0005_LAW-3-deterministic.md) forbids. **`fux setup`'s scaffolding is not
+the index.** Neither precedent reaches it and no law does; W-149 proposed
+*declared* on that mistaken reading and records the correction.
+
+Four constraints the decision carries:
+
+1. ⚠ **The manifest edit belongs to `setup` ALONE.** `ensure_node_reader` runs
+   at the head of **every ingest** via `ensure_layout`
+   ([ADR-DOTFUX](0102_fux-directory.md)), whose own rule is that a no-op ingest
+   produces a no-op diff. An ingest that rewrites the consumer's
+   `package.json` breaks it.
+   ✅ **Enforced by STRUCTURE, not by a comment asking nobody to call it**:
+   `detect_workspace` and `wire_workspace` live in `setup.py`, and
+   `ensure_layout` takes the answer as a keyword (`node_shape=`) it never
+   computes. `test_an_ingest_never_edits_the_consumers_manifest` asserts it
+   where it could actually be violated.
+2. **The edit is format-preserving** — existing indent, key order and trailing
+   newline kept. This is fux's **first write to a file it does not own and a
+   team reviews**; `fux hooks` writes `.git/`, which is machinery. A one-line
+   addition arriving as a whole-file reformat is a bad diff in someone's PR.
+   ✅ **A splice, never a re-serialize.** One array editor handles the JSON
+   key (`"workspaces":`) and pnpm's bare one (`packages:`), plus the YAML block
+   sequence, copying the last element's own indentation and quoting style.
+   Asserted on 2-space, 4-space, tab, single-line and empty arrays.
+3. **Idempotent, and it says what it touched.** Re-running `setup` never adds
+   the entry twice, and the run names the manifest it edited.
+   ✅ `fux setup` prints `monorepo detected: declared .fux/node in <manifest>`
+   and the install command for the manager whose lockfile is actually present.
+4. **Half-configured is not a state.** A monorepo detected but not safely
+   editable — comments in the JSON, an unknown shape, a read-only file — gets
+   **shape A**, and `fux doctor` says why. A workspace stub with nothing
+   resolving it is worse than no workspace.
+   ✅ Every refusal path carries its reason to the consumer's terminal, and
+   ⚠ **a manifest fux cannot PARSE but which names `workspaces` still counts as
+   a monorepo** — returning "no monorepo" there would write shape A with nothing
+   said about it. `doctor`'s `node reader` row additionally fails when a shape-C
+   manifest is declared and no `node_modules/.bin/fux` resolves anywhere the
+   shim would look, which is the half-configured state observed rather than
+   assumed away.
+
+✅ **Yarn Berry is MEASURED now, and the second probe this decision owed is
+filed** ([`2026-09-12-yarn-berry-probe`](../../work/regression/2026-09-12-yarn-berry-probe/report.md),
+Yarn 4.1.0). Two findings:
+
+- **`.fux/node` links in Berry too**, in both linkers — `yarn workspaces list`
+  names it. The dot path is now fine in **five of five** managers, and W-149's
+  hazard 3 is wrong in every one of them.
+- 🔴 **The boundary is the LINKER, not the manager.** `nodeLinker:
+  node-modules` hoists `fux` to the workspace **root** — rung 3, exactly where
+  npm and yarn 1 put it — so shape C works unmodified. **PnP has no
+  `node_modules` anywhere**, by design, so neither install rung resolves and
+  shape A is required. ⚠ **Berry's default IS PnP**, so an unset key is read as
+  PnP: guessing the other way would wire a workspace whose reader nothing can
+  resolve, which is constraint 4's state in a new costume. `corepack yarn fux`
+  is not a fallback either — under PnP a binary is reached through Yarn's own
+  resolver, which a three-line `/bin/sh` shim cannot consult.
+
+**16. 🔴 `.fux/fux` RESOLVES the binary in three rungs; it no longer assumes a
+path.** RULED 2026-09-12 and **BUILT the same day**. Measured, same probe.
+
+| manager | root `node_modules/.bin/fux` | `.fux/node/node_modules/.bin/fux` |
+|---|---|---|
+| npm | present | absent |
+| yarn 1 | present | present |
+| pnpm | **absent** | present |
+| bun | **absent** | present |
+
+npm and yarn hoist the bin to the workspace root; **pnpm and bun do not.** So
+the shim tries, in order:
+
+1. `node .fux/node/fux.mjs` — shape A's vendored bundle
+2. `.fux/node/node_modules/.bin/fux` — pnpm, bun, yarn
+3. `node_modules/.bin/fux`, walking up to the workspace root — npm, yarn
+
+**The shim is therefore the one entry point correct in every shape, and the one
+a README may name.** Documenting `node_modules/.bin/fux` would be right for half
+the ecosystem and silently wrong for the other half. ✅ ADR-DOTFUX's `fux` row
+is amended with it, and both READMEs name the shim and nothing else.
+
+✅ **Yarn Berry adds a row and changes no rung** — `node-modules` resolves at
+rung 3, PnP at none, which is why PnP takes shape A and rung 1. The shim's
+failure message says so, and names the one-line `.yarnrc.yml` change that would
+make shape C available.
+
 ### Consequences
 
 - **`fux` names two binaries when both are installed globally.** `--version`
@@ -294,6 +548,13 @@ one stdio session per run.
   points at `fux --version`. It **reads the shim's shebang and never executes
   it**: doctor does not run a binary the environment chose for it. Registered
   in [ADR-DOCTOR](0154_doctor.md) §2.
+- ✅ **The 47-file vendored tree is GONE as of 2026-09-12 — decisions 13-16
+  replaced it and W-149 built them.** The paragraph below is kept as the
+  measurement that produced the ruling rather than rewritten; **it describes
+  what shipped until that day and is not a description of the current state.**
+  What a consumer's tree holds now is **four files, 244 KB** in shape A
+  (`fux.mjs` · `package.json` · `mcp-tools.json` · `README.md`) or **one** in
+  shape C, and `fux setup` **prunes** whatever an older engine left behind.
 - - **The vendored reader is 47 files / 336 KB** as of 2026-09-12, against the
   37 files / 196 KB W-107 measured before the config readers and the graph
   walk landed. ⚠ **Still ~3 % of this repo's 9.6 MB index and still smaller
@@ -305,10 +566,22 @@ one stdio session per run.
 - **A second implementation is a second thing to keep true.** The arm runs on
   every push, across three OSes and two Node versions, because the whole reason
   this record exists is that two libms disagree.
-- **The arm covers five surfaces since 2026-09-12, and it covered one before.**
+- ✅ **The sixth surface is BUILT: the BUNDLE.** `node_arm.py --bundle-cap`
+  builds the published artefact and compares it against the module tree it came
+  from — `find`, `ask`, `answer`, the MCP server over a real stdio session, and
+  the library export, on whole parsed payloads. **0 discordant on this repo's
+  own index.** It closes decisions 9-12's own lesson applied to itself: *a
+  transcription is only as true as the surface the instrument is aimed at*, and
+  shipping one artefact while measuring another was that failure in a new
+  costume. ⚠ **Determinism is the weaker claim and is not the one that matters
+  here**: a bundler can emit bytes that are reproducible, compile, run, and
+  answer differently. The arm and `tests/test_node_bundle.py` both compare
+  ANSWERS.
+- **The arm covers six surfaces since 2026-09-12, and it covered one before.**
   `find` and `ask` · `explain`/`graph`/`path` as whole parsed payloads ·
   the MCP server over a real stdio session · `fux.api` against
-  `node/src/index.mjs`. Every one of the three defects in decisions 9-12 lived
+  `node/src/index.mjs` · **the published bundle against the module tree**.
+  Every one of the three defects in decisions 9-12 lived
   on a surface the arm did not reach, and each was found on the first run after
   it did. ⚠ **`verify`, `--why`, `--receipt` and `--journal` are still
   uncovered**, because they have no Node twin at all (W-107 R6) — that is a
@@ -341,9 +614,29 @@ one stdio session per run.
 - [PRE-REGISTRATION-NODE-2](../../work/benchmark/PRE-REGISTRATION-NODE-2.md) (frozen,
   sha `2ea40303…`) · [PRE-REGISTRATION-NODE](../../work/benchmark/PRE-REGISTRATION-NODE.md)
   (frozen, superseded)
-- [W-148](../../work/open/W-148-what-the-two-readers-still-owe.md) — what W-107
+- [`2026-09-12-workspace-dotpath-probe`](../../work/regression/2026-09-12-workspace-dotpath-probe/report.md)
+  — decisions 15 and 16, measured across npm / pnpm / yarn 1 / bun. **A surface
+  capture**, so no classification and no per-query rows; Yarn Berry is named as
+  unmeasured in its §4
+- [`src/fux/store/nodebundle.py`](../../src/fux/store/nodebundle.py) — the
+  bundler · [`hatch_build.py`](../../hatch_build.py) — the wheel's build hook ·
+  [`tests/test_node_bundle.py`](../../tests/test_node_bundle.py) — equal
+  ANSWERS, not equal bytes · [`tests/test_setup_workspace.py`](../../tests/test_setup_workspace.py)
+  — the detection table and the manifest diff
+- [`2026-09-12-yarn-berry-probe`](../../work/regression/2026-09-12-yarn-berry-probe/report.md)
+  — decision 15's second probe: Berry links `.fux/node`, and `nodeLinker`
+  decides the shape. **A surface capture**, so no classification and no
+  per-query rows
+- **W-149 is CLOSED** (2026-09-12) — decisions 13-16's build item. Its outcome
+  is in [`work/IMPLEMENTATION.md`](../../work/IMPLEMENTATION.md); the item file
+  is deleted, per OPEN-WORK rule 2, and is **named, never cited** ·
+  [W-148](../../work/open/W-148-what-the-two-readers-still-owe.md) — what W-107
   could not close. ⚠ **W-107 itself is retired and is NAMED, never cited**
   (`CLAUDE.md` §"Archive is not evidence")
+- npm workspaces <https://docs.npmjs.com/cli/using-npm/workspaces> · pnpm
+  workspaces <https://pnpm.io/workspaces> · Yarn workspaces
+  <https://yarnpkg.com/features/workspaces> · Bun workspaces
+  <https://bun.com/docs/install/workspaces>
 - [ADR-RANKING](0111_ranking.md) decision 8a · [ADR-DOTFUX](0102_fux-directory.md) · [ADR-MCP](0136_mcp.md) · [ADR-URL-FRESHNESS](0149_url-freshness.md)
 - RFC 7693 (BLAKE2) <https://www.rfc-editor.org/rfc/rfc7693>
 - UAX #29, text segmentation <http://www.unicode.org/reports/tr29/>

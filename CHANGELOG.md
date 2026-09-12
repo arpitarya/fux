@@ -10,6 +10,37 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Changed
 
+- 🔴 **BREAKING for npm consumers, and a smaller diff for everyone else: the
+  Node reader ships as ONE generated file.**
+  ([ADR-LAW-10](docs/adr/0012_LAW-10-bundled-output.md),
+  [ADR-NODE-SEARCH](docs/adr/0155_node-search.md) decisions 13-16.)
+  - **`.fux/node/` is four files instead of 47** — `fux.mjs` (generated),
+    `package.json`, `mcp-tools.json`, `README.md`. It was fux's own `.mjs`
+    module tree, committed into your repository, editable in place with nothing
+    able to detect that it had been.
+  - ⚠ **`fux setup` now DELETES the old tree** when it upgrades you. If you had
+    edited anything under `.fux/node/src/`, that edit is gone — which is the
+    point: a hand-edited ranker in a consumer's repo is a silent fork of the
+    engine.
+  - ⚠ **npm: `exports` is `./fux.mjs`** and the tarball no longer carries
+    `src/`. `import { open } from 'fux-engine'` is unchanged; a **deep import**
+    like `fux-engine/src/query/rank.mjs` was never supported and now cannot
+    resolve.
+  - **In a monorepo, `fux setup` detects the workspace and wires `.fux/node`
+    into it** — one line added to your root `package.json` or
+    `pnpm-workspace.yaml`, format-preserving, never twice, and it tells you
+    which file it edited and which `install` to run. npm, pnpm, yarn 1, bun and
+    Yarn Berry with `nodeLinker: node-modules` get this shape; Berry under PnP
+    gets the offline bundle, because PnP has no `node_modules` for the shim to
+    resolve from. `fux setup` says which it chose and why.
+  - **`.fux/fux` is the command to use** — it resolves the reader in three
+    rungs, because npm and Yarn hoist the `fux` binary to the workspace root and
+    pnpm and bun do not. Do not hard-code `node .fux/node/fux.mjs` in a script.
+  - **No build step on your machine.** The bundle is built when fux publishes
+    and ships inside both the PyPI wheel and the npm tarball, from one build.
+  - `fux doctor`'s `node reader` row now reports the shape, a stale `src/` tree,
+    and a workspace manifest with nothing installed behind it.
+
 - 🔴 **An unknown key in `fux.toml` is now REFUSED, not ignored**
   ([ADR-CONFIG](docs/adr/0113_config.md) decision 14, W-122; the defect was
   W-140 row 8). A misspelled key used to parse and do nothing, so your setting
