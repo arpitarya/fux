@@ -42,6 +42,39 @@ have never been separable in any number this project has filed.**
 | **sealed subset** | [`seal.py`](seal.py) | **contamination** — a query nobody who authored an artifact has read |
 | **relevance audit** | [`relevance_audit.py`](relevance_audit.py) | whether `recall@k` needs new annotation at all, or the golden schema already carries it |
 | **the blind brief** | [`BLIND-AUTHOR-BRIEF.md`](BLIND-AUTHOR-BRIEF.md) | the auditable instructions for the `unanswerable` class — **committed because its own author was not blind** |
+| **the verdict rule** | [`verdict.py`](verdict.py) | the **exact two-sided binomial** on the discordant pairs — the one place a paired result is adjudicated, so no control can hard-code a bar again |
+| **the resolution table** | [`resolution.py`](resolution.py) | what net difference is distinguishable from chance at each discordant count — the arithmetic `verdict.py` reuses |
+| **prior probes** | [`priors-probes.jsonl`](priors-probes.jsonl) | current-seeking vs history-seeking intent, truth read off `supersedes:` / `archived=true` declarations |
+| **the `heading` control** | [`heading_control.py`](heading_control.py) | 🔴 **retired.** Kept as the evidence for [VERDICT-W142](../../work/regression/2026-09-12-reaim-and-instruments/VERDICT-W142.md), not run again |
+| **the body control** | [`body_control.py`](body_control.py) | 🔴 **retired with it** — and it is the one that found *why*: it **prints its endpoint's corpus base rate before it runs an arm** |
+| **table `flen`** | [`table_flen.py`](table_flen.py) | whether table cells inflate a document's length, and whether removing them moves a ranked list |
+| **the graded table set** | [`w144_graded.py`](w144_graded.py) | *is the new order **better***, truth from prose density, with an `inverse` positive control and a `placebo` |
+| **the fence/depth arms** | [`w115_instrument.py`](w115_instrument.py) | W-115's heading grammar and key-depth cap, two arms patched at one seam each, with a `selftest` that is 22c(b)'s headroom proof |
+
+## 🔴 The endpoint is the thing that fails, not the field
+
+**Three controls were built against the same endpoint and all three returned a
+stable number about nothing.** C4 asked whether a heading-matched distractor
+enters the top-k and got 0 in both arms; the rebuild asked *how many* and moved
+a net of 5; the re-aim at `bm25f.body` moved a net of **1 over 83 discordant
+pairs, `p = 1.0000`**.
+
+**The reason is arithmetic.** 392 of 1 001 documents at `rung-01000` are
+`ext/sibling/`, so **a top-5 drawn at random holds 1.96 of them** — and every arm
+of both fields, off arms included, observed **2.06-2.14**. The count was
+measuring **corpus composition**.
+
+**So, for any control added here:**
+
+1. **Compute the endpoint's base rate and print it before the first arm.**
+   `body_control.py` does; copy it.
+2. **An endpoint that cannot leave its base rate is not a measurement**, however
+   many queries move — 83 did here.
+3. **Prove the arm works separately from the endpoint.** Seed hits fell
+   **272 → 158** with `body` off, which is what makes *"the endpoint is inert"*
+   a finding rather than a broken configuration.
+
+[VERDICT-W142](../../work/regression/2026-09-12-reaim-and-instruments/VERDICT-W142.md).
 
 ### The placebo
 
@@ -70,7 +103,12 @@ python3 tools/quality-controls/placebo.py <corpus>/.fux/enrich /tmp/placebo
 
 ### The decoys
 
-Fifteen questions with **no correct answer in the playground's ten documents**.
+Fifteen questions with **no correct answer in the ten documents they were
+authored against** — `fux-playground`'s, retired by
+[L9](../../docs/adr/0011_LAW-9-environments.md) on 2026-09-11. ⚠ **A decoy is
+only unanswerable relative to a corpus**, so this set says nothing about the
+golden ladder and may not be run against it: re-authoring for a new corpus is
+authoring, and it inherits the least-blind contributor.
 
 ⚠ **CORRECTED 2026-08-28 (Arpit's ruling). This section made two claims and
 both were wrong.** They are left visible rather than quietly rewritten, because
@@ -99,7 +137,7 @@ control**. That was never in question. What they may not be is the scored
 
 ⚠ **A decoy is NOT an `unanswerable` golden**, and the difference is role, not
 content. A decoy is a diagnostic and is never scored; an `unanswerable` query is
-**inside the gate** ([ADR-QUALITY](../../docs/adr/0044_quality-contract.md)
+**inside the gate** ([ADR-QUALITY](../../docs/adr/0141_quality-contract.md)
 decision 5) and its handling is part of the headline number. Promoting these
 fifteen would put informed material in a slot whose only value is that its
 author had not looked. **The class is authored separately** —
