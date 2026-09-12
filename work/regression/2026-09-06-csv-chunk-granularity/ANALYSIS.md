@@ -1,3 +1,10 @@
+---
+type: Analysis
+run: 2026-09-06-csv-chunk-granularity
+description: "What the CSV chunk-granularity run establishes, and what it does not."
+date: 2026-09-06
+---
+
 # ANALYSIS — what this run actually establishes, and what it does not
 
 ## What it establishes

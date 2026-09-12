@@ -15,17 +15,19 @@ timestamp: 2026-08-27T00:00:00Z
 
 ## §1 — For humans
 
-> **This record is the RATIONALE for law L8. It is not the law.**
-> The normative text lives in
-> [`CLAUDE.md` §Non-negotiable constraints](../../CLAUDE.md), and that is its
-> only home. This record explains why the law exists, what it has cost, how its
-> wording has moved, and what would reopen it — **without restating it**, per
-> [ADR-LAWS](0001_LAWS.md) decision 3.
+> **This record is the HOME of law L8 — §2's first block IS the law**, and the
+> rest of this record is its rationale: why it exists, what it has cost, how its
+> wording has moved, and what would reopen it.
+> [`CLAUDE.md` §Non-negotiable constraints](../../CLAUDE.md) carries a
+> **generated** copy, held byte-equal by
+> [`tests/test_claude_md_laws.py`](../../tests/test_claude_md_laws.py) —
+> [ADR-LAW-0](0002_LAW-0-authority.md) decisions 1 and 5, on Arpit's ruling of
+> 2026-09-06. ⚠ **`CLAUDE.md` is not the source any more**; amend the law here.
 
 **The one-line case.** L1–L7 all govern what fux does to documents. None of them reached a record of what somebody went looking for.
 
 **The handle:** *A use record is never committed* — the one-line form from [ADR-LAWS](0001_LAWS.md)'s
-table. ⚠ **A handle is not the law**; read the law at its home.
+table. ⚠ **A handle is not the law**; read the law in §2 below.
 
 **The gap this filled.** [L2](0004_LAW-2-content-never-durable.md) governs *corpus content* — and a query is not content, however precisely it describes one. So a durable log of questions and answers sat outside every law fux had, while a durable use record **already existed** (`.fux/runtime/last-cited.json`) and there was live pressure to grow it.
 
@@ -58,34 +60,36 @@ table. ⚠ **A handle is not the law**; read the law at its home.
 
 ```mermaid
 flowchart LR
-    C["CLAUDE.md §Non-negotiable constraints<br/>(the only normative text)"]
-    N["ADR-LAWS<br/>(the handles L1..L8)"]
-    R["ADR-LAW-8<br/>(this record — rationale, history, veto)"]
+    R["ADR-LAW-8<br/>(THIS RECORD — states law L8)"]
+    N["ADR-LAWS<br/>(the handles L0..L9 — routes, never states)"]
+    C["CLAUDE.md §Non-negotiable constraints<br/>(GENERATED from the records · test-bound)"]
     B["records bound by L8<br/>(cite the number, never restate)"]
-    C --> N --> R
+    R --> C
+    N --> R
     N --> B
-    R -. "explains, never restates" .-> C
+    C -. "regenerate: scripts/gen-laws.py --write" .-> R
 ```
 
 <details>
 <summary><b>ASCII twin</b> — the same diagram, for terminals, diffs, and any reader without a Mermaid renderer</summary>
 
 ```text
+       ADR-LAW-8   <-- THIS RECORD states law L8
+            |
+            | scripts/gen-laws.py  (test-bound, byte-equal)
+            v
    CLAUDE.md §Non-negotiable constraints
-        (the only normative text)
-                   |
-                   v
+        (GENERATED -- not the source)
+
                ADR-LAWS
-          (the handles L1..L8)
+     (the handles L0..L9 -- routes, never states)
                    |
           +--------+---------+
           v                  v
-      ADR-LAW-8            records bound by L8
-   (rationale, history,   (cite the number,
-    veto -- never the      never restate)
-    law itself)
-          :
-          +.... explains, never restates ....> CLAUDE.md
+      ADR-LAW-8          records bound by L8
+   (the law, plus its     (cite the number,
+    rationale, history     never restate)
+    and veto)
 ```
 
 </details>
@@ -93,6 +97,35 @@ flowchart LR
 ---
 
 ## §2 — For agents
+
+### The law (normative)
+
+🔴 **This block IS law L8.** It is the only normative statement of it, and
+[`CLAUDE.md` §Non-negotiable constraints](../../CLAUDE.md) carries a **generated**
+copy of it — rendered from these bytes by
+[`scripts/gen-laws.py`](../../scripts/gen-laws.py) and held byte-equal by
+[`tests/test_claude_md_laws.py`](../../tests/test_claude_md_laws.py).
+Amend it **here**, then run `python scripts/gen-laws.py --write`.
+Amending a law needs Arpit's ruling, named in this record
+([ADR-LAW-0](0002_LAW-0-authority.md) decision 3).
+
+<!-- LAW-TEXT:BEGIN L8 -->
+- **L8** · **A use record is never committed.** Fux may record what was asked
+  and what was answered — **in plaintext, with no law-level size bound** — and
+  may print a per-answer provenance receipt on stdout. **Every durable trace of
+  use lives on a gitignored path and never reaches a committed byte.**
+  ⚠ **Gitignored is the test, not `.fux/`.** `.fux/index/`, `sources/`,
+  `fetchers/`, `decoders/`, `enrich/`, `tune.toml`, `output.toml` and
+  `.fuxignore` are all **committed**; `.fux/runtime/` is the only derived
+  directory under it. *"Inside `.fux/`"* is not the rule and would put a journal
+  beside the committed index. **L2 governs the corpus; L8 governs the record of
+  who went looking in it** — a query is not content, and no other law reached
+  it. ⚠ **Ruled three times on 2026-08-27 (Arpit): written, reverted, then
+  narrowed to commits alone.** Hashing, a size bound, the stdout prohibition and
+  **the transmission clause** were all in earlier forms and none survives;
+  [ADR-LAWS](0001_LAWS.md) decision 8 carries each pass and what it
+  traded away — **including the gap the last one leaves open.**
+<!-- LAW-TEXT:END L8 -->
 
 ### Context
 

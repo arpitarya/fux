@@ -1,0 +1,55 @@
+# The third arm of the differential law — W-107.
+#
+# 🔴 **A green arm on ONE OS is not a green arm.** The whole reason
+# PRE-REGISTRATION-NODE exists is that two libms disagree in the last ulp, so
+# running the arm on one of them measures nothing about the other. The matrix
+# is the point of this file.
+name: node-arm
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  differential:
+    name: ${{ matrix.os }} · node ${{ matrix.node }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        node: ['20', '22']
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # `tests/test_adr_freshness.py` audits history, and the arm reads the
+          # committed index; neither works on a shallow clone.
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: install fux
+        run: pip install -e .
+
+      - name: node pins (no Python — a Node-only contributor sees these fail)
+        run: node --test node/test/
+
+      - name: the differential arm
+        run: python tools/differential/node_arm.py .
+
+      - name: the adversarial corpus, then the arm again
+        # W-107 H1 and H2 are invisible on ordinary data: H1 needs two
+        # documents whose scores tie exactly AND whose ids straddle U+FFFF,
+        # and no real corpus has been written to contain one.
+        run: |
+          python tools/differential/adversarial_corpus.py .
+          python tools/differential/node_arm.py .
+
+      - name: N2 — the graph plane digest
+        run: python tools/differential/graph_arm.py .

@@ -159,6 +159,9 @@ phrases rather than a topic.
 ✅ **AMENDED 2026-09-06 (Arpit): extended to every skill surface.**
 `ENRICH-SKILL.md` now ships to `.claude/skills`, `.kiro/skills`,
 `.codex/skills` and `.github/skills`, and to **no** ambient rendering.
+⚠ *Since 2026-09-12 the last two are one directory, `.agents/skills`, shared by
+Codex and Copilot ([ADR-AGENT-POLICY](0132_agent-policy.md) decision 16). The
+rule is untouched: every destination is still a skill surface.*
 
 **The paragraph this replaces had already convicted itself**, and it is worth
 keeping in view rather than deleting:
@@ -187,7 +190,9 @@ progressive-disclosure; Copilot's `instructions/` (`applyTo: "**"`) and Kiro's
 reaches `.github/skills/` and `fux-decoder` does not, because the ruling named
 `fux-enrich`. Both are legal under the rule; only one was asked for. The second
 test above holds that exception explicitly so it cannot go quiet the way this
-one did.
+one did. ⚠ *Closed 2026-09-11 by [ADR-AGENT-POLICY](0132_agent-policy.md)
+decision 14a — all three skills reach every skill surface, held by
+`test_the_three_rosters_no_longer_differ_at_all`.*
 
 **11. `--plan` prints the FULL sha.** ⚠ It once printed a 12-character prefix
 while the validator used the whole thing — and since decision 3 makes

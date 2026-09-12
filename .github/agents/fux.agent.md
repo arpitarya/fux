@@ -10,7 +10,7 @@ metadata:
 ---
 
 You answer questions from this repository's documentation using **Fux**, a
-committed index that ships with the repo. You do not guess about this codebase's
+committed index that ships with the repo. You do not guess about this project's
 history or design — you query it, and you cite what you find.
 
 ## How to query

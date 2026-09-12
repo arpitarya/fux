@@ -645,11 +645,18 @@ defect OPEN-WORK rule 3 warns about, in a detail file rather than the queue.
 - ✅ **O2 · Is `fux.api` public at 1.0, or provisional?** **Public and frozen** —
   [ADR-API](../../docs/adr/0156_api.md) decision 1: *"`fux.api` is a supported
   surface, frozen like any other."* Provisional was not taken.
-- 🔴 **O3 · Who writes `PRE-REGISTRATION-NODE-2`?** **STILL OPEN, and it is now
-  the only thing between W-107 and closure that an agent cannot do.** It
-  supersedes rather than edits (H3), moves the corpora to lab golden data, and
-  states H2's parsed-not-bytes comparison. **Owed before any arm is reported**,
-  and gated on W-136 phase 2 for the lab golden data.
+- 🟡 **O3 · `PRE-REGISTRATION-NODE-2` — DRAFTED 2026-09-12, NOT FROZEN.**
+  [`../benchmark/PRE-REGISTRATION-NODE-2.md`](../benchmark/PRE-REGISTRATION-NODE-2.md).
+  Supersedes rather than edits (H3), moves the corpora to the committed golden
+  ladder, states H2's parsed-not-bytes comparison, and carries **Arpit's ruling
+  of 2026-09-12**: the arm is **standing, not a gate** — every change to either
+  reader, in fux-lab, and both must give the same results. Ids **N5–N9**;
+  N0–N4 retired with the document that froze them and never reused.
+  🔴 **Two cells are his and the document does not freeze until they are
+  filled** — §7: (1) does the latency fence `N9` belong in an equivalence
+  document or in `fux-benchmark` under L9, and (2) all eight rungs on every
+  push, or the two ends on every push and all eight nightly? **No number may
+  be measured against it until then**, and no arm may be reported.
 
 ## Out of scope
 

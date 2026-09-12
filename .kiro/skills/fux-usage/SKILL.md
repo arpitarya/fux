@@ -8,7 +8,7 @@ compatibility: Requires the `fux` CLI to be resolvable by one of the four invoca
 
 Fux is a committed BM25F index of this repository's documentation. It ships
 **inside the repo**, so if the repo is here the index is here. Your job is to
-query it rather than guess about this codebase's history or design.
+query it rather than guess about this project's history or design.
 
 ## 1. Resolve the command FIRST - this is the step that gets skipped
 

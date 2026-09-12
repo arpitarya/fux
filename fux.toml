@@ -70,7 +70,7 @@ shards = 256
 #
 #   claude   -> .claude/skills/fux-archived-results/SKILL.md
 #   codex    -> AGENTS.md at the repo root (its ONLY always-on surface)
-#               + .codex/skills/ for the operating manual and the decoder guide
+#               + .agents/skills/ for the skills (shared with copilot)
 #   copilot  -> .github/agents/fux.agent.md
 #               .github/instructions/fux-archived-results.instructions.md
 #   kiro     -> .kiro/steering/fux-archived-results.md

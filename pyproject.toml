@@ -5,12 +5,12 @@ build-backend = "hatchling.build"
 [project]
 name = "fux-engine"
 dynamic = ["version"]
-description = "Fux — rank organizational knowledge from a small index committed to git; fetch content from the systems that own it; verify freshness at answer time."
+description = "Fux — rank your written knowledge (decisions, runbooks, specs, wikis) from a small index committed to git; fetch content from the systems that own it; verify freshness at answer time."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
 authors = [{ name = "arpit arya", email = "arpitarya.me@gmail.com" }]
-keywords = ["knowledge", "index", "search", "claude", "agent", "frontmatter", "llm", "adr", "codebase"]
+keywords = ["knowledge", "documentation", "search", "index", "bm25", "adr", "runbook", "frontmatter", "agent"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
@@ -22,7 +22,8 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
     "Topic :: Software Development :: Documentation",
-    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Text Processing :: Indexing",
+    "Topic :: Internet :: WWW/HTTP :: Indexing/Search",
 ]
 # L1: OSI-approved licences only, ever — source-available (BSL, SSPL, Elastic
 # v2, Commons Clause) does NOT qualify. Fux ships packaged: no feature-extras tier. Anything on the ingest path is pinned: byte-identity is a
@@ -48,6 +49,22 @@ path = "src/fux/__init__.py"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/fux"]
+
+# The Node read plane travels in the wheel so `fux setup` can vendor it into a
+# consumer's `.fux/node/` (ADR-NODE-SEARCH, W-107 R2). `force-include` maps the
+# repo's ONE copy into the wheel at build time — deliberately not a second copy
+# under `src/fux/templates/`, which is the drift surface every other vendored
+# directory in this repo exists to avoid.
+# The set is spelled file by file, not as `"node" = ...`, for two reasons:
+# `node/test/` would otherwise be vendored into every consumer's `.fux/node/`
+# (a test suite in someone else's repository), and this list is then the same
+# set npm ships in `node/package.json`'s `files` — one payload, two registries.
+[tool.hatch.build.targets.wheel.force-include]
+"node/fux.mjs" = "fux/templates/node/fux.mjs"
+"node/src" = "fux/templates/node/src"
+"node/mcp-tools.json" = "fux/templates/node/mcp-tools.json"
+"node/package.json" = "fux/templates/node/package.json"
+"node/README.md" = "fux/templates/node/README.md"
 
 [tool.hatch.build.targets.sdist]
 # The sdist is the buildable source + its tests/docs — never the archived old

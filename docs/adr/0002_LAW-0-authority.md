@@ -15,11 +15,13 @@ timestamp: 2026-09-06T00:00:00Z
 
 ## §1 — For humans
 
-> **This record is the RATIONALE for law L0, and it is the one place the
-> two-level structure itself is explained.** The normative text of every law
-> lives in [`CLAUDE.md` §Non-negotiable constraints](../../CLAUDE.md) until
-> ADR-LAWS decision 1 is superseded; L0 is what supersedes it, and the
-> migration is [W-122](../../work/open/W-122-adrs-are-the-source.md).
+> **This record is the HOME of law L0 — §2's first block IS the law** — and it
+> is also the one place the two-level structure itself is explained. It
+> superseded [ADR-LAWS](0001_LAWS.md) decision 1 on 2026-09-06, and
+> W-122 ([its landing record](../../work/IMPLEMENTATION.md)) carried out the
+> migration on 2026-09-12: every law's normative text now lives in its own
+> `ADR-LAW-n` record and [`CLAUDE.md`](../../CLAUDE.md) carries a generated,
+> test-bound copy.
 
 **The one-line case.** Every rule fux has was being stated in two or three
 places at once, and the copies drifted silently while every mechanical check
@@ -27,7 +29,7 @@ stayed green.
 
 **The handle:** *ADRs are the only source of truth, and the Law records
 outrank every other record* — the one-line form from
-[ADR-LAWS](0001_LAWS.md)'s table. ⚠ **A handle is not the law.**
+[ADR-LAWS](0001_LAWS.md)'s table. ⚠ **A handle is not the law**; read the law in §2 below.
 
 **The two levels.**
 
@@ -69,6 +71,39 @@ the trade: one hop of indirection, bought with the end of silent drift.
 
 ## §2 — For agents
 
+### The law (normative)
+
+🔴 **This block IS law L0.** It is the only normative statement of it, and
+[`CLAUDE.md` §Non-negotiable constraints](../../CLAUDE.md) carries a **generated**
+copy of it — rendered from these bytes by
+[`scripts/gen-laws.py`](../../scripts/gen-laws.py) and held byte-equal by
+[`tests/test_claude_md_laws.py`](../../tests/test_claude_md_laws.py).
+Amend it **here**, then run `python scripts/gen-laws.py --write`.
+Amending a law needs Arpit's ruling, named in this record
+([ADR-LAW-0](0002_LAW-0-authority.md) decision 3).
+
+<!-- LAW-TEXT:BEGIN L0 -->
+- **L0** · **ADRs are the only source of truth, and the Law records outrank
+  every other record.** Every rule is *stated* in exactly one ADR; every other
+  artifact — `CLAUDE.md`, a schema, a config comment, a skill, a diagram —
+  **links to it and never restates it**, and a change is made in the record
+  first. The Law records `ADR-LAW-0`…`ADR-LAW-9` outrank every other ADR: **a
+  record that conflicts with a Law is void in the conflicting part**, never a
+  trade-off to weigh. **A Law changes only on Arpit's ruling, named in the
+  record**; an ordinary ADR a session may accept.
+  ⚠ **The test that decides a restatement:** *could this artifact and the
+  record disagree while both still look correct?* If yes it is a restatement
+  and is forbidden; if it would simply fail, it is an implementation
+  (`config.py` naming a key) or an enforcement (a runtime schema, a test) and
+  is permitted.
+  ⚠ **`CLAUDE.md` §Non-negotiable constraints is NOT normative** — since
+  2026-09-12 each law is stated in its own `ADR-LAW-n` record, and what
+  `CLAUDE.md` carries is generated from those records and held equal by a test.
+  Precedence is **judgment, never a gate** — no parser reads *"does this
+  contradict L2"* — and a record self-contradicting inside one file stays
+  ungated. [ADR-LAW-0](0002_LAW-0-authority.md).
+<!-- LAW-TEXT:END L0 -->
+
 ### Context
 
 **Two failures, recorded, and one shape between them.** A configuration key
@@ -99,7 +134,7 @@ artifact — `CLAUDE.md`, a schema file, a config comment, a skill, a README, a
 diagram, a docstring — **links to it and never restates it**. A change is made
 in the record first; everything else keeps pointing.
 
-**2. Precedence.** The Law records `ADR-LAW-0` … `ADR-LAW-8` outrank every
+**2. Precedence.** The Law records `ADR-LAW-0` … `ADR-LAW-9` outrank every
 other ADR. **A record that conflicts with a Law is void in the conflicting
 part** — a defect to fix on contact, never a trade-off to weigh. An ordinary
 record may narrow a law's application to its own subject; it may never widen,
@@ -135,6 +170,22 @@ naming a key does not create it. `acquired_max_bytes` sat "documented but
 never parsed" precisely because its only mention was prose in a decision
 paragraph, where nothing could check it.
 
+**7. The migration LANDED on 2026-09-12** (W-122). Each law's normative text
+moved into its own `ADR-LAW-n` record, fenced by a pair of `LAW-TEXT` HTML
+comment markers;
+[`scripts/gen-laws.py`](../../scripts/gen-laws.py) renders `CLAUDE.md`'s
+§Non-negotiable constraints from the ten blocks, rewriting link targets from
+record-relative to repo-root-relative and doing nothing else;
+[`tests/test_claude_md_laws.py`](../../tests/test_claude_md_laws.py) holds the two
+byte-equal and refuses a verbatim third copy anywhere in a live document.
+
+⚠ **Two things the migration corrected on the way, both factual rather than
+normative.** L0's own text enumerated the supreme records as `ADR-LAW-0`…`ADR-LAW-8`
+while L9 had existed since 2026-09-11 (Arpit's ruling that day made L9 a law; the
+enumeration simply lagged), and it named `this file` where it meant `CLAUDE.md`,
+which stopped being true the moment the text moved. Neither changes what any law
+permits or forbids.
+
 ### Consequences
 
 - **The gate that could not be written becomes a parser.** With one source,
@@ -145,10 +196,16 @@ paragraph, where nothing could check it.
   session discipline, the worklog) **stay**: they govern how an agent behaves
   in a session, there is no record for that, and inventing one would be the
   same duplication in a new place.
-- **Two documentation-only schema files are deleted** — `config.schema.json`
-  and `derive/runtime.schema.json`; verified, nothing loads either. The four
-  runtime-loaded schemas are untouched: they **enforce**, they do not
-  **describe**.
+- **One documentation-only schema file is deleted** — `config.schema.json`,
+  every field of which was a `doc:` string describing a key.
+  ⚠ **This consequence said TWO until 2026-09-12 and was wrong about the
+  second.** `derive/runtime.schema.json` is not documentation:
+  [`tests/derive/test_runtime_schema.py`](../../tests/derive/test_runtime_schema.py)
+  asserts its struct string, its field codes, its doc-table field set and its
+  runtime version against `derive/format.py` in both directions. **A declaration a
+  test holds equal to the code enforces**, which decision 4 permits — so it
+  stays, and W-122's plan to delete it is void in that part. The four
+  runtime-loaded schemas were never in question for the same reason.
 - **This record supersedes [ADR-LAWS](0001_LAWS.md) decision 1**
   (*"CLAUDE.md is the single normative home"*), accepted 2026-09-06, the same
   day. ADR-LAWS is restructured to the meta-rules and the index; the law text
@@ -183,7 +240,7 @@ duplication, not by inventing a check that cannot exist.
 ### Reference (required)
 
 - Arpit's ruling, 2026-09-06 — quoted verbatim in §2 Context.
-- [`work/open/W-122-adrs-are-the-source.md`](../../work/open/W-122-adrs-are-the-source.md) — the migration this record authorises.
+- [`work/IMPLEMENTATION.md`](../../work/IMPLEMENTATION.md) §W-122 — the migration this record authorises, as it landed. Its item file was deleted with its queue row (OPEN-WORK rule 2); what remains open is [W-146](../../work/open/W-146-the-rest-of-l0.md).
 - **The two strikes:** `acquired_max_bytes` — named in a record and the ownership table, never parsed, `NameError` on every retaining fetch (2026-09-01); `max_parallel` — two contradicting sentences in one accepted amendment, the code implementing the wrong one ([`archive/open/W-83-the-unconfigured-fetch-ceiling.md`](../../archive/open/W-83-the-unconfigured-fetch-ceiling.md)).
 - **Precedent for a generated view:** [ADR-TUNE](0135_tuning.md) already names `tune.specimen()` in `src/fux/tune.py` as the authority for `.fux/tune.toml`.
 - US Constitution, Article VI, Clause 2 (the Supremacy Clause) and Article V (the amendment path) — the two-level shape and the reason entrenchment is part of it, not an addition to it.
@@ -195,7 +252,10 @@ duplication, not by inventing a check that cannot exist.
 1. A rule is found stated normatively in two artifacts and **neither is
    generated-and-test-bound** — decision 1 is not holding and the failure is
    its own evidence.
-2. The generated `CLAUDE.md` block exists **without** the test that binds it.
+2. The generated `CLAUDE.md` block exists **without** the test that binds it —
+   [`tests/test_claude_md_laws.py`](../../tests/test_claude_md_laws.py), which is
+   the whole of decision 5's permission. Deleting that file reopens this record,
+   and `python scripts/gen-laws.py --check` is the same assertion as a command.
 3. A Law record is amended in a commit that does not name Arpit's ruling.
 4. An ordinary record is found contradicting a law and the conflict is
    resolved by **weighing** rather than by voiding the record's clause.

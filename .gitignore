@@ -38,3 +38,15 @@ _to_delete/
 # and Claude Code's Grep skip it by default. Back it up by hand. See
 # work/golden/README.md §The one rule.
 work/golden/golden-answer/
+
+# 🔴 AND ANYWHERE ELSE IT LANDS — added 2026-09-12 after the rule above was
+# found to be one path and the key was somewhere else. A copy of it was written
+# to `Claude outputs/golden-answer/` and was STAGED, one `git commit -a` from
+# being in history permanently and in every clone. The path rule above did not
+# reach it because the path rule is a path.
+#
+# ⚠ The name is the thing to ignore, not the location. A key that leaks does not
+# fail loudly — it yields a benchmark number that looks clean, forever.
+**/golden-answer/
+**/golden-answers*
+**/answers.jsonl

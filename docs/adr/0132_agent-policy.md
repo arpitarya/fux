@@ -93,6 +93,26 @@ $ fux setup --no-agents
 
 ---
 
+### Amendment 2026-09-12 — the usage renderings no longer say "codebase"
+
+**What changed.** `USAGE-SKILL.md`, `fux-usage.instructions.md` and
+`fux.agent.md` said *"this codebase's history or design"*. They now say
+*"this project's"*.
+
+**Why.** Fux's corpus is written knowledge — decisions, runbooks, specs, wiki
+pages — and a repository is one place it can live, not what fux is about.
+*"Codebase"* named the wrong thing and was one of the six surfaces that keep
+fux misfiled next to AST/code-graph tools (Arpit's ruling, from
+[`work/proposals/positioning-documents-not-code.md`](../../work/proposals/positioning-documents-not-code.md)).
+
+**`policy-version` stays at 1, deliberately.** Decision 8's version exists to
+make a **stale policy** identifiable. This is a noun swap in the usage half —
+no rule changed, no behaviour changed, and nothing an installed consumer holds
+is now wrong. Bumping it here would spend the only signal decision 8 has on a
+change that is not a policy change. **A version bump means the rules moved.**
+
+---
+
 ## §2 — For agents
 
 ### Context

@@ -1,4 +1,4 @@
-name: Publish to PyPI
+name: Publish
 
 on:
   release:
@@ -18,6 +18,12 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
+
+      - name: Every version site must agree
+        # src/fux/__init__.py is the source, but W-107 gave the Node reader
+        # three more hand-written copies. Checked here as well as on every
+        # push, because this is the last moment a mismatch is still cheap.
+        run: python scripts/check-version-parity.py
 
       - name: Release tag must match the package version
         # Guards the silent-failure mode: an unbumped __version__ would build
@@ -65,3 +71,54 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           skip-existing: true
+
+  publish-npm:
+    name: Stage to npm
+    runs-on: ubuntu-latest
+    needs: build          # the same gate PyPI waits on — one release, two registries
+    permissions:
+      id-token: write     # OIDC trusted publishing; no NPM_TOKEN exists anywhere
+      contents: read
+    # No `environment:` here, deliberately, unlike publish-pypi. The trusted
+    # publisher on npmjs.com was saved with its *Environment name* field blank,
+    # and the OIDC token's environment claim has to match what is configured
+    # there. A GitHub environment on this job would put a claim in the token
+    # that npm's config does not name. Add both together or neither.
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          registry-url: https://registry.npmjs.org
+
+      - name: npm >= 11.19 (trusted publishing needs 11.5.1; `npm stage` needs 11.19)
+        # setup-node ships whatever npm came with the Node line, which is a 10.x
+        # on Node 22 — old enough that `npm stage publish` is not a command and
+        # the OIDC exchange never happens. Pinning the floor here rather than
+        # trusting the runner image is the difference between a clear failure
+        # and a confusing one.
+        run: |
+          npm i -g npm@latest
+          npm --version
+
+      - name: Stage the tarball
+        working-directory: node
+        # STAGED, not direct: the trusted publisher on npmjs.com has
+        # `Allow npm publish` unchecked, which is npm's own recommendation.
+        # CI uploads; a human approves at npmjs.com (or `npm stage approve
+        # <id>`) with 2FA. So npm is NOT automatic the way PyPI is — that is
+        # the deliberate trade, and it is why this job is named "Stage".
+        #
+        # --tag: `npm stage publish` defaults to `latest` and ERRORS on a
+        # prerelease without an explicit tag, so derive it from the version
+        # rather than hardcoding either answer.
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          case "$version" in
+            *-*) tag=alpha ;;
+            *)   tag=latest ;;
+          esac
+          echo "staging fux-engine@$version with tag $tag"
+          npm stage publish --tag "$tag" --provenance

@@ -8,11 +8,22 @@ from __future__ import annotations
 from fux.store import fuxdir
 
 
-def test_ensure_layout_writes_readme_and_gitignore(tmp_path):
+def test_ensure_layout_writes_readme_gitignore_and_the_node_reader(tmp_path):
+    """Three things, not two — the vendored reader joined on 2026-09-12.
+
+    `.fux/node/` and the `.fux/fux` shim are the fourth `.fux/` shape
+    (ADR-DOTFUX, ADR-NODE-SEARCH R2): committed, engine-owned, overwritten on a
+    version difference. They are written here rather than in `fux setup`
+    because a clone with no Python has to be able to read the index the
+    *first* time anyone ingests, not only after someone runs `setup`.
+    """
     written = fuxdir.ensure_layout(tmp_path)
-    assert {p.name for p in written} == {"README.md", ".gitignore"}
+    names = {p.name for p in written}
+    assert {"README.md", ".gitignore", "fux", "package.json"} <= names
     assert (tmp_path / ".fux" / "README.md").is_file()
     assert (tmp_path / ".fux" / ".gitignore").is_file()
+    assert (tmp_path / ".fux" / "node" / "fux.mjs").is_file()
+    assert (tmp_path / ".fux" / "fux").is_file()
 
 
 def test_ensure_layout_is_idempotent(tmp_path):
@@ -23,10 +34,18 @@ def test_ensure_layout_is_idempotent(tmp_path):
 
 
 def test_ensure_layout_never_overwrites_consumer_edits(tmp_path):
+    """⚠ **Write-if-missing applies to the two GENERATED files, not to `node/`.**
+
+    A consumer annotates `README.md` and `.gitignore`, so their edits survive.
+    Nobody edits a vendored reader, and a stale one against a bumped `_format`
+    is a wrong answer rather than an old preference — so it is written anyway,
+    and the assertion here is that doing so touched neither annotated file.
+    """
     (tmp_path / ".fux").mkdir()
     (tmp_path / ".fux" / "README.md").write_text("mine\n", encoding="utf-8")
     (tmp_path / ".fux" / ".gitignore").write_text("mine too\n", encoding="utf-8")
-    assert fuxdir.ensure_layout(tmp_path) == []
+    written = fuxdir.ensure_layout(tmp_path)
+    assert not [p for p in written if p.name in {"README.md", ".gitignore"} and p.parent.name == ".fux"]
     assert (tmp_path / ".fux" / "README.md").read_text(encoding="utf-8") == "mine\n"
     assert (tmp_path / ".fux" / ".gitignore").read_text(encoding="utf-8") == "mine too\n"
 

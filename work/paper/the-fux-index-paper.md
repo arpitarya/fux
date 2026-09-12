@@ -35,9 +35,9 @@ timestamp: 2026-08-09T00:00:00Z
 
 ## Abstract
 
-Agents working in codebases need ranked, cited answers from organizational
-knowledge — documentation, decisions, runbooks — that lives partly in the
-repository and partly in external systems (Confluence, SharePoint, web).
+Agents need ranked, cited answers from written knowledge — documentation,
+decisions, runbooks, specs — that lives partly in a git repository and partly
+in external systems (Confluence, SharePoint, web).
 Existing options either copy that content into a search store (staleness,
 duplication, ACL drift) or traverse it live (no ranking, no verification).
 
@@ -152,8 +152,8 @@ read touches, with delta maintenance provably equal to recompute.
 
 **Adjacent tools.** Graphify [16] builds deterministic AST knowledge graphs
 of code for agents — structure, not ranked retrieval; no external
-connectors; docs pass through an LLM. Fux is the knowledge-side complement,
-joined at file-path/symbol edges.
+connectors; docs pass through an LLM. Fux is the knowledge-side complement: it
+parses no code, and joins a code tool only where a document names a file path.
 
 ## 3. Architecture
 

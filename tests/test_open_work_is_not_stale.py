@@ -82,7 +82,8 @@ def inbox_rows() -> list[tuple[int, str, str, str]]:
     """(line number, what-he-decides, filed, age) for every row of *Blocked on Arpit*.
 
     The block ends at the next `##` heading. Only rows with three cells are
-    returned -- the header and the `|---|` separator are not rows.
+    returned -- the header and the `|---|` separator are not rows, and neither is a
+    `↳ blocks:` sub-row.
     """
     out: list[tuple[int, str, str, str]] = []
     inside = False
@@ -97,6 +98,10 @@ def inbox_rows() -> list[tuple[int, str, str, str]]:
             continue
         cells = [c.strip() for c in line.strip("|").split("|")]
         if len(cells) != 3 or cells[1] == "filed":
+            continue
+        if cells[0].startswith("↳"):
+            # A `↳ blocks:` sub-row belongs to the decision above it and has no
+            # date of its own (OPEN-WORK rule 10); test_open_work_rows_are_short checks it.
             continue
         out.append((lineno, *cells))
     return out

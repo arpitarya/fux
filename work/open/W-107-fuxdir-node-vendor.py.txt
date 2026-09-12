@@ -1,0 +1,135 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# W-107 R2 — the Node reader, vendored into `.fux/`.
+#
+# Insert into `src/fux/store/fuxdir.py`. `ensure_layout` gains the call at the
+# bottom; everything else is new.
+#
+# **The fourth shape**: committed, engine-owned, and OVERWRITTEN — not
+# write-if-missing. `fetchers/` and `decoders/` are write-if-missing because a
+# consumer EDITS them; nobody edits a vendored reader, and a stale one against
+# a bumped `_format` is a WRONG ANSWER rather than an old preference.
+#
+# 🔴 The evidence this is the right call is in this repo: `.fux/decoders/` is
+# write-if-missing, and the `doc`-suffix rename (2026-09-06) shipped with no
+# migration — a repo set up before it still holds stale `<name>doc.py` files
+# that claim the same extensions and WIN.
+# ─────────────────────────────────────────────────────────────────────────────
+
+#: The vendored Node reader. Committed (a clone with no Python still answers)
+#: and rewritten whenever the engine version differs (a `_format` mismatch then
+#: cannot happen, because the copy is always written by the Python that wrote
+#: the index).
+NODE_DIR = "node"
+NODE_ENTRY = "fux.mjs"
+NODE_SHIM = "fux"
+
+#: `chmod` bits for the shim — readable and executable by everyone who can read
+#: the repo, which is the same set that can read the index it queries.
+_SHIM_MODE = 0o755
+
+_SHIM = """#!/bin/sh
+# Vendored by `fux setup`. Runs the Node read plane against this repository.
+# The command is `fux`; the npm package is `fux-engine` (`fux` was taken in
+# 2016). This shim exists so a clone needs nothing installed at all.
+exec node "$(dirname "$0")/fux.mjs" "$@"
+"""
+
+
+def _packaged_node_files() -> "list[tuple[str, bytes]]":
+    """`(relative path, bytes)` for every file of the Node reader in the wheel.
+
+    Read as package data, never imported — the same contract `templates/` has.
+    """
+    from importlib import resources
+
+    root = resources.files("fux") / "templates" / NODE_DIR
+    out: list[tuple[str, bytes]] = []
+
+    def walk(node, prefix: str = "") -> None:
+        for child in sorted(node.iterdir(), key=lambda c: c.name):
+            rel = f"{prefix}{child.name}"
+            if child.is_dir():
+                walk(child, rel + "/")
+            else:
+                out.append((rel, child.read_bytes()))
+
+    walk(root)
+    return out
+
+
+def node_version(directory: "Path") -> "str | None":
+    """The version of the vendored reader, or `None` when it is absent.
+
+    Read from `package.json` rather than from a sidecar: one file, and it is
+    the file npm would read too, so a consumer who vendored by hand and a
+    consumer who ran `fux setup` are compared the same way.
+    """
+    import json
+
+    path = directory / NODE_DIR / "package.json"
+    if not path.is_file():
+        return None
+    try:
+        return json.loads(path.read_text(encoding="utf-8")).get("version")
+    except (OSError, ValueError):
+        return None
+
+
+def ensure_node_reader(root: "Path") -> "list[Path]":
+    """Write `.fux/node/` and the `.fux/fux` shim; return what changed.
+
+    ⚠ **Overwrites, and only on a version difference.** Rewriting unconditionally
+    would dirty the working tree on every ingest — this directory is COMMITTED,
+    so a no-op ingest must produce a no-op diff.
+    """
+    from .. import __version__
+
+    directory = fux_dir(root)
+    if node_version(directory) == __version__:
+        return []
+
+    written: list[Path] = []
+    target = directory / NODE_DIR
+    for rel, data in _packaged_node_files():
+        path = target / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        if not path.exists() or path.read_bytes() != data:
+            path.write_bytes(data)
+            written.append(path)
+
+    shim = directory / NODE_SHIM
+    if not shim.exists() or shim.read_bytes() != _SHIM.encode("ascii"):
+        shim.write_bytes(_SHIM.encode("ascii"))
+        shim.chmod(_SHIM_MODE)
+        written.append(shim)
+    return written
+
+
+# --- in `ensure_layout`, after the README/.gitignore loop: -------------------
+#
+#     written.extend(ensure_node_reader(root))
+#     return written
+#
+# --- in `COMMITTED`, so `fux doctor` stops calling it undeclared: ------------
+#
+#     "node": "the vendored Node read plane (`fux-engine`), engine-owned and "
+#             "REWRITTEN on a version change -- not write-if-missing, because "
+#             "nobody edits it and a stale copy is a wrong answer",
+#
+# --- in `COMMITTED_FILES`: ---------------------------------------------------
+#
+#     "fux": "a 3-line shim: `.fux/fux find rollback` in a clone with nothing "
+#            "installed. Runs `node .fux/node/fux.mjs`",
+#
+# --- and one `fux doctor` row: ----------------------------------------------
+#
+#     def _node_reader_row(root, version):
+#         """`.fux/node/` is present and matches the engine."""
+#         found = fuxdir.node_version(fuxdir.fux_dir(root))
+#         if found is None:
+#             return Check("node reader", True, "absent - `fux setup` writes it")
+#         return Check(
+#             "node reader", found == version,
+#             f".fux/node/ is {found}; the engine is {version}"
+#             + ("" if found == version else " - run `fux setup`"),
+#         )

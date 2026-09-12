@@ -1,0 +1,10 @@
+#!/bin/sh
+# Vendored by `fux setup`. Runs the Node read plane against this repository.
+# The command is `fux`; the npm package is `fux-engine` (`fux` was taken in
+# 2016). This shim exists so a clone needs nothing installed at all.
+#
+# The entry point is `node/fux.mjs`, NOT `fux.mjs` beside this file. W-107 R2
+# was written when the reader was to be one file at `.fux/fux.mjs`; R4 made it
+# a directory, and this line was the half that did not follow -- caught by
+# running the shim in a scratch clone, which is the only thing that could.
+exec node "$(dirname "$0")/node/fux.mjs" "$@"

@@ -53,3 +53,215 @@ is consumer code, not a CI target.
   back. `fux doctor` reports its size.
 - Fux writes `README.md` and `.gitignore` **only if missing**. Your
   edits survive every ingest.
+
+---
+
+# What fux is
+
+A search index for your written knowledge - decisions, runbooks,
+specs, wiki pages - committed to git and read by agents.
+
+- **The index is committed; the content is not.** `index/` holds
+  statistics about your documents, never the documents. That is why
+  it diffs like code and why no second copy of anything exists.
+- **Ranking is arithmetic.** BM25F, one scorer, one sort. The same
+  sources build the same index, byte for byte, on any machine.
+- **No server, no vector database, no API key, and no model anywhere
+  on the path.** `fux ask` is a local process reading local files.
+- **It does not read your code.** No parser runs over source files,
+  and no source extension is on the default type list. Fux is about
+  what you wrote down, not what you compiled.
+- **Answers are re-read before they are quoted.** `fux answer` fetches
+  the cited lines from the source and tells you whether they still
+  say what the index thinks they say.
+
+# The commands
+
+Flat verbs, no subcommand tree. `fux <verb> --help` for any of them.
+
+| group | verbs | what the group does |
+|---|---|---|
+| lifecycle | `setup` `doctor` | set the repo up, then check it |
+| write | `ingest` `build` | `ingest` writes the committed index; `build` derives the local accelerator from it |
+| sources | `add` `remove` `update` `enrich` | maintain what is indexed. `add`/`remove` write lines; `update` re-fetches and writes none; `enrich` writes no committed byte at all |
+| read | `ask` `find` `answer` | the same question, differing only in how much each commits to |
+| graph | `explain` `graph` `path` | answer with relationships the documents stated, never with a ranking |
+| serve | `mcp` `daemon` | the only verbs that do not return |
+| maintenance | `hooks` `tune` `output` `verify` | wire git to keep the index in step; print or set the tunables; re-run a receipt |
+
+**The three read verbs differ in how much they commit to.** `find`
+gives locations and stays out of the way. `ask` gives a ranked list
+with scores, which is what you want when judging the engine. `answer`
+commits to one passage with a line range and a freshness verdict,
+which is what an agent wants when it needs a value and not a menu.
+
+```console
+$ fux setup                 # write the consumer-owned files here
+$ fux add docs/             # index a directory
+$ fux add https://wiki/...  # index a URL through a fetcher you own
+$ fux ingest                # walk the sources into the committed index
+$ fux doctor                # is this repo healthy, and why not
+
+$ fux find rollback                       # one line per hit, for pipes
+$ fux ask 'how do we roll back a release' # ranked, with scores
+$ fux answer 'what is the RTO' --band     # one passage, cited and checked
+```
+
+# Calling fux from a script, in any language
+
+**Fux is a normal command-line program**: it reads files, writes to
+stdout, and exits with a status. Anything that can start a process can
+drive it, which is why there is no binding to install, version, or wait
+for.
+
+**Two languages can also call it in-process, with no subprocess at
+all** - Python via `from fux import open`, and Node via the vendored
+reader in `.fux/node/`. Same method names, same arguments, same return
+shape as `--json`, because all three validate against one schema file.
+
+**Three things are the whole contract:**
+
+1. **`--json` on every read verb.** `ask`, `find`, `answer`, `explain`,
+   `graph`, `path`, `doctor`, `update`. Never parse the prose output -
+   it is for humans and it is allowed to change.
+2. **Exit codes.** `0` ok - `1` error - `2` blocking (strict mode) -
+   `130` interrupted. Errors go to stderr as `error: <message>`.
+3. **It is offline and deterministic.** No network on a read path, so a
+   call is fast enough to make inline and safe to make in a loop.
+
+**The JSON shape you will actually use:**
+
+```json
+{ "results": [ { "id": "docs/runbook.md",
+                 "title": "Release runbook",
+                 "score": 12.41,
+                 "headings": ["Rollback"] } ],
+  "confidence": { "band": "high", "answerable": true, "missing": [] } }
+```
+
+`confidence` is present only when you pass `--band`. **Absent means
+not asked for; it is never a claim about the answer.**
+
+## Shell
+
+```bash
+fux ask 'retention policy' --json | jq -r '.results[0].id'
+
+# exit code first, output second
+if ! fux doctor --json > health.json; then
+  echo "index unhealthy" >&2; exit 1
+fi
+```
+
+## Python
+
+```python
+import json, subprocess
+
+def ask(question, top=5):
+    p = subprocess.run(
+        ["fux", "ask", question, "--json", "--top", str(top), "--band"],
+        capture_output=True, text=True,
+    )
+    if p.returncode != 0:
+        raise RuntimeError(p.stderr.strip())
+    return json.loads(p.stdout)
+
+hits = ask("how do we roll back a release")
+if hits.get("confidence", {}).get("answerable"):
+    print(hits["results"][0]["id"])
+```
+
+### In-process, with no subprocess
+
+```python
+from fux import open as fux_open
+
+ix = fux_open(".")                        # root, gate, tune, output - once
+ix.find("rollback", top=5)                # -> list[Result]
+ix.ask("how do we roll back a release")   # -> AskAnswer(results, confidence)
+ix.answer("what is the RTO")              # -> Answer(passages, citation, ...)
+ix.explain("file:docs/x.md"); ix.graph(q); ix.path(a, b)
+```
+
+**The CLI and `fux.api` are the contract.** Every other module is
+internal and may change without notice. The read verbs are the whole
+surface: nothing that writes - `ingest`, `build`, `add`, `remove`,
+`update`, `enrich`, `setup` - is importable this way, by design.
+
+## Node / TypeScript
+
+**There is a Node reader, and it needs no Python.** `fux setup` writes
+it into `.fux/node/` and leaves a shim beside it, so a fresh clone
+answers with nothing installed:
+
+```console
+$ node .fux/node/fux.mjs find rollback    # a clone, nothing installed
+$ .fux/fux find rollback                  # the shim setup writes
+$ npx fux-engine find rollback            # from npm
+```
+
+It reads an index Python wrote and never writes one: `ingest`, `build`,
+`add`, `remove`, `update`, `enrich` and `setup` are absent and say so
+when you type them. It is held byte-equal to Python by a third arm of
+the differential law.
+
+In-process, the same shape as the Python API:
+
+```js
+import { open } from 'fux-engine'
+const ix = await open('.')
+await ix.find('rollback', { top: 5 })
+```
+
+Or over a subprocess, from any Node without the reader vendored:
+
+```js
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
+const run = promisify(execFile);
+
+export async function ask(question, top = 5) {
+  const { stdout } = await run('fux',
+    ['ask', question, '--json', '--top', String(top), '--band']);
+  return JSON.parse(stdout);
+}
+```
+
+A non-zero exit rejects the promise and carries `stderr`, so the error
+path needs no special handling.
+
+## Go, Ruby, Rust, anything else
+
+Same three steps every time, because there is nothing language-
+specific to learn:
+
+1. Spawn `fux` with the verb, the query, and `--json`.
+2. Check the exit status; read `stderr` when it is non-zero.
+3. Parse `stdout` as JSON.
+
+```go
+out, err := exec.Command("fux", "ask", q, "--json").Output()
+// err is *exec.ExitError on a non-zero status; out is the payload
+```
+
+## For an AI agent
+
+Two ways in, and they differ in who owns the loop:
+
+- **`fux mcp`** - serves the index over the Model Context Protocol
+  (`fux_search`, `fux_passage`, `fux_related`). The client calls the
+  tools; you configure the server once and write no glue.
+- **A skill or instruction file** - `fux setup` installs guides for
+  Claude Code, Codex, Copilot and Kiro that tell the agent to query
+  the index rather than grep. The agent shells out to the CLI.
+
+Use MCP when the client speaks it. Use the CLI everywhere else; it is
+the same engine either way.
+
+## One rule for every caller
+
+**`fux answer` re-reads the source before it quotes.** Its verdict
+field says `current`, `stale`, `as-ingested`, `cached` or `unverified`
+- and a script that ignores that field has thrown away the only thing
+separating fux from a stale cache with good manners.

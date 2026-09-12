@@ -1,0 +1,13 @@
+{
+  "name": "fux-engine",
+  "version": "2.0.0-alpha.7",
+  "description": "Read a fux index from Node. Ranked, cited answers from a small index committed to git — no server, no model, no Python.",
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "bin": { "fux": "./fux.mjs" },
+  "exports": { ".": "./src/index.mjs" },
+  "files": ["fux.mjs", "src", "mcp-tools.json", "README.md"],
+  "license": "MIT",
+  "repository": { "type": "git", "url": "git+https://github.com/arpitarya/fux.git" },
+  "keywords": ["knowledge", "documentation", "search", "index", "bm25", "adr", "runbook"]
+}

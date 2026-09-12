@@ -1,0 +1,140 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 1336" width="1180" height="1336" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+<defs>
+<marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10" fill="none" stroke="#3d6df2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10" fill="none" stroke="#1d8a5e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10" fill="none" stroke="#8a93a0" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10" fill="none" stroke="#c2410c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
+</defs>
+<rect width="1180" height="1336" fill="#fcfcfb"/>
+<text x="46" y="52" font-size="23" font-weight="600" fill="#14181f">How `fux ask` works</text>
+<text x="46" y="76" font-size="13" fill="#626b78">One question in, a ranked and banded list out. Offline, deterministic, no model anywhere on the path.</text>
+<rect x="800" y="34" width="340" height="68" rx="8" fill="#fcfcfb" stroke="#e4e4e0" stroke-width="1.2"/>
+<rect x="812" y="44" width="11" height="11" rx="2.5" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.4"/>
+<text x="830" y="53" font-size="10.5" fill="#626b78">reads a committed file</text>
+<rect x="812" y="59" width="11" height="11" rx="2.5" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="830" y="68" font-size="10.5" fill="#626b78">pure computation</text>
+<rect x="812" y="74" width="11" height="11" rx="2.5" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.4"/>
+<text x="830" y="83" font-size="10.5" fill="#626b78">reads a derived file</text>
+<rect x="812" y="89" width="11" height="11" rx="2.5" fill="#fff4ec" stroke="#c2410c" stroke-width="1.4"/>
+<text x="830" y="98" font-size="10.5" fill="#626b78">off by default</text>
+<text x="46" y="126" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">0 - TWO GATES, BEFORE ANYTHING DISPATCHES</text>
+<line x1="46" y1="136" x2="1136" y2="136" stroke="#e4e4e0" stroke-width="1"/>
+<rect x="46" y="146" width="540" height="74" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="66" y="172" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">.fux/pii.toml must exist</text>
+<text x="66" y="192" font-size="11.5" fill="#4a5260">Not parsed -- a stat. Absent, and ask refuses outright.</text>
+<text x="66" y="209" font-size="11" fill="#8a93a0">Exempt: setup, tune, output, doctor. Nothing else.</text>
+<rect x="606" y="146" width="530" height="74" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="626" y="172" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">.fux/output.toml folded into args, once</text>
+<text x="626" y="192" font-size="11.5" fill="#4a5260">--json, --top, --band, --sections. Every later read is a bool.</text>
+<text x="626" y="209" font-size="11" fill="#8a93a0">--no-output-config bypasses it.</text>
+<text x="46" y="256" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">1 - PREPARE THE QUERY</text>
+<line x1="46" y1="266" x2="1136" y2="266" stroke="#e4e4e0" stroke-width="1"/>
+<rect x="46" y="276" width="250" height="132" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="62" y="302" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">tune.toml</text>
+<text x="62" y="324" font-size="10.5" fill="#4a5260">Read ONCE. Malformed is a</text>
+<text x="62" y="341" font-size="10.5" fill="#4a5260">hard error, never a silent</text>
+<text x="62" y="358" font-size="10.5" fill="#4a5260">default. --no-tune skips it.</text>
+<rect x="326" y="276" width="250" height="132" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="342" y="302" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">sources/dirs</text>
+<text x="342" y="324" font-size="10.5" fill="#4a5260">Which directories are declared</text>
+<text x="342" y="341" font-size="10.5" fill="#4a5260">archived. A failed read</text>
+<text x="342" y="358" font-size="10.5" fill="#4a5260">degrades to empty, never fatal.</text>
+<rect x="606" y="276" width="250" height="132" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="622" y="302" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">analyze</text>
+<text x="622" y="324" font-size="10.5" fill="#4a5260">identifier split -&gt; lower -&gt;</text>
+<text x="622" y="341" font-size="10.5" fill="#4a5260">stopwords -&gt; Porter stem -&gt;</text>
+<text x="622" y="358" font-size="10.5" fill="#4a5260">blake2b-64. THE SAME entry</text>
+<text x="622" y="375" font-size="10.5" fill="#4a5260">point ingest used.</text>
+<rect x="886" y="276" width="250" height="132" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="902" y="302" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">--expand</text>
+<text x="902" y="324" font-size="10.5" fill="#4a5260">Extra term hashes at weight 0.2.</text>
+<text x="902" y="341" font-size="10.5" fill="#4a5260">The ORIGINALS stay required --</text>
+<text x="902" y="358" font-size="10.5" fill="#4a5260">a document matching only an</text>
+<text x="902" y="375" font-size="10.5" fill="#4a5260">expansion term is dropped.</text>
+<text x="46" y="440" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">2 - FIND CANDIDATES: TWO PATHS, ONE ANSWER</text>
+<line x1="46" y1="450" x2="1136" y2="450" stroke="#e4e4e0" stroke-width="1"/>
+<rect x="46" y="460" width="530" height="176" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="66" y="486" font-size="13" fill="#14181f" font-weight="600">Reference scan  --  THE DEFAULT</text>
+<text x="66" y="508" font-size="11.5" fill="#4a5260">Walk every .fux/index/*.jsonl shard as RAW BYTES.</text>
+<text x="66" y="526" font-size="11.5" fill="#4a5260">Pull flen and mtime by regex; json.loads a line only</text>
+<text x="66" y="544" font-size="11.5" fill="#4a5260">when it substring-matches a query hash.</text>
+<text x="66" y="570" font-size="11.5" fill="#626b78">No build step. This is what a bug report reproduces</text>
+<text x="66" y="588" font-size="11.5" fill="#626b78">against, which is why --scan survives as an alias.</text>
+<text x="66" y="616" font-size="11" fill="#8a93a0">df is counted from the PARSED record's own terms.</text>
+<rect x="606" y="460" width="530" height="176" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.8"/>
+<text x="626" y="486" font-size="13" fill="#14181f" font-weight="600">Accelerator  --  only with --fast</text>
+<text x="626" y="508" font-size="11.5" fill="#4a5260">.fux/runtime/ postings, rarest-first, exact theta,</text>
+<text x="626" y="526" font-size="11.5" fill="#4a5260">block-max bound, skip test.</text>
+<text x="626" y="552" font-size="11.5" fill="#4a5260">Taken ONLY if stats.json exists AND the stamp still</text>
+<text x="626" y="570" font-size="11.5" fill="#4a5260">matches the shards. Otherwise it silently falls</text>
+<text x="626" y="588" font-size="11.5" fill="#4a5260">through to the scan -- never a wrong answer.</text>
+<text x="626" y="616" font-size="11" fill="#1d8a5e" font-weight="600">It generates candidates and statistics. It never scores.</text>
+<path d="M311,640 L311,672 L590,672 L590,700" fill="none" stroke="#8a93a0" stroke-width="1.6" marker-end="url(#m)" stroke-linejoin="round"/>
+<path d="M871,640 L871,672 L590,672" fill="none" stroke="#8a93a0" stroke-width="1.6" marker-end="url(#m)" stroke-linejoin="round"/>
+<text x="46" y="706" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">3 - RANK: ONE FUNCTION, BOTH PATHS</text>
+<line x1="46" y1="716" x2="1136" y2="716" stroke="#e4e4e0" stroke-width="1"/>
+<rect x="46" y="726" width="1090" height="150" rx="12" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="66" y="752" font-size="13" fill="#14181f" font-weight="600">rank()  --  and this is why the two paths can be asserted byte-identical</text>
+<text x="66" y="776" font-size="11.5" fill="#4a5260">Float addition is not associative, so the accelerator must never accumulate its own scores. It hands rank() candidates; rank() does the arithmetic.</text>
+<text x="66" y="806" font-size="11.5" fill="#14181f" font-weight="600">guard</text>
+<text x="66" y="824" font-size="10.5" fill="#4a5260">Drop any candidate matching</text>
+<text x="66" y="840" font-size="10.5" fill="#4a5260">no ORIGINAL query term.</text>
+<text x="326" y="806" font-size="11.5" fill="#14181f" font-weight="600">BM25F</text>
+<text x="326" y="824" font-size="10.5" fill="#4a5260">Weight THEN saturate, once.</text>
+<text x="326" y="840" font-size="10.5" fill="#4a5260">body 1.0 heading 3.0 title 2.0</text>
+<text x="326" y="856" font-size="10.5" fill="#4a5260">path 1.5 ctx 1.0  -  k1 1.2 b 0.75</text>
+<text x="626" y="806" font-size="11.5" fill="#14181f" font-weight="600">multipliers</text>
+<text x="626" y="824" font-size="10.5" fill="#4a5260">archived x superseded x recency</text>
+<text x="626" y="840" font-size="10.5" fill="#4a5260">x priority. All defaults short-</text>
+<text x="626" y="856" font-size="10.5" fill="#4a5260">circuit to 1.0 -- byte-identity.</text>
+<text x="886" y="806" font-size="11.5" fill="#14181f" font-weight="600">sort</text>
+<text x="886" y="824" font-size="10.5" fill="#4a5260">(-round(score,9), superseded,</text>
+<text x="886" y="840" font-size="10.5" fill="#4a5260">-mtime, -priority, id)</text>
+<text x="886" y="856" font-size="10.5" fill="#4a5260">ties marked BEFORE truncation</text>
+<text x="46" y="908" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">4 - AFTER THE RANKING</text>
+<line x1="46" y1="918" x2="1136" y2="918" stroke="#e4e4e0" stroke-width="1"/>
+<rect x="46" y="928" width="340" height="142" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="66" y="954" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">-q  -&gt;  RRF fusion</text>
+<text x="66" y="976" font-size="11" fill="#4a5260">Each -q is its own full arm.</text>
+<text x="66" y="993" font-size="11" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">score = sum 1/(60 + rank + 1).</text>
+<text x="66" y="1013" font-size="11" fill="#4a5260">--json then carries "fused": true,</text>
+<text x="66" y="1030" font-size="11" fill="#4a5260">because an RRF score and a BM25F</text>
+<text x="66" y="1047" font-size="11" fill="#4a5260">score are not comparable.</text>
+<text x="66" y="1064" font-size="10.5" fill="#c2410c">The band describes ARM 1 only.</text>
+<rect x="406" y="928" width="340" height="142" rx="10" fill="#fff4ec" stroke="#c2410c" stroke-width="1.8" stroke-dasharray="5 3"/>
+<text x="426" y="954" font-size="12.5" fill="#c2410c" font-weight="600">proximity rerank  --  OFF</text>
+<text x="426" y="976" font-size="11" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">rerank_weight = 0.0 by default.</text>
+<text x="426" y="996" font-size="11" fill="#4a5260">When on: reorders the top 20 by a</text>
+<text x="426" y="1013" font-size="11" fill="#4a5260">bounded uplift over coverage, min-</text>
+<text x="426" y="1030" font-size="11" fill="#4a5260">span and adjacency, re-reading the</text>
+<text x="426" y="1047" font-size="11" fill="#4a5260">working-tree file. url: documents</text>
+<text x="426" y="1064" font-size="11" fill="#4a5260">keep their score -- ask never fetches.</text>
+<rect x="766" y="928" width="370" height="142" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="786" y="954" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">confidence band</text>
+<text x="786" y="976" font-size="10.5" fill="#4a5260">From the ORIGINAL query and the FINAL scores.</text>
+<text x="786" y="996" font-size="10.5" fill="#4a5260">First true clause wins:</text>
+<text x="786" y="1014" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">no support        -&gt; none</text>
+<text x="786" y="1030" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">a term df==0      -&gt; partial</text>
+<text x="786" y="1046" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">weak separation   -&gt; weak</text>
+<text x="786" y="1062" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">otherwise         -&gt; grounded</text>
+<rect x="46" y="1094" width="1090" height="56" rx="8" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.8"/>
+<text x="66" y="1118" font-size="12" fill="#1d8a5e" font-weight="600">verified is always "unverified" on ask and find.</text>
+<text x="66" y="1136" font-size="11" fill="#4a5260">They rank; they fetch nothing. Only fux answer can raise it -- that is the whole difference between the two verbs.</text>
+<text x="46" y="1188" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">NOT ON THE PATH, AND WHERE THAT IS ENFORCED</text>
+<line x1="46" y1="1198" x2="1136" y2="1198" stroke="#e4e4e0" stroke-width="1"/>
+<text x="46" y="1222" font-size="12.5" fill="#4a5260" font-weight="600">No network</text>
+<text x="46" y="1240" font-size="10.5" fill="#8a93a0">dependencies = []. The only networked code is</text>
+<text x="46" y="1256" font-size="10.5" fill="#8a93a0">your own fetcher, and ask never loads one.</text>
+<text x="416" y="1222" font-size="12.5" fill="#4a5260" font-weight="600">No model</text>
+<text x="416" y="1240" font-size="10.5" fill="#8a93a0">The dense lane was deleted 2026-08-25.</text>
+<text x="416" y="1256" font-size="10.5" fill="#8a93a0">--expand exists so the CALLER supplies vocabulary.</text>
+<text x="786" y="1222" font-size="12.5" fill="#4a5260" font-weight="600">No clock</text>
+<text x="786" y="1240" font-size="10.5" fill="#8a93a0">Recency uses committed git mtime, normalised</text>
+<text x="786" y="1256" font-size="10.5" fill="#8a93a0">against the corpus -- never wall time.</text>
+<line x1="46" y1="1282" x2="1136" y2="1282" stroke="#e4e4e0" stroke-width="1"/>
+<text x="46" y="1296" font-size="10.5" fill="#8a93a0">Drawn from src/fux/cli.py, src/fux/query/ and src/fux/derive/accel.py, 2026-09-12. ADR-ASK - ADR-RANKING - ADR-CONFIDENCE - ADR-TUNE.</text>
+</svg>

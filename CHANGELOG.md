@@ -10,6 +10,20 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Changed
 
+- 🔴 **An unknown key in `fux.toml` is now REFUSED, not ignored**
+  ([ADR-CONFIG](docs/adr/0113_config.md) decision 14, W-122; the defect was
+  W-140 row 8). A misspelled key used to parse and do nothing, so your setting
+  was inert with nothing said. The error names the key and lists what is legal
+  at that level. **This can break an existing `fux.toml`** that carries a key
+  fux never read — which is the point: it was not in force either way.
+  - `.fux/tune.toml` has behaved this way since it existed; `fux.toml` now matches.
+- **`fux setup`'s `fux.toml` comments are pointers, not explanations.** Every
+  key's meaning and default lives in ADR-CONFIG; a comment describing a key can
+  drift from the record while both look correct
+  ([ADR-LAW-0](docs/adr/0002_LAW-0-authority.md) decision 4). Your existing
+  `fux.toml` is untouched — `setup` never rewrites a file that is there.
+
+
 - **Codex and Copilot skills now install to `.agents/skills/`** — one shared
   folder, instead of `.codex/skills/` and `.github/skills/`
   ([ADR-AGENT-POLICY](docs/adr/0132_agent-policy.md) decision 16, W-141).
@@ -19,7 +33,62 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
     then re-run `fux setup`. It never deletes files, so otherwise Copilot sees
     the old copies next to the new ones.
 
+### Removed
+
+- **`src/fux/config.schema.json`** — every field in it was a `doc:` string
+  describing a `fux.toml` key, and nothing loaded or checked it, which is how it
+  came to advertise a `[sources] types_file` key that did not exist
+  ([ADR-CONFIG](docs/adr/0113_config.md) decision 15). The five remaining
+  schemas are all loaded at runtime or held equal to the code by a test.
+
 ### Added
+
+- 🔴 **A second reader: `fux` in Node, with no Python and no dependencies**
+  ([ADR-NODE-SEARCH](docs/adr/0155_node-search.md)). `fux setup` vendors it
+  into **`.fux/node/`** and writes a `.fux/fux` shim beside it, so a clone
+  answers with nothing installed:
+
+  ```console
+  $ node .fux/node/fux.mjs find rollback
+  $ .fux/fux find rollback
+  $ npx fux-engine find rollback
+  ```
+
+  - **It only reads.** `ingest`, `build`, `add`, `remove`, `update`, `enrich`,
+    `setup`, `doctor`, `hooks` and `daemon` are absent, and typing one prints
+    the specific correction rather than `unknown command`.
+  - **`--version` names the runtime** — `fux 2.0.0-alpha.7 (node 22.9.0)` —
+    because Python fux installs a `fux` too and a bug report must say which
+    one answered.
+  - **No `dependencies` key at all and no build step**: a build step is a
+    dependency (L1).
+  - ⚠ **`.fux/node/` is committed and OVERWRITTEN on a version difference**,
+    not write-if-missing — the fourth `.fux/` shape
+    ([ADR-DOTFUX](docs/adr/0102_fux-directory.md) decision 6a). Nobody edits a
+    vendored reader, and a stale one against a bumped `_format` is a wrong
+    answer rather than an old preference. `fux doctor` gains a `node reader`
+    row that reports the drift.
+  - ⚠ **It refuses without `.fux/pii.toml`, exactly as Python does.** A reader
+    that answered where the CLI refuses would be a divergence in the product.
+  - **Not on npm yet**, and no global `fux` bin in the first release.
+
+- 🔴 **`from fux import open` — fux is importable, not only spawnable**
+  ([ADR-API](docs/adr/0156_api.md)).
+
+  ```python
+  from fux import open as fux_open
+
+  ix = fux_open(".")
+  ix.find("rollback", top=5)
+  ix.ask("how do we roll back a release")
+  ix.answer("what is the RTO")
+  ```
+
+  Same method names and return shapes as the Node reader, and every result's
+  `as_dict()` is the `--json` payload — `query/output.schema.json` is now the
+  contract for **three** surfaces rather than one. `.fux/README.md`'s *"the CLI
+  is the contract; the modules are not"* is retired: **the CLI and `fux.api`
+  are the contract**, and nothing that writes is in it.
 
 - **Operating guides for every `fux` job, on Claude, Codex, Copilot and Kiro**
   ([ADR-AGENT-POLICY](docs/adr/0132_agent-policy.md) decision 15). `fux setup`
@@ -71,6 +140,20 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   [ADR-AGENT-POLICY](docs/adr/0132_agent-policy.md) decision 14a).
 
 ### Fixed
+
+- **`fux.open()` was 20× slower than it needed to be.** Its PII gate did
+  `from fux.ingest import pii`, which pulls in every decoder — **50.2 ms on a
+  warm open, against 2.6 ms** once the gate became a stat with the import only
+  on the path where it is about to raise. `fux.cli` has spelled the path inline
+  for this reason since the gate shipped; `tests/test_api.py` now asserts on
+  `sys.modules` rather than on a clock, and `tests/test_cli.py` holds all three
+  copies of the path equal.
+- **The MCP tool schema Node advertised contradicted itself.** `fux_search`'s
+  `k` property is declared `"type": "integer"` and Node emitted
+  `"default": "5"` — a string — because the `{{TOP}}` placeholder was
+  substituted into serialized JSON without regard for the quotes around it.
+  Python emitted `5`. Found by writing the equality check that now holds the
+  two halves together ([ADR-MCP](docs/adr/0136_mcp.md) decision 11).
 
 - **`fux update --check --json`.** The verb whose purpose is being read by
   something else had no machine-readable output, and it exits 0 whether or not

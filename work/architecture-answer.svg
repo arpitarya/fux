@@ -1,0 +1,130 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 1400" width="1180" height="1400" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+<defs>
+<marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10" fill="none" stroke="#3d6df2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10" fill="none" stroke="#1d8a5e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10" fill="none" stroke="#8a93a0" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10" fill="none" stroke="#c2410c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
+</defs>
+<rect width="1180" height="1400" fill="#fcfcfb"/>
+<text x="46" y="52" font-size="23" font-weight="600" fill="#14181f">How `fux answer` works</text>
+<text x="46" y="76" font-size="13" fill="#626b78">Rank like ask, then go and read the source. The only verb that can say a citation is still true.</text>
+<rect x="800" y="34" width="340" height="54" rx="8" fill="#fcfcfb" stroke="#e4e4e0" stroke-width="1.2"/>
+<rect x="812" y="44" width="11" height="11" rx="2.5" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.4"/>
+<text x="830" y="53" font-size="10.5" fill="#626b78">committed</text>
+<rect x="812" y="58" width="11" height="11" rx="2.5" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.4"/>
+<text x="830" y="67" font-size="10.5" fill="#626b78">the refer plane</text>
+<rect x="812" y="72" width="11" height="11" rx="2.5" fill="#fff4ec" stroke="#c2410c" stroke-width="1.4"/>
+<text x="830" y="81" font-size="10.5" fill="#626b78">could not verify</text>
+<text x="46" y="126" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">1 - IT REUSES ASK'S PATH EXACTLY</text>
+<line x1="46" y1="136" x2="1136" y2="136" stroke="#e4e4e0" stroke-width="1"/>
+<rect x="46" y="146" width="1090" height="72" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="66" y="172" font-size="12.5" fill="#14181f" font-weight="600">Same tune, same scan-or-accelerator choice, same rank(), same rerank, same confidence  --  with top = 3.</text>
+<text x="66" y="194" font-size="11.5" fill="#4a5260">answer takes ONE question and no -q (an RRF score would make the top-3 incomparable), but --expand applies. No results, and it emits a null answer and stops.</text>
+<path d="M590,222 L590,246" fill="none" stroke="#3d6df2" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="46" y="266" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">2 - OBTAIN EACH OF THE THREE CANDIDATES, IN THIS ORDER</text>
+<line x1="46" y1="276" x2="1136" y2="276" stroke="#e4e4e0" stroke-width="1"/>
+<rect x="46" y="286" width="1090" height="270" rx="12" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.8"/>
+<text x="66" y="312" font-size="13" fill="#14181f" font-weight="600">The decision ladder in _obtain()  --  first match wins, and none of them can crash the query</text>
+<text x="66" y="344" font-size="11.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">file:  -&gt;  read the working tree</text>
+<text x="66" y="361" font-size="10.5" fill="#4a5260">Always, even under mode=never. Reading your own checkout is not a fetch. A deleted file is an error naming it.</text>
+<text x="1116" y="344" font-size="10.5" fill="#1d8a5e" font-weight="600" text-anchor="end">current / stale</text>
+<text x="66" y="386" font-size="11.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">mode=never + url:</text>
+<text x="66" y="403" font-size="10.5" fill="#4a5260">Try .fux/acquired/ for the bytes the record was built from.</text>
+<text x="1116" y="386" font-size="10.5" fill="#1d8a5e" font-weight="600" text-anchor="end">as-ingested  or  unverified</text>
+<text x="66" y="428" font-size="11.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">TTL cache hit</text>
+<text x="66" y="445" font-size="10.5" fill="#4a5260">min(--cache-ttl, the URL line's own ttl=). A URL can narrow the TTL and can never widen it.</text>
+<text x="1116" y="428" font-size="10.5" fill="#1d8a5e" font-weight="600" text-anchor="end">cached</text>
+<text x="66" y="470" font-size="11.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">fetch, bounded by a timeout</text>
+<text x="66" y="487" font-size="10.5" fill="#4a5260">Your fetcher, on one worker, with a hard timeout. A hung consumer thread is abandoned, not joined.</text>
+<text x="1116" y="470" font-size="10.5" fill="#1d8a5e" font-weight="600" text-anchor="end">current / stale</text>
+<text x="66" y="512" font-size="11.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">fetch failed</text>
+<text x="66" y="529" font-size="10.5" fill="#4a5260">Fall back to .fux/acquired/; if that is empty too, say so rather than guessing.</text>
+<text x="1116" y="512" font-size="10.5" fill="#1d8a5e" font-weight="600" text-anchor="end">as-ingested  or  unverified</text>
+<text x="66" y="548" font-size="10.5" fill="#8a93a0">Fetchers are resolved per URL, not once: three candidates can sit behind three different fetchers, and verifying with the wrong one reports false staleness on every query.</text>
+<text x="46" y="590" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">3 - THE FIVE VERDICTS, AND WHAT EACH ACTUALLY CLAIMS</text>
+<line x1="46" y1="600" x2="1136" y2="600" stroke="#e4e4e0" stroke-width="1"/>
+<rect x="46" y="610" width="206" height="128" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.8"/>
+<text x="62" y="636" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">current</text>
+<text x="62" y="660" font-size="10.5" fill="#4a5260">the source matches</text>
+<text x="62" y="676" font-size="10.5" fill="#4a5260">the index</text>
+<text x="62" y="706" font-size="10" fill="#8a93a0">fetched_sha ==</text>
+<text x="62" y="721" font-size="10" fill="#8a93a0">indexed_sha</text>
+<rect x="266" y="610" width="206" height="128" rx="10" fill="#fff4ec" stroke="#c2410c" stroke-width="1.8" stroke-dasharray="5 3"/>
+<text x="282" y="636" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">stale</text>
+<text x="282" y="660" font-size="10.5" fill="#4a5260">the source has changed</text>
+<text x="282" y="676" font-size="10.5" fill="#4a5260">since ingest</text>
+<text x="282" y="706" font-size="10" fill="#8a93a0">fetched_sha !=</text>
+<text x="282" y="721" font-size="10" fill="#8a93a0">indexed_sha</text>
+<rect x="486" y="610" width="206" height="128" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="502" y="636" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">cached</text>
+<text x="502" y="660" font-size="10.5" fill="#4a5260">we looked recently</text>
+<text x="502" y="706" font-size="10" fill="#8a93a0">a TTL hit -- never</text>
+<text x="502" y="721" font-size="10" fill="#8a93a0">folded into current</text>
+<rect x="706" y="610" width="206" height="128" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="722" y="636" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">as-ingested</text>
+<text x="722" y="660" font-size="10.5" fill="#4a5260">we could not look, but</text>
+<text x="722" y="676" font-size="10.5" fill="#4a5260">the index is self-consistent</text>
+<text x="722" y="706" font-size="10" fill="#8a93a0">compared against</text>
+<text x="722" y="721" font-size="10" fill="#8a93a0">the acquired bytes</text>
+<rect x="926" y="610" width="206" height="128" rx="10" fill="#fff4ec" stroke="#c2410c" stroke-width="1.8" stroke-dasharray="5 3"/>
+<text x="942" y="636" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">unverified</text>
+<text x="942" y="660" font-size="10.5" fill="#4a5260">we did not look at all</text>
+<text x="942" y="706" font-size="10" fill="#8a93a0">no fetcher, refused,</text>
+<text x="942" y="721" font-size="10" fill="#8a93a0">or nothing retained</text>
+<rect x="46" y="752" width="1090" height="48" rx="8" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="66" y="774" font-size="11.5" fill="#4a5260">Only stale demotes the band. cached and as-ingested do not -- and "as-ingested" mismatching is an INDEX defect, not a stale source.</text>
+<text x="66" y="792" font-size="10.5" fill="#8a93a0">There is no max-age policy. No committed record carries an ingest time, so an age bound could not be honoured; the constructor says so rather than pretending.</text>
+<text x="46" y="834" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">4 - TURN THE FETCHED BYTES INTO ONE CITED PASSAGE</text>
+<line x1="46" y1="844" x2="1136" y2="844" stroke="#e4e4e0" stroke-width="1"/>
+<rect x="46" y="854" width="250" height="140" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="62" y="880" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">decode</text>
+<text x="62" y="902" font-size="10.5" fill="#4a5260">The same decoder plane</text>
+<text x="62" y="919" font-size="10.5" fill="#4a5260">ingest uses. The sha was</text>
+<text x="62" y="936" font-size="10.5" fill="#4a5260">taken on the RAW bytes,</text>
+<text x="62" y="953" font-size="10.5" fill="#4a5260">one line earlier.</text>
+<rect x="326" y="854" width="250" height="140" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="342" y="880" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">chunk</text>
+<text x="342" y="902" font-size="10.5" fill="#4a5260">Heading-aware, transient,</text>
+<text x="342" y="919" font-size="10.5" fill="#4a5260">never written (L2). Tables</text>
+<text x="342" y="936" font-size="10.5" fill="#4a5260">band at 1 row per passage</text>
+<text x="342" y="953" font-size="10.5" fill="#4a5260">-- hit@1 0.229 -&gt; 0.875.</text>
+<rect x="606" y="854" width="250" height="140" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="622" y="880" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">rescore</text>
+<text x="622" y="902" font-size="10.5" fill="#4a5260">The SAME BM25F scorer, over</text>
+<text x="622" y="919" font-size="10.5" fill="#4a5260">the passage set's own df and</text>
+<text x="622" y="936" font-size="10.5" fill="#4a5260">n. A passage is a two-field</text>
+<text x="622" y="953" font-size="10.5" fill="#4a5260">document: heading + body.</text>
+<rect x="886" y="854" width="250" height="140" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="902" y="880" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">assemble</text>
+<text x="902" y="902" font-size="10.5" fill="#4a5260">8000-byte budget. The best</text>
+<text x="902" y="919" font-size="10.5" fill="#4a5260">absolute passage is seated</text>
+<text x="902" y="936" font-size="10.5" fill="#4a5260">FIRST, so greedy score-per-</text>
+<text x="902" y="953" font-size="10.5" fill="#4a5260">byte cannot crowd it out.</text>
+<path d="M296,924 L324,924" fill="none" stroke="#3d6df2" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M576,924 L604,924" fill="none" stroke="#3d6df2" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M856,924 L884,924" fill="none" stroke="#3d6df2" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="46" y="1010" width="1090" height="54" rx="8" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="66" y="1034" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">The locator is a line range:   loc:L41-L58</text>
+<text x="66" y="1052" font-size="11" fill="#4a5260">Except for decoded documents -- a .docx's Markdown exists nowhere on disk, so a line number would be a confident lie. Those get loc#p3 and carry the heading beside it.</text>
+<text x="46" y="1100" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">5 - WHAT THE FLAGS CHANGE</text>
+<line x1="46" y1="1110" x2="1136" y2="1110" stroke="#e4e4e0" stroke-width="1"/>
+<text x="46" y="1134" font-size="11.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">--no-refer</text>
+<text x="176" y="1134" font-size="11" fill="#4a5260">Skip the fetch entirely. source becomes "index", the answer is the record's own title and headings, and verified stays "unverified" -- deliberately not upgraded.</text>
+<text x="46" y="1166" font-size="11.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">--audit</text>
+<text x="176" y="1166" font-size="11" fill="#4a5260">Per-document {indexed_sha, fetched_sha, freshness, strategy}, every citation, and the byte budget used and dropped.</text>
+<text x="46" y="1198" font-size="11.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">--receipt</text>
+<text x="176" y="1198" font-size="11" fill="#4a5260">An unsigned in-toto statement: index digest, tune digest, engine version, query, cited shas. fux verify re-runs it offline.</text>
+<text x="46" y="1230" font-size="11.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">--journal</text>
+<text x="176" y="1230" font-size="11" fill="#4a5260">The ONLY flag that writes. Appends the receipt to .fux/runtime/provenance.jsonl. Local, gitignored, bounded at 1000.</text>
+<text x="46" y="1262" font-size="11.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">--cache-ttl</text>
+<text x="176" y="1262" font-size="11" fill="#4a5260">Default 0 -- caching off. A caller who did not ask cannot be served a cached byte.</text>
+<rect x="46" y="1298" width="1090" height="54" rx="8" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.8"/>
+<text x="66" y="1322" font-size="12.5" fill="#1d8a5e" font-weight="600">The one rule for every caller</text>
+<text x="66" y="1340" font-size="11" fill="#4a5260">A script that reads the answer and ignores the verdict field has thrown away the only thing separating fux from a stale cache with good manners.</text>
+<line x1="46" y1="1370" x2="1136" y2="1370" stroke="#e4e4e0" stroke-width="1"/>
+<text x="46" y="1384" font-size="10.5" fill="#8a93a0">Drawn from src/fux/query/__init__.py, src/fux/query/refer_answer.py and src/fux/refer/, 2026-09-12. ADR-ANSWER - ADR-REFER - ADR-PROVENANCE.</text>
+</svg>

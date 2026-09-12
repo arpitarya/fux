@@ -175,6 +175,18 @@ record does not describe.** `__pycache__/` joined the file
 gitignored-but-not-derived, are unchanged. Recorded here because the freshness
 gate reads whole files and a reader deserves to know which half moved.
 
+**9. `keep` and `acquired_max_bytes` are DECLARED in
+[ADR-CONFIG](0113_config.md) decision 13's key block** (2026-09-12, W-122), and
+[`tests/test_adr_config_keys.py`](../../tests/test_adr_config_keys.py) holds that
+block equal to `config.py`'s `KNOWN_KEYS` in both directions.
+
+⚠ **This is the gate that would have caught decision 8's own worst day.**
+`acquired_max_bytes` was named in this record's prose and in the ownership table
+while `config.py` never parsed it, and `urlsrc.fetch_all` reached for it through an
+undefined name — a `NameError` on every retaining fetch. **Prose in this record
+can no longer create a key**; the declared block can, because a parser reads it.
+Naming a key here and nowhere else now fails a test instead of failing a user.
+
 ### Consequences
 
 **Easier.** A citation can be checked offline against the exact bytes that produced it — a stronger claim than comparing two fetches, which is why `refer/source.py` verifies with the same fetcher a document was ingested with: *a document fetched two ways is two documents*. A retained original removes that whole class of false staleness, and the browser-session fetcher stops being needed at answer time.

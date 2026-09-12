@@ -246,7 +246,7 @@ Redo this comparison if any of these is true:
 - ADR-FUXIGNORE — [`docs/adr/0145_fuxignore.md`](../../docs/adr/0145_fuxignore.md): decision 5.
 - ADR-DECODE — [`docs/adr/0139_decode.md`](../../docs/adr/0139_decode.md): decisions 13 and 17.
 - [file-type-filter](file-type-filter.compare.md) — option D and its matrix.
-- Code: [`sourcelist.py`](../../src/fux/ingest/sourcelist.py) (`parse`, `TYPES`), [`sources.py`](../../src/fux/sources.py), [`decode/__init__.py`](../../src/fux/decode/__init__.py) (`_declared_bindings`, `_bound_extension`, `_bind`), [`gitdir.py`](../../src/fux/ingest/gitdir.py) (`read_types`, the dot-skip), [`config.schema.json`](../../src/fux/config.schema.json).
+- Code: [`sourcelist.py`](../../src/fux/ingest/sourcelist.py) (`parse`, `TYPES`), [`sources.py`](../../src/fux/sources.py), [`decode/__init__.py`](../../src/fux/decode/__init__.py) (`_declared_bindings`, `_bound_extension`, `_bind`), [`gitdir.py`](../../src/fux/ingest/gitdir.py) (`read_types`, the dot-skip), `config.schema.json` (deleted 2026-09-12 by W-122's consolidation; the declared key block in [ADR-CONFIG](../../docs/adr/0113_config.md) decision 13 replaced it).
 - TOML v1.0.0 — duplicate keys invalid; multi-line arrays with trailing commas and comments — <https://toml.io/en/v1.0.0>
 - Python `tomllib` — read-only, added in 3.11 — <https://docs.python.org/3/library/tomllib.html>
 - Ruff settings, `include` and `extension` — <https://docs.astral.sh/ruff/settings/#extension>

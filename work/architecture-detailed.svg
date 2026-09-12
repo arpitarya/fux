@@ -1,364 +1,197 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 2150" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" xmlns:c2pa="http://c2pa.org/manifest"><metadata><c2pa:manifest>AAAWgmp1bWIAAAAeanVtZGMycGEAEQAQgAAAqgA4m3EDYzJwYQAAABZcanVtYgAAAEdqdW1kYzJtYQARABCAAACqADibcQN1cm46YzJwYTpmZGZjM2EwMy0wZGVkLTQwMzEtODdiNi1hMzk1ZTE4YWZmOWUAAAADl2p1bWIAAAApanVtZGMyYXMAEQAQgAAAqgA4m3EDYzJwYS5hc3NlcnRpb25zAAAAALxqdW1iAAAARGp1bWRjYm9yABEAEIAAAKoAOJtxE2MycGEuaW5ncmVkaWVudC52MwAAAAAYYzJzaDsG5EIb4Y6KwO5T671Q9joAAABwY2JvcqNpZGM6Zm9ybWF0bWltYWdlL3N2Zyt4bWxqaW5zdGFuY2VJRHgseG1wOmlpZDpmZDQ0ZGVmZS1kOTUyLTRiMGMtYTNkZC1lNWI4OTI4MTY0MDNscmVsYXRpb25zaGlwaHBhcmVudE9mAAAB4mp1bWIAAABBanVtZGNib3IAEQAQgAAAqgA4m3ETYzJwYS5hY3Rpb25zLnYyAAAAABhjMnNoCQnUe4dVf/CgE0JEgILaAgAAAZljYm9yomdhY3Rpb25zgqJmYWN0aW9ua2MycGEub3BlbmVkanBhcmFtZXRlcnOha2luZ3JlZGllbnRzgaJjdXJseC1zZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmluZ3JlZGllbnQudjNkaGFzaFggp9aWLdhqtilAi3mvhN7T4uKhMFuKgsZ1JAe6VrD/O62kZmFjdGlvbngdY29tLmFudGhyb3BpYy5jbGF1ZGUucHJvdmlkZWRqcGFyYW1ldGVyc6F4H2NvbS5hbnRocm9waWMub3JpZ2luLWNvbmZpZGVuY2VndW5rbm93bmtkZXNjcmlwdGlvbnhmQ2xhdWRlIHByb3ZpZGVkIHRoaXMgZmlsZSBhdCB0aGUgcmVxdWVzdCBvZiBhIHVzZXIgYW5kIG1heSBoYXZlIGNyZWF0ZWQgb3IgbW9kaWZpZWQgdGhlIGZpbGUgY29udGVudHMubXNvZnR3YXJlQWdlbnShZG5hbWVmQ2xhdWRlcmFsbEFjdGlvbnNJbmNsdWRlZPUAAADIanVtYgAAAEBqdW1kY2JvcgARABCAAACqADibcRNjMnBhLmhhc2guZGF0YQAAAAAYYzJzaPcxUP5AYJ4+jGtj6XdegKYAAACAY2JvcqVjYWxnZnNoYTI1NmNwYWRNAAAAAAAAAAAAAAAAAGRoYXNoWCCXpKPQ58B2NpbwQWrjiPL+l7560xH3PfepL2vZ3pFJRGRuYW1lbmp1bWJmIG1hbmlmZXN0amV4Y2x1c2lvbnOBomVzdGFydBjGZmxlbmd0aBkeBAAAAj5qdW1iAAAAJ2p1bWRjMmNsABEAEIAAAKoAOJtxA2MycGEuY2xhaW0udjIAAAACD2Nib3KlY2FsZ2ZzaGEyNTZpc2lnbmF0dXJleE1zZWxmI2p1bWJmPS9jMnBhL3VybjpjMnBhOmZkZmMzYTAzLTBkZWQtNDAzMS04N2I2LWEzOTVlMThhZmY5ZS9jMnBhLnNpZ25hdHVyZWppbnN0YW5jZUlEeCx4bXA6aWlkOjgwOTc4MDM3LWM5ZjgtNDJmNC1iOTg0LWFiYTdlZjk0OGY3ZnJjcmVhdGVkX2Fzc2VydGlvbnODomN1cmx4LXNlbGYjanVtYmY9YzJwYS5hc3NlcnRpb25zL2MycGEuaW5ncmVkaWVudC52M2RoYXNoWCCn1pYt2Gq2KUCLea+E3tPi4qEwW4qCxnUkB7pWsP87raJjdXJseCpzZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmFjdGlvbnMudjJkaGFzaFgg0aQ9gN6K4gGe8n9REgVHsK4l5eI/dOyeLr5G03lxVRSiY3VybHgpc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5oYXNoLmRhdGFkaGFzaFggqSannsJQIZid4Bs3o9lEQr7G/IV5KPE/lyE9aTiqLGR0Y2xhaW1fZ2VuZXJhdG9yX2luZm+jZG5hbWVvQW50aHJvcGljIEZpbGVzZ3ZlcnNpb25lMS4wLjBrc3BlY1ZlcnNpb25lMi40LjAAABA4anVtYgAAAChqdW1kYzJjcwARABCAAACqADibcQNjMnBhLnNpZ25hdHVyZQAAABAIY2JvctKEWQISogEmGCFZAgowggIGMIIBjaADAgECAhRA5aAK7sI50L64g/oGQgU9Z1UTADAKBggqhkjOPQQDAzBJMRcwFQYDVQQKEw5BbnRocm9waWMsIFBCQzEuMCwGA1UEAxMlQW50aHJvcGljIENvbnRlbnQgQ3JlZGVudGlhbHMgUm9vdCBDQTAeFw0yNjA4MDcxODQzNTZaFw0yODA4MDYxOTQzNTZaMEQxFzAVBgNVBAoTDkFudGhyb3BpYywgUEJDMSkwJwYDVQQDEyBBbnRocm9waWMgQ2xhdWRlIENvbnRlbnQgU2lnbmluZzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABJh6CmvLUBgFFNU0vUKlOVtE6djd17L5SuwX0LemFisBM3dkd/3cyjxFA3Qo5S46fX0/ihY0VZ7mfb9KF703t5OjWDBWMA4GA1UdDwEB/wQEAwIHgDAVBgNVHSUEDjAMBgorBgEEAYPoXgIBMAwGA1UdEwEB/wQCMAAwHwYDVR0jBBgwFoAUzlHiBIFOZFsj+OPEz5o+nMHXXMIwCgYIKoZIzj0EAwMDZwAwZAIwMXMdFJ4BetLLVY7ORuE9noqbbAZOZn/aArXyTwFAZfKrPzxF2vPoJNf1+UCdg1XGAjBwX1zd9WGqYkqmL5SFqw1QySjr1zJfpJM9+1rdDwSPLMOPOjKuiXjoU/pUUeG9RwmhY3BhZFkNngAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPZYQFdX2EgieXGJXgE95AvxMl9PvvRXHfvROLqEaFgfyelKARN1ZevLPRyvpDQ+F36dFHzwOgie+7Y8wwzx9IGH9Xs=</c2pa:manifest></metadata>
-  <defs>
-    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-      <path d="M 0 1.5 L 8.5 5 L 0 8.5" fill="none" stroke="#3d6df2" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
-    </marker>
-    <marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
-      <path d="M 0 1.5 L 8.5 5 L 0 8.5" fill="none" stroke="#1d8a5e" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
-    </marker>
-    <marker id="m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-      <path d="M 0 1.5 L 8.5 5 L 0 8.5" fill="none" stroke="#8a93a0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
-    </marker>
-  </defs>
-
-  <rect width="1240" height="2150" fill="#fcfcfb"/>
-
-  <text x="48" y="46" font-size="22" fill="#14181f" font-weight="600">Fux — the mechanism</text>
-  <text x="48" y="70" font-size="12" fill="#626b78">2.0.0-alpha.2 + unreleased · 2026-08-28 · fux.index.v2 / analyzer v2 / fux.runtime.v5 · lexical only, no model anywhere</text>
-
-  <rect x="826" y="30" width="14" height="14" rx="3" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.6"/>
-  <text x="848" y="42" font-size="11.5" fill="#4a5260">committed to git</text>
-  <rect x="958" y="30" width="14" height="14" rx="3" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
-  <text x="980" y="42" font-size="11.5" fill="#4a5260">derived · gitignored</text>
-  <rect x="1104" y="30" width="14" height="14" rx="3" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.8"/>
-  <text x="1126" y="42" font-size="11.5" fill="#1d8a5e">new since alpha.2</text>
-
-  <!-- ================= 1 · SOURCES ================= -->
-  <text x="48" y="112" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">SOURCES — WHAT IS INDEXED, AND WHAT IS NOT · every one of these is a committed file</text>
-
-  <rect x="48" y="126" width="300" height="112" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.8"/>
-  <text x="64" y="150" font-size="13" fill="#14181f" font-weight="600">.fux/.fuxignore</text>
-  <text x="64" y="170" font-size="11.5" fill="#4a5260">.gitignore grammar · read FIRST</text>
-  <text x="64" y="187" font-size="11.5" fill="#4a5260">decides in BOTH directions — it beats</text>
-  <text x="64" y="204" font-size="11.5" fill="#4a5260">formats.toml either way</text>
-  <text x="64" y="228" font-size="11" fill="#1d8a5e" font-weight="600">! RE-INCLUDES here; it subtracts next door</text>
-
-  <rect x="364" y="126" width="292" height="112" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
-  <text x="380" y="150" font-size="13" fill="#14181f" font-weight="600">.fux/sources/</text>
-  <text x="380" y="170" font-size="11.5" fill="#4a5260">dirs · urls · types — one entry per line</text>
-  <text x="380" y="187" font-size="11.5" fill="#4a5260">loader-sorted, so order cannot leak in</text>
-  <text x="380" y="205" font-size="11" fill="#8a93a0">a url line carries fetch=&lt;name&gt;; a dir line</text>
-  <text x="380" y="219" font-size="11" fill="#8a93a0">carries archived= / enrich=</text>
-  <text x="380" y="233" font-size="11" fill="#c2410c" font-weight="600">! here is the DEPRECATED spelling</text>
-
-  <rect x="672" y="126" width="252" height="112" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
-  <text x="688" y="150" font-size="13" fill="#14181f" font-weight="600">fux.toml</text>
-  <text x="688" y="170" font-size="11.5" fill="#4a5260">policy, not corpus</text>
-  <text x="688" y="187" font-size="11.5" fill="#4a5260">max_parallel is REQUIRED and</text>
-  <text x="688" y="204" font-size="11.5" fill="#4a5260">may not be commented out</text>
-  <text x="688" y="226" font-size="11" fill="#8a93a0">[agents] install = declared vendors</text>
-
-  <rect x="940" y="126" width="252" height="112" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
-  <text x="956" y="150" font-size="13" fill="#14181f" font-weight="600">two words, never mixed</text>
-  <text x="956" y="172" font-size="11.5" fill="#4a5260"><tspan font-weight="600">not indexed</tspan> — a committed rule</text>
-  <text x="956" y="188" font-size="11.5" fill="#4a5260">doing its job. Nothing to fix.</text>
-  <text x="956" y="210" font-size="11.5" fill="#4a5260"><tspan font-weight="600">skipped</tspan> — fux opened it and</text>
-  <text x="956" y="226" font-size="11.5" fill="#4a5260">could not read it. Maybe fixable.</text>
-
-  <!-- ================= 2 · INGEST ================= -->
-  <text x="48" y="272" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">INGEST — WALK, FETCH, DECODE, ANALYSE, RESOLVE EDGES, WRITE · then DISCARD the content</text>
-
-  <rect x="48" y="286" width="212" height="98" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
-  <text x="64" y="310" font-size="13" fill="#14181f" font-weight="600">the git-dir walker</text>
-  <text x="64" y="330" font-size="11.5" fill="#4a5260">reads bytes off disk</text>
-  <text x="64" y="347" font-size="11" fill="#8a93a0">unchanged sha + file: + plain meta</text>
-  <text x="64" y="364" font-size="11" fill="#8a93a0">= carried forward, not re-extracted</text>
-
-  <rect x="284" y="286" width="232" height="98" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
-  <text x="300" y="310" font-size="13" fill="#14181f" font-weight="600">fetch_all — PARALLEL</text>
-  <text x="300" y="330" font-size="11.5" fill="#4a5260">min(fetcher's MAX_PARALLEL,</text>
-  <text x="300" y="347" font-size="11.5" fill="#4a5260">fux.toml max_parallel)</text>
-  <text x="300" y="368" font-size="11" fill="#8a93a0">absent = 1 · http 8 · cdp 1</text>
-
-  <rect x="540" y="286" width="200" height="98" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
-  <text x="556" y="310" font-size="13" fill="#14181f" font-weight="600">analyzer v2</text>
-  <text x="556" y="330" font-size="11.5" fill="#4a5260">split · lower · stopwords</text>
-  <text x="556" y="347" font-size="11.5" fill="#4a5260">Porter stem · blake2b 16-hex</text>
-  <text x="556" y="368" font-size="11" fill="#8a93a0">order is load-bearing</text>
-
-  <rect x="764" y="286" width="196" height="98" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
-  <text x="780" y="310" font-size="13" fill="#14181f" font-weight="600">priors &amp; edges</text>
-  <text x="780" y="330" font-size="11.5" fill="#4a5260">supersedes: · archived</text>
-  <text x="780" y="347" font-size="11.5" fill="#4a5260">git commit time as mtime</text>
-  <text x="780" y="368" font-size="11" fill="#8a93a0">edges re-resolved every run</text>
-
-  <rect x="984" y="286" width="208" height="98" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
-  <text x="1000" y="310" font-size="13" fill="#14181f" font-weight="600">url health</text>
-  <text x="1000" y="330" font-size="11.5" fill="#4a5260">runtime/url-state.json</text>
-  <text x="1000" y="347" font-size="11.5" fill="#4a5260">fail_streak · last_seen_run</text>
-  <text x="1000" y="368" font-size="11" fill="#8a93a0">RUNS, never seconds</text>
-
-  <line x1="260" y1="332" x2="278" y2="332" stroke="#3d6df2" stroke-width="1.8" marker-end="url(#a)"/>
-  <line x1="516" y1="332" x2="534" y2="332" stroke="#3d6df2" stroke-width="1.8" marker-end="url(#a)"/>
-  <line x1="740" y1="332" x2="758" y2="332" stroke="#3d6df2" stroke-width="1.8" marker-end="url(#a)"/>
-
-  <rect x="48" y="396" width="1144" height="34" rx="8" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.2" stroke-dasharray="5 4"/>
-  <text x="66" y="418" font-size="11.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">ingested 632 docs (32 changed, 600 carried forward), 341 not indexed, 1 skipped, 31 shards written</text>
-  <text x="890" y="418" font-size="11" fill="#1d8a5e" font-weight="600">— and the same two words are written into .fuxignore</text>
-
-  <!-- ================= 3 · DECODE ================= -->
-  <text x="48" y="464" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">DECODE — BYTES BECOME MARKDOWN, IN ONE PLACE</text>
-
-  <rect x="48" y="478" width="1144" height="76" rx="10" fill="#f7fbf9" stroke="#1d8a5e" stroke-width="1.4" stroke-dasharray="4 3"/>
-
-  <rect x="68" y="492" width="250" height="48" rx="8" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
-  <text x="82" y="512" font-size="12.5" fill="#14181f" font-weight="600">.fux/decoders/ — 16 modules</text>
-  <text x="82" y="530" font-size="11" fill="#4a5260">setup copies them; THE COPY RUNS</text>
-
-  <rect x="334" y="492" width="266" height="48" rx="8" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
-  <text x="348" y="512" font-size="12.5" fill="#14181f" font-weight="600">dispatch by lowercase extension</text>
-  <text x="348" y="530" font-size="11" fill="#4a5260">pdf · docx · pptx · xlsx · odt · html · eml …</text>
-
-  <rect x="616" y="492" width="252" height="48" rx="8" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
-  <text x="630" y="512" font-size="12.5" fill="#14181f" font-weight="600">bytes → Markdown | None</text>
-  <text x="630" y="530" font-size="11" fill="#4a5260">stdlib · deterministic · never raises</text>
-
-  <rect x="884" y="492" width="288" height="48" rx="8" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
-  <text x="898" y="512" font-size="12.5" fill="#14181f" font-weight="600">None → .fux/enrich/queue.tsv</text>
-  <text x="898" y="530" font-size="11" fill="#4a5260">path · sha · reason — never content</text>
-
-  <!-- ================= 4 · COMMITTED PLANE ================= -->
-  <rect x="48" y="582" width="1144" height="158" rx="12" fill="#eef3fd" stroke="#3d6df2" stroke-width="2.2"/>
-  <text x="68" y="610" font-size="13.5" fill="#14181f" font-weight="700">THE COMMITTED PLANE · .fux/index/{00..ff}.jsonl</text>
-  <text x="68" y="630" font-size="11.5" fill="#4a5260">256 shards — blake2b(id, digest_size=1) · doc-major, one canonical JSON line per document · the header pins schema, analyzer and tf_fields</text>
-
-  <rect x="68" y="644" width="256" height="80" rx="8" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.2"/>
-  <text x="84" y="666" font-size="12" fill="#14181f" font-weight="600">identity &amp; policy</text>
-  <text x="84" y="686" font-size="11" fill="#4a5260">id · src · loc · sha · ver</text>
-  <text x="84" y="704" font-size="11" fill="#4a5260">mode · meta</text>
-
-  <rect x="340" y="644" width="286" height="80" rx="8" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.2"/>
-  <text x="356" y="666" font-size="12" fill="#14181f" font-weight="600">retrieval</text>
-  <text x="356" y="686" font-size="11" fill="#4a5260">terms{16-hex: [tf ×5]} · flen[5]</text>
-  <text x="356" y="704" font-size="11" fill="#4a5260">title (or title_h) · phrases</text>
-
-  <rect x="642" y="644" width="262" height="80" rx="8" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.2"/>
-  <text x="658" y="666" font-size="12" fill="#14181f" font-weight="600">priors &amp; edges</text>
-  <text x="658" y="686" font-size="11" fill="#4a5260">archived · superseded</text>
-  <text x="658" y="704" font-size="11" fill="#4a5260">mtime · edges</text>
-
-  <rect x="920" y="644" width="256" height="80" rx="8" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.2"/>
-  <text x="936" y="666" font-size="12" fill="#14181f" font-weight="600">five weighted fields</text>
-  <text x="936" y="686" font-size="11" fill="#4a5260">body 1.0 · heading 3.0 · title 2.0</text>
-  <text x="936" y="704" font-size="11" fill="#4a5260">path 1.5 · ctx 1.0</text>
-
-  <text x="68" y="736" font-size="11" fill="#3d6df2" font-weight="600">no prose · no floats · no nulls · no clocks · no vectors — the dense lane and its model were deleted 2026-08-25</text>
-
-  <!-- ================= 4b · ALSO COMMITTED ================= -->
-  <rect x="48" y="752" width="1144" height="52" rx="10" fill="#ffffff" stroke="#3d6df2" stroke-width="1.4" stroke-dasharray="5 4"/>
-  <text x="66" y="774" font-size="12" fill="#14181f" font-weight="600">Committed beside the index<tspan fill="#4a5260" font-weight="400" font-family="ui-monospace, Menlo, monospace">   sources/ · fetchers/ · decoders/ · enrich/ · tune.toml · output.toml · .fuxignore</tspan></text>
-  <text x="66" y="793" font-size="11.5" fill="#c2410c" font-weight="600">GITIGNORED IS THE TEST, NOT “.fux/”.<tspan fill="#626b78" font-weight="400">   .fux/runtime/ is the only derived directory under it — which is what keeps a use journal out of a commit.</tspan></text>
-
-  <!-- ================= 5 · DERIVED PLANE ================= -->
-  <text x="48" y="838" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">THE DERIVED PLANE · .fux/runtime/ — gitignored, rebuilt by `fux build` in seconds</text>
-
-  <rect x="48" y="852" width="184" height="86" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
-  <text x="64" y="876" font-size="12.5" fill="#14181f" font-weight="600">postings/</text>
-  <text x="64" y="896" font-size="11" fill="#4a5260">term-major, 128/block</text>
-  <text x="64" y="914" font-size="11" fill="#4a5260">62-byte offset entry</text>
-
-  <rect x="246" y="852" width="176" height="86" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
-  <text x="262" y="876" font-size="12.5" fill="#14181f" font-weight="600">docs.jsonl</text>
-  <text x="262" y="896" font-size="11" fill="#4a5260">loc · title · flen · mtime</text>
-  <text x="262" y="914" font-size="11" fill="#4a5260">archived · superseded</text>
-
-  <rect x="436" y="852" width="164" height="86" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
-  <text x="452" y="876" font-size="12.5" fill="#14181f" font-weight="600">stats.json</text>
-  <text x="452" y="896" font-size="11" fill="#4a5260">n · total_flen</text>
-  <text x="452" y="914" font-size="11" fill="#4a5260">newest_mtime</text>
-
-  <rect x="614" y="852" width="176" height="86" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
-  <text x="630" y="876" font-size="12.5" fill="#14181f" font-weight="600">manifest.json</text>
-  <text x="630" y="896" font-size="11" fill="#4a5260">per-shard content-sha</text>
-  <text x="630" y="914" font-size="11" fill="#4a5260">staleness ground truth</text>
-
-  <rect x="804" y="852" width="176" height="86" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
-  <text x="820" y="876" font-size="12.5" fill="#14181f" font-weight="600">stamp.json</text>
-  <text x="820" y="896" font-size="11" fill="#4a5260">cheap mtime pre-filter</text>
-  <text x="820" y="914" font-size="11" fill="#c2410c" font-weight="600">reads a wall clock</text>
-
-  <rect x="994" y="852" width="182" height="86" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
-  <text x="1010" y="876" font-size="12.5" fill="#14181f" font-weight="600">graph.json</text>
-  <text x="1010" y="896" font-size="11" fill="#4a5260">edges + communities</text>
-  <text x="1010" y="914" font-size="11" fill="#4a5260">unseeded · lazy PPR</text>
-
-  <rect x="48" y="950" width="184" height="86" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
-  <text x="64" y="974" font-size="12.5" fill="#14181f" font-weight="600">fetch-cache/</text>
-  <text x="64" y="994" font-size="11" fill="#4a5260">TTL store, off by default</text>
-  <text x="64" y="1012" font-size="11" fill="#c2410c" font-weight="600">the other wall clock</text>
-
-  <rect x="246" y="950" width="176" height="86" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
-  <text x="262" y="974" font-size="12.5" fill="#14181f" font-weight="600">dirty list</text>
-  <text x="262" y="994" font-size="11" fill="#4a5260">post-commit writes it</text>
-  <text x="262" y="1012" font-size="11" fill="#4a5260">refer writes it too</text>
-
-  <rect x="436" y="950" width="164" height="86" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
-  <text x="452" y="974" font-size="12.5" fill="#14181f" font-weight="600">last-cited</text>
-  <text x="452" y="994" font-size="11" fill="#4a5260">(loc, sha) of the</text>
-  <text x="452" y="1012" font-size="11" fill="#4a5260">last answer</text>
-
-  <rect x="614" y="950" width="176" height="86" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
-  <text x="630" y="974" font-size="12.5" fill="#14181f" font-weight="600">url-state.json</text>
-  <text x="630" y="994" font-size="11" fill="#4a5260">per-URL fail_streak</text>
-  <text x="630" y="1012" font-size="11" fill="#4a5260">counted in runs</text>
-
-  <rect x="804" y="950" width="176" height="86" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
-  <text x="820" y="974" font-size="12.5" fill="#14181f" font-weight="600">display-cache/</text>
-  <text x="820" y="994" font-size="11" fill="#4a5260">titles for hashed</text>
-  <text x="820" y="1012" font-size="11" fill="#4a5260">records, keyed by sha</text>
-
-  <rect x="994" y="950" width="182" height="86" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.8"/>
-  <text x="1010" y="974" font-size="12.5" fill="#14181f" font-weight="600">the answer journal</text>
-  <text x="1010" y="994" font-size="11" fill="#4a5260">opt-in, bounded at 1000</text>
-  <text x="1010" y="1012" font-size="11" fill="#1d8a5e" font-weight="600">L8 lives or dies here</text>
-
-  <rect x="48" y="1052" width="1128" height="50" rx="8" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.2" stroke-dasharray="5 4"/>
-  <text x="66" y="1073" font-size="12" fill="#14181f" font-weight="600">The differential law —</text>
-  <text x="224" y="1073" font-size="12" fill="#4a5260">every result the accelerator returns is byte-identical to the reference scan.</text>
-  <text x="66" y="1092" font-size="11.5" fill="#626b78">Delete the derived plane and you lose speed, never an answer. That is what makes it disposable — and it is why a schema still versions it.</text>
-
-  <!-- ================= 6 · QUERY ================= -->
-  <text x="48" y="1136" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">QUERY — EVERY CALL</text>
-
-  <rect x="48" y="1150" width="196" height="86" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
-  <text x="64" y="1174" font-size="12.5" fill="#14181f" font-weight="600">ask · find · answer</text>
-  <text x="64" y="1194" font-size="12.5" fill="#14181f" font-weight="600">explain · graph · path</text>
-  <text x="64" y="1214" font-size="11" fill="#8a93a0">shares the ingest analyzer</text>
-  <text x="64" y="1230" font-size="11" fill="#8a93a0">read verbs take no lock</text>
-
-  <rect x="268" y="1150" width="212" height="86" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
-  <text x="284" y="1174" font-size="12.5" fill="#14181f" font-weight="600">--fast or --scan</text>
-  <text x="284" y="1194" font-size="11" fill="#4a5260">rarest-first → exact θ →</text>
-  <text x="284" y="1212" font-size="11" fill="#4a5260">block-max bound → skip test</text>
-  <text x="284" y="1230" font-size="11" fill="#8a93a0">candidates, never scores</text>
-
-  <rect x="504" y="1150" width="196" height="86" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
-  <text x="520" y="1174" font-size="12.5" fill="#14181f" font-weight="600">rank() — BM25F</text>
-  <text x="520" y="1194" font-size="11" fill="#4a5260">K1 1.2 · B 0.75</text>
-  <text x="520" y="1212" font-size="11" fill="#4a5260">weight, then saturate — once</text>
-  <text x="520" y="1230" font-size="11" fill="#8a93a0">sort (-round(s,9), id)</text>
-
-  <rect x="724" y="1150" width="196" height="86" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
-  <text x="740" y="1174" font-size="12.5" fill="#14181f" font-weight="600">proximity rerank</text>
-  <text x="740" y="1194" font-size="11" fill="#4a5260">rerank_weight = 0.0 → OFF</text>
-  <text x="740" y="1212" font-size="11" fill="#4a5260">reorders top-20 → top-5</text>
-  <text x="740" y="1230" font-size="11" fill="#8a93a0">never retrieves</text>
-
-  <rect x="944" y="1150" width="232" height="86" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
-  <text x="960" y="1174" font-size="12.5" fill="#14181f" font-weight="600">refer → answer</text>
-  <text x="960" y="1194" font-size="11" fill="#4a5260">fetch live, compare sha, cite L12-L40</text>
-  <text x="960" y="1212" font-size="11" fill="#4a5260">current · stale · unverified · cached</text>
-  <text x="960" y="1230" font-size="11" fill="#8a93a0">a byte budget, not a top-k</text>
-
-  <line x1="244" y1="1193" x2="262" y2="1193" stroke="#3d6df2" stroke-width="1.8" marker-end="url(#a)"/>
-  <line x1="480" y1="1193" x2="498" y2="1193" stroke="#3d6df2" stroke-width="1.8" marker-end="url(#a)"/>
-  <line x1="700" y1="1193" x2="718" y2="1193" stroke="#3d6df2" stroke-width="1.8" marker-end="url(#a)"/>
-  <line x1="920" y1="1193" x2="938" y2="1193" stroke="#3d6df2" stroke-width="1.8" marker-end="url(#a)"/>
-
-  <!-- the detector loop -->
-  <path d="M 1060 1236 L 1060 1264 L 620 1264" fill="none" stroke="#1d8a5e" stroke-width="2.2"/>
-  <path d="M 620 1264 L 28 1264 L 28 332 L 42 332" fill="none" stroke="#1d8a5e" stroke-width="2.2" marker-end="url(#g)"/>
-  <rect x="626" y="1248" width="404" height="32" rx="8" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.4"/>
-  <text x="828" y="1269" font-size="12" fill="#1d8a5e" text-anchor="middle" font-weight="600">sha differs → mark dirty → narrowed re-ingest fixes ranking</text>
-
-  <text x="196" y="1300" font-size="12.5" fill="#14181f" font-weight="700">THE LOOP THAT CLOSES THE GAP</text>
-  <text x="196" y="1320" font-size="12" fill="#4a5260">refer used to compute the verdict and throw it away, so a changed URL kept its old terms, stopped ranking, was never cited, and</text>
-  <text x="196" y="1338" font-size="12" fill="#4a5260">nothing noticed. It buys RECALL, not correctness: a changed document could never be mis-answered, only fail to surface. Only a</text>
-  <text x="196" y="1356" font-size="12" fill="#4a5260">definitive url: staleness enters the list — file: changes are git's job, and post-commit already sees them.</text>
-
-  <!-- ================= 7 · CONFIDENCE & PROVENANCE ================= -->
-  <text x="48" y="1394" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">WHAT THE ANSWER SAYS ABOUT ITSELF — CONFIDENCE AND PROVENANCE</text>
-
-  <rect x="48" y="1408" width="380" height="112" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.8"/>
-  <text x="66" y="1432" font-size="13" fill="#14181f" font-weight="600">the band ladder — first true wins</text>
-  <text x="66" y="1453" font-size="11.5" fill="#4a5260"><tspan font-weight="600">none</tspan> nothing scored above 0, so abstain →</text>
-  <text x="66" y="1470" font-size="11.5" fill="#4a5260"><tspan font-weight="600">partial</tspan> a term matches nothing, or the cited bytes</text>
-  <text x="66" y="1487" font-size="11.5" fill="#4a5260">moved → <tspan font-weight="600">weak</tspan> separation below the floor → <tspan font-weight="600">grounded</tspan></text>
-  <text x="66" y="1509" font-size="10.5" fill="#1d8a5e" font-weight="600">floors: separation 0.1 GATES · doc_coverage 0.0 is OFF</text>
-
-  <rect x="444" y="1408" width="300" height="112" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.8"/>
-  <text x="462" y="1432" font-size="13" fill="#14181f" font-weight="600">ten keys, published together</text>
-  <text x="462" y="1454" font-size="11" fill="#4a5260">band · answerable · coverage · doc_coverage</text>
-  <text x="462" y="1471" font-size="11" fill="#4a5260">separation · support · verified · missing</text>
-  <text x="462" y="1488" font-size="11" fill="#4a5260">separation_floor · doc_coverage_floor</text>
-  <text x="462" y="1509" font-size="10.5" fill="#1d8a5e" font-weight="600">a floor is repo-local — it ships WITH the verdict</text>
-
-  <rect x="760" y="1408" width="432" height="112" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.8"/>
-  <text x="778" y="1432" font-size="13" fill="#14181f" font-weight="600">provenance — and only one flag writes</text>
-  <text x="778" y="1454" font-size="11.5" fill="#4a5260"><tspan font-family="ui-monospace, Menlo, monospace">ask --why</tspan> a second, untuned query: reachable →</text>
-  <text x="778" y="1470" font-size="11.5" fill="#4a5260">window → placed → answered. Never instruments rank().</text>
-  <text x="778" y="1488" font-size="11.5" fill="#4a5260"><tspan font-family="ui-monospace, Menlo, monospace">answer --audit</tspan> the bundle · <tspan font-family="ui-monospace, Menlo, monospace">--receipt</tspan> an unsigned</text>
-  <text x="778" y="1504" font-size="11.5" fill="#4a5260">in-toto statement, no clock · <tspan font-family="ui-monospace, Menlo, monospace">--journal</tspan> WRITES</text>
-
-
-  <rect x="48" y="1532" width="1144" height="34" rx="8" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.2" stroke-dasharray="5 4"/>
-  <text x="66" y="1554" font-size="11.5" fill="#4a5260"><tspan font-family="ui-monospace, Menlo, monospace" fill="#14181f" font-weight="600">fux verify</tspan> re-runs a receipt and never opens a socket → reproduced · drifted:config · drifted:corpus · unverifiable — config is checked before corpus.</text>
-
-  <!-- ================= 8 · CONFIG & SERVE ================= -->
-  <text x="48" y="1600" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">TWO COMMITTED CONFIG FILES WITH OPPOSITE RULES — AND THE AGENT PORT</text>
-
-  <rect x="48" y="1614" width="368" height="104" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
-  <text x="66" y="1638" font-size="13" fill="#14181f" font-weight="600">.fux/tune.toml — ORDERING ONLY</text>
-  <text x="66" y="1660" font-size="11.5" fill="#4a5260">six tables: bm25f · ranking · graph · refer ·</text>
-  <text x="66" y="1677" font-size="11.5" fill="#4a5260">confidence · priority (the one left commented)</text>
-  <text x="66" y="1700" font-size="11" fill="#1d8a5e" font-weight="600">Absent or empty = every default. No error.</text>
-  <text x="66" y="1714" font-size="10.5" fill="#8a93a0">never read on the maintenance path</text>
-
-  <rect x="432" y="1614" width="392" height="104" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
-  <text x="450" y="1638" font-size="13" fill="#14181f" font-weight="600">.fux/output.toml — SHAPE ONLY</text>
-  <text x="450" y="1660" font-size="11.5" fill="#4a5260">three roots: [cli] · [cli.json] inherits [cli] ·</text>
-  <text x="450" y="1677" font-size="11.5" fill="#4a5260">[mcp] inherits nothing</text>
-  <text x="450" y="1700" font-size="11" fill="#c2410c" font-weight="600">An unset key is a FuxError naming the key.</text>
-  <text x="450" y="1714" font-size="10.5" fill="#8a93a0">--no-output-config bypasses it, now everywhere</text>
-
-  <rect x="840" y="1614" width="352" height="104" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
-  <text x="858" y="1638" font-size="13" fill="#14181f" font-weight="600">fux mcp — stdio JSON-RPC 2.0</text>
-  <text x="858" y="1660" font-size="11.5" fill="#4a5260">fux_search · fux_passage · fux_related</text>
-  <text x="858" y="1677" font-size="11.5" fill="#4a5260">hand-rolled, zero dependencies</text>
-  <text x="858" y="1700" font-size="11" fill="#8a93a0">`answer` is deliberately NOT exposed —</text>
-  <text x="858" y="1714" font-size="11" fill="#8a93a0">the agent is the answerer</text>
-
-  <!-- ================= 9 · MAINTENANCE & AGENT SURFACE ================= -->
-  <text x="48" y="1752" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">MAINTENANCE AND THE AGENT SURFACE — written by `fux setup`, owned by the consumer, never rewritten</text>
-
-  <rect x="48" y="1766" width="368" height="98" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
-  <text x="66" y="1790" font-size="13" fill="#14181f" font-weight="600">fux hooks — the hook DEFERS</text>
-  <text x="66" y="1812" font-size="11.5" fill="#4a5260">post-commit writes a dirty list and spawns a</text>
-  <text x="66" y="1829" font-size="11.5" fill="#4a5260">detached one-shot runner — never a daemon</text>
-  <text x="66" y="1850" font-size="11" fill="#8a93a0">post-merge re-ingests · post-checkout rebuilds derived</text>
-
-  <rect x="432" y="1766" width="392" height="98" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
-  <text x="450" y="1790" font-size="13" fill="#14181f" font-weight="600">one write.lock · no hook opens a socket</text>
-  <text x="450" y="1812" font-size="11.5" fill="#4a5260">ingest · build · add · remove · update take it;</text>
-  <text x="450" y="1829" font-size="11.5" fill="#4a5260">every read verb takes nothing</text>
-  <text x="450" y="1850" font-size="11" fill="#8a93a0">fux daemon is a resident clock a human starts</text>
-
-  <rect x="840" y="1766" width="352" height="98" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
-  <text x="858" y="1790" font-size="13" fill="#14181f" font-weight="600">declared vendors only, never sniffed</text>
-  <text x="858" y="1812" font-size="11.5" fill="#4a5260">.claude/skills/ · .kiro/steering/ + skills/</text>
-  <text x="858" y="1829" font-size="11.5" fill="#4a5260">.github/agents/ + instructions/</text>
-  <text x="858" y="1850" font-size="11" fill="#8a93a0">write-if-missing; an edited file is never rewritten</text>
-
-  <rect x="48" y="1876" width="1144" height="34" rx="8" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.2" stroke-dasharray="5 4"/>
-  <text x="66" y="1898" font-size="11.5" fill="#14181f" font-weight="600">the invocation ladder —</text>
-  <text x="224" y="1898" font-size="11.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">fux → uv run fux → ./.venv/bin/fux → python -m fux</text>
-  <text x="628" y="1898" font-size="11.5" fill="#4a5260">· probe with --version, cache per session, and never say “not installed”.</text>
-
-  <!-- ================= LAWS ================= -->
-  <line x1="48" y1="1928" x2="1192" y2="1928" stroke="#e4e4e0" stroke-width="1"/>
-  <text x="48" y="1950" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">THE LAWS THIS SHAPE ENFORCES</text>
-  <text x="48" y="1972" font-size="11.5" fill="#4a5260">L1 stdlib only — threading is stdlib, so the pool costs nothing</text>
-  <text x="470" y="1972" font-size="11.5" fill="#4a5260">L2 no durable content — the index holds statistics</text>
-  <text x="856" y="1972" font-size="11.5" fill="#4a5260">L3 deterministic — the sort, not the loop</text>
-  <text x="48" y="1990" font-size="11.5" fill="#4a5260">L4 offline by default — two named networked paths</text>
-  <text x="470" y="1990" font-size="11.5" fill="#4a5260">L5 hashed meta by default for non-git sources</text>
-  <text x="856" y="1990" font-size="11.5" fill="#4a5260">L6 say “index”, not “db” · L7 Python ≥ 3.11</text>
-  <text x="48" y="2008" font-size="11.5" fill="#4a5260">L8 a use record is never committed — plaintext is legal, a stdout receipt is legal, and “gitignored”, not “inside .fux/”, is the test</text>
-
-  <!-- ================= PROPOSED — search v3 (2026-09-04) · NOT BUILT ================= -->
-  <text x="48" y="2054" font-size="11" fill="#c2410c" font-weight="600" letter-spacing="1.1">PROPOSED — SEARCH V3 · 2026-09-04 · NOTHING IN THIS BAND IS BUILT · work/proposals/search-v3.md · architecture-search-v3.svg</text>
-  <rect x="48" y="2068" width="1144" height="62" rx="10" fill="#fff4ec" stroke="#c2410c" stroke-width="1.8" stroke-dasharray="5 3"/>
-  <text x="64" y="2090" font-size="11.5" fill="#4a5260"><tspan font-weight="600" fill="#14181f">read from Node too</tspan> — npx fux-search, zero deps, the same seven verbs over the same committed contract; python ≡ node as a third arm of the differential law · <tspan font-weight="600" fill="#14181f">answer refers top-3</tspan>, rescored with proximity</text>
-  <text x="64" y="2107" font-size="11.5" fill="#4a5260"><tspan font-weight="600" fill="#14181f">--expand / -q</tspan> an agent-written expansion at a lower weight, RRF across phrasings · <tspan font-weight="600" fill="#14181f">enrich → doc2query</tspan> with a self-retrieval filter · <tspan font-weight="600" fill="#14181f">declared tie-break</tspan> · find --phrase/--under/--all</text>
-  <text x="64" y="2124" font-size="11.5" fill="#4a5260"><tspan font-weight="600" fill="#14181f">.fux/vectors/ (opt-in, pinned int8, agent-run embedder)</tspan> read by --qvec, fused in rank space — <tspan fill="#c2410c" font-weight="600">gated on W-106 first</tspan> · <tspan font-weight="600" fill="#14181f">one portable log()</tspan>, same idf bits on every libm and V8</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1340 1998" width="1340" height="1998" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+<defs>
+<marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10" fill="none" stroke="#3d6df2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10" fill="none" stroke="#1d8a5e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10" fill="none" stroke="#8a93a0" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10" fill="none" stroke="#c2410c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
+</defs>
+<rect width="1340" height="1998" fill="#fcfcfb"/>
+<text x="46" y="52" font-size="23" font-weight="600" fill="#14181f">Fux, in detail</text>
+<text x="46" y="76" font-size="13" fill="#626b78">Every plane, what is committed and what is not, and the two query paths. Drawn from the code on 2026-09-12.</text>
+<rect x="920" y="32" width="340" height="86" rx="8" fill="#fcfcfb" stroke="#e4e4e0" stroke-width="1.2"/>
+<rect x="934" y="46" width="12" height="12" rx="2.5" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.4"/>
+<text x="954" y="56" font-size="10.5" fill="#626b78">committed  --  belongs in git</text>
+<rect x="934" y="63" width="12" height="12" rx="2.5" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="954" y="73" font-size="10.5" fill="#626b78">derived  --  rebuildable, gitignored</text>
+<rect x="934" y="80" width="12" height="12" rx="2.5" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.4"/>
+<text x="954" y="90" font-size="10.5" fill="#626b78">acquired  --  gitignored, NOT rebuildable</text>
+<rect x="934" y="97" width="12" height="12" rx="2.5" fill="#fff4ec" stroke="#c2410c" stroke-width="1.4"/>
+<text x="954" y="107" font-size="10.5" fill="#626b78">off by default, or not built</text>
+<text x="46" y="146" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">SOURCES  --  WHAT COUNTS AS A DOCUMENT</text>
+<line x1="46" y1="156" x2="1216" y2="156" stroke="#e4e4e0" stroke-width="1"/>
+<rect x="46" y="166" width="270" height="112" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="62" y="192" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">.fuxignore</text>
+<text x="62" y="214" font-size="10.5" fill="#4a5260">Read FIRST and outranks</text>
+<text x="62" y="231" font-size="10.5" fill="#4a5260">everything. Nothing in</text>
+<text x="62" y="248" font-size="10.5" fill="#4a5260">formats.toml subtracts.</text>
+<rect x="346" y="166" width="270" height="112" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="362" y="192" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">formats.toml</text>
+<text x="362" y="214" font-size="10.5" fill="#4a5260">include = [...] globs</text>
+<text x="362" y="231" font-size="10.5" fill="#4a5260">[decoders] ext -&gt; module</text>
+<text x="362" y="248" font-size="10.5" fill="#4a5260">Absent = the built-in default.</text>
+<rect x="646" y="166" width="270" height="112" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="662" y="192" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">sources/dirs</text>
+<text x="662" y="214" font-size="10.5" fill="#4a5260">One directory per line.</text>
+<text x="662" y="231" font-size="10.5" fill="#4a5260">A leading ! excludes.</text>
+<text x="662" y="248" font-size="10.5" fill="#4a5260">archived= marks retired.</text>
+<rect x="946" y="166" width="270" height="112" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="962" y="192" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">sources/urls</text>
+<text x="962" y="214" font-size="10.5" fill="#4a5260">One URL per line, with</text>
+<text x="962" y="231" font-size="10.5" fill="#4a5260">fetch= ttl= keep= meta=.</text>
+<text x="962" y="248" font-size="10.5" fill="#4a5260">Fetched by YOUR fetcher.</text>
+<text x="46" y="312" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">INGEST  --  THE ONLY PATH INTO THE COMMITTED PLANE</text>
+<line x1="46" y1="322" x2="1216" y2="322" stroke="#e4e4e0" stroke-width="1"/>
+<rect x="46" y="332" width="174" height="108" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="60" y="358" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">walk / fetch</text>
+<text x="60" y="380" font-size="10" fill="#4a5260">git dir, or your</text>
+<text x="60" y="397" font-size="10" fill="#4a5260">fetcher over HTTP</text>
+<rect x="250" y="332" width="174" height="108" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="264" y="358" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">decode</text>
+<text x="264" y="380" font-size="10" fill="#4a5260">17 built-ins, and</text>
+<text x="264" y="397" font-size="10" fill="#4a5260">your .fux/decoders/</text>
+<text x="264" y="414" font-size="10" fill="#4a5260">copies are what run</text>
+<rect x="454" y="332" width="174" height="108" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.8"/>
+<text x="468" y="358" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">content_sha</text>
+<text x="468" y="380" font-size="10" fill="#4a5260">ON THE RAW BYTES,</text>
+<text x="468" y="397" font-size="10" fill="#4a5260">before redaction.</text>
+<text x="468" y="414" font-size="10" fill="#4a5260">Load-bearing.</text>
+<rect x="658" y="332" width="174" height="108" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.8"/>
+<text x="672" y="358" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">redact</text>
+<text x="672" y="380" font-size="10" fill="#4a5260">pii.toml, REQUIRED.</text>
+<text x="672" y="397" font-size="10" fill="#4a5260">Body + frontmatter</text>
+<text x="672" y="414" font-size="10" fill="#4a5260">title. Not the path.</text>
+<rect x="862" y="332" width="174" height="108" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="876" y="358" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">extract</text>
+<text x="876" y="380" font-size="10" fill="#4a5260">title, phrases,</text>
+<text x="876" y="397" font-size="10" fill="#4a5260">terms + flen over</text>
+<text x="876" y="414" font-size="10" fill="#4a5260">5 weighted fields</text>
+<rect x="1046" y="332" width="170" height="108" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="1060" y="358" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">edges</text>
+<text x="1060" y="380" font-size="10" fill="#4a5260">Re-resolved EVERY</text>
+<text x="1060" y="397" font-size="10" fill="#4a5260">run: links, tags,</text>
+<text x="1060" y="414" font-size="10" fill="#4a5260">supersedes, code</text>
+<path d="M220,386 L246,386" fill="none" stroke="#3d6df2" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M424,386 L450,386" fill="none" stroke="#3d6df2" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M628,386 L654,386" fill="none" stroke="#3d6df2" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M832,386 L858,386" fill="none" stroke="#3d6df2" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M1036,386 L1062,386" fill="none" stroke="#3d6df2" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="46" y="454" width="1170" height="40" rx="8" fill="#fff4ec" stroke="#c2410c" stroke-width="1.8" stroke-dasharray="5 3"/>
+<text x="66" y="479" font-size="11" fill="#c2410c">decode() returned nothing  -&gt;  a row in .fux/enrich/queue.tsv with the reason. Queued, never silently dropped -- and the reason distinguishes "no decoder exists" from "a model is the only way".</text>
+<text x="46" y="530" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">THE COMMITTED PLANE  --  THIS IS THE PRODUCT</text>
+<line x1="46" y1="540" x2="1216" y2="540" stroke="#e4e4e0" stroke-width="1"/>
+<rect x="46" y="550" width="1170" height="206" rx="12" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="70" y="578" font-size="15" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">.fux/index/</text>
+<text x="196" y="578" font-size="11.5" fill="#4a5260">256 shards, {00..ff}.jsonl, one canonical JSON line per document. Doc-major, sorted, so it diffs like code.</text>
+<text x="70" y="604" font-size="11" fill="#8a93a0">The shard is blake2b(doc id, 1 byte). A bundled git merge driver handles two branches touching the index.</text>
+<text x="70" y="640" font-size="11.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">id / loc</text>
+<text x="70" y="658" font-size="10.5" fill="#4a5260">file:docs/x.md or url:https://...</text>
+<text x="330" y="640" font-size="11.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">terms</text>
+<text x="330" y="658" font-size="10.5" fill="#4a5260">hash -&gt; per-field counts, 5 fields</text>
+<text x="590" y="640" font-size="11.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">flen</text>
+<text x="590" y="658" font-size="10.5" fill="#4a5260">field lengths; wlen is DERIVED at query time</text>
+<text x="900" y="640" font-size="11.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">title / phrases</text>
+<text x="900" y="658" font-size="10.5" fill="#4a5260">display only -- the cap never touches ranking</text>
+<text x="70" y="692" font-size="11.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">sha</text>
+<text x="70" y="710" font-size="10.5" fill="#4a5260">of the RAW bytes -- what answer verifies against</text>
+<text x="330" y="692" font-size="11.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">mtime</text>
+<text x="330" y="710" font-size="10.5" fill="#4a5260">git commit time. Recency never reads a clock.</text>
+<text x="590" y="692" font-size="11.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">edges</text>
+<text x="590" y="710" font-size="10.5" fill="#4a5260">kind + dst + grade: link, tag, supersedes, code</text>
+<text x="900" y="692" font-size="11.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">meta</text>
+<text x="900" y="710" font-size="10.5" fill="#4a5260">hashed by default -- L5</text>
+<text x="70" y="738" font-size="11" fill="#1d8a5e" font-weight="600">No content. Ever. The index holds statistics about your documents and never the documents -- that is L2, and it is why there is no second copy to go stale.</text>
+<rect x="46" y="772" width="1170" height="104" rx="8" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="66" y="796" font-size="12" fill="#14181f" font-weight="600">Committed beside the index</text>
+<text x="66" y="818" font-size="11" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">pii.toml</text>
+<text x="66" y="834" font-size="10" fill="#8a93a0">REQUIRED -- every verb but setup, tune,</text>
+<text x="66" y="848" font-size="10" fill="#8a93a0">output and doctor refuses without it</text>
+<text x="446" y="818" font-size="11" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">tune.toml</text>
+<text x="446" y="834" font-size="10" fill="#8a93a0">ORDERING only -- how results are sorted,</text>
+<text x="446" y="848" font-size="10" fill="#8a93a0">never what is indexed</text>
+<text x="826" y="818" font-size="11" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">output.toml</text>
+<text x="826" y="834" font-size="10" fill="#8a93a0">SHAPE only -- how a result is shown,</text>
+<text x="826" y="848" font-size="10" fill="#8a93a0">never which documents come back</text>
+<text x="66" y="864" font-size="10" fill="#8a93a0">also committed: sources/  fetchers/  decoders/  enrich/  refusals.toml  formats.toml  .fuxignore</text>
+<text x="46" y="914" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">THE TWO GITIGNORED PLANES  --  AND THEY ARE NOT THE SAME KIND OF THING</text>
+<line x1="46" y1="924" x2="1216" y2="924" stroke="#e4e4e0" stroke-width="1"/>
+<rect x="46" y="934" width="570" height="168" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="66" y="960" font-size="13" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">.fux/runtime/   --  DERIVED</text>
+<text x="66" y="984" font-size="11.5" fill="#4a5260">fux build reconstructs all of it. Safe to delete, any time.</text>
+<text x="66" y="1008" font-size="10.5" fill="#626b78" font-family="ui-monospace, Menlo, monospace">postings/ docs.jsonl stats.json manifest.json stamp.json</text>
+<text x="66" y="1026" font-size="10.5" fill="#626b78" font-family="ui-monospace, Menlo, monospace">graph.json fetch-cache/ display-cache/ pii-digest</text>
+<text x="66" y="1044" font-size="10.5" fill="#626b78" font-family="ui-monospace, Menlo, monospace">provenance.jsonl (--journal) dirty-list write.lock</text>
+<text x="66" y="1072" font-size="10.5" fill="#8a93a0">Carries CACHEDIR.TAG, so backup tools skip it unasked.</text>
+<rect x="646" y="934" width="570" height="168" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.8"/>
+<text x="666" y="960" font-size="13" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">.fux/acquired/   --  ACQUIRED</text>
+<text x="666" y="984" font-size="11.5" fill="#4a5260">The bytes a fetch actually returned, for URLs whose line</text>
+<text x="666" y="1002" font-size="11.5" fill="#4a5260">says keep=true. Gitignored and tagged like derived --</text>
+<text x="666" y="1020" font-size="11.5" fill="#4a5260" font-weight="600">but NOT rebuildable.</text>
+<text x="666" y="1046" font-size="11" fill="#1d8a5e">Deleting it loses the only local copy. Getting it back means</text>
+<text x="666" y="1064" font-size="11" fill="#1d8a5e">re-fetching from a source that must still exist.</text>
+<text x="666" y="1086" font-size="10.5" fill="#8a93a0">A third kind, not a subdivision of derived: runtime/ MEANS rebuildable.</text>
+<rect x="46" y="1116" width="1170" height="58" rx="8" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="66" y="1138" font-size="11" fill="#4a5260" font-weight="600">.fux/.gitignore lists the ignored directories BY NAME and never a wildcard.</text>
+<text x="66" y="1156" font-size="11" fill="#4a5260">One .fux/* line would quietly drop the committed index from git with no error -- so fux doctor asserts this against git check-ignore itself.</text>
+<text x="46" y="1192" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">QUERY  --  EVERY CALL, AND THE LAW THAT LETS THERE BE TWO PATHS</text>
+<line x1="46" y1="1202" x2="1216" y2="1202" stroke="#e4e4e0" stroke-width="1"/>
+<rect x="46" y="1212" width="570" height="150" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="66" y="1238" font-size="12.5" fill="#14181f" font-weight="600">Reference scan  --  the default</text>
+<text x="66" y="1260" font-size="11" fill="#4a5260">Read every shard as raw bytes; parse a line only when it</text>
+<text x="66" y="1278" font-size="11" fill="#4a5260">substring-matches a query hash. No build step needed.</text>
+<text x="66" y="1306" font-size="12.5" fill="#14181f" font-weight="600">Accelerator  --  only with --fast, only if fresh</text>
+<text x="66" y="1328" font-size="11" fill="#4a5260">Rarest-first, block-max bound, skip test. Falls through to</text>
+<text x="66" y="1346" font-size="11" fill="#4a5260">the scan silently when the stamp no longer matches.</text>
+<rect x="646" y="1212" width="570" height="150" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="666" y="1238" font-size="12.5" fill="#14181f" font-weight="600">The differential law</text>
+<text x="666" y="1260" font-size="11.5" fill="#4a5260" font-weight="600">Accelerator results EQUAL reference-scan results.</text>
+<text x="666" y="1284" font-size="11" fill="#4a5260">Float addition is not associative, so the accelerator never</text>
+<text x="666" y="1302" font-size="11" fill="#4a5260">accumulates a score. It produces candidates and statistics;</text>
+<text x="666" y="1320" font-size="11" fill="#4a5260">rank() does every arithmetic operation, once, for both.</text>
+<text x="666" y="1346" font-size="10.5" fill="#1d8a5e" font-weight="600">--fast can only ever change speed. That is asserted, not hoped.</text>
+<rect x="46" y="1378" width="1170" height="86" rx="8" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="66" y="1404" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">rank()</text>
+<text x="136" y="1404" font-size="11" fill="#4a5260">expansion guard -&gt; BM25F weight-then-saturate-once -&gt; archived x superseded x recency x priority -&gt; the declared 5-key sort -&gt; ties marked before truncation</text>
+<text x="66" y="1430" font-size="10.5" fill="#626b78" font-family="ui-monospace, Menlo, monospace">body 1.0   heading 3.0   title 2.0   path 1.5   ctx 1.0        k1 1.2   b 0.75        sort: (-round(score,9), superseded, -mtime, -priority, id)</text>
+<text x="66" y="1452" font-size="10.5" fill="#8a93a0">Then: -q arms fused by RRF at k=60  -  proximity rerank of the top 20 (OFF by default)  -  the confidence band  -  and for answer, the refer plane.</text>
+<text x="46" y="1500" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">REFER  --  THE ONLY PART THAT LEAVES THE MACHINE</text>
+<line x1="46" y1="1510" x2="1216" y2="1510" stroke="#e4e4e0" stroke-width="1"/>
+<rect x="46" y="1520" width="1170" height="110" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.8"/>
+<text x="66" y="1546" font-size="12.5" fill="#14181f" font-weight="600">fux answer ranks top-3, then goes and reads the source before it quotes.</text>
+<text x="66" y="1568" font-size="11" fill="#4a5260">file: reads the checkout  -  url: hits the TTL cache, else your fetcher under a hard timeout, else .fux/acquired/, else it says it did not look.</text>
+<text x="66" y="1590" font-size="12" fill="#1d8a5e" font-weight="600" font-family="ui-monospace, Menlo, monospace">current  -  stale  -  cached  -  as-ingested  -  unverified</text>
+<text x="66" y="1612" font-size="11" fill="#4a5260">Then: chunk on headings (transient, never written) -&gt; rescore with the same BM25F over the passage set -&gt; assemble under 8000 bytes -&gt; cite with a line range and a fresh sha.</text>
+<path d="M1216,1596 L1272,1596 L1272,386 L1222,386" fill="none" stroke="#1d8a5e" stroke-width="1.6" marker-end="url(#g)" stroke-linejoin="round"/>
+<text x="1288" y="1150" font-size="10" fill="#1d8a5e" font-weight="600" text-anchor="middle">sha</text>
+<text x="1288" y="1166" font-size="10" fill="#1d8a5e" font-weight="600" text-anchor="middle">differs</text>
+<text x="1288" y="1198" font-size="10" fill="#1d8a5e" font-weight="600" text-anchor="middle">mark</text>
+<text x="1288" y="1214" font-size="10" fill="#1d8a5e" font-weight="600" text-anchor="middle">dirty</text>
+<text x="1288" y="1246" font-size="10" fill="#1d8a5e" font-weight="600" text-anchor="middle">a narrowed</text>
+<text x="1288" y="1262" font-size="10" fill="#1d8a5e" font-weight="600" text-anchor="middle">re-ingest</text>
+<text x="1288" y="1278" font-size="10" fill="#1d8a5e" font-weight="600" text-anchor="middle">fixes</text>
+<text x="1288" y="1294" font-size="10" fill="#1d8a5e" font-weight="600" text-anchor="middle">ranking</text>
+<text x="46" y="1668" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">THE LAWS THIS SHAPE EXISTS TO SATISFY</text>
+<line x1="46" y1="1678" x2="1216" y2="1678" stroke="#e4e4e0" stroke-width="1"/>
+<text x="46" y="1702" font-size="11.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">L1</text>
+<text x="86" y="1702" font-size="11.5" fill="#4a5260" font-weight="600">$0 and FOSS-only</text>
+<text x="306" y="1702" font-size="10.5" fill="#8a93a0">dependencies = []. The zero-dependency guarantee was withdrawn 2026-09-06; a runtime dependency now needs an accepted record.</text>
+<text x="46" y="1734" font-size="11.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">L2</text>
+<text x="86" y="1734" font-size="11.5" fill="#4a5260" font-weight="600">content is never durable</text>
+<text x="306" y="1734" font-size="10.5" fill="#8a93a0">The index holds statistics. Chunks are re-derived transiently at answer time and written nowhere.</text>
+<text x="46" y="1766" font-size="11.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">L3</text>
+<text x="86" y="1766" font-size="11.5" fill="#4a5260" font-weight="600">deterministic</text>
+<text x="306" y="1766" font-size="10.5" fill="#8a93a0">Same sources, byte-identical index. No wall clock, no filesystem order, no model.</text>
+<text x="46" y="1798" font-size="11.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">L4</text>
+<text x="86" y="1798" font-size="11.5" fill="#4a5260" font-weight="600">offline by default</text>
+<text x="306" y="1798" font-size="10.5" fill="#8a93a0">ask and find never touch the network. Only ingest and answer can, and only through your fetcher.</text>
+<text x="46" y="1830" font-size="11.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">L5</text>
+<text x="86" y="1830" font-size="11.5" fill="#4a5260" font-weight="600">hashed meta</text>
+<text x="306" y="1830" font-size="10.5" fill="#8a93a0">Non-git sources commit hashed metadata, not values.</text>
+<rect x="46" y="1866" width="1170" height="74" rx="8" fill="#fff4ec" stroke="#c2410c" stroke-width="1.8" stroke-dasharray="5 3"/>
+<text x="66" y="1889" font-size="11.5" fill="#c2410c" font-weight="600">Not built, and named here so no one reads it off a diagram as shipped:</text>
+<text x="66" y="1907" font-size="10.5" fill="#4a5260">the paper's single content-addressed MST keyspace (L/ P/ D/ V/ E/ M/) -- what shipped is flat sharded JSONL.   The dense / vector lane -- deleted 2026-08-25.   The Node reader.</text>
+<text x="66" y="1925" font-size="10.5" fill="#4a5260">The ARC cache is implemented and tested but never constructed on the CLI path -- the cache that actually runs is the TTL fetch cache under .fux/runtime/.</text>
 </svg>

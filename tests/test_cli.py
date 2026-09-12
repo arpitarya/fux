@@ -3,11 +3,14 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
+from pathlib import Path
 
 import pytest
 
 from fux import __version__
 from fux.cli import build_parser, main
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_version_flag(capsys):
@@ -161,10 +164,39 @@ def test_every_verb_is_gated_except_the_named_exemptions(tmp_path, monkeypatch):
 
 
 def test_the_gate_checks_the_same_file_pii_loads(tmp_path):
+    """Every hand-spelled copy of the path, against the one that loads it.
+
+    ⚠ **Three copies now, not two.** `cli.py` and `api.py` each spell
+    `.fux/pii.toml` inline so the gate costs a stat instead of importing
+    `fux.ingest` (~50 ms of decoders on a warm `fux.open`), and `node/fux.mjs`
+    spells it a third time for the same reason in a runtime that cannot import
+    Python at all. The REFUSAL WORDING is not duplicated — it stays in `pii`,
+    which is the part that would actually drift.
+    """
+    from fux.api import _PII_RULES as api_rules
     from fux.cli import _PII_RULES
     from fux.ingest import pii
 
     assert tmp_path.joinpath(*_PII_RULES) == pii.rules_path(tmp_path)
+    assert api_rules == _PII_RULES
+
+
+def test_the_node_reader_gates_on_the_same_file(tmp_path):
+    """W-107 O1, ruled by Arpit 2026-09-12: Node enforces the gate identically.
+
+    A reader that answers where the CLI refuses is a divergence in the
+    PRODUCT, not merely in the code — the gate exists so that a redacted index
+    is the only index anything reads. `fux.mjs` is read as text rather than
+    run, so this costs nothing and still fails if the path is edited there.
+    """
+    from fux.ingest import pii
+
+    source = (ROOT / "node" / "fux.mjs").read_text(encoding="utf-8")
+    assert '".fux", "pii.toml"' in source, (
+        "node/fux.mjs no longer spells the gate's path — a Node-only clone "
+        "would answer where Python refuses (W-107 O1)"
+    )
+    assert pii.rules_path(tmp_path) == tmp_path / ".fux" / "pii.toml"
 
 
 def test_a_gated_verb_stops_before_dispatch_with_exit_1(tmp_path, monkeypatch, capsys):

@@ -15,17 +15,19 @@ timestamp: 2026-08-18T00:00:00Z
 
 ## §1 — For humans
 
-> **This record is the RATIONALE for law L4. It is not the law.**
-> The normative text lives in
-> [`CLAUDE.md` §Non-negotiable constraints](../../CLAUDE.md), and that is its
-> only home. This record explains why the law exists, what it has cost, how its
-> wording has moved, and what would reopen it — **without restating it**, per
-> [ADR-LAWS](0001_LAWS.md) decision 3.
+> **This record is the HOME of law L4 — §2's first block IS the law**, and the
+> rest of this record is its rationale: why it exists, what it has cost, how its
+> wording has moved, and what would reopen it.
+> [`CLAUDE.md` §Non-negotiable constraints](../../CLAUDE.md) carries a
+> **generated** copy, held byte-equal by
+> [`tests/test_claude_md_laws.py`](../../tests/test_claude_md_laws.py) —
+> [ADR-LAW-0](0002_LAW-0-authority.md) decisions 1 and 5, on Arpit's ruling of
+> 2026-09-06. ⚠ **`CLAUDE.md` is not the source any more**; amend the law here.
 
 **The one-line case.** A knowledge tool that can reach the network by accident is a data-exfiltration tool that has not had its accident yet.
 
 **The handle:** *Offline by default* — the one-line form from [ADR-LAWS](0001_LAWS.md)'s
-table. ⚠ **A handle is not the law**; read the law at its home.
+table. ⚠ **A handle is not the law**; read the law in §2 below.
 
 **The default is no socket.** Ranking, ingest of local directories, the index, `find`, `doctor` and the whole accelerator are offline by construction, and an import fence test asserts that the modules on those paths cannot even import a transport.
 
@@ -48,34 +50,36 @@ table. ⚠ **A handle is not the law**; read the law at its home.
 
 ```mermaid
 flowchart LR
-    C["CLAUDE.md §Non-negotiable constraints<br/>(the only normative text)"]
-    N["ADR-LAWS<br/>(the handles L1..L8)"]
-    R["ADR-LAW-4<br/>(this record — rationale, history, veto)"]
+    R["ADR-LAW-4<br/>(THIS RECORD — states law L4)"]
+    N["ADR-LAWS<br/>(the handles L0..L9 — routes, never states)"]
+    C["CLAUDE.md §Non-negotiable constraints<br/>(GENERATED from the records · test-bound)"]
     B["records bound by L4<br/>(cite the number, never restate)"]
-    C --> N --> R
+    R --> C
+    N --> R
     N --> B
-    R -. "explains, never restates" .-> C
+    C -. "regenerate: scripts/gen-laws.py --write" .-> R
 ```
 
 <details>
 <summary><b>ASCII twin</b> — the same diagram, for terminals, diffs, and any reader without a Mermaid renderer</summary>
 
 ```text
+       ADR-LAW-4   <-- THIS RECORD states law L4
+            |
+            | scripts/gen-laws.py  (test-bound, byte-equal)
+            v
    CLAUDE.md §Non-negotiable constraints
-        (the only normative text)
-                   |
-                   v
+        (GENERATED -- not the source)
+
                ADR-LAWS
-          (the handles L1..L8)
+     (the handles L0..L9 -- routes, never states)
                    |
           +--------+---------+
           v                  v
-      ADR-LAW-4            records bound by L4
-   (rationale, history,   (cite the number,
-    veto -- never the      never restate)
-    law itself)
-          :
-          +.... explains, never restates ....> CLAUDE.md
+      ADR-LAW-4          records bound by L4
+   (the law, plus its     (cite the number,
+    rationale, history     never restate)
+    and veto)
 ```
 
 </details>
@@ -83,6 +87,22 @@ flowchart LR
 ---
 
 ## §2 — For agents
+
+### The law (normative)
+
+🔴 **This block IS law L4.** It is the only normative statement of it, and
+[`CLAUDE.md` §Non-negotiable constraints](../../CLAUDE.md) carries a **generated**
+copy of it — rendered from these bytes by
+[`scripts/gen-laws.py`](../../scripts/gen-laws.py) and held byte-equal by
+[`tests/test_claude_md_laws.py`](../../tests/test_claude_md_laws.py).
+Amend it **here**, then run `python scripts/gen-laws.py --write`.
+Amending a law needs Arpit's ruling, named in this record
+([ADR-LAW-0](0002_LAW-0-authority.md) decision 3).
+
+<!-- LAW-TEXT:BEGIN L4 -->
+- **L4** · **Offline by default.** Network access only inside explicit, fenced,
+  opt-in paths. An import fence test enforces it.
+<!-- LAW-TEXT:END L4 -->
 
 ### Context
 

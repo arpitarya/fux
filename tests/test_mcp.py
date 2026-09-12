@@ -349,3 +349,50 @@ def test_every_tool_declares_a_description_and_a_schema():
     for tool in TOOLS:
         assert tool.get("description", "").strip(), f"{tool['name']} has no description"
         assert tool.get("inputSchema", {}).get("required"), f"{tool['name']} declares no required input"
+
+
+# -- the shared tool descriptions (W-107 Phase 3, ADR-MCP decision 11) --------
+
+
+def test_the_node_tool_file_matches_the_python_literal():
+    """One product, one set of tool descriptions — asserted, not intended.
+
+    ⚠ **`src/fux/mcp.py` does NOT read `node/mcp-tools.json`.** Both comments
+    used to say it did, and they were wrong; what keeps the two equal is this
+    test. A description is what an agent reads to decide whether to call a
+    tool, so two hand-maintained copies drift into two products wearing one
+    name — and they already had:
+
+    - `"default": "{{TOP}}"` substituted to the STRING `"5"` on the Node side
+      where Python emits the integer `5`, on a property declared
+      `"type": "integer"`. Found by writing this test, 2026-09-12.
+
+    ⚠ **What this does NOT cover**, stated because it is the live exposure:
+    `node/` is published to npm on its own, so a consumer can hold a
+    `fux-engine` whose descriptions never met this assertion. The vendored
+    `.fux/node/` copy is safe — `fux setup` writes it from the same tree — and
+    the npm copy is covered only by releasing from a green CI run.
+    """
+    import json as json_mod
+    from pathlib import Path
+
+    from fux.output_config import BUILT_IN
+
+    root = Path(__file__).resolve().parents[1]
+    shared = json_mod.loads((root / "node" / "mcp-tools.json").read_text(encoding="utf-8"))
+
+    def resolve(node):
+        if node == "{{TOP}}":
+            return int(BUILT_IN["top"])
+        if isinstance(node, str):
+            return node.replace("{{TOP}}", str(BUILT_IN["top"]))
+        if isinstance(node, dict):
+            return {k: resolve(v) for k, v in node.items()}
+        if isinstance(node, list):
+            return [resolve(v) for v in node]
+        return node
+
+    assert resolve(shared["tools"]) == TOOLS, (
+        "node/mcp-tools.json and fux.mcp.TOOLS have drifted — the two halves "
+        "of one product would describe themselves differently to an agent"
+    )

@@ -1,19 +1,114 @@
 ---
 type: Proposal
-title: "Positioning — a knowledge engine over the documents around a codebase, not over the code"
-description: "Audit of why fux is filed next to AST/code-graph tools, with the evidence that it parses no code (and by default indexes none), every live wording that implies otherwise, proposed replacements, and the OKF v0.1 conformance state of the docs/ + work/ bundle."
-status: proposed
+title: "Positioning — a search index over written knowledge, not over code"
+description: "Audit of why fux is filed next to AST/code-graph tools, with the evidence that it parses no code (and by default indexes none), every live wording that implies otherwise, proposed replacements, and the OKF v0.1 conformance state of the docs/ + work/ bundle. GRADUATED 2026-09-12: §4 applied with Arpit's reframing, §5 as the glossary entry only, §6 option (b) plus a gate."
+status: graduated
 timestamp: 2026-09-11T00:00:00Z
+graduated: 2026-09-12
 ---
 
-# Positioning — documents around the code, not the code
+# Positioning — written knowledge, not code
+
+⚠ **The title and filename still say *documents*, and the file name is kept so
+existing links resolve. The framing they came from was overruled** — see the
+graduation block immediately below.
+
+## ✅ GRADUATED 2026-09-12 — what Arpit ruled, and what landed
+
+**The trigger fired**: Arpit accepted §4, picked §5's cheap alternative, and
+picked §6 option (b). **Read this section before any row below** — §4's
+proposed wording was *overruled on framing*, so the tables in §4 are now a
+record of what was proposed, not of what shipped.
+
+### 🔴 The one thing this proposal got wrong
+
+**§4 defined fux relative to code** — *"the documents around your code"*.
+Arpit struck it: *"I don't want it to say around my code. The code word should
+not be there… It will be all the documents present within an organization or
+not an organization."*
+
+- The proposal set out to stop fux being filed next to code tools, and then
+  **kept code as the reference point** — a weaker version of the same defect.
+- **The corpus is written knowledge**: decisions, runbooks, specs, wiki pages,
+  policies, contracts, notes. A repository is one place it can live, **not what
+  fux is about**, and a solo user with no organization at all is a user.
+- Arpit also struck *"organization"* from the tagline: *"I want even people who
+  are not part of an organization to use it as well."* Second person carries
+  both.
+
+**Shipped tagline:** *A search index for your written knowledge — decisions,
+runbooks, specs, wiki pages — committed to git and read by agents.*
+
+### What landed
+
+| § | ruling | what changed |
+|---|---|---|
+| 4.1 tagline | **reframed** | `README.md:3` — the line above. No "code", no "codebase", no "organization". |
+| 4.2 lede | **applied, reworded** | The proposal's *"It does not read the code."* was dropped from the lede — a denial in the second sentence keeps the association alive. `README.md:6-8` now says *"committed to git"*, not *"committed next to your code"*. |
+| 4.3 bullet | **applied** | New last bullet under *Why fux*: **It indexes documents, not code.** The counterweight lives here, once, where someone checking will look. Still names no competitor. |
+| 4.4 pyproject | **applied** | `description` → *"rank your written knowledge…"*; `codebase`, `llm`, `claude` dropped from `keywords`; **Quality Assurance** classifier dropped; `Text Processing :: Indexing` and `Internet :: WWW/HTTP :: Indexing/Search` added. ⚠ **PyPI only changes on the next upload.** |
+| 4.5 glossary | **applied** | `docs/GLOSSARY.md` → **Documents, not code**, the three facts of §1, so `fux ask` has a live answer on fux's own repo. |
+| 4.6 `docs/index.md` | n/a | Nothing implied code analysis. (It changed for §6 instead.) |
+| 4.7 paper | **applied** | `work/paper/the-fux-index-paper.md:155-156` — the non-existent *symbol edges* are gone. |
+| 4.8 agent templates | **applied** (proposal said low priority) | All three usage renderings + their five installed copies: *"this codebase's history or design"* → *"this project's"*. Recorded as an amendment in [ADR-AGENT-POLICY](../../docs/adr/0132_agent-policy.md), with why `policy-version` stays at 1. |
+| 4.8 GitHub About/topics | **still open** | Not reachable from a Cowork session. Arpit's hands: `gh repo view arpitarya/fux --json description,repositoryTopics`. |
+| **5** `code` edge kind | **glossary only** | Arpit chose the cheap alternative. New entry **`code` (edge kind)** in the glossary; **the rename to `path` was NOT done** and stays owned by [ADR-GRAPH](../../docs/adr/0126_graph.md). |
+| **6** OKF | **option (b)** | See below. |
+
+### §6 — option (b), and the two places it could not be applied literally
+
+**Arpit picked (b): fix the files.** Applied as:
+
+1. **The ALL-CAPS exemption is retired.** It was a repo convention the spec does
+   not have, which is the whole reason the numbers disagreed. 18 trackers now
+   declare a `type` — `OPEN-WORK` (Queue), `WORKLOG` (Log), `GLOSSARY`
+   (Glossary), `DOC-REGISTRY` (Registry), `IMPLEMENTATION` (Milestone Log),
+   `INTERVIEW` (Handoff), `MACHINE` (Runbook), `NOW` (Pointer),
+   `governance.md` (Governance), the ADR register (Register), and every
+   directory `README.md` (Index). `CLAUDE.md` and `docs/index.md` both updated.
+2. **`work/regression/*/evidence/**` is declared outside the bundle**, as (b)
+   said. Evidence is cited *by* a document; it is not one.
+3. ⚠ **Two things (b) could not touch, and why that is not a dodge.**
+   - **Filed regression runs before 2026-08-25** — 29 `report.md` / `ANALYSIS.md`
+     files. `tests/test_regression_runs.py` already baselines its own rule on
+     that date, in its own words: *turning a rule on by editing the evidence it
+     governs is the failure the rule is about.* Same baseline, stated in
+     `docs/index.md`. The one post-baseline miss —
+     `2026-09-06-csv-chunk-granularity/ANALYSIS.md` — **was** fixed.
+   - **`work/golden/seed/` and `golden-answer/`** — the sealed benchmark's test
+     data, authored outside this lane. Declared outside the bundle; editing it
+     to satisfy a docs rule would corrupt the instrument.
+4. **A gate, which is the part that makes it stick.** New
+   [`tests/test_okf_bundle.py`](../../tests/test_okf_bundle.py): 237 documents
+   checked, **0 failures**. The §6 finding was *94 of 314 files fail a bar this
+   repo claimed in prose and checked nowhere* — prose is what let it drift, so
+   prose is not the fix.
+
+### Also fixed on contact
+
+- **`src/fux/frontmatter.py:3`** — *"the zero-dependency guarantee made
+  concrete"*, a promise L1's 2026-09-06 amendment withdrew. §6 found it and did
+  not fix it; it is fixed now, and noted in [ADR-LAWS](../../docs/adr/0001_LAWS.md).
+
+### Still open after this
+
+- **GitHub About + topics** (§4.8) — Arpit's hands, needs `gh`.
+- **The PyPI page** — text changes only on the next upload; older release pages
+  keep theirs forever.
+- **The `code` → `path` rename** (§5) — deliberately not done. Glossary defines
+  it instead.
+- **OKF v0.2 drift** (§6) — the repo pins v0.1 and the upstream spec read v0.2
+  on 2026-09-11. Unchanged by this work.
+
+---
 
 **Model: Sonnet** applies accepted wording (exact before/after text below).
 **Model: Opus** for the `code` edge-kind rename in §5, because it changes a
 committed record field and ADR-GRAPH.
 
-**Graduates when** Arpit accepts or strikes each line in §4. Nothing here is
-applied. **No ADR affected** by the wording itself; §5's rename would affect
+~~**Graduates when** Arpit accepts or strikes each line in §4. Nothing here is
+applied.~~ **Fired 2026-09-12** — see the section above. **No ADR affected** by
+the wording itself; §5's rename would affect
 [ADR-GRAPH](../../docs/adr/0126_graph.md) and ADR-RECORD.
 
 ---

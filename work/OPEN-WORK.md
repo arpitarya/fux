@@ -22,7 +22,7 @@ description: "The single live work queue, two lanes, plus the Blocked-on-Arpit i
 | ↳ **blocks:** **W-87's Part B**, which needs a key nobody has contaminated. Nothing else — it governs what a phase-5 number may *claim*, not whether phase 5 runs | | |
 | 🔴 **W-146** — two rulings: is `ADR-WORK-QUEUE` written (OPEN-WORK's rules are stated twice, owned nowhere), and does *never restates* reach into docstrings? [detail](open/W-146-the-rest-of-l0.md) | 2026-09-12 | 0d |
 | ↳ **blocks:** nothing else in the queue — they decide whether two named exposures get closed, not whether work runs | | |
-| 🔴 **W-107** — **O3: `PRE-REGISTRATION-NODE-2`.** Its blocker is gone (W-136 phase 2). Does an agent draft it for your sign-off, as PRE-REG-NODE was? [detail](open/W-107-node-read-plane.md) | 2026-09-12 | 0d |
+| 🔴 **W-107** — **`PRE-REGISTRATION-NODE-2` is drafted; §7's two cells are yours**: does the latency fence `N9` live here or in fux-benchmark, and all eight rungs per push or two? [draft](benchmark/PRE-REGISTRATION-NODE-2.md) | 2026-09-12 | 0d |
 | ↳ **blocks:** W-107's closure, and every differential-arm number — H3 bars calling any arm green until it exists | | |
 | 🔴 **W-112** — W-106 closed **without a PASS and cannot produce one** (no corpus carries DENSE-CHUNK's bar). Proceed on the narrowed claim, wait for an instrument, or close? [detail](open/W-112-vector-plane.md) | 2026-09-12 | 0d |
 | ↳ **blocks:** nothing else in the queue — search-v3's last item, and the only one left of §5 | | |
@@ -44,7 +44,7 @@ description: "The single live work queue, two lanes, plus the Blocked-on-Arpit i
 ### fux build
 
 - 🟡 **W-140** · `agent`, waiting on Arpit's `--hops` ruling — **1 code row left**: a runner-race flake **not reproduced in 11 attempts**, deliberately unchanged. 20 closed. [detail](open/W-140-guide-authoring-defects.md)
-- 🔴 **W-107** · `agent` — the Node read plane: every agent-closable item is done. **O3 alone is left** — `PRE-REGISTRATION-NODE-2`, unblocked today by W-136 phase 2. [detail](open/W-107-node-read-plane.md)
+- 🔴 **W-107** · `agent` — the Node read plane: every agent-closable item is done. **O3 is drafted, not frozen** — `PRE-REGISTRATION-NODE-2` §7 has two cells only Arpit fills. [detail](open/W-107-node-read-plane.md)
 - 🔴 **W-112** · `arpit` — the vector plane. W-106 closed without a PASS **and cannot produce one**: no corpus carries DENSE-CHUNK's bar. Determinism narrowed to *same embedder build*. [detail](open/W-112-vector-plane.md)
 
 ### testing

@@ -15,17 +15,19 @@ timestamp: 2026-09-06T00:00:00Z
 
 ## §1 — For humans
 
-> **This record is the RATIONALE for law L1. It is not the law.**
-> The normative text lives in
-> [`CLAUDE.md` §Non-negotiable constraints](../../CLAUDE.md), and that is its
-> only home. This record explains why the law exists, what it has cost, how its
-> wording has moved, and what would reopen it — **without restating it**, per
-> [ADR-LAWS](0001_LAWS.md) decision 3.
+> **This record is the HOME of law L1 — §2's first block IS the law**, and the
+> rest of this record is its rationale: why it exists, what it has cost, how its
+> wording has moved, and what would reopen it.
+> [`CLAUDE.md` §Non-negotiable constraints](../../CLAUDE.md) carries a
+> **generated** copy, held byte-equal by
+> [`tests/test_claude_md_laws.py`](../../tests/test_claude_md_laws.py) —
+> [ADR-LAW-0](0002_LAW-0-authority.md) decisions 1 and 5, on Arpit's ruling of
+> 2026-09-06. ⚠ **`CLAUDE.md` is not the source any more**; amend the law here.
 
 **The one-line case.** Fux must never be a purchase order. A tool that needs procurement does not get installed in the corporation it was built for, and a tool that phones a paid API cannot promise the data stayed put.
 
 **The handle:** *`$0`, FOSS-only — OSI-approved licences, shipped packaged* — the one-line form from [ADR-LAWS](0001_LAWS.md)'s
-table. ⚠ **A handle is not the law**; read the law at its home.
+table. ⚠ **A handle is not the law**; read the law in §2 below.
 
 **What the law buys.** Three things, and only the first two survived 2026-09-06 intact:
 
@@ -58,34 +60,36 @@ table. ⚠ **A handle is not the law**; read the law at its home.
 
 ```mermaid
 flowchart LR
-    C["CLAUDE.md §Non-negotiable constraints<br/>(the only normative text)"]
-    N["ADR-LAWS<br/>(the handles L1..L8)"]
-    R["ADR-LAW-1<br/>(this record — rationale, history, veto)"]
+    R["ADR-LAW-1<br/>(THIS RECORD — states law L1)"]
+    N["ADR-LAWS<br/>(the handles L0..L9 — routes, never states)"]
+    C["CLAUDE.md §Non-negotiable constraints<br/>(GENERATED from the records · test-bound)"]
     B["records bound by L1<br/>(cite the number, never restate)"]
-    C --> N --> R
+    R --> C
+    N --> R
     N --> B
-    R -. "explains, never restates" .-> C
+    C -. "regenerate: scripts/gen-laws.py --write" .-> R
 ```
 
 <details>
 <summary><b>ASCII twin</b> — the same diagram, for terminals, diffs, and any reader without a Mermaid renderer</summary>
 
 ```text
+       ADR-LAW-1   <-- THIS RECORD states law L1
+            |
+            | scripts/gen-laws.py  (test-bound, byte-equal)
+            v
    CLAUDE.md §Non-negotiable constraints
-        (the only normative text)
-                   |
-                   v
+        (GENERATED -- not the source)
+
                ADR-LAWS
-          (the handles L1..L8)
+     (the handles L0..L9 -- routes, never states)
                    |
           +--------+---------+
           v                  v
-      ADR-LAW-1            records bound by L1
-   (rationale, history,   (cite the number,
-    veto -- never the      never restate)
-    law itself)
-          :
-          +.... explains, never restates ....> CLAUDE.md
+      ADR-LAW-1          records bound by L1
+   (the law, plus its     (cite the number,
+    rationale, history     never restate)
+    and veto)
 ```
 
 </details>
@@ -93,6 +97,43 @@ flowchart LR
 ---
 
 ## §2 — For agents
+
+### The law (normative)
+
+🔴 **This block IS law L1.** It is the only normative statement of it, and
+[`CLAUDE.md` §Non-negotiable constraints](../../CLAUDE.md) carries a **generated**
+copy of it — rendered from these bytes by
+[`scripts/gen-laws.py`](../../scripts/gen-laws.py) and held byte-equal by
+[`tests/test_claude_md_laws.py`](../../tests/test_claude_md_laws.py).
+Amend it **here**, then run `python scripts/gen-laws.py --write`.
+Amending a law needs Arpit's ruling, named in this record
+([ADR-LAW-0](0002_LAW-0-authority.md) decision 3).
+
+<!-- LAW-TEXT:BEGIN L1 -->
+- **L1** · **`$0`, FOSS-only.** Fux is zero-cost to run and carries no
+  proprietary dependency: **no commercial licence, no paid or metered API, no
+  subscription, no hosted model — ever.** Every dependency ships under an
+  **OSI-approved licence**, identified by its **SPDX identifier**; permissive
+  and copyleft both qualify, and nothing else does.
+  ⚠ **Source-available is not open source, and that is the trap this clause
+  exists for.** BSL 1.1, SSPL, Elastic License 2.0, Commons Clause, "fair
+  source", and the free tier of a commercial product all **fail** L1 —
+  precisely because each one looks like it passes. **The test is the OSI
+  approved-licence list**, never the price, never a public repo, never the word
+  "open" in a README.
+  **Dependencies ship packaged.** Fux is one install with everything it needs —
+  no optional extras, no "install this for PDFs", no capability that works on
+  one machine and not another because of what somebody chose at install time.
+  **Permission is not authorization:** the law permits a dependency, a record
+  still decides one, and every runtime dependency is named by an accepted ADR.
+  **Dev, test and measurement tooling is bound by the same licence rule and
+  nothing more** — OSI-licensed, and numpy/pandas/scipy explicitly fine.
+  ⚠ **Amended 2026-09-06** (Arpit). The previous form forbade third-party runtime
+  dependencies outright — the zero-dependency guarantee, sold as the product's
+  central promise. **That guarantee is withdrawn**, deliberately, and
+  [ADR-LAW-1](0003_LAW-1-zero-cost.md) carries what it bought, what replaced
+  it, and the three things it left unguarded.
+<!-- LAW-TEXT:END L1 -->
 
 ### Context
 

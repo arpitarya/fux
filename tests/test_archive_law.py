@@ -41,10 +41,43 @@ _SKIP = {
 _STALE_LINK_EXEMPT = {"work/WORKLOG.md", "docs/adr/0037_one-archive.md"}
 
 
+def test_the_corpus_exemption_is_one_exact_path_not_a_pattern() -> None:
+    """A law's exemption is the thing most likely to be widened quietly.
+
+    It must stay an exact path: a `parts` match on `golden`, or a prefix, would
+    let a genuine second archive hide under any directory that happened to be
+    named for the benchmark.
+    """
+    assert "/" in _CORPUS_ARCHIVE and not _CORPUS_ARCHIVE.endswith("/")
+    assert _CORPUS_ARCHIVE == "work/golden/seed/archive"
+
+
 def test_the_root_archive_exists_and_is_mapped() -> None:
     assert ARCHIVE.is_dir(), "the archive lives at the repo root and must exist"
     readme = ARCHIVE / "README.md"
     assert readme.is_file(), "archive/README.md is the map; without it the archive is a dead end"
+
+
+#: The one place a directory named `archive` is CONTENT rather than a second
+#: archive: the sealed benchmark's corpus.
+#:
+#: ⚠ **This exemption was forced by a rule, not chosen for convenience.**
+#: [ADR-RS](../docs/adr/0133_predictions.md) decision 23a says the test data
+#: must contain the input each feature acts on — *"one that reads
+#: `archived=true` needs a directory declared archived"*. Codex's prompt 1b
+#: created `work/golden/seed/archive/` on 2026-09-12 to satisfy exactly that,
+#: and this check fired on it.
+#:
+#: **The law is about documentation that retired**; these are five fictional
+#: retired documents about a fictional cold-chain company, and they exist so a
+#: ranking prior has something to act on. Moving them into `archive/` would
+#: move the corpus away from its manifests and break the ladder.
+#:
+#: ⚠ **The cost:** a real second archive created under `work/golden/` would
+#: now be invisible here. The prefix is as narrow as it can be — one path, not
+#: a `golden` part anywhere — and `work/golden/` holds no project documentation
+#: to retire.
+_CORPUS_ARCHIVE = "work/golden/seed/archive"
 
 
 def test_there_is_no_second_archive() -> None:
@@ -59,6 +92,8 @@ def test_there_is_no_second_archive() -> None:
         if any(part in _SKIP for part in rel.parts):
             continue
         if ARCHIVE in path.parents:  # nested inside the one archive is fine
+            continue
+        if rel.as_posix() == _CORPUS_ARCHIVE:  # test data, not a retired doc
             continue
         strays.append(rel.as_posix())
 

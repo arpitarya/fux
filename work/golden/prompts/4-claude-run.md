@@ -13,7 +13,8 @@ surprising. Run once per rung.
 ```
 Execute work/golden/README.md "Phase 4 — Run" for rung <RUNG> (e.g. rung-00100).
 Read CLAUDE.md §Golden answer key and §Conformance runs first. Never open
-work/golden/golden-answer/. You may read work/golden/questions.jsonl.
+work/golden/golden-answer/. Read the questions from work/golden/questions/questions.jsonl
+— it is already there; do not ask anyone for them.
 1. Commit work/regression/<date>-golden-<RUNG>/PRE-REGISTRATION.md before any
    number: engine sha, rung, metrics with k named, headroom disclosure per ADR-RS.
 2. Work in ~/my_programs/fux-lab/corpora/golden/<RUNG>/ with the

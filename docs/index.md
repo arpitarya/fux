@@ -12,13 +12,54 @@ until 2026-08-18; the split does not change the bundle, only its shape:
 - **[`work/`](../work/README.md)** — what is **happening to it**: the session
   memory, the queue, the evidence, and every doc currently mid-rewrite.
 
-Every lowercase knowledge doc carries frontmatter with a `type`; this index
-gives progressive disclosure. ALL-CAPS docs (`OPEN-WORK.md`,
-`INTERVIEW.md`, `IMPLEMENTATION.md`, `WORKLOG.md`, `MACHINE.md`, `GLOSSARY.md`,
-`DOC-REGISTRY.md`) plus repo-root `CLAUDE.md`/`README.md` are
-entry-point/tracker files, exempt from the `type` requirement by repo
-convention. Large docs carry two sections — *For humans* then *For AI agents* —
-update both or neither.
+Large docs carry two sections — *For humans* then *For AI agents* — update both
+or neither.
+
+## What is in the bundle, and what conforms
+
+**Every knowledge doc in the bundle carries frontmatter with a non-empty
+`type`** — ALL-CAPS trackers included. **The ALL-CAPS exemption was retired
+2026-09-12**: it was a repo convention the OKF spec does not have, so a
+conformance claim and the tree disagreed. `OPEN-WORK.md`, `INTERVIEW.md`,
+`IMPLEMENTATION.md`, `WORKLOG.md`, `MACHINE.md`, `NOW.md`, `GLOSSARY.md`,
+`DOC-REGISTRY.md`, `governance.md`, the ADR register and every directory
+`README.md` now declare a `type`.
+
+**This file is the bundle root** (`okf_version: "0.1"`) and is the one reserved
+file that declares only `okf_version`.
+
+**Three things under `docs/`+`work/` are outside the bundle.** They are files
+the tree happens to contain, not knowledge documents it publishes:
+
+| outside the bundle | why |
+|---|---|
+| `work/regression/*/evidence/**` | raw run material — model output, generated corpora, captured stdout. Evidence is cited *by* a document; it is not one. |
+| `work/golden/seed/**`, `work/golden/golden-answer/**`, `work/golden/questions/questions.jsonl` | the sealed benchmark's test data, authored outside this lane ([`work/golden/README.md`](../work/golden/README.md)). Editing it to satisfy a docs rule would corrupt the instrument. `questions/README.md` is a document and stays in the bundle; the `.jsonl` beside it is emitted from the key. |
+| repo-root `CLAUDE.md`, `README.md` | tool entry points, outside `docs/`+`work/` to begin with. |
+
+**Filed regression runs before 2026-08-25 are exempt by baseline, not by
+exception.** `report.md` and `ANALYSIS.md` in those directories are frozen —
+`tests/test_regression_runs.py` already baselines its classification rule on
+the same date, for the same reason: *turning a rule on by editing the evidence
+it governs is the failure the rule is about*. Runs filed on or after that date
+conform.
+
+🔴 **NOT ENFORCED — and this paragraph said it was.** It read *"enforced by
+`tests/test_okf_bundle.py`, so the claim and the tree cannot drift apart
+again"*, and **that file has never existed** (found 2026-09-12 by
+`tests/test_doc_links.py`, which counts links to files that are not there).
+
+- **The drift it claimed to prevent is measured and real:**
+  [the positioning proposal](../work/proposals/positioning-documents-not-code.md)
+  §6 found **94 of 314 files** failing a conformance bar this repo asserts in
+  prose and checks nowhere.
+- ⚠ **The test is not written here on purpose.** It would fail on all 94 today,
+  and the tempting next move — loosening it until it passes — is the
+  moving-threshold failure this repo refuses everywhere else. **A ratchet
+  (conform where we conform, name the 94, never get worse) is the shape that
+  would work**, and it is a decision with a cost, not a gap to fill quietly.
+- **Until then this bar is a convention, not a guarantee.** Read it as *what a
+  conforming file looks like*, and do not cite it as a property of the tree.
 
 # Core (read in this order)
 
@@ -26,7 +67,7 @@ update both or neither.
 * [Open work](../work/OPEN-WORK.md) - **the single live queue**, two concurrent lanes; finished items are deleted, not ticked.
 * [Implementation](../work/IMPLEMENTATION.md) - the milestone log: what shipped, when, and the outcome. What OPEN-WORK reconciles against.
 * [The paper](../work/paper/the-fux-index-paper.md) - the architecture of record, with figures and falsifiable predictions.
-* [High-level diagram](../work/architecture-high-level.svg) - what fux is, in three boxes, for someone who has never seen it · [detailed diagram](../work/architecture-detailed.svg) - the mechanism: record shape, both retrieval paths, the two planes and the laws that separate them.
+* **The five diagrams**, redrawn from the code 2026-09-12 — [high-level](../work/architecture-high-level.svg) (what fux is, in three boxes) · [detailed](../work/architecture-detailed.svg) (every plane, what is committed and what is not) · [decoders](../work/architecture-decoders.svg) (how bytes fux cannot read become text it can) · [ask](../work/architecture-ask.svg) (the query path, and the law that lets there be two of them) · [answer](../work/architecture-answer.svg) (the refer plane and the five freshness verdicts).
 * [Model handoff interview](../work/INTERVIEW.md) - the state of play; read before substantive changes.
 * [Worklog](../work/WORKLOG.md) - per-exchange session trail, newest first.
 * [Machine notes](../work/MACHINE.md) - what breaks on which surface, and why.

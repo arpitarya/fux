@@ -1,0 +1,66 @@
+{
+  "_comment": "The MCP tool descriptions, the authored text for node/src/verbs/mcp.mjs, held equal to src/fux/mcp.py's literal by tests/test_mcp.py. A description is what an agent reads to decide whether to call a tool, so two hand-maintained copies would drift into two products wearing one name. {{TOP}} is substituted with the connection's resolved [mcp] top.",
+  "tools": [
+    {
+      "name": "fux_search",
+      "description": "Search the committed index for documents relevant to a natural-language question. Returns ranked documents with content hashes and the headings that match your query -- section-level, not line-level; call fux_passage for the lines. This is the call to make first for any 'where is X' or 'why did we decide Y' question about this repository. READ THE `confidence` BLOCK BEFORE USING THE RESULTS. If `confidence.answerable` is false, do not answer from these results at all -- say what was searched and stop. If `confidence.band` is 'partial', answer but name every term in `confidence.missing`: those are words from the question that appear in no document here. If it is 'weak', the ranking could not separate the top hits, so report the candidates rather than a conclusion.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "A natural-language question."
+          },
+          "k": {
+            "type": "integer",
+            "description": "Maximum results (default {{TOP}}; this repository's .fux/output.toml may set a different default under [mcp]).",
+            "default": "{{TOP}}"
+          },
+          "expand": {
+            "type": "string",
+            "description": "OPTIONAL. Words you expect the document to use, when they differ from the question's. Scored at a lower weight than the question's own terms, and a document matching ONLY these is never returned. Use it after a search comes back `partial` with a non-empty `missing`: re-search with the vocabulary the corpus would use for the missing term."
+          }
+        },
+        "required": [
+          "query"
+        ]
+      }
+    },
+    {
+      "name": "fux_passage",
+      "description": "Read the verbatim text of a cited span, addressed as returned by fux_search. Use this instead of reading a whole file when you already have a citation: it returns only the cited lines and the hash they were read at.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "line_start": {
+            "type": "integer"
+          },
+          "line_end": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "fux_related",
+      "description": "The neighbourhood around a document: what it links to, what links to it, what it supersedes or is superseded by, and whether it is archived. Use when a result raises 'what else was decided with this?'",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    }
+  ]
+}

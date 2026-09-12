@@ -15,12 +15,14 @@ timestamp: 2026-09-11T00:00:00Z
 
 ## §1 — For humans
 
-> **This record is the RATIONALE for law L9. It is not the law.**
-> The normative text lives in
-> [`CLAUDE.md` §Non-negotiable constraints](../../CLAUDE.md), and that is its
-> only home. This record explains why the law exists, what it costs and voids,
-> and what would reopen it — **without restating it**, per
-> [ADR-LAWS](0001_LAWS.md) decision 3.
+> **This record is the HOME of law L9 — §2's first block IS the law**, and the
+> rest of this record is its rationale: why it exists, what it costs and voids,
+> and what would reopen it.
+> [`CLAUDE.md` §Non-negotiable constraints](../../CLAUDE.md) carries a
+> **generated** copy, held byte-equal by
+> [`tests/test_claude_md_laws.py`](../../tests/test_claude_md_laws.py) —
+> [ADR-LAW-0](0002_LAW-0-authority.md) decisions 1 and 5, on Arpit's ruling of
+> 2026-09-06. ⚠ **`CLAUDE.md` is not the source any more**; amend the law here.
 
 **The one-line case.** Three sibling directories — `fux-playground`,
 `fux-lab`, `fux-benchmark` — had drifted into doing each other's jobs. The
@@ -74,6 +76,35 @@ flowchart LR
 
 ## §2 — For agents
 
+### The law (normative)
+
+🔴 **This block IS law L9.** It is the only normative statement of it, and
+[`CLAUDE.md` §Non-negotiable constraints](../../CLAUDE.md) carries a **generated**
+copy of it — rendered from these bytes by
+[`scripts/gen-laws.py`](../../scripts/gen-laws.py) and held byte-equal by
+[`tests/test_claude_md_laws.py`](../../tests/test_claude_md_laws.py).
+Amend it **here**, then run `python scripts/gen-laws.py --write`.
+Amending a law needs Arpit's ruling, named in this record
+([ADR-LAW-0](0002_LAW-0-authority.md) decision 3).
+
+<!-- LAW-TEXT:BEGIN L9 -->
+- **L9** · **Each sibling environment has one job** (Arpit, 2026-09-11).
+  - **`fux-playground` is Arpit's alone**, for trying things by hand. No agent,
+    script, test, measurement or benchmark ever reads, ingests, grades against,
+    copies or files a number from it.
+  - **`fux-lab` runs every measurement and evaluation**, on the **golden test data
+    only** (`work/golden/`), **at most 10 000 documents**. fux's own `tests/` and
+    `tests_e2e/` keep their built-in fixtures.
+  - **`fux-benchmark` runs benchmarks only**: how fast each query returns, and the
+    ranked list it returned, **kept so the next run is compared against it** —
+    always across **two fux versions**, the current build and the newest release of
+    the previous major. Its corpora are folders of **100, 200, 500, 1 000, 2 000,
+    5 000 and 10 000** documents; each document about **1 000 lines**, lines up to
+    about **300 characters**, with tables, charts, bullet points and Mermaid
+    diagrams, written to read as machine-made or by several authors, professional
+    or amateur. [ADR-LAW-9](0011_LAW-9-environments.md).
+<!-- LAW-TEXT:END L9 -->
+
 ### Context
 
 The three siblings were set up at different times for different reasons —
@@ -121,7 +152,7 @@ judgment, which is the lab's.
 as measured** and are not re-graded; a law is not a re-judgement. What is void
 (per [L0](0002_LAW-0-authority.md)) is every **plan** that would use the
 playground from here on — reconciled by
-[W-138](../../work/open/W-138-reconcile-with-l9.md).
+[W-138](../../archive/open/W-138-reconcile-with-l9.md).
 
 **5. A benchmark's retained ranked list is measurement evidence, not a use
 record.** Its queries are a versioned synthetic set, not a record of anyone

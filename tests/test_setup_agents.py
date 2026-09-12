@@ -1,8 +1,8 @@
 """`fux setup --agents` — the installer, and the safeguards a default-on install needs.
 
 ADR-AGENT-POLICY decision 5 makes this install **by default**, into
-`.claude/`, `.codex/`, `.github/` and `.kiro/` — directories Anthropic,
-OpenAI, GitHub and AWS own. Two things are all that stand between that and a tool quietly editing a
+`.claude/`, `.agents/` (shared by Codex and Copilot, decision 16), `.github/`
+and `.kiro/` — directories Anthropic, OpenAI, GitHub and AWS own. Two things are all that stand between that and a tool quietly editing a
 shared repository, and both are veto conditions rather than niceties:
 
 - **the announcement** (veto 1) — every agent file written is named in
@@ -28,9 +28,12 @@ from fux.errors import FuxError
 # outside `AGENT_FILES` (which is keyed by vendor) and has to be added here by
 # hand. It is still an agent file for every purpose these tests check —
 # `--no-agents` must not write it, and `report.outside` must list it.
-ALL_AGENT_PATHS = [rel for files in setup_mod.AGENT_FILES.values() for rel, _ in files] + [
-    setup_mod.AGENTS_FILE
-]
+#
+# ⚠ **A set, then sorted**: Codex and Copilot share `.agents/skills/`
+# (decision 16), so the same path appears under two vendors and is ONE file.
+ALL_AGENT_PATHS = sorted(
+    {rel for files in setup_mod.AGENT_FILES.values() for rel, _ in files} | {setup_mod.AGENTS_FILE}
+)
 
 
 def _fresh(tmp_path: Path) -> Path:
@@ -87,7 +90,7 @@ def test_optout_flag_leaves_no_vendor_directory_behind(tmp_path):
     """Not just the files: a bare `.github/` fux created and then did not fill
     is still fux having written into GitHub's namespace."""
     setup_mod.run(_fresh(tmp_path), agents=False)
-    for vendor_dir in (".claude", ".codex", ".github", ".kiro"):
+    for vendor_dir in (".agents", ".claude", ".codex", ".github", ".kiro"):
         assert not (tmp_path / vendor_dir).exists(), f"{vendor_dir} was created under --no-agents"
 
 
@@ -314,11 +317,11 @@ def test_codex_reuses_the_claude_and_kiro_skill_bytes(tmp_path):
     setup_mod.run(_fresh(tmp_path))
     usage = (tmp_path / ".claude/skills/fux-usage/SKILL.md").read_bytes()
     decoder = (tmp_path / ".claude/skills/fux-decoder/SKILL.md").read_bytes()
-    assert (tmp_path / ".codex/skills/fux-usage/SKILL.md").read_bytes() == usage
+    assert (tmp_path / ".agents/skills/fux-usage/SKILL.md").read_bytes() == usage
     assert (tmp_path / ".kiro/skills/fux-usage/SKILL.md").read_bytes() == usage
-    assert (tmp_path / ".codex/skills/fux-decoder/SKILL.md").read_bytes() == decoder
+    assert (tmp_path / ".agents/skills/fux-decoder/SKILL.md").read_bytes() == decoder
     enrich = (tmp_path / ".claude/skills/fux-enrich/SKILL.md").read_bytes()
-    for rel in (".codex/skills", ".kiro/skills", ".github/skills"):
+    for rel in (".agents/skills", ".kiro/skills"):
         assert (tmp_path / rel / "fux-enrich/SKILL.md").read_bytes() == enrich, rel
 
 
@@ -328,7 +331,7 @@ def test_codex_gets_no_archived_results_skill(tmp_path):
     skill has to be LOADED to apply. Codex's only ambient surface is the
     repo-root `AGENTS.md`, which carries the verbatim block."""
     setup_mod.run(_fresh(tmp_path))
-    assert not (tmp_path / ".codex/skills/fux-archived-results").exists()
+    assert not (tmp_path / ".agents/skills/fux-archived-results").exists()
     assert "fux:policy:begin" in (tmp_path / "AGENTS.md").read_text(encoding="utf-8")
 
 
@@ -346,9 +349,10 @@ def test_enrich_ships_to_every_skill_surface_and_no_ambient_one():
         if tpl == "ENRICH-SKILL.md"
     ]
     assert sorted(dests) == [
+        # twice: one row for Codex, one for Copilot, one shared file (decision 16)
+        ".agents/skills/fux-enrich/SKILL.md",
+        ".agents/skills/fux-enrich/SKILL.md",
         ".claude/skills/fux-enrich/SKILL.md",
-        ".codex/skills/fux-enrich/SKILL.md",
-        ".github/skills/fux-enrich/SKILL.md",
         ".kiro/skills/fux-enrich/SKILL.md",
     ]
     # the rule, stated mechanically: no ambient surface, on any vendor
@@ -376,17 +380,25 @@ def test_no_committed_write_skill_reaches_an_ambient_surface():
             assert "/skills/" in rel, f"{template} -> {rel}"
 
 
-#: Every skill surface Fux installs to — the four progressive-disclosure
-#: planes, one per vendor. **Ambient planes are deliberately absent**: the rule
-#: that keeps a committed-write skill off `instructions/` and `steering/` is
-#: what these three templates are held to (ADR-AGENT-POLICY decision 14).
-SKILL_SURFACES = {".claude/skills", ".github/skills", ".kiro/skills", ".codex/skills"}
+#: Every skill surface Fux installs to, **as (vendor, directory) pairs** — four
+#: vendors, three directories, because Codex and Copilot share `.agents/skills`
+#: (ADR-AGENT-POLICY decision 16). **Keyed by vendor on purpose**: a set of bare
+#: directories would still pass with Codex's row deleted, since Copilot writes
+#: the same paths. **Ambient planes are deliberately absent**: the rule that
+#: keeps a committed-write skill off `instructions/` and `steering/` is what
+#: these templates are held to (decision 14).
+SKILL_SURFACES = {
+    ("claude", ".claude/skills"),
+    ("codex", ".agents/skills"),
+    ("copilot", ".agents/skills"),
+    ("kiro", ".kiro/skills"),
+}
 
 
 def _surfaces(template):
     return {
-        rel.rsplit("/", 2)[0]
-        for files in setup_mod.AGENT_FILES.values()
+        (vendor, rel.rsplit("/", 2)[0])
+        for vendor, files in setup_mod.AGENT_FILES.items()
         for rel, tpl in files
         if tpl == template
     }
@@ -486,15 +498,77 @@ def test_codex_alone_still_gets_the_root_agents_file(tmp_path):
     assert _agent_files_on_disk(root) == sorted(
         [
             # sorted(): "." < "A", so the vendor paths come first
-            ".codex/skills/fux-decoder/SKILL.md",
-            ".codex/skills/fux-enrich/SKILL.md",
-            ".codex/skills/fux-usage/SKILL.md",
+            ".agents/skills/fux-decoder/SKILL.md",
+            ".agents/skills/fux-enrich/SKILL.md",
+            ".agents/skills/fux-usage/SKILL.md",
             "AGENTS.md",
         ]
         # decision 15: the guides reach Codex as skills; Codex has no
         # path-scoped surface, so no pointer is written for it
-        + [f".codex/skills/{name}/SKILL.md" for name, _tpl in setup_mod.GUIDE_SKILLS]
+        + [f".agents/skills/{name}/SKILL.md" for name, _tpl in setup_mod.GUIDE_SKILLS]
     )
+
+
+# -- codex and copilot share `.agents/skills/` (decision 16) ----------------
+
+
+def test_codex_and_copilot_write_the_one_directory_codex_reads():
+    """W-141, ruled by Arpit 2026-09-12. Codex reads repository skills from
+    `.agents/skills` **only**; Copilot reads `.github/skills`, `.claude/skills`
+    **and** `.agents/skills`. So both vendors write `.agents/skills`, and neither
+    retired directory is written by anyone.
+
+    ⚠ **Veto 3 fired here** — *a shipped rendering no longer loads in its
+    vendor's tool*. `.codex/skills` is not a path Codex's docs list."""
+    for vendor in ("codex", "copilot"):
+        skills = [rel for rel, _tpl in setup_mod.AGENT_FILES[vendor] if rel.endswith("/SKILL.md")]
+        assert skills, vendor
+        assert all(rel.startswith(".agents/skills/") for rel in skills), vendor
+    every = [rel for files in setup_mod.AGENT_FILES.values() for rel, _tpl in files]
+    assert not [rel for rel in every if rel.startswith((".codex/", ".github/skills/"))]
+
+
+def test_codex_and_copilot_skill_rosters_are_identical():
+    """One tuple (`setup.SHARED_SKILLS`) in both rows, so the two cannot drift:
+    a skill added for one vendor reaches the other by construction."""
+    def skills(vendor):
+        return sorted(
+            (rel, tpl) for rel, tpl in setup_mod.AGENT_FILES[vendor] if rel.endswith("/SKILL.md")
+        )
+
+    assert skills("codex") == skills("copilot") == sorted(setup_mod.SHARED_SKILLS)
+
+
+def test_a_path_two_vendors_share_maps_to_one_template():
+    """Two vendors naming one path is legal only if they would write the same
+    bytes there — otherwise install order would decide which vendor's file a
+    repository gets, silently."""
+    templates: dict[str, set[str]] = {}
+    for files in setup_mod.AGENT_FILES.values():
+        for rel, tpl in files:
+            templates.setdefault(rel, set()).add(tpl)
+    assert {rel: tpls for rel, tpls in templates.items() if len(tpls) > 1} == {}
+
+
+def test_a_shared_path_is_written_and_announced_once(tmp_path):
+    """`_write_agents` skips a path an earlier vendor wrote in the same run.
+    Without that, the second pass reports fux's own fresh file as `kept ...
+    (yours; never rewritten)`, and the announcement names it twice."""
+    report = setup_mod.run(_fresh(tmp_path))
+    assert len(report.outside) == len(set(report.outside))
+    assert len(report.written) == len(set(report.written))
+    assert not [rel for rel in report.kept if rel.startswith(".agents/")]
+
+
+def test_copilot_alone_still_gets_every_skill(tmp_path):
+    """Decision 14's hole, re-checked after the move: `install = ["copilot"]`
+    without `codex` must still write the shared skills."""
+    root = _fresh(tmp_path)
+    (root / "fux.toml").write_text('[sources]\n[agents]\ninstall = ["copilot"]\n', encoding="utf-8")
+    setup_mod.run(root)
+    for rel, _tpl in setup_mod.SHARED_SKILLS:
+        assert (root / rel).is_file(), rel
+    assert not (root / ".github" / "skills").exists()
 
 
 def test_a_partial_declaration_without_codex_writes_no_root_agents_file(tmp_path):

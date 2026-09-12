@@ -330,7 +330,14 @@ def test_the_written_config_names_max_parallel_uncommented(tmp_path):
     assert f"\nmax_parallel = {DEFAULT_MAX_PARALLEL}\n" in written, "must be live, not commented"
     assert f"#max_parallel" not in written
     assert "\n[sources.url]\n" in written
-    assert "min(this, what your fetcher declares)" in written
+    # ⚠ **This used to pin the sentence "min(this, what your fetcher declares)".**
+    # That prose left with W-122 (2026-09-12): a comment explaining a key can
+    # drift from ADR-CONFIG while both look correct, which ADR-LAW-0 decision 4
+    # forbids. What the template owes a consumer now is the POINTER — a repo
+    # whose `fux.toml` says nothing and links nowhere is the worse outcome, so
+    # this asserts the link rather than dropping the check.
+    assert "docs/adr/0113_config.md" in written, "the template must name ADR-CONFIG"
+    assert "may not be commented out" in written
 
 
 def test_the_configs_stated_default_is_the_one_the_engine_applies(tmp_path):
@@ -387,7 +394,12 @@ def test_ensure_layout_writes_no_fetcher_and_no_source_list(tmp_path):
     fuxdir.ensure_layout(tmp_path)
     assert not (tmp_path / ".fux" / "fetchers").exists()
     assert not (tmp_path / ".fux" / "sources").exists()
-    assert sorted(p.name for p in (tmp_path / ".fux").iterdir()) == [".gitignore", "README.md"]
+    # `node/` and `fux` are engine-owned and vendored here on purpose
+    # (ADR-NODE-SEARCH R2); a fetcher or a source list would still be `setup`'s
+    # alone, which is the invariant this test exists for.
+    assert sorted(p.name for p in (tmp_path / ".fux").iterdir()) == [
+        ".gitignore", "README.md", "fux", "node",
+    ]
 
 
 def test_a_plain_ingest_puts_no_code_in_the_repo(tmp_path):
