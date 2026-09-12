@@ -1,0 +1,65 @@
+{
+ "note": "The chunk TEXT is deliberately not filed: every source document is already committed at work/golden/seed/, so a copy here would duplicate the corpus into the evidence tree and give it a second place to drift from.",
+ "corpus": "fux-lab/corpora/golden/rung-seed/seed/*.md (11 markdown documents; the rung's .yaml/.txt/.eml/.html are not chunked by this harness)",
+ "chunker": "fux.refer._chunk.chunk at fux-engine 2.0.0-alpha.7",
+ "chunks": 119,
+ "queries": 124,
+ "queries_source": "work/golden/questions/questions.jsonl",
+ "documents": [
+  {
+   "doc": "docs/01-sop-temperature-excursion.md",
+   "chunks": 16,
+   "sha256": "3405e3357f7b2226a7ac341c292494e87d4b827a99d5ac9f69724fca1a524403"
+  },
+  {
+   "doc": "docs/03-postmortem-nagpur-vaccine-excursion.md",
+   "chunks": 19,
+   "sha256": "e0098b4d3ba753113beb3174c6b6e2d1926767488d0853709f0d1d5b66882454"
+  },
+  {
+   "doc": "docs/05-decision-telematics-vendor-2023.md",
+   "chunks": 5,
+   "sha256": "34acf467ceb4a707f6d53bebc61c96a1d7b82e9d725fc92f2c3dccc5eac69623"
+  },
+  {
+   "doc": "docs/07-rate-card-and-surcharges.md",
+   "chunks": 9,
+   "sha256": "3c6b4788770f93506d4a251bb2afd8044adbd400377f0f03caf33673f452b1ef"
+  },
+  {
+   "doc": "docs/08-driver-hours-and-safety-policy.md",
+   "chunks": 10,
+   "sha256": "8dbe2d7728519fd0f8ddcd0796906a2871e49a4a2633ae2ef321f276e37dcded"
+  },
+  {
+   "doc": "docs/10-new-joiner-faq.md",
+   "chunks": 8,
+   "sha256": "14418703b34c0ffac07b292e84dadfde7472c50624559c2e039b8b858d3576a8"
+  },
+  {
+   "doc": "docs/11-decision-telematics-vendor-2026.md",
+   "chunks": 10,
+   "sha256": "241e50919a542d8727d4a81f00e655a64bbb439d820e7370e4e627602b1510d7"
+  },
+  {
+   "doc": "docs/12-rate-card-2026-h2.md",
+   "chunks": 12,
+   "sha256": "7470df480bc86d6ace066918d6592126896d692cf1aeabe724312d2df83e64d9"
+  },
+  {
+   "doc": "docs/13-dock-scheduling-rules-2026.md",
+   "chunks": 11,
+   "sha256": "ac0012fd5315c0985206b8c523ec8440f5c739eb7b347a76c68efcca27e0717d"
+  },
+  {
+   "doc": "docs/14-customer-notification-matrix-2025.md",
+   "chunks": 9,
+   "sha256": "2cfa64bd85aec9646d1f9d35257835ee59c361e9dc866ab1f2c60355e949620e"
+  },
+  {
+   "doc": "docs/15-customer-notification-matrix-2026.md",
+   "chunks": 10,
+   "sha256": "469311e58e202881af7f1b11aafcc683c413b0d988457abc258108eb37c6d4fd"
+  }
+ ]
+}

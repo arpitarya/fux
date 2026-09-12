@@ -21,6 +21,22 @@ That single sentence decides almost everything else about it: it is read-only,
 it is offline, it never repairs, and it must be the most reliable verb in the
 tool — because it is the one that runs *after* the others have failed.
 
+🔴 **It was not read-only, and had not been** (W-140 row 7, fixed 2026-09-12).
+On a repo with no `.fux/`, `fux doctor` created **`.fux/`** and
+**`.fux/runtime/CACHEDIR.TAG`** — two causes, two modules apart:
+
+- the `.fux/ writable` check `mkdir`'d the directory in order to probe it;
+- `maintain/daemon.py`'s `_runtime()` path helper called `derived_dir`, which
+  creates and tags, and `status()` reaches it **on a pure read**. `runner.py`
+  and `urlstate.py` had the same helper right — a path helper returns a path.
+
+**Both fixed, and the writability question is still answered**: the probe goes
+to `.fux/` when it exists and to the repo root when it does not, which is the
+directory that would actually have to be written. Pinned by
+`tests/test_doctor.py::test_doctor_creates_nothing_at_all`, which asserts on the
+**whole tree** rather than on the two paths this session happened to find —
+the second cause was two modules from the check that exposed it.
+
 **This record exists because fifteen checks had thirteen owners.** Each check
 reports on some other record's subject — PII rules, the acquired plane, refusal
 rules, decoder bindings, the recency prior — so `src/fux/doctor.py` accumulated
@@ -141,19 +157,31 @@ authoritative about the row.**
 | `.fux/ layout declared` | warn | undeclared entries at `.fux/`'s top level | [ADR-DOTFUX](0102_fux-directory.md) |
 | `pii rules` | **error** when absent | a missing `.fux/pii.toml`; otherwise compiles every pattern offline and states the scope. ⚠ It cannot see an over-broad rule and says so — only [`tools/pii-probe/`](../../tools/pii-probe/) can | [ADR-PII](0150_pii.md) decision 17 |
 | `acquired plane` | warn, **error** on gitignore | blob count, total bytes, the 80 %-of-cap warning, and the gitignore assertion | [ADR-ACQUIRED](0147_acquired-plane.md) |
-| `refusal rules` | warn | how many rules load, how many responses each has refused, and **the rules that have never fired** — what a typo'd condition looks like | [ADR-REFUSAL](0148_refusals.md) decision 11 |
-| `decoder bindings` | warn | the one binding fault no ingest can catch: a `[decoders]` binding on an extension **no indexed document has** | [ADR-DECODE](0139_decode.md) |
+| `refusal rules` | warn, **error** when the file will not parse | how many rules load, how many responses each has refused, and **the rules that have never fired** — what a typo'd condition looks like | [ADR-REFUSAL](0148_refusals.md) decision 11 |
+| `decoder bindings` | warn, **error** when the registry will not build | the one binding fault no ingest can catch: a `[decoders]` binding on an extension **no indexed document has** | [ADR-DECODE](0139_decode.md) |
 | `recency prior` | warn | whether any document carries an `mtime` — a corpus copied out of its git repository loses every one | [ADR-INGEST](0106_ingest.md) |
 | `freshness verdicts` | warn | `freshness_counts` and `AS_INGESTED_VETO_SHARE` — the veto instrument, shared verbatim with ADR-ACQUIRED's identical one so the quarter has one home | [ADR-URL-FRESHNESS](0149_url-freshness.md) |
 | `ranking priors` | warn | every prior that is wired, reads its input and multiplies by one — **and the count of documents it would have acted on**. It refuses to recommend a value | [ADR-ARCHIVED-CONTENT](0134_archived-content.md) · [ADR-TUNE](0135_tuning.md) |
 | `output.toml present` | warn | absent means every output default is the engine's own and none can be changed | [ADR-OUTPUT](0144_output-defaults.md) decision 20 |
 | `types list usable` | error | a types list with no live pattern — `read_types` refuses it, so ingest stops | [ADR-TYPES](0128_types-list.md) decision 10 |
-| `fuxignore usable` | warn | the `.fuxignore` patterns parse, and duplicates | [ADR-FUXIGNORE](0145_fuxignore.md) |
+| `fuxignore usable` | warn, **error** when the patterns will not parse | the `.fuxignore` patterns parse, and duplicates | [ADR-FUXIGNORE](0145_fuxignore.md) |
 | `fetcher optional functions` | warn | which of `validate()` / `is_rate_limited()` the consumer's fetcher implements — **read as text, never imported** | [ADR-FETCHER](0117_fetcher.md) decisions 12–13 |
-| `url sources` | warn | per-URL health from the committed index, the concurrency policy, and **the `update=never` count with the `keep=false` ones named** — a pinned URL is one `fux update` will never go out for again, which is otherwise learnable only by reading every line of the list | [ADR-URL-LIST](0116_url-list.md) decisions 14/14b |
+| `url sources` | warn | per-URL health from the committed index, **the listed URLs that have never been fetched and so have no record at all** (ADR-MAINTENANCE decision 5a's stated cost, built 2026-09-12), the concurrency policy, and **the `update=never` count with the `keep=false` ones named** — a pinned URL is one `fux update` will never go out for again, which is otherwise learnable only by reading every line of the list | [ADR-URL-LIST](0116_url-list.md) decisions 14/14b |
 | `background runner` | warn | is a runner live, how many documents pend, is the lock held or stale, did the last run fail. **Read-only: a stale lock is named, never cleared** | [ADR-MAINTENANCE](0129_hooks.md) decision 1c |
 | `url daemon` | warn | the refresh daemon's state | [ADR-URL-FRESHNESS](0149_url-freshness.md) |
+
+⚠ **Three rows read *warn, **error** when …* and that split is deliberate**
+(corrected here 2026-09-12, W-140 row 7, from the code). `refusal rules`,
+`decoder bindings` and `fuxignore usable` are warnings about *content* — a rule
+that never fired, a binding nothing matches, a duplicated pattern — and **errors
+about parsing**. A policy file the engine cannot read is not a soft finding: the
+next `fux ingest` will refuse it, and a green doctor in front of that is the
+failure `tune.toml` taught (decision 10). The table said `warn` for all three.
+
+
 | `accelerator` | warn | built, fresh or stale against the committed index | [ADR-T1-ACCELERATOR](0110_accelerator.md) |
+| `node reader` | warn | `.fux/node/`'s `package.json` version against the engine's. **The one drift `doctor` can still see** under the fourth `.fux/` shape: the vendored reader is overwritten on a version difference, so a repo whose owner has not run `setup` or `ingest` since upgrading ships a reader that may not understand the index beside it. Never an error — Python answers without it | [ADR-NODE-SEARCH](0155_node-search.md) |
+| `fux on PATH` | warn | **which `fux` the shell resolves.** `npm i -g fux-engine` puts a second `fux` on PATH with a **different verb set**, so `fux ingest` can answer *"this only reads"* on a machine where Python fux would have worked. The row names the resolved path and points at `fux --version`, which is the one command that disambiguates. ⚠ **Read as text, never executed** — doctor does not run a binary the environment chose for it, which is the same rule the `fetcher optional functions` row follows. Deferred until 2026-09-12 on the premise *"no global bin ships in the first npm release"*; the bin shipped and Arpit ruled it stays, so the premise is gone. | [ADR-NODE-SEARCH](0155_node-search.md) R1a |
 
 **3. `warn` is the default; `error` is reserved for a repo a verb will refuse.**
 A check fails the command **only** when some other fux command will not run

@@ -284,7 +284,10 @@ visible set and whoever builds it must resolve that tension, not inherit it.
                   validates it, +12 tests, and the un-migrated playground file
                   stays valid (reporting `recall@k` as *not computable*, which
                   is the honest answer).
-            - [ ] **Migrate `fux-playground/goldens/queries.jsonl`.** The
+            - [x] ~~**Migrate `fux-playground/goldens/queries.jsonl`**~~ —
+                  🔴 **DEAD, not done (L9, 2026-09-11).** The file is in an
+                  environment no agent may touch, so the migration has no
+                  subject and the evidence below is all that survives. The
                   migrated set is built and validated — **43 `complete`, 7
                   `partial`, 26 multi-document** — and is filed as
                   [evidence](../regression/2026-08-28-annotator-agreement/evidence/queries-migrated-decision-12.jsonl)

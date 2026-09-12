@@ -1304,6 +1304,10 @@ def _print_refer_answer(bundle, as_json: bool, block=None, extra=None, show_band
                         "heading": c.heading,
                         "text": c.text,
                         "score": c.score,
+                        # ADR-REFER decision 17 / ADR-ANSWER decision 9 promised
+                        # this and the payload did not carry it (W-140 row 2).
+                        # Additive: no key removed or repurposed.
+                        "ordinal": c.ordinal,
                     }
                     for c in citations
                 ]

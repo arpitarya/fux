@@ -16,8 +16,30 @@ fields, and a gate.
 ## The spec this implements
 
 [`../proposals/search-v3.md`](../proposals/search-v3.md) §5 and §8 (W-112).
-**Does not start until [W-106](W-106-vector-gate.md) files PASS** and the
+**Does not start until [W-106](../../archive/open/W-106-vector-gate.md) files PASS** and the
 compare doc (*vectors* vs *doc2query*) has Arpit's verdict.
+
+🔴 **W-106 closed 2026-09-12 WITHOUT a PASS, and it cannot produce one.** Its
+retrieval half never tested DENSE-CHUNK's frozen bar — the playground's index
+was unreadable in 2026-09-05, and the golden ladder's questions carry **no rank
+contract**, by design, because their key is sealed. **A corpus that can carry
+that bar does not exist**, so *"until W-106 files PASS"* is not a wait, it is a
+dependency on a new instrument.
+
+✅ **What W-106 did settle, and it shrinks this item's determinism problem.**
+The two-architecture arm found **zero** divergence — one embedder build on
+arm64 and on x86-64, cosine 1.000000, 119/119 and 124/124 int8 vectors
+byte-identical, 0/124 orderings discordant
+([the run](../regression/2026-09-12-vector-gate-crossarch/report.md)). Against
+2026-09-05's two-**implementation** result (0 of 125 identical, 41/50
+discordant), **the variable is the implementation, not the machine**:
+
+- **The determinism claim this item has to make is *"same embedder build"***,
+  not *"same clone + same build + same CPU"*.
+- ⚠ **It is still a strong claim.** A committed vector remains an artefact of
+  one build, and this item proposes committing one.
+- ⚠ **Native x86-64 is unmeasured** — the x86 arm ran under Rosetta, where the
+  kernels see no AVX-512. Do not quote 0/124 for a Linux/x86 CI runner.
 
 ## Definition of done
 

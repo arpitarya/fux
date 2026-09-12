@@ -141,10 +141,14 @@ that a set was authored against a misread of the corpus. What changed is
 
 ## Where it lands, and what it must not become
 
-- The file goes to `<playground>/goldens/unanswerable.jsonl`, **separate from
-  `queries.jsonl`**, so the two authorships never merge into one file whose
-  provenance nobody can reconstruct.
-- ⚠ **It is scored INSIDE the gate** ([ADR-QUALITY](../../docs/adr/0044_quality-contract.md)
+- The file goes beside the golden set it belongs to, as
+  `unanswerable.jsonl`, **separate from the questions file**, so the two
+  authorships never merge into one file whose provenance nobody can
+  reconstruct. ⚠ **It said `<playground>/goldens/` until 2026-09-12**;
+  [L9](../../docs/adr/0011_LAW-9-environments.md) retired that destination, and
+  the set's home is now the golden ladder's
+  ([`work/golden/`](../../work/golden/README.md)).
+- ⚠ **It is scored INSIDE the gate** ([ADR-QUALITY](../../docs/adr/0141_quality-contract.md)
   decision 5), with an `answerable-only` slice reported beside it. That is what
   makes it different from the decoys, which are a diagnostic control and are
   never scored.

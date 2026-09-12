@@ -2,11 +2,39 @@
 type: Runbook
 name: RUNBOOK-TUNER
 title: RUNBOOK-TUNER — how an agent executes the knob sweep, step by step
-description: "The operating procedure for PRE-REGISTRATION-TUNER: one engine, one index per corpus, one query pass per knob value, the playground veto, the cost fence, the candidate table handed over without a recommendation. Restates no bar."
+description: "The operating procedure for PRE-REGISTRATION-TUNER: one engine, one index per corpus, one query pass per knob value, a veto leg, the cost fence, the candidate table handed over without a recommendation. VOID IN PART since 2026-09-11 — the veto leg has no instrument. Restates no bar."
 timestamp: 2026-08-28T00:00:00Z
 ---
 
 # RUNBOOK-TUNER — the knob sweep, executed by an agent
+
+> 🔴 **VOID IN PART since 2026-09-11 — read this before any step below.**
+>
+> **The veto leg has no instrument.** Every step that says *playground* graded
+> the fifty hand-written goldens in `fux-playground`, and
+> [L9](../../docs/adr/0011_LAW-9-environments.md) made that environment Arpit's
+> hands alone. Under [L0](../../docs/adr/0002_LAW-0-authority.md) those steps
+> are **void in that part** — not a trade-off to weigh, and not something to
+> route around by picking a different corpus on the day.
+>
+> - **The gain leg and the cost leg still stand** exactly as written.
+> - **The veto leg cannot simply be re-pointed at the golden ladder.** A veto
+>   asks *"did this knob break an answer that was right?"*, which needs a rank
+>   contract per query; the ladder's questions carry none, because their key is
+>   sealed and no agent may open it. **There is no hand-graded set in reach, and
+>   inventing one here would be authoring an instrument inside the run that
+>   uses it.**
+> - **Nothing was lost in practice.** `bin/bench.py`'s sweep switch and its
+>   playground adapter were never built — [SETUP-BENCHMARK](../setup/fux-benchmark.md)
+>   says so — so this runbook has never been executed end to end. What replaced
+>   the sweep for the two in-scope knobs is
+>   [the priors run](../regression/2026-09-12-priors-and-tables/PRE-REGISTRATION.md) §3,
+>   which **superseded** the frozen pre-registration rather than editing it.
+> - **What would revive it:** a golden set with a per-query rank contract that
+>   an agent may read. That is a new item, not a step in this one.
+>
+> Reconciled by [W-138](../../archive/open/W-138-reconcile-with-l9.md), 2026-09-12.
+
 
 **Model: Sonnet** for §1–§6 — every step has a mechanical gate. **Opus** for
 §7 (`ANALYSIS.md`, the verdicts, the candidate table's wording) and for the

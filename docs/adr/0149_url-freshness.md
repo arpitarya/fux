@@ -33,6 +33,20 @@ six distinct labels and nothing ever folds one into another:
 | `unverified` | we did not look, and have nothing to compare |
 | `as-ingested` *(mismatched)* | the retained bytes disagree with the index — an **index defect**, not a stale source |
 
+⚠ **There are FIVE labels, and two other records said six** (W-140 row 1,
+corrected 2026-09-12). `Verdict.label` in `src/fux/refer/freshness.py` — which
+this record owns — returns `current` · `stale` · `cached` · `as-ingested` ·
+`unverified`, and `output.schema.json`'s enum has had exactly those five since it
+was written. **The off-by-one entered on the day `as-ingested` joined a
+four-state set**, in ADR-REFER decision 19 and ADR-ASK, both of which said *six*
+and then listed five. **This record's own table was right all along**; the
+docstring's *"a SIXTH position"* is fixed, and nothing in the code changed.
+
+**The last row is a sixth *outcome*, not a sixth label** — a mismatched
+comparison is still reported under `as-ingested`, with the mismatch in the note.
+That distinction is very likely where the miscount came from, and it is worth
+keeping straight: a reader counting rows in this table gets six.
+
 `ttl=` on a URL line says how long that URL may go unchecked. It is a **bound
 that narrows**: it can make a URL checked more often than the caller's policy
 asks, never less. With the default policy — caching off — no line can turn
@@ -375,6 +389,21 @@ construction.** The arithmetic was right and nothing could set its left operand.
 - ⚠ **`update=never` still does not keep `answer` offline, and that is decision
   15 working**, not a defect. The row that filed this claimed otherwise; two
   clocks on one line is what decision 15 exists to separate.
+
+**`[sources.url] ttl` is DECLARED in
+[ADR-CONFIG](0113_config.md) decision 13's key block** (2026-09-12, W-122), bound
+to `config.py`'s `KNOWN_KEYS` in both directions by
+[`tests/test_adr_config_keys.py`](../../tests/test_adr_config_keys.py).
+
+⚠ **Nothing about the duration grammar changed, and that is worth stating**, since
+a key-name gate could look like one. `ttl` is still validated by
+`sourcelist.parse_duration` and never by a second copy in `config.py` — the gate
+checks that the key *exists* on both sides, never what it *means*. A record could
+describe `ttl` as a byte count and the gate would stay green.
+
+⚠ **An unknown `fux.toml` key is now refused by name** (ADR-CONFIG decision 14),
+so a misspelled `tll = "1h"` fails loudly instead of leaving the source at the
+built-in default with nothing said.
 
 ### Consequences
 

@@ -36,24 +36,19 @@ def test_a_golden_with_no_relevance_set_is_legal():
     validate({"id": "q001", "q": "x", "doc": "docs/a.md", "max_rank": 1})
 
 
-def test_the_live_playground_goldens_are_valid_under_the_new_schema():
-    """The live file must stay valid, migrated or not.
-
-    ⚠ **This test asserted `eligible == []` until the goldens were migrated on
-    2026-08-28, and the migration turned it red.** The assertion was a snapshot
-    of a moment, not an invariant — exactly the thing that makes a suite fight
-    the work instead of guarding it. What is actually invariant: the file
-    parses, every row obeys decision 12, and the slice accounts for every query.
-    """
-    path = Path.home() / "my_programs" / "fux-playground" / "goldens" / "queries.jsonl"
-    if not path.is_file():
-        pytest.skip("fux-playground is not on this machine")
-    goldens = load(path)  # raises GoldenError on any violation
-    eligible, excluded = recall_slice(goldens)
-    # Nothing is lost between the two halves -- a query is eligible or excluded,
-    # never neither, which is what makes the reported fraction trustworthy.
-    assert len(eligible) + excluded == len(goldens)
-    assert all(g.get("relevance") == COMPLETE for g in eligible)
+# The live-file test that stood here is DELETED, 2026-09-12 (W-138).
+#
+# It loaded the fifty goldens out of the sibling sandbox and asserted the
+# schema over them. L9 (docs/adr/0011_LAW-9-environments.md) closed that
+# environment to every agent on 2026-09-11, so the test had no subject: it
+# would have skipped forever on a clean machine and read a corpus it may not
+# read on this one.
+#
+# **Nothing replaced it, and that is the state of play rather than an
+# oversight.** The live question set is the sealed golden ladder, whose rows
+# carry an id and a question and no `doc`/`relevant` claim at all -- so there is
+# no live file this schema governs. The rules below still hold the schema
+# itself; what is gone is the check that a real file obeyed them.
 
 
 # --- rule a: a list with no declaration is the original defect ---------------

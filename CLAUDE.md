@@ -70,15 +70,16 @@ right now?*
 
 - **If not** — every remaining item is `OPEN·human`, gated on a verdict Arpit
   hasn't read, or waiting on his hands — the session's **first** output is the
-  blocked-on-Arpit list in ≤3 lines, then it **stops**.
+  blocked-on-Arpit list (🔴 rows, 🔺 first) in ≤3 lines, then it **stops**.
 - No invented scope, no doc polishing to fill the hours. "Next: Arpit reads…"
   buried at the end of a long session is the failure this rule exists to
   prevent; said upfront, it is the rule followed.
 - His time and tokens are money. Applies to Cowork and Claude Code alike.
-- **The inbox:** OPEN-WORK's header carries a *Blocked on Arpit* block and the
-  open-items table carries a `filed` date per row. Every session keeps both
+- **The inbox:** OPEN-WORK's header carries a *Blocked on Arpit* block, and
+  each open item's file under `work/open/` carries its `filed` date. Every session keeps both
   current, and any `OPEN·human` row older than **5 days** is named, with its
-  age, in the session's first output.
+  age, in the session's first output. **Each inbox row has a `↳ blocks:`
+  sub-row naming every item that decision holds up** (Arpit, 2026-09-11; OPEN-WORK rule 10).
 - **Two strikes → a gate (2026-08-12).** A failure class the WORKLOG records
   twice becomes a test or mechanical check in the same change that records
   the second occurrence — recurring lessons are gated, not re-learned.
@@ -152,27 +153,31 @@ M8 item.
 is the complete port list; each entry comes forward **with its tests**, when
 its milestone needs it. Nothing else comes back.
 
-## Non-negotiable constraints
+## Non-negotiable constraints (generated — NOT the source)
 
-**This section is the only normative statement of the laws.** They are named
-**L1–L0** by [ADR-LAWS](docs/adr/0001_LAWS.md) so a record can cite one without
-restating it — and no record may restate one. Changing a law changes this
-section *and* ADR-LAWS' table, in the same commit.
+⚠ **This section is NOT normative, and has not been since 2026-09-12.** Each law
+is *stated* in exactly one record — [ADR-LAW-0](docs/adr/0002_LAW-0-authority.md)
+through [ADR-LAW-9](docs/adr/0011_LAW-9-environments.md) — and the block below is
+**generated from them** by [`scripts/gen-laws.py`](scripts/gen-laws.py) and held
+byte-equal by [`tests/test_claude_md_laws.py`](tests/test_claude_md_laws.py).
 
-⚠ **Each law also has its own record, `0002`–`0011`** (since 2026-09-06; `0011` is L9, 2026-09-11) — L1's is
-[ADR-LAW-1](docs/adr/0003_LAW-1-zero-cost.md), and ADR-LAWS' table routes to the rest.
-**Those records are RATIONALE, never the law**: they carry why it exists, what it
-has cost, how its wording has moved, and what would reopen it. **This section is
-still the only place a law is stated.** A session that reads a law record and
-acts on its prose instead of this text has made the exact mistake the
-no-restatement rule exists to prevent.
+**So: amend the record, then run `python scripts/gen-laws.py --write`.** Editing
+the block here is reverted by the next generation and fails the test in between.
+It is reproduced at all because this is the file every session reads first, and
+[ADR-LAW-0](docs/adr/0002_LAW-0-authority.md) decision 5 permits a generated view
+**for exactly as long as a test binds it** — remove the test and this block
+violates decision 1.
 
+[ADR-LAWS](docs/adr/0001_LAWS.md) assigns the handles `L0`–`L9` and routes each
+to its record; that is all it does now.
+
+<!-- LAWS:BEGIN — GENERATED from docs/adr/*_LAW-*.md by scripts/gen-laws.py. Do not edit by hand: amend the record, then run `python scripts/gen-laws.py --write`. -->
 
 - **L0** · **ADRs are the only source of truth, and the Law records outrank
   every other record.** Every rule is *stated* in exactly one ADR; every other
-  artifact — this file, a schema, a config comment, a skill, a diagram —
+  artifact — `CLAUDE.md`, a schema, a config comment, a skill, a diagram —
   **links to it and never restates it**, and a change is made in the record
-  first. The Law records `ADR-LAW-0`…`ADR-LAW-8` outrank every other ADR: **a
+  first. The Law records `ADR-LAW-0`…`ADR-LAW-9` outrank every other ADR: **a
   record that conflicts with a Law is void in the conflicting part**, never a
   trade-off to weigh. **A Law changes only on Arpit's ruling, named in the
   record**; an ordinary ADR a session may accept.
@@ -181,9 +186,9 @@ no-restatement rule exists to prevent.
   and is forbidden; if it would simply fail, it is an implementation
   (`config.py` naming a key) or an enforcement (a runtime schema, a test) and
   is permitted.
-  ⚠ **This law makes THIS SECTION non-normative** once
-  [W-122](work/open/W-122-adrs-are-the-source.md) lands: the text moves to the
-  nine records and what stands here is generated from them and test-bound.
+  ⚠ **`CLAUDE.md` §Non-negotiable constraints is NOT normative** — since
+  2026-09-12 each law is stated in its own `ADR-LAW-n` record, and what
+  `CLAUDE.md` carries is generated from those records and held equal by a test.
   Precedence is **judgment, never a gate** — no parser reads *"does this
   contradict L2"* — and a record self-contradicting inside one file stays
   ungated. [ADR-LAW-0](docs/adr/0002_LAW-0-authority.md).
@@ -254,6 +259,8 @@ no-restatement rule exists to prevent.
     about **300 characters**, with tables, charts, bullet points and Mermaid
     diagrams, written to read as machine-made or by several authors, professional
     or amateur. [ADR-LAW-9](docs/adr/0011_LAW-9-environments.md).
+
+<!-- LAWS:END -->
 
 ## Litmus for any new work
 
@@ -453,17 +460,29 @@ knowledge as a directory of Markdown files with YAML frontmatter:
   *what the project is* / *what is happening to it* did not change the bundle,
   only its shape.) Repo-root CLAUDE.md/README.md are tool entry points outside
   the bundle.
-  **Convention: ALL-CAPS markdown files carry no YAML frontmatter** —
-  GLOSSARY.md, DOC-REGISTRY.md, OPEN-WORK.md, WORKLOG.md are entry-point/tracker
-  files, exempt from the `type` requirement. Lowercase docs conform.
 - **Frontmatter `type` on every knowledge doc** (the only OKF-required field) —
   `type: Compare Doc`, `type: Proposal`, `type: ADR`, `type: Handoff`,
-  `type: Paper`. Provenance keys are legal OKF extensions; consumers must
-  preserve unknown keys.
+  `type: Paper`, and for the trackers `type: Queue`, `type: Log`,
+  `type: Index`, `type: Glossary`. Provenance keys are legal OKF extensions;
+  consumers must preserve unknown keys.
+  ⚠ **The ALL-CAPS exemption was retired 2026-09-12.** This file used to say
+  *"ALL-CAPS markdown files carry no YAML frontmatter… exempt from the `type`
+  requirement"*. **The spec has no such rule**, so the repo claimed plain
+  conformance while 94 of 314 files failed the bar it was claiming — measured
+  in [`work/proposals/positioning-documents-not-code.md`](work/proposals/positioning-documents-not-code.md)
+  §6. Every tracker now declares a `type`, and a new ALL-CAPS file does too.
 - **`log.md` semantics**: `work/WORKLOG.md` follows OKF's log convention
   (date-grouped, newest first).
 - Conformance bar (OKF §9): parseable frontmatter + non-empty `type`
   everywhere; be permissive when consuming.
+- **Enforced by [`tests/test_okf_bundle.py`](tests/test_okf_bundle.py)** since
+  2026-09-12 — it had been prose and nothing else. Three things sit outside the
+  bundle, and the test's docstring says why each is a boundary rather than a
+  waiver: regression `evidence/`, the sealed `work/golden/` test data, and
+  filed regression runs before 2026-08-25 (frozen — the same baseline, for the
+  same stated reason, as `CLASSIFY_SINCE` in `tests/test_regression_runs.py`).
+  **The scope is declared in [`docs/index.md`](docs/index.md); the test is what
+  keeps the declaration true.**
 
 Reference: [OKF spec](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md) ·
 [annotated guide](https://okf.md/spec/).
@@ -560,7 +579,7 @@ signal of how much is actually pending.
    going to make.
    **Items are grouped by what closing them takes — `fux build`, `testing`,
    `adr update`** (Arpit, 2026-08-29; previously grouped by owning record).
-   Law zero is unchanged: every item still names, inline, the record its
+   Law zero is unchanged: every item's detail file still names the record its
    change will have to update. If you cannot name one, that is the "no ADR
    affected" claim, said out loud — it just isn't the sort key any more.
 5. **Priority is damage that accrues with elapsed time**, above damage that is
@@ -569,6 +588,14 @@ signal of how much is actually pending.
    OPEN-WORK. A second document naming what to do next is always the stale one.
 7. **No git housekeeping in the queue** — never what is committed, staged or
    pushed, in any repo. [OPEN-WORK](work/OPEN-WORK.md) rule 9 (Arpit, 2026-09-11).
+8. **One or two lines per item, always** (Arpit, 2026-09-11). A row is id, lane,
+   what is open, and a link. Everything else goes in the item's file under
+   [`work/open/`](work/open/README.md). OPEN-WORK rule 10, gated by
+   `tests/test_open_work_rows_are_short.py`.
+   **Every row carries one ball, always:** 🔴 blocked on Arpit, directly or through
+   another item · 🟡 waiting on another item · 🟢 no blockers. **Optional after it:**
+   🧨 broken or getting worse · 🔺 do first, **set only by Arpit**. Agents pick from
+   🟢 only (🔺 first, then 🧨). Arpit, 2026-09-11; legend in OPEN-WORK rule 6, gated by the same test.
 
 ### Archive is not evidence
 
@@ -638,11 +665,12 @@ The register, the convention and the ownership table are in
   in the same change** — they drift silently otherwise, which is why the
   executable twin exists.
 - **A record that restates a cross-cutting principle is a bug, not
-  redundancy.** The non-negotiable constraints have exactly one home — this
-  file — and are named L0–L9 by
-  [ADR-LAWS](docs/adr/0001_LAWS.md). Every other record cites `ADR-LAWS` and
-  the number; none paraphrases. Paraphrases drift, and a drifted paraphrase in
-  an accepted record reads as authority.
+  redundancy.** Each law has exactly one home — **its own
+  [`ADR-LAW-n`](docs/adr/0002_LAW-0-authority.md) record** — and
+  [ADR-LAWS](docs/adr/0001_LAWS.md) assigns the handles L0–L9 and routes to
+  them. Every other record cites `ADR-LAWS` and the number; none paraphrases.
+  Paraphrases drift, and a drifted paraphrase in an accepted record reads as
+  authority.
 - **Veto conditions are conditions to check, never events to await.** State
   what would have to become *true* to reopen the decision, so it can be checked
   mechanically today. An event never fires, because nobody is waiting.
@@ -806,9 +834,11 @@ work/               THE SHARED MEMORY between sessions — start at work/README.
   MACHINE.md        environment/tooling quirks per surface (local · bridge · cloud · CI)
   DOC-REGISTRY.md   doc freshness tracker (triggers + last-verified)
   paper/            the architecture of record + figures + predictions
-  architecture-high-level.svg  what fux is · architecture-detailed.svg  the mechanism
+  architecture-{high-level,detailed,decoders,ask,answer}.svg   the five diagrams,
+                    redrawn from the code 2026-09-12. proposal-search-v3-target.svg is
+                    a PROPOSAL's target state, deliberately outside that namespace.
   open/             one detail file per open W-nn; deleted with its row
-  setup/            fux-playground (grades) and fux-lab (measures) — outside this repo
+  setup/            the three siblings — playground · lab · benchmark (L9) — outside this repo
   regression/       dated, measured evidence other docs cite as grounding; VERDICT.md rules
   golden/           the sealed benchmark — seed docs, ladder manifests, prompts; golden-answer/ is NEVER read by Claude
   compare/          live forks — verdict + explicit reopen-trigger
@@ -853,7 +883,13 @@ failures — **no subclass hierarchy**. CLI exit codes: `0` ok · `1` error ·
 
 ## Build & test
 
-**`fux-engine` 2.0.0-alpha.7 is released and on PyPI**; `src/fux/` is the live tree.
+**`fux-engine` 2.0.0-alpha.7 is released on PyPI *and*, since 2026-09-12, on
+npm**; `src/fux/` is the live tree and `node/` is the Node reader. One name in
+both registries. **The two registries are NOT reached the same way:** a GitHub
+release publishes to PyPI automatically (OIDC), while the npm half *stages* and
+waits for a human to approve it on npmjs.com — npm's own recommendation, taken
+deliberately. Both jobs hang off one `release: published` trigger in
+[`publish.yml`](.github/workflows/publish.yml).
 
 ```bash
 uv sync --extra dev
@@ -899,8 +935,16 @@ archive/v0.26/.venv/bin/python tools/pruning-eval/run.py --corpus acme orbit syn
   alpha.5 -> enrichment inside the PII boundary, `fux enrich <TARGET>` and a
   cdp fetcher that survives concurrency at alpha.6 -> one enrichment-report
   path spelling on every platform at alpha.7).
-  Bumped in `src/fux/__init__.py` only — it is the single source, read
-  dynamically by `pyproject.toml`. See `CHANGELOG.md` for the full list.
+  Bumped in `src/fux/__init__.py`, which `pyproject.toml` reads dynamically.
+  ⚠ **It is the SOURCE, not the only copy — that claim was false and is
+  corrected here (2026-09-12).** W-107's Node reader carries three more
+  hand-written version strings — `node/package.json`, `node/fux.mjs` and
+  `node/src/verbs/mcp.mjs` — and nothing checked them, so a bump that missed
+  one would ship a PyPI wheel and an npm tarball naming different releases.
+  **`scripts/check-version-parity.py` is now the enforcement**, run by
+  `tests/test_version_parity.py` on every push and by `publish.yml` before a
+  release builds. Add a site to that script's `SITES` the moment a fifth copy
+  appears. See `CHANGELOG.md` for the full list.
 
 ## Merge wall — what actually blocks a merge
 
@@ -937,6 +981,32 @@ merge on red. Source of truth:
   The harness's fixture baseline reproduced the archived lexical eval exactly
   (hit@5 0.952 / MRR 0.833) and orbit's lab number (0.887) — which is what
   makes "we varied only the index" a verified fact rather than an intention.
+
+**2026-09-12 — two sessions, one machine**
+
+- 🔴 **A RED TEST ON AN UNCOMMITTED TREE IS INVISIBLE TO EVERY MECHANISM HERE.**
+  CI reads commits; the ADR-freshness hook reads a commit message; `pytest` reads
+  whatever you choose to run. A test that a working-tree change turns red stays
+  red and unseen until somebody commits — and then it fails for whoever committed
+  it. **It bit two sessions on the same day for different reasons.** The only
+  cover is to run **both suites, whole**, before believing a change is done;
+  reading the code and concluding is what failed.
+- 🔴 **A loaded machine does not produce noise — it produces a clean, localised
+  anomaly that reads like a finding.** One session's corpus build inflated a
+  single benchmark tier's ingest ratio to **0.77 against ~0.46 everywhere else**:
+  tier-localised, internally consistent, and in exactly the shape a real
+  regression takes. **Noise gets distrusted; this would have been filed.** It was
+  caught by two sessions comparing timestamps — a conversation, not a mechanism.
+  Interleaving arms (`A B A B`) is the only structural defence and it protects
+  the *difference*, never the absolute number.
+- **So: say what you are running, and when, to anyone sharing the machine.** It
+  is the only thing that worked. Recorded in
+  [SETUP-BENCHMARK](work/setup/fux-benchmark.md) standing rule 0a as an
+  **unguarded** gap, because it is one.
+- **Concurrent sessions commit, too.** A peer committed a fix to code this
+  session had written and not yet committed. Re-derive `git status` immediately
+  before staging, and **commit with explicit pathspecs** — `git commit -- <paths>`
+  — when the index carries another session's work.
 
 **Earlier knowledge (v0.19–0.26)** is preserved in the archived CLAUDE.md at
 git history (`git show 6473987:CLAUDE.md`). Two items still bind

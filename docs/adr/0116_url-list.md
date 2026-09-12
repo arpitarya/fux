@@ -339,12 +339,26 @@ decision 3) — so the value on the line is the whole story, every run.
 source-wide `[sources.url]` setting, then the line. A line beats both, for its
 own URL only.
 
-**`meta` is a privacy decision, and it only ever loosens per URL.** The
-source-wide setting is the floor; a line may opt one document *out* of hashing
-because that document is public. **There is deliberately no way to make one URL
-stricter than the source** — a source that needs hashing needs it for
-everything, and per-line strictness would invite the mistake of leaving one line
-off.
+**`meta` is a privacy decision, and the line wins in BOTH directions.** A line
+may opt one document *out* of hashing because that document is public, and it
+may opt one *in* on a source whose default is `plain`.
+
+⚠ **This read *"it only ever loosens"* and *"there is deliberately no way to
+make one URL stricter than the source"* until 2026-09-12** (W-140 row 10).
+`urlsrc.resolve_urls` is one line and it is symmetric — `entry.attrs["meta"] if
+"meta" in entry.declared else source.meta` — so `meta=hashed` on a line under a
+`plain` source has always won. **The claimed restriction was never
+implemented.**
+
+- **Nothing leaks either way**, which is why this is a record correction and not
+  a code fix: the stricter direction only ever hashes *more*, and
+  [L5](../../docs/adr/0007_LAW-5-hashed-meta.md) is a floor on what must be
+  hashed, not a ceiling.
+- **The argument the old sentence made is still worth keeping**, and it is about
+  the *source-wide* value: a source that needs hashing needs it for everything,
+  so set the floor there and treat a per-line `plain` as the exception someone
+  has to justify. That is guidance about how to use the file — it was written as
+  a statement about what the file can express, and those are different claims.
 
 ### Considered for the set, and deliberately excluded
 

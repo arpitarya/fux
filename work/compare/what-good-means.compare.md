@@ -323,9 +323,11 @@ future sessions can be held to.
 
 - **`recall@k` is not computed today.** It needs known-relevant sets per query,
   which is real annotation work on the 50 goldens.
-- **The `unanswerable` class does not exist** in the playground and must be
-  authored — and authored **blind**, or it contaminates the set it is meant to
-  test (the W-78 lesson).
+- **The `unanswerable` class does not exist** and must be authored — and
+  authored **blind**, or it contaminates the set it is meant to test (the W-78
+  lesson). ⚠ **This said *"in the playground"***; that environment was retired
+  by [L9](../../docs/adr/0011_LAW-9-environments.md) on 2026-09-11, and the
+  class's home is the golden ladder's.
 - **Nothing here fixes the lost corpora.** Part B still cannot run.
 - ⚠ **Declaring the mix will make some historical numbers incomparable.** That
   is the cost of having been undeclared, and it is paid once.

@@ -1,3 +1,8 @@
+---
+type: Governance
+description: "Map of the files that govern this repo: what each governs, who reads it, what enforces it."
+---
+
 # GOVERNANCE — how this repo's process is documented, and by what
 
 **How to use this file.** ⚠ **Counts here were recounted 2026-08-25 and had drifted badly** — `open/` said 7 when it was 5, `regression/` said 13 when it was 29, the register said 33 when it was 41. A file whose whole job is to be the index cannot be the one that is stale, so the counts now carry the date they were taken.
@@ -33,7 +38,7 @@ none of them currently is.
 | `compare/*.md` (**18 docs + README**, recounted 2026-08-25 — four moved to `archive/compare/`) | live forks — verdict + reopen-trigger | both | none | fork opens/closes/reopen-trigger fires |
 | `proposals/*.md` (**13 docs + README**, recounted 2026-08-25 — the `ideal/` set and one proposal archived) | parked, undecided ideas | both | none | filed, graduates, or rejected |
 | `regression/<date>-<run>/` (**29 runs**, recounted 2026-08-25) | measured evidence other docs cite | both | `tests/test_regression_runs.py` | every measurement run |
-| `setup/*.md` (2 docs + README) | how `fux-playground`/`fux-lab` are stood up | human (mostly) | `tests/test_setup_docs.py` | either sibling changes |
+| `setup/*.md` (3 docs + README) | how the three siblings are stood up; their jobs are [L9](../docs/adr/0011_LAW-9-environments.md)'s | human (mostly) | `tests/test_setup_docs.py`, `tests/test_l9_environments.py` | any sibling changes |
 | `paper/the-fux-index-paper.md` | architecture of record + falsifiable predictions | both | none | architecture changes / a prediction is measured |
 | `architecture*.svg` (2 diagrams) | visual architecture | human | none | tier/component changes |
 

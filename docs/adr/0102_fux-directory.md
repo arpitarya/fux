@@ -143,6 +143,50 @@ would have eaten `sources/` and `fetchers/` without a word.
 An ignore rule is also the kind of thing a reviewer's eye slides over. It has to
 be a machine's job.
 
+
+### Amendment 2026-09-12 — the generated README is also the onboarding document
+
+**What changed.** `_readme()` in [`fuxdir.py`](../../src/fux/store/fuxdir.py)
+emitted only the declaration table, the fetcher note and the rules. It now
+appends four sections after them: **What fux is**, **The commands** (the ADR-CLI
+group table), **Calling fux from a script, in any language**, and **For an AI
+agent**. Arpit's instruction, 2026-09-12.
+
+**Why the README and not the docs site.** This file is the one piece of fux
+prose that **arrives inside the consumer's repo and is committed there**. A
+teammate who opens `.fux/` to find out what these directories are is the same
+person who wants to know what the tool does and how to call it from a script,
+and they are already looking at the only fux document their clone contains.
+
+**The scripting section states the integration contract, which had no home:**
+
+- `--json` on every read verb; **never parse the prose output**.
+- Exit codes `0` / `1` / `2` / `130`, errors on stderr as `error: <message>`.
+- Read paths are offline and deterministic, so a call is safe in a loop.
+
+**There is deliberately no SDK**, and the README says so: fux is a process that
+reads files, writes stdout and exits. Worked examples ship for shell, Python,
+Node and Go, plus the two agent routes (`fux mcp`, or the installed skills).
+**A binding would be a second surface to version**, and the CLI contract is
+already frozen by [ADR-CLI](0101_cli-surface.md).
+
+⚠ **Three constraints the amendment does not relax.**
+
+1. **Still ASCII-only** — `ensure_layout` writes with `.encode("ascii")` and a
+   single em-dash fails the write on a Windows console. Every added line was
+   checked against that encode.
+2. **Still write-if-missing.** A consumer who annotated their README keeps it
+   and will never see these sections. **That is the correct trade** — decision 1
+   makes the file theirs — but it means the new content reaches existing repos
+   only when someone deletes the file, and nothing prompts them to.
+3. **The table is still generated from the four dicts.** The new prose is
+   static text appended after it; it states no per-entry fact that could drift
+   from `COMMITTED` / `DERIVED` / `ACQUIRED`.
+
+⚠ **The one thing now at risk of drift:** the verb-group table duplicates
+ADR-CLI §1. If a verb group changes there, this README is a second place to fix,
+and nothing checks it. Named here rather than left to be discovered.
+
 ### Decision
 
 **1. Every child of `.fux/` is declared committed, derived or acquired**, in a
@@ -170,8 +214,10 @@ table is the reasoning.
 | `decoders/` | committed | consumer code — decision 5 |
 | `enrich/` | committed | pinned enrichment text, one file per **source content sha**, plus `queue.tsv`. It cannot be re-derived: a model wrote it, in an agent, once, and [ADR-ENRICH](0137_enrich.md) decision 1 refuses to call one. Committed also means **every clone has identical coverage**, so L3 holds with a wider input rather than a weaker property. Keying by source sha means editing a document orphans its enrichment automatically — staleness is structural rather than a check someone has to remember |
 | `tune.toml` | committed | how results are **ordered** — plus `[index]` (`max_phrases`, `max_table_rows`), the one table that changes what is indexed ([ADR-TUNE](0135_tuning.md) decision 13, 2026-09-11). A preference that does not travel with the clone is not one: two clones would rank the same corpus differently, which is the surprise this split exists to remove |
-| `.fuxignore` | committed | what is **not** indexed, in `.gitignore`'s grammar — the one home for exclusion, read before the source lists and outranking them in both directions ([ADR-FUXIGNORE](0145_fuxignore.md)). Committed for the same reason `tune.toml` is: a corpus that differed by clone is the surprise this split removes. Written header-only by `fux setup`, and never rewritten |
+| `.fuxignore` | committed | what is **not** indexed, in `.gitignore`'s grammar — the one home for exclusion, read before the source lists and outranking them in both directions ([ADR-FUXIGNORE](0145_fuxignore.md)). Committed for the same reason `tune.toml` is: a corpus that differed by clone is the surprise this split removes. Written header-only by `fux setup`. ⚠ **`fux ingest` REWRITES two delimited blocks at its top** — the not-indexed and skipped lists ([ADR-FUXIGNORE](0145_fuxignore.md) decision 11), sorted, wall-clock-free, whole rather than appended, and **above every hand-written line** so a human's `!` always wins. This row said *never rewritten* until 2026-09-12 (W-140 row 8); it is the one committed file under `.fux/` that a verb edits, which is exactly the fact a reader of this table needs |
 | `README.md` · `.gitignore` | committed | generated, write-if-missing |
+| `node/` | committed | the **vendored Node read plane** — 37 files, no dependencies, no build step ([ADR-NODE-SEARCH](0155_node-search.md)). Committed because the audience is a host with **no Python**: a gitignored copy could only be regenerated by the interpreter that is, by construction, not there, so gitignoring it withholds the file from exactly the person it is for. Measured 2026-09-12: **196 KB against a 9.5 MB index**, and smaller than the `decoders/` Python already committed beside it |
+| `fux` | committed | a three-line `/bin/sh` shim — `.fux/fux find rollback` in a clone with nothing installed. `exec node .fux/node/fux.mjs "$@"`, mode `0755` |
 | `refusals.toml` | committed | what a **refusal** looks like in this organisation — the sign-in walls, paywalls and viewer shells a server returns instead of the document ([ADR-REFUSAL](0148_refusals.md)). Consumer-owned and additive; the engine ships no vendor knowledge, and the always-on magic-byte floor is not configurable from it. Committed because *"what does a login page look like here"* is a team fact, exactly like `.fuxignore` |
 | `pii.toml` | committed | what is **redacted** from the committed index and nowhere else ([ADR-PII](0150_pii.md)). Written by `fux setup` from the starter, never rewritten — and **the one consumer file that is required**: every command refuses in a repo without it (ADR-PII decision 17) |
 | `runtime/` | **derived** | accelerator segments, the fetch cache at `runtime/fetch-cache/`, the write lock, the URL counters, the skip ledger, and `enrich-progress.tsv` — which machine has handled which queued document, **local by design** so two people's progress cannot conflict on a pull |
@@ -209,13 +255,13 @@ configuration. See [ADR-CACHEDIR-TAG](0121_cachedir-tag.md). ⚠ **For
 bytes out of a backup is the same L2 concern that makes the gitignore an error
 rather than a warning.
 
-**6. Scaffolding has two moments, and everything in both is write-if-missing.**
+**6. Scaffolding has two moments. Everything in both is write-if-missing except one shape — see 6a.**
 One generator doing both jobs is how a repo that wanted an index ends up
 holding code.
 
 | moment | writes | why |
 |---|---|---|
-| **`ensure_layout`**, at the head of every ingest | `.fux/README.md`, `.fux/.gitignore` | **mandatory and idempotent** — a fresh clone must be correct before a byte is written into the directory |
+| **`ensure_layout`**, at the head of every ingest | `.fux/README.md`, `.fux/.gitignore`, **`.fux/node/` + `.fux/fux`** | **mandatory and idempotent** — a fresh clone must be correct before a byte is written into the directory. The reader is here rather than in `setup` for the same reason: a clone with no Python has to be able to read the index the first time anyone ingests, not only after someone remembers to run `setup` |
 | **`fux setup`** | `fux.toml`, `sources/dirs`, `sources/urls`, `formats.toml`, `tune.toml`, `output.toml`, `.fuxignore`, `refusals.toml`, `pii.toml`, `fetchers/*.py`, `decoders/*.py`, the agent policy files, and the repo-root `AGENTS.md` under decision 9's conditions | **optional, explicit, once per repo** — a consumer asked for it |
 
 **`ensure_layout` must never write a fetcher**, and nothing in either column is
@@ -353,6 +399,40 @@ table that an old `fux.toml` still carried and a loader refusal was owed.
 wrong?"** — a new key at the status-quo default cannot be, and a removed key
 always is.
 
+**6a. A FOURTH shape: committed, engine-owned, and OVERWRITTEN on a version
+difference.** Added 2026-09-12 for [ADR-NODE-SEARCH](0155_node-search.md) R2.
+
+| shape | examples | rule |
+|---|---|---|
+| committed, **consumer-owned** | `fetchers/` `decoders/` `*.toml` | write-if-missing — a consumer's edit survives |
+| committed, **engine-owned, annotatable** | `README.md` `.gitignore` | write-if-missing — a consumer annotates them |
+| committed, **engine-owned, vendored** | **`node/`**, **`fux`** | **overwritten on a version difference** ← new |
+| derived / acquired | `runtime/` `acquired/` | gitignored |
+
+**Why the first three shapes were not enough.** Write-if-missing protects a
+consumer's edit. **Nobody edits a vendored reader**, so there is no edit to
+protect — and a stale one is not an old preference, it is a **wrong answer**: a
+reader from before a `_format` bump either refuses the shards or, worse,
+misreads them.
+
+🔴 **The evidence is in this repository, and it already cost something.**
+`decoders/` is write-if-missing, and the `doc`-suffix rename
+(`csvdoc` → `csv`, 2026-09-06) shipped **with no migration**: a repo set up
+before it still holds stale `<name>doc.py` files that claim the same extensions
+and **win**. `tests/test_orphaned_modules.py` catches the shipped half and
+nothing reaches a consumer's directory. Same mechanism, worse outcome.
+
+**The payoff is structural.** The copy in `.fux/` is always written by the
+Python that wrote the index, so **a `_format` mismatch cannot happen** — which
+is strictly stronger than npm, where a consumer picks versions independently.
+
+⚠ **Overwriting is conditional on the version, never unconditional.** This
+directory is COMMITTED and `ensure_layout` runs at the head of **every ingest**,
+so a no-op ingest has to produce a no-op diff. `ensure_node_reader` compares
+`.fux/node/package.json`'s `version` against `fux.__version__` and returns
+immediately when they match. `fux doctor`'s `node reader` row reports the drift
+it can still see.
+
 **7. `fetchers/` is consumer code and fux never rewrites it.** It is loaded by
 path, and only under the two fenced paths — `fux add <URL>` and `fux update`.
 The two files fux can put there ship as package data with an extension Python's
@@ -419,6 +499,19 @@ the policy by narrowing one config line.**
 directory under `.github/`, not a fourth vendor — the announcement contract and
 `report.outside` are unchanged, and `test_optout_flag_leaves_no_vendor_directory_behind`
 already covers it, because it checks the vendor root.
+
+⚠ **`.github/skills/` and `.codex/` left the outside set on 2026-09-12, and
+`.agents/skills/` replaced both** ([ADR-AGENT-POLICY](0132_agent-policy.md)
+decision 16, W-141). Codex and Copilot now share one directory, so the set
+shrank from eighty-four files to seventy-one. **Two scaffolding facts change
+with it:**
+
+- **A path two vendors name is written, and announced, once** — `_write_agents`
+  skips a path an earlier vendor wrote in the same run.
+- **`.agents/` is a vendor root no single vendor owns**, and the opt-out test
+  checks it beside the other four.
+- ⚠ **`fux setup` never deletes**, so a repository set up before this keeps its
+  old `.codex/skills/` and `.github/skills/` until the consumer removes them.
 
 ⚠ **`.claude/rules/` joined the outside set on 2026-09-11, and the set grew from
 eighteen files to eighty-four** ([ADR-AGENT-POLICY](0132_agent-policy.md) decision

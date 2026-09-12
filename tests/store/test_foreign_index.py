@@ -129,6 +129,30 @@ def test_a_url_inside_a_file_record_is_not_a_url_record(tmp_path):
     assert store_mod.foreign_url_ids(tmp_path) == []
 
 
+def test_the_version_mismatch_error_names_full_and_warns_off_the_delete(tmp_path):
+    """🔴 **It pointed at the one remedy this record exists to prevent.**
+
+    W-140 row 9, fixed 2026-09-12. The shard-header error told the reader to
+    `delete .fux/index/ and run fux ingest`, *"which is safe because the index
+    holds statistics, never content"* — and ADR-INDEX-LIFECYCLE decision 10a is
+    the record saying it is **not** safe: a `url:` record is the one thing in
+    the index that is not a function of a committed file, so the directory
+    delete destroys it and an offline re-ingest cannot rebuild it.
+
+    **The message is the whole interface at that moment.** Whoever reads it has
+    a repo that will not answer a query, and they will do what it says.
+    """
+    _write_foreign(tmp_path, _file_record("docs/a.md"))
+    with pytest.raises(FuxError) as exc:
+        store_mod.read_index(tmp_path)
+    message = str(exc.value)
+    assert "fux ingest --full" in message
+    assert "Do NOT delete" in message and "url:" in message
+    assert "holds statistics, never content" not in message, (
+        "the sentence that made the wrong remedy sound safe"
+    )
+
+
 # -- what --full does with it -------------------------------------------------
 
 

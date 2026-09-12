@@ -21,7 +21,9 @@ model had never been measured here. This measures one.
   chunked differently would measure a corpus fux does not have.
 - **The lexical ranks come from the shipped CLI** (`fux ask --json`), never
   re-implemented.
-- **Graded on RANK, never score** — `fux-playground/check.py`'s rule.
+- **Graded on RANK, never score** — the rule the retired consumer harness
+  taught, and the one [`tools/quality/goldens.py`](../quality/goldens.py) now
+  states.
 - **No default is proposed and no switch is flipped.** The output is a count.
 
 ## The four files
@@ -53,7 +55,7 @@ npm init -y && npm install @huggingface/transformers@3.7.6
 uv venv .venv-st && VIRTUAL_ENV=$S/.venv-st uv pip install sentence-transformers
 
 G=~/my_programs/fux/tools/vector-gate
-Q=~/my_programs/fux-playground/goldens/queries.jsonl
+Q=<a goldens JSONL file>          # see the corpus note below
 python $G/prepare.py <corpus> $Q $S/prepared.json
 
 cp $G/embed_node.mjs $S/            # node resolves modules beside the script
@@ -65,3 +67,18 @@ python $G/cross_arm.py $S/prepared.json $S/vec-node.json $S/vec-py.json
 ```
 
 Filed run: [`work/regression/2026-09-05-vector-gate/`](../../work/regression/2026-09-05-vector-gate/report.md).
+
+## 🔴 The corpus this ran on no longer exists
+
+The 2026-09-05 run used `fux-playground`'s ten documents and fifty goldens.
+[L9](../../docs/adr/0011_LAW-9-environments.md) made that environment Arpit's
+hands alone on 2026-09-11, so **`<corpus>` and `$Q` above have no default and
+this harness has no live golden set** — the golden ladder
+([`work/golden/`](../../work/golden/README.md)) carries questions with no rank
+contract.
+
+**What that costs W-106**, stated plainly: the retrieval half of this gate
+cannot be re-run as filed. **The two-architecture arm can** — `cross_arm.py`
+compares two implementations' *vectors* and needs no goldens at all, only the
+prepared chunks. That is the half still owed, and it is why this directory is
+kept rather than retired.

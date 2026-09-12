@@ -25,7 +25,7 @@ and nowhere else.** Read it there; this document does not restate it
   See [`README.md`](README.md) §Which is which
 - **Written:** 2026-08-28 · **rewritten 2026-09-12** under L9
   ([W-138](../../archive/open/W-138-reconcile-with-l9.md)), **built to that shape by
-  [W-139](../open/W-139-benchmark-per-l9.md)**
+  [W-139](../../archive/open/W-139-benchmark-per-l9.md)** — done, and its first run is [filed](../regression/2026-09-12-benchmark-l9/report.md)
 
 ---
 
@@ -49,8 +49,11 @@ lab run against the golden ladder.
   bin/
     gen_corpus.py     deterministic generator: seed + N -> one corpus folder
     queries.py        the fixed query set, versioned, emitted with the corpus
-    bench.py          prepare | latency | rankdiff
-    latency.py        interleaved A B A B timing
+    bench.py          prepare | nullcontrol | latency | rankdiff | file
+    latency.py        the older interleaved timer, kept for the B5/B6 shapes
+    bench_v1_mcnemar.py   the OLD harness (paired quality rows + a p-value).
+                      L9 moved that question to the lab; nothing calls it, and
+                      it is kept only so the 2026-08-28 filed run reproduces.
   corpora/
     docs-00100/ docs-00200/ docs-00500/ docs-01000/
     docs-02000/ docs-05000/ docs-10000/
@@ -136,6 +139,31 @@ where timing runs touch it.
 
 **0. Never delete it, never start a fourth harness.** Same rule as the lab, same
 reason. New comparison work is a new `runs/<date>/` inside it.
+
+🔴 **0a. ONE PROCESS PER `runs/<id>/`, and the harness enforces it now.**
+Two sessions on this machine chose the run id `2026-09-12-l9` within three hours
+on 2026-09-12. `bench.py latency` opens its row CSV with `"w"`, so the second
+**silently truncated the first's 10 000-document pass mid-sweep** — and for the
+overlap the two were **timing each other's CPU**, so numbers on both sides were
+wrong in a way nothing asserts on. `summarise()` then printed a confident
+three-query summary in the same format as a sixty-query one.
+
+- **`bench.py` writes `runs/<id>/.owner`** with its pid and refuses a directory
+  a live process holds, naming the pid.
+- ⚠ **The null control could never have caught it.** It compares one arm to
+  itself *inside one process*; the neighbour arrives from outside.
+- **Row files are opened `"x"`, not `"w"`** — the lock stops the common case,
+  exclusive-create stops the one the lock cannot see (a stale `.owner` cleared by
+  hand). A guard whose own failure is silent is half a guard.
+- 🔴 **Still unguarded, and it cost more than the collision did: a neighbour
+  doing UNRELATED work on the same machine.** The same day, the other session
+  was indexing golden-ladder rungs in `fux-lab` for two hours — no shared file,
+  no shared run id, and **every latency measured in that window was inflated by
+  an unknown amount.** The owner lock cannot see it; §Where it can and cannot run
+  is the only mitigation and it is a sentence, not a check. **It was caught
+  because a person said so afterwards**, which is not a mechanism.
+- Filed: [`../regression/2026-09-12-benchmark-l9/`](../regression/2026-09-12-benchmark-l9/report.md)
+  §The collision.
 
 **1. The null control runs first, every time — and it is the same-corpus
 repeat.** Arm A twice on the *same* corpus must give **identical ranked lists**

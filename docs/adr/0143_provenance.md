@@ -185,13 +185,33 @@ answer nobody recomputed — the defect this repo has refused three times
 (`max_age_seconds`; a `cached` verdict reported as `current`; a line range for
 `ask` computed at ingest).
 
-**10. `--receipt` EMITS; only `--journal` WRITES.** L8 as reverted permits a
+**10. `--receipt` EMITS; `--journal` WRITES.** L8 as reverted permits a
 plaintext local log; it does not oblige fux to start one. A `$0`, offline tool
 whose pitch is *nothing leaves your machine* may not quietly begin recording
-questions because a law was relaxed. **The flag is the consent.**
-⚠ Always-on journalling is a real want and needs a `.fux/tune.toml` key, which
-is an [ADR-TUNE](0135_tuning.md) change **deliberately not made here** — it is a
-fork, and no session may pick a default on one.
+questions because a law was relaxed. **Consent is explicit, always.**
+
+🔴 **Corrected 2026-09-12 (W-140 row 3, second half). This said *"only
+`--journal` WRITES"* and that has not been true since `.fux/output.toml`
+shipped.** `[cli.answer] journal = true` sets the same `args.journal` the flag
+does, so a committed config file turns durable local recording on for every
+`fux answer` in that repo.
+
+- **The default is `false` on both surfaces** and `output_config.BUILT_IN`
+  agrees, so nothing is on by accident — this is a second consent surface, not
+  an always-on default.
+- ⚠ **But it arrived with no record at all.** This decision said always-on
+  journalling *"needs a `.fux/tune.toml` key… it is a fork, and no session may
+  pick a default on one"*, and the capability then landed through
+  [ADR-OUTPUT](0144_output-defaults.md), which does not mention `journal`
+  either. **The fork was never ruled; it was routed around.**
+- 🔴 **`journal` is the ONE key in a rendering config that writes to disk.**
+  Every other key in `.fux/output.toml` changes how an answer is *displayed*;
+  this one changes whether a record of the question survives the process. That
+  asymmetry is what makes it worth a ruling rather than a shrug.
+- **Left to Arpit, not decided here** — [W-147](../../work/open/W-147-the-journal-consent-surface.md):
+  does a committed `journal = true` satisfy *"consent is explicit"*, or should
+  `output.toml` refuse the key by name the way it refuses a per-verb key at the
+  shared level? Either answer is defensible and neither is a session's to pick.
 
 **11. The journal is bounded by a DESIGN DEFAULT, not by a law.**
 `DEFAULT_JOURNAL_MAX = 1000`, oldest dropped. L8 no longer requires a bound;
@@ -217,14 +237,33 @@ nothing.**
 
 ```
 { "_type": "https://in-toto.io/Statement/v1",
-  "subject": [ { "name": ..., "digest": {"sha256": ...},
+  "subject": [ { "name": ..., "digest": {"blake2b-160": ...},
                  "annotations": {"fux.dev/loc": ...} } ],
   "predicateType": "https://fux.dev/receipt/v1",
   "predicate": { engine, inputs, confidence, derivation, verdicts } }
 ```
 
 - **It is a rename, not a reshape.** Fux already cited by digest, which is the
-  whole reason the standard fits: `id` → `name`, `sha` → `digest.sha256`.
+  whole reason the standard fits: `id` → `name`, `sha` → `digest.blake2b-160`.
+- 🔴 **The algorithm key said `sha256` from 2026-08-27 to 2026-09-12, and the
+  value was never a SHA-256** (W-140 row 3). A fux `sha` is
+  `store.format.content_sha` — **blake2b with a 20-byte digest**, 40 hex
+  characters, chosen in M1 and recorded in [ADR-RECORD](0109_index-record.md).
+  in-toto's `DigestSet` is keyed **by algorithm**, so the key is a claim about
+  how the value was computed, and this one was false.
+  - **Why it mattered more than a label usually does:** the reader is an
+    external verifier, off this machine. It would hash the bytes with SHA-256,
+    get 64 hex characters, and report a mismatch **on a receipt that is
+    perfectly good** — a failure that lands on someone with no route back to the
+    cause. Nothing inside fux noticed, because `_sha_of` compared the string to
+    fux's own.
+  - **Fixed by emitting `blake2b-160`**, the honest algorithm name; the spec
+    permits an algorithm outside its standard list precisely for this.
+  - ⚠ **`sha256` is still READ and always will be.** Receipts written before
+    the fix carry the wrong key over the right value, and refusing them would
+    turn a labelling fix into a verification outage for every receipt already
+    sitting in a ticket. `_sha_of` tries the honest key first, then the legacy
+    one; nothing writes the legacy one.
 - ⚠ **`loc` has no field in a ResourceDescriptor.** A line range is neither a
   URI nor a digest, so it goes in `annotations` — the spec's own extension
   point — under a **namespaced** key, because an unnamespaced key in a shared
@@ -491,11 +530,11 @@ grep -c "_emit(" src/fux/query/__init__.py
 
 **Project docs**
 
-- [`CLAUDE.md`](../../CLAUDE.md) — §Non-negotiable constraints, L8
+- [ADR-LAW-8](0010_LAW-8-use-record.md) — L8, where it is stated
 - [`archive/open/W-91-the-provenance-plane.md`](../../archive/open/W-91-the-provenance-plane.md)
   and [`archive/proposals/answer-provenance.md`](../../archive/proposals/answer-provenance.md)
   — **named, never cited** (archive is not evidence). The decision is grounded
-  in this record and in `CLAUDE.md` §Non-negotiable constraints above.
+  in this record and in [ADR-LAW-8](0010_LAW-8-use-record.md) above.
 
 **Papers and specifications**
 

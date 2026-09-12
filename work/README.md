@@ -1,3 +1,8 @@
+---
+type: Index
+description: "Map of work/ — the shared memory between sessions."
+---
+
 # `work/` — the shared memory between sessions
 
 **How to use this directory.** Everything here exists so a session that has
@@ -26,8 +31,9 @@ are all mid-rewrite, and a doc being rewritten is work.
 | [`compare/`](compare/README.md) | live forks — verdict + reopen-trigger | a fork opens, closes, or its trigger fires |
 | [`proposals/`](proposals/README.md) | parked ideas, not adopted | an idea is filed, graduates, or is rejected |
 | [`paper/`](paper/the-fux-index-paper.md) | the architecture of record + figures | the architecture changes; a prediction gets measured |
-| `architecture-high-level.svg` · `architecture-detailed.svg` | the two diagrams | any record-shape, plane or query-path change (detailed) · any change to **what fux is** rather than how it works (high-level) — the high-level one should move rarely, and if it moves often it is drawn at the wrong altitude |
-| [`setup/`](setup/README.md) | the two things fux needs but does not contain — `fux-playground` (grades) and `fux-lab` (measures) | either is set up differently, or a new external dependency appears |
+| `architecture-*.svg` | **the five diagrams**, redrawn from the code 2026-09-12: `high-level` (what fux is) · `detailed` (every plane, committed vs not) · `decoders` · `ask` · `answer` | the plane, verb or record shape each one draws changes. **`high-level` should move rarely** — if it moves often it is drawn at the wrong altitude |
+| `proposal-search-v3-target.svg` | the target architecture of [`proposals/search-v3.md`](proposals/README.md) | **deliberately outside the `architecture-*` namespace**: it draws a proposal's target state, not the architecture of record |
+| [`setup/`](setup/README.md) | the three sibling environments fux needs but does not contain — `fux-playground`, `fux-lab`, `fux-benchmark`; each one's job is [L9](../docs/adr/0011_LAW-9-environments.md)'s | any of them is set up differently, or a new external dependency appears |
 
 **Records live in [`../docs/adr/`](../docs/adr/README.md), and nowhere else.**
 `work/adr/` existed for one day as a superseded-pending staging area and was

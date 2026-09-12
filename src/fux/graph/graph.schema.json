@@ -36,15 +36,16 @@
       "edges":       { "type": "list", "required": "always", "of": "list",
                        "doc": "each element is [src, kind, dst, grade]" },
       "communities": { "type": "dict", "required": "always",
-                       "doc": "node id -> community label, emitted in sorted node order" }
+                       "doc": "node id -> community label such as `c0`, a STRING, emitted in sorted node order" }
     },
     "example": {
       "schema": "fux.graph.v1",
       "edges": [
-        ["file:docs/mesh.md", "supersedes", "file:docs/adr-storage.md", "DECLARED"],
-        ["file:docs/mesh.md", "links", "file:docs/runbook-rollback.md", "INFERRED"]
+        ["file:docs/mesh.md", "ref", "file:docs/adr-storage.md", 10],
+        ["file:docs/mesh.md", "code", "file:docs/runbook-rollback.md", 8],
+        ["file:docs/mesh.md", "tag", "tag:ops", 10]
       ],
-      "communities": { "file:docs/mesh.md": 0, "file:docs/runbook-rollback.md": 0 }
+      "communities": { "file:docs/mesh.md": "c0", "file:docs/runbook-rollback.md": "c0" }
     }
   },
 
@@ -57,13 +58,22 @@
       "one, and the distinction is the whole reason the field exists -- it is",
       "why `inferred` was retired as an INGEST MODE name, because INFERRED is",
       "the edge grade for model-derived and the collision would have been",
-      "silent."
+      "silent.",
+      "",
+      "CORRECTED 2026-09-12 (W-140 row 5). This file's example and field types",
+      "described a plane that has never existed: kinds `supersedes` / `links`",
+      "(the real three are `ref` / `code` / `tag`), `grade` as the STRING",
+      "'DECLARED' or 'INFERRED' (it is an int -- 10 / 8 / 6), and community",
+      "labels as ints (they are strings, `c0`). A declared shape that does not",
+      "match the writer is worse than none: `plane.load()` validates against",
+      "THIS FILE before trusting the plane, so the fiction was one type check",
+      "away from refusing every real graph."
     ],
     "positions": ["src", "kind", "dst", "grade"],
     "src":   { "type": "str", "doc": "doc id the edge leaves" },
-    "kind":  { "type": "str", "doc": "the relation, e.g. supersedes / links" },
-    "dst":   { "type": "str", "doc": "doc id the edge enters" },
-    "grade": { "type": "str", "doc": "DECLARED (from the document) or INFERRED (derived)" },
-    "example": ["file:docs/mesh.md", "supersedes", "file:docs/adr-storage.md", "DECLARED"]
+    "kind":  { "type": "str", "doc": "the relation. EXACTLY THREE EXIST: `ref` (a resolved link), `code` (a basename-resolved reference) and `tag` (an outbound edge to a `tag:` node). The vocabulary is `ingest/edges.py`'s and is not re-decided here" },
+    "dst":   { "type": "str", "doc": "doc id the edge enters, or a `tag:` node" },
+    "grade": { "type": "int", "doc": "the edge weight: EXTRACTED 10 / AMBIG 8 / INFERRED 6 (`ingest/edges.py`). It is an INT, and it is the weight every graph verb propagates -- there is no second weighting scheme" },
+    "example": ["file:docs/mesh.md", "ref", "file:docs/adr-storage.md", 10]
   }
 }

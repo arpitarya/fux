@@ -265,6 +265,14 @@ specifically proposed and specifically refused.
 - **The cost, stated:** URLs added by hand-editing `.fux/sources/urls` are not
   fetched at commit time. They wait for the daemon's next pass or an explicit
   `fux update`. That is a delay, not a silence — `fux doctor` reports them.
+  🔴 **It did not, until 2026-09-12** (W-140 row 13). Every line of doctor's
+  `url sources` row was computed from `url:` records **in the index**, and a
+  line that has never been fetched has no record — so **the one case this
+  refusal's cost depends on was the one case the check could not see.** Built
+  now as *listed minus indexed*, named rather than counted, and loudest in the
+  `none indexed` branch, where *"no URLs"* and *"five URLs waiting on a fetch
+  nobody ran"* had read identically. Pinned by
+  `tests/test_doctor.py::test_url_check_names_listed_urls_that_have_never_been_fetched`.
 - **Gated, not trusted:**
   [`tests/maintain/test_hooks.py`](../../tests/maintain/test_hooks.py) asserts
   no hook body contains a networking invocation, per hook. **It is a crude

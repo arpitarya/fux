@@ -257,6 +257,15 @@ read per query whatever the corpus size.
 **The differential law holds**: 240 accelerator-vs-scan comparisons across five
 weights and four depths, 0 divergent.
 
+⚠ **`_rescore.py`'s docstring was corrected 2026-09-12 and no behaviour of this
+record's changed** (W-140 row 2). It said the passage ordinal *"survives as
+`passage.ordinal` and in the `--json`/MCP payload"*; **`--json` did not carry it
+at all** (fixed — `Citation` gains `ordinal`, `answer.passages[]` emits it) and
+**MCP never can** — `fux_passage` reads a line span off disk and does no
+chunking, so the clause is withdrawn. Recorded here because this record claims
+that file: **`passage_boost` and the uplift are untouched**, and a reader who
+sees the file move should not have to diff it to learn that.
+
 ### Alternatives considered
 
 - **The cross-encoder.** Decision 1.

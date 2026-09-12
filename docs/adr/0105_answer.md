@@ -188,8 +188,15 @@ that configuration choice, not invented by `answer` deciding to fetch.
 **9. The locator is a line range, not an ordinal.** `docs/pruning.md:L1-L6`,
 because an agent acts on a citation by opening a file at a line and an ordinal
 forces a second call to work out which lines those were. **The ordinal is not
-lost** — it survives as `passage.ordinal` and in the `--json` and MCP payloads,
+lost** — it survives as `passage.ordinal` and in the **`--json` payload**,
 because it is stable across a reflow that moves every line number.
+
+⚠ **Corrected 2026-09-12 (W-140 row 2).** This said *"and MCP payloads"*, and
+`fux_passage` has no ordinal to carry — it reads a line span off disk and never
+chunks. **The `--json` half was true of the record and false of the code** until
+the same change: `answer.passages[]` now emits `ordinal`, pinned through the
+CLI by `tests_e2e/test_verbs.py::test_every_passage_carries_its_ordinal`.
+[ADR-REFER](0127_refer-plane.md) decision 17 carries both halves.
 
 **10. `answer` reports whether anything changed since the same question was
 last asked.** The comparison that needs — *did the cited bytes move?* — is
@@ -439,6 +446,8 @@ verb's fetching path** (W-140 rows 6 and 7, 2026-09-11).
   playground queries, before and after, per-query rows:
   [`work/regression/2026-09-05-answer-top3/`](../../work/regression/2026-09-05-answer-top3/report.md).
   `classification: informed`; **nothing is claimed at 10 000 documents.**
+  ⚠ **That corpus was retired by [L9](0011_LAW-9-environments.md) on
+  2026-09-11**: the run stands as filed and cannot be re-run where it was run.
 - The recall ceiling this removes, measured first —
   [`work/regression/2026-08-28-first-recall/`](../../work/regression/2026-08-28-first-recall/report.md).
 - Why a confident wrong answer is the expensive failure — Ji et al., *Survey of

@@ -592,14 +592,36 @@ def test_the_receipt_is_an_in_toto_statement(tmp_path):
 
 
 def test_the_subject_is_a_resource_descriptor(tmp_path):
-    """`{id, loc, sha}` -> `{name, digest.sha256, annotations}`.
+    """`{id, loc, sha}` -> `{name, digest.blake2b-160, annotations}`.
 
     **A rename, not a reshape** — fux already cited by digest, which is the
     whole reason the standard shape fits at all.
+
+    🔴 **The key said `sha256` until 2026-09-12 and the value was never one**
+    (W-140 row 3). The fixture's own `"a" * 40` is the tell: a SHA-256 is 64 hex
+    characters. in-toto's `DigestSet` is keyed BY ALGORITHM, so an external
+    verifier would have hashed the bytes with SHA-256 and reported a mismatch on
+    a perfectly good receipt — a failure landing on a reader off this machine,
+    with no route back to the cause.
     """
     entry = _statement(tmp_path)["subject"][0]
     assert entry["name"] == "file:docs/mesh.md"
-    assert entry["digest"] == {"sha256": "a" * 40}
+    assert entry["digest"] == {"blake2b-160": "a" * 40}
+    assert "sha256" not in entry["digest"], (
+        "the legacy key is READ forever and WRITTEN never — see provenance.DIGEST_ALG"
+    )
+
+
+def test_a_receipt_written_under_the_old_digest_key_still_verifies(tmp_path):
+    """Every receipt written before 2026-09-12 carries `digest.sha256`.
+
+    Refusing them would turn a labelling fix into a verification outage for
+    every receipt already sitting in someone's ticket, so `_sha_of` reads both
+    — honest key first — and this pins that the legacy one still resolves.
+    """
+    legacy = {"name": "file:docs/mesh.md", "digest": {"sha256": "b" * 40}}
+    current = {"name": "file:docs/mesh.md", "digest": {provenance.DIGEST_ALG: "b" * 40}}
+    assert provenance._sha_of(legacy) == provenance._sha_of(current) == "b" * 40
 
 
 def test_loc_lives_in_namespaced_annotations(tmp_path):

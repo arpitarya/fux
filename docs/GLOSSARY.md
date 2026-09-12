@@ -1,3 +1,8 @@
+---
+type: Glossary
+description: "Recurring terms in the fux repo, defined once, alphabetical."
+---
+
 # Glossary
 
 *Alphabetical. Each entry is short and links to the doc that owns the detail.
@@ -67,6 +72,15 @@ scorer both arms of the [pruning eval](#pruning-eval-the-gate) run through.
 path and `file:line` span. In v0.30 chunks are **not durable** — they are
 re-derived transiently from fetched bytes at answer time. Ported at
 [M5](../archive/open/W-25-m5-maintenance.md).
+
+**`code` (edge kind)** — An [edge](#edge-grade-extracted--inferred) whose
+source is **a backtick-quoted path that resolves to another indexed document** —
+`ingest/edges.py` matches the span against ingested document paths and nothing
+else. **It is a link, not parsed code**: fux runs no parser over source files,
+so a `code` edge never means a symbol, an import or a call. The name is a
+historical carry-over and is a known misnomer; a rename to `path` would change
+a committed record field and is owned by
+[ADR-GRAPH](adr/0126_graph.md). See [documents, not code](#documents-not-code).
 
 **Compare doc** — A decision record written *before* building whenever a fork
 has multiple viable options: debate, matrix, grounded references, a proposed
@@ -145,6 +159,25 @@ of a *committed plane* (`index/`, `sources/`, `fetchers/`). See
 documents, which is the compression lever the [BIC](#bic-binary-interpolative-coding)
 size model assumes (paper Figure 4).
 
+**Documents, not code** — What fux indexes, stated once so the question has a
+live answer. Three facts:
+
+- **Fux has no code-analysis layer** — no AST, no symbol table, no call graph.
+  `src/` imports no parser and declares no parsing dependency (`dependencies = []`).
+- **Source files are not indexed by default.** No source-code extension is on
+  `DEFAULT_TYPES` (`ingest/gitdir.py`); adding `src/` to
+  [`.fux/sources/dirs`](#fux-directory) still reports *not an indexed file type*
+  per file. Indexing code is opt-in, and even then it is indexed **as text**.
+- **What looks like code analysis is not.** The [`code` edge kind](#code-edge-kind)
+  is a backtick-quoted path to another indexed document.
+
+**Consequence:** fux's corpus is written knowledge — decisions, runbooks,
+specs, wiki pages, policies — wherever it lives. A repository is one place it
+can live, not what fux is about. Pair fux with a code-graph tool when you want
+code structure. The v0.1–v0.26 engine *did* parse code (stdlib `ast`, a
+tree-sitter extra, call edges) — that is why old tags, package pages and
+crawler caches still say so, and why this entry exists.
+
 **Edge grade (EXTRACTED / INFERRED)** — The archived link-graph vocabulary,
 ported at [M3](../archive/open/W-23-m3-graph-lane.md): `EXTRACTED` = deterministically parsed from the
 document, `INFERRED` = model- or heuristic-derived and ranked below it. Since
@@ -197,10 +230,20 @@ self-describing `README.md` and a `.gitignore` naming **only** the derived
 dirs, never `*`. Both are write-if-missing; anything undeclared is a `fux
 doctor` warning. See [ADR-DOTFUX](adr/0102_fux-directory.md).
 
+**Fux-benchmark** — The two-version timing harness
+(`~/my_programs/fux-benchmark/`): its own corpora, a fixed query set with no
+answer key, and every run timing each query and keeping the ranked list it
+returned so the next run has something to compare against. It never judges
+quality — that is the lab's. See
+[SETUP-BENCHMARK](../work/setup/fux-benchmark.md) and
+[L9](adr/0011_LAW-9-environments.md).
+
 **Fux-lab** — The scratch measurement environment (`~/my_programs/fux-lab/`),
-one directory per corpus, each with its own venv, corpus and baselines. It
-commits nothing; its **evidence is filed** into
-[`work/regression/`](../work/regression/README.md), which is a repo law.
+one directory per environment, each with its own venv and baselines, and the
+[golden ladder](../work/golden/README.md) as its corpus. It commits nothing; its
+**evidence is filed** into [`work/regression/`](../work/regression/README.md),
+which is a repo law. What it may measure and how large a corpus it may use are
+[L9](adr/0011_LAW-9-environments.md)'s. See [SETUP-LAB](../work/setup/fux-lab.md).
 
 **FuxVec** — The from-scratch stdlib dense engine: sign-quantizes a 256-dim
 int8 embedding into a **256-bit code** (32 B/doc), scans by Hamming distance,
@@ -213,14 +256,17 @@ paste-ready Claude Code **prompt**. **Every pair names the model that should
 execute it**, with one sentence of why — model choice is a silent failure
 mode. Lives in [`archive/handoff/`](../archive/README.md).
 
-**Golden query** — One line of `goldens/queries.jsonl` in the
-[playground](#playground-fux-playground): a question, the documents that must
-appear at or above a given **rank**, and optionally documents that must not
-outrank them. Ranks are the contract; scores are never asserted, because a
-score is an implementation detail and a rank is what a user experiences. A
-golden is written by reading the corpus and **never** derived from what fux
-returned — the TREC `qrels` discipline. See
-[SETUP-PLAYGROUND](../work/setup/fux-playground.md).
+**Golden query** — A question plus the documents that must appear at or above a
+given **rank**, and optionally documents that must not outrank them. Ranks are
+the contract; scores are never asserted, because a score is an implementation
+detail and a rank is what a user experiences. A golden is written by reading the
+corpus and **never** derived from what fux returned — the TREC `qrels`
+discipline. The schema is
+[`tools/quality/goldens.py`](../tools/quality/goldens.py). ⚠ **The fifty that
+this term was coined for lived in the [playground](#playground-fux-playground)
+and are retired** ([L9](adr/0011_LAW-9-environments.md), 2026-09-11); the live
+question set is the sealed [golden ladder](../work/golden/README.md), whose
+questions carry **no** rank contract, because its key is sealed.
 
 **Headroom** — On a paired run, **how many queries could have changed** — the
 number a null result is only as informative as. Reported per endpoint and
@@ -338,13 +384,17 @@ that starts passing is reported as **XPASS** and *fails* the run, so a closed
 gap gets recorded deliberately instead of drifting. Borrowed from pytest.
 See [SETUP-PLAYGROUND](../work/setup/fux-playground.md).
 
-**Playground (`fux-playground`)** — The graded corpus in a **separate sibling
-repository**: ten fictional internal-developer-platform documents, fifty
-[golden queries](#golden-query), ten URLs that exercise the CDP
-[fetcher](#fetcher-url), and a committed index holding **file documents
-only**. It is a real consumer of fux — it depends on the sibling working tree
-— which makes it a regression net for the code being edited, not for a
-released wheel. Replaced `examples/playground/`, deleted 2026-08-12. See
+**Playground (`fux-playground`)** — A **separate sibling repository** that is
+Arpit's sandbox, and nothing else. Who may touch it and what it may be used for
+are stated by [L9](adr/0011_LAW-9-environments.md); this entry does not restate
+them. It holds ten fictional internal-developer-platform documents, ten URLs
+that exercise the CDP [fetcher](#fetcher-url), and a committed index holding
+**file documents only**. ⚠ **Until 2026-09-11 it was also the project's graded
+corpus and its only ranking regression net** — fifty
+[golden queries](#golden-query), run by a `check.py` — and roughly forty
+documents, tools and plans used it as an instrument. That job is gone, the
+numbers it produced stand as filed, and the reconciliation is W-138. Replaced
+`examples/playground/`, deleted 2026-08-12. See
 [SETUP-PLAYGROUND](../work/setup/fux-playground.md).
 
 **Pruning (static, top-k)** — Permanently dropping low-value postings at index
@@ -436,8 +486,9 @@ still says which documents are asked about and how often; those locators are
 already in the committed `M/` plane, so it adds *frequency*, not new exposure.
 Distinct from [content-never-durable](#content-never-durable-the-law), which
 governs the corpus: a query is not content, which is the gap L8 exists to close.
-See [CLAUDE.md §Non-negotiable constraints](../CLAUDE.md), named and reasoned by
-[ADR-LAWS](adr/0001_LAWS.md) decision 8.
+Stated by [ADR-LAW-8](adr/0010_LAW-8-use-record.md); handle assigned by
+[ADR-LAWS](adr/0001_LAWS.md), whose decision 8 carries the same-day
+write/revert/ratify history.
 
 **Wire format** — The **committed** encoding of the index: BIC postings,
 4-bit impacts, front-coded columnar ledger, Elias-Fano offsets, delta-varint

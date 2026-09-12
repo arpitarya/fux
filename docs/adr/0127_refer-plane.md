@@ -244,11 +244,25 @@ a `flen`, so `score_record` is literally the same call on both sides.
 
 **17. The locator is a line range, with the ordinal as the fallback.**
 `path:L12-L40`, because an agent acts on a citation by opening a file at a line.
-The ordinal survives as `passage.ordinal` and in the `--json` and MCP payloads,
+The ordinal survives as `passage.ordinal` **and in the `--json` payload**,
 because **it is stable across a reflow that moves every line number** — which is
 exactly when a stored citation would otherwise point somewhere else silently. A
 passage carrying no line range falls back to the ordinal form: **a wrong line
 number is worse than an honest ordinal.**
+
+⚠ **Two corrections, 2026-09-12 (W-140 row 2), and they go in opposite
+directions.**
+
+- **The `--json` half was a CODE defect** and is fixed: `Citation` carries
+  `ordinal` and `answer.passages[]` emits it. It had been promised by two
+  accepted records and absent from the payload since W-108 — a reader following
+  the record found nothing, and no test looked, because the assertion lives in
+  the emitter and every test looked at the dataclass.
+- 🔴 **The MCP half was a RECORD defect and the sentence is withdrawn.**
+  `fux_passage` addresses a span by **line numbers against a file on disk**: it
+  does not chunk, so there is no passage and no ordinal for it to carry. The
+  claim could not have been made true without redefining the tool, and saying
+  *"and MCP payloads"* described a surface nobody had opened.
 
 **18. The implementation modules are private, because the function is the API.**
 Renamed 2026-08-27 on Arpit's ruling — *remove the trap at the source.*
@@ -278,9 +292,15 @@ Renamed 2026-08-27 on Arpit's ruling — *remove the trap at the source.*
   proving it can see a planted shadow — this repo has recorded vacuous passes
   before.
 
-**19. The verdict set is SIX states, and `_obtain` has two fallback points**
+**19. The verdict set is FIVE states, and `_obtain` has two fallback points**
 ([ADR-URL-FRESHNESS](0149_url-freshness.md), [ADR-ACQUIRED](0147_acquired-plane.md),
-2026-09-01). `as-ingested` joins `current`, `stale`, `unverified` and `cached`:
+2026-09-01). ⚠ **This said SIX until 2026-09-12 and then listed five** — an
+off-by-one from the day `as-ingested` was added to a four-state set, corrected
+in W-140 row 1 after re-deriving `Verdict.label` (five returns) and
+`output.schema.json` (a five-member enum) on the Mac. **Nothing in the code was
+ever wrong; two accepted records miscounted their own list**, which is the
+failure mode a record is least able to catch about itself.
+`as-ingested` joins `current`, `stale`, `unverified` and `cached`:
 the source could not be reached, but the passage still matches the bytes in
 `.fux/acquired/` that the record was built from.
 

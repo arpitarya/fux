@@ -154,10 +154,79 @@ was missing from npm's `files`, so `fux mcp` would have broken in the published
 package; and Node advertised a **string** `"5"` default on a property declaring
 `"type": "integer"`.
 
-**Still open on W-107:** npm publication, the global bin, the renderer split,
-and the `doctor` PATH row. The item stays in `open/`.
+**Still open on W-107:** O3 — `PRE-REGISTRATION-NODE-2` — and nothing else an
+agent can close. The item stays in `open/`.
+
+### 2026-09-12, later the same day — npm, the PATH row, and the twin map
+
+- **`fux-engine` 2.0.0-alpha.7 published to npm.** Tags `alpha` and `latest`;
+  **`latest` could not be prevented** — npm always creates it on a package's
+  first publish and ignores `--tag`. Trusted publishing (OIDC) configured
+  against `arpitarya/fux` · `publish.yml`, **staged**: CI uploads, a human
+  approves on npmjs.com. `publish.yml` gained a `publish-npm` job on the same
+  `release: published` trigger and `needs: build` gate as PyPI.
+- 🔴 **R1a is amended: the global bin SHIPS.** The tarball went out carrying
+  `bin: {"fux": "./fux.mjs"}` against the standing *"No global bin ships in the
+  first npm release"* — **noticed only after publication**. Arpit was offered
+  unpublish (inside the 72 h window), a bin-less alpha.8, or keeping it, and
+  ruled **keep it**. ADR-NODE-SEARCH and W-107 R1a both amended.
+- **The `fux doctor` PATH row landed** — `doctor._fux_on_path`, R1a mitigation
+  3, which had been deferred *because* no bin was going to ship. A `warn` that
+  names the resolved path and points at `fux --version`; it reads the shim's
+  shebang and **never executes it**. Registered in ADR-DOCTOR §2. **All three
+  R1a mitigations now ship.**
+- **`tests/test_node_twins.py`** — R4's freshness test, the map derived from
+  the path rule, then a header declaration, then a two-entry exemption set. It
+  also fails when a Python twin moves and its `.mjs` does not, which the
+  differential arm structurally cannot catch.
+- **`scripts/check-version-parity.py` + `tests/test_version_parity.py`** — the
+  version string lives in **four** places, not the one `CLAUDE.md` claimed.
+  Corrected there and gated here.
+- **Re-derived, and two were stale:** O1 (Node enforces the pii gate) is built
+  and ruled; O2 (`fux.api` frozen, not provisional) is ADR-API decision 1. Both
+  were still written as open questions.
 
 ---
+
+## 2026-09-12 — W-139: fux-benchmark rebuilt to L9, and its first two-version run
+
+**The environment, the corpora, the query set, the harness and one filed run.**
+
+| what | outcome | evidence |
+|---|---|---|
+| **The generator** | `bin/gen_corpus.py` — deterministic, stdlib only, **verified byte-identical when regenerated in a clean directory**. Seven **nested, hardlinked** folders 100 → 10 000 of ~1 000-line documents (tables, charts, bullets, Mermaid; machine / professional / amateur / multi-author voices), ≤ 300 columns. The seven together cost one corpus on disk, not eighteen thousand documents | `corpora/docs-*/MANIFEST.json` |
+| **The query set** | 60 queries in **seven classes**, emitted with the corpus, **no answer key by design** — a key here would be a second unsealed evaluation set competing with the lab's. `prepare` fails the run if any query is empty on either arm | `corpora/docs-*/queries.jsonl` |
+| **The harness** | `bench.py prepare \| nullcontrol \| latency \| rankdiff \| file`; interleaved `A B A B`, 3 warm-ups then 10 measured, **one process per query** (cold start included — that is what a consumer pays) | [SETUP-BENCHMARK](setup/fux-benchmark.md) |
+| **Ingest** | **B (`2.0.0-alpha.7`) is ~2× faster than A (`1.0.0`) at every tier to 5 000** — 37.7 s → 17.3 s at 1 000 documents — and writes a **~5 % smaller index**. ⚠ The ratio degrades to **0.77 at 10 000** and one point is not a trend | [report §Result 1](regression/2026-09-12-benchmark-l9/report.md) |
+| **Latency** | 🔴 **The gap is a FIXED ~28 ms, not a slower search.** B − A runs 35.7 → 18.9 ms across 200 → 5 000 while the *ratio* collapses 1.32 → 1.02; marginal cost per 1 000 documents converges (A 208.2, B 211.9 ms). **Quoting the ratio alone is the trap** | [report §Result 2](regression/2026-09-12-benchmark-l9/report.md) |
+| **Ranking** | **31–54 of 60 lists differ between the majors; almost none at the top** — 6 of 60 at rank 1 at 5 000 documents. `rankdiff` now reports **where** a list first diverges, because *"the lists differ"* over two identical-looking heads read as self-contradicting | [`RANKDIFF.md`](regression/2026-09-12-benchmark-l9/RANKDIFF.md) |
+| 🔴 **Two corpora excluded, both this session's fault** | `docs-00100`'s timing was contaminated by a busy-wait poll loop I started to watch the run; `docs-10000`'s query pass was **destroyed by a run-id collision** with a second session. **`--path fast` was not run at all.** All three are named in the report, not smoothed over | [report §The collision](regression/2026-09-12-benchmark-l9/report.md) |
+| **The fix it earned** | `bench.py` takes an **owner lock** on `runs/<id>/` and refuses a directory a live pid holds, naming it. ⚠ **The null control could never have caught that class** — it compares one arm to itself inside one process, and the neighbour arrives from outside | SETUP-BENCHMARK standing rule 0a |
+
+🔴 **CORRECTED AFTER FILING, and the correction is the most useful thing in this
+row.** The other session disclosed — *after* the report was written — that it had
+been saturating cores in `fux-lab` from ~13:00 to ~15:10, which covers **the
+whole** of this sweep's timing window, not just the corpus already known lost.
+
+- **What survives:** the ranked lists (ordering is deterministic; the null
+  control says so twice) and the ingest numbers to 5 000 (measured before the
+  window opened).
+- **What does not:** every absolute latency. The interleaved **A − B difference**
+  is the strongest surviving claim and is *designed* to be robust to shared
+  load, which is weaker than measured to be.
+- **What it explains:** the 10 000 ingest ratio's departure from 0.46 was the
+  one unresolved item; that tier was ingested **inside** the window, so the
+  cleanest reading is now the machine rather than the engine.
+- 🔴 **Nothing mechanical caught this.** The owner lock sees a neighbour in the
+  same run directory; nothing sees one indexing 10 000 documents next door.
+  **It was caught because a person said so**, and that is recorded in
+  SETUP-BENCHMARK as the gap it is.
+
+⚠ **No threshold was ruled and none exists here.** A benchmark reports latency
+and what moved; a decision about a regression is a person reading the rows.
+
+---
+
 
 ## 2026-09-12 — W-106: the two-architecture arm, and what it inverts
 

@@ -88,6 +88,33 @@ def test_a_schema_mismatch_is_refused_rather_than_misread(corpus):
         plane_mod.load(corpus)
 
 
+def test_a_stale_plane_is_refused_rather_than_answered_from(corpus):
+    """🔴 **This module's docstring said *refused when stale* and nothing was.**
+
+    W-140 row 5, fixed 2026-09-12. The schema check above catches a plane from
+    a different fux; it says nothing about one built before the last ingest —
+    so `explain`, `graph` and `path` would answer from edges the committed
+    records no longer carry, confidently, with no warning. **A graph verb's
+    whole product is a relationship**, and one read out of a stale plane is
+    wrong in the single way the reader cannot check.
+
+    The index is changed WITHOUT rebuilding, which is exactly what an `ingest`
+    with no `build` leaves behind — and what the hook-less repo does every time.
+    """
+    write_index(
+        corpus,
+        [
+            _rec("file:a.md", "A", {term_hash("alpha"): [2, 1]},
+                 [{"kind": "ref", "dst": "file:c.md", "grade": 10}]),
+        ],
+    )
+    with pytest.raises(FuxError, match="stale"):
+        plane_mod.load(corpus)
+    # ...and the remedy the message names actually works.
+    build(corpus)
+    assert plane_mod.load(corpus)
+
+
 def test_the_plane_carries_no_content_only_relationships(corpus):
     """L2, checked: the graph plane holds ids and grades, never document text."""
     text = (fmt.runtime_dir(corpus) / plane_mod.GRAPH_NAME).read_text()

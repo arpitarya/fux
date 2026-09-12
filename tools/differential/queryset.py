@@ -17,7 +17,9 @@ Five sources, per the M2 design:
    and the `df == 1` singletons.
 2. **Multi-term combinations** by fixed stride over the sorted vocabulary —
    rare+rare, rare+common, common+common.
-3. **Hand-written goldens** supplied by the caller (fux-playground's 50).
+3. **Hand-written goldens** supplied by the caller — whichever set the caller
+   has. (It was `fux-playground`'s 50 until L9 retired those on 2026-09-11;
+   this module never knew where they came from, and still does not.)
 4. **The frozen R2 questions.**
 5. **Adversarial literals** — empty, stopword-only, single character, non-NFC
    unicode, a 16-hex string that looks like a term hash, and a very long

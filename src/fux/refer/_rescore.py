@@ -47,7 +47,8 @@ class ScoredPassage:
         **W-76 Phase 5 changed this from `path#p3`.** An agent acts on a
         citation by opening a file at a line; a passage ordinal forced a
         second call to work out which lines those were. The ordinal survives
-        as `passage.ordinal` and in the `--json`/MCP payload, because it is
+        as `passage.ordinal` and in the `--json` payload (never MCP, which
+        addresses spans by line number and does no chunking), because it is
         stable across a reflow that moves every line number — which is exactly
         when a stored citation would otherwise point somewhere else silently.
 

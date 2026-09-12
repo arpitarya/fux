@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import subprocess
 
 import pytest
@@ -31,10 +32,37 @@ def test_repo_root_found_from_a_git_checkout(tmp_path):
 
 def test_fux_dir_writable_after_root_found(tmp_path):
     (tmp_path / ".git").mkdir()
+    (tmp_path / ".fux").mkdir()
     checks = doctor.run(tmp_path)
     writable = next(c for c in checks if c.name == ".fux/ writable")
     assert writable.ok
-    assert (tmp_path / ".fux").is_dir()
+    assert writable.detail == str(tmp_path / ".fux")
+
+
+def test_doctor_creates_nothing_at_all(tmp_path):
+    """🔴 **It created `.fux/` and `.fux/runtime/CACHEDIR.TAG`** (W-140 row 7).
+
+    Read-only is the first sentence of ADR-DOCTOR and of the README's
+    description of this verb, and it was untrue in the plainest way: running
+    the health command on a repo that had never seen fux left two directories
+    behind. Two causes, both fixed 2026-09-12 — `doctor` mkdir'd `.fux/` to
+    probe it, and `maintain/daemon.py`'s path helper called `derived_dir`,
+    which creates and tags, from a pure read.
+
+    ⚠ **The assertion is on the WHOLE TREE, not on `.fux/`.** The second cause
+    was two modules away from the check that exposed it; naming the paths this
+    session happens to know about would miss the next one.
+    """
+    (tmp_path / ".git").mkdir()
+    before = {p.relative_to(tmp_path).as_posix() for p in tmp_path.rglob("*")}
+    doctor.run(tmp_path)
+    after = {p.relative_to(tmp_path).as_posix() for p in tmp_path.rglob("*")}
+    assert after == before, f"fux doctor created: {sorted(after - before)}"
+
+    # ...and the writability question is still answered, against the directory
+    # that would actually be written.
+    writable = next(c for c in doctor.run(tmp_path) if c.name == ".fux/ writable")
+    assert writable.ok and ".fux/ absent" in writable.detail
 
 
 def test_no_root_reports_single_failing_check(tmp_path):
@@ -257,6 +285,38 @@ def test_url_check_reports_never_fetched_before_any_networked_run(tmp_path):
     assert "2 url: record(s)" in check.detail
     assert "no networked run recorded yet" in check.detail
     assert "2 never re-fetched since first ingest" in check.detail
+
+
+def test_url_check_names_listed_urls_that_have_never_been_fetched(tmp_path):
+    """🔴 **ADR-MAINTENANCE decision 5a paid for its refusal with this row, and
+    the row did not exist** (W-140 row 13, built 2026-09-12).
+
+    5a forbids any git hook from touching the network — including the commit
+    that edits `.fux/sources/urls` — and the cost it states is *"that is a
+    delay, not a silence: `fux doctor` reports them."* **Every other line of
+    this check is computed from `url:` records IN THE INDEX**, and a URL that
+    has never been fetched has no record, so the single case the law's cost
+    depends on was the single case the check could not see.
+
+    ⚠ **The empty branch matters most.** *"none indexed"* on a repo with five
+    URLs listed read as a healthy, unconfigured corpus; it is a corpus waiting
+    on a fetch nobody has run.
+    """
+    _git_repo(tmp_path)
+    _url_index(tmp_path, ["https://a"])
+    (tmp_path / "fux.toml").write_text(
+        "[sources]\n[sources.url]\nmax_parallel = 4\n", encoding="utf-8"
+    )
+    urls = tmp_path / ".fux" / "sources" / "urls"
+    urls.parent.mkdir(parents=True, exist_ok=True)
+    urls.write_text("https://a\nhttps://never-fetched\n", encoding="utf-8")
+
+    check = _check(doctor.run(tmp_path), "url sources")
+    assert "1 listed URL(s) have never been fetched" in check.detail
+    assert "https://never-fetched" in check.detail
+    assert "https://a" not in check.detail.split("never been fetched")[1], (
+        "a URL that IS indexed must not be reported as unfetched"
+    )
 
 
 def test_url_check_states_the_concurrency_a_networked_run_will_use(tmp_path):
@@ -1263,3 +1323,81 @@ def test_no_tune_file_is_not_a_problem(tmp_path):
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     check = _check(doctor.run(tmp_path), "tune.toml loads")
     assert check.ok and "absent" in check.detail
+
+
+# --- the `fux on PATH` row (ADR-NODE-SEARCH R1a mitigation 3) ----------------
+#
+# The row exists because `npm i -g fux-engine` puts a second `fux` on PATH with
+# a DIFFERENT verb set. R1a deferred it on the reasoning "no global bin ships in
+# the first npm release"; the bin shipped on 2026-09-12 and Arpit ruled it stays,
+# so the premise is gone and the row is owed. These tests are what stop it from
+# being a row that cannot fire.
+
+
+def _fake_bin(directory, body):
+    import stat
+
+    directory.mkdir(parents=True, exist_ok=True)
+    p = directory / "fux"
+    p.write_text(body, encoding="utf-8")
+    p.chmod(p.stat().st_mode | stat.S_IEXEC)
+    return p
+
+
+def test_no_fux_on_path_is_not_a_problem(monkeypatch, tmp_path):
+    monkeypatch.setenv("PATH", str(tmp_path / "empty"))
+    row = doctor._fux_on_path()
+    assert row.ok and row.level == "warn"
+    assert "nothing to shadow" in row.detail
+
+
+def test_this_interpreters_fux_resolving_first_is_fine(monkeypatch):
+    import shutil
+    import sys
+    from pathlib import Path
+
+    ours = Path(sys.executable).parent
+    if shutil.which("fux", path=str(ours)) is None:
+        pytest.skip("no console script in this interpreter's bin")
+    monkeypatch.setenv("PATH", str(ours))
+    row = doctor._fux_on_path()
+    assert row.ok
+    assert "this interpreter's" in row.detail
+
+
+def test_a_node_fux_shadowing_python_is_reported(monkeypatch, tmp_path):
+    """The whole point: a `#!/usr/bin/env node` shim earlier on PATH."""
+    import sys
+    from pathlib import Path
+
+    _fake_bin(tmp_path / "npm", "#!/usr/bin/env node\nimport('../fux.mjs')\n")
+    monkeypatch.setenv(
+        "PATH", f"{tmp_path / 'npm'}{os.pathsep}{Path(sys.executable).parent}"
+    )
+    row = doctor._fux_on_path()
+    assert not row.ok, "a node `fux` ahead of Python's was not reported"
+    assert row.level == "warn", "having both installed is legitimate, not an error"
+    assert "NODE reader" in row.detail
+    assert "--version" in row.detail, "the row must name the one command that disambiguates"
+
+
+def test_some_other_fux_is_reported_but_not_blamed_on_node(monkeypatch, tmp_path):
+    """An unrelated `fux` on PATH is worth saying; calling it the Node reader is not."""
+    import sys
+    from pathlib import Path
+
+    _fake_bin(tmp_path / "other", "#!/bin/sh\necho unrelated\n")
+    monkeypatch.setenv(
+        "PATH", f"{tmp_path / 'other'}{os.pathsep}{Path(sys.executable).parent}"
+    )
+    row = doctor._fux_on_path()
+    assert row.ok
+    assert "NODE reader" not in row.detail
+
+
+def test_doctor_run_includes_the_row(tmp_path):
+    (tmp_path / ".git").mkdir()
+    (tmp_path / ".fux").mkdir()
+    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    names = [c.name for c in doctor.run(tmp_path)]
+    assert "fux on PATH" in names

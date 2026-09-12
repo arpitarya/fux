@@ -239,9 +239,12 @@ was not enough. Reopen when **either**:
   **and it is about the wrong model** (§0c). Fux has never measured any
   cross-encoder on its own corpus. The recommendation is an argument from other
   people's corpora, about a weaker reranker than the one specified.
-- **The cheapest thing that would settle leg 1 is to run Ettin-17M once**, on
-  the playground's 50 goldens, offline, ignoring determinism entirely — purely
-  to learn the number. It cannot ship, but it would replace *"unproven"* with
+- **The cheapest thing that would settle leg 1 is to run Ettin-17M once**, on a
+  graded set, offline, ignoring determinism entirely — purely to learn the
+  number. ⚠ **Written when that meant the playground's 50 goldens**, which
+  [L9](../../docs/adr/0011_LAW-9-environments.md) retired on 2026-09-11; the
+  cheapest thing is now **more expensive than this bullet says**, because the
+  set it assumed does not exist. It cannot ship, but it would replace *"unproven"* with
   a measurement, and §0c means the current argument is not entitled to assume
   the number is small.
 - **§3 could be underweighted.** If undeclared negation turns out to be

@@ -1,9 +1,10 @@
 """`work/setup/` documents the things fux needs but does not contain.
 
-Two working directories sit next to the repo — `fux-playground` (grades) and
-`fux-lab` (measures) — and neither can be reconstructed from anything in this
-tree. A setup document that does not say *where* its thing lives, or that
-describes something actually inside the repo, has stopped being a setup
+Three working directories sit next to the repo, and none of them can be
+reconstructed from anything in this tree. What each one is FOR is law
+(`docs/adr/0011_LAW-9-environments.md`); what this test guards is weaker and
+purely structural: a setup document that does not say *where* its thing lives,
+or that describes something actually inside the repo, has stopped being a setup
 document.
 """
 

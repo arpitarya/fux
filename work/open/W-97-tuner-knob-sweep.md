@@ -2,7 +2,7 @@
 type: OpenItem
 id: W-97
 title: "W-97 — the knob sweep: which .fux/tune.toml defaults are defensible, measured"
-description: "Two 2026-08-28 runs found every ranking prior HEAD added ships as a no-op and correctly refused to recommend a default from a generated corpus. This item is the instrument that can carry the question one step: a pre-registered sweep where the generated suite selects a candidate, the hand-graded playground vetoes it, and a latency fence prices it. Output is a candidate table with no recommendation; the default change stays Arpit's ADR-TUNE amendment."
+description: "Two 2026-08-28 runs found every ranking prior HEAD added ships as a no-op and correctly refused to recommend a default from a generated corpus. This item is the instrument that can carry the question one step: a pre-registered sweep where the generated suite selects a candidate, a hand-graded set vetoes it, and a latency fence prices it. The veto leg lost its corpus to L9 on 2026-09-11. Output is a candidate table with no recommendation; the default change stays Arpit's ADR-TUNE amendment."
 status: open
 lane: agent
 timestamp: 2026-08-28T00:00:00Z
@@ -45,9 +45,11 @@ observed / proven / unproven. **0 headroom in a direction is Inconclusive, not
       `tune.toml` rather than writing an empty one; every row carries `tune`
       and `index_sha`. Smoke on `t100`, 240 paired queries, rows deleted —
       **no number from it is a result.**
-- [ ] `bench.py` still owes: a `playground` pass emitting one row per golden,
-      `select` (the frozen rule), `veto` (broken / fixed / XPASS by qid),
-      `difflaw`.
+- [x] ~~`bench.py` still owes: a `playground` pass emitting one row per golden~~
+      — **dead, not done** (L9, 2026-09-11): the pass had no corpus to grade.
+- [ ] `bench.py` still owes `select` (the frozen rule), `veto` (broken / fixed /
+      XPASS by qid) and `difflaw` — **and `veto` has no instrument**, see
+      [RUNBOOK-TUNER](../benchmark/RUNBOOK-TUNER.md)'s void-in-part banner.
 - [ ] Pre-registration §1 carries the frozen sha; committed before the first pass.
 - [ ] T0 gates pass; baselines filed before any knob pass.
 - [ ] T1, T2 grids run as frozen; candidates selected once by the frozen rule.
@@ -60,13 +62,14 @@ observed / proven / unproven. **0 headroom in a direction is Inconclusive, not
 
 ## Blockers
 
-- 🔴 **Per-query rows from the playground** — `check.py`'s `grade()` already
-  returns `{id, state, detail}` per golden and writes none of it, so this is a
-  `--rows <path>` writer and nothing more. **It is not written, and the reason
-  is not difficulty:** that repo has 74 files staged with its index staged as
-  deletions and no commit since 2026-08-20, and adding a change to a pending
-  commit that is Arpit's (R-11) is not a session's call. **Unblocks the moment
-  he commits or restores it.**
+- ~~🔴 **Per-query rows from the playground**~~ — 🔴 **not unblocked: DEAD**
+  (L9, 2026-09-11). It was a `--rows <path>` writer waiting on Arpit to commit
+  or restore that repo; [L9](../../docs/adr/0011_LAW-9-environments.md) removed
+  the corpus instead, so **the veto leg has no instrument at all** and this
+  blocker cannot be cleared by anyone. ⚠ **That is worse than it reads:** a
+  blocker that dies is usually progress; here the leg it gated is the one the
+  whole design called load-bearing (*"a candidate with two green legs is not a
+  candidate"*).
 - ~~The `--tune` switch and index-hash assertion do not exist in `bench.py`.~~
   **Landed 2026-09-05** — see the definition of done above.
 - ⚠ **`rerank_weight` moves two mechanisms since W-108**, and T1 now says so:
@@ -168,4 +171,4 @@ as this file said should happen once L9 removed the playground as an instrument:
 
 ⚠ **T3's joint candidate set and T4's latency fence did not run.** Neither is
 answerable while no single candidate survives its own knob, and the latency
-fence belongs in fux-benchmark ([W-139](W-139-benchmark-per-l9.md)) under L9.
+fence belongs in fux-benchmark ([W-139](../../archive/open/W-139-benchmark-per-l9.md)) under L9.

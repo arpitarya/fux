@@ -207,10 +207,17 @@ floors, so nothing breaks; it is discoverability that is lost, not behaviour.
 
 **5. The key set is closed, and an unknown table or key is a loud error.**
 Reader-strict, on the file that can silently change every answer. **Adding a key
-is a change to this record.** **Six tables**: `bm25f`, `ranking`, `graph`,
-`refer`, `confidence`, `priority` — and `[priority]` is the one **open** table,
-because its keys are the consumer's own source entries, which fux cannot know in
-advance.
+is a change to this record.** **Seven tables**: `bm25f`, `ranking`, `graph`,
+`refer`, `confidence`, `index`, `priority` — and `[priority]` is the one **open**
+table, because its keys are the consumer's own source entries, which fux cannot
+know in advance.
+
+⚠ **This said SIX and omitted `[index]` until 2026-09-12** (W-140 row 12). The
+table was added on 2026-09-11 as *the declared exception to decision 1* — the one
+table that is read by **ingest** and changes committed bytes — and this
+paragraph, which is the closed set's own statement, was not updated with it.
+**The exception is the table most worth being in the list**, because it is the
+one whose behaviour differs from everything else the file does.
 
 **5d. `[confidence]` is the first table that changes no ORDER — added
 2026-08-28, and it stretches this record's own boundary rule.**
@@ -448,7 +455,15 @@ field***, which is a ranking choice rather than the source exclusion `!` owns.
 |---|---|---|---|
 | **written** | `tune.toml`'s own comments | free and permanent — decision 3 means fux never deletes them | the rules true on any corpus |
 | **checked** | `fux doctor` | cheap; reads the source lists, runs no query | structural faults and dangerous *shapes* |
-| **measured** | `fux tune` | a run | the numbers only this corpus can answer |
+| **measured** | a lab run | a run | the numbers only this corpus can answer |
+
+⚠ **The *measured* tier says `fux tune` in earlier readings of this table, and
+`fux tune` measures nothing** (W-140 row 12, corrected 2026-09-12). The verb is
+`print(specimen())` — it emits the engine's defaults as a commented TOML file for
+a human to paste, exactly as decision 3b describes, and it neither reads the
+index nor runs a query. **The tier is real; its producer is a measurement run
+under [L9](0011_LAW-9-environments.md), not a verb**, and naming a verb made a
+one-command answer look available where a filed run is required.
 
 The five written rules: **spread is the cost, not direction**; **demoting only
 makes `1.0` a ceiling**, so sources added later arrive at top priority; **a big
@@ -475,7 +490,14 @@ defaults is the worst outcome available** — the user believes their weights ar
 active, fux answers on different ones, and nothing says so.
 
 **10a. One case is deliberately not fatal:** a `[priority]` key matching no
-source entry is a **stderr warning, once**, plus a durable `doctor` line. With a
+source entry is a **stderr warning, once**, plus a durable `doctor` line.
+🔴 **UNBUILT as of 2026-09-12** (W-140 row 12) — `tune.py` validates a
+`[priority]` value's *type and sign* and never compares its key against the
+source lists, and `doctor` has no `[priority]` row at all. **An orphaned
+priority is silently inert today**, which is the failure this decision was
+written to make visible. Recorded here rather than quietly fixed: the check
+needs the source lists at tune-load time, which is a seam that does not exist
+yet. With a
 syntax error nothing is known; with an orphan **every other weight still applies
 exactly as written**, and a source can be legitimately absent for a moment — a
 folder mid-rename, a priority written before its `fux add`. Failing `ask`

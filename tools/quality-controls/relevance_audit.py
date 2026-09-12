@@ -7,7 +7,7 @@ counting fields was never going to settle it — **completeness is a judgment
 about documents**, which this script says itself further down and which two
 blind annotators then supplied (kappa = 0.960, **25 of 50** goldens
 multi-document). Arpit ruled option B the same day:
-[ADR-QUALITY](../../docs/adr/0044_quality-contract.md) **decision 12** splits
+[ADR-QUALITY](../../docs/adr/0141_quality-contract.md) **decision 12** splits
 the rank contract from the relevance set, and
 [`tools/quality/goldens.py`](../quality/goldens.py) is the schema that enforces
 it.
@@ -23,14 +23,18 @@ field that does not exist, which looked exactly like a finding.
 **Arpit, 2026-08-28: "check first, then decide."** This is that check, and it
 runs where the goldens live rather than needing them copied into this repo.
 
+🔴 **The goldens it ran on are retired.** They lived in `fux-playground`, which
+[L9](../../docs/adr/0011_LAW-9-environments.md) made Arpit's hands alone on
+2026-09-11. The count below stands as filed; **this script takes a path and has
+no default**, so it still runs on any goldens file that exists.
+
 ## Why the question is not obvious
 
 `recall@k` needs a **relevance set** per query: *these are the documents that
 answer it.* [W-87](../../work/open/W-87-what-good-means.md) P2 recorded that as
-missing and blocked on a blind annotator. The golden schema
-(`fux-playground/check.py`, the real consumer — **not**
-`tools/differential/playground_grade.py`'s docstring, which named an `expect`
-list that no goldens file has ever actually used) reads:
+missing and blocked on a blind annotator. The golden schema — as the retired consumer harness read it, **not** as
+`tools/differential/goldens_grade.py`'s docstring once described it (that named
+an `expect` list no goldens file has ever actually used) — reads:
 
     {"id": ..., "q": ..., "doc": "<doc>", "max_rank": 1, "known_failure": "..."}
 
@@ -65,8 +69,8 @@ anyone to annotation.
 
 ## Usage
 
-    python3 tools/quality-controls/relevance_audit.py ~/my_programs/fux-playground
     python3 tools/quality-controls/relevance_audit.py <path-to-queries.jsonl>
+    python3 tools/quality-controls/relevance_audit.py <a corpus dir holding goldens/queries.jsonl>
 """
 
 from __future__ import annotations

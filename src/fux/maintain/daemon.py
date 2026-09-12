@@ -114,6 +114,24 @@ DEFAULT_SWEEP_MINUTES = 60
 
 
 def _runtime(root: Path) -> Path:
+    """The path — **it does not create the directory.**
+
+    🔴 **It called `derived_dir` until 2026-09-12 and that made `fux doctor`
+    write** (W-140 row 7). `derived_dir` mkdir's and drops `CACHEDIR.TAG`, and
+    `status()` → `live_pid()` → `pid_path()` reaches here on a pure READ — so
+    running the read-only health command on a repo with no `.fux/` created
+    `.fux/` and `.fux/runtime/CACHEDIR.TAG`. A diagnostic that modifies the
+    thing it is diagnosing is the one property `doctor` advertises and did not
+    have, and `runner.py`/`urlstate.py` had it right all along: a path helper
+    returns a path.
+
+    **The writers create it**, with `_writable_runtime()` below, which is where
+    the tag belongs anyway — it marks a directory that HOLDS a cache."""
+    return fuxdir.fux_dir(root) / "runtime"
+
+
+def _writable_runtime(root: Path) -> Path:
+    """The path, created and `CACHEDIR.TAG`-marked. **Writers only.**"""
     return fuxdir.derived_dir(root, "runtime")
 
 
@@ -241,8 +259,7 @@ def stop(root: Path, *, timeout: float = STOP_TIMEOUT_S) -> str:
     if pid is None:
         return "not-running"
 
-    directory = _runtime(root)
-    directory.mkdir(parents=True, exist_ok=True)
+    _writable_runtime(root)
     _stop_path(root).write_text(json.dumps({"pid": pid}), encoding="utf-8")
 
     deadline = time.monotonic() + timeout
@@ -278,9 +295,8 @@ def sweep_minutes(root: Path) -> int:
 
 def _write_status(root: Path, outcome: str, **extra) -> None:
     """Write `.fux/runtime/daemon.status`. Declared in `state.schema.json`."""
-    directory = _runtime(root)
     try:
-        directory.mkdir(parents=True, exist_ok=True)
+        directory = _writable_runtime(root)
         (directory / STATUS_NAME).write_text(
             json.dumps({"outcome": outcome, **extra}, sort_keys=True), encoding="utf-8"
         )
@@ -353,8 +369,7 @@ def serve(root: Path) -> str:
     read by nobody.
     """
     pid = os.getpid()
-    directory = _runtime(root)
-    directory.mkdir(parents=True, exist_ok=True)
+    _writable_runtime(root)
     pid_path(root).write_text(json.dumps({"pid": pid}), encoding="utf-8")
 
     interval = sweep_minutes(root) * 60

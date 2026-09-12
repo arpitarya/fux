@@ -285,8 +285,35 @@ place to decide it. Filed in `work/OPEN-WORK.md`.
   not a separate policy: one verb reaching for the accelerator while its sibling
   does not is exactly the divergence [ADR-ASK](0103_ask.md) decision 4 exists to
   prevent. **The plane itself is unaffected** — required for every graph verb
-  regardless of which path produced the seeds, and `plane.load()` still refuses
-  a stale one.
+  regardless of which path produced the seeds, and `plane.load()` refuses a
+  stale one.
+
+  🔴 **That last clause was FALSE from the day it was written until 2026-09-12**
+  (W-140 row 5). `plane.load()` checked that the file **existed** and that its
+  **schema string** matched — nothing about whether the index had moved under
+  it. An `ingest` with no `build` (which is every hook-less repo, every time)
+  left `explain`, `graph` and `path` answering from edges the committed records
+  no longer carried, confidently and with no warning. **A graph verb's whole
+  product is a relationship**, and one read out of a stale plane is wrong in the
+  single way its reader cannot check.
+  - **Made true rather than edited away:** `load()` now calls
+    `derive.accel.is_fresh(root)` — reused, not reimplemented, because `fux
+    build` writes this plane and the accelerator in one pass from the same
+    shards, so the same sizes and mtimes invalidate both and a second staleness
+    rule would be a second thing to drift.
+  - Pinned by `tests/graph/test_graph_plane.py::test_a_stale_plane_is_refused_rather_than_answered_from`,
+    which also checks that the remedy the message names actually works.
+
+- 🔴 **`graph.schema.json` described a plane that has never existed**, corrected
+  in the same change (W-140 row 5). It gave the edge kinds as `supersedes` and
+  `links` — **the real vocabulary is `ref` / `code` / `tag`**, minted by
+  `ingest/edges.py` — `grade` as the string `"DECLARED"`/`"INFERRED"` when it is
+  an **int** (`EXTRACTED` 10 · `AMBIG` 8 · `INFERRED` 6), and community labels as
+  ints when they are strings (`c0`). ⚠ **This is worse than a stale comment:**
+  `plane.load()` validates the payload against that file before trusting it, so
+  the fiction was one type check away from refusing every real graph on the
+  machine. Re-derived from `.fux/runtime/graph.json` on this repo — 4 446 edges,
+  three kinds, two grades.
 - **`fux build` writes one more file** and `DETERMINISTIC_FILES` covers
   `graph.json`, so two builds of the same index are asserted byte-identical
   including the communities. **This makes the accelerator's build a two-lane

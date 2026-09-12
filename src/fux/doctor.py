@@ -1,6 +1,7 @@
 """`fux doctor` — install/environment health check.
 
-Checks today: python version, repo root found, `.fux/` writable, and the two
+Checks today: python version, repo root found, `.fux/` writable, which `fux`
+PATH resolves (ADR-NODE-SEARCH R1a), and the two
 layout assertions from ADR-DOTFUX — the committed index is not git-ignored, and
 nothing undeclared sits at the top level of `.fux/`.
 
@@ -192,14 +193,30 @@ def _repo_root(start: Path | None) -> list[Check]:
         return [Check("repo root", False, "no fux.toml or .git found above the current directory")]
     checks = [Check("repo root", True, str(root)), _config_loads(root)]
     fux_dir = root / ".fux"
+    # 🔴 **This CREATED `.fux/` until 2026-09-12** (W-140 row 7). `doctor` is
+    # read-only by contract — it is the first line of this record and of the
+    # README — and a health command that materialises the directory it is
+    # reporting on has already changed the answer. On a repo with no `.fux/` it
+    # left `.fux/` behind, and (through `maintain/daemon.py`'s path helper)
+    # `.fux/runtime/CACHEDIR.TAG` with it.
+    #
+    # **The writability question is still answered**, on the directory that
+    # would have to be written: `.fux/` when it exists, the repo root when it
+    # does not — which is exactly what `fux setup` or the next `ingest` needs.
+    # The probe file is removed on every path, including failure.
+    target = fux_dir if fux_dir.is_dir() else root
+    note = "" if target == fux_dir else " (.fux/ absent — probing the repo root)"
+    probe = target / ".doctor-probe"
     try:
-        fux_dir.mkdir(exist_ok=True)
-        probe = fux_dir / ".doctor-probe"
         probe.write_text("", encoding="utf-8")
-        probe.unlink()
-        checks.append(Check(".fux/ writable", True, str(fux_dir)))
+        checks.append(Check(".fux/ writable", True, str(target) + note))
     except OSError as exc:
         checks.append(Check(".fux/ writable", False, str(exc)))
+    finally:
+        try:
+            probe.unlink()
+        except OSError:
+            pass
     checks.extend(_layout(root))
     return checks
 
@@ -279,6 +296,8 @@ def _layout(root: Path) -> list[Check]:
     checks.append(_ignore_health(root))
     checks.append(_fetcher_capabilities(root))
     checks.append(_accelerator(root))
+    checks.append(_node_reader(root))
+    checks.append(_fux_on_path())
     checks.append(_background_runner(root))
     daemon_check = _daemon(root)
     if daemon_check is not None:
@@ -1177,6 +1196,10 @@ def _url_health(root: Path) -> Check:
         # first `fux add <URL>` — the moment the number matters most and the
         # only moment nobody can look it up from a previous run.
         bits = ["none indexed"]
+        # ⚠ This branch above all: "none indexed" with five URLs listed is a
+        # repo whose whole corpus is waiting on a fetch nobody has run, and it
+        # read as an empty, healthy configuration.
+        bits.extend(_unfetched_note(root, indexed))
         if policy is not None:
             bits.append(policy)
         note = _rate_limit_note()
@@ -1195,6 +1218,7 @@ def _url_health(root: Path) -> Check:
         parts.append(f"{summary.failing} failing")
     if policy is not None:
         parts.append(policy)
+    parts.extend(_unfetched_note(root, indexed))
     parts.extend(_pinned_note(root))
     note = _rate_limit_note()
     if note is not None:
@@ -1213,6 +1237,48 @@ def _url_health(root: Path) -> Check:
             "fux never deletes a URL record; remove the line from .fux/sources/urls yourself"
         )
     return Check("url sources", not summary.failing_urls, detail, level="warn")
+
+
+def _unfetched_note(root: Path, indexed: list[str]) -> list[str]:
+    """URLs listed in `.fux/sources/urls` that have never produced a record.
+
+    🔴 **[ADR-MAINTENANCE](../docs/adr/0129_hooks.md) decision 5a leaned on this
+    and it did not exist** (W-140 row 13, built 2026-09-12). 5a refuses to let
+    any git hook touch the network, and pays for that refusal with one sentence:
+    *"URLs added by hand-editing `.fux/sources/urls` are not fetched at commit
+    time… That is a delay, not a silence — `fux doctor` reports them."* **It did
+    not report them.** Every other row of `url sources` is computed from `url:`
+    records **in the index**, and a line that has never been fetched has no
+    record — so the one case the law's cost depends on was the one case the
+    check could not see. The silence 5a promised was not a silence was a
+    silence.
+
+    **Listed minus indexed**, read off the committed list. No network, like
+    everything else here.
+    """
+    from .config import load as load_config
+    from .ingest import urlsrc
+
+    try:
+        config = load_config(root)
+        if config.url is None:
+            return []
+        listed = [e.value for e in urlsrc.read_urls(root, config.url.urls_file)]
+    except Exception:
+        # The list or the config is another row's finding — `fux.toml loads`
+        # and `url sources` both name it. Never two reports for one cause.
+        return []
+    have = set(indexed)
+    missing = sorted(url for url in listed if url not in have)
+    if not missing:
+        return []
+    shown = ", ".join(missing[:3])
+    more = f" (+{len(missing) - 3} more)" if len(missing) > 3 else ""
+    return [
+        f"{len(missing)} listed URL(s) have never been fetched, so they are not in "
+        f"the index at all: {shown}{more} - run `fux update` (no hook will do it: "
+        f"ADR-MAINTENANCE decision 5a)"
+    ]
 
 
 def _pinned_note(root: Path) -> list[str]:
@@ -1298,6 +1364,101 @@ def _parallel_policy(root: Path) -> str | None:
     return (
         f"fetches <= {url.max_parallel} at a time "
         "(max_parallel; also capped by your fetcher's MAX_PARALLEL)"
+    )
+
+
+def _node_reader(root: Path) -> Check:
+    """`.fux/node/` is present and matches the engine (ADR-NODE-SEARCH R2).
+
+    A **warning**, never an error: Python answers without it, so a missing or
+    stale reader costs a Node-only clone, not this machine. But it is the one
+    drift `doctor` can still see -- the vendored copy is overwritten on a
+    version difference by `fux setup`/`fux ingest`, and a repo whose owner has
+    not run either since upgrading ships a reader that may not understand the
+    `_format` of the index sitting beside it.
+    """
+    from .store import fuxdir
+
+    found = fuxdir.node_version(fuxdir.fux_dir(root))
+    if found is None:
+        return Check("node reader", True, "absent - `fux setup` writes it", level="warn")
+    if found == __version__:
+        return Check("node reader", True, f".fux/{fuxdir.NODE_DIR}/ is {found}", level="warn")
+    return Check(
+        "node reader",
+        False,
+        f".fux/{fuxdir.NODE_DIR}/ is {found}; the engine is {__version__} - run `fux setup`",
+        level="warn",
+    )
+
+
+def _fux_on_path() -> Check:
+    """Which `fux` does this shell resolve -- Python's, or the Node reader's?
+
+    **ADR-NODE-SEARCH R1a mitigation 3.** `npm i -g fux-engine` puts a `fux` on
+    PATH beside Python's, **with a different verb set**, and whichever resolves
+    first wins. So `fux ingest` can answer *"this only reads"* on a machine
+    where Python fux is installed and would have worked.
+
+    ⚠ **This row was deferred, and the reason it was deferred is gone.** R1a
+    originally ruled *"No global bin ships in the first npm release"*, and the
+    row was left unbuilt because nothing would shadow Python's `fux`.
+    `fux-engine` 2.0.0-alpha.7 went to npm on 2026-09-12 **carrying the bin**,
+    and Arpit ruled the bin stays -- so the shadowing is real and this is the
+    only one of R1a's three mitigations that speaks to a person who has both
+    installed and cannot tell which one they are typing. The other two
+    (`--version` naming the runtime, an unsupported verb signposting) live in
+    the Node half and cannot report on a Python that is not running.
+
+    A **warning**, never an error, on the `_node_reader` precedent: having both
+    installed is a legitimate setup, not a broken repo.
+
+    **No subprocess.** Doctor never runs a binary it found on PATH -- that is
+    an arbitrary executable chosen by the environment, and shelling out to it
+    to ask what it is would be the diagnostic tool doing the unsafe thing it
+    exists to warn about. The shebang answers the question.
+    """
+    import shutil
+
+    found = shutil.which("fux")
+    if found is None:
+        # Not on PATH at all: someone is running `python -m fux`, or a venv
+        # `fux` that PATH does not see. Nothing can shadow what is not there.
+        return Check("fux on PATH", True, "no `fux` on PATH - nothing to shadow", level="warn")
+
+    ours = Path(sys.executable).parent / Path(found).name
+    try:
+        if ours.exists() and Path(found).samefile(ours):
+            return Check("fux on PATH", True, f"{found} (this interpreter's)", level="warn")
+    except OSError:
+        pass
+
+    # Read the shim rather than run it. npm's Unix bin is a symlink to a
+    # `#!/usr/bin/env node` script; its Windows `fux.cmd` names node in the
+    # body. Either way the word appears in the first few hundred bytes.
+    head = ""
+    try:
+        target = Path(found).resolve()
+        head = target.read_text(encoding="utf-8", errors="replace")[:512]
+        node_ish = "node" in head or target.suffix == ".mjs"
+    except OSError:
+        node_ish = False
+
+    if not node_ish:
+        return Check(
+            "fux on PATH",
+            True,
+            f"{found} - not this interpreter's, but not the Node reader either",
+            level="warn",
+        )
+
+    return Check(
+        "fux on PATH",
+        False,
+        f"{found} is the NODE reader (fux-engine), and it resolves before "
+        f"{ours} - it only READS, so write verbs will refuse. Run `fux --version` "
+        "to see which you get, or call this one as `python -m fux`",
+        level="warn",
     )
 
 

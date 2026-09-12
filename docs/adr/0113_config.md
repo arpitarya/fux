@@ -47,13 +47,14 @@ flowchart TD
     S --> D["dirs_file — optional<br/>default .fux/sources/dirs"]
     S --> U["[sources.url] — optional"]
     U --> M["fetcher · urls_file<br/>paths, defaulted"]
-    U --> ME["meta — hashed | plain"]
+    U --> ME["meta · keep · ttl · enrich · update<br/>source-wide LAYERS — a URL line wins"]
     U --> MP["max_parallel — REQUIRED<br/>when the table is present"]
+    U --> SW["sweep_minutes · acquired_max_bytes<br/>defaulted; no line-level layer"]
     U --> CF["[sources.url.config]<br/>PASSED THROUGH, never read"]
     F --> I["[index]"]
     I --> SH["shards = 256<br/>documents the value, cannot set it"]
     F --> AG["[agents]"]
-    AG --> AI["install — claude · copilot · kiro<br/>absent = all three, [] = none"]
+    AG --> AI["install — claude · codex · copilot · kiro<br/>absent = all four, [] = none"]
     F -.->|"REFUSED by name<br/>at any value"| RT["[ranking] · [dense] · [decode]"]
     RT ==>|"the keys moved"| TU[".fux/tune.toml<br/>ORDERING — ADR-TUNE"]
     CF -.->|"verbatim"| MW["your fetcher's configure()"]
@@ -72,7 +73,13 @@ flowchart TD
      |           +-- fetcher       path, default .fux/fetchers/http.py
      |           +-- urls_file     path, default .fux/sources/urls
      |           +-- meta          "hashed" (default) | "plain"
+     |           +-- keep          true (default) | false     -- a LAYER
+     |           +-- ttl           "24h" (default), a duration -- a LAYER
+     |           +-- enrich        false (default) | true     -- a LAYER
+     |           +-- update        "auto" (default) | "never"  -- a LAYER
      |           +-- max_parallel  REQUIRED -- the only key with no default
+     |           +-- sweep_minutes 60 (default)
+     |           +-- acquired_max_bytes  absent = the store's own default
      |           +-- [sources.url.config]
      |                 PASSED THROUGH VERBATIM -- fux never reads a key
      |                        |
@@ -82,7 +89,7 @@ flowchart TD
      |     +-- shards = 256   documents the value; cannot change it
      |
      +-- [agents]
-     |     +-- install        absent = claude, copilot, kiro; [] = none
+     |     +-- install        absent = claude, codex, copilot, kiro; [] = none
      |
      +-- [ranking]  REFUSED --+   an ERROR naming the new home,
      +-- [dense]    REFUSED --+   at any value, never ignored
@@ -106,7 +113,12 @@ dirs_file = ".fux/sources/dirs"      # optional; this IS the default
 fetcher      = ".fux/fetchers/http.py"  # YOUR code; fux loads it by path
 urls_file    = ".fux/sources/urls"      # one URL per line, a file not an array
 meta         = "hashed"                 # the default; "plain" for public content
+keep         = true                     # retain fetched bytes in .fux/acquired/
+ttl          = "24h"                    # ask-time: how long a citation may go unchecked
+enrich       = false                    # whether `fux enrich` plans work for these URLs
+update       = "auto"                   # update-time: "never" pins this source
 max_parallel = 4                        # REQUIRED when this table is present
+sweep_minutes = 60                      # how often `fux daemon` re-checks
 
 [sources.url.config]
 greeting = "hello"                      # the fetcher's vocabulary, never fux's
@@ -163,8 +175,17 @@ tree. The key exists so the number is *visible* rather than folklore.
 **5. `fetcher` and `urls_file` default to `.fux/fetchers/http.py` and
 `.fux/sources/urls`.** Both are repo-relative paths, and both defaults are the
 declared `.fux/` layout ([ADR-DOTFUX](0102_fux-directory.md)). The default is
-the plain-GET fetcher because a URL line carrying no `fetch=` means
-`fetch=http` ([ADR-HTTP-FETCHER](0119_http-fetcher.md) decision 1).
+the plain-GET fetcher ([ADR-HTTP-FETCHER](0119_http-fetcher.md) decision 1).
+
+⚠ **This said *"a URL line carrying no `fetch=` means `fetch=http`"* until
+2026-09-12, and it contradicted the next paragraph** (W-140 row 10). A bare line
+takes **whatever `[sources.url] fetcher` names** — `urlsrc.resolve_urls` reads
+its *stem* — so in a repo configured with `fetcher = ".fux/fetchers/cdp.py"`, a
+bare line means `fetch=cdp`. The sentence was true only of a repo that had left
+the key alone, and false in exactly the case a consumer with a signed-in-Chrome
+fetcher is in. **The paragraph below always had it right**, which is the shape
+W-83 taught: a record contradicting itself inside one file passes every
+mechanical check fux has.
 
 **`fetcher` carries two things, deliberately.** It is the file used by a line
 that declares no `fetch=`, **and** its directory is where a `fetch=<name>`
@@ -341,6 +362,78 @@ above goes through `sourcelist.parse_duration` precisely so a hand-written
 `ttl=1x` and `[sources.url] ttl = "1x"` fail identically (decision 12). `update`
 must never acquire that treatment: it is update-time where `ttl` is ask-time,
 and a duration here would make the two indistinguishable at a glance.
+
+**13. THE DECLARED KEY BLOCK — a key is real only if it is listed here.**
+[ADR-LAW-0](0002_LAW-0-authority.md) decision 6, and the reason it exists is two
+recorded failures in this very file's subject: `acquired_max_bytes` was named in
+prose and never parsed, and `[sources] types_file` was advertised by a schema and
+read by nothing. **Prose cannot create a key.** This block can, because
+[`tests/test_adr_config_keys.py`](../../tests/test_adr_config_keys.py) asserts it
+equals `config.py`'s `KNOWN_KEYS` / `OPAQUE_TABLES` / `REFUSED_KEYS` **in both
+directions** — a key here that nothing parses fails, and a key `config.py`
+parses that is missing here fails too.
+
+**Three sigils, and no fourth.** `+` a key fux reads · `*` a table fux passes
+through without reading a key inside it · `-` a spelling refused **by name**,
+at any value, with an error naming the new home.
+
+```keys
++ sources.dirs_file
++ sources.url.fetcher
++ sources.url.urls_file
++ sources.url.meta
++ sources.url.keep
++ sources.url.ttl
++ sources.url.enrich
++ sources.url.update
++ sources.url.max_parallel
++ sources.url.sweep_minutes
++ sources.url.acquired_max_bytes
+* sources.url.config
++ index.shards
++ agents.install
+- sources.dirs
+- sources.types_file
+- sources.url.urls
+- sources.url.middleware
+- ranking
+- dense
+- decode
+```
+
+⚠ **`sources.url.config` is `*` and must never become a list of `+` rows.**
+Declaring `cdp_port` or `timeout_s` here would breach the adapter cap through the
+back door — one fetcher's vocabulary inside fux's config surface, which every
+future fetcher would then have to be argued against (decision 8). The sigil is
+the boundary.
+
+**14. An undeclared key is REFUSED, not ignored** (2026-09-12, W-122; the defect
+was [W-140](../../work/OPEN-WORK.md) row 8). `fux.toml` silently ignored a
+misspelled key, so `dirs_fil = "…"` left the consumer's setting inert with
+nothing said — the same failure mode as a key documented and never parsed, from
+the other end. `.fux/tune.toml` has rejected unknown tables and keys by name
+since it existed ([ADR-TUNE](0135_tuning.md)), and this is that behaviour, here.
+
+⚠ **It needed decision 13 first, and that is why it waited.** Rejecting a key
+requires a set of real keys to compare against, and hand-writing a second set
+inside `config.py` would have built the duplicate source of truth L0 exists to
+remove. **One set, in the record, bound to the code by a parser.**
+
+**15. `config.schema.json` is DELETED** (2026-09-12). Every field in it was a
+`doc:` string describing a key — *"describes a rule a second time"*, which
+ADR-LAW-0 decision 4 puts on the forbidden row. Nothing loaded it, and nothing
+compared it to `config.py`, which is exactly how it came to advertise a
+`types_file` key that did not exist.
+
+⚠ **`derive/runtime.schema.json` is NOT deleted, and W-122's plan was wrong
+about it.** The plan called both files documentation-only; that is true of this
+one and false of that one —
+[`tests/derive/test_runtime_schema.py`](../../tests/derive/test_runtime_schema.py)
+asserts its struct string, its field codes, its doc-table field set and its
+runtime version against `derive/format.py` in both directions. A declaration a
+test holds equal to the code **enforces**, and ADR-LAW-0 decision 4 permits an
+enforcement. Deleting it would have removed a live gate to satisfy a rule it
+already satisfies.
 
 ### Consequences
 

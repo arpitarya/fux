@@ -76,9 +76,22 @@ worked. Not hypothetical; it is what two binaries of the same name means.
 
 ⚠ **Inside a repo there is no collision at all**, because the call is
 `node .fux/fux.mjs`. The shadowing exists only for the opt-in global install.
-**No global bin ships in the first npm release**; the library export and the
-vendored copy cover both real use cases, and the bin is added once someone
-asks for it.
+
+🔴 **AMENDED 2026-09-12 (Arpit) — the bin ships.** This paragraph read *"No
+global bin ships in the first npm release; the library export and the vendored
+copy cover both real use cases, and the bin is added once someone asks for
+it."* **`fux-engine` 2.0.0-alpha.7 went to npm on 2026-09-12 carrying
+`bin: {"fux": "./fux.mjs"}`** — published at Arpit's direction to hold the name,
+with the bin unnoticed until after the fact. Offered unpublish (inside the 72h
+window), a bin-less alpha.8, or keeping it: **he ruled keep it.**
+
+✅ **Item 3 landed the same day.** It had only ever been deferred because of
+the sentence that just went away. `doctor._fux_on_path` is a `warn` row that
+names the resolved path and points at `fux --version`; it **reads the shim's
+shebang and never executes it** — doctor does not run a binary the environment
+chose for it. Registered in [ADR-DOCTOR](../../docs/adr/0154_doctor.md) §2,
+five tests in `tests/test_doctor.py` including a fake npm shim ahead of Python
+on PATH. **All three R1a mitigations now ship.**
 
 ### R2 · `.fux/fux.mjs` — committed, engine-owned, OVERWRITTEN
 
@@ -352,7 +365,7 @@ playground **Arpit's hands only — no agent, no test, no number.**
 **A frozen pre-registration is never edited.** It is superseded (O3). The
 **build** (Phases 1a–4) is unaffected and starts now; **no arm may be called
 green** until the superseding document exists on lab golden data, which waits
-on W-136 phase 2. Tracked in [W-138](W-138-reconcile-with-l9.md).
+on W-136 phase 2. Tracked in [W-138](../../archive/open/W-138-reconcile-with-l9.md).
 
 ### H4 — carried from the original filing
 
@@ -441,9 +454,10 @@ file exists.
       key's resolution is the cross-runtime contract for the score, the order
       is byte-equal, and a divergence above `~1e-9` relative on any platform
       pair voids it.
-- [ ] Decision restated as **ADR-NODE-SEARCH decision 1** when that record is
-      created — owed at Phase 4, **as a link to ADR-RANKING 8a, never a second
-      statement of the rule** (L0).
+- [x] **DONE** — [ADR-NODE-SEARCH](../../docs/adr/0155_node-search.md)
+      decision 1 says it, as a link to ADR-RANKING 8a and not a second
+      statement of the rule (L0). *(This box was still unticked on 2026-09-12;
+      re-derived from the record, per OPEN-WORK rule 3.)*
 
 ## Phase 1a — the API seam (Python), BEFORE any `node/` file
 
@@ -518,24 +532,89 @@ while there are 200 lines to debug rather than 2 000.
 
 ## Phase 4 — ship
 
-- [ ] **`fux setup` writes `.fux/fux.mjs` + `.fux/fux`** per R2 —
+**Folded in 2026-09-12 from the W-107 finish handoff**, which was
+written into a directory retired on 2026-08-18 (`tests/test_archive_law.py`
+caught it, for the second time — [W-98's pair](../../archive/README.md) was the
+first). The pair is in [`archive/handoff/`](../../archive/handoff/); what was
+still live is here, because an archived doc may not back a live claim.
+
+### Out of scope — do not "helpfully" add these
+
+- 🔴 **The renderer refactor.** `cmd_ask -> print(render(api.ask(...)))` is the
+  finished shape and [ADR-API](../../docs/adr/0156_api.md) records it as
+  deliberately staged. It touches a 1 481-line hot file.
+- 🔴 **Publishing to npm**, and **no global bin in the first release** (R1a).
+- 🔴 **Reporting any differential arm as "green" in a record.** PRE-REG-NODE §4
+  names `fux-playground`, which L9 voided as an instrument (H3). Run the arms,
+  report the numbers in the WORKLOG; do not write *"N0 passes"* into an ADR.
+- Touching [`PRE-REGISTRATION-NODE.md`](../benchmark/PRE-REGISTRATION-NODE.md)
+  at all. It is frozen.
+- `--expand`, `--why`, `--receipt`, `--journal`, `verify` in Node.
+- Moving `Tune.rerank_weight` off `0.0`.
+
+### Three findings from the 2026-09-12 stress test, two of which changed the plan
+
+1. 🔴 **`api.py` re-introduced the decoder import** `cli.py` explicitly avoids.
+   **It was NOT fixed when the handoff said it was** — re-measured 2026-09-12,
+   `fux.open(".")` cost **50.2 ms**, against 2.6 ms once the gate became a stat
+   with the import only on the cold path. `tests/test_api.py` asserts on
+   `sys.modules` rather than on a clock.
+2. 🟠 **R2's size argument was framed for ONE file** (*"~200 KB"*). The reader
+   is **37 files, 196 KB**. The conclusion survives — 2 % of a 9.5 MB index,
+   still smaller than `.fux/decoders/` — but a consumer's `git status` shows
+   **37 new files** after `fux setup`, and every version bump re-diffs them.
+3. 🟠 **Copying `node/` into `src/fux/templates/` would put a second copy in
+   the repo.** Hatchling `force-include` maps it into the wheel at build time
+   instead. ⚠ **It does not surface in an EDITABLE install** (measured: 37
+   files in the built wheel, 0 under `uv pip install -e .`), so
+   `fuxdir._node_source()` falls back to the checkout's own `node/` — the
+   directory the wheel is built from, one source read two ways.
+
+### What landed
+
+- [x] **`fux setup` writes `.fux/node/` + `.fux/fux`** per R2 —
       **overwritten on a version difference, not write-if-missing** — and
       `fux doctor` gains the drift row. **ADR-DOTFUX amended** with the fourth
       shape.
-- [ ] **`ADR-NODE-SEARCH`** (new): owns `node/`; decisions on the `_format`
+- [x] **`ADR-NODE-SEARCH`** (0155, accepted) and **`ADR-API`** (0156, accepted) — both in the register with ownership rows. Decisions on the `_format` version policy, the never-fetch rule, the `url:`-verdict asymmetry, the shared tool-description file (ADR-MCP decision 11) and the `compat/`+`hash/` twin exemption.
+      ⚠ **Superseded line, kept for the diff:** owns `node/`; decisions on the `_format`
       version policy, the never-fetch rule, the `url:`-verdict asymmetry, the
       shared tool-description file, and the `compat/`+`hash/` twin exemption.
-- [ ] Ownership table + `tests/test_adr_ownership.py`; the freshness test maps
-      each Python module to its Node twin **derived from the path rule** (R4),
-      with the exemption list as the only hand-maintained part.
-- [ ] `--version` names the runtime; unsupported verbs signpost; the Python
+- [x] **Ownership table + `tests/test_adr_ownership.py`** — `node/` -> ADR-NODE-SEARCH (the only owned component outside `src/` and `tools/`), `src/fux/api.py` -> ADR-API, and a `describes` row narrowing `store/fuxdir.py` to the four vendoring functions.
+      ⚠ **`src/fux/__init__.py` has NO describes row**: the qualifier narrows to top-level `def`s and `class`es, `open` there is an imported NAME, and an un-narrowed row would demand ADR-API on every version bump. The gate reaches ADR-API through `api.py` instead; editing the re-export alone does not open it.
+      ✅ **LANDED 2026-09-12: `tests/test_node_twins.py`** — the map is derived
+      from the path rule, then from a `src/fux/….py` path the module names in
+      its own header, then a **two-entry** exemption set (`compat/pyfloat.mjs`,
+      `hash/blake2b.mjs`), which is the only hand-maintained part. Five
+      modules — `index.mjs` and the four `verbs/*.mjs` — had no machine-readable
+      twin declaration and gained one. It also fails when a Python twin moves
+      in the working tree and its `.mjs` does not, **which the differential arm
+      structurally cannot catch**: an un-updated Node module still agrees with
+      itself, and only disagrees on a corpus that exercises the changed branch.
+- [x] **`--version` names the runtime** (`fux 2.0.0-alpha.7 (node 24.13.0)`) and unsupported verbs signpost. ⏳ The Python `doctor` PATH row (R1a item 3) is **not built** and is not owed yet: no global bin ships in the first release, so there is nothing to shadow.
+      ⏳ superseded line: unsupported verbs signpost; the Python
       `doctor` PATH row (R1a).
-- [ ] CI matrix Node 20/22 × ubuntu/macos(arm64)/windows; the differential arm
-      on every push. ⚠ `log-probe.yml` is still **unrun** — musl, Windows and
+- [x] **CI matrix Node 20/22 × ubuntu/macos(arm64)/windows** —
+      [`node-arm.yml`](../../.github/workflows/node-arm.yml), the arm on every
+      push. ⚠ **`node --test node/test/` — a bare directory argument — dies
+      `MODULE_NOT_FOUND` on Node 24**, so the step runs `node --test` with
+      `working-directory: node` instead: stable on 20/22/24 and needing no
+      shell glob, which `pwsh` would not have expanded on the windows leg.
+      ⚠ `log-probe.yml` is still **unrun**. ⚠ `log-probe.yml` is still **unrun** — musl, Windows and
       Node 20 are unmeasured.
-- [ ] npm **`fux-engine`** published, **no global bin in the first release**
+- [x] **npm `fux-engine` PUBLISHED 2026-09-12** — `2.0.0-alpha.7`, tags
+      `alpha` and `latest`. ⚠ **`latest` was not intended and could not be
+      prevented:** npm always creates `latest` on a package's FIRST publish and
+      ignores `--tag`, so `npm i fux-engine` resolves to an alpha until a
+      stable release moves it. `npm dist-tag rm fux-engine latest` is the undo
+      if that is wrong. **Shipped WITH the global bin against R1a** — see the
+      amendment in R1a above. **npm trusted publishing (OIDC) is configured**:
+      `arpitarya/fux` · `publish.yml` · no environment · `Allow npm publish`
+      **unchecked**, so CI stages and a human confirms each publish on
+      npmjs.com. Original line: **npm `fux-engine` NOT published (out of scope,
+      R1a)**. ⚠ **Two publication defects were fixed on contact**: `mcp-tools.json` was absent from `package.json`'s `files`, so `fux mcp` would have broken in the published package; and `{{TOP}}` substituted into serialized JSON produced `"default": "5"` — a string — on a property declared `"type": "integer"`. Original line: **no global bin in the first release**
       (R1a); README front door; CHANGELOG.
-- [ ] `IMPLEMENTATION.md` row; this file to `archive/open/`.
+- [x] `IMPLEMENTATION.md` row. ⏳ **This file stays in `open/`**: npm publication and the renderer split are still open, so the item is not closed.
 
 ## Blockers
 
@@ -551,19 +630,26 @@ while there are 200 lines to debug rather than 2 000.
 
 ▶ **Nothing blocks Phase 1a. It starts.**
 
-## Open questions for Arpit — neither blocks Phase 1a
+## Open questions for Arpit — re-derived 2026-09-12; TWO OF THREE ARE SETTLED
 
-- **O1 · Does Node enforce the `.fux/pii.toml` gate?** Python refuses every
-  non-exempt verb without it ([ADR-PII](../../docs/adr/0150_pii.md) decision
-  17). **Recommend: yes, identically** — the gate exists because the index is
-  redacted, and a Node reader that answers where Python refuses is a divergence
-  in the *product*, not just in the code. The decision is Python-side today and
-  someone must extend it.
-- **O2 · Is `fux.api` public at 1.0, or marked provisional through alpha?**
-  R3's cost is that it freezes. Provisional buys room and costs the promise.
-- **O3 · Who writes `PRE-REGISTRATION-NODE-2`?** It supersedes rather than
-  edits (H3), moves the corpora to lab golden data, and states H2's
-  parsed-not-bytes comparison. Owed before any arm is reported.
+⚠ **This section was stale.** O1 and O2 were answered in the code and in a
+record respectively, and the section still presented them as open — the exact
+defect OPEN-WORK rule 3 warns about, in a detail file rather than the queue.
+
+- ✅ **O1 · Does Node enforce the `.fux/pii.toml` gate?** **Yes, identically —
+  ruled by Arpit 2026-09-12 and built.** `node/fux.mjs`'s `requirePiiRules`
+  refuses every verb and exits 1 without the file; the literal is held equal to
+  the two Python copies by
+  `tests/test_cli.py::test_the_node_reader_gates_on_the_same_file`. Verified by
+  behaviour 2026-09-12, not by reading the box.
+- ✅ **O2 · Is `fux.api` public at 1.0, or provisional?** **Public and frozen** —
+  [ADR-API](../../docs/adr/0156_api.md) decision 1: *"`fux.api` is a supported
+  surface, frozen like any other."* Provisional was not taken.
+- 🔴 **O3 · Who writes `PRE-REGISTRATION-NODE-2`?** **STILL OPEN, and it is now
+  the only thing between W-107 and closure that an agent cannot do.** It
+  supersedes rather than edits (H3), moves the corpora to lab golden data, and
+  states H2's parsed-not-bytes comparison. **Owed before any arm is reported**,
+  and gated on W-136 phase 2 for the lab golden data.
 
 ## Out of scope
 
@@ -581,4 +667,4 @@ is measured at 10 000 documents.
   *(spec: [`proposals/search-v3.md`](../proposals/search-v3.md) §8 · one detail
   file each under [`open/`](README.md))* · **Opus** executes, in Arpit's
   ratified order: **W-107 Phases 1–4** → **W-112**. `ratified: 2026-09-05`
-  - **[W-107](W-107-node-read-plane.md)** · `agent` · *(**ADR-NODE-SEARCH** new · ADR-RANKING · ADR-MCP)* · the Node read plane — `npx fux-search ask|find|answer|explain|graph|path|mcp`, zero deps, one contract, a third arm of the differential law. ▶ **Phase 1 starts; nothing blocks it.** Phase 0's `log()` question is settled and the rule lives in [ADR-RANKING decision 8a](../../docs/adr/0111_ranking.md) — scores equal after `round(9)`, ordering byte-equal; [`PRE-REGISTRATION-NODE.md`](../benchmark/PRE-REGISTRATION-NODE.md) is frozen in full, sha `0e3b4c80bf9e6a3ad122cb4e0db4f81adf04693fd47047fa24dd9edc7cb037a7`, and Phases 1–4 build against it. ⚠ **§4 still requires all three OSes before an arm is called green**, and only glibc/arm64 has been touched — [`log-probe.yml`](../../.github/workflows/log-probe.yml) is **unrun**, so musl, Windows and Node 20 are unmeasured. ⚠ **[L9](../../docs/adr/0011_LAW-9-environments.md): its frozen pre-registration names the playground** — the build (Phases 1–4) is unaffected, but any measured arm runs on fux-lab golden data under a superseding pre-registration ([W-138](W-138-reconcile-with-l9.md)). `filed: 2026-09-04`
+  - **[W-107](W-107-node-read-plane.md)** · `agent` · *(**ADR-NODE-SEARCH** new · ADR-RANKING · ADR-MCP)* · the Node read plane — `npx fux-search ask|find|answer|explain|graph|path|mcp`, zero deps, one contract, a third arm of the differential law. ▶ **Phase 1 starts; nothing blocks it.** Phase 0's `log()` question is settled and the rule lives in [ADR-RANKING decision 8a](../../docs/adr/0111_ranking.md) — scores equal after `round(9)`, ordering byte-equal; [`PRE-REGISTRATION-NODE.md`](../benchmark/PRE-REGISTRATION-NODE.md) is frozen in full, sha `0e3b4c80bf9e6a3ad122cb4e0db4f81adf04693fd47047fa24dd9edc7cb037a7`, and Phases 1–4 build against it. ⚠ **§4 still requires all three OSes before an arm is called green**, and only glibc/arm64 has been touched — [`log-probe.yml`](../../.github/workflows/log-probe.yml) is **unrun**, so musl, Windows and Node 20 are unmeasured. ⚠ **[L9](../../docs/adr/0011_LAW-9-environments.md): its frozen pre-registration names the playground** — the build (Phases 1–4) is unaffected, but any measured arm runs on fux-lab golden data under a superseding pre-registration ([W-138](../../archive/open/W-138-reconcile-with-l9.md)). `filed: 2026-09-04`

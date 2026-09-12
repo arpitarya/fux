@@ -6,6 +6,11 @@ status: proposed
 timestamp: 2026-09-05T00:00:00Z
 ---
 
+> 🔴 **Void in part since 2026-09-11.** The R-11 bracket and every other line
+> naming `fux-playground` are dead: [L9](../../docs/adr/0011_LAW-9-environments.md)
+> made that environment Arpit's hands alone. The companion proposal's banner says
+> what each one needs instead. Reconciled by [W-138](../../archive/open/W-138-reconcile-with-l9.md).
+
 **Model: Opus** — every ratified line amends a record, freezes a threshold, or writes a gate; a wrong one passes every mechanical check fux has. Run in `~/my_programs/fux`.
 
 ---

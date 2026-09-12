@@ -86,6 +86,13 @@ class Citation:
     text: str
     score: float
     source: str  # "index" | "fetched"
+    #: The passage's position in its document, from 0. The locator is a LINE
+    #: RANGE (ADR-REFER decision 17) because that is what a reader acts on; the
+    #: ordinal rides along because it is stable across a reflow that moves every
+    #: line number, which is exactly when a stored citation silently starts
+    #: pointing somewhere else. ⚠ **It was promised by two accepted records and
+    #: not carried by the code for six days** (W-140 row 2, fixed 2026-09-12).
+    ordinal: int = -1
 
     @property
     def nbytes(self) -> int:
@@ -179,6 +186,7 @@ def assemble(
             text=s.passage.text,
             score=s.score,
             source=source,
+            ordinal=s.passage.ordinal,
         )
         spent = per_doc.get(s.doc_id, 0)
         # A document's FIRST citation is exempt from the per-document cap: the

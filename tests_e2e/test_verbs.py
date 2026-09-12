@@ -256,6 +256,31 @@ def test_answer_cites_across_documents_and_names_each_one(tmp_path):
         assert f"  -- {p['loc']} (sha {p['sha'][:12]}" in human
 
 
+def test_every_passage_carries_its_ordinal(tmp_path):
+    """ADR-REFER decision 17 and ADR-ANSWER decision 9, through the CLI.
+
+    **Both records promised `passage.ordinal` in the `--json` payload and the
+    code did not emit it** (W-140 row 2). The reason it is promised is worth
+    keeping: the locator is a LINE RANGE, and a reflow that moves every line
+    number silently invalidates a stored citation — the ordinal is what
+    survives that. A reader following the record would have found nothing.
+
+    ⚠ **It is asserted through `subprocess`, not on the dataclass.** The claim
+    the records make is about the payload a consumer parses; a unit test on
+    `Citation` would pass while the emitter dropped the field, which is exactly
+    how this went unnoticed.
+    """
+    _write_fixture(tmp_path)
+    _run(tmp_path, "ingest")
+    payload = json.loads(
+        _run(tmp_path, "answer", "pruning gate index format postings", "--json").stdout
+    )
+    passages = payload["answer"]["passages"]
+    assert passages, "the fixture query must return passages, or this asserts nothing"
+    for p in passages:
+        assert isinstance(p["ordinal"], int) and p["ordinal"] >= 0, p
+
+
 def test_answer_sha_changes_when_the_source_file_changes(tmp_path):
     """PRIORITY.md P6's literal done-when: a passage + a sha that changes when
     the source changes — proving refer re-fetches rather than echoing the

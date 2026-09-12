@@ -1,3 +1,8 @@
+---
+type: Index
+description: "Index of parked, undecided ideas, each with a graduation trigger."
+---
+
 # `work/proposals/` — parked ideas
 
 **How to use this directory.** Ideas worth keeping that are **not being built
@@ -49,14 +54,24 @@ the defect this ordering exists to make visible.*
   `fux doctor`, **B** gate quality claims (*"abstains 0 of N"* beside every headline),
   **C** build abstention and measure it in fux-lab on golden data. Recommends **B, then C**.
   Parked from the inbox at Arpit's instruction. **Graduates when Arpit picks.**
-* [Positioning — documents around the code, not the code](positioning-documents-not-code.md)
-  — why fux is filed next to AST/code-graph tools. **Fux parses no code and, by
-  default, indexes none** (`.py` → *not an indexed file type*); the misfiling
-  traces to v0.1–v0.26, which did, plus *"AI-assisted codebases"*, the
-  `codebase` keyword, the *Quality Assurance* classifier and the paper's
-  non-existent *symbol edges*. Exact before/after wording per surface, and the
-  OKF bundle scan (94 of 314 files lack `type`). **Nothing applied.**
-  **Graduates when Arpit accepts or strikes each line in §4.**
+* [Positioning — written knowledge, not code](positioning-documents-not-code.md)
+  — ✅ **`graduated`: RULED AND APPLIED by Arpit 2026-09-12.** Why fux was filed
+  next to AST/code-graph tools: **it parses no code and, by default, indexes
+  none** (`.py` → *not an indexed file type*); the misfiling traced to
+  v0.1–v0.26, which did, plus *"AI-assisted codebases"*, the `codebase`
+  keyword, the *Quality Assurance* classifier and the paper's non-existent
+  *symbol edges*. **All six surfaces fixed**, plus the agent templates.
+  🔴 **Arpit overruled the proposal's own framing** — it said *"the documents
+  around your code"*, which keeps code as the reference point; the shipped
+  tagline is *"A search index for your written knowledge"*, with no "code",
+  "codebase" or "organization" in it. §5's `code`→`path` rename was **declined**
+  in favour of a glossary definition. §6 went to **option (b)**: the ALL-CAPS
+  exemption is retired, 18 trackers typed, evidence and sealed golden data
+  declared outside the bundle, frozen pre-2026-08-25 runs exempt by the repo's
+  own baseline — and `tests/test_okf_bundle.py` now gates it (237 docs, 0
+  failures) so the claim and the tree cannot drift again.
+  **Kept here, not archived:** GitHub About/topics still need Arpit's `gh`, the
+  PyPI page changes only on the next upload, and §5's rename is a live fork.
 
 ## Filed 2026-09-05
 
@@ -80,7 +95,7 @@ the defect this ordering exists to make visible.*
   is why it is still here rather than archived. Where `ask`/`find`/`answer`
   lose (measured), the fixes inside L1–L8, the Python-writes /
   Python-or-Node-reads split, the pinned vector plane an agent can produce, the
-  target architecture ([`../architecture-search-v3.svg`](../architecture-search-v3.svg)),
+  target architecture ([`../proposal-search-v3-target.svg`](../proposal-search-v3-target.svg)),
   the research appendix, and the plan — **W-106 … W-112**, each with a detail
   file under [`../open/`](../open/README.md).
   ⚠ **Its frontmatter said the three proposals it supersedes were "deleted in

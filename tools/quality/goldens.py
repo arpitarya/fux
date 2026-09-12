@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The golden schema — the RANK CONTRACT and the RELEVANCE SET, kept apart.
 
-[ADR-QUALITY](../../docs/adr/0044_quality-contract.md) decision 12, ruled by
+[ADR-QUALITY](../../docs/adr/0141_quality-contract.md) decision 12, ruled by
 Arpit 2026-08-28.
 
 ## Why two fields and not one plural field
@@ -12,8 +12,11 @@ come back at rank <= n"* — and was later read as a **relevance judgment** —
 be **complete**, and the first never promised completeness.
 
 Two blind annotators, agreeing at **Cohen's kappa = 0.960**, judged **25 of 50**
-playground goldens to have more than one genuinely relevant document against one
-asserted for all 50. **Making `doc` a list would have carried the conflation
+of the then-live goldens to have more than one genuinely relevant document
+against one asserted for all 50. (Those fifty lived in `fux-playground` and were
+retired by [L9](../../docs/adr/0011_LAW-9-environments.md) on 2026-09-11; the
+measurement stands, the file is out of reach, and **this schema has no live
+file** — the golden ladder's questions carry no relevance claim.) **Making `doc` a list would have carried the conflation
 into a plural field**; splitting the claims is what decision 12 chose instead.
 
 ## The schema

@@ -1,38 +1,40 @@
+---
+type: Index
+description: "Index of the three sibling environments — how each is stood up, and which is which."
+---
+
 # `work/setup/` — the things fux needs that fux does not contain
 
-**How to use this directory.** Fux depends on three working directories that
-sit **next to** the repo and are not part of it. None is shipped, none is a
+**How to use this directory.** Fux depends on three working directories that sit
+**next to** the repo and are not part of it. None is shipped, none is a
 submodule, and none can be reconstructed from anything in this tree. This
-directory is where each one's setup and standing contract is written down, so a
-session on a fresh machine can stand them up rather than discover them.
+directory is where each one's setup and operational contract is written down, so
+a session on a fresh machine can stand them up rather than discover them.
 
 | document | thing | location | what it is |
 |---|---|---|---|
-| [SETUP-PLAYGROUND](fux-playground.md) | `fux-playground` | `~/my_programs/fux-playground` | a **sibling git repository** — the graded fixture corpus |
+| [SETUP-PLAYGROUND](fux-playground.md) | `fux-playground` | `~/my_programs/fux-playground` | a **sibling git repository** — Arpit's sandbox |
 | [SETUP-LAB](fux-lab.md) | `fux-lab` | `~/my_programs/fux-lab` | a **scratch working directory** — the measurement environment |
-| [SETUP-BENCHMARK](fux-benchmark.md) | `fux-benchmark` | `~/my_programs/fux-benchmark` | a **scratch git repository** — the two-engine comparison harness |
+| [SETUP-BENCHMARK](fux-benchmark.md) | `fux-benchmark` | `~/my_programs/fux-benchmark` | a **scratch git repository** — the two-version timing harness |
 
 ## Which is which
 
-They get confused, so:
+🔴 **Each one has exactly one job, and the job is stated by
+[L9](../../docs/adr/0011_LAW-9-environments.md) — read it there.** This section
+does not restate the law ([L0](../../docs/adr/0002_LAW-0-authority.md)); it
+exists because the three get confused, and it points at the right document.
 
-- **The playground GRADES.** Ten adversarial documents and ~50 hand-written
-  golden queries asserting *ranks*. It answers *"did this change break an
-  answer?"* Its output is pass / xfail / XPASS.
-- **The lab MEASURES.** One directory per corpus, each with its own venv,
-  baselines and pinned engine version. It answers *"how big, how fast, how
-  accurate?"* Its output is numbers, filed into
-  [`../regression/`](../regression/README.md).
+| if you want to | go to |
+|---|---|
+| try something by hand, break it, wipe it | the playground — **and you are Arpit, or you are in the wrong place** |
+| produce a number anyone will cite: quality, size, accuracy, a verdict | [SETUP-LAB](fux-lab.md) |
+| know how fast a query is, or whether a ranking moved between two versions | [SETUP-BENCHMARK](fux-benchmark.md) |
 
-- **The benchmark COMPARES.** **Two engine versions resident at once**, over
-  byte-identical corpora. It answers *"what is the difference between these two
-  versions?"* Its output is paired per-query rows and a p-value, filed into
-  [`../regression/`](../regression/README.md) like everything else.
-
-A ranking change should survive the playground. A performance or size claim
-needs the lab. **A version-to-version claim needs the benchmark** — and it is a
-*third* harness rather than a lab environment because the lab's shape is one
-pinned engine version per directory, which a comparison cannot honour.
+⚠ **Before 2026-09-11 the playground was the grading corpus**, and roughly forty
+documents, tools and plans in this repo used it as an instrument. L9 ended that;
+[W-138](../../archive/open/W-138-reconcile-with-l9.md) is the reconciliation, and
+[`tests/test_l9_environments.py`](../../tests/test_l9_environments.py) is what
+stops it coming back.
 
 ## Why these are documents and not ADRs
 

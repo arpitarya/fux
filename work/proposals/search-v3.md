@@ -48,7 +48,7 @@ mechanical enough for Sonnet it says so, and Opus still owns the gate.
 expansion → W-110 doc2query enrichment → W-111 `ask`/`find` ergonomics →
 W-112 the vector plane, only if W-106 passes.
 
-**Diagrams:** [`../architecture-search-v3.svg`](../architecture-search-v3.svg)
+**Diagrams:** [`../proposal-search-v3-target.svg`](../proposal-search-v3-target.svg)
 is the target; the two shipped diagrams carry a *proposed — not built* band
 pointing at it.
 
@@ -419,7 +419,7 @@ tuple `(-round(s, 9), id)` exactly in the comparator.
 
 ## 7 · Target architecture
 
-**Full picture:** [`../architecture-search-v3.svg`](../architecture-search-v3.svg).
+**Full picture:** [`../proposal-search-v3-target.svg`](../proposal-search-v3-target.svg).
 The two shipped diagrams ([high-level](../architecture-high-level.svg),
 [detailed](../architecture-detailed.svg)) now carry a dashed *proposed — not
 built* band that names this document; nothing proposed is drawn as shipped.
@@ -472,12 +472,17 @@ duplicated: `rerank_weight`, `superseded_weight`, abstention.
 ### W-106 — the vector gate *(parallel; scratch; no fux code)*
 
 - **DoD.** A script under `tools/vector-gate/` (dev extra, not runtime):
-  chunk the 10 playground docs with `refer._chunk`; embed chunks and 50
-  queries with `bge-small-en-v1.5` q8 via `@huggingface/transformers` **and**
-  via `sentence-transformers`; int8 per-vector quantize; max-sim per doc; RRF
-  with today's BM25F ranks; grade. Filed under `work/regression/`, per-query
-  rows, `informed`, both embedder implementations as separate arms, plus a
+  chunk the corpus with `refer._chunk`; embed chunks and the query set with
+  `bge-small-en-v1.5` q8 via `@huggingface/transformers` **and** via
+  `sentence-transformers`; int8 per-vector quantize; max-sim per doc; RRF with
+  today's BM25F ranks; grade. Filed under `work/regression/`, per-query rows,
+  `informed`, both embedder implementations as separate arms, plus a
   **two-architecture** arm for the query vectors (discordant count).
+  ⚠ **As executed on 2026-09-05 the corpus was `fux-playground`'s ten
+  documents and fifty goldens**; [L9](../../docs/adr/0011_LAW-9-environments.md)
+  closed that environment on 2026-09-11, so the retrieval half is not re-runnable
+  and the two-architecture arm — which needs no goldens — is what remains
+  ([W-106](../../archive/open/W-106-vector-gate.md), closed 2026-09-12).
 - **Bar.** DENSE-CHUNK's frozen `>= 3 fixed / 0 broken`, **judged on the
   vocabulary-gap failures**; negation queries reported but not expected.
 - **Outcome.** PASS → W-112 is unblocked and a compare doc (*vectors* vs
@@ -486,7 +491,8 @@ duplicated: `rerank_weight`, `superseded_weight`, abstention.
 ### W-107 — the Node read plane
 
 - **Phase 0 (Opus, decision):** the `log()` fork. Measure Python-vs-Node
-  score divergence on the playground and lab corpora *as is*; write
+  score divergence on whatever corpora are in reach (as executed: the
+  playground and the lab, before [L9](../../docs/adr/0011_LAW-9-environments.md)); write
   `PRE-REGISTRATION-NODE.md` with the three-arm law; Arpit picks portable
   `log` or tolerance. If portable: land `fux/query/portable_math.py` first,
   ADR-RANKING amended, differential and goldens re-run, **then** Node.

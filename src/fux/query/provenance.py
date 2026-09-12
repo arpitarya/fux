@@ -505,11 +505,24 @@ def receipt(
     }
 
 
+#: The digest algorithm a fux `sha` actually is: blake2b with a 20-byte digest
+#: (`store.format.content_sha`). in-toto's DigestSet is a map keyed BY
+#: ALGORITHM, so the key is a claim about how the value was computed.
+#:
+#: 🔴 **This key was `sha256` until 2026-09-12 and the value was never a
+#: SHA-256** (W-140 row 3). A 40-hex string under `sha256` is not merely
+#: mislabelled — an external verifier reading the attestation would hash the
+#: bytes with SHA-256, get 64 hex characters, and report a mismatch on a
+#: receipt that is perfectly good. The failure lands on the reader, off this
+#: machine, with no way back to the cause.
+DIGEST_ALG = "blake2b-160"
+
+
 def _resource(cited: dict) -> dict:
     """One cited document as an in-toto **ResourceDescriptor**.
 
     `{id, loc, sha}` maps almost exactly: `id` -> `name`, `sha` ->
-    `digest.sha256`. **The mapping is a rename, not a reshape** — fux already
+    `digest.<alg>`. **The mapping is a rename, not a reshape** — fux already
     cited by digest, which is the whole reason the standard shape fits.
 
     ⚠ **`loc` has no field in a ResourceDescriptor.** A line range is not a URI
@@ -518,7 +531,7 @@ def _resource(cited: dict) -> dict:
     schema is how two tools collide.
     """
     sha = str(cited.get("sha", ""))
-    resource = {"name": str(cited.get("id", "")), "digest": {"sha256": sha}}
+    resource = {"name": str(cited.get("id", "")), "digest": {DIGEST_ALG: sha}}
     loc = cited.get("loc")
     if loc:
         resource["annotations"] = {"fux.dev/loc": str(loc)}
@@ -634,16 +647,24 @@ def _sha_of(entry) -> str:
     """The sha of one cited document, from either shape.
 
     A receipt's `subject` holds in-toto ResourceDescriptors
-    (`digest.sha256`); `verify`'s `rerun` callback hands back fux's internal
+    (`digest.<alg>`); `verify`'s `rerun` callback hands back fux's internal
     `{id, sha}`. **Both are read here rather than at two call sites**, because
     a missing key would degrade to `""` and two empty strings compare EQUAL —
     which would report `reproduced` for a receipt that verified nothing.
+
+    ⚠ **`sha256` is still READ, and will be forever.** Every receipt written
+    before 2026-09-12 carries the wrong key over the right value (W-140 row 3),
+    and refusing to read them would turn a labelling fix into a verification
+    outage for every receipt already in someone's ticket. **It is never
+    written** — see `DIGEST_ALG`.
     """
     if not isinstance(entry, dict):
         return ""
     digest = entry.get("digest")
-    if isinstance(digest, dict) and digest.get("sha256"):
-        return str(digest["sha256"])
+    if isinstance(digest, dict):
+        for key in (DIGEST_ALG, "sha256"):
+            if digest.get(key):
+                return str(digest[key])
     return str(entry.get("sha", ""))
 
 

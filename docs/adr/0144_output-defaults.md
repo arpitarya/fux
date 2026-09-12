@@ -52,14 +52,27 @@ so on the line itself.
 
 **Precedence, and it is the whole of the mechanism:**
 
+⚠ **This diagram showed a `[defaults]` / `[verb]` file until 2026-09-12** and
+that layout has not existed since the three-root rewrite (W-140 row 12). The
+real roots are `[cli]`, `[cli.json]` and `[mcp]`, with per-verb subtables under
+the first two — and the `BUILT_IN` rung is reached **only when the file is
+absent altogether** (decisions 19 and 20), not key by key.
+
 ```mermaid
 flowchart LR
     F["CLI flag<br/>(passed?)"] -->|yes| OUT[value used]
-    F -->|no| V["[verb] table"]
-    V -->|set| OUT
-    V -->|unset| D["[defaults] table"]
-    D -->|set| OUT
-    D -->|unset| B["BUILT_IN"] --> OUT
+    F -->|no| A["file absent?"]
+    A -->|yes| B["BUILT_IN"] --> OUT
+    A -->|no| JV["[cli.json.verb]"]
+    JV -->|set| OUT
+    JV -->|unset| J["[cli.json]"]
+    J -->|set| OUT
+    J -->|unset| CV["[cli.verb]"]
+    CV -->|set| OUT
+    CV -->|unset| C["[cli]"]
+    C -->|set| OUT
+    C -->|unset| E["FuxError<br/>the verb refuses to guess"]
+    M["MCP tool arg"] -->|no| MT["[mcp]"] --> OUT
 ```
 
 <details><summary>ASCII twin — update together, always</summary>
@@ -69,30 +82,43 @@ flowchart LR
         |
         no
         v
-  [verb] table set? --yes--> value used
+  .fux/output.toml ABSENT? --yes--> BUILT_IN ---> value used   (decision 20)
         |
-        no
+        no   (a PRESENT file RULES -- decision 19)
         v
-  [defaults] set?  --yes--> value used
-        |
-        no
+  [cli.json.<verb>] set? --yes--> value used     (--json renderings only)
+        |  no
         v
-      BUILT_IN     ---------> value used
+  [cli.json]        set? --yes--> value used
+        |  no
+        v
+  [cli.<verb>]      set? --yes--> value used
+        |  no
+        v
+  [cli]             set? --yes--> value used
+        |  no
+        v
+      FuxError -- the verb refuses to guess, rather than reaching BUILT_IN
+
+  MCP is a separate root and inherits NOTHING from [cli]:
+      tool argument --> [mcp] --> value used
 ```
 </details>
 
-**`[defaults]` reaches a verb only where that verb declares the key.**
-`band = true` under `[defaults]` does not put a band on `doctor`, which has no
-such concept — the schema decides, not the table.
+**A table reaches a verb only where that verb declares the key.**
+`band = true` under `[cli]` does not put a band on `doctor`, which has no such
+concept — the schema decides, not the table. **A key unique to one verb**
+(`explain`, `no_refer`, `journal`, `hops`) **is refused at the shared level by
+name**: setting it there reads as global and is not.
 
 ### Examples
 
 ```console
 $ cat .fux/output.toml
-[defaults]
+[cli]
 band = true
 
-[find]
+[cli.find]
 band = false        # find pipes bare paths
 
 $ fux ask "how does the merge driver work?" --json | jq -r .confidence.band
@@ -599,6 +625,27 @@ empty tuple is what makes `[cli.json] enabled` reach it. `keys is None` — an
 absent entry — means *this verb is not shaped by this file*, and that
 distinction is the reason the guard is written that way rather than as `not
 keys`.
+
+22. 🔴 **`journal` is the one key in this file that WRITES TO DISK, and it
+    arrived with no decision.** Every other key here changes how an answer is
+    *rendered*; `[cli.answer] journal = true` changes whether a durable local
+    record of the question survives the process — the same `args.journal`
+    `fux answer --journal` sets.
+
+    - **It is off by default** (`BUILT_IN["journal"] = False`, and the generated
+      specimen says `false`), so nothing records by accident.
+    - ⚠ **[ADR-PROVENANCE](0143_provenance.md) decision 10 says *only*
+      `--journal` writes, and reserved always-on journalling as a fork *"no
+      session may pick"*.** The capability then shipped here instead. **This
+      record does not ratify it** — naming it is not the same as deciding it,
+      and a record that quietly absorbed another record's reserved fork would be
+      the L0 failure in its most convenient form.
+    - **The ruling is owed from Arpit**:
+      [W-147](../../work/open/W-147-the-journal-consent-surface.md). Until it
+      lands, this paragraph is the only thing telling a reader of a *rendering*
+      config that one of its keys is not about rendering.
+    - Found 2026-09-12 re-deriving [W-140](../../work/open/W-140-guide-authoring-defects.md)
+      row 3 against the code.
 
 ### Consequences
 

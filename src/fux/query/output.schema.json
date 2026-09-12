@@ -194,7 +194,7 @@
       "answer": { "passages": [
         { "id": "file:docs/mesh.md", "loc": "docs/mesh.md:L10-L13",
           "sha": "516bef06781262a0a64b10027316c18d668eeccb",
-          "heading": "Rollback procedure", "text": "Drain the sidecar and fail open.", "score": 2.689 }
+          "heading": "Rollback procedure", "text": "Drain the sidecar and fail open.", "score": 2.689, "ordinal": 3 }
       ] },
       "citation": {
         "id": "file:docs/mesh.md", "loc": "docs/mesh.md:L10-L13",
@@ -334,7 +334,7 @@
     ],
     "fields": {
       "_type":         { "type": "str",  "required": "always", "doc": "`https://in-toto.io/Statement/v1` -- the STANDARD envelope shape, adopted 2026-08-27 so the ecosystem can read a fux receipt without a translator" },
-      "subject":       { "type": "list", "required": "always", "doc": "in-toto ResourceDescriptors: `{name, digest: {sha256}, annotations?}` -- what was actually cited, named by digest. `annotations['fux.dev/loc']` carries the line range, because a ResourceDescriptor has no field for one and `annotations` is the spec's own extension point" },
+      "subject":       { "type": "list", "required": "always", "doc": "in-toto ResourceDescriptors: `{name, digest: {blake2b-160}, annotations?}` -- the algorithm key is `blake2b-160` because that is what a fux `sha` IS (`store.format.content_sha`, 20-byte blake2b); it said `sha256` until 2026-09-12 and the value was never one. A receipt written before that carries `sha256` and is still READ -- what was actually cited, named by digest. `annotations['fux.dev/loc']` carries the line range, because a ResourceDescriptor has no field for one and `annotations` is the spec's own extension point" },
       "predicateType": { "type": "str",  "required": "always", "doc": "`https://fux.dev/receipt/v1` -- what KIND of claim the predicate makes. Versioned separately from `_type`, so fux's payload can change without pretending the envelope did" },
       "predicate":     { "type": "dict", "required": "always", "doc": "the claim: `engine`, `inputs`, `confidence`, `derivation`, `verdicts`" }
     },
@@ -342,7 +342,7 @@
       "_type": "https://in-toto.io/Statement/v1",
       "subject": [
         { "name": "file:docs/mesh.md",
-          "digest": { "sha256": "516bef06781262a0a64b10027316c18d668eeccb" },
+          "digest": { "blake2b-160": "516bef06781262a0a64b10027316c18d668eeccb" },
           "annotations": { "fux.dev/loc": "docs/mesh.md:L10-L13" } }
       ],
       "predicateType": "https://fux.dev/receipt/v1",

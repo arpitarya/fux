@@ -176,7 +176,7 @@ class Verdict:
         new place. A caller that wants to treat them alike may; the engine
         will not do it on their behalf.
 
-        ⚠ **`as-ingested` is a SIXTH position and it is not `current` either.**
+        ⚠ **`as-ingested` is a FIFTH position and it is not `current` either.**
         It means *we could not look, but the index is internally consistent* —
         the passage still matches the exact bytes the record was built from,
         held in `.fux/acquired/`. That is a real comparison, so it is not

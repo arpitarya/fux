@@ -1,10 +1,11 @@
 # Fux
 
-**A search index for your docs that lives in your git repo — built for coding agents.**
+**A search index for your written knowledge — decisions, runbooks, specs,
+wiki pages — committed to git and read by agents.**
 
-Fux ranks documents from a small, plain-text index committed next to your code,
-then reads the answer back from the source itself. No server, no vector
-database, no API key, and no model anywhere on the path.
+Fux ranks documents from a small, plain-text index committed to git, then reads
+the answer back from the source itself. No server, no vector database, no API
+key, and no model anywhere on the path.
 
 > **Status: `2.0.0-alpha.7` (alpha).** The CLI and the index format can still
 > change between pre-releases. Every change is in [`CHANGELOG.md`](CHANGELOG.md).
@@ -22,8 +23,12 @@ database, no API key, and no model anywhere on the path.
 - **Says when it doesn't know.** Results carry a confidence band, and an unrelated
   question gets *"No confident matches"* rather than the nearest noise
   ([ADR-CONFIDENCE](docs/adr/0142_confidence.md)).
+- **It indexes documents, not code.** Fux runs no parser over source files — no
+  AST, no symbols, no call graph — and source extensions are not on its default
+  type list. Pair it with a code-graph tool when you want structure.
 
 The whole idea in one picture: [`work/architecture-high-level.svg`](work/architecture-high-level.svg).
+How a verb actually works: [`ask`](work/architecture-ask.svg) · [`answer`](work/architecture-answer.svg) · [decoders](work/architecture-decoders.svg).
 
 ## Install
 
@@ -32,6 +37,25 @@ pip install --pre fux-engine    # Python ≥ 3.11 · Linux, macOS, Windows
 ```
 
 `--pre` is needed while fux is in alpha. The command is `fux`.
+
+**You can also read an index without Python.** `fux setup` vendors a
+zero-dependency Node reader into `.fux/node/`, so a clone answers with nothing
+installed at all:
+
+```bash
+node .fux/node/fux.mjs find rollback   # or: .fux/fux find rollback
+npx fux-engine find rollback           # from npm
+```
+
+It only reads — `ingest`, `build` and every other writing verb stay with Python
+— and it is held byte-equal to Python by a third arm of the differential law.
+
+**And fux is importable**, not only spawnable:
+
+```python
+from fux import open as fux_open
+fux_open(".").ask("how do we roll back a release")
+```
 
 ## Quickstart
 
@@ -151,9 +175,9 @@ Fux is built under nine laws, each with its own record in the
 
 1. [`docs/index.md`](docs/index.md) — the map of every doc in the repo
 2. [The ADR register](docs/adr/README.md) — every decision of record
-3. [Detailed architecture diagram](work/architecture-detailed.svg) — record shape, query paths, planes
+3. [Detailed architecture diagram](work/architecture-detailed.svg) — every plane, what is committed and what is not, and the two query paths
 4. [The paper](work/paper/the-fux-index-paper.md) — design and falsifiable predictions (a draft; its status note lists what changed)
-5. [Playground setup](work/setup/fux-playground.md) — a graded corpus to try fux on, in a sibling repo
+5. [Sibling environments](work/setup/README.md) — the sandbox, the measurement lab and the benchmark harness that sit next to this repo
 6. [`CLAUDE.md`](CLAUDE.md) — how work is done here, for people and agents
 
 ## Contributing

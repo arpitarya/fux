@@ -7,7 +7,7 @@ status: accepted
 date: 2026-08-27
 feature: the quality contract — what a fux quality number means
 owns: [tools/quality]
-laws: [L1, L2, L3, L4, L8]
+laws: [L1, L2, L3, L4, L8, L9]
 timestamp: 2026-08-27T00:00:00Z
 ---
 
@@ -272,8 +272,14 @@ problem, which is the reason decision 5 is not negotiable.
 > an invented transcript is worse than none."* **Both blockers cleared on
 > 2026-08-28.**
 
+⚠ **The command below is HISTORY, not an instruction.** It was run on
+2026-08-28 against `fux-playground/goldens/queries.jsonl`, and
+[L9](0011_LAW-9-environments.md) retired that corpus on 2026-09-11. The output
+stands as measured; the path is kept so the number can be traced to what
+produced it, and **`goldens.py` takes whatever path you give it.**
+
 ```console
-$ python3 tools/quality/goldens.py ~/my_programs/fux-playground/goldens/queries.jsonl
+$ python3 tools/quality/goldens.py <the retired goldens file>
 50 goldens, all valid against ADR-QUALITY decision 12
 
   carry a relevance set:      50
@@ -343,7 +349,13 @@ future session can be held to.
   agreeing at κ = 0.960 — and it is what revealed the schema defect decision 12
   fixes. **The remaining blocker is migration, not annotation**: the goldens
   must carry `relevant` + `relevance` before a recall number can be computed
-  over them, and that file lives in `fux-playground`.
+  over them. 🔴 **And that file was in `fux-playground`**, which
+  [L9](0011_LAW-9-environments.md) closed to every agent on 2026-09-11 — so the
+  migration has no subject. **`recall@k` is now blocked on a golden set that
+  declares a relevance set at all**: the ladder's questions
+  ([`work/golden/`](../../work/golden/README.md)) carry an id and a question and
+  nothing else, by design, because their key is sealed. That is a bigger gap
+  than *"migration"* and is named here rather than left reading as almost-done.
 - **The `unanswerable` class does not exist** and must be authored **blind**, or
   it contaminates the set it is meant to test.
 - **Declaring the mix makes some historical numbers incomparable.** That is the

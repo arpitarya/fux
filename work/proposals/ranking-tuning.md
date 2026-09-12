@@ -374,7 +374,7 @@ Not the optimiser. The optimiser is a weekend.
 
 | asset | size |
 |---|---|
-| `fux-playground` goldens | ~50 ranked queries, one gold doc each |
+| ~~`fux-playground` goldens~~ | ~~50 ranked queries, one gold doc each~~ — **retired 2026-09-11 by [L9](../../docs/adr/0011_LAW-9-environments.md); this row is why the table's conclusion got worse, not better** |
 | `fux-lab/graph-acceptance` | 66 documents, 24 graded queries |
 | Sakai's requirement to detect Δ nDCG = 0.10 | **73 topics** |
 | the Δ actually on offer (§1) | ~0.005–0.016 |

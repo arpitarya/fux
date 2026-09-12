@@ -7,7 +7,7 @@ status: accepted
 date: 2026-08-18
 feature: "`.fux/runtime/` — the derived index, `fux build`, and the block bound that makes skipping provable"
 owns: [src/fux/derive, tools/differential]
-laws: [L1, L3]
+laws: [L1, L3, L9]
 timestamp: 2026-08-18T00:00:00Z
 ---
 
@@ -419,8 +419,33 @@ fail is worse than none.
   following the documentation. Fixed in the *field shape*, never in this
   record's invariant ([ADR-RECORD](0109_index-record.md) rule 2); the
   differential harness now carries a hashed record, which it never had.
-- ⚠ **`tools/differential/playground_grade.py` grades two modes — `scan` and
-  `accelerator` — and no test imports it.** Those are exactly the pair the
+- **`tools/differential/` now holds THREE arms, not one** (2026-09-12,
+  [ADR-NODE-SEARCH](0155_node-search.md)). This record owns the directory, so
+  it says what is in it; the arms' *bars* belong to the records whose claims
+  they test.
+  - `goldens_grade.py` — `scan` vs `accelerator`, the arm this record exists
+    for.
+  - `node_arm.py` — **Python's reader vs Node's**, per document field. The
+    comparison is on **parsed values, never on stdout bytes**: Python prints
+    `--json` with `ensure_ascii=True` and `JSON.stringify` does not, so a byte
+    diff fails on the first em-dash and measures nothing about the engine.
+  - `graph_arm.py` — the in-memory graph plane's digest, both runtimes.
+  - `adversarial_corpus.py` — writes a corpus whose ids straddle U+FFFF and
+    whose scores tie exactly. ⚠ **It MUTATES the index it is pointed at**, so
+    it runs in a copy or in CI, never against a repository anyone reads.
+
+  ⚠ **The warning above still applies, and applies harder: no test imports any
+  of them.** They are run by [`node-arm.yml`](../../.github/workflows/node-arm.yml)
+  on every push across 3 OSes × Node 20/22, which is a schedule rather than a
+  gate — CI green is nobody's required check on `main`.
+- ⚠ **`tools/differential/goldens_grade.py` grades two modes — `scan` and
+  `accelerator` — and no test imports it.** ⚠ **It was `playground_grade.py`
+  until 2026-09-12**, when [L9](0011_LAW-9-environments.md) took its default
+  corpus away and W-138 renamed it and made `--corpus`/`--goldens` required;
+  the grading logic did not change, so the count below is still what that code
+  produces. 🔴 **It has no live golden set to read** — the golden ladder's
+  questions carry no `doc` + `max_rank` contract — so the differential law has
+  no graded instrument today. Those two modes are exactly the pair the
   differential law binds together, so the harness is precisely a
   differential-law instrument. It has sat broken before, found by a sweep rather
   than by a test; **a live tool with no test importing it is a tool that can
@@ -434,8 +459,9 @@ fail is worse than none.
   applied — a systematic divergence from what `fux ask` actually returns, not
   noise. Fixed by routing both modes through `run_query` (the same entrypoint
   `cmd_ask` uses) with one shared `Tune`, loaded once per corpus; the harness
-  now reproduces `fux-playground/check.py`'s own count exactly (41 pass / 0
-  fail / 9 known-failure) with `scan == accelerator` holding. **Still no test
+  now reproduces the retired consumer harness's own count exactly (41 pass / 0
+  fail / 9 known-failure, on a corpus that no longer exists) with
+  `scan == accelerator` holding. **Still no test
   imports it** — the warning above is unchanged by this fix.
 
 ### Alternatives considered

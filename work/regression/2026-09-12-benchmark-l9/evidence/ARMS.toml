@@ -1,0 +1,213 @@
+# Generated into the RUN's evidence, never kept at the harness root:
+# a manifest beside the harness describes whatever the harness is today.
+run = "2026-09-12-benchmark-l9"
+
+[[arm]]
+name = "A"
+version = "1.0.0"
+python = "3.11.15"
+install = "pip install fux-engine==1.0.0"
+corpus = "docs-00100"
+corpus_docs = 100
+corpus_sha256 = "670fb9513e8ae4828461a2533b441ed691476c836930902ddce682415ed5a54e"
+queries_sha256 = "544e8f2337a90faea7be809ca4cf26160c32cb5171192d7ed626065cfbe92017"
+index_sha256 = "9b861bb8aa245b80b19901f3c4cf198241f9fc3113fa118eaccb9bbf5abf099f"
+index_bytes = 1407555
+ingest_ms = 3860.3
+build_ms = 147.4
+enrich_present = false
+
+[[arm]]
+name = "B"
+version = "2.0.0-alpha.7"
+python = "3.11.15"
+install = "pip install -e ../fux"
+corpus = "docs-00100"
+corpus_docs = 100
+corpus_sha256 = "670fb9513e8ae4828461a2533b441ed691476c836930902ddce682415ed5a54e"
+queries_sha256 = "544e8f2337a90faea7be809ca4cf26160c32cb5171192d7ed626065cfbe92017"
+index_sha256 = "23554245b238c358bb0b8953b61390c6075e27ba30a6ea82850f89e387b1aa9a"
+index_bytes = 1335981
+ingest_ms = 1807.8
+build_ms = 192.5
+enrich_present = false
+
+[[arm]]
+name = "A"
+version = "1.0.0"
+python = "3.11.15"
+install = "pip install fux-engine==1.0.0"
+corpus = "docs-00200"
+corpus_docs = 200
+corpus_sha256 = "75a2c430830d8065720eb913c878e8dd50372acd678e9181ce8f2f243edaf1e2"
+queries_sha256 = "a8215f773e5b8dc91461e73ba0f5b2dbee5461a00fec7263219dbcbcf4dadc02"
+index_sha256 = "d51e5a6d4b27973c4c18c21913dba817d52fb854ecdd27ac3191a50f45d46341"
+index_bytes = 2801415
+ingest_ms = 7628.1
+build_ms = 198.1
+enrich_present = false
+
+[[arm]]
+name = "B"
+version = "2.0.0-alpha.7"
+python = "3.11.15"
+install = "pip install -e ../fux"
+corpus = "docs-00200"
+corpus_docs = 200
+corpus_sha256 = "75a2c430830d8065720eb913c878e8dd50372acd678e9181ce8f2f243edaf1e2"
+queries_sha256 = "a8215f773e5b8dc91461e73ba0f5b2dbee5461a00fec7263219dbcbcf4dadc02"
+index_sha256 = "347f2142ae68f6de55274d865d387bb76a81b25b2d3ca8a60a878f562ff4d0e9"
+index_bytes = 2659177
+ingest_ms = 3511.4
+build_ms = 276.5
+enrich_present = false
+
+[[arm]]
+name = "A"
+version = "1.0.0"
+python = "3.11.15"
+install = "pip install fux-engine==1.0.0"
+corpus = "docs-00500"
+corpus_docs = 500
+corpus_sha256 = "c6dc6ad186fcd4d0254e6fc2105574568fb079a8b6b720bcab83d2cffe745759"
+queries_sha256 = "f80029cc8199084ea770d437fd0ea4012be1deabc67d7e3518ff73eb809c747a"
+index_sha256 = "0a7588a2ac8747349e669d596bcaff858d9627be2910b1e29e441d13ce249935"
+index_bytes = 6972004
+ingest_ms = 18882.8
+build_ms = 355.5
+enrich_present = false
+
+[[arm]]
+name = "B"
+version = "2.0.0-alpha.7"
+python = "3.11.15"
+install = "pip install -e ../fux"
+corpus = "docs-00500"
+corpus_docs = 500
+corpus_sha256 = "c6dc6ad186fcd4d0254e6fc2105574568fb079a8b6b720bcab83d2cffe745759"
+queries_sha256 = "f80029cc8199084ea770d437fd0ea4012be1deabc67d7e3518ff73eb809c747a"
+index_sha256 = "5ac3a37d69dd7f0a4695ed7ac99c45c9698a7c048b7ef43b03dbb5ac43e5f564"
+index_bytes = 6615297
+ingest_ms = 8812.5
+build_ms = 524.9
+enrich_present = false
+
+[[arm]]
+name = "A"
+version = "1.0.0"
+python = "3.11.15"
+install = "pip install fux-engine==1.0.0"
+corpus = "docs-01000"
+corpus_docs = 1000
+corpus_sha256 = "8a2a770caa723125241ecf577a32bc6c251a7eedf3b9df71eb5b187bd0b75084"
+queries_sha256 = "b3ea802e4c440611c00ba3e8e9599c9f46186aa3e9f0aed3774ccd76d8ae158e"
+index_sha256 = "a1e1a5079dc90e058e32de74e3553df4b2b14b3e9e1885339eb6316ba2e4910d"
+index_bytes = 13928576
+ingest_ms = 37731.8
+build_ms = 617.1
+enrich_present = false
+
+[[arm]]
+name = "B"
+version = "2.0.0-alpha.7"
+python = "3.11.15"
+install = "pip install -e ../fux"
+corpus = "docs-01000"
+corpus_docs = 1000
+corpus_sha256 = "8a2a770caa723125241ecf577a32bc6c251a7eedf3b9df71eb5b187bd0b75084"
+queries_sha256 = "b3ea802e4c440611c00ba3e8e9599c9f46186aa3e9f0aed3774ccd76d8ae158e"
+index_sha256 = "ed80b2656438444575c36d55714c833d4b937ad61503ecfa6dd4e27c805f85ab"
+index_bytes = 13211224
+ingest_ms = 17345.9
+build_ms = 1030.3
+enrich_present = false
+
+[[arm]]
+name = "A"
+version = "1.0.0"
+python = "3.11.15"
+install = "pip install fux-engine==1.0.0"
+corpus = "docs-02000"
+corpus_docs = 2000
+corpus_sha256 = "b61a3a0f1352a52b137ccb36da437b0bf2a790c03dea8bdac746d2e2b63f2993"
+queries_sha256 = "a1553caee0738a087242950c2be0309a66a795788c42dcbf4090f853671a8ef3"
+index_sha256 = "0269d8cb327a716d4377a9bf2cbf6fb1b95b4e59f1a63caa9e905b23a94d262c"
+index_bytes = 27826549
+ingest_ms = 76128.2
+build_ms = 1138.8
+enrich_present = false
+
+[[arm]]
+name = "B"
+version = "2.0.0-alpha.7"
+python = "3.11.15"
+install = "pip install -e ../fux"
+corpus = "docs-02000"
+corpus_docs = 2000
+corpus_sha256 = "b61a3a0f1352a52b137ccb36da437b0bf2a790c03dea8bdac746d2e2b63f2993"
+queries_sha256 = "a1553caee0738a087242950c2be0309a66a795788c42dcbf4090f853671a8ef3"
+index_sha256 = "e290ac2bfe6db6db11a2faaf09e91c21971841f08b1d7d8f2ca2436947cfea4c"
+index_bytes = 26386990
+ingest_ms = 34709.0
+build_ms = 1865.0
+enrich_present = false
+
+[[arm]]
+name = "A"
+version = "1.0.0"
+python = "3.11.15"
+install = "pip install fux-engine==1.0.0"
+corpus = "docs-05000"
+corpus_docs = 5000
+corpus_sha256 = "92e75010035deb1e9e664cef9545636c9222cf54e3e58df6061b2d7117f18755"
+queries_sha256 = "5a605bd56016e81adfa396d1876399950893956cd222bf98650ba714de509174"
+index_sha256 = "4867372fc1257202e82d54ce5d1a6d35f4dc9cea343649858f2143cccc6b4231"
+index_bytes = 69516232
+ingest_ms = 196914.5
+build_ms = 2758.2
+enrich_present = false
+
+[[arm]]
+name = "B"
+version = "2.0.0-alpha.7"
+python = "3.11.15"
+install = "pip install -e ../fux"
+corpus = "docs-05000"
+corpus_docs = 5000
+corpus_sha256 = "92e75010035deb1e9e664cef9545636c9222cf54e3e58df6061b2d7117f18755"
+queries_sha256 = "5a605bd56016e81adfa396d1876399950893956cd222bf98650ba714de509174"
+index_sha256 = "3caaa2cea27aee0974cce3442cfd5ec395a3337aa836532a8f9cd98f3a23338b"
+index_bytes = 65912339
+ingest_ms = 101072.5
+build_ms = 4496.8
+enrich_present = false
+
+[[arm]]
+name = "A"
+version = "1.0.0"
+python = "3.11.15"
+install = "pip install fux-engine==1.0.0"
+corpus = "docs-10000"
+corpus_docs = 10000
+corpus_sha256 = "0a3dace08a75188b6372d4c4ccd1cd90f0e1b795013b07ec2820eb5b5b14e6d7"
+queries_sha256 = "f93f28c9bf097dcf17c31bf154c18da033c41d32e1023ccb9baaebeeec8450b9"
+index_sha256 = "d90db30cd50685ae7586528ab4f37487d8fa281133a8345a524e504e375c26e6"
+index_bytes = 138960394
+ingest_ms = 445260.8
+build_ms = 10104.4
+enrich_present = false
+
+[[arm]]
+name = "B"
+version = "2.0.0-alpha.7"
+python = "3.11.15"
+install = "pip install -e ../fux"
+corpus = "docs-10000"
+corpus_docs = 10000
+corpus_sha256 = "0a3dace08a75188b6372d4c4ccd1cd90f0e1b795013b07ec2820eb5b5b14e6d7"
+queries_sha256 = "f93f28c9bf097dcf17c31bf154c18da033c41d32e1023ccb9baaebeeec8450b9"
+index_sha256 = "5d6c85ea7353084d92dbc92424e69ad1954dabaf922b395e3165679800b6b97e"
+index_bytes = 131750954
+ingest_ms = 341086.6
+build_ms = 15362.8
+enrich_present = false

@@ -90,6 +90,27 @@ def load(root: Path) -> GraphPlane:
             "run `fux build` to rebuild the derived plane"
         )
 
+    # 🔴 **STALENESS, which this module's docstring and ADR-GRAPH both claimed
+    # was checked and which nothing checked** (W-140 row 5, fixed 2026-09-12).
+    # The version check above catches a plane from a different fux; it says
+    # nothing about a plane built before the last ingest — so `explain`, `graph`
+    # and `path` would answer from edges the committed records no longer have,
+    # confidently and with no warning. A graph verb's whole product is a
+    # relationship, and a relationship read out of a stale plane is wrong in the
+    # one way the reader cannot see.
+    #
+    # `accel.is_fresh` is reused rather than reimplemented: `fux build` writes
+    # this plane and the accelerator in one pass from the same shards, so the
+    # same shard sizes and mtimes invalidate both. A second staleness rule would
+    # be a second thing to drift.
+    from ..derive import accel
+
+    if not accel.is_fresh(root):
+        raise FuxError(
+            f"{path} is stale - the index has changed since `fux build` wrote it. "
+            "Run `fux build` to rebuild the derived plane"
+        )
+
     # Checked against `graph/graph.schema.json` before it is trusted. This is
     # the largest derived structure fux writes and it had NO guard of the
     # DOCS_FIELDS kind -- and unlike the others it is one of

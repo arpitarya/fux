@@ -448,6 +448,14 @@ its value as a **delta between arms**, which decision 12 governs — so grading 
 corpus three ways needs the blind/informed question answered before any number
 from it may be cited.
 
+⚠ **`tools/vector-gate/` was retargeted 2026-09-12 and this record owns it.**
+Its README defaulted `$Q` to `fux-playground`'s goldens; **there is no default
+now**, and the directory carries what the retirement costs: the *retrieval* half
+of the gate cannot be re-run as filed, and `cross_arm.py` — which compares two
+implementations' **vectors** and needs no goldens at all — is the half that can.
+That half then ran on golden data:
+[`2026-09-12-vector-gate-crossarch`](../../work/regression/2026-09-12-vector-gate-crossarch/report.md).
+
 🔴 **And the corpus it was run on is gone.** Every number in this decision was
 produced on `fux-playground`, which [L9](0011_LAW-9-environments.md) made
 Arpit's hands alone on 2026-09-11. **The filed numbers stand exactly as

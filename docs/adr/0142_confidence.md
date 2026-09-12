@@ -8,7 +8,7 @@ date: 2026-08-27
 amended: 2026-08-28
 feature: the confidence plane
 owns: [src/fux/query/confidence.py]
-laws: [1, 3, 4]
+laws: [L1, L3, L4, L9]
 timestamp: 2026-08-27T00:00:00Z
 ---
 
@@ -440,7 +440,9 @@ retrieval width, and it read as the strongest possible separation signal.
 
 **Since W-108 `answer` retrieves `ANSWER_TOP` = 3, the number is real, and it
 demotes.** On the 43 graded playground queries **8 answers moved `grounded` ->
-`weak`** ([the run](../../work/regression/2026-09-05-answer-top3/report.md)).
+`weak`** ([the run](../../work/regression/2026-09-05-answer-top3/report.md)) —
+a corpus [L9](0011_LAW-9-environments.md) retired six days later, so this is a
+filed number and not a repeatable check.
 
 ⚠ **Nothing was traded to get that.** No floor moved — `separation_floor` is a
 `tune.toml` key and decision 13 is untouched. No abstention was implemented;
@@ -473,7 +475,10 @@ one path and not the other.
 why the field was added rather than redefined.
 
 🔴 **The gate is OFF (`DOC_COVERAGE_FLOOR = 0.0`) because the two populations
-overlap.** Measured against the playground's 50 goldens and the 15 decoys:
+overlap.** Measured against the playground's 50 goldens and the 15 decoys —
+⚠ **an instrument [L9](0011_LAW-9-environments.md) retired on 2026-09-11.** The
+numbers stand as measured; **turning this gate on needs a new measurement on a
+golden rung in `fux-lab`**, not a re-run of this one:
 
 | | n | min | median | max |
 |---|---:|---:|---:|---:|

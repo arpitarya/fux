@@ -1822,29 +1822,35 @@ the reason is that the measuring environments are gone.**
 
 *Updated **2026-09-12** (Claude Code, Opus) — maintainer line: this session.*
 
-### IN FLIGHT RIGHT NOW: the benchmark timing sweep (2026-09-12, Claude Code)
+### DONE, not in flight: the benchmark's first run is filed (2026-09-12, Claude Code)
 
-🔴 **`fux-benchmark`'s scan-path latency sweep is RUNNING in the background** —
-`bin/bench.py latency --run 2026-09-12-l9 --corpus docs-NNNNN --path scan`, seven
-corpora, smallest first, 60 queries × (3 warm-up + 10 measured) × 2 arms each.
-**It takes hours**, dominated by `docs-10000` where one `fux ask` is ~4 s.
+**W-139 closed.** [`2026-09-12-benchmark-l9`](regression/2026-09-12-benchmark-l9/report.md)
+— five corpora, two versions, 6 000 timings, 600 ranked lists. What a successor
+should carry from it:
 
-- **Rows land as it goes** in `~/my_programs/fux-benchmark/runs/2026-09-12-l9/rows/`
-  — `latency-<corpus>-scan.csv` and `ranked-<corpus>-scan.jsonl`. A partial
-  sweep is still filable: it is a curve with fewer points, not a broken run.
-- ⚠ **`docs-00100`'s timing is contaminated and must be re-run.** A busy-wait
-  poll loop of mine burned a core during part of it. Re-run that one corpus at
-  the end, on a quiet machine, and use the second set.
-- **`--path fast` was not run.** Time, not a decision. Say so in the report
-  rather than implying the accelerator was measured.
-- **Already established, before any query timing:** arm B (`2.0.0-alpha.7`)
-  ingests ~**2× faster** than arm A (`1.0.0`) at every tier — 37.7 s → 17.3 s at
-  1 000 documents, 445.3 s → 341.1 s at 10 000 — and writes a ~5 % smaller index.
-  That is in `rows/prepare-*.json` and does not depend on the sweep finishing.
+1. **The latency difference between the two majors is a FIXED ~28 ms, and the
+   ratio hides that.** B − A runs 35.7 → 18.9 ms across 200 → 5 000 documents
+   while the ratio collapses 1.32 → 1.02. **Never quote the ratio alone** —
+   *"32 % slower"* is true at 200 documents and meaningless at 5 000. Ingest is
+   the other way round: **B is ~2× faster at every tier to 5 000**, with a ~5 %
+   smaller index.
+2. 🔴 **Two sessions in one `runs/<id>/` destroy each other silently, and the
+   null control cannot see it.** It happened; it cost the 10 000-document pass.
+   `bench.py` now takes an owner lock. **A neighbour under a *different* run id
+   is still unguarded** — timings taken while another benchmark runs are wrong
+   and nothing says so.
+3. **`docs-10000`'s query pass is the one thing owed.** Re-run it under a unique
+   run id: it is the only tier whose ingest ratio departs from 0.46 (0.77), and
+   the query pass that would explain that is the one that was lost.
+4. **`--path fast` has never been timed.** Every number filed is the scan path.
+   A version comparison that measures only the reference path can miss a
+   regression in the shipped fast one entirely.
 
-**The next step after it lands:** `bench.py rankdiff --run 2026-09-12-l9`, then
-`bench.py file --run 2026-09-12-l9 --dest work/regression/2026-09-12-benchmark-l9`,
-then the report + ANALYSIS + a `regression/README.md` row.
+⚠ **A defect I shipped and a peer session caught:** a `⚠` in a shard-error
+message is unencodable in cp1252, so the command would die instead of printing
+the remedy — `tests/test_windows_console_safe.py` had been red on my
+uncommitted tree the whole time. **Run the suite; do not read the code and
+conclude.**
 
 ### 🔴 READ THIS FIRST: `CLAUDE.md` is no longer where a law lives (2026-09-12)
 
