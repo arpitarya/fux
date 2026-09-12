@@ -143,3 +143,29 @@ endpoint measures two different things and averages them.
 
 The inversion count is **key-free**, so that arm is not contaminated by
 [W-145](W-145-codex-regenerates-the-key.md). Anything scored against the key is.
+
+## ✅ SWEPT 2026-09-12 — the candidate table, with no recommendation
+
+Both in-scope knobs were swept on golden data under a new pre-registration that
+**supersedes the frozen `PRE-REGISTRATION-TUNER.md` (T0–T5)** for them, exactly
+as this file said should happen once L9 removed the playground as an instrument:
+[the run](../regression/2026-09-12-priors-and-tables/report.md) §1, [the verdict](../regression/2026-09-12-priors-and-tables/VERDICT-W143.md).
+
+| knob | result |
+|---|---|
+| `superseded_weight` | **No value clears `0 broken`.** `0.9` clears on `rung-00100` and breaks on `rung-seed` (`p07`) and `rung-01000` (`p15`); net +1 |
+| `rerank_weight` | Net **+1** at `rung-01000`, **no effect at any value** on `rung-00100`, breaks one probe on `rung-seed`. The same evidential position the hold already rests on |
+
+- ✅ **The endpoint is named, as this file's 2026-09-12 note required.** The
+  document plane and the passage plane disagree on supersession, so the sweep
+  states that it measures the **document plane** — `fux ask`'s ranked list —
+  and nothing else.
+- ✅ **The playground per-query-rows blocker is moot.** It was blocked on Arpit
+  committing that repo; the measurement moved to golden data and does not need it.
+- 🔴 **Output is a candidate table with NO recommendation**, as the goal states.
+  **Lane is now `arpit`**: a default change is an
+  [ADR-TUNE](../../docs/adr/0135_tuning.md) amendment he ratifies.
+
+⚠ **T3's joint candidate set and T4's latency fence did not run.** Neither is
+answerable while no single candidate survives its own knob, and the latency
+fence belongs in fux-benchmark ([W-139](W-139-benchmark-per-l9.md)) under L9.

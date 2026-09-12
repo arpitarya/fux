@@ -1,3 +1,8 @@
+---
+type: Register
+description: "The ADR register: the convention, the ownership table, and the state of every record."
+---
+
 # ADRs — the decision records
 
 **How to use this file.** This is the register: the naming convention, the
@@ -130,10 +135,12 @@ await never fires, because nobody is waiting** — and a veto keyed to a filenam
 goes stale when the file is renamed, where one keyed to a committed value does
 not.
 
-**A record that restates a cross-cutting principle is a bug.** The project's
-foundational rules live in exactly one place — **ADR-LAWS**. Every other record
-names the law's number in its `laws:` key and moves on. **The paraphrase is what
-drifts.**
+**A record that restates a cross-cutting principle is a bug.** Each law lives in
+exactly one place — **its own `ADR-LAW-n` record**, which `ADR-LAWS` routes to.
+Every other record names the law's number in its `laws:` key and moves on. **The
+paraphrase is what drifts.** ⚠ **The home moved on 2026-09-12** (W-122): it was
+`CLAUDE.md` §Non-negotiable constraints, which now carries a **generated**,
+test-bound view of all ten.
 
 ### Records are kept current by a check, not by good intentions
 
@@ -147,6 +154,9 @@ drifts.**
 | [`tests/test_adr_frontmatter.py`](../../tests/test_adr_frontmatter.py) | the ten keys, their order, the quoting, the title, and the two things a body may not contain |
 | [`tests/test_adr_ownership.py`](../../tests/test_adr_ownership.py) | every component claimed exactly once, every owner resolvable, every number unique within a directory |
 | [`scripts/adr-guard.sh`](../../scripts/adr-guard.sh) | the freshness check as a `commit-msg` hook: `ln -sf ../../scripts/adr-guard.sh .git/hooks/commit-msg` |
+| [`tests/test_claude_md_laws.py`](../../tests/test_claude_md_laws.py) | holds `CLAUDE.md`'s law block byte-equal to the ten `ADR-LAW-n` records, refuses a verbatim third copy in any live document, and checks that `ADR-LAWS` routes every handle. **Deleting this file makes the block an illegal restatement** — ADR-LAW-0 decision 5 |
+| [`scripts/gen-laws.py`](../../scripts/gen-laws.py) | the generator behind it: `--write` regenerates `CLAUDE.md`'s block from the records, `--check` is the test as a command |
+| [`tests/test_adr_config_keys.py`](../../tests/test_adr_config_keys.py) | the key-tree gate — ADR-CONFIG ↔ `config.py` and ADR-TUNE ↔ `tune.py`'s `_SCHEMA`, **both directions**, so *a key is real only if it is in its record's declared block* (ADR-LAW-0 decision 6) |
 
 **The escape hatch is a line reading exactly `no ADR affected` in the commit
 message**, on its own line. **It is not a silent skip — it is a claim, in git
@@ -441,7 +451,7 @@ table does not grant.
 | `tools/refer-bench/` | ADR-REFER | the latency harness and its frozen pre-registration — a real `http.server` behind the **consumer's own generated fetcher**, so the measured path is the shipped one |
 | `tools/refer-budget-sweep/` | ADR-REFER | the assembler-vs-greedy budget sweep and its frozen pre-registration |
 | `tools/differential/` | ADR-T1-ACCELERATOR | the differential-law harness and its bench. ⚠ **No test imports it**, so it can break silently — and has |
-| `tools/quality-controls/` | ADR-RS | the two controls **decision 15 is owed** — a content-free matched-length placebo and a decoy query set. Owned by the record that demands them, not by ADR-CONFIDENCE whose behaviour they test: a control belongs to the measurement discipline, so changing what a control IS updates the rule rather than the feature. ⚠ **The third, the sealed subset, is NOT built** and decision 15 keeps its `NOT BUILT` marker |
+| `tools/quality-controls/` | ADR-RS | **every measurement control**, and the harnesses that run them: the content-free placebo, the decoy query set and the sealed subset (decision 15), plus the three built 2026-09-12 — `priors-probes.jsonl` + `priors_sweep.py` (intent-split probes over declared supersession and archived directories), `heading_control.py` (the rebuilt `heading` control with its own feature-off arm) and `table_flen.py` (the table-`flen` counterfactual). Owned by the record that demands them, not by the records whose behaviour they test: **a control belongs to the measurement discipline, so changing what a control IS updates the rule rather than the feature** |
 | `tools/archived-signal-eval/` | ADR-ARCHIVED-CONTENT | the live-vs-archived contamination instrument, its frozen pre-registration and its query set. Owned by the record whose claim it tests, because this measures a **feature gate** and takes no `R` id |
 | `tools/graph-bench/` | ADR-GRAPH | cost-attribution profiler for the graph lane — not a gate |
 | `tools/quality/` | ADR-QUALITY | the frozen quality contract — the declared query mix and the published cost of an error — **and `goldens.py`, the schema that keeps the rank contract and the relevance set apart** (decision 12). The mix and the cost are a **frozen instrument, not a harness**; `goldens.py` is the one executable thing here, and it exists because decision 12's rules are mechanical: an undeclared relevance list, or a `doc` outside its own relevance set, is refused rather than trusted |
@@ -500,7 +510,7 @@ rows narrowed so far were each verified by reading every mention in the file
 | `src/fux/ingest/sourcelist.py` | ADR-PII | `enrich` on the URL list, resolved through the same three layers as `keep` and `ttl` |
 | `src/fux/config.py` | ADR-PII | `[sources.url] enrich` — the source-wide layer |
 | `src/fux/cli.py::_require_pii_rules,main` | ADR-PII | `_require_pii_rules` and `PII_EXEMPT` — decision 17's refusal, placed before dispatch so a verb added later is gated without knowing it. Owned by ADR-CLI for the verb surface; the rule and its exemptions are this record's |
-| `src/fux/setup.py` | ADR-PII | writes `.fux/pii.toml` from the starter, write-if-missing — the half of decision 17 that makes the refusal fixable. Owned by ADR-DOTFUX for scaffolding |
+| `src/fux/setup.py::run` | ADR-PII | writes `.fux/pii.toml` from the starter, write-if-missing — the half of decision 17 that makes the refusal fixable. Owned by ADR-DOTFUX for scaffolding |
 | `src/fux/store/fuxdir.py` | ADR-PII | `pii.toml`'s row in `COMMITTED_FILES` — **the ruleset is committed, and that is the decision** (decision 1): a redaction rule that lived on a gitignored path would redact one clone and not the next, so the file has to sit in the category `fux doctor` audits. Owned by ADR-DOTFUX for the layout |
 | `src/fux/ingest/urlsrc.py` | ADR-ACQUIRED | retention lives in `fetch_all()` and **never inside a fetcher** (decision 5) — W-86 P8's precedent, so every fetcher gains it with no line changed in any of them. Owned by ADR-FETCHER for the contract itself |
 | `src/fux/ingest/urlsrc.py` | ADR-REFUSAL | the refusal check sits in `fetch_all()`, **after `_unpack` and before persist and decode** (decision 1) — the ordering is the decision, and it lives in a file this record does not own |

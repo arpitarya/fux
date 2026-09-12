@@ -1,0 +1,35 @@
+rung: rung-00100   documents measured: 100
+field weights: {'body': 1.0, 'heading': 3.0, 'title': 2.0, 'path': 1.5, 'ctx': 1.0}
+✅ all 100 documents reproduce the committed flen[body] exactly
+
+documents with ANY table token:               39 (39.0 %)
+documents with table share >= 10%:           34 (34.0 %)   <- the population with headroom
+  table share   median 0.487   max 0.802
+  wlen delta    median 0.326   max 0.576
+
+  the ten most table-heavy documents:
+    0.802 share  Δwlen 0.557  body   106  ext/sibling/00003-ratecard.md
+    0.802 share  Δwlen 0.576  body   106  ext/sibling/00016-ratecard.md
+    0.802 share  Δwlen 0.576  body   106  ext/sibling/00030-ratecard.md
+    0.800 share  Δwlen 0.573  body   105  ext/sibling/00009-ratecard.md
+    0.616 share  Δwlen 0.513  body   164  seed/07-rate-card-and-surcharges.md
+    0.601 share  Δwlen 0.462  body   163  ext/archive/a20-braidwood-rate-card-2023.md
+    0.585 share  Δwlen 0.465  body   193  ext/sibling/a06-braidwood-rate-card-2026.md
+    0.560 share  Δwlen 0.366  body    50  ext/filler/00008-syllabus.md
+    0.549 share  Δwlen 0.361  body    51  ext/filler/00002-syllabus.md
+    0.515 share  Δwlen 0.326  body   103  ext/sibling/00023-notification.md
+
+per-document rows -> work/regression/2026-09-12-priors-and-tables/evidence/tables-rung-00100-documents.json
+
+ranking arms  n=100  avg_wlen 232.3 -> 208.23 without table tokens
+  queries whose TOP-1 changes:    16 / 124
+  queries whose TOP-10 changes:  100 / 124
+  top-1 movers: g005 g021 g024 g035 g063 g065 g068 g078 g083 g086 g089 g097 g100 g116 g117 g123
+  direction: the new top-1 is MORE table-heavy in 14 of 16, less in 1  <- the proposal predicts MORE
+  per-query rows -> work/regression/2026-09-12-priors-and-tables/evidence/tables-rung-00100-ranking.jsonl
+
+prose probes (df==1 term from a table-heavy document's prose): 15
+  hit@1 shipped            15 / 15
+  hit@1 no-table-flen      15 / 15
+  fixed 0   broken 0   discordant 0
+  per-probe rows -> work/regression/2026-09-12-priors-and-tables/evidence/tables-rung-00100-prose-probes.jsonl

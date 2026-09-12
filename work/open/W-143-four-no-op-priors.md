@@ -128,3 +128,37 @@ document plane and the passage plane disagree
 
 ⚠ **This does not answer Arpit's question**; it removes *"cannot run"* as the
 reason it is unanswered.
+
+## ✅ ANSWERED 2026-09-12 — and the answer is **NO**
+
+**[VERDICT-W143](../regression/2026-09-12-priors-and-tables/VERDICT-W143.md).** Arpit's pre-registered question —
+*does ANY single global value clear a `0 broken` bar?* — has run on the corpus
+he ruled should be built for it, and returns the answer this file predicted was
+likelier.
+
+- **26 intent-split probes**, 13 current-seeking / 13 history-seeking, truth read
+  off the `supersedes:` and `archived=true` **declarations** — so **no answer key
+  is involved** and this does not wait on [W-145](W-145-codex-regenerates-the-key.md).
+- **Every value that perfects current-seeking (13/13) dismantles history-seeking**,
+  one probe for one. `recency_half_life_days` at a year or less takes it to **0/13**.
+- **Three candidates appeared to clear and none survives**: each clears on one
+  rung and breaks on another, on a different probe, and each has a net of +1 or
+  +2 against decision 19's floor of 6.
+- **Both directions have headroom**, so this is a measured negative and not
+  decision 22d's Inconclusive — which is exactly what the 2026-09-11 precondition
+  check could not say.
+
+🔴 **The lane is now `arpit`.** This file's own framing was *"agent for the
+remeasure, then back to Arpit with the result"*. The result is back. The three
+options are unchanged and all three are his:
+
+1. **Close the knobs** — option (c), now with evidence rather than an argument.
+2. **Move the mechanism query-side** — a query carries its intent; a document
+   does not. ⚠ **No record has opened this and a session must not open it by
+   implementing it.**
+3. **Leave them at their no-op defaults**, and stop describing them as tunable
+   quality levers.
+
+⚠ **What this does NOT do:** change a default, close a knob, or authorise a
+query-side design. [ADR-TUNE](../../docs/adr/0135_tuning.md) decision 13 carries
+the result; the amendment is his.

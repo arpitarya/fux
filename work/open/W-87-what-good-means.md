@@ -609,3 +609,28 @@ is Claude-authored ([W-145](W-145-codex-regenerates-the-key.md)), so it is *not*
 yet the uncontaminable Part B corpus this item hoped for. It becomes one when
 Codex regenerates the key against the **same frozen ladder** — which is why the
 rungs were committed before the questions were opened.
+
+## 2026-09-12 — one P2 gate is measured; the rest still needs an uncontaminated key
+
+**P2's `unanswerable` gate is measured on real test data.** [The ladder run](../regression/2026-09-12-golden-ladder/report.md)
+§4.1: **0 abstentions of 124 questions, on every one of five rungs**, against 12
+`unanswerable` questions in the key — so `abstain_correct` is **0 of 12** without
+anyone scoring anything. That is the *"engine scores 0/20"* finding restated at
+six times the size, on purpose-built data, and it is the **third** recorded
+occurrence.
+
+⚠ **The band moves and the decision does not** — `weak` reaches 39 of 124, and
+`g004` reports `separation: 0.0` against a floor of `0.1` with
+`answerable: true`. **Whether `weak` should imply `answerable: false` is
+undecided in any record**, which is why the two-strikes gate this owes is still
+unwritten.
+
+**What P2 still owes, and why neither is agent work today:**
+
+- **A clean-corpus `recall@k`** — needs the key, so it waits on W-136 phase 5.
+- **Part B** — ⚠ **the ladder is NOT yet the uncontaminable Part B corpus this
+  item hoped for.** Its key is Claude-authored ([W-145](W-145-codex-regenerates-the-key.md)).
+  It becomes one when Codex regenerates the key against the **same frozen
+  ladder**, which is why the rungs were committed before the questions were opened.
+
+🟡 **Waiting on W-136 phase 5**, not on a ruling and not on an environment.

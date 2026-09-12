@@ -45,3 +45,34 @@ feature-off/on arm or a generator `--selftest` before the headroom may be called
 **proven**, and the 2026-09-12 run declares its own headroom **unproven** for
 exactly that reason. ⚠ **`rung-seed` saturates** — every top-1 is trivially a
 seed path — so a control built there is the 2026-08-28 failure again.
+
+## ✅ REBUILT 2026-09-12 — and the control's premise turns out to be wrong
+
+[The run](../regression/2026-09-12-priors-and-tables/report.md) §2. The control now **counts** rather than testing a
+boolean, and carries its own feature-off arm (`bm25f.heading` 3.0 → 1.0 → 0.0),
+which is what ADR-RS decision 22c(a) asks for.
+
+| heading weight | sibling hits in top-5 | queries with ≥ 1 sibling |
+|---:|---:|---:|
+| 3.0 (shipped) | 256 | 90 / 124 |
+| 1.0 | 265 | 92 / 124 |
+| 0.0 (off) | 258 | 90 / 124 |
+
+Paired over queries: `b = 16`, `c = 21`, **discordant 37, net 5** — below
+decision 19's floor of 6.
+
+🔴 **Headroom is NOT established, and the finding is better than a pass.**
+Switching the heading field off **entirely** barely changes how many
+heading-matched distractors sit in the window. **They are winning on body
+similarity, not on headings** — so C4's premise is unsupported on a corpus built
+specifically to support it, and the saturation was never the whole problem.
+
+**What is owed now, and it is a choice not a task:**
+
+- **re-aim the control** at the mechanism that is operating (body similarity,
+  off arm `bm25f.body`); or
+- **retire it**, and say plainly that C1 and C3 rest on generator assertions —
+  which is what they have rested on since 2026-08-28.
+
+⚠ **Do not lower the floor to make a net of 5 pass.** That is the
+moving-threshold failure in a different costume.

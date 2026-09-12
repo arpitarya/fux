@@ -1,0 +1,17 @@
+rung rung-01000   knob rerank_weight   probes 26 (13 current / 13 history)
+baseline at the shipped default 0.0: 20 / 26 right
+
+   value    right  fixed  broken      cur     hist   verdict
+     0.0   20 / 26      0       0   11 / 13    9 / 13   baseline
+    0.25   21 / 26      1       0   12 / 13    9 / 13   CLEARS 0 broken
+     0.5   21 / 26      1       0   12 / 13    9 / 13   CLEARS 0 broken
+     1.0   21 / 26      1       0   12 / 13    9 / 13   CLEARS 0 broken
+     2.0   21 / 26      1       0   12 / 13    9 / 13   CLEARS 0 broken
+
+HEADROOM, observed, from the rows (ADR-RS decision 22b):
+  improvement — probes not right at the default: 6 / 26
+  regression  — probes right at the default:     20 / 26
+
+🟢 value(s) clearing the 0-broken bar WITH a fix: 0.25, 0.5, 1.0, 2.0
+
+per-probe rows (130) -> work/regression/2026-09-12-priors-and-tables/evidence/sweep-rung-01000-rerank_weight.jsonl

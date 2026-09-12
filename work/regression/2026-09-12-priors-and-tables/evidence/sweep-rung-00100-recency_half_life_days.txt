@@ -1,0 +1,18 @@
+rung rung-00100   knob recency_half_life_days   probes 26 (13 current / 13 history)
+baseline at the shipped default 0.0: 19 / 26 right
+
+   value    right  fixed  broken      cur     hist   verdict
+     0.0   19 / 26      0       0   11 / 13    8 / 13   baseline
+   730.0   14 / 26      2       7   13 / 13    1 / 13   BREAKS 7: p03 p04 p18 p20 p22 p23 p24
+   365.0   13 / 26      2       8   13 / 13    0 / 13   BREAKS 8: p03 p04 p08 p18 p20 p22 p23 p24
+   180.0   13 / 26      2       8   13 / 13    0 / 13   BREAKS 8: p03 p04 p08 p18 p20 p22 p23 p24
+    90.0   13 / 26      2       8   13 / 13    0 / 13   BREAKS 8: p03 p04 p08 p18 p20 p22 p23 p24
+    30.0   12 / 26      2       9   12 / 13    0 / 13   BREAKS 9: p03 p04 p08 p18 p20 p22 p23 p24 p25
+
+HEADROOM, observed, from the rows (ADR-RS decision 22b):
+  improvement — probes not right at the default: 7 / 26
+  regression  — probes right at the default:     19 / 26
+
+🔴 NO single global value clears the 0-broken bar. Every value that fixes a probe breaks another, which is the pre-registered answer NO — and it is a result, not a failed run.
+
+per-probe rows (156) -> work/regression/2026-09-12-priors-and-tables/evidence/sweep-rung-00100-recency_half_life_days.jsonl

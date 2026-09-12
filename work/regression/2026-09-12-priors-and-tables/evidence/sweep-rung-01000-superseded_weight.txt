@@ -1,0 +1,19 @@
+rung rung-01000   knob superseded_weight   probes 26 (13 current / 13 history)
+baseline at the shipped default 1.0: 20 / 26 right
+
+   value    right  fixed  broken      cur     hist   verdict
+     1.0   20 / 26      0       0   11 / 13    9 / 13   baseline
+     0.9   19 / 26      0       1   11 / 13    8 / 13   BREAKS 1: p15
+    0.75   17 / 26      0       3   11 / 13    6 / 13   BREAKS 3: p03 p08 p15
+     0.5   16 / 26      0       4   11 / 13    5 / 13   BREAKS 4: p03 p04 p08 p15
+    0.25   16 / 26      0       4   11 / 13    5 / 13   BREAKS 4: p03 p04 p08 p15
+     0.1   16 / 26      0       4   11 / 13    5 / 13   BREAKS 4: p03 p04 p08 p15
+     0.0   16 / 26      0       4   11 / 13    5 / 13   BREAKS 4: p03 p04 p08 p15
+
+HEADROOM, observed, from the rows (ADR-RS decision 22b):
+  improvement — probes not right at the default: 6 / 26
+  regression  — probes right at the default:     20 / 26
+
+🔴 NO single global value clears the 0-broken bar. Every value that fixes a probe breaks another, which is the pre-registered answer NO — and it is a result, not a failed run.
+
+per-probe rows (182) -> work/regression/2026-09-12-priors-and-tables/evidence/sweep-rung-01000-superseded_weight.jsonl

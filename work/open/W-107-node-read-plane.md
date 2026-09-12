@@ -2,7 +2,7 @@
 type: OpenItem
 id: W-107
 title: "W-107 — the Node read plane: ask / find / answer / explain / graph / path / mcp from Node.js, zero dependencies, byte-equal to Python"
-description: "A read-only port of the seven query verbs to one ESM file (npm: fux-search) so a Node-only host reads an index Python wrote. Four phases behind a pre-registered third arm of the differential law. Phase 0 CLOSED 2026-09-06: Arpit ruled option (b), scores equal after round(9) and ordering byte-equal; measured on darwin and glibc, with idf's argument domain enumerated exhaustively."
+description: "A read-only port of the seven query verbs to Node so a host with no Python reads an index Python wrote. Published to npm as fux-engine, invoked as `fux`, and vendored into .fux/fux.mjs by `fux setup` so a fresh clone needs nothing installed. Behind it, one shared API surface — `fux.api` in Python, the same methods in Node — so both readers and the CLI call one implementation. Four phases behind a pre-registered third arm of the differential law. Phase 0 CLOSED 2026-09-06; naming, placement and the API seam RULED 2026-09-12."
 status: open
 lane: agent
 timestamp: 2026-09-04T00:00:00Z
@@ -20,12 +20,364 @@ the pre-registration exists; Opus owns every gate.
 [`../proposals/search-v3.md`](../proposals/search-v3.md) §6 (design), §8
 (plan), §9.6 (mechanics). Nothing below restates a bar.
 
+⚠ **search-v3 §6.4 says `fux-search` and one ESM file. Both are superseded by
+§Rulings below** — the proposal is `graduated` and is not rewritten; this file
+is the live spec where they disagree.
+
 ## Goal
 
-`npx fux-search ask|find|answer|explain|graph|path|mcp` on a repo whose index
-Python committed, with **no Python on the host**, producing what Python
-produces: same ids, order, locs, headings, band; scores equal after
-`round(9)`; `graph.json` digest equal.
+`fux ask|find|answer|explain|graph|path|mcp` on a repo whose index Python
+committed, with **no Python on the host**, producing what Python produces: same
+ids, order, locs, headings, band; scores equal after `round(9)`; `graph.json`
+digest equal.
+
+---
+
+## Rulings — 2026-09-12 (Arpit)
+
+### R1 · Names
+
+| thing | name | why not the alternative |
+|---|---|---|
+| npm package | **`fux-engine`** | `fux` is taken on npm (a 2016 UI library — search-v3 §6.4 found this), so `npx fux` fetches someone else's package. `fux-engine` is free **and is already the PyPI name**, so the product has one name in both registries instead of two. |
+| the command | **`fux`** | `bin: { "fux": "./fux.mjs" }`. The package name and the command name are different things; the command is what a person types. |
+| the vendored file | **`.fux/fux.mjs`** | written by `fux setup`, see R2 |
+| the source tree | **`node/`** | in this repo, so the goldens, the harness and CI see it |
+
+**Invocations, all four supported:**
+
+```console
+$ node .fux/fux.mjs find rollback     # a fresh clone, nothing installed
+$ .fux/fux find rollback              # the shim setup writes beside it
+$ npx fux-engine find rollback        # one bin, so npx resolves it
+$ fux find rollback                   # after `npm i -g fux-engine`
+```
+
+`npx -p fux-engine fux find …` is the explicit form for a script that wants no
+ambiguity.
+
+### R1a · The PATH collision, and the three things that make it safe
+
+`npm i -g fux-engine` puts a `fux` on PATH **beside Python's `fux`, with a
+different verb set.** Whichever resolves first wins, so `fux ingest` can answer
+*"this only reads"* on a machine where Python fux is installed and would have
+worked. Not hypothetical; it is what two binaries of the same name means.
+
+1. **`--version` names the runtime.** `fux 2.0.0-alpha.7 (node 22.9.0)` versus
+   `fux 2.0.0-alpha.7 (python 3.13.1)`. One word, and no bug report is ever
+   ambiguous again. **This is the highest-value line in the whole item.**
+2. **An unsupported verb signposts rather than erroring.**
+   `error: `ingest` writes the index — this is fux-engine (node), which only
+   reads. Install Python fux and run `fux ingest`, or see .fux/README.md.`
+   A person typing that has a specific wrong model and deserves the specific
+   correction, not `unknown command`.
+3. **`fux doctor` (Python) gains a row** when a node `fux` resolves first on
+   PATH — reported by the half that can report it.
+
+⚠ **Inside a repo there is no collision at all**, because the call is
+`node .fux/fux.mjs`. The shadowing exists only for the opt-in global install.
+**No global bin ships in the first npm release**; the library export and the
+vendored copy cover both real use cases, and the bin is added once someone
+asks for it.
+
+### R2 · `.fux/fux.mjs` — committed, engine-owned, OVERWRITTEN
+
+`fux setup` writes the reader into the consumer's `.fux/`, and **`ensure_layout`
+rewrites it whenever the engine version differs.** It is **not**
+write-if-missing.
+
+**Why committed and not gitignored.** The audience is a host with no Python. A
+gitignored copy can only be regenerated by the Python that is, by construction,
+not there — so gitignoring it withholds the file from exactly the person it is
+for. Committing extends the README's existing *clone and ask* promise from the
+index to the reader.
+
+**The size objection does not survive measurement** (this repo, 2026-09-12):
+
+| | |
+|---|---|
+| `.fux/index/` | **9.6 MB**, 253 shards |
+| `.fux/decoders/` — already committed, already vendored engine code | **280 KB** |
+| `.fux/fux.mjs` — projected | **~200 KB** |
+
+**2 % of the index, and smaller than the vendored Python already sitting beside
+it.**
+
+🔴 **Why NOT write-if-missing, in one piece of evidence from this tree.**
+`.fux/decoders/` is write-if-missing, and the `doc`-suffix rename
+(`csvdoc` → `csv`, 2026-09-06) shipped **with no migration**: a repo set up
+before it still holds stale `<name>doc.py` files that claim the same extensions
+and **win**. `tests/test_orphaned_modules.py` catches the shipped half and
+nothing reaches a consumer's directory. Same mechanism here, worse outcome — a
+stale `fux.mjs` against a bumped `_format` is a **wrong answer**, not an old
+preference, and nobody edits a vendored reader, so there is no consumer edit to
+protect.
+
+**The payoff is structural:** the copy in `.fux/` is always written by the
+Python that wrote the index, so **a `_format` mismatch cannot happen.** That is
+stronger than npm, where the consumer picks versions independently.
+
+**This is a fourth shape under [ADR-DOTFUX](../../docs/adr/0102_fux-directory.md),
+and that record is amended in the same change:**
+
+| shape | examples | rule |
+|---|---|---|
+| committed, **consumer-owned** | `fetchers/` `decoders/` `*.toml` | write-if-missing — a consumer's edit survives |
+| committed, **engine-owned, annotatable** | `README.md` `.gitignore` | write-if-missing — a consumer annotates them |
+| committed, **engine-owned, vendored** | **`fux.mjs`**, **`fux`** | **overwritten on a version difference** ← new |
+| derived / acquired | `runtime/` `acquired/` | gitignored |
+
+`fux doctor` reports the drift it can still see:
+*`.fux/fux.mjs` is 2.0.0-alpha.4; the engine is alpha.7 — run `fux setup`.*
+
+### R3 · One API, three surfaces — and it ships FIRST
+
+**Arpit, 2026-09-12: Python must be able to import these functions too, the
+same way the npm package can.**
+
+Today `cmd_ask(args)` takes an argparse `Namespace`, prints to stdout and
+returns an exit code. It cannot be called from Python without faking a
+Namespace and capturing stdout — which is why
+[`.fux/README.md`](../../.fux/README.md) has to say *"the CLI is the contract;
+the modules are not."*
+
+```python
+from fux import open as fux_open
+
+ix = fux_open(".")                        # find_root, gate, tune, output — once
+ix.find("rollback", top=5)                # -> list[Result]
+ix.ask("how do we roll back a release")   # -> AskResult(results, confidence)
+ix.answer("what is the RTO")              # -> Answer(passages, citation, freshness)
+ix.explain("file:docs/x.md"); ix.graph(q); ix.path(a, b)
+```
+
+```js
+import { open } from 'fux-engine'
+const ix = await open('.')
+await ix.find('rollback', { top: 5 })
+```
+
+**Same method names, same argument names, same return shape as the `--json`
+payload.** Three consequences, and the third is why this goes first:
+
+1. **[`output.schema.json`](../../src/fux/query/output.schema.json) becomes the
+   contract for three surfaces** — CLI JSON, Python objects, Node objects — not
+   one. One schema file, already written, already validated at the boundary.
+2. **The differential arm can compare library calls, not subprocess stdout.**
+   That removes the `ensure_ascii` and float-repr noise in H2 from the arm
+   entirely: those are *printing* defects, and the arm stops testing printing.
+3. 🔴 **It makes the port transcribable.** Right now
+   [`query/__init__.py`](../../src/fux/query/__init__.py) is **1 481 lines**
+   with computing and printing interleaved. After the seam, `cmd_ask` is
+   `print(render(api.ask(...)))` and the Node target is the pure half.
+   **Porting the current shape means refactoring twice.**
+
+⚠ **The cost, stated: a public Python API is a new frozen surface.** Once
+`from fux import open` is documented it cannot churn — it needs its own record
+(**ADR-API**, new) and it joins what L0 keeps true. This is a commitment, not a
+free win.
+
+**Sequencing:** the seam lands as **Phase 1a, before any `node/` file is
+written.**
+
+### R4 · `node/` is many files, not one
+
+search-v3 §6.4 says *one ESM file*. **Superseded**, because Phase 4 requires a
+freshness test mapping *each Python module to its Node twin* — which needs more
+than one file — and because a 6 000-line `.mjs` is unreviewable.
+
+**The rule that makes Phase 4 cheap: same relative path, same stem, one Node
+file per Python module.** Then the twin map is derived, not hand-maintained.
+
+```
+node/
+  package.json              no `dependencies` key at all — absent, not empty
+  README.md
+  fux.mjs                   #!/usr/bin/env node — argv + dispatch, nothing else
+  src/
+    index.mjs               the library export: `open()`
+    api.mjs                 ← src/fux/api.py            (R3's twin)
+    config/root.mjs         ← src/fux/config.py         (find_root only)
+    config/toml.mjs         ← (no twin) the TOML subset
+    hash/blake2b.mjs        ← (no twin) RFC 7693, 32-bit halves
+    store/format.mjs        ← src/fux/store/format.py
+    store/reader.mjs        ← src/fux/store/reader.py
+    query/tokenize.mjs      ← src/fux/query/tokenize.py
+    query/stem.mjs          ← src/fux/query/stem.py
+    query/analyzer.mjs      ← src/fux/query/analyzer.py
+    query/bm25f.mjs         ← src/fux/query/bm25f.py
+    query/rank.mjs          ← src/fux/query/rank.py
+    query/scan.mjs          ← src/fux/query/scan.py
+    query/confidence.mjs    ← src/fux/query/confidence.py
+    query/{headings,expand,fuse,rerank,provenance}.mjs
+    refer/{chunk,rescore,assemble}.mjs   ← src/fux/refer/_*.py
+    graph/{community,model,plane,walk}.mjs
+    ingest/priors.mjs       ← src/fux/ingest/priors.py  (recency + priority only)
+    compat/pyfloat.mjs      ← (no twin) repr layout + round-half-even
+    compat/pyjson.mjs       ← (no twin) ensure_ascii dumps, for the receipt digest
+    verbs/{find,ask,answer,explain,graph,path,mcp}.mjs
+  test/vectors/             RFC 7693 App. A · Porter voc.txt / output.txt
+```
+
+**`compat/` and `hash/` have no Python twin and are declared exempt in the
+ownership table.** That list is short, visible, and is exactly where the
+divergence risk concentrates — which is the point of naming it rather than
+letting it be an unexplained gap.
+
+**One deliberate deviation:** `query/__init__.py` splits into `verbs/*.mjs`,
+because it is seven verbs plus plumbing and the twin map records that
+one-to-many edge explicitly.
+
+**`package.json`:**
+
+```json
+{
+  "name": "fux-engine",
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "bin": { "fux": "./fux.mjs" },
+  "exports": { ".": "./src/index.mjs" },
+  "files": ["fux.mjs", "src", "README.md"]
+}
+```
+
+No `dependencies` key **at all** — absent rather than `{}`, so it cannot grow
+one by accident. No `scripts.build`: a build step is a dependency.
+
+### R5 · The read path, fixed
+
+```
+findRoot(cwd)                   walk up for fux.toml or .git       ← same as Python
+.fux/pii.toml                   stat only — the gate, see O1
+.fux/output.toml                folded into args once, same precedence
+.fux/tune.toml                  absent = defaults; malformed = hard error
+.fux/sources/dirs               the archived set
+.fux/index/{00..ff}.jsonl       line 0 = header → REFUSE unless
+                                  _format "fux.index.v2" and analyzer "v2"
+                                lines 1..n = Buffer.indexOf('"<16hex>"'),
+                                  JSON.parse ONLY on a hit
+rank() → emit
+```
+
+Three things in there are load-bearing:
+
+- 🔴 **Read each shard as a `Buffer`, never as a string.** Python's scan
+  regex-matches `flen`/`mtime` and substring-matches the term hash against
+  **raw bytes**, parsing a line only on a hit.
+  `readFileSync().toString().split("\n")` allocates ~10 MB of UTF-16 per query
+  at 10 000 documents and is how **N4's 150 ms fence gets blown by a
+  transcription that is otherwise correct.**
+- **The header is a refusal, not a hint.** A v1 shard silently mixed into a v2
+  read corrupts every `df` and is undetectable at query time. Refuse, naming
+  both versions.
+- **Nothing under `.fux/runtime/` is read.** The graph plane is rebuilt in
+  memory and must hash to Python's `graph.json`; the accelerator is out of
+  scope entirely.
+
+### R6 · The command surface, and what is absent
+
+```
+fux find   <query>  [--json] [--top N] [--under DIR] [--phrase P] [--all]
+fux ask    <query>  [--json] [--top N] [--band] [--explain] [--expand TERMS] [-q Q]...
+fux answer <query>  [--json] [--band] [--no-refer] [--audit] [--receipt]
+fux explain <doc-id>
+fux graph  <query>  [--hops N]
+fux path   <a> <b>  [--hops N]
+fux mcp
+fux --version
+```
+
+| absent | why |
+|---|---|
+| `ingest` `build` `add` `remove` `update` `enrich` `setup` | they write, or need a decoder, or need a fetcher |
+| `doctor` | it reports on a tree Node cannot fully see |
+| `--fast` / `--scan` | no Node accelerator; the scan is the only path, so a flag selecting it is a lie |
+| `--journal` | it writes |
+| `--cache-ttl` | Node never fetches, so there is nothing to cache |
+| `verify` | reproducing a receipt needs the digest path — Phase 2 earns it |
+
+**`answer` on a `url:` document** reads `.fux/acquired/` if the blob is there
+(→ `as-ingested`), else falls back to `source: "index"`. It never emits
+`current` or `stale`, because it never looked. **That asymmetry with Python is
+a decision in ADR-NODE-SEARCH, not a footnote.**
+
+---
+
+## Hazards found 2026-09-12 — each unmeasured before this reading
+
+### H1 🔴 The `id` tie-break is a string comparison, and the two runtimes disagree
+
+The sort key ends in `id`. **Python compares strings by Unicode code point; JS
+`<` compares by UTF-16 code unit.** These differ above U+FFFF — a surrogate
+pair sorts *below* U+E000–U+FFFF in JS and *above* in Python. One document id
+carrying an emoji or a rare CJK extension character and **the ordering
+assertion — the one [PRE-REG-NODE](../benchmark/PRE-REGISTRATION-NODE.md) §2
+calls non-negotiable — silently fails.**
+
+**Phase 0 measured `log`. Nobody measured the tie-break.**
+
+- **Fix:** a code-point comparator in Node (iterate code points, not units).
+- **Pin:** the differential corpus gains a document whose id contains a
+  character above U+FFFF, deliberately, so the arm would catch a regression.
+
+### H2 🟠 `--json` is emitted with `ensure_ascii=True`
+
+[`query/__init__.py`](../../src/fux/query/__init__.py) prints
+`json.dumps(payload, indent=2)` — Python's default escapes every non-ASCII
+character as `\uXXXX`; `JSON.stringify` emits it raw.
+
+**So "byte-equal" in PRE-REG-NODE §2 is only meaningful on *parsed field
+values*, never on raw stdout** — and this repo's own corpus is full of
+em-dashes, so a byte diff fails on query one. **The frozen pre-registration is
+ambiguous on this point and cannot be edited**; the superseding one (O3) states
+it, and the harness compares parsed values.
+
+⚠ **One place it is genuinely byte-level and does not go away:**
+`provenance.py:534` computes the **receipt digest** over
+`json.dumps(payload, sort_keys=True, separators=(",", ":"))` — also
+`ensure_ascii=True`. Node must reproduce Python's escaping exactly or every
+receipt sha diverges. Hence `compat/pyjson.mjs`.
+
+**Not a hazard, checked:** the committed index is written with
+`ensure_ascii=False` ([`store/canonical.py`](../../src/fux/store/canonical.py)),
+so the shards are raw UTF-8 and read identically in both runtimes.
+
+### H3 🔴 The frozen pre-registration is voided in part by L9
+
+[PRE-REG-NODE](../benchmark/PRE-REGISTRATION-NODE.md) §4 names
+`fux-playground` as a corpus and **N3** says *"every distinct term of the
+playground index"*. [L9](../../docs/adr/0011_LAW-9-environments.md) makes the
+playground **Arpit's hands only — no agent, no test, no number.**
+
+**A frozen pre-registration is never edited.** It is superseded (O3). The
+**build** (Phases 1a–4) is unaffected and starts now; **no arm may be called
+green** until the superseding document exists on lab golden data, which waits
+on W-136 phase 2. Tracked in [W-138](W-138-reconcile-with-l9.md).
+
+### H4 — carried from the original filing
+
+- 🔴 **A port that "improves" anything has diverged.** Every difference is a
+  defect until the pre-registration says otherwise.
+- `math.log`: settled by Phase 0 — 655/100 000 on darwin, 722/100 000 on
+  glibc, every one a single ulp, **none surviving `round(9)`**.
+- Truncated `blake2b512` is **not** BLAKE2b-8 — the parameter block puts the
+  digest length in the IV. Hand-roll RFC 7693 and test it.
+- `Number(x.toFixed(9))` is half-up on exact binary ties; Python is half-even.
+  Detect ties via `toFixed(20)`.
+- A `_format` bump in Python without a Node release breaks every Node clone —
+  **R2's overwrite-on-version-difference is the guard**, and the npm copy still
+  needs the version policy.
+- `node/` must have **no** `package.json` dependencies; a build step is a
+  dependency.
+
+---
+
+## Build order
+
+**Harness before code.** This is a ~5 000-line transcription where a wrong last
+bit is invisible until something fires, so the first commit is the thing that
+catches lies, and it passes trivially (Python vs Python) before any `node/`
+file exists.
 
 ## Phase 0 — the `log()` decision (Arpit)
 
@@ -93,83 +445,131 @@ produces: same ids, order, locs, headings, band; scores equal after
       created — owed at Phase 4, **as a link to ADR-RANKING 8a, never a second
       statement of the rule** (L0).
 
-## Phase 1 — `find`
+## Phase 1a — the API seam (Python), BEFORE any `node/` file
 
-- [ ] `node/fux-search.mjs`: BLAKE2b (RFC 7693, 32-bit halves, digest sizes
-      1/8/20; pinned against Python `hashlib` and RFC Appendix A); analyzer
-      (`_WORD_RE`, `_BOUNDARY_RE`, stopwords, `split_identifier`, Porter with
-      `should_stem`); shard reader that refuses unknown `_format`/`analyzer`;
-      BM25F `score_record`/`derive_wlen`; `Weighting` incl. recency
-      (`ingest/priors.py`) and priority; TOML subset reader; `round(9)`
-      half-even shim; Python-`repr` float formatter; sort on the exact key.
-- [ ] Pinned by: hash test vectors; **every distinct term of the playground
-      index analyzed both sides**; Porter `voc.txt`/`output.txt`;
-      `find --json` over all goldens on both corpora, 0 discordant.
+- [ ] `src/fux/api.py` — `open(root=".") -> Index`; `Index.find/ask/answer/
+      explain/graph/path`, each returning a dataclass whose `as_dict()` is the
+      `--json` payload and validates against `output.schema.json`.
+- [ ] `src/fux/query/__init__.py`'s `cmd_*` become **renderers**:
+      `print(render(api.ask(...)))`. No behaviour change — the differential
+      harness's Python-vs-Python arm proves it.
+- [ ] `src/fux/__init__.py` re-exports `open`. `ADR-API` (new) freezes the
+      surface and states what is NOT in it (anything that writes).
+- [ ] `.fux/README.md`'s *"the CLI is the contract; the modules are not"*
+      becomes *"the CLI and `fux.api` are the contract"* — and the Python
+      example in *Calling fux from a script* gains the in-process form beside
+      the subprocess one.
+
+## Phase 1b — the harness
+
+- [ ] `tools/differential/node_arm.py` — run both readers over one corpus,
+      compare **per PRE-REG-NODE §2's field table on PARSED values** (H2),
+      print the first discordant row with both sides. Green Python-vs-Python
+      before `node/` exists.
+- [ ] The corpus gains a document whose id contains a character above U+FFFF
+      (H1) and one whose heading contains non-ASCII (H2).
+
+## Phase 1c — `find`, as a thin vertical slice first
+
+**One query, one document, end to end before any breadth**: hash → analyze →
+read one shard → score → emit. That flushes out H1, H2 and the `round(9)` shim
+while there are 200 lines to debug rather than 2 000.
+
+- [ ] `hash/blake2b.mjs` (RFC 7693, 32-bit halves, digest sizes 1/8/20; pinned
+      against Python `hashlib` **and** RFC Appendix A).
+- [ ] `query/{tokenize,stem,analyzer}.mjs` — identifier split before
+      lowercasing, the boundary regex, stopwords, Porter with `should_stem`.
+- [ ] `store/{format,reader}.mjs`, `query/{scan,bm25f,rank}.mjs`,
+      `ingest/priors.mjs`, `config/{root,toml}.mjs`,
+      `compat/pyfloat.mjs` (`round(9)` half-even + Python `repr` layout).
+- [ ] **The comparator uses code points, not `<`** (H1).
+- [ ] `verbs/find.mjs`, `fux.mjs`, `src/index.mjs`, `package.json`.
+- [ ] **N4's shape measured on this slice at 10 000 documents** — not its bar,
+      its shape. A p95 discovered at Phase 3 is a rewrite; discovered here it
+      is a morning.
+
+**Phase 1 gate: N0 + N3.**
 
 ## Phase 2 — `ask` + `answer`
 
+- [ ] `query/{confidence,headings,expand,fuse,rerank,provenance}.mjs`;
+      `refer/{chunk,rescore,assemble}.mjs`; `compat/pyjson.mjs` for the receipt
+      digest (H2).
 - [ ] Display title (no cache ⇒ Python's no-cache fallback), W-84 headings,
-      confidence block, `--why`; chunker (`refer/_chunk.py`), rescore (with
-      W-108's proximity once landed), assemble, receipt; `answer` on `url:`
-      reads `.fux/acquired/` or returns `source: index`. **Never fetches.**
-- [ ] `output.schema.json` validated in Node too (same file).
+      the confidence block, `--why`; the rescore **with** W-108's proximity
+      multiplier and per-passage locators. **Never fetches** — `answer` on a
+      `url:` document reads `.fux/acquired/` or returns `source: index`, so the
+      URL-keyed fetcher dispatch has **no Node twin** (R6).
+- [ ] `output.schema.json` validated in Node too — the same file, not a copy.
+
+**Phase 2 gate: N1.**
 
 ## Phase 3 — graph + `mcp`
 
-- [ ] `edges_from_records` → label propagation (`graph/community.py`,
-      determinized) → PPR-lite / routes; in-memory plane digest equals
-      Python's `graph.json` on both corpora.
+- [ ] `edges_from_records` → label propagation (determinized) → PPR-lite /
+      routes; the in-memory plane digest equals Python's `graph.json` on both
+      corpora.
 - [ ] MCP: newline-delimited JSON-RPC on stdio, `initialize` →
       `notifications/initialized`, `tools/list`, `tools/call`, `ping`; tool
-      descriptions loaded from one shared JSON that `src/fux/mcp.py` also
-      reads (a new file; ADR-MCP amended).
+      descriptions from **one shared JSON that `src/fux/mcp.py` also reads** (a
+      new file; ADR-MCP amended).
+
+**Phase 3 gate: N2.**
 
 ## Phase 4 — ship
 
-- [ ] `ADR-NODE-SEARCH` (new): owns `node/`; decisions on the `_format`
-      version policy, the never-fetch rule, the shared tool-description file.
-- [ ] Ownership table + `tests/test_adr_ownership.py`; the freshness test
-      maps each Python module to its Node twin.
-- [ ] CI matrix Node 20/22 × ubuntu/macos(arm64)/windows; the differential
-      arm runs on every push.
-- [ ] npm `fux-search` published; README front door; CHANGELOG.
+- [ ] **`fux setup` writes `.fux/fux.mjs` + `.fux/fux`** per R2 —
+      **overwritten on a version difference, not write-if-missing** — and
+      `fux doctor` gains the drift row. **ADR-DOTFUX amended** with the fourth
+      shape.
+- [ ] **`ADR-NODE-SEARCH`** (new): owns `node/`; decisions on the `_format`
+      version policy, the never-fetch rule, the `url:`-verdict asymmetry, the
+      shared tool-description file, and the `compat/`+`hash/` twin exemption.
+- [ ] Ownership table + `tests/test_adr_ownership.py`; the freshness test maps
+      each Python module to its Node twin **derived from the path rule** (R4),
+      with the exemption list as the only hand-maintained part.
+- [ ] `--version` names the runtime; unsupported verbs signpost; the Python
+      `doctor` PATH row (R1a).
+- [ ] CI matrix Node 20/22 × ubuntu/macos(arm64)/windows; the differential arm
+      on every push. ⚠ `log-probe.yml` is still **unrun** — musl, Windows and
+      Node 20 are unmeasured.
+- [ ] npm **`fux-engine`** published, **no global bin in the first release**
+      (R1a); README front door; CHANGELOG.
 - [ ] `IMPLEMENTATION.md` row; this file to `archive/open/`.
 
 ## Blockers
 
 - ~~`arpit`: ratification~~ — **ratified 2026-09-05.**
 - ~~🔴 `arpit`: the Phase 0 `log()` pick~~ — **ruled 2026-09-06: (b),
-  tolerance at `round(9)`.** The pre-registration is frozen in full.
-  ▶ **Nothing blocks Phases 1–4. Phase 1 starts.**
-- ~~W-108 should land first so Phase 2 ports one rescore, not two~~ —
-  **W-108 landed 2026-09-05.** Phase 2 ports the rescore **with** its proximity
-  multiplier, per-passage locators, and the URL-keyed fetcher dispatch. ⚠ Node
-  never fetches, so the dispatcher has **no Node twin**: `answer` on a `url:`
-  document reads `.fux/acquired/` or returns `source: index`.
+  tolerance at `round(9)`.**
+- ~~W-108 should land first~~ — **landed 2026-09-05.**
+- ~~🔴 `arpit`: naming, placement, and whether Python gets an importable
+  surface~~ — **ruled 2026-09-12, R1–R6 above.**
+- 🟡 **H3 — no arm is green until the superseding pre-registration exists**,
+  which waits on W-136 phase 2 for lab golden data. **The build is not
+  blocked.**
 
-## Hazards
+▶ **Nothing blocks Phase 1a. It starts.**
 
-- 🔴 **A port that "improves" anything has diverged.** Every difference is a
-  defect until the pre-registration says otherwise.
-- 🔴 `math.log`: 1 095 / 100 000 last-ulp disagreements measured (V8 fdlibm
-  vs glibc 2.39); macOS libm is a third answer. Phase 0 exists because of
-  this; do not skip it. **Re-measured 2026-09-05 on Apple libm vs
-  V8/darwin-arm64: 655 / 100 000, all one ulp, none surviving `round(9)`** —
-  the hazard is confirmed as a property of `log` and **quantified as seven
-  orders of magnitude below the sort key's resolution.**
-- Truncated `blake2b512` is **not** BLAKE2b-8 (parameter block). Test it.
-- `Number(x.toFixed(9))` is half-up on exact binary ties; Python is
-  half-even. Detect ties via `toFixed(20)`.
-- A `_format` bump in Python without a Node release breaks every Node
-  clone — version policy is the guard.
-- `node/` must have **no** `package.json` dependencies; a build step is a
-  dependency.
+## Open questions for Arpit — neither blocks Phase 1a
+
+- **O1 · Does Node enforce the `.fux/pii.toml` gate?** Python refuses every
+  non-exempt verb without it ([ADR-PII](../../docs/adr/0150_pii.md) decision
+  17). **Recommend: yes, identically** — the gate exists because the index is
+  redacted, and a Node reader that answers where Python refuses is a divergence
+  in the *product*, not just in the code. The decision is Python-side today and
+  someone must extend it.
+- **O2 · Is `fux.api` public at 1.0, or marked provisional through alpha?**
+  R3's cost is that it freezes. Provisional buys room and costs the promise.
+- **O3 · Who writes `PRE-REGISTRATION-NODE-2`?** It supersedes rather than
+  edits (H3), moves the corpora to lab golden data, and states H2's
+  parsed-not-bytes comparison. Owed before any arm is reported.
 
 ## Out of scope
 
-`ingest`, `build`, `add/remove/update`, `enrich`, `embed`, `doctor`,
-`setup`, the accelerator, any fetcher. A Node-side cache (`--fast`) until
-the scan p95 is measured at 10 000 documents.
+`ingest`, `build`, `add/remove/update`, `enrich`, `embed`, `doctor`, `setup`,
+the accelerator, any fetcher. A Node-side cache (`--fast`) until the scan p95
+is measured at 10 000 documents.
 
 ## From OPEN-WORK (moved 2026-09-11)
 

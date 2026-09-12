@@ -1,0 +1,19 @@
+rung rung-seed   knob archived_weight   probes 26 (13 current / 13 history)
+baseline at the shipped default 1.0: 21 / 26 right
+
+   value    right  fixed  broken      cur     hist   verdict
+     1.0   21 / 26      0       0   12 / 13    9 / 13   baseline
+     0.9   21 / 26      0       0   12 / 13    9 / 13   0 broken, 0 fixed — no effect
+    0.75   20 / 26      0       1   12 / 13    8 / 13   BREAKS 1: p20
+     0.5   18 / 26      0       3   12 / 13    6 / 13   BREAKS 3: p20 p22 p24
+    0.25   16 / 26      0       5   12 / 13    4 / 13   BREAKS 5: p18 p20 p22 p23 p24
+     0.1   16 / 26      0       5   12 / 13    4 / 13   BREAKS 5: p18 p20 p22 p23 p24
+     0.0   16 / 26      0       5   12 / 13    4 / 13   BREAKS 5: p18 p20 p22 p23 p24
+
+HEADROOM, observed, from the rows (ADR-RS decision 22b):
+  improvement — probes not right at the default: 5 / 26
+  regression  — probes right at the default:     21 / 26
+
+🔴 NO single global value clears the 0-broken bar. Every value that fixes a probe breaks another, which is the pre-registered answer NO — and it is a result, not a failed run.
+
+per-probe rows (182) -> work/regression/2026-09-12-priors-and-tables/evidence/sweep-rung-seed-archived_weight.jsonl

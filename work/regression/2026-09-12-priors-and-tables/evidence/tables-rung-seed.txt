@@ -1,0 +1,32 @@
+rung: rung-seed   documents measured: 20
+field weights: {'body': 1.0, 'heading': 3.0, 'title': 2.0, 'path': 1.5, 'ctx': 1.0}
+✅ all 20 documents reproduce the committed flen[body] exactly
+
+documents with ANY table token:               11 (55.0 %)
+documents with table share >= 10%:            7 (35.0 %)   <- the population with headroom
+  table share   median 0.344   max 0.616
+  wlen delta    median 0.252   max 0.513
+
+  the ten most table-heavy documents:
+    0.616 share  Δwlen 0.513  body   164  seed/07-rate-card-and-surcharges.md
+    0.511 share  Δwlen 0.413  body   188  seed/12-rate-card-2026-h2.md
+    0.375 share  Δwlen 0.333  body   530  seed/03-postmortem-nagpur-vaccine-excursion.md
+    0.344 share  Δwlen 0.252  body   189  seed/14-customer-notification-matrix-2025.md
+    0.283 share  Δwlen 0.217  body   230  seed/15-customer-notification-matrix-2026.md
+    0.141 share  Δwlen 0.124  body   312  seed/11-decision-telematics-vendor-2026.md
+    0.128 share  Δwlen 0.099  body   305  seed/13-dock-scheduling-rules-2026.md
+
+per-document rows -> work/regression/2026-09-12-priors-and-tables/evidence/tables-rung-seed-documents.json
+
+ranking arms  n=20  avg_wlen 456.55 -> 419.0 without table tokens
+  queries whose TOP-1 changes:    12 / 124
+  queries whose TOP-10 changes:   76 / 124
+  top-1 movers: g012 g014 g016 g035 g041 g058 g063 g065 g080 g105 g108 g120
+  direction: the new top-1 is MORE table-heavy in 11 of 12, less in 0  <- the proposal predicts MORE
+  per-query rows -> work/regression/2026-09-12-priors-and-tables/evidence/tables-rung-seed-ranking.jsonl
+
+prose probes (df==1 term from a table-heavy document's prose): 6
+  hit@1 shipped            6 / 6
+  hit@1 no-table-flen      6 / 6
+  fixed 0   broken 0   discordant 0
+  per-probe rows -> work/regression/2026-09-12-priors-and-tables/evidence/tables-rung-seed-prose-probes.jsonl

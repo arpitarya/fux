@@ -64,3 +64,29 @@ preventive-maintenance schedules — markdown tables inside otherwise short
 documents, which is the exact shape this item asks about. Five rungs are frozen
 with committed indexes, so `flen` can be read per document without ingesting
 anything.
+
+## ✅ MEASURED 2026-09-12 — the mechanism is real; the quality question is not answered
+
+[The run](../regression/2026-09-12-priors-and-tables/report.md) §3.
+
+- **Headroom is large**: 31–35 % of documents carry a table share ≥ 10 %; the
+  most table-heavy document's length normaliser would fall **58 %**; `avg_wlen`
+  at rung 1 000 moves 151.5 → 133.8.
+- **It moves ranking**: 16 of 124 top-1 results change at `rung-01000`, 82 of 124
+  top-10 lists.
+- **In the predicted direction**: **41 of 44** top-1 changes across three rungs
+  promote a *more* table-heavy document; **1** goes the other way.
+- 🔴 **The key-free quality endpoint saturates.** A `df == 1` prose term scores
+  12/12 in **both** arms at every dilution up to 16 terms — its idf is
+  unreachable by length normalisation. **Inconclusive (22d), not a null.**
+
+🔴 **THIS ITEM DOES NOT CLOSE.** Its definition of done says *"a null closes this
+item"*. **This is not a null.** The mechanism is confirmed and one-directional,
+and whether the new order is *better* is unadjudicated.
+
+**The cheapest way to finish it, and it is already paid for:** the 16 top-1
+movers at `rung-01000` are named in
+[`evidence/tables-rung-01000-ranking.jsonl`](../regression/2026-09-12-priors-and-tables/evidence/). Once Codex scores
+the ladder (W-136 phase 5) those ids can be read off directly — **no new run and
+no new corpus**. Only if 16 is too few to clear the floor does this need a
+purpose-built graded set.

@@ -1,0 +1,35 @@
+rung: rung-01000   documents measured: 1000
+field weights: {'body': 1.0, 'heading': 3.0, 'title': 2.0, 'path': 1.5, 'ctx': 1.0}
+✅ all 1000 documents reproduce the committed flen[body] exactly
+
+documents with ANY table token:              318 (31.8 %)
+documents with table share >= 10%:          313 (31.3 %)   <- the population with headroom
+  table share   median 0.510   max 0.804
+  wlen delta    median 0.354   max 0.579
+
+  the ten most table-heavy documents:
+    0.804 share  Δwlen 0.579  body   107  ext/sibling/00429-ratecard.md
+    0.804 share  Δwlen 0.579  body   107  ext/sibling/00603-ratecard.md
+    0.804 share  Δwlen 0.579  body   107  ext/sibling/00843-ratecard.md
+    0.802 share  Δwlen 0.557  body   106  ext/sibling/00003-ratecard.md
+    0.802 share  Δwlen 0.576  body   106  ext/sibling/00016-ratecard.md
+    0.802 share  Δwlen 0.576  body   106  ext/sibling/00030-ratecard.md
+    0.802 share  Δwlen 0.576  body   106  ext/sibling/00069-ratecard.md
+    0.802 share  Δwlen 0.576  body   106  ext/sibling/00090-ratecard.md
+    0.802 share  Δwlen 0.576  body   106  ext/sibling/00150-ratecard.md
+    0.802 share  Δwlen 0.576  body   106  ext/sibling/00156-ratecard.md
+
+per-document rows -> work/regression/2026-09-12-priors-and-tables/evidence/tables-rung-01000-documents.json
+
+ranking arms  n=1000  avg_wlen 151.522 -> 133.756 without table tokens
+  queries whose TOP-1 changes:    16 / 124
+  queries whose TOP-10 changes:   82 / 124
+  top-1 movers: g003 g021 g035 g068 g075 g078 g083 g084 g089 g097 g099 g103 g108 g120 g123 g124
+  direction: the new top-1 is MORE table-heavy in 16 of 16, less in 0  <- the proposal predicts MORE
+  per-query rows -> work/regression/2026-09-12-priors-and-tables/evidence/tables-rung-01000-ranking.jsonl
+
+prose probes (df==1 term from a table-heavy document's prose): 12
+  hit@1 shipped            12 / 12
+  hit@1 no-table-flen      12 / 12
+  fixed 0   broken 0   discordant 0
+  per-probe rows -> work/regression/2026-09-12-priors-and-tables/evidence/tables-rung-01000-prose-probes.jsonl

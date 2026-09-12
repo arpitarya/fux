@@ -652,6 +652,86 @@ CORPUS, and that is a fact about the corpus rather than about the knobs**
   **below decision 19's floor** — a net of 4 cannot clear α at any discordant
   count. It remains **no detected change**, and the knob remains held.
 
+🔴 **MEASURED 2026-09-12 ON A CORPUS BUILT FOR IT: NO SINGLE GLOBAL VALUE
+CLEARS THE BAR, FOR ANY OF THE FOUR.** Arpit ruled (b) on 2026-09-11 — *build
+the instrument into the test data* — and the golden ladder now declares all four
+inputs. The sweep ran against **26 intent-split probes** whose truth is read off
+the declarations, so it needs no answer key:
+[the verdict](../../work/regression/2026-09-12-priors-and-tables/VERDICT-W143.md).
+
+| | current-seeking | history-seeking |
+|---|---:|---:|
+| shipped default | 11–12 / 13 | 8–9 / 13 |
+| **any value that demotes** | **13 / 13** | **5 / 13**, down to **0 / 13** |
+
+- **The knob works, and that is the finding.** Every value that perfects
+  current-seeking dismantles history-seeking in the same step, one probe for
+  one. `recency_half_life_days` at a half-life of a year or less takes
+  history-seeking to **zero of thirteen**.
+- **The three candidates that appeared to clear each fail two independent
+  guards**: each clears on one rung and **breaks on another, on a different
+  probe**, and each has a net of **+1 or +2** against decision 19's floor of 6.
+- 🔴 **So the 2026-09-11 row above is superseded in its conclusion, not in its
+  numbers.** Those numbers stand exactly as measured: on *that* corpus the
+  priors reached nothing. What is new is that on a corpus where they **do**
+  reach, they still cannot be defaulted — and the failure is **structural**. A
+  **per-document multiplier is being asked to carry a per-query distinction**,
+  and *"what do we do now?"* and *"what did we do before?"* want opposite
+  orderings out of one corpus.
+- ⚠ **No default changes here.** The output is a candidate table with no
+  recommendation; closing the knobs, or moving the mechanism query-side, is
+  Arpit's ruling and this record is the evidence for it.
+
+**14. THE DECLARED KEY BLOCK — a key is real only if it is listed here.**
+[ADR-LAW-0](0002_LAW-0-authority.md) decision 6.
+[`tests/test_adr_config_keys.py`](../../tests/test_adr_config_keys.py) asserts this
+block equals `tune.py`'s `_SCHEMA` **in both directions**, and that
+`tune.specimen()` — what `fux setup` writes — names no key outside it.
+
+**Sigils as in [ADR-CONFIG](0113_config.md) decision 13:** `+` a key the loader
+reads · `*` an **open** table whose keys are the consumer's own.
+
+```keys
++ bm25f.k1
++ bm25f.b
++ bm25f.body
++ bm25f.heading
++ bm25f.title
++ bm25f.path
++ bm25f.ctx
++ ranking.archived_weight
++ ranking.superseded_weight
++ ranking.recency_half_life_days
++ ranking.rerank_weight
++ ranking.expand_weight
++ graph.damping
++ graph.iterations
++ graph.laziness
++ graph.hop_decay
++ graph.expand_limit
++ graph.seed_depth
++ refer.budget
++ refer.per_doc_fraction
++ refer.min_passage_bytes
++ refer.max_passage_bytes
++ confidence.separation_floor
++ confidence.doc_coverage_floor
++ index.max_phrases
++ index.max_table_rows
+* priority
+```
+
+⚠ **`[priority]` is `*` and cannot be anything else.** Its keys are the
+consumer's own source entries — `docs/adr`, `vendor/` — which fux cannot know in
+advance (decision 8). There is **no `-` row**, and the absence is a fact worth
+stating: `.fux/tune.toml` has never needed one, because it refused unknown tables
+and keys **by name** from the day it existed. `fux.toml` acquired that behaviour
+only on 2026-09-12 (ADR-CONFIG decision 14), modelled on this file.
+
+⚠ **`[index]` sits in this block and is still the exception decision 13 named** —
+it is the one table here read on the **ingest** path, so it changes committed
+bytes. Being declared alongside the ordering keys does not make it one of them.
+
 ### Consequences
 
 - ⚠ **Veto conditions 1 and 4 fired on 2026-09-11, by ruling** — a tune key

@@ -1,0 +1,17 @@
+rung rung-00100   knob rerank_weight   probes 26 (13 current / 13 history)
+baseline at the shipped default 0.0: 19 / 26 right
+
+   value    right  fixed  broken      cur     hist   verdict
+     0.0   19 / 26      0       0   11 / 13    8 / 13   baseline
+    0.25   19 / 26      0       0   11 / 13    8 / 13   0 broken, 0 fixed — no effect
+     0.5   19 / 26      0       0   11 / 13    8 / 13   0 broken, 0 fixed — no effect
+     1.0   19 / 26      0       0   11 / 13    8 / 13   0 broken, 0 fixed — no effect
+     2.0   19 / 26      0       0   11 / 13    8 / 13   0 broken, 0 fixed — no effect
+
+HEADROOM, observed, from the rows (ADR-RS decision 22b):
+  improvement — probes not right at the default: 7 / 26
+  regression  — probes right at the default:     19 / 26
+
+🔴 NO value moved a single probe in either direction — the knob does not reach this corpus. Inconclusive, not a null.
+
+per-probe rows (130) -> work/regression/2026-09-12-priors-and-tables/evidence/sweep-rung-00100-rerank_weight.jsonl

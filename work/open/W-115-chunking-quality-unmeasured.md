@@ -100,3 +100,40 @@ the ladder does and does not contain before pre-registering.
 ⚠ Any number scored against the golden **answer key** is `informed` until
 [W-145](W-145-codex-regenerates-the-key.md) closes. A chunking measurement that
 uses a key-free endpoint is not.
+
+## 🔴 MEASURED 2026-09-12 — the golden ladder is the THIRD corpus that cannot see it
+
+[The run](../regression/2026-09-12-priors-and-tables/report.md) §4. Two arms of `extract_fields` + `parse_document` —
+`94231b2` (pre-W-115) and `676e973` (HEAD) — over the same 994 `rung-01000`
+documents.
+
+| field | documents differing |
+|---|---:|
+| `title` · `flen` · `terms` hash · term count | **0 / 994** |
+| `phrases` | 1 / 994 — **and it is not W-115** |
+
+The single `phrases` difference is the old tree's hard-coded `max_phrases = 12`
+against HEAD's 32, so the old list is an exact prefix of the new one. That is
+**W-116's** change, de-confounded the same way W-116's own report used a third arm.
+
+**So the table in this file gains a third row, and it is the same answer:**
+
+| corpus | grades? | headroom? |
+|---|---|---|
+| fux-playground | yes | 🔴 none — byte-identical index |
+| fux's own repo | 🔴 none | yes — 304 documents moved |
+| **the golden ladder** | yes (phase 5) | 🔴 **none — 0 of 994** |
+
+✅ **But the reason is now named rather than guessed.** W-115 changed heading
+grammar for `.rst`/`.adoc`/`.org`, citation-path decoding, table banding for
+CSV/XLSX row chunking, and heading skeletons. **The ladder carries `.md`,
+`.txt`, `.yaml`, `.eml` and `.html` — not one of the formats W-115 touches.**
+
+**What the instrument needs, specifically:** a corpus carrying `.jsonl`, `.json`,
+`.csv`, `.xlsx` and at least one `.rst`/`.adoc` document, **with goldens**.
+⚠ **It cannot be added to a frozen rung** — the ladder was committed before the
+questions were opened and that ordering is the only thing making it blind. It is
+a **new corpus** and it needs its own graded set.
+
+🔴 **No document may cite W-115 as measured.** Unchanged, and now for the third
+recorded reason.

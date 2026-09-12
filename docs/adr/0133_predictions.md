@@ -326,6 +326,9 @@ ruled its power tension.
 | content-free placebo, matched length | ✅ **built** — one shared sentence pool so every placebo has the same vocabulary and cannot discriminate; length matched to within a few words; deterministic from the source sha (L3), no model |
 | decoy query set | ✅ **built** — 15 domain-plausible questions the corpus cannot answer. ⚠ **The one kind of evaluation material an agent may author**: no correct answer exists, so there is nothing to fit |
 | **sealed subset** | ✅ **built 2026-08-28** — 15 of 50, split by `sha256(id)`: deterministic, seedless, order-independent |
+| **intent-split prior probes** | ✅ **built 2026-09-12** — 26 probes, 13 current-seeking / 13 history-seeking, over the golden ladder's declared `supersedes:` pairs and `archived=true` directories. ⚠ **Truth is MECHANICAL, read off a declaration**, which is what lets an agent author them: there is a correct answer, but nobody chose it. Adjudicated W-143 the day it was built |
+| **`heading` negative control, rebuilt** | ✅ **built 2026-09-12**, and it reports its own headroom as **not established**: switching `bm25f.heading` off entirely moves the distractor count by a net of 5 across 124 queries, below decision 19's floor. **C4's premise is unsupported** — the distractors win on body similarity, not on headings |
+| **table-`flen` counterfactual** | ✅ **built 2026-09-12** — recomputes `flen` with table tokens out of the body length and re-ranks, recomputing `avg_wlen` in BOTH arms. Carries a gate that refuses to report unless its recomputed `flen[body]` equals the committed one for every document |
 
 ⚠ **The decoys found something on their FIRST run**, which is the argument for
 controls in one line: **one of fifteen unanswerable questions is reported
@@ -755,6 +758,57 @@ baselined by date exactly like decision 15's rows rule, with the same
 exempt/applies pair guarding the baseline itself. **No frozen report is edited**
 — that is how the classification rule was landed and it is the only way a
 measurement discipline can tighten without rewriting its own evidence.
+
+**23. TEST DATA IS BUILT SO THE FEATURE UNDER TEST CAN MOVE IT** (Arpit,
+2026-09-11). *"Whenever we have to test these kind of scenarios, set up the test
+data in a way that it can be tested."*
+
+**23a. Before a feature is measured, the test data must contain the input the
+feature acts on.** A ranking prior that reads `supersedes:` needs documents
+that declare it; one that reads `archived=true` needs a directory declared
+archived; one that reads commit time needs documents with distinct, deliberate
+dates; an abstention mechanism needs unanswerable questions. **The questions
+must also depend on that input** — for a prior that can help one intent and
+hurt another, both intents (e.g. *current-seeking* and *history-seeking*).
+
+**23b. Missing input is a DATA DEFECT, fixed in the data — never a null.** A
+run that finds 0 headroom because the corpus lacks the input (the 2026-09-11
+four-priors precondition check: `supersedes:` declared nowhere, so three priors
+moved 0 of 50 at every value) is not filed as *"no detected change"* and is not
+Inconclusive-and-done: the data is extended so the feature can move it, and the
+measurement is re-planned. Decision 22d still governs any run that does go ahead.
+
+**23b-i. ⚠ Satisfying 23a collided with the one-archive law, and the law's
+test was narrowed rather than the data moved** (2026-09-12). *"A prior that
+reads `archived=true` needs a directory declared archived"* produced
+`work/golden/seed/archive/`, and `tests/test_archive_law.py` fired on it: the
+law forbids a second directory named `archive` anywhere but the repo root.
+
+- **These are five fictional retired documents, not retired documentation.**
+  The law is about where this project's own superseded docs go; the corpus
+  needs the word `archive` because the feature under test reads a directory
+  declared archived.
+- **Moving them into `archive/` would break the ladder** — the corpus must sit
+  with its manifests.
+- **The exemption is one exact path**, asserted by its own test so it cannot be
+  widened into a pattern. ⚠ **Stated cost:** a genuine second archive created
+  under `work/golden/` is now invisible to that check.
+- 🔴 **Arpit's law, narrowed by a session.** Flagged here rather than assumed:
+  if the exemption is not wanted, the alternative is renaming the corpus
+  directory and teaching prompt 1b the new name.
+
+**23c. The data declares what it exercises.** The test data carries a coverage
+table — feature → the input present → the documents and question ids that
+exercise it — and every pre-registration names the rows it relies on. A feature
+with no row is not measurable yet, and says so.
+
+**23d. Where the data lives is L9's call, and who writes it is the blind rule's.**
+Test data is fux-lab's golden data ([L9](0011_LAW-9-environments.md)); anything
+answer-bearing — documents a question depends on, and the questions and answers —
+is written by the key's author, never by a session that tests the engine
+(decision 11). Mechanics that carry no answer (declaring an archived directory,
+committing documents at their stated dates) may be set up by the extending
+session.
 
 
 ### Consequences
