@@ -253,11 +253,16 @@ until he reopens it; *"and so on"* past 10 000 is a separate, later decision.
 
 ---
 
-### Built on 2026-09-12 — five rungs, to 1 000
+### Built on 2026-09-12 — **the ladder is COMPLETE, all eight rungs to 10 000**
 
-**Arpit capped this session's ladder at rung 1 000**; `rung-02000`, `rung-05000`
-and `rung-10000` are a later session and are **not** built, not frozen and not
-measurable.
+The first five landed earlier the same day, under Arpit's cap at rung 1 000; the
+cap was lifted and `rung-02000`, `rung-05000` and `rung-10000` were built from
+the **same committed generator and the same seed**, so the whole ladder is one
+stream.
+
+**10 000 is the ceiling and the ladder stops there** — `CLAUDE.md` §Litmus, and
+[L9](../../docs/adr/0011_LAW-9-environments.md) caps the lab at 10 000 documents.
+There is no rung above this one and none may be built.
 
 | rung | documents | archived | superseded | carrying `mtime` |
 |---|---:|---:|---:|---:|
@@ -266,6 +271,22 @@ measurable.
 | `rung-00200` | 200 | 23 | 22 | 200 / 200 |
 | `rung-00500` | 500 | 53 | 52 | 500 / 500 |
 | `rung-01000` | 1 000 | 103 | 102 | 1 000 / 1 000 |
+| **`rung-02000`** | **2 000** | **203** | **202** | **2 000 / 2 000** |
+| **`rung-05000`** | **5 000** | **503** | **502** | **5 000 / 5 000** |
+| **`rung-10000`** | **10 000** | **1 003** | **1 002** | **10 000 / 10 000** |
+
+⚠ **The three new rungs were built AFTER `questions/` was opened**, which the
+first five were not. **That does not make them informed** — the generator, its
+seed and its blacklist are all committed and unchanged, and no question was read
+by anything that produced a document. But the *ordering* argument that covers
+rungs seed–1 000 (`92f5bff`, checkable in `git log`) does not extend to them, so
+**what protects these three is the generator's determinism, not the clock.**
+Anyone re-deriving them gets the same bytes; that is the claim, and it is
+checkable.
+
+**Nesting is verified across all eight, not asserted**: every rung's manifest
+contains the previous rung's documents with **identical hashes**, and all twenty
+seed documents are in `rung-10000`.
 
 - **Every rung nests**: rung N's manifest contains rung N-1's documents with
   identical hashes, and all twenty seed documents are in every rung. Checked

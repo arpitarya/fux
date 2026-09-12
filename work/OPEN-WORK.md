@@ -22,12 +22,16 @@ description: "The single live work queue, two lanes, plus the Blocked-on-Arpit i
 | ↳ **blocks:** **W-87's Part B**, which needs a key nobody has contaminated. Nothing else — it governs what a phase-5 number may *claim*, not whether phase 5 runs | | |
 | 🔴 **W-146** — two rulings: is `ADR-WORK-QUEUE` written (OPEN-WORK's rules are stated twice, owned nowhere), and does *never restates* reach into docstrings? [detail](open/W-146-the-rest-of-l0.md) | 2026-09-12 | 0d |
 | ↳ **blocks:** nothing else in the queue — they decide whether two named exposures get closed, not whether work runs | | |
+| 🔴 **W-107** — **O3: `PRE-REGISTRATION-NODE-2`.** W-136 phase 2 completed today, so the lab golden data it needs now exists and the last blocker is gone. A frozen instrument is ratified, not self-accepted: say whether an agent drafts it for your sign-off, as PRE-REG-NODE was. [detail](open/W-107-node-read-plane.md) | 2026-09-12 | 0d |
+| ↳ **blocks:** W-107's closure, and every differential-arm number — H3 bars reporting any arm green until it exists. Nothing else in the queue | | |
 | 🔴 **W-112** — W-106 closed **without a PASS and cannot produce one** (no corpus carries DENSE-CHUNK's bar). Proceed on the narrowed claim, wait for an instrument, or close? [detail](open/W-112-vector-plane.md) | 2026-09-12 | 0d |
 | ↳ **blocks:** nothing else in the queue — search-v3's last item, and the only one left of §5 | | |
 | 🔴 **W-147** — `.fux/output.toml` can switch the answer journal on, and ADR-PROVENANCE decision 10 says only the flag can — a fork that decision reserved and that shipped through a different record. [detail](open/W-147-the-journal-consent-surface.md) | 2026-09-12 | 0d |
 | ↳ **blocks:** nothing — but one record is false and another is silent until he rules | | |
 | 🔴 **W-143** — the four ranking priors answered **NO** ([verdict](regression/2026-09-12-priors-and-tables/VERDICT-W143.md)): close the knobs, move the mechanism query-side, or leave them at their no-op defaults. [detail](open/W-143-four-no-op-priors.md) | 2026-09-12 | 0d |
 | ↳ **blocks:** W-97, whose candidate table is the same measurement and whose defaults are the same call | | |
+| 🔴 **W-136** — the golden ladder is **complete, all eight rungs to 10 000**; everything an agent can do is done. **Phase 5 is Codex's hands** — [run prompt 5](golden/prompts/). [detail](open/W-136-golden-benchmark.md) | 2026-09-12 | 0d |
+| ↳ **blocks:** **W-87**'s recall half and **W-144**'s cheap route, both of which read per-query scores off phase 5. Not W-145 — that governs what a number may *claim*, not whether it runs | | |
 | 🔴 **W-144** — excluding table cells from `flen` **ranks better** ([verdict](regression/2026-09-12-reaim-and-instruments/VERDICT-W144.md)); one synthetic corpus may not ship a ranking change, so accept or override [the compare doc](compare/table-tokens-in-flen.compare.md). | 2026-09-12 | 0d |
 | ↳ **blocks:** nothing else in the queue — the measurement is filed and the code is written; what is missing is the call | | |
 | 🔴 **W-97** — the candidate table is filed with no recommendation, as pre-registered; the `superseded_weight` and `rerank_weight` defaults are an ADR-TUNE amendment only he makes. [detail](open/W-97-tuner-knob-sweep.md) | 2026-09-12 | 0d |
@@ -41,12 +45,12 @@ description: "The single live work queue, two lanes, plus the Blocked-on-Arpit i
 
 - 🟡 **W-140** · `agent`, waiting on Arpit's `--hops` ruling — **1 code row left**: a runner-race flake **not reproduced in 11 attempts**, deliberately unchanged. 20 closed. [detail](open/W-140-guide-authoring-defects.md)
 - 🟢 **W-139** · `agent` — build fux-benchmark to [SETUP-BENCHMARK](setup/fux-benchmark.md): seven corpora, two versions, latency and ranked lists kept. [detail](open/W-139-benchmark-per-l9.md)
-- 🟢 **W-107** · `agent` — the Node read plane: published to npm 2026-09-12 **with the global bin** (R1a amended, Arpit); what is left is the `fux doctor` PATH row that amendment now owes, and the renderer split. [detail](open/W-107-node-read-plane.md)
+- 🔴 **W-107** · `agent` — the Node read plane: **every agent-closable item is done** (npm published, R1a's three mitigations all ship, the twin freshness test landed). **O3 alone is left** — `PRE-REGISTRATION-NODE-2`, unblocked today by W-136 phase 2, and no arm may be reported until it exists. [detail](open/W-107-node-read-plane.md)
 - 🔴 **W-112** · `arpit` — the vector plane. W-106 closed without a PASS **and cannot produce one**: no corpus carries DENSE-CHUNK's bar. Determinism narrowed to *same embedder build*. [detail](open/W-112-vector-plane.md)
 
 ### testing
 
-- 🟢 **W-136** · `agent`, then Codex — phase 2 extended to **rung 2 000 and rung 5 000** (2026-09-12); `rung-10000` is the last one, then phase 5 is Codex's. [detail](open/W-136-golden-benchmark.md)
+- 🔴 **W-136** · `arpit` — phase 2 **COMPLETE 2026-09-12, all eight rungs to 10 000**, nesting verified; **phase 5 scoring is Codex's hands** and is all that is left. [detail](open/W-136-golden-benchmark.md)
 - 🔴 **W-145** · `arpit` — Codex regenerates the golden answer key; until then every golden number is `informed`. [detail](open/W-145-codex-regenerates-the-key.md)
 - 🔴 **W-87** · `agent`, waiting on W-145 — P2's `unanswerable` gate is measured (0/124); recall needs phase 5 and **Part B needs an uncontaminated key**. [detail](open/W-87-what-good-means.md)
 - 🔴 **W-144** · `arpit` — **answered 2026-09-12: the counterfactual ranks better** above a table share of ~0.29. One ruling: accept or override [the compare doc](compare/table-tokens-in-flen.compare.md). [detail](open/W-144-structure-aware-extraction.md)

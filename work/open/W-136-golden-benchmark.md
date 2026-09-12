@@ -18,9 +18,9 @@ once; this file carries only state. Prompts: [`work/golden/prompts/`](../golden/
 | phase | who | lane | state |
 |---|---|---|---|
 | 1. Seed + answer key | Codex, **stood in for by Claude 2026-09-12** | — | ✅ **done, provisionally** — 20 documents, `seed-dates.tsv`, 124-question key held in chat. Regenerated under [W-145](W-145-codex-regenerates-the-key.md) |
-| 2. Extend 10 → 10 000, blind | Claude Code (Opus) | `agent` | ✅ **done to rung 1 000** on 2026-09-12 — five rungs built, frozen and committed *before* the questions were opened. `rung-02000`/`05000`/`10000` are **not built**: Arpit capped this session at 1 000. |
+| 2. Extend 10 → 10 000, blind | Claude Code (Opus) | `agent` | ✅ **COMPLETE 2026-09-12 — all eight rungs to 10 000.** The first five were committed *before* the questions were opened (`92f5bff`); `rung-02000`/`05000`/`10000` were built later the same day from the **same committed generator and seed**, so what protects them is determinism rather than the clock — stated in [`golden/README.md`](../golden/README.md) rather than glossed. Nesting verified across all eight. |
 | 3. Freeze ladder, release questions | Codex | `arpit` — run prompt 3 | ⚠ **released early** on 2026-09-12, before the ladder existed — ids permuted so no band identifies the unanswerables. Phase 2 was on its honour and did not open `questions/`. |
-| 4. Run each rung | Claude Code | `agent` | ✅ **run on 2026-09-12** for the five built rungs, under a committed pre-registration ([`work/regression/2026-09-12-golden-ladder/`](../regression/2026-09-12-golden-ladder/PRE-REGISTRATION.md)). Predictions and prose answers are filed per rung. |
+| 4. Run each rung | Claude Code | `agent` | ✅ **run on 2026-09-12** for the five rungs that existed then, under a committed pre-registration ([`work/regression/2026-09-12-golden-ladder/`](../regression/2026-09-12-golden-ladder/PRE-REGISTRATION.md)). ⚠ **`rung-02000`/`05000`/`10000` have NOT been run** — they were built after that run. Running them is cheap (the indexes are committed) but it needs its own pre-registration, because a run across eight rungs is not the run that was registered across five. |
 | 5. Score each rung | Codex | `arpit` — run prompt 5 | 🟢 **ready** — predictions and answers are filed for five rungs. Every number it produces is `informed` until [W-145](W-145-codex-regenerates-the-key.md) closes. |
 
 ## Done in the filing change (2026-09-11)
@@ -113,3 +113,41 @@ which carries what is contaminated and what any number may claim.
   answers. The test data for fux-lab ([L9](../../docs/adr/0011_LAW-9-environments.md)). Process:
   [`golden/README.md`](../golden/README.md) — [detail](W-136-golden-benchmark.md)
   `filed: 2026-09-11`
+
+## 2026-09-12 — phase 2 closed, and what that leaves
+
+**The ladder is complete: eight rungs, 20 → 10 000 documents, all nesting
+byte-for-byte, 10 000/10 000 records carrying an `mtime`, 1 003 declared archived
+and 1 002 declared superseded at the top rung.**
+
+**10 000 is the ceiling and there is no rung above it.** `CLAUDE.md` §Litmus and
+[L9](../../docs/adr/0011_LAW-9-environments.md); a rung at 50 000 is not
+deferred, it is forbidden.
+
+### What is left on this item
+
+| phase | who | state |
+|---|---|---|
+| 3. Freeze + release | Codex | ⚠ released early on 2026-09-12; ids permuted |
+| **5. Score each rung** | **Codex** | 🟢 **ready — and it is the only thing left** |
+
+**Everything an agent can do on W-136 is done.** Phase 5 is Codex's by design:
+it is the half Claude may never see, and that separation is the whole point of
+the benchmark.
+
+⚠ **Two things phase 5 should know before it runs:**
+
+1. **Every number is `informed` until [W-145](W-145-codex-regenerates-the-key.md)
+   closes** — the key is the Claude-authored stopgap.
+2. **Phase 4 covers five rungs, not eight.** The three new rungs are built and
+   indexed but **not run**, and running them needs its own pre-registration —
+   a run across eight rungs is not the run that was registered across five.
+
+### What the new rungs unblock, and what they do not
+
+- ✅ They are the corpus for any measurement that wants scale up to the ceiling.
+- 🔴 **They do not make W-115 measurable.** [VERDICT-W115](../regression/2026-09-12-reaim-and-instruments/VERDICT-W115.md)
+  measured it on a purpose-built corpus instead, and the reason the ladder could
+  not is **content, not size**: 1 of 800 `.md`/`.txt` documents carries a `#`
+  inside a code fence, and a bigger draw from the same generator has the same
+  proportion.
