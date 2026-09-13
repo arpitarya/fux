@@ -9,6 +9,7 @@ timestamp: 2026-09-11T00:00:00Z
 # The abstention gate — what should *0 of 20* block?
 
 **Parked from the *Blocked on Arpit* inbox on 2026-09-11, at his instruction.**
+**Option C graduated on 2026-09-13 to [`compare/abstention-gates.compare.md`](../compare/abstention-gates.compare.md); A and B are still owed a ruling here.**
 Nothing here is decided and nothing is built.
 
 ---

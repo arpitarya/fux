@@ -28,7 +28,7 @@ here. Read that record before changing anything below it.
 | 🔴 **W-112** — W-106 closed **without a PASS and cannot produce one** (no corpus carries DENSE-CHUNK's bar). Proceed on the narrowed claim, wait for an instrument, or close? [detail](open/W-112-vector-plane.md) | 2026-09-12 | 2d |
 | ↳ **blocks:** nothing else in the queue — search-v3's last item, and the only one left of §5 | | |
 | 🔴 **W-156** — every measurement must be on golden data; golden is one synthetic corpus; so *never ship a ranking change off one* can never be met. Which rule gives? [detail](open/W-156-prevalence-outside-golden.md) | 2026-09-13 | 1d |
-| ↳ **blocks:** nothing else in the queue — it decides what evidence a ranking change may HAVE, not whether work runs | | |
+| ↳ **blocks:** **W-161** (the graph-composed `ask`, a ranking change) — and it decides what evidence any other ranking change may HAVE | | |
 | 🔴 **W-144** — excluding table cells from `flen` **ranks better** ([verdict](regression/2026-09-12-reaim-and-instruments/VERDICT-W144.md)); one synthetic corpus may not ship a ranking change, so accept or override [the compare doc](compare/table-tokens-in-flen.compare.md). | 2026-09-12 | 2d |
 | ↳ **blocks:** nothing else in the queue — the measurement is filed and the code is written; what is missing is the call | | |
 | 🔴 **W-148** — two calls left over from W-107: how CI reaches a golden corpus (self-hosted runner / commit `rung-00100` / portable builder), and whether `fux-benchmark` gets built or Node's latency stays unmeasured. [detail](open/W-148-what-the-two-readers-still-owe.md) | 2026-09-12 | 2d |
@@ -40,6 +40,9 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
+- 🟢 **W-160** · `agent` — the two atoms: `fux lexical` (BM25F alone, frozen) and `fux graph --seed`, plus the graph plane in the Node reader, digest-equal. Not a ranking change. Ratified 2026-09-13, not built. [detail](open/W-160-lexical-and-graph-atoms.md)
+- 🔴 **W-161** · `arpit`, blocked on W-156 and waiting on W-160 — the graph-composed `ask`: boosted tier + labelled `related` tier, `answer` reads `ask`. Ratified 2026-09-13; a ranking change, so it waits for the evidence rule. [detail](open/W-161-graph-composed-ask.md)
+- 🟢 **W-162** · `agent` — `fux correct`: a human question line on the document's enrichment file, a rare `--pin`, an eval row per correction, plus the guide skill and agent steering. Accepted 2026-09-13, not built. [detail](open/W-162-fux-correct.md)
 - 🟡 **W-140** · `agent`, waiting on Arpit's `--hops` ruling — **1 code row left**: a runner-race flake **not reproduced in 11 attempts**, deliberately unchanged. 20 closed. [detail](open/W-140-guide-authoring-defects.md)
 - 🔴 **W-148** · `arpit` — what the two readers still owe: CI cannot reach the golden corpora, Node's latency has no instrument, and the renderer split is staged. [detail](open/W-148-what-the-two-readers-still-owe.md)
 - 🔴 **W-112** · `arpit` — the vector plane. W-106 closed without a PASS **and cannot produce one**: no corpus carries DENSE-CHUNK's bar. Determinism narrowed to *same embedder build*. [detail](open/W-112-vector-plane.md)

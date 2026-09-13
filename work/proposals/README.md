@@ -53,6 +53,22 @@ part of it is still to do. `search-v3.md` is the worked example.
 *Newest first. Every `.md` in this directory has a row; a file with no row is
 the defect this ordering exists to make visible.*
 
+## Filed 2026-09-13 — the 3.0 backlog
+
+* [Ten ways to rank better — the 3.0 search backlog](search-improvements-v3.md)
+  — ten ranking improvements Arpit kept on 2026-09-13, each independent of the
+  graph-composed `ask`: anchor text, corpus-mined expansion, an unstemmed identifier
+  field, RM3, supersession-aware ranking, SDM proximity, MMR diversification, a
+  git-derived authority prior, an intent → doc-type prior, section-level units. Each
+  graduates alone, behind W-156, with its own golden question and pre-registration.
+
+* [`fux inspect` — an X-ray of the index](fux-inspect.md)
+  — a read-only verb with six lenses (boilerplate words like "TLDR", unfindable
+  documents, length and fields, duplicates and templates, analyzer coverage, graph
+  orphans and hubs). Descriptive by default, three provisional checks, every finding
+  mapped to an existing lever. Words come from a local, gitignored hash → word
+  dictionary; the committed index stays hashes.
+
 ## Filed 2026-09-11
 
 * [The abstention gate — what should 0 of 20 block?](abstention-gate.md)
@@ -60,6 +76,7 @@ the defect this ordering exists to make visible.*
   `answerable` is false only when nothing matches at all. Options: **A** disclose in
   `fux doctor`, **B** gate quality claims (*"abstains 0 of N"* beside every headline),
   **C** build abstention and measure it in fux-lab on golden data. Recommends **B, then C**.
+  **Option C graduated 2026-09-13 → [`compare/abstention-gates.compare.md`](../compare/abstention-gates.compare.md); A and B still owed a ruling.**
   Parked from the inbox at Arpit's instruction. **Graduates when Arpit picks.**
 * [Positioning — written knowledge, not code](positioning-documents-not-code.md)
   — ✅ **`graduated`: RULED AND APPLIED by Arpit 2026-09-12.** Why fux was filed

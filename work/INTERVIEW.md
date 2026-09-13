@@ -32,8 +32,30 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-09-13**.* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-09-13** (Cowork, 3.0 planning).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
+
+### 3.0.0-alpha.0 has a branch and five work documents — nothing built (2026-09-13, Cowork)
+
+- **Branch `release/3.0.0-alpha.0`** off `main`. **The version is NOT bumped** —
+  `src/fux/__init__.py` and the three Node sites move together under
+  `check-version-parity.py`, and that is Claude Code's first commit on the branch.
+- **Ratified by Arpit, filed as accepted:** [ask-graph-expansion](compare/ask-graph-expansion.compare.md)
+  — `fux lexical` and `fux graph --seed` are atoms, `ask` = their composition,
+  a *boosted* tier and a labelled *related* tier, `answer` reads `ask`, Node
+  gains the graph plane → **W-160** (atoms, 🟢) and **W-161** (the composed
+  `ask`, 🔴 blocked on W-156). [fux-correct](compare/fux-correct.compare.md) —
+  a human question line on the enrichment file, rare `--pin`, eval row, guide
+  skill + agent steering → **W-162** (🟢).
+- **Proposed, not ruled:** [abstention-gates](compare/abstention-gates.compare.md)
+  (which gates; **the shape is ruled**: a gate chain, every signal returned,
+  `output.toml` decides visibility), [search-improvements-v3](proposals/search-improvements-v3.md)
+  (ten ideas, each graduates alone), [fux-inspect](proposals/fux-inspect.md).
+- **Standing constraint on all of it:** every ranking change lands behind
+  **W-156** and needs golden questions that exercise it (SR-RS d23). Link-
+  dependent and unanswerable questions in the key are **Codex's hands**.
+- **Immediate next step:** Arpit reads the two accepted compare docs; Claude
+  Code takes W-160 on the branch.
 
 ### 🔴 SIX ITEMS BUILT IN ONE SESSION, AND NOTHING IS COMMITTED (2026-09-13, Claude Code)
 
@@ -2280,6 +2302,17 @@ the reason is that the measuring environments are gone.**
 ## 2 · In flight, and the immediate next step
 
 *Updated **2026-09-12** (Claude Code, Opus) — maintainer line: this session.*
+*Updated **2026-09-13** (Cowork, Opus) — maintainer line: this session.*
+
+### In flight: the 3.0.0-alpha.0 branch is open and empty of code (2026-09-13, Cowork)
+
+- **W-160** is the first build item on `release/3.0.0-alpha.0` — the two atoms
+  and the Node graph plane; **not a ranking change**, so nothing gates it.
+- **W-162** (`fux correct`) is the second; also ungated.
+- **W-161** waits on W-156 and on W-160. Do not start it.
+- **Immediate next step:** bump the version on the branch (all four sites,
+  parity green), then W-160.
+
 
 ### DONE, not in flight: the benchmark's first run is filed (2026-09-12, Claude Code)
 
