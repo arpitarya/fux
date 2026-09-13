@@ -40,6 +40,33 @@ this is what the major carries against `1.0.0`:
 record shape is v2, and ingest refuses without `.fux/pii.toml`. Re-run
 `fux ingest && fux build` after upgrading.
 
+### Fixed — Windows, and three of these are shipped bugs rather than test defects
+
+The full CI matrix ran green on Windows for the first time while cutting this
+release, and it found what no developer machine here could:
+
+- 🔴 **`fux`'s own stdout was the locale encoding.** `fux ask --json` piped to
+  a file or to an agent emitted **cp1252 bytes** on Windows — an em dash in a
+  document title arrived as `0x97`. `cli.main` and `fux-merge-index` now set
+  UTF-8 before parsing an argument, which is the only legal encoding for JSON
+  anyway (RFC 8259 §8.1). [SR-CLI-SURFACE](records/0101_cli-surface.md)
+  decision 10a.
+- 🔴 **The Node reader's `fux_passage` refused every path in the repository on
+  Windows.** Its containment check compared against `base + "/"`, and the
+  separator there is `\`. Python's twin was always correct; the differential
+  arm caught the divergence the first time it ran on Windows.
+- 🔴 **The engine read git's output with the platform code page** in
+  `ingest/priors.py`, `maintain/runner.py` and `maintain/hooks.py` — and git
+  prints *paths*, so one non-ASCII filename raised `UnicodeDecodeError` from
+  inside the recency prior or silently lost that file's date.
+- **A background re-index could strand work.** A commit landing between the
+  runner's last check and its release had its own spawn refused, leaving
+  `pending: 1` with nothing running. A runner now hands new ids to a successor.
+  [SR-MAINTENANCE](records/0129_hooks.md).
+- **`fux doctor`'s Node-shadowing row cannot fire on Windows** —
+  `shutil.which` resolves through PATHEXT and npm writes `fux.cmd`. Named as
+  unbuilt rather than left to look built; filed as W-159.
+
 
 ### Added
 
