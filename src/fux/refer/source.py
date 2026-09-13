@@ -6,7 +6,7 @@ The obvious reading of M4's "HTTP + Confluence adapters" is *put an HTTP client
 in the refer plane*. That would breach three things at once — L1 (`$0`,
 stdlib-only runtime), L4 (offline by default), and the adapter cap.
 
-The engine already solved this. **ADR-FETCHER established that the consumer
+The engine already solved this. **SR-FETCHER established that the consumer
 owns the fetcher file**: fux loads it by path and calls
 `fetch(url) -> tuple[bytes, str]`, and all transport, auth, retries and browser
 machinery live on the consumer's side of that line. `ingest/urlsrc.py` is fux's half of that contract at ingest
@@ -14,7 +14,7 @@ time; this module is the same half at verify time.
 
 **There is exactly one fetch mechanism in this engine, and the refer plane
 reuses it rather than inventing a second.** A second one would make
-ADR-FETCHER's veto fire on its own successor.
+SR-FETCHER's veto fire on its own successor.
 
 ## Two strategies, and how a document gets one
 
@@ -24,7 +24,7 @@ ADR-FETCHER's veto fire on its own successor.
 | `url:` | the consumer fetcher | networked, opt-in, bounded by the policy's timeout |
 
 **A `url:` document is verified with the same fetcher it was ingested with**,
-resolved from `.fux/sources/urls`. This pays the debt ADR-URL-INGEST recorded
+resolved from `.fux/sources/urls`. This pays the debt SR-URL-INGEST recorded
 when the URL source landed early, and it is decided this way because *a
 document fetched two ways is two documents*: a page whose ingest went through
 `cdp` (a browser) and whose verify went through `http` (a plain GET) would

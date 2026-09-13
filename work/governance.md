@@ -38,7 +38,7 @@ none of them currently is.
 | `compare/*.md` (**21 docs + README**, recounted 2026-09-12 — seven now in `archive/compare/`) | live forks — verdict + reopen-trigger | both | none | fork opens/closes/reopen-trigger fires |
 | `proposals/*.md` (**16 docs + README**, recounted 2026-09-12 — none of the 16 met the archive bar; the `ideal/` set and eight proposals are already archived) | parked, undecided ideas | both | none | filed, graduates, or rejected |
 | `regression/<date>-<run>/` (**29 runs**, recounted 2026-08-25) | measured evidence other docs cite | both | `tests/test_regression_runs.py` | every measurement run |
-| `setup/*.md` (3 docs + README) | how the three siblings are stood up; their jobs are [L9](../docs/adr/0011_LAW-9-environments.md)'s | human (mostly) | `tests/test_setup_docs.py`, `tests/test_l9_environments.py` | any sibling changes |
+| `setup/*.md` (3 docs + README) | how the three siblings are stood up; their jobs are [SR-WORK-ENVIRONMENTS](../records/0052_WORK-environments.md)'s | human (mostly) | `tests/test_setup_docs.py`, `tests/test_work_environments.py` | any sibling changes |
 | `paper/the-fux-index-paper.md` | architecture of record + falsifiable predictions | both | none | architecture changes / a prediction is measured |
 | `architecture-*.svg` (**5 diagrams**, recounted 2026-09-12 — plus `proposal-search-v3-target.svg`, which is a proposal's target and deliberately outside the namespace) | visual architecture; `docs/architecture-*.png` are rendered from them | human | none | the plane, verb, reader or record shape one draws changes |
 
@@ -48,18 +48,18 @@ none of them currently is.
 |---|---|---|---|---|
 | `docs/index.md` | bundle root, reading order across `docs/`+`work/` | both | none | either tree's structure changes |
 | `docs/GLOSSARY.md` (24 KB) | recurring terms, defined once | human | none | a term is coined or redefined |
-| `docs/adr/README.md` | the ADR register: convention, ownership, state | both | none directly (feeds the tests below) | a record's state changes |
-| `docs/adr/000N_*.md` (**41 live records**, recounted 2026-08-25) | one decision per completed feature/measurement | both (§1 human, §2 agent, per-record) | `test_adr_frontmatter.py`, `test_adr_freshness.py`, `test_adr_ownership.py`, `test_adr_owns_consistency.py` | the owning code changes |
-| `docs/adr/TEMPLATE.md` | the shape new ADRs must follow | agent (author) | none | convention changes |
-| `docs/adr/RULE-SINCE` | the freshness gate's audit baseline | agent (tooling) | read by `test_adr_freshness.py` | the gate's rule tightens |
+| `records/README.md` | the SR register: convention, ownership, state | both | none directly (feeds the tests below) | a record's state changes |
+| `records/000N_*.md` (**41 live records**, recounted 2026-08-25) | one decision per completed feature/measurement | both (§1 human, §2 agent, per-record) | `test_sr_frontmatter.py`, `test_sr_freshness.py`, `test_sr_ownership.py`, `test_sr_owns_consistency.py` | the owning code changes |
+| `records/TEMPLATE.md` | the shape new SRs must follow | agent (author) | none | convention changes |
+| `records/RULE-SINCE` | the freshness gate's audit baseline | agent (tooling) | read by `test_sr_freshness.py` | the gate's rule tightens |
 
-**ADR maintenance is remitted to the ADR hooks, not to prose.** Law zero —
-"ADRs are always up to date" — is enforced by `scripts/adr-guard.sh` running
-as a `commit-msg` hook (`ln -sf ../../scripts/adr-guard.sh
-.git/hooks/commit-msg` — **not** `pre-commit`, because the `no ADR affected`
+**SR maintenance is remitted to the SR hooks, not to prose.** Law zero —
+"SRs are always up to date" — is enforced by `scripts/sr-guard.sh` running
+as a `commit-msg` hook (`ln -sf ../../scripts/sr-guard.sh
+.git/hooks/commit-msg` — **not** `pre-commit`, because the `no SR affected`
 escape hatch needs the commit message, which doesn't exist yet at
-`pre-commit` time) plus `tests/test_adr_freshness.py` running the identical
-check in CI. A commit that touches an ADR-owned path without touching that
+`pre-commit` time) plus `tests/test_sr_freshness.py` running the identical
+check in CI. A commit that touches an SR-owned path without touching that
 path's owning record is rejected. Nobody has to remember to reconcile a
 record by discipline — the gate remembers for them.
 
@@ -74,16 +74,16 @@ grounding.
 
 | test | checks |
 |---|---|
-| `test_adr_freshness.py` | a changed ADR-owned file's **owning** record was touched in the same commit |
-| `test_adr_frontmatter.py` | the 6-key frontmatter block, name/status consistency |
-| `test_adr_ownership.py` / `test_adr_owns_consistency.py` | `**Owns:**` lines match the register, no path owned twice |
+| `test_sr_freshness.py` | a changed SR-owned file's **owning** record was touched in the same commit |
+| `test_sr_frontmatter.py` | the 6-key frontmatter block, name/status consistency |
+| `test_sr_ownership.py` / `test_sr_owns_consistency.py` | `**Owns:**` lines match the register, no path owned twice |
 | `test_archive_law.py` | exactly one `archive/` directory exists |
 | `test_doc_registry.py` | `DOC-REGISTRY.md` rows match live docs |
 | `test_setup_docs.py` | `work/setup/*.md` carry the required frontmatter |
 | `test_regression_runs.py` | a `regression/` run has the required artifacts |
 | `.claude/hooks/stop-if-blocked.sh` | a session cannot end with an unsurfaced `BLOCKED.json` |
 | `.claude/hooks/require-progress.sh`, `inject-inbox.sh`, `session-lock.sh` | session-level agent behavior, not doc content |
-| `scripts/adr-guard.sh` (+ `commit-msg` hook) | commit-time ADR-ownership check |
+| `scripts/sr-guard.sh` (+ `commit-msg` hook) | commit-time SR-ownership check |
 
 **8 of ~18 test files in `tests/` guard prose/process, not engine
 correctness by file count** — but PRIORITY.md P7's audit (2026-08-21) read
@@ -126,20 +126,20 @@ lost:
    2026-08-21** (P7) — dropped from CLAUDE.md and `WORKLOG.md`'s template.
 5. **`DOC-REGISTRY.md` scoped to only untested prose — not litigated in P7,
    still parked.** The registry's real unique value is covering docs nothing
-   else checks (`WORKLOG.md`, `MACHINE.md`, `GLOSSARY.md`, the paper); ADRs
+   else checks (`WORKLOG.md`, `MACHINE.md`, `GLOSSARY.md`, the paper); SRs
    and `setup/` already have dedicated tests. Worth its own proposal, same as
    item 3.
 6. `regression/` and `compare/` are not candidates for cutting — confirmed,
    they are the "ground truth over prose" evidence layer CLAUDE.md's own rule
    requires.
-7. ADR maintenance is remitted to the ADR hooks, not a diet candidate —
+7. SR maintenance is remitted to the SR hooks, not a diet candidate —
    confirmed, unchanged.
 
 **On audience split:** almost nothing here is agent-only or human-only —
 `CLAUDE.md`, `OPEN-WORK.md`, `BLOCKED.json`, and the `open/W-nn` specs skew
 agent (an agent reads them to decide what to do next); `README.md`,
 `GLOSSARY.md`, and the two architecture SVGs skew human (nobody automates
-against a diagram). Everything else — ADRs, `compare/`, `proposals/`,
+against a diagram). Everything else — SRs, `compare/`, `proposals/`,
 `regression/`, `WORKLOG.md`, `INTERVIEW.md` — is written for both by design
-(the "§1 for humans / §2 for agents" split inside each ADR is the same idea
+(the "§1 for humans / §2 for agents" split inside each SR is the same idea
 applied per-file).

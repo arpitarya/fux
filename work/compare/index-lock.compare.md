@@ -27,14 +27,14 @@ timestamp: 2026-08-26T00:00:00Z
 > [`maintain/runner.py`](../../src/fux/maintain/runner.py)'s `runner.lock`,
 > already `O_CREAT|O_EXCL`, already pid-based — what changes is **who is
 > required to hold it**. The enrichment pin is `.fux/enrich/<sha>.md`, already
-> committed, already sha-validated ([ADR-ENRICH](../../docs/adr/0137_enrich.md)) —
+> committed, already sha-validated ([SR-ENRICH](../../records/0137_enrich.md)) —
 > what is missing is the **queue** of work not yet done, and a **gitignored
 > progress file** beside it (Arpit, 2026-08-26: *"committed queue, gitignored
 > progress"*).
 >
 > **Neither file may be called `fux.lock`.** That name belongs to the archived
 > engine's manifest and is listed out-of-scope in `CLAUDE.md` pending its own
-> ADR; reusing it makes every archived reference read as if it described this.
+> SR; reusing it makes every archived reference read as if it described this.
 >
 > **Confidence:** high on rejecting A (merge) and E (OS advisory locks) —
 > both are structural arguments, not judgement calls. **Medium** on the
@@ -68,7 +68,7 @@ that call.
 |---|---|---|
 | an index write mutex | `maintain/runner.py::acquire` — `runner.lock`, `O_CREAT\|O_EXCL`, pid inside | **built**, but held by *one* caller (§6) |
 | stale-lock handling | `ingest/__init__.py::_report_takeover` — `stopped` / `stale` / `wedged` | **built** |
-| a committed enrichment pin | `.fux/enrich/<sha>.md`, one file per source content sha | **built** ([ADR-ENRICH](../../docs/adr/0137_enrich.md), [ADR-DOTFUX](../../docs/adr/0102_fux-directory.md)) |
+| a committed enrichment pin | `.fux/enrich/<sha>.md`, one file per source content sha | **built** ([SR-ENRICH](../../records/0137_enrich.md), [SR-DOTFUX](../../records/0102_fux-directory.md)) |
 | coverage reporting | `enrich.py::plan` / `--check`, `validate()`, `prune()` | **built** |
 | a committed **queue** of undone work | — | **absent** |
 | **gitignored progress** | — | **absent** |
@@ -140,7 +140,7 @@ E is also what the third-party ecosystem exists to paper over (`filelock`,
 > ⚠ **Reconciled 2026-08-26, the same day, against
 > [W-86](../../archive/open/W-86-the-decoder-plane.md) §12.** Arpit ruled that a
 > **consumer** may add dependencies fux's runtime may not — the third row of
-> ADR-ENRICH decision 1's table. **That ruling does not reach this rejection,
+> SR-ENRICH decision 1's table. **That ruling does not reach this rejection,
 > and the distinction is the point:** a decoder is consumer code loaded from
 > `.fux/`, while the index write mutex is **`src/fux/` runtime code on the
 > maintenance path**, where L1 is untouched. `filelock` stays refused.
@@ -264,6 +264,6 @@ in that directory must be proven invisible to both, or it lives elsewhere.
   `sources` grammar. W-86's build question, and it follows the grammar
   decision, not this one.
 - **Whether `fux enrich` consumes the queue or keeps computing scope on
-  demand.** ADR-ENRICH decision 4 makes scope *declared*; a queue is derived
+  demand.** SR-ENRICH decision 4 makes scope *declared*; a queue is derived
   from a decode failure, which is a different origin. **Naming the tension is
-  the point; resolving it is ADR-ENRICH's amendment, not this fork's.**
+  the point; resolving it is SR-ENRICH's amendment, not this fork's.**

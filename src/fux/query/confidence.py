@@ -14,7 +14,7 @@ Every one of them is a **pure function of what ranking already produced** — th
 query's term hashes, the `df` and corpus statistics BM25F needed anyway, the
 scored result list, and (on `answer` only) the refer plane's freshness verdict.
 Nothing here fetches, samples, calls a model, or reads a clock, so L1, L3 and
-L4 are untouched — see [ADR-LAWS](../../../docs/adr/0001_LAWS.md).
+L4 are untouched — see [SR-LAWS](../../../records/0001_LAWS.md).
 
 | signal | what it answers | shape |
 |---|---|---|
@@ -31,7 +31,7 @@ between hedging vaguely and saying *"nothing here mentions `mTLS`"*.
 
 `separation_floor` and `doc_coverage_floor` are the *only* values in this
 module that are not structural facts, and since 2026-08-28 a repo may set both
-in `.fux/tune.toml` under `[confidence]` — ADR-CONFIDENCE decision 13, which
+in `.fux/tune.toml` under `[confidence]` — SR-CONFIDENCE decision 13, which
 **reverses decision 7.**
 
 ⚠ **Read what that gave up.** Decision 7 refused the knob because a consumer
@@ -43,11 +43,11 @@ things replace the prohibition, and neither is as strong as it was:
    `grounded` computed under a slack floor is visible rather than implied. A
    consumer comparing two repos' answers can see they were not judged alike.
 2. **`fux ask --no-tune` recomputes the band at the engine defaults**, which is
-   the *"is it me or the config?"* switch ADR-TUNE decision 11 already owned.
+   the *"is it me or the config?"* switch SR-TUNE decision 11 already owned.
 
 **Neither floor can reach a score or an ordering** — see *What this can never
 do*. A tuned floor moves the BAND and nothing else, so `[confidence]` satisfies
-ADR-TUNE decision 1's boundary rule trivially: `.fux/index/` stays
+SR-TUNE decision 1's boundary rule trivially: `.fux/index/` stays
 byte-identical, and `tests/test_tune_boundary.py` asserts it over both keys.
 
 ## Coverage is idf-weighted, and that is the whole point
@@ -124,7 +124,7 @@ BANDS = (GROUNDED, PARTIAL, WEAK, NONE)
 #:
 #: **This is the ENGINE DEFAULT.** ⚠ It was deliberately *not* a `tune.toml`
 #: key until 2026-08-28; **`[confidence] separation_floor` now overrides it**
-#: (ADR-CONFIDENCE decision 13, reversing decision 7).
+#: (SR-CONFIDENCE decision 13, reversing decision 7).
 #:
 #: ⚠ **The cost decision 7 was buying, stated rather than clamped:** a consumer
 #: can lower this until their answers read `grounded`, tuning away the signal
@@ -162,7 +162,7 @@ SEPARATION_FLOOR = 0.10
 #: ✅ **RULED by Arpit 2026-08-28: leave the gate off; publish the signal.**
 #: Shown the table above, he chose reporting over a claim fux cannot support.
 #: **Set this above `0.0` only with a bigger decoy set and a PRE-REGISTERED
-#: floor** — not a number read off 65 queries. ADR-CONFIDENCE decision 12.
+#: floor** — not a number read off 65 queries. SR-CONFIDENCE decision 12.
 #:
 #: **Overridable since 2026-08-28** as `[confidence] doc_coverage_floor`
 #: (decision 13). ⚠ **The cost here is MEASURED, not guessed**, which is what
@@ -268,7 +268,7 @@ class Confidence:
         An agent handed `0.3` will use it anyway and hedge in prose; an agent
         handed `answerable: false` has nothing to hedge with. That asymmetry is
         the reason this is a boolean and not the bottom of a scale
-        (ADR-CONFIDENCE decision 5).
+        (SR-CONFIDENCE decision 5).
         """
         return self.band != NONE
 
@@ -377,7 +377,7 @@ def signals(
     it has **proved** cannot reach the top `k`, so it never scores them; the
     reference scan scores everything. A corpus-wide count would therefore differ
     between `--fast` and `--scan`, which is precisely the differential-law break
-    [ADR-T1-ACCELERATOR](../../../docs/adr/0011_accelerator.md) exists to
+    [SR-T1-ACCELERATOR](../../../records/0110_accelerator.md) exists to
     forbid. Counting only what both paths agree on keeps the law intact, and the
     law is worth more than the better number.
     """

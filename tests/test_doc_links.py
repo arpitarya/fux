@@ -1,10 +1,10 @@
 """Every relative link in a live document resolves to a file that exists.
 
 **Why this is a test and not a rule.** Broken internal links have now been the
-recorded failure twice: five were found and fixed by the 2026-08-24 ADR audit
+recorded failure twice: five were found and fixed by the 2026-08-24 SR audit
 (W-77), and a repo-wide sweep the same day found **71 more** — every one of them
 a link into `work/open/` for an item that had closed and retired into
-`archive/open/`, or an ADR path written from the register's stale display label
+`archive/open/`, or an SR path written from the register's stale display label
 rather than the filename. CLAUDE.md's standing rule is that a failure class the
 WORKLOG records twice becomes a check in the change that records the second
 occurrence. This is that check.
@@ -13,7 +13,7 @@ occurrence. This is that check.
 item's detail file is *deleted from* `work/open/` and *moved to* `archive/open/`
 when its row leaves the queue. Every live doc that linked to it silently breaks
 at that moment, and nothing was watching. The register's renumbering of
-2026-08-22 did the same thing to ADR paths.
+2026-08-22 did the same thing to SR paths.
 
 **What is exempt, and why each one is exempt by law rather than by convenience:**
 
@@ -31,7 +31,7 @@ at that moment, and nothing was watching. The register's renumbering of
 - `archive/**` is frozen and its links are never repaired
   (`tests/test_archive_law.py` states this).
 - `CHANGELOG.md` is a **historical record** of released versions.
-- `docs/adr/TEMPLATE.md` links **placeholders** (`000N_<short-name>.md`).
+- `records/TEMPLATE.md` links **placeholders** (`000N_<short-name>.md`).
 - Targets **outside the repo** cannot be checked from inside it — `README.md`
   points at the sibling `fux-playground`, deliberately.
 
@@ -66,7 +66,7 @@ _FROZEN_GLOBS = ("PRE-REGISTRATION-",)
 _FROZEN_FILES = {
     "work/WORKLOG.md",       # append-only session log
     "CHANGELOG.md",          # released history
-    "docs/adr/TEMPLATE.md",  # links are placeholders, not paths
+    "records/TEMPLATE.md",  # links are placeholders, not paths
 }
 
 # A link may legitimately point at a sibling repo that is not vendored here.
@@ -113,7 +113,7 @@ def test_every_relative_link_in_a_live_document_resolves() -> None:
         f"{len(broken)} link(s) in live documents point at files that do not exist:\n  "
         + "\n  ".join(broken)
         + "\n\nThe usual cause: the target was a work item under `work/open/` that has "
-          "since closed and retired into `archive/open/`, or an ADR path written from "
+          "since closed and retired into `archive/open/`, or an SR path written from "
           "the register's display label instead of the filename. Repoint at the LIVE "
           "successor — a deleted link leaves the claim ungrounded and nobody can see "
           "that anything is missing (CLAUDE.md §Archive is not evidence)."

@@ -1,7 +1,7 @@
 """The skip record — W-93: it lives in `.fux/.fuxignore`, and it is committed.
 
 `fux ingest` reports every path it did not index, with its reason, always
-([ADR-INGEST](../../../docs/adr/0007_ingest.md) decision 4) — a silently
+([SR-INGEST](../../../records/0106_ingest.md) decision 4) — a silently
 dropped file is indistinguishable from a file that was never there. On a real
 corpus that is a **wall of identical lines on every single run**, and a wall
 nobody reads is the same failure the rule exists to prevent, arrived at from
@@ -37,7 +37,7 @@ trade, not a free win:
 `fuxignore.BLOCK_SKIPPED` holds the ones fux could not read. A line's class is
 **which block it is in** — structural. Reading it out of the note text would
 put the classification one string edit away from being silently wrong, which is
-exactly what ADR-INGEST decision 15 refuses.
+exactly what SR-INGEST decision 15 refuses.
 
 **The reason is part of the key, deliberately.** A file that changes *why* it
 is skipped — `empty` becoming `not an indexed file type` — is news, and prints
@@ -52,7 +52,7 @@ reason; that is correct, not noise.
 `fux ingest` learns nothing about any URL, so it must not forget the URL skips
 a networked run recorded — otherwise the next `fux update` re-prints them as
 though they were new. This is `_observe_url_health`'s rule
-([ADR-URL-INGEST](../../../docs/adr/0008_url-ingest.md)) applied to the
+([SR-URL-INGEST](../../../records/0107_url-ingest.md)) applied to the
 writer: an offline run does not get to speak about the networked plane.
 
 ⚠ **A URL is never written into a block, and the consequence is stated rather
@@ -65,7 +65,7 @@ report-once promise now covers files only.
 handful of dead URLs, not hundreds, so it is a line and not a wall — the thing
 W-88 was actually about. And repeat URL failure already has a home built for
 it: `.fux/runtime/url-state.json` and the dead-URL report
-([ADR-URL-INGEST](../../../docs/adr/0008_url-ingest.md)), which counts streaks
+([SR-URL-INGEST](../../../records/0107_url-ingest.md)), which counts streaks
 rather than restating one run's outcome. Keeping a second runtime file alive
 just for URLs would put the answer in two places, which is what this change
 removed.
@@ -164,7 +164,7 @@ def stale_warnings(root: Path, *, types, excludes) -> list[str]:
     `.fux/formats.toml` and the `.py` lines keep those files out; write content
     into a file listed as `empty` and it stays out, still labelled `empty`. The
     line is then a false statement that is also load-bearing — the exact shape
-    ADR-FUXIGNORE exists to abolish.
+    SR-FUXIGNORE exists to abolish.
 
     **The freeze is not undone here** (that was Arpit's call on 2026-08-27);
     it is made *loud*. Advisory, stderr, never an error, and it names the one

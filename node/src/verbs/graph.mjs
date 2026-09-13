@@ -16,7 +16,7 @@
  * the corpus, not a failure to search hard enough.
  *
  * 🔴 Node rebuilds the plane in memory from the committed records; it does not
- * read Python's derived `.fux/runtime/graph.json` (ADR-NODE-SEARCH decision 6's
+ * read Python's derived `.fux/runtime/graph.json` (SR-NODE-SEARCH decision 6's
  * reasoning applied to the graph plane — the digest must EQUAL Python's, and
  * reading Python's file would prove nothing).
  */

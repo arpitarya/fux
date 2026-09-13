@@ -29,7 +29,7 @@ def _write_fixture(root: Path) -> None:
     dirs = root / ".fux" / "sources" / "dirs"
     dirs.parent.mkdir(parents=True, exist_ok=True)
     dirs.write_text("docs\n", encoding="utf-8")
-    # ADR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
+    # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
     (root / ".fux" / "pii.toml").write_text("", encoding="utf-8")
     docs = root / "docs"
     docs.mkdir()
@@ -111,16 +111,21 @@ def test_stale_accelerator_falls_back_rather_than_answering_wrongly(tmp_path):
     ).stdout
 
 
-def test_archived_weight_demotes_only_when_configured(tmp_path):
-    """ADR-ARCHIVED-CONTENT decision 6, through the shipped CLI: byte-identical at
-    the default, and a live document overtakes an archived one once a weight
-    is set — both via `.fux/tune.toml` since ADR-TUNE moved the key there
-    (2026-08-24), never a CLI flag."""
+def test_retirement_marks_and_never_demotes(tmp_path):
+    """SR-ARCHIVED-CONTENT decisions 2, 3 and 6, through the shipped CLI.
+
+    🔴 **REVERSED 2026-09-13.** `archived_weight` let a consumer demote retired
+    documents and was removed (SR-TUNE decision 15a, W-152): retirement is a
+    fact, and fux does not scale a score by a fact. So this asserts three things
+    that are now structural rather than default-dependent — the archived
+    document still wins on its text, it is still **marked**, and a committed
+    `archived_weight` is **refused by name** rather than read.
+    """
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     dirs = tmp_path / ".fux" / "sources" / "dirs"
     dirs.parent.mkdir(parents=True, exist_ok=True)
     dirs.write_text("docs\nold archived=true\n", encoding="utf-8")
-    # ADR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
+    # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
     (tmp_path / "docs").mkdir()
     (tmp_path / "old").mkdir()
@@ -132,17 +137,20 @@ def test_archived_weight_demotes_only_when_configured(tmp_path):
     )
     _run(tmp_path, "ingest")
 
-    default = _run(tmp_path, "ask", "cache", "--json").stdout
-    assert json.loads(default)["results"][0]["loc"] == "old/cache.md"  # heading match wins
+    default = json.loads(_run(tmp_path, "ask", "cache", "--json").stdout)["results"]
+    assert default[0]["loc"] == "old/cache.md"  # heading match wins, undemoted
+    assert default[0]["archived"] is True  # and the reader is TOLD
 
+    # The removed key is an error that names the removal, not an unknown key.
     (tmp_path / ".fux" / "tune.toml").write_text(
         "[ranking]\narchived_weight = 0.1\n", encoding="utf-8"
     )
-    demoted = _run(tmp_path, "ask", "cache", "--json").stdout
-    assert json.loads(demoted)["results"][0]["loc"] == "docs/cache.md"
+    refused = _run(tmp_path, "ask", "cache", "--json", check=False)
+    assert refused.returncode == 1
+    assert "REMOVED on 2026-09-13" in refused.stderr
 
-    # `--no-tune` is the "is it me or the config?" switch (ADR-TUNE decision
-    # 11): the same corpus, the same tune file, the engine's own ordering.
+    # `--no-tune` skips the file entirely (SR-TUNE decision 11), so it answers
+    # even while a removed key sits in it — which is what that switch is for.
     untuned = _run(tmp_path, "ask", "cache", "--json", "--no-tune").stdout
     assert json.loads(untuned)["results"][0]["loc"] == "old/cache.md"
 
@@ -257,7 +265,7 @@ def test_answer_cites_across_documents_and_names_each_one(tmp_path):
 
 
 def test_every_passage_carries_its_ordinal(tmp_path):
-    """ADR-REFER decision 17 and ADR-ANSWER decision 9, through the CLI.
+    """SR-REFER decision 17 and SR-ANSWER decision 9, through the CLI.
 
     **Both records promised `passage.ordinal` in the `--json` payload and the
     code did not emit it** (W-140 row 2). The reason it is promised is worth
@@ -329,7 +337,7 @@ def test_answer_declines_when_nothing_matches(tmp_path):
 
 
 def test_answer_json_carries_source_on_both_branches(tmp_path):
-    """W-48: ADR-ANSWER tells callers to key on `"source"` to detect the M4
+    """W-48: SR-ANSWER tells callers to key on `"source"` to detect the M4
     upgrade, so a branch that omits it is a trap rather than a signal. A hit
     now answers via refer; a miss has nothing to refer to and stays index.
     """
@@ -341,6 +349,114 @@ def test_answer_json_carries_source_on_both_branches(tmp_path):
     assert hit["source"] == "refer"
     assert miss["source"] == "index"
     assert miss["answer"] is None and miss["citation"] is None
+
+
+def test_every_json_hit_carries_mtime_through_the_shipped_cli(tmp_path):
+    """W-153 — the committed date reaches a caller, on `ask` and on `find`.
+
+    🔴 **This fixture is NOT a git repository**, deliberately: `mtime` comes from
+    git commit times, so every document here has none. That is the exact shape a
+    corpus copied out of its repository has, and the assertion is that the key is
+    **present and `null`** rather than missing — an absent key cannot be told
+    from an older fux (the W-48 trap).
+
+    Both paths are checked, because the field is read in `rank()` off a record
+    dict the scan and the accelerator both supply.
+    """
+    _write_fixture(tmp_path)
+    _run(tmp_path, "ingest")
+
+    for extra in ([], ["--fast"]):
+        hits = json.loads(_run(tmp_path, "ask", "pruning", "--json", *extra).stdout)["results"]
+        assert hits
+        for hit in hits:
+            assert "mtime" in hit, "an absent key is indistinguishable from an older fux"
+            assert hit["mtime"] is None, "no git history here, so no committed date"
+
+    found = json.loads(_run(tmp_path, "find", "pruning", "--json").stdout)["results"]
+    assert found and all("mtime" in hit for hit in found)
+
+
+# -- SR-PROVENANCE decision 10, as amended: the journal's TWO consent surfaces --
+
+
+def _journal(root: Path) -> Path:
+    from fux.query.provenance import JOURNAL_NAME
+
+    return root / ".fux" / "runtime" / JOURNAL_NAME
+
+
+def test_both_journal_consent_surfaces_write_and_neither_alone_is_removable(tmp_path):
+    """🔴 W-147, ruled by Arpit 2026-09-13: *"I need the flag as well as output
+    TOML configuration."* **Both are explicit consent and both stay.**
+
+    This test exists so neither can be tidied away by a later session reading
+    `.fux/output.toml` as a pure *rendering* config. It is not — `journal` is a
+    **declared exception** to SR-OUTPUT decision 2's boundary rule: it leaves the
+    result set byte-identical and still **writes a durable file**, which is
+    exactly why the boundary rule alone was never going to catch it.
+
+    Four cases, and the fourth is the one that makes the other three mean
+    something: **neither surface present must write nothing at all.**
+    """
+    _write_fixture(tmp_path)
+    _run(tmp_path, "ingest")
+    q = "pruning"
+
+    # 1 · neither surface -> NO journal. The default is `false` on both.
+    _run(tmp_path, "answer", q, "--json")
+    assert not _journal(tmp_path).exists(), "a journal appeared with no consent of any kind"
+
+    # 2 · the flag alone, no config -> journals.
+    _run(tmp_path, "answer", q, "--json", "--journal")
+    assert _journal(tmp_path).exists(), "`--journal` did not write"
+    flag_lines = len(_journal(tmp_path).read_text(encoding="utf-8").splitlines())
+    assert flag_lines >= 1
+
+    # 3 · the committed key alone, NO flag -> journals. This is the half the
+    #     ruling turns on: a repository-level opt-in, reviewable in git, is
+    #     consent in a way that watching somebody's terminal is not.
+    #
+    # ⚠ The file is the SPECIMEN with one line flipped, not a two-line snippet.
+    # `.fux/output.toml` is a COMPLETE declaration: once it exists every gated
+    # key must be set, and a sparse file is refused by name. That is the shape a
+    # consumer actually has — `fux setup` writes the specimen and they edit a
+    # line — so testing the snippet would test a file nobody has.
+    from fux.output_config import specimen
+
+    _journal(tmp_path).unlink()
+    body = specimen().replace("journal = false", "journal = true")
+    assert "journal = true" in body, "the specimen's journal line changed spelling"
+    (tmp_path / ".fux" / "output.toml").write_text(body, encoding="utf-8")
+    _run(tmp_path, "answer", q, "--json")
+    assert _journal(tmp_path).exists(), (
+        "a committed `[cli.answer] journal = true` did not write — SR-PROVENANCE "
+        "decision 10 as amended says it is consent, so this is the ruling broken"
+    )
+
+    # 4 · `--no-output-config` ignores the file, so the committed key stops
+    #     applying. The escape hatch has to reach this key like any other.
+    _journal(tmp_path).unlink()
+    _run(tmp_path, "answer", q, "--json", "--no-output-config")
+    assert not _journal(tmp_path).exists(), (
+        "`--no-output-config` did not reach `journal`, so a consumer cannot turn "
+        "a committed opt-in off for one invocation"
+    )
+
+
+def test_journal_is_refused_by_name_at_the_shared_cli_level(tmp_path):
+    """It is PER-VERB, and that has not changed.
+
+    `[cli] journal = true` would turn journalling on for verbs that have no such
+    flag, which is a different and much larger consent than the one Arpit ruled.
+    The refusal names the key rather than reporting an unknown one.
+    """
+    _write_fixture(tmp_path)
+    (tmp_path / ".fux" / "output.toml").write_text(
+        "[cli]\njournal = true\n", encoding="utf-8")
+    out = _run(tmp_path, "answer", "pruning", "--json", check=False)
+    assert out.returncode != 0
+    assert "journal" in out.stderr, out.stderr
 
 
 def test_ask_json_reports_which_path_answered_when_explain_is_set(tmp_path):
@@ -365,7 +481,7 @@ def test_find_still_prints_prose_on_the_no_match_path(tmp_path):
     """W-48 item 3, decided and left alone — pinned so the decision is visible.
 
     All three verbs say the same thing for the same condition; `--json` is the
-    machine-readable form. ADR-FIND ties reopening this to a real script
+    machine-readable form. SR-FIND ties reopening this to a real script
     observed breaking on it, and no such script has been observed.
     """
     _write_fixture(tmp_path)
@@ -378,7 +494,7 @@ def test_find_still_prints_prose_on_the_no_match_path(tmp_path):
 
 
 def test_derived_plane_is_gitignored(tmp_path):
-    """ADR-DOTFUX's ignore rule, checked end to end rather than assumed."""
+    """SR-DOTFUX's ignore rule, checked end to end rather than assumed."""
     subprocess.run(["git", "init", "-q"], cwd=tmp_path, capture_output=True)
     _write_fixture(tmp_path)
     _run(tmp_path, "ingest")
@@ -494,7 +610,7 @@ def test_setup_writes_the_types_file_with_the_default_spelled_out(tmp_path):
     # ⚠ Was `assert "No .json" in types`. `.json` rejoined the default on
     # 2026-08-26 (Arpit: *"all the ones which have a decoder"*), so that line
     # was asserting a sentence the template no longer has a reason to write.
-    # Since ADR-TYPES decision 12 a decoded format is a `[decoders]` line.
+    # Since SR-TYPES decision 12 a decoded format is a `[decoders]` line.
     assert '\njson = "json"\n' in types, "a decoded format is spelled out like any other"
 
     # The claim the test was really making — that the file says what is OUT and
@@ -515,7 +631,7 @@ def test_setup_writes_the_types_file_with_the_default_spelled_out(tmp_path):
 
 
 def test_setup_converts_a_leftover_types_file_and_ingest_refuses_until_it_is_gone(tmp_path):
-    """ADR-TYPES decision 12, end to end: refused, converted, then deleted by hand."""
+    """SR-TYPES decision 12, end to end: refused, converted, then deleted by hand."""
     _write_fixture(tmp_path)
     (tmp_path / "docs" / "note.rst").write_text("Pruning notes\n=============\n", encoding="utf-8")
     legacy = tmp_path / ".fux" / "sources" / "types"
@@ -704,7 +820,7 @@ def test_update_refuses_to_create_a_line(tmp_path):
 
 
 def test_add_of_a_file_does_not_override_the_type_allowlist(tmp_path):
-    """Inclusion is a conjunction with no precedence (ADR-DIR-LIST/ADR-TYPES).
+    """Inclusion is a conjunction with no precedence (SR-DIR-LIST/SR-TYPES).
 
     Promoting an explicitly-added file past the allowlist would be the W-55
     defect arriving from a new direction, so the line is written, the type

@@ -31,7 +31,7 @@ def _corpus(root: Path) -> None:
     dirs = root / ".fux" / "sources" / "dirs"
     dirs.parent.mkdir(parents=True, exist_ok=True)
     dirs.write_text("docs\n", encoding="utf-8")
-    # ADR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
+    # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
     (root / ".fux" / "pii.toml").write_text("", encoding="utf-8")
     docs = root / "docs"
     docs.mkdir()

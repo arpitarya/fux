@@ -1,6 +1,6 @@
 ---
 name: fux-enrich
-description: Generate enrichment for documents in a Fux corpus. Use ONLY when explicitly asked to enrich, re-enrich, or fill in enrichment — for one named document or URL ("enrich this page", "enrich the ranking ADR", "enrich https://…") or for a named scope ("enrich the ADRs", "fill in the missing enrichment"). Writes files into .fux/enrich/ that are committed to the repository and that change search ranking.
+description: Generate enrichment for documents in a Fux corpus. Use ONLY when explicitly asked to enrich, re-enrich, or fill in enrichment — for one named document or URL ("enrich this page", "enrich the ranking SR", "enrich https://…") or for a named scope ("enrich the SRs", "fill in the missing enrichment"). Writes files into .fux/enrich/ that are committed to the repository and that change search ranking.
 ---
 
 # Enriching a Fux corpus
@@ -33,7 +33,7 @@ worklist and validates what you write; generating the text is this skill's job.
 | the request named | you enrich |
 |---|---|
 | one document or URL | that one |
-| a scope ("the ADRs", "docs/runbooks") | that scope — after step 1's count |
+| a scope ("the SRs", "docs/runbooks") | that scope — after step 1's count |
 | nothing in particular ("enrich the corpus") | **ask first.** See step 1 |
 
 ## 1 · Get the worklist yourself
@@ -42,13 +42,13 @@ worklist and validates what you write; generating the text is this skill's job.
 
 ```bash
 fux enrich --plan                          # every declared scope
-fux enrich --plan docs/adr/0012_ranking.md # one document
+fux enrich --plan records/0111_ranking.md # one document
 fux enrich --plan https://example.com/x    # one URL
 ```
 
 ```
-scope docs/adr (enrich=true) — filtered to docs/adr/0012_ranking.md
-  docs/adr/0012_ranking.md  sha 3f8a1c2d9b04e7a1c05b2f9d84e6a3771c0d5e82  9 chunks  MISSING
+scope docs/adr (enrich=true) — filtered to records/0111_ranking.md
+  records/0111_ranking.md  sha 3f8a1c2d9b04e7a1c05b2f9d84e6a3771c0d5e82  9 chunks  MISSING
 -> 1 document, 9 chunks
 ```
 
@@ -99,7 +99,7 @@ it and not one you compute.
 
 ```markdown
 ---
-source: docs/adr/0012_ranking.md
+source: records/0111_ranking.md
 source_sha: 3f8a1c2d9b04e7a1c05b2f9d84e6a3771c0d5e82
 chunks: 9
 model: <the model you are>
@@ -120,7 +120,7 @@ If the document **supersedes** another, or **is superseded by** another, say so
 in the *frontmatter*, never in a question:
 
 ```markdown
-superseded_by: docs/adr/0019_calder-gateway.md
+superseded_by: records/0019_calder-gateway.md
 ```
 
 🔴 **`superseded_by:` is the one key here that reaches the RANKING.** It marks
@@ -210,7 +210,7 @@ without the value.** Do not add a `pii.toml` rule to cover it: that would index
 ## 4 · Check your work
 
 ```bash
-fux enrich --check docs/adr/0012_ranking.md   # the one you just wrote
+fux enrich --check records/0111_ranking.md   # the one you just wrote
 fux enrich --check                            # the whole scope
 ```
 

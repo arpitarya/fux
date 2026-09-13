@@ -54,7 +54,7 @@ discordant), **the variable is the implementation, not the machine**:
       refuses: missing keys, sha mismatch, `chunks` ≠ `refer/_chunk`, mixed
       models in a scope, `dim` mismatch, values outside `[-128, 127]`.
 - [ ] `.fux/vectors/<sha>.jsonl`, `fux.vectors.v1`, schema file beside the
-      code; declared **committed** in ADR-DOTFUX's table; `fux doctor` names
+      code; declared **committed** in SR-DOTFUX's table; `fux doctor` names
       orphans and the hashed-meta rule.
 - [ ] `fux ingest` folds vectors into `.fux/runtime/vectors/` (derived;
       manifest + schema bump); **`.fux/index/` byte-identical with or
@@ -70,14 +70,14 @@ discordant), **the variable is the implementation, not the machine**:
       version policy says it does not.
 - [ ] Gate: W-106's bar re-run on the shipped path; differential law with
       and without `--qvec`; two-ISA discordant count for query vectors.
-- [ ] ADR-VECTORS (new), ADR-DOTFUX, ADR-INGEST, ADR-ASK, ADR-PROVENANCE
+- [ ] SR-VECTORS (new), SR-DOTFUX, SR-INGEST, SR-ASK, SR-PROVENANCE
       amended; ownership twin; CHANGELOG; `IMPLEMENTATION.md`; this file to
       `archive/open/`.
 
 ## Blockers
 
 - **W-106 PASS** — hard.
-- W-109 (`fuse.py`, ADR-EXPAND).
+- W-109 (`fuse.py`, SR-EXPAND).
 - `arpit`: the compare-doc verdict; the hashed-meta default.
 
 ## Hazards
@@ -106,4 +106,4 @@ Fux computing any vector. A bundled model. Score-space fusion.
   *(spec: [`proposals/search-v3.md`](../proposals/search-v3.md) §8 · one detail
   file each under [`open/`](README.md))* · **Opus** executes, in Arpit's
   ratified order: **W-107 Phases 1–4** → **W-112**. `ratified: 2026-09-05`
-  - **[W-112](W-112-vector-plane.md)** · `arpit` · *(**ADR-VECTORS** new · ADR-DOTFUX · ADR-INGEST · ADR-ASK · ADR-PROVENANCE)* · the vector plane — `fux embed`, pinned `.fux/vectors/`, `--qvec`, rank-space fusion; fux never computes a vector. 🔴 **Blocked on three things:** a corpus — **under [L9](../../docs/adr/0011_LAW-9-environments.md) the golden ladder in fux-lab (W-136)**, a re-run gate, and a compare doc Arpit rules on **once it is written** (not yet — nothing to decide today). ⚠ **The determinism claim the design can actually make is *"same clone + same embedder build"*, never *"same model"*** — W-106's `0 of 125` is why. `filed: 2026-09-04`
+  - **[W-112](W-112-vector-plane.md)** · `arpit` · *(**SR-VECTORS** new · SR-DOTFUX · SR-INGEST · SR-ASK · SR-PROVENANCE)* · the vector plane — `fux embed`, pinned `.fux/vectors/`, `--qvec`, rank-space fusion; fux never computes a vector. 🔴 **Blocked on three things:** a corpus — **under [SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md) the golden ladder in fux-lab (W-136)**, a re-run gate, and a compare doc Arpit rules on **once it is written** (not yet — nothing to decide today). ⚠ **The determinism claim the design can actually make is *"same clone + same embedder build"*, never *"same model"*** — W-106's `0 of 125` is why. `filed: 2026-09-04`

@@ -186,7 +186,7 @@ source, resolved version, Python minor, `separation_floor`, `doc_coverage_floor`
 
 | gate | on failure |
 |---|---|
-| floors differ between two arms that will be paired | 🔴 void for that pair — a pre-registered threshold is moving inside the comparison (ADR-CONFIDENCE d13 reopen trigger). Fix the config, re-prepare |
+| floors differ between two arms that will be paired | 🔴 void for that pair — a pre-registered threshold is moving inside the comparison (SR-CONFIDENCE d13 reopen trigger). Fix the config, re-prepare |
 | `.fux/enrich` present in a core arm | remove it, re-prepare. An enrichment delta is not a version delta |
 
 ### 5.3 The differential law — within each arm, before any `--fast` number
@@ -303,7 +303,7 @@ tables.
       right in **both** arms) and regression (not wrong in both), each labelled
       **observed**, **proven** or **unproven**. Computed from the rows already
       filed; **0 in a direction makes that null Inconclusive.** The rule is
-      [ADR-RS](../../docs/adr/0133_predictions.md) decision 22; do not restate it
+      [SR-RS](../../records/0133_predictions.md) decision 22; do not restate it
       here.
 - [ ] **Deviations from the pre-registration, listed in the report**, numbered,
       never absorbed.

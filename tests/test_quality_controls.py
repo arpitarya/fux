@@ -1,6 +1,6 @@
-"""The controls ADR-RS decision 15 is owed — the two built, and the seal.
+"""The controls SR-RS decision 15 is owed — the two built, and the seal.
 
-`tools/quality-controls/` is owned by ADR-RS: a control belongs to the
+`tools/quality-controls/` is owned by SR-RS: a control belongs to the
 measurement discipline, not to the feature it tests.
 """
 

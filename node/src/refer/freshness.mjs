@@ -5,6 +5,8 @@
  * reachable here: `current`/`stale` from reading the local checkout, and
  * `as-ingested`/`unverified` for a `url:` document. `cached` requires a TTL
  * fetch cache, which requires fetching.
+ *
+ * Owned, with its Python twin, by [SR-URL-FRESHNESS](../../../records/0147_url-freshness.md).
  */
 
 export const CURRENT = "current";

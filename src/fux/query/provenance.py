@@ -1,7 +1,7 @@
-"""How the returned output got generated — ADR-PROVENANCE.
+"""How the returned output got generated — SR-PROVENANCE.
 
 Fux already tells a caller **what** it used (the citation, with a `sha`) and
-**how much it believes it** ([ADR-CONFIDENCE](../../../docs/adr/0045_confidence.md)).
+**how much it believes it** ([SR-CONFIDENCE](../../../records/0141_confidence.md)).
 It has never told anyone **how it got there**, or **what it left out**. This
 module is that third statement.
 
@@ -45,13 +45,20 @@ because a log nobody can read answers no question anyone asks of it. What
 survives is confinement — the journal lives in `.fux/runtime/`, which
 [`store/fuxdir.py`](../store/fuxdir.py) lists by name as gitignored, and it
 **never reaches a committed byte or the network**. See
-[ADR-LAWS](../../../docs/adr/0001_LAWS.md) decision 8, which also records that
+[SR-LAWS](../../../records/0001_LAWS.md) decision 8, which also records that
 the AOL-2006 risk was *accepted*, not disproved.
 
 ⚠ **The journal is OFF by default.** Turning plaintext logging on for every
 existing consumer without asking is exactly the surprise a `$0`, offline,
-"nothing leaves your machine" tool must not spring. `[provenance] journal =
-true` in `.fux/tune.toml` opts in; `journal_max` bounds it. The bound is a
+"nothing leaves your machine" tool must not spring.
+
+🔴 **TWO surfaces opt in, and both are explicit consent** (Arpit, 2026-09-13;
+SR-PROVENANCE decision 10 as amended): `fux answer --journal` for one
+invocation, and `[cli.answer] journal = true` in **`.fux/output.toml`** for the
+repository — the second reviewable in git rather than by watching a terminal.
+⚠ **NOT `.fux/tune.toml`**, which this docstring claimed until 2026-09-13 and
+which the ruling explicitly REJECTED as option (c): `tune.toml` is the ranking
+file and journalling is not ranking. `journal_max` bounds it. The bound is a
 *design default*, not a law — L8 no longer requires one, and Arpit's standing
 rule is to state the cost rather than clamp the knob.
 
@@ -65,7 +72,7 @@ on the first. Concretely, a derivation reads:
 
 - the committed record's `terms` map (per-field counts, already on disk),
 - the `df`/`n` corpus statistics `stats_out` already hands back for
-  [ADR-CONFIDENCE](../../../docs/adr/0045_confidence.md),
+  [SR-CONFIDENCE](../../../records/0141_confidence.md),
 - the ordering the caller was actually shown.
 
 ⚠ **It therefore reports *observed* quantities, never a reconstructed score.**
@@ -78,7 +85,7 @@ it* — a claim that is exactly true.
 
 ## The four gates
 
-The funnel is [ADR-QUALITY](../../../docs/adr/0044_quality-contract.md)'s, not
+The funnel is [SR-WORK-QUALITY](../../../records/0056_WORK-quality.md)'s, not
 a new invention: `reachable` → `in window` → `placed` → `answered`. Attributing
 a miss to a gate is the whole reason the contract chose a funnel over a blended
 score, and it is the audit-valuable half of a derivation — *what was left out,
@@ -156,7 +163,7 @@ def index_digest(root: Path) -> str:
     """A reproducible digest of the committed index, or `""` when there is none.
 
     **The committed shards, not the runtime stamp.**
-    [ADR-RUNTIME-STAMP](../../../docs/adr/0027_runtime-stamp.md) decision 2
+    [SR-RUNTIME-STAMP](../../../records/0124_runtime-stamp.md) decision 2
     deliberately excludes the stamp from `DETERMINISTIC_FILES` because mtimes
     differ between two checkouts of byte-identical content. A receipt keyed on
     the stamp would therefore fail to reproduce on a fresh clone **by
@@ -269,7 +276,7 @@ class DocDerivation:
 
 @dataclass(frozen=True)
 class Gates:
-    """ADR-QUALITY's funnel, as counts. The negative space, in four integers."""
+    """SR-WORK-QUALITY's funnel, as counts. The negative space, in four integers."""
 
     reachable: int
     in_window: int
@@ -740,7 +747,7 @@ def verify(root: Path, payload: dict, *, rerun=None) -> Verification:
             UNVERIFIABLE,
             note=(
                 "this answer came from the refer plane, and re-running it would "
-                "fetch; `fux verify` never does (ADR-PROVENANCE decision 14). "
+                "fetch; `fux verify` never does (SR-PROVENANCE decision 14). "
                 "Inputs match; the fetched-byte verdicts are in the receipt's "
                 "own `verdicts`"
             ),

@@ -9,7 +9,7 @@ indirection is the single thing worth knowing about this file.
 human reads, and `=VLOOKUP(...)` as a term matches nothing anyone types.
 
 ⚠ **A spreadsheet is the format most likely to be pure numbers**, which is the
-shape [ADR-TYPES](../../../docs/adr/0031_types-list.md) verdict G punished. A
+shape [SR-TYPES](../../../records/0128_types-list.md) verdict G punished. A
 consumer opting `.xlsx` in should know their sheets are mostly words.
 """
 
@@ -20,7 +20,7 @@ from __future__ import annotations
 # `.fux/decoders/` loaded by path. A path-loaded file has no parent package, so
 # `from . import _xml` raises `attempted relative import with no known parent
 # package` — the copy would be dead on arrival. Absolute imports mean the file
-# fux ships and the file you edit are byte-identical (ADR-DECODE decision 11).
+# fux ships and the file you edit are byte-identical (SR-DECODE decision 11).
 from fux.decode import _ooxml, _xml
 from fux.decode._zip import SafeZip, ZipTooBig, numeric_key
 

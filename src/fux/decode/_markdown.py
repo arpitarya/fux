@@ -34,7 +34,7 @@ heading was `Rollbacks` on one side and `Rollbacks ###` on the other.
 * `_chunk.py` opened a new passage there, cutting the example in half and
   citing the comment as that passage's section title.
 
-Every ADR in this repository contains such a block, and so does every README
+Every SR in this repository contains such a block, and so does every README
 worth indexing. This is the common case for the corpus fux was built on, not a
 corner of it.
 
@@ -59,7 +59,7 @@ patterns in `extract.py`: their heading syntax is different, and so is their
 code-block convention (`::` and indentation, `----`, `#+BEGIN_SRC`). Bringing
 those under one scanner is a separate change with its own risk, and no
 decoder emits them — a decoded document is always Markdown
-([ADR-DECODE](../../../docs/adr/0042_decode.md) decision 2), so this module
+([SR-DECODE](../../../records/0139_decode.md) decision 2), so this module
 covers every decoded document and every `.md` in the corpus.
 
 ⚠ **Indented code blocks need no handling.** A four-space-indented `#` never

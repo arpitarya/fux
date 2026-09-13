@@ -27,7 +27,7 @@ partly true here, and pretending otherwise would be worse than saying it:
    required tiers 1 *and* 2 informative and its INCONCLUSIVE row required
    *neither* to be. All-match-with-one-informative is in neither.
    **Arpit ruled §3.1 governs**, and
-   [ADR-MERGE-DRIVER](../../docs/adr/0034_merge-driver.md) was accepted on that
+   [SR-MERGE-DRIVER](../../records/0034_merge-driver.md) was accepted on that
    reading rather than on a clean pass.
 3. **A post-hoc arm already exists and already answered the question.**
    `run.py`'s `tier1b` — disjoint adds selected by hashing into one shard — was
@@ -128,8 +128,8 @@ by design, and that is the point rather than a weakness.
 
 | outcome | condition | action |
 |---|---|---|
-| **PASS** | all three tiers match their expected column, **and** tiers 1 and 2 are both informative per §3.1 | [ADR-MERGE-DRIVER](../../docs/adr/0034_merge-driver.md) veto 2 is satisfied on a clean pass |
-| **FAIL** | any tier deviates from its expected column — a machine plane conflicting, or a human conflict silently resolved | ADR-MERGE-DRIVER returns to `proposed` (its veto 5) |
+| **PASS** | all three tiers match their expected column, **and** tiers 1 and 2 are both informative per §3.1 | [SR-MERGE-DRIVER](../../records/0034_merge-driver.md) veto 2 is satisfied on a clean pass |
+| **FAIL** | any tier deviates from its expected column — a machine plane conflicting, or a human conflict silently resolved | SR-MERGE-DRIVER returns to `proposed` (its veto 5) |
 | **PARTIAL** | all three tiers match, and **exactly one** of tiers 1 and 2 is informative | **Reported and handed to Arpit. The runner does not adjudicate it.** |
 | **INCONCLUSIVE** | all three tiers match, and **neither** tier 1 nor tier 2 is informative | the instrument, not the engine, is what failed; nothing is ruled |
 
@@ -169,7 +169,7 @@ here so this file stands alone:
   merges.** Two-parent merges only.
 - **Not an add/add shard conflict.** git does not invoke a content merge driver
   when a file is added on both sides with no common ancestor; that limitation is
-  recorded in ADR-MERGE-DRIVER and is out of scope here.
+  recorded in SR-MERGE-DRIVER and is out of scope here.
 - **Not concurrent *processes*.** One writer at a time is assumed; the
   prediction is about branches, not about two `fux ingest` runs racing.
   ⚠ **This exclusion is worth re-reading now that W-66 has shipped a background

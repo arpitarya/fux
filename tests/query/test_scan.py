@@ -81,7 +81,7 @@ def test_top_limits_results(tmp_path):
     assert len(ask(tmp_path, "x", top=3)) == 3
 
 
-# -- ADR-ARCHIVED-CONTENT decision 6: the archived demotion weight ----------------
+# -- SR-ARCHIVED-CONTENT decision 6: the archived demotion weight ----------------
 
 
 def _archived_setup(tmp_path):
@@ -107,12 +107,18 @@ def _ranking(results):
     return [(r.id, r.loc, r.score) for r in results]
 
 
-def test_default_weight_is_byte_identical_to_no_archived_dirs(tmp_path):
-    """Decision 2's veto: at the shipped default, nothing reorders."""
+def test_declaring_archived_dirs_cannot_reorder_anything(tmp_path):
+    """Decision 2's veto, now structural rather than a default.
+
+    ⚠ **`archived_weight` was REMOVED on 2026-09-13** (W-152): retirement is a
+    fact, not a weight. The veto used to hold *because the shipped value was
+    `1.0`* and a consumer could switch it off; there is no longer a value to
+    switch, so declaring a source archived can only ever mark it.
+    """
     _archived_setup(tmp_path)
     plain = ask(tmp_path, "cache")
-    with_dirs_at_default = ask(tmp_path, "cache", archived_weight=1.0, archived_dirs=frozenset({"archive"}))
-    assert _ranking(plain) == _ranking(with_dirs_at_default)
+    with_dirs = ask(tmp_path, "cache", archived_dirs=frozenset({"archive"}))
+    assert _ranking(plain) == _ranking(with_dirs)
 
 
 def test_the_marker_does_not_move_the_ranking(tmp_path):
@@ -123,7 +129,7 @@ def test_the_marker_does_not_move_the_ranking(tmp_path):
     would satisfy the first assertion and fail the second.
     """
     _archived_setup(tmp_path)
-    marked = ask(tmp_path, "cache", archived_weight=1.0, archived_dirs=frozenset({"archive"}))
+    marked = ask(tmp_path, "cache", archived_dirs=frozenset({"archive"}))
     assert _ranking(marked) == _ranking(ask(tmp_path, "cache"))
     assert {r.loc: r.archived for r in marked} == {"archive/old.md": True, "docs/new.md": False}
 
@@ -155,25 +161,19 @@ def test_the_record_property_marks_without_any_dirs_declaration(tmp_path):
     assert result.archived is True
 
 
-def test_weight_below_one_demotes_the_archived_document(tmp_path):
+def test_an_archived_document_can_still_win_on_the_text(tmp_path):
+    """🔴 The W-152 removal, asserted rather than assumed.
+
+    `archived_weight = 0.1` used to take the retired document off the top here.
+    There is no such knob, so the better lexical match wins and the reader is
+    told *why they should care* by the marker and the response note instead.
+    **That is the whole trade the removal makes**, and it is stated as a test so
+    a future demotion cannot be reintroduced by accident.
+    """
     _archived_setup(tmp_path)
-    baseline = ask(tmp_path, "cache")
-    assert baseline[0].id == "file:archive/old.md"  # heading match wins pre-demotion
-
-    demoted = ask(tmp_path, "cache", archived_weight=0.1, archived_dirs=frozenset({"archive"}))
-    assert demoted[0].id == "file:docs/new.md"
-    archived_result = next(r for r in demoted if r.id == "file:archive/old.md")
-    baseline_archived = next(r for r in baseline if r.id == "file:archive/old.md")
-    assert archived_result.score == pytest.approx(baseline_archived.score * 0.1)
-
-
-def test_weight_never_touches_a_document_outside_the_archived_dirs(tmp_path):
-    _archived_setup(tmp_path)
-    baseline = ask(tmp_path, "cache")
-    demoted = ask(tmp_path, "cache", archived_weight=0.1, archived_dirs=frozenset({"archive"}))
-    live_baseline = next(r for r in baseline if r.id == "file:docs/new.md")
-    live_demoted = next(r for r in demoted if r.id == "file:docs/new.md")
-    assert live_baseline.score == live_demoted.score
+    results = ask(tmp_path, "cache", archived_dirs=frozenset({"archive"}))
+    assert results[0].id == "file:archive/old.md"  # the heading match, undemoted
+    assert results[0].archived is True
 
 
 def test_multi_term_query_prefers_document_matching_both(tmp_path):

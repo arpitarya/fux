@@ -10,10 +10,10 @@ timestamp: 2026-08-20T00:00:00Z
 
 > **Verdict: A — git hooks (`post-commit`/`post-merge`/`post-checkout`)
 > driving delta ingest**, exactly as scoped in
-> [W-25](../../archive/open/W-25-m5-maintenance.md) / `ADR-MAINTENANCE` (reserved). A
+> [W-25](../../archive/open/W-25-m5-maintenance.md) / `SR-MAINTENANCE` (reserved). A
 > hook re-emits only the changed lines into the committed index — not a full
 > rebuild — and the existing write-if-different + per-shard-sha discipline
-> ([ADR-INDEX-LIFECYCLE](../../docs/adr/0108_index-lifecycle.md)) does the
+> ([SR-INDEX-LIFECYCLE](../../records/0108_index-lifecycle.md)) does the
 > rest. Rejected: **B — CI-triggered rebuild** (a bot commits over the
 > human's diff, defeating the doc-major diffable design the committed index
 > exists for); **C — a local watch daemon** (solves live-edit latency but not
@@ -23,9 +23,9 @@ timestamp: 2026-08-20T00:00:00Z
 > **Status:** ✅ accepted (Arpit, 2026-08-20). **Next: implement W-25.**
 > **Open sub-decision, not yet ruled on:** should the hook also call `fux
 > build` so `.fux/runtime/graph.json` refreshes immediately, or is the
-> existing stale→scan fallback ([ADR-INDEX-LIFECYCLE](../../docs/adr/0108_index-lifecycle.md)
+> existing stale→scan fallback ([SR-INDEX-LIFECYCLE](../../records/0108_index-lifecycle.md)
 > decision 7) sufficient and the rebuild left on its current manual/CI
-> trigger? Fold the answer into `ADR-MAINTENANCE` when it's written.
+> trigger? Fold the answer into `SR-MAINTENANCE` when it's written.
 > **Reopen when:** R5 (20-doc commit < 1 s) or R6 (three-tier merge harness)
 > fails once measured — see W-25's DoD — or a hook is found to leave a
 > half-written committed shard on failure.
@@ -37,7 +37,7 @@ timestamp: 2026-08-20T00:00:00Z
 > 2026-09-12 while reviewing this directory.
 >
 > **The fork WAS revisited; only this document was not.** The answer is
-> [ADR-MAINTENANCE](../../docs/adr/0129_hooks.md) decision 1d: `post-commit`
+> [SR-MAINTENANCE](../../records/0129_hooks.md) decision 1d: `post-commit`
 > **defers** — it records the changed paths and spawns a detached re-index, so
 > the commit returns at once and the re-index cost stops sitting on the
 > developer's keystroke. **Verdict A survived in substance** — hooks still
@@ -62,14 +62,14 @@ Two layers need to stay fresh, and they are not the same problem:
 2. **Committed index → derived runtime, including the graph plane**
    (`.fux/runtime/`, via `fux build`). This layer **already self-protects**:
    the runtime manifest pins a sha per committed shard
-   ([ADR-INDEX-LIFECYCLE](../../docs/adr/0108_index-lifecycle.md) decision
+   ([SR-INDEX-LIFECYCLE](../../records/0108_index-lifecycle.md) decision
    7), and on drift `ask`/`explain`/`graph`/`path` fall back to a full scan
    rather than trust a stale accelerator or a stale graph plane
-   ([ADR-GRAPH](../../docs/adr/0126_graph.md)). It is never *wrong*,
+   ([SR-GRAPH](../../records/0126_graph.md)). It is never *wrong*,
    only slow when stale — so the open problem for this layer is triggering a
    rebuild promptly, not correctness.
 
-This isn't new ground: [ADR-INGEST](../../docs/adr/0106_ingest.md)'s
+This isn't new ground: [SR-INGEST](../../records/0106_ingest.md)'s
 consequences section already named the target — **"re-ingest is safe to run
 on a hook, which is what M5 depends on"** — and
 [W-25](../../archive/open/W-25-m5-maintenance.md) is the open item that was scoped to
@@ -125,7 +125,7 @@ only by `fux doctor` or a stale-answer fallback if someone thinks to check.
 - This is the blueprint for building W-25, not a new spec — W-25's own file
   is still the source of truth for what ships.
 - The open sub-decision (does the hook also call `fux build`) should be
-  answered explicitly when `ADR-MAINTENANCE` is written, not left implicit.
+  answered explicitly when `SR-MAINTENANCE` is written, not left implicit.
   Leaving it implicit risks two people assuming opposite defaults.
 - A watch daemon (C) is not eliminated forever — it's a plausible *later*
   layer on top of A for live-edit latency, not a replacement for the
@@ -139,19 +139,19 @@ misses, or the three-tier merge harness shows machine planes conflicting or a
 human conflict silently resolved instead of preserved.
 
 🔴 **R5's half is SPENT: it fired 2026-08-20 and was answered by the deferring
-hook** (ADR-MAINTENANCE decision 1d) — see the annotation under the verdict.
+hook** (SR-MAINTENANCE decision 1d) — see the annotation under the verdict.
 R6's half and the half-written-shard case are still live. Separately, **not a
 reopen, a revisit**: once the hook exists, decide the `fux build`
-sub-question above and fold it into `ADR-MAINTENANCE` rather than letting it
+sub-question above and fold it into `SR-MAINTENANCE` rather than letting it
 default silently.
 
 ## References
 
 - [W-25 — M5: maintenance](../../archive/open/W-25-m5-maintenance.md) — the item this
   document backs
-- [ADR-INGEST](../../docs/adr/0106_ingest.md) — "re-ingest is safe to run on
+- [SR-INGEST](../../records/0106_ingest.md) — "re-ingest is safe to run on
   a hook, which is what M5 depends on"
-- [ADR-INDEX-LIFECYCLE](../../docs/adr/0108_index-lifecycle.md) — the
+- [SR-INDEX-LIFECYCLE](../../records/0108_index-lifecycle.md) — the
   write-if-different + per-shard-sha staleness mechanism layer 2 already has
-- [ADR-GRAPH](../../docs/adr/0126_graph.md) — the derived graph plane
+- [SR-GRAPH](../../records/0126_graph.md) — the derived graph plane
   this rebuild refreshes

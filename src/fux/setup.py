@@ -1,7 +1,7 @@
 """`fux setup` — write the files a consumer owns, once, and never again.
 
 Scaffolding has **two moments**, and the split is the whole point of this
-module existing (ADR-DOTFUX decision 6, ADR-FETCHER decision 6):
+module existing (SR-DOTFUX decision 6, SR-FETCHER decision 6):
 
 | moment | writes | why |
 |---|---|---|
@@ -15,7 +15,7 @@ because someone ran setup.
 
 The two fetchers ship in the wheel as **package data under `templates/`, with
 an extension Python's import machinery cannot resolve**. Bytes, copied out,
-never imported — which makes ADR-FETCHER's adapter cap structural rather than a
+never imported — which makes SR-FETCHER's adapter cap structural rather than a
 rule someone has to remember. A fetcher fux imports is a fetcher fux owns.
 
 Everything here is **write-if-missing**. An edited `http.py` survives every
@@ -65,7 +65,7 @@ FETCHERS_DIR = "fetchers"
 DECODERS_DIR = "decoders"
 
 #: vendor -> ((destination relative to the repo root, template under
-#: `templates/agents/`), …) — ADR-AGENT-POLICY decisions 3 and 4.
+#: `templates/agents/`), …) — SR-AGENT-POLICY decisions 3 and 4.
 #:
 #: **Copilot has two entries and they are not alternatives.** The *agent* fires
 #: when selected or routed to; the *instructions* fire on every matching
@@ -97,7 +97,7 @@ AGENTS_TEMPLATE = "AGENTS.md"
 #: trailing reminder, so the full line is not a stable string to compare.
 POLICY_BEGIN = "<!-- fux:policy:begin v1"
 
-#: **The operating guides** (ADR-AGENT-POLICY decision 15, Arpit 2026-09-11):
+#: **The operating guides** (SR-AGENT-POLICY decision 15, Arpit 2026-09-11):
 #: one skill per job the CLI supports, written to every skill surface from ONE
 #: template each -- decision 10's agreement by construction, ten more times.
 #: `fux-usage` stays the router and points at these by name.
@@ -147,7 +147,7 @@ def _guide_skills(surface: str) -> tuple[tuple[str, str], ...]:
     return tuple((f"{surface}/{name}/SKILL.md", tpl) for name, tpl in GUIDE_SKILLS)
 
 
-#: The one skill directory **Codex and Copilot both read** (ADR-AGENT-POLICY
+#: The one skill directory **Codex and Copilot both read** (SR-AGENT-POLICY
 #: decision 16, Arpit 2026-09-12). Codex reads repository skills from
 #: `.agents/skills` and nowhere else; Copilot reads `.github/skills`,
 #: `.claude/skills` and `.agents/skills`.
@@ -183,7 +183,7 @@ AGENT_FILES: dict[str, tuple[tuple[str, str], ...]] = {
     # omission, not the rule.** Every skill surface below is
     # progressive-disclosure -- `.claude/skills`, `.kiro/skills` and the
     # `.agents/skills` Codex and Copilot share (decision 16) -- so the risk
-    # class the rule names is absent from every one of them. ADR-ENRICH decision 10 had **flagged the
+    # class the rule names is absent from every one of them. SR-ENRICH decision 10 had **flagged the
     # gap in its own text** rather than leaving it to be discovered
     # (*"the reasoning that admits a Kiro skill elsewhere would admit one
     # here"*), and `fux-decoder` -- named in the SAME sentence, in the same
@@ -218,7 +218,7 @@ AGENT_FILES: dict[str, tuple[tuple[str, str], ...]] = {
         ),
         (".github/instructions/fux-usage.instructions.md", "fux-usage.instructions.md"),
         # ⚠ **`.agents/skills/` is Copilot's non-ambient skill surface, and it is
-        # SHARED with Codex** (ADR-AGENT-POLICY decision 16, Arpit 2026-09-12).
+        # SHARED with Codex** (SR-AGENT-POLICY decision 16, Arpit 2026-09-12).
         # Copilot reads project skills from `.github/skills`, `.claude/skills`
         # **and** `.agents/skills`; Codex reads `.agents/skills` **only**. One
         # directory both read, instead of `.github/skills` for Copilot and a
@@ -289,7 +289,7 @@ AGENT_FILES: dict[str, tuple[tuple[str, str], ...]] = {
 #: skill plane, so a narrowed declaration still delivers the archived-results
 #: policy. **It does not hold for Codex.** `install = ["codex"]` would write two
 #: skills and **no archived-results policy at all** — the exact silent failure
-#: ADR-AGENT-POLICY decision 1 exists to close, reintroduced by a config line.
+#: SR-AGENT-POLICY decision 1 exists to close, reintroduced by a config line.
 AGENTS_MD_VENDORS = ("codex",)
 
 _DIRS_HEADER = """\
@@ -312,11 +312,11 @@ _DIRS_HEADER = """\
 #   !work/regression/*/evidence
 #   !**/node_modules
 #
-# See ADR-DIR-LIST.
+# See SR-DIR-LIST.
 """
 
 _TYPES_HEADER = """\
-# Which files are documents, and which decoder reads each one. See ADR-TYPES.
+# Which files are documents, and which decoder reads each one. See SR-TYPES.
 #
 # THIS FILE IS OPTIONAL. Delete it and the built-in default applies -- an
 # absent file never means "index everything" and never means "index nothing".
@@ -326,13 +326,13 @@ _TYPES_HEADER = """\
 # WHAT IS BELOW IS THAT DEFAULT, written out at `fux setup`: prose, plus every
 # format a built-in decoder reads. It is spelled out rather than left implicit
 # so you can see what fux considers a document without reading its source
-# (ADR-TYPES decision 10). From here it is YOURS -- setup never rewrites this
+# (SR-TYPES decision 10). From here it is YOURS -- setup never rewrites this
 # file, so the list stays exactly as you leave it.
 #
 # TWO KEYS, AND ONLY TWO. `include` lists globs that are already text.
 # `[decoders]` maps an extension to the module that reads it -- and a bound
 # extension IS a document, so it is never repeated in `include`. Any other key
-# is an error (ADR-TYPES decision 12).
+# is an error (SR-TYPES decision 12).
 #
 # NOTHING HERE SUBTRACTS. To keep files out, write the pattern in
 # .fux/.fuxignore, which is read first and outranks this file.
@@ -362,7 +362,7 @@ _TYPES_DECODERS_NOTE = """\
 # extension = "decoder module". THIS IS THE MAP: without it, "which decoder
 # reads .csv" is a property of the code installed on a machine, and two people
 # with different .fux/decoders/ could commit different indexes from the same
-# sources with nothing saying so (ADR-TYPES decision 11).
+# sources with nothing saying so (SR-TYPES decision 11).
 #
 # THE BINDING IS CHECKED, NOT TRUSTED. A module that does not exist stops the
 # run, and so does taking an extension AWAY from the decoder that claims it and
@@ -391,10 +391,10 @@ _TYPES_OPT_IN = """\
 """
 
 _TYPES_CONVERTED_HEADER = """\
-# Which files are documents, and which decoder reads each one. See ADR-TYPES.
+# Which files are documents, and which decoder reads each one. See SR-TYPES.
 #
 # CONVERTED by `fux setup` from .fux/sources/types, the line-grammar list this
-# file replaced on 2026-09-11 (ADR-TYPES decision 12). It states exactly what
+# file replaced on 2026-09-11 (SR-TYPES decision 12). It states exactly what
 # that file stated: every `*.ext decoder=<module>` line is a `[decoders]`
 # binding, every other pattern is an `include` glob, and every `!` line moved
 # to .fux/.fuxignore. Delete .fux/sources/types -- fux refuses to run while it
@@ -440,7 +440,7 @@ _FUXIGNORE = """\
 # is ignored -- unlike .fux/formats.toml, where an empty file is an error,
 # because this one only ever subtracts and so can never empty an index.
 #
-# See ADR-FUXIGNORE.
+# See SR-FUXIGNORE.
 """
 
 
@@ -449,13 +449,13 @@ _CONFIG = """\
 # `.fux/sources/urls`, one entry per line.
 #
 # EVERY KEY, WHAT IT MEANS AND WHAT IT DEFAULTS TO IS IN ONE PLACE:
-#   https://github.com/arpitarya/fux/blob/main/docs/adr/0113_config.md
-# Ranking knobs are not here at all -- they live in .fux/tune.toml (ADR-TUNE):
-#   https://github.com/arpitarya/fux/blob/main/docs/adr/0135_tuning.md
+#   https://github.com/arpitarya/fux/blob/main/records/0113_config.md
+# Ranking knobs are not here at all -- they live in .fux/tune.toml (SR-TUNE):
+#   https://github.com/arpitarya/fux/blob/main/records/0135_tuning.md
 #
 # This file does not explain its own keys, deliberately: a comment that
 # describes a key can drift from the record that decides it while both still
-# look correct (ADR-LAW-0 decision 4). A key fux does not know is REFUSED by
+# look correct (SR-LAW-0 decision 4). A key fux does not know is REFUSED by
 # name, so a typo here fails loudly instead of sitting inert.
 
 [sources]
@@ -529,7 +529,7 @@ def _urls_header() -> str:
 # that one URL once. `fux update` re-fetches the lines known to be stale --
 # `--all` every line, `--failed` the ones whose last run failed, and never a
 # line that says `update=never`. Those are the engine's two networked paths;
-# every other command is offline. See ADR-URL-LIST.
+# every other command is offline. See SR-URL-LIST.
 """
 
 
@@ -539,7 +539,7 @@ class SetupReport:
     kept: list[str] = field(default_factory=list)
     #: Paths written **outside `.fux/` and `fux.toml`** — i.e. into directories
     #: GitHub, AWS and Anthropic own. Tracked separately because
-    #: ADR-AGENT-POLICY decision 6 makes announcing them mandatory, and veto
+    #: SR-AGENT-POLICY decision 6 makes announcing them mandatory, and veto
     #: condition 1 fires on a write this list does not contain. A subset of
     #: `written`, never a replacement for it.
     outside: list[str] = field(default_factory=list)
@@ -549,7 +549,7 @@ class SetupReport:
     #: already has its own conventions, which is where it is most needed.
     skipped_agents_md: bool = False
     #: True when `.fux/formats.toml` was written FROM a leftover `.fux/sources/types`
-    #: (ADR-TYPES decision 12). Announced, because the old file still has to be
+    #: (SR-TYPES decision 12). Announced, because the old file still has to be
     #: deleted by hand and fux refuses to run until it is.
     converted_types: bool = False
     #: `!` patterns that moved from the old types file into `.fux/.fuxignore`.
@@ -557,10 +557,10 @@ class SetupReport:
     #: Paths this run DELETED — the Node reader's prune, and nothing else
     #: today. Separate from `written` because a consumer reading "wrote
     #: .fux/node/src/query/rank.mjs" about a file that is now gone would be
-    #: told the opposite of what happened (ADR-NODE-SEARCH decision 13).
+    #: told the opposite of what happened (SR-NODE-SEARCH decision 13).
     removed: list[str] = field(default_factory=list)
     #: Which shape `.fux/node/` was written in — `"A"` (the vendored bundle) or
-    #: `"C"` (a workspace member). ADR-NODE-SEARCH decision 13.
+    #: `"C"` (a workspace member). SR-NODE-SEARCH decision 13.
     node_shape: str = fuxdir.SHAPE_VENDORED
     #: The consumer manifest this run EDITED, repo-relative, or `None`.
     #: **Announced always** — decision 15 constraint 3: a silent write to a
@@ -591,7 +591,7 @@ def decoder_source(name: str) -> bytes:
     **There is no `.py.txt` template for a decoder, and the asymmetry with the
     fetchers is deliberate.** A fetcher template must be un-importable because
     it carries network code that has no business inside an offline package
-    (ADR-CDP-FETCHER decision 8). A decoder is stdlib-only and offline — it is
+    (SR-CDP-FETCHER decision 8). A decoder is stdlib-only and offline — it is
     already a legitimate module — so the module *is* the template, and there is
     exactly one copy of every decoder in the repo rather than two that agree by
     habit. That was the `_MdParser` defect, and repeating it sixteen times would
@@ -629,7 +629,7 @@ def agent_template_bytes(name: str) -> bytes:
 def agent_template_text(name: str) -> str:
     """The same template as text, for printing rather than writing.
 
-    ASCII-only by ADR-CLI veto 7, which the shipped `AGENTS.md` already is —
+    ASCII-only by SR-CLI veto 7, which the shipped `AGENTS.md` already is —
     `agent_template_bytes` decoding cleanly as ASCII is asserted in tests.
     """
     return agent_template_bytes(name).decode("utf-8")
@@ -662,7 +662,7 @@ def _seed_types() -> bytes:
 
     **A header alone is not a types file.** A file that admits nothing is one
     `read_types` refuses — so writing comments by themselves made `fux setup`
-    followed by `fux ingest` fail on every fresh repo until 2026-08-27. ADR-TYPES
+    followed by `fux ingest` fail on every fresh repo until 2026-08-27. SR-TYPES
     decision 10 always said this file ships "with the default spelled out"; it
     is spelled out here.
 
@@ -696,7 +696,7 @@ def _seed_types() -> bytes:
 
 
 def _convert_legacy_types(root: Path, report: "SetupReport") -> None:
-    """Write `.fux/formats.toml` from a leftover `.fux/sources/types` (ADR-TYPES decision 12).
+    """Write `.fux/formats.toml` from a leftover `.fux/sources/types` (SR-TYPES decision 12).
 
     **Only when the new file is missing** — setup is write-if-missing, and a
     repo holding both has already decided; `read_types` tells it to delete the
@@ -738,7 +738,7 @@ def _convert_legacy_types(root: Path, report: "SetupReport") -> None:
         return
     lines = existing.split("\n") if existing else []
     at = _first_hand_pattern(lines)
-    block = [f"# moved from {LEGACY_TYPES_FILE} by `fux setup` (ADR-TYPES decision 12)", *moved, ""]
+    block = [f"# moved from {LEGACY_TYPES_FILE} by `fux setup` (SR-TYPES decision 12)", *moved, ""]
     lines[at:at] = block
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(lines).rstrip("\n") + "\n", encoding="utf-8", newline="\n")
@@ -785,7 +785,7 @@ def _agents_to_install(root: Path, requested: bool) -> tuple[str, ...]:
 
 def _write_agents(root: Path, report: SetupReport, agents: tuple[str, ...]) -> None:
     # ⚠ **A path two vendors share is written ONCE** (`SHARED_SKILLS`,
-    # ADR-AGENT-POLICY decision 16). Without this, Copilot's pass finds the file
+    # SR-AGENT-POLICY decision 16). Without this, Copilot's pass finds the file
     # Codex's pass wrote a moment earlier and reports it as `kept ... (yours;
     # never rewritten)` -- a claim about a file fux itself just wrote.
     seen: set[str] = set()
@@ -825,7 +825,7 @@ def _write_root_agents(root: Path, report: SetupReport) -> None:
     ⚠ **`_write_if_missing` puts the coverage exactly where it is not needed.**
     A repo that already has a hand-written `AGENTS.md` gets nothing and, worse,
     no error — so the one place fux's guidance is most likely to be missing is
-    the one place nothing says so. ADR-AGENT-POLICY decision 6 makes the
+    the one place nothing says so. SR-AGENT-POLICY decision 6 makes the
     announcement mandatory, so `skipped_agents_md` carries it and `fux setup`
     prints the snippet for the human to paste.
     """
@@ -852,7 +852,7 @@ def _write_root_agents(root: Path, report: SetupReport) -> None:
 
 
 # ---------------------------------------------------------------------------
-# The monorepo shape -- ADR-NODE-SEARCH decision 15, ruled by Arpit 2026-09-12
+# The monorepo shape -- SR-NODE-SEARCH decision 15, ruled by Arpit 2026-09-12
 # ("Auto detect. Auto detect and set it up as well.").
 #
 # 🔴 **This is fux's FIRST write to a file it does not own and a team reviews.**
@@ -867,7 +867,7 @@ def _write_root_agents(root: Path, report: SetupReport) -> None:
 # nobody to call it.
 #
 # ⚠ **Why detection does not conflict with "declared, never detected"**:
-# ADR-FETCHER decision 5 and W-86 fork E govern INGEST, where detection makes
+# SR-FETCHER decision 5 and W-86 fork E govern INGEST, where detection makes
 # the INDEX a function of the environment and L3 forbids it. Scaffolding is not
 # the index; no law reaches it.
 # ---------------------------------------------------------------------------
@@ -924,7 +924,7 @@ def _yarn_berry_linker(root: Path) -> "str | None":
     offline. `None` means *not Berry* and the ordinary detection continues.
 
     ⚠ **Checked BEFORE the `workspaces` array, which is not the order
-    ADR-NODE-SEARCH decision 15's table was written in — and the table was
+    SR-NODE-SEARCH decision 15's table was written in — and the table was
     wrong.** A Berry repository declares `workspaces` in `package.json` exactly
     like npm does, so a literal first-hit reading of that table gave every
     Berry repo shape C, including the PnP ones the record's own warning says
@@ -1121,13 +1121,13 @@ def wire_workspace(root: Path, workspace: Workspace) -> "tuple[bool, str | None]
         return False, (
             "this is a Yarn Berry repository using PnP, which has NO node_modules for "
             "`.fux/fux` to resolve a binary from - measured, not assumed "
-            "(ADR-NODE-SEARCH decision 15). Set `nodeLinker: node-modules` and re-run "
+            "(SR-NODE-SEARCH decision 15). Set `nodeLinker: node-modules` and re-run "
             "`fux setup` if you would rather have the workspace shape"
         )
     if workspace.kind == "yarn-object-form":
         return False, (
             "this manifest declares `workspaces` as an object, which fux will not edit by "
-            "guess (ADR-NODE-SEARCH decision 15 constraint 4)"
+            "guess (SR-NODE-SEARCH decision 15 constraint 4)"
         )
     if workspace.kind == "pnpm-yaml":
         after = _insert_into_pnpm_yaml(before, WORKSPACE_MEMBER)
@@ -1152,7 +1152,7 @@ def run(root: Path, *, agents: bool = True) -> SetupReport:
     """Write the consumer-owned files, write-if-missing. Returns what happened.
 
     `agents=False` is `--no-agents`, and it must write **nothing** under
-    `.github/`, `.kiro/` or `.claude/` — ADR-AGENT-POLICY veto condition 1a:
+    `.github/`, `.kiro/` or `.claude/` — SR-AGENT-POLICY veto condition 1a:
     the opt-out is the whole of a user's control over a default-on install, and
     a leak turns a default into a mandate.
     """
@@ -1160,14 +1160,14 @@ def run(root: Path, *, agents: bool = True) -> SetupReport:
     # `query.bm25f` for the defaults it quotes, and through it the whole query
     # package. `setup` never ranks anything, so paying for the ranker to write
     # a commented file is a cost with no return. There is no import cycle to
-    # dodge — this is latency, in the same spirit as ADR-CLI decision 7.
+    # dodge — this is latency, in the same spirit as SR-CLI decision 7.
     from .tune import TUNE_NAME, specimen
     from .output_config import OUTPUT_NAME, specimen as output_specimen
 
     report = SetupReport()
     # 🔴 **The monorepo shape is decided ONCE, here.** `ensure_layout` runs at
     # the head of every ingest and must never edit a consumer manifest
-    # (ADR-NODE-SEARCH decision 15 constraint 1); what it gets is the answer,
+    # (SR-NODE-SEARCH decision 15 constraint 1); what it gets is the answer,
     # already decided, as a keyword.
     workspace = detect_workspace(root)
     if workspace is not None:
@@ -1191,7 +1191,7 @@ def run(root: Path, *, agents: bool = True) -> SetupReport:
         _write_if_missing(directory / FETCHERS_DIR / name, template_bytes(template), report, root)
 
     # W-86 P7, ruled by Arpit 2026-08-26: every built-in decoder is written into
-    # `.fux/decoders/`, and **the copy is what runs** (ADR-DECODE decision 11).
+    # `.fux/decoders/`, and **the copy is what runs** (SR-DECODE decision 11).
     for name in decode_mod.BUILTIN_MODULES:
         _write_if_missing(
             directory / DECODERS_DIR / f"{name}.py", decoder_source(name), report, root
@@ -1201,14 +1201,14 @@ def run(root: Path, *, agents: bool = True) -> SetupReport:
     _write_if_missing(root / DEFAULT_URLS_FILE, _urls_header().encode("utf-8"), report, root)
     # Header only, no patterns: an ignore file that arrives with guesses in it
     # is one whose first act is to hide a document nobody asked it to hide.
-    # Empty is a legal, meaningful state here (ADR-FUXIGNORE decision 6) in a
+    # Empty is a legal, meaningful state here (SR-FUXIGNORE decision 6) in a
     # way it is not for `types`, so the seed can be honest about knowing
     # nothing. Write-if-missing like the rest -- `fux setup` never rewrites it.
     _write_if_missing(root / fuxignore.IGNORE_FILE, _FUXIGNORE.encode("utf-8"), report, root)
     # AFTER `.fuxignore`, because a conversion moves `!` lines into it.
     # Written with the default spelled out rather than left implicit: a consumer
     # should be able to see what fux considers a document without reading its
-    # source (ADR-TYPES decision 10), and a file that admits nothing is one
+    # source (SR-TYPES decision 10), and a file that admits nothing is one
     # `read_types` rejects — see `_seed_types`. A repo still holding the old
     # `.fux/sources/types` gets it CONVERTED instead (decision 12).
     from .config import LEGACY_TYPES_FILE
@@ -1217,18 +1217,18 @@ def run(root: Path, *, agents: bool = True) -> SetupReport:
         _convert_legacy_types(root, report)
     else:
         _write_if_missing(root / DEFAULT_TYPES_FILE, _seed_types(), report, root)
-    # ADR-REFUSAL: policy, not code. Written once, never rewritten -- the rules
+    # SR-REFUSAL: policy, not code. Written once, never rewritten -- the rules
     # in it are the consumer's to delete, including the vendor ones.
     _write_if_missing(
         refusals.rules_path(root), template_bytes(REFUSALS_TEMPLATE), report, root
     )
-    # ADR-PII decision 17: the one consumer file every command REQUIRES. The
+    # SR-PII decision 17: the one consumer file every command REQUIRES. The
     # starter's safe rules arrive enabled; the consumer edits or empties them,
     # and a repo that already has the file keeps it -- empty or not.
     _write_if_missing(pii.rules_path(root), template_bytes(PII_TEMPLATE), report, root)
     _write_if_missing(root / CONFIG_NAME, _CONFIG.encode("utf-8"), report, root)
     # Every key commented out, so a fresh repo runs on the engine's own
-    # defaults and the file is a menu rather than a configuration (ADR-TUNE
+    # defaults and the file is a menu rather than a configuration (SR-TUNE
     # decisions 2 and 3). Write-if-missing like everything else here: this is
     # the file fux promised never to rewrite, and `fux tune` prints rather than
     # edits for the same reason.
@@ -1237,7 +1237,7 @@ def run(root: Path, *, agents: bool = True) -> SetupReport:
     # for writes into directories other vendors own, which is what makes
     # announcing them mandatory; a file in fux's own directory is not one.
     _write_if_missing(root / TUNE_NAME, specimen().encode("utf-8"), report, root)
-    # ADR-OUTPUT decision 1: the same contract as `tune.toml`, one boundary
+    # SR-OUTPUT decision 1: the same contract as `tune.toml`, one boundary
     # further in — tune changes WHICH documents come back, this changes how
     # they are SHOWN. Write-if-missing for the same reason, and `fux output`
     # prints rather than edits.
@@ -1245,13 +1245,13 @@ def run(root: Path, *, agents: bool = True) -> SetupReport:
 
     # After `fux.toml`, so a first run reads the default this very call just
     # wrote out in full, and a later run reads whatever the consumer edited it
-    # to (ADR-AGENT-POLICY decision 5).
+    # to (SR-AGENT-POLICY decision 5).
     installing = _agents_to_install(root, agents)
     _write_agents(root, report, installing)
     # ⚠ **Gated on the RESOLVED set, not on the `agents` flag.** `--no-agents`
     # is one opt-out; a `[agents] install = []` declaration is the other, and a
     # repo-root file is the most visible thing either could leak
-    # (ADR-AGENT-POLICY veto 1a). ⚠ **And only when EVERY vendor installs**: a
+    # (SR-AGENT-POLICY veto 1a). ⚠ **And only when EVERY vendor installs**: a
     # partial declaration names what it wants, and a neutral file nobody named
     # is not covered by that naming.
     # ⚠ **…OR when a vendor installs for which the root file is the whole
@@ -1296,12 +1296,12 @@ def cmd_setup(args) -> int:
             "edit them, fux will not rewrite them."
         )
 
-    # ADR-AGENT-POLICY decision 6. The install is default-on, so **this
+    # SR-AGENT-POLICY decision 6. The install is default-on, so **this
     # announcement is the entire remaining safeguard** — a user who did not
     # want these files must be able to learn they exist from the terminal they
     # just ran, not from a later `git status` on a repo they share with a team.
     # Veto condition 1 fires on any agent file written without appearing here.
-    # ASCII only: these bytes reach a Windows console (ADR-CLI veto 7).
+    # ASCII only: these bytes reach a Windows console (SR-CLI veto 7).
     if report.skipped_agents_md:
         # W-82 ruling 16 consequence 2. The snippet is printed rather than
         # merged: `AGENTS.md` is the consumer's file and fux does not edit
@@ -1321,7 +1321,7 @@ def cmd_setup(args) -> int:
 
         print()
         print(
-            f"  converted {LEGACY_TYPES_FILE} -> {DEFAULT_TYPES_FILE} (ADR-TYPES decision 12)."
+            f"  converted {LEGACY_TYPES_FILE} -> {DEFAULT_TYPES_FILE} (SR-TYPES decision 12)."
         )
         if report.moved_exclusions:
             print(

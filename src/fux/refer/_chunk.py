@@ -36,7 +36,7 @@ file on disk. For a **decoded** document — a `.docx`, a `.pdf` — the text be
 chunked is generated Markdown that exists nowhere, so `line_numbers=False`
 suppresses the range and `_rescore.locator` falls back to `path#p3`, with the
 passage's heading carried alongside it. A wrong line number is worse than an
-honest ordinal (ADR-REFER decision 14, ruled by Arpit 2026-09-06).
+honest ordinal (SR-REFER decision 14, ruled by Arpit 2026-09-06).
 """
 
 from __future__ import annotations

@@ -2,7 +2,7 @@
 type: OpenItem
 id: W-140
 title: "W-140 — the defects writing the operating guides uncovered"
-description: "Writing ten consumer skills from the code (ADR-AGENT-POLICY decision 15, 2026-09-11) meant checking every flag, field and verdict against src/fux and running most verbs. That found code defects, ADR-vs-code disagreements, and guide text that names workarounds which must change when each defect is fixed."
+description: "Writing ten consumer skills from the code (SR-AGENT-POLICY decision 15, 2026-09-11) meant checking every flag, field and verdict against src/fux and running most verbs. That found code defects, SR-vs-code disagreements, and guide text that names workarounds which must change when each defect is fixed."
 status: open
 lane: agent
 timestamp: 2026-09-11T00:00:00Z
@@ -21,16 +21,16 @@ this repo's own, found on macOS/CPython 3.14.
 
 🔴 **Hazard for whoever fixes a row:** the shipped guides in
 `src/fux/templates/agents/*-SKILL.md` name workarounds for rows marked **(guide)**.
-**Fix the defect and edit the guide in the same change** (ADR-AGENT-POLICY 15g),
+**Fix the defect and edit the guide in the same change** (SR-AGENT-POLICY 15g),
 then refresh this repo's renderings.
 
 ## 1 · Code defects
 
 | # | defect | where | record |
 |---|---|---|---|
-| 12 | ✅ **HANDED OVER 2026-09-12 — the compare doc exists and the fork is Arpit's.** [`compare/path-hops-bound.compare.md`](../compare/path-hops-bound.compare.md), with the measurement the row lacked: **0.65 s at `--hops 2`, 84.6 s at `--hops 6`**, ~11× per hop above 4, on a 738-node / 4 446-edge index with hubs at out-degree 260 and in-degree 152. Proposed verdict **(c) bound the walk's work**, with `truncated` in every rendering including `--json` and MCP. **Nothing is implemented and nothing should be until he rules** | `graph/walk.py`, `cli.py` | ADR-GRAPH |
+| 12 | ✅ **HANDED OVER 2026-09-12 — the compare doc exists and the fork is Arpit's.** [`compare/path-hops-bound.compare.md`](../compare/path-hops-bound.compare.md), with the measurement the row lacked: **0.65 s at `--hops 2`, 84.6 s at `--hops 6`**, ~11× per hop above 4, on a 738-node / 4 446-edge index with hubs at out-degree 260 and in-degree 152. Proposed verdict **(c) bound the walk's work**, with `truncated` in every rendering including `--json` and MCP. **Nothing is implemented and nothing should be until he rules** | `graph/walk.py`, `cli.py` | SR-GRAPH |
 
-| 21 | ⚠ **A SECOND e2e maintenance test races the background runner — STILL NOT REPRODUCED, after 11 attempts.** `test_two_commits_in_quick_succession_produce_one_runner_and_one_index` failed once in a combined `tests tests_e2e` run on 2026-09-12 and has not failed since. **Nothing has been changed**, because the row's own instruction is *capture the failure output before changing anything* and row 19's first diagnosis was wrong and cost two sessions | `tests_e2e/test_maintenance.py` `_drain` | ADR-MAINTENANCE |
+| 21 | ⚠ **A SECOND e2e maintenance test races the background runner — STILL NOT REPRODUCED, after 11 attempts.** `test_two_commits_in_quick_succession_produce_one_runner_and_one_index` failed once in a combined `tests tests_e2e` run on 2026-09-12 and has not failed since. **Nothing has been changed**, because the row's own instruction is *capture the failure output before changing anything* and row 19's first diagnosis was wrong and cost two sessions | `tests_e2e/test_maintenance.py` `_drain` | SR-MAINTENANCE |
 
 ### Row 21 — what was tried on 2026-09-12, and why nothing was changed
 
@@ -74,39 +74,39 @@ wrong half the time.
 
 | # | verdict | what landed |
 |---|---|---|
-| freshness states | **record** | ADR-REFER d19 and ADR-ASK said **SIX** and then listed five; `Verdict.label` returns five and the schema enum has five. An off-by-one from the day `as-ingested` joined a four-state set. `freshness.py`'s *"SIXTH position"* corrected too |
+| freshness states | **record** | SR-REFER d19 and SR-ASK said **SIX** and then listed five; `Verdict.label` returns five and the schema enum has five. An off-by-one from the day `as-ingested` joined a four-state set. `freshness.py`'s *"SIXTH position"* corrected too |
 | `passage.ordinal` | **both, opposite ways** | **`--json` was the CODE's fault** — two accepted records promised the field and the payload never carried it; `Citation` gains `ordinal` and `answer.passages[]` emits it, pinned through `subprocess` because a unit test on the dataclass would have passed all along. **MCP was the RECORD's fault**: `fux_passage` reads a line span off disk and has no ordinal to carry; the clause is withdrawn |
 | `digest.sha256` | **code** | A fux `sha` is a **40-hex blake2b-160**, and the in-toto attestation labelled it `sha256`. in-toto's `DigestSet` is keyed **by algorithm**, so an external verifier would hash with SHA-256, get 64 characters, and report a mismatch **on a perfectly good receipt** — a failure landing off this machine with no route back. Emits `blake2b-160`; **reads `sha256` forever**, because every receipt already in a ticket carries it |
-| `--journal` | **record, and a fork filed** | d10 said *"only `--journal` WRITES"*; `[cli.answer] journal = true` writes too, and d10 had explicitly reserved always-on journalling as a fork *"no session may pick"*. **Not picked here** — ADR-PROVENANCE and ADR-OUTPUT both now say what is true, and [W-147](W-147-the-journal-consent-surface.md) asks Arpit the one question |
-| ADR-FIND veto 4 | **record** | It grepped `^\[band\]`; the line is `confidence: …`. **A veto check that cannot fire reads as passing**, which is worse than no check |
+| `--journal` | **record, and a fork filed** | d10 said *"only `--journal` WRITES"*; `[cli.answer] journal = true` writes too, and d10 had explicitly reserved always-on journalling as a fork *"no session may pick"*. **Not picked here** — SR-PROVENANCE and SR-OUTPUT both now say what is true, and W-147 (**shipped 2026-09-13**) asks Arpit the one question |
+| SR-FIND veto 4 | **record** | It grepped `^\[band\]`; the line is `confidence: …`. **A veto check that cannot fire reads as passing**, which is worse than no check |
 | graph schema | **record** | `graph.schema.json` described a plane that has never existed: kinds `supersedes`/`links` (really `ref`/`code`/`tag`), `grade` as a string (an int, 10/8/6), community labels as ints (strings, `c0`). ⚠ `plane.load()` **validates against that file**, so the fiction was one type check from refusing every real graph |
-| stale graph plane | **code** | ADR-GRAPH and `plane.py` both said a stale plane *"is refused"* and **nothing checked**. An `ingest` with no `build` left `explain`/`graph`/`path` answering from edges the records no longer carry. `load()` now calls `accel.is_fresh` — reused, not reimplemented |
-| ADR-MCP | **record, three claims** | The server does **not** hold the index open (it re-reads per call) — and the consequence was stated **backwards**, telling an operator to restart a server that did not need it. `fux_passage` does not fetch or re-score. `fux_related` is one hop, not routes. Mermaid **and** its ASCII twin updated together |
+| stale graph plane | **code** | SR-GRAPH and `plane.py` both said a stale plane *"is refused"* and **nothing checked**. An `ingest` with no `build` left `explain`/`graph`/`path` answering from edges the records no longer carry. `load()` now calls `accel.is_fresh` — reused, not reimplemented |
+| SR-MCP | **record, three claims** | The server does **not** hold the index open (it re-reads per call) — and the consequence was stated **backwards**, telling an operator to restart a server that did not need it. `fux_passage` does not fetch or re-score. `fux_related` is one hop, not routes. Mermaid **and** its ASCII twin updated together |
 | doctor levels | **record** | `refusal rules`, `decoder bindings` and `fuxignore usable` are `warn` on content and **`error` on a parse failure**; the table said `warn`. The code is right — a policy file the engine cannot read is what `tune.toml` taught (d10) |
 | doctor writes | **code** | `fux doctor` **created `.fux/` and `.fux/runtime/CACHEDIR.TAG`** on a repo that had never seen fux — read-only is its first sentence. Two causes two modules apart: the writability probe `mkdir`'d, and `maintain/daemon.py`'s path helper called `derived_dir` **from a pure read**. The test asserts on the **whole tree**, because the second cause was nowhere near the check that exposed it |
-| `.fuxignore` | **record** | ADR-DOTFUX said *"never rewritten"*; `fux ingest` rewrites two delimited blocks at its top, above every hand-written line. It is the one committed file under `.fux/` a verb edits — exactly the fact that table exists to carry |
-| version-mismatch error | **code** | It said *delete `.fux/index/` and run `fux ingest`*, *"safe because the index holds statistics, never content"* — **the one remedy ADR-INDEX-LIFECYCLE d10a exists to prevent**, with a reassurance that is false for every `url:` record. Names `--full` now and warns off the delete |
-| `meta` / bare `fetch=` | **record, twice** | A line's `meta=hashed` **does** win over a source-wide `plain` — the claimed "no way to be stricter" was never implemented (and nothing leaks either way). And a bare line takes **whatever `[sources.url] fetcher` names**, not `http` — ADR-CONFIG d5 contradicted its own next paragraph, the W-83 shape |
-| `[agents]` / ADR-TUNE / ADR-OUTPUT | **record** | The config diagram and its twin said **three** vendors (`codex` missing) where the code has four. ADR-TUNE said **six** tables — `[index]`, the one table that is the declared exception, was missing; *"measured — `fux tune`"* named a verb that only prints the specimen; **d10a's `[priority]` orphan warning is UNBUILT** and now says so. ADR-OUTPUT §1 still drew a `[defaults]`/`[verb]` file that has not existed since the three-root rewrite |
-| doctor & never-fetched URLs | **code** | ADR-MAINTENANCE d5a forbids hooks touching the network and pays for it with *"that is a delay, not a silence — `fux doctor` reports them"*. **It did not.** Every line of the row came from `url:` records **in the index**, and an unfetched line has none. Built as *listed minus indexed*, loudest in the `none indexed` branch where *"no URLs"* and *"five waiting on a fetch"* had read identically |
+| `.fuxignore` | **record** | SR-DOTFUX said *"never rewritten"*; `fux ingest` rewrites two delimited blocks at its top, above every hand-written line. It is the one committed file under `.fux/` a verb edits — exactly the fact that table exists to carry |
+| version-mismatch error | **code** | It said *delete `.fux/index/` and run `fux ingest`*, *"safe because the index holds statistics, never content"* — **the one remedy SR-INDEX-LIFECYCLE d10a exists to prevent**, with a reassurance that is false for every `url:` record. Names `--full` now and warns off the delete |
+| `meta` / bare `fetch=` | **record, twice** | A line's `meta=hashed` **does** win over a source-wide `plain` — the claimed "no way to be stricter" was never implemented (and nothing leaks either way). And a bare line takes **whatever `[sources.url] fetcher` names**, not `http` — SR-CONFIG d5 contradicted its own next paragraph, the W-83 shape |
+| `[agents]` / SR-TUNE / SR-OUTPUT | **record** | The config diagram and its twin said **three** vendors (`codex` missing) where the code has four. SR-TUNE said **six** tables — `[index]`, the one table that is the declared exception, was missing; *"measured — `fux tune`"* named a verb that only prints the specimen; **d10a's `[priority]` orphan warning is UNBUILT** and now says so. SR-OUTPUT §1 still drew a `[defaults]`/`[verb]` file that has not existed since the three-root rewrite |
+| doctor & never-fetched URLs | **code** | SR-MAINTENANCE d5a forbids hooks touching the network and pays for it with *"that is a delay, not a silence — `fux doctor` reports them"*. **It did not.** Every line of the row came from `url:` records **in the index**, and an unfetched line has none. Built as *listed minus indexed*, loudest in the `none indexed` branch where *"no URLs"* and *"five waiting on a fetch"* had read identically |
 
 <details>
 <summary>The original list, kept verbatim — what was claimed before any of it was re-derived</summary>
 
 
-- **ADR-ASK / ADR-REFER d19 / `output.schema.json`** say six freshness states; `Verdict.label` has five.
-- **ADR-ANSWER d9, ADR-REFER d17**: `passage.ordinal` in `--json`/MCP — absent.
-- **ADR-PROVENANCE d11**: `digest.sha256` is a 40-hex blake2b, not SHA-256; d10 says only `--journal` writes, but `[cli.answer] journal` does too.
-- **ADR-FIND** veto check 4 greps `^\[band\]`; the line is `confidence: …`.
-- **ADR-GRAPH / `graph.schema.json`**: edge kind `supersedes` unlisted; grades are ints, not strings; labels are `c0`; a stale plane is not refused.
-- **ADR-MCP**: `fux_passage` does not fetch or re-score; `fux_related` returns edges only; citations are document-level; the index is not held open.
-- **ADR-DOCTOR**: `refusal rules`, `decoder bindings`, `fuxignore usable` fail as errors, not warnings; doctor creates `.fux/` and `CACHEDIR.TAG`.
-- **ADR-DOTFUX**: says `.fuxignore` is never rewritten; ingest rewrites its skip blocks.
-- **ADR-INDEX-LIFECYCLE 10a** warns against deleting `.fux/index/`; the version-mismatch error tells users to.
-- **ADR-URL-LIST**: a line's `meta=hashed` does win over a source-wide `plain`; **ADR-CONFIG d5**: a line with no `fetch=` uses `[sources.url] fetcher`, not `http`.
-- **ADR-CONFIG**: absent `[agents] install` means four vendors; `Config`'s default and `config.schema.json` lag (missing `keep`, `ttl`, `enrich`, `update`, `sweep_minutes`, `acquired_max_bytes`).
-- **ADR-TUNE**: `fux tune` prints defaults and measures nothing; `[priority]` warnings are unbuilt; seven tables, not six. **ADR-OUTPUT §1** still shows the old `[defaults]` layout.
-- **ADR-MAINTENANCE 5a**: doctor does not report never-fetched hand-added URL lines.
+- **SR-ASK / SR-REFER d19 / `output.schema.json`** say six freshness states; `Verdict.label` has five.
+- **SR-ANSWER d9, SR-REFER d17**: `passage.ordinal` in `--json`/MCP — absent.
+- **SR-PROVENANCE d11**: `digest.sha256` is a 40-hex blake2b, not SHA-256; d10 says only `--journal` writes, but `[cli.answer] journal` does too.
+- **SR-FIND** veto check 4 greps `^\[band\]`; the line is `confidence: …`.
+- **SR-GRAPH / `graph.schema.json`**: edge kind `supersedes` unlisted; grades are ints, not strings; labels are `c0`; a stale plane is not refused.
+- **SR-MCP**: `fux_passage` does not fetch or re-score; `fux_related` returns edges only; citations are document-level; the index is not held open.
+- **SR-DOCTOR**: `refusal rules`, `decoder bindings`, `fuxignore usable` fail as errors, not warnings; doctor creates `.fux/` and `CACHEDIR.TAG`.
+- **SR-DOTFUX**: says `.fuxignore` is never rewritten; ingest rewrites its skip blocks.
+- **SR-INDEX-LIFECYCLE 10a** warns against deleting `.fux/index/`; the version-mismatch error tells users to.
+- **SR-URL-LIST**: a line's `meta=hashed` does win over a source-wide `plain`; **SR-CONFIG d5**: a line with no `fetch=` uses `[sources.url] fetcher`, not `http`.
+- **SR-CONFIG**: absent `[agents] install` means four vendors; `Config`'s default and `config.schema.json` lag (missing `keep`, `ttl`, `enrich`, `update`, `sweep_minutes`, `acquired_max_bytes`).
+- **SR-TUNE**: `fux tune` prints defaults and measures nothing; `[priority]` warnings are unbuilt; seven tables, not six. **SR-OUTPUT §1** still shows the old `[defaults]` layout.
+- **SR-MAINTENANCE 5a**: doctor does not report never-fetched hand-added URL lines.
 
 </details>
 
@@ -119,7 +119,7 @@ wrong half the time.
   rendering the remedy** — on the Windows-first fleet `CLAUDE.md` §Litmus names
   as a design input. The remedy a reader most needs is the one they would never
   have seen. `WARNING:` now.
-  [ADR-INDEX-LIFECYCLE](../../docs/adr/0108_index-lifecycle.md) decision 10a
+  [SR-INDEX-LIFECYCLE](../../records/0108_index-lifecycle.md) decision 10a
   carries it, with the general shape: **a message that names a remedy has to be
   printable wherever the error it explains can happen.**
   ⚠ **`tests/test_windows_console_safe.py` already forbade this and was already
@@ -132,15 +132,15 @@ wrong half the time.
   reading the contract on both sides and asserting it, fixed in
   `refer/source.py` by routing the live fetch through ingest's own `_unpack`
   and `_decode_fetched`, recorded as
-  [ADR-URL-FRESHNESS](../../docs/adr/0149_url-freshness.md) decision 6a with
-  ADR-REFER decision 23's false sentence corrected. `ANSWER-SKILL.md` and
+  [SR-URL-FRESHNESS](../../records/0147_url-freshness.md) decision 6a with
+  SR-REFER decision 23's false sentence corrected. `ANSWER-SKILL.md` and
   `FETCHER-SKILL.md` lost the workaround they named, and this repo's four
   renderings of each were refreshed. 2026-09-11.
 
 - **Row 2 — PII past redaction.** Both halves reproduced on macOS first. The
   frontmatter `title:` is now redacted in the same pass as the body, so the
   title field and its terms are built from redacted text
-  ([ADR-PII](../../docs/adr/0150_pii.md) decision 19a). **A path cannot be
+  ([SR-PII](../../records/0148_pii.md) decision 19a). **A path cannot be
   redacted** — `loc` is an address and `id` is the index's key — so ingest
   prints a note naming the documents whose path matches a rule (19b). The
   pinned "exactly two redaction sites" test was the thing that caught the
@@ -148,18 +148,18 @@ wrong half the time.
   its four renderings updated. 2026-09-11.
 
 - **Row 3 — `fux add <URL> --no-update` never fetched.** Three artifacts
-  promised the one fetch (ADR-URL-LIST decision 14, `--help`, the CHANGELOG)
+  promised the one fetch (SR-URL-LIST decision 14, `--help`, the CHANGELOG)
   and the pin filter, which runs above `fetch_all`'s grouping, knew nothing
   about an add. `cmd_add` now passes the URL it just wrote as `first_fetch`,
   and a test pins that the set has exactly one populator — a wider one would
   make the pin advisory. ⚠ **A pinned line written by hand is still never
   fetched**: recorded in decision 14 as the gap it is, owed to
-  ADR-MAINTENANCE 5a. 2026-09-11.
+  SR-MAINTENANCE 5a. 2026-09-11.
 
 - **Row 4 — `fux update --failed` was parsed and never read.** It fell through
   to the ordinary narrow pass, fetching the *stale* set and reporting that as a
   success. It now selects `fail_streak > 0` intersected with what is still
-  listed, and wins over `--all` as the more specific selector. ADR-CLI carries
+  listed, and wins over `--all` as the more specific selector. SR-CLI carries
   what a verbatim surface capture cannot prove: that a flag is read, not merely
   accepted. 2026-09-11.
 
@@ -190,7 +190,7 @@ wrong half the time.
   file: `fux ingest` reads only `[index]`, so a bad ranking knob leaves a clean
   index and a green doctor while every query in the repo refuses. `doctor` now
   calls `tune.load` and quotes its refusal — an **error**, not a warning, unlike
-  an absent `output.toml`. [ADR-DOCTOR](../../docs/adr/0154_doctor.md) decision
+  an absent `output.toml`. [SR-DOCTOR](../../records/0152_doctor.md) decision
   10. `CONFIG-SKILL.md` and all three config pointers lose the workaround.
   2026-09-11.
 
@@ -198,7 +198,7 @@ wrong half the time.
   fixed here.** The fix is a key set to validate against, and
   W-122 already owned exactly that as gate R-2, and **landed it on 2026-09-12**
   ([IMPLEMENTATION](../IMPLEMENTATION.md) §W-122):
-  *ADR-CONFIG's fenced key tree ↔ `config.py`, both directions, so a key is
+  *SR-CONFIG's fenced key tree ↔ `config.py`, both directions, so a key is
   real only if it is in the tree*. Hand-writing a second key set here would
   create the duplicate source of truth W-122 exists to remove — and this defect
   (`types_file`, `acquired_max_bytes`) is the evidence for that gate, not a
@@ -211,7 +211,7 @@ wrong half the time.
   so the check is now one function both verbs call. A `tag:` id was never
   checked on either verb, because the test read the committed index and a tag
   has no record there; the **plane** answers for tags now.
-  [ADR-GRAPH](../../docs/adr/0126_graph.md) carries both, plus the control
+  [SR-GRAPH](../../records/0126_graph.md) carries both, plus the control
   test that honest emptiness still exits 0. `GRAPH-SKILL.md` loses *"run
   `fux explain` on both ends first"*. **The `--hops` third of the row stays
   open as a fork.** 2026-09-11.
@@ -223,8 +223,8 @@ wrong half the time.
   message names taking either side first (a shard is derived, so either is
   safe), and the reader diagnoses markers as markers before parsing the
   header, the way `tune.toml` and `output.toml` already did.
-  [ADR-MERGE-DRIVER](../../docs/adr/0130_merge-driver.md) and
-  [ADR-INDEX-LIFECYCLE](../../docs/adr/0108_index-lifecycle.md). 2026-09-11.
+  [SR-MERGE-DRIVER](../../records/0130_merge-driver.md) and
+  [SR-INDEX-LIFECYCLE](../../records/0108_index-lifecycle.md). 2026-09-11.
 
 - **Row 10 — `[cli.json] enabled = true` turned `fux hooks` into a report.**
   The verb selected report-instead-of-install from `args.json`, which the
@@ -232,7 +232,7 @@ wrong half the time.
   installed nothing and printed a true report of a repo nobody had wired.
   `--status` selects the mode now; `--json` selects only the rendering, and the
   resolver keeps the flag as typed so an explicit `fux hooks --json` still
-  reports. **ADR-OUTPUT's claim that a rendering config's blast radius is the
+  reports. **SR-OUTPUT's claim that a rendering config's blast radius is the
   resolver was false for one verb** and now says so. 2026-09-11.
 
 - **Row 18 — the four small ones, all four of them statements fux shipped that
@@ -244,7 +244,7 @@ wrong half the time.
   longer say *two attributes* while there are seven, or promise a full sweep
   `fux update` stopped doing; and the starter `pii.toml` and `doctor`'s
   redaction note stop pointing at `tools/pii-probe/probe.py`, which is in the
-  repository and not in the wheel. ADR-DOTFUX, ADR-PII decision 20, ADR-DOCTOR.
+  repository and not in the wheel. SR-DOTFUX, SR-PII decision 20, SR-DOCTOR.
   2026-09-11.
 
 - **Row 17 — the shipped refusal policy refused real wiki pages, and promised a
@@ -256,7 +256,7 @@ wrong half the time.
   216-byte stub at a share link). **There is no warn level** — the comment
   claiming one is gone, and a test pins that no `warn` field exists so the
   prose cannot drift back before the code does.
-  [ADR-REFUSAL](../../docs/adr/0148_refusals.md). ⚠ Write-if-missing, so no
+  [SR-REFUSAL](../../records/0146_refusals.md). ⚠ Write-if-missing, so no
   existing repo gets the fix. 2026-09-11.
 
 - **Row 5 — `fux add` overrode the consumer's own `[sources.url]`.** Every
@@ -266,7 +266,7 @@ wrong half the time.
   middle layer of a three-layer resolution was dead for all of them. The line
   now states the **resolved** value, so decision 12 is whole and the word it
   states is the consumer's; an explicit flag still beats both.
-  [ADR-URL-LIST](../../docs/adr/0116_url-list.md). 2026-09-11.
+  [SR-URL-LIST](../../records/0116_url-list.md). 2026-09-11.
 
 - **Row 15 — `timeout_seconds` bounded nothing.** Validated at construction,
   stamped into every answer bundle, printed by `--audit`, read by nothing: a
@@ -275,7 +275,7 @@ wrong half the time.
   at the deadline — a bound on *waiting*, which is the only honest one, since
   Python cannot interrupt a blocking socket in consumer code. A timeout raises
   `FuxError`, so it degrades down the path that already existed.
-  [ADR-REFER](../../docs/adr/0127_refer-plane.md). 2026-09-11.
+  [SR-REFER](../../records/0127_refer-plane.md). 2026-09-11.
 
 - **Row 11 — the background runner never rebuilt the accelerator.** Every CLI
   verb builds it where the shards are written so `ask --fast` never pays; the
@@ -284,7 +284,7 @@ wrong half the time.
   builds now, best-effort and after the outcome is decided — a disposable plane
   must not turn a correct re-index into a reported failure — and the result is
   recorded in the run status.
-  [ADR-MAINTENANCE](../../docs/adr/0129_hooks.md). 2026-09-11.
+  [SR-MAINTENANCE](../../records/0129_hooks.md). 2026-09-11.
 
 - **Row 6 — every `ttl=` in every repo was dead at ask time.** `answer` built
   its policy with `cache_ttl_seconds` at the default `0`, and decision 11
@@ -293,12 +293,12 @@ wrong half the time.
   nothing could set its left operand. `--cache-ttl` is the way to ask, parsed
   by the source list's own duration grammar; the default stays `0`, so W-60
   verdict F holds. ⚠ **The row's third claim was wrong**: `update=never` not
-  stopping an answer-time fetch is ADR-URL-FRESHNESS decision 15 working —
+  stopping an answer-time fetch is SR-URL-FRESHNESS decision 15 working —
   `ttl=` is ask-time, `update=` is update-time, and merging them is what that
   decision exists to prevent. 2026-09-11.
 
 - **Row 7 — `fux verify --rerun` fetched, in the one verb ruled never to.**
-  It called the refer plane, so ADR-PROVENANCE decision 14 — *`fux verify`
+  It called the refer plane, so SR-PROVENANCE decision 14 — *`fux verify`
   NEVER FETCHES*, Arpit, 2026-08-27 — was contradicted by the code for sixteen
   days, and the failure that decision names in its own words (one receipt, two
   machines, different verdicts) was the shipped behaviour. The re-run re-ranks
@@ -315,7 +315,7 @@ wrong half the time.
   **it narrows on a fact, never on a guess**. ⚠ **Two rows narrowed, not
   twenty**: a too-short list disables a record silently, which is worse than the
   noise, so a row is narrowed only by someone who has read that record's whole
-  reach in the file. [ADR-OWNERSHIP](../../docs/adr/0146_ownership.md).
+  reach in the file. [SR-WORK-OWNERSHIP](../../records/0054_WORK-ownership.md).
   2026-09-11.
 
 - **Row 14 — the verb built to be read had nothing to read.**
@@ -325,14 +325,14 @@ wrong half the time.
   answer was to parse a table meant for a person. `--json` emits
   `{drifted, fresh, unchecked_urls}`, built beside the text rather than parsed
   out of it, and still exits 0. `update` joins `CLI_VERBS` with an empty tuple
-  and gains `--no-output-config`, which ADR-OUTPUT decision 15 requires of any
+  and gains `--no-output-config`, which SR-OUTPUT decision 15 requires of any
   verb that reads the file — **caught by its own test before the change was
   committed.** 2026-09-12.
 
 - **Row 16 — the record was too narrow; the code is as designed.** Reproduced
   on macOS: a `pii.toml` edit followed by an offline `fux ingest --full`
   redacted the `file:` document and left the `url:` record's title carrying the
-  address. **ADR-PII decision 18 said *a pinned URL*; the truth is every `url:`
+  address. **SR-PII decision 18 said *a pinned URL*; the truth is every `url:`
   record that was not fetched this run**, and an offline ingest fetches none.
   Widened there, with the `run.py` comment's *"invalidates every carried
   extraction"* corrected to mean every carried FILE extraction. ⚠ **The fix
@@ -355,13 +355,13 @@ The file closes when both sections are empty.
 *This is what the queue said at the move. Re-derive it before believing it (OPEN-WORK rule 4).*
 
 - 🔴 **W-140 — the defects writing the operating guides uncovered.** `agent` · *(records:
-  ADR-REFER · ADR-PII · ADR-URL-LIST · ADR-PROVENANCE · ADR-MAINTENANCE · ADR-CONFIG ·
+  SR-REFER · SR-PII · SR-URL-LIST · SR-PROVENANCE · SR-MAINTENANCE · SR-CONFIG ·
   and the disagreements listed in the file)* · Checking ten new skills against the code
-  (ADR-AGENT-POLICY decision 15) found **18 code defects** and **13 records that disagree with the
+  (SR-AGENT-POLICY decision 15) found **18 code defects** and **13 records that disagree with the
   code**. ⚠ Guides name workarounds for several: **fix the defect and the guide in one
   change.** **Row 1 is closed** (URL citations were never verified live — the refer plane
   rejected the fetcher contract's tuple, so no `url:` citation ever reached `current`;
-  fixed, recorded as ADR-URL-FRESHNESS 6a, both guides and all four renderings updated).
+  fixed, recorded as SR-URL-FRESHNESS 6a, both guides and all four renderings updated).
   **Row 2 is the remaining 🔴** — a frontmatter `title:` or a filename carries PII past
   redaction. Row 19 was added from this repo's own suite. —
   [detail](W-140-guide-authoring-defects.md) `filed: 2026-09-11`

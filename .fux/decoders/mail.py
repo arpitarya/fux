@@ -38,7 +38,7 @@ from email.parser import BytesParser
 # `.fux/decoders/` loaded by path. A path-loaded file has no parent package, so
 # `from . import _xml` raises `attempted relative import with no known parent
 # package` — the copy would be dead on arrival. Absolute imports mean the file
-# fux ships and the file you edit are byte-identical (ADR-DECODE decision 11).
+# fux ships and the file you edit are byte-identical (SR-DECODE decision 11).
 from fux.decode.html import decode as decode_html
 
 EXTENSIONS = (".eml", ".mbox")

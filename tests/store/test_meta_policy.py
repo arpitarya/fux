@@ -94,7 +94,7 @@ def test_hashed_with_a_display_cache_entry_for_a_different_sha_is_refused(tmp_pa
 
 
 def test_plain_is_a_legal_explicit_opt_out(tmp_path):
-    """ADR-URL-LIST decision 10 — it is allowed, but it has to be *said*."""
+    """SR-URL-LIST decision 10 — it is allowed, but it has to be *said*."""
     write_index(tmp_path, [_url(meta="plain", title="Public page")])
     assert read_index(tmp_path)["url:https://x/1"]["title"] == "Public page"
 

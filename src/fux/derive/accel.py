@@ -277,7 +277,6 @@ def accel_candidates(
     corpus = Corpus(
         n=stats["n"],
         total_wlen=derive_wlen(list(stats["total_flen"]), scoring),
-        newest_mtime=stats.get("newest_mtime", 0),
     )
     if corpus.n == 0:
         return [], dict.fromkeys(query_hashes, 0), corpus
@@ -481,7 +480,6 @@ def ask(
     top: int = 5,
     *,
     skipping: bool = True,
-    archived_weight: float = 1.0,
     archived_dirs: frozenset[str] = frozenset(),
     weighting: "Weighting | None" = None,
     scoring: Scoring = DEFAULT_SCORING,
@@ -494,7 +492,7 @@ def ask(
     confidence block is under the differential law like everything else here:
     both paths derive `df` over the same query hashes and report the same `n`,
     so `--fast` and `--scan` cannot disagree about how confident fux is
-    (ADR-CONFIDENCE decision 8).
+    (SR-CONFIDENCE decision 8).
     """
     query_hashes = query_term_hashes(query)
     if not query_hashes:
@@ -506,7 +504,7 @@ def ask(
     if not (runtime.dir / fmt.STATS_NAME).exists():
         raise FuxError("no accelerator built — run `fux ingest` (or `fux build`) first")
     if weighting is None:
-        weighting = Weighting(archived_weight=archived_weight, archived_dirs=archived_dirs)
+        weighting = Weighting(archived_dirs=archived_dirs)
     collect = list(expansion.hashes) if expansion is not None else query_hashes
     candidates, df, corpus = accel_candidates(
         runtime, collect, top, skipping=skipping, weighting=weighting, scoring=scoring,
@@ -514,7 +512,7 @@ def ask(
     )
     return rank(
         candidates, collect, df, corpus, top,
-        archived_weight=archived_weight, archived_dirs=archived_dirs,
+        archived_dirs=archived_dirs,
         weighting=weighting, scoring=scoring, stats_out=stats_out,
         expansion=expansion,
     )

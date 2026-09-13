@@ -103,6 +103,15 @@ test("tune: [dense] names what happened to it", () => {
   assert.throws(() => loadTune(root), /REMOVED on 2026-08-25/);
 });
 
+test("tune: a REMOVED key is named as removed, not reported as unknown", () => {
+  // All three document priors went on 2026-09-13 (W-151, W-152), and `fux
+  // setup` had written every one of them into the consumer's file.
+  for (const key of ["superseded_weight", "archived_weight", "recency_half_life_days"]) {
+    const root = repo({ ".fux/tune.toml": `[ranking]\n${key} = 0.5\n` });
+    assert.throws(() => loadTune(root), /REMOVED on 2026-09-13/, key);
+  }
+});
+
 test("tune: a whole-number key refuses a float, exactly as tune.py does", () => {
   const root = repo({ ".fux/tune.toml": "[graph]\niterations = 3.0\n" });
   assert.throws(() => loadTune(root), /must be a whole number/);
@@ -110,15 +119,15 @@ test("tune: a whole-number key refuses a float, exactly as tune.py does", () => 
 
 test("tune: semantic errors are COLLECTED, not reported one at a time", () => {
   const root = repo({
-    ".fux/tune.toml": "[ranking]\narchived_weight = -1\nsuperseded_weight = -2\n",
+    ".fux/tune.toml": "[ranking]\nrerank_weight = -1\nexpand_weight = -2\n",
   });
   try {
     loadTune(root);
     assert.fail("expected a refusal");
   } catch (err) {
     assert.ok(err instanceof FuxError);
-    assert.match(err.message, /archived_weight/);
-    assert.match(err.message, /superseded_weight/);
+    assert.match(err.message, /rerank_weight/);
+    assert.match(err.message, /expand_weight/);
   }
 });
 

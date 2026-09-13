@@ -1,6 +1,6 @@
 /** `.fux/tune.toml`, read. The reader half of `src/fux/tune.py`.
  *
- * 🔴 **This file closes [ADR-NODE-SEARCH](../../../docs/adr/0155_node-search.md)
+ * 🔴 **This file closes [SR-NODE-SEARCH](../../../records/0153_node-search.md)
  * decision 8**, which was filed as a gap rather than a decision: Node read no
  * tune file at all, so a consumer who ran `fux tune` got **a different ranked
  * list from the same index at the same engine version**, with nothing saying
@@ -33,7 +33,7 @@
  * R5: **absent, empty or all-commented = every default; malformed = a hard
  * error.** A file that exists and cannot be parsed means somebody edited it and
  * got it wrong; degrading there would answer with the engine's ranking while
- * the reader believed it was theirs (ADR-TUNE decision 10).
+ * the reader believed it was theirs (SR-TUNE decision 10).
  */
 import { readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
@@ -60,13 +60,10 @@ export const DEFAULT_MAX_PHRASES = 32;
 export const DEFAULT_MAX_TABLE_ROWS = 20000;
 export const INDEX_TABLE = "index";
 
-//: The closed key set. Table -> keys. Adding one here is a change to ADR-TUNE.
+//: The closed key set. Table -> keys. Adding one here is a change to SR-TUNE.
 const SCHEMA = {
   bm25f: ["k1", "b", ...FIELD_KEYS],
-  ranking: [
-    "archived_weight", "superseded_weight", "recency_half_life_days",
-    "rerank_weight", "expand_weight",
-  ],
+  ranking: ["rerank_weight", "expand_weight"],
   graph: ["damping", "iterations", "laziness", "hop_decay", "expand_limit", "seed_depth"],
   refer: ["budget", "per_doc_fraction", "min_passage_bytes", "max_passage_bytes"],
   confidence: ["separation_floor", "doc_coverage_floor"],
@@ -80,6 +77,45 @@ const SCHEMA = {
 
 const OPEN_TABLES = new Set(["priority"]);
 
+//: Keys fux ITSELF shipped and then removed. `"<table>.<key>" -> the rest of
+//: the sentence`, so the error names the removal and its date rather than
+//: reporting an unknown key on a line the consumer copied out of fux's own
+//: specimen. The Python twin is `tune._REMOVED_KEYS`; the two must agree, or a
+//: Node reader shrugs at a file Python refuses.
+const REMOVED_KEYS = new Map([
+  ["ranking.archived_weight",
+    "was REMOVED on 2026-09-13 (W-152). Being retired is a FACT, not a weight. " +
+    "Delete the key; ranking is unchanged, because it shipped at 1.0. The FACT " +
+    "is untouched and already reaches you: `archived=true` in .fux/sources/dirs, " +
+    "the `archived` record property, the `[archived]` marker in prose output and " +
+    "`archived: bool` on every JSON hit -- BRANCH ON THAT. " + "Each of the three priors shipped as a no-op, so DELETING the key changes " +
+    "nothing you can measure; what went is a global multiplier no single value " +
+    "can set correctly -- measured across 26 intent-split probes, every value " +
+    "that perfects current-seeking dismantles history-seeking one probe for one " +
+    "(work/regression/2026-09-12-priors-and-tables/VERDICT-W143.md)"],
+  ["ranking.recency_half_life_days",
+    "was REMOVED on 2026-09-13 (W-152). At a half-life of a year or less it took " +
+    "history-seeking queries to ZERO of thirteen: a per-document decay cannot " +
+    "carry a per-query distinction, because `what do we do now?` and `what did we " +
+    "do before?` want opposite orderings out of one corpus. Delete the key; " +
+    "ranking is unchanged, because it shipped at 0.0 (off). `mtime` is still " +
+    "committed on every record and still breaks a tie in favour of the newer " +
+    "document. " + "Each of the three priors shipped as a no-op, so DELETING the key changes " +
+    "nothing you can measure; what went is a global multiplier no single value " +
+    "can set correctly -- measured across 26 intent-split probes, every value " +
+    "that perfects current-seeking dismantles history-seeking one probe for one " +
+    "(work/regression/2026-09-12-priors-and-tables/VERDICT-W143.md)"],
+  ["ranking.superseded_weight",
+    "was REMOVED on 2026-09-13 (W-151). Supersession is a FACT, not a weight: " +
+    "no multiplier decides which document supersedes another, and the only band " +
+    "of values that ordered a corpus sensibly had its lower edge set by an " +
+    "UNRELATED document -- so adding a document moved the correct value. Delete " +
+    "the key; ranking is unchanged, because it shipped at 1.0. The FACT is " +
+    "untouched: `supersedes:` in frontmatter, the `superseded` record property, " +
+    "the graph edge, `fux explain`, and the declared tie-break that puts a live " +
+    "document above a retired one at an equal score"],
+]);
+
 /** Every tunable, resolved. Build it with `loadTune`; the defaults are the engine's. */
 export class Tune {
   constructor(values = {}) {
@@ -88,9 +124,7 @@ export class Tune {
     this.b = B;
     this.fieldWeights = FIELD_WEIGHTS;
     // [ranking]
-    this.archivedWeight = 1.0;
-    this.supersededWeight = 1.0;
-    this.recencyHalfLifeDays = 0.0;
+    // The three DOCUMENT priors were removed on 2026-09-13 (W-151, W-152).
     this.rerankWeight = 0.0;
     this.expandWeight = 0.2;
     // [graph]
@@ -230,7 +264,7 @@ function rejectConflictMarkers(label, text) {
 /** Read `.fux/tune.toml`. Absent, empty or all-commented means every default.
  *
  * `enabled=false` is `--no-tune`: the file is not read at all, so the answer is
- * the engine's own (ADR-TUNE decision 11). */
+ * the engine's own (SR-TUNE decision 11). */
 export function loadTune(root, { enabled = true } = {}) {
   if (!enabled) return DEFAULT_TUNE;
 
@@ -275,6 +309,14 @@ export function loadTune(root, { enabled = true } = {}) {
     if (OPEN_TABLES.has(name)) continue;
     const unknownKeys = Object.keys(value).filter((k) => !SCHEMA[name].includes(k));
     if (unknownKeys.length) {
+      // A key fux removed is named as removed. Sorted so two removed keys in
+      // one table report the same one every run (L3 reaches errors too).
+      const removed = unknownKeys.filter((k) => REMOVED_KEYS.has(`${name}.${k}`)).sort();
+      if (removed.length) {
+        throw new FuxError(
+          `${label}: [${name}] \`${removed[0]}\` ${REMOVED_KEYS.get(`${name}.${removed[0]}`)}`,
+        );
+      }
       const renamed = unknownKeys.filter((k) => LEGACY_FIELD_KEYS.has(k)).sort();
       if (name === "bm25f" && renamed.length) {
         const pairs = renamed.map((k) => `\`${k}\` -> \`${LEGACY_FIELD_KEYS.get(k)}\``).join(", ");
@@ -308,9 +350,6 @@ export function loadTune(root, { enabled = true } = {}) {
   const pick = (table, name, key, dflt, fn = nonNegative) =>
     (has(table, key) ? fn(c, name, key, table[key], dflt) : dflt);
 
-  const archivedWeight = pick(ranking, "ranking", "archived_weight", 1.0);
-  const supersededWeight = pick(ranking, "ranking", "superseded_weight", 1.0);
-  const recencyHalfLifeDays = pick(ranking, "ranking", "recency_half_life_days", 0.0);
   const rerankWeight = pick(ranking, "ranking", "rerank_weight", 0.0);
   const expandWeight = pick(ranking, "ranking", "expand_weight", 0.2);
 
@@ -380,7 +419,7 @@ export function loadTune(root, { enabled = true } = {}) {
 
   return new Tune({
     k1, b, fieldWeights: weights,
-    archivedWeight, supersededWeight, recencyHalfLifeDays, rerankWeight, expandWeight,
+    rerankWeight, expandWeight,
     damping, iterations, laziness, hopDecay, expandLimit, seedDepth,
     separationFloor, docCoverageFloor,
     budget, perDocFraction, minPassageBytes: minPassage, maxPassageBytes: maxPassage,

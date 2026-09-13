@@ -1,6 +1,6 @@
 """The Node reader's bundle — one artefact, and it must ANSWER like its sources.
 
-`fux.store.nodebundle` is what makes [L10](../docs/adr/0012_LAW-10-bundled-output.md)
+`fux.store.nodebundle` is what makes [L10](../records/0011_LAW-10-bundled-output.md)
 possible: a consumer gets one generated `.mjs`, never `node/src/**`. Two things
 have to hold, and they are different claims:
 

@@ -1,8 +1,8 @@
 """On-disk shapes for the derived T1 accelerator.
 
 Everything here lives under `.fux/runtime/` — derived, gitignored,
-`CACHEDIR.TAG`-tagged (ADR-DOTFUX), and rebuildable from the committed shards
-alone. **The committed format is untouched**; ADR-RECORD is frozen and this
+`CACHEDIR.TAG`-tagged (SR-DOTFUX), and rebuildable from the committed shards
+alone. **The committed format is untouched**; SR-RECORD is frozen and this
 milestone does not go near it.
 
 ## Why the offset table is binary, and why that is not a JSONL retreat
@@ -55,7 +55,7 @@ which is the exact cost the accelerator is built to avoid.
 `mx` and `mnw` are both needed because a term's BM25F contribution is
 increasing in weighted tf *and decreasing in `wlen`* — an upper bound over a
 block requires the maximum of the first and the minimum of the second. `mx`
-alone would be a valid but loose bound. See ADR-T1-ACCELERATOR and the proof
+alone would be a valid but loose bound. See SR-T1-ACCELERATOR and the proof
 in `accel.block_bound`.
 """
 
@@ -76,7 +76,7 @@ BLOCK_SIZE = 128
 # A v1 runtime is not read: `is_fresh()` refuses it and the build reruns.
 # v3 (W-76 Phase 1): per-field extrema in the offset table, `flen` in the
 # doc table. A v2 runtime is refused and rebuilt.
-#: v4 (2026-08-24, ADR-TUNE): `stats.json` carries `total_flen`, the five raw
+#: v4 (2026-08-24, SR-TUNE): `stats.json` carries `total_flen`, the five raw
 #: per-field token-count totals, in place of a pre-weighted `total_wlen`. The
 #: field weights became `tune.toml` keys, so a weighted total stored here would
 #: be a derived value that goes stale the moment a knob moves — and only on the
@@ -94,10 +94,10 @@ RUNTIME_SCHEMA = "fux.runtime.v5"
 #: v3 (W-76 Phase 1 record half): `mx` and `mnw` become PER-FIELD arrays.
 #:
 #: They used to be two scalars, each a *weighted* sum computed at build time.
-#: Once field weights are tunable at query time (ADR-TUNE decision 6, and
+#: Once field weights are tunable at query time (SR-TUNE decision 6, and
 #: Arpit's fork B ruling of 2026-08-23) a weighted scalar is stale the moment
 #: someone edits `tune.toml` — so either the accelerator rebuilds on every
-#: ranking edit, which breaks ADR-TUNE's central promise, or the extrema stop
+#: ranking edit, which breaks SR-TUNE's central promise, or the extrema stop
 #: being weighted. They stop being weighted.
 #:
 #: `mx` is a per-field MAXIMUM tf (u16 — a single document holding 65 535

@@ -14,7 +14,7 @@
  * `"default": "5"` (a STRING) where Python emits `5` (an integer), on a
  * property declared `"type": "integer"`. What holds them equal is
  * `tests/test_mcp.py::test_the_node_tool_file_matches_the_python_literal`,
- * not a shared read — ADR-MCP decision 11 states why, and what that leaves
+ * not a shared read — SR-MCP decision 11 states why, and what that leaves
  * unguarded once this file ships to npm on its own.
  */
 import { readFileSync, statSync } from "node:fs";
@@ -131,6 +131,9 @@ function fuxSearch(root, args, top) {
       sha: record.sha ?? "",
       archived: r.archived,
       superseded: Boolean(record.superseded ?? false),
+      // W-153 — the committed git timestamp in whole unix seconds, or `null`
+      // for a document outside git history. Always present; `null` is a claim.
+      mtime: record.mtime ?? null,
       // W-84 — free here: the record is already in hand for `sha`. Always
       // present, `[]` when nothing matches, because an absent key would be
       // indistinguishable from an older server.

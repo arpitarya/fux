@@ -4,7 +4,7 @@
 index?"* lived in four places: a `!` line in `.fux/sources/dirs`, a `!` line in
 the types list, the type allowlist in that same file, and two hardcoded rules in
 the walker. (The types list is `.fux/formats.toml` since 2026-09-11, and it has no
-`!` at all — ADR-TYPES decision 12.) Four places is three too many, and the symptom was always
+`!` at all — SR-TYPES decision 12.) Four places is three too many, and the symptom was always
 the same — a document silently absent, and no single file to read to find out
 why.
 
@@ -66,7 +66,7 @@ five properties make that survivable:
 |---|---|
 | **the blocks are written FIRST** | last match wins, so anything you write below beats them — including the `!` that pulls a file back out. A block written last would silently beat a human line, which is the one real hazard of letting a machine edit a `.gitignore`-shaped file |
 | **a line is a literal path, never a glob** | fux only writes exact paths; translating them would invent a meaning nothing put there. `*` in a filename is a character |
-| **which block a line is in IS its class** | structural, so the `not indexed` / `skipped` split is never parsed back out of the note text — ADR-INGEST decision 15's property |
+| **which block a line is in IS its class** | structural, so the `not indexed` / `skipped` split is never parsed back out of the note text — SR-INGEST decision 15's property |
 | **the note is the reason that put it there** | a generated verdict reports *that*, not *"ignored by .fuxignore:12"*, so the second run's answer is not *"because the first run said so"* |
 | **a path a hand-written pattern covers gets no line** | write `*.py[cod]` yourself and 257 generated lines collapse to zero. One line beats many |
 
@@ -80,7 +80,7 @@ fix is deleting the line or writing a `!` for it.
 ## `!` means the opposite here of what it means next door, on purpose
 
 In `.fux/sources/dirs`, `!` **subtracts**
-([ADR-DIR-LIST](../../../docs/adr/0120_dir-list.md) decision 2b). Here it
+([SR-DIR-LIST](../../../records/0120_dir-list.md) decision 2b). Here it
 **re-includes**. Same character, opposite direction, two files. (`.fux/formats.toml`
 has no `!` at all, so the collision is down to one file since 2026-09-11.)
 
@@ -94,7 +94,7 @@ would actually surface.
 ## It outranks the type allowlist, in both directions
 
 The three walk conditions used to be a **conjunction with no precedence**
-(ADR-TYPES decision 7). They are now a conjunction with **one** thing above
+(SR-TYPES decision 7). They are now a conjunction with **one** thing above
 them, and this is it:
 
 - a path this file **ignores** is skipped, whatever `types` says;
@@ -103,7 +103,7 @@ them, and this is it:
 
 ⚠ **The second half is the sharp edge and it is not softened.** `!*.py` indexes
 Python files as **raw bytes**, because no decoder claims `.py` — which is
-exactly the shape [ADR-TYPES](../../../docs/adr/0128_types-list.md) was opened
+exactly the shape [SR-TYPES](../../../records/0128_types-list.md) was opened
 about. It takes an explicit `!` line a human wrote to get there, it is visible
 in one committed file, and it is the price of the file meaning what its name
 says.
@@ -129,7 +129,7 @@ IGNORE_FILE = ".fux/.fuxignore"
 
 #: The two fux-written blocks. **Which block a line sits in IS its class** —
 #: structural, never parsed out of the reason text, which is the property
-#: ADR-INGEST decision 15 rests on.
+#: SR-INGEST decision 15 rests on.
 BLOCK_NOT_INDEXED = "not indexed"
 BLOCK_SKIPPED = "skipped"
 BLOCKS = (BLOCK_NOT_INDEXED, BLOCK_SKIPPED)
@@ -509,7 +509,7 @@ def duplicate_warnings(root: Path, *, dirs_file: str) -> list[str]:
     to guess which way it resolves.
 
     ⚠ **`dirs` only since 2026-09-11.** The types list became `.fux/formats.toml`,
-    which has no subtraction to duplicate (ADR-TYPES decision 12).
+    which has no subtraction to duplicate (SR-TYPES decision 12).
 
     **ASCII only**, for the same reason `reason()` is.
     """

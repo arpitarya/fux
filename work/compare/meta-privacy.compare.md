@@ -43,7 +43,7 @@ timestamp: 2026-08-21T00:00:00Z
 >
 > **This is the only place in `work/compare/` the model deletion left a false
 > claim**, which is worth knowing: the dense lane's forks were never argued
-> here. They lived in W-79, W-80, the dense-lane gate and ADR-CODES-TABLE.
+> here. They lived in W-79, W-80, the dense-lane gate and SR-CODES-TABLE.
 
 ## Context
 
@@ -132,7 +132,7 @@ sources. It changes what `hashed` *costs* a reader.
 **Ruled: no — outside L2 entirely.** Not "`hashed` implies `snapshot`", and
 not a new named exception either.
 
-Grounding: [ADR-CACHE](../../docs/adr/0131_cache.md) (written two days
+Grounding: [SR-CACHE](../../records/0131_cache.md) (written two days
 earlier, same author, same reasoning target) already ruled that ARC and the
 TTL fetch cache — gitignored, per-machine, never committed — sit outside
 L2's scope: *"L2 forbids durable content; this store is deliberately the
@@ -140,7 +140,7 @@ opposite... nothing here is ever committed, so there is nothing for L2 to
 except."* The P5 display cache is the same shape (gitignored,
 content-addressed, local-only, never committed) and the identical reasoning
 applies without modification. `store/displaycache.py`'s own docstring cites
-this precedent rather than re-arguing it. CLAUDE.md §L2 and ADR-LAWS are
+this precedent rather than re-arguing it. CLAUDE.md §L2 and SR-LAWS are
 **untouched** by this change — the alternative (a new named exception) would
 have added permanent normative surface for something that, on inspection,
 never needed excepting.
@@ -192,7 +192,7 @@ found `loc` is the literal fetch address the refer plane calls
 (`fetcher(loc)` in `refer/source.py`, no other route exists for a fresh
 clone that never ran ingest) and it is already committed in plaintext via a
 second, independent path — the full URL list at `.fux/sources/url`
-([ADR-URL-LIST](../../docs/adr/0116_url-list.md)). Hashing or dropping `loc`
+([SR-URL-LIST](../../records/0116_url-list.md)). Hashing or dropping `loc`
 in the `M/` record would cost the refer plane's only way to fetch a hashed
 document, for **zero** added privacy (the URL is already readable one file
 over). `loc`/`id` are unchanged. This is stated here as a finding, not a
@@ -217,7 +217,7 @@ widens with the surface that uses the field.
 ## Reopen-trigger (2026-08-21 rulings)
 
 Any of: (a) L2's "outside entirely" reasoning is shown wrong for *this*
-cache specifically (not just cited from ADR-CACHE) — e.g. a real caller finds
+cache specifically (not just cited from SR-CACHE) — e.g. a real caller finds
 a path where display-cache content becomes committed or otherwise durable
 outside the source system; (b) a corpus is found where `_reusable()`'s
 carry-forward gate *does* admit a non-git record without a fetch (a code

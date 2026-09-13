@@ -52,7 +52,7 @@ already states as scope.
 ## Context — what fired this
 
 **Nothing fired this, and that is itself the finding.**
-[ADR-GRAPH](../../docs/adr/0126_graph.md)'s three veto conditions are about
+[SR-GRAPH](../../records/0126_graph.md)'s three veto conditions are about
 determinism across machines, walk ordering, and the playground's acceptance
 queries. **None of them is about cost.** No R prediction in
 [OPEN-WORK](../OPEN-WORK.md) measures a graph verb's latency either: R3's
@@ -68,7 +68,7 @@ that fork, the re-index moves off the commit and this plane still costs 9.34 s
 to read afterwards. The two forks are independent and can be decided in either
 order.
 
-**What this does not reopen.** ADR-GRAPH decision 5 (unseeded propagation) and
+**What this does not reopen.** SR-GRAPH decision 5 (unseeded propagation) and
 decision 7 (communities derived, not committed) are untouched by every option
 below — the question is the *layout* of a derived file, not whether it is
 derived, and not how it is computed. **Decision 8**, which names the plane
@@ -245,7 +245,7 @@ adjudicate one.
 So whichever option is taken, the honest close is a **new pre-registered
 prediction** — call it **R8**: *a graph verb answers in under X s at 100 000
 documents on a real corpus* — frozen before the implementation is measured,
-owned by ADR-GRAPH, and run in `fux-lab` as a new environment.
+owned by SR-GRAPH, and run in `fux-lab` as a new environment.
 
 > **⚠ R8 IS RETIRED, 2026-08-22 — it is not dormant and not deferred.** Arpit:
 > *"anything that talks about commitments for fifty thousand or hundred
@@ -283,7 +283,7 @@ than from anything measured here.
 | `explain` under 1 s at 100k (×3) | ✗ | **✓ 0.21 s** | likely, unmeasured | ✓ eventually |
 | `graph` under 1 s at 100k (×3) | ✗ | **✓ 0.45 s** | unmeasured | ✓ eventually |
 | available before P1–P3 clear (×3) | ✓ | **✓** | ✓ | ✗ |
-| keeps ADR-GRAPH decisions 5 and 7 (×3) | ✓ | **✓** | ✓ | ✓ |
+| keeps SR-GRAPH decisions 5 and 7 (×3) | ✓ | **✓** | ✓ | ✓ |
 | cuts `fux build` — feeds R5 (×2) | ✗ | **✗, a wash** | ✓ −1.6 s | ✓ |
 | no duplicated state (×2) | ✗ | **✗** | ✓ | ✗ |
 | holds at 10⁶ (×2) | ✗ | **✓, untested** | ✓, untested | ✓ |
@@ -296,7 +296,7 @@ than from anything measured here.
   [GRAPH-PLANE-PROFILE](../regression/2026-08-21-graph-plane-profile/report.md),
   its [raw output](../regression/2026-08-21-graph-plane-profile/evidence/profile-output.txt)
   and its harness [`tools/graph-bench/profile.py`](../../tools/graph-bench/profile.py).
-- The record that owns the plane — [ADR-GRAPH](../../docs/adr/0126_graph.md)
+- The record that owns the plane — [SR-GRAPH](../../records/0126_graph.md)
   decision 8. Decisions 5 and 7 are explicitly not in question.
 - The write-path fork this does **not** reopen —
   [`hook-at-scale.compare.md`](hook-at-scale.compare.md).

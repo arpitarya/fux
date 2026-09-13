@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The archived-signal instrument — ADR-ARCHIVED-CONTENT decision 5's gate.
+"""The archived-signal instrument — SR-ARCHIVED-CONTENT decision 5's gate.
 
 Runs the frozen query set in `queries.jsonl` against the corpus this repo
 carries and reports the metrics `PRE-REGISTRATION.md` defines. **It computes
@@ -17,7 +17,7 @@ Two things this deliberately does NOT do:
   `archived` key the verb reports, which the engine derives from the committed
   declaration. A harness that hard-coded the path would be exact on this corpus
   and silently wrong on any consumer whose retired documents live in `old/` —
-  the precise failure ADR-DIR-LIST's *declared, never derived* rule exists to
+  the precise failure SR-DIR-LIST's *declared, never derived* rule exists to
   prevent, reintroduced inside the instrument meant to check it.
 - **It never writes a verdict file.** The run does that, with its evidence,
   under `work/regression/`.

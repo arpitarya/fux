@@ -139,7 +139,7 @@ def test_the_usage_skill_is_the_same_bytes_for_claude_and_kiro():
 
 def test_every_vendor_gets_the_ladder():
     """A ladder in one rendering and not the others is exactly the drift
-    ADR-AGENT-POLICY decision 2's conformance test exists to catch."""
+    SR-AGENT-POLICY decision 2's conformance test exists to catch."""
     for vendor in KNOWN_AGENTS:
         templates = {tpl for _dest, tpl in AGENT_FILES[vendor]}
         assert templates & set(LADDER_TEMPLATES), f"{vendor} has no invocation guidance"

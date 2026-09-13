@@ -21,6 +21,13 @@ Both directions are tested because both diverge, for different reasons:
   the promotion.
 - `w < 1` — demoting the current top-k lowers the real threshold, so a
   document pruned on the old `theta` should now enter.
+
+⚠ **The VEHICLE changed on 2026-09-13 and the law did not.** These tests drove
+the weight through `archived_weight`, which was removed with the other two
+document priors (W-152). `.fux/tune.toml`'s `[priority]` is the one multiplier
+left, so it carries the law now — same corpus, same weights, same assertions.
+**The vehicle is incidental; `SR-T1-ACCELERATOR` veto 5 is what is under test,
+and it binds whatever multiplier arrives next.**
 """
 
 from __future__ import annotations
@@ -29,6 +36,7 @@ import pytest
 
 from fux.derive import accel, build
 from fux.query import scan
+from fux.query.rank import Weighting
 from fux.store import term_hash, write_index
 
 
@@ -99,6 +107,12 @@ def built(tmp_path):
 
 ARCHIVED_DIRS = frozenset({"retired"})
 
+#: The archived documents all live under `retired/`, so one `[priority]` entry
+#: scales exactly the set `archived_weight` used to scale — which is what makes
+#: this a change of vehicle rather than of corpus.
+def _weighting(weight):
+    return Weighting(priority=(("retired/", weight),), archived_dirs=ARCHIVED_DIRS)
+
 #: Spanning both directions and both sides of 1.0, plus values large enough to
 #: overcome the slack a real corpus leaves. A weight of 1.01 does not test the
 #: bound; it tests floating point.
@@ -119,19 +133,10 @@ def test_accelerator_equals_scan_at_any_weight(built, weight, top):
     differential law carries it down both the scan and accelerator paths for
     free"* — which held at `1.0` and at no other value.
     """
-    expected = _payload(
-        scan.ask(built, "alpha beta", top=top, archived_weight=weight, archived_dirs=ARCHIVED_DIRS)
-    )
+    expected = _payload(scan.ask(built, "alpha beta", top=top, weighting=_weighting(weight)))
     for skipping in (False, True):
         got = _payload(
-            accel.ask(
-                built,
-                "alpha beta",
-                top=top,
-                skipping=skipping,
-                archived_weight=weight,
-                archived_dirs=ARCHIVED_DIRS,
-            )
+            accel.ask(built, "alpha beta", top=top, skipping=skipping, weighting=_weighting(weight))
         )
         assert got == expected, f"weight={weight} top={top} skipping={skipping}"
 
@@ -152,8 +157,8 @@ def test_promotion_actually_reorders_this_corpus():
         root = Path(tmp)
         write_index(root, _adversarial_corpus())
         build(root)
-        at_default = scan.ask(root, "alpha beta", top=20, archived_weight=1.0, archived_dirs=ARCHIVED_DIRS)
-        promoted = scan.ask(root, "alpha beta", top=20, archived_weight=500.0, archived_dirs=ARCHIVED_DIRS)
+        at_default = scan.ask(root, "alpha beta", top=20, weighting=_weighting(1.0))
+        promoted = scan.ask(root, "alpha beta", top=20, weighting=_weighting(500.0))
         assert not any(r.archived for r in at_default), "fixture: archived already in top-20 at default"
         assert any(r.archived for r in promoted), "fixture: weight never reorders — nothing is under test"
 
@@ -166,12 +171,11 @@ def test_skipping_is_still_load_bearing_at_a_weight(built):
     actually taken by checking it reads fewer blocks than the no-skip path.
     """
     from fux.derive.accel import Runtime, accel_candidates
-    from fux.query.rank import Weighting
     from fux.query.scan import query_term_hashes
 
     runtime = Runtime(built)
     hashes = query_term_hashes("alpha beta")
-    w = Weighting(archived_weight=0.5, archived_dirs=ARCHIVED_DIRS)
+    w = _weighting(0.5)
     with_skip, _, _ = accel_candidates(runtime, hashes, 5, skipping=True, weighting=w)
     without, _, _ = accel_candidates(runtime, hashes, 5, skipping=False, weighting=w)
     assert len(with_skip) < len(without), "skipping never fired — the bound is not load-bearing"
@@ -181,13 +185,11 @@ def test_maximum_is_the_configuration_not_the_candidates():
     """`Weighting.maximum` must include `1.0`, always.
 
     A demoting configuration (`w < 1`) has a supremum of `1.0`, not of `w`:
-    every non-archived document is scaled by `1.0`. Taking the configured
-    weight alone would shrink the ceiling below the scores it must dominate,
-    and the demotion direction is the one that looks harmless.
+    every unlisted document is scaled by `1.0`. Taking the configured weight
+    alone would shrink the ceiling below the scores it must dominate, and the
+    demotion direction is the one that looks harmless.
     """
-    from fux.query.rank import Weighting
-
-    assert Weighting(archived_weight=0.25).maximum == 1.0
-    assert Weighting(archived_weight=4.0).maximum == 4.0
+    assert _weighting(0.25).maximum == 1.0
+    assert _weighting(4.0).maximum == 4.0
     assert Weighting().trivial is True
-    assert Weighting(archived_weight=0.25).trivial is False
+    assert _weighting(0.25).trivial is False

@@ -24,7 +24,7 @@ The rule, in full:
 - `meta: "hashed"` must carry **no display text** — no `title`, no `phrases` —
   and must carry `title_h`.
 - `meta: "plain"` is legal and is an explicit, per-document opt-out
-  (ADR-URL-LIST decision 10). It has to be *said*.
+  (SR-URL-LIST decision 10). It has to be *said*.
 
 
 Always a full, deterministic rewrite of every shard implied by the given

@@ -71,7 +71,7 @@ Filed run: [`work/regression/2026-09-05-vector-gate/`](../../work/regression/202
 ## 🔴 The corpus this ran on no longer exists
 
 The 2026-09-05 run used `fux-playground`'s ten documents and fifty goldens.
-[L9](../../docs/adr/0011_LAW-9-environments.md) made that environment Arpit's
+[SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md) made that environment Arpit's
 hands alone on 2026-09-11, so **`<corpus>` and `$Q` above have no default and
 this harness has no live golden set** — the golden ladder
 ([`work/golden/`](../../work/golden/README.md)) carries questions with no rank

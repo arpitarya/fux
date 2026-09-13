@@ -1,7 +1,7 @@
 ---
 type: Compare Doc
 title: The types file as TOML
-description: Whether `.fux/sources/types` becomes `.fux/formats.toml`, and in what shape — a reversal of ADR-TYPES' recorded rejection of a TOML types list.
+description: Whether `.fux/sources/types` becomes `.fux/formats.toml`, and in what shape — a reversal of SR-TYPES' recorded rejection of a TOML types list.
 status: accepted
 timestamp: 2026-09-11T00:00:00Z
 ---
@@ -11,9 +11,9 @@ timestamp: 2026-09-11T00:00:00Z
 > **Verdict: ACCEPTED (Arpit, 2026-09-11) — D, and F1–F6 exactly as proposed.**
 > ⚠ **F1's file was renamed the same day: `.fux/types.toml` → `.fux/formats.toml`**
 > (Arpit, after `map.toml` and `decoders.toml` were weighed — reasons in
-> ADR-TYPES decision 12). Every mention in this doc now reads `formats.toml`;
+> SR-TYPES decision 12). Every mention in this doc now reads `formats.toml`;
 > the doc's file name keeps `types-toml` so its links do not break.
-> Shipped the same day as [ADR-TYPES](../../docs/adr/0128_types-list.md)
+> Shipped the same day as [SR-TYPES](../../records/0128_types-list.md)
 > decision 12. Two refinements the build found, both recorded there: F3's
 > *stated twice* check is **exact-case** (`"*.CSV"` beside `csv` admits other
 > files), and F5's conversion **refuses** an upper-case bound pattern rather
@@ -35,8 +35,8 @@ timestamp: 2026-09-11T00:00:00Z
 
 ## 0 — Two corrections first
 
-- 🔴 **This reverses a recorded rejection.** ADR-TYPES §Alternatives: *"A
-  `[sources] types` TOML array. Rejected: the shape ADR-DIR-LIST had just moved
+- 🔴 **This reverses a recorded rejection.** SR-TYPES §Alternatives: *"A
+  `[sources] types` TOML array. Rejected: the shape SR-DIR-LIST had just moved
   away from."* Also [file-type-filter](file-type-filter.compare.md) option D.
   §3 re-reads each reason against this proposal.
 
@@ -44,12 +44,12 @@ timestamp: 2026-09-11T00:00:00Z
   was the agent's.** It said the `!` lines are order-sensitive. **They are
   not**: `sourcelist.parse` sorts every entry
   (`sorted(seen.values(), key=lambda e: (e.exclude, e.value))`), and
-  ADR-DIR-LIST decision 2b has no un-exclude. The "ordered rule list" pick
+  SR-DIR-LIST decision 2b has no un-exclude. The "ordered rule list" pick
   (option C) rested on that claim, so it is re-opened here rather than assumed.
 
 ## 1 — Context
 
-- **The file does two jobs:** *what is a document* (ADR-TYPES decisions 2, 3, 6)
+- **The file does two jobs:** *what is a document* (SR-TYPES decisions 2, 3, 6)
   and *which decoder reads each extension* (decision 11 — Arpit, 2026-09-01:
   *"use the file as map"*).
 
@@ -84,7 +84,7 @@ timestamp: 2026-09-11T00:00:00Z
 **D — the default as `fux setup` would write it (abridged):**
 
 ```toml
-# Which files are documents, and which decoder reads each one. See ADR-TYPES.
+# Which files are documents, and which decoder reads each one. See SR-TYPES.
 # Absent file -> the built-in default. Present -> it REPLACES the default.
 
 # Already text: no decoder in the path. One glob per line.
@@ -121,9 +121,9 @@ pattern = "*.md"
 
 | why TOML was rejected | where | does it hold against D? |
 |---|---|---|
-| a large inline array is **one diff hunk, one merge conflict** | ADR-URL-LIST decisions 1-2 | **No.** TOML arrays span lines with trailing commas and comments; one entry per line merges line by line. The writer keeps that layout (§6). |
-| it **buries a corpus decision in config** (`fux.toml`) | ADR-URL-LIST and ADR-DIR-LIST §Alternatives | **No.** Its own file, beside `tune.toml` — not a key in `fux.toml`. |
-| **one grammar, one parser** for the three lists | ADR-DIR-LIST decision 2; file-type-filter matrix | 🔴 **Yes — the cost is real and D pays it.** `types` leaves the shared grammar and `sources.py` grows a second writer. |
+| a large inline array is **one diff hunk, one merge conflict** | SR-URL-LIST decisions 1-2 | **No.** TOML arrays span lines with trailing commas and comments; one entry per line merges line by line. The writer keeps that layout (§6). |
+| it **buries a corpus decision in config** (`fux.toml`) | SR-URL-LIST and SR-DIR-LIST §Alternatives | **No.** Its own file, beside `tune.toml` — not a key in `fux.toml`. |
+| **one grammar, one parser** for the three lists | SR-DIR-LIST decision 2; file-type-filter matrix | 🔴 **Yes — the cost is real and D pays it.** `types` leaves the shared grammar and `sources.py` grows a second writer. |
 
 ## 4 — Matrix
 
@@ -158,17 +158,17 @@ pattern = "*.md"
 | F1 | location | **`.fux/formats.toml`** — Arpit's ask, recorded as his ruling | `.fux/sources/formats.toml`, keeping the three lists together |
 | F2 | shape | **D** | C — the chat pick, on the false premise in §0 |
 | F3 | does a binding admit its extension? | **yes** (Ruff's rule). `[decoders] csv` makes `*.csv` a document; `*.csv` also in `include` is a loud *stated twice* error | no — admission only through `include`; a bound-but-not-included extension is an error |
-| F4 | subtraction (`!`) | **dropped.** `.fux/.fuxignore` is already the home and `!` here the deprecated spelling (ADR-TYPES 2a, ADR-FUXIGNORE decision 5); a new format should not ship a deprecated spelling | carry `exclude = [...]` |
-| F5 | an existing `.fux/sources/types` | **loud error** from `ingest` and `doctor` while it exists; `fux setup` writes `.fux/formats.toml` converted from it (only if the new file is missing) and says to delete the old one; its `!` lines become `.fuxignore` lines | no migration — ADR-DECODE decision 17 is the precedent, Arpit's call for the decoder rename |
+| F4 | subtraction (`!`) | **dropped.** `.fux/.fuxignore` is already the home and `!` here the deprecated spelling (SR-TYPES 2a, SR-FUXIGNORE decision 5); a new format should not ship a deprecated spelling | carry `exclude = [...]` |
+| F5 | an existing `.fux/sources/types` | **loud error** from `ingest` and `doctor` while it exists; `fux setup` writes `.fux/formats.toml` converted from it (only if the new file is missing) and says to delete the old one; its `!` lines become `.fuxignore` lines | no migration — SR-DECODE decision 17 is the precedent, Arpit's call for the decoder rename |
 | F6 | error positions | **key path always** (`decoders.geojson`), plus the line number when a scan finds exactly one line for it | key path only |
 
 ⛔ **Disqualified for F5: silently ignoring the old file.** The default would
 apply, the index would change, and nothing would say so — *a plausible index
-with different postings*, the worst case ADR-TYPES decision 11 names.
+with different postings*, the worst case SR-TYPES decision 11 names.
 
 ## 6 — Consequences of D
 
-- **Reader lenient, writer strict** (ADR-URL-LIST decision 13, kept). Any valid
+- **Reader lenient, writer strict** (SR-URL-LIST decision 13, kept). Any valid
   TOML loads; `fux source add --types` edits only the canonical
   one-entry-per-line layout and **refuses** a hand-reformatted array rather than
   rewriting it — a rewrite would eat the comments inside it.
@@ -187,8 +187,8 @@ with different postings*, the worst case ADR-TYPES decision 11 names.
 - 🔴 **Semantic errors lose a guaranteed `file:lineno`** (F6), which every
   source list promises today.
 
-- 🔴 **`.fux/sources/` stops holding "the trio".** ADR-TYPES' consequence line
-  and ADR-DIR-LIST decision 1 (*"beside `urls` and `types`"*) are rewritten.
+- 🔴 **`.fux/sources/` stops holding "the trio".** SR-TYPES' consequence line
+  and SR-DIR-LIST decision 1 (*"beside `urls` and `types`"*) are rewritten.
 
 - ⚠ **Index bytes should not move** — a converted file states the identical
   allowlist and bindings. **The build proves that with a byte-identical
@@ -203,24 +203,24 @@ committing.** At 07:33 UTC on 2026-09-11 it held uncommitted edits in
 
 | component | owning record (Law zero) | change |
 |---|---|---|
-| `config.py`, `config.schema.json` | ADR-CONFIG | `DEFAULT_TYPES_FILE`; the phantom `types_file` |
-| `ingest/sourcelist.py` | ADR-URL-LIST | `TYPES` leaves the shared grammar; TOML reader |
-| `ingest/gitdir.py` (`read_types`) | ADR-INGEST | reads the new file; old-file error (F5) |
-| `decode/__init__.py` (`_declared_bindings`) | ADR-DECODE | bindings from `[decoders]`; `_bound_extension`'s refusal becomes unreachable |
-| `sources.py` | ADR-CLI | the types branch of every verb; canonical-layout writer; `_seed_types` |
-| `setup.py` | ADR-DOTFUX | the default file; the `.fuxignore` header prose; conversion (F5) |
-| `doctor.py` | ADR-DOTFUX, ADR-DECODE | `types list usable`; `_decoder_bindings`; an old-file row |
-| `ingest/fuxignore.py`, `ingest/__init__.py`, `ingest/run.py` | ADR-FUXIGNORE, ADR-INGEST | `duplicate_warnings` loses its types half (F4) |
-| `cli.py` | ADR-CLI | `--types` help |
-| `templates/agents/DECODER-SKILL.md` and its three vendor copies | ADR-AGENT-POLICY | the binding example |
+| `config.py`, `config.schema.json` | SR-CONFIG | `DEFAULT_TYPES_FILE`; the phantom `types_file` |
+| `ingest/sourcelist.py` | SR-URL-LIST | `TYPES` leaves the shared grammar; TOML reader |
+| `ingest/gitdir.py` (`read_types`) | SR-INGEST | reads the new file; old-file error (F5) |
+| `decode/__init__.py` (`_declared_bindings`) | SR-DECODE | bindings from `[decoders]`; `_bound_extension`'s refusal becomes unreachable |
+| `sources.py` | SR-CLI | the types branch of every verb; canonical-layout writer; `_seed_types` |
+| `setup.py` | SR-DOTFUX | the default file; the `.fuxignore` header prose; conversion (F5) |
+| `doctor.py` | SR-DOTFUX, SR-DECODE | `types list usable`; `_decoder_bindings`; an old-file row |
+| `ingest/fuxignore.py`, `ingest/__init__.py`, `ingest/run.py` | SR-FUXIGNORE, SR-INGEST | `duplicate_warnings` loses its types half (F4) |
+| `cli.py` | SR-CLI | `--types` help |
+| `templates/agents/DECODER-SKILL.md` and its three vendor copies | SR-AGENT-POLICY | the binding example |
 | tests | — | `test_binding`, `test_source_filters`, `test_fuxignore`, `test_setup`, `test_source_verbs`, `test_skipnotice`, `test_doctor`, e2e |
-| records | — | ADR-TYPES (2, 2a, 10, 11, 11a, consequences, alternatives, veto check commands), ADR-URL-LIST, ADR-DIR-LIST, ADR-FUXIGNORE 5, ADR-DECODE 13, ADR-DOTFUX, ADR-CONFIG, ADR-CLI; path mentions in ADR-TUNE, ADR-OUTPUT, ADR-INGEST, `docs/handbook.html`, `work/architecture-detailed.svg` |
+| records | — | SR-TYPES (2, 2a, 10, 11, 11a, consequences, alternatives, veto check commands), SR-URL-LIST, SR-DIR-LIST, SR-FUXIGNORE 5, SR-DECODE 13, SR-DOTFUX, SR-CONFIG, SR-CLI; path mentions in SR-TUNE, SR-OUTPUT, SR-INGEST, `docs/handbook.html`, `work/architecture-detailed.svg` |
 
 **Model: Opus** — a close call. With §5 ruled the reader is Sonnet work; the
 writer's refuse-don't-reformat rule and F5's conversion are judgment no test
 catches.
 
-**Why ADR-TYPES is not amended yet:** Law zero puts the record change in the
+**Why SR-TYPES is not amended yet:** Law zero puts the record change in the
 same change as the behaviour. A record describing `.fux/formats.toml` today would
 describe code fux does not have — which CLAUDE.md calls worse than no record.
 
@@ -233,20 +233,20 @@ Redo this comparison if any of these is true:
    `ls work/compare/ work/proposals/ | grep -i toml`.
 2. **`types` gains a second attribute that belongs to a pattern, not an
    extension.** D's extension-keyed table cannot hold it; C can. Check:
-   ADR-TYPES decisions after 11a.
+   SR-TYPES decisions after 11a.
 3. **A defect is filed where a `fux source` verb behaves differently for
    `types` than for `dirs`** because of the split writer. Check:
    `grep -n "types" work/OPEN-WORK.md`.
 
 ## References
 
-- ADR-TYPES — [`docs/adr/0128_types-list.md`](../../docs/adr/0128_types-list.md): decisions 1a, 2, 2a, 3, 11, 11a; §Alternatives.
-- ADR-URL-LIST — [`docs/adr/0116_url-list.md`](../../docs/adr/0116_url-list.md): decisions 1-2 and 13; §Alternatives.
-- ADR-DIR-LIST — [`docs/adr/0120_dir-list.md`](../../docs/adr/0120_dir-list.md): decisions 1, 2, 2b; §Alternatives.
-- ADR-FUXIGNORE — [`docs/adr/0145_fuxignore.md`](../../docs/adr/0145_fuxignore.md): decision 5.
-- ADR-DECODE — [`docs/adr/0139_decode.md`](../../docs/adr/0139_decode.md): decisions 13 and 17.
+- SR-TYPES — [`records/0128_types-list.md`](../../records/0128_types-list.md): decisions 1a, 2, 2a, 3, 11, 11a; §Alternatives.
+- SR-URL-LIST — [`records/0116_url-list.md`](../../records/0116_url-list.md): decisions 1-2 and 13; §Alternatives.
+- SR-DIR-LIST — [`records/0120_dir-list.md`](../../records/0120_dir-list.md): decisions 1, 2, 2b; §Alternatives.
+- SR-FUXIGNORE — [`records/0144_fuxignore.md`](../../records/0144_fuxignore.md): decision 5.
+- SR-DECODE — [`records/0139_decode.md`](../../records/0139_decode.md): decisions 13 and 17.
 - [file-type-filter](file-type-filter.compare.md) — option D and its matrix.
-- Code: [`sourcelist.py`](../../src/fux/ingest/sourcelist.py) (`parse`, `TYPES`), [`sources.py`](../../src/fux/sources.py), [`decode/__init__.py`](../../src/fux/decode/__init__.py) (`_declared_bindings`, `_bound_extension`, `_bind`), [`gitdir.py`](../../src/fux/ingest/gitdir.py) (`read_types`, the dot-skip), `config.schema.json` (deleted 2026-09-12 by W-122's consolidation; the declared key block in [ADR-CONFIG](../../docs/adr/0113_config.md) decision 13 replaced it).
+- Code: [`sourcelist.py`](../../src/fux/ingest/sourcelist.py) (`parse`, `TYPES`), [`sources.py`](../../src/fux/sources.py), [`decode/__init__.py`](../../src/fux/decode/__init__.py) (`_declared_bindings`, `_bound_extension`, `_bind`), [`gitdir.py`](../../src/fux/ingest/gitdir.py) (`read_types`, the dot-skip), `config.schema.json` (deleted 2026-09-12 by W-122's consolidation; the declared key block in [SR-CONFIG](../../records/0113_config.md) decision 13 replaced it).
 - TOML v1.0.0 — duplicate keys invalid; multi-line arrays with trailing commas and comments — <https://toml.io/en/v1.0.0>
 - Python `tomllib` — read-only, added in 3.11 — <https://docs.python.org/3/library/tomllib.html>
 - Ruff settings, `include` and `extension` — <https://docs.astral.sh/ruff/settings/#extension>

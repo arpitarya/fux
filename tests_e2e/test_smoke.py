@@ -19,7 +19,7 @@ def test_fux_version_via_subprocess():
 def test_fux_doctor_via_subprocess(tmp_path):
     (tmp_path / ".git").mkdir()
     (tmp_path / ".fux").mkdir()
-    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")  # ADR-PII decision 17
+    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")  # SR-PII decision 17
     result = subprocess.run(
         [sys.executable, "-m", "fux.cli", "doctor"],
         capture_output=True,
@@ -37,7 +37,7 @@ def test_fux_doctor_output_is_ascii_safe(tmp_path):
     strictest plausible stdout encoding to catch this on any platform."""
     (tmp_path / ".git").mkdir()
     (tmp_path / ".fux").mkdir()
-    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")  # ADR-PII decision 17
+    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")  # SR-PII decision 17
     env = {**os.environ, "PYTHONIOENCODING": "ascii"}
     result = subprocess.run(
         [sys.executable, "-m", "fux.cli", "doctor"],
@@ -78,8 +78,8 @@ def test_fux_doctor_reports_the_w101_checks_as_a_user_sees_them(tmp_path):
     for name in ("refusal rules", "decoder bindings", "recency prior", "freshness verdicts"):
         assert name in result.stdout, result.stdout
 
-    # `fux doctor --json`'s `freshness` block is what ADR-ACQUIRED and
-    # ADR-URL-FRESHNESS both name as the way to run their veto.
+    # `fux doctor --json`'s `freshness` block is what SR-ACQUIRED and
+    # SR-URL-FRESHNESS both name as the way to run their veto.
     payload = json.loads(
         subprocess.run(
             [sys.executable, "-m", "fux.cli", "doctor", "--json"],
@@ -118,7 +118,7 @@ def test_a_generated_types_file_leaves_the_binding_check_quiet(tmp_path):
 
 
 def test_a_repo_without_pii_toml_stops_every_gated_verb(tmp_path):
-    """ADR-PII decision 17 through the real CLI: refuse, name the fix, and the fix works."""
+    """SR-PII decision 17 through the real CLI: refuse, name the fix, and the fix works."""
     subprocess.run(["git", "init", "-q"], cwd=tmp_path, check=True, capture_output=True)
     (tmp_path / "fux.toml").write_text("", encoding="utf-8")
     (tmp_path / "docs").mkdir()

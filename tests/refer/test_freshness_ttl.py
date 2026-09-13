@@ -82,7 +82,7 @@ def test_an_undeclared_line_takes_the_defaults(tmp_path):
     urls.write_text("https://x/a\n")
     entry = sourcelist.read(tmp_path, "urls", sourcelist.URLS, missing_hint="")[0]
     assert entry.attrs["ttl"] == "24h"
-    assert entry.attrs["keep"] == "true"      # ADR-ACQUIRED: keep is on by default
+    assert entry.attrs["keep"] == "true"      # SR-ACQUIRED: keep is on by default
     assert entry.declared == frozenset()
 
 

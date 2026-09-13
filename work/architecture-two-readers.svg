@@ -218,7 +218,7 @@
 <text x="722" y="1640" font-size="11" fill="#4a5260">Node reporting `current` for a URL it never</text>
 <text x="722" y="1656" font-size="11" fill="#4a5260">checked would make the claim-strength vocabulary</text>
 <text x="722" y="1672" font-size="11" fill="#4a5260">mean different things in two runtimes -- the one</text>
-<text x="722" y="1688" font-size="11" fill="#4a5260">thing ADR-URL-FRESHNESS exists to prevent.</text>
+<text x="722" y="1688" font-size="11" fill="#4a5260">thing SR-URL-FRESHNESS exists to prevent.</text>
 <text x="722" y="1704" font-size="11" fill="#c2410c" font-weight="600">A DECISION. NOT A GAP.</text>
 <text x="46" y="1730" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">4 - THE THIRD ASYMMETRY: THE DERIVED GRAPH PLANE  --  and here it is PYTHON that refuses</text>
 <line x1="46" y1="1740" x2="1136" y2="1740" stroke="#e4e4e0" stroke-width="1"/>
@@ -256,5 +256,5 @@
 <text x="792" y="2123" font-size="10.5" fill="#4a5260">W-107 R6. No Node twin at all, so the</text>
 <text x="792" y="2138" font-size="10.5" fill="#4a5260">arm does not pretend to cover them --</text>
 <text x="792" y="2153" font-size="10.5" fill="#4a5260">a stated absence, not a gap.</text>
-<text x="46" y="2198" font-size="11" fill="#8a93a0">Drawn from the code 2026-09-12; surface 6 and the bundle added the same day (W-149).  Authority: docs/adr/0155_node-search.md (ADR-NODE-SEARCH), decisions 1-16.  Every difference not on this page is a defect.</text>
+<text x="46" y="2198" font-size="11" fill="#8a93a0">Drawn from the code 2026-09-12; surface 6 and the bundle added the same day (W-149).  Authority: records/0153_node-search.md (SR-NODE-SEARCH), decisions 1-16.  Every difference not on this page is a defect.</text>
 </svg>

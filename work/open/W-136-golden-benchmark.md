@@ -2,7 +2,7 @@
 type: OpenItem
 id: W-136
 title: "W-136 — the sealed golden benchmark"
-description: "Arpit, 2026-09-11: Codex writes 10 seed documents and ~100 questions with answers Claude never sees; Claude grows the corpus 10 → 10 000 blind; Claude runs fux per rung; Codex scores without revealing answers. The test data for fux-lab (L9)."
+description: "Arpit, 2026-09-11: Codex writes 10 seed documents and ~100 questions with answers Claude never sees; Claude grows the corpus 10 → 10 000 blind; Claude runs fux per rung; Codex scores without revealing answers. The test data for fux-lab (SR-WORK-ENVIRONMENTS)."
 status: open
 lane: arpit
 timestamp: 2026-09-11T00:00:00Z
@@ -13,6 +13,17 @@ timestamp: 2026-09-11T00:00:00Z
 **The process is [`work/golden/README.md`](../golden/README.md)** — stated there
 once; this file carries only state. Prompts: [`work/golden/prompts/`](../golden/prompts/).
 
+## 🟣 Gated on 2026-09-30 — Arpit, 2026-09-13
+
+**His Codex limit is exhausted; he runs prompt 5 on 2026-09-30.** Everything an
+agent can do is done. The decision is made, so this left the *Blocked on Arpit*
+table and is a 🟣 date gate in [OPEN-WORK](../OPEN-WORK.md).
+
+- **What this gate holds up**, moved here from the inbox sub-row: **[W-87](W-87-what-good-means.md)'s
+  recall half** and **[W-144](W-144-structure-aware-extraction.md)'s cheap route**,
+  both of which read per-query scores off phase 5. Not [W-145](W-145-codex-regenerates-the-key.md)
+  — that governs what a number may *claim*, not whether it runs.
+
 ## State
 
 | phase | who | lane | state |
@@ -21,7 +32,7 @@ once; this file carries only state. Prompts: [`work/golden/prompts/`](../golden/
 | 2. Extend 10 → 10 000, blind | Claude Code (Opus) | `agent` | ✅ **COMPLETE 2026-09-12 — all eight rungs to 10 000.** The first five were committed *before* the questions were opened (`92f5bff`); `rung-02000`/`05000`/`10000` were built later the same day from the **same committed generator and seed**, so what protects them is determinism rather than the clock — stated in [`golden/README.md`](../golden/README.md) rather than glossed. Nesting verified across all eight. |
 | 3. Freeze ladder, release questions | Codex | `arpit` — run prompt 3 | ⚠ **released early** on 2026-09-12, before the ladder existed — ids permuted so no band identifies the unanswerables. Phase 2 was on its honour and did not open `questions/`. |
 | 4. Run each rung | Claude Code | `agent` | ✅ **run on 2026-09-12** for the five rungs that existed then, under a committed pre-registration ([`work/regression/2026-09-12-golden-ladder/`](../regression/2026-09-12-golden-ladder/PRE-REGISTRATION.md)). ⚠ **`rung-02000`/`05000`/`10000` have NOT been run** — they were built after that run. Running them is cheap (the indexes are committed) but it needs its own pre-registration, because a run across eight rungs is not the run that was registered across five. |
-| 5. Score each rung | Codex | `arpit` — run prompt 5 | 🟢 **ready** — predictions and answers are filed for five rungs. Every number it produces is `informed` until [W-145](W-145-codex-regenerates-the-key.md) closes. |
+| 5. Score each rung | Codex | `arpit` — run prompt 5 | 🟣 **ready, gated on 2026-09-30** (Arpit, 2026-09-13 — Codex limit exhausted) — predictions and answers are filed for five rungs. Every number it produces is `informed` until [W-145](W-145-codex-regenerates-the-key.md) closes. |
 
 ## Done in the filing change (2026-09-11)
 
@@ -75,7 +86,7 @@ which carries what is contaminated and what any number may claim.
 
 ## Feature coverage — prompt 1b (Arpit, 2026-09-11)
 
-- Ruled (b) for the four ranking priors: Codex adds ≥ 4 superseding pairs, ≥ 4 archived documents, a date per seed and ≥ 22 intent-split questions ([prompt 1](../golden/prompts/1-codex-seed.md) part A §3, which absorbed prompt 1b on 2026-09-12); phase 2 declares, dates and checks coverage. Rule: ADR-RS decision 23. The first rung is `rung-seed`.
+- Ruled (b) for the four ranking priors: Codex adds ≥ 4 superseding pairs, ≥ 4 archived documents, a date per seed and ≥ 22 intent-split questions ([prompt 1](../golden/prompts/1-codex-seed.md) part A §3, which absorbed prompt 1b on 2026-09-12); phase 2 declares, dates and checks coverage. Rule: SR-RS decision 23. The first rung is `rung-seed`.
 
 ## Decisions taken with defaults — Arpit may override
 
@@ -104,13 +115,13 @@ which carries what is contaminated and what any number may claim.
 *This is what the queue said at the move. Re-derive it before believing it (OPEN-WORK rule 4).*
 
 - 🟠 **W-136 — the sealed golden benchmark.** `arpit` (Codex phases), then `agent` ·
-  *(records: [ADR-RS](../../docs/adr/0133_predictions.md) · [ADR-QUALITY](../../docs/adr/0141_quality-contract.md) ·
+  *(records: [SR-RS](../../records/0133_predictions.md) · [SR-WORK-QUALITY](../../records/0056_WORK-quality.md) ·
   setup: [fux-lab](../setup/fux-lab.md))* · **Arpit, 2026-09-11.**
   Codex writes 10 seed documents and ~100 questions with answers in
   `work/golden/golden-answer/` — **Claude never reads it**. Claude grows the corpus
   **10 → 10 000** without seeing a question; Codex freezes it and releases questions
   only; Claude runs fux per rung; Codex scores and returns per-query results with no
-  answers. The test data for fux-lab ([L9](../../docs/adr/0011_LAW-9-environments.md)). Process:
+  answers. The test data for fux-lab ([SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md)). Process:
   [`golden/README.md`](../golden/README.md) — [detail](W-136-golden-benchmark.md)
   `filed: 2026-09-11`
 
@@ -121,7 +132,7 @@ byte-for-byte, 10 000/10 000 records carrying an `mtime`, 1 003 declared archive
 and 1 002 declared superseded at the top rung.**
 
 **10 000 is the ceiling and there is no rung above it.** `CLAUDE.md` §Litmus and
-[L9](../../docs/adr/0011_LAW-9-environments.md); a rung at 50 000 is not
+[SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md); a rung at 50 000 is not
 deferred, it is forbidden.
 
 ### What is left on this item

@@ -42,10 +42,10 @@ ROOT = _REPO_ROOT.parent / "fux-lab" / "graph-acceptance"
 BUDGETS = [500, 1000, 2000, 4000, 8000, 16000]
 
 QUERIES_SINGLE = [
-    ("what replaced queue partitioning by hash", "docs/adr/0101-queue-partitioning-by-hash.md"),
-    ("what replaced synchronous webhook delivery", "docs/adr/0102-synchronous-webhook-delivery.md"),
+    ("what replaced queue partitioning by hash", "records/0101-queue-partitioning-by-hash.md"),
+    ("what replaced synchronous webhook delivery", "records/0102-synchronous-webhook-delivery.md"),
     ("gateway rollback procedure", "docs/runbooks/gateway-rollback-current-fleet.md"),
-    ("billing reconciliation cadence", "docs/adr/0006-billing-reconciliation-cadence.md"),
+    ("billing reconciliation cadence", "records/0006-billing-reconciliation-cadence.md"),
     ("onboarding for platform engineers", "docs/guides/0001-onboarding-for-platform-engineers.md"),
 ]
 
@@ -121,13 +121,13 @@ def main():
     # candidates from the same corpus (same team/topic), as a ranker realistically would.
     multi_pairs = [
         ("what replaced queue partitioning by hash",
-         ["docs/adr/0101-queue-partitioning-by-hash.md", "docs/adr/0201-queue-partitioning-by-tenant.md",
-          "docs/adr/0001-queue-backpressure-strategy.md"]),
+         ["records/0101-queue-partitioning-by-hash.md", "records/0201-queue-partitioning-by-tenant.md",
+          "records/0001-queue-backpressure-strategy.md"]),
         ("gateway rollback procedure",
          ["docs/runbooks/gateway-rollback-current-fleet.md", "docs/runbooks/gateway-rollback-legacy-fleet.md",
           "docs/postmortems/0001-quota-gateway-outage-eu-central.md"]),
         ("billing reconciliation cadence",
-         ["docs/adr/0006-billing-reconciliation-cadence.md", "docs/runbooks/billing-reconciler-replay.md",
+         ["records/0006-billing-reconciliation-cadence.md", "docs/runbooks/billing-reconciler-replay.md",
           "docs/policy/0001-data-retention-for-ledger-svc.md"]),
     ]
     multi = run_condition("MULTI (general assemble() API)", multi_pairs)

@@ -3,7 +3,7 @@
 
 **Why this is a module and not four copies of an `if`.** Three instruments
 landed on 2026-09-12 and each was about to hard-code *"net >= 6"*.
-[ADR-RS](../../docs/adr/0133_predictions.md) decision 19 says that is the
+[SR-RS](../../records/0133_predictions.md) decision 19 says that is the
 **floor of all floors** — the bar a result must clear *before the discordant
 count is even known* — and that the real bar **rises with the flips**: 20 flips
 need a net of 10, 50 flips need 16. A tool comparing against 6 alone would pass
@@ -21,7 +21,7 @@ from __future__ import annotations
 
 from resolution import smallest_detectable, two_sided_p
 
-#: Conventional and stated, not derived (ADR-RS decision 19).
+#: Conventional and stated, not derived (SR-RS decision 19).
 ALPHA = 0.05
 
 #: The bar that applies with no discordant count in hand. Nets of 1-5 cannot

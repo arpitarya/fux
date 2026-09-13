@@ -1,6 +1,6 @@
 ---
 name: fux-graph
-description: Explore how documents in a Fux index relate with `fux explain`, `fux graph` and `fux path` — outbound links, tags, supersession, communities, query neighbourhoods and the most reliable route between two documents. Use when asked "what does this doc link to", "what links to this ADR", "how are X and Y related", "what superseded this" or "orient me in this area", and when ask/find cannot answer a question about relationships.
+description: Explore how documents in a Fux index relate with `fux explain`, `fux graph` and `fux path` — outbound links, tags, supersession, communities, query neighbourhoods and the most reliable route between two documents. Use when asked "what does this doc link to", "what links to this SR", "how are X and Y related", "what superseded this" or "orient me in this area", and when ask/find cannot answer a question about relationships.
 ---
 
 # Relationships in a Fux index — `explain`, `graph`, `path`
@@ -130,7 +130,7 @@ hops, halved for each hop beyond the first (`[graph] hop_decay`, default 0.5).
 documents are real and unconnected — a finding, not a typo. `fux explain`
 refuses an unknown `tag:` the same way.
 
-**Inbound edges ("what links to this ADR?") have no verb.** Read the derived
+**Inbound edges ("what links to this SR?") have no verb.** Read the derived
 plane `fux build` writes, one `[src, kind, dst, grade]` per edge:
 
 ```bash

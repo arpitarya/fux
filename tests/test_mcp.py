@@ -28,7 +28,7 @@ from fux.store import TF_FIELDS, term_hash, write_index
 BODY = TF_FIELDS.index("body")
 
 
-def _rec(doc_id, title, word, *, edges=(), superseded=False, phrases=()) -> dict:
+def _rec(doc_id, title, word, *, edges=(), superseded=False, phrases=(), mtime=None) -> dict:
     tf = [0] * len(TF_FIELDS)
     tf[BODY] = 5
     flen = [0] * len(TF_FIELDS)
@@ -46,6 +46,8 @@ def _rec(doc_id, title, word, *, edges=(), superseded=False, phrases=()) -> dict
         "sha": "a" * 40,
         "edges": list(edges),
     }
+    if mtime is not None:
+        record["mtime"] = mtime
     if superseded:
         record["superseded"] = True
     return record
@@ -76,6 +78,7 @@ def repo(tmp_path):
                 "Retry policy",
                 "rollback",
                 superseded=True,
+                mtime=1788330315,
                 # W-84: the headings a real ingest would have extracted. One
                 # matches the query the tests use, one does not, so the
                 # filtering is visible rather than assumed.
@@ -161,6 +164,19 @@ def test_search_surfaces_the_supersession_flag(repo):
     flags = {r["path"]: r["superseded"] for r in payload["results"]}
     assert flags.get("docs/retry.md") is True
     assert flags.get("docs/new.md") is False
+
+
+def test_search_carries_the_committed_mtime(repo):
+    """W-153 — an agent can see how old a result is without fetching it.
+
+    Present on every row; `None` is the claim *no committed date*, which is
+    every document of a corpus copied out of its repository. An absent key
+    would be indistinguishable from an older server (the W-48 trap).
+    """
+    payload = _call(repo, "fux_search", {"query": "rollback", "k": 5})["structuredContent"]
+    dates = {r["path"]: r["mtime"] for r in payload["results"]}
+    assert dates["docs/retry.md"] == 1788330315
+    assert dates["docs/new.md"] is None
 
 
 def test_search_carries_the_matching_headings(repo):
@@ -310,7 +326,7 @@ def test_the_description_names_the_fields_it_tells_an_agent_to_read():
 
 
 def test_the_confidence_block_the_description_promises_is_unconditional_here():
-    """⚠ ADR-CONFIDENCE decision 11 gates the block behind `--band` on the CLI
+    """⚠ SR-CONFIDENCE decision 11 gates the block behind `--band` on the CLI
     and leaves it ALWAYS ON over MCP. The description says *read the confidence
     block* with no caveat, and that is only honest while MCP stays ungated."""
     from fux.output_config import MCP_KEYS
@@ -335,7 +351,7 @@ def test_every_tool_has_a_handler_and_every_handler_a_tool():
 
 
 def test_the_surface_stays_three_tools():
-    """ADR-MCP capped it deliberately — `answer` is absent because the agent is
+    """SR-MCP capped it deliberately — `answer` is absent because the agent is
     the answerer. A fourth tool is a decision, not a convenience, so it should
     cost a failing test and a record edit."""
     from fux.mcp import TOOLS
@@ -351,7 +367,7 @@ def test_every_tool_declares_a_description_and_a_schema():
         assert tool.get("inputSchema", {}).get("required"), f"{tool['name']} declares no required input"
 
 
-# -- the shared tool descriptions (W-107 Phase 3, ADR-MCP decision 11) --------
+# -- the shared tool descriptions (W-107 Phase 3, SR-MCP decision 11) --------
 
 
 def test_the_node_tool_file_matches_the_python_literal():

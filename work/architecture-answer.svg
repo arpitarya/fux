@@ -131,5 +131,5 @@
 <text x="46" y="1428" font-size="10.5" fill="#8a93a0">So current and stale are file:-only there, and cached can NEVER appear -- a TTL fetch cache requires fetching. as-ingested and unverified mean exactly what they mean here.</text>
 <text x="46" y="1446" font-size="10.5" fill="#c2410c">And Node has no decoders: rather than chunk the raw bytes of a document the index holds as decoded Markdown, it declines to refer what it cannot decode.</text>
 <line x1="46" y1="1460" x2="1136" y2="1460" stroke="#e4e4e0" stroke-width="1"/>
-<text x="46" y="1474" font-size="10.5" fill="#8a93a0">Drawn from src/fux/query/__init__.py, src/fux/query/refer_answer.py and src/fux/refer/, 2026-09-12. ADR-ANSWER - ADR-REFER - ADR-PROVENANCE.</text>
+<text x="46" y="1474" font-size="10.5" fill="#8a93a0">Drawn from src/fux/query/__init__.py, src/fux/query/refer_answer.py and src/fux/refer/, 2026-09-12. SR-ANSWER - SR-REFER - SR-PROVENANCE.</text>
 </svg>

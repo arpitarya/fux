@@ -1,7 +1,7 @@
 """W-109 — `-q` multi-query fusion, in rank space only.
 
 RRF was **deleted** with the dense lane on 2026-08-25 and comes back under a
-record ([ADR-PORT-LIST](../../docs/adr/0015_port-list.md) rule 1). These tests
+record ([SR-PORT-LIST](../../records/0114_port-list.md) rule 1). These tests
 pin the two things that make the revival a different object from the deleted
 one: it never touches a score, and its constant is Cormack's rather than one
 this repo picked.

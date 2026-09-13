@@ -1,4 +1,4 @@
-"""ADR-CONFIDENCE — the four signals, the four bands, and what must never move.
+"""SR-CONFIDENCE — the four signals, the four bands, and what must never move.
 
 The easy tests here are the ones that assert a band comes out. **The ones that
 matter are the four below the fold:**
@@ -232,7 +232,7 @@ def test_as_dict_declares_band_and_answerable_rather_than_leaving_them_derivable
     }
     # The floors are published for the OPPOSITE reason to `band`: not so a
     # consumer can re-derive the verdict, but so it can see the verdict is not
-    # comparable across repos that tuned differently (ADR-CONFIDENCE 13).
+    # comparable across repos that tuned differently (SR-CONFIDENCE 13).
     assert payload["separation_floor"] == SEPARATION_FLOOR
     assert payload["doc_coverage_floor"] == DOC_COVERAGE_FLOOR
 
@@ -329,7 +329,7 @@ def test_ask_json_carries_the_block_and_find_keeps_stdout_pipeable(
 def test_the_cli_emits_nothing_without_band_and_still_computes_it(
     tmp_path, monkeypatch, capsys
 ):
-    """ADR-CONFIDENCE decision 11 — and the half of it that is easy to lose.
+    """SR-CONFIDENCE decision 11 — and the half of it that is easy to lose.
 
     **Absent means NOT ASKED FOR, never *not confident*.** A consumer that read
     a missing key as band `none` would abstain on every healthy answer.
@@ -398,7 +398,7 @@ def test_a_question_whose_terms_scatter_across_documents_is_not_grounded():
 
     *"What is the SLA we publish for the payments API"* reached `grounded` on a
     corpus where **no document discusses it**: `sla` and `publish` sat in the
-    retention policy, `payments` in the postmortem, `api` in the mesh ADR — four
+    retention policy, `payments` in the postmortem, `api` in the mesh SR — four
     terms, four documents, so `missing` was empty and `coverage` was `1.0`.
 
     ⚠ **No threshold on `separation` closes this.** That query separated at
@@ -456,7 +456,7 @@ def test_the_corpus_wide_coverage_is_unchanged():
 
 # -- the floors are tunable, and the guard is publication ----------------
 #
-# ADR-CONFIDENCE decision 13 REVERSED decision 7, which had refused these as
+# SR-CONFIDENCE decision 13 REVERSED decision 7, which had refused these as
 # `tune.toml` keys. What decision 7 was protecting is real and is now unguarded
 # by anything mechanical: a consumer can lower `separation_floor` until every
 # answer reads `grounded`, which tunes away the SIGNAL rather than the ranking.

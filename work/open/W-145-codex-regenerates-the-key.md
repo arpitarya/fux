@@ -11,6 +11,20 @@ filed: 2026-09-12
 
 # W-145 — Codex regenerates the golden answer key
 
+## 🟣 Gated on 2026-09-30 — Arpit, 2026-09-13
+
+**His Codex limit is exhausted; he runs part B on 2026-09-30.** The decision is
+made, so this is no longer a *Blocked on Arpit* row — it is a 🟣 date gate in
+[OPEN-WORK](../OPEN-WORK.md), and nothing is owed from him before that day.
+
+- **Do not ask again before 2026-09-30**, and do not work around it: the
+  stopgap key stays in place and every number scored against it stays
+  `informed` (below).
+- **What this gate holds up**, moved here from the inbox sub-row it used to
+  live in: **[W-87](W-87-what-good-means.md)'s Part B**, which needs a key
+  nobody has contaminated. Nothing else — this item governs what a phase-5
+  number may *claim*, not whether phase 5 runs.
+
 ## Why this exists
 
 **Arpit, 2026-09-12.** His Codex quota was exhausted with phase 1 half done: the
@@ -72,5 +86,6 @@ engine.
 
 ## Blocks
 
-Nothing. Phase 2 runs on this corpus today. This item governs what any number
-coming out of phase 5 is allowed to claim.
+**[W-87](W-87-what-good-means.md)'s Part B, and nothing else.** Phase 2 runs on
+this corpus today. This item governs what any number coming out of phase 5 is
+allowed to claim, never whether phase 5 runs.

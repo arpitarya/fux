@@ -2,7 +2,7 @@
 type: Setup
 name: SETUP-BENCHMARK
 title: SETUP-BENCHMARK — fux-benchmark, the two-version timing harness
-description: "How the benchmark environment is stood up under L9: seven corpora it generates itself, a fixed query set with no answer key, two engine versions every run, and latency plus the ranked list kept so the next run has something to compare against."
+description: "How the benchmark environment is stood up under SR-WORK-ENVIRONMENTS: seven corpora it generates itself, a fixed query set with no answer key, two engine versions every run, and latency plus the ranked list kept so the next run has something to compare against."
 location: ~/my_programs/fux-benchmark
 kind: scratch working directory — commits nothing to git; its BUILT CORPORA are kept and reused (Arpit, 2026-09-12)
 timestamp: 2026-09-12T00:00:00Z
@@ -15,21 +15,21 @@ timestamp: 2026-09-12T00:00:00Z
 > honest. See [`README.md`](README.md) for what belongs in this directory.
 
 🔴 **What this environment measures, what its corpora look like and which two
-versions it runs are stated by [L9](../../docs/adr/0011_LAW-9-environments.md)
+versions it runs are stated by [SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md)
 and nowhere else.** Read it there; this document does not restate it
-([L0](../../docs/adr/0002_LAW-0-authority.md)). What follows is how to *run* it.
+([L0](../../records/0002_LAW-0-authority.md)). What follows is how to *run* it.
 
 - **Name:** `SETUP-BENCHMARK` — cite this by name
 - **Location:** `~/my_programs/fux-benchmark` — a **sibling working directory**
 - **Siblings:** [SETUP-PLAYGROUND](fux-playground.md) · [SETUP-LAB](fux-lab.md).
   See [`README.md`](README.md) §Which is which
-- **Written:** 2026-08-28 · **rewritten 2026-09-12** under L9
+- **Written:** 2026-08-28 · **rewritten 2026-09-12** under SR-WORK-ENVIRONMENTS
   ([W-138](../../archive/open/W-138-reconcile-with-l9.md)), **built to that shape by
   [W-139](../../archive/open/W-139-benchmark-per-l9.md)** — done, and its first run is [filed](../regression/2026-09-12-benchmark-l9/report.md)
 
 ---
 
-## ⚠ What L9 changed here, so a reader of the old document is not misled
+## ⚠ What SR-WORK-ENVIRONMENTS changed here, so a reader of the old document is not misled
 
 | | before 2026-09-11 | now |
 |---|---|---|
@@ -48,18 +48,27 @@ lab run against the golden ladder.
 ~/my_programs/fux-benchmark/          # a git repo — the lab was lost once for not being one
   bin/
     gen_corpus.py     deterministic generator: seed + N -> one corpus folder
-    queries.py        the fixed query set, versioned, emitted with the corpus
-    bench.py          prepare | nullcontrol | latency | rankdiff | file
+                      --keys writes the planted key into EXISTING tiers, in place
+    queries.py        the fixed TIMING set, versioned, emitted with the corpus
+    judged.py         the PLANTED KEY (W-150): 42 judged questions + 10
+                      unanswerables, derived from gen_corpus's construction
+                      rules alone — it reads no document and runs no fux
+    bench.py          prepare | nullcontrol | latency | hits | answers |
+                      rankdiff | report | file
+    report.py         CAP-7: one self-contained theme-aware HTML page per run
     latency.py        the older interleaved timer, kept for the B5/B6 shapes
     bench_v1_mcnemar.py   the OLD harness (paired quality rows + a p-value).
-                      L9 moved that question to the lab; nothing calls it, and
+                      SR-WORK-ENVIRONMENTS moved that question to the lab; nothing calls it, and
                       it is kept only so the 2026-08-28 filed run reproduces.
   corpora/
     docs-00100/ docs-00200/ docs-00500/ docs-01000/
     docs-02000/ docs-05000/ docs-10000/
       docs/           the generated documents
-      queries.jsonl   the fixed query set for this folder
-      MANIFEST.json   generator version, seed, per-file sha256, corpus sha256
+      queries.jsonl   the fixed TIMING set for this folder
+      judged.jsonl    the judged questions + the planted unanswerables
+      key.jsonl       the relevant document(s) per judged question
+      MANIFEST.json   generator version, seed, per-file sha256, corpus sha256,
+                      keyset version and the two key hashes
   arms/
     A/venv/           pip install 'fux-engine==<newest 1.x>'
     B/venv/           pip install -e ../fux    (the current build)
@@ -90,7 +99,7 @@ where timing runs touch it.
 - **Deterministic:** `gen_corpus.py --seed S --docs N` produces byte-identical
   output for the same arguments, on any machine. `MANIFEST.json` carries the
   generator version, the seed, every file's sha256 and a corpus sha256.
-- **Document shape is L9's** — about a thousand lines, lines up to about 300
+- **Document shape is SR-WORK-ENVIRONMENTS's** — about a thousand lines, lines up to about 300
   characters, carrying tables, charts, bullet points and Mermaid diagrams, in a
   mix of machine-made and several-author voices. The generator implements that
   sentence; the law is where it is stated.
@@ -98,6 +107,24 @@ where timing runs touch it.
   `docs-00100` plus 100 more, and so on up. A latency curve across the folders is
   then a curve in *corpus size* and nothing else — with independently seeded
   folders it would also be a curve in whatever the generator happened to emit.
+- 🔴 **THE CORPUS CARRIES A PLANTED KEY since 2026-09-13** (W-150), and it cost
+  no corpus byte. [SR-WORK-BENCHMARK](../../records/0053_WORK-benchmark.md)'s
+  CAP-3 and CAP-4 need relevance judgments and well-formed unanswerables;
+  `bin/judged.py` derives both from **the generator's own construction rules** —
+  document `i` has domain `DOMAINS[i % 10]`, subject `SUBJECTS[(i // 10) % 20]`
+  and a unique reference token — so it **reads no document and runs no fux.**
+  - **`gen_corpus.py --keys` writes the key into the tiers that already exist**
+    and asserts `corpus_sha256` did not move. **No corpus was regenerated**, so
+    every timing filed before the key still compares.
+  - **The unanswerables are absent by CONSTRUCTION**: a reference token past the
+    pool's last document, a volume number past it, and a `<domain> <word>
+    handbook` whose word is not in `gen_corpus.py`'s source at all — the
+    generator can only write words it contains literally.
+  - ⚠ **The TIMING set keeps no key and never will.** Its words are scattered
+    randomly *inside* each document, so a key for it could only be built by
+    re-reading the corpus, which is a key that agrees with whatever ranked it.
+  - **Planted is not sealed.** Nothing from `work/golden/` enters this
+    environment, and no Claude session reads the golden answer key.
 - **Regenerating is a new corpus.** Timings taken against a different corpus
   sha256 are not comparable to the ones before it; say so in the report rather
   than plotting them together.
@@ -145,7 +172,7 @@ because a moved fence that lands nowhere is a dropped fence.
 | the bar | **p95 ≤ 150 ms**, warm, in-process, scan path, at **10 000 documents** |
 | on | the Node reader (`node/`) |
 | came from | `PRE-REGISTRATION-NODE`'s `N4`, frozen 2026-09-06 |
-| why it moved | Arpit, 2026-09-12: [L9](../../docs/adr/0011_LAW-9-environments.md) gives latency to `fux-benchmark` by name, and [PRE-REG-NODE-2](../benchmark/PRE-REGISTRATION-NODE-2.md) asks whether two readers **agree**, which is a different claim from how fast one is |
+| why it moved | Arpit, 2026-09-12: [SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md) gives latency to `fux-benchmark` by name, and [PRE-REG-NODE-2](../benchmark/PRE-REGISTRATION-NODE-2.md) asks whether two readers **agree**, which is a different claim from how fast one is |
 
 ⚠ **It is a fence against an ALGORITHMIC divergence, not a performance
 target.** 150 ms is 3× Python's measured p95 (50.2 ms at 10 000 documents), so
@@ -225,7 +252,7 @@ ten thousand data setup. Keep it. We will keep on reusing the data."*
   partial **rows** under `runs/<date>/rows/`. The corpus is never touched.
 
 **6. Both arms, or no run.** A single-version run has nothing to say here and is
-[ADR-LAW-9](../../docs/adr/0011_LAW-9-environments.md)'s veto 3. If the previous
+[SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md)'s veto 3. If the previous
 major will not install, the run stops and files that as the finding.
 
 ## Where it can and cannot run
@@ -241,7 +268,7 @@ half that survives a split session.
 
 ## The two-session blind protocol — retired here, 2026-09-12
 
-**It no longer applies to this harness, and that is a consequence of L9 rather
+**It no longer applies to this harness, and that is a consequence of SR-WORK-ENVIRONMENTS rather
 than a relaxation.** The protocol existed because whoever wrote the corpus and
 the query set and then read a *quality score* is `informed`, and no delta may be
 stated from an informed run. This harness no longer produces a quality score:
@@ -250,7 +277,7 @@ and *"how fast"* and *"what moved"* are not contaminable by knowing the corpus.
 
 🔴 **The protocol is not gone from the project — it moved to where the scoring
 is.** Every evaluation run is a lab run under
-[ADR-RS](../../docs/adr/0133_predictions.md) decisions 11-15, which is where
+[SR-RS](../../records/0133_predictions.md) decisions 11-15, which is where
 `blind`/`informed` is declared. **A benchmark run still declares
 `classification:`** like every filed run; it will read `informed` and that costs
 nothing here.
@@ -280,7 +307,7 @@ regenerated is an anecdote.
 
 ## References (required)
 
-- [ADR-LAW-9](../../docs/adr/0011_LAW-9-environments.md) — the law that gives this
+- [SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md) — the law that gives this
   environment its one job, its corpora and its two arms.
 - [`../regression/2026-08-28-benchmark-v1-vs-head/report.md`](../regression/2026-08-28-benchmark-v1-vs-head/report.md)
   — the first run under the old shape, and where the three hazards above were

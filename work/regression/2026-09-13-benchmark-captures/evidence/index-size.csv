@@ -1,0 +1,3 @@
+run,arm,version,corpus,docs,index_bytes,bytes_per_doc,shards,index_sha256
+2026-09-13-benchmark-captures,A,1.0.0,docs-00100,100,1407555,14075.5,84,9b861bb8aa245b80b19901f3c4cf198241f9fc3113fa118eaccb9bbf5abf099f
+2026-09-13-benchmark-captures,B,2.0.0-alpha.7,docs-00100,100,1335981,13359.8,84,23554245b238c358bb0b8953b61390c6075e27ba30a6ea82850f89e387b1aa9a

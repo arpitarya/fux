@@ -26,7 +26,7 @@ More prose.
 
 
 def test_a_hash_comment_inside_a_fence_is_not_a_heading():
-    """The defect this module exists for. Every ADR in this repository opens a
+    """The defect this module exists for. Every SR in this repository opens a
     ```bash block containing a `# comment` line; each one used to be mined as a
     heading, weighted as a heading, and published in `phrases`."""
     assert [h.text for h in headings(FENCED)] == ["Real Heading", "Second Real Heading"]

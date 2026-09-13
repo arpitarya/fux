@@ -21,7 +21,7 @@ timestamp: 2026-08-09T00:00:00Z
 > | the paper says | reality |
 > |---|---|
 > | **dense binary codes** are part of the committed index (Abstract, §1.2, §3.2) | ⚠ **Deleted 2026-08-25.** The doc-level `code` went 2026-08-23; its per-chunk successor and the model behind it went 2026-08-25, after [DENSE-CHUNK](../regression/2026-08-24-dense-lane-gate/VERDICT.md) measured **0 fixed / 2 broken**. There is no dense lane |
-> | **pruned** per-document term statistics (Abstract, §1.2) | ⚠ **Falsified.** P1-RERUN closed FAIL; the committed index carries **full postings, permanently** ([ADR-POSTINGS](../../docs/adr/0112_postings.md) decision 8) |
+> | **pruned** per-document term statistics (Abstract, §1.2) | ⚠ **Falsified.** P1-RERUN closed FAIL; the committed index carries **full postings, permanently** ([SR-POSTINGS](../../records/0112_postings.md) decision 8) |
 > | **six key prefixes in one Merkle-Search-Tree keyspace** (§1.2, §4) | ⚠ **Never built.** Superseded 2026-08-09 — git itself supplies the Merkle tree, and the committed plane is sharded canonical JSONL. ⚠ **§4 is deliberately exempt** and stays as a description of the superseded design, on Arpit's ruling ([`../BLOCKED.json`](../BLOCKED.json)) |
 > | §5's size model includes **`V/` at 32 B x 10⁶ = 32 MB**, summed into the ≈220-290 MB total | ⚠ That row is gone. **The total is not re-derived here** — deriving it would need a measurement nobody has taken at 10⁶, which is two orders of magnitude above CLAUDE.md §Litmus's ceiling anyway |
 > | §6's latency model quotes **"dense scan 35-50 ms on int-cached codes (measured basis)"** | ⚠ The measured basis no longer exists |
@@ -68,7 +68,7 @@ plan (§8); the pruned-ranking quality prediction P1 gates the build.
 ### 1.1 Problem
 
 The consumer is a software agent inside a coding session. Before modifying
-an artifact it must find the *reasons* behind it — the ADR that governs a
+an artifact it must find the *reasons* behind it — the SR that governs a
 module, the runbook a deploy follows, the decision that superseded last
 quarter's design. Three properties follow:
 
@@ -269,7 +269,7 @@ kept terms/doc; ~8M-term pruned vocabulary (Heaps); ~10⁷ extracted edges.
 > ([P1-RERUN](../regression/2026-08-09-pruning-rerun/VERDICT.md)). Every `P/`
 > figure below is therefore a floor for a design that is not being built. It is
 > left in place because the *codec* rates it cites are still the argument for
-> `ADR-POSTINGS`; it is the *pruning* half that died.
+> `SR-POSTINGS`; it is the *pruning* half that died.
 
 | prefix | arithmetic | estimate |
 |--------|-----------|----------|
@@ -336,7 +336,7 @@ never pays a clone tax.
 > postings (P1 FAILed — full postings, permanently) and it is stated for a
 > corpus size that is now a deferred target.
 
-Anchored baselines (measured, 100k synthetic, ADR-DOTFUX [19] — **the
+Anchored baselines (measured, 100k synthetic, SR-DOTFUX [19] — **the
 *archived* v0.26 engine, not this one**): full-index
 load-everything query 10 570 ms; lean warm 4 105 ms; binary-code scan
 54.5 ms of which ~93% is a removable conversion overhead; ingest
@@ -468,7 +468,7 @@ Manzini, G. *Opportunistic Data Structures with Applications (FM-index).*
 FOCS 2000.
 
 [19] Fux engine internals: ADR-0008 (exact df sidecar), ADR-0009 (retrieval
-kernel, edge grades), ADR-DOTFUX (100k measurements), BitFunnel basis:
+kernel, edge grades), SR-DOTFUX (100k measurements), BitFunnel basis:
 Goodwin, B. et al., SIGIR 2017.
 
 [20] Git project. *Partial Clone.* https://git-scm.com/docs/partial-clone

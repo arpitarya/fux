@@ -9,7 +9,7 @@
  * arm's Python side called `scan.ask` directly — the same seam Node's `find`
  * called — so **both readers were ignoring the same file**. Pointed at
  * `run_query`, the path `fux find` actually uses, fux's own repo went 90 of 174
- * discordant. [ADR-NODE-SEARCH](../../../docs/adr/0155_node-search.md)
+ * discordant. [SR-NODE-SEARCH](../../../records/0153_node-search.md)
  * decision 8.
  *
  * The order of stages is load-bearing and is Python's, exactly:
@@ -41,15 +41,13 @@ export { RERANK_DEPTH };
  *
  * The weights come from `.fux/tune.toml`; the archived **declaration** still
  * comes from the committed dirs list, never from a path convention
- * (ADR-DIR-LIST decision 4). `archivedDirSet` carries the tolerance: a corpus
+ * (SR-DIR-LIST decision 4). `archivedDirSet` carries the tolerance: a corpus
  * whose dirs list cannot be read still answers, demoting nothing. */
 export function archivedRanking(root, tune) {
   const dirs = archivedDirSet(root);
   return new Weighting({
     archivedWeight: tune.archivedWeight,
     archivedDirs: dirs,
-    supersededWeight: tune.supersededWeight,
-    recencyHalfLifeDays: tune.recencyHalfLifeDays,
     priority: tune.priority,
   });
 }
@@ -82,7 +80,7 @@ function buildConfidence(query, stats, results, tune) {
 /** One arm: tune, scan, rank, rerank, band.
  *
  * `useTune=false` is `--no-tune`: `.fux/tune.toml` is not read at all, so the
- * answer is the engine's own (ADR-TUNE decision 11). A caller that has already
+ * answer is the engine's own (SR-TUNE decision 11). A caller that has already
  * loaded a `Tune` passes it as `tune` rather than paying for a second parse. */
 export function runQuery(root, query, top, {
   tune = null, useTune = true, expand = "", wantConfidence = false,

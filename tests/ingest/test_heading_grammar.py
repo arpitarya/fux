@@ -68,7 +68,7 @@ def test_adoc_level_one_is_the_document_title():
 
 
 def test_a_decoded_document_always_uses_the_markdown_grammar():
-    """Decoders emit Markdown (ADR-DECODE decision 2), so a `.docx` or `.pdf`
+    """Decoders emit Markdown (SR-DECODE decision 2), so a `.docx` or `.pdf`
     must NOT be read with an Office-shaped grammar — there is no such thing.
     Only already-prose files take a different pattern.
     """

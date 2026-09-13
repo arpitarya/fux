@@ -151,4 +151,4 @@ phases has a regression run behind it.
 [3] W3C — *PROV-O: The PROV Ontology*: https://www.w3.org/TR/prov-o/
 [4] EU AI Act — Article 12, *Record-keeping*: https://artificialintelligenceact.eu/article/12/
 [5] OpenTelemetry — *Inside the LLM Call: GenAI Observability*: https://opentelemetry.io/blog/2026/genai-observability/
-[6] Internal: [ADR-QUALITY](../../docs/adr/0044_quality-contract.md) — the four-gate funnel this reuses rather than reinventing.
+[6] Internal: [ADR-QUALITY](../../docs/adr/0056_WORK-quality.md) — the four-gate funnel this reuses rather than reinventing.

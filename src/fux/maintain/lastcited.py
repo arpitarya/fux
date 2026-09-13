@@ -26,7 +26,7 @@ question whose answer it does not hold.
 
 ## Why it needs no fifth verdict label
 
-[ADR-REFER](../../../docs/adr/0030_refer-plane.md) decision 6's labels —
+[SR-REFER](../../../records/0127_refer-plane.md) decision 6's labels —
 `current` / `stale` / `unverified` / `cached` — are **per-citation** facts about
 one fetch. This is a **per-answer** statement about the relationship between two
 runs. Different object, different place, so nothing here folds *"we did not
@@ -90,7 +90,7 @@ class Change:
 
         ASCII only: these bytes reach a Windows console, whose default codepage
         cannot encode arrows or dashes and **crashes `print()` rather than
-        degrading** (ADR-CLI veto 7, and a shipped defect twice).
+        degrading** (SR-CLI veto 7, and a shipped defect twice).
         """
         if self.first_time:
             return ""

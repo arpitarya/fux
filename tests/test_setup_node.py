@@ -1,8 +1,8 @@
-"""`fux setup` vendors the Node read plane — ADR-NODE-SEARCH decisions 13-16,
+"""`fux setup` vendors the Node read plane — SR-NODE-SEARCH decisions 13-16,
 the fourth `.fux/` shape.
 
 🔴 **Since 2026-09-12 what is vendored is BUILD OUTPUT, in one of two shapes**
-([L10](../docs/adr/0012_LAW-10-bundled-output.md)): the bundle plus its data
+([L10](../records/0011_LAW-10-bundled-output.md)): the bundle plus its data
 sidecars (shape A, offline, the default), or a manifest declaring
 `fux-engine@<version>` when a monorepo was detected (shape C). The 47-file
 module tree is gone, and `ensure_node_reader` **prunes** it from a repository
@@ -64,7 +64,7 @@ def test_setup_writes_the_bundle_and_NO_source_tree(tmp_path):
 
     This test asserted the opposite until 2026-09-12 — *"writes the whole tree,
     not just the entry point"*, 47 files including `src/query/bm25f.mjs`. That
-    was W-107 R4's decision and it is now the violation ADR-LAW-10 was written
+    was W-107 R4's decision and it is now the violation SR-LAW-10 was written
     for: fux's own ranker, editable in place, in a repository fux was asked to
     index. What a consumer gets is ONE generated file and its data sidecars.
     """
@@ -83,7 +83,7 @@ def test_setup_writes_the_bundle_and_NO_source_tree(tmp_path):
 def test_setup_PRUNES_a_module_tree_left_by_an_older_engine(tmp_path):
     """⚠ **The half that did not exist**, and without which every repository
     that ever ran `fux setup` keeps its stale `.mjs` files for good
-    (ADR-NODE-SEARCH decision 13). A stale `src/` is not inert: it is a
+    (SR-NODE-SEARCH decision 13). A stale `src/` is not inert: it is a
     complete second ranker sitting beside the bundle.
     """
     _setup(tmp_path)
@@ -195,7 +195,7 @@ def test_setup_writes_an_executable_shim(tmp_path):
     assert (shim.parent / "node" / "fux.mjs").is_file()
     # 🔴 Three rungs since 2026-09-12, because the installed bin is NOT in one
     # place: npm and yarn hoist it to the workspace root, pnpm and bun leave it
-    # in the member (ADR-NODE-SEARCH decision 16, measured).
+    # in the member (SR-NODE-SEARCH decision 16, measured).
     assert "node/node_modules/.bin/fux" in text
     assert "node_modules/.bin/fux" in text.split("node/node_modules/.bin/fux", 1)[1]
     if os.name != "nt":

@@ -18,7 +18,7 @@ build did not wait for R4.
 
 ARC is keyed `(loc, sha)` — the **content address is in the key**, so a hit is
 byte-identical to what a fetch would have returned or it is not a hit. That is
-the whole proof behind ADR-REFER decision 9's "cannot change the answer".
+the whole proof behind SR-REFER decision 9's "cannot change the answer".
 
 A TTL entry is served **before** the sha is confirmed: that is what a TTL *is*.
 Putting it in ARC's keyspace would mean serving bytes under a key that no
@@ -37,7 +37,7 @@ separate open question.
 
 ## `cached` is a fourth verdict, never a synonym for `current`
 
-ADR-REFER decision 6's three-state guarantee exists so nothing can collapse
+SR-REFER decision 6's three-state guarantee exists so nothing can collapse
 "we did not look" into "we looked and it was fine". A TTL hit is a *fifth*
 epistemic position — *we looked recently* — and folding it into `current`
 would be decision 4's "knob that lies" reappearing in a new place. It carries

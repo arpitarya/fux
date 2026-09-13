@@ -102,7 +102,7 @@ def plane(root: Path) -> Path:
 def ensure_plane(root: Path) -> Path:
     """Create the plane and tag it. Called only on the write path.
 
-    ⚠ **`CACHEDIR.TAG` is not decoration.** ADR-CACHEDIR-TAG puts it on every
+    ⚠ **`CACHEDIR.TAG` is not decoration.** SR-CACHEDIR-TAG puts it on every
     gitignored plane so backup tools, `tar --exclude-caches` and Time Machine
     skip it without being told. A plane holding retained SOURCE BYTES is
     exactly the directory a consumer least wants silently swept into a backup,

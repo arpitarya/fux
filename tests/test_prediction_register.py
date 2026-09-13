@@ -1,6 +1,6 @@
-"""Every filed verdict has a register row — ADR-RS veto 4, and its acceptance gate.
+"""Every filed verdict has a register row — SR-RS veto 4, and its acceptance gate.
 
-[ADR-RS](../docs/adr/0036_predictions.md) decision 3 says the prediction table
+[SR-RS](../records/0133_predictions.md) decision 3 says the prediction table
 in `work/IMPLEMENTATION.md` **claims to be complete**. Nothing verified that
 claim, and it was already false once: **R9** ran on 2026-08-22, passed, and was
 cited in six documents while having no row. Nothing was wrong with the
@@ -131,7 +131,7 @@ def test_every_filed_verdict_has_a_register_row(path: Path) -> None:
         f"{path.parent.name}/VERDICT.md rules on {pid!r}, which has no row in "
         f"{IMPLEMENTATION.name}'s registers.\n\n"
         f"A measurement that ran and was never registered is exactly the R9 failure: the "
-        f"register claims to be complete (ADR-RS decision 3) and quietly is not.\n\n"
+        f"register claims to be complete (SR-RS decision 3) and quietly is not.\n\n"
         f"Add a row under '## Predictions' (an `R` id) or '## Feature gates' (a feature gate)."
     )
 
@@ -148,7 +148,7 @@ def test_a_registered_id_needs_no_verdict() -> None:
     assert retired, "expected R7/R8 to be registered as retired ids — has the register moved?"
     assert not (retired & ruled), (
         f"{sorted(retired & ruled)} has both a retired registration and a verdict — "
-        "either the id was reused (ADR-RS forbids it) or this fixture is stale."
+        "either the id was reused (SR-RS forbids it) or this fixture is stale."
     )
 
 

@@ -6,7 +6,7 @@ return the same graded result — is checkable on any corpus with goldens.
 
 🔴 **Renamed and de-defaulted 2026-09-12 (W-138).** It was `playground_grade.py`
 and defaulted to `~/my_programs/fux-playground`.
-[L9](../../docs/adr/0011_LAW-9-environments.md) made that environment Arpit's
+[SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md) made that environment Arpit's
 hands alone, so **there is no default corpus any more**: the caller names the
 corpus and the goldens file, and the tool knows nothing about where either
 lives. The grading logic is unchanged, so a number it produced before the rename

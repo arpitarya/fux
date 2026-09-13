@@ -12,7 +12,7 @@ and it derives its statistics from **raw bytes**, not from the parsed record:
 - `df[h]` counts a document if `"<hash>"` appears anywhere on its line.
 - `total_flen` sums each field's raw token counts from the `flen` the regex
   finds. Raw, never weighted: the weights are tunable, and a stored number
-  that is a function of a tunable is ADR-TUNE decision 6a's defect.
+  that is a function of a tunable is SR-TUNE decision 6a's defect.
 
 The accelerator derives the same numbers from the parsed record. These agree
 only if no quoted 16-hex token ever appears outside `terms`, and if the regex
@@ -191,14 +191,18 @@ def _read_committed(root: Path, progress=None):
         for term, tf in record.get("terms", {}).items():
             postings.setdefault(term, []).append((docidx, list(tf)))
 
-    newest_mtime = max((r["mtime"] for r in records if isinstance(r.get("mtime"), int)), default=0)
     # RAW per-field totals, never pre-weighted. The weights are a `tune.toml`
     # key, and a stored number that is a function of a tunable is exactly what
-    # ADR-TUNE decision 6a forbids — the same defect the committed `wlen` had
+    # SR-TUNE decision 6a forbids — the same defect the committed `wlen` had
     # before W-76 Phase 1, one plane up. Both query paths weight this at query
     # time, so changing a field weight needs no rebuild and cannot make
     # `--fast` and `--scan` disagree.
-    stats = {"n": total_docs, "total_flen": total_flen, "newest_mtime": newest_mtime}
+    # `newest_mtime` rode along here until 2026-09-13; it existed only to
+    # normalise `recency_half_life_days`, which was REMOVED (W-152). The plane
+    # is derived and gitignored, so dropping a key needs no migration — and
+    # `accel.py` read it through `.get(..., 0)`, so a stale stats.json that
+    # still carries it is simply ignored.
+    stats = {"n": total_docs, "total_flen": total_flen}
     # `records` rides along so the graph plane needs no second pass over the
     # shards; it is already sorted by id, which is what makes it usable.
     return docs, postings, stats, shard_stamp, records
@@ -222,7 +226,7 @@ def _assert_invariants(path: Path, lineno: int, line: bytes, record: dict) -> No
         if record.get("title_h") == example:
             migration = (
                 " This record's `title_h` predates the `h:` prefix "
-                "(ADR-INDEX-LIFECYCLE): re-run `fux ingest --refresh-urls` to rewrite it."
+                "(SR-INDEX-LIFECYCLE): re-run `fux ingest --refresh-urls` to rewrite it."
             )
         raise FuxError(
             f"{path}:{lineno}: the quoted 16-hex token {example!r} appears outside `terms` in "

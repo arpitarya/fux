@@ -108,10 +108,10 @@ def test_extraction_is_deterministic():
 def test_a_fenced_hash_comment_is_not_mined_as_a_heading():
     """W-115: `^#{1,6}` cannot see a code fence, so `# Install dependencies`
     inside a ```bash block was given heading-field weight and published in
-    `phrases`, where `fux ask` renders it as a `§` line. Every ADR in this
+    `phrases`, where `fux ask` renders it as a `§` line. Every SR in this
     repository contains such a block."""
     body = "# Retention\n\nProse.\n\n```bash\n# Install dependencies\nuv sync\n```\n"
-    out = extract_fields("docs/adr/retention.md", parse(body.encode("utf-8")))
+    out = extract_fields("records/retention.md", parse(body.encode("utf-8")))
     assert out.phrases == ["Retention"]
     assert out.title == "Retention"
 
@@ -120,7 +120,7 @@ def test_a_fenced_hash_comment_stays_in_the_body_field():
     """It was stripped out of `body` as well as counted as a heading — so the
     words a reader can see were words the index could not."""
     body = "# Retention\n\nProse.\n\n```bash\n# Install dependencies\nuv sync\n```\n"
-    out = extract_fields("docs/adr/retention.md", parse(body.encode("utf-8")))
+    out = extract_fields("records/retention.md", parse(body.encode("utf-8")))
     body_i = 0  # store.TF_FIELDS order: (body, heading, title, path, ctx)
     for word in ("install", "dependencies"):
         (term,) = tokenize(word)

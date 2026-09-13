@@ -68,7 +68,7 @@ def build_plane(directory: Path, records: list[dict]) -> int:
     path = directory / GRAPH_NAME
     # `newline="\n"` disables the platform-default translation write_text()
     # otherwise applies. This file is asserted byte-identical across two
-    # builds on two machines (ADR-GRAPH); a Windows build would otherwise
+    # builds on two machines (SR-GRAPH); a Windows build would otherwise
     # commit CRLF where a POSIX build commits LF, breaking that assertion
     # on the one axis it is actually checked across.
     path.write_text(text, encoding="utf-8", newline="\n")
@@ -90,7 +90,7 @@ def load(root: Path) -> GraphPlane:
             "run `fux build` to rebuild the derived plane"
         )
 
-    # 🔴 **STALENESS, which this module's docstring and ADR-GRAPH both claimed
+    # 🔴 **STALENESS, which this module's docstring and SR-GRAPH both claimed
     # was checked and which nothing checked** (W-140 row 5, fixed 2026-09-12).
     # The version check above catches a plane from a different fux; it says
     # nothing about a plane built before the last ingest — so `explain`, `graph`

@@ -2,7 +2,7 @@
 type: OpenItem
 id: W-87
 title: "W-87 — define what \"good\" means, THEN measure"
-description: "Split out of W-82 on 2026-08-27 and then widened: six forks defining the quality contract, and every measurement, benchmark, regression and verification task that was waiting behind them. Phase 0 is RULED (2026-08-27, ADR-QUALITY) — all six forks, with the cost model frozen before any score. P5 is DONE (2026-08-27) and found a live ingest crash. What remains is P1-P4, blocked on inputs and environment rather than on a decision."
+description: "Split out of W-82 on 2026-08-27 and then widened: six forks defining the quality contract, and every measurement, benchmark, regression and verification task that was waiting behind them. Phase 0 is RULED (2026-08-27, SR-WORK-QUALITY) — all six forks, with the cost model frozen before any score. P5 is DONE (2026-08-27) and found a live ingest crash. What remains is P1-P4, blocked on inputs and environment rather than on a decision."
 status: open
 lane: arpit
 timestamp: 2026-08-27T00:00:00Z
@@ -10,10 +10,15 @@ timestamp: 2026-08-27T00:00:00Z
 
 # W-87 — define what "good" means, then measure
 
+> 🟣 **Gated on 2026-09-30** (Arpit, 2026-09-13). Both remaining inputs are
+> Codex's hands and his limit is exhausted: the recall half waits on
+> [W-136](W-136-golden-benchmark.md) phase 5, Part B on
+> [W-145](W-145-codex-regenerates-the-key.md). No decision is owed before then.
+
 ## ✅ PHASE 0 IS RULED — 2026-08-27 (Arpit), all six forks
 
 **The contract is declared.** It lives in
-[ADR-QUALITY](../../docs/adr/0141_quality-contract.md); the argument behind it is
+[SR-WORK-QUALITY](../../records/0056_WORK-quality.md); the argument behind it is
 [the compare doc](../compare/what-good-means.compare.md), now `accepted`; the
 frozen declarations are [`tools/quality/mix.toml`](../../tools/quality/mix.toml).
 
@@ -63,11 +68,11 @@ contract.** It may run the moment a URL corpus exists.
 
 | phase | what | blocked by |
 |---|---|---|
-| ~~**P0**~~ | ~~declare the contract — the six forks~~ | ✅ **RULED 2026-08-27** — [ADR-QUALITY](../../docs/adr/0141_quality-contract.md). P1–P2 are unblocked on the contract and blocked only on inputs |
-| ~~**P1**~~ | the measurement apparatus — sealed subset, decoy set, content-free placebo, ~~orphaned-module check~~ | ✅ **ALL BUILT, and three of four now USED to adjudicate** (decoys 2026-08-27; `unanswerable` and placebo 2026-08-28). 🔴 **The sealed subset is EXERCISED, NOT PROVEN** — it postdates the enrichment it was applied to, so its split cannot test contamination; that is a *chronology* limit, not an unbuilt apparatus, and it is tracked in ADR-RS decision 15 rather than here |
-| **P2** | the quality runs — `recall@k`, the funnel, the cost-weighted curve | ✅ **`recall@k` IS COMPUTED** — [2026-08-28](../regression/2026-08-28-first-recall/report.md), `@5` 0.9535 over the 43/50 declared `complete`, after Arpit ruled option B and [ADR-QUALITY](../../docs/adr/0141_quality-contract.md) decision 12 split the two claims. 🔴 **It is `informed` and not a generalisation estimate** — the installed enrichment was fitted to these queries. **What remains: the funnel's `unanswerable` gate (engine scores 0/20), a clean-corpus recall, and Part B, whose corpora no longer exist** |
+| ~~**P0**~~ | ~~declare the contract — the six forks~~ | ✅ **RULED 2026-08-27** — [SR-WORK-QUALITY](../../records/0056_WORK-quality.md). P1–P2 are unblocked on the contract and blocked only on inputs |
+| ~~**P1**~~ | the measurement apparatus — sealed subset, decoy set, content-free placebo, ~~orphaned-module check~~ | ✅ **ALL BUILT, and three of four now USED to adjudicate** (decoys 2026-08-27; `unanswerable` and placebo 2026-08-28). 🔴 **The sealed subset is EXERCISED, NOT PROVEN** — it postdates the enrichment it was applied to, so its split cannot test contamination; that is a *chronology* limit, not an unbuilt apparatus, and it is tracked in SR-RS decision 15 rather than here |
+| **P2** | the quality runs — `recall@k`, the funnel, the cost-weighted curve | ✅ **`recall@k` IS COMPUTED** — [2026-08-28](../regression/2026-08-28-first-recall/report.md), `@5` 0.9535 over the 43/50 declared `complete`, after Arpit ruled option B and [SR-WORK-QUALITY](../../records/0056_WORK-quality.md) decision 12 split the two claims. 🔴 **It is `informed` and not a generalisation estimate** — the installed enrichment was fitted to these queries. **What remains: the funnel's `unanswerable` gate (engine scores 0/20), a clean-corpus recall, and Part B, whose corpora no longer exist** |
 | ~~**P3**~~ | **§3.0** — sanitized-sha stability | ✅ **PASS 2026-08-27**, 19/19 = 100 % — [verdict](../regression/2026-08-27-p3-sha-stability/VERDICT.md) |
-| ~~**P4**~~ | forks 3 & 4 — `validate` and token storage | ✅ **RULED AND BUILT 2026-08-28** — [ADR-FETCHER](../../docs/adr/0117_fetcher.md) decision 12, [ADR-MAINTENANCE](../../docs/adr/0129_hooks.md) decision 13 |
+| ~~**P4**~~ | forks 3 & 4 — `validate` and token storage | ✅ **RULED AND BUILT 2026-08-28** — [SR-FETCHER](../../records/0117_fetcher.md) decision 12, [SR-MAINTENANCE](../../records/0129_hooks.md) decision 13 |
 | ~~**P5**~~ | ~~`tests_e2e/` verification~~ | ✅ **DONE 2026-08-27** — 74/74 on 3.11.15; found one real defect |
 
 **What did NOT move, and why:** W-82's seven blocked rulings (1, 4, 6, 7, 12, 16
@@ -80,7 +85,7 @@ duplicate OPEN-WORK, which rule 7 forbids.
 ## The gap
 
 **Fux measures rigorously and has never declared what it is measuring.**
-[ADR-RS](../../docs/adr/0133_predictions.md) governs *how* a claim is frozen and
+[SR-RS](../../records/0133_predictions.md) governs *how* a claim is frozen and
 is silent on *what quantity is worth freezing* — so every quality number fux has
 produced carries an **undeclared query distribution** and an implicit cost model
 in which **a fabricated citation and an honest decline count the same.**
@@ -131,7 +136,7 @@ both conditions hold.
 - [x] ⚠ **Fork 3, the order-dependent one.** → **ruled and frozen in time.**
       `t = 0.75` → `c = 2`, committed in `mix.toml` **before** any score exists
       under it, which is the only ordering under which the number means
-      anything. Veto condition 3 in ADR-QUALITY is the check that it never moves
+      anything. Veto condition 3 in SR-WORK-QUALITY is the check that it never moves
       afterwards.
 - [x] **Fork 6's law question** — does L2 reach a query log? → **not answered,
       deliberately.** Ruled out of the metrics decision and filed as
@@ -143,7 +148,7 @@ on **inputs and environment** — see the phases below.
 ## P1 — the measurement apparatus (moved from W-82 §3.5, 2026-08-27)
 
 **Owed since W-78 ruling 2 was accepted**, and ⚠ **nothing may cite any of it as
-in force until it is built** — ADR-RS's own register says *"the sealed set and
+in force until it is built** — SR-RS's own register says *"the sealed set and
 the two controls — **owed, not built**"*.
 
 - [x] ✅ **The sealed query subset** — BUILT 2026-08-28,
@@ -158,7 +163,7 @@ the two controls — **owed, not built**"*.
       saw all fifty queries, so its "sealed" 15 were never hidden from anyone.
       **A post-hoc split of a fully-seen set cannot test contamination.** Its
       first adjudicating use needs an artifact authored *after* the seal
-      existed, by an author given the visible 35 only. Tracked in ADR-RS
+      existed, by an author given the visible 35 only. Tracked in SR-RS
       decision 15, not here.
 - [x] ✅ **The decoy set** — BUILT 2026-08-27,
       [`tools/quality-controls/decoys.jsonl`](../../tools/quality-controls/decoys.jsonl).
@@ -170,7 +175,7 @@ the two controls — **owed, not built**"*.
       `grounded`, because `coverage` is corpus-wide and its terms scatter across
       four documents —
       [the run](../regression/2026-08-27-decoy-control/report.md),
-      ADR-CONFIDENCE decision 12. **Named, not fixed.**
+      SR-CONFIDENCE decision 12. **Named, not fixed.**
 - [x] ✅ **The content-free placebo arm** — BUILT 2026-08-27,
       [`tools/quality-controls/placebo.py`](../../tools/quality-controls/placebo.py).
       Matched-length enrichment carrying no information about its document.
@@ -204,12 +209,12 @@ the two controls — **owed, not built**"*.
       removal — **this repo has recorded two vacuous passes and does not need a
       third.**
 
-- [x] ✅ **ADR-RS decision 15 has lost `NOT BUILT`** — all four controls are
+- [x] ✅ **SR-RS decision 15 has lost `NOT BUILT`** — all four controls are
       built. ⚠ **Built is not proven, and the marker is now per-control**: the
       decoys (2026-08-27), the `unanswerable` class and the placebo
       (2026-08-28) have each adjudicated; 🔴 **the sealed subset has not and
       cannot yet** — it postdates the artifact it was applied to. The scoreboard
-      lives in ADR-RS decision 15.
+      lives in SR-RS decision 15.
 
 ⚠ **The claim that these needed an absent `fux-playground` was FALSE** — it was
 on the machine all along, with its 50 goldens, and two of the three were built on
@@ -274,7 +279,7 @@ visible set and whoever builds it must resolve that tension, not inherit it.
                   fields**, because the defect is conceptual and making the
                   existing field plural would have carried the conflation
                   forward. Recorded as
-                  [ADR-QUALITY](../../docs/adr/0141_quality-contract.md)
+                  [SR-WORK-QUALITY](../../records/0056_WORK-quality.md)
                   **decision 12**, with four rules: a declaration is required
                   with any relevance set; `recall@k` is computable only over
                   `complete` queries; `doc` must appear in `relevant`; and both
@@ -285,7 +290,7 @@ visible set and whoever builds it must resolve that tension, not inherit it.
                   stays valid (reporting `recall@k` as *not computable*, which
                   is the honest answer).
             - [x] ~~**Migrate `fux-playground/goldens/queries.jsonl`**~~ —
-                  🔴 **DEAD, not done (L9, 2026-09-11).** The file is in an
+                  🔴 **DEAD, not done (SR-WORK-ENVIRONMENTS, 2026-09-11).** The file is in an
                   environment no agent may touch, so the migration has no
                   subject and the evidence below is all that survives. The
                   migrated set is built and validated — **43 `complete`, 7
@@ -305,7 +310,7 @@ visible set and whoever builds it must resolve that tension, not inherit it.
       or it contaminates the set it is meant to test (the W-78 lesson).
       ✅ **UNBLOCKED 2026-08-28 (Arpit): a fresh session, corpus only, with the
       prompt committed** — [`tools/quality-controls/BLIND-AUTHOR-BRIEF.md`](../../tools/quality-controls/BLIND-AUTHOR-BRIEF.md).
-      ADR-RS decision 11's test is *no access to the queries, judgments or prior
+      SR-RS decision 11's test is *no access to the queries, judgments or prior
       scores*; it does not require a human, and a fresh session given only the
       corpus satisfies it literally.
       🔴 **The leak channel is the PROMPT, and the prompt's author is not
@@ -348,7 +353,7 @@ visible set and whoever builds it must resolve that tension, not inherit it.
       `tools/pruning-eval/` still hard-codes reading them. **Part A — the
       declarations — needs none of that**, and declaring is most of the value.
 - [x] ✅ **MEASURED 2026-08-28** —
-      [the run](../regression/2026-08-28-resolution-floor/report.md), ADR-RS
+      [the run](../regression/2026-08-28-resolution-floor/report.md), SR-RS
       decision 19. 🔴 **The placeholder admits coin flips**: a paired exact test
       needs a net of **6–16** depending on how many queries flipped, and **at
       net 2 the p-value is never below 0.68.**
@@ -376,7 +381,7 @@ visible set and whoever builds it must resolve that tension, not inherit it.
 >   treatment that touched nothing, reported as a null effect. Two volatile URLs
 >   were added and `Special:Random` changed while the 19 did not. **The
 >   instrument detects change.**
-> - ⚠ **CLEARED IS NOT DECIDED.** Fork 3 is Arpit's, and ADR-FETCHER decision
+> - ⚠ **CLEARED IS NOT DECIDED.** Fork 3 is Arpit's, and SR-FETCHER decision
 >   3's argument against anything that composes is untouched by this number.
 > - ⚠ **The spec named no INTERVAL** and the runs are **12 seconds** apart. That
 >   measures **server-side determinism** — do timestamps, ad slots, CSRF tokens
@@ -384,7 +389,7 @@ visible set and whoever builds it must resolve that tension, not inherit it.
 >   pages did.** It does **not** measure document churn over a sweep interval,
 >   which is the other half of what `validate` is worth and needs a **new**
 >   pre-registration with an interval in it.
-> - ⚠ **`informed`**, as this spec anticipated, and **ADR-RS decision 12's
+> - ⚠ **`informed`**, as this spec anticipated, and **SR-RS decision 12's
 >   reopen trigger has FIRED** — its disclosure has now been written four times.
 >   Recorded in the run's `ANALYSIS.md` §3 and **not acted on**: decision 12 is
 >   Arpit's and its own text forbids a session narrowing it.
@@ -402,7 +407,7 @@ fraction of fetched documents whose **sanitized** sha was unchanged.
   not wait on P0.
 - ⚠ **Classification is `informed`** — whoever runs it will have read the spec.
   That is the correct label, not a reason to delay.
-- ⚠ **It collides with ADR-RS decision 12**, which is a cost measurement made
+- ⚠ **It collides with SR-RS decision 12**, which is a cost measurement made
   entirely of deltas. Ruled 2026-08-27: **disclose the conflict in the report;
   do not self-exempt, and do not narrow decision 12 to let it through.**
 
@@ -420,12 +425,12 @@ fraction of fetched documents whose **sanitized** sha was unchanged.
       ⚠ **It reaches existing repos only when they copy the fetcher in**:
       `fux setup` is write-if-missing. Measured — a repo made before the change
       learned **0 of 7** tokens until its `http.py` was replaced by hand.
-      ADR-FETCHER decision 12. *(Original gate note: cleared ([P3](../regression/2026-08-27-p3-sha-stability/VERDICT.md)).
+      SR-FETCHER decision 12. *(Original gate note: cleared ([P3](../regression/2026-08-27-p3-sha-stability/VERDICT.md)).
       ⚠ **Still Arpit's**, and the number does not answer it: the case against is
-      that four functions survived two callers untouched, and ADR-FETCHER
+      that four functions survived two callers untouched, and SR-FETCHER
       decision 3's refusal of anything that composes is independent of P3.
       **The design is fully worked out** in
-      [ADR-FETCHER](../../docs/adr/0117_fetcher.md) decision 12 — the design and the
+      [SR-FETCHER](../../records/0117_fetcher.md) decision 12 — the design and the
       invariant, moved to a live record when W-82 archived, because an archived
       file may be named and never cited —
       including the one invariant an implementer must carry: **a changed token
@@ -441,7 +446,7 @@ fraction of fetched documents whose **sanitized** sha was unchanged.
       `validate()` matched nothing while every test passed —
       `state.schema.json`'s own header predicts that failure in as many words.
       Now gated by a round-trip test that walks the *declared* shape.
-      ADR-MAINTENANCE decision 13.
+      SR-MAINTENANCE decision 13.
 
 ## P5 — `tests_e2e/` verification (moved from W-82, 2026-08-27)
 
@@ -541,7 +546,7 @@ on *"prove the daemon runs in a real repo"* — **the hold was right.**
 ## Definition of done
 
 - [x] Six forks ruled, recorded in the compare doc's verdict block **and in
-      [ADR-QUALITY](../../docs/adr/0141_quality-contract.md)** — 2026-08-27.
+      [SR-WORK-QUALITY](../../records/0056_WORK-quality.md)** — 2026-08-27.
 - [x] A versioned [`mix.toml`](../../tools/quality/mix.toml) exists, frozen the
       way a pre-registration is frozen. ⚠ *"every report prints its version"* is
       **owed by the first report**, not by this file — no harness reads it yet.
@@ -568,19 +573,19 @@ on *"prove the daemon runs in a real repo"* — **the hold was right.**
       scores 0 of 20 on it** — so this figure describes the answerable half.
 - [ ] **The `judged` series pins model + prompt + version** and is never
       compared across judge versions. ⚠ **It IS ruled in** — fork 4, and
-      [ADR-QUALITY](../../docs/adr/0141_quality-contract.md) decision 9 governs
+      [SR-WORK-QUALITY](../../records/0056_WORK-quality.md) decision 9 governs
       it — so this is not conditional any more. **No judged run has happened**,
       so the pinning has never been exercised.
 - [x] ✅ **A record owns the quality contract** —
-      [ADR-QUALITY](../../docs/adr/0141_quality-contract.md), written 2026-08-27
-      rather than amending ADR-RS. Its components are claimed in the ownership
+      [SR-WORK-QUALITY](../../records/0056_WORK-quality.md), written 2026-08-27
+      rather than amending SR-RS. Its components are claimed in the ownership
       table (`tools/quality/`).
 
 ## References
 
 - **The verdict:** [`work/compare/what-good-means.compare.md`](../compare/what-good-means.compare.md)
 - **The parent:** [W-82](../../archive/open/W-82-the-consolidated-build.md) §5.2 — now a pointer here
-- **The rule it extends:** [ADR-RS](../../docs/adr/0133_predictions.md)
+- **The rule it extends:** [SR-RS](../../records/0133_predictions.md)
 - **The two caught failures:** [P1-GATE](../regression/2026-08-09-pruning-eval/VERDICT.md) ·
   [budget sweep](../regression/2026-08-22-budget-sweep/ANALYSIS.md)
 
@@ -591,14 +596,14 @@ on *"prove the daemon runs in a real repo"* — **the hold was right.**
 *This is what the queue said at the move. Re-derive it before believing it (OPEN-WORK rule 4).*
 
 - **W-87** · `agent`, blocked on W-136 ·
-  *(record: [ADR-QUALITY](../../docs/adr/0141_quality-contract.md))* · **what
+  *(record: [SR-WORK-QUALITY](../../records/0056_WORK-quality.md))* · **what
   "good" means, then measure.** ⚠ **Two things keep it open:**
   - **The `judged` series has never been exercised** — no judged run exists.
-    ⚠ **Its input moves under L9** (2026-09-11): not the playground but fux-lab's
+    ⚠ **Its input moves under SR-WORK-ENVIRONMENTS** (2026-09-11): not the playground but fux-lab's
     golden test data — blocked on W-136.
   - 🔴 **Part B cannot run.** `acme` and `orbit` went in the 2026-08-20 wipe with
     their generator, and `tools/pruning-eval/` hard-codes reading them. **R-11's
-    retarget at the playground is void under L9**; Part B runs in fux-lab on the
+    retarget at the playground is void under SR-WORK-ENVIRONMENTS**; Part B runs in fux-lab on the
     golden ladder — agent work, blocked on W-136 (W-138 repoints the harness). —
   [detail](W-87-what-good-means.md) `filed: 2026-08-27`
 

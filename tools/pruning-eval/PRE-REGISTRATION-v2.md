@@ -7,7 +7,7 @@ rule are all fixed here.
 
 Supersedes [`PRE-REGISTRATION.md`](PRE-REGISTRATION.md) (v1) for the pruning
 question. v1 was not wrong so much as *inapplicable*: its threshold assumed a
-treatment the corpora could not deliver. [ADR-0017](../../docs/adr/0017-pruning-eval-gate.md)
+treatment the corpora could not deliver. [ADR-0017](../../records/0017-pruning-eval-gate.md)
 is the record of that, and it stands unmodified.
 
 ---

@@ -3,7 +3,7 @@
 ⚠ **This decoder inherits `json`'s problem and does not solve it.** A
 spreadsheet of numbers has almost no prose in it, and admitting one to a corpus
 adds tokens without adding answers — which is the shape
-[ADR-TYPES](../../../docs/adr/0031_types-list.md) verdict G measured. `.csv` is
+[SR-TYPES](../../../records/0128_types-list.md) verdict G measured. `.csv` is
 therefore **not** in `DEFAULT_TYPES` either, and a consumer opts in knowing
 their data is mostly words.
 
@@ -41,7 +41,7 @@ EXTENSIONS = (".csv", ".tsv")
 #: Now `.fux/tune.toml [index] max_table_rows`, defaulting to 20 000 (in
 #: `fux.toml [decode]` from 2026-09-06 until Arpit moved it on 2026-09-11).
 #: `[index]` is tune.toml's one table that changes what is **indexed** —
-#: ADR-TUNE decision 13.
+#: SR-TUNE decision 13.
 from fux.decode._limits import max_table_rows
 
 #: Guards against a malformed quote turning one line into one enormous field.

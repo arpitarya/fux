@@ -26,7 +26,7 @@ def test_acquired_is_a_third_category_not_a_derived_directory():
 
 
 def test_acquired_is_declared():
-    # An undeclared child of .fux/ is ADR-DOTFUX veto condition 1 firing.
+    # An undeclared child of .fux/ is SR-DOTFUX veto condition 1 firing.
     assert "acquired" in fuxdir.DECLARED
 
 
@@ -41,7 +41,7 @@ def test_gitignore_lists_it_by_name_and_never_uses_a_blanket():
 
 
 def test_the_plane_carries_cachedir_tag(tmp_path):
-    # ADR-CACHEDIR-TAG. A directory holding retained SOURCE BYTES is the one a
+    # SR-CACHEDIR-TAG. A directory holding retained SOURCE BYTES is the one a
     # consumer least wants swept into a backup without being asked.
     acquired.save(tmp_path, "https://x/a", BODY, XLSX, ".xlsx")
     tag = acquired.plane(tmp_path) / "CACHEDIR.TAG"  # written by save()

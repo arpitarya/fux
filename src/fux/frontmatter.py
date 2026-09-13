@@ -3,7 +3,7 @@
 No PyYAML — this parser is hand-rolled and stdlib-only. ⚠ **It is no longer
 "the zero-dependency guarantee made concrete"**, as this line read until
 2026-09-12: L1's 2026-09-06 amendment withdrew that guarantee
-(`docs/adr/0003_LAW-1-zero-cost.md`). What stands is narrower and still worth
+(`records/0003_LAW-1-zero-cost.md`). What stands is narrower and still worth
 stating — a runtime dependency now needs an accepted record, and no record
 proposes one here. The supported subset: plain and quoted scalars (str, int, float,
 bool, null; ISO dates stay strings), inline `[a, b]` and block `- item` lists,

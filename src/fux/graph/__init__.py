@@ -180,7 +180,7 @@ def cmd_graph(args) -> int:
     plane = plane_mod.load(root)
 
     # Scan by default, `--fast` opts into the accelerator for the seed query
-    # — same choice and same mutually-exclusive `--scan` as `ask` (ADR-ASK).
+    # — same choice and same mutually-exclusive `--scan` as `ask` (SR-ASK).
     tune = _tune_for(root, args)
     results, _ = run_query(
         root,

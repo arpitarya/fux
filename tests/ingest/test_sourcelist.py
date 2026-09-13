@@ -1,4 +1,4 @@
-"""The one grammar, tested once (ADR-URL-LIST decisions 2-13, ADR-DIR-LIST 2-3).
+"""The one grammar, tested once (SR-URL-LIST decisions 2-13, SR-DIR-LIST 2-3).
 
 `urls` and `dirs` share a parser on purpose, so these tests are written against
 the *spec* rather than against either file. A rule that holds here holds for
@@ -91,11 +91,11 @@ def test_the_url_attribute_set_is_exactly_these_seven():
     assert _defaults() == {
         "fetch": "http",
         "meta": "hashed",
-        "keep": "true",      # ADR-ACQUIRED: retention is on, the store is bounded
-        "ttl": "24h",        # ADR-URL-FRESHNESS: not 0; see decision on the default
-        "enrich": "false",   # ADR-PII: enrichment is always opted into
-        "archived": "false", # ADR-ARCHIVED-CONTENT: declared, never inferred
-        "update": "auto",    # ADR-URL-LIST: today's behaviour, byte for byte
+        "keep": "true",      # SR-ACQUIRED: retention is on, the store is bounded
+        "ttl": "24h",        # SR-URL-FRESHNESS: not 0; see decision on the default
+        "enrich": "false",   # SR-PII: enrichment is always opted into
+        "archived": "false", # SR-ARCHIVED-CONTENT: declared, never inferred
+        "update": "auto",    # SR-URL-LIST: today's behaviour, byte for byte
     }
 
 
@@ -203,8 +203,8 @@ def test_urls_rejects_a_non_http_scheme_at_its_line_number():
 
 def test_dirs_has_its_own_closed_attribute_set():
     (entry,) = _parse("archive/v0.26-docs archived=true", sourcelist.DIRS)
-    # The set is CLOSED and now holds two: `archived` (ADR-DIR-LIST) and
-    # `enrich` (ADR-ENRICH, W-76 Phase 8). `attrs` is *resolved* — every
+    # The set is CLOSED and now holds two: `archived` (SR-DIR-LIST) and
+    # `enrich` (SR-ENRICH, W-76 Phase 8). `attrs` is *resolved* — every
     # attribute in the spec is present with its default — so this grows
     # whenever the closed set does, which is the point of asserting it.
     assert entry.attrs == {"archived": "true", "enrich": "false"}

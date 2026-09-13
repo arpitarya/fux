@@ -1,4 +1,4 @@
-"""The progress plane through the real CLI (W-64, ADR-CLI decision 9).
+"""The progress plane through the real CLI (W-64, SR-CLI decision 9).
 
 **The load-bearing test is `test_stdout_is_byte_identical_with_the_bar_on_or
 _off`.** Everything else in this file supports it. A bar that leaked into
@@ -43,7 +43,7 @@ def repo(tmp_path: Path) -> Path:
     dirs = tmp_path / ".fux" / "sources" / "dirs"
     dirs.parent.mkdir(parents=True)
     dirs.write_text("docs\n", encoding="utf-8")
-    # ADR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
+    # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
     docs = tmp_path / "docs"
     docs.mkdir()

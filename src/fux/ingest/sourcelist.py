@@ -1,8 +1,8 @@
 """One parser for both committed source lists — `.fux/sources/urls` and
 `.fux/sources/dirs`.
 
-The grammar is fixed by ADR-URL-LIST decisions 2-13 and reused verbatim by
-ADR-DIR-LIST decision 2. **There is one reader for both files on purpose**:
+The grammar is fixed by SR-URL-LIST decisions 2-13 and reused verbatim by
+SR-DIR-LIST decision 2. **There is one reader for both files on purpose**:
 two parsers for one grammar is how `#`-handling, sorting and the unknown-key
 error end up disagreeing, and the disagreement surfaces as a document
 silently missing rather than as an error.
@@ -16,7 +16,7 @@ The grammar, in one place:
   entry, and stripping from the first `#` anywhere collapsed two URLs into
   one and dropped a document with no error.
 - **`<entry> key=value [key=value ...]`**, whitespace-separated. Values carry
-  no whitespace and no quoting (ADR-URL-LIST decision 8).
+  no whitespace and no quoting (SR-URL-LIST decision 8).
 - **An unknown key, an unknown value, or a repeated key is a loud error
   naming `file:lineno`.** A reader that does not know a key refuses rather
   than guesses: a typo'd `mata=plain` that is silently ignored ships a
@@ -76,7 +76,7 @@ class Attribute:
     """One attribute: its name, its legal values, what absence means.
 
     ⚠ **`values` is empty for a TYPED attribute, and `validate` carries the
-    rule instead.** Every attribute was a closed enum until `ttl` (ADR-URL-
+    rule instead.** Every attribute was a closed enum until `ttl` (SR-URL-
     FRESHNESS): a duration is an unbounded value, and there is no tuple of
     legal ones to write. The enum is still the default and still the right
     shape for `fetch`, `meta`, `archived` and `keep` -- a typed attribute is
@@ -224,7 +224,7 @@ def _ttl_reason(raw: str) -> str | None:
 
 
 #: A decoder name is a MODULE STEM -- `csv`, never `csv.py` and never
-#: `.fux/decoders/csv.py`. It is the same key ADR-DECODE decision 5 resolves
+#: `.fux/decoders/csv.py`. It is the same key SR-DECODE decision 5 resolves
 #: an override on, so a binding and an override cannot disagree about what they
 #: are naming.
 _DECODER_NAME_RE = re.compile(r"[a-z0-9][a-z0-9_]*")
@@ -262,7 +262,7 @@ URLS = ListSpec(
     attributes=(
         Attribute("fetch", ("http", "cdp"), "http"),
         Attribute("meta", ("plain", "hashed"), "hashed"),
-        # ADR-ACQUIRED. Retain the bytes this URL returned.
+        # SR-ACQUIRED. Retain the bytes this URL returned.
         #
         # ⚠ **Default TRUE, and it was `false` for one day.** The argument for
         # off-by-default was a stranger's 9,000-URL corpus quietly filling a
@@ -272,7 +272,7 @@ URLS = ListSpec(
         # for: a citation that can still be checked when the source cannot be
         # reached. `keep=false` on the line, or `--no-keep`, opts out.
         Attribute("keep", ("true", "false"), "true"),
-        # ADR-URL-FRESHNESS. How long a citation may go unchecked at ask time.
+        # SR-URL-FRESHNESS. How long a citation may go unchecked at ask time.
         # THE FIRST TYPED ATTRIBUTE: a duration has no tuple of legal values.
         #
         # The default is NOT 0. A repo-wide always-fetch turns every `fux ask`
@@ -280,13 +280,13 @@ URLS = ListSpec(
         # cost nobody asked for; a day is generous enough to be invisible and
         # short enough to catch a document that moved.
         Attribute("ttl", (), "24h", validate=_ttl_reason),
-        # ADR-PII/W-99: the same attribute the `dirs` list carries, and it
+        # SR-PII/W-99: the same attribute the `dirs` list carries, and it
         # means the same thing. A `url:` document is enrichable because
         # `.fux/acquired/` holds its bytes locally -- before the acquired
         # plane there was nothing for `fux enrich --plan` to chunk, which is
         # why this attribute could not exist on this list until now.
         Attribute("enrich", ("true", "false"), "false"),
-        # W-126, 2026-09-11 (Arpit). ADR-ARCHIVED-CONTENT: the same attribute
+        # W-126, 2026-09-11 (Arpit). SR-ARCHIVED-CONTENT: the same attribute
         # the `dirs` list has carried since 2026-08-22, meaning the same thing.
         #
         # ⚠ **A retired page behind a URL could not be declared retired at
@@ -302,9 +302,9 @@ URLS = ListSpec(
         # `[sources.url]` is meaningful. `archived` is a fact about one
         # DOCUMENT; a source-wide "everything I fetch is retired" describes no
         # corpus anybody has. `dirs` made the same call for the same reason
-        # (ADR-DIR-LIST), and matching it keeps one attribute with one shape.
+        # (SR-DIR-LIST), and matching it keeps one attribute with one shape.
         Attribute("archived", ("true", "false"), "false"),
-        # W-113, 2026-09-05 (Arpit, ruling R-1). ADR-URL-LIST: whether `fux
+        # W-113, 2026-09-05 (Arpit, ruling R-1). SR-URL-LIST: whether `fux
         # update` goes out for this line **at all**.
         #
         # 🔴 **TWO WORDS, NEVER A DURATION, and that is the decision.** `ttl=`
@@ -342,7 +342,7 @@ DIRS = ListSpec(
 #: The vocabulary of a type pattern — **no longer the grammar of a committed file.**
 #:
 #: ⚠ **Since 2026-09-11 the types list is `.fux/formats.toml`**, read and written by
-#: [`typesfile`](typesfile.py) (ADR-TYPES decision 12), so this parser reads two
+#: [`typesfile`](typesfile.py) (SR-TYPES decision 12), so this parser reads two
 #: committed lists, not three. `TYPES` survives for two jobs and nothing else:
 #:
 #: 1. **the `fux add --types` / `fux remove --types` dispatch token** — its
@@ -352,7 +352,7 @@ DIRS = ListSpec(
 #:    (`typesfile.convert_legacy`) and every other path refuses.
 #:
 #: `decoder` is a property of the **extension**, which is why it was the one
-#: attribute this list ever took — ADR-TYPES decisions 11 and 11a.
+#: attribute this list ever took — SR-TYPES decisions 11 and 11a.
 TYPES = ListSpec(
     kind="types",
     attributes=(Attribute("decoder", (), "", validate=_decoder_reason),),
@@ -512,7 +512,7 @@ def read(root: Path, rel_path: str, spec: ListSpec, *, missing_hint: str) -> lis
 
 
 def render_line(value: str, attrs: dict[str, str], spec: ListSpec) -> str:
-    """One generated line, **every attribute stated** (ADR-URL-LIST decision 12).
+    """One generated line, **every attribute stated** (SR-URL-LIST decision 12).
 
     A generated file holds no implicit state: the line says what it means, so
     changing a policy is a one-word diff rather than the appearance or

@@ -29,11 +29,11 @@ resolve against whatever `PATH` the shell happens to carry — which is precisel
 the failure the invocation ladder exists for. Pinning the interpreter pins the
 `.venv` the caller is already running in.
 
-## ADR-MAINTENANCE veto condition 6, fired and answered
+## SR-MAINTENANCE veto condition 6, fired and answered
 
 Veto 6 reads: *"The detached runner turns into something always-on — a resident
 process, a scheduler, or a watcher."* **This is resident, so the veto is fired
-rather than sidestepped**, and the answer is recorded in ADR-MAINTENANCE rather
+rather than sidestepped**, and the answer is recorded in SR-MAINTENANCE rather
 than argued here. Two facts that made it answerable:
 
 - **This is not the runner.** `runner.py` stays one-shot and still exits;
@@ -61,7 +61,7 @@ recording ids for the runner to pick up. That makes it a **second writer**, so:
   reasoning applied unchanged, and it is also the portable answer, because
   Windows has no POSIX `SIGTERM`.
 - **A killed daemon leaves a stale lock**, exactly as a killed runner does, and
-  the answer is the same one ADR-MAINTENANCE decision 1c/1d already gives:
+  the answer is the same one SR-MAINTENANCE decision 1c/1d already gives:
   `fux doctor` reports it and an explicit `fux ingest` takes over. **Nothing
   here silently decides a lock is dead.**
 
@@ -155,7 +155,7 @@ def live_pid(root: Path) -> int | None:
 
     A pid file whose process is gone is **reported as absent and left on
     disk** — deleting it here would make this surface a mutating one, which is
-    ADR-MAINTENANCE veto 7. `fux doctor` is where a stale file gets named.
+    SR-MAINTENANCE veto 7. `fux doctor` is where a stale file gets named.
     """
     try:
         raw = pid_path(root).read_text(encoding="utf-8", errors="replace")

@@ -112,6 +112,30 @@ def terms(n: int) -> list[str]:
 #: resolve: decision 19 needs a net of 12 at 30 discordant pairs.
 TERMS = terms(90)
 
+#: W-155's two families, on terms 90-149. **Kept as a separate slice so the
+#: first 90 keep their terms and their family assignments** — `terms(n)` is a
+#: prefix of `terms(n + k)`, so extending the list cannot renumber what exists.
+#:
+#: 🔴 **These invert the construction: the TABLE carries the query term.** Every
+#: probe above uses a table of unrelated cells, so option (b) has only ever been
+#: measured against a table that is an *appendix*. The compare doc names that
+#: gap in its own recommendation, and these close it.
+TABLE_TERMS = terms(150)[90:]
+
+#: The families whose table carries the term, and which document is correct.
+#:
+#: - **`dump`** is the HARM case and the one the pre-registered question turns
+#:   on: a data dump that names the term in a row and says nothing about it,
+#:   against prose that discusses it. **The prose document is correct.** (b)
+#:   collapses the dump's length; if it then wins, (b) over-promotes.
+#: - **`content`** is the BENEFIT case: a rate card whose subject IS its rows.
+#:   **The table-heavy document is correct**, and shipped `flen` punishes it for
+#:   a length that is the answer rather than padding.
+#:
+#: `content` CANNOT answer the question — there the table-heavy document is the
+#: better answer, so promoting it is correct by construction.
+TABLE_FAMILIES = ("dump", "content")
+
 PROSE_WORDS = (
     "consignment despatch tolerance interval calibration schedule handover "
     "register escalation supervisor ambient variance corridor threshold "
@@ -150,6 +174,34 @@ def _table(rng: random.Random, tokens: int) -> str:
     return "\n".join([header, sep] + rows)
 
 
+def _table_with(rng: random.Random, tokens: int, term: str, hits: int) -> str:
+    """A table whose CELLS carry the probe term `hits` times.
+
+    🔴 **This is the whole of W-155's inversion.** `_table` above never emits a
+    probe term, so every existing probe's table is an appendix: it lengthens the
+    document and says nothing about the query. Here the term is *in the rows*,
+    which is what a rate card is — and what option (b) has never been measured
+    against.
+
+    The term is placed in the FIRST column, the label position, because that is
+    where a rate card carries its subject; scattering it through numeric cells
+    would be a different document shape and a different claim.
+    """
+    header = "| item | carrier | window | status | note |"
+    sep = "|---|---|---|---|---|"
+    rows, used, n = [], 0, 0
+    while used < tokens:
+        label = term if n < hits else rng.choice(CELL_WORDS)
+        cells = [label] + [rng.choice(CELL_WORDS) for _ in range(4)]
+        rows.append("| " + " | ".join(cells) + " |")
+        used += 5
+        n += 1
+    # The term lands in the first `hits` rows, which are the top of the table.
+    # Position carries no weight in BM25F -- `body` tf is a count -- so this is
+    # legibility for a reader of the corpus, not a thumb on the scale.
+    return "\n".join([header, sep] + rows)
+
+
 def _doc(title: str, prose: str, table: str | None) -> str:
     out = [f"---\ntitle: {title}\n---\n", f"# {title}\n", prose, ""]
     if table:
@@ -162,7 +214,7 @@ def scaffold(dest: Path, types: list[str]) -> None:
     """Let `fux setup` write the repo, then declare the corpus.
 
     ⚠ **Hand-writing `fux.toml` was wrong and failed loudly, which is the point.**
-    `[sources] dirs` stopped being a TOML key when ADR-DIR-LIST landed, and a
+    `[sources] dirs` stopped being a TOML key when SR-DIR-LIST landed, and a
     generator carrying its own copy of the config shape is a second source of
     truth that drifts silently. `fux setup` is the one that cannot.
     """
@@ -177,10 +229,10 @@ def scaffold(dest: Path, types: list[str]) -> None:
         sys.stderr.write(r.stdout + r.stderr)
         raise SystemExit("fux setup failed")
     (dest / ".fux" / "sources" / "dirs").write_text(
-        "# The generated corpus. Declared, never derived (ADR-DIR-LIST).\ndocs\n",
+        "# The generated corpus. Declared, never derived (SR-DIR-LIST).\ndocs\n",
         encoding="utf-8")
     # ⚠ **No types file is written, and the argument is kept only to document
-    # that.** The list moved to `.fux/formats.toml` (ADR-TYPES decision 12) and
+    # that.** The list moved to `.fux/formats.toml` (SR-TYPES decision 12) and
     # `setup` writes the built-in default there — which already admits every
     # format these corpora use. A second list here is refused by name, which is
     # how this was found rather than guessed at.
@@ -226,11 +278,50 @@ def cmd_gen(a) -> int:
         probes.append({"id": f"{fam[0]}{i:02d}", "family": fam, "term": term,
                        "query": term, "relevant": subj, "rival": rival, "why": why})
 
+    # ---- W-155: the two families whose TABLE carries the query term ---------
+    #
+    # 🔴 Short prose on the table-heavy side is the point, not an economy. A rate
+    # card is mostly rows; giving it 400 tokens of prose as well would make it a
+    # prose document with an appendix, which is the family already measured.
+    SHORT = max(1, P // 3)
+    for k, term in enumerate(TABLE_TERMS):
+        i = len(TERMS) + k
+        fam = TABLE_FAMILIES[k % len(TABLE_FAMILIES)]
+        heavy = f"docs/{i:03d}-{term}-export.md" if fam == "dump" else f"docs/{i:03d}-{term}-ratecard.md"
+        prose_doc = f"docs/{i:03d}-{term}-analysis.md" if fam == "dump" else f"docs/{i:03d}-{term}-memo.md"
+        if fam == "dump":
+            # The dump NAMES the term in three rows and says nothing about it;
+            # the analysis discusses it six times in ordinary prose.
+            files[heavy] = _doc(f"{term.title()} export",
+                                _prose(rng, term, 1, SHORT), _table_with(rng, TBL, term, 3))
+            files[prose_doc] = _doc(f"{term.title()} analysis", _prose(rng, term, 6, P), None)
+            subj, rival = prose_doc, heavy
+            why = ("the table is a DATA DUMP: it names the term in 3 rows and says nothing "
+                   "about it, against prose that discusses it 6 times. The prose document is "
+                   "correct in BOTH arms, and (b) collapsing the dump's length must not change that")
+        else:
+            # The rate card IS its rows: the term is its subject, six times.
+            files[heavy] = _doc(f"{term.title()} rate card",
+                                _prose(rng, term, 1, SHORT), _table_with(rng, TBL, term, 6))
+            files[prose_doc] = _doc(f"{term.title()} memo", _prose(rng, term, 3, P), None)
+            subj, rival = heavy, prose_doc
+            why = ("the table IS the answer: a rate card whose subject is its rows, 6 cells "
+                   "against a memo's 3 prose mentions. Shipped `flen` punishes it for a length "
+                   "that IS the content; (b) should fix that")
+        probes.append({"id": f"{fam[0]}{i:03d}", "family": fam, "term": term,
+                       "query": term, "relevant": subj, "rival": rival, "why": why})
+
     # Filler. Each mentions several probe terms ONCE, so every probe term's `df`
     # lands in the tens — the single change that unsaturates the endpoint the
     # 2026-09-12 run could not move.
+    #
+    # ⚠ **It samples ALL 150 terms since W-155**, so the three original families'
+    # `df` differs from the 2026-09-12 corpus. That is why this corpus's `main`
+    # numbers are a REPLICATION and not a continuation, and the pre-registration
+    # says so before any of them existed.
+    ALL_TERMS = TERMS + TABLE_TERMS
     for j in range(a.filler):
-        picks = rng.sample(TERMS, 5)
+        picks = rng.sample(ALL_TERMS, 5)
         body = "\n".join(
             f"Routine note {j:04d}. " + " ".join(rng.choice(PROSE_WORDS) for _ in range(20))
             + " " + t + "." for t in picks)
@@ -242,7 +333,7 @@ def cmd_gen(a) -> int:
         p.write_text(body, encoding="utf-8")
     (dest / "probes.jsonl").write_text(
         "".join(json.dumps(p, sort_keys=True) + "\n" for p in probes), encoding="utf-8")
-    for fam in ("main", "inverse", "placebo"):
+    for fam in ("main", "inverse", "placebo", *TABLE_FAMILIES):
         print(f"  {fam:<8} {sum(1 for p in probes if p['family'] == fam)}")
     print(f"{len(files)} documents, {len(probes)} probes -> {dest}")
     return 0
@@ -337,7 +428,7 @@ def cmd_run(a) -> int:
     print(f"{'family':>9}  {'n':>3}  {'hit@1 shipped':>14}  {'hit@1 no-table':>15}  "
           f"{'discordant':>11}  {'net':>5}")
     res = {}
-    for fam in ("main", "inverse", "placebo"):
+    for fam in ("main", "inverse", "placebo", *TABLE_FAMILIES):
         f_ = [r_ for r_ in out if r_["family"] == fam]
         s = sum(1 for r_ in f_ if r_["hit1_shipped"])
         c = sum(1 for r_ in f_ if r_["hit1_cf"])
@@ -356,7 +447,7 @@ def cmd_run(a) -> int:
               and (r_["hit1_shipped"] or r_["hit1_cf"]))
     print()
     print(f"[main] headroom improvement {imp}/{nq} · regression {reg}/{nq} "
-          f"(ADR-RS 22b; PROVEN under 22c(a) — the counterfactual arm is the "
+          f"(SR-RS 22b; PROVEN under 22c(a) — the counterfactual arm is the "
           f"feature-off/on arm and the `inverse` family is its positive control)")
     print(f"[main] {vline(v)}")
     if v["outcome"] == "inconclusive":
@@ -383,6 +474,57 @@ def cmd_run(a) -> int:
     else:
         print(f"[placebo] 🔴 CONTROL BROKEN: shipped {ps}/{pnq} vs no-table {pc}/{pnq} "
               f"with no table in the family. The `main` number is not attributable.")
+
+    # ---- W-155: the families whose TABLE carries the query term -------------
+    for fam in TABLE_FAMILIES:
+        if fam not in res:
+            continue
+        fnq, fs, fc, fb, fw = res[fam]
+        f_ = [r_ for r_ in out if r_["family"] == fam]
+        imp_f = sum(1 for r_ in f_ if not (r_["hit1_shipped"] or r_["hit1_cf"]))
+        reg_f = sum(1 for r_ in f_ if r_["hit1_shipped"] and r_["hit1_cf"])
+        print()
+        print(f"[{fam}] headroom improvement {imp_f}/{fnq} · regression {reg_f}/{fnq} "
+              f"(SR-RS 22b)")
+        # 🔴 **Zero headroom in BOTH directions means two opposite things and the
+        # difference is the whole of decision 22d.** With `discordant == 0` no
+        # probe moved and there is nothing to measure. With `discordant == n`
+        # EVERY probe moved and both headroom counts are zero because none is
+        # right in both arms or wrong in both — the maximal-information case.
+        # Printing the same warning for both would call a total flip a null.
+        if imp_f == reg_f == 0:
+            if fb + fw == fnq:
+                print(f"[{fam}] every one of {fnq} probes is DISCORDANT — both headroom "
+                      f"counts are zero because none is right in both arms or wrong in "
+                      f"both. That is maximal information, NOT decision 22d's null.")
+            else:
+                print(f"[{fam}] 🔴 zero headroom in both directions with only {fb + fw} "
+                      f"discordant — this family measures nothing; see SR-RS 22d.")
+        if fam == "dump":
+            # 🔴 The pre-registered question is read HERE and nowhere else.
+            # `c` — the shipped arm right, the counterfactual wrong — is the
+            # over-promotion the compare doc names as its unmeasured exposure.
+            v_ = vrule(fb, fw,
+                       better="excluding table tokens ALSO helps when the table is a data dump",
+                       worse="🔴 (b) OVER-PROMOTES a data dump above the prose that answers")
+            print(f"[dump] {vline(v_)}")
+            if v_["outcome"] == "inconclusive":
+                print("[dump] INCONCLUSIVE (22d): not one probe moved between the arms. "
+                      "The pre-registered question is NOT answered.")
+            elif v_["outcome"] == "no detected change":
+                print(f"[dump] NO DETECTED CHANGE -> the pre-registered answer is NO and the "
+                      f"gap CLOSES. Floor of all floors {FLOOR_OF_ALL_FLOORS}; at "
+                      f"{v_['discordant']} discordant pairs the bar is a net of "
+                      f"{v_['net_needed']}. Do not lower it.")
+            else:
+                print(f"[dump] {v_['outcome']}.")
+        else:
+            v_ = vrule(fb, fw,
+                       better="excluding table tokens FIXES the rate-card case",
+                       worse="excluding table tokens makes the rate-card case worse")
+            print(f"[content] {vline(v_)}")
+            print("[content] this family measures the UPSIDE and cannot answer the "
+                  "pre-registered question: here the table-heavy document IS the better answer.")
 
     if a.json:
         dest = Path(a.json)

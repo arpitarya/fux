@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The committed ladder manifests, checked without the corpus.
 
-W-107. The golden rungs live in `fux-lab` ([L9]) and are not committed; what
+W-107. The golden rungs live in `fux-lab` ([SR-WORK-ENVIRONMENTS]) and are not committed; what
 this repo holds is `work/golden/ladder/rung-NNNNN.{index,sha256,coverage}`.
 This script is what makes those manifests load-bearing on a machine that has
 no corpus at all — a GitHub runner, a fresh clone, a reviewer.
@@ -21,7 +21,7 @@ It checks three things, each of which is a claim
 
 It reads no corpus, so it is fast and cannot be affected by drift in one.
 
-[L9]: ../../docs/adr/0011_LAW-9-environments.md
+[SR-WORK-ENVIRONMENTS]: ../../records/0052_WORK-environments.md
 """
 
 from __future__ import annotations

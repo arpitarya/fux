@@ -5,6 +5,8 @@
  * same graph from the same records and **its digest must equal Python's**,
  * which is W-107's N2 gate. Reading the derived file instead would prove
  * nothing about whether the two agree.
+ *
+ * Owned, with its Python twin, by [SR-GRAPH](../../../records/0126_graph.md).
  */
 import { createHash } from "node:crypto";
 import { Graph, edgesFromRecords } from "./model.mjs";

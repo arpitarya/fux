@@ -61,7 +61,7 @@ def test_discard_of_nothing_leaves_the_list_alone(tmp_path):
 
 def test_there_is_no_wholesale_clear(tmp_path):
     """A `clear` would silently drop a commit that landed mid-run — the whole
-    reason `discard` takes a snapshot (ADR-MAINTENANCE decision 1d)."""
+    reason `discard` takes a snapshot (SR-MAINTENANCE decision 1d)."""
     assert not hasattr(dirty, "clear")
 
 

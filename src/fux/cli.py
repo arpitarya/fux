@@ -124,7 +124,7 @@ def _cmd_path(args) -> int:
 
 
 def _cmd_tune(args) -> int:
-    # **Prints, never writes** — ADR-TUNE decision 3b. `tomllib` reads and
+    # **Prints, never writes** — SR-TUNE decision 3b. `tomllib` reads and
     # nothing in the stdlib writes TOML, so a writer would mean either a
     # third-party dependency (L1) or fux round-tripping a commented file it
     # promised never to rewrite. The human pastes; the file stays theirs.
@@ -175,7 +175,7 @@ def _hops_help() -> str:
 
 
 def _apply_output_defaults(args) -> None:
-    """Resolve every gated flag through `.fux/output.toml`, ONCE — ADR-OUTPUT.
+    """Resolve every gated flag through `.fux/output.toml`, ONCE — SR-OUTPUT.
 
     **Done here rather than at each consumer, deliberately.** Downstream code
     then reads a plain `bool`/`int` on `args` exactly as it did before this
@@ -238,9 +238,9 @@ def _apply_output_defaults(args) -> None:
 
 
 def _add_tune_flag(parser: argparse.ArgumentParser) -> None:
-    """`--no-tune` on every verb that reads `.fux/tune.toml` (ADR-TUNE decision 11).
+    """`--no-tune` on every verb that reads `.fux/tune.toml` (SR-TUNE decision 11).
 
-    A flag rather than a verb, per ADR-CLI veto 1 — and one flag rather than a
+    A flag rather than a verb, per SR-CLI veto 1 — and one flag rather than a
     knob per table, because the question it answers is *"is it me or the
     config?"*. Bisecting that with six flags is an experiment; with one it is a
     single re-run, which is the whole reason the tune file is one file.
@@ -263,7 +263,7 @@ def _add_output_flags(parser: argparse.ArgumentParser, *, band: bool = False) ->
     """`--no-output-config`, and `--band` where the verb has a band.
 
     ⚠ **Every flag `.fux/output.toml` can default is declared `default=None`,
-    not `default=False`** — ADR-OUTPUT decision 10. At `default=False` an
+    not `default=False`** — SR-OUTPUT decision 10. At `default=False` an
     absent flag and an explicit one are the same value, the file could never
     take effect, and **nothing would fail**: the loader would work, the tests
     would pass, and the feature would silently not exist.
@@ -282,7 +282,7 @@ def _add_output_flags(parser: argparse.ArgumentParser, *, band: bool = False) ->
             "--band",
             action="store_true",
             default=None,
-            help="emit the confidence block (ADR-CONFIDENCE); always on over MCP",
+            help="emit the confidence block (SR-CONFIDENCE); always on over MCP",
         )
 
 
@@ -294,9 +294,9 @@ def build_parser() -> argparse.ArgumentParser:
     p_setup = sub.add_parser(
         "setup", help="write the consumer-owned files into .fux/ (write-if-missing)"
     )
-    # W-68 / ADR-AGENT-POLICY decisions 5 and 6. The agent policy installs by
+    # W-68 / SR-AGENT-POLICY decisions 5 and 6. The agent policy installs by
     # default, so this is a user's one-shot escape; `[agents] install = []` in
-    # `fux.toml` is its durable form. A flag rather than a verb — ADR-CLI veto 1.
+    # `fux.toml` is its durable form. A flag rather than a verb — SR-CLI veto 1.
     p_setup.add_argument(
         "--no-agents",
         action="store_true",
@@ -306,9 +306,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     p_doctor = sub.add_parser("doctor", help="check environment and repo health")
     # W-66 Phase 4. `doctor` is where the detached runner becomes visible, and
-    # an agent reading that needs a parse rather than a sentence (ADR-CLI,
+    # an agent reading that needs a parse rather than a sentence (SR-CLI,
     # 2026-08-22). Promotion to a `fux status` verb has a written condition in
-    # ADR-CLI; it is not a matter of feeling crowded.
+    # SR-CLI; it is not a matter of feeling crowded.
     p_doctor.add_argument("--json", action="store_true", default=None, help="machine-readable report")
     _add_output_flags(p_doctor)
     p_doctor.set_defaults(func=_cmd_doctor)
@@ -330,9 +330,9 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="skip building the derived accelerator (results are unaffected either way)",
     )
-    # W-66 Phase 2 / ADR-MAINTENANCE decision 1d. `--stop` is the takeover
+    # W-66 Phase 2 / SR-MAINTENANCE decision 1d. `--stop` is the takeover
     # without the run; a plain `fux ingest` takes over and then runs. It sits
-    # on `ingest` rather than becoming a verb because ADR-CLI veto 1 forbids
+    # on `ingest` rather than becoming a verb because SR-CLI veto 1 forbids
     # `fux <verb> <subverb>` and `ingest` already owns the re-index.
     p_ingest.add_argument(
         "--stop",
@@ -353,7 +353,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_build.set_defaults(func=_cmd_build)
 
     # The source group. Flat verbs over all three lists, dispatching on the
-    # entry — `fux source add` is the subcommand tree ADR-CLI decision 1
+    # entry — `fux source add` is the subcommand tree SR-CLI decision 1
     # refuses, and it is the shape this replaced `fux url` to avoid growing.
     def _entry_flags(p: argparse.ArgumentParser) -> None:
         """The attribute flags. Each is checked against the list the entry
@@ -429,9 +429,9 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="fetch every listed URL, not just the ones known to be stale",
     )
-    # ADR-URL-FRESHNESS. A flag on the existing networked verb, never a new
+    # SR-URL-FRESHNESS. A flag on the existing networked verb, never a new
     # one: `fux retry` would be a second way to do what `update` already does,
-    # and ADR-CLI decision 1 refuses that. The selector is url-state's own
+    # and SR-CLI decision 1 refuses that. The selector is url-state's own
     # `fail_streak > 0`, which is the number that file exists to report.
     p_update.add_argument(
         "--failed",
@@ -439,7 +439,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="fetch only the URLs whose last run failed (fail_streak > 0)",
     )
     _add_progress_flags(p_update)
-    # ADR-OUTPUT decision 15: a verb that reads `.fux/output.toml` must be able
+    # SR-OUTPUT decision 15: a verb that reads `.fux/output.toml` must be able
     # to ignore it. `update` began reading it when `--json` landed (W-140 row
     # 14), and `test_every_verb_that_reads_the_file_can_bisect_it` said so
     # before the change was committed — the escape hatch is how *is it me or
@@ -487,7 +487,7 @@ def build_parser() -> argparse.ArgumentParser:
     # W-84's matched `§ heading` lines. ⚠ **A pair, not a `store_true`** — the
     # lines are ON by default, so a `store_true` could only ever turn them on
     # again and `.fux/output.toml` could never turn them off from the command
-    # line. `default=None` on BOTH halves is ADR-OUTPUT decision 10: an absent
+    # line. `default=None` on BOTH halves is SR-OUTPUT decision 10: an absent
     # flag has to be distinguishable from an explicit one, or the file's value
     # is unreachable and nothing fails to say so.
     sections = p_ask.add_mutually_exclusive_group()
@@ -499,7 +499,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--no-sections", dest="sections", action="store_false", default=None,
         help="omit the matched section headings, in text and in --json alike",
     )
-    # ADR-PROVENANCE. A separate flag from `--explain`, not an extension of it:
+    # SR-PROVENANCE. A separate flag from `--explain`, not an extension of it:
     # `--explain` answers "which code path ran" and `--why` answers "why this
     # document" — different questions, different costs. `--why` runs a second
     # query when a tune file exists, and folding that cost into a flag people
@@ -552,14 +552,14 @@ def build_parser() -> argparse.ArgumentParser:
         help="skip the refer plane; answer from the index's own structure alone",
     )
     # ⚠ **The only way to ask for caching, and until 2026-09-11 there was none**
-    # (W-140 row 6). [ADR-URL-FRESHNESS](docs/adr/0149_url-freshness.md)
+    # (W-140 row 6). [SR-URL-FRESHNESS](records/0147_url-freshness.md)
     # decision 11 resolves the interval as `min(policy, line)` -- *a line may
     # narrow it and can never widen it* -- and `answer` built its policy with
     # the default `0`. `min(0, anything)` is `0`, so every `ttl=` in every repo
     # was dead at ask time and the `cached` verdict was unreachable by
     # construction. The arithmetic was right; nothing could set the left operand.
     #
-    # A FLAG, not a config key: ADR-OUTPUT's `[cli.*]` chooses rendering and may
+    # A FLAG, not a config key: SR-OUTPUT's `[cli.*]` chooses rendering and may
     # never change what a verb does, which is the defect row 10 closed the same
     # day. Default stays `0`, so a caller who does not ask still cannot be
     # served a cached byte (W-60 verdict F).
@@ -573,7 +573,7 @@ def build_parser() -> argparse.ArgumentParser:
             "only narrow this, never widen it"
         ),
     )
-    # ADR-PROVENANCE. Three flags rather than one, because they are three
+    # SR-PROVENANCE. Three flags rather than one, because they are three
     # different asks and conflating them would make the strongest one
     # (`--journal`, which WRITES) reachable by accident.
     p_answer.add_argument(
@@ -590,7 +590,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p_answer.set_defaults(func=_cmd_answer)
 
-    # ADR-PROVENANCE. A verb, not a flag: it takes a FILE rather than a query,
+    # SR-PROVENANCE. A verb, not a flag: it takes a FILE rather than a query,
     # so it does not belong on the query parser at all — every flag there
     # assumes a `query` positional this command has no use for.
     p_verify = sub.add_parser(
@@ -620,7 +620,7 @@ def build_parser() -> argparse.ArgumentParser:
     # W-104. 🔴 **This FILTERS the report; it never widens scope.** A document
     # no `enrich=true` line reaches is not plannable and naming it here does not
     # make it so -- which directories get enriched stays a human's declaration
-    # (ADR-ENRICH decision 4). Matching is exact rather than a prefix or a glob,
+    # (SR-ENRICH decision 4). Matching is exact rather than a prefix or a glob,
     # because a selector that silently matches two documents is how a
     # one-document request becomes a bulk run.
     p_enrich.add_argument(
@@ -633,12 +633,12 @@ def build_parser() -> argparse.ArgumentParser:
     p_enrich.set_defaults(func=_cmd_enrich)
 
     # W-76 Phase 5. A verb rather than a flag on `ask`: it is a long-running
-    # server, not a query, and ADR-CLI's four groups gain a fifth consumer-facing
+    # server, not a query, and SR-CLI's four groups gain a fifth consumer-facing
     # one rather than overloading the read verbs.
     p_mcp = sub.add_parser(
         "mcp", help="serve the index over MCP on stdio, for coding agents"
     )
-    # ADR-OUTPUT decision 15: on EVERY verb that reads .fux/output.toml,
+    # SR-OUTPUT decision 15: on EVERY verb that reads .fux/output.toml,
     # `mcp` included — read directly in `cmd_mcp` rather than folded into
     # `_apply_output_defaults`, because `mcp` carries no `CLI_VERBS` keys of
     # its own (its only knob, `[mcp] top`, is not a CLI flag at all).
@@ -659,7 +659,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     # W-82 ruling 10 (Arpit, 2026-08-27). A verb, like `mcp`, for the same
     # reason: it is a long-running process rather than a query, and flat rather
-    # than a subcommand tree because "no subcommand tree" is ADR-CLI's
+    # than a subcommand tree because "no subcommand tree" is SR-CLI's
     # constraint. `start`/`stop`/`status` are POSITIONAL, not flags, because
     # they are mutually exclusive states and `fux daemon --start --stop` should
     # not parse.
@@ -683,7 +683,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     # The graph group. Flat, like every other verb — `fux graph path` would be
     # the first subcommand tree on this surface, and "no subcommand tree" is
-    # the constraint ADR-CLI keeps.
+    # the constraint SR-CLI keeps.
     p_explain = sub.add_parser("explain", help="one document's outbound edges and its community")
     p_explain.add_argument("doc", help="a doc id or the loc `find` printed")
     p_explain.add_argument("--json", action="store_true", default=None, help="machine-readable output")
@@ -725,7 +725,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p_tune.set_defaults(func=_cmd_tune)
 
-    # ADR-OUTPUT: prints, never writes. `tomllib` reads and the stdlib does not
+    # SR-OUTPUT: prints, never writes. `tomllib` reads and the stdlib does not
     # write TOML, and a writer would mean fux editing a file it promised was
     # yours — the same refusal `fux tune` makes.
     p_output = sub.add_parser(
@@ -736,7 +736,7 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-#: The verbs `main` runs without `.fux/pii.toml` -- ADR-PII decision 17's table
+#: The verbs `main` runs without `.fux/pii.toml` -- SR-PII decision 17's table
 #: and nothing else. `setup` writes the file; `tune` and `output` print a
 #: specimen and read no repository; `doctor` runs so it can report the missing
 #: file as an error row. **Every other verb is gated, including one added
@@ -750,7 +750,7 @@ _PII_RULES = (".fux", "pii.toml")
 
 
 def _require_pii_rules(command: str) -> None:
-    """ADR-PII decision 17: no `.fux/pii.toml`, no command.
+    """SR-PII decision 17: no `.fux/pii.toml`, no command.
 
     Outside any root there is no repository to hold the file, so the gate does
     not fire and the verb fails, or does not, on its own terms.
@@ -773,14 +773,14 @@ def main(argv: list[str] | None = None) -> int:
     if not getattr(args, "command", None):
         parser.print_help()
         return 1
-    # ADR-PII decision 17, placed by ADR-CLI decision 4: before dispatch and
+    # SR-PII decision 17, placed by SR-CLI decision 4: before dispatch and
     # before anything else reads the repository, so no handler has to remember.
     try:
         _require_pii_rules(args.command)
     except FuxError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return exc.exit_code
-    # ADR-OUTPUT decision 3. Before dispatch and before the progress plane, so
+    # SR-OUTPUT decision 3. Before dispatch and before the progress plane, so
     # every `args` a command sees is already resolved.
     try:
         _apply_output_defaults(args)
@@ -788,7 +788,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"error: {exc}", file=sys.stderr)
         return exc.exit_code
     if args.command in _PROGRESS_COMMANDS:
-        # Imported here, not at module level — ADR-CLI decision 7, `--version`
+        # Imported here, not at module level — SR-CLI decision 7, `--version`
         # stays instant. One `Progress` for the whole invocation (W-64): an
         # `ingest` that also builds the accelerator is one continuous
         # sequence, not two bars fighting over the same terminal line.

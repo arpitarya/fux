@@ -1,6 +1,6 @@
 """The gate W-76 Phase 1 exists to pass: field weights are tunable.
 
-[ADR-TUNE](../../docs/adr/0038_tuning.md) decision 1 states the membership
+[SR-TUNE](../../records/0135_tuning.md) decision 1 states the membership
 test for a tune key as something mechanical rather than a matter of taste:
 
 > **does changing this value change a byte in `.fux/index/`? yes -> not a tune
@@ -20,7 +20,7 @@ the feature is still broken:
 2. changing a weight **changes no committed byte** — otherwise it is not a
    tune key, it is a re-ingest;
 3. the change **needs no rebuild of the derived plane** — otherwise editing
-   your ranking breaks your accelerator, which is the promise ADR-TUNE was
+   your ranking breaks your accelerator, which is the promise SR-TUNE was
    written to make.
 
 (3) is the one fork 3 of `work/compare/record-shape-migration.compare.md` was
@@ -106,7 +106,7 @@ def _weights(heading: float) -> Scoring:
     out = list(FIELD_WEIGHTS)
     out[HEADING] = heading
     # One object, because `k1`, `b` and the weights all land in one fraction —
-    # ADR-TUNE, 2026-08-24.
+    # SR-TUNE, 2026-08-24.
     return Scoring(weights=tuple(out))
 
 
@@ -137,7 +137,7 @@ def test_a_weight_change_moves_the_ranking(corpus):
 
 
 def test_a_weight_change_touches_no_committed_byte(corpus):
-    """Property 2 — the mechanical membership test from ADR-TUNE decision 1.
+    """Property 2 — the mechanical membership test from SR-TUNE decision 1.
 
     Ranking is computed twice at opposite weights, then the committed shards
     are compared byte for byte. This is what `wlen` could not survive: the

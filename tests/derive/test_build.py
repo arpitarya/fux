@@ -70,7 +70,7 @@ def _snapshot(root):
 
 
 def test_runtime_dir_is_tagged_as_a_cache(tmp_path):
-    """ADR-DOTFUX: every derived directory carries CACHEDIR.TAG."""
+    """SR-DOTFUX: every derived directory carries CACHEDIR.TAG."""
     write_index(tmp_path, _corpus(20))
     build(tmp_path)
     tag = fmt.runtime_dir(tmp_path) / "CACHEDIR.TAG"

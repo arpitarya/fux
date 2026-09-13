@@ -1,7 +1,7 @@
 ---
 type: Proposal
 title: "Code + architecture review — 2026-08-28"
-description: "A cloud-mirror review of src/fux, 16 ADRs, CLAUDE.md, OPEN-WORK and CI, run with no git and no test run. The architecture is sound; the risk has moved from design to drift. Findings to verify against the real tree, not landed facts."
+description: "A cloud-mirror review of src/fux, 16 SRs, CLAUDE.md, OPEN-WORK and CI, run with no git and no test run. The architecture is sound; the risk has moved from design to drift. Findings to verify against the real tree, not landed facts."
 status: proposed
 timestamp: 2026-08-28T00:00:00Z
 ---
@@ -13,7 +13,7 @@ a mirror with a wedged shell, so **every finding is to verify, not to act on**.
 
 # Fux — code + architecture review (2026-08-28)
 
-*Reviewed on a cloud mirror of `src/fux`, 16 ADRs, CLAUDE.md, OPEN-WORK, CI — `device_bash` was wedged, so no git, no test run. Every P0/P1 below was re-read in the source by me; the two "reproduced" items were reproduced by a reviewer on a synthetic corpus, not on the device. Treat as findings to verify with `pytest -q tests tests_e2e` on the real tree, not as landed facts. Model: Fable 5 + 4 parallel review agents.*
+*Reviewed on a cloud mirror of `src/fux`, 16 SRs, CLAUDE.md, OPEN-WORK, CI — `device_bash` was wedged, so no git, no test run. Every P0/P1 below was re-read in the source by me; the two "reproduced" items were reproduced by a reviewer on a synthetic corpus, not on the device. Treat as findings to verify with `pytest -q tests tests_e2e` on the real tree, not as landed facts. Model: Fable 5 + 4 parallel review agents.*
 
 ## Verdict
 
@@ -25,17 +25,17 @@ a mirror with a wedged shell, so **every finding is to verify, not to act on**.
 
 | # | Sev | Claim | Where | Fix |
 |---|---|---|---|---|
-| 1 | P0 | `--fast` ≠ `--scan` when `recency_half_life_days > 0`. `_kth_score` gets the caller's `Weighting` (`newest_mtime=0`), only `rank()` sets it → theta over-estimates → docs pruned. Reviewer repro: 251/2700 divergences, 0 with recency off. | `derive/accel.py:274, 358-380`; `query/rank.py:272-273` | Set `newest_mtime` on the weighting once in `accel_candidates` before the loop; add a recency arm to the differential sweep. ADR-ACCELERATOR veto condition. |
+| 1 | P0 | `--fast` ≠ `--scan` when `recency_half_life_days > 0`. `_kth_score` gets the caller's `Weighting` (`newest_mtime=0`), only `rank()` sets it → theta over-estimates → docs pruned. Reviewer repro: 251/2700 divergences, 0 with recency off. | `derive/accel.py:274, 358-380`; `query/rank.py:272-273` | Set `newest_mtime` on the weighting once in `accel_candidates` before the loop; add a recency arm to the differential sweep. SR-ACCELERATOR veto condition. |
 | 2 | P0 | Any non-`FuxError` in an MCP tool call kills the server (`k="abc"`, `path=123`, PermissionError). | `mcp.py:326-333, 369-384` | `except Exception` → `isError` result; wrap loop body. Add a malformed-arg test. |
-| 3 | P0 | `output.toml` "sole source of truth" makes every release that adds an output key hard-fail every existing repo — including `fux mcp` before `initialize`. | `output_config.py:52-67`; `mcp.py:368` | Unset key → `BUILT_IN` + one stderr note / `doctor` row; keep hard error for *unknown* keys. (ADR-OUTPUT decision 20 — Arpit's call, but the MCP start-up death is a defect.) |
-| 4 | P1 | `fux answer` / MCP `k=1` can never be `weak`: list truncated to 1 before `_fill_confidence`, so `separation=1.0` always. | `query/__init__.py:682, 188-228`; `confidence.py:424-427` | Compute separation from the pre-truncation window's top-2. ADR-CONFIDENCE. |
-| 5 | P1 | Graph verbs trust a stale `graph.json`; `plane.load()` checks schema only. ADR-GRAPH says it refuses stale. | `graph/plane.py:78-100` | Call `accel.is_fresh(root)` in `load()`, same "run `fux build`" error. Record drift → fix code or record. |
-| 6 | P1 | `fux mcp` re-reads the whole index per call; ADR-MCP claims a warm server with resident mmaps. | `mcp.py:175, 262`; `accel.py:454` | Cache `read_index`/`Runtime` in `serve()` keyed on stamp mtime. Fix ADR-MCP §1 diagram too. |
+| 3 | P0 | `output.toml` "sole source of truth" makes every release that adds an output key hard-fail every existing repo — including `fux mcp` before `initialize`. | `output_config.py:52-67`; `mcp.py:368` | Unset key → `BUILT_IN` + one stderr note / `doctor` row; keep hard error for *unknown* keys. (SR-OUTPUT decision 20 — Arpit's call, but the MCP start-up death is a defect.) |
+| 4 | P1 | `fux answer` / MCP `k=1` can never be `weak`: list truncated to 1 before `_fill_confidence`, so `separation=1.0` always. | `query/__init__.py:682, 188-228`; `confidence.py:424-427` | Compute separation from the pre-truncation window's top-2. SR-CONFIDENCE. |
+| 5 | P1 | Graph verbs trust a stale `graph.json`; `plane.load()` checks schema only. SR-GRAPH says it refuses stale. | `graph/plane.py:78-100` | Call `accel.is_fresh(root)` in `load()`, same "run `fux build`" error. Record drift → fix code or record. |
+| 6 | P1 | `fux mcp` re-reads the whole index per call; SR-MCP claims a warm server with resident mmaps. | `mcp.py:175, 262`; `accel.py:454` | Cache `read_index`/`Runtime` in `serve()` keyed on stamp mtime. Fix SR-MCP §1 diagram too. |
 | 7 | P1 | `fux_passage` unbounded and unscoped: whole file, any path in repo (`.env`, runtime journals). | `mcp.py:238-253` | Require path ∈ index; default 200-line window; `max_bytes` + `truncated: true`. |
 | 8 | P1 | Committed symlink to a file outside the repo is indexed as `src=git, meta=plain` — title/terms of `~/.ssh/config` into a committed shard. | `ingest/gitdir.py:425-433` | Skip `is_symlink()` (POLICY reason) or require resolved target under root. L2/L5. |
 | 9 | P1 | Hooks installed where git never runs them: worktrees (git uses the common dir's hooks) and any `core.hooksPath` repo (husky/lefthook). `status` still says "fux". | `maintain/hooks.py:139-151` | `git rev-parse --git-path hooks`; refuse otherwise. |
 | 10 | P1 | `mtime` prior depends on clone depth / git presence / `%ct` (rewritten by rebase, squash). Failure → `{}` silently → same sources, different committed bytes. Non-ASCII paths never match (quotepath). | `ingest/priors.py:47-62` | `%at`, `-z -c core.quotepath=false`, detect shallow, refuse-not-silent on failure. L3. |
-| 11 | P1 | Detached runner indexes the working tree (unstaged edits ship in the next commit) and rewrites shards mid-rebase. | `maintain/runner.py:516-534` → `ingest/run.py:163` | Read from `HEAD` (`ls-tree -z` + `cat-file --batch`); skip on `rebase-merge`/`MERGE_HEAD`/`index.lock`. ADR-HOOKS. |
+| 11 | P1 | Detached runner indexes the working tree (unstaged edits ship in the next commit) and rewrites shards mid-rebase. | `maintain/runner.py:516-534` → `ingest/run.py:163` | Read from `HEAD` (`ls-tree -z` + `cat-file --batch`); skip on `rebase-merge`/`MERGE_HEAD`/`index.lock`. SR-HOOKS. |
 | 12 | P1 | `DisplayCache.put` is O(n) reads per put → URL-heavy ingest O(n²). | `store/displaycache.py:86-110` | One `index.json` (sha→seq,size) or a seq counter file. |
 | 13 | P1 | Decoder registry rebuilt + consumer decoders re-`exec`'d per file, 3× per file. | `decode/__init__.py:211-249, 277, 302` | Build once per `run()`, thread through. |
 | 14 | P1 | Analyzer is ASCII-only: `Straße café 日本語` → `stra e caf`. Enterprise litmus fails. | `query/analyzer.py:41` | NFKC + `\w+` + `casefold()`; Porter only on `isascii()`. Header pin invalidates. |
@@ -57,7 +57,7 @@ a mirror with a wedged shell, so **every finding is to verify, not to act on**.
 - **Chunker has no fence state** — `# comment` inside a code block becomes a heading and a passage title. Track ``` / ~~~ toggles.
 - **`--why` under-reports the multiplier** (only `archived_weight`; superseded/recency/priority hidden). Provenance says "×1.0" when the doc was scaled ×0.42.
 - **Config surface.** 3 files, ~30 knobs, 6-level precedence for 7 output keys, a by-name `_REFUSED` catalogue. The *boundary* (indexed / ranked / printed) is right; collapse `[cli]`/`[cli.json]`/`[cli.<verb>]`/`[cli.json.<verb>]` to `[cli]` + `[cli.<verb>]`, `json` as a key.
-- **CLI startup.** `fux --version` ≈ 60 ms vs 13 ms interpreter; `output_config` (dataclasses→inspect, tomllib) imported at parser build. Move `BUILT_IN` to a constants module. ADR-CLI decision 7 says this already.
+- **CLI startup.** `fux --version` ≈ 60 ms vs 13 ms interpreter; `output_config` (dataclasses→inspect, tomllib) imported at parser build. Move `BUILT_IN` to a constants module. SR-CLI decision 7 says this already.
 
 ## C. Retrieval quality — stdlib-only, in cost order
 
@@ -83,13 +83,13 @@ a mirror with a wedged shell, so **every finding is to verify, not to act on**.
 
 - **CI:** no `ruff check`, no type check, no coverage, installs `uv` it never uses, `cache: pip` is a no-op without a requirements file. 8 OS×Python jobs each run both suites. One lint job + coverage on Linux/3.12 only. ci.yml says "fux gate" is a required check; CLAUDE.md says none — one is stale.
 - **Missing test classes:** differential arm with recency on (A.1); `answer` vs `ask --top 5` confidence agreement (A.4); `plane.load` staleness (A.5); malformed MCP args (A.2); cross-arch refer-plane sort (A.20); `write_text(` without `newline` grep-test (A.15); hypothesis round-trip for `frontmatter` and "specimen loads every key" for `tune`/`output` (dev-only dep, runtime stays $0); an "imported-but-never-called" gate — `test_orphaned_modules` misses `ARC` because it is imported.
-- **Doc weight per session:** CLAUDE.md ≈ 12.8k tokens; the 16 ADRs staged ≈ 112k; `adr/README.md` 37 KB; WORKLOG 700 KB; `setup.py` is 65 % prose, much of it dated incident narrative. Mandated reading order ≈ 35–40k tokens before the first edit, every session. Without touching Law zero: (a) each ADR = normative §Decision ≤ ~6 KB (test-enforced) + append-only §History that the freshness gate still counts as "touched"; (b) CLAUDE.md → ≤ 8 KB binding core + `docs/PROCESS.md`; (c) code comments cite `W-nn`/decision numbers, never re-tell the incident.
-- **Record drift found (W-83 class, CI green):** ADR-GRAPH (stale refusal), ADR-MCP (warm server, diagram), ADR-CLI decision 7 (import cost), ADR-OUTPUT "not reached by the regression". Four in one read — the "re-read the records you touched" obligation is not holding on its own; that is the second strike your own two-strikes rule names.
+- **Doc weight per session:** CLAUDE.md ≈ 12.8k tokens; the 16 SRs staged ≈ 112k; `adr/README.md` 37 KB; WORKLOG 700 KB; `setup.py` is 65 % prose, much of it dated incident narrative. Mandated reading order ≈ 35–40k tokens before the first edit, every session. Without touching Law zero: (a) each SR = normative §Decision ≤ ~6 KB (test-enforced) + append-only §History that the freshness gate still counts as "touched"; (b) CLAUDE.md → ≤ 8 KB binding core + `docs/PROCESS.md`; (c) code comments cite `W-nn`/decision numbers, never re-tell the incident.
+- **Record drift found (W-83 class, CI green):** SR-GRAPH (stale refusal), SR-MCP (warm server, diagram), SR-CLI decision 7 (import cost), SR-OUTPUT "not reached by the regression". Four in one read — the "re-read the records you touched" obligation is not holding on its own; that is the second strike your own two-strikes rule names.
 
 ## F. Sequencing
 
-- **Agent lane, this week:** A.1, A.2, A.4, A.5, A.6, A.7, A.8, A.13, A.15, A.18 — all mechanical, all with a test, each names its ADR.
-- **Arpit lane:** A.3 (output.toml strictness — your decision 20), A.9/A.11 (hooks read HEAD — ADR-HOOKS reopen), A.14 (analyzer bump = index invalidation), C.1 disclosure, doc-tiering shape (E), MCP-first steering for agents (D).
+- **Agent lane, this week:** A.1, A.2, A.4, A.5, A.6, A.7, A.8, A.13, A.15, A.18 — all mechanical, all with a test, each names its SR.
+- **Arpit lane:** A.3 (output.toml strictness — your decision 20), A.9/A.11 (hooks read HEAD — SR-HOOKS reopen), A.14 (analyzer bump = index invalidation), C.1 disclosure, doc-tiering shape (E), MCP-first steering for agents (D).
 - **Measure before flipping:** C.2 per-field norm, C.6 reranker default — both blind, both on the contested suite plus the 50 goldens.
 
 ## G. What is good (keep it)

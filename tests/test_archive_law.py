@@ -26,9 +26,14 @@ _SKIP = {
 # really did have a second archive, and rewriting them would make the record
 # false. `archive/` itself is frozen and its links are never repaired.
 #
-# ADR-ONE-ARCHIVE is exempt because it is **the record of this very rule**, and
-# it cannot state what it retired without naming `docs/archive/` and
-# `work/archive/` — they are its §Alternatives and its history, not links to
+# ⚠ SR-ONE-ARCHIVE's exemption was REMOVED 2026-09-13. The record was retired
+# and its file deleted, so the exemption named a path that no longer existed —
+# a dead entry in a law's exemption set, which is the one place a dead entry is
+# dangerous: it reads as a live carve-out. **No live record names `docs/archive/`
+# or `work/archive/` today** (re-derived, not assumed), so the set is one path.
+# It was kept exempt while it existed because it was **the record of this very
+# rule** and could not state what it retired without naming those two paths —
+# they were its §Alternatives and its history, not links to
 # follow. Flagging it is the check firing on correct content, which is how a
 # check gets switched off rather than fixed (the same lesson
 # `tests/test_windows_console_safe.py` paid for when it flagged the code
@@ -38,7 +43,7 @@ _SKIP = {
 # that one file is now invisible to this test. The exemption is per-file
 # because that is the mechanism available, and the mitigation is that the file
 # is short, is about nothing else, and names those paths only in prose.
-_STALE_LINK_EXEMPT = {"work/WORKLOG.md", "docs/adr/0037_one-archive.md"}
+_STALE_LINK_EXEMPT = {"work/WORKLOG.md"}
 
 
 def test_the_corpus_exemption_is_one_exact_path_not_a_pattern() -> None:
@@ -62,7 +67,7 @@ def test_the_root_archive_exists_and_is_mapped() -> None:
 #: archive: the sealed benchmark's corpus.
 #:
 #: ⚠ **This exemption was forced by a rule, not chosen for convenience.**
-#: [ADR-RS](../docs/adr/0133_predictions.md) decision 23a says the test data
+#: [SR-RS](../records/0133_predictions.md) decision 23a says the test data
 #: must contain the input each feature acts on — *"one that reads
 #: `archived=true` needs a directory declared archived"*. Codex's prompt 1b
 #: created `work/golden/seed/archive/` on 2026-09-12 to satisfy exactly that,
@@ -123,7 +128,7 @@ def test_nothing_live_points_into_a_retired_second_archive() -> None:
         if rel.as_posix() in _STALE_LINK_EXEMPT:
             continue
         # Frozen measurement records are never edited; their paths are read
-        # through the move map in docs/adr/README.md instead.
+        # through the move map in records/README.md instead.
         if len(rel.parts) > 2 and rel.parts[:1] == ("work",) and rel.parts[1] == "regression":
             continue
         text = path.read_text(encoding="utf-8", errors="replace")

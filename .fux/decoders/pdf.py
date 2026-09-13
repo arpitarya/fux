@@ -49,7 +49,7 @@ nothing at all.
 multi-column reading order and CID fonts are all approximated. For a *ranking*
 index that is usually enough — the terms are there even when the layout is not.
 A consumer who needs better writes `.fux/decoders/pdf.py` around `pypdf`,
-which is the whole reason the override seam exists (ADR-DECODE §12).
+which is the whole reason the override seam exists (SR-DECODE §12).
 """
 
 from __future__ import annotations

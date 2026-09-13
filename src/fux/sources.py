@@ -30,7 +30,7 @@ next command, wrong for an index whose entire value is being current.
 
 ## What this module does not do
 
-It does not render errors — `cli.main` is the only boundary (ADR-CLI
+It does not render errors — `cli.main` is the only boundary (SR-CLI
 decision 3), so everything here raises. It does not open a socket: the fetch
 `add` performs is `ingest.run`'s, behind the same consumer-fetcher contract
 every other fetch uses. And it never writes the index itself — `add`,
@@ -41,7 +41,7 @@ path is how L3's byte-identical guarantee breaks.
 
 A regenerating writer would be simpler and would silently eat the grouping
 comments a human left behind — and under
-[ADR-URL-LIST](../../docs/adr/0018_url-list.md) decision 3 those comments are
+[SR-URL-LIST](../../records/0116_url-list.md) decision 3 those comments are
 the reason the file is maintainable at all. So an add inserts one line at its
 sorted position, an update rewrites that one line and keeps its trailing
 comment, and a removal deletes it. Every other byte is untouched. The loader
@@ -55,7 +55,7 @@ disappearance of a key.
 
 ## `types` is TOML, and its editor is `typesfile`
 
-Since 2026-09-11 the types list is `.fux/formats.toml` (ADR-TYPES decision 12),
+Since 2026-09-11 the types list is `.fux/formats.toml` (SR-TYPES decision 12),
 so every verb here branches on `sourcelist.TYPES` and hands the edit to
 [`ingest/typesfile.py`](ingest/typesfile.py). **The rule above still holds** —
 one line of the file changes, every other byte is kept — and the editor
@@ -201,7 +201,7 @@ def _add_type(path: Path, value: str, overrides: dict[str, str]) -> tuple[str, s
     """`add` for `.fux/formats.toml`: a binding if a decoder reads it, an `include` glob if not.
 
     **A bare `*.ext` already in `include` moves** when it gains a decoder — the
-    file may not state one extension twice (ADR-TYPES decision 12), and fux's
+    file may not state one extension twice (SR-TYPES decision 12), and fux's
     own edit is the last thing that should trip that error.
     """
     text = path.read_text(encoding="utf-8") if path.is_file() else ""
@@ -305,7 +305,7 @@ def _source_defaults(root: Path, spec: sourcelist.ListSpec) -> dict[str, str]:
     if url is None:
         return {}
     # `fetcher` is a PATH and `fetch=` is a stem: `.fux/fetchers/cdp.py` -> `cdp`
-    # (ADR-FETCHER decision 5, one key carrying both).
+    # (SR-FETCHER decision 5, one key carrying both).
     return {
         "fetch": Path(url.fetcher).stem,
         "meta": url.meta,
@@ -331,7 +331,7 @@ def add(
 
     ⚠ **Without it, `fux add` overrode the consumer's own configuration**
     (W-140 row 5, fixed 2026-09-11). Every generated line states every
-    attribute ([ADR-URL-LIST](../../docs/adr/0116_url-list.md) decision 12),
+    attribute ([SR-URL-LIST](../../records/0116_url-list.md) decision 12),
     and the values stated came from `spec.defaults()` — **the ENGINE's
     built-ins**. So a team with `[sources.url] ttl = "7d"` got `ttl=24h`
     written onto every line `fux add` produced, and the middle layer of a
@@ -483,7 +483,7 @@ def _overrides(args, spec: sourcelist.ListSpec) -> dict[str, str]:
     A flag that names an attribute this list does not have is also an error
     rather than a silent no-op — `fux add docs/ --cdp` is someone believing
     something about the entry they just wrote, and the closed attribute set
-    (ADR-URL-LIST decision 11) is only worth having if it is enforced on the
+    (SR-URL-LIST decision 11) is only worth having if it is enforced on the
     way in as well as on the way out.
     """
     pairs = (
@@ -539,7 +539,7 @@ def _overrides(args, spec: sourcelist.ListSpec) -> dict[str, str]:
 def _drop_acquired(root: Path, spec: sourcelist.ListSpec, entry: str) -> None:
     """Forget the retained bytes for a URL that is no longer listed.
 
-    ADR-ACQUIRED decision 9 keeps sweeping and eviction apart, and this is
+    SR-ACQUIRED decision 9 keeps sweeping and eviction apart, and this is
     neither: it is the removal that makes a blob unreferenced in the first
     place. The blob FILE is left for `fux update`'s sweep rather than unlinked
     here — content addressing means two URLs can share one blob, and deleting
@@ -584,7 +584,7 @@ def _rel(root: Path, path: Path) -> str:
 
 
 def _ingest(root: Path, args, *, refresh_urls: bool = False, only_urls=None, first_fetch=None):
-    """Every verb's single way into the index (L3). Imported lazily (ADR-CLI 7)."""
+    """Every verb's single way into the index (L3). Imported lazily (SR-CLI 7)."""
     from .ingest import ingest_and_report
 
     return ingest_and_report(
@@ -686,7 +686,7 @@ def cmd_add(args) -> int:
     # `--no-update` writes `update=never`, and until 2026-09-11 the ingest
     # filter dropped the line before the fetch — so the add wrote a line,
     # fetched nothing, and exited 1 saying the fetch failed, while `--help` and
-    # [ADR-URL-LIST](../docs/adr/0116_url-list.md) decision 14 both promised one
+    # [SR-URL-LIST](../records/0116_url-list.md) decision 14 both promised one
     # fetch (W-140 row 3). Every run after this one is pinned.
     report = _ingest(
         root, args, refresh_urls=refresh, only_urls=only_urls, first_fetch=only_urls
@@ -724,7 +724,7 @@ def _seed_types(path: Path) -> None:
     """Write the built-in allowlist before adding the first custom pattern.
 
     **Because the file replaces the default rather than extending it.** An
-    absent types file means `gitdir.DEFAULT_TYPES` applies (ADR-TYPES); the
+    absent types file means `gitdir.DEFAULT_TYPES` applies (SR-TYPES); the
     moment one exists, it is the whole allowlist. So `fux add '*.pdf' --types`
     on a repo with no types file would have written a one-entry file and
     silently un-indexed every markdown document in the corpus — an invisible
@@ -742,7 +742,7 @@ def _seed_types(path: Path) -> None:
     prose = [glob for glob in DEFAULT_TYPES if typesfile.pattern_extension(glob) not in bindings]
     header = "\n".join(
         [
-            "# Which files are documents, and which decoder reads each one. See ADR-TYPES.",
+            "# Which files are documents, and which decoder reads each one. See SR-TYPES.",
             "#",
             "# fux created this file when the first pattern was added. What is below is",
             "# the built-in default, written out: this file REPLACES that default rather",

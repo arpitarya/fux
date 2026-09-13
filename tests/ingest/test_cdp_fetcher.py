@@ -2,7 +2,7 @@
 
 The file ships in the wheel as **package data** (`src/fux/templates/cdp.py.txt`)
 and `fux setup` copies it into the consumer's `.fux/fetchers/cdp.py`, where it
-becomes their code (ADR-CDP-FETCHER decision 7). It is never imported by fux —
+becomes their code (SR-CDP-FETCHER decision 7). It is never imported by fux —
 which is why the extension is one Python's import machinery cannot resolve, and
 why these tests have to load it explicitly.
 
@@ -45,7 +45,7 @@ def mw():
 
 
 def test_the_fetcher_ships_as_package_data_and_is_never_imported():
-    """ADR-FETCHER's adapter cap, made structural rather than remembered."""
+    """SR-FETCHER's adapter cap, made structural rather than remembered."""
     assert _TEMPLATE.is_file()
     assert _TEMPLATE.suffix == ".txt"  # `import fux.templates.cdp` must not resolve
 

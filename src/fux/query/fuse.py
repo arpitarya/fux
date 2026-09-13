@@ -3,7 +3,7 @@
 ## Why this module exists at all, given RRF was deleted
 
 Score-space fusion was removed with the dense lane on 2026-08-25, and
-[ADR-PORT-LIST](../../docs/adr/0015_port-list.md) rule 1 says a revival comes
+[SR-PORT-LIST](../../records/0114_port-list.md) rule 1 says a revival comes
 back **with a record**. This is that revival, and it is a different object:
 
 - **The deleted lane fused a BM25F score with a cosine.** Two quantities on

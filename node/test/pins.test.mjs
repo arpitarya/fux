@@ -33,7 +33,7 @@ test("blake2b at digest size 8 is NOT a truncated blake2b-512", () => {
 });
 
 test("shard_for and term_hash are pinned against Python hashlib", () => {
-  assert.equal(blake2bHex(enc.encode("file:docs/adr/0111_ranking.md"), 1).length, 2);
+  assert.equal(blake2bHex(enc.encode("file:records/0111_ranking.md"), 1).length, 2);
   assert.equal(blake2bHex(enc.encode("rollback"), 8), "e460f39a965bec5f");
 });
 

@@ -1,7 +1,8 @@
 """W-109 layer 2 — the pruning bound must survive PER-TERM weights.
 
 `tests/derive/test_weighted_bound.py` is the same defect one level up: a
-*document* weight (`archived_weight`) with an unweighted ceiling. This is the
+*document* weight (`[priority]`; it was `archived_weight` until W-152 removed
+that knob) with an unweighted ceiling. This is the
 same shape with a *term* weight, and it is worth its own file because the
 arithmetic differs — a document weight scales the whole score, a term weight
 scales one summand, and the fix is in a different place (`block_bound`'s caller
@@ -216,7 +217,7 @@ def test_theta_is_computed_at_the_expansion_weights():
 
     hits = {i: {alpha: [3, 1], omega: [30, 8]} for i in range(10)}
     docs = [{"id": f"file:d{i}.md", "flen": [60]} for i in range(10)]
-    corpus = Corpus(n=400, total_wlen=400 * 90.0, newest_mtime=0)
+    corpus = Corpus(n=400, total_wlen=400 * 90.0)
     common = dict(
         hits=hits, docs=docs, opened_order=[alpha, omega],
         df={alpha: 20, omega: 40}, corpus=corpus, top=5, avg_wlen=corpus.avg_wlen,
@@ -249,7 +250,7 @@ def test_theta_excludes_candidates_the_guard_will_drop():
     # the user asked for. `rank()` drops every one of them.
     ghosts = {100 + i: {omega: [60, 20]} for i in range(5)}
     docs = [{"id": f"file:d{i}.md", "flen": [60]} for i in range(200)]
-    corpus = Corpus(n=400, total_wlen=400 * 90.0, newest_mtime=0)
+    corpus = Corpus(n=400, total_wlen=400 * 90.0)
     common = dict(
         docs=docs, opened_order=[alpha, omega],
         df={alpha: 20, omega: 40}, corpus=corpus, top=5, avg_wlen=corpus.avg_wlen,

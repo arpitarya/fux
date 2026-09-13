@@ -12,7 +12,7 @@
  * ⚠ `Number(x.toFixed(9))` agrees on ~200 000 random doubles and **fails on
  * exact binary ties**, where `toFixed` rounds half-UP and Python rounds
  * half-even. `round(score, 9)` is the sort key's own resolution
- * ([ADR-RANKING decision 8a](../../../docs/adr/0111_ranking.md)), so a tie
+ * ([SR-RANKING decision 8a](../../../records/0111_ranking.md)), so a tie
  * resolved the other way is a different ORDER — the one thing
  * PRE-REGISTRATION-NODE §2 calls non-negotiable.
  *

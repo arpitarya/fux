@@ -8,7 +8,7 @@ lower than it should for a term in its prose.
 
 **This tool does not test the claim. It asks whether the claim can be tested on
 this corpus** — the step the pruning gate and the `heading` control each skipped,
-and paid a whole run for. ADR-RS decision 22d: a null measured where nothing
+and paid a whole run for. SR-RS decision 22d: a null measured where nothing
 could have moved is the absence of a measurement, not a negative result.
 
 ## What it computes, per document
@@ -18,7 +18,7 @@ then `query.tokenize` — so the body token stream is exactly the one that produ
 the committed `flen`, and is verified against it. Then it splits that body into
 
 - **table tokens** — lines that are markdown table rows (`| … |`, separator rows
-  included). Every decoded document arrives as Markdown (ADR-DECODE decision 2),
+  included). Every decoded document arrives as Markdown (SR-DECODE decision 2),
   so an HTML `<table>` is a pipe table by the time extraction sees it and one
   rule covers every format.
 - **prose tokens** — everything else.

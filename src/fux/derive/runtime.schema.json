@@ -133,13 +133,17 @@
       "`total_wlen` until 2026-08-24: once field weights became tune.toml keys, a",
       "weighted total stored here would move `avg_wlen` on the scan path and not",
       "on the accelerator path. Storing raw and weighting at query time is what",
-      "keeps the two paths equal."
+      "keeps the two paths equal.",
+      "",
+      "`newest_mtime` was here until 2026-09-13. It existed only to normalise",
+      "`recency_half_life_days`, which was REMOVED (W-152), so nothing reads it.",
+      "This plane is derived and gitignored, so dropping a key needs no",
+      "migration, and `accel.py` read it through a default anyway."
     ],
     "fields": {
       "n":            { "type": "int",  "doc": "documents in the index" },
-      "newest_mtime": { "type": "int",  "doc": "max mtime, for the recency prior" },
       "total_flen":   { "type": "list", "of": "int", "len": 5, "doc": "raw per-field token totals" }
     },
-    "example": { "n": 508, "newest_mtime": 1787728844, "total_flen": [637866, 21752, 3380, 4524, 0] }
+    "example": { "n": 508, "total_flen": [637866, 21752, 3380, 4524, 0] }
   }
 }

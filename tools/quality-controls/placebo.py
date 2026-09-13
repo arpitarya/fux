@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The CONTENT-FREE PLACEBO arm — [ADR-RS](../../docs/adr/0036_predictions.md)
+"""The CONTENT-FREE PLACEBO arm — [SR-RS](../../records/0133_predictions.md)
 decision 15's second control.
 
 **What it is for.** *Neural Retrievers are Biased Towards LLM-Generated Content*
@@ -105,7 +105,7 @@ def main(src: Path, dst: Path) -> int:
         # The marker is in the frontmatter, never in the body: a body marker
         # would be a term the real arm does not have, and the arms must differ
         # in content alone.
-        head = head.replace("skill: fux-enrich@1", "skill: placebo (ADR-RS decision 15)")
+        head = head.replace("skill: fux-enrich@1", "skill: placebo (SR-RS decision 15)")
         (dst / f.name).write_text(f"{head}\n{made}\n" if head else f"{made}\n", encoding="utf-8")
         print(f"{f.name}  real {target}w -> placebo {len(made.split())}w")
     print(f"\n{len(files)} placebo file(s) -> {dst}")

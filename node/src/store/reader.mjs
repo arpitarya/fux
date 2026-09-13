@@ -5,6 +5,8 @@
  * `readFileSync().toString().split("\n")` allocates ~10 MB of UTF-16 per query
  * at 10 000 documents — that is how W-107's N4 fence (p95 <= 150 ms) gets
  * blown by a transcription that is otherwise perfectly correct.
+ *
+ * Owned, with its Python twin, by [SR-INDEX-LIFECYCLE](../../../records/0108_index-lifecycle.md).
  */
 import { readFileSync, readdirSync, existsSync } from "node:fs";
 import { join } from "node:path";

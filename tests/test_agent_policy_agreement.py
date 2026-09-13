@@ -1,4 +1,4 @@
-"""ADR-AGENT-POLICY decision 2 — every rendering carries the canonical block.
+"""SR-AGENT-POLICY decision 2 — every rendering carries the canonical block.
 
 **Exact match on a shared block, not a substring or a similarity test**, and
 that shape was forced by a failure. The renderings were first written to *say
@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parents[1]
 AGENTS = ROOT / "src" / "fux" / "templates" / "agents"
 
 #: The begin marker carries a trailing reminder in the file, so it is matched
-#: by PREFIX and the end marker in full — exactly as ADR-AGENT-POLICY's own
+#: by PREFIX and the end marker in full — exactly as SR-AGENT-POLICY's own
 #: "How to check it" snippet does. The block between them is then compared
 #: whole and byte-for-byte, which is the property that matters.
 BEGIN = "<!-- fux:policy:begin v1"
@@ -84,7 +84,7 @@ NOT_A_POLICY_RENDERING = frozenset(
 )
 
 
-#: **The operating guides and their pointers** (ADR-AGENT-POLICY decision 15,
+#: **The operating guides and their pointers** (SR-AGENT-POLICY decision 15,
 #: Arpit 2026-09-11) -- a SECOND exemption, kept separate from the one above so
 #: neither list quietly absorbs the other.
 #:
@@ -189,7 +189,7 @@ def test_every_rendering_carries_the_block_byte_for_byte(path: Path):
     assert block in text, (
         f"{path.name} does not carry the canonical policy block byte for byte. "
         "Reworded, reordered, partially included or absent — all four are the same "
-        "defect (ADR-AGENT-POLICY veto 3). Copy the block from POLICY.md verbatim; "
+        "defect (SR-AGENT-POLICY veto 3). Copy the block from POLICY.md verbatim; "
         "format-native framing goes AROUND it, never inside it."
     )
 
@@ -212,11 +212,11 @@ def test_the_ambient_renderings_have_not_grown(name: str):
     assert size <= AMBIENT_MAX_BYTES, (
         f"{name} is {size} B, over the {AMBIENT_MAX_BYTES} B bound. This file is "
         "ambient: it is on every prompt in the consumer's repository. If it genuinely "
-        "needs to be longer, that is a decision for ADR-AGENT-POLICY, not a bound to raise"
+        "needs to be longer, that is a decision for SR-AGENT-POLICY, not a bound to raise"
     )
 
 
-# ADR-AGENT-POLICY **veto condition 6** — "the policy tells an agent what the
+# SR-AGENT-POLICY **veto condition 6** — "the policy tells an agent what the
 # answer is, rather than how to read the fact" — is deliberately NOT tested
 # here. A first attempt flagged `SKILL.md` for naming `archive/v0.26-docs/...`
 # in a worked example, which decision 2 explicitly permits ("a skill's worked

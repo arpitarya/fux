@@ -108,7 +108,7 @@ golden set at the design point (W-87 / W-96) gates every ship decision below.
    is the verb that gates (`answer: null` + the block that says why);
    `ask`/`find` keep reporting. A list is not a claim.
 4. **No sentence extraction.** Over MCP the agent is the answerer
-   (ADR-MCP); `answer`'s passages are its input.
+   (SR-MCP); `answer`'s passages are its input.
 
 ### 2.2 `ask` — ranked documents for an agent
 
@@ -153,7 +153,7 @@ document's words; fux does not call a model — but the caller is one.**
   expansion verbatim; `fux verify` replays it; L8 untouched.
 - **Multi-query RRF** (`-q a -q b -q c`, k = 60) as the second step. ⚠ The
   RRF math (`query/fuse.py`) was removed on Arpit's ruling (W-79) for having
-  no caller; ADR-PORT-LIST rule 1 says reviving it needs a **new record** —
+  no caller; SR-PORT-LIST rule 1 says reviving it needs a **new record** —
   this time it has a lexical multi-query caller.
 - **Does not fix negation.** Expansion adds words; it cannot subtract
   *"current"* from a superseded record. That stays with `supersedes:` +
@@ -182,7 +182,7 @@ to L3:
 
 Gate: the `none` / `placebo` / `real` arms from
 `2026-08-28-placebo-and-seal`, re-graded on `recall@k`, blind author, net ≥ 6
-discordant (ADR-RS decision 19).
+discordant (SR-RS decision 19).
 
 ---
 
@@ -191,7 +191,7 @@ discordant (ADR-RS decision 19).
 ### 5.1 The claim, corrected by the research
 
 A skill cannot make the model emit vectors; it can make the agent **run** a
-consumer-owned embedder. That is ADR-FETCHER's boundary a third time. Two
+consumer-owned embedder. That is SR-FETCHER's boundary a third time. Two
 research results (§9.2, §9.5) sharpen what to expect:
 
 - **Where it should pay:** vocabulary mismatch and paraphrase — which is the
@@ -375,7 +375,7 @@ document says so.
    `atanh`-series polynomial using only `+ − × ÷`, which are correctly
    rounded everywhere. Same sequence of ops in Python and JS ⇒ same bits on
    every OS and ISA. ⚠ This changes Python's own scores in the last ulp —
-   a **fux-wide analyzer-class change** (ADR-RANKING amendment, differential
+   a **fux-wide analyzer-class change** (SR-RANKING amendment, differential
    re-run, goldens re-graded) — and it is also the honest fix for the
    `1.9e-6` cross-arch drift the rank-flip run already recorded. Decision
    for Arpit in W-107 §1: portable `log` (byte identity, one Python change)
@@ -403,8 +403,8 @@ tuple `(-round(s, 9), id)` exactly in the comparator.
 - One ESM file, `#!/usr/bin/env node`, Node ≥ 20, no dependencies, no build
   step. Lives in this repo under `node/` so the goldens, the harness and CI
   see both implementations in one change.
-- **`ADR-NODE-SEARCH`** owns `node/`; the ownership table and
-  `tests/test_adr_ownership.py` change in the same commit; the freshness
+- **`SR-NODE-SEARCH`** owns `node/`; the ownership table and
+  `tests/test_sr_ownership.py` change in the same commit; the freshness
   test maps each Python module to its Node twin so a change to one without
   the other fails CI.
 - MCP: legacy handshake (`initialize` → `notifications/initialized`,
@@ -445,13 +445,13 @@ lane `arpit` until ratified, then `agent`. **Model: Opus** on every item.
 
 | id | item | depends on | record(s) | size |
 |---|---|---|---|---|
-| **W-108** | `answer` refers top-3 + proximity in the passage rescore | — | ADR-ANSWER · ADR-REFER · ADR-RERANK | S |
+| **W-108** | `answer` refers top-3 + proximity in the passage rescore | — | SR-ANSWER · SR-REFER · SR-RERANK | S |
 | **W-106** | the vector gate — contextual embedder vs DENSE-CHUNK's frozen bar, scratch only | — | none (a run) | S |
-| **W-107** | the Node read plane (`node/`, `fux-search`) in four phases | portable-`log` decision | **ADR-NODE-SEARCH** (new) · ADR-RANKING (if portable `log`) · ADR-MCP | XL |
-| **W-109** | `--expand` term slot + `-q` multi-query RRF | — | ADR-ASK · ADR-TUNE · **ADR-EXPAND** (new; revives RRF under a new record) | M |
-| **W-110** | `fux-enrich` → doc2query + self-retrieval filter in `--check` | — | ADR-ENRICH | M |
-| **W-111** | declared tie-break + `tie` · `find --phrase/--under/--all` · retry rule in `fux_search`/`fux-usage` | — | ADR-ASK · ADR-FIND · ADR-CLI · ADR-RANKING · ADR-MCP | M |
-| **W-112** | the vector plane (`embed`, `vectors/`, `--qvec`, RRF) | **W-106 PASS** · W-109's RRF | **ADR-VECTORS** (new) · ADR-DOTFUX · ADR-INGEST · ADR-ASK | L |
+| **W-107** | the Node read plane (`node/`, `fux-search`) in four phases | portable-`log` decision | **SR-NODE-SEARCH** (new) · SR-RANKING (if portable `log`) · SR-MCP | XL |
+| **W-109** | `--expand` term slot + `-q` multi-query RRF | — | SR-ASK · SR-TUNE · **SR-EXPAND** (new; revives RRF under a new record) | M |
+| **W-110** | `fux-enrich` → doc2query + self-retrieval filter in `--check` | — | SR-ENRICH | M |
+| **W-111** | declared tie-break + `tie` · `find --phrase/--under/--all` · retry rule in `fux_search`/`fux-usage` | — | SR-ASK · SR-FIND · SR-CLI · SR-RANKING · SR-MCP | M |
+| **W-112** | the vector plane (`embed`, `vectors/`, `--qvec`, RRF) | **W-106 PASS** · W-109's RRF | **SR-VECTORS** (new) · SR-DOTFUX · SR-INGEST · SR-ASK | L |
 
 Three defaults already on *Blocked on Arpit* are referenced, not
 duplicated: `rerank_weight`, `superseded_weight`, abstention.
@@ -479,7 +479,7 @@ duplicated: `rerank_weight`, `superseded_weight`, abstention.
   `informed`, both embedder implementations as separate arms, plus a
   **two-architecture** arm for the query vectors (discordant count).
   ⚠ **As executed on 2026-09-05 the corpus was `fux-playground`'s ten
-  documents and fifty goldens**; [L9](../../docs/adr/0011_LAW-9-environments.md)
+  documents and fifty goldens**; [SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md)
   closed that environment on 2026-09-11, so the retrieval half is not re-runnable
   and the two-architecture arm — which needs no goldens — is what remains
   ([W-106](../../archive/open/W-106-vector-gate.md), closed 2026-09-12).
@@ -492,10 +492,10 @@ duplicated: `rerank_weight`, `superseded_weight`, abstention.
 
 - **Phase 0 (Opus, decision):** the `log()` fork. Measure Python-vs-Node
   score divergence on whatever corpora are in reach (as executed: the
-  playground and the lab, before [L9](../../docs/adr/0011_LAW-9-environments.md)); write
+  playground and the lab, before [SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md)); write
   `PRE-REGISTRATION-NODE.md` with the three-arm law; Arpit picks portable
   `log` or tolerance. If portable: land `fux/query/portable_math.py` first,
-  ADR-RANKING amended, differential and goldens re-run, **then** Node.
+  SR-RANKING amended, differential and goldens re-run, **then** Node.
 - **Phase 1 — `find`.** `node/fux-search.mjs`: BLAKE2b, analyzer + stemmer,
   shard reader, BM25F, `Weighting`, TOML subset, `round`/`repr` shims, sort.
   Pinned by: hash vectors, the term dump, `find --json` equality over all
@@ -506,7 +506,7 @@ duplicated: `rerank_weight`, `superseded_weight`, abstention.
 - **Phase 3 — graph + `mcp`.** Edges → label propagation → PPR/routes; plane
   digest equals Python's `graph.json`. MCP legacy handshake; tool descriptions
   from a shared JSON so the two servers cannot drift.
-- **Phase 4 — ship.** `ADR-NODE-SEARCH`, ownership twin, CI matrix (Node 20/22
+- **Phase 4 — ship.** `SR-NODE-SEARCH`, ownership twin, CI matrix (Node 20/22
   × x86-64/arm64), npm publish `fux-search`, README front door.
 - **Gate (pre-registered before Phase 1):** 0 discordant rows over every
   golden × every verb × both corpora × both ISAs; `graph.json` digest equal;
@@ -521,7 +521,7 @@ duplicated: `rerank_weight`, `superseded_weight`, abstention.
   scored at `[ranking] expand_weight` (default from Query2doc's 1:5, i.e.
   `0.2`; documented as unmeasured until graded); `-q` repeatable with RRF
   `k = 60`; receipt records both; `--why` labels which terms came from the
-  expansion. **ADR-EXPAND** is the new record RRF's revival requires.
+  expansion. **SR-EXPAND** is the new record RRF's revival requires.
 - **Gate.** Blind author writes expansions for the 50 goldens without
   seeing judgments; net ≥ 6 discordant; 0 broken among goldens that pass
   without expansion.
@@ -533,13 +533,13 @@ duplicated: `rerank_weight`, `superseded_weight`, abstention.
 
 - **DoD.** `ENRICH-SKILL.md` rewritten (questions, one per line; currency in
   frontmatter); `fux enrich --check` self-retrieval filter with the top-*k*
-  stated in ADR-ENRICH; `queue.tsv` unchanged; existing prose bodies stay
+  stated in SR-ENRICH; `queue.tsv` unchanged; existing prose bodies stay
   valid (the filter applies to lines that parse as questions).
 - **Gate.** The three placebo arms on `recall@k`, blind author, net ≥ 6.
 
 ### W-111 — `ask` / `find` ergonomics
 
-- **DoD.** Tie-break order recorded in ADR-RANKING and applied in `rank()`
+- **DoD.** Tie-break order recorded in SR-RANKING and applied in `rank()`
   (both candidate paths, one sort key); `tie` on results and in the schema;
   `find --phrase/--under/--all`; the retry sentence in `mcp.py` and
   `fux-usage`. Differential law re-run (a tie-break is a sort-key change).
@@ -549,7 +549,7 @@ duplicated: `rerank_weight`, `superseded_weight`, abstention.
 ### W-112 — the vector plane *(only on W-106 PASS)*
 
 - **DoD.** `fux setup --embedder local-py|local-js`; `fux embed --plan/--check`;
-  `.fux/vectors/` declared in ADR-DOTFUX's table; ingest fold into
+  `.fux/vectors/` declared in SR-DOTFUX's table; ingest fold into
   `runtime/`; `--qvec` + RRF; receipt + `verify`; `fux doctor` orphan line;
   `fux-embed` skill mirroring `fux-enrich`'s discipline; Node reader gains
   the lane. Format `fux.vectors.v1` pinned by a schema file.
@@ -643,7 +643,7 @@ number rules to reject. MCP stdio: newline-delimited JSON-RPC, legacy
 - **Byte-identical Node `--json` needs a portable `log`** — libm and V8
   disagree in the last ulp on ~1 % of inputs (§6.3). The earlier draft called
   this "usually invisible"; it is a decision, not a footnote.
-- **RRF's revival needs a new record** (ADR-PORT-LIST rule 1) — ADR-EXPAND.
+- **RRF's revival needs a new record** (SR-PORT-LIST rule 1) — SR-EXPAND.
 - **ONNX vectors are never byte-identical across machines** — determinism is
   *reuse of committed bytes*, stated as such (§5.1).
 

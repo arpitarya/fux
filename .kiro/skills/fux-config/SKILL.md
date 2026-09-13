@@ -83,7 +83,7 @@ and index-limit keys live in `.fux/tune.toml`.
 | table | keys (engine default) | read by |
 |---|---|---|
 | `[bm25f]` | `k1` 1.2 (> 0) · `b` 0.75 (0–1) · `body` 1.0 · `heading` 3.0 · `title` 2.0 · `path` 1.5 · `ctx` 1.0 (≥ 0; 0 ignores the field) | `ask` `find` `answer`, MCP |
-| `[ranking]` | `archived_weight` 1.0 · `superseded_weight` 1.0 · `recency_half_life_days` 0.0 (off) · `rerank_weight` 0.0 (off) · `expand_weight` 0.2 — all ≥ 0 | same |
+| `[ranking]` | `rerank_weight` 0.0 (off) · `expand_weight` 0.2 — both ≥ 0 | same |
 | `[graph]` | `damping` 0.85 · `iterations` 3 · `laziness` 0.5 · `hop_decay` 0.5 · `expand_limit` 10 · `seed_depth` 5 | `graph` (`path` reads `hop_decay`) |
 | `[refer]` | `budget` 8000 · `per_doc_fraction` 0.5 · `min_passage_bytes` 120 < `max_passage_bytes` 4000 | `answer` |
 | `[confidence]` | `separation_floor` 0.1 · `doc_coverage_floor` 0.0 | the **band** only — never a score or an order |
@@ -100,6 +100,19 @@ and index-limit keys live in `.fux/tune.toml`.
   re-extracts every document, and `--no-tune` does not undo it.
 - **Absent file or absent key = the engine default.** An unknown table or key
   is an error; up to ten value errors are reported together.
+- 🔴 **All three `[ranking]` DOCUMENT priors were REMOVED on 2026-09-13** —
+  `superseded_weight`, `archived_weight`, `recency_half_life_days` — and each is
+  refused **by name**, not as an unknown key. **Delete the lines; ranking is
+  unchanged**, because every one of them shipped as a no-op.
+  - **Why:** measured across 26 intent-split probes, every value that perfects
+    *current-seeking* dismantles *history-seeking* one probe for one; at a
+    half-life of a year or less, history-seeking goes to **0 of 13**. A
+    per-document multiplier cannot carry a per-query distinction.
+  - **The FACTS are untouched and are what you branch on:** `archived: bool` on
+    every JSON hit (and `[archived]` in prose), the `superseded` property and
+    `supersedes:` frontmatter, the graph edge, `fux explain`, and `mtime` on
+    every record. At an **equal score** the declared tie-break still puts a
+    live document above a retired one and a newer above an older.
 - **`--no-tune`** (on `ask`, `find`, `answer`, `graph`, `path`) ignores the
   file — the *"is it me or the config?"* switch.
 - **Receipts:** `fux answer --receipt --json` records `receipt.predicate.inputs.tune`

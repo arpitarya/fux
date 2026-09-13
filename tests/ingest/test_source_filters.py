@@ -115,11 +115,11 @@ def test_the_default_admits_prose_and_every_decodable_format():
     ⚠ **`.svg`, `.png`, `.jpg`/`.jpeg`, `.gif` and `.jsonl` moved from the
     "stays out" list to the "admitted" one on 2026-08-29** — `svgdoc`,
     `imagedoc` and `jsonldoc` shipped as built-ins the same day, reversing the
-    SVG half of ADR-TYPES decision 5 (see `docs/adr/0031_types-list.md`).
+    SVG half of SR-TYPES decision 5 (see `records/0128_types-list.md`).
 
     What still stays out is the point of the assertion below: source code,
     shell scripts and extensionless files have no decoder, so they remain
-    exactly as far outside the default as ADR-TYPES verdict G left them.
+    exactly as far outside the default as SR-TYPES verdict G left them.
     """
     types = TypeFilter(allow=DEFAULT_TYPES)
     for name in ("a.md", "a.markdown", "a.txt", "a.rst", "a.adoc", "a.org"):
@@ -164,7 +164,7 @@ def test_a_types_file_replaces_the_default_rather_than_extending_it(tmp_path):
 
 
 def test_a_binding_admits_its_extension(tmp_path):
-    """ADR-TYPES decision 12: a bound extension IS a document."""
+    """SR-TYPES decision 12: a bound extension IS a document."""
     _types_toml(tmp_path, 'include = ["*.md"]\n[decoders]\ngeojson = "json"\n')
     types = read_types(tmp_path)
     assert types.accepts("docs/sites.geojson") and types.accepts("a.md")
@@ -188,7 +188,7 @@ def test_a_types_file_with_no_positive_pattern_is_refused(tmp_path):
 
 def test_a_leftover_line_grammar_types_file_is_refused_not_ignored(tmp_path):
     """Ignoring it would put the default in its place and change the index with
-    nothing saying so — ADR-TYPES decision 12."""
+    nothing saying so — SR-TYPES decision 12."""
     (tmp_path / ".fux" / "sources").mkdir(parents=True)
     (tmp_path / ".fux" / "sources" / "types").write_text("*.rst\n", encoding="utf-8")
     with pytest.raises(FuxError, match="fux setup"):

@@ -26,7 +26,7 @@ at query time".
 
 **There is no such provenance.** A committed record carries
 `id · src · loc · sha · ver · mode · meta · title · phrases · terms · wlen ·
-edges` (ADR-RECORD) — `ver` is a monotonic revision counter, not a time, and
+edges` (SR-RECORD) — `ver` is a monotonic revision counter, not a time, and
 nothing else in the record is temporal. `.fux/runtime/stamp.json` holds
 filesystem mtimes but is derived and *explicitly excluded* from the
 byte-identity assertion precisely because mtimes are not reproducible.
@@ -35,7 +35,7 @@ So the engine cannot compute an age, and shipping `max_age_seconds` would mean
 shipping a knob that silently does nothing — the worst available outcome,
 because a caller passing `max_age_seconds=60` would reasonably believe they had
 bounded their staleness. Adding a recorded ingest time is a change to
-ADR-RECORD with a real determinism question attached (it would have to derive
+SR-RECORD with a real determinism question attached (it would have to derive
 from `SOURCE_DATE_EPOCH` or source mtime), and that is its own decision.
 
 **Filed as W-58.** What ships is what can be honest:
@@ -163,7 +163,7 @@ class Verdict:
     age_seconds: int | None = None
     #: Set only when the comparison ran against RETAINED BYTES rather than a
     #: fetch — `.fux/acquired/` held the input the record was built from and
-    #: the source could not be reached (ADR-ACQUIRED, ADR-URL-FRESHNESS).
+    #: the source could not be reached (SR-ACQUIRED, SR-URL-FRESHNESS).
     from_acquired: bool = False
 
     @property

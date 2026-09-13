@@ -1,4 +1,4 @@
-"""The `.fux/` layout (ADR-DOTFUX): idempotent creation, never-overwrite,
+"""The `.fux/` layout (SR-DOTFUX): idempotent creation, never-overwrite,
 and the two invariants that keep committed planes safe under one dotdir —
 the ignore file lists only derived dirs, derived dirs carry CACHEDIR.TAG.
 """
@@ -12,7 +12,7 @@ def test_ensure_layout_writes_readme_gitignore_and_the_node_reader(tmp_path):
     """Three things, not two — the vendored reader joined on 2026-09-12.
 
     `.fux/node/` and the `.fux/fux` shim are the fourth `.fux/` shape
-    (ADR-DOTFUX, ADR-NODE-SEARCH R2): committed, engine-owned, overwritten on a
+    (SR-DOTFUX, SR-NODE-SEARCH R2): committed, engine-owned, overwritten on a
     version difference. They are written here rather than in `fux setup`
     because a clone with no Python has to be able to read the index the
     *first* time anyone ingests, not only after someone runs `setup`.
@@ -51,7 +51,7 @@ def test_ensure_layout_never_overwrites_consumer_edits(tmp_path):
 
 
 def test_gitignore_lists_the_derived_planes_the_blobs_and_the_bytecode(tmp_path):
-    """⚠ **Gitignored is not the same as derived** (ADR-ACQUIRED).
+    """⚠ **Gitignored is not the same as derived** (SR-ACQUIRED).
 
     `acquired/` is the third category: gitignored like `runtime/` and *not*
     rebuildable, because a blob can only be re-ACQUIRED and only while the
@@ -67,7 +67,7 @@ def test_gitignore_lists_the_derived_planes_the_blobs_and_the_bytecode(tmp_path)
     ⚠ **`node/node_modules/` is a FIFTH** (W-149, 2026-09-12): a package
     manager's install directory, which exists only in the monorepo shape where
     `.fux/node` is a workspace member and the reader is installed rather than
-    vendored (ADR-NODE-SEARCH decision 13). Listed by PATH rather than by name
+    vendored (SR-NODE-SEARCH decision 13). Listed by PATH rather than by name
     — `node_modules/` alone would also ignore one a consumer keeps elsewhere
     under `.fux/`, and nothing here is ignored by accident.
     """

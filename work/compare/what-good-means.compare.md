@@ -12,7 +12,7 @@ timestamp: 2026-08-27T00:00:00Z
 
 **Every proposed verdict in §4 is accepted as written**, plus a mechanism for
 fork 3 that §4 did not specify. The ruling is recorded in
-[ADR-QUALITY](../../docs/adr/0141_quality-contract.md); this document is the
+[SR-WORK-QUALITY](../../records/0056_WORK-quality.md); this document is the
 argument behind it and stays citable as such.
 
 | fork | ruled |
@@ -46,7 +46,7 @@ asks.
 
 ---
 
-**The gap, stated plainly.** [ADR-RS](../../docs/adr/0133_predictions.md) governs
+**The gap, stated plainly.** [SR-RS](../../records/0133_predictions.md) governs
 *how* a claim is frozen and is silent on *what quantity is worth freezing*. So
 every quality number fux has ever produced carries an **undeclared query
 distribution** and an implicit cost model in which a fabricated citation and an
@@ -93,7 +93,7 @@ default in classical IR. Two independent arguments against it in a RAG setting:
 
 | argument | why it bites |
 |---|---|
-| **A reranker follows retrieval** | the retriever's initial ordering is discarded downstream, so scoring that ordering measures something nobody consumes. Fux has a reranker ([ADR-RERANK](../../docs/adr/0138_rerank.md)) |
+| **A reranker follows retrieval** | the retriever's initial ordering is discarded downstream, so scoring that ordering measures something nobody consumes. Fux has a reranker ([SR-RERANK](../../records/0138_rerank.md)) |
 | **"Lost in the middle"** | LLMs show **U-shaped** attention over long contexts, so a *monotonically decaying* metric like MRR or nDCG asserts a value curve the consumer demonstrably does not have |
 
 **Recall@k is described as "the most directly actionable metric for RAG",**
@@ -283,7 +283,7 @@ by vibes instead.
   every future comparison meaningless.
 - **A judged number may never adjudicate a prediction on its own.** It informs;
   the deterministic gates rule.
-- ⚠ **It inherits ADR-RS's blind/informed rule and adds a third axis** — *which
+- ⚠ **It inherits SR-RS's blind/informed rule and adds a third axis** — *which
   judge, on what date*. A judged series is a snapshot of provider behaviour in a
   window, and the report says so.
 
@@ -326,7 +326,7 @@ future sessions can be held to.
 - **The `unanswerable` class does not exist** and must be authored — and
   authored **blind**, or it contaminates the set it is meant to test (the W-78
   lesson). ⚠ **This said *"in the playground"***; that environment was retired
-  by [L9](../../docs/adr/0011_LAW-9-environments.md) on 2026-09-11, and the
+  by [SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md) on 2026-09-11, and the
   class's home is the golden ladder's.
 - **Nothing here fixes the lost corpora.** Part B still cannot run.
 - ⚠ **Declaring the mix will make some historical numbers incomparable.** That
@@ -366,6 +366,6 @@ Reopen this verdict when **any** becomes true:
 - [Selective Question Answering under Domain Shift](https://arxiv.org/pdf/2006.09462)
 - [Information retrieval evaluation using test collections](https://link.springer.com/article/10.1007/s10791-016-9281-7)
 - [Goodhart's Law Comes for Every Benchmark You Trust — CACM](https://cacm.acm.org/blogcacm/goodharts-law-comes-for-every-benchmark-you-trust/)
-- **In-repo:** [ADR-RS](../../docs/adr/0133_predictions.md) ·
+- **In-repo:** [SR-RS](../../records/0133_predictions.md) ·
   [W-82 §5.2](../../archive/open/W-82-the-consolidated-build.md) ·
   [P1-GATE verdict](../regression/2026-08-09-pruning-eval/VERDICT.md)

@@ -30,7 +30,7 @@ def _init(tmp_path) -> None:
     listing.parent.mkdir(parents=True, exist_ok=True)
     listing.write_text("docs\n", encoding="utf-8")
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
-    # ADR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
+    # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
     (tmp_path / "docs").mkdir(exist_ok=True)
 
@@ -110,7 +110,7 @@ def test_ver_still_bumps_only_on_this_documents_own_sha(corpus):
 def test_an_analyzer_bump_can_never_be_silently_carried_forward(corpus):
     """Two analyzers inside one index would be undetectable afterwards.
 
-    The reader refuses outright — `ADR-recorded analyzer bumps only` — so a
+    The reader refuses outright — `SR-recorded analyzer bumps only` — so a
     delta run cannot reach the reuse decision with a stale analyzer's records
     in hand. `_reusable` re-checks the header anyway, because a check whose
     only guard is another module's behaviour is a check that leaves on the day
@@ -207,7 +207,7 @@ def test_a_stopped_run_does_not_record_the_new_cap(corpus):
 
 
 def test_changing_max_table_rows_is_not_carried_forward(corpus):
-    """The hole `max_table_rows` had since ADR-TABULAR shipped (2026-09-06):
+    """The hole `max_table_rows` had since SR-TABULAR shipped (2026-09-06):
     the CSV's bytes do not change, only which of its rows are decoded."""
     rows = "col\n" + "".join(f"rowword{i}\n" for i in range(12))
     (corpus / "docs" / "t.csv").write_text(rows, encoding="utf-8")

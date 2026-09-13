@@ -1,6 +1,6 @@
 """`.fux/tune.toml` — every knob that changes ORDER, plus `[index]`: the two that change the index.
 
-[ADR-TUNE](../../docs/adr/0038_tuning.md) is the record. What this module is:
+[SR-TUNE](../../records/0135_tuning.md) is the record. What this module is:
 
 - **The loader.** Absent, empty, or every key commented out means every
   default — no error, no warning, no file required. `$0` stays `$0`.
@@ -19,7 +19,7 @@ A value belongs here if and only if changing it leaves `.fux/index/`
 `[index]`, which are the rule's one declared exception.**
 
 ⚠ **`[index]` — `max_phrases` and `max_table_rows` — DOES change the index.**
-Ruled by Arpit 2026-09-11, moving both out of `fux.toml` (ADR-TUNE decision 13).
+Ruled by Arpit 2026-09-11, moving both out of `fux.toml` (SR-TUNE decision 13).
 Three things follow and none is optional:
 
 1. **`fux ingest` reads `[index]`, through `index_limits()` and nothing else.**
@@ -37,7 +37,7 @@ Three things follow and none is optional:
 the *band*, which is what fux says *about* an answer, never which documents come
 back or in what sequence. It passes the boundary rule trivially and is here
 because the rule is about the index, not about ranking
-([ADR-CONFIDENCE](../../docs/adr/0045_confidence.md) decision 13, which reverses
+([SR-CONFIDENCE](../../records/0141_confidence.md) decision 13, which reverses
 decision 7). **The knob it exposes is a real one:** a floor low enough turns
 every `weak` into `grounded`, and the guard is publication (the block emits the
 floor it was judged under) plus `--no-tune`, not a clamp.
@@ -53,7 +53,7 @@ max_table_rows` had while it lived in `fux.toml`.
 They appear on both sides of one fraction. Passing them separately makes it
 possible to reweight a numerator against a denominator computed under the old
 weights — fux's own LUCENE-6819, which
-[ADR-TUNE](../../docs/adr/0038_tuning.md) decision 6 recorded when the weights
+[SR-TUNE](../../records/0135_tuning.md) decision 6 recorded when the weights
 were still baked into a committed field. `query.bm25f.Scoring` makes that
 unrepresentable.
 
@@ -113,7 +113,7 @@ _LEGACY_FIELD_KEYS = {f"{name}_weight": name for name in TF_FIELDS}
 
 #: `[index] max_phrases` — how many of a document's headings are committed as
 #: its `phrases`, in document order. **Display only**: `heading` tf is built
-#: from every heading whatever this is (ADR-EXTRACTED). **Raised 12 -> 32 on
+#: from every heading whatever this is (SR-EXTRACTED). **Raised 12 -> 32 on
 #: 2026-09-11 (Arpit)**: at 12, 87 of 563 markdown documents in fux's own corpus
 #: lost 1 055 headings, and 262 of their 1 584 slots held template headings
 #: (`Context`, `Decision`) — the headings that told documents apart were the
@@ -122,7 +122,7 @@ DEFAULT_MAX_PHRASES = 32
 
 #: `[index] max_table_rows` — data rows admitted from one table (per SHEET for
 #: `.xlsx`). Rows past it are not decoded, not indexed and not citable
-#: (ADR-TABULAR). Raised 500 -> 20 000 on 2026-09-06; moved here from
+#: (SR-TABULAR). Raised 500 -> 20 000 on 2026-09-06; moved here from
 #: `fux.toml [decode]` on 2026-09-11.
 DEFAULT_MAX_TABLE_ROWS = 20_000
 
@@ -131,16 +131,10 @@ DEFAULT_MAX_TABLE_ROWS = 20_000
 INDEX_TABLE = "index"
 
 #: The closed key set. Table -> keys. Adding a key here is a change to
-#: ADR-TUNE, not a convenience (decision 5).
+#: SR-TUNE, not a convenience (decision 5).
 _SCHEMA: dict[str, tuple[str, ...]] = {
     "bm25f": ("k1", "b", *_FIELD_KEYS),
-    "ranking": (
-        "archived_weight",
-        "superseded_weight",
-        "recency_half_life_days",
-        "rerank_weight",
-        "expand_weight",
-    ),
+    "ranking": ("rerank_weight", "expand_weight"),
     "graph": (
         "damping",
         "iterations",
@@ -161,6 +155,54 @@ _SCHEMA: dict[str, tuple[str, ...]] = {
 
 _OPEN_TABLES = frozenset({"priority"})
 
+#: Keys fux ITSELF shipped and then removed. `(table, key) -> the rest of the
+#: sentence`, so the error names the removal and its date instead of reporting
+#: an unknown key on a line the consumer copied out of fux's own specimen.
+#:
+#: ⚠ **Same reasoning as the `[dense]` refusal below, one level down.** A silent
+#: *"unknown key"* on a key `fux setup` wrote into `.fux/tune.toml` sends
+#: somebody hunting for a typo in a line they never typed. This table is the
+#: only place a removal is announced, so a key leaves the schema and arrives
+#: here in the same change or the removal is a trap.
+#: The half of the removal message the three document priors share: the reason
+#: it is safe to delete, and the measurement behind the ruling.
+_PRIORS_REMOVED = (
+    "Each of the three document priors shipped as a no-op, so DELETING the key "
+    "changes nothing you can measure; what went is a global multiplier no single "
+    "value can set correctly -- measured across 26 intent-split probes, every "
+    "value that perfects current-seeking dismantles history-seeking one probe "
+    "for one (work/regression/2026-09-12-priors-and-tables/VERDICT-W143.md)"
+)
+
+_REMOVED_KEYS: dict[tuple[str, str], str] = {
+    ("ranking", "archived_weight"): (
+        "was REMOVED on 2026-09-13 (W-152). Being retired is a FACT, not a weight. "
+        "Delete the key; ranking is unchanged, because it shipped at 1.0. The FACT "
+        "is untouched and already reaches you: `archived=true` in .fux/sources/dirs, "
+        "the `archived` record property, the `[archived]` marker in prose output and "
+        "`archived: bool` on every JSON hit -- BRANCH ON THAT. " + _PRIORS_REMOVED
+    ),
+    ("ranking", "recency_half_life_days"): (
+        "was REMOVED on 2026-09-13 (W-152). At a half-life of a year or less it took "
+        "history-seeking queries to ZERO of thirteen: a per-document decay cannot "
+        "carry a per-query distinction, because `what do we do now?` and `what did we "
+        "do before?` want opposite orderings out of one corpus. Delete the key; "
+        "ranking is unchanged, because it shipped at 0.0 (off). `mtime` is still "
+        "committed on every record and still breaks a tie in favour of the newer "
+        "document. " + _PRIORS_REMOVED
+    ),
+    ("ranking", "superseded_weight"): (
+        "was REMOVED on 2026-09-13 (W-151). Supersession is a FACT, not a weight: "
+        "no multiplier decides which document supersedes another, and the only band "
+        "of values that ordered a corpus sensibly had its lower edge set by an "
+        "UNRELATED document -- so adding a document moved the correct value. Delete "
+        "the key; ranking is unchanged, because it shipped at 1.0. The FACT is "
+        "untouched: `supersedes:` in frontmatter, the `superseded` record property, "
+        "the graph edge, `fux explain`, and the declared tie-break that puts a live "
+        "document above a retired one at an equal score. " + _PRIORS_REMOVED
+    ),
+}
+
 
 
 @dataclass(frozen=True)
@@ -173,9 +215,13 @@ class Tune:
     field_weights: tuple[float, ...] = FIELD_WEIGHTS
 
     # [ranking]
-    archived_weight: float = 1.0
-    superseded_weight: float = 1.0
-    recency_half_life_days: float = 0.0
+    #: ⚠ **Three document priors stood here and all three are GONE**, ruled by
+    #: Arpit on 2026-09-13 (SR-TUNE decision 15): `superseded_weight` (W-151),
+    #: then `archived_weight` and `recency_half_life_days` (W-152). Each shipped
+    #: as a no-op, so nothing ranks differently; what went is three global
+    #: multipliers no single value can set correctly. The FACTS they read —
+    #: `archived`, `superseded`, `mtime` — are all untouched and still reach a
+    #: caller.
     rerank_weight: float = 0.0
     #: W-109 — what an agent-supplied `--expand` term is worth against a term
     #: the user actually typed. **`0.2` is Query2doc's 1:5 ratio** (arXiv
@@ -366,7 +412,7 @@ def index_limits(root: Path) -> IndexLimits:
 def _reject_conflict_markers(path: Path, text: str) -> None:
     """A committed file that people edit will eventually carry `<<<<<<<`.
 
-    `.fux/` has a merge story ([ADR-MERGE-DRIVER]) and this file is inside it,
+    `.fux/` has a merge story ([SR-MERGE-DRIVER]) and this file is inside it,
     so the confusing outcome is real: `tomllib` reports an invalid-TOML syntax
     error pointing at a line that looks fine, and the actual cause is three
     lines above (decision 10c).
@@ -444,6 +490,11 @@ def load(root: Path, *, enabled: bool = True) -> Tune:
             # `<field>_weight`. Reporting them as merely *unknown* would send a
             # consumer hunting for a typo in a key they copied correctly from
             # the shipped specimen, so name the rename instead.
+            # A key fux removed is named as removed. Sorted so two removed keys
+            # in one table report the same one every run (L3 reaches errors too).
+            removed = sorted(k for k in unknown_keys if (name, k) in _REMOVED_KEYS)
+            if removed:
+                raise FuxError(f"{path}: [{name}] `{removed[0]}` {_REMOVED_KEYS[(name, removed[0])]}")
             renamed = sorted(k for k in unknown_keys if k in _LEGACY_FIELD_KEYS)
             if name == "bm25f" and renamed:
                 pairs = ", ".join(f"`{k}` -> `{_LEGACY_FIELD_KEYS[k]}`" for k in renamed)
@@ -469,23 +520,6 @@ def load(root: Path, *, enabled: bool = True) -> Tune:
             weights[i] = _non_negative(c, "bm25f", key, bm25f[key], FIELD_WEIGHTS[i])
 
     ranking = data.get("ranking", {})
-    archived_weight = (
-        _non_negative(c, "ranking", "archived_weight", ranking["archived_weight"], 1.0)
-        if "archived_weight" in ranking
-        else 1.0
-    )
-    superseded_weight = (
-        _non_negative(c, "ranking", "superseded_weight", ranking["superseded_weight"], 1.0)
-        if "superseded_weight" in ranking
-        else 1.0
-    )
-    half_life = (
-        _non_negative(
-            c, "ranking", "recency_half_life_days", ranking["recency_half_life_days"], 0.0
-        )
-        if "recency_half_life_days" in ranking
-        else 0.0
-    )
     rerank_weight = (
         _non_negative(c, "ranking", "rerank_weight", ranking["rerank_weight"], 0.0)
         if "rerank_weight" in ranking
@@ -590,9 +624,6 @@ def load(root: Path, *, enabled: bool = True) -> Tune:
         k1=k1,
         b=b,
         field_weights=tuple(weights),
-        archived_weight=archived_weight,
-        superseded_weight=superseded_weight,
-        recency_half_life_days=half_life,
         rerank_weight=rerank_weight,
         expand_weight=expand_weight,
         damping=damping,
@@ -624,7 +655,7 @@ def specimen() -> str:
     `fux setup` is write-if-missing, so a later change to `K1`, `B`,
     `FIELD_WEIGHTS` or a `Tune` field reaches a repo that has never run setup
     and does not reach one that has. Same trade as `.fux/formats.toml`; same
-    remedy, and ADR-DOTFUX decision 6 names it -- **a loader refusal or a `fux
+    remedy, and SR-DOTFUX decision 6 names it -- **a loader refusal or a `fux
     doctor` check, never a rewrite.**
 
     ⚠ **`[priority]` stays commented, and that is not an inconsistency.** Its
@@ -664,9 +695,6 @@ b                       = {B}     # length normalisation, 0 = off, 1 = full
 {fields}
 
 [ranking]
-archived_weight         = {d.archived_weight}   # multiplier for a source declared archived
-superseded_weight       = {d.superseded_weight}   # multiplier for a document another supersedes
-recency_half_life_days  = {d.recency_half_life_days}   # 0 = off; decays on the committed `mtime`
 rerank_weight           = {d.rerank_weight}   # 0 = off; the proximity reranker's uplift
 # What an agent-supplied `--expand` term is worth against a term you typed.
 # A NO-OP unless a caller passes `--expand`; 0 turns expansion off entirely.

@@ -42,7 +42,7 @@ def test_fux_dir_writable_after_root_found(tmp_path):
 def test_doctor_creates_nothing_at_all(tmp_path):
     """🔴 **It created `.fux/` and `.fux/runtime/CACHEDIR.TAG`** (W-140 row 7).
 
-    Read-only is the first sentence of ADR-DOCTOR and of the README's
+    Read-only is the first sentence of SR-DOCTOR and of the README's
     description of this verb, and it was untrue in the plainest way: running
     the health command on a repo that had never seen fux left two directories
     behind. Two causes, both fixed 2026-09-12 — `doctor` mkdir'd `.fux/` to
@@ -71,14 +71,14 @@ def test_no_root_reports_single_failing_check(tmp_path):
     assert not checks[1].ok
 
 
-# -- the .fux layout checks (ADR-DOTFUX) -------------------------------------
+# -- the .fux layout checks (SR-DOTFUX) -------------------------------------
 
 
 def _check(checks, name):
     return next(c for c in checks if c.name == name)
 
 
-# -- does fux.toml load? (ADR-DOCTOR / ADR-DOTFUX decision 6) -----------------
+# -- does fux.toml load? (SR-DOCTOR / SR-DOTFUX decision 6) -----------------
 
 
 def test_a_fux_toml_the_loader_refuses_makes_doctor_red(tmp_path):
@@ -162,7 +162,7 @@ def test_declared_entries_do_not_warn(tmp_path):
 def test_cmd_doctor_exit_code_ignores_warnings(tmp_path, monkeypatch, capsys):
     (tmp_path / ".git").mkdir()
     (tmp_path / ".fux").mkdir(exist_ok=True)
-    # ADR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
+    # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
     (tmp_path / ".fux" / "scratch").mkdir()
     monkeypatch.chdir(tmp_path)
@@ -170,7 +170,7 @@ def test_cmd_doctor_exit_code_ignores_warnings(tmp_path, monkeypatch, capsys):
     assert "[WARN] .fux/ layout declared" in capsys.readouterr().out
 
 
-# -- the derived accelerator check (M2, ADR-T1-ACCELERATOR) ---------------------------
+# -- the derived accelerator check (M2, SR-T1-ACCELERATOR) ---------------------------
 
 
 def test_accelerator_absent_warns_but_does_not_fail(tmp_path):
@@ -288,7 +288,7 @@ def test_url_check_reports_never_fetched_before_any_networked_run(tmp_path):
 
 
 def test_url_check_names_listed_urls_that_have_never_been_fetched(tmp_path):
-    """🔴 **ADR-MAINTENANCE decision 5a paid for its refusal with this row, and
+    """🔴 **SR-MAINTENANCE decision 5a paid for its refusal with this row, and
     the row did not exist** (W-140 row 13, built 2026-09-12).
 
     5a forbids any git hook from touching the network — including the commit
@@ -414,7 +414,7 @@ def test_url_check_reports_what_the_last_run_confirmed(tmp_path):
 
 
 def test_url_check_names_a_persistently_failing_url_and_refuses_to_delete_it(tmp_path):
-    """ADR-URL-INGEST decision 4 forbids treating a failed fetch as a deletion.
+    """SR-URL-INGEST decision 4 forbids treating a failed fetch as a deletion.
 
     So the check reports and points at the file a human must edit — and the
     record is still in the index afterwards, which is the property under test.
@@ -492,7 +492,7 @@ def test_url_check_survives_an_unreadable_index(tmp_path):
 
 
 def test_url_state_carries_no_wall_clock(tmp_path):
-    """The invariant `refer/fetchcache.py` states and ADR-REFER rests on:
+    """The invariant `refer/fetchcache.py` states and SR-REFER rests on:
     wall clock lives in the TTL store and nowhere else.
 
     W-75 specified this file with `validated_at` / `changed_at`. Both are
@@ -551,7 +551,7 @@ def test_every_check_detail_is_ascii_in_every_branch(tmp_path):
 
 
 def test_doctor_flags_a_types_file_with_no_live_pattern(tmp_path, monkeypatch):
-    """ADR-DOTFUX decision 6's ⚠: the fixed template reaches new repos only."""
+    """SR-DOTFUX decision 6's ⚠: the fixed template reaches new repos only."""
     from fux import doctor as doctor_mod
 
     (tmp_path / "fux.toml").write_text("", encoding="utf-8")
@@ -564,7 +564,7 @@ def test_doctor_flags_a_types_file_with_no_live_pattern(tmp_path, monkeypatch):
 
 
 def test_doctor_flags_a_leftover_line_grammar_types_file(tmp_path):
-    """ADR-DOTFUX decision 6's mechanism for ADR-TYPES decision 12: the move reaches
+    """SR-DOTFUX decision 6's mechanism for SR-TYPES decision 12: the move reaches
     an existing repo as a `doctor` row that names the command, never a rewrite."""
     from fux import doctor as doctor_mod
 
@@ -593,10 +593,10 @@ def test_doctor_passes_when_there_is_no_types_file(tmp_path):
 
 # --- the fetcher-capability notice, added 2026-08-28 ------------------------
 #
-# ADR-FETCHER decision 12's measured gap: a repo created before the decision
+# SR-FETCHER decision 12's measured gap: a repo created before the decision
 # learned 0 of 7 `validate()` tokens until its `http.py` was replaced by hand.
 # `fux setup` is write-if-missing, so the mechanism is a doctor NOTICE, never a
-# rewrite (ADR-DOTFUX decision 6) — `_types_health` above is the precedent.
+# rewrite (SR-DOTFUX decision 6) — `_types_health` above is the precedent.
 
 def _url_repo(root, fetcher_body: str) -> None:
     (root / "fux.toml").write_text(
@@ -730,7 +730,7 @@ def test_a_clean_sweep_is_reported_as_clean(tmp_path):
 #
 # One pass at `doctor.py` for five things that were each reachable only from
 # inside a run that had already finished — or, in the freshness case, from
-# nowhere at all. ADR-DOTFUX's fourth worked instance.
+# nowhere at all. SR-DOTFUX's fourth worked instance.
 
 
 def _record(doc_id="file:a.md", loc="a.md", **extra):
@@ -750,7 +750,7 @@ def _record(doc_id="file:a.md", loc="a.md", **extra):
     return record
 
 
-# -- the refusal counter (ADR-REFUSAL decision 11) ---------------------------
+# -- the refusal counter (SR-REFUSAL decision 11) ---------------------------
 
 
 def _refusals_toml(tmp_path, *names):
@@ -871,7 +871,7 @@ def test_the_magic_floor_is_counted_under_its_reserved_name():
     assert hit[0] == refusals.MAGIC_FLOOR
 
 
-# -- the decoder bindings (ADR-DECODE) --------------------------------------
+# -- the decoder bindings (SR-DECODE) --------------------------------------
 
 
 def test_decoder_bindings_report_nothing_when_none_are_declared(tmp_path):
@@ -949,17 +949,21 @@ def test_a_corpus_with_no_mtime_reports_the_recency_prior_as_off(tmp_path):
     assert "NO document carries an mtime" in check.detail
 
 
-def test_a_configured_half_life_over_a_corpus_with_no_mtime_says_so(tmp_path):
+def test_a_corpus_with_no_mtime_names_what_it_actually_costs(tmp_path):
+    """⚠ The knob went on 2026-09-13 (W-152) and the check did not.
+
+    It used to report *"a prior you have configured is doing nothing"*. There is
+    no prior to configure, so it names the two things a missing `mtime` still
+    costs: no date reaches a caller, and the tie-break's date key is inert.
+    """
     from fux.store import write_index
 
     _git_repo(tmp_path)
-    (tmp_path / ".fux").mkdir(exist_ok=True)
-    (tmp_path / ".fux" / "tune.toml").write_text(
-        "[ranking]\nrecency_half_life_days = 30\n", encoding="utf-8"
-    )
     write_index(tmp_path, [_record()])
-    check = _check(doctor.run(tmp_path), "recency prior")
-    assert "configured is doing nothing" in check.detail
+    detail = _check(doctor.run(tmp_path), "recency prior").detail
+    assert "no date reaches a caller" in detail
+    assert "tie-break" in detail
+    assert "half-life" not in detail
 
 
 def test_a_corpus_where_every_document_has_an_mtime_passes(tmp_path):
@@ -972,7 +976,9 @@ def test_a_corpus_where_every_document_has_an_mtime_passes(tmp_path):
     assert "every one of 1 document(s)" in check.detail
 
 
-def test_a_partly_covered_corpus_is_a_warning_only_when_the_knob_is_on(tmp_path):
+def test_a_partly_covered_corpus_names_the_documents_with_no_date(tmp_path):
+    """A split corpus is a fact about the input, not a broken install — so it
+    passes, and still says which half a caller gets no date for."""
     from fux.store import write_index
 
     _git_repo(tmp_path)
@@ -980,17 +986,13 @@ def test_a_partly_covered_corpus_is_a_warning_only_when_the_knob_is_on(tmp_path)
         tmp_path,
         [_record(mtime=1788330315), _record(doc_id="file:b.md", loc="b.md")],
     )
-    assert _check(doctor.run(tmp_path), "recency prior").ok  # half-life 0: off anyway
-
-    (tmp_path / ".fux" / "tune.toml").write_text(
-        "[ranking]\nrecency_half_life_days = 30\n", encoding="utf-8"
-    )
     check = _check(doctor.run(tmp_path), "recency prior")
-    assert not check.ok
-    assert "1 of 2 document(s)" in check.detail
+    assert check.ok
+    assert "1 of 2 document(s) carry an mtime" in check.detail
+    assert "reach a caller with no date" in check.detail
 
 
-# -- the as-ingested share (ADR-ACQUIRED / ADR-URL-FRESHNESS's veto) ---------
+# -- the as-ingested share (SR-ACQUIRED / SR-URL-FRESHNESS's veto) ---------
 
 
 def _journal(tmp_path, labels):
@@ -1032,7 +1034,7 @@ def test_crossing_the_veto_share_warns_and_names_both_records(tmp_path):
     check = _check(doctor.run(tmp_path), "freshness verdicts")
     assert not check.ok
     assert check.level == "warn"
-    assert "ADR-ACQUIRED and ADR-URL-FRESHNESS" in check.detail
+    assert "SR-ACQUIRED and SR-URL-FRESHNESS" in check.detail
 
 
 def test_the_veto_share_is_machine_readable_in_json(tmp_path, monkeypatch, capsys):
@@ -1060,7 +1062,7 @@ def test_a_corrupt_journal_line_cannot_break_doctor(tmp_path):
     assert doctor.freshness_counts(tmp_path) == {}
 
 
-# -- the redaction counts (ADR-PII decision 15) -----------------------------
+# -- the redaction counts (SR-PII decision 15) -----------------------------
 
 
 def test_pii_line_says_no_ingest_has_recorded_counts_yet(tmp_path):
@@ -1125,7 +1127,7 @@ def test_a_corrupt_counts_file_reads_as_nothing_recorded(tmp_path):
 
 
 def test_the_counts_file_is_gitignored_like_every_derived_plane(tmp_path):
-    """L8 and ADR-DOTFUX: a use-shaped record never reaches a committed byte."""
+    """L8 and SR-DOTFUX: a use-shaped record never reaches a committed byte."""
     from fux.ingest import pii
     from fux.store import fuxdir
 
@@ -1144,7 +1146,13 @@ def _tune(tmp_path, body):
 
 
 def test_the_shipped_defaults_are_disclosed_as_switched_off(tmp_path):
-    """The whole point: four mechanisms built, wired, and doing nothing."""
+    """The whole point: a mechanism built, wired, and doing nothing.
+
+    🔴 **It was four until 2026-09-13.** All three DOCUMENT priors were removed
+    rather than tuned (W-151, W-152) once the disclosure made them visible and
+    a measurement showed no global value works for any of them. What is left is
+    `rerank_weight`, which ships OFF rather than neutral.
+    """
     from fux.store import write_index
 
     _git_repo(tmp_path)
@@ -1152,92 +1160,45 @@ def test_the_shipped_defaults_are_disclosed_as_switched_off(tmp_path):
     check = _check(doctor.run(tmp_path), "ranking priors")
     assert not check.ok
     assert check.level == "warn"  # a default is not a broken install
-    for key in ("archived_weight", "superseded_weight", "rerank_weight", "recency_half_life_days"):
-        assert key in check.detail
+    assert "rerank_weight" in check.detail
+    # Removed on 2026-09-13 — a removed knob is not a switched-off one. Read off
+    # the LISTED part, before the "fux states this" prose, which still cites
+    # `superseded_weight` as the one change ever measured.
+    listed = check.detail.split(". Each is implemented")[0]
+    for gone in ("superseded_weight", "archived_weight", "recency_half_life_days"):
+        assert gone not in listed
 
 
-def test_it_counts_what_each_dead_prior_WOULD_have_acted_on(tmp_path):
-    """A knob that is off over 0 archived documents and one that is off over 40
-    are different findings, and a flat list of defaults cannot tell them apart."""
-    from fux.store import write_index
+def test_the_row_carries_no_count_for_a_prior_with_no_record_field(tmp_path):
+    """🔴 *Switched off* and *unreachable* are different problems, and the row
+    distinguishes them **only for a prior driven by a per-record declaration.**
 
-    _git_repo(tmp_path)
-    write_index(
-        tmp_path,
-        [
-            _record("file:a.md", "a.md", archived=True),
-            _record("file:b.md", "b.md", archived=True),
-            _record("file:c.md", "c.md"),
-        ],
-    )
-    check = _check(doctor.run(tmp_path), "ranking priors")
-    assert "archived_weight=1 (2 document(s) declared archived=true)" in check.detail
-    assert "superseded_weight=1 (0 document(s)" in check.detail
-
-
-def test_a_prior_with_nothing_to_act_on_says_so(tmp_path):
-    """🔴 *Switched off* and *unreachable* are different problems.
-
-    Changing the value fixes the first and does **nothing whatever** about the
-    second, and until 2026-09-11 this row printed the count and left a reader to
-    notice the zero. Measured that day: three of the four priors returned
-    byte-identical results at every value **including `0.0`** on a corpus that
-    declares none of what they read — and the premise that they were testable
-    there had stood in the queue for two weeks, because the documents discuss
-    supersession in **prose** while declaring none of it.
+    `rerank_weight` is not one — it acts on refer-plane passage proximity, not a
+    document flag — so there is no count to print and no *"changing this would
+    change NOTHING"* clause to fire. ⚠ **Both halves of that distinction went
+    with the three DOCUMENT priors on 2026-09-13** (W-151, W-152), which is the
+    disclosure having worked rather than the check having weakened: it is what
+    made them visible enough to be ruled on.
     See `work/regression/2026-09-11-four-priors-headroom/`."""
     from fux.store import write_index
 
     _git_repo(tmp_path)
     write_index(tmp_path, [_record("file:a.md", "a.md", archived=True), _record("file:b.md", "b.md")])
     detail = _check(doctor.run(tmp_path), "ranking priors").detail
-    # 0 superseded documents -> the clause fires
-    assert "superseded_weight=1 (0 document(s)" in detail
-    assert "so changing this value would change NOTHING in this repository" in detail
-    # 1 archived document -> it does not: that knob has something to act on
-    archived_part = next(p for p in detail.split(";") if "archived_weight" in p)
-    assert "1 document(s) declared archived=true" in archived_part
-    assert "NOTHING in this repository" not in archived_part
-
-
-def test_the_unreachable_clause_still_recommends_no_value(tmp_path):
-    """The clause states a fact derived from data already in hand. *"0 documents,
-    so set it to X"* would be the R10 failure this row exists to refuse."""
-    from fux.store import write_index
-
-    _git_repo(tmp_path)
-    write_index(tmp_path, [_record()])
-    detail = _check(doctor.run(tmp_path), "ranking priors").detail
-    assert "NOTHING in this repository" in detail
-    assert "does NOT recommend" in detail
-    for nudge in ("try ", "set it to", "recommended", "should be"):
-        assert nudge not in detail
+    assert "rerank_weight=0" in detail
+    assert "document(s)" not in detail
+    assert "NOTHING in this repository" not in detail
 
 
 def test_a_prior_that_is_switched_ON_is_not_listed(tmp_path):
     from fux.store import write_index
 
     _git_repo(tmp_path)
-    _tune(tmp_path, "rerank_weight = 0.5\narchived_weight = 0.5")
-    write_index(tmp_path, [_record()])
-    check = _check(doctor.run(tmp_path), "ranking priors")
-    assert "rerank_weight" not in check.detail
-    assert "archived_weight" not in check.detail
-    assert "superseded_weight" in check.detail
-
-
-def test_every_prior_switched_on_passes(tmp_path):
-    from fux.store import write_index
-
-    _git_repo(tmp_path)
-    _tune(
-        tmp_path,
-        "rerank_weight = 0.5\narchived_weight = 0.5\n"
-        "superseded_weight = 0.5\nrecency_half_life_days = 30",
-    )
+    _tune(tmp_path, "rerank_weight = 0.5")
     write_index(tmp_path, [_record()])
     check = _check(doctor.run(tmp_path), "ranking priors")
     assert check.ok
+    assert "rerank_weight" not in check.detail
 
 
 def test_it_refuses_to_recommend_a_value(tmp_path):
@@ -1254,7 +1215,7 @@ def test_it_refuses_to_recommend_a_value(tmp_path):
 
 
 def test_a_missing_pii_file_is_an_error_row_and_fails_the_command(tmp_path, monkeypatch, capsys):
-    """ADR-PII decision 17: doctor is exempt from the gate, not from the error."""
+    """SR-PII decision 17: doctor is exempt from the gate, not from the error."""
     import argparse
 
     _git_repo(tmp_path)
@@ -1272,7 +1233,7 @@ def test_a_broken_tune_file_fails_the_doctor(tmp_path):
     """🔴 It left doctor GREEN, which is the worst shape for this file.
 
     `fux ingest` reads only `[index]` from `tune.toml`, so a bad ranking knob
-    deliberately does not stop an ingest (ADR-TUNE decision 13) — while `ask`,
+    deliberately does not stop an ingest (SR-TUNE decision 13) — while `ask`,
     `find` and `answer` refuse. The repo therefore indexes cleanly, doctor
     reports every row fine, and every query in it fails.
     """
@@ -1325,7 +1286,7 @@ def test_no_tune_file_is_not_a_problem(tmp_path):
     assert check.ok and "absent" in check.detail
 
 
-# --- the `fux on PATH` row (ADR-NODE-SEARCH R1a mitigation 3) ----------------
+# --- the `fux on PATH` row (SR-NODE-SEARCH R1a mitigation 3) ----------------
 #
 # The row exists because `npm i -g fux-engine` puts a second `fux` on PATH with
 # a DIFFERENT verb set. R1a deferred it on the reasoning "no global bin ships in

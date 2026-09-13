@@ -13,7 +13,7 @@ The length normaliser is a **weighted** sum of per-field token counts:
 
 Until 2026-08-23 that sum was computed at ingest and **committed** as `wlen`,
 which made a committed field a function of a tunable — the violation
-[ADR-TUNE](../../docs/adr/0038_tuning.md) decision 6 names, and the reason
+[SR-TUNE](../../records/0135_tuning.md) decision 6 names, and the reason
 field weights could not be tune keys. Changing a weight reweighted the
 numerator against a denominator baked in under the old weights: a silent,
 corpus-wide ranking error with nothing to see.
@@ -67,7 +67,7 @@ class Scoring:
     `wtf` is the field weights applied to the numerator; `wlen` is the same
     weights applied to the denominator; `k1` and `b` join them. A caller that
     passes the weights and forgets `k1` reweights half a formula — which is
-    the exact defect [ADR-TUNE](../../docs/adr/0038_tuning.md) decision 6
+    the exact defect [SR-TUNE](../../records/0135_tuning.md) decision 6
     recorded as fux's own LUCENE-6819, one level up. Three parameters make
     that mistake possible at every call site; one object makes it
     unrepresentable.

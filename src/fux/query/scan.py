@@ -43,11 +43,6 @@ from .tokenize import tokenize
 _FLEN_RE = re.compile(rb'"flen":\[([0-9,\s]*)\]')
 
 
-#: W-76 Phase 2. Same reasoning as `_FLEN_RE`: read from bytes on every line,
-#: candidate or not, rather than parsing the corpus to find one integer.
-_MTIME_RE = re.compile(rb'"mtime":(\d+)')
-
-
 def _flen_from_line(line: bytes) -> list[int] | None:
     m = _FLEN_RE.search(line)
     if m is None:
@@ -80,9 +75,8 @@ def scan_candidates(
     # Summing `derive_wlen` per record would give the same number today and
     # would silently bake the weights into a running total the moment anything
     # here started caching it — the accelerator's stats plane made exactly that
-    # mistake (ADR-TUNE, 2026-08-24).
+    # mistake (SR-TUNE, 2026-08-24).
     total_flen = [0] * len(TF_FIELDS)
-    newest_mtime = 0
     df: dict[str, int] = dict.fromkeys(query_hashes, 0)
     candidates: list[dict] = []
 
@@ -94,11 +88,6 @@ def scan_candidates(
             if flen is not None:
                 for i, count in enumerate(flen):
                     total_flen[i] += count
-            mt = _MTIME_RE.search(line)
-            if mt is not None:
-                value = int(mt.group(1))
-                if value > newest_mtime:
-                    newest_mtime = value
             # The substring check is a prefilter only: a query hash can appear
             # as a literal 16-hex string somewhere outside `terms` (a title,
             # an id, a sha — anything quoted) without the document actually
@@ -120,11 +109,7 @@ def scan_candidates(
     return (
         candidates,
         df,
-        Corpus(
-            n=total_docs,
-            total_wlen=derive_wlen(total_flen, scoring),
-            newest_mtime=newest_mtime,
-        ),
+        Corpus(n=total_docs, total_wlen=derive_wlen(total_flen, scoring)),
     )
 
 
@@ -133,7 +118,6 @@ def ask(
     query: str,
     top: int = 5,
     *,
-    archived_weight: float = 1.0,
     archived_dirs: frozenset[str] = frozenset(),
     weighting=None,
     scoring: Scoring = DEFAULT_SCORING,
@@ -160,7 +144,7 @@ def ask(
     candidates, df, corpus = scan_candidates(root, collect, scoring=scoring)
     return rank(
         candidates, collect, df, corpus, top,
-        archived_weight=archived_weight, archived_dirs=archived_dirs,
+        archived_dirs=archived_dirs,
         weighting=weighting, scoring=scoring, stats_out=stats_out,
         expansion=expansion,
     )

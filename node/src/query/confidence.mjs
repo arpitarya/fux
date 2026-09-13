@@ -6,6 +6,8 @@
  * reported with another — and both are published on the block, because a
  * `grounded` judged at 0.02 is a different claim from one judged at 0.10 and
  * absent publication the difference would be invisible.
+ *
+ * Owned, with its Python twin, by [SR-CONFIDENCE](../../../records/0141_confidence.md).
  */
 import { idf } from "./bm25f.mjs";
 import { termHash } from "../store/format.mjs";

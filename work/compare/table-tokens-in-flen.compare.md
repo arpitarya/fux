@@ -15,8 +15,8 @@ a default that every corpus inherits"*.
 
 **Found:** [`proposals/structure-aware-extraction.md`](../proposals/structure-aware-extraction.md),
 graduated as [W-144](../open/W-144-structure-aware-extraction.md) when W-86's P4
-landed. **Owning records:** [ADR-EXTRACTED](../../docs/adr/0115_extracted-mode.md)
-(what `extract.py` builds) and [ADR-RANKING](../../docs/adr/0111_ranking.md)
+landed. **Owning records:** [SR-EXTRACTED](../../records/0115_extracted-mode.md)
+(what `extract.py` builds) and [SR-RANKING](../../records/0111_ranking.md)
 (what the fields mean). Neither decides this today.
 
 ---
@@ -124,10 +124,20 @@ corpus statistic and the per-document one agree.
 
 **Against.**
 - **It changes every corpus's ranking**, including ones nobody will re-measure.
-- A document that genuinely *is* its table — a rate card whose subject is its
-  rows — becomes shorter than it reads, and its rare cell terms get more idf
-  leverage than before. **Not measured.** The graded set has no probe where the
-  table *is* the answer, and that is the honest gap in this recommendation.
+- 🔴 **MEASURED 2026-09-13, and the answer is that (b) HARMS a case it cannot
+  see** ([VERDICT-W155](../regression/2026-09-13-table-is-the-answer/VERDICT.md)).
+  This bullet read *"not measured"* until that run. **30 of 30**: when the query
+  term is a **row label** in a document that says nothing about it, (b) promotes
+  that document above the prose that answers. The controls hold.
+  - **The mirror is also 30/30** — when the table genuinely *is* the answer, (b)
+    **fixes** the rate-card case the paragraph above worried about.
+  - **So the effect is decided by WHERE THE TERM SITS, not by whether the table
+    is an appendix**, and `flen` cannot see the difference because it is a
+    length and the difference is about meaning.
+  - ⚠ **It is the WEAK kind of YES and the pre-registration said so in advance**:
+    the probe author was looking for the harm. **The arithmetic underneath is
+    not weak** — (b) cuts the dump's length ~7× while leaving its `tf`, and no
+    corpus can avoid that.
 - **The threshold is from constructed data.** 0.29 is where a specific tf ratio
   flips; a different ratio moves it.
 
@@ -142,7 +152,7 @@ configurable rather than decided.
 
 **Against.**
 - **A sixth field is a schema change** — `TF_FIELDS`, every record, the wire
-  format, the migration. ADR-INDEX-LIFECYCLE's cost, for a knob nobody has
+  format, the migration. SR-INDEX-LIFECYCLE's cost, for a knob nobody has
   asked for.
 - 🔴 **The four ranking priors are the warning here.**
   [The 2026-09-12 verdict](../regression/2026-09-12-priors-and-tables/VERDICT-W143.md)
@@ -152,6 +162,42 @@ configurable rather than decided.
   thing nobody can set correctly.**
 - It does not make the default question go away — it only renames it
   *"what does `table` default to"*.
+
+### (d) Lower `b` — the standard lever, added 2026-09-13
+
+`b` is BM25's length-normalisation dial: the denominator carries
+`k1 * (1 - b + b * wlen / avg_wlen)`. At `b = 0` length is ignored entirely; at
+`b = 1` a document's score is divided by exactly how many times longer than
+average it is. **fux ships `b = 0.75`** (`src/fux/query/bm25f.py`), tunable at
+`.fux/tune.toml [bm25f]`.
+
+**Added because the option list was missing the textbook answer** (Arpit,
+2026-09-13, asking whether a long document being penalised is not simply
+correct). It is: that is what normalisation is *for*. The question is only
+whether the length is **verbosity** — the same subject at greater length — or
+**scope**, additional material of another kind. `b` is the dial between those
+two readings, which is why it exists.
+
+**For.**
+- **One key, no schema change, no structural claim.** It does not require fux to
+  decide what a table *is*.
+- It softens the measured defect without over-promoting a document whose table
+  **is** its subject — the case (b)'s graded set never covers.
+- Reversible in a consumer's own `tune.toml` without a release.
+
+**Against.**
+- 🔴 **It is global and blunt.** It weakens normalisation for *every* document,
+  so genuinely verbose ones stop being penalised too. (b) is targeted; this is
+  not.
+- 🔴 **Never measured.** W-97 recorded that `k1` and `b` *"have no instrument
+  with headroom"* — no run in this project has ever moved `b`.
+- **It is a knob, and W-143 is the warning:** a single global value that must
+  serve every corpus and every query is the shape that just failed four times.
+  ⚠ The rebuttal: `b` is not a per-document multiplier keyed on a flag — it is a
+  standard IR constant with a literature behind it. **That makes it a better
+  knob than the four, not a good one.**
+
+---
 
 ---
 
@@ -166,23 +212,42 @@ document is about?*
 - If **sometimes** — a rate card is *about* its rates — then **(c)** is the only
   option that can express both, and **(b)** quietly harms the second case.
 
-**The measurement speaks to the first and is silent on the second.** Every probe
-in the graded set has a table that is an appendix, by construction. **That is
-the gap, it is stated rather than hidden, and it is what a reviewer should press
-on.**
+🔴 **AMENDED 2026-09-13: the answer is *sometimes*, and it is measured.**
+[VERDICT-W155](../regression/2026-09-13-table-is-the-answer/VERDICT.md) ran both
+directions, 30 probes each, and both came back total — (b) is right when the term
+is in prose or is the table's subject, and wrong when it is a row label in
+material that says nothing about it. **The sentence directly above this one
+turns out to be the operative branch**, which is the case for **(c)** and not
+for (b).
 
-**Why (b) is still recommended:** it is reversible, it is one field length, and
-the case it might harm — a document whose table *is* its subject — still has
-every one of its cell terms indexed at full `tf`. What changes for that document
-is that it stops being treated as long. **The downside of (b) is bounded by
-construction; the downside of (a) is measured.**
+⚠ **(d) is a third reading: neither answer, just less division.** It treats the
+question as unanswerable in general and turns the correction down instead.
+
+⚠ **The measurement spoke to the first and was silent on the second until
+2026-09-13.** Every probe in the original graded set has a table that is an
+appendix, by construction. **W-155 closed that gap**, and what it found is above.
+
+**Why (b) was recommended, and what has changed.** The case for (b) was that it
+is reversible, it is one field length, and the case it might harm still has every
+cell term indexed at full `tf` — *"the downside of (b) is bounded by
+construction; the downside of (a) is measured."*
+
+🔴 **The bound is now measured and it is not small.** In the `dump` family the
+harm is `hit@1` going from 30/30 to 0/30. **"Bounded by construction" was true
+and did not mean "small"** — a bounded downside can still be total on the cases
+it touches, and this one is.
+
+**What that does NOT do:** it does not make (a) right. `main` and `content` are
+both 30/30 the other way; (b) fixes two cases and breaks a third. **The
+recommendation this document carries is therefore the one thing W-155 leaves
+open, and it is Arpit's** ([W-144](../open/W-144-structure-aware-extraction.md)).
 
 ---
 
 ## 5 · If (b) is accepted, what the change is
 
 1. **A compare-doc verdict from Arpit**, recorded here.
-2. **[ADR-EXTRACTED](../../docs/adr/0115_extracted-mode.md) amended** — what
+2. **[SR-EXTRACTED](../../records/0115_extracted-mode.md) amended** — what
    `flen[body]` counts, and that terms are unaffected — in the same change as
    the code.
 3. `split_body`'s table-row rule moves from `tools/quality-controls/table_flen.py`
@@ -198,9 +263,10 @@ construction; the downside of (a) is measured.**
 
 ## Reference
 
+- [VERDICT-W155](../regression/2026-09-13-table-is-the-answer/VERDICT.md) — **the table-is-the-answer gap, closed**: 30/30 harm on a data dump, 30/30 benefit on a rate card
 - [VERDICT-W144](../regression/2026-09-12-reaim-and-instruments/VERDICT-W144.md) — the graded run and its threshold
 - [The priors run](../regression/2026-09-12-priors-and-tables/report.md) §3 — the mechanism on the ladder
 - [`proposals/structure-aware-extraction.md`](../proposals/structure-aware-extraction.md) — the original claim and the decoder-boundary half
-- [ADR-TABULAR](../../docs/adr/0152_tabular.md) — chunking, a **retrieval** decision, and explicitly not this one
+- [SR-TABULAR](../../records/0150_tabular.md) — chunking, a **retrieval** decision, and explicitly not this one
 - [VERDICT-W143](../regression/2026-09-12-priors-and-tables/VERDICT-W143.md) — why option (c) is a fifth knob nobody can set
 - Robertson & Zaragoza, *The Probabilistic Relevance Framework: BM25 and Beyond* (2009) §3.2 — length normalisation and what `b` is for

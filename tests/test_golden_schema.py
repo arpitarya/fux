@@ -1,4 +1,4 @@
-"""The golden schema's two claims stay apart — ADR-QUALITY decision 12.
+"""The golden schema's two claims stay apart — SR-WORK-QUALITY decision 12.
 
 **Why this is a test and not a convention.** For months `doc` + `max_rank` was
 read as a relevance judgment when it is a rank contract, and the consequence was
@@ -39,7 +39,7 @@ def test_a_golden_with_no_relevance_set_is_legal():
 # The live-file test that stood here is DELETED, 2026-09-12 (W-138).
 #
 # It loaded the fifty goldens out of the sibling sandbox and asserted the
-# schema over them. L9 (docs/adr/0011_LAW-9-environments.md) closed that
+# schema over them. SR-WORK-ENVIRONMENTS (records/0052_WORK-environments.md) closed that
 # environment to every agent on 2026-09-11, so the test had no subject: it
 # would have skipped forever on a clean machine and read a corpus it may not
 # read on this one.

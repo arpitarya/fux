@@ -20,7 +20,7 @@ never subtract one.
 ## Every condition is pure over the bytes, and that is not an oversight
 
 There is no `status`, no `final_url_host`, no "were you redirected" here.
-[ADR-FETCHER](../../docs/adr/0019_fetcher.md) decision 13 says fux never reads
+[SR-FETCHER](../../records/0117_fetcher.md) decision 13 says fux never reads
 a status code, a header or an error string — a fetcher knows it speaks HTTP,
 and fux deliberately does not — and its veto condition names *this file's
 caller* by path. `content_type` is admissible because a MIME type is FORMAT

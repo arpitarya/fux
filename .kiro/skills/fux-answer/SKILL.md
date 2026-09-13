@@ -117,7 +117,7 @@ per document in `audit.documents[]` (`freshness`, `indexed_sha`, `fetched_sha`,
   line's own `ttl=` can only **narrow** that, never widen it, so without the
   flag no line's `ttl=` applies and `cached` never appears. ⚠ **`update=never`
   is update-time and does NOT keep `answer` offline** — that is by design
-  (ADR-URL-FRESHNESS decision 15), not a defect. Read `citation.freshness` (or
+  (SR-URL-FRESHNESS decision 15), not a defect. Read `citation.freshness` (or
   `--audit`) rather than assuming what was fetched.
 - ⚠ **A `note` naming the fetcher** — it raised, returned no bytes, or returned
   a type no decoder claims — means the live fetch was not used: the verdict is
@@ -163,7 +163,7 @@ failure decides:
 | `unverifiable` | 1 | not a fux receipt, an older format, no index here, `--rerun` was not passed — **or the receipt came from a `refer` answer** |
 | `reproduced` | 0 | `--rerun` cited the same documents, in the same order |
 
-- 🔴 **`fux verify` NEVER FETCHES**, by ruling (ADR-PROVENANCE decision 14). So
+- 🔴 **`fux verify` NEVER FETCHES**, by ruling (SR-PROVENANCE decision 14). So
   a **`source: refer` receipt is `unverifiable`** with `--rerun`: its answer was
   assembled from bytes fetched at answer time, and reproducing that would mean
   going out again — which would make one receipt verify differently on a laptop

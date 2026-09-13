@@ -27,7 +27,7 @@ classifiers = [
 ]
 # L1: OSI-approved licences only, ever — source-available (BSL, SSPL, Elastic
 # v2, Commons Clause) does NOT qualify. Fux ships packaged: no feature-extras tier. Anything on the ingest path is pinned: byte-identity is a
-# function of what resolves here. See CLAUDE.md and docs/adr/0002_l1-zero-cost.md.
+# function of what resolves here. See CLAUDE.md and records/0003_LAW-1-zero-cost.md.
 dependencies = []
 
 [project.urls]
@@ -51,9 +51,9 @@ path = "src/fux/__init__.py"
 packages = ["src/fux"]
 
 # The Node read plane travels in the wheel so `fux setup` can vendor it into a
-# consumer's `.fux/node/` (ADR-NODE-SEARCH decision 13). What travels is the
+# consumer's `.fux/node/` (SR-NODE-SEARCH decision 13). What travels is the
 # BUNDLE — one generated `.mjs` plus its manifest and tool descriptions, never
-# fux's own module tree, which is L10 (docs/adr/0012_LAW-10-bundled-output.md).
+# fux's own module tree, which is L10 (records/0011_LAW-10-bundled-output.md).
 #
 # 🔴 **Generated, so it is a build HOOK and not a `force-include` list.** A
 # static list cannot name a file that does not exist until something has built
@@ -62,7 +62,7 @@ packages = ["src/fux"]
 # registries — and none of the authored module tree is ever copied into a
 # consumer's repository again.
 #
-# ⚠ The path of that tree is deliberately NOT spelled here: ADR-LAW-10's veto
+# ⚠ The path of that tree is deliberately NOT spelled here: SR-LAW-10's veto
 # command greps this file for it and expects no hit, so a mention in a comment
 # would be a false positive on the law's own check.
 [tool.hatch.build.targets.wheel.hooks.custom]

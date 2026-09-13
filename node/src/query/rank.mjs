@@ -5,16 +5,17 @@
  * that accumulates its own scores would diverge in the last bit. The
  * accelerator produces candidates and statistics; this does every arithmetic
  * operation, once, for both.
+ *
+ * Owned, with its Python twin, by [SR-RANKING](../../../records/0111_ranking.md).
  */
 import { DEFAULT_SCORING, deriveWlen, scoreRecord } from "./bm25f.mjs";
 import { displayTitle } from "../store/format.mjs";
-import { recencyMultiplier } from "../ingest/priors.mjs";
 import { isArchivedLoc } from "../ingest/gitdir.mjs";
 import { pyRound9, cmpCodePoints } from "../compat/pyfloat.mjs";
 
 export class Corpus {
-  constructor(n = 0, totalWlen = 0.0, newestMtime = 0) {
-    this.n = n; this.totalWlen = totalWlen; this.newestMtime = newestMtime;
+  constructor(n = 0, totalWlen = 0.0) {
+    this.n = n; this.totalWlen = totalWlen;
   }
   get avgWlen() { return this.n ? this.totalWlen / this.n : 0.0; }
 }
@@ -32,23 +33,18 @@ function recordIsArchived(record, archivedDirs) {
 /** The score multiplier policy, in ONE place, for both candidate paths. */
 export class Weighting {
   constructor({
-    archivedWeight = 1.0, archivedDirs = new Set(),
-    supersededWeight = 1.0, recencyHalfLifeDays = 0.0,
-    newestMtime = 0, priority = [],
+    archivedDirs = new Set(), priority = [],
   } = {}) {
-    this.archivedWeight = archivedWeight;
+    // 🔴 The three DOCUMENT priors were REMOVED on 2026-09-13 (W-151, W-152):
+    // supersession, retirement and age are FACTS, not weights. `archivedDirs`
+    // stays because it is the fact's fallback for an index built before the
+    // `archived` record property shipped — it scales nothing.
     this.archivedDirs = archivedDirs;
-    this.supersededWeight = supersededWeight;
-    this.recencyHalfLifeDays = recencyHalfLifeDays;
-    this.newestMtime = newestMtime;
     this.priority = priority;   // [[prefix, weight], ...], longest-prefix wins
     Object.freeze(this);
   }
   get trivial() {
-    return this.archivedWeight === 1.0
-      && this.supersededWeight === 1.0
-      && this.recencyHalfLifeDays === 0.0
-      && this.priority.length === 0;
+    return this.priority.length === 0;
   }
   priorityFor(loc) {
     let best = 1.0, bestLen = -1;
@@ -59,27 +55,10 @@ export class Weighting {
     }
     return best;
   }
-  /** The multiplier for one record: archived x superseded x recency x priority. */
+  /** The multiplier for one record: per-source priority, and nothing else. */
   of(record) {
     if (this.trivial) return 1.0;
-    let weight = 1.0;
-    if (this.archivedWeight !== 1.0 && recordIsArchived(record, this.archivedDirs)) {
-      weight *= this.archivedWeight;
-    }
-    if (this.supersededWeight !== 1.0 && record.superseded) weight *= this.supersededWeight;
-    if (this.recencyHalfLifeDays > 0) {
-      weight *= recencyMultiplier(record.mtime ?? null, this.newestMtime, this.recencyHalfLifeDays);
-    }
-    if (this.priority.length) weight *= this.priorityFor(record.loc || "");
-    return weight;
-  }
-  withNewestMtime(mtime) {
-    return new Weighting({
-      archivedWeight: this.archivedWeight, archivedDirs: this.archivedDirs,
-      supersededWeight: this.supersededWeight,
-      recencyHalfLifeDays: this.recencyHalfLifeDays,
-      newestMtime: mtime, priority: this.priority,
-    });
+    return this.priorityFor(record.loc || "");
   }
 }
 
@@ -93,8 +72,7 @@ export function rank(
   const required = expansion && expansion.required ? expansion.required : queryHashes;
   const avgWlen = corpus.avgWlen;
 
-  let w = weighting || new Weighting();
-  if (w.recencyHalfLifeDays > 0 && corpus.newestMtime) w = w.withNewestMtime(corpus.newestMtime);
+  const w = weighting || new Weighting();
   const demote = !w.trivial;
 
   const scored = [];
@@ -116,8 +94,9 @@ export function rank(
 
   // W-111 — the DECLARED tie-break, in Arpit's ratified order:
   //     superseded -> recency -> priority -> id
-  // Every one of these is already a Weighting multiplier and every one ships
-  // as a no-op; this reads the same FACTS, only where the rounded scores tie.
+  // NONE of these is a weight: all three document priors were REMOVED on
+  // 2026-09-13 (W-151, W-152), so `superseded` and `mtime` reach ranking here
+  // and nowhere else. This reads the FACTS, only where the rounded scores tie.
   //
   // 🔴 `id` is compared by CODE POINT, never with `<` — W-107 hazard H1.
   scored.sort((A, B) => {
@@ -152,5 +131,8 @@ export function rank(
     score: s,
     archived,
     tie: tied.has(i),
+    // W-153 — the committed git timestamp in whole unix seconds, or `null` for
+    // a document outside git history. `null` is a claim, never an absence.
+    mtime: record.mtime ?? null,
   }));
 }

@@ -4,7 +4,7 @@
 
 `ask` cites a **document**. `answer` cites a **span** — `docs/mesh.md:L10-L13`
 — and it can only do that because it fetched the bytes and chunked them
-([ADR-ANSWER](../../../docs/adr/0006_answer.md)). `ask` is offline by default
+([SR-ANSWER](../../../records/0105_answer.md)). `ask` is offline by default
 (L4), holds statistics rather than text (L2), and therefore has nothing to
 count lines in.
 
@@ -42,7 +42,7 @@ every `ask` result has always carried.
   no seam for the differential law to break through. Nothing here computes or
   adjusts a BM25F score, and nothing here may.
 - **It must never read the working tree.** That is `query/rerank.py`'s job and
-  the reason ADR-RERANK is carved out of ADR-ASK's directory claim. This reads
+  the reason SR-RERANK is carved out of SR-ASK's directory claim. This reads
   one committed record and nothing else.
 
 A `hashed` record carries no `phrases` at all — `store/writer.py` refuses to

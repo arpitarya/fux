@@ -3,14 +3,14 @@
  *  Twin of `src/fux/query/__init__.py`'s `find` half (R4's one-to-many).
  *
  * 🔴 **It goes through `runQuery`, not `scan.ask`.** That is the whole of
- * [ADR-NODE-SEARCH](../../../docs/adr/0155_node-search.md) decision 8 at the
+ * [SR-NODE-SEARCH](../../../records/0153_node-search.md) decision 8 at the
  * call site: `scan.ask` skips `.fux/tune.toml`, the archived weighting and the
  * reranker, and calling it here is what made a tuned repo answer differently in
  * the two runtimes.
  *
  * **stdout is BARE PATHS.** No `[archived]` marker, no filter note, no band —
  * `find` exists to be piped, and anything else on stdout is read by `xargs` as
- * a filename (ADR-DIR-LIST decision 12). Every note goes to stderr; the flags
+ * a filename (SR-DIR-LIST decision 12). Every note goes to stderr; the flags
  * are carried in `--json`, which is where a machine reader should look.
  */
 import { runFused } from "../query/run.mjs";
@@ -84,22 +84,24 @@ function declareFilters(args, dropped) {
   );
 }
 
-/** ADR-ARCHIVED-CONTENT decision 7: a response-level note when any archived
+/** SR-ARCHIVED-CONTENT decision 7: a response-level note when any archived
  *  document is returned. **stderr, never stdout.** ASCII only — a Windows
  *  console's default codepage cannot encode a fancy dash and the process
  *  crashes on write rather than degrading. */
-export function declareArchived(results, weight) {
+export function declareArchived(results) {
   const n = results.filter((r) => r.archived).length;
   if (!n) return;
-  const demoted = weight !== 1.0 ? ` (demoted, weight ${weight.toFixed(2)})` : "";
+  // The `(demoted, weight N)` clause went with `archived_weight` on 2026-09-13
+  // (W-152): being retired can no longer move a score, so there is no demotion
+  // to disclose — only the fact, which is what decision 3 always promised.
   process.stderr.write(
-    `note: ${n} of ${results.length} results are from archived sources${demoted}` +
+    `note: ${n} of ${results.length} results are from archived sources` +
     " - retired from the live corpus. An archived document records what was" +
     " true when it was retired, not what is true now.\n",
   );
 }
 
-/** ADR-CONFIDENCE decision 4: the band on stderr, never stdout, and only under
+/** SR-CONFIDENCE decision 4: the band on stderr, never stdout, and only under
  *  `--band` — under which `grounded` prints too, because a flag that goes quiet
  *  exactly when the answer is good reads as broken. */
 export function declareConfidence(block, show) {
@@ -123,11 +125,11 @@ export function runFind(root, args) {
       results: results.map((r) => ({ ...r, headings: headingsFor(recordFor(root, r.id), query) })),
     };
     if (fused) payload.fused = true;
-    // ADR-CONFIDENCE decision 11: present ONLY under --band. **Absent means
+    // SR-CONFIDENCE decision 11: present ONLY under --band. **Absent means
     // NOT ASKED FOR — it is never a claim about the answer.**
     if (confidence && args.band) payload.confidence = confidence.asDict();
     process.stdout.write(JSON.stringify(payload, null, 2) + "\n");
-    declareArchived(results, tune.archivedWeight);
+    declareArchived(results);
     return 0;
   }
 
@@ -137,7 +139,7 @@ export function runFind(root, args) {
     return 0;
   }
   for (const r of results) process.stdout.write(`${r.loc}\n`);
-  declareArchived(results, tune.archivedWeight);
+  declareArchived(results);
   declareConfidence(confidence, args.band);
   return 0;
 }

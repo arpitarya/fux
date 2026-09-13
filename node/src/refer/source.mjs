@@ -5,6 +5,8 @@
  * imports no transport and has no fetcher seam to inject one through. A `url:`
  * document reads `.fux/acquired/` if the blob is retained, and otherwise the
  * caller falls back to `source: "index"`.
+ *
+ * Owned, with its Python twin, by [SR-URL-FRESHNESS](../../../records/0147_url-freshness.md).
  */
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";

@@ -1,6 +1,6 @@
 """`.fux/.fuxignore` — the grammar, the precedence, and the duplicate warning.
 
-ADR-FUXIGNORE. Three properties carry the record, and each has its own block
+SR-FUXIGNORE. Three properties carry the record, and each has its own block
 below:
 
 1. **The grammar is git's**, including the two rules people get wrong —
@@ -8,7 +8,7 @@ below:
    re-included.
 2. **It outranks the type allowlist in both directions.** An ignore beats an
    allow; an explicit `!` beats a *dis*allow. The second half is the one that
-   changed a decided ADR, so it is pinned here rather than left to the walk.
+   changed a decided SR, so it is pinned here rather than left to the walk.
 3. **A pattern stated in two files warns and changes nothing.** The warning is
    early for the day someone edits one copy — `!` means opposite things in the
    two files.
@@ -151,7 +151,7 @@ def test_an_ignore_beats_the_type_allowlist(tmp_path):
 
 
 def test_an_explicit_re_include_beats_the_type_allowlist(tmp_path):
-    """ADR-FUXIGNORE decision 4's sharp half, and the one that moved ADR-TYPES.
+    """SR-FUXIGNORE decision 4's sharp half, and the one that moved SR-TYPES.
 
     `.py` is in no allowlist and has no decoder. A `!` line indexes it anyway,
     as raw bytes — visible in one committed file, and only ever because someone
@@ -225,7 +225,7 @@ def test_no_fuxignore_means_no_warnings_however_many_exclusions_exist(tmp_path):
 
 
 def test_the_types_list_has_no_exclusions_to_duplicate(tmp_path):
-    """ADR-TYPES decision 12: `.fux/formats.toml` has no `!`, so the warning's types
+    """SR-TYPES decision 12: `.fux/formats.toml` has no `!`, so the warning's types
     half is gone rather than silently always-empty."""
     import inspect
 

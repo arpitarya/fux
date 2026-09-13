@@ -2,13 +2,13 @@
 # `.fux/sources/urls`, one entry per line.
 #
 # EVERY KEY, WHAT IT MEANS AND WHAT IT DEFAULTS TO IS IN ONE PLACE:
-#   https://github.com/arpitarya/fux/blob/main/docs/adr/0113_config.md
-# Ranking knobs are not here at all -- they live in .fux/tune.toml (ADR-TUNE):
-#   https://github.com/arpitarya/fux/blob/main/docs/adr/0135_tuning.md
+#   https://github.com/arpitarya/fux/blob/main/records/0113_config.md
+# Ranking knobs are not here at all -- they live in .fux/tune.toml (SR-TUNE):
+#   https://github.com/arpitarya/fux/blob/main/records/0135_tuning.md
 #
 # This file does not explain its own keys, deliberately: a comment that
 # describes a key can drift from the record that decides it while both still
-# look correct (ADR-LAW-0 decision 4). A key fux does not know is REFUSED by
+# look correct (SR-LAW-0 decision 4). A key fux does not know is REFUSED by
 # name, so a typo here fails loudly instead of sitting inert.
 
 [sources]

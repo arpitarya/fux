@@ -41,7 +41,7 @@ jobs:
         # 🔴 **Built here, before either registry job exists**, because the two
         # halves are not symmetric: PyPI publishes automatically via OIDC and npm
         # STAGES and waits for a human. A bundle built per-job could ship two
-        # registries disagreeing about what `2.x.y` is (ADR-NODE-SEARCH
+        # registries disagreeing about what `2.x.y` is (SR-NODE-SEARCH
         # decision 14). The wheel gets the same artefact from `hatch_build.py`,
         # which runs the same deterministic bundler over the same sources.
         run: PYTHONPATH=src python -m fux.store.nodebundle node node/dist

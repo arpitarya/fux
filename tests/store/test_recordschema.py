@@ -2,7 +2,7 @@
 
 The shape used to live in four places — assembled inline twice in
 `ingest/run.py`, policed by `DISPLAY_FIELDS` in `store/writer.py`, carried by
-`EXTRACTED_FIELDS` in `ingest/run.py`, and described in prose by ADR-RECORD —
+`EXTRACTED_FIELDS` in `ingest/run.py`, and described in prose by SR-RECORD —
 and **nothing compared them**. Adding a display field meant remembering to touch
 a tuple in a different module, and forgetting was silent: the field shipped and
 L5's check simply did not look at it.
@@ -118,7 +118,7 @@ def test_a_field_the_template_does_not_declare_is_refused():
 
 
 def test_omit_when_false_leaves_the_field_out_entirely():
-    """ADR-ARCHIVED-CONTENT decision 1: absent, not false, so a live record's
+    """SR-ARCHIVED-CONTENT decision 1: absent, not false, so a live record's
     shape is unchanged and no existing consumer's parse breaks."""
     record = recordschema.build(id="file:a.md", src="git", loc="a.md", sha="s",
                                ver=0, mode="extracted", meta="plain", archived=False)

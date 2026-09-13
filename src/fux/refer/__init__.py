@@ -49,7 +49,7 @@ a different policy is indistinguishable from a replay that reproduced.
 
 **R4 is unmeasured** — the cold/warm latency prediction runs in `fux-lab`, and
 `fux-lab` does not exist (W-56). So this plane is built and unproven, and
-ADR-REFER says so rather than claiming a gate it did not pass.
+SR-REFER says so rather than claiming a gate it did not pass.
 """
 
 from __future__ import annotations
@@ -329,7 +329,7 @@ def _declared_ttls(root) -> dict[str, int]:
     common path costs no file read and gains no new failure mode. When the
     caller HAS opted in, a malformed URL list raises here exactly as it does
     in `fux ingest` -- a file that exists and is wrong is the case a loader
-    refusal is for (ADR-DOTFUX).
+    refusal is for (SR-DOTFUX).
 
     The three layers -- built-in default, `[sources.url] ttl`, the line -- are
     resolved by `resolve_urls`, the same function that resolves `keep`. This

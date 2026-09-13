@@ -18,7 +18,7 @@
  * `json` is resolved FIRST and separately, because it selects which chain
  * every other key walks.
  *
- * ⚠ **A MISSING file is not an error** (ADR-OUTPUT decision 20): it returns the
+ * ⚠ **A MISSING file is not an error** (SR-OUTPUT decision 20): it returns the
  * absent sentinel, which resolves every key to the built-in. The file is
  * write-if-missing, so it reaches new repos only, and refusing without it would
  * break every repo that predates it. *"Once it is in effect"* is the rule that
@@ -97,7 +97,7 @@ const REFUSED = {
 };
 
 const MCP_REFUSED = {
-  band: "the confidence block is UNCONDITIONAL over MCP (ADR-CONFIDENCE " +
+  band: "the confidence block is UNCONDITIONAL over MCP (SR-CONFIDENCE " +
     "decision 11) — a tool call cannot pass a flag",
   json: "an MCP result is always JSON — there is no rendering to switch",
 };

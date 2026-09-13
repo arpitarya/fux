@@ -342,7 +342,7 @@ def test_an_unknown_condition_raises_rather_than_being_ignored():
 
 
 def test_transport_conditions_are_rejected_by_name():
-    # ADR-FETCHER decision 13. These are the three that were specified and
+    # SR-FETCHER decision 13. These are the three that were specified and
     # then removed; naming them in a test is what stops them drifting back.
     for key, value in (
         ("status", "[403]"),

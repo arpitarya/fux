@@ -72,7 +72,7 @@ inside the R3 bar, or is a T2 tier needed?**
 This is [W-26](../../work/open/W-26-m6-scale-t2.md)'s **first** question, and it
 is asked before T2 is built rather than after. `tpack`, mmap byte-aligned
 segments, partial clone and external-shards-only committing are all downstream
-of it: if T1 clears the bar, the honest close is `ADR-T2-SEGMENTS` recording
+of it: if T1 clears the bar, the honest close is `SR-T2-SEGMENTS` recording
 **why T2 was not built**.
 
 **What a FAIL would mean:** T1 is not sufficient at the design point and M6
@@ -134,8 +134,8 @@ the same.
 
 | outcome | condition | consequence |
 |---|---|---|
-| **PASS** | worst-population p95 **≤ 150 ms** at 10 000 documents | **T2 is not built.** `ADR-T2-SEGMENTS` is written as the record of a decision *not* to build, naming the measurement and the size at which it was taken |
-| **FAIL** | worst-population p95 **> 150 ms** at 10 000 documents | T1 is insufficient at the design point; M6 builds T2 and `ADR-T2-SEGMENTS` records the format |
+| **PASS** | worst-population p95 **≤ 150 ms** at 10 000 documents | **T2 is not built.** `SR-T2-SEGMENTS` is written as the record of a decision *not* to build, naming the measurement and the size at which it was taken |
+| **FAIL** | worst-population p95 **> 150 ms** at 10 000 documents | T1 is insufficient at the design point; M6 builds T2 and `SR-T2-SEGMENTS` records the format |
 
 There is **no ambiguous band**: the bar is a hard inequality on a continuous
 quantity, and inventing a tolerance would be the looser restatement the rule

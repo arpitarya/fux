@@ -9,10 +9,10 @@ timestamp: 2026-08-22T00:00:00Z
 
 # T2 segments — measured, and not built
 
-> ## MOVED OUT OF `docs/adr/` ON 2026-08-22, BY ARPIT'S INSTRUCTION.
+> ## MOVED OUT OF `records/` ON 2026-08-22, BY ARPIT'S INSTRUCTION.
 >
-> This was **ADR-T2-SEGMENTS (0037)**, `accepted`. Arpit ruled it should not be
-> a record: *"move the document to proposals and remove the ADR completely."*
+> This was **SR-T2-SEGMENTS (0037)**, `accepted`. Arpit ruled it should not be
+> a record: *"move the document to proposals and remove the SR completely."*
 > **Number 0037 is retired and is never reused.**
 >
 > **Read this as a kept idea, not as a decision with force.** A proposal has no
@@ -22,14 +22,14 @@ timestamp: 2026-08-22T00:00:00Z
 >
 > ### ⚠ Two departures recorded so they are not mistaken for precedent
 >
-> **1. CLAUDE.md says *"the decisions that rest on a verdict live in `docs/adr/`
+> **1. CLAUDE.md says *"the decisions that rest on a verdict live in `records/`
 > and cite it."* This no longer does.** [R9](../regression/2026-08-22-r9-t2-at-10k/VERDICT.md)
 > is a filed verdict whose decision now lives in `work/proposals/`. **That is a
 > departure from a stated law, taken on Arpit's explicit instruction after the
 > consequence was put in front of him — not an interpretation, and not a new
 > general rule.** The law is unchanged for every other verdict.
 >
-> **2. Two frozen files still cite `ADR-T2-SEGMENTS` and always will.**
+> **2. Two frozen files still cite `SR-T2-SEGMENTS` and always will.**
 > [`tools/t2-eval/PRE-REGISTRATION.md`](../../tools/t2-eval/PRE-REGISTRATION.md)
 > names it in its own verdict table, and R9's `VERDICT.md` cites its old path.
 > **Neither may be edited** — a frozen pre-registration and a filed verdict are
@@ -101,7 +101,7 @@ Byte-aligned mmap segments were motivated by query latency at 10⁵–10⁶
 documents. On 2026-08-21 Arpit moved the design point to **10 000**, and W-26
 was re-scoped with an explicit instruction: *"The first question this milestone
 now asks is whether T2 earns its place at 10k, and 'no' is a legitimate answer
-that closes it with an ADR instead of a build."*
+that closes it with an SR instead of a build."*
 
 Three facts framed the question:
 
@@ -193,7 +193,7 @@ gets an answer built for a speed problem.
 - **Set a fresh, tighter bar for T2 than R3's 150 ms.** Rejected as the exact
   inversion the pre-registration rule forbids: the number would have been
   chosen knowing 27.2 ms had already been measured.
-- **Retire the name `ADR-T2-SEGMENTS` and write nothing.** Rejected: W-26
+- **Retire the name `SR-T2-SEGMENTS` and write nothing.** Rejected: W-26
   reserved the name and its DoD requires the record *"either as the record of
   the segment format, or as the record of the decision not to need one yet."*
   A milestone that quietly drops its largest item leaves no trace of why.

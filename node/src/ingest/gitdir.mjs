@@ -7,7 +7,7 @@
  * declared archived, and whether a `loc` falls under one.
  *
  * **The ranking keys off the source list, never a path convention**
- * (ADR-DIR-LIST decision 4), which is why this is read at query time at all
+ * (SR-DIR-LIST decision 4), which is why this is read at query time at all
  * rather than trusted to the `archived` property already on each record. The
  * property is stamped at ingest; the declaration is live. They agree until
  * somebody edits the list, and the whole point of the live read is the window

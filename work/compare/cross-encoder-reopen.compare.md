@@ -62,7 +62,7 @@ exists but targets threading, not ISA — **it would not help.**
 **0c. ⚠ THIS DOCUMENT ARGUED AGAINST THE WRONG MODEL, and Arpit caught it.**
 
 Everywhere below that says *"a 22M MiniLM"* was **my gloss, not the record's**.
-The record specifies neither MiniLM nor 22M. `ADR-RERANK` decision 1 quotes
+The record specifies neither MiniLM nor 22M. `SR-RERANK` decision 1 quotes
 W-76 Phase 6 as *"17–32 M cross-encoder"*, and
 `proposals/ideal/README.md` (archived 2026-08-25) names the source:
 **Ettin**, whose reranker line is **17.6M / 32.8M** — which is exactly where
@@ -242,7 +242,7 @@ was not enough. Reopen when **either**:
 - **The cheapest thing that would settle leg 1 is to run Ettin-17M once**, on a
   graded set, offline, ignoring determinism entirely — purely to learn the
   number. ⚠ **Written when that meant the playground's 50 goldens**, which
-  [L9](../../docs/adr/0011_LAW-9-environments.md) retired on 2026-09-11; the
+  [SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md) retired on 2026-09-11; the
   cheapest thing is now **more expensive than this bullet says**, because the
   set it assumed does not exist. It cannot ship, but it would replace *"unproven"* with
   a measurement, and §0c means the current argument is not entitled to assume

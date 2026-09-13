@@ -25,18 +25,18 @@ Nothing here is decided and nothing is built.
   lever.** Four ids changed band; none changed answerability. `u017` slid to
   `weak` and still reported `answerable: true`.
 
-**Why it happens** — [ADR-CONFIDENCE](../../docs/adr/0142_confidence.md)
+**Why it happens** — [SR-CONFIDENCE](../../records/0141_confidence.md)
 decision 3: `answerable` is `false` **only when nothing scored above zero**. A
 question built from the corpus's own words — *"the names of all four regions"*,
 where the corpus says *"four regions"* and never names them — always scores
 something, so it can never abstain.
 
-**Why it matters** — [ADR-QUALITY](../../docs/adr/0141_quality-contract.md)
+**Why it matters** — [SR-WORK-QUALITY](../../records/0056_WORK-quality.md)
 decision 5 puts `unanswerable` **inside** the quality gate. Today every
 `recall@k` headline describes **the answerable half only**, and an agent asking
 fux something the documents do not say gets a confident, cited answer.
 
-⚠ **A contradiction worth naming:** ADR-CONFIDENCE's own band table says a
+⚠ **A contradiction worth naming:** SR-CONFIDENCE's own band table says a
 `weak` result means *"do not answer"*, while the same result carries
 `answerable: true`. An agent that reads the boolean — which is what decision 5
 tells it to read — answers anyway.
@@ -48,7 +48,7 @@ tells it to read — answers anyway.
 | | option | what changes | cost | risk |
 |---|---|---|---|---|
 | **A** | **Disclose only** | `fux doctor` gains a row: *"`answerable` was false in 0 of the last N answers"* — a fact, never a recommendation (the re-run's ANALYSIS, improvement 1). Reports keep printing the unanswerable class beside the headline | small | agents still get confident answers to questions nobody can answer; the gap is visible, not smaller |
-| **B** | **Gate quality claims** | Until the `unanswerable` class scores above 0, **no quality number is quoted without *"abstains 0 of N"* beside it**, and the funnel's `answered` gate reports that class as failing. An ADR-QUALITY amendment, no code | small | none to the engine; it makes every headline honest and less flattering |
+| **B** | **Gate quality claims** | Until the `unanswerable` class scores above 0, **no quality number is quoted without *"abstains 0 of N"* beside it**, and the funnel's `answered` gate reports that class as failing. An SR-WORK-QUALITY amendment, no code | small | none to the engine; it makes every headline honest and less flattering |
 | **C** | **Build abstention, measure it in fux-lab** | A compare doc picks a mechanism, then a build item. Candidates: **C1** turn on the per-document coverage gate (`doc_coverage`, off since a 2026-08-28 measurement); **C2** make `weak` imply `answerable: false`, resolving the contradiction above; **C3** a passage-level check in the refer plane — the fetched bytes must contain the query's content terms together | medium–large | a mechanism that abstains too often refuses real questions; that is why it must be pre-registered with both directions' headroom |
 
 ### What C must not do
@@ -56,14 +56,14 @@ tells it to read — answers anyway.
 - 🔴 **Never tune or threshold on these 20 questions.** They exposed the problem;
   fitting a floor to them is the moving-threshold failure. They stay a frozen
   control.
-- **Measure only in fux-lab, on the golden test data** — [L9](../../docs/adr/0011_LAW-9-environments.md).
+- **Measure only in fux-lab, on the golden test data** — [SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md).
   The golden set's `unanswerable` class (about 10 % of ~100 questions, W-136) is
   the fresh, blind set.
 - ⚠ **Power:** about 10 unanswerable questions against a baseline of 0 means only a
-  large effect clears ADR-RS decision 19's floor (a net of 6). If C is chosen,
+  large effect clears SR-RS decision 19's floor (a net of 6). If C is chosen,
   the golden key may need more `unanswerable` questions — a Codex task, never
   Claude's.
-- **Pre-register both directions** (ADR-RS decision 22): more abstentions on
+- **Pre-register both directions** (SR-RS decision 22): more abstentions on
   unanswerable questions, and no new abstentions on answerable ones.
 
 ---
@@ -78,7 +78,7 @@ tells it to read — answers anyway.
   between `weak` and `answerable` in place.
 - **C is the real fix**, but it needs the golden ladder (W-136) to exist and a
   compare doc to choose between C1–C3; starting it before either would repeat
-  the playground mistake L9 exists to stop.
+  the playground mistake SR-WORK-ENVIRONMENTS exists to stop.
 
 ---
 
@@ -87,7 +87,7 @@ tells it to read — answers anyway.
 **Graduates when Arpit picks A, B, C or a combination.**
 
 - **A** → a `fux doctor` build item.
-- **B** → an ADR-QUALITY amendment, filed as an `adr update` item.
+- **B** → an SR-WORK-QUALITY amendment, filed as an `adr update` item.
 - **C** → a compare doc under `work/compare/` (C1 vs C2 vs C3), then a build item
   whose measured run waits on W-136's frozen ladder.
 
@@ -98,10 +98,10 @@ tells it to read — answers anyway.
 - [2026-08-28 run](../regression/2026-08-28-blind-unanswerable/report.md) ·
   [2026-09-11 re-run](../regression/2026-09-11-blind-unanswerable-rerun/report.md) and its
   [ANALYSIS](../regression/2026-09-11-blind-unanswerable-rerun/ANALYSIS.md)
-- [ADR-CONFIDENCE](../../docs/adr/0142_confidence.md) decisions 3 and 5 ·
-  [ADR-QUALITY](../../docs/adr/0141_quality-contract.md) decision 5 ·
-  [ADR-RS](../../docs/adr/0133_predictions.md) decisions 19 and 22 ·
-  [ADR-LAW-9](../../docs/adr/0011_LAW-9-environments.md)
+- [SR-CONFIDENCE](../../records/0141_confidence.md) decisions 3 and 5 ·
+  [SR-WORK-QUALITY](../../records/0056_WORK-quality.md) decision 5 ·
+  [SR-RS](../../records/0133_predictions.md) decisions 19 and 22 ·
+  [SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md)
 - Rajpurkar, Jia & Liang, *Know What You Don't Know: Unanswerable Questions for
   SQuAD*, ACL 2018 — https://arxiv.org/abs/1806.03822
 - Kamath, Jia & Liang, *Selective Question Answering under Domain Shift*, ACL 2020 —

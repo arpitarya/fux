@@ -20,7 +20,7 @@ prediction runs was visible on disk. Those numbers are recorded in
 consequences, both deliberate:
 
 1. **They do not count.** They measured a build without delta ingest
-   ([ADR-INGEST](../../docs/adr/0007_ingest.md) decision 1b), which changed
+   ([SR-INGEST](../../records/0007_ingest.md) decision 1b), which changed
    ingest cost by more than an order of magnitude. The engine they described no
    longer exists.
 2. **Whoever writes this file already has an idea where the threshold falls.**
@@ -101,7 +101,7 @@ is anything the run reveals about the threshold's own construction — for
 instance, if the number is dominated by a component the prediction plainly did
 not have in mind.
 
-**A FAIL is a shipped result.** [ADR-MAINTENANCE](../../docs/adr/0033_hooks.md)
+**A FAIL is a shipped result.** [SR-MAINTENANCE](../../records/0033_hooks.md)
 veto condition 1 already states what changes: *"`post-commit` is too slow to be
 automatic and the hook becomes opt-in or incremental in a way it currently is
 not."* Tuning the hook to pass is explicitly forbidden by
@@ -171,6 +171,6 @@ the treatment arm.** A tier that merges cleanly in *both* is reported as
   octopus merges.** Two-parent merges only.
 - **Not an add/add shard conflict.** git does not invoke a content merge driver
   when a file is added on both sides with no common ancestor; that limitation is
-  recorded in ADR-MAINTENANCE and is out of scope here.
+  recorded in SR-MAINTENANCE and is out of scope here.
 - **Not concurrent *processes*.** One writer at a time is assumed; the
   prediction is about branches, not about two `fux ingest` runs racing.

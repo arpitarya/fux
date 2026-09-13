@@ -13,7 +13,7 @@ problem rather than an access-control problem.
 | plane | PII | why |
 |---|---|---|
 | `.fux/index/` | **redacted** | committed, cloned, travels to every machine |
-| `.fux/acquired/` | raw | gitignored; it must stay the exact bytes the source returned, or the `as-ingested` verdict is a lie (ADR-URL-FRESHNESS decision 6) |
+| `.fux/acquired/` | raw | gitignored; it must stay the exact bytes the source returned, or the `as-ingested` verdict is a lie (SR-URL-FRESHNESS decision 6) |
 | `runtime/display-cache` | as extracted | gitignored, local, and derived from the redacted text anyway |
 | `refer` passages, `fux answer` | raw | read from the source or the retained bytes under the reader's own access, and never committed |
 
@@ -46,7 +46,7 @@ as PII* is a policy question that differs by jurisdiction, industry and
 corpus, and a floor fux imposed would be both wrong somewhere and impossible
 to switch off.
 
-⚠ **The file itself is required** (ADR-PII decision 17): `fux setup` writes the
+⚠ **The file itself is required** (SR-PII decision 17): `fux setup` writes the
 starter, `load()` raises without it, and the CLI refuses every verb but
 `setup`, `tune`, `output` and `doctor`. A file with no rules is legal and
 redacts nothing -- that is a committed choice. A missing file is an accident.
@@ -59,7 +59,7 @@ of order ids and timestamps. `validate = "luhn"` or `validate = "verhoeff"`
 makes a rule replace **only the matches whose digits pass**. The set is closed
 and engine-owned rather than a consumer hook: a hook is consumer code running
 inside ingest, and determinism would stop being this engine's guarantee and
-become each consumer's (ADR-PII decision 16).
+become each consumer's (SR-PII decision 16).
 
 ## Determinism
 
@@ -108,7 +108,7 @@ _FLAGS: dict[str, int] = {
 # passes Luhn, and passes Verhoeff, one time in ten. `validate` cuts a
 # shape-only rule's false positives by about an order of magnitude and never to
 # zero -- which is why the starter still ships both checksum rules commented
-# out (ADR-PII decision 12).
+# out (SR-PII decision 12).
 
 _ASCII_DIGITS = "0123456789"
 
@@ -188,7 +188,7 @@ def verhoeff(text: str) -> bool:
 
 #: Checksum validators a rule may name. A CLOSED set, like `_FLAGS`: an
 #: unknown name raises at load. ⚠ **Not a plugin point, on purpose** — a
-#: consumer-supplied function would be consumer code inside ingest (ADR-PII
+#: consumer-supplied function would be consumer code inside ingest (SR-PII
 #: decision 16). A new scheme is added here, with its test vectors, or not at all.
 _VALIDATORS: dict[str, Callable[[str], bool]] = {
     "luhn": luhn,
@@ -284,7 +284,7 @@ def rules_path(root: Path) -> Path:
 
 
 def require(root: Path) -> Path:
-    """`.fux/pii.toml`, or `FuxError` naming the fix. ADR-PII decision 17.
+    """`.fux/pii.toml`, or `FuxError` naming the fix. SR-PII decision 17.
 
     The one place the refusal is worded: `load()` calls it, and the CLI gate
     calls it on the path where the file is missing, so a person meets the same
@@ -293,7 +293,7 @@ def require(root: Path) -> Path:
     path = rules_path(root)
     if not path.is_file():
         raise FuxError(
-            f"{path.relative_to(root).as_posix()} is missing, and fux will not run without it (ADR-PII decision 17). "
+            f"{path.relative_to(root).as_posix()} is missing, and fux will not run without it (SR-PII decision 17). "
             "Run `fux setup` to write the starter, then review its rules; to redact "
             "nothing, keep the file with no [[rule]] entries."
         )

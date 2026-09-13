@@ -76,7 +76,7 @@ quality and authors; several edited by more than one person over time.
 | 02 | `02-sensor-thresholds.yaml` | legacy YAML used as documentation | ~120–180 lines | Gregor, one later edit by someone else | comments explain setpoints; deprecated keys left in; **one block in °F**; a comment that disagrees with its value |
 | 03 | `03-postmortem-nagpur-vaccine-excursion.md` | Markdown, **malformed** frontmatter (wrong key names, `12/03/25`-style date) | ~800–1 000 words | Revathi, written in a hurry | timeline table, root cause, action items with owners — some actions never followed up |
 | 04 | `04-night-shift-handover-log.txt` | plain text, no structure | ~1 000–1 400 words | Bunty + 2–3 other shift leads, appended over months | dated entries, typos, shorthand, repeated issues, one entry quietly describes a workaround that breaks the SOP |
-| 05 | `05-decision-telematics-vendor-2023.md` | old ADR style, **no frontmatter**, `Status: Accepted` line | ~600–800 words | Col. Sandhu + IT | chooses Kalpa Fleet Systems, with reasons and numbers |
+| 05 | `05-decision-telematics-vendor-2023.md` | old SR style, **no frontmatter**, `Status: Accepted` line | ~600–800 words | Col. Sandhu + IT | chooses Kalpa Fleet Systems, with reasons and numbers |
 | 06 | `06-re-fw-telematics-cutover.eml` | email thread (RFC 822 headers, quoted replies, signatures) | ~800–1 100 words, 5–7 messages | Farhan, Tomás, Anjali, Col. Sandhu | **supersedes 05** — the switch to Tessaline is decided mid-thread, a date slips, a cost changes |
 | 07 | `07-rate-card-and-surcharges.md` | Markdown tables + footnotes | **small**, ~200–300 words | Anjali | 2024 vs 2026 rates; **a footnote revises the diesel surcharge and the table was not updated** |
 | 08 | `08-driver-hours-and-safety-policy.md` | Markdown + frontmatter that says `status: draft` although the text says it is in force | ~1 400–1 800 words | Col. Sandhu, amended by Meera | numbered legal-style clauses, one clause amended inline "(amended …)" |
@@ -91,7 +91,7 @@ at least one fact that needs two documents together.
 
 ## 2 · Why feature coverage is part of this prompt
 
-**[ADR-RS](../../../docs/adr/0133_predictions.md) decision 23: a feature is measured
+**[SR-RS](../../../records/0133_predictions.md) decision 23: a feature is measured
 only on data that contains the input it acts on.** fux has three ranking priors
 that read inputs the ten base documents do not provide:
 

@@ -1,4 +1,4 @@
-"""ADR-PROVENANCE — the derivation, the receipt, the journal, and `verify`.
+"""SR-PROVENANCE — the derivation, the receipt, the journal, and `verify`.
 
 **What these tests are asserting, and what they deliberately are not.**
 
@@ -450,7 +450,7 @@ class _Args:
         self.receipt = False
         self.journal = False
         self.why = False
-        # ADR-CONFIDENCE decision 11 gates the CLI's confidence block behind
+        # SR-CONFIDENCE decision 11 gates the CLI's confidence block behind
         # `--band`. On by default HERE because this file's subject is the
         # receipt and the derivation, both of which quote the block — a test
         # about provenance must not silently become a test about the gate.
@@ -543,7 +543,7 @@ def test_every_answer_branch_validates_against_the_output_contract(tmp_path, mon
     """⚠ The declaration claimed this and only one branch did it.
 
     `output.schema.json` says *"`fux answer --json` is validated against this
-    before it is printed"*. Until ADR-PROVENANCE only the no-match branch went
+    before it is printed"*. Until SR-PROVENANCE only the no-match branch went
     through `_emit`; the refer and index branches printed unvalidated. Same
     defect class as W-84's MCP tool descriptions — a promise in a machine-facing
     declaration that nothing enforced.
@@ -725,7 +725,7 @@ def test_two_missing_digests_never_compare_equal(tmp_path):
 
 
 def test_verify_never_reaches_the_network(tmp_path):
-    """⚠ ADR-PROVENANCE decision 14 / veto 3, made mechanical.
+    """⚠ SR-PROVENANCE decision 14 / veto 3, made mechanical.
 
     `verify` answers *does this reproduce from what is committed* — a question
     with the same answer on every machine. A fetching `verify` would make one
@@ -755,7 +755,7 @@ def test_verify_never_reaches_the_network(tmp_path):
 
 
 def test_the_receipt_shape_does_not_vary_by_config(tmp_path, monkeypatch):
-    """⚠ ADR-PROVENANCE decision 15's refusal, made mechanical.
+    """⚠ SR-PROVENANCE decision 15's refusal, made mechanical.
 
     `.fux/output.toml` may change what is EMITTED; it may not make one artifact
     two shapes. Two receipts of the same answer must be identical, which is the
@@ -764,7 +764,7 @@ def test_the_receipt_shape_does_not_vary_by_config(tmp_path, monkeypatch):
     from fux.output_config import CLI_VERBS, MCP_KEYS
 
     # ⚠ This read `SCHEMA` until 2026-08-28 and had been an ImportError since
-    # ADR-OUTPUT decision 19 split that one dict into `CLI_VERBS` (the
+    # SR-OUTPUT decision 19 split that one dict into `CLI_VERBS` (the
     # `[cli]`/`[cli.json]` side, per verb) and `MCP_KEYS` (the `[mcp]` side).
     # An assertion that cannot import is an assertion that never ran, so this
     # walks BOTH key sets now — the guarantee is about every configurable key,

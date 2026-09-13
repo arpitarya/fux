@@ -50,9 +50,9 @@ runbooks, specs, wiki pages — committed to git and read by agents.*
 | 4.5 glossary | **applied** | `docs/GLOSSARY.md` → **Documents, not code**, the three facts of §1, so `fux ask` has a live answer on fux's own repo. |
 | 4.6 `docs/index.md` | n/a | Nothing implied code analysis. (It changed for §6 instead.) |
 | 4.7 paper | **applied** | `work/paper/the-fux-index-paper.md:155-156` — the non-existent *symbol edges* are gone. |
-| 4.8 agent templates | **applied** (proposal said low priority) | All three usage renderings + their five installed copies: *"this codebase's history or design"* → *"this project's"*. Recorded as an amendment in [ADR-AGENT-POLICY](../../docs/adr/0132_agent-policy.md), with why `policy-version` stays at 1. |
+| 4.8 agent templates | **applied** (proposal said low priority) | All three usage renderings + their five installed copies: *"this codebase's history or design"* → *"this project's"*. Recorded as an amendment in [SR-AGENT-POLICY](../../records/0132_agent-policy.md), with why `policy-version` stays at 1. |
 | 4.8 GitHub About/topics | **still open** | Not reachable from a Cowork session. Arpit's hands: `gh repo view arpitarya/fux --json description,repositoryTopics`. |
-| **5** `code` edge kind | **glossary only** | Arpit chose the cheap alternative. New entry **`code` (edge kind)** in the glossary; **the rename to `path` was NOT done** and stays owned by [ADR-GRAPH](../../docs/adr/0126_graph.md). |
+| **5** `code` edge kind | **glossary only** | Arpit chose the cheap alternative. New entry **`code` (edge kind)** in the glossary; **the rename to `path` was NOT done** and stays owned by [SR-GRAPH](../../records/0126_graph.md). |
 | **6** OKF | **option (b)** | See below. |
 
 ### §6 — option (b), and the two places it could not be applied literally
@@ -64,7 +64,7 @@ runbooks, specs, wiki pages — committed to git and read by agents.*
    declare a `type` — `OPEN-WORK` (Queue), `WORKLOG` (Log), `GLOSSARY`
    (Glossary), `DOC-REGISTRY` (Registry), `IMPLEMENTATION` (Milestone Log),
    `INTERVIEW` (Handoff), `MACHINE` (Runbook), `NOW` (Pointer),
-   `governance.md` (Governance), the ADR register (Register), and every
+   `governance.md` (Governance), the SR register (Register), and every
    directory `README.md` (Index). `CLAUDE.md` and `docs/index.md` both updated.
 2. **`work/regression/*/evidence/**` is declared outside the bundle**, as (b)
    said. Evidence is cited *by* a document; it is not one.
@@ -88,7 +88,7 @@ runbooks, specs, wiki pages — committed to git and read by agents.*
 
 - **`src/fux/frontmatter.py:3`** — *"the zero-dependency guarantee made
   concrete"*, a promise L1's 2026-09-06 amendment withdrew. §6 found it and did
-  not fix it; it is fixed now, and noted in [ADR-LAWS](../../docs/adr/0001_LAWS.md).
+  not fix it; it is fixed now, and noted in [SR-LAWS](../../records/0001_LAWS.md).
 
 ### Still open after this
 
@@ -104,12 +104,12 @@ runbooks, specs, wiki pages — committed to git and read by agents.*
 
 **Model: Sonnet** applies accepted wording (exact before/after text below).
 **Model: Opus** for the `code` edge-kind rename in §5, because it changes a
-committed record field and ADR-GRAPH.
+committed record field and SR-GRAPH.
 
 ~~**Graduates when** Arpit accepts or strikes each line in §4. Nothing here is
-applied.~~ **Fired 2026-09-12** — see the section above. **No ADR affected** by
+applied.~~ **Fired 2026-09-12** — see the section above. **No SR affected** by
 the wording itself; §5's rename would affect
-[ADR-GRAPH](../../docs/adr/0126_graph.md) and ADR-RECORD.
+[SR-GRAPH](../../records/0126_graph.md) and SR-RECORD.
 
 ---
 
@@ -240,7 +240,7 @@ a counterweight.
 ## 5. The `code` edge kind (flag, not a wording fix)
 
 - `ingest/edges.py`: `code` = a backtick span that resolves to another **ingested document's path**. It is a link, not code analysis.
-- A rename (e.g. `path`) changes the committed record and `graph.schema.json` examples — **owned by ADR-GRAPH**, Opus, its own change.
+- A rename (e.g. `path`) changes the committed record and `graph.schema.json` examples — **owned by SR-GRAPH**, Opus, its own change.
 - Cheap alternative: define it in `docs/GLOSSARY.md` as *"a backtick-quoted path to another indexed document — not parsed code."*
 
 ## 6. OKF v0.1 (brief task 4)

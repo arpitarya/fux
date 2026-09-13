@@ -42,7 +42,7 @@ def parse(raw: bytes) -> ET.Element:
     if _DOCTYPE_RE.search(raw[:_PROLOG_BYTES]):
         raise UnsafeXml(
             "document declares a DOCTYPE; entity expansion is refused "
-            "(billion-laughs / XXE). See docs/adr/0042_decode.md"
+            "(billion-laughs / XXE). See records/0139_decode.md"
         )
     try:
         return ET.fromstring(raw)

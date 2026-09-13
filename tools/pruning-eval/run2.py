@@ -5,7 +5,7 @@
         --corpus rfc repodocs --out work/regression/<date>-pruning-rerun/evidence
 
 Definitions are frozen in `PRE-REGISTRATION-v2.md`, committed before the first
-gating number. This script measures; the verdict is a human-reviewed ADR.
+gating number. This script measures; the verdict is a human-reviewed SR.
 
 Three things differ from `run.py` (the run P1-GATE voided):
 

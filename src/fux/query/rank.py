@@ -17,7 +17,7 @@ See `work/adr/0005_derived-accelerator.md`.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from .. import store as store_mod
@@ -34,7 +34,7 @@ class AskResult:
     title: str
     loc: str
     score: float
-    #: The document is retired (ADR-ARCHIVED-CONTENT decisions 1 and 3).
+    #: The document is retired (SR-ARCHIVED-CONTENT decisions 1 and 3).
     #: **Never part of the sort key** — decision 2 fixes the order as
     #: byte-identical at the default weight, and this field is what a reader is
     #: told, not what the scorer computes.
@@ -46,6 +46,20 @@ class AskResult:
     #: caller reading `--top 5` is told the fifth row was a coin-toss even
     #: though the coin's other side is not on the page.
     tie: bool = False
+    #: W-153. The document's committed `mtime` — the git commit timestamp, in
+    #: whole unix seconds — or `None` when the document is outside git history.
+    #:
+    #: 🔴 **`None` is a CLAIM, not an absence.** The key is on every hit, always,
+    #: because an absent key cannot be told from an older fux (the W-48 trap);
+    #: `None` says *this document carries no committed date*, which a corpus
+    #: copied out of its repository produces for every one of its documents.
+    #:
+    #: **It exposes a fact and orders nothing.** `mtime` reaches the sort only
+    #: through the declared tie-break, at an equal score. It was on every record
+    #: and reachable by no caller until 2026-09-13, which is the gap closing
+    #: `recency_half_life_days` opened (W-152) and W-153 named rather than left
+    #: to be discovered.
+    mtime: int | None = None
 
 
 @dataclass(frozen=True)
@@ -57,7 +71,7 @@ class Corpus:
     denominator and not the numerator — that is `scan.py`'s behaviour, and the
     accelerator's build asserts it reproduces the same statistics.
 
-    **`total_wlen` is a float and is derived per query** (ADR-TUNE, 2026-08-24).
+    **`total_wlen` is a float and is derived per query** (SR-TUNE, 2026-08-24).
     It used to be an integer summed at build time with the field weights baked
     in, which meant a `tune.toml` field weight moved `avg_wlen` on the scan
     path and not on the accelerator path — the two disagreeing on the same
@@ -69,11 +83,6 @@ class Corpus:
 
     n: int
     total_wlen: float
-    #: The newest commit timestamp in the corpus (W-76 Phase 2), or 0 when no
-    #: record carries one. Recency is normalised against it so the freshest
-    #: document scores 1.0 and the prior is a pure demotion -- which is what
-    #: keeps `Weighting.maximum` finite and the block bound usable.
-    newest_mtime: int = 0
 
     @property
     def avg_wlen(self) -> float:
@@ -83,7 +92,7 @@ class Corpus:
 def _record_is_archived(record: dict, archived_dirs: frozenset[str]) -> bool:
     """Is this document retired?
 
-    **The record property wins** (ADR-ARCHIVED-CONTENT decision 1): a record
+    **The record property wins** (SR-ARCHIVED-CONTENT decision 1): a record
     states the rule it was written under, which is the whole reason the property
     exists rather than being recomputed by every reader.
 
@@ -92,7 +101,7 @@ def _record_is_archived(record: dict, archived_dirs: frozenset[str]) -> bool:
     re-ingesting the world is not a precondition for the marker being correct.
     Both inputs are *declarations* — the record's own, or the `archived=true`
     line in `.fux/sources/dirs` — so neither path ever derives currency from a
-    path convention, which is what ADR-DIR-LIST forbids.
+    path convention, which is what SR-DIR-LIST forbids.
     """
     if record.get("archived"):
         return True
@@ -124,16 +133,22 @@ class Weighting:
     candidate does, which is precisely the case the bound has to survive.
     """
 
-    archived_weight: float = 1.0
+    #: 🔴 **THE THREE DOCUMENT PRIORS ARE GONE, and `[priority]` is what is
+    #: left.** `superseded_weight` went on 2026-09-13 (W-151), `archived_weight`
+    #: and `recency_half_life_days` the same day (W-152) — Arpit's rulings on
+    #: [VERDICT-W143], which measured that no single global value clears the bar
+    #: for any of them. Each shipped as a no-op, so nothing ranks differently.
+    #:
+    #: **The FACTS survive and are read elsewhere in this file** — `archived` is
+    #: computed for every candidate and reaches the marker and the hit,
+    #: `superseded` and `mtime` break a tie. A fact is not a weight, and this
+    #: class is now only about weights.
+    #:
+    #: `archived_dirs` stays because `_record_is_archived` is the FACT's
+    #: fallback for an index built before the record property shipped — it has
+    #: not scaled a score since 2026-09-13.
     archived_dirs: frozenset[str] = frozenset()
-    #: W-76 Phase 2. Both default to no-ops, so a corpus that configures
-    #: nothing scores byte-identically to before they existed.
-    superseded_weight: float = 1.0
-    recency_half_life_days: float = 0.0
-    #: The newest commit timestamp in the corpus, used to normalise recency so
-    #: the freshest document scores `1.0`. Zero disables the prior.
-    newest_mtime: int = 0
-    #: `.fux/tune.toml`'s `[priority]` (ADR-TUNE decision 8), **sorted
+    #: `.fux/tune.toml`'s `[priority]` (SR-TUNE decision 8), **sorted
     #: longest-key-first** by the loader so `priority_for` can stop at the
     #: first match. Empty is the default and costs nothing.
     priority: tuple[tuple[str, float], ...] = ()
@@ -141,7 +156,7 @@ class Weighting:
     def priority_for(self, loc: str) -> float:
         """The per-source multiplier for a document location; unlisted is `1.0`.
 
-        **Longest matching entry wins** (ADR-TUNE decision 8a). Elasticsearch
+        **Longest matching entry wins** (SR-TUNE decision 8a). Elasticsearch
         resolves the same overlap with first-match on an ordered array; fux
         cannot copy that, and the reason is a property worth being pleased
         about — its source lists are loader-sorted and file order is
@@ -167,63 +182,41 @@ class Weighting:
 
         When this holds every weighted path short-circuits to the arithmetic
         that shipped before W-73, so a corpus with no configured weight still
-        scores and orders **byte-identically** (ADR-ARCHIVED-CONTENT decision
+        scores and orders **byte-identically** (SR-ARCHIVED-CONTENT decision
         2's veto) and the differential evidence gathered at the default still
         stands unmodified.
+
+        ⚠ **Since 2026-09-13 this is true of every corpus that configures no
+        `[priority]`** — the three document priors that could also make it false
+        were removed. That is not a reason to delete the short-circuit: the
+        property it guards is the one the accelerator's bound rests on, and
+        `[priority]` can still make it false.
         """
-        return (
-            self.archived_weight == 1.0
-            and self.superseded_weight == 1.0
-            and self.recency_half_life_days <= 0
-            and not self.priority
-        )
+        return not self.priority
 
     @property
     def maximum(self) -> float:
         """`sup_d w(d)` over every document the configuration can produce.
 
-        `1.0` is always attainable — a document that is not archived is never
-        scaled — so the supremum is `max(1.0, archived_weight)` and never the
-        configured weight alone. Taking the configured weight alone would make
-        the ceiling too small for `w < 1`, which is the demotion direction and
-        the one that looks safe.
+        `1.0` is always attainable — an unlisted document is never scaled — so
+        the supremum is `max(1.0, ...)` and never the configured weight alone.
+        Taking the configured weight alone would make the ceiling too small for
+        `w < 1`, which is the demotion direction and the one that looks safe.
+
+        ⚠ **It was a PRODUCT of independent suprema until 2026-09-13**, when
+        `archived_weight` joined `superseded_weight` in being removed. One
+        multiplier is left, so the product has one factor. **Restore the product
+        the moment a second one arrives** — a document can carry two independent
+        weights and be scaled twice, and taking the larger under-estimates the
+        ceiling, which is the W-73 defect's exact shape.
         """
-        #: `archived` and `superseded` are INDEPENDENT flags, so a document can
-        #: carry both and be scaled twice. The supremum is therefore the
-        #: product of the per-flag suprema, not the larger of the two.
-        #:
-        #: Recency contributes exactly `1.0`: `recency_multiplier` is bounded
-        #: to `(0, 1]` by construction, so it can only ever demote. That bound
-        #: is load-bearing here — an unbounded recency prior would make this
-        #: supremum unbounded and the block bound useless.
-        #: Per-source priority is a third independent multiplier, so it joins
-        #: the product. `max(1.0, ...)` again rather than the raw maximum: an
-        #: unlisted document is scaled by `1.0`, so `1.0` is always attainable
-        #: and a configuration of demotions must not lower the ceiling.
-        return (
-            max(1.0, self.archived_weight)
-            * max(1.0, self.superseded_weight)
-            * max([1.0, *(w for _, w in self.priority)])
-        )
+        return max([1.0, *(w for _, w in self.priority)])
 
     def of(self, record: dict) -> float:
-        """The multiplier for one record: archived x superseded x recency."""
+        """The multiplier for one record: per-source priority, and nothing else."""
         if self.trivial:
             return 1.0
-        weight = 1.0
-        if self.archived_weight != 1.0 and _record_is_archived(record, self.archived_dirs):
-            weight *= self.archived_weight
-        if self.superseded_weight != 1.0 and record.get("superseded"):
-            weight *= self.superseded_weight
-        if self.recency_half_life_days > 0:
-            from ..ingest.priors import recency_multiplier
-
-            weight *= recency_multiplier(
-                record.get("mtime"), self.newest_mtime, self.recency_half_life_days
-            )
-        if self.priority:
-            weight *= self.priority_for(record.get("loc", ""))
-        return weight
+        return self.priority_for(record.get("loc", ""))
 
 
 def rank(
@@ -233,7 +226,6 @@ def rank(
     corpus: Corpus,
     top: int,
     *,
-    archived_weight: float = 1.0,
     archived_dirs: frozenset[str] = frozenset(),
     weighting: "Weighting | None" = None,
     scoring: Scoring = DEFAULT_SCORING,
@@ -247,18 +239,19 @@ def rank(
     are dropped rather than ranked — `ask` says "no confident matches" instead
     of listing a document it scored at zero.
 
-    `archived_weight`/`archived_dirs` are ADR-ARCHIVED-CONTENT decision 6's demotion:
-    a document declared archived has its score multiplied by the weight. **At the
-    shipped default (`1.0`) the multiply is skipped outright**, so a corpus with
-    no configured weight scores and orders byte-identically — ADR-ARCHIVED-CONTENT
-    decision 2's veto, held, and asserted by
-    `tests/query/test_scan.py::test_the_marker_does_not_move_the_ranking`.
+    `archived_dirs` is the FACT's fallback, for an index built before the
+    `archived` record property shipped. 🔴 **It is no longer a demotion:**
+    SR-ARCHIVED-CONTENT decision 6's `archived_weight` was REMOVED on 2026-09-13
+    (W-152, SR-TUNE decision 15), so being retired can no longer move a score at
+    all. What decision 2's veto asserted — that the marker does not move the
+    ranking — is now structural rather than a consequence of a default
+    (`tests/query/test_scan.py::test_the_marker_does_not_move_the_ranking`).
 
-    **Every result carries `archived` regardless of the weight** (decision 3).
-    The flag is computed for all candidates, never enters the sort key, and is
-    what the marker and the disclaimer read. Telling a reader a document is
-    retired and reordering because it is retired are two different decisions,
-    and only the second one is configurable.
+    **Every result still carries `archived`** (decision 3). The flag is computed
+    for all candidates, never enters the sort key, and is what the marker, the
+    response note and the JSON hit read. Telling a reader a document is retired
+    and reordering because it is retired were two different decisions; only the
+    first one survives.
 
     ## `expansion` — W-109, and the guard that lives here and nowhere else
 
@@ -282,7 +275,7 @@ def rank(
     `stats_out`, when a caller supplies a dict, receives the two corpus
     statistics only this function holds — `df` and `n` — for
     [`confidence.py`](confidence.py) to build its block from
-    (ADR-CONFIDENCE decision 2). **It is an out-parameter rather than a second
+    (SR-CONFIDENCE decision 2). **It is an out-parameter rather than a second
     return value on purpose:** every existing caller of `rank()` is unchanged,
     the differential law's two paths keep one shared signature, and the dict is
     owned by the caller rather than by this module, which matters now that
@@ -301,12 +294,7 @@ def rank(
     term_weights = expansion.weights or None
     avg_wlen = corpus.avg_wlen
     if weighting is None:
-        weighting = Weighting(archived_weight=archived_weight, archived_dirs=archived_dirs)
-    # Recency needs the corpus it is being normalised against, and the corpus
-    # is only known here. `replace` rather than mutation: `Weighting` is frozen
-    # so that a caller can never hand two code paths a policy that drifted.
-    if weighting.recency_half_life_days > 0 and corpus.newest_mtime:
-        weighting = replace(weighting, newest_mtime=corpus.newest_mtime)
+        weighting = Weighting(archived_dirs=archived_dirs)
     demote = not weighting.trivial
 
     scored = []
@@ -337,17 +325,18 @@ def rank(
     #
     # ## Why this is not "add three ranking priors"
     #
-    # 🔴 **Every one of these is already a `Weighting` multiplier, and every one
-    # of them ships as a NO-OP** (`superseded_weight = 1.0`,
-    # `recency_half_life_days = 0.0`, empty `[priority]`). This key does not
-    # turn any of them on: it reads the same *facts* those weights read, and it
-    # reads them **only where the rounded scores are equal**. A corpus with no
+    # 🔴 **NONE of these is a weight, and after 2026-09-13 none of them can be
+    # one.** `superseded_weight` (W-151), `archived_weight` and
+    # `recency_half_life_days` (W-152) were all REMOVED, so `superseded` and
+    # `mtime` reach ranking **here and nowhere else**. What the key reads is the
+    # *facts* — and only where the rounded scores are equal. A corpus with no
     # ties orders exactly as it did before.
     #
-    # **W-94's "doing nothing is legitimate" is untouched.** That decision is
-    # about whether `superseded_weight` should move off `1.0` and change
-    # SCORES. This changes no score, and it cannot promote or demote a document
-    # past one that outscores it.
+    # **W-94's "doing nothing is legitimate" is untouched, and is now the whole
+    # story.** That decision asked whether these should move off their no-op
+    # defaults and change SCORES; the answer was that no global value is
+    # correct, so the knobs went. This changes no score, and it cannot promote
+    # or demote a document past one that outscores it.
     #
     # ## What it replaces, and why the old answer was worse
     #
@@ -380,7 +369,7 @@ def rank(
             tied.add(i)
             tied.add(i + 1)
 
-    # ADR-CONFIDENCE: which of the query's terms the TOP-RANKED document itself
+    # SR-CONFIDENCE: which of the query's terms the TOP-RANKED document itself
     # contains. Handed out through the same seam as `df`/`n` and for the same
     # reason — **both paths reach this function with the same record dicts**
     # (`derive/accel.py`'s contract is *"the scan's contract"*), so a signal
@@ -399,6 +388,11 @@ def rank(
             score=s,
             archived=archived,
             tie=i in tied,
+            # Both candidate paths carry `mtime` on the record dict — the scan
+            # reads it off the line, `derive/_build.py` copies it into the doc
+            # table — so reading it here is under the differential law like
+            # every other field, rather than being a second read on one path.
+            mtime=record.get("mtime"),
         )
         for i, (record, s, archived) in enumerate(scored[:top])
     ]

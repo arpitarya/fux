@@ -76,7 +76,7 @@ def raw_record_lines(path: Path) -> tuple[dict, list[bytes]]:
         # 🔴 **This used to say *delete `.fux/index/` and run `fux ingest`*,
         # "which is safe because the index holds statistics, never content"**
         # (W-140 row 9, fixed 2026-09-12). It is not safe, and
-        # [ADR-INDEX-LIFECYCLE] decision 10a exists BECAUSE it is not: a `url:`
+        # [SR-INDEX-LIFECYCLE] decision 10a exists BECAUSE it is not: a `url:`
         # record is the one thing in the index that is not a function of a
         # committed file, so deleting the directory destroys it and an offline
         # re-ingest cannot bring it back. `--full` was built to be this path and
@@ -93,7 +93,7 @@ def raw_record_lines(path: Path) -> tuple[dict, list[bytes]]:
     if header.get("analyzer") != HEADER["analyzer"]:
         raise FuxError(
             f"shard {path} was written by analyzer {header.get('analyzer')!r}, "
-            f"this reader is {HEADER['analyzer']!r} — ADR-recorded analyzer bumps only"
+            f"this reader is {HEADER['analyzer']!r} — SR-recorded analyzer bumps only"
         )
     if header.get("tf_fields") != HEADER["tf_fields"]:
         raise FuxError(
@@ -160,7 +160,7 @@ def read_index(root: Path) -> dict[str, dict]:
 
 # -- the foreign-index seam ---------------------------------------------------
 #
-# ADR-INDEX-LIFECYCLE decision 10 says a full re-ingest is owed on every index
+# SR-INDEX-LIFECYCLE decision 10 says a full re-ingest is owed on every index
 # written before an analyzer bump, and names `fux ingest --full` as the command
 # that discharges it. That command read the existing index unconditionally — to
 # carry `url:` records forward — so **the documented migration refused the very

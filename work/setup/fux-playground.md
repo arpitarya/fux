@@ -2,7 +2,7 @@
 type: Setup
 name: SETUP-PLAYGROUND
 title: SETUP-PLAYGROUND — fux-playground, Arpit's sandbox
-description: "How the sibling sandbox is stood up, the URL carry-forward trap that governs anything done in it, and the grading contract L9 retired — kept as history, never as a live instrument."
+description: "How the sibling sandbox is stood up, the URL carry-forward trap that governs anything done in it, and the grading contract SR-WORK-ENVIRONMENTS retired — kept as history, never as a live instrument."
 location: ~/my_programs/fux-playground
 kind: sibling git repository (one local commit; no remote)
 timestamp: 2026-09-12T00:00:00Z
@@ -15,9 +15,9 @@ timestamp: 2026-09-12T00:00:00Z
 > [`README.md`](README.md) for what belongs in this directory.
 
 🔴 **What this environment is for, and who may touch it, is stated by
-[L9](../../docs/adr/0011_LAW-9-environments.md) and nowhere else.** Read it
+[SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md) and nowhere else.** Read it
 there. This document does not restate it and must never be read as a second
-source for it ([L0](../../docs/adr/0002_LAW-0-authority.md)).
+source for it ([L0](../../records/0002_LAW-0-authority.md)).
 
 - **Name:** `SETUP-PLAYGROUND` — cite this by name
 - **Location:** `~/my_programs/fux-playground` — a **sibling repository**, not a
@@ -82,7 +82,7 @@ deleting it — so *"record exists"* never proves *"fetched this run"*.
 
 **Kept because filed runs cite it**, and a reader who meets *"32/50 on the
 playground"* in a 2026-08 verdict needs to know what was counted. Those runs
-stand exactly as measured ([ADR-LAW-9](../../docs/adr/0011_LAW-9-environments.md)
+stand exactly as measured ([SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md)
 decision 4, *forward only*). **Nothing here may be re-run, re-graded, cited as a
 current capability, or restored.**
 
@@ -101,7 +101,7 @@ it out how it works, how does it feel like… No testing or anything or any samp
 set should be captured from Fux Playground."* It sat in this document as a
 *planned redesign, not yet executed* for twenty days while the corpus went on
 being the instrument for the four ranking priors, W-97's veto leg and every
-blind annotation run. **L9 is that ruling made law**, and the reconciliation is
+blind annotation run. **SR-WORK-ENVIRONMENTS is that ruling made law**, and the reconciliation is
 [W-138](../../archive/open/W-138-reconcile-with-l9.md).
 
 ⚠ **What went with it, stated rather than discovered:** this was the project's
@@ -116,7 +116,7 @@ against an uncontaminated key, there is no net at all**, not a quieter one.
 ## The decision — `examples/` leaves the engine repo
 
 *Settled 2026-08-12. Kept here because it is the reason this repository exists.*
-⚠ **Its fourth part — the graded golden contract — was retired by L9 on
+⚠ **Its fourth part — the graded golden contract — was retired by SR-WORK-ENVIRONMENTS on
 2026-09-11**; the other three stand.
 
 ## Context
@@ -157,7 +157,7 @@ a separate sibling repository, `fux-playground`.**
    parties and changes without notice; a golden over it would be a test of the
    internet.
 
-4. ⚠ **RETIRED 2026-09-11 by [L9](../../docs/adr/0011_LAW-9-environments.md).**
+4. ⚠ **RETIRED 2026-09-11 by [SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md).**
    *"The golden queries are the regression contract"* — fifty hand-written
    queries asserting ranks — was the fourth part, and this environment no longer
    holds a contract anyone measures against.
@@ -168,7 +168,7 @@ a separate sibling repository, `fux-playground`.**
 |---|---|
 | Keep `examples/` and add goldens in place | Leaves the corpus-contamination problem entirely unfixed, which was the first of the three reasons to act. |
 | Move it to `tests_e2e/fixtures/` | Makes it a test fixture rather than something a human reads. The corpus has to be readable in twenty minutes or nobody validates that the goldens encode the right answers. |
-| Grade the URL documents too | Third-party content changes without notice, so every such golden is a scheduled false alarm. It would also require committing fetched content, which [L2](../../docs/adr/0004_LAW-2-content-never-durable.md) forbids. |
+| Grade the URL documents too | Third-party content changes without notice, so every such golden is a scheduled false alarm. It would also require committing fetched content, which [L2](../../records/0004_LAW-2-content-never-durable.md) forbids. |
 | Publish `fux-playground` with a GitHub remote now | Out of scope and Arpit's call. No remote was created; the repo has one local commit. |
 
 ## Consequences
@@ -178,7 +178,7 @@ a separate sibling repository, `fux-playground`.**
 - The engine's own dogfood corpus is now exactly its own documentation.
 - The CDP fetcher has an exercise: ten pages including a client-rendered SPA, a
   redirect chain, and the same document over two transports.
-- **Since L9:** Arpit can break, edit or wipe this repo without moving a number
+- **Since SR-WORK-ENVIRONMENTS:** Arpit can break, edit or wipe this repo without moving a number
   anywhere.
 
 **Harder, and what we now owe.**
@@ -199,7 +199,7 @@ that owns the topic.
 
 ## References (required)
 
-- [ADR-LAW-9](../../docs/adr/0011_LAW-9-environments.md) — the law that gave this
+- [SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md) — the law that gave this
   environment its one job, and retired the other one.
 - Google SRE Workbook, *Alerting on SLOs* —
   https://sre.google/workbook/alerting-on-slos/ — the source of the corpus's
@@ -214,7 +214,7 @@ that owns the topic.
   (2009) — https://www.staff.city.ac.uk/~sbrp622/papers/foundations_bm25_review.pdf
   — §3 on `k1` term-frequency saturation, the mechanism behind the third class
   of failure this corpus planted.
-- [ADR-RECORD](../../docs/adr/0109_index-record.md) — the committed index format ·
-  [ADR-URL-LIST](../../docs/adr/0116_url-list.md) ·
-  [ADR-DOTFUX](../../docs/adr/0102_fux-directory.md) — the URL source and `.fux/`
+- [SR-RECORD](../../records/0109_index-record.md) — the committed index format ·
+  [SR-URL-LIST](../../records/0116_url-list.md) ·
+  [SR-DOTFUX](../../records/0102_fux-directory.md) — the URL source and `.fux/`
   layout this repo consumes.

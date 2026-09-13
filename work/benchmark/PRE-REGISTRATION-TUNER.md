@@ -1,13 +1,13 @@
 ---
 type: PreRegistration
 name: PRE-REG-BENCH-TUNER
-description: "Frozen before any number existed. Which shipped defaults in .fux/tune.toml, if any, are defensible — measured as a knob sweep on one engine where a generated suite selects a candidate, the hand-graded playground vetoes it, a latency fence prices it, and the default change itself remains an ADR-TUNE amendment Arpit ratifies. Ids T0–T5."
+description: "Frozen before any number existed. Which shipped defaults in .fux/tune.toml, if any, are defensible — measured as a knob sweep on one engine where a generated suite selects a candidate, the hand-graded playground vetoes it, a latency fence prices it, and the default change itself remains an SR-TUNE amendment Arpit ratifies. Ids T0–T5."
 timestamp: 2026-08-28T00:00:00Z
 ---
 
 # Benchmark — the knob sweep over `.fux/tune.toml`. Frozen before the run.
 
-**Filed against W-97** ([`../open/W-97-tuner-knob-sweep.md`](../open/W-97-tuner-knob-sweep.md)).
+**Filed against W-97** ([`../../archive/../archive/open/W-97-tuner-knob-sweep.md`](../../archive/../archive/open/W-97-tuner-knob-sweep.md)).
 Two runs on 2026-08-28 found the same thing from two directions: **every
 ranking prior `HEAD` added ships as a no-op** (`superseded_weight = 1.0`,
 `recency_half_life_days = 0.0`, `rerank_weight = 0.0`), so on ranking priors
@@ -85,7 +85,7 @@ Defaults, read from [`src/fux/tune.py`](../../src/fux/tune.py) and
 | `[confidence]` | `separation_floor` · `doc_coverage_floor` | — | 🔴 no — a calibration question (R10), not a ranking knob |
 | `[graph]` `[refer]` `[priority]` | — | — | no — other metric planes / consumer data |
 
-**Why a sweep is cheap here, and the invariant that makes it so:** ADR-TUNE's
+**Why a sweep is cheap here, and the invariant that makes it so:** SR-TUNE's
 rule is that *changing any value in `tune.toml` leaves `.fux/index/`
 byte-identical*. One ingest per corpus, then one query pass per knob value.
 **T0.b asserts the invariant on every pass** — a knob that moves the index is
@@ -235,7 +235,7 @@ post-hoc, labelled so, and in no verdict.**
 
 - 🔴 **It changes no default.** A `PASS` produces a **candidate** with three
   green legs and a filed cost. The change itself is an amendment to
-  [ADR-TUNE](../../docs/adr/0135_tuning.md) that **Arpit ratifies**, and
+  [SR-TUNE](../../records/0135_tuning.md) that **Arpit ratifies**, and
   *doing nothing is legitimate* — W-94 and the `rerank_weight` item both say
   so and this run does not overrule them.
 - **It is `informed`.** The session that sweeps reads the scores that select
@@ -285,7 +285,7 @@ pre-registration takes ids `T6+` and this document stays as it is.
 | 9 | **T4** on the laptop, one session | `not measured` if it slips — never *unchanged* |
 | 10 | T5 headroom table | — |
 | 11 | File `work/regression/<date>-benchmark-tuner/` | full per-run contract; `VERDICT-T1.md`, `VERDICT-T2.md` (+ T3, T4); README row; DOC-REGISTRY; the deck |
-| 12 | Hand the candidate table to Arpit **without a recommendation** | the ADR-TUNE amendment, if any, is his |
+| 12 | Hand the candidate table to Arpit **without a recommendation** | the SR-TUNE amendment, if any, is his |
 
 ## 8. Owed before this can run
 

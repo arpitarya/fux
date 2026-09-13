@@ -1,4 +1,4 @@
-"""The v1 -> v2 migration seam — ADR-INDEX-LIFECYCLE decision 10.
+"""The v1 -> v2 migration seam — SR-INDEX-LIFECYCLE decision 10.
 
 Decision 10 owes a full re-ingest on every index older than the current
 analyzer and names `fux ingest --full` as the command that discharges it.
@@ -134,7 +134,7 @@ def test_the_version_mismatch_error_names_full_and_warns_off_the_delete(tmp_path
 
     W-140 row 9, fixed 2026-09-12. The shard-header error told the reader to
     `delete .fux/index/ and run fux ingest`, *"which is safe because the index
-    holds statistics, never content"* — and ADR-INDEX-LIFECYCLE decision 10a is
+    holds statistics, never content"* — and SR-INDEX-LIFECYCLE decision 10a is
     the record saying it is **not** safe: a `url:` record is the one thing in
     the index that is not a function of a committed file, so the directory
     delete destroys it and an offline re-ingest cannot rebuild it.

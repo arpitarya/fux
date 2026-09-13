@@ -23,7 +23,7 @@ requests, not one, and the second is worth more than the first.
 > that a reader would be misled:
 >
 > 1. **"Exactly one of the twelve is configurable"** and the whole §2 knob
->    table. **ADR-TUNE shipped 2026-08-24**: `.fux/tune.toml` exposes `k1`, `b`,
+>    table. **SR-TUNE shipped 2026-08-24**: `.fux/tune.toml` exposes `k1`, `b`,
 >    the five field weights, four `[ranking]` knobs, six `[graph]`, four
 >    `[refer]` and `[priority]`. `fux.toml [ranking]` now raises an error.
 > 2. **§2.1's "field weights must be integers"**, with its quoted
@@ -95,7 +95,7 @@ can reach it:
 | `HOP_DECAY` | 0.5 | `graph/walk.py` | module constant |
 
 **Exactly one of the twelve is configurable**, and it was made so by
-ADR-ARCHIVED-CONTENT decision 11 with a default of `1.0` chosen precisely so
+SR-ARCHIVED-CONTENT decision 11 with a default of `1.0` chosen precisely so
 that nothing reorders. That is the precedent to follow, and it already carries
 the right instinct: *a knob ships at the value that changes nothing.*
 
@@ -154,12 +154,12 @@ saturation value; it is the scale the weights forced.
 
 Two more from the repo rather than the laws:
 
-- **ADR-CLI veto 1** — `fux <verb> <subverb>` is forbidden. A tuner is one flat
+- **SR-CLI veto 1** — `fux <verb> <subverb>` is forbidden. A tuner is one flat
   verb taking flags. Criterion's three baseline verbs become
   `--save-baseline` / `--baseline` / `--load-baseline`, which is fine.
 - **CLAUDE.md §Litmus measurement ceiling** — no measurement, threshold, budget
   or pre-registration above **10 000 documents**. A tuning sweep is a
-  measurement, so it lives under ADR-RS and needs a prediction id and a frozen
+  measurement, so it lives under SR-RS and needs a prediction id and a frozen
   pre-registration like every other run in `work/regression/`.
 
 ### §3.1 — The engine/lab split does the heavy lifting
@@ -192,7 +192,7 @@ run:    <qid> Q0 <docno> <rank> <score> <tag>
 ## §4 — Where judgments live
 
 This is the largest undecided question in the note, and it is a
-**ADR-DOTFUX** question, not a ranking one: every child of `.fux/` is declared
+**SR-DOTFUX** question, not a ranking one: every child of `.fux/` is declared
 **committed** or **derived**, and judgments would be a new child.
 
 The case for **committed, one judgment per line**, on the sources-list grammar:
@@ -211,7 +211,7 @@ Sketch, deliberately on the existing grammar rather than a new one:
 # .fux/judgments — one judgment per line, loader-sorted
 what is the committed index format :: docs/index-format.md 3
 what is the committed index format :: work/compare/index-format.compare.md 2
-how do URLs get fetched :: docs/adr/0019_fetcher.md 3
+how do URLs get fetched :: records/0117_fetcher.md 3
 ```
 
 **The unresolved half is staleness.** A judgment names a path, and a path's
@@ -374,7 +374,7 @@ Not the optimiser. The optimiser is a weekend.
 
 | asset | size |
 |---|---|
-| ~~`fux-playground` goldens~~ | ~~50 ranked queries, one gold doc each~~ — **retired 2026-09-11 by [L9](../../docs/adr/0011_LAW-9-environments.md); this row is why the table's conclusion got worse, not better** |
+| ~~`fux-playground` goldens~~ | ~~50 ranked queries, one gold doc each~~ — **retired 2026-09-11 by [SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md); this row is why the table's conclusion got worse, not better** |
 | `fux-lab/graph-acceptance` | 66 documents, 24 graded queries |
 | Sakai's requirement to detect Δ nDCG = 0.10 | **73 topics** |
 | the Δ actually on offer (§1) | ~0.005–0.016 |
@@ -416,17 +416,17 @@ recommendation.
 
 Named here so the cost is visible, not to pre-empt any of them:
 
-- **ADR-CLI** — a new flat verb; a seventh group (`measure`?) or an argument
+- **SR-CLI** — a new flat verb; a seventh group (`measure`?) or an argument
   for joining an existing one; veto 1 says flags, never a subverb.
-- **ADR-DOTFUX** — `.fux/judgments` as a new **committed** child, declared.
-- **ADR-RANKING** — every constant it currently states as a value becomes a
+- **SR-DOTFUX** — `.fux/judgments` as a new **committed** child, declared.
+- **SR-RANKING** — every constant it currently states as a value becomes a
   value *with a provenance*; the integer-weight constraint (§2.1) and the
   identifiability pin (§2.2) belong in it.
-- **ADR-T1-ACCELERATOR** — if fractional field weights are ever wanted, `mx`
+- **SR-T1-ACCELERATOR** — if fractional field weights are ever wanted, `mx`
   and the block-max invariant are its property.
-- **ADR-CONFIG** — any knob promoted to `fux.toml`, following
+- **SR-CONFIG** — any knob promoted to `fux.toml`, following
   `archived_weight`'s precedent of shipping at the value that changes nothing.
-- **ADR-RS** — a sweep is a measurement: prediction id, frozen
+- **SR-RS** — a sweep is a measurement: prediction id, frozen
   pre-registration, filed verdict, under the 10 000-document ceiling.
 
 ---

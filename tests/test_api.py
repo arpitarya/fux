@@ -1,15 +1,15 @@
-"""`fux.api` — the importable read surface (ADR-API).
+"""`fux.api` — the importable read surface (SR-API).
 
 Four things are asserted here and each is a promise the record makes:
 
 1. **`from fux import open` resolves.** The record and `.fux/README.md` both
    document that spelling, and nothing but the re-export in
-   `src/fux/__init__.py` makes it true — a file ADR-LAWS owns, which is why the
+   `src/fux/__init__.py` makes it true — a file SR-LAWS owns, which is why the
    register carries a `describes` row pointing at this record.
 2. **The gate fires here too.** `open()` outside a root, and `open()` in a repo
    with no `.fux/pii.toml`, both raise `FuxError`. A library caller that
    bypassed the gate would be reading a promise the CLI does not make
-   (ADR-PII decision 17; W-107 O1 answered the same way for Node).
+   (SR-PII decision 17; W-107 O1 answered the same way for Node).
 3. **The gate costs a STAT, not an import.** `from .ingest import pii` pulls in
    every decoder — measured 2026-09-12 at **50 ms on a warm `fux.open(".")`**,
    against 2.6 ms after. `cli.py` spells the path inline for exactly this
@@ -33,17 +33,20 @@ from fux.store import TF_FIELDS, term_hash, write_index
 BODY = TF_FIELDS.index("body")
 
 
-def _rec(doc_id: str, title: str, word: str, *, phrases=()) -> dict:
+def _rec(doc_id: str, title: str, word: str, *, phrases=(), mtime=None) -> dict:
     tf = [0] * len(TF_FIELDS)
     tf[BODY] = 5
     flen = [0] * len(TF_FIELDS)
     flen[BODY] = 40
-    return {
+    record = {
         "id": doc_id, "src": "git", "loc": doc_id.removeprefix("file:"),
         "mode": "extracted", "meta": "plain", "title": title,
         "phrases": list(phrases), "terms": {term_hash(word): tf},
         "flen": flen, "sha": "a" * 40, "edges": [],
     }
+    if mtime is not None:
+        record["mtime"] = mtime
+    return record
 
 
 @pytest.fixture
@@ -51,7 +54,7 @@ def repo(tmp_path):
     (tmp_path / ".git").mkdir()
     (tmp_path / ".fux").mkdir()
     # CLAUDE.md §Build & test: a test that builds a repo by hand writes
-    # `.fux/pii.toml`, or every verb refuses (ADR-PII decision 17).
+    # `.fux/pii.toml`, or every verb refuses (SR-PII decision 17).
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
     (tmp_path / OUTPUT_NAME).write_text(specimen(), encoding="utf-8")
     (tmp_path / "docs").mkdir()
@@ -62,7 +65,9 @@ def repo(tmp_path):
         tmp_path,
         [
             _rec("file:docs/retry.md", "Retry policy", "rollback",
-                 phrases=["Rollback procedure"]),
+                 phrases=["Rollback procedure"], mtime=1788330315),
+            # No `mtime`: a document outside git history, which is what a corpus
+            # copied OUT of its repository produces for every one of its files.
             _rec("file:docs/new.md", "New decision", "rollback", phrases=["Scope"]),
         ],
     )
@@ -80,7 +85,7 @@ def test_from_fux_import_open_resolves():
 
 
 def test_the_package_exports_nothing_that_writes():
-    """ADR-API: the read plane, and the same cut the Node reader makes.
+    """SR-API: the read plane, and the same cut the Node reader makes.
 
     ⚠ Asserted on the package's OWN names, never on `hasattr` — importing
     `fux.setup` anywhere in the suite binds it as an attribute of `fux`, so a
@@ -157,6 +162,28 @@ def test_find_returns_results_that_validate(repo):
         _validate(result.as_dict(), "ask_result")
 
 
+def test_the_hit_carries_mtime_and_null_is_a_CLAIM(repo):
+    """W-153 — the committed date reaches a caller.
+
+    🔴 **The key is on every hit, always.** An absent key cannot be told from an
+    older fux (the W-48 trap), so `None` is what *this document carries no
+    committed date* looks like — and that is a whole corpus, every time somebody
+    copies one out of its repository.
+
+    **It exposes a fact and orders nothing:** `mtime` reaches the sort only
+    through the declared tie-break, at an equal score.
+    """
+    from fux import open as fux_open
+
+    by_loc = {r.loc: r for r in fux_open(repo).find("rollback", top=5)}
+    assert by_loc["docs/retry.md"].mtime == 1788330315
+    assert by_loc["docs/new.md"].mtime is None
+    # Present in the serialized shape too, in BOTH states — the dict is the
+    # `--json` payload exactly (SR-API decision 1).
+    for loc in ("docs/retry.md", "docs/new.md"):
+        assert "mtime" in by_loc[loc].as_dict()
+
+
 def test_find_under_narrows_by_path(repo):
     from fux import open as fux_open
 
@@ -166,7 +193,7 @@ def test_find_under_narrows_by_path(repo):
 
 
 def test_ask_carries_the_band_by_default_and_validates(repo):
-    """`band=True` here and `False` on the CLI, deliberately — ADR-API.
+    """`band=True` here and `False` on the CLI, deliberately — SR-API.
 
     A caller in Python has already decided to read the object; the block is the
     part that says whether to trust it.
@@ -182,7 +209,7 @@ def test_ask_carries_the_band_by_default_and_validates(repo):
 
     quiet = fux_open(repo).ask("rollback", band=False)
     assert quiet.confidence is None
-    # ADR-CONFIDENCE decision 11: absent means NOT ASKED FOR, never a claim.
+    # SR-CONFIDENCE decision 11: absent means NOT ASKED FOR, never a claim.
     assert "confidence" not in quiet.as_dict()
 
 

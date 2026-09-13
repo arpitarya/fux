@@ -30,14 +30,14 @@ export function runAsk(root, args) {
 
   if (args.json) {
     const payload = { results: rows };
-    // ADR-CONFIDENCE decision 11: present ONLY under --band. **Absent means
+    // SR-CONFIDENCE decision 11: present ONLY under --band. **Absent means
     // NOT ASKED FOR — it is never a claim about the answer.**
     if (confidence && args.band) payload.confidence = confidence.asDict();
     // An RRF score and a BM25F score are not comparable, so a consumer must be
     // told which it is holding. Absent means "one question", never "unknown".
     if (fused) payload.fused = true;
     process.stdout.write(JSON.stringify(payload, null, 2) + "\n");
-    declareArchived(results, tune.archivedWeight);
+    declareArchived(results);
     return 0;
   }
 
@@ -55,7 +55,7 @@ export function runAsk(root, args) {
     process.stdout.write(`${r.score.toFixed(4)}${tie}  ${mark}${r.title}  (${r.loc})\n`);
     for (const h of r.headings || []) process.stdout.write(`        ${SECTION_MARKER} ${h}\n`);
   }
-  declareArchived(results, tune.archivedWeight);
+  declareArchived(results);
   declareConfidence(confidence, args.band);
   return 0;
 }

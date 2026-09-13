@@ -81,7 +81,7 @@ def make_repo(path: Path, *, hooks: bool) -> str:
     (path / "docs").mkdir()
     (path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     (path / ".fux" / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
-    # ADR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
+    # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
     (path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
     # aa.md and gr.md land in the SAME shard, so an edit to each produces
     # adjacent changed lines — which is exactly what a textual merge cannot do.
@@ -300,7 +300,7 @@ def test_post_commit_defers_and_a_detached_runner_drains_the_list(tmp_path):
 
 
 def test_the_commit_returns_before_the_re_index_has_happened(tmp_path):
-    """ADR-MAINTENANCE veto condition 5, asserted **structurally rather than
+    """SR-MAINTENANCE veto condition 5, asserted **structurally rather than
     with a stopwatch** — the commit hands back while the work is still
     outstanding, which is the property, and it is observable without timing
     anything.
@@ -316,7 +316,7 @@ def test_the_commit_returns_before_the_re_index_has_happened(tmp_path):
     > flake until it hid. The real defect is that a **latency** assertion does
     > not belong in a suite that must be green on someone else's machine:
     > fux-lab's TEST-PLAN §2 already says latency is not comparable across
-    > surfaces, and ADR-MAINTENANCE's own "How to check it" for veto 5 points
+    > surfaces, and SR-MAINTENANCE's own "How to check it" for veto 5 points
     > at `work/regression/.../reproduce.sh` — a measured run — rather than at
     > this file. The cross-size *measurement* is that harness's job. What
     > belongs here is that the deferral exists at all.
@@ -366,7 +366,7 @@ def test_the_commit_returns_before_the_re_index_has_happened(tmp_path):
 
 
 def test_nothing_fux_spawned_outlives_its_own_run(tmp_path):
-    """ADR-MAINTENANCE veto condition 6. The runner is one-shot: it may
+    """SR-MAINTENANCE veto condition 6. The runner is one-shot: it may
     outlive the *commit* (that is what deferral means) but it must exit, and
     nothing resident may remain once it has."""
     make_repo(tmp_path, hooks=True)
@@ -415,7 +415,7 @@ def test_two_commits_in_quick_succession_produce_one_runner_and_one_index(tmp_pa
 
 
 def test_ingest_stop_exits_zero_with_nothing_running(tmp_path):
-    """ADR-CLI, 2026-08-22: "make sure it is not running" has succeeded when
+    """SR-CLI, 2026-08-22: "make sure it is not running" has succeeded when
     it was not running. Every script that calls it defensively depends on it."""
     make_repo(tmp_path, hooks=False)
     result = fux(tmp_path, "ingest", "--stop")

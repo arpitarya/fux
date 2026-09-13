@@ -1,7 +1,7 @@
 """JSON -> Markdown.
 
 **Parsing JSON is one line. Deciding what becomes prose is the whole job**, and
-it is where [ADR-TYPES](../../../docs/adr/0031_types-list.md) verdict G lives:
+it is where [SR-TYPES](../../../records/0128_types-list.md) verdict G lives:
 `.json` was measured at **11.4 % of this repo's tokens** across 6 % of its
 documents, and a raw blob took second place on a plain prose query.
 

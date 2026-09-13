@@ -7,7 +7,7 @@ date: 2026-08-28
 
 # `recall@k` is computed for the first time
 
-**[ADR-QUALITY](../../../docs/adr/0044_quality-contract.md) decision 2 made
+**[ADR-QUALITY](../../../docs/adr/0056_WORK-quality.md) decision 2 made
 `recall@k` the headline on 2026-08-27 and its own consequences said it could not
 be computed** — *"it needs known-relevant sets per query."* Those sets now exist,
 authored blind and twice, and decision 12 gave them a schema. This is the first

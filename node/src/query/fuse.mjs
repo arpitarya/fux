@@ -1,5 +1,7 @@
 /** Reciprocal-rank fusion for `-q` — several phrasings, one ranked list.
- *  Twin of `fuse.py`. */
+ *  Twin of `fuse.py`. *
+ * Owned, with its Python twin, by [SR-EXPAND](../../../records/0149_expand.md).
+ */
 import { pyRound9, cmpCodePoints } from "../compat/pyfloat.mjs";
 
 /** Cormack et al. 2009's constant. **Not tuned here and not a tune.toml key** —

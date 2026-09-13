@@ -46,7 +46,7 @@ payload has two places to change, and this sentence is the only thing saying so.
 the Node reader makes — one surface, one promise, in both runtimes.
 
 ⚠ **This is a frozen surface.** Once documented it cannot churn; it is owned by
-ADR-API and joins what L0 keeps true.
+SR-API and joins what L0 keeps true.
 """
 
 from __future__ import annotations
@@ -114,12 +114,17 @@ class Result:
     score: float
     archived: bool
     tie: bool
+    #: W-153. The committed git commit timestamp in whole unix seconds, or
+    #: `None` for a document outside git history. Always present; `None` is the
+    #: claim *no committed date*, never "this fux is too old to say".
+    mtime: int | None = None
     headings: list[str] = field(default_factory=list)
 
     def as_dict(self) -> dict:
         return {
             "id": self.id, "loc": self.loc, "title": self.title,
             "score": self.score, "archived": self.archived, "tie": self.tie,
+            "mtime": self.mtime,
             "headings": list(self.headings),
         }
 
@@ -134,7 +139,7 @@ class AskAnswer:
 
     def as_dict(self) -> dict:
         out: dict[str, Any] = {"results": [r.as_dict() for r in self.results]}
-        # ADR-CONFIDENCE decision 11: present ONLY when asked for. **Absent
+        # SR-CONFIDENCE decision 11: present ONLY when asked for. **Absent
         # means NOT ASKED FOR — it is never a claim about the answer.**
         if self.confidence is not None:
             out["confidence"] = self.confidence
@@ -186,21 +191,21 @@ class Index:
         `rerank_weight = 0.3`: `graph plane` scored 6.392573 here against the
         CLI's 8.310345.
 
-        It is the same defect ADR-NODE-SEARCH decision 8 records for the Node
+        It is the same defect SR-NODE-SEARCH decision 8 records for the Node
         reader, in the third of R3's three surfaces — and it was found the same
         way, by aiming an instrument at the seam the CLI actually uses.
 
         ⚠ **`under` is a prefix PLUS a component boundary here, and a bare
         prefix on the CLI** (`query/__init__.py::_filtered`): `under="docs/a"`
         matches `docs/ab.md` there and not here. Stated rather than quietly
-        changed — `fux.api` is frozen (ADR-API decision 1), so which of the two
-        is right is a ruling, not a cleanup. ADR-API decision 6.
+        changed — `fux.api` is frozen (SR-API decision 1), so which of the two
+        is right is a ruling, not a cleanup. SR-API decision 6.
         """
         from .query import run_query
 
         results = [
             Result(id=r.id, loc=r.loc, title=r.title, score=r.score,
-                   archived=r.archived, tie=r.tie)
+                   archived=r.archived, tie=r.tie, mtime=r.mtime)
             for r in run_query(self.root, query, top)[0]
         ]
         if under is not None:
@@ -244,7 +249,7 @@ class Index:
 
         rows = [
             Result(id=r.id, loc=r.loc, title=r.title, score=r.score,
-                   archived=r.archived, tie=r.tie,
+                   archived=r.archived, tie=r.tie, mtime=r.mtime,
                    headings=headings_for(self._record(r.id), query) if sections else [])
             for r in results
         ]
@@ -404,7 +409,7 @@ def open(root: str | Path = ".") -> Index:  # noqa: A001 - the name is the API
             f"no fux root at or above {root} — no fux.toml and no .git. "
             "Run `fux setup` in the repository you want to index."
         )
-    # ADR-PII decision 17, and W-107 open question O1 answered the same way for
+    # SR-PII decision 17, and W-107 open question O1 answered the same way for
     # Node: a reader that answers where the CLI refuses is a divergence in the
     # PRODUCT, not merely in the code.
     #

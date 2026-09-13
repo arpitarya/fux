@@ -33,16 +33,16 @@ timestamp: 2026-09-12T00:00:00Z
 
 
 🔴 **What this environment is for, what data it may use, and the size it stops
-at are stated by [L9](../../docs/adr/0011_LAW-9-environments.md) and nowhere
+at are stated by [SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md) and nowhere
 else.** Read it there. This document does not restate it
-([L0](../../docs/adr/0002_LAW-0-authority.md)) — it says how to *run* it.
+([L0](../../records/0002_LAW-0-authority.md)) — it says how to *run* it.
 
 - **Name:** `SETUP-LAB` — cite this by name
 - **Location:** `~/my_programs/fux-lab` — a **sibling working directory**, not a
   repository we ship and not a directory in this one
 - **Siblings:** [SETUP-PLAYGROUND](fux-playground.md) ·
   [SETUP-BENCHMARK](fux-benchmark.md). See [`README.md`](README.md) §Which is which
-- **Written:** 2026-08-18 · **rewritten 2026-09-12** under L9 ([W-138](../../archive/open/W-138-reconcile-with-l9.md))
+- **Written:** 2026-08-18 · **rewritten 2026-09-12** under SR-WORK-ENVIRONMENTS ([W-138](../../archive/open/W-138-reconcile-with-l9.md))
 
 ---
 
@@ -94,7 +94,7 @@ run**; it is standing rule §0b in `fux-lab/TEST-PLAN.md`.
 `.fux/`?"*. That last detail is not decoration: the scaffolder once emitted a
 corpus only, and every scaffolded environment reproduced the same confusion.
 
-⚠ **`new-env.sh` still generates a synthetic corpus.** Under L9 an environment
+⚠ **`new-env.sh` still generates a synthetic corpus.** Under SR-WORK-ENVIRONMENTS an environment
 that produces a *filed measurement* reads a golden rung instead; the generator
 survives for scaffolding, smoke runs and harness self-tests, which are not
 measurements of quality. If you scaffold an environment for a filed run, point
@@ -178,12 +178,12 @@ and add a row to [`../regression/README.md`](../regression/README.md).
 **The reproduce command must actually reproduce.** A run whose numbers cannot be
 regenerated is an anecdote.
 
-## What L9 settled here, 2026-09-11
+## What SR-WORK-ENVIRONMENTS settled here, 2026-09-11
 
 The 2026-08-22 *"multiple folders, each its own git repo, tiers 10 / 100 / 1000 /
 5000 / 10000"* redesign sat in this document unexecuted for three weeks. **It is
 answered, not deferred:** the ladder is the shape, its rungs are their own git
-repos under `corpora/golden/`, and the tier list is L9's. The three open
+repos under `corpora/golden/`, and the tier list is SR-WORK-ENVIRONMENTS's. The three open
 questions that came with it — how `shared/` reaches independent repos, whether
 the outer directory needs its own safety net, and the naming — are closed by the
 layout above: `shared/` stays one copy at the lab root, the outer `.git` is the
@@ -191,7 +191,7 @@ safety net, and the name did not change.
 
 ## References (required)
 
-- [ADR-LAW-9](../../docs/adr/0011_LAW-9-environments.md) — the law that gave this
+- [SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md) — the law that gave this
   environment its one job and its data.
 - [`work/golden/README.md`](../golden/README.md) — the sealed benchmark and the
   one rule about its key.

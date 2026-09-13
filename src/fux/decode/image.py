@@ -16,7 +16,7 @@ producing nothing.
 
 ⚠ **`.png`/`.jpg`/`.jpeg`/`.gif` joined `DEFAULT_TYPES` on 2026-08-29**
 (Arpit, in the same change this decoder shipped) — a genuinely new addition,
-not a reversal: [ADR-TYPES](../../../docs/adr/0031_types-list.md) never named
+not a reversal: [SR-TYPES](../../../records/0128_types-list.md) never named
 raster images. **Why this is safe where the raw-bytes case measured in that
 record was not**: a pure-pixel image with none of the metadata above decodes
 to `None` and is **not indexed at all** — there is no equivalent of the `.json`

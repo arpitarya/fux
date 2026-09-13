@@ -1,8 +1,8 @@
 """jsonl / svg / image — three built-in decoders added on 2026-08-29
 for `.jsonl`, `.svg`, `.png`/`.jpg`/`.jpeg`/`.gif`.
 
-Shipped as built-ins (`fux.decode.BUILTIN_MODULES`), which — per [ADR-TYPES](
-../../docs/adr/0031_types-list.md) decision 1 — automatically widens
+Shipped as built-ins (`fux.decode.BUILTIN_MODULES`), which — per [SR-TYPES](
+../../records/0128_types-list.md) decision 1 — automatically widens
 `DEFAULT_TYPES` to admit these extensions, reversing the SVG half of that
 record's decision 5. These tests load the real committed copy from this
 repo's `.fux/decoders/` the same way `fux ingest` does — through

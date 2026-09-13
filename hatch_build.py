@@ -2,9 +2,9 @@
 
 **Why a build hook rather than a static `force-include`.** The wheel carries
 the Node reader at `fux/templates/node/` so `fux setup` can vendor it
-(ADR-NODE-SEARCH decision 13). Since 2026-09-12 what it carries is **one
+(SR-NODE-SEARCH decision 13). Since 2026-09-12 what it carries is **one
 generated file plus its sidecars**, never `node/src/**`
-([L10](docs/adr/0012_LAW-10-bundled-output.md)) — and a generated file cannot be
+([L10](records/0011_LAW-10-bundled-output.md)) — and a generated file cannot be
 named in a static include list without someone having remembered to generate it
 first. The hook removes the ordering question: **every wheel built from this
 tree carries a bundle built from this tree.**

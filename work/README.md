@@ -10,7 +10,7 @@ never seen this repo can arrive cold, learn the true state in minutes, do
 work, and leave the next session better off than it found it. Nothing here is
 decoration; every file has a trigger that says when it must change.
 
-`docs/` holds what the project **is** — the plan, the glossary, and the ADR
+`docs/` holds what the project **is** — the plan, the glossary, and the SR
 register. `work/` holds what is **happening to it**, which since 2026-08-18
 includes the paper, the diagrams, the handoffs and the v0.30 record set: those
 are all mid-rewrite, and a doc being rewritten is work.
@@ -20,6 +20,7 @@ are all mid-rewrite, and a doc being rewritten is work.
 | file | what it is | when it changes |
 |---|---|---|
 | [`OPEN-WORK.md`](OPEN-WORK.md) | **read first** — the single live queue, **items first, grouped by record**; rules at the foot | in the **same change** as the work that affects it |
+| [`BACKLOG.md`](BACKLOG.md) | the **named-but-unclaimed** — everything a record, proposal or compare doc says is outstanding and nobody is doing, in five classes; rules in [SR-WORK-BACKLOG](../records/0055_WORK-backlog.md). ⚠ **its length is not a signal** | a record names something outstanding, or an item is promoted into the queue — **same change**, always |
 | [`WORKLOG.md`](WORKLOG.md) | append-only session log, newest first | **every** session, before it ends — chat-only ones too |
 | [`INTERVIEW.md`](INTERVIEW.md) | the state-of-play doc a cold successor reads | **during** the session, not at the end |
 | [`IMPLEMENTATION.md`](IMPLEMENTATION.md) | milestone log — what shipped, when, and how it turned out | a milestone or release lands |
@@ -33,9 +34,9 @@ are all mid-rewrite, and a doc being rewritten is work.
 | [`paper/`](paper/the-fux-index-paper.md) | the architecture of record + figures | the architecture changes; a prediction gets measured |
 | `architecture-*.svg` | **the six diagrams**, redrawn from the code 2026-09-12 and again the same day for the Node read plane: `high-level` (what fux is) · `detailed` (every plane, committed vs not, and **the two readers**) · `decoders` · `ask` · `answer` · `two-readers` (Python versus Node, component for component). `docs/architecture-*.png` are rendered from these and are never edited directly | the plane, verb, **reader** or record shape each one draws changes. **`high-level` should move rarely** — if it moves often it is drawn at the wrong altitude |
 | `proposal-search-v3-target.svg` | the target architecture of [`proposals/search-v3.md`](proposals/README.md) | **deliberately outside the `architecture-*` namespace**: it draws a proposal's target state, not the architecture of record |
-| [`setup/`](setup/README.md) | the three sibling environments fux needs but does not contain — `fux-playground`, `fux-lab`, `fux-benchmark`; each one's job is [L9](../docs/adr/0011_LAW-9-environments.md)'s | any of them is set up differently, or a new external dependency appears |
+| [`setup/`](setup/README.md) | the three sibling environments fux needs but does not contain — `fux-playground`, `fux-lab`, `fux-benchmark`; each one's job is [SR-WORK-ENVIRONMENTS](../records/0052_WORK-environments.md)'s | any of them is set up differently, or a new external dependency appears |
 
-**Records live in [`../docs/adr/`](../docs/adr/README.md), and nowhere else.**
+**Records live in [`../records/`](../records/README.md), and nowhere else.**
 `work/adr/` existed for one day as a superseded-pending staging area and was
 retired on 2026-08-18. There is no archive tier either: on 2026-09-06 Arpit
 deleted the archived records outright, so a superseded record is **rewritten or
@@ -45,6 +46,12 @@ deleted in the change that supersedes it** and leaves no second file behind.
 decision with real options on the table — gets a `compare/` doc with a verdict
 and a reopen-trigger. An idea nobody has decided on gets a `proposals/` doc.
 If you cannot tell which, it is a proposal.
+
+**Queue or backlog?** If somebody is doing it, or is about to, it is a `W-nn` in
+[`OPEN-WORK.md`](OPEN-WORK.md) with a ball and a detail file. If it has only been
+*named* — a record says it is unbuilt, ungated, unmeasured, unruled, or a cost
+accepted — it is a `B-nnn` row in [`BACKLOG.md`](BACKLOG.md) and nothing else.
+**Never both** ([SR-WORK-BACKLOG](../records/0055_WORK-backlog.md) rule 7).
 
 ## Three cross-cutting rules
 
@@ -77,7 +84,9 @@ command that reproduces. A doc repeating another doc is not a second source.
 
 1. Read [`../CLAUDE.md`](../CLAUDE.md) §Documentation discipline.
 2. Read [`INTERVIEW.md`](INTERVIEW.md) — state of play, in-flight work, next step.
-3. Read [`OPEN-WORK.md`](OPEN-WORK.md), then **reconcile** it against
+3. Read [`OPEN-WORK.md`](OPEN-WORK.md) — and [`BACKLOG.md`](BACKLOG.md) before
+   filing anything new, so a thing already named does not get named twice — then
+   **reconcile** the queue against
    [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md)
    and the repo itself before believing any of its status markers.
 4. Do the work, updating `OPEN-WORK.md` and `INTERVIEW.md` as you go.

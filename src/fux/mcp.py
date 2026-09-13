@@ -40,7 +40,7 @@ def _k_property(top: int) -> dict:
     5 in its own tool schema, which is W-83's class of defect exactly — an
     accepted decision (11: "the resolved top") whose code implemented a
     different one. `_tools(top)` closes the gap: it is called once, in
-    `serve()`, with the value ADR-OUTPUT's own chain resolved.
+    `serve()`, with the value SR-OUTPUT's own chain resolved.
     """
     from .output_config import OUTPUT_NAME
 
@@ -168,10 +168,10 @@ def _search(root: Path, args: dict, *, top: int) -> dict:
     from .query.headings import headings_for
 
     query = args.get("query") or ""
-    # ADR-OUTPUT: `[mcp] top` is this surface's default, because a tool call
+    # SR-OUTPUT: `[mcp] top` is this surface's default, because a tool call
     # has no flags. An explicit `k` in the call still wins, exactly as a CLI
     # flag does. ⚠ There is deliberately no `[mcp] band`: the confidence block
-    # below is UNCONDITIONAL here (ADR-CONFIDENCE decision 11).
+    # below is UNCONDITIONAL here (SR-CONFIDENCE decision 11).
     #
     # `top` is a parameter, not a per-call `output_config.load()` — decision
     # 17: the config is read ONCE, in `serve()`, not once per search in a
@@ -205,6 +205,11 @@ def _search(root: Path, args: dict, *, top: int) -> dict:
                 "sha": record.get("sha", ""),
                 "archived": r.archived,
                 "superseded": bool(record.get("superseded", False)),
+                # W-153 -- the committed git commit timestamp in whole unix
+                # seconds, or `None` for a document outside git history. Always
+                # present; `None` is the claim *no committed date*, never "this
+                # server is too old to say" (the W-48 trap).
+                "mtime": record.get("mtime"),
                 # W-84 -- the document's headings that match this query, best
                 # first, at most three. **Free here**: the record is already in
                 # hand for `sha`, and `phrases` was committed at ingest. Always
@@ -217,7 +222,7 @@ def _search(root: Path, args: dict, *, top: int) -> dict:
     return {
         "results": out,
         "ranked_by": path,
-        # ADR-CONFIDENCE. **The single most important key on this surface**, and
+        # SR-CONFIDENCE. **The single most important key on this surface**, and
         # the reason the record exists: an agent handed a ranked list cannot
         # tell "these documents answer your question" from "these are the
         # closest things in a corpus that never discusses it". Both look
@@ -370,7 +375,7 @@ def serve(stdin=None, stdout=None, root: Path | None = None, *, enabled: bool = 
     subprocess — the protocol is the thing worth testing, and a pipe adds
     nothing but flakiness.
 
-    `[mcp] top` is resolved ONCE here, at start-up (ADR-OUTPUT decision 17),
+    `[mcp] top` is resolved ONCE here, at start-up (SR-OUTPUT decision 17),
     and threaded into every message handled on this connection — never
     re-read per search. `enabled=False` is `--no-output-config`: `.fux/
     output.toml` is not read at all and `top` resolves to `BUILT_IN['top']`.

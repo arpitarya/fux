@@ -139,7 +139,7 @@ def test_the_enrichment_body_is_redacted_before_it_becomes_ctx():
 
 
 def test_the_enrichment_sha_is_never_recomputed_from_redacted_text():
-    """ADR-PII decision 3's hazard, at the enrichment surface.
+    """SR-PII decision 3's hazard, at the enrichment surface.
 
     `_enrichment_for` takes the sha as an argument and must never derive one.
     A sha over redacted text reports every enriched document `stale` against
@@ -154,7 +154,7 @@ def test_the_enrichment_sha_is_never_recomputed_from_redacted_text():
 def test_the_acquired_plane_is_never_redacted():
     """`.fux/acquired/` must stay the exact bytes the source returned.
 
-    ADR-URL-FRESHNESS decision 6 compares an ingest-time sha against a
+    SR-URL-FRESHNESS decision 6 compares an ingest-time sha against a
     verify-time one built from these bytes. Redacting them makes `as-ingested`
     a claim about text nobody ever served.
     """
@@ -252,7 +252,7 @@ def test_the_generated_readme_says_index_only():
 
 
 def test_ingest_refuses_a_repo_with_no_pii_file(tmp_path):
-    """ADR-PII decision 17's second layer: a library caller never reaches the CLI gate."""
+    """SR-PII decision 17's second layer: a library caller never reaches the CLI gate."""
     from fux.errors import FuxError
     from fux.ingest.run import run
 

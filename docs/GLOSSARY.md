@@ -24,12 +24,12 @@ exactly three — git-dir, generic HTTP (conditional GET), Confluence REST —
 and the cap is a decision, not a backlog. MCP is the endgame and is parked as
 [a proposal](../work/proposals/mcp-adapters.md). See [M5](../archive/open/W-25-m5-maintenance.md).
 
-**ADR** — Architecture Decision Record. One per completed feature, in
-[`adr/`](adr/): decision, context, alternatives, consequences, references
+**SR** — Architecture Decision Record. One per completed feature, in
+[`adr/`](../records/): decision, context, alternatives, consequences, references
 (required). Numbering **restarted at 0001** for the v0.30 rebuild (Arpit,
-2026-08-09); the archived engine's ADRs 0001–0015 live at
+2026-08-09); the archived engine's SRs 0001–0015 live at
 [`archive/v0.26-docs/adr/`](../archive/v0.26-docs/adr/) and are always cited
-as "archived ADR-NNNN". See [CLAUDE.md](../CLAUDE.md), [adr/README](adr/README.md).
+as "archived SR-NNNN". See [CLAUDE.md](../CLAUDE.md), [adr/README](../records/README.md).
 
 **AI-assisted mode** — See [enriched mode](#enriched-mode).
 
@@ -44,7 +44,7 @@ resistance**: a re-index after a large merge is the bulk scan that flushes an
 LRU's hot set, and here a miss costs a network fetch. In-memory and
 per-process — distinct from the [TTL fetch cache](#ttl-fetch-cache), which is
 on disk. Megiddo & Modha, FAST 2003 (paper ref [11]). See
-[ADR-CACHE](adr/0131_cache.md) decisions 2–5,
+[SR-CACHE](../records/0131_cache.md) decisions 2–5,
 [cache-policy](../work/compare/cache-policy.compare.md).
 
 **BIC (Binary Interpolative Coding)** — The posting-list codec for the
@@ -80,7 +80,7 @@ else. **It is a link, not parsed code**: fux runs no parser over source files,
 so a `code` edge never means a symbol, an import or a call. The name is a
 historical carry-over and is a known misnomer; a rename to `path` would change
 a committed record field and is owned by
-[ADR-GRAPH](adr/0126_graph.md). See [documents, not code](#documents-not-code).
+[SR-GRAPH](../records/0126_graph.md). See [documents, not code](#documents-not-code).
 
 **Compare doc** — A decision record written *before* building whenever a fork
 has multiple viable options: debate, matrix, grounded references, a proposed
@@ -92,7 +92,7 @@ convention. Lives in [`work/compare/`](../work/compare/README.md).
 the [ledger](#ledger-l). The single exception is per-source
 [`snapshot` mode](#snapshot-mode), which is explicit and opt-in. This is what
 makes the committed artifact small, ACL-safe, and never stale-by-accumulation.
-See [CLAUDE.md §Non-negotiable constraints](../CLAUDE.md), named by [ADR-LAWS](adr/0001_LAWS.md), [paper §3](../work/paper/the-fux-index-paper.md).
+See [CLAUDE.md §Non-negotiable constraints](../CLAUDE.md), named by [SR-LAWS](../records/0001_LAWS.md), [paper §3](../work/paper/the-fux-index-paper.md).
 
 **Determinism** — Same sources → byte-identical index and root hash; same
 question → same answer. No wall-clock output, no model in the maintenance
@@ -105,7 +105,7 @@ Blocked postings (128 per line) plus a fixed-width binary
 [offset table](#offset-table); it makes warm `ask` fast and is bound by the
 [differential law](#differential-law). Deleting it costs a `fux build` and
 nothing else. Tier T1 in the [index-format compare doc](../work/compare/index-format.compare.md)
-§3. See [ADR-T1-ACCELERATOR](adr/0110_accelerator.md).
+§3. See [SR-T1-ACCELERATOR](../records/0110_accelerator.md).
 
 **Block / block line** — One line of the accelerator's postings file, holding
 up to 128 `(docidx, tf_heading, tf_body)` entries for a single term, in
@@ -121,7 +121,7 @@ generated sweeps and every graded golden, in both skipping modes, at several
 whole tiering story rests on: a 99 %-equivalent accelerator produces a fast
 system whose every downstream measurement is quietly untrustworthy, and
 nothing ever errors. M4's [ARC cache](#arc-adaptive-replacement-cache) carries the same discipline.
-See [ADR-T1-ACCELERATOR](adr/0110_accelerator.md), `tools/differential/`.
+See [SR-T1-ACCELERATOR](../records/0110_accelerator.md), `tools/differential/`.
 
 **`mx` (block max)** — The largest **weighted term frequency**
 (`3*tf_heading + tf_body`) in a [block](#block--block-line), stored as an
@@ -152,7 +152,7 @@ M4's fetch cache nested inside it at `runtime/fetch-cache/`). Created through
 `derived_dir()`, which drops a [`CACHEDIR.TAG`](https://bford.info/cachedir/)
 so backup tools skip it, and named explicitly in `.fux/.gitignore`. Opposite
 of a *committed plane* (`index/`, `sources/`, `fetchers/`). See
-[ADR-DOTFUX](adr/0102_fux-directory.md).
+[SR-DOTFUX](../records/0102_fux-directory.md).
 
 **Doc-id** — A document's integer identity inside the wire index, assigned in
 **ledger sort order**. Not an arbitrary counter: sort order clusters related
@@ -181,7 +181,7 @@ crawler caches still say so, and why this entry exists.
 **Edge grade (EXTRACTED / INFERRED)** — The archived link-graph vocabulary,
 ported at [M3](../archive/open/W-23-m3-graph-lane.md): `EXTRACTED` = deterministically parsed from the
 document, `INFERRED` = model- or heuristic-derived and ranked below it. Since
-[ADR-EXTRACTED](adr/0115_extracted-mode.md) these **agree** with the
+[SR-EXTRACTED](../records/0115_extracted-mode.md) these **agree** with the
 [ingest modes](#extracted-mode) rather than contradicting them: `extracted`
 means "no model" on both sides, and `enriched` sits with `INFERRED`.
 
@@ -196,8 +196,8 @@ outputs are **pinned** into the index with provenance and re-read forever
 deterministic signal wherever they compete, and **enrichment never runs inside
 `fux ingest`** — it is its own command, pinned then ingested. Contrast
 [extracted mode](#extracted-mode). Named and fenced by
-[ADR-ENRICH](adr/0137_enrich.md) (the contract, ratified 2026-08-19 as
-ADR-ENRICHED and folded in here when that record was superseded on 2026-08-27 —
+[SR-ENRICH](../records/0137_enrich.md) (the contract, ratified 2026-08-19 as
+SR-ENRICHED and folded in here when that record was superseded on 2026-08-27 —
 still **not permission to build**); deferred to
 [M8](../archive/open/W-38-m8-deferred.md).
 
@@ -206,12 +206,12 @@ deterministic — conversion, chunking, term selection, static-table embedding
 codes, edge extraction. Everything is *taken from* the document; nothing is
 invented. Byte-reproducible, and the mode every guarantee in the paper is
 stated for. Contrast [enriched mode](#enriched-mode). Ratified by
-[ADR-EXTRACTED](adr/0115_extracted-mode.md), Arpit 2026-08-19.
+[SR-EXTRACTED](../records/0115_extracted-mode.md), Arpit 2026-08-19.
 
-**Renamed from `inferred`** by [ADR-EXTRACTED](adr/0115_extracted-mode.md):
+**Renamed from `inferred`** by [SR-EXTRACTED](../records/0115_extracted-mode.md):
 `INFERRED` is the [edge grade](#edge-grade-extracted--inferred) for
 *model-derived*, so calling the no-model tier `inferred` reproduced the exact
-collision the ADR existed to remove. `inferred` survives only in the frozen
+collision the SR existed to remove. `inferred` survives only in the frozen
 archived *fidelity* vocabulary and is **not** a valid v0.30 mode value.
 
 **Eval corpora (the three)** — What [P1](#p-predictions-p1p7) is measured on:
@@ -228,7 +228,7 @@ child is **declared** as committed or [derived](#derived-plane): `index/`
 `fetchers/` (consumer-owned code) and two generated files — a
 self-describing `README.md` and a `.gitignore` naming **only** the derived
 dirs, never `*`. Both are write-if-missing; anything undeclared is a `fux
-doctor` warning. See [ADR-DOTFUX](adr/0102_fux-directory.md).
+doctor` warning. See [SR-DOTFUX](../records/0102_fux-directory.md).
 
 **Fux-benchmark** — The two-version timing harness
 (`~/my_programs/fux-benchmark/`): its own corpora, a fixed query set with no
@@ -236,14 +236,14 @@ answer key, and every run timing each query and keeping the ranked list it
 returned so the next run has something to compare against. It never judges
 quality — that is the lab's. See
 [SETUP-BENCHMARK](../work/setup/fux-benchmark.md) and
-[L9](adr/0011_LAW-9-environments.md).
+[SR-WORK-ENVIRONMENTS](../records/0052_WORK-environments.md).
 
 **Fux-lab** — The scratch measurement environment (`~/my_programs/fux-lab/`),
 one directory per environment, each with its own venv and baselines, and the
 [golden ladder](../work/golden/README.md) as its corpus. It commits nothing; its
 **evidence is filed** into [`work/regression/`](../work/regression/README.md),
 which is a repo law. What it may measure and how large a corpus it may use are
-[L9](adr/0011_LAW-9-environments.md)'s. See [SETUP-LAB](../work/setup/fux-lab.md).
+[SR-WORK-ENVIRONMENTS](../records/0052_WORK-environments.md)'s. See [SETUP-LAB](../work/setup/fux-lab.md).
 
 **FuxVec** — The from-scratch stdlib dense engine: sign-quantizes a 256-dim
 int8 embedding into a **256-bit code** (32 B/doc), scans by Hamming distance,
@@ -264,7 +264,7 @@ corpus and **never** derived from what fux returned — the TREC `qrels`
 discipline. The schema is
 [`tools/quality/goldens.py`](../tools/quality/goldens.py). ⚠ **The fifty that
 this term was coined for lived in the [playground](#playground-fux-playground)
-and are retired** ([L9](adr/0011_LAW-9-environments.md), 2026-09-11); the live
+and are retired** ([SR-WORK-ENVIRONMENTS](../records/0052_WORK-environments.md), 2026-09-11); the live
 question set is the sealed [golden ladder](../work/golden/README.md), whose
 questions carry **no** rank contract, because its key is sealed.
 
@@ -277,7 +277,7 @@ generator `--selftest` shows those queries are actually separable by the
 property under test, and **unproven** otherwise — unproven is disclosed, never
 treated as zero. **Zero headroom in a direction makes a null *Inconclusive*, not
 *no detected change*.** There is deliberately no minimum. See
-[ADR-RS](adr/0133_predictions.md) decision 22.
+[SR-RS](../records/0133_predictions.md) decision 22.
 
 **Hashed meta (`meta = hashed`)** — The **default** for every non-git source:
 `M/` stores term and phrase *hashes*, never readable text. Closes the
@@ -332,8 +332,8 @@ path — only under `fux add <URL>` or `fux update` — and calls
 the system lives here, outside `src/fux/`, which is how the
 [`$0`](#0-the-zero-dollar-law) offline-by-default laws survive URL ingestion.
 Tunables arrive through the opaque `[sources.url.config]` table, never as
-typed keys in fux's schema. See [ADR-URL-INGEST](adr/0107_url-ingest.md),
-[ADR-DOTFUX](adr/0102_fux-directory.md).
+typed keys in fux's schema. See [SR-URL-INGEST](../records/0107_url-ingest.md),
+[SR-DOTFUX](../records/0102_fux-directory.md).
 
 **MPH (minimal perfect hash)** — A collision-free term→slot map at ~2–3
 bits/key, the planned `D/` dictionary upgrade (~15 MB saving at 10⁶ docs — **deferred-target arithmetic**; the design point is 10 000 since 2026-08-21).
@@ -386,7 +386,7 @@ See [SETUP-PLAYGROUND](../work/setup/fux-playground.md).
 
 **Playground (`fux-playground`)** — A **separate sibling repository** that is
 Arpit's sandbox, and nothing else. Who may touch it and what it may be used for
-are stated by [L9](adr/0011_LAW-9-environments.md); this entry does not restate
+are stated by [SR-WORK-ENVIRONMENTS](../records/0052_WORK-environments.md); this entry does not restate
 them. It holds ten fictional internal-developer-platform documents, ten URLs
 that exercise the CDP [fetcher](#fetcher-url), and a committed index holding
 **file documents only**. ⚠ **Until 2026-09-11 it was also the project's graded
@@ -452,7 +452,7 @@ two are separate stores and why a TTL hit is labelled
 caching whatever the TTL says. Disk-bounded, oldest-`fetched_at` evicted first.
 **The only place in the engine that reads a wall clock.** Its existence is a
 rate-limit answer, not a latency one — an agent asking ten questions about one
-runbook must not fetch it ten times. See [ADR-CACHE](adr/0131_cache.md)
+runbook must not fetch it ten times. See [SR-CACHE](../records/0131_cache.md)
 decisions 6–11, [refer-fetch-cache](../work/compare/refer-fetch-cache.compare.md).
 
 **`cached` (the fourth verdict)** — One of the four freshness labels the
@@ -462,8 +462,8 @@ decisions 6–11, [refer-fetch-cache](../work/compare/refer-fetch-cache.compare.
 it carries `age_seconds` so a caller can judge for itself. **Never folded into
 `current`**, which is reserved for "verified against the source this call".
 Collapsing them anywhere downstream is the "knob that lies" failure in a new
-location. See [ADR-CACHE](adr/0131_cache.md) decision 7,
-[ADR-REFER](adr/0127_refer-plane.md) decision 6.
+location. See [SR-CACHE](../records/0131_cache.md) decision 7,
+[SR-REFER](../records/0127_refer-plane.md) decision 6.
 
 **URL source (`[sources.url]`)** — The `src: "url"` ingestion path: URLs are
 read from the committed `.fux/sources/urls` (one per line), fetched through
@@ -472,7 +472,7 @@ files with [hashed meta](#hashed-meta-meta--hashed) by default. Fux ships
 **no** URL adapter — the adapter cap is untouched, because the fetching code
 is the consumer's. Fetching happens only under `fux add <URL>` or `fux update`; a plain
 ingest carries every `url:` record forward byte-identically. See
-[ADR-URL-INGEST](adr/0107_url-ingest.md).
+[SR-URL-INGEST](../records/0107_url-ingest.md).
 
 **Use record (the law, L8)** — Anything durable fux keeps about **someone using
 it**, as opposed to about the corpus: query keys, citation history, counters. L8
@@ -486,8 +486,8 @@ still says which documents are asked about and how often; those locators are
 already in the committed `M/` plane, so it adds *frequency*, not new exposure.
 Distinct from [content-never-durable](#content-never-durable-the-law), which
 governs the corpus: a query is not content, which is the gap L8 exists to close.
-Stated by [ADR-LAW-8](adr/0010_LAW-8-use-record.md); handle assigned by
-[ADR-LAWS](adr/0001_LAWS.md), whose decision 8 carries the same-day
+Stated by [SR-LAW-8](../records/0010_LAW-8-use-record.md); handle assigned by
+[SR-LAWS](../records/0001_LAWS.md), whose decision 8 carries the same-day
 write/revert/ratify history.
 
 **Wire format** — The **committed** encoding of the index: BIC postings,
@@ -508,7 +508,7 @@ mutex over the committed index. A pid in JSON, created with
 and by **no** read verb. Named `write.lock` rather than `index.lock` because
 git keeps one of those in the same repository. Its stop files
 (`runner.stop`, `daemon.stop`) and `daemon.pid` are **not** locks — they are
-how a holder is asked to release. See [ADR-LOCKS](adr/0140_locks.md); and note
+how a holder is asked to release. See [SR-LOCKS](../records/0140_locks.md); and note
 that `fux.lock` — the archived engine's committed state plane — is retired and
 not the same object.
 

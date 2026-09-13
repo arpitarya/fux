@@ -3,6 +3,8 @@
  * Twin of `headings.py`. Runs after `run_query` returns, over the record's
  * committed `phrases`, so it can never reach a score. `[]` for a missing
  * record, a `hashed` one, or a query no heading matches.
+ *
+ * Owned, with its Python twin, by [SR-ASK](../../../records/0103_ask.md).
  */
 import { tokenize } from "./tokenize.mjs";
 

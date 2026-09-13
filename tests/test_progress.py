@@ -1,4 +1,4 @@
-"""The progress plane (W-64, ADR-CLI decision 9).
+"""The progress plane (W-64, SR-CLI decision 9).
 
 The load-bearing property is asserted end-to-end in
 `tests_e2e/test_progress.py`: stdout is byte-identical with the bar on or off.

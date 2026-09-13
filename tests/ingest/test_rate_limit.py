@@ -143,7 +143,7 @@ def test_a_working_predicate_prints_nothing(capsys):
 def test_the_warning_never_becomes_a_raise():
     """The guarantee the warning sits on top of, restated where it could break.
 
-    ADR-FETCHER decision 10: one consumer bug must never end an ingest of
+    SR-FETCHER decision 10: one consumer bug must never end an ingest of
     10 000 documents.
     """
     out, limited, _ = _run(_boom_module(flaky_for=99), urls=("https://a.test/x", "https://b.test/y"))

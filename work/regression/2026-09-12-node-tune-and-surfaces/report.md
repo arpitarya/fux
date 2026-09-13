@@ -129,7 +129,7 @@ pairs differ.
 Every conformant client got an **empty result reported as success**.
 `fux_search` additionally returned five of the nine keys Python returns and
 **none of `confidence`** — the one key
-[ADR-CONFIDENCE](../../../docs/adr/0142_confidence.md) decision 11 makes
+[ADR-CONFIDENCE](../../../docs/adr/0141_confidence.md) decision 11 makes
 unconditional on MCP, precisely because a tool call cannot pass a flag.
 
 `[mcp] top` was hard-coded to `5`, so `.fux/output.toml` did not reach the

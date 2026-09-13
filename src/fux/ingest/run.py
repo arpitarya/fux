@@ -23,7 +23,7 @@ sha and gated on the shard header still matching `store.HEADER`, so an analyzer
 version bump invalidates every reused field at once rather than silently
 mixing two analyzers in one index. `fux ingest --full` re-extracts regardless.
 
-Two honest consequences, both recorded in ADR-MAINTENANCE:
+Two honest consequences, both recorded in SR-MAINTENANCE:
 
 - **Term-hash collision detection is complete only on a full run.** The tracker
   sees the raw terms of changed documents; an unchanged document contributes
@@ -38,7 +38,7 @@ Two honest consequences, both recorded in ADR-MAINTENANCE:
 what `store.write_index` guarantees: a shard whose bytes come out identical is
 left untouched on disk.
 
-URL docs (ADR-URL-INGEST) obey the offline-by-default law: a plain `fux ingest`
+URL docs (SR-URL-INGEST) obey the offline-by-default law: a plain `fux ingest`
 never touches the network. Only the fenced paths load a consumer fetcher and
 fetch; a configured URL whose fetch fails keeps its prior record, because a
 transient network failure must never delete a document.
@@ -58,13 +58,13 @@ this run no longer holds. `_without_dangling_edges` drops those, which is what
 keeps the derived graph plane free of targets no verb can explain.
 
 Which fetcher runs, and whether a URL's display fields are hashed, are both
-**per line** (ADR-URL-LIST decision 10): `urlsrc.resolve_urls` layers the
+**per line** (SR-URL-LIST decision 10): `urlsrc.resolve_urls` layers the
 built-in default, the source-wide `[sources.url]` setting and the line, and
 everything below it reads one already-resolved answer.
 
 Every run calls `ensure_layout` first, so a fresh clone gets its `.fux/`
 README and narrow `.gitignore` before anything is written into the directory
-(ADR-DOTFUX). Both are write-if-missing; a consumer's edits survive.
+(SR-DOTFUX). Both are write-if-missing; a consumer's edits survive.
 """
 
 from __future__ import annotations
@@ -146,10 +146,10 @@ def run(
     thing that may fetch a line declaring `update=never`. A pin freezes a
     document; it cannot freeze one that was never fetched, so the add that
     creates the line gets its single fetch and every run after it is pinned
-    (ADR-URL-LIST decision 14). Nothing else ever populates this set.
+    (SR-URL-LIST decision 14). Nothing else ever populates this set.
 
     `should_stop` is the **cooperative stop** the deferred runner is halted by
-    (W-66 Phase 2, ADR-MAINTENANCE decision 1d). It is polled between units of
+    (W-66 Phase 2, SR-MAINTENANCE decision 1d). It is polled between units of
     work and **only ever before `write_index`**: once bytes start reaching a
     committed shard the run finishes, because `write_index` is the single path
     into the committed plane and a partial shard is the one outcome worse than
@@ -169,10 +169,10 @@ def run(
     covered = dirty_mod.read(root)
     config = load_config(root)
     # `[index]` alone, never `tune.load()`: a bad ranking knob must not fail an
-    # ingest or a hook, and `--no-tune` does not reach these (ADR-TUNE
+    # ingest or a hook, and `--no-tune` does not reach these (SR-TUNE
     # decision 13). Read up front so a bad value stops the run before any work.
     limits = tune_mod.index_limits(root)
-    store_mod.ensure_layout(root)  # `.fux/` README + .gitignore, write-if-missing (ADR-DOTFUX)
+    store_mod.ensure_layout(root)  # `.fux/` README + .gitignore, write-if-missing (SR-DOTFUX)
     files, skipped = walk_sources(
         root,
         source_dirs(root, config.dirs_file),
@@ -194,7 +194,7 @@ def run(
     carried: dict[str, dict] = {}  # url doc_id -> prior record, reused verbatim
     url_meta: dict[str, str] = {}  # url doc_id -> the `meta` policy its line resolved to
     #: URL documents whose bytes arrived and yielded nothing — the same
-    #: discovered need for a model that an unreadable file is (ADR-FETCHER
+    #: discovered need for a model that an unreadable file is (SR-FETCHER
     #: decision 11, ruled 2026-08-28).
     unreadable_urls: list[queue_mod.QueueEntry] = []
     validated_count = 0
@@ -225,7 +225,7 @@ def run(
         # one.
         #
         # ⚠ **ONE exemption, and it is the one the record always named:
-        # `first_fetch`.** [ADR-URL-LIST](../../docs/adr/0116_url-list.md)
+        # `first_fetch`.** [SR-URL-LIST](../../records/0116_url-list.md)
         # decision 14 says *`fux add <URL> --no-update` ... still fetches once —
         # one fetch is what makes the line ingestable at all; the flag governs
         # every run after*. The filter did not know about the add, so that add
@@ -294,7 +294,7 @@ def run(
         # A URL whose bytes arrived and yielded nothing needs a MODEL, exactly as
         # a scanned PDF on disk does — so it goes in the same committed queue,
         # under the same `doc_id` convention. Ruled by Arpit 2026-08-28; the
-        # asymmetry was a gap, not a decision (ADR-FETCHER decision 11).
+        # asymmetry was a gap, not a decision (SR-FETCHER decision 11).
         #
         # ⚠ **`UNFETCHED` is excluded, and that is the whole care here.** A 404
         # or a timeout is not something enrichment discharges, and `queue.tsv` is
@@ -394,7 +394,7 @@ def run(
     # bytes; until it is ruled, nothing here moves.
     parsed |= {doc_id: parse(content) for doc_id, content in fresh.items()}
 
-    # ⚠ **Redaction sits HERE and the position is load-bearing** (ADR-PII).
+    # ⚠ **Redaction sits HERE and the position is load-bearing** (SR-PII).
     # `file_shas` and `content_sha(fresh[...])` are already computed from the
     # RAW bytes above, and the record keeps those: a sha fingerprints the
     # source, and `refer` verifies a citation by fetching that source and
@@ -454,7 +454,7 @@ def run(
                 # one leak this plane can only report.** `loc` is the address
                 # `fux answer` fetches with and `id` is the key the whole index
                 # is sorted and diffed on; a redacted path addresses nothing.
-                # Silence here is the worse option: ADR-PII's stated cost is
+                # Silence here is the worse option: SR-PII's stated cost is
                 # that a bad rule is invisible, and so is this.
                 _, loc_hits = pii_mod.redact(pii_rules, _loc_of(doc_id))
                 if loc_hits:
@@ -493,7 +493,7 @@ def run(
             # it. An email address written in enrichment prose therefore became
             # a committed term on a document whose own body had been redacted,
             # one screen below the comment promising everything downstream is
-            # built from redacted text. ADR-PII decision 1 says the committed
+            # built from redacted text. SR-PII decision 1 says the committed
             # index is redacted; the enrichment body is part of it.
             ctx, ctx_hits = _enrichment_for(root, file_shas.get(doc_id, ""), pii_rules)
             for name, count in ctx_hits.items():
@@ -531,7 +531,7 @@ def run(
     tracker = store_mod.CollisionTracker()
     records: list[dict] = []
     changed = 0
-    # ADR-ARCHIVED-CONTENT decision 1: a record from a declared-archived source
+    # SR-ARCHIVED-CONTENT decision 1: a record from a declared-archived source
     # says so on the record, the way `mode` and `meta` already do, so a record
     # read years later states the rule it was written under instead of having it
     # re-derived by whoever reads it. **Declared, never a path convention** —
@@ -616,7 +616,7 @@ def run(
         if doc_id in archived_url_srcs:
             record["archived"] = True
         # Per-URL, not per-source: a line may opt one public document out of
-        # hashing (ADR-URL-LIST decision 10). It only ever loosens.
+        # hashing (SR-URL-LIST decision 10). It only ever loosens.
         if url_meta.get(doc_id) == "plain":
             record["meta"] = "plain"
             record["title"] = fields.title
@@ -650,7 +650,7 @@ def run(
     # the entire rest of an ingest, measured at 9.5 s for 10 000 documents).
     #
     # The weights that read these are tunable; these values are not. That is
-    # ADR-TUNE decision 1's split, and it is why they can live in the
+    # SR-TUNE decision 1's split, and it is why they can live in the
     # committed index at all.
     from .priors import git_commit_times, superseded_ids
 
@@ -683,7 +683,7 @@ def run(
     # W-66: a run that reaches here indexed the whole corpus, so the snapshot
     # it took at the top is now covered. **Subtracted, never cleared** — an id
     # recorded by a commit that landed while this run was in flight is not in
-    # `covered` and stays pending (ADR-MAINTENANCE decision 1d). A run that
+    # `covered` and stays pending (SR-MAINTENANCE decision 1d). A run that
     # was stopped or died never reaches this line, so the list survives it.
     dirty_mod.discard(root, covered)
     _record_extract_config_digest(root, extract_digest)
@@ -767,7 +767,7 @@ def _enrichment_for(root, sha: str, rules=()) -> tuple[str, dict[str, int]]:
 
     ## Why redaction happens here rather than in the phase named after it
 
-    ADR-PII's redact phase walks `parsed`, and `parsed` holds **document
+    SR-PII's redact phase walks `parsed`, and `parsed` holds **document
     bodies**. Enrichment is a second source of committed vocabulary that never
     enters that map — it is read from `.fux/enrich/` at extraction time — so it
     needs its own pass or it has none. W-102: it had none, and the leak was
@@ -777,12 +777,12 @@ def _enrichment_for(root, sha: str, rules=()) -> tuple[str, dict[str, int]]:
     document's* content sha, taken from raw bytes before any redaction, and it
     is both this file's name and the key `validate()` compares. Redacting the
     body changes what is indexed and changes nothing about identity — the same
-    ordering ADR-PII decision 3 pins for documents, for the same reason: a sha
+    ordering SR-PII decision 3 pins for documents, for the same reason: a sha
     over redacted text would report every enriched document `stale` against its
     own unchanged source.
 
     ⚠ **The frontmatter is deliberately outside the pass.** It is stripped
-    before indexing already (ADR-ENRICH decision 8), so nothing in it reaches a
+    before indexing already (SR-ENRICH decision 8), so nothing in it reaches a
     committed term, and running rules over a `model:` value would refuse a file
     for text the index never sees. `fux enrich --check` draws the same line.
     """
@@ -827,7 +827,7 @@ EXTRACTED_FIELDS = store_mod.recordschema.carried_fields()
 def _existing_index(root: Path, *, full: bool) -> dict[str, dict]:
     """The prior index, or `{}` when `--full` is discharging a schema migration.
 
-    ADR-INDEX-LIFECYCLE decision 10 owes a full re-ingest on every index older
+    SR-INDEX-LIFECYCLE decision 10 owes a full re-ingest on every index older
     than the current analyzer and names `fux ingest --full` as the command that
     pays it. Reading the prior index unconditionally made that command **refuse
     the exact index it exists to replace** — the migration path was documented
@@ -935,7 +935,7 @@ def _pii_ruleset_moved(root: Path, rules) -> bool:
     ruleset, so the next delta run reused terms built under the OLD one and
     nothing ever re-extracted them. `_record_pii_digest` is now called after
     `write_index` returns, which is `extract-config-digest`'s ordering and the
-    reason the two are siblings (ADR-PII decision 11, ADR-INGEST decision 15b).
+    reason the two are siblings (SR-PII decision 11, SR-INGEST decision 15b).
     """
     from ..store import fuxdir
 
@@ -1060,7 +1060,7 @@ def _observe_url_health(root: Path, *, fetched, skipped, listed, token_shas=None
 
     **Best-effort, and that is deliberate.** This is a reporting plane; a
     failure to write it must never fail an ingest that otherwise succeeded.
-    The same reasoning ADR-MAINTENANCE decision 3 applies to hooks: a
+    The same reasoning SR-MAINTENANCE decision 3 applies to hooks: a
     diagnostic that can break the thing it diagnoses is worse than no
     diagnostic.
     """
@@ -1159,7 +1159,7 @@ def _archived_url_ids(root: Path, config) -> set[str]:
 
     The URL half of `gitdir.archived_dirs`, and deliberately the same shape:
     **declared in a committed, diffable line, never inferred from the
-    document's own text** (ADR-ARCHIVED-CONTENT). Inference is not merely
+    document's own text** (SR-ARCHIVED-CONTENT). Inference is not merely
     unreliable — it was measured to INVERT, because BM25F cannot see negation
     and "no longer current" carries the token `current`.
 

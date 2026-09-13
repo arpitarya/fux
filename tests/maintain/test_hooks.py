@@ -94,7 +94,7 @@ def test_post_commit_never_re_indexes_inline():
 
 
 def test_post_commit_does_no_work_that_tracks_corpus_size():
-    """ADR-MAINTENANCE veto condition 5, as a property of the hook body: it
+    """SR-MAINTENANCE veto condition 5, as a property of the hook body: it
     spawns and returns. Anything O(corpus) here would be the veto firing."""
     body = hooks.HOOKS["post-commit"]
     for forbidden in ("git diff-tree", "sort", "sed", "cat ", "fux build"):

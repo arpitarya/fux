@@ -29,7 +29,7 @@ that **table cells inflate `flen`**, so BM25F's length normalisation makes a
 table-heavy document read as denser than it is, and it ranks lower than it
 should for a term that appears in its prose.
 
-⚠ **[ADR-TABULAR](../../docs/adr/0152_tabular.md) did NOT answer this.** It
+⚠ **[SR-TABULAR](../../records/0150_tabular.md) did NOT answer this.** It
 decided how a tabular document is *chunked* — one passage per row, bounded by
 `max_table_rows` — which is a **retrieval** decision about passages. The
 proposal's subject is **ranking**: what a table contributes to a document's
@@ -44,16 +44,16 @@ and every format inherits it free.
 
 1. **Measure first, on golden data.** Does a table-heavy document's `flen`
    differ enough from its prose to move a ranking? A pre-registration under
-   [ADR-RS](../../docs/adr/0133_predictions.md) naming the metric, the arms and
+   [SR-RS](../../records/0133_predictions.md) naming the metric, the arms and
    the bar, frozen before the first number.
 2. **A null closes this item**, and closing it that way is a success — the
    proposal's own text says a ranking change here needs a verdict and never an
    argument.
 3. If it is not null: a compare doc for the field design, then an
-   ADR-EXTRACTED / ADR-RANKING amendment, then the change.
+   SR-EXTRACTED / SR-RANKING amendment, then the change.
 
 🔴 **Blocked on [W-136](W-136-golden-benchmark.md)** — the corpus this must be
-measured on is the golden ladder in fux-lab ([L9](../../docs/adr/0011_LAW-9-environments.md)),
+measured on is the golden ladder in fux-lab ([SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md)),
 and the proposal asks for a verdict at 10 000 documents, which is the ceiling
 and therefore the right size.
 
@@ -140,7 +140,7 @@ corpus gives a gradient; the cliff **locates** the threshold.
 ## 🔴 What is left: Arpit accepts or overrides the compare doc
 
 **This item's clause 2 — *"a null closes this item"* — is not reached.** Clause 3
-applies: *a compare doc for the field design, then an ADR amendment, then the
+applies: *a compare doc for the field design, then an SR amendment, then the
 change.*
 
 **The compare doc is filed:**
@@ -160,6 +160,47 @@ document shorter than it reads and gives its rare cell terms more idf leverage.
 **If (b) is accepted**, the work is small and mostly done: `split_body`'s rule
 moves from `tools/quality-controls/table_flen.py` into `ingest/extract.py` (it
 already agrees with the committed index on 330/330 and 994/994 documents), then
-[ADR-EXTRACTED](../../docs/adr/0115_extracted-mode.md) is amended in the same
+[SR-EXTRACTED](../../records/0115_extracted-mode.md) is amended in the same
 change, then an L3 determinism check, then the re-measurement the
 reopen-trigger names.
+
+## 2026-09-13 — the option list gained a fourth, and the gap gained an item
+
+**Arpit, 2026-09-13**, on being told the measured defect: *"this could happen in
+the real world — document A could be longer and document B smaller, and one gets
+penalised, right?"* **Yes, and that is what length normalisation is FOR.** The
+question is only whether the extra length is **verbosity** — the same subject at
+greater length — or **scope**, material of another kind. `b` is BM25's dial
+between those two readings.
+
+- **[The compare doc](../compare/table-tokens-in-flen.compare.md) gained option
+  (d): lower `b`.** It was missing the textbook lever — one key, no schema
+  change, and **no structural claim about what a table is**. Its cost is that it
+  is global and blunt, and that no run in this project has ever moved `b`
+  (`k1`/`b` have no instrument with headroom).
+- 🔴 **W-155 RAN on 2026-09-13 and the answer is YES**
+  ([verdict](../regression/2026-09-13-table-is-the-answer/VERDICT.md)). It was
+  *"the only outstanding test whose result could move the call from (b) to (c)
+  or (d)"*, and it moved it.
+  - **`dump` 30/30 → 0/30**: when the query term is a **row label** in a
+    document that says nothing about it, excluding table cells promotes that
+    document **above the prose that answers**.
+  - **`content` 0/30 → 30/30**: when the table genuinely IS the answer, (b)
+    **fixes** it. Both controls hold.
+  - **So (b) is right for two document shapes and wrong for a third, and `flen`
+    cannot tell them apart** — the effect is decided by *where the term sits*,
+    not by whether the table is an appendix.
+  - ⚠ **The YES is the weak kind, declared in the pre-registration before the
+    run** — the probe author was looking for the harm. **The arithmetic under it
+    is not weak**: (b) cuts the dump's length ~7× while leaving its `tf`.
+  - **This item still does not close.** The ruling — accept (b) anyway, move to
+    (c), move to (d), or wait for W-156 — is Arpit's, and the measurement is
+    now in front of him instead of missing.
+- 🔴 **[W-156](W-156-prevalence-outside-golden.md)** carries the reason this
+  cannot ship on the evidence it has: **SR-WORK-ENVIRONMENTS puts every
+  measurement on golden data, golden is one synthetic corpus, and the
+  single-corpus rule therefore cannot be satisfied by any ranking change.**
+  That is a conflict between two of Arpit's rulings, not a gap in this item.
+
+⚠ **This item is still one ruling — accept or override — and it is still his.**
+Neither new item decides it.

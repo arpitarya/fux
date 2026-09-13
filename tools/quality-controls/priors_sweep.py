@@ -46,8 +46,16 @@ document might win.
 `fixed`   = wrong at the shipped default, right at the candidate.
 
 Usage:
-    python3 tools/quality-controls/priors_sweep.py --rung rung-seed --knob superseded_weight
-    python3 tools/quality-controls/priors_sweep.py --rung rung-00100 --knob archived_weight --json rows.jsonl
+    python3 tools/quality-controls/priors_sweep.py --rung rung-00100 --knob rerank_weight --json rows.jsonl
+
+🔴 **THREE OF THE FOUR SUBJECTS NO LONGER EXIST.** `superseded_weight` (W-151),
+`archived_weight` and `recency_half_life_days` (W-152) were removed on
+2026-09-13 — writing any of them into a `tune.toml` is a refusal now, not a
+sweep. This script is kept **narrowed, not retired**, because `rerank_weight`
+is still open: it is the one prior left, and W-154 restates its question as
+*cost*, which this harness does not measure. **A verdict on `rerank_weight`
+needs a latency fence (`fux-benchmark`) that this script has no part of** — do
+not mistake a green run here for an answer to W-154.
 """
 
 from __future__ import annotations
@@ -66,16 +74,12 @@ FUX = ROOT / ".venv" / "bin" / "fux"
 PROBES = Path(__file__).resolve().parent / "priors-probes.jsonl"
 
 #: Shipped defaults — the baseline arm, and the value `broken` is measured against.
-DEFAULTS = {"superseded_weight": 1.0, "archived_weight": 1.0,
-            "recency_half_life_days": 0.0, "rerank_weight": 0.0}
+DEFAULTS = {"rerank_weight": 0.0}
 
 #: The grids. A multiplier below 1.0 demotes; `0.0` is the sharp column — it
 #: pushes the matched document below every other result, so a knob that moves
 #: nothing at `0.0` reaches nothing at all.
 GRIDS = {
-    "superseded_weight": [1.0, 0.9, 0.75, 0.5, 0.25, 0.1, 0.0],
-    "archived_weight": [1.0, 0.9, 0.75, 0.5, 0.25, 0.1, 0.0],
-    "recency_half_life_days": [0.0, 730.0, 365.0, 180.0, 90.0, 30.0],
     "rerank_weight": [0.0, 0.25, 0.5, 1.0, 2.0],
 }
 
@@ -187,7 +191,7 @@ def main() -> int:
         results.append({"value": value, "fixed": fixed, "broken": broken})
 
     print()
-    print(f"HEADROOM, observed, from the rows (ADR-RS decision 22b):")
+    print(f"HEADROOM, observed, from the rows (SR-RS decision 22b):")
     print(f"  improvement — probes not right at the default: {headroom_up} / {n}")
     print(f"  regression  — probes right at the default:     {headroom_down} / {n}")
     if headroom_up == 0:

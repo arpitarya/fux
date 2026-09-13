@@ -13,7 +13,7 @@ told.**
 
 ## ⚠ Read this part first: why the brief is in the repository
 
-[ADR-RS](../../docs/adr/0036_predictions.md) decision 11 defines **blind** as
+[SR-RS](../../records/0133_predictions.md) decision 11 defines **blind** as
 authored with no access to the evaluation queries, the judgments, prior
 per-query scores, or any derived report of them. A fresh session given only the
 corpus satisfies that literally.
@@ -145,10 +145,10 @@ that a set was authored against a misread of the corpus. What changed is
   `unanswerable.jsonl`, **separate from the questions file**, so the two
   authorships never merge into one file whose provenance nobody can
   reconstruct. ⚠ **It said `<playground>/goldens/` until 2026-09-12**;
-  [L9](../../docs/adr/0011_LAW-9-environments.md) retired that destination, and
+  [SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md) retired that destination, and
   the set's home is now the golden ladder's
   ([`work/golden/`](../../work/golden/README.md)).
-- ⚠ **It is scored INSIDE the gate** ([ADR-QUALITY](../../docs/adr/0141_quality-contract.md)
+- ⚠ **It is scored INSIDE the gate** ([SR-WORK-QUALITY](../../records/0056_WORK-quality.md)
   decision 5), with an `answerable-only` slice reported beside it. That is what
   makes it different from the decoys, which are a diagnostic control and are
   never scored.

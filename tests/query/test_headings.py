@@ -211,7 +211,7 @@ def test_the_headings_key_is_present_even_when_empty(tmp_path, monkeypatch, caps
 
 def test_find_stdout_is_untouched(tmp_path, monkeypatch, capsys):
     """`find` exists to be piped. A `§` line on its stdout would be read as a
-    filename — the same argument ADR-DIR-LIST decision 12 made for the
+    filename — the same argument SR-DIR-LIST decision 12 made for the
     archived marker."""
     monkeypatch.setattr("fux.query.find_root", lambda: _corpus(tmp_path))
     assert cmd_find(_args()) == 0
@@ -249,7 +249,7 @@ def test_headings_do_not_change_the_ranking(tmp_path, monkeypatch, capsys):
     assert strip(with_headings) == strip(without)
 
 
-# -- the `sections` toggle (ADR-OUTPUT decision 21) ------------------------
+# -- the `sections` toggle (SR-OUTPUT decision 21) ------------------------
 
 
 def test_sections_false_removes_the_marker_lines_from_text(tmp_path, monkeypatch, capsys):
@@ -295,7 +295,7 @@ def test_sections_defaults_to_on_when_the_attribute_is_absent(tmp_path, monkeypa
 
 def test_find_is_not_reachable_by_the_sections_key(tmp_path, monkeypatch, capsys):
     """`sections` is declared for `ask` only, so `[cli] sections = false` can
-    never reach `find` — the schema decides, not the table (ADR-OUTPUT)."""
+    never reach `find` — the schema decides, not the table (SR-OUTPUT)."""
     from fux.output_config import CLI_VERBS
 
     assert "sections" in CLI_VERBS["ask"]

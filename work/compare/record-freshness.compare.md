@@ -34,7 +34,7 @@ timestamp: 2026-08-20T00:00:00Z
 >
 > **This is not an agent's to re-decide.** It is filed as
 > [W-82 §5.3](../../archive/open/W-82-the-consolidated-build.md) ruling 1, in the `arpit` lane:
-> *"ADR-REFER decision 4 is currently **standing but unargued**, which is the
+> *"SR-REFER decision 4 is currently **standing but unargued**, which is the
 > one state a record should never be in."*
 >
 > **Four further claims in the body are now false**, listed so a reader does
@@ -63,7 +63,7 @@ nothing about *when*.
 [`caller-set-freshness-policy.md`](../../archive/proposals/caller-set-freshness-policy.md)
 specified `{max_age_seconds, timeout_seconds}`, with age measured against
 recorded provenance. **That provenance does not exist**, so
-[ADR-REFER](../../docs/adr/0127_refer-plane.md) decision 4 refused to ship the
+[SR-REFER](../../records/0127_refer-plane.md) decision 4 refused to ship the
 knob: a caller passing `max_age_seconds=60` would reasonably believe they had
 bounded their staleness. **A knob that lies is worse than a missing knob.**
 
@@ -127,7 +127,7 @@ deterministic set. **Naming this loudly is half the value of this document.**
 per-record timestamp is a field inside a shard. Re-ingesting after any commit
 changes that field, so **write-if-different rewrites every shard on every
 run** — and `git status` clean after an unchanged re-ingest is the guarantee
-[ADR-INGEST](../../docs/adr/0106_ingest.md) rests on. C additionally asks the
+[SR-INGEST](../../records/0106_ingest.md) rests on. C additionally asks the
 git-dir walker to read git *objects*; it deliberately reads bytes.
 
 **E is the right shape if an age is ever wanted**, and it is why D is a bet
@@ -146,10 +146,10 @@ exists.
 ## Consequences
 
 - **`max_age_seconds` is struck** from the proposal, and
-  [ADR-REFER](../../docs/adr/0127_refer-plane.md) records the closure — its
+  [SR-REFER](../../records/0127_refer-plane.md) records the closure — its
   veto condition 3 is exactly this question, so it fires and is answered rather
   than left open.
-- **No `_format` bump, no ADR-RECORD change, nothing rewritten.** D is the only
+- **No `_format` bump, no SR-RECORD change, nothing rewritten.** D is the only
   option that costs nothing, which matters when the need is unmeasured.
 - **The refer plane keeps two modes**, `never` and `always`, and they remain
   the endpoints. If E ever lands, it slots between them without changing
@@ -175,5 +175,5 @@ under [`work/regression/`](../regression/README.md), not an opinion.
 - Why timestamps break reproducibility —
   https://reproducible-builds.org/docs/timestamps/
 - The refusal this doc either confirms or overturns —
-  [ADR-REFER](../../docs/adr/0127_refer-plane.md) decision 4.
+  [SR-REFER](../../records/0127_refer-plane.md) decision 4.
 - The finding — [W-58](../../archive/open/W-58-no-recorded-ingest-time.md).

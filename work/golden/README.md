@@ -5,7 +5,7 @@ description: "Index of the sealed golden benchmark: seed corpus, prompts, and th
 
 # `work/golden/` — the sealed golden benchmark
 
-**The test data for `fux-lab` — and only for `fux-lab`, per [L9](../../docs/adr/0011_LAW-9-environments.md): seed documents written by
+**The test data for `fux-lab` — and only for `fux-lab`, per [SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md): seed documents written by
 Codex, ~100 questions with answers Claude never sees, and a corpus ladder Claude
 grows from 10 to 10 000 documents without ever seeing a question.**
 
@@ -183,7 +183,7 @@ nothing else, and says so in its report. Nothing mechanical enforces this.
 
 ## Feature coverage — what this data can test
 
-**[ADR-RS](../../docs/adr/0133_predictions.md) decision 23: a feature is measured only
+**[SR-RS](../../records/0133_predictions.md) decision 23: a feature is measured only
 on data that contains the input it acts on.** This table is that declaration.
 **File names and counts only — never question text, ids or answers.**
 
@@ -261,7 +261,7 @@ the **same committed generator and the same seed**, so the whole ladder is one
 stream.
 
 **10 000 is the ceiling and the ladder stops there** — `CLAUDE.md` §Litmus, and
-[L9](../../docs/adr/0011_LAW-9-environments.md) caps the lab at 10 000 documents.
+[SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md) caps the lab at 10 000 documents.
 There is no rung above this one and none may be built.
 
 | rung | documents | archived | superseded | carrying `mtime` |
@@ -325,8 +325,8 @@ seed documents are in `rung-10000`.
 ## Phase 4 — Run (Claude Code)
 
 - **Pre-register first**, per run: `work/regression/<date>-golden-rung-NNNNN/PRE-REGISTRATION.md`
-  — engine sha, rung, metrics with `k` named, and the headroom disclosure ADR-RS
-  requires ([ADR-RS](../../docs/adr/0133_predictions.md) decision 22, which is where
+  — engine sha, rung, metrics with `k` named, and the headroom disclosure SR-RS
+  requires ([SR-RS](../../records/0133_predictions.md) decision 22, which is where
   W-135 landed on 2026-09-11). Commit it before any number.
 - **Use the rung's own index — do not re-ingest.** Check the engine version
   matches `ladder/rung-NNNNN.index`; if it does not, re-ingest that rung once, update
@@ -360,5 +360,5 @@ seed documents are in `rung-10000`.
 - **The first scored run on a frozen ladder is `blind`.** Once Claude has seen
   per-query scores, any engine or config change made afterwards is `informed`
   for the non-sealed ids. The sealed aggregate stays the clean comparison.
-- **A delta follows ADR-RS**: paired, discordant-count floor, headroom per direction.
+- **A delta follows SR-RS**: paired, discordant-count floor, headroom per direction.
 - **No threshold is moved** after a number exists.

@@ -2,7 +2,7 @@
 
 Successor to `test_url_command.py`, which tested `fux url` before that verb
 was retired. **Every property that file pinned is still pinned here** — a
-written line states every attribute (ADR-URL-LIST decision 12), the command
+written line states every attribute (SR-URL-LIST decision 12), the command
 opens no socket of its own, it edits one line rather than regenerating the
 file, and the file is LF-only with exactly one trailing newline. What is new
 is that all of it now holds for three lists instead of one, plus the two
@@ -40,7 +40,7 @@ def repo(tmp_path):
     (tmp_path / ".fux" / "sources").mkdir(parents=True)
     (tmp_path / ".fux" / "sources" / "urls").write_text("# my list\n", encoding="utf-8")
     (tmp_path / ".fux" / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
-    # ADR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
+    # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "a.md").write_text("# A\n\nbody\n", encoding="utf-8")
@@ -112,7 +112,7 @@ def test_a_trailing_slash_is_the_same_directory(repo, monkeypatch, capsys):
     `docs` wrote a second line for the same directory.
     """
     _add(repo, monkeypatch, _args("docs/"))
-    # A fux-written line states EVERY attribute explicitly (ADR-URL-LIST
+    # A fux-written line states EVERY attribute explicitly (SR-URL-LIST
     # decision 12), so this grows when the closed attribute set grows.
     # `enrich=false` arrived with W-76 Phase 8.
     assert [line for line in _dirs(repo).splitlines() if line.strip()] == [
@@ -137,7 +137,7 @@ def test_a_dirs_line_carries_its_attribute_too(repo, monkeypatch):
 
 def test_a_types_entry_a_decoder_reads_becomes_a_binding(repo, monkeypatch):
     """⚠ **This test asserted `*.pdf` carried NO binding until 2026-09-01**, and a
-    `*.pdf decoder=pdf` LINE until 2026-09-11 (ADR-TYPES decisions 11 and 12). The
+    `*.pdf decoder=pdf` LINE until 2026-09-11 (SR-TYPES decisions 11 and 12). The
     binding fux would otherwise derive is written down, and since decision 12 it is
     a `[decoders]` line — the extension is the key."""
     _add(repo, monkeypatch, _args("*.pdf", types=True))
@@ -164,7 +164,7 @@ def test_adding_a_type_edits_one_line_and_keeps_a_comment(repo, monkeypatch):
 
 def test_the_writer_refuses_a_layout_it_did_not_write(repo, monkeypatch):
     """Reformatting an inline array would eat the comments around it, so fux says so
-    and writes nothing (ADR-TYPES decision 12, reader lenient / writer strict)."""
+    and writes nothing (SR-TYPES decision 12, reader lenient / writer strict)."""
     from fux.errors import FuxError
 
     original = 'include = ["*.md", "*.txt"]\n'
@@ -221,7 +221,7 @@ def test_two_flags_for_one_attribute_is_an_error(repo, monkeypatch):
 def test_a_flag_the_list_does_not_have_is_an_error_not_a_no_op(repo, monkeypatch):
     """`fux add docs --cdp` is someone believing something false about the line.
 
-    The closed attribute set (ADR-URL-LIST decision 11) is only worth having
+    The closed attribute set (SR-URL-LIST decision 11) is only worth having
     if it is enforced on the way in as well as on the way out.
     """
     with pytest.raises(FuxError, match="which `dirs` does not have"):
@@ -428,7 +428,7 @@ def test_adding_the_first_type_seeds_the_built_in_allowlist(repo, monkeypatch):
     """Otherwise `fux add '*.pdf' --types` un-indexes every markdown document.
 
     The file REPLACES the built-in default rather than extending it
-    (ADR-TYPES), so a one-entry file is a corpus-wide invisible filter — the
+    (SR-TYPES), so a one-entry file is a corpus-wide invisible filter — the
     exact defect W-55 was opened about. Found by running the verb.
     """
     from fux.ingest.gitdir import DEFAULT_TYPES, read_types
@@ -503,7 +503,7 @@ def test_listing_an_empty_list_says_so(repo, monkeypatch, capsys):
 def test_a_cli_written_line_states_the_repo_policy_not_the_engine_default(tmp_path):
     """🔴 `fux add` wrote the ENGINE's defaults onto every line.
 
-    Every generated line states every attribute (ADR-URL-LIST decision 12), and
+    Every generated line states every attribute (SR-URL-LIST decision 12), and
     the values came from `spec.defaults()` — so a team with
     `[sources.url] ttl = "7d"` got `ttl=24h` written onto each line, and the
     middle layer of a three-layer resolution was dead for every line the CLI

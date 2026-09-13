@@ -83,7 +83,7 @@ This item was written as **W-89** and its record as **ADR 0043**. Both were
 taken by the concurrent session *while this session was building*:
 
 - **W-89** is now *does L2 reach a query log?* → this item is **W-90**.
-- **0043** is now `0043_locks.md` and **0044** is `0044_quality-contract.md` →
+- **0043** is now `0043_locks.md` and **0044** is `0056_WORK-quality.md` →
   this record is **0045**.
 
 ⚠ **`docs/adr/0043_confidence.md` and `work/open/W-89-the-confidence-plane.md`
@@ -93,7 +93,7 @@ records at `0043` will fail `tests/test_adr_ownership.py` and is exactly the
 condition the register warns about.
 
 **The second collision was substantive, and it improved the design.**
-[ADR-QUALITY](../../docs/adr/0044_quality-contract.md) landed the same day and
+[ADR-QUALITY](../../docs/adr/0056_WORK-quality.md) landed the same day and
 its decision 6 had **already frozen the abstention economics** — `t = 0.75`,
 penalty `c = t/(1-t) = 2`, with Chow's rule fixing the reject threshold from the
 ratio. This record had independently invented `SEPARATION_FLOOR = 0.10`.

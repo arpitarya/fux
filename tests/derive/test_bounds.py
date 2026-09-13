@@ -209,7 +209,7 @@ def test_a_v3_runtime_plane_is_refused_with_an_actionable_message(tmp_path):
     """The upgrade door, at the one surface that does not go through `is_fresh`.
 
     `RUNTIME_SCHEMA` moved to `fux.runtime.v4` on 2026-08-24 because
-    `stats.json` stopped storing a pre-weighted `total_wlen` (ADR-TUNE). The
+    `stats.json` stopped storing a pre-weighted `total_wlen` (SR-TUNE). The
     CLI never reaches this — `is_fresh` refuses a stale schema and the query
     falls back to the scan — but `accel.accel_candidates` is also a direct
     call, and there a missing key would surface as a `KeyError` naming nothing
@@ -225,7 +225,7 @@ def test_a_v3_runtime_plane_is_refused_with_an_actionable_message(tmp_path):
     directory = fmt.runtime_dir(tmp_path)
     directory.mkdir(parents=True, exist_ok=True)
     (directory / fmt.STATS_NAME).write_text(
-        json.dumps({"n": 3, "total_wlen": 300, "newest_mtime": 0}), encoding="utf-8"
+        json.dumps({"n": 3, "total_wlen": 300}), encoding="utf-8"
     )
     runtime = accel.Runtime(tmp_path)
     with pytest.raises(FuxError, match=r"run `fux build`"):

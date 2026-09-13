@@ -15,7 +15,7 @@ timestamp: 2026-09-06T00:00:00Z
 > was asked about; the 2026-09-11 ruling closes the roster.
 >
 > ⚠ **Moved to B — `.agents/skills/` — by Arpit on 2026-09-12** (W-141,
-> [ADR-AGENT-POLICY](../../docs/adr/0132_agent-policy.md) decision 16). Codex's
+> [SR-AGENT-POLICY](../../records/0132_agent-policy.md) decision 16). Codex's
 > docs list `.agents/skills` as its only repository skill directory, so Copilot
 > and Codex now share it and `.github/skills/` is not written. **A's argument —
 > write Copilot its own copy, because `["copilot"]` alone must get skills —
@@ -33,7 +33,7 @@ timestamp: 2026-09-06T00:00:00Z
 
 ## Context
 
-[ADR-AGENT-POLICY](../../docs/adr/0132_agent-policy.md) decision 9a shipped
+[SR-AGENT-POLICY](../../records/0132_agent-policy.md) decision 9a shipped
 `fux-decoder` to Claude and Kiro and **not** Copilot, on a fact that was true
 when it was written: *"a Kiro skill is progressive-disclosure; only Kiro
 steering is ambient — which admits Kiro while still excluding Copilot's
@@ -52,7 +52,7 @@ Two consequences, and they pull opposite ways:
 2. **The exclusion is already moot in practice.** Copilot reads
    `.claude/skills` — so in the default install it *already* loads
    `fux-decoder`, and `fux-enrich`, and everything else fux writes for Claude.
-   That is [ADR-AGENT-POLICY](../../docs/adr/0132_agent-policy.md) decision 13.
+   That is [SR-AGENT-POLICY](../../records/0132_agent-policy.md) decision 13.
 
 ## Options
 
@@ -87,7 +87,7 @@ Two consequences, and they pull opposite ways:
 
 🔴 **That framing overstated the unknown, and the correction is this document's
 own.** The two copies are **byte-identical by construction** — one template,
-N destinations, [ADR-AGENT-POLICY](../../docs/adr/0132_agent-policy.md)
+N destinations, [SR-AGENT-POLICY](../../records/0132_agent-policy.md)
 decision 10 — so *dedupe* and *double-load* are **the same outcome**: the same
 instructions, once or twice, idempotent either way. The only branch that costs
 anything is a **hard error on duplicate names**, and that is a much narrower
@@ -111,7 +111,7 @@ move and the one this project already relies on for the verbatim block.**
 
 **Shipped under A, 2026-09-06:** `AGENT_FILES["copilot"]` gains
 `.github/skills/fux-enrich/SKILL.md` and no template;
-[ADR-AGENT-POLICY](../../docs/adr/0132_agent-policy.md) decision 9a is amended
+[SR-AGENT-POLICY](../../records/0132_agent-policy.md) decision 9a is amended
 (its *"the two skill surfaces — Claude and Kiro"* was a count doing a rule's
 job), decision 14 records the ruling, and decision 13 is marked superseded **in
 effect, not in substance** — the cross-read is unchanged, it is simply no
@@ -124,7 +124,7 @@ held it is replaced by two that assert the opposite:
 `test_the_three_rosters_no_longer_differ_at_all` (any divergence, either
 direction) and `test_every_committed_write_skill_reaches_every_skill_surface`
 (against the four surfaces by name, so deleting a vendor fails rather than
-making three empty rosters agree). ADR-AGENT-POLICY decision 14a.
+making three empty rosters agree). SR-AGENT-POLICY decision 14a.
 
 ⚠ **`fux-usage` is additive for Copilot**, which already receives it ambiently
 as `instructions/fux-usage.instructions.md`. Both ship: the instructions file is
@@ -139,16 +139,16 @@ were hand-editable with nothing comparing them, and two had drifted
 `.github/agents/fux.agent.md` behind its own). **The crux above rests on that
 identity**, so it is now asserted by
 `test_this_repos_own_agent_files_still_match_the_templates_that_ship` rather
-than assumed. ADR-AGENT-POLICY decision 14b.
+than assumed. SR-AGENT-POLICY decision 14b.
 
 ## References
 
 - GitHub Copilot agent skills, and the three project-skill directories —
   <https://docs.github.com/en/copilot/concepts/agents/about-agent-skills>
 - The exclusion this reopens —
-  [ADR-AGENT-POLICY](../../docs/adr/0132_agent-policy.md) decision 9a.
+  [SR-AGENT-POLICY](../../records/0132_agent-policy.md) decision 9a.
 - The cross-read finding —
-  [ADR-AGENT-POLICY](../../docs/adr/0132_agent-policy.md) decision 13.
+  [SR-AGENT-POLICY](../../records/0132_agent-policy.md) decision 13.
 - The precedent for refusing to ship on an unmeasured premise —
   [`CLAUDE.md`](../../CLAUDE.md) §"A pre-registered threshold may never move".
 

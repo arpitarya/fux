@@ -20,8 +20,8 @@ a session on a fresh machine can stand them up rather than discover them.
 ## Which is which
 
 🔴 **Each one has exactly one job, and the job is stated by
-[L9](../../docs/adr/0011_LAW-9-environments.md) — read it there.** This section
-does not restate the law ([L0](../../docs/adr/0002_LAW-0-authority.md)); it
+[SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md) — read it there.** This section
+does not restate the law ([L0](../../records/0002_LAW-0-authority.md)); it
 exists because the three get confused, and it points at the right document.
 
 | if you want to | go to |
@@ -31,18 +31,18 @@ exists because the three get confused, and it points at the right document.
 | know how fast a query is, or whether a ranking moved between two versions | [SETUP-BENCHMARK](fux-benchmark.md) |
 
 ⚠ **Before 2026-09-11 the playground was the grading corpus**, and roughly forty
-documents, tools and plans in this repo used it as an instrument. L9 ended that;
+documents, tools and plans in this repo used it as an instrument. SR-WORK-ENVIRONMENTS ended that;
 [W-138](../../archive/open/W-138-reconcile-with-l9.md) is the reconciliation, and
-[`tests/test_l9_environments.py`](../../tests/test_l9_environments.py) is what
+[`tests/test_work_environments.py`](../../tests/test_work_environments.py) is what
 stops it coming back.
 
-## Why these are documents and not ADRs
+## Why these are documents and not SRs
 
 A setup document records **how a thing is stood up and what its contract is** —
-operational knowledge that a new machine or a new session needs. An ADR records
+operational knowledge that a new machine or a new session needs. An SR records
 a **decision someone could later supersede**.
 
-`SETUP-PLAYGROUND` was an ADR until 2026-08-18 and mostly was not one: the
+`SETUP-PLAYGROUND` was an SR until 2026-08-18 and mostly was not one: the
 sibling-repo layout, the CDP port, the golden-file rules and the URL
 carry-forward trap are all *how it works*, not a position anyone argues with.
 The one real decision inside it — **`examples/` is deleted from the engine
@@ -50,7 +50,7 @@ repo** — is settled and kept at the foot of that document, because it is the
 reason the repository exists.
 
 This is the same distinction that moved the two P1 rulings into
-[`../regression/`](../regression/README.md) as verdicts: **`docs/adr/` is for
+[`../regression/`](../regression/README.md) as verdicts: **`records/` is for
 decisions, and a great deal of valuable writing is not a decision.**
 
 ## The rules

@@ -47,7 +47,7 @@ def repo(tmp_path, monkeypatch):
     sources.mkdir(parents=True)
     (sources / "dirs").write_text("docs\n", encoding="utf-8")
     (sources / "urls").write_text("", encoding="utf-8")
-    # ADR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
+    # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "a.md").write_text("# A\n\nsweepterm body\n", encoding="utf-8")

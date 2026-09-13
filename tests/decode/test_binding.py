@@ -1,6 +1,6 @@
 """`.fux/formats.toml` binds an extension to the decoder that reads it, and fux
-checks the binding instead of trusting it — ADR-TYPES decisions 11 and 12 and
-ADR-DECODE decision 13, ruled by Arpit 2026-09-01 and 2026-09-11.
+checks the binding instead of trusting it — SR-TYPES decisions 11 and 12 and
+SR-DECODE decision 13, ruled by Arpit 2026-09-01 and 2026-09-11.
 
 **What the binding is for.** Before it, "which decoder reads `.csv`" was a
 property of the code installed on a machine: a built-in's `EXTENSIONS` tuple,
@@ -90,7 +90,7 @@ def test_an_empty_binding_is_refused_because_it_binds_nothing():
 
 
 def test_a_path_scoped_binding_cannot_be_written():
-    """**ADR-TYPES decision 12: the shape is the rule.** The line grammar had to
+    """**SR-TYPES decision 12: the shape is the rule.** The line grammar had to
     refuse `docs/api/*.json decoder=json` at resolution, because dispatch sees a
     suffix and nothing about the glob. A `[decoders]` key is an extension, so the
     nearest thing anybody can write is an extension that is not one."""
@@ -137,7 +137,7 @@ def test_a_quoted_compound_extension_is_legal():
 
 
 def test_an_error_names_the_key_and_the_line_when_it_can():
-    """ADR-TYPES decision 12's stated cost: a parsed TOML value has no position,
+    """SR-TYPES decision 12's stated cost: a parsed TOML value has no position,
     so the key is always named and the line only when a scan finds exactly one."""
     with pytest.raises(FuxError) as caught:
         _parse('include = [\n  "*.md",\n]\n\n[decoders]\ngeojson = "Json"\n')
@@ -269,7 +269,7 @@ def test_the_written_map_verifies_against_the_modules_it_names(repo: Path):
 
 
 def test_a_leftover_line_grammar_file_stops_dispatch_loudly(repo: Path):
-    """ADR-TYPES decision 12. `fux ask` decodes fetched documents without walking,
+    """SR-TYPES decision 12. `fux ask` decodes fetched documents without walking,
     so a binding it silently stopped seeing would re-read them with a different
     decoder than the index was built with."""
     (repo / ".fux" / "sources").mkdir()

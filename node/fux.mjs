@@ -16,7 +16,7 @@ import { runMcp } from "./src/verbs/mcp.mjs";
 import { FuxError } from "./src/errors.mjs";
 import { applyOutputDefaults, loadOutput } from "./src/config/output.mjs";
 // 🔴 **The library surface travels with the CLI, and that is what makes ONE
-// bundle possible** (L10, docs/adr/0012_LAW-10-bundled-output.md). `exports`
+// bundle possible** (L10, records/0011_LAW-10-bundled-output.md). `exports`
 // and `bin` in `package.json` both name this file, so `import { open } from
 // "fux-engine"` and `fux ask` reach the same artefact. The twin of this
 // re-export is `src/fux/__init__.py`'s, and it is deliberately thin: the
@@ -29,7 +29,7 @@ const VERSION = "2.0.0-alpha.7";
  *
  * 🔴 **W-107 O1, ruled by Arpit 2026-09-12: Node enforces it identically.**
  * Python refuses every non-exempt verb without `.fux/pii.toml`
- * (ADR-PII decision 17). The gate exists because the committed index is
+ * (SR-PII decision 17). The gate exists because the committed index is
  * redacted, so a Node reader that answered where Python refuses would be a
  * divergence in the PRODUCT, not merely in the code — and this runtime cannot
  * import the Python that carries the rule, so it carries the path itself.
@@ -47,7 +47,7 @@ function requirePiiRules(root) {
   if (existsSync(path) && statSync(path).isFile()) return true;
   process.stderr.write(
     `error: ${PII_RULES.join("/")} is missing, and fux will not run without it ` +
-    `(ADR-PII decision 17).\n` +
+    `(SR-PII decision 17).\n` +
     `       Run \`fux setup\` to write the starter, then review its rules; to redact\n` +
     `       nothing, keep the file with no [[rule]] entries.\n`,
   );
@@ -79,7 +79,7 @@ function parseArgs(argv) {
     else if (a === "--all") out.all = true;
     else if (a === "--band") out.band = true;
     else if (a === "--no-sections") out.sections = false;
-    // ADR-TUNE decision 11: `.fux/tune.toml` is not read AT ALL, so the answer
+    // SR-TUNE decision 11: `.fux/tune.toml` is not read AT ALL, so the answer
     // is the engine's own. The "is it me or the config?" switch, and it has to
     // exist in both runtimes or the question can only be asked of one of them.
     else if (a === "--no-tune") out.noTune = true;

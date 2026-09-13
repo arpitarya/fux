@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The SEALED SUBSET — [ADR-RS](../../docs/adr/0036_predictions.md) decision 15's
+"""The SEALED SUBSET — [SR-RS](../../records/0133_predictions.md) decision 15's
 third control, and the one it says must not be inherited silently.
 
 **Ruled by Arpit 2026-08-28: seal 15 of 50, and grow the set later.**

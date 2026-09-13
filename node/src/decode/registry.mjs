@@ -12,7 +12,7 @@
  *
  * **Porting the decoders is not the fix and never will be.** A consumer
  * decoder is arbitrary Python in `.fux/decoders/`, loaded by path
- * ([ADR-DECODE]'s whole boundary), and there is no Node twin of a file the
+ * ([SR-DECODE]'s whole boundary), and there is no Node twin of a file the
  * consumer wrote in another language. Nor can a built-in be transcribed
  * safely: `xlsx`, `pdf` and `docx` are format work where a near-miss produces
  * plausible text.
@@ -20,7 +20,7 @@
  * **So Node declines, in the shape it already uses for the network.** A
  * document whose type goes through a decoder is skipped by `answer`, exactly
  * as an unreachable `url:` is, and the verb falls back rather than citing
- * something it cannot reproduce ([ADR-NODE-SEARCH](../../../docs/adr/0155_node-search.md)
+ * something it cannot reproduce ([SR-NODE-SEARCH](../../../records/0153_node-search.md)
  * decision 11). **Under-claiming is the only safe direction here**: a document
  * wrongly treated as plain text is a wrong citation, while one wrongly skipped
  * is an answer from the next candidate.
@@ -32,7 +32,7 @@
  * JS and all able to drift. Instead: *"is this document ALREADY TEXT?"*, which
  * `.fux/formats.toml`'s `include` list answers in committed bytes, written by
  * the consumer and read by both runtimes. A bound extension is never repeated
- * in `include` (ADR-TYPES decision 12), so the two sets do not overlap and the
+ * in `include` (SR-TYPES decision 12), so the two sets do not overlap and the
  * complement is exact.
  */
 import { readFileSync, statSync } from "node:fs";
@@ -73,7 +73,7 @@ export function globMatch(pattern, path) {
  *  one, the built-in default otherwise.
  *
  *  **An absent file never means "everything" and never means "nothing"** — it
- *  means the default, which is ADR-TYPES' own rule and the reason a missing
+ *  means the default, which is SR-TYPES' own rule and the reason a missing
  *  file is not an error. */
 export function alreadyTextGlobs(root) {
   const path = join(root, ".fux", "formats.toml");

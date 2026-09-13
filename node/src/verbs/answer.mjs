@@ -32,7 +32,7 @@ function obtain(root, record, textGlobs) {
     // decoders and would chunk the raw bytes, producing a `path:L20-L28` that
     // points into text the index never held. Declining is the same move the
     // never-fetch rule makes for an unreachable URL, for the same reason —
-    // `decode/registry.mjs`, ADR-NODE-SEARCH decision 11.
+    // `decode/registry.mjs`, SR-NODE-SEARCH decision 11.
     if (!isAlreadyText(root, target, textGlobs)) {
       return {
         text: null,
@@ -64,7 +64,7 @@ function obtain(root, record, textGlobs) {
  *
  * Split out so `src/index.mjs` can return the object rather than parse the
  * CLI's own stdout back — which is what `api.py::_answer_from` still has to do
- * on the Python side, and is why [ADR-API](../../../docs/adr/0156_api.md)
+ * on the Python side, and is why [SR-API](../../../records/0154_api.md)
  * records the renderer split as deliberately staged. This verb is small
  * enough that the split costs nothing, so it is taken here.
  *
@@ -72,7 +72,7 @@ function obtain(root, record, textGlobs) {
  * person sees. */
 export function answerPayload(root, args) {
   const query = args._.join(" ");
-  // ⚠ **`answer` takes ONE question and no `-q`** (ADR-ANSWER decision 4): the
+  // ⚠ **`answer` takes ONE question and no `-q`** (SR-ANSWER decision 4): the
   // verb means one answer. `--expand` applies exactly as it does to `ask`,
   // because expanding a question is not asking a second one.
   const { results, confidence, tune } = runQuery(root, query, ANSWER_TOP, {
@@ -160,7 +160,7 @@ export function answerPayload(root, args) {
       passages: bundle.citations.map((c) => ({
         id: c.doc_id, loc: c.locator, sha: c.sha,
         heading: c.heading, text: c.text, score: c.score,
-        // ADR-REFER decision 17 / ADR-ANSWER decision 9. Additive: no key
+        // SR-REFER decision 17 / SR-ANSWER decision 9. Additive: no key
         // removed or repurposed.
         ordinal: c.ordinal,
       })),

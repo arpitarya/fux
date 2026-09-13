@@ -5,7 +5,7 @@
 > *"Enrich should work like a skill in the chat — that way we don't need to
 > integrate the API in the code and AI coding agents can be used."*
 
-This is [ADR-FETCHER](../../docs/adr/0019_fetcher.md)'s pattern applied to a
+This is [SR-FETCHER](../../records/0117_fetcher.md)'s pattern applied to a
 second boundary. Network I/O is something fux refuses to own, so it lives in
 consumer code under `.fux/fetchers/`; model calls are the same, so they live in
 an agent skill the consumer invokes. **Fux says what needs doing and validates
@@ -33,7 +33,7 @@ two, which is why scope is declared per source line rather than assumed.
 
 An enrichment body is committed **and** indexed, so a value written into one
 travels twice: in the file every clone gets, and as a term in `.fux/index/`.
-ADR-PII decision 1 covers both, and until W-102 neither was checked —
+SR-PII decision 1 covers both, and until W-102 neither was checked —
 `run.py`'s redact phase walks document bodies, and the enrichment text never
 entered that map.
 
@@ -58,7 +58,7 @@ from .query.bm25f import FIELD_WEIGHTS
 from .store import TF_FIELDS
 
 #: W-110. How far down its own ranking a question must place its document.
-#: **3**, ratified by Arpit 2026-09-05 and recorded in ADR-ENRICH. A question
+#: **3**, ratified by Arpit 2026-09-05 and recorded in SR-ENRICH. A question
 #: is a *retrieval* claim, and one that cannot reach the top three on the
 #: corpus it was written for is not one.
 SELF_RETRIEVAL_K = 3
@@ -232,7 +232,7 @@ def plan(
     🔴 **A selector narrows the report and changes nothing about scope.** A
     document no `enrich=true` line reaches is not in `scopes` at all, so naming
     it here cannot make it enrichable. Which directories get enriched stays a
-    human's declaration (ADR-ENRICH decision 4), and this parameter is one step
+    human's declaration (SR-ENRICH decision 4), and this parameter is one step
     away from being the thing that quietly overrides it. Matching is **exact**
     — not a prefix and not a glob — because a selector that silently matches
     two documents turns a one-document request into a bulk run.
@@ -374,13 +374,13 @@ def _pii_in_body(path: Path, rules: tuple) -> list[str]:
     """Rule names that fire on this enrichment's BODY, in file order.
 
     ⚠ **The body only.** The frontmatter is provenance — `model:`, `generated:`
-    — it is stripped before indexing (ADR-ENRICH decision 8), so nothing in it
+    — it is stripped before indexing (SR-ENRICH decision 8), so nothing in it
     reaches a committed term, and refusing a file over a value the index never
     sees would be a false positive with no remedy.
 
     ⚠ **This reports; it never rewrites.** `fux enrich --check` is a validator
     and the file is prose a human reviews in a diff — the same discipline as
-    `fux doctor` reporting a lock it will not clear (ADR-MAINTENANCE veto 7),
+    `fux doctor` reporting a lock it will not clear (SR-MAINTENANCE veto 7),
     and stronger here, because a silent rewrite would make that diff lie.
 
     Nor is redacting the file the fix a consumer should reach for: a redacted
@@ -522,7 +522,7 @@ def cmd_enrich(args) -> int:
     pii_rules = pii_mod.load(root)
 
     # W-110 — the self-retrieval filter runs under `--check` only. `k` is
-    # ADR-ENRICH's, ratified by Arpit 2026-09-05: a question must place its own
+    # SR-ENRICH's, ratified by Arpit 2026-09-05: a question must place its own
     # document in the **top 3**, or it is refused as a question that would pull
     # other documents up rather than its own.
     reports = plan(
@@ -543,7 +543,7 @@ def _target_problem(root: Path, scopes: dict[str, list[dict]], target: str) -> s
     - **not declared** — fux has the document, but no `enrich=true` line reaches
       it. The fix is a human's edit to `.fux/sources/dirs` or the URL list, and
       it is deliberately not something this command will do for them
-      (ADR-ENRICH decision 4).
+      (SR-ENRICH decision 4).
     - **not indexed** — fux has never seen it. The fix is `fux ingest`, or a
       path that is spelled the way the index spells it.
     """
@@ -690,7 +690,7 @@ def _render_check(reports: list[ScopeReport], *, target: str | None = None) -> i
         for path, why in report.malformed:
             print(f"      refused: {path} — {why}")
         for path, names in report.pii:
-            # ADR-PII decision 7's reasoning applied to a second surface: say
+            # SR-PII decision 7's reasoning applied to a second surface: say
             # WHICH rule fired. `[REDACTED]` everywhere destroys that, and so
             # does "this file contains PII".
             print(f"      refused: {path} — matches .fux/pii.toml rule(s): {', '.join(names)}")

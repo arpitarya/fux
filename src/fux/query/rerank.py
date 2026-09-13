@@ -22,7 +22,7 @@ W-76 Phase 6 as written specified a 17-32 M cross-encoder behind an optional
 `onnxruntime`. That was refused, and the reason is not cost:
 
 1. **It would break cross-machine determinism, which is the product.**
-   ADR-GRAPH proved fux's float maths is byte-identical between x86-64 Linux
+   SR-GRAPH proved fux's float maths is byte-identical between x86-64 Linux
    and arm64 macOS -- *for pure Python*. `onnxruntime` dispatches to different
    SIMD kernels per architecture and reduces GEMMs in a different order, so
    two developers running the same query against the same commit would get
@@ -54,7 +54,7 @@ So the reranker computes three things BM25F structurally cannot, over the
   second scorer that will disagree with the first (`refer/rescore.py`'s
   opening argument, applied again).
 - **Deterministic.** Pure Python, no floats crossing a machine boundary that
-  ADR-GRAPH did not already cover, and the sort key is
+  SR-GRAPH did not already cover, and the sort key is
   `(-round(score, 9), id)` -- never iteration order.
 - **A document it cannot read is left alone.** Offline, a `url:` document has
   no text to rerank against; it keeps its BM25F score rather than being

@@ -4,7 +4,7 @@ title: W-59 budget sweep — greedy assembler vs plain top-k
 timestamp: 2026-08-22T00:00:00Z
 ---
 
-# Pre-registration — the refer-plane budget sweep (W-59, ADR-REFER veto condition 2)
+# Pre-registration — the refer-plane budget sweep (W-59, SR-REFER veto condition 2)
 
 **Written before any number was produced.** Committed in the same change as
 the script that runs it and before that script has been run for a number
@@ -14,7 +14,7 @@ that counts.
 
 `src/fux/refer/assemble.py` packs citations into a byte budget **greedy by
 score-per-byte**, with a floor that seats the single best-scoring passage
-first. ADR-REFER's veto condition 2: *"a measured hit-rate on real Fux
+first. SR-REFER's veto condition 2: *"a measured hit-rate on real Fux
 workloads shows [the assembler] no better than plain top-k with truncation —
 then take the simpler code."* This has never been measured.
 

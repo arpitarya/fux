@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Render `CLAUDE.md` §Non-negotiable constraints from the eleven Law records.
 
-**Why this exists.** [ADR-LAW-0](../docs/adr/0002_LAW-0-authority.md) decision 1
-says every rule is *stated* in exactly one ADR and every other artifact links to
+**Why this exists.** [SR-LAW-0](../records/0002_LAW-0-authority.md) decision 1
+says every rule is *stated* in exactly one SR and every other artifact links to
 it. `CLAUDE.md` is the file every session reads first, so dropping the law text
 out of it would cost agents their first read of the constitution — and keeping a
 hand-written copy is the restatement decision 1 forbids.
@@ -15,7 +15,7 @@ permission is the test, not the generation.
 
 ## The contract
 
-- Each `docs/adr/*_LAW-*.md` record carries **exactly one** normative block::
+- Each `records/*_LAW-*.md` record carries **exactly one** normative block::
 
       <!-- LAW-TEXT:BEGIN L3 -->
       - **L3** · **Deterministic — no model in the maintenance path.** ...
@@ -24,7 +24,7 @@ permission is the test, not the generation.
 - The eleven blocks are concatenated in `L0 … L10` order between `CLAUDE.md`'s
   `<!-- LAWS:BEGIN … -->` / `<!-- LAWS:END -->` markers.
 - **Link targets are rewritten, and that is the only transform.** A record lives
-  at `docs/adr/`, `CLAUDE.md` at the repo root, so the same law text needs two
+  at `records/`, `CLAUDE.md` at the repo root, so the same law text needs two
   spellings of the same target. Rewriting deterministically here is what lets
   both files carry working links without either becoming the source.
 
@@ -41,12 +41,16 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-ADR_DIR = ROOT / "docs" / "adr"
+SR_DIR = ROOT / "records"
 CLAUDE_MD = ROOT / "CLAUDE.md"
 
 #: The eleven handles, in the order the block renders them. L0 first because it
 #: is the law that governs the others; L10 last because it is the newest.
-LAW_ORDER = tuple(f"L{i}" for i in range(11))
+#: The live law handles, in order. ⚠ **L9 is absent and the gap is deliberate**:
+#: the environment rule became SR-WORK-ENVIRONMENTS on 2026-09-13 and the handle
+#: is retired, never reused. Renumbering L10 down would silently change the
+#: meaning of every citation already written.
+LAW_ORDER = ("L0", "L1", "L2", "L3", "L4", "L5", "L6", "L7", "L8", "L10")
 
 BEGIN = "<!-- LAWS:BEGIN"
 END = "<!-- LAWS:END -->"
@@ -55,7 +59,7 @@ END = "<!-- LAWS:END -->"
 #: a reader who edits the block by hand is told where the text actually lives
 #: before the test tells them.
 BEGIN_LINE = (
-    "<!-- LAWS:BEGIN — GENERATED from docs/adr/*_LAW-*.md by "
+    "<!-- LAWS:BEGIN — GENERATED from records/*_LAW-*.md by "
     "scripts/gen-laws.py. Do not edit by hand: amend the record, then run "
     "`python scripts/gen-laws.py --write`. -->"
 )
@@ -64,22 +68,30 @@ _LINK_RE = re.compile(r"\]\(([^)\s]+)\)")
 
 
 def _rewrite_target(target: str) -> str:
-    """One link target, from `docs/adr/`-relative to repo-root-relative.
+    """One link target, from `records/`-relative to repo-root-relative.
 
-    Four cases and no others, because a fifth would be a guess:
+    Three cases and no others, because a fourth would be a guess:
 
     - absolute or in-page (`http…`, `mailto:`, `#frag`) — unchanged
-    - `../../x` — the record reaching the repo root, so the prefix is dropped
-    - `../x` — the record reaching `docs/`, so `docs/` replaces the `../`
-    - anything else — a sibling record, so `docs/adr/` is prepended
+    - `../x` — the record reaching the repo root, so the prefix is dropped
+    - anything else — a sibling record, so `records/` is prepended
+
+    ⚠ **`records/` sits at the repo root since 2026-09-13**, one level up from
+    the old `docs/adr/`. The `../../x` case that used to reach the root now
+    reaches *above* it and cannot occur; a target that still carries it is a
+    link the move missed, so it raises rather than resolving to something
+    plausible.
     """
     if target.startswith(("http://", "https://", "mailto:", "#")):
         return target
     if target.startswith("../../"):
-        return target[len("../../") :]
+        raise SystemExit(
+            f"gen-laws: {target!r} escapes the repo root — `records/` is at the root now, "
+            "so a law record's link to the root is `../x`, not `../../x`."
+        )
     if target.startswith("../"):
-        return "docs/" + target[len("../") :]
-    return "docs/adr/" + target
+        return target[len("../") :]
+    return "records/" + target
 
 
 def _rewrite_links(text: str) -> str:
@@ -89,7 +101,7 @@ def _rewrite_links(text: str) -> str:
 def law_records() -> dict[str, Path]:
     """`{handle: path}` for every `*_LAW-*.md` record, keyed by its marker."""
     found: dict[str, Path] = {}
-    for path in sorted(ADR_DIR.glob("*_LAW-*.md")):
+    for path in sorted(SR_DIR.glob("*_LAW-*.md")):
         text = path.read_text(encoding="utf-8")
         handles = re.findall(r"<!-- LAW-TEXT:BEGIN (L\d+) -->", text)
         if not handles:
@@ -183,13 +195,13 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     diff = difflib.unified_diff(
         actual.splitlines(), expected.splitlines(),
-        fromfile="CLAUDE.md (committed)", tofile="docs/adr/*_LAW-*.md (records)",
+        fromfile="CLAUDE.md (committed)", tofile="records/*_LAW-*.md (records)",
         lineterm="",
     )
     print("\n".join(diff), file=sys.stderr)
     print(
         "\nCLAUDE.md's law block does not match the records. The records are the "
-        "source (ADR-LAW-0 decision 1): fix the record, then run "
+        "source (SR-LAW-0 decision 1): fix the record, then run "
         "`python scripts/gen-laws.py --write`.",
         file=sys.stderr,
     )

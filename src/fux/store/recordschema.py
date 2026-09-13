@@ -14,7 +14,7 @@ The shape existed in four places and agreed with itself only by habit:
 | `ingest/run.py` | assembled the dict — **twice**, once for `git` and once for `url` |
 | `ingest/run.py` | `EXTRACTED_FIELDS` — which fields a delta ingest may carry |
 | `store/writer.py` | `DISPLAY_FIELDS` — which fields L5 forbids on a hashed record |
-| ADR-RECORD | the prose description everyone reads |
+| SR-RECORD | the prose description everyone reads |
 
 **Nothing compared them.** Adding a display field meant remembering to touch a
 tuple in a different module, and forgetting was silent: the field would ship,
@@ -58,11 +58,11 @@ __all__ = [
 
 #: Beside the code that owns it, NOT under `templates/`, and the reason is
 #: ownership rather than tidiness: `src/fux/templates/` is claimed by
-#: ADR-FETCHER (the fetcher files live there), so a record-shape template in it
+#: SR-FETCHER (the fetcher files live there), so a record-shape template in it
 #: would be owned by a record with nothing to say about the record shape.
-#: `src/fux/store/` is ADR-INDEX-LIFECYCLE's, which is exactly right -- so the
+#: `src/fux/store/` is SR-INDEX-LIFECYCLE's, which is exactly right -- so the
 #: ownership is correct BY CONSTRUCTION instead of by a carve-out somebody has
-#: to remember. The ADR guard caught this on the first commit attempt.
+#: to remember. The SR guard caught this on the first commit attempt.
 SCHEMA_NAME = "index-record.schema.json"
 
 _PY_TYPES = {"str": str, "int": int, "bool": bool, "list": list, "dict": dict}
@@ -218,5 +218,5 @@ def validate(record: dict) -> None:
         if field.has_omit and value == field.omit_when:
             raise FuxError(
                 f"{doc_id}: {name!r} == {field.omit_when!r} must be OMITTED, not written. "
-                "Absent-when-false keeps a live record's shape unchanged (ADR-ARCHIVED-CONTENT)"
+                "Absent-when-false keeps a live record's shape unchanged (SR-ARCHIVED-CONTENT)"
             )

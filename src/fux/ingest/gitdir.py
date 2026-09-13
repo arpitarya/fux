@@ -1,6 +1,6 @@
 """Git-dir source adapter — the committed directory list, and a sorted walk of it.
 
-The list is `.fux/sources/dirs` (ADR-DIR-LIST), read through the one shared
+The list is `.fux/sources/dirs` (SR-DIR-LIST), read through the one shared
 grammar in `sourcelist.py`: one entry per line, `#` comments, the loader
 dedupes and sorts, and a line may declare `archived=true`.
 
@@ -14,16 +14,16 @@ on disk is a misconfiguration and fails loudly instead.
 **`archived` is parsed, and since 2026-08-22 it is read.** The declaration is
 the half this module owns. `archived_dirs()` exposes it and `is_archived_loc()`
 is the one test for whether a `loc` falls under one — used by `ingest/run.py` to
-stamp the record property (ADR-ARCHIVED-CONTENT decision 1) and by
+stamp the record property (SR-ARCHIVED-CONTENT decision 1) and by
 `query/rank.py` for the marker and the demotion. **One definition, because two
 copies of this predicate is a differential-law failure waiting for them to
 drift.** The ranking is still byte-identical at the default weight — which is
-ADR-ARCHIVED-CONTENT decision 2, and it has a test.
+SR-ARCHIVED-CONTENT decision 2, and it has a test.
 
 ## `.fuxignore` is consulted first, and everything else is a conjunction
 
 **One file outranks the rest**: `.fux/.fuxignore`
-([ADR-FUXIGNORE](../../../docs/adr/0047_fuxignore.md)), a `.gitignore`-shaped
+([SR-FUXIGNORE](../../../records/0144_fuxignore.md)), a `.gitignore`-shaped
 list where `!` **re-includes**. Its verdict is taken before anything else and
 it decides in both directions — an ignored path is skipped whatever the rest
 says, and an explicitly `!`-re-included path skips straight past the exclusions
@@ -35,11 +35,11 @@ three hold:
 
 1. it lives under an **included** `dirs` entry;
 2. no `!` **exclusion** entry matches it or any of its ancestors
-   (ADR-DIR-LIST, W-45's verdict E) — the **deprecated** home for exclusions,
+   (SR-DIR-LIST, W-45's verdict E) — the **deprecated** home for exclusions,
    still honoured, and `fux ingest` warns when a pattern is stated here *and*
    in `.fuxignore`;
 3. its name matches the **type allowlist** — `.fux/formats.toml` if that file
-   exists, otherwise the built-in `DEFAULT_TYPES` (ADR-TYPES, W-55's verdict G).
+   exists, otherwise the built-in `DEFAULT_TYPES` (SR-TYPES, W-55's verdict G).
 
 **No rule inside that trio beats another**, so there is nothing to remember
 about precedence among them and nothing to get wrong. Every file that fails one
@@ -59,7 +59,7 @@ Why it exists: on the fux repo itself an ingest reported `599 skipped`, of which
 **598 were the type allowlist doing exactly its job** and one was a file worth
 looking at. One number over two populations is a number nobody reads — the same
 failure `skipnotice` was written for, arrived at from the other side. See
-ADR-INGEST decision 15.
+SR-INGEST decision 15.
 
 **The content skips are not overridable and are not meant to be.** `empty`,
 `binary` and `non-utf8` apply to a `!`-re-included file exactly as they do to
@@ -95,7 +95,7 @@ class WalkedFile:
 #:
 #: Collapsing the two into one count is what made `599 skipped` unreadable on
 #: a real corpus: 598 of them were the type allowlist doing its job and one was
-#: a file that should have been there. See ADR-INGEST decision 15.
+#: a file that should have been there. See SR-INGEST decision 15.
 POLICY = "policy"
 UNREADABLE = "unreadable"
 
@@ -212,10 +212,10 @@ def source_excludes(root: Path, rel_path: str) -> list[str]:
 
 
 def archived_dirs(root: Path, rel_path: str) -> list[str]:
-    """Included entries declared `archived=true` (ADR-ARCHIVED-CONTENT decision 6's
-    input). Reads the same committed declaration ADR-ARCHIVED-CONTENT decision 1 leaves off the
+    """Included entries declared `archived=true` (SR-ARCHIVED-CONTENT decision 6's
+    input). Reads the same committed declaration SR-ARCHIVED-CONTENT decision 1 leaves off the
     record — the ranking keys off the source list, never a path convention
-    (ADR-DIR-LIST decision 4)."""
+    (SR-DIR-LIST decision 4)."""
     return [
         entry.value
         for entry in read_dirs(root, rel_path)
@@ -263,7 +263,7 @@ def _default_types() -> tuple[str, ...]:
     """The built-in allowlist: prose, plus everything a built-in decoder reads.
 
     ⚠ **Widened 2026-08-26 on Arpit's ruling** — *"all the ones which have a
-    decoder"*. [ADR-TYPES](../../../docs/adr/0128_types-list.md) verdict G had
+    decoder"*. [SR-TYPES](../../../records/0128_types-list.md) verdict G had
     kept the default to six prose globs, on a measurement showing 14 % of this
     repo's documents were non-prose and carried 15 % of its tokens, `.json`
     alone at 11.4 %. **That measurement stands and was not overturned**; what
@@ -291,7 +291,7 @@ DEFAULT_TYPES: tuple[str, ...] = _default_types()
 class TypeFilter:
     """Which filenames are documents. `allow` is never empty by construction.
 
-    ⚠ **There is no `deny` any more** (ADR-TYPES decision 12, 2026-09-11). The
+    ⚠ **There is no `deny` any more** (SR-TYPES decision 12, 2026-09-11). The
     `!` subtraction the old line grammar carried was already the deprecated
     spelling of an exclusion; `.fux/formats.toml` has no such key, and
     `.fux/.fuxignore` is the one home for keeping a file out.
@@ -348,7 +348,7 @@ def walk_sources(
     defaults exist for tests that are exercising one condition at a time.
 
     **`ignores` is checked first and can end the question in either
-    direction** (ADR-FUXIGNORE decision 4). An empty `Ignores` — which is what
+    direction** (SR-FUXIGNORE decision 4). An empty `Ignores` — which is what
     a repo with no `.fuxignore` produces — is indistinguishable from not
     passing one, so the old two-condition behaviour is exactly what a repo that
     has not adopted the file still gets.

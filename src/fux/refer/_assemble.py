@@ -87,7 +87,7 @@ class Citation:
     score: float
     source: str  # "index" | "fetched"
     #: The passage's position in its document, from 0. The locator is a LINE
-    #: RANGE (ADR-REFER decision 17) because that is what a reader acts on; the
+    #: RANGE (SR-REFER decision 17) because that is what a reader acts on; the
     #: ordinal rides along because it is stable across a reflow that moves every
     #: line number, which is exactly when a stored citation silently starts
     #: pointing somewhere else. ⚠ **It was promised by two accepted records and

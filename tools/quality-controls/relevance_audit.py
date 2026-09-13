@@ -7,7 +7,7 @@ counting fields was never going to settle it — **completeness is a judgment
 about documents**, which this script says itself further down and which two
 blind annotators then supplied (kappa = 0.960, **25 of 50** goldens
 multi-document). Arpit ruled option B the same day:
-[ADR-QUALITY](../../docs/adr/0141_quality-contract.md) **decision 12** splits
+[SR-WORK-QUALITY](../../records/0056_WORK-quality.md) **decision 12** splits
 the rank contract from the relevance set, and
 [`tools/quality/goldens.py`](../quality/goldens.py) is the schema that enforces
 it.
@@ -24,7 +24,7 @@ field that does not exist, which looked exactly like a finding.
 runs where the goldens live rather than needing them copied into this repo.
 
 🔴 **The goldens it ran on are retired.** They lived in `fux-playground`, which
-[L9](../../docs/adr/0011_LAW-9-environments.md) made Arpit's hands alone on
+[SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md) made Arpit's hands alone on
 2026-09-11. The count below stands as filed; **this script takes a path and has
 no default**, so it still runs on any goldens file that exists.
 

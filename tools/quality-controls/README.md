@@ -1,7 +1,7 @@
-# `tools/quality-controls/` — the controls ADR-RS decision 15 is owed
+# `tools/quality-controls/` — the controls SR-RS decision 15 is owed
 
 **Status: all three built (2026-08-28). One has now been USED.**
-⚠ **[ADR-RS](../../docs/adr/0036_predictions.md) decision 15 may now lose its
+⚠ **[SR-RS](../../records/0133_predictions.md) decision 15 may now lose its
 `NOT BUILT` marker** — the sealed subset was the one outstanding item and it is
 here.
 
@@ -105,7 +105,7 @@ python3 tools/quality-controls/placebo.py <corpus>/.fux/enrich /tmp/placebo
 
 Fifteen questions with **no correct answer in the ten documents they were
 authored against** — `fux-playground`'s, retired by
-[L9](../../docs/adr/0011_LAW-9-environments.md) on 2026-09-11. ⚠ **A decoy is
+[SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md) on 2026-09-11. ⚠ **A decoy is
 only unanswerable relative to a corpus**, so this set says nothing about the
 golden ladder and may not be run against it: re-authoring for a new corpus is
 authoring, and it inherits the least-blind contributor.
@@ -137,7 +137,7 @@ control**. That was never in question. What they may not be is the scored
 
 ⚠ **A decoy is NOT an `unanswerable` golden**, and the difference is role, not
 content. A decoy is a diagnostic and is never scored; an `unanswerable` query is
-**inside the gate** ([ADR-QUALITY](../../docs/adr/0141_quality-contract.md)
+**inside the gate** ([SR-WORK-QUALITY](../../records/0056_WORK-quality.md)
 decision 5) and its handling is part of the headline number. Promoting these
 fifteen would put informed material in a slot whose only value is that its
 author had not looked. **The class is authored separately** —

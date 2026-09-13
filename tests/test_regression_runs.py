@@ -7,7 +7,7 @@ it ruled against, quietly turns a citation into an assertion.
 The **verdict** rules are the newer half. A run that adjudicates a
 pre-registered prediction carries a `VERDICT.md`: `type: Verdict`, the
 prediction id, the frozen pre-registration it was ruled against, and the ruling
-itself. Verdicts are deliberately not ADRs — an ADR records a decision someone
+itself. Verdicts are deliberately not SRs — an SR records a decision someone
 can supersede, and nothing supersedes a measurement except a better one.
 
 The **classification** rules are newer still (2026-08-25, W-78 ruling 2). Every
@@ -33,13 +33,13 @@ from fux import frontmatter as fm  # noqa: E402
 
 REGRESSION = ROOT / "work" / "regression"
 INDEX = REGRESSION / "README.md"
-# ADR-RS: the five ways an R can end. `VOID` was added 2026-09-06 (Arpit) for a
+# SR-RS: the five ways an R can end. `VOID` was added 2026-09-06 (Arpit) for a
 # bar that could not be applied at all -- distinct from INCONCLUSIVE, which is
 # an instrument that could not discriminate. `RETIRED` is not here because a
 # retired question files no verdict.
 VERDICTS = {"PASS", "FAIL", "INCONCLUSIVE", "VOID"}
 
-# ADR-RS decision 11, ruled by Arpit 2026-08-25. Runs filed before this date are
+# SR-RS decision 11, ruled by Arpit 2026-08-25. Runs filed before this date are
 # exempt by BASELINE, not by exception: their reports are frozen, and turning a
 # rule on by editing the evidence it governs is the failure the rule is about.
 CLASSIFY_SINCE = "2026-08-25"
@@ -164,7 +164,7 @@ def test_verdict_says_what_it_ruled_and_against_what(path: Path) -> None:
     meta = fm.parse(path.read_text(encoding="utf-8")).meta
     assert meta.get("type") == "Verdict", (
         f"{path.parent.name}/VERDICT.md: type must be Verdict, got {meta.get('type')!r}. "
-        "A verdict is not an ADR — nothing supersedes a measurement except a better one."
+        "A verdict is not an SR — nothing supersedes a measurement except a better one."
     )
     for key in ("name", "verdict", "prediction", "pre_registration"):
         assert str(meta.get(key, "")).strip(), f"{path.parent.name}/VERDICT.md: missing {key!r}"
@@ -175,7 +175,7 @@ def test_verdict_says_what_it_ruled_and_against_what(path: Path) -> None:
 
 #: Where a run keeps a copy of a pre-registration whose live path has since been
 #: deleted. The verdict is frozen and its `pre_registration:` line is never
-#: rewritten, so the pointer is resolved here instead -- see ADR-RS decision 5.
+#: rewritten, so the pointer is resolved here instead -- see SR-RS decision 5.
 MIRROR = "evidence/pre-registration"
 
 
@@ -222,7 +222,7 @@ def test_a_mirrored_pre_registration_is_only_used_when_the_live_one_is_gone() ->
 
 
 # --------------------------------------------------------------------------
-# The run-classification rule -- ADR-RS decisions 11-13, ruled 2026-08-25.
+# The run-classification rule -- SR-RS decisions 11-13, ruled 2026-08-25.
 #
 # Two layers on purpose. The parametrised checks below guard the runs actually
 # filed; the fixture checks after them guard THE RULE, so that a refactor which
@@ -240,7 +240,7 @@ def test_measured_run_declares_blind_or_informed(run: Path) -> None:
     assert got in CLASSIFICATIONS, (
         f"{run.name}: report needs `classification: blind` or `classification: informed` "
         f"in its frontmatter, got {got or 'nothing'!r}. See CLAUDE.md "
-        "(§Conformance runs) and ADR-RS decision 11. A run whose artifacts were "
+        "(§Conformance runs) and SR-RS decision 11. A run whose artifacts were "
         "authored with the evaluation queries in hand produces a number that looks "
         "exactly like a clean one -- the label is the only thing that separates them. "
         "If this is a surface capture, say so in the report and the rule does not apply."
@@ -253,7 +253,7 @@ def test_measured_run_names_who_authored_what(run: Path) -> None:
     assert report is not None
     text = report.read_text(encoding="utf-8")
     assert AUTHORSHIP_HEADING.search(text), (
-        f"{run.name}: report has no `## Authorship` section. ADR-RS decision 13 -- "
+        f"{run.name}: report has no `## Authorship` section. SR-RS decision 13 -- "
         "name each artifact's author and which of queries / judgments / prior scores / "
         "none they could reach at the time. The burden is on the author to argue "
         "exposure was absent, not on a reader to prove it was present."
@@ -381,7 +381,7 @@ def test_a_conforming_report_satisfies_both_checks(tmp_path: Path) -> None:
 
 
 # --------------------------------------------------------------------------
-# headroom — ADR-RS decision 22, ratified by Arpit 2026-09-11
+# headroom — SR-RS decision 22, ratified by Arpit 2026-09-11
 
 
 #: Baselined on the ruling's own day, unlike `ROWS_SINCE`, and the difference
@@ -423,7 +423,7 @@ def headroom_runs() -> list[Path]:
 
 @pytest.mark.parametrize("run", headroom_runs(), ids=lambda p: p.name)
 def test_a_paired_run_discloses_its_headroom_in_both_directions(run: Path) -> None:
-    """ADR-RS decision 22a/22b — how many queries COULD have changed, per direction.
+    """SR-RS decision 22a/22b — how many queries COULD have changed, per direction.
 
     A null is only as informative as the number of queries that could have
     moved, and the grounding run has all three cases in one table: 94
@@ -439,7 +439,7 @@ def test_a_paired_run_discloses_its_headroom_in_both_directions(run: Path) -> No
     """
     text = report_of(run).read_text(encoding="utf-8").lower()
     assert "headroom" in text, (
-        f"{run.name}: no headroom disclosure in the report. ADR-RS decision 22, ratified "
+        f"{run.name}: no headroom disclosure in the report. SR-RS decision 22, ratified "
         "by Arpit 2026-09-11 -- every paired run states, per endpoint, the score in each "
         "arm and how many queries COULD have changed. It is computed from the per-query "
         "rows the run already files; there is nothing extra to measure. If this run "
@@ -448,7 +448,7 @@ def test_a_paired_run_discloses_its_headroom_in_both_directions(run: Path) -> No
     missing = [d for d in HEADROOM_DIRECTIONS if d not in text]
     assert not missing, (
         f"{run.name}: the report names headroom but not its direction(s) "
-        f"({', '.join(missing)}). ADR-RS decision 22b -- improvement headroom is the "
+        f"({', '.join(missing)}). SR-RS decision 22b -- improvement headroom is the "
         "queries not right in BOTH arms, regression headroom the queries not wrong in "
         "both. They are different questions and one number answers neither."
     )

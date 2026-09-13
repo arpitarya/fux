@@ -8,7 +8,7 @@ their order*; this file asks *how are they shown*. `top` is the one admitted
 boundary case: it truncates a ranking (allowed) and it bounds
 `confidence.support`, a REPORTED signal (stated, not hidden).
 
-## Three roots, because there are three consumers (ADR-OUTPUT decision 3)
+## Three roots, because there are three consumers (SR-OUTPUT decision 3)
 
 | root | consumer | shapes |
 |---|---|---|
@@ -68,7 +68,7 @@ that refuses to guess.
 
 ⚠ **A MISSING file is a different question, and it is NOT an error
 (decision 20).** Decision 19 made `load()` raise when the file did not exist
-at all. Because the file is write-if-missing (ADR-DOTFUX decision 6) it
+at all. Because the file is write-if-missing (SR-DOTFUX decision 6) it
 reaches **new repos only** — so that raise turned `ask`, `find` and `doctor`
 into exit-1 in **every repo that predates the file**, with `doctor`, the verb
 you would run to diagnose it, broken too. Decision 6 forbids reaching those
@@ -132,7 +132,7 @@ _ROOTS = ("cli", "mcp")
 #: ⚠ **`graph` has no `top` key.** It had a dead one on the first build:
 #: `graph` has no `--top` flag and reads `seed_depth`/`expand_limit` from
 #: `.fux/tune.toml` instead — truncating a graph walk is a ranking change,
-#: which this file may not make (ADR-OUTPUT decision 18).
+#: which this file may not make (SR-OUTPUT decision 18).
 #:
 #: `json` is deliberately absent from every tuple below: it is not a `[cli]`
 #: key at all, it is the question of WHICH chain the other keys walk
@@ -156,7 +156,7 @@ CLI_VERBS: dict[str, tuple[str, ...]] = {
 
 #: `[mcp]`'s closed key set. `top` only — decision 11. No `json` (an MCP
 #: result is always JSON) and, corrected during the first build, no `band`
-#: (ADR-CONFIDENCE decision 11 makes the confidence block unconditional over
+#: (SR-CONFIDENCE decision 11 makes the confidence block unconditional over
 #: MCP precisely because a tool call cannot pass a flag).
 MCP_KEYS: tuple[str, ...] = ("top",)
 
@@ -254,7 +254,7 @@ _REFUSED: dict[str, str] = {
 #: decision.
 _MCP_REFUSED: dict[str, str] = {
     "band": (
-        "the confidence block is UNCONDITIONAL over MCP (ADR-CONFIDENCE "
+        "the confidence block is UNCONDITIONAL over MCP (SR-CONFIDENCE "
         "decision 11) — a tool call cannot pass a flag, so `[mcp] band` "
         "would re-blind the one surface this file exists to serve"
     ),
@@ -514,7 +514,7 @@ def _parse(path: Path, data: dict) -> OutputDefaults:
 
     # A file in the OLD flat layout (`[defaults]`, or a bare `[<verb>]` table
     # at the top level) parses cleanly under this grammar and would mean
-    # something else — named, not shrugged at (ADR-TUNE's `_LEGACY_FIELD_KEYS`
+    # something else — named, not shrugged at (SR-TUNE's `_LEGACY_FIELD_KEYS`
     # precedent).
     if "defaults" in data and not isinstance(data.get("cli"), dict):
         c.add("[defaults] is the old layout — output keys now live under [cli] (shared) or [cli.<verb>] (per verb). Run `fux output` for the new specimen.")
@@ -597,7 +597,7 @@ def load(root: Path, *, enabled: bool = True) -> OutputDefaults:
     `ABSENT_OUTPUT`, which resolves every key to `BUILT_IN`. Decision 19
     briefly made this a hard error too, which broke `ask`/`find`/`doctor` in
     **every repo that predates the file** — the file is write-if-missing
-    (ADR-DOTFUX decision 6), so it reaches new repos only, and decision 6
+    (SR-DOTFUX decision 6), so it reaches new repos only, and decision 6
     forbids reaching the rest by rewrite. Decision 19's own wording, *"once
     it is in effect"*, is the rule that survives: a file that does not exist
     is not in effect, so it cannot be the sole source of anything. The repo
@@ -627,7 +627,7 @@ def load(root: Path, *, enabled: bool = True) -> OutputDefaults:
 def specimen() -> str:
     """The file `fux setup` writes (write-if-missing) and `fux output` prints.
 
-    ⚠ **Live lines, not comments** (ADR-OUTPUT decision 14, ruled by Arpit
+    ⚠ **Live lines, not comments** (SR-OUTPUT decision 14, ruled by Arpit
     2026-08-27, and now load-bearing rather than cosmetic: since 2026-08-28 a
     key this file does not set is a hard error, so a specimen that shipped
     fully commented would break every verb on the very first run after
@@ -667,7 +667,7 @@ def specimen() -> str:
         "# verb's own table, below — setting it here would read as global, and",
         "# it is not.",
         "[cli]",
-        f"band = {str(bool(BUILT_IN['band'])).lower()}       # the confidence block — ADR-CONFIDENCE decision 11",
+        f"band = {str(bool(BUILT_IN['band'])).lower()}       # the confidence block — SR-CONFIDENCE decision 11",
         f"top = {int(BUILT_IN['top'])}            # ask/find. ⚠ also bounds `confidence.support`,",
         "               #   which is a REPORTED signal — the one key here that",
         "               #   changes a number an agent reads, admitted rather than hidden.",
@@ -683,7 +683,16 @@ def specimen() -> str:
         "",
         "[cli.answer]",
         f"no_refer = {str(bool(BUILT_IN['no_refer'])).lower()}",
-        f"journal = {str(bool(BUILT_IN['journal'])).lower()}    # record each answer's receipt locally",
+        # 🔴 The ONE key in this file that writes bytes, and the specimen has to
+        # say so. `.fux/output.toml` is a RENDERING config; a reader scanning it
+        # for things that change what they see would pass over a key that
+        # changes what is on their disk. *"locally"* -- the wording until
+        # 2026-09-13 -- named the place and not the act (W-147).
+        f"journal = {str(bool(BUILT_IN['journal'])).lower()}"
+        "    # ⚠ NOT a rendering key. `true` APPENDS every answer's receipt to",
+        "                     #   a file: .fux/runtime/provenance.jsonl, gitignored,",
+        "                     #   never committed. Consent, either here or per-call",
+        "                     #   with `fux answer --journal` -- both are explicit.",
         "",
         "[cli.json]",
         f"enabled = {str(bool(BUILT_IN['json'])).lower()}   # emit --json by default; per-verb: [cli.json.<verb>] enabled = true",
@@ -691,7 +700,7 @@ def specimen() -> str:
         "[mcp]                # the one surface with NO command-line flags at all —",
         "                     # this table is the only way to configure it.",
         f"top = {int(BUILT_IN['top'])}            # ⚠ no `band` here: the MCP confidence block is",
-        "               #   UNCONDITIONAL (ADR-CONFIDENCE decision 11), refused by name.",
+        "               #   UNCONDITIONAL (SR-CONFIDENCE decision 11), refused by name.",
         "",
     ]
     return "\n".join(lines) + ("\n" if not lines[-1] else "")

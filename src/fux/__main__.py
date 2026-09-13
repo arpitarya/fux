@@ -1,6 +1,6 @@
 """`python -m fux` — the invocation ladder's last rung.
 
-**Why this file exists at all.** The ladder ADR-AGENT-POLICY hands an agent
+**Why this file exists at all.** The ladder SR-AGENT-POLICY hands an agent
 ends in a `python -m` form, so that a repo where `fux` is installed into a
 `.venv` that is not active still resolves to *the engine is here* rather than
 `command not found` — the failure that made an agent conclude "not installed"

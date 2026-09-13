@@ -1,6 +1,6 @@
 # `refusal-probe` — do this repo's rules say the right thing about a real response?
 
-The runnable form of [ADR-REFUSAL](../../docs/adr/0051_refusals.md)'s veto
+The runnable form of [SR-REFUSAL](../../records/0146_refusals.md)'s veto
 condition, and the tool for debugging a rule.
 
 ```console

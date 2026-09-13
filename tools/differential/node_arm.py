@@ -38,7 +38,7 @@ gets authored to pass.
 loss gets attributed):
 
 | `--python-tune on` (default) | **the contract** — what `fux find` answers on this corpus, tune and all. A discordance means the two readers disagree, whatever the cause |
-| `--python-tune off` | **the transcription** — `--no-tune` on the Python side (ADR-TUNE decision 11), which is the engine's own answer. A discordance here is a Node transcription defect and nothing else |
+| `--python-tune off` | **the transcription** — `--no-tune` on the Python side (SR-TUNE decision 11), which is the engine's own answer. A discordance here is a Node transcription defect and nothing else |
 
 They are the same run on a corpus whose tune is all-defaults, which is every
 golden rung today. They differ on **this repo**, whose `.fux/tune.toml` sets
@@ -67,7 +67,7 @@ NODE_ENTRY = ENGINE / "node" / "fux.mjs"
 
 #: 🔴 **The sixth surface, and it is the one a CONSUMER runs.** Every other
 #: surface here reads `node/fux.mjs` and its module tree; what `fux setup`
-#: vendors and npm publishes is the BUNDLE (ADR-NODE-SEARCH decisions 13-14,
+#: vendors and npm publishes is the BUNDLE (SR-NODE-SEARCH decisions 13-14,
 #: L10). Shipping one artefact and measuring another is decisions 9-12 in a new
 #: costume — *a transcription is only as true as the surface the instrument is
 #: aimed at* — so the arm builds the bundle and compares it against the tree it
@@ -82,7 +82,7 @@ from fux.query import run_query  # noqa: E402
 from fux.query.headings import headings_for  # noqa: E402
 from fux.store import reader as py_reader  # noqa: E402
 
-#: Fields compared byte-equal. `score` is handled separately — ADR-RANKING 8a.
+#: Fields compared byte-equal. `score` is handled separately — SR-RANKING 8a.
 EXACT = ("id", "loc", "title", "archived", "tie")
 
 #: Every confidence field compared byte-equal. `coverage`, `separation` and
@@ -149,7 +149,7 @@ class Arm:
     def node(self, verb: str, query: str, top: int, extra: tuple[str, ...] = (),
              entry: "Path | None" = None) -> dict:
         # 🔴 `--no-tune` goes to BOTH sides or to neither. Since 2026-09-12 Node
-        # reads `.fux/tune.toml` too (ADR-NODE-SEARCH decision 8, closed), so a
+        # reads `.fux/tune.toml` too (SR-NODE-SEARCH decision 8, closed), so a
         # transcription arm that flipped only the Python side would compare a
         # tuned reader against an untuned one and report the tune file as a
         # transcription defect — the same both-sides-blind failure in reverse.
@@ -266,7 +266,7 @@ class Arm:
 
     #: `ranked_by` names WHICH candidate path answered, and the two runtimes
     #: legitimately differ: Python's MCP surface opts into the accelerator and
-    #: Node has none (ADR-NODE-SEARCH decision 10). The differential law says
+    #: Node has none (SR-NODE-SEARCH decision 10). The differential law says
     #: the two paths return the same documents, so the label is the only honest
     #: difference — excluded by name, never by a loosened comparison.
     MCP_EXCLUDE = ("ranked_by",)
@@ -306,7 +306,7 @@ class Arm:
     # checked one of the three. Measured 2026-09-12: `fux.api.find` called
     # `scan_ask` directly, so `from fux import open` returned a different
     # RANKING from `fux find` on this repo (`graph plane`: 6.392573 against
-    # 8.310345) — the same defect as ADR-NODE-SEARCH decision 8, in Python.
+    # 8.310345) — the same defect as SR-NODE-SEARCH decision 8, in Python.
     # Node's half additionally dropped the `ordinal` key from every passage.
 
     #: The six methods, called identically on both sides. Kept as source rather
@@ -365,7 +365,7 @@ print(json.dumps({
                 # equality.** Python decodes a cited document before chunking
                 # it; Node has no decoders and skips such a document rather than
                 # citing line numbers into text the index never held
-                # (ADR-NODE-SEARCH decision 11).
+                # (SR-NODE-SEARCH decision 11).
                 #
                 # **The invariant is checked on EVERY answer**: nothing Node
                 # cites may be a decoded document. That is the contract, it is
@@ -476,7 +476,7 @@ print(json.dumps({
         for f in fields:
             if p[f] != n[f]:
                 out.append(f"{where} {f}: python={p[f]!r} node={n[f]!r}")
-        # ADR-RANKING decision 8a — the sort key's own resolution, and the
+        # SR-RANKING decision 8a — the sort key's own resolution, and the
         # tolerance Arpit ruled in Phase 0 (option b). NOT an invented epsilon.
         if round(p["score"], 9) != round(n["score"], 9):
             out.append(
@@ -512,7 +512,7 @@ def graph_lane_ready(root: Path) -> bool:
     🔴 **They are ASYMMETRIC and only one side is gated.** Python's
     `graph.plane.load` reads the derived `.fux/runtime/graph.json` and REFUSES
     when it is absent or stale; Node rebuilds the plane in memory from the
-    committed records and answers either way (ADR-NODE-SEARCH decision 9).
+    committed records and answers either way (SR-NODE-SEARCH decision 9).
 
     So a corpus with no fresh build is one where the two readers *legitimately*
     differ, and running the comparison there would file Python's refusal as a
@@ -624,7 +624,7 @@ def main() -> int:
     if args.graph_cap and not graph_lane_ready(root):
         print("graph    : SKIPPED - no fresh derived plane on this corpus. Python's "
               "`explain`/`graph`/`path` refuse without `fux build`; Node's rebuild in "
-              "memory and answer (ADR-NODE-SEARCH decision 9). Run `fux build` to "
+              "memory and answer (SR-NODE-SEARCH decision 9). Run `fux build` to "
               "compare them.")
     elif args.graph_cap:
         ids = sorted(arm.records)
@@ -701,7 +701,7 @@ def main() -> int:
 
     if args.evidence:
         # JSONL, one object per query per verb per depth — the shape
-        # `tests/test_regression_runs.py` looks for, and the shape ADR-RS
+        # `tests/test_regression_runs.py` looks for, and the shape SR-RS
         # decision 14 needs: a discordant count is derivable from these rows
         # and from nothing else.
         args.evidence.mkdir(parents=True, exist_ok=True)

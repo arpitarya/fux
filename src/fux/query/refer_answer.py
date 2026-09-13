@@ -102,7 +102,7 @@ def answer_via_refer(
     )
     # ⚠ **`cache_ttl_seconds` was hard-coded to the `Policy` default, so every
     # `ttl=` in every repo was DEAD at ask time** (W-140 row 6, fixed
-    # 2026-09-11). [ADR-URL-FRESHNESS](../../../docs/adr/0149_url-freshness.md)
+    # 2026-09-11). [SR-URL-FRESHNESS](../../../records/0147_url-freshness.md)
     # decision 11 resolves the interval as `min(policy, line)` precisely so a
     # line can narrow and never widen — and with the policy pinned at `0`,
     # `min(0, 86400)` made the `cached` verdict unreachable by construction. The

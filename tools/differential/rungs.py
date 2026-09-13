@@ -4,7 +4,7 @@ committed manifest before anything measures it.
 W-107. [PRE-REG-NODE-2](../../work/benchmark/PRE-REGISTRATION-NODE-2.md) §4
 fixes the corpora for the Node differential arm: the committed golden ladder,
 rungs 100 through 10 000, in **fux-lab and nowhere else**
-([L9](../../docs/adr/0011_LAW-9-environments.md)).
+([SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md)).
 
 **The rung is not in this repo; its manifest is.** `work/golden/ladder/` holds
 `rung-NNNNN.sha256` (every document, by hash) and `rung-NNNNN.index` (the
@@ -96,7 +96,7 @@ def index_root_sha256(root: Path) -> str:
 
     Path bytes then file bytes, over `sorted(rglob("*"))` — `build_golden_rung.py`
     §"the three ladder records". Restated here only as executable code, which is
-    the one form [L0](../../docs/adr/0002_LAW-0-authority.md) permits: it cannot
+    the one form [L0](../../records/0002_LAW-0-authority.md) permits: it cannot
     disagree with the manifest and still look correct, it simply fails.
     """
     digest = hashlib.sha256()
@@ -169,7 +169,7 @@ def resolve(name: str, *, verify_documents: bool = True) -> Path:
     if not root.is_dir():
         raise RungError(
             f"the ladder corpus is not on this machine: {root} does not exist.\n"
-            f"  The rungs live in fux-lab (L9), are not committed (work/golden/README.md),\n"
+            f"  The rungs live in fux-lab (SR-WORK-ENVIRONMENTS), are not committed (work/golden/README.md),\n"
             f"  and are rebuilt with build_golden_rung.py. Set FUX_GOLDEN_CORPORA to\n"
             f"  point at another checkout."
         )

@@ -59,11 +59,11 @@ def test_every_schema_lives_beside_the_code_it_describes(package, path):
     This repo assigns every component to exactly one decision record BY
     DIRECTORY. A shared `schemas/` directory would put one record in charge of
     shapes belonging to five — and that is not hypothetical: the record schema
-    was first written into `src/fux/templates/`, and the ADR guard refused the
-    commit because that directory belongs to ADR-FETCHER, a record with nothing
+    was first written into `src/fux/templates/`, and the SR guard refused the
+    commit because that directory belongs to SR-FETCHER, a record with nothing
     to say about the record shape.
     """
-    assert path.parent.name != "schemas", "a shared schemas/ directory breaks ADR ownership"
+    assert path.parent.name != "schemas", "a shared schemas/ directory breaks SR ownership"
     siblings = list(path.parent.glob("*.py"))
     assert siblings, f"{path} sits beside no code"
 

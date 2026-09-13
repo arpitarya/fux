@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Run a repo's refusal rules against a CAPTURED response, and say what happens.
 
-This is [ADR-REFUSAL](../../docs/adr/0051_refusals.md)'s veto check made
+This is [SR-REFUSAL](../../records/0146_refusals.md)'s veto check made
 runnable, and it is the tool a consumer uses to debug a rule. The record's veto
 condition is *"a refusal is captured that no byte-pure condition can express"* —
 and the only way to evaluate that is to hold the real bytes and ask.

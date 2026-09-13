@@ -57,7 +57,7 @@ def test_invalid_toml(tmp_path):
         load(tmp_path)
 
 
-# -- the retired key (ADR-DIR-LIST decision 1) -----------------------------
+# -- the retired key (SR-DIR-LIST decision 1) -----------------------------
 
 
 def test_the_retired_dirs_key_errors_with_instructions(tmp_path):
@@ -99,7 +99,7 @@ def test_a_directory_may_declare_itself_archived(tmp_path):
 
 
 def test_archived_is_declared_and_never_derived_from_the_path(tmp_path):
-    """ADR-DIR-LIST decision 4 — the reason it superseded its predecessor."""
+    """SR-DIR-LIST decision 4 — the reason it superseded its predecessor."""
     _write_dirs(tmp_path, ["archive/v0.26-docs"])
     (entry,) = read_dirs(tmp_path, ".fux/sources/dirs")
     assert entry.attrs["archived"] == "false"  # the path is a hint, not the signal
@@ -111,7 +111,7 @@ def test_a_missing_dirs_list_fails_loudly_naming_setup(tmp_path):
         source_dirs(tmp_path, load(tmp_path).dirs_file)
 
 
-# -- the ranking keys left this file (ADR-TUNE decision 7) ------------------
+# -- the ranking keys left this file (SR-TUNE decision 7) ------------------
 #
 # `[ranking]` and `[dense]` moved to `.fux/tune.toml` on 2026-08-24. Their
 # validation moved with them (`tests/test_tune.py`); what stays here is the
@@ -154,11 +154,13 @@ def test_config_no_longer_carries_the_ranking_fields(tmp_path):
     """The fields are gone, not merely unread — two homes is decision 1's rot."""
     _write(tmp_path, "[sources]\n")
     config = load(tmp_path)
+    # `superseded_weight` moved here in 2026-08 and was REMOVED outright on
+    # 2026-09-13 (W-151); it must not reappear on `Config` either way.
     for gone in ("archived_weight", "superseded_weight", "dense_mode", "rerank_weight"):
         assert not hasattr(config, gone), f"{gone} should have moved to tune.toml"
 
 
-# -- the archived directory set (ADR-ARCHIVED-CONTENT decision 6's input) ---------
+# -- the archived directory set (SR-ARCHIVED-CONTENT decision 6's input) ---------
 
 
 def test_archived_dirs_is_only_the_declared_ones(tmp_path):
@@ -175,9 +177,9 @@ def test_archived_dirs_excludes_exclusion_lines(tmp_path):
     assert archived_dirs(tmp_path, ".fux/sources/dirs") == ["old"]
 
 
-# -- [sources.url] acquired_max_bytes (ADR-CONFIG decision 12) --------------
+# -- [sources.url] acquired_max_bytes (SR-CONFIG decision 12) --------------
 #
-# ⚠ **This key was DOCUMENTED before it was parsed.** ADR-ACQUIRED decision 8
+# ⚠ **This key was DOCUMENTED before it was parsed.** SR-ACQUIRED decision 8
 # named it and the ownership table gave it to `config.py`, while `config.py`
 # never read it and `urlsrc.fetch_all` reached for it through an undefined
 # name -- a `NameError` on every retaining fetch. These tests are the gate on
@@ -253,7 +255,7 @@ def test_the_scaffolded_fux_toml_has_no_decode_table():
 
 def test_a_types_file_key_is_refused_by_name(tmp_path):
     """`config.schema.json` advertised `[sources] types_file` and nothing read it;
-    the types list is always `.fux/formats.toml` (ADR-TYPES decision 12)."""
+    the types list is always `.fux/formats.toml` (SR-TYPES decision 12)."""
     import pytest
 
     from fux.config import load

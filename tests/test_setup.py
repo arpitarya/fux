@@ -1,4 +1,4 @@
-"""`fux setup` — the second scaffolding moment (ADR-DOTFUX decision 6).
+"""`fux setup` — the second scaffolding moment (SR-DOTFUX decision 6).
 
 Two rules carry the whole design and both are cheap to break silently:
 **`ensure_layout` never writes a fetcher**, so a plain `fux ingest` cannot put
@@ -40,7 +40,7 @@ def test_both_fetchers_ship_as_package_data_never_as_modules():
 
 
 def test_the_engine_never_imports_a_fetcher():
-    """ADR-FETCHER decision 1 — a fetcher fux imports is a fetcher fux owns."""
+    """SR-FETCHER decision 1 — a fetcher fux imports is a fetcher fux owns."""
     offenders = []
     for path in (Path(__file__).resolve().parents[1] / "src" / "fux").rglob("*.py"):
         text = path.read_text(encoding="utf-8")
@@ -157,7 +157,7 @@ def test_setup_writes_a_types_file_ingest_can_actually_read(tmp_path):
 
 
 def test_the_written_types_file_spells_the_default_out_as_live_lines(tmp_path):
-    """ADR-TYPES decision 10 — visible without reading fux's source.
+    """SR-TYPES decision 10 — visible without reading fux's source.
 
     Since decision 11 the file also states each **binding**, so what is visible
     is the whole map; since decision 12 the map is `[decoders]` and the prose is
@@ -196,7 +196,7 @@ def test_setup_never_overwrites_an_edited_types_file(tmp_path):
     assert listing.read_text(encoding="utf-8") == 'include = ["*.md"]\n'
 
 
-# -- ADR-TYPES decision 12: the old file is converted, never silently dropped --
+# -- SR-TYPES decision 12: the old file is converted, never silently dropped --
 
 
 def _legacy(root, text):
@@ -332,11 +332,11 @@ def test_the_written_config_names_max_parallel_uncommented(tmp_path):
     assert "\n[sources.url]\n" in written
     # ⚠ **This used to pin the sentence "min(this, what your fetcher declares)".**
     # That prose left with W-122 (2026-09-12): a comment explaining a key can
-    # drift from ADR-CONFIG while both look correct, which ADR-LAW-0 decision 4
+    # drift from SR-CONFIG while both look correct, which SR-LAW-0 decision 4
     # forbids. What the template owes a consumer now is the POINTER — a repo
     # whose `fux.toml` says nothing and links nowhere is the worse outcome, so
     # this asserts the link rather than dropping the check.
-    assert "docs/adr/0113_config.md" in written, "the template must name ADR-CONFIG"
+    assert "records/0113_config.md" in written, "the template must name SR-CONFIG"
     assert "may not be commented out" in written
 
 
@@ -395,7 +395,7 @@ def test_ensure_layout_writes_no_fetcher_and_no_source_list(tmp_path):
     assert not (tmp_path / ".fux" / "fetchers").exists()
     assert not (tmp_path / ".fux" / "sources").exists()
     # `node/` and `fux` are engine-owned and vendored here on purpose
-    # (ADR-NODE-SEARCH R2); a fetcher or a source list would still be `setup`'s
+    # (SR-NODE-SEARCH R2); a fetcher or a source list would still be `setup`'s
     # alone, which is the invariant this test exists for.
     assert sorted(p.name for p in (tmp_path / ".fux").iterdir()) == [
         ".gitignore", "README.md", "fux", "node",
@@ -411,7 +411,7 @@ def test_a_plain_ingest_puts_no_code_in_the_repo(tmp_path):
     listing = tmp_path / ".fux" / "sources" / "dirs"
     listing.parent.mkdir(parents=True, exist_ok=True)
     listing.write_text("docs\n", encoding="utf-8")
-    # ADR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
+    # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
 
     ingest(tmp_path)
@@ -419,7 +419,7 @@ def test_a_plain_ingest_puts_no_code_in_the_repo(tmp_path):
 
 
 def test_setup_writes_the_pii_starter_and_never_rewrites_it(tmp_path):
-    """ADR-PII decision 17: the starter's header said setup wrote it; now it does."""
+    """SR-PII decision 17: the starter's header said setup wrote it; now it does."""
     from fux.ingest import pii
 
     setup_mod.run(tmp_path, agents=False)

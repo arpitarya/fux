@@ -31,7 +31,7 @@ timestamp: 2026-08-20T00:00:00Z
 ## Context
 
 `.fux/sources/dirs` is an include-only whitelist
-([ADR-DIR-LIST](../../docs/adr/0120_dir-list.md)). There is no way to say
+([SR-DIR-LIST](../../records/0120_dir-list.md)). There is no way to say
 *"index this directory, except the machine-generated parts."*
 
 It bites in this repo in the most self-referential way available: the
@@ -66,9 +66,9 @@ And it is **ranking-visible**, not merely present:
 
 ```console
 $ fux ask "the fixture behind the CLI examples" --scan --top 3
-10.2071  The fixture behind ADR-CLI's examples. …  (work/regression/2026-08-18-cli-surface/evidence/fixture.sh)
+10.2071  The fixture behind SR-CLI's examples. …  (work/regression/2026-08-18-cli-surface/evidence/fixture.sh)
  7.5843  SUPERSEDED 2026-08-19 by …                (work/regression/2026-08-18-ingest-and-index/evidence/fixture.sh)
- 7.2232  ADR-CLI (0002) — the command-line surface (docs/adr/0002_cli-surface.md)
+ 7.2232  SR-CLI (0002) — the command-line surface (records/0101_cli-surface.md)
 
 $ fux ask "arm audit results" --scan --top 3
  9.2050  ANALYSIS — M1-rerun, the pruning gate made decidable  (…/ANALYSIS.md)
@@ -98,7 +98,7 @@ argument that option D cannot work.
 
 ## Options
 
-- **A — an `exclude=` attribute on a directory line.** What ADR-DIR-LIST
+- **A — an `exclude=` attribute on a directory line.** What SR-DIR-LIST
   anticipated. `work exclude=regression/*/evidence`.
 - **B — a `.fuxignore` file**, gitignore syntax, per-directory.
 - **C — honour `.gitignore` only.**
@@ -115,7 +115,7 @@ argument that option D cannot work.
 | **solves the measured case** (H) | yes | yes | **no** — every contaminating file is git-*tracked*; `.gitignore` says nothing about them | partly, and only while remembered | yes |
 | **visible in the one file you read to know what is indexed** (H) | yes | **no** — a second file, and the hazard names this | no | **no** | yes |
 | **survives being forgotten** (H) | yes | yes | yes | **no — measured: 2 of 7** | yes |
-| **new grammar concepts** (H) | **a delimiter inside a value** — values carry no whitespace and no quoting (ADR-URL-LIST 8) and a repeated key is a loud error (10), so two exclusions need `exclude=a,b` | a whole second ignore language | none | none | **one prefix character** |
+| **new grammar concepts** (H) | **a delimiter inside a value** — values carry no whitespace and no quoting (SR-URL-LIST 8) and a repeated key is a loud error (10), so two exclusions need `exclude=a,b` | a whole second ignore language | none | none | **one prefix character** |
 | **merges line-by-line at scale** (M) | one long line grows and conflicts | yes | n/a | n/a | yes — the property the file format exists for |
 | **generalises past this repo** (M) | yes | yes | no | **no** | yes |
 | **stays inside the hazard** ("do not widen into a general ignore system") (H) | yes | **no** — gitignore syntax is negation + `**` + trailing-slash precedence, and a *partial* implementation is the dangerous kind | yes | yes | yes — one prefix, repo-relative globs, **no negation**, order-independent |
@@ -188,7 +188,7 @@ closes.
   holding the same set in different orders must produce the same committed
   bytes.
 - No negation, ever. `!` excludes; there is no un-exclude.
-- ADR-DIR-LIST changes: decision 2's grammar gains the prefix, and the
+- SR-DIR-LIST changes: decision 2's grammar gains the prefix, and the
   anticipation of "an exclusion attribute on a directory line" is corrected.
 - `CLAUDE.md`'s conformance law is reconciled — it says `evidence/`, the repo
   writes both, and with E it can say `evidence/` and mean it.
@@ -196,9 +196,9 @@ closes.
 
 ## References
 
-- [ADR-DIR-LIST](../../docs/adr/0120_dir-list.md) — the file, the grammar, the
+- [SR-DIR-LIST](../../records/0120_dir-list.md) — the file, the grammar, the
   closed attribute set.
-- [ADR-URL-LIST](../../docs/adr/0116_url-list.md) decisions 8, 10, 13 — no
+- [SR-URL-LIST](../../records/0116_url-list.md) decisions 8, 10, 13 — no
   whitespace or quoting in values; a repeated key is an error; reader lenient,
   writer strict. These are what rule out the multi-value attribute.
 - [`../regression/2026-08-12-r2-close/report.md`](../regression/2026-08-12-r2-close/report.md)

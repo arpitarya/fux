@@ -1,4 +1,4 @@
-"""ADR-AGENT-POLICY decision 15 — the operating guides and their pointers.
+"""SR-AGENT-POLICY decision 15 — the operating guides and their pointers.
 
 Arpit, 2026-09-11: skills for every job the CLI supports, **and** steering-style
 pointers, for Claude, Codex, Copilot and Kiro. Decision 9 had said a manual

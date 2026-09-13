@@ -9,7 +9,7 @@ timestamp: 2026-08-20T00:00:00Z
 # Which files are documents — Comparison
 
 >
-> ⚠ **Status corrected 2026-08-22 (queue review):** this read `proposed` while its verdict landed with **W-45 (verdict E, decided the same day)**, W-45 and W-55 are both archived, and [ADR-TYPES](../../docs/adr/0128_types-list.md) is `accepted` and shipped. Decided and built; only the frontmatter lagged.
+> ⚠ **Status corrected 2026-08-22 (queue review):** this read `proposed` while its verdict landed with **W-45 (verdict E, decided the same day)**, W-45 and W-55 are both archived, and [SR-TYPES](../../records/0128_types-list.md) is `accepted` and shipped. Decided and built; only the frontmatter lagged.
 
 > **VERDICT: G — DECIDED by Arpit, 2026-08-20.** A built-in default allowlist,
 > overridable by `.fux/sources/types`. A third committed source file, one glob per line,
@@ -28,7 +28,7 @@ timestamp: 2026-08-20T00:00:00Z
 > untouched** — a built-in default, overridable by `.fux/sources/types`,
 > absent means the default applies. **The 14 % / 11.4 % measurement stands**;
 > what changed is that those tokens were raw bytes and now pass through a
-> decoder ([ADR-DECODE](../../docs/adr/0139_decode.md)). This was rulable
+> decoder ([SR-DECODE](../../records/0139_decode.md)). This was rulable
 > precisely because of the confidence line above — *a defaults judgment rather
 > than a measurement*. ⚠ Two documents had claimed it needed a new
 > pre-registration at 10 000 documents; **that was wrong and is corrected**.
@@ -60,7 +60,7 @@ tokens** — `.json` alone is 11.4 %, because a machine-written evidence file is
 long and repetitive, which is exactly the shape that distorts `df`.
 
 **Scope:** this decides the **git-dir walker only**. A URL record is whatever
-its fetcher returned as markdown ([ADR-FETCHER](../../docs/adr/0117_fetcher.md)),
+its fetcher returned as markdown ([SR-FETCHER](../../records/0117_fetcher.md)),
 so there is no extension to filter on and nothing here applies to it.
 
 ## Prior art
@@ -89,7 +89,7 @@ so there is no extension to filter on and nothing here applies to it.
   `*.rst`, `*.adoc` compiled in. Zero surface; changing it needs a release.
 - **C — a `types=` attribute on each `dirs` line.** Per-root control:
   `docs types=md,rst`. Expresses "this root is prose, that one is code".
-- **D — a `[sources] types` array in `fux.toml`.** The shape ADR-DIR-LIST
+- **D — a `[sources] types` array in `fux.toml`.** The shape SR-DIR-LIST
   just moved *away* from.
 - **E — named type sets, ripgrep-style**, defined in the types file and
   referenced from `dirs` lines (`docs types=doc`). Two levels of indirection.
@@ -119,11 +119,11 @@ whether bytes "read as prose" is a classifier, and a classifier that misfires
 does so silently — indexing a lockfile as a runbook, or dropping a sparse but
 real document. This repo has already ruled that a heuristic must not decide
 what a document *means*
-([ADR-HTTP-FETCHER](../../docs/adr/0119_http-fetcher.md) decision 3); the same
+([SR-HTTP-FETCHER](../../records/0119_http-fetcher.md) decision 3); the same
 argument applies to deciding what a document *is*. It also cannot be reviewed:
 there is no diff for a judgment made at ingest.
 
-**D — a TOML array is the shape ADR-DIR-LIST just retired.** One diff hunk,
+**D — a TOML array is the shape SR-DIR-LIST just retired.** One diff hunk,
 one merge conflict, and it puts a corpus decision back inside config after a
 record deliberately took it out. Rejecting it is consistency, not taste.
 
@@ -184,7 +184,7 @@ another, so there is no order to remember and no order to get wrong.
   not `evidence/report.md`. Both mechanisms are still needed; this one is
   larger and simpler, which is why it should land first.
 - **`.mermaid` is a judgment call, stated so it is not silently made.** It is a
-  diagram source, not prose, and the ASCII twin every ADR carries means the
+  diagram source, not prose, and the ASCII twin every SR carries means the
   diagram's content is already indexed as markdown. Excluded.
 - **A third file under `.fux/sources/` makes the trio complete**: `dirs` says
   *where*, `types` says *what*, `urls` says *what else*. That is a clean

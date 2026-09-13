@@ -17,7 +17,7 @@
  *
  * ## Why it is in the Node reader at all
  *
- * It is the second half of [ADR-NODE-SEARCH](../../../docs/adr/0155_node-search.md)
+ * It is the second half of [SR-NODE-SEARCH](../../../records/0153_node-search.md)
  * decision 8. `[ranking] rerank_weight` ships at `0.0`, so this is dead code on
  * an untuned repo — and fux's own `.fux/tune.toml` sets `0.3`, which is exactly
  * why 90 of 174 comparisons were discordant there and 0 of 174 with

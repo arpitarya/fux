@@ -39,6 +39,14 @@ edited, which is the property that makes its contents trustworthy.
 
 ---
 
+
+> ⚠ **Archived documents filed before 2026-09-13 cite `docs/adr/` and `ADR-<NAME>`.**
+> That directory is now [`records/`](../records/README.md) and the names are `SR-<NAME>`
+> (the SR rename, Arpit 2026-09-13). **Nothing under `archive/` was rewritten** — an
+> archive that is edited to match a live convention stops being evidence of what was —
+> so those links dangle by design; resolve them by name against the register.
+> `archive/v0.26-docs/adr/` is a different, frozen numbering and keeps `ADR-NNNN`.
+
 ## Layout — the archive mirrors the live tree
 
 A retired artifact goes to `archive/<the-directory-it-came-from>/`. `work/adr/`
@@ -117,6 +125,7 @@ they are worth keeping.
 
 | item | closed | outcome and live successor |
 |---|---|---|
+| [`W-157-recover-deleted-item-files.md`](open/W-157-recover-deleted-item-files.md) | 2026-09-13 | **Completed in full.** The 2026-08-19 archive-on-close ruling had held for 76 items and failed for 40; this recovered **20 files for 19 ids** — nine from committed history, **eleven from `git fsck --unreachable` loose objects a `git gc` would have taken** — and wrote down why each of the other 31 ids has none. Live successors: the rule is [SR-WORK-OPEN-QUEUE](../records/0051_WORK-open-queue.md) rules 54–58, the gate is [`tests/test_no_work_item_is_lost.py`](../tests/test_no_work_item_is_lost.py), the map is §*Recovered 2026-09-13* above, and the outcome is [`work/IMPLEMENTATION.md`](../work/IMPLEMENTATION.md) §2026-09-13. ⚠ **Twenty ids are lost for good** — their bytes are in no commit and no loose object, and the item forbade rebuilding one from `WORKLOG.md`, so each is named in the gate's `UNRECOVERABLE` set instead. ⚠ **Its own audit was wrong three times** and running it is what found that: the list of 50 was short by one (`W-155`), `W-114` did have a file after all, and `W-70` had been allocated twice |
 | [`W-137-adr-renumber-laws-to-100.md`](open/W-137-adr-renumber-laws-to-100.md) | 2026-09-11 | **Landed as ruled**: the laws own `0001`–`0100` (`0011`–`0100` reserved and empty, no placeholder files) and every other record starts at `0101` — 54 records +90, ADR-CLI `0011` → `0101` through ADR-DOCTOR `0064` → `0154`. Live successor: [the register](../docs/adr/README.md) §The convention and its *Renumbered again on 2026-09-11* note, which is where the scheme is stated. ⚠ **Its own DoD was incomplete**: it did not anticipate that each record's frontmatter `title:` carries the number as `ADR-NAME (NNNN)` and that the script would not rewrite it — all 54 failed `test_adr_frontmatter.py` on the first suite run |
 | [`W-98-acquired-plane.md`](open/W-98-acquired-plane.md) | 2026-09-01 | **All four phases landed**: the browser fetcher returns the intercepted resource, declarative refusal detection, the clock-free `.fux/acquired/` plane, and `ttl=` with the sixth `as-ingested` verdict. Live successors: [ADR-CDP-FETCHER](../docs/adr/0020_cdp-fetcher.md) · [ADR-REFUSAL](../docs/adr/0051_refusals.md) · [ADR-ACQUIRED](../docs/adr/0050_acquired-plane.md) · [ADR-URL-FRESHNESS](../docs/adr/0052_url-freshness.md). ⚠ **Two of its own claims were WRONG and are worth knowing**: the in-page `fetch(url, {credentials:'include'})` the spec prescribed could never have worked (CORS/CSP are page-level, CDP is not — so `ETag` was invisible and `validate()` undeliverable), and its guess that `cdp.py`'s `HTMLParser`/`urljoin` were dead code was ruled the other way. ⚠ **Its Phase 2 spec was CUT, not built** — four conditions would have put HTTP facts inside the engine, which [ADR-FETCHER](../docs/adr/0019_fetcher.md) decision 13 forbids |
 | [`W-30-ratify-adr-0001.md`](open/W-30-ratify-adr-0001.md) | 2026-08-19 | Arpit ratified the ingest-mode naming → [ADR-EXTRACTED](../docs/adr/0016_extracted-mode.md) · [ADR-ENRICHED](../docs/adr/0017_enriched-mode.md), both accepted. The file's own "**Non-blocking**" note was **wrong**: `mode` is a committed wire-format value, so the *reversal* cost rises with every index written |
@@ -196,6 +205,54 @@ Every outcome is recorded in
 [`work/IMPLEMENTATION.md`](../work/IMPLEMENTATION.md) — §Ratified decisions for
 the human calls, §Defects closed outside a milestone for the rest, and the
 milestone table for the milestones.
+
+## Recovered 2026-09-13 — the 20 item files that were deleted (W-157)
+
+**These twenty files were deleted, not archived.** The archive-never-delete
+ruling held from 2026-08-19 and then failed for a run of items, because
+[`work/DOC-REGISTRY.md`](../work/DOC-REGISTRY.md)'s trigger for `work/open/`
+said a detail file is "deleted with" its queue row. That sentence is corrected;
+these files are recovered here under
+[W-157](open/W-157-recover-deleted-item-files.md) and rules 54-58 of
+[SR-WORK-OPEN-QUEUE](../records/0051_WORK-open-queue.md).
+
+**Read the provenance column before citing any of these as history.** Every file
+here is the **last version git ever saw**, which is *earlier* than the state the
+item closed in — each still carries `status: open`. None was reconstructed from
+`WORKLOG.md`: a rebuilt file would be a forgery, and W-157 forbids it. Two
+filenames marked **DERIVED** are reconstructions of the *name* only; their bytes
+are original.
+
+| item | provenance | closed / outcome and live successor |
+|---|---|---|
+| [`W-22-m2-t1-accelerator.md`](open/W-22-m2-t1-accelerator.md) | committed at `e54f98b0` (2026-08-12), path `docs/open/` | Pre-`work/` era. M2's T1 accelerator. Live successor: [`work/IMPLEMENTATION.md`](../work/IMPLEMENTATION.md) milestone table |
+| [`W-42-close-r2-q3.md`](open/W-42-close-r2-q3.md) | committed at `61f522a2` (2026-08-12), path `docs/open/` | R2 closed 3/3 PASS in that same commit. Live successor: [`work/IMPLEMENTATION.md`](../work/IMPLEMENTATION.md) |
+| [`W-43-archive-law-debt.md`](open/W-43-archive-law-debt.md) | committed at `e8035bbe` (2026-08-12), path `docs/open/` | The archive-law debt was paid in that commit — executed pairs left `handoff/`. Live successor: **this README**, §`handoff/` |
+| [`W-70-fux-playground-personal-sandbox.md`](open/W-70-fux-playground-personal-sandbox.md) | committed at `e11ca745` (v0.36.0, 2026-08-22) | Planning only, never executed. Live successor: [`work/WORKLOG.md`](../work/WORKLOG.md) 2026-08-22 |
+| [`W-70-per-document-cap.md`](open/W-70-per-document-cap.md) | unreachable blob `a65101b96d` | ⚠ **`W-70` was allocated TWICE.** This is the *other* W-70 — the per-document budget cap, filed 2026-08-22 out of [W-59](open/W-59-refer-plane-measurement.md)'s sweep. Renamed on recovery to break the filename collision; the id inside the file is untouched |
+| [`W-71-fux-lab-tiered-repos.md`](open/W-71-fux-lab-tiered-repos.md) | committed at `e11ca745` (v0.36.0, 2026-08-22) | Planning only; the tier was **measured and declined** in that release. Live successor: [`work/WORKLOG.md`](../work/WORKLOG.md) 2026-08-22 |
+| [`W-102-enrich-pii.md`](open/W-102-enrich-pii.md) | unreachable blob `fe933340bd` | Live successors: [`work/WORKLOG.md`](../work/WORKLOG.md) §2026-09-01 *W-102/103/104/105 opened and implemented* and the run [`2026-09-02-enrich-pii-leak`](../work/regression/2026-09-02-enrich-pii-leak/report.md) |
+| [`W-103-accept-locks.md`](open/W-103-accept-locks.md) | unreachable blob `8ae40d8869` | Live successor: [`work/WORKLOG.md`](../work/WORKLOG.md) §2026-09-01, same entry |
+| [`W-104-enrich-skill-one-target.md`](open/W-104-enrich-skill-one-target.md) | unreachable blob `146cc5a450` | Live successor: [`work/WORKLOG.md`](../work/WORKLOG.md) §2026-09-01, same entry |
+| [`W-105-cdp-parallel.md`](open/W-105-cdp-parallel.md) | unreachable blob `6b6ff6a14e` | Live successors: [`work/WORKLOG.md`](../work/WORKLOG.md) §2026-09-01 and the run [`2026-09-02-cdp-parallel`](../work/regression/2026-09-02-cdp-parallel/report.md) |
+| [`W-114-adrs-are-the-source.md`](open/W-114-adrs-are-the-source.md) | unreachable blob `f6c6a3e395` · **filename DERIVED** from its successor's slug — the original path is not in git | ⚠ **Renumbered, not shipped.** W-114 became [`W-122-adrs-are-the-source.md`](open/W-122-adrs-are-the-source.md), which is the live successor. Kept because the renumber is itself a closure, and rule 55 archives every closure |
+| [`W-115-chunking-quality-unmeasured.md`](open/W-115-chunking-quality-unmeasured.md) | committed at `05ebaab8` (2026-09-12) | Measured and closed in that commit. Live successors: [`work/WORKLOG.md`](../work/WORKLOG.md) §2026-09-06 and [SR-CHUNKING](../records/0151_chunking.md) |
+| [`W-141-codex-skill-directory.md`](open/W-141-codex-skill-directory.md) | committed at `02d23502` (2026-09-12) | Closed 2026-09-12 — Codex and Copilot share `.agents/skills/`. Live successor: [`work/WORKLOG.md`](../work/WORKLOG.md) §2026-09-12 |
+| [`W-142-heading-negative-control.md`](open/W-142-heading-negative-control.md) | committed at `05ebaab8` (2026-09-12) | ⚠ **RETIRED, not shipped** — the heading-matched distractor control was saturated and withdrawn. Live successor: its VERDICT under [`work/golden/`](../work/golden/) and [`work/WORKLOG.md`](../work/WORKLOG.md) |
+| [`W-149-the-consumer-gets-no-source.md`](open/W-149-the-consumer-gets-no-source.md) | committed at `bf8216d6` (2026-09-12) | **Shipped** in that commit — one generated file, L10 satisfied, bundled at publish. Live successor: [SR-LAW-10](../records/0011_LAW-10-bundled-output.md) |
+| [`W-150-benchmark-seven-captures.md`](open/W-150-benchmark-seven-captures.md) | unreachable blob `b21e0bbdcb` · **filename DERIVED** from the item's own title | Live successors: [`work/DOC-REGISTRY.md`](../work/DOC-REGISTRY.md) and SR-WORK-BENCHMARK, which this item was the build for |
+| [`W-151-remove-superseded-weight.md`](open/W-151-remove-superseded-weight.md) | unreachable blob `d4a45d35e4` (largest of three drafts) | Ruled closed 2026-09-13. Live successor: [`work/WORKLOG.md`](../work/WORKLOG.md) §2026-09-13 *`superseded_weight` ruled closed* |
+| [`W-152-close-archived-and-recency.md`](open/W-152-close-archived-and-recency.md) | unreachable blob `b77456b970` (larger of two drafts) | Ruled closed by Arpit 2026-09-13 on VERDICT-W143's evidence; both ship as no-ops. Live successor: [SR-RANKING](../records/0111_ranking.md) |
+| [`W-153-mtime-on-the-hit.md`](open/W-153-mtime-on-the-hit.md) | unreachable blob `da13b90ad5` | Live successor: [`work/DOC-REGISTRY.md`](../work/DOC-REGISTRY.md) |
+| [`W-155-table-is-the-answer-probes.md`](open/W-155-table-is-the-answer-probes.md) | unreachable blob `b4304e49b6` | Live successor: the run [`2026-09-13-table-is-the-answer`](../work/regression/2026-09-13-table-is-the-answer/report.md) |
+| [`W-147-the-journal-consent-surface.md`](open/W-147-the-journal-consent-surface.md) | 2026-09-13 | **Ruled (a) and built the same day.** Arpit: *"I need the flag as well as output TOML configuration"* — the `--journal` flag AND a committed `[cli.answer] journal = true` are **both** explicit consent, and both stay. Live successors: [SR-PROVENANCE](../records/0142_provenance.md) decision 10 and [SR-OUTPUT](../records/0143_output-defaults.md) decision 22 (the records were amended by the ruling session); the binding is `tests_e2e/test_verbs.py::test_both_journal_consent_surfaces_write_and_neither_alone_is_removable` — all four states, including that **neither surface present writes nothing** — plus `tests/test_node_config_parity.py::test_the_journal_key_is_bound_on_BOTH_runtimes_by_name`; the specimen line is `src/fux/output_config.py`. ⚠ **Two things the build found that the item did not predict:** `.fux/output.toml` is a **COMPLETE declaration** — a two-line snippet is refused, so the tested surface is the specimen with one line flipped — and `query/provenance.py`'s docstring named **`.fux/tune.toml`** as the opt-in, the very home the ruling REFUSED, corrected on contact |
+
+**Nineteen of the fifty-one audited ids came back, as twenty files. The other
+thirty-two did not, and the reason each one did not is written down** in
+[W-157](open/W-157-recover-deleted-item-files.md) §Disposition — twenty
+were genuinely lost (their bytes are in no commit and no loose object; the
+durable record of each is its `WORKLOG` entry and its record), and twelve were
+never allocated as files at all.
 
 ## Retired planning documents
 
@@ -286,7 +343,7 @@ between 2026-08-26 and 2026-08-27. **They may be named, never cited.***
 | [`proposals/answer-provenance.md`](proposals/answer-provenance.md) | 2026-08-27 | **Graduated.** Live successor: [ADR-PROVENANCE](../docs/adr/0046_provenance.md) — `ask --why`, `answer --receipt`, and `fux verify`'s four-state verdict |
 | [`proposals/output-toml-is-the-only-default.md`](proposals/output-toml-is-the-only-default.md) | 2026-08-27 | **Graduated.** Live successor: [ADR-OUTPUT](../docs/adr/0047_output-defaults.md) |
 | [`proposals/tune-file-and-source-priority.md`](proposals/tune-file-and-source-priority.md) | 2026-08-27 | **Graduated 2026-08-22**; the move is what was late. Live successor: [ADR-TUNE](../docs/adr/0038_tuning.md) — `.fux/tune.toml` and per-source priority in either direction |
-| [`proposals/playground-goldens-draft.md`](proposals/playground-goldens-draft.md) | 2026-08-27 | **Graduated 2026-08-24** when Arpit waived the human-author rule and the 50 candidates were installed; the move is what was late. Live successor: the playground's `goldens/queries.jsonl` ([SETUP-PLAYGROUND](../work/setup/fux-playground.md)) and [ADR-QUALITY](../docs/adr/0044_quality-contract.md) |
+| [`proposals/playground-goldens-draft.md`](proposals/playground-goldens-draft.md) | 2026-08-27 | **Graduated 2026-08-24** when Arpit waived the human-author rule and the 50 candidates were installed; the move is what was late. Live successor: the playground's `goldens/queries.jsonl` ([SETUP-PLAYGROUND](../work/setup/fux-playground.md)) and [ADR-QUALITY](../docs/adr/0056_WORK-quality.md) |
 
 ## Archived 2026-08-28 — three items closed, and the queue cut back to what is open
 

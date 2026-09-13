@@ -14,7 +14,7 @@ degrades an honest empty result into an ambiguous one.
 
 **Found:** [W-140](../open/W-140-guide-authoring-defects.md) row 12, the third
 of three halves; the other two were defects and are fixed
-([ADR-GRAPH](../../docs/adr/0126_graph.md)). **Owning record:** ADR-GRAPH,
+([SR-GRAPH](../../records/0126_graph.md)). **Owning record:** SR-GRAPH,
 §Consequences, which states the problem and decides nothing.
 
 ---
@@ -152,8 +152,8 @@ Reopen this decision if **any** becomes true:
   `for h in 2 3 4 5 6; do time fux path CLAUDE.md docs/GLOSSARY.md --hops $h; done`
   in this repo, after `fux build`.
 - **The code** — [`src/fux/graph/walk.py`](../../src/fux/graph/walk.py)
-  `routes()` · [ADR-GRAPH](../../docs/adr/0126_graph.md) §Consequences, which
+  `routes()` · [SR-GRAPH](../../records/0126_graph.md) §Consequences, which
   states the problem.
 - **The honest-emptiness precedent** — W-140 row 12's other two halves: a typo'd
   id printed the same line as a true empty result and exited 0. Fixed in
-  ADR-GRAPH; the same failure is what §3's point 2 exists to prevent.
+  SR-GRAPH; the same failure is what §3's point 2 exists to prevent.

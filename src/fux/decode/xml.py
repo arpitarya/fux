@@ -18,7 +18,7 @@ from __future__ import annotations
 # `.fux/decoders/` loaded by path. A path-loaded file has no parent package, so
 # `from . import _xml` raises `attempted relative import with no known parent
 # package` — the copy would be dead on arrival. Absolute imports mean the file
-# fux ships and the file you edit are byte-identical (ADR-DECODE decision 11).
+# fux ships and the file you edit are byte-identical (SR-DECODE decision 11).
 from fux.decode import _xml
 from fux.decode.json import MAX_DEPTH, _label
 

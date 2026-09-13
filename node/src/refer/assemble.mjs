@@ -60,7 +60,7 @@ export function assemble(scored, {
       doc_id: s.doc_id, locator: s.locator, sha: s.sha,
       heading: s.passage.heading, text, score: s.score, source,
       // The passage's position in ITS OWN document, carried so `answer` can
-      // report it — ADR-REFER decision 17 / ADR-ANSWER decision 9 promised it
+      // report it — SR-REFER decision 17 / SR-ANSWER decision 9 promised it
       // and the payload did not carry it on either side (W-140 row 2 fixed the
       // Python half; this is the Node half, found 2026-09-12 by comparing the
       // two library surfaces).

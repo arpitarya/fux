@@ -12,8 +12,8 @@ timestamp: 2026-08-28T00:00:00Z
 >
 > **The veto leg has no instrument.** Every step that says *playground* graded
 > the fifty hand-written goldens in `fux-playground`, and
-> [L9](../../docs/adr/0011_LAW-9-environments.md) made that environment Arpit's
-> hands alone. Under [L0](../../docs/adr/0002_LAW-0-authority.md) those steps
+> [SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md) made that environment Arpit's
+> hands alone. Under [L0](../../records/0002_LAW-0-authority.md) those steps
 > are **void in that part** — not a trade-off to weigh, and not something to
 > route around by picking a different corpus on the day.
 >
@@ -193,7 +193,7 @@ python3 bin/bench.py veto --run T --base playground-base.jsonl --cand playground
 
 | gate | on failure |
 |---|---|
-| T0.b violated at any value | that knob's passes are **void**; the run says the knob is not a tune knob and files it as a defect against ADR-TUNE |
+| T0.b violated at any value | that knob's passes are **void**; the run says the knob is not a tune knob and files it as a defect against SR-TUNE |
 | no value beats baseline by more than net 6 on the isolating suite | no candidate; the knob's verdict is `INCONCLUSIVE` |
 | the veto prints `broken > 0` | the knob's verdict is **`FAIL`** at that candidate. 🔴 **Do not try the next grid value to find one that passes** — the candidate is selected once, by the frozen rule. If Arpit wants the mildest value that passes the veto measured, that is a new pre-registration |
 | `q022` / `q033` break at the T2 candidate | as predicted; file it. If they **do not**, hand the result to Arpit unadjudicated — the pre-registration says this is its one real question |
@@ -250,17 +250,17 @@ python3 bin/latency.py --run T --tier t10000 --queries 240 --repeats 5 --arms ba
       *knob · default · candidate · gain (b / c / p, fresh seed) · veto (broken
       / fixed / XPASS, by qid) · cost (p95 ratio, law) · verdict*. **No
       recommendation column.** The last line of the report is the handoff to
-      Arpit, and it names ADR-TUNE as where a change would be recorded.
+      Arpit, and it names SR-TUNE as where a change would be recorded.
 - [ ] T5's headroom table, every endpoint, every grid value — **per direction
       and labelled observed / proven / unproven**, per
-      [ADR-RS](../../docs/adr/0133_predictions.md) decision 22.
+      [SR-RS](../../records/0133_predictions.md) decision 22.
 - [ ] Post-hoc observations (a grid value that "would have passed") **labelled
       post-hoc, outside every verdict**.
 - [ ] The deck (README rule 4): the three-leg diagram, one dose–response chart
       per knob with the candidate marked, the veto by qid, the cost bar.
 - [ ] `W-97`: row deleted from `OPEN-WORK.md`, file to `archive/open/`; a new
       `arpit`-lane row for each candidate that passed, pointing at the run and
-      at ADR-TUNE.
+      at SR-TUNE.
 - [ ] Tests green: `python -m pytest -q tests/test_regression_runs.py tests/test_doc_registry.py tests/test_doc_links.py`.
 
 ---
@@ -276,4 +276,4 @@ python3 bin/latency.py --run T --tier t10000 --queries 240 --repeats 5 --arms ba
 | source constant edited mid-run | baseline shifts between passes | `git -C ~/my_programs/fux status --short` empty; sha unchanged |
 | selecting the veto's survivor | trying values until `q022` stops breaking | selection happens once, by the frozen rule, before the veto runs |
 | `fixed` on the playground reported as a win | "+3 goldens" | `N = 50`: reported, never tested, never claimed |
-| a recommendation in the report | "we suggest shipping 0.25" | the table has no recommendation column; the change is Arpit's ADR-TUNE amendment |
+| a recommendation in the report | "we suggest shipping 0.25" | the table has no recommendation column; the change is Arpit's SR-TUNE amendment |

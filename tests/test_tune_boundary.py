@@ -1,4 +1,4 @@
-"""ADR-TUNE decision 1's membership test, executed rather than asserted.
+"""SR-TUNE decision 1's membership test, executed rather than asserted.
 
 **The rule is mechanical, not a taste:** a value may live in `.fux/tune.toml`
 if and only if changing it leaves `.fux/index/` **byte-identical**. Decision 1b
@@ -44,7 +44,6 @@ MUTATIONS: dict[str, dict[str, str]] = {
     },
     "ranking": {
         "archived_weight": "0.1",
-        "superseded_weight": "0.2",
         "recency_half_life_days": "30.0",
         "rerank_weight": "0.75",
         # W-109. ⚠ A value that CANNOT move a committed byte for a second
@@ -78,7 +77,7 @@ MUTATIONS: dict[str, dict[str, str]] = {
     "priority": {'"alpha.md"': "6.0", '"beta.md"': "0.2"},
 }
 
-#: ⚠ **The declared exception to decision 1** (Arpit, 2026-09-11, ADR-TUNE
+#: ⚠ **The declared exception to decision 1** (Arpit, 2026-09-11, SR-TUNE
 #: decision 13). `[index]` keys are read by `fux ingest` and DO change
 #: committed bytes, so they are NOT run through the byte-identical test —
 #: and instead `test_an_index_key_does_change_the_index` proves the opposite,
@@ -229,7 +228,7 @@ def test_an_index_key_does_change_the_index(tmp_path, key, value):
     listing.parent.mkdir(parents=True, exist_ok=True)
     listing.write_text("docs\n", encoding="utf-8")
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
-    # ADR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
+    # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "a.md").write_text(

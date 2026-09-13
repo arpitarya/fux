@@ -1,7 +1,7 @@
 ---
 type: Pre-Registration
 name: PREREG-ARCHIVED-SIGNAL
-title: "Pre-registration — the archived-content signal (W-44), ADR-ARCHIVED-CONTENT decision 5's gate"
+title: "Pre-registration — the archived-content signal (W-44), SR-ARCHIVED-CONTENT decision 5's gate"
 description: "The frozen question, slices, metrics and threshold for whether archived content contaminates live-intent answers enough to warrant a marker and a disclaimer. Written and committed before any number exists."
 timestamp: 2026-08-22T00:00:00Z
 ---
@@ -33,7 +33,7 @@ redefine the term. (CLAUDE.md §A pre-registered threshold may never move.)
 **Does archived content contaminate answers to questions about the current
 engine often enough to justify changing what every verb says?**
 
-[ADR-ARCHIVED-CONTENT](../../docs/adr/0037_archived-content.md) decision 5 is
+[SR-ARCHIVED-CONTENT](../../records/0037_archived-content.md) decision 5 is
 the gate:
 
 > *changing what a verb says about a document is a claim that needs an
@@ -92,8 +92,8 @@ assignment.
 
 **Gold-label rule.** One gold document per query, the *authoritative* record for
 that concept — not merely a document that mentions it. Where a live record
-supersedes an archived one on the same subject (ADR-INGEST over archived
-ADR-0002, ADR-GRAPH over archived ADR-0009), the **live** record is gold for a
+supersedes an archived one on the same subject (SR-INGEST over archived
+ADR-0002, SR-GRAPH over archived ADR-0009), the **live** record is gold for a
 `live`-slice query and the **archived** one is gold for the paired
 `historical`-slice query. Those pairs are deliberate: they are the collision
 the whole item is about.
@@ -158,7 +158,7 @@ cost nothing to run and it is still excluded, for two reasons:
 `.fux/sources/dirs` via the same loader the engine uses. A harness that
 hard-coded `loc.startswith("archive/")` would be exact on *this* corpus and
 silently wrong on any consumer whose retired documents sit in `old/` — the
-precise failure ADR-DIR-LIST's *declared, never derived* rule exists to
+precise failure SR-DIR-LIST's *declared, never derived* rule exists to
 prevent, reintroduced in the instrument that is supposed to check it.
 
 ## 7. What this instrument can and cannot license
@@ -179,7 +179,7 @@ single-corpus result is sufficient evidence about *what a reader is told*.
 ## 8. Threats to validity, declared in advance
 
 - **One corpus, and it is this repo.** Fux's own documentation is unusually
-  dense in near-synonymous records — a retired ADR and its live successor
+  dense in near-synonymous records — a retired SR and its live successor
   argue the same subject in the same vocabulary. That is the **worst case** for
   live/archived confusion, so a high contamination number here may not
   generalise to a customer corpus. Stated now, so it cannot be discovered
@@ -207,13 +207,13 @@ registers a threshold, so the run that reads it owes a verdict
 (`tests/test_regression_runs.py`).
 
 **The verdict's prediction id is `W44-SIGNAL`.** It is not an `R` prediction:
-those are the paper's architectural claims ([ADR-RS](../../docs/adr/0036_predictions.md)),
+those are the paper's architectural claims ([SR-RS](../../records/0036_predictions.md)),
 and this is a feature gate. It therefore takes **no `R` number** and must not
 be entered in the R register.
 
 ## 10. Reference
 
-- [ADR-ARCHIVED-CONTENT](../../docs/adr/0037_archived-content.md) — decision 5
+- [SR-ARCHIVED-CONTENT](../../records/0037_archived-content.md) — decision 5
   (the gate this discharges), decisions 1 and 3 (the marker), decision 7 (the
   disclaimer), decision 2 (ranking byte-identical at the default).
 - [W-44](../../work/open/W-44-archived-content-signalling.md) — the item, and

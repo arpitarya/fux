@@ -100,7 +100,7 @@ HOOKS: dict[str, str] = {
     # The committed index is derived from the COMMITTED tree, which is why this
     # runs after the commit rather than before it. See the module docstring.
     #
-    # **It defers** (W-66 Phase 2, ADR-MAINTENANCE decision 1a). One line, and
+    # **It defers** (W-66 Phase 2, SR-MAINTENANCE decision 1a). One line, and
     # everything it does is constant in the corpus: `--spawn-runner` records
     # HEAD's paths into the dirty list and spawns a detached one-shot
     # re-index, then returns. R5 failed because this used to be `fux ingest`

@@ -1,15 +1,24 @@
-"""W-76 Phase 2 — recency and supersession, and the law they must not break.
+"""W-76 Phase 2's priors — all three now REMOVED — and the law they left behind.
 
-Both priors are multipliers, and W-73 is the reason this file exists rather
-than a couple of ordering assertions. A multiplier that reaches the scorer
+🔴 **`superseded_weight`, `archived_weight` and `recency_half_life_days` were
+all removed on 2026-09-13** (W-151, W-152; SR-TUNE decision 15), on
+VERDICT-W143's finding that no single global value clears the bar for any of
+them. Each shipped as a no-op, so nothing ranked differently. **The FACTS they
+read are all still committed and all still tested** — `superseded_ids` below,
+`archived` in `test_scan.py`, and the declared tie-break in
+`test_ties_and_filters.py`.
+
+**What survives is the LAW, and this file is where it is asserted.** A prior is
+a multiplier, and W-73 is the reason: a multiplier that reaches the scorer
 without reaching the accelerator's pruning bound makes `--fast` and `--scan`
-return different documents, silently, only at non-default settings, only on
-some corpora. So every ordering test here is run down **both paths**, at
-settings far enough from the default to actually bite.
+return different documents, silently, only at non-default settings, only on some
+corpora. So every ordering test here runs down **both paths**, at settings far
+enough from the default to actually bite. `[priority]` is the one multiplier
+left and it carries that duty now.
 
-`ADR-T1-ACCELERATOR` veto 5 is the standing rule: any new multiplier goes
-through `query/rank.py::Weighting`, which is what `maximum` and the weighted
-`theta` read. These two were the first to arrive under it.
+`SR-T1-ACCELERATOR` veto 5 is the standing rule: **any multiplier that arrives
+next** goes through `query/rank.py::Weighting`, which is what `maximum` and the
+weighted `theta` read.
 """
 
 from __future__ import annotations
@@ -17,7 +26,7 @@ from __future__ import annotations
 import pytest
 
 from fux.derive import accel, build
-from fux.ingest.priors import recency_multiplier, superseded_ids
+from fux.ingest.priors import superseded_ids
 from fux.query import scan
 from fux.query.rank import Weighting
 from fux.store import TF_FIELDS, term_hash, write_index
@@ -86,63 +95,53 @@ def _both_paths(root, weighting, top=5):
 
 
 def test_the_defaults_change_nothing(corpus):
-    """Both priors ship off. A corpus that configures nothing must be untouched."""
+    """Nothing configured means nothing scaled, down both paths."""
     plain = _both_paths(corpus, Weighting())
     assert _ids(plain) == ["file:old.md", "file:new.md"], (
         "fixture: the retired document must win on text alone, or nothing below is under test"
     )
 
 
-def test_supersession_demotes_and_both_paths_agree(corpus):
-    results = _both_paths(corpus, Weighting(superseded_weight=0.1))
-    assert _ids(results) == ["file:new.md", "file:old.md"], (
-        "a retired decision outranked the live one that replaced it"
-    )
+def test_no_document_prior_can_be_configured_any_more(corpus):
+    """🔴 The W-151/W-152 removals, asserted rather than assumed.
+
+    `Weighting` has no field for any of the three, so a caller cannot demote a
+    retired, superseded or old document by configuration at all — and the
+    retired document keeps the lead its better text earns it. A live document
+    wins only at an **equal** score, through the declared tie-break, which is a
+    different mechanism tested in `test_ties_and_filters.py`.
+    """
+    for gone in ("superseded_weight", "archived_weight", "recency_half_life_days"):
+        with pytest.raises(TypeError):
+            Weighting(**{gone: 0.1})
+    assert _ids(_both_paths(corpus, Weighting())) == ["file:old.md", "file:new.md"]
 
 
-def test_recency_demotes_and_both_paths_agree(corpus):
-    results = _both_paths(corpus, Weighting(recency_half_life_days=30.0, newest_mtime=NOW))
+def test_priority_demotes_and_both_paths_agree(corpus):
+    """The one surviving multiplier still carries W-73's duty on both paths."""
+    results = _both_paths(corpus, Weighting(priority=(("old.md", 0.1),)))
     assert _ids(results) == ["file:new.md", "file:old.md"]
 
 
-def test_the_two_priors_compose(corpus):
-    both = _both_paths(
-        corpus,
-        Weighting(superseded_weight=0.5, recency_half_life_days=90.0, newest_mtime=NOW),
-    )
-    assert _ids(both) == ["file:new.md", "file:old.md"]
+def test_the_ceiling_is_never_lowered_by_a_configuration_of_DEMOTIONS():
+    """🔴 `max(1.0, ...)`, and it is the half that looks unnecessary.
 
-
-def test_maximum_is_the_PRODUCT_of_the_independent_suprema():
-    """`archived` and `superseded` are independent flags.
-
-    A document can be both, and is then scaled twice. Taking the larger of the
-    two suprema instead of their product would under-estimate the ceiling —
-    which is the error direction that loses documents, and the exact shape of
-    the W-73 defect.
+    An unlisted document is scaled by `1.0`, so `1.0` is always attainable.
+    Taking the configured weight alone would make the ceiling too small whenever
+    every configured weight is `< 1` — the demotion direction, which is the one
+    that looks safe and is the W-73 defect's exact shape.
     """
-    w = Weighting(archived_weight=3.0, superseded_weight=5.0)
-    assert w.maximum == 15.0
-
-    # Recency contributes exactly 1.0 because it is bounded to (0, 1].
-    assert Weighting(recency_half_life_days=7.0, newest_mtime=NOW).maximum == 1.0
+    assert Weighting(priority=(("old.md", 0.1),)).maximum == 1.0
+    assert Weighting(priority=(("old.md", 5.0),)).maximum == 5.0
+    assert Weighting().maximum == 1.0
 
 
-def test_recency_is_bounded_to_zero_one():
-    """The bound `Weighting.maximum` relies on.
-
-    An unbounded recency prior would make the supremum unbounded and the block
-    bound useless — a ceiling of infinity skips nothing.
-    """
-    assert recency_multiplier(NOW, NOW, 30.0) == 1.0
-    assert 0.0 < recency_multiplier(NOW - 3650 * DAY, NOW, 30.0) <= 1.0
-    assert recency_multiplier(NOW - 30 * DAY, NOW, 30.0) == pytest.approx(0.5)
-    # A document newer than "newest" cannot exceed 1.0 (clock skew, a future
-    # commit date) — `age_days` is clamped at zero.
-    assert recency_multiplier(NOW + 100 * DAY, NOW, 30.0) == 1.0
-    # Off by default, and off means exactly 1.0 rather than approximately.
-    assert recency_multiplier(NOW - 999 * DAY, NOW, 0.0) == 1.0
-    assert recency_multiplier(None, NOW, 30.0) == 1.0
+def test_the_ceiling_is_the_LARGEST_configured_weight_not_the_first():
+    """Two prioritised sources: the supremum is over the configuration, never
+    over the candidates in hand — an unseen document may carry a weight no
+    candidate does, and that is precisely the case the bound must survive."""
+    w = Weighting(priority=(("vendor/", 2.0), ("docs/", 7.0)))
+    assert w.maximum == 7.0
 
 
 def test_supersession_is_declared_never_inferred():

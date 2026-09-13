@@ -14,7 +14,7 @@ heuristic.* This document is the half that must exist first;
 ## ⚠ The gap this run does NOT close, stated before any number
 
 [ADR-CONFIDENCE](../../../docs/adr/0045_confidence.md) decision 6 binds
-`SEPARATION_FLOOR` to [ADR-QUALITY](../../../docs/adr/0044_quality-contract.md)'s
+`SEPARATION_FLOOR` to [ADR-QUALITY](../../../docs/adr/0056_WORK-quality.md)'s
 confidence target `t = 0.75`, by Chow's rule.
 
 **Chow's rule assumes a calibrated probability. `separation` is not one.** It is

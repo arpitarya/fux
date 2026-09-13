@@ -18,7 +18,7 @@ mechanisms could explain it, and they have different consequences:
    equal frequency. Then arm 2 over-keeps headings too — which would explain why
    it also lost to KL, whose ranking ignores field weights entirely.
 
-This script measures both, so the ADR attributes the result to a mechanism
+This script measures both, so the SR attributes the result to a mechanism
 rather than to a guess.
 """
 

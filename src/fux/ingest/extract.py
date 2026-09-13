@@ -21,7 +21,7 @@ from .parse import ParsedDoc
 #: The cap on `phrases` is `.fux/tune.toml [index] max_phrases` (default
 #: `tune.DEFAULT_MAX_PHRASES`, 32), passed in by `ingest/run.py`. It was a
 #: hard-coded 12 until 2026-09-11. Headings only, not headings + first
-#: sentence — the simpler of the original handoff's two options (ADR-EXTRACTED).
+#: sentence — the simpler of the original handoff's two options (SR-EXTRACTED).
 #: ⚠ **The cap truncates DISPLAY, never ranking**: `heading` tf below is built
 #: from every heading, so a heading past the cap still ranks.
 
@@ -29,7 +29,7 @@ from .parse import ParsedDoc
 #: 2026-09-06, because a regex cannot see a code fence and this one did not:
 #: a `# Install dependencies` line inside a ```bash block was counted as a
 #: heading, given heading-field weight, published in `phrases` where `fux ask`
-#: renders it as a `§` line, and **removed from the body**. Every ADR in this
+#: renders it as a `§` line, and **removed from the body**. Every SR in this
 #: repository contains such a block. `refer/_chunk.py` reads the same module,
 #: so the two planes can no longer disagree about what a heading is.
 #:
@@ -66,7 +66,7 @@ _ORG_RE = re.compile(r"^(\*{1,6})[ \t]+(?P<text>\S[^\n]*?)\s*$", re.MULTILINE)
 #: extension -> its heading pattern. A `None` result means Markdown, which is
 #: applied to everything else — including `.txt`, because a `#` line in a text
 #: file is a heading by intent far more often than it is prose, and including
-#: every decoded document, which is Markdown by construction (ADR-DECODE
+#: every decoded document, which is Markdown by construction (SR-DECODE
 #: decision 2).
 #:
 #: ⚠ **These three keep regexes and get no fence handling.** Their heading
@@ -115,7 +115,7 @@ class Extracted:
     terms: dict[str, tuple[int, ...]]
     #: per-field TOKEN COUNTS, same order. Replaces the committed `wlen`
     #: (W-76 Phase 1): `wlen` is a weighted sum of these, and committing it
-    #: made a committed field a function of a tunable — ADR-TUNE decision 6.
+    #: made a committed field a function of a tunable — SR-TUNE decision 6.
     #: These are facts; the weighting happens at query time.
     flen: tuple[int, ...]
 
@@ -133,7 +133,7 @@ def extract_fields(
 
         max_phrases = DEFAULT_MAX_PHRASES
     # W-86 P0: the heading grammar follows the file type. A decoded document
-    # always arrives as Markdown (ADR-DECODE decision 2), so only an
+    # always arrives as Markdown (SR-DECODE decision 2), so only an
     # already-prose `.rst`/`.adoc`/`.org` takes a different pattern.
     headings, stripped_body = _headings_and_body(rel_path, doc.body)
     title = _title(doc.meta, headings, rel_path)

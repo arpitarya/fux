@@ -23,7 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # `tests/test_adr_freshness.py` audits history, and the arm reads the
+          # `tests/test_sr_freshness.py` audits history, and the arm reads the
           # committed index; neither works on a shallow clone.
           fetch-depth: 0
 
@@ -58,7 +58,7 @@ jobs:
         # same missing multiplier.
         #
         # So CI runs the arm that can attribute a failure: `--no-tune` on the
-        # Python side is *the engine's own answer* (ADR-TUNE decision 11),
+        # Python side is *the engine's own answer* (SR-TUNE decision 11),
         # which is exactly what Node implements. A discordance in this step is
         # a Node transcription defect and nothing else.
         #
@@ -89,7 +89,7 @@ jobs:
     # 🔴 **A GitHub runner cannot meet it, and this job says so rather than
     # pretending.** The ladder *corpus* is not in this repo — only its
     # manifests are (`work/golden/ladder/*.{index,sha256}`, 2.2 MB); the rungs
-    # themselves live in `fux-lab` because [L9] gives every measurement to that
+    # themselves live in `fux-lab` because [SR-WORK-ENVIRONMENTS] gives every measurement to that
     # environment, and rung-10000 alone is 120 MB. Regenerating one here would
     # mean running `build_golden_rung.py`, which hard-codes two absolute paths
     # on Arpit's machine.
@@ -99,7 +99,7 @@ jobs:
     # corpus is present. Where `FUX_GOLDEN_CORPORA` points at one — a lab
     # checkout, a self-hosted runner — the same command is the real thing.
     #
-    # [L9]: docs/adr/0011_LAW-9-environments.md
+    # [SR-WORK-ENVIRONMENTS]: records/0052_WORK-environments.md
     name: golden ladder (fux-lab corpora)
     runs-on: ubuntu-latest
     steps:

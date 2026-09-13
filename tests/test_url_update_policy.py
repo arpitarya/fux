@@ -10,7 +10,7 @@ bounds how long `fux answer` may cite a document without re-checking it.
 different clocks, and `update=` is deliberately not a clock at all.
 
 🔴 **And the saving is not the ETag saving.** `update=never` buys bandwidth by
-giving up freshness. ADR-CDP-FETCHER decision 12's response-stage interception
+giving up freshness. SR-CDP-FETCHER decision 12's response-stage interception
 saves the decode, never the transfer; only request-stage interception would
 deliver *"check cheaply and stay fresh"*, and it is neither costed nor built.
 """
@@ -231,7 +231,7 @@ def _repo(tmp_path, urls, fetcher=FAKE):
     (fux / "sources").mkdir(parents=True)
     (fux / "sources" / "urls").write_text("\n".join(urls) + "\n", encoding="utf-8")
     (fux / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
-    # ADR-PII decision 17: a hand-built repo needs this or every verb refuses.
+    # SR-PII decision 17: a hand-built repo needs this or every verb refuses.
     (fux / "pii.toml").write_text("", encoding="utf-8")
     docs = tmp_path / "docs"
     docs.mkdir()
@@ -308,7 +308,7 @@ def test_a_corpus_that_declares_nothing_is_byte_identical(tmp_path):
 
 
 def test_the_add_that_writes_a_pinned_line_still_fetches_it_once(tmp_path):
-    """ADR-URL-LIST decision 14, which the code contradicted for six days.
+    """SR-URL-LIST decision 14, which the code contradicted for six days.
 
     `fux add <URL> --no-update` wrote the line, fetched nothing and exited 1
     saying *the fetch failed* — because the pin filter ran above the fetch and

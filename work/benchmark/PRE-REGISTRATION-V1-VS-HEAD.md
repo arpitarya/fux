@@ -9,7 +9,7 @@ timestamp: 2026-08-28T00:00:00Z
 
 **Asked by Arpit, 2026-08-28 (Cowork):** benchmark version one of fux against
 the latest. This document is the half that must exist first;
-[ADR-RS](../../docs/adr/0133_predictions.md) is why.
+[SR-RS](../../records/0133_predictions.md) is why.
 
 ---
 
@@ -105,7 +105,7 @@ its shipped default path.
   compared.** Arm A emits no confidence block at all, so §4.5 is B-only for the
   band distribution and paired only on decline behaviour. Where B-core and
   B-full are compared, `separation_floor` and `doc_coverage_floor` must be
-  equal or the comparison is void — ADR-CONFIDENCE decision 13's reopen
+  equal or the comparison is void — SR-CONFIDENCE decision 13's reopen
   trigger.
 - **`ask`/`find`/`answer` run on the default scan path** for quality. `--fast`
   appears only in §4.3, and only after the differential law is asserted *within*

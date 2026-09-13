@@ -74,7 +74,7 @@ def _tune(root: Path, *, enabled: bool = True) -> "Tune":
     and is the normal case, while a file that exists and cannot be parsed
     means someone edited it and got it wrong. Degrading there would answer a
     question with the engine's ranking while the reader believed it was
-    theirs (ADR-TUNE decision 10).
+    theirs (SR-TUNE decision 10).
     """
     from ..tune import load as load_tune
 
@@ -84,9 +84,9 @@ def _tune(root: Path, *, enabled: bool = True) -> "Tune":
 def _archived_ranking(root: Path, tune: "Tune") -> tuple["Weighting", frozenset[str]]:
     """The document-level multipliers and the directories they apply to.
 
-    The weights come from `.fux/tune.toml` (ADR-TUNE decision 7 moved them out
+    The weights come from `.fux/tune.toml` (SR-TUNE decision 7 moved them out
     of `fux.toml`); the archived *declaration* still comes from the committed
-    dirs list, never from a path convention (ADR-DIR-LIST decision 4).
+    dirs list, never from a path convention (SR-DIR-LIST decision 4).
 
     Degrades to no archived directories when the dirs list can't be read, so
     `ask`/`find` never fail because ranking metadata is missing — the same
@@ -101,13 +101,7 @@ def _archived_ranking(root: Path, tune: "Tune") -> tuple["Weighting", frozenset[
     except FuxError:
         dirs = frozenset()
     return (
-        Weighting(
-            archived_weight=tune.archived_weight,
-            archived_dirs=dirs,
-            superseded_weight=tune.superseded_weight,
-            recency_half_life_days=tune.recency_half_life_days,
-            priority=tune.priority,
-        ),
+        Weighting(archived_dirs=dirs, priority=tune.priority),
         dirs,
     )
 
@@ -128,19 +122,19 @@ def run_query(
     and a fresh build exists. Return `(results, path)`.
 
     `use_tune=False` is `--no-tune`: `.fux/tune.toml` is not read at all, so
-    the answer is the engine's own (ADR-TUNE decision 11). Callers that have
+    the answer is the engine's own (SR-TUNE decision 11). Callers that have
     already loaded a `Tune` pass it as `tune=` rather than paying for a second
     parse.
 
     `trace_out`, when a caller supplies a dict, receives `{"window": [...],
-    "pre_rerank": [...]}` — ADR-PROVENANCE. The **window** is what `depth`
+    "pre_rerank": [...]}` — SR-PROVENANCE. The **window** is what `depth`
     retrieved before truncation, and it is the only place the *negative space*
     exists: once `_maybe_rerank` has truncated to `top`, the documents that
     were considered and cut are gone and no later stage can recover them.
     Costs one list reference on a path that already holds both lists.
 
     `confidence_out`, when a caller supplies a dict, receives
-    `{"confidence": Confidence}` — ADR-CONFIDENCE. **It stays an
+    `{"confidence": Confidence}` — SR-CONFIDENCE. **It stays an
     out-parameter rather than becoming a third element of the return tuple**
     because that tuple is unpacked by `cmd_ask`, `cmd_find`, `cmd_answer`,
     `mcp._search` and the test suite; an additive keyword changes none of them,
@@ -217,7 +211,7 @@ def _fill_confidence(
 ) -> None:
     """Assemble the confidence block, if anyone asked for one.
 
-    **`tune` supplies the two band floors** (ADR-CONFIDENCE decision 13). They
+    **`tune` supplies the two band floors** (SR-CONFIDENCE decision 13). They
     are resolved once, here, from the same `Tune` that scored the query — so a
     query cannot be judged by one floor and reported with another, and
     `--no-tune` reaches the band exactly as it reaches the ranking.
@@ -236,7 +230,7 @@ def _fill_confidence(
         from .tokenize import tokenize_pairs
 
         stats = stats or {}
-        # ADR-PROVENANCE reads the same `df`/`n` rather than recomputing them:
+        # SR-PROVENANCE reads the same `df`/`n` rather than recomputing them:
         # a derivation that invented its own frequencies could disagree with the
         # confidence block printed beside it, and two numbers that disagree
         # about the same corpus are worse than one.
@@ -247,7 +241,7 @@ def _fill_confidence(
             stats.get("df", {}),
             int(stats.get("n", 0)),
             [r.score for r in results],
-            # ADR-CONFIDENCE: `rank()` put this in the same dict as `df`/`n`,
+            # SR-CONFIDENCE: `rank()` put this in the same dict as `df`/`n`,
             # from the record it actually ranked first — so the accelerator and
             # the scan cannot disagree about it.
             top_doc_hashes=stats.get("top_doc_hashes"),
@@ -306,8 +300,8 @@ def _emit(payload: dict, shape: str, *, band_requested: bool = False) -> None:
     """Validate against the output contract, then print.
 
     **Fux cannot emit JSON that violates its own contract**, and that is worth
-    a few microseconds on a payload of a handful of keys. ADR-ANSWER already
-    tells callers to switch on `source` and ADR-ASK tells them to branch on the
+    a few microseconds on a payload of a handful of keys. SR-ANSWER already
+    tells callers to switch on `source` and SR-ASK tells them to branch on the
     `archived` boolean — two promises stated in prose and checked by nothing
     until now. A key quietly renamed here breaks a consumer silently, at their
     end, with no error at ours.
@@ -320,8 +314,8 @@ def _emit(payload: dict, shape: str, *, band_requested: bool = False) -> None:
     """
     from ..schema import load as load_schema
 
-    # `band_requested` is a caller-defined condition (ADR-CONFIDENCE decision
-    # 11, ADR-OUTPUT decision 3): `confidence` is required **when the caller
+    # `band_requested` is a caller-defined condition (SR-CONFIDENCE decision
+    # 11, SR-OUTPUT decision 3): `confidence` is required **when the caller
     # asked for it** and absent otherwise.
     #
     # ⚠ **The condition must come from the REQUEST, not from the payload.**
@@ -354,7 +348,7 @@ def _force_scan(args) -> bool:
 
 
 def _show_band(args) -> bool:
-    """ADR-CONFIDENCE decision 11: the CLI emits the block only under `--band`.
+    """SR-CONFIDENCE decision 11: the CLI emits the block only under `--band`.
 
     By the time this runs, `cli._apply_output_defaults` has already folded
     `.fux/output.toml` into `args.band`, so this is a plain read — the
@@ -382,7 +376,7 @@ def _tune_for(root: Path, args) -> "Tune":
 def _declare_pending(root: Path) -> None:
     """W-66 Phase 3: state a lagging index on stderr, never on stdout.
 
-    `--json` is a contract and the ADR surface captures compare stdout bytes
+    `--json` is a contract and the SR surface captures compare stdout bytes
     (the W-64 progress plane solved the identical problem the identical way),
     so this never touches the answer itself — it declares, it never gates.
     ASCII only: a Windows console's default codepage cannot encode a fancy
@@ -438,7 +432,7 @@ def _declare_no_accelerator(root: Path) -> None:
     )
 
 
-#: ADR-ARCHIVED-CONTENT decision 3 — the per-result marker in text output.
+#: SR-ARCHIVED-CONTENT decision 3 — the per-result marker in text output.
 ARCHIVED_MARKER = "[archived]"
 
 #: W-84 — what precedes a matched heading in `ask`'s text output. The section
@@ -455,31 +449,35 @@ def _headings_for(record: dict | None, query: str) -> list[str]:
     return headings_for(record, query)
 
 
-def _declare_archived(results, weight: float) -> None:
-    """ADR-ARCHIVED-CONTENT decision 7: a response-level note when any archived
+def _declare_archived(results) -> None:
+    """SR-ARCHIVED-CONTENT decision 7: a response-level note when any archived
     document is returned. **stderr, never stdout.**
 
     Three reasons it cannot go on stdout, each sufficient alone:
 
     - `fux find` prints bare paths so it can pipe. A note on stdout is read by
       `xargs` as a filename.
-    - `--json` is a contract, and the ADR surface captures compare stdout bytes.
+    - `--json` is a contract, and the SR surface captures compare stdout bytes.
     - It declares; it never gates. Same contract as `_declare_pending` above,
-      and the same one ADR-CLI's staleness declaration took.
+      and the same one SR-CLI's staleness declaration took.
 
     ASCII only: a Windows console's default codepage cannot encode a fancy dash
     and the process crashes on `print()` rather than degrading (v0.35.0).
 
     The note carries **the rule, not a hedge** — it says what an archived
     document *is* and does not tell the reader what to conclude from it.
-    Intent-neutral by ADR-DIR-LIST decision 12: Fux ships facts, not policy.
+    Intent-neutral by SR-DIR-LIST decision 12: Fux ships facts, not policy.
+
+    ⚠ **The `(demoted, weight N)` clause is GONE**, with `archived_weight`
+    itself (2026-09-13, W-152). Being retired can no longer move a score, so
+    there is no demotion to disclose — only the fact, which is what decision 3
+    always said the reader gets.
     """
     n = sum(1 for r in results if r.archived)
     if not n:
         return
-    demoted = f" (demoted, weight {weight:.2f})" if weight != 1.0 else ""
     print(
-        f"note: {n} of {len(results)} results are from archived sources{demoted}"
+        f"note: {n} of {len(results)} results are from archived sources"
         f" - retired from the live corpus. An archived document records what was"
         f" true when it was retired, not what is true now.",
         file=sys.stderr,
@@ -487,7 +485,7 @@ def _declare_archived(results, weight: float) -> None:
 
 
 def _declare_confidence(block, show: bool = False) -> None:
-    """ADR-CONFIDENCE decision 4, as amended: the band on stderr, never stdout.
+    """SR-CONFIDENCE decision 4, as amended: the band on stderr, never stdout.
 
     Same contract as `_declare_archived` and `_declare_pending`, for the same
     three reasons — `find` pipes bare paths, `--json` is a contract, and this
@@ -577,7 +575,7 @@ def cmd_ask(args) -> int:
     _declare_pending(root)
     _declare_no_accelerator(root)
 
-    # ADR-OUTPUT decision 21. `getattr` rather than `args.sections` because
+    # SR-OUTPUT decision 21. `getattr` rather than `args.sections` because
     # `_as_dict` is shared with `find`, which declares no such key, and a
     # caller constructing args by hand (the MCP surface, the tests) should get
     # the built-in rather than an AttributeError.
@@ -591,7 +589,7 @@ def cmd_ask(args) -> int:
         payload: dict = {
             "results": [_as_dict(root, r, args.query, sections=show_sections) for r in results]
         }
-        # ADR-CONFIDENCE decision 11: present only under `--band`. **Absent
+        # SR-CONFIDENCE decision 11: present only under `--band`. **Absent
         # means NOT ASKED FOR — it is never a claim about the answer**, which
         # is why the schema makes it conditional rather than optional-in-prose.
         if block is not None and _show_band(args):
@@ -606,7 +604,7 @@ def cmd_ask(args) -> int:
         if why is not None:
             payload["derivation"] = why.as_dict()
         print(json_mod.dumps(payload, indent=2))
-        _declare_archived(results, tune.archived_weight)
+        _declare_archived(results)
         return 0
 
     if not results:
@@ -633,7 +631,7 @@ def cmd_ask(args) -> int:
         print(f"\n[{path}]")
     if why is not None:
         _declare_derivation(why)
-    _declare_archived(results, tune.archived_weight)
+    _declare_archived(results)
     _declare_confidence(block, _show_band(args))
     return 0
 
@@ -680,7 +678,6 @@ def _derivation_for(root: Path, args, results, path, signals, trace, tune):
             window=(trace or {}).get("window"),
             pre_rerank=(trace or {}).get("pre_rerank"),
             untuned=untuned,
-            multiplier=getattr(tune, "archived_weight", 1.0),
             expand=_expand_of(args),
         )
     except Exception:  # pragma: no cover - a diagnostic must not break an answer
@@ -724,10 +721,10 @@ def _filtered(root: Path, results, args) -> tuple[list, int]:
     worked around.
 
     ⚠ **The alternative was retrieving deeper and truncating after**, which is
-    what the reranker does. Refused here for [ADR-EXPAND](../../docs/adr/0054_expand.md)
+    what the reranker does. Refused here for [SR-EXPAND](../../records/0149_expand.md)
     decision 11's reason: it would make `support` in the confidence block
     describe a retrieval depth the caller never asked for, and
-    [ADR-CONFIDENCE](../../docs/adr/0045_confidence.md) states plainly that
+    [SR-CONFIDENCE](../../records/0141_confidence.md) states plainly that
     `support` is bounded by `--top`. One inconsistency is worth more than a
     little extra recall on a filter.
 
@@ -780,7 +777,7 @@ def _filtered(root: Path, results, args) -> tuple[list, int]:
                 # has no text to test, and dropping it would report *"this page
                 # does not contain the phrase"* on the strength of not having
                 # looked. That is the reranker's own rule
-                # ([ADR-RERANK](../../docs/adr/0041_rerank.md) decision 8) and
+                # ([SR-RERANK](../../records/0138_rerank.md) decision 8) and
                 # the four-state freshness vocabulary's, applied to a filter.
                 survivors.append(r)
                 continue
@@ -795,7 +792,7 @@ def _declare_filters(args, dropped: int) -> None:
     """What a filter removed, on **stderr**, so stdout stays a bare path list.
 
     `find` exists to be piped; a note on stdout would be read as a filename.
-    The same reason ADR-DIR-LIST decision 12 put the archived note here.
+    The same reason SR-DIR-LIST decision 12 put the archived note here.
     """
     if not dropped:
         return
@@ -830,13 +827,13 @@ def cmd_find(args) -> int:
         payload: dict = {"results": [_as_dict(root, r, args.query) for r in results]}
         if fused:
             payload["fused"] = True
-        # ADR-CONFIDENCE decision 11: present only under `--band`. **Absent
+        # SR-CONFIDENCE decision 11: present only under `--band`. **Absent
         # means NOT ASKED FOR — it is never a claim about the answer**, which
         # is why the schema makes it conditional rather than optional-in-prose.
         if block is not None and _show_band(args):
             payload["confidence"] = block.as_dict()
         print(json_mod.dumps(payload, indent=2))
-        _declare_archived(results, tune.archived_weight)
+        _declare_archived(results)
         return 0
 
     if not results:
@@ -846,11 +843,11 @@ def cmd_find(args) -> int:
 
     # **Bare paths, deliberately unmarked.** `find` exists to be piped, so a
     # `[archived]` prefix on stdout would be read as part of the filename — the
-    # concrete reason ADR-DIR-LIST decision 12 put the note on stderr. The flag
+    # concrete reason SR-DIR-LIST decision 12 put the note on stderr. The flag
     # is carried in `--json`, which is where a machine reader should look.
     for r in results:
         print(r.loc)
-    _declare_archived(results, tune.archived_weight)
+    _declare_archived(results)
     _declare_confidence(block, _show_band(args))
     return 0
 
@@ -889,7 +886,7 @@ def cmd_answer(args) -> int:
     root = _root()
     tune = _tune_for(root, args)
     signals: dict = {}
-    # ⚠ **`answer` takes ONE question and no `-q`** — [ADR-ANSWER](../../..)
+    # ⚠ **`answer` takes ONE question and no `-q`** — [SR-ANSWER](../../..)
     # decision 4: the verb means one answer. `--expand` applies here exactly as
     # it does to `ask`, because expanding a question is not asking a second one.
     results, _ = run_query(
@@ -901,7 +898,7 @@ def cmd_answer(args) -> int:
 
     if not results:
         if args.json:
-            # `"source"` is the key ADR-ANSWER tells callers to switch on when
+            # `"source"` is the key SR-ANSWER tells callers to switch on when
             # the refer plane lands, so it must be present on the no-match
             # branch too — an absent key is a trap, not a signal (W-48).
             # `confidence` is required on this branch for the same reason, and
@@ -966,7 +963,7 @@ def _provenance_for(root: Path, args, bundle, block, *, best=None) -> dict:
     start one behind a consumer's back. A `$0`, offline tool whose pitch is
     *nothing leaves your machine* may not quietly begin recording questions
     because a law was relaxed. Always-on journalling is a real want and it needs
-    a `.fux/tune.toml` key, which is an ADR-TUNE change deliberately not made
+    a `.fux/tune.toml` key, which is an SR-TUNE change deliberately not made
     here — it is a fork, and this session may not pick a default on one.
     """
     want_audit = bool(getattr(args, "audit", False))
@@ -1071,7 +1068,7 @@ def cmd_verify(args) -> int:
             # corpus.
             # 🔴 **This called `_answer_via_refer`, which FETCHES** — in the
             # one verb Arpit ruled must never go to the network
-            # ([ADR-PROVENANCE](../../docs/adr/0143_provenance.md) decision
+            # ([SR-PROVENANCE](../../records/0142_provenance.md) decision
             # 14). Fixed 2026-09-11 (W-140 row 7). A refer-path receipt does
             # not reach here at all now: `provenance.verify` returns
             # `unverifiable` before the callback runs, because an answer
@@ -1120,7 +1117,7 @@ def _block_dict(block) -> dict:
 def _cache_ttl_of(args) -> int:
     """`--cache-ttl` as seconds, validated by the source list's own parser.
 
-    ⚠ **One validator, deliberately** — [ADR-URL-FRESHNESS](../../../docs/adr/0149_url-freshness.md)
+    ⚠ **One validator, deliberately** — [SR-URL-FRESHNESS](../../../records/0147_url-freshness.md)
     decision 10 says `--ttl 1x` and a hand-written `ttl=1x` must fail
     identically, and a second duration parser here would be the drift that
     decision exists to prevent.
@@ -1272,7 +1269,7 @@ def _print_refer_answer(bundle, as_json: bool, block=None, extra=None, show_band
     refer plane has actually compared the fetched bytes against the sha the
     index ranked on, so the block is upgraded to that verdict before it is
     emitted — and a `stale` verdict demotes the band to `partial` on its own,
-    with no threshold involved (ADR-CONFIDENCE decision 3).
+    with no threshold involved (SR-CONFIDENCE decision 3).
     """
     citations = bundle.assembled.citations
     freshness = _freshness_of(bundle)
@@ -1304,7 +1301,7 @@ def _print_refer_answer(bundle, as_json: bool, block=None, extra=None, show_band
                         "heading": c.heading,
                         "text": c.text,
                         "score": c.score,
-                        # ADR-REFER decision 17 / ADR-ANSWER decision 9 promised
+                        # SR-REFER decision 17 / SR-ANSWER decision 9 promised
                         # this and the payload did not carry it (W-140 row 2).
                         # Additive: no key removed or repurposed.
                         "ordinal": c.ordinal,
@@ -1447,7 +1444,7 @@ def _title_from(root: Path, record: dict | None, fallback_title: str) -> str:
 
     W-84: `ask` needs the record for its `phrases` as well as its title, and
     two lookups per result for one record is a cost with no reader. The
-    behaviour is `_resolve_title`'s exactly — that name is what ADR-ASK cites
+    behaviour is `_resolve_title`'s exactly — that name is what SR-ASK cites
     and what P5 decided, and it still does what it says.
     """
     from .. import store as store_mod
@@ -1470,7 +1467,7 @@ def _as_dict(root: Path, result: AskResult, query: str, *, sections: bool = True
     of a list the two generators already agree on.
 
     ⚠ **`sections=False` is the ONE case the key is absent, and it is not the
-    W-48 trap** (ADR-OUTPUT decision 21). It is `confidence`-under-`--band`'s
+    W-48 trap** (SR-OUTPUT decision 21). It is `confidence`-under-`--band`'s
     shape exactly: **absent means NOT ASKED FOR — never a claim about the
     document.** The distinction W-48 is about is *"empty vs. unsupported"*,
     and both of those still resolve to `[]`; this third state is *"the

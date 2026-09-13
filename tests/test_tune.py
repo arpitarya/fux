@@ -1,6 +1,6 @@
 """`.fux/tune.toml` — the loader, the closed key set, and the two refusals.
 
-[ADR-TUNE](../docs/adr/0038_tuning.md) is the record. The boundary rule it
+[SR-TUNE](../records/0135_tuning.md) is the record. The boundary rule it
 turns on — *changing any key here leaves `.fux/index/` byte-identical* — has
 its own module, `tests/test_tune_boundary.py`, because it needs a built corpus
 and these do not.
@@ -132,7 +132,7 @@ def test_min_passage_must_be_below_max_passage(tmp_path):
 
 def test_a_bool_is_not_a_number(tmp_path):
     """`bool` is an `int` subclass in Python — `true` is not a weight."""
-    _write(tmp_path, "[ranking]\narchived_weight = true\n")
+    _write(tmp_path, "[ranking]\nrerank_weight = true\n")
     with pytest.raises(FuxError, match="must be a number"):
         load(tmp_path)
 
@@ -295,10 +295,38 @@ def test_a_retired_dense_table_names_its_removal_rather_than_reading_as_a_typo(t
         load(tmp_path)
 
 
+def test_a_removed_ranking_key_names_its_removal_rather_than_reading_as_a_typo(tmp_path):
+    """🔴 `superseded_weight` went on 2026-09-13 (W-151), and `fux setup` had
+    WRITTEN it into every `.fux/tune.toml` it ever created.
+
+    So the generic *"unknown key"* would send a consumer hunting for a typo in a
+    line fux typed for them. The error has to name the removal, its date, and
+    that their ranking has not moved — it shipped at `1.0`.
+    """
+    _write(tmp_path, "[ranking]\nsuperseded_weight = 0.5\n")
+    with pytest.raises(FuxError, match="REMOVED on 2026-09-13"):
+        load(tmp_path)
+
+
+def test_a_removed_key_is_named_even_beside_a_genuine_typo(tmp_path):
+    """The removal is the finding; an unknown key beside it must not mask it."""
+    _write(tmp_path, "[ranking]\nsuperseded_weight = 0.5\nnot_a_key = 1\n")
+    with pytest.raises(FuxError, match="REMOVED on 2026-09-13"):
+        load(tmp_path)
+
+
+def test_a_removed_key_is_gone_from_the_closed_key_set(tmp_path):
+    """Schema and refusal table move together, or the removal is a trap."""
+    from fux.tune import _REMOVED_KEYS, _SCHEMA
+
+    for table, key in _REMOVED_KEYS:
+        assert key not in _SCHEMA[table], f"{table}.{key} is both removed and live"
+
+
 def test_a_tune_can_be_constructed_directly_for_tests(tmp_path):
     """The dataclass is the seam programmatic callers use; no file required."""
-    tune = Tune(archived_weight=0.5, priority=(("docs/", 2.0),))
-    assert tune.archived_weight == 0.5
+    tune = Tune(rerank_weight=0.5, priority=(("docs/", 2.0),))
+    assert tune.rerank_weight == 0.5
     assert not tune.trivial
 
 

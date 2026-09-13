@@ -2,9 +2,12 @@
  *  against. Twin of `src/fux/query/scan.py`.
  *
  * Every line in the corpus is touched; only a line whose raw bytes contain a
- * query hash is parsed. `flen` and `mtime` are read by regex from the bytes on
- * every line, candidate or not, because parsing every record to sum a length
- * is exactly what the prefilter exists to avoid.
+ * query hash is parsed. `flen` is read by regex from the bytes on every line,
+ * candidate or not, because parsing every record to sum a length is exactly
+ * what the prefilter exists to avoid. (`mtime` was read the same way until
+ * 2026-09-13, for the corpus-wide `newestMtime` the recency prior normalised
+ * against; the prior went (W-152) and the regex with it. A candidate's own
+ * `mtime` comes off the parsed record, like every other per-document fact.)
  */
 import { rawRecordLines, iterShardPaths } from "../store/reader.mjs";
 import { termHash, TF_FIELDS } from "../store/format.mjs";
@@ -16,7 +19,6 @@ import { tokenize } from "./tokenize.mjs";
 //: at the weights in force, so this parses the array and applies `deriveWlen`
 //: — the same function the scorer and the refer plane use, so they cannot drift.
 const FLEN_RE = /"flen":\[([0-9,\s]*)\]/;
-const MTIME_RE = /"mtime":(\d+)/;
 
 function flenFromLine(text) {
   const m = FLEN_RE.exec(text);
@@ -47,9 +49,8 @@ export function scanCandidates(root, queryHashes, { scoring = DEFAULT_SCORING } 
   // Per-field totals, summed raw and weighted ONCE at the end. Summing
   // `deriveWlen` per record would bake the weights into a running total the
   // moment anything cached it — the accelerator's stats plane made exactly
-  // that mistake (ADR-TUNE, 2026-08-24).
+  // that mistake (SR-TUNE, 2026-08-24).
   const totalFlen = new Array(TF_FIELDS.length).fill(0);
-  let newestMtime = 0;
   const df = {};
   for (const h of queryHashes) df[h] = 0;
   const candidates = [];
@@ -63,11 +64,6 @@ export function scanCandidates(root, queryHashes, { scoring = DEFAULT_SCORING } 
       const text = line.toString("latin1");
       const flen = flenFromLine(text);
       if (flen !== null) for (let i = 0; i < flen.length; i++) totalFlen[i] += flen[i];
-      const mt = MTIME_RE.exec(text);
-      if (mt !== null) {
-        const value = parseInt(mt[1], 10);
-        if (value > newestMtime) newestMtime = value;
-      }
       // The substring check is a PREFILTER only: a query hash can appear as a
       // literal 16-hex string outside `terms` (a title, an id, a sha) without
       // the document containing that term. Once a line is worth parsing, `df`
@@ -83,7 +79,7 @@ export function scanCandidates(root, queryHashes, { scoring = DEFAULT_SCORING } 
     }
   }
 
-  return [candidates, df, new Corpus(totalDocs, deriveWlen(totalFlen, scoring), newestMtime)];
+  return [candidates, df, new Corpus(totalDocs, deriveWlen(totalFlen, scoring))];
 }
 
 /** The reference path. */

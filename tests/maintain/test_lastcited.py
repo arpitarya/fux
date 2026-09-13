@@ -112,7 +112,7 @@ def test_the_store_is_bounded(root):
 
 
 def test_the_line_is_ascii_in_every_branch(root):
-    """ADR-CLI veto 7: these bytes reach a Windows console, whose default
+    """SR-CLI veto 7: these bytes reach a Windows console, whose default
     codepage crashes `print()` on a non-encodable character rather than
     degrading. Shipped twice as a real defect."""
     cases = [

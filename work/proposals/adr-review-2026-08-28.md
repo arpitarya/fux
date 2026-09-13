@@ -1,6 +1,6 @@
 ---
 type: Proposal
-title: "ADR review — 2026-08-28: the rules are excellent and the records do not follow them"
+title: "SR review — 2026-08-28: the rules are excellent and the records do not follow them"
 description: "All 47 live records read against the register's own rules. Five rules are each broken in 20-45 of 47 records, and nothing mechanical notices. Record-vs-record only: no claim here was checked against src/ or tests/. Findings, not landed facts."
 status: proposed
 timestamp: 2026-08-28T00:00:00Z
@@ -11,9 +11,9 @@ is an OKF conformance break and this directory's own declared contract
 (`README.md` states the block every proposal carries). The `type` and `status`
 are the directory's; nothing about the findings changed.
 
-# ADR review — 2026-08-28
+# SR review — 2026-08-28
 
-**Scope.** All 47 live records in `docs/adr/` plus `README.md`, `TEMPLATE.md`, `RULE-SINCE`, read against the register's own rules. Only `docs/adr/` was read; every claim about `src/` or `tests/` below is *record-vs-record*, not record-vs-code. Line numbers are from the files as of 2026-08-28.
+**Scope.** All 47 live records in `records/` plus `README.md`, `TEMPLATE.md`, `RULE-SINCE`, read against the register's own rules. Only `records/` was read; every claim about `src/` or `tests/` below is *record-vs-record*, not record-vs-code. Line numbers are from the files as of 2026-08-28.
 
 **One-line verdict.** The rule set is excellent; the records don't follow it, and nothing mechanical notices. Five rules (`no history`, `ten keys`, `veto = checkable`, `References = index of the body`, `never an archived doc as grounding`) are each broken in 20–45 of 47 records. The fix is not 47 rewrites — it is ~6 new lint tests, then one bulk pass, then `RULE-SINCE` moves.
 
@@ -24,16 +24,16 @@ are the directory's; nothing about the findings changed.
 | rule (README) | records violating | what a test would grep |
 |---|---|---|
 | **No history** — "the word Amended does not appear"; no `used to`, `originally`, `until <date>` | **~40 / 47.** Literal `Amended`/`AMENDED` in 0004 0009 0019 0031 0047 0049; dated `REVERSED`/`RULED by Arpit 2026-08-2x`/`BUILT 2026-08-28`/✅🔴 status logs in 0036 0044 0045 0047 0019 0032 0038; "This record previously read…" blockquotes kept in 0045 L262 0044 L246 0038 L157 | `\b(Amended|AMENDED|used to|originally|previously read|until 2026|since 2026|as of 2026|Ruled by|REVERSED|no longer)\b` in body — fail on any hit |
-| **Ten keys, in order** | **9 / 47.** `amended:` in 0003 0004 0038 0045 0047; `ratified:` (not `ratifies`) in 0046 0047 0049; `built:` in 0047; `laws: [1, 3, 4]` / `[0]` instead of `[L1, L3, L4]` in 0045 0047 0049 | `test_adr_frontmatter.py` claims to check this — **it is either not running or not checking**; verify first |
+| **Ten keys, in order** | **9 / 47.** `amended:` in 0003 0004 0038 0045 0047; `ratified:` (not `ratifies`) in 0046 0047 0049; `built:` in 0047; `laws: [1, 3, 4]` / `[0]` instead of `[L1, L3, L4]` in 0045 0047 0049 | `test_sr_frontmatter.py` claims to check this — **it is either not running or not checking**; verify first |
 | **Veto = condition + `How to check it`** | **20 / 47 have no check command at all** (0029–0036, 0038–0044, 0047–0049); 0047 has twelve conditions and zero commands; many "conditions" are events ("a real workflow is found…", "a major agent host drops MCP", "someone wants…") | fail a record whose Veto section has no `How to check` / fenced command |
-| **References lists only what the body cites; never an archived doc** | **~35 / 47** list ADR-LAWS or other records the body never names; ~15 omit records/runs the body does cite; **archived docs listed or used as grounding** in 0015 (Reference *required* → `archive/v0.26/`), 0040 (Reference required → ADR-ENRICHED), 0038 0041 0044 0045 0046 0049 | parse `[ADR-X]( … )` in References, assert each name appears in §1/§2; assert no `archive/` path in References |
+| **References lists only what the body cites; never an archived doc** | **~35 / 47** list SR-LAWS or other records the body never names; ~15 omit records/runs the body does cite; **archived docs listed or used as grounding** in 0015 (Reference *required* → `archive/v0.26/`), 0040 (Reference required → SR-ENRICHED), 0038 0041 0044 0045 0046 0049 | parse `[SR-X]( … )` in References, assert each name appears in §1/§2; assert no `archive/` path in References |
 | **Cite by name, never number** | 0041 §1 example cites `ADR-0007`/`ADR-0019` | `ADR-\d{4}` in any live doc — README says this is already a defect |
-| **Decisions numbered, unique, in order** | 0046 numbers **11, 12, 13 twice**; 0040 has **two 1–N sequences** (ADR-DECODE's "ADR-ENRICH decision 3" resolves to two things); 0045 orders 13 before 12 and 14 after "Decision 12's outcome"; 0032 uses 0, 1a–1d, 9c-i; 0029 has 8a and an unnumbered decision under *Reference*; 0007 goes 13 → 15 → 14 → 16; 0049 vetoes 1 2 3 6 4 5 | parse `**N.` under `### Decision`, assert strictly increasing and unique |
+| **Decisions numbered, unique, in order** | 0046 numbers **11, 12, 13 twice**; 0040 has **two 1–N sequences** (SR-DECODE's "SR-ENRICH decision 3" resolves to two things); 0045 orders 13 before 12 and 14 after "Decision 12's outcome"; 0032 uses 0, 1a–1d, 9c-i; 0029 has 8a and an unnumbered decision under *Reference*; 0007 goes 13 → 15 → 14 → 16; 0049 vetoes 1 2 3 6 4 5 | parse `**N.` under `### Decision`, assert strictly increasing and unique |
 | **§1 one screen** | 17 / 47 over 90 lines; 0012 = 149, 0011 = 130, 0010 = 129 | soft warning at >80 lines between `## §1` and `## §2` |
 | **Laws cited, never restated** | 0014 0018 0027 0032 0034 0040 0042 0044 0046 0047 paraphrase L2/L3/L5/L8 in prose; 0011 argues from L4 with `laws: [L1, L3]`; 0043 cites L7 for Windows portability (L7 is Python ≥3.11) | hard to lint; do in the bulk pass |
 | **Transcripts real, trimmed never edited** | 0006 L99 `--json \| tail -1` cannot print `"source": "refer"`; 0030 L385 `--json` prints non-JSON; 0034 L83 `grep -n` output without line prefixes; 0021 L213 `score: 0.0000` hit; 0007 L118 `head -8` prints 9 lines; 0040 example names `0031_maintenance.md` (does not exist) and `--plan`/`--check` disagree on the same scope; 0045: **every** capture lacks the floors decisions 12–13 make required (veto 3 is violated by the record's own examples) | can't lint; rule: every block names corpus + commit or gets deleted |
 
-**Register/README itself:** the ADR-CONFIDENCE row carries "⚠ Amended 2026-08-27 (decision 11)…" — history in the register; the ownership row for `output_config.py` says "Since 2026-08-28"; the DESCRIBES preamble says "four rows", the table has six; `built: no` on 0044 and 0049 while both records cite their own built tools/tests; 0043 is `proposed` while marked built and describing shipped behaviour.
+**Register/README itself:** the SR-CONFIDENCE row carries "⚠ Amended 2026-08-27 (decision 11)…" — history in the register; the ownership row for `output_config.py` says "Since 2026-08-28"; the DESCRIBES preamble says "four rows", the table has six; `built: no` on 0044 and 0049 while both records cite their own built tools/tests; 0043 is `proposed` while marked built and describing shipped behaviour.
 
 ---
 
@@ -60,20 +60,20 @@ These are the ones an implementing agent trips on *today*. Ranked by blast radiu
 17. **`[archived]` prefix on `find`.** 0037 decision 3 says `ask` and `find` show it; Consequences say `find` stdout is deliberately unmarked.
 18. **Include-only directory list.** 0014 L299 "no exclusions" — false per 0022 (`!`), 0007, 0048. 0022's own veto ("a precedence rule between this file and something else") is already true via `.fuxignore`; 0048 veto 3 is already true via `fux remove`.
 
-**Wrong cross-citations (mechanically checkable — a test could resolve `ADR-X decision N` / `veto N` against the target):** 0003→MAINTENANCE veto 7 (is 4), →URL-INGEST d4 (is 3), →CDP d8 (is 9); 0043→MAINTENANCE veto 7 (is 4), →"decision 11a with an amendment block" (does not exist); 0004→DIR-LIST d12 (has 1–5); 0001→PROVENANCE "decision C" (is 14), →CLI 1e (is 1d); 0048→URL-LIST d10 (is 4); 0042→its own d13 (is 12); 0046→its own d3 (is 9), d8 (is 7); 0036→d8 for the freeze (is 1); 0047→`ADR-FUX-DIR` (is ADR-DOTFUX); 0007→"ADR-TYPES verdict G" (no such label); 0030/0034→REFER d4's "knob that lies" (phrase absent).
+**Wrong cross-citations (mechanically checkable — a test could resolve `SR-X decision N` / `veto N` against the target):** 0003→MAINTENANCE veto 7 (is 4), →URL-INGEST d4 (is 3), →CDP d8 (is 9); 0043→MAINTENANCE veto 7 (is 4), →"decision 11a with an amendment block" (does not exist); 0004→DIR-LIST d12 (has 1–5); 0001→PROVENANCE "decision C" (is 14), →CLI 1e (is 1d); 0048→URL-LIST d10 (is 4); 0042→its own d13 (is 12); 0046→its own d3 (is 9), d8 (is 7); 0036→d8 for the freeze (is 1); 0047→`SR-FUX-DIR` (is SR-DOTFUX); 0007→"SR-TYPES verdict G" (no such label); 0030/0034→REFER d4's "knob that lies" (phrase absent).
 
 ---
 
 ## 3. Proposal — do it in this order
 
-**Step 0 — find out why the existing tests are green.** `test_adr_frontmatter.py` is documented as checking the ten-key set; nine files violate it. Either the test is skipped in CI, its key check is looser than README says, or CI is red and nobody looked. This is the W-83 lesson again ("touched, not coherent") one level up — a *check* that is described but not enforced.
+**Step 0 — find out why the existing tests are green.** `test_sr_frontmatter.py` is documented as checking the ten-key set; nine files violate it. Either the test is skipped in CI, its key check is looser than README says, or CI is red and nobody looked. This is the W-83 lesson again ("touched, not coherent") one level up — a *check* that is described but not enforced.
 
-**Step 1 — ship the lints before the rewrite** (same-change-as-the-rule, per the currency law). One file, `tests/test_adr_lint.py`, six assertions:
+**Step 1 — ship the lints before the rewrite** (same-change-as-the-rule, per the currency law). One file, `tests/test_sr_lint.py`, six assertions:
 
 - history vocabulary in body (list above) → fail
 - decision numbers under `### Decision` strictly increasing, unique, integer
 - Veto section contains a fenced `console`/`sh` block or `How to check it`
-- every `[ADR-X]` in `## References` is named in §1/§2; no `archive/` path anywhere in References; every `ADR-X decision N` / `veto N` in any record resolves to an existing number in X
+- every `[SR-X]` in `## References` is named in §1/§2; no `archive/` path anywhere in References; every `SR-X decision N` / `veto N` in any record resolves to an existing number in X
 - frontmatter: exactly the ten keys + optional `supersedes`/`ratifies`; `laws:` items match `^L[1-8]$`
 - `ADR-\d{4}` appears nowhere under `docs/`
 
@@ -84,7 +84,7 @@ Baseline these the same way freshness was — allow-list current failures per fi
 **Step 3 — three record-shape changes to TEMPLATE/README.**
 
 - Add **`supersedes-decision:`-style pointers inside the record** — no. Instead: adopt the rule the register already implies but never states: *a corrected decision keeps its number and its text is replaced; a retired decision keeps its number with the single line "retired — see decision N"*. Today records do this inconsistently (0011 renames, 0046 duplicates, 0040 restarts).
-- **Make `built` a frontmatter key** (0047 already invented one) so `test_adr_register_status.py` can assert the register column the same way it asserts `status`; today `built` is hand-maintained and wrong in three rows.
+- **Make `built` a frontmatter key** (0047 already invented one) so `test_sr_register_status.py` can assert the register column the same way it asserts `status`; today `built` is hand-maintained and wrong in three rows.
 - **Move worked-instance narratives to `work/regression/` or WORKLOG** and let the record cite the run. The template's own advice ("the failure is the argument, the date is not") is right; the records keep the date because there is nowhere else obvious to put the story. Give them the place.
 
 **Step 4 — move `RULE-SINCE` forward** after Step 2, with the comment naming this review, and say the cost out loud (per the carve-out note).
@@ -136,17 +136,17 @@ Two to three lines each; the subagent audits behind this have the full line-by-l
 | 0037 ARCHIVED-CONTENT | d3 says `find` shows `[archived]`; Consequences say `find` stdout is bare. Does `answer` prefix? `is_archived_loc()` — name says path, decision says declaration. Example C has two rows for one `loc`. |
 | 0038 TUNE | L523 vs 5d on `doc_coverage_floor`. d4 is an explicit "REVERSED… *Original:*" block. `archive/proposals/` in References. Vetoes narrate "fired twice". |
 | 0039 MCP | d10 text describes the `BUILT_IN["top"]` defect Consequences say was fixed. Example lacks the confidence block d10 mandates, `version: 1.0.0`. Where does `graph` fold? Veto "host drops MCP" is an event. |
-| 0040 ENRICH | Section duplicated verbatim (L231–253). Two 1–N decision sequences. Example: `--plan` 2 stale vs `--check` 41/41 on the same scope; names `0031_maintenance.md`. Reference (required) → archived ADR-ENRICHED. |
+| 0040 ENRICH | Section duplicated verbatim (L231–253). Two 1–N decision sequences. Example: `--plan` 2 stale vs `--check` 41/41 on the same scope; names `0031_maintenance.md`. Reference (required) → archived SR-ENRICHED. |
 | 0041 RERANK | No Context section. States the `+4` delta d7a says an informed run may not state. Cites `ADR-0007`/`ADR-0019` by number. Veto 1 is "when experiments are run". `archive/proposals/` in References. |
 | 0042 DECODE | "decision 13" doesn't exist (is 12). `DecodeFailed` not a `FuxError` vs the one-flat-error contract — reconcile or name internal-only. Raise-vs-None queue rule unstated. L3 paraphrased twice. |
 | 0043 LOCKS | `proposed` while built. Cites MAINTENANCE veto 7 (is 4) and "d11a with an amendment block" (doesn't exist); never cites MAINTENANCE d8, the ruling it restates. L7 cited for portability. Write the takeover as ordered steps. |
 | 0044 QUALITY | `c = 2` → 3. Consequences 1/2/4 are all false per the record's own output block (recall@k computed; unanswerable class exists; floor measured). 25 vs 26 multi-relevant. d11 "never the query text" vs PROVENANCE. W-89 linked as `work/open/`, lives in `archive/`. |
 | 0045 CONFIDENCE | `amended:`; `laws: [1, 3, 4]`; 13 before 12; reversed text kept as blockquote; every capture violates d1/d4/d11–13 and veto 3. `c = 2`. d14 claims ownership of `query/__init__.py` (ASK owns it). `doc_coverage` clause missing from d3's band table. |
 | 0046 PROVENANCE | Decisions 11/12/13 each twice. `ratified:` key. Receipt is a hex digest in the example and an in-toto Statement in d11/15. L211 restates L8 with the network clause CLAUDE.md says was dropped. `[answer]` table doesn't exist in any config record. |
-| 0047 OUTPUT | `built:` `amended:` `ratified:` keys; `laws: [1,3,4,7]`. §1 diagram/example/text = retired `[defaults]` layout ending at `BUILT_IN`. d19 (raises) left standing above d20 (fallback). "Six keys refused" — eight. Twelve vetoes, zero checks. `ADR-FUX-DIR`. A session test log inside Reference. |
+| 0047 OUTPUT | `built:` `amended:` `ratified:` keys; `laws: [1,3,4,7]`. §1 diagram/example/text = retired `[defaults]` layout ending at `BUILT_IN`. d19 (raises) left standing above d20 (fallback). "Six keys refused" — eight. Twelve vetoes, zero checks. `SR-FUX-DIR`. A session test log inside Reference. |
 | 0048 FUXIGNORE | Veto 3 already true (`fux remove` still writes `sources/dirs`). URL-LIST "d10" is d4. Shown `.fuxignore` ≠ the file the captures ran on. Seven history sentences incl. two "Arpit's ruling (2026-08-27)". |
 | 0049 OWNERSHIP | `laws: [0]` (no L0). `ratified:`. Decision grounded on archived W-82. "Four rows" vs six. Vetoes 1 2 3 6 4 5, no checks; veto 5 contradicts d6 ("deliberately not mechanised"). Register `built: no` vs the tests it names. |
 
 ---
 
-*Method: mechanical greps over all 47 files (frontmatter keys, §1 length, Mermaid/twin pairing, history vocabulary, veto/check presence) followed by four parallel full-read audits of 10–13 records each, cross-checking every `ADR-X decision N` citation against the target record. Not verified against `src/` or `tests/`.*
+*Method: mechanical greps over all 47 files (frontmatter keys, §1 length, Mermaid/twin pairing, history vocabulary, veto/check presence) followed by four parallel full-read audits of 10–13 records each, cross-checking every `SR-X decision N` citation against the target record. Not verified against `src/` or `tests/`.*

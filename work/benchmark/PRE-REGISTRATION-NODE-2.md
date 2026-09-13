@@ -1,7 +1,7 @@
 ---
 type: PreRegistration
 name: PRE-REG-NODE-2
-description: "FROZEN 2026-09-12. Supersedes PRE-REG-NODE, which L9 voided in part by making fux-playground Arpit's hands only. Arpit ruled that the Python/Node equivalence is measured in fux-lab, on the committed golden ladder, on EVERY change to either reader, and that both must give the same results. Fixes the corpora, the cadence, the comparison, the bar and what is filed. Ids N5-N8; the latency fence moved to fux-benchmark."
+description: "FROZEN 2026-09-12. Supersedes PRE-REG-NODE, which SR-WORK-ENVIRONMENTS voided in part by making fux-playground Arpit's hands only. Arpit ruled that the Python/Node equivalence is measured in fux-lab, on the committed golden ladder, on EVERY change to either reader, and that both must give the same results. Fixes the corpora, the cadence, the comparison, the bar and what is filed. Ids N5-N8; the latency fence moved to fux-benchmark."
 timestamp: 2026-09-12T00:00:00Z
 ---
 
@@ -24,7 +24,7 @@ are both about *the instrument*, never about a result anyone disliked:
 
 1. 🔴 **Its corpora are unusable.** §4 names `fux-playground`, and N3 says
    *"every distinct term of the playground index"*.
-   [L9](../../docs/adr/0011_LAW-9-environments.md) made the playground
+   [SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md) made the playground
    **Arpit's hands only — no agent, no test, no number**. An instrument that
    names a corpus no measurement may touch cannot be run.
 2. **It is ambiguous on bytes.** W-107 H2: Python prints `--json` with
@@ -61,8 +61,8 @@ Three consequences:
   arm exists precisely because the Python half can move alone.
   `tests/test_node_twins.py` is the structural half of the same rule and fires
   when a Python twin moves and its `.mjs` does not.
-- **"Same results" is not a new bar** — it is [ADR-RANKING decision
-  8a](../../docs/adr/0111_ranking.md), which Arpit ruled on 2026-09-06 and
+- **"Same results" is not a new bar** — it is [SR-RANKING decision
+  8a](../../records/0111_ranking.md), which Arpit ruled on 2026-09-06 and
   which §3 links rather than restates (L0).
 
 ## 3 · The comparison — what must be equal, and how
@@ -74,9 +74,9 @@ Three consequences:
 | `id`, `loc`, `order` of results | **byte-equal** | this is the answer; a different order is a different product |
 | `heading`, `title`, `phrases`, `locators` (`path:L<a>-L<b>`) | **byte-equal** | a citation a reader opens; an off-by-one line is a wrong quote |
 | `band`, `missing`, `answerable` | **byte-equal** | a claim fux makes out loud |
-| `source`, `freshness` | **byte-equal** | the claim-strength vocabulary ([ADR-URL-FRESHNESS](../../docs/adr/0149_url-freshness.md)) |
+| `source`, `freshness` | **byte-equal** | the claim-strength vocabulary ([SR-URL-FRESHNESS](../../records/0147_url-freshness.md)) |
 | `graph.json` plane digest | **byte-equal** | one digest or the arm proves nothing |
-| `score` | **equal after `round(9)`** | [ADR-RANKING 8a](../../docs/adr/0111_ranking.md). Not restated here |
+| `score` | **equal after `round(9)`** | [SR-RANKING 8a](../../records/0111_ranking.md). Not restated here |
 
 ⚠ **Ordering is not subject to the score tolerance.** A discordant top-5 fails
 the arm even when every score agrees at `round(9)`.
@@ -85,7 +85,7 @@ the arm even when every score agrees at `round(9)`.
 
 | | |
 |---|---|
-| where | **`fux-lab` only** ([L9](../../docs/adr/0011_LAW-9-environments.md)). Never the playground, never a corpus an agent invented |
+| where | **`fux-lab` only** ([SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md)). Never the playground, never a corpus an agent invented |
 | what | the committed golden ladder, [`../golden/ladder/`](../golden/README.md) — rungs **100 · 200 · 500 · 1 000 · 2 000 · 5 000 · 10 000**, plus `rung-seed` |
 | ceiling | **10 000 documents, hard.** No rung above it is built, measured, or promised (`CLAUDE.md` §Litmus) |
 | adversarial | `tools/differential/adversarial_corpus.py` stays in the matrix — H1's id above U+FFFF exists in no real corpus |
@@ -131,7 +131,7 @@ a smaller size.
 | **N8** | N3 | the analyzer and the hash, **pinned not sampled** | **every distinct term of the 10 000 rung** analyzed and hashed identically |
 
 🔴 **N4's latency fence is NOT here — Arpit moved it to `fux-benchmark`,
-2026-09-12.** [L9](../../docs/adr/0011_LAW-9-environments.md) gives latency to
+2026-09-12.** [SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md) gives latency to
 that environment by name, and this document asks whether two readers *agree*,
 which is a different kind of claim from how fast one of them is.
 
@@ -145,7 +145,7 @@ silent.
 
 ## 6 · What is filed, per run
 
-Per [ADR-RS](../../docs/adr/0133_predictions.md) decisions 11–15, and its 🔴
+Per [SR-RS](../../records/0133_predictions.md) decisions 11–15, and its 🔴
 per-query rule:
 
 - **Per-query rows under `evidence/`** — one row per query per arm, per rung,
@@ -161,7 +161,7 @@ per-query rule:
 ## 7 · ✅ The two open cells, filled — Arpit, 2026-09-12
 
 1. **Does the latency fence belong here?** **No — moved to `fux-benchmark`.**
-   L9 gives latency to that environment; equivalence and speed are different
+   SR-WORK-ENVIRONMENTS gives latency to that environment; equivalence and speed are different
    claims and one document asserting both makes neither easy to check. §5
    carries the obligation W-139 inherits, so the fence is moved rather than
    dropped.
@@ -177,7 +177,7 @@ per-query rule:
 - **If the ladder stops being representative** — a rung that no longer carries
   `url:` records, non-ASCII headings, or an id above U+FFFF makes N5–N8 pass
   for a reason unrelated to correctness.
-- **If `round(9)` stops being the sort key's resolution.** §3 borrows ADR-RANKING
+- **If `round(9)` stops being the sort key's resolution.** §3 borrows SR-RANKING
   8a; if `rank.py` changes its key, this document's score row is void, not
   merely loose.
 - **If the arm ever compares stdout bytes again** — it would fail on printing

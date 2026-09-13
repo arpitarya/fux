@@ -19,19 +19,15 @@ detail. The detail lives here, one file per `W-nn`, named
    🔴 blocked on Arpit (directly or through another item) · 🟡 waiting · 🟢 no
    blockers — then optional 🧨 broken or worsening and 🔺, which only Arpit adds
    (OPEN-WORK rule 6).
-2. When an item closes, **delete its index row and move its file to
-   [`archive/open/`](../../archive/open/)** — in the same change as the work.
-   *(Arpit, 2026-08-19: archive the file rather than delete it. The row still
-   goes, so the queue's length keeps meaning what it meant; what is kept is the
-   argument that produced the call, which outlives the call.)* Closing is legal
-   only once the outcome is recorded in
-   [`../IMPLEMENTATION.md`](../IMPLEMENTATION.md) and any evidence is filed
-   under [`../regression/`](../regression/README.md). The durable record of a
-   closed item is still its ADR plus the [`WORKLOG`](../WORKLOG.md) entry — the
-   archived file is history, and **archive is not evidence**.
+2. **When an item closes its row is deleted and its file MOVES to
+   [`archive/open/`](../../archive/open/), in the same change — it is never
+   deleted.** The rules are
+   [SR-WORK-OPEN-QUEUE](../../records/0051_WORK-open-queue.md) rules 8–12 and
+   **54–58**, and they are not restated here.
+
 3. A file carries only what a builder needs to start: goal, definition of
    done, blockers, the spec it implements, hazards, and the model that
-   should execute it. Anything longer belongs in an ADR or a
+   should execute it. Anything longer belongs in an SR or a
    compare/proposal doc, and is linked from here.
 4. **This file is the spec as well as the state.** `PLAN.md` was archived on
    2026-08-18 and its milestone scope migrated into these files, so there is

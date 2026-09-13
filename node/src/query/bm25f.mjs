@@ -31,7 +31,7 @@ export const DEFAULT_SCORING = new Scoring();
 /** ⚠ `Math.log` and Python's `math.log` disagree in the last ulp on ~0.7 % of
  *  inputs (Phase 0, measured on darwin and glibc). **Every difference is one
  *  ulp and none survives `round(9)`**, which is the sort key's own resolution
- *  — ADR-RANKING decision 8a. This is the tolerance Arpit ruled, option (b). */
+ *  — SR-RANKING decision 8a. This is the tolerance Arpit ruled, option (b). */
 export function idf(df, n) { return Math.log((n - df + 0.5) / (df + 0.5) + 1); }
 
 /** The BM25F numerator for one term in one document.

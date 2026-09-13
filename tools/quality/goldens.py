@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The golden schema — the RANK CONTRACT and the RELEVANCE SET, kept apart.
 
-[ADR-QUALITY](../../docs/adr/0141_quality-contract.md) decision 12, ruled by
+[SR-WORK-QUALITY](../../records/0056_WORK-quality.md) decision 12, ruled by
 Arpit 2026-08-28.
 
 ## Why two fields and not one plural field
@@ -14,7 +14,7 @@ be **complete**, and the first never promised completeness.
 Two blind annotators, agreeing at **Cohen's kappa = 0.960**, judged **25 of 50**
 of the then-live goldens to have more than one genuinely relevant document
 against one asserted for all 50. (Those fifty lived in `fux-playground` and were
-retired by [L9](../../docs/adr/0011_LAW-9-environments.md) on 2026-09-11; the
+retired by [SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md) on 2026-09-11; the
 measurement stands, the file is out of reach, and **this schema has no live
 file** — the golden ladder's questions carry no relevance claim.) **Making `doc` a list would have carried the conflation
 into a plural field**; splitting the claims is what decision 12 chose instead.
@@ -137,7 +137,7 @@ def main(argv: list[str]) -> int:
 
     eligible, excluded = recall_slice(goldens)
     sizes = [len(g["relevant"]) for g in goldens if g.get("relevant")]
-    print(f"{len(goldens)} goldens, all valid against ADR-QUALITY decision 12\n")
+    print(f"{len(goldens)} goldens, all valid against SR-WORK-QUALITY decision 12\n")
     print(f"  carry a relevance set:      {len(sizes)}")
     print(f"  declared `{COMPLETE}`:       {len(eligible)}  <- recall@k is computable over these")
     print(f"  excluded from recall@k:     {excluded}")

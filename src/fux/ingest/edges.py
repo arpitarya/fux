@@ -41,7 +41,7 @@ class DocScan:
     tags: list[str]
     #: Frontmatter `supersedes:` — paths this document retires. **Declared,
     #: never inferred** (W-76 Phase 2): nothing guesses supersession from
-    #: titles, numbering or dates. Same rule ADR-DIR-LIST decision 10 applies
+    #: titles, numbering or dates. Same rule SR-DIR-LIST decision 10 applies
     #: to `archived`, for the same reason -- a heuristic that is exact for the
     #: repo that invented it is a silent convention for everyone else.
     supersedes: list[str]
@@ -109,7 +109,7 @@ def _resolve_ref(doc_id: str, target: str, known_ids: set[str]) -> str | None:
         return None
     if target.startswith(("http://", "https://")):
         # An absolute link resolves iff that exact URL is itself an ingested
-        # doc (ADR-URL-INGEST); anything else is dangling and dropped, same rule
+        # doc (SR-URL-INGEST); anything else is dangling and dropped, same rule
         # as an unresolved path.
         candidate_id = f"url:{target}"
         return candidate_id if candidate_id in known_ids else None

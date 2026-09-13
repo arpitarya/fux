@@ -1,4 +1,4 @@
-"""URL source (ADR-URL-INGEST, relocated by ADR-DOTFUX): the consumer-fetcher
+"""URL source (SR-URL-INGEST, relocated by SR-DOTFUX): the consumer-fetcher
 contract, the committed line-oriented URL list, the opaque config table,
 offline-by-default carry-forward, hashed-meta default, and determinism. No
 test here touches the network — the fetcher under test is a fake written
@@ -52,7 +52,7 @@ def _write_toml(tmp_path, text, dirs=("docs",)):
     listing = tmp_path / ".fux" / "sources" / "dirs"
     listing.parent.mkdir(parents=True, exist_ok=True)
     listing.write_text("".join(f"{d}{chr(10)}" for d in dirs), encoding="utf-8")
-    # ADR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
+    # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
 
 
@@ -99,7 +99,7 @@ def test_config_paths_default_into_the_fux_dir(tmp_path):
     _write_toml(tmp_path, "[sources]\n[sources.url]\nmax_parallel = 4\n")
     cfg = load_config(tmp_path)
     # The default is the plain-GET fetcher: a line with no `fetch=` means
-    # `fetch=http` (ADR-HTTP-FETCHER decision 1), and this key is the
+    # `fetch=http` (SR-HTTP-FETCHER decision 1), and this key is the
     # source-wide setting for that attribute.
     assert cfg.url.fetcher == ".fux/fetchers/http.py"
     assert cfg.url.urls_file == ".fux/sources/urls"
@@ -443,7 +443,7 @@ def test_file_doc_gets_ref_edge_to_ingested_url(tmp_path):
     assert not any(e["dst"] == "url:https://x.test/other" for e in edges)  # dangling stays dropped
 
 
-# -- the attribute grammar, per URL (ADR-URL-LIST decisions 7-13) ----------
+# -- the attribute grammar, per URL (SR-URL-LIST decisions 7-13) ----------
 
 
 def test_a_fragment_survives_the_round_trip(tmp_path):
@@ -705,7 +705,7 @@ def test_json_with_prose_in_it_decodes_rather_than_skipping():
 
 
 def test_a_consumer_decoder_reaches_url_content_too(tmp_path):
-    """ADR-DECODE's premise stopped at the network boundary until 2026-08-27.
+    """SR-DECODE's premise stopped at the network boundary until 2026-08-27.
 
     `decode_mod.decode(raw, rel)` was called with **no `root`**, so
     `registry(None)` returned built-ins only and a decoder the consumer wrote
@@ -734,7 +734,7 @@ def test_a_consumer_decoder_reaches_url_content_too(tmp_path):
 #
 # The file path routed an unreadable document into `.fux/enrich/queue.tsv` with
 # its reason; the URL path routed it nowhere, so a URL that needed a model could
-# never be queued for one. ADR-FETCHER decision 11 named the asymmetry; this is
+# never be queued for one. SR-FETCHER decision 11 named the asymmetry; this is
 # it closed.
 
 def test_a_fetch_failure_is_not_queued_for_a_model():

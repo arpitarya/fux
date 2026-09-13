@@ -3,6 +3,8 @@
  * Fux never invents terms: no model sits anywhere on the query path, so an
  * expansion arrives from whoever asked. What this module owns is the rule that
  * an expansion is a *supplement* — it may lift a document, never define one.
+ *
+ * Owned, with its Python twin, by [SR-EXPAND](../../../records/0149_expand.md).
  */
 
 /** Every hash to score (originals first), what the user actually asked for,

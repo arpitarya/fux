@@ -4,11 +4,11 @@
 # `mix@version` beside its number, so two scores under different mixes can
 # never be silently compared.
 #
-# Owned by ADR-QUALITY (docs/adr/0044_quality-contract.md).
+# Owned by SR-WORK-QUALITY (records/0056_WORK-quality.md).
 #
 # WHAT MAY CHANGE, AND HOW
 #   [cost]  is a COMMITMENT. It was set before any score existed under it, and
-#           changing it after a score has been seen voids ADR-QUALITY decision 6
+#           changing it after a score has been seen voids SR-WORK-QUALITY decision 6
 #           outright — that is veto condition 3, and it is checkable from
 #           `git log --follow -p` against the dates in work/regression/.
 #   [mix]   is a DECLARED PRIOR, not a measurement. It may be replaced by
@@ -20,10 +20,10 @@
 version = 1
 
 # --------------------------------------------------------------------------
-# [cost] — FROZEN 2026-08-27 (Arpit, W-87 fork 3). Ratified in ADR-QUALITY.
+# [cost] — FROZEN 2026-08-27 (Arpit, W-87 fork 3). Ratified in SR-WORK-QUALITY.
 #
 # The cost is stated as a CONFIDENCE TARGET, not as a bare weight, for two
-# reasons recorded in ADR-QUALITY decision 6:
+# reasons recorded in SR-WORK-QUALITY decision 6:
 #
 #   1. Only the RATIO is identifiable. Chow's rule puts the optimal reject
 #      threshold at (C_r - C_c)/(C_e - C_c); absolute costs do not move the

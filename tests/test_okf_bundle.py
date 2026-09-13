@@ -2,7 +2,10 @@
 
 Fux follows Google's **Open Knowledge Format** (OKF v0.1), whose conformance bar
 is a parseable frontmatter block with a **non-empty `type`** on every knowledge
-document. The bundle is `docs/` + `work/`, rooted at `docs/index.md`.
+document. The bundle is `docs/` + `records/` + `work/`, rooted at `docs/index.md`.
+(`records/` moved out of `docs/` to the repo root on 2026-09-13 with the SR
+rename; it stays in the bundle, because what a root is called never decided
+whether its documents conform.)
 
 **Why this file exists.** Until 2026-09-12 the bar was stated in `CLAUDE.md`,
 restated in `docs/index.md`, and checked nowhere. A scan run for
@@ -24,8 +27,7 @@ repo calls *a record that reads as authority*.
   a rule on by editing the evidence it governs is the failure the rule is
   about.* Runs filed on or after that date conform.
 
-Repo-root `CLAUDE.md` and `README.md` are tool entry points outside `docs/` +
-`work/`, so they are outside the bundle by construction, not by exclusion.
+Repo-root `CLAUDE.md` and `README.md` are tool entry points outside the bundle roots, so they are outside the bundle by construction, not by exclusion.
 """
 
 from __future__ import annotations
@@ -41,7 +43,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from fux import frontmatter as fm  # noqa: E402
 
-BUNDLE_ROOTS = ("docs", "work")
+BUNDLE_ROOTS = ("docs", "records", "work")
 #: The bundle root declares `okf_version` and nothing else; it is the one
 #: reserved filename in the spec and carries no `type`.
 BUNDLE_INDEX = Path("docs/index.md")

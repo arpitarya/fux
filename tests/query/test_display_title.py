@@ -129,7 +129,7 @@ def test_answer_degrades_to_a_labelled_hash_when_the_cache_is_cold(tmp_path, mon
 
 def test_the_scan_and_accelerator_paths_agree_on_a_cold_hashed_title(tmp_path, monkeypatch, capsys):
     """The differential law's own spirit, applied to the new display step:
-    whichever path answers, title resolution must agree — see ADR-ASK's
+    whichever path answers, title resolution must agree — see SR-ASK's
     P5 consequence for why this can never diverge by construction."""
     from fux.derive import build as build_fn
 

@@ -82,7 +82,7 @@ weights**:
 wlen = 3.0 * len(heading_tokens) + 1.0 * len(body_tokens)
 ```
 
-[ADR-TUNE](../../docs/adr/0135_tuning.md) decision 6 already names this as its
+[SR-TUNE](../../records/0135_tuning.md) decision 6 already names this as its
 own violation — *no committed field may be a function of a tunable* — and
 proposes the remedy *"commit the two token counts and derive `wlen` at query
 time when the format next moves"*. **This is that move**, and Arpit's fork B
@@ -95,13 +95,13 @@ baked in.
 | field weights tunable | **no** — changing one silently reweights the numerator against a stale denominator | **yes** |
 | bytes per record | 1 int | 5 ints (trailing zeros omitted: usually 2) |
 | scan byte oracle | `rb'"wlen":(\d+)'`, unchanged | new regex over `"flen":[...]`, and the sum is computed per query |
-| ADR-TUNE decision 6 | violation goes from 1 field to **5** | **discharged** |
+| SR-TUNE decision 6 | violation goes from 1 field to **5** | **discharged** |
 | re-ingest to retune | every time | never |
 
 **Proposed verdict: B.** A is only defensible if tuning is abandoned, and it
 has been explicitly ruled in.
 
-⚠ **The one-line equality gate ADR-TUNE asks for is owed here**: assert that
+⚠ **The one-line equality gate SR-TUNE asks for is owed here**: assert that
 `derive_wlen(flen, weights) == wlen` for every record in the pre-migration
 index, at the shipped default weights. That is what proves the migration moved
 no ranking.
@@ -118,7 +118,7 @@ The accelerator precomputes, per block of 128 postings:
 
 Both are weighted sums. If weights become tunable at query time, both become
 stale the moment a weight changes — so either the accelerator rebuilds whenever
-someone edits `tune.toml` (which breaks ADR-TUNE's central promise that
+someone edits `tune.toml` (which breaks SR-TUNE's central promise that
 *editing your ranking cannot break your index*), or the block metadata stops
 being a scalar.
 
@@ -127,7 +127,7 @@ being a scalar.
 | `tune.toml` edit costs | a full accelerator rebuild | **nothing** | n/a |
 | entry size | 40 B (unchanged) | 40 B -> ~64 B (5 × `mx`, 5 × `mnw`, narrowed) | 40 B |
 | bound tightness | exact | **looser** — see below | exact |
-| ADR-TUNE promise | **broken** | kept | kept by abandoning fork 2 |
+| SR-TUNE promise | **broken** | kept | kept by abandoning fork 2 |
 
 **B is correct, and the looseness is provably safe:**
 
@@ -158,7 +158,7 @@ there is 5× of room, but *"there is room"* is not a measurement. Owed: p95 at
 **Proposed verdict: B, which is already what happened.** Analyzer v2 landed
 alone and the suite is green at 1149; the record shape is the second step. C is
 rejected outright: a dual-read shim in `store/reader.py` is exactly the
-"two analyzers in one index" hazard ADR-INDEX-LIFECYCLE decision 10 refuses,
+"two analyzers in one index" hazard SR-INDEX-LIFECYCLE decision 10 refuses,
 wearing different clothes.
 
 ---

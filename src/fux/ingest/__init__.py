@@ -66,7 +66,7 @@ def cmd_ingest(args) -> int:
 
     if getattr(args, "spawn_runner", False):
         # The hook's whole job. Constant time in the corpus — one dirty-list
-        # write plus one spawn — which is ADR-MAINTENANCE veto condition 5.
+        # write plus one spawn — which is SR-MAINTENANCE veto condition 5.
         pending = runner_mod.record_head(root)
         if runner_mod.spawn(root):
             print(f"fux: re-indexing in the background ({pending} changed path(s) pending)", file=sys.stderr)
@@ -75,7 +75,7 @@ def cmd_ingest(args) -> int:
         return 0
 
     if getattr(args, "stop", False):
-        # `--stop` with nothing running is SUCCESS (ADR-CLI, 2026-08-22): a
+        # `--stop` with nothing running is SUCCESS (SR-CLI, 2026-08-22): a
         # command whose job is "make sure it is not running" has done its job.
         return _report_takeover(runner_mod.request_stop(root), root, halting=True)
 
@@ -118,7 +118,7 @@ def ingest_and_report(args_root, args, *, refresh_urls: bool = False, only_urls=
     one write path into the index, which is what L3 needs (W-63).
 
     **The takeover lives here, not in `cmd_ingest`** (W-66 Phase 2,
-    ADR-MAINTENANCE decision 1d). Every verb that reaches this function is
+    SR-MAINTENANCE decision 1d). Every verb that reaches this function is
     about to write the index, so every one of them has to stop a background
     runner first — putting it on the one shared seam is the same argument that
     put the printing here.
@@ -142,7 +142,7 @@ def ingest_and_report(args_root, args, *, refresh_urls: bool = False, only_urls=
     # W-93: two counts, not one. `not indexed` is a committed list doing its
     # job and needs no attention; `skipped` is a file fux could not read and
     # may. One number over both populations was 598 + 1 on this repo, which
-    # reads as 599 problems. ADR-INGEST decision 15.
+    # reads as 599 problems. SR-INGEST decision 15.
     not_indexed, unreadable = partition(report.skipped)
     print(
         f"ingested {report.doc_count} docs ({report.changed_count} changed, "

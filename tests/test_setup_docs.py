@@ -2,7 +2,7 @@
 
 Three working directories sit next to the repo, and none of them can be
 reconstructed from anything in this tree. What each one is FOR is law
-(`docs/adr/0011_LAW-9-environments.md`); what this test guards is weaker and
+(`records/0052_WORK-environments.md`); what this test guards is weaker and
 purely structural: a setup document that does not say *where* its thing lives,
 or that describes something actually inside the repo, has stopped being a setup
 document.
@@ -37,7 +37,7 @@ def test_setup_doc_declares_what_it_is(path: Path) -> None:
     meta = fm.parse(path.read_text(encoding="utf-8")).meta
     assert meta.get("type") == "Setup", (
         f"{path.name}: type must be Setup, got {meta.get('type')!r}. "
-        "A setup document is not an ADR — an ADR records a decision someone can supersede."
+        "A setup document is not an SR — an SR records a decision someone can supersede."
     )
     for key in ("name", "title", "description", "location"):
         assert str(meta.get(key, "")).strip(), f"{path.name}: missing {key!r} in frontmatter"

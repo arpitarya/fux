@@ -187,7 +187,7 @@ def test_results_come_back_in_sorted_order_whatever_the_completion_order():
 
 
 def test_per_url_error_isolation_survives_the_pool():
-    """ADR-URL-INGEST decision 4 in code, and the reason an optional
+    """SR-URL-INGEST decision 4 in code, and the reason an optional
     `fetch_many` was rejected: it would have moved this responsibility to every
     fetcher author, and most would not reimplement it correctly."""
 

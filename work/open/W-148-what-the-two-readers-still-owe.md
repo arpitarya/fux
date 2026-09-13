@@ -2,7 +2,7 @@
 type: OpenItem
 id: W-148
 title: "W-148 — what the two readers still owe: CI reach, the latency fence, and the renderer split"
-description: "The three things W-107 could not close and one ADR-API deliberately staged. None is a build task: two are decisions Arpit has not taken, one needs an environment nobody has built, and the fourth is a refactor of a 1 481-line hot file that is explicitly not in scope until someone asks for it. Filed so that closing W-107 does not close them by silence."
+description: "The three things W-107 could not close and one SR-API deliberately staged. None is a build task: two are decisions Arpit has not taken, one needs an environment nobody has built, and the fourth is a refactor of a 1 481-line hot file that is explicitly not in scope until someone asks for it. Filed so that closing W-107 does not close them by silence."
 status: open
 lane: arpit
 timestamp: 2026-09-12T00:00:00Z
@@ -17,7 +17,7 @@ allowed to claim); **Sonnet** for row 4 once row 4's definition-of-done exists.
 
 [W-107](../IMPLEMENTATION.md) closed on 2026-09-12: the Node read plane is
 built, five surfaces are compared against Python, and
-[ADR-NODE-SEARCH](../../docs/adr/0155_node-search.md) is accepted and built.
+[SR-NODE-SEARCH](../../records/0153_node-search.md) is accepted and built.
 
 **Four obligations were open inside it and none of them is agent-closable.**
 Deleting W-107's row without carrying them forward would have closed them by
@@ -27,8 +27,8 @@ can do have become invisible.**
 
 ⚠ **This file is not a place to park W-107's unfinished build.** There is no
 unfinished build. Every row below was already written down in W-107 or in
-ADR-API as blocked, staged, or a decision — check that claim against
-[the register](../../docs/adr/README.md) before believing it.
+SR-API as blocked, staged, or a decision — check that claim against
+[the register](../../records/README.md) before believing it.
 
 ---
 
@@ -43,7 +43,7 @@ moment `FUX_GOLDEN_CORPORA` points at a checkout that has the rungs.
 
 | | |
 |---|---|
-| the corpora are not committed | and [L2](../../docs/adr/0004_LAW-2-content-never-durable.md) is why |
+| the corpora are not committed | and [L2](../../records/0004_LAW-2-content-never-durable.md) is why |
 | `rung-10000` is **120 MB** | too big for the repository whatever L2 said |
 | `build_golden_rung.py` hard-codes two absolute paths | on Arpit's machine |
 
@@ -73,7 +73,7 @@ N4's `p95 ≤ 150 ms` fence was retired with PRE-REGISTRATION-NODE and moved to
 
 **`fux-benchmark` is unbuilt and is carried by no open item** — W-139 was
 removed from the queue on 2026-09-12.
-[L9](../../docs/adr/0011_LAW-9-environments.md) puts benchmarks there and
+[SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md) puts benchmarks there and
 nowhere else, so this cannot be measured in fux-lab or in the repo as a
 workaround.
 
@@ -103,9 +103,9 @@ bit-for-bit and **0 differ at `round(9)`**. A third libm would have to diverge
 by ~7 orders of magnitude more than the two measured ones to matter. **This row
 is about closing a stated gap, not about a risk anyone has a reason to expect.**
 
-## 4 · 🟠 The renderer split — ADR-API's `partial`, deliberately staged
+## 4 · 🟠 The renderer split — SR-API's `partial`, deliberately staged
 
-[ADR-API](../../docs/adr/0156_api.md) records `cmd_ask -> print(render(api.ask(...)))`
+[SR-API](../../records/0154_api.md) records `cmd_ask -> print(render(api.ask(...)))`
 as the finished shape and the current arrangement as **staged, not done**. It
 touches [`query/__init__.py`](../../src/fux/query/__init__.py), a **1 481-line**
 file on the hot path, and W-107 put it out of scope explicitly.
@@ -132,7 +132,7 @@ change.
   one of the five that *could* be compared today and is not; naming it here is
   a note, not a commitment.
 - **The `find --under` semantics fork** between `fux.api` and the CLI. That is
-  ADR-API decision 6's stated difference on a frozen surface, and it is Arpit's
+  SR-API decision 6's stated difference on a frozen surface, and it is Arpit's
   call — it belongs in the inbox if he wants it, not in a build item.
 
 ## Blockers

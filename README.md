@@ -19,10 +19,10 @@ key, and no model anywhere on the path.
 - **Documents stay where they are.** The index holds statistics, not content.
   `answer` reads the cited lines from the source and says whether they are still current.
 - **Deterministic.** Ranking is BM25F arithmetic
-  ([ADR-RANKING](docs/adr/0111_ranking.md)). The same sources build the same index.
+  ([SR-RANKING](records/0111_ranking.md)). The same sources build the same index.
 - **Says when it doesn't know.** Results carry a confidence band, and an unrelated
   question gets *"No confident matches"* rather than the nearest noise
-  ([ADR-CONFIDENCE](docs/adr/0142_confidence.md)).
+  ([SR-CONFIDENCE](records/0141_confidence.md)).
 - **It indexes documents, not code.** Fux runs no parser over source files — no
   AST, no symbols, no call graph — and source extensions are not on its default
   type list. Pair it with a code-graph tool when you want structure.
@@ -89,7 +89,7 @@ $ git add .fux fux.toml && git commit -m "Add fux index"
 ```
 
 `.fux/` explains itself: `setup` writes a `.fux/README.md` and a `.gitignore` that
-keeps the derived and fetched parts out of git ([ADR-DOTFUX](docs/adr/0102_fux-directory.md)).
+keeps the derived and fetched parts out of git ([SR-DOTFUX](records/0102_fux-directory.md)).
 
 ## Everyday commands
 
@@ -109,7 +109,7 @@ keeps the derived and fetched parts out of git ([ADR-DOTFUX](docs/adr/0102_fux-d
 | A re-runnable answer receipt | `fux answer --receipt "…"`, later `fux verify <receipt>` |
 | Check the setup | `fux doctor` (read-only, offline) |
 
-Full surface: `fux --help` and [ADR-CLI](docs/adr/0101_cli-surface.md).
+Full surface: `fux --help` and [SR-CLI](records/0101_cli-surface.md).
 
 ## With coding agents
 
@@ -118,13 +118,13 @@ Agents are fux's primary reader.
 - **Instructions out of the box.** `fux setup` adds skills and instructions for
   Claude Code, Codex, GitHub Copilot and Kiro, plus a root `AGENTS.md`. They tell
   the agent to search the index before grepping and how to read a result. Skip
-  with `--no-agents` ([ADR-AGENT-POLICY](docs/adr/0132_agent-policy.md)).
+  with `--no-agents` ([SR-AGENT-POLICY](records/0132_agent-policy.md)).
 - **MCP.** `fux mcp` serves the index over stdio as three tools: `fux_search`,
   `fux_passage` and `fux_related`. There is no `answer` tool — the agent is the
-  answerer ([ADR-MCP](docs/adr/0136_mcp.md)).
+  answerer ([SR-MCP](records/0136_mcp.md)).
 - **Read the JSON, not the prose.** `--json` and `--band` carry the fields an agent
   should branch on, including whether a result is archived
-  ([ADR-ARCHIVED-CONTENT](docs/adr/0134_archived-content.md)).
+  ([SR-ARCHIVED-CONTENT](records/0134_archived-content.md)).
 
 ## Beyond Markdown
 
@@ -132,20 +132,20 @@ Agents are fux's primary reader.
   plus decoders for PDF, Word, PowerPoint, Excel, CSV/TSV, HTML, email,
   draw.io, JSON, YAML, TOML, INI, XML, SVG and images. The decoders are copied
   into `.fux/decoders/` as your code, to edit or replace
-  ([ADR-DECODE](docs/adr/0139_decode.md)).
+  ([SR-DECODE](records/0139_decode.md)).
 - **Web pages and wikis.** `fux add <url>` fetches through a fetcher in
   `.fux/fetchers/`: `http.py` for a plain GET, or `cdp.py` (`--cdp`) to use the
   session your signed-in Chrome already holds. Both are yours to edit
-  ([ADR-FETCHER](docs/adr/0117_fetcher.md)).
+  ([SR-FETCHER](records/0117_fetcher.md)).
 - **Offline unless you ask.** Only explicit, opt-in commands touch the network,
-  and they say so on stderr ([L4](docs/adr/0006_LAW-4-offline-by-default.md)).
+  and they say so on stderr ([L4](records/0006_LAW-4-offline-by-default.md)).
 - **Sensitive text.** `.fux/pii.toml` redacts matches from the committed index
-  ([ADR-PII](docs/adr/0150_pii.md)). `fux setup` writes it, and fux will not run
+  ([SR-PII](records/0148_pii.md)). `fux setup` writes it, and fux will not run
   without it. `.fux/refusals.toml` stops a sign-in wall
-  being indexed as the page behind it ([ADR-REFUSAL](docs/adr/0148_refusals.md)).
+  being indexed as the page behind it ([SR-REFUSAL](records/0146_refusals.md)).
 - **Images and scans.** Fux never calls a model. `fux enrich` plans the work for
   your coding agent and validates what it writes
-  ([ADR-ENRICH](docs/adr/0137_enrich.md)).
+  ([SR-ENRICH](records/0137_enrich.md)).
 
 ## Measured, not assumed
 
@@ -163,24 +163,23 @@ Claims ship with a pre-registered bar and a published run — including the ones
 
 ## Design rules
 
-Fux is built under eleven laws, each with its own record in the
-[ADR register](docs/adr/README.md) ([ADR-LAWS](docs/adr/0001_LAWS.md)):
-[L0 ADRs are the source of truth](docs/adr/0002_LAW-0-authority.md) ·
-[L1 `$0`, FOSS-only](docs/adr/0003_LAW-1-zero-cost.md) ·
-[L2 content never durable](docs/adr/0004_LAW-2-content-never-durable.md) ·
-[L3 deterministic](docs/adr/0005_LAW-3-deterministic.md) ·
-[L4 offline by default](docs/adr/0006_LAW-4-offline-by-default.md) ·
-[L5 hashed meta](docs/adr/0007_LAW-5-hashed-meta.md) ·
-[L6 say "index"](docs/adr/0008_LAW-6-say-index.md) ·
-[L7 Python ≥ 3.11](docs/adr/0009_LAW-7-python-311.md) ·
-[L8 use record never committed](docs/adr/0010_LAW-8-use-record.md) ·
-[L9 one job per environment](docs/adr/0011_LAW-9-environments.md) ·
-[L10 build output, never source](docs/adr/0012_LAW-10-bundled-output.md).
+Fux is built under ten laws, each with its own record in the
+[SR register](records/README.md) ([SR-LAWS](records/0001_LAWS.md)):
+[L0 SRs are the source of truth](records/0002_LAW-0-authority.md) ·
+[L1 `$0`, FOSS-only](records/0003_LAW-1-zero-cost.md) ·
+[L2 content never durable](records/0004_LAW-2-content-never-durable.md) ·
+[L3 deterministic](records/0005_LAW-3-deterministic.md) ·
+[L4 offline by default](records/0006_LAW-4-offline-by-default.md) ·
+[L5 hashed meta](records/0007_LAW-5-hashed-meta.md) ·
+[L6 say "index"](records/0008_LAW-6-say-index.md) ·
+[L7 Python ≥ 3.11](records/0009_LAW-7-python-311.md) ·
+[L8 use record never committed](records/0010_LAW-8-use-record.md) ·
+[L10 build output, never source](records/0011_LAW-10-bundled-output.md).
 
 ## Reading order
 
 1. [`docs/index.md`](docs/index.md) — the map of every doc in the repo
-2. [The ADR register](docs/adr/README.md) — every decision of record
+2. [The SR register](records/README.md) — every decision of record
 3. [Detailed architecture diagram](work/architecture-detailed.svg) — every plane, what is committed and what is not, and the two query paths
 4. [The paper](work/paper/the-fux-index-paper.md) — design and falsifiable predictions (a draft; its status note lists what changed)
 5. [Sibling environments](work/setup/README.md) — the sandbox, the measurement lab and the benchmark harness that sit next to this repo
@@ -192,7 +191,7 @@ Fux is built under eleven laws, each with its own record in the
 pip install -e ".[dev]" && pytest
 ```
 
-Every change to an ADR-owned component updates its owning record in the same
+Every change to an SR-owned component updates its owning record in the same
 commit; CI checks it. Start with [`CLAUDE.md`](CLAUDE.md).
 
 ## License

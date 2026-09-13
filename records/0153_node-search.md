@@ -1,0 +1,645 @@
+---
+type: Standing Record
+kind: component
+name: SR-NODE-SEARCH
+title: "SR-NODE-SEARCH (0153) — the Node read plane: one index, two readers, three arms"
+description: "Why a Node reader exists, what it may and may not do, and the decisions that keep it from becoming a second product: the _format version policy, the never-fetch rule, the url: verdict asymmetry, the shared tool-description file, and the three places where Node is deliberately a SUBSET of Python rather than a copy — the derived graph plane, the accelerator label, and the decoder boundary. Decisions 13-16 carry the SHIPPING shape, ruled AND BUILT on 2026-09-12: the consumer gets a published artefact rather than source, the bundle is built at publish time into both registries, a monorepo is auto-detected and wired up, and the .fux/fux shim resolves the binary across five package managers."
+status: accepted
+date: 2026-09-12
+feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
+owns: [node@bf50a4513a56, src/fux/store/nodebundle.py@071a24a596dd]
+laws: [L1, L3, L4, L6]
+ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
+timestamp: 2026-09-12T00:00:00Z
+content_sha: 5d066f04910baad5fbb3458e21cf87335925c34b55ec86fcb45b0ab1991afd60
+---
+
+# SR-NODE-SEARCH — the Node read plane
+
+## §1 — For humans
+
+**A fux index is a small, plain-text index committed to git.** Python writes
+it. Until now Python was also the only thing that could read it, which made
+"clone and ask" a promise fux could only keep for people who had Python.
+
+`node/` is a second reader. It is published to npm as **`fux-engine`**,
+invoked as **`fux`**, and vendored by `fux setup` into **`.fux/node/`** so a
+clone with nothing installed still answers.
+
+**It is not a port in the usual sense.** A port is allowed to be different in
+ways nobody minds; this one is held byte-equal to Python by a third arm of the
+differential law, and **every difference is a defect until
+[PRE-REGISTRATION-NODE](../work/benchmark/PRE-REGISTRATION-NODE.md) says
+otherwise.**
+
+## §2 — For agents
+
+### Context
+
+W-107 carried the plan; **it closed on 2026-09-12** and this record carries the
+decisions that outlive it. What grounds them is
+[`2026-09-12-node-tune-and-surfaces`](../work/regression/2026-09-12-node-tune-and-surfaces/report.md)
+and [`2026-09-12-node-arm-rungs`](../work/regression/2026-09-12-node-arm-rungs/report.md),
+never the retired item — its file is named in
+[`archive/README.md`](../archive/README.md) and may not back a live claim.
+What it could **not** close is
+[W-148](../work/open/W-148-what-the-two-readers-still-owe.md).
+
+⚠ **Decisions 9-11 were all found on one day, 2026-09-12, by pointing the
+differential arm at surfaces it had never covered** — the graph verbs, the MCP
+server and the library export. Each was a place where Node answered *something*
+where Python answers something else or refuses, and none of them could have
+been caught by the arm as it stood, because the arm compared `find` and `ask`
+and nothing else. That is the pattern, and it is worth more than the three
+findings: **a transcription is only as true as the surface the instrument is
+aimed at.**
+
+### Decision
+
+**1. Scores are equal after `round(9)`; ordering is byte-equal.**
+A link to [SR-RANKING decision 8a](0111_ranking.md), never a second statement
+of the rule (L0). `Math.log` and `math.log` genuinely differ — 655/100 000 on
+darwin, 722/100 000 on glibc — but every difference is one ulp and **none
+survives `round(9)`**, which is the sort key's own resolution.
+
+⚠ **Ordering is not subject to that tolerance.** A discordant top-5 fails the
+arm. The tolerance is on the printed score field and nothing else.
+
+**2. The `_format` version policy: refuse, naming both versions.**
+A reader that guesses at an unknown `_format` corrupts every `df` silently, and
+the corruption is undetectable at query time. `store/reader.mjs` refuses, and
+the message says which version the index is and which the reader speaks —
+because the fix ("upgrade the reader" versus "re-ingest") depends on which way
+round they are.
+
+**The vendored copy makes this unreachable in practice**, which is the real
+guard: `.fux/node/` is rewritten by `fux setup` whenever the engine version
+differs, so the reader in a repo is always the one that wrote the index. The
+npm copy is where the policy binds, because there a consumer picks versions.
+
+**3. Node NEVER fetches.** Not "does not by default" — there is no transport in
+`node/`, no fetcher seam, and nothing to inject one through.
+
+- `file:` reads the working tree. **Reading your own checkout is not a fetch.**
+- `url:` reads `.fux/acquired/` if the blob was retained, else the answer falls
+  back to `source: "index"`.
+
+**4. …so the `url:` verdict set is ASYMMETRIC with Python's, deliberately.**
+
+| verdict | Python | Node | why |
+|---|---|---|---|
+| `current` / `stale` | `file:` and `url:` | **`file:` only** | Node cannot look at a URL |
+| `as-ingested` | yes | yes | the acquired blob is local |
+| `unverified` | yes | yes | *we did not look* |
+| `cached` | yes | **never** | a TTL fetch cache requires fetching |
+
+🔴 **This is a decision and not a gap.** The alternative — Node reporting
+`current` for a URL it never checked — would make the claim-strength vocabulary
+mean different things in two runtimes, which is the one thing
+[SR-URL-FRESHNESS](0147_url-freshness.md) exists to prevent.
+
+**5. The MCP tool DESCRIPTIONS live in one file both runtimes read.**
+`node/mcp-tools.json`, read by `src/fux/mcp.py` and `node/src/verbs/mcp.mjs`.
+
+A description is what an agent reads to decide whether to call a tool. Two
+hand-maintained copies would drift into **two different products wearing one
+name**, and the drift would be invisible: both would work, and they would
+advise differently. `{{TOP}}` is the only substitution, filled with the
+connection's resolved `[mcp] top`.
+
+**6. `node/` is many files, one per Python module, at the same relative path.**
+Superseding `search-v3.md` §6.4's *one ESM file*. Phase 4's freshness test maps
+each Python module to its Node twin, which needs more than one file, and a
+6 000-line `.mjs` is unreviewable.
+
+⚠ **This decision governs what is AUTHORED, and since 2026-09-12 that is no
+longer the same thing as what SHIPS** — see decision 13. `node/` stays many
+files and `tests/test_node_twins.py` is unchanged; the consumer receives one
+bundled artefact. The rule stands; its reach narrowed.
+
+✅ **That test landed 2026-09-12: `tests/test_node_twins.py`.** The map is
+derived three ways in order — the path rule (`x/y.mjs` → `src/fux/x/y.py`, or
+`_y.py` for a private module), else a `src/fux/….py` path the module names in
+its own header, else the two-entry exemption set. **It also fails when a Python
+twin changes in the working tree and its `.mjs` does not** — which the
+differential arm structurally cannot catch, because a Node module nobody
+updated still agrees with itself and only disagrees with Python on a corpus
+that exercises the changed branch.
+
+**The exemption list is short and visible, and that is the point** — it is
+exactly where the divergence risk concentrates:
+
+| Node file | why it has no twin |
+|---|---|
+| `src/hash/blake2b.mjs` | Python uses `hashlib`; `node:crypto` cannot do arbitrary digest sizes |
+| `src/compat/pyfloat.mjs` | Python float semantics JS does not share — see decision 7 |
+| `src/config/toml.mjs` | Python has `tomllib`; Node has no TOML |
+| `src/verbs/*.mjs` | one-to-many against `query/__init__.py`, recorded here |
+
+**7. Three Python semantics are reimplemented, and each is a correctness fix.**
+
+- **`round(x, 9)` is half-EVEN on the exact binary value.**
+  `Number(x.toFixed(9))` is half-UP and fails exactly on ties — and a tie
+  resolved the other way is a different ORDER.
+- **`repr(float)` switches to an exponent at `e < -4 or e >= 16`;** JS at
+  `-6 / 21`. Both are shortest-round-trip, so only the layout differs.
+- 🔴 **Python compares strings by CODE POINT; JS `<` compares by UTF-16 code
+  UNIT.** A surrogate pair sorts BELOW U+E000–U+FFFF in JS and ABOVE it in
+  Python. The sort key ends in `id`, so **one document id containing an emoji
+  or a rare CJK extension character orders differently in the two runtimes** —
+  measured 2026-09-12: **30 of 324 ordered pairs disagree.** Every comparison
+  on a doc id goes through `cmpCodePoints`.
+
+**8. ✅ Node reads `.fux/tune.toml` and `.fux/output.toml`. CLOSED 2026-09-12.**
+
+This decision was filed as a **gap, not a decision**: Node read neither file,
+so a consumer who ran `fux tune` got **a different ranked list from the same
+index at the same engine version**, with nothing saying so. `fux-engine` is on
+npm and `fux setup` vendors the reader into every consumer's `.fux/`, so the
+blast radius was every repository that had ever been tuned. Decision 2's
+`_format` refusal did not reach it: the versions agreed and the answer still
+differed.
+
+**Measured before and after**, on fux's own repo, whose tune sets
+`rerank_weight = 0.3`
+([`2026-09-12-node-tune-and-surfaces`](../work/regression/2026-09-12-node-tune-and-surfaces/report.md)):
+
+| | before | after |
+|---|---|---|
+| contract arm (tune applied) | **90 of 174 discordant** | **0 of 199** |
+| transcription arm (`--no-tune` both sides) | 0 of 174 | **0 of 199** |
+
+**What closed it, and where each piece went:**
+
+| file | what it is |
+|---|---|
+| `node/src/config/toml.mjs` | the TOML subset. **No Python twin — CPython's `tomllib` is the twin**, and it is stdlib, which is why this exists at all |
+| `node/src/config/tune.mjs` | the reader half of `tune.py`: the defaults, the closed key set, the validators and the error COLLECTION. Not the writer half — Node never writes this file |
+| `node/src/config/output.mjs` | `output_config.py`'s precedence chain and both closed key sets |
+| `node/src/query/rerank.mjs` | the proximity reranker, which reads document content and so lands with the refer plane |
+| `node/src/ingest/{sourcelist,gitdir}.mjs` | the `archived=true` declaration, read live from `.fux/sources/dirs` rather than trusted to the record's stamped property |
+| `node/src/query/run.mjs` | where they all enter — `find`, `ask`, `answer`, `graph` and the library export are projections of it |
+
+🔴 **The integer/float distinction is carried, and it is not pedantry.**
+`tune.py::_at_least` refuses `[graph] iterations = 3.0` and accepts `3`; JS has
+one number type. `config/toml.mjs` records, per table, which keys were written
+as TOML **floats**. Without it Node would silently load a file Python refuses —
+a divergence in which repositories *work*, which is worse than a divergence in
+what they mean and far harder to notice.
+
+⚠ **What the differential arm could never have caught here**, and why the
+closing change ships equality tests instead
+(`tests/test_node_config_parity.py`): a drifted key set only shows on a corpus
+whose tune actually sets the drifted key, and **every golden rung's tune is
+all-defaults**. A drifted *refusal* never shows at all — a repository one
+reader refuses and the other accepts produces an error on one side and an
+answer on the other, which the harness reports as a crash rather than a finding.
+
+⚠ **`--no-tune` is a two-runtime flag now, or it is not the switch it claims to
+be.** [SR-TUNE](0135_tuning.md) decision 11 calls it the *"is it me or the
+config?"* switch; a flag that exists in one reader can only ask the question of
+that reader. `node/fux.mjs` parses it and `tools/differential/node_arm.py`
+passes it **to both sides or to neither** — flipping only Python's would compare
+a tuned reader against an untuned one and file `.fux/tune.toml` as a
+transcription defect.
+
+**9. The graph lane is ASYMMETRIC: Python requires `fux build`, Node does not.**
+Found 2026-09-12.
+
+`graph/plane.py::load` reads the derived `.fux/runtime/graph.json` and
+**refuses** when it is absent or stale. Node rebuilds the same plane in memory
+from the committed records and answers either way.
+
+**Node's behaviour is the right one for its audience and is kept.** The reader
+exists for a clone with no Python; `.fux/runtime/` is gitignored and is written
+by `fux build`, which is Python — so requiring it would make the Node reader
+refuse precisely where it is the only reader present.
+
+⚠ **It follows that `explain`, `graph` and `path` cannot be compared on a
+corpus with no fresh build**, and the harness says so out loud rather than
+skipping quietly (`node_arm.py::graph_lane_ready`). A lane that silently does
+not run is how `find` went a month without its tune file.
+
+**10. `ranked_by` names the candidate path, and the two runtimes differ there —
+which is honest, not a defect.**
+
+`mcp.py::_search` passes `force_scan=False` and reports `"accelerator"` when a
+fresh build exists. Node has no accelerator and reports `"scan"`. The
+differential law asserts the two paths return **the same documents in the same
+order**, so the label is the only difference, and each side's label is true of
+itself. The differential arm excludes this key **by name** — never by a
+loosened comparison.
+
+**11. 🔴 Node does not refer a document it cannot DECODE. It declines.**
+Found 2026-09-12.
+
+Python's refer plane runs a cited document's bytes back through the decoder
+plane before chunking, so a `.csv` is re-scored as the Markdown table ingest
+indexed. Node has no decoders and was chunking the **raw bytes** — producing
+`path:L20-L28` locators that point at real lines of a file whose text the index
+never contained. Caught by comparing the two library surfaces on this repo:
+`answer("rollback")` returned a different document, a different passage and a
+different locator in each runtime.
+
+**Porting the decoders is not the fix and never will be.** A consumer decoder
+is arbitrary Python in `.fux/decoders/` ([SR-DECODE](0139_decode.md)'s whole
+boundary) and there is no Node twin of a file the consumer wrote in another
+language; nor can `xlsx`, `pdf` or `docx` be transcribed safely, because a
+near-miss there produces *plausible* text.
+
+**So Node declines, in the shape decision 3 already uses for the network.** A
+document whose type goes through a decoder is skipped by `answer`, exactly as
+an unreachable `url:` is, and the verb falls back rather than citing something
+it cannot reproduce.
+
+⚠ **The question is asked the right way round.** Not *"does a decoder claim
+this extension?"* — which would need the built-in registry, every
+`.fux/decoders/*.py` and their precedence, all mirrored in JS and all able to
+drift — but *"is this document ALREADY TEXT?"*, which `.fux/formats.toml`'s
+`include` list answers in committed bytes both runtimes read. A bound extension
+is never repeated in `include` ([SR-TYPES](0128_types-list.md) decision 12), so
+the two sets do not overlap and the complement is exact. **Under-claiming is the
+only safe direction**: a document wrongly treated as plain text is a wrong
+citation, one wrongly skipped is an answer from the next candidate.
+
+**The arm asserts the invariant, not equality.** Once Python refers a decoded
+document Node skipped, the two rescore over different passage populations —
+`df` is computed across the candidate set — so every score downstream
+legitimately differs, and comparing there would be meaningless rather than
+merely weak. What is checked on **every** answer is that nothing Node cites is
+a decoded document.
+
+**12. The MCP handlers read the argument names the SCHEMA advertises.**
+Found 2026-09-12, in a package already on npm.
+
+`node/mcp-tools.json` declares `path` for `fux_passage` and `fux_related`;
+Node's handlers read `args.id`. Every conformant client therefore got an empty
+answer **from a server reporting success**. `fux_search` additionally returned
+five of the nine keys Python returns, and none of `ranked_by`, `confidence` or
+`next` — so the one key [SR-CONFIDENCE](0141_confidence.md) exists for was
+absent from the surface it exists to serve.
+
+Nothing could have caught this except comparing the two servers: each was
+internally consistent, and the shared descriptions file held only the
+descriptions, not the handlers. `node_arm.py::compare_mcp` now drives both over
+one stdio session per run.
+
+**13. 🔴 The consumer gets NO SOURCE. `.fux/node/` carries a published
+artefact, never a copy of `node/`.** RULED by Arpit 2026-09-12 and **BUILT the
+same day** (W-149, closed).
+
+> *"`src` is not needed for the consumer. It should just be the bundled code
+> which needs to be executed on the system."*
+
+Two shapes, both shipping, consuming the same published artefact:
+
+| | `.fux/node/` holds | offline | how it runs |
+|---|---|---|---|
+| **A**, the default | `package.json` · the bundled `fux.mjs` · `mcp-tools.json` · `README.md` | **yes** | the `.fux/fux` shim — decision 16 |
+| **C**, a monorepo | `package.json` only, declaring `fux-engine@<version>` | after install | the shim, which resolves the installed bin |
+
+**What shipped.** `fuxdir._packaged_node_files` returns the four-file payload;
+`ensure_node_reader(root, shape=...)` writes the declared shape and
+`_prune_node_reader` deletes everything else under `.fux/node/`, **`node_modules/`
+excepted** — that directory holds shape C's installed reader, and deleting it
+would leave a manifest pointing at nothing. **The shape is read back OFF the
+directory** (`node_shape`: shape C's manifest declares a `fux-engine`
+dependency and shape A's never does), so there is no fifth config file and a
+consumer who switches by hand gets the shape they actually created.
+
+**What it replaces:** `_packaged_node_files` walked the whole packaged tree, so
+`fux setup` wrote **47 files, 223 KB, 5 484 lines** into a consumer's git, and
+`ensure_node_reader` **pruned nothing** — every version bump re-diffed all of
+them. The consequence block below recorded the growth and asked no question of
+it; this is the answer.
+
+⚠ **The prune is part of the decision, not a follow-up.** Without it, every
+repository that ever ran `fux setup` keeps its 37-47 stale files for good.
+
+🔴 **And the VERSION is not a sufficient trigger for it — found by running the
+migration on fux's own repository, not by reading the code.**
+`ensure_node_reader` rewrote on a version difference, so a `.fux/node/` written
+by *this* version before the payload changed shape kept its 44 modules: the
+version matched, nothing was rewritten, and the prune never ran. A consumer
+upgrading across a release is covered; **anyone tracking one alpha from git is
+not, and fux itself was not.** So the trigger is version **or shape or LAYOUT** —
+`_layout_is_stale` compares the file-name set against the shape's declared one,
+which is cheap enough for the head of every ingest because it builds nothing.
+✅
+It ships with the rest, and `tests/test_setup_node.py` asserts both halves — the
+tree goes and `node_modules/` stays. **The test that used to assert the opposite**
+(*"writes the whole tree, not just the entry point"*, naming
+`src/query/bm25f.mjs` by hand) **is the same file, rewritten**, which is the only
+honest way to record that a decision reversed.
+
+**14. 🔴 The bundle is built when fux PUBLISHES, and ships inside BOTH
+distributions.** RULED by Arpit 2026-09-12 and **BUILT the same day**.
+
+> *"It should be bundled and then published in Python as well as in the npm
+> package."* — *"It shouldn't be bundled at the consumer end."*
+
+- **One build, two registries.** The bundle exists before either job in
+  [`publish.yml`](../.github/workflows/publish.yml) runs, off the single
+  `release: published` trigger. ⚠ The halves are not symmetric — PyPI is
+  automatic via OIDC, npm **stages and waits for a human** — so a bundle built
+  per-job could ship two registries disagreeing.
+- ✅ **This is why *"no build step — a build step is a dependency"* survives.**
+  The line narrows to **the consumer's end**, which is the end it was ever
+  about. Fux's release has a bundler; nobody running `fux setup` does.
+- **The bundler is fux's own, zero-dependency, and deterministic** — same
+  sources, byte-identical bundle. [L1](0003_LAW-1-zero-cost.md) would permit a
+  third-party one; nothing needs it. ⚠ **Determinism here is a promise adopted
+  voluntarily, not [L3](0005_LAW-3-deterministic.md) reaching a build
+  artefact** — L3 binds the index. Stated so nobody later cites the wrong
+  authority for it.
+  ✅ **What it is:** [`src/fux/store/nodebundle.py`](../src/fux/store/nodebundle.py),
+  ~300 lines of stdlib. Each source module becomes an **IIFE returning its
+  exports**, emitted in topological order with a path tie-break; `node:` imports
+  are hoisted and deduplicated; the entry's shebang moves to line 1.
+  🔴 **It is not a parser, and it REFUSES rather than skipping.** A flat
+  concatenation would have to rename — `signals`, `isArchivedLoc`, `STOPWORDS`,
+  `DEPTH` and `K` are each exported by two different modules — and a renaming
+  bundler without a real JS parser is a silent-wrong-answer machine. So every
+  form the tree does not use (`export default`, `export … from`, a bare package
+  import, a cycle, a builtin name bound two ways) raises `FuxError` **with the
+  offending line in it**. A dropped statement compiles and answers differently,
+  which is the one failure mode a build step may never have.
+  ✅ **And the test is on ANSWERS, not bytes** (`tests/test_node_bundle.py`):
+  the bundle and the module tree are run through `find`, `ask`, `answer`,
+  `--version` and a real MCP session and must agree exactly. Byte-identity
+  across builds is asserted too, but it is the weaker claim.
+- 🔴 **A checkout has no bundle, and must not quietly fall back to the module
+  tree.** `_node_source()` resolves `node/` beside `src/` when the wheel's
+  template is absent; there, `fux setup` **builds the bundle or refuses with a
+  message saying so.** Silently vendoring `node/src/**` in development and the
+  bundle in release is two products wearing one version.
+  ✅ **Built both ways round.** In a checkout `_packaged_node_files` calls the
+  bundler; in a release install it copies the payload — and if that payload ever
+  contains a `src/` file it **refuses**, naming L10, rather than writing fux's
+  source into a repository.
+  ✅ **The wheel gets it from a hatchling build HOOK**
+  ([`hatch_build.py`](../hatch_build.py)), not a static `force-include`: a
+  generated file cannot be named in an include list without somebody having
+  remembered to generate it first. `pyproject.toml` no longer mentions
+  `node/src` at all, which is this record's own veto check.
+- **The npm package's own shape changes with it** — `exports` leaves
+  `./src/index.mjs`, `files` drops `"src"`. A published-surface change, so it
+  lands in the next alpha rather than being back-fitted to `2.0.0-alpha.7`.
+  ✅ **Both now name `fux.mjs`, and one file therefore carries two surfaces.**
+  `node/fux.mjs` re-exports `open` and `Index` from `src/index.mjs` and runs
+  `main()` **only when it is the program** — the standard ESM entry check,
+  through `realpath` so a package manager's `.bin` symlink resolves to the same
+  file. 🔴 **Unconditional invocation was safe while the library lived in a
+  separate file and became a bug the moment one bundle served both**: `import
+  "fux-engine"` would have parsed the caller's `process.argv` and set their exit
+  code. Asserted directly, because nothing else would notice.
+  ✅ **`mcp-tools.json` is now RESOLVED rather than addressed.** It sits two
+  directories above `src/verbs/mcp.mjs` in this repo and beside the bundle in a
+  consumer's, so a constant path works in one shape and throws `ENOENT` in the
+  other — and the other is the one people run.
+  ✅ **`publish.yml` builds it ONCE**, in the `build` job before either
+  registry job exists, uploads it as an artifact, and stages npm from
+  `node/dist` rather than from `node/`. `scripts/check-version-parity.py
+  --with-bundle` asserts the built bundle's header and `VERSION` against
+  `src/fux/__init__.py` — the bundle is a **derivation**, so what is checked is
+  the derivation and not a fifth hand-written site.
+
+**15. 🔴 A monorepo is AUTO-DETECTED and wired up — and the dot path is
+MEASURED to work.** RULED by Arpit 2026-09-12 (*"Auto detect. Auto detect and
+set it up as well."*) and **BUILT the same day**. Grounded in
+[`2026-09-12-workspace-dotpath-probe`](../work/regression/2026-09-12-workspace-dotpath-probe/report.md)
+and [`2026-09-12-yarn-berry-probe`](../work/regression/2026-09-12-yarn-berry-probe/report.md).
+
+Detected in this order, first hit wins — `setup.py::detect_workspace`:
+
+| signal | shape |
+|---|---|
+| Yarn Berry (`.yarnrc.yml`, or `packageManager: yarn@≥2`) with `nodeLinker` **unset or `pnp`** | **A** — no `node_modules` exists to resolve from |
+| Yarn Berry with `nodeLinker: node-modules` | **C**, yarn — the bin hoists to the root, MEASURED |
+| `workspaces` declared as an **object** (`{packages: […]}`) | **A** — an array splicer cannot extend an object |
+| `pnpm-workspace.yaml` with `packages:` | **C**, pnpm |
+| root `package.json` `workspaces` array | **C**, npm / yarn 1 / bun |
+| none of the above | **A** |
+
+Then `.fux/node` is added to that manifest's workspace list and
+`.fux/node/package.json` declares `fux-engine@<version>`.
+
+🔴 **THE ORDER ABOVE IS NOT THE ORDER THIS DECISION FIRST CARRIED, AND THE
+FIRST ONE WAS WRONG.** It read *"`workspaces` array → C"* **above** *"Berry →
+A"*, and a Berry repository declares `workspaces` in `package.json` exactly as
+npm does — so a literal first-hit reading gave every Berry repo shape C,
+including the PnP ones this decision's own warning said must not have it. **The
+record contradicted itself inside one file, which is the W-83 class of failure
+and no mechanical check here can see it** (`CLAUDE.md` §Law zero). Corrected in
+the change that built it: the Berry test runs **first**, and
+`tests/test_setup_workspace.py` pins the order.
+
+✅ **The probe settles the question this was gated on, and refutes the hazard as
+it was written.** *"Several package managers' glob handling skips
+dot-directories"* was **wrong**: npm, pnpm, yarn 1 and bun all accept
+`.fux/node` as a workspace project when it is declared — pnpm says so itself
+(`Scope: all 3 workspace projects` against `all 2` on the control).
+
+🔴 **And the control is what makes the wiring load-bearing:** a root manifest
+declaring only `packages/*` picks `.fux/node` up in **none** of the four. An
+existing monorepo does not acquire the reader by having workspaces. *"Set it up
+as well"* is the decision, not a courtesy.
+
+⚠ **Why detection does not conflict with *declared, never detected*.**
+[SR-FETCHER](0117_fetcher.md) decision 5, and W-86 fork E's refusal of decoder
+auto-detection, both govern **ingest** — where detection would make **the
+index** a function of the environment, which is what
+[L3](0005_LAW-3-deterministic.md) forbids. **`fux setup`'s scaffolding is not
+the index.** Neither precedent reaches it and no law does; W-149 proposed
+*declared* on that mistaken reading and records the correction.
+
+Four constraints the decision carries:
+
+1. ⚠ **The manifest edit belongs to `setup` ALONE.** `ensure_node_reader` runs
+   at the head of **every ingest** via `ensure_layout`
+   ([SR-DOTFUX](0102_fux-directory.md)), whose own rule is that a no-op ingest
+   produces a no-op diff. An ingest that rewrites the consumer's
+   `package.json` breaks it.
+   ✅ **Enforced by STRUCTURE, not by a comment asking nobody to call it**:
+   `detect_workspace` and `wire_workspace` live in `setup.py`, and
+   `ensure_layout` takes the answer as a keyword (`node_shape=`) it never
+   computes. `test_an_ingest_never_edits_the_consumers_manifest` asserts it
+   where it could actually be violated.
+2. **The edit is format-preserving** — existing indent, key order and trailing
+   newline kept. This is fux's **first write to a file it does not own and a
+   team reviews**; `fux hooks` writes `.git/`, which is machinery. A one-line
+   addition arriving as a whole-file reformat is a bad diff in someone's PR.
+   ✅ **A splice, never a re-serialize.** One array editor handles the JSON
+   key (`"workspaces":`) and pnpm's bare one (`packages:`), plus the YAML block
+   sequence, copying the last element's own indentation and quoting style.
+   Asserted on 2-space, 4-space, tab, single-line and empty arrays.
+3. **Idempotent, and it says what it touched.** Re-running `setup` never adds
+   the entry twice, and the run names the manifest it edited.
+   ✅ `fux setup` prints `monorepo detected: declared .fux/node in <manifest>`
+   and the install command for the manager whose lockfile is actually present.
+4. **Half-configured is not a state.** A monorepo detected but not safely
+   editable — comments in the JSON, an unknown shape, a read-only file — gets
+   **shape A**, and `fux doctor` says why. A workspace stub with nothing
+   resolving it is worse than no workspace.
+   ✅ Every refusal path carries its reason to the consumer's terminal, and
+   ⚠ **a manifest fux cannot PARSE but which names `workspaces` still counts as
+   a monorepo** — returning "no monorepo" there would write shape A with nothing
+   said about it. `doctor`'s `node reader` row additionally fails when a shape-C
+   manifest is declared and no `node_modules/.bin/fux` resolves anywhere the
+   shim would look, which is the half-configured state observed rather than
+   assumed away.
+
+✅ **Yarn Berry is MEASURED now, and the second probe this decision owed is
+filed** ([`2026-09-12-yarn-berry-probe`](../work/regression/2026-09-12-yarn-berry-probe/report.md),
+Yarn 4.1.0). Two findings:
+
+- **`.fux/node` links in Berry too**, in both linkers — `yarn workspaces list`
+  names it. The dot path is now fine in **five of five** managers, and W-149's
+  hazard 3 is wrong in every one of them.
+- 🔴 **The boundary is the LINKER, not the manager.** `nodeLinker:
+  node-modules` hoists `fux` to the workspace **root** — rung 3, exactly where
+  npm and yarn 1 put it — so shape C works unmodified. **PnP has no
+  `node_modules` anywhere**, by design, so neither install rung resolves and
+  shape A is required. ⚠ **Berry's default IS PnP**, so an unset key is read as
+  PnP: guessing the other way would wire a workspace whose reader nothing can
+  resolve, which is constraint 4's state in a new costume. `corepack yarn fux`
+  is not a fallback either — under PnP a binary is reached through Yarn's own
+  resolver, which a three-line `/bin/sh` shim cannot consult.
+
+**16. 🔴 `.fux/fux` RESOLVES the binary in three rungs; it no longer assumes a
+path.** RULED 2026-09-12 and **BUILT the same day**. Measured, same probe.
+
+| manager | root `node_modules/.bin/fux` | `.fux/node/node_modules/.bin/fux` |
+|---|---|---|
+| npm | present | absent |
+| yarn 1 | present | present |
+| pnpm | **absent** | present |
+| bun | **absent** | present |
+
+npm and yarn hoist the bin to the workspace root; **pnpm and bun do not.** So
+the shim tries, in order:
+
+1. `node .fux/node/fux.mjs` — shape A's vendored bundle
+2. `.fux/node/node_modules/.bin/fux` — pnpm, bun, yarn
+3. `node_modules/.bin/fux`, walking up to the workspace root — npm, yarn
+
+**The shim is therefore the one entry point correct in every shape, and the one
+a README may name.** Documenting `node_modules/.bin/fux` would be right for half
+the ecosystem and silently wrong for the other half. ✅ SR-DOTFUX's `fux` row
+is amended with it, and both READMEs name the shim and nothing else.
+
+✅ **Yarn Berry adds a row and changes no rung** — `node-modules` resolves at
+rung 3, PnP at none, which is why PnP takes shape A and rung 1. The shim's
+failure message says so, and names the one-line `.yarnrc.yml` change that would
+make shape C available.
+
+### Consequences
+
+- **`fux` names two binaries when both are installed globally.** `--version`
+  reports the runtime (`fux 2.0.0-alpha.7 (node 22.9.0)`), an unsupported verb
+  signposts the other, and `fux doctor` reports a node `fux` earlier on PATH.
+  ⚠ **Amended 2026-09-12 (Arpit): the global bin SHIPS.** This clause read
+  *"No global bin ships in the first npm release"* and `fux-engine`
+  **2.0.0-alpha.7 was published to npm on 2026-09-12 carrying
+  `bin: {"fux": "./fux.mjs"}`** — so the rule was already false when it was
+  read. Arpit ruled the bin stays rather than burning a version to remove it.
+  ✅ **All three mitigations now ship.** The clause was holding up the
+  `fux doctor` PATH row, deferred *because* nothing was going to shadow
+  Python's `fux`; that premise died with the clause and the row **landed the
+  same day** — `doctor._fux_on_path`, a `warn` that names the resolved path and
+  points at `fux --version`. It **reads the shim's shebang and never executes
+  it**: doctor does not run a binary the environment chose for it. Registered
+  in [SR-DOCTOR](0152_doctor.md) §2.
+- ✅ **The 47-file vendored tree is GONE as of 2026-09-12 — decisions 13-16
+  replaced it and W-149 built them.** The paragraph below is kept as the
+  measurement that produced the ruling rather than rewritten; **it describes
+  what shipped until that day and is not a description of the current state.**
+  What a consumer's tree holds now is **four files, 244 KB** in shape A
+  (`fux.mjs` · `package.json` · `mcp-tools.json` · `README.md`) or **one** in
+  shape C, and `fux setup` **prunes** whatever an older engine left behind.
+- - **The vendored reader is 47 files / 336 KB** as of 2026-09-12, against the
+  37 files / 196 KB W-107 measured before the config readers and the graph
+  walk landed. ⚠ **Still ~3 % of this repo's 9.6 MB index and still smaller
+  than `.fux/decoders/`**, so R2's argument survives its own numbers — but a
+  consumer's `git status` now shows 47 new files after `fux setup`, and every
+  version bump re-diffs them. `_packaged_node_files` walks the directory, so
+  nothing had to be updated for the new modules to ship; **that is also why
+  nobody would have noticed the growth.**
+- **A second implementation is a second thing to keep true.** The arm runs on
+  every push, across three OSes and two Node versions, because the whole reason
+  this record exists is that two libms disagree.
+- ✅ **The sixth surface is BUILT: the BUNDLE.** `node_arm.py --bundle-cap`
+  builds the published artefact and compares it against the module tree it came
+  from — `find`, `ask`, `answer`, the MCP server over a real stdio session, and
+  the library export, on whole parsed payloads. **0 discordant on this repo's
+  own index.** It closes decisions 9-12's own lesson applied to itself: *a
+  transcription is only as true as the surface the instrument is aimed at*, and
+  shipping one artefact while measuring another was that failure in a new
+  costume. ⚠ **Determinism is the weaker claim and is not the one that matters
+  here**: a bundler can emit bytes that are reproducible, compile, run, and
+  answer differently. The arm and `tests/test_node_bundle.py` both compare
+  ANSWERS.
+- **The arm covers six surfaces since 2026-09-12, and it covered one before.**
+  `find` and `ask` · `explain`/`graph`/`path` as whole parsed payloads ·
+  the MCP server over a real stdio session · `fux.api` against
+  `node/src/index.mjs` · **the published bundle against the module tree**.
+  Every one of the three defects in decisions 9-12 lived
+  on a surface the arm did not reach, and each was found on the first run after
+  it did. ⚠ **`verify`, `--why`, `--receipt` and `--journal` are still
+  uncovered**, because they have no Node twin at all (W-107 R6) — that is a
+  stated absence, not a gap the arm should pretend to close.
+- ⚠ **The arm cannot be called green yet.** PRE-REGISTRATION-NODE §4 names
+  `fux-playground`, which [SR-WORK-ENVIRONMENTS](0052_WORK-environments.md) voided as an
+  instrument. A frozen pre-registration is superseded, never edited; the build
+  is unaffected and no measured arm may be reported until the superseding
+  document exists on lab golden data.
+
+### Alternatives
+
+- **One portable `log` in both runtimes** (byte-identity, one Python change) —
+  declined by Arpit 2026-09-06. It bought bit-identity at the price of a
+  corpus-wide ranking change, to fix a difference seven orders of magnitude
+  below the sort key.
+- **Truncating `blake2b512`** — wrong, not merely slower: the parameter block
+  folds the digest length into `h[0]`, so `blake2b(x, 8)` and
+  `blake2b(x, 64)[:8]` disagree on every input.
+- **A WASM build of the Python scorer** — one implementation and no
+  transcription, at the price of a build step, a toolchain and a binary in the
+  repo. A build step is a dependency (L1), and the differential law is what
+  makes two implementations safe.
+
+## References
+
+- [`2026-09-12-node-tune-and-surfaces`](../work/regression/2026-09-12-node-tune-and-surfaces/report.md)
+  — decisions 8-12, measured · [`2026-09-12-node-arm-rungs`](../work/regression/2026-09-12-node-arm-rungs/report.md)
+  — the ladder run that found decision 8
+- [PRE-REGISTRATION-NODE-2](../work/benchmark/PRE-REGISTRATION-NODE-2.md) (frozen,
+  sha `2ea40303…`) · [PRE-REGISTRATION-NODE](../work/benchmark/PRE-REGISTRATION-NODE.md)
+  (frozen, superseded)
+- [`2026-09-12-workspace-dotpath-probe`](../work/regression/2026-09-12-workspace-dotpath-probe/report.md)
+  — decisions 15 and 16, measured across npm / pnpm / yarn 1 / bun. **A surface
+  capture**, so no classification and no per-query rows; Yarn Berry is named as
+  unmeasured in its §4
+- [`src/fux/store/nodebundle.py`](../src/fux/store/nodebundle.py) — the
+  bundler · [`hatch_build.py`](../hatch_build.py) — the wheel's build hook ·
+  [`tests/test_node_bundle.py`](../tests/test_node_bundle.py) — equal
+  ANSWERS, not equal bytes · [`tests/test_setup_workspace.py`](../tests/test_setup_workspace.py)
+  — the detection table and the manifest diff
+- [`2026-09-12-yarn-berry-probe`](../work/regression/2026-09-12-yarn-berry-probe/report.md)
+  — decision 15's second probe: Berry links `.fux/node`, and `nodeLinker`
+  decides the shape. **A surface capture**, so no classification and no
+  per-query rows
+- **W-149 is CLOSED** (2026-09-12) — decisions 13-16's build item. Its outcome
+  is in [`work/IMPLEMENTATION.md`](../work/IMPLEMENTATION.md); the item file
+  is deleted, per OPEN-WORK rule 2, and is **named, never cited** ·
+  [W-148](../work/open/W-148-what-the-two-readers-still-owe.md) — what W-107
+  could not close. ⚠ **W-107 itself is retired and is NAMED, never cited**
+  (`CLAUDE.md` §"Archive is not evidence")
+- npm workspaces <https://docs.npmjs.com/cli/using-npm/workspaces> · pnpm
+  workspaces <https://pnpm.io/workspaces> · Yarn workspaces
+  <https://yarnpkg.com/features/workspaces> · Bun workspaces
+  <https://bun.com/docs/install/workspaces>
+- [SR-RANKING](0111_ranking.md) decision 8a · [SR-DOTFUX](0102_fux-directory.md) · [SR-MCP](0136_mcp.md) · [SR-URL-FRESHNESS](0147_url-freshness.md)
+- RFC 7693 (BLAKE2) <https://www.rfc-editor.org/rfc/rfc7693>
+- UAX #29, text segmentation <http://www.unicode.org/reports/tr29/>
+- Cormack, Clarke & Buettcher, *Reciprocal rank fusion*, SIGIR 2009

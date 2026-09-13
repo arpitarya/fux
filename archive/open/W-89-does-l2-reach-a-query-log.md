@@ -22,7 +22,7 @@ timestamp: 2026-08-27T00:00:00Z
 > **Why shape 2 and not shape 3** (leave it a product decision, which is what
 > Arpit's first instinct — *"the log is built, and it's in gitignored files, so
 > it's okay"* — amounts to): the guard would have been one decision inside
-> [ADR-QUALITY](../../docs/adr/0044_quality-contract.md), and an ADR is designed
+> [ADR-QUALITY](../../docs/adr/0056_WORK-quality.md), and an ADR is designed
 > to be superseded. Two facts made that too thin — a durable use record
 > **already exists** in [`maintain/lastcited.py`](../../src/fux/maintain/lastcited.py),
 > and [`ranking-tuning.md`](../proposals/ranking-tuning.md) §8 calls a per-repo
@@ -50,7 +50,7 @@ the reasoning that produced the call is worth keeping.*
 catchable by any test.
 
 **Filed 2026-08-27**, split out of [W-87](W-87-what-good-means.md) fork 6 in the
-change that ruled it. [ADR-QUALITY](../../docs/adr/0044_quality-contract.md)
+change that ruled it. [ADR-QUALITY](../../docs/adr/0056_WORK-quality.md)
 decision 11 declines a query log **and explicitly declines to settle this**.
 
 ## The question
@@ -96,12 +96,12 @@ not reach one"* is a change to the constitution and belongs in
       [ADR-LAWS](../../docs/adr/0001_laws.md)'s table edited in the **same
       commit** — CLAUDE.md is the only normative home and no record may restate
       a law.
-- [ ] [ADR-QUALITY](../../docs/adr/0044_quality-contract.md) decision 11's
+- [ ] [ADR-QUALITY](../../docs/adr/0056_WORK-quality.md) decision 11's
       pointer updated to name the answer instead of the open question.
 
 ## References
 
-- [ADR-QUALITY](../../docs/adr/0044_quality-contract.md) — decision 11, which
+- [ADR-QUALITY](../../docs/adr/0056_WORK-quality.md) — decision 11, which
   declines to settle this
 - [ADR-LAWS](../../docs/adr/0001_laws.md) — where an answer would land
 - [`work/compare/what-good-means.compare.md`](../compare/what-good-means.compare.md)

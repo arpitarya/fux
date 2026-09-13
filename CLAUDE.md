@@ -15,34 +15,34 @@ This file is binding. Read it, then
 [`work/INTERVIEW.md`](work/INTERVIEW.md) (start at the reset block), before
 your first substantive change.
 
-## Law zero — the ADRs are always up to date
+## Law zero — the SRs are always up to date
 
-**Arpit, 2026-08-18, emphatic and standing: *always* make sure the ADRs are up
+**Arpit, 2026-08-18, emphatic and standing: *always* make sure the SRs are up
 to date.** Not at the end of the milestone, not when someone asks — in the
 change that makes them wrong.
 
 Three things follow, and none of them is optional:
 
-1. **No behaviour change lands without its ADR updated in the same change.**
+1. **No behaviour change lands without its SR updated in the same change.**
    Same commit, not the next one.
 2. **If a change genuinely touches no recorded decision, say so out loud** —
-   `no ADR affected`, in the commit message. That is a claim under your name in
+   `no SR affected`, in the commit message. That is a claim under your name in
    git history, which is the point. Silence is not an answer.
 3. **Before you finish a session, re-read the records you touched code under.**
    A record that describes behaviour the code no longer has is worse than no
    record: it reads as authority.
 
-**This is enforced, not trusted.** `tests/test_adr_freshness.py` runs in CI on
+**This is enforced, not trusted.** `tests/test_sr_freshness.py` runs in CI on
 every push (with `fetch-depth: 0`, so the runner can see the history it
-audits) and fails a commit that changed an ADR-owned component without
+audits) and fails a commit that changed an SR-owned component without
 touching that component's **owning** record specifically — touching some
-other record does not satisfy it. `scripts/adr-guard.sh` is the same check as
+other record does not satisfy it. `scripts/sr-guard.sh` is the same check as
 a `commit-msg` hook (not `pre-commit`: it has to read the commit message to
-honor the `no ADR affected` escape hatch, and `pre-commit` runs before that
+honor the `no SR affected` escape hatch, and `pre-commit` runs before that
 message exists) — install it once:
 
 ```bash
-ln -sf ../../scripts/adr-guard.sh .git/hooks/commit-msg
+ln -sf ../../scripts/sr-guard.sh .git/hooks/commit-msg
 ```
 
 **Why it is enforced.** Replayed over the 25 commits before the check existed,
@@ -50,7 +50,7 @@ ln -sf ../../scripts/adr-guard.sh .git/hooks/commit-msg
 was already in this file the whole time. That is the measured case for a check.
 
 ⚠ **What the check does NOT prove, and nothing else does either.**
-`tests/test_adr_freshness.py` proves an owning record was **touched** in the
+`tests/test_sr_freshness.py` proves an owning record was **touched** in the
 change. **It never reads the record.** A record can be amended into
 self-contradiction in the same commit and every mechanical check fux has will
 pass — **W-83 is the case**: an accepted amendment contradicted itself, the code
@@ -89,15 +89,16 @@ right now?*
 | you want | read |
 |---|---|
 | what to work on next | [`work/OPEN-WORK.md`](work/OPEN-WORK.md) — **the single live queue**, two lanes |
-| the spec for a milestone id | [the ADR register](docs/adr/README.md) |
+| the spec for a milestone id | [the SR register](records/README.md) |
 | why the architecture is this shape | [`work/paper/the-fux-index-paper.md`](work/paper/the-fux-index-paper.md) |
 | a closed decision + its reopen-trigger | [`work/compare/`](work/compare/README.md) |
 | the judgment behind the reset | [`work/INTERVIEW.md`](work/INTERVIEW.md) |
 | a word you don't recognise | [`docs/GLOSSARY.md`](docs/GLOSSARY.md) |
 | what has actually shipped | [`work/IMPLEMENTATION.md`](work/IMPLEMENTATION.md) |
 | the measured evidence behind a claim | [`work/regression/`](work/regression/README.md) |
+| what a benchmark run always captures | [SR-WORK-BENCHMARK](records/0053_WORK-benchmark.md) — the seven, stated once |
 | why a command fails on *this* surface | [`work/MACHINE.md`](work/MACHINE.md) |
-| which record owns a module | [`docs/adr/README.md`](docs/adr/README.md) §Ownership |
+| which record owns a module | [`records/README.md`](records/README.md) §Ownership |
 
 Any work item or prediction that starts, finishes, blocks, or is descoped
 updates `OPEN-WORK.md` **in the same change as the work**. PLAN is the spec;
@@ -120,13 +121,13 @@ systems that own it; verify at answer time.
   from their source (git dir / HTTP / Confluence — **that cap is a decision**),
   re-score passages on the fetched bytes, and cite a fresh sha.
 - **Two ingest modes.** `extracted` (default: `$0`, offline, deterministic,
-  [ADR-EXTRACTED](docs/adr/0115_extracted-mode.md) — **accepted**) and
+  [SR-EXTRACTED](records/0115_extracted-mode.md) — **accepted**) and
   `enriched` (opt-in, model-assisted,
-  [ADR-ENRICH](docs/adr/0137_enrich.md) — **accepted**: the name, the
+  [SR-ENRICH](records/0137_enrich.md) — **accepted**: the name, the
   boundary and the record shape are ratified; **the build is not**). Both
-  ratified by Arpit 2026-08-19. ⚠ **ADR-ENRICHED was superseded 2026-08-27** —
-  its contract was folded into ADR-ENRICH verbatim first, and the
-  non-authorization came with it (ADR-ENRICH decision 8). **`fux enrich` is a
+  ratified by Arpit 2026-08-19. ⚠ **SR-ENRICHED was superseded 2026-08-27** —
+  its contract was folded into SR-ENRICH verbatim first, and the
+  non-authorization came with it (SR-ENRICH decision 8). **`fux enrich` is a
   different feature** and shipping it did not authorize the mode.
   **`inferred` is retired**, because `INFERRED` is the edge grade for
   *model-derived* and the collision is the whole point of those records.
@@ -143,55 +144,55 @@ retired with plan revision 1; their successors **R1–R7**, and which milestone
 measures each, are in [`work/OPEN-WORK.md`](work/OPEN-WORK.md) §"Predictions
 still unmeasured".
 
-**Out of scope until it has an ADR and Arpit's sign-off:** anything from the
+**Out of scope until it has an SR and Arpit's sign-off:** anything from the
 archived build (the SQLite substrate, per-file cache, lean profile, state
 plane, `fux.lock`), further adapters beyond the capped three, MCP (it is
 [a proposal](work/proposals/mcp-adapters.md), not a backlog item), and every
 M8 item.
 
-**Do not port the archived engine.** [the ADR register](docs/adr/README.md) §"What survives"
+**Do not port the archived engine.** [the SR register](records/README.md) §"What survives"
 is the complete port list; each entry comes forward **with its tests**, when
 its milestone needs it. Nothing else comes back.
 
 ## Non-negotiable constraints (generated — NOT the source)
 
 ⚠ **This section is NOT normative, and has not been since 2026-09-12.** Each law
-is *stated* in exactly one record — [ADR-LAW-0](docs/adr/0002_LAW-0-authority.md)
-through [ADR-LAW-9](docs/adr/0011_LAW-9-environments.md) — and the block below is
+is *stated* in exactly one record — [SR-LAW-0](records/0002_LAW-0-authority.md)
+through [SR-WORK-ENVIRONMENTS](records/0052_WORK-environments.md) — and the block below is
 **generated from them** by [`scripts/gen-laws.py`](scripts/gen-laws.py) and held
 byte-equal by [`tests/test_claude_md_laws.py`](tests/test_claude_md_laws.py).
 
 **So: amend the record, then run `python scripts/gen-laws.py --write`.** Editing
 the block here is reverted by the next generation and fails the test in between.
 It is reproduced at all because this is the file every session reads first, and
-[ADR-LAW-0](docs/adr/0002_LAW-0-authority.md) decision 5 permits a generated view
+[SR-LAW-0](records/0002_LAW-0-authority.md) decision 5 permits a generated view
 **for exactly as long as a test binds it** — remove the test and this block
 violates decision 1.
 
-[ADR-LAWS](docs/adr/0001_LAWS.md) assigns the handles `L0`–`L9` and routes each
+[SR-LAWS](records/0001_LAWS.md) assigns the handles `L0`–`L8` and `L10` and routes each
 to its record; that is all it does now.
 
-<!-- LAWS:BEGIN — GENERATED from docs/adr/*_LAW-*.md by scripts/gen-laws.py. Do not edit by hand: amend the record, then run `python scripts/gen-laws.py --write`. -->
+<!-- LAWS:BEGIN — GENERATED from records/*_LAW-*.md by scripts/gen-laws.py. Do not edit by hand: amend the record, then run `python scripts/gen-laws.py --write`. -->
 
-- **L0** · **ADRs are the only source of truth, and the Law records outrank
-  every other record.** Every rule is *stated* in exactly one ADR; every other
+- **L0** · **SRs are the only source of truth, and the Law records outrank
+  every other record.** Every rule is *stated* in exactly one SR; every other
   artifact — `CLAUDE.md`, a schema, a config comment, a skill, a diagram —
   **links to it and never restates it**, and a change is made in the record
-  first. The Law records `ADR-LAW-0`…`ADR-LAW-9` outrank every other ADR: **a
+  first. The Law records `SR-LAW-0`…`SR-WORK-ENVIRONMENTS` outrank every other SR: **a
   record that conflicts with a Law is void in the conflicting part**, never a
   trade-off to weigh. **A Law changes only on Arpit's ruling, named in the
-  record**; an ordinary ADR a session may accept.
+  record**; an ordinary SR a session may accept.
   ⚠ **The test that decides a restatement:** *could this artifact and the
   record disagree while both still look correct?* If yes it is a restatement
   and is forbidden; if it would simply fail, it is an implementation
   (`config.py` naming a key) or an enforcement (a runtime schema, a test) and
   is permitted.
   ⚠ **`CLAUDE.md` §Non-negotiable constraints is NOT normative** — since
-  2026-09-12 each law is stated in its own `ADR-LAW-n` record, and what
+  2026-09-12 each law is stated in its own `SR-LAW-n` record, and what
   `CLAUDE.md` carries is generated from those records and held equal by a test.
   Precedence is **judgment, never a gate** — no parser reads *"does this
   contradict L2"* — and a record self-contradicting inside one file stays
-  ungated. [ADR-LAW-0](docs/adr/0002_LAW-0-authority.md).
+  ungated. [SR-LAW-0](records/0002_LAW-0-authority.md).
 - **L1** · **`$0`, FOSS-only.** Fux is zero-cost to run and carries no
   proprietary dependency: **no commercial licence, no paid or metered API, no
   subscription, no hosted model — ever.** Every dependency ships under an
@@ -207,13 +208,13 @@ to its record; that is all it does now.
   no optional extras, no "install this for PDFs", no capability that works on
   one machine and not another because of what somebody chose at install time.
   **Permission is not authorization:** the law permits a dependency, a record
-  still decides one, and every runtime dependency is named by an accepted ADR.
+  still decides one, and every runtime dependency is named by an accepted SR.
   **Dev, test and measurement tooling is bound by the same licence rule and
   nothing more** — OSI-licensed, and numpy/pandas/scipy explicitly fine.
   ⚠ **Amended 2026-09-06** (Arpit). The previous form forbade third-party runtime
   dependencies outright — the zero-dependency guarantee, sold as the product's
   central promise. **That guarantee is withdrawn**, deliberately, and
-  [ADR-LAW-1](docs/adr/0003_LAW-1-zero-cost.md) carries what it bought, what replaced
+  [SR-LAW-1](records/0003_LAW-1-zero-cost.md) carries what it bought, what replaced
   it, and the three things it left unguarded.
 - **L2** · **Content is never durable outside its source system.** The index holds
   statistics, never content. The single exception is explicit per-source
@@ -242,24 +243,9 @@ to its record; that is all it does now.
   it. ⚠ **Ruled three times on 2026-08-27 (Arpit): written, reverted, then
   narrowed to commits alone.** Hashing, a size bound, the stdout prohibition and
   **the transmission clause** were all in earlier forms and none survives;
-  [ADR-LAWS](docs/adr/0001_LAWS.md) decision 8 carries each pass and what it
+  [SR-LAWS](records/0001_LAWS.md) decision 8 carries each pass and what it
   traded away — **including the gap the last one leaves open.**
-- **L9** · **Each sibling environment has one job** (Arpit, 2026-09-11).
-  - **`fux-playground` is Arpit's alone**, for trying things by hand. No agent,
-    script, test, measurement or benchmark ever reads, ingests, grades against,
-    copies or files a number from it.
-  - **`fux-lab` runs every measurement and evaluation**, on the **golden test data
-    only** (`work/golden/`), **at most 10 000 documents**. fux's own `tests/` and
-    `tests_e2e/` keep their built-in fixtures.
-  - **`fux-benchmark` runs benchmarks only**: how fast each query returns, and the
-    ranked list it returned, **kept so the next run is compared against it** —
-    always across **two fux versions**, the current build and the newest release of
-    the previous major. Its corpora are folders of **100, 200, 500, 1 000, 2 000,
-    5 000 and 10 000** documents; each document about **1 000 lines**, lines up to
-    about **300 characters**, with tables, charts, bullet points and Mermaid
-    diagrams, written to read as machine-made or by several authors, professional
-    or amateur. [ADR-LAW-9](docs/adr/0011_LAW-9-environments.md).
-- **L10** · **The consumer is served build output, never source.** Code fux puts in front of a consumer — `.py`, `.mjs`, `.js`, `.ts`, vendored into their tree or exported by a published package — is ONE generated artefact per plane, bundled at publish and never on their machine. The only exceptions are the consumer's own extension points, [`.fux/decoders/`](docs/adr/0139_decode.md) and [`.fux/fetchers/`](docs/adr/0117_fetcher.md), where readable source IS the contract. Bundled ≠ minified.
+- **L10** · **The consumer is served build output, never source.** Code fux puts in front of a consumer — `.py`, `.mjs`, `.js`, `.ts`, vendored into their tree or exported by a published package — is ONE generated artefact per plane, bundled at publish and never on their machine. The only exceptions are the consumer's own extension points, [`.fux/decoders/`](records/0139_decode.md) and [`.fux/fetchers/`](records/0117_fetcher.md), where readable source IS the contract. Bundled ≠ minified.
 
 <!-- LAWS:END -->
 
@@ -369,7 +355,7 @@ committed:
    being built now gets a *proposal doc* in
    [`work/proposals/`](work/proposals) — same rigor, `status: proposed`.
    Parked, not lost: when picked up they graduate to a compare doc or plan entry.
-1. **Plan** — the design of record. Update [the ADR register](docs/adr/README.md)
+1. **Plan** — the design of record. Update [the SR register](records/README.md)
    before building: what, why, scope in/out, the decision.
 2. **Handoff** — a self-contained spec: context, definition-of-done,
    constraints, key files, edge cases, tests, open questions. **It lives in the
@@ -399,31 +385,33 @@ to be Sonnet-executable is itself the signal that the design phase was done.
 
 Then, on completion:
 
-4. **One feature → one ADR** in [`docs/adr/`](docs/adr/), from
-   [`docs/adr/TEMPLATE.md`](docs/adr/TEMPLATE.md): §1 for humans (one screen,
+4. **One feature → one SR** in [`records/`](records/), from
+   [`records/TEMPLATE.md`](records/TEMPLATE.md): §1 for humans (one screen,
    Mermaid + its ASCII twin), §2 for agents (context · decision · consequences ·
    alternatives · reference · veto condition). Give it a **NAME** and cite that
    name everywhere; the file number is an ordinal, not an identity. Add its
    components to the ownership table and update
-   [`tests/test_adr_ownership.py`](tests/test_adr_ownership.py) in the same
-   change. Full convention: [`docs/adr/README.md`](docs/adr/README.md).
-   **The live numbering runs on two ranges since 2026-09-11** (Arpit):
-   `docs/adr/0001`–`0100` is the **Law** range — `0001` ADR-LAWS and
-   `0002`–`0011` ADR-LAW-0…ADR-LAW-9, with `0012`–`0100` reserved and **empty,
-   no placeholder files** — and `0101`– is every other record, today
-   `0101` ADR-CLI through `0154` ADR-DOCTOR. A new record takes the next free
-   number in its own range.
+   [`tests/test_sr_ownership.py`](tests/test_sr_ownership.py) in the same
+   change. Full convention: [`records/README.md`](records/README.md).
+   **The live numbering runs on three ranges** (Arpit, 2026-09-11, extended
+   2026-09-13): `0001`–`0050` is the **Law** range — `0001` SR-LAWS and
+   `0002`–`0011` SR-LAW-0…SR-LAW-10; `0051`–`0100` is the **WORK** range —
+   today `0051` SR-WORK-OPEN-QUEUE through `0056` SR-WORK-QUALITY; and
+   `0101`– is **every other record**, today `0101` SR-CLI through
+   `0154` SR-API. `0012`–`0050` and `0057`–`0100` are **reserved and empty —
+   no placeholder files**. A new record takes the next free number in its own
+   range.
    `archive/v0.26-docs/adr/0001`–`0015` are the **archived** engine's records —
    a numbering distinct from both live ranges — and are cited as "archived
-   ADR-NNNN" with that archive path, never bare "ADR-NNNN".
+   SR-NNNN" with that archive path, never bare "SR-NNNN".
 
-**Every rule, ADR, and material decision must carry a reference** — a paper, a
-blog post, or a concrete example link. A rule or ADR with no reference is
+**Every rule, SR, and material decision must carry a reference** — a paper, a
+blog post, or a concrete example link. A rule or SR with no reference is
 incomplete. Ground the claim; don't assert it.
 
 **Archive implemented docs — into the ONE archive.** When a proposal is fully
-implemented and its ADR is written, move it to [`archive/`](archive/README.md)
-in the same change, stamping `status: implemented` + the ADR link, and add its
+implemented and its SR is written, move it to [`archive/`](archive/README.md)
+in the same change, stamping `status: implemented` + the SR link, and add its
 row to `archive/README.md` naming its live successor. Active directories hold
 *live* work only.
 
@@ -462,7 +450,7 @@ knowledge as a directory of Markdown files with YAML frontmatter:
   only its shape.) Repo-root CLAUDE.md/README.md are tool entry points outside
   the bundle.
 - **Frontmatter `type` on every knowledge doc** (the only OKF-required field) —
-  `type: Compare Doc`, `type: Proposal`, `type: ADR`, `type: Handoff`,
+  `type: Compare Doc`, `type: Proposal`, `type: SR`, `type: Handoff`,
   `type: Paper`, and for the trackers `type: Queue`, `type: Log`,
   `type: Index`, `type: Glossary`. Provenance keys are legal OKF extensions;
   consumers must preserve unknown keys.
@@ -560,43 +548,13 @@ code moved**:
 
 ### OPEN-WORK — the single live queue
 
-[`work/OPEN-WORK.md`](work/OPEN-WORK.md) is the *only* queue. Its length is the
-signal of how much is actually pending.
-
-1. **Updated in the same change as the work**, never afterwards — an item
-   finishes, a defect appears, scope moves, something blocks or unblocks: the
-   index row **and** the item's detail file change in that edit.
-2. **Completed items are removed, never ticked.** Deletion is legal only once
-   the outcome is in `IMPLEMENTATION.md` and any evidence is in
-   `work/regression/`. No tombstones, no DONE rows, no `closed/`.
-3. **Its markers are assertions, not evidence — re-derive, do not read.**
-   Reconcile against `work/regression/`, `IMPLEMENTATION.md` and the repo
-   itself (`git log`, `git tag`, the code) before believing any status. A stale
-   ✅ overstates progress; a stale pending row that an unrelated commit already
-   closed understates it — **same class of defect**.
-4. **Two lanes, ordered independently.** `arpit` needs a human's hands;
-   `agent` an agent can execute alone. They run concurrently — never force one
-   priority order across both, and never idle behind a decision you were never
-   going to make.
-   **Items are grouped by what closing them takes — `fux build`, `testing`,
-   `adr update`** (Arpit, 2026-08-29; previously grouped by owning record).
-   Law zero is unchanged: every item's detail file still names the record its
-   change will have to update. If you cannot name one, that is the "no ADR
-   affected" claim, said out loud — it just isn't the sort key any more.
-5. **Priority is damage that accrues with elapsed time**, above damage that is
-   merely present-but-static. Only the former gets worse by waiting.
-6. **No separate prioritization or sequencing doc.** Ordering lives inside
-   OPEN-WORK. A second document naming what to do next is always the stale one.
-7. **No git housekeeping in the queue** — never what is committed, staged or
-   pushed, in any repo. [OPEN-WORK](work/OPEN-WORK.md) rule 9 (Arpit, 2026-09-11).
-8. **One or two lines per item, always** (Arpit, 2026-09-11). A row is id, lane,
-   what is open, and a link. Everything else goes in the item's file under
-   [`work/open/`](work/open/README.md). OPEN-WORK rule 10, gated by
-   `tests/test_open_work_rows_are_short.py`.
-   **Every row carries one ball, always:** 🔴 blocked on Arpit, directly or through
-   another item · 🟡 waiting on another item · 🟢 no blockers. **Optional after it:**
-   🧨 broken or getting worse · 🔺 do first, **set only by Arpit**. Agents pick from
-   🟢 only (🔺 first, then 🧨). Arpit, 2026-09-11; legend in OPEN-WORK rule 6, gated by the same test.
+[`work/OPEN-WORK.md`](work/OPEN-WORK.md) is the *only* queue, and it is the
+**list and nothing else**. Its rules — what the file is, an item's lifecycle,
+the shape of a row, the four balls, ordering, the Blocked-on-Arpit inbox and the
+standing obligations — are stated once in
+[SR-WORK-OPEN-QUEUE](records/0051_WORK-open-queue.md) and are **not repeated
+here or in the queue** (Arpit, 2026-09-13). Read that record before touching an
+item.
 
 ### Archive is not evidence
 
@@ -631,7 +589,7 @@ retired wholesale into `archive/handoff/` — and gets a row in
 `archive/README.md` naming its live successor, or saying plainly that it has
 none. ⚠ **Decision records are the exception** (Arpit, 2026-09-06): they are
 never archived. A superseded record is rewritten or deleted in the change that
-supersedes it, and `docs/adr/` is the whole set. Enforced by
+supersedes it, and `records/` is the whole set. Enforced by
 `tests/test_archive_law.py`, which fails on a second `archive` directory
 anywhere and on a live doc still pointing at one.
 
@@ -645,31 +603,31 @@ anywhere and on a live doc still pointing at one.
   source of truth: `git log`/`status`/`tag`, the code, a command that
   reproduces. A doc repeating another doc is not a second source.
 
-### The ADR standing rules
+### The SR standing rules
 
 The register, the convention and the ownership table are in
-[`docs/adr/README.md`](docs/adr/README.md). What binds every session:
+[`records/README.md`](records/README.md). What binds every session:
 
-- **No behaviour change lands without its ADR updated in the same change.**
+- **No behaviour change lands without its SR updated in the same change.**
   See §Law zero. If a change genuinely touches no recorded decision, **say so
-  explicitly — `no ADR affected` in the commit message** — rather than silently
-  skipping the check. Enforced by `tests/test_adr_freshness.py` (CI) and
-  `scripts/adr-guard.sh` (`commit-msg` hook); neither can be satisfied by
+  explicitly — `no SR affected` in the commit message** — rather than silently
+  skipping the check. Enforced by `tests/test_sr_freshness.py` (CI) and
+  `scripts/sr-guard.sh` (`commit-msg` hook); neither can be satisfied by
   intending to update the record later.
-- **Cite records by name, never by number.** `ADR-RECORD`, not
+- **Cite records by name, never by number.** `SR-RECORD`, not
   "ADR-0004". Numbers exist only so the archive can map a retired record to its
   successor. A live doc citing a number is a defect; fix it on contact.
-  ("archived ADR-NNNN" *with its path* still means the frozen v0.26 line.)
+  ("archived SR-NNNN" *with its path* still means the frozen v0.26 line.)
 - **Ownership is a table, not a judgement call.** Every `src/`/`tools/`
-  component is claimed by exactly one record in `docs/adr/README.md`. **When
-  the table changes, edit [`tests/test_adr_ownership.py`](tests/test_adr_ownership.py)
+  component is claimed by exactly one record in `records/README.md`. **When
+  the table changes, edit [`tests/test_sr_ownership.py`](tests/test_sr_ownership.py)
   in the same change** — they drift silently otherwise, which is why the
   executable twin exists.
 - **A record that restates a cross-cutting principle is a bug, not
   redundancy.** Each law has exactly one home — **its own
-  [`ADR-LAW-n`](docs/adr/0002_LAW-0-authority.md) record** — and
-  [ADR-LAWS](docs/adr/0001_LAWS.md) assigns the handles L0–L9 and routes to
-  them. Every other record cites `ADR-LAWS` and the number; none paraphrases.
+  [`SR-LAW-n`](records/0002_LAW-0-authority.md) record** — and
+  [SR-LAWS](records/0001_LAWS.md) assigns the handles L0–L8 and L10 and routes to
+  them. Every other record cites `SR-LAWS` and the number; none paraphrases.
   Paraphrases drift, and a drifted paraphrase in an accepted record reads as
   authority.
 - **Veto conditions are conditions to check, never events to await.** State
@@ -680,7 +638,7 @@ The register, the convention and the ownership table are in
   block); §2 is for agents** (context · decision ·
   consequences · alternatives · reference · veto). The reference is grounded in
   code, a live doc, or measured evidence — **never an archived doc**.
-- **Records live in `docs/adr/`, and nowhere else.** There is no archive tier
+- **Records live in `records/`, and nowhere else.** There is no archive tier
   for records (Arpit, 2026-09-06): a superseded record is **rewritten or deleted
   in the same change that accepts its successor**, and the successor states in
   prose what it replaced. Nothing is left behind to be found and mistaken for
@@ -697,7 +655,7 @@ documentation. A task is not "done" until the docs are true. At minimum:
    abandoned — the affected `W-nn` rows and prediction rows are updated before
    the session ends. A failed run records the failure with a one-line why.
    Never mark an item DONE with failing tests.
-2. **[the ADR register](docs/adr/README.md)** — design of record; keep milestone status
+2. **[the SR register](records/README.md)** — design of record; keep milestone status
    truthful when behaviour or scope changes.
 3. **[`work/WORKLOG.md`](work/WORKLOG.md)** — an entry per substantive exchange
    (see below).
@@ -714,7 +672,7 @@ documentation. A task is not "done" until the docs are true. At minimum:
    Enforced by `tests/test_doc_registry.py`.
 6. **[`README.md`](README.md)** — the public front door: status, guarantees,
    reading order. **`CHANGELOG.md`** once a package exists.
-7. **The relevant ADR**, [`docs/GLOSSARY.md`](docs/GLOSSARY.md) for any new
+7. **The relevant SR**, [`docs/GLOSSARY.md`](docs/GLOSSARY.md) for any new
    recurring term, and every test the behaviour change needs.
 
 **Auto-fold useful information into this file.** When a session produces
@@ -779,7 +737,7 @@ queries, the judgments, prior per-query scores, or any derived report of them
   cannot clear α = 0.05 at any discordant count** — and it rises from there
   (20 flips → net 10; 50 flips → net 16). The old *"±2 on 50"* admitted results
   whose best possible p-value is **0.50**. Table, script and the α discussion:
-  [ADR-RS](docs/adr/0133_predictions.md) decision 19.
+  [SR-RS](records/0133_predictions.md) decision 19.
 - 🔴 **Every measured run records its PER-QUERY RESULTS under `evidence/`** —
   one row per query per arm, pass/fail. **Ruled by Arpit 2026-08-28:** *"record
   all the questions so we can check in detail."* ⚠ **A summary count is not
@@ -793,20 +751,20 @@ queries, the judgments, prior per-query scores, or any derived report of them
   `tests/test_regression_runs.py` checks it from there.
 
 Ruled by Arpit 2026-08-25 (W-78 ruling 2); explained and guarded by
-[ADR-RS](docs/adr/0133_predictions.md) decisions 11-15. ⚠ Two parts of the
+[SR-RS](records/0133_predictions.md) decisions 11-15. ⚠ Two parts of the
 accepted rule — a **sealed** query set and the **decoy/placebo controls** — are
 **not built** and are owed as W-81; nothing may cite them as in force.
 
-**A verdict is not an ADR.** When a run adjudicates a pre-registered
+**A verdict is not an SR.** When a run adjudicates a pre-registered
 prediction, the ruling is a `VERDICT.md` beside its evidence — `type: Verdict`,
-with the prediction id and the frozen pre-registration path. An ADR records a
+with the prediction id and the frozen pre-registration path. An SR records a
 decision someone can supersede; **nothing supersedes a measurement except a
 better measurement**, which is a new run with its own verdict. The *decisions*
-that rest on a verdict live in `docs/adr/` and cite it. Enforced by
+that rest on a verdict live in `records/` and cite it. Enforced by
 `tests/test_regression_runs.py`.
 
 **The reproduce command must actually reproduce.** Findings that warrant a
-change graduate to `work/proposals/` and, when accepted, an ADR. Never ship a
+change graduate to `work/proposals/` and, when accepted, an SR. Never ship a
 ranking/behaviour change off a single synthetic corpus.
 
 ## Golden answer key — Claude never reads it (required)
@@ -839,17 +797,20 @@ work/               THE SHARED MEMORY between sessions — start at work/README.
                     diagrams, redrawn from the code 2026-09-12. proposal-search-v3-target.svg is
                     a PROPOSAL's target state, deliberately outside that namespace.
   open/             one detail file per open W-nn; deleted with its row
-  setup/            the three siblings — playground · lab · benchmark (L9) — outside this repo
+  setup/            the three siblings — playground · lab · benchmark — outside this repo
+                    (SR-WORK-ENVIRONMENTS)
   regression/       dated, measured evidence other docs cite as grounding; VERDICT.md rules
   golden/           the sealed benchmark — seed docs, ladder manifests, prompts; golden-answer/ is NEVER read by Claude
   compare/          live forks — verdict + explicit reopen-trigger
   proposals/        parked ideas, not yet decided
+records/            THE STANDING RECORDS — the register, TEMPLATE.md, SR-LAWS and
+                    SR-LAW-0…SR-LAW-10; new records land here. At the repo root
+                    since 2026-09-13, and in the OKF bundle from wherever it sits
 docs/               WHAT THE PROJECT IS
   GLOSSARY.md       every recurring term, defined once
-  adr/              THE REGISTER + TEMPLATE.md + ADR-LAWS; new records land here
   index.md          the OKF bundle root
-src/fux/            the engine — every component claimed in docs/adr/README.md
-tests/              the suite, incl. test_adr_ownership.py (the ownership twin)
+src/fux/            the engine — every component claimed in records/README.md
+tests/              the suite, incl. test_sr_ownership.py (the ownership twin)
 tools/
   pruning-eval/     the gate — frozen pre-registrations, KL selector, eval harness
   differential/     the differential-law harness and the R3 bench
@@ -858,16 +819,16 @@ archive/            THE ONE ARCHIVE — everything retired, mirroring the live t
   adr/              superseded records; maps old number -> successor NAME
   handoff/          the retired handoff directory (executed pairs + unresolved specs)
   v0.26/            build: the previous engine — runnable, REFERENCE ONLY
-  v0.26-docs/       build: the frozen v0.19–0.26 doc set ("archived ADR-NNNN")
+  v0.26-docs/       build: the frozen v0.19–0.26 doc set ("archived SR-NNNN")
   v0.26-implemented/ · v0.30-rev1-planning/   frozen build artifacts
   v0.1/             build: the first one
 ```
 
-**Records live in `docs/adr/`, and only there.** A superseded one is rewritten
+**Records live in `records/`, and only there.** A superseded one is rewritten
 or deleted in the same change that accepts its successor; the successor names
 what it replaced, in prose. `work/adr/` no longer exists, and on 2026-09-06
 Arpit deleted the archived records outright — there is no archive tier to
-consult, and a record citation resolves into `docs/adr/` or not at all.
+consult, and a record citation resolves into `records/` or not at all.
 
 **`src/fux/` was gated behind P1, and now exists.** The package scaffold was
 M0b and landed only once the pruning gate had been decided — scaffolding a
@@ -901,7 +862,7 @@ python -m fux.store.nodebundle node node/dist  # the published bundle (L10)
 ```
 
 **What a consumer is served is BUILD OUTPUT, and since 2026-09-12 that is
-[L10](docs/adr/0012_LAW-10-bundled-output.md).** `node/` is 44 authored `.mjs`
+[L10](records/0011_LAW-10-bundled-output.md).** `node/` is 44 authored `.mjs`
 files; what `fux setup` vendors and npm publishes is **one generated
 `fux.mjs`** — built by `src/fux/store/nodebundle.py`, into the wheel by
 [`hatch_build.py`](hatch_build.py) and into the npm tarball by `publish.yml`,
@@ -910,7 +871,7 @@ it resolves as a module path and fails with `MODULE_NOT_FOUND`, which reads like
 a test failure and is not one.
 
 **A test that builds a repo by hand writes `.fux/pii.toml`** (an empty file is
-enough), or ingest and every CLI verb refuse — [ADR-PII](docs/adr/0150_pii.md)
+enough), or ingest and every CLI verb refuse — [SR-PII](records/0148_pii.md)
 decision 17.
 
 **Two suites, both maintained** — `tests/` (fast unit) and `tests_e2e/` (the
@@ -1002,7 +963,7 @@ merge on red. Source of truth:
 **2026-09-12 — two sessions, one machine**
 
 - 🔴 **A RED TEST ON AN UNCOMMITTED TREE IS INVISIBLE TO EVERY MECHANISM HERE.**
-  CI reads commits; the ADR-freshness hook reads a commit message; `pytest` reads
+  CI reads commits; the SR-freshness hook reads a commit message; `pytest` reads
   whatever you choose to run. A test that a working-tree change turns red stays
   red and unseen until somebody commits — and then it fails for whoever committed
   it. **It bit two sessions on the same day for different reasons.** The only

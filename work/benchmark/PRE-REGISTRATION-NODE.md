@@ -59,7 +59,7 @@ until this document says otherwise.
 | `id`, `loc`, `order` of results | **byte-equal** | this is the answer; a different order is a different product |
 | `heading`, `title`, `phrases`, `locators` (`path:L<a>-L<b>`) | **byte-equal** | a citation a reader opens; an off-by-one line is a wrong quote |
 | `band`, `missing`, `answerable` | **byte-equal** | a claim fux makes out loud |
-| `source`, `freshness` | **byte-equal** | the claim-strength vocabulary ([ADR-URL-FRESHNESS](../../docs/adr/0149_url-freshness.md)) |
+| `source`, `freshness` | **byte-equal** | the claim-strength vocabulary ([SR-URL-FRESHNESS](../../records/0147_url-freshness.md)) |
 | `graph.json` plane digest | **byte-equal** | one digest or the arm proves nothing |
 | **`score`** | ✅ **(b) — equal after `round(9)`.** Arpit, 2026-09-06. `round(9)` is `rank.py`'s own sort-key resolution, not a tolerance invented to pass a test; **(a)** (byte-equal on one portable `log`) was declined | **his call, per §0** |
 

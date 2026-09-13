@@ -3,7 +3,7 @@
 ## Why this exists, and why it is not a parameter
 
 A decoder is `EXTENSIONS` plus `decode(raw, rel_path)` — two names, and
-[ADR-DECODE](../../../docs/adr/0139_decode.md) decision 1 is emphatic that the
+[SR-DECODE](../../../records/0139_decode.md) decision 1 is emphatic that the
 protocol is the whole interface. Adding a third parameter for configuration
 would break every consumer decoder in every repo to serve one setting.
 
@@ -23,7 +23,7 @@ kind of defect to leave for someone else.
 ## L3 holds
 
 The value lives in `.fux/tune.toml [index]` (moved from `fux.toml [decode]` on
-2026-09-11, Arpit — ADR-TUNE decision 13). That file is **committed**, so `same
+2026-09-11, Arpit — SR-TUNE decision 13). That file is **committed**, so `same
 sources -> same index` becomes `same sources + same committed [index] -> same
 index`. `[index]` is the one tune.toml table that changes what is **indexed**,
 and it is read through `tune.index_limits()`, which `--no-tune` never reaches:
@@ -62,7 +62,7 @@ def max_table_rows() -> int:
     Never raises: a decoder runs inside a walk over thousands of documents, and
     a malformed `[index]` is reported by `tune.index_limits()` where ingest
     reads it first — failing the decode of every document as well would turn
-    one bad line into an unreadable corpus (ADR-TABULAR decision 6).
+    one bad line into an unreadable corpus (SR-TABULAR decision 6).
     """
     from ..tune import DEFAULT_MAX_TABLE_ROWS, index_limits
 

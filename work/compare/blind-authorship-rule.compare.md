@@ -21,7 +21,7 @@ timestamp: 2026-08-24T00:00:00Z
 > **placeholder**, taken from two author samples, and is labelled one everywhere
 > it appears.
 >
-> **Where it now lives.** [ADR-RS](../../docs/adr/0133_predictions.md)
+> **Where it now lives.** [SR-RS](../../records/0133_predictions.md)
 > decisions 11-15 · [`CLAUDE.md`](../../CLAUDE.md) §Conformance runs ·
 > [`work/regression/README.md`](../regression/README.md) per-run contract row 7
 > · checked by [`tests/test_regression_runs.py`](../../tests/test_regression_runs.py)
@@ -30,7 +30,7 @@ timestamp: 2026-08-24T00:00:00Z
 >
 > ⚠ **Two of the six parts did NOT take effect** — the sealed query subset and
 > the decoy/placebo controls are apparatus, not protocol, and are owed as
-> [W-82 §5.4](../../archive/open/W-82-the-consolidated-build.md). ADR-RS decision
+> [W-82 §5.4](../../archive/open/W-82-the-consolidated-build.md). SR-RS decision
 > 15 carries them marked `NOT BUILT`.
 >
 > ⚠ **The ruling costs this project's own evidence something.** Decision 14's

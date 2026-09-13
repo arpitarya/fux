@@ -1,6 +1,6 @@
 """`fux setup --agents` — the installer, and the safeguards a default-on install needs.
 
-ADR-AGENT-POLICY decision 5 makes this install **by default**, into
+SR-AGENT-POLICY decision 5 makes this install **by default**, into
 `.claude/`, `.agents/` (shared by Codex and Copilot, decision 16), `.github/`
 and `.kiro/` — directories Anthropic, OpenAI, GitHub and AWS own. Two things are all that stand between that and a tool quietly editing a
 shared repository, and both are veto conditions rather than niceties:
@@ -127,7 +127,7 @@ def test_a_partial_declaration_installs_exactly_what_it_names(tmp_path):
             ".kiro/skills/fux-usage/SKILL.md",
             ".kiro/steering/fux-archived-results.md",
         ]
-        # ADR-AGENT-POLICY decision 15: the operating guides, and Kiro's
+        # SR-AGENT-POLICY decision 15: the operating guides, and Kiro's
         # path-scoped and auto-inclusion steering pointers.
         + [f".kiro/skills/{name}/SKILL.md" for name in guides]
         + [f".kiro/steering/fux-{t}-files.md" for t in setup_mod.PATH_SCOPED_TOPICS]
@@ -213,7 +213,7 @@ def test_a_consumer_edit_survives_a_later_setup(tmp_path):
 
 def test_the_installer_never_branches_on_a_vendor_directory_existing(tmp_path):
     """Veto 4. A heuristic is exact for the repo it was written against and a
-    silent convention for everyone else — the derivation ADR-DIR-LIST decision
+    silent convention for everyone else — the derivation SR-DIR-LIST decision
     4 already refused for `archived`."""
     import inspect
     import io
@@ -336,7 +336,7 @@ def test_codex_gets_no_archived_results_skill(tmp_path):
 
 
 def test_enrich_ships_to_every_skill_surface_and_no_ambient_one():
-    """ADR-ENRICH decision 10, as amended 2026-09-06. The rule is **never
+    """SR-ENRICH decision 10, as amended 2026-09-06. The rule is **never
     ambient** — it was never *claude only*, and shipping to Claude alone was an
     omission the record had already flagged against itself.
 
@@ -382,7 +382,7 @@ def test_no_committed_write_skill_reaches_an_ambient_surface():
 
 #: Every skill surface Fux installs to, **as (vendor, directory) pairs** — four
 #: vendors, three directories, because Codex and Copilot share `.agents/skills`
-#: (ADR-AGENT-POLICY decision 16). **Keyed by vendor on purpose**: a set of bare
+#: (SR-AGENT-POLICY decision 16). **Keyed by vendor on purpose**: a set of bare
 #: directories would still pass with Codex's row deleted, since Copilot writes
 #: the same paths. **Ambient planes are deliberately absent**: the rule that
 #: keeps a committed-write skill off `instructions/` and `steering/` is what
@@ -471,7 +471,7 @@ def test_every_committed_write_skill_reaches_every_skill_surface():
 
 
 def test_every_operating_guide_reaches_every_skill_surface_and_no_ambient_one():
-    """ADR-AGENT-POLICY decision 15 (Arpit, 2026-09-11). The ten operating
+    """SR-AGENT-POLICY decision 15 (Arpit, 2026-09-11). The ten operating
     guides are decision 14a's roster rule applied ten more times: one template,
     all four skill surfaces, and never an `instructions/` or `steering/`
     destination -- four of them (`fux-sources`, `fux-config`, `fux-fetcher`,
@@ -584,7 +584,7 @@ def test_this_repos_own_decoders_still_match_the_package_modules():
     """🔴 **The same drift, a third time, in `.fux/decoders/`.**
 
     `fux setup` writes the built-in decoders into `.fux/decoders/` **write-if-
-    missing**, and [ADR-DOTFUX](../docs/adr/0102_fux-directory.md) decision 8
+    missing**, and [SR-DOTFUX](../records/0102_fux-directory.md) decision 8
     makes those copies *what actually run* — the package modules are not
     consulted while a copy exists. So a fix to `src/fux/decode/` reaches **this
     repository not at all**, silently, exactly as a template fix did not reach

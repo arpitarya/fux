@@ -147,7 +147,7 @@ def test_the_digest_is_stable_across_calls():
 
 
 def test_a_missing_file_raises_and_names_fux_setup(tmp_path):
-    # ADR-PII decision 17 reversed "missing is silence": a deleted file must not
+    # SR-PII decision 17 reversed "missing is silence": a deleted file must not
     # read as a repo that decided to redact nothing.
     with pytest.raises(FuxError, match=r"\.fux/pii\.toml is missing.*fux setup"):
         pii.load(tmp_path)
@@ -261,7 +261,7 @@ def test_the_starter_leaves_ordinary_prose_completely_untouched():
     assert pii.redact(_starter(), prose) == (prose, {})
 
 
-# -- checksum validators (ADR-PII decision 16) -------------------------------
+# -- checksum validators (SR-PII decision 16) -------------------------------
 
 
 def test_luhn_accepts_the_published_vectors_and_rejects_their_neighbours():

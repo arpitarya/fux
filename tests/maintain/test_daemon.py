@@ -204,7 +204,7 @@ def test_one_bad_sweep_does_not_end_the_daemon(root, monkeypatch):
     assert daemon._sweep(root)["outcome"] == "failed"
 
 
-# -- status is read-only (ADR-MAINTENANCE veto 7) ---------------------------
+# -- status is read-only (SR-MAINTENANCE veto 7) ---------------------------
 
 
 def test_status_never_clears_a_stale_pid_file(root):
@@ -234,7 +234,7 @@ def test_a_corrupt_pid_file_reads_as_not_running(root):
 
 
 def test_setup_and_hooks_never_start_the_daemon():
-    """The L4 consent is the whole answer to ADR-MAINTENANCE veto 6.
+    """The L4 consent is the whole answer to SR-MAINTENANCE veto 6.
 
     `maintenance-trigger` rejected an always-on process because it had no
     moment of choosing. This one is chosen — and stops being chosen the instant

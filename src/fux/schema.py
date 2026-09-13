@@ -22,7 +22,7 @@ The reason is ownership, not tidiness. This repo assigns every component to
 exactly one decision record **by directory**, so a shared directory would have
 one record owning shapes that belong to five. That is not hypothetical: the
 first version of the record schema was written into `src/fux/templates/`, and
-the ADR guard refused the commit because `templates/` belongs to ADR-FETCHER —
+the SR guard refused the commit because `templates/` belongs to SR-FETCHER —
 a record with nothing to say about the record shape. **Beside the code, the
 ownership is correct by construction.**
 

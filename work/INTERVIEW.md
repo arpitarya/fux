@@ -32,12 +32,278 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-09-12**.* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-09-13**.* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
+
+### 🔴 SIX ITEMS BUILT IN ONE SESSION, AND NOTHING IS COMMITTED (2026-09-13, Claude Code)
+
+**Read this first.** The working tree carries **W-151, W-152, W-153, W-150,
+W-155** complete and green — 4 133 unit + 88 e2e + 36 Node tests — and **W-154
+Part A** in flight. **Only two commits were made**, both single-file
+pre-registrations (`a414012`, `19b0f3c8`), ahead of their own numbers.
+
+⚠ **WHY NOTHING ELSE IS COMMITTED, and it is not an oversight.** The index
+carries a **peer session's staged `docs/adr/ → records/` rename** — hundreds of
+renames, not yet committed. A selective `git commit -- <paths>` would either rope
+that in or commit a `records/` file without the matching `docs/adr/` deletion,
+leaving a phantom. **That is the peer's commit to make**; this session's changes
+sit in the working tree beside it and every suite is green.
+
+**What landed, in one line each:**
+
+| item | what |
+|---|---|
+| **W-151** | `superseded_weight` REMOVED — refused **by name**, no ranking change |
+| **W-152** | `archived_weight` + `recency_half_life_days` REMOVED — **all three document priors gone**; `recency_multiplier` and `stats.json`'s `newest_mtime` went with them |
+| **W-153** | `mtime` on **every** `--json` hit — SR-API's first amendment to a frozen surface |
+| **W-150** | the benchmark harness files **all seven captures**; planted key cost **no corpus byte** |
+| **W-155** | the table-is-the-answer gap **measured: YES**, 30/30 both directions |
+| **W-154** | pre-registered; Part A (the price) running, Part B (quality) named as **unbuilt** |
+
+🔴 **`Weighting` now carries ONE multiplier — `[priority]`.** Three document
+priors were removed on Arpit's rulings because **no single global value sets any
+of them correctly**; every FACT they read (`archived`, `superseded`, `mtime`)
+survives and reaches a caller. `tests/derive/test_weighted_bound.py` drives
+W-73's adversarial bound through `[priority]` now — **the vehicle changed, the
+law did not.**
+
+🔴 **Two findings this session produced that nobody asked for:**
+
+1. **The abstention shape, fourth occurrence, first instrument that names the
+   missing term.** Both fux versions answered **10 of 10** planted
+   unanswerables, `band: "partial"`, `answerable: true`, with the absent word in
+   `missing` — one at `coverage: 0.0009`. Still not adjudicated; *does `weak`
+   imply `answerable: false`?* is in `BLOCKED.json`.
+2. **`tests/test_prediction_register.py` only sees a file named exactly
+   `VERDICT.md`.** `VERDICT-W144.md` has **no register row and nothing
+   notices** — the R9 failure in a different costume. **First occurrence, not
+   fixed:** widening the glob turns frozen verdicts red, and which of *register
+   them* or *rename them* is right is a ruling.
+
+### A benchmark captures seven things, and halt gates are not among them (2026-09-13, Cowork)
+
+- **[SR-WORK-BENCHMARK](../records/0053_WORK-benchmark.md) (`0053`, `kind: process`)** is the home of
+  the capture set. **CAP-1** the ranked lists · **CAP-2** what moved between the
+  arms, per document · **CAP-3** `hit@k` at **1, 5, 10, 20, 50** · **CAP-4** the
+  answer layer and the planted unanswerables · **CAP-5** committed index size ·
+  **CAP-6** latency, ingest and build · **CAP-7** an **HTML report, every run**.
+- **CAP-1…CAP-4 are per-query rows.** A total is a rendering of a capture, never
+  the capture — the rule that already cost four runs their headline claims.
+- 🔴 **Halt gates are OUT** (Arpit): the determinism null control and
+  `ask --fast` ≡ `ask --scan` *must always pass*, and are **functionality** —
+  `tests/` and `tests_e2e/` prove them. A benchmark compares two versions; it
+  does not re-prove the engine works. What this accepts is stated as decision
+  4's assumption, not hidden.
+- **SR-WORK-ENVIRONMENTS decision 3 is reversed in the part that said a
+  benchmark never judges quality and carries no answer key.** It does both now,
+  with a **planted** key the generator emits. ⚠ **Planted is not sealed** —
+  `work/golden/` is the lab's and never enters a benchmark corpus.
+- **Enforced from 2026-09-13** by `tests/test_benchmark_capture.py`, baselined
+  so no frozen report is edited into compliance.
+- 🔴 **The harness files 2 of the 7** — CAP-3 and CAP-4 are *impossible* today
+  because the corpora carry no key. **W-150**.
+
+### All four ranking priors are ruled; W-143 and W-97 are closed (2026-09-13, Cowork)
+
+**Arpit ruled every prior, and none of the rulings picks a value.**
+
+| prior | ruling | item |
+|---|---|---|
+| `superseded_weight` | closed — a fact, not a weight | W-151 |
+| `archived_weight` | closed — the flag already reaches every caller | W-152 |
+| `recency_half_life_days` | closed — at ≤365 days history-seeking → 0/13 | W-152 (+ W-153) |
+| `rerank_weight` | **different question**, split out as cost | W-154 |
+
+- **The one number behind all four:** shipped defaults already give 11–12/13
+  current-seeking and 8–9/13 history-seeking. Any value that perfects the first
+  costs 3–9 on the second. +1/+2 against a floor of 6.
+- **Nothing ships.** All three closed knobs are no-ops today.
+- ⚠ **W-153 is not optional in spirit:** `mtime` is on every record and in no
+  public field, so closing recency leaves callers with no date at all.
+- ⚠ **The query-side fork is unopened** — `--intent` / `--as-of` / surface the
+  chain. **No session may open it by implementing it.**
+- 🔴 **Standing instruction (Arpit, 2026-09-13):** Cowork ratifies and unblocks;
+  **Claude Code implements.** Filed to project memory.
+
+### `superseded_weight` is ruled closed — W-151 filed, not built (2026-09-13, Cowork)
+
+**Arpit, 2026-09-13:** no weight determines which document supersedes another,
+so the knob goes. **W-151** — [shipped 2026-09-13](IMPLEMENTATION.md) — carried the
+full definition of done and is 🟢 for Claude Code.
+
+- **The knob goes; the FACT stays** — the `superseded` property, the
+  `supersedes:` declaration, the edge and the graph plane are untouched.
+- **It changes no ranking.** It ships at `1.0`. After W-151 lands, *"which
+  vendor do we use"* still answers the 2023 document.
+- **Why the knob cannot work:** the band that orders a corpus sensibly
+  (~0.906–0.999 in a three-document test) has its lower edge set by an
+  **unrelated** document. Add a file and the correct value moves.
+- **And the flag is never set:** supersession is declared, never inferred, and
+  `git log -S "supersedes:"` is empty across the playground's whole history.
+- 🔴 **The open question is bigger than the knob:** will anyone ever write
+  `supersedes:`? If not, the concept wants re-examining, perhaps behind a
+  `fux link --supersedes` verb. Separate item, Arpit's call.
+- ⚠ **A `grep -r` across `work/` matched the golden answer key.** Path only —
+  no question or answer text. Exclude `work/golden` from every recursive search.
+
+### SR-WORK-OWNERSHIP, and the WORK family is now four (2026-09-13, Cowork)
+
+- **`0146_ownership.md` → [`records/0054_WORK-ownership.md`](../records/0054_WORK-ownership.md)**,
+  `SR-OWNERSHIP` → `SR-WORK-OWNERSHIP`. The hole at `0146` closed by shifting
+  `0147`–`0156` down one; a file number is an ordinal.
+- **The WORK range is `0051` SR-WORK-OPEN-QUEUE · `0052` SR-WORK-ENVIRONMENTS ·
+  `0053` SR-WORK-BENCHMARK · `0054` SR-WORK-OWNERSHIP.** Next free: `0055`.
+  ⚠ **`0053` was filed by a DIFFERENT session** at 12:53 on 2026-09-13, already
+  using the WORK range and the `owns@hash` convention. Check the directory
+  before taking a number.
+- 🔴 **Fourth renumber, second with no `RULE-SINCE` entry.** Decision 9 is why.
+- ⚠ **The device VM ran out of INODES twice** — `df -h` shows free space while
+  `df -i` is at 100%, and the second time it took the bridge's socket down.
+  Clear `$HOME/tmp/pytest-of-*` between long runs.
+
+### `owns` carries a content hash, and SR-LAW-10 is 0011 (2026-09-13, Cowork)
+
+- **`owns: [src/fux/query/rank.py@d95543ea8d13]`** on every record.
+  `scripts/sr-owns.py --write` stamps it, **then** `sr-hash.py --write` — the
+  order matters, because stamping a claim changes the record.
+  [SR-WORK-OWNERSHIP](../records/0054_WORK-ownership.md) decision 13.
+- **It is strictly stronger than the freshness gate**, which only proves the
+  owning record was *touched*. It cannot tell a redesign from a typo and never
+  will. ⚠ **A failure is a prompt to re-read the record.** If it starts being
+  obeyed without reading, **narrow what is owned — never loosen the check.**
+- **`0012_LAW-10` → `0011`**, closing the hole L9 left. The **handle `L10` did
+  not move**: a handle is an identity, a file number is an ordinal.
+- 🔴 **The renumber cost no `RULE-SINCE` entry — the first one that didn't.**
+  SR-WORK-OWNERSHIP decision 9 (judge a commit against the register as it stood then)
+  is why, and this is its first live proof.
+
+### L9 is retired — the environment rule is a WORK record now (2026-09-13, Cowork)
+
+**`SR-LAW-9` → [SR-WORK-ENVIRONMENTS](../records/0052_WORK-environments.md)**
+(`0052`, `kind: process`), on Arpit's ruling: which sibling environment may do
+what is **how work is done**, not a guarantee the engine makes.
+
+- 🔴 **The handle `L9` is retired and never reused; `records/0011` is VACATED,
+  not reserved.** Live handles: `L0`–`L8` and `L10`, gap deliberate. Renumbering
+  `L10` down would change the meaning of every citation already written.
+- **It owns `tests/test_work_environments.py`** (renamed) — an unowned guard
+  until today.
+- **The rule's content did not change.** What it lost is law precedence: a
+  conflict with it is now a conflict resolved by reading, not a voiding.
+- **Frozen artifacts keep their `L9` citations** and resolve by name against the
+  register; `work/regression/`, the sealed golden data and WORKLOG were not
+  rewritten.
+
+### The queue is the list; its rules live in SR-WORK-OPEN-QUEUE (2026-09-13, Cowork)
+
+**[`records/0051_WORK-open-queue.md`](../records/0051_WORK-open-queue.md)** is
+the home of all 53 queue rules. `OPEN-WORK.md` is **194 → 60 lines**: the
+Blocked-on-Arpit table, the open items, a pointer, and the two-line ball legend.
+Nothing else.
+
+- **WORK is a family with its own range, `0051`–`0100`** (Arpit). Law range
+  narrows to `0001`–`0050`; neither family borrows from the other, and a law
+  still outranks a WORK record.
+- **The record owns both enforcing tests** (`kind: process`), so the freshness
+  gate covers the queue's checks for the first time.
+- **The legend is the ONE exception**, declared verbatim in the record and held
+  byte-equal by `tests/test_work_queue_rules_have_one_home.py`. It is a caption
+  — four balls and stop. Precedence, the chain and the verb list are rules
+  20–34.
+- ⚠ **A generated view was built and withdrawn the same day.** It is in the
+  record's *Alternatives considered* with the argument for it, because it will
+  be re-proposed as a convenience: a generated copy is still a copy, and
+  rendered rules break what rule 3 says the queue's length means. **Do not
+  reintroduce it without ruling on decision 2 first.**
+- **`OPEN-WORK.md`'s frontmatter names its record** — `governed_by:
+  SR-WORK-OPEN-QUEUE` plus the path — so the reference is machine-readable.
+- **Every record carries a `content_sha` of itself** (SR-WORK-OWNERSHIP decision 12):
+  SHA-256 over the whole file with its own `content_sha:` line removed, stamped
+  by `scripts/sr-hash.py` **in the same change that amends the record**. It
+  answers *"which version of SR-X was this written against?"*, which amend-in-
+  place otherwise leaves unanswerable. It says THAT a record moved, never what;
+  it is not a signature.
+- ⚠ **The duplication regrows from summaries, not from rules.** The new check
+  found three fresh copies in `DOC-REGISTRY.md` and `INTERVIEW.md`, written
+  hours earlier by the session that was removing duplication. That is why the
+  scan is repo-wide.
+
+### Every record declares its `kind` (2026-09-13, Cowork)
+
+**`kind: law | component | process`**, required, between `type` and `name`.
+Sorted by one question: *what would have to change for this record to become
+wrong?* — Arpit's ruling (`law`, 12), a code change (`component`, 52), or the
+way work is done (`process`, 4). Definitions live once, in the register's
+§The three kinds; the model is [SR-WORK-OWNERSHIP](../records/0054_WORK-ownership.md)
+decision 11.
+
+- **It selects an ADDITIONAL gate, never switches one off.** Ownership and
+  freshness still bind any record with a non-empty `owns`.
+- **Written, not derived, on purpose:** SR-POSTINGS owns `tools/pruning-eval`
+  and is `component`; SR-WORK-QUALITY owns `tools/quality` and is `process`.
+  Identical shape, opposite kind — a derived field would have to guess.
+- 🔴 **Thirteen `component` records own nothing and are therefore ungated.**
+  Named in the register. Same hole SR-WORK-OWNERSHIP decision 7 admits for itself,
+  now counted. **Stage 2** (`process` owns its enforcing test) and **stage 3**
+  (`component` must own something) are **proposed and not in force** — each of
+  the thirteen is a separate ruling: gain an owner, be re-kinded, or claim one
+  of decision 7's two honest cases.
+- ⚠ **`process` is the kind that can rot.** It exists because a rule had no
+  home; owning its test is the only brake and it is not yet fitted. SR-WORK-OWNERSHIP
+  and SR-PORT-LIST are both in that state today, and veto 6 names it.
+
+### The records are SRs now, and they live at the repo root (2026-09-13, Cowork)
+
+**`docs/adr/` → `records/`, `ADR-<NAME>` → `SR-<NAME>`** (Arpit, 2026-09-13).
+**SR = Standing Record**: a maintained specification, not a decision-log entry.
+
+- **Why the name was wrong.** Law zero amends records in place; superseded ones
+  are deleted; they are cited by name because the content moves; they own `src/`
+  components and carry a veto condition to check *today*. That is a spec. The old
+  name imported immutability into a thing amended weekly — the premise that makes
+  the W-83 class possible. The register's new §*What an SR is* carries the table.
+- **The decision-log role was never in these files** — it is `work/compare/`
+  (fork + verdict + reopen-trigger) and `regression/*/VERDICT.md`.
+- **What did NOT move:** `archive/` (untouched, links dangle by design),
+  `archive/v0.26-docs/adr/` (frozen, keeps `ADR-NNNN`), `work/regression/`,
+  the sealed `work/golden/` data, and WORKLOG history.
+- ⚠ **`.fux/index/` is stale until a re-ingest** — every indexed path changed.
+- ⚠ **Three lessons, all caught only by running the suites.** A substring rename
+  is not a rename (`docs/adr` matched the fixture `docs/adr-storage.md`, 17 files
+  corrupted); reversing a bad rename by suffix is worse than the bad rename (it
+  wrote a SyntaxError into `src/fux/enrich.py`) — **rebuild from HEAD through one
+  canonical transform instead**; and a comment-only change to a twinned module
+  trips `test_node_twins`, which is correct, so the twins gained the record their
+  Python half already cites, **from the ownership table**.
+
+### 🟣 is a ball now, and the two Codex items are date-gated to 2026-09-30 (2026-09-13, Cowork)
+
+**Arpit, 2026-09-13:** his Codex limit is exhausted and he will run it on
+**2026-09-30**. *"Use a purple ball to signify that it is being waiting on a
+particular date"* — and, asked how far it reaches: **anything directly or
+indirectly dependent on a date gate carries 🟣.**
+
+- **The legend gained a fourth ball.** 🟣 = gated on a named date, directly or
+  through a chain. Precedence, the date format and the chain's verb list are
+  rules 20–34 of [SR-WORK-OPEN-QUEUE](../records/0051_WORK-open-queue.md) and
+  are not repeated here.
+- **A date gate is not a decision owed, so it leaves the inbox.** W-145 and
+  W-136 came out of *Blocked on Arpit* — **nine rows to seven** — and their
+  `↳ blocks:` content moved into their own files first (rule 3). W-87 is 🟣
+  behind both.
+- ⚠ **The gating test was near-vacuous and nobody could see it.**
+  `blocks_subrows()` keyed on the regex's 🔺 group, not the id — every inbox row
+  collapsed into one dict entry, so both `↳ blocks:` checks had been running
+  against the last row alone since they were written. Fixed in the same change;
+  **it immediately failed on W-147's sub-row**, which said *"blocks: nothing"*
+  where the rule wants `nothing else in the queue`. A check that passes because
+  it is looking at one row is worse than no check.
+- **Nothing else about the two items changed.** The stopgap key stays, every
+  golden number stays `informed`, and phase 5 still has not run.
 
 ### The consumer gets no source — BUILT and CLOSED (2026-09-12, Claude Code)
 
-✅ **W-149 is closed and [L10](../docs/adr/0012_LAW-10-bundled-output.md) is
+✅ **W-149 is closed and [L10](../records/0011_LAW-10-bundled-output.md) is
 satisfied.** What a consumer's `.fux/node/` holds is **one generated `fux.mjs`**
 plus `package.json`, `mcp-tools.json` and a README (shape A), or a **workspace
 manifest alone** (shape C); the bundler is
@@ -77,7 +343,7 @@ shipped inside both the PyPI wheel and the npm tarball.
   narrowed to **the consumer's end**. Fux's release has a bundler; the person
   running `fux setup` does not.
 - The offline promise — *"a clone with nothing installed still answers"*, which
-  [ADR-NODE-SEARCH](../docs/adr/0155_node-search.md) decision 2 leans on —
+  [SR-NODE-SEARCH](../records/0153_node-search.md) decision 2 leans on —
   survives under shape A.
 - **Decision 6 stands as written.** `node/` stays many files, one per Python
   module; `tests/test_node_twins.py` is untouched. The amendment adds one
@@ -97,9 +363,9 @@ splice that lives in `setup.py` so `ensure_layout` structurally cannot reach it.
 
 ⚠ **The item had proposed *declared, never detected* and was wrong on the
 precedent** — worth knowing, because the wrong version of this rule is easy to
-inherit. [ADR-FETCHER](../docs/adr/0117_fetcher.md) decision 5 and W-86 fork E
+inherit. [SR-FETCHER](../records/0117_fetcher.md) decision 5 and W-86 fork E
 govern **ingest**, where detection makes the *index* a function of the
-environment and [L3](../docs/adr/0005_LAW-3-deterministic.md) forbids it.
+environment and [L3](../records/0005_LAW-3-deterministic.md) forbids it.
 **`fux setup`'s scaffolding is not the index.** Neither precedent reached this,
 and the ruling trades away nothing a law protects.
 
@@ -133,18 +399,18 @@ hoists the `fux` bin to the workspace root — rung 3, shape C works. **PnP has 
 read as PnP or fux would wire a workspace nothing can resolve.
 
 ⚠ **And still true:** `ensure_node_reader` runs at the head of **every** ingest
-via `ensure_layout` ([ADR-DOTFUX](../docs/adr/0102_fux-directory.md)), so the
+via `ensure_layout` ([SR-DOTFUX](../records/0102_fux-directory.md)), so the
 manifest edit belongs to `setup` alone or a no-op ingest starts rewriting a file
 fux does not own.
 
 ✅ **The records were AHEAD of the code for one day, and the markers are now
-flipped.** ADR-NODE-SEARCH decisions 13-16 said **RULED / NOT BUILT**; they say
-BUILT, in the change that built them, along with ADR-DOTFUX's three rows,
-ADR-LAW-10's decision 8, ADR-DOCTOR's `node reader` row,
-ADR-T1-ACCELERATOR's decision 14 (five surfaces → six) and notes in
-ADR-ACQUIRED and ADR-PII. ⚠ **The exposure `643305b` recorded stands as a
+flipped.** SR-NODE-SEARCH decisions 13-16 said **RULED / NOT BUILT**; they say
+BUILT, in the change that built them, along with SR-DOTFUX's three rows,
+SR-LAW-10's decision 8, SR-DOCTOR's `node reader` row,
+SR-T1-ACCELERATOR's decision 14 (five surfaces → six) and notes in
+SR-ACQUIRED and SR-PII. ⚠ **The exposure `643305b` recorded stands as a
 lesson** — a record ahead of its code reads as authority exactly as one behind
-it does, and `tests/test_adr_freshness.py` sees neither. The window was one day
+it does, and `tests/test_sr_freshness.py` sees neither. The window was one day
 because the build followed immediately; nothing guarantees the next one is.
 
 **And the one that is easy to skip: the differential arm must gain the bundle as
@@ -154,7 +420,7 @@ a fifth surface** — shipping one artefact and measuring another is decisions
 ### W-107 is CLOSED, and the way it closed is the lesson (2026-09-12, Claude Code)
 
 **The Node read plane is built, published, and compared against Python on five
-surfaces.** [ADR-NODE-SEARCH](../docs/adr/0155_node-search.md) is
+surfaces.** [SR-NODE-SEARCH](../records/0153_node-search.md) is
 `accepted / yes`. W-107's row is deleted and its file is in `archive/open/`.
 
 🔴 **The headline is not the tune fix. It is what the tune fix exposed.**
@@ -202,7 +468,7 @@ nothing else**. Four more surfaces had been transcribed and never checked, and
 [W-148](open/W-148-what-the-two-readers-still-owe.md), `lane: arpit`: CI cannot
 reach a golden corpus (three routes, none chosen), Node's latency has no
 instrument (`fux-benchmark` unbuilt), `log-probe.yml` has never run, and
-ADR-API's renderer split is staged. **Two are his calls.**
+SR-API's renderer split is staged. **Two are his calls.**
 
 ⚠ **Nothing claims `N5 passes`** — one machine, Node 24, and PRE-REG-NODE-2 §2
 makes the arm standing rather than a gate.
@@ -241,14 +507,14 @@ nothing.
 
 🔴 **What this leaves unguarded, and it is not an item.** C1 and C3 have rested
 on **generator assertions** since 2026-08-28 and no live control backs them.
-That is recorded in [ADR-RS](../docs/adr/0133_predictions.md) rather than carried
+That is recorded in [SR-RS](../records/0133_predictions.md) rather than carried
 as work, because the fault is the endpoint and there is no third field to aim at.
 A replacement would have to ask *does the correct seed document rank above every
 sibling*, which is a `hit@1` question against a key — **W-136 phase 5's job**.
 
 **Two process changes landed with it, and both are mechanical:**
 
-1. **The bar is computed, not compared by hand** (ADR-RS decision 19a).
+1. **The bar is computed, not compared by hand** (SR-RS decision 19a).
    All three tools independently hard-coded *"net >= 6"*, which is the **floor of
    all floors** — the bar *before* the discordant count is known. A net of 8 on
    30 discordant pairs clears 6 and **fails decision 19's own table**, which asks
@@ -280,14 +546,14 @@ ordering that covers the first five. **Phase 4 covers five rungs, not eight.**
 **W-107 Phases 1a-4 landed.** `node/` reads an index Python wrote — 36 files,
 no dependencies, no build step — and `from fux import open` makes the read
 verbs importable. Both are recorded:
-[ADR-NODE-SEARCH](../docs/adr/0155_node-search.md) and
-[ADR-API](../docs/adr/0156_api.md).
+[SR-NODE-SEARCH](../records/0153_node-search.md) and
+[SR-API](../records/0154_api.md).
 
 **The shape to carry forward, in four sentences.**
 
 1. **`.fux/node/` is the FOURTH `.fux/` shape** — committed, engine-owned, and
    **overwritten on a version difference**, not write-if-missing
-   ([ADR-DOTFUX](../docs/adr/0102_fux-directory.md) decision 6a). Nobody edits
+   ([SR-DOTFUX](../records/0102_fux-directory.md) decision 6a). Nobody edits
    a vendored reader; a stale one is a wrong answer.
 2. **`ensure_layout` writes it, so every `fux ingest` does** — which is why the
    overwrite is conditional on the version: a committed directory must produce
@@ -306,7 +572,7 @@ algorithmic divergence**. The corpus is **959 documents**, a tenth of the design
 point, and Phase 0's baseline (50.2 ms at 10 000) does not reproduce on this
 machine. **Nothing was tuned, and no arm is called green anywhere** — the
 superseding pre-registration (H3 / W-138) still does not exist, and
-PRE-REGISTRATION-NODE §4 names an instrument L9 voided.
+PRE-REGISTRATION-NODE §4 names an instrument SR-WORK-ENVIRONMENTS voided.
 
 **The lesson worth keeping.** Every one of the four defects this change found
 was invisible to the suite and visible the moment something real ran: the
@@ -315,26 +581,26 @@ pointing at a path two rulings out of date, `mcp-tools.json` missing from npm's
 `files`, and a `"5"` where a `5` belonged. **Three of the four were found by
 running the thing in a scratch clone and a clean venv, not by reading it.**
 
-### L9 is reconciled, the benchmark is being rebuilt, and W-140 is down to one row (2026-09-12, Claude Code)
+### SR-WORK-ENVIRONMENTS is reconciled, the benchmark is being rebuilt, and W-140 is down to one row (2026-09-12, Claude Code)
 
 **Four items in one session: W-138 closed, W-139 in flight, W-106's arm, W-140's
 thirteen record/code disagreements.** What a successor needs, in order of how
 much it would cost to rediscover:
 
 1. 🔴 **`fux-playground` is gone as an instrument, and its replacement does not
-   exist yet.** W-138 rewrote ~40 artifacts to L9. The honest state: the golden
+   exist yet.** W-138 rewrote ~40 artifacts to SR-WORK-ENVIRONMENTS. The honest state: the golden
    ladder is the only quality instrument, **its questions carry no rank
    contract**, so `recall@k`, W-97's veto leg and the differential law's graded
    check all have **no set to run against at all** — not a smaller one. Three
    accepted records now say so in those words. Do not go looking for the
    hand-graded corpus; it is not coming back.
-2. ⚠ **`tests/test_l9_environments.py` is the guard, and it names every
+2. ⚠ **`tests/test_work_environments.py` is the guard, and it names every
    exception.** A new mention of the sandbox anywhere under `src/ tools/ tests/
    scripts/` fails until someone writes down why. A string literal naming it
    fails outright. That is deliberate: the veto's own `grep` cannot tell naming
    from reading, and half the remaining mentions are measured provenance that
    `forward only` protects.
-3. **The benchmark is being rebuilt to L9's shape in `~/my_programs/fux-benchmark`** —
+3. **The benchmark is being rebuilt to SR-WORK-ENVIRONMENTS's shape in `~/my_programs/fux-benchmark`** —
    its own generator (`bin/gen_corpus.py`, deterministic, verified byte-identical
    from a clean tree), seven **nested, hardlinked** corpora 100 → 10 000 of
    ~1 000-line documents, a 60-query fixed set **with no answer key**, and
@@ -350,9 +616,30 @@ much it would cost to rediscover:
    maintenance test that raced the background runner once and has not
    reproduced. Row 19's first diagnosis was wrong and cost two sessions. **Do
    not guess it.**
-6. 🔴 **W-147 is new and it is Arpit's**: `.fux/output.toml` can turn the answer
-   journal on, and ADR-PROVENANCE decision 10 says only a flag can — a fork that
-   decision explicitly reserved and that shipped through a different record.
+6. ✅ **W-147 is RULED (2026-09-13, Arpit): the journal has TWO consent
+   surfaces and both stay** — `fux answer --journal` and a committed
+   `[cli.answer] journal = true`. *"I need the flag as well as output TOML
+   configuration."* A committed line is more reviewable than a typed flag: git,
+   code review, no terminal to watch. **`tune.toml` is refused as the home**
+   (ranking file, not a journalling file) and **always-on-by-default is still
+   refused** — an opt-in somebody committed is not a default fux picked.
+   SR-PROVENANCE decision 10 and SR-OUTPUT decision 22 are both amended, and
+   `journal` is now a **declared exception** to SR-OUTPUT decision 2's boundary
+   rule rather than an instance of it. **SHIPPED the same day** — both surfaces
+   are bound by a test and the specimen line now says the key writes
+   ([IMPLEMENTATION.md](IMPLEMENTATION.md); the item is archived at
+   [`archive/open/`](../archive/open/W-147-the-journal-consent-surface.md)).
+7. ⚠ **A renumber repoints the records and forgets the tree — twice now**
+   (2026-09-11, 2026-09-13). The second left ~300 dead `NNNN_slug.md`
+   citations: 40 in `src/fux/` docstrings, 24 in the agent skills, 11 in
+   `tests/`, 5 in the decoders `fux setup` writes into a consumer's repo. **CI
+   was green through both.** All repointed 2026-09-13 and now gated by
+   `tests/test_record_paths_resolve.py` ([SR-WORK-OWNERSHIP](../records/0054_WORK-ownership.md)
+   decision 15). 🔴 **`work/regression/` is FROZEN and must never be
+   repointed** — a `"gold"` field in an `evidence/*.json` names the document
+   that was the right answer *on the day of the run*; it is a datum, not a
+   link, and rewriting it falsifies the measurement. That mistake was made and
+   reverted in the same session, which is why it is written down here.
 
 ### The four ranking priors are answered, and the answer is structural (2026-09-12, Claude Code)
 
@@ -456,13 +743,13 @@ touches; none of them is waiting on a sweep:
    shipped. What exists is `.fux/index/{00..ff}.jsonl`, flat and doc-major.
    **Nothing at the point of reading says so.** The new detailed diagram says
    it; the paper still does not.
-2. **ADR-RANKING §1's diagram shows the pre-W-111 two-key sort**
+2. **SR-RANKING §1's diagram shows the pre-W-111 two-key sort**
    `(-round(score,9), id)` while its own later section states the 5-key order.
    `rank.py:349` is authoritative; the record contradicts itself.
-3. **ADR-REFER decision 6 still says "the verdict is four-state"** while a later
+3. **SR-REFER decision 6 still says "the verdict is four-state"** while a later
    decision in the same record adds `as-ingested` (shipped 2026-09-01).
    `Confidence.verified`'s docstring carries the same omission.
-4. **ADR-DOTFUX's Mermaid says `sources/ -- dirs - urls - types`** while its own
+4. **SR-DOTFUX's Mermaid says `sources/ -- dirs - urls - types`** while its own
    ASCII twin says `formats.toml`. The two halves of a diagram whose stated rule
    is *update both, always, together* have drifted.
 
@@ -505,7 +792,7 @@ by agents.*
   not re-litigate blind:** pre-2026-08-25 regression artifacts are **frozen**
   (same baseline as `test_regression_runs.py`); `work/golden/seed|golden-answer`
   is **sealed test data**; the `code`→`path` edge-kind rename is **declined** in
-  favour of a glossary definition and remains ADR-GRAPH's.
+  favour of a glossary definition and remains SR-GRAPH's.
 - 🔴 **On Arpit's hands:** `pytest -q` on the Mac (the device VM is 3.10, no
   pytest), and the **GitHub About + topics**, which still carry the old
   positioning and are a strong classifier signal.
@@ -545,27 +832,27 @@ by agents.*
 - **Row 8 moved to W-122** rather than being fixed: unknown-`fux.toml`-key rejection needs a key set, which is W-122's gate R-2, and a second hand-written set is the duplicate that item exists to remove.
 - **Row 20 filed:** the freshness gate's `describes` relation is per-file, so changing one function demanded no-op lines in three unrelated records — twice in one session.
 
-### Four priors ruled (b); ADR-RS decision 23 (2026-09-11, Cowork)
+### Four priors ruled (b); SR-RS decision 23 (2026-09-11, Cowork)
 
-- **Test data must contain the input a feature acts on** (ADR-RS d23). For the priors: Codex prompt 1b adds superseding pairs, `seed/archive/`, `seed-dates.tsv` and intent-split questions; phase 2 declares archived dirs, commits at the dates, checks coverage counts. First rung is now `rung-seed`.
+- **Test data must contain the input a feature acts on** (SR-RS d23). For the priors: Codex prompt 1b adds superseding pairs, `seed/archive/`, `seed-dates.tsv` and intent-split questions; phase 2 declares archived dirs, commits at the dates, checks coverage counts. First rung is now `rung-seed`.
 
-### Operating guides on four vendors — ADR-AGENT-POLICY decision 15 (2026-09-11, Cowork; committed `4d243e3`)
+### Operating guides on four vendors — SR-AGENT-POLICY decision 15 (2026-09-11, Cowork; committed `4d243e3`)
 
 - **`fux setup` now writes 71 agent files, not 18** (84 until W-141 merged Codex's and Copilot's skills): ten guide skills on every vendor's skill surface, 21 path-scoped pointers (Kiro/Claude/Copilot), five Kiro auto guides. Roster: `setup.GUIDE_SKILLS`, `PATH_SCOPED_TOPICS`, `AUTO_GUIDE_TOPICS`. Gates: `tests/test_setup_agents_guides.py`.
 - 🔴 **Guides name workarounds for defects** (W-140). Fixing a defect without editing its guide ships a lie in the wheel — 15g, unenforced, and **exercised nine times on 2026-09-11**: every closed row deleted a workaround from a shipped skill.
-- **Codex and Copilot share `.agents/skills/`** (W-141, closed 2026-09-12, ADR-AGENT-POLICY decision 16) — one tuple, `setup.SHARED_SKILLS`, in both rows; `.codex/skills/` and `.github/skills/` are no longer written, so the outside set is **71** files, not 84. ⚠ Consumer repos set up earlier keep their old folders; `fux setup` never deletes.
+- **Codex and Copilot share `.agents/skills/`** (W-141, closed 2026-09-12, SR-AGENT-POLICY decision 16) — one tuple, `setup.SHARED_SKILLS`, in both rows; `.codex/skills/` and `.github/skills/` are no longer written, so the outside set is **71** files, not 84. ⚠ Consumer repos set up earlier keep their old folders; `fux setup` never deletes.
 
-### L9 — each sibling environment has one job (2026-09-11, Cowork)
+### SR-WORK-ENVIRONMENTS — each sibling environment has one job (2026-09-11, Cowork)
 
-- 🔴 **`fux-playground` is Arpit's hands only** — no agent, tool, test or run uses it. **`fux-lab`** runs every measurement on golden test data ≤ 10 000. **`fux-benchmark`** only times queries and keeps ranked lists, current build vs newest previous-major release. Law text: CLAUDE.md L9; rationale ADR-LAW-9 (`0011`).
+- 🔴 **`fux-playground` is Arpit's hands only** — no agent, tool, test or run uses it. **`fux-lab`** runs every measurement on golden test data ≤ 10 000. **`fux-benchmark`** only times queries and keeps ranked lists, current build vs newest previous-major release. Law text: CLAUDE.md SR-WORK-ENVIRONMENTS; rationale SR-WORK-ENVIRONMENTS (`0011`).
 - Reconciliation is W-138 (~40 artifacts + guard test); the benchmark build is W-139. Filed playground runs stand.
-- **OPEN-WORK ratified against L9:** W-115, W-97, the heading control, W-106, W-112 and W-107's measured arms all wait on W-136's golden ladder. **W-136 phase 1 (Arpit runs Codex) is the single biggest unblock.**
+- **OPEN-WORK ratified against SR-WORK-ENVIRONMENTS:** W-115, W-97, the heading control, W-106, W-112 and W-107's measured arms all wait on W-136's golden ladder. **W-136 phase 1 (Arpit runs Codex) is the single biggest unblock.**
 
-### W-137 — the ADR renumber LANDED (2026-09-11, Claude Code)
+### W-137 — the SR renumber LANDED (2026-09-11, Claude Code)
 
-- **Laws own `0001`–`0100`**; `0011`–`0100` is reserved and **empty — no placeholder files**. **Every other record starts at `0101`**: ADR-CLI `0011` → `0101` through ADR-DOCTOR `0064` → `0154`, 54 records +90. The one-shot script is deleted; the scheme is stated in [the register](../docs/adr/README.md) §The convention.
-- ⚠ **Any ADR path or bare number you read in a document written before today is stale.** Resolve it through the **name** beside it. `work/WORKLOG.md` entries above 2026-09-11 are the worst case — append-only, so their prose was never corrected.
-- ⚠ **The first new law takes `0011`**, ADR-CLI's ordinal until today — accepted deliberately over leaving the law set non-contiguous.
+- **Laws own `0001`–`0100`**; `0011`–`0100` is reserved and **empty — no placeholder files**. **Every other record starts at `0101`**: SR-CLI `0011` → `0101` through SR-DOCTOR `0064` → `0154`, 54 records +90. The one-shot script is deleted; the scheme is stated in [the register](../records/README.md) §The convention.
+- ⚠ **Any SR path or bare number you read in a document written before today is stale.** Resolve it through the **name** beside it. `work/WORKLOG.md` entries above 2026-09-11 are the worst case — append-only, so their prose was never corrected.
+- ⚠ **The first new law takes `0011`**, SR-CLI's ordinal until today — accepted deliberately over leaving the law set non-contiguous.
 
 ### W-136 — the sealed golden benchmark (2026-09-11, Cowork)
 
@@ -574,20 +861,20 @@ by agents.*
 
 ### Four inbox rows ruled; three are now Claude Code's (2026-09-11, Cowork)
 
-- **W-132** — `RULE-SINCE` moves to HEAD (Arpit: stop auditing old commits). Fires ADR-OWNERSHIP veto 6 by ruling; the file-scoped `describes` over-firing stays.
+- **W-132** — `RULE-SINCE` moves to HEAD (Arpit: stop auditing old commits). Fires SR-WORK-OWNERSHIP veto 6 by ruling; the file-scoped `describes` over-firing stays.
 - **W-118** — `fux-decoder` + `fux-usage` to `.github/skills/`; Claude, Kiro, Codex already have them.
 - **W-133** — re-run the blind `unanswerable` set; answer TRUE/FALSE, no threshold. The gating question returns to the inbox after.
-- **W-121** — closed; evidence kept, recorded in ADR-TABULAR.
+- **W-121** — closed; evidence kept, recorded in SR-TABULAR.
 - **W-134** — fux-playground repaired on Arpit's ruling (`3b4d275`: `docs` back in the source list, goldens saved); left is a current index + `check.py --rows`.
 - **Enrichment re-run question** — closed; the lesson is in §4.
-- **W-135** — Arpit ratified the headroom obligation: per endpoint and direction, observed vs proven, 0 → Inconclusive, no minimum, dated test. ADR-RS is written in W-135's change, not before.
+- **W-135** — Arpit ratified the headroom obligation: per endpoint and direction, observed vs proven, 0 → Inconclusive, no minimum, dated test. SR-RS is written in W-135's change, not before.
 - **7 `partial` goldens** — resolved by a third blind annotator ([run](regression/2026-09-11-third-annotator/report.md)): annotator 2's set on all 7; W-134 flips them to `complete`.
 - **Inbox is one ruling:** W-87 Part B → accept R-11 or not. W-116's `fux-lab` blocker was stale; it is agent work behind W-134.
 - **Order:** W-132 → W-118; W-133 and W-134 independent. OPEN-WORK rule 9: no git housekeeping in the queue.
 
 ### `.fux/pii.toml` is REQUIRED now (2026-09-11, Cowork — W-128 + W-129, uncommitted)
 
-- **Every command but `setup`/`tune`/`output` refuses in a repo without it**; `doctor` runs and fails the row. Rule and exemptions: [ADR-PII](../docs/adr/0150_pii.md) decision 17 — do not restate them.
+- **Every command but `setup`/`tune`/`output` refuses in a repo without it**; `doctor` runs and fails the row. Rule and exemptions: [SR-PII](../records/0148_pii.md) decision 17 — do not restate them.
 - **Writing a test that builds a repo by hand?** Write `.fux/pii.toml` (empty is fine) or ingest and every CLI verb refuse.
 - **Rules may name a checksum** (`validate = "luhn" | "verhoeff"`), a closed engine set — decision 16. **The starter covers US and Canadian identifiers** (SSN, ITIN, MBI, SIN on; EIN, postal code, NANP phone off) — decision 12a. Allowlists, shared packs and path scoping were offered and not chosen.
 - ⚠ W-128's code rode into `fa47760` unannounced; its records and all of W-129 are uncommitted.
@@ -595,7 +882,7 @@ by agents.*
 ### W-130 landed: the types list is `.fux/formats.toml` (2026-09-11, Cowork)
 
 - **What changed:** `include` + `[decoders]` in `.fux/formats.toml` replaced the
-  line-grammar `.fux/sources/types` — [ADR-TYPES](../docs/adr/0128_types-list.md)
+  line-grammar `.fux/sources/types` — [SR-TYPES](../records/0128_types-list.md)
   decision 12, committed in `607ca88` as `types.toml` and **renamed to
   `formats.toml` the same day** on Arpit's ruling (uncommitted). `types.toml` was
   never pushed, so it has no refusal path.
@@ -603,7 +890,7 @@ by agents.*
   converts it. A session that meets *"moved to .fux/formats.toml"* in another repo
   runs `fux setup` and deletes the old file — it does not re-create `sources/types`.
 - ⚠ **Code names did not change**: `typesfile.py`, `read_types`, `--types`,
-  ADR-TYPES. Only the file on disk is `formats.toml`.
+  SR-TYPES. Only the file on disk is `formats.toml`.
 - **Verified in the Cowork container on the Mac's tree after the rename:** 3208
   unit + 80 e2e green; the one failure is the pre-existing `94231b2bf` freshness
   red.
@@ -611,21 +898,21 @@ by agents.*
 ### `[index]` in tune.toml: `max_phrases` (12 -> 32) and `max_table_rows` (2026-09-11, latest — uncommitted)
 
 - **Ruling (Arpit):** both index limits live in `.fux/tune.toml [index]`, not
-  `fux.toml`. It is the **declared exception** to ADR-TUNE decision 1 — ingest
+  `fux.toml`. It is the **declared exception** to SR-TUNE decision 1 — ingest
   reads it via `tune.index_limits()` only, `--no-tune` does not reach it, and
-  the boundary test asserts it DOES move bytes. ADR-TUNE decision 13.
+  the boundary test asserts it DOES move bytes. SR-TUNE decision 13.
 - **Default `max_phrases = 32`** — display only; measured on this repo's 563
-  markdown docs (ADR-EXTRACTED decision 9). Dedup of repeated headings was
+  markdown docs (SR-EXTRACTED decision 9). Dedup of repeated headings was
   **declined** on numbers (0.24 % of the index) and on reuse/shard grounds.
 - **A changed `[index]` re-extracts** via `runtime/extract-config-digest`,
   written after `write_index`. This closed a live hole: `max_table_rows` never
   reached unchanged CSVs on delta runs since 2026-09-06.
 - **Not done, and why:** uncommitted (the freshness gate will also want
-  ADR-ACQUIRED / ADR-URL-FRESHNESS, which describe `config.py`); `pii-digest`'s
+  SR-ACQUIRED / SR-URL-FRESHNESS, which describe `config.py`); `pii-digest`'s
   write-before-extract exposure filed, not fixed; this repo's index needs one
   `fux ingest` on a Python ≥ 3.11 machine.
 - **Lesson:** a recommended fux.toml table was checked against the code and
-  not against ADR-CONFIG's veto list — the veto was already breached. **Read the
+  not against SR-CONFIG's veto list — the veto was already breached. **Read the
   veto conditions of the record that owns a file before proposing a new key in it.**
 
 ### W-101 landed: `fux doctor` closed FIVE gaps, and two accepted vetoes can now be run (2026-09-05, latest)
@@ -635,8 +922,8 @@ One pass at [`doctor.py`](../src/fux/doctor.py) — see
 [IMPLEMENTATION](IMPLEMENTATION.md) for the table and the evidence.
 
 🔴 **The one that mattered most: the `as-ingested` share.** It is the **veto
-check of two ACCEPTED records** ([ADR-ACQUIRED](../docs/adr/0147_acquired-plane.md),
-[ADR-URL-FRESHNESS](../docs/adr/0149_url-freshness.md)), both of which named
+check of two ACCEPTED records** ([SR-ACQUIRED](../records/0145_acquired-plane.md),
+[SR-URL-FRESHNESS](../records/0147_url-freshness.md)), both of which named
 `fux doctor --json` as how to run it and neither of which could be run at all.
 `doctor.freshness_counts()` and the new `freshness` block close that; both
 records' debt paragraphs are rewritten with a captured output block.
@@ -667,7 +954,7 @@ the tests and both records keep them apart.
 the clean-corpus-recall row are **deleted**. Before the second went, its unique
 claims — the `none` arm's numbers and *`recall@k` is a paired metric that
 separates arms `hit@k` cannot* — moved into
-[ADR-QUALITY](../docs/adr/0141_quality-contract.md).
+[SR-WORK-QUALITY](../records/0056_WORK-quality.md).
 
 **Still idle and needing no ruling:** the glibc `log` probe on a CI runner, the
 `idf` widening, the lab emitter, W-97's two harness blockers, the `heading`
@@ -746,7 +1033,7 @@ graded queries, answer recall `0.4341 → 0.8256`, `ask` byte-identical. **Read
 the three costs before you touch this verb**: +157 % assembled bytes on 43/43,
 8/43 bands demoted `grounded → weak`, and the cited document differs from
 `ask`'s first result on 18/43. All three are in
-[ADR-ANSWER](../docs/adr/0105_answer.md) decisions 11–13.
+[SR-ANSWER](../records/0105_answer.md) decisions 11–13.
 
 ⚠ **Two things a next session must not re-derive as a surprise:**
 
@@ -763,9 +1050,9 @@ the three costs before you touch this verb**: +157 % assembled bytes on 43/43,
    for an absolute one. The next absolute number is **blocked**, not
    inconvenienced.
 
-⚠ **`ADR-ANSWER` owned no component until 2026-09-05.** W-108 rewrote the
-`answer` verb and the freshness gate demanded ADR-ASK, ADR-CONFIDENCE,
-ADR-OUTPUT, ADR-REFER and ADR-URL-FRESHNESS — every record except the one whose
+⚠ **`SR-ANSWER` owned no component until 2026-09-05.** W-108 rewrote the
+`answer` verb and the freshness gate demanded SR-ASK, SR-CONFIDENCE,
+SR-OUTPUT, SR-REFER and SR-URL-FRESHNESS — every record except the one whose
 entire subject is the verb. Fixed with three `describes` rows. **If you are
 about to trust the gate to open the right record, check the table first.**
 
@@ -785,7 +1072,7 @@ new and both are genuinely his:
    performs no body download"* is **unmet as written**: CDP interception is at
    the response stage, so the body has already transferred. `validate()` saves
    the decode and the shard comparison, not bandwidth
-   ([ADR-CDP-FETCHER](../docs/adr/0118_cdp-fetcher.md) decision 12).
+   ([SR-CDP-FETCHER](../records/0118_cdp-fetcher.md) decision 12).
 2. **Whether the W-83 shape gets a gate.** `acquired_max_bytes` was accepted in
    a record, assigned in the ownership table, and **never implemented** — every
    mechanical check passed, because the freshness gate proves a record was
@@ -796,8 +1083,8 @@ new and both are genuinely his:
 
 **What is actually open:** [W-101](OPEN-WORK.md), a single `doctor.py` pass
 carrying four things — and its first is the **veto check for TWO accepted
-records** ([ADR-ACQUIRED](../docs/adr/0147_acquired-plane.md),
-[ADR-URL-FRESHNESS](../docs/adr/0149_url-freshness.md)), so until it lands
+records** ([SR-ACQUIRED](../records/0145_acquired-plane.md),
+[SR-URL-FRESHNESS](../records/0147_url-freshness.md)), so until it lands
 neither veto can be run at all. **The `.fux/enrich/` redaction hole is closed** —
 see the section below.
 
@@ -855,12 +1142,12 @@ shell is dead, write that file.**
 ⚠ **Phase 2's spec was CUT, not built, and the boundary HELD.** The `status`,
 `final_url_host` and `final_url_contains` conditions and the always-on
 `landed-off-origin` check would have put HTTP facts inside the engine, which
-[ADR-FETCHER](../docs/adr/0117_fetcher.md) decision 13 forbids — and whose own
+[SR-FETCHER](../records/0117_fetcher.md) decision 13 forbids — and whose own
 veto names *"`urlsrc.py` mentions a status code"* as proof of regression. Arpit
 ruled CUT; the six remaining conditions are pure over the bytes, and provider
 detection survives as `body_contains` over **form-field names**, which are an
 API between a page and its own backend and outlive the redesigns that rewrite
-every visible string. [ADR-REFUSAL](../docs/adr/0148_refusals.md) decision 4.
+every visible string. [SR-REFUSAL](../records/0146_refusals.md) decision 4.
 
 The item's detail file is archived at
 [`archive/open/W-98-acquired-plane.md`](../archive/open/W-98-acquired-plane.md)
@@ -921,7 +1208,7 @@ middle, contract and transport unchanged:
 1. **An acceptance criterion is unmet as written**: *"`fux update` with a
    matching ETag performs no body download."* Interception is at the response
    stage, so the body has already transferred — `validate()` saves the decode
-   and the shard comparison, **not bandwidth**. Written into ADR-CDP-FETCHER
+   and the shard comparison, **not bandwidth**. Written into SR-CDP-FETCHER
    decision 12 rather than quietly satisfied. He re-words it or accepts it.
 2. ~~**a `handoff/` directory under `work/` exists and duplicates
    [W-98](../archive/open/W-98-acquired-plane.md) §11.**~~ **CLOSED 2026-09-01 — and it
@@ -930,7 +1217,7 @@ middle, contract and transport unchanged:
    phases landed), so it went to
    [`archive/handoff/`](../archive/README.md) with a successor row naming the
    three records it produced, and W-98 §2/§11 now point at
-   [ADR-REFUSAL](../docs/adr/0148_refusals.md) instead of at the moved file.
+   [SR-REFUSAL](../records/0146_refusals.md) instead of at the moved file.
    `tests/test_archive_law.py` is green. ⚠ **The lesson worth keeping is the
    one that produced the red:** a handoff was written into the `work/`-side
    directory retired on 2026-08-18, and both copies then had to be *kept in sync by hand* for a
@@ -948,7 +1235,7 @@ byte-identical to the old template (verified before writing) and was synced.
 `extract_links` has no caller in `src/`, but the file's comment and
 `tests/ingest/test_cdp_fetcher.py` retain it deliberately. **Arpit ruled: keep
 the code, fix the docstring.** Done. And
-[ADR-ACQUIRED](../docs/adr/0147_acquired-plane.md) is still `⏳ proposed` with
+[SR-ACQUIRED](../records/0145_acquired-plane.md) is still `⏳ proposed` with
 `owns: []` — **a record claims what the table gives it today.**
 
 **Suite: 2647 unit passed, 2 skipped, 74 e2e passed** (2026-09-01, after the
@@ -973,12 +1260,12 @@ ran. It is now a committed line that fux verifies.
 ⚠ **It reverses a settled rule** — `types` had no attributes, deliberately,
 since 2026-08-20; `sourcelist.parse`'s own error text still says *"Adding one is
 a change to the record, not a config addition."* Arpit ruled it. The test that
-keeps it from being the first crack is in ADR-TYPES decision 11 and is **whose
+keeps it from being the first crack is in SR-TYPES decision 11 and is **whose
 property is it** — the directory's (still refused, veto 1) or the extension's.
 
-**Five records touched**: ADR-TYPES d11 + **11a**, ADR-DECODE d13,
-ADR-URL-LIST d12 narrowed (an attribute at an *empty* default is omitted),
-ADR-CLI and ADR-DOTFUX annotated. Four of them because four components changed.
+**Five records touched**: SR-TYPES d11 + **11a**, SR-DECODE d13,
+SR-URL-LIST d12 narrowed (an attribute at an *empty* default is omitted),
+SR-CLI and SR-DOTFUX annotated. Four of them because four components changed.
 
 ⚠ **Decision 11a was written hours after 11, because 11 refused its own main
 use case.** `*.geojson decoder=jsondoc` — a new extension on an existing
@@ -1060,7 +1347,7 @@ half of it.**
 
 - **What shipped.** `.fux/tune.toml` gains `[confidence]` —
   `separation_floor` (default `0.1`) and `doc_coverage_floor` (default `0.0`).
-  Ruled by Arpit in Cowork. **This reverses ADR-CONFIDENCE decision 7**, which
+  Ruled by Arpit in Cowork. **This reverses SR-CONFIDENCE decision 7**, which
   had refused exactly this; decision 7 is kept in the record, quoted, with the
   half of its argument that survives named.
 
@@ -1080,7 +1367,7 @@ half of it.**
   is the precedent: it can silently reweight a whole corpus and ships with a
   warning, not a lock.
 
-- ⚠ **ADR-QUALITY decision 6's binding now has a hole.** Fux does not get to
+- ⚠ **SR-WORK-QUALITY decision 6's binding now has a hole.** Fux does not get to
   pick a second abstention threshold. A *consumer* now can. Accepted rather
   than argued away: the engine default stays bound to `t = 0.75`, and a local
   value is published as local.
@@ -1094,9 +1381,9 @@ half of it.**
   pre-registered threshold moving inside a comparison. Forbidden.
 
 - **Also fixed on contact, and both were W-83's class** — a record describing
-  behaviour the code no longer has. **ADR-TUNE decision 4** still said *keys
+  behaviour the code no longer has. **SR-TUNE decision 4** still said *keys
   ship COMMENTED* (they have shipped live since 2026-08-27) and carried a
-  commented specimen; the **handbook** still said ADR-CONFIDENCE was
+  commented specimen; the **handbook** still said SR-CONFIDENCE was
   *proposed*, said *five fields* when there are six, and told the reader the
   floor was deliberately not tunable.
 
@@ -1119,7 +1406,7 @@ at 12 s apart this measures server-side determinism, not document churn.
 18 ruled, 8 moved to W-87, 1 answered by the build. What is left under W-82 is
 ruling 3, which is a judgement.
 
-**🔴 Read this before ruling R10.** Two of ADR-RS decision 15's three controls
+**🔴 Read this before ruling R10.** Two of SR-RS decision 15's three controls
 were built (`tools/quality-controls/`), and **the decoy set found a defect on its
 first run**:
 
@@ -1135,9 +1422,9 @@ first run**:
   case argues `separation` measures **decisiveness** rather than groundedness:
   a corpus of near-misses is decisive about its best near-miss.
 - **Named, not fixed**, and **deliberately unpinned by any test** — pinning a
-  defect is how it becomes the contract. ADR-CONFIDENCE decision 12.
+  defect is how it becomes the contract. SR-CONFIDENCE decision 12.
 
-**ADR-RS decision 15 keeps its `NOT BUILT` marker.** It names three controls; the
+**SR-RS decision 15 keeps its `NOT BUILT` marker.** It names three controls; the
 **sealed subset** is the one left, and it is blocked on a judgement rather than an
 environment — decision 15 says sealing *shrinks* the visible set and whoever
 builds it must resolve that tension rather than inherit it. On 50 goldens both
@@ -1192,7 +1479,7 @@ rule picks `0.5`; its verdict table's non-monotone row picks *no change*.
 - **`SEPARATION_FLOOR` stays `0.10`, and no test was edited** — the confidence
   test asserts the rule relative to the constant and never its value, a guard
   built for exactly this moment and working.
-- **The correction lives in [ADR-RS](../docs/adr/0133_predictions.md) decision
+- **The correction lives in [SR-RS](../records/0133_predictions.md) decision
   18, never in the frozen file** (W-82 ruling 8).
 
 **Three defects, all the same shape: an error message that sends the reader
@@ -1212,7 +1499,7 @@ error path, say what was found, what was expected, and what to do.**
 decided-but-unexecuted items — and, less visibly, had **never been able to run
 the test suite it was reporting on**.
 
-**The first finding is the one to carry forward.** `OPEN-WORK.md` said *"two ADR
+**The first finding is the one to carry forward.** `OPEN-WORK.md` said *"two SR
 tests are RED right now."* **Twelve were**, in five groups. The queue was
 accurate about what it had seen and blind to everything else, which is exactly
 what `CLAUDE.md` §Two hazards describes: **a doc repeating a doc is not a second
@@ -1220,29 +1507,29 @@ source.** If you arrive with a shell and the queue was written without one,
 **run the suite before you believe anything.**
 
 **What closed.** Five hands items (plus two `BLOCKED.json` named that the queue's
-table did not) — two `git rm`, six `git mv` into `archive/`, every ADR-ENRICHED
+table did not) — two `git rm`, six `git mv` into `archive/`, every SR-ENRICHED
 citation repointed. `tests/` went **2 158 passed / 12 failed → 2 170 / 0**, and
 `tests_e2e/` ran on **macOS** for the first time (74 passed, 1 skipped).
 
 **Three of the twelve failures were defects in the checks, not in the code**,
 and they are the durable part:
 
-1. **The ADR register's §"the number line is contiguous" note was FALSE.** It
+1. **The SR register's §"the number line is contiguous" note was FALSE.** It
    described a renumber of `0026`+ down by one that never ran — and **must never
    run**: W-82 ruling 7 forbids compacting a vacated ordinal, having already
    watched one put two records on `0022`. The note cited
-   `0025_runtime-manifest.md` and `0042_locks.md`; **neither file has ever
+   `0123_runtime-manifest.md` and `0140_locks.md`; **neither file has ever
    existed in this repo.** ⚠ **If you read a doc claiming the numbering is
    contiguous, it is stale.** `0017` and `0025` are burned, deliberately.
-2. **`tests/test_adr_freshness.py` convicts history unless it is stopped**, and
+2. **`tests/test_sr_freshness.py` convicts history unless it is stopped**, and
    its own docstring claimed it never did. It ran here for the first time and
    flagged eight commits against records written the same day. Now the register
-   is parsed **per commit** (`git show <sha>:docs/adr/README.md`) — ADR-OWNERSHIP
+   is parsed **per commit** (`git show <sha>:records/README.md`) — SR-WORK-OWNERSHIP
    decision 9. **`RULE-SINCE` did NOT move**; the standing precedent was to
    retire ~95 commits of auditability to excuse eight, twice before.
    **A fourth entry on `RULE-SINCE` means this fix failed.**
 3. **A frozen pre-registration with no report is a legal state** —
-   `pre-registered, not yet measured`, ADR-RS decision 17. R10's directory failed
+   `pre-registered, not yet measured`, SR-RS decision 17. R10's directory failed
    four checks for correctly following the method: commit the threshold first,
    measure when the environment exists.
 
@@ -1268,7 +1555,7 @@ is the one whose every assertion is that something is ABSENT. **Prefer measuring
 a claim about the test suite over reading one.**
 
 ⚠ **L8's one-line handle was stale in four live docs** — including this one and
-ADR-LAWS' own §1 table — all carrying the form Arpit **withdrew the same day he
+SR-LAWS' own §1 table — all carrying the form Arpit **withdrew the same day he
 wrote it**. Reconciled. **That is a reconciliation, not a ratification**: the L8
 sanity-check is still open and still his.
 
@@ -1329,7 +1616,7 @@ doing exactly its job; **one** was a `binary` fixture worth a look. One number
 over two populations is a number nobody reads by the second run — the same
 failure W-88's skip notice was written for, arrived at from the other side.
 
-**So [ADR-INGEST](../docs/adr/0106_ingest.md) gained decision 15:** a skip
+**So [SR-INGEST](../records/0106_ingest.md) gained decision 15:** a skip
 carries its class — `POLICY` (a committed list said no) or `UNREADABLE` (fux
 opened it and could not read it) — **assigned where the skip is made, never
 parsed back out of the reason string**, and the summary counts them separately.
@@ -1349,15 +1636,15 @@ Ruled by Arpit on 2026-08-27, closing W-89.
 
 > **L8** · *A use record never leaves the machine.*
 >
-> ⚠ **This handle changed on 2026-08-27, the day L8 was written**: it read *"What fux retains about use is hashed, bounded, and local"* until Arpit reverted the hashing, the size bound and the stdout prohibition hours later. Plaintext queries and answers are legal; what survives is the confinement. Read the law where it is stated — [ADR-LAW-8](../docs/adr/0010_LAW-8-use-record.md) §2 (it lived in `CLAUDE.md` until 2026-09-12).
+> ⚠ **This handle changed on 2026-08-27, the day L8 was written**: it read *"What fux retains about use is hashed, bounded, and local"* until Arpit reverted the hashing, the size bound and the stdout prohibition hours later. Plaintext queries and answers are legal; what survives is the confinement. Read the law where it is stated — [SR-LAW-8](../records/0010_LAW-8-use-record.md) §2 (it lived in `CLAUDE.md` until 2026-09-12).
 
 - **Every one of L1–L7 governs what fux does to documents.** L8 is the first law
   about what fux retains of *people using it*. L2 governs **corpus content**, and
   a query is not content however precisely it describes one — that was the gap.
 - **Normative text is `CLAUDE.md` §Non-negotiable constraints**, as always. The
   handle, the reasoning and the limits are
-  [ADR-LAWS](../docs/adr/0001_LAWS.md) **decision 8**. Both changed in one commit,
-  which ADR-LAWS decision 4 requires — **if you find them committed separately,
+  [SR-LAWS](../records/0001_LAWS.md) **decision 8**. Both changed in one commit,
+  which SR-LAWS decision 4 requires — **if you find them committed separately,
   that is the defect, not a style question.**
 - **L8 forbids nothing fux does today.** Verified against the code *before* the
   text was written: `maintain/lastcited.py` hashes the query key
@@ -1370,9 +1657,9 @@ Ruled by Arpit on 2026-08-27, closing W-89.
   locators are already in the committed `M/` plane — the file adds **frequency,
   not new exposure**. Grounded in the 2006 AOL search-log release, where
   de-identified queries still identified a named individual.
-- ⚠ **Why this was a law and not one more ADR decision.** The prohibition already
-  existed as [ADR-QUALITY](../docs/adr/0141_quality-contract.md) decision 11 — and
-  an ADR is a thing another ADR may supersede. Meanwhile
+- ⚠ **Why this was a law and not one more SR decision.** The prohibition already
+  existed as [SR-WORK-QUALITY](../records/0056_WORK-quality.md) decision 11 — and
+  an SR is a thing another SR may supersede. Meanwhile
   [`proposals/ranking-tuning.md`](proposals/ranking-tuning.md) §8 calls a per-repo
   query log *"an asset fux gets for free"*. **The pull toward building one is
   documented and growing**, which is OPEN-WORK rule 6's damage-that-accrues.
@@ -1387,8 +1674,8 @@ operations in [`OPEN-WORK.md`](OPEN-WORK.md).
 ### Before that: the record set was rewritten — metadata once, and no record carries history (2026-08-27)
 
 **Arpit's instruction, and it reshaped all 45 records plus
-[`TEMPLATE.md`](../docs/adr/TEMPLATE.md) and
-[the register](../docs/adr/README.md).** Three parts, none cosmetic:
+[`TEMPLATE.md`](../records/TEMPLATE.md) and
+[the register](../records/README.md).** Three parts, none cosmetic:
 
 1. **Frontmatter is stated once.** Ten keys in a fixed order —
    `type · name · title · description · status · date · feature · owns · laws ·
@@ -1414,15 +1701,15 @@ operations in [`OPEN-WORK.md`](OPEN-WORK.md).
    — was **derived by reading the tests and grepping the tree**. Run
    `uv run pytest -q tests` before trusting a word of it.
 2. ⚠ **Three tests are red, and all three have one cause.**
-   `docs/adr/0043_confidence.md` is a stale duplicate of `0045_confidence.md`
-   (same `name:`; `0043` is also ADR-LOCKS). ✅ **Arpit ruled 2026-08-27: keep
+   `records/0141_confidence.md` is a stale duplicate of `0141_confidence.md`
+   (same `name:`; `0043` is also SR-LOCKS). ✅ **Arpit ruled 2026-08-27: keep
    `0045`** — the concurrent-session reason for leaving it in place is
    discharged. `git rm` it and all three go green. **Do not "fix" them by
    reordering the register** — `register_names()` is keyed by name, so
    reordering only moves which of the two files reads as unlisted.
 3. **Do not re-add an `Amended` block, and do not restore a record's history
    from git when you find prose missing.** It was removed deliberately, under an
-   explicit instruction. `tests/test_adr_frontmatter.py` will fail you, but the
+   explicit instruction. `tests/test_sr_frontmatter.py` will fail you, but the
    reason matters more than the check.
 4. **`Owns (on acceptance)` no longer exists.** A record that owns nothing
    declares `owns: []`, whatever its status. The conditional form let a record
@@ -1431,12 +1718,12 @@ operations in [`OPEN-WORK.md`](OPEN-WORK.md).
 
 ⚠ **It crossed `BLOCKED.json`, and landed two of the blocked rulings by
 accident.** That blocker says W-82 rulings **1, 4, 6, 7** are stuck on
-`docs/adr/README.md` being held uncommitted by the concurrent session — and this
-pass rewrote that file. **Ruling 1** (ADR-MCP / ADR-ENRICH / ADR-RERANK →
-`accepted`) and **ruling 7** (ADR-CODES-TABLE out of the register, archived,
+`records/README.md` being held uncommitted by the concurrent session — and this
+pass rewrote that file. **Ruling 1** (SR-MCP / SR-ENRICH / SR-RERANK →
+`accepted`) and **ruling 7** (SR-CODES-TABLE out of the register, archived,
 ordinal burned) are now **landed**; *flip where the code exists* and the archive
 law produced them independently. **Rulings 4 and 6 are not landed** — the
-`describes` column, and ADR-ENRICH superseding ADR-ENRICHED — and both apply
+`describes` column, and SR-ENRICH superseding SR-ENRICHED — and both apply
 cleanly on top of the new register. **Do not let a second session claim 1 or 7
 as still outstanding.**
 
@@ -1447,7 +1734,7 @@ subject ceased to exist*. **The answer was archival, not a fourth status.**
 
 ### The change before it: fux states how much it believes its own answer (2026-08-27)
 
-**[ADR-CONFIDENCE](../docs/adr/0142_confidence.md) (`0045`, ⏳ proposed) is the
+**[SR-CONFIDENCE](../records/0141_confidence.md) (`0045`, ⏳ proposed) is the
 runtime half of the quality contract below.** Every answer now carries four
 signals (`coverage` idf-weighted · `separation` · `verified` · `support`), a
 `band`, and an `answerable` boolean — on `ask`/`find`/`answer` in `--json`, on
@@ -1456,7 +1743,7 @@ signals (`coverage` idf-weighted · `separation` · `verified` · `support`), a
 
 **Five things a session arriving cold will otherwise get wrong:**
 
-1. ⚠ **`SEPARATION_FLOOR` is a PROXY, not fux's own threshold.** ADR-QUALITY
+1. ⚠ **`SEPARATION_FLOOR` is a PROXY, not fux's own threshold.** SR-WORK-QUALITY
    decision 6 froze `t = 0.75` hours earlier; two abstention thresholds
    governing one decision is drift. **R10 must find the `separation` at which
    `P(correct) = t`.** If you find yourself picking a floor because it makes
@@ -1477,7 +1764,7 @@ signals (`coverage` idf-weighted · `separation` · `verified` · `support`), a
    1811 passed / 8 errors on the last clean run; 38 new tests green in
    isolation; the sandbox died mid-verification.
    **`tests/derive/test_weighted_bound.py` is in the blast radius.** And two
-   **stray misnumbered files** — `docs/adr/0043_confidence.md`,
+   **stray misnumbered files** — `records/0141_confidence.md`,
    `work/open/W-89-the-confidence-plane.md` — are still on disk and must be
    deleted. ✅ **Ruled by Arpit 2026-08-27** (keep `0045`/`W-90`); the removal is
    two `git rm`s nobody has run yet, not an open question.
@@ -1485,7 +1772,7 @@ signals (`coverage` idf-weighted · `separation` · `verified` · `support`), a
 ### The change before it: the quality contract is declared (2026-08-27)
 
 **Fux now says what a quality number means, for the first time.**
-[ADR-QUALITY](../docs/adr/0141_quality-contract.md) (`0044`, accepted) ratifies
+[SR-WORK-QUALITY](../records/0056_WORK-quality.md) (`0044`, accepted) ratifies
 W-87 Phase 0 — all six forks, on Arpit's ruling.
 
 **Four things a session arriving cold will otherwise get wrong:**
@@ -1507,7 +1794,7 @@ W-87 Phase 0 — all six forks, on Arpit's ruling.
    nothing.
 4. ⚠ **W-87's fork 6 ruled "no query log" and deliberately did NOT rule whether
    L2 reaches one.** That gap is [W-89](../archive/open/W-89-does-l2-reach-a-query-log.md).
-   Do not close it by inference from ADR-QUALITY decision 11 — the record
+   Do not close it by inference from SR-WORK-QUALITY decision 11 — the record
    explicitly declines it.
 
 **The queue is three items** — W-82, W-87, W-89 — and the *Blocked on Arpit*
@@ -1519,7 +1806,7 @@ detail file with no index row.
 **Fux reads thirty extensions now, not six.** Sixteen built-in decoders, all
 stdlib, no dependency added; `fux setup` copies them into `.fux/decoders/` and
 **the copy is what runs**. Consumer decoders may bring dependencies the runtime
-may not — [ADR-DECODE](../docs/adr/0139_decode.md) is the record, and the
+may not — [SR-DECODE](../records/0139_decode.md) is the record, and the
 detail file is archived at
 [`archive/open/W-86-the-decoder-plane.md`](../archive/open/W-86-the-decoder-plane.md)
 (named, never cited).
@@ -1535,7 +1822,7 @@ detail file is archived at
    **adding a decoder silently starts indexing a new file type**. Pinned by a
    test.
 3. ⚠ **A bare `str` from a fetcher is still accepted**, as a transition ramp.
-   The P8 break was **never re-costed** — ADR-FETCHER's *"no external
+   The P8 break was **never re-costed** — SR-FETCHER's *"no external
    consumers"* is dated v0.32.0 and predates the PyPI release. Removing the
    ramp without measuring is removing the thing that makes the break survivable.
 4. ⚠ **Markdown is ratified as the decoder intermediate, with no reopen
@@ -1579,7 +1866,7 @@ split, 2026-08-26.
 **Fork E was ruled the same day, and the law did not move.** Arpit: *"let the
 consumer add the dependencies — unless the consumer adds the dependencies,
 that feature won't be available."* This looked like an L1 amendment and is not
-one: [ADR-ENRICH](../docs/adr/0137_enrich.md) decision 1 already states the
+one: [SR-ENRICH](../records/0137_enrich.md) decision 1 already states the
 pattern as a table — network I/O → `.fux/fetchers/`, model calls → the
 consumer's agent — and **this is its third row, `.fux/decoders/<name>.py`.**
 L1 constrains the runtime fux ships; consumer code is not that. ⚠ **The
@@ -1588,10 +1875,10 @@ imported would make two developers with identical sources produce different
 root hashes, so the set is **declared, not detected**, and a machine that
 cannot satisfy it **fails loudly** rather than shipping a smaller index. ⚠ The
 honest cost: a consumer decoder **can break L4 and no gate reaches it** — the
-same asymmetry ADR-ENRICH decision 3 owns about `model:`.
+same asymmetry SR-ENRICH decision 3 owns about `model:`.
 
 **Two refusals to preserve.** `.json` may not re-enter the allowlist by
-argument: ADR-TYPES verdict G was measured, and only a new pre-registration at
+argument: SR-TYPES verdict G was measured, and only a new pre-registration at
 10 000 documents replaces it. And full YAML is refused **on correctness** —
 expanding anchors duplicates terms and inflates `tf`, so the conformant parser
 is the wrong one.
@@ -1599,7 +1886,7 @@ is the wrong one.
 ### The change before it: `ask` cites at heading level (W-84, 2026-08-26)
 
 **Arpit asked whether `ask` should cite at line level. The answer was no, and
-the refusal is the durable half** — [ADR-ASK](../docs/adr/0103_ask.md)
+the refusal is the durable half** — [SR-ASK](../records/0103_ask.md)
 decision 10 carries it. A line range on `ask` could only be computed at
 **ingest**, so one edit makes it point at the wrong lines *while looking
 exactly as right as before*; it also costs a positional index (2–4× the
@@ -1682,7 +1969,7 @@ sections below that describe a dense lane are history and are marked.
 committed record shape moved to `fux.index.v2` (five-field BM25F, `flen`
 replacing `wlen`, the `code` field dropped) and the analyzer to `v2`, so it
 ships ahead of a stable `2.0.0` to give the migration a soak. **All four new
-records — ADR-TUNE, ADR-MCP, ADR-ENRICH, ADR-RERANK — are `status: proposed`.**
+records — SR-TUNE, SR-MCP, SR-ENRICH, SR-RERANK — are `status: proposed`.**
 Ratifying them is a separate, human step and it is owed.
 
 **W-73 and W-76 are closed.** Both built, both released, both recorded in
@@ -1690,10 +1977,10 @@ Ratifying them is a separate, human step and it is owed.
 `archive/open/`. The queue is **three, and every one of them is `arpit`**.
 
 **What the 2026-08-24 audit found, and it is the thing to carry forward.**
-`tests/test_adr_freshness.py` **passed throughout W-76 while sixteen records
+`tests/test_sr_freshness.py` **passed throughout W-76 while sixteen records
 went stale**, because ownership is **directory-level**: rewriting the scorer
-under `src/fux/query/` satisfied the check by touching **ADR-ASK**, while
-**ADR-RANKING**, whose entire subject is that scorer, was never opened. *The
+under `src/fux/query/` satisfied the check by touching **SR-ASK**, while
+**SR-RANKING**, whose entire subject is that scorer, was never opened. *The
 check is not wrong; it is narrower than it reads.* Deciding whether a record
 may declare *"I describe this component even though I do not own it"* is
 [W-82 §5.3](../archive/open/W-82-the-consolidated-build.md)'s real deliverable.
@@ -1720,7 +2007,7 @@ delta ingest) shipped the same day, ahead of it.
 | **W-64 — the progress plane** on `ingest.run()` / `derive.build()`; stderr-only, TTY-gated, counts not clocks, stdout byte-identical with the bar on or off | `v0.35.0` |
 | **scan-by-default** — `ask`/`find`/`answer`/`graph` take the reference scan unless `--fast`; three e2e tests had gone **vacuous** at the flip | `v0.35.0` |
 | **PRIORITY P1–P7**, then `PRIORITY.md` archived — ordering lives in `OPEN-WORK.md` only | `1fc51a7`…`1a8ce1a` |
-| **P6 — the refer plane wired into `answer`** as its default path (`--no-refer` restores the M2 shape); **ADR-REFER and ADR-ANSWER both flip `accepted`** | `9f8366e` |
+| **P6 — the refer plane wired into `answer`** as its default path (`--no-refer` restores the M2 shape); **SR-REFER and SR-ANSWER both flip `accepted`** | `9f8366e` |
 | **the Windows console class became a check** — `→` in a `print()` crashed both Windows CI arms on the release commit; second occurrence of the class, so `tests/test_windows_console_safe.py` now gates it | `35eeae0` |
 
 **The design point moved to 10 000 documents on 2026-08-21** (Arpit,
@@ -1777,21 +2064,21 @@ without it tier 1 would have been recorded as a pass that proved nothing.
 
 ⚠ **Both records stayed `proposed` on the day, and both went `accepted` on
 2026-08-22** — neither on a passing re-measurement, which is the part to
-understand before touching either. **ADR-MAINTENANCE** is accepted because the
+understand before touching either. **SR-MAINTENANCE** is accepted because the
 fork R5's failure opened was *ruled*: it now describes a **deferring** hook, not
-the inline one R5 judged. **ADR-MERGE-DRIVER** is accepted on Arpit's reading of
+the inline one R5 judged. **SR-MERGE-DRIVER** is accepted on Arpit's reading of
 R6 — §3.1 governs, tier 1 is dropped as uninformative, tiers 2 and 3 carry it.
-⚠ **Both carry a named debt.** ADR-MAINTENANCE describes behaviour that is
-**not built** (W-66). ADR-MERGE-DRIVER rests on a **reading of a
+⚠ **Both carry a named debt.** SR-MAINTENANCE describes behaviour that is
+**not built** (W-66). SR-MERGE-DRIVER rests on a **reading of a
 self-contradicting pre-registration** (W-67), and its veto 5 returns it to
 `proposed` if the repair overturns that reading. **R6-MERGE itself still reads
-`INCONCLUSIVE` and was not edited** — the ruling is an addendum beside it. **ADR-REFER went `accepted` on 2026-08-21** once P6 made the
+`INCONCLUSIVE` and was not edited** — the ruling is an addendum beside it. **SR-REFER went `accepted` on 2026-08-21** once P6 made the
 plane load-bearing in `answer`: accepted **carrying its budget-sweep veto
 condition open**, which is Arpit's call and not the same as measured.
 
 ### Before that: delta ingest, and a veto that fired (2026-08-20)
 
-**`fux ingest` no longer re-extracts what did not change.** ADR-INGEST
+**`fux ingest` no longer re-extracts what did not change.** SR-INGEST
 decision **1b**: an unchanged content `sha` keeps its `title`, `phrases`,
 `terms`, `wlen` and `code`; **edges still re-resolve every run**, because they
 are the one field the rest of the corpus can change without this document
@@ -1806,7 +2093,7 @@ would reopen it*. That measurement was taken, filed
 change. Nobody had to argue about it.
 
 **One guarantee is narrower, and it is written down**: term-hash collision
-detection is complete only under `--full`. It is in ADR-INGEST's Consequences,
+detection is complete only under `--full`. It is in SR-INGEST's Consequences,
 not hidden in a docstring. ⚠ **This paragraph used to name a second guarantee**
 — *"a newly available embedding bundle does not retro-fit `code`"* — and both
 the bundle and `code` were deleted (2026-08-23 and 2026-08-25). The carry-forward
@@ -1823,20 +2110,20 @@ a verdict, a hold lifted, or fifty goldens written by hand.
 
 | shipped 2026-08-20 | record | measured? |
 |---|---|---|
-| W-46 · W-48 — two query defects | ADR-CLI · ADR-ASK · ADR-ANSWER | n/a |
-| **M3** the graph lane | [ADR-GRAPH](../docs/adr/0126_graph.md) ✅ | **no** — W-57 |
-| **M4 core** the refer plane | [ADR-REFER](../docs/adr/0127_refer-plane.md) ✅ (2026-08-21, veto 2 open) | **partly** — R4 passed; the budget sweep is W-59 |
-| W-45 + W-55 — what fux indexes | [ADR-DIR-LIST](../docs/adr/0120_dir-list.md) · [ADR-TYPES](../docs/adr/0128_types-list.md) ✅ | **no** — rides with W-52 |
+| W-46 · W-48 — two query defects | SR-CLI · SR-ASK · SR-ANSWER | n/a |
+| **M3** the graph lane | [SR-GRAPH](../records/0126_graph.md) ✅ | **no** — W-57 |
+| **M4 core** the refer plane | [SR-REFER](../records/0127_refer-plane.md) ✅ (2026-08-21, veto 2 open) | **partly** — R4 passed; the budget sweep is W-59 |
+| W-45 + W-55 — what fux indexes | [SR-DIR-LIST](../records/0120_dir-list.md) · [SR-TYPES](../records/0128_types-list.md) ✅ | **no** — rides with W-52 |
 | W-56 — both lab environments | SETUP-LAB · SETUP-PLAYGROUND | rebuilt, under git |
-| **M5** maintenance | [ADR-MAINTENANCE](../docs/adr/0129_hooks.md) ✅ · [ADR-MERGE-DRIVER](../docs/adr/0130_merge-driver.md) ✅ | **ruled, not passed** — W-66 builds it, W-67 repairs R6's instrument |
-| W-60 — the TTL fetch cache | [ADR-REFER](../docs/adr/0127_refer-plane.md) 5a-5c ✅ | n/a |
-| **W-63 · W-64** the source verbs, the progress plane | [ADR-CLI](../docs/adr/0101_cli-surface.md) ✅ | captured, not gated |
+| **M5** maintenance | [SR-MAINTENANCE](../records/0129_hooks.md) ✅ · [SR-MERGE-DRIVER](../records/0130_merge-driver.md) ✅ | **ruled, not passed** — W-66 builds it, W-67 repairs R6's instrument |
+| W-60 — the TTL fetch cache | [SR-REFER](../records/0127_refer-plane.md) 5a-5c ✅ | n/a |
+| **W-63 · W-64** the source verbs, the progress plane | [SR-CLI](../records/0101_cli-surface.md) ✅ | captured, not gated |
 
-**No record on this list is `proposed` any more.** ADR-MAINTENANCE and
-ADR-MERGE-DRIVER both went `accepted` on 2026-08-22 on Arpit's two calls;
-ADR-REFER left the list on 2026-08-21. **What replaced "unratified" as the
-standing risk is subtler and worth naming**: ADR-MAINTENANCE is an accepted
-record describing **unbuilt** behaviour (W-66), and ADR-MERGE-DRIVER is an
+**No record on this list is `proposed` any more.** SR-MAINTENANCE and
+SR-MERGE-DRIVER both went `accepted` on 2026-08-22 on Arpit's two calls;
+SR-REFER left the list on 2026-08-21. **What replaced "unratified" as the
+standing risk is subtler and worth naming**: SR-MAINTENANCE is an accepted
+record describing **unbuilt** behaviour (W-66), and SR-MERGE-DRIVER is an
 accepted record resting on a **reading** rather than a clean pass (W-67). An
 accepted record that is wrong reads as authority — which is what Law zero exists
 to prevent — so both debts are written into the records themselves rather than
@@ -1860,12 +2147,12 @@ days old, pre-1.0). **Still no subcommand tree.**
 **Read this first: the engine grew two milestones and neither is measured, and
 the reason is that the measuring environments are gone.**
 
-- **M3, the graph lane, shipped** ([ADR-GRAPH](../docs/adr/0126_graph.md),
+- **M3, the graph lane, shipped** ([SR-GRAPH](../records/0126_graph.md),
   accepted). `explain` / `graph` / `path`; communities by **unseeded** label
   propagation in a **derived** plane (`.fux/runtime/graph.json`); PPR-lite with
   a **lazy** walk. The archived relational eval passes on the new kernel,
   11/11, its corpus copied live into `tests_e2e/eval/`.
-- **M4's core shipped** ([ADR-REFER](../docs/adr/0127_refer-plane.md),
+- **M4's core shipped** ([SR-REFER](../records/0127_refer-plane.md),
   **⏳ proposed, not accepted**). `source` · `freshness` · `arc` · `chunk` ·
   `rescore` · `assemble`. **No verb exposes it** — deliberately.
 - **`fux-lab` and `fux-playground` do not exist on this machine**
@@ -1910,16 +2197,16 @@ the reason is that the measuring environments are gone.**
   instructions — **two breaking changes**, both cheapest now.
 - **Two new verbs, eight in total.** `fux setup` writes the files a consumer
   owns (write-if-missing, from wheel package data); `fux url` records a URL with
-  every attribute stated and **never fetches**. ADR-CLI's mental model is now
+  every attribute stated and **never fetches**. SR-CLI's mental model is now
   four groups — lifecycle / write / sources / read — because the *count* was
   never the model. **"No subcommand tree" is the constraint that survived.**
 - **`title_h` carries an `h:` prefix.** That was the defect with a measured
   cost: the L5 `hashed` default wrote an index no `fux build` would accept, so
   27.2 ms became 4 248.8 ms. **Fixed in the field's shape, never in the
   accelerator invariant.** No `_format` or `analyzer` bump — the reasoning is
-  [ADR-INDEX-LIFECYCLE](../docs/adr/0108_index-lifecycle.md) decision 9, and
+  [SR-INDEX-LIFECYCLE](../records/0108_index-lifecycle.md) decision 9, and
   the migration is `fux ingest --refresh-urls`.
-- **`archived=` is parsed and deliberately unread.** ADR-ARCHIVED-CONTENT decision 5
+- **`archived=` is parsed and deliberately unread.** SR-ARCHIVED-CONTENT decision 5
   was amended to split the file from the signal: parsing a declaration nothing
   reads cannot be wrong, and changing what a verb says about a document needs
   an instrument. [W-44](../archive/open/W-44-archived-content-signalling.md) still owns it.
@@ -1937,58 +2224,58 @@ the reason is that the measuring environments are gone.**
   a measured net −6, its per-chunk successor measured **0 fixed / 2 broken**,
   and Arpit deleted the lane, the model and the flag. `--hybrid` is now an
   argparse error. **There is no dense lane to flip.**
-- **Documentation moved into [`work/`](README.md) on 2026-08-18**, and the ADR
+- **Documentation moved into [`work/`](README.md) on 2026-08-18**, and the SR
   system was rebuilt around cite-by-name, §1-humans/§2-agents, checkable veto
   conditions, and an ownership table with an executable twin.
 - **A second move the same day** took the paper, both architecture diagrams,
   `handoff/`, and the eight v0.30 records into `work/`. `docs/` now holds only
-  `GLOSSARY.md`, `index.md`, and the ADR register with `TEMPLATE.md`
-  and ADR-LAWS.
-- **The new record set has started.** [ADR-LAWS](../docs/adr/0001_LAWS.md)
-  opened it at 0001; **[ADR-CLI](../docs/adr/0101_cli-surface.md)** is 0002 —
+  `GLOSSARY.md`, `index.md`, and the SR register with `TEMPLATE.md`
+  and SR-LAWS.
+- **The new record set has started.** [SR-LAWS](../records/0001_LAWS.md)
+  opened it at 0001; **[SR-CLI](../records/0101_cli-surface.md)** is 0002 —
   the six-verb command-line surface, with every command and its real output
   captured in [`regression/2026-08-18-cli-surface/`](regression/2026-08-18-cli-surface/report.md).
   Writing it found a live defect ([W-46](../archive/open/W-46-hybrid-missing-model-crash.md)).
 - **A great deal of valuable writing is not a decision** (2026-08-18). Three
   documents left `work/adr/` without being superseded, because none of them was
-  ever an ADR: the two P1 rulings became **verdicts** beside their evidence,
-  and ADR-PLAYGROUND became **SETUP-PLAYGROUND** in
+  ever an SR: the two P1 rulings became **verdicts** beside their evidence,
+  and SR-PLAYGROUND became **SETUP-PLAYGROUND** in
   [`setup/`](setup/README.md) — most of it was how to stand up a sibling repo,
   not a position anyone argues with. A new **SETUP-LAB** was written the same
   day; the lab had run for weeks with its rules scattered across memory, a
   TEST-PLAN and a dozen worklog entries. **`work/adr/` is now five records, and
   every one has a named successor** — what is left is ratification, not writing.
-- **A verdict is not an ADR** (2026-08-18). The two P1 rulings left the record
+- **A verdict is not an SR** (2026-08-18). The two P1 rulings left the record
   set and became `VERDICT.md` files beside their evidence — `P1-GATE`
   (INCONCLUSIVE) and `P1-RERUN` (FAIL). Nothing supersedes a measurement except
   a better measurement, so a verdict is cited, never replaced. Only
   **SETUP-PLAYGROUND** is now unsuperseded in `work/adr/`.
 - **`PLAN.md` is archived** (2026-08-18). Milestone scope was migrated into
   each W-item's detail file, so **an open item is now its own spec**; the port
-  list became [ADR-PORT-LIST](../docs/adr/0114_port-list.md). `docs/` holds
+  list became [SR-PORT-LIST](../records/0114_port-list.md). `docs/` holds
   `GLOSSARY.md`, `index.md` and `adr/`, and nothing else.
 - **Five more records landed 2026-08-18, all ⏳ proposed:**
-  [ADR-RECORD](../docs/adr/0109_index-record.md) (the committed line, property
-  by property), [ADR-T1-ACCELERATOR](../docs/adr/0110_accelerator.md),
-  [ADR-RANKING](../docs/adr/0111_ranking.md),
-  [ADR-POSTINGS](../docs/adr/0112_postings.md),
-  [ADR-CONFIG](../docs/adr/0113_config.md). **The template's §1 now carries
+  [SR-RECORD](../records/0109_index-record.md) (the committed line, property
+  by property), [SR-T1-ACCELERATOR](../records/0110_accelerator.md),
+  [SR-RANKING](../records/0111_ranking.md),
+  [SR-POSTINGS](../records/0112_postings.md),
+  [SR-CONFIG](../records/0113_config.md). **The template's §1 now carries
   optional Examples and Charts sections**, and all nine earlier records were
   retrofitted with Examples in the same change.
 - **Three verb records landed 2026-08-18, all ⏳ proposed:**
-  [ADR-ASK](../docs/adr/0103_ask.md), [ADR-FIND](../docs/adr/0104_find.md),
-  [ADR-ANSWER](../docs/adr/0105_answer.md) — written from a captured session
+  [SR-ASK](../records/0103_ask.md), [SR-FIND](../records/0104_find.md),
+  [SR-ANSWER](../records/0105_answer.md) — written from a captured session
   ([`regression/2026-08-18-query-verbs/`](regression/2026-08-18-query-verbs/report.md)).
   The earlier three were re-indexed to 0007–0009 to seat them at the numbers
   Arpit chose; **no prose moved**, because records are cited by name.
-- **Four more records landed 2026-08-18, all ⏳ proposed:** [ADR-DOTFUX](../docs/adr/0102_fux-directory.md), [ADR-INGEST](../docs/adr/0106_ingest.md), [ADR-URL-INGEST](../docs/adr/0107_url-ingest.md), [ADR-INDEX-LIFECYCLE](../docs/adr/0108_index-lifecycle.md) — written from a captured session in [`regression/2026-08-18-ingest-and-index/`](regression/2026-08-18-ingest-and-index/report.md). **They retire nothing yet**: three predecessors are unratified, so W-30/W-31 gate the swap.
+- **Four more records landed 2026-08-18, all ⏳ proposed:** [SR-DOTFUX](../records/0102_fux-directory.md), [SR-INGEST](../records/0106_ingest.md), [SR-URL-INGEST](../records/0107_url-ingest.md), [SR-INDEX-LIFECYCLE](../records/0108_index-lifecycle.md) — written from a captured session in [`regression/2026-08-18-ingest-and-index/`](regression/2026-08-18-ingest-and-index/report.md). **They retire nothing yet**: three predecessors are unratified, so W-30/W-31 gate the swap.
 - **The v0.30 record set is archived** (2026-08-18, Arpit's instruction, all
   five at once). `work/adr/` no longer exists, and on 2026-09-06 the archived
   records were deleted outright — the successors in
-  [`../docs/adr/`](../docs/adr/README.md) are the only records now. **The successors are
+  [`../records/`](../records/README.md) are the only records now. **The successors are
   accepted** and hold the components — a record cannot own the engine and be a
-  proposal at the same time. Records that supersede nothing (ADR-FIND,
-  ADR-ANSWER, ADR-RANKING, ADR-POSTINGS, ADR-PORT-LIST) stay ⏳ proposed.
+  proposal at the same time. Records that supersede nothing (SR-FIND,
+  SR-ANSWER, SR-RANKING, SR-POSTINGS, SR-PORT-LIST) stay ⏳ proposed.
 
 ## 2 · In flight, and the immediate next step
 
@@ -2027,8 +2314,8 @@ conclude.**
 ### 🔴 READ THIS FIRST: `CLAUDE.md` is no longer where a law lives (2026-09-12)
 
 **W-122 landed in full.** Each law is **stated in its own record** —
-[`ADR-LAW-0`](../docs/adr/0002_LAW-0-authority.md) …
-[`ADR-LAW-9`](../docs/adr/0011_LAW-9-environments.md), in a `LAW-TEXT`-fenced block
+[`SR-LAW-0`](../records/0002_LAW-0-authority.md) …
+[`SR-WORK-ENVIRONMENTS`](../records/0052_WORK-environments.md), in a `LAW-TEXT`-fenced block
 at the top of §2. `CLAUDE.md` §Non-negotiable constraints carries a **generated**
 copy, rendered by [`scripts/gen-laws.py`](../scripts/gen-laws.py) and held
 byte-equal by [`tests/test_claude_md_laws.py`](../tests/test_claude_md_laws.py).
@@ -2039,16 +2326,16 @@ byte-equal by [`tests/test_claude_md_laws.py`](../tests/test_claude_md_laws.py).
   Editing `CLAUDE.md`'s block by hand fails a test and is reverted by the next
   generation. A law still changes **only on Arpit's ruling, named in the record**.
 - **Reading a law record's §2 prose is now correct**, and before 2026-09-12 it was
-  the mistake ADR-LAWS existed to prevent. Both sentences are true of their dates.
-- **`ADR-LAWS` is the router** — handles and the table, nothing normative. Its
+  the mistake SR-LAWS existed to prevent. Both sentences are true of their dates.
+- **`SR-LAWS` is the router** — handles and the table, nothing normative. Its
   decision 1 is struck through and kept, because live citations point at it.
 - **A key is real only if it is in its record's declared `keys` block.**
-  [`tests/test_adr_config_keys.py`](../tests/test_adr_config_keys.py) holds
-  ADR-CONFIG ↔ `config.py` and ADR-TUNE ↔ `tune.py` equal in both directions, and
+  [`tests/test_sr_config_keys.py`](../tests/test_sr_config_keys.py) holds
+  SR-CONFIG ↔ `config.py` and SR-TUNE ↔ `tune.py` equal in both directions, and
   **an unknown `fux.toml` key is now refused by name** rather than ignored.
 - **[W-146](open/W-146-the-rest-of-l0.md) is what is left**, and it is Arpit's: the
   26-row inventory naming eleven `CLAUDE.md` sections that are technical and
-  unhoused, plus two rulings — whether `ADR-WORK-QUEUE` is written, and how far
+  unhoused, plus two rulings — whether `SR-WORK-QUEUE` is written, and how far
   *never restates* reaches into docstrings. ⚠ **This session applied the narrow
   reading and touched no docstring.** The unguarded exposure is named there.
 
@@ -2082,7 +2369,7 @@ that *"this corpus can see the change"* is a thing to establish, not assume.
 
 ### What a new session most needs to know about this one
 
-- **ADR-DOCTOR (0064) is new and it is a carve-out**, ruled by Arpit after the
+- **SR-DOCTOR (0064) is new and it is a carve-out**, ruled by Arpit after the
   file-scoped `describes` over-firing fired twice in two days. A change to
   `doctor.py` now demands **one** record instead of eight. ⚠ **The over-firing
   itself is NOT fixed** — key-scoped `describes` was declined, twice, and stays
@@ -2103,14 +2390,14 @@ that *"this corpus can see the change"* is a thing to establish, not assume.
 
 **The thing that was owed is now paid.** `.venv/bin/python -m pytest -q tests
 tests_e2e` on the actual device (not a mirror): **2425 passed, 3 skipped, 0
-failed.** The output.toml fork (ADR-OUTPUT decision 20) and `ask`'s
+failed.** The output.toml fork (SR-OUTPUT decision 20) and `ask`'s
 `sections` (decision 21) were ruled 2026-08-28 and verified only in a cloud
 mirror at the time; the device run surfaced one real gap the mirror
-structurally could not see — the `sections` pair had touched ADR-CLI-owned
-`cli.py` and ADR-CONFIDENCE-owned `query/__init__.py` without touching either
+structurally could not see — the `sections` pair had touched SR-CLI-owned
+`cli.py` and SR-CONFIDENCE-owned `query/__init__.py` without touching either
 owning record (`test_working_tree_is_not_mid_violation` diffs the working
 tree against `HEAD`, and a staged mirror copy has no `HEAD` to diff). Fixed
-with cross-reference notes only — ADR-CLI decision 11, ADR-CONFIDENCE
+with cross-reference notes only — SR-CLI decision 11, SR-CONFIDENCE
 decision 14, both pointing back at decision 21, no new ruling. See
 `IMPLEMENTATION.md`'s 2026-08-29 entry and `WORKLOG.md` for the full trail.
 **Nothing here is committed** — this was a same-session device re-verification
@@ -2118,9 +2405,9 @@ of an already-uncommitted working tree, not a new change.
 
 **Two questions from the same 2026-08-28 session remain open and are
 Arpit's, not this file's to resolve:** the engine abstained 0/20 times on
-blind-authored unanswerable questions (ADR-QUALITY decision 5 puts that class
+blind-authored unanswerable questions (SR-WORK-QUALITY decision 5 puts that class
 inside the gate); and the 7 `partial` goldens need a human or a third blind
-reader. Both live as ordinary rows in `OPEN-WORK.md`'s ADR-QUALITY section —
+reader. Both live as ordinary rows in `OPEN-WORK.md`'s SR-WORK-QUALITY section —
 not a session blocker, just unclosed.
 
 *The `arpit` queue is **three**, unchanged:*
@@ -2141,7 +2428,7 @@ not a session blocker, just unclosed.
 > The table above is the state of play.
 
 *Superseded lede, 2026-08-25: the queue is **five**: **W-78** (ruling 1 only —
-reopen ADR-RERANK veto 1 or confirm it), **W-81** (`agent`), **W-77**, **W-74**,
+reopen SR-RERANK veto 1 or confirm it), **W-81** (`agent`), **W-77**, **W-74**,
 **W-75**. Four of the five are `arpit`-lane rulings. W-73, W-76, W-79 and W-80
 are closed and their entries below are history, not pending work.*
 
@@ -2151,21 +2438,21 @@ are closed and their entries below are history, not pending work.*
 > the current state cannot be the one that is stale.**
 
 > **Addendum 2026-08-26 — this section predates two things that happened since
-> and needs a fuller pass; not done here, flagged instead.** (1) ADR-TUNE was
+> and needs a fuller pass; not done here, flagged instead.** (1) SR-TUNE was
 > built the same day this was last updated (see its 2026-08-24 amendment) —
-> *"the immediate next step: build ADR-TUNE"* below is stale, it is built and
+> *"the immediate next step: build SR-TUNE"* below is stale, it is built and
 > `status: proposed` pending ratification. Building it surfaced two gaps
 > (`[fuse]` unreachable, `explain --no-tune` inert), filed same-day as **W-79**
 > in the `agent` lane — a fourth queue item this section's own count omits.
 > (2) **W-79 is now closed** — ruled delete, built 2026-08-26:
-> `query/hybrid.py` deleted, `[fuse]` out of ADR-TUNE's schema, `explain
+> `query/hybrid.py` deleted, `[fuse]` out of SR-TUNE's schema, `explain
 > --no-tune` removed, `playground_grade.py` repointed at `run_query`. Detail:
 > [`archive/open/W-79-remove-the-dead-fusion-code.md`](../archive/open/W-79-remove-the-dead-fusion-code.md),
 > `IMPLEMENTATION.md`'s W-79 row. The queue is genuinely **W-77, W-74, W-75**
 > now — three, and W-79's absence from the original count above was already
 > wrong the day it was written, not made wrong by this close.
 
-⚠ **~~The immediate next step: build ADR-TUNE~~ — BUILT 2026-08-24**, shipped
+⚠ **~~The immediate next step: build SR-TUNE~~ — BUILT 2026-08-24**, shipped
 in `v2.0.0-alpha.1`; the record is still `status: proposed` pending
 ratification (that ratification is W-77 ruling 3). **The immediate next step is
 now W-78 ruling 1**, which is Arpit's. The paragraph below is kept as the
@@ -2175,13 +2462,13 @@ arrival**: several of its own decisions shipped inside W-76 (6b's
 code before building from it.
 
 ⚠ **A live fork, unadjudicated, filed 2026-08-24:** ~40 of the links the sweep
-repointed now point *into* `archive/`. Whether a link in an ADR's prose
+repointed now point *into* `archive/`. Whether a link in an SR's prose
 *names* an archived item or *cites* it is Arpit's call — a test was written for
 it and **deliberately removed rather than shipped red**, because it could not
 tell the two apart. Both readings are written out in W-77.
 
 - **W-75 was filed 2026-08-22** under a new
-  **ADR-URL-INGEST · ADR-FETCHER** group: [nothing in fux can learn that a URL
+  **SR-URL-INGEST · SR-FETCHER** group: [nothing in fux can learn that a URL
   changed](../archive/open/W-82-the-consolidated-build.md), spec in
   [W-82 §3](../archive/open/W-82-the-consolidated-build.md), two forks split
   out to [W-82 §4.1](../archive/open/W-82-the-consolidated-build.md)
@@ -2193,7 +2480,7 @@ tell the two apart. Both readings are written out in W-77.
   **recall, not correctness**; and a **detector** and a **clock** are different
   roles, which collapses most of the apparent options. **Eight forks, all
   Arpit's** — fork 3 is the consequential one, because it amends a contract
-  (`ADR-FETCHER` decision 2, four functions) that has survived two callers
+  (`SR-FETCHER` decision 2, four functions) that has survived two callers
   unchanged. **Phases 0 (measure) and 1 (report) are startable now and depend
   on no fork.** ⚠ Three hazards live in the item: `dirty.py`'s *"advisory,
   never authoritative"* is what keeps L3 true and a URL refresh driven by it is
@@ -2202,9 +2489,9 @@ tell the two apart. Both readings are written out in W-77.
   thread pool produces plausible documents attributed to the wrong URLs — it
   passes every determinism check.
 - **The queue's second item — W-74, filed 2026-08-22** under a new
-  **ADR-RS** group: [fux has no contract for what *right* means](../archive/open/W-82-the-consolidated-build.md),
+  **SR-RS** group: [fux has no contract for what *right* means](../archive/open/W-82-the-consolidated-build.md),
   spec in [W-82 §5.2](../archive/open/W-82-the-consolidated-build.md).
-  ADR-RS governs *how* a claim is frozen and is silent on *what quantity is
+  SR-RS governs *how* a claim is frozen and is silent on *what quantity is
   worth freezing*, so every quality number this project has produced carries an
   undeclared query distribution and an implicit cost model where a fabricated
   citation and an honest decline count the same. **Nothing is decided — it ends
@@ -2254,7 +2541,7 @@ tell the two apart. Both readings are written out in W-77.
   `new-env.sh` scaffolds pins `fux-engine==0.33.0` from PyPI, which is neither
   current nor the working tree a tier measurement wants.
 - **R6 no longer rests on a reading.** W-67 re-specified tier 1 to hash-select
-  a shared shard and re-ran: **PASS**. ADR-MERGE-DRIVER's veto 2 is spent.
+  a shared shard and re-ran: **PASS**. SR-MERGE-DRIVER's veto 2 is spent.
   **The frozen 2026-08-20 instrument was not edited** — the repair is a new
   file beside it.
 - **W-65 reconciled fourteen documents** to the 10 000-document design point,
@@ -2351,7 +2638,7 @@ tell the two apart. Both readings are written out in W-77.
   *acceptance measurements*, carried by
   [W-57](../archive/open/W-57-graph-lane-acceptance.md) and
   [W-59](../archive/open/W-59-refer-plane-measurement.md). **Do not read "landed" as
-  "validated"**, and **do not read ADR-REFER's `accepted` as "measured"**
+  "validated"**, and **do not read SR-REFER's `accepted` as "measured"**
   either — it was accepted on 2026-08-21 with its budget-sweep veto condition
   deliberately left open.
 - **W-59 carries a standing instruction worth knowing before you run it:** if
@@ -2359,9 +2646,9 @@ tell the two apart. Both readings are written out in W-77.
   kept. **What changed on 2026-08-21:** the assembler is now on `answer`'s
   default path, so that deletion is a change to a released verb's output — the
   instruction stands, the change is bigger.
-- **The ADR rewrite is done.** `work/adr/` no longer exists; `docs/adr/` holds
-  the live set, ADR-LAWS at 0001, and the archived records were deleted on
-  2026-09-06 — [`../docs/adr/`](../docs/adr/README.md) is the whole set.
+- **The SR rewrite is done.** `work/adr/` no longer exists; `records/` holds
+  the live set, SR-LAWS at 0001, and the archived records were deleted on
+  2026-09-06 — [`../records/`](../records/README.md) is the whole set.
 - **The Lane B inbox is empty.** W-30, W-31, W-32, W-33 and W-44's decision
   were all ratified by Arpit on 2026-08-19 and their outcomes are in
   [`IMPLEMENTATION.md`](IMPLEMENTATION.md) §Ratified decisions.
@@ -2388,8 +2675,8 @@ tell the two apart. Both readings are written out in W-77.
 
 The **laws** are normative in [`../CLAUDE.md`](../CLAUDE.md) §Non-negotiable
 constraints and named L1–L7 by
-[ADR-LAWS](../docs/adr/0001_LAWS.md). They are not restated here — that is the
-rule ADR-LAWS exists to enforce. What follows are the constraints *on the work*,
+[SR-LAWS](../records/0001_LAWS.md). They are not restated here — that is the
+rule SR-LAWS exists to enforce. What follows are the constraints *on the work*,
 which are not laws:
 
 - **OPEN-WORK rows are one or two lines, always** (Arpit, 2026-09-11). Status,
@@ -2413,20 +2700,20 @@ which are not laws:
   [`../archive/`](../archive/README.md), into a directory mirroring where it
   came from, with a row naming its live successor. Enforced by
   `tests/test_archive_law.py`.
-- **Law zero: the ADRs are always up to date.** Arpit's standing instruction,
+- **Law zero: the SRs are always up to date.** Arpit's standing instruction,
   2026-08-18, given emphatically. No behaviour change lands without its record
   updated in the *same* change; a change that touches no recorded decision says
-  `no ADR affected` in the commit message. Enforced by
-  `tests/test_adr_freshness.py` in CI and `scripts/adr-guard.sh` as a
+  `no SR affected` in the commit message. Enforced by
+  `tests/test_sr_freshness.py` in CI and `scripts/sr-guard.sh` as a
   **`commit-msg`** hook — not `pre-commit`, because it has to read the commit
-  message to honour the `no ADR affected` escape hatch, and that message does
+  message to honour the `no SR affected` escape hatch, and that message does
   not exist yet at `pre-commit`. Do not treat it as advisory, and do not "fix
   it in the next commit".
 - **No M-milestone work while its gating prediction is unmeasured or failed.**
   A hard sequencing rule, not a preference.
 - **A pre-registered threshold may never move.** Ambiguous results go to Arpit
   unadjudicated.
-- **Do not port the archived engine.** [ADR-PORT-LIST](../docs/adr/0114_port-list.md)
+- **Do not port the archived engine.** [SR-PORT-LIST](../records/0114_port-list.md)
   is the complete list, and it is closed; each entry comes forward with its
   tests, when its milestone needs it.
 - **The design point is 10 000 documents** (Arpit, 2026-08-21 — CLAUDE.md
@@ -2450,14 +2737,14 @@ when a session produces a lesson; do not let it become a changelog.
   (2026-09-12). `6f518c6` held four source files back on the reasoning that their
   five owning records were untouched and a session must not write a record out of
   someone else's diff. **The premise was false**: the records had already landed in
-  `24c0a3d` — ADR-CONFIG decisions 13/14/15, ADR-DOTFUX's `.agents/skills` and
+  `24c0a3d` — SR-CONFIG decisions 13/14/15, SR-DOTFUX's `.agents/skills` and
   Node-vendoring text, the `keep`/`ttl`/`enrich` key rows. What was missing was the
   code, so for two commits five accepted records described a refusal the engine did
-  not perform. **`tests/test_adr_freshness.py` cannot see this**, in either
+  not perform. **`tests/test_sr_freshness.py` cannot see this**, in either
   direction: it checks that an owning record was *touched* in a change, never what
   the record says. **Before holding code back for a record, read the record** —
   `git log -1 -- <record>` is the whole check. Written up in
-  [ADR-CONFIG](../docs/adr/0113_config.md) after decision 15. W-83's shape with the
+  [SR-CONFIG](../records/0113_config.md) after decision 15. W-83's shape with the
   halves swapped; first occurrence, so no gate.
 - **A symptom worked around per-arm is an engine defect hiding** (2026-08-28 →
   2026-09-05, W-110). `placebo-and-seal` saw *"0 changed, 10 carried forward"* with
@@ -2467,7 +2754,7 @@ when a session produces a lesson; do not let it become a changelog.
   The audit that closed the related question: `--full` empties reuse, so no
   enrichment measurement on record was affected.
 - **Exposing a knob and publishing what it was set to are ONE change, not two**
-  (2026-08-28, ADR-CONFIDENCE 13). The confidence floors were locked because a
+  (2026-08-28, SR-CONFIDENCE 13). The confidence floors were locked because a
   consumer could tune away the signal. Opening them was right by the project's
   own rule on knobs — but opening them *alone* would have made `band` silently
   incomparable across repos, which is a worse failure than either the lock or
@@ -2476,10 +2763,10 @@ when a session produces a lesson; do not let it become a changelog.
   something configurable, ask what downstream reader is now comparing two things
   that are no longer alike, and hand them the difference.
 - **A record can be stale in the direction of "we refused that"** (2026-08-28).
-  ADR-TUNE decision 4 said keys ship commented; they had shipped live for a day.
+  SR-TUNE decision 4 said keys ship commented; they had shipped live for a day.
   The handbook told a reader a knob did not exist. **Both were found by
   re-reading the records the change landed under** — CLAUDE.md §Law zero point 3
-  — and by nothing mechanical, because `test_adr_freshness.py` proves a record
+  — and by nothing mechanical, because `test_sr_freshness.py` proves a record
   was *touched*, never that it is *true*.
 - **Verifying a request is not the same as answering it** (2026-08-27, W-93).
   Arpit asked for the skip list to be written into `.fuxignore`. The walker said
@@ -2602,7 +2889,7 @@ when a session produces a lesson; do not let it become a changelog.
   measurement**, never by an edit. The new fixture is a new run, the old one got
   a forward pointer, and the live citations were repointed so no claim was left
   ungrounded.
-- **The count was never the mental model** (2026-08-19). ADR-CLI opened with
+- **The count was never the mental model** (2026-08-19). SR-CLI opened with
   *"six verbs — three build the index and three query it"*, and two new verbs
   made the sentence false. The temptation is to re-count. The fix was to find
   the grouping the surface actually had (lifecycle / write / sources / read) and
@@ -2621,20 +2908,20 @@ when a session produces a lesson; do not let it become a changelog.
   consumer, not your own.** The check now uses fux's own quoting rule to
   predict what strict YAML will reject.
 - **A rule in prose is a rule that gets skipped** (2026-08-18). "No behaviour
-  change without its ADR" had been written in `CLAUDE.md` for weeks. Replayed
+  change without its SR" had been written in `CLAUDE.md` for weeks. Replayed
   over the 25 commits before the check existed, **13 of them** changed an
-  ADR-owned component and updated no record. The fix was not better wording; it
-  was `tests/test_adr_freshness.py`. **When a rule matters, ship the check in
+  SR-owned component and updated no record. The fix was not better wording; it
+  was `tests/test_sr_freshness.py`. **When a rule matters, ship the check in
   the same change as the rule.**
 - **Features that are individually correct can be mutually exclusive** (2026-08-18). Hashed meta writes a 16-hex `title_h`; the accelerator refuses any index with a 16-hex token outside `terms`. Both decisions were right; together they meant the **default** URL path could never build an accelerator ([closed 2026-08-19](regression/2026-08-19-w54/report.md)). Each shipped in a different release with its own tests, and nothing exercised the intersection. **Test the seam between two features, not just each feature.**
 - **Documenting a surface walks paths nobody walks** (2026-08-18). Writing
-  ADR-CLI meant running every verb and flag, which immediately surfaced W-46 —
+  SR-CLI meant running every verb and flag, which immediately surfaced W-46 —
   `ask --hybrid` crashing on a source install. The guard for that exact case
   was written and dead: it caught `FuxError, ImportError, FileNotFoundError`,
   and the real failure is an `AttributeError` from a documented `None` return.
   It survived because it cannot reproduce where the model bundle is present,
   which is every machine here.
-- **Capture output, never illustrate it** (2026-08-18). ADR-CLI's examples are
+- **Capture output, never illustrate it** (2026-08-18). SR-CLI's examples are
   verbatim from a container run against a committed fixture. The cost was one
   run; the return was a real bug and a set of examples that cannot rot silently.
 - **A written file can vanish from the Cowork mount** (2026-08-18). One created,
@@ -2687,7 +2974,7 @@ it is no longer the state of play. Read this block, then read the rest as
 
 **Update (2026-08-10, Cowork/Claude):** one post-M1 capability landed at
 Arpit's direction — URL ingestion through a **consumer-owned fetcher
-file** (ADR-URL-INGEST, ⏳ proposed;
+file** (SR-URL-INGEST, ⏳ proposed;
 a CDP template ported from the archived `render="cdp"` path, now at
 `.fux/fetchers/cdp.py`). The judgment worth inheriting: the adapter cap
 survives by making URL fetch *configuration plus consumer code*, never core
@@ -2696,7 +2983,7 @@ real exercise; offline ingest carries `url:` records forward byte-identically
 because the writer's implicit-deletion rule would otherwise eat them.
 
 **Update (2026-08-11, Claude Code):** `.fux/` is now a **declared layout**
-(ADR-DOTFUX, ⏳ proposed) — every child is
+(SR-DOTFUX, ⏳ proposed) — every child is
 committed or derived, and the URL source moved fully inside it. Two pieces of
 judgment to inherit. First, **an ignore rule is the silent failure mode** of
 putting committed and derived planes under one dotdir; the repo's own
@@ -2715,7 +3002,7 @@ Claude (Cowork, claude-opus-5).
 **Update (2026-08-12, Claude Code):** Phase 0 of the v0.32.0 open-items
 program cleared the backlog; **R2 is 3/3 PASS**. Three pieces of judgment to
 inherit. First, **an unindexed source is not a ranking failure** — R2-Q3 had
-been "failing" since M1 for want of one line in `fux.toml`, and ADR-RECORD was
+been "failing" since M1 for want of one line in `fux.toml`, and SR-RECORD was
 right to diagnose it and *decline to fix it*, because moving the archived doc
 set was Arpit's call; the restraint is why the eventual fix was one line
 instead of an argument. Second, **the fix bought a new problem and it was
@@ -2725,7 +3012,7 @@ describing a deleted subsystem), found post-hoc, filed as W-44 with a
 recommended *shape* and no mechanism — five hand-picked probes on one corpus
 is not grounds to ship a ranking change, and the v0.26 line already paid to
 learn that. Third, **a recorded rank is a snapshot of a corpus, not a
-property of the engine**: ADR-RECORD's Q2 "#1" became "#2" because `README.md`
+property of the engine**: SR-RECORD's Q2 "#1" became "#2" because `README.md`
 grew a relevant table two days later, so recorded ranks now carry their date.
 Also worth knowing: **`CLAUDE.md.proposed` does not exist** — the M0a rewrite
 has been the live `CLAUDE.md` since `3892c55`, which makes "reject" a
@@ -2772,7 +3059,7 @@ Claude Opus 5 (1M context).
 
 **Q: What changed?**
 
-- The substrate engine (v0.19 → v0.26, ADRs 0001–0015) is **archived at
+- The substrate engine (v0.19 → v0.26, SRs 0001–0015) is **archived at
   [`../archive/v0.26/`](../archive/v0.26/)**, runnable but reference-only. Its
   docs are at [`archive/v0.26-docs/`](../archive/v0.26-docs/); the old plan at
   [`archive/v0.26-implemented/PLAN-v0.26.md`](../archive/v0.26-implemented/PLAN-v0.26.md).
@@ -2806,7 +3093,7 @@ the majority of the code for a minority of the value.
 
 1. **The reset itself, and the archive.** Do not port the substrate, the lean
    profile, the state plane, or the per-file cache back. The port list in
-   [the ADR register](../docs/adr/README.md) §"What survives" is the whole of what comes forward,
+   [the SR register](../records/README.md) §"What survives" is the whole of what comes forward,
    and it comes forward *with its tests*.
 
 2. **"Index", not "db".** A council ruling. What Fux commits is an index —
@@ -2849,7 +3136,7 @@ P1–P7 statuses). It replaced the archived IMPLEMENTATION.md. `PLAN.md` is the
 
 **Q: What of the old answers below still holds?**
 
-The **process** and the **person**: compare-doc-before-building, one ADR per
+The **process** and the **person**: compare-doc-before-building, one SR per
 feature with references, docs true in the same change, worklog every exchange,
 name the model on every handoff. Arpit's working style (concise, recommendation
 first, debate culture, minority reports preserved) is unchanged and is the most
@@ -2858,7 +3145,7 @@ unchanged and still binding: *design for a very large-scale project inside a
 corporation*, not for Anton — Anton is a convenient small testbed, not the
 priority filter.
 
-What does **not** hold: every module, command, config key and ADR number
+What does **not** hold: every module, command, config key and SR number
 mentioned below. Treat them as archived history.
 
 ---
@@ -2873,7 +3160,7 @@ agents before they touch anything, and checked deterministically — never by a 
 **Q: What does Arpit actually want?**
 
 His words, near enough: *"I want AI agents to develop based on documentation —
-Jira, Confluence, ADRs — and never deviate from it. The references must be
+Jira, Confluence, SRs — and never deviate from it. The references must be
 accessible to agents. None of the rules gets broken."* Two refinements that matter:
 enforcement must not stop at pass/fail — a blocking finding must *tell the agent how
 to fix it* (the loop); and everything built must be usable first-hand in **Anton**
@@ -2894,7 +3181,7 @@ strategy) and are **awaiting Arpit's verdict** before any build. The engine fork
 decides whether `$0`/no-LLM/deterministic still binds this tool — do not assume; read
 `work/compare/query-engine.compare.md`. The old strategic layer (Fux Fleet,
 federation, the deferred Plane) is *not* carried forward — reviving anything out of
-scope requires an ADR and Arpit's sign-off.
+scope requires an SR and Arpit's sign-off.
 
 A standing rule was set here: **whenever a decision has multiple viable options,
 write a compare doc first** (debate + matrix + references + proposed verdict) and let
@@ -2922,7 +3209,7 @@ pure-stdlib inference is final; and a new fork opened + proposed:
 **agent integration** — `fux init-agents` generating AGENTS.md (the Linux Foundation
 standard most agents read) + CLAUDE.md/copilot-instructions/`.kiro/steering/`
 pointers, plus Claude Code `UserPromptSubmit` and Kiro hooks for enforced injection;
-MCP noted as "better later," deferred behind an ADR. Agent-integration **accepted 2026-07-21** with a twist the research earned: skills are
+MCP noted as "better later," deferred behind an SR. Agent-integration **accepted 2026-07-21** with a twist the research earned: skills are
 now an open standard (Agent Skills / SKILL.md, 32+ tools incl. Copilot and Kiro), so
 **one skill file replaces the old build's per-platform skillgen** — ship `fux-query` +
 `fux-ingest` skills once. Setup: single **`fux setup`** (renamed from `fux init` at
@@ -2964,19 +3251,19 @@ emitted after phase 1 so Anton dogfooding runs in parallel.
 suites are green (108 unit + 21 e2e incl. byte-determinism goldens): setup wizard,
 inferred ingest → OKF cache with provenance, heading chunker, true BM25F
 (weight-then-saturate), ask/find/answer with --json/--explain, extractive TextRank
-answers, AGENTS.md/skills/hooks generation. ADRs 0001–0004; 0001 pair archived.
+answers, AGENTS.md/skills/hooks generation. SRs 0001–0004; 0001 pair archived.
 Build judgment a successor should keep: determinism beat wall-clock provenance
 (`converted_at` = SOURCE_DATE_EPOCH/mtime); JSON index won by measurement (16 ms
 load at 5k chunks — postings build, not format, dominates); the e2e suite earned
 its keep immediately (caught skipped-files-as-drift and answer noise).
 
 **Phase 3 shipped — the master run is complete (2026-07-21, v0.22.0).** Engine
-v2 per handoff 0003 (ADRs 0006–0007): eval harness first (the gate and the
+v2 per handoff 0003 (SRs 0006–0007): eval harness first (the gate and the
 reopen-instrument), re-packed potion-base-8M at 7.93 MB int8 (sha-pinned, MIT),
 stdlib inference with *exact* tokenizer parity, (sha, fidelity)-keyed vector
 cache, RRF k=60 over BM25F candidates only, `--lexical-only` byte-parity
 enforced by the pre-v2 goldens. The gate passed as a tie on the fixture set
-(0.762/0.952/0.833 both engines) — recorded honestly in ADR 0006 with the
+(0.762/0.952/0.833 both engines) — recorded honestly in SR 0006 with the
 rank-level rescues and the zero-candidate limitation; hybrid ships enabled.
 What a successor should know: the fixture eval saturates at this corpus size —
 **the Anton private eval (tests_e2e/eval/README.md) is the real instrument**,
@@ -2985,7 +3272,7 @@ distill-our-own decisions. Final state: 172 unit + 29 e2e tests, wheel 6.98 MB
 with the bundle. Next action: Anton dogfood via DOGFOOD.md.
 
 **Phase 2 shipped (2026-07-21, v0.21.0).** Web/CDP/advanced ingest per handoff
-0002 (ADR 0005): stdlib HTML→MD (hand-rolled wins the default for determinism),
+0002 (SR 0005): stdlib HTML→MD (hand-rolled wins the default for determinism),
 guardrailed crawl (robots non-negotiable, sha dedupe with dual provenance,
 byte-stable re-crawl), hand-rolled RFC 6455 + minimal CDP (user's Chrome only;
 settle = fixed delay, networkIdle deferred to dogfood), `--advanced` Docling/
@@ -3007,7 +3294,7 @@ deterministic = compliance-grade). Anton stays a convenient small testbed only.
 
 **Q: Phase 4 — where does it stand (2026-07-22)?**
 
-**Shipped: v0.23.0, ADRs 0008–0011, M1–M8 all green.** The substrate is real —
+**Shipped: v0.23.0, SRs 0008–0011, M1–M8 all green.** The substrate is real —
 SQLite store, committed `fux.lock` + `.fux/state/`, one-kernel `retrieve()` with
 explain/graph/path/cat, FuxVec dense-global, full/lean profiles, `db pull`.
 Parity held: all six v0.22 goldens are byte-identical through the kernel
@@ -3015,7 +3302,7 @@ re-plumb, and `--lexical-only` still measures exactly 0.762/0.952/0.833.
 
 The engine got measurably better, not just bigger: **hit@5 0.952 → 1.000, MRR
 0.833 → 0.873**, because FuxVec's full-corpus scan removed the candidate-only
-ceiling ADR 0006 had recorded as unfixable-by-design.
+ceiling SR 0006 had recorded as unfixable-by-design.
 
 Three things a successor should know about *how* it went, because they are the
 process working rather than luck:
@@ -3034,12 +3321,12 @@ process working rather than luck:
    query path still loads the whole index into memory to build the `Searcher`,
    and the `postings` table — populated and indexed at ingest — is never read at
    query time. **The substrate solved storage at scale, not query at scale.**
-   That is the honest head of phase 5, scoped in ADR 0011. Do not let the
+   That is the honest head of phase 5, scoped in SR 0011. Do not let the
    "substrate shipped" headline hide it.
 
 **Q: Phase 5 — where does it stand (2026-07-22)?**
 
-**Shipped: v0.24.0, ADR 0012, M1–M6 all green.** Debug & observability: a
+**Shipped: v0.24.0, SR 0012, M1–M6 all green.** Debug & observability: a
 hand-rolled, stdout-safe emitter (`fux.debug`) behind `[debug]` in fux.toml
 with `--debug[=LEVEL]`/`FUX_DEBUG` precedence; `dbg()`/`timer()` calls at every
 pipeline stage; `fux doctor` (seven groups, exit 0/1, every failing check
@@ -3058,11 +3345,11 @@ is stderr or an explicit file) did what it was designed to do.
 One deliberate scope line: `fux doctor`'s "Chrome for CDP" check is
 binary-presence only, not a live port probe — `import socket` outside
 `ingest/` trips the standing network-fence test, and that fence is worth
-keeping over one doctor check's completeness. See ADR 0012's "owed" section.
+keeping over one doctor check's completeness. See SR 0012's "owed" section.
 
 **Q: Phase 6 — where does it stand (2026-07-23)?**
 
-**Shipped: v0.25.0, ADRs 0013–0014, M1–M6 all green — but read the "owed"
+**Shipped: v0.25.0, SRs 0013–0014, M1–M6 all green — but read the "owed"
 paragraph before calling this "fixed."** The acme-payments run measured two
 real defects: the superseded document outranks the current one in 9/12
 planted pairs, and `answer` fabricates confidently on all 4 well-formed
@@ -3090,7 +3377,7 @@ rules are why that's the *correct* outcome, not a shortfall:
   measured 0/4-decline defect this phase set out to fix is not fixed in
   v0.25.0** — say that plainly to anyone who asks, rather than letting the
   phase's existence imply it was. See
-  `conformance/2026-07-23-min-confidence-calibration/` and ADR 0014's F1/F2
+  `conformance/2026-07-23-min-confidence-calibration/` and SR 0014's F1/F2
   follow-up (an absolute, cross-query-comparable signal — e.g. dense cosine —
   is the real path to a working floor; this phase's sentence score is
   pool-relative and cannot separate the two populations).
@@ -3172,22 +3459,22 @@ investigate the metric that *didn't* move.
 4. **The df sidecar** (`.fux/state/df/`). It looks like redundant statistics you
    could recompute. You cannot — it is the *only* reason lean rankings are
    provably identical to full rather than approximately so, and deleting it
-   silently downgrades a guarantee to a hope. See ADR 0008.
+   silently downgrades a guarantee to a hope. See SR 0008.
 5. **The early return when BM25F finds zero candidates.** It looks like it is
    blocking FuxVec's rescue path. It is not — it is what keeps "No confident
    matches" reachable, since a binary prefilter always has a nearest neighbour.
    Measured: noise scores 0.23–0.26 cosine against a true rescue's 0.34, so no
    floor separates them. This exact mistake was made and reverted during M5;
-   ADR 0010 records why.
-4. **The lifecycle.** plan → handoff → prompt, then one ADR per feature, every rule
-   and ADR carrying a reference. This is how work is trusted here.
+   SR 0010 records why.
+4. **The lifecycle.** plan → handoff → prompt, then one SR per feature, every rule
+   and SR carrying a reference. This is how work is trusted here.
 6. **`[answer] min_confidence`'s default of `0.0`.** It looks unfinished — a
    knob nobody turned on. It is not: v0.25.0's calibration measured that
    every tested non-zero value declines real answers on the corpus used to
    justify it (the unanswerable and answerable score distributions
    interleave). Do not "fix" this by picking a plausible-looking default
    without new calibration evidence — that is the exact failure this phase
-   exists to prevent. See ADR 0014.
+   exists to prevent. See SR 0014.
 5. **Anton first.** Built for and lived-with in Anton before any external claim.
 
 **Q: How does Arpit like to work with a model?**
@@ -3202,7 +3489,7 @@ reshapes the design. Litmus: "is it relevant to Anton?"
 **Q: What does the repo demand of you mechanically?**
 
 CLAUDE.md is binding: every code change updates PLAN.md (design of record), the
-README, this document, the relevant ADR, and every other doc it touches — a change
+README, this document, the relevant SR, and every other doc it touches — a change
 is not done until the docs are true. Every behaviour change ships with a test.
 `uv run pytest -q` green. Python ≥ 3.11, match the surrounding style.
 
@@ -3211,14 +3498,14 @@ is not done until the docs are true. Every behaviour change ships with a test.
 *Maintained by: Claude Opus 4.8, July 2026 — reset the record for the from-scratch
 rebuild; scoped to rules substrate + fix loop; carried the succession premise
 forward. · Claude Fable 5, 2026-07-21 — executed the full master run: v1 query
-CLI, v1.1 web/CDP/advanced, v2 hybrid engine (v0.20.0 → v0.22.0, ADRs
+CLI, v1.1 web/CDP/advanced, v2 hybrid engine (v0.20.0 → v0.22.0, SRs
 0001–0007); recorded the build judgment above; the Anton eval is the successor's
 compass. · Claude Opus 4.8 (1M context), 2026-07-22 — built phase 4, the
-knowledge substrate (v0.23.0, ADRs 0008–0011): escalated the DoD-7 conflict
+knowledge substrate (v0.23.0, SRs 0008–0011): escalated the DoD-7 conflict
 rather than redefining it, mutation-tested the parity claims that resulted, and
 recorded what the 100k benchmark exposed but did not fix (query-at-scale).
 · Claude Sonnet 5, 2026-07-22 — built phase 5, debug & observability (v0.24.0,
-ADR 0012): the emitter, `fux doctor`, `fux why`, and the `fux-debug` skill; kept
+SR 0012): the emitter, `fux doctor`, `fux why`, and the `fux-debug` skill; kept
 the stdout-purity gate green from M1's empty emitter through M6's fully
 instrumented pipeline.
 · Claude Opus 4.8 (Cowork), 2026-07-22 — ran the fux-lab conformance scaling
@@ -3226,18 +3513,18 @@ curve (1k→5k→10k, 0.23.0) and filed it into `work/proposals/hybrid-degrades-
 Finding: the 1k "hybrid 4× worse" gap is not stable — it closes with scale as
 lexical collapses toward hybrid; leans corpus-artifact (B) but does not settle
 A vs B (same generator). Query latency is linear from the start, corroborating
-ADR 0011's query-at-scale limit. No engine change made; acme-payments remains
+SR 0011's query-at-scale limit. No engine change made; acme-payments remains
 the discriminating next run. Direction unchanged.
 · Claude Sonnet 5, 2026-07-23 — built phase 6, trust & currency (v0.25.0,
-ADRs 0013–0014): supersession parsed/persisted/annotated (never reorders;
+SRs 0013–0014): supersession parsed/persisted/annotated (never reorders;
 `answer` prefers current when both are in pool); confidence floor built,
 calibrated against all five gates via a background Opus subagent, and shipped
 disabled — no value clears both the unanswerable and answerable gates.
 Delegated both real-corpus measurements (calibration sweep, then supersession
 recovery) to one resumed background agent sharing an editable-install acme
 environment rather than three cold setups. Both proposals graduated to
-`archive/` with their ADRs; the honest finding that the fabrication defect is
-*not* fixed in this release is recorded here and in ADR 0014 on purpose.
+`archive/` with their SRs; the honest finding that the fabrication defect is
+*not* fixed in this release is recorded here and in SR 0014 on purpose.
 · Claude Opus 5 (1M context), 2026-08-09 — wrote the reset block at the top of
 this document and gave GLOSSARY its v0.30 vocabulary; committed the archive
 move as its own commit so the reset and the work on top of it stay separable.
@@ -3267,7 +3554,7 @@ scoped**, as its own Opus handoff.
 program: paid the archive-law debt, **closed R2 at 3/3 PASS**, and packaged
 five ratification decisions. Recorded the post-hoc retired-content finding as
 W-44 rather than fixing it, and corrected two things the tracker had wrong
-(`CLAUDE.md.proposed` never existed; ADR-RECORD's recorded rank had drifted).
+(`CLAUDE.md.proposed` never existed; SR-RECORD's recorded rank had drifted).
 · Claude Opus 5 (1M context), 2026-08-12 — built M2: the T1 accelerator,
 the differential law, bounded skipping, the dense lane and RRF (default-off on
 measured evidence). **R3 PASS.** Mutation-tested the differential harness and

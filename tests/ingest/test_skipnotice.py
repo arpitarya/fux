@@ -30,7 +30,7 @@ def _init(tmp_path) -> None:
     listing.parent.mkdir(parents=True, exist_ok=True)
     listing.write_text("docs\n", encoding="utf-8")
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
-    # ADR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
+    # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
     (tmp_path / "docs").mkdir(exist_ok=True)
 
@@ -277,7 +277,7 @@ def test_a_frozen_line_that_stopped_being_true_warns_loudly(corpus, capsys):
 
     Arpit's call on 2026-08-27, and not undone here — made loud instead. A
     frozen line that is also wrong is an invisible filter, which is the failure
-    ADR-FUXIGNORE exists to abolish.
+    SR-FUXIGNORE exists to abolish.
     """
     ingest_and_report(corpus, _args())
     capsys.readouterr()

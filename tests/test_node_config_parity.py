@@ -16,7 +16,7 @@ So these are equality tests, in the shape `tests/test_mcp.py` already uses for
 `node/mcp-tools.json` and `tests/test_cli.py` for the `pii.toml` path literal:
 **one authority in Python, one transcription in JS, and a test between them.**
 
-W-107 R5 / ADR-NODE-SEARCH decision 8.
+W-107 R5 / SR-NODE-SEARCH decision 8.
 """
 
 from __future__ import annotations
@@ -76,9 +76,6 @@ def test_the_node_tune_schema_is_the_python_one():
     "js, py",
     [
         ("k1 = K1", "k1"),
-        ("archivedWeight = 1.0", "archived_weight"),
-        ("supersededWeight = 1.0", "superseded_weight"),
-        ("recencyHalfLifeDays = 0.0", "recency_half_life_days"),
         ("rerankWeight = 0.0", "rerank_weight"),
         ("expandWeight = 0.2", "expand_weight"),
         ("damping = 0.85", "damping"),
@@ -140,6 +137,34 @@ def test_the_node_output_built_ins_are_the_python_ones():
     assert written == BUILT_IN
 
 
+def test_the_journal_key_is_bound_on_BOTH_runtimes_by_name():
+    """🔴 W-147, and it names `journal` rather than trusting the two checks above.
+
+    They already cover it — `CLI_VERBS` is compared tuple-for-tuple and
+    `BUILT_IN` dict-for-dict — so this adds no coverage. **What it adds is a
+    grep hit.** SR-PROVENANCE decision 10 as amended makes a committed
+    `[cli.answer] journal = true` explicit consent, and the failure mode the
+    ruling guards against is a later session reading `.fux/output.toml` as a
+    pure *rendering* config and tidying the key out of one runtime. A test that
+    only fails as *"`answer` key set differs"* does not tell that session what it
+    just broke; this one does.
+    """
+    from fux.output_config import BUILT_IN, CLI_VERBS
+
+    assert "journal" in CLI_VERBS["answer"], "the Python side lost the key"
+    assert BUILT_IN["journal"] is False, "journalling must never default ON"
+
+    source = _source("config/output.mjs")
+    assert re.search(r'answer: \[[^\]]*"journal"', source), (
+        "`node/src/config/output.mjs` no longer carries `journal` under `answer`. "
+        "It is the ONE key in that file that writes a durable file, and a runtime "
+        "that drops it silently ignores a consumer's committed consent."
+    )
+    assert re.search(r"journal:\s*false", source), (
+        "the Node `BUILT_IN` no longer defaults `journal` to false"
+    )
+
+
 # -- the decode boundary -----------------------------------------------------
 
 
@@ -147,7 +172,7 @@ def test_the_node_prose_types_are_the_python_ones():
     """🔴 The set that decides whether Node may CITE a document at all.
 
     Node has no decoders, so it refers only documents that are already text and
-    skips the rest (ADR-NODE-SEARCH decision 11). A format that is prose on one
+    skips the rest (SR-NODE-SEARCH decision 11). A format that is prose on one
     side and not the other is not a cosmetic drift: too wide and Node cites
     line numbers into text the index never held; too narrow and it declines a
     document it could have answered from.

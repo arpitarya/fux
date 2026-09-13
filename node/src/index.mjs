@@ -14,14 +14,14 @@
  * `.fux/tune.toml` enters. Calling the scan directly — which this file did
  * until 2026-09-12, and so did `api.py` — returns a different ranking from the
  * CLI on any tuned repo, silently. Three surfaces, one seam, or it is not one
- * API (ADR-NODE-SEARCH decision 8; ADR-API decision 6).
+ * API (SR-NODE-SEARCH decision 8; SR-API decision 6).
  *
  * ⚠ **`explain`, `graph` and `path` here are `api.py`'s shapes, which are NOT
  * the CLI's.** The Python API grew its own simpler helpers for the graph lane —
  * `{id, community, members, edges}` rather than the CLI's `{doc, edges,
  * community}`, a breadth-first best route rather than every enumerated route.
  * This file mirrors `api.py` because `api.py` is its twin; that the two Python
- * surfaces disagree is `api.py`'s business and is recorded in ADR-API decision
+ * surfaces disagree is `api.py`'s business and is recorded in SR-API decision
  * 6, not smoothed over here.
  */
 import { findRoot } from "./config/root.mjs";
@@ -37,7 +37,7 @@ import { cmpCodePoints } from "./compat/pyfloat.mjs";
 function result(r, headings = []) {
   return {
     id: r.id, loc: r.loc, title: r.title, score: r.score,
-    archived: r.archived, tie: r.tie, headings,
+    archived: r.archived, tie: r.tie, mtime: r.mtime ?? null, headings,
   };
 }
 
@@ -191,7 +191,7 @@ class Index {
    *
    * Built rather than loaded: `.fux/runtime/graph.json` is derived and
    * gitignored, so a library caller on a fresh clone has none — and Python's
-   * CLI REFUSES there while this answers (ADR-NODE-SEARCH decision 9). */
+   * CLI REFUSES there while this answers (SR-NODE-SEARCH decision 9). */
   _plane() {
     if (this._planeCache === null) {
       const records = [];

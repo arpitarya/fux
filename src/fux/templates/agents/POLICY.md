@@ -1,7 +1,7 @@
 # The canonical agent policy — the source of truth
 
 **This file is not shipped to a consumer.** It is what the per-vendor renderings
-in this directory must all say. [ADR-AGENT-POLICY](../../../../docs/adr/0132_agent-policy.md)
+in this directory must all say. [SR-AGENT-POLICY](../../../../records/0132_agent-policy.md)
 decision 2: the renderings are by hand, but **agreement is asserted, not
 trusted** — every numbered rule below must appear in every rendering, and a test
 checks it. A rule changed here and not there is worse than no policy at all,
@@ -33,7 +33,7 @@ conclusion depends on why the question was asked.
 **Copy it byte for byte.** Format-native framing may surround it; the block
 itself may not be reworded, reordered, or partially included. That is what makes
 agreement checkable by exact match rather than by judgement, and it is the same
-device the ADRs use for a Mermaid diagram and its ASCII twin: two
+device the SRs use for a Mermaid diagram and its ASCII twin: two
 representations, one asserted to match.
 
 <!-- fux:policy:begin v1 — VERBATIM in every rendering. Do not reword. -->
@@ -52,7 +52,7 @@ representations, one asserted to match.
 - **Never encode an opinion about a particular document.** Every rule here is
   about *how to read the flag*. The moment a rendering says which document is
   right, Fux has smuggled a reader-intent taxonomy back in through the policy
-  layer — which [ADR-ARCHIVED-CONTENT](../../../../docs/adr/0134_archived-content.md) decision
+  layer — which [SR-ARCHIVED-CONTENT](../../../../records/0134_archived-content.md) decision
   7 refused on purpose. This is veto condition 5.
 
 <!-- policy-version: 1 -->

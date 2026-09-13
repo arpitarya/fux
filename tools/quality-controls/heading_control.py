@@ -17,7 +17,7 @@ happens cannot move, so it cannot be a control. Two things fix it:
    somewhere to go in both directions; a boolean pinned at zero does not.
 2. **Turn the mechanism off.** `bm25f.heading` is a tunable field weight, and
    `0.0` means *ignore this field entirely*. So the control ships with its own
-   feature-off arm, which is exactly what ADR-RS decision 22c(a) requires before
+   feature-off arm, which is exactly what SR-RS decision 22c(a) requires before
    headroom may be called **proven** rather than merely observed.
 
 ## The corpus is the golden ladder, and the distractors are real
@@ -137,7 +137,7 @@ def main() -> int:
 
     # 🔴 The paired unit is the QUERY, not the corpus-wide sum. A total that
     # shifts by two out of 256 is not a mechanism; it is two queries moving, and
-    # ADR-RS decision 19's floor is stated on the DISCORDANT COUNT for exactly
+    # SR-RS decision 19's floor is stated on the DISCORDANT COUNT for exactly
     # this reason. `b` and `c` below are that count, split by direction.
     base, off = summary[0], summary[-1]
     on_rows = {r["id"]: r for r in rows if r["heading_weight"] == HEADING_WEIGHTS[0]}
@@ -150,10 +150,10 @@ def main() -> int:
     print(f"  more siblings with the field OFF: b = {b}")
     print(f"  more siblings with the field ON:  c = {c}")
     print(f"  discordant = {discordant}   net = {net}   "
-          f"(ADR-RS decision 19: a net below 6 cannot clear a = 0.05 at any count)")
+          f"(SR-RS decision 19: a net below 6 cannot clear a = 0.05 at any count)")
     print()
     if net >= 6:
-        print(f"✅ HEADROOM IS PROVEN (ADR-RS 22c(a)): the heading field weight moves the "
+        print(f"✅ HEADROOM IS PROVEN (SR-RS 22c(a)): the heading field weight moves the "
               f"distractor count on {discordant} queries, net {net}. The field weight IS "
               f"the mechanism, so this control can adjudicate.")
     elif discordant == 0:

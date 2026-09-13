@@ -5,7 +5,7 @@
 
 Definitions (metrics, slices, gold labels, threshold) are frozen in
 ``PRE-REGISTRATION.md``, committed before the first run. This script measures;
-it does not adjudicate. The verdict is written by a human-reviewed ADR.
+it does not adjudicate. The verdict is written by a human-reviewed SR.
 
 Design in one line: **one scorer, three arms, only the index differs.** Every
 arm is scored by the archived v0.26 ``Searcher.search``; nothing under

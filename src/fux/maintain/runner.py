@@ -1,4 +1,4 @@
-"""The deferred re-index runner — W-66 Phase 2, ADR-MAINTENANCE decisions 1a/1d.
+"""The deferred re-index runner — W-66 Phase 2, SR-MAINTENANCE decisions 1a/1d.
 
 `post-commit` no longer re-indexes inline. It records what changed
 ([`dirty.py`](dirty.py)), spawns a **detached one-shot** re-index, and returns.
@@ -8,7 +8,7 @@ what R5's failure bought.
 ## One-shot, never resident
 
 The spawned process **drains the dirty list and exits**. No scheduler, no
-watcher, nothing resident — ADR-MAINTENANCE veto condition 6 fires on any of
+watcher, nothing resident — SR-MAINTENANCE veto condition 6 fires on any of
 those. It outlives the *commit* by design (that is what deferral means); what
 it may never do is outlive the work it was started for.
 
@@ -37,7 +37,7 @@ the dirty list, which is a union, so the work is not lost by being dropped.
 
 An OS-level advisory lock (`fcntl.flock`, `msvcrt.locking`) would release
 itself when a holder dies and so could never go stale. It was **not** used, and
-that is a decision rather than an oversight: ADR-MAINTENANCE decision 1c
+that is a decision rather than an oversight: SR-MAINTENANCE decision 1c
 requires the runner's state to be *reportable* — which pid, held or stale — and
 an flock is held by a file descriptor nobody outside the process can name. The
 cost is that a killed runner leaves a lock file behind; the answer to that is
@@ -120,7 +120,7 @@ _POLL_S = 0.05
 #: **A bound, not a tuning knob.** It exists so the loop in `run_once`
 #: provably terminates: without it, a repository committing faster than it
 #: re-indexes would keep one process alive indefinitely, which is precisely
-#: the resident process ADR-MAINTENANCE veto condition 6 forbids. Reaching the
+#: the resident process SR-MAINTENANCE veto condition 6 forbids. Reaching the
 #: cap is not an error — the leftovers stay in the dirty list, `fux doctor`
 #: reports them, and the next commit spawns a fresh runner.
 MAX_PASSES = 5
@@ -133,7 +133,7 @@ def _runtime(root: Path) -> Path:
 def lock_path(root: Path) -> Path:
     """Public because every message about a wedged runner has to name it —
     a status that says "something is stuck" without saying where is not a
-    status (ADR-MAINTENANCE decision 1c)."""
+    status (SR-MAINTENANCE decision 1c)."""
     return _runtime(root) / LOCK_NAME
 
 
@@ -161,7 +161,7 @@ def is_alive(pid: int | None) -> bool:
     The answer is advisory in both directions and is never acted on
     destructively: a pid can be reused, so `True` does not prove *our* runner
     is alive, and this is why the status surface reports rather than repairs
-    (ADR-MAINTENANCE decision 1c, veto 7).
+    (SR-MAINTENANCE decision 1c, veto 7).
     """
     if not pid or pid <= 0:
         return False
@@ -283,7 +283,7 @@ def break_lock(root: Path) -> None:
     """Remove a lock this process has decided is stale.
 
     **Only ever called from an explicit human command** (`fux ingest`, which is
-    a takeover by ADR-MAINTENANCE decision 1d) and only after the holder has
+    a takeover by SR-MAINTENANCE decision 1d) and only after the holder has
     been given the cooperative stop and found not to be running. The status
     surface never calls this — that is veto 7.
     """
@@ -360,7 +360,7 @@ def request_stop(root: Path, *, timeout: float = STOP_TIMEOUT_S) -> str:
 def take_over(root: Path, *, timeout: float = STOP_TIMEOUT_S) -> str:
     """Stop whatever is running so an explicit command can write the index.
 
-    ADR-MAINTENANCE decision 1d: *the explicit instruction wins*. Refusing
+    SR-MAINTENANCE decision 1d: *the explicit instruction wins*. Refusing
     would make a person argue with a background job they did not start, and
     waiting would reintroduce on `fux ingest` exactly the latency deferral
     removed from `git commit`.
@@ -376,7 +376,7 @@ def _write_status(root: Path, outcome: str, **extra) -> None:
 
     A detached process has nowhere to print, so without this a failed
     background re-index is completely silent — which is the opacity
-    ADR-MAINTENANCE decision 1c exists to close.
+    SR-MAINTENANCE decision 1c exists to close.
     """
     try:
         directory = fuxdir.derived_dir(root, "runtime")
@@ -397,7 +397,7 @@ def last_run(root: Path) -> dict | None:
 def status(root: Path) -> dict:
     """Everything the runner knows about itself. **Read-only, always.**
 
-    This is the whole of ADR-MAINTENANCE decision 1c's four questions, and it
+    This is the whole of SR-MAINTENANCE decision 1c's four questions, and it
     is a pure function of the filesystem: it opens no lock, clears nothing, and
     repairs nothing. `fux doctor` renders it; nothing else in the engine acts
     on it.

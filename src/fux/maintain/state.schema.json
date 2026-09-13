@@ -24,7 +24,7 @@
       "",
       "COUNTED IN RUNS, NEVER IN SECONDS, and that is a law rather than a",
       "preference: `refer/fetchcache.py` states that wall clock lives in the TTL",
-      "store and nowhere else, which ADR-REFER rests on. W-75 had specified this",
+      "store and nowhere else, which SR-REFER rests on. W-75 had specified this",
       "file with `validated_at` and `changed_at` -- two timestamps -- and",
       "shipping them would have been a quiet contradiction of an accepted",
       "record.",

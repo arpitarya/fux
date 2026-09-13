@@ -23,14 +23,14 @@ runs by `ask`/`find`/`explain`/`answer`/graph labels.
 ## Bounded, and eviction is silent by design
 
 Titles are small, so eviction should be rare in practice — but an unbounded
-cache is the slow-leak shape `ADR-CACHE` already refused for the TTL store,
+cache is the slow-leak shape `SR-CACHE` already refused for the TTL store,
 and the same reasoning applies here. `max_bytes` bounds total size; entries
 evict oldest-written first. A miss here is never an error: the reader
 degrades to a labelled `title_h`, and `ingest` (for a *carried-forward*
 record whose cache went cold) re-fetches to repopulate rather than commit
 without one — the "force a re-fetch" ruling on the delta-path fork.
 
-**No clock, unlike the TTL store.** `ADR-CACHE` decision 8 is deliberate:
+**No clock, unlike the TTL store.** `SR-CACHE` decision 8 is deliberate:
 "wall clock lives in the TTL store and nowhere else." This cache does not
 need real time — only *which entry is older* to break a tie under
 `max_bytes` — so eviction orders by a monotonic `seq` written into each

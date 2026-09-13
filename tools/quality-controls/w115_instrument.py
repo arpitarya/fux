@@ -31,7 +31,7 @@ were **not changed by it**. What W-115 changed for ranking is:
 **So the ladder has the right formats and the wrong CONTENT.** Measured on
 `rung-01000`: of 800 `.md`/`.txt` documents **1** carries a `#` line inside a
 code fence, and of 146 `.yaml` documents **2** nest deeper than two levels. A
-corpus cannot show you a change it never triggers — ADR-RS decision 23b, which
+corpus cannot show you a change it never triggers — SR-RS decision 23b, which
 calls that a data defect and not a null.
 
 ## What this corpus does differently
@@ -50,7 +50,7 @@ reader wants; a shell comment inside a code block does not make a runbook a
 document about that phrase. The W-115 change is the claim that the engine should
 agree, and this measures whether it does.
 
-⚠ **`--selftest` is the headroom proof (ADR-RS decision 22c(b)).** It asserts
+⚠ **`--selftest` is the headroom proof (SR-RS decision 22c(b)).** It asserts
 the two arms disagree about the decoys' heading sets and agree about everything
 else — separable only by the property under test. A run whose selftest fails is
 measuring nothing and says so.
@@ -143,7 +143,7 @@ def scaffold(dest: Path, types: list[str]) -> None:
     """Let `fux setup` write the repo, then declare the corpus.
 
     ⚠ **Hand-writing `fux.toml` was wrong and failed loudly, which is the point.**
-    `[sources] dirs` stopped being a TOML key when ADR-DIR-LIST landed, and a
+    `[sources] dirs` stopped being a TOML key when SR-DIR-LIST landed, and a
     generator carrying its own copy of the config shape is a second source of
     truth that drifts silently. `fux setup` is the one that cannot.
     """
@@ -158,10 +158,10 @@ def scaffold(dest: Path, types: list[str]) -> None:
         sys.stderr.write(r.stdout + r.stderr)
         raise SystemExit("fux setup failed")
     (dest / ".fux" / "sources" / "dirs").write_text(
-        "# The generated corpus. Declared, never derived (ADR-DIR-LIST).\ndocs\n",
+        "# The generated corpus. Declared, never derived (SR-DIR-LIST).\ndocs\n",
         encoding="utf-8")
     # ⚠ **No types file is written, and the argument is kept only to document
-    # that.** The list moved to `.fux/formats.toml` (ADR-TYPES decision 12) and
+    # that.** The list moved to `.fux/formats.toml` (SR-TYPES decision 12) and
     # `setup` writes the built-in default there — which already admits every
     # format these corpora use. A second list here is refused by name, which is
     # how this was found rather than guessed at.
@@ -433,7 +433,7 @@ def _run_arm(arm: str, corpus: Path, probes: Path, out: Path) -> None:
 
 
 def cmd_selftest(a) -> int:
-    """ADR-RS 22c(b): the arms must disagree about the decoys and about nothing
+    """SR-RS 22c(b): the arms must disagree about the decoys and about nothing
     else. Asserted on extraction, in two fresh processes, before any ranking
     number exists.
 
@@ -504,7 +504,7 @@ print(json.dumps(out))
           and pl_d == 0 and s_diff == 0 and not unreadable)
     print()
     if ok:
-        print("SELFTEST PASSES (ADR-RS 22c(b)): every TREATED decoy is separable "
+        print("SELFTEST PASSES (SR-RS 22c(b)): every TREATED decoy is separable "
               "by the property under test, no placebo decoy is, and no subject is. "
               "Headroom is PROVEN, not observed.")
     else:
@@ -565,7 +565,7 @@ def cmd_run(a) -> int:
         head_reg = sum(1 for p in probes if p["family"] == fam
                        and (out["old"][p["id"]]["hit1"] or out["new"][p["id"]]["hit1"]))
         print(f"[{fam}] headroom improvement {head_imp}/{nq} · regression {head_reg}/{nq} "
-              f"(ADR-RS 22b, PROVEN by --selftest under 22c(b))")
+              f"(SR-RS 22b, PROVEN by --selftest under 22c(b))")
         print(f"[{fam}] {vline(v)}")
         if v["outcome"] == "inconclusive":
             print(f"[{fam}] INCONCLUSIVE (22d): not one probe moved between the arms.")

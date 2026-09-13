@@ -8,12 +8,88 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Added
+
+- **`.fux/output.toml`'s `journal` line now says what the key DOES.** It reads
+  **`⚠ NOT a rendering key`** and names the file it appends to, instead of
+  *"record each answer's receipt locally"* — which named the place and not the
+  act ([SR-PROVENANCE](records/0142_provenance.md) decision 10, W-147).
+  - **Both consent surfaces stay and both are explicit** (Arpit, 2026-09-13):
+    `fux answer --journal` for one invocation, and a committed
+    `[cli.answer] journal = true` for the repository — the second reviewable in
+    git rather than by watching a terminal. **Default is `false` on both**;
+    nothing records by accident.
+  - **No behaviour changed** — both surfaces already worked. What is new is the
+    disclosure, and a test binding all four states so neither surface can be
+    tidied away by a reader who takes `output.toml` for a pure rendering config.
+
+- **`mtime` on every `--json` hit** — `ask`, `find`, `fux.api`, the Node reader
+  and both MCP servers ([SR-API](records/0154_api.md) decision 7, W-153). The
+  document's committed **git commit timestamp, in whole UNIX seconds**.
+  - **Every record already carried it and no caller could read it**, so you
+    could not sort by recency, filter by age, or see how old an answer was.
+  - 🔴 **Always present; `null` is a CLAIM**, not an absence — *this document
+    carries no committed date*. A corpus copied **out** of its repository has no
+    `mtime` anywhere, which `fux doctor`'s `recency prior` row reports.
+  - ⚠ **Additive, and stated rather than assumed:** a consumer validating
+    strictly against the previous `output.schema.json` will see a new key.
+  - **It exposes a fact and orders nothing.** `mtime` reaches the sort only
+    through the declared tie-break, at an equal score. **Prose output is
+    unchanged.**
+
+### Removed
+
+- 🔴 **`.fux/tune.toml` `[ranking] archived_weight` and `recency_half_life_days`
+  are REMOVED** (Arpit, 2026-09-13; [SR-TUNE](records/0135_tuning.md) decisions
+  15a and 15b, W-152). With `superseded_weight` below, **all three document
+  priors are gone** and `[ranking]` is `rerank_weight` and `expand_weight`.
+  - **Nothing ranks differently.** `archived_weight` shipped at `1.0` and
+    `recency_half_life_days` at `0.0` (off). Delete the lines; results are
+    byte-identical.
+  - **Why:** measured across 26 intent-split probes, every value that perfects
+    *current-seeking* dismantles *history-seeking* one probe for one; at a
+    half-life of a year or less, history-seeking drops to **0 of 13**. A
+    per-document multiplier cannot carry a per-query distinction.
+  - ⚠ **Both are refused BY NAME**, in the Python and Node readers alike.
+  - **The facts are untouched and are what you branch on:** `archived: bool` on
+    every JSON hit, `[archived]` in prose, and `mtime` on every record. At an
+    **equal score** the declared tie-break still puts a live document above a
+    retired one and a newer above an older.
+  - 🔴 **The response note loses its `(demoted, weight N)` clause** — there is no
+    demotion left to disclose.
+  - **Also gone, because their only reader was the knob:**
+    `fux.ingest.priors.recency_multiplier` (and its Node twin) and
+    `newest_mtime` from the derived `.fux/runtime/stats.json`. The runtime plane
+    is gitignored, so **no migration and no rebuild is required** — a stale
+    `stats.json` that still carries the key is ignored.
+  - `fux doctor`'s `ranking priors` row now covers one prior; its `recency prior`
+    row now names what a missing `mtime` actually costs (no date reaches a
+    caller; the tie-break's date key is inert).
+
+- 🔴 **`.fux/tune.toml` `[ranking] superseded_weight` is REMOVED** (Arpit,
+  2026-09-13; [SR-TUNE](records/0135_tuning.md) decision 15, W-151).
+  Supersession is a **fact**, not a weight: no multiplier decides which document
+  supersedes another, and the only band of values that ordered a corpus sensibly
+  had its lower edge set by an **unrelated** document — so adding a document
+  moved the correct value.
+  - **Nothing ranks differently.** It shipped at `1.0`, which was already the
+    identity. Delete the line and your results are byte-identical.
+  - ⚠ **A committed `superseded_weight` is now an ERROR** — in the Python reader
+    and the Node one — and the error **names the removal and its date** rather
+    than reporting an unknown key. `fux setup` wrote this key into every
+    `.fux/tune.toml` it created, so the generic message would have sent you
+    hunting for a typo in a line fux typed for you.
+  - **The fact is untouched:** `supersedes:` frontmatter, the `superseded`
+    record property, the graph edge, `fux explain`, and the declared tie-break
+    that still puts a live document above a retired one at an equal score.
+  - `fux doctor`'s `ranking priors` row stops listing it.
+
 ### Changed
 
 - 🔴 **BREAKING for npm consumers, and a smaller diff for everyone else: the
   Node reader ships as ONE generated file.**
-  ([ADR-LAW-10](docs/adr/0012_LAW-10-bundled-output.md),
-  [ADR-NODE-SEARCH](docs/adr/0155_node-search.md) decisions 13-16.)
+  ([SR-LAW-10](records/0011_LAW-10-bundled-output.md),
+  [SR-NODE-SEARCH](records/0153_node-search.md) decisions 13-16.)
   - **`.fux/node/` is four files instead of 47** — `fux.mjs` (generated),
     `package.json`, `mcp-tools.json`, `README.md`. It was fux's own `.mjs`
     module tree, committed into your repository, editable in place with nothing
@@ -42,22 +118,22 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
     and a workspace manifest with nothing installed behind it.
 
 - 🔴 **An unknown key in `fux.toml` is now REFUSED, not ignored**
-  ([ADR-CONFIG](docs/adr/0113_config.md) decision 14, W-122; the defect was
+  ([SR-CONFIG](records/0113_config.md) decision 14, W-122; the defect was
   W-140 row 8). A misspelled key used to parse and do nothing, so your setting
   was inert with nothing said. The error names the key and lists what is legal
   at that level. **This can break an existing `fux.toml`** that carries a key
   fux never read — which is the point: it was not in force either way.
   - `.fux/tune.toml` has behaved this way since it existed; `fux.toml` now matches.
 - **`fux setup`'s `fux.toml` comments are pointers, not explanations.** Every
-  key's meaning and default lives in ADR-CONFIG; a comment describing a key can
+  key's meaning and default lives in SR-CONFIG; a comment describing a key can
   drift from the record while both look correct
-  ([ADR-LAW-0](docs/adr/0002_LAW-0-authority.md) decision 4). Your existing
+  ([SR-LAW-0](records/0002_LAW-0-authority.md) decision 4). Your existing
   `fux.toml` is untouched — `setup` never rewrites a file that is there.
 
 
 - **Codex and Copilot skills now install to `.agents/skills/`** — one shared
   folder, instead of `.codex/skills/` and `.github/skills/`
-  ([ADR-AGENT-POLICY](docs/adr/0132_agent-policy.md) decision 16, W-141).
+  ([SR-AGENT-POLICY](records/0132_agent-policy.md) decision 16, W-141).
   Codex's docs list `.agents/skills` as its only repository skill folder, so
   the old Codex copies may never have loaded. Copilot reads the same folder.
   - ⚠ **Already set up? Delete `.codex/skills/` and `.github/skills/` yourself**,
@@ -69,13 +145,13 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 - **`src/fux/config.schema.json`** — every field in it was a `doc:` string
   describing a `fux.toml` key, and nothing loaded or checked it, which is how it
   came to advertise a `[sources] types_file` key that did not exist
-  ([ADR-CONFIG](docs/adr/0113_config.md) decision 15). The five remaining
+  ([SR-CONFIG](records/0113_config.md) decision 15). The five remaining
   schemas are all loaded at runtime or held equal to the code by a test.
 
 ### Added
 
 - 🔴 **A second reader: `fux` in Node, with no Python and no dependencies**
-  ([ADR-NODE-SEARCH](docs/adr/0155_node-search.md)). `fux setup` vendors it
+  ([SR-NODE-SEARCH](records/0153_node-search.md)). `fux setup` vendors it
   into **`.fux/node/`** and writes a `.fux/fux` shim beside it, so a clone
   answers with nothing installed:
 
@@ -95,7 +171,7 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
     dependency (L1).
   - ⚠ **`.fux/node/` is committed and OVERWRITTEN on a version difference**,
     not write-if-missing — the fourth `.fux/` shape
-    ([ADR-DOTFUX](docs/adr/0102_fux-directory.md) decision 6a). Nobody edits a
+    ([SR-DOTFUX](records/0102_fux-directory.md) decision 6a). Nobody edits a
     vendored reader, and a stale one against a bumped `_format` is a wrong
     answer rather than an old preference. `fux doctor` gains a `node reader`
     row that reports the drift.
@@ -104,7 +180,7 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   - **Not on npm yet**, and no global `fux` bin in the first release.
 
 - 🔴 **`from fux import open` — fux is importable, not only spawnable**
-  ([ADR-API](docs/adr/0156_api.md)).
+  ([SR-API](records/0154_api.md)).
 
   ```python
   from fux import open as fux_open
@@ -122,7 +198,7 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   are the contract**, and nothing that writes is in it.
 
 - **Operating guides for every `fux` job, on Claude, Codex, Copilot and Kiro**
-  ([ADR-AGENT-POLICY](docs/adr/0132_agent-policy.md) decision 15). `fux setup`
+  ([SR-AGENT-POLICY](records/0132_agent-policy.md) decision 15). `fux setup`
   now writes **ten more skills** — `fux-search`, `fux-answer`, `fux-graph`,
   `fux-index`, `fux-maintain`, `fux-mcp`, `fux-sources`, `fux-config`,
   `fux-fetcher`, `fux-pii` — to all four skill surfaces, and `fux-usage` gains a
@@ -140,7 +216,7 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
     write-if-missing, so re-run it to add the new files; your edited copies stay.
 
 - **`update = auto|never` on a URL line** (W-113,
-  [ADR-URL-LIST](docs/adr/0116_url-list.md) decision 14). A line could say how
+  [SR-URL-LIST](records/0116_url-list.md) decision 14). A line could say how
   to reach a document and how long a citation could go unchecked, and could not
   say whether to go back for it at all. `update=never` pins the document:
   `fux update` opens no socket for it and **does not even import your fetcher**
@@ -152,23 +228,23 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   byte-identical to before.**
   - 🔴 **It buys bandwidth by giving up freshness, and it is NOT the ETag
     saving.** CDP intercepts at the response stage, so the body has already
-    crossed the wire ([ADR-CDP-FETCHER](docs/adr/0118_cdp-fetcher.md) decision
+    crossed the wire ([SR-CDP-FETCHER](records/0118_cdp-fetcher.md) decision
     12, now carrying the veto that re-costs request-stage interception).
   - ⚠ **`update=never` + `keep=false` is legal and lossy** — nothing retained
     and nothing fetched, so the document is frozen with nothing to verify a
     citation against. `fux doctor` counts the pinned lines and names those ones.
   - 🔴 **A pinned URL can never be re-redacted, `--full` included**
-    ([ADR-PII](docs/adr/0150_pii.md)). Its record is carried forward verbatim,
+    ([SR-PII](records/0148_pii.md)). Its record is carried forward verbatim,
     so a new `.fux/pii.toml` rule cannot reach it. Documented, not fixed.
 - **`fux doctor` gains `fux.toml loads`.** A config the loader refuses used to
   produce a **green doctor beside an exit-1 ingest** — every config-dependent
   check degraded to `skipped (no readable fux.toml)` at warn level, each
   correctly, and collectively they deleted the finding. The new row is an
   **error** and prints the loader's own message verbatim
-  ([ADR-DOCTOR](docs/adr/0154_doctor.md) decision 4).
+  ([SR-DOCTOR](records/0152_doctor.md) decision 4).
 - **`fux-decoder` and `fux-usage` now install for Copilot** (`.github/skills/` — now `.agents/skills/`, see *Changed*),
   so all three committed-write skills reach all four vendors (W-118,
-  [ADR-AGENT-POLICY](docs/adr/0132_agent-policy.md) decision 14a).
+  [SR-AGENT-POLICY](records/0132_agent-policy.md) decision 14a).
 
 ### Fixed
 
@@ -184,16 +260,16 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   `"default": "5"` — a string — because the `{{TOP}}` placeholder was
   substituted into serialized JSON without regard for the quotes around it.
   Python emitted `5`. Found by writing the equality check that now holds the
-  two halves together ([ADR-MCP](docs/adr/0136_mcp.md) decision 11).
+  two halves together ([SR-MCP](records/0136_mcp.md) decision 11).
 
 - **`fux update --check --json`.** The verb whose purpose is being read by
   something else had no machine-readable output, and it exits 0 whether or not
   anything drifted — so the only way to act on the answer was to parse a table
   meant for a person. It emits `{drifted, fresh, unchecked_urls}` and still
   exits 0; gate CI on `drifted` being empty, never on the status
-  ([ADR-CLI](docs/adr/0101_cli-surface.md)).
+  ([SR-CLI](records/0101_cli-surface.md)).
 
-- 🔴 **`fux verify --rerun` fetched.** ADR-PROVENANCE decision 14 is a ruling
+- 🔴 **`fux verify --rerun` fetched.** SR-PROVENANCE decision 14 is a ruling
   that `fux verify` never goes to the network — one receipt must not verify
   differently on a laptop with a VPN and in CI. `--rerun` called the refer
   plane, which fetches every citation. It re-ranks from the committed index
@@ -209,21 +285,21 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   `ttl=` may only narrow the caller's policy, never widen it — so `min(0, …)`
   was always `0`. **`fux answer --cache-ttl 15m`** is how to ask; the default
   stays off, so nobody who did not ask can be served a cached byte
-  ([ADR-URL-FRESHNESS](docs/adr/0149_url-freshness.md)).
+  ([SR-URL-FRESHNESS](records/0147_url-freshness.md)).
 
 - **The background re-index rebuilds the accelerator.** Every CLI verb builds
   it where the shards are written, so `ask --fast` never pays for one; the
   detached runner skipped it, leaving the derived plane stale after every
   background pass. Best-effort and recorded in the run status — a disposable
   plane must not fail a correct re-index
-  ([ADR-MAINTENANCE](docs/adr/0129_hooks.md)).
+  ([SR-MAINTENANCE](records/0129_hooks.md)).
 
 - 🔴 **The answer-time fetch timeout bounded nothing.** `timeout_seconds` was
   validated, stamped into every answer bundle and printed by `--audit`, and no
   code read it — so a consumer fetcher that blocked forever hung `fux answer`
   behind a number that read as a guarantee. The fetch now runs in a worker and
   the query stops waiting at the deadline, degrading exactly as a failed fetch
-  does ([ADR-REFER](docs/adr/0127_refer-plane.md)).
+  does ([SR-REFER](records/0127_refer-plane.md)).
 
 - 🔴 **`fux add <URL>` wrote the engine's defaults over your `[sources.url]`.**
   Each generated line states every attribute, and the values came from the
@@ -231,7 +307,7 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   or a `cdp` fetcher got `ttl=24h meta=hashed fetch=http` written onto every
   line `fux add` produced. The line now states the resolved value: built-in,
   then `[sources.url]`, then an explicit flag
-  ([ADR-URL-LIST](docs/adr/0116_url-list.md)). Existing lines are unchanged —
+  ([SR-URL-LIST](records/0116_url-list.md)). Existing lines are unchanged —
   a line that already states an attribute has already spoken.
 
 - 🔴 **The starter refusal rules refused real wiki pages.**
@@ -239,7 +315,7 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   `.html`/`.htm` — so `document-request-returned-a-web-page`, the file's
   highest-value rule, refused every `viewpage.action`, `Page.aspx`,
   `index.php` and `.jsp` document a corpus had. Both suffix rules now carry the
-  server-page extensions ([ADR-REFUSAL](docs/adr/0148_refusals.md)). The
+  server-page extensions ([SR-REFUSAL](records/0146_refusals.md)). The
   starter also promised that a short page "warns instead of indexing silently";
   **there is no warn level** and never was — every rule refuses, and the
   comment says so now. **Existing repos keep their `refusals.toml`**: add the
@@ -261,7 +337,7 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   the output config fills that field — so the command whose job is to wire the
   hooks printed a true status report of an unwired repo instead. `--status`
   selects the mode now; `--json` only selects the rendering, and an explicit
-  `fux hooks --json` still reports ([ADR-MAINTENANCE](docs/adr/0129_hooks.md)).
+  `fux hooks --json` still reports ([SR-MAINTENANCE](records/0129_hooks.md)).
 
 - **A shard with merge conflict markers says so.** It reported *not a fux index
   shard, or the file is truncated* — corruption-shaped words for an unresolved
@@ -274,19 +350,19 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   N hop(s)` and exited 0 — the same answer as for two real, unconnected
   documents, so a typo read as a finding. `fux explain` now refuses an unknown
   `tag:` too; neither verb checked tags at all
-  ([ADR-GRAPH](docs/adr/0126_graph.md)). An empty `paths` still exits 0 and
+  ([SR-GRAPH](records/0126_graph.md)). An empty `paths` still exits 0 and
   still means what it says.
 
 - **`fux doctor` gains a `tune.toml loads` row.** A tune file that did not parse
   left every row green — `fux ingest` reads only `[index]` from it, so the index
   stayed clean while `ask`, `find`, `answer`, `graph` and `path` all refused.
   The row quotes the loader's own refusal and fails as an **error**
-  ([ADR-DOCTOR](docs/adr/0154_doctor.md) decision 10).
+  ([SR-DOCTOR](records/0152_doctor.md) decision 10).
 
 - **`fux add <URL> --no-update` now fetches once**, as `--help` and the record
   always said. It wrote the line, fetched nothing and exited 1 — the pin filter
   ran above the fetch and did not know an add was in progress. Every run after
-  the add is still pinned ([ADR-URL-LIST](docs/adr/0116_url-list.md) decision
+  the add is still pinned ([SR-URL-LIST](records/0116_url-list.md) decision
   14). ⚠ A pinned line written **by hand** into `.fux/sources/urls` is still
   never fetched and so has no record.
 
@@ -300,13 +376,13 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   read `[PII:email]` could carry the address in its committed title, and in the
   title field's terms on every record. The title is redacted in the same pass as
   the body now; **re-ingest to clean an index built before this**
-  ([ADR-PII](docs/adr/0150_pii.md) decision 19a).
+  ([SR-PII](records/0148_pii.md) decision 19a).
 
 - ⚠ **A document's PATH is never redacted, and ingest now says so.** `loc` is
   the address `fux answer` fetches with and `id` is the key the index is sorted
   on, so a redacted path addresses nothing. A run whose rules match a path
   prints a note naming those documents; renaming the file or ignoring it is the
-  consumer's call ([ADR-PII](docs/adr/0150_pii.md) decision 19b).
+  consumer's call ([SR-PII](records/0148_pii.md) decision 19b).
 
 - 🔴 **No URL citation was ever verified live.** The refer plane's fetch step
   still required a fetcher to return a `str`, while the fetcher contract has
@@ -319,7 +395,7 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   two shas are comparable; a response whose type no decoder claims is
   `unverified` with the decoder's own reason, and a pre-2026-08-26 fetcher that
   returns prose still verifies
-  ([ADR-URL-FRESHNESS](docs/adr/0149_url-freshness.md) decision 6a).
+  ([SR-URL-FRESHNESS](records/0147_url-freshness.md) decision 6a).
 
 - 🔴 **`.jsonl` and `.json` documents lost their title.** Since 2026-09-06 a
   record-oriented decoder emitted `## Record 1` / `## Item 1` as its **first**
@@ -328,7 +404,7 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   Measured over this repo: **96 documents** (86 `.jsonl`, 10 `.json`) lost a real
   title and **not one gained anything**
   ([the run](work/regression/2026-09-11-w116-chunking/report.md),
-  [ADR-DECODE](docs/adr/0139_decode.md) decision 11a). Both decoders now emit a
+  [SR-DECODE](records/0139_decode.md) decision 11a). Both decoders now emit a
   `# <filename>` title with the records as siblings beneath it — which is what
   `DECODER-SKILL.md` told decoder authors to do all along.
   - ⚠ **Run `fux ingest --full` to pick this up.** Reuse is keyed on a
@@ -340,12 +416,12 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   decoder's headings become citable passages. `.github/agents/fux.agent.md` had
   drifted the other way, losing the command-resolution ladder. Both repaired, and
   a test now asserts every committed agent file still equals the template that
-  ships ([ADR-AGENT-POLICY](docs/adr/0132_agent-policy.md) decision 14b).
+  ships ([SR-AGENT-POLICY](records/0132_agent-policy.md) decision 14b).
 
 ### Changed
 
 - ⚠ **BREAKING — the types list is `.fux/formats.toml`** (W-130,
-  [ADR-TYPES](docs/adr/0128_types-list.md) decision 12). It was
+  [SR-TYPES](records/0128_types-list.md) decision 12). It was
   `.fux/sources/types`, a line-grammar file. The new file has two keys:
   `include` (globs that are already text) and `[decoders]` (`ext = "module"`,
   and a bound extension is a document). **Nothing in it subtracts** — `!`
@@ -358,10 +434,10 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   re-ingests to a **byte-identical** index and `.fuxignore`.
 - `[sources] types_file` in `fux.toml` is now refused by name.
   `config.schema.json` advertised it; nothing ever read it
-  ([ADR-CONFIG](docs/adr/0113_config.md)).
+  ([SR-CONFIG](records/0113_config.md)).
 
 - ⚠ **BREAKING — `.fux/pii.toml` is required** (W-129,
-  [ADR-PII](docs/adr/0150_pii.md) decision 17). `fux setup` now writes the
+  [SR-PII](records/0148_pii.md) decision 17). `fux setup` now writes the
   starter, and **every command except `setup`, `tune` and `output` stops with an
   error in a repo without it**; `fux doctor` runs and reports it as a failing
   row. A file with every rule commented out is legal and redacts nothing.
@@ -370,7 +446,7 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   Medicare MBI, Canadian SIN), and the next ingest re-extracts in full.
 
 - **The PII starter covers US and Canadian identifiers** (W-131,
-  [ADR-PII](docs/adr/0150_pii.md) decision 12a). **On:** US SSN and ITIN/ATIN
+  [SR-PII](records/0148_pii.md) decision 12a). **On:** US SSN and ITIN/ATIN
   in their written shape, excluding numbers the SSA and IRS never issue; the
   Medicare MBI; the Canadian SIN with a Luhn check. **Off, commented with what
   each over-matches:** US EIN, Canadian postal code, NANP phone numbers.
@@ -383,23 +459,23 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   corpus 87 of 563 markdown documents lost 1 055 headings, and 262 of the slots
   that survived held template headings (`Context`, `Decision`). At 32, 98.2 %
   keep every heading for ~0.3 % more index. **Display only** — ranking already
-  read every heading. [ADR-EXTRACTED](docs/adr/0115_extracted-mode.md) decision 9.
+  read every heading. [SR-EXTRACTED](records/0115_extracted-mode.md) decision 9.
 - ⚠ **BREAKING: `fux.toml [decode]` is refused.** `max_table_rows` moved to
   `.fux/tune.toml [index]`, beside `max_phrases`. `[index]` is tune.toml's one
   declared exception to "nothing here changes the index": `fux ingest` reads it,
   `--no-tune` does not undo it, and changing it re-extracts.
-  [ADR-TUNE](docs/adr/0135_tuning.md) decision 13.
+  [SR-TUNE](records/0135_tuning.md) decision 13.
 - **Fixed: a changed `max_table_rows` never reached an unchanged CSV on a delta
   ingest** (since 2026-09-06), so delta and `--full` disagreed. Ingest now keeps
   a digest of `[index]` in `.fux/runtime/` and re-extracts when it moves —
   recorded only after the index is written, so a stopped run cannot hide it.
-  [ADR-INGEST](docs/adr/0106_ingest.md) decision 15b. **The first ingest after
+  [SR-INGEST](records/0106_ingest.md) decision 15b. **The first ingest after
   upgrading re-extracts every document once.**
 
 ### Added
 
 - **`.fux/pii.toml` rules can name a checksum — `validate = "luhn"` or
-  `"verhoeff"`** (W-128, [ADR-PII](docs/adr/0150_pii.md) decision 16). A match
+  `"verhoeff"`** (W-128, [SR-PII](records/0148_pii.md) decision 16). A match
   is redacted only when its digits pass, so a payment-card or Aadhaar rule stops
   eating order ids and timestamps. The set is closed and engine-owned — no
   consumer code runs inside ingest. ⚠ **A checksum is a 1-in-10 filter**, so the
@@ -422,9 +498,9 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   sentences*, with live links and correct ages, and nothing here would have
   caught them. Guessing at claim truth would pass on exactly those. ⚠ **The
   rules it enforces live in `CLAUDE.md` and `OPEN-WORK.md`'s footer and in no
-  ADR**, so the test is an unowned guard — filed to W-122 Phase 1.
+  SR**, so the test is an unowned guard — filed to W-122 Phase 1.
 
-- **ADR-RS — a FIFTH way a prediction can end: `VOID`** (Arpit, 2026-09-06),
+- **SR-RS — a FIFTH way a prediction can end: `VOID`** (Arpit, 2026-09-06),
   for a bar that could not be applied at all. 🔴 **Distinct from
   `INCONCLUSIVE`, and conflating them destroys the finding:** INCONCLUSIVE is
   *the instrument could not discriminate*; VOID is *the measurement was fine
@@ -434,7 +510,7 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   on the same rule that sends an ambiguous result to him. `tests/test_regression_runs.py`
   accepts the value.
 
-- **ADR-QUALITY decision 2a — a bar on `recall@k` names its `k`, or it is
+- **SR-QUALITY decision 2a — a bar on `recall@k` names its `k`, or it is
   VOID** (Arpit ruled, 2026-09-06). `recall@k` is a curve, so a bar that omits
   `k` is four bars whose verdicts can disagree, and whoever supplies the
   missing `k` afterwards picks the verdict — a moving threshold wearing an
@@ -450,7 +526,7 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   bar — *net ≥ 6 on `recall@k`* — never named `k`: the run is **+7 at `k = 1`**
   and **+3 / +2 / +1** at `3 / 5 / 10`, because `recall@10` is already
   `0.9884` with no enrichment at all. **No behaviour changed** — the feature
-  stays shipped on ADR-ENRICH decision 15's own argument (prose measured
+  stays shipped on SR-ENRICH decision 15's own argument (prose measured
   `+1 / −1`; a question is a checkable object) — but the record no longer
   reads as *measured and passing*. ✅ **The placebo control is not voided with
   it**: 0 discordant queries at every `k`, so the gain is the content of the
@@ -458,7 +534,7 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   any arm**. ⚠ The doc2query−− filter is **unproven, not disproven** — 2 of 98
   questions, a 2 % treatment.
 
-- **ADR-RANKING decision 8a — `round(score, 9)` is the cross-runtime contract
+- **SR-RANKING decision 8a — `round(score, 9)` is the cross-runtime contract
   for the score; the ORDER stays byte-equal** (Arpit ruled, 2026-09-06).
   Two runtimes reading one committed index agree on `round(score, 9)`, not
   necessarily on the score's last bit: `log` is the one transcendental in
@@ -476,24 +552,24 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   `work/benchmark/PRE-REGISTRATION-NODE.md` is now **frozen in full**
   (sha `0e3b4c8`), which unblocks **W-107 Phase 1**.
 
-- 🔴 **L0 — ADRs are the only source of truth, and the Law records outrank
+- 🔴 **L0 — SRs are the only source of truth, and the Law records outrank
   every other record** (Arpit, 2026-09-06).
-  [ADR-LAW-0](docs/adr/0002_LAW-0-authority.md). Two clauses: a rule is
-  **stated in exactly one ADR** and every other artifact links to it, never
-  restates it; and the Law records `ADR-LAW-0`…`ADR-LAW-8` outrank every other
-  ADR, so **a record conflicting with a Law is void in the conflicting part**.
+  [SR-LAW-0](records/0002_LAW-0-authority.md). Two clauses: a rule is
+  **stated in exactly one SR** and every other artifact links to it, never
+  restates it; and the Law records `SR-LAW-0`…`SR-LAW-8` outrank every other
+  SR, so **a record conflicting with a Law is void in the conflicting part**.
   **A Law changes only on Arpit's ruling, named in the record.**
   The record carries the test that makes the first clause followable —
   *describes* is forbidden, *implements* and *enforces* are not — and states
   plainly that precedence is **judgment, never a gate**.
-  ⚠ **Supersedes [ADR-LAWS](docs/adr/0001_LAWS.md) decision 1** (*"CLAUDE.md is
+  ⚠ **Supersedes [SR-LAWS](records/0001_LAWS.md) decision 1** (*"CLAUDE.md is
   the single normative home"*), accepted the same day. `CLAUDE.md` becomes a
   pointer; its process sections stay, because no record governs how an agent
   behaves in a session. Migration: **W-122**.
-- **The nine law records are named `ADR-LAW-n` and filed as `*_LAW-n-*.md`**
+- **The nine law records are named `SR-LAW-n` and filed as `*_LAW-n-*.md`**
   (`0002_l1-zero-cost.md` → `0003_LAW-1-zero-cost.md`, and its seven
   siblings). Every citation swept across 13 files. **The prefix is the
-  grouping key**, so `docs/adr/*_LAW-*.md` finds all nine wherever they sit —
+  grouping key**, so `records/*_LAW-*.md` finds all nine wherever they sit —
   and **L0 sits at `0002`, first, because the law about laws precedes the laws** —
   `CLAUDE.md` has called this *"Law zero"* since August, so the number inherits a
   name the repo already used. Every record from the old `0002` to `0061` shifted
@@ -510,8 +586,8 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   `doctor.py`.** Each closes something that was reachable only from inside a
   run that had already finished, or from nowhere at all:
   - 🔴 **`freshness verdicts` — the `as-ingested` share.** This is the **veto
-    check of two accepted records** ([ADR-ACQUIRED](docs/adr/0050_acquired-plane.md),
-    [ADR-URL-FRESHNESS](docs/adr/0052_url-freshness.md)); both say to run it
+    check of two accepted records** ([SR-ACQUIRED](records/0145_acquired-plane.md),
+    [SR-URL-FRESHNESS](records/0147_url-freshness.md)); both say to run it
     with `fux doctor --json`, and until now neither veto could be run at all.
     The machine-readable form is the new `freshness` block.
     ⚠ **Over journalled answers only** — a verdict exists at answer time and
@@ -534,7 +610,7 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   - **Redaction counts on `pii rules`.** `redact()` returned per-rule hit
     counts from day one and `run()` summed them into a variable nothing ever
     read. Every ingest now records them
-    ([ADR-PII](docs/adr/0053_pii.md) decision 15), and `doctor` reports them
+    ([SR-PII](records/0148_pii.md) decision 15), and `doctor` reports them
     with their denominator.
   - **Absent is never reported as zero.** *"No ingest has recorded counts"*,
     *"no networked run has recorded a refusal"* and *"no receipts journalled"*
@@ -824,7 +900,7 @@ them against measured runs, because CI structurally cannot see either failure.
   writing each file, so the window between planning and writing is closed with
   no new field and no second digest.
 
-- **[ADR-LOCKS](docs/adr/0043_locks.md) is accepted**, and its veto captures are
+- **[SR-LOCKS](records/0140_locks.md) is accepted**, and its veto captures are
   a 2026-09-02 re-run rather than a five-day-old one. All three checks: not
   fired.
 
@@ -844,7 +920,7 @@ committed files and one gitignored plane.
 ### Added
 
 - **`.fux/acquired/` — the retained bytes a citation can be checked against**
-  (ADR-ACQUIRED). Ingest used to decode a fetched URL, keep the markdown and
+  (SR-ACQUIRED). Ingest used to decode a fetched URL, keep the markdown and
   drop the bytes, so a `url:` record could only ever be verified by a *fresh
   fetch* — which needs the network, the session, and the source still existing.
   - **A third `.fux/` category**, beside committed and derived: gitignored like
@@ -861,7 +937,7 @@ committed files and one gitignored plane.
     `fux remove <url>` drops the manifest entry and sweeps the blob.
 
 - **`.fux/refusals.toml` — declarative refusal detection that fails closed**
-  (ADR-REFUSAL). A SharePoint share link returns a **sign-in page with HTTP
+  (SR-REFUSAL). A SharePoint share link returns a **sign-in page with HTTP
   200** that decodes perfectly well and lands a login page in the committed
   index. Six shipped rules, ORed in file order, first match wins; the check
   runs **after `_unpack` and before both retention and decode**, so a refusal
@@ -870,13 +946,13 @@ committed files and one gitignored plane.
     before the first socket opens.
   - ⚠ **Conditions are pure over the bytes.** `status`, `final_url_host` and
     `final_url_contains` were specified and **cut**: they would have put HTTP
-    facts inside the engine, which ADR-FETCHER decision 13 forbids. Provider
+    facts inside the engine, which SR-FETCHER decision 13 forbids. Provider
     detection survives as `body_contains` over **form-field names**
     (`name="loginfmt"`, `name="SAMLRequest"`) — an API between a page and its
     own backend, which outlives the redesigns that rewrite every visible string.
 
 - **`ttl=` on a URL line, and a sixth freshness verdict `as-ingested`**
-  (ADR-URL-FRESHNESS). When the source cannot be reached but the passage still
+  (SR-URL-FRESHNESS). When the source cannot be reached but the passage still
   matches the retained bytes the record was built from, that is a **real
   comparison** — no longer reported as `unverified`, which is
   indistinguishable from never having looked.
@@ -889,7 +965,7 @@ committed files and one gitignored plane.
     nothing and still always report `unverified`.
 
 - **`.fux/pii.toml` — redaction of the committed index, and nothing else**
-  (ADR-PII). The boundary is **committed vs local**, not *sensitive vs not*:
+  (SR-PII). The boundary is **committed vs local**, not *sensitive vs not*:
   acquired bytes, refer passages and `fux answer` quotes are untouched.
   - **The sha is taken BEFORE redaction**, so `refer` still verifies a citation
     against its unchanged source. An index storing the sha of redacted text
@@ -897,14 +973,14 @@ committed files and one gitignored plane.
     source, forever — a defect that presents as a working feature.
   - **Editing the ruleset invalidates extraction reuse** (`.fux/runtime/pii-digest`);
     a missing digest reads as *moved*, which costs one full extraction and settles.
-  - 🔴 **`.fux/enrich/` is committed and is NOT redacted.** Stated in ADR-PII
-    decision 1 and ADR-ENRICH decision 11 rather than left to be discovered.
+  - 🔴 **`.fux/enrich/` is committed and is NOT redacted.** Stated in SR-PII
+    decision 1 and SR-ENRICH decision 11 rather than left to be discovered.
   - ⚠ A pathological regex can hang an ingest — Python's `re` has no timeout.
     Empty patterns are refused and `doctor` compiles the rest; beyond that a
     consumer's regex is a consumer's regex.
 
 - **`.fux/sources/types` became the decoder map: `decoder=<module stem>`**
-  (ADR-TYPES decision 11/11a, ADR-DECODE decision 13). *"Which decoder reads
+  (SR-TYPES decision 11/11a, SR-DECODE decision 13). *"Which decoder reads
   `.csv`"* was a property of the code on a machine — two clones with different
   `.fux/decoders/` could commit different indexes from the same sources with
   nothing in the repo recording which decoder ran. It is now a committed line,
@@ -915,20 +991,20 @@ committed files and one gitignored plane.
     decoder's *default claim*, not a declaration of what it can read.
 
 - **`fux enrich` covers `url:` documents** via `enrich=` on a URL line
-  (ADR-ENRICH decision 11), under one synthetic scope, `.fux/sources/urls`.
+  (SR-ENRICH decision 11), under one synthetic scope, `.fux/sources/urls`.
   Possible only because the acquired plane holds the bytes locally — before it,
   planning a URL's enrichment meant a network fetch inside an offline command.
 
 - **`fux add --keep` / `--no-keep` / `--ttl D`**, and **`fux update --failed`**
   (fetch only URLs whose last run failed). A flag on the existing networked
-  verb rather than a `fux retry`, per ADR-CLI decision 1.
+  verb rather than a `fux retry`, per SR-CLI decision 1.
 
 - **`[sources.url] acquired_max_bytes`, `keep`, `ttl` and `enrich`**
-  (ADR-CONFIG decision 12) — each a source-wide *layer* a line still overrides.
+  (SR-CONFIG decision 12) — each a source-wide *layer* a line still overrides.
 
 ### Changed
 
-- **`cdp.py` returns the resource instead of a rendering** (ADR-CDP-FETCHER
+- **`cdp.py` returns the resource instead of a rendering** (SR-CDP-FETCHER
   decisions 5, 10–13; W-98 Phase 1). The shipped browser fetcher now
   intercepts the response over CDP — `Fetch.enable` at
   `requestStage: "Response"` → `Page.navigate` → `Fetch.requestPaused` →
@@ -964,7 +1040,7 @@ committed files and one gitignored plane.
 
 - 🔴 **`NameError` on every retaining fetch.** `urlsrc.fetch_all` read
   `source.acquired_max_bytes` with no `source` in scope, because
-  ADR-ACQUIRED named the key and `config.py` never parsed it. The key is now
+  SR-ACQUIRED named the key and `config.py` never parsed it. The key is now
   parsed, validated (a `bool` is rejected — it is an `int` subclass — and `< 1`
   refuses, pointing at `keep = false`) and passed in explicitly.
 - 🔴 **`refer()` raised in a repo with no `fux.toml`.** Reading a URL line's
@@ -987,7 +1063,7 @@ committed files and one gitignored plane.
 ### Added
 
 - **Three new built-in decoders: `jsonldoc` (`.jsonl`), `svgdoc` (`.svg`),
-  `imagedoc` (`.png`/`.jpg`/`.jpeg`/`.gif`)** (ADR-DECODE decision 10a).
+  `imagedoc` (`.png`/`.jpg`/`.jpeg`/`.gif`)** (SR-DECODE decision 10a).
   Sixteen built-ins → nineteen.
   - `jsonldoc` walks JSON Lines the same way `jsondoc` walks JSON — keys
     become headings, ids/hashes/timestamps are dropped — one malformed line
@@ -999,19 +1075,19 @@ committed files and one gitignored plane.
     extensions — hand-rolled per L1 (no Pillow). A pure-pixel image or a
     geometry-only SVG decodes to `None` and is not indexed at all.
 
-  ⚠ **This widens `DEFAULT_TYPES`** (ADR-TYPES decision 1 unions every
+  ⚠ **This widens `DEFAULT_TYPES`** (SR-TYPES decision 1 unions every
   built-in's extensions in automatically), reversing the SVG half of
-  ADR-TYPES decision 5 for every fresh `fux setup`. Images and `.jsonl` were
+  SR-TYPES decision 5 for every fresh `fux setup`. Images and `.jsonl` were
   never named by that decision, so those are new admissions rather than a
-  reversal. See [ADR-TYPES](docs/adr/0031_types-list.md) decision 5 and
-  [ADR-DECODE](docs/adr/0042_decode.md) decision 10a for the reasoning.
+  reversal. See [SR-TYPES](records/0128_types-list.md) decision 5 and
+  [SR-DECODE](records/0139_decode.md) decision 10a for the reasoning.
 
 ## [2.0.0-alpha.3] - 2026-08-29
 
 ### Added
 
 - **`fux ask` gained `--sections` / `--no-sections`, and a `[cli.ask]
-  sections` key** (ADR-OUTPUT decision 21, ADR-ASK decision 8 reopened).
+  sections` key** (SR-OUTPUT decision 21, SR-ASK decision 8 reopened).
   W-84's matched `§ heading` lines were the one part of `ask`'s output nothing
   could turn off.
 
@@ -1036,11 +1112,11 @@ committed files and one gitignored plane.
 
 - **`fux doctor` gained an `output.toml present` row.** A **warning**, naming
   `fux output > .fux/output.toml`, for a repo that predates the file. This is
-  ADR-DOTFUX decision 6's sanctioned mechanism for reaching existing repos,
+  SR-DOTFUX decision 6's sanctioned mechanism for reaching existing repos,
   modelled on `types list usable`.
 
 - **The two confidence band floors are `.fux/tune.toml` keys**
-  (ADR-CONFIDENCE decision 13, ADR-TUNE decision 5d). A sixth table:
+  (SR-CONFIDENCE decision 13, SR-TUNE decision 5d). A sixth table:
 
   ```toml
   [confidence]
@@ -1048,7 +1124,7 @@ committed files and one gitignored plane.
   doc_coverage_floor = 0.0   # 0.0 = the clause is OFF
   ```
 
-  **This reverses ADR-CONFIDENCE decision 7**, which had refused both as tune
+  **This reverses SR-CONFIDENCE decision 7**, which had refused both as tune
   keys. Neither can move a score or an ordering — confidence is computed *from*
   `rank()`'s output and nothing feeds back — so `[confidence]` is the first
   table in `tune.toml` that changes no ranking at all.
@@ -1075,9 +1151,9 @@ committed files and one gitignored plane.
 ### Fixed
 
 - 🔴 **`fux ask`, `fux find` and `fux doctor` hard-failed in every repo without
-  `.fux/output.toml`** (ADR-OUTPUT decision 20 rules the fork decision 19
+  `.fux/output.toml`** (SR-OUTPUT decision 20 rules the fork decision 19
   opened). Decision 19 made a *missing* file a hard `FuxError` at load time.
-  The file is **write-if-missing** (ADR-DOTFUX decision 6), so it reaches new
+  The file is **write-if-missing** (SR-DOTFUX decision 6), so it reaches new
   repos only — which made every pre-existing repo exit 1 on every query after
   upgrading, **`doctor` included**, the verb you would run to find out why.
 
@@ -1098,12 +1174,12 @@ committed files and one gitignored plane.
   that now shows up.
 
 - **`test_the_receipt_shape_does_not_vary_by_config` had not run since
-  ADR-OUTPUT decision 19.** It imported `SCHEMA` from `output_config`, which
+  SR-OUTPUT decision 19.** It imported `SCHEMA` from `output_config`, which
   decision 19 split into `CLI_VERBS` and `MCP_KEYS` — so the assertion was an
   `ImportError`, not a check. It now walks **both** key sets, including
-  `[mcp]`, which is the surface ADR-PROVENANCE decision 15 was written about.
+  `[mcp]`, which is the surface SR-PROVENANCE decision 15 was written about.
 
-- **ADR-TUNE decision 4 described behaviour the code had not had since
+- **SR-TUNE decision 4 described behaviour the code had not had since
   2026-08-27** — it said tune keys ship *commented* and carried a commented
   specimen; they have shipped as live lines since Arpit's ruling that day.
   Rewritten, with the setup-freeze cost it correctly predicted now recorded as
@@ -1111,13 +1187,13 @@ committed files and one gitignored plane.
 - **`output.schema.json` said `doc_coverage` below `1.0` makes the band
   `partial`.** The gate was measured on 2026-08-28 and left **off**; the field
   reports and does not gate.
-- **Handbook staleness:** *Fact vs guess* claimed ADR-CONFIDENCE was *proposed*
+- **Handbook staleness:** *Fact vs guess* claimed SR-CONFIDENCE was *proposed*
   (accepted since 2026-08-27) and that the floor was deliberately not a tune
   key; *The five fields* counted five when `doc_coverage` made it six; the
   `--json` sample omitted three keys.
 
 - **`fux ingest` writes the skip list into `.fux/.fuxignore`, and counts it in
-  two numbers** (ADR-FUXIGNORE decision 11, ADR-INGEST decisions 4 and 15).
+  two numbers** (SR-FUXIGNORE decision 11, SR-INGEST decisions 4 and 15).
   `599 skipped` on this repo was 598 files a committed list rejected exactly as
   designed and **one** worth looking at, and the list itself sat in
   `.fux/runtime/skipped` — derived, gitignored, invisible to review.
@@ -1169,7 +1245,7 @@ committed files and one gitignored plane.
   nowhere to be recorded and prints on every networked run; repeat URL failure
   is `.fux/runtime/url-state.json`'s job.
 
-- **`.fux/.fuxignore` — one file for what is not indexed** (ADR-FUXIGNORE).
+- **`.fux/.fuxignore` — one file for what is not indexed** (SR-FUXIGNORE).
   *"Why is my file not in the index?"* had four answers across three files plus
   the walker's source. Exclusion now has one home, in `.gitignore`'s grammar:
   last match wins, `!` re-includes, a trailing `/` means a directory, any `/`
@@ -1189,7 +1265,7 @@ committed files and one gitignored plane.
   same pattern is written in both places, naming the `sources/` line to delete.
 
   ⚠ **A `!` line can now index a format with no decoder, as raw bytes.**
-  `!*.py` really does index Python. That is the shape ADR-TYPES was opened
+  `!*.py` really does index Python. That is the shape SR-TYPES was opened
   about; it costs one explicit line a human wrote, in one committed file.
 
   ⚠ **One deliberate divergence from git:** a `#` after whitespace begins a
@@ -1202,9 +1278,9 @@ committed files and one gitignored plane.
 
 ### Changed
 
-- **ADR-TYPES decision 7 is narrower.** The three walk conditions were *"a
+- **SR-TYPES decision 7 is narrower.** The three walk conditions were *"a
   conjunction, deliberately not a priority order"*. They are now a conjunction
-  with exactly one thing above them. ADR-DIR-LIST decision 3a is unchanged and
+  with exactly one thing above them. SR-DIR-LIST decision 3a is unchanged and
   its argument is restated: `fux add` still may not outrank the allowlist,
   because a verb leaves nothing behind for a reader to find and a committed
   `.fuxignore` line does.
@@ -1212,7 +1288,7 @@ committed files and one gitignored plane.
   deprecated spelling for an exclusion.** They still parse and still work —
   `fux remove` still writes one — and `.fuxignore` is the home.
 - **A `.fux/output.toml` that EXISTS is now the sole source of every output
-  default it is asked for** (ADR-OUTPUT decision 19). Earlier, a key the file
+  default it is asked for** (SR-OUTPUT decision 19). Earlier, a key the file
   did not set fell through silently to the engine's built-in value; now
   resolving an unset key on a present file is a `FuxError` naming the key and
   where to add it. `fux setup` / `fux output` already write every key
@@ -1225,8 +1301,8 @@ committed files and one gitignored plane.
   left `doctor` unable to be bisected from the very file it might exist to
   diagnose.
 - 🔴 **Fixed same-day: a MISSING `.fux/output.toml` no longer hard-errors**
-  (ADR-OUTPUT decision 20). Decision 19, above, briefly made a missing file
-  raise too — and since the file is write-if-missing (ADR-DOTFUX decision 6,
+  (SR-OUTPUT decision 20). Decision 19, above, briefly made a missing file
+  raise too — and since the file is write-if-missing (SR-DOTFUX decision 6,
   reaching new repos only), that meant `fux ask` / `fux find` / `fux doctor`
   all exited 1, after upgrading, in every repo that predates this release.
   **Fixed before it reached anyone**: a missing file now resolves to the same
@@ -1234,16 +1310,16 @@ committed files and one gitignored plane.
   key is unchanged and still a hard error. `fux doctor` gains an
   `output.toml present` row — a warning naming `fux output > .fux/output.toml`
   — since a loader refusal was already ruled out as the fix for a missing
-  file (ADR-DOTFUX decision 6 forbids reaching an existing repo by rewrite).
+  file (SR-DOTFUX decision 6 forbids reaching an existing repo by rewrite).
 - **`.fux/output.toml`'s three roots (`[cli]`/`[cli.json]`/`[mcp]`) are now
-  fully built**, closing a one-day gap where ADR-OUTPUT's record described
+  fully built**, closing a one-day gap where SR-OUTPUT's record described
   them and the code still ran the original one-root layout. `[mcp] top`
   (`fux mcp`'s only knob) is loaded once at server start-up instead of once
   per search, and the `fux_search` tool schema now advertises the *resolved*
   `top`, not a hardcoded literal — a repo-configured `[mcp] top` used to
   change the server's behaviour while `tools/list` kept announcing the
   built-in number.
-- **`ask` gains `sections` / `--no-sections`** (ADR-OUTPUT decision 21). The
+- **`ask` gains `sections` / `--no-sections`** (SR-OUTPUT decision 21). The
   matched-heading `§` lines W-84 added under each `ask` hit shipped
   unconditional, with no way to turn them off; `sections = false` in
   `[cli.ask]` (or the flag) removes them from stdout **and** omits `headings`
@@ -1271,7 +1347,7 @@ committed files and one gitignored plane.
   re-fetched since first ingest, and how many are failing — naming any that have
   failed five runs in a row.
 
-  **Report, never auto-delete.** ADR-URL-INGEST decision 4 forbids treating a
+  **Report, never auto-delete.** SR-URL-INGEST decision 4 forbids treating a
   failed fetch as a deletion, and the cost of that rule is that a permanently
   dead URL lives in the index forever. This makes the cost legible instead of
   invisible. ⚠ **The counters are runs, not clocks** — wall clock lives in the
@@ -1368,13 +1444,13 @@ committed files and one gitignored plane.
   Phase 7 gave `--hybrid` a lane through `query/dense.py`. Its only caller,
   `tools/differential/playground_grade.py`, now grades `--hybrid` through
   `fux.query.run_query`, the same path the CLI takes.
-  [ADR-TUNE](docs/adr/0038_tuning.md), [ADR-CLI](docs/adr/0002_cli-surface.md),
-  [ADR-ASK](docs/adr/0004_ask.md) — filed as
+  [SR-TUNE](records/0135_tuning.md), [SR-CLI](records/0101_cli-surface.md),
+  [SR-ASK](records/0103_ask.md) — filed as
   [W-79](archive/open/W-79-remove-the-dead-fusion-code.md).
 
 ## [2.0.0-alpha.1] - 2026-08-24
 
-**ADR-TUNE is built.** The knobs that decide what you read first have a home.
+**SR-TUNE is built.** The knobs that decide what you read first have a home.
 
 ### Added
 
@@ -1383,7 +1459,7 @@ committed files and one gitignored plane.
   commented out means every default, so `$0` stays `$0`. Seven tables:
   `[bm25f]` (`k1`, `b`, five field weights), `[ranking]`, `[dense]`,
   `[fuse]`, `[graph]`, `[refer]`, and `[priority]`.
-  [ADR-TUNE](docs/adr/0038_tuning.md).
+  [SR-TUNE](records/0135_tuning.md).
 - **Per-source priority, in either direction.** A multiplicative weight keyed
   by a source entry exactly as it appears in `.fux/sources/`. Anything
   unlisted is `1.0`; when two entries match, the **longer** one wins. Fux
@@ -1425,7 +1501,7 @@ committed files and one gitignored plane.
 - **The four new records still ship `status: proposed`.** Built is not
   ratified, and the register carries two columns for exactly that reason.
 - Two `[fuse]` keys are validated but no CLI path reads them today, and
-  `explain --no-tune` is inert. Both are stated in ADR-TUNE rather than left
+  `explain --no-tune` is inert. Both are stated in SR-TUNE rather than left
   to be discovered.
 
 
@@ -1433,7 +1509,7 @@ committed files and one gitignored plane.
 
 **A pre-release.** The record shape and analyzer changed, so this ships
 ahead of a stable `2.0.0` to give the migration a soak before it is called
-final — every new ADR here (`ADR-TUNE`, `ADR-MCP`, `ADR-ENRICH`, `ADR-RERANK`)
+final — every new SR here (`SR-TUNE`, `SR-MCP`, `SR-ENRICH`, `SR-RERANK`)
 is still `status: proposed`.
 
 ### Changed
@@ -1446,8 +1522,8 @@ is still `status: proposed`.
   for 0.4% of the index). `fux ingest --full` is required to move an
   existing `.fux/index/` off `v1`; this repo's own corpus is migrated in
   this release (434 records, delta run byte-identical to the full run).
-  [ADR-INDEX-LIFECYCLE](docs/adr/0009_index-lifecycle.md),
-  [ADR-RECORD](docs/adr/0010_index-record.md).
+  [SR-INDEX-LIFECYCLE](records/0108_index-lifecycle.md),
+  [SR-RECORD](records/0109_index-record.md).
 - **The analyzer moves to `v2`** — Porter stemming (75/75 published vectors)
   and identifier splitting, `query/analyzer.py` + `query/stem.py`.
 
@@ -1470,14 +1546,14 @@ is still `status: proposed`.
   silently destroys every `url:` record, the one thing in the index that cannot
   be rebuilt offline. `--full` now discards an unreadable index when nothing
   would be lost, and refuses **by name** when `url:` records would be. Present
-  in `1.0.0`. [ADR-INDEX-LIFECYCLE](docs/adr/0009_index-lifecycle.md)
+  in `1.0.0`. [SR-INDEX-LIFECYCLE](records/0108_index-lifecycle.md)
   decision 10.
 - **`fux enrich --plan` printed a sha that could not be used.** It showed the
   first 12 characters while validation compared the whole value, so enrichment
   written by correctly following the documented procedure came back `STALE` —
   under a message rendering two identical-looking shas. Both the command and
   the skill's own worked example are corrected.
-  [ADR-ENRICH](docs/adr/0040_enrich.md) decision 11.
+  [SR-ENRICH](records/0137_enrich.md) decision 11.
 
 ### Added
 
@@ -1485,19 +1561,19 @@ is still `status: proposed`.
   BM25F field weights, fuse/graph/refer constants and per-source query-time
   priority (longest-directory-match, multiplicative, both directions
   allowed — fux states the cost rather than picking a side).
-  [ADR-TUNE](docs/adr/0038_tuning.md).
+  [SR-TUNE](records/0135_tuning.md).
 - **`fux enrich`** — a separate, opt-in command that writes model-assisted
   enrichment into `.fux/enrich/` for a named scope; never runs inside
   `fux ingest`, so the maintenance path stays model-free (L3).
-  [ADR-ENRICH](docs/adr/0040_enrich.md).
+  [SR-ENRICH](records/0137_enrich.md).
 - **`fux mcp`** — serves the index to coding agents over stdio JSON-RPC,
   stdlib-only, as three tools rather than the full CLI surface (no
-  `answer` — the agent is the answerer). [ADR-MCP](docs/adr/0039_mcp.md).
+  `answer` — the agent is the answerer). [SR-MCP](records/0136_mcp.md).
 - **Proximity reranking**, in stdlib arithmetic — a specified cross-encoder
   pass was refused because `onnxruntime` is not byte-identical across
   x86-64/arm64. Measured on 50 new playground goldens: 28 -> 32 (4 fixed,
   0 broken), +8ms p95 against a 150ms bar at 10 000 documents, 240
-  differential comparisons green. [ADR-RERANK](docs/adr/0041_rerank.md).
+  differential comparisons green. [SR-RERANK](records/0138_rerank.md).
 - **Per-chunk committed `int8` vectors**, with a derived Hamming-prefix
   prefilter over them replacing the old whole-document sign codes.
 - **Priors** — `supersedes:` frontmatter edges and git commit recency,
@@ -1530,7 +1606,7 @@ marks the milestone `v0.37.1` already reached, not new code.
 
 ### Added
 
-- Every ADR gains a `References` bibliography, generated from the citations
+- Every SR gains a `References` bibliography, generated from the citations
   already in its own body — 465 links, nothing invented.
 - Two research proposals on ranking/pruning tuning, filed but not built:
   a committed `.fux/tune.toml` and per-source query-time priority.
@@ -1551,9 +1627,9 @@ marks the milestone `v0.37.1` already reached, not new code.
 - **Docs only, no code change.** `README.md`'s status block was two releases
   stale (still read `0.36.0` and described the graph lane's two acceptance
   gaps as open after both closed); rewritten against ground truth and given
-  an archived-content-signalling paragraph. `docs/adr/TEMPLATE.md` gains an
+  an archived-content-signalling paragraph. `records/TEMPLATE.md` gains an
   optional worked-output block per §2 section, retrofitted to
-  ADR-ARCHIVED-CONTENT, ADR-REFER and ADR-GRAPH where real output existed.
+  SR-ARCHIVED-CONTENT, SR-REFER and SR-GRAPH where real output existed.
   The committed `.fux/index/` shards were re-derived from the corpus these
   doc edits touched.
 
@@ -1568,7 +1644,7 @@ marks the milestone `v0.37.1` already reached, not new code.
   archived document is returned. **The ranking does not move**: the demotion
   weight stays at its `1.0` default and a test asserts scores and order are
   byte-identical with the marker present.
-  [ADR-ARCHIVED-CONTENT](docs/adr/0037_archived-content.md) decisions 1, 3 and 7.
+  [SR-ARCHIVED-CONTENT](records/0134_archived-content.md) decisions 1, 3 and 7.
 
   Measured before shipping, on a frozen 45-query instrument:
   **[W44-SIGNAL](work/regression/2026-08-22-archived-signal/VERDICT.md) —
@@ -1593,7 +1669,7 @@ marks the milestone `v0.37.1` already reached, not new code.
   [the budget sweep](work/regression/2026-08-22-budget-sweep/report.md), fixed
   as W-72; the cap still binds the moment a second document competes, with a
   test for each direction.
-  [ADR-REFER](docs/adr/0030_refer-plane.md) veto condition 2.
+  [SR-REFER](records/0127_refer-plane.md) veto condition 2.
 
 ## [0.36.0] - 2026-08-22
 
@@ -1606,9 +1682,9 @@ setup` writes outside `.fux/` for the first time, into directories GitHub, AWS
 and Anthropic own. It announces every one of them and both ways to turn them
 off.
 
-[ADR-MAINTENANCE](docs/adr/0032_hooks.md) 1a–1d ·
-[ADR-AGENT-POLICY](docs/adr/0035_agent-policy.md) ·
-[ADR-DIR-LIST](docs/adr/0022_dir-list.md) 11. Measured evidence:
+[SR-MAINTENANCE](records/0129_hooks.md) 1a–1d ·
+[SR-AGENT-POLICY](records/0132_agent-policy.md) ·
+[SR-DIR-LIST](records/0120_dir-list.md) 11. Measured evidence:
 [R6 re-run](work/regression/2026-08-22-r6-rerun/VERDICT.md) (PASS) ·
 [R9](work/regression/2026-08-22-r9-t2-at-10k/VERDICT.md) (PASS).
 
@@ -1640,12 +1716,12 @@ off.
   way.
 
   Write-if-missing like everything else `setup` writes: edit any of them and
-  fux will never rewrite it. [ADR-AGENT-POLICY](docs/adr/0035_agent-policy.md).
+  fux will never rewrite it. [SR-AGENT-POLICY](records/0132_agent-policy.md).
 
 - **`post-commit` no longer waits for a re-index.** It records what changed and
   spawns a **detached one-shot** background run, so committing costs what git
   costs regardless of corpus size. The re-index still happens; nobody watches
-  it. [ADR-MAINTENANCE](docs/adr/0032_hooks.md) 1a–1d (W-66).
+  it. [SR-MAINTENANCE](records/0129_hooks.md) 1a–1d (W-66).
   - **`fux ingest` takes over** from a background run, and **`fux ingest
     --stop`** halts one without running — exiting **0** when nothing was
     running, so scripts can call it defensively.
@@ -1661,7 +1737,7 @@ off.
 - **`[ranking] archived_weight`** (`fux.toml`, default `1.0`) — a score
   multiplier for documents under a directory declared `archived=true`.
   Byte-identical at the default; demotes an archived document only once a
-  weight is configured. [ADR-DIR-LIST](docs/adr/0022_dir-list.md) decision 11
+  weight is configured. [SR-DIR-LIST](records/0120_dir-list.md) decision 11
   (W-44). The marker and the response-level disclaimer (decisions 5/7/12)
   stay gated on a pre-registered query set.
 - **`fux ask` says when the index is behind.** Since the hook defers, the
@@ -1669,7 +1745,7 @@ off.
   documents are pending — on **stderr**, so `--json` and every pipe produce
   exactly the bytes they did before. It is a declaration, never a gate: `ask`
   does not refuse to answer and does not re-index on your latency.
-  [ADR-MAINTENANCE](docs/adr/0032_hooks.md) decision 1b (W-66).
+  [SR-MAINTENANCE](records/0129_hooks.md) decision 1b (W-66).
 - **A dirty list** (`.fux/runtime/dirty`, gitignored) records which documents
   each commit touched. **It is advisory only** — `fux ingest` produces the same
   index whether the list is right, stale, empty or missing, which is asserted
@@ -1680,9 +1756,9 @@ off.
 
 The corpus becomes a first-class verb, and two defects that made removing a
 document harder than adding one are fixed.
-[ADR-CLI](docs/adr/0002_cli-surface.md) 1a–1e ·
-[ADR-INGEST](docs/adr/0007_ingest.md) 9–10 ·
-[ADR-DIR-LIST](docs/adr/0022_dir-list.md) 2d–2e, 3a. Surface captured
+[SR-CLI](records/0101_cli-surface.md) 1a–1e ·
+[SR-INGEST](records/0106_ingest.md) 9–10 ·
+[SR-DIR-LIST](records/0120_dir-list.md) 2d–2e, 3a. Surface captured
 verbatim in [`work/regression/2026-08-21-source-verbs/`](work/regression/2026-08-21-source-verbs/report.md).
 
 ### Added
@@ -1776,9 +1852,9 @@ verbatim in [`work/regression/2026-08-21-source-verbs/`](work/regression/2026-08
   path. `--scan` is unchanged in behaviour and now redundant with the
   default — kept because it is what a bug report reproduces against
   explicitly. `--fast` and `--scan` are mutually exclusive. The differential
-  law (ADR-ASK) makes this a pure speed choice: results are byte-identical
-  either way. See [ADR-CLI](docs/adr/0002_cli-surface.md) and
-  [ADR-ASK](docs/adr/0004_ask.md).
+  law (SR-ASK) makes this a pure speed choice: results are byte-identical
+  either way. See [SR-CLI](records/0101_cli-surface.md) and
+  [SR-ASK](records/0103_ask.md).
 
 ## [0.34.0] - 2026-08-21
 
@@ -1791,18 +1867,18 @@ M3 makes the edges ingest already extracts answerable: `explain`, `graph`,
 plane — fetch a citation from the system that owns it, verify it still says
 what the index thinks, re-score on the fetched bytes — and P6 wires it into
 `answer` by default, making it load-bearing for the first time
-([ADR-REFER](docs/adr/0030_refer-plane.md) accepted,
+([SR-REFER](records/0127_refer-plane.md) accepted,
 [R4 PASS](work/regression/2026-08-20-refer-plane-r4/VERDICT.md)). M5 adds
 `fux hooks` and a merge driver for the committed index, but
 [R5 FAIL](work/regression/2026-08-20-r5-hook-latency/VERDICT.md) (44.4 s at
 100 000 documents against a 1 s bound) and
 [R6 INCONCLUSIVE](work/regression/2026-08-20-r6-merge-driver/VERDICT.md) mean
-[ADR-MAINTENANCE](docs/adr/0032_hooks.md) stays **proposed, not accepted** —
+[SR-MAINTENANCE](records/0129_hooks.md) stays **proposed, not accepted** —
 the hook ships, its accept gate has not cleared. Delta ingest reuses
 extraction for byte-unchanged documents (22.7×–26.4× measured, byte-identical
 to a full run). Only prose files are indexed by default now — a 14 % non-prose
 slice this repo carried silently is excluded
-([ADR-TYPES](docs/adr/0031_types-list.md)) — and L5's hashed-meta rule moved
+([SR-TYPES](records/0128_types-list.md)) — and L5's hashed-meta rule moved
 from ingest to `write_index`, so it can no longer be skipped by a caller that
 bypasses ingest.
 
@@ -1851,7 +1927,7 @@ way).
   harness (a real loopback HTTP server behind the *shipped* consumer fetcher)
   and the cost attribution that turns "it is slow" into "here is where."
 
-- **Delta ingest — unchanged documents keep their extraction** (ADR-INGEST
+- **Delta ingest — unchanged documents keep their extraction** (SR-INGEST
   decision 1b). A filed [cost profile](work/regression/2026-08-20-ingest-cost-profile/report.md)
   put **92 % of a full ingest inside the dense embedding**, so a document whose
   content `sha` is unchanged now keeps its `title`, `phrases`, `terms`, `wlen`
@@ -1862,12 +1938,12 @@ way).
 - **`fux ingest --full`** — re-extract every document regardless. It is the
   complete term-hash collision check, and the way to retro-fit `code` after an
   embedding bundle becomes available; both are consequences of the reuse and
-  are recorded in ADR-INGEST rather than left to be discovered.
+  are recorded in SR-INGEST rather than left to be discovered.
 - The ingest summary now reports what was carried forward:
   `ingested 3 docs (1 changed, 2 carried forward), 2 skipped, 1 shards written`.
 
 - **A TTL-bounded local fetch cache for the refer plane** (W-60,
-  [ADR-REFER](docs/adr/0030_refer-plane.md) 5a-5c). `cache_ttl_seconds`
+  [SR-REFER](records/0127_refer-plane.md) 5a-5c). `cache_ttl_seconds`
   (**default 0 — off**) and `no_cache` on the freshness policy; entries live in
   the gitignored `.fux/runtime/fetch-cache/`. Motivated by rate limits rather
   than latency: an agent asking ten questions about one runbook must not fetch
@@ -1878,7 +1954,7 @@ way).
   the index.
 
 - **`fux hooks` — the maintenance plane** (M5,
-  [ADR-MAINTENANCE](docs/adr/0032_hooks.md), **proposed, not accepted**).
+  [SR-MAINTENANCE](records/0129_hooks.md), **proposed, not accepted**).
   Installs `post-commit` / `post-merge` / `post-checkout` and registers a merge
   driver for `.fux/index/*.jsonl`. Every hook is best-effort and **cannot block
   a commit**; installation **refuses rather than overwrites** a hook fux did
@@ -1923,8 +1999,8 @@ way).
 ### Changed — **breaking**
 
 - **`answer` fetches, verifies and re-scores by default now** (PRIORITY.md
-  P6, 2026-08-21, ADR-REFER **accepted** — R4 passed, and the plane is now
-  load-bearing in a shipped verb; ADR-ANSWER **accepted**). A citation whose
+  P6, 2026-08-21, SR-REFER **accepted** — R4 passed, and the plane is now
+  load-bearing in a shipped verb; SR-ANSWER **accepted**). A citation whose
   source can be reached returns a verbatim passage re-scored on the fetched
   bytes, cited with a fresh `sha` and a freshness verdict — `"source":
   "refer"` in `--json`. `--no-refer` keeps the exact M2 shape
@@ -1942,7 +2018,7 @@ way).
   **Breaking only for a caller writing records directly**; every record this
   repo already holds complied, so nothing changed on disk.
 
-- **Only prose files are indexed now** ([ADR-TYPES](docs/adr/0031_types-list.md),
+- **Only prose files are indexed now** ([SR-TYPES](records/0128_types-list.md),
   W-55 verdict G). The git-dir walker had **no file-type filter at all**:
   anything UTF-8-decodable was a document, which on this repo meant 21 of 150
   records (14 %, and 15 % of the tokens) were `.json`, `.svg`, `.sh`, `.py` or
@@ -1954,7 +2030,7 @@ way).
   `df` moves for every surviving document, so **this changes rankings** — it is
   not claimed to improve them, and nothing has measured it.
 - **`.fux/sources/dirs` accepts `!` exclusions**
-  ([ADR-DIR-LIST](docs/adr/0022_dir-list.md), W-45 verdict E).
+  ([SR-DIR-LIST](records/0120_dir-list.md), W-45 verdict E).
   `!work/regression/*/evidence` removes matching paths, and everything beneath
   them, from every included root. Order-independent, no un-exclude, no
   attributes. `*` does not cross a `/`; `**` is the any-depth form.
@@ -1970,7 +2046,7 @@ way).
 ### Added
 
 - **The refer plane's core — `fux.refer`** (M4,
-  [ADR-REFER](docs/adr/0030_refer-plane.md), **proposed, not accepted**).
+  [SR-REFER](records/0127_refer-plane.md), **proposed, not accepted**).
   Fetches a cited document from the system that owns it, verifies it still says
   what the index thinks, cuts it into heading-delimited passages, re-scores
   those against the query, and assembles as much as fits a **byte** budget.
@@ -1978,7 +2054,7 @@ way).
   plane into the default surface is how it becomes load-bearing before anyone
   knows whether it works.
 - **Fux still does not fetch.** The plane reuses the consumer-owned fetcher
-  contract ([ADR-FETCHER](docs/adr/0019_fetcher.md)) rather than adding a
+  contract ([SR-FETCHER](records/0117_fetcher.md)) rather than adding a
   second fetch mechanism; the callable is injected, never imported, and an AST
   test asserts no network import anywhere in the plane.
 - **Freshness is verified by content, not by age.** `never` (the default,
@@ -1993,7 +2069,7 @@ way).
   returned — asserted by a differential test.
 
 - **The graph lane — `fux explain`, `fux graph`, `fux path`** (M3,
-  [ADR-GRAPH](docs/adr/0029_graph.md)). The `ref`/`tag`/`code` edges
+  [SR-GRAPH](records/0126_graph.md)). The `ref`/`tag`/`code` edges
   ingest has extracted since M1 become answerable. `explain` lists a
   document's outbound edges and its community; `graph` returns the
   neighbourhood around a query's best answers, PPR-expanded; `path` returns
@@ -2026,7 +2102,7 @@ way).
   falling back. It now returns the lexical answer at exit 0. Fixed with an
   explicit `None` check rather than a wider `except`, so a real bug inside
   `embed()` still propagates; both halves are asserted
-  ([ADR-CLI](docs/adr/0002_cli-surface.md)).
+  ([SR-CLI](records/0101_cli-surface.md)).
 
 ### Changed
 
@@ -2034,9 +2110,9 @@ way).
   or `"hybrid"`. `--explain` was text-only, so the one fact worth logging about
   a slow query was the one a caller could not read. The key appears only when
   `--explain` is passed, so the default payload is unchanged
-  ([ADR-ASK](docs/adr/0004_ask.md)).
+  ([SR-ASK](records/0103_ask.md)).
 - **`answer --json` now carries `"source"` on the no-match branch too.**
-  [ADR-ANSWER](docs/adr/0006_answer.md) tells callers to key on `"source"` to
+  [SR-ANSWER](records/0105_answer.md) tells callers to key on `"source"` to
   detect the M4 upgrade, so its absence on one branch was a trap. The payload
   is now `{"answer": null, "citation": null, "source": "index"}`.
 
@@ -2066,18 +2142,18 @@ measures nothing about speed, so this release reports no new timing.
 
 - **`fux setup`** — writes the files you own into your repo, **write-if-missing**:
   `fux.toml`, `.fux/sources/dirs`, `.fux/sources/urls`, and both fetchers
-  ([ADR-DOTFUX](docs/adr/0003_fux-directory.md) decision 6). Optional, explicit,
+  ([SR-DOTFUX](records/0102_fux-directory.md) decision 6). Optional, explicit,
   once per repo, and a second run is a no-op that never clobbers an edit. It is
   the only verb that may run before a repo root exists — it is what creates one.
 - **Two fetchers ship in the wheel**, `http.py` and `cdp.py`
-  ([ADR-HTTP-FETCHER](docs/adr/0021_http-fetcher.md),
-  [ADR-CDP-FETCHER](docs/adr/0020_cdp-fetcher.md)). They travel as **package
+  ([SR-HTTP-FETCHER](records/0119_http-fetcher.md),
+  [SR-CDP-FETCHER](records/0118_cdp-fetcher.md)). They travel as **package
   data with an extension Python cannot import**, so fux copies them and never
   imports them — the adapter cap is structural, not remembered. `http.py` is a
   plain stdlib GET and is what a URL with no `fetch=` attribute gets; it never
   escalates to the browser on its own.
 - **`fux url`** — records a URL in the committed list, writing **every**
-  attribute explicitly ([ADR-URL-LIST](docs/adr/0018_url-list.md) decisions 12
+  attribute explicitly ([SR-URL-LIST](records/0116_url-list.md) decisions 12
   and 13). Flags, not a subcommand tree: `--cdp`/`--http`, `--plain`/`--hashed`,
   `--remove`; no argument lists what the loader sees. **It never fetches** —
   `fux ingest --refresh-urls` remains the only networked path in the engine.
@@ -2087,7 +2163,7 @@ measures nothing about speed, so this release reports no new timing.
   `[sources.url]` setting, which beats the built-in default. `meta` only ever
   *loosens* per line: there is deliberately no way to make one URL stricter.
 - **`.fux/sources/dirs`** — the committed directory list, on the same grammar
-  ([ADR-DIR-LIST](docs/adr/0022_dir-list.md)). A line may declare
+  ([SR-DIR-LIST](records/0120_dir-list.md)). A line may declare
   `archived=true`; it is parsed and validated today and **not yet read** — the
   marker in results is gated on a pre-registered query set.
 
@@ -2119,7 +2195,7 @@ corpus or fetching through the wrong file.
 
 - **BREAKING — `[sources.url] middleware` is retired, renamed `fetcher`**, and
   `.fux/middleware/` is `.fux/fetchers/`
-  ([ADR-FETCHER](docs/adr/0019_fetcher.md)). Middleware names a pattern whose
+  ([SR-FETCHER](records/0117_fetcher.md)). Middleware names a pattern whose
   defining property is composition, and nothing here composes: one file, one
   `fetch(url)`, exactly one running per URL.
 
@@ -2139,10 +2215,10 @@ corpus or fetching through the wrong file.
   directory a `fetch=<name>` resolves in.
 - **`fux.toml` has no required keys.** It holds policy; the source lists hold
   the corpus.
-- **ADR-DOTFUX, ADR-URL-INGEST and ADR-CONFIG are ratified** (Arpit,
+- **SR-DOTFUX, SR-URL-INGEST and SR-CONFIG are ratified** (Arpit,
   2026-08-19), closing W-31. Their `⏳ proposed` qualifiers in the `0.32.0`
   entry below are stale as of that date; the register
-  ([`docs/adr/README.md`](docs/adr/README.md)) is the live statement of every
+  ([`records/README.md`](records/README.md)) is the live statement of every
   record's status, and released entries are left as written.
 
 ### Fixed
@@ -2155,7 +2231,7 @@ corpus or fetching through the wrong file.
   becomes 4 248.8 ms at RFC scale. **Fixed in the field's shape, not the check** —
   `title_h` is now `"h:" + <hash>` and the two paths agree by construction.
   **Migration: re-run `fux ingest --refresh-urls`.** No `_format` or `analyzer`
-  bump ([ADR-INDEX-LIFECYCLE](docs/adr/0009_index-lifecycle.md) decision 9), and
+  bump ([SR-INDEX-LIFECYCLE](records/0108_index-lifecycle.md) decision 9), and
   the build's refusal names the migration.
 - **A URL fragment was silently truncated.** `#` began a comment anywhere on a
   line, so `https://x/page#section` loaded as `https://x/page`, two URLs
@@ -2187,7 +2263,7 @@ Versions 0.31.x were never published; their work ships here.
 
 ### Added
 
-- **The derived T1 accelerator — M2** ([ADR-T1-ACCELERATOR](archive/adr/0005_derived-accelerator.md),
+- **The derived T1 accelerator — M2** ([SR-T1-ACCELERATOR](archive/adr/0005_derived-accelerator.md),
   ⏳ proposed). Term-major blocked postings and a fixed-width binary offset
   table under `.fux/runtime/` (derived, gitignored, `CACHEDIR.TAG`-tagged),
   rebuilt from the committed shards alone. **Prediction R3 PASS:** warm `ask`
@@ -2264,7 +2340,7 @@ Versions 0.31.x were never published; their work ships here.
   no `--update-goldens` flag. Standing status: 41 pass, 9 named engine gaps.
   README reading-order item 5 now points there.
 - **The `.fux/` directory is a declared layout**
-  ([ADR-DOTFUX](archive/adr/0011_fux-dir-layout.md), ⏳ proposed): every child is
+  ([SR-DOTFUX](archive/adr/0011_fux-dir-layout.md), ⏳ proposed): every child is
   committed (`index/`, `sources/`, `fetchers/`) or derived (`runtime/`,
   `cache/`). Ingest writes a self-describing `.fux/README.md` and a narrow
   `.fux/.gitignore` — derived names only, **never `*`** — both
@@ -2273,7 +2349,7 @@ Versions 0.31.x were never published; their work ships here.
   the committed index must not be git-ignored (error), and undeclared
   top-level `.fux/` entries are reported (warning).
 - **URL source via consumer-owned fetcher**
-  ([ADR-URL-INGEST](archive/adr/0010_url-source-consumer-middleware.md), ⏳ proposed):
+  ([SR-URL-INGEST](archive/adr/0010_url-source-consumer-middleware.md), ⏳ proposed):
   `fux.toml [sources.url]` names a consumer-editable Python file
   (`fetcher`, `urls_file`, `meta`); `fux ingest --refresh-urls` — the only
   networked ingest path — calls its `fetch(url) -> str` and indexes the
@@ -2296,7 +2372,7 @@ Versions 0.31.x were never published; their work ships here.
   line-numbered errors on a bad scheme. An inline `urls = [...]` key is now a
   hard error pointing at the file. The fetcher moved from the repo root to
   `.fux/fetchers/cdp.py`. Both are breaking changes against an unreleased,
-  hours-old surface, so no shims exist ([ADR-DOTFUX](archive/adr/0011_fux-dir-layout.md)).
+  hours-old surface, so no shims exist ([SR-DOTFUX](archive/adr/0011_fux-dir-layout.md)).
 - Fetcher tunables now live in an optional **`[sources.url.config]`** table
   passed verbatim to `configure(config)`. Fux validates only that it is a
   table and never reads a key inside it — the PEP 518 `[tool.*]` discipline,
@@ -2307,7 +2383,7 @@ Versions 0.31.x were never published; their work ships here.
 ## [0.30.0] - 2026-08-11
 
 M0 scaffold + M1 T0 slice — the first real code of the v0.30 rebuild.
-[ADR-RECORD](archive/adr/0004_index-format.md); R1 PASS, R2 2/3 PASS.
+[SR-RECORD](archive/adr/0004_index-format.md); R1 PASS, R2 2/3 PASS.
 
 ### Added
 

@@ -44,7 +44,7 @@ fail with `Operation not permitted`. The consequences are not obvious:
   `git --no-optional-locks diff --name-only HEAD` both run clean on the bridge
   and leave no lock behind, because git skips the index refresh that needs one.
   **Prefer it for every read-only git call on this surface**, and in any tooling
-  that has to run here — `tests/test_adr_freshness.py` uses it for exactly this
+  that has to run here — `tests/test_sr_freshness.py` uses it for exactly this
   reason. Plain `git status` still strands one.
 - A stranded `.git/index.lock` cannot be removed, and `mv`-ing it *out* of the
   mount fails too (that is a copy plus an unlink). **Rename it in place** —

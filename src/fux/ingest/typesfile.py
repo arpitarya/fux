@@ -1,6 +1,6 @@
 """`.fux/formats.toml` — which files are documents, and which decoder reads each.
 
-**Two keys, and the set is closed** (ADR-TYPES decision 12):
+**Two keys, and the set is closed** (SR-TYPES decision 12):
 
 ```toml
 include = [          # globs that are already text -- no decoder in the path
@@ -29,7 +29,7 @@ that must agree are one edit away from disagreeing. Ruff's `include` /
 
 - **The key set** — `tomllib` accepts any key, so fux refuses one it does not
   know. `!` subtraction is deliberately not a key: exclusions live in
-  `.fux/.fuxignore` (ADR-FUXIGNORE decision 5).
+  `.fux/.fuxignore` (SR-FUXIGNORE decision 5).
 - **Every glob** by the same rule the line grammar used
   (`sourcelist._type_reason`), and **every module name** by its shape
   (`sourcelist._decoder_reason`). Whether the module exists, and whether a
@@ -42,7 +42,7 @@ Any valid TOML with the right keys loads. The editors below change **one
 line** of the canonical layout — one glob per line inside `include = [ ... ]`,
 one `key = "value"` per line under `[decoders]` — and **refuse** a layout they
 did not write rather than reformat it, because a reformat would eat the
-comments a human left inside the array (ADR-URL-LIST decision 13, kept).
+comments a human left inside the array (SR-URL-LIST decision 13, kept).
 
 ## Positions in errors are best effort, and say so
 
@@ -50,13 +50,13 @@ comments a human left inside the array (ADR-URL-LIST decision 13, kept).
 position. So a semantic error always names the **key** (`decoders.geojson`),
 and adds `:lineno` only when a scan of the text finds exactly one line for it.
 The line grammar guaranteed `file:lineno`; this one does not, and that is a
-cost ADR-TYPES decision 12 records.
+cost SR-TYPES decision 12 records.
 
 ## The old file is refused, never read
 
 `.fux/sources/types` is a loud error wherever the types list is consulted.
 Ignoring it would put the built-in default in its place — *a plausible index
-with different postings*, the failure ADR-TYPES decision 11 names. `fux setup`
+with different postings*, the failure SR-TYPES decision 11 names. `fux setup`
 converts it (`convert_legacy`).
 """
 
@@ -71,7 +71,7 @@ from ..config import DEFAULT_TYPES_FILE, LEGACY_TYPES_FILE
 from ..errors import FuxError
 from . import sourcelist
 
-#: The closed key set. Adding one is a change to ADR-TYPES, not a config addition.
+#: The closed key set. Adding one is a change to SR-TYPES, not a config addition.
 KEYS: tuple[str, ...] = ("include", "decoders")
 
 #: An extension key: lowercase, no leading dot, dot-separated parts for a
@@ -134,12 +134,12 @@ def legacy_message(root: Path) -> str:
     if both:
         return (
             f"{LEGACY_TYPES_FILE} still exists beside {DEFAULT_TYPES_FILE}. The types list moved "
-            f"to {DEFAULT_TYPES_FILE} (ADR-TYPES decision 12) and only that file is the list - "
+            f"to {DEFAULT_TYPES_FILE} (SR-TYPES decision 12) and only that file is the list - "
             f"delete {LEGACY_TYPES_FILE}. fux refuses rather than guess which one you meant"
         )
     return (
         f"{LEGACY_TYPES_FILE} is the old types list; it moved to {DEFAULT_TYPES_FILE} "
-        f"(ADR-TYPES decision 12). Run `fux setup` to write {DEFAULT_TYPES_FILE} from it - its "
+        f"(SR-TYPES decision 12). Run `fux setup` to write {DEFAULT_TYPES_FILE} from it - its "
         f"`!` lines become .fux/.fuxignore lines - then delete {LEGACY_TYPES_FILE}. fux refuses "
         f"rather than ignore it: ignoring it would silently put the built-in default in its place"
     )
@@ -177,11 +177,11 @@ def parse(text: str, *, origin: str) -> TypesList:
         if any(k in ("exclude", "exclusions", "deny") for k in unknown):
             hint = (
                 " Exclusions are not part of this file: write them in .fux/.fuxignore, which is "
-                "read first and outranks it (ADR-FUXIGNORE decision 5)"
+                "read first and outranks it (SR-FUXIGNORE decision 5)"
             )
         raise FuxError(
             f"{origin}: unknown key {unknown[0]!r} - the key set is closed and is "
-            f"`include` and `decoders` (ADR-TYPES decision 12).{hint}"
+            f"`include` and `decoders` (SR-TYPES decision 12).{hint}"
         )
 
     include = data.get("include", [])
@@ -225,7 +225,7 @@ def _check_glob(glob: str, text: str, origin: str) -> None:
     if glob.startswith("!"):
         raise FuxError(
             f"{where}: `{glob}` - `!` does not subtract here. Exclusions live in "
-            f".fux/.fuxignore, which is read first and outranks this file (ADR-FUXIGNORE "
+            f".fux/.fuxignore, which is read first and outranks this file (SR-FUXIGNORE "
             f"decision 5); write `{glob[1:]}` there"
         )
     reason = sourcelist._type_reason(glob)

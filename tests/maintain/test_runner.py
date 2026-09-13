@@ -25,7 +25,7 @@ def _corpus(root: Path, docs: int = 3) -> None:
     listing.parent.mkdir(parents=True, exist_ok=True)
     listing.write_text("docs\n", encoding="utf-8")
     (root / "fux.toml").write_text("[sources]\n", encoding="utf-8")
-    # ADR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
+    # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
     (root / ".fux" / "pii.toml").write_text("", encoding="utf-8")
     (root / "docs").mkdir(exist_ok=True)
     for i in range(docs):
@@ -338,7 +338,7 @@ def test_record_head_outside_a_repo_does_not_raise(tmp_path):
 
 def test_stop_with_nothing_running_exits_zero(tmp_path, monkeypatch, capsys):
     """A verb whose job is "make sure it is not running" has succeeded when
-    it was not running (ADR-CLI, 2026-08-22)."""
+    it was not running (SR-CLI, 2026-08-22)."""
     from fux.cli import main
 
     _corpus(tmp_path)

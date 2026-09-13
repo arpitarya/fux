@@ -184,6 +184,6 @@ the `supersedes:` priors shipped and do not do the job they were built for.
 - [`../benchmark/README.md`](../benchmark/README.md) · [SETUP-BENCHMARK](../setup/fux-benchmark.md) · [SETUP-LAB](../setup/fux-lab.md)
 - [`../regression/2026-08-28-resolution-floor/`](../regression/2026-08-28-resolution-floor/report.md) — why the bar is the discordant count
 - [ADR-RS](../../docs/adr/0036_predictions.md) decisions 11–15 — pre-registration, `blind`/`informed`, the resolution rule
-- [ADR-QUALITY](../../docs/adr/0044_quality-contract.md) · [ADR-CONFIDENCE](../../docs/adr/0045_confidence.md) decision 13
+- [ADR-QUALITY](../../docs/adr/0056_WORK-quality.md) · [ADR-CONFIDENCE](../../docs/adr/0045_confidence.md) decision 13
 - [W-87](W-87-what-good-means.md) — the quality contract this measures against; **W-93 does not re-open it**
 - [W-81](../../archive/open/W-81-the-sealed-set-and-the-two-controls.md) — the sealed set and the two controls; **B9 builds the cheap half of the placebo control**

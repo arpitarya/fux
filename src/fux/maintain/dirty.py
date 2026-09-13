@@ -1,13 +1,13 @@
 """The dirty list — W-66 Phase 1: the artefact a deferred re-index consumes.
 
 Local, gitignored state under `.fux/runtime/` (the existing home for derived
-planes, ADR-DOTFUX) recording which documents changed since the last
+planes, SR-DOTFUX) recording which documents changed since the last
 completed `fux ingest`. `post-commit` appends to it; a completed ingest run
 subtracts what it set out to cover.
 
 **It is a union, never a replacement.** Two commits landing before anything
 consumes the list must leave both commits' documents pending — this is what
-makes a later takeover safe (ADR-MAINTENANCE decision 1d): whichever run
+makes a later takeover safe (SR-MAINTENANCE decision 1d): whichever run
 picks the list up gets everything, not just the most recent commit.
 
 **It is emptied by subtraction, never wholesale — there is deliberately no

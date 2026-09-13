@@ -1,6 +1,6 @@
 """URL health state — W-82 §3.1, the reporting half of URL freshness.
 
-Local, gitignored state under `.fux/runtime/` (ADR-DOTFUX's home for derived
+Local, gitignored state under `.fux/runtime/` (SR-DOTFUX's home for derived
 planes) recording, per listed URL, **how the last few networked runs went**.
 It exists because of one asymmetry: a file change is an event git observes, and
 a URL change is not. Between `fux update` runs the `url:` half of the index is a
@@ -12,7 +12,7 @@ anywhere reported how old any of it was**.
 `fux doctor` had no URL check at all. Its checks were the background runner, the
 Python version, the repo root, the layout and the accelerator — so a URL that
 had failed every fetch for a month looked exactly like one fetched a minute ago.
-[ADR-URL-INGEST](../../../docs/adr/0008_url-ingest.md) decision 4 is right that
+[SR-URL-INGEST](../../../records/0107_url-ingest.md) decision 4 is right that
 a failed fetch keeps the prior record — a flaky network must never present as a
 deletion — but the consequence is that **a permanently dead URL lives in the
 index forever**, and nobody is told. `fail_streak` makes that consequence
@@ -28,7 +28,7 @@ of invisible.
 W-75 specified this file as `{token, validated_at, changed_at, fail_streak}`.
 **Two of those are timestamps, and they may not be here.**
 [`refer/fetchcache.py`](../refer/fetchcache.py) states the invariant that
-[ADR-REFER](../../../docs/adr/0030_refer-plane.md) rests on — *wall clock lives
+[SR-REFER](../../../records/0127_refer-plane.md) rests on — *wall clock lives
 in the TTL store and nowhere else* — and `store/displaycache.py` restates it.
 A second wall-clock home would have been a quiet contradiction of an accepted
 record.

@@ -243,7 +243,7 @@ def test_a_clean_enrichment_body_fires_no_rule(tmp_path):
 
 
 def test_a_value_in_the_BODY_is_caught_and_the_rule_is_named(tmp_path):
-    """Naming the rule is ADR-PII decision 7's reasoning at a second surface:
+    """Naming the rule is SR-PII decision 7's reasoning at a second surface:
     "this file contains PII" tells the author nothing about what to change."""
     path = _write(tmp_path, "abc123", body="Page the on-call at arpit@example.com. " + GOOD_BODY)
     assert _pii_in_body(path, EMAIL_RULES) == ["email"]
@@ -252,7 +252,7 @@ def test_a_value_in_the_BODY_is_caught_and_the_rule_is_named(tmp_path):
 def test_a_value_in_the_FRONTMATTER_ONLY_is_NOT_caught(tmp_path):
     """The negative the decision turns on.
 
-    Frontmatter is provenance and is stripped before indexing (ADR-ENRICH
+    Frontmatter is provenance and is stripped before indexing (SR-ENRICH
     decision 8), so nothing in it reaches a committed term. Refusing a file over
     a `model:` value would be a false positive with no remedy — the author
     cannot write the model's name differently.
@@ -270,7 +270,7 @@ def test_no_rules_means_the_pre_W102_behaviour_exactly(tmp_path):
 
 
 def test_check_REFUSES_a_matching_file_and_does_not_rewrite_it(tmp_path):
-    """Report, never repair — ADR-MAINTENANCE veto 7 applied to this surface.
+    """Report, never repair — SR-MAINTENANCE veto 7 applied to this surface.
 
     Stronger here than there: the file is prose a human reviews in a diff, and a
     silent rewrite would make that diff lie.

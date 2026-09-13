@@ -76,7 +76,7 @@ contain a table fux can see.
 golden corpus because the proposal's own text asks for a pre-registration and a
 verdict at 10 000 documents rather than an argument.
 
-⚠ **[ADR-TABULAR](../../docs/adr/0152_tabular.md) did not answer this**, and it
+⚠ **[SR-TABULAR](../../records/0150_tabular.md) did not answer this**, and it
 is the nearest thing that might look like it had. It decided how a tabular
 document is **chunked** — one passage per row — which is a retrieval decision
 about passages. The suspicion below is about **ranking**: what a table
@@ -89,8 +89,8 @@ contributes to `flen`. Both can be true and neither implies the other.
 - **Robertson & Zaragoza, *The Probabilistic Relevance Framework: BM25 and
   Beyond* (2009)** — §3 on length normalisation, which is the mechanism by
   which a table-heavy document is mis-scored today.
-- **[ADR-RANKING](../../docs/adr/0111_ranking.md)** and
-  **[ADR-TUNE](../../docs/adr/0135_tuning.md)** — where field weights live now,
+- **[SR-RANKING](../../records/0111_ranking.md)** and
+  **[SR-TUNE](../../records/0135_tuning.md)** — where field weights live now,
   and the record any new field has to amend.
 - **[`extract.py`](../../src/fux/ingest/extract.py)** — the five fields and the
   heading regex, i.e. the actual current behaviour rather than a description

@@ -939,7 +939,7 @@ body.present #progress{display:block}
     non-git sources, L5) and those become a single <code>title_h</code> instead, with the readable
     title kept only in the gitignored display cache. So: a shard never reveals a document's
     <em>prose</em>; whether it reveals a document's <em>name</em> is a per-source policy you choose.
-    See ADR-RECORD (<code>0010</code>).
+    See SR-RECORD (<code>0010</code>).
   </div>
   </figure>
 </section>
@@ -1666,7 +1666,7 @@ confidence: none - nothing in the
       rather than closing it.</li>
     <li><strong>Confidence can never reach a score or an ordering.</strong> It is computed from
       <code>rank()</code>'s output and handed to the caller; nothing downstream feeds back.</li>
-    <li>ADR-CONFIDENCE is <strong>accepted</strong> (ratified 2026-08-27, amended 2026-08-28). What
+    <li>SR-CONFIDENCE is <strong>accepted</strong> (ratified 2026-08-27, amended 2026-08-28). What
       is still owed is <strong>R10</strong> — the measurement, not the ratification.</li>
   </ul>
 </section>
@@ -1800,7 +1800,7 @@ doc_coverage_floor = 0.0   # 0.0 = the clause is OFF</code></pre>
 
         <rect x="40" y="268" width="1120" height="52" rx="10" fill="var(--d-warn-bg)" stroke="var(--d-warn)" stroke-width="1.6"/>
         <text x="58" y="292" font-size="11.5" fill="var(--d-ink)" font-weight="700">What NO check can prove:</text>
-        <text x="248" y="292" font-size="11.5" fill="var(--d-body)">the ADR freshness gate proves a record was TOUCHED. It never reads the record.</text>
+        <text x="248" y="292" font-size="11.5" fill="var(--d-body)">the SR freshness gate proves a record was TOUCHED. It never reads the record.</text>
         <text x="58" y="311" font-size="11" fill="var(--d-body)">A record has been amended into self-contradiction in the same commit, the code implemented the wrong sentence, and CI stayed green the whole way.</text>
       </svg>
     </div>
@@ -1864,11 +1864,11 @@ uv run pytest -q tests_e2e      # the package as a user: the real CLI via subpro
   <table>
     <thead><tr><th>Guard</th><th>Fails the build when…</th></tr></thead>
     <tbody>
-      <tr><td><code>test_adr_freshness.py</code></td>
+      <tr><td><code>test_sr_freshness.py</code></td>
         <td>A commit changes a component a decision record owns without touching that record. The
-          escape hatch is a literal <code>no ADR affected</code> in the commit message — a claim under
+          escape hatch is a literal <code>no SR affected</code> in the commit message — a claim under
           your name in git history. Also a <code>commit-msg</code> hook.</td></tr>
-      <tr><td><code>test_adr_ownership.py</code></td>
+      <tr><td><code>test_sr_ownership.py</code></td>
         <td>A source component is owned by zero records or by two.</td></tr>
       <tr><td><code>test_archive_law.py</code></td>
         <td>A second <code>archive/</code> directory appears, or a live document points into one.</td></tr>
@@ -1877,7 +1877,7 @@ uv run pytest -q tests_e2e      # the package as a user: the real CLI via subpro
           internal link is dead.</td></tr>
       <tr><td><code>test_regression_runs.py</code></td>
         <td>A measured run is filed without its <code>blind</code>/<code>informed</code>
-          classification, or a verdict is written as an ADR instead of a <code>VERDICT.md</code>.</td></tr>
+          classification, or a verdict is written as an SR instead of a <code>VERDICT.md</code>.</td></tr>
       <tr><td>Import fences</td>
         <td>Anything under <code>src/fux/</code> imports a network library. L4 is asserted, not
           trusted.</td></tr>
@@ -2628,7 +2628,7 @@ def decode(path: Path, rel_path: str) -&gt; str | None: ...</code></pre>
     <strong>Gitignored is the test, not <code>.fux/</code>:</strong> <code>index/</code>,
     <code>sources/</code>, <code>fetchers/</code>, <code>decoders/</code>, <code>tune.toml</code> and
     <code>.fuxignore</code> are all committed; <code>.fux/runtime/</code> is the only derived
-    directory under it. ADR-LAWS decision 8 carries each pass and what it traded away, including the
+    directory under it. SR-LAWS decision 8 carries each pass and what it traded away, including the
     gap the last one leaves open.
   </div>
   <div class="note">
@@ -2644,11 +2644,11 @@ def decode(path: Path, rel_path: str) -&gt; str | None: ...</code></pre>
 
   <div class="note key">
     <strong>Counts are facts about a moment.</strong> Checked against the tree on 2026-08-28:
-    <strong>47 live records — 46 accepted, 1 proposed</strong> (ADR-LOCKS, which describes shipped
-    behaviour and is waiting on ratification). ADR-CONFIDENCE was ratified 2026-08-27 and amended
-    2026-08-28; the stale duplicate at <code>0043_confidence.md</code> has since been deleted, and
-    <code>0043</code> is ADR-LOCKS. Re-derive before quoting:
-    <code>grep '^status:' docs/adr/*.md</code>.
+    <strong>47 live records — 46 accepted, 1 proposed</strong> (SR-LOCKS, which describes shipped
+    behaviour and is waiting on ratification). SR-CONFIDENCE was ratified 2026-08-27 and amended
+    2026-08-28; the stale duplicate at <code>0141_confidence.md</code> has since been deleted, and
+    <code>0043</code> is SR-LOCKS. Re-derive before quoting:
+    <code>grep '^status:' records/*.md</code>.
   </div>
 
   <ul class="tight">
@@ -2709,7 +2709,7 @@ def decode(path: Path, rel_path: str) -&gt; str | None: ...</code></pre>
     <div class="card">
       <h4>What the project <em>is</em></h4>
       <ul class="tight">
-        <li><code>docs/adr/</code> — the decision records</li>
+        <li><code>records/</code> — the decision records</li>
         <li><code>docs/GLOSSARY.md</code> — every recurring term</li>
         <li><code>docs/index.md</code> — the OKF bundle root</li>
       </ul>

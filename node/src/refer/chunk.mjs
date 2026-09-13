@@ -12,6 +12,8 @@
  *
  * ⚠ **Transient. Never written.** L2: chunks are re-derived from fetched bytes
  * at answer time and stored nowhere.
+ *
+ * Owned, with its Python twin, by [SR-CHUNKING](../../../records/0151_chunking.md).
  */
 import { headings } from "../decode/markdown.mjs";
 

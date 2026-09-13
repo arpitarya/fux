@@ -1,4 +1,4 @@
-"""ADR-MAINTENANCE veto condition 7 — the status surface never repairs.
+"""SR-MAINTENANCE veto condition 7 — the status surface never repairs.
 
 Named by that record's own "How to check it" block, so the file lives at the
 path the record points at. **Reporting must not repair**: a surface that can
@@ -33,7 +33,7 @@ def _corpus(root: Path, docs: int = 3) -> None:
 
 @pytest.mark.parametrize("held_by", ["alive", "stale"])
 def test_every_status_path_leaves_the_lock_byte_identical(tmp_path, held_by):
-    """ADR-MAINTENANCE veto 7: reporting must not repair. Run every read-only
+    """SR-MAINTENANCE veto 7: reporting must not repair. Run every read-only
     surface against a held and a stale lock and diff the bytes."""
     from fux import doctor
 

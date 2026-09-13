@@ -4,7 +4,7 @@
 fux quality number is meaningless without — **which queries are scored**, and
 **what an error costs**.
 
-- **Owner:** [ADR-QUALITY](../../docs/adr/0141_quality-contract.md).
+- **Owner:** [SR-WORK-QUALITY](../../records/0056_WORK-quality.md).
 - **Discipline:** the same as a pre-registration
   ([`tools/pruning-eval/PRE-REGISTRATION.md`](../pruning-eval/PRE-REGISTRATION.md)
   is the worked example) — written before the number, never edited after it.
@@ -20,7 +20,7 @@ point, not an oversight.
 
 | block | kind | may it change? |
 |---|---|---|
-| `[cost]` | a **commitment** | **No.** Changing it after a filed score voids ADR-QUALITY decision 6 — veto condition 3 |
+| `[cost]` | a **commitment** | **No.** Changing it after a filed score voids SR-WORK-QUALITY decision 6 — veto condition 3 |
 | `[mix]` | a **declared prior** | Yes, by **bumping `version`**. Never by a silent edit |
 
 ## What is not here yet
@@ -28,7 +28,7 @@ point, not an oversight.
 - **`recall@k` is not computed.** It needs known-relevant sets per query. The
   annotation exists (κ = 0.960) but the fifty goldens it was made over were
   retired with `fux-playground` by
-  [L9](../../docs/adr/0011_LAW-9-environments.md) on 2026-09-11, and the golden
+  [SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md) on 2026-09-11, and the golden
   ladder's questions carry no relevance claim — so **there is no set to compute
   it over at all** (W-87 phase P2).
 - ⚠ **`mix.toml`'s WARNING comment is superseded, and the file is not edited to
@@ -41,7 +41,7 @@ point, not an oversight.
 
 ## Reference
 
-- [ADR-QUALITY](../../docs/adr/0141_quality-contract.md) — the contract
+- [SR-WORK-QUALITY](../../records/0056_WORK-quality.md) — the contract
 - [`work/compare/what-good-means.compare.md`](../../work/compare/what-good-means.compare.md)
   — the research behind it
 - [`work/open/W-87-what-good-means.md`](../../work/open/W-87-what-good-means.md)

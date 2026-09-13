@@ -11,11 +11,11 @@ has to carry it.
 **Two kinds of decoder, one protocol.** Built-ins live in this package and are
 stdlib-only (**L1**). Consumer decoders live in `.fux/decoders/<name>.py`, may
 import whatever the consumer installed, and **override a built-in of the same
-name**. This is [ADR-FETCHER]'s pattern at a third boundary: fux refuses to
+name**. This is [SR-FETCHER]'s pattern at a third boundary: fux refuses to
 own network I/O, model calls, and now third-party parsing libraries — the
 consumer owns each as a file loaded by path that fux never rewrites.
 
-**The protocol** (see `references` in ADR-DECODE):
+**The protocol** (see `references` in SR-DECODE):
 
     EXTENSIONS = (".html", ".htm")          # required; lowercase, with the dot
     def decode(raw: bytes, rel_path: str) -> str | None: ...
@@ -40,7 +40,7 @@ for a font, not for an XML external entity. The import fence test asserts it
 for this package. ⚠ It cannot reach `.fux/decoders/`, and that limit is stated
 rather than papered over: a consumer decoder's offline behaviour is a
 documented obligation checked by review of a committed diff, the same
-asymmetry ADR-ENRICH already owns about `model:`.
+asymmetry SR-ENRICH already owns about `model:`.
 """
 
 from __future__ import annotations
@@ -99,7 +99,7 @@ CONSUMER_DIR = ".fux/decoders"
 #: old decoders until the stale files are deleted. `tests/test_orphaned_modules.py`
 #: catches the shipped half of this — an old module left in `src/fux/decode/`
 #: is unreachable from `BUILTIN_MODULES` and fails the run — but **nothing
-#: reaches a consumer's `.fux/decoders/`.** ADR-DECODE decision 17.
+#: reaches a consumer's `.fux/decoders/`.** SR-DECODE decision 17.
 #:
 #: Sorted and explicit rather than discovered by scanning the directory: a
 #: directory listing is filesystem order, and a plane whose dispatch depends on
@@ -224,7 +224,7 @@ def _load_consumer(path: Path, name: str) -> Decoder:
     if decoder is None:
         raise FuxError(
             f"decoder {path} defines no EXTENSIONS tuple and decode(raw, rel_path) "
-            "callable — see docs/adr/0042_decode.md §2 decision 1 for the protocol"
+            "callable — see records/0139_decode.md §2 decision 1 for the protocol"
         )
     return decoder
 
@@ -253,7 +253,7 @@ def registry(root: Path | None = None) -> dict[str, Decoder]:
        merged, not fallen back to. Matching on *module name* rather than on
        extension is what makes an override a replacement rather than a race:
        two files both claiming `.html` would otherwise resolve by whichever the
-       loader reached first (ADR-DECODE decision 5).
+       loader reached first (SR-DECODE decision 5).
     3. **A `[decoders]` binding in `.fux/formats.toml` wins over both** — and it
        is checked, not trusted. A line naming a module that does not exist is a
        hard error, and so is one that takes an extension away from the decoder
@@ -373,7 +373,7 @@ def _declared_bindings(root: Path | None) -> dict[str, tuple[str, str]]:
     Empty when there is no root or no types file — which is the built-in
     default, where nothing is declared and every extension resolves through the
     module tuples. **An absent file never means "bind nothing on purpose"**; it
-    means the same thing it means for the allowlist itself (ADR-TYPES).
+    means the same thing it means for the allowlist itself (SR-TYPES).
 
     ⚠ **A leftover `.fux/sources/types` is a hard error here too**, not only in
     `read_types`: `fux ask` decodes fetched documents without ever walking, and
@@ -383,7 +383,7 @@ def _declared_bindings(root: Path | None) -> dict[str, tuple[str, str]]:
     **No per-extension shape check any more.** The line grammar had to refuse
     `docs/api/*.json decoder=json` at this point, because dispatch sees a suffix
     and nothing about the glob; a `[decoders]` key IS an extension, so that
-    line cannot be written (ADR-TYPES decision 12).
+    line cannot be written (SR-TYPES decision 12).
     """
     if root is None:
         return {}

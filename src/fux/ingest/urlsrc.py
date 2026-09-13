@@ -1,26 +1,26 @@
 """URL source — fux's half of the consumer-fetcher contract.
 
-Fux never fetches a URL itself (ADR-FETCHER decision 1): the repo owns the
+Fux never fetches a URL itself (SR-FETCHER decision 1): the repo owns the
 fetcher files under `.fux/fetchers/`, this module loads one by path, calls its
 `fetch(url) -> tuple[bytes, str]` per URL, decodes the bytes through the
 decoder plane, and normalizes the result into ingestable bytes (W-86 P8).
 All network code — transport, browser, auth, retries — lives on the consumer's
 side of that boundary; `src/fux/` stays offline and stdlib-only. Fetching runs
 only under the engine's two named fenced paths — `fux add <URL>`, scoped to the
-one URL, and `fux update` (law L4, [ADR-CLI](../../docs/adr/0002_cli-surface.md)
+one URL, and `fux update` (law L4, [SR-CLI](../../records/0101_cli-surface.md)
 decision 1e). A plain ingest never imports a fetcher.
 
 The URL list is a committed *file*, `.fux/sources/urls`, parsed by the one
-shared grammar in `sourcelist.py` (ADR-URL-LIST).
+shared grammar in `sourcelist.py` (SR-URL-LIST).
 
-**Routing is declared, never detected** (ADR-FETCHER decision 5). A line's
+**Routing is declared, never detected** (SR-FETCHER decision 5). A line's
 `fetch=` names a fetcher, and a name resolves to `<fetchers dir>/<name>.py` —
 the directory being the parent of `[sources.url] fetcher`, so a consumer who
 relocates their fetchers relocates all of them with one key. Nothing escalates
 from one fetcher to another: a plain GET that returns a rendered shell returns
 a rendered shell, and a human writes `fetch=cdp` on that line.
 
-**Three layers, and the same order for every attribute** (ADR-URL-LIST
+**Three layers, and the same order for every attribute** (SR-URL-LIST
 decision 10): the built-in default, then the source-wide `[sources.url]`
 setting, then the line. `[sources.url] fetcher` is the source-wide setting for
 `fetch` (its stem is the fetcher name); `[sources.url] meta` is the source-wide
@@ -73,19 +73,19 @@ class UrlEntry:
     fetch: str
     meta: str
     fetcher_path: str
-    #: ADR-ACQUIRED: retain the bytes this URL returned. Opt-in per line.
+    #: SR-ACQUIRED: retain the bytes this URL returned. Opt-in per line.
     keep: bool = False
-    #: ADR-URL-FRESHNESS: how long a citation may go unchecked at ask time,
+    #: SR-URL-FRESHNESS: how long a citation may go unchecked at ask time,
     #: **verbatim** as written ("15m", not 900). Resolved to seconds only at
     #: the point of use, so config order never changes a committed byte.
     ttl: str = "24h"
-    #: ADR-ARCHIVED-CONTENT: this URL points at a retired document. **Declared,
+    #: SR-ARCHIVED-CONTENT: this URL points at a retired document. **Declared,
     #: never inferred** -- inference from retirement prose is refused and was
     #: measured to invert. Line-level only: there is no `[sources.url] archived`
     #: layer, because `archived` is a fact about one document rather than a
     #: policy about how to reach a source.
     archived: bool = False
-    #: ADR-URL-LIST: whether `fux update` goes out for this URL **at all**.
+    #: SR-URL-LIST: whether `fux update` goes out for this URL **at all**.
     #: `"auto"` is today's behaviour; `"never"` pins the document and no socket
     #: is opened for it -- the fetcher is not even resolved, so a consumer's
     #: fetcher module is never imported on its account.
@@ -232,7 +232,7 @@ DEFAULT_MAX_PARALLEL = 4
 
 #: A fetcher that declares nothing is called **one URL at a time**, which is
 #: byte-for-byte the behaviour that shipped before this existed. Opting in is
-#: the author's act, never fux's inference — ADR-FETCHER decision 5's
+#: the author's act, never fux's inference — SR-FETCHER decision 5's
 #: *declared, never detected*, applied to a second property.
 UNDECLARED_MAX_PARALLEL = 1
 
@@ -344,7 +344,7 @@ def is_rate_limited(module, exc: Exception, warned: set | None = None) -> bool:
     unchanged — every fetcher written before this keeps working.
 
     **Never raises.** A consumer-owned predicate that throws must not be able to
-    turn one slow page into a failed ingest — ADR-FETCHER decision 10's per-URL
+    turn one slow page into a failed ingest — SR-FETCHER decision 10's per-URL
     isolation, applied to the predicate as well as to `fetch`.
 
     ⚠ **But it no longer fails SILENTLY** (Arpit, 2026-08-28). A predicate that
@@ -427,7 +427,7 @@ def _fetch_group(module, urls: list[str], workers: int, limited: dict | None = N
 
     **Per-URL error isolation stays here, in fux.** A `fetch` that raises
     becomes one `(url, None, exc)` and the batch continues — that is
-    ADR-URL-INGEST decision 4 in code, and it is the reason an optional
+    SR-URL-INGEST decision 4 in code, and it is the reason an optional
     `fetch_many` was rejected: it would have moved this responsibility to every
     fetcher author, and most would not reimplement it correctly.
 
@@ -538,7 +538,7 @@ def _report_rate_limits(root: Path, limited: dict[str, int]) -> None:
 
 #: A decoded document below this many words is *reported*, never dropped.
 #:
-#: **Reported, not filtered, and that is the whole design.** ADR-URL-INGEST
+#: **Reported, not filtered, and that is the whole design.** SR-URL-INGEST
 #: decision 4's rule is report-never-auto-delete, and a short page is a
 #: legitimate document -- a stub, a redirect notice, a one-line changelog. A
 #: filter here would silently lose them; a note costs one line and loses
@@ -650,7 +650,7 @@ def fetch_all(
     # written is finding it out too late.
     refusal_rules = refusals.load(root)
 
-    # ADR-ACQUIRED. `keep` is per line, so the persist step needs to know
+    # SR-ACQUIRED. `keep` is per line, so the persist step needs to know
     # which URL it is holding bytes for -- `fetch_all` groups by fetcher and
     # loses the entry by the time the body arrives.
     keep_urls = {entry.url for entry in entries if entry.keep}
@@ -742,7 +742,7 @@ def fetch_all(
                     )
                     skipped.append(Skipped(rel_path=url, reason=denial, kind=UNFETCHED))
                     continue
-                # ADR-ACQUIRED: after the refusal check, before the decoder.
+                # SR-ACQUIRED: after the refusal check, before the decoder.
                 # A refusal must never be retained -- that would keep the
                 # wrong bytes AND make them look authoritative -- and keeping
                 # them before decoding means a decoder change can be replayed
@@ -968,7 +968,7 @@ def _decode_fetched(
 
     ⚠ **`root` is passed to the decoder registry**, which it was not before, so
     a **consumer-owned decoder in `.fux/decoders/` now applies to URL content**
-    as it always has to files. Without it, ADR-DECODE's premise — *a consumer
+    as it always has to files. Without it, SR-DECODE's premise — *a consumer
     may bring a dependency fux may not* — silently stopped at the network
     boundary, which is the one place a strange content type is most likely.
     """

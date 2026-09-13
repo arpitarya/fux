@@ -10,7 +10,7 @@ subtlety is that the payload is *raw* deflate with no zlib header, which needs
 a negative window size.
 
 ⚠ **Labels are HTML fragments**, so they are converted through `html` rather
-than stripped by hand — one HTML implementation, per ADR-DECODE.
+than stripped by hand — one HTML implementation, per SR-DECODE.
 """
 
 from __future__ import annotations
@@ -25,7 +25,7 @@ from urllib.parse import unquote
 # `.fux/decoders/` loaded by path. A path-loaded file has no parent package, so
 # `from . import _xml` raises `attempted relative import with no known parent
 # package` — the copy would be dead on arrival. Absolute imports mean the file
-# fux ships and the file you edit are byte-identical (ADR-DECODE decision 11).
+# fux ships and the file you edit are byte-identical (SR-DECODE decision 11).
 from fux.decode import _xml
 from fux.decode.html import html_to_markdown
 

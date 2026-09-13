@@ -9,7 +9,7 @@ and discharged nothing. `heading_control.py` rebuilt it as a **count** with its
 own feature-off arm — and the rebuild returned a finding rather than a pass:
 
 > switching `bm25f.heading` from 3.0 to **0.0** moves the sibling count on 37 of
-> 124 queries, **net 5**, below [ADR-RS](../../docs/adr/0133_predictions.md)
+> 124 queries, **net 5**, below [SR-RS](../../records/0133_predictions.md)
 > decision 19's floor of 6. The heading field is **not** what puts those
 > documents in the window.
 > ([the run](../../work/regression/2026-09-12-priors-and-tables/report.md) §2)
@@ -26,7 +26,7 @@ similarity** — the ordinary lexical field — and that headings are a small te
 on top of it.
 
 **The arms are `bm25f.body` at 1.0 (shipped), 0.5, 0.25 and 0.0 (off).** That is
-ADR-RS decision 22c(a)'s feature-off arm, aimed at the field the evidence
+SR-RS decision 22c(a)'s feature-off arm, aimed at the field the evidence
 implicates rather than the one C4 guessed.
 
 ⚠ **`body = 0.0` is a degenerate ranker, and that is the point of an off arm.**
@@ -206,7 +206,7 @@ def main() -> int:
         print(f"HEADROOM IS ZERO: not one query changes its sibling count when the "
               f"body field is switched off. Inconclusive (22d).")
     else:
-        print(f"HEADROOM IS PROVEN (ADR-RS 22c(a)): bm25f.body moves the "
+        print(f"HEADROOM IS PROVEN (SR-RS 22c(a)): bm25f.body moves the "
               f"heading-matched distractor count on {discordant} queries, net {net}, "
               f"p = {v['p']:.4f}. BODY SIMILARITY is the mechanism, so the re-aimed "
               f"control can adjudicate.")

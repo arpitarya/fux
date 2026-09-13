@@ -92,7 +92,7 @@ def test_priority_cannot_reach_the_tie_break_and_the_reason_is_recorded(tmp_path
 
     The slot is kept because it is what was ratified, it costs nothing, and it
     is already correct if `[priority]` ever becomes a declaration that does not
-    multiply. **ADR-RANKING records this; the code does not pretend.**
+    multiply. **SR-RANKING records this; the code does not pretend.**
     """
     write_index(tmp_path, _tied_corpus())
     weighting = Weighting(priority=(("c_doc.md", 5.0),))
@@ -194,7 +194,7 @@ def _filter_corpus(root):
     dirs = root / ".fux" / "sources" / "dirs"
     dirs.parent.mkdir(parents=True, exist_ok=True)
     dirs.write_text("docs\n", encoding="utf-8")
-    # ADR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
+    # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
     (root / ".fux" / "pii.toml").write_text("", encoding="utf-8")
     (root / "docs" / "runbooks").mkdir(parents=True)
     (root / "docs" / "runbooks" / "roll.md").write_text(

@@ -63,7 +63,7 @@ def test_the_plane_is_part_of_the_deterministic_build(corpus):
 def test_the_plane_is_written_lf_only_regardless_of_host_os(corpus):
     """`write_text`'s platform-default newline translation would commit CRLF
     on Windows and LF everywhere else — this file is asserted byte-identical
-    across two builds on two machines (ADR-GRAPH), so that would break the
+    across two builds on two machines (SR-GRAPH), so that would break the
     one axis it is actually checked across. `newline="\\n"` disables it.
     """
     raw = (fmt.runtime_dir(corpus) / plane_mod.GRAPH_NAME).read_bytes()

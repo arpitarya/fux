@@ -1,7 +1,7 @@
 """`fux setup` detects a monorepo and wires `.fux/node` into it.
 
 Ruled by Arpit 2026-09-12 — *"Auto detect. Auto detect and set it up as well."*
-— and recorded as ADR-NODE-SEARCH decision 15. The detection table and the
+— and recorded as SR-NODE-SEARCH decision 15. The detection table and the
 `.fux/node` dot-path are **measured**, in
 [`2026-09-12-workspace-dotpath-probe`](../work/regression/2026-09-12-workspace-dotpath-probe/report.md):
 npm, pnpm, yarn 1 and bun all link it when it is declared, and **none** of the

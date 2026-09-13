@@ -1,8 +1,8 @@
 """`fux doctor` — install/environment health check.
 
 Checks today: python version, repo root found, `.fux/` writable, which `fux`
-PATH resolves (ADR-NODE-SEARCH R1a), and the two
-layout assertions from ADR-DOTFUX — the committed index is not git-ignored, and
+PATH resolves (SR-NODE-SEARCH R1a), and the two
+layout assertions from SR-DOTFUX — the committed index is not git-ignored, and
 nothing undeclared sits at the top level of `.fux/`.
 
 The index check exists because the failure it catches is silent: a `.fux/*`
@@ -73,7 +73,7 @@ def run(start: Path | None = None) -> list[Check]:
 def _background_runner(root: Path) -> Check:
     """The deferred re-index, reported and never repaired (W-66 Phase 4).
 
-    ADR-MAINTENANCE decision 1c: `post-commit` spawns a detached process that
+    SR-MAINTENANCE decision 1c: `post-commit` spawns a detached process that
     exits, so without this the whole maintenance path is invisible — a runner
     that died leaves the dirty list intact and says nothing at all. Four
     questions, one line: is one live and which pid, how many documents are
@@ -84,7 +84,7 @@ def _background_runner(root: Path) -> Check:
     it. Clearing a lock whose owner is actually alive puts two runners inside
     `.fux/index/` at once, which is the single failure the lock exists to
     prevent — decision 1c's veto 7. The logic lives in `maintain/runner.py`
-    (ADR-MAINTENANCE's component); this function only renders it.
+    (SR-MAINTENANCE's component); this function only renders it.
 
     A **warning**, never an error: a pending re-index means the index is late,
     which is the deferring hook working as designed, not a broken repo.
@@ -261,7 +261,7 @@ def _config_loads(root: Path) -> Check:
 
 
 def _layout(root: Path) -> list[Check]:
-    """ADR-DOTFUX: the index must not be ignored; `.fux/` holds only declared entries."""
+    """SR-DOTFUX: the index must not be ignored; `.fux/` holds only declared entries."""
     checks: list[Check] = []
     ignored = _is_git_ignored(root, root / fuxdir.FUX_DIR / "index")
     if ignored is None:
@@ -284,7 +284,7 @@ def _layout(root: Path) -> list[Check]:
         Check(
             ".fux/ layout declared",
             not extras,
-            f"undeclared entries: {', '.join(extras)} - see .fux/README.md and ADR-DOTFUX"
+            f"undeclared entries: {', '.join(extras)} - see .fux/README.md and SR-DOTFUX"
             if extras
             else "every entry is declared",
             level="warn",
@@ -313,16 +313,24 @@ def _layout(root: Path) -> list[Check]:
     return checks
 
 
-#: The four ranking priors that ship at a value which makes them do nothing,
-#: with the record that owns each and the record field each one reads.
+#: The ranking priors that ship at a value which makes them do nothing, with
+#: the record field each one reads.
 #:
 #: `(key, no-op value, record field, what the field means)`. `None` for the
 #: field means the prior is not driven by a per-record declaration.
+#:
+#: ⚠ **There were FOUR until 2026-09-13 and there is ONE.** Arpit ruled all
+#: three DOCUMENT priors closed that day on VERDICT-W143's evidence —
+#: `superseded_weight` (W-151), then `archived_weight` and
+#: `recency_half_life_days` (W-152). A prior no single global value can set
+#: correctly is not a prior waiting for a number, and disclosing it as one was
+#: misleading. **The facts they read all survive and all reach a caller.**
+#:
+#: `rerank_weight` is the survivor and was never the same question: it ships
+#: **off** rather than neutral, acts on refer-plane passage proximity rather
+#: than a document flag, and its open question is cost, not which value (W-154).
 _NO_OP_PRIORS = (
-    ("archived_weight", 1.0, "archived", "declared archived=true"),
-    ("superseded_weight", 1.0, "superseded", "superseded by another document"),
     ("rerank_weight", 0.0, None, ""),
-    ("recency_half_life_days", 0.0, "mtime", "carrying an mtime"),
 )
 
 
@@ -330,11 +338,20 @@ def _no_op_priors(root: Path) -> Check:
     """Every ranking prior that is BUILT, WIRED and SWITCHED OFF at its default.
 
     **W-126 part B, on Arpit's ask of 2026-09-11.** Four mechanisms — the
-    archived demotion, the supersession demotion, the proximity reranker and
-    the recency decay — are each implemented, each read their input, and each
-    ship at a value that makes them return the score unchanged. A repo that
-    declares `archived=true` on a source line, or writes `supersedes:` in a
-    document's frontmatter, gets **exactly nothing** for it and **is not told**.
+    archived demotion, the supersession demotion, the proximity reranker and the
+    recency decay — were each implemented, each read their input, and each
+    shipped at a value that made them return the score unchanged, with nothing
+    telling the repo that declared `archived=true` it was getting nothing.
+
+    🔴 **THREE OF THE FOUR WERE REMOVED ON 2026-09-13** rather than tuned
+    (W-151, W-152; SR-TUNE decision 15), which is the disclosure working: once
+    a dead knob is visible, *"what value should it be?"* turns out to be the
+    wrong question, and **no single global value clears the bar for any of them**
+    (`work/regression/2026-09-12-priors-and-tables/VERDICT-W143.md`).
+
+    **What is left is `rerank_weight`**, which ships **off** rather than neutral
+    and whose open question is cost, not which value. This row keeps disclosing
+    it, and keeps refusing to recommend one.
 
     ⚠ **This is a DISCLOSURE and not a ranking change**, and the distinction is
     the whole reason it could be built today. Whether any of these defaults
@@ -346,8 +363,9 @@ def _no_op_priors(root: Path) -> Check:
     the remeasure's job. `P-SUPERSEDE` is the standing proof of why: at `0.5`
     the supersession prior fixed two queries and **broke two**, and every
     broken query had the superseded document as its correct answer. A `doctor`
-    row that said *"try 0.5"* would be handing out the exact change a frozen
-    pre-registration already failed.
+    row that said *"try 0.5"* would have been handing out the exact change a
+    frozen pre-registration already failed — and in the end that knob, and the
+    two beside it, were deleted rather than given a number.
 
     **What it does say is the part nobody could see:** for each dead prior, how
     many documents in THIS corpus declare the thing it would have acted on. A
@@ -406,11 +424,10 @@ def _no_op_priors(root: Path) -> Check:
         "BUILT, WIRED AND SWITCHED OFF at these values: "
         + "; ".join(dead)
         + ". Each is implemented and reads its input, and at the value shown it "
-        "returns the score unchanged - so a document you declared archived or "
-        "superseded ranks exactly as if you had not. fux states this and does NOT "
-        "recommend a value: the one change measured so far (superseded_weight 0.5) "
-        "fixed two queries and broke two, and every broken one had the superseded "
-        "document as its correct answer",
+        "returns the score unchanged. fux states this and does NOT recommend a "
+        "value: the one change ever measured (superseded_weight at 0.5, a knob "
+        "since REMOVED) fixed two queries and broke two, and every broken one had "
+        "the superseded document as its correct answer",
         level="warn",
     )
 
@@ -432,7 +449,7 @@ def _pii_health(root: Path) -> Check:
     """
     from .ingest import pii
 
-    # ADR-PII decision 17: a missing file is an ERROR row -- `load` raises and
+    # SR-PII decision 17: a missing file is an ERROR row -- `load` raises and
     # says what to run. `doctor` is exempt from the CLI gate so that it gets
     # here and names the fix, not so that the fault reads as healthy.
     try:
@@ -519,7 +536,7 @@ def _acquired_health(root: Path) -> Check:
     index is *not* ignored — neither of them asks whether a plane that must be
     ignored actually is. This does.
 
-    **A `warn`, never an `error`, on size.** ADR-ACQUIRED decision 8 bounds the
+    **A `warn`, never an `error`, on size.** SR-ACQUIRED decision 8 bounds the
     store and evicts; a store near its cap is working as designed, not broken.
     An UNIGNORED plane is a different matter and fails.
     """
@@ -670,7 +687,7 @@ def _decoder_bindings(root: Path) -> Check:
     ⚠ **The third fault is one only `doctor` can catch**, and it is why this is
     not simply "call `registry()` early". A binding on an extension **no
     document in the corpus has** — a typo'd `jsno = "json"` — resolves perfectly:
-    extending is legal by design (ADR-DECODE, `_bind`), so nothing errors, and
+    extending is legal by design (SR-DECODE, `_bind`), so nothing errors, and
     the line indexes nothing forever. That is deliberately not an ingest
     failure, and a report is the right weight for it.
 
@@ -755,13 +772,17 @@ def _recency_prior(root: Path) -> Check:
     it. `fux-benchmark`'s 10 000-document corpus is exactly that, and every
     measurement over it that touched recency measured the prior turned off.
 
-    ⚠ **The severity depends on the knob, and both cases are reported.** With
-    `recency_half_life_days = 0` the prior is off anyway and a missing `mtime`
-    costs nothing today — but it is still the fact a future sweep of that knob
-    has to know, so it is stated rather than suppressed. With the knob **on**,
-    a corpus with no `mtime` is a configured prior that is a no-op, which is
-    the shape this repo has now recorded three times (`superseded_weight`,
-    `rerank_weight`, and now this one arriving from the data side).
+    ⚠ **The knob this used to be about is GONE, and the check is not.**
+    `recency_half_life_days` was removed on 2026-09-13 (W-152), so a missing
+    `mtime` no longer switches a configured prior off. What it still costs is
+    real and now MORE visible, not less:
+
+    - **`mtime` reaches the caller**, on every `ask` hit (W-153) — so a corpus
+      with none hands every consumer a null date and no way to sort by age.
+    - **`mtime` is the second key of the declared tie-break** in
+      `query/rank.py`, which is now one of only two routes by which a document
+      fact reaches ranking at all. With no `mtime` anywhere, that key is inert
+      and ties fall through to `priority` and then `id`.
 
     A **warning**, never an error: a corpus with no git history is a legitimate
     corpus, and this is a fact about the input rather than a broken install.
@@ -769,53 +790,27 @@ def _recency_prior(root: Path) -> Check:
     records = _records(root)
     if not records:
         return Check("recency prior", True, "no readable index", level="warn")
-    # ⚠ **The `load` call is guarded and the attribute read is NOT**, and that
-    # asymmetry is deliberate. A malformed `tune.toml` is a fact about the repo
-    # that another check reports, so it degrades to the engine default here; a
-    # renamed field is a bug in *this* function, and wrapping the read would
-    # make it silently report `half-life 0 (off)` forever. It did, for the
-    # length of one edit — `Tune` is flat, and `tune.ranking.…` raised straight
-    # into the `except`.
-    from .tune import DEFAULT_TUNE
-    from .tune import load as load_tune
-
-    try:
-        tune = load_tune(root)
-    except Exception:
-        tune = DEFAULT_TUNE
-    half_life = tune.recency_half_life_days
-
     with_mtime = sum(1 for record in records.values() if record.get("mtime"))
     total = len(records)
     if with_mtime == total:
         return Check(
-            "recency prior",
-            True,
-            f"every one of {total} document(s) carries an mtime"
-            + (f"; half-life {half_life:g} day(s)" if half_life > 0 else "; half-life 0 (off)"),
+            "recency prior", True, f"every one of {total} document(s) carries an mtime"
         )
     if with_mtime == 0:
-        note = (
-            f"NO document carries an mtime, so the recency prior is off for the whole "
-            f"corpus. mtime is derived from git commit times, so a corpus copied out of "
-            f"its repository - or one that was never in git - has none"
+        return Check(
+            "recency prior",
+            False,
+            "NO document carries an mtime, so no date reaches a caller and the "
+            "tie-break's date key is inert for the whole corpus. mtime is derived "
+            "from git commit times, so a corpus copied out of its repository - or "
+            "one that was never in git - has none",
+            level="warn",
         )
-        if half_life > 0:
-            note += (
-                f". recency_half_life_days is set to {half_life:g}, so a prior you have "
-                f"configured is doing nothing"
-            )
-        return Check("recency prior", False, note, level="warn")
     return Check(
         "recency prior",
-        half_life <= 0,
-        f"{with_mtime} of {total} document(s) carry an mtime"
-        + (
-            f"; the other {total - with_mtime} are outside git history and the "
-            f"{half_life:g}-day prior cannot decay them"
-            if half_life > 0
-            else "; half-life 0 (off)"
-        ),
+        True,
+        f"{with_mtime} of {total} document(s) carry an mtime; the other "
+        f"{total - with_mtime} are outside git history and reach a caller with no date",
         level="warn",
     )
 
@@ -824,8 +819,8 @@ def freshness_counts(root: Path) -> dict[str, int]:
     """Verified-citation verdicts, by label, from the local receipt journal.
 
     **This is the veto check for two accepted records** —
-    [ADR-ACQUIRED](../../docs/adr/0050_acquired-plane.md) and
-    [ADR-URL-FRESHNESS](../../docs/adr/0052_url-freshness.md) both say
+    [SR-ACQUIRED](../../records/0145_acquired-plane.md) and
+    [SR-URL-FRESHNESS](../../records/0147_url-freshness.md) both say
     *"reopen this decision if `as-ingested` exceeds a quarter of verified
     citations"* and both name `fux doctor --json` as how to check it. Until
     this existed neither veto could be run at all.
@@ -862,13 +857,13 @@ def freshness_counts(root: Path) -> dict[str, int]:
 #: The share above which `as-ingested` stops meaning *"a rare unreachable
 #: source"* and starts meaning *"the fetch path is broken and the plane is
 #: masking it"*. **Not a threshold this check invented** — it is the reopen
-#: condition written into ADR-ACQUIRED and ADR-URL-FRESHNESS, quoted here so
+#: condition written into SR-ACQUIRED and SR-URL-FRESHNESS, quoted here so
 #: the number has one home.
 AS_INGESTED_VETO_SHARE = 0.25
 
 
 def _freshness_share(root: Path) -> Check:
-    """The `as-ingested` share — ADR-ACQUIRED and ADR-URL-FRESHNESS's veto.
+    """The `as-ingested` share — SR-ACQUIRED and SR-URL-FRESHNESS's veto.
 
     See `freshness_counts` for where the numbers come from and why the journal
     is the only source. The machine-readable form is `fux doctor --json`'s
@@ -885,7 +880,7 @@ def _freshness_share(root: Path) -> Check:
             "freshness verdicts",
             True,
             "no receipts journalled - run an answer with `--journal` to record verdicts. "
-            "Until then the as-ingested share (ADR-ACQUIRED and ADR-URL-FRESHNESS's veto "
+            "Until then the as-ingested share (SR-ACQUIRED and SR-URL-FRESHNESS's veto "
             "condition) cannot be computed",
             level="warn",
         )
@@ -898,7 +893,7 @@ def _freshness_share(root: Path) -> Check:
             "freshness verdicts",
             False,
             f"{detail} - as-ingested is {share:.0%}, past the {AS_INGESTED_VETO_SHARE:.0%} "
-            "reopen condition in ADR-ACQUIRED and ADR-URL-FRESHNESS. That reads as a broken "
+            "reopen condition in SR-ACQUIRED and SR-URL-FRESHNESS. That reads as a broken "
             "fetch path being masked by the retained bytes, not a rare unreachable source",
             level="warn",
         )
@@ -908,8 +903,8 @@ def _freshness_share(root: Path) -> Check:
 def _output_config_health(root: Path) -> Check:
     """`.fux/output.toml` absent — the repo that predates the file.
 
-    ADR-OUTPUT decision 19 made a missing file a hard `FuxError` at load time.
-    The file is write-if-missing (ADR-DOTFUX decision 6), so it reaches **new
+    SR-OUTPUT decision 19 made a missing file a hard `FuxError` at load time.
+    The file is write-if-missing (SR-DOTFUX decision 6), so it reaches **new
     repos only** — which made `ask`, `find` and `doctor` exit 1 in every repo
     that predates it, `doctor` included, the verb you would run to find out
     why. Decision 20 ruled the fork: a missing file resolves to the engine
@@ -945,7 +940,7 @@ def _tune_config_health(root: Path) -> Check:
     ⚠ **A broken tune file left `doctor` green** until 2026-09-11 (W-140 row
     13), and that is the worst shape for this particular file: `fux ingest`
     reads only `[index]` through `index_limits`, so a bad ranking knob **does
-    not stop an ingest by design** ([ADR-TUNE](../../docs/adr/0135_tuning.md)
+    not stop an ingest by design** ([SR-TUNE](../../records/0135_tuning.md)
     decision 13) — while `ask`, `find` and `answer` refuse. So the repo indexes
     cleanly, doctor says every row is fine, and every query fails.
 
@@ -981,14 +976,14 @@ def _types_health(root: Path) -> Check:
     Three ways it cannot, each of which `read_types` refuses:
 
     1. **A leftover `.fux/sources/types`.** The list moved to `.fux/formats.toml`
-       on 2026-09-11 (ADR-TYPES decision 12), and a repo that ran `fux setup`
-       before then still has the old file. ADR-DOTFUX decision 6: when a change
+       on 2026-09-11 (SR-TYPES decision 12), and a repo that ran `fux setup`
+       before then still has the old file. SR-DOTFUX decision 6: when a change
        must reach existing repos the mechanism is *a loader refusal or a
        `doctor` check, never a rewrite* — this row is the check, and it names
        the command that converts.
     2. **A file that does not parse or breaks the closed key set.**
     3. **A file that admits nothing.** A present file replaces the built-in
-       default entirely (ADR-TYPES decision 2), so an empty one would silently
+       default entirely (SR-TYPES decision 2), so an empty one would silently
        empty the index — `fux setup` once wrote exactly that, and **`setup`
        then `ingest` failed on every fresh repo** until 2026-08-27.
     """
@@ -1022,14 +1017,14 @@ def _fetcher_capabilities(root: Path) -> Check:
     """Which optional fetcher functions the consumer's own file implements.
 
     **The gap this closes, measured 2026-08-28:** a repo created before
-    [ADR-FETCHER](../../docs/adr/0019_fetcher.md) decision 12 learned **0 of 7**
+    [SR-FETCHER](../../records/0117_fetcher.md) decision 12 learned **0 of 7**
     `validate()` tokens until its `http.py` was replaced by hand. `fux setup` is
     write-if-missing and never rewrites a consumer's fetcher — the freeze
-    ADR-DOTFUX decision 6 names — so a new optional function reaches new repos
+    SR-DOTFUX decision 6 names — so a new optional function reaches new repos
     only, silently, and the optimisation that never runs is indistinguishable
     from one that ran and found nothing.
 
-    ⚠ **A NOTICE, never a rewrite.** ADR-DOTFUX decision 6 names the mechanism
+    ⚠ **A NOTICE, never a rewrite.** SR-DOTFUX decision 6 names the mechanism
     for a change that must reach an existing repo: *a loader refusal or a
     `doctor` check, never a rewrite.* `_types_health` is the precedent. Rewriting
     a consumer's committed fetcher would be a worse problem than the one it
@@ -1072,8 +1067,8 @@ def _fetcher_capabilities(root: Path) -> Check:
     #: consumer forfeits by not having it. `fetch` is NOT here -- it is
     #: mandatory and `load_fetcher` already refuses without it.
     optional = [
-        ("validate", "ADR-FETCHER decision 12", "re-fetches every URL body even when unchanged"),
-        ("is_rate_limited", "ADR-FETCHER decision 13", "cannot tell a 429 from a hard failure"),
+        ("validate", "SR-FETCHER decision 12", "re-fetches every URL body even when unchanged"),
+        ("is_rate_limited", "SR-FETCHER decision 13", "cannot tell a 429 from a hard failure"),
     ]
     missing = [(fn, rec, cost) for fn, rec, cost in optional if f"def {fn}(" not in text]
     if not missing:
@@ -1134,7 +1129,7 @@ def _url_health(root: Path) -> Check:
 
     Doctor had **no URL check at all**, which is the defect: a URL that has
     failed every fetch for a month looked exactly like one fetched a minute ago.
-    [ADR-URL-INGEST](../../docs/adr/0008_url-ingest.md) decision 4 keeps the
+    [SR-URL-INGEST](../../records/0107_url-ingest.md) decision 4 keeps the
     prior record on a failed fetch — correct, because a flaky network must never
     present as a deletion — and the cost of that rule is that **a permanently
     dead URL lives in the index forever**. This makes the cost visible.
@@ -1242,7 +1237,7 @@ def _url_health(root: Path) -> Check:
 def _unfetched_note(root: Path, indexed: list[str]) -> list[str]:
     """URLs listed in `.fux/sources/urls` that have never produced a record.
 
-    🔴 **[ADR-MAINTENANCE](../docs/adr/0129_hooks.md) decision 5a leaned on this
+    🔴 **[SR-MAINTENANCE](../records/0129_hooks.md) decision 5a leaned on this
     and it did not exist** (W-140 row 13, built 2026-09-12). 5a refuses to let
     any git hook touch the network, and pays for that refusal with one sentence:
     *"URLs added by hand-editing `.fux/sources/urls` are not fetched at commit
@@ -1277,7 +1272,7 @@ def _unfetched_note(root: Path, indexed: list[str]) -> list[str]:
     return [
         f"{len(missing)} listed URL(s) have never been fetched, so they are not in "
         f"the index at all: {shown}{more} - run `fux update` (no hook will do it: "
-        f"ADR-MAINTENANCE decision 5a)"
+        f"SR-MAINTENANCE decision 5a)"
     ]
 
 
@@ -1377,7 +1372,7 @@ def _node_reader(root: Path) -> Check:
     not run either since upgrading ships a reader that may not understand the
     `_format` of the index sitting beside it.
 
-    Three things beyond the version since 2026-09-12 (ADR-NODE-SEARCH
+    Three things beyond the version since 2026-09-12 (SR-NODE-SEARCH
     decisions 13-16):
 
     - **Which shape**, because the two fail differently. Shape A cannot be
@@ -1431,7 +1426,7 @@ def _installed_reader(root: Path) -> "Path | None":
 
     The rungs are the shim's, in the shim's order, because a check that looked
     somewhere else would pass on a repository the shim cannot run
-    (ADR-NODE-SEARCH decision 16).
+    (SR-NODE-SEARCH decision 16).
     """
     from .store import fuxdir
 
@@ -1449,7 +1444,7 @@ def _installed_reader(root: Path) -> "Path | None":
 def _fux_on_path() -> Check:
     """Which `fux` does this shell resolve -- Python's, or the Node reader's?
 
-    **ADR-NODE-SEARCH R1a mitigation 3.** `npm i -g fux-engine` puts a `fux` on
+    **SR-NODE-SEARCH R1a mitigation 3.** `npm i -g fux-engine` puts a `fux` on
     PATH beside Python's, **with a different verb set**, and whichever resolves
     first wins. So `fux ingest` can answer *"this only reads"* on a machine
     where Python fux is installed and would have worked.
@@ -1542,7 +1537,7 @@ def _accelerator(root: Path) -> Check:
             "accelerator",
             False,
             ".fux/runtime/ is TRACKED by git - it is a derived plane and must not be "
-            "committed; check .fux/.gitignore lists `runtime/` (ADR-DOTFUX)",
+            "committed; check .fux/.gitignore lists `runtime/` (SR-DOTFUX)",
             level="warn",
         )
 
@@ -1591,7 +1586,7 @@ def cmd_doctor(args) -> int:
     exit_code = 0 if all(c.ok for c in checks if c.level == "error") else 1
 
     if getattr(args, "json", False):
-        # W-66 Phase 4 / ADR-CLI, 2026-08-22: `doctor` had no machine-readable
+        # W-66 Phase 4 / SR-CLI, 2026-08-22: `doctor` had no machine-readable
         # form, and a status an agent cannot parse is not a status for this
         # product's actual audience. The runner block is lifted out beside the
         # checks rather than left as prose inside `detail`, because a caller
@@ -1614,7 +1609,7 @@ def cmd_doctor(args) -> int:
             payload["runner"] = runner.status(root)
             # ⚠ **Lifted out beside the checks for the runner block's reason,
             # and this one is load-bearing rather than convenient.**
-            # ADR-ACQUIRED and ADR-URL-FRESHNESS both say to check their veto
+            # SR-ACQUIRED and SR-URL-FRESHNESS both say to check their veto
             # with `fux doctor --json` — *"the `as-ingested` count against
             # total verified citations"* — and a caller doing that must not
             # have to parse an English sentence out of `detail`. An empty

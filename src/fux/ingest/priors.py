@@ -1,11 +1,19 @@
-"""Phase 2's two ranking priors: recency, and supersession.
+"""The committed FACTS that ranking reads about a document: its `mtime`, and
+whether something supersedes it.
 
-Both are **multipliers**, and both are expressed through
-`query/rank.py::Weighting` rather than applied anywhere else. That is not a
-style preference — it is [ADR-T1-ACCELERATOR](../../docs/adr/0011_accelerator.md)
-veto 5, added when W-73 showed what happens to the accelerator's pruning bound
-when a multiplier reaches the scorer without reaching the bound: at any
-non-default weight the two paths silently return different documents.
+🔴 **This module used to own two ranking priors and now owns neither.**
+`recency_multiplier` lived here until 2026-09-13 and was deleted with
+`recency_half_life_days` (W-152); `superseded_weight` went the same day (W-151).
+Both were **multipliers**, expressed through `query/rank.py::Weighting` rather
+than applied anywhere else, under
+[SR-T1-ACCELERATOR](../../records/0110_accelerator.md) veto 5 — W-73's lesson
+about a multiplier that reaches the scorer without reaching the pruning bound.
+**That veto still binds any multiplier that arrives next.**
+
+What is left here is the *derivation of the facts at ingest*: `git_commit_times`
+writes `mtime`, `superseded_ids` reads the declared `supersedes:` edges. Both
+facts still reach ranking — as `query/rank.py`'s declared tie-break, which
+cannot move a document past one that outscores it.
 
 ## Why these are facts in the record, not derivations at query time
 
@@ -18,8 +26,9 @@ non-default weight the two paths silently return different documents.
    filesystem mtimes would differ per machine and break L3. A git commit
    timestamp is a property of the history every clone shares.
 
-The *weights* applied to them are tunable (`tune.toml`); the facts are not.
-That is the ADR-TUNE decision 1 split, on the right side of the line.
+The *weights* applied to them were tunable (`tune.toml`); the facts never were.
+That was the SR-TUNE decision 1 split, on the right side of the line — and since
+2026-09-13 there are no weights left on this side of it at all.
 """
 
 from __future__ import annotations
@@ -79,7 +88,7 @@ def superseded_ids(records: list[dict]) -> set[str]:
 
     **Declared, never inferred.** A document says `supersedes: [...]` in its
     own frontmatter; nothing guesses from titles, numbering or dates. This is
-    the same rule ADR-DIR-LIST decision 10 applies to `archived` — a path
+    the same rule SR-DIR-LIST decision 10 applies to `archived` — a path
     heuristic is exact for the repo that invented it and a silent convention
     for everybody else.
 
@@ -97,19 +106,3 @@ def superseded_ids(records: list[dict]) -> set[str]:
                     out.add(dst)
     return out
 
-
-def recency_multiplier(mtime: int | None, newest: int, half_life_days: float) -> float:
-    """A gentle exponential decay, normalised so the newest document is `1.0`.
-
-    `half_life_days <= 0` disables it and returns `1.0` — the shipped default,
-    so no corpus changes ranking until someone asks for it.
-
-    **Bounded below by design.** The multiplier is in `(0, 1]`, so recency can
-    demote an old document but can never promote a new one past a genuinely
-    better match by an unbounded factor. An unbounded prior on a fact nobody
-    calibrated is how a ranking becomes a date sort.
-    """
-    if half_life_days <= 0 or mtime is None or newest <= 0:
-        return 1.0
-    age_days = max(0.0, (newest - mtime) / 86400.0)
-    return 0.5 ** (age_days / half_life_days)

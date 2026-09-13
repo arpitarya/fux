@@ -38,9 +38,9 @@ def write(root, body: str):
 
 
 def test_absent_file_falls_back_to_the_engine_defaults(tmp_path):
-    """ADR-OUTPUT decision 20 — the fork decision 19 opened, ruled.
+    """SR-OUTPUT decision 20 — the fork decision 19 opened, ruled.
 
-    The file is write-if-missing (ADR-DOTFUX decision 6), so it reaches NEW
+    The file is write-if-missing (SR-DOTFUX decision 6), so it reaches NEW
     repos only. Raising here made every PRE-EXISTING repo exit 1 on `ask`,
     `find` and `doctor` after an upgrade. A file that does not exist is not
     "in effect", so it is not the sole source of anything.
@@ -614,7 +614,7 @@ def test_no_output_config_bypasses_an_incomplete_file(tmp_path, monkeypatch):
 
 
 def test_every_gated_flag_is_declared_default_none():
-    """ADR-OUTPUT decision 10, and veto condition 4.
+    """SR-OUTPUT decision 10, and veto condition 4.
 
     ⚠ **The one defect in this feature that nothing else can see.** A gated
     `store_true` left at `default=False` makes `.fux/output.toml` silently
@@ -634,7 +634,7 @@ def test_every_gated_flag_is_declared_default_none():
             if action.dest in gated:
                 assert action.default is None, (
                     f"`fux {verb} --{action.dest.replace('_', '-')}` is declared "
-                    f"default={action.default!r}; ADR-OUTPUT decision 10 requires "
+                    f"default={action.default!r}; SR-OUTPUT decision 10 requires "
                     "default=None, or the config can never take effect"
                 )
 
@@ -648,7 +648,7 @@ def test_mcp_verb_has_no_gated_flags_of_its_own():
 
 
 def test_every_verb_that_reads_the_file_can_bisect_it():
-    """ADR-OUTPUT decision 15, asserted structurally rather than trusted.
+    """SR-OUTPUT decision 15, asserted structurally rather than trusted.
 
     ⚠ **This is the exact class of bug the 2026-08-28 no-fallback ruling made
     load-bearing.** Before that ruling an unset key silently fell through to
@@ -671,11 +671,11 @@ def test_every_verb_that_reads_the_file_can_bisect_it():
         dests = {action.dest for action in sub.choices[verb]._actions}
         assert "no_output_config" in dests, (
             f"`fux {verb}` reads {OUTPUT_NAME} but has no `--no-output-config` "
-            "escape hatch — ADR-OUTPUT decision 15"
+            "escape hatch — SR-OUTPUT decision 15"
         )
 
 
-# -- `sections` on `ask` (ADR-OUTPUT decision 21) --------------------------
+# -- `sections` on `ask` (SR-OUTPUT decision 21) --------------------------
 
 
 def test_sections_is_declared_for_ask_only():

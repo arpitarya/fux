@@ -27,7 +27,7 @@ match **nothing the user asked for**, scored entirely on words a model made up.
 That is a hallucinated citation with a sha attached — the failure this whole
 architecture exists to prevent. Three parameters make it possible at every call
 site; one frozen object makes it unrepresentable, which is the argument
-[ADR-TUNE](../../docs/adr/0038_tuning.md) decision 6 already made for
+[SR-TUNE](../../records/0135_tuning.md) decision 6 already made for
 `Scoring`.
 
 ## `none()` is the byte-identity guarantee
@@ -103,7 +103,7 @@ def build(query_hashes: list[str], expansion_hashes: list[str], weight: float) -
 
     `weight <= 0` returns `none()` — off is off, and the unexpanded path must
     be reachable by configuration as well as by omission
-    ([ADR-TUNE](../../docs/adr/0038_tuning.md)'s rule for every knob).
+    ([SR-TUNE](../../records/0135_tuning.md)'s rule for every knob).
     """
     if weight <= 0 or not expansion_hashes:
         return Expansion.none(query_hashes)

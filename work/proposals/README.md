@@ -16,6 +16,13 @@ everything in it is findable.
 Every proposal names its **graduation trigger**: the condition under which it
 stops being parked. Without one it is a wish, and it will sit here forever.
 
+**Every file here also carries one row in [`../BACKLOG.md`](../BACKLOG.md)**, under
+*Parked ideas* — the backlog indexes this directory rather than duplicating it, the
+row carries the graduation trigger and nothing else, and it is filed and deleted
+in the same change as the proposal ([SR-WORK-BACKLOG](../../records/0055_WORK-backlog.md)
+rules 6 and 27). A proposal whose remainder has become a `W-nn` carries no row —
+`search-v3.md` and `structure-aware-extraction.md` are the two today.
+
 Per OKF, every file here carries frontmatter:
 
 ```yaml
@@ -108,12 +115,12 @@ the defect this ordering exists to make visible.*
 has been audited against what has since shipped; a session acting on one
 re-derives its claims first.
 
-* [ADR review — 2026-08-28](adr-review-2026-08-28.md) — all 47 live records
+* [SR review — 2026-08-28](adr-review-2026-08-28.md) — all 47 live records
   read against the register's own rules. *"The rule set is excellent; the
   records don't follow it, and nothing mechanical notices."* Five rules each
   broken in 20–45 of 47. **Record-vs-record only** — no claim in it was checked
   against `src/` or `tests/`. **Graduates into lint tests plus one bulk pass**;
-  some of that has since landed (`test_adr_ownership`, `test_adr_freshness`,
+  some of that has since landed (`test_sr_ownership`, `test_sr_freshness`,
   the `describes` relation), **which nobody has reconciled against this list.**
 * [Code + architecture review — 2026-08-28](architecture-review-2026-08-28.md)
   — *"Nothing here says rebuild again."* The risk has moved from design to
@@ -143,11 +150,11 @@ re-derives its claims first.
   four decimals on 250 topics). Argues the **instrument** (evaluate + gate) is
   the product and the **optimiser** is not, and that judgment supply — not
   search — is the binding constraint.
-  ⚠ **Substantially overtaken.** ADR-TUNE shipped 2026-08-24, so *"one of them
+  ⚠ **Substantially overtaken.** SR-TUNE shipped 2026-08-24, so *"one of them
   configurable"* is false; the integer-field-weight constraint it names was
   **dissolved by W-73**; its *"one decision waiting"* was the **hybrid
   default**, and that lane was deleted 2026-08-25. It also proposes the verb
-  name `fux tune`, **which ADR-TUNE has since taken for something else.**
+  name `fux tune`, **which SR-TUNE has since taken for something else.**
   ⚠ **This row said its trigger *"named the hybrid default and can never fire as
   written"* until 2026-09-12. That was a misreading of the file.** The trigger
   is *"≥ 50 committed judgments on a fux corpus **and** a ranking decision
@@ -155,21 +162,21 @@ re-derives its claims first.
   *the candidate that would trip it first*, not as the condition. **The
   condition is alive**: the decision waiting on it is **W-97**, and what it
   needs is 50 judgments on a corpus that is still an instrument —
-  [L9](../../docs/adr/0011_LAW-9-environments.md) voided the playground, so
+  [SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md) voided the playground, so
   that is W-136's golden data. Pre-registration:
   [`../benchmark/PRE-REGISTRATION-TUNER.md`](../benchmark/PRE-REGISTRATION-TUNER.md).
-  **Kept here, not archived:** [ADR-LAWS](../../docs/adr/0001_LAWS.md) and
-  [ADR-TUNE](../../docs/adr/0135_tuning.md) both cite its §8 survey in their
+  **Kept here, not archived:** [SR-LAWS](../../records/0001_LAWS.md) and
+  [SR-TUNE](../../records/0135_tuning.md) both cite its §8 survey in their
   Reference blocks — archiving it would move two accepted records' grounding
   into `archive/`.
-* [T2 segments](t2-segments.md) — **was ADR-T2-SEGMENTS (0037) until Arpit
+* [T2 segments](t2-segments.md) — **was SR-T2-SEGMENTS (0037) until Arpit
   moved it here the same day.** The record that **T2 is not built**, decided by
   measurement: [R9](../regression/2026-08-22-r9-t2-at-10k/VERDICT.md) answered
   worst-case queries in **12.46 ms against a 150 ms bar**. **Nothing was ever
   built** — no `tpack`, no BIC codec, no `tier` knob in `src/`. Its old veto is
   now a **graduation trigger**, and the difference matters: *a veto is checked,
   a trigger is remembered*. **Graduates if a measured warm p95 exceeds 150 ms**
-  — a number, never a corpus size. ⚠ Two frozen files still cite it as an ADR
+  — a number, never a corpus size. ⚠ Two frozen files still cite it as an SR
   and always will; see its head.
 
 ## Filed 2026-08-10
@@ -179,7 +186,7 @@ re-derives its claims first.
   three index-and-refer decisions, and the corpus they *cannot* reach names
   Fux's wedge. **The evidence base the refer-plane proposals cited.**
   *(Both of those graduated and were archived 2026-08-20 when M4's core landed;
-  their live successor is [ADR-REFER](../../docs/adr/0127_refer-plane.md). One
+  their live successor is [SR-REFER](../../records/0127_refer-plane.md). One
   shipped with its central knob deliberately refused — the reasoning is in the
   record and the open question is
   [W-58](../../archive/open/W-58-no-recorded-ingest-time.md).)*
@@ -207,7 +214,7 @@ gives them their substrate natively.
   ask questions of past knowledge. A natural fit for the one-root-hash keyspace.
 
 *(The third survivor, **audit evidence trail**, graduated 2026-08-27 into
-[ADR-PROVENANCE](../../docs/adr/0143_provenance.md) and was **archived
+[SR-PROVENANCE](../../records/0142_provenance.md) and was **archived
 2026-09-05** — see below. The fourth idea from that ideation, the
 **product-memory corpus**, graduated into the v0.26 plan; its successor concept
 is the committed index + ledger of the current architecture.)*
@@ -224,12 +231,12 @@ backing a live claim.
 | left | when | why, and the live successor |
 |---|---|---|
 | [`search-v3-claude-code-prompt.md`](../../archive/proposals/search-v3-claude-code-prompt.md) | 2026-09-12 | **Executed in full on 2026-09-05** — Arpit ratified `search-v3.md` §8 through it and five of the seven items closed. It said so itself: *kept... not because anything in it is still to do*, which is this file's own definition of archivable. No live document cited it. Live successors: [`search-v3.md`](search-v3.md) for what remains, and **W-107** and **W-112** |
-| [`audit-evidence-trail.md`](../../archive/proposals/audit-evidence-trail.md) | 2026-09-05 | **Graduated 2026-08-27 → [ADR-PROVENANCE](../../docs/adr/0143_provenance.md)**; `fux answer --audit`, `--receipt`, `--journal`, `ask --why` and `fux verify` all shipped. It then sat here nine days against this file's own lifecycle rule — **the move was late, the decision never changed.** ⚠ Its graduation trigger, *an enterprise design partner materializes*, **never fired and could not**: it waited on somebody else's arrival rather than naming a condition anyone here could check |
+| [`audit-evidence-trail.md`](../../archive/proposals/audit-evidence-trail.md) | 2026-09-05 | **Graduated 2026-08-27 → [SR-PROVENANCE](../../records/0142_provenance.md)**; `fux answer --audit`, `--receipt`, `--journal`, `ask --why` and `fux verify` all shipped. It then sat here nine days against this file's own lifecycle rule — **the move was late, the decision never changed.** ⚠ Its graduation trigger, *an enterprise design partner materializes*, **never fired and could not**: it waited on somebody else's arrival rather than naming a condition anyone here could check |
 | [`node-search-port.md`](../../archive/proposals/node-search-port.md) · [`agent-run-embeddings.md`](../../archive/proposals/agent-run-embeddings.md) · [`retrieval-quality-per-verb.md`](../../archive/proposals/retrieval-quality-per-verb.md) | 2026-09-05 | **Superseded 2026-09-04** by [`search-v3.md`](search-v3.md), which folded all three in whole. Live successors: **W-107**, **W-112**, and **W-108 … W-111**. ⚠ `search-v3.md` said they were *"deleted in the same change"* — **they never were**, and they sat here unindexed for two days |
-| [`tune-file-and-source-priority.md`](../../archive/proposals/tune-file-and-source-priority.md) | 2026-08-27 | Graduated 2026-08-22 → [ADR-TUNE](../../docs/adr/0135_tuning.md); kept for the survey and its ten forks as they were put |
+| [`tune-file-and-source-priority.md`](../../archive/proposals/tune-file-and-source-priority.md) | 2026-08-27 | Graduated 2026-08-22 → [SR-TUNE](../../records/0135_tuning.md); kept for the survey and its ten forks as they were put |
 | [`playground-goldens-draft.md`](../../archive/proposals/playground-goldens-draft.md) | 2026-08-27 | Graduated 2026-08-24 when Arpit waived the human-author rule and the 50 candidates were installed; the run is [`../regression/2026-08-24-rerank-and-goldens/`](../regression/2026-08-24-rerank-and-goldens/report.md) |
-| [`answer-provenance.md`](../../archive/proposals/answer-provenance.md) | 2026-08-27 | Graduated same-day → [ADR-PROVENANCE](../../docs/adr/0143_provenance.md), built and green. Kept for the prior-art table and **five open forks**, of which fork 1 — always-on journalling as an ADR-TUNE key — is the one a session will be tempted to default |
-| [`consumer-intent-policy.md`](../../archive/proposals/consumer-intent-policy.md) | 2026-08-22 | Became [ADR-AGENT-POLICY](../../docs/adr/0132_agent-policy.md), accepted **and built**: `fux setup` installs the four renderings, which live at [`src/fux/templates/agents/`](../../src/fux/templates/agents/) |
+| [`answer-provenance.md`](../../archive/proposals/answer-provenance.md) | 2026-08-27 | Graduated same-day → [SR-PROVENANCE](../../records/0142_provenance.md), built and green. Kept for the prior-art table and **five open forks**, of which fork 1 — always-on journalling as an SR-TUNE key — is the one a session will be tempted to default |
+| [`consumer-intent-policy.md`](../../archive/proposals/consumer-intent-policy.md) | 2026-08-22 | Became [SR-AGENT-POLICY](../../records/0132_agent-policy.md), accepted **and built**: `fux setup` installs the four renderings, which live at [`src/fux/templates/agents/`](../../src/fux/templates/agents/) |
 | [`process-diet.md`](../../archive/proposals/process-diet.md) | 2026-08-21 | Graduated same-session (PRIORITY P7); the `Cost:` line is gone from the WORKLOG format |
 
 **v0.26-era proposals** (tied to the archived substrate engine) are at

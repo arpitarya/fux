@@ -4,6 +4,8 @@
  * **A fenced code block is content, not structure** — a `# comment` inside a
  * ``` block is not a heading, and treating it as one splits a document where
  * its author did not.
+ *
+ * Owned, with its Python twin, by [SR-DECODE](../../../records/0139_decode.md).
  */
 
 const HEADING_RE = /^(#{1,6})\s+(.*?)\s*#*\s*$/;

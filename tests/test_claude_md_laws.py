@@ -1,14 +1,14 @@
 """The bind that makes `CLAUDE.md`'s law block legal.
 
-[ADR-LAW-0](../docs/adr/0002_LAW-0-authority.md) decision 1 says every rule is
-stated in exactly one ADR and every other artifact links to it. Decision 5 makes
+[SR-LAW-0](../records/0002_LAW-0-authority.md) decision 1 says every rule is
+stated in exactly one SR and every other artifact links to it. Decision 5 makes
 one exception: **a generated view is permitted, and only while a test asserts
 equality.** This file is that test.
 
 🔴 **Delete this file and `CLAUDE.md`'s block becomes an illegal restatement** —
 a second normative-looking copy of eleven laws that can drift from the records while
 both still look correct, which is the exact failure L0 exists to end. The
-permission is the test, not the generation. ADR-LAW-0's veto condition 2 names
+permission is the test, not the generation. SR-LAW-0's veto condition 2 names
 this file's absence as a reopen trigger.
 
 **What is checked, and why each one:**
@@ -18,9 +18,9 @@ this file's absence as a reopen trigger.
    with no home, or two homes, is the same defect as drift one step earlier
 3. no *other* live document carries a law's block verbatim — the residue check,
    so a third copy cannot appear somewhere nobody greps. ⚠ It catches a COPY,
-   never a paraphrase; the test says why, and ADR-LAW-0 says paraphrase is
+   never a paraphrase; the test says why, and SR-LAW-0 says paraphrase is
    ungated
-4. `ADR-LAWS` routes every handle — a law that exists but is unreachable from
+4. `SR-LAWS` routes every handle — a law that exists but is unreachable from
    the router is a law nobody will find
 5. `CLAUDE.md`'s section says it is generated — the one thing a reader has to
    see before they edit the wrong file
@@ -36,7 +36,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 CLAUDE_MD = ROOT / "CLAUDE.md"
-ADR_DIR = ROOT / "docs" / "adr"
+SR_DIR = ROOT / "records"
 GENERATOR = ROOT / "scripts" / "gen-laws.py"
 
 #: Directories that are not live documents. `archive/` above all: an archived
@@ -84,8 +84,8 @@ def test_the_claude_md_law_block_matches_the_records(gen):
     expected = gen.render()
     actual = gen.committed_block()
     assert actual == expected, (
-        "CLAUDE.md's law block has drifted from docs/adr/*_LAW-*.md. The records "
-        "are the source (ADR-LAW-0 decision 1) — fix the record, then run "
+        "CLAUDE.md's law block has drifted from records/*_LAW-*.md. The records "
+        "are the source (SR-LAW-0 decision 1) — fix the record, then run "
         "`python scripts/gen-laws.py --write`."
     )
 
@@ -108,7 +108,7 @@ def test_every_handle_has_exactly_one_record(gen):
 def test_no_record_carries_two_law_blocks():
     """`law_records()` raises on a second block; this asserts the shape directly
     so the failure names the file rather than the loader."""
-    for path in sorted(ADR_DIR.glob("*_LAW-*.md")):
+    for path in sorted(SR_DIR.glob("*_LAW-*.md")):
         text = path.read_text(encoding="utf-8")
         assert text.count("<!-- LAW-TEXT:BEGIN ") == 1, path.name
         assert text.count("<!-- LAW-TEXT:END ") == 1, path.name
@@ -143,14 +143,14 @@ def test_no_verbatim_third_copy_of_a_law_exists(gen):
     point rather than an oversight.** The realistic failure is a section pasted
     into a second document and then amended on one side only — which is what
     happened to the laws for the whole of their life before L0. A *paraphrase* is
-    not caught here and is not caught anywhere: ADR-LAW-0 §"What is gated, and
+    not caught here and is not caught anywhere: SR-LAW-0 §"What is gated, and
     what is not" says so plainly, and writing a fuzzy matcher to close it would
     be choosing a similarity threshold nobody ratified — the moving-threshold
     failure in another costume.
 
     **Why not a shorter, more sensitive phrase.** A law's opening bolded
     statement *is* its handle for the short laws (L5's is five words), and
-    ADR-LAWS' table is required to carry the handle. A check on that phrase fires
+    SR-LAWS' table is required to carry the handle. A check on that phrase fires
     on the router doing its job, and the only way to keep it green is to stop
     routing.
     """
@@ -173,22 +173,22 @@ def test_no_verbatim_third_copy_of_a_law_exists(gen):
             assert not extra, (
                 f"{handle}'s block appears verbatim in {extra} — only its own "
                 f"record and CLAUDE.md's generated block may carry it "
-                f"(ADR-LAW-0 decision 1)"
+                f"(SR-LAW-0 decision 1)"
             )
 
 
 # -- 4. the router routes ----------------------------------------------------
 
 
-def test_adr_laws_routes_every_handle(gen):
-    """`ADR-LAWS` is the index. A law missing from its table is unreachable."""
-    text = (ADR_DIR / "0001_LAWS.md").read_text(encoding="utf-8")
+def test_sr_laws_routes_every_handle(gen):
+    """`SR-LAWS` is the index. A law missing from its table is unreachable."""
+    text = (SR_DIR / "0001_LAWS.md").read_text(encoding="utf-8")
     records = gen.law_records()
     for handle in gen.LAW_ORDER:
         row = f"| **{handle}** |"
-        assert row in text, f"ADR-LAWS has no table row for {handle}"
+        assert row in text, f"SR-LAWS has no table row for {handle}"
         assert records[handle].name in text, (
-            f"ADR-LAWS' {handle} row does not link {records[handle].name}"
+            f"SR-LAWS' {handle} row does not link {records[handle].name}"
         )
 
 

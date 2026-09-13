@@ -11,7 +11,7 @@ timestamp: 2026-08-20T00:00:00Z
 > **Verdict: F — a gitignored, per-machine fetch cache for `url:`
 > sources**, keyed by `loc`, carrying a real wall-clock `fetched_at`. This is
 > the same non-reproducible-runtime-state pattern
-> [ADR-RUNTIME-STAMP](../../docs/adr/0124_runtime-stamp.md) already uses for
+> [SR-RUNTIME-STAMP](../../records/0124_runtime-stamp.md) already uses for
 > `stamp.json` — a cheap local pre-check ahead of the real one, never itself
 > proof of freshness — applied to the refer plane's fetch step instead of the
 > accelerator's build step. **It does not touch the committed record**:
@@ -20,7 +20,7 @@ timestamp: 2026-08-20T00:00:00Z
 > clock lives in gitignored cache metadata, not in a shard. A cache-served
 > answer gets a **fourth verdict state, `cached`**, carrying `age_seconds` —
 > never silently relabelled `current` — so
-> [ADR-REFER](../../docs/adr/0127_refer-plane.md) decision 6 still holds.
+> [SR-REFER](../../records/0127_refer-plane.md) decision 6 still holds.
 > Default `cache_ttl_seconds = 0` (off): a caller opts in per source, same
 > shape as `mode = snapshot` already being opt-in.
 > **Status:** ✅ accepted (Arpit, 2026-08-20) — **as proposed**: default
@@ -39,7 +39,7 @@ timestamp: 2026-08-20T00:00:00Z
 
 The refer plane fetches `url:` documents through the consumer's injected
 fetcher and verifies by content sha
-([ADR-REFER](../../docs/adr/0127_refer-plane.md) decisions 1–5). The existing
+([SR-REFER](../../records/0127_refer-plane.md) decisions 1–5). The existing
 `ARC` cache (decision 9) is keyed `(loc, sha)` and is proven
 **correctness-neutral** — "cannot change the answer" — because a hit only ever
 returns bytes already known to match the recorded sha. It does not save the
@@ -71,7 +71,7 @@ confused with "verified" — revalidation still happens, just not synchronously
 on the caller's critical path.
 
 **This repo already has the pattern**, one layer over:
-[ADR-RUNTIME-STAMP](../../docs/adr/0124_runtime-stamp.md)'s `stamp.json`
+[SR-RUNTIME-STAMP](../../records/0124_runtime-stamp.md)'s `stamp.json`
 records a per-shard `[size, mtime_ns]` specifically so `fux build` can skip a
 real content-hash check on the common unchanged case — and is "deliberately
 excluded" from the byte-identity set because mtimes aren't reproducible, and
@@ -162,15 +162,15 @@ assumed:
 
 ## Consequences
 
-- **ADR-REFER gains a decision on acceptance** — not written into the ADR file
+- **SR-REFER gains a decision on acceptance** — not written into the SR file
   yet, because this compare doc is what's live until Arpit rules; the decision
-  and its veto-condition language land in ADR-REFER in the same change that
+  and its veto-condition language land in SR-REFER in the same change that
   builds this, per Law zero.
 - **`Policy` gains `cache_ttl_seconds: int = 0`**, travelling in the bundle
   alongside `mode`/`timeout_seconds` per decision 8 — extended, not
   reinvented.
 - **record-freshness and W-58 are unchanged.** No `_format` bump, no
-  ADR-RECORD change, no shard rewritten — this is the option that costs the
+  SR-RECORD change, no shard rewritten — this is the option that costs the
   committed index nothing, same as D did.
 - **New test surface**: a TTL hit returns bytes byte-identical to what a live
   fetch would have returned (same differential style as the existing ARC
@@ -195,8 +195,8 @@ latency question has an actual number.
 - Confluence Cloud rate limiting and Atlassian's own caching/ETag guidance —
   <https://developer.atlassian.com/cloud/confluence/rate-limiting/>
 - The precedent this reuses —
-  [ADR-RUNTIME-STAMP](../../docs/adr/0124_runtime-stamp.md)
-- The plane this amends — [ADR-REFER](../../docs/adr/0127_refer-plane.md),
+  [SR-RUNTIME-STAMP](../../records/0124_runtime-stamp.md)
+- The plane this amends — [SR-REFER](../../records/0127_refer-plane.md),
   decisions 4, 6, 7, 9
 - The sibling decision this does not reopen —
   [record-freshness](record-freshness.compare.md) ·

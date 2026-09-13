@@ -1,5 +1,7 @@
 /** Constants and address functions for the committed store.
- *  Twin of `src/fux/store/format.py`. Pure and dependency-free. */
+ *  Twin of `src/fux/store/format.py`. Pure and dependency-free. *
+ * Owned, with its Python twin, by [SR-INDEX-LIFECYCLE](../../../records/0108_index-lifecycle.md).
+ */
 import { blake2bHex } from "../hash/blake2b.mjs";
 
 export const INDEX_DIR = ".fux/index";

@@ -34,7 +34,7 @@ ANALYZER_VERSION = "v2"
 #: vectors in the live index (941 130 B -> 595 492 B) *while going from two
 #: fields to five*. Heading-first would have cost +24 %.
 #:
-#: Reordering this tuple changes every record and is an ADR-recorded format
+#: Reordering this tuple changes every record and is an SR-recorded format
 #: bump, not a refactor.
 TF_FIELDS = ("body", "heading", "title", "path", "ctx")
 
@@ -59,7 +59,7 @@ def term_hash(term: str) -> str:
 #: postings. A bare 16-hex `title_h` is a quoted 16-hex token outside `terms`,
 #: so the scan counts it and the accelerator does not, and the two paths score
 #: the corpus differently. The build refuses such an index rather than
-#: diverging (ADR-INDEX-LIFECYCLE decision 6) — which meant the `hashed` meta
+#: diverging (SR-INDEX-LIFECYCLE decision 6) — which meant the `hashed` meta
 #: default, an L5 default, produced an index no `fux build` would accept.
 #:
 #: **The field shape is the bug, not the check.** Prefixing puts a character
@@ -104,7 +104,7 @@ def content_sha(content: bytes) -> str:
     """40-hex (20-byte) blake2b digest of raw file bytes — the ledger `sha`.
 
     Same hash family as `term_hash`/`shard_for`, deliberately not a literal
-    git blob sha1 (decided during M1 build; see ADR-RECORD).
+    git blob sha1 (decided during M1 build; see SR-RECORD).
     """
     return hashlib.blake2b(content, digest_size=20).hexdigest()
 

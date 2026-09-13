@@ -28,7 +28,7 @@ def test_no_command_prints_help_and_exits_1(capsys):
 def test_module_invocation_spellings_agree():
     """`python -m fux` and `python -m fux.cli` are ONE implementation.
 
-    The ladder's last rung (ADR-AGENT-POLICY) exists so a repo with an
+    The ladder's last rung (SR-AGENT-POLICY) exists so a repo with an
     inactive `.venv` still resolves to *the engine is here* rather than
     `command not found`. `fux.cli` always worked; `fux` is the spelling a
     human actually types, and Arpit ruled it supported (2026-08-27, W-82
@@ -52,7 +52,7 @@ def test_module_invocation_spellings_agree():
 
 
 def test_parser_has_the_verb_surface():
-    """The CLI contract, in four groups and no subcommand tree (ADR-CLI).
+    """The CLI contract, in four groups and no subcommand tree (SR-CLI).
 
     lifecycle `setup`/`doctor` set the repo up and check it · write
     `ingest`/`build` — one writes the committed plane, one derives from it ·
@@ -67,21 +67,21 @@ def test_parser_has_the_verb_surface():
     generates, and has **no `--model` flag**, because fux never calls one.
 
     Phase 5's `mcp` — the index served to
-    coding agents over stdio JSON-RPC ([ADR-MCP](../docs/adr/0039_mcp.md)). A
+    coding agents over stdio JSON-RPC ([SR-MCP](../records/0136_mcp.md)). A
     verb rather than a flag on `ask`, because it is a long-running server and
     not a query.
 
-    ADR-TUNE added **`tune`**, which prints the tunables file and exits. A verb
+    SR-TUNE added **`tune`**, which prints the tunables file and exits. A verb
     rather than `setup --print-tune` because it answers a question on its own —
     *what can I change?* — and it is the one verb that touches neither the repo
     nor the network, so it works before `fux setup` has ever run.
 
-    ADR-OUTPUT added **`output`**, the exact twin of `tune` one boundary
+    SR-OUTPUT added **`output`**, the exact twin of `tune` one boundary
     further in: `tune` prints what changes WHICH documents come back, `output`
     prints what changes how they are SHOWN. Both print and neither writes.
 
     Six, not four, and the count was never the mental model — which is why
-    adding one costs a line here and a line in ADR-CLI rather than a redesign.
+    adding one costs a line here and a line in SR-CLI rather than a redesign.
 
     **`url` is gone, not deprecated** (W-63). It was four days old, pre-1.0,
     and its whole surface is `fux add <URL>` / `fux remove <URL>`. The flag
@@ -115,7 +115,7 @@ def test_parser_has_the_verb_surface():
         # are a positional ARGUMENT, not a subparser — `fux daemon start` must
         # not become the first subcommand tree on this surface.
         "daemon",
-        # ADR-PROVENANCE (2026-08-27). A verb, not a flag on `answer`: it takes
+        # SR-PROVENANCE (2026-08-27). A verb, not a flag on `answer`: it takes
         # a receipt FILE rather than a query, so every flag on the query parser
         # -- `--top`, `--fast`, `--no-tune` -- would be meaningless on it.
         "verify",
@@ -131,7 +131,7 @@ def test_no_verb_grows_a_subcommand_tree():
         assert not nested, f"`fux {name}` grew a subcommand tree"
 
 
-# -- ADR-PII decision 17: no .fux/pii.toml, no command -----------------------
+# -- SR-PII decision 17: no .fux/pii.toml, no command -----------------------
 
 
 def _verbs():
@@ -143,7 +143,7 @@ def _verbs():
 
 
 def test_every_verb_is_gated_except_the_named_exemptions(tmp_path, monkeypatch):
-    """The table in ADR-PII decision 17, enforced over the parser as it is.
+    """The table in SR-PII decision 17, enforced over the parser as it is.
 
     A verb added later is gated by default; exempting one means changing the
     record's table and this set together.
@@ -202,7 +202,7 @@ def test_the_node_reader_gates_on_the_same_file(tmp_path):
     # `.fux/node/fux.mjs` and the npm entry point are the BUNDLE, generated from
     # the source above — so the literal travels by construction. Asserted on the
     # built bytes anyway, because "aimed at the source while the consumer runs
-    # something else" is exactly the class of defect ADR-NODE-SEARCH decisions
+    # something else" is exactly the class of defect SR-NODE-SEARCH decisions
     # 9-12 were all instances of.
     from fux.store import nodebundle
 

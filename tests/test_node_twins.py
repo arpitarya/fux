@@ -11,7 +11,7 @@ this corpus?"* — it cannot answer *"did somebody change the Python half and
 forget the Node half exists?"*, because a Node module that was never updated
 still agrees with itself. A corpus that happens not to exercise the changed
 branch makes that silent. This test is the structural half of the same
-guarantee, in the shape `test_adr_freshness.py` uses for records.
+guarantee, in the shape `test_sr_freshness.py` uses for records.
 
 Three ways a Node module may be accounted for, in order:
 
@@ -54,7 +54,7 @@ EXEMPT = {
 #: `config.py` is the case: `root.mjs` is a `find_root`-only slice (W-107 R4),
 #: and `config.py` moves constantly for reasons `find_root` never sees. The
 #: freshness check narrows to the named symbol using git's own hunk context —
-#: the same narrowing `docs/adr/README.md`'s `describes` table applies to
+#: the same narrowing `records/README.md`'s `describes` table applies to
 #: records. **The twin must still EXIST**; only the freshness half narrows.
 NARROWED = {
     "config/root.mjs": "find_root",
@@ -64,9 +64,10 @@ NARROWED = {
     # reasons `archived_dirs` never sees.
     "ingest/gitdir.mjs": "archived_dirs",
     # `priors.py` carries the git half (`git_commit_times`) as well, which is
-    # an ingest concern with no Node twin — `recency_multiplier` is the whole
-    # of what the query plane reads.
-    "ingest/priors.mjs": "recency_multiplier",
+    # an ingest concern with no Node twin. `recency_multiplier` was the narrowed
+    # symbol until 2026-09-13, when it was deleted with the knob it served
+    # (W-152); `superseded_ids` is what is left on both sides.
+    "ingest/priors.mjs": "superseded_ids",
 }
 
 _DECLARED = re.compile(r"`?(src/fux/[A-Za-z0-9_/]+\.py)`?")
@@ -180,7 +181,7 @@ def _symbol_touched(py_path: str, symbol: str | None) -> bool:
 
 
 def test_working_tree_does_not_change_a_python_module_behind_its_node_twin():
-    """The freshness half — the same shape `test_adr_freshness` uses for records.
+    """The freshness half — the same shape `test_sr_freshness` uses for records.
 
     The differential arm cannot catch this: a Node module nobody updated still
     agrees with itself, and it only disagrees with Python on a corpus that

@@ -1,7 +1,7 @@
 ---
 type: Compare Doc
 title: The Hook at Scale — Where a Re-index Runs When the Corpus Is Large
-description: R5 failed at 100 000 documents (44.4 s against a 1 s bound), firing ADR-MAINTENANCE veto condition 1. Four viable responses were compared against the measured attribution. RULED 2026-08-22 by Arpit — B, the hook defers, in its detached-runner variant: post-commit writes a dirty list and spawns a one-shot re-index, and `fux ask` declares the pending count.
+description: R5 failed at 100 000 documents (44.4 s against a 1 s bound), firing SR-MAINTENANCE veto condition 1. Four viable responses were compared against the measured attribution. RULED 2026-08-22 by Arpit — B, the hook defers, in its detached-runner variant: post-commit writes a dirty list and spawns a one-shot re-index, and `fux ask` declares the pending count.
 status: accepted
 timestamp: 2026-08-20T00:00:00Z
 ---
@@ -96,7 +96,7 @@ required.
 | 10 000 | 3.523 s | 3.5× over |
 | **100 000** | **44.380 s** | **44× over** |
 
-[ADR-MAINTENANCE](../../docs/adr/0129_hooks.md) veto condition 1 states the
+[SR-MAINTENANCE](../../records/0129_hooks.md) veto condition 1 states the
 consequence in its own words: *"`post-commit` is too slow to be automatic and
 the hook becomes opt-in or incremental in a way it currently is not."* **Which
 of those** is the fork, and it has more than two viable answers, so it is here
@@ -127,7 +127,7 @@ Three facts the options turn on:
    47.6 %).
 3. **Delta ingest already took the per-document half.** The 21.3 s of `ingest`
    is *without re-extracting a single unchanged document*
-   ([ADR-INGEST](../../docs/adr/0106_ingest.md) decision 1b). What remains is
+   ([SR-INGEST](../../records/0106_ingest.md) decision 1b). What remains is
    parse-everything, resolve-every-edge, write-every-shard.
 
 ## The options
@@ -157,7 +157,7 @@ index, so the lag stays visible.
 - **For:** commit cost becomes git's cost — **0.34 s at 100 000 documents**,
   and constant in the corpus. It is the only option that reaches the bound at
   every size. The one-commit-lag argument that made `post-commit` correct
-  ([ADR-MAINTENANCE](../../docs/adr/0129_hooks.md) decision 1) is unchanged;
+  ([SR-MAINTENANCE](../../records/0129_hooks.md) decision 1) is unchanged;
   the lag simply becomes *a few commits* instead of *one*.
 - **Against:** the window in which the committed index disagrees with the
   checked-out tree gets longer and less predictable, and "out of band" needs a
@@ -192,7 +192,7 @@ segments the change touches.
 - **For:** attacks the actual cost, and is valuable for `fux ingest` generally,
   not just for the hook.
 - **Against:** **the arithmetic does not reach the bound** (§4). It also means
-  giving up the property ADR-INGEST decision 1 keeps deliberately — a document
+  giving up the property SR-INGEST decision 1 keeps deliberately — a document
   that changed elsewhere can resolve an edge here — and the failure mode of
   getting it wrong is a *stale* index rather than a broken one, which nothing
   surfaces.
@@ -229,7 +229,7 @@ like this one.** It is not the same option.
 Its three stated objections land on C and miss this:
 
 1. *"Doesn't touch the merge-conflict problem"* — correct, and irrelevant:
-   [ADR-MERGE-DRIVER](../../docs/adr/0130_merge-driver.md) owns that, and R6
+   [SR-MERGE-DRIVER](../../records/0130_merge-driver.md) owns that, and R6
    is ruled.
 2. *"Requires an always-on background process this codebase has never needed"* —
    **this is the objection that does not transfer.** A one-shot that exits is
@@ -282,14 +282,14 @@ whoever ruled.** The old `reaches the bound at 100k (×3)` and `holds at 10⁶
 > **This row is an ARGUMENT, not a measurement, and since 2026-08-22 it can only ever be one.** Arpit capped measurement at 10 000 documents, so nobody may go and bench 50 000 to settle it. B's ✓ is *structural* — commit cost becomes git's cost, which does not track corpus size — and D's ✗ is arithmetic from the measured 10k passes. **Both remain legitimate under the ceiling**, which forbids measuring a larger size, not reasoning about one. The verdict is unaffected: B also wins the 10k row outright, needs no unbuilt speedup, and is already shipped.
 | index/tree agreement window (×2) | best | **worse — and now declared on the answer** | worse | best |
 | implementation cost (×1) | none | **moderate** | low | high |
-| keeps ADR-INGEST decision 1 (×2) | ✓ | **✓** | ✓ | ✗ |
+| keeps SR-INGEST decision 1 (×2) | ✓ | **✓** | ✓ | ✗ |
 | new always-on process (×2) | none | **none — one-shot, exits (§5)** | none | none |
 
 ## References
 
 - The measurement — [R5-HOOK](../regression/2026-08-20-r5-hook-latency/VERDICT.md)
   and its [report](../regression/2026-08-20-r5-hook-latency/report.md) §3.
-- The veto that fired — [ADR-MAINTENANCE](../../docs/adr/0129_hooks.md)
+- The veto that fired — [SR-MAINTENANCE](../../records/0129_hooks.md)
   condition 1.
 - The trigger choice this does **not** reopen —
   [`maintenance-trigger.compare.md`](maintenance-trigger.compare.md).
