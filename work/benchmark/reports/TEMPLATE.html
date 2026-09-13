@@ -1,0 +1,603 @@
+<title>{{TITLE}} — {{RUN}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<!-- Chart colour: arm A is an INTENTIONAL neutral baseline (--ink-3) against one
+     accent hue (--accent). Validated with the dataviz validator: adjacent-pair
+     separation is the strongest available -- light dE 17.1 normal / 14.1 protan,
+     dark 20.2 / 18.7 -- and raising the accent chroma CONVERGES the lightness and
+     drops separation below the floor. The validator flags the neutral on its
+     chroma floor by design; identity is never colour-alone here (legend + a direct
+     value label on every mark), which is the required secondary encoding.
+     Do not "fix" this into a two-hue palette without re-running the validator. -->
+<style>
+/* -- tokens: light is the base, both dark paths redefine only tokens ----- */
+:root{
+  --paper:#F6F4EF;
+  --panel:#FFFFFF;
+  --ink:#141A1D;
+  --ink-2:#4A555B;
+  --ink-3:#7A858B;
+  --rule:#D8D2C6;
+  --rule-2:#EAE5DA;
+  --accent:#0F5F73;
+  --accent-soft:#0F5F7318;
+  --pass:#2F7A45;
+  --fail:#B23A2E;
+  --hold:#8C6714;
+  --shadow:0 1px 0 rgba(20,26,29,.06), 0 8px 28px -18px rgba(20,26,29,.35);
+
+  --f-display:"Newsreader",Georgia,"Times New Roman",serif;
+  --f-body:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0C1215;
+    --panel:#111A1E;
+    --ink:#E7EEF0;
+    --ink-2:#9FB0B6;
+    --ink-3:#6D8087;
+    --rule:#22333A;
+    --rule-2:#182429;
+    --accent:#5FC7D9;
+    --accent-soft:#5FC7D91F;
+    --pass:#6BC98A;
+    --fail:#EE8878;
+    --hold:#D7B15A;
+    --shadow:0 1px 0 rgba(0,0,0,.4), 0 10px 30px -18px rgba(0,0,0,.9);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0C1215;
+  --panel:#111A1E;
+  --ink:#E7EEF0;
+  --ink-2:#9FB0B6;
+  --ink-3:#6D8087;
+  --rule:#22333A;
+  --rule-2:#182429;
+  --accent:#5FC7D9;
+  --accent-soft:#5FC7D91F;
+  --pass:#6BC98A;
+  --fail:#EE8878;
+  --hold:#D7B15A;
+  --shadow:0 1px 0 rgba(0,0,0,.4), 0 10px 30px -18px rgba(0,0,0,.9);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--f-body);
+  font-size:16px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* -- deck chrome -------------------------------------------------------- */
+.deck{position:relative;min-height:100vh}
+
+.tick{
+  position:fixed;inset:0 0 auto 0;height:22px;z-index:40;
+  background:var(--paper);
+  border-bottom:1px solid var(--rule);
+  background-image:repeating-linear-gradient(to right,var(--rule) 0 1px,transparent 1px 40px);
+  background-position:0 12px;background-size:40px 10px;background-repeat:repeat-x;
+}
+.tick::after{
+  content:"";position:absolute;left:0;top:0;height:100%;
+  width:var(--progress,0%);
+  background:var(--accent-soft);
+  border-right:2px solid var(--accent);
+  transition:width .25s ease;
+}
+
+.slide{
+  display:none;
+  min-height:100vh;
+  padding:76px clamp(22px,5vw,72px) 84px;
+  flex-direction:column;
+  justify-content:center;
+}
+.slide.active{display:flex}
+.wrap{width:100%;max-width:1080px;margin:0 auto}
+
+.eyebrow{
+  font-family:var(--f-mono);font-size:11.5px;font-weight:500;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--accent);
+  margin:0 0 14px;
+}
+.eyebrow .dim{color:var(--ink-3)}
+
+h1{
+  font-family:var(--f-display);font-weight:600;
+  font-size:clamp(38px,6.4vw,74px);line-height:1.03;letter-spacing:-.02em;
+  text-wrap:balance;margin:0 0 18px;
+}
+h2{
+  font-family:var(--f-display);font-weight:600;
+  font-size:clamp(27px,3.5vw,42px);line-height:1.1;letter-spacing:-.015em;
+  text-wrap:balance;margin:0 0 16px;
+}
+h3{
+  font-family:var(--f-body);font-weight:600;font-size:15px;
+  letter-spacing:.01em;margin:0 0 8px;
+}
+p{margin:0 0 12px;max-width:66ch;color:var(--ink-2)}
+p.lead{font-size:19px;line-height:1.5;color:var(--ink)}
+p strong,li strong{color:var(--ink);font-weight:600}
+em{font-style:italic}
+a{color:var(--accent)}
+
+.counter{
+  position:fixed;right:clamp(16px,4vw,32px);bottom:16px;z-index:40;
+  font-family:var(--f-mono);font-size:11.5px;color:var(--ink-3);
+  letter-spacing:.08em;
+  display:flex;gap:14px;align-items:center;
+}
+.navbtn{
+  font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em;
+  background:none;border:1px solid var(--rule);color:var(--ink-2);
+  padding:4px 9px;cursor:pointer;border-radius:2px;
+}
+.navbtn:hover{border-color:var(--accent);color:var(--accent)}
+.navbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.hint{
+  position:fixed;left:clamp(16px,4vw,32px);bottom:16px;z-index:40;
+  font-family:var(--f-mono);font-size:11px;color:var(--ink-3);letter-spacing:.06em;
+}
+
+/* -- content pieces ----------------------------------------------------- */
+.grid{display:grid;gap:18px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(178px,1fr))}
+
+.card{
+  background:var(--panel);border:1px solid var(--rule);border-radius:3px;
+  padding:16px 18px;box-shadow:var(--shadow);
+}
+.card p{margin-bottom:0;font-size:14px}
+.card p + p{margin-top:9px}
+
+.stat{
+  font-family:var(--f-mono);font-variant-numeric:tabular-nums;
+  font-size:clamp(26px,3.4vw,38px);font-weight:500;line-height:1;
+  letter-spacing:-.02em;color:var(--ink);margin:6px 0 6px;
+}
+.stat.sm{font-size:clamp(20px,2.4vw,26px)}
+.statlabel{
+  font-family:var(--f-mono);font-size:10.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-3);
+}
+.statnote{font-size:13px;color:var(--ink-2);margin:0}
+
+.tblwrap{overflow-x:auto;border:1px solid var(--rule);border-radius:3px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:520px}
+th,td{padding:9px 13px;text-align:left;border-bottom:1px solid var(--rule-2);vertical-align:top}
+thead th{
+  font-family:var(--f-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:500;border-bottom:1px solid var(--rule);white-space:nowrap;
+}
+tbody tr:last-child td{border-bottom:none}
+td.num,th.num{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+td.k{font-family:var(--f-mono);font-size:12.5px;color:var(--ink)}
+tr.hi td{background:var(--accent-soft)}
+
+.pill{
+  display:inline-block;font-family:var(--f-mono);font-size:10.5px;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:2px;
+  border:1px solid currentColor;white-space:nowrap;
+}
+.pass{color:var(--pass)}
+.fail{color:var(--fail)}
+.hold{color:var(--hold)}
+.info{color:var(--accent)}
+
+ul,ol{margin:0 0 12px;padding-left:20px;color:var(--ink-2);max-width:68ch}
+li{margin-bottom:8px}
+li::marker{color:var(--ink-3)}
+ol.recs{list-style:none;padding-left:0;counter-reset:r}
+ol.recs > li{
+  counter-increment:r;position:relative;padding-left:44px;margin-bottom:16px;max-width:74ch;
+}
+ol.recs > li::before{
+  content:"R" counter(r);position:absolute;left:0;top:1px;
+  font-family:var(--f-mono);font-size:11px;font-weight:600;letter-spacing:.06em;
+  color:var(--accent);border:1px solid var(--accent);border-radius:2px;padding:2px 6px;
+}
+
+.callout{
+  border-left:2px solid var(--accent);padding:2px 0 2px 16px;margin:0 0 14px;
+}
+.callout.warn{border-left-color:var(--fail)}
+.callout p:last-child{margin-bottom:0}
+
+code,.mono{font-family:var(--f-mono);font-size:.9em}
+code{background:var(--accent-soft);padding:1px 4px;border-radius:2px;color:var(--ink)}
+pre{
+  font-family:var(--f-mono);font-size:12.5px;line-height:1.6;overflow-x:auto;
+  background:var(--panel);border:1px solid var(--rule);border-radius:3px;
+  padding:14px 16px;margin:0;color:var(--ink-2);
+}
+figure{margin:0}
+figcaption{
+  font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;color:var(--ink-3);
+  margin-top:9px;
+}
+svg{max-width:100%;height:auto;display:block}
+.chartbox{
+  background:var(--panel);border:1px solid var(--rule);border-radius:3px;
+  padding:16px;overflow-x:auto;
+}
+.legend{
+  display:flex;flex-wrap:wrap;gap:16px;margin-top:10px;
+  font-family:var(--f-mono);font-size:11px;letter-spacing:.05em;color:var(--ink-3);
+}
+.swatch{display:inline-block;width:11px;height:11px;border-radius:1px;margin-right:6px;vertical-align:-1px}
+
+.rule{height:1px;background:var(--rule);border:0;margin:22px 0}
+
+@media (prefers-reduced-motion: reduce){
+  *{transition:none !important;animation:none !important}
+}
+@media (max-width:640px){
+  .slide{padding:66px 20px 76px;justify-content:flex-start}
+  p{max-width:none}
+}
+
+/* -- direction of goodness: REQUIRED on every number -------------------- */
+/* SR-WORK-BENCHMARK decision 10. Exactly one of .up / .down / .flat sits  */
+/* beside every metric, so a reader who does not know the metric can still */
+/* read the chart. `.dir` alone renders nothing -- pick a direction.       */
+.dir{
+  display:inline-block;font-family:var(--f-mono);font-size:10px;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;
+  padding:1px 5px;border-radius:2px;border:1px solid currentColor;
+  vertical-align:1px;margin-left:6px;
+}
+.dir.up{color:var(--pass)}
+.dir.down{color:var(--accent)}
+.dir.flat{color:var(--ink-3)}
+th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
+
+/* a capture with no number for THIS run says so -- it is never omitted */
+.nonumber{
+  border-left:2px dashed var(--ink-3);padding:6px 0 6px 14px;margin:0 0 14px;
+  color:var(--ink-3);font-size:14px;
+}
+.nonumber strong{color:var(--ink-2)}
+</style>
+<!--
+  ===========================================================================
+  BENCHMARK REPORT TEMPLATE  ·  CAP-7
+  ===========================================================================
+
+  WHAT MUST BE IN A FINISHED REPORT IS NOT STATED HERE. It is stated once, in
+  SR-WORK-BENCHMARK -> ../../../records/0053_WORK-benchmark.md
+  and this file is that record's SKELETON: one section per capture, in the
+  record's own order, with nothing to fill in that the record does not ask for.
+
+  SR-LAW-0: this template LINKS to the record and never restates it. If a
+  section here and the record disagree, the record is right and this file is
+  a defect -- fix it here, never there.
+
+  HOW TO USE IT
+    1. copy to  work/benchmark/reports/<yyyy-mm-dd>-<run>.html
+       <yyyy-mm-dd>-<run> is the run's own directory name under
+       work/regression/ -- same string, .html on the end. One run, one report.
+    2. replace every {{TOKEN}}.
+    3. fill each CAP section from the FILED ROWS under that run's evidence/.
+       The report carries no number the filed run does not; where the two
+       disagree the report is wrong.
+    4. a capture this run has no number for KEEPS ITS SECTION and says so --
+       use <p class="nonumber">. Deleting the section hides the gap.
+    5. every number carries a direction: <span class="dir up">/<dir down>/
+       <dir flat>. A chart with no direction is not finished.
+
+  {{TOKENS}}
+    {{RUN}}          the run id, e.g. 2026-09-13-benchmark-captures
+    {{DATE}}         yyyy-mm-dd
+    {{TITLE}}        one line, what this run was for
+    {{ARM_A}} {{ARM_B}}   versions, from evidence/ARMS.toml
+    {{CORPORA}}      the corpus/corpora, with document counts
+    {{CLASSIFICATION}}    blind | informed  (SR-RS)
+  ===========================================================================
+-->
+<div class="tick" id="tick"></div>
+
+<main class="deck" id="deck">
+
+<!-- ============ 1 · COVER ================================================ -->
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">Benchmark report <span class="dim">/ {{RUN}} / executed {{DATE}}</span></p>
+    <h1>{{TITLE}}</h1>
+    <p class="lead" style="max-width:62ch">{{ONE_PARAGRAPH: what this run was for, and what it is not. A benchmark rules no threshold.}}</p>
+    <hr class="rule">
+    <div class="grid g4">
+      <div><p class="statlabel">Arms</p><p class="stat sm">{{ARM_A}} &rarr; {{ARM_B}}</p><p class="statnote">{{how each was installed}}</p></div>
+      <div><p class="statlabel">Corpora</p><p class="stat sm">{{CORPORA}}</p><p class="statnote">{{tiers run, and tiers not run}}</p></div>
+      <div><p class="statlabel">Questions</p><p class="stat sm">{{N}}</p><p class="statnote">{{judged / timing / planted unanswerable}}</p></div>
+      <div><p class="statlabel">Classification</p><p class="stat sm">{{CLASSIFICATION}}</p><p class="statnote">no threshold ruled &mdash; SR-WORK-BENCHMARK decision 6</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 2 · HOW TO READ EVERY NUMBER ON THIS REPORT ==============
+     KEEP THIS SLIDE. It is what makes the rest legible to somebody who does
+     not already know which way each metric points. -->
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">How to read this report <span class="dim">/ every number carries its direction</span></p>
+    <h2>Which way is <em>good</em>, stated on every metric</h2>
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th>marker</th><th>means</th><th>metrics it sits on in this run</th></tr></thead>
+        <tbody>
+          <tr><td><span class="dir up">&uarr; higher is better</span></td><td>a bigger number is a better engine</td><td class="k">hit@1 &middot; hit@5 &middot; hit@10 &middot; hit@20 &middot; hit@50 &middot; declined&#8209;when&#8209;unanswerable</td></tr>
+          <tr><td><span class="dir down">&darr; lower is better</span></td><td>a smaller number is a better engine</td><td class="k">query p50 &middot; query p95 &middot; ingest &middot; build &middot; index bytes &middot; bytes/document &middot; fabricated</td></tr>
+          <tr><td><span class="dir flat">&mdash; neither</span></td><td><strong>a change is a signal, not a score.</strong> Nothing here says which value is better &mdash; a person reads the rows</td><td class="k">queries whose list moved &middot; first differing rank &middot; shard count &middot; headroom &middot; b and c</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout warn" style="margin-top:18px"><p><strong>&ldquo;Better&rdquo; here means better on THIS instrument, and nothing more.</strong> A direction marker says which way the metric points; it never says the difference is real, large enough to act on, or a regression. <strong>That is a person reading the rows</strong> &mdash; SR&#8209;WORK&#8209;BENCHMARK decision 6.</p></div>
+    <p style="font-size:13px;color:var(--ink-3)">A capture with <strong>no number for this run</strong> keeps its section and says so. It is never dropped for being empty &mdash; a missing section reads as a capture that was not required.</p>
+  </div>
+</section>
+
+<!-- ============ 3 · THE ARMS ============================================= -->
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">The arms <span class="dim">/ evidence/ARMS.toml</span></p>
+    <h2>Two engines, byte&#8209;checked against one corpus</h2>
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th>&nbsp;</th><th>arm A</th><th>arm B</th></tr></thead>
+        <tbody>
+          <tr><td>version</td><td class="k">{{ARM_A}}</td><td class="k">{{ARM_B}}</td></tr>
+          <tr><td>install</td><td class="k">{{...}}</td><td class="k">{{...}}</td></tr>
+          <tr><td>python</td><td class="k">{{...}}</td><td class="k">{{...}}</td></tr>
+          <tr class="hi"><td>corpus sha256</td><td class="k">{{...}}</td><td class="k">{{... identical, or the run is void}}</td></tr>
+          <tr class="hi"><td>queries sha256</td><td class="k">{{...}}</td><td class="k">{{...}}</td></tr>
+          <tr><td>enrichment</td><td class="k">{{present|absent}}</td><td class="k">{{present|absent}}</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout"><p>{{Anything that makes this run non-reproducible -- an editable install of a dirty tree, an uncommitted change, a machine that was not quiet -- is stated HERE, not discovered later.}}</p></div>
+  </div>
+</section>
+
+<!-- ============ 4 · NULL CONTROL =========================================
+     Runs first, always. A difference here voids every number in the run. -->
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">The null control <span class="dim">/ run first, as it always is</span></p>
+    <h2>Arm A against itself</h2>
+    <div class="grid g2">
+      <div class="card">
+        <p class="statlabel">nullcontrol &middot; {{corpus}} &middot; {{path}}</p>
+        <p class="stat sm">{{n}} differed<span class="dir down">&darr; lower is better</span></p>
+        <p class="statnote">{{Identical ranked lists on every query, or the run stops here.}}</p>
+      </div>
+      <div class="card">
+        <h3>Why it is first</h3>
+        <p>Ordering is deterministic. <strong>A difference between two runs of the same arm is a broken harness, not a finding</strong> &mdash; and it would be invisible in every table after this one.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5 · CAP-3  hit@k ========================================= -->
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">CAP&#8209;3 <span class="dim">/ hit@k against the planted key</span></p>
+    <h2>{{the one-line finding, or: no number exists for this run}}</h2>
+    <div class="tblwrap">
+      <table>
+        <thead><tr>
+          <th>arm</th><th>version</th>
+          <th class="num">hit@1<span class="dir up">&uarr; higher is better</span></th>
+          <th class="num">hit@5<span class="dir up">&uarr; higher is better</span></th>
+          <th class="num">hit@10<span class="dir up">&uarr; higher is better</span></th>
+          <th class="num">hit@20<span class="dir up">&uarr; higher is better</span></th>
+          <th class="num">hit@50<span class="dir up">&uarr; higher is better</span></th>
+        </tr></thead>
+        <tbody>
+          <tr><td class="k">A</td><td class="k">{{ARM_A}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td></tr>
+          <tr><td class="k">B</td><td class="k">{{ARM_B}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:13px;color:var(--ink-3);margin-top:8px"><strong>hit@5 is the headline</strong>; the other four are context and are never dropped for being undramatic.</p>
+    <!-- when this run has no key: replace the table with
+    <p class="nonumber"><strong>No number exists for this run.</strong> {{why -- e.g. the corpus carried no key, so hit@k could not be computed. Say which, and do not re-run to fill it.}}</p>
+    -->
+  </div>
+</section>
+
+<!-- ============ 6 · CAP-3  headroom, BOTH directions ===================== -->
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">CAP&#8209;3 <span class="dim">/ headroom, stated in both directions</span></p>
+    <h2>How much could have moved at all</h2>
+    <p>One score answers neither question. <strong>Improvement headroom</strong> is the questions wrong in <em>both</em> arms &mdash; the most that could have been fixed. <strong>Regression headroom</strong> is the questions right in both &mdash; the most that could have broken.</p>
+    <div class="tblwrap">
+      <table>
+        <thead><tr>
+          <th class="num">k</th><th class="num">n</th>
+          <th class="num">improvement headroom<span class="dir flat">&mdash; neither</span></th>
+          <th class="num">regression headroom<span class="dir flat">&mdash; neither</span></th>
+          <th class="num">b &nbsp;A wrong &rarr; B right<span class="dir up">&uarr; higher is better</span></th>
+          <th class="num">c &nbsp;A right &rarr; B wrong<span class="dir down">&darr; lower is better</span></th>
+        </tr></thead>
+        <tbody>
+          <tr><td class="num">1</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td></tr>
+          <tr><td class="num">5</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td></tr>
+          <tr><td class="num">10</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout warn" style="margin-top:16px"><p><strong>Zero headroom is not agreement.</strong> Where the improvement column is 0 no delta is representable, so equal scores there report a <em>ceiling</em>, never a match. Say which rows are ceilings.</p></div>
+  </div>
+</section>
+
+<!-- ============ 7 · CAP-4  the answer layer ============================== -->
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">CAP&#8209;4 <span class="dim">/ the answer layer, and the planted unanswerables</span></p>
+    <h2>{{the one-line finding}}</h2>
+    <div class="tblwrap">
+      <table>
+        <thead><tr>
+          <th>arm</th>
+          <th class="num">answered<span class="dir flat">&mdash; neither</span></th>
+          <th class="num">declined<span class="dir up">&uarr; higher is better</span></th>
+          <th class="num">fabricated<span class="dir down">&darr; lower is better</span></th>
+        </tr></thead>
+        <tbody>
+          <tr><td class="k">A &nbsp;{{ARM_A}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td></tr>
+          <tr><td class="k">B &nbsp;{{ARM_B}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:13px;color:var(--ink-3);margin-top:8px"><strong>fabricated</strong> = answered a question planted to have no answer. <strong>Higher <span class="mono">declined</span> is better only on the planted unanswerables</strong> &mdash; on the judged set, declining is a miss. Say which set each column is over.</p>
+    <div class="callout">{{Any asymmetry between the arms -- a flag one version does not have -- is stated, not smoothed.}}</div>
+  </div>
+</section>
+
+<!-- ============ 8 · CAP-1 / CAP-2  what moved ============================ -->
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">CAP&#8209;1 &middot; CAP&#8209;2 <span class="dim">/ the ranked lists, and what moved between them</span></p>
+    <h2>{{n}} of {{N}} lists differ &mdash; {{and where}}</h2>
+    <figure class="chartbox">
+      {{ INLINE SVG: first-differing-rank histogram, or the chart this run's CAP-2 rows support.
+         Label the axes. Put the direction marker in the caption, not on the bars. }}
+      <figcaption>{{what the chart is over}} &middot; <strong>first differing rank <span class="dir flat">&mdash; neither; a change is a signal, not a score</span></strong> &mdash; a difference at rank 1 is a changed top answer, which is worth a look; nothing here says which ordering is better.</figcaption>
+    </figure>
+    <div class="callout" style="margin-top:16px"><p>{{entered / left counts, and the one sentence a reader should take away}}</p></div>
+  </div>
+</section>
+
+<!-- ============ 9 · CAP-5  index size ==================================== -->
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">CAP&#8209;5 <span class="dim">/ the committed index</span></p>
+    <h2>{{one line}}</h2>
+    <div class="tblwrap">
+      <table>
+        <thead><tr>
+          <th>arm</th><th class="num">index bytes<span class="dir down">&darr; lower is better</span></th>
+          <th class="num">bytes / document<span class="dir down">&darr; lower is better</span></th>
+          <th class="num">shards<span class="dir flat">&mdash; neither</span></th>
+        </tr></thead>
+        <tbody>
+          <tr><td class="k">A</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td></tr>
+          <tr><td class="k">B</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:13px;color:var(--ink-3)">Deterministic &mdash; unaffected by what else the machine was doing.</p>
+  </div>
+</section>
+
+<!-- ============ 10 · CAP-6  speed ========================================
+     The capture most easily destroyed by a shared machine. If the machine was
+     not quiet, the numbers stay and carry the warning -- they are never deleted
+     and never quietly reported. -->
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">CAP&#8209;6 <span class="dim">/ speed, arms interleaved A B A B</span></p>
+    <h2>{{one line}} {{<span class="pill fail">do not quote</span> when the machine was not quiet}}</h2>
+    <div class="tblwrap">
+      <table>
+        <thead><tr>
+          <th>arm</th>
+          <th class="num">query p50<span class="dir down">&darr; lower is better</span></th>
+          <th class="num">query p95<span class="dir down">&darr; lower is better</span></th>
+          <th class="num">ingest<span class="dir down">&darr; lower is better</span></th>
+          <th class="num">build<span class="dir down">&darr; lower is better</span></th>
+        </tr></thead>
+        <tbody>
+          <tr><td class="k">A</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td></tr>
+          <tr><td class="k">B</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout warn" style="margin-top:16px"><p><strong>State whether the machine was quiet.</strong> A loaded machine does not produce noise &mdash; <em>it produces a clean, localised anomaly that reads like a finding.</em> Interleaving <span class="mono">A B A B</span> protects the <strong>difference</strong> and never the absolute number.</p></div>
+  </div>
+</section>
+
+<!-- ============ 11 · WHAT THIS RUN DOES NOT SAY ========================== -->
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">Guard rails <span class="dim">/ what this run may never be used to say</span></p>
+    <h2>What this run does <em>not</em> do</h2>
+    <div class="grid g4">
+      <div class="card"><h3>It rules no threshold</h3><p>SR&#8209;WORK&#8209;BENCHMARK decision 6 &mdash; <strong>no pass/fail anywhere</strong>. A bar is a pre&#8209;registration with its own id space and its own verdict.</p></div>
+      <div class="card"><h3>{{scope limit}}</h3><p>{{tiers not run, paths not run, arms not compared}}</p></div>
+      <div class="card"><h3>{{classification limit}}</h3><p>{{what informed costs this run, or what blind buys it}}</p></div>
+      <div class="card"><h3>{{captures with no number}}</h3><p>{{named here as well as in their own section, so the gaps are countable from one slide}}</p></div>
+    </div>
+    <hr class="rule">
+    <p style="font-size:13px;color:var(--ink-3);margin:18px 0 0">The run is <span class="mono">work/regression/{{RUN}}/</span> &mdash; <span class="mono">report.md</span>, <span class="mono">ANALYSIS.md</span>, <span class="mono">evidence/</span>. <strong>This report carries no number that run does not; anything that disagrees with it is this file being wrong.</strong> What must be here at all: <span class="mono">records/0053_WORK-benchmark.md</span>.</p>
+  </div>
+</section>
+
+</main>
+
+<div class="hint" id="hint">&larr; &rarr; to move</div>
+<div class="counter">
+  <button class="navbtn" id="prev" aria-label="Previous slide">prev</button>
+  <span id="pos" aria-live="polite">01 / 11</span>
+  <button class="navbtn" id="next" aria-label="Next slide">next</button>
+</div>
+<script>
+(function () {
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var pos = document.getElementById('pos');
+  var tick = document.getElementById('tick');
+  var i = 0;
+
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+
+  function show(n) {
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function (s, k) { s.classList.toggle('active', k === i); });
+    pos.textContent = pad(i + 1) + ' / ' + pad(slides.length);
+    tick.style.setProperty('--progress', ((i + 1) / slides.length * 100) + '%');
+    window.scrollTo(0, 0);
+    try { location.hash = 's' + (i + 1); } catch (e) {}
+  }
+
+  document.getElementById('next').addEventListener('click', function () { show(i + 1); });
+  document.getElementById('prev').addEventListener('click', function () { show(i - 1); });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { show(i + 1); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { show(i - 1); e.preventDefault(); }
+    else if (e.key === 'Home') { show(0); e.preventDefault(); }
+    else if (e.key === 'End') { show(slides.length - 1); e.preventDefault(); }
+  });
+
+  var start = null;
+  document.addEventListener('touchstart', function (e) { start = e.changedTouches[0].clientX; }, {passive: true});
+  document.addEventListener('touchend', function (e) {
+    if (start === null) return;
+    var dx = e.changedTouches[0].clientX - start;
+    if (Math.abs(dx) > 55) { show(dx < 0 ? i + 1 : i - 1); }
+    start = null;
+  }, {passive: true});
+
+  var m = (location.hash || '').match(/^#s(\d+)$/);
+  show(m ? parseInt(m[1], 10) - 1 : 0);
+
+  setTimeout(function () {
+    var h = document.getElementById('hint');
+    if (h) { h.style.transition = 'opacity .6s'; h.style.opacity = '0'; }
+  }, 4200);
+})();
+</script>

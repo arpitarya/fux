@@ -1,0 +1,528 @@
+<title>Contested answers — 2026-08-28</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<!-- Chart colour: arm A is an INTENTIONAL neutral baseline (--ink-3) against one
+     accent hue (--accent). Validated with the dataviz validator: adjacent-pair
+     separation is the strongest available -- light dE 17.1 normal / 14.1 protan,
+     dark 20.2 / 18.7 -- and raising the accent chroma CONVERGES the lightness and
+     drops separation below the floor. The validator flags the neutral on its
+     chroma floor by design; identity is never colour-alone here (legend + a direct
+     value label on every mark), which is the required secondary encoding.
+     Do not "fix" this into a two-hue palette without re-running the validator. -->
+<style>
+/* -- tokens: light is the base, both dark paths redefine only tokens ----- */
+:root{
+  --paper:#F6F4EF;
+  --panel:#FFFFFF;
+  --ink:#141A1D;
+  --ink-2:#4A555B;
+  --ink-3:#7A858B;
+  --rule:#D8D2C6;
+  --rule-2:#EAE5DA;
+  --accent:#0F5F73;
+  --accent-soft:#0F5F7318;
+  --pass:#2F7A45;
+  --fail:#B23A2E;
+  --hold:#8C6714;
+  --shadow:0 1px 0 rgba(20,26,29,.06), 0 8px 28px -18px rgba(20,26,29,.35);
+
+  --f-display:"Newsreader",Georgia,"Times New Roman",serif;
+  --f-body:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0C1215;
+    --panel:#111A1E;
+    --ink:#E7EEF0;
+    --ink-2:#9FB0B6;
+    --ink-3:#6D8087;
+    --rule:#22333A;
+    --rule-2:#182429;
+    --accent:#5FC7D9;
+    --accent-soft:#5FC7D91F;
+    --pass:#6BC98A;
+    --fail:#EE8878;
+    --hold:#D7B15A;
+    --shadow:0 1px 0 rgba(0,0,0,.4), 0 10px 30px -18px rgba(0,0,0,.9);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0C1215;
+  --panel:#111A1E;
+  --ink:#E7EEF0;
+  --ink-2:#9FB0B6;
+  --ink-3:#6D8087;
+  --rule:#22333A;
+  --rule-2:#182429;
+  --accent:#5FC7D9;
+  --accent-soft:#5FC7D91F;
+  --pass:#6BC98A;
+  --fail:#EE8878;
+  --hold:#D7B15A;
+  --shadow:0 1px 0 rgba(0,0,0,.4), 0 10px 30px -18px rgba(0,0,0,.9);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--f-body);
+  font-size:16px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* -- deck chrome -------------------------------------------------------- */
+.deck{position:relative;min-height:100vh}
+
+.tick{
+  position:fixed;inset:0 0 auto 0;height:22px;z-index:40;
+  background:var(--paper);
+  border-bottom:1px solid var(--rule);
+  background-image:repeating-linear-gradient(to right,var(--rule) 0 1px,transparent 1px 40px);
+  background-position:0 12px;background-size:40px 10px;background-repeat:repeat-x;
+}
+.tick::after{
+  content:"";position:absolute;left:0;top:0;height:100%;
+  width:var(--progress,0%);
+  background:var(--accent-soft);
+  border-right:2px solid var(--accent);
+  transition:width .25s ease;
+}
+
+.slide{
+  display:none;
+  min-height:100vh;
+  padding:76px clamp(22px,5vw,72px) 84px;
+  flex-direction:column;
+  justify-content:center;
+}
+.slide.active{display:flex}
+.wrap{width:100%;max-width:1080px;margin:0 auto}
+
+.eyebrow{
+  font-family:var(--f-mono);font-size:11.5px;font-weight:500;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--accent);
+  margin:0 0 14px;
+}
+.eyebrow .dim{color:var(--ink-3)}
+
+h1{
+  font-family:var(--f-display);font-weight:600;
+  font-size:clamp(38px,6.4vw,74px);line-height:1.03;letter-spacing:-.02em;
+  text-wrap:balance;margin:0 0 18px;
+}
+h2{
+  font-family:var(--f-display);font-weight:600;
+  font-size:clamp(27px,3.5vw,42px);line-height:1.1;letter-spacing:-.015em;
+  text-wrap:balance;margin:0 0 16px;
+}
+h3{
+  font-family:var(--f-body);font-weight:600;font-size:15px;
+  letter-spacing:.01em;margin:0 0 8px;
+}
+p{margin:0 0 12px;max-width:66ch;color:var(--ink-2)}
+p.lead{font-size:19px;line-height:1.5;color:var(--ink)}
+p strong,li strong{color:var(--ink);font-weight:600}
+em{font-style:italic}
+a{color:var(--accent)}
+
+.counter{
+  position:fixed;right:clamp(16px,4vw,32px);bottom:16px;z-index:40;
+  font-family:var(--f-mono);font-size:11.5px;color:var(--ink-3);
+  letter-spacing:.08em;
+  display:flex;gap:14px;align-items:center;
+}
+.navbtn{
+  font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em;
+  background:none;border:1px solid var(--rule);color:var(--ink-2);
+  padding:4px 9px;cursor:pointer;border-radius:2px;
+}
+.navbtn:hover{border-color:var(--accent);color:var(--accent)}
+.navbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.hint{
+  position:fixed;left:clamp(16px,4vw,32px);bottom:16px;z-index:40;
+  font-family:var(--f-mono);font-size:11px;color:var(--ink-3);letter-spacing:.06em;
+}
+
+/* -- content pieces ----------------------------------------------------- */
+.grid{display:grid;gap:18px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(178px,1fr))}
+
+.card{
+  background:var(--panel);border:1px solid var(--rule);border-radius:3px;
+  padding:16px 18px;box-shadow:var(--shadow);
+}
+.card p{margin-bottom:0;font-size:14px}
+.card p + p{margin-top:9px}
+
+.stat{
+  font-family:var(--f-mono);font-variant-numeric:tabular-nums;
+  font-size:clamp(26px,3.4vw,38px);font-weight:500;line-height:1;
+  letter-spacing:-.02em;color:var(--ink);margin:6px 0 6px;
+}
+.stat.sm{font-size:clamp(20px,2.4vw,26px)}
+.statlabel{
+  font-family:var(--f-mono);font-size:10.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-3);
+}
+.statnote{font-size:13px;color:var(--ink-2);margin:0}
+
+.tblwrap{overflow-x:auto;border:1px solid var(--rule);border-radius:3px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:520px}
+th,td{padding:9px 13px;text-align:left;border-bottom:1px solid var(--rule-2);vertical-align:top}
+thead th{
+  font-family:var(--f-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:500;border-bottom:1px solid var(--rule);white-space:nowrap;
+}
+tbody tr:last-child td{border-bottom:none}
+td.num,th.num{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+td.k{font-family:var(--f-mono);font-size:12.5px;color:var(--ink)}
+tr.hi td{background:var(--accent-soft)}
+
+.pill{
+  display:inline-block;font-family:var(--f-mono);font-size:10.5px;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:2px;
+  border:1px solid currentColor;white-space:nowrap;
+}
+.pass{color:var(--pass)}
+.fail{color:var(--fail)}
+.hold{color:var(--hold)}
+.info{color:var(--accent)}
+
+ul,ol{margin:0 0 12px;padding-left:20px;color:var(--ink-2);max-width:68ch}
+li{margin-bottom:8px}
+li::marker{color:var(--ink-3)}
+ol.recs{list-style:none;padding-left:0;counter-reset:r}
+ol.recs > li{
+  counter-increment:r;position:relative;padding-left:44px;margin-bottom:16px;max-width:74ch;
+}
+ol.recs > li::before{
+  content:"R" counter(r);position:absolute;left:0;top:1px;
+  font-family:var(--f-mono);font-size:11px;font-weight:600;letter-spacing:.06em;
+  color:var(--accent);border:1px solid var(--accent);border-radius:2px;padding:2px 6px;
+}
+
+.callout{
+  border-left:2px solid var(--accent);padding:2px 0 2px 16px;margin:0 0 14px;
+}
+.callout.warn{border-left-color:var(--fail)}
+.callout p:last-child{margin-bottom:0}
+
+code,.mono{font-family:var(--f-mono);font-size:.9em}
+code{background:var(--accent-soft);padding:1px 4px;border-radius:2px;color:var(--ink)}
+pre{
+  font-family:var(--f-mono);font-size:12.5px;line-height:1.6;overflow-x:auto;
+  background:var(--panel);border:1px solid var(--rule);border-radius:3px;
+  padding:14px 16px;margin:0;color:var(--ink-2);
+}
+figure{margin:0}
+figcaption{
+  font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;color:var(--ink-3);
+  margin-top:9px;
+}
+svg{max-width:100%;height:auto;display:block}
+.chartbox{
+  background:var(--panel);border:1px solid var(--rule);border-radius:3px;
+  padding:16px;overflow-x:auto;
+}
+.legend{
+  display:flex;flex-wrap:wrap;gap:16px;margin-top:10px;
+  font-family:var(--f-mono);font-size:11px;letter-spacing:.05em;color:var(--ink-3);
+}
+.swatch{display:inline-block;width:11px;height:11px;border-radius:1px;margin-right:6px;vertical-align:-1px}
+
+.rule{height:1px;background:var(--rule);border:0;margin:22px 0}
+
+@media (prefers-reduced-motion: reduce){
+  *{transition:none !important;animation:none !important}
+}
+@media (max-width:640px){
+  .slide{padding:66px 20px 76px;justify-content:flex-start}
+  p{max-width:none}
+}
+
+/* -- direction of goodness: REQUIRED on every number -------------------- */
+/* SR-WORK-BENCHMARK decision 10. Exactly one of .up / .down / .flat sits  */
+/* beside every metric, so a reader who does not know the metric can still */
+/* read the chart. `.dir` alone renders nothing -- pick a direction.       */
+.dir{
+  display:inline-block;font-family:var(--f-mono);font-size:10px;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;
+  padding:1px 5px;border-radius:2px;border:1px solid currentColor;
+  vertical-align:1px;margin-left:6px;
+}
+.dir.up{color:var(--pass)}
+.dir.down{color:var(--accent)}
+.dir.flat{color:var(--ink-3)}
+th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
+
+/* a capture with no number for THIS run says so -- it is never omitted */
+.nonumber{
+  border-left:2px dashed var(--ink-3);padding:6px 0 6px 14px;margin:0 0 14px;
+  color:var(--ink-3);font-size:14px;
+}
+.nonumber strong{color:var(--ink-2)}
+</style>
+<div class="tick" id="tick"></div>
+<main class="deck" id="deck">
+
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">Benchmark report <span class="dim">/ 2026&#8209;08&#8209;28&#8209;benchmark&#8209;contested / executed 2026&#8209;08&#8209;28</span></p>
+    <h1>A suite that <em>can</em><br>detect a ranking change</h1>
+    <p class="lead" style="max-width:62ch">The marker suite was saturated before it ran. This is its replacement: four candidates sharing the query&rsquo;s terms at <strong>equal term frequency, equal field and equal length</strong>, one correct answer, and a generator that <strong>asserts the headroom instead of assuming it</strong>.</p>
+    <hr class="rule">
+    <div class="grid g4">
+      <div><p class="statlabel">Arms</p><p class="stat sm">unchanged</p><p class="statnote"><span class="mono">1.0.0</span> vs <span class="mono">75ade57</span> &mdash; <strong>only the instrument differs</strong></p></div>
+      <div><p class="statlabel">Corpora</p><p class="stat sm">1 200 &middot; 10 000</p><p class="statnote">220 contested clusters; every finding re&#8209;checked at 8&times; the corpus</p></div>
+      <div><p class="statlabel">Per&#8209;query rows</p><p class="stat sm">1 900</p><p class="statnote">120 proximity &middot; 60 path &middot; 40 heading</p></div>
+      <div><p class="statlabel">Classification</p><p class="stat sm">informed</p><p class="statnote">no delta stated</p></div>
+    </div>
+    <p style="font-size:13px;color:var(--ink-3);margin-top:18px">⚠ <strong>Rebuilt 2026&#8209;09&#8209;13 into the report template.</strong> Every number is read from the filed run; <strong>no test was re&#8209;run</strong>, and the four captures this run never took say so rather than being dropped.</p>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">How to read this report <span class="dim">/ every number carries its direction</span></p>
+    <h2>Which way is <em>good</em>, stated on every metric</h2>
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th>marker</th><th>means</th><th>metrics it sits on in this run</th></tr></thead>
+        <tbody>
+          <tr><td><span class="dir up">&uarr; higher is better</span></td><td>a bigger number is a better engine</td><td class="k">target&#8209;at&#8209;rank&#8209;1 % &middot; marker hit@5 &middot; <span class="mono">b</span> &middot; candidates visible per cluster</td></tr>
+          <tr><td><span class="dir down">&darr; lower is better</span></td><td>a smaller number is a better engine</td><td class="k"><span class="mono">c</span></td></tr>
+          <tr><td><span class="dir flat">&mdash; neither</span></td><td><strong>a change is a signal, not a score</strong></td><td class="k">discordant count &middot; headroom &middot; <span class="mono">p</span> &middot; chance level</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout warn" style="margin-top:16px"><p>🔴 <strong>Read the chance level before the score.</strong> A four&#8209;candidate cluster is <strong>25 % by guessing</strong>. Both arms sit at <strong>21.7 %</strong> &mdash; so a number that looks like a fifth of the questions is <em>not better than chance</em>, and &ldquo;higher is better&rdquo; starts from 25, not 0.</p></div>
+    <p style="font-size:13px;color:var(--ink-3)">Captures with <strong>no number for this run</strong> keep their section and say so. <strong>Four of the seven have none</strong> &mdash; this suite measured ranking and nothing else, on purpose.</p>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">The result, before the detail <span class="dim">/ the pre-registered endpoints</span></p>
+    <h2>A null the instrument <em>could</em> have broken</h2>
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th>id</th><th>endpoint</th><th>verdict</th><th>measured</th></tr></thead>
+        <tbody>
+          <tr class="hi"><td class="k">C1</td><td>proximity, A vs B&#8209;core &mdash; <strong>primary</strong></td><td><span class="pill hold">no detected change</span></td><td class="k">0 discordant of 120 &middot; <span class="mono">p = 1.0</span> &middot; <strong>94 queries of headroom</strong> &middot; both arms <strong>21.7 %</strong></td></tr>
+          <tr><td class="k">C2</td><td>proximity, B&#8209;core vs B&#8209;tuned &mdash; <em>ablation</em></td><td><span class="pill pass">tuned better</span></td><td class="k">b = 94, c = 0 &middot; <span class="mono">p = 1.0e&#8209;28</span> &middot; 22 % &rarr; <strong>100 %</strong></td></tr>
+          <tr><td class="k">C3</td><td>path, A vs B&#8209;core</td><td><span class="pill pass">B better</span></td><td class="k">b = 60, c = 0 &middot; <span class="mono">p = 1.7e&#8209;18</span> &middot; 0 % &rarr; <strong>100 %</strong></td></tr>
+          <tr><td class="k">C4</td><td>heading &mdash; <em>negative control</em></td><td><span class="pill fail">inconclusive</span></td><td class="k">0 discordant of 40 &middot; <strong>0 queries of headroom</strong> &mdash; saturated at 100 % in both arms</td></tr>
+          <tr><td class="k">C5</td><td>null control &mdash; halt gate</td><td><span class="pill pass">pass</span></td><td class="k">380/380 substantive rows identical, arm A twice. <strong>Run first.</strong></td></tr>
+          <tr><td class="k">C6</td><td>headroom disclosure</td><td class="k">reported</td><td class="k">the line the previous pre&#8209;registration had no way to print</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout" style="margin-top:14px"><p><strong>C3 is a capability delta, not a ranking win</strong> &mdash; arm A has no <span class="mono">path</span> tf field, so the contest is near&#8209;tautological. <strong>C2 is an ablation and carries no version claim</strong>: it says the proximity reranker works and <strong>ships switched off</strong> (<span class="mono">rerank_weight = 0.0</span>).</p></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">The arms <span class="dim">/ evidence/ARMS.toml</span></p>
+    <h2>Deliberately the same two engines</h2>
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th>&nbsp;</th><th>arm A</th><th>arm B&#8209;core</th><th>arm B&#8209;tuned</th></tr></thead>
+        <tbody>
+          <tr><td>version</td><td class="k">fux 1.0.0</td><td class="k">fux 2.0.0&#8209;alpha.2</td><td class="k">B&#8209;core + one key</td></tr>
+          <tr><td>what it is</td><td class="k">the previous major</td><td class="k">shipped defaults</td><td class="k"><strong>an ablation</strong> &mdash; carries no version claim</td></tr>
+          <tr class="hi"><td>corpora</td><td class="k">t1200 &middot; t10000</td><td class="k">identical bytes</td><td class="k">identical bytes</td></tr>
+          <tr><td>regeneration</td><td class="k" colspan="3"><strong>byte&#8209;identical when regenerated</strong>, verified on both corpora</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout"><p>🔴 <strong>The arms are deliberately identical to the v1&#8209;vs&#8209;head run&rsquo;s, so only the instrument differs.</strong> That is what makes this run readable against that one &mdash; and it is the only thing about the two that is comparable.</p></div>
+    <p style="font-size:13px;color:var(--ink-3)">The pre&#8209;registration &mdash; <span class="mono">sha256 e8417b33…</span> &mdash; was written and on disk <strong>before the first corpus byte existed</strong>. Its ids are <span class="mono">C1</span>&ndash;<span class="mono">C6</span>: a new id space, because the <span class="mono">B</span> ids belong to a frozen document and may never be reused.</p>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">The null control <span class="dim">/ C5, a halt gate, run first</span></p>
+    <h2>Arm A against itself</h2>
+    <div class="grid g2">
+      <div class="card">
+        <p class="statlabel">nullcontrol &middot; t1200</p>
+        <p class="stat" style="color:var(--pass)">380/380<span class="dir up">&uarr; higher is better</span></p>
+        <p class="statnote">substantive rows identical, arm A twice</p>
+      </div>
+      <div class="card">
+        <h3>It is a gate, not a result</h3>
+        <p><strong>Everything above and below depends on it.</strong> A difference between two runs of the same arm is a broken harness, and it would be invisible in every table in this report.</p>
+      </div>
+    </div>
+    <hr class="rule">
+    <h3>The instrument has its own gate, and it is the point of the run</h3>
+    <p>The generator&rsquo;s <span class="mono">--selftest</span> <strong>asserts all four equalities &mdash; equal tf, equal field, equal length, path order &ne; role &mdash; and HALTS</strong> rather than reporting a number it cannot trust. <strong>The headroom is asserted, not assumed.</strong> Confirmed empirically: both bag&#8209;of&#8209;words arms landed at 21.7 % against a 25 % chance level, and <strong>all four candidates were visible in the top 10 in 120 of 120 clusters</strong> <span class="dir up">&uarr; higher is better</span> &mdash; so every contest was genuinely joined.</p>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">CAP&#8209;3 <span class="dim">/ the ranking endpoint, in this suite's own terms</span></p>
+    <h2>Both arms, indistinguishable from guessing</h2>
+    <div class="tblwrap">
+      <table>
+        <thead><tr>
+          <th>kind</th><th class="num">n</th>
+          <th class="num">arm A<span class="dir up">&uarr; higher is better</span></th>
+          <th class="num">arm B&#8209;core<span class="dir up">&uarr; higher is better</span></th>
+          <th class="num">chance<span class="dir flat">&mdash; the floor</span></th>
+          <th class="num">discordant<span class="dir flat">&mdash; neither</span></th>
+        </tr></thead>
+        <tbody>
+          <tr class="hi"><td class="k">proximity &middot; t1200</td><td class="num">120</td><td class="num">21.7 %</td><td class="num">21.7 %</td><td class="num">25 %</td><td class="num">0</td></tr>
+          <tr><td class="k">proximity &middot; t10000</td><td class="num">120</td><td class="num">29.2 %</td><td class="num">29.2 %</td><td class="num">25 %</td><td class="num">0</td></tr>
+          <tr><td class="k">path &middot; t1200</td><td class="num">60</td><td class="num">0 %</td><td class="num" style="color:var(--pass);font-weight:600">100 %</td><td class="num">25 %</td><td class="num">60</td></tr>
+          <tr><td class="k">heading &middot; t1200 <em>(control)</em></td><td class="num">40</td><td class="num">100 %</td><td class="num">100 %</td><td class="num">25 %</td><td class="num">0</td></tr>
+          <tr><td class="k">marker hit@5 <em>(control)</em></td><td class="num">120</td><td class="num">120/120</td><td class="num">120/120</td><td class="num">&mdash;</td><td class="num">0</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout warn" style="margin-top:14px"><p><strong>Both arms rise together at 8&times; the corpus</strong> (21.7 % &rarr; 29.2 %) and the discordant count stays 0 in both directions. <strong>The instrument is not scale&#8209;dependent and neither is the null.</strong></p></div>
+    <p class="nonumber"><strong><span class="mono">hit@1</span>, <span class="mono">hit@10</span>, <span class="mono">hit@20</span> and <span class="mono">hit@50</span>: no number exists for this run.</strong> Its endpoint is <em>target&#8209;at&#8209;rank&#8209;1 within a 4&#8209;candidate cluster</em>, which is not <span class="mono">hit@k</span> over a corpus. The five&#8209;column requirement postdates the run by sixteen days. <strong>Not re&#8209;run to fill it.</strong> The retained marker <span class="mono">hit@5</span> row above is a control, not the endpoint.</p>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">CAP&#8209;3 <span class="dim">/ headroom &mdash; the column this run was built to print</span></p>
+    <h2>94 of 120 clusters were free to change hands</h2>
+    <div class="tblwrap">
+      <table>
+        <thead><tr>
+          <th>endpoint</th><th class="num">n</th>
+          <th class="num">improvement headroom<span class="dir flat">&mdash; neither</span></th>
+          <th class="num">b<span class="dir up">&uarr; higher is better</span></th>
+          <th class="num">c<span class="dir down">&darr; lower is better</span></th>
+          <th class="num">p</th>
+          <th>what the null means</th>
+        </tr></thead>
+        <tbody>
+          <tr class="hi"><td class="k">C1 proximity</td><td class="num">120</td><td class="num" style="color:var(--pass);font-weight:600">94</td><td class="num">0</td><td class="num">0</td><td class="num">1.0</td><td><strong>about the engines</strong> &mdash; power 0.99 against a <span class="mono">pb .25 / pc .05</span> effect</td></tr>
+          <tr><td class="k">C3 path</td><td class="num">60</td><td class="num">60</td><td class="num">60</td><td class="num">0</td><td class="num">1.7e&#8209;18</td><td>a capability, not a ranking win</td></tr>
+          <tr><td class="k">C4 heading <em>(control)</em></td><td class="num">40</td><td class="num" style="color:var(--fail);font-weight:600">0</td><td class="num">0</td><td class="num">0</td><td class="num">1.0</td><td>🔴 <strong>a ceiling</strong> &mdash; it returned the right answer for the wrong reason</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout" style="margin-top:14px"><p>🔴 <strong>This is the first suite in the project whose null is load&#8209;bearing.</strong> The previous run&rsquo;s null could not be told apart from a broken instrument; this one can, because the corpus <em>asserts</em> that 94 clusters could have changed hands and none did.</p></div>
+    <div class="callout warn"><p><strong>C4 is Inconclusive, not Pass, and the run&rsquo;s own headroom column is what caught it.</strong> A negative control with zero headroom did not discharge its job &mdash; it must be rebuilt before it is cited as a control again.</p></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">CAP&#8209;4 <span class="dim">/ the answer layer</span></p>
+    <h2>Not asked by this run</h2>
+    <p class="nonumber"><strong>No number exists for this run.</strong> This is a <em>ranking</em> suite: it measures whether an engine puts the target first among four equally&#8209;evidenced candidates. <strong>It contains no unanswerable questions and never calls <span class="mono">answer</span></strong>, so there is nothing to report as answered, declined or fabricated. <strong>Not re&#8209;run to produce one.</strong></p>
+    <div class="grid g2">
+      <div class="card"><h3>Where the question was asked instead</h3><p>Its sibling on the same two arms &mdash; <span class="mono">2026&#8209;08&#8209;28&#8209;benchmark&#8209;v1&#8209;vs&#8209;head</span> &mdash; planted 20 unanswerables and <strong>both arms answered all 20</strong>. That run&rsquo;s CAP&#8209;4 section carries it.</p></div>
+      <div class="card"><h3>Why the gap is stated</h3><p>&ldquo;Correct&rdquo; here is <strong>declared by construction, not true</strong>: the base documents state no facts. This suite measures whether an engine prefers co&#8209;occurrence and whether it can see a filename &mdash; <strong>never whether a document answers anything.</strong></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">CAP&#8209;1 &middot; CAP&#8209;2 <span class="dim">/ the ranked lists, and what moved</span></p>
+    <h2>Not captured by this run</h2>
+    <p class="nonumber"><strong>No number exists for this run, in either capture.</strong> The filed rows are <strong>per&#8209;query outcomes</strong> &mdash; 1 900 of them, one per query per arm per tier, which is what makes every test above recomputable &mdash; but the <strong>ordered lists themselves were not retained</strong>, so there is no diff and no per&#8209;document rank delta. <strong>The run is frozen and was not re&#8209;executed.</strong></p>
+    <div class="callout"><p>Within the contest, the equivalent question <em>was</em> answered: <strong>all four candidates were visible in the top 10 in 120 of 120 clusters</strong>. That is a statement about the contest being joined, not about the corpus&#8209;wide ordering.</p></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">CAP&#8209;5 &middot; CAP&#8209;6 <span class="dim">/ index size and speed</span></p>
+    <h2>Neither was measured, and the run says so</h2>
+    <p class="nonumber"><strong>CAP&#8209;5 &mdash; committed index size: no number exists for this run.</strong> The plan measured quality only; no index byte count, bytes/document or shard count was taken on either corpus.</p>
+    <p class="nonumber"><strong>CAP&#8209;6 &mdash; speed: no number exists for this run.</strong> The report states it outright &mdash; <em>&ldquo;no wall&#8209;clock claim&hellip; latency was not re&#8209;measured and the previous run&rsquo;s B5/B6 stand unchallenged.&rdquo;</em> <strong>Not re&#8209;run to fill it</strong>, and the earlier run&rsquo;s numbers are that run&rsquo;s, on a different corpus.</p>
+    <div class="grid g2">
+      <div class="card"><h3>Why this is a deliberate gap</h3><p>The two arms and the two corpora were fixed so that <strong>only the instrument differed</strong> from the sibling run. Re&#8209;measuring bytes and latency would have added nothing the sibling did not already carry &mdash; and the sibling&rsquo;s numbers were taken on a different corpus, so <strong>they are not this run&rsquo;s.</strong></p></div>
+      <div class="card"><h3>What the capture set changed</h3><p>From 2026&#8209;09&#8209;13 a run files <strong>all seven or is not filed as a benchmark</strong>. That is the rule this gap argued for: <strong>two sibling runs that cannot be read as one because each took a different half.</strong></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">Guard rails <span class="dim">/ what this run may never be used to say</span></p>
+    <h2>What this run does <em>not</em> do</h2>
+    <div class="grid g4">
+      <div class="card"><h3>It states no delta</h3><p>One session wrote the generator and read the scores, so the run is <span class="mono">informed</span>. It may be filed, listed and cited. <strong>It is not a generalisation estimate.</strong></p></div>
+      <div class="card"><h3>A null is not equality</h3><p>C1 says these engines do not separate <em>these</em> clusters. With headroom that is a real statement about the engines &mdash; <strong>it is still not &ldquo;they retrieve equally well&rdquo;.</strong></p></div>
+      <div class="card"><h3>No default may move from here</h3><p>C2 is an ablation on a corpus that <strong>rewards exactly what the reranker does</strong>; <span class="mono">c = 0</span> is a property of the generator. On hand&#8209;graded text the same reranker is worth <strong>28 &rarr; 32</strong>. <strong>Doing nothing is legitimate.</strong></p></div>
+      <div class="card"><h3>It captures three of seven</h3><p><strong>CAP&#8209;1, CAP&#8209;2, CAP&#8209;4 and CAP&#8209;5/6 have no number here</strong>, and <span class="mono">hit@k</span> is not this suite&rsquo;s endpoint. The gaps are named, never filled after the fact.</p></div>
+    </div>
+    <hr class="rule">
+    <p style="font-size:13px;color:var(--ink-3);margin:18px 0 0">The run is <span class="mono">work/regression/2026&#8209;08&#8209;28&#8209;benchmark&#8209;contested/</span> &mdash; <span class="mono">report.md</span>, <span class="mono">ANALYSIS.md</span>, five <span class="mono">VERDICT</span> files, <span class="mono">DISCLOSURE&#8209;C6.md</span>, <span class="mono">evidence/rows/</span>. Frozen pre&#8209;registration: <span class="mono">work/benchmark/PRE-REGISTRATION-CONTESTED.md</span>. <strong>This report carries no number that run does not.</strong> What must be here at all: <span class="mono">records/0053_WORK-benchmark.md</span>.</p>
+  </div>
+</section>
+
+</main>
+
+<div class="hint" id="hint">&larr; &rarr; to move</div>
+<div class="counter">
+  <button class="navbtn" id="prev" aria-label="Previous slide">prev</button>
+  <span id="pos" aria-live="polite">01 / 11</span>
+  <button class="navbtn" id="next" aria-label="Next slide">next</button>
+</div>
+<script>
+(function () {
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var pos = document.getElementById('pos');
+  var tick = document.getElementById('tick');
+  var i = 0;
+
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+
+  function show(n) {
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function (s, k) { s.classList.toggle('active', k === i); });
+    pos.textContent = pad(i + 1) + ' / ' + pad(slides.length);
+    tick.style.setProperty('--progress', ((i + 1) / slides.length * 100) + '%');
+    window.scrollTo(0, 0);
+    try { location.hash = 's' + (i + 1); } catch (e) {}
+  }
+
+  document.getElementById('next').addEventListener('click', function () { show(i + 1); });
+  document.getElementById('prev').addEventListener('click', function () { show(i - 1); });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { show(i + 1); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { show(i - 1); e.preventDefault(); }
+    else if (e.key === 'Home') { show(0); e.preventDefault(); }
+    else if (e.key === 'End') { show(slides.length - 1); e.preventDefault(); }
+  });
+
+  var start = null;
+  document.addEventListener('touchstart', function (e) { start = e.changedTouches[0].clientX; }, {passive: true});
+  document.addEventListener('touchend', function (e) {
+    if (start === null) return;
+    var dx = e.changedTouches[0].clientX - start;
+    if (Math.abs(dx) > 55) { show(dx < 0 ? i + 1 : i - 1); }
+    start = null;
+  }, {passive: true});
+
+  var m = (location.hash || '').match(/^#s(\d+)$/);
+  show(m ? parseInt(m[1], 10) - 1 : 0);
+
+  setTimeout(function () {
+    var h = document.getElementById('hint');
+    if (h) { h.style.transition = 'opacity .6s'; h.style.opacity = '0'; }
+  }, 4200);
+})();
+</script>

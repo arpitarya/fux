@@ -58,6 +58,7 @@ version-named directories.
 archive/
   README.md              this map
   adr/                   superseded decision records — old number -> successor NAME
+  benchmark-reports/     benchmark HTML superseded by a dated report under work/benchmark/reports/
   handoff/               executed handoff + prompt pairs of the current build
   open/                  closed work items — the detail file, once its row left the queue
   templates/             retired shipped-fetcher code, lifted out of src/fux/templates/
@@ -67,6 +68,28 @@ archive/
   v0.26-implemented/     build: that line's executed artifacts
   v0.30-rev1-planning/   the rebuild's research phase, frozen
 ```
+
+## `benchmark-reports/` — benchmark HTML superseded by the dated reports
+
+**Retired 2026-09-13.** Every benchmark HTML now lives at one path —
+[`work/benchmark/reports/<yyyy-mm-dd>-<run>.html`](../work/benchmark/reports/README.md),
+one per run, generated from
+[`TEMPLATE.html`](../work/benchmark/reports/TEMPLATE.html) against
+[SR-WORK-BENCHMARK](../records/0053_WORK-benchmark.md). These four are what was
+there before, kept rather than deleted.
+
+| archived | what it was | live successor |
+|---|---|---|
+| `2026-08-28-benchmark-v1-vs-head-handbuilt-deck.html` | the 18-slide deck a session wrote by hand, at `work/benchmark/benchmark-v1-vs-head.html` | [`reports/2026-08-28-benchmark-v1-vs-head.html`](../work/benchmark/reports/2026-08-28-benchmark-v1-vs-head.html) |
+| `2026-08-28-benchmark-contested-handbuilt-deck.html` | the 12-slide deck, at `work/benchmark/benchmark-contested.html` | [`reports/2026-08-28-benchmark-contested.html`](../work/benchmark/reports/2026-08-28-benchmark-contested.html) |
+| `2026-09-13-benchmark-captures-handbuilt-deck.html` | the 17-slide deck, at `work/benchmark/benchmark-captures.html` | [`reports/2026-09-13-benchmark-captures.html`](../work/benchmark/reports/2026-09-13-benchmark-captures.html) |
+| `2026-09-13-benchmark-captures-harness-emitter.html` | 🔴 **the harness's own CAP-7**, at `work/regression/2026-09-13-benchmark-captures/benchmark.html` — the first and so far only automatically generated benchmark report | the same successor as the row above; **the harness emitting into the new path and shape is owed as W-158** |
+
+⚠ **Archive is not evidence.** These may be named — *"the deck this replaced"* —
+and never cited as backing a live claim. Every number they carry is in the filed
+run under [`work/regression/`](../work/regression/README.md), which is where a
+citation goes.
+
 
 ## Superseded decision records
 

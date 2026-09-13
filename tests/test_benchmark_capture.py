@@ -6,6 +6,13 @@ arms, `hit@k` at 1/5/10/20/50, the answer layer with its planted unanswerables,
 the committed index size, the speed, and an HTML report. This module is that
 record's enforcement -- a `kind: process` record owns its enforcing test.
 
+**Where CAP-7 lives, and why it is not beside its evidence.** Decision 7 was
+amended on 2026-09-13: the six evidence captures stay with their run under
+`work/regression/`, and the HTML report lives at one path for every run --
+`work/benchmark/reports/<yyyy-mm-dd>-<run>.html`, the run directory's own name
+with `.html` on the end. The pairing is mechanical, which is the whole reason
+the naming rule is a rule.
+
 **Why a file-existence check and not a content one.** The captures are produced
 by a harness that lives outside this repo (`fux-benchmark`, per
 SR-WORK-ENVIRONMENTS), so what this repo can assert is what was *filed*: that
@@ -28,6 +35,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 REGRESSION = ROOT / "work" / "regression"
+REPORTS = ROOT / "work" / "benchmark" / "reports"
 RECORD = ROOT / "records" / "0053_WORK-benchmark.md"
 
 # SR-WORK-BENCHMARK, ruled by Arpit 2026-09-13. A run directory is dated by its
@@ -64,11 +72,11 @@ def runs() -> list[Path]:
     )
 
 
-def _missing(run: Path) -> list[str]:
+def _missing(run: Path, reports: Path = REPORTS) -> list[str]:
     evidence = run / "evidence"
     missing = [f"{name} -- {why}" for name, why in REQUIRED_EVIDENCE.items() if not (evidence / name).is_file()]
-    if not list(run.glob("*.html")):
-        missing.append("*.html -- CAP-7 the HTML report, generated every run")
+    if not (reports / f"{run.name}.html").is_file():
+        missing.append(f"{run.name}.html -- CAP-7, in work/benchmark/reports/, one per run, always")
     return missing
 
 
@@ -95,29 +103,56 @@ def test_the_baseline_is_the_one_the_record_states() -> None:
     assert CAPTURE_SINCE in text, "the record must state the baseline this module enforces"
 
 
-def _make_run(root: Path, name: str, *, complete: bool, html: bool = True) -> Path:
-    run = root / name
+def _make_run(root: Path, name: str, *, complete: bool, html: bool = True) -> tuple[Path, Path]:
+    run = root / "regression" / name
     (run / "evidence").mkdir(parents=True)
     names = list(REQUIRED_EVIDENCE) if complete else list(REQUIRED_EVIDENCE)[:-1]
     for f in names:
         (run / "evidence" / f).write_text("", encoding="utf-8")
+    reports = root / "reports"
+    reports.mkdir(exist_ok=True)
     if html:
-        (run / "benchmark.html").write_text("<!doctype html>", encoding="utf-8")
-    return run
+        (reports / f"{name}.html").write_text("<!doctype html>", encoding="utf-8")
+    return run, reports
 
 
 def test_a_complete_run_passes(tmp_path: Path) -> None:
-    assert _missing(_make_run(tmp_path, "2026-09-20-benchmark-x", complete=True)) == []
+    assert _missing(*_make_run(tmp_path, "2026-09-20-benchmark-x", complete=True)) == []
 
 
 def test_a_run_missing_one_capture_fails(tmp_path: Path) -> None:
-    missing = _missing(_make_run(tmp_path, "2026-09-20-benchmark-x", complete=False))
+    missing = _missing(*_make_run(tmp_path, "2026-09-20-benchmark-x", complete=False))
     assert len(missing) == 1 and missing[0].startswith("latency.csv")
 
 
 def test_a_run_with_no_html_report_fails(tmp_path: Path) -> None:
-    missing = _missing(_make_run(tmp_path, "2026-09-20-benchmark-x", complete=True, html=False))
-    assert missing == ["*.html -- CAP-7 the HTML report, generated every run"]
+    missing = _missing(*_make_run(tmp_path, "2026-09-20-benchmark-x", complete=True, html=False))
+    assert missing == ["2026-09-20-benchmark-x.html -- CAP-7, in work/benchmark/reports/, one per run, always"]
+
+
+def test_the_html_beside_the_evidence_no_longer_counts(tmp_path: Path) -> None:
+    """The pre-amendment layout must FAIL, or the move was not enforced."""
+    run, reports = _make_run(tmp_path, "2026-09-20-benchmark-x", complete=True, html=False)
+    (run / "benchmark.html").write_text("<!doctype html>", encoding="utf-8")
+    assert _missing(run, reports) != []
+
+
+def test_the_record_names_the_report_directory_and_the_naming_rule() -> None:
+    text = RECORD.read_text(encoding="utf-8")
+    assert "work/benchmark/reports/" in text, "decision 7 must name the one home for CAP-7"
+    assert "<yyyy-mm-dd>-<run>.html" in text, "decision 7 must state the naming rule this module enforces"
+
+
+def test_every_report_in_the_directory_pairs_with_a_filed_run() -> None:
+    """A report with no run is as broken as a run with no report."""
+    if not REPORTS.is_dir():
+        pytest.skip("no reports directory")
+    orphans = [
+        p.name
+        for p in sorted(REPORTS.glob("*.html"))
+        if p.name != "TEMPLATE.html" and not (REGRESSION / p.stem).is_dir()
+    ]
+    assert not orphans, f"reports with no run under work/regression/: {orphans}"
 
 
 @pytest.mark.parametrize(

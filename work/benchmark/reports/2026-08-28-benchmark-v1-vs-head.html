@@ -1,0 +1,587 @@
+<title>Fux 1.0.0 vs HEAD — 2026-08-28</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<!-- Chart colour: arm A is an INTENTIONAL neutral baseline (--ink-3) against one
+     accent hue (--accent). Validated with the dataviz validator: adjacent-pair
+     separation is the strongest available -- light dE 17.1 normal / 14.1 protan,
+     dark 20.2 / 18.7 -- and raising the accent chroma CONVERGES the lightness and
+     drops separation below the floor. The validator flags the neutral on its
+     chroma floor by design; identity is never colour-alone here (legend + a direct
+     value label on every mark), which is the required secondary encoding.
+     Do not "fix" this into a two-hue palette without re-running the validator. -->
+<style>
+/* -- tokens: light is the base, both dark paths redefine only tokens ----- */
+:root{
+  --paper:#F6F4EF;
+  --panel:#FFFFFF;
+  --ink:#141A1D;
+  --ink-2:#4A555B;
+  --ink-3:#7A858B;
+  --rule:#D8D2C6;
+  --rule-2:#EAE5DA;
+  --accent:#0F5F73;
+  --accent-soft:#0F5F7318;
+  --pass:#2F7A45;
+  --fail:#B23A2E;
+  --hold:#8C6714;
+  --shadow:0 1px 0 rgba(20,26,29,.06), 0 8px 28px -18px rgba(20,26,29,.35);
+
+  --f-display:"Newsreader",Georgia,"Times New Roman",serif;
+  --f-body:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0C1215;
+    --panel:#111A1E;
+    --ink:#E7EEF0;
+    --ink-2:#9FB0B6;
+    --ink-3:#6D8087;
+    --rule:#22333A;
+    --rule-2:#182429;
+    --accent:#5FC7D9;
+    --accent-soft:#5FC7D91F;
+    --pass:#6BC98A;
+    --fail:#EE8878;
+    --hold:#D7B15A;
+    --shadow:0 1px 0 rgba(0,0,0,.4), 0 10px 30px -18px rgba(0,0,0,.9);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0C1215;
+  --panel:#111A1E;
+  --ink:#E7EEF0;
+  --ink-2:#9FB0B6;
+  --ink-3:#6D8087;
+  --rule:#22333A;
+  --rule-2:#182429;
+  --accent:#5FC7D9;
+  --accent-soft:#5FC7D91F;
+  --pass:#6BC98A;
+  --fail:#EE8878;
+  --hold:#D7B15A;
+  --shadow:0 1px 0 rgba(0,0,0,.4), 0 10px 30px -18px rgba(0,0,0,.9);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--f-body);
+  font-size:16px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* -- deck chrome -------------------------------------------------------- */
+.deck{position:relative;min-height:100vh}
+
+.tick{
+  position:fixed;inset:0 0 auto 0;height:22px;z-index:40;
+  background:var(--paper);
+  border-bottom:1px solid var(--rule);
+  background-image:repeating-linear-gradient(to right,var(--rule) 0 1px,transparent 1px 40px);
+  background-position:0 12px;background-size:40px 10px;background-repeat:repeat-x;
+}
+.tick::after{
+  content:"";position:absolute;left:0;top:0;height:100%;
+  width:var(--progress,0%);
+  background:var(--accent-soft);
+  border-right:2px solid var(--accent);
+  transition:width .25s ease;
+}
+
+.slide{
+  display:none;
+  min-height:100vh;
+  padding:76px clamp(22px,5vw,72px) 84px;
+  flex-direction:column;
+  justify-content:center;
+}
+.slide.active{display:flex}
+.wrap{width:100%;max-width:1080px;margin:0 auto}
+
+.eyebrow{
+  font-family:var(--f-mono);font-size:11.5px;font-weight:500;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--accent);
+  margin:0 0 14px;
+}
+.eyebrow .dim{color:var(--ink-3)}
+
+h1{
+  font-family:var(--f-display);font-weight:600;
+  font-size:clamp(38px,6.4vw,74px);line-height:1.03;letter-spacing:-.02em;
+  text-wrap:balance;margin:0 0 18px;
+}
+h2{
+  font-family:var(--f-display);font-weight:600;
+  font-size:clamp(27px,3.5vw,42px);line-height:1.1;letter-spacing:-.015em;
+  text-wrap:balance;margin:0 0 16px;
+}
+h3{
+  font-family:var(--f-body);font-weight:600;font-size:15px;
+  letter-spacing:.01em;margin:0 0 8px;
+}
+p{margin:0 0 12px;max-width:66ch;color:var(--ink-2)}
+p.lead{font-size:19px;line-height:1.5;color:var(--ink)}
+p strong,li strong{color:var(--ink);font-weight:600}
+em{font-style:italic}
+a{color:var(--accent)}
+
+.counter{
+  position:fixed;right:clamp(16px,4vw,32px);bottom:16px;z-index:40;
+  font-family:var(--f-mono);font-size:11.5px;color:var(--ink-3);
+  letter-spacing:.08em;
+  display:flex;gap:14px;align-items:center;
+}
+.navbtn{
+  font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em;
+  background:none;border:1px solid var(--rule);color:var(--ink-2);
+  padding:4px 9px;cursor:pointer;border-radius:2px;
+}
+.navbtn:hover{border-color:var(--accent);color:var(--accent)}
+.navbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.hint{
+  position:fixed;left:clamp(16px,4vw,32px);bottom:16px;z-index:40;
+  font-family:var(--f-mono);font-size:11px;color:var(--ink-3);letter-spacing:.06em;
+}
+
+/* -- content pieces ----------------------------------------------------- */
+.grid{display:grid;gap:18px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(178px,1fr))}
+
+.card{
+  background:var(--panel);border:1px solid var(--rule);border-radius:3px;
+  padding:16px 18px;box-shadow:var(--shadow);
+}
+.card p{margin-bottom:0;font-size:14px}
+.card p + p{margin-top:9px}
+
+.stat{
+  font-family:var(--f-mono);font-variant-numeric:tabular-nums;
+  font-size:clamp(26px,3.4vw,38px);font-weight:500;line-height:1;
+  letter-spacing:-.02em;color:var(--ink);margin:6px 0 6px;
+}
+.stat.sm{font-size:clamp(20px,2.4vw,26px)}
+.statlabel{
+  font-family:var(--f-mono);font-size:10.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-3);
+}
+.statnote{font-size:13px;color:var(--ink-2);margin:0}
+
+.tblwrap{overflow-x:auto;border:1px solid var(--rule);border-radius:3px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:520px}
+th,td{padding:9px 13px;text-align:left;border-bottom:1px solid var(--rule-2);vertical-align:top}
+thead th{
+  font-family:var(--f-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:500;border-bottom:1px solid var(--rule);white-space:nowrap;
+}
+tbody tr:last-child td{border-bottom:none}
+td.num,th.num{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+td.k{font-family:var(--f-mono);font-size:12.5px;color:var(--ink)}
+tr.hi td{background:var(--accent-soft)}
+
+.pill{
+  display:inline-block;font-family:var(--f-mono);font-size:10.5px;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:2px;
+  border:1px solid currentColor;white-space:nowrap;
+}
+.pass{color:var(--pass)}
+.fail{color:var(--fail)}
+.hold{color:var(--hold)}
+.info{color:var(--accent)}
+
+ul,ol{margin:0 0 12px;padding-left:20px;color:var(--ink-2);max-width:68ch}
+li{margin-bottom:8px}
+li::marker{color:var(--ink-3)}
+ol.recs{list-style:none;padding-left:0;counter-reset:r}
+ol.recs > li{
+  counter-increment:r;position:relative;padding-left:44px;margin-bottom:16px;max-width:74ch;
+}
+ol.recs > li::before{
+  content:"R" counter(r);position:absolute;left:0;top:1px;
+  font-family:var(--f-mono);font-size:11px;font-weight:600;letter-spacing:.06em;
+  color:var(--accent);border:1px solid var(--accent);border-radius:2px;padding:2px 6px;
+}
+
+.callout{
+  border-left:2px solid var(--accent);padding:2px 0 2px 16px;margin:0 0 14px;
+}
+.callout.warn{border-left-color:var(--fail)}
+.callout p:last-child{margin-bottom:0}
+
+code,.mono{font-family:var(--f-mono);font-size:.9em}
+code{background:var(--accent-soft);padding:1px 4px;border-radius:2px;color:var(--ink)}
+pre{
+  font-family:var(--f-mono);font-size:12.5px;line-height:1.6;overflow-x:auto;
+  background:var(--panel);border:1px solid var(--rule);border-radius:3px;
+  padding:14px 16px;margin:0;color:var(--ink-2);
+}
+figure{margin:0}
+figcaption{
+  font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;color:var(--ink-3);
+  margin-top:9px;
+}
+svg{max-width:100%;height:auto;display:block}
+.chartbox{
+  background:var(--panel);border:1px solid var(--rule);border-radius:3px;
+  padding:16px;overflow-x:auto;
+}
+.legend{
+  display:flex;flex-wrap:wrap;gap:16px;margin-top:10px;
+  font-family:var(--f-mono);font-size:11px;letter-spacing:.05em;color:var(--ink-3);
+}
+.swatch{display:inline-block;width:11px;height:11px;border-radius:1px;margin-right:6px;vertical-align:-1px}
+
+.rule{height:1px;background:var(--rule);border:0;margin:22px 0}
+
+@media (prefers-reduced-motion: reduce){
+  *{transition:none !important;animation:none !important}
+}
+@media (max-width:640px){
+  .slide{padding:66px 20px 76px;justify-content:flex-start}
+  p{max-width:none}
+}
+
+/* -- direction of goodness: REQUIRED on every number -------------------- */
+/* SR-WORK-BENCHMARK decision 10. Exactly one of .up / .down / .flat sits  */
+/* beside every metric, so a reader who does not know the metric can still */
+/* read the chart. `.dir` alone renders nothing -- pick a direction.       */
+.dir{
+  display:inline-block;font-family:var(--f-mono);font-size:10px;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;
+  padding:1px 5px;border-radius:2px;border:1px solid currentColor;
+  vertical-align:1px;margin-left:6px;
+}
+.dir.up{color:var(--pass)}
+.dir.down{color:var(--accent)}
+.dir.flat{color:var(--ink-3)}
+th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
+
+/* a capture with no number for THIS run says so -- it is never omitted */
+.nonumber{
+  border-left:2px dashed var(--ink-3);padding:6px 0 6px 14px;margin:0 0 14px;
+  color:var(--ink-3);font-size:14px;
+}
+.nonumber strong{color:var(--ink-2)}
+</style>
+<div class="tick" id="tick"></div>
+<main class="deck" id="deck">
+
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">Benchmark report <span class="dim">/ 2026&#8209;08&#8209;28&#8209;benchmark&#8209;v1&#8209;vs&#8209;head / executed 2026&#8209;08&#8209;28</span></p>
+    <h1>Every paired test<br>returned <em>zero</em></h1>
+    <p class="lead" style="max-width:62ch">Not a small delta &mdash; <strong>no query changed its outcome in either direction</strong>, on any tier, on any suite. The primary endpoint turned out to be <strong>saturated before it ran</strong>, and the supersession endpoint failed its predicted pass for a reason nobody had guessed.</p>
+    <hr class="rule">
+    <div class="grid g4">
+      <div><p class="statlabel">Arms</p><p class="stat sm">1.0.0 &rarr; alpha.2</p><p class="statnote">two engines resident at once, one venv each, CPython 3.11.15</p></div>
+      <div><p class="statlabel">Corpora</p><p class="stat sm">100 / 1k / 10k</p><p class="statnote">one generated corpus, three tiers, byte&#8209;identical per arm</p></div>
+      <div><p class="statlabel">Questions</p><p class="stat sm">240 &times; 3</p><p class="statnote">marker queries per tier, + 40 chains + 20 unanswerables + decoys</p></div>
+      <div><p class="statlabel">Classification</p><p class="stat sm">informed</p><p class="statnote">no delta stated &mdash; one session wrote the generator and read the scores</p></div>
+    </div>
+    <p style="font-size:13px;color:var(--ink-3);margin-top:18px">⚠ <strong>Rebuilt 2026&#8209;09&#8209;13 into the report template.</strong> Every number is read from the filed run; <strong>no test was re-run</strong>, and captures this run never took say so rather than being dropped.</p>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">How to read this report <span class="dim">/ every number carries its direction</span></p>
+    <h2>Which way is <em>good</em>, stated on every metric</h2>
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th>marker</th><th>means</th><th>metrics it sits on in this run</th></tr></thead>
+        <tbody>
+          <tr><td><span class="dir up">&uarr; higher is better</span></td><td>a bigger number is a better engine</td><td class="k">hit@5 &middot; hit@10 &middot; rank&#8209;1 &middot; declined&#8209;when&#8209;unanswerable &middot; <span class="mono">b</span></td></tr>
+          <tr><td><span class="dir down">&darr; lower is better</span></td><td>a smaller number is a better engine</td><td class="k">ask p50/p95 &middot; ingest &middot; build &middot; index bytes &middot; wheel bytes &middot; fabricated &middot; chain inversions &middot; <span class="mono">c</span></td></tr>
+          <tr><td><span class="dir flat">&mdash; neither</span></td><td><strong>a change is a signal, not a score</strong></td><td class="k">shards &middot; discordant count &middot; headroom &middot; decoys reaching the top 5</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout warn" style="margin-top:18px"><p><strong>&ldquo;Better&rdquo; means better on THIS instrument, and nothing more.</strong> A direction marker says which way a metric points; it never says the difference is real or large enough to act on. <strong>That is a person reading the rows.</strong></p></div>
+    <p style="font-size:13px;color:var(--ink-3)">Captures with <strong>no number for this run</strong> keep their section and say so &mdash; this run predates the capture set, and three of the seven were never taken.</p>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">The result, before the detail <span class="dim">/ the pre-registered endpoints</span></p>
+    <h2>Two nulls, one failure, and a gate that did its job</h2>
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th>id</th><th>endpoint</th><th>verdict</th><th>measured</th></tr></thead>
+        <tbody>
+          <tr><td class="k">B1</td><td>retrieval quality, tier 1 000 &mdash; <strong>primary</strong></td><td><span class="pill hold">inconclusive</span></td><td class="k">0 discordant of 240 &middot; p = 1.0 &mdash; <strong>and hit@5 240/240 in BOTH arms</strong></td></tr>
+          <tr class="hi"><td class="k">B2</td><td>supersession &mdash; current ranks first</td><td><span class="pill fail">fail</span></td><td class="k">both arms invert <strong>21 of 40</strong> at tier 1 000 &mdash; <span class="mono">superseded_weight</span> ships at <span class="mono">1.0</span>, a no&#8209;op</td></tr>
+          <tr><td class="k">B3</td><td>committed bytes and wheel</td><td><span class="pill pass">pass</span></td><td class="k">index 1.002 &times; &middot; wheel 7.11 MB &rarr; 259 KB &middot; <strong>no <span class="mono">int8</span> vectors committed</strong></td></tr>
+          <tr><td class="k">B5 / B6</td><td>query and ingest latency</td><td><span class="pill pass">pass</span></td><td class="k">ask p95 1.32 &times; (bar 1.5 &times;) &middot; cold ingest 1.04 &times; (bar 2.0 &times;)</td></tr>
+          <tr><td class="k">B7</td><td>declining on unanswerables</td><td><span class="pill hold">inconclusive</span></td><td class="k">0 of 20 declined in both arms &mdash; a generated corpus can only test declining when <em>nothing</em> matches</td></tr>
+          <tr><td class="k">B9</td><td>null control &mdash; run first</td><td><span class="pill pass">pass</span></td><td class="k">300/300 identical rows &middot; 0 discordant across seeds</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout" style="margin-top:16px"><p><strong><span class="mono">B4</span> and <span class="mono">B8</span> do not exist.</strong> The item says &ldquo;thresholds B1&ndash;B9&rdquo;; the frozen document defines seven ids. <strong>Nothing was skipped &mdash; two ids were never written.</strong></p></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">The arms <span class="dim">/ evidence/ARMS.toml</span></p>
+    <h2>Two engines resident at once</h2>
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th>&nbsp;</th><th>arm A</th><th>arm B</th></tr></thead>
+        <tbody>
+          <tr><td>version</td><td class="k">fux&#8209;engine 1.0.0</td><td class="k">2.0.0&#8209;alpha.2 @ <span class="mono">75ade57</span></td></tr>
+          <tr><td>python</td><td class="k">3.11.15</td><td class="k">3.11.15</td></tr>
+          <tr class="hi"><td>corpus</td><td class="k">one generated corpus</td><td class="k">its own copy of <strong>identical bytes</strong></td></tr>
+          <tr><td>record shape</td><td class="k">fux.index.v1</td><td class="k">fux.index.v2</td></tr>
+          <tr><td><span class="mono">tf_fields</span></td><td class="k">["heading","body"]</td><td class="k">["body","heading","title","path","ctx"]</td></tr>
+          <tr><td>dense lane</td><td class="k">document records carry <span class="mono">code</span></td><td class="k"><strong>absent</strong> &mdash; B3's one named check, read from a record</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout"><p><strong>The frozen <span class="mono">HEAD</span> was written into the pre-registration before the first command ran.</strong> The differential law was checked before any <span class="mono">--fast</span> number was produced: <span class="mono">ask --fast</span> and <span class="mono">ask --scan</span> byte&#8209;identical across all 240 queries, 0 mismatches.</p></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">The null control <span class="dim">/ B9, run first, in two halves</span></p>
+    <h2>Arm A against itself</h2>
+    <div class="grid g3">
+      <div class="card">
+        <p class="statlabel">same corpus, twice</p>
+        <p class="stat sm" style="color:var(--pass)">300/300<span class="dir up">&uarr; higher is better</span></p>
+        <p class="statnote">identical rows</p>
+      </div>
+      <div class="card">
+        <p class="statlabel">arm A vs arm A&prime;, second seed</p>
+        <p class="stat sm" style="color:var(--pass)">0 discordant<span class="dir down">&darr; lower is better</span></p>
+        <p class="statnote"><span class="mono">p = 1.0</span></p>
+      </div>
+      <div class="card">
+        <h3>Run first, deliberately</h3>
+        <p><strong>No number in this report was produced before this gate passed.</strong></p>
+      </div>
+    </div>
+    <hr class="rule">
+    <div class="callout warn"><p>⚠ <strong>A method correction filed later:</strong> a cross&#8209;seed pairing compares <em>different questions</em> &mdash; it is a rate check, not a determinism check. <strong>B9 carries that weakness</strong>, named by the contested run that found it.</p></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">CAP&#8209;3 <span class="dim">/ hit@k &mdash; and why it could not move</span></p>
+    <h2>Both arms perfect, on every tier</h2>
+    <div class="tblwrap">
+      <table>
+        <thead><tr>
+          <th class="num">tier</th><th>arm</th>
+          <th class="num">rank&#8209;1<span class="dir up">&uarr; higher is better</span></th>
+          <th class="num">hit@5<span class="dir up">&uarr; higher is better</span></th>
+          <th class="num">hit@10<span class="dir up">&uarr; higher is better</span></th>
+          <th class="num">MRR@10<span class="dir up">&uarr; higher is better</span></th>
+          <th class="num">chain inversions<span class="dir down">&darr; lower is better</span></th>
+        </tr></thead>
+        <tbody>
+          <tr><td class="num">100</td><td class="k">A / B</td><td class="num">240/240</td><td class="num">240/240</td><td class="num">240/240</td><td class="num">1.0000</td><td class="num">5/10 &middot; 5/10</td></tr>
+          <tr class="hi"><td class="num">1 000</td><td class="k">A / B</td><td class="num">240/240</td><td class="num">240/240</td><td class="num">240/240</td><td class="num">1.0000</td><td class="num">21/40 &middot; 21/40</td></tr>
+          <tr><td class="num">10 000</td><td class="k">A / B</td><td class="num">240/240</td><td class="num">240/240</td><td class="num">240/240</td><td class="num">1.0000</td><td class="num">17/40 &middot; 17/40</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="nonumber"><strong><span class="mono">hit@20</span> and <span class="mono">hit@50</span>: no number exists for this run.</strong> The capture set that requires five values of <span class="mono">k</span> was ruled on 2026&#8209;09&#8209;13, sixteen days after this run filed. Its plan chose <span class="mono">hit@5</span> and <span class="mono">hit@10</span>. <strong>Not re&#8209;run to fill the gap</strong> &mdash; the report is frozen and a better number is a new run.</p>
+    <div class="callout warn"><p>🔴 <strong>A marker planted in exactly one document has <span class="mono">df = 1</span>.</strong> It is already at rank 1 and nothing can move it &mdash; so the discordant count of 0 was <strong>fixed by the corpus design, not measured from the engines</strong>.</p></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">CAP&#8209;3 <span class="dim">/ headroom &mdash; the column this run did not have</span></p>
+    <h2>Zero headroom in the direction that mattered</h2>
+    <div class="tblwrap">
+      <table>
+        <thead><tr>
+          <th>endpoint</th><th class="num">n</th>
+          <th class="num">improvement headroom<span class="dir flat">&mdash; neither</span></th>
+          <th class="num">b<span class="dir up">&uarr; higher is better</span></th>
+          <th class="num">c<span class="dir down">&darr; lower is better</span></th>
+          <th class="num">discordant<span class="dir flat">&mdash; neither</span></th>
+          <th class="num">p</th>
+        </tr></thead>
+        <tbody>
+          <tr class="hi"><td class="k">B1 &nbsp;hit@5, tier 1 000</td><td class="num">240</td><td class="num" style="color:var(--fail);font-weight:600">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">1.0</td></tr>
+          <tr><td class="k">B2 &nbsp;current&#8209;ranks&#8209;first</td><td class="num">40</td><td class="num">19</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">1.0</td></tr>
+          <tr><td class="k">B7 &nbsp;declined</td><td class="num">20</td><td class="num">20</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">1.0</td></tr>
+          <tr><td class="k">B9 &nbsp;hit@5, A vs A&prime;</td><td class="num">240</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">1.0</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout warn" style="margin-top:16px"><p>🔴 <strong>B1's improvement headroom is 0, and that is the whole verdict.</strong> <span class="mono">pb</span> and <span class="mono">pc</span> are <em>structurally</em> zero on this suite, so a null reports a <strong>ceiling</strong>, never a match. Ruling it PASS would report a property of the queries as a finding about the engines.</p></div>
+    <p style="font-size:13px;color:var(--ink-3)">⚠ <strong>The reusable lesson, and it outlived the run:</strong> the pre-registration's power table asked <em>how many queries</em> and answered correctly. It never asked whether the queries could express the effect. <strong>A power calculation does not tell you the queries are hard.</strong></p>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">CAP&#8209;4 <span class="dim">/ the answer layer, and the 20 planted unanswerables</span></p>
+    <h2>Nothing declined, in either version</h2>
+    <div class="tblwrap">
+      <table>
+        <thead><tr>
+          <th>arm</th>
+          <th class="num">planted unanswerable<span class="dir flat">&mdash; neither</span></th>
+          <th class="num">declined<span class="dir up">&uarr; higher is better</span></th>
+          <th class="num">fabricated<span class="dir down">&darr; lower is better</span></th>
+        </tr></thead>
+        <tbody>
+          <tr><td class="k">A &nbsp;1.0.0</td><td class="num">20</td><td class="num">0</td><td class="num" style="color:var(--fail);font-weight:600">20</td></tr>
+          <tr class="hi"><td class="k">B &nbsp;2.0.0&#8209;alpha.2</td><td class="num">20</td><td class="num">0</td><td class="num" style="color:var(--fail);font-weight:600">20</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-top:14px">On all 20, arm B returned <span class="mono">band: partial</span>, <span class="mono">answerable: true</span> &mdash; and for the absent&#8209;entity half it <strong>named the missing term</strong>: <span class="mono">missing: ["zq00000w"]</span>, <span class="mono">coverage: 0.0009</span>. <strong>Arm B knows the queried term is absent and answers anyway.</strong></p>
+    <div class="callout"><p><strong>Arm A emits no confidence block at all</strong>, so this is a capability table and not a contrast. Stated, not smoothed &mdash; the asymmetry is permanent, because the flag cannot be added to a released version.</p></div>
+    <p style="font-size:13px;color:var(--ink-3)">The controls: a decoy reached the top 5 for <strong>1 of 50</strong> shadowed queries at tier 1 000 and <strong>1 of 208</strong> at tier 10 000 <span class="dir flat">&mdash; neither</span>, <strong>identically in both arms</strong>.</p>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">CAP&#8209;1 &middot; CAP&#8209;2 <span class="dim">/ the ranked lists, and what moved</span></p>
+    <h2>Not captured by this run</h2>
+    <p class="nonumber"><strong>No number exists for this run, in either capture.</strong> The ranked lists were <strong>not retained</strong> &mdash; the plan recorded pass/fail per query and discarded the ordering &mdash; so there is nothing to diff and no rank delta to file. <strong>The run is frozen and was not re&#8209;executed to produce them.</strong></p>
+    <div class="grid g2">
+      <div class="card"><h3>What this costs a reader</h3><p>Every statement about <em>where</em> the two engines agree rests on <span class="mono">hit@5</span> being 240/240 &mdash; which is a ceiling. <strong>Whether the orderings below rank 5 were identical is unknown and unknowable from what was filed.</strong></p></div>
+      <div class="card"><h3>Why it is a section and not a deletion</h3><p>A missing section reads as a capture that was never required. <strong>This one was required from 2026&#8209;09&#8209;13</strong>, and this run predates it &mdash; which is exactly what a reader needs to know before comparing it with a later run.</p></div>
+    </div>
+    <p style="font-size:13px;color:var(--ink-3)">🔴 <strong>This run is also the first in the store to file PER&#8209;QUERY ROWS</strong> for every query, arm and tier &mdash; which is why its <span class="mono">b</span>, <span class="mono">c</span> and every test above can be recomputed by anybody.</p>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">CAP&#8209;5 <span class="dim">/ the committed index, and the wheel</span></p>
+    <h2>The index held; the wheel collapsed</h2>
+    <div class="tblwrap">
+      <table>
+        <thead><tr>
+          <th>&nbsp;</th>
+          <th class="num">arm A<span class="dir down">&darr; lower is better</span></th>
+          <th class="num">arm B<span class="dir down">&darr; lower is better</span></th>
+          <th class="num">ratio<span class="dir down">&darr; lower is better</span></th>
+          <th>bar</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>index bytes, 1 000 docs</td><td class="num">1 462 342</td><td class="num">1 465 065</td><td class="num">1.002 &times;</td><td class="k">&le; 1.25 &times; <span class="pill pass">pass</span></td></tr>
+          <tr><td>index bytes, 10 000 docs</td><td class="num">14 147 492</td><td class="num">14 117 857</td><td class="num">0.998 &times;</td><td class="k">&le; 1.25 &times; <span class="pill pass">pass</span></td></tr>
+          <tr><td>shards, 10 000 docs<span class="dir flat">&mdash; neither</span></td><td class="num">256</td><td class="num">256</td><td class="num">&mdash;</td><td class="k">&mdash;</td></tr>
+          <tr class="hi"><td><strong>published wheel</strong></td><td class="num">7 113 352</td><td class="num">258 901</td><td class="num" style="color:var(--pass);font-weight:600">0.036 &times;</td><td class="k">&mdash;</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="nonumber"><strong><span class="mono">bytes / document</span>: not filed by this run.</strong> It is divisible from the two columns beside it; it is left uncomputed here because <strong>this report renders the filed rows and does not derive new ones</strong>.</p>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">CAP&#8209;6 <span class="dim">/ speed, arms interleaved A B A B, tier 10 000</span></p>
+    <h2>Both bars cleared, with the slower engine</h2>
+    <div class="tblwrap">
+      <table>
+        <thead><tr>
+          <th>&nbsp;</th>
+          <th class="num">arm A<span class="dir down">&darr; lower is better</span></th>
+          <th class="num">arm B<span class="dir down">&darr; lower is better</span></th>
+          <th class="num">ratio<span class="dir down">&darr; lower is better</span></th>
+          <th>bar</th>
+        </tr></thead>
+        <tbody>
+          <tr><td><span class="mono">ask</span> p50</td><td class="num">79.3 ms</td><td class="num">103.7 ms</td><td class="num">1.31 &times;</td><td class="k">&mdash;</td></tr>
+          <tr class="hi"><td><strong><span class="mono">ask</span> p95</strong></td><td class="num">85.6 ms</td><td class="num">112.6 ms</td><td class="num">1.32 &times;</td><td class="k">&le; 1.5 &times; <span class="pill pass">pass</span></td></tr>
+          <tr class="hi"><td><strong>cold <span class="mono">ingest</span> median</strong></td><td class="num">25.68 s</td><td class="num">26.78 s</td><td class="num">1.04 &times;</td><td class="k">&le; 2.0 &times; <span class="pill pass">pass</span></td></tr>
+          <tr><td><span class="mono">build</span> median</td><td class="num">612 ms</td><td class="num">1 086 ms</td><td class="num">1.77 &times;</td><td class="k">&mdash;</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:13px;color:var(--ink-3);margin-top:8px">1 200 timed queries per arm (240 &times; 5 repeats), 20 warm&#8209;ups per arm discarded, three cold ingest repeats per arm.</p>
+    <div class="callout warn"><p>⚠ <strong>Arm B's three ingest repeats were 25.4 / 26.8 / 38.8 s</strong> &mdash; the third is an outlier on a laptop that was doing other things. <strong>The median is reported and all three are filed.</strong></p></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">Guard rails <span class="dim">/ what this run may never be used to say</span></p>
+    <h2>What this run does <em>not</em> do</h2>
+    <div class="grid g4">
+      <div class="card"><h3>It licenses no improvement</h3><p>B1 is <strong>inconclusive, not pass</strong>. The numeric condition resolved and the experiment reached almost nothing &mdash; ruling it pass would report the corpus as a finding about the engines.</p></div>
+      <div class="card"><h3>It states no delta</h3><p><span class="mono">informed</span>: one session wrote the generator and read the scores. <strong>Never compared with a blind run, and not a generalisation estimate.</strong></p></div>
+      <div class="card"><h3>It captures three of seven</h3><p><strong>CAP&#8209;1, CAP&#8209;2 and two <span class="mono">hit@k</span> columns have no number here.</strong> The capture set postdates the run; the gaps are named, never filled after the fact.</p></div>
+      <div class="card"><h3>B2's failure is not a defect report</h3><p>Both arms invert identically because <span class="mono">superseded_weight</span> <strong>ships at <span class="mono">1.0</span></strong>. Post&#8209;hoc at <span class="mono">0.5</span> the same arm goes <strong>21/40 &rarr; 0/40</strong>, 21 fixed / 0 broken &mdash; <strong>the machinery works and is switched off</strong>. Labelled post&#8209;hoc, and out of the verdict.</p></div>
+    </div>
+    <hr class="rule">
+    <p style="font-size:13px;color:var(--ink-3);margin:18px 0 0">The run is <span class="mono">work/regression/2026&#8209;08&#8209;28&#8209;benchmark&#8209;v1&#8209;vs&#8209;head/</span> &mdash; <span class="mono">report.md</span>, <span class="mono">ANALYSIS.md</span>, six <span class="mono">VERDICT</span> files, <span class="mono">evidence/rows/</span>. Frozen pre&#8209;registration: <span class="mono">work/benchmark/PRE-REGISTRATION-V1-VS-HEAD.md</span>. <strong>This report carries no number that run does not.</strong> What must be here at all: <span class="mono">records/0053_WORK-benchmark.md</span>.</p>
+  </div>
+</section>
+
+</main>
+
+<div class="hint" id="hint">&larr; &rarr; to move</div>
+<div class="counter">
+  <button class="navbtn" id="prev" aria-label="Previous slide">prev</button>
+  <span id="pos" aria-live="polite">01 / 12</span>
+  <button class="navbtn" id="next" aria-label="Next slide">next</button>
+</div>
+<script>
+(function () {
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var pos = document.getElementById('pos');
+  var tick = document.getElementById('tick');
+  var i = 0;
+
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+
+  function show(n) {
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function (s, k) { s.classList.toggle('active', k === i); });
+    pos.textContent = pad(i + 1) + ' / ' + pad(slides.length);
+    tick.style.setProperty('--progress', ((i + 1) / slides.length * 100) + '%');
+    window.scrollTo(0, 0);
+    try { location.hash = 's' + (i + 1); } catch (e) {}
+  }
+
+  document.getElementById('next').addEventListener('click', function () { show(i + 1); });
+  document.getElementById('prev').addEventListener('click', function () { show(i - 1); });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { show(i + 1); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { show(i - 1); e.preventDefault(); }
+    else if (e.key === 'Home') { show(0); e.preventDefault(); }
+    else if (e.key === 'End') { show(slides.length - 1); e.preventDefault(); }
+  });
+
+  var start = null;
+  document.addEventListener('touchstart', function (e) { start = e.changedTouches[0].clientX; }, {passive: true});
+  document.addEventListener('touchend', function (e) {
+    if (start === null) return;
+    var dx = e.changedTouches[0].clientX - start;
+    if (Math.abs(dx) > 55) { show(dx < 0 ? i + 1 : i - 1); }
+    start = null;
+  }, {passive: true});
+
+  var m = (location.hash || '').match(/^#s(\d+)$/);
+  show(m ? parseInt(m[1], 10) - 1 : 0);
+
+  setTimeout(function () {
+    var h = document.getElementById('hint');
+    if (h) { h.style.transition = 'opacity .6s'; h.style.opacity = '0'; }
+  }, 4200);
+})();
+</script>

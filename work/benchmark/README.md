@@ -9,11 +9,15 @@ description: "Index of the version-comparison benchmark plans and their pre-regi
 **knob-to-knob** benchmark is specified and its thresholds frozen, before any
 number exists. It holds plans and runbooks, not results.
 
-**Results do not live here — one narrow exception, named.** A **presentation**
-of an executed run may live beside its plan, because it is read by people rather
-than cited by documents. **The evidence is not duplicated**: the presentation
-carries no number the filed run does not, and anything that disagrees with
-`../regression/` is the presentation being wrong.
+**Results do not live here — one narrow exception, named, and since 2026-09-13
+it has its own directory.** Every benchmark run's HTML report lives in
+[`reports/`](reports/README.md), one per run, dated
+`<yyyy-mm-dd>-<run>.html` — the run directory's own name with `.html` on the
+end. It is read by people rather than cited by documents. **The evidence is not
+duplicated**: a report carries no number the filed run does not, and anything
+that disagrees with `../regression/` is the report being wrong. **What must be
+in one is [SR-WORK-BENCHMARK](../../records/0053_WORK-benchmark.md); the
+skeleton is [`reports/TEMPLATE.html`](reports/TEMPLATE.html).**
 
 Every executed run still files under
 [`../regression/<date>-<run>/`](../regression/README.md) under the per-run
@@ -31,7 +35,7 @@ Three kinds of document, and the kind decides whether it may ever be edited:
 |---|---|---|
 | **`PRE-REGISTRATION-*.md`** | 🔴 **never** — frozen once the first corpus byte exists. A later `HEAD`, a later knob, a better idea = a **new** pre-registration with a **new id space** | the bars, the metrics, the predicted verdicts, the things the run may never be used to say |
 | **`RUNBOOK-*.md`** | yes — an operating procedure, corrected as the harness teaches | the step-by-step an agent executes, with the gate at every step, where each step runs, and which model runs it. **A runbook restates no bar**; it points at the pre-registration for every one |
-| **`*.html`** | yes, but only to agree with `../regression/` | the presentation of one executed run |
+| **`reports/*.html`** | yes, but only to agree with `../regression/` | **CAP-7** — one report per executed run, dated, built from `reports/TEMPLATE.html`. [Its own index](reports/README.md) |
 
 | document | what it is |
 |---|---|
@@ -41,9 +45,7 @@ Three kinds of document, and the kind decides whether it may ever be edited:
 | [`PRE-REGISTRATION-NODE.md`](PRE-REGISTRATION-NODE.md) | the frozen bar for the **Node read plane** (W-107), ids **`N0`–`N4`** — a **fourth id space**. **One index, two readers**; not a version comparison. 🔴 **ONE CELL IS DELIBERATELY UNFROZEN** — §2's score-comparison mode is Arpit's `log()` decision, which the 2026-09-05 ratification left unstruck, and **the document is not frozen until he fills it in**. Everything else is: the byte-equal field table, ids `N0`–`N4`, `N4`'s **p95 ≤ 150 ms at 10 000 documents** (3× Python's measured 50.2 ms — a fence against an algorithmic divergence, not a constant factor), the corpora, and **all three OS/libm pairs**. Grounded in [`../regression/2026-09-05-node-log-divergence/`](../regression/2026-09-05-node-log-divergence/report.md). **Not yet executed; Phase 1 does not start before §0 is filled.** |
 | [`RUNBOOK-BENCHMARK.md`](RUNBOOK-BENCHMARK.md) | the agent-executable procedure for a **version** benchmark against either frozen pre-registration above — stand-up, gates, machine split, the two-session `blind` protocol, filing. Written 2026-08-28 from what the two executed runs learned |
 | [`RUNBOOK-TUNER.md`](RUNBOOK-TUNER.md) | the agent-executable procedure for the **knob sweep** — one index per corpus, many query passes, a veto leg, the candidate table. 🔴 **Void in part**: the veto leg has no instrument since SR-WORK-ENVIRONMENTS |
-| [`benchmark-v1-vs-head.html`](benchmark-v1-vs-head.html) | the **presentation** of the 2026-08-28 run — 18 slides, self-contained, no network. Open it in a browser; `←` `→` to move. The run itself is [`../regression/2026-08-28-benchmark-v1-vs-head/`](../regression/2026-08-28-benchmark-v1-vs-head/report.md) |
-| [`benchmark-contested.html`](benchmark-contested.html) | the **presentation** of the 2026-08-28 contested-answer run — 12 slides, self-contained, theme-aware. The run itself is [`../regression/2026-08-28-benchmark-contested/`](../regression/2026-08-28-benchmark-contested/report.md) |
-| [`benchmark-captures.html`](benchmark-captures.html) | the **presentation** of the 2026-09-13 capture run — 13 slides, self-contained, theme-aware, same deck chrome. ⚠ It is a **harness-validation run, not a version comparison**: one tier, an `informed` key, no threshold ruled. 🔴 **Its CAP-6 latency slide carries the do-not-quote warning the run files**, and every other number on it is deterministic. **Slides 13–16 are the LINEAGE** — all four benchmark runs side by side (what each instrument could detect, what changed between them, the abstention shape that repeats, and 🔴 **the three cross-run pairs that look like a trend and may never be compared**). Every cross-run figure is attributed to its own filed run. The run itself is [`../regression/2026-09-13-benchmark-captures/`](../regression/2026-09-13-benchmark-captures/report.md), whose own `benchmark.html` is CAP-7 and stays where it is |
+| [`reports/`](reports/README.md) | **every benchmark run's HTML report**, one per run, dated `<yyyy-mm-dd>-<run>.html`, plus the [`TEMPLATE.html`](reports/TEMPLATE.html) they are built from. 🔴 **This is the only home for CAP-7** — SR-WORK-BENCHMARK decision 7, amended 2026-09-13. Three reports are there today; [`2026-09-12-benchmark-l9`](../regression/2026-09-12-benchmark-l9/report.md) is the one filed benchmark run with none, and is owed as **W-158** |
 
 **Id spaces, so far:** `B` (v1-vs-HEAD) · `C` (contested) · `T` (tuner). The
 next pre-registration takes the next letter. An id is never reused, renumbered
