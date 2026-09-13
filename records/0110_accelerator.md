@@ -7,10 +7,10 @@ description: A disposable term-major index under .fux/runtime/ that makes warm q
 status: accepted
 date: 2026-08-18
 feature: "`.fux/runtime/` — the derived index, `fux build`, and the block bound that makes skipping provable"
-owns: [src/fux/derive@08c8ff2c8767, tools/differential@48bff0353031]
+owns: [src/fux/derive@08c8ff2c8767, tools/differential@417bd6ee8590]
 laws: [L1, L3]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 12acb807778d2bc2220a94f455a736e218dbb2399e5db1a628c37b739ec205a8
+content_sha: fffe0587c20a75db3e81b04f8bd79352ba000c57bc3f30c79a2e234ab3ed75d7
 ---
 
 # SR-T1-ACCELERATOR — the derived T1 accelerator
@@ -371,6 +371,28 @@ shapes to do it**, because the `theta` and ceiling defects bite under opposite
 conditions; the third is pinned as a direct property because no corpus shape
 found it. That is recorded in the file itself — a differential test that cannot
 fail is worse than none.
+
+**13. Every pipe the harness reads is UTF-8, named rather than inherited.**
+Added 2026-09-13, on `node-arm.yml`'s first run.
+
+`subprocess.run(..., text=True)` decodes with the platform's preferred
+encoding, which on a Windows runner is cp1252. Node writes UTF-8, so every
+title carrying an em dash came back mojibake and the arm reported **174
+transcription defects on both Windows jobs while all four Unix jobs were
+clean** — the arm accusing the reader it exists to check.
+
+🔴 **The failure shape is the point: a harness artifact is indistinguishable
+from a finding, and this one was OS-localised, internally consistent and
+100 % reproducible.** It is the same class as the loaded-machine anomaly in
+`CLAUDE.md` §Hard-won build knowledge — plausible, tidy, and wrong. The arm
+now names `encoding="utf-8"` on every call and reconfigures its own stdout,
+because printing the report's `⚠` to a cp1252 console raises
+`UnicodeEncodeError` *after* the comparison has already passed.
+
+⚠ **The engine was never implicated** — `store/reader.py` reads bytes and every
+`read_text` in `src/fux/` names its encoding. Checked before the harness was
+touched, because "fix the harness" is what a session says when it has decided
+the answer first.
 
 **12. The differential harness takes a CORPUS, not a repo — and a golden rung
 is resolved through its committed manifest.** Added 2026-09-12 (W-107).

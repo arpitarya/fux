@@ -8,6 +8,39 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [2.0.0] - 2026-09-13
+
+**The 2.0.0-alpha line, promoted — plus everything below, which had
+accumulated unreleased since `2.0.0-alpha.7` on 2026-09-02.** Read the
+`Added` / `Changed` / `Removed` / `Fixed` sections that follow for the detail;
+this is what the major carries against `1.0.0`:
+
+- **Record shape v2, tuning, `fux enrich`, MCP and reranking** (alpha.0), with
+  the **dense lane removed** (alpha.1).
+- **The URL freshness loop** (alpha.2), `ask --sections` and the `output.toml`
+  fork closed (alpha.3), and three built-in decoders — jsonl, svg, images
+  (alpha.4).
+- **The acquired plane, declarative refusal detection, `ttl=`/`as-ingested`
+  and PII redaction** (alpha.5) — a repository without `.fux/pii.toml` is
+  refused rather than indexed.
+- **Enrichment inside the PII boundary**, `fux enrich <TARGET>` and a cdp
+  fetcher that survives concurrency (alpha.6); one enrichment-report path
+  spelling on every platform (alpha.7).
+- **The Node read plane** — `fux-engine` in both registries under one name,
+  served as **one generated file** rather than 44 source modules
+  ([L10](records/0011_LAW-10-bundled-output.md)).
+- **The decision records moved to `records/` at the repo root** and were
+  renumbered into three ranges; `ADR-<NAME>` is now `SR-<NAME>`. A
+  documentation change, but it is what every citation in this changelog
+  resolves against.
+
+⚠ **Upgrading from `1.0.0` is not a drop-in:** the dense lane is gone, the
+record shape is v2, and ingest refuses without `.fux/pii.toml`. Re-run
+`fux ingest && fux build` after upgrading.
+
+
 ### Added
 
 - **`.fux/output.toml`'s `journal` line now says what the key DOES.** It reads

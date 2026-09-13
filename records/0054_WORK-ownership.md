@@ -13,7 +13,7 @@ owns: []
 laws: [0]
 ratifies: W-82 ruling 4
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 9e6657fdc5627ded59b133aa308261982489068c3a06bc84aff02a496588f7ce
+content_sha: 57832926c4aff0c61922ff665a45d4c8173cdb60cc909b6e11fad05851dda073
 ---
 
 # SR-WORK-OWNERSHIP — `owns` and `describes`
@@ -282,6 +282,16 @@ top-level definitions.
     or over `relpath\0filehash` for every file under a directory, sorted.
     Stamped by [`scripts/sr-owns.py`](../scripts/sr-owns.py) **before**
     `sr-hash.py`, because stamping a claim changes the record.
+    🔴 **A directory's file list comes from `git ls-files`, not from the
+    filesystem** (amended 2026-09-13, first CI run of the gate). Walking the
+    directory put whatever the working tree happened to hold into the hash:
+    `node/` grows a gitignored `node/dist/` the moment anyone builds the
+    bundle, so a claim stamped on that machine could not match the same commit
+    on a runner, and `tests/test_sr_owns_hash.py` failed on all eight CI jobs
+    while passing locally for the session that stamped it. **A record owns what
+    the commit carries** — tracked files, read from the working tree so an
+    uncommitted edit still moves the hash and settles in the commit that lands
+    it.
     **What it adds over the freshness gate:** that gate proves the owning record
     was *touched*; this proves the claim still matches the *bytes*. A comma
     satisfies the first and cannot satisfy the second.

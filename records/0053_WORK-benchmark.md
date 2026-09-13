@@ -7,10 +7,10 @@ description: "The seven things a benchmark run always files: the ranked lists, w
 status: accepted
 date: 2026-09-13
 feature: the capture set every benchmark run files
-owns: [tests/test_benchmark_capture.py@a14ab6584c16]
+owns: [tests/test_benchmark_capture.py@f6af3d328537]
 laws: []
 timestamp: 2026-09-13T00:00:00Z
-content_sha: 548283d5c7aca6df969b88b96570056d7e96a39b2fdda4051c2bbb2a074b94cc
+content_sha: 892a53df176b42b2e8846a406687c14a2c4d8b4c0e6e5c7635c414a90687979b
 ratifies: Arpit, 2026-09-13 — what a benchmark must always capture
 ---
 
@@ -205,7 +205,7 @@ work/regression/<date>-<run>/
     ranked-lists.jsonl          CAP-1
     rankdiff.jsonl              CAP-2
     hits.jsonl                  CAP-3   hit@1,5,10,20,50 per query per arm
-    answers.jsonl               CAP-4   answered|declined|fabricated
+    answer-layer.jsonl          CAP-4   answered|declined|fabricated
     index-size.csv              CAP-5
     latency.csv                 CAP-6
 
@@ -345,12 +345,22 @@ for them:
    of its safety.
 5. **Any file states this capture set instead of referencing this record.**
 
+🔴 **CAP-4's file is `answer-layer.jsonl`, and the name is load-bearing**
+(2026-09-13, the gate's first CI run). `.gitignore` bans `**/answers.jsonl`
+**anywhere in the tree** — the golden answer key's name, banned by name rather
+than by path after a copy of the key turned up somewhere the path rule could not
+reach. A capture called `answers.jsonl` therefore can never be committed: the
+gate demanded a file the repository refuses to carry, and passed only on the
+machine that had it sitting untracked. **The seal is not narrowed to fix this**
+— the capture is renamed, because a run's answer layer over a generated ladder
+rung is measurement evidence and the sealed key is not.
+
 **How to check it:**
 
 ```bash
 ls work/regression | awk '$0 >= "2026-09-13"' | grep -i bench
 # then, per run: evidence/ carries ranked-lists.jsonl, rankdiff.jsonl,
-# hits.jsonl, answers.jsonl, index-size.csv, latency.csv -- and the run
+# hits.jsonl, answer-layer.jsonl, index-size.csv, latency.csv -- and the run
 # directory carries an .html report
 uv run pytest -q tests/test_benchmark_capture.py
 ```

@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@bf50a4513a56, src/fux/store/nodebundle.py@071a24a596dd]
+owns: [node@b3f963f43513, src/fux/store/nodebundle.py@071a24a596dd]
 laws: [L1, L3, L4, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 5d066f04910baad5fbb3458e21cf87335925c34b55ec86fcb45b0ab1991afd60
+content_sha: a630757bd71045d830a6e89859a232b9e84040ababc590ca9f551c0eaa31e206
 ---
 
 # SR-NODE-SEARCH — the Node read plane
@@ -543,6 +543,8 @@ make shape C available.
   **2.0.0-alpha.7 was published to npm on 2026-09-12 carrying
   `bin: {"fux": "./fux.mjs"}`** — so the rule was already false when it was
   read. Arpit ruled the bin stays rather than burning a version to remove it.
+  ⚠ **`2.0.0` (2026-09-13) carries the same bin**, unchanged — the alpha line
+  promoted, not re-decided.
   ✅ **All three mitigations now ship.** The clause was holding up the
   `fux doctor` PATH row, deferred *because* nothing was going to shadow
   Python's `fux`; that premise died with the clause and the row **landed the

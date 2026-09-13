@@ -47,7 +47,11 @@ REQUIRED_EVIDENCE = {
     "ranked-lists.jsonl": "CAP-1 the ranked list each arm returned, per query",
     "rankdiff.jsonl": "CAP-2 what entered, what left, and the per-document rank delta",
     "hits.jsonl": "CAP-3 hit@1,5,10,20,50 per query per arm",
-    "answers.jsonl": "CAP-4 answered|declined, and fabricated on the planted unanswerables",
+    # NOT `answers.jsonl`: `.gitignore` bans that name ANYWHERE (the golden
+    # answer key, banned by name after a copy of it escaped the path rule),
+    # so a capture under it could never be committed. SR-WORK-BENCHMARK
+    # decision 7, amended 2026-09-13.
+    "answer-layer.jsonl": "CAP-4 answered|declined, and fabricated on the planted unanswerables",
     "index-size.csv": "CAP-5 committed bytes, bytes/doc, shard count",
     "latency.csv": "CAP-6 query p50/p95 interleaved, ingest and build wall-clock",
 }

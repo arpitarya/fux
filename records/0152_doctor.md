@@ -11,7 +11,7 @@ owns: [src/fux/doctor.py@e924a085d794]
 laws: [L4, L8]
 ratifies: "Arpit, 2026-09-11 — *create a new adr for doctor*"
 timestamp: 2026-09-11T00:00:00Z
-content_sha: 55476631f716f2f9f0cf694a8d639a999767fee81612b81c2fd3495e04bc4087
+content_sha: 08d16a08b165379235c6b8c7f8361b54dee46121ef3d87191565a4c967b960d8
 ---
 
 # SR-DOCTOR — the health command, and who owns its rows
@@ -96,7 +96,7 @@ flowchart TD
 
 ```console
 $ fux doctor
-[OK] python version: 3.11, fux 2.0.0-alpha.7
+[OK] python version: 3.11, fux 2.0.0
 [OK] repo root: /root/fuxlab/demo
 [OK] fux.toml loads: fux.toml
 [OK] .fux/ writable: /root/fuxlab/demo/.fux

@@ -161,7 +161,7 @@ class Arm:
         no_tune = () if (self.use_tune or top is None) else ("--no-tune",)
         proc = subprocess.run(
             ["node", str(entry or NODE_ENTRY), verb, query, "--json", *depth, *no_tune, *extra],
-            capture_output=True, text=True, cwd=self.root,
+            capture_output=True, text=True, encoding="utf-8", cwd=self.root,
         )
         if proc.returncode != 0:
             raise RuntimeError(f"node exited {proc.returncode}: {proc.stderr.strip()}")
@@ -230,7 +230,7 @@ class Arm:
         env = dict(os.environ, PYTHONPATH=str(ENGINE / "src"))
         proc = subprocess.run(
             [sys.executable, "-m", "fux", verb, *argv, "--json"],
-            capture_output=True, text=True, cwd=self.root, env=env,
+            capture_output=True, text=True, encoding="utf-8", cwd=self.root, env=env,
         )
         if proc.returncode != 0:
             raise RuntimeError(f"python exited {proc.returncode}: {proc.stderr.strip()}")
@@ -274,7 +274,7 @@ class Arm:
     def mcp(self, runner: list[str], calls: list[dict]) -> list[dict]:
         lines = "\n".join(json.dumps(c) for c in calls) + "\n"
         env = dict(os.environ, PYTHONPATH=str(ENGINE / "src"))
-        proc = subprocess.run(runner, input=lines, capture_output=True, text=True,
+        proc = subprocess.run(runner, input=lines, capture_output=True, text=True, encoding="utf-8",
                               cwd=self.root, env=env)
         if proc.returncode != 0:
             raise RuntimeError(f"{runner[0]} exited {proc.returncode}: {proc.stderr.strip()}")
@@ -351,7 +351,7 @@ print(json.dumps({
         }
         got = {}
         for name, (argv, e) in runs.items():
-            proc = subprocess.run(argv, capture_output=True, text=True, cwd=self.root, env=e)
+            proc = subprocess.run(argv, capture_output=True, text=True, encoding="utf-8", cwd=self.root, env=e)
             if proc.returncode != 0:
                 return [f"api ({name}) exited {proc.returncode}: {proc.stderr.strip()[:300]}"]
             # Python's `answer` prints a stderr note; stdout is the payload, and
@@ -426,7 +426,7 @@ print(json.dumps({
             }
             proc = subprocess.run(
                 ["node", "--input-type=module", "-e", self.API_JS % subs],
-                capture_output=True, text=True, cwd=self.root,
+                capture_output=True, text=True, encoding="utf-8", cwd=self.root,
             )
             if proc.returncode != 0:
                 return [f"bundle api ({entry.name}) exited {proc.returncode}: "
@@ -687,6 +687,20 @@ def main() -> int:
             return job, fn(query, top)
         except Exception as exc:  # a reader that crashes is a discordance
             return job, [f"{verb} {query!r} top={top}: {type(exc).__name__}: {exc}"]
+
+    # 🔴 **Windows decodes a pipe with the ANSI code page unless told not to**
+    # (2026-09-13, this file's first CI run). `text=True` alone decoded Node's
+    # UTF-8 stdout as cp1252, so every title carrying an em dash came back
+    # mojibake and the arm reported 174 transcription defects that were not
+    # there — a harness artifact in exactly the shape of a real finding. The
+    # subprocess calls now name `encoding="utf-8"`, and stdout is reconfigured
+    # here because printing the report's own `⚠` to a cp1252 console raises
+    # UnicodeEncodeError and kills the run after the comparison has passed.
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8")
+        except (AttributeError, OSError):  # pragma: no cover - not a tty we own
+            pass
 
     with ThreadPoolExecutor(max_workers=max(1, args.jobs)) as pool:
         # Order is restored by `jobs`, not by completion — a parallel harness

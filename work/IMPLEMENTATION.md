@@ -28,6 +28,44 @@ Rules:
 
 
 
+## 2026-09-13 — **2.0.0 released**: the alpha line promoted, and two gates that only CI could see
+
+**Shipped** (`2.0.0`, PyPI + npm). Records touched:
+[SR-LAWS](../records/0001_LAWS.md) (`__version__`),
+[SR-WORK-OWNERSHIP](../records/0054_WORK-ownership.md) (decision 13 amended),
+[SR-WORK-BENCHMARK](../records/0053_WORK-benchmark.md) (CAP-4's filename),
+[SR-T1-ACCELERATOR](../records/0110_accelerator.md) (decision 13, new) and
+[SR-NODE-SEARCH](../records/0153_node-search.md).
+
+**What was released.** No behaviour was written for the release itself: the
+eight `2.0.0-alpha.*` pre-releases plus everything that had accumulated
+unreleased since alpha.7 on 2026-09-02, cut as one major. All four version
+sites and the derived bundle agree; `.fux/node/` was re-vendored so this
+repository's own reader reports `2.0.0`.
+
+🔴 **Two tests were green on every developer machine and red on all eight CI
+jobs, for two different reasons — both structural, both now fixed.**
+
+1. **`test_sr_owns_hash` — the stamp depended on the working tree.**
+   `scripts/sr-owns.py` hashed a directory by walking the filesystem, so
+   `node/dist/` (gitignored, present the moment anyone builds the bundle) went
+   into the hash. A stamp written on that machine could never match the same
+   commit on a runner. Directories are now enumerated from `git ls-files` — **a
+   record owns what the commit carries**.
+2. **`test_benchmark_capture` — the gate required a file the repository
+   refuses to hold.** CAP-4's capture was named `answers.jsonl`, and
+   `.gitignore` bans that name *anywhere* as the golden answer key's guard. The
+   gate passed only where the file sat untracked. **The seal was not narrowed**
+   — the capture is `answer-layer.jsonl`.
+
+🔴 **`node-arm.yml`'s first ever run failed on Windows with 174 transcription
+defects that did not exist.** `subprocess.run(text=True)` decoded Node's UTF-8
+stdout as cp1252, and the harness then died printing `⚠` to the same console.
+The engine was cleared first — `store/reader.py` reads bytes and every
+`read_text` in `src/fux/` names its encoding. SR-T1-ACCELERATOR decision 13.
+
+---
+
 ## 2026-09-13 — W-157 CLOSED: 20 deleted item files recovered, 20 lost for good, and the invariant is gated
 
 **Shipped.** Arpit's ruling of the same day — *"once a work item is

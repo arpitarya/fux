@@ -845,7 +845,7 @@ failures — **no subclass hierarchy**. CLI exit codes: `0` ok · `1` error ·
 
 ## Build & test
 
-**`fux-engine` 2.0.0-alpha.7 is released on PyPI *and*, since 2026-09-12, on
+**`fux-engine` 2.0.0 is released on PyPI *and*, since 2026-09-12, on
 npm**; `src/fux/` is the live tree and `node/` is the Node reader. One name in
 both registries. **The two registries are NOT reached the same way:** a GitHub
 release publishes to PyPI automatically (OIDC), while the npm half *stages* and
@@ -895,7 +895,7 @@ archive/v0.26/.venv/bin/python tools/pruning-eval/run.py --corpus acme orbit syn
 ## Package identity (do not change casually)
 
 - Distribution name: **`fux-engine`**. Import package: **`fux`**.
-- Version: **`2.0.0-alpha.7`**, released (0.26.0 archived → reset → 0.30.0 →
+- Version: **`2.0.0`**, released (0.26.0 archived → reset → 0.30.0 →
   M2 at 0.32.0 → the sources rewrite at 0.33.0 → the graph/refer/maintenance
   planes at 0.34.0 → the source verbs and the progress plane at 0.35.0 → the
   deferring hook and agent policy at 0.36.0 → the refer per-doc cap fix and
@@ -907,7 +907,10 @@ archive/v0.26/.venv/bin/python tools/pruning-eval/run.py --corpus acme orbit syn
   declarative refusal detection, `ttl=`/`as-ingested` and PII redaction at
   alpha.5 -> enrichment inside the PII boundary, `fux enrich <TARGET>` and a
   cdp fetcher that survives concurrency at alpha.6 -> one enrichment-report
-  path spelling on every platform at alpha.7).
+  path spelling on every platform at alpha.7 -> **2.0.0**, the alpha line
+  promoted unchanged on 2026-09-13: `records/` at the repo root, the Node read
+  plane and its one bundled file (L10), the acquired plane, PII redaction and
+  the URL freshness loop, all released together).
   Bumped in `src/fux/__init__.py`, which `pyproject.toml` reads dynamically.
   ⚠ **It is the SOURCE, not the only copy — that claim was false and is
   corrected here (2026-09-12).** W-107's Node reader carries three more

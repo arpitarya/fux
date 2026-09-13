@@ -7,8 +7,9 @@ Fux ranks documents from a small, plain-text index committed to git, then reads
 the answer back from the source itself. No server, no vector database, no API
 key, and no model anywhere on the path.
 
-> **Status: `2.0.0-alpha.7` (alpha).** The CLI and the index format can still
-> change between pre-releases. Every change is in [`CHANGELOG.md`](CHANGELOG.md).
+> **Status: `2.0.0` — released on PyPI and npm.** The 2.x CLI and index format
+> are what the next 2.x releases keep; a break waits for the next major. Every
+> change is in [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Why fux
 

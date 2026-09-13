@@ -92,7 +92,7 @@ Python's `fux-engine` installs a `fux` too, with a **different verb set**.
 
 ```console
 $ fux --version
-fux 2.0.0-alpha.7 (node 24.13.0)
+fux 2.0.0 (node 24.13.0)
 ```
 
 `fux doctor` (Python's) reports when a Node `fux` sits earlier on your PATH.
