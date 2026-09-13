@@ -169,6 +169,11 @@ def _conflict_text(ours: str, theirs: str, ids: list[str]) -> str:
 
 
 def main(argv: list[str] | None = None) -> int:
+    # The second console script gets the same UTF-8 stdio as `fux` — one
+    # encoding per artefact, not per entry point. See `cli._stdio_utf8`.
+    from ..cli import _stdio_utf8
+
+    _stdio_utf8()
     argv = list(sys.argv[1:] if argv is None else argv)
     if len(argv) < 3:
         print("usage: fux-merge-index <ancestor> <ours> <theirs>", file=sys.stderr)

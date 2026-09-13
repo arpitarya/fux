@@ -13,7 +13,7 @@ feature: configurable output defaults
 owns: [src/fux/output_config.py@bb73da35f5b1]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: bc685e56b24d14ea6ae8a60b5adcdf9e267ac3115fb24b219bce0e020fdf294d
+content_sha: 8662d257396dc8008a9efb19f595a8a4caa70924e54ede239f28b2912df90dc7
 ---
 
 # SR-OUTPUT — output defaults are configurable, in a third file
@@ -774,6 +774,12 @@ catchable by the tests that existed when they were written.**
   command computes — the same two-layer separation, and the reason git can
   promise `--porcelain` output is stable while `color.ui` varies per repo.
   <https://git-scm.com/docs/git-config>
+
+
+⚠ **2026-09-13:** `cli.main` now sets UTF-8 stdio **before** it parses an argument,
+so the guard this record places in `main` runs on a stream whose encoding is fux's
+choice rather than the console's. Nothing about the guard itself changed;
+[SR-CLI-SURFACE](0101_cli-surface.md) decision 10a states why.
 
 ### Veto condition
 

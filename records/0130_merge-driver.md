@@ -7,10 +7,10 @@ description: "The merge driver for .fux/index/*.jsonl. A shard is a header plus 
 status: accepted
 date: 2026-08-21
 feature: the merge driver for the committed index
-owns: [src/fux/maintain/mergedriver.py@6366145baf52]
+owns: [src/fux/maintain/mergedriver.py@8066b90a98a8]
 laws: [L1, L3]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 60e758c75be11a865b5f6cc2a3b225e7c3e5f413f62b1832877bfb099889c1f1
+content_sha: 74e190291c2c8d97d43a035011b08c6402fbfdfccd2b252b6cc7088882d1b1eb
 ---
 
 # SR-MERGE-DRIVER — a machine plane that never conflicts on adjacency

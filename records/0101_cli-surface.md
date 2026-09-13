@@ -7,10 +7,10 @@ description: Flat verbs in seven groups, one error boundary, three output modes.
 status: accepted
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@47bd3f16da05, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@74ed15facf94, src/fux/progress.py@925dccc045ce]
+owns: [src/fux/cli.py@4f87294070d9, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@74ed15facf94, src/fux/progress.py@925dccc045ce]
 laws: [L1, L4, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: f1bd83bb2d65620769585ee4a42748c42421bef2400fc30dac55963b918ae356
+content_sha: ee942205a3b5413752ffb8f0da49f0f711bcbef5fd8b539174db282ae45ce9b5
 ---
 
 # SR-CLI — the command-line surface
@@ -329,6 +329,29 @@ scope is calls rather than literals** because `store/canonical.py` and
 `ingest/urlsrc.py` hold U+2028/U+2029/U+0085 as the sentinels they *strip*, and
 a guard that flags the code defending against a character is one people learn
 to switch off.
+
+**10a. And the stream itself is UTF-8, on every platform** (amended
+2026-09-13, found by the Windows e2e suite's first run).
+`cli.main` reconfigures `sys.stdout`/`sys.stderr` to `encoding="utf-8",
+errors="replace"` before it parses an argument, and `fux-merge-index` does the
+same.
+
+🔴 **Decision 10 governs what fux writes ABOUT ITSELF; what broke was DATA.**
+The ASCII-literal rule cannot reach a document title, a path, or a passage —
+those come from the corpus, and a corpus is UTF-8 by construction. On Windows
+`sys.stdout` was the active code page, so `fux ask --json` piped to a file or
+to an agent emitted **cp1252 bytes**, and an em dash in a title arrived as
+`0x97`. Thirteen `tests_e2e` tests failed with `UnicodeDecodeError` the first
+time that suite ran there — reading fux's own output.
+
+**JSON settles it:** RFC 8259 §8.1 says UTF-8, so `--json` had no other legal
+encoding, and the index, the Node reader and every fetcher already agree.
+
+⚠ **Decision 10 and its test STAY.** They are not made redundant: a legacy
+console is still cp437/cp1252 for *rendering*, and `->`/`[OK]` is what keeps
+fux legible there. What changed is the bytes on a pipe, and that a character
+outside the console's page now degrades instead of raising out of a verb that
+had already done its work.
 
 11. **`ask` gained a `--sections` / `--no-sections` pair — the decision is
     [SR-OUTPUT](0143_output-defaults.md) decision 21, noted here only because

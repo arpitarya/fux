@@ -34,7 +34,7 @@ from fux.store import reader  # noqa: E402
 
 NODE_SNIPPET = """
 const fs = require('fs');
-import('%s/src/graph/plane.mjs').then(({buildPlane, planeBytes}) => {
+import('%s').then(({buildPlane, planeBytes}) => {
   const records = JSON.parse(fs.readFileSync(process.argv[1], 'utf8'));
   process.stdout.write(planeBytes(buildPlane(records)));
 });
@@ -83,7 +83,10 @@ def main() -> int:
         records_path = handle.name
 
     proc = subprocess.run(
-        ["node", "-e", NODE_SNIPPET % NODE_DIR.as_posix(), records_path],
+        # A file:// URL, not a path. `as_posix()` yields `D:/a/...` on Windows,
+        # and Node reads the drive letter as a URL scheme:
+        # ERR_UNSUPPORTED_ESM_URL_SCHEME, protocol 'd:'.
+        ["node", "-e", NODE_SNIPPET % (NODE_DIR / "src" / "graph" / "plane.mjs").as_uri(), records_path],
         capture_output=True, text=True, encoding="utf-8",
     )
     if proc.returncode != 0:
