@@ -18,6 +18,8 @@ from pathlib import Path
 
 import pytest
 
+from fux.maintain import runner as runner_mod
+
 DRIVER = shutil.which("fux-merge-index")
 
 
@@ -143,8 +145,23 @@ def diverge(path: Path, base: str) -> None:
 
 
 @pytest.mark.skipif(DRIVER is None, reason="fux-merge-index not on PATH (editable install needed)")
-def test_the_driver_resolves_what_git_cannot(tmp_path):
-    """The control and the treatment, same scenario."""
+def test_the_driver_resolves_what_git_cannot(tmp_path, monkeypatch):
+    """The control and the treatment, same scenario.
+
+    🔴 **No background runner, and that is the point of the test rather than a
+    convenience.** This measures the MERGE DRIVER. A detached re-index writes
+    into the repository at a moment nobody chose, and a `git merge` landing
+    there dies `fatal: stash failed` — which is how this failed on macOS CI,
+    intermittently, while saying nothing about the driver. `quiesce` cannot
+    close that window: a spawn already in flight has not claimed the lock, so
+    there is nothing for a stop to wait on.
+
+    `FUX_NO_SPAWN` removes the scheduler from the experiment. The hooks still
+    install, the merge driver is still configured by them — which is the whole
+    treatment — and the dirty list still records, exactly as it does whenever a
+    runner is busy.
+    """
+    monkeypatch.setenv(runner_mod.NO_SPAWN_ENV, "1")
     plain = tmp_path / "plain"
     plain.mkdir()
     base = make_repo(plain, hooks=False)

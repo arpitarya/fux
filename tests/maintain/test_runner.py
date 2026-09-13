@@ -549,3 +549,26 @@ def test_a_successor_is_spawned_with_the_marker(tmp_path, monkeypatch):
 
     assert runner._hand_off_if_leftovers_are_new(tmp_path, {"file:docs/d0.md"}) is True
     assert seen_kwargs == {"handoff": True}
+
+
+def test_no_spawn_makes_every_spawn_a_no_op(tmp_path, monkeypatch):
+    """`FUX_NO_SPAWN=1` — the switch a harness uses to measure something other
+    than the scheduler. Nothing detaches; the dirty list is untouched, which is
+    where the work waits for the next foreground verb either way."""
+    _corpus(tmp_path)
+    dirty.record(tmp_path, ["file:docs/d0.md"])
+    monkeypatch.setenv(runner.NO_SPAWN_ENV, "1")
+
+    assert runner.spawn(tmp_path) is False
+    assert dirty.read(tmp_path) == ["file:docs/d0.md"], "the list must survive a refused spawn"
+
+
+def test_without_the_switch_a_spawn_is_attempted(tmp_path, monkeypatch):
+    """The control: without it the test above proves nothing."""
+    _corpus(tmp_path)
+    monkeypatch.delenv(runner.NO_SPAWN_ENV, raising=False)
+    started = []
+    monkeypatch.setattr(runner.subprocess, "Popen", lambda *a, **kw: started.append(a) or None)
+
+    assert runner.spawn(tmp_path) is True
+    assert started, "no process was started"

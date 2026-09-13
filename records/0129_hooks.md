@@ -7,10 +7,10 @@ description: "post-commit DEFERS — it writes a dirty list and spawns a detache
 status: accepted
 date: 2026-08-20
 feature: maintenance — the hooks, the deferring runner, the write lock, and the URL freshness daemon
-owns: [src/fux/maintain@a53318a8c9dd, tools/maintenance-bench@23a6ade137a5]
+owns: [src/fux/maintain@1e2ab181bdab, tools/maintenance-bench@23a6ade137a5]
 laws: [L3, L4, L5, L7]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 327d1c7257f1748c3ded5e830c98cf7affbe8c414f4a4a68cd09c7bdea20019c
+content_sha: 01f69487913e6dc326a2f38f293fbc5db09bc5172bcf875ef15ce00170816919
 ---
 
 # SR-MAINTENANCE — keeping the index in step
@@ -694,6 +694,23 @@ the stop meant for both of them and keep writing. **Measured the same day** —
 shard the assertions were reading, after `quiesce` had stopped its parent. A
 handoff runner (marked by `FUX_RUNNER_HANDOFF` in its environment) records
 `stopped` and exits instead of guessing.
+
+**`FUX_NO_SPAWN=1` makes every spawn a no-op** (added 2026-09-13). Hooks still
+run and still install the merge driver, the dirty list still records, and
+nothing detaches.
+
+🔴 **It exists because a detached writer makes a measurement of anything else
+unreliable.** A re-index writes into the repository at a moment nobody chose,
+and a `git merge` landing there dies `fatal: stash failed` — which is how
+`tests_e2e`'s merge-driver test failed on macOS CI while saying nothing about
+the merge driver. ⚠ **`fux daemon stop` cannot close that window**: a spawn
+already in flight has not claimed the lock, so there is nothing for a stop to
+wait on. That is a real limit of the stop protocol, stated here rather than
+discovered again.
+
+**A switch for a harness, not a mode.** Nothing about ingest, the index or the
+hooks changes, and the work waits for the next foreground verb — where the
+dirty list has always sent leftovers.
 
 Gated by `tests/maintain/test_runner.py` (ten cases: including **the same count
 with a different id still hands off**, which the count version failed; a

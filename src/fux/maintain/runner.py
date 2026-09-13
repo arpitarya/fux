@@ -476,6 +476,22 @@ def record_head(root: Path) -> int:
 #: them and keep writing. A handoff runner therefore clears nothing and exits.
 HANDOFF_ENV = "FUX_RUNNER_HANDOFF"
 
+#: Set to `1` to make every spawn a no-op: hooks still run, the dirty list is
+#: still recorded, and nothing detaches.
+#:
+#: 🔴 **What it is for is measuring something OTHER than the scheduler.** A
+#: detached runner writes into the repository at a time nobody chose, and a
+#: `git merge` running at that moment dies `fatal: stash failed` — which is how
+#: `tests_e2e`'s merge-driver test failed on macOS CI, intermittently, saying
+#: nothing about the merge driver it exists to test. `fux daemon stop` cannot
+#: close that window, because a spawn already in flight has not claimed the
+#: lock yet and so there is nothing to stop.
+#:
+#: **It is a switch for a harness, not a mode.** Nothing about ingest, the
+#: index or the hooks changes; the work simply waits for the next foreground
+#: verb, which is where the dirty list has always sent leftovers.
+NO_SPAWN_ENV = "FUX_NO_SPAWN"
+
 
 def spawn(root: Path, *, handoff: bool = False) -> bool:
     """Start a detached one-shot re-index. `False` if one is already live.
@@ -488,6 +504,8 @@ def spawn(root: Path, *, handoff: bool = False) -> bool:
     **Never raises.** A hook that could fail a commit because a spawn failed
     would have traded a slow commit for a broken one.
     """
+    if os.environ.get(NO_SPAWN_ENV) == "1":
+        return False
     if holder(root) is not None:
         return False
 
