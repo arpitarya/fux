@@ -422,8 +422,11 @@ def test_a_failed_accelerator_build_does_not_fail_the_re_index(tmp_path, monkeyp
 
 
 def _spy(monkeypatch):
+    # `**kw` matters: the real call is `spawn(root, handoff=True)`, and a spy
+    # with the wrong signature raises inside a helper that swallows everything
+    # — which reads as "it chose not to hand off".
     spawned = []
-    monkeypatch.setattr(runner, "spawn", lambda root: spawned.append(root) or True)
+    monkeypatch.setattr(runner, "spawn", lambda root, **kw: spawned.append(root) or True)
     return spawned
 
 
@@ -498,8 +501,51 @@ def test_a_handoff_never_raises(tmp_path, monkeypatch):
     _corpus(tmp_path)
     dirty.record(tmp_path, ["file:docs/d0.md"])
 
-    def explode(root):
+    def explode(root, **kw):
         raise OSError("fork: resource temporarily unavailable")
 
     monkeypatch.setattr(runner, "spawn", explode)
     assert runner._hand_off_if_leftovers_are_new(tmp_path, set()) is False
+
+
+def test_a_handoff_runner_defers_to_a_stop_instead_of_clearing_it(tmp_path, monkeypatch):
+    """🔴 `fux daemon stop` must not be undone by a successor.
+
+    `run_once` clears a stop it decides was aimed at an earlier runner. For a
+    spawn a commit made that is right. For a HANDOFF it is wrong: `daemon stop`
+    lands in the gap between the parent releasing the lock and the successor
+    claiming it routinely, and clearing it would restart the very work that was
+    just stopped — and, in `tests_e2e`, rewrite a shard mid-assertion.
+    """
+    _corpus(tmp_path)
+    dirty.record(tmp_path, ["file:docs/d0.md"])
+    runner._stop_path(tmp_path).parent.mkdir(parents=True, exist_ok=True)
+    runner._stop_path(tmp_path).write_text("0", encoding="utf-8")
+    monkeypatch.setenv(runner.HANDOFF_ENV, "1")
+
+    assert runner.run_once(tmp_path) == "stopped"
+    assert runner._stop_path(tmp_path).exists(), "a handoff cleared a stop it could not own"
+    assert runner.last_run(tmp_path)["outcome"] == "stopped"
+
+
+def test_an_ordinary_runner_still_clears_a_stale_stop(tmp_path, monkeypatch):
+    """The control: without the handoff marker the old behaviour is intact,
+    or a stop aimed at a dead runner would wedge every future re-index."""
+    _corpus(tmp_path)
+    runner._stop_path(tmp_path).parent.mkdir(parents=True, exist_ok=True)
+    runner._stop_path(tmp_path).write_text("0", encoding="utf-8")
+    monkeypatch.delenv(runner.HANDOFF_ENV, raising=False)
+
+    assert runner.run_once(tmp_path) == "ok"
+    assert not runner._stop_path(tmp_path).exists()
+
+
+def test_a_successor_is_spawned_with_the_marker(tmp_path, monkeypatch):
+    """The wiring: if the marker is not set, the deferral above never happens."""
+    _corpus(tmp_path)
+    dirty.record(tmp_path, ["file:docs/d1.md"])
+    seen_kwargs = {}
+    monkeypatch.setattr(runner, "spawn", lambda root, **kw: seen_kwargs.update(kw) or True)
+
+    assert runner._hand_off_if_leftovers_are_new(tmp_path, {"file:docs/d0.md"}) is True
+    assert seen_kwargs == {"handoff": True}

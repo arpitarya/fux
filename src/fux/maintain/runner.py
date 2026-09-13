@@ -467,7 +467,17 @@ def record_head(root: Path) -> int:
 # -- the spawn --------------------------------------------------------------
 
 
-def spawn(root: Path) -> bool:
+#: Set in a successor's environment by `_hand_off_if_leftovers_are_new`.
+#: 🔴 **What it buys is the honesty of `fux daemon stop`.** `run_once` clears a
+#: stop file it decides was aimed at an earlier runner — right for a spawn a
+#: commit made, and WRONG for a handoff, because `daemon stop` can land in the
+#: gap between the parent releasing the lock and the successor claiming it, and
+#: the successor would then clear the very stop that was meant for the pair of
+#: them and keep writing. A handoff runner therefore clears nothing and exits.
+HANDOFF_ENV = "FUX_RUNNER_HANDOFF"
+
+
+def spawn(root: Path, *, handoff: bool = False) -> bool:
     """Start a detached one-shot re-index. `False` if one is already live.
 
     Checked before spawning as a courtesy only — the spawned process races for
@@ -482,6 +492,8 @@ def spawn(root: Path) -> bool:
         return False
 
     kwargs: dict = {}
+    if handoff:
+        kwargs["env"] = dict(os.environ, **{HANDOFF_ENV: "1"})
     if sys.platform == "win32":  # pragma: no cover - exercised on the Windows CI arms
         # There is no `fork`. These two flags are the documented way to get a
         # process that survives its parent and owns no console.
@@ -527,8 +539,17 @@ def run_once(root: Path) -> str:
         # A stop aimed at a *previous* runner must not kill this one before it
         # has done anything. We hold the lock, so nobody else can be racing us
         # for this file.
-        if _stop_path(root).exists() and not stop_requested(root, pid):
-            _clear_stop(root)
+        #
+        # ⚠ **Unless we are a handoff** — see `HANDOFF_ENV`. A successor cannot
+        # tell a stale stop from one written while it was starting, and for a
+        # handoff the second is the likely one: `daemon stop` aimed at the
+        # parent lands in exactly that gap. So it defers rather than guesses.
+        if _stop_path(root).exists():
+            if os.environ.get(HANDOFF_ENV) == "1":
+                _write_status(root, "stopped", passes=0)
+                return "stopped"
+            if not stop_requested(root, pid):
+                _clear_stop(root)
 
         from . import dirty
 
@@ -649,6 +670,6 @@ def _hand_off_if_leftovers_are_new(root: Path, seen: set[str] | None) -> bool:
             return False
         if _stop_path(root).exists():
             return False
-        return spawn(root)
+        return spawn(root, handoff=True)
     except Exception:  # noqa: BLE001 - a handoff is an optimisation, never a failure
         return False

@@ -7,10 +7,10 @@ description: "post-commit DEFERS — it writes a dirty list and spawns a detache
 status: accepted
 date: 2026-08-20
 feature: maintenance — the hooks, the deferring runner, the write lock, and the URL freshness daemon
-owns: [src/fux/maintain@dc11be265db7, tools/maintenance-bench@23a6ade137a5]
+owns: [src/fux/maintain@a53318a8c9dd, tools/maintenance-bench@23a6ade137a5]
 laws: [L3, L4, L5, L7]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: c443551932738bb77f8dafd4d357147dba4bd67a6708989affe01406dffca1af
+content_sha: 327d1c7257f1748c3ded5e830c98cf7affbe8c414f4a4a68cd09c7bdea20019c
 ---
 
 # SR-MAINTENANCE — keeping the index in step
@@ -685,8 +685,21 @@ one-shot, still watches nothing, and a chain that makes no progress stops after
 one link. A pending stop cancels the handoff outright — `fux daemon stop` means
 stop, not *stop and start another one*.
 
-Gated by `tests/maintain/test_runner.py` (seven cases, including the one the
-count version failed: **the same count with a different id still hands off**).
+🔴 **And a successor never clears a stop.** `run_once` clears a stop file it
+decides was aimed at an earlier runner — right for a spawn a commit made, and
+wrong for a handoff: `fux daemon stop` lands in the gap between the parent
+releasing the lock and the successor claiming it, and the successor would clear
+the stop meant for both of them and keep writing. **Measured the same day** —
+`tests_e2e`'s merge-driver test failed on macOS because a successor rewrote the
+shard the assertions were reading, after `quiesce` had stopped its parent. A
+handoff runner (marked by `FUX_RUNNER_HANDOFF` in its environment) records
+`stopped` and exits instead of guessing.
+
+Gated by `tests/maintain/test_runner.py` (ten cases: including **the same count
+with a different id still hands off**, which the count version failed; a
+handoff runner deferring to a stop; the control that an ORDINARY runner still
+clears a stale one, or a stop aimed at a dead runner would wedge every future
+re-index; and that the successor is spawned carrying the marker at all).
 
 ### Veto condition
 
