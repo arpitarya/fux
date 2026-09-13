@@ -7,10 +7,10 @@ description: "post-commit DEFERS — it writes a dirty list and spawns a detache
 status: accepted
 date: 2026-08-20
 feature: maintenance — the hooks, the deferring runner, the write lock, and the URL freshness daemon
-owns: [src/fux/maintain@406007ea1cff, tools/maintenance-bench@23a6ade137a5]
+owns: [src/fux/maintain@dc11be265db7, tools/maintenance-bench@23a6ade137a5]
 laws: [L3, L4, L5, L7]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 9f564aaf55c120da0e39e535c4876f6e3195792b485cd63599e3eb7ba2100f44
+content_sha: c443551932738bb77f8dafd4d357147dba4bd67a6708989affe01406dffca1af
 ---
 
 # SR-MAINTENANCE — keeping the index in step
@@ -665,10 +665,19 @@ printed exactly that state on 2026-09-13 after waiting 120 s for it to change,
 which is also the reproduction W-140 row 1 could not get in 11 attempts.
 
 **So `run_once` spawns a successor after releasing the lock — bounded by
-PROGRESS, not by a counter.** A successor is spawned only if this run actually
-shrank the dirty list. A chain therefore continues exactly as long as it keeps
-draining a finite list, and an entry ingest cannot clear hands off once, is not
-drained, and the next runner hands off to nobody.
+IDENTITY, not by a count.** It remembers every id it looked at, and hands off
+only for ids in the list that are not among them.
+
+⚠ **A count-based version of this shipped first and did not fire.** *"Did the
+list get shorter?"* cannot express what actually happens: the list held one id,
+the runner drained it, the next commit put a **different** one there — one in,
+one out, no change in the count, and the work is real. Two CI runs printed the
+same `pending: 1` afterwards. **The quantity that moves is not the size.**
+
+**It terminates because the remembered set only grows.** An id ingest cannot
+clear is read at the top of a pass, so it is remembered, so it never justifies
+a successor however many runners see it. A chain advances only on genuinely new
+ids, and those arrive one per commit.
 
 ⚠ **This is not veto condition 6 and the distinction is the terminating
 argument, not a reassurance.** Nothing becomes resident: each process is still
@@ -676,9 +685,8 @@ one-shot, still watches nothing, and a chain that makes no progress stops after
 one link. A pending stop cancels the handoff outright — `fux daemon stop` means
 stop, not *stop and start another one*.
 
-Gated by `tests/maintain/test_runner.py` (five cases: progress hands on, no
-progress does not, an empty list does not, a pending stop cancels, and a
-handoff that raises is swallowed rather than losing the status write).
+Gated by `tests/maintain/test_runner.py` (seven cases, including the one the
+count version failed: **the same count with a different id still hands off**).
 
 ### Veto condition
 

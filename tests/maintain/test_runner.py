@@ -414,44 +414,69 @@ def test_a_failed_accelerator_build_does_not_fail_the_re_index(tmp_path, monkeyp
 # race. The window is between the loop's last `dirty.read` and `release`: a
 # commit landing there has its own spawn refused because the lock is still
 # held, and then nobody is left to do the work.
+#
+# ⚠ **The FIRST fix for it shipped and did not fire**, which is why these cases
+# are about identity and not about counts: the list held one id, the runner
+# drained it, the next commit put a DIFFERENT one there, and a count saw no
+# change. `seen` is every id the runner actually looked at.
 
 
-def test_a_runner_that_made_progress_hands_the_leftovers_on(tmp_path, monkeypatch):
-    """Work that arrived at the tail gets a successor, not silence."""
-    _corpus(tmp_path)
-    dirty.record(tmp_path, ["file:docs/d0.md"])
-
+def _spy(monkeypatch):
     spawned = []
     monkeypatch.setattr(runner, "spawn", lambda root: spawned.append(root) or True)
+    return spawned
 
-    # started from 3 outstanding, one left: this run drained two of them.
-    assert runner._hand_off_if_progress_was_made(tmp_path, 3) is True
+
+def test_an_id_the_runner_never_saw_gets_a_successor(tmp_path, monkeypatch):
+    """Work that arrived at the tail gets a successor, not silence."""
+    _corpus(tmp_path)
+    dirty.record(tmp_path, ["file:docs/d2.md"])
+    spawned = _spy(monkeypatch)
+
+    assert runner._hand_off_if_leftovers_are_new(tmp_path, {"file:docs/d0.md"}) is True
     assert spawned == [tmp_path]
 
 
-def test_no_progress_means_no_successor(tmp_path, monkeypatch):
-    """The terminating argument: a chain continues only while it drains.
+def test_the_same_count_still_hands_off_when_the_id_is_new(tmp_path, monkeypatch):
+    """🔴 The case the first fix got wrong: one in, one out, count unchanged."""
+    _corpus(tmp_path)
+    dirty.record(tmp_path, ["file:docs/d1.md"])
+    spawned = _spy(monkeypatch)
 
-    An entry ingest cannot clear would otherwise spawn a runner that cannot
-    clear it either, forever — a resident process assembled out of one-shot
-    ones, which is exactly what SR-MAINTENANCE veto condition 6 forbids.
+    # started with exactly one id, ends with exactly one — a different one.
+    assert runner._hand_off_if_leftovers_are_new(tmp_path, {"file:docs/d0.md"}) is True
+    assert spawned == [tmp_path]
+
+
+def test_an_id_already_seen_hands_off_to_nobody(tmp_path, monkeypatch):
+    """The terminating argument: `seen` only grows.
+
+    An entry ingest cannot clear is read at the top of a pass, so it is in
+    `seen` — it can never justify another runner, however many see it. Without
+    this, one-shot processes would assemble into the resident one
+    SR-MAINTENANCE veto condition 6 forbids.
     """
     _corpus(tmp_path)
     dirty.record(tmp_path, ["file:docs/d0.md"])
+    spawned = _spy(monkeypatch)
 
-    spawned = []
-    monkeypatch.setattr(runner, "spawn", lambda root: spawned.append(root) or True)
-
-    assert runner._hand_off_if_progress_was_made(tmp_path, 1) is False
-    assert runner._hand_off_if_progress_was_made(tmp_path, 0) is False
+    assert runner._hand_off_if_leftovers_are_new(tmp_path, {"file:docs/d0.md"}) is False
     assert spawned == []
 
 
 def test_an_empty_dirty_list_hands_off_to_nobody(tmp_path, monkeypatch):
     _corpus(tmp_path)
-    spawned = []
-    monkeypatch.setattr(runner, "spawn", lambda root: spawned.append(root) or True)
-    assert runner._hand_off_if_progress_was_made(tmp_path, 5) is False
+    spawned = _spy(monkeypatch)
+    assert runner._hand_off_if_leftovers_are_new(tmp_path, {"file:docs/d0.md"}) is False
+    assert spawned == []
+
+
+def test_a_run_that_never_read_the_list_hands_off_to_nobody(tmp_path, monkeypatch):
+    """`seen is None` — `run_once` failed before it looked at anything."""
+    _corpus(tmp_path)
+    dirty.record(tmp_path, ["file:docs/d0.md"])
+    spawned = _spy(monkeypatch)
+    assert runner._hand_off_if_leftovers_are_new(tmp_path, None) is False
     assert spawned == []
 
 
@@ -461,10 +486,9 @@ def test_a_pending_stop_cancels_the_handoff(tmp_path, monkeypatch):
     dirty.record(tmp_path, ["file:docs/d0.md"])
     runner._stop_path(tmp_path).parent.mkdir(parents=True, exist_ok=True)
     runner._stop_path(tmp_path).write_text("0", encoding="utf-8")
+    spawned = _spy(monkeypatch)
 
-    spawned = []
-    monkeypatch.setattr(runner, "spawn", lambda root: spawned.append(root) or True)
-    assert runner._hand_off_if_progress_was_made(tmp_path, 3) is False
+    assert runner._hand_off_if_leftovers_are_new(tmp_path, set()) is False
     assert spawned == []
 
 
@@ -478,4 +502,4 @@ def test_a_handoff_never_raises(tmp_path, monkeypatch):
         raise OSError("fork: resource temporarily unavailable")
 
     monkeypatch.setattr(runner, "spawn", explode)
-    assert runner._hand_off_if_progress_was_made(tmp_path, 3) is False
+    assert runner._hand_off_if_leftovers_are_new(tmp_path, set()) is False
