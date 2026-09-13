@@ -37,6 +37,25 @@ Rules:
 [SR-T1-ACCELERATOR](../records/0110_accelerator.md) (decision 13, new) and
 [SR-NODE-SEARCH](../records/0153_node-search.md).
 
+**Released 2026-09-13 (UTC).** Tag `v2.0.0` · [publish run
+34775968150](https://github.com/arpitarya/fux/actions/runs/34775968150) — all
+three jobs green.
+
+| registry | state |
+|---|---|
+| **PyPI** | **`fux-engine` 2.0.0 is live** — sdist + wheel, published by OIDC |
+| **npm** | **STAGED, id `b5303aa3-f75b-479a-a696-95ee742b1d64`** — waiting on a human to approve it at npmjs.com, which is the deliberate asymmetry SR-NODE-SEARCH decision 14 describes |
+
+⚠ **One thing to check after approving the npm half.** The stage step warned
+`"bin[fux]" script name fux.mjs was invalid and removed`. A tarball built from
+the same bundler here **keeps** `bin: {"fux": "./fux.mjs"}`, and the published
+`2.0.0-alpha.7` carries `bin: {"fux": "fux.mjs"}` in its registry metadata, so
+this may be npm 11.x normalising rather than dropping. **It is unverifiable
+until the stage is approved** — a staged version has no public metadata. If the
+bin is gone, `npm i -g fux-engine` installs no `fux` command, which is the
+mitigation R1a ships and what [W-159](open/W-159-windows-shadowing-row.md)
+already concerns itself with.
+
 **What was released.** No behaviour was written for the release itself: the
 eight `2.0.0-alpha.*` pre-releases plus everything that had accumulated
 unreleased since alpha.7 on 2026-09-02, cut as one major. All four version
