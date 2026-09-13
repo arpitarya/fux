@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-08-18
 feature: the `fux ingest` pipeline — sources to committed records
-owns: [src/fux/ingest@116c43d99cde, src/fux/ingest/priors.py@04920ab89b6a]
+owns: [src/fux/ingest@6f0af99dd108, src/fux/ingest/priors.py@8ffcc632a4be]
 laws: [L2, L3, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: c9ccd841a99c04383b2d7e89dfaf2731d557515f5daac780e35d496e8947925e
+content_sha: d2bac143dba1e095d0d00fd2d264a8b06c818724326c52831bf1351bdd84842d
 ---
 
 # SR-INGEST — how ingest works
@@ -784,6 +784,12 @@ policy input to what gets indexed.
 - Prior art for content-addressed reuse of a pure derivation, with an explicit
   full-rebuild escape hatch — Bazel's action cache keyed on the action's inputs:
   https://bazel.build/basics/hermeticity
+
+
+⚠ **2026-09-13:** every `subprocess` pipe under this record's components now names
+`encoding="utf-8"` rather than inheriting the platform code page. Why, and what it
+cost on Windows, is stated once in
+[SR-T1-ACCELERATOR](0110_accelerator.md) decision 13.
 
 ### Veto condition
 

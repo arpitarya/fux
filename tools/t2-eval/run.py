@@ -64,10 +64,10 @@ POPULATION_SIZE = 20
 
 def _engine_sha() -> str:
     out = subprocess.run(
-        ["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, capture_output=True, text=True
+        ["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, capture_output=True, text=True, encoding="utf-8"
     )
     dirty = subprocess.run(
-        ["git", "status", "--porcelain"], cwd=ROOT, capture_output=True, text=True
+        ["git", "status", "--porcelain"], cwd=ROOT, capture_output=True, text=True, encoding="utf-8"
     )
     return out.stdout.strip() + ("+dirty" if dirty.stdout.strip() else "")
 
@@ -218,7 +218,7 @@ def main(argv=None) -> int:
     report = {
         "engine_sha": _engine_sha(),
         "python": sys.version.split()[0],
-        "platform": subprocess.run(["uname", "-srm"], capture_output=True, text=True).stdout.strip(),
+        "platform": subprocess.run(["uname", "-srm"], capture_output=True, text=True, encoding="utf-8").stdout.strip(),
         "pre_registration": "tools/t2-eval/PRE-REGISTRATION.md",
         "r9_bar_ms": R9_BAR_MS,
         "r9_judged_docs": R9_JUDGED_DOCS,

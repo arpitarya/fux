@@ -11,7 +11,7 @@ from fux import __version__
 
 def test_fux_version_via_subprocess():
     result = subprocess.run(
-        [sys.executable, "-m", "fux.cli", "--version"], capture_output=True, text=True, check=True
+        [sys.executable, "-m", "fux.cli", "--version"], capture_output=True, text=True, encoding="utf-8", check=True
     )
     assert result.stdout.strip() == f"fux {__version__}"
 
@@ -24,6 +24,7 @@ def test_fux_doctor_via_subprocess(tmp_path):
         [sys.executable, "-m", "fux.cli", "doctor"],
         capture_output=True,
         text=True,
+        encoding="utf-8",
         cwd=tmp_path,
     )
     assert result.returncode == 0
@@ -43,6 +44,7 @@ def test_fux_doctor_output_is_ascii_safe(tmp_path):
         [sys.executable, "-m", "fux.cli", "doctor"],
         capture_output=True,
         text=True,
+        encoding="utf-8",
         cwd=tmp_path,
         env=env,
     )
@@ -64,16 +66,16 @@ def test_fux_doctor_reports_the_w101_checks_as_a_user_sees_them(tmp_path):
     (tmp_path / "fux.toml").write_text("", encoding="utf-8")
     (tmp_path / "a.md").write_text("# Alpha\n\nsomething findable\n", encoding="utf-8")
     setup = subprocess.run(
-        [sys.executable, "-m", "fux.cli", "setup"], capture_output=True, text=True, cwd=tmp_path
+        [sys.executable, "-m", "fux.cli", "setup"], capture_output=True, text=True, encoding="utf-8", cwd=tmp_path
     )
     assert setup.returncode == 0, setup.stderr
     ingest = subprocess.run(
-        [sys.executable, "-m", "fux.cli", "ingest"], capture_output=True, text=True, cwd=tmp_path
+        [sys.executable, "-m", "fux.cli", "ingest"], capture_output=True, text=True, encoding="utf-8", cwd=tmp_path
     )
     assert ingest.returncode == 0, ingest.stderr
 
     result = subprocess.run(
-        [sys.executable, "-m", "fux.cli", "doctor"], capture_output=True, text=True, cwd=tmp_path
+        [sys.executable, "-m", "fux.cli", "doctor"], capture_output=True, text=True, encoding="utf-8", cwd=tmp_path
     )
     for name in ("refusal rules", "decoder bindings", "recency prior", "freshness verdicts"):
         assert name in result.stdout, result.stdout
@@ -85,6 +87,7 @@ def test_fux_doctor_reports_the_w101_checks_as_a_user_sees_them(tmp_path):
             [sys.executable, "-m", "fux.cli", "doctor", "--json"],
             capture_output=True,
             text=True,
+            encoding="utf-8",
             cwd=tmp_path,
         ).stdout
     )
@@ -108,7 +111,7 @@ def test_a_generated_types_file_leaves_the_binding_check_quiet(tmp_path):
     line = next(
         ln
         for ln in subprocess.run(
-            [sys.executable, "-m", "fux.cli", "doctor"], capture_output=True, text=True,
+            [sys.executable, "-m", "fux.cli", "doctor"], capture_output=True, text=True, encoding="utf-8",
             cwd=tmp_path,
         ).stdout.splitlines()
         if "decoder bindings" in ln
@@ -128,7 +131,7 @@ def test_a_repo_without_pii_toml_stops_every_gated_verb(tmp_path):
 
     def fux(*args):
         return subprocess.run(
-            [sys.executable, "-m", "fux.cli", *args], capture_output=True, text=True, cwd=tmp_path
+            [sys.executable, "-m", "fux.cli", *args], capture_output=True, text=True, encoding="utf-8", cwd=tmp_path
         )
 
     for verb in (("ingest",), ("find", "findable"), ("ask", "findable")):

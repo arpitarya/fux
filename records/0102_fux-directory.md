@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@923073c87ec5, src/fux/setup.py@425c58247116]
+owns: [src/fux/store/fuxdir.py@836cc5ab2239, src/fux/setup.py@425c58247116]
 laws: [L2, L3, L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 3746a5f872ff6802c7f06de9aff075b3b0d6af4edb45226836aad4003186fe64
+content_sha: 8251b94483d863a707dfa10e8cddc807fcef612112ad7e353d0a30ce8873ac12
 ---
 
 # SR-DOTFUX — the `.fux/` directory
@@ -771,6 +771,12 @@ check can see neither.
 - Cache-directory tagging — https://bford.info/cachedir/
 - `gitignore` pattern semantics, including the directory-negation trap —
   https://git-scm.com/docs/gitignore
+
+
+⚠ **2026-09-13:** every `subprocess` pipe under this record's components now names
+`encoding="utf-8"` rather than inheriting the platform code page. Why, and what it
+cost on Windows, is stated once in
+[SR-T1-ACCELERATOR](0110_accelerator.md) decision 13.
 
 ### Veto condition
 

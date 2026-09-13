@@ -44,6 +44,7 @@ def test_module_invocation_spellings_agree():
             [sys.executable, "-m", target, "--version"],
             capture_output=True,
             text=True,
+            encoding="utf-8",
         )
         for target in ("fux", "fux.cli")
     ]
@@ -248,7 +249,7 @@ def test_the_gate_does_not_import_fux_ingest_when_the_file_exists(tmp_path):
         "_require_pii_rules('find'); print('fux.ingest' in sys.modules)"
     )
     out = subprocess.run(
-        [sys.executable, "-c", code], cwd=tmp_path, capture_output=True, text=True, check=True
+        [sys.executable, "-c", code], cwd=tmp_path, capture_output=True, text=True, encoding="utf-8", check=True
     )
     assert out.stdout.strip() == "False"
 

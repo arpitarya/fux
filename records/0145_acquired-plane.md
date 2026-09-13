@@ -10,7 +10,7 @@ feature: the acquired plane
 owns: [src/fux/store/acquired.py@9897ee1fe4af]
 laws: []
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 1a7e81d547fe563c14a4b2e7c7995e5468550ed5706a39ef3efb84c319e29b3c
+content_sha: 1d98b9e28d68c17fd7eb759e8f30202616730d9c325ed1c1f8249adbf118d939
 ---
 
 # SR-ACQUIRED: fetched bytes are kept, in a plane that is neither committed nor derived
@@ -229,6 +229,12 @@ landed one commit later — see SR-CONFIG after decision 15.
 - `src/fux/doctor.py` — `freshness_counts()` and `AS_INGESTED_VETO_SHARE`, the veto's instrument (W-101, 2026-09-05)
 - `tests/store/test_acquired.py` — 24 tests, including the failing-URL eviction guard and the no-wall-clock assertion
 - SR-DOTFUX (`0102_fux-directory.md`) · SR-FETCHER (`0117_fetcher.md`) · SR-REFER (`0127_refer-plane.md`)
+
+
+⚠ **2026-09-13:** every `subprocess` pipe under this record's components now names
+`encoding="utf-8"` rather than inheriting the platform code page. Why, and what it
+cost on Windows, is stated once in
+[SR-T1-ACCELERATOR](0110_accelerator.md) decision 13.
 
 ### Veto condition
 

@@ -168,7 +168,7 @@ def start_server(docs: dict[str, bytes]) -> tuple[_Server, int]:
 
 
 def _run(cmd: list[str], cwd: Path) -> None:
-    result = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True)
+    result = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, encoding="utf-8")
     if result.returncode != 0:
         raise SystemExit(f"{' '.join(cmd)} failed:\n{result.stdout}\n{result.stderr}")
 
@@ -261,10 +261,10 @@ def measure_arm(root: Path, candidates, fetcher, arm: str, delay: float, pairs: 
 
 def _engine_sha() -> str:
     sha = subprocess.run(
-        ["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, capture_output=True, text=True
+        ["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, capture_output=True, text=True, encoding="utf-8"
     ).stdout.strip()
     dirty = subprocess.run(
-        ["git", "status", "--porcelain"], cwd=ROOT, capture_output=True, text=True
+        ["git", "status", "--porcelain"], cwd=ROOT, capture_output=True, text=True, encoding="utf-8"
     ).stdout.strip()
     return sha + ("+dirty" if dirty else "")
 

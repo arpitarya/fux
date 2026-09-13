@@ -33,6 +33,7 @@ def _run(cwd: Path, *args: str, env: dict | None = None) -> subprocess.Completed
         cwd=cwd,
         capture_output=True,
         text=True,
+        encoding="utf-8",
         env={**os.environ, **(env or {})},
     )
 
@@ -212,6 +213,7 @@ def test_an_interrupted_ingest_leaves_no_partial_line(repo: Path):
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True,
+        encoding="utf-8",
     )
     try:
         process.send_signal(subprocess.signal.SIGINT)

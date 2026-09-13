@@ -7,10 +7,10 @@ description: A disposable term-major index under .fux/runtime/ that makes warm q
 status: accepted
 date: 2026-08-18
 feature: "`.fux/runtime/` — the derived index, `fux build`, and the block bound that makes skipping provable"
-owns: [src/fux/derive@08c8ff2c8767, tools/differential@417bd6ee8590]
+owns: [src/fux/derive@08c8ff2c8767, tools/differential@2ce90dcc920c]
 laws: [L1, L3]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: fffe0587c20a75db3e81b04f8bd79352ba000c57bc3f30c79a2e234ab3ed75d7
+content_sha: 51991b4e140b8400210642ffc72d2bf4f02e370b8daa33be7cb8629eba6afd2a
 ---
 
 # SR-T1-ACCELERATOR — the derived T1 accelerator
@@ -389,10 +389,23 @@ now names `encoding="utf-8"` on every call and reconfigures its own stdout,
 because printing the report's `⚠` to a cp1252 console raises
 `UnicodeEncodeError` *after* the comparison has already passed.
 
-⚠ **The engine was never implicated** — `store/reader.py` reads bytes and every
-`read_text` in `src/fux/` names its encoding. Checked before the harness was
-touched, because "fix the harness" is what a session says when it has decided
-the answer first.
+⚠ **The engine was never implicated in the mojibake** — `store/reader.py`
+reads bytes and every `read_text` in `src/fux/` names its encoding. Checked
+before the harness was touched, because *"fix the harness"* is what a session
+says when it has decided the answer first.
+
+🔴 **But the same call was wrong in four places inside `src/fux/`, and this is
+where that is stated** — cited, never restated, by the records owning them.
+`ingest/priors.py`, `maintain/runner.py` and `maintain/hooks.py` read **git**
+through `subprocess.run(text=True)`, and `store/fuxdir.py` writes that same
+call into the snippet `fux setup` leaves in a consumer's repository. Git's
+output there is **paths**: on a Windows machine with one non-ASCII filename,
+`ingest` raises `UnicodeDecodeError` from inside the recency prior, or silently
+loses that file's date. All four now name `encoding="utf-8"` — with
+`errors="replace"` in the engine, because a diagnostic read must not be able to
+kill a verb — and so does every call under `tests/`, `tests_e2e/`, `scripts/`
+and `tools/`. **69 sites; none of them was a decision, all of them were a
+default.**
 
 **12. The differential harness takes a CORPUS, not a repo — and a golden rung
 is resolved through its committed manifest.** Added 2026-09-12 (W-107).

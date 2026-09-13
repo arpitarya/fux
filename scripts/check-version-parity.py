@@ -92,7 +92,10 @@ def check(root: Path = ROOT) -> list[str]:
     if problems:
         return problems
 
-    want = found[str(SOURCE)]
+    # `SOURCE.as_posix()`, never `str(SOURCE)`: SITES is keyed by the posix
+    # spelling and `str(Path)` is backslashed on Windows, which made this a
+    # KeyError on every Windows runner while passing everywhere else.
+    want = found[SOURCE.as_posix()]
     problems += [
         f"{name}: {v!r} != {want!r} (src/fux/__init__.py is the source)"
         for name, v in found.items()

@@ -92,13 +92,13 @@ _ENV = {
 
 def git(repo: Path, *args: str, check: bool = True) -> subprocess.CompletedProcess:
     return subprocess.run(
-        ["git", *args], cwd=repo, capture_output=True, text=True, env=_ENV, check=check
+        ["git", *args], cwd=repo, capture_output=True, text=True, encoding="utf-8", env=_ENV, check=check
     )
 
 
 def fux(repo: Path, *args: str) -> subprocess.CompletedProcess:
     return subprocess.run(
-        [FUX, *args], cwd=repo, capture_output=True, text=True, env=_ENV, check=False
+        [FUX, *args], cwd=repo, capture_output=True, text=True, encoding="utf-8", env=_ENV, check=False
     )
 
 
@@ -416,7 +416,7 @@ def _engine_sha() -> str:
     out = subprocess.run(
         ["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, capture_output=True, text=True
     )
-    dirty = subprocess.run(["git", "status", "--porcelain"], cwd=ROOT, capture_output=True, text=True)
+    dirty = subprocess.run(["git", "status", "--porcelain"], cwd=ROOT, capture_output=True, text=True, encoding="utf-8")
     return out.stdout.strip() + ("+dirty" if dirty.stdout.strip() else "")
 
 

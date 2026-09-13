@@ -29,7 +29,7 @@ CORPUS = EVAL_DIR / "relational"
 def _run(cwd: Path, *args: str) -> subprocess.CompletedProcess:
     return subprocess.run(
         [sys.executable, "-m", "fux.cli", *args],
-        cwd=cwd, capture_output=True, text=True, check=True,
+        cwd=cwd, capture_output=True, text=True, encoding="utf-8", check=True,
     )
 
 
@@ -135,7 +135,7 @@ def test_graph_verbs_ask_for_a_build_rather_than_crashing(linked, tmp_path):
 
     result = subprocess.run(
         [sys.executable, "-m", "fux.cli", "explain", "docs/adr-storage.md"],
-        cwd=proj, capture_output=True, text=True,
+        cwd=proj, capture_output=True, text=True, encoding="utf-8",
     )
     assert result.returncode == 1
     assert "fux build" in result.stderr
@@ -147,7 +147,7 @@ def test_graph_verbs_ask_for_a_build_rather_than_crashing(linked, tmp_path):
 
 def _run_failing(cwd: Path, *args: str) -> subprocess.CompletedProcess:
     return subprocess.run(
-        [sys.executable, "-m", "fux.cli", *args], cwd=cwd, capture_output=True, text=True
+        [sys.executable, "-m", "fux.cli", *args], cwd=cwd, capture_output=True, text=True, encoding="utf-8"
     )
 
 

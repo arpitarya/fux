@@ -1326,8 +1326,25 @@ def test_this_interpreters_fux_resolving_first_is_fine(monkeypatch):
     assert "this interpreter's" in row.detail
 
 
+@pytest.mark.skipif(
+    os.name == "nt",
+    reason=(
+        "the shim this builds cannot be found on Windows: `shutil.which` honours "
+        "PATHEXT, so an extensionless `fux` is invisible there and npm installs "
+        "`fux.cmd` instead. The ROW is what is unbuilt, not the test — W-159"
+    ),
+)
 def test_a_node_fux_shadowing_python_is_reported(monkeypatch, tmp_path):
-    """The whole point: a `#!/usr/bin/env node` shim earlier on PATH."""
+    """The whole point: a `#!/usr/bin/env node` shim earlier on PATH.
+
+    ⚠ **Unix only, and the gap is real rather than cosmetic.** `_fux_on_path`
+    finds the shadowing binary with `shutil.which("fux")`, which on Windows
+    resolves through PATHEXT — so it sees `fux.cmd`/`fux.exe` and never an
+    extensionless shim, while `npm i -g fux-engine` writes exactly a `fux.cmd`
+    there. The row therefore cannot fire on the platform, and this test cannot
+    construct the situation. Filed as W-159; skipping is the honest state, and
+    a passing test on Windows would have been the dishonest one.
+    """
     import sys
     from pathlib import Path
 

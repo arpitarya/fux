@@ -22,12 +22,27 @@ DRIVER = shutil.which("fux-merge-index")
 
 
 def git(cwd: Path, *args: str, check: bool = True) -> subprocess.CompletedProcess:
-    return subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True, check=check)
+    """`check=True` raises with git's OWN message, not just an exit code.
+
+    `subprocess.run(check=True)` raises `CalledProcessError`, whose string is
+    `Command '[...]' returned non-zero exit status 128` — the stderr it
+    captured is on the exception and pytest never prints it. A flaky
+    `git add -A` in this file therefore said only *128* for as long as it had
+    been flaking (2026-09-13).
+    """
+    proc = subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True, encoding="utf-8")
+    if check and proc.returncode != 0:
+        raise AssertionError(
+            f"git {' '.join(args)} exited {proc.returncode} in {cwd}\n"
+            f"stdout: {proc.stdout.strip()}\nstderr: {proc.stderr.strip()}"
+        )
+    return proc
 
 
 def fux(cwd: Path, *args: str) -> subprocess.CompletedProcess:
     return subprocess.run(
-        [sys.executable, "-m", "fux.cli", *args], cwd=cwd, capture_output=True, text=True
+        [sys.executable, "-m", "fux.cli", *args], cwd=cwd, capture_output=True, text=True,
+        encoding="utf-8",
     )
 
 
@@ -234,7 +249,7 @@ def test_the_hook_environment_can_actually_find_fux(tmp_path):
     class including tests nobody has written yet.
     """
     which = subprocess.run(
-        ["sh", "-c", "command -v fux"], env=_hook_env(), capture_output=True, text=True
+        ["sh", "-c", "command -v fux"], env=_hook_env(), capture_output=True, text=True, encoding="utf-8"
     )
     assert which.returncode == 0, (
         "`fux` is not on PATH inside the hook environment, so every hook in this "
@@ -242,7 +257,7 @@ def test_the_hook_environment_can_actually_find_fux(tmp_path):
         "editable (`uv sync --extra dev`) before trusting a green run here."
     )
     version = subprocess.run(
-        ["sh", "-c", "fux --version"], env=_hook_env(), capture_output=True, text=True
+        ["sh", "-c", "fux --version"], env=_hook_env(), capture_output=True, text=True, encoding="utf-8"
     )
     assert version.returncode == 0, (
         "`command -v fux` resolves but `fux --version` fails — a shim or a stale "
@@ -252,17 +267,32 @@ def test_the_hook_environment_can_actually_find_fux(tmp_path):
 
 
 def _drain(root: Path, timeout: float = 120.0) -> bool:
-    """Wait for the detached runner to finish. True if it drained the list."""
+    """Wait for the detached runner to finish. True if it drained the list.
+
+    🔴 **A doctor call that does not parse is RETRIED, not fatal** (2026-09-13).
+    This returned `False` the first time `json.loads` raised, which made the
+    whole helper hostage to one poll landing while the runner held the index:
+    the test then failed *faster* than a passing run, and the payload that
+    caused it was discarded, so the failure said only `assert False`. Measured
+    at roughly one run in thirteen locally and on three of eight CI jobs.
+    Now only the deadline decides, and what the last bad poll actually said is
+    carried out with the answer.
+    """
     deadline = time.monotonic() + timeout
+    last = "no doctor call completed"
     while time.monotonic() < deadline:
-        pending = fux(root, "doctor", "--json").stdout
+        proc = fux(root, "doctor", "--json")
         try:
-            state = json.loads(pending)["runner"]
-        except (ValueError, KeyError):
-            return False
+            state = json.loads(proc.stdout)["runner"]
+        except (ValueError, KeyError) as exc:
+            last = f"{type(exc).__name__}: {exc} | rc={proc.returncode} | stdout={proc.stdout[:400]!r} | stderr={proc.stderr[:400]!r}"
+            time.sleep(0.2)
+            continue
         if not state["running"] and state["pending"] == 0:
             return True
+        last = f"runner still busy: {state}"
         time.sleep(0.2)
+    print(f"_drain gave up after {timeout}s — last poll: {last}")
     return False
 
 
@@ -289,7 +319,7 @@ def test_post_commit_defers_and_a_detached_runner_drains_the_list(tmp_path):
     (tmp_path / "docs" / "new.md").write_text(doc("dirtylistterm"), encoding="utf-8")
     git(tmp_path, "add", "-A")
     committed = subprocess.run(
-        ["git", "commit", "-m", "add new"], cwd=tmp_path, capture_output=True, text=True,
+        ["git", "commit", "-m", "add new"], cwd=tmp_path, capture_output=True, text=True, encoding="utf-8",
         env=_hook_env(),
     )
     assert committed.returncode == 0, "a hook must never block a commit"
@@ -342,7 +372,7 @@ def test_the_commit_returns_before_the_re_index_has_happened(tmp_path):
         (tmp_path / "docs" / f"bulk{i}.md").write_text(doc(f"bulkterm{i}"), encoding="utf-8")
     git(tmp_path, "add", "-A")
     committed = subprocess.run(
-        ["git", "commit", "-m", "bulk"], cwd=tmp_path, capture_output=True, text=True,
+        ["git", "commit", "-m", "bulk"], cwd=tmp_path, capture_output=True, text=True, encoding="utf-8",
         env=_hook_env(),
     )
     assert committed.returncode == 0, "a hook must never block a commit"
@@ -373,7 +403,7 @@ def test_nothing_fux_spawned_outlives_its_own_run(tmp_path):
     (tmp_path / "docs" / "resident.md").write_text(doc("residentterm"), encoding="utf-8")
     git(tmp_path, "add", "-A")
     subprocess.run(
-        ["git", "commit", "-qm", "resident"], cwd=tmp_path, capture_output=True, text=True,
+        ["git", "commit", "-qm", "resident"], cwd=tmp_path, capture_output=True, text=True, encoding="utf-8",
         env=_hook_env(),
     )
     assert _drain(tmp_path)
@@ -403,7 +433,7 @@ def test_two_commits_in_quick_succession_produce_one_runner_and_one_index(tmp_pa
         (tmp_path / "docs" / f"rapid{i}.md").write_text(doc(f"rapidterm{i}"), encoding="utf-8")
         git(tmp_path, "add", "-A")
         subprocess.run(
-            ["git", "commit", "-qm", f"rapid {i}"], cwd=tmp_path, capture_output=True, text=True,
+            ["git", "commit", "-qm", f"rapid {i}"], cwd=tmp_path, capture_output=True, text=True, encoding="utf-8",
             env=_hook_env(),
         )
     assert _drain(tmp_path)
@@ -479,7 +509,7 @@ def test_a_hook_never_blocks_a_commit_even_when_fux_is_absent(tmp_path):
     git(tmp_path, "add", "-A")
     result = subprocess.run(
         ["git", "commit", "-m", "no fux on path"],
-        cwd=tmp_path, capture_output=True, text=True,
+        cwd=tmp_path, capture_output=True, text=True, encoding="utf-8",
         env={"PATH": "/usr/bin:/bin", "HOME": os.environ.get("HOME", "")},
     )
     assert result.returncode == 0, result.stderr

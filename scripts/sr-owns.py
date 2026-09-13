@@ -99,13 +99,19 @@ def component_digest(component: str) -> str | None:
     if target.is_file():
         return _file_digest(target)[:WIDTH]
     if target.is_dir():
-        parts = []
-        for p in sorted(_tracked_under(target)):
+        # 🔴 Sorted by the POSIX RELATIVE PATH, never by `Path`. `PurePath`
+        # ordering compares parts, and on Windows it lowercases them first, so
+        # a directory holding both `Makefile` and `mkdocs.yml` hashed in one
+        # order on a Mac and another on a runner — the same component, two
+        # hashes, and `tests/test_sr_owns_hash.py` red on Windows alone.
+        rows = []
+        for p in _tracked_under(target):
             if not p.is_file() or p.suffix in SKIP_SUFFIX:
                 continue
             if SKIP_NAMES & set(p.parts):
                 continue
-            parts.append(f"{p.relative_to(target).as_posix()}\0{_file_digest(p)}\n")
+            rows.append((p.relative_to(target).as_posix(), p))
+        parts = [f"{rel}\0{_file_digest(p)}\n" for rel, p in sorted(rows)]
         return hashlib.sha256("".join(parts).encode("utf-8")).hexdigest()[:WIDTH]
     return None
 

@@ -84,7 +84,7 @@ def main() -> int:
 
     proc = subprocess.run(
         ["node", "-e", NODE_SNIPPET % NODE_DIR.as_posix(), records_path],
-        capture_output=True, text=True,
+        capture_output=True, text=True, encoding="utf-8",
     )
     if proc.returncode != 0:
         print(f"node exited {proc.returncode}: {proc.stderr.strip()}")

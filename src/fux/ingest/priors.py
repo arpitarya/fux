@@ -60,6 +60,12 @@ def git_commit_times(root: Path, rel_paths: list[str]) -> dict[str, int]:
             cwd=root,
             capture_output=True,
             text=True,
+            # 🔴 UTF-8 named, never the platform's. `text=True` alone decodes
+            # with the ANSI code page on Windows, and these lines are PATHS: a
+            # non-ASCII filename would raise UnicodeDecodeError inside ingest,
+            # or come back mangled and silently lose that file's recency prior.
+            encoding="utf-8",
+            errors="replace",
             timeout=120,
         )
     except (OSError, subprocess.SubprocessError):

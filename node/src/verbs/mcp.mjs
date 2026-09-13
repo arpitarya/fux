@@ -18,7 +18,7 @@
  * unguarded once this file ships to npm on its own.
  */
 import { readFileSync, statSync } from "node:fs";
-import { dirname, join, resolve as resolvePath } from "node:path";
+import { dirname, isAbsolute, join, relative, resolve as resolvePath, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createInterface } from "node:readline";
 import { runQuery } from "../query/run.mjs";
@@ -159,7 +159,13 @@ function fuxPassage(root, args) {
   // traversal cannot slip through by being spelled differently.
   const target = resolvePath(root, rel);
   const base = resolvePath(root);
-  if (target !== base && !target.startsWith(base + "/")) {
+  // 🔴 `relative`, not `startsWith(base + "/")` — the separator is `\` on
+  // Windows, so the prefix test matched NOTHING there and `fux_passage`
+  // refused every path in the repository, including the one it had just cited.
+  // Python's twin used `Path.is_relative_to` and was always correct; the
+  // differential arm caught the divergence on its first Windows run.
+  const inside = relative(base, target);
+  if (inside !== "" && (isAbsolute(inside) || inside.split(sep)[0] === "..")) {
     throw new FuxError(`'${rel}' resolves outside the repository`);
   }
   let raw;

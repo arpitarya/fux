@@ -7,10 +7,10 @@ description: The same information in two shapes — doc-major in git for diffs a
 status: accepted
 date: 2026-08-18
 feature: the postings — `terms` in the committed record, `postings/` in the derived plane, and the standing refusal to prune either
-owns: [tools/pruning-eval@46fb2c9999c1]
+owns: [tools/pruning-eval@f132f4ab7e46]
 laws: [L2, L3]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: de9fb0404cadbab61b1807c39ab5189ae35add4f6a70a4eace25ee701b5c9875
+content_sha: bf4edf62b87b76c96dd5fd906885cbb55c812064477186cfa21e9e4153bc683e
 ---
 
 # SR-POSTINGS — the postings, committed and derived
@@ -281,6 +281,12 @@ time ([SR-RANKING](0111_ranking.md)).
   [SR-RUNTIME-MANIFEST](0123_runtime-manifest.md),
   [SR-RUNTIME-STAMP](0124_runtime-stamp.md),
   [SR-RUNTIME-STATS](0125_runtime-stats.md).
+
+
+⚠ **2026-09-13:** every `subprocess` pipe under this record's components now names
+`encoding="utf-8"` rather than inheriting the platform code page. Why, and what it
+cost on Windows, is stated once in
+[SR-T1-ACCELERATOR](0110_accelerator.md) decision 13.
 
 ### Veto condition
 

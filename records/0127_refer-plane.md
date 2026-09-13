@@ -7,10 +7,10 @@ description: "Fux still does not fetch — the refer plane reuses the consumer-f
 status: accepted
 date: 2026-08-20
 feature: the refer plane — fetch, verify, chunk, re-score, assemble
-owns: [src/fux/refer@30eed86dbb60, tools/refer-bench@3d3cdbb1ebb9, tools/refer-budget-sweep@db9ff8233332]
+owns: [src/fux/refer@30eed86dbb60, tools/refer-bench@cfdb47b24af2, tools/refer-budget-sweep@db9ff8233332]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 15491d020f0a488cf4c7fccdef00a860f3b7e1d946d44f878b943379af436767
+content_sha: e79cca15ebc94552e972383b97697479bafebad69c5a4f204ca2ebc18613a49a
 ---
 
 # SR-REFER — the refer plane
@@ -638,6 +638,12 @@ read as a guarantee.
 - Megiddo & Modha, *ARC: A Self-Tuning, Low Overhead Replacement Cache*
   (FAST '03) — the cache and its scan resistance:
   <https://www.usenix.org/legacy/events/fast03/tech/full_papers/megiddo/megiddo.pdf>
+
+
+⚠ **2026-09-13:** every `subprocess` pipe under this record's components now names
+`encoding="utf-8"` rather than inheriting the platform code page. Why, and what it
+cost on Windows, is stated once in
+[SR-T1-ACCELERATOR](0110_accelerator.md) decision 13.
 
 ### Veto condition
 

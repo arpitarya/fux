@@ -154,6 +154,7 @@ def _git(*args: str) -> str:
         ["git", "-C", str(ROOT), *args],
         capture_output=True,
         text=True,
+        encoding="utf-8",
         check=True,
         env={"GIT_OPTIONAL_LOCKS": "0", "PATH": "/usr/bin:/bin:/usr/local/bin"},
     ).stdout

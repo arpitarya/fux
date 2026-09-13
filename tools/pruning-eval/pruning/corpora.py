@@ -61,7 +61,7 @@ def _env() -> dict[str, str]:
 def _run_cli(cwd: Path, *args: str) -> None:
     proc = subprocess.run(
         [sys.executable, "-m", "fux", *args],
-        cwd=cwd, env=_env(), capture_output=True, text=True,
+        cwd=cwd, env=_env(), capture_output=True, text=True, encoding="utf-8",
     )
     if proc.returncode != 0:
         raise SystemExit(f"fux {' '.join(args)} failed in {cwd}:\n{proc.stderr}")
@@ -214,7 +214,7 @@ def prepare(name: str, work: Path, *, synth_docs: int = 100_000, seed: int = 0) 
             subprocess.run(
                 [sys.executable, str(ARCHIVE / "tools" / "synth_corpus.py"),
                  "--docs", str(synth_docs), "--seed", str(seed), "--out", str(root)],
-                env=_env(), check=True, capture_output=True, text=True,
+                env=_env(), check=True, capture_output=True, text=True, encoding="utf-8",
             )
             _run_cli(root, "ingest")
         return Corpus(name, root, synth_queries(root, synth_docs), gating=True,

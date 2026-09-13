@@ -7,10 +7,10 @@ description: "A document from a source declared archived=true carries archived: 
 status: accepted
 date: 2026-08-22
 feature: what happens once a document is declared archived — the record property, ranking, the marker, and the disclaimer
-owns: [tools/archived-signal-eval@3676da30259c]
+owns: [tools/archived-signal-eval@30fb75fa7476]
 laws: [L3, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 94c4532a6dd6661cb9c2ccc8ee800432f5d3a1ce532388cd4b9f123259ab2589
+content_sha: 0b4ec44a64745b2380f5c15b6c94eee0383db13438259d6373e935ff0253653b
 ---
 
 # SR-ARCHIVED-CONTENT — what "archived" does, once a document carries it
@@ -465,6 +465,12 @@ $ fux ask "what commands does the fux command line have" --top 8   # shipped beh
   [W44-SIGNAL](../work/regression/2026-08-22-archived-signal/VERDICT.md).
 - The `df` argument and its references —
   [`work/compare/df-over-the-union.compare.md`](../work/compare/df-over-the-union.compare.md).
+
+
+⚠ **2026-09-13:** every `subprocess` pipe under this record's components now names
+`encoding="utf-8"` rather than inheriting the platform code page. Why, and what it
+cost on Windows, is stated once in
+[SR-T1-ACCELERATOR](0110_accelerator.md) decision 13.
 
 ### Veto condition
 

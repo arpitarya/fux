@@ -447,6 +447,10 @@ def record_head(root: Path) -> int:
             cwd=str(root),
             capture_output=True,
             text=True,
+            # Paths again — see `ingest/priors.py`. UTF-8 is git's, not the
+            # console's.
+            encoding="utf-8",
+            errors="replace",
             check=False,
         )
     except (OSError, subprocess.SubprocessError):

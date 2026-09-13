@@ -149,8 +149,8 @@ def test_two_foreground_writers_actually_race_without_it(repo):
     env["PYTHONPATH"] = os.pathsep.join(
         p for p in (str(pathlib.Path(__file__).resolve().parents[2] / "src"), env.get("PYTHONPATH", "")) if p
     )
-    first = subprocess.run([sys.executable, "-c", script, str(repo)], capture_output=True, text=True, env=env)
-    second = subprocess.run([sys.executable, "-c", script, str(repo)], capture_output=True, text=True, env=env)
+    first = subprocess.run([sys.executable, "-c", script, str(repo)], capture_output=True, text=True, encoding="utf-8", env=env)
+    second = subprocess.run([sys.executable, "-c", script, str(repo)], capture_output=True, text=True, encoding="utf-8", env=env)
     assert first.stdout.strip() == "GOT", first.stderr[-500:]
     # The second is refused *because the first leaked its lock on exit* — which
     # is exactly why `write_lock` releases in a `finally` rather than trusting

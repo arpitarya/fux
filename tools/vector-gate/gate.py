@@ -57,7 +57,7 @@ def bm25f_ranks(corpus: Path, queries: list[dict], top: int, engine_src: Path) -
     for q in queries:
         proc = subprocess.run(
             [sys.executable, "-m", "fux.cli", "ask", q["q"], "--json", "--top", str(top)],
-            cwd=corpus, capture_output=True, text=True, env=env, check=True,
+            cwd=corpus, capture_output=True, text=True, encoding="utf-8", env=env, check=True,
         )
         out[q["id"]] = [r["loc"] for r in json.loads(proc.stdout)["results"]]
     return out

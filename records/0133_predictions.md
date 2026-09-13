@@ -7,10 +7,10 @@ description: "An R is a claim frozen before measurement; its threshold may never
 status: accepted
 date: 2026-08-22
 feature: the prediction system — the R ids, their register, the rules that make a frozen claim mean something, and the classification of the runs those claims are measured by
-owns: [tests/test_regression_runs.py@f359951081fc, tools/t2-eval@1445d0ec3d15, tools/quality-controls@12bd9b03c5dd, tools/vector-gate@71c9f02919aa]
+owns: [tests/test_regression_runs.py@f359951081fc, tools/t2-eval@cc5410393ce4, tools/quality-controls@a6bc8b6a056c, tools/vector-gate@0023bff0cdef]
 laws: [L3]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 881fa185c989741eaff3acad7801727db2767d690edef2d43300390dd19243b2
+content_sha: fd8bbf0b66c44d53381e326f519066d09cc593411a445fa325f73f4780e5d60b
 ---
 
 # SR-RS — the R predictions
@@ -948,6 +948,12 @@ session.
 - Pre-registration as practised in empirical research, and the
   outcome-reporting bias it exists to prevent —
   <https://www.cos.io/initiatives/prereg>
+
+
+⚠ **2026-09-13:** every `subprocess` pipe under this record's components now names
+`encoding="utf-8"` rather than inheriting the platform code page. Why, and what it
+cost on Windows, is stated once in
+[SR-T1-ACCELERATOR](0110_accelerator.md) decision 13.
 
 ### Veto condition
 

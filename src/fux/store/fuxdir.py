@@ -282,7 +282,7 @@ def _readme() -> str:
         "def ask(question, top=5):",
         "    p = subprocess.run(",
         "        [\"fux\", \"ask\", question, \"--json\", \"--top\", str(top), \"--band\"],",
-        "        capture_output=True, text=True,",
+        "        capture_output=True, text=True, encoding=\"utf-8\",",
         "    )",
         "    if p.returncode != 0:",
         "        raise RuntimeError(p.stderr.strip())",

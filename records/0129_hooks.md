@@ -7,10 +7,10 @@ description: "post-commit DEFERS — it writes a dirty list and spawns a detache
 status: accepted
 date: 2026-08-20
 feature: maintenance — the hooks, the deferring runner, the write lock, and the URL freshness daemon
-owns: [src/fux/maintain@e21aa662c5bc, tools/maintenance-bench@cff46a0156d1]
+owns: [src/fux/maintain@9dc721475d44, tools/maintenance-bench@23a6ade137a5]
 laws: [L3, L4, L5, L7]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 5e896af0b05ffa6c7e66826ef85d05f5076876279fcb4481a50d16d9f0e5f767
+content_sha: d1f0d69ff51e303d60b1dbafd49dfe8b96fef038ccd9ab1912f775faa411bab1
 ---
 
 # SR-MAINTENANCE — keeping the index in step
@@ -645,6 +645,12 @@ places. **An offline run never touches it**, exactly like `observe`.
   <https://lucene.apache.org/core/9_0_0/core/org/apache/lucene/index/IndexWriter.html>
 - The tests: [`tests/maintain/`](../tests/maintain/) and
   [`tests_e2e/test_maintenance.py`](../tests_e2e/test_maintenance.py).
+
+
+⚠ **2026-09-13:** every `subprocess` pipe under this record's components now names
+`encoding="utf-8"` rather than inheriting the platform code page. Why, and what it
+cost on Windows, is stated once in
+[SR-T1-ACCELERATOR](0110_accelerator.md) decision 13.
 
 ### Veto condition
 

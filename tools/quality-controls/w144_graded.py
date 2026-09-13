@@ -349,7 +349,7 @@ def _score(corpus: Path, probes: list[dict], quiet: bool = False):
                         "import sys;from fux.cli import main;"
                         "sys.argv=['fux','ingest','--full'];rc=main();"
                         "sys.argv=['fux','build'];raise SystemExit(rc or main())"],
-                       cwd=str(corpus), text=True, capture_output=True, check=False)
+                       cwd=str(corpus), text=True, encoding="utf-8", capture_output=True, check=False)
     if r.returncode != 0:
         sys.stderr.write(r.stdout + r.stderr)
         raise SystemExit("ingest/build failed")

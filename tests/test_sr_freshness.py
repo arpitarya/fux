@@ -88,6 +88,7 @@ def _git(*args: str) -> str:
         cwd=ROOT,
         capture_output=True,
         text=True,
+        encoding="utf-8",
         check=False,
     )
     if out.returncode != 0:
@@ -107,6 +108,7 @@ def _register_at(sha: str) -> str | None:
         cwd=ROOT,
         capture_output=True,
         text=True,
+        encoding="utf-8",
         check=False,
     )
     return out.stdout if out.returncode == 0 else None

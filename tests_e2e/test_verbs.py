@@ -20,7 +20,7 @@ from pathlib import Path
 
 def _run(cwd: Path, *args: str, check: bool = True) -> subprocess.CompletedProcess:
     return subprocess.run(
-        [sys.executable, "-m", "fux.cli", *args], cwd=cwd, capture_output=True, text=True, check=check
+        [sys.executable, "-m", "fux.cli", *args], cwd=cwd, capture_output=True, text=True, encoding="utf-8", check=check
     )
 
 
@@ -638,7 +638,7 @@ def test_setup_converts_a_leftover_types_file_and_ingest_refuses_until_it_is_gon
     legacy.write_text("*.rst\n", encoding="utf-8")
 
     refused = subprocess.run([sys.executable, "-m", "fux.cli", "ingest"], cwd=tmp_path,
-                             capture_output=True, text=True)
+                             capture_output=True, text=True, encoding="utf-8")
     assert refused.returncode == 1 and "fux setup" in refused.stderr
 
     out = _run(tmp_path, "setup").stdout

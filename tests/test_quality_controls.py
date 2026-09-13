@@ -110,6 +110,6 @@ def test_the_controls_are_runnable_as_scripts():
     for script in ("placebo.py", "seal.py"):
         p = subprocess.run(
             [sys.executable, str(ROOT / "tools" / "quality-controls" / script)],
-            capture_output=True, text=True,
+            capture_output=True, text=True, encoding="utf-8",
         )
         assert p.returncode == 2, f"{script} should exit 2 with usage, got {p.returncode}"

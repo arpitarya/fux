@@ -299,7 +299,7 @@ def test_run_without_should_stop_can_never_return_none(tmp_path):
 
 def _git(root, *args):
     return subprocess.run(
-        ["git", *args], cwd=root, capture_output=True, text=True, check=True,
+        ["git", *args], cwd=root, capture_output=True, text=True, encoding="utf-8", check=True,
         env={**os.environ, "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t",
              "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@t"},
     )

@@ -184,7 +184,7 @@ def _register_merge_driver(root: Path) -> str:
         (f"merge.{MERGE_DRIVER_NAME}.driver", command),
     ):
         result = subprocess.run(
-            ["git", "config", "--local", key, value], cwd=root, capture_output=True, text=True
+            ["git", "config", "--local", key, value], cwd=root, capture_output=True, text=True, encoding="utf-8", errors="replace"
         )
         if result.returncode != 0:
             raise FuxError(f"git config {key} failed: {result.stderr.strip()}")
@@ -214,7 +214,7 @@ def status(root: Path) -> dict:
     directory = _hooks_dir(root)
     driver = subprocess.run(
         ["git", "config", "--local", "--get", f"merge.{MERGE_DRIVER_NAME}.driver"],
-        cwd=root, capture_output=True, text=True,
+        cwd=root, capture_output=True, text=True, encoding="utf-8", errors="replace",
     ).stdout.strip()
     attributes = (root / ".gitattributes")
     return {
@@ -250,6 +250,6 @@ def uninstall(root: Path) -> HookReport:
         report.installed.append(name)
     subprocess.run(
         ["git", "config", "--local", "--remove-section", f"merge.{MERGE_DRIVER_NAME}"],
-        cwd=root, capture_output=True, text=True,
+        cwd=root, capture_output=True, text=True, encoding="utf-8", errors="replace",
     )
     return report

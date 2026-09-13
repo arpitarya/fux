@@ -233,7 +233,7 @@ def _repo_with_an_index(tmp_path: Path) -> Path:
 
 def _run(entry: Path, root: Path, argv: list[str]) -> tuple[int, str]:
     proc = subprocess.run(
-        ["node", str(entry), *argv], capture_output=True, text=True, cwd=root
+        ["node", str(entry), *argv], capture_output=True, text=True, encoding="utf-8", cwd=root
     )
     return proc.returncode, proc.stdout
 
@@ -269,7 +269,9 @@ def test_importing_the_bundle_does_not_run_the_cli(tmp_path, built):
     _needs_node()
     root = _repo_with_an_index(tmp_path)
     script = (
-        f"const m = await import({json.dumps(str(built / 'fux.mjs'))});\n"
+        # A file URL, not a path: `import("C:\\...")` is
+        # ERR_UNSUPPORTED_ESM_URL_SCHEME on Windows.
+        f"const m = await import({json.dumps((built / 'fux.mjs').as_uri())});\n"
         "if (process.exitCode !== undefined) { console.log('RAN'); }\n"
         f"const ix = await m.open({json.dumps(str(root))});\n"
         "const r = await ix.find('rollback', { top: 2 });\n"
@@ -277,7 +279,7 @@ def test_importing_the_bundle_does_not_run_the_cli(tmp_path, built):
     )
     proc = subprocess.run(
         ["node", "--input-type=module", "-e", script],
-        capture_output=True, text=True, cwd=root,
+        capture_output=True, text=True, encoding="utf-8", cwd=root,
     )
     assert proc.returncode == 0, proc.stderr
     assert "RAN" not in proc.stdout
@@ -298,7 +300,7 @@ def test_the_bundle_finds_its_own_tool_descriptions(tmp_path, built):
     )
     proc = subprocess.run(
         ["node", str(built / "fux.mjs"), "mcp"],
-        input=calls, capture_output=True, text=True, cwd=root,
+        input=calls, capture_output=True, text=True, encoding="utf-8", cwd=root,
     )
     assert proc.returncode == 0, proc.stderr
     listed = json.loads(proc.stdout.splitlines()[1])
@@ -322,7 +324,7 @@ def test_the_bundle_and_the_tree_agree_on_the_mcp_surface(tmp_path, built):
     for entry in (NODE / "fux.mjs", built / "fux.mjs"):
         proc = subprocess.run(
             ["node", str(entry), "mcp"], input=calls,
-            capture_output=True, text=True, cwd=root,
+            capture_output=True, text=True, encoding="utf-8", cwd=root,
         )
         assert proc.returncode == 0, proc.stderr
         out.append(proc.stdout)
@@ -333,6 +335,6 @@ def test_the_bundle_compiles(built: Path):
     """Cheap, and it fails first when the bundler emits something malformed."""
     _needs_node()
     proc = subprocess.run(
-        ["node", "--check", str(built / "fux.mjs")], capture_output=True, text=True
+        ["node", "--check", str(built / "fux.mjs")], capture_output=True, text=True, encoding="utf-8"
     )
     assert proc.returncode == 0, proc.stderr

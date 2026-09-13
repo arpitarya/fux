@@ -340,7 +340,9 @@ print(json.dumps({
 
     def compare_api(self, query: str, doc: str, doc2: str) -> list[str]:
         subs = {
-            "entry": json.dumps(str(ENGINE / "node" / "src" / "index.mjs")),
+            # `.as_uri()`, not `str()`: an ESM specifier is a URL, and Node on
+            # Windows rejects `C:\...` with ERR_UNSUPPORTED_ESM_URL_SCHEME.
+            "entry": json.dumps((ENGINE / "node" / "src" / "index.mjs").as_uri()),
             "root": json.dumps(str(self.root)),
             "q": json.dumps(query), "doc": json.dumps(doc), "doc2": json.dumps(doc2),
         }
@@ -421,7 +423,7 @@ print(json.dumps({
         out = []
         for entry in (ENGINE / "node" / "src" / "index.mjs", bundle_entry()):
             subs = {
-                "entry": json.dumps(str(entry)), "root": json.dumps(str(self.root)),
+                "entry": json.dumps(entry.as_uri()), "root": json.dumps(str(self.root)),
                 "q": json.dumps(query), "doc": json.dumps(doc), "doc2": json.dumps(doc2),
             }
             proc = subprocess.run(

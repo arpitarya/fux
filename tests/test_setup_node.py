@@ -28,6 +28,7 @@ than npm, where a consumer picks versions independently.
 from __future__ import annotations
 
 import json
+from pathlib import Path
 import os
 import stat
 import subprocess
@@ -102,7 +103,9 @@ def test_setup_PRUNES_a_module_tree_left_by_an_older_engine(tmp_path):
     assert {p.relative_to(target).as_posix() for p in target.rglob("*") if p.is_file()} == {
         "fux.mjs", "package.json", "mcp-tools.json", "README.md"
     }
-    assert any("src/query/bm25f.mjs" in str(p) for p in changed), (
+    # `as_posix()`, not `str()`: the report carries Paths, and on Windows
+    # `str(Path)` is backslashed — the substring never matched there.
+    assert any("src/query/bm25f.mjs" in Path(p).as_posix() for p in changed), (
         "the prune must be reported, not done silently"
     )
 
@@ -261,7 +264,7 @@ def test_the_vendored_reader_answers_in_a_clone(tmp_path):
 
     proc = subprocess.run(
         ["node", str(tmp_path / ".fux" / "node" / "fux.mjs"), "find", "rollback"],
-        capture_output=True, text=True, cwd=tmp_path,
+        capture_output=True, text=True, encoding="utf-8", cwd=tmp_path,
     )
     assert proc.returncode == 0, proc.stderr
     assert "docs/retry.md" in proc.stdout
@@ -284,7 +287,7 @@ def test_the_vendored_reader_refuses_without_pii_rules(tmp_path):
     (tmp_path / ".fux" / "pii.toml").unlink(missing_ok=True)
     proc = subprocess.run(
         ["node", str(tmp_path / ".fux" / "node" / "fux.mjs"), "find", "rollback"],
-        capture_output=True, text=True, cwd=tmp_path,
+        capture_output=True, text=True, encoding="utf-8", cwd=tmp_path,
     )
     assert proc.returncode == 1
     assert "pii.toml is missing" in proc.stderr

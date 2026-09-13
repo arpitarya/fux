@@ -7,10 +7,10 @@ description: One canonical encoder, sharded doc-major JSONL, write-if-different;
 status: accepted
 date: 2026-08-18
 feature: generation and update of the committed index, and the refusal that keeps its derived accelerator from diverging
-owns: [src/fux/store@44f53d3d43da]
+owns: [src/fux/store@b9c242b1cfaf]
 laws: [L1, L2, L3, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: a1ea5c7a08bf5fcebde841d5e362d4daa55b3b29ab5b69779876aad6638d284d
+content_sha: aaf92dfab6ce33394a883c72c5dc968935bad42ebf11a5f1d21f7fd2dab25b3b
 ---
 
 # SR-INDEX-LIFECYCLE — how the index is generated and updated
@@ -517,6 +517,12 @@ the three to be merged, did not.
   [`work/regression/2026-08-12-m2-accelerator/`](../work/regression/2026-08-12-m2-accelerator/report.md).
 - Canonical JSON, the prior art this follows — RFC 8785 (JCS):
   https://www.rfc-editor.org/rfc/rfc8785
+
+
+⚠ **2026-09-13:** every `subprocess` pipe under this record's components now names
+`encoding="utf-8"` rather than inheriting the platform code page. Why, and what it
+cost on Windows, is stated once in
+[SR-T1-ACCELERATOR](0110_accelerator.md) decision 13.
 
 ### Veto condition
 
