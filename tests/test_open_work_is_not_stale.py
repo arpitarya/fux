@@ -75,7 +75,28 @@ _STRUCK = re.compile(r"~~.+~~")
 
 
 def _today() -> dt.date:
+    """The local date — the one a session reading the queue actually has.
+
+    Paired with `_TOLERANCE_DAYS`, which is what makes this safe to compare
+    against a number somebody else wrote on a different meridian.
+    """
     return dt.date.today()
+
+
+#: 🔴 **One day of slack, because "today" is not one date worldwide.**
+#: This test failed on all eight CI jobs at 18:37 UTC on 2026-09-13: the
+#: session that wrote the ages was on IST, where it was already the 14th, and
+#: the runners were on UTC, where it was not. **There is no number that
+#: satisfies both**, so an exact comparison here is a gate that fires on
+#: geography — and it fires for a whole working day, every day, for anyone east
+#: of UTC.
+#:
+#: ⚠ **What it costs is exactly one day of staleness, and no more.** An age
+#: copied forward is wrong by one on the first day and by two on the second, so
+#: a carried number is still caught — just a day later than an exact check
+#: would catch it. The rule this gate exists for is CLAUDE.md's **5-day**
+#: threshold, which one day of slack cannot hide.
+_TOLERANCE_DAYS = 1
 
 
 def inbox_rows() -> list[tuple[int, str, str, str]]:
@@ -138,8 +159,9 @@ def test_the_age_is_arithmetic_not_a_copied_number(row: tuple[int, str, str, str
     m = _AGE.match(age)
     assert m, f"OPEN-WORK.md:{lineno}: `age` is {age!r}, expected `<n>d`."
     expected = (_today() - dt.date.fromisoformat(filed)).days
-    assert int(m.group(1)) == expected, (
-        f"OPEN-WORK.md:{lineno}: age reads {age} but {filed} was {expected} days ago.\n\n"
+    assert abs(int(m.group(1)) - expected) <= _TOLERANCE_DAYS, (
+        f"OPEN-WORK.md:{lineno}: age reads {age} but {filed} was {expected} days ago "
+        f"here (±{_TOLERANCE_DAYS} allowed for the timezone this is read in).\n\n"
         f"  {what[:120]}\n\n"
         "Ages are recomputed against the reading date, never copied. A queue that "
         "carries its ages forward stops flagging its own oldest item -- which is the "

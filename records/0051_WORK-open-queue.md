@@ -7,11 +7,11 @@ description: "The live queue's discipline has one home, and this is it. Fifty-ei
 status: accepted
 date: 2026-09-13
 feature: the discipline of the single live work queue — its rules, its markers, and the three tests that enforce them
-owns: [tests/test_open_work_rows_are_short.py@d590c19ef8ed, tests/test_open_work_is_not_stale.py@04ba39dfd0b2, tests/test_no_work_item_is_lost.py@26c600758acf]
+owns: [tests/test_open_work_rows_are_short.py@d590c19ef8ed, tests/test_open_work_is_not_stale.py@c41cd5e600be, tests/test_no_work_item_is_lost.py@26c600758acf]
 laws: [L0]
 ratifies: W-146 ruling 1 · Arpit 2026-09-13 (archive, never delete)
 timestamp: 2026-09-13T00:00:00Z
-content_sha: 7ef75d53c64c73f29deecf04cbc86e12a444e3c7e897cf33f731f20a3335725c
+content_sha: 0d53c017e0859fa2c833a3a595d9f7de0f0556152b9c8708d374cba81e6aa236
 ---
 
 # SR-WORK-OPEN-QUEUE — how OPEN-WORK works
@@ -280,6 +280,19 @@ both `↳ blocks:` checks validating a single row for two days, green throughout
    `tests/test_open_work_is_not_stale.py`. That is what the kind means: a
    process record's enforcement is a test, so it owns that test, and the
    freshness gate demands this record when either one changes.
+
+4a. **An inbox age is checked to within a day, not exactly** (amended
+    2026-09-13). *Today* is not one date worldwide: at 18:37 UTC the session
+    writing the ages was on IST, where it was already the 14th, and all eight
+    CI runners were on UTC, where it was not. **No number satisfies both**, so
+    an exact check is a gate that fires on geography — for a whole working day,
+    every day, for anyone east of UTC.
+    ⚠ **What the slack costs is one day and no more.** An age copied forward is
+    wrong by one on the first day and by two on the second, so a carried number
+    is still caught, a day later. The rule this enforces is CLAUDE.md's
+    **5-day** threshold, which one day cannot hide.
+    ⚠ **It does not make the age optional.** `filed` must still be an ISO date
+    and the age must still be arithmetic against it.
 
 5. **WORK records are a family with their own range: `0051`–`0100`**
    (Arpit, 2026-09-13), named `SR-WORK-<SUBJECT>` in files
