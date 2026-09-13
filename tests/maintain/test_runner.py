@@ -403,3 +403,79 @@ def test_a_failed_accelerator_build_does_not_fail_the_re_index(tmp_path, monkeyp
     status = runner.last_run(tmp_path)
     assert status["outcome"] == "ok"
     assert "no space left" in status["accelerator"]
+
+
+# -- the tail handoff -------------------------------------------------------
+#
+# 🔴 **Second recorded occurrence, so it is gated** (CLAUDE.md two-strikes).
+# W-140 row 1 carries a runner-race flake that 11 attempts could not reproduce;
+# on 2026-09-13 a CI job printed the state it leaves behind — `pending: 1`,
+# `running: False`, `lock: free`, after 120 s of waiting — and that is this
+# race. The window is between the loop's last `dirty.read` and `release`: a
+# commit landing there has its own spawn refused because the lock is still
+# held, and then nobody is left to do the work.
+
+
+def test_a_runner_that_made_progress_hands_the_leftovers_on(tmp_path, monkeypatch):
+    """Work that arrived at the tail gets a successor, not silence."""
+    _corpus(tmp_path)
+    dirty.record(tmp_path, ["file:docs/d0.md"])
+
+    spawned = []
+    monkeypatch.setattr(runner, "spawn", lambda root: spawned.append(root) or True)
+
+    # started from 3 outstanding, one left: this run drained two of them.
+    assert runner._hand_off_if_progress_was_made(tmp_path, 3) is True
+    assert spawned == [tmp_path]
+
+
+def test_no_progress_means_no_successor(tmp_path, monkeypatch):
+    """The terminating argument: a chain continues only while it drains.
+
+    An entry ingest cannot clear would otherwise spawn a runner that cannot
+    clear it either, forever — a resident process assembled out of one-shot
+    ones, which is exactly what SR-MAINTENANCE veto condition 6 forbids.
+    """
+    _corpus(tmp_path)
+    dirty.record(tmp_path, ["file:docs/d0.md"])
+
+    spawned = []
+    monkeypatch.setattr(runner, "spawn", lambda root: spawned.append(root) or True)
+
+    assert runner._hand_off_if_progress_was_made(tmp_path, 1) is False
+    assert runner._hand_off_if_progress_was_made(tmp_path, 0) is False
+    assert spawned == []
+
+
+def test_an_empty_dirty_list_hands_off_to_nobody(tmp_path, monkeypatch):
+    _corpus(tmp_path)
+    spawned = []
+    monkeypatch.setattr(runner, "spawn", lambda root: spawned.append(root) or True)
+    assert runner._hand_off_if_progress_was_made(tmp_path, 5) is False
+    assert spawned == []
+
+
+def test_a_pending_stop_cancels_the_handoff(tmp_path, monkeypatch):
+    """`fux daemon stop` means stop, not *stop and start another one*."""
+    _corpus(tmp_path)
+    dirty.record(tmp_path, ["file:docs/d0.md"])
+    runner._stop_path(tmp_path).parent.mkdir(parents=True, exist_ok=True)
+    runner._stop_path(tmp_path).write_text("0", encoding="utf-8")
+
+    spawned = []
+    monkeypatch.setattr(runner, "spawn", lambda root: spawned.append(root) or True)
+    assert runner._hand_off_if_progress_was_made(tmp_path, 3) is False
+    assert spawned == []
+
+
+def test_a_handoff_never_raises(tmp_path, monkeypatch):
+    """It is an optimisation on the way out of a `finally`. If it can raise, it
+    can turn a completed re-index into a crash that loses the status write."""
+    _corpus(tmp_path)
+    dirty.record(tmp_path, ["file:docs/d0.md"])
+
+    def explode(root):
+        raise OSError("fork: resource temporarily unavailable")
+
+    monkeypatch.setattr(runner, "spawn", explode)
+    assert runner._hand_off_if_progress_was_made(tmp_path, 3) is False

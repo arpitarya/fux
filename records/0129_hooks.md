@@ -7,10 +7,10 @@ description: "post-commit DEFERS — it writes a dirty list and spawns a detache
 status: accepted
 date: 2026-08-20
 feature: maintenance — the hooks, the deferring runner, the write lock, and the URL freshness daemon
-owns: [src/fux/maintain@443b67cb5d60, tools/maintenance-bench@23a6ade137a5]
+owns: [src/fux/maintain@406007ea1cff, tools/maintenance-bench@23a6ade137a5]
 laws: [L3, L4, L5, L7]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: b4c686d664c9f821ed631eccd7c085815a797e24e8c83402d5b05b533e23ff63
+content_sha: 9f564aaf55c120da0e39e535c4876f6e3195792b485cd63599e3eb7ba2100f44
 ---
 
 # SR-MAINTENANCE — keeping the index in step
@@ -651,6 +651,34 @@ places. **An offline run never touches it**, exactly like `observe`.
 `encoding="utf-8"` rather than inheriting the platform code page. Why, and what it
 cost on Windows, is stated once in
 [SR-T1-ACCELERATOR](0110_accelerator.md) decision 13.
+
+**A runner hands its leftovers on, once, and only while it is draining**
+(added 2026-09-13).
+
+🔴 **The re-check inside `run_once`'s loop could not close the window it was
+written for, because the check is inside the lock.** A commit landing between
+the last `dirty.read` and `release` has its own spawn refused — one writer,
+correctly — and then the runner exits. What is left is `pending: 1`,
+`running: False`, `lock: free`, **and no process that will ever pick it up**:
+the repository stays stale until somebody happens to commit again. A CI job
+printed exactly that state on 2026-09-13 after waiting 120 s for it to change,
+which is also the reproduction W-140 row 1 could not get in 11 attempts.
+
+**So `run_once` spawns a successor after releasing the lock — bounded by
+PROGRESS, not by a counter.** A successor is spawned only if this run actually
+shrank the dirty list. A chain therefore continues exactly as long as it keeps
+draining a finite list, and an entry ingest cannot clear hands off once, is not
+drained, and the next runner hands off to nobody.
+
+⚠ **This is not veto condition 6 and the distinction is the terminating
+argument, not a reassurance.** Nothing becomes resident: each process is still
+one-shot, still watches nothing, and a chain that makes no progress stops after
+one link. A pending stop cancels the handoff outright — `fux daemon stop` means
+stop, not *stop and start another one*.
+
+Gated by `tests/maintain/test_runner.py` (five cases: progress hands on, no
+progress does not, an empty list does not, a pending stop cancels, and a
+handoff that raises is swallowed rather than losing the status write).
 
 ### Veto condition
 

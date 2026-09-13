@@ -522,6 +522,7 @@ def run_once(root: Path) -> str:
     if not acquire(root):
         return "busy"  # the live runner will pick up our additions: the list is a union
     pid = os.getpid()
+    pending_at_start: int | None = None
     try:
         # A stop aimed at a *previous* runner must not kill this one before it
         # has done anything. We hold the lock, so nobody else can be racing us
@@ -531,6 +532,7 @@ def run_once(root: Path) -> str:
 
         from . import dirty
 
+        pending_at_start = len(dirty.read(root))
         passes = 0
         while True:
             passes += 1
@@ -601,3 +603,42 @@ def run_once(root: Path) -> str:
         return "ok"
     finally:
         release(root)
+        _hand_off_if_progress_was_made(root, pending_at_start)
+
+
+def _hand_off_if_progress_was_made(root: Path, pending_at_start: int | None) -> bool:
+    """Spawn a successor when work arrived at the tail of this run.
+
+    🔴 **The re-check inside the loop cannot close this window, because it is
+    inside the lock.** A commit landing after the last `dirty.read` but before
+    `release` has its own spawn refused — correctly, one writer — and then the
+    runner exits. The result is `pending: 1` with `running: False` and **no
+    process that will ever pick it up**: the repository is silently stale until
+    someone happens to commit again. Diagnosed 2026-09-13 from a CI failure
+    that printed exactly that state after waiting 120 s for it to change.
+
+    **The bound is PROGRESS, not a counter.** A successor is spawned only when
+    this run actually shrank the dirty list. So a chain continues exactly as
+    long as it keeps draining a finite list, and an entry that cannot be
+    cleared — a document ingest keeps failing on — hands off **once**, is not
+    drained, and the next runner makes no progress and hands off to nobody.
+    That is the same terminating argument `MAX_PASSES` makes for the loop, on
+    the one quantity that has to move for the work to be worth continuing.
+
+    Best-effort in every direction: it never raises, and a refused spawn leaves
+    the dirty list exactly where it was — reported by `fux doctor`, picked up
+    by the next commit, which is where these leftovers lived before.
+    """
+    if pending_at_start is None:
+        return False
+    try:
+        from . import dirty
+
+        pending_now = len(dirty.read(root))
+        if not pending_now or pending_now >= pending_at_start:
+            return False
+        if _stop_path(root).exists():
+            return False
+        return spawn(root)
+    except Exception:  # noqa: BLE001 - a handoff is an optimisation, never a failure
+        return False

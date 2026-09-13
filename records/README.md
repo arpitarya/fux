@@ -60,6 +60,16 @@ or it does not resolve at all.
 
 New records are written here, from [`TEMPLATE.md`](TEMPLATE.md).
 
+**Four files here are NOT records** and carry no number: this register,
+[`TEMPLATE.md`](TEMPLATE.md), [`RULE-SINCE`](RULE-SINCE), and
+[`BIBLIOGRAPHY.md`](BIBLIOGRAPHY.md) — every external paper, standard and
+piece of prior art any record cites, in one table per engine area, each row
+ending in **what depends on it or what was not built because of it**. It is
+an index of the register's sourcing and **never an authority**: where it and
+a record disagree, the record wins and the bibliography is the defect. It is
+not a Standing Record because it owns no component, rules nothing, and has
+no veto condition to check.
+
 ---
 
 ## The three kinds
