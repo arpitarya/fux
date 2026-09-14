@@ -28,6 +28,43 @@ Rules:
 
 
 
+## 2026-09-14 — **W-159, W-163, W-164**: a wrong diagnosis, eight rows, and four gates that were all red first
+
+**Shipped** on `release/3.0.0-alpha.0` — `053d712a` (W-159), `77d7de34`
+(W-163), `edddadac` (W-164). Unreleased.
+
+| item | what landed | what it found |
+|---|---|---|
+| **W-159** | `_is_node_shim` split out and tested on every platform; the Windows skip gone | 🔴 **The item's own diagnosis was wrong.** *"The row cannot fire on Windows"* rested on a skipped test; `shutil.which` honours PATHEXT, which is how it finds npm's `fux.cmd`. The **fixture** was unbuildable, not the row. And a **real false positive**: a `.exe` read for the word `node` would report an ordinary Python `fux` as the Node reader |
+| **W-163** | eight `fux doctor` setup-drift rows, all report-only, all `warn`, **all kept** | A false positive in my own row, caught by the item's keep-call *before it shipped* — `output.toml current` reported six keys missing from fux's own correct file, because that file nests per verb. Then five real `fux-lab` corpora: every warning a true positive, one repo clean |
+| **W-164** | four gates — backlog row shape, verb-table agreement, doctor-register completeness, confidence-floor disclosure | **Every one red on the live tree first**, which was the item's bar. `B-129` at 444/400 chars · **SR-CLI §1 missing `fux output`** · `tune.toml loads` unregistered since 2026-09-11 · SR-CONFIDENCE decision 13's own *"nothing mechanical catches it"* |
+
+**Records closed from *stated* to *fixed*:** SR-WORK-BACKLOG (`built: no` →
+`yes`, and it owns its test at last), SR-CONFIDENCE decision 13,
+SR-AGENT-POLICY 16, SR-DOTFUX 6, SR-REFUSAL, SR-TUNE 4, SR-OUTPUT 14, SR-TYPES,
+SR-DIR-LIST, SR-HTTP-FETCHER, SR-NODE-SEARCH's platform claim.
+
+**Outcome: green in the working tree** — 4409 unit + 89 e2e + 36 Node.
+
+⚠ **A clean checkout of `edddadac` fails two tests, and the cause is not this
+work.** `records/0132` links `0155_agent-surfaces.md` and `0102`/`0132`'s
+`owns:` hashes name sources the commit does not carry — all of them a
+concurrent session's uncommitted files, which rode in on records this work also
+had to touch. **Two attempts to fix it were blocked** (committing that
+session's records; overwriting them to strip their edits out) and **both
+blocks were right**. It resolves the moment that session commits.
+
+⚠ **Two judgement calls that need finding later, not discovering:**
+`doctor.RETIRED_REFUSAL_STARTERS` must be **appended to by hand** when the
+refusal starter changes, or W-163's row cannot fire; and W-164 gate 4 was
+**widened past its DoD** to `find` and `answer` on both readers, because a note
+on one of three would have made SR-FIND decision 6's *"the same rule as `ask`"*
+false for the second time in one week.
+
+⚠ **Still owed:** the shipped `fux-search` skill tells agents the no-match line
+is on stdout. The correction is written and **uncommitted** — it collides with
+that same session's `templates/agents/` work.
+
 ## 2026-09-14 — **W-165 + W-166**: five surfaces the records already owed
 
 **Shipped** on `release/3.0.0-alpha.0`, commit `b77b9058`. Unreleased — the
