@@ -37,11 +37,19 @@ Chrome/Chromium (never a bundled browser) over CDP, and it returns **the
 resource the server sent**, not a rendering of it:
 
     discover Chrome -> open the page target's WebSocket
+      -> Page.navigate(origin)                  once per origin, BEFORE Fetch
       -> Fetch.enable(requestStage="Response")
       -> Page.navigate(url)                     [fire-and-forget, see below]
       -> Fetch.requestPaused                    (final url, status, headers)
       -> Fetch.getResponseBody                  (base64 body)
+         ...or takeResponseBodyAsStream + IO.read for a large one
       -> Fetch.failRequest / continueRequest    ALWAYS, or the page hangs
+
+**The origin hop is not politeness.** A tab from `/json/new` has no history,
+and Chrome closes a history-less tab the moment its navigation becomes a
+download — which closes this socket too, and surfaced only as `WebSocket
+closed mid-frame`. Committing a page on the origin first also establishes the
+browser's session for that host, which is what this fetcher is FOR.
 
 **Why interception and not an in-page `fetch()`.** An earlier draft ran
 `Runtime.evaluate` with an in-page `fetch(url, {credentials:'include'})`.
@@ -122,7 +130,33 @@ LOAD_TIMEOUT_S = 30.0  # max wait for the intercepted response, per URL
 #: Redirect chain cap. Each hop is a separate `Fetch.requestPaused`, so an
 #: unbounded loop here is an unbounded wait. Not a `fux.toml` key on purpose —
 #: see `_SETTINGS` at the bottom for why this file stopped adding them.
+#:
+#: ⚠ **Only a REDIRECT spends this budget.** It used to be spent by every
+#: paused request, and `urlPattern` is `"*"` — so a page whose subresources
+#: paused ahead of its document exhausted the cap and raised *more than 20
+#: redirects … or a sign-in flow bouncing between an identity provider and the
+#: site*. **That message is a misdiagnosis, which is the expensive part**: it
+#: sends a reader after an auth loop that does not exist. Reproduced with 25
+#: subresource pauses ahead of the document; see `_await_document`.
 MAX_REDIRECTS = 20
+
+#: Above this DECLARED `Content-Length`, the body is read with
+#: `Fetch.takeResponseBodyAsStream` + `IO.read` instead of one
+#: `Fetch.getResponseBody`.
+#:
+#: ⚠ **`getResponseBody` returns the WHOLE body base64'd into a single CDP
+#: message**, and base64 inflates it by a third. DevTools drops the connection
+#: on a message it will not carry, which surfaces here as the socket dying
+#: mid-read — indistinguishable, without `_diagnose` below, from the tab being
+#: closed. A spreadsheet or PDF behind a `?download=1` link reaches this size
+#: routinely, so it is a normal path, not an edge case.
+#:
+#: A module constant, not a `fux.toml` key: see the note on `_SETTINGS`.
+STREAM_ABOVE_BYTES = 8 * 1024 * 1024
+
+#: Per `IO.read`. Small enough that no single reply is itself the problem this
+#: streaming path exists to avoid.
+IO_CHUNK_BYTES = 512 * 1024
 
 # ====================================================================
 # RFC 6455 WebSocket client — stdlib socket/hashlib/base64.
@@ -295,7 +329,13 @@ class WebSocket:
         return data
 
     def send_text(self, text: str) -> None:
-        self.sock.sendall(encode_frame(text.encode("utf-8"), OP_TEXT))
+        try:
+            self.sock.sendall(encode_frame(text.encode("utf-8"), OP_TEXT))
+        except OSError as exc:
+            # The read side raises FetcherError when the peer goes away; the
+            # write side must too, or `_diagnose` never sees a socket that
+            # died between two commands and a BrokenPipeError reaches the CLI.
+            raise FetcherError(f"WebSocket closed while sending: {exc}") from exc
 
     def recv_text(self) -> str:
         opcode, payload = self.reader.read_message(self._pong)
@@ -515,6 +555,16 @@ class CdpSession:
         conn = _Conn(WebSocket(target["webSocketDebuggerUrl"], timeout=LOAD_TIMEOUT_S))
         ws = conn
         try:
+            # ⚠ **Give the tab a page before asking it for a resource.** A tab
+            # from `/json/new` has NO history, and Chrome closes a
+            # history-less tab as soon as its navigation turns into a
+            # download — taking this socket with it, which arrives here as
+            # `WebSocket closed mid-frame` and reads like a fux bug. Visiting
+            # the origin first is also what the design note asked for
+            # originally ("navigate once per ORIGIN, then fetch"): it is where
+            # the browser's session for this host gets established, which is
+            # the entire reason this fetcher exists.
+            self._ensure_origin(ws, url)
             # ⚠ `urlPattern` is "*", not the target URL, and that is DELIBERATE.
             # A download URL typically 30x-es to a CDN on another host, and each
             # hop is its own `Fetch.requestPaused`. A pattern narrowed to the
@@ -540,13 +590,92 @@ class CdpSession:
                     self._call(ws, "Fetch.disable", {})
                 except FetcherError:
                     pass
+        except (FetcherError, OSError) as exc:
+            # A dead socket says only that it died. Turn it into a statement
+            # about WHICH thing died, while Chrome can still be asked. OSError
+            # is here as a backstop: every socket path in this file is meant to
+            # convert already, and one that is missed must still be diagnosed
+            # rather than reaching the CLI as `[Errno 32] Broken pipe`.
+            raise self._diagnose(exc, target) from exc
         finally:
             conn.ws.close()
+
+    def _ensure_origin(self, ws: "_Conn", url: str) -> None:
+        """Commit a page on `url`'s origin, once per origin per tab.
+
+        Runs BEFORE `Fetch.enable`, so `Page.navigate` is a plain command that
+        returns when the navigation commits — no paused response to deadlock
+        against, and no interception to unpick.
+
+        A failure here is deliberately swallowed: a 404 or a redirect to a
+        sign-in page on the origin root still leaves the tab with history,
+        which is the property this method exists to create.
+        """
+        parts = urlsplit(url)
+        if not parts.scheme or not parts.netloc:
+            return
+        origin = f"{parts.scheme}://{parts.netloc}/"
+        if getattr(self._local, "origin", None) == origin:
+            return
+        try:
+            self._call(ws, "Page.navigate", {"url": origin})
+        except FetcherError:
+            pass
+        self._local.origin = origin
+
+    def _diagnose(self, exc: FetcherError, target: dict) -> FetcherError:
+        """Name what died, for the one error this file cannot explain itself.
+
+        ⚠ **`WebSocket closed mid-frame` is true and useless.** It reports that
+        the peer went away; it cannot say whether the TAB was destroyed, the
+        BROWSER died, or DevTools dropped an oversized message — three causes
+        with three different fixes. Chrome still knows, for a moment, so ask.
+
+        Also drops this thread's dead tab, so the next fetch opens a fresh one
+        instead of reusing a target id Chrome has already forgotten.
+        """
+        if isinstance(exc, FetcherError) and "WebSocket" not in str(exc):
+            return exc
+        target_id = str(target.get("id") or "")
+        try:
+            alive = {str(t.get("id")) for t in self._targets()}
+        except Exception:
+            return FetcherError(
+                f"{exc} — and Chrome is no longer answering on {self._endpoint()}, so "
+                "the browser itself went away (a crash, or somebody quit it). Check "
+                "chrome://crashes, restart Chrome with --remote-debugging-port, and re-run."
+            )
+        if target_id and target_id not in alive:
+            self._local.target = None
+            self._local.origin = None
+            with self._lock:
+                self._opened.discard(target_id)
+            return FetcherError(
+                f"{exc} — Chrome destroyed the tab this fetch was driving, which closes "
+                "the CDP socket with it. The usual cause is a navigation that became a "
+                "DOWNLOAD (a `?download=1` link, or any Content-Disposition: attachment) "
+                "in a tab with no history — Chrome closes such a tab the moment the "
+                "download starts. This fetcher visits the origin first precisely to give "
+                "the tab history; if you are reading this anyway, the SITE is closing the "
+                "tab (window.close(), or a sign-in flow that ends in one)."
+            )
+        return FetcherError(
+            f"{exc} — the tab survived, so DevTools dropped the connection rather than the "
+            f"target. That is what an oversized CDP message does; bodies declaring more "
+            f"than {STREAM_ABOVE_BYTES // (1024 * 1024)} MB are streamed, so a large body "
+            "that declares NO Content-Length is the remaining gap. Lower "
+            "STREAM_ABOVE_BYTES in this file if you are hitting it."
+        )
 
     def _await_document(self, ws: "_Conn", url: str, *, want_body: bool) -> "Resource":
         """Pump paused requests until the main document's response arrives."""
         deadline = time.monotonic() + LOAD_TIMEOUT_S
-        for _ in range(MAX_REDIRECTS + 1):
+        #: ⚠ **Redirect hops, NOT paused requests.** `urlPattern` is `"*"`, so
+        #: every subresource of whatever the tab was showing pauses here too;
+        #: counting those spent the budget on traffic that is not a redirect
+        #: and blamed a sign-in loop for it. See the note on MAX_REDIRECTS.
+        hops = 0
+        while hops <= MAX_REDIRECTS:
             paused = self._wait_event(ws, "Fetch.requestPaused", deadline, url)
             request_id = paused["requestId"]
             status = int(paused.get("responseStatusCode") or 0)
@@ -555,6 +684,8 @@ class CdpSession:
             if not is_document or 300 <= status < 400:
                 # A subresource, or a hop on the way. Let it run; the next
                 # `Fetch.requestPaused` is the one we are waiting for.
+                if is_document:
+                    hops += 1
                 self._resolve(ws, request_id, abort=False)
                 continue
 
@@ -562,9 +693,7 @@ class CdpSession:
             body = b""
             try:
                 if want_body:
-                    result = self._call(ws, "Fetch.getResponseBody", {"requestId": request_id})
-                    raw = result.get("body") or ""
-                    body = base64.b64decode(raw) if result.get("base64Encoded") else raw.encode("utf-8")
+                    body = self._body(ws, request_id, headers)
             finally:
                 # Abort rather than continue: we already hold the bytes, and
                 # letting the navigation complete would either render the page
@@ -586,6 +715,62 @@ class CdpSession:
             f"more than {MAX_REDIRECTS} redirects fetching {url} — a redirect loop, "
             "or a sign-in flow bouncing between an identity provider and the site"
         )
+
+    def _body(self, ws: "_Conn", request_id: str, headers: dict[str, str]) -> bytes:
+        """The response body, whole, by whichever route survives its size.
+
+        `Fetch.getResponseBody` is one request and one reply, which is right up
+        to the point where the reply is too big for DevTools to send — and then
+        it does not fail, it drops the socket. So a body that DECLARES more
+        than `STREAM_ABOVE_BYTES` is streamed instead, and a `getResponseBody`
+        that fails anyway falls back to the stream rather than to nothing: a
+        body with no `Content-Length` is exactly the case the threshold cannot
+        see.
+        """
+        try:
+            declared = int(headers.get("content-length", ""))
+        except ValueError:
+            declared = -1
+        if declared > STREAM_ABOVE_BYTES:
+            return self._body_by_stream(ws, request_id)
+        try:
+            result = self._call(ws, "Fetch.getResponseBody", {"requestId": request_id})
+        except FetcherError:
+            return self._body_by_stream(ws, request_id)
+        raw = result.get("body") or ""
+        return base64.b64decode(raw) if result.get("base64Encoded") else raw.encode("utf-8")
+
+    def _body_by_stream(self, ws: "_Conn", request_id: str) -> bytes:
+        """The body in `IO_CHUNK_BYTES` pieces, so no one CDP message is huge.
+
+        ⚠ `Fetch.takeResponseBodyAsStream` **takes** the body: after it,
+        `Fetch.getResponseBody` on the same request is gone. The request still
+        has to be resolved, which the caller's `finally` does.
+        """
+        result = self._call(ws, "Fetch.takeResponseBodyAsStream", {"requestId": request_id})
+        handle = result.get("stream")
+        if not handle:
+            raise FetcherError("CDP Fetch.takeResponseBodyAsStream returned no stream handle")
+        pieces: list[bytes] = []
+        try:
+            while True:
+                piece = self._call(ws, "IO.read", {"handle": handle, "size": IO_CHUNK_BYTES})
+                data = piece.get("data") or ""
+                if data:
+                    pieces.append(
+                        base64.b64decode(data) if piece.get("base64Encoded")
+                        else data.encode("utf-8")
+                    )
+                if piece.get("eof"):
+                    break
+        finally:
+            # Best effort: an unclosed handle is a leak in Chrome, not a failed
+            # fetch, and raising here would mask the real error.
+            try:
+                self._call(ws, "IO.close", {"handle": handle})
+            except FetcherError:
+                pass
+        return b"".join(pieces)
 
     def _resolve(self, ws: "_Conn", request_id: str, *, abort: bool) -> None:
         """Every paused request gets exactly one of these. Never skip it."""
@@ -717,7 +902,7 @@ class CdpSession:
             opened, self._opened = self._opened, set()
         for target_id in sorted(opened):
             self._close_target(target_id)
-        self._local = threading.local()
+        self._local = threading.local()  # drops each thread's target AND its origin
         if self.chrome is not None:
             self.chrome.terminate()
             self.chrome = None

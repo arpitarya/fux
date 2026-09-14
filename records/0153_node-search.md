@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@84d59aba18a8, src/fux/store/nodebundle.py@071a24a596dd]
+owns: [node@d634c7430c10, src/fux/store/nodebundle.py@071a24a596dd]
 laws: [L1, L3, L4, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 02096daa4c997489ba6d1e25cb52afc4eb9f34f20620b3090d871f470cd88bbe
+content_sha: 2286ecb0fd4dd6e4ab47dc7161a3ae85f3a72acf9366f8b367fb9b53ef1daac4
 ---
 
 # SR-NODE-SEARCH — the Node read plane
@@ -533,6 +533,18 @@ rung 3, PnP at none, which is why PnP takes shape A and rung 1. The shim's
 failure message says so, and names the one-line `.yarnrc.yml` change that would
 make shape C available.
 
+
+**2026-09-14 — `src/fux/setup.py` changed under this record and NOTHING this record
+decides moved.** The scaffolded `fux.toml`'s `[sources.url.config]` block now shows the
+per-fetcher sub-tables ([SR-FETCHER](0117_fetcher.md) decision 8).
+`detect_workspace`, `wire_workspace` and `_yarn_berry_linker` — the monorepo
+half of what this record owns in that file — are untouched, and no byte of
+`node/` changed.
+
+⚠ **Said out loud rather than left to the freshness gate.** That check proves an
+owning record was *touched*, never that it was read (CLAUDE.md §Law zero), so a
+co-owner's file changing under this one is exactly the case where a reader needs
+to be told *"not yours"* in writing.
 ### Consequences
 
 - **`fux` names two binaries when both are installed globally.** `--version`

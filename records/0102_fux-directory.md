@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@836cc5ab2239, src/fux/setup.py@425c58247116]
+owns: [src/fux/store/fuxdir.py@836cc5ab2239, src/fux/setup.py@d3e9d88f4dd4]
 laws: [L2, L3, L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 8251b94483d863a707dfa10e8cddc807fcef612112ad7e353d0a30ce8873ac12
+content_sha: 3e758a5a5effc2c438b2b1d40eedb0479ea3c54119c83766832e5dbb048c964c
 ---
 
 # SR-DOTFUX — the `.fux/` directory
@@ -759,6 +759,17 @@ check can see neither.
   upgrade cost on the table: a consumer reading `.fux/decoders/pdf.py` and
   finding it is not the code that ran is a worse surprise than an upgrade that
   needs a deliberate refresh.
+
+**The generated `fux.toml` shows `[sources.url.config]` in its PER-FETCHER
+form** (amended 2026-09-14). The commented specimen `fux setup` writes is
+`[sources.url.config.cdp]` / `[sources.url.config.http]`, not a flat table with
+`cdp_port` in it — because a scaffolded example is what a consumer uncomments,
+and the flat form hands a Chrome-only key to `http.py`, which refuses keys it
+does not know. The specimen was already commented out and so never broke a
+generated repo; **fux's own `fux.toml` had it uncommented and did**, which is
+how the defect reached a real corpus. See
+[SR-FETCHER](0117_fetcher.md) decision 8 for the slicing rule itself — this
+record owns only what the scaffold writes.
 
 ### Reference (required)
 

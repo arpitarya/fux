@@ -199,18 +199,69 @@ def resolve_urls(entries: list[sourcelist.Entry], source) -> list[UrlEntry]:
     return resolved
 
 
-def configure_fetcher(module, config: dict) -> None:
-    """Hand `[sources.url.config]` to the fetcher's optional `configure`.
+def config_for(config: dict, fetcher: str | None) -> dict:
+    """The slice of `[sources.url.config]` ONE fetcher is handed.
 
-    The table is passed verbatim — fux never inspects a key. A `configure`
-    that raises is a misconfiguration, not a per-URL failure, so it stops the
-    run rather than degrading into skips.
+    ⚠ **The table used to go to every fetcher verbatim, and that was a defect
+    with a live victim.** Each shipped `configure()` raises on a key it does
+    not know — deliberately, because a typo'd tunable that does nothing is
+    found three ingests later — so one fetcher's tunable made the OTHER
+    fetcher refuse the whole run:
+
+        [sources.url.config]
+        cdp_port = 9222          # cdp.py's key
+
+        $ fux add https://example.com/handbook     # resolves to http.py
+        error: [sources.url] fetcher configure() failed: [sources.url.config]
+        unknown key(s): cdp_port — known keys: fetcher_max_parallel, …
+
+    A repo could therefore configure **at most one** of the two shipped
+    fetchers, and `fetcher_max_parallel` had to be spelled the same in both
+    files purely to survive the collision (see the long note beside it in
+    `http.py`).
+
+    The shape of the fix, and why it is this shape:
+
+    * **A scalar at the top level is SHARED** and still reaches every fetcher,
+      so `fetcher_max_parallel` keeps working and no existing repo changes.
+    * **A sub-table belongs to the fetcher it is named for** —
+      `[sources.url.config.cdp]` reaches `cdp.py` and reaches nothing else.
+      The name is the fetcher file's stem, which is already how
+      `fetcher_for()` resolves `fetch=cdp`.
+    * **A sub-table is never passed down as a key**, so `http.py` does not see
+      `cdp` and its strictness is untouched. **Do not loosen that strictness**
+      — it is what catches the typo this function's sub-tables now make
+      addressable.
+
+    A sub-table naming a fetcher this run never loads is simply not read.
+    That is deliberate: a repo may carry config for a fetcher used only on
+    another branch, and making it an error would punish the thing the design
+    is for.
+    """
+    #: Shared first, own second, so the fetcher's own table wins a clash. Both
+    #: are insertion-ordered from `tomllib`, so the merge is deterministic (L3).
+    merged = {key: value for key, value in config.items() if not isinstance(value, dict)}
+    if fetcher is not None:
+        own = config.get(fetcher)
+        if isinstance(own, dict):
+            merged.update(own)
+    return merged
+
+
+def configure_fetcher(module, config: dict, fetcher_path: str | None = None) -> None:
+    """Hand this fetcher's slice of `[sources.url.config]` to its `configure`.
+
+    Fux still never inspects a key — `config_for` sorts the table by shape
+    (scalar vs sub-table), never by meaning. A `configure` that raises is a
+    misconfiguration, not a per-URL failure, so it stops the run rather than
+    degrading into skips.
     """
     hook = getattr(module, "configure", None)
     if not callable(hook):
         return
+    fetcher = PurePosixPath(fetcher_path).stem if fetcher_path else None
     try:
-        hook(dict(config))
+        hook(config_for(config, fetcher))
     except Exception as exc:
         raise FuxError(f"[sources.url] fetcher configure() failed: {exc}") from exc
 
@@ -687,7 +738,7 @@ def fetch_all(
     token_shas: dict[str, str] = {}
     for fetcher_path in sorted(groups):
         module = load_fetcher(root, fetcher_path)
-        configure_fetcher(module, config or {})
+        configure_fetcher(module, config or {}, fetcher_path)
         connect = getattr(module, "connect", None)
         close = getattr(module, "close", None)
         if callable(connect):

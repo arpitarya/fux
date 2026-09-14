@@ -12,7 +12,7 @@ from fux import store
 from fux.config import load as load_config
 from fux.errors import FuxError
 from fux.ingest.run import run
-from fux.ingest.urlsrc import UrlEntry, fetch_all, load_fetcher, read_urls
+from fux.ingest.urlsrc import UrlEntry, config_for, fetch_all, load_fetcher, read_urls
 from fux.query.tokenize import tokenize
 from fux.store.format import term_hash, title_hash
 
@@ -212,7 +212,19 @@ def test_fetch_all_calls_hooks_once_and_skips_failures(tmp_path):
 _RECORDER = 'import pathlib\n_LOG = pathlib.Path(__file__).with_name("log.txt")\n'
 
 
-def test_config_table_reaches_configure_verbatim(tmp_path):
+def test_a_scalar_is_shared_and_a_sub_table_reaches_only_its_own_fetcher(tmp_path):
+    """🔴 **The table went VERBATIM to every fetcher, and that was a defect with a
+    live victim.** Each shipped `configure()` raises on a key it does not know, so
+    one fetcher's tunable made the OTHER fetcher refuse the whole run — `cdp_port`
+    in `[sources.url.config]` refused `http.py`, and a repo could therefore
+    configure **at most one** of the two shipped fetchers.
+
+    The slice is by SHAPE, never by meaning
+    ([SR-FETCHER](../../records/0117_fetcher.md) decision 8): a scalar is shared
+    and reaches everyone, a sub-table belongs to the fetcher whose name it carries,
+    and ⚠ **a sub-table is never passed down as a key** — which is what leaves the
+    other fetcher's strictness intact.
+    """
     (tmp_path / "mw.py").write_text(
         _RECORDER
         + 'def configure(config):\n'
@@ -221,9 +233,47 @@ def test_config_table_reaches_configure_verbatim(tmp_path):
         '    return "# T\\n\\nbody\\n"\n',
         encoding="utf-8",
     )
-    table = {"cdp_port": 9333, "nested": {"deep": [1, 2]}, "flag": True}
+    table = {
+        "fetcher_max_parallel": 2,  # a scalar: shared, reaches every fetcher
+        "mw": {"own_key": "mine"},  # this fetcher's own table, by file stem
+        "other": {"cdp_port": 9333},  # another fetcher's — never read, never an error
+    }
     fetch_all(tmp_path, _entries(["https://x.test/a"]), table)
-    assert (tmp_path / "log.txt").read_text(encoding="utf-8") == repr(sorted(table.items()))
+    seen = (tmp_path / "log.txt").read_text(encoding="utf-8")
+    assert seen == repr([("fetcher_max_parallel", 2), ("own_key", "mine")])
+
+
+def test_a_fetchers_own_key_wins_a_clash_with_the_shared_level(tmp_path):
+    """Shared first, own second — so a repo can set a default for every fetcher
+    and still override it for one. Both tables are insertion-ordered from
+    `tomllib`, so the merge is deterministic (L3)."""
+    (tmp_path / "mw.py").write_text(
+        _RECORDER
+        + 'def configure(config):\n'
+        '    _LOG.write_text(repr(sorted(config.items())))\n'
+        'def fetch(url):\n'
+        '    return "# T\\n\\nbody\\n"\n',
+        encoding="utf-8",
+    )
+    fetch_all(
+        tmp_path,
+        _entries(["https://x.test/a"]),
+        {"timeout_s": 30, "mw": {"timeout_s": 5}},
+    )
+    assert (tmp_path / "log.txt").read_text(encoding="utf-8") == repr([("timeout_s", 5)])
+
+
+def test_config_for_slices_by_shape_and_leaves_an_unknown_fetcher_unread():
+    """The rule itself, without the fetch machinery around it.
+
+    ⚠ **A sub-table naming a fetcher this run never loads is simply NOT READ**,
+    not an error — a repo may carry config for a fetcher used only on another
+    branch, and erroring there would punish the thing the design is for."""
+    table = {"shared": 1, "cdp": {"cdp_port": 9222}, "http": {"timeout_s": 30}}
+    assert config_for(table, "cdp") == {"shared": 1, "cdp_port": 9222}
+    assert config_for(table, "http") == {"shared": 1, "timeout_s": 30}
+    assert config_for(table, "nobody") == {"shared": 1}
+    assert config_for(table, None) == {"shared": 1}
 
 
 def test_configure_is_optional_and_absent_table_is_empty(tmp_path):

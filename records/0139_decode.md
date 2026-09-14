@@ -7,10 +7,10 @@ description: "Decoding gets one home, one protocol, and a consumer seam where th
 status: accepted
 date: 2026-08-26
 feature: the decoder plane — the protocol, the registry, the consumer seam and the enrichment queue
-owns: [src/fux/decode@b8e3ff5c9dbf, src/fux/templates/agents/DECODER-SKILL.md@474a416bcc42]
+owns: [src/fux/decode@de1d51fa6042, src/fux/templates/agents/DECODER-SKILL.md@474a416bcc42]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-26T00:00:00Z
-content_sha: da782cd57d8f4f69f24bd0bcf9de65ce587a0ff36ea48673286daaa6204d9e89
+content_sha: a1e1077a99ff4126911a01d6c0362220a830e27c12d76a361e675d131b951795
 ---
 
 # SR-DECODE — bytes become Markdown in one place

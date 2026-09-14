@@ -26,9 +26,14 @@ meta         = "hashed"
 # hard, in a number a person can read. Comment it out and fux refuses to load.
 max_parallel = 4
 
-# Passed to your fetcher's configure() verbatim; fux never reads a key inside.
-[sources.url.config]
-cdp_port  = 9222
+# Passed to your fetcher's configure(); fux sorts this table by SHAPE, never by
+# meaning. A scalar here is shared and reaches every fetcher. A sub-table
+# reaches only the fetcher it names -- keep a fetcher-specific key there, or
+# the other fetcher is handed it and refuses the key it does not know.
+#[sources.url.config]
+#[sources.url.config.cdp]
+#cdp_port  = 9222
+#[sources.url.config.http]
 #timeout_s = 30
 
 [index]

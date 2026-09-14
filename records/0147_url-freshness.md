@@ -10,7 +10,7 @@ feature: the freshness verdict vocabulary and the per-URL check interval
 owns: [src/fux/refer/freshness.py@6757eeeba7c6]
 laws: [L2, L3, L4]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 0943613bc9e85a333bff3cfe4988eda5006d33b93e1d317d6708bd2ce7ef87bd
+content_sha: b0b3cad3987c6b6641116dbbb2418a8069ccfbf5bb4d77e38a58764601fa336e
 ---
 
 # SR-URL-FRESHNESS: what a citation may claim, and how often it has to earn it
@@ -415,6 +415,17 @@ list's own parser, and now `tlt = "1d"` fails too instead of leaving the source
 on its default freshness. ⚠ The record said so from `24c0a3d` and the code landed
 two commits later — see SR-CONFIG after decision 15.
 
+
+**2026-09-14 — `src/fux/ingest/urlsrc.py` changed under this record and NOTHING this record
+decides moved.** Per-fetcher `[sources.url.config]` resolution
+([SR-FETCHER](0117_fetcher.md) decision 8). `UrlEntry.ttl` and its three-layer
+resolution are untouched, and so is `fetch_at_answer`, which lives in
+`config.py` and `query/refer_answer.py` rather than here.
+
+⚠ **Said out loud rather than left to the freshness gate.** That check proves an
+owning record was *touched*, never that it was read (CLAUDE.md §Law zero), so a
+co-owner's file changing under this one is exactly the case where a reader needs
+to be told *"not yours"* in writing.
 ### Consequences
 
 **Easier.** An offline or signed-out corpus keeps answering, with citations that

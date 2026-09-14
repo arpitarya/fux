@@ -10,7 +10,7 @@ feature: "`fux answer` — one answer, its footing stated, and the report of wha
 owns: []
 laws: [L1, L2, L3]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: f5b2cf284f5001ee7fc798176a3a858fd808ba78bc219165d0e96d64fd1442af
+content_sha: f4c23b8fded235b28a2d21fc1da146cb55003935148be9fb1c8caca394bbe67a
 ---
 
 # SR-ANSWER — the `answer` verb
@@ -379,6 +379,18 @@ verb's fetching path** (W-140 rows 6 and 7, 2026-09-11).
   index alone now, and a receipt from a refer answer is `unverifiable` rather
   than compared against bytes fetched on the spot.
 
+
+**2026-09-14 — `src/fux/query/refer_answer.py` changed under this record and NOTHING this record
+decides moved.** `_load_fetchers` passes the fetcher's own slice of the config table to
+`configure()` rather than the whole table ([SR-FETCHER](0117_fetcher.md)
+decision 8) — a one-line change that keeps this module's resolution identical to
+`ingest/urlsrc.py`'s, which is the property this record's §Reference already
+insists on. The candidate list, the dispatch and the policy seam are unchanged.
+
+⚠ **Said out loud rather than left to the freshness gate.** That check proves an
+owning record was *touched*, never that it was read (CLAUDE.md §Law zero), so a
+co-owner's file changing under this one is exactly the case where a reader needs
+to be told *"not yours"* in writing.
 ### Consequences
 
 - **The passage carries the document's frontmatter block.** `refer/_chunk.py`

@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-08-18
 feature: the `fux ingest` pipeline — sources to committed records
-owns: [src/fux/ingest@6f0af99dd108, src/fux/ingest/priors.py@8ffcc632a4be]
+owns: [src/fux/ingest@34eb1cd9a49b, src/fux/ingest/priors.py@8ffcc632a4be]
 laws: [L2, L3, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: d2bac143dba1e095d0d00fd2d264a8b06c818724326c52831bf1351bdd84842d
+content_sha: 8bbbd1dca46940fd37c09b1c6578ada2088869407b1fbaf0cbe9188b45dd210e
 ---
 
 # SR-INGEST — how ingest works

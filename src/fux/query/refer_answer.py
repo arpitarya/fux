@@ -188,7 +188,7 @@ def _load_fetchers(root: Path, citations: list[tuple[str, str, str]]):
         if module is None:
             try:
                 module = urlsrc.load_fetcher(root, entry.fetcher_path)
-                urlsrc.configure_fetcher(module, config.url.config)
+                urlsrc.configure_fetcher(module, config.url.config, entry.fetcher_path)
                 connect = getattr(module, "connect", None)
                 if callable(connect):
                     connect()

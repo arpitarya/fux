@@ -10,7 +10,7 @@ feature: refusal detection before decode
 owns: [src/fux/ingest/refusals.py@adf187806c43, src/fux/templates/refusals.toml.txt@bdf2356bc679, tools/refusal-probe@76b6f6b7f4aa]
 laws: [L1, L3]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 4dafd67965261a0fd55c6e53ff485df9b666595d8f7021e7765fc37348506989
+content_sha: c03fc19bcec3300e071059208f0121013157eedd676ce64899f12c1518d2d6fc
 ---
 
 # SR-REFUSAL: a sign-in wall is not a document, and only the bytes may say so
@@ -360,6 +360,17 @@ those is the document, not an auth wall. `.action`, `.aspx`, `.asp`, `.php` and
   `doctor`'s `refusal rules` row (which counts hits per rule) is where a
   consumer would notice.
 
+
+**2026-09-14 — `src/fux/ingest/urlsrc.py` changed under this record and NOTHING this record
+decides moved.** The line that changed is the `configure()` call — each fetcher is handed its
+own slice of `[sources.url.config]` ([SR-FETCHER](0117_fetcher.md) decision 8).
+The refusal check's **position** is what this record owns and it has not moved:
+still in `fetch_all`, still after `_unpack` and before persist and decode.
+
+⚠ **Said out loud rather than left to the freshness gate.** That check proves an
+owning record was *touched*, never that it was read (CLAUDE.md §Law zero), so a
+co-owner's file changing under this one is exactly the case where a reader needs
+to be told *"not yours"* in writing.
 ### Consequences
 
 **Easier.** A refusal that used to become a record now becomes a skip with a
