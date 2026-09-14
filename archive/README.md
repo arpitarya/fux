@@ -148,6 +148,7 @@ they are worth keeping.
 
 | item | closed | outcome and live successor |
 |---|---|---|
+| [`W-174-offline-url-answers.md`](open/W-174-offline-url-answers.md) | 2026-09-14 | **Shipped in full.** `[sources.url] fetch_at_answer` — the `fux.toml` boolean that pins every `url:` citation to `.fux/acquired/` at answer time. Live successors: [SR-URL-FRESHNESS](../records/0147_url-freshness.md) decision 16 (the decision, the name and the two look-alikes) · [SR-CONFIG](../records/0113_config.md) (the declared key) · [SR-ANSWER](../records/0105_answer.md) (the seam) · [SR-DOCTOR](../records/0152_doctor.md) (the `pinned url bytes` row). ⚠ **Its central finding was that the mode was already BUILT** — `Policy(mode=NEVER)` and `_obtain`'s never-branch, with tests — and only the selector was missing, so the item shrank from a feature to a config key while it was being written. ⚠ **Its one open question is answered and closed**: Node needs nothing, because Node never fetches (W-107 R6) and has always behaved as `fetch_at_answer = false` |
 | [`W-164-four-small-gates.md`](open/W-164-four-small-gates.md) | 2026-09-14 | **Shipped in full — four gates, and 🔴 every one of them was RED on the live tree before it was green**, which is what the item demanded (*"a gate that has never been red proves nothing about itself"*). Gate 1 found `B-129` at 444 chars against a cap of 400. Gate 2 found **SR-CLI §1 missing `fux output`** — the record was the stale copy, which is the direction that matters under L0. Gate 3 found `tune.toml loads` live and unregistered since 2026-09-11. Gate 4 is the one with a behaviour, and closed SR-CONFIDENCE decision 13's own *"nothing mechanical catches it"*. ⚠ **One of gate 1's two reds was the TEST misreading its rule**, not a defect: rule 11's *filing order* survives grouping by class, so the check narrowed to per-section. ⚠ **Gate 4 was widened past its DoD** — `find` and `answer` publish the same band, and both readers say it. Live successors: [SR-WORK-BACKLOG](../records/0055_WORK-backlog.md) (`built: yes` at last, and it owns its test), [SR-DOTFUX](../records/0102_fux-directory.md), [SR-DOCTOR](../records/0152_doctor.md), [SR-CONFIDENCE](../records/0141_confidence.md) |
 | [`W-163-doctor-setup-drift-rows.md`](open/W-163-doctor-setup-drift-rows.md) | 2026-09-14 | **Shipped in full — all eight rows, every one kept.** `fux setup` writes once and never rewrites, so every template freezes in every repo set up before it changed and nothing said so; five records each named `fux doctor` as the place that should, and none was built. 🔴 **Its own keep-call caught a false positive before the row shipped** — `output.toml current` reported six keys missing from fux's own correctly-written file, because that file nests per verb on purpose. Two fixes followed, both found by RUNNING the row rather than reading it. **The call was then discharged on real corpora**: run across five `fux-lab` repos, every warning was a true positive (frozen READMEs, a genuinely left-behind `.github/skills/`, three tune keys the engine had gained) and one repo came back clean, proving the rows can be silent. Live successors: [SR-DOCTOR](../records/0152_doctor.md)'s register and the eight source records, each of which now says *is there* rather than *is where that would go* |
 | [`W-159-windows-shadowing-row.md`](open/W-159-windows-shadowing-row.md) | 2026-09-14 | **Shipped**, and ⚠ **its own diagnosis was wrong in the direction that matters.** It stated *"the row cannot fire on Windows"* on the evidence of a test skipped there; `shutil.which` honours PATHEXT, which is exactly how it resolves the `fux.cmd` npm writes, so the row fires and the **fixture** was what could not be built. A skipped test was read back as a claim about the code it could not reach. What shipped: `_is_node_shim` split out and tested on every platform, a platform-shaped `_fake_bin`, the skip gone, and a **real false positive closed** — a Windows console script is a `.exe`, and reading one for the word `node` would have reported an ordinary Python `fux` as the Node reader. Live successors: [SR-NODE-SEARCH](../records/0153_node-search.md) (the mitigation now names its platforms) and [SR-DOCTOR](../records/0152_doctor.md)'s `fux on PATH` row |
@@ -281,6 +282,24 @@ thirty-two did not, and the reason each one did not is written down** in
 were genuinely lost (their bytes are in no commit and no loose object; the
 durable record of each is its `WORKLOG` entry and its record), and twelve were
 never allocated as files at all.
+
+### The 2026-09-14 id collision — three ids with no file, and why none is a loss
+
+Two sessions filed into `OPEN-WORK.md` minutes apart on 2026-09-14. The wake is
+three ids that resolve to no file, named in
+[`tests/test_no_work_item_is_lost.py`](../tests/test_no_work_item_is_lost.py)
+`RENUMBER_WAKE_2026_09_14` and nowhere else:
+
+| id | what happened | live successor |
+|---|---|---|
+| **W-167** | filed as `W-167-finish-the-claude-md-extraction`, then **re-filed by its own author as W-173** before either draft was staged. Searched for on 2026-09-14: in no commit, and in none of the 4 136 unreachable blobs `git fsck` holds — so unlike [`W-114`](open/W-114-adrs-are-the-source.md) there is nothing to archive | [`W-173-finish-the-claude-md-extraction.md`](../work/open/W-173-finish-the-claude-md-extraction.md) — the same item, same accepted proposal |
+| **W-171** | never allocated. The concurrent session renumbered its three items to W-168/169/170 for contiguity and the count stopped there | none — nothing ever claimed it, and a later session may |
+| **W-172** | never allocated, same renumber | none, same |
+
+**Rule 55 archives every closure, and a renumber is one** — which is why W-167
+is written down here rather than left to be found as a gap. What the rule cannot
+recover is bytes that were never staged, and that is the whole of what was lost:
+one session's earlier draft of an item that is live.
 
 ## Retired planning documents
 

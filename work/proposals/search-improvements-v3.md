@@ -2,10 +2,12 @@
 type: Proposal
 title: "Ten ways to rank better, all $0 and deterministic — the 3.0 search backlog"
 description: "Ten ranking improvements Arpit kept on 2026-09-13, each independent of the graph-composed `ask`: anchor text as a field, corpus-mined expansion, an unstemmed identifier field, RM3 pseudo-relevance feedback, supersession-aware ranking, passage proximity (SDM), community diversification (MMR), a git-derived authority prior, a query-intent → doc-type prior, and section-level index units. Each is its own ranking change: its own golden questions, its own pre-registration, behind W-156."
-status: proposed
+status: graduated
 timestamp: 2026-09-13T00:00:00Z
 filed: 2026-09-13
 ---
+
+**Graduated 2026-09-14 → [W-168](../open/W-168-search-improvements.md)** (Arpit). This file stays the spec the item points at.
 
 # Ten ways to rank better — the 3.0 search backlog
 
@@ -81,6 +83,32 @@ pre-registration exist.**
 | 10 | a new record; SR-POSTINGS, SR-CHUNKING | a plane |
 
 ---
+
+## 3b · Per idea: what is tested, what is measured, and the keep/remove call
+
+**Order for every idea: golden question(s) → pre-registration → implement →
+measure → call.** Never two ideas in one arm. Every floor is SR-RS decision
+19's paired floor for the observed discordant count; "both directions" means
+the gain on the target questions **and** zero new misses elsewhere.
+
+| # | unit tests prove | measured on | keep if | remove if (and what is removed) |
+|---|---|---|---|---|
+| 1 anchor text | the field is populated only from `ref` edges; determinism (same edges → same field bytes) | golden questions answerable only via linker wording | recall@k gain clears the floor, no new misses | fails → the field stays indexed at weight 0 (no index change on removal), the record says so |
+| 2 corpus-mined expansion | the mined table is deterministic and contains only patterns the record names; the refusal still holds | acronym / house-term questions | same | fails → the table is not consulted; the miner stays as a `fux inspect` lens (it is useful as a report) |
+| 3 identifier field | ids survive the analyzer byte-exact; a stemmed collision test | id-queries | recall@1 on id-queries clears the floor | fails → removed outright (a field nobody hits costs postings) |
+| 4 RM3 | the expansion is a pure function of the top-k; weight 0 is byte-identical to today | under-specified questions | gain clears the floor **and drift bound holds**: no answerable question loses its top-1 | any drift → removed; RM3 stays reachable only as an agent's manual `--expand` |
+| 5 supersession | the `supersedes` edge demotes exactly its target; no effect without the edge | superseded/successor pairs | the successor wins on ≥ the registered fraction; no demotion of a live doc | fails → the demotion weight is 0 (edge still indexed for `graph`) |
+| 6 SDM proximity | window scoring on fetched bytes is deterministic; zero weight is byte-identical | phrase-sensitive questions | passage-level gain clears the floor | fails → weight 0 in refer, code stays behind the tunable |
+| 7 MMR | the swap fires only when the top-k share one community; deterministic | multi-facet questions | coverage gain **and** precision@1 unchanged | precision moves → removed |
+| 8 git authority prior | derived from commit metadata only; `SOURCE_DATE_EPOCH`-safe | needs a corpus with history — **golden is synthetic, so this idea starts with an instrument, not a measurement** | a corpus exists and the prior clears the floor | no corpus → stays a proposal; never ships unmeasured |
+| 9 intent prior | declared, not inferred; an undeclared repo is byte-identical | intent-labelled questions | gain clears the floor | fails → the declaration key stays, weight 0 |
+| 10 section units | a plane change — its own compare doc before any test | long-document questions | its own pre-registration | its own doc decides |
+
+- **"Remove" means the default is off and the record says why**, not that
+  the code is deleted in the same change — a measured negative is evidence
+  worth keeping reachable for one release; the following release deletes what
+  nobody re-armed.
+- **Ambiguous → Arpit**, per-query rows filed under `evidence/`.
 
 ## 4 · Graduation trigger
 

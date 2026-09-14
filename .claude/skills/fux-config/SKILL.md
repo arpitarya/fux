@@ -58,6 +58,7 @@ refuses.** A query succeeding proves nothing about `fux.toml`; the
 | `keep` | `true` | retain fetched bytes in `.fux/acquired/` |
 | `ttl` | `"24h"` | the URL's declared freshness window — `0` or an integer + `s`/`m`/`h`/`d`; read `answer`'s verdict rather than assuming it (see `fux-answer`) |
 | `update` | `"auto"` | `"never"` pins these URLs: `fux update` does not fetch them |
+| `fetch_at_answer` | `true` | `false` = `fux answer` never opens a socket for these URLs; it verifies against `.fux/acquired/` instead |
 | `enrich` | `false` | whether `fux enrich` plans work for these URLs |
 | `sweep_minutes` | `60` | how often `fux daemon` re-checks URLs |
 | `acquired_max_bytes` | store default | byte cap on `.fux/acquired/` |
@@ -67,14 +68,37 @@ refuses.** A query succeeding proves nothing about `fux.toml`; the
 
 **`meta`, `keep`, `ttl`, `update` and `enrich` are source-wide defaults** — a
 line in the URL list that sets the same attribute wins for its own URL.
+**`fetch_at_answer` and `acquired_max_bytes` are not**: they have no line-level
+form, so the `fux.toml` value is the only value.
+
+⚠ **Three keys sound like one knob and are three.** Getting them confused
+configures the opposite of what was meant:
+
+| you want | the key |
+|---|---|
+| check a citation less often, but still go out | `ttl` — a duration, ask-time |
+| stop re-fetching the page for the **index** | `update = "never"` — update-time. It does **not** keep `answer` offline |
+| never touch the network when **answering** | `fetch_at_answer = false` — ask-time |
+
+**`fetch_at_answer = false` is only worth having with `keep = true`.** With
+retained bytes, every `url:` citation comes back `as-ingested` — verified
+against the exact input its record was built from. Without them, every one is
+`unverified`. Fux does not refuse the combination; `fux doctor`'s
+`pinned url bytes` row counts it.
+
+⚠ **It is not `--no-refer`.** That flag turns the refer plane off — no passage
+re-scoring, no line ranges, no verification. `fetch_at_answer = false` keeps all
+of that and only removes the socket.
 
 **Refused by name, with the new home in the message:** `[ranking]`, `[decode]`,
 `[dense]`, `[sources] dirs`, `[sources] types_file`, `[sources.url] urls`,
 `[sources.url] middleware`.
 
-⚠ **Any other unknown key is silently ignored.** `metta = "plain"` or
-`[index] max_phrases = 64` in `fux.toml` does nothing and says nothing. Ranking
-and index-limit keys live in `.fux/tune.toml`.
+⚠ **Any other unknown key is REFUSED by name**, and the error lists what is
+legal at that level. `metta = "plain"` fails the load rather than sitting
+inert — a key quietly not read is a setting its author believes is in force.
+Ranking and index-limit keys live in `.fux/tune.toml`, which refuses unknown
+keys the same way.
 
 ---
 

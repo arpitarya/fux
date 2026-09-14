@@ -28,9 +28,11 @@ here. Read that record before changing anything below it.
 | 🔴 **W-112** — W-106 closed **without a PASS and cannot produce one** (no corpus carries DENSE-CHUNK's bar). Proceed on the narrowed claim, wait for an instrument, or close? [detail](open/W-112-vector-plane.md) | 2026-09-12 | 2d |
 | ↳ **blocks:** nothing else in the queue — search-v3's last item, and the only one left of §5 | | |
 | 🔴 **W-156** — every measurement must be on golden data; golden is one synthetic corpus; so *never ship a ranking change off one* can never be met. Which rule gives? [detail](open/W-156-prevalence-outside-golden.md) | 2026-09-13 | 1d |
-| ↳ **blocks:** **W-161** (the graph-composed `ask`, a ranking change) — and it decides what evidence any other ranking change may HAVE | | |
+| ↳ **blocks:** **W-168** (all ten search steps), **W-161** (the graph-composed `ask`) and **W-144**'s acceptance — every item whose output is a ranking change waits on this ruling for the evidence it is allowed to have | | |
 | 🔴 **W-144** — excluding table cells from `flen` **ranks better** ([verdict](regression/2026-09-12-reaim-and-instruments/VERDICT-W144.md)); one synthetic corpus may not ship a ranking change, so accept or override [the compare doc](compare/table-tokens-in-flen.compare.md). | 2026-09-12 | 2d |
 | ↳ **blocks:** nothing else in the queue — the measurement is filed and the code is written; what is missing is the call | | |
+| 🔴 **W-170** — does cage's `fux-search-leg` compare doc get accepted (option C: transcript classification + fux's per-invocation fact row)? That verdict fixes the row shape and the `args_hash` contract. [detail](open/W-170-cage-search-leg.md) | 2026-09-14 | 0d |
+| ↳ **blocks:** nothing else in the queue — fux's emitter is the only item behind it | | |
 | 🔴 **W-148** — two calls left over from W-107: how CI reaches a golden corpus (self-hosted runner / commit `rung-00100` / portable builder), and whether `fux-benchmark` gets built or Node's latency stays unmeasured. [detail](open/W-148-what-the-two-readers-still-owe.md) | 2026-09-12 | 2d |
 | ↳ **blocks:** nothing else in the queue — the Node plane is built and measured; these decide where a future measurement runs and what it may CLAIM | | |
 
@@ -40,6 +42,9 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
+- 🔴 **W-168** · `arpit`, blocked on W-156 — the ten search improvements as one program, ten gated steps (anchor text first, section units last); each step golden question → pre-registration → build → measure. Promoted 2026-09-14. [detail](open/W-168-search-improvements.md)
+- 🟢 **W-169** · `agent` — `fux inspect`: the index X-ray (boilerplate words, unfindable docs, duplicates/templates, analyzer coverage, orphans) from a local gitignored dictionary; SR-INSPECT + guide skill. Promoted 2026-09-14. [detail](open/W-169-fux-inspect.md)
+- 🔴 **W-170** · `arpit` — fux's emitter for cage's search leg: one counts-only fact row per invocation to `ledger/fux/`; the `args_hash` contract first. Waits on the cage compare-doc verdict. [detail](open/W-170-cage-search-leg.md)
 - 🟢 **W-160** · `agent` — the two atoms: `fux lexical` (BM25F alone, frozen) and `fux graph --seed`, plus the graph plane in the Node reader, digest-equal. Not a ranking change. Ratified 2026-09-13, not built. [detail](open/W-160-lexical-and-graph-atoms.md)
 - 🔴 **W-161** · `arpit`, blocked on W-156 and waiting on W-160 — the graph-composed `ask`: boosted tier + labelled `related` tier, `answer` reads `ask`. Ratified 2026-09-13; a ranking change, so it waits for the evidence rule. [detail](open/W-161-graph-composed-ask.md)
 - 🟢 **W-162** · `agent` — `fux correct`: a human question line on the document's enrichment file, a rare `--pin`, an eval row per correction, plus the guide skill and agent steering. Accepted 2026-09-13, not built. [detail](open/W-162-fux-correct.md)
@@ -61,6 +66,8 @@ here. Read that record before changing anything below it.
 
 - 🔴 **W-156** · `arpit` — the environments rule and the single-corpus rule cannot both hold; the resolution decides what evidence any ranking change may have. [detail](open/W-156-prevalence-outside-golden.md)
 
-- 🔴 **W-146** · `arpit` — L0's remainder: ten unhoused `CLAUDE.md` sections want records, and one ruling is owed. [detail](open/W-146-the-rest-of-l0.md)
+- 🔴 **W-146** · `arpit` — L0's remainder: **one ruling is owed** — how far *never restates* reaches into docstrings. Its inventory is reconciled; eight of its sections landed as records `0057`–`0064` on 2026-09-14. [detail](open/W-146-the-rest-of-l0.md)
+
+- 🟢 **W-173** · `agent` — finish the `CLAUDE.md` extraction: six sections fold into records that already state them, the dated lessons become a `work/` log, one owed test. 668 → ~330 lines. [detail](open/W-173-finish-the-claude-md-extraction.md)
 
 ---

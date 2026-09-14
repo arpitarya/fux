@@ -32,8 +32,53 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-09-13** (Cowork, 3.0 planning).* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-09-14** (Cowork, W-174).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
+
+### `fetch_at_answer` — the never-fetch mode now has a selector, W-174 SHIPPED (2026-09-14, Cowork)
+
+- **`[sources.url] fetch_at_answer`**, bool, default `true`. `false` pins every
+  `url:` citation to `.fux/acquired/` at answer time: no fetcher loaded, no
+  `connect()`, no socket, verdict `as-ingested`. Built, tested (12 unit + 3
+  e2e), eight records amended, W-174 archived. **Not committed** — see the
+  concurrency note below.
+- 🔴 **The finding worth carrying:** the behaviour already existed.
+  `freshness.Policy(mode=NEVER)` and `refer/_obtain`'s never-branch have
+  shipped since the module did, **with tests**, and `refer_answer.py` wrote
+  `Policy(mode=ALWAYS, …)` literally. **A branch with a test and no selector
+  reads exactly like a branch in use** — nothing in this repo catches that, and
+  `freshness.py`'s own docstring had been naming the unreachable caller in
+  prose the whole time.
+- ⚠ **Do not confuse it with the two neighbours.** `--no-refer` turns the refer
+  plane off (no rescoring, no line ranges, no verification); `update=never` is
+  the **update-time** clock. Decision 16 of SR-URL-FRESHNESS is the third cell
+  of decision 15's table and states all three.
+- **Two wrong sentences were found by reading the records under the code.**
+  SR-ACQUIRED claimed `update=never keep=true` meant *"no socket opens"* — never
+  true. The `fux-config` guide told agents unknown `fux.toml` keys were
+  *"silently ignored"* — wrong since SR-CONFIG decision 14. Both corrected here.
+- **Node is settled and owes nothing:** it never fetches (W-107 R6), so it has
+  always behaved as `fetch_at_answer = false`; under `false` the two readers'
+  `url:` verdicts converge exactly.
+- ⚠ **Tree state when this was written:** a concurrent session holds a large
+  staged changeset and uncommitted `src/` edits. Four suite rows are red and
+  **all four are theirs** — `test_doc_links` (their cage proposal's sibling-repo
+  link), `test_no_work_item_is_lost` (W-167/171/172 mid-renumber),
+  `…blocks_subrow` (W-156's sub-row removed), `test_sr_freshness`
+  (SR-AGENT-POLICY / SR-NODE-SEARCH / SR-PII). Commit with explicit pathspecs.
+
+### The backlog was swept: four new 🟢 items, three stale sentences fixed (2026-09-14, Cowork)
+
+- **W-163** (eight `fux doctor` rows), **W-164** (four small gates), **W-165**
+  (three CLI honesty fixes), **W-166** (carry-forward invalidation) — all
+  promoted from `BACKLOG.md`, all 🟢 `agent`, each with a handoff. **Six 🟢
+  items now sit in the queue with W-160 and W-162**; nothing agent-side is
+  blocked.
+- Three records corrected as statements of fact (B-032, B-239, B-240) and
+  restamped. **Do not "fix" `records/0149_expand.md`'s hash** — its staged
+  copy belongs to another session.
+- What stays in the backlog stays for a reason: `unruled` is Arpit's,
+  `unmeasured` waits on golden, `cost` never graduates.
 
 ### 3.0.0-alpha.0 has a branch and five work documents — nothing built (2026-09-13, Cowork)
 

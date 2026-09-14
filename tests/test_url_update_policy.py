@@ -140,8 +140,15 @@ def test_never_plus_keep_false_is_legal():
 
 def test_never_plus_keep_true_is_the_coherent_pair():
     """More offline, with the grain of L4: the bytes are in `.fux/acquired/`,
-    `answer` verifies against them and reports `as-ingested`, and no socket
-    opens."""
+    so a fetch that fails or is forbidden verifies against them and reports
+    `as-ingested` rather than `unverified`.
+
+    ⚠ **This docstring said "and no socket opens" and that was wrong**
+    (corrected 2026-09-14, W-174). `update=` is the UPDATE-time clock;
+    SR-URL-FRESHNESS decision 15 says in as many words that it *"still does not
+    keep `answer` offline"*. The knob that closes the socket at ask time is
+    `[sources.url] fetch_at_answer` (decision 16).
+    """
     (entry,) = _resolve("https://x.test/a update=never")
     assert entry.update == "never" and entry.keep is True
 

@@ -10,7 +10,7 @@ feature: the refer plane — fetch, verify, chunk, re-score, assemble
 owns: [src/fux/refer@30eed86dbb60, tools/refer-bench@cfdb47b24af2, tools/refer-budget-sweep@db9ff8233332]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: e79cca15ebc94552e972383b97697479bafebad69c5a4f204ca2ebc18613a49a
+content_sha: b1c65ac4959371e65017e4f2f3b4f939680dc826d72a51142d3ad9d05736e0aa
 ---
 
 # SR-REFER — the refer plane
@@ -567,6 +567,18 @@ read as a guarantee.
   returns, so a late arrival cannot race into an answer. A fetcher that leaks a
   thread per query is a fetcher problem, and `[sources.url.config]` is where it
   is bounded — fux will not reach into consumer code to kill it.
+
+**The never-branch is now REACHABLE from a repo's own config** (W-174,
+2026-09-14). Nothing in this plane changed: `_obtain`'s policy-forbids-fetch
+branch has always consulted `.fux/acquired/` and returned `as-ingested`, and
+`Policy(mode=NEVER)` has always existed. What changed is upstream —
+`query/refer_answer.py` no longer hard-codes `ALWAYS`, so
+`[sources.url] fetch_at_answer = false` selects the mode this plane already
+implemented. The key is stated once in
+[SR-URL-FRESHNESS](0147_url-freshness.md) decision 16.
+
+⚠ **Worth naming because it was invisible:** a branch with a test and no
+selector reads, to anyone auditing the plane, exactly like a branch in use.
 
 ### Consequences
 

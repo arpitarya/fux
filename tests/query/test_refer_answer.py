@@ -92,7 +92,7 @@ def test_url_document_uses_the_configured_fetcher(tmp_path):
 
 def test_connect_and_close_bracket_the_fetch(tmp_path):
     _init_url_repo(tmp_path)
-    fetch, close = _load_fetchers(tmp_path, [("url:https://x.test/a", "https://x.test/a", "sha")])
+    fetch, close, _fa = _load_fetchers(tmp_path, [("url:https://x.test/a", "https://x.test/a", "sha")])
     assert fetch is not None
     fetch("https://x.test/a")
     close()
@@ -104,7 +104,7 @@ def test_connect_and_close_bracket_the_fetch(tmp_path):
 
 def test_configure_receives_the_opaque_config_table(tmp_path):
     _init_url_repo(tmp_path, config_table='[sources.url.config]\nport = 9222\n')
-    fetch, close = _load_fetchers(tmp_path, [("url:https://x.test/a", "https://x.test/a", "sha")])
+    fetch, close, _fa = _load_fetchers(tmp_path, [("url:https://x.test/a", "https://x.test/a", "sha")])
     try:
         assert fetch is not None
     finally:
@@ -116,7 +116,7 @@ def test_configure_receives_the_opaque_config_table(tmp_path):
 
 def test_a_url_with_no_sources_url_configured_degrades_to_none(tmp_path):
     """No `[sources.url]` at all — nothing to resolve, no crash."""
-    fetch, close = _load_fetchers(tmp_path, [("url:https://x.test/a", "https://x.test/a", "sha")])
+    fetch, close, _fa = _load_fetchers(tmp_path, [("url:https://x.test/a", "https://x.test/a", "sha")])
     assert fetch is None
     close()  # the noop — must be safe to call unconditionally
 
@@ -125,7 +125,7 @@ def test_a_url_not_in_the_committed_list_degrades_to_none(tmp_path):
     """Configured source, but this exact URL was never recorded — same
     honest degradation as no config at all, not a crash."""
     _init_url_repo(tmp_path, url="https://x.test/other")
-    fetch, close = _load_fetchers(tmp_path, [("url:https://x.test/a", "https://x.test/a", "sha")])
+    fetch, close, _fa = _load_fetchers(tmp_path, [("url:https://x.test/a", "https://x.test/a", "sha")])
     assert fetch is None
     close()
 
@@ -136,7 +136,7 @@ def test_a_missing_fetcher_file_degrades_to_none(tmp_path):
     over, not a crash here."""
     _init_url_repo(tmp_path)
     (tmp_path / "mw.py").unlink()
-    fetch, close = _load_fetchers(tmp_path, [("url:https://x.test/a", "https://x.test/a", "sha")])
+    fetch, close, _fa = _load_fetchers(tmp_path, [("url:https://x.test/a", "https://x.test/a", "sha")])
     assert fetch is None
     close()
 
@@ -218,7 +218,7 @@ def test_every_document_failing_is_the_only_none(tmp_path):
 
 
 def test_an_empty_citation_list_loads_no_fetcher(tmp_path):
-    fetch, close = _load_fetchers(tmp_path, [])
+    fetch, close, _fa = _load_fetchers(tmp_path, [])
     assert fetch is None
     close()
 
@@ -227,7 +227,7 @@ def test_a_file_only_candidate_set_loads_no_fetcher(tmp_path):
     """No config read, no module import, no `connect()` — the `file:`-only
     corpus takes exactly the path it took before the dispatcher existed."""
     _init_url_repo(tmp_path)
-    fetch, close = _load_fetchers(tmp_path, [("file:a.md", "a.md", "sha")])
+    fetch, close, _fa = _load_fetchers(tmp_path, [("file:a.md", "a.md", "sha")])
     assert fetch is None
     close()
     assert not (tmp_path / "calls.log").exists()
@@ -261,7 +261,7 @@ def test_two_urls_behind_different_fetchers_each_get_their_own(tmp_path):
     urls.parent.mkdir(parents=True, exist_ok=True)
     urls.write_text("https://x.test/a\nhttps://x.test/b  fetch=cdp\n", encoding="utf-8")
 
-    fetch, close = _load_fetchers(
+    fetch, close, _fa = _load_fetchers(
         tmp_path,
         [("url:https://x.test/a", "https://x.test/a", "s1"),
          ("url:https://x.test/b", "https://x.test/b", "s2")],
@@ -283,7 +283,7 @@ def test_two_urls_behind_one_fetcher_connect_once(tmp_path):
     (tmp_path / ".fux" / "sources" / "urls").write_text(
         "https://x.test/a\nhttps://x.test/b\n", encoding="utf-8"
     )
-    fetch, close = _load_fetchers(
+    fetch, close, _fa = _load_fetchers(
         tmp_path,
         [("url:https://x.test/a", "https://x.test/a", "s1"),
          ("url:https://x.test/b", "https://x.test/b", "s2")],
@@ -305,7 +305,7 @@ def test_a_url_with_no_route_raises_rather_than_fetching_with_the_wrong_module(t
     from fux.errors import FuxError
 
     _init_url_repo(tmp_path, url="https://x.test/a")
-    fetch, close = _load_fetchers(
+    fetch, close, _fa = _load_fetchers(
         tmp_path,
         [("url:https://x.test/a", "https://x.test/a", "s1"),
          ("url:https://x.test/missing", "https://x.test/missing", "s2")],
@@ -317,3 +317,112 @@ def test_a_url_with_no_route_raises_rather_than_fetching_with_the_wrong_module(t
             fetch("https://x.test/missing")
     finally:
         close()
+
+
+# -- W-174: `[sources.url] fetch_at_answer` -----------------------------------
+#
+# The behaviour these prove was BUILT AND UNREACHABLE until 2026-09-14:
+# `Policy(mode=NEVER)` and `_obtain`'s never-branch have always existed, and
+# this module constructed `Policy(mode=ALWAYS, ...)` literally. What is under
+# test here is the SELECTOR — which mode the seam builds, and what it reports.
+
+
+def test_fetch_at_answer_defaults_to_true(tmp_path):
+    """Silence means today's behaviour. No repo changes meaning on upgrade."""
+    _init_url_repo(tmp_path)
+    _fetch, close, fetch_at_answer = _load_fetchers(
+        tmp_path, [("url:https://x.test/a", "https://x.test/a", "sha")]
+    )
+    close()
+    assert fetch_at_answer is True
+
+
+def test_fetch_at_answer_false_rides_out_of_the_resolver(tmp_path):
+    _init_url_repo(tmp_path, config_table="fetch_at_answer = false\n")
+    _fetch, close, fetch_at_answer = _load_fetchers(
+        tmp_path, [("url:https://x.test/a", "https://x.test/a", "sha")]
+    )
+    close()
+    assert fetch_at_answer is False
+
+
+def test_an_unresolvable_url_still_reports_the_real_policy(tmp_path):
+    """⚠ The `not routes` path reads config, so it must not report a guess.
+
+    Stamping the wrong mode into the receipt is the silent-policy-swap failure
+    `Policy.as_record` exists to close, and this is an early return where
+    config was genuinely read — so it returns what the repo actually said.
+    """
+    _init_url_repo(tmp_path, url="https://x.test/other")
+    fetch, close, fetch_at_answer = _load_fetchers(
+        tmp_path, [("url:https://x.test/a", "https://x.test/a", "sha")]
+    )
+    close()
+    assert fetch is None
+    assert fetch_at_answer is True
+
+
+def test_a_file_only_candidate_set_reads_no_config_at_all(tmp_path):
+    """The property `_load_fetchers` has always had, kept by the third value.
+
+    `True` here is not a default — it is the honest answer to a question that
+    was never asked. A `fux.toml` that would REFUSE to load proves nothing was
+    read: `max_parallel` is required whenever `[sources.url]` exists.
+    """
+    (tmp_path / "fux.toml").write_text("[sources]\n[sources.url]\n", encoding="utf-8")
+    fetch, close, fetch_at_answer = _load_fetchers(tmp_path, [("file:a.md", "a.md", "sha")])
+    close()
+    assert fetch is None
+    assert fetch_at_answer is True
+
+
+def test_never_verifies_against_acquired_and_never_opens_a_socket(tmp_path):
+    """The whole point, end to end through `answer_via_refer`.
+
+    The fake fetcher logs every call to `calls.log`, so *no log file at all* is
+    the assertion that no socket was opened — stronger than trusting a mode
+    string. Under `never` the fetcher is not even loaded, so `configure()` and
+    `connect()` never run either.
+    """
+    from fux.store import acquired
+
+    body = "# Page\n\nthe retained body\n"
+    _init_url_repo(tmp_path, config_table="fetch_at_answer = false\n")
+    blob = acquired.save(tmp_path, "https://x.test/a", body.encode("utf-8"), "text/markdown", ".md")
+    # ⚠ `save()` writes the blob and NEVER the manifest (it runs under a thread
+    # pool in the real path); `from_acquired` reads the manifest. A test that
+    # saves and does not record is a plane with nothing findable in it.
+    acquired.write_manifest(tmp_path, {"https://x.test/a": blob})
+
+    bundle = answer_via_refer(
+        tmp_path, "retained", [("url:https://x.test/a", "https://x.test/a", _sha(body))]
+    )
+    assert bundle is not None
+    assert bundle.policy["mode"] == "never"
+    assert bundle.documents[0].verdict.label == "as-ingested"
+    assert not (tmp_path / "calls.log").exists()
+
+
+def test_never_with_no_retained_bytes_is_unverified_not_a_crash(tmp_path):
+    """Arpit's ruling, 2026-09-14: disclosed, never refused. `fux doctor`
+    carries the disclosure; the query keeps answering."""
+    _init_url_repo(tmp_path, config_table="fetch_at_answer = false\n")
+    bundle = answer_via_refer(
+        tmp_path, "nothing retained", [("url:https://x.test/a", "https://x.test/a", "sha")]
+    )
+    assert bundle is None or bundle.documents[0].verdict.label == "unverified"
+    assert not (tmp_path / "calls.log").exists()
+
+
+def test_cache_ttl_is_declared_inert_rather_than_silently_dropped(tmp_path, capsys):
+    """W-140 row 6 from the other end: a knob that cannot act must say so."""
+    _init_url_repo(tmp_path, config_table="fetch_at_answer = false\n")
+    answer_via_refer(
+        tmp_path,
+        "q",
+        [("url:https://x.test/a", "https://x.test/a", "sha")],
+        cache_ttl_seconds=3600,
+    )
+    err = capsys.readouterr().err
+    assert "--cache-ttl has no effect" in err
+    assert "fetch_at_answer" in err

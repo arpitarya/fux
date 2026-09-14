@@ -7,11 +7,12 @@ file:archive/v0.1/fux/assets/fux-lockup.png	dc2561c37c5b324d0eda0762a33331981e21
 file:archive/v0.1/fux/assets/fux-mark.svg	f7440d72f87c4365c6ad8fdf82579fc9304b8c1d	svg: nothing readable in .svg
 file:archive/v0.26/tests_e2e/corpus/assets/logo.png	6a94256cf5c226310f6f94011b64926f014de247	image: nothing readable in .png
 file:archive/v0.26/tests_e2e/site/logo.png	6a94256cf5c226310f6f94011b64926f014de247	image: nothing readable in .png
-file:docs/architecture-answer.png	5c015172de2cbfcda26c1c9c8efdf0cef845a99c	image: nothing readable in .png
-file:docs/architecture-ask.png	ae65d987edcd9ab6b250a71d0d2e242dbe60c600	image: nothing readable in .png
-file:docs/architecture-decoders.png	01feff9535bdfe8335e03ee2d533f46fa2356744	image: nothing readable in .png
-file:docs/architecture-detailed.png	64c72f3f31204a5eedc5d4323270331a2ed708fa	image: nothing readable in .png
-file:docs/architecture-high-level.png	ca3c99c9411f1875024869d576686e4551c4ea31	image: nothing readable in .png
+file:docs/architecture-answer.png	531cfd52ac64fe957a24c09a17809859fe2e0134	image: nothing readable in .png
+file:docs/architecture-ask.png	3819a4075534caeeedce2a8f9bfbd8cf271aad76	image: nothing readable in .png
+file:docs/architecture-decoders.png	f2141b9e2561dee3be83f5a124afc245a5d901e5	image: nothing readable in .png
+file:docs/architecture-detailed.png	209c398f762627e36fec2e777600467e320b294f	image: nothing readable in .png
+file:docs/architecture-high-level.png	8137bc581d22b9ca476530f74abf2057373121fb	image: nothing readable in .png
+file:docs/architecture-two-readers.png	4260809c29564195f5ad9656cf016876c91ea809	image: nothing readable in .png
 file:tools/refusal-probe/captures/entra-sign-in.stand-in.html	418d77f289ffc2875a0a50e8605b77c32c52cef0	html: nothing readable in .html
 file:tools/refusal-probe/captures/workbook-download.stand-in.xlsx	2b5a32870bd597a12b7837c637ec3345a7aff8ce	xlsx: nothing readable in .xlsx
 file:work/regression/2026-08-27-p3-sha-stability/evidence/control-a.json	a7f947d05ed22eb0ec2fb9c42f5f3d1b5e1ec6ef	json: nothing readable in .json

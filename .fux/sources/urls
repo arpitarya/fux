@@ -17,4 +17,4 @@
 # that one URL once. `fux update` re-fetches the lines known to be stale --
 # `--all` every line, `--failed` the ones whose last run failed, and never a
 # line that says `update=never`. Those are the engine's two networked paths;
-# every other command is offline. See ADR-URL-LIST.
+# every other command is offline. See SR-URL-LIST.

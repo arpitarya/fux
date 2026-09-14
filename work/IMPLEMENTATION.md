@@ -28,6 +28,34 @@ Rules:
 
 
 
+## 2026-09-14 — **W-174**: a mode that was built, tested and unreachable
+
+**Shipped**, uncommitted at the time of writing — both suites green on the
+slice; the four red rows on the whole tree belong to a concurrent session's
+in-flight work (`test_doc_links`, `test_no_work_item_is_lost`,
+`test_open_work_rows_are_short::…blocks_subrow`, `test_sr_freshness` naming
+SR-AGENT-POLICY / SR-NODE-SEARCH / SR-PII).
+
+**`[sources.url] fetch_at_answer`** — a `fux.toml` boolean. `false` pins every
+`url:` citation to `.fux/acquired/` at answer time: no fetcher is loaded, no
+`connect()` runs, no socket opens, and the verdict is `as-ingested`.
+
+| what landed | what it found |
+|---|---|
+| the config key + declaration in SR-CONFIG's key block; `Policy(mode=NEVER)` selected in `refer_answer.py` | 🔴 **The whole behaviour already existed.** `freshness.Policy(mode=NEVER)` and `_obtain`'s never-branch have shipped since the module existed, with tests. `query/refer_answer.py` wrote `Policy(mode=ALWAYS, …)` literally — so `freshness.py`'s own documented third caller (*"CI, or a replayed `--audit` bundle: never"*) could never be selected. **A branch with a test and no selector reads exactly like a branch in use** |
+| the early return **before the fetcher is loaded** | Found by a test asserting the fetcher's log file does not exist. The first cut returned the mode but still resolved, `configure()`d and `connect()`ed the fetcher — and for `cdp.py` that attaches to a signed-in Chrome. *Expensive and interactive at answer time* is the cost SR-ACQUIRED exists to remove; paying it and then not fetching is the worst of both |
+| `fux doctor` row `pinned url bytes` (warn) | Arpit ruled **disclosed, never refused** for the no-retained-bytes case |
+| `--cache-ttl` declared inert under `never` | W-140 row 6 from the other end: a knob that cannot act must say so |
+| SR-ACQUIRED's pairing table corrected | 🔴 **A record said *"`update=never keep=true` … and no socket opens"* and that was never true.** `update=` is the update-time clock; SR-URL-FRESHNESS decision 15 says so in as many words two records away. A test docstring carried the same wrong sentence. Both corrected |
+| the `fux-config` guide corrected | 🔴 **It told agents *"any other unknown key is silently ignored"*** — wrong since SR-CONFIG decision 14 refused unknown keys by name. An agent reading it would have told a consumer their typo was harmless |
+| the Node question, settled | **Nothing owed.** `node/src/refer/source.mjs` and `freshness.mjs` both state that Node never fetches (W-107 R6), so the Node reader has always behaved as `fetch_at_answer = false`. Under `false` the two readers' `url:` verdicts converge exactly — this key does not diverge them |
+
+**Records:** SR-URL-FRESHNESS (decision 16, the third clock cell) · SR-CONFIG
+(key block + decision 12) · SR-ANSWER (the seam) · SR-ASK · SR-REFER ·
+SR-ACQUIRED · SR-DOCTOR · SR-DOTFUX. **Tests:** 12 unit + 3 e2e.
+
+---
+
 ## 2026-09-14 — **W-159, W-163, W-164**: a wrong diagnosis, eight rows, and four gates that were all red first
 
 **Shipped** on `release/3.0.0-alpha.0` — `053d712a` (W-159), `77d7de34`

@@ -7,10 +7,10 @@ description: "A deliberately tiny config: what each key does, why the surface is
 status: accepted
 date: 2026-08-18
 feature: "`fux.toml` — discovery, schema, validation, and the keys that are refused rather than ignored"
-owns: [src/fux/config.py@1d1fec929d78]
+owns: [src/fux/config.py@27f70dedbc42]
 laws: [L4, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 307f87e059097a3f5d089faf28755ca61ed98dcddab8edc5e1603357c1ee209b
+content_sha: 2f9037250a051e9a11681b832d826ec45fe3a1542c646dc7c731f1e73bab6739
 ---
 
 # SR-CONFIG — `fux.toml` and every property in it
@@ -343,6 +343,14 @@ resolves all of them.
   raise somebody else's bound. `None` means the store's own default rather than
   a number frozen here, so raising that default does not require editing every
   `fux.toml` that never thought about the question.
+- ⚠ **`fetch_at_answer` is the SECOND key with no line-level layer** (W-174,
+  2026-09-14), and it is not an exception for `acquired_max_bytes`'s reason.
+  That one is a property of the disk; this one is a property of *reaching the
+  source*, and [SR-ACQUIRED](0145_acquired-plane.md)'s own two-layer test says
+  a source-wide layer means something exactly when the attribute answers
+  *"how do I reach these pages?"* — which is the question it asks. A line layer
+  is therefore **possible and deliberately not built**; it would need its own
+  argument, not an extension of this one.
 
 ⚠ **`acquired_max_bytes` was documented before it was parsed, and that is the
 defect this decision closes.** SR-ACQUIRED decision 8 named the key and the
@@ -388,6 +396,7 @@ at any value, with an error naming the new home.
 + sources.url.ttl
 + sources.url.enrich
 + sources.url.update
++ sources.url.fetch_at_answer
 + sources.url.max_parallel
 + sources.url.sweep_minutes
 + sources.url.acquired_max_bytes
@@ -475,9 +484,13 @@ shape with the two halves swapped, and it is unguarded for the same reason.
   the default path. The schema entry is deleted and the key is now a loud error
   in `load()`, the same treatment `[sources] dirs` gets; held by
   `tests/test_config.py::test_a_types_file_key_is_refused_by_name`.
-- ⚠ **The directory list is include-only, with no exclusions** — so committed
-  measurement evidence under `work/regression/` contaminates the corpus it
-  measures. That cost is stated rather than discovered.
+- ⚠ **The directory list was include-only, with no exclusions, when this was
+  written** — so committed measurement evidence under `work/regression/`
+  contaminated the corpus it measures. **No longer true (corrected 2026-09-14):**
+  a `!` line in `.fux/sources/dirs` ([SR-DIR-LIST](0120_dir-list.md) decision 2a)
+  and [`.fux/.fuxignore`](0144_fuxignore.md) both exclude; what remains owed is
+  that `fux remove` still writes `!` where `.fuxignore` is the stated home
+  ([SR-FUXIGNORE](0144_fuxignore.md) Consequences).
 - ⚠ **`[sources.url]` now ships live in a scaffolded repo, and one behaviour
   changes with it.** `fux add <URL>` used to record the line and print *"no
   `[sources.url]` in fux.toml, so nothing can fetch this line yet"*; in a repo

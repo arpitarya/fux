@@ -17,7 +17,7 @@
 #   !work/regression/*/evidence
 #   !**/node_modules
 #
-# See ADR-DIR-LIST.
+# See SR-DIR-LIST.
 
 CHANGELOG.md
 CLAUDE.md

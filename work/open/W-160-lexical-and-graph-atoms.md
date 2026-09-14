@@ -76,3 +76,25 @@ digest that *almost* matches is the failure mode nobody's test names.
 ## Records this will touch
 
 SR-CLI · SR-GRAPH · SR-NODE-SEARCH · (SR-AGENT-POLICY for the guide skills).
+
+## Also owed in this item (gap check 2026-09-14)
+
+- **MCP:** `fux_related` is re-implemented over `graph --seed` (same output,
+  one code path); the tool description says so.
+- **Glossary:** *atom*, *lexical*, *seed*, *link-IDF*.
+- **README** front door: the verb table gains `lexical`; `graph` gains
+  `--seed`.
+- **CHANGELOG** entry under 3.0.0-alpha.0.
+
+## Verification, and the keep/remove call
+
+| component | test | keep if | remove if |
+|---|---|---|---|
+| `fux lexical` | byte-identical to today's `ask` on every golden rung, both readers, `--json` and prose | the test holds | cannot fail independently of `ask` |
+| `graph --seed` | `graph "<q>"` ≡ `graph --seed <lexical top-k>`; walk output at defaults byte-identical to before | the tests hold | — |
+| exposed walk parameters | defaults inert: a test asserts `graph` output unchanged with the parameters at their defaults | holds | — |
+| Node graph plane | `graph.json` digest equal on every golden rung; three relational verbs byte-equal under `npx`; differential arm 0 discordant | 0 discordant across the ladder | any rung's digest cannot be reconciled → **withdraw the Node plane only**; the Python atoms ship, W-161 waits |
+
+Order: implement → test. Nothing here is measured against a quality number;
+nothing here moves a ranking, and `test_the_graph_lane_does_not_move_ask`
+stays green throughout this item.

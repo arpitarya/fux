@@ -7,11 +7,11 @@ description: "One record owns the health-check surface. Every check names a caus
 status: accepted
 date: 2026-09-11
 feature: "`fux doctor` — the read-only, offline health command and its check register"
-owns: [src/fux/doctor.py@a17f4e4c3cda, tests/test_doctor_register_is_complete.py@6c3d2378d45f]
+owns: [src/fux/doctor.py@3fd07cac7ca5, tests/test_doctor_register_is_complete.py@6c3d2378d45f]
 laws: [L4, L8]
 ratifies: "Arpit, 2026-09-11 — *create a new adr for doctor*"
 timestamp: 2026-09-11T00:00:00Z
-content_sha: 4fef84fba26b32a3ba20de4a056a56be9215faff219e9670613d20a9773f2b86
+content_sha: 2e76c94e59c234240a30bda62f687bd8949012f23c8f356bd2f0ea1755d1007c
 ---
 
 # SR-DOCTOR — the health command, and who owns its rows
@@ -159,6 +159,7 @@ authoritative about the row.**
 | `.fux/ layout declared` | warn | undeclared entries at `.fux/`'s top level | [SR-DOTFUX](0102_fux-directory.md) |
 | `pii rules` | **error** when absent | a missing `.fux/pii.toml`; otherwise compiles every pattern offline and states the scope. ⚠ It cannot see an over-broad rule and says so — only [`tools/pii-probe/`](../tools/pii-probe/) can | [SR-PII](0148_pii.md) decision 17 |
 | `acquired plane` | warn, **error** on gitignore | blob count, total bytes, the 80 %-of-cap warning, and the gitignore assertion | [SR-ACQUIRED](0145_acquired-plane.md) |
+| `pinned url bytes` | warn | with `[sources.url] fetch_at_answer = false`, the listed urls with no retained bytes — every citation from those is `unverified` | [SR-URL-FRESHNESS](0147_url-freshness.md) decision 16 |
 | `refusal rules` | warn, **error** when the file will not parse | how many rules load, how many responses each has refused, and **the rules that have never fired** — what a typo'd condition looks like | [SR-REFUSAL](0146_refusals.md) decision 11 |
 | `decoder bindings` | warn, **error** when the registry will not build | the one binding fault no ingest can catch: a `[decoders]` binding on an extension **no indexed document has** | [SR-DECODE](0139_decode.md) |
 | `recency prior` | warn | whether any document carries an `mtime` — a corpus copied out of its git repository loses every one | [SR-INGEST](0106_ingest.md) |
@@ -316,6 +317,23 @@ shape for **this** file specifically:
 repository and in no consumer's install. It names the `fux-pii` skill instead,
 which `fux setup` wrote into their repo. See
 [SR-PII](0148_pii.md) decision 20.
+
+**`pinned url bytes` — the row that discloses what `fetch_at_answer = false`
+costs** (W-174, 2026-09-14). `doctor._pinned_without_bytes`: when
+`[sources.url] fetch_at_answer` is false, it counts the listed URLs with no
+entry in `acquired/manifest.json` and **warns** with the count and the first
+three.
+
+- **`warn`, never `error`.** The combination is legal — Arpit ruled
+  *disclosed, never refused* — and the precedent is
+  [SR-ACQUIRED](0145_acquired-plane.md)'s handling of the equally lossy
+  `update=never keep=false` pair.
+- **Silent while the flag is on**, which is the default: there is nothing to
+  warn about while fux may still go and look. It reports `ok` with the reason
+  rather than omitting the row, so the register stays a fixed list.
+- **Reads only what is on disk** — `fux.toml`, the url list, the manifest. No
+  fetch, and an unreadable config or list is another check's finding, never a
+  traceback out of a health command.
 
 ### Consequences
 

@@ -11,7 +11,7 @@ archive/v0.1/uv.lock                                                            
 archive/v0.26-docs/architecture-flow.mermaid                                               # not an indexed file type
 archive/v0.26/src/fux/embed/data/model.bin                                                 # not an indexed file type
 archive/v0.26/uv.lock                                                                      # not an indexed file type
-docs/adr/RULE-SINCE                                                                        # not an indexed file type
+records/RULE-SINCE                                                                         # not an indexed file type
 tools/vector-gate/embed_node.mjs                                                           # not an indexed file type
 work/golden/README.md                                                                      # excluded by !work/golden
 work/golden/golden-answer/golden-answers-claude-provisional.jsonl                          # excluded by !work/golden
@@ -123,7 +123,7 @@ archive/v0.26/tests_e2e/corpus/docs/binary.md   # binary
 # is ignored -- unlike .fux/formats.toml, where an empty file is an error,
 # because this one only ever subtracts and so can never empty an index.
 #
-# See ADR-FUXIGNORE.
+# See SR-FUXIGNORE.
 
 # --- hand-written -------------------------------------------------------
 # ⚠ RE-ADDED 2026-08-27 after these two lines were lost. The engine was

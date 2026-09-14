@@ -142,6 +142,32 @@ Binding on every measured gate:
 
 ---
 
+## 6b · Per gate: test, measure, and the keep/remove call
+
+**Order for every measured gate: pre-register → implement behind a flag →
+measure → call.** Gates 1 and 9 are rules and text: implement → test, no
+measurement. One gate per arm; a gate is kept or removed on its own row.
+
+| # | tested by | measured on | keep if | remove if |
+|---|---|---|---|---|
+| 1 `weak` ⇒ not answerable | a unit test on the band table; e2e goldens | — | the test holds | — |
+| 2 IDF-weighted coverage | determinism; stopwords weigh 0 | golden unanswerable + answerable classes | more abstentions on unanswerable (net ≥ d19 floor) **and** zero new abstentions on answerable | either fails → flag stays, default off |
+| 3 passage co-occurrence | window logic on fixed passages | same | same | same |
+| 4 answer-type check | each opener → type on a fixture set; unknown opener ⇒ no constraint | same, plus the u017-class subset | same, and the u017 subset moves | same |
+| 5 QPP (NQC, Clarity) | pure functions of scores/df/n; deterministic | same | same | same |
+| 6 graph coherence | degrades to `unknown` on a link-poor corpus (tested) | same, after W-161 | same | same |
+| 7 identifier hard-fail | exact-token check; no effect without an id in the query | id-questions about absent ids | same | same |
+| 8 verification floor | refer re-score below floor abstains (fixture) | same | same | same |
+| 9 consumer steering | renderings equal templates | — | the test holds | — |
+| output surface | every signal appears in `--json`; `output.toml` toggles the prose keys; Node byte-equal | — | tests hold | — |
+
+- **"Remove" = the flag stays, default off, the record names the failed
+  direction.** A withdrawn gate is never loosened to pass.
+- **Power first.** Before any of 2–8 is measured, the golden key must carry
+  enough unanswerable questions for the d19 floor to be reachable; that is a
+  Codex task and a hard stop.
+- **Ambiguous → Arpit**, per-query rows filed.
+
 ## 7 · Reopen trigger
 
 - If a measured gate abstains on answerable golden questions above its

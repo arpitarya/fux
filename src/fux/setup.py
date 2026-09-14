@@ -169,6 +169,77 @@ SHARED_SKILLS: tuple[tuple[str, str], ...] = (
 )
 
 
+#: **The five Claude-native surfaces beyond the document kinds**
+#: (SR-AGENT-SURFACES decision 2, Arpit 2026-09-14). Skills, steering, rules,
+#: instructions and `agents` files all INSTRUCT; these five do something else --
+#: they fire on a tool call, gate a permission, are invoked by name, run as a
+#: scoped agent, or shape a reply. They are **Claude-only on purpose**: no other
+#: vendor fux ships to has an equivalent, and inventing one would be a rendering
+#: with nothing to render into.
+#:
+#: WARNING **Every one goes through `_write_if_missing`.** A consumer's own
+#: `settings.json`, hook or command is never touched -- decision 6's rule, and
+#: the reason `settings.json` gets the `AGENTS.md` treatment (write if absent,
+#: announce the snippet if not) rather than a merge nobody asked for.
+#: WARNING **The Claude-only claim was FALSE and is corrected here**
+#: (SR-AGENT-SURFACES decision 3a, 2026-09-14). Codex, Kiro and Copilot all ship
+#: repo-level acting surfaces. Two real bounds survive: output styles are
+#: Claude-only, and Codex slash-prompts live in `~/.codex/prompts/` and are
+#: "not shared through your repository", so fux cannot write one.
+KIRO_SURFACES: tuple[tuple[str, str], ...] = (
+    (".kiro/hooks/fux-index-hint.json", "kiro-hook-fux-index-hint.json"),
+    (".kiro/hooks/fux-index-hint.sh", "hook-fux-index-hint.sh"),
+    (".kiro/agents/fux-researcher.md", "kiro-agent-fux-researcher.md"),
+)
+
+#: WARNING `.codex/hooks.json` is a whole-file config a consumer may already
+#: own -- CO_OWNED, like `.claude/settings.json`. Its subagent is not.
+CODEX_SURFACES: tuple[tuple[str, str], ...] = (
+    (".codex/hooks.json", "codex-hooks.json"),
+    (".codex/hooks/fux-index-hint.sh", "hook-fux-index-hint.sh"),
+    (".codex/agents/fux-researcher.md", "codex-agent-fux-researcher.md"),
+)
+
+#: Copilot has no hook surface. It has the richest COMMAND surface of the four
+#: -- prompt files carry `argument-hint` and `tools` natively -- and an agent
+#: surface versioned by commit SHA that works in the IDE, the CLI and the cloud.
+COPILOT_SURFACES: tuple[tuple[str, str], ...] = (
+    (".github/prompts/fux-search.prompt.md", "copilot-prompt-fux-search.prompt.md"),
+    (".github/prompts/fux-answer.prompt.md", "copilot-prompt-fux-answer.prompt.md"),
+    (".github/prompts/fux-verify.prompt.md", "copilot-prompt-fux-verify.prompt.md"),
+    (".github/agents/fux-researcher.md", "copilot-agent-fux-researcher.md"),
+)
+
+CLAUDE_SURFACES: tuple[tuple[str, str], ...] = (
+    (".claude/hooks/fux-index-hint.sh", "hook-fux-index-hint.sh"),
+    (".claude/commands/fux-search.md", "command-fux-search.md"),
+    (".claude/commands/fux-answer.md", "command-fux-answer.md"),
+    (".claude/commands/fux-verify.md", "command-fux-verify.md"),
+    (".claude/agents/fux-researcher.md", "subagent-fux-researcher.md"),
+    (".claude/output-styles/fux-cited.md", "output-style-fux-cited.md"),
+    (".claude/settings.json", "settings-claude.json"),
+)
+
+#: Surfaces the CONSUMER owns and fux only seeds. Written when absent, never
+#: over an existing file, and deliberately **exempt from the template drift
+#: test**: this repo's own `.claude/settings.json` carries deny rules and hooks
+#: that are nothing to do with fux, and so will every real consumer's.
+#: SR-AGENT-SURFACES decision 6.
+CO_OWNED_SURFACES: frozenset[str] = frozenset(
+    {".claude/settings.json", ".codex/hooks.json"}
+)
+
+#: The one surface above that must be **executable** to do anything at all.
+#: A hook written 0644 fails silently: the runner reports nothing and the hint
+#: never appears.
+EXECUTABLE_SURFACES: frozenset[str] = frozenset(
+    {
+        ".claude/hooks/fux-index-hint.sh",
+        ".kiro/hooks/fux-index-hint.sh",
+        ".codex/hooks/fux-index-hint.sh",
+    }
+)
+
 AGENT_FILES: dict[str, tuple[tuple[str, str], ...]] = {
     # `fux-enrich` is **INVOKED, never ambient** (W-76 Phase 8) -- and the rule
     # is *never ambient*, which was never the same thing as *claude only*.
@@ -209,6 +280,7 @@ AGENT_FILES: dict[str, tuple[tuple[str, str], ...]] = {
         (".claude/skills/fux-decoder/SKILL.md", "DECODER-SKILL.md"),
         *_guide_skills(".claude/skills"),
         *((f".claude/rules/fux-{t}-files.md", f"rule-fux-{t}-files.md") for t in PATH_SCOPED_TOPICS),
+        *CLAUDE_SURFACES,
     ),
     "copilot": (
         (".github/agents/fux.agent.md", "fux.agent.md"),
@@ -240,6 +312,7 @@ AGENT_FILES: dict[str, tuple[tuple[str, str], ...]] = {
             (f".github/instructions/fux-{t}-files.instructions.md", f"fux-{t}-files.instructions.md")
             for t in PATH_SCOPED_TOPICS
         ),
+        *COPILOT_SURFACES,
     ),
     "kiro": (
         (".kiro/steering/fux-archived-results.md", "steering-fux-archived-results.md"),
@@ -256,6 +329,7 @@ AGENT_FILES: dict[str, tuple[tuple[str, str], ...]] = {
         *_guide_skills(".kiro/skills"),
         *((f".kiro/steering/fux-{t}-files.md", f"steering-fux-{t}-files.md") for t in PATH_SCOPED_TOPICS),
         *((f".kiro/steering/fux-{t}-guide.md", f"steering-fux-{t}-guide.md") for t in AUTO_GUIDE_TOPICS),
+        *KIRO_SURFACES,
     ),
     # **Codex is decision 3 EXERCISED, not amended** — *"adding a fourth is a
     # template plus a rendering plus a row, not a new decision"*. It costs no
@@ -276,7 +350,7 @@ AGENT_FILES: dict[str, tuple[tuple[str, str], ...]] = {
     # wrong?* — yes, and a skill has to be loaded to apply.
     # **`AGENTS_MD_VENDORS` below is the consequence**, and it is not optional.
     #
-    "codex": SHARED_SKILLS,
+    "codex": SHARED_SKILLS + CODEX_SURFACES,
 }
 
 #: Vendors whose ONLY always-on surface is the repo-root `AGENTS.md`.
@@ -468,6 +542,7 @@ fetcher      = ".fux/fetchers/http.py"
 urls_file    = ".fux/sources/urls"
 meta         = "hashed"
 #update      = "auto"
+#fetch_at_answer = true
 
 # REQUIRED, and may not be commented out: a repo that CAN fetch has to say how
 # hard, in a number a person can read. Comment it out and fux refuses to load.
@@ -798,6 +873,10 @@ def _write_agents(root: Path, report: SetupReport, agents: tuple[str, ...]) -> N
             before = len(report.written)
             _write_if_missing(path, agent_template_bytes(template), report, root)
             if len(report.written) > before:
+                # A hook written 0644 fails silently -- the runner reports
+                # nothing and the hint never appears. Decision 5.
+                if rel in EXECUTABLE_SURFACES:
+                    path.chmod(0o755)
                 # Recorded at the moment of writing, from the same branch that
                 # wrote it, so the announcement cannot drift out of step with
                 # the filesystem. Veto condition 1 is exactly this list being

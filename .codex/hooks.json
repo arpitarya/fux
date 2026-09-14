@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "grep|rg|ripgrep|shell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".codex/hooks/fux-index-hint.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

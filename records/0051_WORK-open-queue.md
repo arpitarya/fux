@@ -7,11 +7,11 @@ description: "The live queue's discipline has one home, and this is it. Fifty-ei
 status: accepted
 date: 2026-09-13
 feature: the discipline of the single live work queue — its rules, its markers, and the three tests that enforce them
-owns: [tests/test_open_work_rows_are_short.py@d590c19ef8ed, tests/test_open_work_is_not_stale.py@c41cd5e600be, tests/test_no_work_item_is_lost.py@26c600758acf]
+owns: [tests/test_open_work_rows_are_short.py@d590c19ef8ed, tests/test_open_work_is_not_stale.py@c41cd5e600be, tests/test_no_work_item_is_lost.py@3c6a033612b2]
 laws: [L0]
 ratifies: W-146 ruling 1 · Arpit 2026-09-13 (archive, never delete)
 timestamp: 2026-09-13T00:00:00Z
-content_sha: 0d53c017e0859fa2c833a3a595d9f7de0f0556152b9c8708d374cba81e6aa236
+content_sha: 5cc05b55e0ebc817ee6b4d07a3a10f980d2eef8ef536d3fc10da4016197b7329
 ---
 
 # SR-WORK-OPEN-QUEUE — how OPEN-WORK works
@@ -342,6 +342,26 @@ both `↳ blocks:` checks validating a single row for two days, green throughout
   record fails the freshness gate. That is the hole the register named for
   itself in [SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7, closed here for this
   subject.
+- **Rule 55's *renumbered* clause has a third shape, and the gate now names
+  it** (2026-09-14). A renumber is a closure and archives — but only if the file
+  was ever staged. On 2026-09-14 two sessions filed minutes apart: one filed
+  `W-167`, renumbered its own item to `W-173`, and neither draft was ever
+  staged; the other had already renumbered its three items to W-168/169/170,
+  leaving **171 and 172 allocated to nobody**. All three ids resolve to no file
+  and none of them can, so `test_no_work_item_is_lost.py` carries them as
+  `RENUMBER_WAKE_2026_09_14` and
+  [`archive/README.md`](../archive/README.md) §*The 2026-09-14 id collision*
+  names each with its successor or with the fact that it has none.
+
+  ⚠ **This is a fourth exemption category, not a stretch of an existing one.**
+  `UNRECOVERABLE` means *real, closed, and its bytes are gone* — W-167 was
+  never closed, it was **renamed while live**, and `NEVER_ALLOCATED` means
+  *named nowhere*, which 171 and 172 are not: `WORKLOG.md` names them, as
+  holes. Collapsing them into either set would have made both sets lie, and the
+  sets are the only durable statement of what the recovery could and could not
+  reach. **The lesson rule 55 did not have: contiguity is not worth a renumber
+  when another session is filing** — the holes cost more than the gap in the
+  numbering would have.
 - ⚠ **Roughly twenty of the fifty-three rules are enforced by nothing** — 1, 2,
   5, 7, 11, 12, 29, 30, 32, 33, 35, 36, 37, 38, 47, 48, 50, 51 and 53. Writing
   them down does not gate them, and this record does not claim it does. What

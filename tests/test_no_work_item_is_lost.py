@@ -81,7 +81,31 @@ UNRECOVERABLE = {
     123, 124, 125, 126, 127, 128, 129, 131,
 }
 
-EXEMPT = LEDGER_IDS | NEVER_ALLOCATED | UNRECOVERABLE
+#: **The 2026-09-14 id collision, all three of it.** Two sessions filed into
+#: `OPEN-WORK.md` within minutes of each other. One filed
+#: `W-167-finish-the-claude-md-extraction`; the other, filing at the same moment,
+#: renumbered its own three items to **W-168/169/170** for contiguity; the first
+#: session then re-filed its item as **W-173** and its `W-167` draft was never
+#: staged. Three ids are the wake of that:
+#:
+#: - **167 -- renumbered to `W-173`, which is live** and is the same item,
+#:   same subject, same accepted proposal. Its bytes are in no commit and in no
+#:   loose object (`git fsck --unreachable` searched, 4 136 blobs, 2026-09-14),
+#:   so unlike `W-114` there is nothing to archive -- the renumber is recorded in
+#:   `archive/README.md` and in `WORKLOG.md` 2026-09-14 instead. **What is lost
+#:   is one session's earlier draft of a live item, not an argument.**
+#: - **171, 172 -- never allocated.** The renumber to 168/169/170 skipped them;
+#:   no file, no draft and no session ever held either id. They are named here
+#:   rather than left to `NEVER_ALLOCATED`, whose entries are *named nowhere* --
+#:   these two are named in `WORKLOG.md` precisely AS holes, and that is a
+#:   different fact.
+#:
+#: **This set may only ever shrink**, and it shrinks by a concurrent session
+#: filing under 171 or 172 -- which is allowed, because nothing ever claimed
+#: them.
+RENUMBER_WAKE_2026_09_14 = {167, 171, 172}
+
+EXEMPT = LEDGER_IDS | NEVER_ALLOCATED | UNRECOVERABLE | RENUMBER_WAKE_2026_09_14
 
 #: W-70 was allocated TWICE on the same day -- the fux-playground sandbox item
 #: and the per-document budget cap out of W-59's sweep. Both files are archived;

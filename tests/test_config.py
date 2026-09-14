@@ -264,3 +264,47 @@ def test_a_types_file_key_is_refused_by_name(tmp_path):
     (tmp_path / "fux.toml").write_text('[sources]\ntypes_file = "x"\n', encoding="utf-8")
     with pytest.raises(FuxError, match="types_file is not a key"):
         load(tmp_path)
+
+
+# -- W-174: `[sources.url] fetch_at_answer` -----------------------------------
+
+
+def test_fetch_at_answer_defaults_to_true(tmp_path):
+    """Silence is today's behaviour, so no existing repo changes meaning."""
+    _write(tmp_path, "[sources]\n[sources.url]\nmax_parallel = 4\n")
+    assert load(tmp_path).url.fetch_at_answer is True
+
+
+def test_fetch_at_answer_is_read(tmp_path):
+    _write(tmp_path, "[sources]\n[sources.url]\nmax_parallel = 4\nfetch_at_answer = false\n")
+    assert load(tmp_path).url.fetch_at_answer is False
+
+
+def test_fetch_at_answer_rejects_a_non_bool(tmp_path):
+    """Type, not truthiness — SR-CONFIG decision 11. `"false"` is a string and
+    would otherwise be truthy, which is the opposite of what was typed."""
+    _write(tmp_path, '[sources]\n[sources.url]\nmax_parallel = 4\nfetch_at_answer = "false"\n')
+    with pytest.raises(FuxError, match="fetch_at_answer must be true or false"):
+        load(tmp_path)
+
+
+def test_fetch_at_answer_has_no_line_level_layer(tmp_path):
+    """SR-CONFIG decision 12: possible, and deliberately not built.
+
+    The twin of `test_archived_has_no_source_wide_layer` in the other
+    direction — that one asserts a source-wide layer stays absent, this one
+    asserts the LINE layer does. A line growing `fetch_at_answer=` silently
+    would give one URL a policy the bundle's single recorded mode cannot
+    express.
+    """
+    from fux.ingest.urlsrc import UrlEntry
+
+    assert not hasattr(UrlEntry, "fetch_at_answer")
+
+
+def test_a_misspelled_fetch_at_answer_is_refused_by_name(tmp_path):
+    """The whole point of the declared key list: a typo cannot restore the
+    default silently, leaving a consumer believing they are offline."""
+    _write(tmp_path, "[sources]\n[sources.url]\nmax_parallel = 4\nfetch_at_anwser = false\n")
+    with pytest.raises(FuxError, match="not a fux.toml key"):
+        load(tmp_path)

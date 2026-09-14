@@ -10,7 +10,7 @@ feature: the acquired plane
 owns: [src/fux/store/acquired.py@9897ee1fe4af]
 laws: []
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 1d98b9e28d68c17fd7eb759e8f30202616730d9c325ed1c1f8249adbf118d939
+content_sha: 351025745f25a0b879f94884ad6085231711bf662d79a405e0b63a83e30dc740
 ---
 
 # SR-ACQUIRED: fetched bytes are kept, in a plane that is neither committed nor derived
@@ -163,13 +163,36 @@ again*, and the two pairings are not equivalent:
 
 | pairing | what a citation is worth |
 |---|---|
-| `update=never keep=true` | **the coherent one.** The bytes are here, `fux answer` verifies against them and reports `as-ingested`, and no socket opens. *More* offline, with the grain of L4 |
-| `update=never keep=false` | **legal and lossy.** Nothing was retained and nothing will be fetched, so the document is frozen at whatever statistics its last ingest produced with nothing to check it against |
+| `update=never keep=true` | **the coherent one.** The bytes are here, and a fetch that fails or is forbidden verifies against them and reports `as-ingested` |
+| `update=never keep=false` | **legal and lossy.** Nothing was retained and no *update* will fetch again, so the document is frozen at whatever statistics its last ingest produced with nothing to check it against |
 
 **The lossy pair is disclosed, never refused** — `fux doctor` counts the pinned
 lines and names the ones with no retained bytes. It is coherent for a document
 that genuinely never changes and surprising to have chosen by accident, which is
 a warning's shape rather than a refusal's.
+
+⚠ **The first row said *"and no socket opens"* and that was WRONG for as long as
+it stood** (corrected 2026-09-14, W-174). `update=` is the **update-time**
+clock: it stops `fux update` and `ingest --refresh-urls`, and
+[SR-URL-FRESHNESS](0147_url-freshness.md) decision 15 says in as many words
+that it *"still does not keep `answer` offline"*. A pinned line still opened a
+socket on every answer. **The sentence read as authority and described
+behaviour the code never had** — Law zero's third obligation, found by reading
+the record under code that was being changed.
+
+**The knob that does close the socket is `[sources.url] fetch_at_answer`**
+(decision 16 of that record, W-174), and it makes a third pairing the coherent
+one for an answer-time reader:
+
+| pairing | what a citation is worth |
+|---|---|
+| `fetch_at_answer = false` + `keep = true` | **fully offline, and verified.** No socket at ask time, and every `url:` citation is compared against the exact bytes its record was built from — `as-ingested` |
+| `fetch_at_answer = false` + `keep = false` | **the lossy pair again, one clock over.** Nothing retained and nothing fetched: every citation is `unverified`. Disclosed by `fux doctor`'s `pinned url bytes` row, never refused |
+
+**This is the strongest case on record for the plane existing.** Without
+retained bytes, a never-fetch policy degrades every URL citation to
+`unverified` — indistinguishable from never having looked, which is the exact
+failure `.fux/acquired/` was built to end.
 
 ⚠ **Touched twice by changes to `.fux/.gitignore`'s generator that this record
 does not describe.** `__pycache__/` joined the file on 2026-09-11, and

@@ -1,0 +1,14 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "fux index hint",
+      "trigger": "PreToolUse",
+      "matcher": "grep|rg|ripgrep",
+      "action": {
+        "type": "command",
+        "command": ".kiro/hooks/fux-index-hint.sh"
+      }
+    }
+  ]
+}

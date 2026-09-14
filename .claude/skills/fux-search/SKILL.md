@@ -19,7 +19,7 @@ writes, and neither needs the network. Resolve the `fux` command first — see t
 | only documents containing an exact phrase | `fux find "<q>" --phrase "blue green deploy"` |
 | "why did this rank" / "why is X above Y" | `fux ask "<q>" --why --json` |
 | two ways of saying the same thing | `fux ask "<q>" -q "<other phrasing>" --json --band` |
-| the corpus probably uses different words | `fux ask "<q>" --expand "<words the doc would use>" --json --band` |
+| the corpus probably uses different words | `fux ask "<q>" --expand "<a passage YOU write — section 5a>" --json --band` |
 | is my result caused by repo config? | re-run with `--no-tune`, then with `--no-output-config` |
 | the exact lines that answer it | not here — `fux answer` (see `fux-answer`) |
 
@@ -111,7 +111,43 @@ Checked top to bottom; the first true row wins.
   deeper fusion.
 - **`--expand`:** expansion terms score below your own words, and a document that
   matches **only** expansion terms is dropped. `missing` still describes your
-  question, not the expansion.
+  question, not the expansion. **You write the text — section 5a.**
+
+## 5a · `--expand` — YOU are the author, and what to write
+
+🔴 **Fux never writes the expansion. It cannot.** No fux path may call a model,
+so there is no `--auto-expand` and there never will be. **You are the model in
+this loop**: you write the text, fux scores it deterministically, and the
+receipt replays it. If you skip this, `--expand` does nothing.
+
+**Write a short passage that answers the question in the words the document
+would use — not a list of synonyms.** Two or three sentences, as if you were
+the document. Guessing wrong is cheap; a document matching only your words is
+dropped, so the floor is "no change", never a wrong citation.
+
+```console
+# the question uses "outage"; the document is titled
+# "checkout unavailable for 47 minutes" and never says "outage"
+
+fux ask "what caused the outage" --json --band \
+  --expand "Checkout was unavailable for 47 minutes. The payment service
+            returned 503 after a config rollout. Recovery was a rollback."
+```
+
+**Do it in this order:**
+
+1. Ask plainly first. Read `confidence.missing` — those are the words the
+   corpus does **not** have.
+2. Only if the band is `none` or `partial`, write the passage using what you
+   know of the corpus's own vocabulary (headings you have seen, `fux find`
+   output, the folder's house terms).
+3. Re-ask **once** with `--expand`. If it is still thin, report honestly — do
+   not keep rewriting the passage.
+
+⚠ **`-q` is a different tool and they do not combine into one mechanism.** Use
+`-q` when you know two real *phrasings* of the question (their rankings are
+fused by RRF); use `--expand` when you are guessing at the *document's*
+vocabulary (one ranking, extra terms at a discount).
 - **Results are deterministic** for the same index, tune file and working tree
   (with `[ranking] rerank_weight` above 0, the reranker reads local files).
   Retrying an identical command is wasted time.
@@ -124,7 +160,7 @@ match `rollback`, via stemming).
 
 | signal | next move |
 |---|---|
-| `No confident matches.` / band `none`, every term in `missing` | the corpus does not use these words — re-ask with the corpus's words, or add `--expand` |
+| `No confident matches.` on **stderr** / band `none`, every term in `missing` | the corpus does not use these words — re-ask with the corpus's words, or add `--expand` |
 | band `partial`, some terms in `missing` | replace or drop the missing term; keep the rest |
 | band `weak` | add the distinguishing term, or add a `-q` phrasing; if still `weak`, report the top 2–3 |
 | right area, wrong folder | `fux find "<q>" --under <prefix> --top 20` |
@@ -165,8 +201,10 @@ With a tune file present, `--why` runs a second, untuned query.
 ## 8 · `find` in a pipe
 
 - **stdout is bare locations**, one per line. Every note goes to stderr.
-- ⚠ **`No confident matches.` is printed on stdout, exit 0.** Guard before
-  piping, or use `--json`, where the empty case is `{"results": []}`.
+- ✅ **`No confident matches.` goes to STDERR, exit 0** (since 2.1.0). stdout is
+  **empty** on the no-match path, so a pipe sees zero lines and needs no guard.
+  ⚠ **It was on stdout before that**, which is why older notes tell you to
+  `grep -qx` it out first; that guard is harmless and no longer needed.
 - **`url:` documents appear as URLs**; a pipe may receive both kinds.
 - Filters run **after** ranking, on the top `--top` results. A `[filter] … removed
   N` line on stderr says what went; the band still describes the unfiltered list.
@@ -174,8 +212,9 @@ With a tune file present, `--why` runs a second, untuned query.
   files, and **keeps** `url:` documents it cannot read offline.
 
 ```bash
+# stdout is paths or nothing, so `xargs` on an empty file is a no-op.
 fux find "retry policy" --under services/ --top 20 > hits.txt
-grep -qx "No confident matches." hits.txt || xargs grep -n "max_retries" < hits.txt
+xargs grep -n "max_retries" < hits.txt
 ```
 
 ## 9 · Defaults, paths, notes and exit codes
@@ -205,7 +244,7 @@ If a result carries `"archived": true`, follow the `fux-archived-results` policy
 - **Don't read a missing `confidence` key as `none`.** You forgot `--band`.
 - **Don't compare fused scores with single-query scores**, or any scores across queries or repos.
 - **Don't expect `--under`, `--phrase` or `--all` to surface more** — raise `--top`.
-- **Don't pipe `find` stdout without guarding** for the `No confident matches.` line.
+- **Don't parse stderr.** The no-match line lives there now, with every other note.
 - **Don't answer from `weak` or `none`** and cite the returned files as if they said it.
 - **Don't re-run an identical query** hoping for a different ranking.
 

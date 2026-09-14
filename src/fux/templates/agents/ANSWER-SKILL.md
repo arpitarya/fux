@@ -29,7 +29,7 @@ touches the text. Resolve the `fux` command first — see the `fux-usage` skill
 |---|---|
 | `--json` | the payload in section 4; **prefer it** |
 | `--band` | add the `confidence` block (JSON) or a `confidence:` line (stderr) |
-| `--expand TEXT` | extra terms the document probably uses, scored at a discount |
+| `--expand TEXT` | extra terms the document probably uses, scored at a discount. **You write this text — fux never generates it** (see `fux-search` §5a); it is recorded in the receipt and replayed by `fux verify` |
 | `--no-refer` | read nothing; answer from the index's title and headings |
 | `--audit` | add `audit`: every document looked at, both shas, the budget spent |
 | `--receipt` | add `receipt`: a re-runnable record for `fux verify` |
@@ -106,7 +106,7 @@ per document in `audit.documents[]` (`freshness`, `indexed_sha`, `fetched_sha`,
 |---|---|---|
 | `current` | read now; matches what was indexed | cite plainly with `loc` |
 | `stale` | read now; **changed since indexing** | quote it — it is the **current** text — and say the index is behind (a stale winner drops the band to `partial`) |
-| `as-ingested` | source unreachable; compared against the bytes kept in `.fux/acquired/` at ingest (retained unless the URL line says `keep=false`) | "as of the last ingest; the source could not be reached" |
+| `as-ingested` | source unreachable **or not consulted**; compared against the bytes kept in `.fux/acquired/` at ingest (retained unless the URL line says `keep=false`) | "as of the last ingest" — say *could not be reached* only if a fetch was actually tried |
 | `cached` | served from the local fetch cache — **only when you pass `--cache-ttl`** | "checked recently, not just now" |
 | `unverified` | not read — no fetcher, fetch failed, or file gone from the working tree | that document supplied **no passage**; never call it confirmed |
 
@@ -119,6 +119,13 @@ per document in `audit.documents[]` (`freshness`, `indexed_sha`, `fetched_sha`,
   is update-time and does NOT keep `answer` offline** — that is by design
   (SR-URL-FRESHNESS decision 15), not a defect. Read `citation.freshness` (or
   `--audit`) rather than assuming what was fetched.
+- ⚠ **`[sources.url] fetch_at_answer = false` makes `as-ingested` the NORMAL
+  verdict, not a degradation.** The repo has said *never open a socket when
+  answering*; no fetch was attempted, so **do not report the source as
+  unreachable** — it was never asked. Check `fux.toml` before writing that
+  sentence, or read `--audit`'s recorded policy, where `mode` is `never`.
+  **This is not `--no-refer`**: the passage was still re-scored on real bytes
+  and the line range is real.
 - ⚠ **A `note` naming the fetcher** — it raised, returned no bytes, or returned
   a type no decoder claims — means the live fetch was not used: the verdict is
   `as-ingested` (kept bytes) or `unverified`, never `current`. The note says

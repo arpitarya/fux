@@ -67,3 +67,33 @@ Codex's hands, never Claude's).
 
 SR-ASK · SR-GRAPH · SR-EXPAND · SR-ANSWER · SR-CONFIDENCE · SR-PROVENANCE ·
 SR-OUTPUT-DEFAULTS · SR-NODE-SEARCH · SR-RS (the new prediction).
+
+## Verification, and the keep/remove call (gap check 2026-09-14)
+
+**Order: pre-register → implement → measure → call.** Nothing in this item is
+built before the pre-registration file is committed.
+
+1. **Pre-registration** (frozen, under `work/regression/<date>-graph-ask/PRE-REGISTRATION.md`):
+   the golden link-dependent question set and its size; `k`; the paired floor
+   from SR-RS d19 for the expected discordant count; **two arms** (A: Tier A
+   boost vs `lexical`; B: Tier B presence on link-dependent questions);
+   **both directions** for each arm; the `related` length cap.
+2. **Arm A — Tier A boost.** Keep if net flips clear the d19 floor *and*
+   answerable questions gain zero new misses. Fail → the RRF boost is removed;
+   Tier A becomes `lexical` order; arm B is unaffected.
+3. **Arm B — Tier B related.** Keep if the answer document appears in
+   `related` for at least the registered fraction of link-dependent questions
+   where Tier A missed it, with median `related` length within the cap. Fail →
+   `related` ships as an opt-in flag, default off; `graph --seed` remains the
+   route.
+4. **`answer` reads `ask`** — tested, not measured: a Tier-B document with no
+   passage support never appears in an answer; the receipt names the tier.
+   If arm B is removed, `answer` reads Tier A, which is then `lexical` order.
+5. **Composition tests** stay on whatever survives.
+6. **Ambiguous → Arpit.** A result between the floors is written up as
+   ambiguous with per-query rows under `evidence/` (SR-RS 2026-08-28 ruling)
+   and handed over; the session does not adjudicate.
+
+Also owed here: GLOSSARY entries *boosted tier*, *related tier*; CHANGELOG;
+the `fux-search`/`fux-answer`/`fux-graph` guide skills and the MCP tool
+descriptions in the same change as the flag they describe.

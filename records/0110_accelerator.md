@@ -10,7 +10,7 @@ feature: "`.fux/runtime/` — the derived index, `fux build`, and the block boun
 owns: [src/fux/derive@08c8ff2c8767, tools/differential@f4c752e76d2a]
 laws: [L1, L3]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 5a8a3e49dc361f535917358fc368de875996cdd3e10fc4ff7647fefbe4389780
+content_sha: 7c07416bf9b187afd73f7fac82b97aad83e447b1a1fc869622f30b9e61ed9d67
 ---
 
 # SR-T1-ACCELERATOR — the derived T1 accelerator
@@ -442,9 +442,11 @@ checks gets authored to pass.
 
 **They are the same run on a corpus whose tune is all-defaults**, which is
 every golden rung. They differ on fux's own repo — 90 of 174 comparisons
-against 0 — because **Node reads no `tune.toml` at all**
-([SR-NODE-SEARCH](0153_node-search.md) decision 8 records that gap; it is
-that record's to close, not this one's).
+against 0 — because, **when this was measured, Node read no `tune.toml` at
+all**. ⚠ **Closed 2026-09-12** ([SR-NODE-SEARCH](0153_node-search.md) decision
+8): the reader now reads `.fux/tune.toml` and `.fux/output.toml`, and this repo
+went 90 of 174 discordant to 0 of 199. The two arms still exist — the
+diagnostic pattern below is why — and on this repo they now agree.
 
 ⚠ **This is the diagnostic-arm pattern this repo already learned once** —
 `CLAUDE.md` §"Hard-won build knowledge", M1: keep an arm that *does* borrow the

@@ -53,6 +53,14 @@ part of it is still to do. `search-v3.md` is the worked example.
 *Newest first. Every `.md` in this directory has a row; a file with no row is
 the defect this ordering exists to make visible.*
 
+## Filed 2026-09-14
+
+* [fux's half of cage's search leg](cage-search-leg.md)
+  — cage proposes a leg that classifies every searchable moment in agent transcripts
+  (fux vs grep vs Read); this is fux's half: one counts-only fact row per invocation
+  (verb, `args_hash`, band, answerable, counts, latency) pushed fail-open to the resolved
+  cage ledger. No text, no ids — L8 and cage's law agree. Waits on cage's verdict.
+
 ## Filed 2026-09-13 — the 3.0 backlog
 
 * [Ten ways to rank better — the 3.0 search backlog](search-improvements-v3.md)

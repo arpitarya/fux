@@ -83,3 +83,19 @@ the skill templates), `node/src/verbs/`.
 
 SR-ENRICH · SR-CLI · SR-PROVENANCE · SR-DOCTOR · SR-AGENT-POLICY · SR-PII (a
 note, no rule change).
+
+## Verification, and the keep/remove call (gap check 2026-09-14)
+
+Order: **implement → test → measure generalisation → call.**
+
+1. Unit and e2e tests for DoD 1–9 and 10–13 (renderings equal templates;
+   the steering rule *proposes, never writes* asserted in the policy test).
+2. **Generalisation, pre-registered** (the compare doc §6): N corrections
+   from real failures on an ungraded corpus, M blind paraphrases each
+   (Codex), top-3 retrieval before/after; both directions.
+3. **Keep** the vocabulary effect if the paraphrase gain clears the SR-RS d19
+   floor with no golden top-1 losses. **Remove** it — human lines stop being
+   indexed into `ctx` (no per-author weight exists in a shared field), `--pin`
+   becomes the default effect, eval rows stay — if not.
+4. The verb, the marker, `--check` reporting, the eval rows and the skill are
+   kept on tests alone; they are not a ranking change.

@@ -42,6 +42,7 @@ KNOWN_KEYS: tuple[str, ...] = (
     "sources.url.ttl",
     "sources.url.enrich",
     "sources.url.update",
+    "sources.url.fetch_at_answer",
     "sources.url.max_parallel",
     "sources.url.sweep_minutes",
     "sources.url.acquired_max_bytes",
@@ -163,6 +164,19 @@ class UrlSource:
     #: duration** -- `ttl` above is ask-time and this is update-time, and a
     #: second time-shaped key here would be read as the same knob.
     update: str = "auto"
+    #: SR-URL-FRESHNESS decision 16 -- may `fux answer` open a socket for these
+    #: URLs at all? `True` is today's behaviour; `False` pins every `url:`
+    #: citation to `.fux/acquired/` and the verdict becomes `as-ingested`.
+    #: ⚠ **The name states its CLOCK, and that is the whole reason it is three
+    #: words.** Decision 15 keeps two clocks apart on one line -- `ttl` is
+    #: ask-time *how often*, `update` is update-time *at all* -- and this is
+    #: the third cell: ask-time *at all*. `offline` was rejected (it collides
+    #: with L4's vocabulary and reads as the whole engine) and `pinned` was
+    #: rejected (one word over both clocks, which is the merge decision 15
+    #: exists to prevent). **No line-level layer**, like `acquired_max_bytes`:
+    #: it answers *"how do I reach these pages?"*, which a source answers for
+    #: all of them at once (SR-ACQUIRED, the two-layer/three-layer test).
+    fetch_at_answer: bool = True
     #: SR-ACQUIRED decision 8 -- the bound on `.fux/acquired/`, in bytes.
     #: `None` means the store's own `DEFAULT_MAX_BYTES`. **There is no
     #: line-level layer**, unlike `keep`: a cap is a property of the disk the
@@ -442,6 +456,14 @@ def _load_url_source(path: Path, raw) -> UrlSource | None:
             "at all; a line's own `update=` still wins. It takes no duration -- `ttl` is "
             "the ask-time knob and this one is update-time"
         )
+    fetch_at_answer = raw.get("fetch_at_answer", True)
+    if not isinstance(fetch_at_answer, bool):
+        raise FuxError(
+            f"{path}: [sources.url] fetch_at_answer must be true or false "
+            f"(got {fetch_at_answer!r}). It decides whether `fux answer` may open a "
+            "socket for these URLs at all; false answers from .fux/acquired/ instead. "
+            "It is ask-time, like `ttl` -- `update` is the update-time knob"
+        )
     config = raw.get("config", {})
     if not isinstance(config, dict):  # the ONLY validation fux does on it
         raise FuxError(f"{path}: [sources.url.config] must be a table (got {type(config).__name__})")
@@ -523,6 +545,7 @@ def _load_url_source(path: Path, raw) -> UrlSource | None:
         ttl=ttl,
         enrich=enrich,
         update=update,
+        fetch_at_answer=fetch_at_answer,
         config=dict(config),
         max_parallel=max_parallel,
         sweep_minutes=sweep_minutes,

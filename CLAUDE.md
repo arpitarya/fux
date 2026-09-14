@@ -99,6 +99,15 @@ right now?*
 | what a benchmark run always captures | [SR-WORK-BENCHMARK](records/0053_WORK-benchmark.md) — the seven, stated once |
 | why a command fails on *this* surface | [`work/MACHINE.md`](work/MACHINE.md) |
 | which record owns a module | [`records/README.md`](records/README.md) §Ownership |
+| the stages a feature moves through | [SR-WORK-LIFECYCLE](records/0058_WORK-lifecycle.md) |
+| what a session owes before it ends, and how long an answer may be | [SR-WORK-SESSION](records/0060_WORK-session.md) |
+| what a task owes the documentation | [SR-WORK-DOCS](records/0059_WORK-docs.md) |
+| whether a number above 10 000 may be written down | [SR-WORK-SCALE](records/0057_WORK-scale.md) |
+| whether a claim may be grounded in an archived doc | [SR-WORK-ARCHIVE](records/0062_WORK-archive.md) |
+| what the bundle requires of a new doc | [SR-WORK-OKF](records/0061_WORK-okf.md) |
+| how a release reaches PyPI and npm, and what blocks a merge | [SR-WORK-RELEASE](records/0063_WORK-release.md) |
+| what to do when you cannot proceed without Arpit | [SR-WORK-BLOCKERS](records/0064_WORK-blockers.md) |
+| the whole set of rules about how work is done | the **WORK** records `0051`–`0064` — [the register](records/README.md) §The register |
 
 Any work item or prediction that starts, finishes, blocks, or is descoped
 updates `OPEN-WORK.md` **in the same change as the work**. PLAN is the spec;
@@ -251,173 +260,22 @@ to its record; that is all it does now.
 
 ## Litmus for any new work
 
-**The design point is 10 000 documents** (Arpit, 2026-08-21). Fux is built,
-measured and judged at that size.
-
-> **And since 2026-08-22, it is a CEILING ON MEASUREMENT *AND* ON COMMITMENT.**
-> Arpit: *"no testing should go beyond ten thousand documents"*, and —
-> *"anything that talks about commitments for fifty thousand or hundred
-> thousand or above that, remove those commitments… there should be no rules or
-> promises for it."*
->
-> **Above 10 000 documents: do not measure, do not file a verdict, do not write
-> a threshold, a budget, a bound, a veto condition or a pre-registration, and do
-> not block work on one.** 50 000 and 100 000 are re-entered deliberately, by
-> Arpit, when the build is done — they are not a queue a session may start
-> drawing from because it has capacity.
->
-> **Two predictions were withdrawn under this rule on 2026-08-22**: **R7**
-> (committed-index size, budget frozen at 100k) and **R8** (a graph-verb bound
-> at 100k, never registered). Both ids are **retired and not reused**. If either
-> question is wanted again it returns as a **new prediction at 10 000 with a new
-> id** — never a revival at a smaller size, which would be moving a frozen
-> threshold in disguise.
->
-> **THE CEILING IS ON MEASUREMENT AND PROMISES — NOT ON THE DESIGN'S REACH.**
-> Arpit, 2026-08-22: *"since we are limiting it till ten k, that does not mean
-> that we need to update the design. Later on, we will build it for fifty k,
-> hundred k, and so on."*
->
-> **Fux is still architected to scale.** A document describing how the design
-> behaves at 10⁵–10⁶ is **describing the architecture, not making a promise**,
-> and it is not stale — it says where this is going. **Do not "clean up"
-> architectural prose to match the current test target.** The paper's §4
-> (one keyspace) is the worked example: it names no corpus size at all, so no
-> size ruling can ever make it stale, and a session that "reconciled" it would
-> be destroying a correct document to satisfy a rule that does not apply to it.
->
-> **The test, applied per sentence:** does it *commit* to something at a size
-> above the ceiling — a threshold, a budget, a bound, a veto — or does it
-> *describe* how the design works there? **Commitments go. Descriptions stay.**
->
-> **Three things this does NOT do**, and getting these wrong is how a scope
-> ruling turns into a data loss:
-> 1. **It does not un-measure anything.** Verdicts already filed above 10 000 —
->    R5's 44.4 s at 100 000 above all — **stand exactly as measured** and are
->    never edited. A pre-registered threshold may never move, and a scope change
->    is not a re-judgement.
-> 2. **It does not delete a feature.** Arpit: *"whatever features are built,
->    let's keep them — they are going to be helpful either way."* Nothing is
->    ripped out for being bigger than the current target.
-> 3. **It does not forbid an ARGUMENT about scale.** *"This cost is constant in
->    the corpus"* is a structural claim, not a measurement, and it stays
->    legitimate. What is forbidden is going and **measuring** it at 50 000 to
->    prove the point.
-
-This replaced a 10⁵–10⁶ design point on 2026-08-21. **What changed is the
-scale filter. What did not change is the deployment filter** — a
-10 000-document corpus inside a corporation is still inside that corporation.
-
-- **Scale is a staged target, not the default — and the later stages are
-  closed to measurement.** 10k now. 50k and 100k are **later**, and since
-  2026-08-22 no session runs a measurement at either without Arpit re-opening
-  them. An argument that turns on 10⁵–10⁶ documents describes where the design
-  is heading and **may not gate work today**. A feature is not blocked, and a
-  measurement is not owed, because of a size Fux is not yet built for.
-
-- **Enterprise realities are still design inputs** — Windows-first fleets,
-  proxies and SSO in front of every internal site, air-gapped/regulated
-  environments, multi-team corpora with access boundaries, audit and
-  compliance demands. None of these got cheaper when the corpus got smaller.
-
-- **Fux's laws are enterprise features, not constraints** — `$0`/FOSS-only =
-  no licence to buy, no procurement, and an SPDX-declared dependency tree an
-  auditor can clear in a sitting; offline/no-API = no data ever leaves the tenant; deterministic =
-  compliance-grade reproducibility. ⚠ **The stronger claim — a *trivially*
-  auditable supply chain, because there was no supply chain — was withdrawn
-  2026-09-06 with L1's amendment. Do not restore it in marketing prose.**
-
-The question per feature: *"does this hold up on a 10 000-document corpus
-inside that corporation, and does it foreclose 50k later?"* **The second
-clause is a check against painting into a corner — not a licence to build for
-a size nobody is measuring, and since 2026-08-22 not a licence to measure one
-either.** Answer it by reasoning, never by running a 50 000-document bench.
-
-Anton remains a convenient testbed. **Do not design in reference to it.**
-
-> **A gate judged at a deferred size is not a blocker.** A pre-registered
-> threshold may never move (§the lifecycle), so a verdict measured at 100 000
-> documents stands as measured — it is **re-judged at 10 000 by a new
-> pre-registration**, never by editing the old one. Records and compare docs
-> that argue from the old design point are stale until reconciled, and that
-> reconciliation is an item, not a silent edit.
+**The design point is 10 000 documents, and it is a ceiling on what may be
+measured and on what may be promised** (Arpit, 2026-08-21; the ceiling
+2026-08-22). The rule, the three things it explicitly does not do, and the
+per-sentence test are stated once in
+[SR-WORK-SCALE](records/0057_WORK-scale.md) and are **not repeated here**.
+Read decisions 1–7 before writing any number above 10 000 into a document, and
+13 before treating a deferred-size gate as a blocker.
 
 ## How work happens here (the lifecycle)
 
-Every non-trivial feature moves through this pipeline, and the artifacts are
-committed:
-
-0. **Compare (when there's a fork).** Whenever a decision has multiple viable
-   options, write a *compare doc* in [`work/compare/`](work/compare) first —
-   debate, matrix, grounded references, a proposed verdict Arpit accepts or
-   overrides, and a **reopen-trigger**. Standing rule.
-   **Proposals (when it's an idea, not a fork).** An idea worth keeping but not
-   being built now gets a *proposal doc* in
-   [`work/proposals/`](work/proposals) — same rigor, `status: proposed`.
-   Parked, not lost: when picked up they graduate to a compare doc or plan entry.
-1. **Plan** — the design of record. Update [the SR register](records/README.md)
-   before building: what, why, scope in/out, the decision.
-2. **Handoff** — a self-contained spec: context, definition-of-done,
-   constraints, key files, edge cases, tests, open questions. **It lives in the
-   item's own detail file under [`work/open/`](work/open/README.md)**, not in a
-   separate directory: the handoff directory was retired on 2026-08-18 and its
-   contents moved to [`archive/handoff/`](archive/README.md). One item, one
-   file, spec and state together.
-3. **Prompt** — the paste-ready Claude Code prompt that executes the handoff
-   (explore → plan → implement → verify), alongside its handoff.
-
-**Every handoff and prompt names the model that should execute it** — a
-`**Model: <name>**` line at the top, plus one sentence of *why*. State it when
-handing the prompt over, too. Model choice is a silent failure mode: an
-under-powered model on a judgment-heavy task does not error, it returns
-confident, plausible, wrong work, and the cost lands later.
-
-- **Opus** — the output quality *is* the deliverable and no test can catch a
-  bad one: design, architecture, debate, ambiguous diagnosis, interpreting a
-  confusing measurement, **calling a gate**, anything touching the
-  non-negotiable constraints.
-- **Sonnet** — well-specified implementation against a written
-  definition-of-done with tests to verify it; mechanical suite runs.
-- **Haiku** — mechanical bulk edits with an exact, unambiguous rule.
-
-When borderline, say Opus and say why it was close. A handoff detailed enough
-to be Sonnet-executable is itself the signal that the design phase was done.
-
-Then, on completion:
-
-4. **One feature → one SR** in [`records/`](records/), from
-   [`records/TEMPLATE.md`](records/TEMPLATE.md): §1 for humans (one screen,
-   Mermaid + its ASCII twin), §2 for agents (context · decision · consequences ·
-   alternatives · reference · veto condition). Give it a **NAME** and cite that
-   name everywhere; the file number is an ordinal, not an identity. Add its
-   components to the ownership table and update
-   [`tests/test_sr_ownership.py`](tests/test_sr_ownership.py) in the same
-   change. Full convention: [`records/README.md`](records/README.md).
-   **The live numbering runs on three ranges** (Arpit, 2026-09-11, extended
-   2026-09-13): `0001`–`0050` is the **Law** range — `0001` SR-LAWS and
-   `0002`–`0011` SR-LAW-0…SR-LAW-10; `0051`–`0100` is the **WORK** range —
-   today `0051` SR-WORK-OPEN-QUEUE through `0056` SR-WORK-QUALITY; and
-   `0101`– is **every other record**, today `0101` SR-CLI through
-   `0154` SR-API. `0012`–`0050` and `0057`–`0100` are **reserved and empty —
-   no placeholder files**. A new record takes the next free number in its own
-   range.
-   `archive/v0.26-docs/adr/0001`–`0015` are the **archived** engine's records —
-   a numbering distinct from both live ranges — and are cited as "archived
-   SR-NNNN" with that archive path, never bare "SR-NNNN".
-
-**Every rule, SR, and material decision must carry a reference** — a paper, a
-blog post, or a concrete example link. A rule or SR with no reference is
-incomplete. Ground the claim; don't assert it.
-
-**Archive implemented docs — into the ONE archive.** When a proposal is fully
-implemented and its SR is written, move it to [`archive/`](archive/README.md)
-in the same change, stamping `status: implemented` + the SR link, and add its
-row to `archive/README.md` naming its live successor. Active directories hold
-*live* work only.
-
-**There is no handoff directory.** It was retired on 2026-08-18; a spec for
-open work lives in that item's detail file under
-[`work/open/`](work/open/README.md), spec and state in one place.
+**Every non-trivial feature moves through committed stages, and every handoff
+and prompt names the model that should execute it.** The stages, the model
+table, and what each stage owes are stated once in
+[SR-WORK-LIFECYCLE](records/0058_WORK-lifecycle.md) — read it before scoping
+work (decisions 6–8 before handing a prompt to anyone). The record convention
+itself is [`records/README.md`](records/README.md).
 
 ## A pre-registered threshold may never move
 
@@ -440,111 +298,26 @@ for the worked example.
 
 ## Follow the OKF pattern (docs)
 
-Fux follows Google's **Open Knowledge Format** (OKF v0.1) — an open spec for
-knowledge as a directory of Markdown files with YAML frontmatter:
+**This repo is a declared Open Knowledge Format v0.1 bundle**, rooted at
+[`docs/index.md`](docs/index.md). What the bundle contains, the field it
+requires, the tracker vocabulary and the three declared boundaries are stated
+once in [SR-WORK-OKF](records/0061_WORK-okf.md), enforced by
+[`tests/test_okf_bundle.py`](tests/test_okf_bundle.py).
 
-- **The bundle is `docs/` + `work/`** — root index at
-  [`docs/index.md`](docs/index.md), which declares `okf_version: "0.1"` and
-  indexes both trees. (It spanned one tree until 2026-08-18; the split into
-  *what the project is* / *what is happening to it* did not change the bundle,
-  only its shape.) Repo-root CLAUDE.md/README.md are tool entry points outside
-  the bundle.
-- **Frontmatter `type` on every knowledge doc** (the only OKF-required field) —
-  `type: Compare Doc`, `type: Proposal`, `type: SR`, `type: Handoff`,
-  `type: Paper`, and for the trackers `type: Queue`, `type: Log`,
-  `type: Index`, `type: Glossary`. Provenance keys are legal OKF extensions;
-  consumers must preserve unknown keys.
-  ⚠ **The ALL-CAPS exemption was retired 2026-09-12.** This file used to say
-  *"ALL-CAPS markdown files carry no YAML frontmatter… exempt from the `type`
-  requirement"*. **The spec has no such rule**, so the repo claimed plain
-  conformance while 94 of 314 files failed the bar it was claiming — measured
-  in [`work/proposals/positioning-documents-not-code.md`](work/proposals/positioning-documents-not-code.md)
-  §6. Every tracker now declares a `type`, and a new ALL-CAPS file does too.
-- **`log.md` semantics**: `work/WORKLOG.md` follows OKF's log convention
-  (date-grouped, newest first).
-- Conformance bar (OKF §9): parseable frontmatter + non-empty `type`
-  everywhere; be permissive when consuming.
-- **Enforced by [`tests/test_okf_bundle.py`](tests/test_okf_bundle.py)** since
-  2026-09-12 — it had been prose and nothing else. Three things sit outside the
-  bundle, and the test's docstring says why each is a boundary rather than a
-  waiver: regression `evidence/`, the sealed `work/golden/` test data, and
-  filed regression runs before 2026-08-25 (frozen — the same baseline, for the
-  same stated reason, as `CLASSIFY_SINCE` in `tests/test_regression_runs.py`).
-  **The scope is declared in [`docs/index.md`](docs/index.md); the test is what
-  keeps the declaration true.**
+## Documentation (required)
 
-Reference: [OKF spec](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md) ·
-[annotated guide](https://okf.md/spec/).
+**Three rule groups, one home, none of them restated here** —
+[SR-WORK-DOCS](records/0059_WORK-docs.md):
 
-## Documentation style (required)
+- **how a doc is written** — decisions 1–5.
+- **who may edit the agent-steering files, including this one, and under what
+  two obligations** — decisions 6–8. **Read these before editing `CLAUDE.md`.**
+- **the seven documents every task updates before it is done** — decisions
+  9–13, and the registry rules in 11.
 
-**No large paragraphs — they are hard to read.**
-
-- Split dense prose into **short points** (bullets or numbered lists), one idea
-  per point.
-- Keep paragraphs to **3–4 lines max**; if it runs longer, it's two points.
-- Make it **roomy**: blank lines between points and sections; tables for
-  option/field comparisons; headings to break up long sections.
-- Lead each point with the takeaway (bold it when it helps scanning).
-- When you touch a doc that has a wall of text, split it in the same change —
-  "fix stale docs on contact" applies to *form*, not just facts.
-- **Chat responses too.** Answers in Cowork / Claude Code follow the same rule:
-  precise, short paragraphs, lead with the takeaway.
-
-## Documentation discipline (required)
-
-**An agent may edit this file directly** (Arpit, 2026-08-27). It previously read
-*"Agent-steering files are proposed, never auto-applied — an agent proposes a
-change as a named diff and does not apply it to itself"*, which is why this file
-carried a PROPOSED header from 2026-08-09 until the 2026-08-19 rewrite was
-adopted. **Arpit removed it**: the proposal step had become a way for a ruling
-he had already made to sit unapplied in a ledger nobody reads.
-
-⚠ **What that rule was protecting, now unguarded and worth knowing:** an agent
-can change the instructions it is about to be judged by, in the same session, and
-nothing mechanical will flag it. **Two obligations replace the prohibition:**
-
-1. **Say it out loud.** A change to this file is named in the session's output
-   and in the WORKLOG entry — never folded silently into a larger diff.
-2. **A ruling of Arpit's, or a fact.** Edit this file to record a decision he
-   made or to correct something untrue about the repo. **Do not edit it to
-   grant yourself latitude you were not given** — that is the failure the old
-   rule made structurally impossible and now rests on judgment.
-
-**Statements of fact about the repo are exempt.** A version number, a path, a
-"does not exist yet" that now exists — fixed on contact, in the change that
-notices it, with a DOC-REGISTRY bump. The rule protects what this file
-*instructs*, never what it *claims*: three sessions read "there is no package on
-`main` yet" while `fux-engine` was on PyPI, because a rule meant for normative
-content was applied to a fact.
-
-**The shared memory between sessions is [`work/`](work/README.md).** `docs/`
-holds what the project *is* — plan, paper, glossary, decision records. `work/`
-holds what is *happening to it*. Read
-[`work/README.md`](work/README.md) once; it is the map.
-
-### The three-file session discipline
-
-Every session, without exception — **including a chat-only session where no
-code moved**:
-
-1. **[`work/WORKLOG.md`](work/WORKLOG.md)** — append **one entry before the
-   session ends**: what was asked, what got done, what was decided or left
-   open, and what's next. **Never edit a past entry.** Append only, newest on
-   top. A wrong old entry is corrected by a new entry, not by a rewrite.
-   (The mandatory `Cost:` line was dropped 2026-08-21, PRIORITY.md P7 —
-   58 of 58 entries had said `unmeasured`; see
-   [`archive/proposals/process-diet.md`](archive/proposals/process-diet.md).)
-2. **[`work/INTERVIEW.md`](work/INTERVIEW.md)** — the state-of-play doc, kept
-   current **during** the session, not in a wrap-up pass. Four maintained
-   sections: state of play · in-flight work + the immediate next step ·
-   standing constraints · lessons learned. Write it for a **different model
-   arriving mid-task with zero other context**. **A stale INTERVIEW at handoff
-   is as serious as a missing changelog entry.**
-3. **[`work/IMPLEMENTATION.md`](work/IMPLEMENTATION.md)** — the milestone log:
-   what shipped, when, and the outcome. This is the evidence store
-   `OPEN-WORK` reconciles against before anything is called done. A row is
-   earned by landing, never by being planned.
+**The shared memory between sessions is [`work/`](work/README.md)**; `docs/`
+holds what the project *is*. Read [`work/README.md`](work/README.md) once; it is
+the map.
 
 ### OPEN-WORK — the single live queue
 
@@ -558,50 +331,11 @@ item.
 
 ### Archive is not evidence
 
-A doc under **any** `archive/` may be *named* ("superseded by X"). It may
-**never be cited as backing a live claim** — nothing guarantees an archived
-file was not overwritten after retirement.
-
-When repointing a citation away from an archived doc, **point it at the live
-successor**, don't just delete the link: a deleted link leaves the claim
-ungrounded, and nobody can see that anything is missing. If an archived doc was
-a claim's only support, the claim needs new grounding — code, a live doc, or a
-measured run under [`work/regression/`](work/regression/README.md).
-
-**A link is not a citation** (Arpit, 2026-08-27). Prose naming an archived item
-— *"W-52's trigger"*, *"superseded by X"* — may link to it, **including from a
-Reference block.** This rule governs where a claim is **grounded**, never
-whether a hyperlink may point somewhere, and the ~40 existing links into
-`archive/` all stand. No repointing is owed and no test is owed.
-
-⚠ **The exposure this leaves is real and unguarded.** A Reference block can
-consist entirely of archive links, leaving a claim ungrounded with nothing
-flagging it. A test for this was written and **deliberately removed rather than
-shipped red** — it could not tell naming from citing, and adjudicating it by
-writing a looser check would be the moving-threshold failure in a different
-costume. **The paragraph above is the only guard.**
-
-**There is exactly ONE archive, and it is [`archive/`](archive/README.md) at
-the repo root** (Arpit, 2026-08-10, restated 2026-08-18). Nothing under `docs/`
-or `work/` is an archive. **Anything that gets archived is moved there**, into a
-directory mirroring where it came from — the handoff directory, for instance,
-retired wholesale into `archive/handoff/` — and gets a row in
-`archive/README.md` naming its live successor, or saying plainly that it has
-none. ⚠ **Decision records are the exception** (Arpit, 2026-09-06): they are
-never archived. A superseded record is rewritten or deleted in the change that
-supersedes it, and `records/` is the whole set. Enforced by
-`tests/test_archive_law.py`, which fails on a second `archive` directory
-anywhere and on a live doc still pointing at one.
-
-### Two hazards that bite silently
-
-- **Concurrent sessions are real.** Cowork, Claude Code and scheduled tasks all
-  touch these files. **Re-stage and re-apply your changes to `work/*.md` right
-  before committing** — another session may have landed an entry in between.
-- **Ground truth over prose.** Before writing any status claim — release state,
-  test counts, "nothing pending", "X is done" — check it against the actual
-  source of truth: `git log`/`status`/`tag`, the code, a command that
-  reproduces. A doc repeating another doc is not a second source.
+**There is exactly one archive, [`archive/`](archive/README.md) at the repo
+root.** What may be named, what may never be cited, how a citation is
+repointed, the exposure the rule leaves unguarded, and the records exception are
+stated once in [SR-WORK-ARCHIVE](records/0062_WORK-archive.md) — decisions 4–8
+are the ones that decide whether a Reference block is legal.
 
 ### The SR standing rules
 
@@ -644,51 +378,16 @@ The register, the convention and the ownership table are in
   prose what it replaced. Nothing is left behind to be found and mistaken for
   current, and no live doc may link to a retired record — the file is gone.
 
-## Keep the docs in sync (required)
+## Session continuity — what a session owes (required)
 
-**Every task updates the documentation — no exceptions.** This holds whether or
-not the task touched code: a decision, a scope change, or a plan is also
-documentation. A task is not "done" until the docs are true. At minimum:
+**Four files, one-line transition markers, and the rules that govern every
+reply you write** — the worklog entry (a chat-only session counts), the
+interview, the milestone log and [`work/NOW.md`](work/NOW.md) — are stated once
+in [SR-WORK-SESSION](records/0060_WORK-session.md).
 
-1. **[`work/OPEN-WORK.md`](work/OPEN-WORK.md)** — the live tracker. **On every
-   execution, whatever the outcome** — success, failure, blocked, interrupted,
-   abandoned — the affected `W-nn` rows and prediction rows are updated before
-   the session ends. A failed run records the failure with a one-line why.
-   Never mark an item DONE with failing tests.
-2. **[the SR register](records/README.md)** — design of record; keep milestone status
-   truthful when behaviour or scope changes.
-3. **[`work/WORKLOG.md`](work/WORKLOG.md)** — an entry per substantive exchange
-   (see below).
-4. **[`work/INTERVIEW.md`](work/INTERVIEW.md)** — the agent-succession handoff.
-   Read it before your first substantive change; update it when direction,
-   strategy, or a major decision changes, and add yourself to its maintainer
-   line when you do. You will retire too; leave it better.
-5. **[`work/DOC-REGISTRY.md`](work/DOC-REGISTRY.md)** — bump the row for any doc
-   you touched; new maintained doc → new row, same change. **It lists live
-   documents only:** an archived doc's row is **deleted** in the change that
-   archives it — not struck through, not annotated "retired" — the same
-   discipline OPEN-WORK applies to closed items. No row may point into
-   `archive/`, every row's target must exist, and one document gets one row.
-   Enforced by `tests/test_doc_registry.py`.
-6. **[`README.md`](README.md)** — the public front door: status, guarantees,
-   reading order. **`CHANGELOG.md`** once a package exists.
-7. **The relevant SR**, [`docs/GLOSSARY.md`](docs/GLOSSARY.md) for any new
-   recurring term, and every test the behaviour change needs.
-
-**Auto-fold useful information into this file.** When a session produces
-durable, repo-wide knowledge — a decision, a constraint, a disproven idea, a
-pattern worth keeping — fold it in here concisely (details live in the linked
-docs), in the same change. If a future agent would act differently knowing
-something, it belongs here or is linked from here.
-
-## Session continuity — the running worklog (required)
-
-At the end of **every substantive exchange**, append an entry to
-[`work/WORKLOG.md`](work/WORKLOG.md): what was asked, what was done, what was
-decided or left open, and the single next step. A rolling exit-interview so a
-*new chat can pick up cold*. **Applies in Cowork and Claude Code alike.** Newest
-entry on top; short and true. Distinct from `INTERVIEW.md` (strategic,
-cross-session succession) — the worklog is the granular, per-exchange trail.
+**Read it before your first answer, not before your last:** decisions 1–5 are
+the files, 6–7 the markers, 8–9 how long an answer may be, and 10–12 the two
+hazards of sharing a machine with another session.
 
 ## Conformance runs — file every one (required)
 
@@ -892,51 +591,14 @@ archive/v0.26/.venv/bin/python -m pytest tools/pruning-eval/tests -q
 archive/v0.26/.venv/bin/python tools/pruning-eval/run.py --corpus acme orbit synth
 ```
 
-## Package identity (do not change casually)
+## Package identity and release (do not change casually)
 
-- Distribution name: **`fux-engine`**. Import package: **`fux`**.
-- Version: **`2.0.0`**, released (0.26.0 archived → reset → 0.30.0 →
-  M2 at 0.32.0 → the sources rewrite at 0.33.0 → the graph/refer/maintenance
-  planes at 0.34.0 → the source verbs and the progress plane at 0.35.0 → the
-  deferring hook and agent policy at 0.36.0 → the refer per-doc cap fix and
-  two-machine determinism at 0.37.0/0.37.1 → **1.0.0** the first major release
-  → record shape v2 / tuning / enrich / mcp / rerank at 2.0.0-alpha.0 → the
-  dense lane removed at alpha.1 → the URL freshness loop closes at alpha.2 →
-  the output.toml fork closes and `ask` gains `sections` at alpha.3 → three
-  built-in decoders join (jsonl/svg/images) at alpha.4 -> the acquired plane,
-  declarative refusal detection, `ttl=`/`as-ingested` and PII redaction at
-  alpha.5 -> enrichment inside the PII boundary, `fux enrich <TARGET>` and a
-  cdp fetcher that survives concurrency at alpha.6 -> one enrichment-report
-  path spelling on every platform at alpha.7 -> **2.0.0**, the alpha line
-  promoted unchanged on 2026-09-13: `records/` at the repo root, the Node read
-  plane and its one bundled file (L10), the acquired plane, PII redaction and
-  the URL freshness loop, all released together).
-  Bumped in `src/fux/__init__.py`, which `pyproject.toml` reads dynamically.
-  ⚠ **It is the SOURCE, not the only copy — that claim was false and is
-  corrected here (2026-09-12).** W-107's Node reader carries three more
-  hand-written version strings — `node/package.json`, `node/fux.mjs` and
-  `node/src/verbs/mcp.mjs` — and nothing checked them, so a bump that missed
-  one would ship a PyPI wheel and an npm tarball naming different releases.
-  **`scripts/check-version-parity.py` is now the enforcement**, run by
-  `tests/test_version_parity.py` on every push and by `publish.yml` before a
-  release builds. Add a site to that script's `SITES` the moment a fifth copy
-  appears.
-  ⚠ **The Node BUNDLE is not a fifth site — it is a DERIVATION**, and what is
-  checked is the derivation: `check-version-parity.py --with-bundle <path>`
-  asserts the built bundle's generated header and its `VERSION` constant against
-  `src/fux/__init__.py`. The release workflow runs it on the very artefact it is
-  about to ship, and `tests/test_version_parity.py` builds one on every push. See `CHANGELOG.md` for the full list.
-
-## Merge wall — what actually blocks a merge
-
-**There are no required status checks on `main`.** What remains:
-`enforce_admins: true`, no force-push, no deletion — history is protected, the
-quality gate is not.
-
-Practical consequence: **CI green is your responsibility to check, not
-something the wall guarantees.** Read `gh pr checks <n>` yourself and do not
-merge on red. Source of truth:
-[`.github/branch-protection.json`](.github/branch-protection.json).
+**Distribution name `fux-engine`; import package `fux`; released on PyPI and on
+npm.** How a release reaches both registries, where the version number lives and
+what keeps its copies equal, and what the merge wall does and does not block are
+stated once in [SR-WORK-RELEASE](records/0063_WORK-release.md) — **read
+decisions 10–11 before merging anything.** The version's history is
+[`CHANGELOG.md`](CHANGELOG.md)'s and is not duplicated.
 
 ## Hard-won build knowledge (auto-folded)
 
@@ -999,61 +661,8 @@ because their code is on the port list:
 
 ## Blockers stop the session (required)
 
-**A blocker is a file, not a remark.** The moment you cannot proceed without
-Arpit, write `work/BLOCKED.json` and stop:
+**A blocker is a file — [`work/BLOCKED.json`](work/BLOCKED.json) — and the
+session stops.** Its shape, the four decision values, the prohibition on working
+around one, and the three hooks that enforce it are stated once in
+[SR-WORK-BLOCKERS](records/0064_WORK-blockers.md).
 
-```json
-{"decision":"ASK","reason":"one line","questions":["the minimum question"],
- "safe_alternative":"what you can do meanwhile, or \"\"","surfaced":false,"filed":"YYYY-MM-DD"}
-```
-
-`decision` is `ASK` (he can unblock you) · `REFUSE` (disallowed or unsafe) ·
-`UNKNOWN` (out of scope to answer reliably) · `PROCEED` (nothing is blocked).
-
-**Do not work around a blocker.** Choosing a plausible default and continuing is
-how a week of work lands on the wrong side of a decision nobody made. Say it,
-set `surfaced: true`, stop.
-
-Three hooks enforce this rather than trusting anyone to remember —
-`.claude/settings.json`:
-
-| hook | does |
-|---|---|
-| `UserPromptSubmit` | prepends `work/BLOCKED.json` and the OPEN-WORK inbox to every prompt, so a pending decision cannot go unmentioned |
-| `Stop` | refuses to end a turn while a blocker is unsurfaced, three times, then relents |
-| `PreToolUse` | one writer **per asset** — a `Write`/`Edit`/`MultiEdit`/`NotebookEdit` locks only the file it targets (`.claude/.locks/<hash>/owner`, TTL 900s), so two sessions editing `work/OPEN-WORK.md` at once is still blocked, but two sessions editing different files run in parallel |
-
-## Answer length (required)
-
-**Ten lines or fewer unless asked for more.** Lead with the answer.
-
-**Never summarise work you just did** — the diff showed it. Reasoning only when
-asked or when the answer depends on it. No closing offers: ask a real question
-or stop. Tables and code over prose. **Length follows the work, not the
-effort**; a four-hour change can be three lines. `/output-style terse` carries
-the same rules session-wide.
-
-## Say what you are doing (required)
-
-**Announce every transition, in one line, always.** Not a summary — a marker.
-
-```
-→ W-56: building fux-lab from SETUP-LAB
-✓ W-56 lab environment · → W-56 playground corpus
-✓ W-56 · → W-59: the R4 measurement
-```
-
-Rules:
-
-- **Before starting**, name the item id and what you are about to do. One line.
-- **On finishing**, `✓ <id>` and immediately what starts next. One line for
-  both — a finish with no next is a stop, and a stop is its own sentence.
-- **Use `TodoWrite`** for anything with more than two steps, and keep it
-  current *during* the work. A todo list updated at the end is a report, not a
-  plan.
-- **Write the current line to [`work/NOW.md`](work/NOW.md)** — one line,
-  overwritten. It is read back into the next session, so a session that dies
-  mid-task leaves a note rather than a mystery.
-- **This is not a recap.** §Answer length still holds: never restate what a
-  diff already shows. A transition marker is a pointer, a summary is a
-  substitute for reading — the first is required, the second is banned.

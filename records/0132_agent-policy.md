@@ -7,10 +7,10 @@ description: "Fux's readers are AI agents, and an engine whose output is misread
 status: accepted
 date: 2026-08-22
 feature: the agent-facing policy and skill artifacts Fux ships, and their installer
-owns: [src/fux/templates/agents@e6f68bb61e94]
+owns: [src/fux/templates/agents@a92046b256a3]
 laws: [L1, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: bec60e668dc983732efe6327be1515ee4ade2ecf2ed7ae815b1a76d78a3640b3
+content_sha: db43fa418334f5399ef0c1c891b2fd2dc0ca87eadb53b20ee0aaa90b3cd99da1
 ---
 
 # SR-AGENT-POLICY — shipping the policy, not just the facts
@@ -700,6 +700,21 @@ since decision 11.
 `SKILL_SURFACES` there is keyed by **(vendor, directory)**, so deleting Codex's
 row still fails even though Copilot writes the same paths.
 
+
+**Two guide skills changed with the code they describe** (W-174, 2026-09-14) —
+`CONFIG-SKILL.md` and `ANSWER-SKILL.md`, edited as **templates** and re-rendered
+to all three skill surfaces, per decision 15.
+
+- `fux-config` gains `fetch_at_answer`, a three-row table separating it from
+  `ttl` and `update=never`, and the `--no-refer` distinction.
+- `fux-answer` gains the sentence that matters at citation time: under
+  `fetch_at_answer = false`, **`as-ingested` is the normal verdict and the
+  source was never asked**, so an agent must not report it as unreachable.
+- 🔴 **A live defect went with it.** `fux-config` told agents *"any other
+  unknown key is silently ignored"* — wrong since
+  [SR-CONFIG](0113_config.md) decision 14 made unknown keys refuse by name. An
+  agent reading it would have assured a consumer that a typo in `fux.toml` was
+  harmless. Fixed in the same change as the feature, which is the rule.
 
 ### Consequences
 

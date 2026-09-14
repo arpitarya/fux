@@ -83,7 +83,7 @@ to** (Arpit, 2026-09-13). It is the answer to one question:
 |---|---|---|---|
 | `law` | **Arpit rules differently** | 11 — SR-LAWS + SR-LAW-0…SR-LAW-8 and SR-LAW-10 | [`tests/test_claude_md_laws.py`](../tests/test_claude_md_laws.py) holds `CLAUDE.md`'s generated block byte-equal to the record; a record conflicting with a law is void in the conflicting part |
 | `component` | **the code changes** | 52 | [`tests/test_sr_freshness.py`](../tests/test_sr_freshness.py) and [`scripts/sr-guard.sh`](../scripts/sr-guard.sh) — the owning record is touched in the same change |
-| `process` | **the way work is done changes**, with no code behind it | 8 — SR-RS, SR-WORK-QUALITY, SR-WORK-OWNERSHIP, SR-PORT-LIST, SR-WORK-OPEN-QUEUE, SR-WORK-ENVIRONMENTS, SR-WORK-BENCHMARK, SR-WORK-BACKLOG | its enforcement is a test, so it **owns that test** |
+| `process` | **the way work is done changes**, with no code behind it | 17 — SR-RS, SR-PORT-LIST, SR-AGENT-SURFACES, and the fourteen WORK records SR-WORK-OPEN-QUEUE, SR-WORK-ENVIRONMENTS, SR-WORK-BENCHMARK, SR-WORK-OWNERSHIP, SR-WORK-BACKLOG, SR-WORK-QUALITY, SR-WORK-SCALE, SR-WORK-LIFECYCLE, SR-WORK-DOCS, SR-WORK-SESSION, SR-WORK-OKF, SR-WORK-ARCHIVE, SR-WORK-RELEASE, SR-WORK-BLOCKERS | its enforcement is a test, so it **owns that test** |
 
 **The kind selects an *additional* gate; it never switches one off.** The
 ownership and freshness gates apply to any record with a non-empty `owns`,
@@ -99,10 +99,17 @@ reads as authority.
 
 ### 🔴 What the kind made visible: thirteen ungated component records
 
-**26 of 71 records carry `owns: []`.** Eleven are laws, which is correct, and
-two are `process` records that name their own hole out loud —
-[SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7 and
-[SR-WORK-BACKLOG](0055_WORK-backlog.md) decision 7. **The
+**30 of 80 records carry `owns: []`.** Ten are law records, which is correct,
+and **seven are `process` records that name their own hole out loud** — each in
+its own decision, never by omission: [SR-WORK-OWNERSHIP](0054_WORK-ownership.md)
+decision 7, [SR-WORK-BACKLOG](0055_WORK-backlog.md) decision 7,
+[SR-PORT-LIST](0114_port-list.md), [SR-AGENT-SURFACES](0155_agent-surfaces.md),
+and the three the 2026-09-14 `CLAUDE.md` extraction added —
+[SR-WORK-SCALE](0057_WORK-scale.md) decision 15,
+[SR-WORK-LIFECYCLE](0058_WORK-lifecycle.md) decision 12 and
+[SR-WORK-SESSION](0060_WORK-session.md) decision 13, whose subjects are what a
+sentence may claim, the order work happens in, and whether a written handoff is
+true — none of which a checker can grade without grading it wrongly. **The
 other thirteen are `component` records that own no component**, so the freshness
 gate can never fire for them and nothing said so before this key existed:
 
@@ -133,7 +140,7 @@ only thing that stops that**, and it is load-bearing rather than decorative.
 | range | holds | a new record takes |
 |---|---|---|
 | `0001`–`0050` | the **Law** records only — `0001` SR-LAWS, `0002`–`0011` the ten laws (SR-LAW-0…SR-LAW-8, SR-LAW-10) | the next free number **from `0012`** |
-| `0051`–`0100` | the **WORK** records only — how work is done: `0051` SR-WORK-OPEN-QUEUE, `0052` SR-WORK-ENVIRONMENTS, `0053` SR-WORK-BENCHMARK, `0054` SR-WORK-OWNERSHIP, `0055` SR-WORK-BACKLOG, `0056` SR-WORK-QUALITY (Arpit, 2026-09-13) | the next free number **from `0057`** |
+| `0051`–`0100` | the **WORK** records only — how work is done: `0051` SR-WORK-OPEN-QUEUE, `0052` SR-WORK-ENVIRONMENTS, `0053` SR-WORK-BENCHMARK, `0054` SR-WORK-OWNERSHIP, `0055` SR-WORK-BACKLOG, `0056` SR-WORK-QUALITY (Arpit, 2026-09-13), and `0057`–`0064` the eight the `CLAUDE.md` extraction filled — SR-WORK-SCALE, SR-WORK-LIFECYCLE, SR-WORK-DOCS, SR-WORK-SESSION, SR-WORK-OKF, SR-WORK-ARCHIVE, SR-WORK-RELEASE, SR-WORK-BLOCKERS (Arpit, 2026-09-14) | the next free number **from `0065`** |
 | `0101`– | **every other record**, sequentially | the next free number **after the highest** |
 
 **`0012`–`0050` and `0057`–`0100` are reserved and EMPTY — there are no
@@ -306,8 +313,16 @@ Start from [`TEMPLATE.md`](TEMPLATE.md).
 | [0052](0052_WORK-environments.md) | **SR-WORK-ENVIRONMENTS** | Each sibling environment has one job — `fux-playground` is Arpit's hands alone, `fux-lab` runs every measurement on the golden test data up to 10 000 documents, `fux-benchmark` compares the current build against the previous major. **Was law L9 until 2026-09-13**; the handle is retired | accepted | yes |
 | [0053](0053_WORK-benchmark.md) | **SR-WORK-BENCHMARK** | What every benchmark run captures — the ranked lists, what moved between the arms, `hit@k` at 1/5/10/20/50, the answer layer with its planted unanswerables, the committed index size, the speed, and an HTML report, per query and never as a total. Halt gates are functionality and are not captured | accepted | yes |
 | [0054](0054_WORK-ownership.md) | **SR-WORK-OWNERSHIP** | `owns` and `describes` — the record-to-component model itself, which two tests enforced and no record decided. Exactly one owner per component; any number of describers, and the freshness gate demands all of them | accepted | **no** |
-| [0055](0055_WORK-backlog.md) | **SR-WORK-BACKLOG** | How `BACKLOG.md` works — the named-but-unclaimed in five classes (`unbuilt` · `ungated` · `unmeasured` · `unruled` · `cost`), no detail files, promotion into the queue by opening a `W-nn`, and the one rule that inverts the queue's: **its length is not a signal** | accepted | **no** |
+| [0055](0055_WORK-backlog.md) | **SR-WORK-BACKLOG** | How `BACKLOG.md` works — the named-but-unclaimed in five classes (`unbuilt` · `ungated` · `unmeasured` · `unruled` · `cost`), no detail files, promotion into the queue by opening a `W-nn`, and the one rule that inverts the queue's: **its length is not a signal** | accepted | yes |
 | [0056](0056_WORK-quality.md) | **SR-WORK-QUALITY** | What *"good"* means — a four-gate funnel with `recall@k` as the headline, a declared and versioned query mix, unanswerable queries inside the gate, and the cost of an error published before any score exists | accepted | **no** |
+| [0057](0057_WORK-scale.md) | **SR-WORK-SCALE** | The design point is 10 000 documents, and since 2026-08-22 that is a ceiling on **measurement and on commitment** — no threshold, budget, bound, veto or pre-registration above it, and no work blocked on one. **Descriptions of how the design behaves at 10⁵ stay and are not stale**; commitments go. Two withdrawn R ids that are never reused | accepted | **partial** |
+| [0058](0058_WORK-lifecycle.md) | **SR-WORK-LIFECYCLE** | How a feature travels — compare doc on a fork, proposal doc on a parked idea, the plan, the handoff in the item's own file, the paste-ready prompt, then one record. **Every handoff and prompt names the model that should execute it**, because an under-powered model does not error, it returns confident wrong work | accepted | **partial** |
+| [0059](0059_WORK-docs.md) | **SR-WORK-DOCS** | The documentation contract in one place — the form rules (short points, takeaway first, 3–4 line paragraphs), **an agent may edit its own steering files** under two obligations with facts exempt, and the seven documents every task updates before it is done. The registry lists live documents only, one row each | accepted | yes |
+| [0060](0060_WORK-session.md) | **SR-WORK-SESSION** | What a session owes before it ends — the append-only worklog (a chat-only session counts), the interview kept current **during** the work, the milestone row earned by landing, the one-line pointer for a session that dies mid-task, the transition markers, the ten-line answer, and the two hazards of sharing a machine | accepted | **partial** |
+| [0061](0061_WORK-okf.md) | **SR-WORK-OKF** | The repo is a declared **Open Knowledge Format v0.1** bundle — `docs/` + `records/` + `work/`, rooted at `docs/index.md`, every knowledge document carrying a non-empty `type`. **The ALL-CAPS exemption was retired 2026-09-12**: the spec never had one, and 94 of 314 files were failing the bar the repo claimed | accepted | yes |
+| [0062](0062_WORK-archive.md) | **SR-WORK-ARCHIVE** | One archive, at the repo root, mirroring where each retired document came from. An archived doc may be **named** — link included — and may **never ground a live claim**, because nothing guarantees it was not overwritten after retirement. Records are the exception: never archived, rewritten or deleted in the superseding change | accepted | yes |
+| [0063](0063_WORK-release.md) | **SR-WORK-RELEASE** | One name in two registries from one trigger — PyPI automatically by OIDC, **npm staged for a human to approve** — four hand-written version sites plus one derived bundle held equal by `check-version-parity.py`. **`main` has no required status checks**: history is protected, the quality gate is not, so CI green is the author's to read | accepted | yes |
+| [0064](0064_WORK-blockers.md) | **SR-WORK-BLOCKERS** | A blocker is a **file, not a remark** — `work/BLOCKED.json`, four decision values, and a stop. No working around one by picking a plausible default. Three hooks enforce it: the inbox injected into every prompt, a `Stop` that refuses three times then relents, and a **per-asset** write lock | accepted | yes |
 | [0101](0101_cli-surface.md) | **SR-CLI** | The command-line surface — flat verbs in seven groups, one error boundary, three output modes, every command captured verbatim | accepted | yes |
 | [0102](0102_fux-directory.md) | **SR-DOTFUX** | The `.fux/` directory — every child declared committed or derived; the ignore rule asserted against git itself | accepted | yes |
 | [0103](0103_ask.md) | **SR-ASK** | The `ask` verb — one scorer, one sort; the path that answers can never change the answer | accepted | yes |
@@ -362,6 +377,7 @@ Start from [`TEMPLATE.md`](TEMPLATE.md).
 | [0152](0152_doctor.md) | **SR-DOCTOR** | The health command — fifteen checks, one owner. `warn` is the default and `error` is reserved for a repo a verb will refuse; a check that degrades to `skipped` must name the row that does fail; `fux doctor` never repairs. Carved out of SR-DOTFUX so a change to one check stops demanding eight records | accepted | yes |
 | [0153](0153_node-search.md) | **SR-NODE-SEARCH** | The Node read plane — a second reader for an index Python writes, zero dependencies and no build step, held byte-equal by the third arm of the differential law. The `_format` version policy, the never-fetch rule, the `url:`-verdict asymmetry, the tool descriptions both runtimes read from one file, and the three places Node is deliberately a SUBSET of Python — the derived graph plane, the accelerator label, and the decoder boundary. ⚠ **`partial` until 2026-09-12**, when decision 8's gap closed: the reader now reads `.fux/tune.toml` and `.fux/output.toml`, and this repo went 90 of 174 discordant to 0 of 199 | accepted | yes |
 | [0154](0154_api.md) | **SR-API** | `from fux import open` — the read-only library surface, frozen. One `output.schema.json` for three readers (CLI JSON, Python objects, Node objects); nothing that writes is in it; every method through `run_query`, so the library cannot rank differently from the CLI (decision 6, 2026-09-12); and the renderer split that makes `cmd_ask` call it is deliberately staged, not done — [W-148](../work/open/W-148-what-the-two-readers-still-owe.md) row 4 | accepted | **partial** |
+| [0155](0155_agent-surfaces.md) | **SR-AGENT-SURFACES** | the word *agent surface*, and the taxonomy by what a surface DOES rather than which vendor reads it — instructing (skills · steering · rules · instructions · agents), acting (hooks · settings · commands · subagents · output styles), protocol (MCP descriptions, no file at all) and emitted (CLI output, the busiest surface fux has). Five acting surfaces ship, Claude-only; an acting surface may enforce only where the rule is exact, so the hook is advisory and exits 0 always; a co-owned surface is seeded, never overwritten, and cannot be byte-pinned | accepted | n/a — the roster is SR-AGENT-POLICY's |
 | [0002](0002_LAW-0-authority.md) | **SR-LAW-0** | L0 — a rule is stated in exactly one SR and every other artifact links to it; the Law records outrank every other record and a conflicting record is void in the conflicting part; a Law changes only on Arpit's ruling | accepted | yes |
 
 > ## Renumbered again on 2026-09-13 — the quality contract became a WORK record
@@ -625,6 +641,15 @@ table does not grant.
 | `tools/t2-eval/` | SR-RS | a harness whose feature record was retired, held here by SR-RS decision 10's fallback. **A retired record cannot own anything, and a proposal is not a valid owner** |
 | `node/` | SR-NODE-SEARCH | the Node read plane — 44 `.mjs` files as AUTHORED, shipped as ONE bundled file (L10, decision 13); no `dependencies` key, and no build step **for the consumer**. **The only owned component outside `src/` and `tools/`**, so `test_sr_ownership.py::components()` does not demand it; the row is what makes the freshness gate demand this record when a `.mjs` file changes. `compat/` and `hash/` have no Python twin and are exempt by decision |
 
+| `tests/test_doc_registry.py` | SR-WORK-DOCS | the registry's own rules as code — live documents only, one row per document, no row pointing into `archive/`, every target existing. **A `kind: process` record owns its enforcement**; this test had **no owner at all** until 2026-09-14, so no change to it could ever demand the rule it enforces |
+| `tests/test_doc_links.py` | SR-WORK-DOCS | every relative link in a live document resolves, and the exemption list — the append-only worklog, filed runs, pre-registrations, the archive, the changelog, the template's placeholders. **Each exemption is a frozen-by-law document, not a convenience**, which is why the list belongs to the documentation record rather than to the archive one |
+| `tests/test_okf_bundle.py` | SR-WORK-OKF | parseable frontmatter and a non-empty `type` across `docs/` + `records/` + `work/`, the asserted document count, and the three declared boundaries whose reasons live in the docstring. **Previously unowned** — the conformance claim was gated and the gate belonged to nobody |
+| `tests/test_archive_law.py` | SR-WORK-ARCHIVE | one archive, and no live document pointing into it where the rule forbids it. **Previously unowned.** What it cannot check is the naming-versus-citing line, which is stated in [SR-WORK-ARCHIVE](0062_WORK-archive.md) decision 8 as an unguarded hole rather than approximated by a looser check |
+| `scripts/check-version-parity.py` | SR-WORK-RELEASE | the `SITES` list and the `--with-bundle` derivation check — the only thing standing between a missed version bump and a PyPI wheel and npm tarball naming different releases. **The first claimed component under `scripts/`**, and previously unowned despite being run by CI and by the release workflow |
+| `tests/test_version_parity.py` | SR-WORK-RELEASE | runs the parity script on every push and builds a bundle to check the derivation. **Previously unowned** |
+| `.claude/hooks/stop-if-blocked.sh` | SR-WORK-BLOCKERS | the `Stop` hook — refuses to end a turn while a blocker is unsurfaced, three times, then relents. **The relent is deliberate** and is stated in [SR-WORK-BLOCKERS](0064_WORK-blockers.md) decision 8: a hook that can never be escaped turns a blocker into a hang, and a hung session cannot report the question it owes |
+| `.claude/hooks/inject-inbox.sh` | SR-WORK-BLOCKERS | the `UserPromptSubmit` hook — prepends `work/BLOCKED.json` and the queue's inbox to every prompt, so a pending decision cannot go unmentioned |
+| `.claude/hooks/session-lock.sh` | SR-WORK-BLOCKERS | the `PreToolUse` hook — one writer **per asset**, not per session, so two sessions editing different files run in parallel while two editing the queue collide. **The first claimed components under `.claude/`** |
 <!-- OWNERSHIP-TABLE-END -->
 
 ---

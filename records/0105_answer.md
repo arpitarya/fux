@@ -10,7 +10,7 @@ feature: "`fux answer` — one answer, its footing stated, and the report of wha
 owns: []
 laws: [L1, L2, L3]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: b0f3b4e0f65ba5c7bd8b8e44fcbbf2bae585b6172f99c3c1bcef191bf7205981
+content_sha: fa5b99ff7b060b461a6f853ed05e8ef09eefde1cfa59057069306bd4c5144252
 ---
 
 # SR-ANSWER — the `answer` verb
@@ -385,6 +385,29 @@ verb's fetching path** (W-140 rows 6 and 7, 2026-09-11).
   that verify never goes to the network. The rerun re-ranks from the committed
   index alone now, and a receipt from a refer answer is `unverifiable` rather
   than compared against bytes fetched on the spot.
+
+**`answer`'s freshness policy is READ FROM CONFIG, not written in this module**
+(W-174, 2026-09-14). `query/refer_answer.py` built `Policy(mode=ALWAYS, …)`
+literally; it now builds `ALWAYS` or `NEVER` from
+`[sources.url] fetch_at_answer`. The decision, the name and what the two
+neighbouring attributes do instead are stated once in
+[SR-URL-FRESHNESS](0147_url-freshness.md) decision 16 and are **not restated
+here**; what belongs to this record is the seam:
+
+- **The value rides out of `_load_fetchers`**, as a third return value, rather
+  than being read by `answer_via_refer`. Config is loaded there already, on the
+  only path that needs it — and a second read could pick up a different file,
+  which is the argument this module already makes about `tune`.
+- ⚠ **The no-`url:`-candidate property is preserved**: an all-`file:` candidate
+  set still loads no config, imports no module and connects to nothing. It
+  returns `True` because the question was never asked, not as a default.
+- ⚠ **`not routes` returns the REAL value.** Config *was* read on that path, so
+  stamping `always` into the receipt for a repo that said `never` would be the
+  silent-policy-swap failure `Policy.as_record` exists to close.
+- **`--cache-ttl` under `fetch_at_answer = false` prints a note on stderr** and
+  is otherwise inert. Same contract as this module's other declarations: stderr
+  so a piped stdout stays parseable, ASCII so a Windows codepage cannot crash
+  `print()`.
 
 ### Consequences
 

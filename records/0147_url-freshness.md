@@ -10,7 +10,7 @@ feature: the freshness verdict vocabulary and the per-URL check interval
 owns: [src/fux/refer/freshness.py@6757eeeba7c6]
 laws: [L2, L3, L4]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 0943613bc9e85a333bff3cfe4988eda5006d33b93e1d317d6708bd2ce7ef87bd
+content_sha: 7620b2b745ed44f240e30f00094fc7de05c183d7602551a8efe8d62a4eb1d8d1
 ---
 
 # SR-URL-FRESHNESS: what a citation may claim, and how often it has to earn it
@@ -414,6 +414,78 @@ duration grammar is unchanged — `ttl = "1x"` still fails through the source
 list's own parser, and now `tlt = "1d"` fails too instead of leaving the source
 on its default freshness. ⚠ The record said so from `24c0a3d` and the code landed
 two commits later — see SR-CONFIG after decision 15.
+
+**16. 🔴 `[sources.url] fetch_at_answer` is the THIRD cell of decision 15's
+table, and until 2026-09-14 the mode behind it was built and unreachable**
+(W-174, ratified by Arpit the same day).
+
+`refer/freshness.py` has shipped `Policy(mode=NEVER)` — *"do not fetch.
+Deterministic-replay mode"* — since the module existed, and
+`refer/__init__.py::_obtain`'s never-branch has always fallen back to
+`.fux/acquired/` and returned `as-ingested`. **`query/refer_answer.py`
+constructed `Policy(mode=ALWAYS, …)` literally**, so the third caller this
+record's own module docstring names — *"CI, or a replayed `--audit` bundle:
+**never**"* — had no way to ask for the behaviour written for it.
+
+| attribute | when it acts | what it decides |
+|---|---|---|
+| **`ttl=`** | ask time | how long a citation may go **unchecked** |
+| **`update=`** ([SR-URL-LIST](0116_url-list.md) decision 14) | update time | whether fux goes back for the document **at all** |
+| **`fetch_at_answer`** *(new)* | **ask time** | whether a socket may open **at all** |
+
+- **The name states its clock, which is the entire reason it is three words.**
+  Decision 15 exists to keep two clocks from being read as one knob; a third
+  key called `offline` or `pinned` would have undone it. `offline` also
+  collides with [L4](0006_LAW-4-offline-by-default.md)'s vocabulary and reads
+  as the whole engine rather than the URL refer path. Both rejections are
+  recorded so neither is re-proposed.
+- **Source-wide, boolean, default `true`** — `true` is the behaviour every
+  existing repo already has, so no upgrade changes meaning. There is **no
+  line-level layer**, deliberately ([SR-CONFIG](0113_config.md) decision 12).
+- ⚠ **It is not `--no-refer`.** That flag skips the refer plane entirely: no
+  passage re-scoring, no line ranges, no verification at all. `fetch_at_answer
+  = false` keeps refer **on** and points it at the retained bytes. Opposite
+  intent, adjacent words — which is why both are named here.
+- ⚠ **It is not `update=never` either**, and the sentence four paragraphs above
+  is the proof: *"`update=never` still does not keep `answer` offline, and that
+  is decision 15 working, not a defect."* That gap is what this key closes, on
+  the clock that owns it.
+- **The verdict is what the never-branch already produced**: `as-ingested`
+  against a retained blob (drift, if any, in the note), `unverified` with no
+  blob, and a `file:` citation is untouched — reading the local checkout is not
+  a fetch, which is why `--audit` can still quote the repository it audits.
+- **No retained bytes is DISCLOSED, never refused** (Arpit's ruling,
+  2026-09-14). `fux doctor`'s `pinned url bytes` row counts the listed URLs
+  with no entry in `acquired/manifest.json` and warns. Refusing at load was the
+  alternative and is the wrong shape: [SR-ACQUIRED](0145_acquired-plane.md)
+  already resolves the equally lossy `update=never keep=false` pair as a
+  warning, and a refusal would lock out a repo mid-migration for no benefit.
+- **`--cache-ttl` becomes inert and says so.** With no socket the TTL cache can
+  be neither written nor read, so passing it prints a note on stderr. Staying
+  silent is the W-140 row 6 defect from the other end — there, `min(0, 86400)`
+  made every `ttl=` dead at ask time and nothing said so.
+- **The policy travels, as it always has.** `Policy.as_record()` puts
+  `mode: "never"` in the bundle, `--json` and the receipt, because a replay
+  that silently used a different policy is the failure that method exists to
+  close.
+
+**Declared in [SR-CONFIG](0113_config.md) decision 13's key block**, which
+`tests/test_sr_config_keys.py` holds equal to `config.py`'s `KNOWN_KEYS` in both
+directions — so this record naming the key is not what creates it.
+
+⚠ **The Node reader needs NOTHING, and the reason is worth stating rather than
+leaving as an absence.** W-174 was filed with *"does Node's refer plane fetch at
+all?"* as an open question, because `node/src/config/` reads `tune.toml` and
+`output.toml` and not `fux.toml`. It was settled by reading the plane:
+**Node never fetches** (W-107 R6), stated at the top of both
+`node/src/refer/source.mjs` (*"it imports no transport and has no fetcher seam
+to inject one through"*) and `node/src/refer/freshness.mjs`.
+
+**So the Node reader has always behaved as `fetch_at_answer = false`**, and this
+key does not diverge the two readers — it lets the Python reader be told to
+match. Under `false` the verdicts for a `url:` citation converge exactly:
+`as-ingested` with a retained blob, `unverified` without one, in both. A
+`fux.toml` read in `node/` would be work for no behaviour, and is not owed.
 
 ### Consequences
 

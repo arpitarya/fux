@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@836cc5ab2239, src/fux/setup.py@c0e4866a4884, tests/test_verb_table_agreement.py@2c2a8f52fb6c]
+owns: [src/fux/store/fuxdir.py@836cc5ab2239, src/fux/setup.py@93709065ecd2, tests/test_verb_table_agreement.py@2c2a8f52fb6c]
 laws: [L2, L3, L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 04a535ca87cc2c7b9f45d8be76912603523901357362c090f71b5c77d9ea1dc3
+content_sha: 82c5a69946bd4cf0c914e5b717a6e6a1e0af44ce881bf8f26d279a440e9d841d
 ---
 
 # SR-DOTFUX — the `.fux/` directory
@@ -687,6 +687,18 @@ generator and a skill surface the package did not yet produce.
 [SR-CONFIG](0113_config.md), after its decision 15, carries the general form:
 a record ahead of its code is as misleading as one behind it, and the freshness
 check can see neither.
+
+**The scaffolded `fux.toml` gained one COMMENTED line** (W-174, 2026-09-14):
+`#fetch_at_answer = true`, under `[sources.url]` beside `#update = "auto"`.
+
+- **It shows the default and explains nothing**, which is the only form this
+  file allows: a comment that *describes* a key can drift from the record that
+  decides it while both still look correct (SR-LAW-0 decision 4). The commented
+  default cannot drift into a wrong explanation — at worst it is a value a
+  reader checks against the record the header already points at.
+- **Written commented, not live.** An uncommented `fetch_at_answer = true`
+  would freeze today's default into every repo `fux setup` touches, which is
+  the mistake `acquired_max_bytes` avoids by defaulting to `None`.
 
 ### Consequences
 

@@ -910,3 +910,91 @@ def test_dry_run_writes_no_bytes_anywhere(tmp_path):
 
     assert dirs.read_bytes() == before_list
     assert _shards(tmp_path) == before_shards
+
+
+# -- W-174: `fetch_at_answer = false`, through the real CLI -------------------
+
+#: Logs every lifecycle call. **The absence of this file after `answer` is the
+#: assertion** — stronger than reading a mode out of the JSON, because it
+#: proves no consumer code ran at all, not merely that no fetch was attempted.
+_LOGGING_FETCHER = '''\
+import pathlib
+
+LOG = pathlib.Path(__file__).with_name("calls.log")
+
+def _log(line):
+    with LOG.open("a", encoding="utf-8") as f:
+        f.write(line + "\\n")
+
+def connect():
+    _log("connect")
+
+def close():
+    _log("close")
+
+def fetch(url):
+    _log("fetch:" + url)
+    return "# Runbook\\n\\nRestart the indexer with `fux build --force`.\\n"
+'''
+
+
+def _url_repo(tmp_path: Path, *, extra: str = "") -> None:
+    (tmp_path / "fux.toml").write_text(
+        "[sources]\n"
+        "[sources.url]\n"
+        'fetcher = "mw.py"\n'
+        "max_parallel = 4\n" + extra,
+        encoding="utf-8",
+    )
+    (tmp_path / "mw.py").write_text(_LOGGING_FETCHER, encoding="utf-8")
+    fux = tmp_path / ".fux"
+    (fux / "sources").mkdir(parents=True, exist_ok=True)
+    (fux / "sources" / "dirs").write_text("", encoding="utf-8")
+    (fux / "sources" / "urls").write_text("https://x.test/runbook\n", encoding="utf-8")
+    (fux / "pii.toml").write_text("", encoding="utf-8")
+
+
+def test_fetch_at_answer_false_answers_from_acquired_and_opens_no_socket(tmp_path):
+    """The whole feature, as a user sees it.
+
+    Ingest retains the bytes (`keep` defaults to true), then the flag goes on
+    and `answer` must produce a real, verified citation without the fetcher
+    being loaded, configured, connected or called.
+    """
+    _url_repo(tmp_path)
+    # ⚠ `--refresh-urls`: a plain `ingest` never opens a socket (SR-MAINTENANCE
+    # decision 5a), so without it the URL is listed and not in the index, and
+    # this test would pass for the wrong reason.
+    _run(tmp_path, "ingest", "--refresh-urls")
+    assert (tmp_path / ".fux" / "acquired" / "manifest.json").exists()
+
+    # Everything up to here was allowed to fetch; only what follows is on trial.
+    (tmp_path / "calls.log").unlink()
+    _url_repo(tmp_path, extra="fetch_at_answer = false\n")
+
+    out = _run(tmp_path, "answer", "how do I restart the indexer", "--json").stdout
+    payload = json.loads(out)
+
+    assert payload["source"] == "refer"
+    assert payload["citation"]["freshness"] == "as-ingested"
+    assert not (tmp_path / "calls.log").exists(), "the fetcher was touched under `never`"
+
+
+def test_the_default_still_fetches_so_no_repo_changes_meaning(tmp_path):
+    """The other half of the same claim: silence is today's behaviour."""
+    _url_repo(tmp_path)
+    _run(tmp_path, "ingest", "--refresh-urls")
+    (tmp_path / "calls.log").unlink()
+
+    _run(tmp_path, "answer", "how do I restart the indexer", "--json")
+    log = (tmp_path / "calls.log").read_text(encoding="utf-8")
+    assert "fetch:https://x.test/runbook" in log
+
+
+def test_a_misspelled_flag_is_refused_rather_than_silently_ignored(tmp_path):
+    """The failure this key would otherwise have: a consumer who believes they
+    are offline, and is not."""
+    _url_repo(tmp_path, extra="fetch_at_anwser = false\n")
+    done = _run(tmp_path, "doctor", check=False)
+    assert done.returncode != 0
+    assert "not a fux.toml key" in (done.stdout + done.stderr)

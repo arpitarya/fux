@@ -14,6 +14,9 @@ description: Running any fux command in this repository - resolving the fux bina
   anything** to make it run.
 - **Prefer `--json` and branch on fields**, never on the wording.
 - `ask`/`find` return documents; **only `answer` returns line ranges.**
+- **Thin result = vocabulary gap.** Re-ask with the corpus's word, or add `--expand`
+  — **text YOU write**, 2-3 sentences answering the question in the document's likely
+  words, never a keyword list. Fux cannot write it for you.
 - If every rung fails, say which you tried, then say you fell back.
 
 Full procedure: the `fux-usage` skill.

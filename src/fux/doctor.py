@@ -319,6 +319,7 @@ def _layout(root: Path) -> list[Check]:
         checks.append(daemon_check)
     checks.append(_url_health(root))
     checks.append(_acquired_health(root))
+    checks.append(_pinned_without_bytes(root))
     checks.append(_pii_health(root))
     checks.append(_refusal_health(root))
     checks.append(_decoder_bindings(root))
@@ -539,6 +540,68 @@ def _redaction_note(root: Path, rules) -> str:
     # skill `fux setup` wrote into their repo, which carries a copy.
     note += ". A big number is a hint, not a finding: probe it (the `fux-pii` skill carries the script)"
     return note
+
+
+def _pinned_without_bytes(root: Path) -> Check:
+    """`fetch_at_answer = false` with URLs that have no retained bytes.
+
+    **The disclosure SR-URL-FRESHNESS decision 16 chose over a refusal**
+    (Arpit, 2026-09-14). `[sources.url] fetch_at_answer = false` says *never
+    open a socket at answer time*; a URL with nothing in `.fux/acquired/` then
+    has nothing to verify against, and every citation from it comes back
+    `unverified` — honest, and silently much weaker than the consumer thinks.
+
+    ⚠ **Refusing at load would have been the wrong shape**, and the precedent
+    is this plane's own: [SR-ACQUIRED](../../records/0145_acquired-plane.md)
+    resolves the equally lossy `update=never keep=false` pair as *disclosed,
+    never refused*, because the combination is coherent for a document that
+    genuinely never changes and merely surprising to have chosen by accident.
+    A repo mid-migration — `fetch_at_answer` set before a re-ingest with
+    `keep=true` — would be locked out by a refusal for no benefit.
+
+    **Silent when the flag is on**, which is the default: there is nothing to
+    warn about while fux may still go and look.
+    """
+    from .config import load as load_config
+    from .ingest import urlsrc
+    from .store import acquired
+
+    name = "pinned url bytes"
+    try:
+        config = load_config(root)
+    except FuxError:
+        return Check(name, True, "no readable fux.toml - another check owns that")
+    if config.url is None or config.url.fetch_at_answer:
+        return Check(name, True, "fetch_at_answer is on - answers may verify against the source")
+
+    try:
+        entries = urlsrc.resolve_urls(urlsrc.read_urls(root, config.url.urls_file), config.url)
+    except (FuxError, OSError):
+        return Check(name, True, "no readable url list - another check owns that")
+    if not entries:
+        return Check(name, True, "fetch_at_answer is off, and no url is listed")
+
+    try:
+        manifest = acquired.read_manifest(root)
+    except (FuxError, OSError):
+        manifest = {}
+    missing = sorted(e.url for e in entries if e.url not in manifest)
+    if not missing:
+        return Check(
+            name,
+            True,
+            f"fetch_at_answer is off; all {len(entries)} url(s) have retained bytes - "
+            "citations verify as `as-ingested`",
+        )
+    return Check(
+        name,
+        True,
+        f"fetch_at_answer is off and {len(missing)} of {len(entries)} url(s) have NO retained "
+        f"bytes: {', '.join(missing[:3])}"
+        + (f" (+{len(missing) - 3} more)" if len(missing) > 3 else "")
+        + " - every citation from these will be `unverified`. Set keep = true and re-ingest",
+        level="warn",
+    )
 
 
 def _acquired_health(root: Path) -> Check:

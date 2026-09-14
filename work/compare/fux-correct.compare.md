@@ -95,6 +95,26 @@ refusal), [SR-PROVENANCE](../../records/0142_provenance.md).
 - If `ctx`'s weight has to be raised for corrections to bite, that is a
   ranking change and goes through W-156's rule, not through this record.
 
+## 6 · What is tested, what is measured, and the keep/remove call
+
+**Order: implement → test → measure the generalisation claim → call.** The
+mechanism is small enough to build first; what must be *measured* is the one
+claim the pin cannot make — that a human line helps phrasings other than its
+own.
+
+| | how | keep if | remove if |
+|---|---|---|---|
+| the verb writes and preserves human lines | unit tests: append, regeneration preserves, marker survives, `--check` reports-never-refuses | tests hold | — |
+| the eval row | each correction's own question retrieves its document at top-3 after ingest; the check runs in the suite | holds for every filed correction | a correction that cannot retrieve its own document is *reported* (that is what the eval row is for), never silently dropped |
+| **generalisation** (the reason (b) beat (a)) | pre-registered on golden: for N corrections, M held-out paraphrases per correction, written blind by Codex; measure top-3 retrieval of the corrected document on the paraphrases, before vs after | paraphrase retrieval gain clears the SR-RS d19 floor, **and** no golden answerable question loses its top-1 (the tilt check) | fails → human lines are **no longer indexed into `ctx`** (they share the field with model lines, so there is no per-author weight to turn down); they stay as eval rows, and exact-question `--pin` becomes the default effect |
+| `--pin` | tests: exact-match only, suspended on sha change, labelled everywhere | tests hold | — (it is opt-in and rare by design) |
+| the guide skill and steering | the `test_setup_agents` renderings equal the templates; a proposal-not-write assertion in the policy test | tests hold | — |
+
+- **Do not measure with the 20 blind unanswerables** or the sealed key's
+  questions as the correction source — corrections must come from real
+  failures on a corpus the measurer did not grade.
+- **Ambiguous → Arpit**, per-query rows filed.
+
 ## Reference
 
 - Rocchio — *Relevance feedback in information retrieval*, in Salton (ed.),

@@ -11,7 +11,7 @@ owns: [src/fux/query/expand.py@c4c8d5671973, src/fux/query/fuse.py@749673d52166]
 laws: [3, 4, 8]
 ratifies: W-109
 timestamp: 2026-09-05T00:00:00Z
-content_sha: ec724601b51f754ec27cac623b36792651632f827cdb6e4224fc5c5e8f6dc067
+content_sha: 787955bc7dfd393e2376c635542030615ab13d65cbc2eda328e36388d5cbe3fd
 ---
 
 # SR-EXPAND: the caller supplies the vocabulary, and fuses its own phrasings
@@ -240,6 +240,26 @@ reaches no committed byte.
   deliberately misleading expansion among documents that all match; that is a
   trust boundary this record does not close, and `--expand` is opt-in per call
   rather than a mode.
+- ⚠ **A slot nobody is told to fill is an unused slot — closed 2026-09-14.**
+  This record says the caller supplies the vocabulary; until now **the guide
+  skills never said so**. They listed `--expand` as a flag and told an agent to
+  "add `--expand`" on a thin result, with a placeholder (`<words the doc would
+  use>`) that pointed at **synonyms** — the weaker form Query2doc is explicitly
+  not. An agent reading only the guide could reasonably assume fux expands.
+  `SEARCH-SKILL.md` §5a now states the authorship, the passage shape, the
+  order of operations, and that `-q` is a different tool; `ANSWER-SKILL.md` and
+  the steering pointer carry one line each. **No engine behaviour changed** —
+  this closes a documentation gap that made decision 1 unreachable in practice.
+- 🔴 **Extended to ALL FIVE agent-facing kinds the same day (Arpit): skills,
+  steering, rules, instructions and the `agents` files.** The first pass fixed the
+  skills only, and the worse defect was elsewhere: `USAGE-SKILL.md`,
+  `fux-usage.instructions.md` and `MCP-SKILL.md` each shipped a **worked example in
+  the keyword-soup form** (`--expand "checkout unavailable 47 minutes incident
+  timeline"`) — an agent copying it got the weaker variant Query2doc measures
+  *against*, while believing it had followed the guide. All five kinds now carry the
+  authorship and the passage shape; `rule-*` files are file-scoped and teach no
+  searching, so they carry nothing. ⚠ **A guide that names a flag is not a guide that
+  gets it used** — and a wrong worked example is worse than none.
 - **Two RRF arms at `--top 5` fuse shallowly.** Decision 11's cost, stated: a
   document ranked 6th in both arms is invisible to the fusion. Raising `--top`
   is the whole remedy.

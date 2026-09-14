@@ -25,12 +25,13 @@ the refer plane's own honest `unverified` verdict (`refer/source.py`'s
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 from ..errors import FuxError
 from ..refer import Bundle, Policy, refer
-from ..refer.freshness import ALWAYS
+from ..refer.freshness import ALWAYS, NEVER
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from ..tune import Tune
@@ -82,7 +83,7 @@ def answer_via_refer(
     """
     if not citations:
         return None
-    fetch, close = _load_fetchers(root, citations)
+    fetch, close, fetch_at_answer = _load_fetchers(root, citations)
     # Absent, rather than defaulted here: `refer()` owns what these mean when
     # nobody has said, and restating its four defaults in this module would be
     # a second copy that no test compares against the first.
@@ -111,12 +112,37 @@ def answer_via_refer(
     # **Still `0` unless the caller asks** (`--cache-ttl`), so W-60 verdict F
     # holds exactly as before: a caller who did not ask for caching cannot be
     # served a cached byte.
+    # ⚠ **`[sources.url] fetch_at_answer = false` selects the mode that was
+    # BUILT AND UNREACHABLE** (W-174). `freshness.py` has shipped
+    # `Policy(mode=NEVER)` — *"do not fetch; the index at this commit is the
+    # answer"* — since the module existed, and `refer._obtain`'s never-branch
+    # has always fallen back to `.fux/acquired/` and reported `as-ingested`.
+    # This line was `mode=ALWAYS` literally, so the third caller that module's
+    # own docstring names (*"CI, or a replayed `--audit` bundle: never"*) had
+    # no way to ask for it.
+    #
+    # ⚠ **This is not `--no-refer`, and the difference is the point.**
+    # `--no-refer` skips this module entirely: no passage re-scoring, no line
+    # ranges, no verification at all. `never` keeps the refer plane ON and
+    # points it at the retained bytes.
+    mode = ALWAYS if fetch_at_answer else NEVER
+    if not fetch_at_answer and cache_ttl_seconds > 0:
+        # Declared, never silently dropped. `ttl=` was dead at ask time in
+        # every repo for weeks because `min(0, 86400)` is 0 and nothing said
+        # so (W-140 row 6); an inert `--cache-ttl` is the same defect from the
+        # other end. ASCII only -- a Windows console's default codepage
+        # crashes `print()` on a fancy dash rather than degrading.
+        print(
+            "fux: --cache-ttl has no effect - [sources.url] fetch_at_answer is false,\n"
+            "     so no fetch happens and there is nothing to cache.",
+            file=sys.stderr,
+        )
     try:
         bundle = refer(
             root,
             query,
             list(citations),
-            policy=Policy(mode=ALWAYS, cache_ttl_seconds=cache_ttl_seconds),
+            policy=Policy(mode=mode, cache_ttl_seconds=cache_ttl_seconds),
             fetcher=fetch,
             **sizes,
         )
@@ -150,10 +176,26 @@ def _load_fetchers(root: Path, citations: list[tuple[str, str, str]]):
     import, no connect — byte-identical to the path a `file:`-only corpus took
     before this function existed.
 
-    Returns `(None, noop)` when nothing can be resolved at all, so the refer
-    plane's own graceful degradation takes over rather than this crashing
+    Returns `(None, noop, ...)` when nothing can be resolved at all, so the
+    refer plane's own graceful degradation takes over rather than this crashing
     `answer`. The caller must call the returned `close` in a `finally`,
     mirroring `urlsrc.fetch_all`'s own connect/close bracket.
+
+    ## The third return value, and why it is returned from HERE
+
+    `[sources.url] fetch_at_answer` (W-174) rides out of this function rather
+    than being read by the caller, for the reason this module already gives
+    about `tune`: **a second read could pick up a different file**, and the
+    policy a bundle records must be the one it ran under. Config is loaded here
+    exactly once, on the path that already needs it.
+
+    ⚠ **`True` on the early returns is not a default — it is the honest answer
+    to a question that was never asked.** No `url:` candidate means no config
+    is read at all (the property stated above, preserved); no `[sources.url]`
+    table means the key cannot have been set. **`not routes` is different and
+    returns the REAL value**: config *was* read there, so reporting `always` in
+    the receipt for a repo that said `never` would be the silent-policy-swap
+    failure `freshness.Policy.as_record` exists to close.
     """
 
     def noop() -> None:
@@ -162,7 +204,7 @@ def _load_fetchers(root: Path, citations: list[tuple[str, str, str]]):
     # Order-preserving and de-duplicated: two candidates may cite one URL.
     urls = list(dict.fromkeys(loc for doc_id, loc, _sha in citations if doc_id.startswith("url:")))
     if not urls:
-        return None, noop
+        return None, noop, True
 
     from ..config import load as load_config
     from ..ingest import urlsrc
@@ -170,10 +212,19 @@ def _load_fetchers(root: Path, citations: list[tuple[str, str, str]]):
     try:
         config = load_config(root)
         if config.url is None:
-            return None, noop
+            return None, noop, True
+        if not config.url.fetch_at_answer:
+            # ⚠ **Return before the fetcher is even LOADED** (W-174). `never`
+            # opens no socket, so resolving one would import consumer code,
+            # call its `configure()` and run its `connect()` for nothing — and
+            # for `cdp.py` that `connect()` attaches to a signed-in Chrome.
+            # *Expensive and interactive at answer time* is the cost
+            # SR-ACQUIRED was written to remove; paying it and then not
+            # fetching would be the worst of both.
+            return None, noop, False
         entries = urlsrc.resolve_urls(urlsrc.read_urls(root, config.url.urls_file), config.url)
     except FuxError:
-        return None, noop
+        return None, noop, True
     by_url = {entry.url: entry for entry in entries}
 
     modules: dict[str, object] = {}
@@ -207,7 +258,7 @@ def _load_fetchers(root: Path, citations: list[tuple[str, str, str]]):
         routes[url] = module
 
     if not routes:
-        return None, noop
+        return None, noop, config.url.fetch_at_answer
 
     def dispatch(url: str) -> str:
         module = routes.get(url)
@@ -225,4 +276,4 @@ def _load_fetchers(root: Path, citations: list[tuple[str, str, str]]):
             except Exception:  # pragma: no cover - a close must not fail an answer
                 pass
 
-    return dispatch, close_all
+    return dispatch, close_all, config.url.fetch_at_answer

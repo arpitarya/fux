@@ -1817,3 +1817,54 @@ def test_thin_urls_is_silent_without_an_acquired_plane(tmp_path):
     row = _row(_drift_repo(tmp_path), "url extraction depth")
     assert row.ok
     assert "no" in row.detail.lower()
+
+
+# -- pinned url bytes (W-174) ------------------------------------------------
+
+
+def _pinned_repo(tmp_path, *, urls=("https://x.test/a",), flag="fetch_at_answer = false\n"):
+    root = _drift_repo(tmp_path)
+    (root / "fux.toml").write_text(
+        "[sources]\n[sources.url]\nmax_parallel = 4\n" + flag, encoding="utf-8"
+    )
+    (root / ".fux" / "sources" / "urls").write_text(
+        "".join(f"{u}\n" for u in urls), encoding="utf-8"
+    )
+    return root
+
+
+def test_pinned_row_is_silent_while_fetch_at_answer_is_on(tmp_path):
+    """The default. There is nothing to warn about while fux may still look."""
+    row = _row(_pinned_repo(tmp_path, flag=""), "pinned url bytes")
+    assert row.ok
+    assert "fetch_at_answer is on" in row.detail
+
+
+def test_pinned_row_names_the_urls_with_no_retained_bytes(tmp_path):
+    root = _pinned_repo(tmp_path, urls=("https://x.test/a", "https://x.test/b"))
+    row = _row(root, "pinned url bytes")
+    assert row.ok  # disclosed, NEVER refused — Arpit, 2026-09-14
+    assert row.level == "warn"
+    assert "2 of 2" in row.detail
+    assert "https://x.test/a" in row.detail
+    assert "unverified" in row.detail
+
+
+def test_pinned_row_is_quiet_when_every_url_has_bytes(tmp_path):
+    from fux.store import acquired
+
+    root = _pinned_repo(tmp_path)
+    blob = acquired.save(root, "https://x.test/a", b"# A\n\nbody\n", "text/markdown", ".md")
+    acquired.write_manifest(root, {"https://x.test/a": blob})
+    row = _row(root, "pinned url bytes")
+    assert row.ok
+    assert row.level == "error"  # i.e. the default level: an ok row, not a warning
+    assert "as-ingested" in row.detail
+
+
+def test_pinned_row_never_raises_on_an_unreadable_repo(tmp_path):
+    """A traceback out of a health command is the worst answer to *what is
+    wrong*. Every reader on this path degrades, and this one is no exception."""
+    (tmp_path / "fux.toml").write_text("[sources\n", encoding="utf-8")  # invalid TOML
+    row = _row(tmp_path, "pinned url bytes")
+    assert row.ok

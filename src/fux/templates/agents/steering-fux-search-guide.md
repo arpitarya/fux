@@ -10,6 +10,8 @@ description: Searching the Fux index with fux ask or fux find - flags, the confi
 - **`answerable: false` or band `none`: abstain.** `partial`: answer and name
   every term in `confidence.missing`, or retry with the corpus's own word or
   `--expand`. `weak`: report candidates, not a conclusion.
+- **`--expand` text is YOURS to write, never fux's.** 2-3 sentences in the
+  document's likely words, not synonyms. `-q` is separate: real phrasings, RRF.
 - **Scores compare only within one result list**; a fused (`-q`) score is a
   different quantity.
 - `find` filters (`--under`, `--phrase`, `--all`) never add results - raise

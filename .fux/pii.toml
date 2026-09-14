@@ -2,7 +2,7 @@
 #
 # THIS FILE IS YOURS, AND FUX WILL NOT RUN WITHOUT IT. `fux setup` writes it
 # once if it is missing and never rewrites it; delete it and every command
-# stops with an error (ADR-PII decision 17). To redact nothing, keep the file
+# stops with an error (SR-PII decision 17). To redact nothing, keep the file
 # and comment out every rule -- that is a choice; a missing file is an accident.
 #
 # Fux ships the matcher; the policy is yours, because what counts

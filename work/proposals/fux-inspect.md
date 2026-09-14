@@ -2,10 +2,12 @@
 type: Proposal
 title: "`fux inspect` — an X-ray of the index: boilerplate words, unfindable documents, duplicates, orphans"
 description: "Arpit asked for a tool that says what the index looks like across all documents — which words are on every card (\"TLDR\"), whether documents produce similar or different index shapes, and whether the consumed index is good or bad. Proposed: a read-only verb with six lenses (boilerplate, findability, length and fields, duplication and templates, analyzer coverage, graph), descriptive by default with three declared checks whose floors are provisional. The committed index holds term hashes, so the words come from a local, gitignored dictionary built by re-tokenising the sources; nothing new is committed."
-status: proposed
+status: graduated
 timestamp: 2026-09-13T00:00:00Z
 filed: 2026-09-13
 ---
+
+**Graduated 2026-09-14 → [W-169](../open/W-169-fux-inspect.md)** (Arpit). This file stays the spec the item points at.
 
 # `fux inspect` — an X-ray of the index
 
@@ -84,6 +86,24 @@ The report prints the lever beside the finding. It never applies one.
 - **Tune-free:** it reads; it never changes ranking.
 - Both readers eventually; Python first — the dictionary build needs the
   analyzer, which Node has.
+
+## 5b · What is tested, what is measured, and the keep/remove call
+
+`inspect` changes no ranking, so it is judged on **truthfulness and
+determinism**, not on a quality number — except its three checks, whose floors
+are measured.
+
+| | how | keep if | remove if |
+|---|---|---|---|
+| determinism | the report over the same index is byte-identical twice, and across the two readers once Node has it | holds | — (L3 makes this a defect, not a call) |
+| the lenses tell the truth | a **planted corpus** in `tests_e2e/`: a known boilerplate term on every document, two near-duplicates, one template family, one unfindable document, one orphan, one zero-token file — each lens must name its plant and nothing else | every plant named, no false name | a lens that cannot find its plant is removed from the report |
+| nothing committed | a test that `fux inspect` on a clean clone leaves `git status` clean and writes only under `.fux/runtime/inspect/` | holds | — |
+| the three checks' floors | measured on the golden ladder: findable share, boilerplate share, near-duplicate share per rung; the floors are set from the ladder **and marked provisional** | a floor separates the planted-bad corpus from every golden rung | a floor that flags a healthy rung is dropped to *descriptive* — the number prints, the flag does not |
+| the levers are right | each finding's suggested lever is one the records name; a test holds the finding→lever table equal to the record | holds | — |
+
+Order: implement → test (planted corpus) → measure the floors → call the
+flags. The verb ships even if all three flags are dropped; the report is the
+product, the flags are a convenience.
 
 ## 6 · Graduation trigger
 

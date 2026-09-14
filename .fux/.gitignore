@@ -12,3 +12,4 @@ acquired/
 
 __pycache__/
 .doctor-probe
+node/node_modules/

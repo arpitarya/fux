@@ -16,19 +16,19 @@ of THREE kinds:
 |---|---|---|
 | `README.md` | committed | this file: written once by fux, yours to annotate |
 | `.gitignore` | committed | lists the ignored directories BY NAME, never `*` |
-| `index/` | committed | the wire-format index (ADR-RECORD) |
+| `index/` | committed | the wire-format index (SR-RECORD) |
 | `sources/` | committed | the committed source lists (`dirs`, `urls`), one entry per line |
 | `fetchers/` | committed | consumer-owned code (`cdp.py`, `http.py`), edit freely |
-| `decoders/` | committed | consumer-owned code, one module per format. THESE COPIES ARE WHAT RUN, not the ones inside the installed package (ADR-DECODE) |
+| `decoders/` | committed | consumer-owned code, one module per format. THESE COPIES ARE WHAT RUN, not the ones inside the installed package (SR-DECODE) |
 | `enrich/` | committed | pinned enrichment text, one file per source content sha, plus `queue.tsv` (W-86 P6: what fux could NOT read and a model must). Committed, because a backlog is a team fact |
-| `node/` | committed | the vendored Node read plane (`fux-engine`), engine-owned and REWRITTEN on a version change -- not write-if-missing, because nobody edits it and a stale copy is a wrong answer (ADR-NODE-SEARCH) |
-| `tune.toml` | committed | the tunables: HOW results are ordered, never what is indexed (ADR-TUNE) |
-| `output.toml` | committed | the output defaults: HOW a result is SHOWN, never which documents come back (ADR-OUTPUT) |
-| `formats.toml` | committed | which files are documents (`include`) and which decoder reads each extension (`[decoders]`). Optional - absent means the built-in default. Replaced .fux/sources/types on 2026-09-11 (ADR-TYPES) |
-| `.fuxignore` | committed | what is NOT indexed, in .gitignore's grammar. The one place exclusions belong, read before the source lists (ADR-FUXIGNORE) |
-| `pii.toml` | committed | REQUIRED - every command refuses without it. What is REDACTED from the committed index - and ONLY from it. The acquired bytes, the refer plane and every answer quote still see the document as it is (ADR-PII) |
-| `refusals.toml` | committed | what a REFUSAL looks like here - the sign-in walls, paywalls and error shells a server returns INSTEAD of the document. Consumer-owned; fux ships no vendor knowledge (ADR-REFUSAL) |
-| `fux` | committed | a 3-line shim: `.fux/fux find rollback` in a clone with nothing installed. Runs `node .fux/node/fux.mjs` (ADR-NODE-SEARCH) |
+| `node/` | committed | the Node read plane (`fux-engine`) as ONE BUNDLED FILE plus its manifest -- build output, never fux's source (L10). Engine-owned and REWRITTEN on a version change, not write-if-missing, because nobody edits it and a stale copy is a wrong answer. In a monorepo it is a workspace member holding only a manifest (SR-NODE-SEARCH) |
+| `tune.toml` | committed | the tunables: HOW results are ordered, never what is indexed (SR-TUNE) |
+| `output.toml` | committed | the output defaults: HOW a result is SHOWN, never which documents come back (SR-OUTPUT) |
+| `formats.toml` | committed | which files are documents (`include`) and which decoder reads each extension (`[decoders]`). Optional - absent means the built-in default. Replaced .fux/sources/types on 2026-09-11 (SR-TYPES) |
+| `.fuxignore` | committed | what is NOT indexed, in .gitignore's grammar. The one place exclusions belong, read before the source lists (SR-FUXIGNORE) |
+| `pii.toml` | committed | REQUIRED - every command refuses without it. What is REDACTED from the committed index - and ONLY from it. The acquired bytes, the refer plane and every answer quote still see the document as it is (SR-PII) |
+| `refusals.toml` | committed | what a REFUSAL looks like here - the sign-in walls, paywalls and error shells a server returns INSTEAD of the document. Consumer-owned; fux ships no vendor knowledge (SR-REFUSAL) |
+| `fux` | committed | the shim: `.fux/fux find rollback` in a clone with nothing installed. Resolves the reader in three rungs -- the vendored bundle, this member's `node_modules/.bin`, then every ancestor's -- because npm and yarn hoist that bin and pnpm and bun do not (SR-NODE-SEARCH) |
 | `runtime/` | derived | M2 accelerator segments, M4's fetch cache at `runtime/fetch-cache/`, the write lock, and `enrich-progress.tsv` (W-86 P6: which queued documents THIS machine has handled - local by design, so two people's progress cannot conflict on a pull); carries `CACHEDIR.TAG` |
 | `acquired/` | acquired | the bytes a fetch actually returned, for URLs whose line says keep=true. Gitignored and NOT rebuildable - re-acquirable only, and only while the source is still reachable; carries CACHEDIR.TAG |
 
@@ -158,7 +158,7 @@ import json, subprocess
 def ask(question, top=5):
     p = subprocess.run(
         ["fux", "ask", question, "--json", "--top", str(top), "--band"],
-        capture_output=True, text=True,
+        capture_output=True, text=True, encoding="utf-8",
     )
     if p.returncode != 0:
         raise RuntimeError(p.stderr.strip())

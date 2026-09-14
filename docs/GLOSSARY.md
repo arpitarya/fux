@@ -18,6 +18,14 @@ trigger).*
 
 ---
 
+**Acquired plane** — `.fux/acquired/`: the bytes a fetch returned, kept. A
+third category beside committed and derived — **gitignored like derived, and
+not rebuildable**, because a blob can only be re-*acquired*, and only while the
+source still exists. It is what lets a `url:` citation be verified with no
+network: the verdict becomes `as-ingested` rather than `unverified`. Bounded by
+`acquired_max_bytes`, evicted oldest-first by run counter, never by a clock.
+See [SR-ACQUIRED](../records/0145_acquired-plane.md).
+
 **Adapter** — A per-source-system reader on the [refer](#refer-mode) path:
 given a [locator](#locator) and a version, it returns bytes. v0.30 ships
 exactly three — git-dir, generic HTTP (conditional GET), Confluence REST —
@@ -30,6 +38,19 @@ and the cap is a decision, not a backlog. MCP is the endgame and is parked as
 2026-08-09); the archived engine's SRs 0001–0015 live at
 [`archive/v0.26-docs/adr/`](../archive/v0.26-docs/adr/) and are always cited
 as "archived SR-NNNN". See [CLAUDE.md](../CLAUDE.md), [adr/README](../records/README.md).
+
+**Agent surface** — Any file fux writes into a consumer's repository that an AI
+coding agent reads or runs. Classified by **what it does**, never by which
+vendor reads it: **instructing** (skills · steering · rules · instructions ·
+`agents` files — prose an agent may or may not load), **acting** (hooks ·
+settings · commands · subagents · output styles — it fires, gates or is
+invoked), **protocol** (MCP tool and parameter descriptions — no file is
+involved) and **emitted** (what a command prints: errors, `--why`, `doctor`
+rows, the confidence block). ⚠ *Agent-steering files* in `CLAUDE.md` and
+*vendor surfaces* in SR-AGENT-POLICY are **the same thing**; both defer to this
+entry. Do not call the category "steering" — that is one of its members. See
+[SR-AGENT-SURFACES](../records/0155_agent-surfaces.md); the vendor roster is
+[SR-AGENT-POLICY](../records/0132_agent-policy.md).
 
 **AI-assisted mode** — See [enriched mode](#enriched-mode).
 
@@ -327,13 +348,24 @@ What an [adapter](#adapter) needs to fetch the bytes back.
 
 **Fetcher (URL)** — The **consumer's own** Python file, committed at
 `.fux/fetchers/cdp.py`, that turns a URL into markdown. Fux imports it by
-path — only under `fux add <URL>` or `fux update` — and calls
+path — under `fux add <URL>`, `fux update`, and **`fux answer`**, which
+verifies a `url:` citation against its source unless
+[`fetch_at_answer`](#fetch-at-answer) is off — and calls
 `configure(config)` / `connect()` / `fetch(url)` / `close()`. Every socket in
 the system lives here, outside `src/fux/`, which is how the
 [`$0`](#0-the-zero-dollar-law) offline-by-default laws survive URL ingestion.
 Tunables arrive through the opaque `[sources.url.config]` table, never as
 typed keys in fux's schema. See [SR-URL-INGEST](../records/0107_url-ingest.md),
 [SR-DOTFUX](../records/0102_fux-directory.md).
+
+**`fetch_at_answer`** — The `fux.toml` boolean that decides whether
+`fux answer` may open a socket **at all**. `true` (the default) is the
+verifying path: fetch each `url:` citation and compare shas. `false` pins every
+one of them to `.fux/acquired/` — no fetcher is loaded, no
+`connect()` runs, and the verdict is `as-ingested` against the retained bytes
+(or `unverified` with none). **Not `--no-refer`**, which turns the refer plane
+off entirely, and **not `update=never`**, which is the update-time clock. See
+[SR-URL-FRESHNESS](../records/0147_url-freshness.md) decision 16.
 
 **MPH (minimal perfect hash)** — A collision-free term→slot map at ~2–3
 bits/key, the planned `D/` dictionary upgrade (~15 MB saving at 10⁶ docs — **deferred-target arithmetic**; the design point is 10 000 since 2026-08-21).

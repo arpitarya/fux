@@ -187,6 +187,34 @@ fux ask "<q>"                   ==  lexical ─► graph ─► split ─► con
 
 ---
 
+## 7 · Build order, what is tested, and the keep/remove call
+
+**Principle: each component is kept or removed on its own evidence.** The
+atoms are not a ranking change and are judged by tests; the two tiers are a
+ranking change and are judged by a pre-registered measurement — **one arm per
+tier**, so a failure removes the tier that failed and nothing else.
+
+| step | what | order | proves it | keep if | remove if |
+|---|---|---|---|---|---|
+| 1 | `fux lexical` (W-160) | implement → test | byte-identical to today's `ask` on every golden rung, both readers | the test holds | — it cannot fail without `ask` failing first |
+| 2 | `fux graph --seed` (W-160) | implement → test | `graph "<q>"` ≡ `graph --seed <lexical top-k>`; walk unchanged byte-for-byte at defaults | the test holds | — |
+| 3 | Node graph plane (W-160) | implement → test | `graph.json` digest equal on every rung; `graph`/`path`/`explain` byte-equal under `npx` | 0 discordant across the ladder | digest differs on any rung and cannot be reconciled in the item → the plane is withdrawn from Node, the Python atoms stay |
+| 4 | **pre-registration** for W-161 | **write before any build** | a frozen file naming the golden link-dependent question set, `k`, the paired floor (SR-RS d19), both directions | — | — |
+| 5 | Tier A boost (W-161, arm A) | implement → measure | paired vs `lexical` on golden: net flips on recall@k | net ≥ the SR-RS d19 floor for the discordant count **and** zero new misses on answerable questions | either direction fails → the boost is removed (`ask` Tier A = `lexical` order), Tier B unaffected |
+| 6 | Tier B related (W-161, arm B) | implement → measure | on link-dependent questions: fraction whose answer document appears in `related` when absent from Tier A | ≥ the pre-registered floor, and the `related` list's median length ≤ the registered cap | fails → `related` stays as an opt-in flag, default off, and `graph --seed` remains the way to reach it |
+| 7 | `answer` reads `ask` (W-161) | implement → test | refer passage re-score drops a Tier-B doc with no passage support; receipt names the tier | the test holds and Tier B survives step 6 | Tier B removed → `answer` reads Tier A only, which is `lexical` order |
+| 8 | composition tests | with 5–7 | `ask` lexical stage ≡ `lexical`; `ask.related` ≡ `graph --seed(lexical top-k)` | always on | — |
+
+- **Two arms, never one.** A single "graph on/off" measurement cannot say
+  which tier moved the number. Steps 5 and 6 are separate pre-registered arms
+  on the same frozen set.
+- **Who calls it.** Steps 1–3 and 7–8: the tests, in CI. Steps 5–6: the
+  verdict file under `work/regression/`, ambiguous results handed to Arpit,
+  never adjudicated by the session that ran them.
+- **Golden prerequisite is a hard stop.** If the key carries fewer
+  link-dependent questions than the d19 floor can resolve, W-161 does not
+  start; the atoms still ship.
+
 ## Reference
 
 - Cormack, Clarke, Buettcher — *Reciprocal Rank Fusion outperforms Condorcet

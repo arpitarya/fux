@@ -2,6 +2,11 @@
 
 This repo has a committed fux index. Search it before you grep.
 
+If a search comes back thin, the cause is almost always a **vocabulary gap** — the
+document does not use your words. Re-ask with the corpus's word, or add `--expand`
+with a short passage **you write** answering the question in the words the document
+would use. Fux never writes that passage: no fux path may call a model.
+
 ## Running fux — try these in order, stop at the first that works
 
     fux --version

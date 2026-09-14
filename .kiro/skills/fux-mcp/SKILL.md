@@ -54,8 +54,11 @@ advantage is a warm process with no per-call start-up, and a client with no shel
 
 - **`k`** defaults to the server's resolved `[mcp] top` (§3), and the tool schema
   advertises that value. An explicit `k` wins.
-- **`expand`** is words you expect the document to use when they differ from the
-  question's. Scored below the query's own terms; a document matching *only*
+- **`expand`** is the vocabulary-gap slot, and **you fill it**: fux never generates
+  it (no fux path may call a model), so an unfilled `expand` simply does nothing.
+  Write 2-3 sentences answering the question in the words the document would use —
+  a passage, **not a keyword list**. A document matching only your words is dropped,
+  so a wrong guess costs nothing. Use it when the corpus's words differ from the
   them is never returned. Use it after a `partial` with non-empty `missing`.
 - **Results are documents, not spans.** `headings` (at most three, `[]` is a real
   answer) tells you *where* to look; `fux_passage` reads it.

@@ -11,7 +11,7 @@ owns: [node@c5751fcae21e, src/fux/store/nodebundle.py@071a24a596dd]
 laws: [L1, L3, L4, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 0fc1eed8987d8f018543716f60655b822edf5c55ba9650c4a551cd2a4ff8d584
+content_sha: 8aabe92a6992b6b3b1e7cd79ff7acc165daf3780b02f84e5c8f37bcf45a25eec
 ---
 
 # SR-NODE-SEARCH — the Node read plane
@@ -534,6 +534,22 @@ failure message says so, and names the one-line `.yarnrc.yml` change that would
 make shape C available.
 
 ### Consequences
+
+- **`fetch_at_answer = false` COLLAPSES decision 4's asymmetry, from Python's
+  side** (2026-09-14, W-174). `[sources.url] fetch_at_answer = false` tells
+  `fux answer` never to open a socket for `url:` documents; Python then does
+  exactly what decision 3 says Node always does — read `.fux/acquired/` if the
+  blob was retained, fall back to the index if not — so for such a repo the
+  table's two divergent rows go away: no `current`/`stale` on a URL from either
+  reader, and no `cached` from either.
+
+  ⚠ **Node needs no change for this, and that is the point.** There is no
+  transport in `node/` to switch off, so the flag is inert there and the two
+  readers agree by construction. **The asymmetry is NOT retired** — it is the
+  default behaviour with the flag on, which is what ships — and Node still
+  cannot *offer* the verdicts Python offers by default. What is recorded here is
+  that a consumer can now choose the symmetric half, and that choosing it costs
+  them the strongest verdicts rather than buying them anything Node lacked.
 
 - **W-163's eight `fux doctor` rows changed `doctor.py` and changed NOTHING this
   record describes** (2026-09-14). Stated here because the freshness gate was
