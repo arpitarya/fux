@@ -10,7 +10,7 @@ feature: "`.fux/sources/urls` — the file format itself, and the one grammar bo
 owns: [src/fux/ingest/sourcelist.py@55a5f3e2ee67]
 laws: [L2, L3, L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: c4effc3c16d88ef49e01fbc564e62d1a07c951f204f134db95adea26d56449b1
+content_sha: 9b0d0e031209f49106bc3db16e81ca1a50b1ea55a538b50d92432aba2dbe368a
 ---
 
 # SR-URL-LIST — the committed URL list
@@ -421,6 +421,18 @@ line in a repo whose `[sources.url]` said `7d`.
 - ⚠ **Editing `[sources.url]` later still does not reach an existing line**, and
   cannot: decision 12 means the line has already spoken. That is the cost of
   stating everything, and it is now the only cost rather than one of two.
+
+**`update` is now WRITTEN, not commented, in the scaffolded `fux.toml`**
+(Arpit, 2026-09-14). It shipped as `#update = "auto"` and was the only
+`[sources.url]` key whose default a consumer could not see in their own file.
+The ruling, the rule it establishes (a **closed, small value domain** is
+written live; a tuning number defers), and what it costs are stated once in
+[SR-DOTFUX](0102_fux-directory.md) and are **not restated here**.
+
+⚠ **Nothing about the attribute changed** — not the grammar, not the two
+values, not the line-beats-source-wide resolution. What changed is that a repo
+scaffolded today can read `update = "auto"` and discover `"never"` exists
+without leaving the file.
 
 ### Consequences
 

@@ -22,7 +22,7 @@ from fux.ingest.urlsrc import resolve_urls
 def _repo(tmp_path, body):
     (tmp_path / ".fux" / "sources").mkdir(parents=True, exist_ok=True)
     (tmp_path / ".fux" / "sources" / "urls").write_text(body, encoding="utf-8")
-    return SimpleNamespace(url=None)
+    return SimpleNamespace(url=None, urls_file=".fux/sources/urls")
 
 
 # -- the declaration reaches the ingest ------------------------------------
@@ -47,7 +47,7 @@ def test_an_absent_list_is_empty_and_never_raises(tmp_path):
     surviving records is already `_listed_url_ids`' loud error — this must not
     be a second, worse copy of it."""
     (tmp_path / ".fux" / "sources").mkdir(parents=True)
-    assert _archived_url_ids(tmp_path, SimpleNamespace(url=None)) == set()
+    assert _archived_url_ids(tmp_path, SimpleNamespace(url=None, urls_file=".fux/sources/urls")) == set()
 
 
 def test_it_reads_the_list_without_a_sources_url_block(tmp_path):

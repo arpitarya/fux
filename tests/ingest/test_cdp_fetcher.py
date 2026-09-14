@@ -416,3 +416,96 @@ def test_nothing_here_renders_a_page_any_more(mw):
     assert not hasattr(mw, "capture")
     assert not hasattr(mw.CdpSession, "capture")
     assert not hasattr(mw, "SETTLE_MS")
+
+
+# -- .env and the environment (2026-09-14) -----------------------------------
+#
+# Arpit: *"cdp_port define it in a way that it can pick values from .env file
+# also."* The debugging port a person's signed-in Chrome happens to be on is
+# the most machine-specific value this fetcher has, and `fux.toml` is committed.
+
+
+def _fresh():
+    """A module per test: `configure` writes module globals."""
+    return _load()
+
+
+def test_a_dotenv_value_beats_the_committed_fux_toml(tmp_path, monkeypatch):
+    """The ordering is the whole point. If `fux.toml` won, one number in a
+    committed file would pin every machine that clones the repo and `.env`
+    could never say anything."""
+    (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
+    (tmp_path / ".env").write_text("FUX_CDP_PORT=9333\n", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.delenv("FUX_CDP_PORT", raising=False)
+    module = _fresh()
+    module.configure({"cdp_port": 9222})
+    assert module.CDP_PORT == 9333
+
+
+def test_the_process_environment_beats_dotenv(tmp_path, monkeypatch):
+    """A value typed for one run beats a file somebody wrote last month."""
+    (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
+    (tmp_path / ".env").write_text("FUX_CDP_PORT=9333\n", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("FUX_CDP_PORT", "9444")
+    module = _fresh()
+    module.configure({"cdp_port": 9222})
+    assert module.CDP_PORT == 9444
+
+
+def test_fux_toml_still_applies_when_nothing_overrides_it(tmp_path, monkeypatch):
+    (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.delenv("FUX_CDP_PORT", raising=False)
+    module = _fresh()
+    module.configure({"cdp_port": 9222})
+    assert module.CDP_PORT == 9222
+
+
+def test_a_dotenv_boolean_is_parsed_as_one(tmp_path, monkeypatch):
+    """⚠ `bool("false")` is `True`, which is the single worst available answer
+    for `FUX_LAUNCH_CHROME=false` — it would launch a signed-out Chrome and
+    return login pages."""
+    (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
+    (tmp_path / ".env").write_text("FUX_LAUNCH_CHROME=false\n", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.delenv("FUX_LAUNCH_CHROME", raising=False)
+    module = _fresh()
+    module.configure({"launch_chrome": True})
+    assert module.LAUNCH_CHROME is False
+
+
+def test_only_FUX_prefixed_names_are_read_from_dotenv(tmp_path, monkeypatch):
+    """A `.env` is where people keep secrets. This file has no business seeing
+    the rest of it, and the test says so rather than trusting the comment."""
+    (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
+    (tmp_path / ".env").write_text(
+        "AWS_SECRET_ACCESS_KEY=hunter2\nexport FUX_CDP_HOST='10.0.0.5'\n# FUX_CDP_PORT=1\n",
+        encoding="utf-8",
+    )
+    monkeypatch.chdir(tmp_path)
+    module = _fresh()
+    values = module._dotenv_values()
+    assert values == {"FUX_CDP_HOST": "10.0.0.5"}
+    assert not any("hunter2" in str(v) for v in values.values())
+
+
+def test_the_dotenv_is_found_from_a_subdirectory(tmp_path, monkeypatch):
+    """`fux` is run from anywhere in the repo; the `.env` sits at its root."""
+    (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
+    (tmp_path / ".env").write_text("FUX_CDP_PORT=9555\n", encoding="utf-8")
+    deep = tmp_path / "docs" / "guides"
+    deep.mkdir(parents=True)
+    monkeypatch.chdir(deep)
+    monkeypatch.delenv("FUX_CDP_PORT", raising=False)
+    module = _fresh()
+    module.configure({})
+    assert module.CDP_PORT == 9555
+
+
+def test_no_dotenv_at_all_is_not_an_error(tmp_path, monkeypatch):
+    (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+    module = _fresh()
+    assert module._dotenv_values() == {}

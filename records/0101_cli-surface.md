@@ -7,10 +7,10 @@ description: Flat verbs in seven groups, one error boundary, three output modes.
 status: accepted
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@6b884c27a3da, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@e15fc07dcf7e, src/fux/progress.py@925dccc045ce]
+owns: [src/fux/cli.py@6b884c27a3da, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@c6e607249ea0, src/fux/progress.py@925dccc045ce]
 laws: [L1, L4, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: c8caaad530b366e00ca02fbeea25a623c81975f1da1443a7e5426e5431634ca3
+content_sha: ada201b05e461a71c5f47876832d6e51d62ed0946c7173e2d03e86a15492f8d1
 ---
 
 # SR-CLI — the command-line surface

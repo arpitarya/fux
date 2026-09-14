@@ -7,10 +7,10 @@ description: "Fux never fetches; a consumer-owned fetcher file does. One fetcher
 status: accepted
 date: 2026-08-19
 feature: the fetch contract, what it is called, and the two shipped templates
-owns: [src/fux/ingest/urlsrc.py@e7ca1e734cdb, src/fux/templates@4549d2a5f406]
+owns: [src/fux/ingest/urlsrc.py@272f379006fc, src/fux/templates@81de8b37fcfb]
 laws: [L1, L3, L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 166f1b790fb859664b43b85b202a112a4f3f0219bc874d9ff134b7757d99fa67
+content_sha: 70ecc13fdd2e0a0a20bd143e060ab14101d5422e3fe23249a1e0021ab6041ee5
 ---
 
 # SR-FETCHER — the consumer-owned fetcher
@@ -431,6 +431,23 @@ rather than an optimisation.** `update=never`
   decides which fetcher to load.
 - **Checkable:** a fetcher file that raises at import time, and a list whose
   every line is pinned, must complete an ingest.
+
+**A fetcher now receives its OWN slice of `[sources.url.config]`, not the whole
+table** (2026-09-14). Scalars at the top are shared; `[sources.url.config.<stem>]`
+reaches only the fetcher whose file is `<stem>.py`. The shape, the defect it
+fixes and why the adapter cap is untouched are stated once in
+[SR-CONFIG](0113_config.md) decision 8a.
+
+⚠ **What belongs to THIS record is the naming rule, because it is already
+ours.** The sub-table is keyed on the fetcher's file stem — the same name
+decision 5's `fetch=<name>` resolves against `<fetcher dir>/<name>.py`. One
+naming rule serves both, so a consumer who knows `fetch=cdp` already knows
+`[sources.url.config.cdp]`, and there is no second convention to document or
+drift.
+
+⚠ **The `configure()` contract is unchanged**: it is still handed a plain dict
+and still refuses a key it does not know. What changed is which keys arrive —
+which is precisely why refusing was safe to keep.
 
 ### Consequences
 

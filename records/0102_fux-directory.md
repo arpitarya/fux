@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@836cc5ab2239, src/fux/setup.py@96ba8e14b712, tests/test_verb_table_agreement.py@2c2a8f52fb6c]
+owns: [src/fux/store/fuxdir.py@836cc5ab2239, src/fux/setup.py@f229752922a2, tests/test_verb_table_agreement.py@2c2a8f52fb6c]
 laws: [L2, L3, L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 52c3bffda704540eeec52fbf7fd5e423708d3f60199960fcd4c58582ad634894
+content_sha: 1055b0adf3fbf2fa11daa2d2cc51720420705948e646217a477332e762ba3f01
 ---
 
 # SR-DOTFUX — the `.fux/` directory
@@ -693,17 +693,75 @@ generator and a skill surface the package did not yet produce.
 a record ahead of its code is as misleading as one behind it, and the freshness
 check can see neither.
 
-**The scaffolded `fux.toml` gained one COMMENTED line** (W-174, 2026-09-14):
-`#fetch_at_answer = true`, under `[sources.url]` beside `#update = "auto"`.
+**The scaffolded `fux.toml` was rebuilt on 2026-09-14, in four of Arpit's
+rulings in one sitting.** What it writes now, and the rule behind each:
 
-- **It shows the default and explains nothing**, which is the only form this
-  file allows: a comment that *describes* a key can drift from the record that
-  decides it while both still look correct (SR-LAW-0 decision 4). The commented
-  default cannot drift into a wrong explanation — at worst it is a value a
-  reader checks against the record the header already points at.
-- **Written commented, not live.** An uncommented `fetch_at_answer = true`
-  would freeze today's default into every repo `fux setup` touches, which is
-  the mistake `acquired_max_bytes` avoids by defaulting to `None`.
+| what | why |
+|---|---|
+| `[sources] urls_file` beside `dirs_file` | the two committed lists are one kind of thing ([SR-CONFIG](0113_config.md) decision 11a) |
+| `keep`, `enrich`, `update`, `fetch_at_answer`, `meta` written **live** | closed, small value domains — the written line is the complete menu |
+| `ttl`, `sweep_minutes`, `acquired_max_bytes` **absent** | defaults that may move; leaving them out is how a new value reaches this repo without an edit |
+| `[sources.url.config]` + one sub-table **per shipped fetcher**, live | one flat table refused every mixed-fetcher repo (decision 8a) |
+| those sub-tables **derived** from the fetchers, by `ast`, never executed | a transcribed table goes stale — `_urls_header()` is the scar (W-140 row 18); `cdp.py` must never run inside the package (SR-CDP-FETCHER decision 8) |
+
+⚠ **The header now says what is NOT in the file and why**, because a reader who
+sees `keep` written and `ttl` missing will otherwise read the absence as an
+oversight rather than a rule.
+
+**`fux.toml`'s starter is a TEMPLATE FILE now, not a string in `setup.py`**
+(Arpit, 2026-09-14: *"create a template for fux.toml file like others"*).
+`templates/fux.toml.txt`, read through `template_bytes` beside
+`pii.toml.txt`, `refusals.toml.txt` and the two fetchers.
+
+- **Read, never imported** — and for a `.toml` that phrase means something
+  different than it does for `cdp.py.txt`. The fetchers are un-importable
+  because they carry network code that has no business inside an offline
+  package (SR-CDP-FETCHER decision 8). This one is a file because **a starter a
+  consumer is meant to open and edit belongs in a file they can open**, where a
+  stray quote is a typo in a config and not a syntax error in the engine.
+- ⚠ **`{default}` is now SUBSTITUTED, not `.format`ted**, and the change of
+  mechanism is the point. W-83's property is unchanged — the number written and
+  the number applied are one object, asserted by `tests/test_setup.py` — but
+  `str.format` on an **editable file** raises on any future `{` someone adds to
+  a comment, which would turn a documentation edit into a broken `fux setup`.
+- **No packaging change was needed**: `pyproject.toml` declares
+  `packages = ["src/fux"]`, so the wheel already carries every file under the
+  package, which is why the four existing `.txt` templates ship.
+
+**The scaffolded `fux.toml` writes the two-valued `[sources.url]` keys LIVE,
+with their defaults** (W-174, 2026-09-14, Arpit's ruling): `update = "auto"`
+and `fetch_at_answer = true`, beside `meta = "hashed"`. **`update` was
+commented from the day it existed and is now uncommented too**, in the same
+ruling and for the same reason.
+
+- **It carries a value and explains nothing**, which is the only form this file
+  allows: a comment that *describes* a key can drift from the record that
+  decides it while both still look correct (SR-LAW-0 decision 4). A key and its
+  value cannot drift into a wrong explanation, because they are not one.
+- ⚠ **Written live, and that was Arpit's ruling on 2026-09-14** — the first cut
+  wrote `fetch_at_answer` commented, and `update` had been commented since it
+  was added. **The argument against, stated so the trade is on the record:** an
+  uncommented default freezes today's value into every repo `fux setup`
+  touches, so a future change of default would not reach them.
+- **The line the ruling draws is the SHAPE OF THE VALUE, and it is a rule
+  rather than two exceptions.** A key whose domain is **closed and small** —
+  `meta` (`hashed`/`plain`), `update` (`auto`/`never`), `fetch_at_answer`
+  (`true`/`false`) — is written live with its default: the written line is the
+  complete menu, so a reader learns the key *and* its alternatives without
+  leaving the file, and nobody greps a record for a flag they do not know
+  exists. A key whose default is a **number that may rise** stays out:
+  `acquired_max_bytes` defers to `None` precisely so raising the store's bound
+  reaches every repo that never thought about it, and `sweep_minutes` is the
+  same shape. `max_parallel` is neither — it is required, with no default at
+  all (W-85).
+- ⚠ **So the test is not "is it important" but "can this value go stale?"**
+  A closed two-value domain cannot; a tuning number can.
+- **What it costs, named:** if fux ever flips either default, existing repos
+  keep the old behaviour until someone edits the line. For `fetch_at_answer`
+  that is the safer direction — explicit behaviour surviving a default change,
+  on a key whose `false` value stops network access — and for `update` it means
+  a repo scaffolded today keeps fetching on `fux update`, which is what its
+  author saw written in their own file.
 
 ### Consequences
 

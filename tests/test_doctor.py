@@ -604,7 +604,7 @@ def _url_repo(root, fetcher_body: str) -> None:
         'dirs_file = ".fux/sources/dirs"\n'
         "[sources.url]\n"
         'fetcher = ".fux/fetchers/http.py"\n'
-        'urls_file = ".fux/sources/urls"\n'
+        
         "max_parallel = 4\n",
         encoding="utf-8",
     )
@@ -661,7 +661,7 @@ def test_the_shipped_template_implements_every_optional_function(tmp_path):
         'dirs_file = ".fux/sources/dirs"\n'
         "[sources.url]\n"
         'fetcher = ".fux/fetchers/http.py"\n'
-        'urls_file = ".fux/sources/urls"\n'
+        
         "max_parallel = 4\n",
         encoding="utf-8",
     )

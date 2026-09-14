@@ -77,7 +77,6 @@ from pathlib import Path
 
 from .. import store as store_mod
 from .. import tune as tune_mod
-from ..config import DEFAULT_URLS_FILE
 from ..config import load as load_config
 from ..errors import FuxError
 from ..progress import NULL as _NULL_PROGRESS
@@ -1434,7 +1433,7 @@ def _listed_url_ids(root: Path, config, existing_urls: dict[str, dict]) -> set[s
     """
     if not existing_urls:
         return set()
-    rel_path = config.url.urls_file if config.url is not None else DEFAULT_URLS_FILE
+    rel_path = config.urls_file
     entries = sourcelist.read(
         root,
         rel_path,
@@ -1465,7 +1464,7 @@ def _archived_url_ids(root: Path, config) -> set[str]:
     caller only asks when `url:` records exist, and a missing list with
     surviving records is already `_listed_url_ids`' loud error.
     """
-    rel_path = config.url.urls_file if config.url is not None else DEFAULT_URLS_FILE
+    rel_path = config.urls_file
     if not (root / rel_path).is_file():
         return set()
     entries = sourcelist.read(root, rel_path, sourcelist.URLS, missing_hint="")

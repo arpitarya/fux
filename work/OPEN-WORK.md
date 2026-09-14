@@ -67,6 +67,5 @@ here. Read that record before changing anything below it.
 
 - 🔴 **W-146** · `arpit` — L0's remainder: **one ruling is owed** — how far *never restates* reaches into docstrings. Its inventory is reconciled; eight of its sections landed as records `0057`–`0064` on 2026-09-14. [detail](open/W-146-the-rest-of-l0.md)
 
-- 🟢 **W-173** · `agent` — finish the `CLAUDE.md` extraction: six sections fold into records that already state them, the dated lessons become a `work/` log, one owed test. 668 → ~330 lines. [detail](open/W-173-finish-the-claude-md-extraction.md)
 
 ---

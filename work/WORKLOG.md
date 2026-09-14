@@ -73,6 +73,44 @@ play: the worklog is the granular, per-exchange trail.
   at 1d (it now blocks four items), and **W-146 · W-112 · W-144 · W-148** at 2d.
   The blocker file is still `ASK` and untouched.
 
+## 2026-09-14 — the fux.toml audit: four rulings, and a table that was broken for months  ·  Cowork (Opus)
+- **Asked:** move `urls_file` up beside `dirs_file`; never ship a commented
+  config key; audit the config props; let `cdp_port` come from `.env`.
+- **Did:** `[sources] urls_file` (old spelling refused by name, with its new
+  home); `keep`/`enrich` joined `update`/`fetch_at_answer` as live keys;
+  `[sources.url.config]` split into a shared level plus one sub-table per
+  fetcher, **derived from the fetchers by `ast`** into
+  `templates/fux.toml.txt`; `.env` and environment overrides for every
+  `cdp.py` setting; a `fetcher config tables` doctor row; 20 tests; nine
+  records.
+- **Decided / open:** 🔴 **The single `[sources.url.config]` table was BROKEN
+  for any repo loading both shipped fetchers**, and had been since it existed.
+  One table went verbatim to every fetcher and each `configure()` **raises** on
+  a key it does not know — so `cdp_port` refused `http.py` and `timeout_s`
+  refused `cdp.py`, and the only working value was the empty table. **That is
+  why it shipped commented out**, a fact visible in the file for months and
+  never traced to its cause. Arpit's *"2 separate tables"* is the fix. The
+  adapter cap holds: fux matches a **table name** against a filename it already
+  knows (`fetch=<name>`'s rule), never a key.
+- 🔴 **`.env` and the environment BEAT `fux.toml`**, deliberately. `fux.toml`
+  is committed; one `cdp_port` in it pins every machine that clones the repo.
+  The ordering only became urgent because the scaffolded file now writes
+  `cdp_port` live — before that the key was absent and the default applied.
+- **Also found in the audit:** `Config.agents` defaulted to three vendors of
+  four (Codex missing) — dead, since every caller goes through `load()`, and
+  **wrong**, which is worse: a stale default reads as authority. Now
+  `KNOWN_AGENTS`, with the constant lifted above the class so there is one list.
+- ⚠ **A change of contract, named:** a `dict` at the top of
+  `[sources.url.config]` used to reach `configure()` and now is read as a
+  per-fetcher table. Only the top level is namespaced; anything inside a
+  fetcher's own table is still verbatim.
+- ⚠ **The concurrent session COMMITTED this session's record edits** inside
+  their own commits (`92aa5960`, `cf591586`). Not a problem in itself — it is
+  the hazard CLAUDE.md §two sessions names, observed a second time. Re-derive
+  `git status` immediately before staging.
+- **Next:** commit with explicit pathspecs. One red row left and it is theirs:
+  `test_doc_links` on `work/proposals/cage-search-leg.md`.
+
 ## 2026-09-14 — three rulings on the scaffolded `fux.toml`  ·  Cowork (Opus)
 - **Asked:** Arpit, on seeing the key was missing from fux's own `fux.toml`:
   put it there; *"dont comment it uncomment it always and use it as the value

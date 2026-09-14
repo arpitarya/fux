@@ -200,11 +200,18 @@ def resolve_urls(entries: list[sourcelist.Entry], source) -> list[UrlEntry]:
 
 
 def configure_fetcher(module, config: dict) -> None:
-    """Hand `[sources.url.config]` to the fetcher's optional `configure`.
+    """Hand this fetcher's slice of `[sources.url.config]` to its `configure`.
 
-    The table is passed verbatim — fux never inspects a key. A `configure`
-    that raises is a misconfiguration, not a per-URL failure, so it stops the
-    run rather than degrading into skips.
+    Keys are passed verbatim — fux never inspects one. A `configure` that
+    raises is a misconfiguration, not a per-URL failure, so it stops the run
+    rather than degrading into skips.
+
+    ⚠ **`config` is already the RESOLVED slice** (shared keys + this fetcher's
+    sub-table); `UrlSource.config_for` does the resolution, in one place, for
+    this caller and for `query/refer_answer.py` alike. Handing the whole table
+    here is what broke every mixed-fetcher repo before 2026-09-14: each
+    `configure()` raises on a key it does not know, so the other fetcher's keys
+    refused this one.
     """
     hook = getattr(module, "configure", None)
     if not callable(hook):
@@ -669,6 +676,11 @@ def fetch_all(
     #: pool and a per-fetch manifest write is a corruption.
     acquired_blobs: dict[str, acquired.Blob] = dict(acquired.read_manifest(root)) if keep_urls else {}
 
+    # Imported here, not at module scope: `fux.config` imports
+    # `ingest.sourcelist` for the duration grammar, so a top-level import the
+    # other way is a cycle.
+    from ..config import fetcher_config
+
     groups: dict[str, list[str]] = {}
     for entry in entries:
         groups.setdefault(entry.fetcher_path, []).append(entry.url)
@@ -687,7 +699,7 @@ def fetch_all(
     token_shas: dict[str, str] = {}
     for fetcher_path in sorted(groups):
         module = load_fetcher(root, fetcher_path)
-        configure_fetcher(module, config or {})
+        configure_fetcher(module, fetcher_config(config or {}, fetcher_path))
         connect = getattr(module, "connect", None)
         close = getattr(module, "close", None)
         if callable(connect):

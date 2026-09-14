@@ -10,7 +10,7 @@ feature: what happens once a document is declared archived — the record proper
 owns: [tools/archived-signal-eval@30fb75fa7476]
 laws: [L3, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 934d2ba874b6a53c57ca8a430e1cae804eebf10b8b99a3718a4afadcad2cf1de
+content_sha: 93b737f8e1b35d4c08e1274a4d795a2fd52194c875915ea9e0ab8db4e018e374
 ---
 
 # SR-ARCHIVED-CONTENT — what "archived" does, once a document carries it
@@ -374,6 +374,19 @@ gate reads whole files and a reader of this record deserves to know which half
 it was. ⚠ **An `archived=true` line and an `update=never` line are independent**:
 pinning a retired page is legal and means what both words mean.
 
+
+**2026-09-14 — `src/fux/ingest/urlsrc.py and src/fux/ingest/run.py` changed under this record and NOTHING this record
+decides moved.** Two unrelated edits: per-fetcher `[sources.url.config]` resolution in
+`urlsrc` ([SR-CONFIG](0113_config.md) decision 8a), and in `run.py` a
+`config.url is not None else DEFAULT_URLS_FILE` fallback collapsing to
+`config.urls_file` now that the key sits in `[sources]` (decision 11a).
+`UrlEntry.archived`, its deliberate TWO layers, and `_archived_url_ids` are
+untouched.
+
+⚠ **Said out loud rather than left to the freshness gate.** That check proves an
+owning record was *touched*, never that it was read (CLAUDE.md §Law zero), so a
+co-owner's file changing under this one is exactly the case where a reader needs
+to be told *"not yours"* in writing.
 ### Consequences
 
 - **A re-derived `url:` record keeps its archived declaration** (2026-09-14,

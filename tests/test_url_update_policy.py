@@ -158,7 +158,7 @@ def test_doctor_counts_pinned_lines_and_names_the_lossy_ones(tmp_path):
 
     (tmp_path / ".git").mkdir()
     (tmp_path / "fux.toml").write_text(
-        '[sources.url]\nmax_parallel = 4\nurls_file = ".fux/sources/urls"\n', encoding="utf-8"
+        '[sources]\nurls_file = ".fux/sources/urls"\n[sources.url]\nmax_parallel = 4\n', encoding="utf-8"
     )
     urls = tmp_path / ".fux" / "sources" / "urls"
     urls.parent.mkdir(parents=True)
@@ -181,7 +181,7 @@ def test_doctor_says_nothing_when_no_line_is_pinned(tmp_path):
 
     (tmp_path / ".git").mkdir()
     (tmp_path / "fux.toml").write_text(
-        '[sources.url]\nmax_parallel = 4\nurls_file = ".fux/sources/urls"\n', encoding="utf-8"
+        '[sources]\nurls_file = ".fux/sources/urls"\n[sources.url]\nmax_parallel = 4\n', encoding="utf-8"
     )
     urls = tmp_path / ".fux" / "sources" / "urls"
     urls.parent.mkdir(parents=True)

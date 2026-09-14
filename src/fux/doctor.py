@@ -320,6 +320,7 @@ def _layout(root: Path) -> list[Check]:
     checks.append(_url_health(root))
     checks.append(_acquired_health(root))
     checks.append(_pinned_without_bytes(root))
+    checks.append(_fetcher_config_tables(root))
     checks.append(_suspended_pins(root))
     checks.append(_pii_health(root))
     checks.append(_refusal_health(root))
@@ -541,6 +542,54 @@ def _redaction_note(root: Path, rules) -> str:
     # skill `fux setup` wrote into their repo, which carries a copy.
     note += ". A big number is a hint, not a finding: probe it (the `fux-pii` skill carries the script)"
     return note
+
+
+def _fetcher_config_tables(root: Path) -> Check:
+    """`[sources.url.config.<name>]` sub-tables that name no fetcher file.
+
+    **The whole point of the two-level table is that a key reaches exactly one
+    fetcher** — so a sub-table whose name matches no `.py` in the fetchers
+    directory reaches *none*, silently. That is the defect
+    [SR-CONFIG](../../records/0113_config.md) decision 14 exists for, one level
+    down: a setting its author believes is in force.
+
+    ⚠ **A row here rather than a refusal in `config.load`**, and the reason is
+    which module may touch the disk. The loader parses a file; deciding whether
+    `[sources.url.config.wiki]` is a typo means listing
+    `.fux/fetchers/` — a filesystem question, in a function whose job is TOML.
+    `doctor` is the module that already asks filesystem questions about config.
+    """
+    from .config import load as load_config
+
+    name = "fetcher config tables"
+    try:
+        config = load_config(root)
+    except FuxError:
+        return Check(name, True, "no readable fux.toml - another check owns that")
+    if config.url is None or not config.url.config:
+        return Check(name, True, "no [sources.url.config] to check")
+
+    named = sorted(k for k, v in config.url.config.items() if isinstance(v, dict))
+    if not named:
+        return Check(name, True, "only shared keys - every fetcher gets them")
+
+    fetchers_dir = (root / config.url.fetcher).parent
+    try:
+        stems = {p.stem for p in fetchers_dir.glob("*.py")}
+    except OSError:
+        stems = set()
+    orphans = [n for n in named if n not in stems]
+    if not orphans:
+        return Check(name, True, f"{len(named)} per-fetcher table(s), each naming a fetcher on disk")
+    return Check(
+        name,
+        False,
+        f"[sources.url.config.{orphans[0]}]"
+        + (f" and {len(orphans) - 1} more" if len(orphans) > 1 else "")
+        + f" name(s) no fetcher: {fetchers_dir}/ has {sorted(stems) or 'nothing'}. "
+        "These keys reach NO fetcher and nothing else says so - rename the table "
+        "to the fetcher's filename without .py, or delete it",
+    )
 
 
 def _pinned_without_bytes(root: Path) -> Check:

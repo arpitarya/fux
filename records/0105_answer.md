@@ -10,7 +10,7 @@ feature: "`fux answer` — one answer, its footing stated, and the report of wha
 owns: []
 laws: [L1, L2, L3]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: b048c0b8e5c4ceb75984ffb0270f7acf657f5302942e24e71d64eb1f749cec76
+content_sha: 4350a4fba588bdf592b5639238ff7e4ac4d2c240c4291750bce88bea8f98ffc0
 ---
 
 # SR-ANSWER — the `answer` verb
@@ -409,6 +409,19 @@ here**; what belongs to this record is the seam:
   so a piped stdout stays parseable, ASCII so a Windows codepage cannot crash
   `print()`.
 
+
+**2026-09-14 — `src/fux/query/refer_answer.py` changed under this record and NOTHING this record
+decides moved.** `_load_fetchers` passes `config.url.config_for(entry.fetcher_path)` to
+`configure()` rather than the whole table ([SR-CONFIG](0113_config.md) decision
+8a) — a one-line change that keeps this module's resolution identical to
+`ingest/urlsrc.py`'s, which is the property this record's §Reference already
+insists on. The candidate list, the dispatch and the policy seam are
+unchanged.
+
+⚠ **Said out loud rather than left to the freshness gate.** That check proves an
+owning record was *touched*, never that it was read (CLAUDE.md §Law zero), so a
+co-owner's file changing under this one is exactly the case where a reader needs
+to be told *"not yours"* in writing.
 ### Consequences
 
 - **A `fux correct --pin` reaches `answer`, not only `ask`** (2026-09-14,

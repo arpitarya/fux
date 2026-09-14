@@ -260,6 +260,32 @@ implicit.
 
 ---
 
+## 2026-09-14 — **the `fux.toml` audit**: four rulings, and a table nobody could use
+
+**Shipped**, uncommitted. Arpit, in one sitting: move `urls_file` beside
+`dirs_file`; never ship a commented key; audit the props; let `cdp_port` come
+from `.env`.
+
+| what landed | what it found |
+|---|---|
+| `[sources] urls_file`, old spelling refused by name | The move makes a separation visible that was always true: **`[sources.url]`'s PRESENCE enables fetching**, the key only names the list. Two call sites lost a `config.url is not None else DEFAULT_URLS_FILE` fallback that could disagree with the file |
+| `keep` and `enrich` written live, joining `update` and `fetch_at_answer` | The closed-domain rule applied to the rest of the table. `ttl`, `sweep_minutes`, `acquired_max_bytes` stay out — their defaults can move |
+| **`[sources.url.config]` split: shared level + one sub-table per fetcher** | 🔴 **The flat table was BROKEN for any repo loading both shipped fetchers, and had been since it existed.** It went verbatim to every fetcher and each `configure()` **raises** on a key it does not know: `cdp_port` refused `http.py`, `timeout_s` refused `cdp.py`. The only working value was the empty table — **which is why the block shipped commented out.** The symptom sat in the scaffolded file for months, read as caution, and was never traced |
+| the sub-tables **derived** from the fetchers by `ast` | Two constraints at once: a transcribed table goes stale (`_urls_header()`'s scar, W-140 row 18), and `cdp.py` must never *execute* inside the package (SR-CDP-FETCHER decision 8). Parsing gives both. A computed default (`MAX_BYTES = 8 * 1024 * 1024`) is skipped rather than guessed — absent means the fetcher's own constant applies, which is correct; a wrong literal would not be |
+| `.env` + environment overrides for every `cdp.py` key | 🔴 **They beat `fux.toml`, and reversing that makes the feature pointless** — `fux.toml` is committed, so one `cdp_port` pins every machine that clones the repo. Only urgent because the scaffolded file now writes the key live. `bool` coerced explicitly: `bool("false")` is `True`, which for `FUX_LAUNCH_CHROME=false` would launch a signed-out Chrome and return login pages |
+| `fux doctor` row `fetcher config tables` | A sub-table naming no fetcher reaches **none**, silently — decision 14's defect one level down. A row, not a loader refusal: deciding whether `wiki` is a typo means listing `.fux/fetchers/`, a filesystem question inside a TOML parser |
+| ⚠ **`Config.agents` was wrong** | It defaulted to three vendors of four — Codex missing, from before Codex existed. Dead (every caller goes through `load()`) **and** wrong, which is the worse half: a stale default reads as authority. Now `KNOWN_AGENTS`, the constant lifted above the class so there is one list |
+
+**A change of contract, named:** a `dict` at the top of `[sources.url.config]`
+used to reach `configure()` and is now read as a per-fetcher table. Only the
+**top** level is namespaced; anything inside a fetcher's own table is verbatim.
+
+**Records:** SR-CONFIG (decisions 8a and 11a) · SR-FETCHER · SR-CDP-FETCHER ·
+SR-DOTFUX · SR-DOCTOR, plus not-yours notes on the six co-owners of
+`urlsrc.py`, `run.py`, `refer_answer.py` and `setup.py`. **Tests:** 20.
+
+---
+
 ## 2026-09-14 — **W-174**: a mode that was built, tested and unreachable
 
 **Shipped**, uncommitted at the time of writing — both suites green on the

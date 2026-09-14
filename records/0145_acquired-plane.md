@@ -10,7 +10,7 @@ feature: the acquired plane
 owns: [src/fux/store/acquired.py@9897ee1fe4af]
 laws: []
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 351025745f25a0b879f94884ad6085231711bf662d79a405e0b63a83e30dc740
+content_sha: 5a0835c0d6451496fbcba70b5051bedab01483369d7c90f0c85ad328995e4b5c
 ---
 
 # SR-ACQUIRED: fetched bytes are kept, in a plane that is neither committed nor derived
@@ -224,6 +224,18 @@ decisions 13–14) — so a typo in the store's bound fails loudly instead of
 silently restoring the default. ⚠ The record said so from `6f518c6` and the code
 landed one commit later — see SR-CONFIG after decision 15.
 
+
+**2026-09-14 — `src/fux/ingest/urlsrc.py` changed under this record and NOTHING this record
+decides moved.** `fetch_all` now hands each fetcher its own slice of `[sources.url.config]`
+instead of the whole table ([SR-CONFIG](0113_config.md) decision 8a). Retention
+is untouched: still in `fetch_all` and never inside a fetcher (decision 5),
+still ordered `_unpack` -> refusal -> persist -> decode (decision 6), still
+bounded and evicted by `run_seq` (decision 8).
+
+⚠ **Said out loud rather than left to the freshness gate.** That check proves an
+owning record was *touched*, never that it was read (CLAUDE.md §Law zero), so a
+co-owner's file changing under this one is exactly the case where a reader needs
+to be told *"not yours"* in writing.
 ### Consequences
 
 **Easier.** A citation can be checked offline against the exact bytes that produced it — a stronger claim than comparing two fetches, which is why `refer/source.py` verifies with the same fetcher a document was ingested with: *a document fetched two ways is two documents*. A retained original removes that whole class of false staleness, and the browser-session fetcher stops being needed at answer time.

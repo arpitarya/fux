@@ -74,7 +74,6 @@ from pathlib import Path
 from .config import (
     CONFIG_NAME,
     DEFAULT_TYPES_FILE,
-    DEFAULT_URLS_FILE,
     find_root,
     load,
 )
@@ -144,7 +143,7 @@ def list_path(root: Path, spec: sourcelist.ListSpec) -> Path:
     """
     if spec is sourcelist.URLS:
         config = load(root)
-        return root / (config.url.urls_file if config.url is not None else DEFAULT_URLS_FILE)
+        return root / config.urls_file
     if spec is sourcelist.DIRS:
         return root / load(root).dirs_file
     return root / DEFAULT_TYPES_FILE

@@ -57,6 +57,8 @@ FETCHERS = {"http.py": "http.py.txt", "cdp.py": "cdp.py.txt"}
 #: The starter refusal rules, shipped as package data like the fetchers.
 REFUSALS_TEMPLATE = "refusals.toml.txt"
 PII_TEMPLATE = "pii.toml.txt"
+#: The scaffolded `fux.toml`, shipped the same way. See `config_text`.
+CONFIG_TEMPLATE = "fux.toml.txt"
 
 FETCHERS_DIR = "fetchers"
 
@@ -529,55 +531,124 @@ _FUXIGNORE = """\
 """
 
 
-_CONFIG = """\
-# fux.toml -- POLICY, not corpus. What gets indexed is `.fux/sources/dirs` and
-# `.fux/sources/urls`, one entry per line.
-#
-# EVERY KEY, WHAT IT MEANS AND WHAT IT DEFAULTS TO IS IN ONE PLACE:
-#   https://github.com/arpitarya/fux/blob/main/records/0113_config.md
-# Ranking knobs are not here at all -- they live in .fux/tune.toml (SR-TUNE):
-#   https://github.com/arpitarya/fux/blob/main/records/0135_tuning.md
-#
-# This file does not explain its own keys, deliberately: a comment that
-# describes a key can drift from the record that decides it while both still
-# look correct (SR-LAW-0 decision 4). A key fux does not know is REFUSED by
-# name, so a typo here fails loudly instead of sitting inert.
+def _toml_scalar(value) -> str:
+    """One Python default as the TOML literal a consumer would have typed."""
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if isinstance(value, str):
+        return '"' + value.replace("\\", "\\\\").replace('"', '\\"') + '"'
+    if isinstance(value, (int, float)):
+        return repr(value)
+    if isinstance(value, (tuple, list)):
+        return "[" + ", ".join(_toml_scalar(v) for v in value) + "]"
+    raise TypeError(type(value).__name__)
 
-[sources]
-dirs_file = ".fux/sources/dirs"
 
-# Presence of this table enables URL ingestion. Nothing is fetched until a URL
-# is listed in .fux/sources/urls, and only `fux add <URL>` lists one.
-[sources.url]
-fetcher      = ".fux/fetchers/http.py"
-urls_file    = ".fux/sources/urls"
-meta         = "hashed"
-#update      = "auto"
-#fetch_at_answer = true
+def fetcher_defaults(name: str) -> "dict[str, object]":
+    """A shipped fetcher's tunables and their current defaults — **read by
+    `ast`, never executed.**
 
-# REQUIRED, and may not be commented out: a repo that CAN fetch has to say how
-# hard, in a number a person can read. Comment it out and fux refuses to load.
-max_parallel = {default}
+    ⚠ **The fetchers are package data precisely so they are not imported**
+    (SR-CDP-FETCHER decision 8): `cdp.py` carries network code that has no
+    business running inside an offline package, and `fux setup` is the last
+    place that should launch a browser. So this parses the file and reads two
+    things statically: the `_SETTINGS` map (config key -> module global) and
+    the module-level assignment to each of those globals.
 
-# Passed to your fetcher's configure() verbatim; fux never reads a key inside.
-#[sources.url.config]
-#cdp_port  = 9222
-#timeout_s = 30
+    **Derived, never transcribed.** The alternative was typing the values into
+    `templates/fux.toml.txt`, and this repo has already paid for that once —
+    `_urls_header()` below carries the same lesson (W-140 row 18: the table was
+    transcribed and went stale).
 
-[index]
-shards = 256
+    A value whose default is not a plain literal is skipped rather than
+    guessed: a key absent from the scaffolded file falls back to the fetcher's
+    own constant, which is correct, where a wrong literal would not be.
+    """
+    import ast
 
-# Which agent vendors `fux setup` writes archived-results policy for. These
-# files land OUTSIDE .fux/ -- in .claude/, .github/, .kiro/ and AGENTS.md at the
-# repo root -- which is why the default is spelled out rather than left
-# implicit. Delete a name to stop installing it; [] installs none.
-[agents]
-install = ["claude", "codex", "copilot", "kiro"]
-""".format(default=DEFAULT_MAX_PARALLEL)
-#: ⚠ **`{default}` is interpolated, not typed** (W-83). The number in the
-#: written `fux.toml` and the number the engine actually applies are the same
-#: object, so the comment cannot drift from the behaviour the way the constant
-#: itself did before W-83 made it effective. `tests/test_setup.py` asserts it.
+    tree = ast.parse(template_bytes(name).decode("utf-8"))
+    globals_: dict[str, object] = {}
+    settings: dict[str, str] = {}
+    for node in tree.body:
+        if not isinstance(node, ast.Assign) or len(node.targets) != 1:
+            continue
+        target = node.targets[0]
+        if not isinstance(target, ast.Name):
+            continue
+        if target.id == "_SETTINGS" and isinstance(node.value, ast.Dict):
+            for k, v in zip(node.value.keys, node.value.values):
+                if isinstance(k, ast.Constant) and isinstance(v, ast.Tuple) and v.elts:
+                    first = v.elts[0]
+                    if isinstance(first, ast.Constant):
+                        settings[k.value] = first.value
+            continue
+        try:
+            globals_[target.id] = ast.literal_eval(node.value)
+        except (ValueError, SyntaxError):
+            continue  # a computed default -- the fetcher's own value stands
+    out: dict[str, object] = {}
+    for key, global_name in settings.items():
+        if global_name in globals_:
+            out[key] = globals_[global_name]
+    return out
+
+
+def url_config_tables() -> str:
+    """`[sources.url.config]` and one sub-table per shipped fetcher.
+
+    ⚠ **Two tables, because one was BROKEN for any repo using both** (Arpit,
+    2026-09-14). The single flat table went verbatim to every fetcher and each
+    `configure()` raises on a key it does not know, so `cdp_port` made
+    `http.py` refuse and `timeout_s` made `cdp.py` refuse. The scaffolded file
+    could only ever comment the block out, which is how it shipped.
+
+    The shared table stays, and stays **empty in the scaffold**: a key belongs
+    there only when every fetcher a repo loads knows it, and fux cannot know
+    that for a fetcher somebody writes tomorrow.
+    """
+    lines = [
+        "# Handed to your fetcher's configure() verbatim; fux reads no key inside.",
+        "# A key at THIS level goes to every fetcher -- only put one here that all",
+        "# of yours know, because each configure() refuses a key it does not.",
+        "[sources.url.config]",
+        "",
+    ]
+    for generated, template in sorted(FETCHERS.items()):
+        stem = generated.removesuffix(".py")
+        defaults = fetcher_defaults(template)
+        if not defaults:  # pragma: no cover - a fetcher with no tunables
+            continue
+        lines.append(f"# Only .fux/fetchers/{generated} receives these.")
+        lines.append(f"[sources.url.config.{stem}]")
+        width = max(len(k) for k in defaults)
+        for key in sorted(defaults):
+            lines.append(f"{key.ljust(width)} = {_toml_scalar(defaults[key])}")
+        lines.append("")
+    return "\n".join(lines).rstrip("\n") + "\n"
+
+
+def config_text() -> str:
+    """The scaffolded `fux.toml`, read out of the wheel like every other starter.
+
+    ⚠ **It was a triple-quoted constant in this module until 2026-09-14**
+    (Arpit: *"create a template for fux.toml file like others"*). It is now
+    `templates/fux.toml.txt`, beside `pii.toml.txt`, `refusals.toml.txt` and
+    the two fetchers — **read, never imported**, which for a `.toml` is a
+    statement about where it lives rather than about safety: a starter a
+    consumer is meant to read and edit belongs in a file they can open, not
+    inside a Python string where a stray quote is a syntax error in the engine.
+
+    ⚠ **`{default}` is SUBSTITUTED, not `.format`ted** (W-83's property, a
+    safer mechanism). The number in the written `fux.toml` and the number the
+    engine applies are the same object, so the file cannot drift from the
+    behaviour. `str.replace` rather than `str.format` **because the template is
+    now an editable file**: `format` would raise on any future `{` someone adds
+    to a comment, turning a doc edit into a broken `fux setup`.
+    `tests/test_setup.py` asserts the substitution happened.
+    """
+    text = template_bytes(CONFIG_TEMPLATE).decode("utf-8")
+    text = text.replace("{default}", str(DEFAULT_MAX_PARALLEL))
+    return text.replace("{url_config}", url_config_tables())
 
 def _urls_header() -> str:
     """The starter `.fux/sources/urls`, with its attribute table DERIVED.
@@ -1316,7 +1387,7 @@ def run(root: Path, *, agents: bool = True) -> SetupReport:
     # starter's safe rules arrive enabled; the consumer edits or empties them,
     # and a repo that already has the file keeps it -- empty or not.
     _write_if_missing(pii.rules_path(root), template_bytes(PII_TEMPLATE), report, root)
-    _write_if_missing(root / CONFIG_NAME, _CONFIG.encode("utf-8"), report, root)
+    _write_if_missing(root / CONFIG_NAME, config_text().encode("utf-8"), report, root)
     # Every key commented out, so a fresh repo runs on the engine's own
     # defaults and the file is a menu rather than a configuration (SR-TUNE
     # decisions 2 and 3). Write-if-missing like everything else here: this is

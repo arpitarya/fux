@@ -10,7 +10,7 @@ feature: the freshness verdict vocabulary and the per-URL check interval
 owns: [src/fux/refer/freshness.py@6757eeeba7c6]
 laws: [L2, L3, L4]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 7620b2b745ed44f240e30f00094fc7de05c183d7602551a8efe8d62a4eb1d8d1
+content_sha: 3f4992f9fe5b7387065c699283a8cb918eb88f994000dc0a53bb39281948c4be
 ---
 
 # SR-URL-FRESHNESS: what a citation may claim, and how often it has to earn it
@@ -487,6 +487,17 @@ match. Under `false` the verdicts for a `url:` citation converge exactly:
 `as-ingested` with a retained blob, `unverified` without one, in both. A
 `fux.toml` read in `node/` would be work for no behaviour, and is not owed.
 
+
+**2026-09-14 — `src/fux/ingest/urlsrc.py` changed under this record and NOTHING this record
+decides moved.** Per-fetcher `[sources.url.config]` resolution ([SR-CONFIG](0113_config.md)
+decision 8a). `UrlEntry.ttl` and its three-layer resolution are untouched, and
+so is decision 16's `fetch_at_answer`, which lives in `config.py` and
+`query/refer_answer.py` rather than here.
+
+⚠ **Said out loud rather than left to the freshness gate.** That check proves an
+owning record was *touched*, never that it was read (CLAUDE.md §Law zero), so a
+co-owner's file changing under this one is exactly the case where a reader needs
+to be told *"not yours"* in writing.
 ### Consequences
 
 **Easier.** An offline or signed-out corpus keeps answering, with citations that

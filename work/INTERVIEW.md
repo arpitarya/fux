@@ -35,6 +35,34 @@ valuable judgement, but not the state of play.
 *Updated **2026-09-14** (Cowork, W-174).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
+### The `fux.toml` audit — and a config table that was unusable for months (2026-09-14, Cowork)
+
+- **`[sources] urls_file`** now sits beside `dirs_file`; `[sources.url]
+  urls_file` is refused by name. The move makes an always-true separation
+  visible: **`[sources.url]`'s presence enables fetching, the key only names
+  the list.**
+- **Every closed-domain key is written live** — `meta`, `keep`, `enrich`,
+  `update`, `fetch_at_answer`. `ttl`, `sweep_minutes` and `acquired_max_bytes`
+  stay out because their defaults can move.
+- 🔴 **`[sources.url.config]` was BROKEN for any repo loading both shipped
+  fetchers, and had been since it existed.** One table went verbatim to every
+  fetcher; each `configure()` **raises** on a key it does not know; so
+  `cdp_port` refused `http.py` and `timeout_s` refused `cdp.py`, and the only
+  working value was the empty table. **That is why it shipped commented out** —
+  the symptom was in the file for months and read as caution. It is now a
+  shared level plus `[sources.url.config.<fetcher stem>]`, with the scaffolded
+  sub-tables **derived from the fetchers by `ast`** (never executed — `cdp.py`
+  carries network code).
+- **The adapter cap is intact and the distinction is exact:** fux matches a
+  **table name** against a filename it already knows (`fetch=<name>`'s own
+  rule). It still declares no key inside, and a test asserts that.
+- **`.env`/environment beat `fux.toml`** for every `cdp.py` key
+  (`FUX_CDP_PORT`, …). `fux.toml` is committed; one port pins every clone.
+- ⚠ **`Config.agents` defaulted to three vendors of four.** Dead and wrong —
+  the worse half, because a stale default reads as authority.
+- ⚠ **Contract change:** a `dict` at the top of `[sources.url.config]` no
+  longer reaches `configure()`; only the top level is namespaced.
+
 ### `fetch_at_answer` — the never-fetch mode now has a selector, W-174 SHIPPED (2026-09-14, Cowork)
 
 - **`[sources.url] fetch_at_answer`**, bool, default `true`. `false` pins every
@@ -60,12 +88,31 @@ valuable judgement, but not the state of play.
 - **Node is settled and owes nothing:** it never fetches (W-107 R6), so it has
   always behaved as `fetch_at_answer = false`; under `false` the two readers'
   `url:` verdicts converge exactly.
+- **Three follow-on rulings by Arpit, same day, on the scaffolded `fux.toml`:**
+  `fetch_at_answer` and `update` are written **live with their defaults** (they
+  had both been commented), and the starter is now a real template file,
+  `src/fux/templates/fux.toml.txt`, read like `pii.toml.txt` and the fetchers.
+- 🔴 **The live-keys ruling generalises, and the rule is worth carrying:** a
+  `fux.toml` key whose **value domain is closed and small** — `meta`,
+  `update`, `fetch_at_answer` — is written out with its default, because the
+  written line is the complete menu and nobody greps a record for a flag they
+  do not know exists. A key whose default is a **number that may rise** —
+  `acquired_max_bytes`, `sweep_minutes` — stays out, so raising it reaches
+  every repo. **The test is *can this value go stale?*, not *is it
+  important?*.** The cost is on the record: a future change of default will not
+  reach a scaffolded repo.
+- ⚠ **`{default}` is substituted, not `.format`ted**, now that the template is
+  an editable file — `format` would raise on any `{` a later doc edit adds.
+
 - ⚠ **Tree state when this was written:** a concurrent session holds a large
   staged changeset and uncommitted `src/` edits. Four suite rows are red and
-  **all four are theirs** — `test_doc_links` (their cage proposal's sibling-repo
-  link), `test_no_work_item_is_lost` (W-167/171/172 mid-renumber),
-  `…blocks_subrow` (W-156's sub-row removed), `test_sr_freshness`
-  (SR-AGENT-POLICY / SR-NODE-SEARCH / SR-PII). Commit with explicit pathspecs.
+  **all of them theirs.** Two remain as of the last full run —
+  `test_doc_links` (their cage proposal's sibling-repo link). The others
+  cleared while this session ran — and ⚠ **that session COMMITTED this one's
+  record edits inside `92aa5960` and `cf591586`.** Not harmful here, but it is
+  CLAUDE.md §two-sessions' named hazard, observed a second time: re-derive
+  `git status` immediately before staging, and commit with explicit
+  pathspecs.
 
 ### The backlog was swept: four new 🟢 items, three stale sentences fixed (2026-09-14, Cowork)
 

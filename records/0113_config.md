@@ -7,10 +7,10 @@ description: "A deliberately tiny config: what each key does, why the surface is
 status: accepted
 date: 2026-08-18
 feature: "`fux.toml` — discovery, schema, validation, and the keys that are refused rather than ignored"
-owns: [src/fux/config.py@27f70dedbc42]
+owns: [src/fux/config.py@1f1e08231fff]
 laws: [L4, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 2f9037250a051e9a11681b832d826ec45fe3a1542c646dc7c731f1e73bab6739
+content_sha: b3118d96c1912ca51c7698f27ec6c52fcefa19562da11e330c90dd3e1c5a5a1b
 ---
 
 # SR-CONFIG — `fux.toml` and every property in it
@@ -263,6 +263,48 @@ ranking value either. It is **operational**, so it sits beside the other
 passed to the fetcher's `configure()` verbatim. Fux never reads a key inside it,
 and must never gain a reason to.
 
+**8a. 🔴 It has TWO LEVELS since 2026-09-14, because one level was broken for
+any repo that used both shipped fetchers** (Arpit: *"how about create 2
+separate tables, 1 for http and 1 for cdp"*).
+
+**The defect, stated plainly.** One table was handed verbatim to *every*
+fetcher, and both shipped `configure()` implementations **raise** on a key they
+do not know. `http.py` knows `timeout_s`, `user_agent`, `max_bytes`; `cdp.py`
+knows `cdp_port`, `cdp_host`, `launch_chrome`, `load_timeout_s`. Only
+`fetcher_max_parallel` is shared. So in a repo loading both, `cdp_port` made
+every `http.py` fetch refuse and `timeout_s` made every `cdp.py` fetch refuse:
+**the sole configurable state was the empty table.** That is why the scaffolded
+`fux.toml` could only ever ship the block commented out — a fact visible in the
+file for months and never traced to its cause.
+
+**The shape:**
+
+| where | who gets it |
+|---|---|
+| a scalar at the top of `[sources.url.config]` | **every** fetcher |
+| `[sources.url.config.<stem>]` | **only** the fetcher whose file is `<stem>.py` |
+
+- **`config.py::fetcher_config` is the only thing that reads either level**, and
+  `UrlSource.config_for` delegates to it, so the ingest path and the answer path
+  cannot resolve a fetcher differently.
+- ⚠ **The adapter cap is NOT breached, and the distinction is exact.** Decision
+  8 forbids fux declaring a *key* — `cdp_port` must never appear in
+  `KNOWN_KEYS`, and `tests/test_config.py` asserts no `sources.url.config.*`
+  key is declared. What fux matches here is a **table name against a filename it
+  already knows**, which is the same information `fetch=<name>` resolution has
+  used since [SR-FETCHER](0117_fetcher.md) decision 5. One naming rule, not two.
+- **Only the TOP level is namespaced.** Everything inside a fetcher's own table
+  passes through verbatim, nesting included, so a fetcher that wants structured
+  config still gets it.
+- ⚠ **This is a change of contract and it costs something**: a `dict` at the
+  top level used to reach `configure()` and now does not. A consumer who nested
+  config for one fetcher moves it one level, under that fetcher's name.
+- **A sub-table naming no fetcher is ignored by the loader and caught by
+  `doctor`** — `fetcher config tables`. Deciding whether `wiki` is a typo means
+  listing `.fux/fetchers/`, which is a filesystem question and has no business
+  in a TOML parser. Refusing there would also make `fux.toml` unloadable on a
+  machine that has not run `fux setup`.
+
 **9. `[agents] install` is a closed, validated set** — `claude`, `codex`,
 `copilot`, `kiro` — naming which vendors `fux setup` writes policy renderings
 for ([SR-AGENT-POLICY](0132_agent-policy.md) decision 5). ⚠ **`codex` joined
@@ -321,6 +363,22 @@ the boundary, rendered by the CLI, exit 1. Numeric keys are validated as
 non-negative numbers with **`bool` rejected explicitly**, because `bool` is an
 `int` subclass in Python and `archived_weight = true` would otherwise parse
 silently as `1`.
+
+**11a. `urls_file` lives in `[sources]`, beside `dirs_file`** (Arpit,
+2026-09-14). The two committed source lists are one kind of thing and are now
+named in one place; `[sources.url] urls_file` is **refused by name** with the
+new home in the message.
+
+- ⚠ **`[sources.url]`'s PRESENCE still enables URL ingestion.** The key names
+  the list; it does not turn anything on. That separation is what the move
+  makes visible rather than changing: a repo with no `[sources.url]` still
+  resolves a path — `fux add <URL>` needs one to write into — and still fetches
+  nothing.
+- `UrlSource.urls_file` keeps carrying the resolved value, so the twelve
+  call sites that hold a `UrlSource` read one field as before. `Config.urls_file`
+  is what the two call sites without one now read, in place of a
+  `config.url is not None else DEFAULT_URLS_FILE` conditional that can no
+  longer disagree with the file.
 
 **12. `[sources.url]` gained four keys on 2026-09-01, and every one of them is
 a source-wide *layer*, not a setting.** `keep` ([SR-ACQUIRED](0145_acquired-plane.md)),
@@ -389,8 +447,8 @@ at any value, with an error naming the new home.
 
 ```keys
 + sources.dirs_file
++ sources.urls_file
 + sources.url.fetcher
-+ sources.url.urls_file
 + sources.url.meta
 + sources.url.keep
 + sources.url.ttl
@@ -406,6 +464,7 @@ at any value, with an error naming the new home.
 - sources.dirs
 - sources.types_file
 - sources.url.urls
+- sources.url.urls_file
 - sources.url.middleware
 - ranking
 - dense

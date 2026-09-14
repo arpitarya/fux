@@ -213,18 +213,28 @@ _RECORDER = 'import pathlib\n_LOG = pathlib.Path(__file__).with_name("log.txt")\
 
 
 def test_config_table_reaches_configure_verbatim(tmp_path):
-    (tmp_path / "mw.py").write_text(
-        _RECORDER
-        + 'def configure(config):\n'
-        '    _LOG.write_text(repr(sorted(config.items())))\n'
-        'def fetch(url):\n'
-        '    return "# T\\n\\nbody\\n"\n',
-        encoding="utf-8",
-    )
-    table = {"cdp_port": 9333, "nested": {"deep": [1, 2]}, "flag": True}
-    fetch_all(tmp_path, _entries(["https://x.test/a"]), table)
-    assert (tmp_path / "log.txt").read_text(encoding="utf-8") == repr(sorted(table.items()))
+    """Shared keys reach every fetcher, and anything INSIDE a fetcher's own
+    table is still passed through untouched.
 
+    ⚠ **The top level is namespaced now, and that is a real change of contract**
+    (2026-09-14). A `dict` at the top level is read as a per-fetcher table and
+    does **not** reach `configure()`; one level down, inside that fetcher's own
+    table, nesting is verbatim exactly as before. The whole flat table used to
+    go to every fetcher — which is what made a two-fetcher repo unconfigurable,
+    since each `configure()` refuses the other's keys.
+    """
+    _init(
+        tmp_path,
+        urls=["https://x.test/a"],
+        config='flag = true\n[sources.url.config.mw]\ncdp_port = 9333\nnested = {deep = [1, 2]}\n',
+    )
+    from fux.config import load
+
+    cfg = load(tmp_path)
+    got = cfg.url.config_for("mw.py")
+    assert got == {"flag": True, "cdp_port": 9333, "nested": {"deep": [1, 2]}}
+    # A fetcher that is not `mw` sees the shared key and nothing else.
+    assert cfg.url.config_for(".fux/fetchers/other.py") == {"flag": True}
 
 def test_configure_is_optional_and_absent_table_is_empty(tmp_path):
     (tmp_path / "mw.py").write_text(
