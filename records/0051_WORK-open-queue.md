@@ -7,11 +7,11 @@ description: "The live queue's discipline has one home, and this is it. Fifty-ei
 status: accepted
 date: 2026-09-13
 feature: the discipline of the single live work queue — its rules, its markers, and the three tests that enforce them
-owns: [tests/test_open_work_rows_are_short.py@d590c19ef8ed, tests/test_open_work_is_not_stale.py@c41cd5e600be, tests/test_no_work_item_is_lost.py@3c6a033612b2]
+owns: [tests/test_open_work_rows_are_short.py@aaf3da297626, tests/test_open_work_is_not_stale.py@453a93cbbbaa, tests/test_no_work_item_is_lost.py@3c6a033612b2]
 laws: [L0]
 ratifies: W-146 ruling 1 · Arpit 2026-09-13 (archive, never delete)
 timestamp: 2026-09-13T00:00:00Z
-content_sha: 4be51c83af60f14c030cbc3792a99771d0423b8d14d4241b4fb50cf96962b843
+content_sha: 04fc6a7e9ae70af7b39494b7d33a99f886091b8affced888fd39c246eaee0699
 ---
 
 # SR-WORK-OPEN-QUEUE — how OPEN-WORK works
