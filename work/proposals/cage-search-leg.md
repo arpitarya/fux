@@ -7,7 +7,7 @@ timestamp: 2026-09-14T00:00:00Z
 filed: 2026-09-14
 ---
 
-**Graduated 2026-09-14 → [W-170](../open/W-170-cage-search-leg.md)** (Arpit). This file stays the spec the item points at.
+**Graduated 2026-09-14 → [W-170](../open/W-170-cage-search-leg.md)** (Arpit). ⚠ **Superseded the same day on the mechanism:** Arpit ruled that fux *exposes an observe-only hook* (`.fux/observers/`) rather than shipping an emitter; §1's record schema still holds, §2–§4's "fux pushes to cage" does not. The item is the spec now; this file is kept as the record of what was replaced.
 
 # fux's half of cage's search leg
 

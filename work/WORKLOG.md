@@ -29,6 +29,12 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-14 — W-170 becomes the observer hook: fux exposes, cage subscribes  ·  Cowork (Opus)
+- **Asked:** *"How about a middleware that fux exposes and cage can intercept?"* — yes to rewriting the fux half that way.
+- **Did:** [W-170](open/W-170-cage-search-leg.md) rewritten: `.fux/observers/` as a third readable-source extension point (decoders, fetchers, observers); one counts-only record per verb, **after render**, no return path; fail-open, wall-clock-capped; `args_hash` contract first; liveness in `fux doctor`; **fux carries no cage knowledge** (tested) — cage's `cage setup` drops its own observer. New SR-OBSERVE; **SR-LAW-10's exemption table needs Arpit's named amendment** — added to W-170's inbox row. Proposal `cage-search-leg.md` marked superseded-on-mechanism, kept as the record. Cage side: compare doc option B → B′, OPEN-WORK item and README updated. ⚠ Written straight onto the branch with a temporary index — the working tree was on `main` under another session, and I did not move its checkout.
+- **Decided / open:** mechanism ruled (observe-only, never a pre-verb middleware). Open: cage's C verdict; the L10 amendment. Cage side not committed.
+- **Next:** Arpit's two rulings on W-170's inbox row.
+
 ## 2026-09-14 — five items closed to the wall  ·  Claude Code (Opus 5, 1M)
 - **Asked:** *"Commit everything, then implement W-169, W-160, W-162, W-158,
   W-173. One by one to the closure. If anything comes up, resolve it, fix it,
