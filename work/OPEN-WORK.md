@@ -23,8 +23,8 @@ here. Read that record before changing anything below it.
 
 | what he decides | filed | age |
 |---|---|---|
-| 🔴 **W-140** — the `--hops` fork: [the compare doc](compare/path-hops-bound.compare.md) proposes **(c) bound the walk's work** with `truncated` in every rendering. The last ruling owed. [detail](open/W-140-guide-authoring-defects.md) | 2026-09-12 | 2d |
-| ↳ **blocks:** nothing else in the queue — W-140's own last code row is behind it | | |
+
+*Empty since 2026-09-14 — every ruling owed was taken that day. The next gate is a date, not a decision: Codex, 2026-09-30 (W-136 · W-145).*
 
 ---
 
@@ -37,7 +37,7 @@ here. Read that record before changing anything below it.
 - 🟢 **W-176** · `agent` — the nine abstention gates, ruled (a) 2026-09-14: 1 + 9 + the output surface now; 4, 3, 2, 7, 8, 5 measured behind flags from **2026-09-30** (Codex's unanswerable key); 6 once W-161 has landed. [detail](open/W-176-abstention-gates.md)
 - 🟢 **W-170** · `agent` — `.fux/observers/`, the observe-only hook. Both rulings taken 2026-09-14: cage's compare **C**; SR-OBSERVE filed `proposed` with the L10 exemption named. Build it; the record flips to `accepted` in that change. [detail](open/W-170-cage-search-leg.md)
 - 🟢 **W-148** · `agent` — ruled 2026-09-14: golden is **local-only** (drop CI's corpus arm), Node's latency goes into `fux-benchmark` beside Python's, the harness stays scratch. Three rows of agent work, then close. [detail](open/W-148-what-the-two-readers-still-owe.md)
-- 🔴 **W-140** · `agent`, waiting on Arpit's `--hops` ruling — **1 code row left**: a runner-race flake **not reproduced in 11 attempts**, deliberately unchanged. 20 closed. [detail](open/W-140-guide-authoring-defects.md)
+- 🟢 **W-140** · `agent` — `--hops` ruled **(c)** 2026-09-14: bound the walk's work, `truncated` in every rendering; build row 12's last third. Row 21's runner-race flake stays unreproduced (11 attempts). 20 closed. [detail](open/W-140-guide-authoring-defects.md)
 
 ### testing
 

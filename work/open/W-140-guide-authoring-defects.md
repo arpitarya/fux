@@ -28,7 +28,7 @@ then refresh this repo's renderings.
 
 | # | defect | where | record |
 |---|---|---|---|
-| 12 | ✅ **HANDED OVER 2026-09-12 — the compare doc exists and the fork is Arpit's.** [`compare/path-hops-bound.compare.md`](../compare/path-hops-bound.compare.md), with the measurement the row lacked: **0.65 s at `--hops 2`, 84.6 s at `--hops 6`**, ~11× per hop above 4, on a 738-node / 4 446-edge index with hubs at out-degree 260 and in-degree 152. Proposed verdict **(c) bound the walk's work**, with `truncated` in every rendering including `--json` and MCP. **Nothing is implemented and nothing should be until he rules** | `graph/walk.py`, `cli.py` | SR-GRAPH |
+| 12 | ✅ **RULED 2026-09-14 (Arpit): (c) bound the walk's work, (b)'s message as the truncation notice — build it.** Was: HANDED OVER 2026-09-12 — the compare doc exists and the fork is Arpit's. [`compare/path-hops-bound.compare.md`](../compare/path-hops-bound.compare.md), with the measurement the row lacked: **0.65 s at `--hops 2`, 84.6 s at `--hops 6`**, ~11× per hop above 4, on a 738-node / 4 446-edge index with hubs at out-degree 260 and in-degree 152. Proposed verdict **(c) bound the walk's work**, with `truncated` in every rendering including `--json` and MCP. **Nothing is implemented and nothing should be until he rules** | `graph/walk.py`, `cli.py` | SR-GRAPH |
 
 | 21 | ⚠ **A SECOND e2e maintenance test races the background runner — STILL NOT REPRODUCED, after 11 attempts.** `test_two_commits_in_quick_succession_produce_one_runner_and_one_index` failed once in a combined `tests tests_e2e` run on 2026-09-12 and has not failed since. **Nothing has been changed**, because the row's own instruction is *capture the failure output before changing anything* and row 19's first diagnosis was wrong and cost two sessions | `tests_e2e/test_maintenance.py` `_drain` | SR-MAINTENANCE |
 
@@ -213,8 +213,9 @@ wrong half the time.
   has no record there; the **plane** answers for tags now.
   [SR-GRAPH](../../records/0126_graph.md) carries both, plus the control
   test that honest emptiness still exits 0. `GRAPH-SKILL.md` loses *"run
-  `fux explain` on both ends first"*. **The `--hops` third of the row stays
-  open as a fork.** 2026-09-11.
+  `fux explain` on both ends first"*. **The `--hops` third of the row was a
+  fork until 2026-09-14, when Arpit ruled (c)** — see the compare doc's §3 for
+  the exact build list. 2026-09-11, ruled 2026-09-14.
 
 - **Row 9 — the merge driver's refusal named a fix that could not work.** It
   said *re-run `fux ingest`*, and ingest cannot read the file the refusal had

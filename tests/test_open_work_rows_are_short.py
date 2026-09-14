@@ -349,7 +349,13 @@ def test_every_inbox_row_is_followed_by_its_blocks_subrow() -> None:
         f"L{line}: {wid} has no `| ↳ **blocks:** ... | | |` row directly beneath it."
         for wid, (line, sub) in blocks_subrows().items() if sub is None
     ]
-    assert blocks_subrows(), "no decision rows parsed out of *Blocked on Arpit*"
+    if not blocks_subrows():
+        from test_open_work_is_not_stale import _inbox_declared_empty
+
+        assert _inbox_declared_empty(), (
+            "no decision rows parsed out of *Blocked on Arpit*, and the file does not "
+            "declare the inbox empty (`*Empty since YYYY-MM-DD` under the table)."
+        )
     assert not bad, (
         "OPEN-WORK rule 10: under every *Blocked on Arpit* row, name the work that decision "
         "holds up -- or `nothing else in the queue`.\n  " + "\n  ".join(bad)

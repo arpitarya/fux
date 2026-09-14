@@ -135,12 +135,23 @@ def test_the_inbox_is_parseable_at_all() -> None:
     matches nothing is indistinguishable from a queue with no problems.
     """
     rows = inbox_rows()
+    if not rows and _inbox_declared_empty():
+        return  # 2026-09-14: the blocker walk emptied it, and the file says so in words.
     assert rows, (
         "no rows parsed out of OPEN-WORK.md's `## Blocked on Arpit` table. Either the "
-        "inbox is genuinely empty -- in which case delete this line and say so in the "
-        "file -- or its shape changed and every check in this module is now passing on "
-        "nothing, which is worse than having no checks."
+        "inbox is genuinely empty -- in which case the file must SAY so, in a line "
+        "beginning `*Empty since YYYY-MM-DD` directly under the table -- or its shape "
+        "changed and every check in this module is now passing on nothing, which is "
+        "worse than having no checks."
     )
+
+
+def _inbox_declared_empty() -> bool:
+    """An empty inbox is a state the file must declare, never one a parser infers."""
+    text = QUEUE.read_text(encoding="utf-8")
+    start = text.index("## Blocked on Arpit")
+    end = text.index("## Open items", start)
+    return re.search(r"^\*Empty since \d{4}-\d{2}-\d{2}", text[start:end], re.M) is not None
 
 
 @pytest.mark.parametrize("row", inbox_rows(), ids=lambda r: f"L{r[0]}")

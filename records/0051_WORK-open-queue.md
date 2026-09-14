@@ -11,7 +11,7 @@ owns: [tests/test_open_work_rows_are_short.py@d590c19ef8ed, tests/test_open_work
 laws: [L0]
 ratifies: W-146 ruling 1 · Arpit 2026-09-13 (archive, never delete)
 timestamp: 2026-09-13T00:00:00Z
-content_sha: df8a6290333222eddf94c9e892a71295b42517bf42f8d85eea1a65a7a9def15f
+content_sha: 4be51c83af60f14c030cbc3792a99771d0423b8d14d4241b4fb50cf96962b843
 ---
 
 # SR-WORK-OPEN-QUEUE — how OPEN-WORK works
@@ -176,6 +176,12 @@ that is the only thing the file says.
 43. **An item waiting on a decision joins that sub-row in the same edit.**
 44. **An inbox row is always 🔴.** A date gate is not a decision owed.
 45. **A row points only at things that exist.**
+45a. **An empty inbox is declared, never inferred.** When no ruling is owed, the
+    table stays (header only) and the line directly beneath it begins
+    `*Empty since YYYY-MM-DD` and names the next gate. The parser guards in
+    `tests/test_open_work_is_not_stale.py` and `tests/test_open_work_rows_are_short.py`
+    accept an empty table only on that declaration — a table that is merely
+    empty is a moved heading until proven otherwise. (First emptied 2026-09-14.)
 
 **G · Standing, and forbidden**
 
