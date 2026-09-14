@@ -10,7 +10,7 @@ feature: the index X-ray
 owns: [src/fux/inspect@d1930eef9504]
 laws: [L2, L3, L4, L6, L8]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: e750b5b494dc2d4945047fa7c88afdfa9fd7991a50b2fb1f57aa91893d4c0253
+content_sha: 0a0e0d49062f73565a87bb753e4750df4197d674a22f7b2dd35fe0502c5e314e
 ratifies: W-169
 ---
 
@@ -301,8 +301,11 @@ discoverable from the index the whole time and nobody could see it.
   `dictionary.py` (the local hash → word join), `lenses.py` (the six and
   `LEVERS`), `checks.py` (the three floors), `__init__.py` (the report).
 - The spec it was built from:
-  [`work/proposals/fux-inspect.md`](../work/proposals/fux-inspect.md) §2–§5b,
-  and the item [`W-169`](../work/open/W-169-fux-inspect.md).
+  [`work/proposals/fux-inspect.md`](../work/proposals/fux-inspect.md) §2–§5b.
+  The item that built it shipped and archived on 2026-09-14 —
+  [`work/IMPLEMENTATION.md`](../work/IMPLEMENTATION.md) §2026-09-14 W-169 is
+  the live record of what landed and of the three things the item did not
+  predict.
 - The floors: [`work/regression/2026-09-14-inspect-floors/`](../work/regression/2026-09-14-inspect-floors/report.md).
 - Zipf, *Human Behavior and the Principle of Least Effort*, 1949 · Heaps,
   *Information Retrieval: Computational and Theoretical Aspects*, 1978 ·

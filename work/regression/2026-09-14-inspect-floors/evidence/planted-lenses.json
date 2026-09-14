@@ -1,0 +1,548 @@
+{
+  "boilerplate": {
+    "boilerplate_postings": 154,
+    "boilerplate_share": 0.4095744680851064,
+    "boilerplate_terms": 7,
+    "hapax": 117,
+    "hapax_share": 0.6882352941176471,
+    "heaps_beta": 0.8148878931826304,
+    "heaps_k": 1.1296705006587555,
+    "lever": "`[index]` stopwords, or an analyzer amendment \u2014 an index change, with its own record",
+    "terms": 170,
+    "top": [
+      {
+        "df": 27,
+        "hash": "1fc5bd8679f757f5",
+        "idf": 0.018018505502678212,
+        "share": 1.0,
+        "word": "md"
+      },
+      {
+        "df": 27,
+        "hash": "f824bd8d9cb2a038",
+        "idf": 0.018018505502678212,
+        "share": 1.0,
+        "word": "docs"
+      },
+      {
+        "df": 26,
+        "hash": "52bfc1f81a3fb68c",
+        "idf": 0.05505977718302739,
+        "share": 0.9629629629629629,
+        "word": "zqboilerplate"
+      },
+      {
+        "df": 19,
+        "hash": "73cf68d052d30134",
+        "idf": 0.3617900446055028,
+        "share": 0.7037037037037037,
+        "word": "passage"
+      },
+      {
+        "df": 19,
+        "hash": "7d0f151729e424b7",
+        "idf": 0.3617900446055028,
+        "share": 0.7037037037037037,
+        "word": "about"
+      },
+      {
+        "df": 18,
+        "hash": "824059bc49e5c788",
+        "idf": 0.41443377809092485,
+        "share": 0.6666666666666666,
+        "word": "they"
+      },
+      {
+        "df": 18,
+        "hash": "c5d03a886f5c1aa5",
+        "idf": 0.41443377809092485,
+        "share": 0.6666666666666666,
+        "word": "behave"
+      },
+      {
+        "df": 4,
+        "hash": "467271dc3e2ee084",
+        "idf": 1.8281271133989299,
+        "share": 0.14814814814814814,
+        "word": "weighting"
+      },
+      {
+        "df": 3,
+        "hash": "20ffa683e06286c6",
+        "idf": 2.0794415416798357,
+        "share": 0.1111111111111111,
+        "word": "parameters"
+      },
+      {
+        "df": 3,
+        "hash": "3ebddc9f4c00f672",
+        "idf": 2.0794415416798357,
+        "share": 0.1111111111111111,
+        "word": "field"
+      },
+      {
+        "df": 3,
+        "hash": "4501e709459fec24",
+        "idf": 2.0794415416798357,
+        "share": 0.1111111111111111,
+        "word": "tpl"
+      },
+      {
+        "df": 3,
+        "hash": "45ec866144cfabde",
+        "idf": 2.0794415416798357,
+        "share": 0.1111111111111111,
+        "word": "Saturation"
+      },
+      {
+        "df": 3,
+        "hash": "6408f3ed210f4b3e",
+        "idf": 2.0794415416798357,
+        "share": 0.1111111111111111,
+        "word": "Consequences"
+      },
+      {
+        "df": 3,
+        "hash": "763855cbe8f8799f",
+        "idf": 2.0794415416798357,
+        "share": 0.1111111111111111,
+        "word": "committed"
+      },
+      {
+        "df": 3,
+        "hash": "7f84b87958b406ea",
+        "idf": 2.0794415416798357,
+        "share": 0.1111111111111111,
+        "word": "normalisation"
+      },
+      {
+        "df": 3,
+        "hash": "8c916ddad0453cab",
+        "idf": 2.0794415416798357,
+        "share": 0.1111111111111111,
+        "word": "tunables"
+      },
+      {
+        "df": 3,
+        "hash": "ae8413ff8a65334a",
+        "idf": 2.0794415416798357,
+        "share": 0.1111111111111111,
+        "word": "Decision"
+      },
+      {
+        "df": 3,
+        "hash": "e747951710ebd146",
+        "idf": 2.0794415416798357,
+        "share": 0.1111111111111111,
+        "word": "Context"
+      },
+      {
+        "df": 3,
+        "hash": "fedb17fd8a5bc499",
+        "idf": 2.0794415416798357,
+        "share": 0.1111111111111111,
+        "word": "length"
+      },
+      {
+        "df": 2,
+        "hash": "03ddb2bf0c04e6c3",
+        "idf": 2.4159137783010487,
+        "share": 0.07407407407407407,
+        "word": "than"
+      }
+    ],
+    "zipf_slope": -0.811760246227126
+  },
+  "checks": [
+    {
+      "detail": "1 of 27 documents carry no distinctive term at all, so no query can select them (EXHAUSTIVE - every document was checked)",
+      "flagged": true,
+      "floor": {
+        "bound": 0.01,
+        "direction": "max",
+        "provisional": true,
+        "source": "work/regression/2026-09-14-inspect-floors/"
+      },
+      "name": "unreachable share",
+      "status": "attention",
+      "value": 0.037037037037037035
+    },
+    {
+      "detail": "154 of 376 postings carry one of 7 term(s) on half the corpus or more",
+      "flagged": false,
+      "floor": {
+        "bound": 0.6,
+        "direction": "max",
+        "provisional": true,
+        "source": "work/regression/2026-09-14-inspect-floors/"
+      },
+      "name": "boilerplate share",
+      "status": "ok",
+      "value": 0.4095744680851064
+    },
+    {
+      "detail": "2 of 27 documents are one half of a near-duplicate pair (Jaccard >= 0.80); 1 pair(s)",
+      "flagged": false,
+      "floor": {
+        "bound": 0.2,
+        "direction": "max",
+        "provisional": true,
+        "source": "work/regression/2026-09-14-inspect-floors/"
+      },
+      "name": "near-duplicate share",
+      "status": "ok",
+      "value": 0.07407407407407407
+    },
+    {
+      "detail": "27 of 27 documents are returned in the top 3 for their own most distinctive words (every document)",
+      "flagged": false,
+      "floor": null,
+      "name": "findable share",
+      "status": "descriptive",
+      "value": 1.0
+    }
+  ],
+  "corpus": {
+    "boilerplate_df": 13.5,
+    "distinctive_df": 2.7,
+    "documents": 27,
+    "edges": 3,
+    "postings": 376,
+    "shards": {
+      "05.jsonl": "a2b9f1074165531dfd8b96bdce97b720543fa3f2",
+      "10.jsonl": "3dfdbfca7cf6d159e04b7bb396cba4da20c9e235",
+      "13.jsonl": "a5cb5a87776937f9185f4c83f9b8c37c438e5b11",
+      "17.jsonl": "cc056757f7703928bdd4c084dfdb3f89cd5b091b",
+      "22.jsonl": "92a89816cffec1f9f76c9d32450b797755a1faf0",
+      "27.jsonl": "cb153a6cd300b23f34f191c9e4a761ddebf5ca97",
+      "3f.jsonl": "ae6155575b9708933bf352eba4183f1a7590e2c5",
+      "42.jsonl": "bcd5b6ce4d7b7258231861062ab7ca3a0033c6e9",
+      "44.jsonl": "c33e6c21424efa98974d3cc2c6e35e481c3c9dea",
+      "52.jsonl": "ca1315c53734a0932103d90837acd8ea755da329",
+      "56.jsonl": "84e527f9233f3ed405488f94a649e0d0e68afbc0",
+      "59.jsonl": "ca6623e58dc4f9659cb16e723364e234c91a98d9",
+      "74.jsonl": "13883e08a3af4d3c2768c4097b91a6f7b6d48515",
+      "77.jsonl": "ebb65f6a9227ed655838e0ef22a646a9b1fd5ccd",
+      "7c.jsonl": "3aac5de7757b3e68f9203552355105d33ca37ffd",
+      "80.jsonl": "59801808ab696db9a2e6acf1bb0473bb4d2eba15",
+      "83.jsonl": "0ad1b33e6702f89a97dd68dc33ebf5bb780e343d",
+      "8a.jsonl": "6b9306d97f23392f6bbd2201f271e37f3525aef9",
+      "8d.jsonl": "9d187bbdbb36d1c9b25d612dca5724a90aca1519",
+      "8f.jsonl": "edc506419d86659950c7ff955dfc0d224896b558",
+      "a0.jsonl": "8ebcf25c01c190e4caf8f60aee01fc7999f60ff5",
+      "a7.jsonl": "b3d09c4b0eb733bd1ce2ad750985994f53b9de8b",
+      "ac.jsonl": "9fc176cde2828aae3f064a1b4d950d8b001dda7a",
+      "ad.jsonl": "36ee42f0699d092ac0e6bf532eb81b7284a98ee8",
+      "bc.jsonl": "1a5b4d7bea785b0a8895d3fca27aa719167c55dc",
+      "f0.jsonl": "d1c45e742b4f55e5e6a49b5206270d91fae09b87",
+      "f5.jsonl": "c8139a82e532897d380b05a9325f41b1e161c355"
+    },
+    "terms": 170
+  },
+  "coverage": {
+    "dictionary_coverage": 1.0,
+    "kept": 476,
+    "kept_share": 0.8136752136752137,
+    "lever": "a decoder (`fux-decoder`), or leave it in `.fux/enrich/queue.tsv` for a model to describe",
+    "named_terms": 170,
+    "no_content": [
+      "file:docs/nameonly.md"
+    ],
+    "queued": [],
+    "raw_runs": 585,
+    "total_terms": 170,
+    "undecodable": [],
+    "unreadable": []
+  },
+  "duplication": {
+    "documents_in_a_family": 3,
+    "documents_in_a_pair": 2,
+    "families": [
+      {
+        "headings": "Consequences \u00b7 Context \u00b7 Decision",
+        "members": [
+          "file:docs/tpl-1.md",
+          "file:docs/tpl-2.md",
+          "file:docs/tpl-3.md"
+        ]
+      }
+    ],
+    "family_count": 1,
+    "lever": "`.fuxignore`, `archived=`, or `supersedes` on the one that is current",
+    "near_duplicate_share": 0.07407407407407407,
+    "near_duplicates": [
+      {
+        "a": "file:docs/twin-first.md",
+        "b": "file:docs/twin-second.md",
+        "jaccard": 0.8666666666666667
+      }
+    ],
+    "pair_count": 1
+  },
+  "findability": {
+    "fewest_distinctive": [
+      {
+        "distinctive": 0,
+        "id": "file:docs/zqboilerplate.md"
+      },
+      {
+        "distinctive": 1,
+        "id": "file:docs/nameonly.md"
+      },
+      {
+        "distinctive": 2,
+        "id": "file:docs/s00-ranking.md"
+      },
+      {
+        "distinctive": 2,
+        "id": "file:docs/tpl-1.md"
+      },
+      {
+        "distinctive": 2,
+        "id": "file:docs/tpl-2.md"
+      },
+      {
+        "distinctive": 2,
+        "id": "file:docs/tpl-3.md"
+      },
+      {
+        "distinctive": 3,
+        "id": "file:docs/s17-tunables.md"
+      },
+      {
+        "distinctive": 5,
+        "id": "file:docs/lonely.md"
+      },
+      {
+        "distinctive": 6,
+        "id": "file:docs/s02-chunking.md"
+      },
+      {
+        "distinctive": 6,
+        "id": "file:docs/s03-hooks.md"
+      },
+      {
+        "distinctive": 6,
+        "id": "file:docs/s05-postings.md"
+      },
+      {
+        "distinctive": 6,
+        "id": "file:docs/s06-ledger.md"
+      },
+      {
+        "distinctive": 6,
+        "id": "file:docs/s07-edges.md"
+      },
+      {
+        "distinctive": 6,
+        "id": "file:docs/s08-communities.md"
+      },
+      {
+        "distinctive": 6,
+        "id": "file:docs/s09-decoders.md"
+      },
+      {
+        "distinctive": 6,
+        "id": "file:docs/s10-refusals.md"
+      },
+      {
+        "distinctive": 6,
+        "id": "file:docs/s11-redaction.md"
+      },
+      {
+        "distinctive": 6,
+        "id": "file:docs/s12-receipts.md"
+      },
+      {
+        "distinctive": 6,
+        "id": "file:docs/s13-accelerators.md"
+      },
+      {
+        "distinctive": 6,
+        "id": "file:docs/s14-confidence.md"
+      }
+    ],
+    "findable_share": 1.0,
+    "lever": "`fux enrich`, `fux correct`, or fix the source",
+    "misses": [],
+    "retrieved": 27,
+    "sample_is_whole_corpus": true,
+    "sampled": 27,
+    "unfindable": [
+      "file:docs/zqboilerplate.md"
+    ],
+    "unfindable_count": 1
+  },
+  "graph": {
+    "communities": [
+      {
+        "label": "c0",
+        "size": 4
+      }
+    ],
+    "community_count": 1,
+    "edges": 3,
+    "hubs": [
+      {
+        "id": "file:docs/s00-ranking.md",
+        "inbound": 1
+      },
+      {
+        "id": "file:docs/s01-fetching.md",
+        "inbound": 1
+      },
+      {
+        "id": "file:docs/s02-chunking.md",
+        "inbound": 1
+      }
+    ],
+    "lever": "link-IDF and the graph-composed `ask` (W-161) \u2014 until then, add a link from a document that is read",
+    "nodes": 4,
+    "orphan_count": 23,
+    "orphans": [
+      "file:docs/lonely.md",
+      "file:docs/nameonly.md",
+      "file:docs/s03-hooks.md",
+      "file:docs/s04-daemon.md",
+      "file:docs/s05-postings.md",
+      "file:docs/s06-ledger.md",
+      "file:docs/s07-edges.md",
+      "file:docs/s08-communities.md",
+      "file:docs/s09-decoders.md",
+      "file:docs/s10-refusals.md",
+      "file:docs/s11-redaction.md",
+      "file:docs/s12-receipts.md",
+      "file:docs/s13-accelerators.md",
+      "file:docs/s14-confidence.md",
+      "file:docs/s15-enrichment.md",
+      "file:docs/s16-expansion.md",
+      "file:docs/s17-tunables.md",
+      "file:docs/tpl-1.md",
+      "file:docs/tpl-2.md",
+      "file:docs/tpl-3.md"
+    ],
+    "singleton_communities": 0
+  },
+  "lengths": {
+    "body_tokens": {
+      "max": 43,
+      "min": 0,
+      "p10": 7,
+      "p50": 10,
+      "p90": 11
+    },
+    "ctx_over_body": [],
+    "distinct_terms": {
+      "max": 44,
+      "min": 3,
+      "p10": 9,
+      "p50": 13,
+      "p90": 14
+    },
+    "empty_title": [],
+    "fields": {
+      "body": 312,
+      "ctx": 0,
+      "heading": 32,
+      "path": 104,
+      "title": 28
+    },
+    "longest": [
+      {
+        "body_tokens": 43,
+        "id": "file:docs/twin-second.md"
+      },
+      {
+        "body_tokens": 39,
+        "id": "file:docs/twin-first.md"
+      },
+      {
+        "body_tokens": 14,
+        "id": "file:docs/web.md"
+      },
+      {
+        "body_tokens": 11,
+        "id": "file:docs/s04-daemon.md"
+      },
+      {
+        "body_tokens": 11,
+        "id": "file:docs/s03-hooks.md"
+      },
+      {
+        "body_tokens": 11,
+        "id": "file:docs/s02-chunking.md"
+      },
+      {
+        "body_tokens": 11,
+        "id": "file:docs/s01-fetching.md"
+      },
+      {
+        "body_tokens": 11,
+        "id": "file:docs/s00-ranking.md"
+      },
+      {
+        "body_tokens": 10,
+        "id": "file:docs/s17-tunables.md"
+      },
+      {
+        "body_tokens": 10,
+        "id": "file:docs/s16-expansion.md"
+      }
+    ],
+    "no_headings": [
+      "file:docs/nameonly.md"
+    ],
+    "shortest": [
+      {
+        "body_tokens": 0,
+        "id": "file:docs/nameonly.md"
+      },
+      {
+        "body_tokens": 3,
+        "id": "file:docs/zqboilerplate.md"
+      },
+      {
+        "body_tokens": 7,
+        "id": "file:docs/lonely.md"
+      },
+      {
+        "body_tokens": 7,
+        "id": "file:docs/tpl-1.md"
+      },
+      {
+        "body_tokens": 7,
+        "id": "file:docs/tpl-2.md"
+      },
+      {
+        "body_tokens": 7,
+        "id": "file:docs/tpl-3.md"
+      },
+      {
+        "body_tokens": 10,
+        "id": "file:docs/s05-postings.md"
+      },
+      {
+        "body_tokens": 10,
+        "id": "file:docs/s06-ledger.md"
+      },
+      {
+        "body_tokens": 10,
+        "id": "file:docs/s07-edges.md"
+      },
+      {
+        "body_tokens": 10,
+        "id": "file:docs/s08-communities.md"
+      }
+    ]
+  },
+  "levers": {
+    "boilerplate term": "`[index]` stopwords, or an analyzer amendment \u2014 an index change, with its own record",
+    "file-name-only document": "a decoder (`fux-decoder`), or leave it in `.fux/enrich/queue.tsv` for a model to describe",
+    "hub": "link-IDF and the graph-composed `ask` (W-161) \u2014 until then, nothing: a hub is a fact about the corpus",
+    "near-duplicate pair": "`.fuxignore`, `archived=`, or `supersedes` on the one that is current",
+    "orphan": "link-IDF and the graph-composed `ask` (W-161) \u2014 until then, add a link from a document that is read",
+    "template family": "`.fuxignore`, `archived=`, or `supersedes` on the one that is current",
+    "unfindable document": "`fux enrich`, `fux correct`, or fix the source",
+    "unreadable document": "re-ingest, or `keep = true` on the url line so the bytes are retained"
+  }
+}

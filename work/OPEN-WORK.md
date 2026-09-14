@@ -43,7 +43,6 @@ here. Read that record before changing anything below it.
 ### fux build
 
 - 🔴 **W-168** · `arpit`, blocked on W-156 — the ten search improvements as one program, ten gated steps (anchor text first, section units last); each step golden question → pre-registration → build → measure. Promoted 2026-09-14. [detail](open/W-168-search-improvements.md)
-- 🟢 **W-169** · `agent` — `fux inspect`: the index X-ray (boilerplate words, unfindable docs, duplicates/templates, analyzer coverage, orphans) from a local gitignored dictionary; SR-INSPECT + guide skill. Promoted 2026-09-14. [detail](open/W-169-fux-inspect.md)
 - 🔴 **W-170** · `arpit` — fux's emitter for cage's search leg: one counts-only fact row per invocation to `ledger/fux/`; the `args_hash` contract first. Waits on the cage compare-doc verdict. [detail](open/W-170-cage-search-leg.md)
 - 🟢 **W-160** · `agent` — the two atoms: `fux lexical` (BM25F alone, frozen) and `fux graph --seed`, plus the graph plane in the Node reader, digest-equal. Not a ranking change. Ratified 2026-09-13, not built. [detail](open/W-160-lexical-and-graph-atoms.md)
 - 🔴 **W-161** · `arpit`, blocked on W-156 and waiting on W-160 — the graph-composed `ask`: boosted tier + labelled `related` tier, `answer` reads `ask`. Ratified 2026-09-13; a ranking change, so it waits for the evidence rule. [detail](open/W-161-graph-composed-ask.md)

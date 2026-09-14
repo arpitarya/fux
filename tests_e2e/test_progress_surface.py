@@ -60,7 +60,15 @@ def repo(tmp_path: Path) -> Path:
 #: Every verb that constructs a `Progress` — kept in step with `cli.py`'s
 #: `_PROGRESS_COMMANDS` by `test_every_progress_verb_is_covered` below, so a
 #: verb added to the plane cannot skip the invariant by being forgotten here.
-WRITE_VERBS = ["ingest", "build", "add", "remove", "update"]
+#:
+#: ⚠ **`inspect` writes nothing and is still here**, which is why the name is
+#: about the progress plane and not about writing. It paints because its two
+#: long phases — re-tokenising every document for the local dictionary, and one
+#: full query per sampled document — are slow enough that silence reads as a
+#: hang, and it is bound by the same invariant as the rest: **stdout must be
+#: byte-identical with the bar on or off**, because its `--json` is what an
+#: agent parses.
+WRITE_VERBS = ["ingest", "build", "add", "remove", "update", "inspect"]
 
 #: The one argument each verb needs to do real work on the fixture. `update`
 #: with no entry re-reads everything; `add`/`remove` need something to act on.
@@ -69,7 +77,16 @@ WRITE_VERBS = ["ingest", "build", "add", "remove", "update"]
 #: threshold, nothing paints, and both arms would be silent. That comparison
 #: passes while testing nothing, which is the shape of bug this file exists
 #: to catch rather than commit.
-VERB_ARGS = {"add": ("docs",), "remove": ("docs/doc0000.md",), "update": ()}
+#: `inspect` needs a built index, which the fixture's `ingest` provides, and
+#: `--retrieval-sample 0` so the retrieval phase runs over every document —
+#: without it the phase total is 100 on a corpus of `THRESHOLD + 50` and the
+#: two arms could differ in whether that phase painted at all.
+VERB_ARGS = {
+    "add": ("docs",),
+    "remove": ("docs/doc0000.md",),
+    "update": (),
+    "inspect": ("--retrieval-sample", "0"),
+}
 
 #: The contents of `.fux/sources/dirs` each verb needs **before each arm**, so
 #: both arms start from the same state. A mutating verb is not idempotent and
@@ -84,7 +101,7 @@ VERB_PREPARE = {
 #: Verbs whose fixture is large enough that a bar **must** appear. Asserting
 #: this is what stops the parametrization above from passing vacuously if a
 #: verb silently stops inheriting the plane.
-VERBS_THAT_MUST_PAINT = {"ingest", "build", "add", "remove", "update"}
+VERBS_THAT_MUST_PAINT = {"ingest", "build", "add", "remove", "update", "inspect"}
 
 
 def test_every_progress_verb_is_covered():

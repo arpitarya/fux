@@ -7,10 +7,10 @@ description: "Fux's readers are AI agents, and an engine whose output is misread
 status: accepted
 date: 2026-08-22
 feature: the agent-facing policy and skill artifacts Fux ships, and their installer
-owns: [src/fux/templates/agents@a92046b256a3]
+owns: [src/fux/templates/agents@315ce17ef077]
 laws: [L1, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: db43fa418334f5399ef0c1c891b2fd2dc0ca87eadb53b20ee0aaa90b3cd99da1
+content_sha: 48491ea95854f6595f25010712a2a69425bc3d44ad9adeaa3d3a1478e08b4601
 ---
 
 # SR-AGENT-POLICY — shipping the policy, not just the facts
@@ -522,7 +522,7 @@ the drift test) and the hook is **executable or inert**.
 
 | kind | count | destinations | loads |
 |---|---|---|---|
-| **guide skills** — `fux-search`, `fux-answer`, `fux-graph`, `fux-index`, `fux-maintain`, `fux-mcp`, `fux-sources`, `fux-config`, `fux-fetcher`, `fux-pii` | 10 templates | every vendor's skill surface, byte-identical (decision 10) — three directories since decision 16 | on a description match, or when invoked |
+| **guide skills** — `fux-search`, `fux-answer`, `fux-graph`, `fux-index`, `fux-maintain`, `fux-mcp`, `fux-sources`, `fux-config`, `fux-fetcher`, `fux-pii`, `fux-inspect` | 11 templates | every vendor's skill surface, byte-identical (decision 10) — three directories since decision 16 | on a description match, or when invoked |
 | **path-scoped pointers** — `sources`, `decoder`, `enrich`, `fetcher`, `pii`, `config`, `index` | 7 topics × 3 templates | `.kiro/steering/fux-<t>-files.md` (`fileMatch`), `.claude/rules/fux-<t>-files.md` (`paths:`), `.github/instructions/fux-<t>-files.instructions.md` (`applyTo:` explicit globs) | when the agent works on that plane's own files under `.fux/` or `fux.toml` |
 | **Kiro auto guides** — `usage`, `search`, `answer`, `graph`, `mcp` | 5 templates | `.kiro/steering/fux-<t>-guide.md` (`inclusion: auto`) | on a description match |
 
@@ -530,6 +530,16 @@ the drift test) and the hook is **executable or inert**.
 `setup.GUIDE_SKILLS`, `PATH_SCOPED_TOPICS` and `AUTO_GUIDE_TOPICS` are the
 roster; `AGENT_FILES` expands them, so the table is still the whole of the
 routing.
+
+⚠ **`fux-inspect` joined on 2026-09-14 ([SR-INSPECT](0156_inspect.md)), and it
+is the first guide whose verb writes nothing at all** — not a committed file,
+not a gitignored one a consumer decides about. It still gets **no path-scoped
+pointer and no Kiro auto guide**, and the reasons are 15d's two halves read the
+other way round: a pointer fires while an agent is in one of fux's own committed
+files and `inspect` touches none, and an auto guide fires on a description
+match, which would have an agent volunteering critiques of a corpus nobody
+asked it about. **A read-only verb is not automatically ambient-safe**, which is
+the sentence this roster would otherwise invite somebody to assume.
 
 **15b. A pointer is rules plus a skill name, never a procedure.** Each ends
 `Full procedure: the <skill> skill.`, names a skill its own vendor receives, and
@@ -564,7 +574,7 @@ ruling.** On a Kiro CLI that ignores `fileMatch`, the `fux-decoder-files` and
 `fux-enrich-files` pointers enter every request. What bounds it: they carry no
 procedure, they say *only when a human asked*, and they are byte-bounded.
 
-**15e. Codex gets the ten skills and no pointer.** It has no path-scoped
+**15e. Codex gets every guide skill and no pointer.** It has no path-scoped
 surface: its always-on context is `AGENTS.md`, and a nested `AGENTS.md` loads
 only on the path from the working directory up, so one under `.fux/` would
 almost never load. `AGENTS.md` is **not** grown to list the guides — veto 6.

@@ -7,7 +7,11 @@ timestamp: 2026-09-13T00:00:00Z
 filed: 2026-09-13
 ---
 
-**Graduated 2026-09-14 → [W-169](../open/W-169-fux-inspect.md)** (Arpit). This file stays the spec the item points at.
+**Graduated 2026-09-14 (Arpit) and SHIPPED the same day.** This file stays the
+spec — [SR-INSPECT](../../records/0156_inspect.md) is the record of what was
+built, and [`work/IMPLEMENTATION.md`](../IMPLEMENTATION.md) §2026-09-14 W-169
+is the account of what shipping it found, including the check in §3 that failed
+its own rule and ships descriptive.
 
 # `fux inspect` — an X-ray of the index
 

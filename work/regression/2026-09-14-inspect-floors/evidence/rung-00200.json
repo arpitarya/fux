@@ -1,0 +1,627 @@
+{
+  "boilerplate": {
+    "boilerplate_postings": 49597,
+    "boilerplate_share": 0.4731680325131894,
+    "boilerplate_terms": 277,
+    "hapax": 430,
+    "hapax_share": 0.04165859329587289,
+    "heaps_beta": 0.46915003982938863,
+    "heaps_k": 19.995363117179917,
+    "lever": "`[index]` stopwords, or an analyzer amendment \u2014 an index change, with its own record",
+    "terms": 10322,
+    "top": [
+      {
+        "df": 200,
+        "hash": "02444b5e3431b6a2",
+        "idf": 0.0024906613124518304,
+        "share": 1.0,
+        "word": "sequenceDiagram"
+      },
+      {
+        "df": 200,
+        "hash": "0534ec3a9103aa94",
+        "idf": 0.0024906613124518304,
+        "share": 1.0,
+        "word": "90"
+      },
+      {
+        "df": 200,
+        "hash": "07f948f27b8b8b80",
+        "idf": 0.0024906613124518304,
+        "share": 1.0,
+        "word": "Diagram"
+      },
+      {
+        "df": 200,
+        "hash": "090c0b54b2eaf9f5",
+        "idf": 0.0024906613124518304,
+        "share": 1.0,
+        "word": "plate"
+      },
+      {
+        "df": 200,
+        "hash": "0aa043c54b6dd37e",
+        "idf": 0.0024906613124518304,
+        "share": 1.0,
+        "word": "99"
+      },
+      {
+        "df": 200,
+        "hash": "0bb18b7efcfc6dac",
+        "idf": 0.0024906613124518304,
+        "share": 1.0,
+        "word": "promote"
+      },
+      {
+        "df": 200,
+        "hash": "0e5e5d21659dbe17",
+        "idf": 0.0024906613124518304,
+        "share": 1.0,
+        "word": "66"
+      },
+      {
+        "df": 200,
+        "hash": "0f94f0504fedd7fe",
+        "idf": 0.0024906613124518304,
+        "share": 1.0,
+        "word": "projection"
+      },
+      {
+        "df": 200,
+        "hash": "10d8a524b02f1d4f",
+        "idf": 0.0024906613124518304,
+        "share": 1.0,
+        "word": "E"
+      },
+      {
+        "df": 200,
+        "hash": "118595f5e3b4d5c5",
+        "idf": 0.0024906613124518304,
+        "share": 1.0,
+        "word": "backfill"
+      },
+      {
+        "df": 200,
+        "hash": "138e2d373e66b39f",
+        "idf": 0.0024906613124518304,
+        "share": 1.0,
+        "word": "rotate"
+      },
+      {
+        "df": 200,
+        "hash": "13b02a5332f0ecd5",
+        "idf": 0.0024906613124518304,
+        "share": 1.0,
+        "word": "55"
+      },
+      {
+        "df": 200,
+        "hash": "13efe51f2e734d83",
+        "idf": 0.0024906613124518304,
+        "share": 1.0,
+        "word": "deprecated"
+      },
+      {
+        "df": 200,
+        "hash": "151b7d403afd10a2",
+        "idf": 0.0024906613124518304,
+        "share": 1.0,
+        "word": "71"
+      },
+      {
+        "df": 200,
+        "hash": "182d7cbac174658f",
+        "idf": 0.0024906613124518304,
+        "share": 1.0,
+        "word": "18"
+      },
+      {
+        "df": 200,
+        "hash": "197a9d64cb2d63fc",
+        "idf": 0.0024906613124518304,
+        "share": 1.0,
+        "word": "handbook"
+      },
+      {
+        "df": 200,
+        "hash": "1b3d182df7f1004c",
+        "idf": 0.0024906613124518304,
+        "share": 1.0,
+        "word": "6"
+      },
+      {
+        "df": 200,
+        "hash": "1bf41ef6fd6f6f6c",
+        "idf": 0.0024906613124518304,
+        "share": 1.0,
+        "word": "2"
+      },
+      {
+        "df": 200,
+        "hash": "1fc5bd8679f757f5",
+        "idf": 0.0024906613124518304,
+        "share": 1.0,
+        "word": "md"
+      },
+      {
+        "df": 200,
+        "hash": "20398d138e4d7bb4",
+        "idf": 0.0024906613124518304,
+        "share": 1.0,
+        "word": "17"
+      }
+    ],
+    "zipf_slope": -2.145941910943081
+  },
+  "checks": [
+    {
+      "detail": "0 of 200 documents carry no distinctive term at all, so no query can select them (EXHAUSTIVE - every document was checked)",
+      "flagged": false,
+      "floor": {
+        "bound": 0.01,
+        "direction": "max",
+        "provisional": true,
+        "source": "work/regression/2026-09-14-inspect-floors/"
+      },
+      "name": "unreachable share",
+      "status": "ok",
+      "value": 0.0
+    },
+    {
+      "detail": "49597 of 104819 postings carry one of 277 term(s) on half the corpus or more",
+      "flagged": false,
+      "floor": {
+        "bound": 0.6,
+        "direction": "max",
+        "provisional": true,
+        "source": "work/regression/2026-09-14-inspect-floors/"
+      },
+      "name": "boilerplate share",
+      "status": "ok",
+      "value": 0.4731680325131894
+    },
+    {
+      "detail": "0 of 200 documents are one half of a near-duplicate pair (Jaccard >= 0.80); 0 pair(s)",
+      "flagged": false,
+      "floor": {
+        "bound": 0.2,
+        "direction": "max",
+        "provisional": true,
+        "source": "work/regression/2026-09-14-inspect-floors/"
+      },
+      "name": "near-duplicate share",
+      "status": "ok",
+      "value": 0.0
+    },
+    {
+      "detail": "100 of 100 documents are returned in the top 3 for their own most distinctive words (an evenly spaced SAMPLE - the share is an estimate)",
+      "flagged": false,
+      "floor": null,
+      "name": "findable share",
+      "status": "descriptive",
+      "value": 1.0
+    }
+  ],
+  "corpus": {
+    "boilerplate_df": 100.0,
+    "distinctive_df": 20.0,
+    "documents": 200,
+    "edges": 0,
+    "postings": 104819,
+    "shards": {
+      "00.jsonl": "2be7304f59664b8861eabcf5e0b9ee23905ca8f0",
+      "02.jsonl": "3d043518589e80fe50ebbdc13d497923959164f3",
+      "04.jsonl": "7e8b67f5ccef4b3f64016756cd3ade20e0a653d8",
+      "05.jsonl": "5e4064daa4545d3e0b8da4aaab95dd0d0598629f",
+      "07.jsonl": "c2f34f42894c8a833fa051ada3a42a7ba6db7db2",
+      "09.jsonl": "985881fe90af6db50e522da83fd93dccf38041dc",
+      "0a.jsonl": "6ce317ffa3ad6e58260a735a1f34eacbaf3ada74",
+      "0c.jsonl": "e8b86f347125034b2df125cb73f63f18d8dd4d67",
+      "0e.jsonl": "0ace8959010ee429a7a10809b9ede8125ac776f6",
+      "0f.jsonl": "726a7ae76c31f1a1fd36b501d167f17f6ffeae0c",
+      "11.jsonl": "d134e2eeb5d5ec21a8ceda677f74f14a98f942ae",
+      "12.jsonl": "3702a179b3766ff495ab2dec096737ca0c65c00b",
+      "15.jsonl": "fdfb2f9ba79cf2be129589de9c92794449016c68",
+      "16.jsonl": "73eae9209eaa6f29e7b0453b6ba716dd08ca9768",
+      "17.jsonl": "2e323c8b4d0c854c2e2ce039e777d72e052dc573",
+      "1a.jsonl": "ef182523b8f2f8f7ad33e44ff2bd99ede50d512a",
+      "1c.jsonl": "c55632e5b187dcdf66ce395ade1c3482bc2505c3",
+      "1e.jsonl": "d616b57812543b8e8467e0c0840d301ac82a535c",
+      "21.jsonl": "f937475afcd476c3bf5a3507a6d3a4ebe803f620",
+      "23.jsonl": "43d522ee550b55215845990ce29078ec46b4fe7c",
+      "25.jsonl": "1562ffa4dc0e4303710d2b9aafed53f3650e94f1",
+      "26.jsonl": "fe27e7b1e7c4656ff07426b47373c133c587195d",
+      "27.jsonl": "15a4500f8dbb6758a60e985c4ef64726578810c3",
+      "29.jsonl": "48ecbaee417b2506a0388734b96d4a2f74a62114",
+      "2a.jsonl": "5469b0f3ff492933bdd0264b0e62f7ab273b6843",
+      "2d.jsonl": "bbcacd8b22087ce7f33a06352aa980e4b31e64f7",
+      "2e.jsonl": "e300515aff67267e924fa36e24ab3c22123e0203",
+      "2f.jsonl": "1424a0042b02f3e15eca3b557cc694a0d51effb0",
+      "33.jsonl": "544bc7dd8e43faf2d4df6d63e489d8eb4a2edf7b",
+      "34.jsonl": "484c3ef6fc1e5381b6b3cb065eb75763b76b47ca",
+      "35.jsonl": "b17d6e6406db9b7d7e9b62e2a5d575ec02f69dbd",
+      "36.jsonl": "103bdb30df2d2e3351925d15a54388938922065d",
+      "37.jsonl": "2ffbcd6a700b1841400635157cdfa7c43fbb3ffa",
+      "38.jsonl": "a2bdbcd38f1d950814ef698f4533c0803cb6926b",
+      "3a.jsonl": "ed807666a99292fde61ff36901837692a84e70bf",
+      "3b.jsonl": "4c53e281cef8529469ae506cbcecd86dbcb739c8",
+      "3c.jsonl": "dfd0951e63492e674608a0e5f0bf023c8085d862",
+      "3d.jsonl": "e433ac823e2dd0190fcd47afd1233dd101aa25f6",
+      "3e.jsonl": "bc71b69c031e423f24fd4838cc201c47474d410e",
+      "3f.jsonl": "dbed29d64503e291774e1da7b4facb6e8e6f58d7",
+      "48.jsonl": "83b479f76a97d50c9d109b1f90832b20f8e0d5cf",
+      "4b.jsonl": "f66043f2c58dd4e4648bbdb2f316c76b15c7fa7b",
+      "4c.jsonl": "9f63df7f9b1c79add5ebb247f7e01e3b1a78cca6",
+      "51.jsonl": "e4e19647f4a29801cd1647a92182edd74483a724",
+      "52.jsonl": "ebc73078e7174fc18982f8d8072b612eb971379d",
+      "55.jsonl": "a99eb353a353568d80671b3b3f8a9b7345759245",
+      "56.jsonl": "097cf34062eb229f58450cc5e5433a125c60ab57",
+      "57.jsonl": "2cc07aad0b237c983aecf2b272c31ca816d64b45",
+      "59.jsonl": "4bc01c66985ae1aae22c079b63e490e66af5a78e",
+      "5e.jsonl": "f33794c477b672e44a962cd7077b09ded51f42bf",
+      "5f.jsonl": "d79fb058af82c0f3e85f20dabfd549b6ec966059",
+      "62.jsonl": "5a086fe26a89723ea5be30e0c9b29d1470797e4d",
+      "64.jsonl": "b11b88ed1ff0aec0ae6bc786abecda704fcc75cf",
+      "68.jsonl": "658916d5ff478b61d60133edb41c033311a5291c",
+      "69.jsonl": "e63e8cc0468bf9bfb368cc8deaa96dc467bddaf4",
+      "6b.jsonl": "0740a49920184e656384a9736d4fef85fca90ed0",
+      "6d.jsonl": "c596803176450feeb5747fcefdaad2a72ca8ebbf",
+      "6f.jsonl": "d22c9a5706a48d91c95500f9698cddc370c48148",
+      "70.jsonl": "3cff7a7fffd135f6d82f4b79d5d042ba183f6236",
+      "71.jsonl": "cfa5515d3988f860e550a5d52b3d5e54ac1bf9af",
+      "73.jsonl": "9acdc9c4a283fcdd02487f25b2e934d89e507eec",
+      "77.jsonl": "8d55dcb9672261a0a1cbbaa203a6f53ac4ab93fb",
+      "78.jsonl": "2abbb38f4d32eced2d8be20e73ffcff0297168da",
+      "79.jsonl": "2c135342659fb936561ff663cb6468e62ce3b508",
+      "7a.jsonl": "58e871b0046dec2c0620e07b7edd0b621d3452d3",
+      "7b.jsonl": "cfc1bcd5daf47db86ff7506c3cf5be0b760b0ea2",
+      "7c.jsonl": "5b630d3d5946016dc8747b71554449f7fd1df4b8",
+      "7e.jsonl": "7273db250e7f4ccb973c2ebdb9f76d3051470e87",
+      "7f.jsonl": "49eefeff6b03d83e28456e074a818d9dffa2c8b8",
+      "80.jsonl": "c9faca3cf84ceccdd2a92248f3ab2a37564d0431",
+      "82.jsonl": "e2ce73e18081893cd4399070ba3da231883d2eda",
+      "83.jsonl": "1a4d6bbf2c2818191eed5bcd1a0cb2e088b561ab",
+      "84.jsonl": "3870b5050ca776fdd1eba2b1c780466d86696272",
+      "85.jsonl": "13875c5cfa249b521e8a83755fb611949241c850",
+      "87.jsonl": "24c61cf0bc362cfbe1bc42d73e6d6a1a7131905a",
+      "89.jsonl": "5873d5d2264ac07fd0e8dbc3f86e33ba2b61470e",
+      "8b.jsonl": "c74026598af88457f8be6c57fe0ed52f6e18198e",
+      "8c.jsonl": "bf9a7c9dce359d266d54e40b0e288798416ecc90",
+      "8d.jsonl": "72595f693d725f709000059ca0f06994ea08ac74",
+      "8f.jsonl": "4e3914e8faa8ed6c282bc17af68f9fa54c5bdba9",
+      "90.jsonl": "1dcb3a2815726719b9c93a16c68d857770ade6e5",
+      "92.jsonl": "55401d615eb78e3f99df97a257128dcb127ed7ba",
+      "93.jsonl": "4fa90034ae32ce39c9091d446d5f497a3553f872",
+      "94.jsonl": "cb96afce76bf36cb9c34cfe6f3779a2632d44d1c",
+      "98.jsonl": "f63865e07b9eaba666af360f91bfffa854c70303",
+      "99.jsonl": "2941047e64903a7ba835621fdd359561de3e7bef",
+      "9a.jsonl": "5a0315442ae2196fb192230d06da2cb3610ef40a",
+      "9d.jsonl": "9cb17d9f08cba4629ec8ad5c58367449c8bfd5f5",
+      "a0.jsonl": "61035576452ce3df6ed761c86fa16c8053a3ed95",
+      "a2.jsonl": "903d0cb6689897586aa361c2f60ca99f67827b50",
+      "a4.jsonl": "eae13e8aab2eab7bb6253caa008f0b3c24227d89",
+      "a5.jsonl": "e52abc38fdf616464c623d5fc9bc79757ec988cf",
+      "a6.jsonl": "0e9af1f78b76ff617e1d52a5923c21396d68c608",
+      "a8.jsonl": "6726aec075b51fc1164b2ab4ad1a61423f26173e",
+      "a9.jsonl": "0169393557bd872bc05d616592a03c4c6218b0ad",
+      "aa.jsonl": "50d4bdf8eedc0f0c8b9662a8cd6e9f458f3fbc6b",
+      "ab.jsonl": "1e4b77eedc304b4096a9765ac7b902c863ff44f0",
+      "ac.jsonl": "e1dab28d694fd2bb0ac2eb35d84cbf957e3b56bb",
+      "ad.jsonl": "011e75c0fcca6100219d6c04b7940bcc96f82c92",
+      "b0.jsonl": "180cc5c55dd5f4d6a61afada0a4cd413390f2f50",
+      "b1.jsonl": "5bca62c5b2fe3b7e2e9b86d8ede84e5c870a255e",
+      "b3.jsonl": "d6fa7bb3bd37a8e5513a561836dcc440eb9aac8d",
+      "b4.jsonl": "4ada60b04f48167ea4eef37556188568b2b2d7a5",
+      "b6.jsonl": "4a6486dbf19e419edd5abb739790a116439e20fa",
+      "b7.jsonl": "478a601d3847c7d9de4f235d47ed9cfa5b0d1644",
+      "b8.jsonl": "b7c6e92ab32e7dd2d89b97ae2a41862aafe80aa4",
+      "b9.jsonl": "de82f12d83d5d8d8dcf67646e569013bb57834cf",
+      "bb.jsonl": "6c1b1097962aea816825709d77115455337916cb",
+      "bc.jsonl": "d26895289e764d9c6082fc0781ab4ff2043199e1",
+      "bd.jsonl": "eeded8323ad1bb9cd890a82a7fd94976e5115e00",
+      "be.jsonl": "4f05353ba3b0725760abe6a71eee10dc7aacf5b9",
+      "bf.jsonl": "a144a042f66b317e358b5fe026ef5c068aaae980",
+      "c1.jsonl": "08b6f0c8bf318f305d6e776bc759376a4f4a2451",
+      "c5.jsonl": "94acaea569b9cf2f9d2104503860c23910dca44d",
+      "c7.jsonl": "9c2f9da20d3d3ef020e7bb3dad0f072ced124a35",
+      "c8.jsonl": "9feee44645e54a96ef1f8613a700f52c0f558ce3",
+      "ca.jsonl": "a2f0545ea5642699d9135d108d715263bc1b2277",
+      "cc.jsonl": "d462b8079df888f7d02a50f21e8996d73b3963d8",
+      "cd.jsonl": "5a94a0936e68f730297cc22fe628a31ddcac4a04",
+      "ce.jsonl": "32b2521af4b5796664c7b508ca4b2443c9d8b15b",
+      "d1.jsonl": "d047a4d5868e306feab096a8131b96de8acbeb81",
+      "d5.jsonl": "ad66972c80514cef55b60c8c26564da541db4383",
+      "d9.jsonl": "f7be08af03be26e2ebe42b4918885bb3cceb0c60",
+      "da.jsonl": "d0f32694a97625caf07c30cd7b357366810fa8cf",
+      "dd.jsonl": "c24d03770b31a1e7be2de7fd1521e93e3df58d84",
+      "df.jsonl": "8c68163e6879d447bca11c15bbfbcdd21ecec66d",
+      "e0.jsonl": "6cc46cb58cb5c3e6d7023918929a472be39e2d34",
+      "e2.jsonl": "ec80d6acd23b8607808574415dd6a8acfaa004ba",
+      "e4.jsonl": "8d72bd22cbcbc04e175bd9baee7ba84dad07ddc6",
+      "e7.jsonl": "b4812f8fc1af9c6823e2b29692e41af028632ce1",
+      "e8.jsonl": "ed8ccd1e3d8a1d2f9ae082ca16c7e1a56185b26d",
+      "e9.jsonl": "22ad7953060867795574530c55e0ef780db6562c",
+      "ea.jsonl": "f1537bc363cf52c52158d99b51e925d25584da2e",
+      "ee.jsonl": "18edddfa21687de923edfd2393acac7f0b417cc4",
+      "f0.jsonl": "1d210ddd7840cf30e8fec39b7c190c1934dc2546",
+      "f1.jsonl": "adab537581379501e165819a29ea46638d425b0c",
+      "f2.jsonl": "140785718d53384446d20e2165f23cb20284cd88",
+      "f3.jsonl": "b10aeb4d406ee01fd0c5d05cc890b2f142fda6c1",
+      "f4.jsonl": "feee6b1861881030d7d9c22849b141f81d72626a",
+      "f7.jsonl": "a164c13aa59ed1d868bbfbdd4d647bfa3c21fe54",
+      "f8.jsonl": "36d84d930d2fa56626cf181a5cceae270ca45f9c",
+      "fa.jsonl": "574260c8128589282402252a85c8ea4f6c71efa0",
+      "fb.jsonl": "c1416ddaba70295709fbb748729f6326ac3e0a41",
+      "fc.jsonl": "cac94706d2b4c6021a119a03f70482487607fac0",
+      "fe.jsonl": "7dc74a6860f5f907d02b71484f3f9e1cc34267df"
+    },
+    "terms": 10322
+  },
+  "coverage": {
+    "dictionary_coverage": 1.0,
+    "kept": 915678,
+    "kept_share": 0.8335697158494022,
+    "lever": "a decoder (`fux-decoder`), or leave it in `.fux/enrich/queue.tsv` for a model to describe",
+    "named_terms": 10322,
+    "no_content": [],
+    "queued": [],
+    "raw_runs": 1098502,
+    "total_terms": 10322,
+    "undecodable": [],
+    "unreadable": []
+  },
+  "duplication": {
+    "documents_in_a_family": 0,
+    "documents_in_a_pair": 0,
+    "families": [],
+    "family_count": 0,
+    "lever": "`.fuxignore`, `archived=`, or `supersedes` on the one that is current",
+    "near_duplicate_share": 0.0,
+    "near_duplicates": [],
+    "pair_count": 0
+  },
+  "findability": {
+    "fewest_distinctive": [
+      {
+        "distinctive": 209,
+        "id": "file:docs/00190-freight-canopy.md"
+      },
+      {
+        "distinctive": 213,
+        "id": "file:docs/00091-metallurgy-trellis.md"
+      },
+      {
+        "distinctive": 213,
+        "id": "file:docs/00175-seismology-emulsion.md"
+      },
+      {
+        "distinctive": 214,
+        "id": "file:docs/00143-apiculture-datum.md"
+      },
+      {
+        "distinctive": 215,
+        "id": "file:docs/00066-horticulture-rootstock.md"
+      },
+      {
+        "distinctive": 218,
+        "id": "file:docs/00037-lithography-colony.md"
+      },
+      {
+        "distinctive": 220,
+        "id": "file:docs/00020-freight-catchment.md"
+      },
+      {
+        "distinctive": 220,
+        "id": "file:docs/00179-viticulture-emulsion.md"
+      },
+      {
+        "distinctive": 222,
+        "id": "file:docs/00014-cartography-tolerance.md"
+      },
+      {
+        "distinctive": 223,
+        "id": "file:docs/00159-viticulture-epicentre.md"
+      },
+      {
+        "distinctive": 224,
+        "id": "file:docs/00135-seismology-brood.md"
+      },
+      {
+        "distinctive": 225,
+        "id": "file:docs/00103-apiculture-ledger.md"
+      },
+      {
+        "distinctive": 226,
+        "id": "file:docs/00124-cartography-aquifer.md"
+      },
+      {
+        "distinctive": 228,
+        "id": "file:docs/00045-seismology-projection.md"
+      },
+      {
+        "distinctive": 228,
+        "id": "file:docs/00047-lithography-projection.md"
+      },
+      {
+        "distinctive": 228,
+        "id": "file:docs/00119-viticulture-annealing.md"
+      },
+      {
+        "distinctive": 230,
+        "id": "file:docs/00030-freight-colony.md"
+      },
+      {
+        "distinctive": 230,
+        "id": "file:docs/00074-cartography-plate.md"
+      },
+      {
+        "distinctive": 232,
+        "id": "file:docs/00083-apiculture-sounding.md"
+      },
+      {
+        "distinctive": 232,
+        "id": "file:docs/00087-lithography-sounding.md"
+      }
+    ],
+    "findable_share": 1.0,
+    "lever": "`fux enrich`, `fux correct`, or fix the source",
+    "misses": [],
+    "retrieved": 100,
+    "sample_is_whole_corpus": false,
+    "sampled": 100,
+    "unfindable": [],
+    "unfindable_count": 0
+  },
+  "graph": {
+    "communities": [],
+    "community_count": 0,
+    "edges": 0,
+    "hubs": [],
+    "lever": "link-IDF and the graph-composed `ask` (W-161) \u2014 until then, add a link from a document that is read",
+    "nodes": 0,
+    "orphan_count": 200,
+    "orphans": [
+      "file:docs/00000-freight-manifest.md",
+      "file:docs/00001-metallurgy-manifest.md",
+      "file:docs/00002-hydrology-manifest.md",
+      "file:docs/00003-apiculture-manifest.md",
+      "file:docs/00004-cartography-manifest.md",
+      "file:docs/00005-seismology-manifest.md",
+      "file:docs/00006-horticulture-manifest.md",
+      "file:docs/00007-lithography-manifest.md",
+      "file:docs/00008-bathymetry-manifest.md",
+      "file:docs/00009-viticulture-manifest.md",
+      "file:docs/00010-freight-tolerance.md",
+      "file:docs/00011-metallurgy-tolerance.md",
+      "file:docs/00012-hydrology-tolerance.md",
+      "file:docs/00013-apiculture-tolerance.md",
+      "file:docs/00014-cartography-tolerance.md",
+      "file:docs/00015-seismology-tolerance.md",
+      "file:docs/00016-horticulture-tolerance.md",
+      "file:docs/00017-lithography-tolerance.md",
+      "file:docs/00018-bathymetry-tolerance.md",
+      "file:docs/00019-viticulture-tolerance.md"
+    ],
+    "singleton_communities": 0
+  },
+  "lengths": {
+    "body_tokens": {
+      "max": 5272,
+      "min": 3275,
+      "p10": 3444,
+      "p50": 4704,
+      "p90": 5092
+    },
+    "ctx_over_body": [],
+    "distinct_terms": {
+      "max": 606,
+      "min": 452,
+      "p10": 489,
+      "p50": 522,
+      "p90": 565
+    },
+    "empty_title": [],
+    "fields": {
+      "body": 898848,
+      "ctx": 0,
+      "heading": 14830,
+      "path": 1000,
+      "title": 1000
+    },
+    "longest": [
+      {
+        "body_tokens": 5272,
+        "id": "file:docs/00110-freight-annealing.md"
+      },
+      {
+        "body_tokens": 5221,
+        "id": "file:docs/00026-horticulture-catchment.md"
+      },
+      {
+        "body_tokens": 5219,
+        "id": "file:docs/00014-cartography-tolerance.md"
+      },
+      {
+        "body_tokens": 5211,
+        "id": "file:docs/00158-bathymetry-epicentre.md"
+      },
+      {
+        "body_tokens": 5188,
+        "id": "file:docs/00126-horticulture-aquifer.md"
+      },
+      {
+        "body_tokens": 5178,
+        "id": "file:docs/00178-bathymetry-emulsion.md"
+      },
+      {
+        "body_tokens": 5158,
+        "id": "file:docs/00006-horticulture-manifest.md"
+      },
+      {
+        "body_tokens": 5154,
+        "id": "file:docs/00106-horticulture-ledger.md"
+      },
+      {
+        "body_tokens": 5154,
+        "id": "file:docs/00010-freight-tolerance.md"
+      },
+      {
+        "body_tokens": 5138,
+        "id": "file:docs/00174-cartography-emulsion.md"
+      }
+    ],
+    "no_headings": [],
+    "shortest": [
+      {
+        "body_tokens": 3275,
+        "id": "file:docs/00124-cartography-aquifer.md"
+      },
+      {
+        "body_tokens": 3333,
+        "id": "file:docs/00020-freight-catchment.md"
+      },
+      {
+        "body_tokens": 3339,
+        "id": "file:docs/00040-freight-projection.md"
+      },
+      {
+        "body_tokens": 3352,
+        "id": "file:docs/00164-cartography-graft.md"
+      },
+      {
+        "body_tokens": 3356,
+        "id": "file:docs/00160-freight-graft.md"
+      },
+      {
+        "body_tokens": 3369,
+        "id": "file:docs/00188-bathymetry-echogram.md"
+      },
+      {
+        "body_tokens": 3372,
+        "id": "file:docs/00064-cartography-rootstock.md"
+      },
+      {
+        "body_tokens": 3372,
+        "id": "file:docs/00136-horticulture-brood.md"
+      },
+      {
+        "body_tokens": 3377,
+        "id": "file:docs/00172-hydrology-emulsion.md"
+      },
+      {
+        "body_tokens": 3385,
+        "id": "file:docs/00148-bathymetry-datum.md"
+      }
+    ]
+  },
+  "levers": {
+    "boilerplate term": "`[index]` stopwords, or an analyzer amendment \u2014 an index change, with its own record",
+    "file-name-only document": "a decoder (`fux-decoder`), or leave it in `.fux/enrich/queue.tsv` for a model to describe",
+    "hub": "link-IDF and the graph-composed `ask` (W-161) \u2014 until then, nothing: a hub is a fact about the corpus",
+    "near-duplicate pair": "`.fuxignore`, `archived=`, or `supersedes` on the one that is current",
+    "orphan": "link-IDF and the graph-composed `ask` (W-161) \u2014 until then, add a link from a document that is read",
+    "template family": "`.fuxignore`, `archived=`, or `supersedes` on the one that is current",
+    "unfindable document": "`fux enrich`, `fux correct`, or fix the source",
+    "unreadable document": "re-ingest, or `keep = true` on the url line so the bytes are retained"
+  }
+}

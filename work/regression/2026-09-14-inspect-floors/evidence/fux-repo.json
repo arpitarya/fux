@@ -1,0 +1,1414 @@
+{
+  "boilerplate": {
+    "boilerplate_postings": 33027,
+    "boilerplate_share": 0.07212410928570337,
+    "boilerplate_terms": 46,
+    "hapax": 12378,
+    "hapax_share": 0.46274627088863135,
+    "heaps_beta": 0.5642367564796051,
+    "heaps_k": 6.202822485063952,
+    "lever": "`[index]` stopwords, or an analyzer amendment \u2014 an index change, with its own record",
+    "terms": 26749,
+    "top": [
+      {
+        "df": 1016,
+        "hash": "cc4025955488d9f2",
+        "idf": 0.1491490843913092,
+        "share": 0.8617472434266328,
+        "word": "2026"
+      },
+      {
+        "df": 990,
+        "hash": "1fc5bd8679f757f5",
+        "idf": 0.1750598513211048,
+        "share": 0.8396946564885496,
+        "word": "md"
+      },
+      {
+        "df": 969,
+        "hash": "b4c496750066f455",
+        "idf": 0.19648924277700394,
+        "share": 0.821882951653944,
+        "word": "work"
+      },
+      {
+        "df": 969,
+        "hash": "f6fc42039fba3776",
+        "idf": 0.19648924277700394,
+        "share": 0.821882951653944,
+        "word": "1"
+      },
+      {
+        "df": 911,
+        "hash": "1bf41ef6fd6f6f6c",
+        "idf": 0.25817812334099277,
+        "share": 0.7726887192536047,
+        "word": "2"
+      },
+      {
+        "df": 880,
+        "hash": "9e251905a6d98e01",
+        "idf": 0.2927797895234496,
+        "share": 0.7463952502120441,
+        "word": "3"
+      },
+      {
+        "df": 875,
+        "hash": "33ec06a749a3852b",
+        "idf": 0.2984745657338039,
+        "share": 0.7421543681085666,
+        "word": "evidence"
+      },
+      {
+        "df": 815,
+        "hash": "f824bd8d9cb2a038",
+        "idf": 0.36946829539864195,
+        "share": 0.6912637828668363,
+        "word": "docs"
+      },
+      {
+        "df": 810,
+        "hash": "8b54089fee8d99a0",
+        "idf": 0.3756183762839797,
+        "share": 0.6870229007633588,
+        "word": "5"
+      },
+      {
+        "df": 793,
+        "hash": "a6f7f78f66ec2ae1",
+        "idf": 0.39681617749324677,
+        "share": 0.6726039016115352,
+        "word": "regression"
+      },
+      {
+        "df": 786,
+        "hash": "842b7d9d43cddf75",
+        "idf": 0.40567699496137793,
+        "share": 0.6666666666666666,
+        "word": "0"
+      },
+      {
+        "df": 780,
+        "hash": "711d7b067f3018b6",
+        "idf": 0.41333497750422366,
+        "share": 0.6615776081424937,
+        "word": "4"
+      },
+      {
+        "df": 775,
+        "hash": "7e8eafb96f16fae7",
+        "idf": 0.41976173484311696,
+        "share": 0.6573367260390162,
+        "word": "no"
+      },
+      {
+        "df": 753,
+        "hash": "e64984c3aacf6ede",
+        "idf": 0.44854069939316027,
+        "share": 0.638676844783715,
+        "word": "s"
+      },
+      {
+        "df": 752,
+        "hash": "fb4b0d4947c68395",
+        "idf": 0.44986872083667967,
+        "share": 0.6378286683630195,
+        "word": "run"
+      },
+      {
+        "df": 734,
+        "hash": "3a1cdb6d35730e89",
+        "idf": 0.47407972184577846,
+        "share": 0.6225614927905004,
+        "word": "fux"
+      },
+      {
+        "df": 732,
+        "hash": "587103e499c41fe9",
+        "idf": 0.47680637656848807,
+        "share": 0.6208651399491094,
+        "word": "one"
+      },
+      {
+        "df": 716,
+        "hash": "d4b64d628970a496",
+        "idf": 0.49889147019148383,
+        "share": 0.6072943172179813,
+        "word": "Record"
+      },
+      {
+        "df": 709,
+        "hash": "60bf1ccfa0bcabdb",
+        "idf": 0.508709220859613,
+        "share": 0.6013570822731128,
+        "word": "change"
+      },
+      {
+        "df": 698,
+        "hash": "ef6b2250f2665c57",
+        "idf": 0.5243345387626939,
+        "share": 0.5920271416454622,
+        "word": "per"
+      }
+    ],
+    "zipf_slope": -0.9550889834637747
+  },
+  "checks": [
+    {
+      "detail": "1 of 1179 documents carry no distinctive term at all, so no query can select them (EXHAUSTIVE - every document was checked)",
+      "flagged": false,
+      "floor": {
+        "bound": 0.01,
+        "direction": "max",
+        "provisional": true,
+        "source": "work/regression/2026-09-14-inspect-floors/"
+      },
+      "name": "unreachable share",
+      "status": "ok",
+      "value": 0.0008481764206955047
+    },
+    {
+      "detail": "33027 of 457919 postings carry one of 46 term(s) on half the corpus or more",
+      "flagged": false,
+      "floor": {
+        "bound": 0.6,
+        "direction": "max",
+        "provisional": true,
+        "source": "work/regression/2026-09-14-inspect-floors/"
+      },
+      "name": "boilerplate share",
+      "status": "ok",
+      "value": 0.07212410928570337
+    },
+    {
+      "detail": "168 of 1179 documents are one half of a near-duplicate pair (Jaccard >= 0.80); 250 pair(s)",
+      "flagged": false,
+      "floor": {
+        "bound": 0.2,
+        "direction": "max",
+        "provisional": true,
+        "source": "work/regression/2026-09-14-inspect-floors/"
+      },
+      "name": "near-duplicate share",
+      "status": "ok",
+      "value": 0.14249363867684478
+    },
+    {
+      "detail": "97 of 100 documents are returned in the top 3 for their own most distinctive words (an evenly spaced SAMPLE - the share is an estimate)",
+      "flagged": false,
+      "floor": null,
+      "name": "findable share",
+      "status": "descriptive",
+      "value": 0.97
+    }
+  ],
+  "corpus": {
+    "boilerplate_df": 589.5,
+    "distinctive_df": 117.9,
+    "documents": 1179,
+    "edges": 5708,
+    "postings": 457919,
+    "shards": {
+      "00.jsonl": "ffd3aef91cc479fe738666dc5b68939fa162d7ca",
+      "01.jsonl": "0ba9d548724de4a57cd8de4bc11676552c67079b",
+      "02.jsonl": "b7a6f92140cc891259d38f1b8ccb4fa44908fb0d",
+      "03.jsonl": "1829da0b9d96d21776047ee6fe2fbfcc08124848",
+      "04.jsonl": "b267dc6a1f5aa6048cd9e222922424abd5404b39",
+      "05.jsonl": "ec5f95b2de682b814fec952c4e65b58a5dbcaef0",
+      "06.jsonl": "21e29bccb27b8503df3dceeb77c91eab0f1745c7",
+      "07.jsonl": "914b48fff2b483c6ae1bf60bbb98200a954bb4c0",
+      "08.jsonl": "12c375f328250f6fcdf7ea53eb2a279a9a99ca41",
+      "09.jsonl": "9375aa7a1e01c340a9d05eefccebe1a4b7bf1236",
+      "0a.jsonl": "e46126361e494a0bf2dc6f9b8d890da06898869a",
+      "0b.jsonl": "b4d653a550edee2e8ea97de1d203dfaa62b8636e",
+      "0c.jsonl": "fed9102f4464c6e78cbc76c6ebf933c2f0fb2c2b",
+      "0d.jsonl": "fd50345747919285cf74528c5dcc5337c108bc98",
+      "0e.jsonl": "e2af1fe859c9a4cfa75641045e6ef8806cf149cc",
+      "0f.jsonl": "c4d4a29a94ed992a58fb07b25be6882e1d4812b1",
+      "10.jsonl": "ba4cc11bd95a906e8e964805cb5f991874e1114b",
+      "11.jsonl": "d703d1191d48a5c1bb846042cbff17c8ed5cf339",
+      "12.jsonl": "9781cb17b46e4dc2db68cd1cfc634bbaec14de79",
+      "13.jsonl": "f8ec75b03519bd05c24aedbe970849eb8e85c546",
+      "14.jsonl": "45a67c2b80c668a3474368af2b65f154fdcb9440",
+      "15.jsonl": "f21df8df85747eb5fb990cee3231b52bfeed720d",
+      "16.jsonl": "c899123d8a6f49a746ea9f8f70d118f2c5cd45d4",
+      "17.jsonl": "f8dc85be5c079da0fca942010c8f9092084542a4",
+      "18.jsonl": "6814bf8a587792030da1b2d64f4848de1d3d9c97",
+      "19.jsonl": "e410a221fb4ee2b4fda1463677ec2aea90713873",
+      "1a.jsonl": "146a9f49a6b9be9d57503f514b373153b8aeaab7",
+      "1b.jsonl": "dba0afd7ef006cd5b83a4b7d6b90ab326766a1b8",
+      "1c.jsonl": "379c5c86dd1130132bcace5b4833936df07f9258",
+      "1d.jsonl": "d1f32db9f44194915a21a04fb59ccecdf6b3aefb",
+      "1e.jsonl": "c9c4910694aa22f68e4e34e124faec8eab17aba6",
+      "1f.jsonl": "c7b8e2b338b7e72156ad900ef3b31314f249dc1b",
+      "20.jsonl": "2eec773eb5a102dadd788f1aba6b7dfcf0881d33",
+      "21.jsonl": "714ae06fab17e25e9c39214cb1a0a9a155776a69",
+      "22.jsonl": "e31eed30cb2bdd1e5137159c9650acebaf3dd1bf",
+      "23.jsonl": "f3e1e1a08d5ab44a616e3eda60a92b2ade96ab6a",
+      "24.jsonl": "ab5af98729962e985603a7546930dbcf5a3d085c",
+      "25.jsonl": "ded19ce9a0c807a4387bd82086e3cc64ce3033c7",
+      "26.jsonl": "8455df5c724bd9207c5bb0da5520eb7381b7aaad",
+      "27.jsonl": "2cbcd9c49a750d1822101c4c58e59c145cd9cc2e",
+      "28.jsonl": "9f6616b276bd3f82733513871ab2aea5cecee727",
+      "29.jsonl": "8785b55afbe70a52c46f791064eb0a38c7a7c3bc",
+      "2a.jsonl": "547a72aad6bf860aa618766abea421840b71f9a3",
+      "2b.jsonl": "93f7661fef54d3961877f6e895f43adcdd8a9e72",
+      "2c.jsonl": "71cd39022b90f8a7db88834f99d0e1c44cff75e9",
+      "2d.jsonl": "517a51f3575da5836562c9e20f0284599a27d721",
+      "2e.jsonl": "69bf46d8c117fcfe7163ce33173f0fecb6a7f2fc",
+      "2f.jsonl": "5b0257999b5eaf8d3a8af0f1f367caa866b930de",
+      "30.jsonl": "70869a01e8caac21894e025b6c710631345a8791",
+      "31.jsonl": "839cd27dd52c5977ec13194bf9dcdb5b4ce0f2cd",
+      "32.jsonl": "00b8a342520ba3afcb8a42b3eb8a6e22d0b2aeca",
+      "33.jsonl": "8e50176b79f3c14f93f6e9665ae338bba00aaec3",
+      "34.jsonl": "58f89fdd2c751c25d4831116a8b2e982d66387d7",
+      "35.jsonl": "f19066c7f20d8445da278e8640a9ceee19188ac6",
+      "36.jsonl": "dda95dd0a26f30f5638860fc7d6886cefe50afe2",
+      "37.jsonl": "e3eb8ca45ec26d1404e8c3fb45db903732bbc1fe",
+      "38.jsonl": "baf7e9a690f0e50caa364709260d5b1152cf598a",
+      "39.jsonl": "e220a29cacfacd9bd7b4a970171f58c7fd813635",
+      "3a.jsonl": "0511f644205002c89c2e67c90b582009432f984f",
+      "3b.jsonl": "9011e6f63ff5fd4bd44a0a77501b76503c33b2b8",
+      "3c.jsonl": "bf4ab798f9cc9b06d2a2b5e414be483b78812b02",
+      "3d.jsonl": "1a59d417268cdc039c5eaef6934e175aa847d82d",
+      "3e.jsonl": "5b75a7b8d4e79905f0bc4f4748bc39ddffcaa887",
+      "3f.jsonl": "889ea7327ee434de37cf78c1ad8d5706cb908c0e",
+      "40.jsonl": "787678953d790c11d1d45b6674ac341d2dff8641",
+      "41.jsonl": "d2a25acfd3dd8ba36aa9e7549e47fc21d530dc34",
+      "42.jsonl": "180519b1b3015d873a7e09932ef504ba380eca8a",
+      "43.jsonl": "f8ec55dae8ae549a7ec03e316822bd9461a59772",
+      "44.jsonl": "a5fbd74b3d3b5eefc987cb05ce02a5a823cdd043",
+      "45.jsonl": "12fbd811acebde8f34680698f6e87a1222461150",
+      "46.jsonl": "c98f1b9c51012d6f8b58a7540d048a42ea4713a4",
+      "47.jsonl": "1710bcfbe4bfd47606807120f88237351e700242",
+      "48.jsonl": "d0823a73bf62620aa84d00fa1249efc60dfe5711",
+      "49.jsonl": "f451968378f580aa3cb40c622004178075879eb8",
+      "4a.jsonl": "42c4b6426dfbcb7f403c3c10b9643fcd4ab1f4b6",
+      "4b.jsonl": "a3984c1b5ff7d53ed0439be1a2760111dd8a697e",
+      "4c.jsonl": "b1048a415de22a3d12453fecbba40df838da275c",
+      "4d.jsonl": "28ab81fb3539c3b16fcb6981ed284912615938f8",
+      "4e.jsonl": "fa7408474fe96cdad5d5257f777fc0c54ac4ff6a",
+      "4f.jsonl": "465ecae045497648f5d371006f9f7a20dfe4619b",
+      "50.jsonl": "f423f4dfe89c67cbe3cc088f6454d45980d80350",
+      "51.jsonl": "acca34253d10f87e3a9f5be387d7971f54a96302",
+      "52.jsonl": "6baedaf175b5c8e48dcd5f69808f566db098b8a8",
+      "53.jsonl": "b01114faeeb510310e3981c0d98c7ac4760b41fb",
+      "54.jsonl": "bedf44908e2fe330cac4d0336c1761caa1983341",
+      "55.jsonl": "1b572b4b3e8814e77e381d8f9c98fc383c4b1041",
+      "56.jsonl": "1c81c86d7c310005ec23339c23a9c793e06802d8",
+      "57.jsonl": "2127e52324ba5a11d8c002a5c8e2f1b2cc258447",
+      "58.jsonl": "f284c01985ea00fbcd34d7d08c5fb6b214a257b0",
+      "59.jsonl": "ceafaaf557151d4aeb308a215e3413df71bfadd2",
+      "5a.jsonl": "f688d66aac41f8fe47eddc1211f2abcc8072f93c",
+      "5b.jsonl": "8340448d4583092a42209f256a18b0637eaaa3c5",
+      "5c.jsonl": "d25b6a2bfe3119ba7272863ea69495a9aea6da86",
+      "5d.jsonl": "0ed226ad02605934b9afba3f1912cd1909674a63",
+      "5e.jsonl": "0f6e8fb42c6e20377b8c7c83706ef97aa85e5803",
+      "5f.jsonl": "6f3ee21d12f713e6e1c0e617728c9aaaa4f91389",
+      "60.jsonl": "37a5d2f9ab757fe15ddffdf89f4e57160287df0c",
+      "61.jsonl": "99a9287948bd2c9ff2c9352604a7464e6f166f52",
+      "62.jsonl": "847bbba1cb3d1bfa6dae05f52d23df61d8125e2e",
+      "63.jsonl": "b785bb88406268b5b04c5de20076166854fe7881",
+      "64.jsonl": "55a2cc1a00bf4748df895abc4942e741d43bf17c",
+      "65.jsonl": "d968659a3894f07b2e00b5370e12248339f99596",
+      "66.jsonl": "425a8170e3e0d77c4b5a93de3db9680d2db3a9f7",
+      "67.jsonl": "bdf5f7c70f59fc0eb0cb3c0cf8aabd9e670ea251",
+      "68.jsonl": "c0c880227ac0f782b4c4e34ad205806ab3a84f67",
+      "69.jsonl": "1dd8c69c63e8a26b91341c5d0e4885a38e2c173d",
+      "6a.jsonl": "818a5d4a6e54ed98fe95073846febd84c4d74cff",
+      "6b.jsonl": "6cc1bfe0116270ea2a77c6d7f89d192547c75944",
+      "6c.jsonl": "1c13a6ef34539adf4ff86db05e017fac659ab4de",
+      "6d.jsonl": "4baf60f6411c7e2b2aa0c5597525a46ed33064bb",
+      "6e.jsonl": "d309c1bf2211f2b4a0325c9b421cf49b095774e7",
+      "6f.jsonl": "e527f71bb2941be2e379fe4b541b1e5d7220aa30",
+      "70.jsonl": "4369535eb8e6459807758a1f23697d230f047c73",
+      "71.jsonl": "c416e3eec73c3657b29b72180aa5abf33f490345",
+      "72.jsonl": "770ed047db3bd6c2eac71bb8d23c3bf681a6b6c9",
+      "73.jsonl": "66686fd63079effd95e99ff7b39b0dda3ac2d19c",
+      "74.jsonl": "34d74e63bdcc5024ed4a63f079f9d5a6f770dd43",
+      "75.jsonl": "8ec72f74fae2d4b59e028b52bd7d1a545fde3feb",
+      "76.jsonl": "adec5cb97a6db61603caa4873b04f159c4fa0b02",
+      "77.jsonl": "ec786efdb2b41e87389341a830bd06266929a9c8",
+      "78.jsonl": "3fbb4f5cf21ba75fb79546a0517c72ea38a4cabe",
+      "79.jsonl": "97dda2d1d325a187eda0fafab309e0d36978694e",
+      "7a.jsonl": "8560fbadc7af08b8dcf76d5cc5f1f0cb6e986ad2",
+      "7b.jsonl": "cb68521b9477ad3cb594096927506c1c7beece4d",
+      "7c.jsonl": "6911d8169d0ba6931560a9fad9d6dfccb3799987",
+      "7d.jsonl": "79ef254218e15c27c5430607bf5f5be39cb69504",
+      "7e.jsonl": "d7616021e1366e230f060bfd6ab78d1632c160d8",
+      "7f.jsonl": "31d892268a3af5ec6696db7d3dfc243184fd07a7",
+      "80.jsonl": "adb599dc5ca969a53aa1d34cc278c26632fb5831",
+      "81.jsonl": "fcb4f335937b2bc54ca479833bb938aacb35ce33",
+      "82.jsonl": "3fdcb1c1ef21cb72e80200bcd40b3aec0228986e",
+      "83.jsonl": "489587641c82697bcd2e2b0f4dd67594442584c6",
+      "84.jsonl": "aa275d77f3739703af9550a3439adef6d71748c7",
+      "85.jsonl": "dc696728cc6491d87b9bec2036722027f6363dab",
+      "86.jsonl": "b9f11eab488efc82b99dd8a0e03ef8bb162f22f4",
+      "87.jsonl": "cb61a0d10a22c211a055d88b30125c84ee820984",
+      "88.jsonl": "b9b40e0dd9412db087eddd8d51f38bc3f0b1579b",
+      "89.jsonl": "91cc674677f534f336f9bb4032073f29772764ad",
+      "8a.jsonl": "041a055d87733913f3c4f4b078bfea91f80e1a44",
+      "8b.jsonl": "9ad479f504f61a2c2499911bb306fd8d72c96b60",
+      "8c.jsonl": "0908b95a0b3664e5ba9edb9afbc0322c55231cb4",
+      "8d.jsonl": "a79184fb8b93e5e02559b7754699dd7f5ab850c4",
+      "8e.jsonl": "f0595ae52b83187a515120398284612f64ffd818",
+      "8f.jsonl": "355874c0fe88c455537e218bc03ac48646709447",
+      "90.jsonl": "b07dc1da7e344874dea313bd7b3f69270100202a",
+      "91.jsonl": "4430ec3b32d038547e15f986c1cba24c20136c54",
+      "92.jsonl": "ca7ab2ff0810ffdaf20c2f24fd1d8d3f942e8fdd",
+      "93.jsonl": "700f3405ad5d2515d583c878eb245b19e48df4b4",
+      "94.jsonl": "482e439156a11bb0d8abe8683c2026a9d106ea47",
+      "95.jsonl": "4e874c89a142b3cfb9f3eee1e32b9877d5a4e2e1",
+      "96.jsonl": "bb1d9ca17431b1fc14eff7e6399ffbb68d73c2cb",
+      "97.jsonl": "ab60a91f716ea73df7531dd95f85ad1c4071c877",
+      "98.jsonl": "03760cf7585fa1441fbde77e33e876bc0bbb227b",
+      "99.jsonl": "46307ab8e377facdc46ef3dc2efcb4e3446f2b76",
+      "9a.jsonl": "e225efcc36c18f1a0bc1aa7192193a5dc313f7a7",
+      "9b.jsonl": "0d97e90356c83170d3a72914337432a002c530cf",
+      "9c.jsonl": "e0274a3d17f14a29cf866606dd8737e8fdddd6f3",
+      "9d.jsonl": "340cabce229d118ef5e55c6ed1b47ef60d545c51",
+      "9e.jsonl": "f1c4dccaa6c7ec6a8a5deac0f515b622106a0db4",
+      "9f.jsonl": "05cffb7befd2e9378ed82640e5e998e1c03f1fde",
+      "a0.jsonl": "650b41f5fd1a9513d446bb249e1bc63f0a5f82dc",
+      "a1.jsonl": "d820c6f75efdb2b597ebea17134a106f0ad24ce1",
+      "a2.jsonl": "0b2f152cbc09ee9dee87b3773a59e348415aadfe",
+      "a3.jsonl": "92da34e77fb215b943e1a4383e887ae6b93a577f",
+      "a4.jsonl": "4fd1ad062cbb632c79f3211df12d859aa97c9c47",
+      "a5.jsonl": "990e6353087bd1f4ab367f83ed5abbea0361b8dc",
+      "a6.jsonl": "0b16eb3395388c2fd6d70317653b06de6d8dab4a",
+      "a7.jsonl": "6989853d28f5344ca50009c44ecfaa9469197069",
+      "a8.jsonl": "eead4245af42e769ecb4abc0aebf52599c9fc547",
+      "a9.jsonl": "747294c9e8cd8337326f69ce58def1031ee213c1",
+      "aa.jsonl": "019d216ee0db5b9baa308b614d8cbf521ddc394a",
+      "ab.jsonl": "432b040033e98cd0b6b27d9a5cc9a22bcdfb4292",
+      "ac.jsonl": "4e45ba0338988b4b5b5ac17fea4bff6aea119b79",
+      "ad.jsonl": "bb8c3aa895d32bd193322de87312236df673f8de",
+      "ae.jsonl": "732f72e7f434a2313eda8e8e54c2824cd29590b3",
+      "af.jsonl": "e160826436a8e9f9013451819b243c958694b7a3",
+      "b0.jsonl": "2701d84f4826caf8f80626a6a9f5f686100a7f91",
+      "b1.jsonl": "8d8993f6959f476d8feff04e8cc0188bf7315607",
+      "b2.jsonl": "17e6438ff0a0b6ea8fff289f006e768aa6e27e0e",
+      "b3.jsonl": "ccfed849ba90cccfa9f64960a146ad4cbcb39f0f",
+      "b4.jsonl": "69bcc0d4fdcd9b1c89a3fb76a76f6552c211c5a2",
+      "b5.jsonl": "b64773a1995e143ed83159e3853fb1684c877157",
+      "b6.jsonl": "b91671eac3648fc0bee6c7c148177328d789c407",
+      "b7.jsonl": "c18c199cc487e6fd8af8c07938bb8f07d0ec9ceb",
+      "b8.jsonl": "2bf31882b39baaf48374332519cec0ed5d300a52",
+      "b9.jsonl": "0e104f3b7ffbfa059f115dd6c7f403646ba0a68d",
+      "ba.jsonl": "e99259f626f3b2a8c7584bb35e46a4d6a7af42e6",
+      "bb.jsonl": "c5e7c6b72fd788ae91c684b2044767b6a63d2623",
+      "bc.jsonl": "5f1a1cc4d089da708a9fbc36f206f336dfdb9135",
+      "bd.jsonl": "fc397a122bf92025c2ff5fdb599b9866c3a8a029",
+      "be.jsonl": "cdc14c390273bf3ff1d7dfac072052fa3c1b2dc6",
+      "bf.jsonl": "8c0c361fe7c130c5a6f56f429c202b1f1d455cf5",
+      "c0.jsonl": "89bf354cabf72d95724be61684698e5e01155c14",
+      "c1.jsonl": "cc6f580010aa45bdeee5888592328f2a6dc35d11",
+      "c2.jsonl": "305ea7a36be2de9e1709dd899ee3e9b2b98d0b20",
+      "c3.jsonl": "c1952ccf83f668431b9ede8947301c68246b3e83",
+      "c4.jsonl": "072e09c50e49c8efae2a886f098196c7f953e64c",
+      "c5.jsonl": "b2194c50b2b695f657476db09a8fcea0623ee720",
+      "c6.jsonl": "3c4b31d9415e6e95710daeed1f40d88f66dbd16b",
+      "c7.jsonl": "04c86cf8f97abeee1a9dda98142a3cb8c5f19cf3",
+      "c8.jsonl": "8ffd3d8edc0d739554b03192b92373e6ceb72c47",
+      "c9.jsonl": "a2dbe12f2a329258c3e6812bc928836144353aaa",
+      "ca.jsonl": "f34ece41d9a67048a4333966074b1bf308492578",
+      "cb.jsonl": "e20d36b39e7ced1b8c61b46b703324f2116893ed",
+      "cc.jsonl": "d95879b8d8260a4c62e2cda037db2e64d6012b92",
+      "cd.jsonl": "32ebf9ac01695a1d62db11a190750183b0569c81",
+      "ce.jsonl": "b1132497591288419edee132865c28684abae0c6",
+      "cf.jsonl": "aa453cba6f5ec26aaec37f8a81d2f1babd0fda3f",
+      "d0.jsonl": "913e5989f84871b01ff8c04470142d38b1426bb4",
+      "d1.jsonl": "b076f30637f55f6af0db37c3daa9c15ef71c88bb",
+      "d2.jsonl": "e9ded51f82dcf7bc0e87f68d6006d25f39c8321e",
+      "d3.jsonl": "ed32cf64724b2472bedd98ab1841d7a237a8d151",
+      "d4.jsonl": "e368b21d5db2a2e2bfeeba3f05e3bdba1669ae40",
+      "d5.jsonl": "71cd91edd0a179a1ee49925ee21cd10a02bd6bb4",
+      "d6.jsonl": "c7cdde2f2fa6a20814a34806d1e804140ea4900e",
+      "d7.jsonl": "252f41795ecbfc2e5dbc94e23790068740bf11e9",
+      "d8.jsonl": "77f50f3210b92635269c1e1a39d36510b7eda188",
+      "d9.jsonl": "fc4cfd1519bce95ae448a751356558e006a751a3",
+      "da.jsonl": "b247bff07d02eb5525f49d4bdbfdfa7af7d1f9da",
+      "db.jsonl": "692c5885d7acf0ee9dc18bb070807e7960507f82",
+      "dc.jsonl": "bc98b1de84608096dbdb7b5d6e321265ef99e78b",
+      "dd.jsonl": "5b62e1a5d7cf615f41c5b3aa4dc808a21dae22ab",
+      "de.jsonl": "e87a6cbda5ebf01dd137ebb556b8d61da5c1878b",
+      "df.jsonl": "df14686f03792a4fabb8b562f5245324951fb6e4",
+      "e0.jsonl": "34aece447f77b882a816770be3ba8b1623cc4b8f",
+      "e1.jsonl": "cb8dc28de6097bd67b9e2022c3e0f4b2a005ff85",
+      "e2.jsonl": "7772184684748e08dc00057d25e2f3ec8a74a95d",
+      "e3.jsonl": "aff8310760ba71fd39ec0301b91522bef8b92060",
+      "e4.jsonl": "b90594c799fb474d946f5c3c7f49f04d0cd05c0b",
+      "e5.jsonl": "6bf2e09320926bcead9f891de8784f7014a5db02",
+      "e6.jsonl": "bc8f032a8db42b767cbc1f1b26516c161f0062bc",
+      "e7.jsonl": "53af83cee75c5a867f5d9f3747f452365385c96e",
+      "e8.jsonl": "c6cbdd701a48aaa4372e63acd1e3771272733529",
+      "e9.jsonl": "82cc9e3ca0ccf8fff0e6cad89444ec18e6f4f689",
+      "ea.jsonl": "90b14c4c569e4749927a460cc2342202db0da721",
+      "eb.jsonl": "22ffe371923e320e5de90d6857ecd27c1f098d84",
+      "ec.jsonl": "fcd3511aa6c023b12ff48956e33e9e12a7133230",
+      "ed.jsonl": "d568097d74fcbc9e7084ef0240fb3fa97e348ade",
+      "ee.jsonl": "7dbb1c400d8dcc9f05172a7720c199b1da2035e6",
+      "ef.jsonl": "454a29e4ae178bdaf8fa9fa1269d13b69dea3eb5",
+      "f0.jsonl": "10233e1998f0dc6ec845e6c581c4cd8aab91c063",
+      "f1.jsonl": "a7c99ac6fae061b54e4fa7d2e3f5be65a8fd4f7d",
+      "f2.jsonl": "66ef8a5e4664fb9b233dde043e0ff8cc176947d8",
+      "f3.jsonl": "b266c4420bdf0da9b7f3b8c9adf42bc11b113830",
+      "f4.jsonl": "f458b23dffb59b19a3af83d8899a0b8233a0105c",
+      "f5.jsonl": "6c048056cb9615c84af0d1c934acb244d12ec366",
+      "f6.jsonl": "111f307cf68db5dceab03f62dc9473f4683faeed",
+      "f7.jsonl": "550b8533ae5e892b06eaed7bd0faab56e8890f4c",
+      "f8.jsonl": "8eb1afe236be0d91c6904aa53a8fa96ab79c741f",
+      "f9.jsonl": "29aeb60e6adccf2de3acc1c31c82b87410b46cee",
+      "fa.jsonl": "8dd936e065bccb03824685fb9b1fc83c5db72f30",
+      "fb.jsonl": "ea2ffbca36287e58db4b79d854de4f4e5d55b626",
+      "fc.jsonl": "0afd5d021b3b670ff488f77e443090fb70271406",
+      "fd.jsonl": "57d612fb331829d0ab41df18d2d9041eb50533c1",
+      "fe.jsonl": "4f971ed062a478a3f5a92c3a67ca0771b0e18b6b",
+      "ff.jsonl": "33581f51c64225aae789d5f4fdc41df0b03e24fe"
+    },
+    "terms": 26749
+  },
+  "coverage": {
+    "dictionary_coverage": 0.9997383079741299,
+    "kept": 3022778,
+    "kept_share": 0.8781154253188305,
+    "lever": "a decoder (`fux-decoder`), or leave it in `.fux/enrich/queue.tsv` for a model to describe",
+    "named_terms": 26742,
+    "no_content": [],
+    "queued": [
+      {
+        "loc": "file:archive/v0.1/fux/assets/fux-icon.svg",
+        "why": "f3b121dbf142cb4f1f219c9fc59e638e1e6995ac"
+      },
+      {
+        "loc": "file:archive/v0.1/fux/assets/fux-lockup.png",
+        "why": "dc2561c37c5b324d0eda0762a33331981e216af6"
+      },
+      {
+        "loc": "file:archive/v0.1/fux/assets/fux-mark.svg",
+        "why": "f7440d72f87c4365c6ad8fdf82579fc9304b8c1d"
+      },
+      {
+        "loc": "file:archive/v0.26/tests_e2e/corpus/assets/logo.png",
+        "why": "6a94256cf5c226310f6f94011b64926f014de247"
+      },
+      {
+        "loc": "file:archive/v0.26/tests_e2e/site/logo.png",
+        "why": "6a94256cf5c226310f6f94011b64926f014de247"
+      },
+      {
+        "loc": "file:docs/architecture-answer.png",
+        "why": "531cfd52ac64fe957a24c09a17809859fe2e0134"
+      },
+      {
+        "loc": "file:docs/architecture-ask.png",
+        "why": "3819a4075534caeeedce2a8f9bfbd8cf271aad76"
+      },
+      {
+        "loc": "file:docs/architecture-decoders.png",
+        "why": "f2141b9e2561dee3be83f5a124afc245a5d901e5"
+      },
+      {
+        "loc": "file:docs/architecture-detailed.png",
+        "why": "209c398f762627e36fec2e777600467e320b294f"
+      },
+      {
+        "loc": "file:docs/architecture-high-level.png",
+        "why": "8137bc581d22b9ca476530f74abf2057373121fb"
+      },
+      {
+        "loc": "file:docs/architecture-two-readers.png",
+        "why": "4260809c29564195f5ad9656cf016876c91ea809"
+      },
+      {
+        "loc": "file:tools/refusal-probe/captures/entra-sign-in.stand-in.html",
+        "why": "418d77f289ffc2875a0a50e8605b77c32c52cef0"
+      },
+      {
+        "loc": "file:tools/refusal-probe/captures/workbook-download.stand-in.xlsx",
+        "why": "2b5a32870bd597a12b7837c637ec3345a7aff8ce"
+      },
+      {
+        "loc": "file:work/regression/2026-08-27-p3-sha-stability/evidence/control-a.json",
+        "why": "a7f947d05ed22eb0ec2fb9c42f5f3d1b5e1ec6ef"
+      },
+      {
+        "loc": "file:work/regression/2026-08-27-p3-sha-stability/evidence/control-b.json",
+        "why": "90830ff4a5ee349ae9baf09f06ccd4c0482d415f"
+      },
+      {
+        "loc": "file:work/regression/2026-08-27-p3-sha-stability/evidence/run1-url-shas.json",
+        "why": "623b6ee39ed7ec2fa270f8073f1ab4b2cee5f455"
+      },
+      {
+        "loc": "file:work/regression/2026-08-27-p3-sha-stability/evidence/run2-url-shas.json",
+        "why": "623b6ee39ed7ec2fa270f8073f1ab4b2cee5f455"
+      }
+    ],
+    "raw_runs": 3442347,
+    "total_terms": 26749,
+    "undecodable": [],
+    "unreadable": [
+      {
+        "id": "file:work/open/W-159-windows-shadowing-row.md",
+        "why": "not in the working tree at the indexed loc"
+      }
+    ]
+  },
+  "duplication": {
+    "documents_in_a_family": 118,
+    "documents_in_a_pair": 168,
+    "families": [
+      {
+        "headings": "corpus \u00b7 results",
+        "members": [
+          "file:archive/v0.26/conformance/2026-07-23-supersession-recovery/evidence/find-json/pair-0.json",
+          "file:archive/v0.26/conformance/2026-07-23-supersession-recovery/evidence/find-json/pair-11.json",
+          "file:archive/v0.26/conformance/2026-07-23-supersession-recovery/evidence/find-json/pair-2.json",
+          "file:archive/v0.26/conformance/2026-07-23-supersession-recovery/evidence/find-json/pair-5.json",
+          "file:archive/v0.26/conformance/2026-07-23-supersession-recovery/evidence/find-json/pair-9.json",
+          "file:archive/v0.26/tests_e2e/goldens/ask-explain.json",
+          "file:archive/v0.26/tests_e2e/goldens/ask-hybrid.json",
+          "file:archive/v0.26/tests_e2e/goldens/ask.json",
+          "file:archive/v0.26/tests_e2e/goldens/find.json"
+        ]
+      },
+      {
+        "headings": "Record 1 \u00b7 Record 10 \u00b7 Record 11 \u00b7 Record 12",
+        "members": [
+          "file:work/regression/2026-08-28-benchmark-contested/evidence/eval/t10000/pairs.jsonl",
+          "file:work/regression/2026-08-28-benchmark-contested/evidence/eval/t1200/pairs.jsonl",
+          "file:work/regression/2026-08-28-benchmark-contested/evidence/eval/t1200b/pairs.jsonl",
+          "file:work/regression/2026-08-28-benchmark-v1-vs-head/evidence/eval/t100/pairs.jsonl",
+          "file:work/regression/2026-08-28-benchmark-v1-vs-head/evidence/eval/t1000/pairs.jsonl",
+          "file:work/regression/2026-08-28-benchmark-v1-vs-head/evidence/eval/t10000/pairs.jsonl",
+          "file:work/regression/2026-08-28-benchmark-v1-vs-head/evidence/eval/t1000b/pairs.jsonl",
+          "file:work/regression/2026-09-06-csv-chunk-granularity/evidence/pairs.jsonl"
+        ]
+      },
+      {
+        "headings": "Record 1 \u00b7 Record 10 \u00b7 Record 11 \u00b7 Record 12",
+        "members": [
+          "file:work/regression/2026-08-28-benchmark-contested/evidence/eval/t10000/unanswerable.jsonl",
+          "file:work/regression/2026-08-28-benchmark-contested/evidence/eval/t1200/unanswerable.jsonl",
+          "file:work/regression/2026-08-28-benchmark-contested/evidence/eval/t1200b/unanswerable.jsonl",
+          "file:work/regression/2026-08-28-benchmark-v1-vs-head/evidence/eval/t100/unanswerable.jsonl",
+          "file:work/regression/2026-08-28-benchmark-v1-vs-head/evidence/eval/t1000/unanswerable.jsonl",
+          "file:work/regression/2026-08-28-benchmark-v1-vs-head/evidence/eval/t10000/unanswerable.jsonl",
+          "file:work/regression/2026-08-28-benchmark-v1-vs-head/evidence/eval/t1000b/unanswerable.jsonl",
+          "file:work/regression/2026-08-28-blind-unanswerable/evidence/unanswerable.jsonl"
+        ]
+      },
+      {
+        "headings": "by_kind \u00b7 gained_detail \u00b7 lost_detail",
+        "members": [
+          "file:archive/v0.26/conformance/2026-07-24-fusion-lexical-hit-loss/evidence/10k-lexlost.json",
+          "file:archive/v0.26/conformance/2026-07-24-fusion-lexical-hit-loss/evidence/1k-lexlost.json",
+          "file:archive/v0.26/conformance/2026-07-24-fusion-lexical-hit-loss/evidence/5k-lexlost.json",
+          "file:archive/v0.26/conformance/2026-07-24-fusion-lexical-hit-loss/evidence/acme-lexlost-default.json",
+          "file:archive/v0.26/conformance/2026-07-24-fusion-lexical-hit-loss/evidence/acme-lexlost-p0.json",
+          "file:archive/v0.26/conformance/2026-07-24-fusion-lexical-hit-loss/evidence/orbit-lexlost-default.json",
+          "file:archive/v0.26/conformance/2026-07-24-fusion-lexical-hit-loss/evidence/orbit-lexlost-p0.json"
+        ]
+      },
+      {
+        "headings": "corpus \u00b7 sentences \u00b7 sources",
+        "members": [
+          "file:archive/v0.26/conformance/2026-07-22-acme-payments/evidence/gibberish-control-answer.json",
+          "file:archive/v0.26/conformance/2026-07-23-supersession-recovery/evidence/answer-json/pair-0-after.json",
+          "file:archive/v0.26/conformance/2026-07-23-supersession-recovery/evidence/answer-json/pair-11-after.json",
+          "file:archive/v0.26/conformance/2026-07-23-supersession-recovery/evidence/answer-json/pair-5-after.json",
+          "file:archive/v0.26/tests_e2e/goldens/answer-hybrid.json",
+          "file:archive/v0.26/tests_e2e/goldens/answer.json"
+        ]
+      },
+      {
+        "headings": "results \u00b7 values",
+        "members": [
+          "file:archive/v0.26/conformance/2026-07-24-supersession-penalty-calibration/evidence/10k-sweep.json",
+          "file:archive/v0.26/conformance/2026-07-24-supersession-penalty-calibration/evidence/1k-sweep.json",
+          "file:archive/v0.26/conformance/2026-07-24-supersession-penalty-calibration/evidence/5k-sweep.json",
+          "file:archive/v0.26/conformance/2026-07-24-supersession-penalty-calibration/evidence/acme-fine.json",
+          "file:archive/v0.26/conformance/2026-07-24-supersession-penalty-calibration/evidence/acme-sweep.json",
+          "file:archive/v0.26/conformance/2026-07-24-supersession-penalty-calibration/evidence/orbit-sweep.json"
+        ]
+      },
+      {
+        "headings": "/fux \u00b7 Guarantee \u00b7 Rule types (plan \u00a76) \u00b7 Step 1 \u2014 Ensure the engine is installed",
+        "members": [
+          "file:archive/v0.1/fux/data/skills/agents/SKILL.md",
+          "file:archive/v0.1/fux/data/skills/fux/SKILL.md",
+          "file:archive/v0.1/tools/skillgen/expected/fux__data__skills__agents__SKILL.md",
+          "file:archive/v0.1/tools/skillgen/expected/fux__data__skills__fux__SKILL.md",
+          "file:archive/v0.1/tools/skillgen/fragments/core/core.md"
+        ]
+      },
+      {
+        "headings": "Record 1 \u00b7 Record 10 \u00b7 Record 11 \u00b7 Record 12",
+        "members": [
+          "file:work/regression/2026-09-12-golden-ladder/evidence/rung-00100/answers.jsonl",
+          "file:work/regression/2026-09-12-golden-ladder/evidence/rung-00200/answers.jsonl",
+          "file:work/regression/2026-09-12-golden-ladder/evidence/rung-00500/answers.jsonl",
+          "file:work/regression/2026-09-12-golden-ladder/evidence/rung-01000/answers.jsonl",
+          "file:work/regression/2026-09-12-golden-ladder/evidence/rung-seed/answers.jsonl"
+        ]
+      },
+      {
+        "headings": "Record 1 \u00b7 Record 10 \u00b7 Record 11 \u00b7 Record 12",
+        "members": [
+          "file:work/regression/2026-09-12-golden-ladder/evidence/rung-00100/predictions.jsonl",
+          "file:work/regression/2026-09-12-golden-ladder/evidence/rung-00200/predictions.jsonl",
+          "file:work/regression/2026-09-12-golden-ladder/evidence/rung-00500/predictions.jsonl",
+          "file:work/regression/2026-09-12-golden-ladder/evidence/rung-01000/predictions.jsonl",
+          "file:work/regression/2026-09-12-golden-ladder/evidence/rung-seed/predictions.jsonl"
+        ]
+      },
+      {
+        "headings": "rows \u00b7 separating_intervals",
+        "members": [
+          "file:archive/v0.26/conformance/2026-07-24-orbit-fulfillment/evidence/margin-top-vs-runnerup.json",
+          "file:archive/v0.26/conformance/2026-07-24-supersession-penalty-calibration/evidence/acme-margin-p0.json",
+          "file:archive/v0.26/conformance/2026-07-24-supersession-penalty-calibration/evidence/acme-margin-p15.json",
+          "file:archive/v0.26/conformance/2026-07-24-supersession-penalty-calibration/evidence/orbit-margin-p0.json",
+          "file:archive/v0.26/conformance/2026-07-24-supersession-penalty-calibration/evidence/orbit-margin-p15.json"
+        ]
+      },
+      {
+        "headings": "Record 1 \u00b7 Record 10 \u00b7 Record 11 \u00b7 Record 12",
+        "members": [
+          "file:work/regression/2026-09-05-answer-top3/evidence/per-query.jsonl",
+          "file:work/regression/2026-09-05-doc2query/evidence/per-query.jsonl",
+          "file:work/regression/2026-09-05-expand/evidence/per-query.jsonl",
+          "file:work/regression/2026-09-11-four-priors-headroom/evidence/per-query.jsonl"
+        ]
+      },
+      {
+        "headings": "chunks \u00b7 dense \u00b7 graph \u00b7 lexical",
+        "members": [
+          "file:archive/v0.26/conformance/2026-07-22-acme-payments/evidence/why-staleness-current-0018.json",
+          "file:archive/v0.26/conformance/2026-07-22-acme-payments/evidence/why-staleness-stale-0006.json",
+          "file:archive/v0.26/conformance/2026-07-22-acme-payments/evidence/why-unanswerable-crypto.json",
+          "file:archive/v0.26/conformance/2026-07-22-acme-payments/evidence/why-zero-overlap-access.json"
+        ]
+      },
+      {
+        "headings": "Findings \u2014 candidate engine changes \u00b7 Fux conformance run \u2014 env `orbit` \u2014 2026-07-24 \u00b7 Metrics (baseline candidates) \u00b7 Reproduce",
+        "members": [
+          "file:archive/v0.26/conformance/2026-07-24-fusion-lexical-hit-loss/evidence/orbit-report-post-generalised-check.md",
+          "file:archive/v0.26/conformance/2026-07-24-orbit-fulfillment/report.md",
+          "file:archive/v0.26/conformance/2026-07-24-v0.26.0-release-verification/report.md"
+        ]
+      },
+      {
+        "headings": "Record 1 \u00b7 Record 10 \u00b7 Record 11 \u00b7 Record 12",
+        "members": [
+          "file:work/regression/2026-08-28-benchmark-contested/evidence/eval/t10000/chains.jsonl",
+          "file:work/regression/2026-08-28-benchmark-contested/evidence/eval/t1200/chains.jsonl",
+          "file:work/regression/2026-08-28-benchmark-contested/evidence/eval/t1200b/chains.jsonl"
+        ]
+      },
+      {
+        "headings": "Record 1 \u00b7 Record 10 \u00b7 Record 11 \u00b7 Record 12",
+        "members": [
+          "file:work/regression/2026-08-28-benchmark-contested/evidence/eval/t10000/contested.jsonl",
+          "file:work/regression/2026-08-28-benchmark-contested/evidence/eval/t1200/contested.jsonl",
+          "file:work/regression/2026-08-28-benchmark-contested/evidence/eval/t1200b/contested.jsonl"
+        ]
+      },
+      {
+        "headings": "Record 1 \u00b7 Record 10 \u00b7 Record 11 \u00b7 Record 12",
+        "members": [
+          "file:work/regression/2026-08-28-benchmark-contested/evidence/eval/t10000/decoys.jsonl",
+          "file:work/regression/2026-08-28-benchmark-contested/evidence/eval/t1200/decoys.jsonl",
+          "file:work/regression/2026-08-28-benchmark-contested/evidence/eval/t1200b/decoys.jsonl"
+        ]
+      },
+      {
+        "headings": "Record 1 \u00b7 Record 10 \u00b7 Record 11 \u00b7 Record 12",
+        "members": [
+          "file:work/regression/2026-08-28-benchmark-v1-vs-head/evidence/eval/t1000/chains.jsonl",
+          "file:work/regression/2026-08-28-benchmark-v1-vs-head/evidence/eval/t10000/chains.jsonl",
+          "file:work/regression/2026-08-28-benchmark-v1-vs-head/evidence/eval/t1000b/chains.jsonl"
+        ]
+      },
+      {
+        "headings": "Record 1 \u00b7 Record 10 \u00b7 Record 11 \u00b7 Record 12",
+        "members": [
+          "file:work/regression/2026-08-28-benchmark-v1-vs-head/evidence/eval/t1000/decoys.jsonl",
+          "file:work/regression/2026-08-28-benchmark-v1-vs-head/evidence/eval/t10000/decoys.jsonl",
+          "file:work/regression/2026-08-28-benchmark-v1-vs-head/evidence/eval/t1000b/decoys.jsonl"
+        ]
+      },
+      {
+        "headings": "A-t10000.jsonl \u00b7 Record 1 \u00b7 Record 10 \u00b7 Record 11",
+        "members": [
+          "file:work/regression/2026-08-28-benchmark-contested/evidence/rows/A-t10000.jsonl",
+          "file:work/regression/2026-08-28-benchmark-v1-vs-head/evidence/rows/A-t10000.jsonl"
+        ]
+      },
+      {
+        "headings": "Authorship \u00b7 Reproduce \u00b7 The daemon's lifecycle \u2014 2026-08-27 \u00b7 What it does NOT establish",
+        "members": [
+          "file:work/regression/2026-08-27-daemon-lifecycle/evidence/transcript.md",
+          "file:work/regression/2026-08-27-daemon-lifecycle/report.md"
+        ]
+      }
+    ],
+    "family_count": 32,
+    "lever": "`.fuxignore`, `archived=`, or `supersedes` on the one that is current",
+    "near_duplicate_share": 0.14249363867684478,
+    "near_duplicates": [
+      {
+        "a": "file:archive/v0.1/fux/data/skills/agents/SKILL.md",
+        "b": "file:archive/v0.1/fux/data/skills/fux/SKILL.md",
+        "jaccard": 1.0
+      },
+      {
+        "a": "file:work/regression/2026-08-28-annotator-agreement/evidence/annotator-1.jsonl",
+        "b": "file:work/regression/2026-08-28-annotator-agreement/evidence/annotator-2.jsonl",
+        "jaccard": 1.0
+      },
+      {
+        "a": "file:work/regression/2026-09-12-priors-and-tables/evidence/sweep-rung-00100-archived_weight.jsonl",
+        "b": "file:work/regression/2026-09-12-priors-and-tables/evidence/sweep-rung-00100-superseded_weight.jsonl",
+        "jaccard": 1.0
+      },
+      {
+        "a": "file:work/regression/2026-09-12-priors-and-tables/evidence/sweep-rung-01000-archived_weight.jsonl",
+        "b": "file:work/regression/2026-09-12-priors-and-tables/evidence/sweep-rung-01000-superseded_weight.jsonl",
+        "jaccard": 1.0
+      },
+      {
+        "a": "file:work/regression/2026-09-12-priors-and-tables/evidence/sweep-rung-seed-archived_weight.jsonl",
+        "b": "file:work/regression/2026-09-12-priors-and-tables/evidence/sweep-rung-seed-superseded_weight.jsonl",
+        "jaccard": 1.0
+      },
+      {
+        "a": "file:work/regression/2026-08-28-benchmark-contested/evidence/rows/B-t1200.jsonl",
+        "b": "file:work/regression/2026-08-28-benchmark-contested/evidence/rows/Bt-t1200.jsonl",
+        "jaccard": 0.9990925589836661
+      },
+      {
+        "a": "file:work/regression/2026-08-28-benchmark-contested/evidence/rows/A-t1200.jsonl",
+        "b": "file:work/regression/2026-08-28-benchmark-contested/evidence/rows/NULL1-t1200.jsonl",
+        "jaccard": 0.9990909090909091
+      },
+      {
+        "a": "file:work/regression/2026-08-28-benchmark-contested/evidence/eval/t1200/manifest.json",
+        "b": "file:work/regression/2026-08-28-benchmark-contested/evidence/eval/t1200b/manifest.json",
+        "jaccard": 0.9984555984555985
+      },
+      {
+        "a": "file:work/regression/2026-08-28-benchmark-v1-vs-head/evidence/rows/A-t1000.jsonl",
+        "b": "file:work/regression/2026-08-28-benchmark-v1-vs-head/evidence/rows/Arepeat-t1000.jsonl",
+        "jaccard": 0.9983619983619983
+      },
+      {
+        "a": "file:work/regression/2026-09-12-node-arm-rungs/evidence/node-arm-rung-00100-contract.jsonl",
+        "b": "file:work/regression/2026-09-12-node-tune-and-surfaces/evidence/node-arm-rung-00100-contract.jsonl",
+        "jaccard": 0.9982935153583617
+      },
+      {
+        "a": "file:work/regression/2026-09-12-node-arm-rungs/evidence/node-arm-rung-10000-contract.jsonl",
+        "b": "file:work/regression/2026-09-12-node-tune-and-surfaces/evidence/node-arm-rung-10000-contract.jsonl",
+        "jaccard": 0.9982608695652174
+      },
+      {
+        "a": "file:work/regression/2026-08-28-benchmark-contested/evidence/rows/A-t10000.jsonl",
+        "b": "file:work/regression/2026-08-28-benchmark-contested/evidence/rows/B-t10000.jsonl",
+        "jaccard": 0.9977313974591652
+      },
+      {
+        "a": "file:work/regression/2026-08-28-benchmark-contested/evidence/rows/A-t1200.jsonl",
+        "b": "file:work/regression/2026-08-28-benchmark-contested/evidence/rows/B-t1200.jsonl",
+        "jaccard": 0.9977303676804358
+      },
+      {
+        "a": "file:work/regression/2026-08-28-benchmark-contested/evidence/rows/A-t1200.jsonl",
+        "b": "file:work/regression/2026-08-28-benchmark-contested/evidence/rows/Bt-t1200.jsonl",
+        "jaccard": 0.9977303676804358
+      },
+      {
+        "a": "file:work/regression/2026-08-28-benchmark-v1-vs-head/evidence/rows/B-t1000.jsonl",
+        "b": "file:work/regression/2026-08-28-benchmark-v1-vs-head/evidence/rows/Btuned-t1000.jsonl",
+        "jaccard": 0.9975530179445351
+      },
+      {
+        "a": "file:work/regression/2026-09-12-priors-and-tables/evidence/sweep-rung-00100-archived_weight.jsonl",
+        "b": "file:work/regression/2026-09-12-priors-and-tables/evidence/sweep-rung-seed-archived_weight.jsonl",
+        "jaccard": 0.9971988795518207
+      },
+      {
+        "a": "file:work/regression/2026-09-12-priors-and-tables/evidence/sweep-rung-00100-archived_weight.jsonl",
+        "b": "file:work/regression/2026-09-12-priors-and-tables/evidence/sweep-rung-seed-superseded_weight.jsonl",
+        "jaccard": 0.9971988795518207
+      },
+      {
+        "a": "file:work/regression/2026-09-12-priors-and-tables/evidence/sweep-rung-00100-superseded_weight.jsonl",
+        "b": "file:work/regression/2026-09-12-priors-and-tables/evidence/sweep-rung-seed-archived_weight.jsonl",
+        "jaccard": 0.9971988795518207
+      },
+      {
+        "a": "file:work/regression/2026-09-12-priors-and-tables/evidence/sweep-rung-00100-superseded_weight.jsonl",
+        "b": "file:work/regression/2026-09-12-priors-and-tables/evidence/sweep-rung-seed-superseded_weight.jsonl",
+        "jaccard": 0.9971988795518207
+      },
+      {
+        "a": "file:work/regression/2026-09-12-priors-and-tables/evidence/sweep-rung-01000-archived_weight.jsonl",
+        "b": "file:work/regression/2026-09-12-priors-and-tables/evidence/sweep-rung-seed-archived_weight.jsonl",
+        "jaccard": 0.9971988795518207
+      }
+    ],
+    "pair_count": 250
+  },
+  "findability": {
+    "fewest_distinctive": [
+      {
+        "distinctive": 0,
+        "id": "file:work/regression/2026-08-22-graph-acceptance/evidence/check-output.txt"
+      },
+      {
+        "distinctive": 1,
+        "id": "file:work/regression/2026-09-06-csv-chunk-granularity/evidence/results-set-a.json"
+      },
+      {
+        "distinctive": 1,
+        "id": "file:work/regression/2026-09-06-csv-chunk-granularity/evidence/results-set-b.json"
+      },
+      {
+        "distinctive": 2,
+        "id": "file:archive/v0.26/tests_e2e/corpus/data/config.json"
+      },
+      {
+        "distinctive": 2,
+        "id": "file:tools/quality/mix.toml"
+      },
+      {
+        "distinctive": 2,
+        "id": "file:tools/refusal-probe/captures/ordinary-wiki-page.stand-in.html"
+      },
+      {
+        "distinctive": 2,
+        "id": "file:work/regression/2026-08-09-pruning-eval/evidence/retention-synth.json"
+      },
+      {
+        "distinctive": 2,
+        "id": "file:work/regression/2026-08-09-pruning-eval/evidence/retention.json"
+      },
+      {
+        "distinctive": 2,
+        "id": "file:work/regression/2026-08-22-graph-acceptance/evidence/fux-sha.txt"
+      },
+      {
+        "distinctive": 2,
+        "id": "file:work/regression/2026-09-05-doc2query/evidence/check-output.txt"
+      },
+      {
+        "distinctive": 2,
+        "id": "file:work/regression/2026-09-13-benchmark-captures/evidence/nullcontrol-docs-00100-scan.json"
+      },
+      {
+        "distinctive": 3,
+        "id": "file:archive/v0.26/conformance/2026-07-24-supersession-penalty-calibration/evidence/fixture-sweep.json"
+      },
+      {
+        "distinctive": 3,
+        "id": "file:work/regression/2026-08-09-pruning-rerun/evidence/corpus-gate-repodocs.json"
+      },
+      {
+        "distinctive": 3,
+        "id": "file:work/regression/2026-08-20-r5-hook-latency/evidence/attribution.json"
+      },
+      {
+        "distinctive": 3,
+        "id": "file:work/regression/2026-09-12-benchmark-l9/evidence/nullcontrol-docs-00100-scan.json"
+      },
+      {
+        "distinctive": 3,
+        "id": "file:work/regression/2026-09-12-benchmark-l9/evidence/nullcontrol-docs-01000-scan.json"
+      },
+      {
+        "distinctive": 3,
+        "id": "file:work/regression/2026-09-13-benchmark-captures/evidence/ARMS.toml"
+      },
+      {
+        "distinctive": 4,
+        "id": "file:archive/v0.26/tests_e2e/goldens/find.json"
+      },
+      {
+        "distinctive": 4,
+        "id": "file:archive/v0.26/tests_e2e/site/private/secret.html"
+      },
+      {
+        "distinctive": 4,
+        "id": "file:archive/v0.26/tests_e2e/site/robots.txt"
+      }
+    ],
+    "findable_share": 0.97,
+    "lever": "`fux enrich`, `fux correct`, or fix the source",
+    "misses": [
+      {
+        "id": "file:tools/quality/mix.toml",
+        "rank": null
+      },
+      {
+        "id": "file:work/regression/2026-09-06-csv-chunk-granularity/evidence/results-set-b.json",
+        "rank": null
+      },
+      {
+        "id": "file:work/regression/2026-09-12-priors-and-tables/evidence/sweep-rung-01000-rerank_weight.jsonl",
+        "rank": null
+      }
+    ],
+    "retrieved": 97,
+    "sample_is_whole_corpus": false,
+    "sampled": 100,
+    "unfindable": [
+      "file:work/regression/2026-08-22-graph-acceptance/evidence/check-output.txt"
+    ],
+    "unfindable_count": 1
+  },
+  "graph": {
+    "communities": [
+      {
+        "label": "c0",
+        "size": 810
+      },
+      {
+        "label": "c1",
+        "size": 20
+      },
+      {
+        "label": "c2",
+        "size": 13
+      },
+      {
+        "label": "c3",
+        "size": 9
+      },
+      {
+        "label": "c4",
+        "size": 7
+      },
+      {
+        "label": "c5",
+        "size": 6
+      },
+      {
+        "label": "c6",
+        "size": 4
+      },
+      {
+        "label": "c7",
+        "size": 4
+      },
+      {
+        "label": "c8",
+        "size": 2
+      }
+    ],
+    "community_count": 9,
+    "edges": 5708,
+    "hubs": [
+      {
+        "id": "file:CLAUDE.md",
+        "inbound": 180
+      },
+      {
+        "id": "file:work/OPEN-WORK.md",
+        "inbound": 127
+      },
+      {
+        "id": "file:records/0001_LAWS.md",
+        "inbound": 74
+      },
+      {
+        "id": "file:records/0052_WORK-environments.md",
+        "inbound": 55
+      },
+      {
+        "id": "file:README.md",
+        "inbound": 51
+      },
+      {
+        "id": "file:records/0133_predictions.md",
+        "inbound": 51
+      },
+      {
+        "id": "file:work/WORKLOG.md",
+        "inbound": 47
+      },
+      {
+        "id": "file:work/IMPLEMENTATION.md",
+        "inbound": 46
+      },
+      {
+        "id": "file:records/0135_tuning.md",
+        "inbound": 44
+      },
+      {
+        "id": "file:work/DOC-REGISTRY.md",
+        "inbound": 44
+      },
+      {
+        "id": "file:archive/README.md",
+        "inbound": 38
+      },
+      {
+        "id": "file:CHANGELOG.md",
+        "inbound": 37
+      },
+      {
+        "id": "file:records/0102_fux-directory.md",
+        "inbound": 36
+      },
+      {
+        "id": "file:work/INTERVIEW.md",
+        "inbound": 35
+      },
+      {
+        "id": "file:archive/v0.1/docs/cli.md",
+        "inbound": 34
+      },
+      {
+        "id": "file:records/0127_refer-plane.md",
+        "inbound": 34
+      },
+      {
+        "id": "file:work/regression/2026-09-02-enrich-pii-leak/evidence/pii.toml",
+        "inbound": 34
+      },
+      {
+        "id": "file:records/0002_LAW-0-authority.md",
+        "inbound": 33
+      },
+      {
+        "id": "file:records/0101_cli-surface.md",
+        "inbound": 33
+      },
+      {
+        "id": "file:work/MACHINE.md",
+        "inbound": 33
+      }
+    ],
+    "lever": "link-IDF and the graph-composed `ask` (W-161) \u2014 until then, add a link from a document that is read",
+    "nodes": 875,
+    "orphan_count": 341,
+    "orphans": [
+      "file:archive/v0.1/docs/decisions/0002-tier-scrutiny.md",
+      "file:archive/v0.1/fux/assets/fux-lockup.svg",
+      "file:archive/v0.1/fux/data/copilot/prompts/fux-plan.prompt.md",
+      "file:archive/v0.1/fux/data/global/rules/async-everywhere.md",
+      "file:archive/v0.1/fux/data/global/rules/doc-per-code-change.md",
+      "file:archive/v0.1/fux/data/global/rules/files-max-100-lines.md",
+      "file:archive/v0.1/fux/data/global/rules/no-secrets-in-vcs.md",
+      "file:archive/v0.1/fux/data/packs/indian-markets-tax/pack.toml",
+      "file:archive/v0.1/fux/data/packs/indian-markets-tax/rules/capital-gains-equity.md",
+      "file:archive/v0.1/fux/data/packs/indian-markets-tax/rules/market-hours-nse.md",
+      "file:archive/v0.1/fux/data/skills/adr/SKILL.md",
+      "file:archive/v0.1/fux/data/skills/agents/SKILL.md",
+      "file:archive/v0.1/fux/data/skills/critic/SKILL.md",
+      "file:archive/v0.1/fux/data/skills/debate/SKILL.md",
+      "file:archive/v0.1/fux/data/skills/distill/SKILL.md",
+      "file:archive/v0.1/fux/data/skills/fetch-rules/SKILL.md",
+      "file:archive/v0.1/fux/data/skills/savings/SKILL.md",
+      "file:archive/v0.1/fux/data/skills/trace/SKILL.md",
+      "file:archive/v0.1/fux/templates/formula.md",
+      "file:archive/v0.1/probes/Probes.md"
+    ],
+    "singleton_communities": 0
+  },
+  "lengths": {
+    "body_tokens": {
+      "max": 138592,
+      "min": 0,
+      "p10": 68,
+      "p50": 630,
+      "p90": 4407
+    },
+    "ctx_over_body": [],
+    "distinct_terms": {
+      "max": 10094,
+      "min": 8,
+      "p10": 54,
+      "p50": 289,
+      "p90": 794
+    },
+    "empty_title": [
+      "file:archive/open/W-107-fuxdir-node-vendor.py.txt",
+      "file:work/regression/2026-08-28-benchmark-v1-vs-head/evidence/latency-summary-t10000.json"
+    ],
+    "fields": {
+      "body": 2894982,
+      "ctx": 0,
+      "heading": 91655,
+      "path": 11592,
+      "title": 6928
+    },
+    "longest": [
+      {
+        "body_tokens": 138592,
+        "id": "file:work/regression/2026-09-12-benchmark-l9/evidence/latency.csv"
+      },
+      {
+        "body_tokens": 129777,
+        "id": "file:work/WORKLOG.md"
+      },
+      {
+        "body_tokens": 68251,
+        "id": "file:work/regression/2026-09-12-golden-ladder/evidence/rung-seed/answers.jsonl"
+      },
+      {
+        "body_tokens": 64573,
+        "id": "file:work/regression/2026-09-12-golden-ladder/evidence/rung-00100/answers.jsonl"
+      },
+      {
+        "body_tokens": 62971,
+        "id": "file:work/regression/2026-09-12-golden-ladder/evidence/rung-00200/answers.jsonl"
+      },
+      {
+        "body_tokens": 61100,
+        "id": "file:work/regression/2026-08-28-benchmark-contested/evidence/eval/t10000/manifest.json"
+      },
+      {
+        "body_tokens": 60939,
+        "id": "file:work/regression/2026-09-12-golden-ladder/evidence/rung-01000/answers.jsonl"
+      },
+      {
+        "body_tokens": 60930,
+        "id": "file:work/regression/2026-09-12-golden-ladder/evidence/rung-00500/answers.jsonl"
+      },
+      {
+        "body_tokens": 57053,
+        "id": "file:work/regression/2026-09-13-rerank-cost/evidence/latency-rung-01000.csv"
+      },
+      {
+        "body_tokens": 57053,
+        "id": "file:work/regression/2026-09-13-rerank-cost/evidence/latency-rung-00100.csv"
+      }
+    ],
+    "no_headings": [
+      "file:archive/v0.1/fux/assets/fux-lockup.svg",
+      "file:archive/v0.1/fux/data/copilot/prompts/fux-plan.prompt.md",
+      "file:archive/v0.1/fux/data/copilot/prompts/fux.prompt.md",
+      "file:archive/v0.1/fux/data/global/rules/async-everywhere.md",
+      "file:archive/v0.1/fux/data/global/rules/doc-per-code-change.md",
+      "file:archive/v0.1/fux/data/global/rules/files-max-100-lines.md",
+      "file:archive/v0.1/fux/data/global/rules/no-secrets-in-vcs.md",
+      "file:archive/v0.1/fux/data/packs/indian-markets-tax/rules/capital-gains-equity.md",
+      "file:archive/v0.1/fux/data/packs/indian-markets-tax/rules/market-hours-nse.md",
+      "file:archive/v0.1/fux/templates/formula.md",
+      "file:archive/v0.1/tools/skillgen/expected/fux__data__copilot__prompts__fux.prompt.md",
+      "file:archive/v0.1/tools/skillgen/fragments/core/copilot.md",
+      "file:archive/v0.26/conformance/2026-07-22-acme-payments/evidence/README.txt",
+      "file:archive/v0.26/conformance/2026-07-22-acme-payments/evidence/trace-staleness-settlement.txt",
+      "file:archive/v0.26/conformance/2026-07-22-scaling-1k-5k-10k/evidence/trace-demotion-hybrid.txt",
+      "file:archive/v0.26/conformance/2026-07-23-min-confidence-calibration/evidence/README.txt",
+      "file:archive/v0.26/conformance/2026-07-24-orbit-fulfillment/evidence/debug-trace-inversion.txt",
+      "file:archive/v0.26/conformance/2026-07-24-orbit-fulfillment/evidence/inversion-mechanism.txt",
+      "file:archive/v0.26/conformance/2026-07-24-orbit-fulfillment/evidence/per-question-outcomes.txt",
+      "file:archive/v0.26/conformance/2026-07-24-orbit-fulfillment/evidence/supersession-annotation.txt",
+      "file:archive/v0.26/conformance/2026-07-24-orbit-fulfillment/evidence/zero-overlap-rescue-detail.txt",
+      "file:archive/v0.26/conformance/2026-07-24-supersession-penalty-calibration/evidence/why-penalty.txt",
+      "file:archive/v0.26/src/fux/embed/data/model.json",
+      "file:archive/v0.26/tests_e2e/corpus/docs/no-headings.md",
+      "file:archive/v0.26/tests_e2e/corpus/notes/todo.txt",
+      "file:archive/v0.26/tests_e2e/corpus/office/spec.docx",
+      "file:archive/v0.26/tests_e2e/site/robots.txt",
+      "file:archive/v0.30-rev1-planning/architecture-components.svg",
+      "file:archive/v0.30-rev1-planning/architecture-index-and-refer.svg",
+      "file:tools/refusal-probe/captures/ordinary-wiki-page.stand-in.html",
+      "file:work/NOW.md",
+      "file:work/architecture-answer.svg",
+      "file:work/architecture-ask.svg",
+      "file:work/architecture-decoders.svg",
+      "file:work/architecture-detailed.svg",
+      "file:work/architecture-high-level.svg",
+      "file:work/architecture-two-readers.svg",
+      "file:work/paper/fig1-committed-size.svg",
+      "file:work/paper/fig2-composition.svg",
+      "file:work/paper/fig3-latency.svg",
+      "file:work/paper/fig4-codec-bits.svg",
+      "file:work/proposal-search-v3-target.svg",
+      "file:work/regression/2026-08-20-ingest-cost-profile/evidence/profile.txt",
+      "file:work/regression/2026-08-21-graph-plane-profile/evidence/profile-output.txt",
+      "file:work/regression/2026-08-21-progress-plane/evidence/build.txt",
+      "file:work/regression/2026-08-21-progress-plane/evidence/progress.txt",
+      "file:work/regression/2026-08-22-archived-signal/evidence/corpus-stats.txt",
+      "file:work/regression/2026-08-22-graph-acceptance/evidence/check-output.txt",
+      "file:work/regression/2026-08-22-graph-acceptance/evidence/fux-sha.txt",
+      "file:work/regression/2026-08-23-fork3-per-field-bound/evidence/bound-tightness.txt",
+      "file:work/regression/2026-08-24-blind-enrichment-regrade/evidence/blind-enrichment/1c2e5ca2556c0ede07f8b1cffe51127dadcc3b60.md",
+      "file:work/regression/2026-08-24-blind-enrichment-regrade/evidence/blind-enrichment/6a727ca45d2a2699ba45a88cd5ee1f5831631197.md",
+      "file:work/regression/2026-08-24-blind-enrichment-regrade/evidence/blind-enrichment/7e504f4cd3a8c42901d835aaf7b0af1321ad241c.md",
+      "file:work/regression/2026-08-24-blind-enrichment-regrade/evidence/blind-enrichment/8c523a523fc9f8cd2095166fc36df6abcfbf9327.md",
+      "file:work/regression/2026-08-24-blind-enrichment-regrade/evidence/blind-enrichment/92a2b415318df5ccd5ef4e4b482a9c8014f19d9d.md",
+      "file:work/regression/2026-08-24-blind-enrichment-regrade/evidence/blind-enrichment/b5261d070b88568d9c9635469a5fbb3fde3c0540.md",
+      "file:work/regression/2026-08-24-blind-enrichment-regrade/evidence/blind-enrichment/c7f89e49fcd5643cbb8e90679e6d5f505d0f79be.md",
+      "file:work/regression/2026-08-24-blind-enrichment-regrade/evidence/blind-enrichment/c84a92145ee9df3a037ec1f1b90eeac7f179e6c7.md",
+      "file:work/regression/2026-08-24-blind-enrichment-regrade/evidence/blind-enrichment/cfc67d2031fcf87eaf0eeec95fad5a5e8f2c8eef.md",
+      "file:work/regression/2026-08-24-blind-enrichment-regrade/evidence/blind-enrichment/f74ce959a64f0a65148f65bd6402f74b1aa7ef1f.md",
+      "file:work/regression/2026-08-24-blind-enrichment-regrade/evidence/grade-blind-enrichment.txt",
+      "file:work/regression/2026-08-24-blind-enrichment-regrade/evidence/grade-contaminated-enrichment.txt",
+      "file:work/regression/2026-08-24-blind-enrichment-regrade/evidence/grade-no-enrichment.txt",
+      "file:work/regression/2026-08-24-blind-enrichment-second-author/evidence/blind-enrichment-2/1c2e5ca2556c0ede07f8b1cffe51127dadcc3b60.md",
+      "file:work/regression/2026-08-24-blind-enrichment-second-author/evidence/blind-enrichment-2/6a727ca45d2a2699ba45a88cd5ee1f5831631197.md",
+      "file:work/regression/2026-08-24-blind-enrichment-second-author/evidence/blind-enrichment-2/7e504f4cd3a8c42901d835aaf7b0af1321ad241c.md",
+      "file:work/regression/2026-08-24-blind-enrichment-second-author/evidence/blind-enrichment-2/8c523a523fc9f8cd2095166fc36df6abcfbf9327.md",
+      "file:work/regression/2026-08-24-blind-enrichment-second-author/evidence/blind-enrichment-2/92a2b415318df5ccd5ef4e4b482a9c8014f19d9d.md",
+      "file:work/regression/2026-08-24-blind-enrichment-second-author/evidence/blind-enrichment-2/b5261d070b88568d9c9635469a5fbb3fde3c0540.md",
+      "file:work/regression/2026-08-24-blind-enrichment-second-author/evidence/blind-enrichment-2/c7f89e49fcd5643cbb8e90679e6d5f505d0f79be.md",
+      "file:work/regression/2026-08-24-blind-enrichment-second-author/evidence/blind-enrichment-2/c84a92145ee9df3a037ec1f1b90eeac7f179e6c7.md",
+      "file:work/regression/2026-08-24-blind-enrichment-second-author/evidence/blind-enrichment-2/cfc67d2031fcf87eaf0eeec95fad5a5e8f2c8eef.md",
+      "file:work/regression/2026-08-24-blind-enrichment-second-author/evidence/blind-enrichment-2/f74ce959a64f0a65148f65bd6402f74b1aa7ef1f.md",
+      "file:work/regression/2026-08-24-blind-enrichment-second-author/evidence/grade-blind-author-2.txt",
+      "file:work/regression/2026-08-24-blind-enrichment-second-author/evidence/grade-no-enrichment.txt",
+      "file:work/regression/2026-08-24-crossarch-drift-and-declared-supersession/evidence/declared-supersession-sweep.txt",
+      "file:work/regression/2026-08-24-crossarch-drift-and-declared-supersession/evidence/drift-stats.txt",
+      "file:work/regression/2026-08-24-crossarch-drift-and-declared-supersession/evidence/onnx-aarch64.txt",
+      "file:work/regression/2026-08-24-crossarch-drift-and-declared-supersession/evidence/onnx-x86_64.txt",
+      "file:work/regression/2026-08-24-dense-lane-gate/evidence/sweep.txt",
+      "file:work/regression/2026-08-24-rerank-and-goldens/evidence/enrich/1c2e5ca2556c0ede07f8b1cffe51127dadcc3b60.md",
+      "file:work/regression/2026-08-24-rerank-and-goldens/evidence/enrich/6a727ca45d2a2699ba45a88cd5ee1f5831631197.md",
+      "file:work/regression/2026-08-24-rerank-and-goldens/evidence/enrich/7e504f4cd3a8c42901d835aaf7b0af1321ad241c.md",
+      "file:work/regression/2026-08-24-rerank-and-goldens/evidence/enrich/8c523a523fc9f8cd2095166fc36df6abcfbf9327.md",
+      "file:work/regression/2026-08-24-rerank-and-goldens/evidence/enrich/92a2b415318df5ccd5ef4e4b482a9c8014f19d9d.md",
+      "file:work/regression/2026-08-24-rerank-and-goldens/evidence/enrich/b5261d070b88568d9c9635469a5fbb3fde3c0540.md",
+      "file:work/regression/2026-08-24-rerank-and-goldens/evidence/enrich/c7f89e49fcd5643cbb8e90679e6d5f505d0f79be.md",
+      "file:work/regression/2026-08-24-rerank-and-goldens/evidence/enrich/c84a92145ee9df3a037ec1f1b90eeac7f179e6c7.md",
+      "file:work/regression/2026-08-24-rerank-and-goldens/evidence/enrich/cfc67d2031fcf87eaf0eeec95fad5a5e8f2c8eef.md",
+      "file:work/regression/2026-08-24-rerank-and-goldens/evidence/enrich/f74ce959a64f0a65148f65bd6402f74b1aa7ef1f.md",
+      "file:work/regression/2026-08-25-model-removal/evidence/raw.txt",
+      "file:work/regression/2026-08-27-daemon-real-url/evidence/sweep-poll.txt",
+      "file:work/regression/2026-08-27-decoy-control/evidence/decoy-bands.txt",
+      "file:work/regression/2026-08-27-p3-sha-stability/evidence/control.txt",
+      "file:work/regression/2026-08-27-p3-sha-stability/evidence/headline.txt",
+      "file:work/regression/2026-08-27-r10-separation-floor/evidence/run-output.txt",
+      "file:work/regression/2026-08-28-benchmark-contested/evidence/eval/t10000/manifest.json",
+      "file:work/regression/2026-08-28-benchmark-contested/evidence/eval/t1200/manifest.json",
+      "file:work/regression/2026-08-28-benchmark-contested/evidence/eval/t1200b/manifest.json",
+      "file:work/regression/2026-08-28-doc-coverage/evidence/distributions.txt",
+      "file:work/regression/2026-08-28-placebo-and-seal/evidence/placebo-arm/1c2e5ca2556c0ede07f8b1cffe51127dadcc3b60.md",
+      "file:work/regression/2026-08-28-placebo-and-seal/evidence/placebo-arm/6a727ca45d2a2699ba45a88cd5ee1f5831631197.md",
+      "file:work/regression/2026-08-28-placebo-and-seal/evidence/placebo-arm/7e504f4cd3a8c42901d835aaf7b0af1321ad241c.md",
+      "file:work/regression/2026-08-28-placebo-and-seal/evidence/placebo-arm/8c523a523fc9f8cd2095166fc36df6abcfbf9327.md",
+      "file:work/regression/2026-08-28-placebo-and-seal/evidence/placebo-arm/92a2b415318df5ccd5ef4e4b482a9c8014f19d9d.md",
+      "file:work/regression/2026-08-28-placebo-and-seal/evidence/placebo-arm/b5261d070b88568d9c9635469a5fbb3fde3c0540.md",
+      "file:work/regression/2026-08-28-placebo-and-seal/evidence/placebo-arm/c7f89e49fcd5643cbb8e90679e6d5f505d0f79be.md",
+      "file:work/regression/2026-08-28-placebo-and-seal/evidence/placebo-arm/c84a92145ee9df3a037ec1f1b90eeac7f179e6c7.md",
+      "file:work/regression/2026-08-28-placebo-and-seal/evidence/placebo-arm/cfc67d2031fcf87eaf0eeec95fad5a5e8f2c8eef.md",
+      "file:work/regression/2026-08-28-placebo-and-seal/evidence/placebo-arm/f74ce959a64f0a65148f65bd6402f74b1aa7ef1f.md",
+      "file:work/regression/2026-08-28-resolution-floor/evidence/table.txt",
+      "file:work/regression/2026-09-02-cdp-parallel/evidence/head-parallel-1.txt",
+      "file:work/regression/2026-09-02-cdp-parallel/evidence/head-parallel-2.txt",
+      "file:work/regression/2026-09-02-cdp-parallel/evidence/head-parallel-4.txt",
+      "file:work/regression/2026-09-02-cdp-parallel/evidence/head-parallel-6.txt",
+      "file:work/regression/2026-09-02-cdp-parallel/evidence/pre-w105-parallel-1.txt",
+      "file:work/regression/2026-09-02-cdp-parallel/evidence/pre-w105-parallel-2.txt",
+      "file:work/regression/2026-09-02-cdp-parallel/evidence/pre-w105-parallel-4.txt",
+      "file:work/regression/2026-09-02-cdp-parallel/evidence/pre-w105-parallel-6.txt",
+      "file:work/regression/2026-09-02-enrich-pii-leak/evidence/96506a1da27f44277b3bb7b47381321d26734f6a.md",
+      "file:work/regression/2026-09-02-enrich-pii-leak/evidence/arm-head.txt",
+      "file:work/regression/2026-09-02-enrich-pii-leak/evidence/arm-pre-w102.txt",
+      "file:work/regression/2026-09-02-enrich-pii-leak/evidence/e04b8e826b719558804907708f3a5c9d3ae8aae3.md",
+      "file:work/regression/2026-09-05-answer-top3/evidence/goldens-arm-A-main.txt",
+      "file:work/regression/2026-09-05-answer-top3/evidence/goldens-arm-B-w108.txt",
+      "file:work/regression/2026-09-05-declared-ties/evidence/differential-playground.txt",
+      "file:work/regression/2026-09-05-doc2query/evidence/check-output.txt",
+      "file:work/regression/2026-09-05-doc2query/evidence/summary.txt",
+      "file:work/regression/2026-09-05-expand/evidence/summary.txt",
+      "file:work/regression/2026-09-05-node-log-divergence/evidence/compare-playground.txt",
+      "file:work/regression/2026-09-05-node-log-divergence/evidence/compare-t10000.txt",
+      "file:work/regression/2026-09-05-node-log-divergence/evidence/logprobe-glibc-output.txt",
+      "file:work/regression/2026-09-05-node-log-divergence/evidence/logprobe-output.txt",
+      "file:work/regression/2026-09-05-node-log-divergence/evidence/logprobe-self-output.txt",
+      "file:work/regression/2026-09-05-node-log-divergence/evidence/queries-self.txt",
+      "file:work/regression/2026-09-05-vector-gate/evidence/cross-arm-cls-vs-st.txt",
+      "file:work/regression/2026-09-05-vector-gate/evidence/cross-arm-fp32-vs-q8.txt",
+      "file:work/regression/2026-09-05-vector-gate/evidence/cross-arm-mean-vs-st.txt",
+      "file:work/regression/2026-09-05-vector-gate/evidence/grade-node-cls.txt",
+      "file:work/regression/2026-09-05-vector-gate/evidence/grade-node.txt",
+      "file:work/regression/2026-09-05-vector-gate/evidence/grade-py.txt",
+      "file:work/regression/2026-09-06-csv-chunk-granularity/evidence/cohort-and-control.txt",
+      "file:work/regression/2026-09-06-csv-chunk-granularity/evidence/set-a.txt",
+      "file:work/regression/2026-09-06-csv-chunk-granularity/evidence/set-b.txt",
+      "file:work/regression/2026-09-12-node-arm-rungs/evidence/graph-arm-rung-00100.txt",
+      "file:work/regression/2026-09-12-node-arm-rungs/evidence/graph-arm-rung-10000.txt",
+      "file:work/regression/2026-09-12-priors-and-tables/evidence/sweep-rung-00100-archived_weight.txt",
+      "file:work/regression/2026-09-12-priors-and-tables/evidence/sweep-rung-00100-recency_half_life_days.txt",
+      "file:work/regression/2026-09-12-priors-and-tables/evidence/sweep-rung-00100-rerank_weight.txt",
+      "file:work/regression/2026-09-12-priors-and-tables/evidence/sweep-rung-00100-superseded_weight.txt",
+      "file:work/regression/2026-09-12-priors-and-tables/evidence/sweep-rung-01000-archived_weight.txt",
+      "file:work/regression/2026-09-12-priors-and-tables/evidence/sweep-rung-01000-recency_half_life_days.txt",
+      "file:work/regression/2026-09-12-priors-and-tables/evidence/sweep-rung-01000-rerank_weight.txt",
+      "file:work/regression/2026-09-12-priors-and-tables/evidence/sweep-rung-01000-superseded_weight.txt",
+      "file:work/regression/2026-09-12-priors-and-tables/evidence/sweep-rung-seed-archived_weight.txt",
+      "file:work/regression/2026-09-12-priors-and-tables/evidence/sweep-rung-seed-recency_half_life_days.txt",
+      "file:work/regression/2026-09-12-priors-and-tables/evidence/sweep-rung-seed-rerank_weight.txt",
+      "file:work/regression/2026-09-12-priors-and-tables/evidence/sweep-rung-seed-superseded_weight.txt",
+      "file:work/regression/2026-09-12-priors-and-tables/evidence/tables-rung-00100.txt",
+      "file:work/regression/2026-09-12-priors-and-tables/evidence/tables-rung-01000.txt",
+      "file:work/regression/2026-09-12-priors-and-tables/evidence/tables-rung-seed.txt",
+      "file:work/regression/2026-09-12-reaim-and-instruments/evidence/body-control-rung-01000.txt",
+      "file:work/regression/2026-09-12-reaim-and-instruments/evidence/w115-probes.txt",
+      "file:work/regression/2026-09-12-reaim-and-instruments/evidence/w115-selftest.txt",
+      "file:work/regression/2026-09-12-reaim-and-instruments/evidence/w144-dose-response.txt",
+      "file:work/regression/2026-09-12-reaim-and-instruments/evidence/w144-graded.txt",
+      "file:work/regression/2026-09-12-yarn-berry-probe/evidence/arm-0-does-it-link.txt",
+      "file:work/regression/2026-09-12-yarn-berry-probe/evidence/results.txt",
+      "file:work/regression/2026-09-13-table-is-the-answer/evidence/w155-graded.txt"
+    ],
+    "shortest": [
+      {
+        "body_tokens": 0,
+        "id": "file:archive/v0.26/conformance/2026-07-24-v0.26.0-release-verification/evidence/orbit-baseline-0.25.0.json"
+      },
+      {
+        "body_tokens": 0,
+        "id": "file:archive/v0.26/conformance/2026-07-24-v0.26.0-release-verification/evidence/orbit-baseline-0.26.0.json"
+      },
+      {
+        "body_tokens": 0,
+        "id": "file:tools/refusal-probe/captures/onedrive-viewer-shell.html"
+      },
+      {
+        "body_tokens": 0,
+        "id": "file:work/regression/2026-08-25-supersession-and-reranker-default/evidence/results.json"
+      },
+      {
+        "body_tokens": 2,
+        "id": "file:tools/quality/mix.toml"
+      },
+      {
+        "body_tokens": 3,
+        "id": "file:archive/v0.26/tests_e2e/corpus/data/config.json"
+      },
+      {
+        "body_tokens": 3,
+        "id": "file:work/regression/2026-08-22-graph-acceptance/evidence/check-output.txt"
+      },
+      {
+        "body_tokens": 4,
+        "id": "file:archive/v0.26/tests_e2e/eval/relational/docs/unrelated.md"
+      },
+      {
+        "body_tokens": 4,
+        "id": "file:archive/v0.26/tests_e2e/site/robots.txt"
+      },
+      {
+        "body_tokens": 5,
+        "id": "file:archive/v0.1/fux/assets/fux-lockup.svg"
+      }
+    ]
+  },
+  "levers": {
+    "boilerplate term": "`[index]` stopwords, or an analyzer amendment \u2014 an index change, with its own record",
+    "file-name-only document": "a decoder (`fux-decoder`), or leave it in `.fux/enrich/queue.tsv` for a model to describe",
+    "hub": "link-IDF and the graph-composed `ask` (W-161) \u2014 until then, nothing: a hub is a fact about the corpus",
+    "near-duplicate pair": "`.fuxignore`, `archived=`, or `supersedes` on the one that is current",
+    "orphan": "link-IDF and the graph-composed `ask` (W-161) \u2014 until then, add a link from a document that is read",
+    "template family": "`.fuxignore`, `archived=`, or `supersedes` on the one that is current",
+    "unfindable document": "`fux enrich`, `fux correct`, or fix the source",
+    "unreadable document": "re-ingest, or `keep = true` on the url line so the bytes are retained"
+  }
+}
