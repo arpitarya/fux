@@ -10,7 +10,7 @@ feature: "`.fux/sources/dirs` — what the engine indexes, what is subtracted fr
 owns: []
 laws: [L3, L6]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 6d236efb5dade7bc6bfd96e1cf44982098c5e8615729060281de206358dc588c
+content_sha: 409be35789e25893a1e1911a49b0902c4966b457ff1fac4fe63846913af03b28
 ---
 
 # SR-DIR-LIST — the committed directory list
@@ -236,6 +236,18 @@ carries meaning here (decision 3) in a way it does not there. Same grammar,
 different authorship, and the reader is lenient for both.
 
 ### Consequences
+
+- ✅ **A listed path that is not on disk is REPORTED (2026-09-14, W-163).**
+  `fux doctor`'s `listed directories exist` row names it. 🔴 **This is not
+  cosmetic: `walk_sources` RAISES on it**, so the next `fux ingest` in that repo
+  exits 1 — which is precisely why `fux add` refuses a path that does not exist,
+  and a line that arrived any other way (a hand edit, a branch switch, a moved
+  directory) had nothing checking it until the ingest failed.
+  ⚠ **Still a `warn`.** Ingest is where it stops and says so clearly; making
+  `doctor` red as well would fire on a branch where a documented directory is
+  simply not checked out, which is a legitimate state to be in for an afternoon.
+  ⚠ **Exclusions are not checked** — a `!` line names a pattern, and one matching
+  nothing today is what a pattern is for.
 
 - **A single file was always a legal entry.** `_candidate_paths` branches on
   `base.is_file()`, so `fux add docs/onboarding.md` needed no list, no attribute

@@ -11,7 +11,7 @@ feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error 
 owns: [src/fux/tune.py@2303b6568596]
 laws: [L1, L3, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: b483530f27b62cd1e0c974dfea5e07a1e033b0221c9917ffb734c0195b8e9edd
+content_sha: 5929e1da62dd83f54f0413522cc86bf4912f76d957787f337bd323cd9e723927
 ---
 
 # SR-TUNE — the tunables file, and per-source priority
@@ -844,6 +844,18 @@ surfacing the supersession chain instead of ranking for it. It is an **unopened
 fork with no compare doc.**
 
 ### Consequences
+
+- ✅ **A frozen `.fux/tune.toml` is REPORTED (2026-09-14, W-163).**
+  `fux doctor`'s `tune.toml current` row names every `table.key` the engine has
+  gained that the consumer's file does not mention. The file is write-if-missing
+  (SR-DOTFUX decision 6), so it never will — reading resolves to the engine
+  default, **nothing is broken**, and what is lost is that the consumer cannot
+  SEE the knob exists in the one file whose entire purpose is to show them.
+  ⚠ **Absent is not frozen**: a repo with no `tune.toml` is running engine
+  defaults deliberately, and `tune.toml loads` already says so.
+  ⚠ **The expected key set is DERIVED from `_SCHEMA`, never listed in `doctor.py`**
+  — a second copy would be free to disagree while both look correct, and the
+  failure is silent: the row simply stops reporting a key nobody remembered.
 
 - ⚠ **Veto conditions 1 and 4 fired on 2026-09-11, by ruling** — a tune key
   reaches the index, and a committed field (`phrases`, and every term of a

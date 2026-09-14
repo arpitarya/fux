@@ -10,7 +10,7 @@ feature: refusal detection before decode
 owns: [src/fux/ingest/refusals.py@adf187806c43, src/fux/templates/refusals.toml.txt@bdf2356bc679, tools/refusal-probe@76b6f6b7f4aa]
 laws: [L1, L3]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 4dafd67965261a0fd55c6e53ff485df9b666595d8f7021e7765fc37348506989
+content_sha: 625df98b991317d7b6dfd9e48b99cecf47dc546c3918b7a9bd0595337f2c0733
 ---
 
 # SR-REFUSAL: a sign-in wall is not a document, and only the bytes may say so
@@ -362,6 +362,26 @@ those is the document, not an auth wall. `.action`, `.aspx`, `.asp`, `.php` and
 
 ### Consequences
 
+- ✅ **A never-edited, superseded starter is REPORTED (2026-09-14, W-163).**
+  `fux doctor`'s `refusal rules current` row fires when `.fux/refusals.toml` is
+  byte-identical to a starter fux has **REPLACED**: rules that decide what enters
+  the index, shipped as a starting point, that nobody ever looked at and that fux
+  itself has moved on from.
+  ⚠ **Byte equality is the right test here and the opposite call from the
+  `.fux/README.md` row**, which compares sections. That file is prose a consumer
+  annotates; this one is policy, and identical-to-the-starter means unexamined.
+  🔴 **Matching the CURRENT starter is NOT a finding** — a repo set up yesterday
+  is supposed to look exactly like that, and conflating the two would report every
+  fresh `fux setup` in the world as frozen.
+  🔴 **`doctor.RETIRED_REFUSAL_STARTERS` is appended to BY HAND in the same
+  change that edits `templates/refusals.toml.txt`.** fux ships exactly one
+  starter, so *"byte-equal to a previous starter"* is unanswerable from the tree
+  alone; without the outgoing digest the row cannot fire. It is **empty today,
+  and that is correct rather than unfinished** — the starter has not been
+  replaced since it shipped.
+  `tests/test_doctor.py::test_the_current_refusal_starter_is_not_listed_as_retired`
+  fails if the current digest is ever added by mistake.
+
 **Easier.** A refusal that used to become a record now becomes a skip with a
 reason a human can act on, and the reason names the fix rather than the
 symptom. A consumer with a corporate SSO writes two rules once and every URL
@@ -381,10 +401,6 @@ observation and it needed a separate mechanism — the thin-decode warning in
 `urlsrc._warn_if_thin`, which is `(words/KB) < 2.0` **and** `words < 50`, an OR
 away from firing on real short documents. It warns and never refuses, because
 "the decoder found little" is not the same claim as "this is not the document".
-
-**Also owed, and filed in [`work/OPEN-WORK.md`](../work/OPEN-WORK.md):**
-`fux doctor` does not report how many URLs were refused, or by which rule, so
-an over-broad rule is visible only in a run's own output.
 
 ### Alternatives considered
 

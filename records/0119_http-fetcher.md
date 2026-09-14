@@ -10,7 +10,7 @@ feature: "`.fux/fetchers/http.py` — the fetcher a URL gets when its line says 
 owns: []
 laws: [L1, L4, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: bedeb8090d76b587d658002373e2bb4317e6358eeeb0693f15c23dc311a6ea72
+content_sha: 3955f8d8253d728ad74bcc14a2daa27311571d4df4fc97521865e5c7e1bbde8f
 ---
 
 # SR-HTTP-FETCHER — the default fetcher
@@ -258,6 +258,17 @@ alternative — a classifier deciding what "too thin" means — is how a navigat
 bar gets indexed as a runbook.
 
 ### Consequences
+
+- ✅ **The thin-extraction case is REPORTED (2026-09-14, W-163).**
+  `fux doctor`'s `url extraction depth` row names a `url:` record whose extracted
+  text is a negligible share of its retained bytes — the shape this fetcher
+  produces on a single-page app, where a full-size HTML shell decodes to its nav
+  bar and the document indexes, answering nothing. Read from the committed index
+  and `.fux/acquired/`; **no fetch, no second opinion about the page**.
+  ⚠ **Advisory and deliberately loose.** It surfaces the obvious case and
+  adjudicates no extraction quality; a tighter floor would need evidence nobody
+  has gathered. `--cdp` is the remedy, and whether a given page needs a browser
+  is the consumer's call about their own wiki.
 
 - **URL ingestion works out of the box.** `[sources.url]` plus a list is enough;
   no fetcher decision is required to index a served page.

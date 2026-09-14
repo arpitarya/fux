@@ -13,7 +13,7 @@ feature: configurable output defaults
 owns: [src/fux/output_config.py@bb73da35f5b1]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 17dc0554b57ff7579604a515f468ce65d4a25783cf95d3738efa0c526a03ff43
+content_sha: 70e670164c81c897299b4d6f56288533676460e7eedb4c61ac8b6b6c122e0649
 ---
 
 # SR-OUTPUT — output defaults are configurable, in a third file
@@ -698,6 +698,24 @@ drifted **refusal** produces an error on one side and an answer on the other,
 which a harness reports as a crash rather than as a finding.
 
 ### Consequences
+
+- ✅ **A frozen `.fux/output.toml` is REPORTED (2026-09-14, W-163)**, the
+  companion to SR-TUNE's row and with the same reasoning: a key the engine gained
+  resolves to its default, nothing breaks, and the file meant to show the knob
+  does not mention it.
+  🔴 **Its first build was a FALSE POSITIVE on fux's own repository**, and
+  W-163's keep-call is what caught it before the row shipped. Expecting
+  `cli.explain`, `cli.hops`, `cli.no_refer` and three more at those exact paths
+  reported **six keys missing from a file carrying every one of them** — because
+  this file **nests per verb on purpose**: `explain` under `[cli.ask]`, `hops`
+  under `[cli.path]`, `no_refer` and `journal` under `[cli.answer]`, `enabled`
+  under `[cli.json]`. A rendering default means different things to different
+  verbs, which is decision 11's own shape.
+  **So the row asks whether the file MENTIONS a knob, not where** — comparing
+  names, and counting a TABLE name as a name, since `json` is configured at
+  `[cli.json] enabled`. Looser on purpose: a key moved between tables goes
+  unflagged, and the row is not wrong on every correctly-written file.
+  Pinned by `tests/test_doctor.py::test_this_repos_own_output_toml_satisfies_the_row`.
 
 - **The no-match line is a rendering decision, and it moved to stderr on
   2026-09-14** (W-165 fix 2, [SR-FIND](0104_find.md) decision 6). It is emitted

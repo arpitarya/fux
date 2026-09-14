@@ -7,10 +7,10 @@ description: "Fux's readers are AI agents, and an engine whose output is misread
 status: accepted
 date: 2026-08-22
 feature: the agent-facing policy and skill artifacts Fux ships, and their installer
-owns: [src/fux/templates/agents@c4cf58405e78]
+owns: [src/fux/templates/agents@e6f68bb61e94]
 laws: [L1, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 13581ccbd50e2def528b83966326b198459ead5faf4a4d7c1221ea21715b495e
+content_sha: bec60e668dc983732efe6327be1515ee4ade2ecf2ed7ae815b1a76d78a3640b3
 ---
 
 # SR-AGENT-POLICY — shipping the policy, not just the facts
@@ -508,6 +508,16 @@ skills … for Claude, Codex and Copilot as well"*; on being shown decision 9,
 9a and veto 5b, he chose **all** of: skills, Kiro steering, and steering for the
 committed-write topics too).
 
+**15d. A FOURTH kind since 2026-09-14 — the acting surfaces.** `CLAUDE_SURFACES`
+adds a hook, a seeded `settings.json`, three commands, a subagent and an output
+style, Claude-only. **The word for all of them, and the taxonomy that separates
+instructing from acting, is [SR-AGENT-SURFACES](0155_agent-surfaces.md)** —
+stated there once, and not restated here. This record keeps what it always
+owned: the vendor roster, the opt-out, the announcement, and byte agreement.
+⚠ Two of the new surfaces do not behave like the three kinds below:
+`.claude/settings.json` is **co-owned** (seeded, never overwritten, exempt from
+the drift test) and the hook is **executable or inert**.
+
 **15a. What ships.** Three kinds, each from hand-written templates:
 
 | kind | count | destinations | loads |
@@ -692,6 +702,16 @@ row still fails even though Copilot writes the same paths.
 
 
 ### Consequences
+
+- ✅ **The retired skill folders are REPORTED (2026-09-14, W-163).**
+  `fux doctor`'s `retired agent folders` row names `.codex/skills/` and
+  `.github/skills/` when a repo set up before decision 16 still has them.
+  🔴 **The DUPLICATE is the defect, not the unread folder.** Copilot reads
+  `.agents/skills/` **and** `.github/skills/`, so every skill appears twice and
+  the older copy is free to disagree with the newer one while both read as
+  correct. **Delete is the whole remedy**, which is why this is a row and not a
+  rewrite: the folder may hold files fux never wrote, and removing a directory it
+  did not create is not something `fux setup` has ever been allowed to do.
 
 - ⚠ **Fux owns FOUR third-party formats it does not control.** This is a real
   maintenance liability and it is not hypothetical: **between drafting these

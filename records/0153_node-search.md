@@ -11,7 +11,7 @@ owns: [node@51a57ca0e641, src/fux/store/nodebundle.py@071a24a596dd]
 laws: [L1, L3, L4, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: cbdb9dca5782ed39eab86db09c84b34c8b420ee67a578fcb2aa0d4667ac05908
+content_sha: 9022f1d138ad4c423fe6711268f8e1e32f879fe538f0702ec812b20bbc56ee4c
 ---
 
 # SR-NODE-SEARCH — the Node read plane
@@ -534,6 +534,22 @@ failure message says so, and names the one-line `.yarnrc.yml` change that would
 make shape C available.
 
 ### Consequences
+
+- **W-163's eight `fux doctor` rows changed `doctor.py` and changed NOTHING this
+  record describes** (2026-09-14). Stated here because the freshness gate was
+  right to ask and the answer is worth writing down rather than waving through.
+
+  `records/README.md` gives this record `src/fux/doctor.py::_node_reader,_installed_reader`
+  — the `node reader` row and the PATH row's helper — and neither moved. What the
+  gate saw is that the change **inserted 494 lines in one hunk**, which made
+  `changed_symbols` return *"could not tell"*: a hunk that starts between two
+  top-level blocks maps to no enclosing symbol. **The narrowing then correctly
+  refuses to narrow** — *"a gate may only narrow on a fact, never on a guess"* —
+  and demands every describer.
+
+  ⚠ **That is the check working, not a false positive**, and the remedy is this
+  paragraph rather than a looser rule: the alternative is a narrowing that
+  guesses, and a gate that guesses narrow is a gate that stops firing.
 
 - **The no-match sentence moved to stderr in BOTH readers, in one change**
   (2026-09-14, W-165 fix 2). `decline()` in `node/src/verbs/find.mjs` is the twin

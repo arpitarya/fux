@@ -1492,3 +1492,328 @@ def test_the_migration_row_fires_without_a_duplicate(tmp_path):
     checks = {c.name: c for c in doctor.run(root)}
     assert checks["fuxignore usable"].ok  # nothing duplicated — that row is clean
     assert not checks["dirs exclusions migrated"].ok
+
+
+# -- W-163: the setup-drift rows --------------------------------------------
+#
+# 🔴 **One cause, eight rows.** `fux setup` writes once and never rewrites, so
+# everything in a template freezes in every repo set up before the template
+# changed, and nothing tells the repo. Each row below has a source record that
+# named `fux doctor` as the place this should be visible.
+#
+# ⚠ Every one is `warn` and report-only. None stops a verb; an error here would
+# make doctor red on working repos, which is how people learn to ignore it.
+
+
+def _drift_repo(tmp_path):
+    """A minimal repo the drift rows can read, with nothing planted."""
+    (tmp_path / ".git").mkdir()
+    (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
+    (tmp_path / ".fux" / "sources").mkdir(parents=True)
+    (tmp_path / ".fux" / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
+    # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
+    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "docs" / "a.md").write_text("# A\n\nbody\n", encoding="utf-8")
+    return tmp_path
+
+
+def _row(tmp_path, name):
+    return next(c for c in doctor.run(tmp_path) if c.name == name)
+
+
+def test_every_drift_row_is_a_warning_and_none_is_an_error(tmp_path):
+    """The shared property, asserted once rather than eight times.
+
+    A row that failed the command would make `fux doctor` exit non-zero on a
+    repo where nothing is broken — drift is not breakage, and a red doctor
+    people learn to ignore is worse than no doctor.
+    """
+    root = _drift_repo(tmp_path)
+    # Plant every condition at once, so the assertion is over rows that are
+    # actually FIRING. `level` is only consulted when `ok` is false — asserting
+    # it on a passing row tests nothing and fails on the dataclass default.
+    (root / ".github" / "skills").mkdir(parents=True)
+    (root / ".fux" / "README.md").write_text("# old\n", encoding="utf-8")
+    (root / ".fux" / "tune.toml").write_text("[bm25f]\nk1 = 1.2\n", encoding="utf-8")
+    (root / ".fux" / "output.toml").write_text("[cli]\ntop = 5\n", encoding="utf-8")
+    (root / ".fux" / "formats.toml").write_text('include = ["*.md", "*.zzz"]\n', encoding="utf-8")
+    (root / ".fux" / "sources" / "dirs").write_text("docs\nhandbook\n", encoding="utf-8")
+
+    rows = {c.name: c for c in doctor.run(root)}
+    assert set(DRIFT_ROWS) <= set(rows), f"missing rows: {sorted(set(DRIFT_ROWS) - set(rows))}"
+
+    fired = [n for n in DRIFT_ROWS if not rows[n].ok]
+    assert len(fired) >= 6, f"only {fired} fired with every condition planted"
+    assert all(rows[n].level == "warn" for n in fired), (
+        "a drift row failed the COMMAND: " + str([n for n in fired if rows[n].level != "warn"])
+    )
+    assert all(rows[n].detail.isascii() for n in fired), "printed text reaches a Windows console"
+
+
+#: The eight rows W-163 added. Named once; every test below reads this.
+DRIFT_ROWS = (
+    "retired agent folders",
+    "`.fux/README.md` current",
+    "refusal rules current",
+    "tune.toml current",
+    "output.toml current",
+    "declared types are readable",
+    "listed directories exist",
+    "url extraction depth",
+)
+
+
+def test_a_clean_repo_fires_none_of_them(tmp_path):
+    """Silence is the common case, and a row that cannot be silent is useless.
+
+    ⚠ **Scoped to W-163's eight**, not to every warn row. `output.toml present`
+    and `ranking priors` fire on a bare repo *correctly* — they are disclosures
+    about a repo that has not been configured, not drift — and asserting over
+    every row would make this test fail whenever some unrelated row started
+    telling the truth about a minimal fixture.
+    """
+    rows = {c.name: c for c in doctor.run(_drift_repo(tmp_path))}
+    noisy = [n for n in DRIFT_ROWS if not rows[n].ok]
+    assert noisy == [], f"these fired on a repo with nothing planted: {noisy}"
+
+
+# -- retired agent folders ---------------------------------------------------
+
+
+def test_a_retired_skill_folder_is_named_with_its_vendor(tmp_path):
+    root = _drift_repo(tmp_path)
+    (root / ".github" / "skills").mkdir(parents=True)
+    row = _row(root, "retired agent folders")
+    assert not row.ok
+    assert ".github/skills" in row.detail
+    assert "DUPLICATES" in row.detail, "the duplicate IS the defect, not the unread folder"
+    assert row.detail.isascii()
+
+
+def test_both_retired_folders_are_named_when_both_exist(tmp_path):
+    root = _drift_repo(tmp_path)
+    (root / ".github" / "skills").mkdir(parents=True)
+    (root / ".codex" / "skills").mkdir(parents=True)
+    detail = _row(root, "retired agent folders").detail
+    assert ".github/skills" in detail and ".codex/skills" in detail
+
+
+def test_the_live_skills_directory_is_not_reported(tmp_path):
+    """`.agents/skills/` is where they live now — reporting it would be absurd."""
+    root = _drift_repo(tmp_path)
+    (root / ".agents" / "skills").mkdir(parents=True)
+    assert _row(root, "retired agent folders").ok
+
+
+# -- the .fux/README.md section set -----------------------------------------
+
+
+def test_a_readme_missing_template_sections_is_reported(tmp_path):
+    root = _drift_repo(tmp_path)
+    (root / ".fux" / "README.md").write_text("# .fux\n\nan old one\n", encoding="utf-8")
+    row = _row(root, "`.fux/README.md` current")
+    assert not row.ok
+    assert "section(s)" in row.detail
+
+
+def test_a_readme_a_consumer_annotated_is_NOT_reported(tmp_path):
+    """⚠ **Sections, not bytes**, and this is why.
+
+    The file is write-if-missing precisely so a consumer's notes survive. A byte
+    comparison would fire on every repo where somebody added a line — a row
+    wrong more often than right. An EXTRA heading is the feature, not drift.
+    """
+    from fux.store import fuxdir
+
+    root = _drift_repo(tmp_path)
+    (root / ".fux" / "README.md").write_text(
+        fuxdir._readme() + "\n## Our own notes\n\nread the runbook first.\n",
+        encoding="utf-8",
+    )
+    assert _row(root, "`.fux/README.md` current").ok
+
+
+def test_the_current_template_satisfies_its_own_row(tmp_path):
+    """A freshly written README must never be reported as stale."""
+    from fux.store import fuxdir
+
+    root = _drift_repo(tmp_path)
+    (root / ".fux" / "README.md").write_text(fuxdir._readme(), encoding="utf-8")
+    assert _row(root, "`.fux/README.md` current").ok
+
+
+# -- the retired refusal starter --------------------------------------------
+
+
+def test_the_current_refusal_starter_is_not_listed_as_retired():
+    """🔴 **The one way this row can be catastrophically wrong.**
+
+    `RETIRED_REFUSAL_STARTERS` holds digests of starters fux has REPLACED. Adding
+    the current one would report every freshly set-up repo in the world as
+    carrying stale rules — the row firing on exactly the population it exists to
+    exclude.
+    """
+    import hashlib
+    from pathlib import Path
+
+    import fux
+
+    starter = Path(fux.__file__).parent / "templates" / "refusals.toml.txt"
+    digest = hashlib.sha256(starter.read_bytes()).hexdigest()
+    assert digest not in doctor.RETIRED_REFUSAL_STARTERS, (
+        "the CURRENT starter is listed as retired: every repo set up today would "
+        "be reported as frozen. Append the OUTGOING digest when the starter changes, "
+        "never the incoming one"
+    )
+
+
+def test_a_retired_starter_is_reported(tmp_path, monkeypatch):
+    import hashlib
+
+    root = _drift_repo(tmp_path)
+    body = "# an old starter\n"
+    (root / ".fux" / "refusals.toml").write_text(body, encoding="utf-8")
+    monkeypatch.setattr(
+        doctor, "RETIRED_REFUSAL_STARTERS", (hashlib.sha256(body.encode()).hexdigest(),)
+    )
+    row = _row(root, "refusal rules current")
+    assert not row.ok
+    assert "REPLACED" in row.detail
+
+
+def test_an_edited_refusals_file_is_never_reported(tmp_path, monkeypatch):
+    import hashlib
+
+    root = _drift_repo(tmp_path)
+    (root / ".fux" / "refusals.toml").write_text("# ours\n", encoding="utf-8")
+    monkeypatch.setattr(
+        doctor, "RETIRED_REFUSAL_STARTERS", (hashlib.sha256(b"# an old starter\n").hexdigest(),)
+    )
+    assert _row(root, "refusal rules current").ok
+
+
+# -- frozen tunables and output defaults ------------------------------------
+
+
+def test_a_tune_file_missing_a_key_the_engine_gained_is_reported(tmp_path):
+    root = _drift_repo(tmp_path)
+    (root / ".fux" / "tune.toml").write_text("[bm25f]\nk1 = 1.2\n", encoding="utf-8")
+    row = _row(root, "tune.toml current")
+    assert not row.ok
+    assert "nothing is broken" in row.detail, "a frozen knob is drift, not breakage"
+
+
+def test_a_complete_tune_file_is_not_reported(tmp_path):
+    """The file `fux tune` itself writes must satisfy its own row."""
+    from fux import tune as tune_mod
+
+    root = _drift_repo(tmp_path)
+    lines = []
+    for table, keys in tune_mod._SCHEMA.items():
+        lines.append(f"[{table}]")
+        lines += [f"{key} = 0" for key in keys]
+    (root / ".fux" / "tune.toml").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    assert _row(root, "tune.toml current").ok
+
+
+def test_an_absent_tune_file_is_not_frozen(tmp_path):
+    """⚠ Absent is engine defaults, deliberately — `tune.toml loads` says so already."""
+    assert _row(_drift_repo(tmp_path), "tune.toml current").ok
+
+
+def test_this_repos_own_output_toml_satisfies_the_row():
+    """🔴 **The false positive W-163's keep-call caught, pinned so it cannot return.**
+
+    The first build expected `cli.explain`, `cli.hops`, `cli.no_refer` and three
+    more at those exact paths, and reported **six keys missing from a file that
+    carries every one of them** — `.fux/output.toml` nests per verb on purpose
+    (`[cli.ask] explain`, `[cli.path] hops`, `[cli.json] enabled`), because a
+    rendering default means different things to different verbs.
+
+    Two fixes, both found by running the row rather than reading it: compare
+    NAMES not paths, and count a TABLE name as a knob name — `json` is
+    configured at `[cli.json] enabled`, so the name is on the table.
+    """
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    if not (root / ".fux" / "output.toml").is_file():  # pragma: no cover
+        pytest.skip("this checkout has no .fux/output.toml")
+    row = next(c for c in doctor._frozen_keys(root) if c.name == "output.toml current")
+    assert row.ok, row.detail
+
+
+def test_an_output_file_genuinely_missing_a_knob_is_reported(tmp_path):
+    root = _drift_repo(tmp_path)
+    (root / ".fux" / "output.toml").write_text("[cli]\ntop = 5\n", encoding="utf-8")
+    row = _row(root, "output.toml current")
+    assert not row.ok
+    assert "band" in row.detail
+
+
+# -- an unbound declared type ------------------------------------------------
+
+
+def test_a_declared_type_no_decoder_reads_is_reported(tmp_path):
+    root = _drift_repo(tmp_path)
+    (root / ".fux" / "formats.toml").write_text(
+        'include = ["*.md", "*.zzz"]\n', encoding="utf-8"
+    )
+    row = _row(root, "declared types are readable")
+    assert not row.ok
+    assert ".zzz" in row.detail
+
+
+def test_prose_types_are_never_reported_as_unbound(tmp_path):
+    """⚠ Markdown and plain text are read by `extract.py`, not by a decoder.
+
+    Having no decoder is their normal state; reporting it would fire on the
+    single most common line in the file.
+    """
+    root = _drift_repo(tmp_path)
+    (root / ".fux" / "formats.toml").write_text(
+        'include = ["*.md", "*.txt", "*.rst", "*.adoc", "*.org", "*.markdown"]\n',
+        encoding="utf-8",
+    )
+    assert _row(root, "declared types are readable").ok
+
+
+def test_a_glob_naming_no_extension_claims_nothing_and_is_not_reported(tmp_path):
+    """`docs/**` makes no claim about a format, so there is nothing to resolve."""
+    root = _drift_repo(tmp_path)
+    (root / ".fux" / "formats.toml").write_text(
+        'include = ["*.md", "docs/**"]\n', encoding="utf-8"
+    )
+    assert _row(root, "declared types are readable").ok
+
+
+# -- a listed directory that is not on disk ---------------------------------
+
+
+def test_a_listed_path_that_is_not_on_disk_is_reported(tmp_path):
+    root = _drift_repo(tmp_path)
+    (root / ".fux" / "sources" / "dirs").write_text("docs\nhandbook\n", encoding="utf-8")
+    row = _row(root, "listed directories exist")
+    assert not row.ok
+    assert "handbook" in row.detail
+    assert "exit 1" in row.detail, "the consequence is real: walk_sources raises on it"
+
+
+def test_an_exclusion_matching_nothing_is_not_reported(tmp_path):
+    """⚠ A `!` line names a PATTERN. One matching nothing today is what a
+    pattern is for, and reporting it would be reporting a non-event."""
+    root = _drift_repo(tmp_path)
+    (root / ".fux" / "sources" / "dirs").write_text(
+        "docs\n!docs/nothing-here\n", encoding="utf-8"
+    )
+    assert _row(root, "listed directories exist").ok
+
+
+# -- thin url extraction (advisory) -----------------------------------------
+
+
+def test_thin_urls_is_silent_without_an_acquired_plane(tmp_path):
+    row = _row(_drift_repo(tmp_path), "url extraction depth")
+    assert row.ok
+    assert "no" in row.detail.lower()

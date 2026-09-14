@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@836cc5ab2239, src/fux/setup.py@425c58247116]
+owns: [src/fux/store/fuxdir.py@836cc5ab2239, src/fux/setup.py@c0e4866a4884]
 laws: [L2, L3, L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 8251b94483d863a707dfa10e8cddc807fcef612112ad7e353d0a30ce8873ac12
+content_sha: f106591bc678110e373450379d068ee2ce91861f90614a89bc5623503e96bd7d
 ---
 
 # SR-DOTFUX — the `.fux/` directory
@@ -689,6 +689,15 @@ a record ahead of its code is as misleading as one behind it, and the freshness
 check can see neither.
 
 ### Consequences
+
+- ✅ **Decision 6's write-once freeze is now VISIBLE for `.fux/README.md`**
+  (2026-09-14, W-163). `fux doctor`'s `` `.fux/README.md` current `` row compares
+  the file's **section set** against the current template's and names what is
+  absent. ⚠ **Sections, not bytes, and that is the whole care in it**: the file
+  is write-if-missing exactly so a consumer's annotations survive, so a byte
+  comparison would fire on every repo where somebody added a note — a row wrong
+  more often than right. An extra heading is the feature. Registered in
+  [SR-DOCTOR](0152_doctor.md).
 
 - **The dotdir is safe to explain in one table.** A newcomer's first question —
   "what do I commit?" — is answered by a file fux generates.
