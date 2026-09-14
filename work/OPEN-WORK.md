@@ -33,7 +33,7 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** nothing else in the queue — the measurement is filed and the code is written; what is missing is the call | | |
 | 🔴 **W-175** — `fux correct` shipped with its central claim unmeasured: does a human line help OTHER phrasings? Real failures and BLIND paraphrases; an agent may author neither. [detail](open/W-175-correction-generalisation.md) | 2026-09-14 | 0d |
 | ↳ **blocks:** nothing else in the queue — it decides whether SR-ENRICH decision 19 stands or human lines stop being indexed | | |
-| 🔴 **W-170** — one ruling left: **SR-LAW-10's exemption table gains `.fux/observers/*`** — a Law amendment you name in the record. (Cage accepted its search leg on 2026-09-14, so the subscriber is coming.) [detail](open/W-170-cage-search-leg.md) | 2026-09-14 | 0d |
+| 🔴 **W-170** — two rulings: (1) cage's `fux-search-leg` compare doc — accept option C? (2) **SR-LAW-10's exemption table gains `.fux/observers/*`** — the observe-only hook is ruled, the Law amendment must be named in the record by you. [detail](open/W-170-cage-search-leg.md) | 2026-09-14 | 0d |
 | ↳ **blocks:** nothing else in the queue — fux's emitter is the only item behind it | | |
 | 🔴 **W-148** — two calls left over from W-107: how CI reaches a golden corpus (self-hosted runner / commit `rung-00100` / portable builder), and whether `fux-benchmark` gets built or Node's latency stays unmeasured. [detail](open/W-148-what-the-two-readers-still-owe.md) | 2026-09-12 | 2d |
 | ↳ **blocks:** nothing else in the queue — the Node plane is built and measured; these decide where a future measurement runs and what it may CLAIM | | |
@@ -45,7 +45,7 @@ here. Read that record before changing anything below it.
 ### fux build
 
 - 🔴 **W-168** · `arpit`, blocked on W-156 — the ten search improvements as one program, ten gated steps (anchor text first, section units last); each step golden question → pre-registration → build → measure. Promoted 2026-09-14. [detail](open/W-168-search-improvements.md)
-- 🔴 **W-170** · `arpit` — `.fux/observers/`: an observe-only hook fux exposes after render (counts-only record, `args_hash` contract, fail-open, capped); cage's leg is accepted and will subscribe. Waits on the L10 amendment. [detail](open/W-170-cage-search-leg.md)
+- 🔴 **W-170** · `arpit` — `.fux/observers/`: an observe-only hook fux exposes after render (counts-only record, `args_hash` contract, fail-open, capped); cage subscribes. Ruled 2026-09-14; waits on cage's verdict + the L10 amendment. [detail](open/W-170-cage-search-leg.md)
 - 🔴 **W-175** · `arpit`, blocked on W-156 — does a correction help phrasings OTHER than its own? The claim that made W-162's design the accepted one, shipped unmeasured. [detail](open/W-175-correction-generalisation.md)
 - 🔴 **W-161** · `arpit`, blocked on W-156 — the graph-composed `ask`: boosted tier + labelled `related` tier, `answer` reads `ask`. W-160's atoms shipped 2026-09-14, inert; only the evidence rule is left. [detail](open/W-161-graph-composed-ask.md)
 - 🟡 **W-140** · `agent`, waiting on Arpit's `--hops` ruling — **1 code row left**: a runner-race flake **not reproduced in 11 attempts**, deliberately unchanged. 20 closed. [detail](open/W-140-guide-authoring-defects.md)
