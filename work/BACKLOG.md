@@ -218,14 +218,13 @@ W-165 (three CLI fixes), W-166 (carry-forward invalidation), W-168 (search impro
 
 *Every file in that directory has a row here and only here; the proposal keeps
 its own lifecycle, its own graduation trigger, and its own README row.
-[`search-v3.md`](proposals/search-v3.md) and
-[`structure-aware-extraction.md`](proposals/structure-aware-extraction.md) carry
-no row: what remains of each is **W-112** and **W-144** in the queue.*
+[`structure-aware-extraction.md`](proposals/structure-aware-extraction.md) and
+[`search-improvements-v3.md`](proposals/search-improvements-v3.md) carry
+no row: what remains of each is **W-144** and **W-168** in the queue.*
 
 | id | what is outstanding | named in | what closes it |
 |---|---|---|---|
 | B-176 | Positioning — `graduated` and kept: GitHub About and topics still need Arpit's `gh`, the PyPI page changes on the next upload, and §5's `code`→`path` rename is a live fork | [`positioning-documents-not-code.md`](proposals/positioning-documents-not-code.md) | The three remaining surfaces, and the rename ruling |
-| B-177 | The 2026-09-05 unblock — a proposed ruling for every inbox row, `R-1`…`R-11`, with the evidence beside each. "Nothing implemented, nothing defaulted" | [`unblock-2026-09-05.md`](proposals/unblock-2026-09-05.md) + [its prompt](proposals/unblock-2026-09-05-claude-code-prompt.md) | Arpit strikes or accepts each line |
 | B-178 | SR review 2026-08-28 — five rules each broken in 20–45 of 47 records, record-vs-record only, and some of the lint has since landed "which nobody has reconciled against this list" | [`adr-review-2026-08-28.md`](proposals/adr-review-2026-08-28.md) | Reconcile the list against what shipped, then bulk-pass |
 | B-179 | Code + architecture review 2026-08-28 — ran on a cloud mirror with a wedged shell, "so every P0/P1 is to reproduce" | [`architecture-review-2026-08-28.md`](proposals/architecture-review-2026-08-28.md) | Verify item by item on the real tree |
 | B-180 | Ranking tuning — the instrument, not the optimiser; its trigger is 50 committed judgments on a fux corpus **and** a ranking decision waiting, which is W-97 | [`ranking-tuning.md`](proposals/ranking-tuning.md) | 50 judgments on W-136's golden data |

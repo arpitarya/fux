@@ -85,7 +85,7 @@ session does not re-read them to reach the same parked conclusion.*
 
 *Four classical results behind a proposed read-only verb that X-rays the index:
 which words are on every document, which documents no query can reach, and
-which are near-duplicates. [`../work/proposals/fux-inspect.md`](../work/proposals/fux-inspect.md),
+which are near-duplicates. [`../archive/proposals/fux-inspect.md`](../archive/proposals/fux-inspect.md),
 filed 2026-09-13.*
 
 | source | what it is | status |
@@ -198,7 +198,7 @@ filed 2026-09-13.*
 | Cronen-Townsend, Zhou & Croft, *Predicting Query Performance* (SIGIR 2002) | Retrieval-time difficulty is computable **without relevance judgments**. | **BUILT** — the confidence band exists at all because of this. [SR-CONFIDENCE](0141_confidence.md). |
 | Shtok, Kurland, Carmel, Raiber & Markovits, *Predicting Query Performance by Query-Drift Estimation* (TOIS 2012) | Score dispersion among the top results as the difficulty signal. | **BUILT** — the band's actual statistic. |
 | Rajpurkar, Jia & Liang, *Know What You Don't Know: Unanswerable Questions for SQuAD* (ACL 2018) | Answerable/unanswerable pairing as an evaluation design. | **NOT BUILT — and it exposed a hole.** Blind-authored unanswerable questions were run twice: **fux abstained 0 times out of 20.** |
-| Kamath, Jia & Liang, *Selective Question Answering under Domain Shift* (ACL 2020) | Risk–coverage under shift; the El-Yaniv lineage applied to QA. | **PARKED** — [`work/proposals/abstention-gate.md`](../work/proposals/abstention-gate.md), awaiting Arpit's pick between disclose / gate / build. |
+| Kamath, Jia & Liang, *Selective Question Answering under Domain Shift* (ACL 2020) | Risk–coverage under shift; the El-Yaniv lineage applied to QA. | **PARKED** — [`archive/proposals/abstention-gate.md`](../archive/proposals/abstention-gate.md) (archived 2026-09-14; live successor W-176), awaiting Arpit's pick between disclose / gate / build. |
 | El-Yaniv & Wiener, *On the Foundations of Noise-free Selective Classification* (JMLR 11, 2010) | The formalism for a reject option. | **PARKED** — same proposal. |
 | *Machine Learning with a Reject Option: A Survey* (Chow's rule) | Only the **cost ratio** moves the reject threshold, never the absolute costs. | **PARKED** — the arithmetic an abstention gate would use. |
 | *Performance measures for classification systems with rejection* | The threshold as `(C_r − C_c)/(C_e − C_c)`. | **PARKED**. |
@@ -325,7 +325,7 @@ way a paper is: they decide a byte, not a preference.*
   *overridden* are the accurate words, and the rows that carry them are the
   most useful ones in the file.
 
-**Last full sweep: 2026-09-13**, re-run the same day against the five documents filed after the first pass — [`fux-inspect`](../work/proposals/fux-inspect.md), [`search-improvements-v3`](../work/proposals/search-improvements-v3.md), [`abstention-gates`](../work/compare/abstention-gates.compare.md), [`fux-correct`](../work/compare/fux-correct.compare.md) and [`ask-graph-expansion`](../work/compare/ask-graph-expansion.compare.md) — which added 16 sources and moved three rows. ⚠ **The first pass read only each document's final `References` block**; these five carry theirs under `## Reference` (singular) or inline, so a sweep matches both and reads the body, not just the tail.
+**Last full sweep: 2026-09-13**, re-run the same day against the five documents filed after the first pass — [`fux-inspect`](../archive/proposals/fux-inspect.md), [`search-improvements-v3`](../work/proposals/search-improvements-v3.md), [`abstention-gates`](../work/compare/abstention-gates.compare.md), [`fux-correct`](../work/compare/fux-correct.compare.md) and [`ask-graph-expansion`](../work/compare/ask-graph-expansion.compare.md) — which added 16 sources and moved three rows. ⚠ **The first pass read only each document's final `References` block**; these five carry theirs under `## Reference` (singular) or inline, so a sweep matches both and reads the body, not just the tail.
 
 **Known gap.** `work/regression/**` run reports are not swept for citations —
 runs cite the records, not the other way round. If that ever stops being true,

@@ -429,6 +429,38 @@ it shipped and dogfooded for two releases and its defect is instructive.
 |---|---|---|
 | [`templates/cdp-rendering.py.txt`](templates/cdp-rendering.py.txt) | 2026-09-01 | **Superseded, not deleted.** `capture()`, and the `_call`/`_wait_event` pair that discarded every message not their own. Live successor: `src/fux/templates/cdp.py.txt` — `fetch_resource()` on `Fetch.enable`/`Fetch.getResponseBody`, with an event pump that files replies and events separately. Live record: [ADR-CDP-FETCHER](../docs/adr/0020_cdp-fetcher.md). ⚠ **The discard loop is the point of keeping it**: under interception a lost `Fetch.requestPaused` is a paused request nobody resolves, which wedges the page — the old code's shape is why the new code has a pump |
 
+## Archived 2026-09-14 — six proposals whose remainder is nothing
+
+**The review Arpit asked for after the blocker walk:** every proposal and every
+compare doc re-read against the queue as it stood with an empty inbox. A
+proposal leaves when it is **fully implemented** or **superseded** and its live
+successor can be named ([`work/proposals/README.md`](../work/proposals/README.md)
+§Lifecycle). Six qualified. Nothing in `work/compare/` did — an accepted compare
+doc is the home of its reopen-trigger, and every one still has a trigger that
+could fire.
+
+| archived | date | live successor |
+|---|---|---|
+| [`proposals/search-v3.md`](proposals/search-v3.md) | 2026-09-14 | **Every item it graduated into has closed:** W-108, W-109, W-110, W-111 shipped; W-107 shipped (its leftovers are W-148, ruled today); W-106 measured and closed; **W-112 closed today** (B-245). The shipped design lives in SR-ANSWER, SR-EXPAND, SR-ENRICH, SR-NODE-SEARCH, SR-API and the six `work/architecture-*.svg`; its target sheet is in `diagrams/` beside this row |
+| [`proposals/fux-inspect.md`](proposals/fux-inspect.md) | 2026-09-14 | **Shipped in full as W-169 on 2026-09-14.** [SR-INSPECT](../records/0156_inspect.md) is the record; the per-lens keep/remove of §5b was run in `work/regression/2026-09-14-inspect-floors/`. The record names this file as the spec it was built from — history, not authority |
+| [`proposals/cage-search-leg.md`](proposals/cage-search-leg.md) | 2026-09-14 | **Superseded on the mechanism the same day it graduated.** It proposed an emitter fux ships; Arpit ruled an observe-only hook fux *exposes* — [SR-OBSERVE](../records/0157_observe.md) (`proposed`) and [W-170](../work/open/W-170-cage-search-leg.md). §1–§4 are what was replaced |
+| [`proposals/abstention-gate.md`](proposals/abstention-gate.md) | 2026-09-14 | **All three options graduated.** C → [`work/compare/abstention-gates.compare.md`](../work/compare/abstention-gates.compare.md) (DECIDED (a), 2026-09-14) → [W-176](../work/open/W-176-abstention-gates.md). A (*disclose*) is W-176's gate 9, consumer steering. B (*gate quality claims*) is W-176's verification clause — *abstains k of N* beside every quality number. Its backlog row `B-175` was promoted the same day |
+| [`proposals/unblock-2026-09-05.md`](proposals/unblock-2026-09-05.md) | 2026-09-14 | **Superseded by events.** It proposed a default for eleven inbox rows, `R-1`…`R-11`. R-1 and R-2 were ruled (2026-09-05/06); every other row's item has since closed or been re-ruled by a later decision — W-107 and W-110 archived, W-114/L0 replaced the W-83 gate, `superseded_weight` retired in SR-TUNING, the zero-abstention question became W-176, W-87 Part B retargeted — and **the inbox is empty as of 2026-09-14**. `B-177` deleted with it. ⚠ The bracketed defaults for R-3…R-11 were never struck one by one; they were overtaken, which is not the same thing, and this row says so |
+| [`proposals/unblock-2026-09-05-claude-code-prompt.md`](proposals/unblock-2026-09-05-claude-code-prompt.md) | 2026-09-14 | The paste-ready prompt for the row above; never executed as a unit because the environment it targeted became Arpit's alone (SR-WORK-ENVIRONMENTS decision 1). Goes with its document |
+
+**Kept, and why, so nobody re-runs this review from scratch:**
+`search-improvements-v3.md` (W-168's spec), `structure-aware-extraction.md`
+(W-144's), `positioning-documents-not-code.md` (B-176: three surfaces and a
+rename fork still open), `adr-review-2026-08-28.md` and
+`architecture-review-2026-08-28.md` (B-178/B-179: audits never reconciled item
+by item against the tree — findings, not landed facts, and archiving an
+unreconciled audit would hide that), `t2-segments.md`, `ranking-tuning.md`,
+`knowledge-ci.md`, `knowledge-diff.md`, `mcp-adapters.md`, `research-to-spec.md`,
+`wavelet-self-index.md`, `agent-search-landscape.md` (parked, triggers unfired).
+⚠ Two compare docs are **reopen** candidates, not archive candidates:
+`record-freshness` (its own index row says its premise is dead) and
+`maintenance-trigger` (R5's half of its trigger fired 2026-08-20).
+
 ## Archived 2026-09-14 — the search-v3 target sheet, with the vector plane's closure
 
 **Deferred once, on purpose.** The 2026-09-12 review left

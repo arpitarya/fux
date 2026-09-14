@@ -13,7 +13,7 @@ filed: 2026-09-13
 by construction; a floor fitted to the wrong 20 questions is the
 moving-threshold failure in its purest form.
 
-**Graduates:** [`proposals/abstention-gate.md`](../proposals/abstention-gate.md)
+**Graduates:** `proposals/abstention-gate.md` — archived 2026-09-14 in full: C became this doc and W-176; A is gate 9; B is W-176's *abstains k of N* beside every quality number
 option **C** (build abstention, measure in fux-lab). Options **A** and **B**
 there are untouched by this doc and still owed a ruling.
 **Owning records:** [SR-CONFIDENCE](../../records/0141_confidence.md),

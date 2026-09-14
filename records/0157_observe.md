@@ -10,7 +10,7 @@ feature: the observer hook — the extension point a consumer's analytics subscr
 owns: []
 laws: [L1, L2, L3, L4, L8, L10]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 9a11f7b62af90371a09b2d5754e767ec5cda1fb695f988e88736879f80792cd8
+content_sha: 2aceca082a33e9c50aef9265988f5dc2e40340e9aa9e2c7b7e358731054a6a1c
 ratifies: W-170
 ---
 
@@ -151,9 +151,9 @@ component.
 
 - **An emitter fux ships** (`ledger/fux/` written by fux itself) — rejected by
   Arpit 2026-09-14: fux would carry a cage-shaped path and learn a consumer's
-  name. The superseded design is kept in
-  [`work/proposals/cage-search-leg.md`](../work/proposals/cage-search-leg.md);
-  the decision is cage's `work/compare/fux-search-leg.compare.md` (option C).
+  name. The superseded emit design is kept as history in
+  `archive/proposals/cage-search-leg.md` (archived 2026-09-14); the decision is
+  cage's `work/compare/fux-search-leg.compare.md` (option C).
 - **A pre-verb middleware** (filter, rewrite, veto) — rejected: `ask` becomes a
   function of consumer code and L3 is gone. The word *middleware* in the ruling
   was narrowed to *observe-only* in the same conversation.

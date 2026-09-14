@@ -21,7 +21,7 @@ stops being parked. Without one it is a wish, and it will sit here forever.
 row carries the graduation trigger and nothing else, and it is filed and deleted
 in the same change as the proposal ([SR-WORK-BACKLOG](../../records/0055_WORK-backlog.md)
 rules 6 and 27). A proposal whose remainder has become a `W-nn` carries no row —
-`search-v3.md` and `structure-aware-extraction.md` are the two today.
+`structure-aware-extraction.md` (W-144) and `search-improvements-v3.md` (W-168) are the two today.
 
 Per OKF, every file here carries frontmatter:
 
@@ -44,7 +44,9 @@ trace that anything is missing.
 
 ⚠ **A `graduated` file may still live here** — that is what `graduated` means:
 the decision moved into a record or a queue item, and the file is kept because
-part of it is still to do. `search-v3.md` is the worked example.
+part of it is still to do. `search-improvements-v3.md` is the worked example;
+`search-v3.md` was one until every item it graduated into had closed, and it
+moved to the archive on 2026-09-14.
 
 ---
 
@@ -52,14 +54,6 @@ part of it is still to do. `search-v3.md` is the worked example.
 
 *Newest first. Every `.md` in this directory has a row; a file with no row is
 the defect this ordering exists to make visible.*
-
-## Filed 2026-09-14
-
-* [fux's half of cage's search leg](cage-search-leg.md)
-  — cage proposes a leg that classifies every searchable moment in agent transcripts
-  (fux vs grep vs Read); this is fux's half: one counts-only fact row per invocation
-  (verb, `args_hash`, band, answerable, counts, latency) pushed fail-open to the resolved
-  cage ledger. No text, no ids — L8 and cage's law agree. Waits on cage's verdict.
 
 ## Filed 2026-09-13 — the 3.0 backlog
 
@@ -70,22 +64,8 @@ the defect this ordering exists to make visible.*
   git-derived authority prior, an intent → doc-type prior, section-level units. Each
   graduates alone, behind W-156, with its own golden question and pre-registration.
 
-* [`fux inspect` — an X-ray of the index](fux-inspect.md)
-  — a read-only verb with six lenses (boilerplate words like "TLDR", unfindable
-  documents, length and fields, duplicates and templates, analyzer coverage, graph
-  orphans and hubs). Descriptive by default, three provisional checks, every finding
-  mapped to an existing lever. Words come from a local, gitignored hash → word
-  dictionary; the committed index stays hashes.
-
 ## Filed 2026-09-11
 
-* [The abstention gate — what should 0 of 20 block?](abstention-gate.md)
-  — fux answers every one of 20 blind-authored unanswerable questions, twice, because
-  `answerable` is false only when nothing matches at all. Options: **A** disclose in
-  `fux doctor`, **B** gate quality claims (*"abstains 0 of N"* beside every headline),
-  **C** build abstention and measure it in fux-lab on golden data. Recommends **B, then C**.
-  **Option C graduated 2026-09-13 → [`compare/abstention-gates.compare.md`](../compare/abstention-gates.compare.md); A and B still owed a ruling.**
-  Parked from the inbox at Arpit's instruction. **Graduates when Arpit picks.**
 * [Positioning — written knowledge, not code](positioning-documents-not-code.md)
   — ✅ **`graduated`: RULED AND APPLIED by Arpit 2026-09-12.** Why fux was filed
   next to AST/code-graph tools: **it parses no code and, by default, indexes
@@ -104,35 +84,6 @@ the defect this ordering exists to make visible.*
   failures) so the claim and the tree cannot drift again.
   **Kept here, not archived:** GitHub About/topics still need Arpit's `gh`, the
   PyPI page changes only on the next upload, and §5's rename is a live fork.
-
-## Filed 2026-09-05
-
-* [Unblock 2026-09-05 — a proposed ruling for every row in the inbox](unblock-2026-09-05.md)
-  — eleven rows were *Blocked on Arpit*, six past the 5-day threshold. Proposes
-  a default per row (`R-1`…`R-11`, plus W-112's compare doc) with the evidence
-  beside it, names the agent-lane items that need no ruling, and two rows the
-  repo had already closed (Windows e2e runs in CI; the clean-recall number is
-  the doc2query `none` arm). **Nothing implemented, nothing defaulted.**
-  **Graduates when Arpit strikes or accepts each line.**
-* [Claude Code prompt — execute the 2026-09-05 unblock](unblock-2026-09-05-claude-code-prompt.md)
-  — the companion. A bracket per line; **anything left blank is a blocker, not
-  a default.** Graduates with the document above.
-
-## Filed 2026-09-04
-
-* [Search v3 — better answers per verb, a Node.js read plane, and agent-run vectors](search-v3.md)
-  — ✅ **`graduated`: RATIFIED by Arpit 2026-09-05**, and **five of its seven
-  items have closed** (W-108, W-109, W-110, W-111 landed; W-107 Phase 0 and
-  W-106 measured). **W-107 Phases 1–4 and W-112 remain**, both on Arpit, which
-  is why it is still here rather than archived. Where `ask`/`find`/`answer`
-  lose (measured), the fixes inside L1–L8, the Python-writes /
-  Python-or-Node-reads split, the pinned vector plane an agent can produce, the
-  target architecture (its sheet archived 2026-09-14 with W-112's closure — `archive/diagrams/`),
-  the research appendix, and the plan — **W-106 … W-112**, each with a detail
-  file under [`../open/`](../open/README.md).
-  ⚠ **Its frontmatter said the three proposals it supersedes were "deleted in
-  the same change". They were not** — they sat here unindexed until 2026-09-05
-  and were then archived. Corrected in the file.
 
 ## Filed 2026-08-28 — two reviews
 
@@ -255,9 +206,9 @@ backing a live claim.
 
 | left | when | why, and the live successor |
 |---|---|---|
-| [`search-v3-claude-code-prompt.md`](../../archive/proposals/search-v3-claude-code-prompt.md) | 2026-09-12 | **Executed in full on 2026-09-05** — Arpit ratified `search-v3.md` §8 through it and five of the seven items closed. It said so itself: *kept... not because anything in it is still to do*, which is this file's own definition of archivable. No live document cited it. Live successors: [`search-v3.md`](search-v3.md) for what remains, and **W-107** and **W-112** |
+| [`search-v3-claude-code-prompt.md`](../../archive/proposals/search-v3-claude-code-prompt.md) | 2026-09-12 | **Executed in full on 2026-09-05** — Arpit ratified `search-v3.md` §8 through it and five of the seven items closed. It said so itself: *kept... not because anything in it is still to do*, which is this file's own definition of archivable. No live document cited it. Live successors: [`search-v3.md`](../../archive/proposals/search-v3.md) for what remains, and **W-107** and **W-112** |
 | [`audit-evidence-trail.md`](../../archive/proposals/audit-evidence-trail.md) | 2026-09-05 | **Graduated 2026-08-27 → [SR-PROVENANCE](../../records/0142_provenance.md)**; `fux answer --audit`, `--receipt`, `--journal`, `ask --why` and `fux verify` all shipped. It then sat here nine days against this file's own lifecycle rule — **the move was late, the decision never changed.** ⚠ Its graduation trigger, *an enterprise design partner materializes*, **never fired and could not**: it waited on somebody else's arrival rather than naming a condition anyone here could check |
-| [`node-search-port.md`](../../archive/proposals/node-search-port.md) · [`agent-run-embeddings.md`](../../archive/proposals/agent-run-embeddings.md) · [`retrieval-quality-per-verb.md`](../../archive/proposals/retrieval-quality-per-verb.md) | 2026-09-05 | **Superseded 2026-09-04** by [`search-v3.md`](search-v3.md), which folded all three in whole. Live successors: **W-107**, **W-112**, and **W-108 … W-111**. ⚠ `search-v3.md` said they were *"deleted in the same change"* — **they never were**, and they sat here unindexed for two days |
+| [`node-search-port.md`](../../archive/proposals/node-search-port.md) · [`agent-run-embeddings.md`](../../archive/proposals/agent-run-embeddings.md) · [`retrieval-quality-per-verb.md`](../../archive/proposals/retrieval-quality-per-verb.md) | 2026-09-05 | **Superseded 2026-09-04** by [`search-v3.md`](../../archive/proposals/search-v3.md), which folded all three in whole. Live successors: **W-107**, **W-112**, and **W-108 … W-111**. ⚠ `search-v3.md` said they were *"deleted in the same change"* — **they never were**, and they sat here unindexed for two days |
 | [`tune-file-and-source-priority.md`](../../archive/proposals/tune-file-and-source-priority.md) | 2026-08-27 | Graduated 2026-08-22 → [SR-TUNE](../../records/0135_tuning.md); kept for the survey and its ten forks as they were put |
 | [`playground-goldens-draft.md`](../../archive/proposals/playground-goldens-draft.md) | 2026-08-27 | Graduated 2026-08-24 when Arpit waived the human-author rule and the 50 candidates were installed; the run is [`../regression/2026-08-24-rerank-and-goldens/`](../regression/2026-08-24-rerank-and-goldens/report.md) |
 | [`answer-provenance.md`](../../archive/proposals/answer-provenance.md) | 2026-08-27 | Graduated same-day → [SR-PROVENANCE](../../records/0142_provenance.md), built and green. Kept for the prior-art table and **five open forks**, of which fork 1 — always-on journalling as an SR-TUNE key — is the one a session will be tempted to default |

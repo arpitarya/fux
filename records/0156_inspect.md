@@ -10,7 +10,7 @@ feature: the index X-ray
 owns: [src/fux/inspect@d1930eef9504]
 laws: [L2, L3, L4, L6, L8]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 0a0e0d49062f73565a87bb753e4750df4197d674a22f7b2dd35fe0502c5e314e
+content_sha: bc9e054e10e489221ca1d091246a1fa0e9dd2986a7bb7aa3a13f0a9615a06b20
 ratifies: W-169
 ---
 
@@ -301,7 +301,8 @@ discoverable from the index the whole time and nobody could see it.
   `dictionary.py` (the local hash → word join), `lenses.py` (the six and
   `LEVERS`), `checks.py` (the three floors), `__init__.py` (the report).
 - The spec it was built from:
-  [`work/proposals/fux-inspect.md`](../work/proposals/fux-inspect.md) §2–§5b.
+  `archive/proposals/fux-inspect.md` §2–§5b — archived 2026-09-14 once this
+  record existed; named as history, never cited as authority.
   The item that built it shipped and archived on 2026-09-14 —
   [`work/IMPLEMENTATION.md`](../work/IMPLEMENTATION.md) §2026-09-14 W-169 is
   the live record of what landed and of the three things the item did not

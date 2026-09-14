@@ -15,7 +15,7 @@ the answer) **and the L10 amendment; Sonnet for the dispatcher and tests.**
 **Ruled 2026-09-14 (Arpit):** the fux half of cage's search leg is **an extension point fux
 exposes, not an emitter fux ships** — *"a middleware that fux exposes and cage can
 intercept"*, narrowed in the same conversation to **observe-only**. Supersedes the emit
-design in [`proposals/cage-search-leg.md`](../proposals/cage-search-leg.md) §1–§4 (kept
+design in `archive/proposals/cage-search-leg.md` §1–§4 (archived 2026-09-14, kept
 as the record of what was replaced). **Both rulings taken 2026-09-14 (Arpit):**
 (1) cage's `work/compare/fux-search-leg.compare.md` — **option C** (both halves, A first,
 B is the observer hook); cage's half A shipped the same day. (2) **observers get their

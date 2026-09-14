@@ -142,7 +142,7 @@ valuable judgement, but not the state of play.
 - **Proposed, not ruled:** [abstention-gates](compare/abstention-gates.compare.md)
   (which gates; **the shape is ruled**: a gate chain, every signal returned,
   `output.toml` decides visibility), [search-improvements-v3](proposals/search-improvements-v3.md)
-  (ten ideas, each graduates alone), [fux-inspect](proposals/fux-inspect.md).
+  (ten ideas, each graduates alone), [fux-inspect](../archive/proposals/fux-inspect.md).
 - **Standing constraint on all of it:** every ranking change lands behind
   **W-156** and needs golden questions that exercise it (SR-RS d23). Link-
   dependent and unanswerable questions in the key are **Codex's hands**.
@@ -1076,10 +1076,10 @@ control rebuild, W-96's paragraph.
 
 ### The inbox has a proposed answer per row; Arpit ratifies, Opus executes (2026-09-05, later)
 
-**Read [`proposals/unblock-2026-09-05.md`](proposals/unblock-2026-09-05.md)
+**Read [`proposals/unblock-2026-09-05.md`](../archive/proposals/unblock-2026-09-05.md)
 before working anything on the `arpit` lane.** Eleven rows were blocked, six
 past the 5-day threshold; each now has a proposed default (`R-1`…`R-11`) with
-its evidence, and [the prompt beside it](proposals/unblock-2026-09-05-claude-code-prompt.md)
+its evidence, and [the prompt beside it](../archive/proposals/unblock-2026-09-05-claude-code-prompt.md)
 is the ratification vehicle — a bracket per line, blank means blocker.
 
 🔴 **Three rows turned out to be facts, not decisions, on re-derivation:**
