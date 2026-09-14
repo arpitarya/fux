@@ -12,6 +12,15 @@
  * `find` exists to be piped, and anything else on stdout is read by `xargs` as
  * a filename (SR-DIR-LIST decision 12). Every note goes to stderr; the flags
  * are carried in `--json`, which is where a machine reader should look.
+ *
+ * ⚠ **`find` shows no `[pinned]` marker, on either reader, and that is the
+ * bare-paths rule above rather than an omission** (W-162). A pin DOES apply
+ * here — it is applied in `runQuery`, so a pinned document is first in `find`'s
+ * list too — and `find --json` carries `pinned` on the result like every other
+ * field. What `find` does not do is annotate stdout, because stdout is paths
+ * and a marker glued to one breaks the pipe this verb exists for. **A consumer
+ * that needs to know reads `--json`**, which is the same answer `archived` has
+ * always had here.
  */
 import { runFused } from "../query/run.mjs";
 import { headingsFor } from "../query/headings.mjs";

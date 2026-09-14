@@ -18,6 +18,7 @@ import { resolve, readLocal, fromAcquired, GIT } from "../refer/source.mjs";
 import { passageBoost } from "../query/rerank.mjs";
 import { alreadyTextGlobs, isAlreadyText } from "../decode/registry.mjs";
 import { declareFloorOff, decline } from "./find.mjs";
+import { declarePinned } from "./ask.mjs";
 
 /** `answer` refers the top 3 — W-108. One question and no `-q`: an RRF score
  *  would make the three incomparable. */
@@ -91,6 +92,13 @@ export function answerPayload(root, args) {
     if (b) payload.confidence = b;
     return { payload, freshness: null, results };
   }
+  // W-162 — before either rendering branch, so the note reaches the reader
+  // whichever path answers. `answer` is the surface where *a human chose this
+  // source* matters most and is least visible: one document comes back and
+  // there is no list beside it to weigh. **No `pinned` key on the citation** —
+  // see `query/__init__.py` for why a key on one path only is worse than none.
+  declarePinned(results.slice(0, 1));
+
 
   // --no-refer: skip reading the source entirely. `verified` STAYS
   // "unverified" — deliberately not upgraded, because nothing was checked.

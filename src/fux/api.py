@@ -118,13 +118,18 @@ class Result:
     #: `None` for a document outside git history. Always present; `None` is the
     #: claim *no committed date*, never "this fux is too old to say".
     mtime: int | None = None
+    #: W-162. A human pinned this document to this exact question, so its
+    #: position was set after the ranking. `score` is still the ranking's own
+    #: number, and `0.0` means the ranking never scored it — the case a pin
+    #: exists for. Always present; `False` is a claim (W-48).
+    pinned: bool = False
     headings: list[str] = field(default_factory=list)
 
     def as_dict(self) -> dict:
         return {
             "id": self.id, "loc": self.loc, "title": self.title,
             "score": self.score, "archived": self.archived, "tie": self.tie,
-            "mtime": self.mtime,
+            "mtime": self.mtime, "pinned": self.pinned,
             "headings": list(self.headings),
         }
 
@@ -205,7 +210,7 @@ class Index:
 
         results = [
             Result(id=r.id, loc=r.loc, title=r.title, score=r.score,
-                   archived=r.archived, tie=r.tie, mtime=r.mtime)
+                   archived=r.archived, tie=r.tie, mtime=r.mtime, pinned=r.pinned)
             for r in run_query(self.root, query, top)[0]
         ]
         if under is not None:
@@ -249,7 +254,7 @@ class Index:
 
         rows = [
             Result(id=r.id, loc=r.loc, title=r.title, score=r.score,
-                   archived=r.archived, tie=r.tie, mtime=r.mtime,
+                   archived=r.archived, tie=r.tie, mtime=r.mtime, pinned=r.pinned,
                    headings=headings_for(self._record(r.id), query) if sections else [])
             for r in results
         ]

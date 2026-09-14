@@ -54,6 +54,8 @@
                     "doc": "W-111. This result's rounded score EQUALS another candidate's, so its position was decided by the declared tie-break (superseded -> recency -> priority -> id) rather than by the ranking. Computed over the FULL sorted list before truncation, so the last row of a `--top 5` is marked even when the document it ties with is off the page. `false` is a claim, not an absence" },
       "score":    { "type": "any",  "required": "always", "doc": "float; the one place a float is legal, because this is output and not a committed byte" },
       "archived": { "type": "bool", "required": "always", "doc": "BRANCH ON THIS, never on the prose note" },
+      "pinned":   { "type": "bool", "required": "always",
+                    "doc": "W-162. A human filed `fux correct --pin` for this EXACT question (analyzed form), so this document was moved to #1 AFTER the ranking and after the reranker. It is not part of the sort key and not a score: `score` is still whatever the ranking gave it, and `0.0` means the ranking never scored it at all because it was not a candidate -- the case a pin exists for. `false` is a claim, not an absence (W-48). A pin whose document's content sha has moved is SUSPENDED and silently not applied; `fux doctor`'s `correction pins` row names every one" },
       "mtime":    { "type": "any",  "required": "always",
                     "doc": "W-153. int | null -- the document's committed git commit timestamp in whole UNIX SECONDS, the index's own encoding and never a second date format. `null` is a CLAIM: this document carries no committed date, which is what a corpus copied OUT of its repository produces for every one of its documents. It is not an absence, and the key never simply disappears (W-48). It EXPOSES a fact and orders nothing -- `mtime` reaches the sort only through the declared tie-break, at an equal score" },
       "headings": { "type": "any",  "required": "sections_requested",
@@ -66,6 +68,7 @@
       "tie": false,
       "score": 5.9021,
       "archived": false,
+      "pinned": false,
       "mtime": 1788330315,
       "headings": ["Rollback procedure"]
     }

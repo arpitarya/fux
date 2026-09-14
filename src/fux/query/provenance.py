@@ -205,6 +205,83 @@ def tune_digest(root: Path) -> str:
         return "none"
 
 
+#: `ctx`'s position in `store.TF_FIELDS`. Read from the tuple rather than
+#: written as `4`, because reordering that tuple is a format bump and a
+#: hard-coded index here would silently start reporting a different field.
+def _ctx_index() -> int:
+    from ..store import TF_FIELDS
+
+    return TF_FIELDS.index("ctx")
+
+
+def _ctx_authorship(root, record: dict) -> tuple[frozenset[str], frozenset[str]]:
+    """`(analyzed terms from human lines, from model lines)` for this document.
+
+    `(frozenset(), frozenset())` when there is no enrichment file, which is the
+    common case and costs one `stat`. **Never raises** — `--why` is a
+    diagnostic, and a diagnostic that can take out a query is worse than one
+    that says less.
+    """
+    # 🔴 **`record` is `None` for a document the reader could not produce**, and
+    # `derive` is explicitly allowed to be called that way — its own
+    # `test_derive_never_raises_on_a_broken_record_reader` passes a reader that
+    # returns nothing. Guarding on truthiness rather than on `sha` alone,
+    # because the first cut guarded the key and not the dict.
+    if not record:
+        return frozenset(), frozenset()
+    sha = record.get("sha", "")
+    if not sha:
+        return frozenset(), frozenset()
+    from ..correct import human_lines, model_lines
+    from ..enrich import enrich_path
+    from .tokenize import tokenize
+
+    path = enrich_path(root, sha)
+    try:
+        if not path.is_file():
+            return frozenset(), frozenset()
+        text = path.read_text(encoding="utf-8")
+    except OSError:  # pragma: no cover
+        return frozenset(), frozenset()
+    human = frozenset(t for line in human_lines(text) for t in tokenize(line))
+    model = frozenset(t for line in model_lines(text) for t in tokenize(line))
+    return human, model
+
+
+def _ctx_via(counts, term_hash: str, authorship) -> str | None:
+    """`"human"` / `"model"` / `"both"` / `None` for one term on one document.
+
+    ⚠ **`None` when the term has no `ctx` count**, which is a statement — *not
+    via `ctx`* — and not an absence. A term the document carries in its body
+    and not in its enrichment is answered by `fields`, which is right there.
+
+    ⚠ **Compared on the ANALYZED form**, because that is what the index is
+    keyed by; comparing surfaces would miss `Rollback` against `rollback`.
+    """
+    if not isinstance(counts, list):
+        return None
+    index = _ctx_index()
+    if len(counts) <= index or not counts[index]:
+        return None
+    human, model = authorship
+    if not human and not model:
+        # `ctx` fired and no enrichment file explains it — a stale index
+        # against a deleted file. Honest: the term IS in `ctx`, and who wrote
+        # it cannot be recovered from here.
+        return "unattributed"
+    from ..store import term_hash as hash_term
+
+    in_human = any(hash_term(t) == term_hash for t in human)
+    in_model = any(hash_term(t) == term_hash for t in model)
+    if in_human and in_model:
+        return "both"
+    if in_human:
+        return "human"
+    if in_model:
+        return "model"
+    return "unattributed"
+
+
 # -- the derivation ------------------------------------------------------------
 
 
@@ -227,6 +304,21 @@ class TermHit:
     #: *"because you asked for it"***. Present on every hit, never only on the
     #: expanded ones, so a consumer reads a value rather than an absence.
     expanded: bool = False
+    #: W-162 — **who wrote the `ctx` occurrence of this term**: `"human"`,
+    #: `"model"`, `"both"`, or `None` when the term has no `ctx` count at all.
+    #:
+    #: 🔴 **The index cannot answer this and is not asked to.** `ctx` is one
+    #: field; a term's `ctx` count says nothing about which line produced it.
+    #: The answer comes from re-reading `.fux/enrich/<sha>.md` and analyzing
+    #: its two halves — the model block and the `corrections:`-marked human
+    #: lines — which is deterministic, offline, and costs one file read per
+    #: SHOWN document.
+    #:
+    #: **Why it is worth that read.** *"This document is here because a model
+    #: guessed you might ask this"* and *"because a colleague said so"* are
+    #: different answers, and `--why` exists to tell them apart. `None` means
+    #: *not via `ctx`*, never *unknown*.
+    ctx_via: str | None = None
 
     def as_dict(self) -> dict:
         return {
@@ -235,6 +327,7 @@ class TermHit:
             "df": self.df,
             "fields": list(self.fields),
             "expanded": self.expanded,
+            "ctx_via": self.ctx_via,
         }
 
 
@@ -252,6 +345,10 @@ class DocDerivation:
     multiplier: float = 1.0
     rank_before_rerank: int | None = None
     rank_untuned: int | None = None
+    #: W-162 — this position was set by a human `--pin`, not by the ranking.
+    #: **`--why` must say so first**, because every other number in this block
+    #: describes a ranking that did not decide where this document went.
+    pinned: bool = False
 
     def as_dict(self) -> dict:
         out = {
@@ -263,6 +360,7 @@ class DocDerivation:
             "missing": list(self.missing),
             "archived": self.archived,
             "multiplier": self.multiplier,
+            "pinned": self.pinned,
         }
         # Additive and honest: absent means *not computed on this run*, which
         # is a different statement from "unchanged". Present-but-equal is the
@@ -408,6 +506,7 @@ def derive(
             except Exception:
                 record = None
         carried = _record_terms(record)
+        authorship = _ctx_authorship(root, record)
         hits: list[TermHit] = []
         absent: list[str] = []
         for (surface, analyzed), term_hash in [*aligned, *extra]:
@@ -425,6 +524,7 @@ def derive(
                     df=int(df_map.get(term_hash, 0) or 0),
                     fields=tuple(int(c) for c in counts) if isinstance(counts, list) else (),
                     expanded=term_hash in supplied,
+                    ctx_via=_ctx_via(counts, term_hash, authorship),
                 )
             )
         docs.append(
@@ -437,6 +537,7 @@ def derive(
                 missing=tuple(absent),
                 archived=bool(getattr(result, "archived", False)),
                 multiplier=multiplier if getattr(result, "archived", False) else 1.0,
+                pinned=bool(getattr(result, "pinned", False)),
                 rank_before_rerank=before.get(result.id),
                 rank_untuned=untuned_rank.get(result.id),
             )

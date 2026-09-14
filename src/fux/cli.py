@@ -87,6 +87,12 @@ def _cmd_build(args) -> int:
     return cmd_build(args)
 
 
+def _cmd_correct(args) -> int:
+    from .correct import cmd_correct
+
+    return cmd_correct(args)
+
+
 def _cmd_enrich(args) -> int:
     from .enrich import cmd_enrich
 
@@ -707,6 +713,37 @@ def build_parser() -> argparse.ArgumentParser:
     # W-76 Phase 5. A verb rather than a flag on `ask`: it is a long-running
     # server, not a query, and SR-CLI's four groups gain a fifth consumer-facing
     # one rather than overloading the read verbs.
+    # **W-162.** A verb rather than a flag on `enrich`, and the reason is the
+    # author: `enrich` plans and validates text a MODEL wrote; this writes a
+    # line a PERSON typed, and the two have different provenance, different
+    # survival rules under regeneration, and different `--check` treatment.
+    # Folding them would make one command answer to two authors.
+    p_correct = sub.add_parser(
+        "correct",
+        help="add the words people ASK with to the document that answers — one human question line",
+    )
+    p_correct.add_argument("question", nargs="?", help="the question somebody would type")
+    p_correct.add_argument("doc", nargs="?", help="the document that answers it — a `loc` or an id")
+    p_correct.add_argument(
+        "--pin",
+        action="store_true",
+        help="also force this document to #1 for this EXACT question. Rare, and suspended when the document changes",
+    )
+    p_correct.add_argument(
+        "--no-pin",
+        action="store_true",
+        help="drop an existing pin for this question while keeping the correction",
+    )
+    p_correct.add_argument(
+        "--reaffirm",
+        action="store_true",
+        help="re-file an existing correction against the document as it is now, releasing a suspended pin",
+    )
+    p_correct.add_argument("--list", action="store_true", help="every filed correction, and any suspended pin")
+    p_correct.add_argument("--json", action="store_true", default=None, help="machine-readable output")
+    _add_output_flags(p_correct)
+    p_correct.set_defaults(func=_cmd_correct)
+
     p_mcp = sub.add_parser(
         "mcp", help="serve the index over MCP on stdio, for coding agents"
     )

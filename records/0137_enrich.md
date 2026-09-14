@@ -7,11 +7,11 @@ description: "`fux enrich` plans and validates; a coding agent generates. Fux ne
 status: accepted
 date: 2026-08-23
 feature: document enrichment — the deterministic halves fux owns, and the generation it refuses to own
-owns: [src/fux/enrich.py@d13881fd3888, src/fux/templates/agents/ENRICH-SKILL.md@5c384af659f2]
+owns: [src/fux/correct.py@825b9f26220b, src/fux/enrich.py@156e7a9b9a69, src/fux/templates/agents/ENRICH-SKILL.md@5c384af659f2]
 laws: [L1, L2, L3, L4]
 supersedes: SR-ENRICHED
 timestamp: 2026-08-23T00:00:00Z
-content_sha: 8d38b16b48b927bd7c9cca467cbed1436ce3c95c7a6a7e8e3169fe2ed4bdf312
+content_sha: c5f0b5acc528c8940533afbcb05e9da65fc0b048eef952627e9e8f120abe5a8b
 ---
 
 # SR-ENRICH — enrichment as an agent skill
@@ -489,6 +489,96 @@ that opts in reports under a single scope named `.fux/sources/urls`.
 covers it unchanged: the body is redacted before it becomes `ctx`, and
 `fux enrich --check` refuses a file whose body matches a `.fux/pii.toml` rule.
 There is nothing URL-specific about that boundary and this section states none.
+
+**19. 🔴 `fux correct` writes a HUMAN question onto the same file, in the same
+field, with different rules.** (W-162, accepted by Arpit 2026-09-13 —
+[the compare doc](../work/compare/fux-correct.compare.md).)
+
+A correction is **the eleventh line, in a human's handwriting** — the question
+that actually failed, which is the highest-value question the file can hold. It
+is [doc2query](https://arxiv.org/abs/1904.08375)'s deterministic cousin, which
+is what decision 15 already does; **no new directory, no new field, no new
+ranking code.**
+
+- **`fux correct "<question>" <doc>`** appends the question as a plain body line
+  and bumps **`corrections: N` in the frontmatter**, which says *the last N body
+  lines are human*.
+  ⚠ **The marker is in the half that is never indexed and the text is in the
+  half that is**, and that split is forced by decision 8: the frontmatter is
+  stripped before indexing, so a marker there adds no vocabulary while a marker
+  in the body would.
+- **`.fux/eval/corrections.tsv` is the durable record, not the marker.** A
+  regenerating agent rewrites the whole file, frontmatter included, so the
+  marker cannot survive on its own. The eval file is committed, sorted, and is
+  **the human's own claim rather than a record of use** (L8): a row says *this
+  question should reach this document*, never that anybody ran a query.
+- **`--check` REPORTS a human line and never refuses it.** A correction is by
+  definition a question that failed retrieval — that is the case it exists for —
+  so a file whose only failures are human lines stays `ok` and stays indexed.
+  Refusing it would delete the correction's effect as the price of telling you
+  about it. Decision 16 is unchanged for model lines.
+  🔴 **And every human line is checked whatever its punctuation.**
+  `is_question` is a line ending in `?`; a correction files *the words people
+  search with*, which need not be a question — so `fux correct "calder rollback
+  procedure" <doc>` **escaped the check entirely** until the human set was
+  unioned in. Found by filing one and watching `--check` call the file `ok`
+  while the line retrieved nothing.
+- **A negative correction is refused**, with the pointer. *"Don't serve X"* is a
+  supersession or an archive decision and it is **corpus-wide**: `supersedes`,
+  `superseded_by:`, or `archived=`. A per-query demotion is the rule that rots
+  silently — it keeps working long after its reason is gone and nothing says so.
+- **PII refuses rather than redacts**, exactly as decision 12 does for a body: a
+  redacted question indexes `[PII:email]` as vocabulary and retrieves nothing,
+  so redaction is not the remedy. Only a person can write the question without
+  the value.
+- **No wall clock.** `generated:` on a file this verb creates is derived from
+  the document's own committed `mtime`, so two runs a week apart on an unchanged
+  document write identical bytes. `model:` reads `none (human correction)`,
+  which is the honest claim for a line a person typed.
+- 🔴 **Every refusal happens before any write.** The first cut decided the eval
+  row after writing the enrichment file, so a refused command printed
+  `wrote .fux/enrich/<sha>.md` and *then* `error:` — exiting 1 having already
+  changed the repository. Caught by running the suspended-pin path.
+- **`ctx`'s weight is NOT raised.** A correction bites because `ctx` is already
+  indexed and already weighted. Raising it so corrections bite harder is a
+  ranking change and goes through
+  [W-156](../work/open/W-156-prevalence-outside-golden.md)'s rule, not through
+  this record.
+
+**19a. `--pin` is the editorial escape hatch, and it is deliberately brittle.**
+
+`fux correct --pin` forces one document to #1 for **one exact question**,
+matched on the **analyzed** form so capitalisation and plurals do not defeat it.
+Solr's `QueryElevationComponent` is the precedent.
+
+- **Applied after the ranking and after the reranker.** `rank()` never sees it,
+  so `--why` still describes the ranking that actually ran and a reader sees the
+  pin sitting *on top of* it. A pin folded into the score would make the ranking
+  unreadable for exactly the query somebody had to intervene on.
+- **A pinned document the ranking never returned is INSERTED, with `score`
+  `0.0`** — the honest number, because the ranking never scored it. That is the
+  case a pin exists for.
+- **The confidence block is built from the pinned list**, because the band
+  describes the answer the reader was shown: a pinned #1 the corpus barely
+  supports must still say `weak`.
+- **A pin whose document's content sha has moved is SUSPENDED**, and **a plain
+  re-run of `fux correct` does not release it** — `--reaffirm` does, and it is a
+  person saying *still true*. `fux doctor`'s `correction pins` row names every
+  suspended pin, because a suspended pin is silent at query time and that
+  silence is correct in the moment and wrong over months.
+- **The vocabulary effect never suspends.** The question is still the question
+  somebody asks, whatever happened to the document.
+- **Both readers apply it.** `fux correct` is Python-only (this reader never
+  writes), but the *effect* crosses: `node/src/correct.mjs` reads the same file
+  and applies the same rule, or one repository answers two ways.
+
+**19b. `--why` says WHO wrote the `ctx` occurrence of a term** — `human`,
+`model`, `both`, or `unattributed`. The index cannot answer this and is not
+asked to: `ctx` is one field and a count says nothing about which line produced
+it. The answer comes from re-reading the enrichment file and analyzing its two
+halves — deterministic, offline, one file read per **shown** document. *"A model
+guessed you might ask this"* and *"a colleague said so"* are different answers,
+and `--why` exists to tell them apart.
 
 ### Consequences
 

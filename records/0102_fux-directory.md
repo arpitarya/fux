@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@836cc5ab2239, src/fux/setup.py@ca8f6e019655, tests/test_verb_table_agreement.py@2c2a8f52fb6c]
+owns: [src/fux/store/fuxdir.py@836cc5ab2239, src/fux/setup.py@96ba8e14b712, tests/test_verb_table_agreement.py@2c2a8f52fb6c]
 laws: [L2, L3, L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: fb38782861ea1b56fce8ef4c5ad66346ef21bebf620cb55a96e27a0e643fcbd4
+content_sha: 52c3bffda704540eeec52fbf7fd5e423708d3f60199960fcd4c58582ad634894
 ---
 
 # SR-DOTFUX — the `.fux/` directory

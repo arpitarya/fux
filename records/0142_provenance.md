@@ -8,11 +8,11 @@ status: accepted
 date: 2026-08-27
 ratified: 2026-08-27
 feature: answer provenance — the derivation, the receipt, the journal and verification
-owns: [src/fux/query/provenance.py@2755fe84e48c]
+owns: [src/fux/query/provenance.py@dbe6e4c4fe9f]
 laws: [L1, L3, L4, L8]
 ratifies: W-91
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 2c60caf741204aa79ba503515c1e611c321083333fb8a375119ee7f1bef8768e
+content_sha: 84cacbf6364773ce5ee22fce13b6c04ca905f9e53baab409d04452857a182b51
 ---
 
 # SR-PROVENANCE — fux does not keep an audit trail; it makes one derivable

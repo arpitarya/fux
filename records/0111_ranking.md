@@ -7,10 +7,10 @@ description: BM25F over five fields, weight-then-saturate once, with one scorer 
 status: accepted
 date: 2026-08-18
 feature: scoring, ordering, and the analyzer they share with ingest
-owns: [src/fux/query/rank.py@49b799e3a709, src/fux/query/bm25f.py@60ec353f1d84, src/fux/query/tokenize.py@1d8ff4a42048, src/fux/query/analyzer.py@4a6a03793628, src/fux/query/stem.py@728155482c94]
+owns: [src/fux/query/rank.py@a8855cc96b64, src/fux/query/bm25f.py@60ec353f1d84, src/fux/query/tokenize.py@1d8ff4a42048, src/fux/query/analyzer.py@4a6a03793628, src/fux/query/stem.py@728155482c94]
 laws: [L1, L3]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: a985410ab7b20e179b52e24843bc3af435e0fac4486efb3c0c80838a6a708789
+content_sha: be0c239644c15db841c5b3f2faf2f62b3c8e7080ec92c25e97a4917e0abbad2c
 ---
 
 # SR-RANKING — how documents are scored and ordered

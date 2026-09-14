@@ -449,6 +449,19 @@ Status lives in [OPEN-WORK §2](../work/OPEN-WORK.md). See
 edges, doc meta. "Plane" is a *namespace inside one tree*, not a separate
 file or store.
 
+**Pin (a correction pin)** — `fux correct --pin` forcing one document to #1
+for **one exact question**, matched on the analyzed form. Solr's
+`QueryElevationComponent` is the precedent, and the brittleness is the point: a
+pin fixes one phrasing, which is why the [correction](#correction)'s body line —
+which generalises — is the default and the pin is the rare escape hatch.
+Applied **after** the ranking and after the reranker, so it never enters a
+score and `--why` still shows the ranking that actually ran; a pinned document
+the ranking never returned is inserted with `score: 0.0`, which is the honest
+number. **Suspended** when its document's content sha moves, until a human
+`fux correct --reaffirm`s it — `fux doctor`'s `correction pins` row names every
+suspended one, because suspension is silent at query time. See
+[SR-ENRICH](../records/0137_enrich.md) decision 19a.
+
 **PPR-lite** — Personalized PageRank restricted to the seed neighbourhood
 (damping 0.85, exactly 3 iterations, sorted traversal). A *fixed* iteration
 count because reproducibility outranks precision here. Ported to the kernel at

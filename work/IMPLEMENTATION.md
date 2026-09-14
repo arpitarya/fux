@@ -28,6 +28,45 @@ Rules:
 
 
 
+## 2026-09-14 — **W-162 SHIPPED**: `fux correct`, and four claims that were false until somebody ran them
+
+**Shipped in full.** `tests` 4418, `tests_e2e` 136, `node --test` 36.
+
+`fux correct "<question>" <doc>` writes **one question a person typed** onto the
+document that answers it — same file `fux enrich` writes, same `ctx` field,
+different author. Plus `--pin`, `--reaffirm`, `--no-pin`, `--list`; the eval
+file; `--why`'s authorship; a `doctor` row; and the guide skill whose first
+section is *propose the command, do not run it*.
+
+| what landed | what it found |
+|---|---|
+| the human line, marked `corrections: N` in the frontmatter | The marker sits in the half that is **never indexed** and the text in the half that **is**, which is forced by SR-ENRICH decision 8 rather than chosen |
+| `.fux/eval/corrections.tsv`, committed and sorted | The durable record — a regenerating agent rewrites the enrichment file wholesale, marker included, so the eval file is the half fux can actually enforce |
+| `--check` reports a human line and never refuses it | 🔴 **And a correction with no `?` escaped the check entirely.** `is_question` is *a line ending in `?`*; a correction files the words people **search** with, which need not be a question. `fux correct "pomegranate molasses" <doc>` was reported `ok` while the line retrieved nothing. Every human line is now checked whatever its punctuation — found by filing one, not by a test |
+| the negative-correction refusal | 🔴 **Its first pattern refused an ordinary question.** A 40-character window with `use` in the verb list matched *"how do I **stop** the supervisor and **use** the rollback script?"*. Narrowed to a negation plus a serving verb within two words, `use` dropped — and the false-positive cases are in the test now, because a wrong refusal costs somebody a correction they were right to file and they only learn by rephrasing until it is accepted |
+| every refusal before any write | 🔴 **The first cut printed `wrote .fux/enrich/<sha>.md` and THEN `error:`** — exiting 1 having already changed the repository. Caught by running the suspended-pin path |
+| `--pin`, applied after the ranking and after the reranker | `rank()` never sees it, so `--why` still shows the ranking that ran with the pin on top. A pinned document the ranking never returned is inserted with `score: 0.0`, the honest number. **The band is built from the pinned list**, so a weakly-supported pin still says `weak` |
+| suspension, and `--reaffirm` | A plain re-run does **not** release a suspended pin; only a human saying *still true* does |
+| `fux doctor`'s `correction pins` row | 🔴 **And a second defect with it: a `level="warn"` row with `ok=True` renders `[OK]`.** `cmd_doctor` reads `ok` for the MARK and `level` for the exit code. **`pinned url bytes`, which I committed earlier today, printed `[OK]` beside *every citation from these will be `unverified`*** — the disclosure SR-URL-FRESHNESS decision 16 chose over a refusal, disclosing nothing. Both fixed; a test now asserts the **rendered line**, because asserting the fields is what let it ship |
+| `--why`'s `ctx_via` — `human` / `model` / `both` / `unattributed` | The index cannot answer this and is not asked to: `ctx` is one field. The answer comes from re-reading the enrichment file and analyzing its two halves, one file read per **shown** document |
+| the pin on both readers | `fux correct` is Python-only (Node never writes), but the **effect** crosses: `node/src/correct.mjs` reads the same file and applies the same rule. stdout, stderr and `--json` compared identical with a pin firing |
+| 🔴 **a claim in SR-ANSWER that was false when written** | The note I added said `answer` surfaces a pin via `"pinned": true` on the result. **`answer --json` carried no such key at all.** Adding one would have put it on the index path and not the refer path — `pinned` exists on an `AskResult` and not on a refer citation — and **a key on one path only is worse than a key on neither**, because a consumer reading `citation.pinned` gets `false` from the refer path for a question that genuinely is pinned. The stderr note now fires before either branch, on every path and both readers, and the record says that instead |
+| the `POLICY.md` location the item named | ⚠ **Corrected, not executed.** DoD 11 put the *propose, never write* rule in `POLICY.md` — whose verbatim block is the **archived-content** policy, byte-pinned across nine renderings. The rule went where it fires instead: `fux-correct`'s own description and Don't list (*Use ONLY when explicitly asked*, the same shape `fux-enrich`/`fux-decoder`/`fux-fetcher` carry) and a row in `fux-search` and `fux-answer`, which are the surfaces where an agent notices the wrong document |
+
+**Records:** SR-ENRICH (decisions 19, 19a, 19b — the verb, the pin, the
+authorship) · SR-CLI · SR-DOCTOR (the row, and the `[OK]`/`[WARN]` rule) ·
+SR-PROVENANCE · SR-ANSWER (corrected) · SR-CONFIDENCE · SR-PII · SR-TUNE
+(**`pinned` is not a tunable and may not become one**) · SR-API · SR-NODE-SEARCH
+· SR-AGENT-POLICY (the twelfth guide skill).
+**Tests:** +29 unit, +18 e2e, plus the doctor rendering gate.
+**Out of scope and untouched:** raising `ctx`'s weight so corrections bite
+harder — a ranking change, W-156's rule. And the **generalisation measurement**
+the compare doc pre-registered (N corrections, M blind paraphrases) is **not
+done**: the mechanism is kept on tests, and the claim that a human line helps
+phrasings other than its own is **unmeasured**. Filed as W-175.
+
+---
+
 ## 2026-09-14 — **W-160 SHIPPED**: the two atoms, and three defects the freeze found
 
 **Shipped in full.** `tests` 4386, `tests_e2e` 133, `node --test` 36.

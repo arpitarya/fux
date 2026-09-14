@@ -320,6 +320,7 @@ def _layout(root: Path) -> list[Check]:
     checks.append(_url_health(root))
     checks.append(_acquired_health(root))
     checks.append(_pinned_without_bytes(root))
+    checks.append(_suspended_pins(root))
     checks.append(_pii_health(root))
     checks.append(_refusal_health(root))
     checks.append(_decoder_bindings(root))
@@ -593,13 +594,67 @@ def _pinned_without_bytes(root: Path) -> Check:
             f"fetch_at_answer is off; all {len(entries)} url(s) have retained bytes - "
             "citations verify as `as-ingested`",
         )
+    # 🔴 **`ok=False`, or this row renders `[OK]`** — see `_suspended_pins`.
+    # It shipped as `ok=True, level="warn"` on 2026-09-14 and printed `[OK]`
+    # beside *every citation from these will be `unverified`*, which is the
+    # disclosure decision 16 chose over a refusal saying nothing at all.
     return Check(
         name,
-        True,
+        False,
         f"fetch_at_answer is off and {len(missing)} of {len(entries)} url(s) have NO retained "
         f"bytes: {', '.join(missing[:3])}"
         + (f" (+{len(missing) - 3} more)" if len(missing) > 3 else "")
         + " - every citation from these will be `unverified`. Set keep = true and re-ingest",
+        level="warn",
+    )
+
+
+def _suspended_pins(root: Path) -> Check:
+    """W-162. A `fux correct --pin` whose document has moved under it.
+
+    **A suspended pin is silent at query time, deliberately** — the query
+    simply ranks normally — so without this row a person who pinned a question
+    months ago has no way to learn that their pin stopped applying. That is the
+    exact shape of failure `fux doctor` exists for: something that *was* true,
+    is not, and says nothing.
+
+    ⚠ **`warn`, never `error`.** A stale pin answers correctly — it answers
+    with the ranking — so the repository is not broken. And the remedy needs a
+    human to read the document and decide, which `doctor` must not do for them.
+    """
+    name = "correction pins"
+    try:
+        from .correct import load_corrections, suspended_pins
+    except Exception:  # pragma: no cover - a check must not take out the command
+        return Check(name, True, "not available in this build")
+    try:
+        rows = load_corrections(root)
+    except Exception:
+        return Check(name, True, "no readable corrections file")
+    pins = [c for c in rows if c.pin]
+    if not rows:
+        return Check(name, True, "no corrections filed")
+    if not pins:
+        return Check(name, True, f"{len(rows)} correction(s), no pins")
+    try:
+        stale = suspended_pins(root)
+    except Exception:
+        return Check(name, True, f"{len(pins)} pin(s); could not read the index to check them")
+    if not stale:
+        return Check(name, True, f"{len(pins)} pin(s), all applying")
+    shown = "; ".join(f"{c.loc} ({why})" for c, why in stale[:3])
+    more = f" (+{len(stale) - 3} more)" if len(stale) > 3 else ""
+    # 🔴 **`ok=False` with `level="warn"` is what renders `[WARN]`.** `cmd_doctor`
+    # reads `ok` for the mark and `level` for the exit code, so `ok=True,
+    # level="warn"` prints `[OK]` — which is right for an informational row
+    # (*idle, nothing pending*) and wrong for a finding. The first cut of this
+    # row had it that way and disclosed a suspended pin as `[OK]`.
+    return Check(
+        name,
+        False,
+        f"{len(stale)} of {len(pins)} pin(s) SUSPENDED and silently not applying: {shown}{more}"
+        " - read the document, then `fux correct --reaffirm \"<question>\" <doc>`,"
+        " or `--no-pin` to keep the correction without the pin",
         level="warn",
     )
 

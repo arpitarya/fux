@@ -7,10 +7,10 @@ description: "Fux never fetches; a consumer-owned fetcher file does. One fetcher
 status: accepted
 date: 2026-08-19
 feature: the fetch contract, what it is called, and the two shipped templates
-owns: [src/fux/ingest/urlsrc.py@e7ca1e734cdb, src/fux/templates@79bc8fdac078]
+owns: [src/fux/ingest/urlsrc.py@e7ca1e734cdb, src/fux/templates@4549d2a5f406]
 laws: [L1, L3, L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: d02779a1af381111edceaaedf4b15fe9d3727cdb843f66ab2d84a1c92999a195
+content_sha: 166f1b790fb859664b43b85b202a112a4f3f0219bc874d9ff134b7757d99fa67
 ---
 
 # SR-FETCHER — the consumer-owned fetcher

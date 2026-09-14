@@ -134,6 +134,12 @@ def test_parser_has_the_verb_surface():
         # that when W-161 gives `ask` a graph tier there is still a verb whose
         # answer is only what the words say.
         "lexical",
+        # SR-ENRICH decision 19 (W-162). A verb rather than a flag on
+        # `enrich`, and the reason is the AUTHOR: `enrich` plans and validates
+        # text a model wrote; this writes a line a person typed, and the two
+        # have different provenance, different survival under regeneration and
+        # different `--check` treatment.
+        "correct",
     }
 
 

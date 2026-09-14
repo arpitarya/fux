@@ -10,7 +10,7 @@ feature: "`fux answer` — one answer, its footing stated, and the report of wha
 owns: []
 laws: [L1, L2, L3]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: b88496ee773ba2c1e75b04ec5f597c4b2e281cbfcc12b1b6d456e1bc5e572976
+content_sha: b048c0b8e5c4ceb75984ffb0270f7acf657f5302942e24e71d64eb1f749cec76
 ---
 
 # SR-ANSWER — the `answer` verb
@@ -410,6 +410,29 @@ here**; what belongs to this record is the seam:
   `print()`.
 
 ### Consequences
+
+- **A `fux correct --pin` reaches `answer`, not only `ask`** (2026-09-14,
+  W-162). `answer` calls `run_query`, and the pin is applied inside it — so a
+  pinned question's answer is **quoted from the pinned document**, with its
+  line range and its freshness verdict, exactly as any other citation. That is
+  the intended reach: a person who pinned a question wants *the answer*, not a
+  reordered list they then have to read.
+
+  ⚠ **What carries the pin on `answer` is the `note:` on STDERR, and nothing
+  else.** There is no `[pinned]` marker — `answer` returns one document, not a
+  list — and **there is deliberately no `pinned` key on the citation.** The
+  citation is built from an `AskResult` on the index path and from a
+  refer-plane citation on the refer path, and `pinned` exists only on the
+  first; a key present on one path and absent on the other is **worse than a
+  key on neither**, because a consumer reading `citation.pinned` would get
+  `false` from the refer path for a question that genuinely is pinned. So
+  `cmd_answer` emits the note from `results[:1]` **before either branch**, and
+  it therefore fires on every path and on both readers.
+
+  🔴 **This was wrong in this record first.** The note here claimed
+  `"pinned": true` on the result, `answer --json` carried no such key at all,
+  and the claim was written before anyone ran the command. Corrected the same
+  day by running it.
 
 - **`answer` does NOT go through the frozen `lexical` body, and that is
   deliberate** (2026-09-14, W-160). It calls `run_query` directly, so

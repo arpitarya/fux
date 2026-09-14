@@ -122,6 +122,11 @@ GUIDE_SKILLS: tuple[tuple[str, str], ...] = (
     # when somebody asks about the shape of a corpus, and an agent that read it
     # on every request would start volunteering index critiques.
     ("fux-inspect", "INSPECT-SKILL.md"),
+    # `fux-correct` writes COMMITTED files and changes what the index holds, so
+    # it is a skill and never ambient (decision 9a) -- and its own first
+    # section is *propose the command, do not run it*, because the moment an
+    # agent notices a bad result is exactly when it would be tempted to.
+    ("fux-correct", "CORRECT-SKILL.md"),
 )
 
 #: **Path-scoped pointers** (decision 15): a short rule that loads when an agent

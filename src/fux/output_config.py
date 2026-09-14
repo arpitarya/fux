@@ -170,6 +170,10 @@ CLI_VERBS: dict[str, tuple[str, ...]] = {
     # `--top` and `--retrieval-sample` stay flags: both are how much WORK to
     # do, not how a result is shown, and SR-OUTPUT's subject is the latter.
     "inspect": (),
+    # `correct` carries no `[cli.correct]` key of its own — only `--json` to
+    # resolve, like `doctor`, `update` and `inspect`. An EMPTY tuple is the
+    # declaration that this verb IS shaped by this file (W-140 row 14).
+    "correct": (),
 }
 
 #: 🔴 **The one verb that reads ANOTHER verb's subtable, and it is a fact about

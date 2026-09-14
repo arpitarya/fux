@@ -60,6 +60,18 @@ class AskResult:
     #: `recency_half_life_days` opened (W-152) and W-153 named rather than left
     #: to be discovered.
     mtime: int | None = None
+    #: W-162. A human filed `fux correct --pin` for **this exact question**, so
+    #: this document was moved to #1 after ranking.
+    #:
+    #: 🔴 **It is NOT part of the sort key and NOT a score.** `rank()` never
+    #: sees it: the pin is applied by `run_query` after the ranking is
+    #: complete, so `--why`'s derivation still describes the ranking that
+    #: actually ran and the reader can see the pin *on top of* it rather than
+    #: baked into it. A pin that changed the score would make the ranking
+    #: unreadable for exactly the query somebody had to intervene on.
+    #:
+    #: **`False` is a claim, not an absence** — the key is on every hit (W-48).
+    pinned: bool = False
 
 
 @dataclass(frozen=True)

@@ -18,7 +18,13 @@ different document should have been served. How can I correct that?"*
 **Owning records:** [SR-ENRICH](../../records/0137_enrich.md) (the enrichment
 file, `ctx`, `--check`), [SR-EXPAND](../../records/0149_expand.md) (the
 refusal), [SR-PROVENANCE](../../records/0142_provenance.md).
-**Item:** [W-162](../open/W-162-fux-correct.md).
+**Item:** **W-162 — SHIPPED 2026-09-14.** What was built is
+[SR-ENRICH](../../records/0137_enrich.md) decisions 19, 19a and 19b;
+[`work/IMPLEMENTATION.md`](../IMPLEMENTATION.md) §2026-09-14 W-162 is the
+account of what shipping it found. 🔴 **§6's generalisation measurement was
+NOT done** and is [W-175](../open/W-175-correction-generalisation.md) — the
+one claim that made (b) beat (a) is still unmeasured, and this doc's §5
+reopen trigger is what fires if it fails.
 
 ---
 

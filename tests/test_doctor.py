@@ -1841,13 +1841,65 @@ def test_pinned_row_is_silent_while_fetch_at_answer_is_on(tmp_path):
 
 
 def test_pinned_row_names_the_urls_with_no_retained_bytes(tmp_path):
+    """🔴 **This test asserted `row.ok` and that made the row print `[OK]`.**
+
+    *Disclosed, never refused* (Arpit, 2026-09-14) is about the **exit code**,
+    and `cmd_doctor` takes the exit code from `ok` **only for `level ==
+    "error"` rows** — a `warn` row cannot fail the command whatever its `ok`
+    is. What `ok` decides is the MARK: `True` renders `[OK]`.
+
+    So the first version of this row printed
+
+        [OK] pinned url bytes: ... every citation from these will be `unverified`
+
+    which discloses nothing — `[OK]` is what a reader scans past. Corrected
+    2026-09-14 (W-162, which hit the same trap on its own new row): `ok=False`
+    for the mark, `level="warn"` for the exit code, and **the rendered line is
+    asserted below** rather than only the fields, because asserting the fields
+    is what let this ship.
+    """
     root = _pinned_repo(tmp_path, urls=("https://x.test/a", "https://x.test/b"))
     row = _row(root, "pinned url bytes")
-    assert row.ok  # disclosed, NEVER refused — Arpit, 2026-09-14
-    assert row.level == "warn"
+    assert row.level == "warn"      # never refuses: `cmd_doctor` ignores `ok` here
+    assert not row.ok               # ...and therefore renders [WARN], not [OK]
     assert "2 of 2" in row.detail
     assert "https://x.test/a" in row.detail
     assert "unverified" in row.detail
+
+
+def test_a_warn_row_renders_WARN_and_still_exits_zero(tmp_path, capsys):
+    """The property the two rows above are about, asserted on the RENDERING.
+
+    ⚠ **Fields are not the contract a reader meets.** `level` and `ok` are how
+    the mark and the exit code are computed; what a person sees is the line,
+    and the line is what was wrong. This asserts both halves at once — the
+    mark says `WARN`, and the command still succeeds.
+    """
+    import types
+
+    from fux.doctor import Check, cmd_doctor
+
+    root = _pinned_repo(tmp_path, urls=("https://x.test/a",))
+    monkey = _row(root, "pinned url bytes")
+    assert monkey.level == "warn" and not monkey.ok
+
+    # Render a minimal set through the real renderer rather than the real run,
+    # so this asserts the mark rule and not this repository's health.
+    import fux.doctor as doctor_mod
+
+    original = doctor_mod.run
+    doctor_mod.run = lambda *a, **k: [
+        Check("ok row", True, "fine"),
+        Check("warn row", False, "a real finding", level="warn"),
+    ]
+    try:
+        code = cmd_doctor(types.SimpleNamespace(json=False))
+    finally:
+        doctor_mod.run = original
+    out = capsys.readouterr().out
+    assert "[OK] ok row" in out, out
+    assert "[WARN] warn row" in out, out
+    assert code == 0, "a warn row must not fail the command"
 
 
 def test_pinned_row_is_quiet_when_every_url_has_bytes(tmp_path):

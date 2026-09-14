@@ -11,7 +11,7 @@ feature: the confidence plane
 owns: [src/fux/query/confidence.py@664d92120a9b, tests/test_confidence_floor_off.py@f8e18c079a6e]
 laws: [L1, L3, L4]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 5497201a530efe83741360fd1a7a11067962ac403345d873c618504c7eac1a18
+content_sha: 468ffe01bd10af7c62f0b9066aa05ff40430a3171e93a8073f89051e02df8d66
 ---
 
 # SR-CONFIDENCE — how much the index believes its own answer
@@ -584,6 +584,18 @@ functions including `cmd_ask` and `run_query`, so a short list would switch the
 gate off silently — worse than the line you are reading.
 
 ### Consequences
+
+- **The band is computed from the PINNED list, and that is the whole point**
+  (2026-09-14, W-162). `run_query` applies a `fux correct --pin` before
+  `_fill_confidence` runs, so **a pinned #1 that the corpus barely supports
+  still says `weak`.**
+
+  🔴 **The other order would have been a lie with a person's name on it.**
+  Banding the pre-pin list would report the confidence of an answer nobody was
+  shown, and the pinned row would arrive with a `strong` band it had not
+  earned — the one case where a reader is least able to check, because a human
+  put the document there on purpose. **A pin decides the ORDER; it may not
+  decide how much the index believes itself.**
 
 - **`fux lexical --band` emits the same block as `fux ask --band`**
   (2026-09-14, W-160), because it is the same body and the band is built from

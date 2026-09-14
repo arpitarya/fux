@@ -37,7 +37,10 @@ import { cmpCodePoints } from "./compat/pyfloat.mjs";
 function result(r, headings = []) {
   return {
     id: r.id, loc: r.loc, title: r.title, score: r.score,
-    archived: r.archived, tie: r.tie, mtime: r.mtime ?? null, headings,
+    archived: r.archived, tie: r.tie, mtime: r.mtime ?? null,
+    // W-162 — a human pinned this document to this exact question, so its
+    // position was set after the ranking. Always present; `false` is a claim.
+    pinned: Boolean(r.pinned), headings,
   };
 }
 

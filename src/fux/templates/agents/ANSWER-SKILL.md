@@ -207,6 +207,9 @@ off flag, so use `--no-output-config` to bypass.
 - **Don't report `fux verify` without `--rerun` as proof** of anything.
 - **Don't use `ask` or `find` for line ranges**, and don't pass `--top` or `-q` to `answer`.
 - **Don't enable `--journal` unasked** — it records questions in plaintext.
+- **Don't run `fux correct` because the answer was wrong** — say which document
+  should have answered and **propose** the command (`fux-correct`). It writes
+  committed files and records a claim under somebody's name.
 - **Don't loop on an unreachable URL**; report it as unverified.
 
 Related skills: fux-usage, fux-search, fux-graph, fux-sources, fux-index, fux-maintain, fux-config, fux-mcp, fux-fetcher, fux-pii, fux-decoder, fux-enrich, fux-archived-results.

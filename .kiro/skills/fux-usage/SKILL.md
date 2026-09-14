@@ -62,6 +62,7 @@ Three rules that make the ladder safe rather than clever:
 | `fux path <a> <b>` | how two documents connect | you suspect a relationship and want the chain |
 | `fux lexical "<q>"` | the same shape as `ask`, from the words alone | you are comparing against a baseline. **Otherwise use `ask`** |
 | `fux inspect` | what the whole index looks like | you are asked whether the corpus itself is any good |
+| `fux correct "<q>" <doc>` | writes one human question onto a document | **only when asked.** Propose it when fux served the wrong document; it commits a file |
 
 **`fux ask` is the default. `fux lexical` is not a better `ask`** - it is the
 frozen BM25F baseline, kept so a ranking comparison has a stable arm. Today the
@@ -70,7 +71,7 @@ for a baseline.
 
 **Each verb has a deeper skill:** `fux-search` (ask, find, lexical),
 `fux-answer` (answer, verify), `fux-graph` (explain, graph, path),
-`fux-inspect` (inspect). See section 7 for the rest.
+`fux-inspect` (inspect), `fux-correct` (correct). See section 7 for the rest.
 
 **Prefer `--json` everywhere it is offered.** It gives you `score`, `loc` and
 `archived` as fields rather than as prose you have to parse. **Branch on the

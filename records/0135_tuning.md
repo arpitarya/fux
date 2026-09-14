@@ -11,7 +11,7 @@ feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error 
 owns: [src/fux/tune.py@2303b6568596]
 laws: [L1, L3, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 5929e1da62dd83f54f0413522cc86bf4912f76d957787f337bd323cd9e723927
+content_sha: dd3cf3e53d4f064735d8b275382bf1c078741ed0958e9feba5af23c88261c5d4
 ---
 
 # SR-TUNE — the tunables file, and per-source priority
@@ -844,6 +844,24 @@ surfacing the supersession chain instead of ranking for it. It is an **unopened
 fork with no compare doc.**
 
 ### Consequences
+
+- 🔴 **`pinned` is not a tunable and may not become one** (2026-09-14, W-162).
+  A `fux correct --pin` is an **editorial override applied after the ranking**:
+  `rank()` never sees it, it has no weight, and there is deliberately no
+  `[ranking] pin_weight`.
+
+  **A weight is the obvious next request and it is the wrong shape.** A pin is
+  either in force or it is not — *this document, this exact question, #1* — and
+  a number in front of it would turn a person's decision into one more signal
+  competing with the scorer, at a strength nobody could measure. The knob that
+  *does* exist for *how much corrections count* is `ctx`'s field weight, which
+  is a **ranking change** and goes through
+  [W-156](../work/open/W-156-prevalence-outside-golden.md)'s rule rather than
+  through a new key here.
+
+  ⚠ **What this leaves unguarded**: nothing stops somebody adding such a key,
+  because `Tune`'s key set is validated against itself and a new key is just a
+  new key. This is a stated bound, not a gate.
 
 - ✅ **A frozen `.fux/tune.toml` is REPORTED (2026-09-14, W-163).**
   `fux doctor`'s `tune.toml current` row names every `table.key` the engine has

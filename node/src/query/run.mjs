@@ -32,6 +32,7 @@ import { fuseResults } from "./fuse.mjs";
 import * as expandMod from "./expand.mjs";
 import { tokenizePairs } from "./tokenize.mjs";
 import { rerank, DEPTH as RERANK_DEPTH } from "./rerank.mjs";
+import { applyPin } from "../correct.mjs";
 import { loadTune } from "../config/tune.mjs";
 import { archivedDirSet } from "../ingest/gitdir.mjs";
 
@@ -103,7 +104,10 @@ export function runQuery(root, query, top, {
 
   const statsOut = {};
   const window = scanAsk(root, query, depth, { weighting, scoring, statsOut, expansion });
-  const results = maybeRerank(root, query, window, rerankWeight, top);
+  // W-162. **After the reranker, and the confidence block is built from the
+  // PINNED list** — the band describes the answer the reader was shown, so a
+  // pinned #1 the corpus barely supports must still say `weak`.
+  const results = applyPin(root, query, maybeRerank(root, query, window, rerankWeight, top), top);
 
   return {
     results,

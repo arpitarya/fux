@@ -10,10 +10,10 @@ amended: 2026-08-28
 date: 2026-08-27
 ratified: 2026-08-27
 feature: configurable output defaults
-owns: [src/fux/output_config.py@282440291802]
+owns: [src/fux/output_config.py@d8c53dfbf3c9]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: c75a4e21ad953f40a8a9084ef7d537b6d1b99ab9701de2ba774db4b277338b41
+content_sha: c88956c4b8b2d47a37cb70c3f259e9c606ce6cb0ecec100da412736118ac3cc0
 ---
 
 # SR-OUTPUT — output defaults are configurable, in a third file

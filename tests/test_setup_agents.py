@@ -498,12 +498,14 @@ def test_every_operating_guide_reaches_every_skill_surface_and_no_ambient_one():
     committed files, and decision 9a is a predicate on the surface, not on a
     list of names.
 
-    **Eleven since 2026-09-14**, when SR-INSPECT's `fux-inspect` joined. It is
-    the only one whose verb writes nothing at all, and it ships as a skill for
-    the reason the others do: an agent that loaded it ambiently would start
-    volunteering critiques of a corpus nobody asked it about.
+    **Twelve since 2026-09-14** — `fux-inspect` (SR-INSPECT) and `fux-correct`
+    (SR-ENRICH decision 19) both joined that day, at the two ends of the
+    spectrum this rule covers. `inspect` writes nothing at all; `correct`
+    writes committed files and records a claim under somebody's name, and its
+    own first section is *propose the command, do not run it* — because the
+    moment an agent notices a bad result is exactly when it would be tempted.
     """
-    assert len(setup_mod.GUIDE_SKILLS) == 11
+    assert len(setup_mod.GUIDE_SKILLS) == 12
     for name, template in setup_mod.GUIDE_SKILLS:
         assert _surfaces(template) == SKILL_SURFACES, template
         for files in setup_mod.AGENT_FILES.values():

@@ -76,6 +76,49 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Added
 
+- **`fux correct "<question>" <doc>` — the words people ASK with, written onto
+  the document that answers.** It appends one human-authored question to that
+  document's existing `.fux/enrich/<sha>.md` and is indexed as the same `ctx`
+  field as the model-written questions beside it: **same file, same field,
+  different author.** doc2query's deterministic cousin; no new directory, no new
+  ranking code.
+  - **The marker is `corrections: N` in the frontmatter** — *the last N body
+    lines are human* — so it sits in the half that is never indexed while the
+    text sits in the half that is. `.fux/eval/corrections.tsv` (committed,
+    sorted) is the durable record.
+  - **`fux enrich --check` REPORTS a human line and never refuses it**, and the
+    file stays indexed. A correction is by definition a question that failed
+    retrieval. **Every human line is checked whatever its punctuation** — a
+    correction with no `?` is checked too.
+  - **A negative correction is refused** with the pointer: *"don't serve X"* is
+    `supersedes` / `archived=`, corpus-wide. **A PII match is refused, not
+    redacted** — `[PII:…]` as vocabulary retrieves nothing. **A refused command
+    writes nothing.**
+  - **No wall clock**: `generated:` derives from the document's committed
+    `mtime`, so the bytes do not depend on when the command ran.
+  - **`--pin`** forces one document to #1 for one exact question, **after** the
+    ranking and after the reranker — `"pinned": true`, `[pinned]` in text, a
+    `note:` on stderr, and the confidence band still computed from the pinned
+    list so a weakly-supported pin still says `weak`. **Suspended when the
+    document changes**, released only by `fux correct --reaffirm`, and named by
+    `fux doctor`'s new `correction pins` row.
+  - **`--why` says who wrote a `ctx` term**: `ctx_via` is `human`, `model`,
+    `both` or `unattributed`.
+  - **Both readers apply a pin.** `fux correct` is Python-only (the Node reader
+    never writes), but the effect crosses.
+  - Ships with the `fux-correct` guide skill on all four agent surfaces, whose
+    first section is **propose the command, do not run it**.
+    [SR-ENRICH](records/0137_enrich.md) decisions 19, 19a, 19b.
+
+### Fixed (this release)
+
+- 🔴 **`fux doctor`'s `pinned url bytes` row printed `[OK]`** beside *every
+  citation from these will be `unverified`*. `cmd_doctor` takes the exit code
+  from `ok` only for `level == "error"` rows, so a `warn` row's `ok=True` meant
+  *print `[OK]`* — the row disclosed nothing. `ok=False, level="warn"` renders
+  `[WARN]` and still exits 0, which is what *disclosed, never refused* meant.
+  A test now asserts the **rendered line**.
+
 - **`fux lexical` — the lexical core, named and frozen.** BM25F, then the
   proximity reranker, then RRF over any `-q` phrasings. **No graph stage,
   ever.** It takes every flag `ask` takes and returns `ask`'s exact output

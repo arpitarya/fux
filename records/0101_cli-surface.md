@@ -7,10 +7,10 @@ description: Flat verbs in seven groups, one error boundary, three output modes.
 status: accepted
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@20870a22946c, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@e15fc07dcf7e, src/fux/progress.py@925dccc045ce]
+owns: [src/fux/cli.py@6b884c27a3da, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@e15fc07dcf7e, src/fux/progress.py@925dccc045ce]
 laws: [L1, L4, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 14b5a95fd68d69b66e715f1f1e515959a95881945bd650b9ac737ebc57d7d679
+content_sha: c8caaad530b366e00ca02fbeea25a623c81975f1da1443a7e5426e5431634ca3
 ---
 
 # SR-CLI — the command-line surface
@@ -23,7 +23,7 @@ content_sha: 14b5a95fd68d69b66e715f1f1e515959a95881945bd650b9ac737ebc57d7d679
 |---|---|---|
 | **lifecycle** | `setup` · `doctor` · `inspect` | set the repo up, check the environment, then X-ray the index — `doctor`'s fix is a command or a config edit, `inspect`'s is a change to the corpus ([SR-INSPECT](0156_inspect.md)) |
 | **write** | `ingest` · `build` | one writes the committed plane, one derives from it |
-| **sources** | `add` · `remove` · `update` · `enrich` | maintain what is indexed — `add` and `remove` write lines, `update` never touches one, `enrich` writes no committed byte at all |
+| **sources** | `add` · `remove` · `update` · `enrich` · `correct` | maintain what is indexed — `add` and `remove` write lines, `update` never touches one, `enrich` plans and validates a MODEL's text, and `correct` writes one question a PERSON typed ([SR-ENRICH](0137_enrich.md) decision 19) |
 | **read** | `ask` · `find` · `answer` · `lexical` | differ only in how much they commit to. `lexical` is the words alone, **frozen** — decision 12 |
 | **graph** | `explain` · `graph` · `path` | answer with **relationships**, never with a ranking |
 | **serve** | `mcp` · `daemon` | long-running processes; the only verbs that do not return |

@@ -20,6 +20,13 @@ import { recordFor } from "../store/reader.mjs";
 import { declareArchived, declareConfidence, declareFloorOff, decline } from "./find.mjs";
 
 export const ARCHIVED_MARKER = "[archived]";
+
+//: W-162 — a document a human pinned to this exact question. Same shape as the
+//: archived marker and for the same reason: a pinned row's score is still its
+//: own score (`0.0` when the ranking never scored it), so without the marker
+//: the list reads as a ranking that had gone wrong. Twin of
+//: `query/__init__.py::PINNED_MARKER`.
+export const PINNED_MARKER = "[pinned]";
 export const SECTION_MARKER = "§";
 
 export function runAsk(root, args) {
@@ -64,11 +71,28 @@ export function runAsk(root, args) {
   // W-111 — `(tie)` after the score, for the same reason.
   for (const r of rows) {
     const tie = r.tie ? "  (tie)" : "";
-    const mark = r.archived ? `${ARCHIVED_MARKER} ` : "";
+    let mark = r.archived ? `${ARCHIVED_MARKER} ` : "";
+    if (r.pinned) mark = `${PINNED_MARKER} ` + mark;
     process.stdout.write(`${r.score.toFixed(4)}${tie}  ${mark}${r.title}  (${r.loc})\n`);
     for (const h of r.headings || []) process.stdout.write(`        ${SECTION_MARKER} ${h}\n`);
   }
+  declarePinned(results);
   declareArchived(results);
   declareConfidence(confidence, args.band);
   return 0;
+}
+
+/** Say out loud that a person decided the first row. stderr, once.
+ *
+ * Twin of `query/__init__.py::_declare_pinned`. Printed under `--json` too,
+ * exactly as the archived note is, because *a human overrode the ranking* is
+ * the single thing a reader most needs and least expects. */
+export function declarePinned(results) {
+  const pinned = results.filter((r) => r.pinned);
+  if (!pinned.length) return;
+  process.stderr.write(
+    `note: ${pinned[0].loc} is PINNED to this exact question by a human ` +
+    "(.fux/eval/corrections.tsv) - its position is a person's decision, not " +
+    "this ranking's. `fux correct --list` shows every pin.\n",
+  );
 }

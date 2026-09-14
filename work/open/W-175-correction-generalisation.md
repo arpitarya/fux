@@ -1,0 +1,87 @@
+---
+type: Handoff
+name: W-175
+description: "The one claim W-162 shipped unmeasured: that a human correction helps phrasings OTHER than its own. It is the whole reason option (b) beat the editorial pin, it was pre-registered in the compare doc before the build, and the build did not do it. N corrections from real failures on an ungraded corpus, M blind paraphrases each, top-3 before/after, both directions."
+item: W-175
+filed: 2026-09-14
+ball: arpit
+---
+
+# W-175 — does a correction generalise, or does it only fix its own phrasing?
+
+**Model: Opus for the design, Codex for the paraphrases** — the paraphrases
+must be written by somebody who has not seen which corrections were filed, and
+that is the whole instrument.
+
+**Filed 2026-09-14 on shipping [W-162](../../archive/open/W-162-fux-correct.md).**
+`fux correct` is built, tested and in use. **The claim that made it the accepted
+design is not measured.**
+
+## What is unmeasured, precisely
+
+[The compare doc](../compare/fux-correct.compare.md) §1 chose **(b) human
+document expansion** over **(a) an editorial pin** on one argument:
+
+> (a) **yes, but brittle** — one phrasing fixed, the next still wrong.
+> (b) **best fit** — generalises across phrasings.
+
+**Everything else in W-162 stands on tests.** The verb writes, the marker
+survives, `--check` reports, the pin applies and suspends, both readers agree —
+all asserted. **Generalisation is the one property a test cannot assert**, and
+it is the only one that decides which of (a) and (b) fux should have built.
+
+⚠ **`--pin` is not a fallback that makes this moot.** A pin fixes exactly one
+phrasing, which is what (b) was chosen to avoid. If (b) does not generalise,
+then fux built the more complicated of two options for a benefit it does not
+have, and the compare doc's own reopen trigger fires.
+
+## The pre-registration already exists, and it is not this file
+
+[The compare doc](../compare/fux-correct.compare.md) §6 states the design, and
+it was written **before** the build:
+
+> pre-registered on golden: for N corrections, M held-out paraphrases per
+> correction, written blind by Codex; measure top-3 retrieval of the corrected
+> document on the paraphrases, before vs after / **keep** if the paraphrase gain
+> clears the SR-RS d19 floor **and** no golden answerable question loses its
+> top-1 (the tilt check) / **remove** → human lines stop being indexed into
+> `ctx`, they stay as eval rows, and exact-question `--pin` becomes the default
+> effect
+
+**Freeze it into a run directory before the first number** and cite the compare
+doc as the origin, rather than restating the bar in looser words.
+
+## Why this is blocked on Arpit and not agent work
+
+Three of its inputs are not mine to produce:
+
+1. 🔴 **The corrections must come from real failures on a corpus the measurer
+   did not grade** (the compare doc says so). Inventing corrections against a
+   corpus I can read is fitting the instrument to the answer.
+2. 🔴 **The paraphrases must be written blind, by Codex.** A paraphrase written
+   by whoever wrote the correction is the same author twice.
+3. **The evidence rule is [W-156](W-156-prevalence-outside-golden.md)'s.** This
+   measures a retrieval delta on one corpus, which is the exact case W-156 is
+   open about.
+
+## What an agent could do without a ruling
+
+- **Freeze the pre-registration file** into `work/regression/<date>-correction-generalisation/`,
+  quoting §6 and naming the SR-RS d19 floor for the N it will actually run.
+- **Build the harness**: file N corrections, re-ingest, run M paraphrases per
+  correction before and after, emit per-query rows.
+- **Nothing else.** The corrections and the paraphrases are the two things it
+  may not author.
+
+## The keep/remove call this settles
+
+| outcome | what changes |
+|---|---|
+| **keep** | nothing. SR-ENRICH decision 19 stands as written |
+| **remove** | human lines **stop being indexed into `ctx`** — they share the field with model lines, so there is no per-author weight to turn down — `--pin` becomes the default effect, and the eval rows stay. SR-ENRICH decision 19 is rewritten and the compare doc's verdict flips to (a) |
+| **ambiguous** | Arpit's, per-query rows filed |
+
+## Records this will touch
+
+SR-ENRICH (decision 19's keep/remove) · the compare doc's verdict block ·
+a `VERDICT.md` beside the evidence.

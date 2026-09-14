@@ -28,9 +28,11 @@ here. Read that record before changing anything below it.
 | 🔴 **W-112** — W-106 closed **without a PASS and cannot produce one** (no corpus carries DENSE-CHUNK's bar). Proceed on the narrowed claim, wait for an instrument, or close? [detail](open/W-112-vector-plane.md) | 2026-09-12 | 2d |
 | ↳ **blocks:** nothing else in the queue — search-v3's last item, and the only one left of §5 | | |
 | 🔴 **W-156** — every measurement must be on golden data; golden is one synthetic corpus; so *never ship a ranking change off one* can never be met. Which rule gives? [detail](open/W-156-prevalence-outside-golden.md) | 2026-09-13 | 1d |
-| ↳ **blocks:** **W-168** (all ten search steps), **W-161** (the graph-composed `ask`) and **W-144**'s acceptance — every item whose output is a ranking change waits on this ruling for the evidence it is allowed to have | | |
+| ↳ **blocks:** **W-168**, **W-161**, **W-175** and **W-144**'s acceptance — every item whose output or evidence is a ranking claim waits on this ruling | | |
 | 🔴 **W-144** — excluding table cells from `flen` **ranks better** ([verdict](regression/2026-09-12-reaim-and-instruments/VERDICT-W144.md)); one synthetic corpus may not ship a ranking change, so accept or override [the compare doc](compare/table-tokens-in-flen.compare.md). | 2026-09-12 | 2d |
 | ↳ **blocks:** nothing else in the queue — the measurement is filed and the code is written; what is missing is the call | | |
+| 🔴 **W-175** — `fux correct` shipped with its central claim unmeasured: does a human line help OTHER phrasings? Real failures and BLIND paraphrases; an agent may author neither. [detail](open/W-175-correction-generalisation.md) | 2026-09-14 | 0d |
+| ↳ **blocks:** nothing else in the queue — it decides whether SR-ENRICH decision 19 stands or human lines stop being indexed | | |
 | 🔴 **W-170** — does cage's `fux-search-leg` compare doc get accepted (option C: transcript classification + fux's per-invocation fact row)? That verdict fixes the row shape and the `args_hash` contract. [detail](open/W-170-cage-search-leg.md) | 2026-09-14 | 0d |
 | ↳ **blocks:** nothing else in the queue — fux's emitter is the only item behind it | | |
 | 🔴 **W-148** — two calls left over from W-107: how CI reaches a golden corpus (self-hosted runner / commit `rung-00100` / portable builder), and whether `fux-benchmark` gets built or Node's latency stays unmeasured. [detail](open/W-148-what-the-two-readers-still-owe.md) | 2026-09-12 | 2d |
@@ -44,8 +46,8 @@ here. Read that record before changing anything below it.
 
 - 🔴 **W-168** · `arpit`, blocked on W-156 — the ten search improvements as one program, ten gated steps (anchor text first, section units last); each step golden question → pre-registration → build → measure. Promoted 2026-09-14. [detail](open/W-168-search-improvements.md)
 - 🔴 **W-170** · `arpit` — fux's emitter for cage's search leg: one counts-only fact row per invocation to `ledger/fux/`; the `args_hash` contract first. Waits on the cage compare-doc verdict. [detail](open/W-170-cage-search-leg.md)
+- 🔴 **W-175** · `arpit`, blocked on W-156 — does a correction help phrasings OTHER than its own? The claim that made W-162's design the accepted one, shipped unmeasured. [detail](open/W-175-correction-generalisation.md)
 - 🔴 **W-161** · `arpit`, blocked on W-156 — the graph-composed `ask`: boosted tier + labelled `related` tier, `answer` reads `ask`. W-160's atoms shipped 2026-09-14, inert; only the evidence rule is left. [detail](open/W-161-graph-composed-ask.md)
-- 🟢 **W-162** · `agent` — `fux correct`: a human question line on the document's enrichment file, a rare `--pin`, an eval row per correction, plus the guide skill and agent steering. Accepted 2026-09-13, not built. [detail](open/W-162-fux-correct.md)
 - 🟡 **W-140** · `agent`, waiting on Arpit's `--hops` ruling — **1 code row left**: a runner-race flake **not reproduced in 11 attempts**, deliberately unchanged. 20 closed. [detail](open/W-140-guide-authoring-defects.md)
 - 🔴 **W-148** · `arpit` — what the two readers still owe: CI cannot reach the golden corpora, Node's latency has no instrument, and the renderer split is staged. [detail](open/W-148-what-the-two-readers-still-owe.md)
 - 🔴 **W-112** · `arpit` — the vector plane. W-106 closed without a PASS **and cannot produce one**: no corpus carries DENSE-CHUNK's bar. Determinism narrowed to *same embedder build*. [detail](open/W-112-vector-plane.md)

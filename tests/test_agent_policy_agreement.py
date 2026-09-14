@@ -108,6 +108,11 @@ OPERATING_GUIDES = frozenset(
         # reader a document to act on, so there is no archived result in its
         # output to misread.
         "INSPECT",
+        # SR-ENRICH decision 19's guide. An operating guide, and it points at
+        # `fux-archived-results` as well as REFUSING to correct an archived
+        # document at all — *`supersedes` / `archived=` is the fix* is in its
+        # own Don't list, which is a stronger statement than the block's.
+        "CORRECT",
     )}
     | {f"steering-fux-{t}-files.md" for t in (
         "sources", "decoder", "enrich", "fetcher", "pii", "config", "index",
@@ -184,7 +189,7 @@ def test_the_operating_guides_are_deliberate():
     exempt a file that does not exist yet from a check it should face."""
     from fux import setup as setup_mod
 
-    assert len(OPERATING_GUIDES) == 37
+    assert len(OPERATING_GUIDES) == 38
     assert not OPERATING_GUIDES & NOT_A_POLICY_RENDERING
     shipped = {tpl for files in setup_mod.AGENT_FILES.values() for _rel, tpl in files}
     assert OPERATING_GUIDES <= shipped, sorted(OPERATING_GUIDES - shipped)

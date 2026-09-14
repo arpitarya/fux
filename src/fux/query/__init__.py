@@ -195,7 +195,7 @@ def run_query(
                 root, query, top=depth, weighting=weighting, archived_dirs=dirs,
                 scoring=scoring, stats_out=stats, expansion=expansion,
             )
-            final = _maybe_rerank(root, query, results, rerank_weight, top)
+            final = _apply_pin(root, query, _maybe_rerank(root, query, results, rerank_weight, top), top)
             _fill_trace(trace_out, results, rerank_weight)
             _fill_confidence(confidence_out, stats, query, final, tune)
             return final, "accelerator"
@@ -203,10 +203,81 @@ def run_query(
         root, query, top=depth, weighting=weighting, archived_dirs=dirs,
         scoring=scoring, stats_out=stats, expansion=expansion,
     )
-    final = _maybe_rerank(root, query, results, rerank_weight, top)
+    final = _apply_pin(root, query, _maybe_rerank(root, query, results, rerank_weight, top), top)
     _fill_trace(trace_out, results, rerank_weight)
     _fill_confidence(confidence_out, stats, query, final, tune)
     return final, "scan"
+
+
+def _apply_pin(root: Path, query: str, results: list, top: int) -> list:
+    """W-162. Move a pinned document to #1 for this exact question.
+
+    **After the ranking and after the reranker, deliberately.** The pin is an
+    editorial override, not a signal: `rank()` never sees it, so `--why`'s
+    derivation still describes the ranking that actually ran and a reader sees
+    the pin sitting *on top of* it. A pin folded into the score would make the
+    ranking unreadable for precisely the query somebody had to intervene on.
+
+    **The confidence block is computed from the pinned list**, because the band
+    describes the answer the reader was shown — and a pinned #1 that the corpus
+    barely supports should still say `weak`. `_fill_confidence` runs after this.
+
+    ⚠ **A pinned document absent from the results is INSERTED**, and the list is
+    re-truncated to `top`. That is the whole point: the case a pin exists for is
+    a document the ranking did not return at all.
+
+    ⚠ **Never raises and never costs an unpinned query a read.** `pinned_for`
+    returns `None` the moment `.fux/eval/corrections.tsv` has no pins, which is
+    a `stat` on the common path.
+    """
+    from ..correct import pinned_for
+
+    try:
+        doc_id = pinned_for(root, query)
+    except Exception:  # pragma: no cover - an override must not fail a query
+        return results
+    if doc_id is None:
+        return results
+
+    from dataclasses import replace
+
+    kept = [r for r in results if r.id != doc_id]
+    found = next((r for r in results if r.id == doc_id), None)
+    if found is None:
+        found = _result_for_pin(root, doc_id)
+        if found is None:
+            return results  # the document left the corpus between reads
+    # The pinned row keeps its own score, so a reader can see what the ranking
+    # thought of it. What moved is its POSITION, and `pinned: True` says so.
+    return [replace(found, pinned=True), *kept][:top]
+
+
+def _result_for_pin(root: Path, doc_id: str):
+    """An `AskResult` for a pinned document the ranking did not return.
+
+    Its `score` is `0.0`, and that is the honest number: **the ranking gave it
+    no score at all** — it was not a candidate. Inventing one would put a value
+    in the column a reader compares, from a computation that never happened.
+    """
+    from .. import store as store_mod
+    from .rank import AskResult
+
+    try:
+        record = store_mod.read_index(root).get(doc_id)
+    except Exception:  # pragma: no cover
+        return None
+    if record is None:
+        return None
+    return AskResult(
+        id=doc_id,
+        title=store_mod.display_title(record),
+        loc=record.get("loc", ""),
+        score=0.0,
+        archived=bool(record.get("archived", False)),
+        tie=False,
+        mtime=record.get("mtime"),
+        pinned=True,
+    )
 
 
 def _fill_confidence(
@@ -486,6 +557,14 @@ ARCHIVED_MARKER = "[archived]"
 #: four centuries and no reader has to be taught it.
 SECTION_MARKER = "§"
 
+#: W-162 — the per-result marker for a document a human pinned to this exact
+#: question. Same shape as `ARCHIVED_MARKER` and for the same reason: a reader
+#: scanning a list must be able to see that this row's POSITION was decided by
+#: a person rather than by the ranking. **A pinned row's score is still its own
+#: score** (`0.0` when the ranking never scored it), so without the marker the
+#: list would read as a ranking that had gone wrong.
+PINNED_MARKER = "[pinned]"
+
 
 def _headings_for(record: dict | None, query: str) -> list[str]:
     """W-84's matched headings — imported lazily so `find`'s hot path and every
@@ -493,6 +572,26 @@ def _headings_for(record: dict | None, query: str) -> list[str]:
     from .headings import headings_for
 
     return headings_for(record, query)
+
+
+def _declare_pinned(results) -> None:
+    """Say out loud that a person decided the first row, once, on stderr.
+
+    **stderr, and once**: it is a note about the query rather than about a
+    document, it must not reach a `--json` consumer's stdout, and `fux find`
+    exists to be piped. Printed even under `--json`, exactly as the archived
+    note is, because the fact that a human overrode the ranking is the single
+    thing a reader most needs and least expects.
+    """
+    pinned = [r for r in results if getattr(r, "pinned", False)]
+    if not pinned:
+        return
+    print(
+        f"note: {pinned[0].loc} is PINNED to this exact question by a human "
+        f"(.fux/eval/corrections.tsv) - its position is a person's decision, not "
+        f"this ranking's. `fux correct --list` shows every pin.",
+        file=sys.stderr,
+    )
 
 
 def _declare_archived(results) -> None:
@@ -721,6 +820,7 @@ def _ask_shaped(args) -> int:
         if why is not None:
             payload["derivation"] = why.as_dict()
         print(json_mod.dumps(payload, indent=2))
+        _declare_pinned(results)
         _declare_archived(results)
         return 0
 
@@ -736,6 +836,8 @@ def _ask_shaped(args) -> int:
     for r in results:
         record = _record_for(root, r.id)
         mark = f"{ARCHIVED_MARKER} " if r.archived else ""
+        if getattr(r, "pinned", False):
+            mark = f"{PINNED_MARKER} " + mark
         # W-111 — `(tie)` after the score, not after the locator. The `(loc)` a
         # reader copies must stay a bare locator, which is the same rule W-84
         # applied to headings; a marker glued to it breaks a copy-paste.
@@ -748,6 +850,7 @@ def _ask_shaped(args) -> int:
         print(f"\n[{path}]")
     if why is not None:
         _declare_derivation(why)
+    _declare_pinned(results)
     _declare_archived(results)
     _declare_confidence(block, _show_band(args))
     return 0
@@ -818,8 +921,22 @@ def _declare_derivation(why) -> None:
     )
     for doc in why.documents:
         bits = [f"#{doc.rank + 1} {doc.loc} {doc.score:.4f}"]
+        # **First, before any other bit.** Every number on this line describes
+        # a ranking that did not decide where this document went (W-162).
+        if getattr(doc, "pinned", False):
+            bits.append("PINNED by a human")
         if doc.matched:
-            bits.append("matched " + ",".join(t.term for t in doc.matched))
+            # `term(via)` only where `ctx` fired — an annotation on every term
+            # would bury the two that matter. `human` is the one a reader is
+            # looking for; `model` is said too, because *a model guessed you
+            # might ask this* and *a colleague said so* are different answers.
+            bits.append(
+                "matched "
+                + ",".join(
+                    t.term + (f"({t.ctx_via})" if getattr(t, "ctx_via", None) else "")
+                    for t in doc.matched
+                )
+            )
         if doc.missing:
             bits.append("absent " + ",".join(doc.missing))
         if doc.rank_before_rerank is not None and doc.rank_before_rerank != doc.rank:
@@ -1043,6 +1160,11 @@ def cmd_answer(args) -> int:
         return 0
 
     best = results[0]
+    # W-162 — before either rendering branch, so the note reaches the reader
+    # whichever path answers. `answer` is the surface where *a human chose this
+    # source* matters most and is least visible: one document comes back and
+    # there is no list beside it to weigh.
+    _declare_pinned(results[:1])
     no_refer_flag = getattr(args, "no_refer", False)
 
     if not no_refer_flag:
@@ -1473,6 +1595,15 @@ def _print_index_answer(
     if as_json:
         payload = {
             "answer": {"title": title, "phrases": phrases},
+            # ⚠ **No `pinned` key here, deliberately** (W-162). `answer`'s
+            # citation is built from an `AskResult` on this path and from a
+            # refer-plane `Citation` on the other, and `pinned` is only on the
+            # first — so a key present on one path and absent on the other
+            # would be **worse than a key on neither**: a consumer reading
+            # `citation.pinned` would see `false` from the refer path for a
+            # question that genuinely is pinned. What carries the pin on
+            # `answer` is the `note:` on stderr, which `cmd_answer` emits
+            # before either branch and therefore on every path.
             "citation": {"id": best.id, "loc": best.loc, "score": best.score},
             "source": "index",
             # Deliberately NOT upgraded: nothing was fetched on this

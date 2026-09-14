@@ -63,6 +63,11 @@ export const CLI_VERBS = {
   //: `[cli.json] inspect = true` must VALIDATE on both readers, or the same
   //: committed config is legal for one and an error for the other.
   inspect: [],
+  //: `correct` is PYTHON-ONLY as a verb (it writes committed files and this
+  //: reader never writes) and is declared for the same reason `inspect` is:
+  //: this table is what `.fux/output.toml` may SAY, so a repo whose file
+  //: carries `[cli.json] correct = true` must validate on both readers.
+  correct: [],
 };
 
 //: 🔴 **The one verb that reads ANOTHER verb's subtable**, and it is a fact

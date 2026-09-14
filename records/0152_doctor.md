@@ -7,11 +7,11 @@ description: "One record owns the health-check surface. Every check names a caus
 status: accepted
 date: 2026-09-11
 feature: "`fux doctor` — the read-only, offline health command and its check register"
-owns: [src/fux/doctor.py@3fd07cac7ca5, tests/test_doctor_register_is_complete.py@6c3d2378d45f]
+owns: [src/fux/doctor.py@db0c319811e3, tests/test_doctor_register_is_complete.py@6c3d2378d45f]
 laws: [L4, L8]
 ratifies: "Arpit, 2026-09-11 — *create a new adr for doctor*"
 timestamp: 2026-09-11T00:00:00Z
-content_sha: 2e76c94e59c234240a30bda62f687bd8949012f23c8f356bd2f0ea1755d1007c
+content_sha: cf66dfe9423fd4b7b954bf63f36a7b9eb5e0306b283246315fdc1cd839798cb2
 ---
 
 # SR-DOCTOR — the health command, and who owns its rows
@@ -160,6 +160,7 @@ authoritative about the row.**
 | `pii rules` | **error** when absent | a missing `.fux/pii.toml`; otherwise compiles every pattern offline and states the scope. ⚠ It cannot see an over-broad rule and says so — only [`tools/pii-probe/`](../tools/pii-probe/) can | [SR-PII](0148_pii.md) decision 17 |
 | `acquired plane` | warn, **error** on gitignore | blob count, total bytes, the 80 %-of-cap warning, and the gitignore assertion | [SR-ACQUIRED](0145_acquired-plane.md) |
 | `pinned url bytes` | warn | with `[sources.url] fetch_at_answer = false`, the listed urls with no retained bytes — every citation from those is `unverified` | [SR-URL-FRESHNESS](0147_url-freshness.md) decision 16 |
+| `correction pins` | warn | a `fux correct --pin` that is **silently not applying** — its document changed since the pin was made, or left the corpus. Named because a suspended pin is invisible at query time: the query just ranks normally | [SR-ENRICH](0137_enrich.md) decision 19 |
 | `refusal rules` | warn, **error** when the file will not parse | how many rules load, how many responses each has refused, and **the rules that have never fired** — what a typo'd condition looks like | [SR-REFUSAL](0146_refusals.md) decision 11 |
 | `decoder bindings` | warn, **error** when the registry will not build | the one binding fault no ingest can catch: a `[decoders]` binding on an extension **no indexed document has** | [SR-DECODE](0139_decode.md) |
 | `recency prior` | warn | whether any document carries an `mtime` — a corpus copied out of its git repository loses every one | [SR-INGEST](0106_ingest.md) |
@@ -317,6 +318,31 @@ shape for **this** file specifically:
 repository and in no consumer's install. It names the `fux-pii` skill instead,
 which `fux setup` wrote into their repo. See
 [SR-PII](0148_pii.md) decision 20.
+
+**`correction pins` — the row for a human decision that quietly stopped
+applying** (W-162).
+
+A `fux correct --pin` forces one document to #1 for one exact question. When the
+document changes under it the pin is **suspended**: the query path simply ranks
+normally and says nothing, because a pin whose document was rewritten is a claim
+nobody has checked since the day it was made. **That silence is correct at query
+time and wrong over months**, which is precisely the shape this verb exists
+for — something that was true, is not, and nothing says so.
+
+⚠ **`warn`, and the remedy needs a person.** The repository is not broken: it
+answers with the ranking. Only somebody who reads the document can say whether
+it still answers the question, so the row names `fux correct --reaffirm` and
+`--no-pin` and does neither.
+
+🔴 **`ok=False` with `level="warn"` is what renders `[WARN]`, and getting that
+backwards ships a finding as `[OK]`.** `cmd_doctor` takes the exit code from
+`ok` **only for `level == "error"` rows**, so a `warn` row cannot fail the
+command whatever its `ok` is — and `ok=True` therefore means *print `[OK]`*.
+Both this row and `pinned url bytes` shipped that way first, the second of them
+with *every citation from these will be `unverified`* beside an `[OK]`. Fixed
+together, and `tests/test_doctor.py::test_a_warn_row_renders_WARN_and_still_exits_zero`
+asserts the **rendered line** rather than the fields, because asserting the
+fields is what let it through.
 
 **`pinned url bytes` — the row that discloses what `fetch_at_answer = false`
 costs** (W-174, 2026-09-14). `doctor._pinned_without_bytes`: when

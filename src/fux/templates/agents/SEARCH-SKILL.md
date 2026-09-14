@@ -23,6 +23,7 @@ writes, and neither needs the network. Resolve the `fux` command first — see t
 | is my result caused by repo config? | re-run with `--no-tune`, then with `--no-output-config` |
 | a frozen BM25F baseline to compare against | `fux lexical "<q>" --json` — §1a |
 | the exact lines that answer it | not here — `fux answer` (see `fux-answer`) |
+| fux served the wrong document and you know the right one | **propose** `fux correct "<q>" <doc>` in your reply and stop — see `fux-correct`. It writes committed files; never run it unasked |
 
 **Always pass `--band` when you will act on the result.** Without it the
 confidence block is not printed at all.
@@ -266,4 +267,4 @@ If a result carries `"archived": true`, follow the `fux-archived-results` policy
 - **Don't answer from `weak` or `none`** and cite the returned files as if they said it.
 - **Don't re-run an identical query** hoping for a different ranking.
 
-Related skills: fux-usage, fux-answer, fux-graph, fux-sources, fux-index, fux-maintain, fux-config, fux-mcp, fux-fetcher, fux-pii, fux-decoder, fux-enrich, fux-archived-results.
+Related skills: fux-usage, fux-correct, fux-answer, fux-graph, fux-sources, fux-index, fux-maintain, fux-config, fux-mcp, fux-fetcher, fux-pii, fux-decoder, fux-enrich, fux-archived-results.

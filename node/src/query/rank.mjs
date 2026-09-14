@@ -134,5 +134,9 @@ export function rank(
     // W-153 — the committed git timestamp in whole unix seconds, or `null` for
     // a document outside git history. `null` is a claim, never an absence.
     mtime: record.mtime ?? null,
+    // W-162 — a human pinned this document to this exact question. `rank()`
+    // never sets it true: the pin is applied after ranking, in `runQuery`.
+    // `false` is a claim, not an absence (W-48).
+    pinned: false,
   }));
 }
