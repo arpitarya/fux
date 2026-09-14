@@ -68,6 +68,14 @@ on disk. Megiddo & Modha, FAST 2003 (paper ref [11]). See
 [SR-CACHE](../records/0131_cache.md) decisions 2–5,
 [cache-policy](../work/compare/cache-policy.compare.md).
 
+**Atom (a ranking atom)** — A named, single-purpose ranking component with a
+frozen output contract, kept separate so a composed verb can be built out of
+atoms and still be attributable. Fux has two:
+[`fux lexical`](#lexical-the-verb) — the words alone — and `fux graph --seed`,
+the walk from given seeds. **The point of an atom is the baseline**: once `ask`
+composes stages, a comparison needs an arm that cannot quietly acquire one.
+See [SR-CLI](../records/0101_cli-surface.md) decisions 12–13.
+
 **BIC (Binary Interpolative Coding)** — The posting-list codec for the
 [wire format](#wire-format): recursively encodes a sorted docid list against
 its own midpoints, reaching ~4.5 bits/posting on clustered lists. Chosen
@@ -286,6 +294,15 @@ one directory per environment, each with its own venv and baselines, and the
 which is a repo law. What it may measure and how large a corpus it may use are
 [SR-WORK-ENVIRONMENTS](../records/0052_WORK-environments.md)'s. See [SETUP-LAB](../work/setup/fux-lab.md).
 
+**`fux lexical` (the verb)** <a id="lexical-the-verb"></a> — BM25F over the
+committed index, then the proximity reranker, then RRF over any `-q`
+phrasings. **No graph stage, ever.** Byte-identical to `fux ask` today and
+**frozen**: a future component added to the lexical core becomes a new verb or
+a tunable, never a change to this one. It is the baseline arm for every ranking
+verdict and the stable arm of the Python/Node differential law — which is worth
+a verb precisely because `ask --scan` stops meaning *the words alone* the moment
+`ask` grows a stage. See [SR-CLI](../records/0101_cli-surface.md) decision 12.
+
 **FuxVec** — The from-scratch stdlib dense engine: sign-quantizes a 256-dim
 int8 embedding into a **256-bit code** (32 B/doc), scans by Hamming distance,
 re-scores the top candidates with exact int8 cosine. Becomes the `V/` plane at
@@ -325,6 +342,15 @@ treated as zero. **Zero headroom in a direction makes a null *Inconclusive*, not
 ACL-mismatch leak where a repo-cloner without source access could read
 index-derived summaries. `plain` is opt-in, enforced at write time (not in
 documentation). See [meta-privacy](../work/compare/meta-privacy.compare.md).
+
+**Link-IDF** — An inbound edge's discount in the graph walk:
+`1 / (1 + ln(1 + in_degree of its target))`. A node nothing points at is
+`1.0`; `CLAUDE.md`, with 180 inbound edges on this repository, is about `0.16`.
+**The same idea as IDF** — a link everybody makes says little about the
+document it comes from — and deliberately **not** `1/in_degree`, which would
+make a hub weightless and turn *widely cited* into *ignored*. **Ships off
+(`--link-idf`) and is measured by nobody yet.** See
+[SR-GRAPH](../records/0126_graph.md) decision 15.
 
 **Impact quantization** — Storing each posting's precomputed score
 contribution as a **4-bit** bucket against a global scale recorded in the
@@ -500,6 +526,15 @@ sets* overlap at Jaccard ≥ 0.80: a family shares its shape and differs in its
 content, and reporting them as one finding would hide the difference that
 decides the remedy. `fux inspect`'s fourth lens names both. See
 [SR-INSPECT](../records/0156_inspect.md) decision 6.
+
+**Seed (graph)** — A node the PPR walk starts from. Either the top-k of a
+query's ranking (`fux graph "<q>"`) or documents named by hand
+(`fux graph --seed <id>…`), and the two are the same walk: **the query form is
+DEFINED as the seed form over the query's top-k.** Mass follows **argument
+order** for named seeds, the same rank-mass rule the query form applies to a
+ranked top-k. ⚠ A hand-named seed reports `rank` and `"score": null` — there is
+no ranking behind it, so there is no score. See
+[SR-GRAPH](../records/0126_graph.md) decision 13.
 
 **TTL fetch cache** — *Time-to-live.* The on-disk, **gitignored**, per-machine
 store at `.fux/runtime/fetch-cache/` that answers *"do I need to fetch this at

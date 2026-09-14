@@ -106,6 +106,8 @@ keeps the derived and fetched parts out of git ([SR-DOTFUX](records/0102_fux-dir
 | Stop indexing something | `fux remove <entry>`, or a line in `.fux/.fuxignore` |
 | Re-read sources and re-fetch URLs | `fux update` (`--check` only reports drift) |
 | Follow links between documents | `fux explain <doc>` · `fux graph "…"` · `fux path <a> <b>` |
+| Explore around documents you name | `fux graph --seed <doc> [--seed <doc>…]` |
+| The same ranking from the words alone | `fux lexical "…"` — BM25F, frozen; the baseline, not a better `ask` |
 | Re-index automatically on commit and merge | `fux hooks` |
 | A re-runnable answer receipt | `fux answer --receipt "…"`, later `fux verify <receipt>` |
 | Check the setup | `fux doctor` (read-only, offline) |

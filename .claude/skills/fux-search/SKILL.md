@@ -1,6 +1,6 @@
 ---
 name: fux-search
-description: Search the Fux index in depth with `fux ask` and `fux find` — flags, the --json fields, the confidence band (band, answerable, missing), --why, -q fusion, --expand for vocabulary gaps, and find's folder and phrase filters. Use when asked to "search the docs", "find where X is documented", "why did this rank", "fux ask returned nothing" or "narrow results to a folder". Read-only and offline; for exact line ranges use fux-answer.
+description: Search the Fux index in depth with `fux ask`, `fux find` and the frozen `fux lexical` baseline — flags, the --json fields, the confidence band (band, answerable, missing), --why, -q fusion, --expand for vocabulary gaps, and find's folder and phrase filters. Use when asked to "search the docs", "find where X is documented", "why did this rank", "fux ask returned nothing" or "narrow results to a folder". Read-only and offline; for exact line ranges use fux-answer.
 ---
 
 # Searching with `fux ask` and `fux find`
@@ -21,16 +21,34 @@ writes, and neither needs the network. Resolve the `fux` command first — see t
 | two ways of saying the same thing | `fux ask "<q>" -q "<other phrasing>" --json --band` |
 | the corpus probably uses different words | `fux ask "<q>" --expand "<a passage YOU write — section 5a>" --json --band` |
 | is my result caused by repo config? | re-run with `--no-tune`, then with `--no-output-config` |
+| a frozen BM25F baseline to compare against | `fux lexical "<q>" --json` — §1a |
 | the exact lines that answer it | not here — `fux answer` (see `fux-answer`) |
 
 **Always pass `--band` when you will act on the result.** Without it the
 confidence block is not printed at all.
 
+## 1a · `fux lexical` — the frozen baseline, and when NOT to use it
+
+`fux lexical` ranks on **the words alone**: BM25F, then the proximity
+reranker, then RRF over any `-q` phrasings. **No graph stage, ever.** It takes
+every flag `ask` takes and returns `ask`'s exact output shape.
+
+- 🔴 **It is not a better `ask`, and it is not a faster one.** Today the two
+  return **byte-identical** output, and a test holds them equal.
+- **Reach for it only when you were asked for a baseline** — comparing a
+  ranking change, or checking whether a result came from the words or from
+  something else. For an ordinary question, use `ask`.
+- **It is frozen by contract.** A future component added to the lexical core
+  becomes a new verb or a tunable, never a change to this one. That is what
+  makes it usable as a baseline at all.
+- ⚠ **Do not report a `lexical` result as "what fux thinks".** If `ask` and
+  `lexical` ever differ, `ask` is the answer and the difference is the finding.
+
 ## 2 · Flags, verified
 
 | flag | `ask` | `find` | effect |
 |---|:-:|:-:|---|
-| `--json` | ✓ | ✓ | machine-readable payload; **prefer it** |
+| `--json` | ✓ | ✓ | machine-readable payload; **prefer it**. Every `ask` row below also holds for `fux lexical`, which takes `ask`'s whole flag surface |
 | `--top N` | ✓ | ✓ | max results (engine default 5; `.fux/output.toml` may change it) |
 | `--band` | ✓ | ✓ | emit the `confidence` block (JSON) or a `confidence:` line (stderr) |
 | `-q TEXT` / `--query TEXT` | ✓ | ✓ | another phrasing; repeatable; rankings fused by RRF |

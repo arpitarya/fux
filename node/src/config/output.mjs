@@ -41,6 +41,12 @@ const ROOTS = ["cli", "mcp"];
 //: the question of WHICH chain the others walk.
 export const CLI_VERBS = {
   ask: ["band", "top", "explain", "sections"],
+  //: 🔴 **`ask`'s keys exactly.** `fux lexical` is frozen byte-identical to
+  //: `ask` (SR-CLI decision 12), and a verb absent from this table has no key
+  //: resolved at all — which on the Python side printed `ask` with `§` heading
+  //: lines and `lexical` without them, from one ranking. Same table, same
+  //: reason, both readers.
+  lexical: ["band", "top", "explain", "sections"],
   find: ["band", "top"],
   answer: ["band", "no_refer", "journal"],
   explain: [],
@@ -58,6 +64,24 @@ export const CLI_VERBS = {
   //: committed config is legal for one and an error for the other.
   inspect: [],
 };
+
+//: 🔴 **The one verb that reads ANOTHER verb's subtable**, and it is a fact
+//: about the freeze rather than a convenience (W-160). `fux lexical` is frozen
+//: byte-identical to `fux ask`, so a consumer's committed `output.toml` must
+//: not be able to make the two differ — `[cli.lexical] sections = false`
+//: beside `[cli.ask] sections = true` would do exactly that, silently, with
+//: both files valid. Giving `lexical` its own subtable would also have made
+//: every repo that already has an `output.toml` exit 1 on a verb they had
+//: never run, because `explain` is refused at the shared `[cli]` level by name.
+//: **One entry, no mechanism**; a second needs its own reason beside the first.
+//: Twin of `output_config.VERB_READS`.
+export const VERB_READS = { lexical: "ask" };
+
+/** Whose `[cli.<verb>]` subtable this verb resolves through. Identity for
+ *  every verb but `lexical`. A function so both resolvers walk one answer. */
+export function subtableFor(verb) {
+  return VERB_READS[verb] ?? verb;
+}
 
 //: `[mcp]`'s closed key set. `top` only. No `json` (an MCP result is always
 //: JSON) and no `band` (the confidence block is unconditional there).
@@ -140,7 +164,7 @@ export class OutputDefaults {
     }
     if (cliValue !== null && cliValue !== undefined) return Boolean(cliValue);
     if (this.bypass) return Boolean(BUILT_IN.json);
-    const perVerb = this.jsonVerb[verb] ?? {};
+    const perVerb = this.jsonVerb[subtableFor(verb)] ?? {};
     if ("enabled" in perVerb) return Boolean(perVerb.enabled);
     if ("enabled" in this.jsonShared) return Boolean(this.jsonShared.enabled);
     throw new FuxError(
@@ -164,17 +188,18 @@ export class OutputDefaults {
     }
     if (cliValue !== null && cliValue !== undefined) return cliValue;
     if (this.bypass) return BUILT_IN[key];
+    const table = subtableFor(verb);
     if (asJson) {
-      const perVerb = this.jsonVerb[verb] ?? {};
+      const perVerb = this.jsonVerb[table] ?? {};
       if (key in perVerb) return perVerb[key];
       if (key in this.jsonShared) return this.jsonShared[key];
     }
-    const perVerb = this.cliVerb[verb] ?? {};
+    const perVerb = this.cliVerb[table] ?? {};
     if (key in perVerb) return perVerb[key];
     if (key in this.cliShared) return this.cliShared[key];
     const where = asJson
-      ? `[cli.json.${verb}], [cli.json], [cli.${verb}] or [cli]`
-      : `[cli.${verb}] or [cli]`;
+      ? `[cli.json.${table}], [cli.json], [cli.${table}] or [cli]`
+      : `[cli.${table}] or [cli]`;
     throw new FuxError(
       `${OUTPUT_NAME} does not set \`${key}\` for \`${verb}\` — add it under ` +
       `${where} (e.g. \`${key} = ${JSON.stringify(BUILT_IN[key])}\`). Run \`fux output\` to ` +

@@ -28,6 +28,7 @@ from pathlib import Path
 from ..config import find_root
 from ..errors import FuxError
 from . import plane as plane_mod
+from . import walk as walk_mod
 from .model import TAG_PREFIX
 from .walk import expand, routes
 
@@ -169,19 +170,84 @@ def cmd_explain(args) -> int:
     return 0
 
 
-def cmd_graph(args) -> int:
-    """The neighbourhood around a query's best answers."""
+def _walk_parameters(args) -> dict:
+    """The three W-160 parameters off `args`, as `expand` wants them.
+
+    **All three resolve to their inert values when the flags are absent**, so
+    `fux graph "<q>"` with no flags walks exactly the walk it walked before
+    they existed — `tests_e2e/test_relational.py` asserts that byte for byte.
+    """
+    raw = getattr(args, "kinds", None)
+    kinds = None
+    if raw:
+        named = [k.strip() for k in raw.split(",") if k.strip()]
+        unknown = sorted(set(named) - set(walk_mod.EDGE_KINDS))
+        if unknown:
+            raise FuxError(
+                f"--kinds names {', '.join(unknown)}, which is not an edge kind. "
+                f"The kinds this index mints are {', '.join(walk_mod.EDGE_KINDS)}"
+            )
+        kinds = frozenset(named)
+    return {
+        "kinds": kinds,
+        "link_idf_on": bool(getattr(args, "link_idf", False)),
+        "max_hops": getattr(args, "max_hops", None),
+    }
+
+
+def _seeds_of(root: Path, args, plane, tune):
+    """`(seed rows, seed ids)` — from `--seed`, or from the query's top-k.
+
+    ⚠ **The query form is DEFINED as `--seed` over `lexical`'s top-k**, which
+    is why this returns both forms through one function: two code paths would
+    be free to disagree about `seed_depth`, about mass order, or about which
+    candidate generator ran, and the equivalence W-160 claims would hold only
+    until somebody touched one of them.
+    """
+    given = getattr(args, "seed", None)
+    if given and args.query:
+        raise FuxError(
+            "pass a query or --seed, not both. `fux graph \"<q>\"` walks from the "
+            "query's best answers; `fux graph --seed <id>` walks from the documents "
+            "you name, in the order you name them"
+        )
+    if given:
+        seeds = [_resolve_doc(root, s) for s in given]
+        for seed in seeds:
+            # Both ends validated before the walk, exactly as `path` does: a
+            # typo'd seed would otherwise walk from nowhere and report an empty
+            # neighbourhood, which reads as *this document is isolated*.
+            _refuse_unknown(root, plane, seed, flag=" (--seed)")
+        # 🔴 **`score` is `null` and `rank` carries the order, and BOTH halves
+        # of that are deliberate.**
+        #
+        # *Why not a score:* a seed named by hand has a rank and not a ranking.
+        # The query form's seed score is a BM25F number a reader can line up
+        # against `ask`'s output; there is no such number here, and printing
+        # the walk's internal `1/(i+1)` mass would put a **third** incomparable
+        # value in a column SR-GRAPH already warns not to compare across roles.
+        #
+        # *Why it matters beyond taste:* the first cut did print the mass, and
+        # seed 0's mass is exactly `1.0` — which `json.dumps` writes as `1.0`
+        # and `JSON.stringify` writes as `1`. **A differential divergence on
+        # the first line of the new output**, from a value no ranking would
+        # ever produce, caught by running both readers rather than by a test.
+        # `null` is `null` in both.
+        rows = [
+            {"path": _loc_of(s), "id": s, "role": "seed", "score": None, "rank": i + 1}
+            for i, s in enumerate(seeds)
+        ]
+        return rows, seeds
+    if not args.query:
+        raise FuxError(
+            "`fux graph` needs a query or at least one --seed. "
+            "`fux graph \"how does ranking work\"` walks from the best answers; "
+            "`fux graph --seed docs/a.md` walks from a document you name"
+        )
     from ..query import run_query
-
-    root = _root()
-    from ..query import _declare_no_accelerator
-
-    _declare_no_accelerator(root)
-    plane = plane_mod.load(root)
 
     # Scan by default, `--fast` opts into the accelerator for the seed query
     # — same choice and same mutually-exclusive `--scan` as `ask` (SR-ASK).
-    tune = _tune_for(root, args)
     results, _ = run_query(
         root,
         args.query,
@@ -189,7 +255,23 @@ def cmd_graph(args) -> int:
         force_scan=not getattr(args, "fast", False),
         tune=tune,
     )
-    seeds = [r.id for r in results]
+    rows = [
+        {"path": _loc_of(r.id), "id": r.id, "role": "seed", "score": r.score}
+        for r in results
+    ]
+    return rows, [r.id for r in results]
+
+
+def cmd_graph(args) -> int:
+    """The neighbourhood around a query's best answers, or around named seeds."""
+    root = _root()
+    from ..query import _declare_no_accelerator
+
+    _declare_no_accelerator(root)
+    plane = plane_mod.load(root)
+
+    tune = _tune_for(root, args)
+    seed_rows, seeds = _seeds_of(root, args, plane, tune)
     # `seed_depth` and `expand_limit` are the two sizes this verb reports, and
     # they are separately tunable because they answer different questions: how
     # much of the ranking to trust as a starting point, and how far the walk
@@ -202,12 +284,10 @@ def cmd_graph(args) -> int:
         damping=tune.damping,
         iterations=tune.iterations,
         laziness=tune.laziness,
+        **_walk_parameters(args),
     )
 
-    nodes = [
-        {"path": _loc_of(r.id), "id": r.id, "role": "seed", "score": r.score}
-        for r in results
-    ] + [
+    nodes = seed_rows + [
         {"path": _loc_of(node), "id": node, "role": "expanded", "score": score}
         for node, score in expanded
     ]
@@ -221,7 +301,10 @@ def cmd_graph(args) -> int:
         return 0
 
     for node in nodes:
-        print(f"{node['score']:.4f}  {node['role']:<8} {node['path']}")
+        # A hand-named seed has no score — its column carries `#rank` instead.
+        # `0.0000` there would be a claim, and the wrong one.
+        cell = f"{node['score']:.4f}" if node["score"] is not None else f"{'#' + str(node['rank']):>6}"
+        print(f"{cell}  {node['role']:<8} {node['path']}")
     return 0
 
 

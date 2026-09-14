@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@b782a6f78582, src/fux/store/nodebundle.py@071a24a596dd]
+owns: [node@cc4f7c57dc73, src/fux/store/nodebundle.py@071a24a596dd]
 laws: [L1, L3, L4, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: b71929d762758e820ca73522f1bcad5eac78f90b77210f9a8b66ce23f4ba1941
+content_sha: 4ab293142e460325d4e8c0194fb1b32cddbd948d7ea6bfff57fc377e734e1413
 ---
 
 # SR-NODE-SEARCH — the Node read plane
@@ -534,6 +534,38 @@ failure message says so, and names the one-line `.yarnrc.yml` change that would
 make shape C available.
 
 ### Consequences
+
+- **`fux lexical` is ONE FUNCTION on this reader, and that is stronger than the
+  test that holds the Python pair equal** (2026-09-14, W-160). `fux.mjs`
+  dispatches `ask` and `lexical` to the same `runAsk`, so the freeze holds by
+  construction here — decision 10's agreement-by-construction device applied to
+  a verb rather than to bytes. Python has two entry points over one body, held
+  equal by `tests_e2e/test_relational.py::test_lexical_is_byte_identical_to_ask`.
+
+  ⚠ **When [W-161](../work/open/W-161-graph-composed-ask.md) gives Python's
+  `ask` a graph tier, this is the case that splits**, and the differential law
+  will then compare a Python `ask` that has one against a Node `ask` that does
+  not. **That divergence is W-161's to declare**, in this record, before it
+  lands — not something for the harness to discover.
+
+- **`graph --seed` and the three walk parameters are on both readers** (W-160),
+  with `--seed` reporting `score: null` and `rank` in both. That last choice was
+  forced by a divergence rather than chosen for taste: the first cut reported
+  the walk's `1/(i+1)` mass, and seed 0's mass is exactly `1.0` — which
+  `json.dumps` writes `1.0` and `JSON.stringify` writes `1`. **`pyRepr` exists
+  in `compat/pyfloat.mjs` for precisely this and had no caller**, because a
+  BM25F score is never an exact integer; the new output was the first value that
+  could be one. `null` is `null` in both, and the number that was diverging was
+  one no reader should have been comparing anyway.
+
+- ⚠ **`link_idf` is the first `log1p` on the query path, and the two readers
+  agree to `round(9)` rather than bit-for-bit.** Measured on this repository
+  with `--link-idf` on: identical node ordering, four scores differing in the
+  last digit or two. **That is decision 1's contract**, and BM25F's own `idf`
+  has always depended on libm `log` in the same way — it simply happened to
+  agree exactly on the corpora anyone compared. Recorded so that when W-161
+  turns the parameter on, a last-digit difference is read as the contract
+  working rather than as a port defect.
 
 - **`fetch_at_answer = false` COLLAPSES decision 4's asymmetry, from Python's
   side** (2026-09-14, W-174). `[sources.url] fetch_at_answer = false` tells

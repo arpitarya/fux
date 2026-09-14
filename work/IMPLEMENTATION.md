@@ -28,6 +28,39 @@ Rules:
 
 
 
+## 2026-09-14 — **W-160 SHIPPED**: the two atoms, and three defects the freeze found
+
+**Shipped in full.** `tests` 4386, `tests_e2e` 133, `node --test` 36.
+
+**`fux lexical`** — BM25F → rerank → RRF, no graph stage, **frozen** to `ask`'s
+output shape. **`fux graph --seed <id>…`** — the walk from documents you name,
+mass by argument order, with the query form now *defined* as `--seed` over the
+query's top-k. **Three walk parameters exposed and inert.** Not a ranking
+change: nothing `ask` returns moves.
+
+| what landed | what it found |
+|---|---|
+| `fux lexical`, from one parser factory shared with `ask` | 🔴 **`lexical` was absent from `output_config.CLI_VERBS`, and the two verbs printed differently from one ranking.** A verb absent from that table has no key resolved at all, so `args.sections` stayed `None`, `getattr(args, "sections", True)` read it as falsy, and `ask` printed `§` heading lines while `lexical` printed none. **Nothing failed**: the file loaded, the query ran, the scores were identical. W-140 row 14's trap through a different door — and comparing only `--json` would still have missed it, because `headings` is in the payload either way |
+| `lexical` reads `[cli.ask]`'s subtable (`VERB_READS`) | ⚠ **The alternative was a breaking change to every existing `output.toml`.** That file is a complete declaration, and `explain` is refused at the shared `[cli]` level by name — so a `[cli.lexical]` subtable would have made every repo that already has the file **exit 1 on a verb they had never run.** Measured, not predicted: it happened here on the first run. The shared-key count is now over SUBTABLES, so the alias does not loosen a validation as a side effect |
+| `graph --seed`, with `score: null` and `rank` | 🔴 **The first cut printed the walk's `1/(i+1)` mass, and seed 0's mass is exactly `1.0` — which `json.dumps` writes `1.0` and `JSON.stringify` writes `1`.** A differential divergence on the first line of the new output, from a value no ranking would ever produce. `pyRepr` exists in `compat/pyfloat.mjs` for exactly this and **had no caller**, because a BM25F score is never an exact integer. `null` is `null` in both — and the number that diverged was one no reader should have been comparing |
+| the minhash-style banding is not the point here, but the same class of error was | 🔴 **`--max-hops 1` was asserted at the CLI and passed nothing**: the relational fixture is shallow enough that everything reachable is already within one hop of a seed. The bound is proved on a graph built to have depth; the e2e test says so rather than quietly dropping the assertion |
+| three exposed walk parameters, inert | Each has **two** tests: the default is a no-op to the float, **and** a non-default value changes something. A knob inert at every setting is dead code wearing a feature's name, and the inertness half alone would pass for it |
+| `link_idf(n) = 1/(1+ln(1+n))` | ⚠ **The first `log1p` on the query path, and the two readers agree to `round(9)` rather than bit-for-bit** — measured here with `--link-idf` on: identical ordering, four scores differing in the last digit. That is SR-NODE-SEARCH decision 1's contract; BM25F's own `idf` has always depended on libm `log` the same way and simply happened to agree exactly |
+| MCP `fux_related` | 🔴 **The item's gap-check row was wrong.** It asked for `fux_related` to be *"re-implemented over `graph --seed` (same output, one code path)"* — and `fux_related` is not a walk: it returns the edges a document states, not a PPR neighbourhood. The output cannot be both. **The row's second half is done**: both readers now lift `Edge`s through `edges_from_records` and read `Graph`'s adjacency, so *what points at this* has one definition instead of a third comprehension |
+| the Node graph plane (DoD 5) | **Already built** — W-107 Phase 3 shipped it, and SR-NODE-SEARCH decision 9 records the asymmetry as a *build requirement*, not an absence. What W-160 added on Node is `lexical` (the same function as `ask`) and `--seed`. The digest arm is **IDENTICAL on this repo, 875 nodes / 5 708 edges** — ⚠ and **trivially identical on golden rung 1 000, which has 0 edges**, so that run proves nothing and is not cited as if it did |
+
+**Records:** SR-CLI (decisions 11–13) · SR-GRAPH (13–15) · SR-NODE-SEARCH ·
+SR-MCP (the corrected row) · SR-ASK (`ask` is now the composed verb) ·
+SR-ANSWER (`answer` does **not** go through the freeze, and why) ·
+SR-CONFIDENCE (`lexical --band` is the same block, and what W-161 owes) ·
+SR-PII (decision 17's *a new verb is gated without anyone remembering*,
+exercised twice and unmoved) · SR-OUTPUT via `output_config`.
+**Tests:** +11 unit (walk inertness) +2 CLI gates +9 e2e.
+**Out of scope and untouched:** anything that changes what `ask` returns —
+that is [W-161](open/W-161-graph-composed-ask.md), which waits on W-156.
+
+---
+
 ## 2026-09-14 — **W-169 SHIPPED**: `fux inspect`, and the check that failed its own rule
 
 **Shipped in full**, both suites green whole (`tests` 4 371, `tests_e2e` 108,

@@ -58,10 +58,19 @@ Three rules that make the ladder safe rather than clever:
 | `fux answer "<q>"` | one cited answer, fetched and re-scored on the source's current bytes | you want the answer, with a freshness verdict |
 | `fux explain <loc>` | the edges out of one document (outbound only) | you are asking what a document depends on |
 | `fux graph "<q>"` | the neighbourhood around a query's best answers | you are orienting in an unfamiliar area |
+| `fux graph --seed <loc>` | the neighbourhood around documents YOU name | you already know the starting point and do not want a query in the way |
 | `fux path <a> <b>` | how two documents connect | you suspect a relationship and want the chain |
+| `fux lexical "<q>"` | the same shape as `ask`, from the words alone | you are comparing against a baseline. **Otherwise use `ask`** |
+| `fux inspect` | what the whole index looks like | you are asked whether the corpus itself is any good |
 
-**Each verb has a deeper skill:** `fux-search` (ask, find), `fux-answer`
-(answer, verify), `fux-graph` (explain, graph, path). See section 7 for the rest.
+**`fux ask` is the default. `fux lexical` is not a better `ask`** - it is the
+frozen BM25F baseline, kept so a ranking comparison has a stable arm. Today the
+two return identical output; reach for `lexical` only when you have been asked
+for a baseline.
+
+**Each verb has a deeper skill:** `fux-search` (ask, find, lexical),
+`fux-answer` (answer, verify), `fux-graph` (explain, graph, path),
+`fux-inspect` (inspect). See section 7 for the rest.
 
 **Prefer `--json` everywhere it is offered.** It gives you `score`, `loc` and
 `archived` as fields rather than as prose you have to parse. **Branch on the

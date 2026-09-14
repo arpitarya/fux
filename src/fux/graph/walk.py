@@ -45,7 +45,10 @@ from dataclasses import dataclass
 from .model import Edge, Graph
 from ..ingest.edges import EXTRACTED_GRADE
 
-__all__ = ["ppr", "expand", "routes", "Route", "DAMPING", "ITERATIONS", "HOP_DECAY", "LAZINESS"]
+__all__ = [
+    "ppr", "expand", "routes", "Route", "link_idf",
+    "DAMPING", "ITERATIONS", "HOP_DECAY", "LAZINESS", "EDGE_KINDS", "ALL_KINDS",
+]
 
 #: Restart probability is `1 - DAMPING`. 0.85 is PageRank's published default
 #: and there is no measurement here that would justify moving it.
@@ -65,6 +68,28 @@ LAZINESS = 0.5
 #: two intermediaries is not "slightly" less trustworthy than a direct link.
 HOP_DECAY = 0.5
 
+#: **The three walk parameters W-161 will turn on for `ask`, exposed here and
+#: INERT at their defaults** (W-160 DoD 4). Each is an argument with a default
+#: that reproduces today's walk byte for byte, and
+#: `tests/graph/test_walk_parameters_are_inert.py` asserts exactly that on a
+#: fixture graph — because a parameter added *with* the change that uses it is
+#: a parameter nobody can prove was inert.
+#:
+#: **Why expose them before using them.** W-161 is a ranking change and waits
+#: on [W-156](../../../work/open/W-156-prevalence-outside-golden.md); the
+#: mechanism it needs is not a ranking change and does not have to wait. What
+#: must not happen is the two landing together, because then *"the walk moved"*
+#: and *"`ask` composes the walk"* become one indivisible diff and no
+#: measurement can attribute a delta to either.
+#:
+#: `ALL_KINDS` is the sentinel for *no selection*, spelled rather than `None`
+#: so a call site reads as a choice.
+ALL_KINDS = None
+
+#: The edge kinds `ingest/edges.py` mints. Re-exported for a caller that wants
+#: to name a subset (`{"ref"}`) without importing two modules.
+EDGE_KINDS = ("ref", "tag", "code", "supersedes")
+
 
 def ppr(
     graph: Graph,
@@ -73,6 +98,9 @@ def ppr(
     damping: float = DAMPING,
     iterations: int = ITERATIONS,
     laziness: float = LAZINESS,
+    kinds: frozenset[str] | None = ALL_KINDS,
+    link_idf_on: bool = False,
+    max_hops: int | None = None,
 ) -> dict[str, float]:
     """Personalized PageRank, lite — power iteration over the seed neighbourhood.
 
@@ -85,15 +113,39 @@ def ppr(
     forced it. Without laziness this function, at three iterations, ranks a
     three-hop node above a two-hop one.
 
-    The three parameters are `[graph]`'s, defaulting to the constants above, so
-    an unconfigured repo walks exactly the walk this module documents. **They
-    are arguments rather than module reads on purpose**: the parity artefact in
-    the docstring is a joint property of `iterations` and `laziness`, and a
-    caller that can set one without the other would be able to reintroduce it
-    silently. Passed together, a reader of one call site sees both.
+    The three tuning parameters are `[graph]`'s, defaulting to the constants
+    above, so an unconfigured repo walks exactly the walk this module
+    documents. **They are arguments rather than module reads on purpose**: the
+    parity artefact in the docstring is a joint property of `iterations` and
+    `laziness`, and a caller that can set one without the other would be able
+    to reintroduce it silently. Passed together, a reader of one call site sees
+    both.
+
+    ## The three W-160 parameters, and why each defaults to inert
+
+    - **`kinds`** — walk only these edge kinds. `ALL_KINDS` (the default) walks
+      every one, which is today's behaviour. `frozenset({"ref"})` is the case
+      W-161 wants: *follow what the document linked to, not what it was tagged
+      with*, because a tag is a hub that pulls unrelated documents together.
+    - **`link_idf_on`** — divide an edge's weight by the log of its target's
+      **in-degree**, so an edge into `CLAUDE.md` (180 inbound here) carries
+      less than an edge into a document two others cite. `False` by default.
+      **This is the parameter most likely to move a ranking**, which is exactly
+      why it ships off and measured by nobody yet.
+    - **`max_hops`** — refuse mass to a node further than `n` hops from any
+      seed. `None` (the default) bounds nothing beyond what `iterations`
+      already does, and `iterations = 3` already limits reach to three hops, so
+      any `max_hops >= iterations` is also inert. Distinct from `iterations`
+      because *how long the chain runs* and *how far it may reach* are
+      different questions, and the second is the one an `ask` tier needs.
+
+    ⚠ **All three are inert at their defaults, and that is a TEST, not a
+    claim** — `tests/graph/test_walk_parameters_are_inert.py`.
     """
     if not seeds or not graph.edges:
         return {}
+    hop_of = _hops_from_seeds(graph, seeds, max_hops) if max_hops is not None else None
+    inbound = _in_degree(graph) if link_idf_on else None
 
     seed_mass = {doc: 1.0 / (i + 1) for i, doc in enumerate(seeds)}
     total = sum(seed_mass.values())
@@ -107,7 +159,11 @@ def ppr(
             # Laziness: part of the mass stays where it is. This is the whole
             # of the correction over the archived walk.
             nxt[node] = nxt.get(node, 0.0) + damping * laziness * mass
-            neighbours = graph.neighbours(node)
+            neighbours = _neighbours(graph, node, kinds)
+            if hop_of is not None:
+                neighbours = [(n, g) for n, g in neighbours if n in hop_of]
+            if inbound is not None:
+                neighbours = [(n, g * link_idf(inbound.get(n, 0))) for n, g in neighbours]
             out_weight = sum(grade for _, grade in neighbours)
             if not out_weight:
                 continue
@@ -129,6 +185,9 @@ def expand(
     damping: float = DAMPING,
     iterations: int = ITERATIONS,
     laziness: float = LAZINESS,
+    kinds: frozenset[str] | None = ALL_KINDS,
+    link_idf_on: bool = False,
+    max_hops: int | None = None,
 ) -> list[tuple[str, float]]:
     """Top non-seed nodes by PPR score. Ties break on id, as everywhere.
 
@@ -137,7 +196,16 @@ def expand(
     the two would leave a caller unable to say which one it had configured.
     """
     seed_set = set(seeds)
-    walked = ppr(graph, seeds, damping=damping, iterations=iterations, laziness=laziness)
+    walked = ppr(
+        graph,
+        seeds,
+        damping=damping,
+        iterations=iterations,
+        laziness=laziness,
+        kinds=kinds,
+        link_idf_on=link_idf_on,
+        max_hops=max_hops,
+    )
     ranked = [
         (node, score)
         for node, score in walked.items()
@@ -145,6 +213,80 @@ def expand(
     ]
     ranked.sort(key=lambda kv: (-kv[1], kv[0]))
     return ranked[:limit]
+
+
+def _neighbours(graph: Graph, node: str, kinds: frozenset[str] | None):
+    """`graph.neighbours(node)`, optionally narrowed to some edge kinds.
+
+    ⚠ **`ALL_KINDS` returns `graph.neighbours` UNTOUCHED, not a filtered copy
+    that happens to keep everything.** `neighbours` is pre-sorted and the walk
+    accumulates floats over it in that order; rebuilding the list would be
+    equal today and is one refactor away from not being, and float
+    accumulation order is the difference between deterministic and almost.
+    """
+    neighbours = graph.neighbours(node)
+    if kinds is ALL_KINDS:
+        return neighbours
+    keep = {edge.dst for edge in graph.out_edges(node) if edge.kind in kinds}
+    keep |= {
+        edge.src
+        for edge in graph.edges
+        if edge.dst == node and edge.kind in kinds
+    }
+    return [(n, g) for n, g in neighbours if n in keep]
+
+
+def _in_degree(graph: Graph) -> dict[str, int]:
+    """How many edges point AT each node. The input to `link_idf`."""
+    counts: dict[str, int] = {}
+    for edge in graph.edges:
+        counts[edge.dst] = counts.get(edge.dst, 0) + 1
+    return counts
+
+
+def link_idf(in_degree: int) -> float:
+    """An inbound edge's discount, by how many other documents point at it.
+
+    `1 / (1 + ln(1 + in_degree))`. A node nothing points at is `1.0`; a node
+    with 180 inbound edges — `CLAUDE.md` on this repository — is about `0.16`.
+
+    **Named after IDF because it is the same idea**: a link that everybody
+    makes carries little information about the document it comes from, exactly
+    as a term on every document carries little about the document that holds
+    it. It is deliberately **not** `1/in_degree`, which would make a hub
+    weightless and turn *widely cited* into *ignored*; the log keeps a hub in
+    the walk while stopping it from dominating it.
+
+    ⚠ **Nothing measures this yet**, which is why `link_idf_on` defaults to
+    `False`. W-161 is the item that has to measure it, on the evidence rule
+    W-156 settles.
+    """
+    import math
+
+    return 1.0 / (1.0 + math.log1p(max(in_degree, 0)))
+
+
+def _hops_from_seeds(graph: Graph, seeds: list[str], max_hops: int) -> set[str]:
+    """Every node within `max_hops` undirected steps of a seed, seeds included.
+
+    Breadth-first over `neighbours`, which is the same adjacency the walk uses
+    — a reachability bound computed over `out_edges` would exclude a node the
+    walk can still reach backwards, and the two would disagree about what
+    *within n hops* means.
+    """
+    frontier = set(seeds)
+    seen = set(seeds)
+    for _ in range(max(max_hops, 0)):
+        nxt: set[str] = set()
+        for node in sorted(frontier):
+            for neighbour, _grade in graph.neighbours(node):
+                if neighbour not in seen:
+                    seen.add(neighbour)
+                    nxt.add(neighbour)
+        if not nxt:
+            break
+        frontier = nxt
+    return seen
 
 
 @dataclass(frozen=True)

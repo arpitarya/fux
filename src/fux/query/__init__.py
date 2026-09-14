@@ -62,7 +62,10 @@ from .scan import ask as scan_ask
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from ..tune import Tune
 
-__all__ = ["AskResult", "cmd_answer", "cmd_ask", "cmd_find", "cmd_verify", "run_query"]
+__all__ = [
+    "AskResult", "cmd_answer", "cmd_ask", "cmd_find", "cmd_lexical",
+    "cmd_verify", "run_query",
+]
 
 
 def _tune(root: Path, *, enabled: bool = True) -> "Tune":
@@ -639,7 +642,42 @@ def _run_fused(root, args, top, *, tune, confidence_out, trace_out=None):
     return fuse_results(arms, top), path, True
 
 
+def cmd_lexical(args) -> int:
+    """**`fux lexical` — the lexical core, named and frozen** (W-160 atom 1).
+
+    BM25F over the committed index, then the proximity reranker, then RRF over
+    any `-q` phrasings. **No graph stage, ever.** `ask --scan` already computes
+    exactly this; what this verb adds is a *contract*, and the contract is
+    worth a verb for two reasons:
+
+    - **It is the baseline arm.** Every ranking verdict compares something
+      against *the words alone*, and until now that arm was spelled
+      `ask --scan` — which stops being the words alone the moment `ask` gains a
+      stage. [W-161](../../../work/open/W-161-graph-composed-ask.md) gives
+      `ask` a graph tier; after that, `ask --scan` is not a lexical baseline
+      and nothing would have said so.
+    - **It is the differential law's stable arm.** Python and Node are held
+      byte-equal on it, so a divergence in the lexical core cannot hide behind
+      a change to composition.
+
+    ⚠ **Frozen means frozen.** A future component added to the lexical core is
+    a **new verb or a tunable** — never a change to this one
+    ([SR-CLI](../../../records/0101_cli-surface.md) decision 12). Today it is
+    `cmd_ask`'s body verbatim, and
+    `tests_e2e/test_relational.py::test_lexical_is_byte_identical_to_ask`
+    holds them equal *until W-161 deliberately parts them*, at which point that
+    test inverts and this verb does not move.
+    """
+    return _ask_shaped(args)
+
+
 def cmd_ask(args) -> int:
+    """The ranked answer. Today, `lexical` exactly; W-161 composes a graph tier
+    on top of it and this is the function that changes."""
+    return _ask_shaped(args)
+
+
+def _ask_shaped(args) -> int:
     root = _root()
     tune = _tune_for(root, args)
     signals: dict = {}

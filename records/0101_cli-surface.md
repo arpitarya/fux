@@ -7,10 +7,10 @@ description: Flat verbs in seven groups, one error boundary, three output modes.
 status: accepted
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@dfd9bc75aa38, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@e15fc07dcf7e, src/fux/progress.py@925dccc045ce]
+owns: [src/fux/cli.py@20870a22946c, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@e15fc07dcf7e, src/fux/progress.py@925dccc045ce]
 laws: [L1, L4, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 8e95f6564beb45a676eccf90c9232b8f35c8149a60df68c51b567a13615a5ab6
+content_sha: 14b5a95fd68d69b66e715f1f1e515959a95881945bd650b9ac737ebc57d7d679
 ---
 
 # SR-CLI — the command-line surface
@@ -24,7 +24,7 @@ content_sha: 8e95f6564beb45a676eccf90c9232b8f35c8149a60df68c51b567a13615a5ab6
 | **lifecycle** | `setup` · `doctor` · `inspect` | set the repo up, check the environment, then X-ray the index — `doctor`'s fix is a command or a config edit, `inspect`'s is a change to the corpus ([SR-INSPECT](0156_inspect.md)) |
 | **write** | `ingest` · `build` | one writes the committed plane, one derives from it |
 | **sources** | `add` · `remove` · `update` · `enrich` | maintain what is indexed — `add` and `remove` write lines, `update` never touches one, `enrich` writes no committed byte at all |
-| **read** | `ask` · `find` · `answer` | differ only in how much they commit to |
+| **read** | `ask` · `find` · `answer` · `lexical` | differ only in how much they commit to. `lexical` is the words alone, **frozen** — decision 12 |
 | **graph** | `explain` · `graph` · `path` | answer with **relationships**, never with a ranking |
 | **serve** | `mcp` · `daemon` | long-running processes; the only verbs that do not return |
 | **maintenance** | `hooks` · `tune` · `output` · `verify` | wire the repository to keep its own index in step, print the tunables and the output defaults, and re-run a provenance receipt against this tree |
@@ -351,6 +351,68 @@ scope is calls rather than literals** because `store/canonical.py` and
 `ingest/urlsrc.py` hold U+2028/U+2029/U+0085 as the sentinels they *strip*, and
 a guard that flags the code defending against a character is one people learn
 to switch off.
+
+**11. `fux inspect` is a verb, not a flag on `doctor`.** Stated once in
+[SR-INSPECT](0156_inspect.md) decision 1; the boundary is the remedy, not the
+subject — `doctor`'s finding is fixed by a command or a config edit and
+`inspect`'s by a change to the corpus.
+
+**12. 🔴 `fux lexical` and `fux ask` are TWO VERBS OVER ONE BODY, and `lexical`
+is FROZEN.** (W-160.)
+
+`ask --scan` already computed BM25F alone. What this adds is a **contract**:
+
+- **`lexical` is BM25F → rerank → RRF over `-q`. No graph stage, ever.**
+- **A future component added to the lexical core is a NEW VERB or a TUNABLE,
+  never a change to this one.** That sentence is the whole decision; everything
+  else here is what makes it hold.
+- **It exists because [W-161](../work/open/W-161-graph-composed-ask.md) gives
+  `ask` a graph tier.** After that, `ask --scan` is no longer *the words alone*
+  — and nothing would have said so. Every ranking verdict needs a baseline arm
+  that cannot quietly acquire a stage.
+
+⚠ **Two things make the freeze real rather than asserted, and both were found
+by running it rather than by reasoning about it.**
+
+1. **One parser factory, not two flag blocks.** `_ask_shaped_parser` builds both
+   verbs' surface, so a flag added to `ask` reaches `lexical` by construction.
+   Two hand-kept copies would drift the moment one gained a flag, and the drift
+   would be invisible — both parsers would work.
+2. 🔴 **`lexical` must appear in `output_config.CLI_VERBS`, and omitting it made
+   the two verbs print differently from one ranking.** A verb absent from that
+   table has **no key resolved at all**, so `args.sections` stayed `None`,
+   `getattr(args, "sections", True)` read it as falsy, and `ask` printed `§`
+   heading lines while `lexical` printed none. Nothing failed: the file loaded,
+   the query ran, the scores were identical. It is
+   [SR-OUTPUT](0143_output-defaults.md)'s W-140 row 14 trap — *an absent entry
+   never resolves `--json`* — arriving through a different door.
+   **And `lexical` reads `[cli.ask]`'s subtable** (`VERB_READS`), because a
+   subtable of its own would let a consumer's committed file make the two verbs
+   differ, and would have made every repo that already has an `output.toml`
+   exit 1 on a verb they had never run.
+
+**The gate is `tests_e2e/test_relational.py::test_lexical_is_byte_identical_to_ask`,
+and it compares TEXT and `--json`** — comparing only `--json` would have missed
+the `§` defect, because `headings` is in the payload either way.
+
+**13. `fux graph` takes a query OR `--seed`, and the query form is DEFINED as
+the seed form over the query's top-k.** (W-160.) Mass follows **argument
+order**, the same rank-mass rule the query form applies to top-k.
+
+⚠ **Not an argparse mutually-exclusive group, because one of the two is
+required and argparse cannot say both** — such a group refuses a positional. The
+check lives in `cmd_graph`, where it can name which of the two mistakes was
+made, and both mistakes have their own test.
+
+⚠ **A hand-named seed reports `score: null` and `rank: n`, not a score.** The
+query form's seed score is a BM25F number a reader can line up against `ask`'s
+output; there is none here. Printing the walk's internal `1/(i+1)` mass would
+put a **third** incomparable value in a column SR-GRAPH already warns not to
+compare across roles — and it diverged: seed 0's mass is exactly `1.0`, which
+`json.dumps` writes `1.0` and `JSON.stringify` writes `1`. **A differential
+divergence on the first line of the new output, from a value no ranking would
+ever produce**, caught by running both readers rather than by a test. `null` is
+`null` in both.
 
 **10a. And the stream itself is UTF-8, on every platform** (amended
 2026-09-13, found by the Windows e2e suite's first run).

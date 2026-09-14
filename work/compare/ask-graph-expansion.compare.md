@@ -21,10 +21,12 @@ and present those."* **Owning records today:** [SR-ASK](../../records/0103_ask.m
 (the verb), [SR-GRAPH](../../records/0126_graph.md) (the plane, the walk, and
 the standing rule that `ask` does not read it), [SR-EXPAND](../../records/0149_expand.md)
 (the refusal: a document matching only supplied terms is never returned),
-[SR-NODE-SEARCH](../../records/0153_node-search.md) (Node has no graph plane).
+[SR-NODE-SEARCH](../../records/0153_node-search.md) — ⚠ **which this doc described as *Node has no graph plane*, and that was already false when it was written**: W-107 Phase 3 built it, and decision 9 records the asymmetry as a *build requirement* (Python needs `fux build`, Node does not) rather than an absence. Corrected 2026-09-14 with W-160.
 
-**Items:** [W-160](../open/W-160-lexical-and-graph-atoms.md) (the atoms and the
-Node plane — buildable now) · [W-161](../open/W-161-graph-composed-ask.md) (the
+**Items:** **W-160** — the atoms, **shipped 2026-09-14**; see
+[SR-CLI](../../records/0101_cli-surface.md) decisions 12–13 and
+[SR-GRAPH](../../records/0126_graph.md) decisions 13–15 (the atoms and the
+Node plane, already built) · [W-161](../open/W-161-graph-composed-ask.md) (the
 composed `ask`, a ranking change — waits on W-156).
 
 ---

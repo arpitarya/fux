@@ -188,3 +188,146 @@ def test_explain_refuses_a_tag_that_does_not_exist(linked):
     result = _run_failing(linked, "explain", "tag:definitely-not-a-tag")
     assert result.returncode == 1
     assert "is not a tag in this index" in result.stderr
+
+
+# -- W-160: the two atoms ----------------------------------------------------
+
+
+def test_lexical_is_byte_identical_to_ask(linked):
+    """🔴 **The freeze, and the one test W-161 must deliberately INVERT.**
+
+    `fux lexical` is `ask`'s body today. It exists so that when `ask` grows a
+    graph tier there is still a verb whose answer is *only* what the words say
+    — and the value of that is destroyed if `lexical` drifts in the meantime.
+
+    ⚠ **Text AND `--json`, not just one.** The first time `lexical` ran, the
+    two agreed on every score and differed in their output: `lexical` was
+    absent from `output_config.CLI_VERBS`, so `args.sections` never resolved,
+    and `ask` printed `§` heading lines while `lexical` printed none. Nothing
+    failed — the file loaded, the query ran, the ranking was right. Comparing
+    only `--json` would still have missed it, because `headings` is in the
+    payload either way.
+    """
+    for query in ("storage engine selection", "rollback", "catering"):
+        for extra in ((), ("--json",), ("--top", "3"), ("--band",), ("--why",)):
+            ask = _run(linked, "ask", query, *extra).stdout
+            lexical = _run(linked, "lexical", query, *extra).stdout
+            assert lexical == ask, (query, extra)
+
+
+def test_lexical_and_ask_agree_on_the_accelerator_path_too(linked):
+    """`--fast` and `--scan` are asserted byte-identical for `ask`; the frozen
+    verb has to inherit that rather than only matching on the default path."""
+    _run(linked, "build")
+    for flag in ("--fast", "--scan"):
+        assert (
+            _run(linked, "lexical", "rollback", "--json", flag).stdout
+            == _run(linked, "ask", "rollback", "--json", flag).stdout
+        )
+
+
+def test_graph_query_equals_graph_over_lexical_seeds(linked):
+    """**`graph "<q>"` is DEFINED as `--seed` over `lexical`'s top-k** (W-160
+    DoD 3), and this asserts it rather than assuming it.
+
+    ⚠ **The seed SCORES are deliberately not compared, and the report says
+    which column is which.** The query form reports each seed's BM25F score;
+    the `--seed` form reports the mass `walk.ppr` will give it, `1/(i+1)`,
+    because a document named by hand has a rank and not a ranking. What must
+    agree is the seed ids **in order** — the mass follows argument order — and
+    every expanded node, score included, because that is the walk's own output.
+    """
+    _run(linked, "build")
+    tune = json.loads(_run(linked, "graph", "rollback", "--json").stdout)
+    seeds = [n["id"] for n in tune["nodes"] if n["role"] == "seed"]
+    assert len(seeds) > 1, tune["nodes"]
+
+    seeded = json.loads(
+        _run(linked, "graph", *[a for s in seeds for a in ("--seed", s)], "--json").stdout
+    )
+    assert [n["id"] for n in seeded["nodes"] if n["role"] == "seed"] == seeds
+    assert [n for n in seeded["nodes"] if n["role"] == "expanded"] == [
+        n for n in tune["nodes"] if n["role"] == "expanded"
+    ]
+
+
+def test_the_seed_form_follows_argument_order(linked):
+    """Mass by argument order is the contract; reversing the seeds must move the
+    walk, or the order is decorative."""
+    _run(linked, "build")
+    first = _run(linked, "graph", "--seed", "docs/adr-storage.md", "--seed", "docs/runbook-rollback.md", "--json").stdout
+    second = _run(linked, "graph", "--seed", "docs/runbook-rollback.md", "--seed", "docs/adr-storage.md", "--json").stdout
+    assert first != second
+
+
+def test_the_exposed_walk_parameters_are_inert_at_their_defaults(linked):
+    """W-160 DoD 4, through the real CLI.
+
+    The unit test proves inertness in `walk.ppr`; this proves the CLI resolves
+    an absent flag to the inert value rather than to something that merely
+    looks like it. Both halves are needed: a flag defaulting to `""` instead of
+    `None` would pass the unit test and fail here.
+    """
+    _run(linked, "build")
+    baseline = _run(linked, "graph", "rollback", "--json").stdout
+    # Naming every kind must equal naming none — otherwise the filter is doing
+    # something beyond filtering, and the likeliest something is reordering the
+    # adjacency, which changes float accumulation and therefore the scores.
+    assert (
+        _run(linked, "graph", "rollback", "--json", "--kinds", "ref,tag,code,supersedes").stdout
+        == baseline
+    )
+    # `iterations = 3` already bounds reach at three hops, so any bound at or
+    # above it re-states what the walk does.
+    assert _run(linked, "graph", "rollback", "--json", "--max-hops", "99").stdout == baseline
+
+
+def test_a_walk_parameter_that_is_set_actually_changes_the_walk(linked):
+    """The other half: a knob inert at every setting is dead code with a name.
+
+    ⚠ **`--max-hops 1` is NOT asserted here, and the reason is the corpus.**
+    This fixture is 8 documents deep-ish and `seed_depth` is 5, so everything
+    the walk reaches is already within one hop of some seed and a bound of 1
+    cuts nothing — measured, not assumed: the first version of this test
+    asserted it and got two identical payloads. The bound is proved on a graph
+    built to have depth, in
+    `tests/graph/test_walk_parameters_are_inert.py::test_max_hops_cuts_the_far_node_when_tight`.
+    Asserting it here instead would have tied a real parameter's proof to a
+    fixture that cannot exercise it.
+    """
+    _run(linked, "build")
+    baseline = _run(linked, "graph", "rollback", "--json").stdout
+    assert _run(linked, "graph", "rollback", "--json", "--link-idf").stdout != baseline
+    # `ref` only drops the `tag:` nodes the default walk reaches.
+    refs_only = _run(linked, "graph", "rollback", "--json", "--kinds", "ref").stdout
+    assert refs_only != baseline
+    assert "tag:" in baseline and "tag:" not in json.dumps(
+        [n for n in json.loads(refs_only)["nodes"] if n["role"] == "expanded"]
+    )
+
+
+def test_graph_refuses_a_query_and_a_seed_together(linked):
+    result = _run_failing(linked, "graph", "rollback", "--seed", "docs/adr-storage.md")
+    assert result.returncode == 1
+    assert "not both" in result.stderr
+
+
+def test_graph_refuses_neither_a_query_nor_a_seed(linked):
+    result = _run_failing(linked, "graph")
+    assert result.returncode == 1
+    assert "--seed" in result.stderr
+
+
+def test_graph_refuses_a_seed_that_is_not_in_the_index(linked):
+    """Same *three states, not two* rule `path` was fixed for in W-140 row 12:
+    a typo'd seed would otherwise walk from nowhere and report an empty
+    neighbourhood, which reads as *this document is isolated*."""
+    result = _run_failing(linked, "graph", "--seed", "docs/does-not-exist.md")
+    assert result.returncode == 1
+    assert "not in the index" in result.stderr
+
+
+def test_kinds_refuses_a_kind_that_does_not_exist(linked):
+    result = _run_failing(linked, "graph", "rollback", "--kinds", "reference")
+    assert result.returncode == 1
+    assert "not an edge kind" in result.stderr

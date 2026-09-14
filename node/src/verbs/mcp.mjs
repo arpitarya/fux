@@ -25,8 +25,9 @@ import { runQuery } from "../query/run.mjs";
 import { headingsFor } from "../query/headings.mjs";
 import { iterShardPaths, rawRecordLines } from "../store/reader.mjs";
 import { contentSha } from "../store/format.mjs";
-import { pyRound } from "../compat/pyfloat.mjs";
+import { cmpCodePoints, pyRound } from "../compat/pyfloat.mjs";
 import { loadOutput } from "../config/output.mjs";
+import { Graph, edgesFromRecords } from "../graph/model.mjs";
 import { FuxError } from "../errors.mjs";
 
 export const PROTOCOL_VERSION = "2024-11-05";
@@ -187,6 +188,19 @@ function fuxPassage(root, args) {
   };
 }
 
+/** One document's edges, both directions.
+ *
+ * 🔴 **Not a seeded walk**, though W-160's gap-check row asked for it to be
+ * *"re-implemented over `graph --seed` (same output, one code path)"*. A PPR
+ * neighbourhood returns ranked nodes the document never mentioned; this
+ * returns the edges the document states. The output cannot be both.
+ *
+ * **The row's second half stands and is done here**: the inbound scan lifts
+ * `Edge`s through `edgesFromRecords` and reads `Graph`'s own adjacency, so
+ * *what points at this* has ONE definition rather than a third comprehension
+ * beside the plane and the verbs. Twin of `mcp.py::_related`; built in memory,
+ * never from `.fux/runtime/graph.json`, because MCP answers in a clone with no
+ * build. */
 function fuxRelated(root, args) {
   const rel = args.path ?? "";
   const docId = rel.startsWith("file:") || rel.startsWith("url:") ? rel : `file:${rel}`;
@@ -194,14 +208,12 @@ function fuxRelated(root, args) {
   const record = records.get(docId);
   if (record === undefined) throw new FuxError(`'${rel}' is not in the index`);
 
-  const inbound = [];
-  for (const other of records.values()) {
-    for (const edge of other.edges ?? []) {
-      if (edge.dst === docId) inbound.push({ path: other.loc, kind: edge.kind });
-    }
-  }
+  const graph = new Graph(edgesFromRecords([...records.values()]));
+  const inbound = graph.edges
+    .filter((e) => e.dst === docId && records.has(e.src))
+    .map((e) => ({ path: records.get(e.src).loc, kind: e.kind }));
   inbound.sort((a, b) => (a.kind < b.kind ? -1 : a.kind > b.kind ? 1
-    : a.path < b.path ? -1 : a.path > b.path ? 1 : 0));
+    : cmpCodePoints(a.path, b.path)));
   return {
     path: record.loc,
     title: record.title ?? "",

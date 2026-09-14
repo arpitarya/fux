@@ -91,6 +91,12 @@ function parseArgs(argv) {
     else if (a === "--no-refer") out.noRefer = true;
     else if (a === "--audit") out.audit = true;
     else if (a === "--hops") out.hops = parseInt(argv[++i], 10);
+    // W-160's second atom. Repeatable, and ARGUMENT ORDER is the mass order —
+    // the same rank-mass rule the query form applies to top-k.
+    else if (a === "--seed") (out.seed ||= []).push(argv[++i]);
+    else if (a === "--kinds") out.kinds = argv[++i];
+    else if (a === "--link-idf") out.linkIdf = true;
+    else if (a === "--max-hops") out.maxHops = parseInt(argv[++i], 10);
     else if (a.startsWith("--")) { out.unknown = a; }
     else out._.push(a);
   }
@@ -111,7 +117,8 @@ function main(argv) {
     process.stdout.write(
       `fux ${VERSION} (node ${process.versions.node}) — the read plane\n\n` +
       `  fux find <query> [--json] [--top N] [--under DIR] [--phrase P] [--all]\n` +
-      `  fux ask|answer|explain|graph|path|mcp      (Phases 2-3)\n\n` +
+      `  fux ask|lexical|answer|explain|graph|path|mcp      (Phases 2-3)\n` +
+      `  fux graph --seed <id> [--seed <id>...]     walk from documents you name\n\n` +
       `Reads an index Python wrote. It never writes and never fetches.\n`,
     );
     return verb ? 0 : 1;
@@ -157,6 +164,13 @@ function main(argv) {
       case "find":
         return runFind(root, args);
       case "ask":
+        return runAsk(root, args);
+      // **W-160's first atom, and on this reader it is the same handler.**
+      // `fux lexical` is frozen byte-identical to `ask` (SR-CLI decision 12),
+      // and on Node that is true BY CONSTRUCTION rather than by test: there is
+      // one function. When W-161 gives Python's `ask` a graph tier, this is
+      // the case that splits, and the differential law is what will say so.
+      case "lexical":
         return runAsk(root, args);
       case "answer":
         return runAnswer(root, args);

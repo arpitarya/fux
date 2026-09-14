@@ -11,7 +11,7 @@ feature: the confidence plane
 owns: [src/fux/query/confidence.py@664d92120a9b, tests/test_confidence_floor_off.py@f8e18c079a6e]
 laws: [L1, L3, L4]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 36713ae9fdceff216abfaf4c94f4a2146d2fa1d469f6f4f12ab53abd7aa6a46f
+content_sha: 5497201a530efe83741360fd1a7a11067962ac403345d873c618504c7eac1a18
 ---
 
 # SR-CONFIDENCE — how much the index believes its own answer
@@ -584,6 +584,20 @@ functions including `cmd_ask` and `run_query`, so a short list would switch the
 gate off silently — worse than the line you are reading.
 
 ### Consequences
+
+- **`fux lexical --band` emits the same block as `fux ask --band`**
+  (2026-09-14, W-160), because it is the same body and the band is built from
+  the final result list. Asserted rather than assumed: the freeze test compares
+  `--band` output among the flag combinations it walks.
+
+  ⚠ **After [W-161](../work/open/W-161-graph-composed-ask.md) the two will
+  legitimately differ**, and the difference will be informative rather than a
+  defect: the band describes *the answer the reader was shown*, so a graph-lifted
+  document has to be able to move it. **What must not happen is a document
+  lifted by the graph tier raising its own band** — the same guard decision 4
+  already states for expansion terms, which `_fill_confidence` enforces by
+  receiving the original query and never the expansion. W-161 owes the graph
+  half of that guard.
 
 - **The "stderr, never stdout" family gained a third member on 2026-09-14**
   (W-165 fix 2). `_declare_confidence` and `_declare_archived` have always

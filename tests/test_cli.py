@@ -129,7 +129,48 @@ def test_parser_has_the_verb_surface():
         # checks the ENVIRONMENT, whose fix is a command or a config edit, and
         # `inspect` checks the INDEX, whose fix is a change to the corpus.
         "inspect",
+        # SR-CLI decision 12 (W-160). The lexical core, named and FROZEN.
+        # `ask --scan` already computed it; the verb makes it a contract, so
+        # that when W-161 gives `ask` a graph tier there is still a verb whose
+        # answer is only what the words say.
+        "lexical",
     }
+
+
+def test_lexical_takes_exactly_the_flags_ask_takes():
+    """SR-CLI decision 12's freeze, at the parser.
+
+    ⚠ **A flag `lexical` does not accept is a freeze that has already broken**
+    — `lexical` claims to be `ask`'s output shape, and a caller that can pass
+    `--why` to one and not the other has two verbs, not one body. Held by
+    construction (`_ask_shaped_parser` builds both) and asserted here, because
+    *by construction* is one refactor from *by accident*.
+    """
+    parser = build_parser()
+    (command,) = [a for a in parser._subparsers._group_actions if a.dest == "command"]
+
+    def flags(name: str) -> set[str]:
+        return {
+            option
+            for action in command.choices[name]._actions
+            for option in action.option_strings
+        }
+
+    assert flags("lexical") == flags("ask"), sorted(flags("lexical") ^ flags("ask"))
+    # And the positional, which `option_strings` does not cover.
+    positionals = lambda n: [a.dest for a in command.choices[n]._actions if not a.option_strings]
+    assert positionals("lexical") == positionals("ask") == ["query"]
+
+
+def test_graph_takes_a_query_or_seeds_and_argparse_enforces_neither():
+    """SR-CLI decision 13: the *one of the two is required* check is NOT in
+    argparse, deliberately — a mutually-exclusive group with `required=True`
+    refuses a positional. So the parser must accept both-absent and
+    both-present, and `cmd_graph` is what refuses them by name."""
+    parser = build_parser()
+    for argv in (["graph"], ["graph", "q", "--seed", "a.md"]):
+        args = parser.parse_args(argv)  # must not raise
+        assert args.command == "graph"
 
 
 def test_no_verb_grows_a_subcommand_tree():

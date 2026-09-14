@@ -76,6 +76,34 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Added
 
+- **`fux lexical` — the lexical core, named and frozen.** BM25F, then the
+  proximity reranker, then RRF over any `-q` phrasings. **No graph stage,
+  ever.** It takes every flag `ask` takes and returns `ask`'s exact output
+  shape — **byte-identical today**, and held so by a test.
+  - **It is not a better `ask` and not a faster one.** It is the baseline arm
+    every ranking verdict needs, kept separate because `ask --scan` stops
+    meaning *the words alone* the moment `ask` grows a stage.
+  - **Frozen by contract:** a future component added to the lexical core
+    becomes a new verb or a tunable, never a change to this one.
+  - On the Node reader it is the **same function** as `ask`, so the freeze
+    holds there by construction.
+    [SR-CLI](records/0101_cli-surface.md) decision 12.
+- **`fux graph --seed <id> [--seed <id>…]`** — the walk from documents you
+  name, with no query in the way. Mass follows **argument order**, and
+  `fux graph "<q>"` is now *defined* as `--seed` over the query's top-k, with a
+  test asserting the two agree.
+  - ⚠ **A hand-named seed reports `"score": null` and `"rank": n`.** There is
+    no ranking behind it; the query form's seeds still carry their BM25F score.
+  - A query and `--seed` together are refused, and so is neither; a seed that
+    is not in the index is refused by name rather than walking from nowhere.
+    [SR-GRAPH](records/0126_graph.md) decision 13.
+- **Three graph-walk flags, `--kinds`, `--link-idf` and `--max-hops`, all OFF
+  by default and inert at their defaults.** They exist so the mechanism the
+  graph-composed `ask` needs can be driven and measured *before* `ask`
+  composes it — landing both together would make one diff nobody could
+  attribute a delta to. 🔴 **No measurement supports any setting of them yet.**
+  [SR-GRAPH](records/0126_graph.md) decisions 14–15.
+
 - **`fux inspect` — the index X-ray.** Six lenses over the committed index, all
   read-only: **boilerplate** (which words are on every document, with `df`, IDF,
   the Zipf slope and Heaps β), **findability** (documents no query can reach),

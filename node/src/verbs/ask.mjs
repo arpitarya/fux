@@ -1,6 +1,18 @@
 /** `fux ask` — a ranked list with scores, which is what you want when you are
  *  judging the engine. A projection of `runQuery`, never a second strategy.
  *  Twin of `src/fux/query/__init__.py`'s `ask` half (R4's one-to-many).
+ *
+ * 🔴 **This is also `fux lexical`'s handler, and on this reader that is one
+ * FUNCTION rather than one test.** `fux lexical` is BM25F alone, frozen
+ * byte-identical to `ask` (W-160, SR-CLI decision 12). On the Python side the
+ * two are separate entry points held equal by
+ * `tests_e2e/test_relational.py::test_lexical_is_byte_identical_to_ask`; here
+ * `fux.mjs` dispatches both cases to `runAsk`, so they agree by construction.
+ *
+ * ⚠ **When W-161 gives Python's `ask` a graph tier, this is the case that
+ * splits** — and until it does, the differential law compares a Python `ask`
+ * that has one against a Node `ask` that does not. That divergence is W-161's
+ * to declare, not this file's to pre-empt.
  */
 import { runFused } from "../query/run.mjs";
 import { headingsFor } from "../query/headings.mjs";

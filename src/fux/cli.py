@@ -45,6 +45,12 @@ def _cmd_ask(args) -> int:
     return cmd_ask(args)
 
 
+def _cmd_lexical(args) -> int:
+    from .query import cmd_lexical
+
+    return cmd_lexical(args)
+
+
 def _cmd_find(args) -> int:
     from .query import cmd_find
 
@@ -521,42 +527,68 @@ def build_parser() -> argparse.ArgumentParser:
         _add_output_flags(p, band=True)
         return p
 
-    p_ask = _query_parser("ask", "answer a question from the committed index, with citations")
-    p_ask.add_argument("--top", type=int, default=None, metavar="N", help=_top_help())
-    p_ask.add_argument("--explain", action="store_true", default=None, help="report which path answered")
-    # W-84's matched `§ heading` lines. ⚠ **A pair, not a `store_true`** — the
-    # lines are ON by default, so a `store_true` could only ever turn them on
-    # again and `.fux/output.toml` could never turn them off from the command
-    # line. `default=None` on BOTH halves is SR-OUTPUT decision 10: an absent
-    # flag has to be distinguishable from an explicit one, or the file's value
-    # is unreachable and nothing fails to say so.
-    sections = p_ask.add_mutually_exclusive_group()
-    sections.add_argument(
-        "--sections", dest="sections", action="store_true", default=None,
-        help="show the matched section headings under each hit (default)",
-    )
-    sections.add_argument(
-        "--no-sections", dest="sections", action="store_false", default=None,
-        help="omit the matched section headings, in text and in --json alike",
-    )
-    # SR-PROVENANCE. A separate flag from `--explain`, not an extension of it:
-    # `--explain` answers "which code path ran" and `--why` answers "why this
-    # document" — different questions, different costs. `--why` runs a second
-    # query when a tune file exists, and folding that cost into a flag people
-    # already pass for latency debugging would be a surprise.
-    p_ask.add_argument(
-        "--why", action="store_true",
-        help="how the ranking got here: matched terms, the cut line, rerank and tune deltas",
-    )
-    # W-109. **Repeatable, and fused in RANK space** — each phrasing is ranked
-    # on its own and the lists are combined by RRF (k = 60). `dest="also"`
-    # because `query` is already the positional: the first question is
-    # syntactically primary, which is what lets `--band` name one query.
-    p_ask.add_argument(
-        "-q", "--query", dest="also", action="append", metavar="TEXT",
-        help="another phrasing of the same question; results are fused by RRF (repeatable)",
-    )
+    def _ask_shaped_parser(name: str, help_text: str):
+        """`ask`'s whole flag surface, for the two verbs that must share it.
+
+        ⚠ **A factory rather than two blocks, because `fux lexical` is FROZEN
+        to `ask`'s output shape** (SR-CLI decision 12, W-160). Two hand-kept
+        copies of this list would drift the moment one verb gained a flag, and
+        the drift would be invisible: both parsers would work, and the frozen
+        verb would quietly stop accepting what its own contract says it takes.
+        `tests/test_cli.py::test_lexical_takes_exactly_the_flags_ask_takes` is
+        the gate; this factory is what makes it pass by construction.
+        """
+        p = _query_parser(name, help_text)
+        p.add_argument("--top", type=int, default=None, metavar="N", help=_top_help())
+        p.add_argument("--explain", action="store_true", default=None, help="report which path answered")
+        # W-84's matched `§ heading` lines. ⚠ **A pair, not a `store_true`** — the
+        # lines are ON by default, so a `store_true` could only ever turn them on
+        # again and `.fux/output.toml` could never turn them off from the command
+        # line. `default=None` on BOTH halves is SR-OUTPUT decision 10: an absent
+        # flag has to be distinguishable from an explicit one, or the file's value
+        # is unreachable and nothing fails to say so.
+        sections = p.add_mutually_exclusive_group()
+        sections.add_argument(
+            "--sections", dest="sections", action="store_true", default=None,
+            help="show the matched section headings under each hit (default)",
+        )
+        sections.add_argument(
+            "--no-sections", dest="sections", action="store_false", default=None,
+            help="omit the matched section headings, in text and in --json alike",
+        )
+        # SR-PROVENANCE. A separate flag from `--explain`, not an extension of it:
+        # `--explain` answers "which code path ran" and `--why` answers "why this
+        # document" — different questions, different costs. `--why` runs a second
+        # query when a tune file exists, and folding that cost into a flag people
+        # already pass for latency debugging would be a surprise.
+        p.add_argument(
+            "--why", action="store_true",
+            help="how the ranking got here: matched terms, the cut line, rerank and tune deltas",
+        )
+        # W-109. **Repeatable, and fused in RANK space** — each phrasing is ranked
+        # on its own and the lists are combined by RRF (k = 60). `dest="also"`
+        # because `query` is already the positional: the first question is
+        # syntactically primary, which is what lets `--band` name one query.
+        p.add_argument(
+            "-q", "--query", dest="also", action="append", metavar="TEXT",
+            help="another phrasing of the same question; results are fused by RRF (repeatable)",
+        )
+        return p
+
+    p_ask = _ask_shaped_parser("ask", "answer a question from the committed index, with citations")
     p_ask.set_defaults(func=_cmd_ask)
+
+    # **W-160's first atom: BM25F alone, named and FROZEN.** `ask --scan`
+    # already *is* the lexical core; this makes it a contract — the baseline
+    # arm for every ranking verdict and for the Python/Node differential law.
+    # It exists so that when `ask` grows a graph tier (W-161) there is still a
+    # verb whose answer is *only* what the words say, and a test can hold the
+    # two apart. **A future component added to the lexical core is a new verb
+    # or a tunable, never a change to this one** (SR-CLI decision 12).
+    p_lexical = _ask_shaped_parser(
+        "lexical", "rank on the words alone — BM25F, frozen; the baseline `ask` is measured against"
+    )
+    p_lexical.set_defaults(func=_cmd_lexical)
 
     p_find = _query_parser("find", "ranked document locations, one per line")
     p_find.add_argument("--top", type=int, default=None, metavar="N", help=_top_help())
@@ -730,8 +762,29 @@ def build_parser() -> argparse.ArgumentParser:
     _add_output_flags(p_explain)
     p_explain.set_defaults(func=_cmd_explain)
 
-    p_graph = sub.add_parser("graph", help="the neighbourhood around a query's best answers")
-    p_graph.add_argument("query", help="natural-language question")
+    p_graph = sub.add_parser(
+        "graph", help="the neighbourhood around a query's best answers, or around documents you name"
+    )
+    # **W-160's second atom.** The walk gets a life without a query. `query`
+    # becomes optional and `--seed` is its alternative — and the query form is
+    # now DEFINED as `--seed` over `lexical`'s top-k, which is what
+    # `tests_e2e/test_relational.py::test_graph_query_equals_graph_over_lexical_seeds`
+    # asserts rather than assumes.
+    #
+    # ⚠ **Not mutually exclusive via argparse, because one of them is
+    # REQUIRED and argparse cannot say both.** A mutually-exclusive group with
+    # `required=True` refuses a positional, so the check is in `cmd_graph`,
+    # where it can name which of the two mistakes was made.
+    p_graph.add_argument(
+        "query", nargs="?", help="natural-language question; omit it and pass --seed instead"
+    )
+    p_graph.add_argument(
+        "--seed",
+        action="append",
+        metavar="ID",
+        help="walk from these documents instead of from a query's best answers. "
+        "Mass follows ARGUMENT ORDER, the same rank-mass rule the query form applies to top-k (repeatable)",
+    )
     p_graph.add_argument("--json", action="store_true", default=None, help="machine-readable output")
     graph_path_group = p_graph.add_mutually_exclusive_group()
     graph_path_group.add_argument(
@@ -743,6 +796,28 @@ def build_parser() -> argparse.ArgumentParser:
         "--scan",
         action="store_true",
         help="force the reference scan path for the seeds (the default)",
+    )
+    # **Exposed and INERT at their defaults** (W-160 DoD 4). They exist on
+    # `graph` so the mechanism W-161 needs can be driven and measured before
+    # `ask` composes it — landing the mechanism and the composition together
+    # would make one diff nobody can attribute a delta to.
+    p_graph.add_argument(
+        "--kinds",
+        metavar="KIND[,KIND]",
+        default=None,
+        help="walk only these edge kinds (ref, tag, code, supersedes). Default: all of them",
+    )
+    p_graph.add_argument(
+        "--link-idf",
+        action="store_true",
+        help="discount an edge by how many documents point at its target, so a hub does not dominate. Off by default and measured by nobody yet",
+    )
+    p_graph.add_argument(
+        "--max-hops",
+        type=int,
+        default=None,
+        metavar="N",
+        help="refuse mass to a node further than N hops from any seed. Default: unbounded (the walk's own iteration count already reaches three)",
     )
     _add_tune_flag(p_graph)
     _add_output_flags(p_graph)

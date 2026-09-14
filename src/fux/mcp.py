@@ -277,6 +277,34 @@ def _passage(root: Path, args: dict) -> dict:
 
 
 def _related(root: Path, args: dict) -> dict:
+    """One document's edges, both directions.
+
+    🔴 **This is NOT a seeded walk, and W-160's gap-check row said it was**
+    (the correction is [SR-MCP](../../records/0136_mcp.md) §Consequences; the
+    item shipped and archived on 2026-09-14). That row asked for it to be
+    *"re-implemented over `graph --seed` (same output, one code path)"*, and the
+    two halves of that are incompatible: `graph --seed` returns a **PPR
+    neighbourhood** — ranked nodes with scores, including nodes two hops out
+    that this document never mentioned — while `fux_related` returns **the
+    edges this document actually states**, in both directions, with their
+    kinds. Routing it through the walk would have changed what an agent gets
+    while the row promised it would not.
+
+    **What the row was actually right about is the second half: one code path.**
+    The inbound scan here used to re-derive adjacency by walking every record's
+    `edges` array with its own comprehension — a third definition of *what
+    points at this*, beside `graph/model.py::Graph` and the plane. It now lifts
+    the same `Edge`s through `edges_from_records` and reads `Graph`'s own
+    adjacency, so there is one definition and this surface cannot drift from the
+    verbs.
+
+    ⚠ **Built in memory, never loaded from `.fux/runtime/graph.json`.** MCP must
+    answer in a clone that has never run `fux build`
+    ([SR-NODE-SEARCH](../../records/0153_node-search.md) decision 9 is the same
+    asymmetry one reader over), and `plane.load` refuses without a fresh one.
+    The records are already in hand, so the adjacency costs one pass over them.
+    """
+    from .graph.model import Graph, edges_from_records
     from .store import read_index
 
     rel = args.get("path") or ""
@@ -286,11 +314,11 @@ def _related(root: Path, args: dict) -> dict:
     if record is None:
         raise FuxError(f"{rel!r} is not in the index")
 
+    graph = Graph(edges_from_records(list(records.values())))
     inbound = [
-        {"path": other["loc"], "kind": edge["kind"]}
-        for other in records.values()
-        for edge in other.get("edges", ())
-        if edge.get("dst") == doc_id
+        {"path": records[edge.src]["loc"], "kind": edge.kind}
+        for edge in graph.edges
+        if edge.dst == doc_id and edge.src in records
     ]
     return {
         "path": record["loc"],

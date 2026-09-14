@@ -86,7 +86,7 @@ Flat verbs, no subcommand tree. `fux <verb> --help` for any of them.
 | lifecycle | `setup` `doctor` `inspect` | set the repo up, check the environment, then X-ray the index it produced |
 | write | `ingest` `build` | `ingest` writes the committed index; `build` derives the local accelerator from it |
 | sources | `add` `remove` `update` `enrich` | maintain what is indexed. `add`/`remove` write lines; `update` re-fetches and writes none; `enrich` writes no committed byte at all |
-| read | `ask` `find` `answer` | the same question, differing only in how much each commits to |
+| read | `ask` `find` `answer` `lexical` | the same question, differing only in how much each commits to. `lexical` is BM25F alone, frozen — the baseline `ask` is measured against |
 | graph | `explain` `graph` `path` | answer with relationships the documents stated, never with a ranking |
 | serve | `mcp` `daemon` | the only verbs that do not return |
 | maintenance | `hooks` `tune` `output` `verify` | wire git to keep the index in step; print or set the tunables; re-run a receipt |

@@ -139,6 +139,17 @@ _ROOTS = ("cli", "mcp")
 #: (`resolve_json`), answered once per call before any of these are touched.
 CLI_VERBS: dict[str, tuple[str, ...]] = {
     "ask": ("band", "top", "explain", "sections"),
+    # 🔴 **`lexical` carries `ask`'s keys EXACTLY, and omitting it was a live
+    # bug for the length of one smoke test** (W-160). `fux lexical` is frozen
+    # byte-identical to `ask`; a verb absent from this table has no key
+    # resolved at all, so `args.sections` stayed `None`, `getattr(args,
+    # "sections", True)` read it as falsy, and `lexical` printed no `§`
+    # heading lines while `ask` printed them. **Two verbs, same ranking,
+    # different output — the exact divergence the freeze exists to forbid**,
+    # and nothing failed: the file loaded, the query ran, the answer was right.
+    # This is W-140 row 14's trap (an absent entry never resolves `--json`)
+    # arriving through a different door.
+    "lexical": ("band", "top", "explain", "sections"),
     "find": ("band", "top"),
     "answer": ("band", "no_refer", "journal"),
     "explain": (),
@@ -161,6 +172,37 @@ CLI_VERBS: dict[str, tuple[str, ...]] = {
     "inspect": (),
 }
 
+#: 🔴 **The one verb that reads ANOTHER verb's subtable, and it is a fact about
+#: the freeze rather than a convenience** (W-160). `fux lexical` is frozen
+#: byte-identical to `fux ask` ([SR-CLI](../../records/0101_cli-surface.md)
+#: decision 12), so a consumer's committed `output.toml` must not be able to
+#: make the two differ — and `[cli.lexical] sections = false` beside
+#: `[cli.ask] sections = true` would do exactly that, silently, with both files
+#: valid.
+#:
+#: ⚠ **The alternative was a breaking change to every existing file.** This
+#: file is a **complete declaration** (decision 20's companion rule): a verb
+#: with keys that nothing declares raises. `explain` is unique to `ask`, so it
+#: is refused at the shared `[cli]` level by name — which means a `lexical`
+#: with its own subtable would have made every repo that already has an
+#: `output.toml` exit 1 on a verb they had never run. Measured, not predicted:
+#: it happened on this repository the first time `lexical` ran.
+#:
+#: **It is a map with one entry and no mechanism.** A second entry needs a
+#: reason of its own, in this comment, beside the first.
+VERB_READS: dict[str, str] = {"lexical": "ask"}
+
+
+def subtable_for(verb: str) -> str:
+    """Whose `[cli.<verb>]` subtable this verb resolves through.
+
+    Identity for every verb but `lexical` — see `VERB_READS`. Kept a function
+    so both `resolve` and `resolve_json` walk the same answer; two lookups is
+    how one of them would forget.
+    """
+    return VERB_READS.get(verb, verb)
+
+
 #: `[mcp]`'s closed key set. `top` only — decision 11. No `json` (an MCP
 #: result is always JSON) and, corrected during the first build, no `band`
 #: (SR-CONFIDENCE decision 11 makes the confidence block unconditional over
@@ -174,8 +216,24 @@ MCP_KEYS: tuple[str, ...] = ("top",)
 #: **by name** — setting it there reads as global and is not — and belongs
 #: under that verb's own subtable instead (`[cli.ask]`, `[cli.path]`, ...).
 def _keys_shared_by_more_than_one_verb() -> tuple[str, ...]:
+    """Keys more than one SUBTABLE declares — not more than one verb.
+
+    ⚠ **Counting verbs would have loosened a validation as a side effect of
+    `VERB_READS`.** `explain` and `sections` are `ask`'s alone, and this file
+    refuses a single-verb key at the shared `[cli]` level by name, because
+    *"setting it there reads as global and is not"*. `lexical` declares the
+    same keys and resolves through `ask`'s own subtable, so the two are **one
+    declaration in two rows** — and counting rows would have made
+    `[cli] explain = true` legal where it had always been refused. Counting
+    subtables keeps the refusal exactly where decision 3 put it.
+    """
     counts: dict[str, int] = {}
-    for keys in CLI_VERBS.values():
+    seen: set[str] = set()
+    for verb, keys in CLI_VERBS.items():
+        table = subtable_for(verb)
+        if table in seen:
+            continue  # `lexical` reads `ask`'s row; it is not a second declarer
+        seen.add(table)
         for k in keys:
             counts[k] = counts.get(k, 0) + 1
     return tuple(sorted(k for k, n in counts.items() if n > 1))
@@ -321,7 +379,7 @@ class OutputDefaults:
             return bool(cli_value)
         if self.bypass:
             return bool(BUILT_IN["json"])
-        per_verb = self.json_verb.get(verb, {})
+        per_verb = self.json_verb.get(subtable_for(verb), {})
         if "enabled" in per_verb:
             return bool(per_verb["enabled"])
         if "enabled" in self.json_shared:
@@ -351,21 +409,22 @@ class OutputDefaults:
             return cli_value
         if self.bypass:
             return BUILT_IN[key]
+        table = subtable_for(verb)
         if as_json:
-            per_verb = self.json_verb.get(verb, {})
+            per_verb = self.json_verb.get(table, {})
             if key in per_verb:
                 return per_verb[key]
             if key in self.json_shared:
                 return self.json_shared[key]
-        per_verb = self.cli_verb.get(verb, {})
+        per_verb = self.cli_verb.get(table, {})
         if key in per_verb:
             return per_verb[key]
         if key in self.cli_shared:
             return self.cli_shared[key]
         where = (
-            f"[cli.json.{verb}], [cli.json], [cli.{verb}] or [cli]"
+            f"[cli.json.{table}], [cli.json], [cli.{table}] or [cli]"
             if as_json
-            else f"[cli.{verb}] or [cli]"
+            else f"[cli.{table}] or [cli]"
         )
         raise FuxError(
             f"{OUTPUT_NAME} does not set `{key}` for `{verb}` — add it under "
@@ -456,9 +515,17 @@ def _checked(c: _Collector, table: str, key: str, value: object) -> object | Non
 
 
 def _verb_owning(key: str) -> str | None:
-    """The single verb `key` belongs to, if exactly one does — else `None`."""
-    owners = [v for v, keys in CLI_VERBS.items() if key in keys]
-    return owners[0] if len(owners) == 1 else None
+    """The single SUBTABLE `key` belongs to, if exactly one does — else `None`.
+
+    By subtable, for `_keys_shared_by_more_than_one_verb`'s reason: `lexical`
+    declares `ask`'s keys and reads `ask`'s row, so the two are one declaration.
+    Counting verbs would have made this return `None` for `explain` and
+    `sections` — and the error message for `[cli.find] explain = true` would
+    have degraded from *"`explain` is a key of ask, not of `find`"* to
+    *"unknown key `explain`"*, which sends the reader looking for a typo.
+    """
+    owners = {subtable_for(v) for v, keys in CLI_VERBS.items() if key in keys}
+    return next(iter(owners)) if len(owners) == 1 else None
 
 
 def _parse_cli_scalars(c: _Collector, table_label: str, scope: dict, out: dict, *, verb: str | None) -> None:

@@ -15,10 +15,38 @@ ball: arpit
 
 **Ratified:** Arpit, 2026-09-13 —
 [compare doc](../compare/ask-graph-expansion.compare.md). Ratified, not built.
-**Waits on:** [W-160](W-160-lexical-and-graph-atoms.md) (the atoms), **W-156**
+**Waits on:** **W-156** alone. W-160's atoms **shipped 2026-09-14** — see the
+section below and [SR-GRAPH](../../records/0126_graph.md) decisions 13–15
 (what evidence a ranking change may have), and a golden key that carries
 link-dependent questions ([SR-RS](../../records/0133_predictions.md) d23 —
 Codex's hands, never Claude's).
+
+## W-160's atoms shipped on 2026-09-14 — what that changes for this item
+
+**The mechanism is built and inert.** `fux lexical`, `fux graph --seed`, and
+the three walk parameters (`kinds`, `link_idf_on`, `max_hops`) are on both
+readers with defaults that reproduce the previous walk byte for byte, proved by
+`tests/graph/test_walk_parameters_are_inert.py`. So this item no longer has to
+build anything to compose; it has to **decide what to compose and measure it**.
+
+⚠ **Three things W-160 hands over, and two of them are debts:**
+
+1. **`link_idf` is unmeasured.** It ships off. This item is the one that has to
+   measure it, and no corpus has.
+2. **`tests_e2e/test_relational.py::test_lexical_is_byte_identical_to_ask` must
+   be INVERTED here, deliberately.** It holds `ask` and `lexical` equal; the
+   moment `ask` grows a tier they part, and this item is where that test states
+   the parting rather than being deleted.
+3. **`SR-CONFIDENCE` owes the graph half of its own guard.** Decision 4 stops an
+   expansion term raising a document's own band. A graph-lifted document must
+   not raise its band either, and nothing enforces that yet —
+   [SR-CONFIDENCE](../../records/0141_confidence.md) §Consequences names it.
+
+⚠ **And one divergence this item must declare before it lands:** on the Node
+reader `ask` and `lexical` are the **same function**. Giving Python's `ask` a
+tier makes the two readers disagree, which the differential law will find. That
+is this item's to state in [SR-NODE-SEARCH](../../records/0153_node-search.md),
+not the harness's to discover.
 
 ## Definition of done
 

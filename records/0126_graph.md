@@ -7,10 +7,10 @@ description: "The ref/tag/code edges ingest already extracts become a queryable 
 status: accepted
 date: 2026-08-20
 feature: the graph lane — three relational verbs, a derived plane, and a lazy walk
-owns: [src/fux/graph@f6edc21355ad, tools/graph-bench@9c330ea14b42]
+owns: [src/fux/graph@fe0a9b72ad39, tools/graph-bench@9c330ea14b42]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 1675bb9b7a40d5517059cfe8e0c06075fe6d1541c4d3386674e76e4f84db58d7
+content_sha: c15c91ad7a02ae91f8e90aad854646ad13e7dd64f916cf4507c410aa21832cd3
 ---
 
 # SR-GRAPH — the graph lane
@@ -238,6 +238,62 @@ the search *finds*; `hop_decay` only orders what it found.
 cannot read two different files — a neighbourhood around seeds ranked under
 weights that did not choose them is the failure that would make the saving worth
 nothing.
+
+**13. `graph --seed <id>…` walks from documents you name, and the query form is
+DEFINED as `--seed` over the query's top-k.** (W-160 — the second atom.)
+
+One function returns both forms' seeds, so nothing can disagree about
+`seed_depth`, about mass order, or about which candidate generator ran. Mass
+follows **argument order** — the same rank-mass rule decision 12's walk already
+applies to a ranked top-k — so reversing the seeds reverses the walk, and a
+test asserts it does.
+
+**A hand-named seed carries `rank`, never a score.** See
+[SR-CLI](0101_cli-surface.md) decision 13 for why, including the
+`1.0` / `1` divergence that settled it.
+
+**14. Three walk parameters are EXPOSED and INERT, ahead of the change that
+uses them.** (W-160 DoD 4.)
+
+| parameter | default | what it does when set |
+|---|---|---|
+| `kinds` | `ALL_KINDS` — every kind | walk only these edge kinds. `{"ref"}` is the case W-161 wants: *follow what the document linked to, not what it was tagged with*, because a tag is a hub that pulls unrelated documents together |
+| `link_idf_on` | `False` | divide an edge's weight by `link_idf(in_degree of its target)`. **The parameter most likely to move a ranking**, which is why it ships off |
+| `max_hops` | `None` | refuse mass to a node further than `n` hops from any seed. Inert at any value `>= iterations`, since three iterations already bound reach at three hops |
+
+⚠ **Why expose them before using them.** W-161 is a ranking change and waits on
+[W-156](../work/open/W-156-prevalence-outside-golden.md); the mechanism is not a
+ranking change and does not have to wait. **Landing both together would make
+*"the walk moved"* and *"`ask` composes the walk"* one indivisible diff**, and
+no measurement could attribute a delta to either.
+
+⚠ **Inertness is a TEST, not a claim** —
+`tests/graph/test_walk_parameters_are_inert.py`, which also asserts each
+parameter **does** something when set. A knob inert at every setting is dead
+code wearing a feature's name, and the inertness half would pass for it too.
+
+⚠ **`ALL_KINDS` returns `graph.neighbours` untouched, not a filtered copy that
+keeps everything.** `neighbours` is pre-sorted and the walk accumulates floats
+over it in that order; rebuilding the list is equal today and one refactor away
+from not being.
+
+**15. `link_idf(n) = 1 / (1 + ln(1 + n))`, and it is deliberately not
+`1/n`.** A node nothing points at is `1.0`; `CLAUDE.md`, with 180 inbound edges
+on this repository, is about `0.16`. **Named after IDF because it is the same
+idea** — a link everybody makes says little about the document it comes from,
+exactly as a term on every document says little about the document holding it.
+`1/n` would make a hub weightless and turn *widely cited* into *ignored*; the
+log keeps a hub in the walk while stopping it from dominating it.
+
+⚠ **Nothing measures it yet**, which is the whole reason it ships off. W-161 is
+the item that has to, on whatever evidence rule W-156 settles.
+
+⚠ **It is the first place a `log1p` reaches the walk, and the two readers agree
+to `round(9)` rather than bit-for-bit** — measured on this repository, identical
+ordering, last-digit differences in four scores. That is
+[SR-NODE-SEARCH](0153_node-search.md) decision 1's stated contract and not a
+port defect; it is written down here so nobody reads a last digit as one when
+W-161 turns the parameter on.
 
 **A verb refuses a node nothing knows about, and says which end.** `path`
 validated neither `FROM` nor `TO` until 2026-09-11 (W-140 row 12): a typo

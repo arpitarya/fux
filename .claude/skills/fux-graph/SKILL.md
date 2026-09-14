@@ -1,6 +1,6 @@
 ---
 name: fux-graph
-description: Explore how documents in a Fux index relate with `fux explain`, `fux graph` and `fux path` — outbound links, tags, supersession, communities, query neighbourhoods and the most reliable route between two documents. Use when asked "what does this doc link to", "what links to this SR", "how are X and Y related", "what superseded this" or "orient me in this area", and when ask/find cannot answer a question about relationships.
+description: Explore how documents in a Fux index relate with `fux explain`, `fux graph` (by query or by `--seed`) and `fux path` — outbound links, tags, supersession, communities, neighbourhoods and the most reliable route between two documents. Use when asked "what does this doc link to", "what links to this SR", "how are X and Y related", "what superseded this" or "orient me in this area", and when ask/find cannot answer a question about relationships.
 ---
 
 # Relationships in a Fux index — `explain`, `graph`, `path`
@@ -19,6 +19,7 @@ Resolve the `fux` command first — see the `fux-usage` skill (`fux` → `uv run
 | "what does this doc link to / depend on?" | `fux explain <doc> --json` — its **outbound** edges and community |
 | "what links TO this doc?" | the inbound recipe in §5 — ⚠ `explain` is outbound only |
 | "orient me in this area" / "neighbourhood of X" | `fux graph "<query>" --json` — best matches plus what surrounds them |
+| "what surrounds THESE documents?" | `fux graph --seed <loc> [--seed <loc>…] --json` — the walk from documents you name, **no query in the way** |
 | "how are X and Y related?" | `fux path X Y --json`, **then** `fux path Y X --json` — routes are directed |
 | "what does the corpus say about X?" | `fux ask` — relevance is not this skill (`fux-search`) |
 | "the answer, with line ranges" | `fux answer` — only it fetches and cites spans (`fux-answer`) |
@@ -148,6 +149,42 @@ Pass a full id — `tag:ops` lists what carries a tag. **If the assertion fails,
 the recipe is out of date; say so rather than guess.** Over MCP, `fux_related`
 returns inbound edges directly (`fux-mcp`).
 
+## 5a · `graph --seed` — the walk from documents you name
+
+| you want | run |
+|---|---|
+| the neighbourhood of one document | `fux graph --seed docs/a.md --json` |
+| the neighbourhood of several, in priority order | `fux graph --seed docs/a.md --seed docs/b.md --json` |
+
+- **Argument order is the mass order.** The first `--seed` starts with the most
+  weight, exactly as the query form gives the top-ranked hit the most. Reversing
+  the seeds changes the walk.
+- ⚠ **A hand-named seed has `"score": null` and `"rank": n`.** There is no
+  ranking behind it, so there is no score to report. **Read `rank`, and do not
+  treat `null` as zero.** The query form's seeds still carry their BM25F score.
+- **A query and `--seed` together are refused**, and so is neither. Pick one.
+- **A seed that is not in the index is refused by name**, rather than walking
+  from nowhere and reporting an empty neighbourhood — which would read as *this
+  document is isolated*.
+- **`fux graph "<q>"` is defined as `--seed` over the query's top-k**, so the
+  two forms are the same walk reached two ways.
+
+## 5b · The three walk flags — off by default, and measured by nobody yet
+
+| flag | what it does |
+|---|---|
+| `--kinds ref` | follow only those edge kinds (`ref`, `tag`, `code`, `supersedes`). `ref` alone drops the `tag:` hubs |
+| `--link-idf` | discount an edge by how many documents point at its target, so a hub does not dominate |
+| `--max-hops N` | refuse mass to a node more than N hops from a seed |
+
+🔴 **All three are OFF by default and no measurement supports any setting of
+them.** They exist so the mechanism can be driven before `ask` composes it.
+
+- **Do not turn one on to get a better-looking neighbourhood** and then report
+  the result as what fux found. Say which flags you passed, every time.
+- **Do not compare a `--link-idf` run with a default run** and call the
+  difference an improvement. Nothing has established which is better.
+
 ## 6 · Which identifiers are accepted
 
 | you pass | looked up as | works? |
@@ -184,6 +221,8 @@ returns inbound edges directly (`fux-mcp`).
 - **Don't compare a seed's `score` with an expanded node's.**
 - **Don't cite a community label**, or treat "same community" as a relationship.
 - **Don't widen `--hops` to force a route** — no route is a finding.
+- **Don't turn on `--link-idf`, `--kinds` or `--max-hops` to improve an answer** — they are unmeasured; name any you passed.
+- **Don't read a `--seed` result's `"score": null` as zero** — read `rank`.
 - **Don't assume a graph node is live** — archived status is not in this output.
 - **Don't build on a grade-8 edge unchecked** — basename matches can hit the wrong file.
 

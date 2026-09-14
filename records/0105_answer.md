@@ -10,7 +10,7 @@ feature: "`fux answer` — one answer, its footing stated, and the report of wha
 owns: []
 laws: [L1, L2, L3]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: fa5b99ff7b060b461a6f853ed05e8ef09eefde1cfa59057069306bd4c5144252
+content_sha: b88496ee773ba2c1e75b04ec5f597c4b2e281cbfcc12b1b6d456e1bc5e572976
 ---
 
 # SR-ANSWER — the `answer` verb
@@ -410,6 +410,16 @@ here**; what belongs to this record is the seam:
   `print()`.
 
 ### Consequences
+
+- **`answer` does NOT go through the frozen `lexical` body, and that is
+  deliberate** (2026-09-14, W-160). It calls `run_query` directly, so
+  [SR-CLI](0101_cli-surface.md) decision 12's freeze does not reach it — the
+  freeze is on a *verb's output shape*, not on the ranking function both share.
+  **`answer` reading `ask` is
+  [W-161](../work/open/W-161-graph-composed-ask.md)'s change**, and it is a
+  ranking change: today `answer` ranks lexically whatever `ask` does, and after
+  W-161 it would inherit `ask`'s graph tier. Named here so the two items' scopes
+  cannot be confused for each other.
 
 - **`answer` says the confidence floor is off, once per process** (2026-09-14,
   W-164 gate 4). ⚠ **W-164's definition of done named `ask` only**, and stopping
