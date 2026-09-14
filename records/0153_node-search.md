@@ -11,7 +11,7 @@ owns: [node@d634c7430c10, src/fux/store/nodebundle.py@071a24a596dd]
 laws: [L1, L3, L4, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 2286ecb0fd4dd6e4ab47dc7161a3ae85f3a72acf9366f8b367fb9b53ef1daac4
+content_sha: 11325ed23d9b5775b1e839a891afa18ea5e65ed7d514625ed9322f55716689a6
 ---
 
 # SR-NODE-SEARCH — the Node read plane
@@ -340,9 +340,25 @@ distributions.** RULED by Arpit 2026-09-12 and **BUILT the same day**.
 
 - **One build, two registries.** The bundle exists before either job in
   [`publish.yml`](../.github/workflows/publish.yml) runs, off the single
-  `release: published` trigger. ⚠ The halves are not symmetric — PyPI is
-  automatic via OIDC, npm **stages and waits for a human** — so a bundle built
-  per-job could ship two registries disagreeing.
+  `release: published` trigger, so a bundle built per-job cannot ship two
+  registries disagreeing.
+  ⚠ **The halves were NOT symmetric until 2026-09-14** — PyPI automatic via
+  OIDC, npm **staged and waiting for a human**. **Arpit ruled them symmetric on
+  2026-09-14** and `publish.yml` now runs `npm publish`: both registries go out
+  off the one trigger, with no human in either path.
+  🔴 **What the asymmetry actually cost is why it went.** `2.0.0` staged on
+  2026-09-13 and `2.0.1` on 2026-09-14 and **neither was ever approved**, so
+  npm's `latest` went on pointing at `2.0.0-alpha.7` — published 2026-09-02 —
+  while PyPI moved twice. Two releases were live on one registry and absent
+  from the other, and nothing failed, warned or blocked: the release workflow
+  was green each time, because staging IS its success. **A gate nobody walks
+  through does not hold the line, it just hides which side of it you are on.**
+  ⚠ **One thing moved out of this repository and cannot be asserted from it.**
+  The direct publish works only while `Allow npm publish` is ticked on the
+  `fux-engine` trusted publisher at npmjs.com. Untick it and the npm job fails
+  with a registry refusal that no diff in this tree explains. It is named here
+  because it is now a precondition of a release succeeding, and the only
+  written trace of it is this paragraph and the comment beside the step.
 - ✅ **This is why *"no build step — a build step is a dependency"* survives.**
   The line narrows to **the consumer's end**, which is the end it was ever
   about. Fux's release has a bundler; nobody running `fux setup` does.

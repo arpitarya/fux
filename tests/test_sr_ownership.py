@@ -29,6 +29,31 @@ CLAIMED_ROOTS = (ROOT / "src" / "fux", ROOT / "tools")
 _IGNORED_DIR_NAMES = {"__pycache__", ".pytest_cache", "tests", "pruning"}
 
 
+def _has_source(directory: Path) -> bool:
+    """Is there any `.py` under here, or is it just abandoned bytecode?
+
+    🔴 **A branch switch leaves the DIRECTORY behind.** `git checkout` removes
+    the tracked files of a module that does not exist on the other branch, but
+    it cannot remove the directory while `__pycache__/` — untracked, and git
+    therefore not git's business — is still sitting in it. What is left is a
+    component name with no component under it, and this check reported it as
+    **unclaimed by any record**, which reads as a missing ownership row rather
+    than as a stale `.pyc`.
+
+    ⚠ **The failure is worse than noise, because the remedy it names is wrong.**
+    It says *add a row to the ownership table*, and a row added for a module
+    that exists on another branch is a claim that outlives the confusion and
+    has to be found again later.
+
+    Recorded twice in the WORKLOG on 2026-09-14 (`src/fux/inspect` both times,
+    left by `main` <-> `release/3.0.0-alpha.0`), so it becomes a check rather
+    than a third cleanup — [SR-WORK-SESSION](../records/0060_WORK-session.md)
+    decision 13. A directory holding real modules still has to be claimed;
+    nothing is loosened.
+    """
+    return any(directory.rglob("*.py"))
+
+
 def _rel(p: Path) -> str:
     return p.relative_to(ROOT).as_posix()
 
@@ -58,6 +83,8 @@ def components() -> set[str]:
                 continue
             if child.is_dir():
                 if child.name in _IGNORED_DIR_NAMES:
+                    continue
+                if not _has_source(child):
                     continue
                 found.add(_rel(child))
             elif child.suffix == ".py":

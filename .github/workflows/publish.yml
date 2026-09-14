@@ -38,12 +38,13 @@ jobs:
           echo "✔ tag v$tag matches __version__ $pkg"
 
       - name: Bundle the Node read plane — ONE build, two registries
-        # 🔴 **Built here, before either registry job exists**, because the two
-        # halves are not symmetric: PyPI publishes automatically via OIDC and npm
-        # STAGES and waits for a human. A bundle built per-job could ship two
-        # registries disagreeing about what `2.x.y` is (SR-NODE-SEARCH
-        # decision 14). The wheel gets the same artefact from `hatch_build.py`,
-        # which runs the same deterministic bundler over the same sources.
+        # 🔴 **Built here, before either registry job exists.** A bundle built
+        # per-job could ship two registries disagreeing about what `2.x.y` is
+        # (SR-NODE-SEARCH decision 14) — and that risk does NOT go away now that
+        # both halves publish automatically, because two jobs still run on two
+        # runners. One artefact, downloaded by both, is what makes them equal.
+        # The wheel gets the same artefact from `hatch_build.py`, which runs the
+        # same deterministic bundler over the same sources.
         run: PYTHONPATH=src python -m fux.store.nodebundle node node/dist
 
       - name: The bundle's version must be the engine's
@@ -92,7 +93,7 @@ jobs:
           skip-existing: true
 
   publish-npm:
-    name: Stage to npm
+    name: Publish to npm
     runs-on: ubuntu-latest
     needs: build          # the same gate PyPI waits on — one release, two registries
     permissions:
@@ -118,7 +119,7 @@ jobs:
           name: node-bundle
           path: node/dist/
 
-      - name: The staged tarball is the bundle, and nothing else
+      - name: The published tarball is the bundle, and nothing else
         # `node/dist/` holds exactly what `package.json`'s `files` names:
         # `fux.mjs` (generated), `mcp-tools.json`, `README.md`. Asserted rather
         # than assumed — a missing sidecar publishes a reader whose `fux mcp`
@@ -130,36 +131,47 @@ jobs:
           test ! -d node/dist/src || { echo "✗ node/dist/src exists — L10" >&2; exit 1; }
           echo "✔ node/dist carries the bundle and its sidecars"
 
-      - name: npm >= 11.19 (trusted publishing needs 11.5.1; `npm stage` needs 11.19)
+      - name: npm >= 11.5.1 (the floor trusted publishing needs)
         # setup-node ships whatever npm came with the Node line, which is a 10.x
-        # on Node 22 — old enough that `npm stage publish` is not a command and
-        # the OIDC exchange never happens. Pinning the floor here rather than
-        # trusting the runner image is the difference between a clear failure
-        # and a confusing one.
+        # on Node 22 — old enough that the OIDC exchange never happens. Pinning
+        # the floor here rather than trusting the runner image is the difference
+        # between a clear failure and a confusing one.
         run: |
           npm i -g npm@latest
           npm --version
 
-      - name: Stage the tarball
+      - name: Publish the tarball
         # `node/dist`, NOT `node`: the published package is the BUNDLE, and the
         # repository's `node/` is the module tree it was built from. Publishing
         # from the source directory would put `node/src/**` on npm again, which
         # is the violation L10 was written for.
         working-directory: node/dist
-        # STAGED, not direct: the trusted publisher on npmjs.com has
-        # `Allow npm publish` unchecked, which is npm's own recommendation.
-        # CI uploads; a human approves at npmjs.com (or `npm stage approve
-        # <id>`) with 2FA. So npm is NOT automatic the way PyPI is — that is
-        # the deliberate trade, and it is why this job is named "Stage".
+        # DIRECT, not staged (Arpit, 2026-09-14). This job staged until then and
+        # a human approved at npmjs.com with 2FA — npm's own recommendation,
+        # taken deliberately. ⚠ **It cost two releases.** `2.0.0` staged on
+        # 2026-09-13 and `2.0.1` on 2026-09-14 and NEITHER was ever approved, so
+        # npm's `latest` went on pointing at `2.0.0-alpha.7` from 2026-09-02
+        # while PyPI moved twice. A gate nobody walks through is not a gate.
         #
-        # --tag: `npm stage publish` defaults to `latest` and ERRORS on a
-        # prerelease without an explicit tag, so derive it from the version
-        # rather than hardcoding either answer.
+        # ⚠ **This job now REQUIRES `Allow npm publish` ticked on the
+        # `fux-engine` trusted publisher at npmjs.com.** With it unchecked the
+        # registry refuses a direct publish and this step fails — the setting
+        # lives in the npm account, not in this repository, so it cannot be
+        # asserted here. That is the one thing to check if this step starts
+        # failing for no reason a diff explains.
+        #
+        # Provenance is unchanged: `--provenance` still signs from OIDC, so what
+        # reaches the registry carries the same attestation the staged tarball
+        # did.
+        #
+        # --tag: defaults to `latest` and ERRORS on a prerelease without an
+        # explicit tag, so derive it from the version rather than hardcoding
+        # either answer.
         run: |
           version="$(node -p "require('./package.json').version")"
           case "$version" in
             *-*) tag=alpha ;;
             *)   tag=latest ;;
           esac
-          echo "staging fux-engine@$version with tag $tag"
-          npm stage publish --tag "$tag" --provenance
+          echo "publishing fux-engine@$version with tag $tag"
+          npm publish --tag "$tag" --provenance
