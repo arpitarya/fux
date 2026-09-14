@@ -23,20 +23,8 @@ here. Read that record before changing anything below it.
 
 | what he decides | filed | age |
 |---|---|---|
-| 🔴 **W-146** — one ruling: does *never restates* reach into docstrings? `UrlSource` can state a wrong default and SR-CONFIG's key-tree gate stays green — it checks names, not values. [detail](open/W-146-the-rest-of-l0.md) | 2026-09-12 | 2d |
-| ↳ **blocks:** nothing else in the queue — they decide whether two named exposures get closed, not whether work runs | | |
-| 🔴 **W-112** — W-106 closed **without a PASS and cannot produce one** (no corpus carries DENSE-CHUNK's bar). Proceed on the narrowed claim, wait for an instrument, or close? [detail](open/W-112-vector-plane.md) | 2026-09-12 | 2d |
-| ↳ **blocks:** nothing else in the queue — search-v3's last item, and the only one left of §5 | | |
-| 🔴 **W-156** — every measurement must be on golden data; golden is one synthetic corpus; so *never ship a ranking change off one* can never be met. Which rule gives? [detail](open/W-156-prevalence-outside-golden.md) | 2026-09-13 | 1d |
-| ↳ **blocks:** **W-168**, **W-161**, **W-175** and **W-144**'s acceptance — every item whose output or evidence is a ranking claim waits on this ruling | | |
-| 🔴 **W-144** — excluding table cells from `flen` **ranks better** ([verdict](regression/2026-09-12-reaim-and-instruments/VERDICT-W144.md)); one synthetic corpus may not ship a ranking change, so accept or override [the compare doc](compare/table-tokens-in-flen.compare.md). | 2026-09-12 | 2d |
-| ↳ **blocks:** nothing else in the queue — the measurement is filed and the code is written; what is missing is the call | | |
-| 🔴 **W-175** — `fux correct` shipped with its central claim unmeasured: does a human line help OTHER phrasings? Real failures and BLIND paraphrases; an agent may author neither. [detail](open/W-175-correction-generalisation.md) | 2026-09-14 | 0d |
-| ↳ **blocks:** nothing else in the queue — it decides whether SR-ENRICH decision 19 stands or human lines stop being indexed | | |
-| 🔴 **W-170** — two rulings: (1) cage's `fux-search-leg` compare doc — accept option C? (2) **SR-LAW-10's exemption table gains `.fux/observers/*`** — the observe-only hook is ruled, the Law amendment must be named in the record by you. [detail](open/W-170-cage-search-leg.md) | 2026-09-14 | 0d |
-| ↳ **blocks:** nothing else in the queue — fux's emitter is the only item behind it | | |
-| 🔴 **W-148** — two calls left over from W-107: how CI reaches a golden corpus (self-hosted runner / commit `rung-00100` / portable builder), and whether `fux-benchmark` gets built or Node's latency stays unmeasured. [detail](open/W-148-what-the-two-readers-still-owe.md) | 2026-09-12 | 2d |
-| ↳ **blocks:** nothing else in the queue — the Node plane is built and measured; these decide where a future measurement runs and what it may CLAIM | | |
+| 🔴 **W-140** — the `--hops` fork: [the compare doc](compare/path-hops-bound.compare.md) proposes **(c) bound the walk's work** with `truncated` in every rendering. The last ruling owed. [detail](open/W-140-guide-authoring-defects.md) | 2026-09-12 | 2d |
+| ↳ **blocks:** nothing else in the queue — W-140's own last code row is behind it | | |
 
 ---
 
@@ -44,13 +32,12 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🔴 **W-168** · `arpit`, blocked on W-156 — the ten search improvements as one program, ten gated steps (anchor text first, section units last); each step golden question → pre-registration → build → measure. Promoted 2026-09-14. [detail](open/W-168-search-improvements.md)
-- 🔴 **W-170** · `arpit` — `.fux/observers/`: an observe-only hook fux exposes after render (counts-only record, `args_hash` contract, fail-open, capped); cage subscribes. Ruled 2026-09-14; waits on cage's verdict + the L10 amendment. [detail](open/W-170-cage-search-leg.md)
-- 🔴 **W-175** · `arpit`, blocked on W-156 — does a correction help phrasings OTHER than its own? The claim that made W-162's design the accepted one, shipped unmeasured. [detail](open/W-175-correction-generalisation.md)
-- 🔴 **W-161** · `arpit`, blocked on W-156 — the graph-composed `ask`: boosted tier + labelled `related` tier, `answer` reads `ask`. W-160's atoms shipped 2026-09-14, inert; only the evidence rule is left. [detail](open/W-161-graph-composed-ask.md)
-- 🟡 **W-140** · `agent`, waiting on Arpit's `--hops` ruling — **1 code row left**: a runner-race flake **not reproduced in 11 attempts**, deliberately unchanged. 20 closed. [detail](open/W-140-guide-authoring-defects.md)
-- 🔴 **W-148** · `arpit` — what the two readers still owe: CI cannot reach the golden corpora, Node's latency has no instrument, and the renderer split is staged. [detail](open/W-148-what-the-two-readers-still-owe.md)
-- 🔴 **W-112** · `arpit` — the vector plane. W-106 closed without a PASS **and cannot produce one**: no corpus carries DENSE-CHUNK's bar. Determinism narrowed to *same embedder build*. [detail](open/W-112-vector-plane.md)
+- 🟢 **W-161** · `agent` — the graph-composed `ask`: boosted tier + labelled `related` tier, `answer` reads `ask`. W-160's atoms shipped 2026-09-14, inert. **W-156 ruled 2026-09-14**: evidence is SR-RS d19 on golden data; nothing waits. [detail](open/W-161-graph-composed-ask.md)
+- 🟢 **W-168** · `agent` — the ten search improvements as one program, ten gated steps (anchor text first, section units last); each step golden question → pre-registration → build → measure. Unblocked 2026-09-14 by the W-156 ruling. [detail](open/W-168-search-improvements.md)
+- 🟢 **W-176** · `agent` — the nine abstention gates, ruled (a) 2026-09-14: 1 + 9 + the output surface now; 4, 3, 2, 7, 8, 5 measured behind flags from **2026-09-30** (Codex's unanswerable key); 6 once W-161 has landed. [detail](open/W-176-abstention-gates.md)
+- 🟢 **W-170** · `agent` — `.fux/observers/`, the observe-only hook. Both rulings taken 2026-09-14: cage's compare **C**; SR-OBSERVE filed `proposed` with the L10 exemption named. Build it; the record flips to `accepted` in that change. [detail](open/W-170-cage-search-leg.md)
+- 🟢 **W-148** · `agent` — ruled 2026-09-14: golden is **local-only** (drop CI's corpus arm), Node's latency goes into `fux-benchmark` beside Python's, the harness stays scratch. Three rows of agent work, then close. [detail](open/W-148-what-the-two-readers-still-owe.md)
+- 🔴 **W-140** · `agent`, waiting on Arpit's `--hops` ruling — **1 code row left**: a runner-race flake **not reproduced in 11 attempts**, deliberately unchanged. 20 closed. [detail](open/W-140-guide-authoring-defects.md)
 
 ### testing
 
@@ -59,13 +46,12 @@ here. Read that record before changing anything below it.
 - 🟣 **W-136** · `arpit`, waiting on **2026-09-30** — everything an agent can do is done; **phase 5 scoring is Codex's hands** and is all that is left. [detail](open/W-136-golden-benchmark.md)
 - 🟣 **W-145** · `arpit`, waiting on **2026-09-30** — Codex regenerates the golden answer key; until then every golden number is `informed`. [detail](open/W-145-codex-regenerates-the-key.md)
 - 🟣 **W-87** · `agent`, waiting on W-145 — P2's `unanswerable` gate is measured (0/124); recall needs phase 5 and **Part B needs an uncontaminated key**. [detail](open/W-87-what-good-means.md)
-- 🔴 **W-144** · `arpit` — **W-155 answered the last open test: YES, (b) over-promotes a data dump** ([verdict](regression/2026-09-13-table-is-the-answer/VERDICT.md)). Accept, move to (c)/(d), or wait on W-156. [detail](open/W-144-structure-aware-extraction.md)
+- 🟣 **W-175** · `agent`, waiting on **2026-09-30** — does a correction help OTHER phrasings? Ruled 2026-09-14: three arms (dogfood · fux's own tree · Codex), N=12 / M=5. Harness now; the numbers wait for Codex's blind paraphrases. [detail](open/W-175-correction-generalisation.md)
+- 🟢 **W-144** · `agent` — ruled **(d)** 2026-09-14: sweep `b ∈ {0.75, 0.6, 0.5, 0.4}` over the three measured families, ship the first value positive on all with controls holding; (b) + idf guard is the fallback. [detail](open/W-144-structure-aware-extraction.md)
 
 ### adr update
 
-- 🔴 **W-156** · `arpit` — the environments rule and the single-corpus rule cannot both hold; the resolution decides what evidence any ranking change may have. [detail](open/W-156-prevalence-outside-golden.md)
-
-- 🔴 **W-146** · `arpit` — L0's remainder: **one ruling is owed** — how far *never restates* reaches into docstrings. Its inventory is reconciled; eight of its sections landed as records `0057`–`0064` on 2026-09-14. [detail](open/W-146-the-rest-of-l0.md)
+- 🟢 **W-146** · `agent` — L0's remainder, ruled **(a)** 2026-09-14: docstrings may explain mechanism; a key-and-default table becomes a link; `test_docstring_defaults.py` closes the `UrlSource` exposure. Then row 17, then close. [detail](open/W-146-the-rest-of-l0.md)
 
 
 ---

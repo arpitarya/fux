@@ -4,7 +4,7 @@ id: W-148
 title: "W-148 — what the two readers still owe: CI reach, the latency fence, and the renderer split"
 description: "The three things W-107 could not close and one SR-API deliberately staged. None is a build task: two are decisions Arpit has not taken, one needs an environment nobody has built, and the fourth is a refactor of a 1 481-line hot file that is explicitly not in scope until someone asks for it. Filed so that closing W-107 does not close them by silence."
 status: open
-lane: arpit
+lane: agent
 timestamp: 2026-09-12T00:00:00Z
 ---
 
@@ -157,10 +157,17 @@ change.
   SR-API decision 6's stated difference on a frozen surface, and it is Arpit's
   call — it belongs in the inbox if he wants it, not in a build item.
 
+## ✅ RULED 2026-09-14 (Arpit) — all three calls
+
+| call | ruling | agent work |
+|---|---|---|
+| **1 · CI and the golden corpus** | **The golden corpus is not for CI.** Golden runs local-only, in `fux-lab`. No self-hosted runner, no committed rung, no portable builder | `node-arm.yml` keeps `ladder_check.py` (manifests only) and drops the `FUX_GOLDEN_CORPORA` arm; PRE-REG-NODE-2 §4's cadence is rewritten as a local cadence; every report that says *"CI would…"* says *local* |
+| **2 · Node's latency** | **Add the Node measurement to `fux-benchmark`, the same shape as Python's** — same rungs, same `p95`, one more column | a `node` arm in `fux-benchmark`'s capture, the row in [SR-WORK-BENCHMARK](../../records/0053_WORK-benchmark.md), the N4 fence re-stated as measured |
+| **3 · the harness's zero commits** | **Insignificant.** `fux-benchmark` is scratch for testing; commits are optional — *"if you do it, great; if not, also fine"* | the record states the harness is scratch and that SR-WORK-BENCHMARK decisions 8–10 are enforced by an uncommitted file, so nobody rediscovers it |
+
 ## Blockers
 
-- 🔴 Rows 1 and 2 are **Arpit's calls**, and nothing agent-side proceeds on
-  either.
+- ✅ Rows 1 and 2 were Arpit's calls; **ruled above**. Agent work proceeds.
 - 🟡 Row 3 needs the branch on `origin/main`; **no session pushes without being
   asked** (CLAUDE.md).
 - 🟢 Row 4 is agent work whose definition-of-done does not exist yet.

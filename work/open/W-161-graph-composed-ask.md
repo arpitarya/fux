@@ -4,7 +4,7 @@ name: W-161
 description: "`fux ask` becomes lexical → graph → split → confidence → refer: a boosted tier (lexical matches re-ordered by RRF with the walk) and a labelled related tier (link-reached documents with no lexical match). `answer` reads `ask`. A ranking change — waits on W-156 and on golden link-dependent questions."
 item: W-161
 filed: 2026-09-13
-ball: arpit
+ball: agent
 ---
 
 # W-161 — the graph-composed `ask`, two tiers
@@ -15,11 +15,14 @@ ball: arpit
 
 **Ratified:** Arpit, 2026-09-13 —
 [compare doc](../compare/ask-graph-expansion.compare.md). Ratified, not built.
-**Waits on:** **W-156** alone. W-160's atoms **shipped 2026-09-14** — see the
-section below and [SR-GRAPH](../../records/0126_graph.md) decisions 13–15
-(what evidence a ranking change may have), and a golden key that carries
-link-dependent questions ([SR-RS](../../records/0133_predictions.md) d23 —
-Codex's hands, never Claude's).
+**Waits on:** nothing agent-side. **W-156 was ruled 2026-09-14** — SR records
+win on contact and the single-corpus sentence left SR-RS; the evidence a ranking
+change needs is [SR-RS](../../records/0133_predictions.md) decision 19's paired
+floor on golden data ([SR-LAW-0](../../records/0002_LAW-0-authority.md) decision
+2a). W-160's atoms **shipped 2026-09-14** — see the section below and
+[SR-GRAPH](../../records/0126_graph.md) decisions 13–15. The two measured arms
+still want link-dependent golden questions (SR-RS d23 — Codex's hands, never
+Claude's, **available 2026-09-30**); the build does not wait on them.
 
 ## W-160's atoms shipped on 2026-09-14 — what that changes for this item
 

@@ -3,14 +3,14 @@ type: Standing Record
 kind: law
 name: SR-LAW-10
 title: "SR-LAW-10 (0011) — L10 — the consumer is served build output, never source"
-description: "What fux puts in front of a consumer — vendored into their repository or exposed as a published package's entry point — is a generated bundle, one artefact per plane. Decoders and fetchers are the only exceptions, because there readable source IS the contract."
+description: "What fux puts in front of a consumer — vendored into their repository or exposed as a published package's entry point — is a generated bundle, one artefact per plane. Decoders, fetchers and observers are the only exceptions, because there readable source IS the contract."
 status: accepted
 date: 2026-09-12
 feature: the rationale, history and reopen-trigger of L10
 owns: []
 laws: [L10]
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 3e28fa660399339122f070bdf4b50fd3ae7d46a85a32a23055f20f940ecf76e0
+content_sha: db016687e165a752b89a1c8c1c39812cb4f65c761207b4f945e31920f95680a6
 ---
 
 # SR-LAW-10 — L10 — the consumer is served build output, never source
@@ -44,10 +44,12 @@ and before this record each one decided for itself.
 | npm `fux-engine`: `exports: {".": "./src/index.mjs"}`, `files` carries `"src"` | the bundle is the export; `files` drops `src` |
 | `.fux/decoders/*.py` | ✅ **exempt** — the consumer writes these |
 | `.fux/fetchers/*.py` | ✅ **exempt** — the consumer writes these |
+| `.fux/observers/*.py` · `*.mjs` | ✅ **exempt** — the consumer (or a tool it installs) writes these; [SR-OBSERVE](0157_observe.md). Ruled by Arpit 2026-09-14 |
 | `.fux/index`, `.fux/*.toml`, `.fux/enrich/**` | not code; L10 says nothing about them |
 
 **The exemption is not a carve-out for convenience, it is the inverse case.**
-[`.fux/decoders/`](0139_decode.md) and [`.fux/fetchers/`](0117_fetcher.md) exist
+[`.fux/decoders/`](0139_decode.md), [`.fux/fetchers/`](0117_fetcher.md) and
+[`.fux/observers/`](0157_observe.md) exist
 *so that* a consumer reads, edits and commits the Python in them —
 [`fux setup`](0102_fux-directory.md) seeds them from `templates/*.py.txt` as a
 starting point they are expected to change. Bundling those would destroy the
@@ -73,7 +75,7 @@ flowchart LR
     B["bundle, at publish<br/>(in-repo, deterministic)"]
     W["the wheel AND the npm tarball<br/>(both carry the same artefact)"]
     C[".fux/node/fux.mjs<br/>(ONE file in the consumer's tree)"]
-    D[".fux/decoders/ · .fux/fetchers/<br/>(SOURCE — the exemption)"]
+    D[".fux/decoders/ · .fux/fetchers/ · .fux/observers/<br/>(SOURCE — the exemption)"]
     S --> B --> W --> C
     W -. "seeded once, then the consumer owns it" .-> D
 ```
@@ -90,7 +92,7 @@ flowchart LR
             |
      +------+---------------------------+
      v                                  v
-  .fux/node/fux.mjs            .fux/decoders/  .fux/fetchers/
+  .fux/node/fux.mjs            .fux/decoders/  .fux/fetchers/  .fux/observers/
   ONE file in the              SOURCE -- seeded once, then
   consumer's tree              the consumer owns it
                                (THE EXEMPTION)
@@ -163,11 +165,15 @@ plane. It reaches them two ways and the rule is the same for both: **vendored**
 into their tree by `fux setup`, or **exported** as a published package's entry
 point. `.py`, `.mjs`, `.js`, `.ts` — the language does not change the rule.
 
-**2. Exactly two exemptions, by name:** [`.fux/decoders/`](0139_decode.md) and
-[`.fux/fetchers/`](0117_fetcher.md). They ship as readable source because the
-consumer is expected to read and edit them; that is their entire contract.
-**The list is closed.** A third exemption is an amendment to this record with
-Arpit's ruling named in it.
+**2. Exactly three exemptions, by name:** [`.fux/decoders/`](0139_decode.md),
+[`.fux/fetchers/`](0117_fetcher.md) and [`.fux/observers/`](0157_observe.md).
+They ship as readable source because the consumer is expected to read and edit
+them; that is their entire contract. **The list is closed.** A further exemption
+is an amendment to this record with Arpit's ruling named in it — as the third
+was: **Arpit, 2026-09-14, ruling on W-170:** *observers get their own record*,
+and `.fux/observers/` joins the list because an observer is code the consumer
+(or a tool acting for the consumer, such as cage's `setup`) writes and owns;
+fux ships none and imports none by name.
 
 **3. Bundling happens at publish, in fux's pipeline.** One build, off the single
 `release: published` trigger in
@@ -220,8 +226,9 @@ is broken:
 ⚠ **Two exposures remain, and neither is the law's text.** A **consumer who
 never upgrades** keeps their old module tree — the prune runs on a version
 difference, so nothing reaches a repository whose owner stopped running fux.
-And **`.fux/decoders/` is still exempt by design**, so consumer-owned Python
-does sit in their tree; that is the inverse case decision 2 names, not a gap.
+And **`.fux/decoders/`, `.fux/fetchers/` and `.fux/observers/` are exempt by
+design**, so consumer-owned Python does sit in their tree; that is the inverse
+case decision 2 names, not a gap.
 
 ### Consequences
 
@@ -264,8 +271,8 @@ does sit in their tree; that is the inverse case decision 2 names, not a gap.
   *regenerate and compare*, ship the thing that gets regenerated.
 - **Compile or bundle the Python distribution too.** Rejected, and it is the
   reading of *"be it for Python"* this record deliberately did not take. The
-  Python a consumer is **served** is `.fux/decoders/` and `.fux/fetchers/` —
-  already the two exemptions. Everything else is installed into site-packages by
+  Python a consumer is **served** is `.fux/decoders/`, `.fux/fetchers/` and
+  `.fux/observers/` — already the three exemptions. Everything else is installed into site-packages by
   pip, where shipping bytecode or a single-file bundle breaks editable installs,
   makes every stack trace useless, fights the packaging ecosystem
   [L1](0003_LAW-1-zero-cost.md) depends on, and protects a repository nobody was
@@ -275,7 +282,8 @@ does sit in their tree; that is the inverse case decision 2 names, not a gap.
 - **Exempt any directory the consumer might want to read.** Rejected: that is
   the status quo with a justification attached. The test of an exemption is
   *the consumer EDITS this*, not *the consumer might look at it*, and on that
-  test the list is exactly two.
+  test the list is exactly three — an observer is edited by the consumer or by
+  the tool the consumer installed to write it, never by fux.
 - **Require minification.** Rejected: it buys nothing fux wants and costs the
   ability to eyeball a diff during W-149.
 
@@ -288,7 +296,7 @@ does sit in their tree; that is the inverse case decision 2 names, not a gap.
   [`work/IMPLEMENTATION.md`](../work/IMPLEMENTATION.md). Named, never cited
 - [SR-NODE-SEARCH](0153_node-search.md) — the plane this law binds first
 - [SR-FUX-DIRECTORY](0102_fux-directory.md) — what `.fux/` holds, and who owns each child
-- [SR-DECODE](0139_decode.md) · [SR-FETCHER](0117_fetcher.md) — the two exemptions
+- [SR-DECODE](0139_decode.md) · [SR-FETCHER](0117_fetcher.md) · [SR-OBSERVE](0157_observe.md) — the three exemptions
 - [`src/fux/store/fuxdir.py`](../src/fux/store/fuxdir.py) — `_node_source`, `_packaged_node_files`, `ensure_node_reader`: the code that vendors today
 - [`hatch_build.py`](../hatch_build.py) — the wheel's build hook, which replaced
   `pyproject.toml`'s `force-include` list · `node/package.json` `exports` / `files`
@@ -297,7 +305,7 @@ does sit in their tree; that is the inverse case decision 2 names, not a gap.
 
 ### Veto condition
 
-**Reopen if** a code file lands in a consumer's tree outside the two exempt
+**Reopen if** a code file lands in a consumer's tree outside the three exempt
 directories and is not that plane's single bundle, if a published package
 exports a module tree, or if an exemption is added without an amendment to this
 record.

@@ -4,7 +4,7 @@ id: W-146
 title: "W-146 — the rest of L0: the unhoused CLAUDE.md sections, and the ruling Arpit still owes"
 description: "W-122 moved the ten laws into their records and made CLAUDE.md a generated view. What it deliberately did not do: write records for the eleven technical-but-unhoused CLAUDE.md sections its inventory names, and settle the questions only Arpit can. One is answered — SR-WORK-OPEN-QUEUE is written and the queue's rules have a home; what is left is how far `never restates` reaches into docstrings. Carries W-122's delivered inventory verbatim."
 status: open
-lane: arpit
+lane: agent
 timestamp: 2026-09-12T00:00:00Z
 ---
 
@@ -83,7 +83,27 @@ far less reviewable diff than the one Arpit ruled on. They are named here so the
 next session can take one, and none of them is a second copy of anything: no
 record states them today, which is why they stay legible where they are.
 
-## 2 · 🔴 The ruling still owed
+## 2 · ✅ RULED 2026-09-14 (Arpit) — option (a), the narrow reading, with a gate
+
+**The ruling:** a docstring may explain *mechanism and rationale*; a docstring's
+table of keys and their defaults is a restatement and becomes a link; and the
+exposure is closed by a test, not by judgment. Written into
+[SR-LAW-0](../../records/0002_LAW-0-authority.md) decision 4 (a new *explains*
+row) and decision 4a (the docstring gate).
+
+**Agent work now, in order:**
+
+1. `tests/test_docstring_defaults.py` — extract every `key = value` /
+   `default: value` literal from docstrings under `src/fux/`, resolve the owning
+   record via the ownership table, assert the literal equals the record's
+   declared value. Red first on `UrlSource` if it disagrees with SR-CONFIG;
+   fix the docstring, never the record.
+2. Turn any docstring that is *only* a key-and-default table into a one-line
+   link to its record. Leave every mechanism/rationale docstring alone.
+3. Row 17 of §3 lands in the same change. Then this item closes.
+
+The question as it stood before the ruling, kept because the argument still
+binds:
 
 1. **How far does "never restates" reach into code comments?** SR-LAW-0 decision
    4's table names *a docstring* among the artifacts that must link rather than

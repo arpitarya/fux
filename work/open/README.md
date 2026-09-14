@@ -35,3 +35,6 @@ detail. The detail lives here, one file per `W-nn`, named
 
 **Naming.** `W-nn` ids are never reused. Ids `W-00`…`W-14`, `W-20`,
 `W-21`, `W-40`, `W-41` are retired (done); see WORKLOG for their record.
+`W-167`, `W-171`, `W-172` are retired unused — a 2026-09-14 id collision
+between two concurrent sessions (the item became W-173); they are holes by
+design, not lost items.

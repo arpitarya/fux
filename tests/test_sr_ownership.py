@@ -466,6 +466,11 @@ _UNREACHABLE_BY_THE_GATE = {
     # thing and read as authority while doing it.
     "SR-WORK-SCALE", "SR-WORK-LIFECYCLE", "SR-WORK-DOCS", "SR-WORK-SESSION",
     "SR-WORK-OKF", "SR-WORK-ARCHIVE", "SR-WORK-RELEASE", "SR-WORK-BLOCKERS",
+    # SR-OBSERVE (2026-09-14) is `proposed`: Arpit ruled the observer hook and
+    # its L10 exemption before a line of it exists. It owns `src/fux/observe.py`
+    # the moment W-170 lands, and this pin is deleted in that change — a record
+    # here because its code is owed, not because it has none by design.
+    "SR-OBSERVE",
 }
 
 

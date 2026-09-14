@@ -4,7 +4,7 @@ name: W-168
 description: "The ten ranking improvements of proposals/search-improvements-v3.md, promoted as one program with ten gated steps: anchor text, corpus-mined expansion, unstemmed identifier field, RM3, supersession-aware ranking, SDM proximity, MMR diversification, git authority prior, intent → doc-type prior, section-level units. Each step is its own golden question → pre-registration → build → measure → keep/remove; never two in one arm."
 item: W-168
 filed: 2026-09-14
-ball: arpit
+ball: agent
 ---
 
 # W-168 — the ten search improvements, one program
@@ -15,8 +15,10 @@ a golden question and a pre-registration exist.**
 **Promoted 2026-09-14 by Arpit** from
 [`proposals/search-improvements-v3.md`](../proposals/search-improvements-v3.md), which
 stays the spec (the per-idea table in its §1 and §3b is the definition of done here, not
-repeated). **Waits on W-156** — every step is a ranking change and lands under whatever
-evidence rule W-156 settles.
+repeated). **W-156 ruled 2026-09-14:** every step is a ranking change and lands under
+[SR-RS](../../records/0133_predictions.md) decision 19's paired floor on golden data —
+the single-corpus sentence is gone ([SR-LAW-0](../../records/0002_LAW-0-authority.md)
+decision 2a). Nothing agent-side waits.
 
 ## Definition of done — per step, in this order
 

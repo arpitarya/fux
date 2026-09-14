@@ -19,15 +19,15 @@ not trim it, and do not read it top-down as a priority order** —
 [SR-WORK-BACKLOG](../records/0055_WORK-backlog.md) rules 3 and 28.
 
 ⚠ **The first sweep is a claim, not a proof.** Rows `B-001`–`B-241` come from
-one reading of all seventy records on 2026-09-13; `B-242`–`B-244` were filed and promoted the same day (2026-09-14) — W-168, W-169, W-170. **Every row is individually
+one reading of all seventy records on 2026-09-13; `B-242`–`B-244` were filed and promoted the same day (2026-09-14) — W-168, W-169, W-170; `B-245` is W-112 parked (2026-09-14); `B-175` left the same day, promoted as W-176. **Every row is individually
 traceable to the sentence it cites; the set's completeness is not proven** and
 no session should treat this file as exhaustive.
 
 **Nothing here is in [`OPEN-WORK.md`](OPEN-WORK.md).** Items the records name
-that the queue holds instead carry no row here: W-87, W-112, W-136, W-140,
-W-144, W-145, W-146, W-147, W-148, W-154, W-155, W-156, W-157, and — promoted
+that the queue holds instead carry no row here: W-87, W-136, W-140,
+W-144, W-145, W-146, W-147, W-148, W-154, W-155, W-157, and — promoted
 from rows here on 2026-09-14 — W-163 (eight doctor rows), W-164 (four gates),
-W-165 (three CLI fixes), W-166 (carry-forward invalidation), W-168 (search improvements), W-169 (`fux inspect`), W-170 (cage search leg).
+W-165 (three CLI fixes), W-166 (carry-forward invalidation), W-168 (search improvements), W-169 (`fux inspect`), W-170 (cage search leg), W-176 (the nine abstention gates, from B-175).
 
 ---
 
@@ -168,6 +168,7 @@ W-165 (three CLI fixes), W-166 (carry-forward invalidation), W-168 (search impro
 | B-135 | The double-load hazard "is unchanged and still unmeasured" — Copilot sees two same-name skill copies | [SR-AGENT-POLICY](../records/0132_agent-policy.md) decision 14a ⚠ | Observe or rule out a duplicate-name error in Copilot |
 | B-136 | The SR-OUTPUT build's test evidence was measured against a local mirror: "Re-run `pytest -q tests` on the real repo before treating this as landed" | [SR-OUTPUT](../records/0143_output-defaults.md) Reference ⚠ | Run both suites on the real repo and record it |
 | B-137 | A judgment supply in the hundreds is "legal to collect and still not collected" — the L8 reversal "unblocks that pressure rather than resolving it" | [SR-LAWS](../records/0001_LAWS.md) decision 8 · [SR-LAW-8](../records/0010_LAW-8-use-record.md) Consequences | Decide and record whether the query log is collected |
+| B-245 | The vector plane (`fux embed`, `.fux/vectors/`, `--qvec`, RRF fusion) — closed unbuilt 2026-09-14: its gate can never fire, no corpus carries DENSE-CHUNK's bar. Determinism is *same embedder build* only | [SR-RS](../records/0133_predictions.md) d19 · archived W-112 | **Reopen only when both hold:** a rank-contract corpus exists **and** doc2query's ceiling is measured. Compare doc first |
 
 ---
 
@@ -223,7 +224,6 @@ no row: what remains of each is **W-112** and **W-144** in the queue.*
 
 | id | what is outstanding | named in | what closes it |
 |---|---|---|---|
-| B-175 | The abstention gate — fux answers all 20 blind-authored unanswerables twice; options A disclose, B gate quality claims, C build and measure. Recommends B then C | [`abstention-gate.md`](proposals/abstention-gate.md) | Arpit picks A and/or B; **C graduated 2026-09-13 → [`compare/abstention-gates.compare.md`](compare/abstention-gates.compare.md)** |
 | B-176 | Positioning — `graduated` and kept: GitHub About and topics still need Arpit's `gh`, the PyPI page changes on the next upload, and §5's `code`→`path` rename is a live fork | [`positioning-documents-not-code.md`](proposals/positioning-documents-not-code.md) | The three remaining surfaces, and the rename ruling |
 | B-177 | The 2026-09-05 unblock — a proposed ruling for every inbox row, `R-1`…`R-11`, with the evidence beside each. "Nothing implemented, nothing defaulted" | [`unblock-2026-09-05.md`](proposals/unblock-2026-09-05.md) + [its prompt](proposals/unblock-2026-09-05-claude-code-prompt.md) | Arpit strikes or accepts each line |
 | B-178 | SR review 2026-08-28 — five rules each broken in 20–45 of 47 records, record-vs-record only, and some of the lint has since landed "which nobody has reconciled against this list" | [`adr-review-2026-08-28.md`](proposals/adr-review-2026-08-28.md) | Reconcile the list against what shipped, then bulk-pass |

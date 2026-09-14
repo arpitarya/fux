@@ -4,7 +4,7 @@ name: W-170
 description: "`.fux/observers/` — a third consumer extension point beside decoders and fetchers: after a verb renders, fux hands every observer one counts-only fact record (verb, args_hash, band, answerable, result/related counts, refer verdicts, latency, --expand/-q used). Observe-only, fail-open, wall-clock-capped; no question text, no document ids. Cage is the first subscriber — its `cage setup` drops the observer that writes cage's ledger. Ruled by Arpit 2026-09-14 as the mechanism; whether cage's leg ships is cage's open verdict."
 item: W-170
 filed: 2026-09-14
-ball: arpit
+ball: agent
 ---
 
 # W-170 — `.fux/observers/`, the observe-only hook (cage subscribes)
@@ -16,9 +16,14 @@ the answer) **and the L10 amendment; Sonnet for the dispatcher and tests.**
 exposes, not an emitter fux ships** — *"a middleware that fux exposes and cage can
 intercept"*, narrowed in the same conversation to **observe-only**. Supersedes the emit
 design in [`proposals/cage-search-leg.md`](../proposals/cage-search-leg.md) §1–§4 (kept
-as the record of what was replaced). **Still blocked on Arpit:** cage's verdict on
-`cage/work/compare/fux-search-leg.compare.md` decides whether anyone subscribes; the
-L10 exemption (below) is a Law change and needs his ruling **named in the record**.
+as the record of what was replaced). **Both rulings taken 2026-09-14 (Arpit):**
+(1) cage's `work/compare/fux-search-leg.compare.md` — **option C** (both halves, A first,
+B is the observer hook); cage's half A shipped the same day. (2) **observers get their
+own record** — [SR-OBSERVE](../../records/0157_observe.md) is filed `proposed` with the
+seam, the schema and the cap, and [SR-LAW-10](../../records/0011_LAW-10-bundled-output.md)
+decision 2 now names `.fux/observers/` as the third exemption with his ruling in it.
+**Nothing blocks the build.** Landing it flips SR-OBSERVE to `accepted`, fills its
+`owns`, and deletes the `SR-OBSERVE` pin in `tests/test_sr_ownership.py`.
 
 ## Definition of done
 
@@ -46,8 +51,8 @@ L10 exemption (below) is a Law change and needs his ruling **named in the record
 7. **cage's template** is cage's to ship (`cage setup` writes `.fux/observers/cage.py`,
    which appends to `<resolved cage ledger>/ledger/fux/`). fux carries **no** cage
    knowledge — a test asserts `src/fux` imports and names nothing cage-shaped.
-8. **Records.** A new **SR-OBSERVE** (the seam, the record schema, observe-only, the
-   cap); **SR-LAW-10 amended by Arpit** — the exemption table gains `.fux/observers/*`;
+8. **Records.** **SR-OBSERVE exists (`proposed`) and SR-LAW-10 is amended** — the
+   build flips the status, fills `owns`, and adds the ownership row;
    SR-CLI (the dispatch point); SR-LAW-8 (a Consequences note: a counts record handed to
    a consumer's code is not a use record, and nothing here reaches a commit); SR-DOCTOR;
    SR-NODE-SEARCH; SR-AGENT-POLICY (`fux-usage` gains one line; a `fux-observer` guide is

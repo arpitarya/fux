@@ -10,7 +10,7 @@ feature: the authority of records — where a rule lives, which record wins, and
 owns: []
 laws: [L0]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: 57aeba6d043e17cf717fb1af878b92db683adbc26115181c1f8b3e3638e23904
+content_sha: 0b6ec9371eed5abb758b5f472d678ebd424220a9db3d83f8377d34dbc6e3536b
 ---
 
 # SR-LAW-0 — L0 — SRs are the only source of truth
@@ -176,6 +176,19 @@ part** — a defect to fix on contact, never a trade-off to weigh. An ordinary
 record may narrow a law's application to its own subject; it may never widen,
 except, or contradict one.
 
+**2a. On contact, the conflicting sentence is DELETED from the lower document —
+never softened, never footnoted, never left standing beside a pointer.** (Arpit,
+2026-09-14, ruling on W-156: *"SRs are the only standing records and are
+prioritised over everything else. If there is a conflict, the SR is prioritised
+and the other document is cleared of it."*) The order is fixed: a Law record
+outranks an ordinary record, and any record outranks every non-record artifact
+in decision 1's list. The first case: SR-WORK-ENVIRONMENTS decision 2 (*every
+measurement runs in `fux-lab` on the golden test data*) and SR-RS's former
+sentence *"never ship a ranking change off a single synthetic corpus"* could not
+both hold, so the sentence left SR-RS. **The single-corpus rule is gone; the
+evidence a ranking change needs is SR-RS decision 19's paired floor on golden
+data, and nothing else.**
+
 **3. Amendment is entrenched.** A Law record changes **only on Arpit's ruling,
 named in the record**. An ordinary SR a session may accept under the
 lifecycle. Without this clause "supreme" is decoration: a hierarchy whose top
@@ -187,9 +200,18 @@ that is routed around.
 
 | kind | example | verdict |
 |---|---|---|
-| **describes** a rule a second time | a `doc:` string in a schema file; a `fux.toml` comment explaining what a key means | 🔴 forbidden — becomes a link |
+| **describes** a rule a second time | a `doc:` string in a schema file; a `fux.toml` comment explaining what a key means; **a docstring's table of keys and their defaults** | 🔴 forbidden — becomes a link |
+| **explains** mechanism or rationale beside the code | a docstring saying *why* `UrlSource` resolves in this order, or *how* a walk terminates | ✅ permitted — prose about the code is not a second statement of a rule (Arpit, 2026-09-14, W-146: the narrow reading) |
 | **implements** it | `config.py` naming the key it parses | ✅ permitted — it *is* the thing the record governs |
 | **enforces** it | a runtime-loaded schema, a test | ✅ permitted — an executable check, not a second statement |
+
+**4a. The docstring gate.** A docstring may name a key; it may not carry a
+default the record does not. `tests/test_docstring_defaults.py` (owed by W-146)
+extracts every `key = value` / `default: value` literal from docstrings under
+`src/fux/` and asserts each equals the value the owning record declares —
+that is what turns the narrow reading from judgment into an enforcement, and
+closes the exposure that `UrlSource` and SR-CONFIG could disagree while both
+looked correct.
 
 **The test in one sentence:** *could this artifact and the record disagree
 while both still look correct?* If yes, it is a restatement. If it would

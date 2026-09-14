@@ -4,7 +4,7 @@ id: W-144
 title: "W-144 — structure-aware extraction: does a table inflate `flen`?"
 description: "MEASURED 2026-09-12 and the answer is yes: excluding table-row tokens from flen ranks better, hit@1 0/30 -> 30/30 at p = 0 with both controls holding, above a table share of ~0.29 that a third of the golden ladder exceeds. One synthetic corpus may not ship a ranking change, so what is left is Arpit accepting or overriding the compare doc."
 status: open
-lane: arpit
+lane: agent
 timestamp: 2026-09-12T00:00:00Z
 ---
 
@@ -137,7 +137,24 @@ documents actually have.**
 ⚠ The transition is a cliff because all 30 probes are built identically. A real
 corpus gives a gradient; the cliff **locates** the threshold.
 
-## 🔴 What is left: Arpit accepts or overrides the compare doc
+## ✅ RULED 2026-09-14 (Arpit) — (d), lower `b`, measured first
+
+The compare doc's verdict block carries the ruling. **Agent work, in order:**
+
+1. Pre-register the sweep in `work/regression/<date>-b-sweep/PRE-REGISTRATION.md`:
+   `b ∈ {0.75, 0.6, 0.5, 0.4}`, families `dump` · `content` · `main` + `inverse` ·
+   `placebo`, decision rule *first value netting positive on all three with
+   controls holding*, SR-RS d19 floor at the pair count actually run.
+2. Run it on the golden ladder (verdict) and on fux's own docs tree
+   (reopen-trigger evidence only).
+3. Ship the winning `b` as the `tune.toml [bm25f]` default, amend
+   [SR-TUNING](../../records/0135_tuning.md) and
+   [SR-RANKING](../../records/0111_ranking.md) in the same change, L3 check,
+   two-reader byte equality.
+4. If no value wins: (b) + idf guard, its own pre-registration, same bar.
+   **(c) is out for 3.0.**
+
+## What was left before the ruling — kept because the argument binds
 
 **This item's clause 2 — *"a null closes this item"* — is not reached.** Clause 3
 applies: *a compare doc for the field design, then an SR amendment, then the
@@ -196,7 +213,7 @@ between those two readings.
   - **This item still does not close.** The ruling — accept (b) anyway, move to
     (c), move to (d), or wait for W-156 — is Arpit's, and the measurement is
     now in front of him instead of missing.
-- 🔴 **[W-156](W-156-prevalence-outside-golden.md)** carries the reason this
+- 🔴 **W-156 (ruled 2026-09-14, archived)** carries the reason this
   cannot ship on the evidence it has: **SR-WORK-ENVIRONMENTS puts every
   measurement on golden data, golden is one synthetic corpus, and the
   single-corpus rule therefore cannot be satisfied by any ranking change.**

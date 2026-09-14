@@ -10,7 +10,7 @@ feature: the prediction system — the R ids, their register, the rules that mak
 owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@a6bc8b6a056c, tools/vector-gate@0023bff0cdef]
 laws: [L3]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 56b7ded76232db0376c0fb9cf67e5852fb3b7de79f7519fa2acc1f890dd630e7
+content_sha: 2dc4232f1db4b53440ddcf7f3a2b95bfef2642f77dd3e665467710cedbcf7be1
 ---
 
 # SR-RS — the R predictions
@@ -257,9 +257,11 @@ measure against it.
   THAT**, rather than reporting the number as if it did.
 - **The reproduce command must actually reproduce.** Findings that warrant a
   change graduate to [`work/proposals/`](../work/proposals/README.md) and, when
-  accepted, to a record. **Never ship a ranking or behaviour change off a
-  single synthetic corpus** — ⚠ and whether that is satisfiable at all is
-  [W-156](../work/open/W-156-prevalence-outside-golden.md), open and Arpit's.
+  accepted, to a record. **The evidence a ranking change needs is decision 19's
+  paired floor, measured in `fux-lab` on the golden test data** —
+  [SR-WORK-ENVIRONMENTS](0052_WORK-environments.md) decision 2 names the only
+  place a measurement runs, and [SR-LAW-0](0002_LAW-0-authority.md) decision 2a
+  is why no second corpus is demanded here.
 
 [`tools/pruning-eval/PRE-REGISTRATION.md`](../tools/pruning-eval/PRE-REGISTRATION.md)
 is the worked example.

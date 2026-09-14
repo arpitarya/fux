@@ -11,7 +11,7 @@ owns: [src/fux/correct.py@825b9f26220b, src/fux/enrich.py@156e7a9b9a69, src/fux/
 laws: [L1, L2, L3, L4]
 supersedes: SR-ENRICHED
 timestamp: 2026-08-23T00:00:00Z
-content_sha: c5f0b5acc528c8940533afbcb05e9da65fc0b048eef952627e9e8f120abe5a8b
+content_sha: e9eeb28487bbc8d3af6fbf860dc2de76189d0e7e41da2bcca17dfcaef90f2413
 ---
 
 # SR-ENRICH — enrichment as an agent skill
@@ -541,9 +541,8 @@ ranking code.**
   changed the repository. Caught by running the suspended-pin path.
 - **`ctx`'s weight is NOT raised.** A correction bites because `ctx` is already
   indexed and already weighted. Raising it so corrections bite harder is a
-  ranking change and goes through
-  [W-156](../work/open/W-156-prevalence-outside-golden.md)'s rule, not through
-  this record.
+  ranking change and owes [SR-RS](0133_predictions.md) decision 19's paired
+  floor, not a sentence in this record.
 
 **19a. `--pin` is the editorial escape hatch, and it is deliberately brittle.**
 

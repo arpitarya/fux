@@ -10,7 +10,7 @@ feature: the graph lane — three relational verbs, a derived plane, and a lazy 
 owns: [src/fux/graph@fe0a9b72ad39, tools/graph-bench@9c330ea14b42]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: c15c91ad7a02ae91f8e90aad854646ad13e7dd64f916cf4507c410aa21832cd3
+content_sha: cae94c5b768a1601787aa0286da5684e367c62295c806dbe1ee7f0334b99b433
 ---
 
 # SR-GRAPH — the graph lane
@@ -261,9 +261,9 @@ uses them.** (W-160 DoD 4.)
 | `link_idf_on` | `False` | divide an edge's weight by `link_idf(in_degree of its target)`. **The parameter most likely to move a ranking**, which is why it ships off |
 | `max_hops` | `None` | refuse mass to a node further than `n` hops from any seed. Inert at any value `>= iterations`, since three iterations already bound reach at three hops |
 
-⚠ **Why expose them before using them.** W-161 is a ranking change and waits on
-[W-156](../work/open/W-156-prevalence-outside-golden.md); the mechanism is not a
-ranking change and does not have to wait. **Landing both together would make
+⚠ **Why expose them before using them.** W-161 is a ranking change and owes
+[SR-RS](0133_predictions.md) decision 19's paired floor; the mechanism is not a
+ranking change and owes nothing. **Landing both together would make
 *"the walk moved"* and *"`ask` composes the walk"* one indivisible diff**, and
 no measurement could attribute a delta to either.
 

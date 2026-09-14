@@ -11,7 +11,7 @@ feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error 
 owns: [src/fux/tune.py@2303b6568596]
 laws: [L1, L3, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: dd3cf3e53d4f064735d8b275382bf1c078741ed0958e9feba5af23c88261c5d4
+content_sha: 0fedc8639537b3d6e9ca6e67d2514a0edd5d9c29661be42146879a41ebcc8ab8
 ---
 
 # SR-TUNE — the tunables file, and per-source priority
@@ -774,9 +774,9 @@ and neither is a document prior.**
   document moves the correct value. A number nobody can hold still is not a
   default waiting to be found.
 - **Nothing ranks differently.** It shipped at `1.0`, so `Weighting.of()`
-  returned the same float before and after. This is a cleanup, and it is
-  therefore **not** the ranking change *"never ship one off a single synthetic
-  corpus"* forbids — nothing ships.
+  returned the same float before and after. This is a cleanup, not a ranking
+  change, so [SR-RS](0133_predictions.md) decision 19's paired floor is not
+  owed — nothing ships.
 - **The FACT survives untouched** — `supersedes:` frontmatter, the `superseded`
   record property, the graph edge, `fux explain`, and
   [SR-RANKING](0111_ranking.md)'s declared tie-break, which still puts a live
@@ -855,9 +855,8 @@ fork with no compare doc.**
   a number in front of it would turn a person's decision into one more signal
   competing with the scorer, at a strength nobody could measure. The knob that
   *does* exist for *how much corrections count* is `ctx`'s field weight, which
-  is a **ranking change** and goes through
-  [W-156](../work/open/W-156-prevalence-outside-golden.md)'s rule rather than
-  through a new key here.
+  is a **ranking change** and owes [SR-RS](0133_predictions.md) decision 19's
+  paired floor rather than a new key here.
 
   ⚠ **What this leaves unguarded**: nothing stops somebody adding such a key,
   because `Tune`'s key set is validated against itself and a new key is just a

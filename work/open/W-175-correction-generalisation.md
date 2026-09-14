@@ -4,7 +4,7 @@ name: W-175
 description: "The one claim W-162 shipped unmeasured: that a human correction helps phrasings OTHER than its own. It is the whole reason option (b) beat the editorial pin, it was pre-registered in the compare doc before the build, and the build did not do it. N corrections from real failures on an ungraded corpus, M blind paraphrases each, top-3 before/after, both directions."
 item: W-175
 filed: 2026-09-14
-ball: arpit
+ball: agent
 ---
 
 # W-175 — does a correction generalise, or does it only fix its own phrasing?
@@ -16,6 +16,25 @@ that is the whole instrument.
 **Filed 2026-09-14 on shipping [W-162](../../archive/open/W-162-fux-correct.md).**
 `fux correct` is built, tested and in use. **The claim that made it the accepted
 design is not measured.**
+
+## ✅ RULED 2026-09-14 (Arpit) — three arms, all of them
+
+| arm | source of the corrections | who writes the paraphrases | when |
+|---|---|---|---|
+| **(i) dogfood** | Arpit runs fux on his own repositories and files `fux correct` as he hits a wrong answer | Codex, blind | corrections accrue from now; paraphrases **2026-09-30** |
+| **(ii) fux's own tree** | golden-style questions over `records/` + `work/` + `docs/`; Arpit spot-checks the misses and files the corrections | Codex, blind | questions now; paraphrases **2026-09-30** |
+| **(iii) Codex end-to-end** | Codex authors the failures *and* the paraphrases on a corpus no Claude session graded | Codex | **2026-09-30**, when Codex is available |
+
+**Sizes accepted:** N = 12 corrections per arm, M = 5 blind paraphrases each —
+60 pairs per arm, well past the SR-RS d19 floor if the effect is real.
+**Blind means:** the paraphraser sees the *question* only — never the
+correction, never the document.
+
+**Agent work now:** freeze the pre-registration into
+`work/regression/<date>-correction-generalisation/`, build the harness (file N
+corrections → re-ingest → M paraphrases before/after → per-query rows), write
+the Codex prompt Arpit will run. **Ball: 🟣 2026-09-30** for every measured
+number; 🟢 for the harness.
 
 ## What is unmeasured, precisely
 
@@ -51,7 +70,7 @@ it was written **before** the build:
 **Freeze it into a run directory before the first number** and cite the compare
 doc as the origin, rather than restating the bar in looser words.
 
-## Why this is blocked on Arpit and not agent work
+## Why the paraphrases are not agent work
 
 Three of its inputs are not mine to produce:
 
@@ -60,7 +79,7 @@ Three of its inputs are not mine to produce:
    corpus I can read is fitting the instrument to the answer.
 2. 🔴 **The paraphrases must be written blind, by Codex.** A paraphrase written
    by whoever wrote the correction is the same author twice.
-3. **The evidence rule is [W-156](W-156-prevalence-outside-golden.md)'s.** This
+3. **The evidence rule is W-156 (ruled 2026-09-14, archived)'s.** This
    measures a retrieval delta on one corpus, which is the exact case W-156 is
    open about.
 
