@@ -10,7 +10,7 @@ feature: how a release reaches two registries, how the version stays equal acros
 owns: [scripts/check-version-parity.py@2db5c69a9bcd, tests/test_version_parity.py@f45f30bf53ea]
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 1ae136407a2a83058bbe1d850d2dc3dd9592f13a8a53f1f61a0cdfb9c0d3cb6e
+content_sha: 5d2f43bf4640909cb86e653bdc000bfca6c8863bd088759809501c713b0a9da2
 ---
 
 # SR-WORK-RELEASE — one name in two registries, and what actually blocks a merge
@@ -120,9 +120,49 @@ rather than a string somebody might forget to edit.
 7. **Both registries are reached from one `release: published` trigger** in
    [`publish.yml`](../.github/workflows/publish.yml).
 
-8. **PyPI publishes automatically over OIDC. npm STAGES and waits for a human**
-   to approve on npmjs.com — npm's own recommendation, taken deliberately. **A
-   release is not fully out until somebody approves the npm half.**
+8. **Both registries publish automatically over OIDC, with no human in either
+   path** (Arpit, 2026-09-14). One `release: published` trigger, two jobs, two
+   live versions.
+
+   ⚠ **This decision said the opposite until 2026-09-14**, and the sentence it
+   replaces was *"npm STAGES and waits for a human to approve on npmjs.com —
+   npm's own recommendation, taken deliberately. A release is not fully out
+   until somebody approves the npm half."* It is reproduced because the reason
+   it went is worth more than the rule was.
+
+   🔴 **The gate was never walked through, and nothing said so.** `2.0.0`
+   staged on 2026-09-13; `2.0.1` staged on 2026-09-14; **neither was ever
+   approved.** npm's `latest` went on pointing at `2.0.0-alpha.7` — published
+   2026-09-02 — while PyPI moved twice, so two releases were live on one
+   registry and absent from the other for a day and a half. **The release
+   workflow was green every time**, because staging IS its success: the
+   asymmetry was invisible to every mechanism in this repository, including the
+   `IMPLEMENTATION.md` rows that dutifully recorded *"npm: STAGED, waiting on a
+   human"* and were read by nobody as *"npm: not released"*.
+
+   ✅ **What the old rule bought was real, and is what it cost that decided
+   it.** A human with 2FA between CI and the registry is a genuine guard
+   against a compromised workflow publishing in fux's name — npm recommends it
+   for that reason. What it bought was never exercised: the approval was not a
+   review, it was a chore, and the chore did not get done. **A guard that is
+   reliably skipped provides no protection and hides the fact that it is
+   providing none.** Provenance is what survives — `--provenance` signs from
+   OIDC and is unchanged, so the attestation the staged tarball carried is the
+   attestation the published one carries.
+
+   ⚠ **A precondition of a release now lives outside this repository.** The
+   direct publish works only while **`Allow npm publish` is ticked on the
+   `fux-engine` trusted publisher at npmjs.com**. Untick it and the npm job
+   fails with a registry refusal that no diff in this tree explains. It cannot
+   be asserted from here, and the only written trace is this paragraph,
+   [SR-NODE-SEARCH](0153_node-search.md) decision 14, and the comment beside
+   the step.
+
+8a. **Two versions are still staged and this change does not publish them.**
+   `2.0.0` and `2.0.1` are in the npmjs.com queue as of 2026-09-14; the switch
+   reaches the NEXT release. They are cleared by hand or superseded by a
+   version that goes out on the new path — **until one of those happens npm
+   serves `2.0.0-alpha.7`**, whatever `CHANGELOG.md` says.
 
 9. **The version's history lives in [`CHANGELOG.md`](../CHANGELOG.md) and
    nowhere else.** A release list in a steering file or a record is a second copy
