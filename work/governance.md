@@ -40,7 +40,7 @@ none of them currently is.
 | `regression/<date>-<run>/` (**29 runs**, recounted 2026-08-25) | measured evidence other docs cite | both | `tests/test_regression_runs.py` | every measurement run |
 | `setup/*.md` (3 docs + README) | how the three siblings are stood up; their jobs are [SR-WORK-ENVIRONMENTS](../records/0052_WORK-environments.md)'s | human (mostly) | `tests/test_setup_docs.py`, `tests/test_work_environments.py` | any sibling changes |
 | `paper/the-fux-index-paper.md` | architecture of record + falsifiable predictions | both | none | architecture changes / a prediction is measured |
-| `architecture-*.svg` (**5 diagrams**, recounted 2026-09-12 — plus `proposal-search-v3-target.svg`, which is a proposal's target and deliberately outside the namespace) | visual architecture; `docs/architecture-*.png` are rendered from them | human | none | the plane, verb, reader or record shape one draws changes |
+| `architecture-*.svg` (**6 diagrams**, recounted 2026-09-14; the proposal target sheet archived that day with W-112) | visual architecture; `docs/architecture-*.png` are rendered from them | human | none | the plane, verb, reader or record shape one draws changes |
 
 ## 3. `docs/` — what the project *is*
 

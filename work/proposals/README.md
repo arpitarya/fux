@@ -127,7 +127,7 @@ the defect this ordering exists to make visible.*
   is why it is still here rather than archived. Where `ask`/`find`/`answer`
   lose (measured), the fixes inside L1–L8, the Python-writes /
   Python-or-Node-reads split, the pinned vector plane an agent can produce, the
-  target architecture ([`../proposal-search-v3-target.svg`](../proposal-search-v3-target.svg)),
+  target architecture (its sheet archived 2026-09-14 with W-112's closure — `archive/diagrams/`),
   the research appendix, and the plan — **W-106 … W-112**, each with a detail
   file under [`../open/`](../open/README.md).
   ⚠ **Its frontmatter said the three proposals it supersedes were "deleted in

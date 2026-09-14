@@ -429,6 +429,21 @@ it shipped and dogfooded for two releases and its defect is instructive.
 |---|---|---|
 | [`templates/cdp-rendering.py.txt`](templates/cdp-rendering.py.txt) | 2026-09-01 | **Superseded, not deleted.** `capture()`, and the `_call`/`_wait_event` pair that discarded every message not their own. Live successor: `src/fux/templates/cdp.py.txt` — `fetch_resource()` on `Fetch.enable`/`Fetch.getResponseBody`, with an event pump that files replies and events separately. Live record: [ADR-CDP-FETCHER](../docs/adr/0020_cdp-fetcher.md). ⚠ **The discard loop is the point of keeping it**: under interception a lost `Fetch.requestPaused` is a paused request nobody resolves, which wedges the page — the old code's shape is why the new code has a pump |
 
+## Archived 2026-09-14 — the search-v3 target sheet, with the vector plane's closure
+
+**Deferred once, on purpose.** The 2026-09-12 review left
+`work/proposal-search-v3-target.svg` live *against* the request to archive it,
+because its lower-left column — `.fux/embedders/`, `vectors/<sha>.jsonl`, the
+`--qvec` lane, the W-106 gate — drew the one thing still being ruled on, and
+retiring the only drawing of an open question pre-empts the ruling. **W-112
+closed on 2026-09-14** (parked as `B-245`), so the condition that session wrote
+down — *"if the vector plane closes, the sheet archives with that verdict in the
+same change"* — is met.
+
+| archived | date | live successor |
+|---|---|---|
+| [`diagrams/proposal-search-v3-target.svg`](diagrams/proposal-search-v3-target.svg) | 2026-09-14 | **Everything on the sheet that shipped is drawn in the six live `work/architecture-*.svg`** (redrawn from the code 2026-09-12: the two readers, the Node plane, per-verb `ask`/`answer`). **What did not ship is the vector column, and it is `B-245`** — reopen-triggered, compare doc first. The proposal it illustrated, [`work/proposals/search-v3.md`](../work/proposals/search-v3.md), stays where it is; its two links now point here, named, never cited |
+
 ## Archived 2026-09-05 — four proposals a live directory was still holding
 
 **Housekeeping with two distinct causes, and both were the *move* being late

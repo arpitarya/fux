@@ -48,7 +48,7 @@ mechanical enough for Sonnet it says so, and Opus still owns the gate.
 expansion → W-110 doc2query enrichment → W-111 `ask`/`find` ergonomics →
 W-112 the vector plane, only if W-106 passes.
 
-**Diagrams:** [`../proposal-search-v3-target.svg`](../proposal-search-v3-target.svg)
+**Diagrams:** the target sheet is archived — [`archive/diagrams/proposal-search-v3-target.svg`](../../archive/diagrams/proposal-search-v3-target.svg) (2026-09-14, with W-112's closure); what shipped is drawn in the live `work/architecture-*.svg` set
 is the target; the two shipped diagrams carry a *proposed — not built* band
 pointing at it.
 
@@ -419,7 +419,7 @@ tuple `(-round(s, 9), id)` exactly in the comparator.
 
 ## 7 · Target architecture
 
-**Full picture:** [`../proposal-search-v3-target.svg`](../proposal-search-v3-target.svg).
+**Full picture:** archived 2026-09-14 — [`archive/diagrams/proposal-search-v3-target.svg`](../../archive/diagrams/proposal-search-v3-target.svg); the vector column it draws is `B-245`, the rest is in `work/architecture-*.svg`.
 The two shipped diagrams ([high-level](../architecture-high-level.svg),
 [detailed](../architecture-detailed.svg)) now carry a dashed *proposed — not
 built* band that names this document; nothing proposed is drawn as shipped.

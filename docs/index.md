@@ -79,8 +79,8 @@ work/               THE SHARED MEMORY between sessions — start at work/README.
   BLOCKED.json      the blocker file; its presence stops the session
   paper/            the architecture of record + figures + predictions
   architecture-{high-level,detailed,decoders,ask,answer,two-readers}.svg   the six
-                    diagrams, redrawn from the code 2026-09-12. proposal-search-v3-target.svg
-                    is a PROPOSAL's target state, deliberately outside that namespace.
+                    diagrams, redrawn from the code 2026-09-12. (The proposal target
+                    sheet was archived 2026-09-14 with W-112's closure.)
   open/             one detail file per open W-nn; ARCHIVED on close, never deleted
   setup/            the three siblings — playground · lab · benchmark — outside this repo
                     (SR-WORK-ENVIRONMENTS)
