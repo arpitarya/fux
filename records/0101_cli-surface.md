@@ -10,7 +10,7 @@ feature: the `fux` command-line interface — every verb, its flags, its exit co
 owns: [src/fux/cli.py@4f87294070d9, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@e15fc07dcf7e, src/fux/progress.py@925dccc045ce]
 laws: [L1, L4, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: a8b59243429a5f86ccfa7c07f39648a97fa75132f096ee7eef118190d9aa277c
+content_sha: c498b5bad34ed92e01895e6f12e19d42c45ec21982ee0cbf989bd2517f0becb3
 ---
 
 # SR-CLI — the command-line surface
@@ -27,7 +27,21 @@ content_sha: a8b59243429a5f86ccfa7c07f39648a97fa75132f096ee7eef118190d9aa277c
 | **read** | `ask` · `find` · `answer` | differ only in how much they commit to |
 | **graph** | `explain` · `graph` · `path` | answer with **relationships**, never with a ranking |
 | **serve** | `mcp` · `daemon` | long-running processes; the only verbs that do not return |
-| **maintenance** | `hooks` · `tune` · `verify` | wire the repository to keep its own index in step, print the tunables, and re-run a provenance receipt against this tree |
+| **maintenance** | `hooks` · `tune` · `output` · `verify` | wire the repository to keep its own index in step, print the tunables and the output defaults, and re-run a provenance receipt against this tree |
+
+⚠ **`output` was missing from this table until 2026-09-14 (W-164 gate 2).**
+The verb shipped with [SR-OUTPUT](0143_output-defaults.md) and
+`.fux/README.md`'s own verb table listed it; this one did not, in the table this
+record explicitly *"promises to keep true"*. Two hand-maintained copies of one
+list with nothing comparing them, and **the record was the stale copy** — which
+is the direction that matters under L0, because every other artifact is supposed
+to defer to this one. `tests/test_verb_table_agreement.py` holds the two tables
+and `build_parser()` together now.
+
+🔴 **The parser is what settles a disagreement, and that is the whole design of
+that test.** Comparing two documents can only say they differ; it cannot say
+which is right, and a session that guessed had an even chance of editing the
+README to match a stale record.
 
 **The grouping is the mental model; the count is not.** What a verb does to the
 two planes survives a new verb where a count does not — which is why the table

@@ -1554,7 +1554,7 @@ def test_every_drift_row_is_a_warning_and_none_is_an_error(tmp_path):
 #: The eight rows W-163 added. Named once; every test below reads this.
 DRIFT_ROWS = (
     "retired agent folders",
-    "`.fux/README.md` current",
+    "README.md current",
     "refusal rules current",
     "tune.toml current",
     "output.toml current",
@@ -1612,7 +1612,7 @@ def test_the_live_skills_directory_is_not_reported(tmp_path):
 def test_a_readme_missing_template_sections_is_reported(tmp_path):
     root = _drift_repo(tmp_path)
     (root / ".fux" / "README.md").write_text("# .fux\n\nan old one\n", encoding="utf-8")
-    row = _row(root, "`.fux/README.md` current")
+    row = _row(root, "README.md current")
     assert not row.ok
     assert "section(s)" in row.detail
 
@@ -1631,7 +1631,7 @@ def test_a_readme_a_consumer_annotated_is_NOT_reported(tmp_path):
         fuxdir._readme() + "\n## Our own notes\n\nread the runbook first.\n",
         encoding="utf-8",
     )
-    assert _row(root, "`.fux/README.md` current").ok
+    assert _row(root, "README.md current").ok
 
 
 def test_the_current_template_satisfies_its_own_row(tmp_path):
@@ -1640,7 +1640,7 @@ def test_the_current_template_satisfies_its_own_row(tmp_path):
 
     root = _drift_repo(tmp_path)
     (root / ".fux" / "README.md").write_text(fuxdir._readme(), encoding="utf-8")
-    assert _row(root, "`.fux/README.md` current").ok
+    assert _row(root, "README.md current").ok
 
 
 # -- the retired refusal starter --------------------------------------------

@@ -17,7 +17,7 @@ import { Verdict } from "../refer/freshness.mjs";
 import { resolve, readLocal, fromAcquired, GIT } from "../refer/source.mjs";
 import { passageBoost } from "../query/rerank.mjs";
 import { alreadyTextGlobs, isAlreadyText } from "../decode/registry.mjs";
-import { decline } from "./find.mjs";
+import { declareFloorOff, decline } from "./find.mjs";
 
 /** `answer` refers the top 3 — W-108. One question and no `-q`: an RRF score
  *  would make the three incomparable. */
@@ -79,6 +79,7 @@ export function answerPayload(root, args) {
   const { results, confidence, tune } = runQuery(root, query, ANSWER_TOP, {
     useTune: args.noTune !== true, wantConfidence: true, expand: args.expand ?? "",
   });
+  declareFloorOff(tune, Boolean(args.json));
   const band = (block, freshness) => {
     if (!block || !args.band) return undefined;
     return freshness ? block.withVerified(freshness).asDict() : block.asDict();

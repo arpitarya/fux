@@ -10,7 +10,7 @@ feature: "`fux answer` — one answer, its footing stated, and the report of wha
 owns: []
 laws: [L1, L2, L3]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: cab24e6f9225239a24667b8f7bcdda0bab784567d31251e8dd8e31baf00516ce
+content_sha: b0f3b4e0f65ba5c7bd8b8e44fcbbf2bae585b6172f99c3c1bcef191bf7205981
 ---
 
 # SR-ANSWER — the `answer` verb
@@ -387,6 +387,15 @@ verb's fetching path** (W-140 rows 6 and 7, 2026-09-11).
   than compared against bytes fetched on the spot.
 
 ### Consequences
+
+- **`answer` says the confidence floor is off, once per process** (2026-09-14,
+  W-164 gate 4). ⚠ **W-164's definition of done named `ask` only**, and stopping
+  there would have made [SR-FIND](0104_find.md) decision 6's *"the same rule as
+  `ask`"* false for the second time in one week — this verb publishes the same
+  band from the same floor. It costs nothing: the note is once per PROCESS, so a
+  session using two verbs still hears it once. Suppressed under `--json`, whose
+  `confidence` block carries the floor in parseable form.
+  [SR-CONFIDENCE](0141_confidence.md) decision 13.
 
 - **The passage carries the document's frontmatter block.** `refer/_chunk.py`
   chunks the fetched bytes as fetched — it does not strip the YAML frontmatter

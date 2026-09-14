@@ -373,6 +373,49 @@ def _tune_for(root: Path, args) -> "Tune":
     return _tune(root, enabled=not getattr(args, "no_tune", False))
 
 
+#: Has this process already said the floor is off? **Per process, not per call.**
+#: A shell loop running `fux ask` a hundred times prints it a hundred times and
+#: that is correct — each is a process. One long-lived reader (`fux mcp`) says it
+#: once, which is the difference between a note and a nag.
+_FLOOR_NOTE_SAID = False
+
+
+def _declare_floor_off(root: Path, tune, *, quiet: bool = False) -> None:
+    """Say once, on stderr, that `separation_floor = 0.0` turned `weak` off.
+
+    🔴 **SR-CONFIDENCE decision 13 says of itself that nothing mechanical catches
+    this.** Something does now (W-164 gate 4): a repo where no answer can ever be
+    `weak` says so to whoever is reading the answers, not only to whoever
+    happens to run `fux doctor`.
+
+    **All three read verbs, not just `ask`.** W-164's definition of done named
+    `ask`; `find` and `answer` publish the same band from the same floor, and a
+    note on one of three would make SR-FIND decision 6's *"the same rule as
+    `ask`"* false for the second time in one week. It costs nothing to widen:
+    the note is once per PROCESS, so a session using two verbs still hears it
+    once.
+
+    **`quiet` is `--json` and the MCP transport**, and the suppression is not a
+    politeness — it is the same rule every declaration on this path follows.
+    `--json` is a contract whose stdout is captured and diffed, and MCP's
+    transport carries no free-text channel to a human at all; a JSON caller reads
+    the floor from the `confidence` block, which decision 13 made the
+    load-bearing half of the reversal precisely so it could.
+
+    **ASCII only** - it is printed, and printed text reaches a Windows console.
+    """
+    global _FLOOR_NOTE_SAID
+
+    if quiet or _FLOOR_NOTE_SAID:
+        return
+    if getattr(tune, "separation_floor", None) != 0.0:
+        return
+    from ..doctor import FLOOR_OFF_NOTE
+
+    _FLOOR_NOTE_SAID = True
+    print(f"fux: {FLOOR_OFF_NOTE}", file=sys.stderr)
+
+
 def _declare_pending(root: Path) -> None:
     """W-66 Phase 3: state a lagging index on stderr, never on stdout.
 
@@ -607,6 +650,7 @@ def cmd_ask(args) -> int:
     )
     block = signals.get("confidence")
     why = _derivation_for(root, args, results, path, signals, trace, tune) if want_why else None
+    _declare_floor_off(root, tune, quiet=bool(getattr(args, "json", False)))
     _declare_pending(root)
     _declare_no_accelerator(root)
 
@@ -855,6 +899,7 @@ def cmd_find(args) -> int:
     )
     block = signals.get("confidence")
     results, dropped = _filtered(root, results, args)
+    _declare_floor_off(root, tune, quiet=bool(getattr(args, "json", False)))
     _declare_no_accelerator(root)
     _declare_filters(args, dropped)
 
@@ -920,6 +965,7 @@ def cmd_answer(args) -> int:
     """
     root = _root()
     tune = _tune_for(root, args)
+    _declare_floor_off(root, tune, quiet=bool(getattr(args, "json", False)))
     signals: dict = {}
     # ⚠ **`answer` takes ONE question and no `-q`** — [SR-ANSWER](../../..)
     # decision 4: the verb means one answer. `--expand` applies here exactly as

@@ -7,11 +7,11 @@ description: "One record owns the health-check surface. Every check names a caus
 status: accepted
 date: 2026-09-11
 feature: "`fux doctor` — the read-only, offline health command and its check register"
-owns: [src/fux/doctor.py@9bf2c65605e1]
+owns: [src/fux/doctor.py@a17f4e4c3cda, tests/test_doctor_register_is_complete.py@6c3d2378d45f]
 laws: [L4, L8]
 ratifies: "Arpit, 2026-09-11 — *create a new adr for doctor*"
 timestamp: 2026-09-11T00:00:00Z
-content_sha: ba1ef4b346c4613e1bc78f2325925475637e762d401286c28c550afb3f314e3c
+content_sha: 4fef84fba26b32a3ba20de4a056a56be9215faff219e9670613d20a9773f2b86
 ---
 
 # SR-DOCTOR — the health command, and who owns its rows
@@ -165,17 +165,19 @@ authoritative about the row.**
 | `freshness verdicts` | warn | `freshness_counts` and `AS_INGESTED_VETO_SHARE` — the veto instrument, shared verbatim with SR-ACQUIRED's identical one so the quarter has one home | [SR-URL-FRESHNESS](0147_url-freshness.md) |
 | `ranking priors` | warn | every prior that is wired, reads its input and multiplies by one — **and the count of documents it would have acted on**. It refuses to recommend a value | [SR-ARCHIVED-CONTENT](0134_archived-content.md) · [SR-TUNE](0135_tuning.md) |
 | `output.toml present` | warn | absent means every output default is the engine's own and none can be changed | [SR-OUTPUT](0143_output-defaults.md) decision 20 |
+| `tune.toml loads` | warn, **error** when the file will not parse | 🔴 **A broken `.fux/tune.toml` left doctor GREEN until 2026-09-11** (W-140 row 13), which is the worst shape for this file: `fux ingest` reads only `[index]`, so a bad ranking knob does not stop an ingest by design (SR-TUNE decision 13) while `ask`, `find` and `answer` refuse. The repo indexes cleanly, every row is fine, and every query fails. ⚠ **Absent is NOT an error** — that is a repo running engine defaults. It calls `tune.load` rather than re-parsing: a second parser answers a question the real one does not ask | [SR-TUNE](0135_tuning.md) decision 13 |
 | `types list usable` | error | a types list with no live pattern — `read_types` refuses it, so ingest stops | [SR-TYPES](0128_types-list.md) decision 10 |
 | `fuxignore usable` | warn, **error** when the patterns will not parse | the `.fuxignore` patterns parse, and duplicates | [SR-FUXIGNORE](0144_fuxignore.md) |
 | `dirs exclusions migrated` | warn | the `!` lines still in `.fux/sources/dirs`, each with the anchored pattern to write instead. `fux remove` stopped writing them on 2026-09-14 (SR-FUXIGNORE decision 5a) and they are read forever, so this reports and never fails. ⚠ **Not the duplicate finding above** — that one needs the pattern in *both* files; this fires on every survivor, including the ones nothing duplicates, which are the ones no other row would mention | [SR-FUXIGNORE](0144_fuxignore.md) decisions 5a–5b · [SR-DIR-LIST](0120_dir-list.md) decision 2d |
 | `url redaction current` | warn | the `url:` documents a policy change could not reach — no retained bytes in `.fux/acquired/`, so their records still hold text extracted under the OLD rules. **Never an error**: the record is not wrong about its source, and only a fetch can clear it, so failing here would make `doctor` red until someone goes online. ⚠ **Derived state, so it does not travel with a cloned index** — a fresh clone reads clean until its own ingest re-derives the fact | [SR-PII](0148_pii.md) · [SR-INGEST](0106_ingest.md) · [SR-ACQUIRED](0145_acquired-plane.md) |
 | `retired agent folders` | warn | `.codex/skills/` or `.github/skills/` left behind by an older `setup`. **The DUPLICATE is the defect**: Copilot reads `.agents/skills/` *and* `.github/skills/`, so every skill appears twice and the older copy is free to disagree while both look correct. Delete is the whole remedy, and `fux setup` will not, because the folder may hold files fux did not write | [SR-AGENT-POLICY](0132_agent-policy.md) decision 16 |
-| `` `.fux/README.md` current `` | warn | the file's SECTION SET against the current template's. ⚠ **Sections, not bytes**: the file is write-if-missing so a consumer's notes survive, and a byte comparison would fire on every repo where somebody added a line. An EXTRA heading is the feature, never drift | [SR-DOTFUX](0102_fux-directory.md) decision 6 |
+| `README.md current` | warn | the file's SECTION SET against the current template's. ⚠ **Sections, not bytes**: the file is write-if-missing so a consumer's notes survive, and a byte comparison would fire on every repo where somebody added a line. An EXTRA heading is the feature, never drift | [SR-DOTFUX](0102_fux-directory.md) decision 6 |
 | `refusal rules current` | warn | `.fux/refusals.toml` byte-equal to a starter fux has **REPLACED** — never edited, and refusing by rules fux stopped shipping. ⚠ **Matching the CURRENT starter is not a finding**; a repo set up yesterday looks exactly like that. Fires only on a digest in `doctor.RETIRED_REFUSAL_STARTERS`, **which is appended to by hand in the change that edits the starter** — fux ships one starter, so "equal to a previous one" is otherwise unanswerable from the tree | [SR-REFUSAL](0146_refusals.md) |
 | `tune.toml current` · `output.toml current` | warn | a key the engine has gained that the consumer's file does not mention. Write-if-missing means it never will, so the knob exists and the one file meant to show it does not. ⚠ **Absent is not frozen** — that is engine defaults, deliberately, and each file's own `loads`/`present` row says so | [SR-TUNE](0135_tuning.md) decision 4 · [SR-OUTPUT](0143_output-defaults.md) decision 14 |
 | `declared types are readable` | warn | an include glob in `.fux/formats.toml` naming an extension no built-in and no `.fux/decoders/` decoder claims. ⚠ **Not the `decoder bindings` row**, which fires on a binding no indexed document matches; this one fires on a declared type nothing can READ — the documents are walked and then indexed as raw bytes or skipped, while a committed file says they are documents. **Prose suffixes are exempt**: `extract.py` reads them, so having no decoder is their normal state | [SR-TYPES](0128_types-list.md) |
 | `listed directories exist` | warn | a non-exclusion line in `.fux/sources/dirs` naming a path not on disk. 🔴 **`walk_sources` RAISES on this**, so the next `fux ingest` exits 1 — `fux add` refuses such a path, and a line that arrived another way had nothing checking it. Still `warn`: ingest is where it stops, and a directory not checked out on this branch is a legitimate state for an afternoon | [SR-DIR-LIST](0120_dir-list.md) |
 | `url extraction depth` | warn | a `url:` record whose extracted text is under `THIN_URL_SHARE` of its retained bytes — the `http` fetcher runs no JavaScript, so a single-page app returns a full-size shell and decodes to its nav bar. Read from the committed index and `.fux/acquired/`, never a fetch. ⚠ **Advisory and deliberately loose**: it surfaces the obvious case and adjudicates no extraction quality; `--cdp` is the remedy and whether a page needs one is the consumer's call | [SR-HTTP-FETCHER](0119_http-fetcher.md) |
+| `confidence floors` | warn | `[confidence] separation_floor = 0.0` in `.fux/tune.toml`, which makes `weak` UNREACHABLE for every answer in the repo. 🔴 [SR-CONFIDENCE](0141_confidence.md) decision 13 says of itself that *"nothing mechanical catches it"*; this is the catch. **Reports, never refuses** — zero is a legal value and decision 13 reversed a lock on exactly the reasoning that fux states costs rather than clamping knobs. ⚠ **A merely LOW floor is not reported**: only zero changes what the band can SAY. ⚠ **`doc_coverage_floor = 0.0` is that clause's shipped default** and is never reported. The same sentence is printed once per process on `ask`'s stderr, suppressed under `--json` and MCP | [SR-CONFIDENCE](0141_confidence.md) decision 13 |
 | `fetcher optional functions` | warn | which of `validate()` / `is_rate_limited()` the consumer's fetcher implements — **read as text, never imported** | [SR-FETCHER](0117_fetcher.md) decisions 12–13 |
 | `url sources` | warn | per-URL health from the committed index, **the listed URLs that have never been fetched and so have no record at all** (SR-MAINTENANCE decision 5a's stated cost, built 2026-09-12), the concurrency policy, and **the `update=never` count with the `keep=false` ones named** — a pinned URL is one `fux update` will never go out for again, which is otherwise learnable only by reading every line of the list | [SR-URL-LIST](0116_url-list.md) decisions 14/14b |
 | `background runner` | warn | is a runner live, how many documents pend, is the lock held or stale, did the last run fail. **Read-only: a stale lock is named, never cleared** | [SR-MAINTENANCE](0129_hooks.md) decision 1c |
@@ -316,6 +318,25 @@ which `fux setup` wrote into their repo. See
 [SR-PII](0148_pii.md) decision 20.
 
 ### Consequences
+
+- ✅ **The register is HELD COMPLETE against the code (2026-09-14, W-164 gate 3)**
+  by `tests/test_doctor_register_is_complete.py`, in both directions: a row that
+  exists and is unregistered is an undocumented surface, and a row that is
+  registered and does not exist is worse — this record then says `fux doctor`
+  reports something it does not, which a reader cannot check without running the
+  command and counting.
+  🔴 **It was red on its first run, on a pre-existing gap**: `tune.toml loads`
+  shipped on 2026-09-11 and was never registered.
+  ⚠ **The names are read by RUNNING `doctor`, not by parsing `doctor.py`.** A
+  static scan finds the `Check(...)` calls, but a row's NAME is a literal inside
+  a branch, several per function. Running it on an empty directory produces
+  exactly the set a user sees. **The cost, stated:** a row that appears only
+  under a condition the fixture cannot create goes unchecked — `url daemon` is
+  the live example, listed in that test's `CONDITIONAL` **by name**, never by
+  pattern, because a regex exemption grows to cover what nobody meant to exempt.
+  ⚠ **One row was RENAMED to make this possible**: the README check was
+  `` `.fux/README.md` current ``, whose embedded backticks no table cell can
+  carry unambiguously. It is `README.md current`, like every other row name.
 
 - ✅ **A change to one check opens two records, not eight** — this one, and the
   subject record if the check's *meaning* changed rather than its rendering.

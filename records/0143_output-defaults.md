@@ -13,7 +13,7 @@ feature: configurable output defaults
 owns: [src/fux/output_config.py@bb73da35f5b1]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 70e670164c81c897299b4d6f56288533676460e7eedb4c61ac8b6b6c122e0649
+content_sha: 70d36c4576b7cb36f9d8d17d3eaa15b34b731490b053a111ed863de4c6b0c5e2
 ---
 
 # SR-OUTPUT — output defaults are configurable, in a third file
@@ -698,6 +698,15 @@ drifted **refusal** produces an error on one side and an answer on the other,
 which a harness reports as a crash rather than as a finding.
 
 ### Consequences
+
+- **The confidence-floor note is a stderr DECLARATION, and gains no
+  `output.toml` key** (2026-09-14, W-164 gate 4). It follows the rule every other
+  declaration on this path follows — stderr, suppressed under `--json` and MCP,
+  never gating the answer. ⚠ **It is deliberately not configurable.** A caller
+  who could switch it off would be switching off the one sentence that says their
+  `grounded` is not comparable to anybody else's, which is the misreading
+  [SR-CONFIDENCE](0141_confidence.md) decision 13 left unguarded. A knob here
+  would be a new way to produce the defect the note exists to close.
 
 - ✅ **A frozen `.fux/output.toml` is REPORTED (2026-09-14, W-163)**, the
   companion to SR-TUNE's row and with the same reasoning: a key the engine gained

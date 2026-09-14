@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-27
 amended: 2026-08-28
 feature: the confidence plane
-owns: [src/fux/query/confidence.py@664d92120a9b]
+owns: [src/fux/query/confidence.py@664d92120a9b, tests/test_confidence_floor_off.py@f8e18c079a6e]
 laws: [L1, L3, L4]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: d12e58def03e146302fb3b6494de54644a528b599ea1dbd8590e01d25db6b4d4
+content_sha: 36713ae9fdceff216abfaf4c94f4a2146d2fa1d469f6f4f12ab53abd7aa6a46f
 ---
 
 # SR-CONFIDENCE — how much the index believes its own answer
@@ -340,9 +340,38 @@ doc_coverage_floor = 0.0   # engine default; 0.0 = the clause is OFF
 
 - ⚠ **What decision 7 was buying, now unguarded, stated plainly.** A consumer
   can set `separation_floor = 0.0` and **no answer is ever `weak` again**. That
-  is tuning away the *signal* rather than the ranking, it is silent, and
-  **nothing mechanical catches it.** A session reading a `grounded` from a
-  tuned repo learns less than it thinks it does.
+  is tuning away the *signal* rather than the ranking, and a session reading a
+  `grounded` from a tuned repo learns less than it thinks it does.
+
+  ✅ **It is no longer SILENT, and no longer uncaught (2026-09-14, W-164 gate 4).**
+  This bullet ended *"it is silent, and **nothing mechanical catches it**"* from
+  the day the reversal was accepted. Two surfaces now say so, from **one string**
+  (`doctor.FLOOR_OFF_NOTE` — two accounts of one fact is how they drift):
+
+  1. **`fux doctor`'s `confidence floors` row**, for whoever goes looking.
+  2. **A once-per-PROCESS note on `ask`'s stderr**, for whoever does not. The
+     person reading a `grounded` is the one who needs to know what it is worth,
+     and they are not running `doctor`. Once per process rather than per call: a
+     shell loop is a hundred processes and says it a hundred times, correctly;
+     `fux mcp` is one and says it once.
+
+  🔴 **It reports and never refuses**, which is this decision's own reasoning
+  applied to its own remedy: a check that rejected the value would be decision 7
+  coming back in a new costume.
+
+  ⚠ **Suppressed under `--json` and MCP**, and that is not politeness. `--json`
+  is a contract whose stdout is captured and diffed, and MCP's transport carries
+  no free-text channel to a human. **Both still carry the floor in the
+  `confidence` block** — point 1 below, *"the load-bearing half of the
+  reversal"* — which is exactly what makes suppressing the prose legitimate
+  rather than a silence. `tests/test_confidence_floor_off.py` asserts the block
+  still carries it on the very call where the note is withheld.
+
+  ⚠ **A merely LOW floor is not reported.** `0.02` is a judgement about a corpus
+  and the block publishes it; only **zero** makes `weak` unreachable, which
+  changes what the band can *say* rather than where it sits.
+  **`doc_coverage_floor = 0.0` is that clause's shipped default** and is never
+  reported — firing on it would fire on every repo there is.
 
 - **Two things replace the prohibition, and both are weaker than it was.**
 

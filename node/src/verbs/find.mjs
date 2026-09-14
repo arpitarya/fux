@@ -124,6 +124,38 @@ export function decline() {
   process.stderr.write(NO_MATCHES + "\n");
 }
 
+/** The one sentence `fux doctor` prints, ported verbatim from
+ *  `doctor.FLOOR_OFF_NOTE` (W-164 gate 4). ASCII only — a Windows console's
+ *  default codepage must be able to encode it. */
+export const FLOOR_OFF_NOTE =
+  "`[confidence] separation_floor = 0.0` in .fux/tune.toml: NO answer in this repo " +
+  "can ever be `weak` again. That tunes away the SIGNAL, not the ranking - a " +
+  "`grounded` here does not mean what a `grounded` elsewhere means. The band " +
+  "publishes the floor it was judged under (`--band`, or the `confidence` block in " +
+  "`--json`), which is the only way a reader can tell. Raise it, or keep it and " +
+  "know what the band is worth";
+
+//: Said once per process, not per call — the Python twin's rule. A shell loop is
+//: a hundred processes and says it a hundred times, correctly; one long-lived
+//: reader says it once, which is the difference between a note and a nag.
+let floorNoteSaid = false;
+
+/** Twin of `_declare_floor_off` in `src/fux/query/__init__.py`.
+ *
+ * SR-CONFIDENCE decision 13 says of itself that nothing mechanical catches a
+ * floor tuned to zero. Both readers catch it now: Node reads `.fux/tune.toml`
+ * through `runQuery` (SR-NODE-SEARCH decision 8), so a repo answering from the
+ * Node reader would otherwise be the one place the note went unsaid.
+ *
+ * `quiet` is `--json`: a contract whose stdout is captured and diffed, and whose
+ * `confidence` block already carries the floor in parseable form. */
+export function declareFloorOff(tune, quiet) {
+  if (quiet || floorNoteSaid) return;
+  if (!tune || tune.separationFloor !== 0) return;
+  floorNoteSaid = true;
+  process.stderr.write(`fux: ${FLOOR_OFF_NOTE}\n`);
+}
+
 export function runFind(root, args) {
   const query = args._.join(" ");
   const queries = [query, ...(args.q || [])];
@@ -132,6 +164,7 @@ export function runFind(root, args) {
   const { results: ranked, confidence, fused, tune } = runFused(root, queries, top, {
     useTune: args.noTune !== true, wantConfidence: true, expand: args.expand ?? "",
   });
+  declareFloorOff(tune, Boolean(args.json));
   const [results, dropped] = filtered(root, ranked, query, args);
   declareFilters(args, dropped);
 

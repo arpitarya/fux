@@ -308,6 +308,7 @@ def _layout(root: Path) -> list[Check]:
     checks.append(_unbound_types(root))
     checks.append(_listed_dirs_exist(root))
     checks.append(_thin_urls(root))
+    checks.append(_confidence_floors(root))
     checks.append(_fetcher_capabilities(root))
     checks.append(_accelerator(root))
     checks.append(_node_reader(root))
@@ -1296,19 +1297,19 @@ def _readme_current(root: Path) -> Check:
 
     path = root / ".fux" / "README.md"
     if not path.is_file():
-        return Check("`.fux/README.md` current", True, "absent - nothing to be stale")
+        return Check("README.md current", True, "absent - nothing to be stale")
     builder = getattr(fuxdir, "_readme", None)
     if builder is None:  # pragma: no cover - the template is not optional today
-        return Check("`.fux/README.md` current", True, "no template to compare against")
+        return Check("README.md current", True, "no template to compare against")
     try:
         template = builder()
     except Exception:  # pragma: no cover - a template that will not build is its own bug
-        return Check("`.fux/README.md` current", True, "the template did not build")
+        return Check("README.md current", True, "the template did not build")
     missing = sorted(_headings(template) - _headings(path.read_text(encoding="utf-8", errors="replace")))
     if not missing:
-        return Check("`.fux/README.md` current", True, "every section the template carries is present")
+        return Check("README.md current", True, "every section the template carries is present")
     return Check(
-        "`.fux/README.md` current",
+        "README.md current",
         False,
         f"{len(missing)} section(s) the current template carries are absent: "
         + ", ".join(f"`{m}`" for m in missing[:4])
@@ -1715,6 +1716,60 @@ def _thin_urls(root: Path) -> Check:
         "`fux add <url> --cdp` fetches through a signed-in Chrome instead",
         level="warn",
     )
+
+
+def _confidence_floors(root: Path) -> Check:
+    """A confidence floor tuned to zero — the knob that turns a band OFF silently.
+
+    🔴 **SR-CONFIDENCE decision 13's own words, about itself:** *"A consumer can
+    set `separation_floor = 0.0` and no answer is ever `weak` again. That is
+    tuning away the SIGNAL rather than the ranking, it is silent, and **nothing
+    mechanical catches it.**"* This is the mechanical catch (W-164 gate 4).
+
+    **It reports; it never refuses.** Decision 13 reversed a prohibition on
+    exactly the reasoning that fux states costs rather than clamping knobs, and a
+    row that refused the value would be decision 7 coming back in a new costume.
+    Zero is a legal value; what it is not is a value a reader of the band should
+    have to discover.
+
+    ⚠ **`doc_coverage_floor = 0.0` is the ENGINE DEFAULT and is not reported.**
+    That clause ships off — decision 13's own comment says `0.0 = the clause is
+    OFF` — so firing on it would fire on every repo in the world. Only
+    `separation_floor` has a non-zero default to be tuned away from, and only a
+    `doc_coverage_floor` that was raised and then returned to zero would be
+    interesting, which is not something the file can tell us.
+    """
+    from . import tune as tune_mod
+
+    path = root / tune_mod.TUNE_NAME
+    if not path.is_file():
+        return Check("confidence floors", True, "engine defaults - no floor is tuned off")
+    try:
+        resolved = tune_mod.load(root)
+    except (FuxError, OSError):
+        return Check("confidence floors", True, "tune.toml not parsed here - see its own row")
+    if getattr(resolved, "separation_floor", None) != 0.0:
+        return Check(
+            "confidence floors",
+            True,
+            f"separation_floor = {getattr(resolved, 'separation_floor', '?')} - "
+            "`weak` can still be reached",
+        )
+    return Check("confidence floors", False, FLOOR_OFF_NOTE, level="warn")
+
+
+#: The one sentence both surfaces print. **One string, two callers** — `doctor`'s
+#: row and `ask`'s first-of-process note would otherwise drift into two accounts
+#: of one fact. **ASCII only**: it is printed, and printed text reaches a Windows
+#: console.
+FLOOR_OFF_NOTE = (
+    "`[confidence] separation_floor = 0.0` in .fux/tune.toml: NO answer in this repo "
+    "can ever be `weak` again. That tunes away the SIGNAL, not the ranking - a "
+    "`grounded` here does not mean what a `grounded` elsewhere means. The band "
+    "publishes the floor it was judged under (`--band`, or the `confidence` block in "
+    "`--json`), which is the only way a reader can tell. Raise it, or keep it and "
+    "know what the band is worth"
+)
 
 
 def _url_health(root: Path) -> Check:

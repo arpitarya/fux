@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@836cc5ab2239, src/fux/setup.py@c0e4866a4884]
+owns: [src/fux/store/fuxdir.py@836cc5ab2239, src/fux/setup.py@c0e4866a4884, tests/test_verb_table_agreement.py@2c2a8f52fb6c]
 laws: [L2, L3, L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: f106591bc678110e373450379d068ee2ce91861f90614a89bc5623503e96bd7d
+content_sha: 04a535ca87cc2c7b9f45d8be76912603523901357362c090f71b5c77d9ea1dc3
 ---
 
 # SR-DOTFUX — the `.fux/` directory
@@ -690,6 +690,20 @@ check can see neither.
 
 ### Consequences
 
+- ✅ **The verb table in `.fux/README.md` is HELD EQUAL to SR-CLI §1**
+  (2026-09-14, W-164 gate 2) by `tests/test_verb_table_agreement.py`. Two
+  hand-maintained copies of one list with nothing comparing them, and
+  🔴 **they had already drifted**: the `maintenance` group read
+  `hooks · tune · verify` in the record and `hooks tune output verify` here.
+  **`fux output` is a real verb**, so the RECORD was the stale copy — the
+  direction that matters under L0, since every other artifact defers to it.
+  🔴 **`build_parser()` is the third party, and is what settles a disagreement.**
+  Comparing two documents can only say they differ; a session that guessed had an
+  even chance of editing this file to match a stale record.
+  ⚠ **The prose is NOT compared.** The two say the same thing in different words
+  on purpose — this file is written for a consumer looking at their own `.fux/`,
+  the record for whoever is deciding — and holding them byte-equal would be the
+  restatement L0 forbids wearing a test's clothes.
 - ✅ **Decision 6's write-once freeze is now VISIBLE for `.fux/README.md`**
   (2026-09-14, W-163). `fux doctor`'s `` `.fux/README.md` current `` row compares
   the file's **section set** against the current template's and names what is

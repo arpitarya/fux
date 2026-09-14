@@ -5,7 +5,7 @@
 import { runFused } from "../query/run.mjs";
 import { headingsFor } from "../query/headings.mjs";
 import { recordFor } from "../store/reader.mjs";
-import { declareArchived, declareConfidence, decline } from "./find.mjs";
+import { declareArchived, declareConfidence, declareFloorOff, decline } from "./find.mjs";
 
 export const ARCHIVED_MARKER = "[archived]";
 export const SECTION_MARKER = "§";
@@ -18,6 +18,7 @@ export function runAsk(root, args) {
   const { results, confidence, fused, tune } = runFused(root, queries, top, {
     useTune: args.noTune !== true, wantConfidence: true, expand: args.expand ?? "",
   });
+  declareFloorOff(tune, Boolean(args.json));
 
   // Headings are display-only and are resolved AFTER ranking, exactly like the
   // title fallback — so they can never reach a score.
