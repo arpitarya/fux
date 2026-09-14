@@ -28,6 +28,59 @@ Rules:
 
 
 
+## 2026-09-14 — **W-165 + W-166**: five surfaces the records already owed
+
+**Shipped** on `release/3.0.0-alpha.0`, commit `b77b9058`. Unreleased — the
+`[Unreleased]` section of [`CHANGELOG.md`](../CHANGELOG.md) carries the user-
+facing form, including the one breaking change.
+
+**Records closed, all five from *stated* to *fixed*:**
+[SR-FUXIGNORE](../records/0144_fuxignore.md) 5a–5b (veto condition 3
+**discharged**) · [SR-DECODE](../records/0139_decode.md) 11a ·
+[SR-INGEST](../records/0106_ingest.md) Consequences (two bullets) ·
+[SR-PII](../records/0148_pii.md) (the 🔴 before decision 18) ·
+[SR-FIND](../records/0104_find.md) decision 6 + its **veto replaced**.
+Also amended: SR-ASK, SR-ANSWER, SR-CLI, SR-DIR-LIST, SR-DOCTOR (two new rows),
+SR-NODE-SEARCH, SR-CONFIDENCE, SR-OUTPUT, SR-ARCHIVED-CONTENT, SR-EXTRACTED,
+SR-TABULAR.
+
+**What landed**
+
+| # | change | the record's own words before it |
+|---|---|---|
+| 1 | `No confident matches.` → **stderr** on `ask`/`find`/`answer`, both readers | *"goes to stdout… in a pipe that is a line of prose where a path was expected"* |
+| 2 | `fux remove` writes an **anchored** pattern to `.fux/.fuxignore` | *"a migration we now owe"* |
+| 3 | the ingest summary counts deletions | *"`0 shards written` can accompany a deletion… mildly under-informative"* |
+| 4 | a **decoder digest** in the reuse key, per extension | *"There is no decoder digest. **Stated, not fixed**"* |
+| 5 | `extract.RULES_VERSION` in the reuse key; `url:` records re-extracted from `.fux/acquired/` | *"the data needed to honour a new rule is present and unused"* |
+
+**Outcome: green.** 4341 unit + 89 e2e + 36 Node pass. Verified from a **clean
+checkout of the commit** in a throwaway worktree (924 pass) after an earlier
+amend produced a commit whose `run.py` imported a module that commit did not
+contain — see the WORKLOG entry.
+
+**Three reds on the working tree are a concurrent session's and were red before
+this one started**: `test_no_work_item_is_lost` and
+`test_open_work_rows_are_short` (OPEN-WORK mid-renumber) and
+`test_sr_freshness::test_working_tree_is_not_mid_violation` (SR-NODE-SEARCH
+owns files that session has staged).
+
+⚠ **No measurement, and none was owed.** These are surface and
+maintenance-path fixes; nothing here changes what an unchanged corpus scores.
+The differential arm and `test_the_graph_lane_does_not_move_ask` stay green.
+
+⚠ **The keep/remove call for W-166 is a test, not a number.**
+`test_a_no_op_delta_re_extracts_nothing` is the gate its handoff asked for: a
+digest scoped too coarsely would turn every engine release into a full
+re-ingest of every consumer's repo. **The first ingest after this lands
+re-extracts every document once** — the accepted price, stated in the changelog.
+
+⚠ **Held back deliberately:** the shipped `fux-search` skill still tells agents
+the sentence is on stdout and to `grep -qx` it before piping. The correction is
+written and sits uncommitted in `src/fux/templates/agents/SEARCH-SKILL.md` plus
+three mirrors, because it collides with a concurrent session's in-flight
+`templates/agents/` work.
+
 ## 2026-09-13 — **2.0.0 released**: the alpha line promoted, and two gates that only CI could see
 
 **Shipped** (`2.0.0`, PyPI + npm). Records touched:
