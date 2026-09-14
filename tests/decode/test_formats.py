@@ -171,6 +171,88 @@ def test_xlsx_resolves_the_shared_string_table():
     assert "## Runbook" in out, "the sheet name is its heading"
 
 
+# -- the xlsx row budget ----------------------------------------------------
+#
+# `csv.py` and `xlsx.py` are both SR-TABULAR's, and until 2026-09-14 only one of
+# them kept decision 3's promise. These three tests are the difference.
+
+
+def _sheet(rows: list[list[str]], *, phantoms: bool = False) -> bytes:
+    """A one-sheet workbook of inline strings. `phantoms` interleaves the empty
+    `<row/>` element a worksheet carries for every row that was ever STYLED —
+    which, on a maintained tracker, is most of them."""
+    body = []
+    for cells in rows:
+        body.append(
+            "<row>" + "".join(f"<c t='inlineStr'><is><t>{c}</t></is></c>" for c in cells) + "</row>"
+        )
+        if phantoms:
+            body.append("<row/>")
+    return zf(
+        {
+            "xl/workbook.xml": f'<?xml version="1.0"?><workbook xmlns="{_SS}">'
+            '<sheets><sheet name="Tracker"/></sheets></workbook>',
+            "xl/worksheets/sheet1.xml": f'<?xml version="1.0"?><worksheet xmlns="{_SS}">'
+            "<sheetData>" + "".join(body) + "</sheetData></worksheet>",
+        }
+    )
+
+
+def _tuned(tmp_path, text: str):
+    from fux.tune import TUNE_NAME
+
+    path = tmp_path / TUNE_NAME
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+    return tmp_path
+
+
+def test_a_phantom_blank_row_does_not_spend_the_xlsx_row_budget(tmp_path):
+    """🔴 **The defect this fix is for: `max_table_rows` bounded XML ELEMENTS,
+    not records.** Every `<row>` was appended and counted, blank ones included,
+    so a budget of 10 delivered 5 data rows on a sheet with interleaved
+    phantoms. `table_markdown` then dropped the blanks, so the output looked
+    like a clean short table and **the loss left no trace anywhere**.
+
+    `csv.py` never had it — it filters empty rows *before* applying the limit.
+    Two files, one record ([SR-TABULAR](../../records/0150_tabular.md) decision
+    7), one of them right: the divergence was the defect."""
+    root = _tuned(tmp_path, "[index]\nmax_table_rows = 10\n")
+    rows = [["h"]] + [[f"value {i}"] for i in range(10)]
+    out = decode(_sheet(rows, phantoms=True), "book.xlsx", root)
+    assert out.count("\n| value ") == 10, "a blank row bought budget it should not have"
+    assert "table truncated" not in out
+
+
+def test_an_xlsx_over_the_row_budget_says_so(tmp_path):
+    """`xlsx.py` emitted no truncation notice at all, while `csv.py` has emitted
+    one the whole time — so an `.xlsx` cut at the budget was silent."""
+    root = _tuned(tmp_path, "[index]\nmax_table_rows = 3\n")
+    rows = [["h"]] + [[f"value {i}"] for i in range(50)]
+    out = decode(_sheet(rows), "book.xlsx", root)
+    assert out.count("\n| value ") == 3
+    assert "table truncated" in out
+
+
+def test_an_xlsx_wider_than_max_cols_discloses_the_dropped_columns():
+    """`MAX_COLS` had no disclosure in either file, because only `xlsx.py` has a
+    column cap. The notice carries a NUMBER where the row notice does not: a
+    sheet's width is a property of the sheet, so the text is stable, while a row
+    count would move every time the file grows."""
+    from fux.decode.xlsx import MAX_COLS
+
+    out = decode(_sheet([[f"c{i}" for i in range(MAX_COLS + 5)]]), "book.xlsx")
+    assert f"columns past {MAX_COLS} dropped" in out
+    assert "c0" in out and f"c{MAX_COLS + 4}" not in out
+
+
+def test_an_xlsx_within_both_caps_says_nothing(tmp_path):
+    """The notices are evidence of loss, so a clean sheet must carry neither."""
+    out = decode(_sheet([["h"], ["a"], ["b"]]), "book.xlsx")
+    assert "table truncated" not in out
+    assert "dropped" not in out
+
+
 # -- the smaller formats ----------------------------------------------------
 
 

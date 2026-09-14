@@ -30,7 +30,7 @@ from fux.decode._zip import SafeZip, ZipTooBig, numeric_key
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = 1
+VERSION = 2  # 2026-09-14: phantom rows no longer spend the row budget; truncation and column notices added
 
 EXTENSIONS = (".xlsx", ".xlsm")
 
@@ -62,13 +62,29 @@ def decode(raw: bytes, rel_path: str) -> str | None:
                     root = _xml.parse(archive.read(part))
                 except _xml.UnsafeXml:
                     continue
-                rows = _rows(root, shared, max_table_rows() + 1)
+                limit = max_table_rows()
+                rows, truncated, dropped_cols = _rows(root, shared, limit + 1)
                 table = _ooxml.table_markdown(rows)
                 if not table:
                     continue
                 title = names[index] if index < len(names) else f"Sheet {index + 1}"
                 blocks.append(f"## {title}")
                 blocks.append(table)
+                # ⚠ **Said in the document, exactly as `csv.py` says it.** Both
+                # files are SR-TABULAR's, the record exists to close silent
+                # tabular data loss, and until now only one of them did it: an
+                # `.xlsx` truncated at `max_table_rows` or at `MAX_COLS` left
+                # NO trace at all, in the index or on the page.
+                notices = []
+                if truncated:
+                    notices.append("table truncated")
+                if dropped_cols:
+                    # A count here, unlike the row case, because a sheet's width
+                    # is a property of the sheet rather than of how much of it
+                    # was read -- it does not move as the file grows.
+                    notices.append(f"columns past {MAX_COLS} dropped")
+                if notices:
+                    blocks.append("*(" + "; ".join(notices) + ")*")
     except ZipTooBig:
         return None
 
@@ -107,10 +123,28 @@ def _sheet_names(archive: SafeZip) -> list[str]:
     return names
 
 
-def _rows(root, shared: list[str], limit: int) -> list[list[str]]:
-    """`limit` counts the header too — the caller adds one, so the number a
-    consumer writes in `fux.toml` is the number of DATA rows they get."""
+def _rows(root, shared: list[str], limit: int) -> tuple[list[list[str]], bool, bool]:
+    """`(rows, truncated, dropped_cols)`.
+
+    `limit` counts the header too — the caller adds one, so the number a
+    consumer writes in `.fux/tune.toml` is the number of DATA rows they get.
+
+    ⚠ **A BLANK ROW DOES NOT SPEND THE BUDGET, and it used to.** Every `<row>`
+    element was appended and counted, blank ones included — and a sheet carries
+    a phantom blank row for any row that was ever styled, which is most of them
+    on a maintained tracker. So a sheet with interleaved phantom rows stopped
+    at `max_table_rows` **elements** and delivered roughly HALF that many
+    records, while the docstring above promised records. `table_markdown` then
+    dropped the blanks, leaving no evidence that anything had been skipped.
+
+    `csv.py` never had this: it filters empty rows *before* applying the limit
+    (`rows = [r for r in rows if any(cell.strip() …)]`). Two files, one record,
+    one of them right — the divergence is the defect, not a difference of
+    opinion.
+    """
     out: list[list[str]] = []
+    truncated = False
+    dropped_cols = False
     for row in root.iter():
         if _xml.local(row.tag) != "row":
             continue
@@ -118,13 +152,24 @@ def _rows(root, shared: list[str], limit: int) -> list[list[str]]:
         for cell in row:
             if _xml.local(cell.tag) != "c":
                 continue
-            cells.append(_cell(cell, shared))
             if len(cells) >= MAX_COLS:
+                dropped_cols = True
                 break
+            cells.append(_cell(cell, shared))
+        if not any(cell.strip() for cell in cells):
+            continue  # a phantom row: no content, so it buys no budget
         out.append(cells)
-        if len(out) >= limit:
+        # ⚠ **One row PAST the budget is what proves a tail exists.** Stopping
+        # AT the budget cannot tell "exactly filled" from "more remained", and
+        # a sheet that exactly fits then claimed a truncation that never
+        # happened. `csv.py` never had to solve this — it reads every row and
+        # compares (`len(rows) > limit + 1`); streaming one further and
+        # discarding it buys the same answer for one row of work.
+        if len(out) > limit:
+            truncated = True
+            out.pop()
             break
-    return out
+    return out, truncated, dropped_cols
 
 
 def _cell(cell, shared: list[str]) -> str:

@@ -182,6 +182,46 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   reads from derived state, so it does not travel with a cloned index.
   [SR-DOCTOR](records/0152_doctor.md).
 
+## [2.0.1] - 2026-09-14
+
+**Two shipped bugs, one in each of the two extension points a consumer
+actually writes against.** Both had been live since the surfaces existed, and
+both failed in the way that is hardest to notice: not with an error, but with
+a plausible-looking result.
+
+### Fixed
+
+- **`[sources.url.config]` went VERBATIM to every fetcher, so a repo could
+  configure at most ONE of the two shipped fetchers.** Each `configure()`
+  raises on a key it does not know — deliberately — so `cdp_port` made
+  `http.py` refuse the whole run, and the error named the innocent party.
+  The table is now sliced **by shape, never by meaning**: a scalar at the top
+  level is shared and reaches every fetcher, and a sub-table belongs to the
+  fetcher whose name it carries. `[sources.url.config.cdp]` reaches `cdp.py`
+  and nothing else; a sub-table naming a fetcher this run never loads is
+  simply not read. **A flat table behaves exactly as before, so no existing
+  repo changes.** [SR-FETCHER](records/0117_fetcher.md) decision 8.
+- **An `.xlsx` row budget counted XML elements rather than records.** A
+  worksheet carries a phantom blank `<row/>` for every row that was ever
+  *styled*, and each one spent budget — so `max_table_rows = 10` delivered
+  five data rows on a maintained tracker. The blanks were then dropped from
+  the rendered table, leaving **no trace anywhere** that a fact had gone
+  missing. `csv.py` never had this; it filters empty rows before applying the
+  limit. [SR-TABULAR](records/0150_tabular.md) decision 7.
+- **An `.xlsx` truncated at the row budget said nothing**, while `csv.py` has
+  emitted `*(table truncated)*` the whole time. It now emits the same line,
+  plus `*(columns past 40 dropped)*` for the column cap, which had no
+  disclosure in either file. A sheet that exactly *fills* the budget says
+  nothing — the notices are evidence of loss, so one row past the budget is
+  what proves a tail exists.
+
+### Changed
+
+- **A `dict` at the top of `[sources.url.config]` is now read as a
+  per-fetcher table** rather than handed to `configure()` as a value. Only
+  the top level is namespaced. This is the one behaviour change in the patch
+  and it is named here because a config table is a published surface.
+
 ## [2.0.0] - 2026-09-13
 
 **The 2.0.0-alpha line, promoted — plus everything below, which had

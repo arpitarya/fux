@@ -7,10 +7,10 @@ description: "Fux never fetches; a consumer-owned fetcher file does. One fetcher
 status: accepted
 date: 2026-08-19
 feature: the fetch contract, what it is called, and the two shipped templates
-owns: [src/fux/ingest/urlsrc.py@272f379006fc, src/fux/templates@81de8b37fcfb]
+owns: [src/fux/ingest/urlsrc.py@272f379006fc, src/fux/templates@5831b35f9e13]
 laws: [L1, L3, L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 70ecc13fdd2e0a0a20bd143e060ab14101d5422e3fe23249a1e0021ab6041ee5
+content_sha: fad5dd9946771b3cf9bbe0fa6c27c47b9e3e2b7b2e23197ec39a178f677775e5
 ---
 
 # SR-FETCHER — the consumer-owned fetcher
@@ -198,9 +198,64 @@ that silently does nothing is worse than one that stops the run, and here
 "silently does nothing" would mean falling back to a default path and fetching
 the wrong thing.
 
-**8. `[sources.url.config]` is passed to `configure()` verbatim** and fux never
-reads a key inside it. It is the back door through which the adapter cap would
-otherwise leak: a `cdp_port` in fux's schema is fux knowing about Chrome.
+**8. `[sources.url.config]` is sliced BY SHAPE, and fux never reads what a key
+MEANS.** A scalar at the top level is **shared** and reaches every fetcher; a
+**sub-table belongs to the fetcher whose name it carries** —
+`[sources.url.config.cdp]` reaches `cdp.py` and reaches nothing else.
+`UrlSource.config_for()` in `config.py` is the whole of the rule and it sorts
+entries by `isinstance(value, dict)`, never by what a key is called. The table
+is still the back door through which the adapter cap would otherwise leak: a
+`cdp_port` in fux's schema is fux knowing about Chrome, and a sub-table keeps
+it out of the schema exactly as verbatim passing did.
+
+⚠ **The resolution lives in ONE place and this record does not own it.**
+`UrlSource.config_for()` resolves the slice for `ingest/urlsrc.py` and
+`query/refer_answer.py` alike, so `configure_fetcher` receives a table that is
+**already this fetcher's** — it never sees the whole of `[sources.url.config]`.
+The key shape is [SR-CONFIG](0113_config.md) decision 8a's; what is stated here
+is the fetcher-facing contract, which is the half a fetcher author reads.
+
+    [sources.url.config]
+    fetcher_max_parallel = 2      # scalar  -> every fetcher
+
+    [sources.url.config.cdp]
+    cdp_port = 9222               # sub-table -> cdp.py only
+
+    [sources.url.config.http]
+    timeout_s = 30                # sub-table -> http.py only
+
+⚠ **It was passed VERBATIM to every fetcher until 2026-09-14, and that was a
+defect with a live victim.** Each shipped `configure()` raises on a key it does
+not know — deliberately, because a typo'd tunable that does nothing is found
+three ingests later — so **one fetcher's tunable made the OTHER fetcher refuse
+the whole run**:
+
+    $ fux add "https://…/handbook"      # no fetch=, so http.py
+    error: [sources.url] fetcher configure() failed: [sources.url.config]
+    unknown key(s): cdp_port — known keys: fetcher_max_parallel, max_bytes,
+    timeout_s, user_agent
+
+**A repo could therefore configure at most ONE of the two shipped fetchers**,
+and the failure named the innocent party: the operator reached for `--cdp`,
+which made the error go away by changing which fetcher ran.
+
+Three properties of the fix are load-bearing:
+
+- **A sub-table is never passed down as a key.** `http.py` does not see `cdp`,
+  so ⚠ **its strictness is untouched — do not loosen it.** That strictness is
+  what catches the typo sub-tables now make addressable.
+- **A sub-table naming a fetcher this run never loads is simply not read**, not
+  an error. A repo may carry config for a fetcher used only on another branch,
+  and erroring there would punish the thing the design is for.
+- **A flat table behaves exactly as before**, so no existing repo changes.
+
+⚠ **Consequence worth naming: `fetcher_max_parallel` no longer HAS to be spelled
+identically in both fetchers.** Decision 9's note, and `http.py`'s own long
+comment beside the key, argue for the shared name from this collision — *"a
+`http_`-prefixed key here would break any repo that also loads `cdp.py`"*. That
+argument has expired. The shared name is still correct (it names a capability
+both files have) but it is now a choice, not a constraint, and the comments that
+justify it by the collision are stale on their own terms.
 
 **9. A fetcher may declare `MAX_PARALLEL = n` as an optional module constant.
 Absent the declaration the value is 1.** This is decision 5's own principle —

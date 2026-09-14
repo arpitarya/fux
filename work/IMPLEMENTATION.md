@@ -28,6 +28,55 @@ Rules:
 
 
 
+## 2026-09-14 — **2.0.1 released**: both consumer extension points were broken, and the tests that were missing found a third bug
+
+**Shipped** (`2.0.1`, PyPI + npm). Records touched:
+[SR-FETCHER](../records/0117_fetcher.md) (decision 8 rewritten),
+[SR-TABULAR](../records/0150_tabular.md) (decision 7, new),
+[SR-DOTFUX](../records/0102_fux-directory.md), [SR-ASK](../records/0103_ask.md),
+[SR-CDP-FETCHER](../records/0118_cdp-fetcher.md) and
+[SR-LAWS](../records/0001_LAWS.md) (`__version__`), plus *not yours* notes on
+the seven co-owners the freshness gate names.
+
+**Released 2026-09-14 (UTC).** Tag `v2.0.1` · commit `444e3bb6` · [publish run
+34856185446](https://github.com/arpitarya/fux/actions/runs/34856185446) — all
+three jobs green. CI 34855444448 and node-arm 34855444455 green on the same
+commit before the tag was cut.
+
+| registry | state |
+|---|---|
+| **PyPI** | **`fux-engine` 2.0.1 is live** — `fux_engine-2.0.1-py3-none-any.whl` + `.tar.gz`, published by OIDC |
+| **npm** | **STAGED with tag `latest`** — 4 files, 80.2 kB, provenance signed; waiting on a human at npmjs.com, which is the deliberate asymmetry [SR-NODE-SEARCH](../records/0153_node-search.md) decision 14 describes |
+
+**Outcome — two shipped defects, both of the silent kind.**
+
+| what | how it failed | evidence |
+|---|---|---|
+| `[sources.url.config]` passed verbatim to every fetcher | each `configure()` raises on an unknown key, so one fetcher's tunable made the OTHER refuse the run — **a repo could configure at most one of the two shipped fetchers**, and the error named the innocent party | [SR-FETCHER](../records/0117_fetcher.md) decision 8; 3 tests |
+| `.xlsx` row budget counted XML elements | a phantom blank `<row/>` (present for every row ever *styled*) spent budget, so `max_table_rows = 10` returned **five** data rows; `table_markdown` then dropped the blanks, so **the loss left no trace at all** | [SR-TABULAR](../records/0150_tabular.md) decision 7; 4 tests |
+| `.xlsx` truncation was silent | `csv.py` has emitted `*(table truncated)*` the whole time and `xlsx.py` never did; `MAX_COLS` had no disclosure in either file | same |
+
+🔴 **The fixes arrived with no tests, and writing them found a third bug in the
+fix itself**: `truncated` was set at `len(out) >= limit`, so a sheet that
+*exactly filled* the budget claimed a truncation that never happened. One row
+past the budget is what proves a tail exists — which is how `csv.py` has always
+answered it. **Two of the three defects in this release were found by the test,
+not by the fix.**
+
+⚠ **Still true, and unchanged from 2.0.0:** the npm stage step again warned
+`"bin[fux]" script name fux.mjs was invalid and removed`. `node/package.json`
+still carries `"bin": { "fux": "./fux.mjs" }`, so this is the **second**
+release the warning has fired on and it is no longer a one-off to check after
+approving — it is a defect with two occurrences.
+
+⚠ **`main` and `release/3.0.0-alpha.0` carried the same fetcher fix in two
+different shapes** — `urlsrc.config_for()` on `main`, `UrlSource.config_for` in
+`3709d40f` here, the latter with `[sources] urls_file`, `.env` overrides and a
+doctor row the patch did not carry. **Merged into this branch 2026-09-14, 22
+conflicts, resolved toward `UrlSource.config_for()`**: one resolution point for
+`ingest/urlsrc.py` and `query/refer_answer.py` alike, `main`'s implementation
+and its three tests dropped as covered by `tests/test_config.py`. The `.xlsx`
+decoder fix came across whole — it exists nowhere else.
 ## 2026-09-14 — **W-173 SHIPPED**: the `CLAUDE.md` extraction finished, and three rules that had no home
 
 **Shipped in full.** `CLAUDE.md` **668 → 437 lines**; `tests` 4441,

@@ -8,10 +8,10 @@ status: accepted
 date: 2026-09-06
 amended: 2026-09-11
 feature: tabular documents — row granularity, the admitted-row limit, and what a table citation is
-owns: [src/fux/decode/csv.py@3dcdf4365361, src/fux/decode/xlsx.py@aa4a281db3ff, src/fux/decode/_limits.py@5970a244258a]
+owns: [src/fux/decode/csv.py@3dcdf4365361, src/fux/decode/xlsx.py@a54a416685f2, src/fux/decode/_limits.py@5970a244258a]
 laws: [L1, L2, L3]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: 8bd5b418c024712c59dfb8749f8f791226a06356580f5dbfd24b0fc0ee2c70a4
+content_sha: c81d42a572a5f55ccac21430e22abf3aad67bef4cbf1eb976dc0e1a40f47acf8
 ---
 
 # SR-TABULAR — a table is a list of rows, and a row is the unit of an answer
@@ -115,6 +115,34 @@ before any decoder runs, so a bad value has already stopped the run. Turning one
 bad line into an unreadable corpus is a worse failure than an ignored setting —
 and this is the ONE place that rule applies. (Written for `fux.toml`; the
 reader moved on 2026-09-11 and the rule did not.)
+
+**7. A BLANK ROW DOES NOT SPEND THE ROW BUDGET, and an `.xlsx` says when it
+truncated** — decision 3's own promise, kept in both files rather than one.
+
+⚠ **`xlsx.py` broke decision 3 for two weeks and nothing noticed.** `_rows`
+appended and counted **every `<row>` element**, blank ones included — and a
+worksheet carries a phantom blank row for any row that was ever styled, which
+on a maintained tracker is most of them. So `max_table_rows` bounded XML
+elements, not records: **a budget of 10 delivered 5 data rows** on a sheet with
+interleaved phantoms (measured on a 20-row fixture, `20 real + 20 phantom`).
+`_ooxml.table_markdown` then dropped the blanks, so the output looked like a
+clean short table and **the loss left no trace anywhere**. `csv.py` never had
+it — it filters empty rows *before* applying the limit. Two files, one record,
+one of them right: the divergence was the defect.
+
+⚠ **And `xlsx.py` emitted no truncation notice at all.** The `*(table
+truncated)*` line this record is rude about — *"the only trace was a `*(table
+truncated)*` line that nobody diffs"* — was rude about it because it was the
+only trace of a **500-row cap that should not have existed**. The cap is fixed;
+the notice is still the right thing, and `csv.py` has kept emitting it the
+whole time. `xlsx.py` now emits the same line, plus
+`*(columns past 40 dropped)*` for `MAX_COLS`, which had no disclosure in either
+file because only `xlsx.py` has a column cap.
+
+The column notice carries a number where the row notice does not. That is not
+an inconsistency: a sheet's **width** is a property of the sheet, so the text is
+stable, while a row count moves every time the file grows and would make the
+indexed text a moving target for no benefit.
 
 ### The measurement
 

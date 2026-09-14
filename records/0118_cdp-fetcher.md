@@ -10,7 +10,7 @@ feature: "`.fux/fetchers/cdp.py` — the reference fetcher for documents behind 
 owns: []
 laws: [L1, L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 5e12be8d454be1494ea232528fa5ca6f67dd1eba94b8dc3e212adf353fbab65c
+content_sha: 904c2f6f2b6c167a9f23012e9adfd9782b0cd534560e7490eedecddf409133fe
 ---
 
 # SR-CDP-FETCHER — the browser fetcher
@@ -57,11 +57,13 @@ producing the same bytes on a bad network day.
 flowchart LR
     U["url with fetch=cdp"] --> D["attach to YOUR<br/>signed-in Chrome"]
     D --> W["WebSocket<br/>hand-rolled RFC 6455"]
-    W --> F["Fetch.enable<br/>requestStage: Response"]
+    W --> O["Page.navigate ORIGIN<br/>once per origin, before Fetch"]
+    O --> F["Fetch.enable<br/>requestStage: Response"]
     F --> N["Page.navigate<br/>not awaited"]
     N --> P["Fetch.requestPaused<br/>final url · status · headers"]
-    P -->|"3xx or subresource"| C["Fetch.continueRequest"] --> P
-    P -->|"the document"| B["Fetch.getResponseBody"]
+    P -->|"3xx hop: spends the budget"| C["Fetch.continueRequest"] --> P
+    P -->|"subresource: does NOT"| C
+    P -->|"the document"| B["Fetch.getResponseBody<br/>…or takeResponseBodyAsStream<br/>+ IO.read when large"]
     B --> A["Fetch.failRequest<br/>bytes already held"]
     A --> R["return (bytes, server's type)<br/>fux.decode converts"]
 ```
@@ -79,6 +81,10 @@ flowchart LR
   WebSocket: hand-rolled RFC 6455 on stdlib socket  --(no dependency)
         |
         v
+  Page.navigate(ORIGIN)  --(once per origin, BEFORE Fetch is enabled, so it
+        |                   is a plain command with nothing paused to deadlock
+        |                   against. A tab with no history is CLOSED BY CHROME
+        v                   when its navigation becomes a download.)
   Fetch.enable(urlPattern "*", requestStage "Response")
         |
         v
@@ -87,14 +93,18 @@ flowchart LR
         v
   Fetch.requestPaused  --> final url, status, response headers
         |
-        |--- 3xx hop, or a subresource --> Fetch.continueRequest --+
-        |                                                          |
-        |<---------------------------------------------------------+
+        |--- 3xx hop (spends the redirect budget) -----------------+
+        |--- subresource (does NOT spend it) --> continueRequest --+|
+        |                                                          ||
+        |<---------------------------------------------------------++
         v
   the document response
         |
         v
-  Fetch.getResponseBody (base64)  ->  Fetch.failRequest(Aborted)
+  body: getResponseBody, or takeResponseBodyAsStream + IO.read
+        |       when Content-Length declares more than STREAM_ABOVE_BYTES
+        v
+  Fetch.failRequest(Aborted)
         |                                    ^
         |                                    |
         |                       we hold the bytes; completing would
@@ -104,6 +114,12 @@ flowchart LR
 
   EVERY paused request is continued or failed. One that is neither
   wedges the page until the timeout -- it does not raise.
+
+  ONLY A REDIRECT spends the redirect budget. Counting subresources
+  reported a sign-in loop for a page that had none.
+
+  A dead socket is DIAGNOSED, not reported as "closed mid-frame":
+  ask /json whether the tab, or the browser, is what went away.
 
   This file does NOT convert. Agreement with http.py is structural.
 ```
@@ -309,9 +325,21 @@ extension Python cannot import, and `fux setup` copies it into
 that indexes only local files never sees a byte of WebSocket code, which is what
 decision 1's *never bundle a browser* is worth nothing without.
 
-**10. The bytes come from `Fetch.getResponseBody`, never from the page.**
-`Fetch.enable` at `requestStage: "Response"`, `Page.navigate`, then read the
-body off the paused response.
+**10. The bytes come from the paused response, never from the page** —
+`Fetch.getResponseBody` for an ordinary body, `Fetch.takeResponseBodyAsStream`
+plus `IO.read` for a large one. `Fetch.enable` at `requestStage: "Response"`,
+`Page.navigate`, then read the body off the paused response.
+
+⚠ **`getResponseBody` returns the WHOLE body base64'd into a SINGLE CDP
+message, and DevTools does not fail on a message it will not carry — it drops
+the socket** (found 2026-09-14). Base64 inflates by a third, and a spreadsheet
+or PDF behind a `?download=1` link reaches the ceiling routinely, so this is a
+normal path and not an edge case. A body whose `Content-Length` declares more
+than `STREAM_ABOVE_BYTES` is streamed instead, and a `getResponseBody` that
+fails anyway **falls back to the stream rather than to nothing** — a large body
+that declares no length is exactly the case the threshold cannot see.
+`takeResponseBodyAsStream` *takes* the body: `getResponseBody` on that request
+is gone afterwards, and the request still has to be resolved per decision 11.
 
 ⚠ **The obvious alternative was tried and measured, and it cannot do the job.**
 An in-page `fetch(url, {credentials:'include'})` via `Runtime.evaluate` was the
@@ -338,6 +366,16 @@ paused request is continued or failed, always**. ⚠ **An unresolved one wedges
 the page; it does not raise.** The captured document is *failed* rather than
 continued — the bytes are already held, and completing the navigation would
 either render a page nobody reads or write a download to disk.
+
+⚠ **Only a REDIRECT may spend the redirect budget, and getting that wrong
+produced a confident wrong diagnosis** (found 2026-09-14). `MAX_REDIRECTS` was
+decremented once per *paused request*, and `urlPattern` is `"*"` — so a page
+whose subresources paused ahead of its document exhausted the cap and raised
+*"more than 20 redirects … or a sign-in flow bouncing between an identity
+provider and the site"*. **The misdiagnosis is the expensive half**: it sends a
+reader after an auth loop that does not exist, on a page that has none. The
+budget now counts documents only. Reproduced with 25 subresource pauses ahead
+of the document; a real 30-hop chain still trips at 20.
 
 ⚠ **`Page.navigate` is dispatched without awaiting its reply.** It does not
 return until the navigation commits, and it cannot commit while we hold its
@@ -385,6 +423,43 @@ comes back as a login page. It flipped from `True` on 2026-09-01 — the old
 default made sense for a renderer of public pages and makes none for a fetcher
 whose entire value is a borrowed session. Not signed in fails loudly rather than
 indexing the sign-in page.
+
+**14. The tab visits the URL's ORIGIN before the URL, once per origin.**
+`Page.navigate(origin)` runs *before* `Fetch.enable`, so it is a plain command
+with no paused response to deadlock against — the deadlock decision 11 warns
+about applies only to the navigation being intercepted. A failure is swallowed:
+a 404 or a redirect to a sign-in page on the origin root still leaves the tab
+with history, which is the property this step exists to create.
+
+⚠ **This is not politeness, and it is not a cache warm-up. A tab created by
+`/json/new` has NO HISTORY, and Chrome closes a history-less tab the moment its
+navigation becomes a download** — which closes this fetcher's CDP socket with
+it. The symptom is `WebSocket closed mid-frame` on exactly the URLs this
+fetcher exists for: a SharePoint `?download=1` workbook, or anything serving
+`Content-Disposition: attachment`. Found 2026-09-14 on a real corpus, after the
+entry had recorded five consecutive failed runs.
+
+⚠ **It is also what the 2026-08-31 design note asked for and the implementation
+dropped** — *"navigate once per ORIGIN (to establish session), then in-page
+fetch many URLs on that host"*. The in-page-fetch half was correctly abandoned
+(decision 10); the origin half was correct and was lost with it. Committing a
+page on the origin is where the browser's session for that host is established,
+which is the entire reason this fetcher exists.
+
+**15. A dead socket is diagnosed, not reported.** `WebSocket closed mid-frame`
+is true and useless: it says the peer went away and cannot say whether the
+**tab** was destroyed, the **browser** died, or **DevTools dropped an oversized
+message** — three causes with three different fixes. Chrome still knows for a
+moment, so `_diagnose()` asks `/json` at failure time and names which one, with
+the fix for that one. It also drops the thread's dead target, so the next fetch
+opens a fresh tab instead of reusing an id Chrome has already forgotten.
+
+⚠ **The write side of the socket had to be converted too.** `_recv_exact`
+raised `FetcherError` when the peer vanished; `send_text` did not, so a peer
+that went away *between two commands* escaped as a raw `BrokenPipeError`,
+reached the CLI as `[Errno 32] Broken pipe`, and **never entered the diagnosis
+at all**. Same failure, same class of error, two code paths — which is how one
+of them stayed unconverted.
 
 ### What it looks like
 
@@ -585,6 +660,15 @@ a way that it can pick values from .env file also"*).
   [`archive/templates/cdp-rendering.py.txt`](../archive/templates/cdp-rendering.py.txt).
 - The behaviour around it, captured against a no-network fetcher —
   [`work/regression/2026-08-18-ingest-and-index/`](../work/regression/2026-08-18-ingest-and-index/report.md) §6.
+- **The four defects fixed 2026-09-14** (decisions 10, 11, 14, 15) were each
+  reproduced before being fixed, against a **fake CDP endpoint that reuses this
+  file's own frame codec** — so the client under test is the real one, and the
+  scenarios (`subresources`, `loop`, `bigbody`, `tabdeath`, `socketdrop`,
+  `browserdeath`) are scripted rather than hoped for. ⚠ **The harness is not in
+  the repo yet and this is therefore an unguarded claim**: it ran on Arpit's
+  machine during the session that made the fix. Landing it under
+  `tests/ingest/` is owed — a defect class recorded twice becomes a gate, and
+  this is occurrence one.
 - The WebSocket framing this implements — RFC 6455:
   https://www.rfc-editor.org/rfc/rfc6455
 - The protocol it speaks — Chrome DevTools Protocol:
