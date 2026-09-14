@@ -13,6 +13,28 @@ timestamp: 2026-09-12T00:00:00Z
 **Model: Opus** for rows 1 and 2 (each is a call about what a measurement is
 allowed to claim); **Sonnet** for row 4 once row 4's definition-of-done exists.
 
+## 🔴 A third call, named 2026-09-14: the benchmark harness has no commits
+
+**`~/my_programs/fux-benchmark` is a git repo with ZERO commits and every file
+untracked.** W-158 rewrote `bin/report.py` there so that
+[SR-WORK-BENCHMARK](../../records/0053_WORK-benchmark.md) decisions 8–10 are
+actually enforced by code — and that code now exists **on one machine**.
+
+⚠ **Nothing in fux would notice it going.** `tests/test_benchmark_capture.py`
+checks that a report was *filed*, never that anything can still generate one,
+so a wiped `fux-benchmark` leaves every past report intact and every future one
+impossible, silently.
+
+**This is the same question this item already asks in its second row** —
+*whether `fux-benchmark` gets built or Node's latency stays unmeasured* — with
+one more thing riding on the answer. Three shapes, and the call is Arpit's:
+
+| | what it means |
+|---|---|
+| **commit the harness in place** | one `git commit` in that repo. Cheapest, and it makes the environment something more than scratch, which is a change to what SR-WORK-ENVIRONMENTS says it is |
+| **vendor the emitter into fux** | `report.py` reads only `TEMPLATE.html` and a run's `evidence/`, both of which live in fux — so it could live in `tools/` with an ownership row and a test. It is the only part of the harness with no dependency on the sibling environment |
+| **leave it scratch and accept the exposure** | then decisions 8–10 are enforced by a file with no home, and this record should say so where it states them rather than only here |
+
 ## Why this file exists, said plainly
 
 [W-107](../IMPLEMENTATION.md) closed on 2026-09-12: the Node read plane is

@@ -54,7 +54,6 @@ here. Read that record before changing anything below it.
 
 ### testing
 
-- 🟢 **W-158** · `agent` — the benchmark harness must emit its CAP-7 report from the template, and `2026-09-12-benchmark-l9` still has none. **Filed rows only; no run re-executed.** [detail](open/W-158-the-harness-emits-the-templated-report.md)
 
 - 🟡 **W-154** · `agent`, waiting on a quality endpoint that does not exist — **the price is measured** ([run](regression/2026-09-13-rerank-cost/report.md)); the benefit is not, and every obvious endpoint is circular. [detail](open/W-154-rerank-weight-cost.md)
 - 🟣 **W-136** · `arpit`, waiting on **2026-09-30** — everything an agent can do is done; **phase 5 scoring is Codex's hands** and is all that is left. [detail](open/W-136-golden-benchmark.md)

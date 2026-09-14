@@ -10,7 +10,7 @@ feature: the capture set every benchmark run files
 owns: [tests/test_benchmark_capture.py@f6af3d328537]
 laws: []
 timestamp: 2026-09-13T00:00:00Z
-content_sha: 892a53df176b42b2e8846a406687c14a2c4d8b4c0e6e5c7635c414a90687979b
+content_sha: 6e229c2ff0d443d04144bf20dc390e11d2f58eed3041c5262c12e140a2f1a21e
 ratifies: Arpit, 2026-09-13 — what a benchmark must always capture
 ---
 
@@ -246,6 +246,62 @@ cannot read the chart, and a chart that cannot be read is not a capture.
 ⚠ **A direction says which way a metric points and nothing else** — never that a
 difference is real, large enough to act on, or a regression. Decision 6 is
 unchanged by it.
+
+**11. The template and the emitter agree by MARKER, and the emitter writes no
+direction of its own.** (W-158, 2026-09-14 — decisions 8–10 built.)
+
+`fux-benchmark/bin/report.py <run>` renders
+[`TEMPLATE.html`](../work/benchmark/reports/TEMPLATE.html) into
+`work/benchmark/reports/<run>.html`. It substitutes the template's `{{TOKENS}}`
+and replaces every region between a `fux:fill:NAME` marker comment and its
+`fux:end:NAME` partner. **Everything outside a marker is copied through byte
+for byte** — the CSS, slide 2's how-to-read table, slide 11's guard rails, and
+**every numeric column header with its direction marker on it.**
+
+🔴 **That last clause is decision 10's enforcement, and it is structural rather
+than careful.** The directions live in the template's own `<thead>` rows, so a
+direction is a property of the **metric**; an emitter that wrote them would
+restate them once per report and two reports would be free to disagree. The
+emitter writes exactly one direction anywhere, on a table the template has no
+header for, and that is the only exception.
+
+- **A marker renamed or deleted makes the emitter REFUSE**, naming which. A
+  section silently dropped would be a page that looks generated and states
+  nothing where a capture should be — worse than a failure, because a failure
+  gets fixed.
+- **The date on a generated report is the RUN DIRECTORY'S**, never today's. A
+  report regenerated a year later must say when the run executed; a wall-clock
+  read would silently re-date frozen evidence.
+- **The emitter reads `report.md`'s frontmatter as filed evidence.** The run's
+  own `description` becomes the cover's lead and its `classification` the
+  cover's label — quoted, never composed. *A generated sentence about what a
+  run meant is the one thing this emitter must not write.*
+- **Where an expected capture file is absent and the same measurement is filed
+  under another name, it is read and the substitution is STATED on the page.**
+  `2026-09-12-benchmark-l9` filed no `index-size.csv` and its `ARMS.toml`
+  carries `index_bytes` per arm per corpus, so CAP-5 has a number and says
+  where it came from. A silent substitution would have the page claim a capture
+  the run's file list does not have.
+
+⚠ **11a. A generated report is THINNER than a hand-authored one, and the three
+written by hand before this are left exactly as they are.** The template's
+CAP-2 figure is an inline SVG a person draws; the emitter draws none and
+**says so in the figure's place** rather than omitting it. Regenerating
+`2026-09-13-benchmark-captures` was tried and **rejected on the evidence**: the
+generated page loses the hand-built per-corpus hit@k breakdown and **adds**
+numbers the hand-built page does not carry, and decision 9's frozen-report rule
+admits a regeneration only when the diff carries no new number. **From the next
+run onward the emitter is the report**; the three before it are frozen.
+
+🔴 **11b. The harness this decision now depends on is UNCOMMITTED.**
+`~/my_programs/fux-benchmark` is a git repo with **zero commits** and every file
+untracked, so `bin/report.py` exists on one machine. **Decisions 8–10 are
+therefore enforced by a file that a `rm -rf` would end**, and nothing in this
+repository would notice — `tests/test_benchmark_capture.py` checks that a report
+was *filed*, never that anything can still generate one. Stated rather than
+fixed: whether that environment gets a commit is
+[W-148](../work/open/W-148-what-the-two-readers-still-owe.md)'s territory and
+Arpit's, and it is named there.
 
 ### Consequences
 

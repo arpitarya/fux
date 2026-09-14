@@ -1,4 +1,4 @@
-<title>{{TITLE}} — {{RUN}}</title>
+<title>Benchmark — 2026-09-12-benchmark-l9 — 2026-09-12-benchmark-l9</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
@@ -270,63 +270,7 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
 }
 .nonumber strong{color:var(--ink-2)}
 </style>
-<!--
-  ===========================================================================
-  BENCHMARK REPORT TEMPLATE  ·  CAP-7
-  ===========================================================================
 
-  WHAT MUST BE IN A FINISHED REPORT IS NOT STATED HERE. It is stated once, in
-  SR-WORK-BENCHMARK -> ../../../records/0053_WORK-benchmark.md
-  and this file is that record's SKELETON: one section per capture, in the
-  record's own order, with nothing to fill in that the record does not ask for.
-
-  SR-LAW-0: this template LINKS to the record and never restates it. If a
-  section here and the record disagree, the record is right and this file is
-  a defect -- fix it here, never there.
-
-  HOW TO USE IT
-    1. copy to  work/benchmark/reports/<yyyy-mm-dd>-<run>.html
-       <yyyy-mm-dd>-<run> is the run's own directory name under
-       work/regression/ -- same string, .html on the end. One run, one report.
-    2. replace every {{TOKEN}}.
-    3. fill each CAP section from the FILED ROWS under that run's evidence/.
-       The report carries no number the filed run does not; where the two
-       disagree the report is wrong.
-
-    OR DO NOT COPY IT AT ALL -- `fux-benchmark/bin/report.py <run>` renders
-    this file for you (W-158). It substitutes the {{TOKENS}} below and replaces
-    every region between a `fux:fill:NAME` marker comment and its
-    `fux:end:NAME` partner with rows computed from `evidence/`.
-
-    ⚠ The two marker names are written WITHOUT their comment delimiters in
-    this paragraph on purpose: an HTML comment cannot contain the closing
-    delimiter, and spelling them in full here ENDED THIS COMMENT EARLY -- the
-    first generated report carried these instructions as visible page text.
-
-    🔴 **THE MARKERS ARE THE CONTRACT BETWEEN THIS FILE AND THAT EMITTER.**
-    Everything OUTSIDE them -- this comment, the CSS, the direction markers on
-    every numeric header, slide 2's how-to-read table, slide 11's guard rails --
-    is copied through verbatim, so a change to any of it reaches the next
-    generated report with no code change. That is the point: the headers and
-    their direction markers live HERE and the emitter never writes one.
-
-    ⚠ **Renaming or deleting a marker breaks the emitter, and it says so** --
-    it refuses rather than silently dropping a section. Moving a marker is
-    fine; the emitter finds them by name.
-    4. a capture this run has no number for KEEPS ITS SECTION and says so --
-       use <p class="nonumber">. Deleting the section hides the gap.
-    5. every number carries a direction: <span class="dir up">/<dir down>/
-       <dir flat>. A chart with no direction is not finished.
-
-  {{TOKENS}}
-    {{RUN}}          the run id, e.g. 2026-09-13-benchmark-captures
-    {{DATE}}         yyyy-mm-dd
-    {{TITLE}}        one line, what this run was for
-    {{ARM_A}} {{ARM_B}}   versions, from evidence/ARMS.toml
-    {{CORPORA}}      the corpus/corpora, with document counts
-    {{CLASSIFICATION}}    blind | informed  (SR-RS)
-  ===========================================================================
--->
 <div class="tick" id="tick"></div>
 
 <main class="deck" id="deck">
@@ -334,18 +278,11 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
 <!-- ============ 1 · COVER ================================================ -->
 <section class="slide">
   <div class="wrap">
-    <p class="eyebrow">Benchmark report <span class="dim">/ {{RUN}} / executed {{DATE}}</span></p>
-    <h1>{{TITLE}}</h1>
-    <p class="lead" style="max-width:62ch">{{ONE_PARAGRAPH: what this run was for, and what it is not. A benchmark rules no threshold.}}</p>
+    <p class="eyebrow">Benchmark report <span class="dim">/ 2026-09-12-benchmark-l9 / executed 2026-09-12</span></p>
+    <h1>Benchmark — 2026-09-12-benchmark-l9</h1>
+    <p class="lead" style="max-width:62ch">The first benchmark run under L9&#x27;s shape: two versions, five corpora, latency and ranked lists kept. The RANKED LISTS and the ingest numbers stand; EVERY ABSOLUTE LATENCY IS CONTAMINATED — a second session was saturating cores for the whole sweep, disclosed after filing. What survives is the interleaved A-vs-B difference and the ordering, and the report says exactly which is which.</p>
     <hr class="rule">
-<!-- fux:fill:cover_stats -->
-    <div class="grid g4">
-      <div><p class="statlabel">Arms</p><p class="stat sm">{{ARM_A}} &rarr; {{ARM_B}}</p><p class="statnote">{{how each was installed}}</p></div>
-      <div><p class="statlabel">Corpora</p><p class="stat sm">{{CORPORA}}</p><p class="statnote">{{tiers run, and tiers not run}}</p></div>
-      <div><p class="statlabel">Questions</p><p class="stat sm">{{N}}</p><p class="statnote">{{judged / timing / planted unanswerable}}</p></div>
-      <div><p class="statlabel">Classification</p><p class="stat sm">{{CLASSIFICATION}}</p><p class="statnote">no threshold ruled &mdash; SR-WORK-BENCHMARK decision 6</p></div>
-    </div>
-<!-- fux:end:cover_stats -->
+<div class="grid g4"><div><p class="statlabel">Arms</p><p class="stat sm">1.0.0 &rarr; 2.0.0-alpha.7</p><p class="statnote">pip install fux-engine==1.0.0 &middot; pip install -e ../fux</p></div><div><p class="statlabel">Corpora</p><p class="stat sm">docs-00100, docs-00200, docs-00500, docs-01000, docs-02000, docs-05000, docs-10000</p><p class="statnote">7 tier(s) built; 5 produced ranked lists. No CAP-1 rows for: docs-00100, docs-10000.</p></div><div><p class="statlabel">Questions</p><p class="stat sm">60</p><p class="statnote">judged / timing / planted unanswerable split not filed</p></div><div><p class="statlabel">Classification</p><p class="stat sm">informed</p><p class="statnote">no threshold ruled &mdash; SR-WORK-BENCHMARK decision 6</p></div></div>
   </div>
 </section>
 
@@ -376,22 +313,7 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
   <div class="wrap">
     <p class="eyebrow">The arms <span class="dim">/ evidence/ARMS.toml</span></p>
     <h2>Two engines, byte&#8209;checked against one corpus</h2>
-<!-- fux:fill:arms -->
-    <div class="tblwrap">
-      <table>
-        <thead><tr><th>&nbsp;</th><th>arm A</th><th>arm B</th></tr></thead>
-        <tbody>
-          <tr><td>version</td><td class="k">{{ARM_A}}</td><td class="k">{{ARM_B}}</td></tr>
-          <tr><td>install</td><td class="k">{{...}}</td><td class="k">{{...}}</td></tr>
-          <tr><td>python</td><td class="k">{{...}}</td><td class="k">{{...}}</td></tr>
-          <tr class="hi"><td>corpus sha256</td><td class="k">{{...}}</td><td class="k">{{... identical, or the run is void}}</td></tr>
-          <tr class="hi"><td>queries sha256</td><td class="k">{{...}}</td><td class="k">{{...}}</td></tr>
-          <tr><td>enrichment</td><td class="k">{{present|absent}}</td><td class="k">{{present|absent}}</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="callout"><p>{{Anything that makes this run non-reproducible -- an editable install of a dirty tree, an uncommitted change, a machine that was not quiet -- is stated HERE, not discovered later.}}</p></div>
-<!-- fux:end:arms -->
+<div class="tblwrap"><table><thead><tr><th>&nbsp;</th><th>arm A</th><th>arm B</th></tr></thead><tbody><tr><td>version</td><td class="k">1.0.0<br><span class='dim'>identical across 7 corpus tier(s)</span></td><td class="k">2.0.0-alpha.7<br><span class='dim'>identical across 7 corpus tier(s)</span></td></tr><tr><td>install</td><td class="k">pip install fux-engine==1.0.0<br><span class='dim'>identical across 7 corpus tier(s)</span></td><td class="k">pip install -e ../fux<br><span class='dim'>identical across 7 corpus tier(s)</span></td></tr><tr><td>python</td><td class="k">3.11.15<br><span class='dim'>identical across 7 corpus tier(s)</span></td><td class="k">3.11.15<br><span class='dim'>identical across 7 corpus tier(s)</span></td></tr><tr class="hi"><td>corpus sha256</td><td class="k">varies across 7 corpus tier(s)<br><span class='dim'>7 distinct values</span></td><td class="k">varies across 7 corpus tier(s)<br><span class='dim'>7 distinct values</span></td></tr><tr class="hi"><td>queries sha256</td><td class="k">varies across 7 corpus tier(s)<br><span class='dim'>7 distinct values</span></td><td class="k">varies across 7 corpus tier(s)<br><span class='dim'>7 distinct values</span></td></tr><tr class="hi"><td>index sha256</td><td class="k">varies across 7 corpus tier(s)<br><span class='dim'>7 distinct values</span></td><td class="k">varies across 7 corpus tier(s)<br><span class='dim'>7 distinct values</span></td></tr><tr><td>enrichment</td><td class="k">False<br><span class='dim'>identical across 7 corpus tier(s)</span></td><td class="k">False<br><span class='dim'>identical across 7 corpus tier(s)</span></td></tr></tbody></table></div><div class="callout"><p><strong>Both arms indexed the same corpus and the same queries</strong> &mdash; the two <code>hi</code> rows above agree, which is what makes the comparison a comparison.</p></div>
   </div>
 </section>
 
@@ -402,13 +324,7 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
     <p class="eyebrow">The null control <span class="dim">/ run first, as it always is</span></p>
     <h2>Arm A against itself</h2>
     <div class="grid g2">
-<!-- fux:fill:nullcontrol -->
-      <div class="card">
-        <p class="statlabel">nullcontrol &middot; {{corpus}} &middot; {{path}}</p>
-        <p class="stat sm">{{n}} differed<span class="dir down">&darr; lower is better</span></p>
-        <p class="statnote">{{Identical ranked lists on every query, or the run stops here.}}</p>
-      </div>
-<!-- fux:end:nullcontrol -->
+<div class="card"><p class="statlabel">nullcontrol &middot; docs-00100 · scan</p><p class="stat sm">0 differed<span class="dir down">&darr; lower is better</span></p><p class="statnote">Arm A against itself. Identical ranked lists on every query, or the run stops here.</p></div><div class="card"><p class="statlabel">nullcontrol &middot; docs-01000 · scan</p><p class="stat sm">0 differed<span class="dir down">&darr; lower is better</span></p><p class="statnote">Arm A against itself. Identical ranked lists on every query, or the run stops here.</p></div>
       <div class="card">
         <h3>Why it is first</h3>
         <p>Ordering is deterministic. <strong>A difference between two runs of the same arm is a broken harness, not a finding</strong> &mdash; and it would be invisible in every table after this one.</p>
@@ -421,29 +337,7 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
 <section class="slide">
   <div class="wrap">
     <p class="eyebrow">CAP&#8209;3 <span class="dim">/ hit@k against the planted key</span></p>
-<!-- fux:fill:hits -->
-    <h2>{{the one-line finding, or: no number exists for this run}}</h2>
-    <div class="tblwrap">
-      <table>
-        <thead><tr>
-          <th>arm</th><th>version</th>
-          <th class="num">hit@1<span class="dir up">&uarr; higher is better</span></th>
-          <th class="num">hit@5<span class="dir up">&uarr; higher is better</span></th>
-          <th class="num">hit@10<span class="dir up">&uarr; higher is better</span></th>
-          <th class="num">hit@20<span class="dir up">&uarr; higher is better</span></th>
-          <th class="num">hit@50<span class="dir up">&uarr; higher is better</span></th>
-        </tr></thead>
-        <tbody>
-          <tr><td class="k">A</td><td class="k">{{ARM_A}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td></tr>
-          <tr><td class="k">B</td><td class="k">{{ARM_B}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p style="font-size:13px;color:var(--ink-3);margin-top:8px"><strong>hit@5 is the headline</strong>; the other four are context and are never dropped for being undramatic.</p>
-    <!-- when this run has no key: replace the table with
-    <p class="nonumber"><strong>No number exists for this run.</strong> {{why -- e.g. the corpus carried no key, so hit@k could not be computed. Say which, and do not re-run to fill it.}}</p>
-    -->
-<!-- fux:end:hits -->
+<h2>No hit@k for this run</h2><p class="nonumber"><strong>No number exists for this run &mdash; CAP-3 hit@k.</strong> No <code>evidence/hits.jsonl</code> was filed. <strong>Neither corpus tier this run used carries a planted key</strong>, so no hit@k is computable from it &mdash; not a small number, and not a zero. <em>The run is frozen and was not re-executed to fill this.</em></p>
   </div>
 </section>
 
@@ -453,25 +347,7 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
     <p class="eyebrow">CAP&#8209;3 <span class="dim">/ headroom, stated in both directions</span></p>
     <h2>How much could have moved at all</h2>
     <p>One score answers neither question. <strong>Improvement headroom</strong> is the questions wrong in <em>both</em> arms &mdash; the most that could have been fixed. <strong>Regression headroom</strong> is the questions right in both &mdash; the most that could have broken.</p>
-<!-- fux:fill:headroom -->
-    <div class="tblwrap">
-      <table>
-        <thead><tr>
-          <th class="num">k</th><th class="num">n</th>
-          <th class="num">improvement headroom<span class="dir flat">&mdash; neither</span></th>
-          <th class="num">regression headroom<span class="dir flat">&mdash; neither</span></th>
-          <th class="num">b &nbsp;A wrong &rarr; B right<span class="dir up">&uarr; higher is better</span></th>
-          <th class="num">c &nbsp;A right &rarr; B wrong<span class="dir down">&darr; lower is better</span></th>
-        </tr></thead>
-        <tbody>
-          <tr><td class="num">1</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td></tr>
-          <tr><td class="num">5</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td></tr>
-          <tr><td class="num">10</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="callout warn" style="margin-top:16px"><p><strong>Zero headroom is not agreement.</strong> Where the improvement column is 0 no delta is representable, so equal scores there report a <em>ceiling</em>, never a match. Say which rows are ceilings.</p></div>
-<!-- fux:end:headroom -->
+<p class="nonumber"><strong>No number exists for this run &mdash; CAP-3 headroom.</strong> Headroom is derived from <code>hits.jsonl</code>, which was not filed. <strong>Without it a null in any table below is uninterpretable</strong> &mdash; a zero delta on a saturated endpoint and a zero delta on a live one look identical. <em>The run is frozen and was not re-executed to fill this.</em></p>
   </div>
 </section>
 
@@ -479,25 +355,7 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
 <section class="slide">
   <div class="wrap">
     <p class="eyebrow">CAP&#8209;4 <span class="dim">/ the answer layer, and the planted unanswerables</span></p>
-<!-- fux:fill:answers -->
-    <h2>{{the one-line finding}}</h2>
-    <div class="tblwrap">
-      <table>
-        <thead><tr>
-          <th>arm</th>
-          <th class="num">answered<span class="dir flat">&mdash; neither</span></th>
-          <th class="num">declined<span class="dir up">&uarr; higher is better</span></th>
-          <th class="num">fabricated<span class="dir down">&darr; lower is better</span></th>
-        </tr></thead>
-        <tbody>
-          <tr><td class="k">A &nbsp;{{ARM_A}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td></tr>
-          <tr><td class="k">B &nbsp;{{ARM_B}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p style="font-size:13px;color:var(--ink-3);margin-top:8px"><strong>fabricated</strong> = answered a question planted to have no answer. <strong>Higher <span class="mono">declined</span> is better only on the planted unanswerables</strong> &mdash; on the judged set, declining is a miss. Say which set each column is over.</p>
-    <div class="callout">{{Any asymmetry between the arms -- a flag one version does not have -- is stated, not smoothed.}}</div>
-<!-- fux:end:answers -->
+<h2>No answer layer for this run</h2><p class="nonumber"><strong>No number exists for this run &mdash; CAP-4 the answer layer.</strong> No <code>evidence/answer-layer.jsonl</code> was filed, so <strong>answered / declined / fabricated cannot be stated</strong> &mdash; including on the planted unanswerables, which is the one place a fabrication would show. <em>The run is frozen and was not re-executed to fill this.</em></p>
   </div>
 </section>
 
@@ -505,15 +363,7 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
 <section class="slide">
   <div class="wrap">
     <p class="eyebrow">CAP&#8209;1 &middot; CAP&#8209;2 <span class="dim">/ the ranked lists, and what moved between them</span></p>
-<!-- fux:fill:rankdiff -->
-    <h2>{{n}} of {{N}} lists differ &mdash; {{and where}}</h2>
-    <figure class="chartbox">
-      {{ INLINE SVG: first-differing-rank histogram, or the chart this run's CAP-2 rows support.
-         Label the axes. Put the direction marker in the caption, not on the bars. }}
-      <figcaption>{{what the chart is over}} &middot; <strong>first differing rank <span class="dir flat">&mdash; neither; a change is a signal, not a score</span></strong> &mdash; a difference at rank 1 is a changed top answer, which is worth a look; nothing here says which ordering is better.</figcaption>
-    </figure>
-    <div class="callout" style="margin-top:16px"><p>{{entered / left counts, and the one sentence a reader should take away}}</p></div>
-<!-- fux:end:rankdiff -->
+<h2>600 ranked lists filed &mdash; what moved between them is not</h2><figure class="chartbox"><figcaption><strong>No chart.</strong> The template's figure here is an inline SVG a person draws from the CAP-2 rows; this report was generated and carries the counts instead. <span class="dir flat">&mdash; neither; a change is a signal, not a score</span></figcaption></figure><p class="nonumber"><strong>No number exists for this run &mdash; CAP-2 what moved.</strong> No <code>evidence/rankdiff.jsonl</code> was filed. CAP-1's lists are filed, so the diff is recomputable from them &mdash; but it was not computed by this run, and this page states only what the run filed. <em>The run is frozen and was not re-executed to fill this.</em></p>
   </div>
 </section>
 
@@ -521,23 +371,7 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
 <section class="slide">
   <div class="wrap">
     <p class="eyebrow">CAP&#8209;5 <span class="dim">/ the committed index</span></p>
-<!-- fux:fill:size -->
-    <h2>{{one line}}</h2>
-    <div class="tblwrap">
-      <table>
-        <thead><tr>
-          <th>arm</th><th class="num">index bytes<span class="dir down">&darr; lower is better</span></th>
-          <th class="num">bytes / document<span class="dir down">&darr; lower is better</span></th>
-          <th class="num">shards<span class="dir flat">&mdash; neither</span></th>
-        </tr></thead>
-        <tbody>
-          <tr><td class="k">A</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td></tr>
-          <tr><td class="k">B</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p style="font-size:13px;color:var(--ink-3)">Deterministic &mdash; unaffected by what else the machine was doing.</p>
-<!-- fux:end:size -->
+<h2>Committed bytes, per arm per corpus</h2><div class="tblwrap"><table><thead><tr><th>arm</th><th class="num">index bytes<span class="dir down">&darr; lower is better</span></th><th class="num">bytes / document<span class="dir down">&darr; lower is better</span></th><th class="num">shards<span class="dir flat">&mdash; neither</span></th></tr></thead><tbody><tr><td class="k">A <span class="dim">docs-00100</span></td><td class="num">1,407,555</td><td class="num">14076</td><td class="num">—</td></tr><tr><td class="k">B <span class="dim">docs-00100</span></td><td class="num">1,335,981</td><td class="num">13360</td><td class="num">—</td></tr><tr><td class="k">A <span class="dim">docs-00200</span></td><td class="num">2,801,415</td><td class="num">14007</td><td class="num">—</td></tr><tr><td class="k">B <span class="dim">docs-00200</span></td><td class="num">2,659,177</td><td class="num">13296</td><td class="num">—</td></tr><tr><td class="k">A <span class="dim">docs-00500</span></td><td class="num">6,972,004</td><td class="num">13944</td><td class="num">—</td></tr><tr><td class="k">B <span class="dim">docs-00500</span></td><td class="num">6,615,297</td><td class="num">13231</td><td class="num">—</td></tr><tr><td class="k">A <span class="dim">docs-01000</span></td><td class="num">13,928,576</td><td class="num">13929</td><td class="num">—</td></tr><tr><td class="k">B <span class="dim">docs-01000</span></td><td class="num">13,211,224</td><td class="num">13211</td><td class="num">—</td></tr><tr><td class="k">A <span class="dim">docs-02000</span></td><td class="num">27,826,549</td><td class="num">13913</td><td class="num">—</td></tr><tr><td class="k">B <span class="dim">docs-02000</span></td><td class="num">26,386,990</td><td class="num">13193</td><td class="num">—</td></tr><tr><td class="k">A <span class="dim">docs-05000</span></td><td class="num">69,516,232</td><td class="num">13903</td><td class="num">—</td></tr><tr><td class="k">B <span class="dim">docs-05000</span></td><td class="num">65,912,339</td><td class="num">13182</td><td class="num">—</td></tr><tr><td class="k">A <span class="dim">docs-10000</span></td><td class="num">138,960,394</td><td class="num">13896</td><td class="num">—</td></tr><tr><td class="k">B <span class="dim">docs-10000</span></td><td class="num">131,750,954</td><td class="num">13175</td><td class="num">—</td></tr></tbody></table></div><p class="nonumber"><strong>These come from <code>evidence/ARMS.toml</code>, not from <code>index-size.csv</code>, which this run did not file.</strong> Same measurement, different file; the shard count is in neither and is shown as &mdash;. <em>The run is frozen and was not re-executed.</em></p><p style="font-size:13px;color:var(--ink-3)">Deterministic &mdash; unaffected by what else the machine was doing.</p>
   </div>
 </section>
 
@@ -548,25 +382,7 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
 <section class="slide">
   <div class="wrap">
     <p class="eyebrow">CAP&#8209;6 <span class="dim">/ speed, arms interleaved A B A B</span></p>
-<!-- fux:fill:latency -->
-    <h2>{{one line}} {{<span class="pill fail">do not quote</span> when the machine was not quiet}}</h2>
-    <div class="tblwrap">
-      <table>
-        <thead><tr>
-          <th>arm</th>
-          <th class="num">query p50<span class="dir down">&darr; lower is better</span></th>
-          <th class="num">query p95<span class="dir down">&darr; lower is better</span></th>
-          <th class="num">ingest<span class="dir down">&darr; lower is better</span></th>
-          <th class="num">build<span class="dir down">&darr; lower is better</span></th>
-        </tr></thead>
-        <tbody>
-          <tr><td class="k">A</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td></tr>
-          <tr><td class="k">B</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="callout warn" style="margin-top:16px"><p><strong>State whether the machine was quiet.</strong> A loaded machine does not produce noise &mdash; <em>it produces a clean, localised anomaly that reads like a finding.</em> Interleaving <span class="mono">A B A B</span> protects the <strong>difference</strong> and never the absolute number.</p></div>
-<!-- fux:end:latency -->
+<h2>Query latency, both arms</h2><div class="tblwrap"><table><thead><tr><th>arm</th><th class="num">query p50 (ms)<span class="dir down">&darr; lower is better</span></th><th class="num">query p95 (ms)<span class="dir down">&darr; lower is better</span></th><th class="num">ingest (s)<span class="dir down">&darr; lower is better</span></th><th class="num">build (s)<span class="dir down">&darr; lower is better</span></th></tr></thead><tbody><tr><td class="k">A</td><td class="num">279.2</td><td class="num">307.0</td><td class="num">37.7</td><td class="num">0.6</td></tr><tr><td class="k">B</td><td class="num">305.5</td><td class="num">339.9</td><td class="num">17.3</td><td class="num">1.0</td></tr></tbody></table></div><div class="callout warn" style="margin-top:16px"><p><strong>No <code>latency_warning</code> key was filed. The only statement this run makes about the machine is its own <code>report.md</code>, quoted here because a reader of the table above needs it:</strong><br><em>&ldquo;The first benchmark run under L9&#x27;s shape: two versions, five corpora, latency and ranked lists kept. The RANKED LISTS and the ingest numbers stand; EVERY ABSOLUTE LATENCY IS CONTAMINATED — a second session was saturating cores for the whole sweep, disclosed after filing. What survives is the interleaved A-vs-B difference and the ordering, and the report says exactly which is which.&rdquo;</em></p></div>
   </div>
 </section>
 
@@ -577,14 +393,10 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
     <h2>What this run does <em>not</em> do</h2>
     <div class="grid g4">
       <div class="card"><h3>It rules no threshold</h3><p>SR&#8209;WORK&#8209;BENCHMARK decision 6 &mdash; <strong>no pass/fail anywhere</strong>. A bar is a pre&#8209;registration with its own id space and its own verdict.</p></div>
-<!-- fux:fill:guardrails -->
-      <div class="card"><h3>{{scope limit}}</h3><p>{{tiers not run, paths not run, arms not compared}}</p></div>
-      <div class="card"><h3>{{classification limit}}</h3><p>{{what informed costs this run, or what blind buys it}}</p></div>
-      <div class="card"><h3>{{captures with no number}}</h3><p>{{named here as well as in their own section, so the gaps are countable from one slide}}</p></div>
-<!-- fux:end:guardrails -->
+<div class="card"><h3>Scope</h3><p>7 tier(s) built; 5 produced ranked lists. No CAP-1 rows for: docs-00100, docs-10000.</p></div><div class="card"><h3>Classification: informed</h3><p>an informed run is never compared with a blind one and never used to state a delta</p></div><div class="card"><h3>Captures with no number</h3><p class="mono">CAP-2, CAP-3, CAP-4, CAP-5</p><p>Named here as well as in their own sections, so the gaps are countable from one slide. <strong>No run is re-executed to fill one.</strong></p></div>
     </div>
     <hr class="rule">
-    <p style="font-size:13px;color:var(--ink-3);margin:18px 0 0">The run is <span class="mono">work/regression/{{RUN}}/</span> &mdash; <span class="mono">report.md</span>, <span class="mono">ANALYSIS.md</span>, <span class="mono">evidence/</span>. <strong>This report carries no number that run does not; anything that disagrees with it is this file being wrong.</strong> What must be here at all: <span class="mono">records/0053_WORK-benchmark.md</span>.</p>
+    <p style="font-size:13px;color:var(--ink-3);margin:18px 0 0">The run is <span class="mono">work/regression/2026-09-12-benchmark-l9/</span> &mdash; <span class="mono">report.md</span>, <span class="mono">ANALYSIS.md</span>, <span class="mono">evidence/</span>. <strong>This report carries no number that run does not; anything that disagrees with it is this file being wrong.</strong> What must be here at all: <span class="mono">records/0053_WORK-benchmark.md</span>.</p>
   </div>
 </section>
 

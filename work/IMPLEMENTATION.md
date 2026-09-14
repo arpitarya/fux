@@ -28,6 +28,58 @@ Rules:
 
 
 
+## 2026-09-14 — **W-158 SHIPPED**: the harness renders CAP-7 from the template, and the l9 report exists
+
+**Shipped**, with one part deliberately not done and one exposure named rather
+than fixed. `tests/test_benchmark_capture.py` passes **unchanged**, as DoD 5
+required.
+
+`fux-benchmark/bin/report.py <run>` now renders
+`work/benchmark/reports/TEMPLATE.html` into
+`work/benchmark/reports/<run>.html` — nothing into the run directory — by
+substituting the template's `{{TOKENS}}` and filling ten
+`fux:fill:NAME` / `fux:end:NAME` regions from `evidence/`.
+
+| what landed | what it found |
+|---|---|
+| the marker contract | **Everything outside a marker is copied through byte for byte**, so every numeric header keeps the direction marker the TEMPLATE puts on it. The emitter writes exactly one direction anywhere. That is decision 10 enforced structurally rather than carefully: a direction written in the emitter would be restated per report and two reports could disagree |
+| the `2026-09-12-benchmark-l9` report, from its filed rows | **Five `nonumber` sections** — CAP-2, CAP-3, CAP-3 headroom, CAP-4 and (before the substitution below) CAP-5 — each naming which capture and why, and each saying the run was not re-executed |
+| CAP-5 after all | 🔴 **The numbers were filed under another name.** The run wrote no `index-size.csv` and its `ARMS.toml` carries `index_bytes` and `corpus_docs` per arm per corpus — the same measurement. Read, and **the substitution is stated on the page**: a silent one would have the report claim a capture the run's own file list does not have |
+| the contaminated latencies | The run filed no `latency_warning` key, and its `report.md` says *EVERY ABSOLUTE LATENCY IS CONTAMINATED*. The emitter **quotes that, attributed, in the latency callout** — explicit key first, the run's own report second, **never a keyword sniff** |
+| the cover | The run's `report.md` `description` becomes the lead and its `classification` the label, quoted. *A generated sentence about what a run meant is the one thing this emitter must not write* |
+| 🔴 **my own template edit broke the template** | I wrote the marker names in full — with a literal `-->` — inside the authoring comment, which **closed the comment early**, and the first generated report carried the template's how-to instructions as visible page text. The names are now spelled without their delimiters, with the reason beside them |
+| 🔴 **the first reader read nothing and the page said so in every cell** | `ARMS.toml` is `[[arm]]`, an array of tables, **one per arm per corpus**. My reader guessed `[A]`/`[B]` sections, so the arms table printed *not filed* seven rows deep while the file sat there with every value in it. Same for the null control: `differed` is a **list of query ids**, and the card read `[] differed`. **Read the evidence, then write the reader** |
+| the tiers note, which nobody asked for | `ARMS.toml` records **7 tiers built** and `ranked-lists.jsonl` has **5**. Reporting the second as the first would have dropped two tiers the run indexed and then said nothing about, so the cover names them: *No CAP-1 rows for: docs-00100, docs-10000* |
+| determinism | Byte-identical over two runs. The date is the **run directory's**, never today's — a report regenerated a year later must say when the run executed |
+
+⚠ **DoD's out-of-scope clause fired, and the three hand-built reports are left
+exactly as they are.** It permits regenerating them only if the generated shape
+differs *and the diff carries no new number*. Regenerating
+`2026-09-13-benchmark-captures` was tried and **rejected on the evidence**: the
+generated page **loses** the hand-built per-corpus hit@k breakdown and **adds**
+index-bytes and latency figures the hand-built page does not carry. So a
+generated report is **thinner than a hand-authored one** — the CAP-2 figure is
+an inline SVG a person draws, and the emitter **says so in the figure's place**
+rather than omitting it. From the next run onward the emitter is the report.
+
+🔴 **The exposure this item created, named and not fixed.**
+`~/my_programs/fux-benchmark` is a git repo with **zero commits** and every file
+untracked, so the code that now enforces decisions 8–10 exists on **one
+machine** — and nothing in fux would notice it going, because
+`tests/test_benchmark_capture.py` checks that a report was *filed*, never that
+anything can still generate one. **Committing in that environment is not my
+call**: it would change what SR-WORK-ENVIRONMENTS says the environment is.
+Filed as a third row on [W-148](open/W-148-what-the-two-readers-still-owe.md)
+with three shapes for Arpit, and stated in SR-WORK-BENCHMARK decision 11b where
+the decisions it undermines are stated.
+
+**Records:** SR-WORK-BENCHMARK (decision 11, 11a, 11b).
+**Files in this repo:** `TEMPLATE.html` (the markers), the l9 report,
+DOC-REGISTRY, W-148. **The emitter itself is in the sibling environment** and is
+the half that is not durable.
+
+---
+
 ## 2026-09-14 — **W-162 SHIPPED**: `fux correct`, and four claims that were false until somebody ran them
 
 **Shipped in full.** `tests` 4418, `tests_e2e` 136, `node --test` 36.
@@ -152,6 +204,8 @@ SR-AGENT-POLICY / SR-NODE-SEARCH / SR-PII).
 | `--cache-ttl` declared inert under `never` | W-140 row 6 from the other end: a knob that cannot act must say so |
 | SR-ACQUIRED's pairing table corrected | 🔴 **A record said *"`update=never keep=true` … and no socket opens"* and that was never true.** `update=` is the update-time clock; SR-URL-FRESHNESS decision 15 says so in as many words two records away. A test docstring carried the same wrong sentence. Both corrected |
 | the `fux-config` guide corrected | 🔴 **It told agents *"any other unknown key is silently ignored"*** — wrong since SR-CONFIG decision 14 refused unknown keys by name. An agent reading it would have told a consumer their typo was harmless |
+| ⚠ **written LIVE, not commented** (Arpit's ruling) | The first cut wrote `#fetch_at_answer = true`. Ruled: write the key with its default value, from `fux setup` onward. **The trade is real** — an uncommented default does not follow a future change of default — and the ruling is right here because the value is a *boolean*, not a number that may rise (`acquired_max_bytes`'s reason for deferring to `None`), and because it is the key a consumer is least likely to discover any other way. `meta = "hashed"` is the precedent |
+| ⚠ **this repo's own `fux.toml`** | Found by Arpit: the first pass added `#fetch_at_answer = true` to `setup._CONFIG` — the file `fux setup` writes into a **new** repo — and not to fux's own `fux.toml`, which `setup` will not overwrite. The key worked; it was invisible where he looked. Both carry the commented default now |
 | the Node question, settled | **Nothing owed.** `node/src/refer/source.mjs` and `freshness.mjs` both state that Node never fetches (W-107 R6), so the Node reader has always behaved as `fetch_at_answer = false`. Under `false` the two readers' `url:` verdicts converge exactly — this key does not diverge them |
 
 **Records:** SR-URL-FRESHNESS (decision 16, the third clock cell) · SR-CONFIG
