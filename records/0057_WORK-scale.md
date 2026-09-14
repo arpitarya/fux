@@ -10,7 +10,7 @@ feature: the design point, and the ceiling it puts on what may be measured and w
 owns: []
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 53209a6907f1630d8dcc725a34060165191a430980f85ed2a2ef6b60f7756093
+content_sha: 74dc30b8a7b51974e76706b8362aef72080b513a4a705337dcb256fe4677b639
 ---
 
 # SR-WORK-SCALE — the 10 000-document ceiling
@@ -202,7 +202,7 @@ a correct document to satisfy a rule that does not apply to it.
 - [SR-RS](0133_predictions.md) — the prediction system: a frozen claim, the four
   ways one ends, and why a threshold may never move. The rule this record defers
   to for everything about an `R` id.
-- [`work/paper/the-fux-index-paper.md`](../work/paper/the-fux-index-paper.md)
+- [`docs/paper/the-fux-index-paper.md`](../docs/paper/the-fux-index-paper.md)
   §4, §8 — one keyspace (naming no corpus size, the worked example for decision
   7) and the falsifiable-prediction sequencing.
 - [`work/regression/2026-08-09-pruning-rerun/VERDICT.md`](../work/regression/2026-08-09-pruning-rerun/VERDICT.md)
@@ -241,5 +241,5 @@ evidence.*
 
 **Project docs**
 
-- [`work/paper/the-fux-index-paper.md`](../work/paper/the-fux-index-paper.md)
+- [`docs/paper/the-fux-index-paper.md`](../docs/paper/the-fux-index-paper.md)
 - [`tools/pruning-eval/PRE-REGISTRATION.md`](../tools/pruning-eval/PRE-REGISTRATION.md)

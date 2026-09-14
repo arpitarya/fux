@@ -1,0 +1,14 @@
+flowchart LR
+  classDef src fill:#eef3f8,stroke:#5b7fa6,color:#1c2b3a
+  classDef idx fill:#fff4e0,stroke:#c98a1b,color:#3a2a08
+  classDef loc fill:#eefaf0,stroke:#3f9a5a,color:#12301c
+  classDef ans fill:#f6eefa,stroke:#8a5bb0,color:#2b1638
+  S["SOURCES own the content<br/>git dirs · url: pages<br/>(never copied into the index)"]:::src
+  I["THE COMMITTED INDEX owns findability<br/>.fux/index — 256 JSONL shards<br/>term hashes · tf per field · flen · sha · edges<br/>deterministic, byte-identical (L3)"]:::idx
+  L["THE DERIVED PLANE owns speed<br/>.fux/runtime — gitignored, rebuildable<br/>T1 accelerator · graph.json · caches"]:::loc
+  A["THE ANSWER PATH owns truth<br/>rank in the index → fetch the cited docs<br/>→ verify sha → re-score passages → cite"]:::ans
+  S -- "fux ingest: extract, then discard" --> I
+  I -- "fux build / on demand" --> L
+  I --> A
+  L --> A
+  A -. "refer: read the bytes back<br/>from the owning system" .-> S

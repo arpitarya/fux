@@ -64,7 +64,7 @@ Below the age bound, serve from index. Above it, fetch live — bounded by a
 latency guard so a crawl cannot blow the SLA.
 
 **That is the refer plane**
-([paper](../paper/the-fux-index-paper.md) §refer): rank in the index, fetch
+([paper](../../docs/paper/the-fux-index-paper.md) §refer): rank in the index, fetch
 from the system that owns the content, verify at answer time. Arrived at
 independently, from the opposite end of the scale axis.
 
@@ -264,7 +264,7 @@ the number exists.
 [Common Crawl](https://commoncrawl.org/blog/january-2025-crawl-archive-now-available) ·
 [Cloudflare Pay Per Crawl](https://blog.cloudflare.com/introducing-pay-per-crawl/)
 
-**Internal** — [`../paper/the-fux-index-paper.md`](../paper/the-fux-index-paper.md) ·
+**Internal** — [`../paper/the-fux-index-paper.md`](../../docs/paper/the-fux-index-paper.md) ·
 [`../compare/cache-policy.compare.md`](../compare/cache-policy.compare.md) ·
 `../adr/0004_index-format.md` ·
 [the SR register](../../records/README.md) §M4

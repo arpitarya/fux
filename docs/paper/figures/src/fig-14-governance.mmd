@@ -1,0 +1,17 @@
+flowchart TB
+  classDef law fill:#fbeeee,stroke:#b85c5c,color:#3a1414
+  classDef rec fill:#fff4e0,stroke:#c98a1b,color:#3a2a08
+  classDef q fill:#eef3f8,stroke:#5b7fa6,color:#1c2b3a
+  classDef ar fill:#f4f4f4,stroke:#999,color:#555
+  L["LAW records 0001–0011 (11)<br/>change only on Arpit's ruling, named in the record<br/>outrank every other record (L0)"]:::law
+  W["WORK records 0051–0065 (18 process)<br/>how work is done: queue, backlog, environments, quality…"]:::rec
+  C["COMPONENT records 0101–0157 (52)<br/>one owner per src/ component · content_sha · owns@hash"]:::rec
+  G["ownership gate: a commit touching an owned component<br/>must touch its record — or say 'no SR affected'"]:::law
+  B["BACKLOG.md — named, unclaimed<br/>unbuilt · ungated · unmeasured · unruled · cost"]:::q
+  O["OPEN-WORK.md — the one live queue<br/>🔴 Arpit · 🟣 date · 🟡 item · 🟢 free<br/>inbox: EMPTY since 2026-09-14"]:::q
+  I["IMPLEMENTATION.md — what shipped, evidence"]:::q
+  A["archive/ — named, never cited as authority<br/>a closed item's file is moved, never deleted"]:::ar
+  L --> W --> C --> G
+  B -- "promote → W-nn" --> O -- "ship" --> I
+  O -- "close" --> A
+  C -- "ratifies" --> O

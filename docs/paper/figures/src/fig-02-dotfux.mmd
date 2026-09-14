@@ -1,0 +1,24 @@
+flowchart TB
+  classDef c fill:#fff4e0,stroke:#c98a1b,color:#3a2a08
+  classDef d fill:#eefaf0,stroke:#3f9a5a,color:#12301c
+  classDef a fill:#fbeeee,stroke:#b85c5c,color:#3a1414
+  subgraph COMMITTED["COMMITTED — travels with the repository"]
+    direction TB
+    c1["index/  00.jsonl … ff.jsonl<br/>header: fux.index.v2 · analyzer v2 · 5 tf fields"]:::c
+    c2["sources/dirs · sources/urls · formats.toml · .fuxignore"]:::c
+    c3["enrich/&lt;sha&gt;.md  (doc2query + human lines → ctx field)<br/>eval/corrections.tsv"]:::c
+    c4["tune.toml · output.toml · pii.toml (required) · refusals.toml"]:::c
+    c5["decoders/ · fetchers/ · observers/ (proposed)<br/>readable source — the three L10 exemptions"]:::c
+    c6["node/fux.mjs — the bundled Node reader (L10)<br/>fux — a /bin/sh shim"]:::c
+  end
+  subgraph DERIVED["DERIVED — .fux/runtime/, gitignored, rebuildable"]
+    direction TB
+    d1["postings/xx.jsonl + xx.idx (T1 accelerator)<br/>docs.jsonl · stats.json · manifest.json · stamp.json"]:::d
+    d2["graph.json · fetch-cache/ · display-cache/<br/>provenance.jsonl (--journal, bounded 1000) · write.lock"]:::d
+  end
+  subgraph ACQUIRED["ACQUIRED — .fux/acquired/, gitignored, NOT rebuildable"]
+    direction TB
+    a1["objects/&lt;sha256&gt;&lt;ext&gt; — url: bytes kept for refer<br/>bounded by acquired_max_bytes (2 GiB) · evicted by run_seq"]:::a
+  end
+  COMMITTED -- "fux build" --> DERIVED
+  COMMITTED -- "fux ingest / answer (url: keep=true)" --> ACQUIRED

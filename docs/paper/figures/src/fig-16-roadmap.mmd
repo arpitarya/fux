@@ -1,0 +1,32 @@
+flowchart LR
+  classDef now fill:#eefaf0,stroke:#3f9a5a,color:#12301c
+  classDef date fill:#f3eefa,stroke:#7f5bb0,color:#25123a
+  classDef wait fill:#fff4e0,stroke:#c98a1b,color:#3a2a08
+  subgraph NOW["🟢 runnable now — agent lane"]
+    direction TB
+    W146["W-146 docstring gate test"]:::now
+    W140["W-140 --hops work budget"]:::now
+    W148["W-148 golden local-only · Node latency in benchmark"]:::now
+    W176a["W-176 gates 1 + 9 + output surface"]:::now
+    W170["W-170 .fux/observers/ hook (SR-OBSERVE)"]:::now
+    W144["W-144 sweep b ∈ {0.75, 0.6, 0.5, 0.4}"]:::now
+    W161["W-161 graph-composed ask (two arms)"]:::now
+    W168["W-168 ten search improvements, ten gated steps"]:::now
+  end
+  subgraph DATE["🟣 gated on 2026-09-30 — Codex available"]
+    direction TB
+    W145["W-145 Codex regenerates the golden key"]:::date
+    W136["W-136 phase-5 scoring"]:::date
+    W175["W-175 correction generalisation, 3 arms"]:::date
+    W176b["W-176 gates 4 3 2 7 8 5 (measured)"]:::date
+  end
+  subgraph WAIT["🟡 waiting on another item"]
+    direction TB
+    W87["W-87 what good means, Part B"]:::wait
+    W154["W-154 rerank benefit — no endpoint"]:::wait
+    W176c["W-176 gate 6 graph coherence"]:::wait
+  end
+  W145 --> W87
+  W145 --> W136
+  W161 --> W176c
+  W168 -. "identifier field feeds gate 7" .-> W176b

@@ -1,0 +1,14 @@
+flowchart LR
+  classDef fx fill:#fff4e0,stroke:#c98a1b,color:#3a2a08
+  classDef ob fill:#eefaf0,stroke:#3f9a5a,color:#12301c
+  classDef law fill:#fbeeee,stroke:#b85c5c,color:#3a1414
+  V["verb runs — ask · answer · lexical · graph …"]:::fx
+  R["render → stdout flushed → exit code fixed"]:::fx
+  F["freeze ONE fact record<br/>verb · args_hash · band · answerable · n_results<br/>n_related · refer_verdicts · ms · expand_used · fux_version<br/>NEVER the question, a path, a snippet, the answer"]:::fx
+  O1[".fux/observers/cage.py → observe(record)<br/>(cage's search leg is the first subscriber)"]:::ob
+  O2[".fux/observers/&lt;yours&gt;.py"]:::ob
+  X["return value discarded · raise → skipped (FUX_DEBUG)<br/>slow → killed at [observe] max_ms · exit code untouched<br/>fux imports and names no subscriber"]:::law
+  V --> R --> F --> O1
+  F --> O2
+  O1 -.-> X
+  O2 -.-> X

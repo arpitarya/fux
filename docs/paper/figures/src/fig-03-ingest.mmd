@@ -1,0 +1,17 @@
+flowchart LR
+  classDef step fill:#eef3f8,stroke:#5b7fa6,color:#1c2b3a
+  classDef gate fill:#fbeeee,stroke:#b85c5c,color:#3a1414
+  classDef out fill:#fff4e0,stroke:#c98a1b,color:#3a2a08
+  W["1 · WALK<br/>.fuxignore first, then sources/dirs,<br/>sources/urls, formats.toml include globs"]:::step
+  D["2 · DECODE<br/>17 built-in decoders, copied into .fux/decoders/<br/>consumer copy replaces by module name<br/>decode(raw, rel_path) → str | None"]:::step
+  Q["None → enrich/queue.tsv with a reason<br/>(never silently dropped)"]:::gate
+  H["3 · content_sha on the RAW bytes<br/>(before redaction)"]:::step
+  R["4 · REDACT — pii.toml<br/>body + frontmatter title, never the path<br/>reaches the committed index only"]:::gate
+  X["5 · EXTRACT<br/>title · heading phrases · terms (tf per field)<br/>flen per field · analyzer v2 (split → lower → stop → Porter → blake2b-64)"]:::step
+  E["6 · RESOLVE EDGES — every run<br/>ref · tag · code · grades EXTRACTED 10 / AMBIG 8 / INFERRED 6"]:::step
+  M["meta: hashed for non-git sources (L5)<br/>enforced inside write_index"]:::gate
+  O["7 · WRITE<br/>canonical JSON · sorted keys · NFC · no floats<br/>shard = blake2b(id) → write-if-different"]:::out
+  CF["carry-forward when sha, header, PII digest,<br/>caps, enrichment sha, decoder VERSION unchanged<br/>(edges never carried)"]:::step
+  W --> D --> H --> R --> X --> E --> M --> O
+  D -. "cannot decode" .-> Q
+  H -. "unchanged" .-> CF -.-> O

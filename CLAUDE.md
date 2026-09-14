@@ -9,7 +9,7 @@ maintenance path.
 **This is the second from-scratch rebuild.** The v0.19–0.26 substrate engine
 is archived at [`archive/v0.26/`](archive/v0.26/) — runnable, reference-only,
 never imported by new code. The architecture being built is **index-and-refer**,
-specified in [`work/paper/the-fux-index-paper.md`](work/paper/the-fux-index-paper.md).
+specified in [`docs/paper/the-fux-index-paper.md`](docs/paper/the-fux-index-paper.md).
 
 This file is binding. Read it, then
 [`work/INTERVIEW.md`](work/INTERVIEW.md) (start at the reset block), before
@@ -52,7 +52,7 @@ occurrence — [SR-WORK-SESSION](records/0060_WORK-session.md) decision 13.
 |---|---|
 | what to work on next | [`work/OPEN-WORK.md`](work/OPEN-WORK.md) — **the single live queue**, two lanes |
 | the spec for a milestone id | [the SR register](records/README.md) |
-| why the architecture is this shape | [`work/paper/the-fux-index-paper.md`](work/paper/the-fux-index-paper.md) |
+| why the architecture is this shape | [`docs/paper/the-fux-index-paper.md`](docs/paper/the-fux-index-paper.md) |
 | a closed decision + its reopen-trigger | [`work/compare/`](work/compare/README.md) |
 | the judgment behind the reset | [`work/INTERVIEW.md`](work/INTERVIEW.md) |
 | a word you don't recognise | [`docs/GLOSSARY.md`](docs/GLOSSARY.md) |

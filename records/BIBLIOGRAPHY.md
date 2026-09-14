@@ -101,7 +101,7 @@ filed 2026-09-13.*
 
 > 🔴 **This is the section where reading stopped code from being written.**
 > The paper's committed-index design rests on these; the engine ships almost
-> none of them, and [`work/paper/the-fux-index-paper.md`](../work/paper/the-fux-index-paper.md)'s
+> none of them, and [`docs/paper/the-fux-index-paper.md`](../docs/paper/the-fux-index-paper.md)'s
 > status banner is the record of that.
 
 | source | what it is | what depends on it — or what it stopped |

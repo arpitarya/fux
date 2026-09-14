@@ -130,7 +130,7 @@ convention. Lives in [`work/compare/`](../work/compare/README.md).
 the [ledger](#ledger-l). The single exception is per-source
 [`snapshot` mode](#snapshot-mode), which is explicit and opt-in. This is what
 makes the committed artifact small, ACL-safe, and never stale-by-accumulation.
-See [CLAUDE.md §Non-negotiable constraints](../CLAUDE.md), named by [SR-LAWS](../records/0001_LAWS.md), [paper §3](../work/paper/the-fux-index-paper.md).
+See [CLAUDE.md §Non-negotiable constraints](../CLAUDE.md), named by [SR-LAWS](../records/0001_LAWS.md), [paper §3](paper/the-fux-index-paper.md).
 
 **Determinism** — Same sources → byte-identical index and root hash; same
 question → same answer. No wall-clock output, no model in the maintenance
@@ -442,7 +442,7 @@ is 10 000 documents (W-65, 2026-08-22). Listed: P1 pruning holds quality · P2 w
 ≤ 300 ms @1M · P4 cold external answer ≤ 3 s · P5 clone→first answer ≤ 5 min ·
 P6 concurrent-ingest merges cleanly · P7 20-doc commit re-indexes < 1 s.
 Status lives in [OPEN-WORK §2](../work/OPEN-WORK.md). See
-[paper §8](../work/paper/the-fux-index-paper.md).
+[paper §8](paper/the-fux-index-paper.md).
 
 **Planes (`L/ P/ D/ V/ E/ M/`)** — The six key ranges of the
 [keyspace](#keyspace-one-mst): ledger, postings, dictionary+df, dense codes,

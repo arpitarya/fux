@@ -1,0 +1,12 @@
+sequenceDiagram
+  autonumber
+  participant A as agent
+  participant F as fux ask
+  participant R as rank()
+  A->>F: ask "how are locks acquired" -q "index write lock" --expand mutex
+  F->>R: phrasing 1 — original terms, plus expand terms at weight 0.2
+  R-->>F: ranked list 1 — a doc matching only "mutex" is DROPPED
+  F->>R: phrasing 2 — "index write lock"
+  R-->>F: ranked list 2
+  Note over F: RRF — score(d) = sum of 1/(60 + rank_i(d))
+  F-->>A: fused list, fused=true · --band describes phrasing 1 only

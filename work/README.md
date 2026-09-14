@@ -31,7 +31,6 @@ are all mid-rewrite, and a doc being rewritten is work.
 | [`golden/`](golden/README.md) | the sealed benchmark — seed docs, ladder manifests, prompts. 🔴 `golden-answer/` is **never read by Claude** | a phase of W-136 runs; the process changes |
 | [`compare/`](compare/README.md) | live forks — verdict + reopen-trigger | a fork opens, closes, or its trigger fires |
 | [`proposals/`](proposals/README.md) | parked ideas, not adopted | an idea is filed, graduates, or is rejected |
-| [`paper/`](paper/the-fux-index-paper.md) | the architecture of record + figures | the architecture changes; a prediction gets measured |
 | `architecture-*.svg` | **the six diagrams**, redrawn from the code 2026-09-12 and again the same day for the Node read plane: `high-level` (what fux is) · `detailed` (every plane, committed vs not, and **the two readers**) · `decoders` · `ask` · `answer` · `two-readers` (Python versus Node, component for component). `docs/architecture-*.png` are rendered from these and are never edited directly | the plane, verb, **reader** or record shape each one draws changes. **`high-level` should move rarely** — if it moves often it is drawn at the wrong altitude |
 | [`setup/`](setup/README.md) | the three sibling environments fux needs but does not contain — `fux-playground`, `fux-lab`, `fux-benchmark`; each one's job is [SR-WORK-ENVIRONMENTS](../records/0052_WORK-environments.md)'s | any of them is set up differently, or a new external dependency appears |
 

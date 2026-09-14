@@ -1,0 +1,22 @@
+flowchart TB
+  classDef q fill:#eef3f8,stroke:#5b7fa6,color:#1c2b3a
+  classDef b fill:#fff4e0,stroke:#c98a1b,color:#3a2a08
+  classDef fut fill:#f4f4f4,stroke:#999,color:#555,stroke-dasharray: 5 5
+  S["signals, every one returned as its own field:<br/>coverage (idf-weighted) · separation (top1 vs top2)<br/>verified · support · doc_coverage · missing"]:::q
+  N{"nothing scored?"}:::q
+  P{"a term with df = 0,<br/>or cited bytes stale?"}:::q
+  W{"separation &lt; separation_floor (0.10)?"}:::q
+  B0["none — answerable: false"]:::b
+  B1["partial"]:::b
+  B2["weak"]:::b
+  B3["grounded"]:::b
+  G["W-176 (open): nine gates in a weakest-link chain<br/>weak ⇒ not answerable · answer-type · passage co-occurrence<br/>IDF coverage · identifier hard-fail · verification floor · QPP · graph coherence · steering"]:::fut
+  S --> N
+  N -- yes --> B0
+  N -- no --> P
+  P -- yes --> B1
+  P -- no --> W
+  W -- yes --> B2
+  W -- no --> B3
+  B2 -.-> G
+  B3 -.-> G

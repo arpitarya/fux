@@ -1,0 +1,30 @@
+classDiagram
+  class Header {
+    _format = fux.index.v2
+    analyzer = v2
+    tf_fields = body heading title path ctx
+  }
+  class Record {
+    id : file-path or url
+    src : git or url
+    loc
+    sha : 40-hex blake2b of raw bytes
+    ver : bumps only on own sha change
+    terms : 16-hex hash to tf-per-field list
+    flen : per-field token counts
+    mtime : last git commit timestamp
+    superseded and archived : only when true
+    title or title_h (hashed)
+    phrases (plain meta only)
+    edges : src kind dst grade
+    mode : extracted or enriched
+    meta : plain or hashed
+  }
+  class NeverCommitted {
+    wlen — derived at query time from flen
+    scores ranks use-records (L8)
+    content snippets passages (L2)
+    vectors (deleted 2026-08-25)
+  }
+  Header "1" --> "*" Record : shard 00.jsonl … ff.jsonl
+  Record ..> NeverCommitted : excluded by law

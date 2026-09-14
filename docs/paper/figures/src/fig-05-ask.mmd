@@ -1,0 +1,20 @@
+flowchart TB
+  classDef step fill:#eef3f8,stroke:#5b7fa6,color:#1c2b3a
+  classDef alt fill:#eefaf0,stroke:#3f9a5a,color:#12301c
+  classDef gate fill:#fbeeee,stroke:#b85c5c,color:#3a1414
+  classDef out fill:#fff4e0,stroke:#c98a1b,color:#3a2a08
+  Q["question (and -q phrasings, --expand terms)"]:::step
+  AN["analyzer v2 → term hashes"]:::step
+  subgraph CAND["candidate generation — byte-identical results (the differential law)"]
+    direction LR
+    SC["SCAN — the default<br/>reads every shard"]:::alt
+    T1["T1 ACCELERATOR — --fast + fresh manifest<br/>rarest-first · block-max skipping<br/>candidates only, never scores"]:::alt
+  end
+  BM["BM25F over 5 fields<br/>weights body 1.0 · heading 3.0 · title 2.0 · path 1.5 · ctx 1.0<br/>k1 1.2 · b 0.75 · weight-then-saturate once"]:::step
+  RF["SR-EXPAND refusal:<br/>a document matching NO original term is dropped"]:::gate
+  TB["one sort: (-round(score,9), superseded, -mtime, -priority, id)"]:::step
+  RR["rerank top-20 on working-tree bytes<br/>ships OFF (rerank_weight = 0)"]:::alt
+  RRF["RRF fusion of phrasings, 1/(60+rank)<br/>(only with -q / --expand)"]:::alt
+  CB["confidence band<br/>none → partial → weak → grounded"]:::step
+  OUT["output.toml decides what prints<br/>--json · --band · --why · exit 0 / 1 / 130"]:::out
+  Q --> AN --> CAND --> BM --> RF --> TB --> RR --> RRF --> CB --> OUT

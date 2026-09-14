@@ -186,7 +186,7 @@ Fux is built under ten laws, each with its own record in the
 1. [`docs/index.md`](docs/index.md) — the map of every doc in the repo
 2. [The SR register](records/README.md) — every decision of record
 3. [Detailed architecture diagram](work/architecture-detailed.svg) — every plane, what is committed and what is not, and the two query paths
-4. [The paper](work/paper/the-fux-index-paper.md) — design and falsifiable predictions (a draft; its status note lists what changed)
+4. [The paper](docs/paper/the-fux-index-paper.md) — the architecture of record, v1.0 (2026-09-14): what ships, what was measured, what was designed and not built, and the open work — with twenty diagrams
 5. [Sibling environments](work/setup/README.md) — the sandbox, the measurement lab and the benchmark harness that sit next to this repo
 6. [`CLAUDE.md`](CLAUDE.md) — how work is done here, for people and agents
 

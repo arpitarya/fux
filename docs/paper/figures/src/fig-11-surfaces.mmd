@@ -1,0 +1,24 @@
+flowchart TB
+  classDef s fill:#eef3f8,stroke:#5b7fa6,color:#1c2b3a
+  classDef v fill:#eefaf0,stroke:#3f9a5a,color:#12301c
+  classDef m fill:#fff4e0,stroke:#c98a1b,color:#3a2a08
+  SU["fux setup — writes from a DECLARATION<br/>[agents] install = [...] · never detection<br/>announces every path outside .fux/"]:::s
+  subgraph INSTRUCTING["instructing surfaces"]
+    direction LR
+    SK["skills (15): fux-usage router · fux-search · fux-answer<br/>fux-graph · fux-index · fux-maintain · fux-mcp · fux-sources<br/>fux-config · fux-fetcher · fux-pii · fux-inspect<br/>fux-enrich · fux-decoder · fux-correct"]:::s
+    ST["steering — always on, one sentence class:<br/>the archived-results policy<br/>(carried verbatim into each vendor's format)"]:::s
+  end
+  subgraph ACTING["acting surfaces (Claude only, 2026-09-14)"]
+    AC["advisory hook (exits 0 always) · seeded settings.json<br/>three commands · a subagent · an output style"]:::s
+  end
+  subgraph VENDORS["where they land"]
+    direction LR
+    V1["Claude: .claude/skills · .claude/rules"]:::v
+    V2["Copilot: .github/agents · .github/instructions · .agents/skills"]:::v
+    V3["Kiro: .kiro/steering · .kiro/skills"]:::v
+    V4["Codex: AGENTS.md · .agents/skills"]:::v
+  end
+  MCP["protocol surface — fux mcp (stdio JSON-RPC)<br/>fux_search · fux_passage · fux_related<br/>answer deliberately absent: the agent is the answerer"]:::m
+  SU --> INSTRUCTING --> VENDORS
+  SU --> ACTING --> V1
+  SU -.-> MCP

@@ -1,0 +1,16 @@
+flowchart LR
+  classDef ag fill:#eef3f8,stroke:#5b7fa6,color:#1c2b3a
+  classDef fx fill:#fff4e0,stroke:#c98a1b,color:#3a2a08
+  classDef hu fill:#eefaf0,stroke:#3f9a5a,color:#12301c
+  classDef gate fill:#fbeeee,stroke:#b85c5c,color:#3a1414
+  P["fux enrich --plan<br/>MISSING / STALE per source sha"]:::fx
+  A["the agent's fux-enrich skill writes<br/>.fux/enrich/&lt;sha&gt;.md — 5–10 questions (doc2query)<br/>fux never calls a model (L3)"]:::ag
+  C["fux enrich --check<br/>a model question must retrieve its own document<br/>in top 3 with title and ctx zeroed — else refused"]:::gate
+  H["fux correct &quot;question&quot; &lt;doc&gt;<br/>a HUMAN line in the same file, corrections: N<br/>logged to eval/corrections.tsv; --check reports, never refuses"]:::hu
+  PIN["--pin: one doc to #1 for one exact question<br/>(deliberately brittle escape hatch)"]:::hu
+  I["fux ingest → the file body becomes the ctx field<br/>weight 1.0, already in BM25F"]:::fx
+  M["W-175 (open): does a correction help OTHER phrasings?<br/>3 arms · N=12 · M=5 blind paraphrases (Codex)"]:::gate
+  P --> A --> C --> I
+  H --> I
+  H -.-> PIN
+  I -.-> M
