@@ -11,7 +11,7 @@ owns: [node@51a57ca0e641, src/fux/store/nodebundle.py@071a24a596dd]
 laws: [L1, L3, L4, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: c490eb4bb4ad22c41a4b3d09302acb22c10f36191f673e6829b254014df00d55
+content_sha: cbdb9dca5782ed39eab86db09c84b34c8b420ee67a578fcb2aa0d4667ac05908
 ---
 
 # SR-NODE-SEARCH — the Node read plane
@@ -566,9 +566,37 @@ make shape C available.
   `fux doctor` PATH row, deferred *because* nothing was going to shadow
   Python's `fux`; that premise died with the clause and the row **landed the
   same day** — `doctor._fux_on_path`, a `warn` that names the resolved path and
-  points at `fux --version`. It **reads the shim's shebang and never executes
-  it**: doctor does not run a binary the environment chose for it. Registered
-  in [SR-DOCTOR](0152_doctor.md) §2.
+  points at `fux --version`. It **reads the launcher and never executes it**:
+  doctor does not run a binary the environment chose for it. Registered in
+  [SR-DOCTOR](0152_doctor.md) §2.
+
+  ⚠ **Amended 2026-09-14 (W-159): "reads the shim's SHEBANG" was the Unix
+  half of the rule, stated as the whole of it.** npm writes no shebang on
+  Windows — it writes a `fux.cmd` whose body names `node` — so the sentence
+  described a mechanism that is absent on the platform where two globally
+  installed `fux` binaries are most likely. `_is_node_shim` reads both shapes.
+
+  **The row covers Windows, macOS and Linux.** W-159 was filed believing it
+  could not fire on Windows, on the evidence of a test skipped there. **That
+  reading was wrong, and the correction is the finding**: `shutil.which` honours
+  PATHEXT, which is exactly how it resolves the `fux.cmd` npm installs. What
+  could not be built on Windows was the *test's* extensionless shim — a fixture
+  defect read back as a claim about the code it could not reach. The fixture is
+  platform-shaped now and the skip is gone.
+
+  🔴 **And the platform sweep found a real false positive.** The classifier
+  read whatever `which` returned as text with `errors="replace"` and asked
+  whether `node` appeared in the first 512 bytes. **A Windows console script is
+  a `.exe`** — a small binary launcher — and three letters occurring by chance in
+  its bytes would have told someone their working Python `fux` was the Node
+  reader and only reads. A compiled binary is not a shim and is no longer read;
+  `tests/test_doctor.py::test_a_compiled_launcher_is_never_read_as_text` pins it.
+
+  ⚠ **`_is_node_shim` is split out so it can be tested on EVERY platform.**
+  Neither end-to-end shape is reachable on both — `which('fux')` finds
+  `fux.cmd` only on Windows and an extensionless `fux` only on Unix — so the
+  row's own test exercises one shape per platform forever, and the half that was
+  actually wrong would have stayed half-covered.
 - ✅ **The 47-file vendored tree is GONE as of 2026-09-12 — decisions 13-16
   replaced it and W-149 built them.** The paragraph below is kept as the
   measurement that produced the ruling rather than rewritten; **it describes

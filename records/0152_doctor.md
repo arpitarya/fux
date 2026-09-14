@@ -7,11 +7,11 @@ description: "One record owns the health-check surface. Every check names a caus
 status: accepted
 date: 2026-09-11
 feature: "`fux doctor` — the read-only, offline health command and its check register"
-owns: [src/fux/doctor.py@ec313696b42e]
+owns: [src/fux/doctor.py@5b561b547349]
 laws: [L4, L8]
 ratifies: "Arpit, 2026-09-11 — *create a new adr for doctor*"
 timestamp: 2026-09-11T00:00:00Z
-content_sha: 7fb715d657cd2ce28507b6964d80f83b054df8349a8e65f7e693f8dcbda37cc5
+content_sha: 9e6bdfc0729be65269aecb15bbef8d14c88f5781d10d19f87b3c75e95e42bb3d
 ---
 
 # SR-DOCTOR — the health command, and who owns its rows
@@ -185,7 +185,7 @@ failure `tune.toml` taught (decision 10). The table said `warn` for all three.
 
 | `accelerator` | warn | built, fresh or stale against the committed index | [SR-T1-ACCELERATOR](0110_accelerator.md) |
 | `node reader` | warn | `.fux/node/`'s `package.json` version against the engine's, **its SHAPE, and whether that shape can actually RUN** (amended 2026-09-12, L10). **The one drift `doctor` can still see** under the fourth `.fux/` shape: the vendored bundle is overwritten on a version difference, so a repo whose owner has not run `setup` or `ingest` since upgrading ships a reader that may not understand the index beside it. Three things beyond the version, because the two shapes fail differently: a **stale `src/` tree** still sitting beside the bundle (fux's own source in a consumer's repository — it means `setup` has not run since the prune shipped), a **shape-C manifest with no `node_modules/.bin/fux`** resolving anywhere `.fux/fux` would look (decision 15's *half-configured is not a state*, observed rather than assumed away), and **which shape** it is at all. Never an error — Python answers without it | [SR-NODE-SEARCH](0153_node-search.md) |
-| `fux on PATH` | warn | **which `fux` the shell resolves.** `npm i -g fux-engine` puts a second `fux` on PATH with a **different verb set**, so `fux ingest` can answer *"this only reads"* on a machine where Python fux would have worked. The row names the resolved path and points at `fux --version`, which is the one command that disambiguates. ⚠ **Read as text, never executed** — doctor does not run a binary the environment chose for it, which is the same rule the `fetcher optional functions` row follows. Deferred until 2026-09-12 on the premise *"no global bin ships in the first npm release"*; the bin shipped and Arpit ruled it stays, so the premise is gone. | [SR-NODE-SEARCH](0153_node-search.md) R1a |
+| `fux on PATH` | warn | **which `fux` the shell resolves.** `npm i -g fux-engine` puts a second `fux` on PATH with a **different verb set**, so `fux ingest` can answer *"this only reads"* on a machine where Python fux would have worked. The row names the resolved path and points at `fux --version`, which is the one command that disambiguates. ⚠ **Read as text, never executed** — doctor does not run a binary the environment chose for it, which is the same rule the `fetcher optional functions` row follows. ⚠ **Amended 2026-09-14 (W-159): "read as text" now excludes a compiled launcher.** A Windows console script is a `.exe`, and reading one with `errors="replace"` to look for the word `node` would report an ordinary Python `fux` as the Node reader whenever those three letters occurred by chance in its bytes — the exact misdiagnosis this row exists to prevent. **The row covers all three platforms**; it was believed Windows-blind on the evidence of a test skipped there, and the fixture was what could not be built, not the row. Deferred until 2026-09-12 on the premise *"no global bin ships in the first npm release"*; the bin shipped and Arpit ruled it stays, so the premise is gone. | [SR-NODE-SEARCH](0153_node-search.md) R1a |
 
 **3. `warn` is the default; `error` is reserved for a repo a verb will refuse.**
 A check fails the command **only** when some other fux command will not run

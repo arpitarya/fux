@@ -1529,6 +1529,53 @@ def _installed_reader(root: Path) -> "Path | None":
     return None
 
 
+#: Extensions a launcher shim can have, across the platforms fux ships on.
+#:
+#: ⚠ **`.exe` is deliberately absent, and that is a correctness fix, not tidying**
+#: (W-159). The classifier read whatever `shutil.which` returned as text with
+#: `errors="replace"` and asked whether the word `node` appeared in the first
+#: 512 bytes. A Windows console script IS a `.exe` — a small binary launcher —
+#: and three letters occurring by chance in its bytes would have reported a
+#: perfectly ordinary Python `fux` as the Node reader. A compiled binary is not
+#: a shim and is never read.
+_SHIM_SUFFIXES = frozenset({"", ".cmd", ".bat", ".ps1", ".mjs", ".js", ".sh"})
+
+
+def _is_node_shim(path: Path) -> bool:
+    """Does this launcher hand off to node? **Read, never run** (W-159).
+
+    Doctor never executes a binary it found on PATH — that is an arbitrary
+    executable chosen by the environment, and shelling out to ask what it is
+    would be the diagnostic tool doing the unsafe thing it exists to warn about.
+
+    **Two shapes, because npm writes two.** On Unix the bin is a symlink to a
+    `#!/usr/bin/env node` script; on Windows it is a `fux.cmd` whose body names
+    `node` — *there is no shebang there at all*, which is why "look for a
+    shebang" was never the rule, only ever the Unix half of one.
+
+    **Split out of `_fux_on_path` so it can be tested on every platform.** The
+    end-to-end row needs `shutil.which` to resolve a shim, and `which` honours
+    PATHEXT — so an extensionless `fux` is invisible on Windows and a `fux.cmd`
+    is invisible to a Unix lookup of `fux`. Neither shape can be exercised
+    end-to-end on both platforms, and the classification is the part that was
+    actually wrong.
+    """
+    try:
+        target = path.resolve()
+    except OSError:
+        return False
+    suffix = target.suffix.lower()
+    if suffix == ".mjs":
+        return True
+    if suffix not in _SHIM_SUFFIXES:
+        return False  # a compiled launcher; not a shim, and not read as text
+    try:
+        head = target.read_text(encoding="utf-8", errors="replace")[:512]
+    except OSError:
+        return False
+    return "node" in head
+
+
 def _fux_on_path() -> Check:
     """Which `fux` does this shell resolve -- Python's, or the Node reader's?
 
@@ -1553,7 +1600,15 @@ def _fux_on_path() -> Check:
     **No subprocess.** Doctor never runs a binary it found on PATH -- that is
     an arbitrary executable chosen by the environment, and shelling out to it
     to ask what it is would be the diagnostic tool doing the unsafe thing it
-    exists to warn about. The shebang answers the question.
+    exists to warn about. `_is_node_shim` reads the launcher instead.
+
+    ⚠ **Amended 2026-09-14 (W-159): this said "the shebang answers the
+    question", and on Windows there is no shebang.** npm writes a `fux.cmd`
+    whose body names `node`; `shutil.which` finds it, because PATHEXT is exactly
+    what it resolves through. **So the row does fire on Windows for the real npm
+    shape** — what could not be constructed there was the TEST's extensionless
+    shim, and the item that filed this read the skipped test as evidence about
+    the row. One of those was broken and it was the fixture.
     """
     import shutil
 
@@ -1570,16 +1625,7 @@ def _fux_on_path() -> Check:
     except OSError:
         pass
 
-    # Read the shim rather than run it. npm's Unix bin is a symlink to a
-    # `#!/usr/bin/env node` script; its Windows `fux.cmd` names node in the
-    # body. Either way the word appears in the first few hundred bytes.
-    head = ""
-    try:
-        target = Path(found).resolve()
-        head = target.read_text(encoding="utf-8", errors="replace")[:512]
-        node_ish = "node" in head or target.suffix == ".mjs"
-    except OSError:
-        node_ish = False
+    node_ish = _is_node_shim(Path(found))
 
     if not node_ish:
         return Check(

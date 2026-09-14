@@ -1295,14 +1295,40 @@ def test_no_tune_file_is_not_a_problem(tmp_path):
 # being a row that cannot fire.
 
 
-def _fake_bin(directory, body):
+#: npm's Windows launcher, in the shape it actually writes one.
+NPM_CMD_SHIM = (
+    "@ECHO off\r\nSETLOCAL\r\n"
+    'CALL :find_dp0\r\n'
+    'IF EXIST "%dp0%\\node.exe" (SET "_prog=%dp0%\\node.exe") ELSE (SET "_prog=node")\r\n'
+    'endLocal & "%_prog%" "%dp0%\\node_modules\\fux-engine\\fux.mjs" %*\r\n'
+)
+
+#: npm's Unix launcher: a symlink to a script that begins with a shebang.
+NPM_UNIX_SHIM = "#!/usr/bin/env node\nimport('../fux.mjs')\n"
+
+
+def _fake_bin(directory, body, name=None):
+    """A launcher `shutil.which('fux')` can actually resolve **on this platform**.
+
+    ⚠ **The name is platform-dependent and that is the whole of W-159's test
+    half.** `which` honours PATHEXT, so an extensionless `fux` is invisible on
+    Windows — `npm i -g fux-engine` writes `fux.cmd` there. The fixture wrote the
+    Unix shape unconditionally, the Windows job could not resolve it, and the
+    test was skipped with a reason that blamed the ROW. The row was fine; the
+    fixture was building a file Windows would never find.
+    """
     import stat
 
     directory.mkdir(parents=True, exist_ok=True)
-    p = directory / "fux"
+    p = directory / (name or ("fux.cmd" if os.name == "nt" else "fux"))
     p.write_text(body, encoding="utf-8")
     p.chmod(p.stat().st_mode | stat.S_IEXEC)
     return p
+
+
+def _node_shim_body():
+    """The body npm writes on this platform."""
+    return NPM_CMD_SHIM if os.name == "nt" else NPM_UNIX_SHIM
 
 
 def test_no_fux_on_path_is_not_a_problem(monkeypatch, tmp_path):
@@ -1326,29 +1352,21 @@ def test_this_interpreters_fux_resolving_first_is_fine(monkeypatch):
     assert "this interpreter's" in row.detail
 
 
-@pytest.mark.skipif(
-    os.name == "nt",
-    reason=(
-        "the shim this builds cannot be found on Windows: `shutil.which` honours "
-        "PATHEXT, so an extensionless `fux` is invisible there and npm installs "
-        "`fux.cmd` instead. The ROW is what is unbuilt, not the test — W-159"
-    ),
-)
 def test_a_node_fux_shadowing_python_is_reported(monkeypatch, tmp_path):
-    """The whole point: a `#!/usr/bin/env node` shim earlier on PATH.
+    """The whole point: npm's launcher earlier on PATH than Python's.
 
-    ⚠ **Unix only, and the gap is real rather than cosmetic.** `_fux_on_path`
-    finds the shadowing binary with `shutil.which("fux")`, which on Windows
-    resolves through PATHEXT — so it sees `fux.cmd`/`fux.exe` and never an
-    extensionless shim, while `npm i -g fux-engine` writes exactly a `fux.cmd`
-    there. The row therefore cannot fire on the platform, and this test cannot
-    construct the situation. Filed as W-159; skipping is the honest state, and
-    a passing test on Windows would have been the dishonest one.
+    ⚠ **This was SKIPPED on Windows until 2026-09-14 (W-159), and the skip
+    reason blamed the wrong thing.** It read *"the ROW is what is unbuilt, not
+    the test"*. The row is built and fires there: `shutil.which` resolves
+    through PATHEXT, which is precisely how it finds the `fux.cmd` npm writes.
+    What could not be constructed was this fixture's **extensionless** shim, and
+    a skipped test was read back as evidence about the code it could not reach.
+    `_fake_bin` builds the shape the platform actually uses now.
     """
     import sys
     from pathlib import Path
 
-    _fake_bin(tmp_path / "npm", "#!/usr/bin/env node\nimport('../fux.mjs')\n")
+    _fake_bin(tmp_path / "npm", _node_shim_body())
     monkeypatch.setenv(
         "PATH", f"{tmp_path / 'npm'}{os.pathsep}{Path(sys.executable).parent}"
     )
@@ -1359,12 +1377,60 @@ def test_a_node_fux_shadowing_python_is_reported(monkeypatch, tmp_path):
     assert "--version" in row.detail, "the row must name the one command that disambiguates"
 
 
+# -- the classifier, on every platform (W-159) ------------------------------
+
+
+def test_both_npm_shim_shapes_are_recognised_everywhere(tmp_path):
+    """⚠ **Neither end-to-end test can run on both platforms**, so this does.
+
+    `which('fux')` finds `fux.cmd` only on Windows and extensionless `fux` only
+    on Unix — so the row's own test exercises one shape per platform, forever,
+    and the half that was actually wrong (what counts as a node launcher) would
+    stay half-covered. Split out as `_is_node_shim` to be testable here.
+    """
+    unix = _fake_bin(tmp_path / "u", NPM_UNIX_SHIM, name="fux")
+    win = _fake_bin(tmp_path / "w", NPM_CMD_SHIM, name="fux.cmd")
+    assert doctor._is_node_shim(unix), "the `#!/usr/bin/env node` shebang shape"
+    assert doctor._is_node_shim(win), "npm's `fux.cmd`, which has no shebang at all"
+
+
+def test_a_powershell_shim_counts_too(tmp_path):
+    """npm writes `fux.ps1` beside `fux.cmd`; PATHEXT can be configured to reach it."""
+    ps1 = _fake_bin(tmp_path / "p", '$exe="node"\n& "$exe" "$PSScriptRoot/fux.mjs" $args\n', name="fux.ps1")
+    assert doctor._is_node_shim(ps1)
+
+
+def test_an_unrelated_shell_script_is_not_a_node_shim(tmp_path):
+    assert not doctor._is_node_shim(_fake_bin(tmp_path / "o", "#!/bin/sh\necho unrelated\n", name="fux"))
+
+
+def test_a_compiled_launcher_is_never_read_as_text(tmp_path):
+    """🔴 **The false positive this fix closes.**
+
+    A Windows console script is a small `.exe`, and the classifier used to read
+    whatever `which` returned with `errors="replace"` and look for the word
+    `node` in the first 512 bytes. Three letters occurring by chance in a
+    binary would have reported an ordinary Python `fux` as the Node reader —
+    telling someone their working install only reads, which is the exact
+    misdiagnosis this row exists to prevent.
+    """
+    directory = tmp_path / "bin"
+    directory.mkdir()
+    exe = directory / "fux.exe"
+    exe.write_bytes(b"MZ\x90\x00" + b"\x00" * 64 + b"node" + b"\x00" * 64)
+    assert not doctor._is_node_shim(exe), "a .exe is a binary launcher, not a shim"
+
+
+def test_a_missing_launcher_is_not_a_node_shim(tmp_path):
+    assert not doctor._is_node_shim(tmp_path / "nope" / "fux")
+
+
 def test_some_other_fux_is_reported_but_not_blamed_on_node(monkeypatch, tmp_path):
     """An unrelated `fux` on PATH is worth saying; calling it the Node reader is not."""
     import sys
     from pathlib import Path
 
-    _fake_bin(tmp_path / "other", "#!/bin/sh\necho unrelated\n")
+    _fake_bin(tmp_path / "other", "#!/bin/sh\necho unrelated\n")  # platform-shaped name
     monkeypatch.setenv(
         "PATH", f"{tmp_path / 'other'}{os.pathsep}{Path(sys.executable).parent}"
     )
