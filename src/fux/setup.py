@@ -116,6 +116,12 @@ GUIDE_SKILLS: tuple[tuple[str, str], ...] = (
     ("fux-config", "CONFIG-SKILL.md"),
     ("fux-fetcher", "FETCHER-SKILL.md"),
     ("fux-pii", "PII-SKILL.md"),
+    # `fux-inspect` writes nothing at all -- it is the only guide here whose
+    # verb is read-only end to end (SR-INSPECT decision 1). It still ships as a
+    # SKILL rather than as ambient steering: its whole job is to be reached
+    # when somebody asks about the shape of a corpus, and an agent that read it
+    # on every request would start volunteering index critiques.
+    ("fux-inspect", "INSPECT-SKILL.md"),
 )
 
 #: **Path-scoped pointers** (decision 15): a short rule that loads when an agent

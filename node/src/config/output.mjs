@@ -50,6 +50,13 @@ export const CLI_VERBS = {
   hooks: [],
   daemon: [],
   update: [],
+  //: `inspect` is PYTHON-ONLY as a verb (its dictionary build re-tokenises
+  //: the sources, which is an ingest-side job Node has no home for yet) and
+  //: is still declared here, because this table is not a verb list — it is
+  //: what `.fux/output.toml` is allowed to say. A repo whose file carries
+  //: `[cli.json] inspect = true` must VALIDATE on both readers, or the same
+  //: committed config is legal for one and an error for the other.
+  inspect: [],
 };
 
 //: `[mcp]`'s closed key set. `top` only. No `json` (an MCP result is always

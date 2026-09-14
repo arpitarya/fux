@@ -83,7 +83,7 @@ Flat verbs, no subcommand tree. `fux <verb> --help` for any of them.
 
 | group | verbs | what the group does |
 |---|---|---|
-| lifecycle | `setup` `doctor` | set the repo up, then check it |
+| lifecycle | `setup` `doctor` `inspect` | set the repo up, check the environment, then X-ray the index it produced |
 | write | `ingest` `build` | `ingest` writes the committed index; `build` derives the local accelerator from it |
 | sources | `add` `remove` `update` `enrich` | maintain what is indexed. `add`/`remove` write lines; `update` re-fetches and writes none; `enrich` writes no committed byte at all |
 | read | `ask` `find` `answer` | the same question, differing only in how much each commits to |

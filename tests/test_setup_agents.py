@@ -491,13 +491,19 @@ def test_every_committed_write_skill_reaches_every_skill_surface():
 
 
 def test_every_operating_guide_reaches_every_skill_surface_and_no_ambient_one():
-    """SR-AGENT-POLICY decision 15 (Arpit, 2026-09-11). The ten operating
-    guides are decision 14a's roster rule applied ten more times: one template,
-    all four skill surfaces, and never an `instructions/` or `steering/`
-    destination -- four of them (`fux-sources`, `fux-config`, `fux-fetcher`,
-    `fux-pii`) write committed files, and decision 9a is a predicate on the
-    surface, not on a list of names."""
-    assert len(setup_mod.GUIDE_SKILLS) == 10
+    """SR-AGENT-POLICY decision 15 (Arpit, 2026-09-11). The operating guides are
+    decision 14a's roster rule applied once per guide: one template, all four
+    skill surfaces, and never an `instructions/` or `steering/` destination --
+    four of them (`fux-sources`, `fux-config`, `fux-fetcher`, `fux-pii`) write
+    committed files, and decision 9a is a predicate on the surface, not on a
+    list of names.
+
+    **Eleven since 2026-09-14**, when SR-INSPECT's `fux-inspect` joined. It is
+    the only one whose verb writes nothing at all, and it ships as a skill for
+    the reason the others do: an agent that loaded it ambiently would start
+    volunteering critiques of a corpus nobody asked it about.
+    """
+    assert len(setup_mod.GUIDE_SKILLS) == 11
     for name, template in setup_mod.GUIDE_SKILLS:
         assert _surfaces(template) == SKILL_SURFACES, template
         for files in setup_mod.AGENT_FILES.values():

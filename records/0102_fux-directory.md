@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@836cc5ab2239, src/fux/setup.py@93709065ecd2, tests/test_verb_table_agreement.py@2c2a8f52fb6c]
+owns: [src/fux/store/fuxdir.py@836cc5ab2239, src/fux/setup.py@ca8f6e019655, tests/test_verb_table_agreement.py@2c2a8f52fb6c]
 laws: [L2, L3, L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 82c5a69946bd4cf0c914e5b717a6e6a1e0af44ce881bf8f26d279a440e9d841d
+content_sha: fb38782861ea1b56fce8ef4c5ad66346ef21bebf620cb55a96e27a0e643fcbd4
 ---
 
 # SR-DOTFUX — the `.fux/` directory
@@ -534,9 +534,14 @@ with it:**
 
 ⚠ **`.claude/rules/` joined the outside set on 2026-09-11, and the set grew from
 eighteen files to eighty-four** ([SR-AGENT-POLICY](0132_agent-policy.md) decision
-15): ten guide skills on four surfaces, seven path-scoped pointers on three
-vendors, and five Kiro auto guides, beside the existing seventeen vendor files
-and `AGENTS.md`. Still write-if-missing, still announced
+15): **eleven** guide skills on four surfaces — `fux-inspect` joined on
+2026-09-14 with [SR-INSPECT](0156_inspect.md) — seven path-scoped pointers on
+three vendors, and five Kiro auto guides, beside the existing seventeen vendor
+files and `AGENTS.md`. ⚠ **`fux-inspect` gets no path-scoped pointer and no
+Kiro auto guide, and the asymmetry is the rule rather than an omission:** a
+pointer fires when an agent edits one of fux's own committed files and
+`inspect` writes none, and an auto guide fires on a description match, which
+would have an agent volunteering critiques of a corpus nobody asked about. Still write-if-missing, still announced
 path by path, still one `--no-agents` away. ⚠ **The announcement is now long**
 — that is the contract working, not a defect: veto condition 1 is *every* path
 named. **The ambient cost moved too**: on a Kiro CLI without inclusion modes the

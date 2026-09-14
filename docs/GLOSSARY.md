@@ -88,6 +88,15 @@ archived engine: BM25 with *fielded* term frequency — heading (3.0), path
 per-field BM25 glued together. Ported at [M4](../archive/open/W-24-m4-refer-plane.md); it is also the single
 scorer both arms of the [pruning eval](#pruning-eval-the-gate) run through.
 
+**Boilerplate term** — A term whose document frequency is **at or above half
+the corpus**, so `idf(df, n)` is at most `ln 2` ≈ 0.69 and it separates almost
+nothing. Named as a *share* rather than as an IDF floor on purpose: an absolute
+floor moves with `n`, so the same word would be boilerplate on one rung of a
+corpus and not the next. `fux inspect`'s first lens names them — `tldr`,
+`status`, `owner`, a template heading — and reports the share of **postings**
+they carry, because a handful of such terms can be most of the index's bytes.
+See [SR-INSPECT](../records/0156_inspect.md) decisions 6 and 8.
+
 **Chunk** — The passage unit: a heading-bounded slice of a document
 (256–512 token target, code fences and tables atomic), carrying its heading
 path and `file:line` span. In v0.30 chunks are **not durable** — they are
@@ -250,6 +259,17 @@ child is **declared** as committed or [derived](#derived-plane): `index/`
 self-describing `README.md` and a `.gitignore` naming **only** the derived
 dirs, never `*`. Both are write-if-missing; anything undeclared is a `fux
 doctor` warning. See [SR-DOTFUX](../records/0102_fux-directory.md).
+
+**Findability** — Whether any query can reach a document at all —
+retrievability in the IR literature (Azzopardi, de Rijke and Balog, SIGIR
+2007), and the one property of an index that matters before ranking does. Fux
+answers it two ways and keeps them apart: **exhaustively**, by whether a
+document carries any [distinctive term](#boilerplate-term) at all, and by
+**sample**, by whether a document comes back in the top 3 for its own most
+distinctive words. ⚠ **The sampled half is near 1.0 on almost every corpus,
+healthy or not** — a fingerprint is built from a document's own rarest terms
+and its path is part of its indexed vocabulary — so it is reported and carries
+no floor. See [SR-INSPECT](../records/0156_inspect.md) decisions 7 and 9a.
 
 **Fux-benchmark** — The two-version timing harness
 (`~/my_programs/fux-benchmark/`): its own corpora, a fixed query set with no
@@ -471,6 +491,15 @@ the [wire format](#wire-format). See
 commits a machine-made Markdown copy with provenance frontmatter, for
 air-gap availability, PR-reviewed change tracking, or audit retention. The
 archived frontmatter parser's home in v0.30. Built at [M6](../archive/open/W-26-m6-scale-t2.md).
+
+**Template family** — Two or more documents with an **identical heading
+set** — the same form filled in more than once. The *set*, never the sequence:
+a filled-in template reorders its sections and is still the same template.
+Distinct from a **near-duplicate pair**, which is two documents whose *term
+sets* overlap at Jaccard ≥ 0.80: a family shares its shape and differs in its
+content, and reporting them as one finding would hide the difference that
+decides the remedy. `fux inspect`'s fourth lens names both. See
+[SR-INSPECT](../records/0156_inspect.md) decision 6.
 
 **TTL fetch cache** — *Time-to-live.* The on-disk, **gitignored**, per-machine
 store at `.fux/runtime/fetch-cache/` that answers *"do I need to fetch this at

@@ -27,6 +27,12 @@ def _cmd_doctor(args) -> int:
     return cmd_doctor(args)
 
 
+def _cmd_inspect(args) -> int:
+    from .inspect import cmd_inspect
+
+    return cmd_inspect(args)
+
+
 def _cmd_ingest(args) -> int:
     from .ingest import cmd_ingest
 
@@ -138,7 +144,10 @@ def _cmd_tune(args) -> int:
 #: (W-64). `add`/`remove`/`update` joined it in W-63: they end in
 #: `ingest.run()`, so they inherit the bar from that seam rather than growing
 #: one of their own.
-_PROGRESS_COMMANDS = ("ingest", "build", "add", "remove", "update")
+#: `inspect` joins these because its retrieval half is one full query per
+#: sampled document and its dictionary half re-tokenises the whole corpus —
+#: both are long enough that silence reads as a hang.
+_PROGRESS_COMMANDS = ("ingest", "build", "add", "remove", "update", "inspect")
 
 
 def _add_progress_flags(parser: argparse.ArgumentParser) -> None:
@@ -312,6 +321,37 @@ def build_parser() -> argparse.ArgumentParser:
     p_doctor.add_argument("--json", action="store_true", default=None, help="machine-readable report")
     _add_output_flags(p_doctor)
     p_doctor.set_defaults(func=_cmd_doctor)
+
+    # `inspect` reads the INDEX; `doctor` checks the ENVIRONMENT (SR-INSPECT
+    # decision 1). A flag on `doctor` would have made one command answer two
+    # questions with two different remedies — a config edit versus a change to
+    # the corpus — and the two lists would have been read as one.
+    p_inspect = sub.add_parser(
+        "inspect", help="what the index looks like: boilerplate, unfindable documents, duplicates"
+    )
+    p_inspect.add_argument("--json", action="store_true", default=None, help="machine-readable report")
+    p_inspect.add_argument(
+        "--top",
+        type=int,
+        default=20,
+        metavar="N",
+        help="how many rows each named list shows (the counts beside them are never truncated)",
+    )
+    p_inspect.add_argument(
+        "--retrieval-sample",
+        type=int,
+        default=None,
+        metavar="N",
+        help="documents to test by retrieval; 0 means every one of them (one full query each)",
+    )
+    p_inspect.add_argument(
+        "--rebuild-dictionary",
+        action="store_true",
+        help="re-tokenise the sources even when the cached hash-to-word dictionary is current",
+    )
+    _add_progress_flags(p_inspect)
+    _add_output_flags(p_inspect)
+    p_inspect.set_defaults(func=_cmd_inspect)
 
     p_ingest = sub.add_parser("ingest", help="walk configured sources into the committed index")
     p_ingest.add_argument("--list-skipped", action="store_true", help="print skipped files and why, then exit")

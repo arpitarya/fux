@@ -7,10 +7,10 @@ description: Flat verbs in seven groups, one error boundary, three output modes.
 status: accepted
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@4f87294070d9, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@e15fc07dcf7e, src/fux/progress.py@925dccc045ce]
+owns: [src/fux/cli.py@dfd9bc75aa38, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@e15fc07dcf7e, src/fux/progress.py@925dccc045ce]
 laws: [L1, L4, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: c498b5bad34ed92e01895e6f12e19d42c45ec21982ee0cbf989bd2517f0becb3
+content_sha: 8e95f6564beb45a676eccf90c9232b8f35c8149a60df68c51b567a13615a5ab6
 ---
 
 # SR-CLI — the command-line surface
@@ -21,7 +21,7 @@ content_sha: c498b5bad34ed92e01895e6f12e19d42c45ec21982ee0cbf989bd2517f0becb3
 
 | group | verbs | |
 |---|---|---|
-| **lifecycle** | `setup` · `doctor` | set the repo up, then check it |
+| **lifecycle** | `setup` · `doctor` · `inspect` | set the repo up, check the environment, then X-ray the index — `doctor`'s fix is a command or a config edit, `inspect`'s is a change to the corpus ([SR-INSPECT](0156_inspect.md)) |
 | **write** | `ingest` · `build` | one writes the committed plane, one derives from it |
 | **sources** | `add` · `remove` · `update` · `enrich` | maintain what is indexed — `add` and `remove` write lines, `update` never touches one, `enrich` writes no committed byte at all |
 | **read** | `ask` · `find` · `answer` | differ only in how much they commit to |

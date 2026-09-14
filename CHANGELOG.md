@@ -76,6 +76,27 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Added
 
+- **`fux inspect` — the index X-ray.** Six lenses over the committed index, all
+  read-only: **boilerplate** (which words are on every document, with `df`, IDF,
+  the Zipf slope and Heaps β), **findability** (documents no query can reach),
+  **length and fields** (per-field totals and the vocabulary percentiles that
+  killed index pruning here), **duplication and templates** (minhash pairs and
+  identical heading sets), **analyzer coverage** (what never became a term), and
+  **graph** (orphans, hubs, community sizes). `--json` for agents; a Markdown
+  report and its JSON twin under the gitignored `.fux/runtime/inspect/`.
+  - **Every finding names the lever that would change it and applies none** —
+    stopwords, `.fuxignore`, `archived=`, `supersedes`, `fux enrich`, a decoder.
+  - **Three checks carry a flag, and every floor prints the word *provisional*.**
+    `fux inspect` **exits 0 whatever it finds**: a flag is attention, not a
+    failure. There is no one-number index score.
+  - **The words come from a gitignored, locally rebuilt hash → word dictionary**
+    — the committed index holds term hashes, and still does. Nothing new is
+    committed, nothing is fetched, and the report carries no timestamp, so it is
+    byte-identical over an unchanged index.
+  - Ships with the `fux-inspect` guide skill on all four agent surfaces.
+    [SR-INSPECT](records/0156_inspect.md) ·
+    [the floors run](work/regression/2026-09-14-inspect-floors/report.md).
+
 - **The ingest summary counts deletions** — `…, N records deleted`, present only
   when `N > 0`. `write_index` writes the whole index, so a removal is an
   *absence*: every other number on that line could sit still while a document

@@ -81,6 +81,10 @@ def test_parser_has_the_verb_surface():
     further in: `tune` prints what changes WHICH documents come back, `output`
     prints what changes how they are SHOWN. Both print and neither writes.
 
+    SR-INSPECT added **`inspect`** — the index X-ray. It sits beside `doctor`
+    rather than inside it: `doctor` checks the environment and `inspect` checks
+    the index, and the remedies do not overlap.
+
     Six, not four, and the count was never the mental model — which is why
     adding one costs a line here and a line in SR-CLI rather than a redesign.
 
@@ -120,6 +124,11 @@ def test_parser_has_the_verb_surface():
         # a receipt FILE rather than a query, so every flag on the query parser
         # -- `--top`, `--fast`, `--no-tune` -- would be meaningless on it.
         "verify",
+        # SR-INSPECT (W-169). A verb rather than a flag on `doctor`, because
+        # the two answer different questions with different remedies: `doctor`
+        # checks the ENVIRONMENT, whose fix is a command or a config edit, and
+        # `inspect` checks the INDEX, whose fix is a change to the corpus.
+        "inspect",
     }
 
 

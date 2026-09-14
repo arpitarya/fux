@@ -152,6 +152,13 @@ CLI_VERBS: dict[str, tuple[str, ...]] = {
     # verb is shaped by this file; an absent entry means it is not, and
     # `--json` would then never be resolved from `[cli.json]` (W-140 row 14).
     "update": (),
+    # `inspect` carries no `[cli.inspect]` key of its own — only `--json` to
+    # resolve, like `doctor` and `update`. The EMPTY tuple is the declaration
+    # that this verb IS shaped by this file; an absent entry would leave
+    # `--json` unreachable from `[cli.json]` (W-140 row 14, the same trap).
+    # `--top` and `--retrieval-sample` stay flags: both are how much WORK to
+    # do, not how a result is shown, and SR-OUTPUT's subject is the latter.
+    "inspect": (),
 }
 
 #: `[mcp]`'s closed key set. `top` only — decision 11. No `json` (an MCP

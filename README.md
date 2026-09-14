@@ -109,6 +109,7 @@ keeps the derived and fetched parts out of git ([SR-DOTFUX](records/0102_fux-dir
 | Re-index automatically on commit and merge | `fux hooks` |
 | A re-runnable answer receipt | `fux answer --receipt "…"`, later `fux verify <receipt>` |
 | Check the setup | `fux doctor` (read-only, offline) |
+| See what the index looks like | `fux inspect` — boilerplate words, documents no query can reach, duplicates, orphans |
 
 Full surface: `fux --help` and [SR-CLI](records/0101_cli-surface.md).
 
