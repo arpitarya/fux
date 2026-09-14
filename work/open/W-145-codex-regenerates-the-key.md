@@ -11,6 +11,12 @@ filed: 2026-09-12
 
 # W-145 — Codex regenerates the golden answer key
 
+**Model: NONE — no Claude model executes this**, and that is the item. A
+Claude session authored the key as a stopgap, which is exactly the
+contamination this re-run removes; a Claude model executing it would
+reproduce the defect. Codex re-runs prompt 1 part B on Arpit's account
+([SR-WORK-LIFECYCLE](../../records/0058_WORK-lifecycle.md) decision 6).
+
 ## 🟣 Gated on 2026-09-30 — Arpit, 2026-09-13
 
 **His Codex limit is exhausted; he runs part B on 2026-09-30.** The decision is

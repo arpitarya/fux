@@ -10,7 +10,7 @@ feature: the authority of records — where a rule lives, which record wins, and
 owns: []
 laws: [L0]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: c9f65a1461bce13570fa23cece8e7535c8da0b113b3bff2057625ea35be00ee2
+content_sha: 57aeba6d043e17cf717fb1af878b92db683adbc26115181c1f8b3e3638e23904
 ---
 
 # SR-LAW-0 — L0 — SRs are the only source of truth
@@ -136,6 +136,40 @@ artifact — `CLAUDE.md`, a schema file, a config comment, a skill, a README, a
 diagram, a docstring — **links to it and never restates it**. A change is made
 in the record first; everything else keeps pointing.
 
+**1a. The records are always up to date — IN THE CHANGE THAT MAKES THEM
+WRONG.** (Arpit, 2026-08-18, emphatic and standing: *always* make sure the SRs
+are up to date. Not at the end of the milestone, not when someone asks.)
+
+Three obligations, and none is optional:
+
+1. **No behaviour change lands without its record updated in the same change.**
+   Same commit, not the next one.
+2. **If a change genuinely touches no recorded decision, say so out loud** —
+   `no SR affected`, on its own line in the commit message. **That is a claim
+   under your name in git history, which is the point. Silence is not an
+   answer.**
+3. **Before a session ends, re-read the records you touched code under.** A
+   record describing behaviour the code no longer has is **worse than no
+   record: it reads as authority.**
+
+⚠ **Obligations 1 and 2 are enforced; obligation 3 is not, and cannot be.**
+[SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 3 is the gate, and what it
+proves is that an owning record was **touched** — it never reads the record. **A
+record can be amended into self-contradiction in the same commit and every
+mechanical check fux has will pass.** W-83 is the case: an accepted amendment
+contradicted itself, the code implemented the wrong sentence, and CI was green
+the whole way.
+
+**So obligation 3 is the only thing covering coherence.** Ruled 2026-08-27
+(W-82 ruling 18) as *stated rather than mechanised*, because the two-strikes
+rule ([SR-WORK-SESSION](0060_WORK-session.md) decision 13) makes a **second**
+recorded occurrence the trigger for a gate, and this has happened once.
+
+⚠ **Stated here from 2026-09-14** (W-173, accepted by Arpit). It had been
+stated in `CLAUDE.md` §Law zero — a hand-written second copy of this record's
+own subject, which decision 4's test classes as a restatement and decision 1
+therefore forbids.
+
 **2. Precedence.** The Law records `SR-LAW-0` … `SR-WORK-ENVIRONMENTS` outrank every
 other SR. **A record that conflicts with a Law is void in the conflicting
 part** — a defect to fix on contact, never a trade-off to weigh. An ordinary
@@ -227,7 +261,7 @@ once a conflict is found; it does not find one.
 🔴 **A record contradicting itself inside one file is still ungated**, exactly
 as it was before L0. Both strikes that motivated this law would have been
 caught by the source clause; neither would have been caught by a parser
-reading for contradiction. The two-strikes rule is answered by removing the
+reading for contradiction. The two-strikes rule ([SR-WORK-SESSION](0060_WORK-session.md) decision 13) is answered by removing the
 duplication, not by inventing a check that cannot exist.
 
 ### Alternatives considered

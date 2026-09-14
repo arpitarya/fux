@@ -7,10 +7,10 @@ description: "The five stages every non-trivial feature moves through — compar
 status: accepted
 date: 2026-09-14
 feature: the order work happens in, and the artifact each stage owes
-owns: []
+owns: [tests/test_handoff_names_its_model.py@a0987372427e]
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 873e9b68c315bf5271deb9bdc88c1295fd81fff8a5b9f557ec597a5c9db6ca29
+content_sha: 631b0b8fb8d26090c88a2687f0a540baf5e1abdea3febe6adee1d505dee361b7
 ---
 
 # SR-WORK-LIFECYCLE — how a feature travels from fork to record
@@ -142,13 +142,35 @@ work that passes review because it reads well.
     successor. Active directories hold live work only; the archive's own rules
     are [SR-WORK-ARCHIVE](0062_WORK-archive.md)'s.
 
-12. **This record's enforcement is unbuilt.** The checkable part is decision 6 —
-    every file under `work/open/` carries a `**Model:**` line — and nothing
-    checks it today. The record owns no component under the terms
-    [SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7 sets: **the honest
-    case here is that the subject is the ORDER work happens in, and no change to
-    the engine can make an order true or false.** The one mechanical clause is
-    owed as a work item rather than claimed as done.
+12. **The one mechanical clause is BUILT; the rest cannot be.**
+    `tests/test_handoff_names_its_model.py` checks decision 6 — every file under
+    `work/open/` carries a `**Model:**` line — and that **no second handoff
+    directory has reappeared under `work/`**, because a handoff has one home
+    and two would be free to disagree. The retired one is in
+    [`archive/`](../archive/README.md) and is history.
+    (Built 2026-09-14, W-173 item 9.)
+
+    ⚠ **Naming the retired path here was itself a defect**, caught by
+    `tests/test_archive_law.py` in the same change: a live record that spells a
+    retired live path is how somebody goes looking for it.
+
+    ⚠ **It reads the line's PRESENCE, never its correctness.** Nothing can know
+    whether a diagnosis needed Opus, and a check that guessed would be worse
+    than none: it would teach sessions to write the model the checker expects.
+
+    🔴 **`**Model: NONE — <who, and why not a model>**` is a legal answer, and
+    that is the opposite of leniency.** W-136 and W-145 are executed by
+    **Codex, on Arpit's account** — the sealed benchmark's premise is that no
+    Claude session sees the answers, and a Claude model executing W-145 would
+    reproduce the contamination it exists to remove. *What should execute this*
+    still has an answer there; **a blank line is the only wrong response**, and
+    letting one pass is what the earlier absence of a check did.
+
+    **Everything else this record says is unenforced and has to be.** The
+    record owns no `src/` component under the terms
+    [SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7 sets: **the subject
+    is the ORDER work happens in, and no change to the engine can make an order
+    true or false.**
 
 ### Consequences
 
@@ -158,8 +180,11 @@ work that passes review because it reads well.
   being an argument about whether the idea was good.
 - **A handoff is worth reading on its own**, which is what lets the work move
   between models and between surfaces.
-- **The debt is decision 12's**: the model line is the stage most often dropped
-  and the only one a check could catch.
+- ✅ **Decision 12's debt is PAID** (2026-09-14): the model line is the stage
+  most often dropped and the only one a check could catch, and it is now
+  checked. **The check's own finding was that two items have no Claude model at
+  all** — and that the honest shape is a required line that may say `NONE`,
+  rather than an exemption nobody would ever revisit.
 
 ### Alternatives considered
 

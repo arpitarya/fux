@@ -40,14 +40,14 @@ and inventing one would be the same duplication in a new place.
 
 | # | `CLAUDE.md` section | verdict | state |
 |---|---|---|---|
-| 1 | Law zero — the SRs are always up to date | needs no new record: `SR-LAW-0` holds the authority half and [SR-WORK-OWNERSHIP](../../records/0054_WORK-ownership.md) the freshness gate. **The section is a second copy of both** | 🟡 open — the fold is [W-173](W-173-finish-the-claude-md-extraction.md) item 2 |
-| 2 | Triage first — a human-blocked queue | ✅ stays — agent process | done |
+| 1 | Law zero — the SRs are always up to date | needs no new record: `SR-LAW-0` holds the authority half and [SR-WORK-OWNERSHIP](../../records/0054_WORK-ownership.md) the freshness gate. **The section is a second copy of both** | ✅ **landed 2026-09-14** — W-173 item 2 — [SR-LAW-0](../../records/0002_LAW-0-authority.md) decision 1a (the three obligations) + [SR-WORK-OWNERSHIP](../../records/0054_WORK-ownership.md) 2a (the gate) |
+| 2 | Triage first — a human-blocked queue | ~~stays — agent process~~ **overruled by W-173**: it restated queue rules 41 and 42 | ✅ **landed 2026-09-14** — [SR-WORK-OPEN-QUEUE](../../records/0051_WORK-open-queue.md) 32–34, 39–45, **plus the two-strikes rule, which was in `CLAUDE.md` and NOWHERE ELSE** → [SR-WORK-SESSION](../../records/0060_WORK-session.md) 13 |
 | 3 | Where the state of play lives | ✅ stays — a pointer table | done |
 | 4 | What we are building (scope) | ✅ stays — statements of fact + links | done |
 | 5 | **Non-negotiable constraints** | 🔴 **moved** → the ten `SR-LAW-n`; section is now a generated, test-bound block | ✅ **landed** |
 | 6 | Litmus (the 10 000-document design point) | 🟠 needs a record | ✅ **landed 2026-09-14** — [SR-WORK-SCALE](../../records/0057_WORK-scale.md) |
 | 7 | How work happens here (the lifecycle) | ~~stays — process~~ **overruled 2026-09-14** | ✅ **landed** — [SR-WORK-LIFECYCLE](../../records/0058_WORK-lifecycle.md) |
-| 8 | A pre-registered threshold may never move | 🔴 link → [SR-RS](../../records/0133_predictions.md) already holds it | 🟡 open — [W-173](W-173-finish-the-claude-md-extraction.md) item 1 |
+| 8 | A pre-registered threshold may never move | 🔴 link → [SR-RS](../../records/0133_predictions.md) already holds it | ✅ **landed 2026-09-14** — W-173 item 1 — [SR-RS](../../records/0133_predictions.md) decision 10b |
 | 9 | Follow the OKF pattern | 🟠 a record, not a link — the bundle is not the docs table | ✅ **landed 2026-09-14** — [SR-WORK-OKF](../../records/0061_WORK-okf.md) |
 | 10 | Documentation style (required) | ~~stays — process~~ **overruled 2026-09-14** | ✅ **landed** — [SR-WORK-DOCS](../../records/0059_WORK-docs.md) |
 | 11 | Documentation discipline (required) | ~~stays — process~~ **overruled 2026-09-14** | ✅ **landed** — [SR-WORK-DOCS](../../records/0059_WORK-docs.md) |
@@ -55,13 +55,13 @@ and inventing one would be the same duplication in a new place.
 | 13 | OPEN-WORK — the single live queue | 🔴 **needs a record** | ✅ **landed** — [SR-WORK-OPEN-QUEUE](../../records/0051_WORK-open-queue.md); the section is a generated view |
 | 14 | Keep the docs in sync (required) | ~~stays — process~~ **overruled 2026-09-14** | ✅ **landed** — [SR-WORK-DOCS](../../records/0059_WORK-docs.md) |
 | 15 | Session continuity — the running worklog | ~~stays — process~~ **overruled 2026-09-14** | ✅ **landed** — [SR-WORK-SESSION](../../records/0060_WORK-session.md) |
-| 16 | Conformance runs — file every one | 🔴 link → SR-RS holds both halves | 🟡 open — [W-173](W-173-finish-the-claude-md-extraction.md) item 1 |
+| 16 | Conformance runs — file every one | 🔴 link → SR-RS holds both halves | ✅ **landed 2026-09-14** — W-173 item 1 — SR-RS decision 10a. 🔴 **And SR-RS had been DEFERRING to `CLAUDE.md`** for the obligation it only explains; inverted in the same change |
 | 17 | Golden answer key — Claude never reads it | 🟠 needs a record (it is a technical prohibition with a hook behind it) | 🟡 open — **deliberately left in place 2026-09-14**: the paragraph is Cowork's only cover, so moving it needs Arpit's call |
-| 18 | Layout | ✅ stays — a statement of fact | done |
-| 19 | Error contract | 🟠 no new record — [SR-CLI](../../records/0101_cli-surface.md) is already credited with the boundary error contract | 🟡 open — [W-173](W-173-finish-the-claude-md-extraction.md) item 7 |
-| 20 | Build & test | ✅ stays — commands | done |
+| 18 | Layout | ~~stays — a statement of fact~~ **overruled by W-173**: 40 lines of tree in the file every session reads first | ✅ **landed 2026-09-14** — [`docs/index.md`](../../docs/index.md) §The tree; a twelve-line tree stays |
+| 19 | Error contract | 🟠 no new record — [SR-CLI](../../records/0101_cli-surface.md) is already credited with the boundary error contract | ✅ **landed 2026-09-14** — W-173 item 7 — SR-CLI decisions 4 and 5. 🔴 **The two COPIES CONTRADICTED each other about exit `2`** and the record was right |
+| 20 | Build & test | ~~stays — commands~~ **the commands stay; the GOTCHAS did not** | ✅ **landed 2026-09-14** — the `node --test` glob trap and the `pii.toml` requirement are surface quirks → [`work/MACHINE.md`](../MACHINE.md) |
 | 21 | Merge wall | ~~stays — a statement of fact~~ **overruled 2026-09-14**: the fact and its consequence are one subject with the release path | ✅ **landed** — [SR-WORK-RELEASE](../../records/0063_WORK-release.md) |
-| 22 | Hard-won build knowledge — the two binding items (BM25F weight-then-saturate; no wall-clock on the maintenance path) | 🟠 the two binding items go to the records that own the code; **the dated lessons are a LOG, not a record** — a record carries no history | 🟡 open — [W-173](W-173-finish-the-claude-md-extraction.md) item 5 |
+| 22 | Hard-won build knowledge — the two binding items (BM25F weight-then-saturate; no wall-clock on the maintenance path) | 🟠 the two binding items go to the records that own the code; **the dated lessons are a LOG, not a record** — a record carries no history | ✅ **landed 2026-09-14** — W-173 item 5 — [`work/LESSONS.md`](../LESSONS.md); the two binding items point at [SR-RANKING](../../records/0111_ranking.md) and [SR-LAW-3](../../records/0005_LAW-3-deterministic.md) |
 | 23 | Blockers stop the session | ~~stays — process~~ **overruled 2026-09-14** | ✅ **landed** — [SR-WORK-BLOCKERS](../../records/0064_WORK-blockers.md) |
 | 24 | Answer length · Say what you are doing | ~~stays — process~~ **overruled 2026-09-14** | ✅ **landed** — [SR-WORK-SESSION](../../records/0060_WORK-session.md) decisions 6–9 |
 | 25 | Package identity | 🟠 needs a record | ✅ **landed 2026-09-14** — [SR-WORK-RELEASE](../../records/0063_WORK-release.md) |
@@ -72,9 +72,9 @@ nine rows above carry the correction. W-122's rule was that *"there is no record
 for how an agent behaves in a session and inventing one would be the same
 duplication in a new place"*; asked to shrink `CLAUDE.md`, **Arpit accepted eight
 WORK records covering exactly those sections** — so the missing home was the
-defect, not the duplication. `0051`–`0064` are that home. What is left here is
-§2's ruling and the rows still marked open, which [W-173](W-173-finish-the-claude-md-extraction.md)
-executes.
+defect, not the duplication. `0051`–`0064` are that home. **W-173 shipped on 2026-09-14** and executed every row above
+([IMPLEMENTATION](../IMPLEMENTATION.md) §2026-09-14 W-173). **What is left in
+this item is §2's one ruling and row 17**, which was deliberately not moved.
 
 ⚠ **`🟡 open` is not a defect and does not block anything.** Every one of those
 sections is *technical and unhoused*, so L0 says it wants a record — and writing

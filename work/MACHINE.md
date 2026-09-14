@@ -228,6 +228,31 @@ has the network but not the key, the device has the key but not the network.
 
 ---
 
+## Two test invocations that fail for reasons that are not failures (2026-09-14)
+
+**Both are surface quirks and neither is a defect in the code**, which is why
+they live here rather than in `CLAUDE.md` (W-173).
+
+| you typed | what happens | what to type |
+|---|---|---|
+| `node --test node/test` | `MODULE_NOT_FOUND` | `node --test node/test/*.test.mjs` |
+| a hand-built test repo with no `.fux/pii.toml` | **every CLI verb refuses**, `ingest` included | `: > .fux/pii.toml` — an empty file is enough |
+
+🔴 **`node --test node/test` reads as a test failure and is not one.** Without
+the glob, Node resolves the bare directory as a **module path** rather than as a
+test directory, so it reports a missing module — and a session that has just
+changed the Node reader reads `MODULE_NOT_FOUND` as *I broke the reader*.
+
+**The `pii.toml` refusal is by design** — [SR-PII](../records/0148_pii.md)
+decision 17: a repository with no ruleset does not get to index anything, and
+the gate sits before dispatch so a verb added later is covered without anyone
+remembering. It costs one line in every fixture that builds a repo by hand, and
+the alternative is a repo that silently indexes with no redaction policy.
+
+⚠ **A test file that predates the rule is the likeliest thing to trip it**, and
+the symptom is the same refusal on every verb rather than a message about
+fixtures.
+
 ## macOS vs CI — the case-insensitivity trap
 
 The macOS filesystem is case-**insensitive**. A link written as

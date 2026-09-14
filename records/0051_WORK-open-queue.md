@@ -11,7 +11,7 @@ owns: [tests/test_open_work_rows_are_short.py@d590c19ef8ed, tests/test_open_work
 laws: [L0]
 ratifies: W-146 ruling 1 · Arpit 2026-09-13 (archive, never delete)
 timestamp: 2026-09-13T00:00:00Z
-content_sha: 5cc05b55e0ebc817ee6b4d07a3a10f980d2eef8ef536d3fc10da4016197b7329
+content_sha: df8a6290333222eddf94c9e892a71295b42517bf42f8d85eea1a65a7a9def15f
 ---
 
 # SR-WORK-OPEN-QUEUE — how OPEN-WORK works
@@ -233,8 +233,9 @@ artifact and the record disagree while both still look correct?*
 **The exposure was not hypothetical and it fired twice.**
 [W-122](../work/IMPLEMENTATION.md)'s inventory named the gap on 2026-09-12. On
 2026-09-13 a session added a fourth ball and had to hand-edit both copies to
-keep them equal, with nothing checking the two. `CLAUDE.md`'s two-strikes rule
-makes the second occurrence the trigger for a gate.
+keep them equal, with nothing checking the two. The two-strikes rule
+([SR-WORK-SESSION](0060_WORK-session.md) decision 13) makes the second
+occurrence the trigger for a gate.
 
 **And the enforcement had no owner.** The two tests that enforce most of these
 rules could name no owning record, so the freshness gate could never demand

@@ -7,10 +7,10 @@ description: "An R is a claim frozen before measurement; its threshold may never
 status: accepted
 date: 2026-08-22
 feature: the prediction system — the R ids, their register, the rules that make a frozen claim mean something, and the classification of the runs those claims are measured by
-owns: [tests/test_regression_runs.py@f359951081fc, tools/t2-eval@cc5410393ce4, tools/quality-controls@a6bc8b6a056c, tools/vector-gate@0023bff0cdef]
+owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@a6bc8b6a056c, tools/vector-gate@0023bff0cdef]
 laws: [L3]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: fd8bbf0b66c44d53381e326f519066d09cc593411a445fa325f73f4780e5d60b
+content_sha: 56b7ded76232db0376c0fb9cf67e5852fb3b7de79f7519fa2acc1f890dd630e7
 ---
 
 # SR-RS — the R predictions
@@ -216,6 +216,53 @@ that measured a prediction is prediction apparatus even after the feature
 question is settled, and an unowned component is one whose contract can change
 with no record updating. **This is a backstop, not a preference**: a harness
 moves to its feature's record the moment one exists.
+
+**10a. EVERY MEASURED RUN IS FILED, and this is what filing one means.**
+(Arpit; the normative home from 2026-09-14, previously `CLAUDE.md`
+§Conformance runs.)
+
+The measurement environments are scratch and commit nothing
+([SR-WORK-ENVIRONMENTS](0052_WORK-environments.md)). **Their evidence is not.**
+Every run's report, its diagnosis and its raw data are filed into
+[`work/regression/`](../work/regression/README.md), so engine changes are made
+from measured data rather than from memory. **Binding, exactly as the
+documentation law is.**
+
+**The per-run contract — what artifacts a run owes — is stated once in
+[`work/regression/README.md`](../work/regression/README.md) §Per-run contract
+and is not repeated here.** What this record states is what the *numbers* in it
+may claim: decisions 11 through 19a.
+
+⚠ **A verdict is not an SR.** When a run adjudicates a pre-registered
+prediction the ruling is a `VERDICT.md` beside its evidence — `type: Verdict`,
+with the prediction id and the frozen pre-registration's path. An SR records a
+decision somebody can supersede; **nothing supersedes a measurement except a
+better measurement**, which is a new run with its own verdict. The *decisions*
+that rest on a verdict live in `records/` and cite it. Enforced by
+`tests/test_regression_runs.py`.
+
+**10b. A pre-registered threshold may never move.** When a decision is gated on
+a measurement, **write the threshold, the metric definitions and the slice
+definitions down before producing a number, and commit that file first.** Then
+measure against it.
+
+- **A recorded NEGATIVE that stops months of building is a *successful*
+  outcome, not a failed task.** Report it plainly.
+- **A result between *clearly passes* and *clearly fails* is written up as
+  AMBIGUOUS and handed to Arpit.** Do not adjudicate it, and do not restate the
+  threshold in looser words.
+- **Post-hoc analysis is allowed and often valuable** — label it **post-hoc**
+  and keep it out of the verdict.
+- **If the measurement turns out not to test what the threshold assumed, say
+  THAT**, rather than reporting the number as if it did.
+- **The reproduce command must actually reproduce.** Findings that warrant a
+  change graduate to [`work/proposals/`](../work/proposals/README.md) and, when
+  accepted, to a record. **Never ship a ranking or behaviour change off a
+  single synthetic corpus** — ⚠ and whether that is satisfiable at all is
+  [W-156](../work/open/W-156-prevalence-outside-golden.md), open and Arpit's.
+
+[`tools/pruning-eval/PRE-REGISTRATION.md`](../tools/pruning-eval/PRE-REGISTRATION.md)
+is the worked example.
 
 **11. Every measured run is `blind` or `informed`, and declares which.** A run
 is **blind** only if *every* artifact it depends on was authored without access
@@ -633,8 +680,14 @@ set"* implies the bar tracks the set size; **it tracks the flips.** Replacing
   so we can check in detail"* — **per-query results, one row per query per arm,
   filed under `evidence/`.** It is strictly stronger and strictly cheaper to
   comply with: `b`, `c`, the discordant count and every later test are all
-  derivable from per-query rows, and from nothing else. `CLAUDE.md`
-  §Conformance runs carries it as a numbered obligation.
+  derivable from per-query rows, and from nothing else.
+
+  🔴 **Decision 19a states it, and this record is its only home from
+  2026-09-14.** It read *"`CLAUDE.md` §Conformance runs carries it as a
+  numbered obligation"* — and `CLAUDE.md` did, which made a **generated**,
+  explicitly non-normative file the normative home of a rule this record
+  explains. That is the inversion L0 forbids, and W-173 corrected it by moving
+  the obligation here and leaving `CLAUDE.md` a pointer.
 - ⚠ **CORRECTION, 2026-08-28 — this record and the run's `ANALYSIS.md` both
   stated the reranker case wrongly, in the GENEROUS direction.** Both said the
   `28 → 32` net of **4** *"clears α only if exactly 4 flipped and all 4 went one
@@ -727,7 +780,8 @@ never that it is the right file.
 row per query? per arm?* — cannot be written without knowing each run's arm
 structure in advance, and shipping an approximation that passes is the
 moving-threshold failure in another costume. **Whether a second recorded
-instance of the W-83 shape triggers CLAUDE.md's two-strikes gate is Arpit's
+instance of the W-83 shape triggers the two-strikes gate
+([SR-WORK-SESSION](0060_WORK-session.md) decision 13) is Arpit's
 call**, and it sits in the queue as a ruling rather than as a task.
 
 **21c. A paired comparison must assert that both arms resolved the SAME

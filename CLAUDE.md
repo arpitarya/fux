@@ -15,74 +15,36 @@ This file is binding. Read it, then
 [`work/INTERVIEW.md`](work/INTERVIEW.md) (start at the reset block), before
 your first substantive change.
 
-## Law zero — the SRs are always up to date
+## Law zero — the records are always up to date
 
-**Arpit, 2026-08-18, emphatic and standing: *always* make sure the SRs are up
-to date.** Not at the end of the milestone, not when someone asks — in the
-change that makes them wrong.
+**Stated once in [SR-LAW-0](records/0002_LAW-0-authority.md) decision 1a**
+(Arpit, 2026-08-18, standing) — three obligations, of which **the third cannot
+be enforced and is the only thing covering coherence**. Read it before your
+first substantive change.
 
-Three things follow, and none of them is optional:
-
-1. **No behaviour change lands without its SR updated in the same change.**
-   Same commit, not the next one.
-2. **If a change genuinely touches no recorded decision, say so out loud** —
-   `no SR affected`, in the commit message. That is a claim under your name in
-   git history, which is the point. Silence is not an answer.
-3. **Before you finish a session, re-read the records you touched code under.**
-   A record that describes behaviour the code no longer has is worse than no
-   record: it reads as authority.
-
-**This is enforced, not trusted.** `tests/test_sr_freshness.py` runs in CI on
-every push (with `fetch-depth: 0`, so the runner can see the history it
-audits) and fails a commit that changed an SR-owned component without
-touching that component's **owning** record specifically — touching some
-other record does not satisfy it. `scripts/sr-guard.sh` is the same check as
-a `commit-msg` hook (not `pre-commit`: it has to read the commit message to
-honor the `no SR affected` escape hatch, and `pre-commit` runs before that
-message exists) — install it once:
+The gate that enforces the first two is
+[SR-WORK-OWNERSHIP](records/0054_WORK-ownership.md) decisions 2a and 3. Install
+its `commit-msg` hook once:
 
 ```bash
 ln -sf ../../scripts/sr-guard.sh .git/hooks/commit-msg
 ```
 
-**Why it is enforced.** Replayed over the 25 commits before the check existed,
-**13 of them** changed an owned component and updated no record. The prose rule
-was already in this file the whole time. That is the measured case for a check.
-
-⚠ **What the check does NOT prove, and nothing else does either.**
-`tests/test_sr_freshness.py` proves an owning record was **touched** in the
-change. **It never reads the record.** A record can be amended into
-self-contradiction in the same commit and every mechanical check fux has will
-pass — **W-83 is the case**: an accepted amendment contradicted itself, the code
-implemented the wrong sentence, and CI was green the whole way.
-
-**So point 3 above — re-read the records you touched code under — is the only
-thing covering coherence, and it is unenforced.** Treat it as the obligation it
-is, not as a tidy-up. Ruled 2026-08-27 (W-82 ruling 18): stated rather than
-mechanised, because the two-strikes rule makes a *second* recorded occurrence
-the trigger for a gate, and this has happened once.
-
 ## Triage first — a human-blocked queue stops the session
 
-**Standing directive (Arpit, 2026-08-12).** Before any work, read
-[`work/OPEN-WORK.md`](work/OPEN-WORK.md) and ask: *is any item agent-closable
-right now?*
+**Before any work, read [`work/OPEN-WORK.md`](work/OPEN-WORK.md)** and ask: *is
+any item agent-closable right now?* If none is, the session's **first** output
+is the blocked-on-Arpit list and it then **stops**.
 
-- **If not** — every remaining item is `OPEN·human`, gated on a verdict Arpit
-  hasn't read, or waiting on his hands — the session's **first** output is the
-  blocked-on-Arpit list (🔴 rows, 🔺 first) in ≤3 lines, then it **stops**.
-- No invented scope, no doc polishing to fill the hours. "Next: Arpit reads…"
-  buried at the end of a long session is the failure this rule exists to
-  prevent; said upfront, it is the rule followed.
-- His time and tokens are money. Applies to Cowork and Claude Code alike.
-- **The inbox:** OPEN-WORK's header carries a *Blocked on Arpit* block, and
-  each open item's file under `work/open/` carries its `filed` date. Every session keeps both
-  current, and any `OPEN·human` row older than **5 days** is named, with its
-  age, in the session's first output. **Each inbox row has a `↳ blocks:`
-  sub-row naming every item that decision holds up** (Arpit, 2026-09-11; OPEN-WORK rule 10).
-- **Two strikes → a gate (2026-08-12).** A failure class the WORKLOG records
-  twice becomes a test or mechanical check in the same change that records
-  the second occurrence — recurring lessons are gated, not re-learned.
+The rules — what the first output must name, the inbox, the 5-day rule, the
+`↳ blocks:` sub-row, and which balls an agent may pick from — are stated once
+in [SR-WORK-OPEN-QUEUE](records/0051_WORK-open-queue.md) rules 32–34 and
+39–45. **His time and tokens are money**; this applies to Cowork and Claude
+Code alike.
+
+**Two strikes → a gate:** a failure class the WORKLOG records twice becomes a
+test or a mechanical check in the same change that records the second
+occurrence — [SR-WORK-SESSION](records/0060_WORK-session.md) decision 13.
 
 ## Where the state of play lives
 
@@ -279,22 +241,11 @@ itself is [`records/README.md`](records/README.md).
 
 ## A pre-registered threshold may never move
 
-When a decision is gated on a measurement, **write the threshold, the metric
-definitions, and the slice definitions down before producing a number**, and
-commit that file first. Then measure against it.
-
-- A recorded **negative** that stops months of building is a *successful*
-  outcome, not a failed task. Report it plainly.
-- If a result lands between "clearly passes" and "clearly fails", write it up
-  as **ambiguous and hand it to Arpit**. Do not adjudicate it, and do not
-  restate the threshold in looser words.
-- Post-hoc analysis is allowed and often valuable — but label it **post-hoc**
-  and keep it out of the verdict.
-- If the measurement turns out not to test what the threshold assumed, say
-  *that*, rather than reporting the number as if it did.
-
-See [`tools/pruning-eval/PRE-REGISTRATION.md`](tools/pruning-eval/PRE-REGISTRATION.md)
-for the worked example.
+**Stated once in [SR-RS](records/0133_predictions.md) decision 10b**, with
+[`tools/pruning-eval/PRE-REGISTRATION.md`](tools/pruning-eval/PRE-REGISTRATION.md)
+as the worked example. A recorded **negative** that stops months of building is
+a *successful* outcome; an ambiguous result goes to Arpit, not to whoever ran
+it.
 
 ## Follow the OKF pattern (docs)
 
@@ -339,44 +290,10 @@ are the ones that decide whether a Reference block is legal.
 
 ### The SR standing rules
 
-The register, the convention and the ownership table are in
-[`records/README.md`](records/README.md). What binds every session:
-
-- **No behaviour change lands without its SR updated in the same change.**
-  See §Law zero. If a change genuinely touches no recorded decision, **say so
-  explicitly — `no SR affected` in the commit message** — rather than silently
-  skipping the check. Enforced by `tests/test_sr_freshness.py` (CI) and
-  `scripts/sr-guard.sh` (`commit-msg` hook); neither can be satisfied by
-  intending to update the record later.
-- **Cite records by name, never by number.** `SR-RECORD`, not
-  "ADR-0004". Numbers exist only so the archive can map a retired record to its
-  successor. A live doc citing a number is a defect; fix it on contact.
-  ("archived SR-NNNN" *with its path* still means the frozen v0.26 line.)
-- **Ownership is a table, not a judgement call.** Every `src/`/`tools/`
-  component is claimed by exactly one record in `records/README.md`. **When
-  the table changes, edit [`tests/test_sr_ownership.py`](tests/test_sr_ownership.py)
-  in the same change** — they drift silently otherwise, which is why the
-  executable twin exists.
-- **A record that restates a cross-cutting principle is a bug, not
-  redundancy.** Each law has exactly one home — **its own
-  [`SR-LAW-n`](records/0002_LAW-0-authority.md) record** — and
-  [SR-LAWS](records/0001_LAWS.md) assigns the handles L0–L8 and L10 and routes to
-  them. Every other record cites `SR-LAWS` and the number; none paraphrases.
-  Paraphrases drift, and a drifted paraphrase in an accepted record reads as
-  authority.
-- **Veto conditions are conditions to check, never events to await.** State
-  what would have to become *true* to reopen the decision, so it can be checked
-  mechanically today. An event never fires, because nobody is waiting.
-- **§1 is for humans (one screen, with a Mermaid diagram and its hand-paired
-  ASCII twin — both updated together, the twin collapsed in a `<details>`
-  block); §2 is for agents** (context · decision ·
-  consequences · alternatives · reference · veto). The reference is grounded in
-  code, a live doc, or measured evidence — **never an archived doc**.
-- **Records live in `records/`, and nowhere else.** There is no archive tier
-  for records (Arpit, 2026-09-06): a superseded record is **rewritten or deleted
-  in the same change that accepts its successor**, and the successor states in
-  prose what it replaced. Nothing is left behind to be found and mistaken for
-  current, and no live doc may link to a retired record — the file is gone.
+**All of them are stated in [`records/README.md`](records/README.md)** — the
+register, the record shape, the two-section split, the grounded reference, the
+veto-as-condition rule, the ownership table and its executable twin, cite-by-name,
+and *records live in `records/` and nowhere else*. Nothing is restated here.
 
 ## Session continuity — what a session owes (required)
 
@@ -391,80 +308,23 @@ hazards of sharing a machine with another session.
 
 ## Conformance runs — file every one (required)
 
-The fux-lab environment (`~/my_programs/fux-lab/`) is scratch and commits
-nothing. Its **evidence is not** — every run's report + diagnosis + raw
-evidence is filed into [`work/regression/`](work/regression), so engine
-changes are made from measured data, not memory. Binding, like the docs law.
+**Every measured run is filed into [`work/regression/`](work/regression), and
+what filing one means is stated once in
+[SR-RS](records/0133_predictions.md) decision 10a.** Binding, exactly as the
+documentation law is.
 
-Per run, in the same change:
+- **what artifacts a run owes** —
+  [`work/regression/README.md`](work/regression/README.md) §Per-run contract.
+- **what its numbers may claim** — SR-RS decisions 11–19a: `blind` or
+  `informed` and why an informed run is reclassified rather than banned, the
+  authorship table, **the measured paired-comparison floor** (a net of 6 is the
+  floor of all floors, and it tracks the *flips*, never the set size), and the
+  per-query-rows rule.
+- **a verdict is not an SR** — SR-RS decision 10a's closing paragraph.
 
-1. Create `work/regression/<date>-<run>/`.
-2. Drop the run's own report(s) there.
-3. Write `ANALYSIS.md` — the diagnosis turned into **specific improvements**,
-   each with a repro command; state unresolved causes as unresolved.
-4. Save the primary data under `evidence/`.
-5. Add the run to [`work/regression/README.md`](work/regression/README.md)
-   and bump the DOC-REGISTRY row.
-6. **Classify the run — `blind` or `informed` — in the report's frontmatter,
-   and name who authored each artifact and what evaluation material they could
-   reach.** Required from 2026-08-25 for every *measured* run; a surface
-   capture is exempt. See below.
-
-**Every measured run is `blind` or `informed`, and says which.** A run is
-**blind** only if *every* artifact it depends on — corpus enrichment, the
-enrichment prompt, chunking and index configuration, retriever and reranker
-settings, **and the analysis** — was authored with no access to the evaluation
-queries, the judgments, prior per-query scores, or any derived report of them
-(a failure list, a dashboard, a ticket naming a query). Anything else is
-**informed**.
-
-- **An informed run is reclassified, not banned.** File it, list it, cite it,
-  let it inform the corpus. It is **never compared with a blind run and never
-  used to state a delta.** This is TREC's manual/automatic split; a rule that
-  bans useful work gets routed around, a rule that sorts it survives.
-- **Say who authored each artifact and what they could reach** — *queries /
-  judgments / prior scores / none*. The burden is on the author to argue
-  exposure was absent. An informed number is **not** an "upper bound" (that
-  claims a bounded magnitude a leak does not have); label it **"not a
-  generalisation estimate."**
-- **A delta below the set's resolution is "no detected change"**, whoever
-  authored it. ⚠ **The floor is no longer a placeholder — it is MEASURED, and
-  the old one was far too loose** (Arpit, 2026-08-28). Two arms graded on the
-  same queries is a **paired** comparison, so only the queries that **flip**
-  carry information: **the bar tracks the discordant count, never the set
-  size.** **A net of 6 is the floor of all floors — a net of 1, 2, 3, 4 or 5
-  cannot clear α = 0.05 at any discordant count** — and it rises from there
-  (20 flips → net 10; 50 flips → net 16). The old *"±2 on 50"* admitted results
-  whose best possible p-value is **0.50**. Table, script and the α discussion:
-  [SR-RS](records/0133_predictions.md) decision 19.
-- 🔴 **Every measured run records its PER-QUERY RESULTS under `evidence/`** —
-  one row per query per arm, pass/fail. **Ruled by Arpit 2026-08-28:** *"record
-  all the questions so we can check in detail."* ⚠ **A summary count is not
-  enough and never was.** The discordant count, `b`, `c`, and every test anyone
-  runs later are derivable from per-query rows **and from nothing else** — so a
-  run that files only totals cannot be re-tested by anybody, including its own
-  author. **No run filed before 2026-08-28 has them**, which is why none of the
-  paired results on record can be checked from what was filed.
-- **Do not edit a frozen report to classify it.** The rule is baselined at
-  2026-08-25 on the run directory's own date, and
-  `tests/test_regression_runs.py` checks it from there.
-
-Ruled by Arpit 2026-08-25 (W-78 ruling 2); explained and guarded by
-[SR-RS](records/0133_predictions.md) decisions 11-15. ⚠ Two parts of the
-accepted rule — a **sealed** query set and the **decoy/placebo controls** — are
-**not built** and are owed as W-81; nothing may cite them as in force.
-
-**A verdict is not an SR.** When a run adjudicates a pre-registered
-prediction, the ruling is a `VERDICT.md` beside its evidence — `type: Verdict`,
-with the prediction id and the frozen pre-registration path. An SR records a
-decision someone can supersede; **nothing supersedes a measurement except a
-better measurement**, which is a new run with its own verdict. The *decisions*
-that rest on a verdict live in `records/` and cite it. Enforced by
-`tests/test_regression_runs.py`.
-
-**The reproduce command must actually reproduce.** Findings that warrant a
-change graduate to `work/proposals/` and, when accepted, an SR. Never ship a
-ranking/behaviour change off a single synthetic corpus.
+⚠ **Two accepted parts are NOT built** — a sealed query set and the
+decoy/placebo controls — and are owed as W-81. **Nothing may cite them as in
+force.**
 
 ## Golden answer key — Claude never reads it (required)
 
@@ -483,111 +343,62 @@ count lines, hash it, or `grep -r` across `work/`.
 
 ## Layout
 
-```
-work/               THE SHARED MEMORY between sessions — start at work/README.md
-  WORKLOG.md        append-only session log (an entry every session)
-  INTERVIEW.md      state of play, kept current DURING the session
-  IMPLEMENTATION.md milestone log — what shipped, when, outcome (the evidence store)
-  OPEN-WORK.md      THE single live queue — two lanes; finished items are DELETED
-  MACHINE.md        environment/tooling quirks per surface (local · bridge · cloud · CI)
-  DOC-REGISTRY.md   doc freshness tracker (triggers + last-verified)
-  paper/            the architecture of record + figures + predictions
-  architecture-{high-level,detailed,decoders,ask,answer,two-readers}.svg   the six
-                    diagrams, redrawn from the code 2026-09-12. proposal-search-v3-target.svg is
-                    a PROPOSAL's target state, deliberately outside that namespace.
-  open/             one detail file per open W-nn; deleted with its row
-  setup/            the three siblings — playground · lab · benchmark — outside this repo
-                    (SR-WORK-ENVIRONMENTS)
-  regression/       dated, measured evidence other docs cite as grounding; VERDICT.md rules
-  golden/           the sealed benchmark — seed docs, ladder manifests, prompts; golden-answer/ is NEVER read by Claude
-  compare/          live forks — verdict + explicit reopen-trigger
-  proposals/        parked ideas, not yet decided
-records/            THE STANDING RECORDS — the register, TEMPLATE.md, SR-LAWS and
-                    SR-LAW-0…SR-LAW-10; new records land here. At the repo root
-                    since 2026-09-13, and in the OKF bundle from wherever it sits
-docs/               WHAT THE PROJECT IS
-  GLOSSARY.md       every recurring term, defined once
-  index.md          the OKF bundle root
-src/fux/            the engine — every component claimed in records/README.md
-tests/              the suite, incl. test_sr_ownership.py (the ownership twin)
-tools/
-  pruning-eval/     the gate — frozen pre-registrations, KL selector, eval harness
-  differential/     the differential-law harness and the R3 bench
-archive/            THE ONE ARCHIVE — everything retired, mirroring the live tree
-  README.md         the map: every archived doc and its live successor
-  adr/              superseded records; maps old number -> successor NAME
-  handoff/          the retired handoff directory (executed pairs + unresolved specs)
-  v0.26/            build: the previous engine — runnable, REFERENCE ONLY
-  v0.26-docs/       build: the frozen v0.19–0.26 doc set ("archived SR-NNNN")
-  v0.26-implemented/ · v0.30-rev1-planning/   frozen build artifacts
-  v0.1/             build: the first one
-```
+**The full tree is in [`docs/index.md`](docs/index.md) §The tree.** The twelve
+directories a session needs to find its way:
 
-**Records live in `records/`, and only there.** A superseded one is rewritten
-or deleted in the same change that accepts its successor; the successor names
-what it replaced, in prose. `work/adr/` no longer exists, and on 2026-09-06
-Arpit deleted the archived records outright — there is no archive tier to
-consult, and a record citation resolves into `records/` or not at all.
-
-**`src/fux/` was gated behind P1, and now exists.** The package scaffold was
-M0b and landed only once the pruning gate had been decided — scaffolding a
-package for an architecture a measurement might falsify is the "build the fun
-part first" failure the plan exists to avoid. It shipped in `v0.30.0`; the
-gating rule stands for every milestone after it.
+```
+work/        THE SHARED MEMORY between sessions — start at work/README.md
+records/     THE STANDING RECORDS — the register, the template, SR-LAW-0…SR-LAW-10
+docs/        WHAT THE PROJECT IS — the OKF bundle root, the glossary
+src/fux/     the engine — every component claimed in records/README.md
+node/        the Node read plane — authored .mjs; ONE bundled file ships (L10)
+tests/       the fast unit suite
+tests_e2e/   the package as a user — real CLI via subprocess
+tools/       the gate (pruning-eval) and the differential-law harness
+archive/     THE ONE ARCHIVE — everything retired, mirroring the live tree
+```
 
 ## Error contract
 
-Catch and render errors only at the boundaries (CLI `main`, hook entrypoints).
-Internals keep raising. Raise the single `FuxError` for expected user-facing
-failures — **no subclass hierarchy**. CLI exit codes: `0` ok · `1` error ·
-`2` blocking (strict) · `130` interrupted.
+**Stated once in [SR-CLI](records/0101_cli-surface.md) decisions 4 and 5.**
+Catch and render only at the boundaries; internals keep raising; one flat
+`FuxError` and **no subclass hierarchy**.
+
+⚠ **This section said exit `2` meant *blocking (strict)*. SR-CLI decision 5
+says `2` is reserved and NOT PRODUCED** — no `raise FuxError` site passes it.
+The two disagreed, both read as correct, and the record is the one that is
+right. That is the restatement hazard L0 names, found by folding the copy out.
 
 ## Build & test
 
-**`fux-engine` 2.0.0 is released on PyPI *and*, since 2026-09-12, on
-npm**; `src/fux/` is the live tree and `node/` is the Node reader. One name in
-both registries. **The two registries are NOT reached the same way:** a GitHub
-release publishes to PyPI automatically (OIDC), while the npm half *stages* and
-waits for a human to approve it on npmjs.com — npm's own recommendation, taken
-deliberately. Both jobs hang off one `release: published` trigger in
-[`publish.yml`](.github/workflows/publish.yml).
+**`fux-engine` 2.0.0 is released on PyPI and on npm.** `src/fux/` is the live
+tree, `node/` is the Node reader, and how a release reaches each registry is
+[SR-WORK-RELEASE](records/0063_WORK-release.md)'s.
 
 ```bash
 uv sync --extra dev
-uv run pytest -q tests        # fast unit
-uv run pytest -q tests_e2e    # the package as a user
+uv run pytest -q tests                         # fast unit
+uv run pytest -q tests_e2e                     # the package as a user
 node --test node/test/*.test.mjs               # the Node reader's own units
 python -m fux.store.nodebundle node node/dist  # the published bundle (L10)
 ```
 
-**What a consumer is served is BUILD OUTPUT, and since 2026-09-12 that is
-[L10](records/0011_LAW-10-bundled-output.md).** `node/` is 44 authored `.mjs`
-files; what `fux setup` vendors and npm publishes is **one generated
-`fux.mjs`** — built by `src/fux/store/nodebundle.py`, into the wheel by
-[`hatch_build.py`](hatch_build.py) and into the npm tarball by `publish.yml`,
-from one build. ⚠ **`node --test node/test` (no glob) is not the invocation** —
-it resolves as a module path and fails with `MODULE_NOT_FOUND`, which reads like
-a test failure and is not one.
+**Two suites, both maintained**, and a feature is not done until both cover it
+and pass. **What a consumer is served is build output**
+([L10](records/0011_LAW-10-bundled-output.md)): `node/` is authored `.mjs`, and
+one generated `fux.mjs` is what ships.
 
-**A test that builds a repo by hand writes `.fux/pii.toml`** (an empty file is
-enough), or ingest and every CLI verb refuse — [SR-PII](records/0148_pii.md)
-decision 17.
-
-**Two suites, both maintained** — `tests/` (fast unit) and `tests_e2e/` (the
-package as a user: real CLI via `subprocess`, fixture corpus, golden files
-updated deliberately and never regenerated blindly). A feature is not done
-until both cover it and pass.
+⚠ **Two invocations that fail for reasons that are not failures** — the bare
+`node --test node/test`, and a hand-built test repo with no `.fux/pii.toml` —
+are in [`work/MACHINE.md`](work/MACHINE.md) §Two test invocations, with what to
+type instead.
 
 The archived engine still runs — reference, and M1's baseline. **Do not modify
 it:**
 
 ```bash
 cd archive/v0.26 && uv sync --extra dev && uv run pytest -q tests
-
-# M1's gate: the KL selector's contract + the harness self-checks
 archive/v0.26/.venv/bin/python -m pytest tools/pruning-eval/tests -q
-
-# M1's gate: the experiment itself
 archive/v0.26/.venv/bin/python tools/pruning-eval/run.py --corpus acme orbit synth
 ```
 
@@ -600,64 +411,22 @@ stated once in [SR-WORK-RELEASE](records/0063_WORK-release.md) — **read
 decisions 10–11 before merging anything.** The version's history is
 [`CHANGELOG.md`](CHANGELOG.md)'s and is not duplicated.
 
-## Hard-won build knowledge (auto-folded)
+## Hard-won build knowledge
 
-**2026-08-09 — M1, the pruning gate**
+**Dated lessons live in [`work/LESSONS.md`](work/LESSONS.md)** — a log rather
+than a record, because **a record states what is true now and carries no
+history**, and here the date is part of the lesson. Newest first.
 
-- **A pre-registered threshold is only as good as the corpus that tests it.**
-  M1's k=128 arm returned a zero delta on all three eval corpora — and prune
-  coverage showed why: their documents' median vocabulary is 32–46 distinct
-  terms, so top-128 was a **no-op for 97 %+ of documents**. Always report the
-  fraction of the population a treatment actually touched; an aggregate delta
-  of zero over an untreated population is not evidence.
-- **Recompute statistics over the pruned index, never borrow them.** `df`, `n`
-  and field lengths must come from the surviving postings, because that is what
-  production holds. Borrowing the baseline's statistics makes scores line up
-  and measures a system nobody will ship. Keep a diagnostic arm that *does*
-  borrow — it is how a loss gets attributed to missing postings vs shifted
-  statistics.
-- **Wrap the archive; never edit it.** The archived `Searcher` exposed a
-  `stats` seam (built for the lean profile) that turned out to be exactly the
-  hook the diagnostic arm needed. Look for an existing seam before concluding
-  an archived module has to change.
-- **The archived engine's own recorded numbers are a free correctness check.**
-  The harness's fixture baseline reproduced the archived lexical eval exactly
-  (hit@5 0.952 / MRR 0.833) and orbit's lab number (0.887) — which is what
-  makes "we varied only the index" a verified fact rather than an intention.
+**Three of them bind hard enough to be worth naming here:**
 
-**2026-09-12 — two sessions, one machine**
-
-- 🔴 **A RED TEST ON AN UNCOMMITTED TREE IS INVISIBLE TO EVERY MECHANISM HERE.**
-  CI reads commits; the SR-freshness hook reads a commit message; `pytest` reads
-  whatever you choose to run. A test that a working-tree change turns red stays
-  red and unseen until somebody commits — and then it fails for whoever committed
-  it. **It bit two sessions on the same day for different reasons.** The only
-  cover is to run **both suites, whole**, before believing a change is done;
-  reading the code and concluding is what failed.
-- 🔴 **A loaded machine does not produce noise — it produces a clean, localised
-  anomaly that reads like a finding.** One session's corpus build inflated a
-  single benchmark tier's ingest ratio to **0.77 against ~0.46 everywhere else**:
-  tier-localised, internally consistent, and in exactly the shape a real
-  regression takes. **Noise gets distrusted; this would have been filed.** It was
-  caught by two sessions comparing timestamps — a conversation, not a mechanism.
-  Interleaving arms (`A B A B`) is the only structural defence and it protects
-  the *difference*, never the absolute number.
-- **So: say what you are running, and when, to anyone sharing the machine.** It
-  is the only thing that worked. Recorded in
-  [SETUP-BENCHMARK](work/setup/fux-benchmark.md) standing rule 0a as an
-  **unguarded** gap, because it is one.
-- **Concurrent sessions commit, too.** A peer committed a fix to code this
-  session had written and not yet committed. Re-derive `git status` immediately
-  before staging, and **commit with explicit pathspecs** — `git commit -- <paths>`
-  — when the index carries another session's work.
-
-**Earlier knowledge (v0.19–0.26)** is preserved in the archived CLAUDE.md at
-git history (`git show 6473987:CLAUDE.md`). Two items still bind
-because their code is on the port list:
-
-- **BM25F means weight-then-saturate once** — never sum per-field BM25.
-- **No wall-clock output anywhere on the maintenance path** — timestamps derive
-  from `SOURCE_DATE_EPOCH`/source mtime, or the byte-identical guarantee breaks.
+- 🔴 **A red test on an uncommitted tree is invisible to every mechanism in this
+  repo.** Run **both suites, whole**, before believing a change is done.
+- 🔴 **A loaded machine produces a clean, localised anomaly that reads like a
+  finding**, not noise. Say what you are running, and when, to anyone sharing
+  the machine ([SR-WORK-SESSION](records/0060_WORK-session.md) decision 12).
+- **Concurrent sessions commit, too.** Re-derive `git status` immediately before
+  staging, and commit with explicit pathspecs when the index carries another
+  session's work (decision 10).
 
 ## Blockers stop the session (required)
 

@@ -260,9 +260,27 @@ paraphrase is what drifts.** ⚠ **The home moved on 2026-09-12** (W-122): it wa
 `CLAUDE.md` §Non-negotiable constraints, which now carries a **generated**,
 test-bound view of all ten.
 
+**Ownership is a table, not a judgement call, and it has an executable twin.**
+Every `src/`/`tools/` component is claimed by exactly one record in the
+ownership table below. ⚠ **When that table changes, edit
+[`tests/test_sr_ownership.py`](../tests/test_sr_ownership.py) in the same
+change** — its exemption sets and pinned counts are hand-maintained, so the two
+drift silently otherwise. **That is why the executable twin exists**: a table
+nothing reads is a table nobody notices going wrong.
+
+**Records live in `records/`, and nowhere else.** There is **no archive tier for
+records** (Arpit, 2026-09-06): a superseded record is **rewritten or deleted in
+the same change that accepts its successor**, and the successor states in prose
+what it replaced. Nothing is left behind to be found and mistaken for current,
+and **no live doc may link to a retired record** — the file is gone.
+[`tests/test_doc_links.py`](../tests/test_doc_links.py) is what notices a link
+that no longer resolves.
+
 ### Records are kept current by a check, not by good intentions
 
-`CLAUDE.md` §Law zero is the rule; these are where it is enforced:
+[SR-LAW-0](0002_LAW-0-authority.md) decision 1a is the rule — three
+obligations, of which the third cannot be checked; these are where the
+first two are enforced:
 
 | where | what it does |
 |---|---|
@@ -625,6 +643,7 @@ table does not grant.
 | `tests/test_verb_table_agreement.py` | SR-DOTFUX | `.fux/README.md`'s verb table, SR-CLI §1's, and `build_parser()` held together. **The parser settles a disagreement** — comparing two documents can only say they differ. The prose is deliberately not compared |
 | `tests/test_doctor_register_is_complete.py` | SR-DOCTOR | every live `doctor` row is registered and every registered row still exists, read by RUNNING doctor rather than parsing it. Conditional rows are exempted **by name** |
 | `tests/test_confidence_floor_off.py` | SR-CONFIDENCE | decision 13's *"nothing mechanical catches it"*, caught: the `confidence floors` doctor row and `ask`'s once-per-process stderr note, both suppressed under `--json` and MCP, both from one string |
+| `tests/test_handoff_names_its_model.py` | SR-WORK-LIFECYCLE | decision 6's one mechanical clause — every open item names what should execute it, and there is no second home for a handoff. **The record's only owned component**, and it was owed as a debt by its own decision 12 until 2026-09-14 |
 | `tests/test_open_work_rows_are_short.py` | SR-WORK-OPEN-QUEUE | the row shape, the four balls and the `↳ blocks:` sub-rows — rules 13–19, 20–34 and 42–44. **A `kind: process` record owns its enforcement**, which is what makes the freshness gate able to demand it at all |
 | `tests/test_open_work_is_not_stale.py` | SR-WORK-OPEN-QUEUE | the inbox's arithmetic and its claims about itself — rules 39–41 and 45, plus the tombstone rule 10 |
 | `tests/test_no_work_item_is_lost.py` | SR-WORK-OPEN-QUEUE | the archive-never-delete invariant — rules 54–58. Every `W-nn` id resolves to a file in `work/open/` or `archive/open/`, with the ids that genuinely have none exempted **by name, never by range**; an exemption that stops being true fails the test, so the list shrinks and never rots |

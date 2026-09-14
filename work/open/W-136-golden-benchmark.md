@@ -10,6 +10,13 @@ timestamp: 2026-09-11T00:00:00Z
 
 # W-136 — the sealed golden benchmark
 
+**Model: NONE — no Claude model executes this.** Phase 5 is **Codex's**, run
+on Arpit's account, and the whole point of the instrument is that no Claude
+session sees the answers. Stated rather than left blank so
+[SR-WORK-LIFECYCLE](../../records/0058_WORK-lifecycle.md) decision 6 has an
+answer here: *what would execute this* is a real question with a real answer,
+and the answer is not one of the three models.
+
 **The process is [`work/golden/README.md`](../golden/README.md)** — stated there
 once; this file carries only state. Prompts: [`work/golden/prompts/`](../golden/prompts/).
 

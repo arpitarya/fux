@@ -10,7 +10,7 @@ feature: the session contract — the three files, the running pointer, and how 
 owns: []
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 997f20b72fb30649a00cf2c2283f7a4a061e9c98377676ab1311e58f7e1b6673
+content_sha: c4b8e7bdb0f08d401fa6dab320bf433cb2a7745a56bc050b71af8e53913c51db
 ---
 
 # SR-WORK-SESSION — what a session owes before it ends
@@ -147,7 +147,35 @@ real regression and would have been filed as one.
     the absolute number. Recorded as an unguarded gap in
     [`work/setup/fux-benchmark.md`](../work/setup/fux-benchmark.md) standing rule 0a.
 
-13. **This record's enforcement is unbuilt, and the honest case is named.**
+13. 🔴 **TWO STRIKES → A GATE. A failure class this file records twice becomes
+    a test or a mechanical check IN THE SAME CHANGE that records the second
+    occurrence.** Recurring lessons are gated, not re-learned. (Arpit,
+    2026-08-12.)
+
+    **It is an obligation on the session that writes the second entry**, which
+    is why it lives here: the worklog is where a failure class becomes
+    countable, and the moment of counting is the only moment anybody is looking.
+
+    ⚠ **Stated here from 2026-09-14, and it had been stated in `CLAUDE.md` and
+    nowhere else** — while [SR-LAW-0](0002_LAW-0-authority.md),
+    [SR-WORK-OPEN-QUEUE](0051_WORK-open-queue.md),
+    [SR-RS](0133_predictions.md) and [SR-OUTPUT](0143_output-defaults.md) all
+    cited *"`CLAUDE.md`'s two-strikes rule"* as authority. Under L0 that made
+    `CLAUDE.md` the normative home of a rule four records rest on, which is
+    exactly the shape L0 forbids, and folding §Triage first out of `CLAUDE.md`
+    would have deleted the only statement of it. Found by W-173 on contact.
+
+    ⚠ **What it does NOT say**, and the distinction is the whole of it: a gate
+    is owed for a **failure class**, not for a failure. Two unrelated mistakes
+    are two mistakes. The same mistake in the same shape twice is a class, and
+    the second entry is where somebody has to stop and build the check.
+
+    ⚠ **Unenforced, and it has to be.** A check for *"did this change add a
+    gate?"* would grade the presence of a test, which is the thing a session
+    can satisfy without satisfying the rule. Decision 13a below is the same
+    argument for this record as a whole.
+
+13a. **This record's enforcement is unbuilt, and the honest case is named.**
     Decisions 1 and 5 are mechanically checkable — an entry exists for today, a
     pointer was overwritten — but a check would grade *presence*, never
     truthfulness, and an entry written to satisfy a gate is the failure the

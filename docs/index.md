@@ -61,6 +61,70 @@ again"*, and **that file has never existed** (found 2026-09-12 by
 - **Until then this bar is a convention, not a guarantee.** Read it as *what a
   conforming file looks like*, and do not cite it as a property of the tree.
 
+## The tree — where everything lives
+
+**The full layout, stated once.** `CLAUDE.md` keeps a twelve-line top-level
+tree as orientation and points here for the rest (W-173, 2026-09-14).
+
+```
+work/               THE SHARED MEMORY between sessions — start at work/README.md
+  WORKLOG.md        append-only session log (an entry every session)
+  INTERVIEW.md      state of play, kept current DURING the session
+  IMPLEMENTATION.md milestone log — what shipped, when, outcome (the evidence store)
+  OPEN-WORK.md      THE single live queue — two lanes; finished items are DELETED
+  NOW.md            the one-line running pointer
+  LESSONS.md        dated build lessons — a log, because a record carries no history
+  MACHINE.md        environment/tooling quirks per surface (local · bridge · cloud · CI)
+  DOC-REGISTRY.md   doc freshness tracker (triggers + last-verified)
+  BLOCKED.json      the blocker file; its presence stops the session
+  paper/            the architecture of record + figures + predictions
+  architecture-{high-level,detailed,decoders,ask,answer,two-readers}.svg   the six
+                    diagrams, redrawn from the code 2026-09-12. proposal-search-v3-target.svg
+                    is a PROPOSAL's target state, deliberately outside that namespace.
+  open/             one detail file per open W-nn; ARCHIVED on close, never deleted
+  setup/            the three siblings — playground · lab · benchmark — outside this repo
+                    (SR-WORK-ENVIRONMENTS)
+  regression/       dated, measured evidence other docs cite as grounding; VERDICT.md rules
+  benchmark/reports/ CAP-7, one HTML report per benchmark run, plus TEMPLATE.html
+  golden/           the sealed benchmark — seed docs, ladder manifests, prompts. Its
+                    answer key is NEVER read by any Claude session; see its README
+  compare/          live forks — verdict + explicit reopen-trigger
+  proposals/        parked ideas, not yet decided
+records/            THE STANDING RECORDS — the register, TEMPLATE.md, SR-LAWS and
+                    SR-LAW-0…SR-LAW-10; new records land here. At the repo root
+                    since 2026-09-13, and in the OKF bundle from wherever it sits
+docs/               WHAT THE PROJECT IS
+  GLOSSARY.md       every recurring term, defined once
+  index.md          the OKF bundle root — this file
+src/fux/            the engine — every component claimed in records/README.md
+node/               the Node read plane — authored .mjs; ONE bundled file ships (L10)
+tests/              the fast unit suite, incl. test_sr_ownership.py (the ownership twin)
+tests_e2e/          the package as a user — real CLI via subprocess, fixture corpora
+tools/
+  pruning-eval/     the gate — frozen pre-registrations, KL selector, eval harness
+  differential/     the differential-law harness and the R3 bench
+archive/            THE ONE ARCHIVE — everything retired, mirroring the live tree
+  README.md         the map: every archived doc and its live successor
+  open/             closed work items, byte for byte, with a successor row
+  handoff/          the retired handoff directory (executed pairs + unresolved specs)
+  v0.26/            build: the previous engine — runnable, REFERENCE ONLY
+  v0.26-docs/       build: the frozen v0.19–0.26 doc set ("archived SR-NNNN")
+  v0.26-implemented/ · v0.30-rev1-planning/   frozen build artifacts
+  v0.1/             build: the first one
+```
+
+⚠ **`archive/adr/` is gone.** There is **no archive tier for records** — the
+rule and its consequence are stated in
+[the register](../records/README.md), and a record citation resolves into
+`records/` or not at all.
+
+**`src/fux/` was gated behind P1, and now exists.** The package scaffold was
+M0b and landed only once the pruning gate had been decided — scaffolding a
+package for an architecture a measurement might falsify is the *build the fun
+part first* failure the plan exists to avoid. It shipped in `v0.30.0`; **the
+gating rule stands for every milestone after it**
+([SR-RS](../records/0133_predictions.md)).
+
 # Core (read in this order)
 
 * [The SR register](../records/README.md) - the decisions of record. `PLAN.md` was archived 2026-08-18; milestone scope now lives in the item that will build it, under [`work/open/`](../work/open/README.md).

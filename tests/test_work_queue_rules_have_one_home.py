@@ -72,6 +72,20 @@ _FINGERPRINTS = (
     "blocked on arpit's decision",
     "an agent picks from",
     "red wins, then purple",
+    # 🔴 **Added 2026-09-14 (W-173 item 8), and the set was INCOMPLETE for the
+    # two rules most likely to be restated.** `CLAUDE.md` §Triage first carried
+    # a hand-written second copy of rules 41 and 42 — the 5-day naming rule and
+    # the `↳ blocks:` sub-row — from 2026-08-12 to 2026-09-14, and **this check
+    # passed the whole time** because neither phrase was fingerprinted. The
+    # item's own DoD asked whether the test *should already have been failing*;
+    # it should, and the defect was here rather than in the section.
+    #
+    # ⚠ **Fingerprints are phrases, so they are a sample and never a proof.**
+    # This test can only catch a restatement somebody happened to word the way
+    # the record words it. Two added because two were restated; the class is not
+    # closed and cannot be.
+    "older than 5 days is named",
+    "sub-row naming every item",
 )
 
 #: Not live documents. `archive/` above all: an archived doc may carry an old

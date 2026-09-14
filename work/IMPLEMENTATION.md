@@ -28,6 +28,82 @@ Rules:
 
 
 
+## 2026-09-14 — **W-173 SHIPPED**: the `CLAUDE.md` extraction finished, and three rules that had no home
+
+**Shipped in full.** `CLAUDE.md` **668 → 437 lines**; `tests` 4441,
+`node --test` 36. Every fold the item named is done.
+
+⚠ **437, not the item's estimated ~330, and the estimate is what was wrong.**
+It counted the lines coming *out* and not the eight pointer stubs going *in* —
+each names its record and the decisions to read, which is the whole point of a
+pointer and costs ~15 lines. The alternative was a bare link, which is how the
+next session fails to find the rule.
+
+| fold | where it went |
+|---|---|
+| §Conformance runs + §A pre-registered threshold | **SR-RS decisions 10a and 10b** |
+| §Law zero | **SR-LAW-0 decision 1a** (the three obligations) + **SR-WORK-OWNERSHIP 2a** (the gate, its install line, the 13-of-25 measurement) |
+| §The SR standing rules | [`records/README.md`](../records/README.md) |
+| §Layout | [`docs/index.md`](../docs/index.md) §The tree; a twelve-line tree stays |
+| §Hard-won build knowledge | [`work/LESSONS.md`](LESSONS.md) — a **log**, because a record carries no history |
+| §Build & test gotchas | [`work/MACHINE.md`](MACHINE.md); the five commands stay |
+| §Error contract | **SR-CLI decisions 4 and 5** |
+| §Triage first | **SR-WORK-OPEN-QUEUE rules 32–34, 39–45** |
+
+**Three rules turned out to have no record home, and folding is what found
+each one:**
+
+1. 🔴 **The two-strikes rule was stated in `CLAUDE.md` and NOWHERE ELSE**, while
+   SR-LAW-0, SR-WORK-OPEN-QUEUE, SR-RS and SR-OUTPUT all cited *"`CLAUDE.md`'s
+   two-strikes rule"* as authority. Under L0 that made a **generated,
+   explicitly non-normative** file the normative home of a rule four records
+   rest on — and deleting §Triage first would have deleted the only statement
+   of it. Now **SR-WORK-SESSION decision 13**, with all four citations
+   repointed.
+2. 🔴 **SR-RS explicitly deferred to `CLAUDE.md`**: *"`CLAUDE.md` §Conformance
+   runs carries it as a numbered obligation."* The record that explains the rule
+   pointed at the file that is not allowed to state one. Inverted.
+3. **`records/README.md` was missing two of the six standing rules it was
+   supposed to own** — the ownership table's executable twin, and *records live
+   in `records/` and nowhere else*. Added before the copy was deleted.
+
+**And one live contradiction the fold exposed.** §Error contract said exit `2`
+means *blocking (strict)*; **SR-CLI decision 5 says `2` is reserved and NOT
+produced** — no `raise FuxError` site passes it. Two sentences, both reading as
+correct, in a repository whose whole L0 argument is that this happens. The
+record is right and the copy is gone.
+
+**Item 9 — the owed test — is built**, and building it found something the item
+did not anticipate: `tests/test_handoff_names_its_model.py` asserts every open
+item names what should execute it, **and two items have no Claude model at
+all.** W-136 and W-145 are Codex's, on Arpit's account; the benchmark's premise
+is that no Claude session sees the answers, and a Claude model executing W-145
+would reproduce the contamination it exists to remove. So the honest shape is a
+**required line that may say `NONE — <who, and why not a model>`** rather than
+an exemption nobody would revisit. SR-WORK-LIFECYCLE decision 12's debt is paid;
+its second clause — no second handoff directory — went in with it, and **naming
+the retired path in the record was itself caught** by `test_archive_law.py`.
+
+**Item 8's sub-question answered: yes, the test should already have been
+failing.** `test_work_queue_rules_have_one_home.py`'s fingerprint set did not
+carry rules 41 or 42, so §Triage first's hand-written copy of the 5-day rule and
+the `↳ blocks:` sub-row sat there from 2026-08-12 to 2026-09-14 with the check
+green. Two fingerprints added — ⚠ and the set is a **sample, not a proof**: it
+catches only a restatement worded the way the record words it.
+
+**Out of scope and untouched:** a `--brief` laws block (Arpit ruled the full
+block stays), SR-WORK-SCALE 15 and SR-WORK-SESSION 13a's deliberately-open
+gaps, and **§What we are building** — whether it becomes `0065` SR-WORK-SCOPE is
+the item's own open question and nobody has ruled it.
+
+**Records:** SR-LAW-0 · SR-WORK-OWNERSHIP · SR-WORK-SESSION · SR-WORK-LIFECYCLE
+· SR-RS · SR-CLI · `records/README.md`. **Docs:** `docs/index.md`,
+`work/LESSONS.md` (new), `work/MACHINE.md`, DOC-REGISTRY.
+**Tests:** the new model-line gate, two fingerprints, three messages repointed
+off `CLAUDE.md`.
+
+---
+
 ## 2026-09-14 — **W-158 SHIPPED**: the harness renders CAP-7 from the template, and the l9 report exists
 
 **Shipped**, with one part deliberately not done and one exposure named rather
@@ -204,7 +280,8 @@ SR-AGENT-POLICY / SR-NODE-SEARCH / SR-PII).
 | `--cache-ttl` declared inert under `never` | W-140 row 6 from the other end: a knob that cannot act must say so |
 | SR-ACQUIRED's pairing table corrected | 🔴 **A record said *"`update=never keep=true` … and no socket opens"* and that was never true.** `update=` is the update-time clock; SR-URL-FRESHNESS decision 15 says so in as many words two records away. A test docstring carried the same wrong sentence. Both corrected |
 | the `fux-config` guide corrected | 🔴 **It told agents *"any other unknown key is silently ignored"*** — wrong since SR-CONFIG decision 14 refused unknown keys by name. An agent reading it would have told a consumer their typo was harmless |
-| ⚠ **written LIVE, not commented** (Arpit's ruling) | The first cut wrote `#fetch_at_answer = true`. Ruled: write the key with its default value, from `fux setup` onward. **The trade is real** — an uncommented default does not follow a future change of default — and the ruling is right here because the value is a *boolean*, not a number that may rise (`acquired_max_bytes`'s reason for deferring to `None`), and because it is the key a consumer is least likely to discover any other way. `meta = "hashed"` is the precedent |
+| **`templates/fux.toml.txt`** (Arpit: *"create a template like others"*) | The starter left `setup.py`'s triple-quoted string for a file beside `pii.toml.txt`, `refusals.toml.txt` and the two fetchers. `{default}` is now **substituted, not `.format`ted** — W-83's property unchanged, but a `{` someone later adds to a comment in an *editable file* would have raised out of `fux setup`. No packaging change: `packages = ["src/fux"]` already ships every file under the package |
+| ⚠ **`fetch_at_answer` AND `update` written LIVE** (Arpit's ruling) | The first cut wrote `#fetch_at_answer = true`; `update` had been commented since it was added. Ruled: write both with their defaults. **The trade is real** — an uncommented default does not follow a future change of default — and the ruling generalises into a rule rather than two exceptions: a key whose **value domain is closed and small** (`meta`, `update`, `fetch_at_answer`) is written out, because the written line is the complete menu and nobody greps a record for a flag they do not know exists; a key whose default is a **number that may rise** (`acquired_max_bytes`, `sweep_minutes`) stays out, so raising it reaches every repo. The test is *can this value go stale?* |
 | ⚠ **this repo's own `fux.toml`** | Found by Arpit: the first pass added `#fetch_at_answer = true` to `setup._CONFIG` — the file `fux setup` writes into a **new** repo — and not to fux's own `fux.toml`, which `setup` will not overwrite. The key worked; it was invisible where he looked. Both carry the commented default now |
 | the Node question, settled | **Nothing owed.** `node/src/refer/source.mjs` and `freshness.mjs` both state that Node never fetches (W-107 R6), so the Node reader has always behaved as `fetch_at_answer = false`. Under `false` the two readers' `url:` verdicts converge exactly — this key does not diverge them |
 

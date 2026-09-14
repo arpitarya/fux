@@ -29,6 +29,78 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-14 — five items closed to the wall  ·  Claude Code (Opus 5, 1M)
+- **Asked:** *"Commit everything, then implement W-169, W-160, W-162, W-158,
+  W-173. One by one to the closure. If anything comes up, resolve it, fix it,
+  implement it, and keep going till it's completely implemented."*
+- **Did:** five commits, each with its records, tests and queue paperwork.
+  `91255adb` the inherited tree — **343 files another session left staged with
+  three suite failures on them**, greened first. `0f219482` **W-169**
+  `fux inspect`: six lenses, three floors measured on all seven golden rungs.
+  `3bfb421b` **W-160** the two atoms: `fux lexical` frozen, `graph --seed`,
+  three inert walk parameters, both readers. `ae2b806d` **W-162**
+  `fux correct`: the human line, `--pin` with suspension, `--why`'s authorship,
+  a doctor row. `1e52a6df` **W-158**: CAP-7 renders from the template and
+  `2026-09-12-benchmark-l9` finally has a report. **W-173** the `CLAUDE.md`
+  extraction — **668 → 437 lines**, eight folds, `work/LESSONS.md`, and the
+  owed model-line test.
+- **Decided / open:** **W-175 filed and 🔴** — `fux correct` shipped with its
+  central claim unmeasured, and an agent may author neither its corrections
+  nor its blind paraphrases. **Four findings worth his time:** (1) the **golden
+  ladder is one vocabulary spread over more documents** — 9 619 terms at 100
+  docs, 20 163 at 10 000, Heaps β 0.599 → 0.20, Zipf −2.36 against prose's −1 —
+  filed as evidence for W-156; (2) `fux doctor`'s `pinned url bytes` row was
+  printing **`[OK]` beside a real warning**, because `ok=True, level="warn"`
+  renders `[OK]`, and the test asserted the fields rather than the line;
+  (3) the **two-strikes rule was stated in `CLAUDE.md` and nowhere else** while
+  four records cited it as authority, and **SR-RS explicitly deferred to
+  `CLAUDE.md`** for an obligation it only explains; (4) **`fux-benchmark` is a
+  git repo with ZERO commits**, so W-158's emitter — the code now enforcing
+  SR-WORK-BENCHMARK 8–10 — exists on one machine, named as a third row on
+  W-148 because committing in that environment is not mine to decide.
+  ⚠ **Two of my own claims were false when written and are corrected in place**:
+  a report of mine said its pre-registration was *"committed alone, ahead of the
+  first number"* (28 files, and written after), and a note I added to SR-ANSWER
+  claimed `answer --json` carries `pinned` (it carried no such key).
+- 🔴 **`fux setup` is BROKEN on the working tree right now, and it is not
+  mine.** A concurrent session has landed a refusal in `config.py` — *"`[sources.url]`
+  `urls_file` moved to `[sources]`"* — and has **not** updated the `fux.toml`
+  starter, so `fux setup` writes a file its own loader rejects: exit 1 in a
+  fresh repo, and `tests_e2e/test_verbs.py` red on two rows. Their `setup.py`
+  alone is also what leaves `test_sr_freshness` demanding SR-NODE-SEARCH and
+  SR-PII. **Committed around all of it with explicit pathspecs.**
+- **Next:** Arpit reads the inbox — **W-175** and **W-170** at 0d, **W-156**
+  at 1d (it now blocks four items), and **W-146 · W-112 · W-144 · W-148** at 2d.
+  The blocker file is still `ASK` and untouched.
+
+## 2026-09-14 — three rulings on the scaffolded `fux.toml`  ·  Cowork (Opus)
+- **Asked:** Arpit, on seeing the key was missing from fux's own `fux.toml`:
+  put it there; *"dont comment it uncomment it always and use it as the value
+  with default value being set on setup"*; *"do the same for update='auto'"*;
+  *"create a template for fux.toml file like others"*.
+- **Did:** `fetch_at_answer = true` and `update = "auto"` are written **live**
+  with their defaults, in the repo's own `fux.toml` and by `fux setup`; the
+  starter moved out of `setup.py`'s triple-quoted string into
+  `src/fux/templates/fux.toml.txt`, read through `template_bytes` like
+  `pii.toml.txt` and the fetchers. `{default}` is substituted rather than
+  `.format`ted. Three tests, SR-DOTFUX and SR-URL-LIST amended.
+- **Decided / open:** 🔴 **The first cut wrote `fetch_at_answer` COMMENTED and
+  argued for it in a record** — *"an uncommented default freezes today's value
+  into every repo"*. Arpit ruled the other way, and the ruling generalises:
+  **a key whose value domain is closed and small is written out** (`meta`,
+  `update`, `fetch_at_answer`) because the written line is the complete menu;
+  **a key whose default is a number that may rise stays out**
+  (`acquired_max_bytes`, `sweep_minutes`) so raising it reaches every repo.
+  The test is *can this value go stale?* — not *is it important?*. The cost is
+  recorded rather than argued away: a future change of default will not reach
+  a scaffolded repo.
+- ⚠ **`str.replace` over `str.format`** was not asked for and is not cosmetic:
+  the template is an editable file now, so a `{` added to a comment would have
+  raised `KeyError` out of `fux setup`.
+- **Next:** commit the slice with explicit pathspecs — the tree still carries
+  a concurrent session's work, and the two remaining red rows are theirs
+  (`test_doc_links`, `test_sr_freshness` naming SR-NODE-SEARCH / SR-PII).
+
 ## 2026-09-14 — W-174 BUILT: the never-fetch mode gets a selector  ·  Cowork (Opus)
 - **Asked:** *"Implement it."* — Arpit, overriding this surface's usual
   ratify-don't-build split for this item.

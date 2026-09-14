@@ -13,7 +13,7 @@ feature: configurable output defaults
 owns: [src/fux/output_config.py@d8c53dfbf3c9]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: c88956c4b8b2d47a37cb70c3f259e9c606ce6cb0ecec100da412736118ac3cc0
+content_sha: e9b6b04e737a479e5cd0c950b2bce42485b9155f63f43f3e97990d2b1545f2b0
 ---
 
 # SR-OUTPUT — output defaults are configurable, in a third file
@@ -743,7 +743,8 @@ catchable by the tests that existed when they were written.**
   `fux.query.find_root` and never reach the CLI's own import — and the failure
   appeared only on a real `python -m fux ask`, as an `ImportError` on **every
   verb**. Caught by *running* it. Gated now by a test that exercises the seam
-  with no monkeypatching at all (CLAUDE.md, two strikes).
+  with no monkeypatching at all ([SR-WORK-SESSION](0060_WORK-session.md)
+  decision 13, two strikes).
 - **`answer --no-refer` and five verb-level `--json` flags were left at
   `default=False`.** Decision 10's failure, in the wild, on the first build
   that could produce it: the file would silently never take effect for those
