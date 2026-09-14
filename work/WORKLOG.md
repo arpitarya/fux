@@ -29,6 +29,12 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-14 — cage accepted the search leg; W-170 waits on one ruling  ·  Cowork (Opus)
+- **Asked:** "okay, create a work document" — for the cage search leg.
+- **Did:** cage side: compare doc DECIDED (C, A first, fux's half = the observer hook), handoff + prompt pair filed there. Here: W-170's inbox row narrowed to the one ruling still owed — **SR-LAW-10's exemption table gaining `.fux/observers/*`**. Written onto the branch through a temporary index again; the working tree is still `main` under the other session.
+- **Decided / open:** the L10 amendment (Arpit, named in the record). Then W-170 is buildable; cage's P4 waits on it.
+- **Next:** Arpit amends SR-LAW-10 or says the word and a session does it under his name.
+
 ## 2026-09-14 — W-170 becomes the observer hook: fux exposes, cage subscribes  ·  Cowork (Opus)
 - **Asked:** *"How about a middleware that fux exposes and cage can intercept?"* — yes to rewriting the fux half that way.
 - **Did:** [W-170](open/W-170-cage-search-leg.md) rewritten: `.fux/observers/` as a third readable-source extension point (decoders, fetchers, observers); one counts-only record per verb, **after render**, no return path; fail-open, wall-clock-capped; `args_hash` contract first; liveness in `fux doctor`; **fux carries no cage knowledge** (tested) — cage's `cage setup` drops its own observer. New SR-OBSERVE; **SR-LAW-10's exemption table needs Arpit's named amendment** — added to W-170's inbox row. Proposal `cage-search-leg.md` marked superseded-on-mechanism, kept as the record. Cage side: compare doc option B → B′, OPEN-WORK item and README updated. ⚠ Written straight onto the branch with a temporary index — the working tree was on `main` under another session, and I did not move its checkout.
