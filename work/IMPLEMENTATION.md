@@ -106,8 +106,13 @@ the same bundler here **keeps** `bin: {"fux": "./fux.mjs"}`, and the published
 this may be npm 11.x normalising rather than dropping. **It is unverifiable
 until the stage is approved** — a staged version has no public metadata. If the
 bin is gone, `npm i -g fux-engine` installs no `fux` command, which is the
-mitigation R1a ships and what [W-159](open/W-159-windows-shadowing-row.md)
-already concerns itself with.
+mitigation R1a ships and what W-159 already concerned itself with. ⚠ **W-159
+closed 2026-09-14** (archived at
+[`archive/open/W-159-windows-shadowing-row.md`](../archive/open/W-159-windows-shadowing-row.md),
+named and not cited); the live successor for the PATH row is
+[SR-NODE-SEARCH](../records/0153_node-search.md), which now states which
+platforms it covers, and [SR-DOCTOR](../records/0152_doctor.md)'s `fux on PATH`
+row.
 
 **What was released.** No behaviour was written for the release itself: the
 eight `2.0.0-alpha.*` pre-releases plus everything that had accumulated
