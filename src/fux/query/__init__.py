@@ -484,6 +484,41 @@ def _declare_archived(results) -> None:
     )
 
 
+#: The honest decline, printed by `ask`, `find` and `answer` alike.
+#:
+#: **One string in one place**, because it is a documented surface a consumer
+#: greps for: three literals is three chances for one verb to drift a full stop.
+NO_MATCHES = "No confident matches."
+
+
+def _decline() -> None:
+    """Print the no-match sentence **on stderr**, exit code unchanged (W-165 fix 2).
+
+    **It was on stdout until 2026-09-14**, and SR-FIND's Consequences had
+    carried the cost since the verb shipped: `find` exists to be piped, so a
+    prose sentence on the stream that otherwise holds nothing but paths turns
+    an empty result into one fake path. Every caller had to know the sentence
+    and grep it back out — the `grep -qx` guard the search skill documents —
+    which is a contract made of a string.
+
+    Three things deliberately do NOT change, because the fix is about the
+    *stream* and nothing else:
+
+    - **Exit code 0.** An honest decline is a successful run, SR-CLI
+      decision 6, and moving the stream is not a verdict about the answer.
+    - **`--json`.** It never printed this sentence; a JSON caller reads
+      `results: []`, which is the contract it already had.
+    - **The wording.** A consumer matching the text keeps matching it - on the
+      other stream, which is exactly the breakage this is meant to be.
+
+    ⚠ **`fux graph` still prints it on stdout.** Named here rather than left to
+    be discovered: W-165's scope is the three query verbs, and widening it
+    silently would make the graph verb's surface change with no record saying
+    so.
+    """
+    print(NO_MATCHES, file=sys.stderr)
+
+
 def _declare_confidence(block, show: bool = False) -> None:
     """SR-CONFIDENCE decision 4, as amended: the band on stderr, never stdout.
 
@@ -608,7 +643,7 @@ def cmd_ask(args) -> int:
         return 0
 
     if not results:
-        print("No confident matches.")
+        _decline()
         _declare_confidence(block, _show_band(args))
         return 0
 
@@ -837,7 +872,7 @@ def cmd_find(args) -> int:
         return 0
 
     if not results:
-        print("No confident matches.")
+        _decline()
         _declare_confidence(block, _show_band(args))
         return 0
 
@@ -919,7 +954,7 @@ def cmd_answer(args) -> int:
                 band_requested=_show_band(args),
             )
         else:
-            print("No confident matches.")
+            _decline()
             _declare_confidence(block, _show_band(args))
         return 0
 

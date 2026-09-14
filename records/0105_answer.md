@@ -10,7 +10,7 @@ feature: "`fux answer` — one answer, its footing stated, and the report of wha
 owns: []
 laws: [L1, L2, L3]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: f5b2cf284f5001ee7fc798176a3a858fd808ba78bc219165d0e96d64fd1442af
+content_sha: cab24e6f9225239a24667b8f7bcdda0bab784567d31251e8dd8e31baf00516ce
 ---
 
 # SR-ANSWER — the `answer` verb
@@ -179,6 +179,13 @@ emits `{"answer": null, "citation": null, "source": "index"}`. **`"source"` is
 present on every branch**, because it is the key callers switch on — an absent
 key is a trap, not a signal. It carries two live values: `"refer"` (fetched and
 re-scored) and `"index"` (fallback, or nothing to refer to).
+
+⚠ **Amended 2026-09-14 (W-165 fix 2): the sentence goes to STDERR.** It was on
+stdout from the day the verb shipped. **Exit code 0, `--json` and the wording are
+all unchanged** — the fix is about the stream and nothing else, so a consumer
+matching the text keeps matching it, on the other stream. All three query verbs
+moved in one change, because SR-FIND decision 6 is *"the same rule as `ask`"* and
+a split would have made that sentence false.
 
 **8. Refer is opt-out, not opt-in.** `--no-refer` keeps the index-only path.
 This follows [SR-REFER](0127_refer-plane.md)'s own reasoning: a `file:`

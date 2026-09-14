@@ -17,6 +17,7 @@ import { Verdict } from "../refer/freshness.mjs";
 import { resolve, readLocal, fromAcquired, GIT } from "../refer/source.mjs";
 import { passageBoost } from "../query/rerank.mjs";
 import { alreadyTextGlobs, isAlreadyText } from "../decode/registry.mjs";
+import { decline } from "./find.mjs";
 
 /** `answer` refers the top 3 — W-108. One question and no `-q`: an RRF score
  *  would make the three incomparable. */
@@ -189,7 +190,7 @@ export function runAnswer(root, args) {
 
   if (args.json || payload.answer === null) {
     if (!args.json && payload.answer === null) {
-      process.stdout.write("No confident matches.\n");
+      decline();
       return 0;
     }
     process.stdout.write(JSON.stringify(payload, null, 2) + "\n");

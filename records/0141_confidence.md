@@ -11,7 +11,7 @@ feature: the confidence plane
 owns: [src/fux/query/confidence.py@664d92120a9b]
 laws: [L1, L3, L4]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 47fc7da2a8d37cc8bd606892a3c2b2e67f33604f643b6c41713285a5289c35eb
+content_sha: d12e58def03e146302fb3b6494de54644a528b599ea1dbd8590e01d25db6b4d4
 ---
 
 # SR-CONFIDENCE — how much the index believes its own answer
@@ -555,6 +555,15 @@ functions including `cmd_ask` and `run_query`, so a short list would switch the
 gate off silently — worse than the line you are reading.
 
 ### Consequences
+
+- **The "stderr, never stdout" family gained a third member on 2026-09-14**
+  (W-165 fix 2). `_declare_confidence` and `_declare_archived` have always
+  written to stderr for the reason decision 4 gives — `find` pipes bare paths,
+  `--json` is a contract, and both of these *declare* rather than gate. The
+  no-match line `No confident matches.` did not, and was the last prose on
+  stdout; it does now. **Nothing about the band moved**: it is still gated on
+  `--band`, still computed on the final list, still on stderr. What changed is
+  that the stream is no longer split between two kinds of note.
 
 **`support` is bounded by `--top`, and cannot honestly be a corpus-wide count.**
 A corpus-wide *"47 documents matched"* would be the more useful number. The

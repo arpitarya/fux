@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@84d59aba18a8, src/fux/store/nodebundle.py@071a24a596dd]
+owns: [node@51a57ca0e641, src/fux/store/nodebundle.py@071a24a596dd]
 laws: [L1, L3, L4, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 02096daa4c997489ba6d1e25cb52afc4eb9f34f20620b3090d871f470cd88bbe
+content_sha: c490eb4bb4ad22c41a4b3d09302acb22c10f36191f673e6829b254014df00d55
 ---
 
 # SR-NODE-SEARCH — the Node read plane
@@ -535,6 +535,23 @@ make shape C available.
 
 ### Consequences
 
+- **The no-match sentence moved to stderr in BOTH readers, in one change**
+  (2026-09-14, W-165 fix 2). `decline()` in `node/src/verbs/find.mjs` is the twin
+  of `_decline()` in `src/fux/query/__init__.py`; `ask` and `answer` import it
+  rather than each holding the literal, on both sides. Exit codes, wording and
+  `--json` are unchanged. **`fux graph` still writes it to stdout in both** —
+  named so the asymmetry is recorded rather than found.
+
+  ⚠ **`tests/test_node_twins.py` did not catch a thing here, and the fix was to
+  narrow it.** `node/src/query/run.mjs` declares `src/fux/query/__init__.py` as
+  its twin, and so do the three verb modules — a one-to-many mapping the record
+  already had. A change to what a verb *prints* moves the Python module without
+  touching anything `runQuery` mirrors, so the check reported `run.mjs` as behind
+  while the three files carrying the change sat updated beside it. `run.mjs` is
+  now in `NARROWED` against `run_query`, which is what its own header has always
+  said it mirrors: *"twin of the PURE half"*. **The three verb modules stay
+  unnarrowed** — narrowing those too would leave the printing half unguarded,
+  which is the failure this row exists to describe.
 - **`fux` names two binaries when both are installed globally.** `--version`
   reports the runtime (`fux 2.0.0-alpha.7 (node 22.9.0)`), an unsupported verb
   signposts the other, and `fux doctor` reports a node `fux` earlier on PATH.

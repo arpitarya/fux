@@ -1379,3 +1379,50 @@ def test_doctor_run_includes_the_row(tmp_path):
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
     names = [c.name for c in doctor.run(tmp_path)]
     assert "fux on PATH" in names
+
+
+# -- W-165 fix 1: the `!` lines `fux remove` no longer writes ----------------
+
+
+def _corpus_with_dirs(tmp_path, dirs_text: str):
+    """A minimal repo whose `dirs` list says exactly `dirs_text`."""
+    (tmp_path / ".git").mkdir()
+    (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
+    (tmp_path / ".fux" / "sources").mkdir(parents=True)
+    (tmp_path / ".fux" / "sources" / "dirs").write_text(dirs_text, encoding="utf-8")
+    return tmp_path
+
+
+def test_no_bang_lines_is_a_clean_migration_row(tmp_path):
+    checks = doctor.run(_corpus_with_dirs(tmp_path, "docs\n"))
+    row = next(c for c in checks if c.name == "dirs exclusions migrated")
+    assert row.ok
+    assert ".fux/.fuxignore" in row.detail
+
+
+def test_a_surviving_bang_line_is_named_with_its_move(tmp_path):
+    """The note lists the survivor and the one-line move — and stays a `warn`.
+
+    `!` lines in `dirs` keep being READ (SR-DIR-LIST decision 2a); breaking them
+    would be a silent re-inclusion, which is the worse direction. So the row
+    reports and never fails the command.
+    """
+    root = _corpus_with_dirs(tmp_path, "docs\n!docs/secret.md\n")
+    row = next(c for c in doctor.run(root) if c.name == "dirs exclusions migrated")
+    assert not row.ok
+    assert row.level == "warn"
+    assert "docs/secret.md" in row.detail
+    assert "/docs/secret.md" in row.detail  # the anchored pattern to write instead
+    assert row.detail.isascii()  # printed, and a Windows console must encode it
+
+
+def test_the_migration_row_fires_without_a_duplicate(tmp_path):
+    """⚠ Distinct from `_ignore_health`'s duplicate finding, which needs BOTH files.
+
+    The survivors nothing duplicates are the ones no other check would mention,
+    and they are the ones the migration is actually owed for.
+    """
+    root = _corpus_with_dirs(tmp_path, "docs\n!docs/secret.md\n")
+    checks = {c.name: c for c in doctor.run(root)}
+    assert checks["fuxignore usable"].ok  # nothing duplicated — that row is clean
+    assert not checks["dirs exclusions migrated"].ok

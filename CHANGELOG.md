@@ -8,7 +8,87 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
-Nothing yet.
+### Changed
+
+- 🔴 **`No confident matches.` goes to STDERR on `ask`, `find` and `answer`** —
+  a **breaking change to a documented surface**, and the one thing in this entry
+  to read before upgrading. `fux find` exists to be piped, and a line of prose on
+  the stream that otherwise holds nothing but paths turns an empty result into
+  one fake path. **stdout is now empty on the no-match path.**
+  - **Unchanged:** exit code `0` (an honest decline is a successful run),
+    `--json` (which never printed the sentence — the empty case is still
+    `{"results": []}`), and the wording, so a consumer matching the text keeps
+    matching it on the other stream.
+  - **If you guard with `grep -qx "No confident matches."` before piping**, that
+    guard is now unnecessary and still harmless.
+  - **`fux graph` still prints it on stdout**, deliberately and in both readers.
+  - Both readers moved in one change.
+    [SR-FIND](records/0104_find.md) decision 6 · [SR-ASK](records/0103_ask.md)
+    decision 7 · [SR-ANSWER](records/0105_answer.md) decision 7 ·
+    [SR-CLI](records/0101_cli-surface.md) decision 6.
+- **`fux remove` writes its exclusion to `.fux/.fuxignore`**, not as a `!` line
+  in `.fux/sources/dirs`. The pattern is **anchored** (`/docs/a.md`), with a
+  trailing `/` for a directory, because a bare name in that grammar means *at any
+  depth*. `!` lines already in `dirs` **keep working and are left exactly alone**;
+  `fux doctor`'s new `dirs exclusions migrated` row names each survivor with the
+  one-line move. `fux add` refuses a path `.fux/.fuxignore` excludes, for the same
+  reason it always refused a `!` line — there is no un-exclude by design.
+  [SR-FUXIGNORE](records/0144_fuxignore.md) decisions 5a–5b ·
+  [SR-DIR-LIST](records/0120_dir-list.md) decision 2d.
+
+### Fixed
+
+- 🔴 **Three ways a carried-forward record silently kept stale bytes.** Ingest
+  reuses a document's extracted record when its source bytes are unchanged; two
+  other inputs to extraction were not in that key, and one class of record was
+  never re-processed at all. Each was already named in its record as *stated,
+  not fixed*.
+
+  **⚠ The first `fux ingest` after upgrading re-extracts every document, once.**
+  That is the price of the new keys taking effect, it is paid on one run, and a
+  no-op ingest after it re-extracts nothing — pinned by a test, because a digest
+  scoped too coarsely would turn every future release into the same full pass.
+
+  - **A decoder change now invalidates the documents it read.** Every built-in
+    decoder declares `VERSION`; a consumer decoder in `.fux/decoders/` is
+    digested by its file sha. **Keyed per extension**, so a `.pptx` fix
+    re-extracts slides and leaves the markdown corpus alone.
+    [SR-DECODE](records/0139_decode.md) decision 11a.
+  - **An extraction-rule change now reaches unchanged documents.**
+    `extract.RULES_VERSION` joins the `[index]` caps in the reuse key. Corpus-
+    wide, because those rules run on every document.
+    [SR-INGEST](records/0106_ingest.md) Consequences.
+  - **A `url:` record is re-extracted from `.fux/acquired/`** when a PII,
+    decoder or extraction-rule change lands — **offline**, from bytes already on
+    disk. Before this, a `url:` record carried forward verbatim whenever the
+    fetch did not happen, and under `update=never` that was permanent, `--full`
+    included: a new redaction rule could not reach it, ever.
+    [SR-PII](records/0148_pii.md).
+
+  **A URL with no retained bytes is stranded, never dropped** — its record is
+  left exactly as it is, the run warns, and `fux doctor`'s new
+  `url redaction current` row names it. `keep=true` on the line is what lets the
+  next policy change reach it offline.
+
+  ⚠ **For maintainers of this repo:** `VERSION` and `RULES_VERSION` are bumped
+  **by hand**, in the change that edits the module. Two tests fail a changed
+  module whose constant did not move, so it is a recorded decision either way.
+
+### Added
+
+- **The ingest summary counts deletions** — `…, N records deleted`, present only
+  when `N > 0`. `write_index` writes the whole index, so a removal is an
+  *absence*: every other number on that line could sit still while a document
+  left the corpus, `0 shards written` included.
+  [SR-INGEST](records/0106_ingest.md) Consequences.
+- **`fux doctor`: `dirs exclusions migrated`** — a `warn` row listing the `!`
+  lines left in `.fux/sources/dirs`. Distinct from the duplicate warning, which
+  fires only when a pattern sits in both files; this one fires on every survivor.
+  [SR-DOCTOR](records/0152_doctor.md).
+- **`fux doctor`: `url redaction current`** — a `warn` row naming the `url:`
+  documents a policy change could not reach for want of retained bytes. ⚠ It
+  reads from derived state, so it does not travel with a cloned index.
+  [SR-DOCTOR](records/0152_doctor.md).
 
 ## [2.0.0] - 2026-09-13
 

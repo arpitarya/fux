@@ -7,11 +7,11 @@ description: "One record owns the health-check surface. Every check names a caus
 status: accepted
 date: 2026-09-11
 feature: "`fux doctor` — the read-only, offline health command and its check register"
-owns: [src/fux/doctor.py@e924a085d794]
+owns: [src/fux/doctor.py@ec313696b42e]
 laws: [L4, L8]
 ratifies: "Arpit, 2026-09-11 — *create a new adr for doctor*"
 timestamp: 2026-09-11T00:00:00Z
-content_sha: 08d16a08b165379235c6b8c7f8361b54dee46121ef3d87191565a4c967b960d8
+content_sha: 7fb715d657cd2ce28507b6964d80f83b054df8349a8e65f7e693f8dcbda37cc5
 ---
 
 # SR-DOCTOR — the health command, and who owns its rows
@@ -167,6 +167,8 @@ authoritative about the row.**
 | `output.toml present` | warn | absent means every output default is the engine's own and none can be changed | [SR-OUTPUT](0143_output-defaults.md) decision 20 |
 | `types list usable` | error | a types list with no live pattern — `read_types` refuses it, so ingest stops | [SR-TYPES](0128_types-list.md) decision 10 |
 | `fuxignore usable` | warn, **error** when the patterns will not parse | the `.fuxignore` patterns parse, and duplicates | [SR-FUXIGNORE](0144_fuxignore.md) |
+| `dirs exclusions migrated` | warn | the `!` lines still in `.fux/sources/dirs`, each with the anchored pattern to write instead. `fux remove` stopped writing them on 2026-09-14 (SR-FUXIGNORE decision 5a) and they are read forever, so this reports and never fails. ⚠ **Not the duplicate finding above** — that one needs the pattern in *both* files; this fires on every survivor, including the ones nothing duplicates, which are the ones no other row would mention | [SR-FUXIGNORE](0144_fuxignore.md) decisions 5a–5b · [SR-DIR-LIST](0120_dir-list.md) decision 2d |
+| `url redaction current` | warn | the `url:` documents a policy change could not reach — no retained bytes in `.fux/acquired/`, so their records still hold text extracted under the OLD rules. **Never an error**: the record is not wrong about its source, and only a fetch can clear it, so failing here would make `doctor` red until someone goes online. ⚠ **Derived state, so it does not travel with a cloned index** — a fresh clone reads clean until its own ingest re-derives the fact | [SR-PII](0148_pii.md) · [SR-INGEST](0106_ingest.md) · [SR-ACQUIRED](0145_acquired-plane.md) |
 | `fetcher optional functions` | warn | which of `validate()` / `is_rate_limited()` the consumer's fetcher implements — **read as text, never imported** | [SR-FETCHER](0117_fetcher.md) decisions 12–13 |
 | `url sources` | warn | per-URL health from the committed index, **the listed URLs that have never been fetched and so have no record at all** (SR-MAINTENANCE decision 5a's stated cost, built 2026-09-12), the concurrency policy, and **the `update=never` count with the `keep=false` ones named** — a pinned URL is one `fux update` will never go out for again, which is otherwise learnable only by reading every line of the list | [SR-URL-LIST](0116_url-list.md) decisions 14/14b |
 | `background runner` | warn | is a runner live, how many documents pend, is the lock held or stale, did the last run fail. **Read-only: a stale lock is named, never cleared** | [SR-MAINTENANCE](0129_hooks.md) decision 1c |

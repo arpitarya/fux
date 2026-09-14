@@ -13,7 +13,7 @@ feature: configurable output defaults
 owns: [src/fux/output_config.py@bb73da35f5b1]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 8662d257396dc8008a9efb19f595a8a4caa70924e54ede239f28b2912df90dc7
+content_sha: 17dc0554b57ff7579604a515f468ce65d4a25783cf95d3738efa0c526a03ff43
 ---
 
 # SR-OUTPUT — output defaults are configurable, in a third file
@@ -698,6 +698,15 @@ drifted **refusal** produces an error on one side and an answer on the other,
 which a harness reports as a crash rather than as a finding.
 
 ### Consequences
+
+- **The no-match line is a rendering decision, and it moved to stderr on
+  2026-09-14** (W-165 fix 2, [SR-FIND](0104_find.md) decision 6). It is emitted
+  from `cmd_ask` / `cmd_find` / `cmd_answer`, which this record already reaches
+  into for `_show_band` and `_gated`. ⚠ **It is NOT configurable and gains no
+  `output.toml` key.** A caller that could turn the decline off would get a
+  silent, exit-0, empty answer — the one output this file's whole subject is
+  making harder to misread. The stream is the fix; a knob would be a new way to
+  produce the defect.
 
 ⚠ **Two defects this build produced and caught, recorded because neither was
 catchable by the tests that existed when they were written.**

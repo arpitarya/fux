@@ -477,20 +477,45 @@ def test_ask_json_reports_which_path_answered_when_explain_is_set(tmp_path):
     assert fast["path"] == "accelerator"
 
 
-def test_find_still_prints_prose_on_the_no_match_path(tmp_path):
-    """W-48 item 3, decided and left alone — pinned so the decision is visible.
+def test_the_no_match_prose_is_on_stderr_and_stdout_is_empty(tmp_path):
+    """W-165 fix 2 — the golden updated BY HAND, in the change that moved it.
 
-    All three verbs say the same thing for the same condition; `--json` is the
-    machine-readable form. SR-FIND ties reopening this to a real script
-    observed breaking on it, and no such script has been observed.
+    **It asserted the opposite until 2026-09-14.** W-48 item 3 had left the
+    sentence on stdout and SR-FIND tied reopening to *"a real script observed
+    breaking on it"*. No script was ever observed, and the reopen came from the
+    other direction: the surface is documented as needing a `grep -qx` guard
+    before a caller may pipe `find`, which is a contract made of a string.
+
+    **Empty stdout is the assertion that matters** — that is what makes an empty
+    result read as zero paths rather than one that happens to be prose.
+
+    The exit code stays 0 (SR-CLI decision 6: an honest decline is a successful
+    run) and the wording is unchanged, so a consumer matching the text keeps
+    matching it on the other stream.
     """
     _write_fixture(tmp_path)
     _run(tmp_path, "ingest")
 
-    result = _run(tmp_path, "find", "zzzz nothing")
+    for verb in ("find", "ask", "answer"):
+        result = _run(tmp_path, verb, "zzzz nothing")
+        assert result.returncode == 0, verb
+        assert result.stdout == "", verb
+        assert result.stderr.strip() == "No confident matches.", verb
+
+
+def test_the_no_match_json_never_carried_the_prose(tmp_path):
+    """`--json` is unaffected by the stream move, because it never printed it.
+
+    The companion to the test above: a JSON caller's contract is `results: []`
+    and it is the same before and after W-165 fix 2, on both streams.
+    """
+    _write_fixture(tmp_path)
+    _run(tmp_path, "ingest")
+
+    result = _run(tmp_path, "find", "zzzz nothing", "--json")
     assert result.returncode == 0
-    assert result.stdout.strip() == "No confident matches."
-    assert result.stderr == ""
+    assert json.loads(result.stdout) == {"results": []}
+    assert "No confident matches." not in result.stderr
 
 
 def test_derived_plane_is_gitignored(tmp_path):
@@ -753,11 +778,13 @@ def test_remove_takes_the_document_out_of_the_index_and_the_graph(tmp_path):
     assert "pruning.md" in _run(tmp_path, "find", "pruning").stdout
 
     out = _run(tmp_path, "remove", "docs/pruning.md").stdout
-    assert "excluded  !docs/pruning.md" in out  # covered by `docs`, so an exclusion
+    # W-165 fix 1: the exclusion is a `.fuxignore` line now, anchored with a
+    # leading `/` so it cannot also drop an `archive/docs/pruning.md`.
+    assert "excluded  /docs/pruning.md" in out  # covered by `docs`, so an exclusion
     assert "dropped file:docs/pruning.md from the index" in out
 
     assert "pruning.md" not in _run(tmp_path, "find", "pruning").stdout
-    assert "No confident matches." in _run(tmp_path, "ask", "why did pruning fail").stdout
+    assert "No confident matches." in _run(tmp_path, "ask", "why did pruning fail").stderr
 
     gone = _run(tmp_path, "explain", "docs/pruning.md", check=False)
     assert gone.returncode != 0

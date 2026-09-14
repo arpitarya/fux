@@ -258,8 +258,27 @@ def test_adding_a_path_that_is_not_on_disk_writes_nothing(repo, monkeypatch):
 
 
 def test_adding_something_already_excluded_is_an_error(repo, monkeypatch):
-    """There is no un-exclude, so `add` may not pretend to be one."""
+    """There is no un-exclude, so `add` may not pretend to be one.
+
+    ⚠ **The exclusion is a `.fuxignore` pattern since W-165 fix 1**, and this
+    test is the reason that move needed a second guard. `add` checked only the
+    `!` lines in `dirs`; pointing `remove` at the other file would have turned
+    `add` into the un-exclude this refuses, and the command would have reported
+    success while `.fuxignore` went on beating the line it wrote.
+    """
     _remove(repo, monkeypatch, _args("docs/a.md"))
+    with pytest.raises(FuxError, match="no un-exclude"):
+        _add(repo, monkeypatch, _args("docs/a.md"))
+
+
+def test_adding_something_a_hand_written_ignore_covers_is_an_error(repo, monkeypatch):
+    """The same refusal for a pattern nothing in `dirs` knows about.
+
+    A person's own `.fuxignore` line is the common case, and it reaches `add`
+    through exactly the path a `fux remove`-written one does.
+    """
+    ignore = repo / ".fux" / ".fuxignore"
+    ignore.write_text("/docs/a.md\n", encoding="utf-8")
     with pytest.raises(FuxError, match="no un-exclude"):
         _add(repo, monkeypatch, _args("docs/a.md"))
 
@@ -326,11 +345,30 @@ def test_an_entry_with_its_own_line_is_removed_by_deleting_it(repo, monkeypatch,
 
 
 def test_a_covered_entry_is_removed_by_writing_an_exclusion(repo, monkeypatch, capsys):
+    """W-165 fix 1 — the exclusion lands in `.fuxignore`, and `dirs` is untouched.
+
+    SR-FUXIGNORE made that file the one place a path is kept out of the index and
+    called the write path *"a migration we now owe"*. `!` in `dirs` keeps being
+    READ (SR-DIR-LIST decision 2a) — it is no longer WRITTEN.
+    """
     _remove(repo, monkeypatch, _args("docs/a.md"))
-    assert "!docs/a.md" in _dirs(repo)
+    ignore = (repo / ".fux" / ".fuxignore").read_text(encoding="utf-8")
+    # Anchored with a leading `/`: a bare `docs/a.md` would be anchored by its
+    # own slash, but the rule has to hold for a top-level entry too, where a
+    # bare name means "at any depth" and would drop `archive/docs` as well.
+    assert "/docs/a.md" in ignore
+    assert "!" not in _dirs(repo)  # nothing new written next door
     assert "docs" in _dirs(repo)  # the ancestor stays listed
     out = capsys.readouterr().out
     assert "excluded" in out and "still listed" in out
+
+
+def test_a_removed_directory_is_written_with_a_trailing_slash(repo, monkeypatch):
+    """`build/` is a directory rule, so a *file* of that name later is untouched."""
+    (repo / "docs" / "generated").mkdir()
+    (repo / "docs" / "generated" / "x.md").write_text("# x\n", encoding="utf-8")
+    _remove(repo, monkeypatch, _args("docs/generated"))
+    assert "/docs/generated/" in (repo / ".fux" / ".fuxignore").read_text(encoding="utf-8")
 
 
 def test_removing_something_neither_listed_nor_covered_names_both_checks(repo, monkeypatch):
@@ -362,9 +400,30 @@ def test_removing_a_url_deletes_its_line_and_nothing_else(repo, monkeypatch):
 
 
 def test_removing_an_already_excluded_entry_says_so(repo, monkeypatch):
+    """Removing something already removed is an error, not a quiet second line.
+
+    The contract the `!`-line form kept, preserved across W-165 fix 1's change of
+    write target — a caller's exit code depends on it, and a no-op line would be
+    a `duplicate_warnings` conflict fux created itself.
+    """
     _remove(repo, monkeypatch, _args("docs/a.md"))
     with pytest.raises(FuxError, match="already excluded"):
         _remove(repo, monkeypatch, _args("docs/a.md"))
+
+
+def test_removing_something_a_surviving_bang_line_excludes_leaves_it_alone(repo, monkeypatch):
+    """A legacy `!` line is not migrated as a side effect of `fux remove`.
+
+    It already excludes, so there is nothing to do; rewriting it here would be a
+    migration performed by a verb asked to remove something already removed.
+    `fux doctor`'s `dirs exclusions migrated` row is where the move is offered.
+    """
+    dirs = repo / ".fux" / "sources" / "dirs"
+    dirs.write_text(dirs.read_text(encoding="utf-8") + "!docs/a.md\n", encoding="utf-8")
+    with pytest.raises(FuxError, match="already excluded"):
+        _remove(repo, monkeypatch, _args("docs/a.md"))
+    assert "!docs/a.md" in dirs.read_text(encoding="utf-8")  # left exactly as it was
+    assert not (repo / ".fux" / ".fuxignore").is_file()
 
 
 # -- --dry-run writes no bytes ----------------------------------------------

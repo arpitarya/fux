@@ -68,6 +68,19 @@ NARROWED = {
     # symbol until 2026-09-13, when it was deleted with the knob it served
     # (W-152); `superseded_ids` is what is left on both sides.
     "ingest/priors.mjs": "superseded_ids",
+    # `query/__init__.py` is a one-to-many twin and `run.mjs` is the narrow end
+    # of it: its own header says "twin of the PURE half", and `verbs/ask.mjs`,
+    # `verbs/find.mjs` and `verbs/answer.mjs` each declare the same Python file
+    # for the half they project. So a change to what a verb PRINTS moves the
+    # Python module without touching anything `runQuery` mirrors, and before
+    # 2026-09-14 that reported `run.mjs` as behind while the three files that
+    # actually carry the change sat updated beside it (W-165 fix 2).
+    #
+    # ⚠ **This narrows `run.mjs` and nothing else.** The three verb modules stay
+    # unnarrowed — the whole file is the twin there — so a ranking change in
+    # `run_query` is still caught by this row, and a printing change is still
+    # caught by theirs. Narrowing the verbs too would leave the pair unguarded.
+    "query/run.mjs": "run_query",
 }
 
 _DECLARED = re.compile(r"`?(src/fux/[A-Za-z0-9_/]+\.py)`?")

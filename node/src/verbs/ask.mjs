@@ -5,7 +5,7 @@
 import { runFused } from "../query/run.mjs";
 import { headingsFor } from "../query/headings.mjs";
 import { recordFor } from "../store/reader.mjs";
-import { declareArchived, declareConfidence } from "./find.mjs";
+import { declareArchived, declareConfidence, decline } from "./find.mjs";
 
 export const ARCHIVED_MARKER = "[archived]";
 export const SECTION_MARKER = "§";
@@ -42,7 +42,7 @@ export function runAsk(root, args) {
   }
 
   if (!rows.length) {
-    process.stdout.write("No confident matches.\n");
+    decline();
     declareConfidence(confidence, args.band);
     return 0;
   }

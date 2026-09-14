@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-08-18
 feature: the `fux ingest` pipeline — sources to committed records
-owns: [src/fux/ingest@6f0af99dd108, src/fux/ingest/priors.py@8ffcc632a4be]
+owns: [src/fux/ingest@9b541cf699e0, src/fux/ingest/priors.py@8ffcc632a4be]
 laws: [L2, L3, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: d2bac143dba1e095d0d00fd2d264a8b06c818724326c52831bf1351bdd84842d
+content_sha: 7254ea1e3d9029ba2d14b7e6eaa3d1e5f8c5c25e14218febe5621d1d49ef1ccb
 ---
 
 # SR-INGEST — how ingest works
@@ -639,10 +639,42 @@ rejected, is [SR-PII](0148_pii.md) decision 19b.
   one of them is not detected on a delta run. `fux ingest --full` is the
   complete check. This is a real narrowing of a "fails loudly" guarantee and is
   written down rather than hoped about.
-- **A new extraction rule does not reach an unchanged document** until that
-  document changes or `--full` runs. That is the carry-forward's defining
-  property and it outlives any particular field;
-  [`run.py`](../src/fux/ingest/run.py)'s module docstring says the same.
+- ✅ **A new extraction rule reaches an unchanged document — FIXED 2026-09-14
+  (W-166).** This bullet said it *"does not… until that document changes or
+  `--full` runs"*, and called that *"the carry-forward's defining property"*.
+
+  **It is the defining property for inputs the engine cannot see, and a constant
+  in fux's own tree is not one of those.** `extract.RULES_VERSION` is in the
+  reuse key — folded into `extract-config-digest` beside the two `[index]` caps,
+  because the three move together and for the same reason: something that decides
+  what extraction produces changed, so every document must be re-extracted.
+
+  ⚠ **Corpus-wide, unlike the decoder digests, and the asymmetry is deliberate.**
+  A decoder is bound to an extension, so the documents it read are identifiable.
+  These rules run on every document fux extracts, so there is no smaller set to
+  invalidate — which is exactly why it is a constant somebody bumps rather than
+  a sha of the module, whose every whitespace edit would charge a full
+  re-extraction. `tests/ingest/test_extract_rules_version.py` fails a changed
+  `extract.py` whose constant did not move, and separately asserts the constant
+  is actually IN the digest — without that second half a diligent author could
+  bump it forever and change nothing.
+
+  **What genuinely remains the carry-forward's property:** anything outside the
+  source tree and outside the committed inputs. A library upgrade under a
+  decoder, a locale, a Python version. Those have no digest and are not getting
+  one; `--full` is still the complete answer.
+- ✅ **A `url:` record is re-extracted from `.fux/acquired/` — NEW 2026-09-14
+  (W-166).** A policy change (PII, decoder or extraction rule) re-derives every
+  `url:` record whose bytes are retained, **offline**, through the one
+  `parse -> redact -> extract` path. Previously a `url:` record carried forward
+  verbatim whenever the fetch did not happen, which under `update=never` was
+  permanent — `--full` included. [SR-PII](0148_pii.md)'s own words for it:
+  *"the data needed to honour a new rule is present and unused."*
+
+  ⚠ **A URL with no retained blob is STRANDED, never dropped.** Its record is
+  left exactly as it is and named by `fux doctor`'s `url redaction current` row.
+  Deleting a document because a policy changed is the one thing a redaction
+  change must not do.
 - **`fux ingest --stop` and the runner takeover change nothing about what a run
   computes.** Delta-ness is decided by comparing content shas (decision 1b),
   **never by reading the dirty list** — the list is advisory, and a run that
@@ -683,8 +715,24 @@ rejected, is [SR-PII](0148_pii.md) decision 19b.
 - **A `not indexed` count of zero is now a meaningful statement** — every
   omission from the index was a file fux could not read, which is worth
   knowing and was previously unsayable.
-- **`0 shards written` can accompany a deletion**, since removing a shard is not
-  a write. True, and mildly under-informative when reading a run log.
+- ✅ **`0 shards written` can accompany a deletion**, since removing a shard is
+  not a write. **Fixed 2026-09-14 (W-165 fix 3): the summary counts deletions.**
+  `IngestReport.deleted_count` is the prior index's ids minus this run's, and the
+  line gains `, N records deleted` — **only when N > 0**, because a trailing
+  `, 0 records deleted` on every run is noise on the one line every verb ends
+  with, and the clause exists to make a removal visible.
+
+  ⚠ **This was filed as *"mildly under-informative"* and it is worse than that.**
+  `write_index` writes the WHOLE index, so a deletion is an **absence** — there
+  is no counter unless one is kept. Every other number on the line can sit still
+  while a document leaves: `0 changed`, `3 carried forward`, and `0 shards
+  written` whenever the departing document's shard still holds others whose bytes
+  did not move. The run that dropped a document and the run that did nothing
+  printed the same line.
+
+  **Zero when `--full` discharged a foreign index**, where `_existing_index`
+  returns `{}` and there is nothing to diff — the honest count, not an inferred
+  one.
 - **Re-ingest is safe to run on a hook**, which is what the maintenance plane
   depends on.
 - **`fux remove` became possible.** Decision 9 is its precondition: a verb that

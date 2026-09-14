@@ -7,10 +7,10 @@ description: Flat verbs in seven groups, one error boundary, three output modes.
 status: accepted
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@4f87294070d9, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@74ed15facf94, src/fux/progress.py@925dccc045ce]
+owns: [src/fux/cli.py@4f87294070d9, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@e15fc07dcf7e, src/fux/progress.py@925dccc045ce]
 laws: [L1, L4, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: ee942205a3b5413752ffb8f0da49f0f711bcbef5fd8b539174db282ae45ce9b5
+content_sha: a8b59243429a5f86ccfa7c07f39648a97fa75132f096ee7eef118190d9aa277c
 ---
 
 # SR-CLI — the command-line surface
@@ -284,9 +284,17 @@ not produced** — no `raise FuxError` site passes `exit_code=2`. It is kept in
 the contract for strict-mode hooks; a `2` appearing later narrows behaviour and
 is compatible. Do not treat `2` as live.
 
-**6. "No confident matches." is exit 0.** An honest decline is a successful
-answer, not a failure. Callers test the output, not the exit code, for
-emptiness — `--json` is the reliable way to do that.
+**6. "No confident matches." is exit 0, and goes to STDERR.** An honest decline
+is a successful answer, not a failure. Callers test the output, not the exit
+code, for emptiness — `--json` is the reliable way to do that.
+
+⚠ **The stream half was added 2026-09-14 (W-165 fix 2).** The exit code is
+unchanged and is the decision this clause was always about; what moved is where
+the sentence is written, so that `fux find`'s stdout carries paths and nothing
+else. Stated on all three query verbs at once — [SR-ASK](0103_ask.md) decision 7,
+[SR-FIND](0104_find.md) decision 6, [SR-ANSWER](0105_answer.md) decision 7 —
+because *"the same rule as `ask`"* is what those records say and a split would
+have made it false. **`fux graph` still writes it to stdout**, in both readers.
 
 **7. Off-by-default flags are decisions.** `--fast` opts into the derived
 accelerator and is off by default: the scan needs no build step and the
@@ -612,26 +620,43 @@ only by a listed ancestor is subtracted with the `!` the grammar already has:
 
 ```console
 $ fux remove handbook
-removed   handbook archived=false
+removed   handbook
   in .fux/sources/dirs
-ingested 3 docs (0 changed, 3 carried forward), 0 skipped, 0 shards written
-accelerator: 22 terms, 22 blocks, 23 postings (derived, not committed)
+ingested 2 docs (0 changed, 2 carried forward), 0 not indexed, 0 skipped, 0 shards written, 1 records deleted
+accelerator: 7 terms, 7 blocks, 9 postings (derived, not committed)
   dropped file:handbook/rota.md from the index
 # exit 0
 
 $ fux remove docs/onboarding.md
-excluded  !docs/onboarding.md
-  in .fux/sources/dirs — docs still listed; this path is subtracted from it
-ingested 2 docs (0 changed, 2 carried forward), 1 skipped, 0 shards written
-  skip docs/onboarding.md: excluded by !docs/onboarding.md
-accelerator: 15 terms, 15 blocks, 15 postings (derived, not committed)
+excluded  /docs/onboarding.md
+  in .fux/.fuxignore — docs still listed; this path is subtracted from it
+ingested 1 docs (0 changed, 1 carried forward), 1 not indexed, 0 skipped, 0 shards written, 1 records deleted
+  (1 already recorded in .fux/.fuxignore; 'fux ingest --list-skipped' lists them all)
+accelerator: 4 terms, 4 blocks, 4 postings (derived, not committed)
   dropped file:docs/onboarding.md from the index
 # exit 0
+
+$ fux remove docs/onboarding.md
+[stderr] error: docs/onboarding.md is already excluded by .fux/.fuxignore:1 (`/docs/onboarding.md`), which is left alone. Nothing further to remove — delete that pattern to put it back
+# exit 1
 
 $ fux remove elsewhere/nope.md
 [stderr] error: elsewhere/nope.md is not in <root>/.fux/sources/dirs: it has no line of its own, and no listed entry covers it. Both were checked. `fux add elsewhere/nope.md` would list it; nothing needs removing
 # exit 1
 ```
+
+⚠ **Three things in that transcript changed on 2026-09-14 and every one is
+captured from the shipped CLI, not written by hand** (W-165):
+
+1. **`excluded  /docs/onboarding.md` … `in .fux/.fuxignore`** — the exclusion
+   moved next door (SR-FUXIGNORE decision 5a), and so did the `in …` line, which
+   would otherwise point a reader at a file `git diff` shows unchanged. It is
+   anchored with a leading `/`, because a bare name in that grammar means *at any
+   depth*.
+2. **`, 1 records deleted`** — the summary counts what left (SR-INGEST
+   Consequences). Present only when the count is non-zero.
+3. **Removing it twice is exit 1.** Removing something already removed is an
+   error, which is the contract the `!`-line form kept.
 
 **`update` re-reads; `--check` writes nothing** and is offline for files:
 

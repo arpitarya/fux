@@ -144,11 +144,17 @@ def ingest_and_report(args_root, args, *, refresh_urls: bool = False, only_urls=
     # may. One number over both populations was 598 + 1 on this repo, which
     # reads as 599 problems. SR-INGEST decision 15.
     not_indexed, unreadable = partition(report.skipped)
+    # W-165 fix 3: the deletions clause appears only when there are deletions.
+    # A trailing `, 0 records deleted` on every run is noise on the one line
+    # every verb ends with, and the number it would carry is the number nobody
+    # needs — the clause is there to make a removal visible, and a removal that
+    # did not happen has nothing to make visible. SR-INGEST Consequences.
+    deleted = f", {report.deleted_count} records deleted" if report.deleted_count else ""
     print(
         f"ingested {report.doc_count} docs ({report.changed_count} changed, "
         f"{report.reused_count} carried forward), "
         f"{len(not_indexed)} not indexed, {len(unreadable)} skipped, "
-        f"{len(report.written_shards)} shards written"
+        f"{len(report.written_shards)} shards written{deleted}"
     )
     # W-88: every skip is still reported — the first time it is seen. A corpus
     # of any size makes the unconditional list a wall printed on every run, and

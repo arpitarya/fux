@@ -13,6 +13,7 @@ offline — it never touches the fetcher or the network.
 
 from __future__ import annotations
 
+import json
 import subprocess
 import sys
 from dataclasses import dataclass
@@ -294,6 +295,8 @@ def _layout(root: Path) -> list[Check]:
     checks.append(_tune_config_health(root))
     checks.append(_types_health(root))
     checks.append(_ignore_health(root))
+    checks.append(_dirs_exclusions_migrated(root))
+    checks.append(_stale_redaction(root))
     checks.append(_fetcher_capabilities(root))
     checks.append(_accelerator(root))
     checks.append(_node_reader(root))
@@ -1121,6 +1124,91 @@ def _ignore_health(root: Path) -> Check:
         "fuxignore usable",
         True,
         f"{fuxignore.IGNORE_FILE}: {active} ignore rule(s), {len(rules) - active} re-include(s)",
+    )
+
+
+def _stale_redaction(root: Path) -> Check:
+    """`url:` documents the last policy change could not reach (W-166 DoD 3).
+
+    A PII, decoder or extraction-rule change re-derives every `url:` record whose
+    bytes are retained in `.fux/acquired/`. One with no retained blob cannot be
+    re-derived offline at all, so **its record is left exactly as it is** —
+    dropping a document because a policy changed is the one thing a redaction
+    change must never do — and it is named here instead.
+
+    ⚠ **`warn`, and the reason is worth stating.** The record is not wrong about
+    its source; it is extracted under rules that have since moved. The fix needs
+    the network (`fux update`), which `doctor` is not going to take on a user's
+    behalf, and failing the command for a condition only a fetch can clear would
+    make `doctor` red until someone goes online.
+
+    ⚠ **Derived state, so it does not travel with a cloned index** — see
+    `run._record_stale_redaction` for what that trade bought. A fresh clone reads
+    clean here until its own ingest re-derives the fact.
+
+    **ASCII only** - it is printed, and printed text reaches a Windows console.
+    """
+    from .ingest.run import STALE_REDACTION_FILE
+    from .store import fuxdir
+
+    path = fuxdir.fux_dir(root) / "runtime" / STALE_REDACTION_FILE
+    try:
+        stranded = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        stranded = []
+    if not isinstance(stranded, list) or not stranded:
+        return Check(
+            "url redaction current",
+            True,
+            "every url record was re-extracted under the current rules, or none needed to be",
+        )
+    shown = ", ".join(sorted(str(s) for s in stranded)[:3])
+    more = f" and {len(stranded) - 3} more" if len(stranded) > 3 else ""
+    return Check(
+        "url redaction current",
+        False,
+        f"{len(stranded)} url document(s) still hold text extracted under the OLD rules "
+        f"- no retained bytes to re-extract from: {shown}{more}. "
+        "`fux update` fetches them; `keep=true` on the line retains the bytes so the next "
+        "policy change can reach them offline",
+        level="warn",
+    )
+
+
+def _dirs_exclusions_migrated(root: Path) -> Check:
+    """`!` lines still in `.fux/sources/dirs`, and the one-line move for each.
+
+    **`fux remove` stopped writing them on 2026-09-14** (W-165 fix 1): the
+    exclusion goes to `.fux/.fuxignore`, which SR-FUXIGNORE made the one place a
+    path is kept out of the index. The `!` lines already written keep being read
+    — SR-DIR-LIST decision 2a, and breaking them would be a silent re-inclusion,
+    which is the worse direction — so this is a `warn` and never an error.
+
+    ⚠ **Not the same finding as `_ignore_health`'s duplicate.** That one fires
+    when a pattern is in *both* files and is about the two spellings drifting
+    apart. This fires on *every* survivor, duplicated or not, because the
+    migration is owed for the ones nothing duplicates too — and those are the
+    ones no other check would ever mention.
+
+    **ASCII only** - it is printed, and printed text reaches a Windows console.
+    """
+    from .ingest import fuxignore
+
+    try:
+        notes = fuxignore.dirs_exclusion_notes(root, dirs_file=DEFAULT_DIRS_FILE)
+    except (FuxError, OSError) as exc:
+        return Check("dirs exclusions migrated", False, f"{DEFAULT_DIRS_FILE}: {exc}", level="warn")
+    if not notes:
+        return Check(
+            "dirs exclusions migrated",
+            True,
+            f"no `!` lines in {DEFAULT_DIRS_FILE} - exclusions live in {fuxignore.IGNORE_FILE}",
+        )
+    return Check(
+        "dirs exclusions migrated",
+        False,
+        f"{len(notes)} `!` line(s) left in {DEFAULT_DIRS_FILE}. " + " ".join(notes),
+        level="warn",
     )
 
 

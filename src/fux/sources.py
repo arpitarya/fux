@@ -79,7 +79,7 @@ from .config import (
     load,
 )
 from .errors import FuxError
-from .ingest import sourcelist, typesfile
+from .ingest import fuxignore, sourcelist, typesfile
 
 # -- which list, and where it lives ----------------------------------------
 
@@ -415,7 +415,9 @@ def _covering_ancestor(value: str, entries: list[sourcelist.Entry]) -> str | Non
     return None
 
 
-def remove_or_exclude(path: Path, spec: sourcelist.ListSpec, value: str) -> tuple[str, str, str]:
+def remove_or_exclude(
+    root: Path, path: Path, spec: sourcelist.ListSpec, value: str
+) -> tuple[str, str, str]:
     """Take `value` out of the corpus. Returns `(action, line, detail)`.
 
     **Two ways in, so two ways out** (W-63 decision 4). A path with its own
@@ -430,6 +432,13 @@ def remove_or_exclude(path: Path, spec: sourcelist.ListSpec, value: str) -> tupl
     The verb says which branch it took, because "removed" and "excluded" are
     different facts about the file and a reader of the diff needs to know
     which one they are looking at.
+
+    ⚠ **The exclusion is written into `.fux/.fuxignore`, not as a `!` line
+    here** (W-165 fix 1). `!` in `dirs` keeps being *read* — SR-DIR-LIST
+    decision 2a, and every line anyone already wrote goes on working — but
+    `.fuxignore` is where exclusion lives (SR-FUXIGNORE), and a verb that kept
+    writing into the older of two spellings was the migration that record
+    called *"a migration we now owe"*. `fux doctor` names the survivors.
     """
     if spec is sourcelist.TYPES:
         typesfile.check_legacy(_types_root(path))
@@ -452,9 +461,16 @@ def remove_or_exclude(path: Path, spec: sourcelist.ListSpec, value: str) -> tupl
         )
 
     if any(e.value == value and e.exclude for e in entries):
+        # **The `!` line is left exactly as it is.** It already excludes, so
+        # there is nothing to do; rewriting it into `.fuxignore` here would be
+        # a migration performed as a side effect of a verb that was asked to
+        # remove something already removed. `doctor` is where the move is
+        # offered, at a moment the reader chose (W-165 fix 1).
         raise FuxError(
-            f"{value} is already excluded in {path}. `!` subtracts and nothing adds back, so "
-            "there is nothing further to remove — delete the `!` line to put it back"
+            f"{value} is already excluded by a `!` line in {path}, which is left alone. "
+            "`!` subtracts there and nothing adds back, so there is nothing further to "
+            f"remove — delete that line to put it back. Exclusions are written to "
+            f"{fuxignore.IGNORE_FILE} now; `fux doctor` names the `!` lines still here"
         )
 
     ancestor = _covering_ancestor(value, entries)
@@ -464,10 +480,7 @@ def remove_or_exclude(path: Path, spec: sourcelist.ListSpec, value: str) -> tupl
             f"Both were checked. `fux add {value}` would list it; nothing needs removing"
         )
 
-    lines = (path.read_text(encoding="utf-8") if path.is_file() else "").split("\n")
-    line = f"!{value}"
-    lines.insert(_insert_at(lines, line), line)
-    _write(path, lines)
+    line = fuxignore.add_exclusion(root, value, is_dir=(root / value).is_dir())
     return "excluded", line, f"{ancestor} still listed; this path is subtracted from it"
 
 
@@ -622,6 +635,23 @@ def cmd_add(args) -> int:
             f"{entry} is excluded in {_rel(root, path)}. There is no un-exclude by design — "
             f"`!` subtracts and nothing adds back, so delete the `!{entry}` line to index it again"
         )
+    # **The same refusal for the file `remove` writes to now** (W-165 fix 1).
+    # Without this, moving the write target would have quietly turned `add`
+    # into the un-exclude the line above exists to refuse: `fux remove docs/a.md`
+    # then `fux add docs/a.md` would have written a line that the `.fuxignore`
+    # pattern goes on beating, so the command would report success and index
+    # nothing. Refusing is the loud direction, and it names the file to edit.
+    if spec is sourcelist.DIRS:
+        verdict = fuxignore.read(root).decide(
+            entry, is_dir=(root / entry).is_dir(), hand_only=True
+        )
+        if verdict.ignored and verdict.rule is not None:
+            raise FuxError(
+                f"{entry} is excluded by {fuxignore.IGNORE_FILE}:{verdict.rule.lineno} "
+                f"(`{verdict.rule.raw}`), which is consulted first and would keep beating any "
+                f"line written here. There is no un-exclude by design — delete that pattern, or "
+                f"write `!{entry}` below it, to index it again"
+            )
     # A line that breaks the next ingest is worse than a refused command:
     # `walk_sources` raises on a configured source that is not on disk, so a
     # typo'd `add` would otherwise take the whole corpus down until someone
@@ -804,16 +834,37 @@ def cmd_remove(args) -> int:
                     f"{entry} is not in {_rel(root, path)}: no line of its own, and no listed "
                     "entry covers it. Both were checked"
                 )
-            print(f"would exclude !{entry} — covered by {ancestor}, which stays listed")
+            if any(e.value == entry and e.exclude for e in entries):
+                raise FuxError(
+                    f"{entry} is already excluded by a `!` line in {_rel(root, path)}, which "
+                    "would be left alone. Delete that line to put it back"
+                )
+            is_dir = (root / entry).is_dir()
+            pattern = fuxignore.exclusion_pattern(entry, is_dir=is_dir)
+            covering = fuxignore.read(root).decide(entry, is_dir=is_dir, hand_only=True)
+            if covering.ignored and covering.rule is not None:
+                print(
+                    f"would write nothing — `{covering.rule.raw}` at "
+                    f"{fuxignore.IGNORE_FILE}:{covering.rule.lineno} already excludes {entry}"
+                )
+                return 0
+            print(f"would exclude {pattern} — covered by {ancestor}, which stays listed")
+            print(f"  in {fuxignore.IGNORE_FILE}, leaving {_rel(root, path)} untouched")
+            return 0
         print(f"  in {_rel(root, path)}")
         return 0
 
     before = _index_ids(root) if not getattr(args, "no_ingest", False) else set()
     before_edges = _inbound_edges(root) if before else {}
 
-    action, line, detail = remove_or_exclude(path, spec, entry)
+    action, line, detail = remove_or_exclude(root, path, spec, entry)
     print(f"{action:9s} {line}")
-    print(f"  in {_rel(root, path)}" + (f" — {detail}" if detail else ""))
+    # **The file the line was actually written to**, which stopped being one
+    # file on 2026-09-14: a deletion edits the source list, an exclusion writes
+    # `.fux/.fuxignore` (W-165 fix 1). Naming the list either way would point a
+    # reader at a file `git diff` shows unchanged.
+    written = _rel(root, path) if action == "removed" else fuxignore.IGNORE_FILE
+    print(f"  in {written}" + (f" — {detail}" if detail else ""))
     _drop_acquired(root, spec, entry)
 
     if getattr(args, "no_ingest", False):

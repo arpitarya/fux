@@ -10,7 +10,7 @@ feature: what happens once a document is declared archived — the record proper
 owns: [tools/archived-signal-eval@30fb75fa7476]
 laws: [L3, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 0b4ec44a64745b2380f5c15b6c94eee0383db13438259d6373e935ff0253653b
+content_sha: 934d2ba874b6a53c57ca8a430e1cae804eebf10b8b99a3718a4afadcad2cf1de
 ---
 
 # SR-ARCHIVED-CONTENT — what "archived" does, once a document carries it
@@ -375,6 +375,22 @@ it was. ⚠ **An `archived=true` line and an `update=never` line are independent
 pinning a retired page is legal and means what both words mean.
 
 ### Consequences
+
+- **A re-derived `url:` record keeps its archived declaration** (2026-09-14,
+  W-166). A policy change now re-extracts a retained `url:` record from
+  `.fux/acquired/` instead of carrying it forward, and that path builds the
+  record through `_with_archived` like any other fresh one — so `archived=true`
+  on the line still reaches it without a fetch, which is decision 1a's whole
+  point. ⚠ **A STRANDED record — no retained bytes — is left untouched**, so its
+  archived flag is as correct as it ever was: nothing about it is re-derived,
+  including this.
+- **The archived note's stream is now the rule rather than the exception**
+  (2026-09-14, W-165 fix 2). Decision 3's note has always gone to stderr, and
+  the reason given — a `[archived]` prefix on stdout would be read as part of a
+  filename — was the same argument that finally moved `No confident matches.`
+  there. **Nothing here changed**; what changed is that the verb no longer
+  writes prose to stdout at all, so this note is no longer the odd one out and a
+  caller reading stdout gets locators or nothing.
 
 - ⚠ **`is_archived_loc()` has exactly one definition**, used by both the ingest
   stamp and the query-time marker. **Two copies of that predicate is a

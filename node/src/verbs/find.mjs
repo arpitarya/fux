@@ -109,6 +109,21 @@ export function declareConfidence(block, show) {
   process.stderr.write((block.line() || `confidence: ${block.band}.`) + "\n");
 }
 
+/** The honest decline, shared by `ask`, `find` and `answer`. **stderr since
+ *  2026-09-14** (W-165 fix 2): `find` exists to be piped, so a prose sentence on
+ *  the stream that otherwise holds nothing but paths turns an empty result into
+ *  one fake path. Exit code, wording and `--json` are all unchanged — the fix is
+ *  about the stream and nothing else. Digest-equal with the Python reader's
+ *  `_decline`. ASCII only.
+ *
+ *  `fux graph` still writes it to stdout in both readers; W-165's scope is the
+ *  three query verbs and widening it silently would be an unrecorded change. */
+export const NO_MATCHES = "No confident matches.";
+
+export function decline() {
+  process.stderr.write(NO_MATCHES + "\n");
+}
+
 export function runFind(root, args) {
   const query = args._.join(" ");
   const queries = [query, ...(args.q || [])];
@@ -134,7 +149,7 @@ export function runFind(root, args) {
   }
 
   if (!results.length) {
-    process.stdout.write("No confident matches.\n");
+    decline();
     declareConfidence(confidence, args.band);
     return 0;
   }
