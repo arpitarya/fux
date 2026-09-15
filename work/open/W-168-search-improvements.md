@@ -20,6 +20,54 @@ repeated). **W-156 ruled 2026-09-14:** every step is a ranking change and lands 
 the single-corpus sentence is gone ([SR-LAW-0](../../records/0002_LAW-0-authority.md)
 decision 2a). Nothing agent-side waits.
 
+## 🔴 Found 2026-09-15, before step 1 was built — two things the proposal's cost column is wrong about
+
+**Step 1 was scoped and not started.** Both findings below are about *step 1 as
+specified*, and the second one reaches step 5 as well. Neither is a reason to
+drop either step; both are reasons the proposal's *"cost: small — edges are
+already extracted"* is not true as written, and the second needs a ruling
+before any of it is built.
+
+**1 · Link TEXT is not extracted today, and edges do not carry it.**
+[`ingest/edges.py`](../../src/fux/ingest/edges.py)'s `_LINK_RE` is
+`\[[^\]]*\]\(([^)\s]+)…\)` — the anchor text sits in a **non-capturing**
+class and is discarded; only the target is kept. `DocScan.links` is a list of
+targets, and `Edge` has `src`, `kind`, `dst`, `grade` and no text. So *"edges
+are already extracted"* is true and *"the words other documents use when
+linking"* are **not extracted anywhere**. `DocScan.links` has to change shape,
+and it has callers.
+
+**2 · 🔴 An anchor field makes a document's index bytes depend on OTHER
+documents, and fux's re-index is per-document.** This is the one that needs a
+decision rather than an implementation.
+
+[`maintain/runner.py`](../../src/fux/maintain/runner.py) drains a **dirty list
+of changed paths** and re-indexes those. If `A`'s `anchor` field is built from
+the link text of every document that points at `A`, then **editing `B` changes
+`A`'s committed bytes while only `B` is dirty** — so a full `fux ingest` and an
+incremental re-index produce **different indexes from the same sources**.
+
+⚠ **That is [L3](../../records/0005_LAW-3-deterministic.md) failing on the
+incremental path only, which is the worst shape for it**: the full-ingest path
+stays byte-reproducible, so every test and every CI check that rebuilds from
+scratch passes, and the drift appears only in a working repository that has
+been edited over time. **Nothing in this repo would catch it.**
+
+**The fix is not hard and it is not free:** a changed document must dirty the
+**targets of its own out-edges** as well as itself. Bounded (a document links
+to few things), but it is a change to what *changed* means, it belongs to
+[SR-MAINTAIN]'s re-index contract rather than to a ranking proposal, and it
+wants its own test — *edit a linker, re-index incrementally, assert the index
+equals a full ingest*, which is the assertion that does not exist today for any
+field.
+
+**Step 5 inherits this**, verbatim: *"the successor inherits the target's
+anchor text"* is the same cross-document dependency.
+
+**So step 1's real order is:** the incremental-invalidation ruling → link-text
+capture → the field → the golden question → the pre-registration → measure.
+The first of those is Arpit's, and nothing below starts before it.
+
 ## Definition of done — per step, in this order
 
 | step | idea | golden prerequisite (Codex's hands where the sealed key is involved) |
