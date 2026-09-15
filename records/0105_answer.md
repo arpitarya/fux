@@ -10,7 +10,7 @@ feature: "`fux answer` — one answer, its footing stated, and the report of wha
 owns: []
 laws: [L1, L2, L3]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 4350a4fba588bdf592b5639238ff7e4ac4d2c240c4291750bce88bea8f98ffc0
+content_sha: 538673e54011891076fbf471e27271b576161db2675dd2e3453cedeff0c6e662
 ---
 
 # SR-ANSWER — the `answer` verb
@@ -422,6 +422,28 @@ unchanged.
 owning record was *touched*, never that it was read (CLAUDE.md §Law zero), so a
 co-owner's file changing under this one is exactly the case where a reader needs
 to be told *"not yours"* in writing.
+**14. `answer` READS `ask`, both tiers — and the band is Tier A's alone**
+(W-161; Arpit overrode the draft that had it read `lexical`).
+
+A Tier B document is fetched and passage-scored on the bytes like any other
+candidate. **That is the point rather than a concession:** Tier B's weakness is
+that no query word matched the *index*, and the refer plane reads the document
+itself — so a related document with nothing in it survives nowhere, and one
+that genuinely answers is found by the same re-score that judges every other
+candidate.
+
+**14a. Tier A is offered to the refer plane first, and the order is the
+tie-break.** `refer()` scores on fetched bytes and picks a winner; when it
+cannot separate two candidates, the list order decides, and **a document the
+words found should win that tie against one only a link reached.**
+
+**14b. The band does not move, and that is structural rather than careful.**
+`_fill_confidence` runs inside `run_query` over the Tier A list; the combined
+candidate list is assembled afterwards and reaches only the refer plane. **A
+linked document cannot raise how much the index believes itself** — there is no
+code path by which it could, which is a stronger guarantee than a rule.
+
+
 ### Consequences
 
 - **A `fux correct --pin` reaches `answer`, not only `ask`** (2026-09-14,

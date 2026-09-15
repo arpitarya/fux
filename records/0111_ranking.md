@@ -7,10 +7,10 @@ description: BM25F over five fields, weight-then-saturate once, with one scorer 
 status: accepted
 date: 2026-08-18
 feature: scoring, ordering, and the analyzer they share with ingest
-owns: [src/fux/query/rank.py@a8855cc96b64, src/fux/query/bm25f.py@60ec353f1d84, src/fux/query/tokenize.py@1d8ff4a42048, src/fux/query/analyzer.py@4a6a03793628, src/fux/query/stem.py@728155482c94]
+owns: [src/fux/query/rank.py@1ce3ee8b94c5, src/fux/query/bm25f.py@60ec353f1d84, src/fux/query/tokenize.py@1d8ff4a42048, src/fux/query/analyzer.py@4a6a03793628, src/fux/query/stem.py@728155482c94]
 laws: [L1, L3]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: be0c239644c15db841c5b3f2faf2f62b3c8e7080ec92c25e97a4917e0abbad2c
+content_sha: 82231a8d0663337a44856f55c8beb04dc43fb0d82b81d7d4859ce0a8fd4d100e
 ---
 
 # SR-RANKING — how documents are scored and ordered
@@ -405,6 +405,28 @@ un-mark it. `false` is a claim, not an absence.
 **The differential law holds** — both paths reach `rank()` with the same record
 dicts, and the key reads only fields both generators already carry
 (`superseded`, `mtime`, `loc`).
+
+**A hit carries `boosted` and `route`, and neither is in the sort key**
+(W-161).
+
+`rank()` sets neither: the graph tier is composed by `run_query` after the
+lexical core is complete, exactly as `pinned` is. What they explain is the one
+list fux prints that **may not be monotone in `score`** — under the boosted
+tier a row can outrank a higher-scoring one, because the order is
+`RRF(lexical rank, PPR rank)` while the number printed is still BM25F.
+
+🔴 **A caller that re-sorts `results` by `score` is discarding the graph's
+contribution and re-deriving the lexical order.** That is a legitimate thing to
+want — it is what `fux lexical` returns — but it should be asked for by name
+rather than arrived at by sorting. `route` names exactly the rows such a sort
+would move.
+
+`boosted` marks a row the walk **reached**, not one that moved: a walked
+document already at #1 is still the reason #1 is #1, and marking only movers
+would hide the tier's effect exactly where it agreed with the words — the case
+a reader most needs to see, because it is the one that looks like nothing
+happened. [SR-ASK](0103_ask.md) decision 13 carries the composition.
+
 
 ### Consequences
 

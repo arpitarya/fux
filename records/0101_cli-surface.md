@@ -7,10 +7,10 @@ description: Flat verbs in seven groups, one error boundary, three output modes.
 status: accepted
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@6b884c27a3da, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@c6e607249ea0, src/fux/progress.py@925dccc045ce]
+owns: [src/fux/cli.py@c78bc5296e7d, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@c6e607249ea0, src/fux/progress.py@925dccc045ce]
 laws: [L1, L4, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: ada201b05e461a71c5f47876832d6e51d62ed0946c7173e2d03e86a15492f8d1
+content_sha: ba7b3de0adf8750e1e3d9f6bcee0f441605b3c13cd225171e88ea4c693cb484c
 ---
 
 # SR-CLI — the command-line surface
@@ -1042,6 +1042,35 @@ on the answer: parse a table meant for a person.
   `hooks`: the empty tuple is the declaration that this verb is shaped by
   [SR-OUTPUT](0143_output-defaults.md), and an absent entry would leave
   `--json` unresolvable from `[cli.json]`.
+
+**14. `ask` and `lexical` part on ONE ARGUMENT, and `--related` is a pair with
+no config key behind it** (W-161).
+
+**14a. The freeze survived the split, and this is how.** Decision 12 froze
+`fux lexical` — *a future component added to the lexical core is a new verb or
+a tunable, never a change to this one*. W-161 added the graph tier to `ask`, and
+the two verbs now differ. They are still **one body**: `_ask_shaped(args, *,
+compose)`, which forces both `[graph] ask_*` booleans off when `compose` is
+false. **Forcing rather than trusting the caller is the load-bearing half** — a
+repository whose `tune.toml` turns the tier on must not be able to make the
+frozen baseline verb stop being a baseline, and every ranking verdict in this
+repository cites `lexical` as its control.
+
+**14b. `--related` / `--no-related` is a pair, and is NOT backed by
+`.fux/output.toml`.** A pair for `--sections`' reason
+([SR-OUTPUT](0143_output-defaults.md) decision 10): the tier is on by default,
+so a bare `store_true` could only ever turn it on again. **Why it has no key in
+that file is [SR-OUTPUT](0143_output-defaults.md) decision 23**, which owns the
+question and is not restated here. What this record carries is the flag's own
+resolution: `None` means *the tune decides* — `[graph] ask_related` — which is
+`--no-tune`'s own shape.
+
+⚠ **The flag reaches `lexical` too and is inert there.** `_ask_flags` is the
+single source of both parsers precisely so they cannot drift (decision 12), and
+`lexical` has no tier by definition. Giving `lexical` its own parser to remove a
+flag that already does nothing would reintroduce the drift the factory exists to
+prevent.
+
 
 ### Consequences
 

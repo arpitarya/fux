@@ -13,7 +13,7 @@ feature: configurable output defaults
 owns: [src/fux/output_config.py@d8c53dfbf3c9]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: e9b6b04e737a479e5cd0c950b2bce42485b9155f63f43f3e97990d2b1545f2b0
+content_sha: 84babb3ecd17d42fc6c4ac8113878d67a8ae47ca26d3d085275dbf7d4f7aaf6d
 ---
 
 # SR-OUTPUT — output defaults are configurable, in a third file
@@ -696,6 +696,39 @@ process whose premise is staying resident.
 `BUILT_IN` equal across the two runtimes. The differential arm cannot: a
 drifted **refusal** produces an error on one side and an answer on the other,
 which a harness reports as a crash rather than as a finding.
+
+**23. 🔴 `related` IS NOT A KEY IN THIS FILE, and the refusal is a decision
+rather than an omission** (W-161, 2026-09-14).
+
+W-161 gave `fux ask` a labelled `related` tier with a `--related` /
+`--no-related` flag pair. Every other flag pair on `ask` — `--sections` above
+all — has a key here. **This one does not, for two reasons, and either alone
+would be enough.**
+
+**23a. `[graph] ask_related` already states it, and two statements could
+disagree.** [SR-TUNE](0135_tuning.md) decision 16's `ask_related` answers *do I
+want the related tier in this repository?* A key here would answer the same
+question in a second file, and the two could disagree while both looked
+correct — the restatement [SR-LAW-0](0002_LAW-0-authority.md) decision 1
+forbids, arriving through the door this file is most exposed to. ⚠ **The
+`[cli]`/`[graph]` split does not rescue it.** The honest reading of *compute it
+but do not show it* is that nobody wants it: a tier a reader never sees is
+latency and nothing else.
+
+**23b. Decision 19 makes every new key a BREAKING CHANGE to every committed
+file, and that price buys nothing here.** An unset key is a hard error, by
+design. So adding `related` would make `fux ask` **exit 1 in every repository
+whose `.fux/output.toml` predates this version** — the precise failure decision
+19's own ⚠ note describes — in order to ship a knob duplicating one the consumer
+already has. Measured, not predicted: it was added, `test_apply_output_defaults`
+went red on a fixture, and this repository's own `ask` refused until the key was
+written in by hand.
+
+⚠ **The general rule this makes explicit, and it was implicit before:** *a new
+key in this file costs every existing consumer an edit.* That is affordable for
+a genuinely new rendering question and never affordable for a second spelling of
+an existing one. **The test to apply is decision 19's own: is there a state a
+reader could want that no current key can express?** For `related` there is not.
 
 ### Consequences
 

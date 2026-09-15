@@ -7,10 +7,10 @@ description: "The ref/tag/code edges ingest already extracts become a queryable 
 status: accepted
 date: 2026-08-20
 feature: the graph lane — three relational verbs, a derived plane, and a lazy walk
-owns: [src/fux/graph@fe0a9b72ad39, tools/graph-bench@9c330ea14b42]
+owns: [src/fux/graph@a56b22729e7c, tools/graph-bench@9c330ea14b42]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: cae94c5b768a1601787aa0286da5684e367c62295c806dbe1ee7f0334b99b433
+content_sha: 0816fe0bd38ea5a2ab6c862133cb9c26e5874088e47cf50c841f6d328705b41f
 ---
 
 # SR-GRAPH — the graph lane
@@ -320,6 +320,58 @@ decision above names). **Capping the argument, warning above a threshold, or
 bounding the walk's work are three different answers** with different costs to
 a small graph, and picking one silently inside a defect fix would be the wrong
 place to decide it. Filed in `work/OPEN-WORK.md`.
+
+**16. 🔴 *`ask` IS UNTOUCHED* IS SUPERSEDED. The graph plane reaches `ask`**
+(W-161; Arpit, 2026-09-13).
+
+This record pinned *the graph lane does not move `ask`* with
+`tests_e2e/test_relational.py::test_the_graph_lane_does_not_move_ask`, because
+at the time the walk's value was unproven and `ask` was the reference surface.
+**The person who may reopen it did.** The rule is void; the test was inverted
+rather than deleted — see 16a — and the composition is
+[SR-ASK](0103_ask.md) decision 13.
+
+**16a. What replaced the pinning test, and why the inversion kept a half of
+it.** The old test asserted two things at once and only one of them died. *The
+graph plane must not reach `ask`* is now false by design; **the accelerator and
+the scan must return the same bytes** was always the real content and still
+holds — the tier runs after both candidate paths and reads the same derived
+plane, so a divergence there means the tier is reading something path-dependent.
+Deleting the test would have lost that, and the three composition tests beside
+it do not cover it: they compare verbs, not candidate paths.
+
+**16b. `fux graph "<q>"` seeds from `lexical`, and after W-161 that has to be
+written in code.** Decision 13 defines the query form as `--seed` over the
+query's top-k. While `ask` and `lexical` were one body, calling `run_query` gave
+that for free; now `ask` composes a tier, and seeding the walk from a list the
+walk already re-ordered would make `fux graph "<q>"` **a walk over its own
+output** — the seeds would move when the tier moved, `graph "<q>"` would stop
+equalling `graph --seed <lexical top-k>`, and the orientation verb would become
+path-dependent with nothing saying so. Both readers force the tier off for the
+seed query.
+
+**16c. The `ask` walk and the `graph` walk are DIFFERENT WALKS, deliberately.**
+Decision 14 exposed three parameters for exactly this moment, and here is what
+each caller sets:
+
+| | `fux graph` (orientation) | `ask`'s tier (answering) |
+|---|---|---|
+| `kinds` | `ALL_KINDS` | `ref` only — a `tag` edge makes the graph bipartite and one shared tag is a 200-document hub |
+| `link_idf_on` | `False` | `True` — a link everybody makes says little about the document it comes from |
+| `max_hops` | `None` | `1` — for orientation two hops is right; for an answer a second-hop document is a guess about a guess |
+
+⚠ **So a composition test may not compare `ask`'s `related` against bare
+`fux graph` output.** It has to pass `--kinds ref --link-idf --max-hops 1`, or
+it is comparing two different walks and calling the difference a failure.
+
+**16d. A `related` row's route names only an edge kind the walk was allowed to
+follow.** Found on the first real run against this repository: with
+`ask_kinds = "ref"` the route read `#2 via code`, crediting an edge the walk was
+forbidden to follow and had not followed — the walk had arrived through a `ref`
+edge and a `code` edge merely also existed between the same two documents.
+**A route a reader cannot verify is worse than no route**, and this tier's whole
+claim to honesty is that its provenance can be checked.
+
 
 ### Consequences
 

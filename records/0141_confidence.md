@@ -11,7 +11,7 @@ feature: the confidence plane
 owns: [src/fux/query/confidence.py@664d92120a9b, tests/test_confidence_floor_off.py@f8e18c079a6e]
 laws: [L1, L3, L4]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 468ffe01bd10af7c62f0b9066aa05ff40430a3171e93a8073f89051e02df8d66
+content_sha: dc72bc7d180b9c709c5bd873119aebb2d5c59121c13a6dffcab1254a69761183
 ---
 
 # SR-CONFIDENCE — how much the index believes its own answer
@@ -582,6 +582,38 @@ unchanged.** This row is exactly the case
 deliberately NOT narrowed yet: this record's reach in that module spans nine
 functions including `cmd_ask` and `run_query`, so a short list would switch the
 gate off silently — worse than the line you are reading.
+
+**15. THE GRAPH HALF OF DECISION 4'S GUARD, which §Consequences named as owed
+and W-161 owes** — **a graph-lifted #1 may LOWER the band and may never raise
+it.**
+
+Decision 4 stops an expansion term raising a document's own band by never
+handing `_fill_confidence` the expansion. **The graph tier needs an active
+guard instead, because it adds no terms** — it changes *which document the band
+is describing*.
+
+`rank()` computes `top_doc_hashes` from the document it ranked first. When the
+walk promotes a different one, that field describes a document the reader was
+never shown. Both obvious answers are wrong on their own:
+
+| | why it fails |
+|---|---|
+| leave it | the band describes a document nobody saw |
+| recompute it for the shown document | a document the **links** lifted arrives with a higher `doc_coverage` than the words ever gave it — which is precisely a graph-lifted document raising its own band |
+
+**So: recompute for the shown document, and keep the lexical #1's value
+whenever the shown document's is higher.** The band then describes the answer on
+the page, and the tier can only ever cost confidence.
+
+⚠ **Weighted by `idf`, not counted.** `doc_coverage` is an idf-weighted sum, so
+a count comparison would let three common terms outrank one rare one and
+**reverse the guard on exactly the queries where it matters.** `query/__init__.py::_band_guard`,
+and its Node twin `run.mjs::bandGuard`.
+
+⚠ **`fux lexical --band` and `fux ask --band` now legitimately differ**, which
+§Consequences predicted. The difference is informative: the band describes the
+answer the reader was shown, and the two verbs no longer show the same answer.
+
 
 ### Consequences
 

@@ -179,7 +179,12 @@ function seedsOf(root, args, records, plane, tune) {
       "`fux graph --seed docs/a.md` walks from a document you name",
     );
   }
-  const { results } = runQuery(root, query, tune.seedDepth, { tune });
+  // 🔴 **The seed query is `lexical`, NOT `ask`** — `compose: false`. After
+  // W-161 `ask` composes a graph tier, and seeding the walk from a list the
+  // walk already re-ordered would make `fux graph "<q>"` a walk over its own
+  // output: the seeds would move when the tier moved, and the orientation verb
+  // would quietly become path-dependent. SR-GRAPH decision 13.
+  const { results } = runQuery(root, query, tune.seedDepth, { tune, compose: false });
   return [
     results.map((r) => ({ path: locOf(r.id), id: r.id, role: "seed", score: r.score })),
     results.map((r) => r.id),

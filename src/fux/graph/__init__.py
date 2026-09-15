@@ -248,12 +248,23 @@ def _seeds_of(root: Path, args, plane, tune):
 
     # Scan by default, `--fast` opts into the accelerator for the seed query
     # — same choice and same mutually-exclusive `--scan` as `ask` (SR-ASK).
+    #
+    # 🔴 **The seed query is `lexical`, NOT `ask`, and after W-161 that has to
+    # be said in code rather than inherited.** SR-GRAPH decision 13 defines the
+    # query form as `--seed` over the query's top-k; while `ask` and `lexical`
+    # were one body, calling `run_query` gave that for free. Now `ask` composes
+    # a graph tier, and seeding the walk from a list the walk already re-ordered
+    # would make `fux graph "<q>"` a walk over its own output — the seeds would
+    # move when the tier moved, `graph "<q>" != graph --seed <lexical top-k>`,
+    # and the orientation verb would quietly become path-dependent.
+    import dataclasses
+
     results, _ = run_query(
         root,
         args.query,
         tune.seed_depth,
         force_scan=not getattr(args, "fast", False),
-        tune=tune,
+        tune=dataclasses.replace(tune, ask_boost=False, ask_related=False),
     )
     rows = [
         {"path": _loc_of(r.id), "id": r.id, "role": "seed", "score": r.score}

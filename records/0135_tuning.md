@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-22
 amended: 2026-09-11
 feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error contract, and per-source preference weights
-owns: [src/fux/tune.py@2303b6568596]
+owns: [src/fux/tune.py@a14639bc1348]
 laws: [L1, L3, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 0fedc8639537b3d6e9ca6e67d2514a0edd5d9c29661be42146879a41ebcc8ab8
+content_sha: 15131a8674c086b9245dd3ce05119285411fffde9753ace2abbe803846bc9131
 ---
 
 # SR-TUNE — the tunables file, and per-source priority
@@ -736,6 +736,12 @@ reads · `*` an **open** table whose keys are the consumer's own.
 + graph.hop_decay
 + graph.expand_limit
 + graph.seed_depth
++ graph.ask_boost
++ graph.ask_related
++ graph.ask_kinds
++ graph.ask_link_idf
++ graph.ask_max_hops
++ graph.ask_related_limit
 + refer.budget
 + refer.per_doc_fraction
 + refer.min_passage_bytes
@@ -842,6 +848,43 @@ next.
 the query-side mechanism — an `--intent` flag, an `--as-of` date lens, or
 surfacing the supersession chain instead of ranking for it. It is an **unopened
 fork with no compare doc.**
+
+**16. `[graph]`'s six `ask_*` keys — the graph tier's, and the two booleans
+exist so the arms can be withdrawn separately** (W-161, 2026-09-14).
+
+| key | default | what it is |
+|---|---|---|
+| `ask_boost` | `true` | arm A — re-order the lexical window by `RRF(lexical rank, PPR rank)` |
+| `ask_related` | `true` | arm B — the labelled `related` list of link-reached documents with no lexical match |
+| `ask_kinds` | `"ref"` | which edge kinds the `ask` walk follows |
+| `ask_link_idf` | `true` | hub damping, on for `ask` |
+| `ask_max_hops` | `1` | one hop |
+| `ask_related_limit` | `5` | the cap on the `related` list |
+
+**They are in `[graph]` and not in `[ranking]` because they configure the graph
+plane's walk**, and they **do not move `fux graph`**: that verb keeps
+`ALL_KINDS`, `link_idf_on = False` and `max_hops = None`, because orientation
+and answering want different walks —
+[SR-GRAPH](0126_graph.md) decision 14 exposed the three parameters for exactly
+this, and the compare doc ruled the two callers may differ.
+
+🔴 **Two of the six are ranking defaults that ship ON and UNMEASURED**, and that
+is stated rather than buried. It is the state the ratified compare doc puts them
+in: Arpit accepted the two-tier `ask` on 2026-09-13, and the measurement needs
+link-dependent golden questions that only Codex may author
+([SR-RS](0133_predictions.md) decision 23, available 2026-09-30). The frozen
+bar is [`work/regression/2026-09-14-graph-ask/PRE-REGISTRATION.md`](../work/regression/2026-09-14-graph-ask/PRE-REGISTRATION.md),
+committed before a line of the composition existed, and **each boolean is how
+its arm is withdrawn without touching the other** — which is the reason there
+are two booleans and not one `ask_graph`.
+
+⚠ **`ask_boost` is the first key in this file that can change the ORDER of
+`ask` without changing a score**, and decision 1's boundary rule still holds
+for it: the index stays byte-identical, and `--no-tune` turns the tier off with
+everything else. What it breaks is a weaker assumption nothing had written
+down — that `ask`'s printed order is monotone in its printed score. It is not,
+under the boost, and the row that causes it carries `boosted` and its route so
+the exception is annotated where it happens.
 
 ### Consequences
 

@@ -120,6 +120,7 @@ def run_query(
     confidence_out: dict | None = None,
     trace_out: dict | None = None,
     expand: str = "",
+    related_out: list | None = None,
 ) -> tuple[list[AskResult], str]:
     """Scan by default; use the accelerator only when `force_scan` is False
     and a fresh build exists. Return `(results, path)`.
@@ -155,6 +156,18 @@ def run_query(
     lifted by expansion terms cannot raise its own band. It also cannot be
     returned at all: `rank()` drops a candidate that matches no original term.
 
+    `related_out`, when a caller supplies a list, receives W-161's **Tier B** —
+    documents the graph walk reached that no query word retrieves. It is an
+    out-parameter for `confidence_out`'s reason exactly: the return tuple is
+    unpacked by `cmd_ask`, `cmd_find`, `cmd_answer`, `mcp._search` and the test
+    suite, and an additive keyword changes none of them.
+
+    🔴 **Tier B is never in the returned list**, whatever the caller asked for.
+    A document with no lexical match sitting among real matches *looks like* a
+    match, and the label is the only thing keeping `ask` honest about what it
+    found versus what it followed — the compare doc rejected interleaving for
+    this reason and it is enforced here by the two lists being two objects.
+
     **The block is built from the FINAL result list, after reranking.**
     `rank()` supplies `df` and `n`; the scores come from `results` as the caller
     will see them. Computing separation from `rank()`'s pre-rerank scores would
@@ -176,7 +189,16 @@ def run_query(
     # documents already shown cannot promote the sixth, and the sixth is where
     # most of the recoverable failures are.
     rerank_weight = tune.rerank_weight
-    depth = max(top, rerank.DEPTH) if rerank_weight > 0 else top
+    # W-161: the graph tier retrieves deeper for W-76 Phase 6's reason, word
+    # for word. A re-orderer that can only shuffle the five documents already
+    # shown cannot promote the sixth, and the sixth is where most of the
+    # recoverable failures are — which is as true of a walk as it is of the
+    # proximity reranker. **`graph_on` is read from the tune, so `--no-tune`
+    # turns the tier off with everything else** and the depth goes back with
+    # it; a repo that has never run `fux build` pays nothing either, because
+    # the stage degrades to absent before it costs a read.
+    graph_on = tune.ask_boost or tune.ask_related
+    depth = max(top, rerank.DEPTH) if (rerank_weight > 0 or graph_on) else top
     stats: dict | None = {} if confidence_out is not None else None
 
     from .expand import build as build_expansion
@@ -195,7 +217,9 @@ def run_query(
                 root, query, top=depth, weighting=weighting, archived_dirs=dirs,
                 scoring=scoring, stats_out=stats, expansion=expansion,
             )
-            final = _apply_pin(root, query, _maybe_rerank(root, query, results, rerank_weight, top), top)
+            final = _compose(
+                root, query, results, rerank_weight, top, depth, tune, stats, related_out
+            )
             _fill_trace(trace_out, results, rerank_weight)
             _fill_confidence(confidence_out, stats, query, final, tune)
             return final, "accelerator"
@@ -203,10 +227,109 @@ def run_query(
         root, query, top=depth, weighting=weighting, archived_dirs=dirs,
         scoring=scoring, stats_out=stats, expansion=expansion,
     )
-    final = _apply_pin(root, query, _maybe_rerank(root, query, results, rerank_weight, top), top)
+    final = _compose(
+        root, query, results, rerank_weight, top, depth, tune, stats, related_out
+    )
     _fill_trace(trace_out, results, rerank_weight)
     _fill_confidence(confidence_out, stats, query, final, tune)
     return final, "scan"
+
+
+def _compose(root, query, window, rerank_weight, top, depth, tune, stats, related_out):
+    """The lexical core, then W-161's graph stage. Returns the final list.
+
+    **The lexical core is `rerank` → `pin`, and it runs over the WINDOW, not
+    over `top`.** `fux lexical` truncates at `top` because that is its whole
+    answer; here the window survives one stage longer so the walk has
+    something to promote from. The two agree exactly when the tier is off —
+    `rerank(window)[:depth][:top] == rerank(window)[:top]`, and `_apply_pin`
+    puts a pinned document at position 0 under either truncation — which is
+    what `tests_e2e/test_relational.py` asserts byte for byte.
+
+    ⚠ **The pin is applied BEFORE the graph stage, and the order is a
+    decision.** A pin is an editorial override for one exact question
+    (W-162); a walk is a corpus-wide signal. Letting the walk re-order a
+    pinned document off the top would mean a person's explicit intervention
+    could be overruled by a link somebody else drew, silently. So the pin
+    goes in first and the boost sorts around it — and because `_apply_pin`
+    inserts a document the ranking never returned, that document is in the
+    window the walk seeds from, which is what a person pinning it meant.
+    """
+    ordered = _apply_pin(root, query, _maybe_rerank(root, query, window, rerank_weight, depth), depth)
+    if not (tune.ask_boost or tune.ask_related):
+        return ordered[:top]
+
+    from .compose import tiers
+
+    # 🔴 **`find` shares Tier A and never computes Tier B, and both halves are
+    # decisions.** `find` is `ask`'s terse sibling — both are *ranked
+    # documents* — so a boost that moved one and not the other would make the
+    # two verbs rank the same corpus differently, which is a worse defect than
+    # the one the tier is for. But `find` is the verb for piping bare paths,
+    # so it has no `related` rendering and never asks for one; `related_out is
+    # None` is that request's absence, and skipping the work is not an
+    # optimisation on the Node reader — there it is a whole extra parse of
+    # every committed record (SR-NODE-SEARCH decision 17a).
+    split = tiers(root, query, ordered, top, tune, want_related=related_out is not None)
+    if split.note:
+        print(split.note, file=sys.stderr)
+    if related_out is not None:
+        related_out.extend(split.related)
+    _band_guard(root, query, stats, split.results)
+    return split.results
+
+
+def _band_guard(root: Path, query: str, stats: dict | None, results: list) -> None:
+    """**A graph-lifted #1 may LOWER the band. It may never raise it.**
+
+    [SR-CONFIDENCE](../../../records/0141_confidence.md) §Consequences names
+    this as the graph half of decision 4's guard, and W-161 owes it. Decision 4
+    stops an expansion term raising a document's own band by never handing
+    `_fill_confidence` the expansion; the graph tier needs an active guard
+    instead, because it does not add terms — it changes **which document the
+    band is describing**.
+
+    `rank()` computes `top_doc_hashes` from the document it ranked first. When
+    the walk promotes a different document, that field then describes a
+    document the reader was not shown, and `doc_coverage` is a number about
+    the wrong page. Both available answers are wrong on their own:
+
+    - **Leave it** → the band describes a document nobody saw.
+    - **Recompute it for the shown document** → a document the *links* lifted
+      can arrive with a higher `doc_coverage` than the words ever gave it,
+      which is precisely a graph-lifted document raising its own band.
+
+    So: recompute for the shown document, and keep the lexical #1's value
+    whenever the shown document's is **higher**. The band then describes the
+    answer on the page, and the tier can only ever cost confidence. Weighted
+    by `idf` and not counted, because that is how `doc_coverage` itself is
+    computed — comparing counts would let three stopwords outrank one rare
+    term and reverse the guard on exactly the queries it matters for.
+
+    **Never raises**, like every other signal on this path.
+    """
+    if stats is None or not results or not results[0].boosted:
+        return
+    try:
+        lexical = stats.get("top_doc_hashes")
+        if lexical is None:
+            return
+        record = _record_for(root, results[0].id)
+        if record is None:
+            return
+        from .bm25f import idf
+        from .scan import query_term_hashes
+
+        terms = record.get("terms", {})
+        shown = [h for h in query_term_hashes(query) if h in terms]
+        df, n = stats.get("df", {}), int(stats.get("n", 0))
+
+        def weight(hashes) -> float:
+            return sum(idf(df.get(h, 0), n) for h in hashes)
+
+        stats["top_doc_hashes"] = shown if weight(shown) <= weight(lexical) else lexical
+    except Exception:  # pragma: no cover - a signal must not break an answer
+        pass
 
 
 def _apply_pin(root: Path, query: str, results: list, top: int) -> list:
@@ -565,6 +688,59 @@ SECTION_MARKER = "§"
 #: list would read as a ranking that had gone wrong.
 PINNED_MARKER = "[pinned]"
 
+#: W-161 — what precedes the Tier B block in `ask`'s text output. **It says
+#: *related*, never *results* or *also*,** because the word is the whole
+#: contract: these documents matched no query word and are shown because the
+#: answers above link to them.
+RELATED_HEADING = "related (linked from the answers, no query word matched):"
+
+#: W-161 — the per-row arrow in the Tier B block. ASCII, like every other note
+#: fux prints, because a Windows console's default codepage cannot encode a
+#: fancy arrow and the process crashes on `print()` rather than degrading.
+RELATED_MARKER = "<-"
+
+
+def _related_dict(row) -> dict:
+    """One Tier B row as JSON. Declared in `output.schema.json` as
+    `related_result`; the field order here is that declaration's order."""
+    return {
+        "id": row.id,
+        "title": row.title,
+        "loc": row.loc,
+        "mass": row.mass,
+        "archived": row.archived,
+        "route": row.route,
+    }
+
+
+def _declare_related(related) -> None:
+    """The Tier B block, **on stdout and under the results** (W-161).
+
+    🔴 **This one is stdout, and it is the exception to the family above.**
+    `_declare_archived`, `_declare_pending` and `_declare_confidence` go to
+    stderr because they are things fux says *about* an answer. `related` is
+    part of the answer — it is the tier the compare doc ratified, one of the
+    two things `ask` now returns — and a consumer redirecting stdout to a file
+    must get it. What keeps that safe is the same thing that keeps `headings`
+    safe: **`find` is the verb for piping bare paths, and `find` has no tier.**
+
+    **Blank line first, then an indented block.** The indentation is what says
+    *these are not results* to a reader skimming, before they have read the
+    heading — the same job `§` does for a matched section.
+    """
+    if not related:
+        return
+    print()
+    print(RELATED_HEADING)
+    for row in related:
+        mark = f"{ARCHIVED_MARKER} " if row.archived else ""
+        # The mass is NOT printed. It is a walk statistic on a scale nothing
+        # else here shares, and a float in the score column's position would be
+        # read as a score by every reader who did not stop to check — which is
+        # the one confusion this tier exists to avoid. `--json` carries it for
+        # a caller that knows what it is.
+        print(f"  {RELATED_MARKER} {mark}{row.title}  ({row.loc})  {row.route}")
+
 
 def _headings_for(record: dict | None, query: str) -> list[str]:
     """W-84's matched headings — imported lazily so `find`'s hot path and every
@@ -697,7 +873,7 @@ def _expand_of(args) -> str:
     return str(getattr(args, "expand", "") or "")
 
 
-def _run_fused(root, args, top, *, tune, confidence_out, trace_out=None):
+def _run_fused(root, args, top, *, tune, confidence_out, trace_out=None, related_out=None):
     """`run_query` for one question, or several fused by RRF. W-109.
 
     Returns `(results, path, fused)`.
@@ -722,6 +898,7 @@ def _run_fused(root, args, top, *, tune, confidence_out, trace_out=None):
     results, path = run_query(
         root, queries[0], top, force_scan=_force_scan(args), tune=tune,
         confidence_out=confidence_out, trace_out=trace_out, expand=expand,
+        related_out=related_out,
     )
     if len(queries) == 1:
         return results, path, False
@@ -732,6 +909,14 @@ def _run_fused(root, args, top, *, tune, confidence_out, trace_out=None):
     # description of the document's vocabulary, not of one phrasing of the
     # question, and giving each arm a different one would make the fusion a
     # comparison of expansions rather than of queries.
+    #
+    # ⚠ **`related` describes ARM 1 ONLY, exactly as the confidence block
+    # does** (W-161). The later arms are run without `related_out`, so nothing
+    # accumulates across phrasings. Fusing several arms' related lists would
+    # produce a neighbourhood of a *set* of questions while the band beside it
+    # describes one of them — two labels on one page disagreeing about what
+    # was asked, which is the shape this function already refused for the
+    # band and refuses again here for the same reason.
     arms = [results]
     for q in queries[1:]:
         more, _ = run_query(
@@ -767,23 +952,45 @@ def cmd_lexical(args) -> int:
     holds them equal *until W-161 deliberately parts them*, at which point that
     test inverts and this verb does not move.
     """
-    return _ask_shaped(args)
+    return _ask_shaped(args, compose=False)
 
 
 def cmd_ask(args) -> int:
-    """The ranked answer. Today, `lexical` exactly; W-161 composes a graph tier
-    on top of it and this is the function that changes."""
-    return _ask_shaped(args)
+    """The ranked answer: **`lexical`, then the graph tier** (W-161).
+
+    `ask` = `lexical` → `graph --seed <lexical top-k>` → split → confidence →
+    refer. The two verbs share this body and part on one argument, which is
+    what keeps [SR-CLI](../../../records/0101_cli-surface.md) decision 12's
+    freeze meaningful: `lexical` did not change when `ask` grew a tier, and
+    the diff shows it.
+    """
+    return _ask_shaped(args, compose=True)
 
 
-def _ask_shaped(args) -> int:
+def _ask_shaped(args, *, compose: bool) -> int:
     root = _root()
     tune = _tune_for(root, args)
+    # 🔴 **The freeze, enforced on the one line where it could be lost.**
+    # `fux lexical` is BM25F, the proximity reranker and `-q` fusion — and no
+    # graph stage, ever. Forcing both booleans off here rather than trusting
+    # `cmd_lexical` not to ask for a tier means a repo whose `tune.toml` turns
+    # the tier on cannot make the frozen baseline verb stop being a baseline.
+    # That is the whole value of having the verb (W-160).
+    if not compose:
+        import dataclasses
+
+        tune = dataclasses.replace(tune, ask_boost=False, ask_related=False)
+    elif getattr(args, "related", None) is False:
+        import dataclasses
+
+        tune = dataclasses.replace(tune, ask_related=False)
     signals: dict = {}
     want_why = bool(getattr(args, "why", False))
     trace: dict | None = {} if want_why else None
+    related: list = []
     results, path, fused = _run_fused(
         root, args, args.top, tune=tune, confidence_out=signals, trace_out=trace,
+        related_out=related,
     )
     block = signals.get("confidence")
     why = _derivation_for(root, args, results, path, signals, trace, tune) if want_why else None
@@ -805,6 +1012,15 @@ def _ask_shaped(args) -> int:
         payload: dict = {
             "results": [_as_dict(root, r, args.query, sections=show_sections) for r in results]
         }
+        # W-161. **Its own key, never merged into `results`** — a document with
+        # no lexical match sitting among real matches *looks like* a match, and
+        # the separate key is what keeps a downstream reader from mistaking a
+        # neighbour for a hit. **Absent means the tier did not run**, which
+        # covers `--no-related`, `[graph] ask_related = false`, `fux lexical`,
+        # and a repository with no fresh `fux build`; `[]` is what *no
+        # neighbours* looks like.
+        if tune.ask_related:
+            payload["related"] = [_related_dict(r) for r in related]
         # SR-CONFIDENCE decision 11: present only under `--band`. **Absent
         # means NOT ASKED FOR — it is never a claim about the answer**, which
         # is why the schema makes it conditional rather than optional-in-prose.
@@ -842,10 +1058,26 @@ def _ask_shaped(args) -> int:
         # reader copies must stay a bare locator, which is the same rule W-84
         # applied to headings; a marker glued to it breaks a copy-paste.
         tie = "  (tie)" if r.tie else ""
-        print(f"{r.score:.4f}{tie}  {mark}{_title_from(root, record, r.title)}  ({r.loc})")
+        # W-161 — `(graph)` after the score, beside `(tie)` and for the same
+        # reason: the `(loc)` a reader copies must stay a bare locator, so a
+        # marker never touches it.
+        #
+        # 🔴 **The MOVED rows carry their move, and that is what makes the
+        # non-monotone order legible.** A bare `(graph)` on every row was the
+        # first rendering and it was useless for the job the marker exists to
+        # do: on a query where the walk reaches all five, every row is marked
+        # and a reader seeing 5.93 above 6.36 still has nothing to read it by.
+        # A row the walk reached but did not move keeps the bare marker — it is
+        # still true, and it is the case where the links agreed with the words.
+        boost = ""
+        if r.boosted:
+            moved = r.route and not r.route.startswith(f"#{results.index(r) + 1} ->")
+            boost = f"  (graph {r.route.split(' via ')[0]})" if moved else "  (graph)"
+        print(f"{r.score:.4f}{tie}{boost}  {mark}{_title_from(root, record, r.title)}  ({r.loc})")
         if show_sections:
             for heading in _headings_for(record, args.query):
                 print(f"        {SECTION_MARKER} {heading}")
+    _declare_related(related)
     if getattr(args, "explain", False):
         print(f"\n[{path}]")
     if why is not None:
@@ -1125,9 +1357,22 @@ def cmd_answer(args) -> int:
     # ⚠ **`answer` takes ONE question and no `-q`** — [SR-ANSWER](../../..)
     # decision 4: the verb means one answer. `--expand` applies here exactly as
     # it does to `ask`, because expanding a question is not asking a second one.
+    # W-161 DoD 5 — **`answer` reads `ask`, both tiers.** A Tier B document is
+    # fetched and passage-scored on the bytes like any other candidate, and a
+    # related document with nothing in it survives nowhere: the refer plane's
+    # re-score is what decides, on the fetched text, and it has no idea which
+    # tier a candidate came from. **That is the point** — Tier B's weakness is
+    # that no query word matched the INDEX, and the refer plane reads the
+    # document itself.
+    #
+    # 🔴 **The band is unaffected, and that is not a side effect.**
+    # `_fill_confidence` runs inside `run_query` on the Tier A list alone; this
+    # list is assembled afterwards and reaches only the refer plane. A linked
+    # document cannot raise how much the index believes itself.
+    related: list = []
     results, _ = run_query(
         root, args.query, ANSWER_TOP, force_scan=_force_scan(args), tune=tune,
-        confidence_out=signals, expand=_expand_of(args),
+        confidence_out=signals, expand=_expand_of(args), related_out=related,
     )
     block = signals.get("confidence")
     _declare_no_accelerator(root)
@@ -1169,7 +1414,7 @@ def cmd_answer(args) -> int:
 
     if not no_refer_flag:
         referred = _answer_via_refer(
-            root, args.query, results, tune, _cache_ttl_of(args)
+            root, args.query, results, tune, _cache_ttl_of(args), related=related
         )
         if referred is not None:
             _declare_change_since_last_ask(root, args.query, referred)
@@ -1377,7 +1622,8 @@ def _cache_ttl_of(args) -> int:
 
 
 def _answer_via_refer(
-    root: Path, query: str, results: list[AskResult], tune: "Tune", cache_ttl_seconds: int = 0
+    root: Path, query: str, results: list[AskResult], tune: "Tune", cache_ttl_seconds: int = 0,
+    related: list | None = None,
 ):
     """`None` when NO candidate produced a usable citation — never raises.
 
@@ -1391,7 +1637,11 @@ def _answer_via_refer(
     from .refer_answer import answer_via_refer
 
     citations: list[tuple[str, str, str]] = []
-    for result in results:
+    # ⚠ **Tier A first and Tier B after it, always.** The refer plane scores on
+    # fetched bytes and picks a winner; the order here is the tie-break when it
+    # cannot separate two candidates, and a document the words found should win
+    # that tie against one only a link reached.
+    for result in [*results, *(related or [])]:
         record = _record_for(root, result.id)
         if record is None:
             continue

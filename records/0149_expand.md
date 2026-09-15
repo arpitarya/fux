@@ -11,7 +11,7 @@ owns: [src/fux/query/expand.py@c4c8d5671973, src/fux/query/fuse.py@749673d52166]
 laws: [3, 4, 8]
 ratifies: W-109
 timestamp: 2026-09-05T00:00:00Z
-content_sha: 787955bc7dfd393e2376c635542030615ab13d65cbc2eda328e36388d5cbe3fd
+content_sha: c506dffdcd5d28830b0fce4cee7d5175845542af804ba8ea9e1b115e76ea8e83
 ---
 
 # SR-EXPAND: the caller supplies the vocabulary, and fuses its own phrasings
@@ -224,6 +224,32 @@ bare question returns a different list and `verify` reports `drifted` for a
 reason that has nothing to do with the corpus. ⚠ **L8**: the expansion is a
 *use record*, so it lives on the receipt and the journal, both gitignored, and
 reaches no committed byte.
+
+**14. The refusal holds for Tier A; Tier B is LABELLED, not returned as a
+match** (W-161). Stated here so this record and
+[SR-ASK](0103_ask.md) decision 13 cannot be read as contradicting.
+
+Decision 1's refusal is *a document matching only supplied terms is never
+returned*. W-161's `related` tier returns documents matching **no** supplied
+term and no query term at all, which reads like a wider version of the same
+thing and is not:
+
+- **Tier A is unchanged.** A boosted document is a document `rank()` scored,
+  which means it matched an original query term; the expansion guard in
+  `rank()` runs before any of this and drops an expansion-only candidate
+  exactly as before. The walk re-orders what survived that guard.
+- **Tier B is not returned as a match.** It is a separate list, under its own
+  key, never counted as an answer, never in the confidence band, with a route
+  on every row. **What decision 1 forbids is a hallucinated citation wearing a
+  match's clothes**; a labelled neighbour with its provenance printed beside it
+  is the opposite artifact.
+- 🔴 **And the tier applies the refusal itself, one level down.** A walked
+  document is Tier B only if its committed record holds none of the
+  **original** query's term hashes — never the expansion's. A document that
+  matches only words a model invented is not `related` to a question nobody
+  asked, and testing against the expansion's hashes would have re-opened
+  decision 1 through the back door.
+
 
 ### Consequences
 

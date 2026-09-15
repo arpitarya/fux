@@ -21,6 +21,8 @@ from pathlib import Path
 
 import pytest
 
+from fux.query import RELATED_HEADING
+
 EVAL_DIR = Path(__file__).parent / "eval"
 PAIRS = EVAL_DIR / "relational.jsonl"
 CORPUS = EVAL_DIR / "relational"
@@ -113,18 +115,169 @@ def test_reliability_decays_with_distance(linked):
     assert best("docs/rota-oncall.md") < best("docs/runbook-rollback.md")
 
 
-def test_the_graph_lane_does_not_move_ask(linked):
-    """The load-bearing negative for M3.
+def test_the_two_candidate_paths_still_agree_with_a_graph_tier(linked):
+    """**This test was `test_the_graph_lane_does_not_move_ask`, and W-161
+    inverted it deliberately** — SR-GRAPH's *`ask` is untouched* was superseded
+    by the compare doc Arpit ratified on 2026-09-13.
 
-    M3 adds verbs; it must not touch the ranking `ask` returns. The derived
-    graph plane is built by the same `fux build` that builds the accelerator,
-    so this is the assertion that catches a graph plane leaking into the
-    lexical path.
+    What it asserted — *the graph plane must not reach `ask`* — is now false by
+    design. What survives is the half that was always the real content: **the
+    accelerator and the scan must return the same bytes**, tier included. The
+    graph stage runs after both and reads the same derived plane, so a
+    divergence here means the tier is reading something path-dependent, which
+    is the differential law's business rather than the graph lane's.
+
+    ⚠ **Deleting it instead would have lost that**, and the composition tests
+    below do not cover it: they compare verbs, not candidate paths.
     """
+    _run(linked, "build")
     for query in ("storage engine selection", "rollback", "catering"):
         scanned = _run(linked, "ask", query, "--json").stdout
         accelerated = _run(linked, "ask", query, "--json", "--fast").stdout
-        assert accelerated == scanned
+        assert accelerated == scanned, query
+
+
+def test_ask_is_lexical_when_the_graph_tier_is_off(linked):
+    """**Composition test 1** (W-161 DoD 1): `ask`'s lexical stage IS `lexical`.
+
+    With both tier booleans off, `ask` must be `fux lexical` byte for byte —
+    not approximately, and not only in the ranking. That is what makes
+    `lexical` a baseline: every ranking verdict in this repository compares
+    something against *the words alone*, and if `ask` minus the tier were not
+    exactly `lexical` then the baseline would be measuring a third thing.
+    """
+    _run(linked, "build")
+    off = "[graph]\nask_boost = false\nask_related = false\n"
+    (linked / ".fux" / "tune.toml").write_text(off, encoding="utf-8")
+    try:
+        for query in ("storage engine selection", "rollback", "catering"):
+            for extra in ((), ("--json",), ("--top", "3"), ("--band",)):
+                ask = _run(linked, "ask", query, *extra).stdout
+                lexical = _run(linked, "lexical", query, *extra).stdout
+                assert ask == lexical, (query, extra)
+    finally:
+        (linked / ".fux" / "tune.toml").unlink()
+
+
+def test_lexical_ignores_a_tune_that_turns_the_tier_on(linked):
+    """🔴 **The freeze, tested where it could actually be lost.**
+
+    `fux lexical` is the lexical core and has no graph tier *by definition*.
+    A repository whose `.fux/tune.toml` turns the tier on must not be able to
+    make the frozen baseline verb stop being a baseline — otherwise every
+    verdict that cites `lexical` as its control is measuring whatever that
+    repo's config happened to say.
+
+    The tier is forced off in `_ask_shaped`, not left to the caller, and this
+    is the assertion that would fail if someone moved that decision outwards.
+    """
+    _run(linked, "build")
+    (linked / ".fux" / "tune.toml").write_text(
+        "[graph]\nask_boost = true\nask_related = true\n", encoding="utf-8"
+    )
+    try:
+        for query in ("storage engine selection", "rollback", "catering"):
+            payload = json.loads(_run(linked, "lexical", query, "--json").stdout)
+            assert "related" not in payload, query
+            assert not any(r["boosted"] for r in payload["results"]), query
+    finally:
+        (linked / ".fux" / "tune.toml").unlink()
+
+
+def test_ask_related_is_the_walk_over_lexical_top_k(linked):
+    """**Composition test 2** (W-161 DoD 1): `ask`'s `related` ≡ `graph` fed
+    `lexical`'s top-k, minus everything the words already matched.
+
+    ⚠ **The two are NOT simply equal, and the difference is the split rule
+    itself.** `graph --seed` returns every walked non-seed node; `related` is
+    that list with two filters — a node already in `ask`'s retrieval window is
+    a boosted candidate rather than a neighbour, and a node whose committed
+    record holds a query term is a lexical match that ranked low rather than a
+    document the words could not reach. So what this asserts is **containment
+    in order**: every `related` id appears in the walk, in the walk's order.
+
+    A test asserting equality would be asserting the filters do nothing.
+    """
+    _run(linked, "build")
+    for query in ("storage engine selection", "rollback", "catering"):
+        payload = json.loads(_run(linked, "ask", query, "--json").stdout)
+        related = [r["id"] for r in payload.get("related", [])]
+        if not related:
+            continue
+        seeds = [
+            n["id"]
+            for n in json.loads(_run(linked, "graph", query, "--json").stdout)["nodes"]
+            if n["role"] == "seed"
+        ]
+        # ⚠ **The `ask` walk's parameters, passed explicitly.** `fux graph`
+        # keeps its own defaults — all edge kinds, no hub damping, unbounded
+        # hops — because orientation and answering want different walks, and
+        # the compare doc ruled they may differ. Comparing against the bare
+        # `graph` defaults would be comparing two different walks and calling
+        # the difference a composition failure.
+        walked = [
+            n["id"]
+            for n in json.loads(
+                _run(
+                    linked, "graph", *[a for s in seeds for a in ("--seed", s)],
+                    "--kinds", "ref", "--link-idf", "--max-hops", "1", "--json",
+                ).stdout
+            )["nodes"]
+            if n["role"] == "expanded"
+        ]
+        assert set(related) <= set(walked), (query, related, walked)
+        assert related == [i for i in walked if i in set(related)], (query, related, walked)
+
+
+def test_no_related_row_is_ever_a_result(linked):
+    """🔴 **The one invariant the whole tier rests on.**
+
+    A Tier B document has no BM25F score — that is its definition. If one ever
+    appeared in `results` it would arrive carrying whatever score the shape
+    demanded, and a reader would have no way to tell a document the words
+    found from one a link reached. The compare doc rejected interleaving for
+    exactly this and the two lists being two objects is the enforcement.
+    """
+    _run(linked, "build")
+    for query in ("storage engine selection", "rollback", "catering"):
+        payload = json.loads(_run(linked, "ask", query, "--json").stdout)
+        hits = {r["id"] for r in payload["results"]}
+        related = {r["id"] for r in payload.get("related", [])}
+        assert not (hits & related), (query, hits & related)
+
+
+def test_no_related_omits_the_tier_entirely(linked):
+    """`--no-related` removes the key, in text and in `--json` alike.
+
+    ⚠ **Absent, not empty.** `[]` is what *no neighbours* looks like; an absent
+    key is what *you said not to compute it* looks like. A consumer that cannot
+    tell those apart cannot tell a corpus with no links from a flag it forgot
+    it set — `confidence`-under-`--band`'s shape exactly.
+    """
+    _run(linked, "build")
+    for query in ("storage engine selection", "rollback"):
+        assert "related" not in json.loads(
+            _run(linked, "ask", query, "--json", "--no-related").stdout
+        ), query
+        assert RELATED_HEADING not in _run(linked, "ask", query, "--no-related").stdout
+
+
+def test_a_related_route_only_names_an_edge_kind_the_walk_followed(linked):
+    """🔴 **Found on the first real run, against fux's own corpus.**
+
+    With `ask_kinds = "ref"` the route line read `#2 via code` — naming an edge
+    the walk was forbidden to follow and had not followed. The walk had reached
+    the document through a `ref` edge; the route credited a `code` edge that
+    merely happened to exist between the same two documents.
+
+    **A route a reader cannot verify is worse than no route**, and this tier's
+    whole claim to honesty is that its provenance can be checked.
+    """
+    _run(linked, "build")
+    for query in ("storage engine selection", "rollback", "catering"):
+        payload = json.loads(_run(linked, "ask", query, "--json").stdout)
+        for row in payload.get("related", []):
+            assert row["route"] == "via the walk" or row["route"].endswith(" via ref"), row
 
 
 def test_graph_verbs_ask_for_a_build_rather_than_crashing(linked, tmp_path):
@@ -193,37 +346,49 @@ def test_explain_refuses_a_tag_that_does_not_exist(linked):
 # -- W-160: the two atoms ----------------------------------------------------
 
 
-def test_lexical_is_byte_identical_to_ask(linked):
-    """🔴 **The freeze, and the one test W-161 must deliberately INVERT.**
+def test_lexical_did_not_move_when_ask_grew_a_tier(linked):
+    """🔴 **This test WAS `test_lexical_is_byte_identical_to_ask`, and W-161 is
+    the change that inverted it** — as W-160 said it would, in this docstring,
+    before the tier existed.
 
-    `fux lexical` is `ask`'s body today. It exists so that when `ask` grows a
-    graph tier there is still a verb whose answer is *only* what the words say
-    — and the value of that is destroyed if `lexical` drifts in the meantime.
+    The freeze was never *these two verbs are equal*. It was **`lexical` does
+    not move**, and the equality was how that was checkable while the two were
+    one body. Now that they have parted, equality is the wrong assertion and
+    would have to be deleted; what replaces it is the same property stated
+    directly — `lexical` is BM25F, the proximity reranker and `-q` fusion, and
+    carries neither of the tier's two marks.
 
-    ⚠ **Text AND `--json`, not just one.** The first time `lexical` ran, the
-    two agreed on every score and differed in their output: `lexical` was
-    absent from `output_config.CLI_VERBS`, so `args.sections` never resolved,
-    and `ask` printed `§` heading lines while `lexical` printed none. Nothing
-    failed — the file loaded, the query ran, the ranking was right. Comparing
-    only `--json` would still have missed it, because `headings` is in the
-    payload either way.
+    ⚠ **Text AND `--json`, still, and for W-160's reason.** The first time
+    `lexical` ran, the two agreed on every score and differed in their output:
+    `lexical` was absent from `output_config.CLI_VERBS`, so `args.sections`
+    never resolved and `ask` printed `§` lines where `lexical` printed none.
+    Nothing failed. Comparing only `--json` would still have missed it, because
+    `headings` is in the payload either way — so both renderings are walked.
     """
-    for query in ("storage engine selection", "rollback", "catering"):
-        for extra in ((), ("--json",), ("--top", "3"), ("--band",), ("--why",)):
-            ask = _run(linked, "ask", query, *extra).stdout
-            lexical = _run(linked, "lexical", query, *extra).stdout
-            assert lexical == ask, (query, extra)
-
-
-def test_lexical_and_ask_agree_on_the_accelerator_path_too(linked):
-    """`--fast` and `--scan` are asserted byte-identical for `ask`; the frozen
-    verb has to inherit that rather than only matching on the default path."""
     _run(linked, "build")
-    for flag in ("--fast", "--scan"):
-        assert (
-            _run(linked, "lexical", "rollback", "--json", flag).stdout
-            == _run(linked, "ask", "rollback", "--json", flag).stdout
-        )
+    for query in ("storage engine selection", "rollback", "catering"):
+        for extra in ((), ("--top", "3"), ("--band",), ("--why",)):
+            text = _run(linked, "lexical", query, *extra).stdout
+            assert RELATED_HEADING not in text, (query, extra)
+            assert "(graph" not in text, (query, extra)
+        payload = json.loads(_run(linked, "lexical", query, "--json").stdout)
+        assert "related" not in payload, query
+        assert not any(r["boosted"] or r["route"] for r in payload["results"]), query
+
+
+def test_lexical_agrees_with_itself_on_both_candidate_paths(linked):
+    """`--fast` and `--scan` are asserted byte-identical for `ask`; the frozen
+    verb has to inherit that rather than only matching on the default path.
+
+    ⚠ **It compares `lexical` against `lexical`, not against `ask`** — since
+    W-161 the two verbs legitimately differ, so the cross-verb form would now
+    be asserting the tier does nothing.
+    """
+    _run(linked, "build")
+    assert (
+        _run(linked, "lexical", "rollback", "--json", "--fast").stdout
+        == _run(linked, "lexical", "rollback", "--json", "--scan").stdout
+    )
 
 
 def test_graph_query_equals_graph_over_lexical_seeds(linked):

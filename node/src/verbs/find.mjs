@@ -172,6 +172,13 @@ export function runFind(root, args) {
 
   const { results: ranked, confidence, fused, tune } = runFused(root, queries, top, {
     useTune: args.noTune !== true, wantConfidence: true, expand: args.expand ?? "",
+    // W-161 — **Tier A yes, Tier B never.** `find` is `ask`'s terse sibling and
+    // must rank the same corpus the same way, or the two verbs disagree; but it
+    // is also the verb for piping bare paths, so a labelled second block would
+    // be read by `xargs` as filenames. Saying `related: false` here rather than
+    // simply not rendering it also skips the work — on this reader that is a
+    // `recordFor` per candidate on top of a full plane rebuild.
+    related: false,
   });
   declareFloorOff(tune, Boolean(args.json));
   const [results, dropped] = filtered(root, ranked, query, args);

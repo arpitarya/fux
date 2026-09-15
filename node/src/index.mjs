@@ -40,7 +40,14 @@ function result(r, headings = []) {
     archived: r.archived, tie: r.tie, mtime: r.mtime ?? null,
     // W-162 — a human pinned this document to this exact question, so its
     // position was set after the ranking. Always present; `false` is a claim.
-    pinned: Boolean(r.pinned), headings,
+    pinned: Boolean(r.pinned),
+    // W-161 — the graph walk reached this document, and where the boost moved
+    // it from. 🔴 **The one reason a `results` list may not be monotone in
+    // `score`**: the order is `RRF(lexical rank, PPR rank)` and the number is
+    // still BM25F, so a caller re-sorting by `score` is re-deriving the lexical
+    // order. Always present; `false`/`null` on an unboosted row.
+    boosted: Boolean(r.boosted), route: r.route ?? null,
+    headings,
   };
 }
 

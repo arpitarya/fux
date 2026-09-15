@@ -72,6 +72,27 @@ class AskResult:
     #:
     #: **`False` is a claim, not an absence** — the key is on every hit (W-48).
     pinned: bool = False
+    #: W-161. The graph walk out of the lexical top-k reached this document, so
+    #: the boosted tier's RRF used a PPR rank for it as well as a lexical one.
+    #:
+    #: 🔴 **It marks a row the WALK REACHED, not a row that moved.** A walked
+    #: document that was already #1 is still the reason #1 is #1, and marking
+    #: only movers would hide the tier's effect exactly where it agreed with
+    #: the words — which is the case a reader most needs to be able to see,
+    #: because it is the one that looks like nothing happened.
+    #:
+    #: **Like `pinned`, it is not part of the sort key and not a score.**
+    #: `rank()` never sees it: the tier is applied by `run_query` after the
+    #: lexical core is complete. What it explains is the one list fux prints
+    #: whose second row may score higher than its first — see
+    #: [`compose.py`](compose.py) for why that shape was chosen here and
+    #: rejected for `-q` fusion.
+    boosted: bool = False
+    #: Where the boost came from, as a reader can check it:
+    #: `#7 → #2 via graph`. `None` on every unboosted row, and `None` is an
+    #: absence here rather than a claim — an unboosted row has no route because
+    #: no walk reached it, which the `boosted` key already says.
+    route: str | None = None
 
 
 @dataclass(frozen=True)

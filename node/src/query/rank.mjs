@@ -138,5 +138,13 @@ export function rank(
     // never sets it true: the pin is applied after ranking, in `runQuery`.
     // `false` is a claim, not an absence (W-48).
     pinned: false,
+    // W-161 — the graph walk out of the lexical top-k reached this document.
+    // `rank()` never sets it either: the tier is composed after the lexical
+    // core, in `runQuery`. **Key order here is the payload's key order**, and
+    // Python builds the same payload from `AskResult.__dict__`, so these two
+    // lines have to sit exactly where `boosted` and `route` sit in the
+    // dataclass or `--json` differs between the runtimes on every hit.
+    boosted: false,
+    route: null,
   }));
 }

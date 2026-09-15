@@ -35,6 +35,9 @@ import { rerank, DEPTH as RERANK_DEPTH } from "./rerank.mjs";
 import { applyPin } from "../correct.mjs";
 import { loadTune } from "../config/tune.mjs";
 import { archivedDirSet } from "../ingest/gitdir.mjs";
+import { tiers } from "./compose.mjs";
+import { recordFor } from "../store/reader.mjs";
+import { idf } from "./bm25f.mjs";
 
 export { RERANK_DEPTH };
 
@@ -78,6 +81,50 @@ function buildConfidence(query, stats, results, tune) {
   }
 }
 
+/**
+ * **A graph-lifted #1 may LOWER the band. It may never raise it.**
+ *
+ * SR-CONFIDENCE §Consequences names this as the graph half of decision 4's
+ * guard. Decision 4 stops an expansion term raising a document's own band by
+ * never handing the block the expansion; the graph tier needs an active guard
+ * instead, because it adds no terms — it changes **which document the band is
+ * describing**.
+ *
+ * `rank()` computes `top_doc_hashes` from the document it ranked first. When
+ * the walk promotes a different one, that field describes a document the reader
+ * was never shown. Both obvious answers are wrong on their own: leaving it
+ * bands a document nobody saw, and recomputing it lets a document the LINKS
+ * lifted arrive with a higher `doc_coverage` than the words ever gave it.
+ *
+ * So: recompute for the shown document, and keep the lexical #1's value
+ * whenever the shown document's is higher. Weighted by `idf` and not counted,
+ * because that is how `doc_coverage` itself is computed — comparing counts
+ * would let three stopwords outrank one rare term and reverse the guard on
+ * exactly the queries it matters for. **Never throws.**
+ */
+function bandGuard(root, query, statsOut, results) {
+  if (!results.length || !results[0].boosted) return;
+  try {
+    const lexical = statsOut.top_doc_hashes;
+    if (lexical === null || lexical === undefined) return;
+    const record = recordFor(root, results[0].id);
+    if (record === null || record === undefined) return;
+    const terms = record.terms ?? {};
+    const shown = queryTermHashes(query).filter((h) => h in terms);
+    const df = statsOut.df ?? {};
+    const n = statsOut.n ?? 0;
+    const weight = (hashes) => hashes.reduce((sum, h) => sum + idf(df[h] ?? 0, n), 0);
+    statsOut.top_doc_hashes = weight(shown) <= weight(lexical) ? shown : lexical;
+  } catch {
+    // A signal must not be able to take an answer down with it.
+  }
+}
+
+/** A `Tune` with some fields overridden, prototype and getters intact. */
+function withTier(tune, overrides) {
+  return Object.assign(Object.create(Object.getPrototypeOf(tune)), tune, overrides);
+}
+
 /** One arm: tune, scan, rank, rerank, band.
  *
  * `useTune=false` is `--no-tune`: `.fux/tune.toml` is not read at all, so the
@@ -85,8 +132,25 @@ function buildConfidence(query, stats, results, tune) {
  * loaded a `Tune` passes it as `tune` rather than paying for a second parse. */
 export function runQuery(root, query, top, {
   tune = null, useTune = true, expand = "", wantConfidence = false,
+  compose = true, related: wantRelated = true,
 } = {}) {
-  const resolved = tune ?? loadTune(root, { enabled: useTune });
+  let resolved = tune ?? loadTune(root, { enabled: useTune });
+  // 🔴 **The freeze, enforced on the one line where it could be lost.**
+  // `compose: false` is `fux lexical`, which has no graph tier by definition;
+  // forcing both booleans off here rather than trusting the caller means a
+  // repository whose `tune.toml` turns the tier on cannot make the frozen
+  // baseline verb stop being a baseline.
+  //
+  // ⚠ **`Object.create` + `assign`, never a `{...spread}`.** `Tune.scoring` is
+  // a PROTOTYPE GETTER, and spreading an instance into an object literal keeps
+  // the own properties and silently drops it — `resolved.scoring` two lines
+  // below would then be `undefined` and every score would be computed at
+  // default weights, on the frozen baseline verb, with nothing failing.
+  if (!compose) resolved = withTier(resolved, { askBoost: false, askRelated: false });
+  else if (wantRelated === false) resolved = withTier(resolved, { askRelated: false });
+  // After the two lines above, `wantRelated` and `resolved.askRelated` agree, so
+  // the tier reads one of them and the verb reads the other without either
+  // having to know about the flag that set it.
   const scoring = resolved.scoring;
   const weighting = archivedRanking(root, resolved);
 
@@ -94,8 +158,14 @@ export function runQuery(root, query, top, {
   // asked and hand back `top` from the reordered list. A reranker that can only
   // shuffle the five documents already shown cannot promote the sixth, and the
   // sixth is where most of the recoverable failures are.
+  //
+  // W-161: the graph tier retrieves deeper for the same reason. A walk that can
+  // only shuffle the five documents already shown cannot promote the sixth
+  // either. `graphOn` is read from the tune, so `--no-tune` turns the tier off
+  // with everything else and the depth goes back with it.
   const rerankWeight = resolved.rerankWeight;
-  const depth = rerankWeight > 0 ? Math.max(top, RERANK_DEPTH) : top;
+  const graphOn = resolved.askBoost || resolved.askRelated;
+  const depth = (rerankWeight > 0 || graphOn) ? Math.max(top, RERANK_DEPTH) : top;
 
   const queryHashes = queryTermHashes(query);
   const expansion = expandMod.build(
@@ -107,10 +177,37 @@ export function runQuery(root, query, top, {
   // W-162. **After the reranker, and the confidence block is built from the
   // PINNED list** — the band describes the answer the reader was shown, so a
   // pinned #1 the corpus barely supports must still say `weak`.
-  const results = applyPin(root, query, maybeRerank(root, query, window, rerankWeight, top), top);
+  //
+  // ⚠ **The lexical core runs over the WINDOW, not over `top`**, so the graph
+  // stage has something to promote from. The two agree exactly when the tier is
+  // off: `rerank(window)[:depth][:top] === rerank(window)[:top]`, and
+  // `applyPin` puts a pinned document at position 0 under either truncation.
+  //
+  // ⚠ **The pin goes in BEFORE the walk, and the order is a decision.** A pin
+  // is an editorial override for one exact question; a walk is a corpus-wide
+  // signal. Letting the walk re-order a pinned document off the top would mean
+  // a person's explicit intervention could be overruled, silently, by a link
+  // somebody else drew.
+  const ordered = applyPin(root, query, maybeRerank(root, query, window, rerankWeight, depth), depth);
+  // 🔴 **`find` shares Tier A and never computes Tier B.** `find` is `ask`'s
+  // terse sibling — both are *ranked documents* — so a boost that moved one and
+  // not the other would make the two verbs rank the same corpus differently,
+  // which is a worse defect than the one the tier is for. But `find` pipes bare
+  // paths and has no `related` rendering, and skipping the work here is not an
+  // optimisation on this reader: `related` costs a `recordFor` per candidate on
+  // top of a plane rebuild that already parses every committed record.
+  const split = graphOn
+    ? tiers(root, query, ordered, top, resolved, { wantRelated })
+    : { results: ordered.slice(0, top), related: [] };
+  const results = split.results;
+  bandGuard(root, query, statsOut, results);
 
   return {
     results,
+    // `null`, not `[]`, when the tier did not run: absent means NOT ASKED FOR
+    // or NOT AVAILABLE, and `[]` means *no neighbours*. The `--json` key is
+    // omitted on `null`, which is the distinction the schema declares.
+    related: resolved.askRelated ? split.related : null,
     confidence: wantConfidence ? buildConfidence(query, statsOut, results, resolved) : null,
     queryHashes,
     stats: statsOut,

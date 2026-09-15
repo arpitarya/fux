@@ -58,6 +58,23 @@ MUTATIONS: dict[str, dict[str, str]] = {
         "hop_decay": "0.1",
         "expand_limit": "3",
         "seed_depth": "17",
+        # W-161's graph tier. ⚠ **These six prove the boundary rule in its
+        # weakest form**, like `[confidence]`'s two above and for a related
+        # reason: they are read at QUERY time by a stage that runs after the
+        # ranking, over a DERIVED plane the committed index does not contain.
+        # Of course `.fux/index/` is byte-identical. They are listed because
+        # `_SCHEMA` is the contract and an unexercised key is an untested one.
+        #
+        # 🔴 **`ask_boost` is the first key in this table that can change the
+        # ORDER of an answer without changing a score**, so the boundary it is
+        # proving here — *ingest does not read it* — is emphatically not the
+        # interesting property. That one is the pre-registration's.
+        "ask_boost": "false",
+        "ask_related": "false",
+        "ask_kinds": '"tag"',
+        "ask_link_idf": "false",
+        "ask_max_hops": "3",
+        "ask_related_limit": "2",
     },
     "refer": {
         "budget": "512",

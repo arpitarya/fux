@@ -562,6 +562,36 @@ def build_parser() -> argparse.ArgumentParser:
             "--no-sections", dest="sections", action="store_false", default=None,
             help="omit the matched section headings, in text and in --json alike",
         )
+        # W-161's Tier B opt-out. **A pair, like `--sections`**, so that both
+        # directions are reachable from the command line and an absent flag stays
+        # distinguishable from an explicit one.
+        #
+        # 🔴 **It is NOT backed by a key in `.fux/output.toml`, deliberately.**
+        # `[graph] ask_related` already states *do I want the related tier?* for
+        # this repository; a second statement in the rendering file would be the
+        # restatement [SR-LAW-0](../records/0002_LAW-0-authority.md) forbids —
+        # the two could disagree while both looked correct — and, because an
+        # unset output key is a hard error (SR-OUTPUT decision 19), it would
+        # **break every consumer's committed `output.toml` on upgrade** to add a
+        # knob that duplicates one they already have. `None` here means *the
+        # tune decides*, which is `--no-tune`'s own shape.
+        #
+        # ⚠ **It reaches `lexical` too, and is INERT there.** This factory is the
+        # single source of both parsers precisely so the two cannot drift
+        # (SR-CLI decision 12), and `fux lexical` has no graph tier **by
+        # definition** — it is the lexical core, frozen. So the flag parses and
+        # changes nothing there. The alternative was giving `lexical` its own
+        # parser, which is the drift this factory exists to prevent, to remove a
+        # flag that already does nothing.
+        related = p.add_mutually_exclusive_group()
+        related.add_argument(
+            "--related", dest="related", action="store_true", default=None,
+            help="show documents the answers link to but no query word matched (default)",
+        )
+        related.add_argument(
+            "--no-related", dest="related", action="store_false", default=None,
+            help="omit the related tier, in text and in --json alike",
+        )
         # SR-PROVENANCE. A separate flag from `--explain`, not an extension of it:
         # `--explain` answers "which code path ran" and `--why` answers "why this
         # document" — different questions, different costs. `--why` runs a second

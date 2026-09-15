@@ -164,14 +164,16 @@ function main(argv) {
       case "find":
         return runFind(root, args);
       case "ask":
-        return runAsk(root, args);
-      // **W-160's first atom, and on this reader it is the same handler.**
-      // `fux lexical` is frozen byte-identical to `ask` (SR-CLI decision 12),
-      // and on Node that is true BY CONSTRUCTION rather than by test: there is
-      // one function. When W-161 gives Python's `ask` a graph tier, this is
-      // the case that splits, and the differential law is what will say so.
+        return runAsk(root, args, { compose: true });
+      // **W-160's first atom, and W-161 is the change that split it.**
+      // `fux lexical` is the lexical core — BM25F, the proximity reranker and
+      // `-q` fusion, and NO graph stage, ever (SR-CLI decision 12). It was the
+      // same call as `ask` until `ask` grew a tier; now it is the same
+      // function with the tier forced off, which is the narrowest possible
+      // parting and keeps the freeze checkable in one argument rather than in
+      // a second handler that could drift.
       case "lexical":
-        return runAsk(root, args);
+        return runAsk(root, args, { compose: false });
       case "answer":
         return runAnswer(root, args);
       case "explain":

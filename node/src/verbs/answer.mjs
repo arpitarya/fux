@@ -77,7 +77,12 @@ export function answerPayload(root, args) {
   // ⚠ **`answer` takes ONE question and no `-q`** (SR-ANSWER decision 4): the
   // verb means one answer. `--expand` applies exactly as it does to `ask`,
   // because expanding a question is not asking a second one.
-  const { results, confidence, tune } = runQuery(root, query, ANSWER_TOP, {
+  // W-161 — **`answer` reads `ask`, both tiers.** A Tier B document is fetched
+  // and passage-scored on the bytes like any other candidate, and one with
+  // nothing in it survives nowhere: the refer plane re-scores on the fetched
+  // text and has no idea which tier a candidate came from. That is the point —
+  // Tier B's weakness is that no query word matched the INDEX.
+  const { results, related, confidence, tune } = runQuery(root, query, ANSWER_TOP, {
     useTune: args.noTune !== true, wantConfidence: true, expand: args.expand ?? "",
   });
   declareFloorOff(tune, Boolean(args.json));
@@ -121,7 +126,11 @@ export function answerPayload(root, args) {
   // Resolved ONCE per answer, not once per candidate: it is a committed file
   // read, and three candidates is three reads of the same bytes.
   const textGlobs = alreadyTextGlobs(root);
-  for (const r of results) {
+  // ⚠ **Tier A first and Tier B after it, always.** The refer plane picks a
+  // winner on fetched bytes; this order is the tie-break when it cannot
+  // separate two, and a document the words found should win that tie against
+  // one only a link reached.
+  for (const r of [...results, ...(related ?? [])]) {
     const record = recordFor(root, r.id);
     if (!record) continue;
     const got = obtain(root, record, textGlobs);

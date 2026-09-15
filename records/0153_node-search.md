@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@1c1ae230eb27, src/fux/store/nodebundle.py@071a24a596dd]
+owns: [node@15442fe10b25, src/fux/store/nodebundle.py@071a24a596dd]
 laws: [L1, L3, L4, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 40c965b3cfcd120c91079c49e161b9e274ae26148fef8175893eed7c8b91ea00
+content_sha: d846285d9a84d7c7f6110259b0801dd959de4c9fc6dd73048cba5e5f7af4e85b
 ---
 
 # SR-NODE-SEARCH — the Node read plane
@@ -561,6 +561,54 @@ untouched, and no byte of `node/` changed.
 owning record was *touched*, never that it was read (CLAUDE.md §Law zero), so a
 co-owner's file changing under this one is exactly the case where a reader needs
 to be told *"not yours"* in writing.
+**17. THE GRAPH TIER IS ON BOTH READERS, and the asymmetry it inherits is
+decision 9's, not a new one** (W-161).
+
+Node composes W-161's two tiers. It does **not** read Python's derived
+`.fux/runtime/graph.json` — it rebuilds the plane in memory from the committed
+records, exactly as `verbs/graph.mjs` already does, because decision 9 ruled
+that behaviour *"the right one for its audience"*: this reader exists for a
+clone with no Python, and `.fux/runtime/` is written by `fux build`, which is
+Python.
+
+**So the two readers are byte-equal wherever Python has a fresh plane** — which
+is every corpus the differential arm runs on, because the golden ladder's rungs
+are built — **and diverge on a corpus with no fresh build**, where Python has no
+tier and Node has one. That is decision 9's existing asymmetry showing through a
+new surface. ⚠ **It is stated here rather than left for the harness to
+discover**, which is what W-161's item required of this record.
+
+**17a. 🔴 And it is not free on this reader.** Rebuilding the plane parses
+**every** committed record — the work the B2 prefilter exists to avoid — so a
+Node `ask` with the tier on pays a full parse that its lexical answer does not.
+Python reads one JSON file. **Node's query latency is unmeasured**
+([W-148](../work/open/W-148-what-the-two-readers-still-owe.md) row 2 — the
+instrument does not exist), and this is now one more reason it should not stay
+that way. `[graph] ask_boost = false` and `ask_related = false` turn it off.
+
+**17b. `fux lexical` and `fux ask` are no longer the same call.** They were one
+function on this reader and equal by construction; `fux.mjs` now dispatches
+`ask` with `compose: true` and `lexical` with `compose: false`, and `runQuery`
+forces both tier booleans off on that argument rather than trusting the caller.
+**A repository whose `tune.toml` turns the tier on must not be able to make the
+frozen baseline verb stop being a baseline** — every ranking verdict in this
+repo cites `lexical` as its control.
+
+**17c. ⚠ `Object.create` + `Object.assign`, never a `{...spread}`, to override
+a `Tune`.** `Tune.scoring` is a **prototype getter**; spreading an instance into
+an object literal keeps the own properties and silently drops it, so
+`resolved.scoring` would be `undefined` and every score would be computed at
+default weights — on the frozen baseline verb, with nothing failing. Caught
+while writing 17b, not by a test.
+
+**17d. The six `[graph] ask_*` keys are PARSED AND CARRIED by this reader's
+tune loader**, and validated identically (`boolean` and `edgeKinds` are twins of
+Python's `_boolean` and `_edge_kinds`). A key one reader refused and the other
+accepted would make one committed `tune.toml` valid in one runtime and an error
+in the other, which is the one asymmetry the config parity test exists to
+forbid.
+
+
 ### Consequences
 
 - **`fux lexical` is ONE FUNCTION on this reader, and that is stronger than the
