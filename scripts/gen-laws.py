@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render `CLAUDE.md` §Non-negotiable constraints from the eleven Law records.
+"""Render `CLAUDE.md` §Non-negotiable constraints from the twelve Law records.
 
 **Why this exists.** [SR-LAW-0](../records/0002_LAW-0-authority.md) decision 1
 says every rule is *stated* in exactly one SR and every other artifact links to
@@ -21,7 +21,7 @@ permission is the test, not the generation.
       - **L3** · **Deterministic — no model in the maintenance path.** ...
       <!-- LAW-TEXT:END L3 -->
 
-- The eleven blocks are concatenated in `L0 … L10` order between `CLAUDE.md`'s
+- The twelve blocks are concatenated in `L0 … L11` order between `CLAUDE.md`'s
   `<!-- LAWS:BEGIN … -->` / `<!-- LAWS:END -->` markers.
 - **Link targets are rewritten, and that is the only transform.** A record lives
   at `records/`, `CLAUDE.md` at the repo root, so the same law text needs two
@@ -44,13 +44,13 @@ ROOT = Path(__file__).resolve().parents[1]
 SR_DIR = ROOT / "records"
 CLAUDE_MD = ROOT / "CLAUDE.md"
 
-#: The eleven handles, in the order the block renders them. L0 first because it
-#: is the law that governs the others; L10 last because it is the newest.
+#: The twelve handles, in the order the block renders them. L0 first because it
+#: is the law that governs the others; L11 last because it is the newest.
 #: The live law handles, in order. ⚠ **L9 is absent and the gap is deliberate**:
 #: the environment rule became SR-WORK-ENVIRONMENTS on 2026-09-13 and the handle
 #: is retired, never reused. Renumbering L10 down would silently change the
 #: meaning of every citation already written.
-LAW_ORDER = ("L0", "L1", "L2", "L3", "L4", "L5", "L6", "L7", "L8", "L10")
+LAW_ORDER = ("L0", "L1", "L2", "L3", "L4", "L5", "L6", "L7", "L8", "L10", "L11")
 
 BEGIN = "<!-- LAWS:BEGIN"
 END = "<!-- LAWS:END -->"
@@ -139,7 +139,7 @@ def render() -> str:
     if missing:
         raise SystemExit(f"no record declares {', '.join(missing)}")
         # An extra handle is impossible: LAW_ORDER is the closed set and a
-        # record declaring L11 would fail the `extra` check below, loudly.
+        # record declaring L12 would fail the `extra` check below, loudly.
     extra = [h for h in records if h not in LAW_ORDER]
     if extra:
         raise SystemExit(f"unknown law handle(s) {extra} — add them to LAW_ORDER first")

@@ -466,6 +466,32 @@ _UNREACHABLE_BY_THE_GATE = {
     # thing and read as authority while doing it.
     "SR-WORK-SCALE", "SR-WORK-LIFECYCLE", "SR-WORK-DOCS", "SR-WORK-SESSION",
     "SR-WORK-OKF", "SR-WORK-ARCHIVE", "SR-WORK-RELEASE", "SR-WORK-BLOCKERS",
+    # SR-WORK-GOVERNANCE (2026-09-14) owns no component and never will: it is
+    # the MAP of what governs what, converted from `work/governance.md`. Its
+    # subject is the inventory of governing files, so no change under `src/`
+    # can make a row of it true or false. It owns no test either, and says so
+    # under SR-WORK-OWNERSHIP decision 7: the only check worth having would be
+    # *"is this map complete"*, and completeness against an open-ended set of
+    # future steering files is exactly the thing a checker cannot grade —
+    # which is why it is decision 8's obligation and the record's veto
+    # condition instead.
+    "SR-WORK-GOVERNANCE",
+    # SR-WORK-GOLDEN (2026-09-15) owns three components and not one of them
+    # is under `src/`: the PreToolUse hook that guards the sealed answer key,
+    # the generator behind `CLAUDE.md`'s view of the prohibition, and the test
+    # that binds the two. Its subject is **who may read a file**, so no change
+    # to the engine can make it true or false — the SR-WORK-OPEN-QUEUE case,
+    # not the SR-ANSWER one. It is unreachable only by THIS set's question,
+    # which asks whether a change under `src/` can demand a record.
+    "SR-WORK-GOLDEN",
+    # SR-LAW-11 (2026-09-15) is the sealed-answer-key prohibition, and it owns
+    # no `src/` component for the same reason its process record SR-WORK-GOLDEN
+    # owns none: its subject is **who may read a directory**, enforced outside
+    # the engine by a PreToolUse hook, a deny rule, `.gitignore` and the
+    # generated law block. No change under `src/` can make the law true or
+    # false, so the freshness gate cannot reach it — the SR-WORK-OPEN-QUEUE
+    # case, not the SR-ANSWER one.
+    "SR-LAW-11",
 }
 
 

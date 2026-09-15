@@ -23,7 +23,7 @@
     "above, in a new costume."
   ],
 
-  "schema": "fux.runtime.v5",
+  "schema": "fux.runtime.v6",
 
   "postings_block_line": {
     "_doc": [
@@ -116,12 +116,42 @@
       "flen":       { "type": "list", "of": "int", "doc": "per-field token counts, trailing zeros trimmed" },
       "archived":   { "type": "bool" },
       "superseded": { "type": "bool" },
-      "mtime":      { "type": "int",  "doc": "git commit time -- NOT wall clock at build time" }
+      "mtime":      { "type": "int",  "doc": "git commit time -- NOT wall clock at build time" },
+      "alen":       { "type": "int",  "doc": "anchor token total -- the words OTHER documents use to link here (W-168 step 1)" }
     },
     "example": {
-      "archived": false, "flen": [990, 6, 1, 2], "id": "file:README.md",
+      "alen": 3, "archived": false, "flen": [990, 6, 1, 2], "id": "file:README.md",
       "loc": "README.md", "mtime": 1787688862, "superseded": false, "title": "Fux"
     }
+  },
+
+  "anchor_shard": {
+    "_doc": [
+      "The whole of .fux/runtime/anchors/<xx>.json -- W-168 step 1's REVERSE",
+      "map, term hash -> [[docidx, count], ...], for the terms whose hash starts",
+      "with byte xx. Sharded like postings/ and like the committed store, so a",
+      "query opens one small file per term rather than a corpus-wide map.",
+      "",
+      "WHY IT IS DERIVED AND NOT COMMITTED, and this is the whole of Arpit's",
+      "2026-09-15 ruling (option (c) of three). The anchor WORDS are committed,",
+      "on the `at` map of the SOURCE document's own edge, because",
+      "Edge(src=B, dst=A) is a pure function of B's bytes: editing B rewrites B",
+      "and moves nothing of A's. What ranking needs is the other direction --",
+      "every word pointed AT a document -- and that view is corpus-wide. Storing",
+      "IT would make a committed per-document byte a function of other",
+      "documents: a full ingest and an incremental re-index would produce",
+      "different indexes from the same sources, on the incremental path only.",
+      "",
+      "So it is folded here instead, from the committed shards alone, exactly",
+      "the way `df` and `avg_wlen` are counted at read time.",
+      "",
+      "Whole-file JSON rather than the block-and-offset shape postings/ uses:",
+      "anchor postings are link text, a handful of words against a body's",
+      "thousands, so a bisectable fixed-width table would buy nothing and add a",
+      "second binary layout to keep in step."
+    ],
+    "shape": { "type": "dict", "key": "term hash (16 hex)", "value": "list of [docidx, count]" },
+    "example": { "000219ac0fa26dbb": [[0, 2], [17, 1]] }
   },
 
   "stats": {
@@ -135,6 +165,10 @@
       "on the accelerator path. Storing raw and weighting at query time is what",
       "keeps the two paths equal.",
       "",
+      "`total_anchor_len` is RAW for the same reason total_flen is: the anchor",
+      "weight is a tune.toml key, so the total is weighted at query time and",
+      "moving the knob needs no rebuild.",
+      "",
       "`newest_mtime` was here until 2026-09-13. It existed only to normalise",
       "`recency_half_life_days`, which was REMOVED (W-152), so nothing reads it.",
       "This plane is derived and gitignored, so dropping a key needs no",
@@ -142,8 +176,9 @@
     ],
     "fields": {
       "n":            { "type": "int",  "doc": "documents in the index" },
-      "total_flen":   { "type": "list", "of": "int", "len": 5, "doc": "raw per-field token totals" }
+      "total_flen":   { "type": "list", "of": "int", "len": 5, "doc": "raw per-field token totals" },
+      "total_anchor_len": { "type": "int", "doc": "corpus-wide anchor token total -- avg_wlen's sixth term, at the query's own anchor weight (W-168 step 1)" }
     },
-    "example": { "n": 508, "total_flen": [637866, 21752, 3380, 4524, 0] }
+    "example": { "n": 508, "total_anchor_len": 4180, "total_flen": [637866, 21752, 3380, 4524, 0] }
   }
 }

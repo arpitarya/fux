@@ -15,24 +15,20 @@ Ruled by Arpit, 2026-09-11. Tracked as [W-136](../open/W-136-golden-benchmark.md
 
 ## 🔴 The one rule
 
-**Claude never opens `golden-answer/`.** Not Cowork, not Claude Code, not a
-subagent — not to check the format, not to count lines, not by `grep -r`.
-
-- **Who may read it:** Arpit, Codex, ChatGPT.
-- **Why:** a question whose answer the engine's builder has seen can be
-  optimised against without anyone meaning to. A leak does not fail loudly; it
-  produces a number that looks exactly like a clean one.
-- **What guards it** — layered, and **none of it is a cryptographic guarantee**
-  (Claude Code and Codex run as the same Mac user, so no file permission can
-  tell them apart):
+🔴 **It is LAW — [L11](../../records/0012_LAW-11-sealed-answer-key.md)**, stated
+once there (Arpit, 2026-09-11; made law 2026-09-15) and carried into `CLAUDE.md`
+§Non-negotiable constraints. **Read it before you touch anything in this
+directory.** The guards and what Claude MAY read are
+[SR-WORK-GOLDEN](../../records/0066_WORK-golden.md) decision 2. This file states
+neither, and says only what each guard stops:
 
 | guard | stops |
 |---|---|
 | `.gitignore` | the key reaching git history or a remote; `rg` and Claude's Grep skipping it by default |
 | `!work/golden` in `.fux/sources/dirs` | the key's vocabulary landing in fux's own **committed** index |
 | `permissions.deny` in `.claude/settings.json` | Claude Code's Read / Edit / Grep / Glob on the folder |
-| `.claude/hooks/guard-golden-answer.sh` | any Claude Code tool call — Bash included — that names `golden-answer` |
-| CLAUDE.md §Golden answer key | everything above can't reach: Cowork, and a recursive `grep` |
+| `.claude/hooks/guard-golden-answer.sh` | any Claude Code tool call — Bash included — that **targets** the folder by path |
+| `CLAUDE.md` §Non-negotiable constraints — L11's generated view | everything above cannot reach: **Cowork**, and a recursive `grep` that never names the folder |
 
 ⚠ **Back the key up yourself.** It is gitignored, so git will not keep it.
 

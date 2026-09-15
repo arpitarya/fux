@@ -7,10 +7,10 @@ description: A disposable term-major index under .fux/runtime/ that makes warm q
 status: accepted
 date: 2026-08-18
 feature: "`.fux/runtime/` — the derived index, `fux build`, and the block bound that makes skipping provable"
-owns: [src/fux/derive@08c8ff2c8767, tools/differential@f4c752e76d2a]
+owns: [src/fux/derive@d97158a8fa5b, tools/differential@44301711f1ed]
 laws: [L1, L3]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 7c07416bf9b187afd73f7fac82b97aad83e447b1a1fc869622f30b9e61ed9d67
+content_sha: 00266fddd2d2307f69e9da0c9a68dc80a12b67abd7e3ac063db6f5593c026362
 ---
 
 # SR-T1-ACCELERATOR — the derived T1 accelerator
@@ -496,6 +496,64 @@ every answer).
 plane.** Python's graph verbs refuse without `fux build` and Node's do not
 (SR-NODE-SEARCH decision 9), so there is nothing to compare there — and a lane
 that silently does not run is the failure decision 13 is about.
+
+
+**15. The anchor seed happens BEFORE the skipping loop, and that ordering is
+the whole correctness argument** (W-168 step 1, 2026-09-15).
+
+`block_bound` bounds what a document can score **from the postings**. An anchor
+contribution is not in the postings, so a document whose score comes from a
+linker's wording is not bounded by it — and skipping would lose it. That is the
+W-73 defect exactly: a bound that no longer bounds.
+
+**Seeding every anchor-matching document up front makes the existing bound
+sound again, unchanged.** After the seed, every document with a non-zero anchor
+contribution for any query term is already a candidate, so an *unseen*
+document's anchor contribution is **zero by construction** and `block_bound`
+bounds it as it always did. The ceiling is therefore **exact** rather than
+merely conservative, and nothing in it needed widening.
+
+- **The other direction is safe too.** Anchor length only ever raises a
+  candidate's `wlen`, and `mnw` under-estimates `wlen`, which pushes the bound
+  **up** — the one error direction that never loses a document.
+- **`theta` DOES carry the fold**, and must: a real candidate's real score
+  includes its anchor terms. A higher `theta` skips more, which is sound
+  because it is compared against a ceiling over documents that provably have
+  none. Scoring a candidate without its anchor terms while `rank()` scores it
+  with them would report a k-th best that no longer matches the ranking anyone
+  sees — the same rule `--expand`'s per-term weights follow in `_kth_score`.
+- **It is cheap.** Anchor postings are link text: a handful of words per edge
+  against thousands per body.
+
+**15a. `fux.runtime.v6` — the anchor plane.** `anchors/<prefix>.json` holds the
+reverse map term → `[(docidx, count)]`; `docs.jsonl` carries each document's
+`alen`; `stats.json` carries `total_anchor_len`. All three are folded from the
+committed shards alone and gitignored, which is the whole of Arpit's ruling:
+**the words are committed on the source's edge, and the per-target view ranking
+needs is rebuilt, never committed.**
+
+- **Sharded by the term hash's first byte**, mirroring `postings/` and the
+  committed store, so a query opens one small file per term rather than a
+  corpus-wide map.
+- **Whole-file JSON, not the block-and-offset shape `postings/` uses.** Anchor
+  postings are a small fraction of body postings, so a bisectable fixed-width
+  table would buy nothing and add a second binary layout to keep in step.
+- **`alen` is in the doc table, not the anchor shards**, because every
+  candidate needs it and only a *matching* candidate needs its terms — a linked
+  document is longer whether or not a single anchor word matches.
+- **`DOCS_FIELDS` moved with the table**, which is the 2026-08-23 lesson that
+  field set exists for: a key added while the schema string stayed put left an
+  accelerator built minutes earlier still being read, and the two paths weighted
+  the same document differently.
+
+**15b. The differential arm ran at anchor ON as well as off.** 692 queries × 4
+`top` values × 2 skipping modes over this repository's 1 237 documents:
+**5 536 byte-identical comparisons at the default and 5 536 at `anchor = 2.0`,
+zero mismatches** (2026-09-15). ⚠ **Run through an ad-hoc copy of the harness,
+not `tools/differential/run.py`**, because `queryset.py::vocabulary` decodes
+every walked file as UTF-8 and this repository's source dirs now hold ten files
+that are not — a pre-existing harness defect, unrelated to this change, filed
+as **W-184**. The comparison performed is the harness's own.
 
 ### Consequences
 

@@ -44,12 +44,17 @@ _VERB = re.compile(r"`([a-z]+)`")
 
 
 def _table(path: Path) -> dict[str, set[str]]:
-    """`{group: {verbs}}` from the first verb table in `path`.
+    """`{group: {verbs}}` from the first verb table in `path`."""
+    return _table_from_text(path.read_text(encoding="utf-8"))
+
+
+def _table_from_text(text: str) -> dict[str, set[str]]:
+    """`{group: {verbs}}` from the first verb table in `text`.
 
     A verb table is recognised by its header row, so a later table of flags or
     exit codes cannot be read as one.
     """
-    lines = path.read_text(encoding="utf-8").splitlines()
+    lines = text.splitlines()
     out: dict[str, set[str]] = {}
     inside = False
     for line in lines:
@@ -131,3 +136,43 @@ def test_the_two_tables_group_the_verbs_identically():
         + "\n  ".join(f"{g}: {d}" for g, d in sorted(differing.items()))
         + "\n\nThe parser decides which copy is wrong — see `_parser_verbs`."
     )
+
+
+# --- the THIRD copy: the template a new consumer is given ---------------------
+#
+# 🔴 **The tests above read `.fux/README.md`, which is THIS repository's copy —
+# written once and then hand-annotated.** The table a *new* consumer gets comes
+# from `fux.store.fuxdir._readme()`, and `ensure_layout` is write-if-missing, so
+# the two diverge silently: on 2026-09-15 the committed copy listed `inspect`,
+# `correct` and `lexical` and the template listed none of them, which every test
+# above was green through. A fresh `fux setup` was handing out a short list.
+
+
+def _template() -> str:
+    from fux.store.fuxdir import _readme
+
+    return _readme()
+
+
+def test_the_template_lists_every_shipped_verb_too():
+    """The copy a NEW consumer is handed, held to the same fact: the parser."""
+    listed = {v for verbs in _table_from_text(_template()).values() for v in verbs}
+    assert listed, "no verb table parsed out of the `.fux/README.md` template"
+    missing = sorted(_parser_verbs() - listed)
+    assert not missing, (
+        f"the `.fux/README.md` template does not list: {missing}\n\n"
+        "`ensure_layout` is write-if-missing, so this repository's own copy can "
+        "be correct while every fresh `fux setup` hands out a short list."
+    )
+    phantom = sorted(listed - _parser_verbs())
+    assert not phantom, f"the template names verbs the parser does not have: {phantom}"
+
+
+def test_the_template_is_pure_ascii():
+    """`ensure_layout` writes it with `.encode("ascii")` and nothing catches it.
+
+    An em dash in the template raises `UnicodeEncodeError` at the head of every
+    ingest **in a repository that has no `.fux/README.md` yet** — so the failure
+    misses this repository entirely and lands on a new consumer's first run.
+    """
+    _template().encode("ascii")

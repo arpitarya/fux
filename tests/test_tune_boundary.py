@@ -41,6 +41,9 @@ MUTATIONS: dict[str, dict[str, str]] = {
         "title": "11.0",
         "path": "0.0",
         "ctx": "5.5",
+        # W-168 step 1. Non-zero on purpose: `0.0` IS the default, and a
+        # mutation that sets a key to its default exercises nothing.
+        "anchor": "4.0",
     },
     "ranking": {
         "archived_weight": "0.1",

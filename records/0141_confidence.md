@@ -6,12 +6,12 @@ title: SR-CONFIDENCE (0141) — how much the index believes its own answer
 description: "Four deterministic signals and one band, emitted with every answer, so a consuming agent can tell a grounded result from the closest thing in a corpus that never discusses the question."
 status: accepted
 date: 2026-08-27
-amended: 2026-08-28
+amended: 2026-09-15
 feature: the confidence plane
 owns: [src/fux/query/confidence.py@e0641ff2c3be, tests/test_confidence_floor_off.py@f8e18c079a6e]
 laws: [L1, L3, L4]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 33216bf0dd13f2ac935022d0e52c402b9e6d1fc727ab5cf336a13f52af2179da
+content_sha: 23d8e8898ebc69d529af4ac81c965a0618313e986c018b906613bbc77bd86890
 ---
 
 # SR-CONFIDENCE — how much the index believes its own answer
@@ -653,6 +653,35 @@ and its Node twin `run.mjs::bandGuard`.
 §Consequences predicted. The difference is informative: the band describes the
 answer the reader was shown, and the two verbs no longer show the same answer.
 
+
+
+**16. An anchor-reached document reports the query's word as `missing`, and
+that is correct** (W-168 step 1, 2026-09-15).
+
+`top_doc_hashes` — decision 2's seam, and what `doc_coverage` is computed from
+— is *which of the query's terms the top-ranked document itself contains*, read
+off `record["terms"]`. Anchor terms are in no committed posting and are not in
+`terms`, so a document ranked #1 purely on what its linkers call it reports
+**coverage 0** and names the word in `confidence.missing`.
+
+🔴 **Not a defect, and deliberately not patched.** The band answers *what does
+the top document itself say?*, and the honest answer for such a document is
+*not this word — other documents use it about me*. A reader told `partial`, with
+the term named, can see exactly that and go and check. Folding anchor terms into
+`top_doc_hashes` would report full coverage for a document that does not contain
+the term, which is the one thing this block exists to stop.
+
+⚠ **The interaction is UNMEASURED and is not in
+[the pre-registration](../work/regression/2026-09-15-anchor-text/PRE-REGISTRATION.md)'s
+decision rule.** If turning the field on pushes a class of answers into
+`partial` or `weak`, that is a finding for Arpit and a second question — not a
+reason to widen the seam mid-run.
+
+**16a. The seam itself is untouched, so both paths still agree.**
+`top_doc_hashes` is derived in `rank()`, which both candidate generators reach
+with the same record dicts, so decision 8's guarantee — `--fast` and `--scan`
+cannot disagree about how confident fux is — holds with the field on. Asserted
+at `anchor = 2.0` by the 2026-09-15 differential run.
 
 ### Consequences
 

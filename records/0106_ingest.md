@@ -5,13 +5,13 @@ name: SR-INGEST
 title: SR-INGEST (0106) — how ingest works
 description: "Re-resolve every edge every run; carry unchanged documents' extraction forward. Write only shards whose bytes changed. Skips are reported once, counted by class, and recorded in the committed `.fux/.fuxignore`; deletions honoured, output byte-identical."
 status: accepted
-amended: 2026-09-11
+amended: 2026-09-15
 date: 2026-08-18
 feature: the `fux ingest` pipeline — sources to committed records
-owns: [src/fux/ingest@89fb94b6f47c, src/fux/ingest/priors.py@8ffcc632a4be]
+owns: [src/fux/ingest@d641250d723e, src/fux/ingest/priors.py@8ffcc632a4be]
 laws: [L2, L3, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 2ed533c810ac7dcd4005445cbaa0861950a11ee9d6f7a566345665fe669a16bf
+content_sha: 98c78270834b9c3ebf5796f236171274917b170dd1cfd13cea12269cfde21bd7
 ---
 
 # SR-INGEST — how ingest works
@@ -484,6 +484,71 @@ not exist in that scope and raised `NameError` on every retaining fetch. This
 file is the only place that holds both the config and the fetch plane, so it is
 the only place the value can cross, and stating that here is what stops the
 next version reaching sideways for it again.
+
+
+**17. Anchor terms ride the edge, and the edge rides the SOURCE document**
+(W-168 step 1; Arpit, 2026-09-15, option (c) of three). A `ref` edge carries
+`at` — anchor term hash to count, taken from the **link text** this document
+wrote — and `al`, the token total.
+
+**The invariant this protects is sharper than "no cross-document
+dependencies"**, and naming it wrongly is how the specified form of the feature
+nearly shipped:
+
+> **A committed per-document byte is a function of that document alone.
+> Everything corpus-wide is a read-time fold.**
+
+`df` and `avg_wlen` are corpus-wide and cost nothing, because they are
+**counted at read time**. An `anchor` field on the TARGET, built from what
+everyone else calls it, would have been the first thing in the engine to break
+the invariant: editing `B` would move `A`'s committed bytes while the dirty
+list marked only `B`, so a full `fux ingest` and an incremental re-index would
+produce **different indexes from the same sources**.
+
+⚠ **That is [L3](0005_LAW-3-deterministic.md) failing on the INCREMENTAL path
+only, which is the worst shape for it.** The full-ingest path stays
+byte-reproducible, so every test and every CI check that rebuilds from scratch
+passes, and the drift appears only in a working repository that has been edited
+over time. **Nothing in this repo would have caught it**, which is why
+`tests/ingest/test_anchor_is_source_local.py` tests the property rather than a
+symptom.
+
+⚠ **It was not reachable today, and that is not a reason it was safe.**
+`maintain/runner.py`'s `record_head` says in terms that *"`fux ingest`
+re-indexes the whole corpus regardless of what the list says"*, and `B-002`
+records that the dirty list's input is unused. The hazard was **B-002's
+inheritance** — building step 1 first would have planted it where nothing would
+find it.
+
+**17a. Terms, never the anchor string.** Link text is a verbatim fragment of
+the source document's prose, so committing it plainly would put content in the
+index ([L2](0004_LAW-2-content-never-durable.md)) and would need L5's
+hashed-meta branch on top. A term hash is a *statistic*, which is what the
+index holds — and it is the currency `terms` is already written in, so
+`query/scan.py`'s byte prefilter finds an anchor source by the substring check
+it already runs, at no extra cost.
+
+**17b. Hashed through the RUN's single `CollisionTracker`.** `resolve()` takes
+`hash_of` as a required parameter with **no default** — an anchor-less fallback
+would be a silent off-switch on a retrieval feature, which is the one kind of
+bug a query cannot show you. Passed in rather than imported so `ingest/edges.py`
+stays free of `store`, and so a caller cannot hash anchor terms with a *second*
+tracker that could not see a cross-document collision.
+
+**17c. Merged per target, absent when empty.** `edges` has always been
+deduplicated by `(kind, dst)`, so two links from `B` to `A` are one edge and
+their words are one bag. A link whose text is empty, punctuation or all
+stopwords adds **no keys at all** — absent rather than `{}`/`0`, the same rule
+`omit_when` follows, so a record's shape stays what it was. Only `ref` edges
+can carry them: a `tag`, `code` or `supersedes` edge has no link text.
+
+**17d. `al` is redundant and the build asserts it.** `al == sum(at.values())`
+by construction; it exists so `query/scan.py` can read a document's anchor
+length off raw bytes with one integer capture, on every line in the corpus,
+without a parse. Redundancy nothing checks is redundancy that drifts, and this
+one would drift into `avg_wlen` — a corpus-wide denominator — on the scan path
+alone. `derive/_build.py::_assert_invariants` refuses to build an index where
+they disagree, or where one is present without the other.
 
 ### What it looks like
 

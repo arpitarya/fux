@@ -7,11 +7,11 @@ description: "`--expand` scores agent-supplied terms at a lower weight beside th
 status: accepted
 date: 2026-09-05
 feature: agent-side query expansion and multi-query fusion
-owns: [src/fux/query/expand.py@c4c8d5671973, src/fux/query/fuse.py@749673d52166]
+owns: [src/fux/query/expand.py@19b697b80e8c, src/fux/query/fuse.py@749673d52166]
 laws: [3, 4, 8]
 ratifies: W-109
 timestamp: 2026-09-05T00:00:00Z
-content_sha: c506dffdcd5d28830b0fce4cee7d5175845542af804ba8ea9e1b115e76ea8e83
+content_sha: e1719f97846bbed19c9e92e4a0bca22dd503b7df42643669c102e19e59fb7edf
 ---
 
 # SR-EXPAND: the caller supplies the vocabulary, and fuses its own phrasings
@@ -250,6 +250,26 @@ thing and is not:
   asked, and testing against the expansion's hashes would have re-opened
   decision 1 through the back door.
 
+
+
+**15. An ANCHOR match passes the hallucinated-citation guard** (W-168 step 1,
+2026-09-15). `Expansion.matches` takes the candidate's anchor terms alongside
+its own `terms`, and a document carrying a required hash in either is kept.
+
+🔴 **It had to be said here or the retrieval change was dead on arrival.** A
+document reachable only through what its linkers call it carries **none** of the
+query's hashes in its own `terms`, so this guard — whose test was *vacuous*
+until now, because every candidate matched by construction — would have dropped
+it before it was ever scored.
+
+🔴 **And the distinction is what makes relaxing it legitimate rather than
+convenient.** This guard refuses **invented vocabulary**: `--expand` hands fux
+words a *model* wrote about a document, and returning that document with a fresh
+`sha` beside it is a hallucinated citation with provenance attached. An anchor
+term is a word a **human linker** wrote, extracted deterministically from a
+committed document, pointing at this one. `required` is still the user's own
+hashes in both cases — what changed is where a match may be found, not what
+counts as one.
 
 ### Consequences
 

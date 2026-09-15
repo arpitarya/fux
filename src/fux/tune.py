@@ -133,7 +133,7 @@ INDEX_TABLE = "index"
 #: The closed key set. Table -> keys. Adding a key here is a change to
 #: SR-TUNE, not a convenience (decision 5).
 _SCHEMA: dict[str, tuple[str, ...]] = {
-    "bm25f": ("k1", "b", *_FIELD_KEYS),
+    "bm25f": ("k1", "b", *_FIELD_KEYS, "anchor"),
     "ranking": ("rerank_weight", "expand_weight"),
     "graph": (
         "damping",
@@ -225,6 +225,17 @@ class Tune:
     k1: float = K1
     b: float = B
     field_weights: tuple[float, ...] = FIELD_WEIGHTS
+    #: W-168 step 1 — the anchor field: what other documents call this one when
+    #: they link to it. **`0.0` is OFF and is the default**, per SR-RS decision
+    #: 19: a ranking change ships behind a tunable at zero and is defaulted on
+    #: only by a PASS on a frozen pre-registration. Unmeasured today.
+    #:
+    #: ⚠ **Not in `field_weights`, deliberately.** That tuple is aligned
+    #: index-for-index with `TF_FIELDS`, the five fields a record COMMITS an
+    #: `flen` for; anchor is folded at read time out of other documents' edges
+    #: and has no committed slot. Padding it in would claim a sixth committed
+    #: field and leave every `flen` one short — see `query/bm25f.py`.
+    anchor_weight: float = 0.0
 
     # [ranking]
     #: ⚠ **Three document priors stood here and all three are GONE**, ruled by
@@ -313,7 +324,9 @@ class Tune:
     @property
     def scoring(self) -> Scoring:
         """The three-part BM25F parameter set, as one object."""
-        return Scoring(k1=self.k1, b=self.b, weights=self.field_weights)
+        return Scoring(
+            k1=self.k1, b=self.b, weights=self.field_weights, anchor=self.anchor_weight
+        )
 
     @property
     def trivial(self) -> bool:
@@ -604,6 +617,11 @@ def load(root: Path, *, enabled: bool = True) -> Tune:
             # Zero is legal here and means *ignore this field* — that is a
             # ranking choice, not the source exclusion decision 9a refuses.
             weights[i] = _non_negative(c, "bm25f", key, bm25f[key], FIELD_WEIGHTS[i])
+    anchor_weight = (
+        _non_negative(c, "bm25f", "anchor", bm25f["anchor"], 0.0)
+        if "anchor" in bm25f
+        else 0.0
+    )
 
     ranking = data.get("ranking", {})
     rerank_weight = (
@@ -736,6 +754,7 @@ def load(root: Path, *, enabled: bool = True) -> Tune:
 
     return Tune(
         k1=k1,
+        anchor_weight=anchor_weight,
         b=b,
         field_weights=tuple(weights),
         rerank_weight=rerank_weight,
@@ -821,6 +840,11 @@ k1                      = {K1}      # term-frequency saturation
 b                       = {B}     # length normalisation, 0 = off, 1 = full
 # The five field weights, in index order. 0 means "ignore this field".
 {fields}
+# The sixth field is ANCHOR: what OTHER documents call this one when they link
+# to it (W-168 step 1). Folded in at read time from their edges -- it is in no
+# committed posting, so moving this needs no re-ingest. 0 = OFF, and off is the
+# default: UNMEASURED, and it turns on only on a passing pre-registered run.
+anchor                  = {d.anchor_weight}
 
 [ranking]
 rerank_weight           = {d.rerank_weight}   # 0 = off; the proximity reranker's uplift

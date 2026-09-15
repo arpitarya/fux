@@ -7,10 +7,10 @@ description: BM25F over five fields, weight-then-saturate once, with one scorer 
 status: accepted
 date: 2026-08-18
 feature: scoring, ordering, and the analyzer they share with ingest
-owns: [src/fux/query/rank.py@1ce3ee8b94c5, src/fux/query/bm25f.py@60ec353f1d84, src/fux/query/tokenize.py@1d8ff4a42048, src/fux/query/analyzer.py@4a6a03793628, src/fux/query/stem.py@728155482c94]
+owns: [src/fux/query/rank.py@aeee6408bcf8, src/fux/query/bm25f.py@720cf2ef6fdf, src/fux/query/tokenize.py@1d8ff4a42048, src/fux/query/analyzer.py@4a6a03793628, src/fux/query/stem.py@728155482c94]
 laws: [L1, L3]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 82231a8d0663337a44856f55c8beb04dc43fb0d82b81d7d4859ce0a8fd4d100e
+content_sha: 1bc1480dfe0c6cd3df914e3ceed0411292c3490778c9cff37c38836d8a23a590
 ---
 
 # SR-RANKING — how documents are scored and ordered
@@ -427,6 +427,68 @@ would hide the tier's effect exactly where it agreed with the words — the case
 a reader most needs to see, because it is the one that looks like nothing
 happened. [SR-ASK](0103_ask.md) decision 13 carries the composition.
 
+
+
+**12. `anchor` is the sixth BM25F field, folded at READ time, and it is not in
+`TF_FIELDS`** (W-168 step 1, 2026-09-15). A document's anchor terms are the
+words **other documents use when they link to it** — every other field is
+something the document says about itself.
+
+- **Weighted into `wtf`, never scored as a second BM25.** BM25F is
+  weight-then-saturate **once**; summing a separate per-field BM25 is what this
+  record's own law forbids, and it is what would let an anchor match on a short
+  document outrank a full body match. One `wtf`, one saturation.
+- **`alen` joins `wlen`.** A heavily linked-to document is a **longer**
+  document. Leaving anchor out of the normaliser is what would let a link farm
+  max out a term with no length price, so it is in, at the weight the numerator
+  uses — and it is the only guard in the engine against the failure direction
+  the [pre-registration](../work/regression/2026-09-15-anchor-text/PRE-REGISTRATION.md)
+  names, because **anchor tf is unbounded in the number of linkers** where body
+  tf is bounded by one document's length.
+- 🔴 **Anchor terms are in no committed posting, so they are in no `df`.**
+  Switching the field on cannot move `idf` for anything. That is also forced:
+  `derive/accel.py` counts `df` from the postings alone, so counting them on the
+  scan side would be an immediate differential-law break.
+- **Outside the `weights` tuple, deliberately.** That tuple is aligned
+  index-for-index with `TF_FIELDS` — the five fields a record commits an `flen`
+  for — and the alignment is asserted at import because a misalignment would
+  weight `title` as `path`. Anchor has no committed slot.
+
+**12a. `tf is None` stopped being a reason to skip a term.** `score_record`
+returned early for a document whose own `terms` lack the hash. **That early
+return was the second place the retrieval change would have died silently** —
+the first being candidate generation — and both had to move or the fold would
+have been dead code for exactly the documents it exists for.
+
+**12b. The fold lands in `rank()`, once, for both candidate paths.** Each
+generator attaches `atf` and `alen` to the record dicts it hands over, and
+`rank()` reads them the way it reads `flen`. The differential law then stays
+what this record and `derive/accel.py` already make it — **a property of the
+candidate set** — rather than a hope about two copies of an arithmetic.
+
+⚠ **Both keys go on EVERY candidate when the field is on, `atf` empty or not.**
+A document that is linked-to is a longer document whether or not the query's
+words are what its linkers used; attaching them only where `atf` is non-empty
+would drop that length out of `wlen` on one path and not the other, silently
+and only on linked documents.
+
+**12c. `0.0` is OFF, not "weight zero".** Every anchor branch in the engine
+tests it and is skipped entirely, so an unconfigured corpus does the float
+arithmetic it did before the field existed. Same rule, and the same reason, as
+`--expand`'s `term_weights`: the differential law must not pick up a last-bit
+difference from a feature merely being present, and the evidence gathered at
+the default stands unmodified. **Measured 2026-09-15**: 692 queries × 4 `top`
+values × 2 skipping modes over this repository's 1 237 documents — **5 536
+byte-identical comparisons at the default and 5 536 at `anchor = 2.0`, zero
+mismatches.**
+
+**12d. It ships off and is UNMEASURED.** [SR-RS](0133_predictions.md) decision
+19: a ranking change ships behind a tunable at zero and is defaulted on only by
+a PASS on a frozen pre-registration. That pre-registration is
+[`2026-09-15-anchor-text`](../work/regression/2026-09-15-anchor-text/PRE-REGISTRATION.md),
+and the data it needs — documents findable only through a linker's wording —
+does not exist yet. **No claim about ranking quality is made or may be made
+until it has a `VERDICT.md`.**
 
 ### Consequences
 

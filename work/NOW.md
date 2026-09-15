@@ -3,6 +3,19 @@ type: Pointer
 description: "One line: the current state and the immediate next step. Overwritten every session."
 ---
 
-✓ 2026-09-15 Claude Code: **six of nine queue items moved; the graph tier, the abstention gate and the observer hook all shipped.** [W-161](open/W-161-graph-composed-ask.md) `ask` = lexical → graph → split → confidence → refer, both readers, **0 discordant**, pre-registration committed alone first. [W-176](open/W-176-abstention-gates.md) steps 1–3: 🔴 **`weak` now means `answerable: false`** — it was `band != none`, and *nothing scored above zero* is a state no corpus produces, so **the refusal was structurally unreachable** and four measured runs found the symptom without naming the cause. [W-170](open/W-170-cage-search-leg.md) `.fux/observers/` — counts only, no return path, and fux's stdout taken away for the dispatch because an observer's `print` reached the answer. [W-148](open/W-148-what-the-two-readers-still-owe.md) rows 1–3, [W-140](open/W-140-guide-authoring-defects.md) row 12, [W-146](open/W-146-the-rest-of-l0.md)'s gate (**green first run, no drift**), [W-144](open/W-144-structure-aware-extraction.md)'s `b` sweep frozen. ⚠ **Two breaking changes for a 3.0.0-alpha consumer, both now in the CHANGELOG:** `results` is no longer sorted by `score`, and `answerable` changed meaning. 🔴 **Two ABANDONED Cowork changesets sit in the tree** (`SR-WORK-GOVERNANCE`/`0065`, and the paper rewrite) — backed up, preserved intact, still uncommitted; **adopting or discarding them is Arpit's.** Also uncommitted and not mine: W-177 (`fux update` deleted, `ingest` absorbs it) and W-178, both filed by Cowork on 2026-09-15 and both needing his ruling. 🔴 `2.0.1` is still not on npm.
+✓ 2026-09-15 Claude Code: **W-168 step 1 is BUILT** — the anchor field, *what other documents call this one*, in both readers behind `[bm25f] anchor` **default `0.0`**. The words ride the **source's** edge (`at`/`al`); the per-target view folds at read time from `.fux/runtime/anchors/`, so no committed byte crosses a document boundary. `fux.index.v3` + `fux.runtime.v6`, repo re-ingested `--full`, vendored Node bundle rebuilt (mandatory — the old one pins v2 and refuses the new index). **5 536 byte-identical scan-vs-accelerator comparisons at the default and 5 536 at `anchor = 2.0`, 0 mismatches.** 13 records amended, [pre-registration](regression/2026-09-15-anchor-text/PRE-REGISTRATION.md) frozen.
 
-→ **Next:** Arpit rules the **two inbox rows** — W-168 step 1 (an anchor field makes a document's bytes depend on other documents while re-index is per-document, so full and incremental ingest disagree **on the incremental path only**) and W-146 row 17 (the golden-key paragraph) — and decides what happens to the two abandoned changesets.
+→ **Next:** 🟢 **W-179 · W-180 · W-181 · W-182 · W-184** — all agent work, no blockers,
+inbox still empty. **W-168 is 🟣 until 2026-09-30**: obligations 8 and 10 need documents
+findable only through a linker's wording, and those are Codex's
+([SR-RS](../records/0133_predictions.md) d23 +
+[L11](../records/0012_LAW-11-sealed-answer-key.md)). ⚠ **New: W-184** —
+`tools/differential/run.py` dies on a PNG in a source dir, so **the real-corpus
+differential arm has been dead while the synthetic one covered for it**; this session's
+evidence came through an ad-hoc copy and says so. ⚠ **Two things for Arpit, neither
+blocking:** the edge carries **hashed terms, not the anchor string** (L2 — a readable
+string for `fux explain` is a second field and a second decision), and a document ranked
+#1 on its linkers' wording reports `coverage 0` with the query's word in
+`confidence.missing` — honest, deliberate, unmeasured. 🔴 **`tests/test_sr_ownership.py`
+is RED and was red before this session**: `SR-LAW-11` needs a `describes` row or a pin
+entry. That is the L11 change, **still staged and uncommitted**.

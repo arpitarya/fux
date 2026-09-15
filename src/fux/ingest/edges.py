@@ -10,14 +10,49 @@ Grades: `EXTRACTED` (10) for a deterministic, unambiguous resolution;
 `AMBIG` (8) for a `code` span that only resolves by basename among several
 candidates. `INFERRED` (6, matching the archived EXTRACTED:INFERRED ≈
 1.0:0.6 weight ratio) is unused until the enriched tier (M8).
+
+## Anchor terms ride the EDGE — W-168 step 1, option (c)
+
+A `ref` edge carries two extra keys, `at` (anchor term hash -> count) and
+`al` (the token total), taken from the **link text** of every markdown link
+this document writes to that target.
+
+🔴 **The byte stays on the document that wrote it.** `Edge(src=B, dst=A)`
+already lives on `B`'s committed record, so editing `B` rewrites `B`'s bytes
+and moves nothing of `A`'s. The field as originally specified — an `anchor`
+field on `A`, built from what everyone else calls it — would have made a
+committed per-document byte a function of OTHER documents, and the invariant
+it breaks is sharper than "no cross-document dependencies":
+
+> **A committed per-document byte is a function of that document alone.
+> Everything corpus-wide is a read-time fold.**
+
+`df` and `avg_wlen` are corpus-wide and cost nothing because they are counted
+at read time; the anchor fold is the same shape. Ruled by Arpit, 2026-09-15,
+option (c) of three. `tests/ingest/test_edges.py::
+test_edge_text_is_a_function_of_its_source_alone` is the gate: edit the
+linker, re-index it alone, assert the target's committed bytes did not move.
+
+## Why HASHES and not the anchor string
+
+[L2](../../records/0004_LAW-2-content-never-durable.md) — content is never
+durable outside its source system. Link text is a verbatim fragment of the
+source document's prose, so committing it plainly would put content in the
+index and would need L5's hashed-meta branch on top. A term hash is a
+*statistic*, which is what the index holds, and it is already the currency
+`terms` is written in — so the scan's byte prefilter finds an anchor source
+by the same substring check it already runs, at no extra cost.
 """
 
 from __future__ import annotations
 
 import re
+from collections import Counter
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import PurePosixPath
 
+from ..query.tokenize import tokenize
 from .parse import ParsedDoc
 
 #: The namespace a tag node lives in. Minted here because this is the only
@@ -30,13 +65,19 @@ EXTRACTED_GRADE = 10
 AMBIG_GRADE = 8
 INFERRED_GRADE = 6
 
-_LINK_RE = re.compile(r"\[[^\]]*\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
+#: ⚠ **Group 1 is the ANCHOR TEXT and it used to be discarded.** It sat in a
+#: non-capturing class until W-168 step 1, so the proposal's *"edges are
+#: already extracted"* was half true: the edges were, the words were not.
+_LINK_RE = re.compile(r"\[([^\]]*)\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
 _INLINE_CODE_RE = re.compile(r"`([^`\n]+)`")
 
 
 @dataclass(frozen=True)
 class DocScan:
-    links: list[str]
+    #: `(anchor text, target)` pairs, in document order. **Was a list of bare
+    #: targets until W-168 step 1** — the shape had to change because the words
+    #: are not extracted anywhere else in the engine.
+    links: list[tuple[str, str]]
     code_spans: list[str]
     tags: list[str]
     #: Frontmatter `supersedes:` — paths this document retires. **Declared,
@@ -49,7 +90,7 @@ class DocScan:
 
 def scan(doc: ParsedDoc) -> DocScan:
     return DocScan(
-        links=[m.group(1) for m in _LINK_RE.finditer(doc.body)],
+        links=[(m.group(1), m.group(2)) for m in _LINK_RE.finditer(doc.body)],
         code_spans=[m.group(1) for m in _INLINE_CODE_RE.finditer(doc.body)],
         tags=_scan_tags(doc.meta),
         supersedes=_scan_supersedes(doc.meta),
@@ -67,13 +108,40 @@ def basename_index(known_ids: set[str]) -> dict[str, list[str]]:
     return index
 
 
-def resolve(doc_id: str, doc_scan: DocScan, known_ids: set[str], by_basename: dict[str, list[str]]) -> list[dict]:
-    edges: dict[tuple[str, str], int] = {}
+def resolve(
+    doc_id: str,
+    doc_scan: DocScan,
+    known_ids: set[str],
+    by_basename: dict[str, list[str]],
+    hash_of: Callable[[str], str],
+) -> list[dict]:
+    """This document's resolved edges, with anchor terms on the `ref` ones.
 
-    for target in doc_scan.links:
+    `hash_of` is the run's single `CollisionTracker.hash_of` — the same
+    function `terms` is hashed through, passed in rather than imported so this
+    module stays free of `store` and so a caller cannot silently hash anchor
+    terms with a *second* tracker. It has **no default**: an anchor-less
+    fallback would be a silent off-switch on a retrieval feature, which is the
+    one kind of bug a query cannot show you.
+    """
+    edges: dict[tuple[str, str], int] = {}
+    #: dst -> raw anchor term counts, merged across every link this document
+    #: writes to that target. Merged rather than kept per-link because
+    #: `edges` is already deduplicated by `(kind, dst)` — two links from B to
+    #: A are one edge, so their words are one bag.
+    anchor: dict[str, Counter] = {}
+
+    for text, target in doc_scan.links:
         dst = _resolve_ref(doc_id, target, known_ids)
         if dst and dst != doc_id:
             edges[("ref", dst)] = EXTRACTED_GRADE
+            # Analyzed with the engine's own tokenizer, so an anchor term and
+            # a body term for the same word are the same hash. A link whose
+            # text is empty, punctuation, or nothing but stopwords contributes
+            # no terms and the edge keeps its pre-W-168 shape.
+            terms = tokenize(text)
+            if terms:
+                anchor.setdefault(dst, Counter()).update(terms)
 
     for target in doc_scan.supersedes:
         # **Repo-root relative, not document relative.** A markdown link is
@@ -100,7 +168,21 @@ def resolve(doc_id: str, doc_scan: DocScan, known_ids: set[str], by_basename: di
             dst, grade = resolved
             edges[("code", dst)] = max(grade, edges.get(("code", dst), 0))
 
-    return [{"kind": kind, "dst": dst, "grade": grade} for (kind, dst), grade in sorted(edges.items())]
+    out: list[dict] = []
+    for (kind, dst), grade in sorted(edges.items()):
+        edge = {"kind": kind, "dst": dst, "grade": grade}
+        counts = anchor.get(dst) if kind == "ref" else None
+        if counts:
+            # `al` is `sum(at.values())` and is therefore redundant — kept
+            # because `query/scan.py` needs a document's anchor LENGTH off the
+            # raw bytes of every line in the corpus, candidate or not, and a
+            # byte regex can read one integer where summing a map cannot.
+            # `derive/_build.py` asserts the two agree on every record, so the
+            # redundancy cannot drift.
+            edge["at"] = {hash_of(term): count for term, count in sorted(counts.items())}
+            edge["al"] = sum(counts.values())
+        out.append(edge)
+    return out
 
 
 def _resolve_ref(doc_id: str, target: str, known_ids: set[str]) -> str | None:

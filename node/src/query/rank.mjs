@@ -75,17 +75,30 @@ export function rank(
   const w = weighting || new Weighting();
   const demote = !w.trivial;
 
+  // 🔴 **W-168 step 1 — the anchor fold lands HERE, once.** `scan.mjs`
+  // attaches `atf` (this document's anchor term counts over the query's
+  // hashes) and `alen` (its anchor token total) to every candidate it hands
+  // over. The fold being in the shared scorer rather than in a generator is
+  // what keeps the two readers, and the two Python paths, on one arithmetic.
+  const anchorOn = scoring.anchorOn;
+
   const scored = [];
   for (const record of candidates) {
     const terms = record.terms || {};
+    const anchorTf = anchorOn ? (record.atf ?? null) : null;
     // 🔴 The hallucinated-citation guard, before anything is scored: a
     // document matching ONLY expansion terms is not an answer to the question.
+    // An anchor match passes it — a human linker's word is not an invented one.
     let matches = false;
     for (const h of required) { if (h in terms) { matches = true; break; } }
+    if (!matches && anchorTf !== null) {
+      for (const h of required) { if (h in anchorTf) { matches = true; break; } }
+    }
     if (!matches) continue;
 
     let s = scoreRecord(
       terms, record.flen || [], queryHashes, df, corpus.n, avgWlen, scoring, termWeights,
+      anchorTf, anchorOn ? (record.alen ?? 0) : 0,
     );
     const archived = recordIsArchived(record, w.archivedDirs);
     if (demote) s *= w.of(record);

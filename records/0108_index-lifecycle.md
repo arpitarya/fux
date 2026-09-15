@@ -7,10 +7,10 @@ description: One canonical encoder, sharded doc-major JSONL, write-if-different;
 status: accepted
 date: 2026-08-18
 feature: generation and update of the committed index, and the refusal that keeps its derived accelerator from diverging
-owns: [src/fux/store@4e0800c422a2]
+owns: [src/fux/store@c68fffd16114]
 laws: [L1, L2, L3, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: f16833119bc3d665aedb0eec8df8c6022a56c41587253f3a6041a9a89bbaff5a
+content_sha: e88c714b524d76242f23972f1ef0075ba855b4de5cba1102690b9101964db408
 ---
 
 # SR-INDEX-LIFECYCLE — how the index is generated and updated
@@ -331,6 +331,42 @@ door, one lock, extended rather than duplicated: a `hashed` record with no
 matching entry in `.fux/runtime/display-cache/` (keyed by `sha`) is refused.
 The cache is gitignored runtime state, same tier as the accelerator, so decision
 5 already covers it. Full rationale on [SR-RECORD](0109_index-record.md).
+
+
+**14. `_format` bumped to `fux.index.v3` on 2026-09-15** (W-168 step 1), and
+decision 9 is what decided it rather than a judgement call. A `ref` edge gained
+`at` and `al`, so **a property appeared** — 9.1's first condition — and the
+reason 9.1 exists is exactly this case: *a reader cannot know what it is
+missing*. A v2 index has no `at` anywhere, and nothing distinguishes *this
+corpus links without words* from *this index predates anchor text*. That is the
+W-48 trap, on the edge.
+
+- **`analyzer` is untouched, by 9.2's own reasoning.** Anchor terms go through
+  the same `query/tokenize.py` every other term does, so no hash changes
+  meaning and no `df` moves.
+- **`tf_fields` is untouched.** Anchor is a **read-time** field with no
+  committed `flen` slot; it is folded from other documents' edges and enters no
+  posting. Adding it to `TF_FIELDS` would claim a sixth committed field that
+  does not exist.
+- **The migration is the one decision 10a already names**: `fux ingest --full`,
+  through the foreign-index seam, which refuses rather than stranding `url:`
+  records. There is no in-place path and none was added.
+- ⚠ **The cost is a whole-corpus diff**, which 9's closing paragraph calls
+  asymmetric and a reason NOT to bump for a display field. It is paid here
+  because the property set moved, which is the case 9.1 carves out.
+
+**14a. The build's stray-hash tripwire admits an edge's anchor terms.**
+`derive/_build.py::_assert_invariants` refused any quoted 16-hex token outside
+`terms`; `at` keys are exactly that, deliberately, because it is what lets the
+scan's prefilter find an anchor source for free. They join the allowed set
+rather than the check being relaxed.
+
+⚠ **The check is no longer the thing its message says, and already was not.**
+`query/scan.py` counts `df` from the **parsed** record's `terms` keys, not from
+the substring match, so a stray hash costs a wasted parse and cannot inflate a
+`df`. It is kept as a tripwire on a record shape nobody meant to write — and it
+is what would catch anchor terms being smuggled into the postings, which is
+option (a) shipped under (c)'s name.
 
 ### What it looks like
 

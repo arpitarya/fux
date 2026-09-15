@@ -90,7 +90,7 @@ def test_edges_is_never_carried_forward():
 
 def test_the_template_schema_matches_the_index_schema():
     """Two fux versions with different record shapes must never both call their
-    output `fux.index.v2`."""
+    output `fux.index.v3`."""
     from fux.store.format import SCHEMA_ID
 
     assert recordschema.shape().schema == SCHEMA_ID

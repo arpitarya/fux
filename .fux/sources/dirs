@@ -27,7 +27,7 @@ docs
 records
 tools
 work
-!work/golden              # the sealed benchmark: its corpus and answer key must never enter fux's own committed index
+!work/golden              # the sealed benchmark: its corpus and answer key must never enter fux's own committed index (LAW L11 — records/0012_LAW-11-sealed-answer-key.md)
 
 
 archive                   archived=true

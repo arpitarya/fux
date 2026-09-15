@@ -67,7 +67,10 @@ def test_the_node_tune_schema_is_the_python_one():
         if table == "bm25f":
             # `...FIELD_KEYS` is spread in rather than spelled out, exactly as
             # Python spreads `*_FIELD_KEYS` — compare only what is literal.
-            assert spelled == ["k1", "b"], "the [bm25f] scalars drifted"
+            # `anchor` (W-168 step 1) is literal on both sides for the same
+            # reason it is not in `FIELD_KEYS`: it is not one of the five
+            # committed fields, it is the read-time sixth.
+            assert spelled == ["k1", "b", "anchor"], "the [bm25f] scalars drifted"
             continue
         assert spelled == list(keys), f"[{table}] key set differs from tune.py"
 

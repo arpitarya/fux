@@ -10,7 +10,7 @@ feature: the authority of records — where a rule lives, which record wins, and
 owns: []
 laws: [L0]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: 1c412aadc62bfcc194419352bbcbdfad77971c3d02204ef497e695cee9c9525c
+content_sha: d825dd0e3183198b1dcbdd64c6252c9126e3b1f180823b7b84cb8ca75968dc9e
 ---
 
 # SR-LAW-0 — L0 — SRs are the only source of truth
@@ -337,7 +337,7 @@ duplication, not by inventing a check that cannot exist.
 ### Reference (required)
 
 - Arpit's ruling, 2026-09-06 — quoted verbatim in §2 Context.
-- [`work/IMPLEMENTATION.md`](../work/IMPLEMENTATION.md) §W-122 — the migration this record authorises, as it landed. Its item file was deleted with its queue row (OPEN-WORK rule 2); what remains open is [W-146](../work/open/W-146-the-rest-of-l0.md).
+- [`work/IMPLEMENTATION.md`](../work/IMPLEMENTATION.md) §W-122 — the migration this record authorises, as it landed. Its item file was deleted with its queue row (OPEN-WORK rule 2). **W-146 carried the remainder and closed 2026-09-15** — its last row became [SR-WORK-GOLDEN](0066_WORK-golden.md), the second generated view decision 5 permits; the item file is [archived](../archive/open/W-146-the-rest-of-l0.md).
 - **The two strikes:** `acquired_max_bytes` — named in a record and the ownership table, never parsed, `NameError` on every retaining fetch (2026-09-01); `max_parallel` — two contradicting sentences in one accepted amendment, the code implementing the wrong one ([`archive/open/W-83-the-unconfigured-fetch-ceiling.md`](../archive/open/W-83-the-unconfigured-fetch-ceiling.md)).
 - **Precedent for a generated view:** [SR-TUNE](0135_tuning.md) already names `tune.specimen()` in `src/fux/tune.py` as the authority for `.fux/tune.toml`.
 - US Constitution, Article VI, Clause 2 (the Supremacy Clause) and Article V (the amendment path) — the two-level shape and the reason entrenchment is part of it, not an addition to it.

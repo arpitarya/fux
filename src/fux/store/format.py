@@ -14,7 +14,15 @@ INDEX_DIR = ".fux/index"
 # v2 (W-76 Phase 1 record half, 2026-08-23): five tf fields instead of two,
 # trailing zeros omitted, and `wlen` replaced by `flen` (per-field token
 # counts) so the length normaliser stops being a function of a tunable.
-SCHEMA_ID = "fux.index.v2"
+# v3 (W-168 step 1, 2026-09-15): a `ref` edge carries `at` (anchor term hash ->
+# count) and `al` (the token total), taken from the link text the SOURCE
+# document wrote. **A property appeared**, which is exactly what
+# SR-INDEX-LIFECYCLE decision 9.1 bumps `_format` for: a v2 index has no `at`
+# anywhere, and a reader cannot tell "this corpus links without words" from
+# "this index predates anchor text" — the W-48 trap, on the edge.
+# `analyzer` is UNTOUCHED (decision 9.2): anchor terms go through the same
+# `query/tokenize.py` every other term does, so no hash changes meaning.
+SCHEMA_ID = "fux.index.v3"
 # v2 (W-76 Phase 1, 2026-08-23): identifier splitting before lowercasing,
 # plus Porter stemming before hashing. A v1 shard is refused by
 # `store/reader.py` rather than silently mixed -- two analyzers in one

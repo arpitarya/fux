@@ -24,7 +24,7 @@ from fux.store.canonical import canonical_dumps  # noqa: E402
 from fux.store.format import shard_for, term_hash  # noqa: E402
 
 HEADER = (
-    b'{"_format":"fux.index.v2","analyzer":"v2",'
+    b'{"_format":"fux.index.v3","analyzer":"v2",'
     b'"tf_fields":["body","heading","title","path","ctx"]}\n'
 )
 

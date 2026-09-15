@@ -10,7 +10,7 @@ feature: the rationale, history and reopen-trigger of L3
 owns: []
 laws: [L3]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 6a3d48fcc4dd33fdbefbdf8dbb2f7d56fe5fe3eac430c7e4cc13257780065f15
+content_sha: 47a26fde11d96aadca5cdaf1661cdf4c45c153a3fb41283652bb1648aeee5cfa
 ---
 
 # SR-LAW-3 — L3 — deterministic; no model in the maintenance path
@@ -52,7 +52,7 @@ Two laws used to stand between fux and an embedding model: [L1](0003_LAW-1-zero-
 ```mermaid
 flowchart LR
     R["SR-LAW-3<br/>(THIS RECORD — states law L3)"]
-    N["SR-LAWS<br/>(the handles L0..L10 — routes, never states)"]
+    N["SR-LAWS<br/>(the handles L0..L11 — routes, never states)"]
     C["CLAUDE.md §Non-negotiable constraints<br/>(GENERATED from the records · test-bound)"]
     B["records bound by L3<br/>(cite the number, never restate)"]
     R --> C
@@ -73,7 +73,7 @@ flowchart LR
         (GENERATED -- not the source)
 
                SR-LAWS
-     (the handles L0..L10 -- routes, never states)
+     (the handles L0..L11 -- routes, never states)
                    |
           +--------+---------+
           v                  v

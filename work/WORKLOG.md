@@ -29,6 +29,160 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-15 — W-168 step 1: anchor text, built  ·  Claude Code (Opus 5)
+
+- **Asked:** implement W-168.
+- **Triage first:** inbox empty, `work/BLOCKED.json` is `PROCEED`, W-168 step 1
+  ruled (c) the day before and marked 🟢. Step 1 is the only 🟢 in the program.
+- **Did — obligations 1–7 and 9 of step 1's ten:**
+  - **Extraction.** `_LINK_RE` captures the anchor text (group 1 was a
+    non-capturing class); `DocScan.links` is `(text, target)`; `resolve()` takes
+    the run's `hash_of` as a **required** parameter and writes `at`/`al` onto
+    `ref` edges only, merged per target.
+  - **Retrieval, which is the half that would have died silently.** `scan.py`
+    gains a second, targeted pass via `shard_for(id)`; `accel.py` seeds every
+    anchor-matching document **before** the skipping loop; `score_record`'s
+    `tf is None` early return had to go; and `Expansion.matches` had to accept an
+    anchor match, or the hallucinated-citation guard would have dropped every
+    one of these documents before they were scored.
+  - **One fold, in `rank()`**, fed by `atf`/`alen` on the candidate records both
+    generators produce — so the differential law stays a property of the
+    candidate set.
+  - **`fux.index.v3`** (a property appeared) and **`fux.runtime.v6`** (the
+    anchor plane, `alen`, `total_anchor_len`). Repo re-ingested with `--full`.
+  - **Node:** all five modules, plus a rebuild of the vendored bundle — which
+    was mandatory, not tidy: the old one pins `fux.index.v2` and refuses the new
+    index outright.
+  - **`[bm25f] anchor`, default `0.0`**, in both readers' schemas.
+  - **Tests:** 3 new files, 42 new tests, including
+    `test_edge_text_is_a_function_of_its_source_alone` — the gate the ruling
+    exists for — and a Node twin that brings its own corpus.
+  - **13 records amended**, [the pre-registration](regression/2026-09-15-anchor-text/PRE-REGISTRATION.md)
+    frozen, CHANGELOG, OPEN-WORK, IMPLEMENTATION.
+- **Measured:** 692 queries × 4 `top` × 2 skipping modes over this repo's 1 237
+  documents — **5 536 byte-identical comparisons at anchor off, 5 536 at
+  `anchor = 2.0`, zero mismatches.** Suites: 4 691 unit (1 pre-existing red, see
+  below), 143 e2e, 36 Node, all green otherwise.
+- **Decided / open:**
+  - 🔴 **The edge carries hashed TERMS, not the anchor string** — a build
+    decision the ruling did not make. L2 keeps content out of the index, and a
+    hash is what lets the scan's byte prefilter find an anchor source for free.
+    **Flagged for Arpit**: a readable string for `fux explain` is a second field
+    and a second decision.
+  - ⚠ **SR-CONFIDENCE 16 is a finding, not a fix.** A document ranked #1 purely
+    on its linkers' wording reports **coverage 0** and names the query's word in
+    `confidence.missing`. That is the honest answer to *what does the top
+    document itself say?*, and whether it pushes a class of answers into
+    `partial` is unmeasured and deliberately not in the decision rule.
+  - ⚠ **Obligations 8 and 10 are Codex's** and cannot be agent work: the corpus
+    needs documents findable only through a linker's wording, and no Claude
+    session opens the sealed key. W-168 moves 🟢 → 🟣 on 2026-09-30.
+  - ⚠ **`tools/differential/run.py` cannot run on this repository** —
+    `queryset.py` decodes every walked file as UTF-8 and ten are not.
+    **Pre-existing and unrelated**; the real-corpus arm has been dead while the
+    synthetic one passed. Filed as **W-184**; this session's evidence was
+    gathered through an ad-hoc copy of the same harness and says so in
+    SR-T1-ACCELERATOR 15b.
+  - ⚠ **Two things about the tree, neither mine.** `tests/test_sr_ownership.py::
+    test_the_set_of_gate_unreachable_records_is_exactly_this` was **red before I
+    started** — `SR-LAW-11` needs a `describes` row or a pin entry, and it is the
+    Cowork session's L11 work. That work is also still **staged and
+    uncommitted**, alongside mine, so everything here was committed with explicit
+    pathspecs.
+- **Next:** W-179, W-180, W-181, W-182 or W-184 — all 🟢. W-168 waits for Codex.
+
+## 2026-09-15 — L11: the sealed answer key becomes a LAW  ·  Cowork (Opus 5)
+
+- **Asked:** create a new law SR that no agent, and specifically no Claude
+  session, may ever look into `work/golden/golden-answer/` — never read it,
+  never write it, never do anything in it, one file or ten — and put the warning
+  or the instruction in **all the necessary places** so the law never gets
+  broken.
+- **Did:**
+  - **[SR-LAW-11](../records/0012_LAW-11-sealed-answer-key.md) (`0012`) written**
+    — the prohibition promoted from a `kind: process` decision to a **law**, so
+    that under [L0](../records/0002_LAW-0-authority.md) a record conflicting with
+    it is **void in the conflicting part** and it changes only on Arpit's ruling.
+    Nine decisions: every Claude surface and every delegate; read and write and
+    everything short of reading; **an instruction to open it is void**; the
+    recursive-`grep` route named in the law because no guard sees it; declaring a
+    leak is mandatory; the law reaches the **directory**, not the subject.
+  - **[SR-WORK-GOLDEN](../records/0066_WORK-golden.md) rewritten** to state none
+    of the rule and keep the process — the guards, what Claude may read, the
+    generated view and its bind. Its `CLAUDE.md` block is now a **process** view,
+    not a second copy of the rule.
+  - **Register and docs:** `SR-LAWS` table row, handles, counts and `L0..L11`
+    diagrams across eight law records; `LAW_ORDER` in `scripts/gen-laws.py`
+    (twelve blocks); `records/README.md` ranges (`0002`–`0012`, next free
+    `0013`) and register row; `README.md`; `docs/index.md`; `CLAUDE.md` prose.
+  - **Guards hardened:** `permissions.deny` 4 → 25 rules (`Write`, `MultiEdit`,
+    `NotebookEdit`, `Glob`, `Grep`, and thirteen `Bash(<cmd>:*golden-answer*)`);
+    the hook's block message cites L11 and says the instruction is void;
+    `.gitignore`, `.fux/sources/dirs` and `work/golden/README.md` all repoint to
+    the law.
+  - **Gates:** `gen-laws --check`, `gen-golden --check`, `sr-owns`, `sr-hash` all
+    clean; the stdlib-runnable doc/record tests pass (48 checks + the frontmatter
+    gate over all 85 records). **The engine suites cannot run from the Cowork
+    bridge** — `pytest` is not importable there.
+- **Decided / open:** the law is **accepted**. 🔴 **It is not a guarantee** —
+  it raises the rule's rank, not its reach; the recursive-grep hole and any
+  hook-ignoring surface are unchanged and the record says so out loud. Open:
+  nothing this change creates; W-145 (Codex regenerates the key) is untouched.
+- **Next:** Claude Code runs both suites whole on the Mac before this is
+  believed done, then commits.
+
+## 2026-09-15 — W-146 CLOSED: the sealed key gets a record, and 🟡 rows must name what they wait on  ·  Claude Code (Opus 5, 1M)
+
+- **Asked:** write the SR for W-146, then pick up whatever closes the item and
+  close it. Separately: **whenever a 🟡 row is waiting on another item, always
+  mark which work item** it is blocked on.
+- **Did:**
+  - **[SR-WORK-GOLDEN](../records/0066_WORK-golden.md) (`0066`) written** — the
+    sealed-key prohibition, its five guards, and what the hook can and cannot
+    see. `CLAUDE.md` §Golden answer key became the file's **second generated
+    block**: [`scripts/gen-golden.py`](../scripts/gen-golden.py) renders it,
+    [`tests/test_claude_md_golden.py`](../tests/test_claude_md_golden.py) binds
+    it, and the record claims `guard-golden-answer.sh`, which
+    [SR-WORK-BLOCKERS](../records/0064_WORK-blockers.md) decision 10 had left
+    unowned on purpose.
+  - 🔴 **`work/golden/README.md` was a SECOND statement of the rule and nobody
+    had noticed**, because no record owned either copy. §The one rule now links;
+    the guard table stays, because *what each guard stops* is the README's.
+  - **Queue rule 23a + decision 8 + a gate.** A 🟡 row names `waiting on W-nn`
+    with the bare id, or says **`not a queue item`** in those words. 🔴 **All
+    five live 🟡 rows said the second** — a subscriber, a `fux-benchmark` Node
+    column, one captured flake, a non-circular quality endpoint, a `fux-lab`
+    run. **Nothing in the queue is waiting on anything anyone has filed**, and
+    the old rule hid that: a noun phrase satisfied it, so a row that clears
+    itself looked identical to one that never will.
+  - **W-146 archived** with its row, its inbox row and the now-empty §adr update
+    group; `archive/README.md`, `IMPLEMENTATION.md`, `DOC-REGISTRY.md` and three
+    repointed links follow it.
+- **Decided / open:**
+  - **Row 17's ruling was not either option it offered.** Moving the paragraph
+    deletes Cowork's only cover; leaving it keeps two copies that can disagree
+    while both look correct. The third shape is
+    [SR-LAW-0](../records/0002_LAW-0-authority.md) decision 5 — a generated,
+    test-bound view — applied a second time, on the argument that produced it.
+  - 🔴 **A CONCURRENT session is mid-flight on the same subject** and is
+    promoting the prohibition to **law L11** (`0012_LAW-11-sealed-answer-key.md`,
+    `0001_LAWS.md`, `scripts/gen-laws.py`, and a rewrite of `0066` into the
+    guards half). **I stopped editing shared files rather than race it.** Its
+    `ratifies` quotes a ruling of Arpit's this session was not given, so it is
+    his to confirm — and if L11 stands, **the two shapes must not both state the
+    prohibition.**
+  - 🔴 **The tree is RED and nothing is committed.** 11 unit failures: **10 are
+    the concurrent session's** unstamped `content_sha`s, missing register and
+    ownership rows, and an ungenerated law block. None is in this session's
+    work, which was green on its own before that session landed.
+  - 🔴 **`records/README.md` is shared with the abandoned Cowork changeset**
+    (`0065`/SR-WORK-GOVERNANCE). Committing this work's register rows carries
+    that record's row, which needs `0065` itself — so **this change cannot be
+    committed without adopting `0065`**, and NOW.md says that is Arpit's.
+- **Next:** Arpit confirms L11, decides `0065`/`W-177`/`W-178`, and says whether
+  to commit — the concurrent session finishes its half first, or the two collide
+  in `0066` and `CLAUDE.md`.
+
 ## 2026-09-15 — the graph tier, the abstention gate, and the observer hook  ·  Claude Code (Opus 5, 1M)
 - **Asked:** *"implement W-161 W-168 W-176 W-170 W-148 W-140, at the last W-154 then W-144 then W-146. Keep implementing them… till the work items are completely implemented, and then close them."*
 - **Did — nine commits.** **W-161** (`13e17e55`, `fb82494b`, `8480e1b8`) the graph-composed `ask`, both readers, 0 discordant; pre-registration committed ALONE at `806e9ebe` first. **W-176 steps 1–3** (`c7a274b3`) `weak` ⇒ `answerable: false`. **W-170** (`fd674584`) `.fux/observers/`. **W-148 rows 1–3** (`1a5adbb9`). **W-140 row 12** (`f4651aee`) the walk's work bounded. **W-146's gate** (`3a103b09`). **W-144 step 1** (`fe8e39df`) the `b` sweep frozen. **W-168 triaged 🔴** (`e68f66b1`).
@@ -45,6 +199,183 @@ play: the worklog is the granular, per-exchange trail.
 - ⚠ **A gate that fires wrongly is worse than one that does not fire.** W-146's docstring gate matched a bare `` `key = value` `` and produced **twelve** false positives, then eight, before it was scoped and narrowed to claims that say they are claims. It then went **green on its first real run**: the exposure decision 4a names is real in principle and there was **no drift**.
 - 🔴 **The tree holds two ABANDONED Cowork changesets**, ~12h cold when found (`SR-WORK-GOVERNANCE`/`0065`, and the paper rewrite), tangled across nine files. Neither is mine to commit. I backed both up, reverted, made my own edits, verified their patch still applied, committed mine, and restored theirs — so both are intact and still uncommitted. **Adopting or discarding them is Arpit's call**, and a peer session surfaced it to him.
 - **Next:** Arpit rules the two inbox rows — **W-168 step 1**'s incremental invalidation and **W-146 row 17**'s golden-key paragraph — and decides what happens to the two abandoned changesets.
+
+## 2026-09-15 — W-178: consumer fetchers open like decoders already do · Cowork
+- **Asked:** *"I want a pattern where a consumer can build custom fetchers as well
+  as custom decoders. They just put the file in those directories and then use flags
+  and format file to map them."*
+- **Did:** filed [`work/open/W-178-consumer-planes-open-sets.md`](open/W-178-consumer-planes-open-sets.md)
+  (**ratified, not built**), its `OPEN-WORK.md` row, and updated §2 + §9 of
+  [`glassbox-sessions.md`](proposals/glassbox-sessions.md) to point at it. No `src/`,
+  `node/` or `tests/` touched.
+- **Decided / open:** the ruling is **symmetry, not a new mechanism** — half of it
+  already ships. `types.decoder` (`sourcelist.py:358`, `Attribute("decoder", (), "",
+  validate=_decoder_reason)`) is the exact precedent and `fetch` copies it. 🔴 **Three
+  things found while filing:** (a) `urlsrc._fetcher_path()` and its not-found error
+  already implement the open behaviour, so only the grammar is wrong; (b)
+  `_urls_header()` (`setup.py:668-672`) hardcodes `'<duration>'` as the placeholder for
+  *any* typed attribute, so a naive flip writes `fetch=<duration>` into every new repo
+  — **W-140 row 18 returning, inside the derivation that was supposed to prevent it**;
+  (c) `Attribute`'s own docstring says the enum *"is still the right shape for
+  `fetch`"*, which this ruling overturns. Scope held to **open values, closed keys** —
+  the seven-attribute set does not open. §6 of the item argues L4 is untouched and says
+  why; that paragraph wants a reviewer, not a skim.
+- **Next:** build W-178 in Claude Code. Separately, Arpit still owes the
+  committed-plane ruling in `glassbox-sessions.md` §5.
+
+## YYYY-MM-DD — <one-line title>  ·  <Cowork | Claude Code>
+- **Asked:** what the human requested.
+- **Did:** what actually changed (files, decisions).
+- **Decided / open:** verdicts reached, and what's still awaiting a call.
+- **Next:** the single immediate next step.
+```
+
+## 2026-09-15 — the two carried-forward 🔴s were both already dead; W-168 step 1 gets a third option  ·  Cowork
+- **Asked:** *"Look into open work. Explain me the items blocked on me one by one."*, then
+  *"Second item, clear blocked JSON. Third one, 2.0.1 is published. First one, explain to me
+  with example and options and recommendation."*
+- **Did:** walked the queue and reported three things on him — W-168 step 1 (the inbox),
+  [`BLOCKED.json`](BLOCKED.json), and npm `2.0.1`. On his instruction: **`BLOCKED.json` set to
+  `PROCEED`** with the reason naming which ruling closed each of its three questions;
+  **[`IMPLEMENTATION.md`](IMPLEMENTATION.md)'s npm row corrected** from *STAGED* to live, against
+  the registry rather than against a claim (`npm view fux-engine versions` → `2.0.0-alpha.7 ·
+  2.0.0 · 2.0.1`; `dist-tags.latest` → `2.0.1`); **[`NOW.md`](NOW.md) overwritten.** No `src/`,
+  `node/` or `tests/` byte touched. ⚠ **Also moved, verbatim, not edited:** the 2026-09-15
+  Glassbox entry had been written *inside* this file's `Entry format:` code fence, so it was an
+  example and not a log entry — lifted out of the fence and placed below this one, with the
+  template left in the fence alone. ⚠ **And one red test fixed that was not this session's:**
+  `test_open_work_rows_are_short` was failing on **W-177** at 390 chars against a 280 cap — a
+  concurrent session's row, whose detail file already held every word trimmed, so the row was cut
+  to the rule's shape and nothing was lost. All ten stdlib-only doc/record suites green after
+  (360 passed, 1 skipped).
+- **Decided / open:** 🔴 **`BLOCKED.json` was stale, not open, and had been for three days.**
+  Every question in it was answered after it was filed on 2026-09-12: Q1 by W-143's closure
+  (2026-09-13 — W-151 and W-152 remove three of the four priors, W-154 carries `rerank_weight`
+  as a **cost** question), Q2 by W-97's descope the same day, Q3 by W-176 gate 1 ruled (a) on
+  2026-09-14. **Nothing was blocked; the file simply outlived its content.** ⚠ **That is an
+  unguarded class:** [SR-WORK-BLOCKERS](../records/0064_WORK-blockers.md)'s `Stop` hook fires on
+  `surfaced: false` and **nothing checks that a surfaced blocker still has live questions**, so
+  the file is injected into every prompt until a human notices. The npm row is the same class in
+  a different file — stage-then-approve has no signal back into this tree, so *STAGED* stayed
+  written for a day after it stopped being true. **Two occurrences of one shape, in one session**;
+  named here rather than filed, because Cowork ratifies and does not build.
+  🔴 **W-168 step 1 — a third option the item does not name, and the reason it exists.** The
+  finding is right that an anchor field makes `A`'s committed bytes a function of `B`. What it
+  does not say is **why that is new**: `df` and `avg_wlen` are corpus-wide too and cost nothing,
+  because they are **counted at read time** — `store/format.py` has `query/scan.py` find a term's
+  `df` by scanning the raw record bytes, and `derive/accel.py` folds `idf(df, n)` and `avg_wlen`
+  in the **derived** plane, which `derive/__init__.py` says is *"rebuildable from the committed
+  shards and never committed"*. So the live invariant is **a committed per-document byte is a
+  function of that document alone; everything corpus-wide is a read-time fold** — and the anchor
+  field would be the first thing to break it. ⚠ **A correction to the item's premise, in fux's
+  favour:** the divergence it describes is **not reachable today**. `maintain/runner.py`'s
+  `record_head` says in terms that *"`fux ingest` re-indexes the whole corpus regardless of what
+  the list says"*, and `B-002` records that the dirty list's input is unused — there is no
+  incremental path to disagree with the full one. The hazard is real but it is **B-002's**, not
+  step 1's. Hence the recommendation: put the text on the **edge** in `E/` (a pure function of the
+  linking document, exactly what `Edge` already is) and fold the anchor contribution in the
+  derived plane, which `runner.py` rebuilds after every pass anyway. No re-index contract moves,
+  L3 never comes into play, and step 5's inheritance is covered by the same shape.
+  ⚠ **Found while checking:** `archive/README.md` carries **no map row for `W-143` or `W-97`**,
+  though both files are in `archive/open/` from the W-157 recovery commit. Rules 54–58 want the
+  row too. W-157 residue, not a new closure; not filed.
+- **RULED, same session:** *"ratify go with option C"*. **Step 1 takes (c).** The ruling is
+  written into [`open/W-168-search-improvements.md`](open/W-168-search-improvements.md) in
+  the W-151 shape — the quote and date, the finding it answers, the three-option table with
+  what he took, a ten-row definition of done, the tests, and the records to amend in the
+  same change. **Ratified, not built.** The inbox row and its `↳ blocks:` sub-row deleted,
+  the inbox declared `*Empty since 2026-09-15*`, and W-168 re-balled **🔴 → 🟢**. ⚠ **Option
+  (a) is refused, not deferred** — the out-edge invalidation is owed as its own `W-nn` under
+  SR-MAINTENANCE sequenced with `B-002`, and **W-168 no longer waits on anything**. ⚠ **Two
+  traps written in as done-ness rather than left for the builder:** step 1 is a **retrieval**
+  change, not a scoring one — a document is never a *candidate* for a word its bytes do not
+  contain, so a read-time fold alone cannot surface it; and the fold must land **once, in the
+  shared read path**, because `query/rank.py` states that the accelerator reproduces the
+  scan's statistics, so a fold in the accelerator alone ships exactly the `--fast`/scan drift
+  that file spends four comments guarding. The gate named is
+  `test_edge_text_is_a_function_of_its_source_alone` — edit `B`, re-index `B` alone, assert
+  `A`'s committed bytes are byte-identical; if it ever reddens, the build has drifted back
+  into (a). ⚠ **A general `full == incremental` test is deliberately NOT owed here** — that
+  is the out-edge item's gate, and claiming it would be W-168 taking credit for something it
+  does not build.
+- **THEN a standing rule, same session.** *"The yellow balls always need to have a work item
+  on which they are dependent on. If one doesn't exist, create one. So at least we know what
+  to do."* **[SR-WORK-OPEN-QUEUE](../records/0051_WORK-open-queue.md) 23a rewritten, 23b and
+  23c added**, `content_sha` restamped. A 🟡 names `waiting on W-nn` and **there is no second
+  form**. ⚠ **This SUPERSEDES the `— not a queue item` form added earlier the same day** and
+  used on all five 🟡 rows — 23c says what that form got right (naming an absence makes a
+  stuck row visible) and what it got wrong (**a row that admits nothing can clear it has
+  already done the analysis that produces the item**, and leaving it unfiled spends that
+  analysis again every time a session re-reads the row).
+- **Filed, five items, one per 🟡:** **W-179** Node latency column (W-148) · **W-180** the
+  frozen `b`-sweep run (W-144) · **W-181** the observer latency capture (W-170) · **W-182**
+  make the runner race reproducible (W-140) · **W-183** design a non-circular quality
+  endpoint (W-154). Every row repointed to its id; `test_open_work_rows_are_short` and
+  `test_open_work_is_not_stale` green, so rule 27's verb list now reads a real edge on all
+  five. **365 doc/record tests pass.**
+- **Decided / open:** 🟢 **All five new items are `agent`, not Arpit's hands** — re-derived
+  rather than assumed: [SR-WORK-ENVIRONMENTS](../records/0052_WORK-environments.md)'s table
+  says `fux-lab` and `fux-benchmark` are open to *"agents and Arpit"*, and only
+  `fux-playground` is hands-only. So *"waiting on a run"* was never a blocker on him; it was
+  an unassigned task. ⚠ **Two of the five must be allowed to end in a null and 23b says so**
+  — W-182 (*unreproducible under deliberate stress* is a result) and W-183 (*no endpoint
+  satisfies all four constraints* closes W-154 with the price recorded and the benefit
+  declared unmeasurable). **The failure mode of this rule is an item that renames the wait**,
+  and that is what 23b's *"what producing it takes, and who or what can produce it"* bar is
+  against. ⚠ **W-182 is the one whose framing actually changed**: its blocker was never *a
+  flake that has not happened* but **a harness nobody built** — 11 attempts is the evidence
+  that waiting is not a plan.
+  ⚠ **One thing NOT done, and it is owed:** rule 23a is now checkable and **no test checks
+  it**. `test_open_work_rows_are_short` already asserts *a 🟡 names its wait*; what it does
+  not assert is that the wait is a `W-nn` **that exists**. That is a `tests/` change and
+  therefore Claude Code's, per the standing Cowork boundary — named here so it is not
+  discovered as a gap later.
+- **Next:** Claude Code builds W-168 step 1, and gates rule 23a. **The inbox is empty and
+  every 🟡 now has a 🟢 behind it** — nothing in fux is blocked on Arpit.
+
+## 2026-09-15 — Glassbox sessions proposal; the `fetch=` drift found on the way · Cowork
+- **Asked:** *"There is a tool called glass box. propose how folks can connect to
+  Glassbox"*, clarified to: *"I want fux to pull glassbox sessions and give me the
+  numbers around it... let's say an API call failed. I want to know what was on the
+  screen, when the API failed, and later on in same or another session, did the same
+  API call succeed."*
+- **Did:** filed [`work/proposals/glassbox-sessions.md`](proposals/glassbox-sessions.md)
+  (`status: proposed`, **not built**), its README index row, and **B-248** in
+  `BACKLOG.md`. No `src/`, `node/` or `tests/` touched.
+- **Decided / open:** nothing decided — the proposal deliberately rules neither fork.
+  🔴 **Found on the way:** `fetch=`'s value set is **closed** at
+  `src/fux/ingest/sourcelist.py:263` — `Attribute("fetch", ("http", "cdp"), "http")` —
+  while `src/fux/ingest/urlsrc.py`'s docstring says a name *"resolves to
+  `<fetchers dir>/<name>.py>`"*. The two have drifted and **no third fetcher of any
+  kind is possible today**; the W-83 class, and nothing in SR-URL-LIST or
+  SR-CDP-FETCHER says the set should be closed. ⚠ **Not filed as a queue item** —
+  awaiting Arpit. Two forks put to him: `.fux/index/` is committed and `pii.toml`'s
+  regex validators do not bound a DOM snapshot (proposal recommends indexing
+  **dossiers only**); and thousands of session lines break `sources/urls`'
+  human-ordered premise, which §6 argues would dissolve the fetcher path entirely.
+- **Next:** Arpit rules the committed-plane fork (§5) — it is a privacy call that
+  stands independent of build order — and says whether the `fetch=` drift becomes a
+  `W-nn`.
+
+## 2026-09-15 — `fux update` is deleted; `fux ingest` absorbs it, and the default verb goes networked  ·  Cowork
+- **Asked:** *"I want fux ingest to work networked. Reread what's listed, refetch the URLs, and then remove fux update verb completely. I want `--check` to be there in ingest as well. `--all`, `--failed`. Everything that is there in update, move it to ingest. The first time you ingest something you'll be using fux ingest; next time when you're trying to update something you'll still be using fux ingest, be it for directories, be it for URLs."*
+- **Did:** filed [`work/open/W-177-ingest-absorbs-update.md`](open/W-177-ingest-absorbs-update.md) and its `OPEN-WORK` row (🟢, `agent`, `fux build`). **Nothing built** — no `src/`, `node/`, `tests/` or `records/` touched. Blast radius measured rather than estimated: **13 modules · 11 test files · 17 records · 6 shipped agent skills**, plus `GLOSSARY.md` and `handbook.html`.
+- **Decided / open:** **three rulings from Arpit, all in one exchange**, each put to him as a fork. (1) **A bare `fux ingest` goes to the network** and fetches the stale URLs — narrow-by-default survives the move, W-82 ruling 3 untouched. (2) **The daemon fetches; the git hooks do not** — split by caller, not by flag default, so a commit never opens a socket. (3) **`--all` → `--refetch-all`**, because on `ingest` it lands beside `--full` and the two read as synonyms while one selects URLs and the other re-extracts documents. ⚠ **This reverses [W-63](../archive/open/W-63-source-verbs.md) decision 3** (2026-08-21), which created `fux update` precisely to hold the networked paths at two, both explicitly named. **No law edit** — [SR-LAW-4](../records/0006_LAW-4-offline-by-default.md) says *paths*, plural, and states that the count was never part of the law; its own §"The narrowing that already happened once" is the record of this exact mistake being made before. SR-LAW-4 §1's **two-row table** does name `fux update` and is rationale prose, so it is edited; `CLAUDE.md`'s generated block must not move. ⚠ **What the move costs:** `fux ingest` is offline *by construction* today and the import fence asserts it; after this it cannot be, and the item is not done until a test pins that a hook-invoked ingest opens no socket. **Three sub-questions filed, not guessed:** the hook's offline invocation (`--offline` vs `--no-fetch` vs a non-surface flag), what `fux doctor`'s remediation strings point at, and whether the verb rename rides a `2.1.0` breaking-change block or waits for `3.0`.
+- **Also:** 🔴 [`work/BLOCKED.json`](BLOCKED.json) is **still open** (`ASK`, W-143's four priors, updated 2026-09-12) and unrelated to this item — surfaced, not worked around.
+- **Next:** Arpit rules the three sub-questions in W-177 §Open questions — question 1 gates the build, since the hook invocation is what keeps L4's fence somewhere testable.
+
+## 2026-09-14 — `governance.md` becomes a record, and its counts do not come with it  ·  Cowork
+- **Asked:** *"Governance dot MD document converted into SR work document."*
+- **Did:** filed [SR-WORK-GOVERNANCE](../records/0065_WORK-governance.md) (`0065`, `kind: process`, `owns: []`) — the governance map in four layers, every entry carrying audience, enforcement and update trigger. `work/governance.md` → `archive/governance.md` with a successor row in [`archive/README.md`](../archive/README.md); its registry row **deleted**; the map's stale entries fixed on contact (`DOGFOOD.md` is gone; `AGENTS.md`, `BACKLOG.md`, `LESSONS.md`, `golden/`, `paper/` were missing). Register updated: the row, the `process` count 17 → 18, the WORK range's next-free `0065` → `0066`, and the reserved-and-empty tail corrected from `0057`–`0100` to `0066`–`0100` — stale since the extraction filled `0057`–`0064`. `SR-WORK-GOVERNANCE` pinned into `_UNREACHABLE_BY_THE_GATE` in [`tests/test_sr_ownership.py`](../tests/test_sr_ownership.py) with its reason.
+- **Decided / open:** **three rulings from Arpit, all in one exchange.** (1) The old file is **archived, not kept as a pointer** — two files on one subject is how the counts drifted. (2) **No counts, at all** — they were recounted 2026-08-25 and had drifted again by today (`open/` 5 against 14, `regression/` 29 against 71, the register 41 against 82); the directory is its own count. (3) The two still-parked P7 ideas become **backlog rows**, not record prose — `B-246` (`WORKLOG.md` archive-and-truncate) and `B-247` (`DOC-REGISTRY.md` scoped to untested prose), both `unruled`, both needing him. ⚠ **Nothing mechanically proves the map is complete** — decision 8 is an obligation and the veto condition is the catch; stated in the record rather than papered over.
+- **Also — what this session could NOT run:** the engine suites. `.venv/` is a macOS virtualenv and the bridge's shell is Linux/py3.10, so `tests/` collection fails on `import fux` for 124 files. The **1007 stdlib-only doc, record, registry, link, archive, OKF and backlog tests all pass**; no `src/`, `node/` or engine code was touched, so nothing else was at risk — but the green is partial and says so.
+- **Next:** nothing is owed on this item. `B-246` and `B-247` sit on Arpit whenever he wants them; the queue is unchanged.
+
+## 2026-09-14 — the paper, v1.0: rewritten from the records, moved to `docs/paper/`, twenty diagrams  ·  Cowork
+- **Asked:** *"Review the work paper. Get it up to date as well as include the open work items and then move the whole directory to docs. Create as many images as possible, as many flow diagrams as possible."*
+- **Did:** a fact base was compiled from 46 staged files (CLAUDE.md, the register, 30 records, the regression index, IMPLEMENTATION, the six architecture SVGs) and the paper rewritten against it — **v1.0**, measured numbers only, every one naming its run and class; §9 maps each v0.2 pillar (MST keyspace, pruned postings, dense codes, BIC wire format, CRDT merge, 220 ms at 10⁶) to what shipped and the verdict that decided it; §10 is `OPEN-WORK.md` as of today with the empty inbox. **Twenty Mermaid diagrams** (index-and-refer, `.fux/` kinds, ingest, the record, `ask`, expansion/RRF, graph plane, `answer`/refer, confidence band, two readers, agent surfaces, hooks/merge, observers, enrichment/correct, evaluation pipeline, governance, latency chart, roadmap, designed-vs-built, verb map) rendered to SVG under `docs/paper/figures/` with sources in `figures/src/` and inlined in the paper. `work/paper/` → `docs/paper/`; v0.2 and its four projection charts → `archive/paper/` with a map row; eleven live links repointed (README, CLAUDE.md, GLOSSARY, docs/index, BIBLIOGRAPHY, SR-WORK-SCALE, SR-WORK-GOVERNANCE, work/README, DOC-REGISTRY, storage compare, landscape proposal, INTERVIEW).
+- **Decided / open:** ⚠ **A concurrent session holds uncommitted edits in `archive/README.md`, `docs/index.md`, `work/DOC-REGISTRY.md`, `work/INTERVIEW.md` and this file** (the governance.md → SR-WORK-GOVERNANCE move). My edits to those five are in the working tree and **deliberately left uncommitted** so that session's hunks are not swept into a Cowork commit; the tree passes `test_doc_links`, the Cowork commit alone does not (docs/index.md still names `work/paper/` in it). Whoever commits next takes them. ⚠ Three facts the fact base flagged as stale *outside* the paper and left alone: CLAUDE.md §What we are building still describes the MST/six-plane design; GLOSSARY still defines *Keyspace (one MST)*, *Wire format*, *FuxVec*; the two 2026-09-12 SVGs still draw the removed priors and say "20 verbs".
+- **Next:** the other session commits the shared five; then Claude Code takes the 🟢 rows in the order the previous entry gives.
 
 ## 2026-09-14 — the blocker walk: eight rulings, two closures, one new record, one item left in the inbox  ·  Cowork
 - **Asked:** *"Let's go through all the blockers… one by one"*, then *"Update the open work and the necessary documents. And once done, I'll have Claude Code run and fix or implement all those."*

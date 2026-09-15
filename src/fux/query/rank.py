@@ -330,11 +330,32 @@ def rank(
         weighting = Weighting(archived_dirs=archived_dirs)
     demote = not weighting.trivial
 
+    # 🔴 **W-168 step 1 — the anchor fold lands HERE, once, for both paths.**
+    #
+    # Each candidate generator attaches two keys to the record dicts it hands
+    # over: `atf` (this document's anchor term counts, restricted to the
+    # query's hashes) and `alen` (its anchor token total). The scan folds them
+    # out of the `at` maps on the committed edges of the documents that link
+    # here; `derive/accel.py` reads the same numbers out of the anchor plane it
+    # built from those same bytes.
+    #
+    # **The fold is one line, in the one function both paths reach**, which is
+    # what makes it checkable: [`accel.py`](../derive/accel.py) states the
+    # contract as *"the accelerator generates candidates and statistics, never
+    # scores"*, so a fold written into the accelerator alone would ship
+    # `--fast`/`--scan` drift — data-dependent, silent, and visible only on the
+    # documents somebody linked to.
+    #
+    # `None` when the anchor field is off, and `None` performs no arithmetic:
+    # see `score_record`.
+    anchor_on = scoring.anchor_on
+
     scored = []
     for record in candidates:
         terms = record.get("terms", {})
+        anchor_tf = record.get("atf") if anchor_on else None
         # 🔴 The hallucinated-citation guard, before anything is scored.
-        if not expansion.matches(terms):
+        if not expansion.matches(terms, anchor_tf):
             continue
         s = score_record(
             terms,
@@ -345,6 +366,8 @@ def rank(
             avg_wlen,
             scoring,
             term_weights,
+            anchor_tf,
+            record.get("alen", 0) if anchor_on else 0,
         )
         archived = _record_is_archived(record, weighting.archived_dirs)
         if demote:

@@ -10,7 +10,7 @@ feature: the acquired plane
 owns: [src/fux/store/acquired.py@9897ee1fe4af]
 laws: []
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 0094dda609c6b00c9a8e662cb7a49be4155f93535b75d166c9b72ef9e905d756
+content_sha: ef95512304c457da9168657cb2d0b8f0d90e9f3a868113ef534aa9df68954d20
 ---
 
 # SR-ACQUIRED: fetched bytes are kept, in a plane that is neither committed nor derived
@@ -244,6 +244,17 @@ to be told *"not yours"* in writing.
   directory — and it touches no acquired byte, no retention policy and no
   budget. Stated so the freshness gate's demand for this record has an answer
   in it rather than an empty edit.
+
+- **The `.fux/README.md` template reaches nothing here either** (2026-09-15).
+  `store/fuxdir.py::_readme` renders the file a NEW consumer is handed, and its
+  verb table had drifted three verbs behind the parser; fixing it moved a
+  function in a file this record describes for the `ACQUIRED` declaration and
+  the `.gitignore` line. **Neither moved.** ⚠ The narrowing qualifier cannot
+  cover this case: the two things this record describes in that file are
+  **module constants**, and the gate resolves top-level `def`/`class` names only
+  — a constant change deliberately reads as *every symbol*. So the demand will
+  come back on the next template edit, and the answer is this bullet.
+  [SR-DOTFUX](0102_fux-directory.md) decision 6b is the co-location itself.
 
 **Easier.** A citation can be checked offline against the exact bytes that produced it — a stronger claim than comparing two fetches, which is why `refer/source.py` verifies with the same fetcher a document was ingested with: *a document fetched two ways is two documents*. A retained original removes that whole class of false staleness, and the browser-session fetcher stops being needed at answer time.
 

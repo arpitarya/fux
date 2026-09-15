@@ -5,7 +5,7 @@
 import { blake2bHex } from "../hash/blake2b.mjs";
 
 export const INDEX_DIR = ".fux/index";
-export const SCHEMA_ID = "fux.index.v2";
+export const SCHEMA_ID = "fux.index.v3";
 export const ANALYZER_VERSION = "v2";
 
 /** **Order is load-bearing** — body first, trailing zeros omitted on the wire.

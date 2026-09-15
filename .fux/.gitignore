@@ -1,5 +1,6 @@
 # Gitignored planes, BY NAME. NEVER add `*` here: `.fux/index/`,
-# `.fux/sources/`, `.fux/fetchers/` and `.fux/decoders/` are committed,
+# `.fux/sources/`, `.fux/fetchers/`, `.fux/decoders/` and
+# `.fux/observers/` are committed,
 # and a blanket ignore would drop them from git silently. `fux doctor`
 # checks exactly that.
 #
@@ -9,7 +10,7 @@
 # reachable. Both are ignored; only one can be regenerated.
 runtime/
 acquired/
-
 __pycache__/
-.doctor-probe
 node/node_modules/
+
+.doctor-probe

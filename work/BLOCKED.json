@@ -1,12 +1,8 @@
 {
- "decision": "ASK",
- "reason": "UPDATED 2026-09-12, second pass. Question 1 is ANSWERED, not still open: the four-priors remeasure Arpit ordered has RUN on the purpose-made corpus he ruled should be built, and the answer is NO — no single global value clears `0 broken` for any of the four priors on any rung. The knob works, and that is the finding: every value that perfects current-seeking (13/13) dismantles history-seeking one probe for one, and recency_half_life_days at a year or less takes history-seeking to 0 of 13. Three candidates appeared to clear and each breaks on another rung with a net of +1 or +2 against a floor of 6. Verdict: work/regression/2026-09-12-priors-and-tables/VERDICT-W143.md. The abstention finding is now the THIRD recorded occurrence (20/20 twice, then 0/124 on five rungs) and the two-strikes gate is still unwritten, because what it should assert is undecided.",
- "questions": [
-  "W-143, now evidenced rather than argued: close the four priors, move the mechanism query-side (no record has opened this), or leave them at their no-op defaults and stop calling them tunable quality levers?",
-  "W-97's candidate table is filed with no recommendation, as pre-registered. No value of superseded_weight or rerank_weight clears the bar. Do the defaults stay where they ship?",
-  "Does `weak` imply `answerable: false`? Until this is in a record the abstention gate cannot be written against anything, and it is the single decision that unblocks the most."
- ],
- "safe_alternative": "Plenty runs without any of these. W-142 (re-aim the heading control at body similarity, or retire it) and W-144 (read the 16 named movers off phase 5) are agent work. W-115 needs a NEW corpus carrying .jsonl/.csv/.rst with goldens — agent work, no ruling. Golden ladder rungs 2 000 / 5 000 / 10 000 are unbuilt. W-107 Phases 1-4, W-122, W-138 and W-140 are all open and need no ruling.",
+ "decision": "PROCEED",
+ "reason": "CLEARED 2026-09-15 by Arpit, in session. The three questions this file carried were filed 2026-09-12 and every one of them was answered in the days after, without anyone going back for the file. Q1 (the four no-op priors) was closed by W-143's ruling on 2026-09-13 — W-151 removes superseded_weight, W-152 removes archived_weight and recency_half_life_days, W-153 covers the date gap, and W-154 carries rerank_weight forward as a cost question rather than a quality one. Q2 (W-97's candidate table) went with W-97's descope the same day; its residue moved into W-143 and was ruled with it. Q3 (does weak imply answerable: false) was ruled (a) on 2026-09-14 and is now gate 1 of W-176. Nothing in this file is open. The live decision is W-168 step 1, and it is in OPEN-WORK's inbox where SR-WORK-OPEN-QUEUE puts it, not here.",
+ "questions": [],
+ "safe_alternative": "",
  "surfaced": true,
- "filed": "2026-09-12"
+ "filed": "2026-09-15"
 }

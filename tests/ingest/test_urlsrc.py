@@ -449,7 +449,10 @@ def test_file_doc_gets_ref_edge_to_ingested_url(tmp_path):
     )
     run(tmp_path, refresh_urls=True)
     edges = store.read_index(tmp_path)["file:docs/a.md"]["edges"]
-    assert {"kind": "ref", "dst": "url:https://x.test/a", "grade": 10} in edges
+    # The anchor keys ride along on a `ref` edge (W-168 step 1); this test is
+    # about which URL resolves, so they are stripped rather than asserted.
+    bare = [{k: v for k, v in e.items() if k not in ("at", "al")} for e in edges]
+    assert {"kind": "ref", "dst": "url:https://x.test/a", "grade": 10} in bare
     assert not any(e["dst"] == "url:https://x.test/other" for e in edges)  # dangling stays dropped
 
 

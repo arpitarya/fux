@@ -2,21 +2,51 @@
 type: OpenItem
 id: W-146
 title: "W-146 — the rest of L0: the unhoused CLAUDE.md sections, and the ruling Arpit still owes"
-description: "W-122 moved the ten laws into their records and made CLAUDE.md a generated view. What it deliberately did not do: write records for the eleven technical-but-unhoused CLAUDE.md sections its inventory names, and settle the questions only Arpit can. One is answered — SR-WORK-OPEN-QUEUE is written and the queue's rules have a home; what is left is how far `never restates` reaches into docstrings. Carries W-122's delivered inventory verbatim."
-status: open
+description: "CLOSED 2026-09-15. W-122 moved the ten laws into their records and made CLAUDE.md a generated view; this item carried what it deliberately left — records for the technical-but-unhoused CLAUDE.md sections, and the questions only Arpit could settle. All 26 inventory rows and all three of §2 are done: the docstring reach was ruled narrow with a gate, and row 17 became SR-WORK-GOLDEN with a second generated view. Carries W-122's delivered inventory verbatim."
+status: closed
 lane: agent
 timestamp: 2026-09-12T00:00:00Z
 ---
 
+# ✅ CLOSED 2026-09-15 — row 17 ruled, and the item is complete
+
+**Arpit ruled row 17 on 2026-09-15: write the record, and keep the `CLAUDE.md`
+paragraph as a generated view.** That is
+[SR-WORK-GOLDEN](../../records/0066_WORK-golden.md), and it is the last thing
+this item was waiting on.
+
+**Why the ruling is not a compromise.** The two options row 17 offered were
+*move it* (which deletes Cowork's only cover, since Cowork reads `CLAUDE.md` and
+not `records/`) and *leave it* (which leaves two hand-maintained copies that can
+disagree while both look correct). The third shape —
+[SR-LAW-0](../../records/0002_LAW-0-authority.md) decision 5's generated,
+test-bound view — satisfies both, and it is the same argument that produced
+decision 5 for the law block in the first place. `scripts/gen-golden.py` renders
+it; `tests/test_claude_md_golden.py` is the permission.
+
+**And `work/golden/README.md` lost its copy in the same change** — it was the
+*second* statement of the rule, and nothing had noticed because no record owned
+either one.
+
+| §1 row | outcome |
+|---|---|
+| 17 · Golden answer key | ✅ **landed 2026-09-15** — [SR-WORK-GOLDEN](../../records/0066_WORK-golden.md); `CLAUDE.md` §Golden answer key is now a generated, test-bound view and the README links rather than restates |
+
+**All 26 inventory rows are now closed, and §2's three items with them.** Nothing
+in this item is open.
+
+---
+
 ✅ **§2's agent work is DONE 2026-09-15.** Items 1 and 2 landed;
 [SR-LAW-0](../../records/0002_LAW-0-authority.md) decision 4b records what they
-found. **Only §1 row 17 is left, and it is Arpit's** — now an inbox row.
+found. **Row 17 was the last open thing and it closed the same day** — see the
+block above.
 
 | §2 item | outcome |
 |---|---|
 | 1 · `tests/test_docstring_defaults.py` | ✅ built. 🔴 **It went GREEN on its first run** — `UrlSource`'s docstring, SR-CONFIG decision 5 and `config.py`'s loader all agree (`.fux/fetchers/http.py`, `"hashed"`). The exposure is real in principle and **there was no drift** |
 | 2 · key-and-default docstrings → links | ✅ **nothing to do.** No docstring under `src/fux/` is only a key-and-default table; the narrow reading had already been applied on 2026-09-14 when `config.schema.json` and `fux setup`'s comments were removed |
-| 3 · row 17 in the same change | 🔴 **not done, and it cannot be** — row 17's own note says moving it needs Arpit's call, because the paragraph is Cowork's only cover. §2 item 3 and row 17 contradict each other, and row 17 is the more specific statement |
+| 3 · row 17 in the same change | ✅ **done 2026-09-15, one change later.** It could not land with items 1 and 2 — row 17 needed Arpit's call — and the contradiction between §2 item 3 and row 17 resolved the way the more specific statement said it would |
 
 🔴 **Two things about the gate itself, kept because they generalise:**
 
@@ -82,7 +112,7 @@ and inventing one would be the same duplication in a new place.
 | 14 | Keep the docs in sync (required) | ~~stays — process~~ **overruled 2026-09-14** | ✅ **landed** — [SR-WORK-DOCS](../../records/0059_WORK-docs.md) |
 | 15 | Session continuity — the running worklog | ~~stays — process~~ **overruled 2026-09-14** | ✅ **landed** — [SR-WORK-SESSION](../../records/0060_WORK-session.md) |
 | 16 | Conformance runs — file every one | 🔴 link → SR-RS holds both halves | ✅ **landed 2026-09-14** — W-173 item 1 — SR-RS decision 10a. 🔴 **And SR-RS had been DEFERRING to `CLAUDE.md`** for the obligation it only explains; inverted in the same change |
-| 17 | Golden answer key — Claude never reads it | 🟠 needs a record (it is a technical prohibition with a hook behind it) | 🟡 open — **deliberately left in place 2026-09-14**: the paragraph is Cowork's only cover, so moving it needs Arpit's call |
+| 17 | Golden answer key — Claude never reads it | 🟠 needs a record (it is a technical prohibition with a hook behind it) | ✅ **landed 2026-09-15** — [SR-WORK-GOLDEN](../../records/0066_WORK-golden.md). Arpit ruled the third shape: the record states it, `CLAUDE.md` carries a **generated, test-bound** view, and Cowork keeps its cover |
 | 18 | Layout | ~~stays — a statement of fact~~ **overruled by W-173**: 40 lines of tree in the file every session reads first | ✅ **landed 2026-09-14** — [`docs/index.md`](../../docs/index.md) §The tree; a twelve-line tree stays |
 | 19 | Error contract | 🟠 no new record — [SR-CLI](../../records/0101_cli-surface.md) is already credited with the boundary error contract | ✅ **landed 2026-09-14** — W-173 item 7 — SR-CLI decisions 4 and 5. 🔴 **The two COPIES CONTRADICTED each other about exit `2`** and the record was right |
 | 20 | Build & test | ~~stays — commands~~ **the commands stay; the GOTCHAS did not** | ✅ **landed 2026-09-14** — the `node --test` glob trap and the `pii.toml` requirement are surface quirks → [`work/MACHINE.md`](../MACHINE.md) |

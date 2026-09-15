@@ -64,12 +64,15 @@ class BuildReport:
 def build(root: Path, *, progress=None) -> BuildReport:
     """Materialize `.fux/runtime/` from the committed index."""
     progress = progress or _NULL_PROGRESS
-    docs, postings, stats, shard_stamp, records = _read_committed(root, progress)
+    docs, postings, anchors, stats, shard_stamp, records = _read_committed(root, progress)
 
     directory = fuxdir.derived_dir(root, fmt.RUNTIME_DIR)
     postings_directory = directory / fmt.POSTINGS_DIR
     postings_directory.mkdir(parents=True, exist_ok=True)
     _clear(postings_directory)
+    anchors_directory = directory / fmt.ANCHORS_DIR
+    anchors_directory.mkdir(parents=True, exist_ok=True)
+    _clear(anchors_directory)
 
     written = 0
     written += _write_docs(directory, docs)
@@ -91,6 +94,7 @@ def build(root: Path, *, progress=None) -> BuildReport:
         p.update(edge_total)
 
     blocks, postings_count = _write_postings(root, postings, [d["flen"] for d in docs], progress)
+    written += _write_anchors(root, anchors, progress)
 
     written += _write_json(
         directory / fmt.MANIFEST_NAME,
@@ -125,9 +129,11 @@ def build(root: Path, *, progress=None) -> BuildReport:
 def _read_committed(root: Path, progress=None):
     """One pass over the committed shards: doc table, postings, statistics.
 
-    Returns `(docs, postings, stats, shard_stamp, records)`. `docs` is sorted by
-    id, so a document's index is stable across builds, and `postings` maps a
-    term hash to its `(docidx, per-field tf list)` list in docidx order.
+    Returns `(docs, postings, anchors, stats, shard_stamp, records)`. `docs` is
+    sorted by id, so a document's index is stable across builds; `postings`
+    maps a term hash to its `(docidx, per-field tf list)` list in docidx order;
+    and `anchors` maps a term hash to its `(docidx, count)` list, the same way,
+    over anchor terms alone.
     """
     progress = progress or _NULL_PROGRESS
     records: list[dict] = []
@@ -202,10 +208,61 @@ def _read_committed(root: Path, progress=None):
     # is derived and gitignored, so dropping a key needs no migration — and
     # `accel.py` read it through `.get(..., 0)`, so a stale stats.json that
     # still carries it is simply ignored.
-    stats = {"n": total_docs, "total_flen": total_flen}
+    # W-168 step 1 — the ANCHOR fold, built here and committed nowhere.
+    #
+    # 🔴 **This is what makes option (c) work.** The anchor words are committed
+    # on the edges of the documents that WROTE them, so editing `B` rewrites
+    # `B`'s bytes and moves nothing of `A`'s. What ranking needs is the reverse
+    # view — every word pointed AT `A` — and that view is corpus-wide, so it is
+    # rebuilt here from the committed shards exactly as `df` and `avg_wlen`
+    # are. Nothing crosses a document boundary in git.
+    #
+    # `docs` is already sorted by id, so `alen` lands on the right row and the
+    # docidx a posting names is the same one the doc table holds.
+    anchor_len: dict[str, int] = {}
+    anchor_postings: dict[str, dict[str, int]] = {}
+    for record in records:
+        for edge in record.get("edges", ()):
+            at = edge.get("at")
+            if not at:
+                continue
+            dst = edge["dst"]
+            anchor_len[dst] = anchor_len.get(dst, 0) + int(edge["al"])
+            for term, count in at.items():
+                bag = anchor_postings.setdefault(term, {})
+                bag[dst] = bag.get(dst, 0) + count
+    for doc in docs:
+        doc["alen"] = anchor_len.get(doc["id"], 0)
+    # To docidx, in docidx order — the same shape and the same ordering rule
+    # `postings` uses, because `accel.py` reads both through the doc table.
+    # A `dst` outside `docidx_of` cannot occur (ingest drops dangling edges);
+    # it is skipped rather than trusted, because a hand-edited shard is the one
+    # way it could, and a KeyError here would name nothing.
+    docidx_of = {doc["id"]: i for i, doc in enumerate(docs)}
+    anchors: dict[str, list[tuple[int, int]]] = {}
+    for term in sorted(anchor_postings):
+        entries = [
+            (docidx_of[dst], count)
+            for dst, count in anchor_postings[term].items()
+            if dst in docidx_of
+        ]
+        if entries:
+            entries.sort()
+            anchors[term] = entries
+    # ⚠ Summed over the EDGES, which is the same total as summing over the
+    # targets and is the number `query/scan.py` reaches by its own byte regex.
+    # Dangling edges are dropped at ingest, so no anchor length can belong to a
+    # document the corpus does not hold.
+    total_anchor_len = sum(anchor_len.values())
+
+    stats = {
+        "n": total_docs,
+        "total_flen": total_flen,
+        "total_anchor_len": total_anchor_len,
+    }
     # `records` rides along so the graph plane needs no second pass over the
     # shards; it is already sorted by id, which is what makes it usable.
-    return docs, postings, stats, shard_stamp, records
+    return docs, postings, anchors, stats, shard_stamp, records
 
 
 def _assert_invariants(path: Path, lineno: int, line: bytes, record: dict) -> None:
@@ -216,6 +273,20 @@ def _assert_invariants(path: Path, lineno: int, line: bytes, record: dict) -> No
     """
     quoted = set(_QUOTED_HASH_RE.findall(line))
     term_keys = {t.encode("ascii") for t in record.get("terms", {})}
+    # W-168 step 1: an edge's `at` keys are quoted 16-hex tokens outside
+    # `terms`, deliberately and by design — that is what lets the scan's byte
+    # prefilter find an anchor source for free. They are legitimate, so they
+    # join the allowed set rather than relaxing the check.
+    #
+    # ⚠ **The check itself is no longer the thing its message says**, and was
+    # already not: `query/scan.py` counts `df` from the PARSED record's `terms`
+    # keys, not from the substring match, so a stray hash costs a wasted parse
+    # and cannot inflate a `df`. It is kept as a tripwire on a record shape
+    # nobody meant to write — and it is what would catch anchor terms being
+    # smuggled into the postings, which is (a) shipped under (c)'s name.
+    for edge in record.get("edges", ()):
+        for term in edge.get("at", ()):  # noqa: PERF401 - clarity over a comprehension
+            term_keys.add(term.encode("ascii"))
     stray = quoted - term_keys
     if stray:
         example = sorted(stray)[0].decode("ascii")
@@ -235,6 +306,30 @@ def _assert_invariants(path: Path, lineno: int, line: bytes, record: dict) -> No
             f"score this corpus differently. Refusing to build a divergent accelerator."
             + migration
         )
+
+    # W-168 step 1. `al` is redundant with `sum(at.values())` and exists only
+    # so `query/scan.py` can read a document's anchor length off raw bytes with
+    # one integer capture. Redundancy that nothing checks is redundancy that
+    # drifts, and this one would drift into `avg_wlen` — a corpus-wide
+    # denominator — on the scan path alone.
+    for edge in record.get("edges", ()):
+        at = edge.get("at")
+        al = edge.get("al")
+        if (at is None) != (al is None):
+            raise FuxError(
+                f"{path}:{lineno}: record {record.get('id')!r} has an edge to "
+                f"{edge.get('dst')!r} carrying {'at' if al is None else 'al'} without the "
+                f"other. Anchor terms and their token count are written together or "
+                f"not at all. Re-run `fux ingest --full`."
+            )
+        if at is not None and al != sum(at.values()):
+            raise FuxError(
+                f"{path}:{lineno}: record {record.get('id')!r} has an edge to "
+                f"{edge.get('dst')!r} with al={al} but its anchor terms sum to "
+                f"{sum(at.values())}. `query/scan.py` reads `al` off the raw bytes and "
+                f"the accelerator sums `at`; the two feed the same `avg_wlen`. "
+                f"Refusing to build."
+            )
 
     m = _FLEN_RE.search(line)
     if m is None:
@@ -346,6 +441,34 @@ def _write_postings(
             fmt.offsets_path(root, prefix).write_bytes(b"".join(entries))
 
     return total_blocks, total_postings
+
+
+def _write_anchors(root: Path, anchors: dict[str, list[tuple[int, int]]], progress=None) -> int:
+    """Write the anchor plane: `anchors/<prefix>.json`, term -> [[docidx, count]].
+
+    Sharded by the term hash's first byte so a query opens one small file per
+    term, mirroring `postings/` and the committed store. **Every shard is
+    written, including the empty ones**, for the same reason `_clear` runs
+    first: a corpus that loses its last link to a target must not leave a file
+    behind that the next query would read as current.
+
+    Whole-file JSON rather than the block-and-offset shape `postings/` uses:
+    anchor postings are a small fraction of body postings, so a bisectable
+    fixed-width table would buy nothing and add a second binary layout to keep
+    in step with `format.py`.
+    """
+    progress = progress or _NULL_PROGRESS
+    by_prefix: dict[str, dict[str, list[list[int]]]] = {}
+    for term in sorted(anchors):
+        prefix = fmt.term_prefix(term)
+        by_prefix.setdefault(prefix, {})[term] = [[idx, count] for idx, count in anchors[term]]
+
+    written = 0
+    with progress.phase("anchors", len(anchors), "terms") as p:
+        for prefix, payload in sorted(by_prefix.items()):
+            written += _write_json(fmt.anchors_path(root, prefix), payload)
+            p.update(len(payload))
+    return written
 
 
 def _write_docs(directory: Path, docs: list[dict]) -> int:

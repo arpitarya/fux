@@ -55,6 +55,25 @@ moved to the archive on 2026-09-14.
 *Newest first. Every `.md` in this directory has a row; a file with no row is
 the defect this ordering exists to make visible.*
 
+## Filed 2026-09-15
+
+* [Glassbox sessions — event streams as a fux corpus](glassbox-sessions.md) —
+  Arpit's ask of 2026-09-14: pull session-replay sessions and *"give me the
+  numbers"* — what was on screen when an API call failed, and whether it later
+  succeeded in another session. **The connection point already exists**
+  (`.fux/fetchers/<name>.py` + `fetch=<name>`), but 🔴 **`fetch=`'s value set is
+  closed at [`sourcelist.py:263`](../../src/fux/ingest/sourcelist.py) while
+  `urlsrc.py`'s docstring says it resolves by filename** — the two have drifted
+  and *no* third fetcher is possible today. Argues the answer is not a fetcher
+  at all but **fetch → materialise → index**: aggregate deterministically at
+  ingest and let fux *cite* the number, since fux counts nothing and joins
+  nothing. ⚠ **Two forks first** — `.fux/index/` is committed and `pii.toml`'s
+  regex validators do not bound a DOM snapshot (recommends indexing **dossiers
+  only**); and thousands of session lines break `sources/urls`' human-ordered
+  premise, which §6 argues dissolves §1 entirely. **Graduates on a second
+  event-stream source being asked for** — one request is a use case, two is a
+  shape.
+
 ## Filed 2026-09-13 — the 3.0 backlog
 
 * [Ten ways to rank better — the 3.0 search backlog](search-improvements-v3.md)

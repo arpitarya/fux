@@ -21,6 +21,40 @@ record is the rule and this file is the anecdote that motivated it.
 
 ---
 
+## 2026-09-15 — a green synthetic arm covering for a dead real one
+
+🔴 **`tools/differential/run.py` — the proof obligation for every ranking
+change — has been unable to run on this repository, and nothing said so**, for
+as long as a binary file has sat in a listed source directory.
+`queryset.py::vocabulary` decodes every walked file as UTF-8; ten files in
+`docs/paper/figures/` are not, and the first one raises.
+
+**Why it stayed invisible.** There are two arms and only one of them is in the
+suite. `tests/derive/test_differential.py` builds its own synthetic corpora,
+passes in a second, and is what a session sees go green. The arm that runs over
+a **real** repo is a tool you have to type — so *the differential is green* was
+true of the half that could not have caught a corpus-shaped defect, and the
+half that could was dead.
+
+**The shape to recognise, because it is not specific to this tool:** a
+hermetic test and an end-to-end run of the same thing are not redundant, and
+when only the hermetic one is wired into CI, **its greenness is evidence about
+the hermetic one alone**. The end-to-end half rots silently, and it rots
+precisely on the inputs a synthetic fixture never produces — which is why it
+existed.
+
+⚠ **What it cost, concretely.** W-168 step 1's differential evidence — 11 072
+byte-for-byte comparisons — had to be gathered through an **ad-hoc copy** of
+the harness in a scratch directory. The numbers are real and the comparison is
+the harness's own; the provenance is a workaround, and it is written into
+[SR-T1-ACCELERATOR](../records/0110_accelerator.md) decision 15b and
+[W-184](open/W-184-differential-harness-utf8.md) rather than left to be
+rediscovered.
+
+⚠ **The remedy is a rule and a repair, not judgement**, so it is W-184's: skip
+what cannot be decoded, **say how many**, and a test that fails on a binary
+file in a source dir. What lives here is the failure that produced it.
+
 ## 2026-09-15 — a green working tree hiding a red HEAD
 
 🔴 **CLAUDE.md warns that a red test on an uncommitted tree is invisible to

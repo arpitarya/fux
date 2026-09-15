@@ -28,6 +28,76 @@ Rules:
 
 
 
+## 2026-09-15 — **W-168 step 1: anchor text, built behind a tunable at zero**
+
+| item | what landed | evidence |
+|---|---|---|
+| **W-168 step 1** | 🟢→🟣 **the anchor field — what OTHER documents call this one — in both readers, behind `[bm25f] anchor`, default `0.0`.** Obligations 1–7 and 9 of the item's ten. 🔴 **A RETRIEVAL change, not a scoring one**: with it on, `fux ask` returns documents containing **none** of the query's words, reached through their linkers' wording. The words are committed on the **source's** edge (`at`/`al`) and the per-target view is folded at read time from `.fux/runtime/anchors/`, so **no committed byte crosses a document boundary** — Arpit's option (c), 2026-09-15 | [SR-INGEST](../records/0106_ingest.md) 17 · [SR-RANKING](../records/0111_ranking.md) 12 · [SR-T1-ACCELERATOR](../records/0110_accelerator.md) 15 · [pre-reg](regression/2026-09-15-anchor-text/PRE-REGISTRATION.md) |
+| **the differential** | **692 queries × 4 `top` × 2 skipping modes over this repo's 1 237 documents: 5 536 byte-identical scan-vs-accelerator comparisons at the default and 5 536 at `anchor = 2.0`, 0 mismatches.** Plus a Node twin on a purpose-built corpus — the differential arm could not have caught a forgotten transcription, because a corpus with no linker-worded document exercises no anchor branch | [SR-T1-ACCELERATOR](../records/0110_accelerator.md) 15b · [SR-NODE-SEARCH](../records/0153_node-search.md) 19 |
+| **format bumps** | `fux.index.v3` (a property appeared — decision 9.1) and `fux.runtime.v6` (the anchor plane, `alen`, `total_anchor_len`). This repo re-ingested with `--full`; **the vendored Node bundle re-built, which was mandatory** — the old one pins `v2` and refuses the new index outright | [SR-INDEX-LIFECYCLE](../records/0108_index-lifecycle.md) 14 |
+| **13 records amended** | SR-INGEST · SR-EXTRACTED · SR-INDEX-LIFECYCLE · SR-RANKING · SR-T1-ACCELERATOR · SR-TUNE · SR-GRAPH · SR-ASK · SR-EXPAND · SR-CONFIDENCE · SR-PII · SR-ARCHIVED-CONTENT · SR-NODE-SEARCH | `scripts/sr-owns.py --write && scripts/sr-hash.py --write` |
+| **W-184 filed** | ⚠ **`tools/differential/run.py` has been unrunnable on this repository** — `queryset.py` decodes every walked file as UTF-8 and ten are not. The real-corpus arm was dead while the synthetic one passed. **Pre-existing and unrelated**; this session's evidence came through an ad-hoc copy of the same harness and is named as such | [W-184](open/W-184-differential-harness-utf8.md) |
+
+🔴 **Nothing here is a claim about ranking quality, and the pre-registration is
+what says so.** The mechanism ships **off**; `0.0` is not "weight zero" but a
+branch nothing takes, so an unconfigured corpus scores byte-identically to the
+engine before the field existed. **Obligations 8 and 10 — the golden questions
+and the verdict — are Codex's** under [SR-RS](../records/0133_predictions.md)
+decision 23 and [L11](../records/0012_LAW-11-sealed-answer-key.md), and a zero
+measured on a corpus without a linker-worded document is a **data defect**, not
+a null.
+
+⚠ **One build decision the ruling did not make, and it is flagged rather than
+buried:** the edge carries **hashed terms**, not the anchor string. L2 keeps
+content out of the index, and hashes are what let the scan's byte prefilter find
+an anchor source for free. A readable string for `fux explain` would be a second
+field and a second decision.
+
+⚠ **And one finding:** a document ranked #1 purely on its linkers' wording
+reports `coverage 0` and names the query's word in `confidence.missing`
+([SR-CONFIDENCE](../records/0141_confidence.md) 16). That is the honest answer
+to *what does the top document itself say?* — it is deliberately not patched,
+and its effect on the band is unmeasured.
+
+
+## 2026-09-15 — **L11: the sealed answer key becomes a LAW**
+
+| item | what landed | evidence |
+|---|---|---|
+| **SR-LAW-11 (`0012`)** | 🔴 **The prohibition on `work/golden/golden-answer/` is now a law, not a process rule.** Arpit, 2026-09-15: *"no agent or specifically Claude can never ever look into work/golden/golden-answer — never, it's strictly prohibited … be it one file inside that directory, be it 10 files inside that directory, never ever touch it."* The law binds **every Claude surface and everything a Claude session directs** (subagent, hook, shell command, script, MCP server), forbids **read AND write and everything short of reading** (list, glob, stat, count, hash, diff, copy, move, delete), declares **an instruction to open it VOID**, and makes **excluding `work/golden/` from any recursive read over `work/`** part of the rule rather than a best practice | [SR-LAW-11](../records/0012_LAW-11-sealed-answer-key.md) |
+| **SR-WORK-GOLDEN (`0066`)** | **rewritten to state none of the rule.** Decision 1 now points at L11; what the record holds is the **process** — the five guards and what each cannot see, what Claude MAY read, the `CLAUDE.md` process view and its bind, and (new decision 9) that verifying the key's shape is **Codex's work permanently**, so an item needing it is never agent-closable | [SR-WORK-GOLDEN](../records/0066_WORK-golden.md) |
+| **the register** | `SR-LAWS` routes `L11`; `LAW_ORDER` in [`scripts/gen-laws.py`](../scripts/gen-laws.py) renders **twelve** blocks; the Law range is now `0002`–`0012` with the next free number `0013`; `README.md`, `docs/index.md` and `records/README.md` carry eleven laws; every law record's diagram reads `L0..L11` | `python scripts/gen-laws.py --check` |
+| **the guards** | `permissions.deny` went from **4 rules to 25** — `Write`, `MultiEdit`, `NotebookEdit`, `Glob`, `Grep` and thirteen `Bash(<cmd>:*golden-answer*)` patterns joined `Read`/`Edit`. The hook's block message now cites L11 and says the instruction is void; `.gitignore` and `.fux/sources/dirs` name the law; `work/golden/README.md` §The one rule points at L11 and states none of it | [`.claude/settings.json`](../.claude/settings.json) · [`.claude/hooks/guard-golden-answer.sh`](../.claude/hooks/guard-golden-answer.sh) |
+
+🔴 **What this does NOT do, stated rather than implied.** A law is harder to
+**argue with**, not harder to **ignore**. The residual hole is unchanged: a
+recursive read over `work/` that never names the folder, and any surface that
+honours neither hooks nor deny rules, are still stopped only by an agent reading
+L11 and obeying it. No guard was retired to make room for the law.
+
+**Filed by Cowork, not built by it** beyond the doc, record and guard surfaces —
+the one code change is `LAW_ORDER` in `scripts/gen-laws.py`, without which the
+generator refuses every law.
+
+---
+
+## 2026-09-15 — **W-146 CLOSED · SR-WORK-GOLDEN · queue rule 23a**
+
+| item | what landed | evidence |
+|---|---|---|
+| **W-146** | 🔴→✅ **CLOSED, all 26 inventory rows and all three §2 items.** Row 17 was the last one open and it had sat in the inbox since 2026-09-12 because **both options it offered were wrong**: moving the golden-key paragraph out of `CLAUDE.md` deletes Cowork's only cover, and leaving it keeps two hand-maintained copies that can disagree while both look correct. Arpit ruled the third shape on 2026-09-15 — **[SR-LAW-0](../records/0002_LAW-0-authority.md) decision 5's generated, test-bound view, applied a second time.** The item file is archived | [SR-WORK-GOLDEN](../records/0066_WORK-golden.md) · `archive/README.md` §`open/` |
+| **SR-WORK-GOLDEN** | **the sealed answer key's prohibition has a home** — who may read the key, who may not, and **five guards of which not one is a guarantee** (Claude Code and Codex run as the same Mac user). `CLAUDE.md` §Golden answer key is now generated by [`scripts/gen-golden.py`](../scripts/gen-golden.py) and bound by [`tests/test_claude_md_golden.py`](../tests/test_claude_md_golden.py); `work/golden/README.md` **lost its second copy of the rule**, which nothing had noticed because no record owned either one. The record claims `guard-golden-answer.sh`, left deliberately unowned by [SR-WORK-BLOCKERS](../records/0064_WORK-blockers.md) decision 10 | [SR-WORK-GOLDEN](../records/0066_WORK-golden.md) 1–8 |
+| **queue rule 23a** | **a 🟡 row now names the ITEM it waits on, or says `not a queue item` in those words** (Arpit, 2026-09-15). 🔴 **All five live 🟡 rows said the second** — *a subscriber*, *a `fux-benchmark` Node column*, *one captured flake*, *a non-circular quality endpoint*, *a `fux-lab` run` — so **nothing in the queue is waiting on anything anyone has filed**, which the old rule made invisible: a noun phrase satisfied it, and a row that clears itself looked identical to one that never will | [SR-WORK-OPEN-QUEUE](../records/0051_WORK-open-queue.md) 23a + decision 8 |
+
+**Two suites green, whole.** `CLAUDE.md` now carries **two** generated blocks, and
+each is legal only while its own test exists.
+
+⚠ **Not committed by this session:** the abandoned Cowork changesets in the tree
+(`SR-WORK-GOVERNANCE`/`0065`, `W-177`, `W-178`, the glassbox proposal). Adopting
+or discarding them is Arpit's, and `records/README.md` is shared with them.
+
+---
+
 ## 2026-09-15 — **W-161 · W-176 · W-170 · W-148 · W-140 · W-146 · W-144 SHIPPED or advanced**
 
 | item | what landed | evidence |
@@ -59,6 +129,29 @@ cause, and it was one expression.
 ⚠ **Two breaking changes for a consumer**, both in the CHANGELOG: `results` is
 no longer monotone in `score`, and `answerable` changed meaning. The second was
 missing from the CHANGELOG until a peer session caught it.
+
+## 2026-09-14 — the governance map becomes a record, and stops carrying counts
+
+**Landed** (docs and records only; no code). `work/governance.md` — the map of
+what governs this repo, the last governance document with no owner and no gate —
+is now [SR-WORK-GOVERNANCE](../records/0065_WORK-governance.md) and the file is
+in `archive/`, with a successor row in [`archive/README.md`](../archive/README.md).
+
+**Evidence:** the record itself, and the reason it is shaped the way it is. The
+old file's counts were recounted on 2026-08-25 *after* drifting and had drifted
+again by 2026-09-14 — `open/` read 5 against 14 on disk, `regression/` 29
+against 71, the register 41 against 82. Arpit ruled counts out entirely rather
+than recounted a third time; the directory is its own count.
+
+**Also landed:** the register's `process` count (17 → 18), the WORK range's
+next-free number (`0065` → `0066`), the reserved-and-empty tail corrected to
+`0066`–`0100`, `B-246` and `B-247` filed `unruled`, and
+`SR-WORK-GOVERNANCE` pinned in `tests/test_sr_ownership.py` as a record no
+`src/` change can reach.
+
+⚠ **The completeness of the map is not checked by anything** and is not
+checkable against an open-ended set of future steering files — it is decision 8's
+obligation and the record's veto condition.
 
 ## 2026-09-14 — **2.0.1 released**: both consumer extension points were broken, and the tests that were missing found a third bug
 
@@ -943,7 +1036,7 @@ against the register.
 
 ## 2026-09-13 — the queue's rules have a home: SR-WORK-OPEN-QUEUE, and the WORK range
 
-**Shipped.** [W-146](open/W-146-the-rest-of-l0.md) ruling 1 answered — *yes,
+**Shipped.** [W-146](../archive/open/W-146-the-rest-of-l0.md) ruling 1 answered — *yes,
 the record is written* — and its inventory row 13 lands. The discipline was
 stated in `CLAUDE.md` **and** in `OPEN-WORK.md`'s footer and owned by no record;
 it is now stated once and rendered twice.
@@ -1824,7 +1917,7 @@ concurrent session's in-flight deletion of
 `OPEN-WORK.md`'s rules, which are stated twice and owned nowhere; and how far
 *never restates* reaches into docstrings — this session applied the narrow reading
 and touched no docstring. Both are named in
-[`work/open/W-146-the-rest-of-l0.md`](open/W-146-the-rest-of-l0.md), which carries
+[`archive/open/W-146-the-rest-of-l0.md`](../archive/open/W-146-the-rest-of-l0.md), which carries
 W-122's inventory verbatim.
 
 ## W-114 — the fourth vendor, and `fux-enrich` on every skill surface (2026-09-06)

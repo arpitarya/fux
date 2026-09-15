@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@d30962d29a5d, src/fux/store/nodebundle.py@071a24a596dd]
+owns: [node@df209f8aa1fe, src/fux/store/nodebundle.py@071a24a596dd]
 laws: [L1, L3, L4, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 95a541dba68132f11304b0c48cbdddd3f18b87cf2d3102c9e2dc8818add4cca3
+content_sha: 49f9bb3b18c517d61ebd292bb29e4c4867ddffefd4b30897763a2ff0e2b00973
 ---
 
 # SR-NODE-SEARCH — the Node read plane
@@ -634,6 +634,41 @@ runs and none for its Node runs**, and a consumer joining the two will see a
 gap that is this decision rather than a bug. That is the cost, and it is stated
 so nobody diagnoses it twice.
 
+
+
+**19. The Node reader folds anchors identically, and it brought its own
+corpus** (W-168 step 1, 2026-09-15).
+
+`scan.mjs`, `bm25f.mjs`, `rank.mjs`, `expand.mjs` and `config/tune.mjs` carry
+the same anchor path their Python twins do: the byte regex over every line, the
+`at` fold on parsed lines, the second targeted pass through `recordFor`, `atf`
+and `alen` on every candidate, and `[bm25f] anchor` read out of
+`.fux/tune.toml`.
+
+🔴 **The differential arm could not have caught a forgotten transcription
+here.** It answers *do the two readers disagree on this corpus?* — and a corpus
+with no document reachable only through a linker's wording exercises no anchor
+branch, so a Node half that was never written would agree with itself. So the
+feature ships its own fixture: `tests/query/test_anchor_node_twin.py` builds a
+corpus that contains the input, switches the key on **in the file a consumer
+would edit**, and compares both readers. With the key on the target ranks #1 in
+both; with it off, it is unreachable in both.
+
+⚠ **Compared on parsed values, never stdout bytes** — hazard H2: Python prints
+`--json` with `ensure_ascii=True` and `JSON.stringify` does not. `score` after
+`round(9)`, decision 8a's tolerance.
+
+**19a. `SCHEMA_ID` moved to `fux.index.v3` on the Node side in the same
+change**, and **the vendored bundle had to be rebuilt or it would have refused
+this repository's index outright.** `.fux/node/fux.mjs` pins the schema string
+it was bundled with, so a re-ingested corpus and a stale bundle are a hard
+refusal rather than a degradation — which is the right failure, and is the
+reason the bundle is regenerated in the same commit as the bump.
+
+⚠ **That rebuild also carried W-161's `related` payload and W-176's `weak`
+steering into `.fux/node/`**, which had not been regenerated since. Stated here
+because a commit that says *anchor text* and moves 60 KB of bundle owes the
+reader the reason.
 
 ### Consequences
 

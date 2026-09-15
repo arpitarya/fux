@@ -10,7 +10,7 @@ feature: what happens once a document is declared archived — the record proper
 owns: [tools/archived-signal-eval@30fb75fa7476]
 laws: [L3, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 93b737f8e1b35d4c08e1274a4d795a2fd52194c875915ea9e0ab8db4e018e374
+content_sha: f9f64fd0a6e0b314bb4eb5dc6c0568c93d1f8c133eac4ac47713f67342040f8b
 ---
 
 # SR-ARCHIVED-CONTENT — what "archived" does, once a document carries it
@@ -387,6 +387,25 @@ untouched.
 owning record was *touched*, never that it was read (CLAUDE.md §Law zero), so a
 co-owner's file changing under this one is exactly the case where a reader needs
 to be told *"not yours"* in writing.
+
+**9. An archived document's anchor terms are folded like any other's**
+(W-168 step 1, 2026-09-15), and no new weight arrives with them.
+
+The three document priors were removed on 2026-09-13, and decision 2's veto —
+*the marker does not move the ranking* — became structural rather than a
+consequence of a default. **The anchor field does not reintroduce one.** It is a
+*field weight*, applied to a term's contribution exactly as `body` and `heading`
+are; `archived` reaches ranking only through the declared tie-break, at an equal
+score, and reaches a reader through the marker. Neither moved.
+
+⚠ **A live document can now be reached through a retired one's link text, and
+the reverse.** The edge is a fact about the source, `archived` is a fact about
+each document, and both are reported; nothing here scales a score by either.
+Whether a retired linker's wording *should* count as much as a live one's is a
+real question, and it is **not answered here and not in
+[the pre-registration](../work/regression/2026-09-15-anchor-text/PRE-REGISTRATION.md)** —
+raising it would be a second lever in one arm.
+
 ### Consequences
 
 - **A re-derived `url:` record keeps its archived declaration** (2026-09-14,

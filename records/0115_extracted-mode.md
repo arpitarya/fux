@@ -6,13 +6,13 @@ title: "SR-EXTRACTED (0115) — the extracted ingest mode"
 description: "The deterministic ingest mode, ratified by name. Everything is taken from the document; nothing is invented; every guarantee in the paper is stated for this mode and no other."
 status: accepted
 date: 2026-08-19
-amended: 2026-09-11
+amended: 2026-09-15
 feature: the `extracted` ingest mode — the value in every committed record's `mode` property, and the contract it asserts
 owns: [src/fux/ingest/extract.py@db4fc8f68ac0]
 laws: [L1, L2, L3, L4]
 ratifies: W-30
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 7c36d1e74906911e32469da70043b9ee865f6a55eff1164c771c192a4b48881f
+content_sha: a90ebdcf2f05698d84c9e6d8b57c358ed69caa98180aa3b0592ab453888ef75d
 ---
 
 # SR-EXTRACTED — the deterministic ingest mode
@@ -286,6 +286,23 @@ max_phrases`, default **32** (Arpit, 2026-09-11; it was a hard-coded `12`).
 - **Why tune.toml** — [SR-TUNE](0135_tuning.md) decision 13. **Why a changed
   cap reaches unchanged documents** — [SR-INGEST](0106_ingest.md)'s
   `[index]` digest.
+
+
+**10. The same-sources-same-bytes guarantee now covers the link text**
+(W-168 step 1, 2026-09-15). A `ref` edge carries the analyzed, hashed terms of
+the anchor text the document wrote — extraction-only and deterministic like
+every other field here: the words are **taken from** the document, nothing is
+invented, and no model is consulted.
+
+⚠ **They are taken from the REDACTED body**, downstream of `ingest/run.py`'s
+redaction pass, exactly as `terms` and the edge scan already were
+([SR-PII](0148_pii.md) decision 3). Anchor text is prose, so it can carry a
+secret as readily as a heading can.
+
+⚠ **Edges are still not carried forward, and anchor terms inherit that.** They
+are re-resolved every run because the rest of the corpus can change what a link
+resolves to — so `RULES_VERSION` in `extract.py` does not gate them, and no
+re-extraction is owed for an edit to how they are taken.
 
 ### Consequences
 

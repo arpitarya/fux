@@ -2458,7 +2458,7 @@ byte-equal by [`tests/test_claude_md_laws.py`](../tests/test_claude_md_laws.py).
   [`tests/test_sr_config_keys.py`](../tests/test_sr_config_keys.py) holds
   SR-CONFIG ↔ `config.py` and SR-TUNE ↔ `tune.py` equal in both directions, and
   **an unknown `fux.toml` key is now refused by name** rather than ignored.
-- **[W-146](open/W-146-the-rest-of-l0.md) is what is left**, and it is Arpit's: the
+- **[W-146](../archive/open/W-146-the-rest-of-l0.md) is what is left**, and it is Arpit's: the
   26-row inventory naming eleven `CLAUDE.md` sections that are technical and
   unhoused, plus two rulings — whether `SR-WORK-QUEUE` is written, and how far
   *never restates* reaches into docstrings. ⚠ **This session applied the narrow

@@ -10,7 +10,7 @@ feature: the rationale, history and reopen-trigger of L4
 owns: []
 laws: [L4]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 89605c2b777c0848509c3effa41e9ccd16161c32afe622975d7d147450286992
+content_sha: 5affa07c6fba764619763f35a8591cde370a9fc470fccbfc2e3f7047d2584861
 ---
 
 # SR-LAW-4 — L4 — offline by default
@@ -53,7 +53,7 @@ table. ⚠ **A handle is not the law**; read the law in §2 below.
 ```mermaid
 flowchart LR
     R["SR-LAW-4<br/>(THIS RECORD — states law L4)"]
-    N["SR-LAWS<br/>(the handles L0..L10 — routes, never states)"]
+    N["SR-LAWS<br/>(the handles L0..L11 — routes, never states)"]
     C["CLAUDE.md §Non-negotiable constraints<br/>(GENERATED from the records · test-bound)"]
     B["records bound by L4<br/>(cite the number, never restate)"]
     R --> C
@@ -74,7 +74,7 @@ flowchart LR
         (GENERATED -- not the source)
 
                SR-LAWS
-     (the handles L0..L10 -- routes, never states)
+     (the handles L0..L11 -- routes, never states)
                    |
           +--------+---------+
           v                  v

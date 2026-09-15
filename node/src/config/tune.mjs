@@ -65,7 +65,7 @@ export const INDEX_TABLE = "index";
 
 //: The closed key set. Table -> keys. Adding one here is a change to SR-TUNE.
 const SCHEMA = {
-  bm25f: ["k1", "b", ...FIELD_KEYS],
+  bm25f: ["k1", "b", ...FIELD_KEYS, "anchor"],
   ranking: ["rerank_weight", "expand_weight"],
   // The six `ask_*` keys are W-161's graph tier. They are parsed and carried
   // here so a consumer's committed `tune.toml` is accepted identically by both
@@ -137,6 +137,11 @@ export class Tune {
     this.k1 = K1;
     this.b = B;
     this.fieldWeights = FIELD_WEIGHTS;
+    // W-168 step 1 — the anchor field, folded at read time from other
+    // documents' edges. NOT in `fieldWeights`: that array is aligned with
+    // TF_FIELDS, the five fields a record commits an `flen` for. 0 = off, and
+    // off is the default until a pre-registered run says otherwise.
+    this.anchorWeight = 0.0;
     // [ranking]
     // The three DOCUMENT priors were removed on 2026-09-13 (W-151, W-152).
     this.rerankWeight = 0.0;
@@ -172,7 +177,7 @@ export class Tune {
   }
 
   /** The three-part BM25F parameter set, as one object. */
-  get scoring() { return new Scoring(this.k1, this.b, this.fieldWeights); }
+  get scoring() { return new Scoring(this.k1, this.b, this.fieldWeights, this.anchorWeight); }
 }
 
 export const DEFAULT_TUNE = new Tune();
@@ -409,6 +414,10 @@ export function loadTune(root, { enabled = true } = {}) {
     if (has(bm25f, key)) weights[i] = nonNegative(c, "bm25f", key, bm25f[key], FIELD_WEIGHTS[i]);
   });
 
+  const anchorWeight = has(bm25f, "anchor")
+    ? nonNegative(c, "bm25f", "anchor", bm25f.anchor, 0.0)
+    : 0.0;
+
   const ranking = data.ranking ?? {};
   const pick = (table, name, key, dflt, fn = nonNegative) =>
     (has(table, key) ? fn(c, name, key, table[key], dflt) : dflt);
@@ -493,7 +502,7 @@ export function loadTune(root, { enabled = true } = {}) {
   c.raiseIfAny();
 
   return new Tune({
-    k1, b, fieldWeights: weights,
+    k1, b, fieldWeights: weights, anchorWeight,
     rerankWeight, expandWeight,
     damping, iterations, laziness, hopDecay, expandLimit, seedDepth,
     askBoost, askRelated, askKinds, askLinkIdf, askMaxHops, askRelatedLimit,

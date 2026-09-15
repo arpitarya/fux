@@ -10,6 +10,51 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Changed — read this before upgrading a consumer
 
+- 🔴 **The committed index format is `fux.index.v3`, and an existing index must
+  be rewritten: `fux ingest --full`.** There is no in-place migration and
+  `store/reader.py` refuses a v2 shard rather than misreading one. ⚠ **Do NOT
+  delete `.fux/index/` by hand** — `url:` records are the one thing in it no
+  re-extraction can rebuild, and `--full` refuses rather than stranding them,
+  naming each.
+  - **What appeared:** a `ref` edge now carries `at` (anchor term hash → count,
+    from the **link text the source document wrote**) and `al` (the token
+    total). The `_format` bump is
+    [SR-INDEX-LIFECYCLE](records/0108_index-lifecycle.md) decision 9.1 firing —
+    *a property appeared, and a reader cannot know what it is missing.*
+  - **`analyzer` and `tf_fields` are UNCHANGED**, so no term hash changes
+    meaning and no `df` moves.
+  - 🔴 **A vendored Node reader must be re-bundled with the same upgrade.**
+    `.fux/node/fux.mjs` pins the schema string it was built with, so a
+    re-ingested corpus and a stale bundle are a hard refusal. `fux setup`
+    rewrites it.
+  - **Nothing about ranking changes on upgrade** — see below.
+
+### Added
+
+- **Anchor text: what OTHER documents call this one, as a sixth BM25F field**
+  ([W-168](work/open/W-168-search-improvements.md) step 1; Arpit's ruling,
+  2026-09-15). Every other field is something a document says about itself.
+  - **`[bm25f] anchor`, default `0.0` — OFF, and unmeasured.** `0.0` is not
+    "weight zero": every anchor branch in the engine tests it and is skipped, so
+    an unconfigured corpus scores **byte-identically** to the engine before the
+    field existed. Measured: 5 536 byte-identical scan-vs-accelerator
+    comparisons at the default, and 5 536 more at `anchor = 2.0`.
+  - 🔴 **It is a RETRIEVAL change, not just a scoring one.** With it on, `fux
+    ask` can return a document that contains **none** of the query's words —
+    reached through what its linkers call it. That is the point; *a document is
+    never a candidate for a word it does not contain* is the sentence it exists
+    to stop being true.
+  - **The words are committed on the SOURCE's edge**, never on the target's
+    record, so editing one document never rewrites another's committed bytes.
+    The per-target view ranking needs is folded at read time from
+    `.fux/runtime/anchors/` — derived, gitignored, rebuilt by `fux build`.
+  - **Terms, not text.** An anchor is stored as hashed terms, like every other
+    posting: link text is content, and [L2](records/0004_LAW-2-content-never-durable.md)
+    keeps content out of the index.
+  - ⚠ **Turning it on is not recommended yet.** The frozen bar is
+    [`2026-09-15-anchor-text`](work/regression/2026-09-15-anchor-text/PRE-REGISTRATION.md)
+    and it has no verdict. **No claim about ranking quality is made.**
+
 - 🔴 **`confidence.answerable` is now `false` for `weak` as well as `none`**
   (W-176 gate 1). It was `band != "none"`. **A consumer that branches on
   `band == "none"` is now wrong for half the refusals** and will answer from a

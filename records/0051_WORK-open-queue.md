@@ -7,11 +7,11 @@ description: "The live queue's discipline has one home, and this is it. Fifty-ei
 status: accepted
 date: 2026-09-13
 feature: the discipline of the single live work queue — its rules, its markers, and the three tests that enforce them
-owns: [tests/test_open_work_rows_are_short.py@aaf3da297626, tests/test_open_work_is_not_stale.py@453a93cbbbaa, tests/test_no_work_item_is_lost.py@3c6a033612b2]
+owns: [tests/test_open_work_rows_are_short.py@01fe412431ad, tests/test_open_work_is_not_stale.py@453a93cbbbaa, tests/test_no_work_item_is_lost.py@3c6a033612b2]
 laws: [L0]
 ratifies: W-146 ruling 1 · Arpit 2026-09-13 (archive, never delete)
 timestamp: 2026-09-13T00:00:00Z
-content_sha: 04fc6a7e9ae70af7b39494b7d33a99f886091b8affced888fd39c246eaee0699
+content_sha: c40c2d95dabb508d236cab9231b08bc0b8ce2d72f31f38bf05b78ea576e8493b
 ---
 
 # SR-WORK-OPEN-QUEUE — how OPEN-WORK works
@@ -131,6 +131,33 @@ that is the only thing the file says.
     behind it names the item it waits on.
 23. 🟡 **waiting on another item, or on Codex, whose chain ends at neither Arpit
     nor a date** — the row names what.
+23a. **A 🟡 row names its blocker as a queue item, and if none exists the row's
+    own edit creates one** (Arpit, 2026-09-15). The row says
+    `waiting on W-nn` — **the bare id, right after the verb** — so rule 27's verb
+    list, rule 42's `↳ blocks:` sub-row and the ball checks all read the same
+    edge.
+    ⚠ **There is no second form.** *"Waiting on a subscriber"*, *"waiting on a
+    run"*, *"waiting on an endpoint that does not exist"* — each of these is
+    **an unfiled work item wearing a blocker's clothes**. It reads as blocked,
+    nothing in the queue can clear it, and no session can tell whether it is
+    still true. **File the item, in the same edit, and point the row at it.**
+23b. **What the filed item contains** (Arpit, 2026-09-15): *"at least we know
+    what to do"* is the bar. The new item states **what the missing thing is,
+    what producing it takes, and who or what can produce it** — a run on a named
+    environment, a design with a named output, a harness that makes a
+    non-deterministic failure reproducible. It is a real item with a real
+    definition of done, not a placeholder that renames the wait.
+    ⚠ **A blocker that cannot be turned into an item is not a blocker — it is a
+    reason to close.** If nobody can say what would produce the missing thing,
+    the waiting row's honest outcomes are *close it and record why the question
+    is unanswerable*, or *put the fork to Arpit*. **Neither is staying 🟡.**
+23c. ⚠ **This supersedes the `— not a queue item` form**, added earlier the same
+    day and used on five rows before it was overruled. It was written as an
+    honesty mechanism — name the absence so a stuck row is visible as one — and
+    the naming was right. **What it got wrong is stopping there**: a row that
+    admits nothing can clear it has already done the analysis that produces the
+    item, and leaving it unfiled spends that analysis every time a session
+    re-reads the row.
 24. 🟢 **no blockers, good to go.**
 25. **Red wins, then purple.** An item waiting on several things is 🔴 if any
     chain ends at Arpit, else 🟣 if any chain ends at a date.
@@ -339,6 +366,16 @@ both `↳ blocks:` checks validating a single row for two days, green throughout
    the per-file map is
    [`archive/README.md`](../archive/README.md) §*Recovered 2026-09-13*, and the
    outcome is [`work/IMPLEMENTATION.md`](../work/IMPLEMENTATION.md).
+
+8. **A 🟡 row names the item it waits on, or says there is none** (Arpit,
+   2026-09-15) — rule 23a. The queue already required a 🟡 row to say *what* it
+   waits on, and every one of the five live 🟡 rows satisfied that with a noun:
+   *a subscriber*, *a `fux-lab` run*, *one captured failure*. **None of them
+   named an id, and none of them could** — which the rule made invisible rather
+   than legible. A reader could not tell a row waiting on tracked work from a
+   row waiting on something nobody had filed, and those are opposite states:
+   the first clears itself when its blocker lands, the second never clears.
+   `tests/test_open_work_rows_are_short.py` enforces the two forms.
 
 ### Consequences
 

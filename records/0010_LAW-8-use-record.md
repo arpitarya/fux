@@ -10,7 +10,7 @@ feature: the rationale, history and reopen-trigger of L8
 owns: []
 laws: [L8]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 413fc4202fb456c8a994b42c774800c1e4f0ab3ad95dce00f8c720f9b1ca6dfc
+content_sha: e62412a35163e35352aab29f2fa6c9db50eb6c220a3ebade62a7f587d902aec6
 ---
 
 # SR-LAW-8 — L8 — a use record is never committed
@@ -63,7 +63,7 @@ table. ⚠ **A handle is not the law**; read the law in §2 below.
 ```mermaid
 flowchart LR
     R["SR-LAW-8<br/>(THIS RECORD — states law L8)"]
-    N["SR-LAWS<br/>(the handles L0..L10 — routes, never states)"]
+    N["SR-LAWS<br/>(the handles L0..L11 — routes, never states)"]
     C["CLAUDE.md §Non-negotiable constraints<br/>(GENERATED from the records · test-bound)"]
     B["records bound by L8<br/>(cite the number, never restate)"]
     R --> C
@@ -84,7 +84,7 @@ flowchart LR
         (GENERATED -- not the source)
 
                SR-LAWS
-     (the handles L0..L10 -- routes, never states)
+     (the handles L0..L11 -- routes, never states)
                    |
           +--------+---------+
           v                  v

@@ -10,7 +10,7 @@ feature: the rationale, history and reopen-trigger of L5
 owns: []
 laws: [L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: ff9e46213653e3fbce85f106ddf2a8cc53d0a7a5ed58097236fe65e749b4d0cc
+content_sha: 84e5eb84ffdfde6c7efec657eb33d5c08f6ea38fae6d6a4a588bb052453c7111
 ---
 
 # SR-LAW-5 — L5 — hashed meta is the default for non-git sources
@@ -44,7 +44,7 @@ So for non-git sources, human-readable metadata — the title, the headings — 
 ```mermaid
 flowchart LR
     R["SR-LAW-5<br/>(THIS RECORD — states law L5)"]
-    N["SR-LAWS<br/>(the handles L0..L10 — routes, never states)"]
+    N["SR-LAWS<br/>(the handles L0..L11 — routes, never states)"]
     C["CLAUDE.md §Non-negotiable constraints<br/>(GENERATED from the records · test-bound)"]
     B["records bound by L5<br/>(cite the number, never restate)"]
     R --> C
@@ -65,7 +65,7 @@ flowchart LR
         (GENERATED -- not the source)
 
                SR-LAWS
-     (the handles L0..L10 -- routes, never states)
+     (the handles L0..L11 -- routes, never states)
                    |
           +--------+---------+
           v                  v

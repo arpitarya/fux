@@ -6,12 +6,12 @@ title: "SR-TUNE (0135) — the tunables file, and per-source priority"
 description: "`.fux/tune.toml` — a committed, setup-written, never-rewritten file holding every knob that changes ordering, plus one declared exception (`[index]`: `max_phrases`, `max_table_rows`) that changes the index; plus a per-source preference weight in either direction, where fux states the cost and refuses only what is broken."
 status: accepted
 date: 2026-08-22
-amended: 2026-09-11
+amended: 2026-09-15
 feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error contract, and per-source preference weights
-owns: [src/fux/tune.py@a14639bc1348]
+owns: [src/fux/tune.py@97814aaa4a31]
 laws: [L1, L3, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 15131a8674c086b9245dd3ce05119285411fffde9753ace2abbe803846bc9131
+content_sha: fc3ed2094d891138a351a266374eeccf34a5ac1fd67c105d763a266f495b52d3
 ---
 
 # SR-TUNE — the tunables file, and per-source priority
@@ -728,6 +728,7 @@ reads · `*` an **open** table whose keys are the consumer's own.
 + bm25f.title
 + bm25f.path
 + bm25f.ctx
++ bm25f.anchor
 + ranking.rerank_weight
 + ranking.expand_weight
 + graph.damping
@@ -885,6 +886,37 @@ everything else. What it breaks is a weaker assumption nothing had written
 down — that `ask`'s printed order is monotone in its printed score. It is not,
 under the boost, and the row that causes it carries `boosted` and its route so
 the exception is annotated where it happens.
+
+
+**17. `[bm25f] anchor`, default `0.0`** (W-168 step 1, 2026-09-15) — the
+anchor field's weight, and the sixth key in a table whose other five are the
+committed fields.
+
+- **In `[bm25f]` and not in `[ranking]`**, because it is a field weight in the
+  same formula `k1` and `b` sit in, not a document prior. It is carried on
+  `Scoring` with them, for the reason decision 6 gives: every number there
+  appears on both sides of the same fraction, and a caller that passes some of
+  them reweights half a formula.
+- **Outside `_FIELD_KEYS`**, which is `TF_FIELDS` and is aligned
+  index-for-index with `FIELD_WEIGHTS`. Anchor is folded at read time and has no
+  committed `flen` slot; padding it into the aligned tuple would claim a sixth
+  committed field and leave every record's `flen` one short.
+- 🔴 **Moving it needs NO re-ingest**, which is decision 6a's property holding
+  for a new field: nothing stored is a function of it. `total_anchor_len` and
+  `alen` are raw counts, weighted at query time on both paths, exactly as
+  `total_flen` is.
+- **`0.0` is off, and off is arithmetic-free.** Every anchor branch tests it and
+  is skipped, so an unconfigured corpus scores byte-identically to the engine
+  before the field existed — the `expand_weight` precedent, and the reason
+  `--no-tune` remains a real off-switch here.
+
+⚠ **UNMEASURED, and the default is not a recommendation.** [SR-RS](0133_predictions.md)
+decision 19; the frozen bar is
+[`2026-09-15-anchor-text`](../work/regression/2026-09-15-anchor-text/PRE-REGISTRATION.md).
+⚠ **Defaulting it on later would change every consumer's ranking on upgrade**
+unless their `tune.toml` pins it — and `fux setup` writes every value out in
+full, so a repo that has run setup keeps `0.0` and a fresh clone would get the
+new one. That divergence belongs in the CHANGELOG on the day it happens.
 
 ### Consequences
 

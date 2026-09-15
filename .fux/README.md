@@ -20,6 +20,7 @@ of THREE kinds:
 | `sources/` | committed | the committed source lists (`dirs`, `urls`), one entry per line |
 | `fetchers/` | committed | consumer-owned code (`cdp.py`, `http.py`), edit freely |
 | `decoders/` | committed | consumer-owned code, one module per format. THESE COPIES ARE WHAT RUN, not the ones inside the installed package (SR-DECODE) |
+| `observers/` | committed | consumer-owned code, one module per subscriber. Called AFTER a verb has fully rendered, with one record of COUNTS -- never the question, a path, or the answer. It cannot change an answer: no return path, and the dispatch runs after every write (SR-OBSERVE) |
 | `enrich/` | committed | pinned enrichment text, one file per source content sha, plus `queue.tsv` (W-86 P6: what fux could NOT read and a model must). Committed, because a backlog is a team fact |
 | `node/` | committed | the Node read plane (`fux-engine`) as ONE BUNDLED FILE plus its manifest -- build output, never fux's source (L10). Engine-owned and REWRITTEN on a version change, not write-if-missing, because nobody edits it and a stale copy is a wrong answer. In a monorepo it is a workspace member holding only a manifest (SR-NODE-SEARCH) |
 | `tune.toml` | committed | the tunables: HOW results are ordered, never what is indexed (SR-TUNE) |
@@ -86,7 +87,7 @@ Flat verbs, no subcommand tree. `fux <verb> --help` for any of them.
 | lifecycle | `setup` `doctor` `inspect` | set the repo up, check the environment, then X-ray the index it produced |
 | write | `ingest` `build` | `ingest` writes the committed index; `build` derives the local accelerator from it |
 | sources | `add` `remove` `update` `enrich` `correct` | maintain what is indexed. `add`/`remove` write lines; `update` re-fetches and writes none; `enrich` plans and validates a model's text; `correct` writes one question a PERSON typed onto the document that answers it |
-| read | `ask` `find` `answer` `lexical` | the same question, differing only in how much each commits to. `lexical` is BM25F alone, frozen — the baseline `ask` is measured against |
+| read | `ask` `find` `answer` `lexical` | the same question, differing only in how much each commits to. `lexical` is BM25F alone, frozen - the baseline `ask` is measured against |
 | graph | `explain` `graph` `path` | answer with relationships the documents stated, never with a ranking |
 | serve | `mcp` `daemon` | the only verbs that do not return |
 | maintenance | `hooks` `tune` `output` `verify` | wire git to keep the index in step; print or set the tunables; re-run a receipt |

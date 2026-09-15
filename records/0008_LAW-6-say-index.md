@@ -10,7 +10,7 @@ feature: the rationale, history and reopen-trigger of L6
 owns: []
 laws: [L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 8e1bee460c5e940874a42ebd2af022039f41a0c9850bf6c18f2aaa61fec96d64
+content_sha: 781b08222b44c7f6fa6cb82047a06813fe13b0a31ffdf7e6623768e37ed7d0ad
 ---
 
 # SR-LAW-6 — L6 — say "index", not "db"
@@ -44,7 +44,7 @@ table. ⚠ **A handle is not the law**; read the law in §2 below.
 ```mermaid
 flowchart LR
     R["SR-LAW-6<br/>(THIS RECORD — states law L6)"]
-    N["SR-LAWS<br/>(the handles L0..L10 — routes, never states)"]
+    N["SR-LAWS<br/>(the handles L0..L11 — routes, never states)"]
     C["CLAUDE.md §Non-negotiable constraints<br/>(GENERATED from the records · test-bound)"]
     B["records bound by L6<br/>(cite the number, never restate)"]
     R --> C
@@ -65,7 +65,7 @@ flowchart LR
         (GENERATED -- not the source)
 
                SR-LAWS
-     (the handles L0..L10 -- routes, never states)
+     (the handles L0..L11 -- routes, never states)
                    |
           +--------+---------+
           v                  v

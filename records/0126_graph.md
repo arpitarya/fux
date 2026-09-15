@@ -10,7 +10,7 @@ feature: the graph lane — three relational verbs, a derived plane, and a lazy 
 owns: [src/fux/graph@190867c8ad31, tools/graph-bench@9c330ea14b42]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 4efefd01968e8f774ad530f936506cf850e2d82e658cc51c641183424a222e44
+content_sha: aba1b4d7e48d95f02ae857de2397265f87c14b02a3b2dfbef514ad67d2ec28ce
 ---
 
 # SR-GRAPH — the graph lane
@@ -419,6 +419,35 @@ every consumer has one more state to handle. That is real, and it is the reason
 option (a) was tempting. It is accepted because the alternative is a verb that
 **hangs** — and a hang is also an incomplete result, one that says nothing at
 all.
+
+
+**18. A `ref` edge carries anchor terms, and the graph plane does NOT**
+(W-168 step 1, 2026-09-15).
+
+The committed edge gained `at` and `al`. `Edge`, `edges_from_records` and
+`graph.json` are **untouched**: they lift `src`, `kind`, `dst`, `grade` and
+nothing else, so the plane's bytes, its schema and its byte-identity assertion
+across two builds are unchanged.
+
+🔴 **The reverse map ranking needs is a SEPARATE derived structure**, in
+`.fux/runtime/anchors/`, and keeping it out of `graph.json` is deliberate: the
+graph plane is read whole by `explain`, `graph` and `path`, and a query needs
+one term's in-edges, not every edge's words. Sharded by term hash, it opens one
+small file per query term.
+
+**It is the same argument this record already makes about communities**, one
+level down. Edges are committed because they are **local and diffable**;
+communities are derived because they are **global and would not be**. A
+per-target anchor view is global in exactly that sense — every linker
+contributes to it — so it is folded at read time, which is what keeps a
+one-file commit from producing a corpus-wide diff and what kept
+[L3](0005_LAW-3-deterministic.md) out of the conversation entirely.
+
+⚠ **Step 5 of [W-168](../work/open/W-168-search-improvements.md) —
+supersession-aware ranking — reads this same in-edge map.** *"The successor
+inherits the target's anchor text"* is a second read-time fold over one
+structure, not a second cross-document committed byte. Nothing about it is built
+yet.
 
 ### Consequences
 

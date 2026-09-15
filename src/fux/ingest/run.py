@@ -643,7 +643,14 @@ def run(
             )
         # Edges last, and never reused: they are the one field the rest of the
         # corpus can change without this document changing.
-        record["edges"] = edges_mod.resolve(doc_id, scans[doc_id], known_ids, by_basename)
+        #
+        # `tracker.hash_of` is the RUN's tracker, the same one `hash_terms`
+        # uses above: anchor terms (W-168 step 1) are hashed in the same
+        # currency as body terms, through the one object that can see a
+        # cross-document collision.
+        record["edges"] = edges_mod.resolve(
+            doc_id, scans[doc_id], known_ids, by_basename, tracker.hash_of
+        )
         record["ver"] = ver_for(doc_id, record["sha"])
         records.append(record)
 
@@ -658,7 +665,9 @@ def run(
             mode="extracted",
             terms=store_mod.hash_terms(fields.terms, tracker),
             flen=store_mod.trim(fields.flen),
-            edges=edges_mod.resolve(doc_id, scans[doc_id], known_ids, by_basename),
+            edges=edges_mod.resolve(
+                doc_id, scans[doc_id], known_ids, by_basename, tracker.hash_of
+            ),
         )
         record["ver"] = ver_for(doc_id, record["sha"])
         # Absent when false, exactly as on the `file:` side above.

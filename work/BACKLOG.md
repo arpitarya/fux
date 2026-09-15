@@ -235,6 +235,9 @@ no row: what remains of each is **W-144** and **W-168** in the queue.*
 | B-185 | Research-to-Spec — evidence-backed specs where every claim cites the corpus at a commit | [`research-to-spec.md`](proposals/research-to-spec.md) | No trigger stated — the row it is owed |
 | B-186 | Knowledge diff and time-travel — `fux diff` / `fux log`, asking questions of past knowledge; a natural fit for the one-root-hash keyspace | [`knowledge-diff.md`](proposals/knowledge-diff.md) | No trigger stated — the row it is owed |
 | B-187 | Agent search-API landscape — a research note and the evidence base the refer-plane proposals cited, kept because two live records still ground on it | [`agent-search-landscape.md`](proposals/agent-search-landscape.md) | Nothing; it is grounding, not work |
+| B-246 | `WORKLOG.md` archive-and-truncate — append-only and growing forever; a yearly or v-major cut into `archive/worklog/YYYY.md` would cap the live file under the one-archive law. Parked since 2026-08-21, never litigated | [SR-WORK-GOVERNANCE](../records/0065_WORK-governance.md) Consequences | Arpit rules on the cut, or rules it never happens |
+| B-247 | `DOC-REGISTRY.md` scoped to untested prose — its unique value is the docs nothing else checks (`WORKLOG`, `MACHINE`, `GLOSSARY`, the paper); SRs and `setup/` have dedicated tests. Parked since 2026-08-21, never litigated | [SR-WORK-GOVERNANCE](../records/0065_WORK-governance.md) Consequences | Arpit rules on the scope, or rules it stays whole |
+| B-248 | Glassbox sessions — the ask is counts and cross-session joins, which fux does not do; the sketch is materialise-then-index. 🔴 `fetch=`'s value set is closed at `sourcelist.py:263` while `urlsrc.py` resolves by filename | [`glassbox-sessions.md`](proposals/glassbox-sessions.md) | A second event-stream source is asked for |
 
 ---
 

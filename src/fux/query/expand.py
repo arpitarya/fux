@@ -76,7 +76,7 @@ class Expansion:
         hashes = tuple(query_hashes)
         return cls(hashes=hashes, required=frozenset(hashes), weights={})
 
-    def matches(self, terms) -> bool:
+    def matches(self, terms, anchor_tf=None) -> bool:
         """Does this record match at least one term the **user** asked for?
 
         🔴 **The hallucinated-citation guard.** A record that matches only
@@ -85,8 +85,25 @@ class Expansion:
 
         `terms` is the record's own `terms` mapping, so this is a membership
         test and not a second scoring pass.
+
+        ## W-168 step 1: an ANCHOR match is a match, and had to be said here
+
+        `anchor_tf` is the document's anchor terms — the words other documents
+        use when they link to it. A document reachable only that way carries
+        **none** of the query's hashes in its own `terms`, so this guard would
+        have dropped it before it was ever scored: the retrieval change would
+        have been built, tested at the scorer, and produced nothing.
+
+        🔴 **It is not a hallucination, and the distinction is the whole
+        reason the guard can be relaxed at all.** `--expand` hands fux words a
+        *model* invented about a document; an anchor term is a word a *human
+        linker* wrote, extracted from a committed document, pointing at this
+        one. The guard exists to refuse invented vocabulary, not indirect
+        evidence — and `required` is still the user's own hashes either way.
         """
-        return any(h in terms for h in self.required)
+        if any(h in terms for h in self.required):
+            return True
+        return anchor_tf is not None and any(h in anchor_tf for h in self.required)
 
     def weight_of(self, term_hash: str) -> float:
         """The multiplier for one hash. `1.0` for anything not weighted."""

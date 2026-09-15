@@ -10,7 +10,7 @@ feature: the rationale, history and reopen-trigger of L1
 owns: []
 laws: [L1]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: c934a294fba6cfa099fb0330ca8905769636e8bbe42a3dcd726ca566120da848
+content_sha: f85eb3f40a680e229cc91ad92f64006882734ca53f07c1188574a11dc5fb31fb
 ---
 
 # SR-LAW-1 — L1 — $0, FOSS-only
@@ -63,7 +63,7 @@ table. ⚠ **A handle is not the law**; read the law in §2 below.
 ```mermaid
 flowchart LR
     R["SR-LAW-1<br/>(THIS RECORD — states law L1)"]
-    N["SR-LAWS<br/>(the handles L0..L10 — routes, never states)"]
+    N["SR-LAWS<br/>(the handles L0..L11 — routes, never states)"]
     C["CLAUDE.md §Non-negotiable constraints<br/>(GENERATED from the records · test-bound)"]
     B["records bound by L1<br/>(cite the number, never restate)"]
     R --> C
@@ -84,7 +84,7 @@ flowchart LR
         (GENERATED -- not the source)
 
                SR-LAWS
-     (the handles L0..L10 -- routes, never states)
+     (the handles L0..L11 -- routes, never states)
                    |
           +--------+---------+
           v                  v

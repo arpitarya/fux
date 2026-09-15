@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@7b34fac195d3, src/fux/setup.py@af9f0203b42d, tests/test_verb_table_agreement.py@2c2a8f52fb6c]
+owns: [src/fux/store/fuxdir.py@3e0a9d91c4a7, src/fux/setup.py@af9f0203b42d, tests/test_verb_table_agreement.py@1e7999ffd28f]
 laws: [L2, L3, L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 93f701ef7c320f26cb95b534ee21e2f726f10304565afc194a645055d32e68d6
+content_sha: 8684abdd94979b1395f5353b0679444e8e7ac016e14cdd140ea98d42c77dd0a5
 ---
 
 # SR-DOTFUX — the `.fux/` directory
@@ -451,6 +451,35 @@ made [L10](0011_LAW-10-bundled-output.md)'s *"a local edit is invisible"* a live
 exposure rather than a hypothetical. `_prune_node_reader` deletes everything the
 declared shape does not name, **`node_modules/` excepted**: that holds shape C's
 installed reader, and removing it would leave a manifest pointing at nothing.
+
+**6b. The write-if-missing shape has a second copy, and it is the one nobody
+reads.** Added 2026-09-15. `README.md` is *engine-owned, annotatable*: written
+once and never again, so **this repository's `.fux/README.md` and the template
+in `store/fuxdir.py::_readme` that a NEW consumer is handed are two artifacts
+that drift apart in silence.** A fresh `fux setup` does not read this
+repository's copy.
+
+🔴 **They had drifted, and the drift was the verb table.** On 2026-09-15 the
+committed copy listed `inspect`, `correct` and `lexical` and the template listed
+none of the three — three verbs that shipped between 2026-09-06 and 2026-09-14,
+each one hand-added to the file in front of whoever added it. Every test in
+`tests/test_verb_table_agreement.py` was green throughout, because all of them
+read `.fux/README.md`. **A consumer setting fux up that day was handed a short
+list, and the repository that defines the verbs could not tell.**
+
+**So the template is held to the parser too**, by the same third party decision
+6's table is: `build_parser()`. Two tests now read `_readme()` rather than the
+file — one for the verbs, one for the encoding, because `ensure_layout` writes
+the template with `.encode("ascii")` and a single em dash in it raises
+`UnicodeEncodeError` **only in a repository that has no `.fux/README.md` yet**.
+That failure cannot land here. It lands on a new consumer's first ingest, and
+the fix that introduced this decision hit it on the way past.
+
+⚠ **This is the general shape of every write-if-missing file**, not a fact about
+the README: `.gitignore` has the same two copies and the same silence. The
+narrow gate is the one that was buildable — *does the template still name every
+verb* — and it covers one file. The rest of the shape is unguarded and is named
+here so the next drift is recognised rather than rediscovered.
 
 **7. `fetchers/` is consumer code and fux never rewrites it.** It is loaded by
 path, and only under the two fenced paths — `fux add <URL>` and `fux update`.

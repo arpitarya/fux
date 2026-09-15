@@ -374,7 +374,7 @@ def test_a_shard_with_conflict_markers_says_so(tmp_path):
     index = tmp_path / ".fux" / "index"
     index.mkdir(parents=True)
     (index / "00.jsonl").write_text(
-        '{"_format":"fux.index.v2"}\n<<<<<<< ours\n{"id":"a"}\n=======\n{"id":"b"}\n>>>>>>> theirs\n',
+        '{"_format":"fux.index.v3"}\n<<<<<<< ours\n{"id":"a"}\n=======\n{"id":"b"}\n>>>>>>> theirs\n',
         encoding="utf-8",
     )
     with pytest.raises(FuxError, match="unresolved merge conflict markers"):
