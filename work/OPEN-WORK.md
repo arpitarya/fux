@@ -38,7 +38,7 @@ here. Read that record before changing anything below it.
 - 🔴 **W-168** · `agent` — the ten search improvements. **Step 1 scoped 2026-09-15, not started:** an anchor field makes a document's bytes depend on other documents while re-index is per-document. Needs the inbox ruling. [detail](open/W-168-search-improvements.md)
 - 🟣 **W-176** · `agent`, waiting on **2026-09-30** — **steps 1–3 landed 2026-09-15**: `weak` ⇒ `answerable: false`, the steering text, `failed`. The seven measured gates need Codex's key. [detail](open/W-176-abstention-gates.md)
 - 🟡 **W-170** · `agent`, waiting on a subscriber — **BUILT 2026-09-15**, SR-OBSERVE `accepted`. Node declared out of scope (SR-NODE-SEARCH d18). Only the latency capture is owed, and it needs a real subscriber's observer to measure. [detail](open/W-170-cage-search-leg.md)
-- 🟢 **W-148** · `agent` — ruled 2026-09-14: golden is **local-only** (drop CI's corpus arm), Node's latency goes into `fux-benchmark` beside Python's, the harness stays scratch. Three rows of agent work, then close. [detail](open/W-148-what-the-two-readers-still-owe.md)
+- 🟡 **W-148** · `agent`, waiting on `fux-benchmark` — **rows 1–3 done 2026-09-15**: CI's corpus arm removed, §4 amended local, SR-WORK-BENCHMARK 12–13. N4 stays unmeasured until the Node column is run. Row 4 out of scope. [detail](open/W-148-what-the-two-readers-still-owe.md)
 - 🟢 **W-140** · `agent` — `--hops` ruled **(c)** 2026-09-14: bound the walk's work, `truncated` in every rendering; build row 12's last third. Row 21's runner-race flake stays unreproduced (11 attempts). 20 closed. [detail](open/W-140-guide-authoring-defects.md)
 
 ### testing

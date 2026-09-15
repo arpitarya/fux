@@ -83,24 +83,26 @@ jobs:
         run: python tools/differential/graph_arm.py .
 
   ladder:
-    # PRE-REG-NODE-2 §4's cadence: `rung-00100` and `rung-10000` on every push,
-    # all eight nightly and before a release.
+    # 🔴 **THE GOLDEN CORPUS IS NOT FOR CI.** Ruled by Arpit on 2026-09-14
+    # (W-148 row 1): golden runs **local-only, in `fux-lab`** — no self-hosted
+    # runner, no committed rung, no portable builder. The three routes out were
+    # named and none was taken.
     #
-    # 🔴 **A GitHub runner cannot meet it, and this job says so rather than
-    # pretending.** The ladder *corpus* is not in this repo — only its
-    # manifests are (`work/golden/ladder/*.{index,sha256}`, 2.2 MB); the rungs
-    # themselves live in `fux-lab` because [SR-WORK-ENVIRONMENTS] gives every measurement to that
-    # environment, and rung-10000 alone is 120 MB. Regenerating one here would
-    # mean running `build_golden_rung.py`, which hard-codes two absolute paths
-    # on Arpit's machine.
+    # So this job checks the **manifests and nothing else**: `ladder_check.py`
+    # proves `rungs.py` resolves and verifies what `work/golden/ladder/` holds
+    # (2.2 MB of `*.{index,sha256}`), which is the half CI can honestly do.
     #
-    # What this job does have is the manifests, so it proves the *instrument*
-    # is wired: `rungs.py` resolves and verifies, and the arm runs the moment a
-    # corpus is present. Where `FUX_GOLDEN_CORPORA` points at one — a lab
-    # checkout, a self-hosted runner — the same command is the real thing.
+    # ⚠ **The `FUX_GOLDEN_CORPORA` arm was here and is REMOVED**, not disabled.
+    # It ran the real differential arm whenever a repository variable happened
+    # to point at a corpus — so the cadence PRE-REG-NODE-2 §4 asks for was
+    # *conditionally* met by a setting nobody could see from the tree, and a
+    # green tick meant either "the arm passed" or "there was no corpus". A
+    # conditional arm that skips silently is how `find` went a month without
+    # its tune file. **The cadence is LOCAL**, stated in the pre-registration
+    # rather than implied by a variable.
     #
     # [SR-WORK-ENVIRONMENTS]: records/0052_WORK-environments.md
-    name: golden ladder (fux-lab corpora)
+    name: golden ladder manifests (the corpus is local-only)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -118,16 +120,3 @@ jobs:
       - name: the ladder manifests are readable and self-consistent
         run: python tools/differential/ladder_check.py
 
-      - name: the arm on rung-00100 and rung-10000, when the corpora are here
-        env:
-          FUX_GOLDEN_CORPORA: ${{ vars.FUX_GOLDEN_CORPORA }}
-        run: |
-          if [ -z "$FUX_GOLDEN_CORPORA" ] || [ ! -d "$FUX_GOLDEN_CORPORA" ]; then
-            echo "::notice::the ladder corpus is not on this runner — PRE-REG-NODE-2 §4's"
-            echo "::notice::per-push cadence is met in fux-lab, not here. See W-107."
-            exit 0
-          fi
-          for rung in rung-00100 rung-10000; do
-            python tools/differential/node_arm.py --rung "$rung"
-            python tools/differential/graph_arm.py --rung "$rung"
-          done

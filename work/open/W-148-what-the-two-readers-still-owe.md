@@ -165,6 +165,36 @@ change.
 | **2 · Node's latency** | **Add the Node measurement to `fux-benchmark`, the same shape as Python's** — same rungs, same `p95`, one more column | a `node` arm in `fux-benchmark`'s capture, the row in [SR-WORK-BENCHMARK](../../records/0053_WORK-benchmark.md), the N4 fence re-stated as measured |
 | **3 · the harness's zero commits** | **Insignificant.** `fux-benchmark` is scratch for testing; commits are optional — *"if you do it, great; if not, also fine"* | the record states the harness is scratch and that SR-WORK-BENCHMARK decisions 8–10 are enforced by an uncommitted file, so nobody rediscovers it |
 
+## ✅ AGENT WORK DONE 2026-09-15 — what the three rulings became
+
+| row | what landed |
+|---|---|
+| **1 · CI and the golden corpus** | ✅ **`node-arm.yml`'s `FUX_GOLDEN_CORPORA` arm is REMOVED**, not disabled; the job is renamed *golden ladder manifests (the corpus is local-only)* and runs `ladder_check.py` alone. `PRE-REGISTRATION-NODE-2` §4's cadence is **amended to local**, with the loss stated: one machine is not three OSes, so §4's cross-OS half is now aspirational rather than something CI was quietly failing |
+| **2 · Node's latency** | ✅ **[SR-WORK-BENCHMARK](../../records/0053_WORK-benchmark.md) decision 12** — a COLUMN, not a second harness, because the question is a comparison. 🔴 **N4 stays UNMEASURED and no document may say otherwise**; the arm itself is `fux-benchmark`'s, which is scratch |
+| **3 · the harness's zero commits** | ✅ **decision 13** — the environment is scratch, commits are optional, and decisions 8–10 are enforced by a file on one machine. **Stated, not remedied**, because committing it would change what SR-WORK-ENVIRONMENTS says that environment is |
+| **4 · the renderer split** | 🟡 untouched. Still a refactor of a 1 481-line hot file with no failing test driving it, and still out of scope until someone asks |
+
+🔴 **Two corrections this made to documents that were wrong, in the direction
+that flatters:**
+
+1. **`PRE-REGISTRATION-NODE-2` §4 claimed *"the ladder is committed to this
+   repo … so CI can run the same rungs fux-lab runs."*** What is committed is
+   the **manifests**; 2.2 MB is *their* size, and `rung-10000` alone is 120 MB.
+   The sentence was never true, and the conditional CI arm is what let it
+   survive: a green tick meant *the arm passed* **or** *there was no corpus*,
+   and nothing in the tree said which.
+2. **A removed arm beats a skipped one.** The old job called `exit 0` with a
+   `::notice::` when no corpus was present — which is the shape
+   [SR-NODE-SEARCH](../../records/0153_node-search.md) decision 9 already warns
+   about: *a lane that silently does not run is how `find` went a month without
+   its tune file.*
+
+⚠ **W-161 made row 2 harder on 2026-09-15**, and it is named in decision 12: a
+Node `ask` now rebuilds the graph plane in memory, parsing every committed
+record, which the Python reader does not do. **The first Node latency number
+will contain that cost**, and a run that does not separate it will attribute a
+tier's price to the reader.
+
 ## Blockers
 
 - ✅ Rows 1 and 2 were Arpit's calls; **ruled above**. Agent work proceeds.

@@ -10,7 +10,7 @@ feature: the capture set every benchmark run files
 owns: [tests/test_benchmark_capture.py@f6af3d328537]
 laws: []
 timestamp: 2026-09-13T00:00:00Z
-content_sha: 6e229c2ff0d443d04144bf20dc390e11d2f58eed3041c5262c12e140a2f1a21e
+content_sha: 83dfea48ea0b9293f95e403893be7d17e3c67cbb9c533ecfabea5549c2de2ade
 ratifies: Arpit, 2026-09-13 — what a benchmark must always capture
 ---
 
@@ -302,6 +302,59 @@ was *filed*, never that anything can still generate one. Stated rather than
 fixed: whether that environment gets a commit is
 [W-148](../work/open/W-148-what-the-two-readers-still-owe.md)'s territory and
 Arpit's, and it is named there.
+
+**12. The NODE READER IS A COLUMN, not a separate benchmark** (W-148 row 2;
+Arpit, 2026-09-14).
+
+Node's query latency has never been measured. `PRE-REGISTRATION-NODE`'s N4
+fence — `p95 ≤ 150 ms` — was retired with that document and moved here, so the
+bar was **stated rather than silently dropped**, and then nothing measured it
+because no instrument existed.
+
+**The ruling: add the Node measurement to `fux-benchmark` in the same shape as
+Python's** — same rungs, same `p95`, **one more column**. Not a second harness
+and not a second report.
+
+⚠ **A column, because the question is a comparison.** Node against Python on
+the same corpus, same queries, same run, is the number anybody actually wants;
+two separate reports from two runs would be two absolute numbers measured under
+different machine load, which decision 6's *a benchmark rules no threshold*
+already refuses to let anyone read as a delta.
+
+🔴 **Until that column is filed, N4 is UNMEASURED and no document may say
+otherwise.** The structural argument — *Node's scan is the same algorithm over
+the same shards* — says where to expect the number and **is not the number**,
+and filing it as one would be the exact failure
+[SR-RS](0133_predictions.md) decision 22 names.
+
+⚠ **This got harder on 2026-09-15**, and the reason is worth carrying: W-161's
+graph tier makes a Node `ask` rebuild the graph plane in memory, which parses
+every committed record — work the Python reader does not do, because it reads
+one derived file ([SR-NODE-SEARCH](0153_node-search.md) decision 17a). **So the
+first Node latency number will contain that cost**, and a run that does not
+separate it will attribute a tier's price to the reader.
+
+**13. `fux-benchmark` IS SCRATCH, its commits are optional, and decisions 8–10
+are enforced by a file that exists on one machine** (W-148 row 3; Arpit,
+2026-09-14 — *"if you do it, great; if not, also fine"*).
+
+The harness repository has **zero commits** and every file untracked. W-158
+rewrote its `bin/report.py` so that decisions 8, 9 and 10 are enforced by code
+rather than by whoever is writing the report — and **that code now exists
+nowhere else.**
+
+🔴 **Nothing here would notice it going.** `tests/test_benchmark_capture.py`
+checks that a report was *filed*; it cannot check that another one could be
+generated. So a wiped `fux-benchmark` leaves every past report intact and every
+future one impossible, **silently** — and this paragraph is the only warning
+that exists, which is why it is in a record rather than in a queue item that
+closes.
+
+⚠ **It is not a defect to fix by committing the harness.** Arpit ruled the
+commits optional and the environment scratch
+([SR-WORK-ENVIRONMENTS](0052_WORK-environments.md)); committing it would make
+the environment something more than scratch, which is a change to what that
+record says it is. **Stated, not remedied** — the cost is known and accepted.
 
 ### Consequences
 
