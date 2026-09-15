@@ -32,9 +32,11 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
+- 🟢 **W-178** · `agent` — **consumer fetchers open like their decoders already do**: `fetch=` becomes a typed, shape-validated name. Ruled 2026-09-15. 🔴 No third fetcher is possible today. Ratified, not built. [detail](open/W-178-consumer-planes-open-sets.md)
+- 🟢 **W-177** · `agent` — **`fux update` is deleted; `fux ingest` absorbs its whole surface**, ruled 2026-09-15. Reverses W-63 decision 3; no law edit. [detail](open/W-177-ingest-absorbs-update.md)
 - 🟣 **W-161** · `agent`, waiting on **2026-09-30** — **BUILT 2026-09-15**, both readers, 0 discordant; both tiers ship on and unmeasured. Only the two arms remain, and they need Codex's link-dependent questions. [detail](open/W-161-graph-composed-ask.md)
 - 🔴 **W-168** · `agent` — the ten search improvements. **Step 1 scoped 2026-09-15, not started:** an anchor field makes a document's bytes depend on other documents while re-index is per-document. Needs the inbox ruling. [detail](open/W-168-search-improvements.md)
-- 🟢 **W-176** · `agent` — the nine abstention gates, ruled (a) 2026-09-14: 1 + 9 + the output surface now; 4, 3, 2, 7, 8, 5 measured behind flags from **2026-09-30** (Codex's unanswerable key); 6 once W-161 has landed. [detail](open/W-176-abstention-gates.md)
+- 🟣 **W-176** · `agent`, waiting on **2026-09-30** — **steps 1–3 landed 2026-09-15**: `weak` ⇒ `answerable: false`, the steering text, `failed`. The seven measured gates need Codex's key. [detail](open/W-176-abstention-gates.md)
 - 🟢 **W-170** · `agent` — `.fux/observers/`, the observe-only hook. Both rulings taken 2026-09-14: cage's compare **C**; SR-OBSERVE filed `proposed` with the L10 exemption named. Build it; the record flips to `accepted` in that change. [detail](open/W-170-cage-search-leg.md)
 - 🟢 **W-148** · `agent` — ruled 2026-09-14: golden is **local-only** (drop CI's corpus arm), Node's latency goes into `fux-benchmark` beside Python's, the harness stays scratch. Three rows of agent work, then close. [detail](open/W-148-what-the-two-readers-still-owe.md)
 - 🟢 **W-140** · `agent` — `--hops` ruled **(c)** 2026-09-14: bound the walk's work, `truncated` in every rendering; build row 12's last third. Row 21's runner-race flake stays unreproduced (11 attempts). 20 closed. [detail](open/W-140-guide-authoring-defects.md)

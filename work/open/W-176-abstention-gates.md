@@ -21,6 +21,41 @@ every step: the verdict is a gate chain, weakest link, never a blended number;
 and every independent signal is returned as its own field, visibility set in
 `.fux/output.toml`.
 
+## ✅ Steps 1–3 landed 2026-09-15 — `c7a274b3`
+
+| step | gate | state |
+|---|---|---|
+| 1 | **1** `weak` ⇒ `answerable: false` | ✅ done — SR-CONFIDENCE 3a, three tests |
+| 2 | **9** consumer steering | ✅ done — both MCP tool descriptions, three guides, four copies each |
+| 3 | **output surface** | ✅ done — `failed` names which gate refused; SR-OUTPUT 24 |
+
+🔴 **The defect gate 1 closed was structural, not a threshold.** `answerable`
+was `band != none`, and *nothing scored above zero* is the one state no real
+corpus produces — BM25F returns something for almost any query. So the refusal
+was **unreachable**, which is why four separate runs measured the symptom and
+none could name the cause. The cause is one expression.
+
+⚠ **Nothing behavioural broke when it changed.** No test in either suite
+asserted the old reading, on either reader. That is the second finding: the
+band table and `answerable` had never been held in agreement by anything, and
+now `test_the_band_table_and_answerable_cannot_disagree` walks every band and
+`test_every_refusal_names_at_least_one_failed_gate` holds `failed` and
+`answerable` together — so a **ninth gate added later cannot arrive
+answerable-by-default**, which is the direction that loses silently.
+
+**Step 3 was narrowed where §4's ruling met SR-OUTPUT decision 19**, and the
+narrowing is recorded rather than taken quietly. §4 says *"`output.toml`
+decides which appear, per verb"*. An unset output key is a hard error, so nine
+signals would be **nine breaking changes**, each making `fux ask` exit 1 in
+every repository whose config predates it. They get **one key between them —
+the `band` key that already exists** ([SR-OUTPUT](../../records/0143_output-defaults.md)
+decision 24); `--json` carries all of them unconditionally, as ruled. What it
+gives up: a consumer cannot show one prose signal and hide another.
+
+**Steps 4–10 are unchanged and still gated.** Every one needs golden
+unanswerable questions in enough number to clear the d19 floor — Codex,
+2026-09-30. Step 10's other gate, W-161, **is now built**.
+
 ## Definition of done — per gate, in this order
 
 | step | gate | kind | bar |
