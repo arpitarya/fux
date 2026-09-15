@@ -28,6 +28,38 @@ Rules:
 
 
 
+## 2026-09-15 — **W-161 · W-176 · W-170 · W-148 · W-140 · W-146 · W-144 SHIPPED or advanced**
+
+| item | what landed | evidence |
+|---|---|---|
+| **W-161** | 🟢→🟣 **the graph-composed `ask`**, both readers, **0 discordant** on `results` and `related` across 15 verb × query comparisons. Tier A re-orders by `RRF(lexical, PPR)`; Tier B is a labelled `related` list of documents no query word matched. `answer` reads both tiers. Only the two measured arms remain (Codex, 2026-09-30) | [SR-ASK](../records/0103_ask.md) 13a–e · [pre-reg](regression/2026-09-14-graph-ask/PRE-REGISTRATION.md), committed alone at `806e9ebe` |
+| **W-176** | 🟢→🟣 **steps 1–3.** `weak` ⇒ `answerable: false`; the steering text on two MCP tool descriptions and three guides; `failed` names which gate refused. Seven measured gates wait on Codex | [SR-CONFIDENCE](../records/0141_confidence.md) 3a · [SR-OUTPUT](../records/0143_output-defaults.md) 24 |
+| **W-170** | 🟢→🟡 **`.fux/observers/` built.** Counts only, no return path, fail-open, bounded. Node declared out of scope. Only the latency capture is owed and it needs a subscriber's observer | [SR-OBSERVE](../records/0157_observe.md) `accepted`, 10–11 · [SR-NODE-SEARCH](../records/0153_node-search.md) 18 |
+| **W-148** | 🟢→🟡 **rows 1–3.** CI's conditional corpus arm REMOVED; §4's cadence amended to local; Node is a benchmark COLUMN; the harness is scratch and says so | [SR-WORK-BENCHMARK](../records/0053_WORK-benchmark.md) 12–13 |
+| **W-140** | 🟢→🟡 **row 12.** `routes()` bounded by WORK, not depth; `truncated` in text and `--json` on both readers | [SR-GRAPH](../records/0126_graph.md) 17a–e |
+| **W-146** | 🟢→🔴 **the docstring gate.** Green on its first run — no drift existed; step 2 had nothing to do. Row 17 is Arpit's | [SR-LAW-0](../records/0002_LAW-0-authority.md) 4b |
+| **W-144** | 🟢→🟡 **step 1.** The `b` sweep frozen, first-that-clears **descending** | [pre-reg](regression/2026-09-15-b-sweep/PRE-REGISTRATION.md) |
+| **W-168** | 🟢→🔴 **scoped, not started.** An anchor field makes a document's bytes depend on other documents while re-index is per-document | inbox row, 2026-09-15 |
+
+🔴 **Six defects the builds found in themselves, none by a test that already
+existed.** ① W-161's PPR rank list excluded the **seeds**, so every walked
+neighbour outranked every seed on every query — arithmetic, not tuning, and
+`ask "luhn verhoeff" --top 3` returned the words' 6th, 7th and 9th. ② A
+`related` route named an edge kind the walk never followed. ③ `find` acquired
+the tier by inheritance. ④ An observer's `print` reached the answer. ⑤
+SR-OBSERVE said the cap *kills* a slow observer; Python cannot, so it
+**abandons**. ⑥ fux named a subscriber in its own docstring.
+
+🔴 **And the finding that explains four earlier runs.** `answerable` was
+`band != none`, and *nothing scored above zero* is a state no real corpus
+produces — the refusal was **structurally unreachable**. 20/20 twice, 0 of 124
+on five rungs, 10/10 planted: four runs measured the symptom, none named the
+cause, and it was one expression.
+
+⚠ **Two breaking changes for a consumer**, both in the CHANGELOG: `results` is
+no longer monotone in `score`, and `answerable` changed meaning. The second was
+missing from the CHANGELOG until a peer session caught it.
+
 ## 2026-09-14 — **2.0.1 released**: both consumer extension points were broken, and the tests that were missing found a third bug
 
 **Shipped** (`2.0.1`, PyPI + npm). Records touched:
