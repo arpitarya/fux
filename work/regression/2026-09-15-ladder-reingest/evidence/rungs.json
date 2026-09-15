@@ -1,0 +1,106 @@
+[
+  {
+    "rung": "rung-00100",
+    "config": [
+      "tune.toml: dropped 3 retired key(s)",
+      "fux.toml: urls_file moved to [sources]"
+    ],
+    "ingest_rc": 0,
+    "ingest": "accelerator: 2131 terms, 2131 blocks, 12274 postings (derived, not committed)",
+    "index_root_sha256": "7fcc885916c9a6c081bb70a538bdac6fc14d850a41a82651a515eb696279641e",
+    "rung_head_commit": "c26e76fc3bcc",
+    "verify": [],
+    "ask_results": 3
+  },
+  {
+    "rung": "rung-00200",
+    "config": [
+      "tune.toml: dropped 3 retired key(s)",
+      "fux.toml: urls_file moved to [sources]"
+    ],
+    "ingest_rc": 0,
+    "ingest": "accelerator: 2338 terms, 2341 blocks, 20653 postings (derived, not committed)",
+    "index_root_sha256": "07d45fc0dbb4f87e68310bbd5f0b8865d8dcd4a6f690d908c1dc9fdb156cc944",
+    "rung_head_commit": "31b8773e45a9",
+    "verify": [],
+    "ask_results": 3
+  },
+  {
+    "rung": "rung-00500",
+    "config": [
+      "tune.toml: dropped 3 retired key(s)",
+      "fux.toml: urls_file moved to [sources]"
+    ],
+    "ingest_rc": 0,
+    "ingest": "accelerator: 2868 terms, 2927 blocks, 45930 postings (derived, not committed)",
+    "index_root_sha256": "286e16f2ae80baed1070238b9a049d8071b12f5f66607ba26729c190901d423c",
+    "rung_head_commit": "d1d2fd05e313",
+    "verify": [],
+    "ask_results": 3
+  },
+  {
+    "rung": "rung-01000",
+    "config": [
+      "tune.toml: dropped 3 retired key(s)",
+      "fux.toml: urls_file moved to [sources]"
+    ],
+    "ingest_rc": 0,
+    "ingest": "accelerator: 3631 terms, 3939 blocks, 88259 postings (derived, not committed)",
+    "index_root_sha256": "c86ade78dee4a668e2622a216b25c174361095d9f44d2756b240b871d779f528",
+    "rung_head_commit": "4fb528e5be5d",
+    "verify": [],
+    "ask_results": 3
+  },
+  {
+    "rung": "rung-02000",
+    "config": [
+      "tune.toml: dropped 3 retired key(s)",
+      "fux.toml: urls_file moved to [sources]"
+    ],
+    "ingest_rc": 0,
+    "ingest": "accelerator: 4980 terms, 5884 blocks, 172778 postings (derived, not committed)",
+    "index_root_sha256": "4d3a37432fcbc075eebf767be88b1118af34a8252216af81ff80b5523c2e6a9a",
+    "rung_head_commit": "2a3c28b6b007",
+    "verify": [],
+    "ask_results": 3
+  },
+  {
+    "rung": "rung-05000",
+    "config": [
+      "tune.toml: dropped 3 retired key(s)",
+      "fux.toml: urls_file moved to [sources]"
+    ],
+    "ingest_rc": 0,
+    "ingest": "accelerator: 8482 terms, 11260 blocks, 426245 postings (derived, not committed)",
+    "index_root_sha256": "beb97ef9093b8b517f79d63c64762b8355163f315977c5197fd951a08c05498b",
+    "rung_head_commit": "9e2f9b81e235",
+    "verify": [],
+    "ask_results": 3
+  },
+  {
+    "rung": "rung-10000",
+    "config": [
+      "tune.toml: dropped 3 retired key(s)",
+      "fux.toml: urls_file moved to [sources]"
+    ],
+    "ingest_rc": 0,
+    "ingest": "accelerator: 13895 terms, 19877 blocks, 848736 postings (derived, not committed)",
+    "index_root_sha256": "7209a2c7ea0e0bf54f46ac096b37830629f02d37ff1b3ab6e79bab0f1e703764",
+    "rung_head_commit": "af65f7258aeb",
+    "verify": [],
+    "ask_results": 3
+  },
+  {
+    "rung": "rung-seed",
+    "config": [
+      "tune.toml: dropped 3 retired key(s)",
+      "fux.toml: urls_file moved to [sources]"
+    ],
+    "ingest_rc": 0,
+    "ingest": "accelerator: 1368 terms, 1368 blocks, 4223 postings (derived, not committed)",
+    "index_root_sha256": "6230b878a9c2ee345ebd75c2528a3545162a80fb77086b650cbfbba6ee2cfbfd",
+    "rung_head_commit": "cfe6bf1cbabc",
+    "verify": [],
+    "ask_results": 3
+  }
+]

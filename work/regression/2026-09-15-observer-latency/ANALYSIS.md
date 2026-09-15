@@ -68,7 +68,7 @@ than the reason to reverse it.
 |---|---|---|
 | 1 | `tools/observer-bench/` — the reference observer, the slow observer, the interleaved runner | `python tools/observer-bench/run.py --root . --queries 40 --repeats 5 --cap-arm 2000` |
 | 2 | **W-170's remaining obligation discharged**; it closes | `work/OPEN-WORK.md` |
-| 3 | **W-186 filed** — every golden rung is unreadable by HEAD, found on the way to the second corpus | `work/open/W-186-golden-ladder-unreadable.md` |
+| 3 | **W-186 filed** — every golden rung is unreadable by HEAD, found on the way to the second corpus. ⚠ **Closed the same day** | [the re-ingest](../2026-09-15-ladder-reingest/report.md) |
 
 ## 6 · Unresolved
 

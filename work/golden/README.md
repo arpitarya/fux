@@ -71,7 +71,7 @@ work/golden/
   questions/questions.jsonl     ids + text only — the phase-4 input; see questions/README.md
   questions/README.md           what it omits, and the cost of it existing before the freeze
   ladder/rung-NNNNN.sha256      frozen manifests: which files make each rung, by hash
-  ladder/rung-NNNNN.index       the engine version and index root hash each rung was built with
+  ladder/rung-NNNNN.index       the engine version AND COMMIT, and the index root hash, each rung was built with
   prompts/                  the five paste-ready prompts, one per phase
 ```
 
@@ -108,6 +108,13 @@ waits on 10 000.
   `ext`, plus `pii.toml`). Its index is built **once per engine version** and
   recorded in `ladder/rung-NNNNN.index`; a new engine version means a re-ingest of
   that rung, nothing else.
+- 🔴 **`engine_commit:` is in the stamp too, since 2026-09-15 (W-186), and the
+  version alone was not enough.** `fux.index.v3` was written by a tree whose
+  `__version__` still read **2.0.1** — the version published on PyPI, which
+  writes **v2**. So *"check the engine version matches"* compared two engines
+  that cannot read each other's index and saw a match. Between releases the
+  version string is the LAST release's; the commit is what identifies the engine
+  that actually built the rung.
 
 ---
 

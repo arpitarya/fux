@@ -120,9 +120,20 @@ play: the worklog is the granular, per-exchange trail.
   **Nothing detects it**: no test, hook or CI arm reads a rung, so a format bump
   and two key retirements landed over nine days and the ladder went quiet. It
   blocks W-180, W-154 Part B and W-175, which the queue had been calling ready.
-- **Next:** W-186 (it unblocks three), then W-179. W-140 is 🟢 and its only
-  remaining question is a call, not work: close row 21 as unreproduced, or put it
-  to Arpit.
+- **Did — W-186, the same session:** all eight rungs re-ingested at
+  `fux.index.v3`, configs fixed, rungs committed, stamps rewritten. **No
+  document moved** — the manifests are untouched and the per-document check is
+  clean on all eight (100 to 10 000 hashes per rung, against manifests written
+  weeks earlier), nesting re-verified, one real `ask` per rung. 🔴 **The stamp
+  gained `engine_commit:`**, because the engine that wrote `v3` reports
+  **`fux 2.0.1`** and the *published* 2.0.1 writes `v2` — *"check the engine
+  version matches"* compared two engines that cannot read each other's index and
+  saw a match. ⚠ **Nothing detects the next one**, and that is named rather than
+  half-built: the check that would needs the corpus, and `ladder_check.py`'s
+  whole virtue is that it does not.
+- **Next:** W-179 (the Node latency column — the harness half is written, the run
+  is not), then W-180 · W-154. W-140 is 🟢 and its only remaining question is a
+  call, not work: close row 21 as unreproduced, or put it to Arpit.
 
 ## 2026-09-15 — W-168 step 1: anchor text, built  ·  Claude Code (Opus 5)
 

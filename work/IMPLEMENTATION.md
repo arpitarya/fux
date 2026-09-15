@@ -28,6 +28,18 @@ Rules:
 
 
 
+## 2026-09-15 — **W-186: the golden ladder was dead and nothing said so**
+
+| item | what landed | evidence |
+|---|---|---|
+| **W-186** | 🟢→✅ **all eight rungs re-ingested at `fux.index.v3`, re-stamped, and answering.** Three refusals on every rung — the `[ranking]` priors W-152 retired (2026-09-13), the `fux.toml` key W-164 moved (2026-09-14), and a v2 index against an engine writing v3 (2026-09-15). 🔴 **Each is a good decision whose blast radius nobody swept** | [`2026-09-15-ladder-reingest`](regression/2026-09-15-ladder-reingest/report.md) |
+| **no document moved** | The manifests are untouched and the **per-document check is clean on all eight** — 100 to 10 000 hashes per rung against manifests written weeks earlier by another session. Nesting re-verified. ⚠ `verify()`'s index-root half is **circular** here (it compares against the stamp this run wrote); the document half is what carries it | `tools/differential/ladder_check.py` |
+| **the stamp gained a field** | 🔴 `engine_commit:`. The engine that wrote `v3` reports **`fux 2.0.1`**, and the **published** 2.0.1 writes `v2` — so *"check the engine version matches"* compared two engines that cannot read each other's index **and saw a match**. Between releases the version string is the last release's | [`work/golden/README.md`](golden/README.md) |
+| **unblocked** | W-180, W-154 Part B, W-175 — three items the queue had been calling ready | `work/OPEN-WORK.md` |
+| **NOT fixed, and named** | ⚠ **Nothing detects the next one.** The check that would — one `ask` per rung — needs the corpus, and `ladder_check.py`'s whole virtue is that it does not. A lab-side script is a decision about `fux-lab`, not a line to add while clearing a backlog | [the analysis](regression/2026-09-15-ladder-reingest/ANALYSIS.md) §2 |
+
+
+
 ## 2026-09-15 — **W-181 and W-170: the observer hook, priced**
 
 | item | what landed | evidence |
@@ -36,7 +48,7 @@ Rules:
 | **the cap, tested against its real claim** | a **2 000 ms** observer adds **+63 ms**, not 2 000, against `[observe] max_ms` = 50. 🔴 **And `0 of 350` abandoned observers ever finished** — which is the reason to KEEP decision 10b's *abandoned* rather than reverse it: the observed death is a short-lived CLI process exiting first, and a longer one would see the write land | SR-OBSERVE decision 12a |
 | **the fork W-181 was filed with** | resolved: **a reference observer in fux**, run first. 🔴 **It prices the SEAM, never a subscriber** — cage's observer is the reopen trigger, and the reference observer's own docstring opens with that warning | `tools/observer-bench/` |
 | **W-170** | 🟡→✅ closed. Its last obligation was this capture; Node's half stays out of scope by declaration (SR-NODE-SEARCH decision 18) | SR-OBSERVE decision 12 · the item closed 2026-09-15 |
-| **W-186 filed** | ⚠ **every golden rung is unreadable by HEAD** — `fux.index.v2`, three `[ranking]` keys W-152 removed, and a `fux.toml` key W-164 moved, on **all eight**. Found taking a scratch copy for the second corpus; blocks W-180, W-154 Part B and W-175 | [W-186](open/W-186-golden-ladder-unreadable.md) |
+| **W-186 filed** | ⚠ **every golden rung is unreadable by HEAD** — `fux.index.v2`, three `[ranking]` keys W-152 removed, and a `fux.toml` key W-164 moved, on **all eight**. Found taking a scratch copy for the second corpus; blocks W-180, W-154 Part B and W-175 | W-186 (closed the same day) |
 
 
 
