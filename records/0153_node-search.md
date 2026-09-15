@@ -11,7 +11,7 @@ owns: [node@df209f8aa1fe, src/fux/store/nodebundle.py@071a24a596dd]
 laws: [L1, L3, L4, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 3a24247643b0fca5356783a09b0295f1975a6c3fd2ce2c817aba6c30369b1a3d
+content_sha: 882818d806cde9a30499a00bf98eefd2757c126ddebd815f5a4fa2097d969db7
 ---
 
 # SR-NODE-SEARCH — the Node read plane
@@ -56,7 +56,7 @@ and [`2026-09-12-node-arm-rungs`](../work/regression/2026-09-12-node-arm-rungs/r
 never the retired item — its file is named in
 [`archive/README.md`](../archive/README.md) and may not back a live claim.
 What it could **not** close is
-[W-148](../work/open/W-148-what-the-two-readers-still-owe.md).
+W-148 (closed 2026-09-15).
 
 ⚠ **Decisions 9-11 were all found on one day, 2026-09-12, by pointing the
 differential arm at surfaces it had never covered** — the graph verbs, the MCP
@@ -595,7 +595,7 @@ discover**, which is what W-161's item required of this record.
 **every** committed record — the work the B2 prefilter exists to avoid — so a
 Node `ask` with the tier on pays a full parse that its lexical answer does not.
 Python reads one JSON file. **Node's query latency is unmeasured**
-([W-148](../work/open/W-148-what-the-two-readers-still-owe.md) row 2 — the
+(W-148 (closed 2026-09-15) row 2 — the
 instrument does not exist), and this is now one more reason it should not stay
 that way. `[graph] ask_boost = false` and `ask_related = false` turn it off.
 
@@ -904,7 +904,7 @@ reader the reason.
 - **W-149 is CLOSED** (2026-09-12) — decisions 13-16's build item. Its outcome
   is in [`work/IMPLEMENTATION.md`](../work/IMPLEMENTATION.md); the item file
   is deleted, per OPEN-WORK rule 2, and is **named, never cited** ·
-  [W-148](../work/open/W-148-what-the-two-readers-still-owe.md) — what W-107
+  W-148 (closed 2026-09-15) — what W-107
   could not close. ⚠ **W-107 itself is retired and is NAMED, never cited**
   (`CLAUDE.md` §"Archive is not evidence")
 - npm workspaces <https://docs.npmjs.com/cli/using-npm/workspaces> · pnpm

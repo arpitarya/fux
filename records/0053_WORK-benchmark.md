@@ -10,7 +10,7 @@ feature: the capture set every benchmark run files
 owns: [tests/test_benchmark_capture.py@f6af3d328537]
 laws: []
 timestamp: 2026-09-13T00:00:00Z
-content_sha: 83dfea48ea0b9293f95e403893be7d17e3c67cbb9c533ecfabea5549c2de2ade
+content_sha: ae5e4e8153c4e7713b0659f5fd70326649ca340f3d5bb77571ac09e2b2f4980d
 ratifies: Arpit, 2026-09-13 — what a benchmark must always capture
 ---
 
@@ -300,7 +300,7 @@ therefore enforced by a file that a `rm -rf` would end**, and nothing in this
 repository would notice — `tests/test_benchmark_capture.py` checks that a report
 was *filed*, never that anything can still generate one. Stated rather than
 fixed: whether that environment gets a commit is
-[W-148](../work/open/W-148-what-the-two-readers-still-owe.md)'s territory and
+W-148 (closed 2026-09-15)'s territory and
 Arpit's, and it is named there.
 
 **12. The NODE READER IS A COLUMN, not a separate benchmark** (W-148 row 2;
@@ -333,6 +333,45 @@ every committed record — work the Python reader does not do, because it reads
 one derived file ([SR-NODE-SEARCH](0153_node-search.md) decision 17a). **So the
 first Node latency number will contain that cost**, and a run that does not
 separate it will attribute a tier's price to the reader.
+
+**12a. MEASURED 2026-09-15 (W-179), and the split decision 12 demanded is what
+makes the number mean anything.**
+
+| arm | docs-00100 p50 | docs-01000 p50 |
+|---|---|---|
+| `A` — Python 1.0.0 | 51.9 ms | 208.0 ms |
+| `B` — Python HEAD | 77.7 ms | 231.2 ms |
+| `B-node` — the vendored reader, as shipped | 63.2 ms | **269.5 ms** |
+| `B-node-nograph` — the same reader, graph tier off | **26.3 ms** | **26.4 ms** |
+
+🔴 **The Node reader is FLAT in corpus size** — 26.3 → 26.4 ms across a 10×
+corpus — and every bit of its growth is W-161's in-memory graph rebuild:
+**36.9 ms** at 100 documents, **243.1 ms** at 1 000, and **~2.4 s** at 10 000
+from a single timed call.
+
+⚠ **Read the column without the split and you get the opposite answer.**
+`B-node` 269.5 ms against `B` 231.2 ms says *the Node reader is slower than
+Python*; it is **8.7× faster**, and a tier that ships **on and unmeasured**
+costs ten times the reader. **That is the misattribution decision 12 named in
+advance, and it would have been believed.**
+
+**So N4 has a number where it had none** — and **which** number depends entirely
+on the arm: `B-node-nograph` clears the retired `p95 ≤ 150 ms` fence by 5× at
+every tier measured, `B-node` misses it by 1.8× at 1 000 documents. ⚠ **N4 is
+not RULED**: decision 6 says a benchmark rules no threshold, and this run rules
+none.
+
+🔴 **The load-bearing number belongs to [W-161](../work/open/W-161-graph-composed-ask.md)
+rather than to W-179.** Its queue row says both tiers *"ship on and unmeasured"*;
+one of them is now priced on one reader. **The tier's price on PYTHON is a
+different run** — it reads a derived file instead of rebuilding — **and the
+tier's VALUE is unmeasured on either**, gated on Codex's link-dependent
+questions. A cost without a benefit is half an argument.
+
+⚠ **`B` is an editable install pointing at the working tree**, so it reports
+`2.0.1` and is not the published `2.0.1`. **Two runs of "arm B" are not
+necessarily the same engine** — true of every filed benchmark number here, not
+only this one. [The run](../work/regression/2026-09-15-node-column/report.md).
 
 **13. `fux-benchmark` IS SCRATCH, its commits are optional, and decisions 8–10
 are enforced by a file that exists on one machine** (W-148 row 3; Arpit,

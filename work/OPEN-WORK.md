@@ -38,8 +38,6 @@ agent-closable; this row is a session output, not a stop.
 - 🟣 **W-161** · `agent`, waiting on **2026-09-30** — **BUILT 2026-09-15**, both readers, 0 discordant; both tiers ship on and unmeasured. Only the two arms remain, and they need Codex's link-dependent questions. [detail](open/W-161-graph-composed-ask.md)
 - 🟣 **W-168** · `agent`, waiting on **2026-09-30** — the ten search improvements. **Step 1 BUILT 2026-09-15**: both readers, `[bm25f] anchor` default 0, `_format` v3, 0 discordant. Steps 8 and 10 need Codex's questions. [detail](open/W-168-search-improvements.md)
 - 🟣 **W-176** · `agent`, waiting on **2026-09-30** — **steps 1–3 landed 2026-09-15**: `weak` ⇒ `answerable: false`, the steering text, `failed`. The seven measured gates need Codex's key. [detail](open/W-176-abstention-gates.md)
-- 🟡 **W-148** · `agent`, waiting on W-179 — **rows 1–3 done 2026-09-15**: CI's corpus arm removed, §4 local, SR-WORK-BENCHMARK 12–13. N4 unmeasured; row 4 out of scope. [detail](open/W-148-what-the-two-readers-still-owe.md)
-- 🟢 **W-179** · `agent` — run the **Node latency column** in `fux-benchmark` (SR-WORK-BENCHMARK d12); split out W-161's in-memory graph rebuild or the number blames the reader. Unblocks W-148. [detail](open/W-179-node-latency-column.md)
 
 ### testing
 

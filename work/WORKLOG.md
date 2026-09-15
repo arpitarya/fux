@@ -145,9 +145,21 @@ play: the worklog is the granular, per-exchange trail.
   `0.15` because the probe found it is the moving-threshold failure the rule
   exists to prevent.
 - **Did — W-140 closed** (row 21 as *unreproduced*, not proven closed).
-- **Next:** W-179's sweep is running; then W-154. ⚠ **The first tier's numbers
-  were measured while I ran the unit suite on the same machine** — re-running
-  clean rather than filing them.
+- **Did — W-179, the Node latency column:** four arms interleaved inside every
+  repeat, and 🔴 **the split is the whole result**. **The Node reader is FLAT in
+  corpus size** — 26.3 → 26.4 ms across a 10× corpus, a ninth of Python's at
+  1 000 documents — and every bit of its growth is W-161's in-memory graph
+  rebuild: 36.9 ms at 100, 243.1 ms at 1 000, ~2.4 s at 10 000. ⚠ **Without the
+  fourth arm the column says the opposite** (`B-node` 269.5 ms against Python's
+  231.2 ms reads as *Node is slower*, and it is 8.7× faster) — the exact
+  misattribution decision 12 named in advance, and it would have been believed.
+  **N4 has a number where it had none and is NOT ruled.** W-148 closes with it.
+- 🔴 **The load-bearing number is W-161's, not W-179's.** Its tiers *ship on and
+  unmeasured*; one is now priced, on one reader, with its VALUE still unmeasured
+  on either.
+- **Next:** W-154 is the last 🟢. ⚠ `docs-00100`'s absolute numbers were measured
+  under a concurrent unit-suite run of mine — interleaving protects the
+  difference, never the absolute, and the report says so.
 
 ## 2026-09-15 — W-168 step 1: anchor text, built  ·  Claude Code (Opus 5)
 

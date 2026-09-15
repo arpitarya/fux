@@ -28,6 +28,19 @@ Rules:
 
 
 
+## 2026-09-15 — **W-179: Node's latency measured, and the split is the whole result**
+
+| item | what landed | evidence |
+|---|---|---|
+| **W-179** | 🟢→✅ **the Node column, populated beside Python's** — four arms interleaved inside every repeat, so all four see the same machine | [`2026-09-15-node-column`](regression/2026-09-15-node-column/report.md) · SR-WORK-BENCHMARK decision 12a |
+| **the finding** | 🔴 **The Node reader is FLAT in corpus size**: **26.3 → 26.4 ms** across a 10× corpus, ~a third of Python's at 100 documents and a **ninth** at 1 000. Every bit of its growth is W-161's in-memory graph rebuild — **36.9 ms** at 100, **243.1 ms** at 1 000, **~2.4 s** at 10 000 | the report |
+| **why decision 12 demanded the split** | ⚠ **Without the fourth arm the column says the opposite.** `B-node` 269.5 ms against Python's 231.2 ms reads as *the Node reader is slower*; it is **8.7× faster**, and a tier that ships **on and unmeasured** costs ten times the reader. **The wrong answer would have been believed** | decision 12's second paragraph |
+| **N4** | has **a number where it had none**, and is **NOT ruled** — a benchmark rules no threshold (decision 6). Which number it gets depends entirely on the arm: the tier-off arm clears the retired `p95 ≤ 150 ms` fence by 5×, the shipped arm misses it by 1.8× at 1 000 documents | SR-WORK-BENCHMARK decision 12a |
+| **W-148** | 🟡→✅ closes with row 2. Rows 1 and 3 landed 2026-09-15; row 4 (the renderer split) was out of scope and stays out | [the item](../archive/open/W-148-what-the-two-readers-still-owe.md) |
+| **the load-bearing result is W-161's** | 🔴 its two tiers *ship on and unmeasured*; **one is now priced, on one reader**. The tier's price on Python is a different run (it reads a derived file), and **the tier's VALUE is unmeasured on either** — gated on Codex. A cost without a benefit is half an argument | W-161 |
+
+
+
 ## 2026-09-15 — **W-180: the `b` sweep ran, and the frozen range missed the effect**
 
 | item | what landed | evidence |
@@ -390,7 +403,7 @@ machine** — and nothing in fux would notice it going, because
 `tests/test_benchmark_capture.py` checks that a report was *filed*, never that
 anything can still generate one. **Committing in that environment is not my
 call**: it would change what SR-WORK-ENVIRONMENTS says the environment is.
-Filed as a third row on [W-148](open/W-148-what-the-two-readers-still-owe.md)
+Filed as a third row on W-148 (closed 2026-09-15)
 with three shapes for Arpit, and stated in SR-WORK-BENCHMARK decision 11b where
 the decisions it undermines are stated.
 
@@ -1201,7 +1214,7 @@ SR-DOTFUX / SR-PII / SR-URL-FRESHNESS) and **none of them owns anything this
 change touched** — re-derived, not assumed.
 
 ⚠ **Four obligations did NOT close and are carried, not dropped** —
-[W-148](open/W-148-what-the-two-readers-still-owe.md): CI cannot reach a golden
+W-148 (closed 2026-09-15): CI cannot reach a golden
 corpus (three routes, none chosen), Node's latency has no instrument
 (`fux-benchmark` unbuilt), `log-probe.yml` has never run (not on
 `origin/main`), and SR-API's renderer split is staged. **Two are Arpit's

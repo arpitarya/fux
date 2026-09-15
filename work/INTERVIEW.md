@@ -579,7 +579,7 @@ nothing else**. Four more surfaces had been transcribed and never checked, and
    transcriptions — and not more arm coverage.
 
 ⚠ **Four obligations did NOT close** and are
-[W-148](open/W-148-what-the-two-readers-still-owe.md), `lane: arpit`: CI cannot
+W-148 (closed 2026-09-15), `lane: arpit`: CI cannot
 reach a golden corpus (three routes, none chosen), Node's latency has no
 instrument (`fux-benchmark` unbuilt), `log-probe.yml` has never run, and
 SR-API's renderer split is staged. **Two are his calls.**
