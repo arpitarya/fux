@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@056ba375f6e7, src/fux/store/nodebundle.py@071a24a596dd]
+owns: [node@d30962d29a5d, src/fux/store/nodebundle.py@071a24a596dd]
 laws: [L1, L3, L4, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 41483bd1cc3d0b8aedd4e75484504efdb7e7939f7f1b4ef79fbef627539fcae0
+content_sha: 95a541dba68132f11304b0c48cbdddd3f18b87cf2d3102c9e2dc8818add4cca3
 ---
 
 # SR-NODE-SEARCH — the Node read plane
@@ -636,6 +636,17 @@ so nobody diagnoses it twice.
 
 
 ### Consequences
+
+- **`routes()` returns `(routes, truncated)` on both readers, and the budget is
+  the same number on both** (W-140 row 12, 2026-09-15). `EXPANSION_BUDGET` is a
+  constant in each and must stay equal: the truncation point is a function of
+  the index — `out_edges` is sorted on both sides — so two readers on one index
+  cut at the same place, and a different budget would make them disagree about
+  whether a search finished.
+  ⚠ **Verified byte-equal on the `path --json` payload.** The one difference
+  found is `"reliability": 1.0` against `1`, which is `json.dumps` against
+  `JSON.stringify` and is this record's own known divergence, present in the
+  confidence block too and **not W-140's**.
 
 - **`fux lexical` is ONE FUNCTION on this reader, and that is stronger than the
   test that holds the Python pair equal** (2026-09-14, W-160). `fux.mjs`

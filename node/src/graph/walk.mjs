@@ -205,12 +205,36 @@ export function reliability(hops, { hopDecay = HOP_DECAY } = {}) {
  * enumeration is bounded by `hops`, a CLI argument and deliberately not a
  * tunable — a tune file that could widen a search would make `--hops 2` mean
  * different things in two repos. */
-export function routes(graph, src, dst, { hops, limit = 10, hopDecay = HOP_DECAY } = {}) {
-  if (hops < 1 || src === dst) return [];
+/**
+ * How many node expansions one `routes()` search may spend. Twin of Python's
+ * `walk.EXPANSION_BUDGET` and it must stay equal — the truncation point is
+ * asserted byte-equal across the two readers.
+ *
+ * 🔴 A **work** bound, not a depth bound (Arpit, 2026-09-14, option (c)).
+ * Capping `--hops` would be a pre-registered threshold in everything but name:
+ * measured on one corpus and shipped to every corpus. Work is the same on
+ * every corpus; depth is not. **Not tunable** — a tune file that could widen a
+ * search would make `--hops 2` mean different things in two repositories.
+ */
+export const EXPANSION_BUDGET = 200000;
+
+/** `{routes, truncated}`. **`truncated` describes the SEARCH, not the result
+ *  set** — a truncated search that found three routes may have missed a better
+ *  one, and *"no route within 6 hops"* is a different claim from *"no route
+ *  found in the first 200 000 expansions"*. Returning the first when the
+ *  second is true is a confident answer to a question that was not finished. */
+export function routes(
+  graph, src, dst, { hops, limit = 10, hopDecay = HOP_DECAY, budget = EXPANSION_BUDGET } = {},
+) {
+  if (hops < 1 || src === dst) return { routes: [], truncated: false };
 
   const found = [];
+  let spent = 0;
+  let truncated = false;
   const walk = (node, trail, seen) => {
-    if (trail.length >= hops) return;
+    if (truncated || trail.length >= hops) return;
+    spent += 1;
+    if (spent > budget) { truncated = true; return; }
     for (const edge of graph.outEdges(node)) {
       if (seen.has(edge.dst)) continue;
       const step = [...trail, edge];
@@ -219,6 +243,7 @@ export function routes(graph, src, dst, { hops, limit = 10, hopDecay = HOP_DECAY
         continue;  // a longer route to the same place is not more evidence
       }
       walk(edge.dst, step, new Set([...seen, edge.dst]));
+      if (truncated) return;
     }
   };
   walk(src, [], new Set([src]));
@@ -234,5 +259,5 @@ export function routes(graph, src, dst, { hops, limit = 10, hopDecay = HOP_DECAY
     }
     return a.hops.length - b.hops.length;
   });
-  return found.slice(0, limit);
+  return { routes: found.slice(0, limit), truncated };
 }

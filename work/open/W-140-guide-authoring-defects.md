@@ -8,6 +8,21 @@ lane: agent
 timestamp: 2026-09-11T00:00:00Z
 ---
 
+✅ **Row 12's last third landed 2026-09-15** — `routes()` takes an expansion
+budget and returns `(routes, truncated)`; `truncated` is in `--json` and in
+both text renderings, on both readers, and SR-GRAPH decision 17 carries it.
+
+⚠ **There is no MCP surface for `truncated`, because there is no `fux_path`
+tool.** The compare doc's *"`--json` and MCP carry it"* names a surface that
+does not exist — `fux_related` returns a neighbourhood, not a route. Stated in
+SR-GRAPH 17c rather than quietly dropped.
+
+⚠ **Two-reader check done and it is byte-equal on `truncated`.** The one
+difference found is `"reliability": 1.0` against `1` — `json.dumps` against
+`JSON.stringify`, already recorded in
+[SR-NODE-SEARCH](../../records/0153_node-search.md), present in the confidence
+block too, and **not this change's**.
+
 # W-140 — defects found while writing the operating guides
 
 **Model: Opus** — each row needs a call on whether the code or the record is

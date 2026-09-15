@@ -333,7 +333,9 @@ def cmd_path(args) -> int:
     # `--hops` bounds the search and stays a CLI argument; `hop_decay` only
     # orders what the search found. See `walk.routes` for why the boundary is
     # there rather than one step over.
-    found = routes(plane.graph, src, dst, hops=args.hops, hop_decay=_tune_for(root, args).hop_decay)
+    found, truncated = routes(
+        plane.graph, src, dst, hops=args.hops, hop_decay=_tune_for(root, args).hop_decay
+    )
 
     if args.json:
         print(
@@ -351,6 +353,14 @@ def cmd_path(args) -> int:
                         }
                         for route in found
                     ],
+                    # 🔴 **The half that matters** (W-140 row 12, Arpit
+                    # 2026-09-14). A truncated search that returned `[]` is not
+                    # *no route*, and a truncated search that returned three is
+                    # not *these three*. **stderr is invisible to exactly the
+                    # callers most likely to ask for a deep walk**, so the
+                    # boolean is in the payload. Always present; `false` is a
+                    # claim, not an absence (W-48).
+                    "truncated": truncated,
                 },
                 indent=2,
             )
@@ -358,12 +368,29 @@ def cmd_path(args) -> int:
         return 0
 
     if not found:
-        print(f"No route from {src} to {dst} within {args.hops} hop(s).")
+        if truncated:
+            # ⚠ **Two different claims, and this is the one that was being made
+            # wrongly.** *No route within N hops* asserts the search finished.
+            print(
+                f"No route from {src} to {dst} found within {args.hops} hop(s) - "
+                f"the search was cut short after {walk_mod.EXPANSION_BUDGET} steps. "
+                "This is NOT the same as no route existing; narrow it with fewer "
+                "--hops, or start from a more specific document."
+            )
+        else:
+            print(f"No route from {src} to {dst} within {args.hops} hop(s).")
         return 0
 
     for route in found:
         trail = " -> ".join(f"[{e.kind}] {e.dst}" for e in route.hops)
         print(f"{route.reliability:.4f}  {src} -> {trail}")
+    if truncated:
+        # A trailing note, not a prefix: the routes are real and are the
+        # answer; what is uncertain is whether a better one was missed.
+        print(
+            f"\n(the search was cut short after {walk_mod.EXPANSION_BUDGET} steps - "
+            "there may be routes, including better ones, that were not reached)"
+        )
     return 0
 
 

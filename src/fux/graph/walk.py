@@ -301,6 +301,26 @@ class Route:
         return self.hops[-1].dst
 
 
+#: How many node expansions one `routes()` search may spend before it stops.
+#:
+#: 🔴 **A WORK bound, not a depth bound, and that is the whole ruling**
+#: (Arpit, 2026-09-14 — [`path-hops-bound`](../../../work/compare/path-hops-bound.compare.md)
+#: option (c)). Capping `--hops` would have been a pre-registered threshold in
+#: everything but name: measured on one corpus, shipped to every corpus, and
+#: wrong on the first corpus shaped differently. **Work is the same on every
+#: corpus; depth is not.**
+#:
+#: ⚠ **NOT tunable**, for this module's own standing reason: a tune file that
+#: could widen a search would make `--hops 2` mean different things in two
+#: repositories, and a route is evidence about a corpus rather than a preference.
+#:
+#: ⚠ **200 000 is a number somebody picked**, and saying so is the point. What
+#: makes it defensible is not the value: it is that exceeding it is **reported**
+#: rather than silently absorbed, so the failure mode is a stated *incomplete*
+#: instead of a confident *no route*.
+EXPANSION_BUDGET = 200_000
+
+
 def routes(
     graph: Graph,
     src: str,
@@ -309,8 +329,12 @@ def routes(
     hops: int,
     limit: int = 10,
     hop_decay: float = HOP_DECAY,
-) -> list[Route]:
+    budget: int = EXPANSION_BUDGET,
+) -> tuple[list[Route], bool]:
     """Every simple directed route `src` → `dst` of at most `hops` edges.
+
+    Returns `(routes, truncated)`. **`truncated` is the half that matters** —
+    see below.
 
     Simple — a node is never revisited within a route — because a cycle adds
     length without adding evidence, and enumerating cycles is how a bounded
@@ -323,14 +347,41 @@ def routes(
     never which routes exist — enumeration is bounded by `hops`, which is a CLI
     argument and deliberately not a tunable: a tune file that could widen a
     search would make `--hops 2` mean different things in two repos.
+
+    ## The budget, and why the boolean is not optional
+
+    🔴 **`"no route within 6 hops"` and `"no route found in the first 200 000
+    expansions"` are different claims**, and returning the first when the second
+    is true is a confident answer to a question that was not finished. The
+    search is simple-path DFS, so a dense graph at `--hops 6` is exponential and
+    the verb could simply hang; a hang is also an incomplete result — one that
+    says nothing at all.
+
+    ⚠ **So the cost of this bound is that `fux path` can now return an
+    INCOMPLETE result**, and every consumer has one more state to handle. That
+    is real, and it is accepted because the alternative is a verb that hangs.
+    The compare doc states it as the reason option (a) was tempting.
+
+    **Deterministic:** `out_edges` is sorted, so *where* the budget runs out is
+    a function of the index rather than of the machine — two runs on one index
+    truncate at the same place, and so do two machines.
     """
     if hops < 1 or src == dst:
-        return []
+        return [], False
 
     found: list[Route] = []
+    # A list rather than an int because the closure assigns to it. `spent[0]`
+    # counts **node expansions** — one per `walk()` entry — which is the unit
+    # the budget is named in and the one that tracks wall-clock.
+    spent = [0]
+    truncated = [False]
 
     def walk(node: str, trail: list[Edge], seen: set[str]) -> None:
-        if len(trail) >= hops:
+        if truncated[0] or len(trail) >= hops:
+            return
+        spent[0] += 1
+        if spent[0] > budget:
+            truncated[0] = True
             return
         for edge in graph.out_edges(node):
             if edge.dst in seen:
@@ -340,11 +391,17 @@ def routes(
                 found.append(Route(hops=step, reliability=reliability(step, hop_decay=hop_decay)))
                 continue  # a longer route to the same place is not more evidence
             walk(edge.dst, step, seen | {edge.dst})
+            if truncated[0]:
+                return
 
     walk(src, [], {src})
     # Most reliable first; ties by the route's own ids, never by walk order.
     found.sort(key=lambda r: (-r.reliability, [(e.kind, e.dst) for e in r.hops]))
-    return found[:limit]
+    # ⚠ **`truncated` is reported even when routes WERE found.** A truncated
+    # search that found three routes may have missed a better one, so the flag
+    # describes the SEARCH and never the result set — which is why it is a
+    # second return value rather than an empty-list sentinel.
+    return found[:limit], truncated[0]
 
 
 def reliability(hops: list[Edge], *, hop_decay: float = HOP_DECAY) -> float:

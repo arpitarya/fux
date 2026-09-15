@@ -22,7 +22,7 @@
  */
 import { buildPlane } from "../graph/plane.mjs";
 import { TAG_PREFIX } from "../graph/model.mjs";
-import { ALL_KINDS, EDGE_KINDS, expand, routes } from "../graph/walk.mjs";
+import { ALL_KINDS, EDGE_KINDS, EXPANSION_BUDGET, expand, routes } from "../graph/walk.mjs";
 import { iterShardPaths, rawRecordLines } from "../store/reader.mjs";
 import { runQuery } from "../query/run.mjs";
 import { loadTune } from "../config/tune.mjs";
@@ -252,7 +252,7 @@ export function runPath(root, args) {
   // `--hops` bounds the search and stays a CLI argument; `hop_decay` only
   // orders what the search found.
   const tune = loadTune(root, { enabled: args.noTune !== true });
-  const found = routes(plane.graph, src, dst, { hops, hopDecay: tune.hopDecay });
+  const { routes: found, truncated } = routes(plane.graph, src, dst, { hops, hopDecay: tune.hopDecay });
 
   if (args.json) {
     process.stdout.write(JSON.stringify({
@@ -262,17 +262,37 @@ export function runPath(root, args) {
         hops: route.hops.map((e) => ({ kind: e.kind, src: e.src, dst: e.dst, grade: e.grade })),
         reliability: route.reliability,
       })),
+      // 🔴 **The half that matters.** stderr is invisible to exactly the
+      // callers most likely to ask for a deep walk, so the boolean is in the
+      // payload. Always present; `false` is a claim, not an absence (W-48).
+      truncated,
     }, null, 2) + "\n");
     return 0;
   }
 
   if (!found.length) {
-    process.stdout.write(`No route from ${src} to ${dst} within ${hops} hop(s).\n`);
+    if (truncated) {
+      // ⚠ Two different claims, and this is the one that was being made
+      // wrongly: *no route within N hops* asserts the search finished.
+      process.stdout.write(
+        `No route from ${src} to ${dst} found within ${hops} hop(s) - the search was ` +
+        `cut short after ${EXPANSION_BUDGET} steps. This is NOT the same as no route ` +
+        "existing; narrow it with fewer --hops, or start from a more specific document.\n",
+      );
+    } else {
+      process.stdout.write(`No route from ${src} to ${dst} within ${hops} hop(s).\n`);
+    }
     return 0;
   }
   for (const route of found) {
     const trail = route.hops.map((e) => `[${e.kind}] ${e.dst}`).join(" -> ");
     process.stdout.write(`${route.reliability.toFixed(4)}  ${src} -> ${trail}\n`);
+  }
+  if (truncated) {
+    process.stdout.write(
+      `\n(the search was cut short after ${EXPANSION_BUDGET} steps - there may be ` +
+      "routes, including better ones, that were not reached)\n",
+    );
   }
   return 0;
 }

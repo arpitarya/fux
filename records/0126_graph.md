@@ -7,10 +7,10 @@ description: "The ref/tag/code edges ingest already extracts become a queryable 
 status: accepted
 date: 2026-08-20
 feature: the graph lane — three relational verbs, a derived plane, and a lazy walk
-owns: [src/fux/graph@a56b22729e7c, tools/graph-bench@9c330ea14b42]
+owns: [src/fux/graph@190867c8ad31, tools/graph-bench@9c330ea14b42]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 0816fe0bd38ea5a2ab6c862133cb9c26e5874088e47cf50c841f6d328705b41f
+content_sha: 4efefd01968e8f774ad530f936506cf850e2d82e658cc51c641183424a222e44
 ---
 
 # SR-GRAPH — the graph lane
@@ -372,6 +372,53 @@ edge and a `code` edge merely also existed between the same two documents.
 **A route a reader cannot verify is worse than no route**, and this tier's whole
 claim to honesty is that its provenance can be checked.
 
+
+**17. `routes()` IS BOUNDED BY WORK, AND A CUT-SHORT SEARCH SAYS SO**
+(W-140 row 12; Arpit, 2026-09-14 — option (c) of
+[`path-hops-bound`](../work/compare/path-hops-bound.compare.md)).
+
+`routes()` takes a `budget` of **node expansions** (`walk.EXPANSION_BUDGET`,
+200 000) and returns `(routes, truncated)`.
+
+**17a. A WORK bound, not a depth bound, and the distinction is the ruling.**
+Capping `--hops` was option (a) and is *a pre-registered threshold in
+everything but name*: measured on one corpus, shipped to every corpus, wrong on
+the first corpus shaped differently. **Work is the same on every corpus; depth
+is not.** `--hops` keeps meaning exactly what it means today.
+
+**17b. 🔴 `truncated` describes the SEARCH, never the result set.** A truncated
+search that found three routes may have missed a better one, so the flag cannot
+be an empty-list sentinel — which is why it is a second return value.
+
+> *"no route within 6 hops"* and *"no route found in the first 200 000
+> expansions"* are **different claims**, and `fux path` has shipped this exact
+> ambiguity once already.
+
+**17c. It is in `--json`, and that is the half that matters.** stderr is
+invisible to exactly the callers most likely to ask for a deep walk. Always
+present; `false` is a claim, not an absence (W-48). Text mode gets the honest
+sentence when nothing was found and a trailing note when routes were.
+
+⚠ **There is no MCP surface for it, because there is no `path` tool.** The
+compare doc's *"`--json` and MCP carry `truncated`"* names a surface that does
+not exist — `fux_related` returns a neighbourhood, not a route. **Stated rather
+than quietly dropped**: if a `fux_path` tool is ever added, this field is part
+of its contract from the first commit.
+
+**17d. The budget is NOT tunable**, for this record's standing reason: a tune
+file that could widen a search would make `--hops 2` mean different things in
+two repositories, and a route is evidence about a corpus rather than a
+preference.
+
+⚠ **200 000 is a number somebody picked**, and what makes it defensible is not
+the value — it is that exceeding it is **reported** rather than absorbed. The
+failure mode is a stated *incomplete* instead of a confident *no route*.
+
+**17e. The cost, stated: `fux path` can now return an INCOMPLETE result**, and
+every consumer has one more state to handle. That is real, and it is the reason
+option (a) was tempting. It is accepted because the alternative is a verb that
+**hangs** — and a hang is also an incomplete result, one that says nothing at
+all.
 
 ### Consequences
 
