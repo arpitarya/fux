@@ -16,8 +16,14 @@ It checks three things, each of which is a claim
    not asserted"*; until now nothing ran that verification outside the session
    that built the ladder.
 3. **The manifests name `seed/` and `ext/` only.** 🔴 A manifest line pointing
-   into `work/golden/questions/` or `golden-answer/` would give the arm a path
-   to the sealed key, and the arm must never acquire a reason to open one.
+   into `work/golden/questions/` or at any path holding an answer would give the
+   arm a route to the key, and the arm must never acquire a reason to open one.
+4. **Every rung's `seed/` half still matches `work/golden/seed/`.** Added
+   2026-09-15 (W-136 prompt 4) after the ladder drifted a second time with
+   nothing detecting it: checks 1–3 all compare the ladder against ITSELF, so
+   eight rungs carrying a superseded copy of seven seed documents passed them
+   cleanly. `rungs.seed_drift()` is the only check here that reads a byte
+   outside `work/golden/ladder/`.
 
 It reads no corpus, so it is fast and cannot be affected by drift in one.
 
@@ -69,7 +75,12 @@ def main() -> int:
                 f"{name}: {len(stray)} manifest path(s) outside seed/ and ext/: {stray[:3]}"
             )
 
-        print(f"{name:12} {len(docs):>6} documents  root {meta['index_root_sha256'][:12]}…")
+        drift = rungs.seed_drift(name)
+        problems.extend(drift)
+
+        seeds = sum(1 for r in by_name[name] if r.startswith("seed/"))
+        print(f"{name:12} {len(docs):>6} documents  root {meta['index_root_sha256'][:12]}…  "
+              f"seed {seeds}{'' if not drift else '  STALE'}")
 
     # Nesting, smallest to largest. `rung-seed` sorts last by name and is the
     # base of the ladder, not its top — order by document count instead.

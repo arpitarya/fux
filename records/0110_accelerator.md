@@ -7,10 +7,10 @@ description: A disposable term-major index under .fux/runtime/ that makes warm q
 status: accepted
 date: 2026-08-18
 feature: "`.fux/runtime/` — the derived index, `fux build`, and the block bound that makes skipping provable"
-owns: [src/fux/derive@d97158a8fa5b, tools/differential@c76c21f0ede2]
+owns: [src/fux/derive@d97158a8fa5b, tools/differential@179a82d1d2a8]
 laws: [L1, L3]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 23038fcb7e93653f4cc3c26475f00c216e5fa6a10f5fc149a5666d313af60b86
+content_sha: e97166646b3a356096e4ab41e2bf987a2c6e7ba5c2a9386a08502625817fa3b8
 ---
 
 # SR-T1-ACCELERATOR — the derived T1 accelerator
@@ -594,6 +594,18 @@ has to run**, and the two days this one spent dead are what that costs.
 
 ### Consequences
 
+- ⚠ **`tools/differential/` also carries the golden ladder's custody, and
+  that is an accident of location rather than a decision of this record**
+  (2026-09-15, W-136 prompt 4). `rungs.py` and `ladder_check.py` resolve and
+  verify a golden rung for the Node differential arm, and they gained
+  `seed_drift()` — the check that a frozen rung still holds the seed corpus
+  this repository has — after all eight rungs were found frozen against a
+  superseded seed while every existing check passed. **Nothing about the
+  accelerator changed**; the harness's directory is simply where the ladder's
+  join between manifest and corpus already lived. **Whether ladder custody
+  should own its own record is Arpit's**, and it is noted here rather than
+  decided, because a component this record owns may not change without the
+  record saying so.
 - **The differential law now covers the confidence block too.** `accel.ask`
   threads `stats_out` straight through to `rank()`, so both generators derive
   `df` over the same query hashes and report the same `n`, and `--fast` and

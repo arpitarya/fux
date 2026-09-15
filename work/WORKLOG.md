@@ -29,6 +29,44 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-15 — prompt 4 ran blind and the golden ladder was STALE: all eight rungs re-frozen  ·  Claude Code (Opus 5)
+- **Asked:** run [prompt 4](golden/prompts/4-claude-corpus.md) — verify the golden ladder, blind — tracked under W-136, with the standing correction that the prompt's *"run this BEFORE prompts 2 and 3"* ordering could no longer be kept because Arpit had already run both.
+- 🔴 **Honour declaration, which the prompt requires the report to make out loud:** under `work/golden/` this session read **`seed/`, `seed-dates.tsv`, `README.md`, `prompts/4-claude-corpus.md` and `ladder/`** and nothing else. It did not open, list, glob, grep, hash, count or stat `questions/` or any path holding an answer, and no question or answer text reached its context. With the ordering gone, **that declaration is the whole of what protects this phase** — nothing mechanical enforces it.
+- 🔴 **Did — the check failed, which is why the prompt is a check.** All eight rungs matched their manifests byte for byte (**0 drifted, 0 missing of 18 820**), nesting verified across all seven steps, `ladder_check.py` green. **And every one of them was frozen against a superseded seed:** `0aa4bbcf` extended **7 of the 20 documents in `work/golden/seed/` by 131 lines** on 2026-09-15 — a concurrent Cowork session's work, swept in on an instruction to commit everything staged — while the rungs were frozen on 2026-09-12. **Both question sets were authored afterwards, from the new text.** So the benchmark was, at the moment this ran, questions written against sentences no corpus on the ladder contained.
+- 🔴 **Why nothing saw it, and it is one sentence:** `verify()` asks *does this corpus match its own manifest*, `ladder_check` asks *do the manifests agree with each other* — **neither ever asks whether `seed/` is the seed this repository has**, and a rung's `seed/` is a copy taken once at build time. ⚠ **A stale rung does not fail. It answers** — ranks, cites, returns a number shaped exactly like a good one, against a paragraph it does not contain. That is the silent shape L11 names for a leaked key, arriving from the other direction.
+- **Did — all eight rebuilt and re-frozen** from the current seed by [`rebuild.py`](regression/2026-09-15-ladder-seed-refresh/evidence/rebuild.py), a thin driver over the **unmodified** 2026-09-12 builder and generator (editing them would have destroyed the only check worth making). 🔴 **`ext/` came back byte-identical on all eight — 18 800 generated documents, 0 drift**, re-derived three days later at a different engine commit by a different session: the README's *"anyone re-deriving them gets the same bytes"* is **measured now, not asserted**. Exactly 14 manifest lines moved per rung (7 out, 7 in), **every coverage count unchanged**, every rung answers at `fux.index.v3` with **0 seed files on any skip list**.
+- **Did — the gate, because this is strike two.** W-186 was strike one the same day (*"Nothing detected it. No test, hook or CI arm reads a rung"*), same class: **the ladder drifts and nothing notices**. Shipped in this change ([SR-WORK-SESSION](../records/0060_WORK-session.md) decision 13): `rungs.seed_drift()`, `ladder_check.py` check 4 (prints `STALE`), and [`tests/test_golden_ladder_seed.py`](../tests/test_golden_ladder_seed.py) — one case per rung, in the **fast** suite, needing no corpus so it runs on a clean clone. **It caught the two un-rebuilt rungs while the rebuild was still running**, which is the only demonstration a gate of this kind can give.
+- **Decided / open:** ⚠ **Every number filed against the old rungs names a corpus that is gone** — caused by the seed moving, not by the rebuild, which only made it visible. **No pre-registration pins a rung index root**, checked across `work/regression/` and `work/benchmark/`, so **no threshold moved and none needed an addendum**. ⚠ **One correction filed rather than applied**: `2026-09-15-anchor-mechanism` says the seed carries *"zero markdown or HTML link syntax"* — it carries **three `<a href>` tags**, all under a heading called *Stale links*, all site-absolute and resolving to no document in any rung, all predating the extension. Its finding (**0 anchor-bearing edges**) stands; a filed report is frozen, so the correction lives in the new run's `ANALYSIS.md`. 🔴 **Why the seed was extended at all is stated nowhere** — no item, no record, one clause in a long commit message; the rebuild treats the current seed as authoritative **because the questions were authored from it**, which is not the same as knowing why it moved.
+- 🔴 **Two for Arpit, neither actionable by an agent.** **(1)** A directory named `work/golden/` + `golden-answers/` **exists**, which L11 and SR-WORK-GOLDEN both say is not a location. One `ls work/golden/` — needed to find `ladder/` — returned the name. **Nothing was done with it**: not entered, listed, stat'd, hashed or deleted, because deleting is itself a tool call reaching into it. **(2)** ⚠ Every `permissions.deny` entry is spelled for the **singular** `golden-answer`, so `**/golden-answer/**` does not match a directory whose name ends in `s`; what catches it is `guard-golden-answer.sh`'s substring grep, by luck rather than design. **Four of the five guards have a hole one letter wide.**
+- ⚠ **Suites: the tree is RED and was red before this session touched it.** Baseline taken by reverting this session's two `tools/differential/` edits and re-running: **8 unit failures remain, none caused here** — `test_node_config_parity`, `test_node_twins`, `test_open_work_rows_are_short` (W-177 and W-144's rows, 319 and 297 chars), `test_setup_agents`, `test_sr_content_hash`, `test_sr_freshness`, `test_sr_owns_hash`, and one flaky `test_foreign_index`. All belong to another session's uncommitted and staged work. **`SR-T1-ACCELERATOR` owns `tools/differential`**, so [`records/0110_accelerator.md`](../records/0110_accelerator.md) carries the change — a Consequences note saying the ladder's custody lives in the harness's directory by accident of location, that **nothing about the accelerator changed**, and that whether ladder custody deserves its own record is Arpit's. 🔴 **Its `owns:` hash was stamped BY HAND for `tools/differential` alone**: `scripts/sr-owns.py --write` stamps all fifteen stale components at once and would have **blessed another session's uncommitted `src/fux/derive` work inside this commit** — the exact partial-sweep failure this worklog already records as its own two-strikes class. `src/fux/derive@d97158a8fa5b` is left at its stale value deliberately; it is theirs to stamp.
+- ⚠ **`work/DOC-REGISTRY.md` is bumped but NOT in this commit.** Its index entry carries a concurrent session's staged *golden unblock* bump, and committing the path would carry theirs too — so the two registry rows this run owes (`regression/` and `golden/README.md`) sit in the working tree and ride with whoever commits that file. **The bump is written, not filed**; it is the one part of the per-run contract this change does not close by itself.
+- **Next:** **prompt 5** — run both question sets against the re-frozen rungs and hand off to Arpit. It may be run by a session that has never read `questions/`; this one qualified for prompt 4 and, having read no question, still does.
+
+## 2026-09-15 — Two guard hooks for OPEN-WORK.md rule 45a: Claude blocks, Codex advises  ·  Cowork (Sonnet 5)
+- **Asked:** *"maybe create a claude hook and codex hook for it"* — after declining to turn the previous entry into a new SR (restating rule 45a would violate L0), catch the same defect inside a session instead, rather than only at the next `uv run pytest`.
+- **Did:** wrote [`scripts/check-open-work-inbox.py`](../scripts/check-open-work-inbox.py) (read-only, mirrors `tests/test_open_work_is_not_stale.py`'s rule-45a check, states no rule of its own), and two thin wrappers — [`.claude/hooks/guard-open-work-inbox.sh`](../.claude/hooks/guard-open-work-inbox.sh) (PostToolUse on `Write|Edit|MultiEdit`, **blocks** via `decision:"block"`) and [`.codex/hooks/guard-open-work-inbox.sh`](../.codex/hooks/guard-open-work-inbox.sh) (PostToolUse on `shell|apply_patch`, **advisory only**). Registered both in `.claude/settings.json` and `.codex/hooks.json`. Amended **SR-WORK-OPEN-QUEUE** rule 45a to name both, per Law zero. Tested against synthetic good/bad `OPEN-WORK.md` copies in `/tmp` — real repo file untouched during testing, all four cases (wrapped-but-valid, recap prose, real rows, undeclared-empty) correct.
+- **Decided / open:** 🔴 **Codex's hook is advisory, not enforced, on purpose.** This session could confirm Codex's `PostToolUse` matcher taxonomy (`.codex/hooks.json` already uses `shell` for its one existing hook) but **not** its deny/block response contract — SR-AGENT-SURFACES decision 5 warns a wrongly-shaped hook fails silently, and inventing an unconfirmed block protocol risks exactly that from the other direction. It prints to stderr and exits 0 until someone confirms the contract; promoting it to match the Claude side is a small follow-up once confirmed, not filed as a `W-nn`.
+- **Next:** none blocking. If Arpit wants the Codex side to actually block, confirm Codex CLI's PostToolUse deny contract first.
+
+## 2026-09-15 — Blocked-on-Arpit inbox left narrative prose; corrected to rule 45a's format  ·  Cowork (Sonnet 5)
+- **Asked:** *"from open work blocked on arpit section - never ever show unnecessary data ... do not show me greek items in blocked section"* — flagging the emptied inbox's closing paragraph as clutter, called out before.
+- **Did:** removed the multi-line recap prose left under **Blocked on Arpit** and replaced it with the format [SR-WORK-OPEN-QUEUE](../records/0051_WORK-open-queue.md) rule 45a actually requires — table (header only) plus one `*Empty since YYYY-MM-DD ...*` line naming what's next. No other section touched.
+- **Decided / open:** ⚠ **This was not a missing gate** — `tests/test_open_work_is_not_stale.py` and `tests/test_open_work_rows_are_short.py` already enforce rule 45a's shape; the defect was a Cowork session writing a longer, unformatted recap instead of following it. Logged in [`LESSONS.md`](LESSONS.md) so it isn't repeated a third time.
+- **Next:** none — inbox is empty and correctly declared.
+
+## 2026-09-15 — Blocked-on-Arpit inbox walked and emptied: W-144 and W-177 ruled  ·  Cowork (Fable 5.1)
+- **Asked:** *"Let's walk through the open work blockers on me one by one and ratify them. Explain it to me with example."*
+- **Did:** presented each inbox row with a worked example and a recommendation; Arpit ruled both. Filed the rulings into [`OPEN-WORK.md`](OPEN-WORK.md) (inbox emptied, W-144 and W-177 re-balled 🟢 `agent`), [`W-144`](open/W-144-structure-aware-extraction.md) and [`W-177`](open/W-177-ingest-absorbs-update.md). No `src/`, `tests/` or `records/` touched — Cowork ratifies, Claude Code builds.
+- **Decided:** **W-144 → (b)**: pre-register a LOWER descending `b` range (`0.4→0.3→0.2→0.15`) as a separate run, **gated on first adding a control family with regression headroom** (`verbose`) because both existing controls are saturated; (a) rejected as re-solving W-155's `dump` defect that `b` does not have, (c) rejected because the mechanism is confirmed. **W-177 → (b) `--no-fetch`** for the hook's offline invocation (reuses `fux add`'s flag; L4 fence test names it); doctor strings say `fux ingest`; the verb rename rides 3.0 with a CHANGELOG breaking block.
+- **Next:** Claude Code builds W-177 (Opus, per the item's model line). W-144's next step is agent work: the `verbose` control and the second pre-registration.
+
+## 2026-09-15 — W-177 and W-178 were orphaned out of the queue; both rows restored  ·  Cowork (Opus 5)
+- **Asked:** *"I still see fux update in my CLI. Why?"* — with `fux --help` pasted, showing `update` still in the verb list.
+- **Answer:** because **nothing was built**. W-177 ratified the deletion; the build is Claude Code's. But the check turned up a second, worse reason.
+- **Did:** restored the **W-177 and W-178 rows** to [`OPEN-WORK.md`](OPEN-WORK.md) §fux build, filed W-177's gating question into the **Blocked-on-Arpit inbox**, and corrected the inbox's closing line from *"One row is left"* to two. No `src/`, `node/`, `tests/` or `records/` touched. `OPEN-WORK.md`'s links re-checked: none dangling.
+- **Decided / open:** 🔴 **Both items were orphaned for four commits** — detail files at HEAD, no queue row, no `NOW.md` mention. `6c73ab5a` removed the rows *correctly at the time* (the detail files were untracked, and the queue requires every row to link a tracked file) and said in its message that *"they return with Cowork's own commit, which carries them"*. **That commit never came** — the files were instead swept into `f21c0eaf` by a third session, which satisfied the precondition and left nobody holding the obligation. ⚠ **The hand-back was a promise, not a mechanism**, and no gate looks for a detail file with no row: `test_doc_links` checks that a row's link resolves, never that a `work/open/` file is reachable from the queue. **This is the two-strikes class** — `8480e1b8` and `31f432b9` were the first pair of partial sweeps, this is the damage they caused, and the check that would have caught it does not exist.
+- **Next:** Arpit rules W-177's inbox row — the git hook's offline invocation, `--offline` / `--no-fetch` / non-surface. It gates the build because it is where L4's import fence ends up. ⚠ **Also worth a `W-nn`, not filed:** a gate asserting every `work/open/*.md` is linked from `OPEN-WORK.md` — awaiting Arpit.
+
 ## 2026-09-15 — both question sets landed; W-189 and W-145 closed  ·  Claude Code (Opus 5)
 
 - **Asked:** *"codex question and answer are generated unblock the open work item"* — Arpit had run prompt 2, and the queue still showed W-189 red in the inbox.
@@ -580,8 +618,45 @@ play: the worklog is the granular, per-exchange trail.
   not assert is that the wait is a `W-nn` **that exists**. That is a `tests/` change and
   therefore Claude Code's, per the standing Cowork boundary — named here so it is not
   discovered as a gap later.
-- **Next:** Claude Code builds W-168 step 1, and gates rule 23a. **The inbox is empty and
-  every 🟡 now has a 🟢 behind it** — nothing in fux is blocked on Arpit.
+- **THEN: the golden lane, same session.** *"All the items which were dependent on Codex
+  generating the questions and answers, Codex did it today. Unblock all of them."*
+- **Did:** verified the released files **structure-first** — `questions/set-1.jsonl` (125
+  rows) and `set-2.jsonl` (124), keys `{"id","question"}` **and nothing else**, so no answer
+  reached this session. Then re-derived each 🟣 row against what it actually needs rather
+  than clearing the date in a sweep. **Every 2026-09-30 gate is void** — that date was
+  Codex's *availability*. **W-168 → 🟢** (steps 2–7 and 9 runnable) · **W-176 → 🟡 on W-136**
+  · **W-161 → 🟡 on W-191** · **W-175 → 🟡 on W-192**. Filed **W-191** 🧨 and **W-192**.
+- **Decided / open:** 🔴 **The questions unblocked exactly ONE of the four rows that named
+  them.** Three were waiting on something else and said so in words that read like a
+  question shortage. ① **The ladder carries no links** — 0 `ref` edges on all eight rungs,
+  every edge `supersedes`, no link syntax in `seed/`. Under **SR-RS decision 23 that is a
+  data defect, not a null**, and W-168 step 8's *0/124 flips at every weight* is exactly
+  what a feature with no input looks like. It blocks W-161's **both** arms, W-168 step 8 and
+  W-176 step 10 — one cause, three items, **no item**. Now **W-191**. ⚠ Its nastiest shape
+  is W-176 gate 10: `unknown` is its **only reachable outcome**, which is also its specified
+  link-poor degradation, so *correct* and *unmeasurable* look identical in a report.
+  ② 🔴 **"Codex's key" in W-176 was void wording.** [SR-LAW-11](../records/0012_LAW-11-sealed-answer-key.md)
+  says the answers are Arpit's custody, there is **no key file**, and Claude is closed out
+  of a paste as well as a file. Gates 4–9 need a **scored run** (prompt 6), which arrives
+  through W-136. Corrected in the item. ⚠ **And its precondition is unverifiable by any
+  agent by design** — *enough unanswerable questions to clear the d19 floor* cannot be read
+  off `questions/`, which deliberately omits `answerable`; the item now takes that count
+  from the scored run rather than asserting it. ③ **Codex's question sets are not W-175's
+  paraphrases** — a different artifact, written blind against corrections nobody has filed
+  yet. **W-192**, whose first job is naming the arm order, since arm (iii) has no upstream.
+- **Also:** three rows from a **concurrent session** (W-177's inbox row and item row, W-178)
+  were over rule 10's 280-char cap and W-177's `↳ blocks:` sub-row named only itself, so the
+  suite was red on a shared file. Trimmed to the rule's shape; every word kept lives in
+  their detail files. **Nothing of theirs was reverted.**
+- ⚠ **Read-declaration, per L11.** This session read the two released question files
+  **structure only** — keys and row counts, via a script that printed neither questions nor
+  values — and no question text entered context. `work/golden/golden-answers/` was **named
+  by a one-level listing of the parent and never opened, listed, hashed or read**. 🔴 **It
+  should not exist**: L11 as amended says the key is Arpit's custody and no key file exists
+  anywhere an agent can reach. **Removing it is Arpit's** — deleting is a tool call that
+  reaches into it, which L11 forbids as firmly as reading.
+- **Next:** W-191 is the highest-value 🟢 — three measurements are inert until it lands.
+  W-144's three options are the only thing in the inbox.
 
 ## 2026-09-15 — Glassbox sessions proposal; the `fetch=` drift found on the way · Cowork
 - **Asked:** *"There is a tool called glass box. propose how folks can connect to

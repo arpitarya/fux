@@ -1,0 +1,8 @@
+rung: rung-seed
+documents_indexed: 20
+archived_declared: 5
+archived_in_index: 5
+superseded_declared: 4
+superseded_in_index: 4
+carrying_mtime: 20
+categories: {"seed": 20}

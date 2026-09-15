@@ -37,10 +37,41 @@ table and is a 🟣 date gate in [OPEN-WORK](../OPEN-WORK.md).
 | phase | who | lane | state |
 |---|---|---|---|
 | 1. Seed + question sets | Codex (set 1) and Claude (set 2) | — | ✅ **DONE for real 2026-09-15** — the 20 seed documents and `seed-dates.tsv` stand; the provisional Claude key was deleted and **Arpit ran prompt 2 and prompt 3**. [`questions/`](../golden/questions/README.md): set 1 is Codex's (125, `s1-001…s1-125`), set 2 is Claude's (124, `s2-001…s2-124`); **both questions-only, both keys Arpit's**. W-145 closed as overtaken |
-| 2. Extend 10 → 10 000, blind | Claude Code (Opus) | `agent` | ✅ **COMPLETE 2026-09-12 — all eight rungs to 10 000.** The first five were committed *before* the questions were opened (`92f5bff`); `rung-02000`/`05000`/`10000` were built later the same day from the **same committed generator and seed**, so what protects them is determinism rather than the clock — stated in [`golden/README.md`](../golden/README.md) rather than glossed. Nesting verified across all eight. |
+| 2. Extend 10 → 10 000, blind | Claude Code (Opus) | `agent` | ✅ **COMPLETE 2026-09-12 — all eight rungs to 10 000.** The first five were committed *before* the questions were opened (`92f5bff`); `rung-02000`/`05000`/`10000` were built later the same day from the **same committed generator and seed**, so what protects them is determinism rather than the clock — stated in [`golden/README.md`](../golden/README.md) rather than glossed. Nesting verified across all eight. 🔴 **RE-FROZEN 2026-09-15** — prompt 4's check found all eight rungs holding a **superseded seed** and rebuilt them; see below. |
 | 3. Freeze ladder, release questions | Codex | `arpit` — run prompt 3 | ⚠ **released early** on 2026-09-12, before the ladder existed — ids permuted so no band identifies the unanswerables. Phase 2 was on its honour and did not open `questions/`. |
 | 4. Run each rung | Claude Code | `agent` | ✅ **run on 2026-09-12** for the five rungs that existed then, under a committed pre-registration ([`work/regression/2026-09-12-golden-ladder/`](../regression/2026-09-12-golden-ladder/PRE-REGISTRATION.md)). ⚠ **`rung-02000`/`05000`/`10000` have NOT been run** — they were built after that run. Running them is cheap (the indexes are committed) but it needs its own pre-registration, because a run across eight rungs is not the run that was registered across five. |
 | 5. Score each set, per rung | Codex | `arpit` — run prompt 6 | 🟣 **gated on 2026-09-30** (Arpit, 2026-09-13 — Codex limit exhausted). ⚠ **The premise visibly changed on 2026-09-15**, when Codex authored set 1; **only Arpit lifts a date gate**, so it stands until he says otherwise. ✅ **Set 1 is no longer `informed` for key authorship** — W-145's defect is gone. 🔴 **Set 2 is `informed` permanently** (SR-LAW-11 decision 7). |
+
+## 🔴 Prompt 4 ran 2026-09-15 — and the ladder was stale
+
+**The check failed, which is why the prompt is a check.** All eight rungs had
+been frozen on 2026-09-12; `0aa4bbcf` then extended **7 of the 20 documents in
+`work/golden/seed/` by 131 lines** on 2026-09-15, and **both question sets were
+authored after that**. Every rung still carried the old bytes, and nothing saw
+it: `verify()` compares a rung to its own manifest and `ladder_check` compares
+the manifests to each other — neither asks whether `seed/` is the seed the repo
+has.
+
+- **All eight rebuilt and re-frozen** from the current seed with the
+  **unmodified** 2026-09-12 builder and generator.
+- 🔴 **`ext/` byte-identical on all eight** — 18 800 generated documents,
+  **0 drift**, re-derived three days later at a different engine commit. The
+  determinism claim is measured now.
+- **Every coverage count unchanged**; 14 manifest lines moved per rung; every
+  rung answers at `fux.index.v3` with **0 seed files on any skip list**.
+- **Two strikes → a gate** ([SR-WORK-SESSION](../../records/0060_WORK-session.md)
+  decision 13; W-186 was strike one): `rungs.seed_drift()`, `ladder_check.py`
+  check 4 and [`tests/test_golden_ladder_seed.py`](../../tests/test_golden_ladder_seed.py).
+- **Blind** — `work/golden/seed/` and nothing else under `work/golden/` was read.
+- Filed: [`2026-09-15-ladder-seed-refresh`](../regression/2026-09-15-ladder-seed-refresh/report.md).
+
+⚠ **Every number filed against the old rungs names a corpus that is gone** —
+caused by the seed moving, not by the rebuild. No pre-registration pins a rung
+index root, so no threshold moved.
+
+⚠ **A rung is a COPY of `seed/`.** Touching a seed document in this repo
+invalidates all eight until they are rebuilt — the gate is what makes that loud
+instead of silent.
 
 ## Done in the filing change (2026-09-11)
 

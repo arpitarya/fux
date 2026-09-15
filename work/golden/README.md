@@ -337,8 +337,8 @@ on data that contains the input it acts on.** This table is that declaration.
 |---|---|---|---|---:|
 | `superseded_weight` | `supersedes:` in the newer doc's frontmatter | Codex, [prompt 1](prompts/1-codex-seed.md) part A §3 | 4 pairs: `11-decision-telematics-vendor-2026.md` → `05-…-2023.md` · `12-rate-card-2026-h2.md` → `07-rate-card-and-surcharges.md` · `13-dock-scheduling-rules-2026.md` → `09-dock-scheduling-wiki-export.html` · `15-customer-notification-matrix-2026.md` → `14-…-2025.md` | 12 |
 | `archived_weight` | a directory declared `archived=true` | Codex places files in `seed/archive/`; each rung declares it (phase 4) | 5 docs in `seed/archive/`: `a01-sop-temperature-excursion-rev2.md` · `a02-kalpa-alert-routing-guide-2021.md` · `a03-dock-scheduling-wiki-2021.html` · `a04-driver-hours-policy-2019.md` · `a05-induction-checklist-2020.txt` | 9 |
-| `recency_half_life_days` | commit time per file | Codex writes `seed-dates.tsv`; each rung commits at those dates (phase 4) | all 20 seed documents, dated 2019-08-12 → 2026-07-01 | 7 |
-| abstention | unanswerable questions | Codex, prompt 1 | — | ~10 % of the key |
+| `recency` | commit time per file | Codex writes `seed-dates.tsv`; each rung commits at those dates (phase 4) | all 20 seed documents, dated 2019-08-12 → 2026-07-01 | 7 |
+| abstention | unanswerable questions | Codex, prompt 2 | — | 12 |
 | `heading` negative control | heading-matched distractors | Claude, phase 4 `sibling` documents | 32 at rung 100, rising to 392 at rung 1 000 — `ext/sibling/` documents reusing the seed documents' **headings and document types** (Temperature Excursion Response SOP, Rate card and surcharges, Customer notification matrix, Dock scheduling rules, …) with a different company, people, facilities and every number changed | — |
 
 A feature with no row, or a row still showing *(filled by …)*, **is not measurable
@@ -399,7 +399,40 @@ until he reopens it; *"and so on"* past 10 000 is a separate, later decision.
 
 ---
 
-### Built on 2026-09-12 — **the ladder is COMPLETE, all eight rungs to 10 000**
+### 🔴 Re-frozen on 2026-09-15 — the ladder had drifted off the seed
+
+**Prompt 4 ran as the check it says it is, and the check failed.** All eight
+rungs were frozen on 2026-09-12; on 2026-09-15 commit `0aa4bbcf` extended
+**7 of the 20 documents in `seed/` by 131 lines**, and **both question sets were
+authored afterwards, from the new text**. Every rung still held the old bytes,
+and every mechanism in the repo passed: `verify()` compares a rung to its own
+manifest, `ladder_check` compares the manifests to each other, and neither ever
+asked whether the `seed/` half was the seed this repository has.
+
+🔴 **That rung does not fail. It answers** — with a number shaped exactly like a
+good one, against a paragraph it does not contain.
+
+All eight were rebuilt from the current seed with the **unmodified** 2026-09-12
+builder and generator and re-frozen. **`ext/` came back byte-identical on all
+eight — 18 800 generated documents, zero drift** — so the determinism claim
+below is measured now, not asserted. Every coverage count is unchanged; exactly
+fourteen manifest lines moved per rung. **Every `index_root_sha256` and
+`rung_head_commit` is new**, and every number filed against the old rungs names
+a corpus that no longer exists.
+
+**The gate that will catch the next one** — `rungs.seed_drift()`,
+`ladder_check.py` check 4, and
+[`tests/test_golden_ladder_seed.py`](../../tests/test_golden_ladder_seed.py) in
+the fast suite. Two strikes, so a check
+([SR-WORK-SESSION](../../records/0060_WORK-session.md) decision 13); W-186 was
+the first. Filed:
+[`2026-09-15-ladder-seed-refresh`](../regression/2026-09-15-ladder-seed-refresh/report.md).
+
+⚠ **A rung is a COPY of `seed/`, not a view of it.** Changing a seed document in
+this repo silently invalidates all eight until they are rebuilt — that is the
+shape of the thing, and the gate is what makes it loud.
+
+### Built on 2026-09-12, rebuilt 2026-09-15 — **the ladder is COMPLETE, all eight rungs to 10 000**
 
 The first five landed earlier the same day, under Arpit's cap at rung 1 000; the
 cap was lifted and `rung-02000`, `rung-05000` and `rung-10000` were built from
@@ -428,11 +461,13 @@ by anything that produced a document. But the *ordering* argument that covers
 rungs seed–1 000 (`92f5bff`, checkable in `git log`) does not extend to them, so
 **what protects these three is the generator's determinism, not the clock.**
 Anyone re-deriving them gets the same bytes; that is the claim, and it is
-checkable.
+checkable. 🔴 **It was checked on 2026-09-15** — re-derived by a
+different session at a different engine commit, all eight rungs, **0 of 18 800
+generated documents drifted.**
 
 **Nesting is verified across all eight, not asserted**: every rung's manifest
 contains the previous rung's documents with **identical hashes**, and all twenty
-seed documents are in `rung-10000`.
+seed documents are in `rung-10000`. Re-verified after the 2026-09-15 rebuild.
 
 - **Every rung nests**: rung N's manifest contains rung N-1's documents with
   identical hashes, and all twenty seed documents are in every rung. Checked
