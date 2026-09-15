@@ -238,6 +238,7 @@ no row: what remains of each is **W-144** and **W-168** in the queue.*
 | B-246 | `WORKLOG.md` archive-and-truncate — append-only and growing forever; a yearly or v-major cut into `archive/worklog/YYYY.md` would cap the live file under the one-archive law. Parked since 2026-08-21, never litigated | [SR-WORK-GOVERNANCE](../records/0065_WORK-governance.md) Consequences | Arpit rules on the cut, or rules it never happens |
 | B-247 | `DOC-REGISTRY.md` scoped to untested prose — its unique value is the docs nothing else checks (`WORKLOG`, `MACHINE`, `GLOSSARY`, the paper); SRs and `setup/` have dedicated tests. Parked since 2026-08-21, never litigated | [SR-WORK-GOVERNANCE](../records/0065_WORK-governance.md) Consequences | Arpit rules on the scope, or rules it stays whole |
 | B-248 | Glassbox sessions — the ask is counts and cross-session joins, which fux does not do; the sketch is materialise-then-index. 🔴 `fetch=`'s value set is closed at `sourcelist.py:263` while `urlsrc.py` resolves by filename | [`glassbox-sessions.md`](proposals/glassbox-sessions.md) | A second event-stream source is asked for |
+| B-249 | A non-circular quality endpoint for proximity reranking — five candidates, and a mechanical SCREEN (`agreement` against the reranker's own objective, band `0.25`-`0.85`) that can disqualify the recommendation before an arm runs | [`quality-endpoint-for-reranking.md`](proposals/quality-endpoint-for-reranking.md) | The screen's number decides: W-154's Part B, or the fork to Arpit |
 
 ---
 
