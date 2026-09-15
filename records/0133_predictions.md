@@ -7,10 +7,10 @@ description: "An R is a claim frozen before measurement; its threshold may never
 status: accepted
 date: 2026-08-22
 feature: the prediction system — the R ids, their register, the rules that make a frozen claim mean something, and the classification of the runs those claims are measured by
-owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@19e012a10288, tools/vector-gate@0023bff0cdef]
+owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@f698ad1c2747, tools/vector-gate@0023bff0cdef]
 laws: [L3]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: bdd538841912e261927c837ae467d08f1f37f158b6b9d5d181c085825f3f1867
+content_sha: 11e4187082997aba07b98f056beedcca334286c49601a2ebc2dbee0d4485d9d1
 ---
 
 # SR-RS — the R predictions
@@ -578,6 +578,31 @@ query shares more than 80 % of its terms with the true passage.
 ⚠ **It screens an ENDPOINT, never a corpus.** A number measured on one tree
 transfers to no other, and the run that produced this one says **dogfood** in
 its own verdict.
+
+**15b. A frozen sweep gets its OWN arm in the instrument, and the instrument
+does not adjudicate** (2026-09-15, W-180). `w144_graded.py` was built for
+W-144's option (b) — shipped `flen` against a table-excluded counterfactual.
+Arpit ruled **(d)**, *lower `b`*, on 2026-09-14, so the arm the
+[pre-registration](../work/regression/2026-09-15-b-sweep/PRE-REGISTRATION.md)
+needs is a different one: **the shipped `flen` in every arm, and `b` the only
+thing that moves.**
+
+`bsweep` is that arm. Two properties are worth stating because both are easy to
+lose:
+
+- **The index is ingested once.** `b` is a **query-time** parameter, so all four
+  values read the same committed bytes. Four corpora would have introduced a
+  second difference into an ablation whose whole point is that one lever moves.
+- 🔴 **The command prints what each value did and applies no bar.** The decision
+  rule — *first value, descending, netting positive on all three families with
+  both controls holding and the net clearing decision 19's floor* — lives in the
+  frozen pre-registration, and a harness that also encoded it would be a second
+  copy of a threshold that may not move. It prints the rule and says it is not
+  applying it.
+
+⚠ **The counterfactual `flen` is deliberately NOT computed in this arm.** Option
+(b) was ruled out; carrying it alongside would put two levers in one run, which
+is what the pre-registration forbids in those words.
 
 **16. When a pre-registration's live path is DELETED, the run keeps a mirror of
 it — the verdict is not edited.** Decision 1 freezes a pre-registration and

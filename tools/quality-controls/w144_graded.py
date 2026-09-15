@@ -584,6 +584,137 @@ def cmd_sweep(a) -> int:
     return 0
 
 
+def _score_at_b(corpus: Path, probes: list[dict], values: tuple[float, ...]) -> dict:
+    """Rank every probe at each `b`, with the SHIPPED `flen` in every arm.
+
+    🔴 **One lever moves and it is `b`.** The counterfactual `flen` that
+    `_score` computes is NOT used here: W-144's option (b) was ruled out on
+    2026-09-14 and option (d) — lower `b` — is what the sweep tests. Two levers
+    in one arm cannot attribute a delta, which the pre-registration says in
+    those words.
+
+    The index is ingested and built once; `b` is a **query-time** parameter, so
+    every arm reads the same committed bytes. That is the property that makes
+    this a clean ablation rather than four corpora.
+    """
+    r = subprocess.run([str(PY), "-c",
+                        "import sys;from fux.cli import main;"
+                        "sys.argv=['fux','ingest','--full'];rc=main();"
+                        "sys.argv=['fux','build'];raise SystemExit(rc or main())"],
+                       cwd=str(corpus), text=True, encoding="utf-8", capture_output=True, check=False)
+    if r.returncode != 0:
+        sys.stderr.write(r.stdout + r.stderr)
+        raise SystemExit("ingest/build failed")
+
+    from fux.query.bm25f import DEFAULT_SCORING, Scoring, derive_wlen, score_record
+    from fux.query.scan import query_term_hashes
+    from fux.store import TF_FIELDS, reader
+
+    records = [rec for rec in reader.read_index(corpus).values() if rec.get("loc")]
+    n = len(records)
+    prepared, total = [], 0.0
+    for rec in records:
+        flen = list(rec.get("flen") or [])
+        if not flen:
+            continue
+        flen += [0] * (len(TF_FIELDS) - len(flen))
+        total += derive_wlen(flen)
+        prepared.append((rec, flen))
+    avg = total / n
+
+    scorings = {v: Scoring(b=v) for v in values}
+    per_probe: list[dict] = []
+    for p in probes:
+        hashes = query_term_hashes(p["query"])
+        df = {h: 0 for h in hashes}
+        for rec, _f in prepared:
+            for h in hashes:
+                if h in rec.get("terms", {}):
+                    df[h] += 1
+        row = {**p, "df": max(df.values()) if df else 0}
+        for value, scoring in scorings.items():
+            ranked = []
+            for rec, flen in prepared:
+                score = score_record(rec.get("terms", {}), flen, hashes, df, n, avg, scoring)
+                if score > 0:
+                    ranked.append((score, rec["loc"]))
+            top = [loc for _s, loc in sorted(ranked, key=lambda t: (-t[0], t[1]))][:10]
+            row[f"top_b{value}"] = top
+            row[f"hit1_b{value}"] = bool(top) and top[0] == p["relevant"]
+        per_probe.append(row)
+    assert DEFAULT_SCORING.b == 0.75, "the baseline moved; the pre-registration names 0.75"
+    return {"n": n, "avg_wlen": avg, "rows": per_probe}
+
+
+def cmd_bsweep(a) -> int:
+    """W-180 — the FROZEN `b` sweep, run. The bar is not in this file.
+
+    🔴 **The decision rule is `work/regression/2026-09-15-b-sweep/PRE-REGISTRATION.md`'s
+    and it may not move** (SR-RS decision 10b): ship the FIRST value, in
+    descending order, that nets positive on `dump`, `content` AND `main`, with
+    `inverse` moving the other way and `placebo` not moving, and with the net
+    clearing decision 19's floor for the discordant count observed.
+
+    ⚠ **Descending order is the rule, not a convenience.** A sweep that reported
+    *the best value* would pick the extreme whenever the curve is flat; the first
+    value that clears is the smallest departure that works.
+
+    This command prints what each value did. **It does not adjudicate** — an
+    ambiguous result goes to Arpit under the pre-registration's own rule 4.
+    """
+    corpus = Path(a.corpus)
+    probes = [json.loads(l) for l in (corpus / "probes.jsonl").read_text().splitlines()
+              if l.strip()]
+    values = tuple(a.values)
+    result = _score_at_b(corpus, probes, values)
+    rows = result["rows"]
+    base = values[0]
+
+    print(f"corpus n={result['n']}   avg_wlen {result['avg_wlen']:.1f}")
+    print(f"probe-term df: {min(r['df'] for r in rows)}-{max(r['df'] for r in rows)}")
+    print(f"\nbaseline b={base} (shipped). One lever moves; `flen` is the shipped one in every arm.\n")
+    header = f"{'family':>9}  {'n':>3}  " + "  ".join(f"hit@1 b={v:<5}" for v in values)
+    print(header)
+    summary: dict[str, dict] = {}
+    for fam in ("main", "inverse", "placebo", *TABLE_FAMILIES):
+        fam_rows = [r for r in rows if r["family"] == fam]
+        if not fam_rows:
+            continue
+        cells = []
+        for v in values:
+            cells.append(f"{sum(1 for r in fam_rows if r[f'hit1_b{v}']):>5} /{len(fam_rows):<5}")
+        print(f"{fam:>9}  {len(fam_rows):>3}  " + "  ".join(cells))
+        summary[fam] = {"n": len(fam_rows),
+                        **{f"hit1_b{v}": sum(1 for r in fam_rows if r[f"hit1_b{v}"]) for v in values}}
+
+    print("\nPaired against the baseline, per family (b = better, w = worse, net = b - w):\n")
+    print(f"{'family':>9}  {'b':>5}  {'better':>6}  {'worse':>5}  {'discordant':>10}  {'net':>5}  {'p':>8}  outcome")
+    verdicts: dict[str, dict] = {}
+    for v in values[1:]:
+        for fam in ("main", "inverse", "placebo", *TABLE_FAMILIES):
+            fam_rows = [r for r in rows if r["family"] == fam]
+            if not fam_rows:
+                continue
+            better = sum(1 for r in fam_rows if r[f"hit1_b{v}"] and not r[f"hit1_b{base}"])
+            worse = sum(1 for r in fam_rows if r[f"hit1_b{base}"] and not r[f"hit1_b{v}"])
+            rule = vrule(better, worse, better=f"b={v} RANKS BETTER", worse=f"b={base} RANKS BETTER")
+            print(f"{fam:>9}  {v:>5}  {better:>6}  {worse:>5}  {better + worse:>10}  "
+                  f"{better - worse:>+5}  {rule['p']:>8.4f}  {rule['outcome']}")
+            verdicts.setdefault(str(v), {})[fam] = {"better": better, "worse": worse, **rule}
+        print()
+
+    print("🔴 The decision rule is the PRE-REGISTRATION's, and this command does not apply it:")
+    print("   the first value, descending, netting positive on dump AND content AND main,")
+    print("   with `inverse` moving the other way and `placebo` not moving, and the net")
+    print("   clearing SR-RS decision 19's floor. An ambiguous result goes to Arpit.")
+
+    if a.json:
+        Path(a.json).write_text(json.dumps(
+            {"values": list(values), "n": result["n"], "avg_wlen": result["avg_wlen"],
+             "summary": summary, "paired": verdicts, "rows": rows}, indent=2), encoding="utf-8")
+    return 0
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     sub = ap.add_subparsers(dest="verb", required=True)
@@ -600,6 +731,12 @@ def main() -> int:
     s.add_argument("--filler", type=int, default=150)
     s.add_argument("--prose", type=int, default=400)
     s.add_argument("--json"); s.set_defaults(fn=cmd_sweep)
+    bs = sub.add_parser("bsweep", help="W-180: the frozen `b` sweep, shipped `flen` in every arm")
+    bs.add_argument("--corpus", required=True)
+    bs.add_argument("--values", type=float, nargs="+", default=[0.75, 0.6, 0.5, 0.4],
+                    help="the baseline FIRST, then the treatments in the pre-registered "
+                         "descending order — 0.75 0.6 0.5 0.4")
+    bs.add_argument("--json"); bs.set_defaults(fn=cmd_bsweep)
     a = ap.parse_args()
     return a.fn(a)
 

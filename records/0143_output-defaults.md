@@ -13,7 +13,7 @@ feature: configurable output defaults
 owns: [src/fux/output_config.py@d8c53dfbf3c9]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 3185aecf690cb2dafee1e7f672e7c89cd92ec5cde574122a0b13dc6772b17ba2
+content_sha: d29c553be3a518ebffbb10ba37ab2b13d1f44ab5d51ace80dccf3409bf559333
 ---
 
 # SR-OUTPUT — output defaults are configurable, in a third file
@@ -668,7 +668,7 @@ keys`.
     - **L8 is untouched by this.** The journal is gitignored, local, and never
       reaches a committed byte — [SR-LAWS](0001_LAWS.md) decision 8. What the
       committed key holds is the *instruction to journal*, never the journal.
-    - Found 2026-09-12 re-deriving [W-140](../work/open/W-140-guide-authoring-defects.md)
+    - Found 2026-09-12 re-deriving W-140 (closed 2026-09-15)
       row 3 against the code; ruled 2026-09-13.
 
 **22. Both readers fold this file in, at the same place, since 2026-09-12.**

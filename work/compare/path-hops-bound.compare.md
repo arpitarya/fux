@@ -12,7 +12,7 @@ filed: 2026-09-12
 **Model: Opus** — it is a fork with no obviously right answer, and the wrong one
 degrades an honest empty result into an ambiguous one.
 
-**Found:** [W-140](../open/W-140-guide-authoring-defects.md) row 12, the third
+**Found:** W-140 (closed 2026-09-15) row 12, the third
 of three halves; the other two were defects and are fixed
 ([SR-GRAPH](../../records/0126_graph.md)). **Owning record:** SR-GRAPH,
 §Consequences, which states the problem and decides nothing.

@@ -23,6 +23,30 @@ difference found is `"reliability": 1.0` against `1` — `json.dumps` against
 [SR-NODE-SEARCH](../../records/0153_node-search.md), present in the confidence
 block too, and **not this change's**.
 
+## ✅ CLOSED 2026-09-15 — both remaining rows answered
+
+Row 12 landed 2026-09-14/15. Row 21 is answered by
+[the W-182 soak](../regression/2026-09-15-runner-race-soak/report.md) and
+[the W-185 fix](../regression/2026-09-15-index-temp-ignore/report.md).
+
+🔴 **Row 21 closes as UNREPRODUCED, not as proven closed**, and the distinction
+is the whole of what the soak bought:
+
+- **The stranding never fired** — 0 of 104 deliberate trials, **67 of them with
+  the second commit inside a live runner**, which the eleven previous re-runs
+  could never demonstrate they had reached.
+- ⚠ **That is not proof the window is shut.** `_hand_off_if_leftovers_are_new`
+  re-reads the dirty list after `release`, and the surviving ordering needs a
+  delay injected **inside** `run_once` — a `src/` change a capture pass may not
+  make. **If it ever fires again, this row reopens and the instrument to build
+  is that delay**, not another wait.
+- 🔴 **The diagnosis was aimed at the wrong window.** What actually failed, twice
+  in the soak and once in `tests_e2e` itself, was `git add -A` dying on
+  `.fux/index/<shard>.jsonl.tmp`. Fixed as W-185, measured with a control.
+- ⚠ **Nothing proves the 2026-09-12 failure was either one.** That output was
+  never captured — which is exactly what this row said to do first, and the
+  second time this session lost a traceback to `| tail` ([LESSONS](../LESSONS.md)).
+
 # W-140 — defects found while writing the operating guides
 
 **Model: Opus** — each row needs a call on whether the code or the record is

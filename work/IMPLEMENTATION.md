@@ -28,6 +28,16 @@ Rules:
 
 
 
+## 2026-09-15 — **W-140 closed: the last row was answered by not reproducing**
+
+| item | what landed | evidence |
+|---|---|---|
+| **W-140** | 🟢→✅ closed. Row 12 landed 2026-09-14/15; row 21 is answered | [the item](../archive/open/W-140-guide-authoring-defects.md) |
+| **row 21's outcome** | 🔴 **UNREPRODUCED, not proven closed.** The stranding never fired in **104 deliberate trials, 67 of them with the second commit inside a live runner** — which the eleven previous re-runs could never show they had reached. ⚠ `_hand_off_if_leftovers_are_new` re-reads the dirty list after `release`, and the surviving ordering needs a delay injected **inside `run_once`**, which a capture pass may not add. **If it fires again the row reopens, and the instrument is that delay, not another wait** | [the soak](regression/2026-09-15-runner-race-soak/report.md) |
+| **what actually failed** | a different race — `git add -A` on `.fux/index/<shard>.jsonl.tmp` — in the soak twice and in `tests_e2e` once. Fixed as W-185. ⚠ **Nothing proves the 2026-09-12 failure was either one**: that output was never captured | [the fix](regression/2026-09-15-index-temp-ignore/report.md) |
+
+
+
 ## 2026-09-15 — **W-186: the golden ladder was dead and nothing said so**
 
 | item | what landed | evidence |
@@ -1533,7 +1543,7 @@ re-derived on macOS before it was touched (rule 4); every one held up as filed.
 | **Row 18** | Four statements `fux setup` shipped into consumer repos that were untrue: no `__pycache__/` ignore beside the committed Python, the `AGENTS.md` snippet re-printed on every run, a `urls` header claiming *two attributes* of seven, and a probe path that is in the repository and not the wheel | `009b3f1` · SR-DOTFUX · SR-PII decision 20 |
 | **Row 8** | **Moved to W-122, not fixed.** Rejecting an unknown `fux.toml` key needs a key set to validate against — which is W-122's gate R-2. A second hand-written set would build the duplicate source of truth that item exists to remove | `4be982c` · W-122's detail file carries it |
 | 🔴 **Row 19, and the correction** | The merge-driver e2e test failed twice, got a gate, **failed again**, and the third failure gave the real answer: it asserted `ver == 2`, which counts sha changes against whichever checked-out index a pass compared with — observed at 1 and at 4. It asserts the merged file's content sha now. **The merge driver was never the defect** | `009b3f1` · two sessions' suspicion pointed at the driver because the failing assertion sat under it |
-| **What is left** | **6 code rows** — 6, 7, 12's `--hops` fork, 14, 16, 20 — **and all 13 record/code disagreements**, none critical | [`work/open/W-140-guide-authoring-defects.md`](open/W-140-guide-authoring-defects.md) |
+| **What is left** | **6 code rows** — 6, 7, 12's `--hops` fork, 14, 16, 20 — **and all 13 record/code disagreements**, none critical | `W-140` — ⚠ **closed 2026-09-15**, and this row's *"6 code rows left"* is the state as of the day it was written |
 
 ⚠ **Nine of the twelve had a guide describing the defect as behaviour.** Every
 fix deleted a workaround from a skill `fux setup` ships, which is
