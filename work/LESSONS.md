@@ -21,6 +21,65 @@ record is the rule and this file is the anecdote that motivated it.
 
 ---
 
+## 2026-09-15 — a green working tree hiding a red HEAD
+
+🔴 **CLAUDE.md warns that a red test on an uncommitted tree is invisible to
+every mechanism in this repo. This is the inverse, and nothing warns about
+it:** a **green working tree can hide a red HEAD**, and `git status` cannot
+tell you, because every fix is sitting right there looking like somebody
+else's mess.
+
+**What happened.** A session ran all three suites — 4614 / 142 / 36, green —
+and reported it. HEAD alone failed **three** different gates:
+
+| gate | why |
+|---|---|
+| `test_doc_links` | eight links pointing at files that moved |
+| `test_doc_registry` | two rows pointing at documents that no longer exist there |
+| `test_sr_owns_hash` | a record's `owns:` hash for a component the same session had changed |
+
+**Every one of those was repaired in the working tree** — by another session's
+uncommitted files, and by a restamp of my own that an explicit pathspec had
+left out of its commit. So the suite passed on a tree nobody would ever clone.
+
+**Three causes, and they are different from each other.** Worth separating,
+because only the first is the obvious one:
+
+1. **Two partial sweeps.** `git add X && git commit` takes the **whole index**,
+   and on a shared tree the index already holds another session's staged work.
+   `git commit -- X` is the form. CLAUDE.md names this exactly, and ten commits
+   in that session used it while two did not.
+2. **The opposite error, from the same tool.** An explicit pathspec will also
+   happily *omit* a file your own change requires — a record's restamp, most
+   easily. Pathspecs stop you taking too much and let you commit too little.
+3. **An orphan that predated all of it.** A file had been moved in an earlier
+   commit without its registry row, and it had been red since. Nobody noticed,
+   because the working tree had the row.
+
+**The remedy is judgement and it is one sentence: `git status` describes a
+tree, not a commit.** To know whether HEAD is consistent you have to look at
+HEAD — `git worktree add --detach <tmp> HEAD` and run the gates there.
+
+⚠ **And that trick has a hole that must be known before it is trusted.** An
+editable install points `import fux` at the **main** tree's `src/`, so a run
+inside a detached worktree tests HEAD's *documents* and the live tree's *code*:
+
+```
+$ cd <worktree> && python -c "import fux; print(fux.__file__)"
+/Users/.../fux/src/fux/__init__.py      # the MAIN tree, not this one
+```
+
+**So it isolates the docs, records and registry gates reliably, and the
+behaviour tests only when `git status -- src/ node/` is empty.** If `src/` is
+dirty, the worktree silently tests the wrong code and reports a number that
+means nothing. Check that it is clean, or install into the worktree.
+
+⚠ **Why there is no gate for this.** A check that HEAD is green means running
+the suite against a commit on every commit, which is CI's job and not a
+pre-commit hook's — and CI on a branch nobody has pushed catches it late,
+which is exactly when this one was caught. **Stated as judgement, unenforced,
+which is the honest half.**
+
 ## 2026-09-14 — five items in one session
 
 - 🔴 **Read the evidence, then write the reader.** Three defects in one
