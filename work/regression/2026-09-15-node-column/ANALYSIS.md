@@ -45,6 +45,25 @@ tiers *"ship on and unmeasured"*:
   without a benefit is half an argument**, and this run supplies only the half
   that was cheap.
 
+## 2a · The 10 000 tier, measured — and one claim of §1 needs narrowing
+
+The two-tier draft of this analysis said the Node reader is **flat**. With the
+third tier in, the honest statement is **sub-linear, not constant**:
+
+| corpus | reader (tier off) | the tier's price |
+|---|---|---|
+| 100 | 26.3 ms | 36.9 ms |
+| 1 000 | 26.4 ms | 243.1 ms |
+| **10 000** | **42.7 ms** | **3 157 ms** |
+
+**The reader grows 16 ms across a 100× corpus; the tier grows 3 120 ms.** The
+shape of the argument is unchanged and the wording is corrected rather than left
+to flatter.
+
+🔴 **And the tier's growth is steeper than linear in the corpus** — ×6.6 from
+100→1 000, ×13 from 1 000→10 000 — which is what rebuilding a graph plane by
+parsing every committed record, once per query, looks like from outside.
+
 ## 3 · What I would not conclude from it
 
 1. **"Node is faster than Python."** True at these tiers, on this machine, with

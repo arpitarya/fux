@@ -3,7 +3,7 @@ type: Report
 run: 2026-09-15-node-column
 item: W-179
 classification: surface capture
-description: "Node's query latency, measured for the first time, as a COLUMN beside Python's. The Node reader is FLAT in corpus size — 26.3 ms at 100 documents and 26.4 ms at 1 000 — and every bit of its growth is W-161's in-memory graph rebuild, which takes a Node ask to 269.5 ms at 1 000 and about 2.4 s at 10 000."
+description: "Node's query latency, measured for the first time, as a COLUMN beside Python's, at three tiers. The Node reader grows 26.3 -> 26.4 -> 42.7 ms across a 100x corpus; W-161's in-memory graph rebuild grows 37 -> 243 -> 3157 ms and is the whole of the difference. The tier-off arm clears N4's retired p95 fence at every tier; the shipped arm misses it by 36x at 10 000."
 filed: 2026-09-15
 ---
 
@@ -67,17 +67,36 @@ Python*. It is not: it is **8.7× faster**, and a tier that
 ten times the reader. That is exactly the misattribution decision 12 named in
 advance.
 
-## docs-10000 — the tier where it stops being a cost and becomes a wall
+## docs-10000 — measured, and the split becomes a chasm
 
-**One timed call, `node fux.mjs ask` in the prepared work dir: `real 2.40 s`.**
+Run separately at **1 warm-up + 3 repeats** (the other tiers use 2 + 5) — a
+deliberate reduction, because a Node `ask` there costs seconds and a benchmark
+rules no threshold. Stated rather than quietly applied.
 
-⚠ **That is one call, under load from the sweep then running** — it is a
-magnitude, not a p50, and it is labelled as one.
+| arm | p50 | p95 |
+|---|---|---|
+| `A` — Python 1.0.0 | 2009.3 ms | 3999.4 ms |
+| `B` — Python HEAD | 1952.2 ms | 4458.6 ms |
+| `B-node` — as shipped | 3200.3 ms | 5488.6 ms |
+| `B-node-nograph` | **42.7 ms** | **83.7 ms** |
 
-🔴 **Against N4's retired fence — `p95 ≤ 150 ms` — the split decides the
-answer**: `B-node-nograph` clears it by 5× at every tier measured;
-`B-node` misses it by 1.8× at 1 000 documents and by more than an order of
-magnitude at 10 000.
+🔴 **The graph tier costs 3 157 ms at 10 000 documents** — 75× the reader it is
+bolted to.
+
+⚠ **The reader is not perfectly flat after all**, and that is worth saying
+plainly: 26.3 → 26.4 → **42.7 ms** across 100 → 1 000 → 10 000. It grows
+**sub-linearly and by 16 ms across a 100× corpus**, against Python's 52 → 208 →
+1 952 ms. *Flat* is the shape; it is not literally constant.
+
+### 🔴 N4's retired fence, and the arm decides it
+
+| arm | `p95` at 10 000 | against `≤ 150 ms` |
+|---|---|---|
+| `B-node-nograph` | **83.7 ms** | ✅ **clears it**, at every tier measured |
+| `B-node` | 5 488.6 ms | ❌ misses by **36×** |
+
+**N4 is not ruled** — decision 6 — but it now has a number, and *which* number
+depends entirely on whether the graph tier is counted as the reader's cost.
 
 ## What this run does NOT establish
 
@@ -91,12 +110,24 @@ magnitude at 10 000.
 
 ## Machine and contention — stated, not buried
 
-⚠ **The `docs-00100` tier was measured while this session ran the unit suite on
-the same machine.** Interleaving protects the *difference* between arms and
-never the absolute number
-([SR-WORK-SESSION](../../../records/0060_WORK-session.md) decision 12, and the
-2026-09-12 correction that established the distinction). **The comparisons stand;
-the absolute milliseconds at that tier do not.**
+🔴 **Every absolute number in this run is contended, and the 10 000 tier worst
+of all.** Three separate things were on this machine during it: the unit suite
+(during `docs-00100`), W-154 Part B's ~2 000 subprocesses (during `docs-10000`),
+and **a concurrent Cowork session**, which the queue's in-flight marker surfaced
+only afterwards.
+
+**Interleaving protects the DIFFERENCE between arms and never the absolute
+number** ([SR-WORK-SESSION](../../../records/0060_WORK-session.md) decision 12,
+and the 2026-09-12 correction that established the distinction). So:
+
+| claim | status |
+|---|---|
+| `B-node-nograph` is far cheaper than every other arm, at every tier | ✅ stands — the arms are interleaved |
+| the graph tier is the whole of Node's growth | ✅ stands — same reason |
+| Python at 10 000 costs ~2 s | ❌ **do not quote it.** The filed 2026-09-12 benchmark puts it near 400 ms; this run says the machine was busy, not that the engine got slower |
+
+⚠ **Two sessions shared this machine and neither told the other in advance.**
+Decision 12 asks for the disclosure; it got it late, from a queue marker.
 
 ## Headroom
 

@@ -3,14 +3,14 @@ type: Standing Record
 kind: process
 name: SR-WORK-BENCHMARK
 title: "SR-WORK-BENCHMARK (0053) — what every benchmark run captures"
-description: "The seven things a benchmark run always files: the ranked lists, what moved between the two arms, hit@k at 1/5/10/20/50, the answer layer including the planted unanswerables, the committed index size, the speed, and an HTML report. Per query and per arm, never as a total. Halt gates are functionality and are not captured here."
+description: "The seven things a benchmark run always files: the ranked lists, what moved between the two arms, hit@k at 1/5/10/20/50, the answer layer including the planted unanswerables, the committed index size, the speed, and an HTML report whose spine is one slide per capture, titled by its CAP id and comparing the two arms. Per query and per arm, never as a total. Halt gates are functionality and are not captured here."
 status: accepted
 date: 2026-09-13
 feature: the capture set every benchmark run files
 owns: [tests/test_benchmark_capture.py@f6af3d328537]
 laws: []
 timestamp: 2026-09-13T00:00:00Z
-content_sha: ae5e4e8153c4e7713b0659f5fd70326649ca340f3d5bb77571ac09e2b2f4980d
+content_sha: 95f733f022e262dc946f343444ad2d769653cd797b9538e80c1e998c17adf3f1
 ratifies: Arpit, 2026-09-13 — what a benchmark must always capture
 ---
 
@@ -344,10 +344,11 @@ makes the number mean anything.**
 | `B-node` — the vendored reader, as shipped | 63.2 ms | **269.5 ms** |
 | `B-node-nograph` — the same reader, graph tier off | **26.3 ms** | **26.4 ms** |
 
-🔴 **The Node reader is FLAT in corpus size** — 26.3 → 26.4 ms across a 10×
-corpus — and every bit of its growth is W-161's in-memory graph rebuild:
-**36.9 ms** at 100 documents, **243.1 ms** at 1 000, and **~2.4 s** at 10 000
-from a single timed call.
+🔴 **The Node reader is SUB-LINEAR in corpus size** — 26.3 → 26.4 → **42.7 ms**
+across a **100×** corpus — and every bit of its growth is W-161's in-memory
+graph rebuild: **36.9 ms** at 100 documents, **243.1 ms** at 1 000, and
+**3 157 ms** at 10 000. ⚠ *Flat* was the two-tier reading and is narrowed here:
+the reader grows **16 ms** across that 100×, against Python's 52 → 1 952 ms.
 
 ⚠ **Read the column without the split and you get the opposite answer.**
 `B-node` 269.5 ms against `B` 231.2 ms says *the Node reader is slower than
@@ -356,8 +357,9 @@ costs ten times the reader. **That is the misattribution decision 12 named in
 advance, and it would have been believed.**
 
 **So N4 has a number where it had none** — and **which** number depends entirely
-on the arm: `B-node-nograph` clears the retired `p95 ≤ 150 ms` fence by 5× at
-every tier measured, `B-node` misses it by 1.8× at 1 000 documents. ⚠ **N4 is
+on the arm: `B-node-nograph` clears the retired `p95 ≤ 150 ms` fence at **every**
+tier including 10 000 (**83.7 ms**), while `B-node` misses it by 1.8× at 1 000
+documents and by **36×** at 10 000. ⚠ **N4 is
 not RULED**: decision 6 says a benchmark rules no threshold, and this run rules
 none.
 
@@ -394,6 +396,105 @@ commits optional and the environment scratch
 ([SR-WORK-ENVIRONMENTS](0052_WORK-environments.md)); committing it would make
 the environment something more than scratch, which is a change to what that
 record says it is. **Stated, not remedied** — the cost is known and accepted.
+
+**14. The report's SPINE IS ONE SLIDE PER CAPTURE, titled by its CAP id, each
+comparing arm A against arm B** (Arpit, 2026-09-15).
+
+**CAP-1 to CAP-6 each get their own slide**, in id order, and **the slide's
+title names the capture** — `CAP-3 — hit@k`, not *"how much moved"*. A reader
+looking for a capture finds a slide with that capture's name on it, and a
+capture cannot be read as absorbed into a neighbour.
+
+**Each of the six is a COMPARISON**, on one slide: **arm A (newest previous
+major) against arm B (current build)**, with the direction of goodness on every
+column (decision 10). ⚠ **A capture rendered for one arm alone is not this
+slide** — *what changed between the two versions* is the question the report
+exists to answer, and six separate one-arm renderings do not answer it.
+
+🔴 **CAP-7 gets NO slide of its own, and that is the ruling rather than a
+dropped section** (Arpit, 2026-09-15). **CAP-7 *is* the report**; a slide
+comparing this report to the previous one carries no number the run filed, which
+decision 5 forbids. Where the report came from — which run, generated or
+hand-written, which emitter — is the **cover's**, per decision 11.
+
+**The framing slides stay, all of them**: the cover, *which way is good*, the
+arms, the null control, the headroom and the guard rails. They **surround** the
+spine. A framing slide never replaces a CAP slide, and a CAP slide never
+absorbs one.
+
+**Decision 9 is unchanged and now bites harder.** Six titled slides means a
+capture with no number **keeps its titled slide** and says which capture it is
+and why this run has none — the confusion decision 1 exists to end, made
+structural by the title.
+
+⚠ **This is a change to the template AND the emitter, in one change**
+(decision 11). Today's `TEMPLATE.html` has **no CAP-1 slide at all** — the
+ranked lists are only ever seen through CAP-2's rankdiff — and it titles its
+sections by *finding* rather than by capture. So: new `fux:fill:` markers, the
+CAP ids in the `<thead>` region the emitter copies through byte for byte, and
+the emitter's marker set moved in the same commit, or it refuses.
+
+✅ **RATIFIED AND BUILT 2026-09-15** — W-187, archived. Twelve slides:
+cover · which way is good · the arms · the null control · **CAP-1 · CAP-2 ·
+CAP-3** · headroom · **CAP-4 · CAP-5 · CAP-6** · guard rails. The emitter gained
+`_fill_ranked` and the `ranked` marker, and **stopped writing titles at all** —
+its 13 `<h2>`s became `<p class="finding">` subtitles under the template's own
+`CAP-n` headings, which is decision 10's argument applied to titles: a title is a
+property of the CAPTURE, a finding is a property of the run.
+
+⚠ **CAP-1 had no slide before this** — the ranked lists were only ever seen
+through CAP-2's rankdiff, which is why the change was a new section and not a
+rename. **Every filed report was rebuilt to the spine the same day** — decision 15,
+which supersedes the frozen-report reading of 11a for SHAPE alone.
+
+**15. EVERY FILED REPORT IS REBUILT TO THE SPINE, and a capture with no number
+says so and names the run that will carry it** (Arpit, 2026-09-15).
+
+> *"update the benchmark template and the existing benchmark reports. if a
+> number exists great add it to the new report if it doesnt say that it doesnt
+> exis… and what is done is done, in future capture that number"*
+
+**The three rules this ruling sets, and they are narrow:**
+
+- **A number the run filed goes on the rebuilt report.** Reading a filed row is
+  not re-executing anything, and a report that omits a number its own run
+  produced is the gap decision 1 exists to close.
+- **A capture with no number keeps its titled slide, says which capture, says
+  why, and says that the next run captures it.** *What is done is done* — the
+  forward obligation is on the next run, never on re-running a frozen one.
+- **Nothing is measured to fill a gap.** 🔴 **No engine was run**, no corpus was
+  touched, and no filed row changed.
+
+⚠ **This supersedes decision 11a's *"the three written by hand are left exactly
+as they are"* for SHAPE and nothing else.** 11a's reason stands and is why the
+rebuild was done as an edit rather than a regeneration: the generated page is
+thinner than a hand-authored one, so **the hand-built content was kept and
+re-titled**, not replaced by emitter output. What 11a refused was *losing* a
+hand-built breakdown; what this decision requires is *finding* each capture by
+its own name.
+
+**Rebuilt legacy reports keep their own narrative order.** Decision 14's *id
+order* binds a report the emitter generates. A report written as an argument —
+the 2026-09-13 deck's numbered sections, the two 2026-08-28 decks' result-first
+openings — keeps that order, and each says on its guard-rails slide that it was
+rebuilt and that its order is the run's own. **Renumbering an argument to satisfy
+a template would make the page worse to read and would change nothing about
+finding a capture**, which the title already solves.
+
+✅ **DONE 2026-09-15, all five filed benchmark runs:**
+
+| report | what the rebuild did |
+|---|---|
+| `2026-08-28-benchmark-v1-vs-head` | CAP-1 and CAP-2 split out of one combined slide, each stating why no number exists; hit@20/hit@50 named as absent on the CAP-3 slide |
+| `2026-08-28-benchmark-contested` | CAP-1/CAP-2 and CAP-5/CAP-6 split into four titled slides, each keeping the paragraph the hand-built deck already carried |
+| `2026-09-12-benchmark-l9` | regenerated by the emitter — **CAP-1 now carries 600 filed lists**, which the old page showed only as a sentence inside CAP-2 |
+| `2026-09-13-benchmark-captures` | **gained a CAP-1 slide with numbers** read from its own `ranked-lists.jsonl` (120 lists, 60 per arm, depth 10); CAP-5 and CAP-6 split; all 18 original slides kept |
+| `2026-09-15-node-column` | 🔴 **had no report at all** — CAP-7 has been mandatory since 2026-09-13 and this run filed none. Generated: CAP-6 from the two `latency-<tier>.csv` files **with the substitution stated**, the other five saying they have no number |
+
+⚠ **One defect was found by doing this and fixed in the emitter:** an absent
+`ingest`/`build` phase printed **`0.0 s`** — a fabricated zero, which decision 9
+forbids in as many words. It prints `—` now, and `2026-09-15-node-column` is the
+run that would have carried the zero.
 
 ### Consequences
 
