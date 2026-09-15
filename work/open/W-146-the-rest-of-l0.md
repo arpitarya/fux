@@ -8,6 +8,32 @@ lane: agent
 timestamp: 2026-09-12T00:00:00Z
 ---
 
+✅ **§2's agent work is DONE 2026-09-15.** Items 1 and 2 landed;
+[SR-LAW-0](../../records/0002_LAW-0-authority.md) decision 4b records what they
+found. **Only §1 row 17 is left, and it is Arpit's** — now an inbox row.
+
+| §2 item | outcome |
+|---|---|
+| 1 · `tests/test_docstring_defaults.py` | ✅ built. 🔴 **It went GREEN on its first run** — `UrlSource`'s docstring, SR-CONFIG decision 5 and `config.py`'s loader all agree (`.fux/fetchers/http.py`, `"hashed"`). The exposure is real in principle and **there was no drift** |
+| 2 · key-and-default docstrings → links | ✅ **nothing to do.** No docstring under `src/fux/` is only a key-and-default table; the narrow reading had already been applied on 2026-09-14 when `config.schema.json` and `fux setup`'s comments were removed |
+| 3 · row 17 in the same change | 🔴 **not done, and it cannot be** — row 17's own note says moving it needs Arpit's call, because the paragraph is Cowork's only cover. §2 item 3 and row 17 contradict each other, and row 17 is the more specific statement |
+
+🔴 **Two things about the gate itself, kept because they generalise:**
+
+1. **It asserts against the CODE, not the record** — a deliberate narrowing of
+   decision 4a's wording. A record declares a key's *existence*; it names a
+   value only in prose, which decision 6 says cannot make a key real, so a
+   parser reading values out of prose would be guessing. The name is bound to
+   the record by `test_sr_config_keys.py` and the value to the loader by this
+   gate; a docstring can drift from neither.
+2. ⚠ **The first version produced twelve false positives, then eight** — it
+   matched every inline `` `key = value` `` example, and every TOML key whose
+   name collided with a Python parameter. **A gate that fires wrongly is worse
+   than one that does not fire.** It now requires a default claim to say it is
+   one, and carries a self-test proving it can still fail. **The cost is that
+   the gate is thin**: one claim in the whole tree is checkable today. It is a
+   tripwire, not a survey.
+
 # W-146 — the rest of L0
 
 **Model: Opus.** Every row here decides where a rule lives, and a wrong answer

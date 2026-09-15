@@ -25,6 +25,8 @@ here. Read that record before changing anything below it.
 |---|---|---|
 | 🔴 **W-168 step 1** — an anchor field makes a document's bytes a function of OTHER documents while re-index is per-document, so full and incremental ingest disagree on the incremental path only. Dirty the out-edge targets too, or don't build it? | 2026-09-15 | 0d |
 | ↳ **blocks:** nothing else in the queue — W-168's own steps 1 and 5; steps 2, 4 and 6–10 are unaffected. | | |
+| 🔴 **W-146 row 17** — `CLAUDE.md` §Golden answer key is a technical prohibition with a hook behind it, so L0 says it wants a record. It was left in place because that paragraph is Cowork's ONLY cover, and Cowork reads `CLAUDE.md`. Move it to an SR, or rule that it stays? | 2026-09-15 | 0d |
+| ↳ **blocks:** W-146, which closes on it and nothing else. | | |
 
 ---
 
@@ -39,7 +41,7 @@ here. Read that record before changing anything below it.
 - 🟣 **W-176** · `agent`, waiting on **2026-09-30** — **steps 1–3 landed 2026-09-15**: `weak` ⇒ `answerable: false`, the steering text, `failed`. The seven measured gates need Codex's key. [detail](open/W-176-abstention-gates.md)
 - 🟡 **W-170** · `agent`, waiting on a subscriber — **BUILT 2026-09-15**, SR-OBSERVE `accepted`. Node declared out of scope (SR-NODE-SEARCH d18). Only the latency capture is owed, and it needs a real subscriber's observer to measure. [detail](open/W-170-cage-search-leg.md)
 - 🟡 **W-148** · `agent`, waiting on `fux-benchmark` — **rows 1–3 done 2026-09-15**: CI's corpus arm removed, §4 amended local, SR-WORK-BENCHMARK 12–13. N4 stays unmeasured until the Node column is run. Row 4 out of scope. [detail](open/W-148-what-the-two-readers-still-owe.md)
-- 🟡 **W-140** · `agent` — **row 12's last third landed 2026-09-15**: `routes()` bounded by work, `truncated` in text and `--json`, both readers. Row 21's runner-race flake stays unreproduced (11 attempts) and is all that is left. [detail](open/W-140-guide-authoring-defects.md)
+- 🟡 **W-140** · `agent`, waiting on **one captured failure** — row 12 landed 2026-09-15; row 21's runner-race flake is all that is left and has not reproduced in 11 attempts. [detail](open/W-140-guide-authoring-defects.md)
 
 ### testing
 
@@ -53,7 +55,7 @@ here. Read that record before changing anything below it.
 
 ### adr update
 
-- 🟢 **W-146** · `agent` — L0's remainder, ruled **(a)** 2026-09-14: docstrings may explain mechanism; a key-and-default table becomes a link; `test_docstring_defaults.py` closes the `UrlSource` exposure. Then row 17, then close. [detail](open/W-146-the-rest-of-l0.md)
+- 🔴 **W-146** · `agent` — L0's remainder. **Gate landed 2026-09-15, no drift found**; step 2 had nothing to do. Only row 17 is left. [detail](open/W-146-the-rest-of-l0.md)
 
 
 ---

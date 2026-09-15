@@ -10,7 +10,7 @@ feature: the authority of records — where a rule lives, which record wins, and
 owns: []
 laws: [L0]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: 0b6ec9371eed5abb758b5f472d678ebd424220a9db3d83f8377d34dbc6e3536b
+content_sha: 1c412aadc62bfcc194419352bbcbdfad77971c3d02204ef497e695cee9c9525c
 ---
 
 # SR-LAW-0 — L0 — SRs are the only source of truth
@@ -212,6 +212,44 @@ extracts every `key = value` / `default: value` literal from docstrings under
 that is what turns the narrow reading from judgment into an enforcement, and
 closes the exposure that `UrlSource` and SR-CONFIG could disagree while both
 looked correct.
+
+**4b. BUILT 2026-09-15 (W-146), and three things it found are worth more than
+the gate.**
+
+**① The exposure is real in principle and there was NO DRIFT in practice.**
+`UrlSource`'s docstring, SR-CONFIG decision 5 and `config.py`'s loader all agree
+today: `.fux/fetchers/http.py` and `"hashed"`, three artifacts, one value each.
+**A gate that goes green on its first run is the good outcome**, not a wasted
+one — the alternative was finding out later.
+
+**② Step 2 of W-146 found NOTHING TO DO.** Its instruction was *turn any
+docstring that is only a key-and-default table into a one-line link*. There is
+no such docstring under `src/fux/`. The narrow reading had already been applied
+correctly on 2026-09-14 — the two artifacts whose whole content was descriptions
+of keys (`config.schema.json` and `fux setup`'s `fux.toml` comments) were
+removed then, and nothing else qualified.
+
+**③ 🔴 The gate asserts against the CODE, not the record, and that is a
+deliberate narrowing of 4a's wording.** A record declares a key's **existence**
+— the `keys` block is dotted paths and sigils — and may name a value only in
+prose, which decision 6 says cannot make a key real. A parser reading values out
+of prose would be guessing. So: the **name** is bound to the record by
+`tests/test_sr_config_keys.py`, in both directions; the **value** is bound to
+the loader by `tests/test_docstring_defaults.py`; and a docstring can drift from
+neither. **The claim narrows, the enforcement does not.**
+
+⚠ **And a fourth, about gates rather than about docstrings.** The first version
+matched a bare `` `key = value` `` anywhere in a docstring and produced **twelve
+false positives**, then eight — every inline example of that shape, and every
+TOML key whose name collided with a Python parameter in the same module. **A
+gate that fires wrongly is worse than one that does not fire**: it teaches every
+reader to pass over it, which is how SR-FIND veto 4 grepped a line that does not
+exist and read as passing for weeks. The pattern now requires a default claim to
+**say** it is one, and the file carries a self-test proving it can still fail.
+
+⚠ **The cost of that narrowing, stated: the gate is thin.** One claim in the
+whole tree is checkable today. It is a tripwire for a drift that has not
+happened yet, not a survey of the codebase.
 
 **The test in one sentence:** *could this artifact and the record disagree
 while both still look correct?* If yes, it is a restatement. If it would
