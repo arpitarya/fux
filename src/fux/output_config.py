@@ -158,20 +158,25 @@ CLI_VERBS: dict[str, tuple[str, ...]] = {
     "doctor": (),
     "hooks": (),
     "daemon": (),
-    # `update` has no `[cli.update]` key of its own — only `--json` to resolve,
+    # `ingest` has no `[cli.ingest]` key of its own — only `--json` to resolve,
     # like `doctor` and `hooks`. An EMPTY tuple is the declaration that this
     # verb is shaped by this file; an absent entry means it is not, and
     # `--json` would then never be resolved from `[cli.json]` (W-140 row 14).
-    "update": (),
+    # ⚠ **It arrived with `--check --json` on `fux update` and moved here whole
+    # when W-177 deleted that verb.**
+    "ingest": (),
+    # ⚠ **`update` had this row until W-177 deleted the verb** (2026-09-15).
+    # It is not missing — `ingest` absorbed `--check --json`, so `ingest`
+    # carries the row now, above.
     # `inspect` carries no `[cli.inspect]` key of its own — only `--json` to
-    # resolve, like `doctor` and `update`. The EMPTY tuple is the declaration
+    # resolve, like `doctor` and `ingest`. The EMPTY tuple is the declaration
     # that this verb IS shaped by this file; an absent entry would leave
     # `--json` unreachable from `[cli.json]` (W-140 row 14, the same trap).
     # `--top` and `--retrieval-sample` stay flags: both are how much WORK to
     # do, not how a result is shown, and SR-OUTPUT's subject is the latter.
     "inspect": (),
     # `correct` carries no `[cli.correct]` key of its own — only `--json` to
-    # resolve, like `doctor`, `update` and `inspect`. An EMPTY tuple is the
+    # resolve, like `doctor`, `ingest` and `inspect`. An EMPTY tuple is the
     # declaration that this verb IS shaped by this file (W-140 row 14).
     "correct": (),
 }

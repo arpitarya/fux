@@ -1,0 +1,116 @@
+# `fux ingest` after it absorbed `fux update` — W-177, 2026-09-15
+#
+# Produced by: sh evidence/fixture.sh /tmp/demo && cd /tmp/demo && sh evidence/capture.sh
+# Engine: $(git rev-parse --short HEAD) working tree; fux-engine 2.0.1 + W-177
+# The fetcher is LOCAL and FAKE (evidence/fixture.sh). Nothing here touched a network.
+
+$ fux ingest
+fetching  2 listed URL(s) (network) — no dirty list yet, so nothing is known to be stale
+note: fux_url_fetcher declares MAX_PARALLEL = 1; max_parallel = 4 clamped to 1 - exceeding a fetcher's declared maximum is a correctness violation, not a preference
+  ! https://wiki.test/pinned — update=never; pinned, no fetch attempted; prior record kept
+ingested 3 docs (3 changed, 0 carried forward), 1 not indexed, 0 skipped, 3 shards written
+  not indexed https://wiki.test/pinned: update=never; pinned, no fetch attempted
+accelerator: 26 terms, 26 blocks, 29 postings (derived, not committed)
+# exit 0
+
+--- .fux/fetchers/CALLED (after the first bare ingest) ---
+https://wiki.test/runbook
+
+$ fux ingest
+fetching  2 listed URL(s) (network) — no dirty list yet, so nothing is known to be stale
+note: fux_url_fetcher declares MAX_PARALLEL = 1; max_parallel = 4 clamped to 1 - exceeding a fetcher's declared maximum is a correctness violation, not a preference
+  ! https://wiki.test/pinned — update=never; pinned, no fetch attempted; prior record kept
+ingested 3 docs (0 changed, 2 carried forward), 1 not indexed, 0 skipped, 0 shards written
+  not indexed https://wiki.test/pinned: update=never; pinned, no fetch attempted
+accelerator: 26 terms, 26 blocks, 29 postings (derived, not committed)
+# exit 0
+
+--- .fux/fetchers/CALLED (after a second bare ingest) ---
+https://wiki.test/runbook
+https://wiki.test/runbook
+
+$ fux ingest --no-fetch
+ingested 3 docs (0 changed, 2 carried forward), 0 not indexed, 0 skipped, 0 shards written
+accelerator: 26 terms, 26 blocks, 29 postings (derived, not committed)
+# exit 0
+
+--- .fux/fetchers/CALLED (after --no-fetch) ---
+https://wiki.test/runbook
+https://wiki.test/runbook
+
+$ fux ingest --refetch-all
+fetching  2 listed URL(s) (network) — `--refetch-all`
+note: fux_url_fetcher declares MAX_PARALLEL = 1; max_parallel = 4 clamped to 1 - exceeding a fetcher's declared maximum is a correctness violation, not a preference
+  ! https://wiki.test/pinned — update=never; pinned, no fetch attempted; prior record kept
+ingested 3 docs (0 changed, 2 carried forward), 1 not indexed, 0 skipped, 0 shards written
+  not indexed https://wiki.test/pinned: update=never; pinned, no fetch attempted
+accelerator: 26 terms, 26 blocks, 29 postings (derived, not committed)
+# exit 0
+
+--- .fux/fetchers/CALLED (after --refetch-all) ---
+https://wiki.test/runbook
+https://wiki.test/runbook
+https://wiki.test/runbook
+
+$ fux ingest --check
+  1 url document(s) not checked — verifying one means fetching it, and `--check` does not go to the network on its own
+  fresh  2 others
+nothing has drifted.
+# exit 0
+
+$ fux ingest --check --json
+{
+  "drifted": [],
+  "fresh": 2,
+  "unchecked_urls": 1
+}
+# exit 0
+
+$ fux ingest --failed
+nothing to fetch — 0 with a failing last run (`--failed`)
+ingested 3 docs (0 changed, 2 carried forward), 0 not indexed, 0 skipped, 0 shards written
+accelerator: 26 terms, 26 blocks, 29 postings (derived, not committed)
+# exit 0
+
+$ fux ingest --check --list-skipped
+  1 url document(s) not checked — verifying one means fetching it, and `--check` does not go to the network on its own
+  fresh  2 others
+nothing has drifted.
+# exit 0
+
+$ fux ingest --list-skipped
+# exit 0
+
+$ fux ingest https://wiki.test/runbook
+fetching  https://wiki.test/runbook (network — this entry only)
+note: fux_url_fetcher declares MAX_PARALLEL = 1; max_parallel = 4 clamped to 1 - exceeding a fetcher's declared maximum is a correctness violation, not a preference
+ingested 3 docs (0 changed, 2 carried forward), 0 not indexed, 0 skipped, 0 shards written
+accelerator: 26 terms, 26 blocks, 29 postings (derived, not committed)
+# exit 0
+
+$ fux ingest docs/nothing.md
+error: docs/nothing.md is not in any source list, so there is nothing to ingest. `fux add docs/nothing.md` lists it — `ingest` never creates a line
+# exit 1
+
+$ fux ingest --no-fetch docs/nothing.md
+error: docs/nothing.md is not in any source list, so there is nothing to ingest. `fux add docs/nothing.md` lists it — `ingest` never creates a line
+# exit 1
+
+$ fux update
+usage: fux [-h] [--version]
+           {setup,doctor,inspect,ingest,build,add,remove,ask,lexical,find,answer,verify,enrich,correct,mcp,hooks,daemon,explain,graph,path,tune,output} ...
+fux: error: argument command: invalid choice: 'update' (choose from setup, doctor, inspect, ingest, build, add, remove, ask, lexical, find, answer, verify, enrich, correct, mcp, hooks, daemon, explain, graph, path, tune, output)
+# exit 2
+
+$ fux ingest --refresh-urls
+usage: fux [-h] [--version]
+           {setup,doctor,inspect,ingest,build,add,remove,ask,lexical,find,answer,verify,enrich,correct,mcp,hooks,daemon,explain,graph,path,tune,output} ...
+fux: error: unrecognized arguments: --refresh-urls
+# exit 2
+
+--- .fux/fetchers/CALLED (at the end) ---
+https://wiki.test/runbook
+https://wiki.test/runbook
+https://wiki.test/runbook
+https://wiki.test/runbook
+

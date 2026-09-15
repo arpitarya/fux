@@ -156,8 +156,9 @@ arbitrary `.py` from `.fux/fetchers/` and call `fetch()` on it, over the network
   path, and the fetcher dir is its parent — so *where* fux imports from is
   already a config key, not a constant.
 - **The fence is the verb, not the name.** L4's two networked paths are
-  `fux add <URL>` and `fux update` (becoming `fux ingest` under
-  [W-177](W-177-ingest-absorbs-update.md)). Which fetcher file runs inside a
+  `fux add <URL>` and `fux ingest`
+  ([SR-CLI](../../records/0101_cli-surface.md) decision 16 — W-177 landed
+  2026-09-15 and renamed the second one). Which fetcher file runs inside a
   fenced path does not move the fence.
 
 **What actually changes** is that the *set of files that can be reached* goes
@@ -200,6 +201,7 @@ above them should stop implying the set is two.
 2. **Does `fux setup` grow a `--fetcher` scaffold** that writes a stub
    consumer fetcher with the contract docstring? ⚠ Out of scope here — filed as
    a question, not a task, because it is a new surface and SR-CLI owns it.
-3. **W-177 interaction.** `_urls_header()`'s prose names `fux update`, which
-   W-177 deletes. Whichever lands second fixes the sentence; neither blocks the
-   other.
+3. ✅ **W-177 interaction — RESOLVED, W-177 landed first** (2026-09-15).
+   `_urls_header()`'s prose named `fux update`; it names `fux ingest` and
+   `--refetch-all` now, and the attribute table it derives is unchanged, so this
+   item inherits a correct header and touches none of it.

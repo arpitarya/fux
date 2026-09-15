@@ -7,10 +7,10 @@ description: "Fux never fetches; a consumer-owned fetcher file does. One fetcher
 status: accepted
 date: 2026-08-19
 feature: the fetch contract, what it is called, and the two shipped templates
-owns: [src/fux/ingest/urlsrc.py@272f379006fc, src/fux/templates@0a36c48180eb]
+owns: [src/fux/ingest/urlsrc.py@3bcef2b31764, src/fux/templates@d5e6c07c50b7]
 laws: [L1, L3, L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 8a50db1c5ab7aad07e91d852e0441c1ce0cc247da671284b9ec27c3782269c0c
+content_sha: b97957c8e29abde95bc108a23571d77fbd83c5799b628ab51b30760ba20ac7bf
 ---
 
 # SR-FETCHER — the consumer-owned fetcher
@@ -19,7 +19,7 @@ content_sha: 8a50db1c5ab7aad07e91d852e0441c1ce0cc247da671284b9ec27c3782269c0c
 
 **Fux never fetches. Your fetcher does.** A Python file in your repo, named in
 `fux.toml`, loaded by path, called once per URL under either fenced path —
-`fux add <URL>` (that URL only) or `fux update` (all of them). Core holds **zero
+`fux add <URL>` (that URL only) or `fux ingest` (all of them). Core holds **zero
 network lines**, and that is the property this record exists to keep true.
 
 The file is called a *fetcher* and not middleware. Middleware composes: Django,
@@ -40,7 +40,7 @@ per-URL attribute all say one word.
 
 ```mermaid
 flowchart LR
-    L[".fux/sources/urls<br/>fetch= declares which"] --> R["fux add &lt;URL&gt; · fux update"]
+    L[".fux/sources/urls<br/>fetch= declares which"] --> R["fux add &lt;URL&gt; · fux ingest"]
     R --> P["load by path<br/>fux.toml [sources.url] fetcher"]
     P --> F[".fux/fetchers/*.py<br/>YOUR code"]
     F --> B["bytes + Content-Type"]
@@ -53,7 +53,7 @@ flowchart LR
 <summary><b>ASCII twin</b> — the same diagram, for terminals, diffs, and any reader without a Mermaid renderer</summary>
 
 ```text
-  .fux/sources/urls          fux add <URL> · fux update
+  .fux/sources/urls          fux add <URL> · fux ingest
   (fetch= declares which) -->  |  load by path from fux.toml
                                v
                      .fux/fetchers/*.py   <-- YOUR code, fux never rewrites it
@@ -92,7 +92,7 @@ MAX_PARALLEL = 1                 # optional module constant; absent means 1
 The retired key stops the run and says what to do:
 
 ```console
-$ fux update
+$ fux ingest
 error: fux.toml: [sources.url] middleware was renamed to fetcher — rename the
 key, and move the file from .fux/middleware/ to .fux/fetchers/ (SR-FETCHER)
 # exit 1
@@ -403,7 +403,7 @@ every request, and it is re-fetched every run while three stable URLs are not.
   working as designed rather than a defect in it.
 - **A validated URL is neither a fetch nor a skip**, and is counted separately —
   its prior record is correct and carried forward, which is the opposite of a
-  failure. `fux update` prints the count, because **an optimisation that fails
+  failure. `fux ingest` prints the count, because **an optimisation that fails
   silently in the safe direction looks identical to one that never ran.**
 
 **13. `is_rate_limited(exc) -> bool` — the optional sixth function. Ratified by

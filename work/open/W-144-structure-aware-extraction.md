@@ -8,6 +8,45 @@ lane: agent
 timestamp: 2026-09-12T00:00:00Z
 ---
 
+## ✅ RULED 2026-09-15 (Arpit, Cowork) — (b), a LOWER range, gated on a control that can lose
+
+**Ruling: option (b)** of the three the verdict put up — pre-register a lower `b`
+range — **with one condition**: the run does not start until the arm set carries a
+control family with regression headroom. Both existing controls (`inverse`,
+`placebo`) are saturated 30/30 in every arm, so *"nothing regresses"* on the
+probe is consistent with safety and is not evidence of it.
+
+**Not taken:** (a) the pre-registered fallback — it returns to option (b)-of-the-
+compare-doc, which W-155 showed destroys `dump`, a defect lowering `b` does not
+have; (c) stopping at `0.75` — the mechanism is confirmed and one-directional
+and bites at table shares a third of the ladder has.
+
+**Agent work, in order — a SEPARATE run, not a continuation of 2026-09-15-b-sweep:**
+
+1. **Add a control family that can regress** — e.g. `verbose`: same subject as
+   its rival at ~3× the prose, expected to LOSE at `b = 0.75` and to keep losing
+   at every value tried. If a lower `b` stops penalising verbosity, this arm
+   catches it. Name it, its expected direction and its floor in the
+   pre-registration before any number exists.
+2. **Pre-register the lower range, descending**, in
+   `work/regression/<date>-b-sweep-2/PRE-REGISTRATION.md`: `b ∈ {0.4 → 0.3 → 0.2 → 0.15}`,
+   families `dump` · `content` · `main` + `inverse` · `placebo` · **`verbose`**,
+   rule *first value netting positive on `dump`, `content` and `main` with every
+   control holding*, SR-RS d19 floor at the pair count actually run. The probe's
+   crossovers (`content` 0.4→0.3, `main` 0.2→0.15) are the reason for the range,
+   not the answer — first-that-clears still decides.
+3. Run on the golden ladder (verdict) and on fux's own docs tree (reopen-trigger
+   evidence only), in `fux-lab`.
+4. If a value clears: ship it as the `tune.toml [bm25f]` default, amend SR-TUNING
+   and SR-RANKING in the same change, L3 check, two-reader byte equality, and a
+   CHANGELOG line — `fux setup` writes `b` out in full, so a new default diverges
+   fresh clones from set-up repos.
+5. If no value clears with `verbose` holding: **stop and re-inbox**, with the
+   numbers. No second widening without a ruling.
+
+⚠ **`0.15` is far from the literature's `0.75`.** That is why the descending rule
+and the new control both exist; neither is optional.
+
 ## 🔴 THE SWEEP IS RUN, AND NO PRE-REGISTERED VALUE CLEARS (2026-09-15)
 
 [Verdict](../regression/2026-09-15-b-sweep/VERDICT.md) · `FAIL`.

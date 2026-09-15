@@ -11,7 +11,7 @@ owns: [tests/test_open_work_rows_are_short.py@01fe412431ad, tests/test_open_work
 laws: [L0]
 ratifies: W-146 ruling 1 · Arpit 2026-09-13 (archive, never delete)
 timestamp: 2026-09-13T00:00:00Z
-content_sha: c40c2d95dabb508d236cab9231b08bc0b8ce2d72f31f38bf05b78ea576e8493b
+content_sha: bfe398da0bc69a0c8554f6c6900c47bab601870cf5efbdcfb22535d189b201d0
 ---
 
 # SR-WORK-OPEN-QUEUE — how OPEN-WORK works
@@ -209,6 +209,16 @@ that is the only thing the file says.
     `tests/test_open_work_is_not_stale.py` and `tests/test_open_work_rows_are_short.py`
     accept an empty table only on that declaration — a table that is merely
     empty is a moved heading until proven otherwise. (First emptied 2026-09-14.)
+    ⚠ **A Cowork session violated this on 2026-09-15** — emptied the table
+    correctly but closed it with a multi-paragraph recap instead of the one
+    declaration line ([`work/LESSONS.md`](../work/LESSONS.md)). Two PostToolUse
+    guards now surface the same check inside the session rather than only at
+    the next test run — `scripts/check-open-work-inbox.py`, run from
+    [`.claude/hooks/guard-open-work-inbox.sh`](../.claude/hooks/guard-open-work-inbox.sh)
+    (blocks) and
+    [`.codex/hooks/guard-open-work-inbox.sh`](../.codex/hooks/guard-open-work-inbox.sh)
+    (advisory — Codex's PostToolUse deny contract is unconfirmed here). **Neither
+    is the rule; the two tests above are, and stay maintained.**
 
 **G · Standing, and forbidden**
 

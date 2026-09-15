@@ -319,7 +319,7 @@ def _sweep(root: Path) -> dict:
       go on.
     * **An `"ok"` sweep could skip URLs silently.** Two of seven did in the
       2026-08-27 real-network run, and the only surface that said so was a
-      foreground `fux update` nobody runs.
+      foreground `fux ingest` nobody runs.
 
     So `reason` explains a failure and `fetched`/`skipped` describe every
     outcome — an `"ok"` with `skipped: 2` is the case the old shape could not
@@ -356,7 +356,7 @@ def _sweep(root: Path) -> dict:
         # The FIRST skip's reason, not a list: the status file is a fixed-size
         # courtesy, and an unbounded field on a file written every sweep is how a
         # runtime file grows without anyone deciding it should. The count says
-        # how many; `fux update` and the enrich queue carry the rest.
+        # how many; `fux ingest` and the enrich queue carry the rest.
         first = skipped[0]
         out["reason"] = f"{len(skipped)} skipped, first: {getattr(first, 'reason', '?')}"[:300]
     return out

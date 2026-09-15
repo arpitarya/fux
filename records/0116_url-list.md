@@ -10,7 +10,7 @@ feature: "`.fux/sources/urls` — the file format itself, and the one grammar bo
 owns: [src/fux/ingest/sourcelist.py@55a5f3e2ee67]
 laws: [L2, L3, L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 9b0d0e031209f49106bc3db16e81ca1a50b1ea55a538b50d92432aba2dbe368a
+content_sha: ecf7fb3d2e9967c972d583d3f53a411adf450422ea88bf01a8376105242dbad1
 ---
 
 # SR-URL-LIST — the committed URL list
@@ -107,7 +107,7 @@ A URL that fails to fetch is a **skip**, not a deletion — the list is the
 statement of intent, and only removing a line removes a document:
 
 ```console
-$ fux update
+$ fux ingest
 ingested 7 docs (5 changed), 1 skipped, 5 shards written
   skip https://example.invalid/gone: fetch failed: 404 not found
 ```
@@ -245,7 +245,7 @@ edited manually"* from a policy into an observation anyone can make. The check
 belongs to `fux doctor`; the rule is here because it is a property of the
 format.
 
-**14. `update = auto|never` — whether `fux update` goes out for a line at all**
+**14. `update = auto|never` — whether `fux ingest` goes out for a line at all**
 (Arpit, 2026-09-05, ruling R-1; built 2026-09-11). A line could say how to reach
 a document, how to store it and how long a citation could go unchecked, and
 **could not say whether to go back for it.**

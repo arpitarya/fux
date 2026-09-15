@@ -297,7 +297,7 @@ def _assert_invariants(path: Path, lineno: int, line: bytes, record: dict) -> No
         if record.get("title_h") == example:
             migration = (
                 " This record's `title_h` predates the `h:` prefix "
-                "(SR-INDEX-LIFECYCLE): re-run `fux ingest --refresh-urls` to rewrite it."
+                "(SR-INDEX-LIFECYCLE): re-run `fux ingest` to rewrite it."
             )
         raise FuxError(
             f"{path}:{lineno}: the quoted 16-hex token {example!r} appears outside `terms` in "

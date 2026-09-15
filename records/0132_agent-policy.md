@@ -7,10 +7,10 @@ description: "Fux's readers are AI agents, and an engine whose output is misread
 status: accepted
 date: 2026-08-22
 feature: the agent-facing policy and skill artifacts Fux ships, and their installer
-owns: [src/fux/templates/agents@43209a8b0645]
+owns: [src/fux/templates/agents@d88094bdc334]
 laws: [L1, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 0fefd4038d6be06c7105b683e2b0026a7e22e296063a3f11478bd534e5ac4ecd
+content_sha: 53aca8ebaaa77749faeee8f93f94b3615a3dbfb4490f8046d40baff0f741aa07
 ---
 
 # SR-AGENT-POLICY — shipping the policy, not just the facts
@@ -591,7 +591,7 @@ it states behaviour rather than linking a record — the same shape
 from the code, not from the records**, and cross-checking them turned up
 disagreements between records and code, and defects in the code, filed in
 `work/OPEN-WORK.md` rather than papered over here. Where a guide names a
-workaround for a defect (`fux add <URL> --no-update`, `fux update --failed`, a
+workaround for a defect (`fux add <URL> --no-update`, `fux ingest --failed`, a
 URL citation the shipped fetchers cannot verify), **fixing the defect must edit
 the guide in the same change** — the templates ship in the same wheel as the
 code. Nothing enforces that; this sentence is the guard.

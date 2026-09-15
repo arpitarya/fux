@@ -10,7 +10,7 @@ feature: the acquired plane
 owns: [src/fux/store/acquired.py@9897ee1fe4af]
 laws: []
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 69bcf0261b5c3bc1a1c1e9f80b2930ebe055cbe6fb3355d6116b5fa91edf702c
+content_sha: a206982343b9b607a919119a9211eb7c0d4fd4dc00e5812e3f1da7d24ac6b27f
 ---
 
 # SR-ACQUIRED: fetched bytes are kept, in a plane that is neither committed nor derived
@@ -173,7 +173,7 @@ a warning's shape rather than a refusal's.
 
 ⚠ **The first row said *"and no socket opens"* and that was WRONG for as long as
 it stood** (corrected 2026-09-14, W-174). `update=` is the **update-time**
-clock: it stops `fux update` and `ingest --refresh-urls`, and
+clock: it stops `fux ingest` and `ingest --refresh-urls`, and
 [SR-URL-FRESHNESS](0147_url-freshness.md) decision 15 says in as many words
 that it *"still does not keep `answer` offline"*. A pinned line still opened a
 socket on every answer. **The sentence read as authority and described

@@ -7,11 +7,11 @@ description: "One record owns the health-check surface. Every check names a caus
 status: accepted
 date: 2026-09-11
 feature: "`fux doctor` — the read-only, offline health command and its check register"
-owns: [src/fux/doctor.py@f5ce38d8a703, tests/test_doctor_register_is_complete.py@6c3d2378d45f]
+owns: [src/fux/doctor.py@fdd7d3fd867b, tests/test_doctor_register_is_complete.py@6c3d2378d45f]
 laws: [L4, L8]
 ratifies: "Arpit, 2026-09-11 — *create a new adr for doctor*"
 timestamp: 2026-09-11T00:00:00Z
-content_sha: e260b0b6c738d226a787d4bd543e0ee04ebb1d7ceb6a3b716fa2097223174601
+content_sha: a6bb68c903e9fd666307d8a9830e765bdcbf98fe5ae5006ea0be601181651b96
 ---
 
 # SR-DOCTOR — the health command, and who owns its rows
@@ -184,7 +184,7 @@ authoritative about the row.**
 | `url extraction depth` | warn | a `url:` record whose extracted text is under `THIN_URL_SHARE` of its retained bytes — the `http` fetcher runs no JavaScript, so a single-page app returns a full-size shell and decodes to its nav bar. Read from the committed index and `.fux/acquired/`, never a fetch. ⚠ **Advisory and deliberately loose**: it surfaces the obvious case and adjudicates no extraction quality; `--cdp` is the remedy and whether a page needs one is the consumer's call | [SR-HTTP-FETCHER](0119_http-fetcher.md) |
 | `confidence floors` | warn | `[confidence] separation_floor = 0.0` in `.fux/tune.toml`, which makes `weak` UNREACHABLE for every answer in the repo. 🔴 [SR-CONFIDENCE](0141_confidence.md) decision 13 says of itself that *"nothing mechanical catches it"*; this is the catch. **Reports, never refuses** — zero is a legal value and decision 13 reversed a lock on exactly the reasoning that fux states costs rather than clamping knobs. ⚠ **A merely LOW floor is not reported**: only zero changes what the band can SAY. ⚠ **`doc_coverage_floor = 0.0` is that clause's shipped default** and is never reported. The same sentence is printed once per process on `ask`'s stderr, suppressed under `--json` and MCP | [SR-CONFIDENCE](0141_confidence.md) decision 13 |
 | `fetcher optional functions` | warn | which of `validate()` / `is_rate_limited()` the consumer's fetcher implements — **read as text, never imported** | [SR-FETCHER](0117_fetcher.md) decisions 12–13 |
-| `url sources` | warn | per-URL health from the committed index, **the listed URLs that have never been fetched and so have no record at all** (SR-MAINTENANCE decision 5a's stated cost, built 2026-09-12), the concurrency policy, and **the `update=never` count with the `keep=false` ones named** — a pinned URL is one `fux update` will never go out for again, which is otherwise learnable only by reading every line of the list | [SR-URL-LIST](0116_url-list.md) decisions 14/14b |
+| `url sources` | warn | per-URL health from the committed index, **the listed URLs that have never been fetched and so have no record at all** (SR-MAINTENANCE decision 5a's stated cost, built 2026-09-12), the concurrency policy, and **the `update=never` count with the `keep=false` ones named** — a pinned URL is one `fux ingest` will never go out for again, which is otherwise learnable only by reading every line of the list | [SR-URL-LIST](0116_url-list.md) decisions 14/14b |
 | `background runner` | warn | is a runner live, how many documents pend, is the lock held or stale, did the last run fail. **Read-only: a stale lock is named, never cleared** | [SR-MAINTENANCE](0129_hooks.md) decision 1c |
 | `url daemon` | warn | the refresh daemon's state | [SR-URL-FRESHNESS](0147_url-freshness.md) |
 

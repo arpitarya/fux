@@ -24,6 +24,10 @@ floor on golden data ([SR-LAW-0](../../records/0002_LAW-0-authority.md) decision
 still want link-dependent golden questions (SR-RS d23 — Codex's hands, never
 Claude's, **available 2026-09-30**); the build does not wait on them.
 
+✅ **2026-09-15, later: Codex delivered both question sets and the 2026-09-30 gate
+is void.** It changes nothing here, which is the point — see below. The arms now
+wait on [W-191](W-191-the-ladder-carries-no-links.md).
+
 🔴 **Corrected 2026-09-15 — questions are NOT what the arms are waiting on.**
 [The anchor mechanism probe](../regression/2026-09-15-anchor-mechanism/report.md)
 counted the ladder's edges: **0 `ref` edges on all eight rungs**, every edge

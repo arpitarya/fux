@@ -7,10 +7,10 @@ description: Flat verbs in seven groups, one error boundary, three output modes.
 status: accepted
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@ab77abe7a32c, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@c6e607249ea0, src/fux/progress.py@925dccc045ce]
+owns: [src/fux/cli.py@9a75c5894fb0, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@b9295123f1b4, src/fux/progress.py@925dccc045ce]
 laws: [L1, L4, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 9e6a2594849ac02a4a23fb6ab4f21426cd16c0f26e711996cbc4da3e1411c876
+content_sha: 9f5b552f938d9833f5e6ce7cfe075486a25aca64f23dd2add23931eef64cb9ca
 ---
 
 # SR-CLI — the command-line surface
@@ -22,8 +22,8 @@ content_sha: 9e6a2594849ac02a4a23fb6ab4f21426cd16c0f26e711996cbc4da3e1411c876
 | group | verbs | |
 |---|---|---|
 | **lifecycle** | `setup` · `doctor` · `inspect` | set the repo up, check the environment, then X-ray the index — `doctor`'s fix is a command or a config edit, `inspect`'s is a change to the corpus ([SR-INSPECT](0156_inspect.md)) |
-| **write** | `ingest` · `build` | one writes the committed plane, one derives from it |
-| **sources** | `add` · `remove` · `update` · `enrich` · `correct` | maintain what is indexed — `add` and `remove` write lines, `update` never touches one, `enrich` plans and validates a MODEL's text, and `correct` writes one question a PERSON typed ([SR-ENRICH](0137_enrich.md) decision 19) |
+| **write** | `ingest` · `build` | one writes the committed plane, one derives from it. **`ingest` is the first ingest AND every re-ingest**, directories and URLs alike — decision 16 |
+| **sources** | `add` · `remove` · `enrich` · `correct` | maintain what is indexed — `add` and `remove` write lines and end in an ingest, `enrich` plans and validates a MODEL's text, and `correct` writes one question a PERSON typed ([SR-ENRICH](0137_enrich.md) decision 19). ⚠ **`update` was a fourth verb here and decision 16 deleted it** |
 | **read** | `ask` · `find` · `answer` · `lexical` | differ only in how much they commit to. `lexical` is the words alone, **frozen** — decision 12 |
 | **graph** | `explain` · `graph` · `path` | answer with **relationships**, never with a ranking |
 | **serve** | `mcp` · `daemon` | long-running processes; the only verbs that do not return |
@@ -154,7 +154,7 @@ teeth for this project specifically —
 the constraint. A new verb takes flags or positionals, never a subcommand tree,
 and lands in one of the groups in §1 or argues for a new one in this record.
 
-**1a. `add` / `remove` / `update` maintain the corpus, over all three source
+**1a. `add` / `remove` maintain the corpus, over all three source
 lists.** The entry picks the list — anything with a `scheme://` is a URL,
 `--types` says type pattern, everything else is `dirs`, which already accepts a
 directory *or* a single file. The common cases need no flag at all, which is
@@ -173,13 +173,17 @@ excludes** — the types list has no subtraction, so a pattern that is not in it
 is an error naming `.fux/.fuxignore`. A leftover `.fux/sources/types` stops every
 verb until `fux setup` converts it.
 
-**1b. `add` and `remove` write lines; `update` never touches one.** One
-sentence, and it is the whole reason three verbs do not overlap. Attribute
+**1b. `add` and `remove` write lines; `ingest` never touches one.** One
+sentence, and it is the whole reason the verbs do not overlap. Attribute
 edits belong to `add`, which is already an upsert. Re-reading a source belongs
-to `update`, which is why `fux update <entry>` can take an entry without that
+to `ingest`, which is why `fux ingest <entry>` can take an entry without that
 meaning "create it" — an entry nobody listed is a loud error, because an
-`update` that silently created lines would be a second `add`. Re-fetching is
-re-reading, so it is `update`'s.
+`ingest <entry>` that silently created lines would be a second `add`.
+Re-fetching is re-reading, so it is `ingest`'s.
+
+⚠ **This sentence named `update` until 2026-09-15**, when decision 16 deleted
+that verb and moved its whole surface here. The rule did not change; the verb
+under it did.
 
 **1c. `fux add <URL>` fetches that one URL.** Scoped to the URL just added,
 announced on stderr, `--no-fetch` to opt out. Recording a URL without fetching
@@ -205,8 +209,13 @@ line because a site was down would make the committed list a function of
 network weather.
 
 **1d. The engine has exactly two named networked paths, and this record names
-them**: `fux add <URL>` and `fux update`. Both are fenced, both are opt-in per
-invocation, both announce on stderr that they went out.
+them**: `fux add <URL>` and `fux ingest`. Both are fenced, both announce on
+stderr that they went out.
+
+⚠ **"Opt-in per invocation" stopped being true of the second one on
+2026-09-15** (decision 16). A bare `fux ingest` goes to the network, so the
+opt-in is now the *verb* rather than a flag on it, and the opt-**out** is
+`--no-fetch`. **The count is not the law and never was** — see decision 16.
 
 **L4's text does not change, and must not.** It reads *"network access only
 inside explicit, fenced, opt-in paths"* — already plural, already satisfied.
@@ -650,7 +659,7 @@ accelerator rebuilt from the committed index: 3 docs, 78 terms, 78 blocks, 82 po
 # exit 0
 ```
 
-#### `fux add` / `fux remove` / `fux update` — maintain what is indexed
+#### `fux add` / `fux remove` — maintain what is indexed
 
 **`add` records and then does the work** — one of the engine's two named
 networked paths when the entry is a URL, and it says so on stderr:
@@ -734,12 +743,27 @@ captured from the shipped CLI, not written by hand** (W-165):
 3. **Removing it twice is exit 1.** Removing something already removed is an
    error, which is the contract the `!`-line form kept.
 
-**`update` re-reads; `--check` writes nothing** and is offline for files:
+**`fux ingest` re-reads; `--check` writes nothing** and is offline for files:
 
 ```console
-$ fux update --check
+$ fux ingest --check
   fresh  2 others
 nothing has drifted.
+# exit 0
+```
+
+**And the bare verb says what it is about to go out for** (decision 16a):
+
+```console
+$ fux ingest
+fetching  1 of 1 listed URL(s) (network) — 1 known stale. `fux ingest --refetch-all` fetches every one
+ingested 4 docs (1 changed, 3 carried forward), 0 not indexed, 0 skipped, 1 shards written
+accelerator: 24 terms, 24 blocks, 25 postings (derived, not committed)
+# exit 0
+
+$ fux ingest --no-fetch
+ingested 4 docs (0 changed, 4 carried forward), 0 not indexed, 0 skipped, 0 shards written
+accelerator: 24 terms, 24 blocks, 25 postings (derived, not committed)
 # exit 0
 ```
 
@@ -779,9 +803,12 @@ refusing.
 | `--plain` / `--hashed` | `add` | URLs: record `meta=`. Same rule |
 | `--archived` | `add` | dirs: record `archived=true` |
 | `--no-ingest` | `add` · `remove` | edit the line only — the `git remote add` behaviour, on request |
-| `--no-fetch` | `add` | URLs: record and ingest offline |
+| `--no-fetch` | `add` · `ingest` | URLs: record and ingest offline. On `ingest` it is the whole offline form |
 | `--dry-run` | `add` · `remove` | print the line and the plan; write nothing |
-| `--check` | `update` | read-only drift report; does not fetch |
+| `--check` | `ingest` | read-only drift report; does not fetch. Beats `--list-skipped` when both are given ([SR-INGEST](0106_ingest.md) decision 21) |
+| `--refetch-all` | `ingest` | fetch every listed URL, not only the stale ones. **Named `--all` on `fux update`** — decision 16b |
+| `--failed` | `ingest` | fetch only the URLs whose last run failed; the most specific selector |
+| `--no-fetch` | `ingest` | open no socket. Same flag, same meaning as on `add`; what `fux hooks` writes |
 
 #### `fux ask` — ranked results with scores
 
@@ -938,14 +965,15 @@ usage: fux [-h] [--version] {…} ...      # … verb list omitted; it is build_
 
 ---
 
-⚠ **`fux update --all` added 2026-08-28** (W-82 ruling 3). `update` now refreshes
-only the URLs the dirty list names; `--all` forces the full sweep. **There is
+⚠ **`fux update --all` added 2026-08-28** (W-82 ruling 3), **and it is
+`fux ingest --refetch-all` since 2026-09-15** (decision 16b). The verb refreshes
+only the URLs the dirty list names; the flag forces the full sweep. **There is
 deliberately no `--dirty`/`--stale`/`--changed`** — if the dirty list is the right
 thing to refresh, it should not have to be asked for. A behaviour change to a
 shipped verb, free now and a deprecation cycle once anyone scripts it. See
 [SR-URL-INGEST](0107_url-ingest.md) decision 8.
 
-⚠ **`fux update` prints a validated-URL count from 2026-08-28.** One line:
+⚠ **The networked verb prints a validated-URL count from 2026-08-28.** One line:
 `N URL(s) unchanged by validate(); no body fetched`. **An optimisation that
 fails silently in the safe direction looks identical to one that never ran**, so
 the count is the only way a person can tell `validate()` is working. Silent when
@@ -980,7 +1008,7 @@ design.
 
 **`fux add <URL> --no-update`** records `update=never`
 ([SR-URL-LIST](0116_url-list.md) decision 14): this document is pinned and
-`fux update` will not fetch it again.
+`fux ingest` will not fetch it again, `--refetch-all` included.
 
 ⚠ **That `add` still fetches ONCE, and `--help` says so rather than only this
 record.** One fetch is what makes the line ingestable at all — a pinned URL that
@@ -995,7 +1023,7 @@ to the ordinary narrow pass, so it fetched the **stale** set and reported that
 as a success. Nothing in the surface capture could show it: the flag parsed, the
 command exited 0, and the summary was a true statement about a different
 selection. Fixed 2026-09-11 (W-140 row 4); `--failed` is the most specific
-selector and wins over `--all`, because answering a narrower request with a
+selector and wins over `--refetch-all`, because answering a narrower request with a
 wider sweep is the same defect wearing a different hat.
 
 **What this costs the capture:** a verbatim capture proves a flag is *accepted*,
@@ -1026,7 +1054,8 @@ first flag whose value is a duration, and it is parsed by
 ([SR-URL-FRESHNESS](0147_url-freshness.md) decision 10). A second duration
 parser on this surface would be the drift that decision exists to prevent.
 
-**`fux update --check --json`** (W-140 row 14, 2026-09-12). The verb whose
+**`fux ingest --check --json`** (W-140 row 14, 2026-09-12; `fux update --check
+--json` until decision 16 moved the verb). The form whose
 entire purpose is being read by something else had no machine-readable output —
 and it **exits 0 whether or not anything drifted**, deliberately, because drift
 is a fact and a non-zero exit would make *your docs changed* look like a broken
@@ -1038,7 +1067,7 @@ on the answer: parse a table meant for a person.
 - **The structured view is built beside the text, never parsed out of it** —
   one traversal, two renderings. A JSON view derived from a human table is a
   second format that can disagree with the first.
-- **`update` joins `CLI_VERBS` with an EMPTY key tuple**, like `doctor` and
+- **`ingest` joins `CLI_VERBS` with an EMPTY key tuple**, like `doctor` and
   `hooks`: the empty tuple is the declaration that this verb is shaped by
   [SR-OUTPUT](0143_output-defaults.md), and an absent entry would leave
   `--json` unresolvable from `[cli.json]`.
@@ -1088,6 +1117,76 @@ calling consumer code once per request is a different decision.
 look broken because somebody's analytics is. Everything in that path — finding
 the root, reading `fux.toml`, the dispatch itself — is wrapped, and a malformed
 `fux.toml` falls back to the default cap rather than failing twice.
+
+
+**16. 🔴 `fux update` is DELETED and `fux ingest` absorbs its whole surface**
+(Arpit, 2026-09-15, Cowork; W-177). **One verb over the corpus:** the first
+ingest and every re-ingest, for directories and URLs alike.
+
+> *"Remove `fux update` completely. I want `--check` to be there in ingest as
+> well. `--all`, `--failed`. Everything that is there in update, move it to
+> ingest. The first time you ingest something you'll be using `fux ingest`;
+> next time when you're trying to update something you'll still be using `fux
+> ingest`, be it for directories, be it for URLs."*
+
+**16a. A bare `fux ingest` goes to the network.** It fetches the URLs known to
+be stale and announces it on stderr. **Narrow-by-default survives the move
+untouched** — [SR-URL-INGEST](0107_url-ingest.md) and W-82 ruling 3 are about
+*which* URLs, never which verb, and nothing here reopens them.
+
+**16b. The flags, and the one rename.**
+
+| on `update` | on `ingest` | owned by |
+|---|---|---|
+| *(bare)* | *(bare)* — fetch the stale URLs | this record, [SR-INGEST](0106_ingest.md) |
+| `--all` | **`--refetch-all`** | [SR-URL-INGEST](0107_url-ingest.md) |
+| `--failed` | `--failed`, still the most specific selector | [SR-URL-FRESHNESS](0147_url-freshness.md) |
+| `--check` | `--check` — read-only, offline, **exit 0 always** | [SR-INGEST](0106_ingest.md) |
+| `--json` | `--json`, the drift report | [SR-OUTPUT](0143_output-defaults.md) decision 15 |
+| `<entry>` | positional `<entry>`, one listed entry | this record, decision 1b |
+| — | **`--no-fetch`**, the offline form | this record, decision 16c |
+
+**`--all` is renamed because of where it lands.** On `update` it sat alone; on
+`ingest` it sits beside `--full`, and *all* and *full* read as synonyms while
+one selects **URLs** and the other re-extracts **documents**. One of them opens
+a socket and the other cannot.
+
+**16c. The offline form is `fux ingest --no-fetch`** — the same flag, with the
+same meaning, that `fux add` already carries. It is **public surface on
+purpose**: CI and an air-gapped clone have to be able to ask for an offline
+ingest by hand. **No `--offline` alias.**
+
+**16d. The hook/daemon split is by CALLER, not by flag default.** `fux hooks`
+writes `--no-fetch` into `post-merge`; `fux daemon` writes the bare verb. The
+freshness daemon is the thing whose job *is* freshness; a git hook stays
+local-only. `--spawn-runner` and `--runner` inherit whichever side spawned
+them, and the hook side is offline by construction.
+
+**16e. No deprecation alias, and the hidden `--refresh-urls` goes too.** W-63
+deleted `fux url` outright and kept `ingest --refresh-urls` only because that
+flag was older and likelier to be in someone's CI. `update` was **three weeks
+old** and the same argument does not reach it. `--refresh-urls` is worse than
+gone: on the verb it now sits on it would silently name *what already happens*.
+**The break rides 3.0**, not a 2.1 patch — 3.0 is already the breaking release
+— and `CHANGELOG.md` carries a breaking-change block.
+
+**16f. What this REVERSES, and why that is legal.**
+[W-63](../archive/open/W-63-source-verbs.md) decision 3 folded
+`fux ingest --refresh-urls` into `fux update` so the engine would have exactly
+two networked paths, *both explicitly named*. This reverses that; the paths are
+`fux add <URL>` and `fux ingest` now.
+
+🔴 **No law changes, and the reason is in the law.**
+[SR-LAW-4](0006_LAW-4-offline-by-default.md) says *paths*, plural, and its own
+§"The narrowing that already happened once" is the record of exactly this
+mistake — **reading a count as the rule** — being made before. Decision 1d's
+count was a fact about the surface of the day, never a constraint on it.
+
+⚠ **What the move costs.** `fux ingest` was offline *by construction* and the
+import fence asserted that the modules on its path cannot import a transport.
+After this it cannot be. **The fence does not disappear — it moves**: the L4
+test now asserts that an ingest invoked with `--no-fetch` imports no transport
+and opens no socket, which is the invocation the git hooks actually run.
 
 
 ### Consequences

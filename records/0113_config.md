@@ -7,10 +7,10 @@ description: "A deliberately tiny config: what each key does, why the surface is
 status: accepted
 date: 2026-08-18
 feature: "`fux.toml` — discovery, schema, validation, and the keys that are refused rather than ignored"
-owns: [src/fux/config.py@e83604b36345]
+owns: [src/fux/config.py@80082dd02b86]
 laws: [L4, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 522bde9099243cf9ea06a1c5a4e64d6387ab45377e5ea36bd6fc24c14cd279df
+content_sha: a05ad203aa030255fea9e9ccf08a38abace15048b0bfaed789f11c50a2227879
 ---
 
 # SR-CONFIG — `fux.toml` and every property in it
@@ -172,7 +172,7 @@ value is an error, not a silent override: the shard function is
 tree. The key exists so the number is *visible* rather than folklore.
 
 **4. `[sources.url]` is entirely optional.** Absent means no URL source, and
-`fux update` has nothing to do.
+`fux ingest` has nothing to do.
 
 **5. `fetcher` and `urls_file` default to `.fux/fetchers/http.py` and
 `.fux/sources/urls`.** Both are repo-relative paths, and both defaults are the
@@ -578,7 +578,7 @@ exits, because Python cannot safely interrupt arbitrary consumer code.
   every mechanical check will pass.** This record once stated *"`None` means
   whatever the fetcher declares"* four paragraphs above *"default `4` when a
   fetcher declares more"*; the code implemented the second sentence's opposite,
-  and an unconfigured `fux update` opened eight concurrent connections to one
+  and an unconfigured `fux ingest` opened eight concurrent connections to one
   intranet host. **The freshness gate checks that a record was *touched*, never
   that it is *coherent*.** That is the reason this record carries no amendment
   layers at all.

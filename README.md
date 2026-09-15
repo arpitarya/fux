@@ -104,7 +104,7 @@ keeps the derived and fetched parts out of git ([SR-DOTFUX](records/0102_fux-dir
 | Index another folder, file or URL | `fux add <path-or-url>` |
 | Mark a folder as history | `fux add old/2023-platform --archived` |
 | Stop indexing something | `fux remove <entry>`, or a line in `.fux/.fuxignore` |
-| Re-read sources and re-fetch URLs | `fux update` (`--check` only reports drift) |
+| Re-read sources and re-fetch URLs | `fux ingest` — the same verb as the first time. `--check` only reports drift; `--no-fetch` stays offline |
 | Follow links between documents | `fux explain <doc>` · `fux graph "…"` · `fux path <a> <b>` |
 | Explore around documents you name | `fux graph --seed <doc> [--seed <doc>…]` |
 | The same ranking from the words alone | `fux lexical "…"` — BM25F, frozen; the baseline, not a better `ask` |

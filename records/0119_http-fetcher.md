@@ -10,7 +10,7 @@ feature: "`.fux/fetchers/http.py` — the fetcher a URL gets when its line says 
 owns: []
 laws: [L1, L4, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 3955f8d8253d728ad74bcc14a2daa27311571d4df4fc97521865e5c7e1bbde8f
+content_sha: fc929a63e1a8f5afe1fdbad1e2df79cc600f02d818a78e5590bf0c58078b5640
 ---
 
 # SR-HTTP-FETCHER — the default fetcher
@@ -82,7 +82,7 @@ flowchart LR
 plain GET would have served.
 
 ```console
-$ fux update
+$ fux ingest
 error: [sources.url] fetcher not found: .fux/fetchers/cdp.py
 # exit 1
 ```
@@ -95,7 +95,7 @@ $ cat .fux/sources/urls
 https://example.com/docs/api
 https://wiki.corp/display/ENG/runbook    fetch=cdp
 
-$ fux update
+$ fux ingest
 ingested 2 docs (2 changed), 0 skipped, 2 shards written
 ```
 

@@ -57,8 +57,8 @@ def test_parser_has_the_verb_surface():
 
     lifecycle `setup`/`doctor` set the repo up and check it · write
     `ingest`/`build` — one writes the committed plane, one derives from it ·
-    sources **`add`/`remove`/`update`** maintain what is indexed (W-63,
-    replacing `url`) · read `ask`/`find`/`answer` differ only in how much they
+    sources **`add`/`remove`** maintain what is indexed (W-63, replacing `url`;
+    `update` joined them there and W-177 folded it into `ingest`) · read `ask`/`find`/`answer` differ only in how much they
     commit to · **graph `explain`/`graph`/`path` answer with relationships
     rather than with rankings** (M3) · maintenance `hooks` wires the
     repository up to keep its own index in step (M5).
@@ -89,10 +89,15 @@ def test_parser_has_the_verb_surface():
     adding one costs a line here and a line in SR-CLI rather than a redesign.
 
     **`url` is gone, not deprecated** (W-63). It was four days old, pre-1.0,
-    and its whole surface is `fux add <URL>` / `fux remove <URL>`. The flag
-    `ingest --refresh-urls` was the opposite call — older, likelier to be in
-    someone's CI — and survives one release as a hidden alias for
-    `fux update`, which is asserted below.
+    and its whole surface is `fux add <URL>` / `fux remove <URL>`.
+
+    🔴 **`update` is gone too, and so is the hidden `--refresh-urls` alias**
+    (W-177, Arpit 2026-09-15). `fux ingest` absorbed the whole verb — the first
+    ingest and every re-ingest, dirs and URLs alike — so the alias now names
+    the default behaviour of the flag's own verb, which is worse than no alias
+    at all. **No deprecation shim:** W-63 kept `--refresh-urls` because it was
+    older and likelier to be in someone's CI, and `update` was three weeks old
+    when it went. The break rides 3.0.
     """
     parser = build_parser()
     sub_actions = [a for a in parser._subparsers._group_actions if a.dest == "command"]
@@ -103,7 +108,6 @@ def test_parser_has_the_verb_surface():
         "build",
         "add",
         "remove",
-        "update",
         "output",
         "ask",
         "find",

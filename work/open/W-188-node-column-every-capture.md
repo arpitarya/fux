@@ -12,13 +12,36 @@ ball: agent
 
 # W-188 — Node as a column in CAP-1, CAP-2, CAP-3 and CAP-4
 
-🔴 **RATIFIED 2026-09-15, NOT BUILT.** The measurement runs on Arpit's machine
+✅ **THE HARNESS AND THE REPORT ARE BUILT (2026-09-15). The RUN is what is
+left.** `bench.py` gained `answer_node`, `--node-arms` on `hits` and `answers`,
+`RANK_PAIRS` with the `version`/`reader`/`tier` split, and `parity.jsonl`;
+`report.py` gained the parity fill and `TEMPLATE.html` a reader-parity slide.
+Exercised end to end on a **synthetic fixture** — four arms through CAP-1,
+CAP-3, CAP-4 and the parity table, with both callout branches. 🔴 **No filed
+number exists yet**, because the measurement runs on Arpit's machine
 (`fux-benchmark`, node, the corpora ladder) and **cannot run from a Cowork
 bridge shell** — no interpreter here can import `fux` and the arm venvs are not
 reachable. This file is the spec; the run is Claude Code's.
 
-**Model: Sonnet** for the harness wiring; **Opus** for the parity verdict if the
+**Model: Sonnet** to execute the run; **Opus** for the parity verdict if the
 discordant count comes back non-zero.
+
+## What is left, exactly
+
+```bash
+bin/bench.py latency --run <r> --corpus docs-00100 --node-arms B-node
+bin/bench.py hits    --run <r> --corpus docs-00100 --node-arms B-node
+bin/bench.py answers --run <r> --corpus docs-00100 --node-arms B-node
+bin/bench.py rankdiff --run <r>          # writes parity.jsonl as well
+bin/bench.py file    --run <r> --dest <fux>/work/regression/<r>
+bin/bench.py report  --dest <fux>/work/regression/<r>
+```
+
+⚠ **`answer_node` has never been executed.** The Node reader accepts `--band`
+(`node/fux.mjs`), but whether its payload carries the same `confidence` shape
+Python's does is exactly what nobody has checked — if the block is absent every
+Node row will read `answered` and the column will look like a fabrication
+machine. **Check one question by hand before the sweep.**
 
 ## The ruling
 
@@ -28,9 +51,11 @@ discordant count comes back non-zero.
 
 Two forks he settled in the same exchange:
 
-- **Every run, as columns** — `B-node` and `B-node-nograph` join CAP-1, CAP-2,
-  CAP-3 and CAP-4, exactly as decision 12 put them in CAP-6. Not a separate
-  parity run.
+- **Every run, as a column** — `B-node` joins CAP-1, CAP-2, CAP-3 and CAP-4,
+  exactly as decision 12 put it in CAP-6. Not a separate parity run.
+- 🔴 **`B-node-nograph` is NOT an arm** (Arpit, later the same day): a benchmark
+  measures what ships and the graph tier ships on. **The arms are `A` · `B` ·
+  `B-node`.** Decision 16a.
 - **A reported capture, not a gate** — a disagreement is shown (discordant
   count, first differing rank, max score delta) and a person reads it. A
   benchmark rules no threshold (decision 6).
@@ -53,10 +78,9 @@ instrument.
 
 ## Definition of done
 
-1. **CAP-1** — `B-node` and `B-node-nograph` rows in `ranked-lists.jsonl`, same
-   schema as the Python arms.
-2. **CAP-2** — the movement table gains **reader pairs**: `B` vs `B-node`, and
-   `B-node` vs `B-node-nograph`. ⚠ **Read the other way round from an A/B
+1. **CAP-1** — `B-node` rows in `ranked-lists.jsonl`, same schema as the Python
+   arms.
+2. **CAP-2** — the movement table gains one **reader pair**: `B` vs `B-node`. ⚠ **Read the other way round from an A/B
    pair**: 0 discordant is the expected result, and a non-zero one is a defect
    report rather than a finding.
 3. **CAP-3** — hit@k for both Node arms against the same planted key. Identical
@@ -80,7 +104,7 @@ Not ruled; proposed here so the decision is Arpit's and the list is in one place
 |---|---|
 | **cold start, separated** | today's Node p50 is **one process per query**, so it carries `node` boot. A warm-process pass beside it splits the reader's work from its startup — otherwise the column silently measures Node booting |
 | **peak RSS per query** | W-161's graph tier rebuilds in memory (~2.4 s at 10 000). Time is half the price; **memory is the half nobody has** |
-| **the tier's effect on RANKING, not just latency** | `B-node` vs `B-node-nograph` on CAP-1/2/3 prices what the graph tier *does*. W-161's tiers ship **on and unmeasured** for value on either reader |
+| ~~the tier's effect on ranking~~ | 🔴 **STRUCK by decision 16a** — not a benchmark column. The question is real and is W-161's, with its own run |
 | **failure parity** | same refusal, same exit code on a stale index (`fux.index.v2`), a missing `pii.toml`, a retired config key. W-186 showed three refusals in a row; whether Node refuses identically is unknown |
 | **the 10 000 tier for both readers** | the column exists at 100 and 1 000. The design point is 10 000 (SR-WORK-SCALE) and that is where the tier's cost explodes |
 
@@ -97,7 +121,7 @@ Not ruled; proposed here so the decision is Arpit's and the list is in one place
 - 🔴 **A non-zero discordant count between readers is a DEFECT, and the report
   must not read like a quality delta.** Same table shape as A-vs-B, opposite
   meaning — say so on the slide, every run.
-- ⚠ **Two Node arms in four more captures doubles the query passes.** Interleave
+- ⚠ **One Node arm in four more captures adds a pass per capture.** Interleave
   inside the repeat, as decision 12a's run already does, or the columns measure
   different machines.
 - ⚠ **`B` is an editable install of the working tree** (decision 12a's warning).

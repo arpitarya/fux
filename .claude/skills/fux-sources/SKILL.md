@@ -1,12 +1,12 @@
 ---
 name: fux-sources
-description: Manage what is in a Fux corpus with `fux add`, `fux remove` and `fux update` — directories, files, file types and URLs, archived=, meta, keep, ttl and update, and why a file is not indexed. Use ONLY when explicitly asked to change the corpus ("index this folder", "add this URL", "stop indexing X", "mark these docs archived", "refresh the URLs"), or to answer "why isn't file X indexed". Edits committed files in .fux/.
+description: Manage what is in a Fux corpus with `fux add`, `fux remove` and `fux ingest` — the ONE verb for the first ingest and every re-ingest, since `fux update` was deleted in 3.0. Directories, files, file types and URLs, archived=, meta, keep, ttl, update=, and why a file is not indexed. Use ONLY when explicitly asked to change the corpus ("index this folder", "add this URL", "stop indexing X", "refresh the URLs"), or to answer "why isn't file X indexed". Edits committed files in .fux/.
 ---
 
 # Managing a Fux corpus
 
 What Fux indexes is decided by **committed lists in `.fux/`**, not by a scan of
-the repo. `fux add`, `fux remove` and `fux update` are the editors for those
+the repo. `fux add`, `fux remove` and `fux ingest` are the editors for those
 lists, and each one ends in an ingest.
 
 > ⚠ **These verbs change committed files and the committed index.** Run one only
@@ -21,16 +21,23 @@ Resolve the `fux` command first — see the `fux-usage` skill (`fux` → `uv run
 |---|---|
 | "what is indexed?" | `fux add` with no entry — prints every list as the loader sees it |
 | "index this folder / this file" | `fux add docs/runbooks` · `fux add docs/onboarding.md` |
+| "re-index / bring the index up to date" | `fux ingest` — the same verb as the first time, for dirs and URLs alike |
 | "add this page / Confluence URL" | `fux add https://…` — fetches **that URL only**, then ingests |
 | "index our `.srt` files" | `fux add '*.srt' --types` — a format with no decoder also needs the `fux-decoder` skill |
 | "stop indexing X" | `fux remove X --dry-run`, read the branch, then `fux remove X` |
 | "mark these docs archived" | `fux add old/2023-platform --archived` (a URL line takes `--archived` too) |
-| "refresh the URLs" | `fux update` — add `--all` to fetch every URL |
+| "refresh the URLs" | `fux ingest` — add `--refetch-all` to fetch every URL |
 | "why isn't X indexed?" | §6. Change nothing until you know the reason |
 | the page comes back as a login page | the `fux-fetcher` skill — that is a fetcher problem, not a list problem |
 
-**`add` and `remove` write lines; `update` never writes one.** Changing an
+**`add` and `remove` write lines; `ingest` never writes one.** Changing an
 attribute is another `fux add` on the same entry — it is an upsert.
+
+> 🔴 **`fux update` no longer exists** (3.0). Every form of it is `fux ingest`,
+> and `--all` is now `--refetch-all` — beside `--full` the old name read as its
+> synonym, and the two are unrelated. A bare `fux ingest` **goes to the
+> network** for the URLs known to be stale; `fux ingest --no-fetch` is the
+> offline form, and it is what the git hooks run.
 
 ## 2 · The files, and their line syntax
 
@@ -108,7 +115,7 @@ flags for one attribute, is an error and writes nothing. There is no flag for
 
 **`fux add <URL> --no-update` fetches once, then never again.** One fetch is
 what makes the line ingestable at all; the pin governs every run after it,
-`--all` and `--full` included. ⚠ **A pinned line written BY HAND into
+`--refetch-all` and `--full` included. ⚠ **A pinned line written BY HAND into
 `.fux/sources/urls` is never fetched** — `fux add` on a line that already exists
 reports `unchanged` and ingests nothing, so it has no record and no document.
 
@@ -136,14 +143,16 @@ also forgets its retained bytes.
 the `# >>> fux: not indexed >>>` block of `.fux/.fuxignore` — those lines keep the
 files out on their own. `fux add X` refuses while the `!` line exists.
 
-## 5 · `fux update`
+## 5 · `fux ingest`
 
 | form | does |
 |---|---|
-| `fux update` | re-ingests; fetches the URLs **known to be stale** (all of them if nothing has recorded staleness yet) |
-| `fux update --all` | re-ingests and fetches every listed URL |
-| `fux update <entry>` | the entry must already be listed; a URL fetches that one only |
-| `fux update --check` | **read-only**: compares files on disk with the index |
+| `fux ingest` | re-ingests; fetches the URLs **known to be stale** (all of them if nothing has recorded staleness yet) |
+| `fux ingest --refetch-all` | re-ingests and fetches every listed URL |
+| `fux ingest <entry>` | the entry must already be listed; a URL fetches that one only |
+| `fux ingest --check` | **read-only, offline**: compares files on disk with the index |
+| `fux ingest --no-fetch` | re-ingests from disk and opens no socket — what `fux hooks` writes |
+| `fux ingest --failed` | fetches only the URLs whose last run failed |
 
 - **A failed fetch keeps the prior record.** To drop a dead page, `fux remove` it.
 - **Exit is `0` even when fetches fail.** Read stderr for
@@ -155,7 +164,11 @@ files out on their own. `fux add X` refuses while the `!` line exists.
   a fact, not a failure**, so read the output, never the status.
 - **`--failed` fetches exactly the URLs whose last run failed** (`fail_streak >
   0`) and nothing else. It is the most specific selector, so it wins over
-  `--all`; with nothing failing it fetches nothing and says so.
+  `--refetch-all`; with nothing failing it fetches nothing and says so.
+- **`--no-fetch` opens no socket.** Same flag, same meaning `fux add` carries.
+  Use it in CI and on an air-gapped clone; there is no `--offline` alias.
+- **`--check` and `--list-skipped` are both exit-early.** Given both, `--check`
+  wins — it is the one with a `--json` form and the one a pipeline gates on.
 
 ## 6 · "Why isn't file X indexed?"
 
@@ -181,7 +194,7 @@ fux ingest --list-skipped        # read-only, offline: one `path: reason` per li
   `.fux/.fuxignore`, and that line **keeps deciding**. Ingest then warns
   `.fux/.fuxignore lists <path> as <reason>, and that is no longer true`. Delete
   that line and run `fux ingest`.
-- **A URL** is never in `.fuxignore`. Run `fux update <URL>` and read its `!`
+- **A URL** is never in `.fuxignore`. Run `fux ingest <URL>` and read its `!`
   line; a sign-in or refusal reason means the `fux-fetcher` skill.
 
 ## 7 · `archived`, `meta`, `keep` and PII
@@ -204,7 +217,9 @@ fux ingest --list-skipped        # read-only, offline: one `path: reason` per li
 - **Don't change the corpus as a side effect** of another task.
 - **Don't infer `archived` from a path or a title** — ask, then declare it.
 - **Don't use `--plain` on an intranet page** without the owner saying it is public.
-- **Don't trust `fux update`'s exit code** as "every URL fetched" — read the `!` lines.
+- **Don't trust `fux ingest`'s exit code** as "every URL fetched" — read the `!` lines.
+- **`fux update` in a script is a 3.0 break.** It exits non-zero with argparse's
+  *invalid choice*; there is no alias. Replace it with `fux ingest`.
 - **Don't undo a remove by deleting only the `!` line** — the `.fuxignore` line stays.
 - **Don't write `!path` in `.fux/.fuxignore` to exclude** — there it re-includes.
 - **Don't treat `--dry-run` as proof a URL is fetchable.**

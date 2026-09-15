@@ -1,4 +1,8 @@
-"""`fux update` refreshes the dirty list; `--all` forces the full sweep.
+"""`fux ingest` refreshes the dirty list; `--refetch-all` forces the full sweep.
+
+⚠ **Renamed from `test_update_narrow.py` by W-177** (2026-09-15), which deleted
+`fux update` and moved its whole surface onto `fux ingest`. The ruling below is
+untouched by that: W-82 ruling 3 is about **which URLs**, never which verb.
 
 W-82 ruling 3, landed 2026-08-28 (Arpit) together with ruling 10 — *"the two
 must land together or the tail silently stops being refreshed at all."*
@@ -6,7 +10,8 @@ must land together or the tail silently stops being refreshed at all."*
 **Why narrow is the default rather than a flag.** *"If the dirty list is the
 right thing to refresh, it should not have to be asked for. A user typing
 `fux update` wants a current index, not a network sweep."* There is deliberately
-no `--dirty` / `--stale` / `--changed`.
+no `--dirty` / `--stale` / `--changed`. (The quote is his, from 2026-08-28, and
+names the verb of the day.)
 """
 
 from __future__ import annotations
@@ -26,10 +31,14 @@ class Entry:
 LISTED = [Entry("https://a.test/x"), Entry("https://b.test/y"), Entry("https://c.test/z")]
 
 
-def test_all_forces_the_full_sweep(tmp_path):
+def test_refetch_all_forces_the_full_sweep(tmp_path):
+    """⚠ **`--all` until W-177 renamed it.** Beside `--full` on `ingest` the old
+    name read as its synonym, and the two are unrelated: `--full` re-extracts
+    every document, `--refetch-all` fetches every URL."""
     targeted, why = _narrow(tmp_path, LISTED, all_urls=True)
     assert targeted is None, "None means every listed URL, not zero of them"
-    assert "--all" in why
+    assert "--refetch-all" in why
+    assert "`--all`" not in why, "the announcement must not name a flag that is gone"
 
 
 def test_an_absent_dirty_list_sweeps_everything(tmp_path):
@@ -41,7 +50,7 @@ def test_an_absent_dirty_list_sweeps_everything(tmp_path):
     *fetch nothing*.
 
     A repo that has never run the hook, or whose `.fux/runtime/` was wiped,
-    would otherwise have `fux update` become a silent no-op — **the exact
+    would otherwise have `fux ingest` become a silent no-op — **the exact
     "the tail silently stops being refreshed" failure ruling 3 warns about**,
     arriving through a file's tolerance rather than through the ruling.
     """

@@ -50,7 +50,7 @@ reason; that is correct, not noise.
 
 **URL skips are only replaced by a run that actually fetched.** An offline
 `fux ingest` learns nothing about any URL, so it must not forget the URL skips
-a networked run recorded — otherwise the next `fux update` re-prints them as
+a networked run recorded — otherwise the next `fux ingest` re-prints them as
 though they were new. This is `_observe_url_health`'s rule
 ([SR-URL-INGEST](../../../records/0107_url-ingest.md)) applied to the
 writer: an offline run does not get to speak about the networked plane.

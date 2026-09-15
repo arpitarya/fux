@@ -10,7 +10,7 @@ feature: the `url:` source and how ingestion behaves around the fetcher boundary
 owns: []
 laws: [L2, L4, L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 2af454d323e166d34e452eb39e657135d1d6af009427f23af14432a07fb8a4d6
+content_sha: ceb59c514840d36ec821414ede3a8c5744ff35484abf62e848fc7ebb147b9b56
 ---
 
 # SR-URL-INGEST — URL ingestion through a consumer-owned fetcher
@@ -30,7 +30,7 @@ SSO" stops being a feature request against fux and becomes fifteen lines in a
 file you already own.
 
 Two rules make it safe rather than merely clever. Fetching happens **only**
-under the two named fenced paths — `fux add <URL>` and `fux update` — and a
+under the two named fenced paths — `fux add <URL>` and `fux ingest` — and a
 plain ingest never even imports your file. And a page that fails to fetch is
 recorded as a skip; it does **not** delete the document you already have,
 because a flaky network must never look like a deletion.
@@ -40,7 +40,7 @@ because a flaky network must never look like a deletion.
 ```mermaid
 flowchart LR
     subgraph fux ["fux — no network code"]
-        R["fux add &lt;URL&gt; · fux update"]
+        R["fux add &lt;URL&gt; · fux ingest"]
         U[".fux/sources/urls<br/>committed, one per line"]
         N["normalize<br/>CRLF · U+2028/9/85 · NUL"]
         W["records src:url"]
@@ -91,7 +91,7 @@ Either fenced path runs the whole contract, and a dead page is a **skip**, not a
 crash:
 
 ```console
-$ fux update
+$ fux ingest
   [fetcher] configure({'greeting': 'hello'})
   [fetcher] connect()
   [fetcher] close()
@@ -125,10 +125,17 @@ that drifts. What follows is what this record owns: how URL ingestion
 *behaves* around that contract.
 
 **2. Fetching happens only under a named fenced path.** There are two —
-`fux add <URL>`, scoped to the URL just added, and `fux update`. A plain ingest
-carries every listed `url:` record forward byte-identically and never imports
-the fetcher. **The count is not the rule**; being named, fenced and opt-in is
-(L4, [SR-CLI](0101_cli-surface.md) decision 1d).
+`fux add <URL>`, scoped to the URL just added, and `fux ingest`. **The count is
+not the rule**; being named and fenced is (L4,
+[SR-CLI](0101_cli-surface.md) decision 1d).
+
+⚠ **This clause said *a plain ingest never imports the fetcher* until
+2026-09-15.** `fux ingest` absorbed `fux update` (SR-CLI decision 16), so the
+bare verb is the second fenced path rather than the offline one. **The offline
+ingest still exists and is still fenced-out by construction** — it is
+`fux ingest --no-fetch`, it is what the git hooks run, and it is what the L4
+import test now pins. A run with nothing to fetch still carries every listed
+`url:` record forward byte-identically.
 
 **3. A failed fetch keeps the prior record.** It is reported as a skip. A
 transient failure must never present as a deletion.
@@ -172,7 +179,7 @@ ingested 2 docs (0 changed), 2 skipped, 0 shards written
 **A fenced path runs the whole contract:**
 
 ```console
-$ fux update
+$ fux ingest
   [fetcher] configure({'greeting': 'hello'})
   [fetcher] connect()
   [fetcher] close()
@@ -203,7 +210,8 @@ record taken today carries `"flen": [...]` where this shows `"wlen": 11`:
 }
 ```
 
-**8. `fux update` refreshes the dirty list; `--all` forces the full sweep.**
+**8. The networked verb refreshes the dirty list; `--refetch-all` forces the
+full sweep.**
 W-82 ruling 3, landed 2026-08-28 **together with ruling 10**, which is a
 condition of the ruling and not a coincidence: *"with narrow as the default the
 tail is never refreshed unless something else sweeps it."*
@@ -213,24 +221,30 @@ tail is never refreshed unless something else sweeps it."*
   `fux update` wants a current index, not a network sweep."*
 - ⚠ **This is a behaviour change to a shipped verb** — free now, a deprecation
   cycle once anyone scripts it.
+- ⚠ **The verb it sits on is `fux ingest` since 2026-09-15**, and the flag is
+  `--refetch-all` ([SR-CLI](0101_cli-surface.md) decision 16). 🔴 **That reopened
+  nothing here.** This ruling is about **which URLs** a networked run goes out
+  for; W-177 changed **which verb** runs it. Every clause below holds word for
+  word with the name substituted, which is why the record was renamed rather
+  than re-decided.
 - 🔴 **An ABSENT dirty list sweeps EVERYTHING; a present-and-empty one fetches
   nothing.** [`dirty.read`](../src/fux/maintain/dirty.py) collapses
   missing-and-unreadable to `[]` on purpose, because it feeds reporting paths
   where *"cannot tell"* should degrade quietly. **A consumer that acts on the
   list cannot afford that**: under narrow-by-default, empty means *fetch
   nothing*, so a repo that never ran the hook — or whose `.fux/runtime/` was
-  wiped — would have `update` become a silent no-op. **That is precisely the
+  wiped — would have the networked run become a silent no-op. **That is precisely the
   failure ruling 3 warns about, arriving through a tolerance rather than through
   the ruling.** `dirty.is_readable` draws the distinction; fail safe, not fail
   silent.
-- **The announcement always names `--all`**, and states what it is doing:
+- **The announcement always names `--refetch-all`**, and states what it is doing:
   `fetching 1 of 7 listed URL(s) (network) — 1 known stale`. An L4 announcement
   that overstates the network is the one thing it may never do.
 - **A dirty URL that is no longer listed is not fetched.** The list is advisory
   and outlives edits to the source list; fetching a removed entry would
   re-index a document the repo has said it no longer wants.
 - ⚠ **The residual risk, stated:** a repo running no daemon, whose URLs change
-  without any commit, now re-fetches only on `--all`. That is the trade ruling 3
+  without any commit, now re-fetches only on `--refetch-all`. That is the trade ruling 3
   makes, and ruling 10 is what covers it.
 
 **9. Answer-time verification fixes CORRECTNESS and cannot fix RECALL, and that
@@ -247,7 +261,7 @@ written down.**
 - **That is what the daemon is for** ([SR-MAINTENANCE](0129_hooks.md) decision
   9), and it is why rulings 3 and 10 had to land together: with narrow-by-default
   the tail is refreshed by the clock **and by nothing else**.
-- ⚠ **A repo running no daemon has no tail coverage at all.** `fux update --all`
+- ⚠ **A repo running no daemon has no tail coverage at all.** `fux ingest --refetch-all`
   is the whole remedy, and it is a command somebody has to remember. **Stated as
   a cost rather than solved**, because solving it means either fetching on a path
   that is supposed to be offline, or a background process nobody asked to start.

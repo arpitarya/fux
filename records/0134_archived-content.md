@@ -10,7 +10,7 @@ feature: what happens once a document is declared archived — the record proper
 owns: [tools/archived-signal-eval@30fb75fa7476]
 laws: [L3, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: f9f64fd0a6e0b314bb4eb5dc6c0568c93d1f8c133eac4ac47713f67342040f8b
+content_sha: 5669b411ce18db1675dd73e3487fdbc2c8a97fcc29521586853c729b8f3becb7
 ---
 
 # SR-ARCHIVED-CONTENT — what "archived" does, once a document carries it
@@ -416,6 +416,14 @@ raising it would be a second lever in one arm.
   point. ⚠ **A STRANDED record — no retained bytes — is left untouched**, so its
   archived flag is as correct as it ever was: nothing about it is re-derived,
   including this.
+- ⚠ **A bare `fux ingest` reaches `_with_archived` through a FETCH now**
+  (2026-09-15, W-177). `fux ingest` absorbed `fux update`
+  ([SR-CLI](0101_cli-surface.md) decision 16), so the default verb goes out for
+  the URLs known to be stale and re-derives their records rather than carrying
+  them forward. **Decision 1a is unaffected** — `archived=true` on the line
+  reaches a record on the fetch path and on the carry-forward path alike, which
+  is why it was written that way. The offline behaviour this record describes is
+  `fux ingest --no-fetch`'s.
 - **The archived note's stream is now the rule rather than the exception**
   (2026-09-14, W-165 fix 2). Decision 3's note has always gone to stderr, and
   the reason given — a `[archived]` prefix on stdout would be read as part of a

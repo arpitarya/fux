@@ -79,6 +79,19 @@ def cmd_ingest(args) -> int:
         # command whose job is "make sure it is not running" has done its job.
         return _report_takeover(runner_mod.request_stop(root), root, halting=True)
 
+    # ⚠ **Two exit-early flags on one verb, and the order is a RULING, not
+    # argparse's** (SR-INGEST decision 21, W-177 DoD 3). `--check` wins: it is
+    # the whole-corpus freshness question, it is the one with a `--json` form,
+    # and it is the one a pipeline gates on. `--list-skipped` reports on a walk
+    # that this invocation is not going to do — answering it while a machine
+    # asked for the drift report would hand back a table nothing can parse.
+    if getattr(args, "check", False):
+        from ..sources import check_drift
+
+        return check_drift(
+            root, getattr(args, "entry", None), as_json=bool(getattr(args, "json", False))
+        )
+
     if getattr(args, "list_skipped", False):
         from . import fuxignore
 
@@ -105,14 +118,22 @@ def cmd_ingest(args) -> int:
             print(line, file=sys.stderr)
         return 0
 
-    ingest_and_report(root, args, refresh_urls=getattr(args, "refresh_urls", False))
+    # **The networked half** (W-177). A bare `fux ingest` goes out for the URLs
+    # known to be stale — narrow by default, W-82 ruling 3 — and `--no-fetch`
+    # is the offline form the git hooks run. The planner decides and announces;
+    # this owns the run.
+    from ..sources import plan_url_refresh, report_url_outcomes
+
+    refresh, only_urls = plan_url_refresh(root, args)
+    report = ingest_and_report(root, args, refresh_urls=refresh, only_urls=only_urls)
+    report_url_outcomes(report)
     return 0
 
 
 def ingest_and_report(args_root, args, *, refresh_urls: bool = False, only_urls=None, first_fetch=None):
     """Run one ingest and print its summary. **The only ingest the verbs call.**
 
-    `fux add`, `fux remove` and `fux update` all end here rather than each
+    `fux ingest`, `fux add` and `fux remove` all end here rather than each
     printing their own version of the same three numbers — one format, so a
     person reading two different verbs' output is reading the same thing, and
     one write path into the index, which is what L3 needs (W-63).

@@ -68,10 +68,12 @@ def repo(tmp_path: Path) -> Path:
 #: hang, and it is bound by the same invariant as the rest: **stdout must be
 #: byte-identical with the bar on or off**, because its `--json` is what an
 #: agent parses.
-WRITE_VERBS = ["ingest", "build", "add", "remove", "update", "inspect"]
+WRITE_VERBS = ["ingest", "build", "add", "remove", "inspect"]
 
-#: The one argument each verb needs to do real work on the fixture. `update`
+#: The one argument each verb needs to do real work on the fixture. `ingest`
 #: with no entry re-reads everything; `add`/`remove` need something to act on.
+#: ⚠ **`update` was a row here until W-177 deleted the verb** (2026-09-15); its
+#: work is `ingest`'s, which is already in the list with no arguments.
 #: **`remove` takes a single document, not `docs`** — removing the whole
 #: directory empties the corpus, so every phase total drops under the
 #: threshold, nothing paints, and both arms would be silent. That comparison
@@ -84,7 +86,6 @@ WRITE_VERBS = ["ingest", "build", "add", "remove", "update", "inspect"]
 VERB_ARGS = {
     "add": ("docs",),
     "remove": ("docs/doc0000.md",),
-    "update": (),
     "inspect": ("--retrieval-sample", "0"),
 }
 
@@ -101,7 +102,7 @@ VERB_PREPARE = {
 #: Verbs whose fixture is large enough that a bar **must** appear. Asserting
 #: this is what stops the parametrization above from passing vacuously if a
 #: verb silently stops inheriting the plane.
-VERBS_THAT_MUST_PAINT = {"ingest", "build", "add", "remove", "update", "inspect"}
+VERBS_THAT_MUST_PAINT = {"ingest", "build", "add", "remove", "inspect"}
 
 
 def test_every_progress_verb_is_covered():

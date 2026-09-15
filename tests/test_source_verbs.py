@@ -1,4 +1,4 @@
-"""`fux add` / `fux remove` / `fux update` — the managing commands (W-63).
+"""`fux add` / `fux remove` / `fux ingest` — the managing commands (W-63, W-177).
 
 Successor to `test_url_command.py`, which tested `fux url` before that verb
 was retired. **Every property that file pinned is still pinned here** — a
@@ -70,9 +70,38 @@ def _remove(repo, monkeypatch, args):
     return sources.cmd_remove(args)
 
 
-def _update(repo, monkeypatch, args):
+def _ingest_args(entry=None, **flags):
+    """`fux ingest`'s namespace — the absorbed surface, all of it (W-177).
+
+    Separate from `_args` because the two verbs no longer share a shape:
+    `ingest` carries `--check`, `--json`, `--refetch-all`, `--failed`,
+    `--no-fetch`, `--full` and the two runner flags, and `add`/`remove` carry
+    none of them. `no_fetch` defaults **False** here — the bare verb goes to
+    the network now, and a fixture that quietly opted out would test the wrong
+    default.
+    """
+    base = {
+        "check": False, "json": False, "list_skipped": False,
+        "refetch_all": False, "failed": False, "no_fetch": False,
+        "full": False, "no_accelerator": True, "stop": False,
+        "spawn_runner": False, "runner": False, "progress": None,
+    }
+    return SimpleNamespace(entry=entry, **(base | flags))
+
+
+def _ingest(repo, monkeypatch, args):
+    """What `fux ingest` does once W-177 folded `fux update` into it.
+
+    ⚠ **This drives `cmd_ingest`, not a `sources` entry point.** The verb lives
+    in `fux.ingest` now and `sources` keeps only the planning half, so a test
+    that called `sources.cmd_update` would have gone on passing against a
+    function no CLI path reaches.
+    """
+    from fux import ingest as ingest_mod
+
     monkeypatch.setattr("fux.sources.find_root", lambda: repo)
-    return sources.cmd_update(args)
+    monkeypatch.setattr("fux.ingest.find_root", lambda: repo)
+    return ingest_mod.cmd_ingest(args)
 
 
 # -- dispatch: the entry decides which list ---------------------------------
@@ -444,40 +473,66 @@ def test_dry_run_remove_writes_no_bytes_and_names_the_branch(repo, monkeypatch, 
     assert "would exclude" in capsys.readouterr().out
 
 
-# -- update never writes a line ---------------------------------------------
+# -- ingest re-reads and never writes a line --------------------------------
 
 
-def test_update_refuses_an_entry_nobody_listed(repo, monkeypatch):
+def test_ingest_refuses_an_entry_nobody_listed(repo, monkeypatch):
     with pytest.raises(FuxError, match="never creates a line"):
-        _update(repo, monkeypatch, _args("docs/nothing.md", check=False))
+        _ingest(repo, monkeypatch, _ingest_args("docs/nothing.md"))
     assert "docs/nothing.md" not in _dirs(repo)
 
 
-def test_update_with_no_url_source_still_runs_the_dirs_half(repo, monkeypatch, capsys):
-    """**Not an error**, unlike the `--refresh-urls` this verb replaces."""
-    _update(repo, monkeypatch, _args(None, check=False, no_ingest=False))
+def test_ingest_no_fetch_still_refuses_an_entry_nobody_listed(repo, monkeypatch):
+    """🔴 **The order inside `plan_url_refresh` is what this holds.**
+
+    `--no-fetch` returns early, so locating the entry has to happen BEFORE it —
+    otherwise `fux ingest --no-fetch typo` re-ingests the whole corpus and
+    reports success, which is the silent-wrong-thing `_locate` exists to stop.
+    """
+    with pytest.raises(FuxError, match="never creates a line"):
+        _ingest(repo, monkeypatch, _ingest_args("docs/nothing.md", no_fetch=True))
+
+
+def test_ingest_with_no_url_source_still_runs_the_dirs_half(repo, monkeypatch, capsys):
+    """**Not an error**, unlike the `--refresh-urls` this absorbed."""
+    _ingest(repo, monkeypatch, _ingest_args(None))
     assert "ingested" in capsys.readouterr().out
 
 
-def test_update_check_is_read_only_and_reports_drift(repo, monkeypatch, capsys):
-    _update(repo, monkeypatch, _args(None, check=False, no_ingest=False))
+def test_ingest_check_is_read_only_and_reports_drift(repo, monkeypatch, capsys):
+    _ingest(repo, monkeypatch, _ingest_args(None))
     capsys.readouterr()
 
     before = {p: p.read_bytes() for p in (repo / ".fux" / "index").glob("*.jsonl")}
     (repo / "docs" / "a.md").write_text("# A\n\nchanged body\n", encoding="utf-8")
 
-    assert _update(repo, monkeypatch, _args(None, check=True)) == 0
+    assert _ingest(repo, monkeypatch, _ingest_args(None, check=True)) == 0
     out = capsys.readouterr().out
     assert "stale" in out and "docs/a.md" in out
     assert {p: p.read_bytes() for p in (repo / ".fux" / "index").glob("*.jsonl")} == before
 
 
-def test_update_check_exits_zero_when_nothing_drifted(repo, monkeypatch, capsys):
+def test_ingest_check_exits_zero_when_nothing_drifted(repo, monkeypatch, capsys):
     """Drift is a fact, not a failure — a script checking status must not see one."""
-    _update(repo, monkeypatch, _args(None, check=False, no_ingest=False))
+    _ingest(repo, monkeypatch, _ingest_args(None))
     capsys.readouterr()
-    assert _update(repo, monkeypatch, _args(None, check=True)) == 0
+    assert _ingest(repo, monkeypatch, _ingest_args(None, check=True)) == 0
     assert "nothing has drifted" in capsys.readouterr().out
+
+
+def test_check_beats_list_skipped_when_both_are_given(repo, monkeypatch, capsys):
+    """SR-INGEST decision 21 — the precedence is RULED, not argparse's order.
+
+    Both flags print and exit. `--check` wins because it is the whole-corpus
+    freshness question, the one with a `--json` form, and the one a pipeline
+    gates on; `--list-skipped` reports on a walk this invocation will not do.
+    """
+    _ingest(repo, monkeypatch, _ingest_args(None))
+    capsys.readouterr()
+    assert _ingest(repo, monkeypatch, _ingest_args(None, check=True, list_skipped=True)) == 0
+    out = capsys.readouterr().out
+    assert "drifted" in out or "stale" in out, "the drift report is what must come back"
+    assert "ingested" not in out, "neither flag may run an ingest"
 
 
 # -- the type allowlist is extended, never replaced --------------------------
@@ -528,6 +583,110 @@ def test_add_with_no_fetch_opens_nothing(repo, monkeypatch, capsys):
     _add(repo, monkeypatch, _args("https://x.test/a", no_fetch=True))
     assert "https://x.test/a" in _urls(repo)
     assert "fetching" not in capsys.readouterr().err
+
+
+def _url_repo(repo):
+    """`repo`, with a URL source configured and one URL listed.
+
+    Enough for the fence tests below to be about the FLAG rather than about a
+    repo that had nothing to fetch either way — a fixture with no
+    `[sources.url]` passes them vacuously.
+    """
+    (repo / "fux.toml").write_text(
+        '[sources]\nurls_file = ".fux/sources/urls"\n'
+        '[sources.url]\nfetcher = ".fux/fetchers/http.py"\nmax_parallel = 4\n',
+        encoding="utf-8",
+    )
+    (repo / ".fux" / "sources" / "urls").write_text(
+        "https://x.test/a fetch=http meta=hashed keep=true ttl=24h "
+        "enrich=false archived=false update=auto\n",
+        encoding="utf-8",
+    )
+    # 🔴 **A REAL fetcher, and it is what makes the fence test load-bearing.**
+    # With no `.fux/fetchers/http.py` a networked run dies on *fetcher not
+    # found* before it ever reaches a socket — so the offline assertion would
+    # pass for a reason that has nothing to do with the flag. This one opens
+    # one, which is the thing `--no-fetch` has to stop.
+    fetchers = repo / ".fux" / "fetchers"
+    fetchers.mkdir(parents=True, exist_ok=True)
+    # ⚠ **It leaves a FILE behind, and that is not belt-and-braces.** Ingest
+    # catches a fetcher exception and turns it into `! <url> — …; prior record
+    # kept` (decision 21a), so a bare `AssertionError` raised in here is
+    # *swallowed* and the run still exits 0. The marker is the only evidence
+    # that survives the guarantee.
+    (fetchers / "http.py").write_text(
+        "import pathlib\nimport socket\n\n\ndef fetch(url, **kw):\n"
+        "    pathlib.Path(__file__).with_name(\"FETCHED\").write_text(url)\n"
+        "    socket.create_connection((\"127.0.0.1\", 9), timeout=0.01)\n"
+        "    return \"unreachable\"\n",
+        encoding="utf-8",
+    )
+    return repo
+
+
+def _fetch_marker(repo):
+    return repo / ".fux" / "fetchers" / "FETCHED"
+
+
+def _no_sockets(monkeypatch):
+    """Every `socket.socket()` becomes a test failure, not a connection.
+
+    🔴 **Asserting on stderr is not enough for this one.** The announcement is
+    the thing a bug would leave in place while the fetch happened anyway, or
+    remove while it still happened — so the fence has to be the syscall, which
+    is what L4 is actually about.
+    """
+    import socket
+
+    def refuse(*a, **kw):
+        raise AssertionError("L4: this path opened a socket")
+
+    monkeypatch.setattr(socket, "socket", refuse)
+    monkeypatch.setattr(socket, "create_connection", refuse)
+
+
+def test_a_hook_path_ingest_opens_no_socket(repo, monkeypatch, capsys):
+    """🔴 **W-177 DoD 4 — the fence, moved onto the flag the git hooks write.**
+
+    `fux ingest` was offline *by construction* until W-177 made the bare verb
+    networked (SR-CLI decision 16). The fence did not disappear; it moved to
+    `--no-fetch`, which is the invocation `fux hooks` writes into `post-merge`
+    and the one an air-gapped clone runs by hand. **Split by caller, not by flag
+    default** — so this is the assertion that keeps the caller's half honest.
+    """
+    _no_sockets(monkeypatch)
+    _ingest(_url_repo(repo), monkeypatch, _ingest_args(None, no_fetch=True))
+    assert not _fetch_marker(repo).exists(), "the consumer fetcher was called"
+    err = capsys.readouterr().err
+    assert "fetching" not in err, "an offline run may not announce a fetch"
+
+
+def test_the_hook_script_is_the_invocation_that_test_pins():
+    """The two halves of decision 16d, held together.
+
+    A fence test on `--no-fetch` proves nothing if the hook stopped writing the
+    flag, and the hook is a string in another module — so the string is checked
+    here rather than trusted.
+    """
+    from fux.maintain.hooks import HOOKS
+
+    assert "fux ingest --no-fetch" in HOOKS["post-merge"]
+    assert "fux ingest --spawn-runner" in HOOKS["post-commit"]
+    for name, script in HOOKS.items():
+        for line in script.splitlines():
+            bare = line.strip()
+            assert bare != "fux ingest", f"{name} runs the NETWORKED bare verb"
+
+
+def test_check_opens_no_socket_either(repo, monkeypatch):
+    """`--check` is documented read-only AND offline (SR-INGEST decision 21b).
+
+    It is the form a pipeline runs on every commit, so *offline* has to be the
+    syscall rather than the docstring.
+    """
+    _no_sockets(monkeypatch)
+    assert _ingest(_url_repo(repo), monkeypatch, _ingest_args(None, check=True)) == 0
+    assert not _fetch_marker(repo).exists(), "`--check` called the consumer fetcher"
 
 
 # -- bare `fux add` lists all three -----------------------------------------

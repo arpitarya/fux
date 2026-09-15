@@ -705,6 +705,10 @@ def _urls_header() -> str:
     *"`fux update` re-fetches every line"*, which stopped being true when
     narrow-by-default landed (W-82 ruling 3) and again when `update=never` did.
     Every repo set up in between got both sentences committed into it.
+    ⚠ **The verb in that quote is `update` because that is what it SAID**; the
+    verb it names is `fux ingest` from 2026-09-15 (W-177), and a rename that
+    silently corrected the history would hide the defect this docstring exists
+    to record.
 
     `_seed_types` already had the rule: **derived, never transcribed**, so the
     file cannot disagree with the engine that wrote it.
@@ -728,8 +732,8 @@ def _urls_header() -> str:
 #   https://wiki.corp/display/ENG/runbook  fetch=cdp  meta=hashed ttl=7d
 #
 # `fux add <URL>` writes a line here with every attribute stated, and fetches
-# that one URL once. `fux update` re-fetches the lines known to be stale --
-# `--all` every line, `--failed` the ones whose last run failed, and never a
+# that one URL once. `fux ingest` re-fetches the lines known to be stale --
+# `--refetch-all` every line, `--failed` the ones whose last run failed, and never a
 # line that says `update=never`. Those are the engine's two networked paths;
 # every other command is offline. See SR-URL-LIST.
 """

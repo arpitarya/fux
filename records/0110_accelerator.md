@@ -7,10 +7,10 @@ description: A disposable term-major index under .fux/runtime/ that makes warm q
 status: accepted
 date: 2026-08-18
 feature: "`.fux/runtime/` — the derived index, `fux build`, and the block bound that makes skipping provable"
-owns: [src/fux/derive@d97158a8fa5b, tools/differential@179a82d1d2a8]
+owns: [src/fux/derive@28c69c111b2e, tools/differential@179a82d1d2a8]
 laws: [L1, L3]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: e97166646b3a356096e4ab41e2bf987a2c6e7ba5c2a9386a08502625817fa3b8
+content_sha: 4388cdb8366c5ed47a16cb6f5015f3a0379596215f625f4fd11c2ceff609ab69
 ---
 
 # SR-T1-ACCELERATOR — the derived T1 accelerator

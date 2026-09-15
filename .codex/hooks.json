@@ -11,6 +11,18 @@
           }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "shell|apply_patch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".codex/hooks/guard-open-work-inbox.sh",
+            "timeout": 5
+          }
+        ]
+      }
     ]
   }
 }

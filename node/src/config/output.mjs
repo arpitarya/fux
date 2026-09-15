@@ -55,7 +55,14 @@ export const CLI_VERBS = {
   doctor: [],
   hooks: [],
   daemon: [],
-  update: [],
+  //: `ingest` is PYTHON-ONLY as a verb (this reader never writes an index) and
+  //: is declared for the same reason `inspect` and `correct` below are: this
+  //: table is what `.fux/output.toml` may SAY, not a verb list, so a repo whose
+  //: file carries `[cli.json] ingest = true` must validate on both readers.
+  //: ⚠ **It was `update: []` until 2026-09-15** — W-177 deleted that verb and
+  //: `fux ingest` absorbed `--check --json`, which is the key this row exists
+  //: to make resolvable (SR-CLI decision 16).
+  ingest: [],
   //: `inspect` is PYTHON-ONLY as a verb (its dictionary build re-tokenises
   //: the sources, which is an ingest-side job Node has no home for yet) and
   //: is still declared here, because this table is not a verb list — it is

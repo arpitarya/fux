@@ -21,6 +21,21 @@ record is the rule and this file is the anecdote that motivated it.
 
 ---
 
+## 2026-09-15 — an emptied Blocked-on-Arpit inbox is one line, not a recap
+
+Cowork emptied the inbox correctly (both rows ruled) but closed the section
+with a multi-paragraph prose recap of what had just been decided — restating
+rulings that already live in the item files and the worklog. Arpit had flagged
+this shape before. [SR-WORK-OPEN-QUEUE](../records/0051_WORK-open-queue.md)
+rule 45a already says exactly what belongs there: the table, header only, plus
+one `*Empty since YYYY-MM-DD — <why>. <what's next.>*` line. Nothing else.
+**The gate already existed** (`tests/test_open_work_is_not_stale.py`,
+`tests/test_open_work_rows_are_short.py`); the failure was not reading rule
+45a before writing the closing line. Check the record's exact required shape
+before improvising a summary, even a well-intentioned one.
+
+---
+
 ## 2026-09-15 — a flake fired, and I threw its traceback away with `| tail -3`
 
 🔴 **`tests_e2e/test_maintenance.py::test_post_commit_defers_and_a_detached_runner_drains_the_list`

@@ -23,9 +23,12 @@ here. Read that record before changing anything below it.
 
 | what he decides | filed | age |
 |---|---|---|
+| 🔴 **W-193** — argparse exits `2`; SR-CLI decision 5 reserves `2` and says fux never produces one. Leave it, take it, or split it. [detail](open/W-193-argparse-exit-two.md) | 2026-09-15 | 0d |
+| ↳ **blocks:** nothing else in the queue | | |
 
-*Empty since 2026-09-15 — W-144 and W-177 were the last rows and both were
-ruled the day they were filed. Nothing in the queue waits on a decision of his.*
+⚠ **It blocks nothing.** The exit code is wrong in a way no queued item
+waits on; every other row below is agent-closable, and this is a session
+output rather than a stop.
 
 ---
 
@@ -33,7 +36,7 @@ ruled the day they were filed. Nothing in the queue waits on a decision of his.*
 
 ### fux build
 
-- 🟢 **W-177** · `agent` — **`fux update` is deleted; `fux ingest` absorbs its whole surface**, ruled 2026-09-15; reverses W-63 decision 3, no law edit. **Hook's offline invocation ruled: `--no-fetch`** (same flag `fux add` carries); L4's fence test names it. Buildable now. [detail](open/W-177-ingest-absorbs-update.md)
+- 🔴 **W-193** · `arpit` — argparse produces exit `2`; SR-CLI decision 5 reserves it and says fux never does. Found by W-177's capture. Three options filed. [detail](open/W-193-argparse-exit-two.md)
 - 🟢 **W-178** · `agent` — `fetch=` becomes a **typed attribute validated by name shape**, not an enum of shipped fetchers; a consumer drops in `.fux/fetchers/<name>.py`. Ratified not built. [detail](open/W-178-consumer-planes-open-sets.md)
 - 🟡 **W-161** · `agent`, waiting on W-191 — **BUILT 2026-09-15**; both tiers ship on and unmeasured. 🔴 **Both arms inert — 0 `ref` edges on the ladder**; they need linked documents, and Codex's questions are not that. [detail](open/W-161-graph-composed-ask.md)
 - 🟢 **W-168** · `agent` — the ten search improvements. **Step 1 BUILT 2026-09-15**; both question sets released, so steps 2–7 and 9 are runnable now. Step 8 is inert until W-191 lands. [detail](open/W-168-search-improvements.md)
@@ -49,7 +52,7 @@ ruled the day they were filed. Nothing in the queue waits on a decision of his.*
 - 🟡 **W-87** · `agent`, waiting on W-136 — P2's `unanswerable` gate is measured (0/124). ✅ **Part B's blocker is gone** (set 1 is Codex-authored), so both halves now wait on phase 5. [detail](open/W-87-what-good-means.md)
 - 🟢 **W-192** · `agent` — **write the Codex prompt for the blind paraphrases** and name the arm order; (iii) has no upstream. Unblocks W-175. [detail](open/W-192-codex-blind-paraphrases.md)
 - 🟡 **W-175** · `agent`, waiting on W-192 — does a correction help OTHER phrasings? Three arms, N=12 / M=5. ⚠ **Codex's question sets are NOT the paraphrases**; the harness is agent work and does not wait. [detail](open/W-175-correction-generalisation.md)
-- 🟢 **W-144** · `agent` — the `b` sweep FAILED its frozen range; **ruled (b) 2026-09-15**: pre-register a LOWER descending range as a separate run, **after** adding a control family with regression headroom (both existing controls are saturated). [detail](open/W-144-structure-aware-extraction.md)
+- 🟢 **W-144** · `agent` — the `b` sweep FAILED its frozen range; **ruled (b) 2026-09-15**: a LOWER descending range, pre-registered separately, **after** a control family with headroom. [detail](open/W-144-structure-aware-extraction.md)
 - 🟢 **W-188** · `agent` — Node in CAP-1/2/3/4: **harness, parity file and report BUILT 2026-09-15**; the run is what is left, on Arpit's machine. [detail](open/W-188-node-column-every-capture.md)
 
 

@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@2b1bd5523b9f, src/fux/setup.py@af9f0203b42d, tests/test_verb_table_agreement.py@1e7999ffd28f]
+owns: [src/fux/store/fuxdir.py@c984699b459a, src/fux/setup.py@03aa5d79b50e, tests/test_verb_table_agreement.py@1e7999ffd28f]
 laws: [L2, L3, L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: f8deae295273c63273860fe3d7949abec7b76eafb88b002e35540380c547a319
+content_sha: dd9b3e38e2f02da6157ca436ce479f9e2c13be1ed723fbf7e50a482d26c5a966
 ---
 
 # SR-DOTFUX — the `.fux/` directory
@@ -514,7 +514,7 @@ other annotatable file. So `fux doctor` gains a **`warn` row**, `index temp file
 ignored`, which is the only thing that reaches a repo set up before 2026-09-15.
 
 **7. `fetchers/` is consumer code and fux never rewrites it.** It is loaded by
-path, and only under the two fenced paths — `fux add <URL>` and `fux update`.
+path, and only under the two fenced paths — `fux add <URL>` and `fux ingest`.
 The two files fux can put there ship as package data with an extension Python's
 import machinery cannot resolve, so **fux copies them and never imports them**
 ([SR-FETCHER](0117_fetcher.md) decision 1). One known consequence, accepted:
@@ -632,7 +632,7 @@ this record binds:
   importing it runs whatever sits at that file's module level. **`doctor` is
   the command a person runs when something is already wrong** — it must stay
   out of the business of executing consumer code. It names the `min(...)` rule
-  and leaves `fux update` to apply it. `tests/test_doctor.py` plants a fetcher
+  and leaves `fux ingest` to apply it. `tests/test_doctor.py` plants a fetcher
   whose module body raises and asserts the check still returns.
 
 ⚠ **`doctor.py` renders another plane's state and that is deliberate.** The
@@ -724,7 +724,7 @@ litter beside the modules `fux setup` writes into `.fux/decoders/` and
 
 **The starter `.fux/sources/urls` header is DERIVED from the list spec**, not
 transcribed. It said *"Two attributes, and the set is closed"* while the spec
-had grown to seven, and *"`fux update` re-fetches every line"*, which stopped
+had grown to seven, and *"`fux ingest` re-fetches every line"*, which stopped
 being true when narrow-by-default landed and again when `update=never` did.
 Every repo set up in between committed both sentences. `_seed_types` already
 had the rule this needed — *derived, never transcribed* — so the file cannot
@@ -821,7 +821,7 @@ ruling and for the same reason.
   keep the old behaviour until someone edits the line. For `fetch_at_answer`
   that is the safer direction — explicit behaviour surviving a default change,
   on a key whose `false` value stops network access — and for `update` it means
-  a repo scaffolded today keeps fetching on `fux update`, which is what its
+  a repo scaffolded today keeps fetching on `fux ingest`, which is what its
   author saw written in their own file.
 
 ### Consequences
@@ -884,7 +884,7 @@ ruling and for the same reason.
   out of a health command is the worst possible answer to *"what is wrong"*.
 - ⚠ **Two of the new checks report on the PAST, not on now.** `refusal rules`
   and `freshness verdicts` read counters that networked runs and journalled
-  answers wrote. A repo that has never run `fux update`, or never passed
+  answers wrote. A repo that has never run `fux ingest`, or never passed
   `--journal`, is told it has **no data** — never shown a zero it would read as
   *"nothing was refused"* or *"nothing was as-ingested"*.
 - **A committed file needs a row in `COMMITTED_FILES`, not just a mention

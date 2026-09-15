@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-15
 date: 2026-08-18
 feature: the `fux ingest` pipeline — sources to committed records
-owns: [src/fux/ingest@d641250d723e, src/fux/ingest/priors.py@8ffcc632a4be]
+owns: [src/fux/ingest@154f2f6fc998, src/fux/ingest/priors.py@8ffcc632a4be]
 laws: [L2, L3, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 98c78270834b9c3ebf5796f236171274917b170dd1cfd13cea12269cfde21bd7
+content_sha: 0adc6adfea4fcfdf5417948a7bae18e9051766c8ef89356b0612250c9206db3c
 ---
 
 # SR-INGEST — how ingest works
@@ -692,6 +692,38 @@ committed byte** — `loc` and `id` are addresses, and this walk's output is
 unchanged. Why it is a note rather than a redaction, and why silence was
 rejected, is [SR-PII](0148_pii.md) decision 19b.
 
+**21. `fux ingest` is the ONE verb over the corpus, and `--check` beats
+`--list-skipped`** (Arpit, 2026-09-15; W-177).
+
+`fux update` is deleted and its whole surface lands here — the flag table, the
+rename of `--all` to `--refetch-all`, the offline `--no-fetch`, and the
+hook/daemon split — all of which is stated once in
+[SR-CLI](0101_cli-surface.md) decision 16 and **not repeated**. What belongs to
+*this* record is what the walk now owes:
+
+**21a. The bare verb fetches, so the walk has a networked entry.** `cmd_ingest`
+plans the URL refresh before it runs, announces it on stderr, and prints the
+two URL lines after — the validated count and one `! <url> — <reason>; prior
+record kept` per failure. **Exit stays `0` when a fetch fails.** A listed URL
+whose fetch failed keeps its prior record; the run is not a failure because a
+site was down, and the only thing that says so is that line.
+
+**21b. `--check` wins over `--list-skipped`, and the order is RULED rather than
+argparse's.** Both are read-only, offline, and print-then-exit, so giving both
+was previously answered by whichever `if` came first in the file — a behaviour
+nobody decided and a test could not name.
+
+- **`--check` is the whole-corpus freshness question**, it is the one with a
+  `--json` form, and it is the one a pipeline gates on. Answering
+  `--list-skipped` while a machine asked for the drift report would hand back a
+  table nothing can parse.
+- **`--list-skipped` reports on a walk this invocation is not going to do.**
+  Under `--check` nothing is walked and nothing is written, so its answer would
+  describe the *last* run, silently.
+- **Neither runs an ingest**, and a test asserts that too: the failure worth
+  guarding is not the ordering alone but an exit-early flag that stopped
+  exiting.
+
 ### Consequences
 
 - **Ingest cost is O(corpus) in parsing and edge resolution, O(changed) in
@@ -814,7 +846,7 @@ rejected, is [SR-PII](0148_pii.md) decision 19b.
   writes the extracted title to `.fux/runtime/display-cache/`, keyed by `sha` —
   a write, not a fetch, so ingest's cost does not measurably change and L4 is
   untouched by construction. A *carried-forward* `hashed` record whose cache has
-  gone cold is refused by `store/writer.py`, naming `fux update` as the fix,
+  gone cold is refused by `store/writer.py`, naming `fux ingest` as the fix,
   rather than committing a record no reader can ever show a title for. Full
   rationale on [SR-RECORD](0109_index-record.md).
 - **Two Unicode defects are fixed and stay fixed.** `parse.py` decodes with

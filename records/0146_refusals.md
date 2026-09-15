@@ -10,7 +10,7 @@ feature: refusal detection before decode
 owns: [src/fux/ingest/refusals.py@adf187806c43, src/fux/templates/refusals.toml.txt@bdf2356bc679, tools/refusal-probe@76b6f6b7f4aa]
 laws: [L1, L3]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 88d6ce3a89a75a0ff3b655b38cf62e74a10a69170df5da6c14c3a80239bbb347
+content_sha: ab61ac5a2d68048713c23f48fb48270502a0e590dcebcb67250f350f9193d7a2
 ---
 
 # SR-REFUSAL: a sign-in wall is not a document, and only the bytes may say so
@@ -238,7 +238,16 @@ was written. The document in the index is the viewer's chrome.
     workbook, not diagnose a viewer.
 
 11. **Every networked run counts its refusals by rule, and `fux doctor`
-    reports them** (W-101, 2026-09-05). A refusal rule is the one piece of
+    reports them** (W-101, 2026-09-05).
+
+    ⚠ **Which command that is changed on 2026-09-15, and it widened the
+    population.** `fux ingest` absorbed `fux update`
+    ([SR-CLI](0101_cli-surface.md) decision 16), so the run that counts
+    refusals is now the **default verb** rather than a second one somebody
+    chose to type. **Nothing in this decision moves** — the count is taken in
+    `fetch_all()` and a run with nothing to fetch still records nothing — but
+    the *"only surface was the run's own output, which scrolls away"* problem
+    below gets larger, because far more runs now have output to scroll away. A refusal rule is the one piece of
     consumer policy whose correct behaviour and whose catastrophic behaviour
     are indistinguishable from outside: a rule matching every response empties
     the `url:` half of the corpus, and an empty corpus looks exactly like one

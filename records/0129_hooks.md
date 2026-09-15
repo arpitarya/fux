@@ -7,10 +7,10 @@ description: "post-commit DEFERS — it writes a dirty list and spawns a detache
 status: accepted
 date: 2026-08-20
 feature: maintenance — the hooks, the deferring runner, the write lock, and the URL freshness daemon
-owns: [src/fux/maintain@1e2ab181bdab, tools/maintenance-bench@23a6ade137a5, tools/runner-race@98bd70ff092a]
+owns: [src/fux/maintain@70ceb83a6071, tools/maintenance-bench@23a6ade137a5, tools/runner-race@98bd70ff092a]
 laws: [L3, L4, L5, L7]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 3e96d29a902f67222cc537928b367bc866f1b0cfe7af27f96c6bc546ac0d23f0
+content_sha: 81d44f2417b3ec5fd60348a413f5f4660c390c6c11196758b0fb2a2a2cebbcf7
 ---
 
 # SR-MAINTENANCE — keeping the index in step
@@ -260,13 +260,23 @@ specifically proposed and specifically refused.
   then on some commits send requests to hosts they never chose, from a machine
   that may be on a customer's network — **a one-time, invisible consent buying a
   per-commit, permanent consequence.**
-- **What still fetches:** `fux add <URL>` and `fux update`, both explicit
+- **What still fetches:** `fux add <URL>` and `fux ingest`, both explicit
   commands a human typed, and **the daemon**, which is started deliberately and
   stays visible while it runs. **Network in fux is always something someone
   asked for in the moment or chose to leave running.**
+- 🔴 **Since 2026-09-15 that takes a flag, and the flag is where this refusal
+  now lives.** `fux ingest` absorbed `fux update` ([SR-CLI](0101_cli-surface.md)
+  decision 16), so the bare verb fetches — and a `post-merge` hook running it
+  bare would open sockets on every `git merge`, which is exactly the
+  *one-time, invisible consent* above. **`fux hooks` therefore writes
+  `fux ingest --no-fetch`**, and `post-commit` spawns a runner that is offline
+  by construction. **The split is by CALLER, not by flag default** (W-177 open
+  question 1, ruled (b) by Arpit): the daemon's job *is* freshness and it runs
+  the bare verb; a git hook stays local-only and names its opt-out in the
+  script, where anyone reading their own `.git/hooks/` can see it.
 - **The cost, stated:** URLs added by hand-editing `.fux/sources/urls` are not
   fetched at commit time. They wait for the daemon's next pass or an explicit
-  `fux update`. That is a delay, not a silence — `fux doctor` reports them.
+  `fux ingest`. That is a delay, not a silence — `fux doctor` reports them.
   🔴 **It did not, until 2026-09-12** (W-140 row 13). Every line of doctor's
   `url sources` row was computed from `url:` records **in the index**, and a
   line that has never been fetched has no record — so **the one case this
@@ -464,7 +474,7 @@ Ruled by Arpit 2026-08-28.
     go on.
   - ⚠ **An `"ok"` sweep could skip URLs silently.** Two of seven did in the
     [2026-08-27 real-network run](../work/regression/2026-08-27-daemon-real-url/report.md),
-    and the only surface that said so was a foreground `fux update` nobody runs.
+    and the only surface that said so was a foreground `fux ingest` nobody runs.
     **`outcome: "ok"` with `skipped: 2` is a state the old shape could not
     express at all.**
 - **`reason` explains something or is absent** — never an empty string. A field

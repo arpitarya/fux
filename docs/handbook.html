@@ -1260,7 +1260,7 @@ fux ingest &amp;&amp; fux build</code></pre>
 fux add README.md
 fux add https://wiki.corp/page
 fux remove docs/legacy/
-fux update</code></pre>
+fux ingest</code></pre>
     </div>
     <div class="card">
       <h4>Ask</h4>
@@ -1276,7 +1276,10 @@ fux doctor</code></pre>
       source lists, the fetcher and decoder templates, the agent files. Commit them, edit them; fux
       will not overwrite them.</li>
     <li><code>fux add &lt;URL&gt;</code> both <em>records</em> the URL and <em>fetches</em> it.</li>
-    <li><code>fux update --check</code> is read-only: it reports drift, offline, without fetching.</li>
+    <li><code>fux ingest</code> is the <strong>one verb</strong> for the first ingest and every
+      re-ingest, for directories and URLs alike. A bare run fetches the URLs known to be stale;
+      <code>--refetch-all</code> fetches every one and <code>--no-fetch</code> opens no socket.</li>
+    <li><code>fux ingest --check</code> is read-only: it reports drift, offline, without fetching.</li>
   </ul>
 
   <details class="more">
@@ -2308,8 +2311,9 @@ def configure(config: dict) -&gt; None: # [sources.url.config], verbatim
       another: a plain GET that returns a rendered shell <em>returns a rendered shell</em>, and a
       human writes <code>fetch=cdp</code> on that line.</li>
     <li><strong>Network only inside two fenced paths</strong> — <code>fux add &lt;URL&gt;</code>
-      (scoped to that one URL) and <code>fux update</code>. A plain <code>fux ingest</code> never
-      imports a fetcher.</li>
+      (scoped to that one URL) and <code>fux ingest</code>, whose bare form goes out for the URLs
+      known to be stale. <code>fux ingest --no-fetch</code> never imports a fetcher, and it is what
+      the git hooks run.</li>
     <li><strong>Verify uses the ingest fetcher.</strong> A document fetched two ways is two
       documents.</li>
     <li>A bare <code>str</code> return still works — read as already-prose, so older fetchers keep
@@ -2431,12 +2435,10 @@ def decode(path: Path, rel_path: str) -&gt; str | None: ...</code></pre>
       <tr><td><code>fux remove &lt;entry&gt;</code></td>
         <td>Delete its line, or exclude it if an ancestor is listed.</td>
         <td><code>--types --no-ingest --dry-run</code></td></tr>
-      <tr><td><code>fux update [entry]</code></td>
-        <td>Re-read what is already listed, re-fetching URLs.</td>
-        <td><code>--check</code></td></tr>
-      <tr><td><code>fux ingest</code></td>
-        <td>Walk the configured sources into the committed index.</td>
-        <td><code>--full --list-skipped --no-accelerator --stop</code></td></tr>
+      <tr><td><code>fux ingest [entry]</code></td>
+        <td>Walk the configured sources into the committed index — the first time and every time
+          after, re-fetching the URLs known to be stale.</td>
+        <td><code>--check --json --refetch-all --failed --no-fetch --full --list-skipped --no-accelerator --stop</code></td></tr>
       <tr><td><code>fux build</code></td>
         <td>Rebuild the derived accelerator from the committed index.</td>
         <td>progress flags</td></tr>
@@ -2605,7 +2607,7 @@ def decode(path: Path, rel_path: str) -&gt; str | None: ...</code></pre>
   <div class="law"><b>L3</b><span><strong>Deterministic — no model in the maintenance path.</strong>
     Same sources produce a byte-identical index. Nothing calls a model to build one.</span></div>
   <div class="law"><b>L4</b><span><strong>Offline by default.</strong> Network access only inside
-    explicit, fenced, opt-in paths — <code>fux add &lt;URL&gt;</code> and <code>fux update</code>.</span></div>
+    explicit, fenced, opt-in paths — <code>fux add &lt;URL&gt;</code> and <code>fux ingest</code>.</span></div>
   <div class="law"><b>L5</b><span><strong>Hashed meta is the default</strong> for non-git sources,
     enforced at write time. It closes an ACL-mismatch leak.</span></div>
   <div class="law"><b>L6</b><span><strong>Say "index", not "db".</strong> Load-bearing vocabulary.</span></div>

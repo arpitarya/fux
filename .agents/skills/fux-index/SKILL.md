@@ -190,8 +190,8 @@ sorted, canonical JSON, no clock. Two consequences:
 ```
 
 `git status --porcelain`, not `git diff`: a new document can add an untracked
-shard. ⚠ **`fux update --check` is not this gate** — its exit code is always 0.
-`fux update --check --json` gives you `drifted`, which you can gate on; it is
+shard. ⚠ **`fux ingest --check` is not this gate** — its exit code is always 0.
+`fux ingest --check --json` gives you `drifted`, which you can gate on; it is
 still blind to files that were never indexed, which is what this gate catches.
 
 ---
@@ -220,7 +220,7 @@ still blind to files that were never indexed, which is what this gate catches.
 - **Don't commit `.fux/runtime/` or `.fux/acquired/`**, or ignore `.fux/` wholesale.
 - **Don't delete `write.lock` while a fux process is running** — two writers corrupt the index.
 - **Don't delete `.fux/index/` to clear an error** when URL sources exist.
-- **Don't gate CI on `fux update --check`'s exit code** (gate on `--json`'s
+- **Don't gate CI on `fux ingest --check`'s exit code** (gate on `--json`'s
   `drifted`), or ingest in a shallow clone.
 
 Related skills: fux-usage, fux-search, fux-answer, fux-graph, fux-sources, fux-maintain, fux-config, fux-mcp, fux-fetcher, fux-pii, fux-decoder, fux-enrich, fux-archived-results.

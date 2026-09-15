@@ -140,7 +140,7 @@ def _daemon(root: Path) -> Check | None:
     ⚠ **The case this exists for is `outcome: "ok"` with `skipped > 0`** — a
     sweep that looked healthy and did not index everything. Two of seven URLs
     were skipped in the 2026-08-27 real-network run and nothing said so outside
-    a foreground `fux update`.
+    a foreground `fux ingest`.
     """
     from .maintain import daemon as daemon_mod
 
@@ -169,7 +169,7 @@ def _daemon(root: Path) -> Check | None:
             "url daemon",
             False,
             f"{where}; the last sweep reported ok but did not index {skipped} document(s) "
-            f"({reason}) - run `fux update` to see them all",
+            f"({reason}) - run `fux ingest` to see them all",
             level="warn",
         )
     detail = f"{where}; last sweep {outcome}"
@@ -804,7 +804,7 @@ def _acquired_health(root: Path) -> Check:
     if ignored is None:
         detail += " (gitignore unchecked: not a git checkout)"
     if orphans > 0:
-        detail += f" - {orphans} unreferenced, swept on the next `fux update`"
+        detail += f" - {orphans} unreferenced, swept on the next `fux ingest`"
     cap = acquired.DEFAULT_MAX_BYTES
     if total > cap * 0.8:
         return Check(
@@ -837,7 +837,7 @@ def _refusal_health(root: Path) -> Check:
 
     ⚠ **Offline, and the count is therefore about the PAST.** Doctor never
     fetches, so it reports what networked runs recorded. A repo that has never
-    run `fux update` has nothing here and is told that rather than shown a zero
+    run `fux ingest` has nothing here and is told that rather than shown a zero
     it would read as *"nothing was refused"*.
 
     ⚠ **A warning, never an error.** Refusing sign-in walls is the feature
@@ -877,7 +877,7 @@ def _refusal_health(root: Path) -> Check:
     if not counted:
         parts.append(
             "no networked run has recorded a refusal yet - the count starts at the "
-            "next `fux update`"
+            "next `fux ingest`"
         )
         return Check("refusal rules", True, ", ".join(parts), level="warn")
 
@@ -1368,7 +1368,7 @@ def _stale_redaction(root: Path) -> Check:
 
     ⚠ **`warn`, and the reason is worth stating.** The record is not wrong about
     its source; it is extracted under rules that have since moved. The fix needs
-    the network (`fux update`), which `doctor` is not going to take on a user's
+    the network (`fux ingest`), which `doctor` is not going to take on a user's
     behalf, and failing the command for a condition only a fetch can clear would
     make `doctor` red until someone goes online.
 
@@ -1399,7 +1399,7 @@ def _stale_redaction(root: Path) -> Check:
         False,
         f"{len(stranded)} url document(s) still hold text extracted under the OLD rules "
         f"- no retained bytes to re-extract from: {shown}{more}. "
-        "`fux update` fetches them; `keep=true` on the line retains the bytes so the next "
+        "`fux ingest` fetches them; `keep=true` on the line retains the bytes so the next "
         "policy change can reach them offline",
         level="warn",
     )
@@ -2070,7 +2070,7 @@ def _url_health(root: Path) -> Check:
 
     parts = [f"{summary.indexed} url: record(s)"]
     if summary.run_seq == 0:
-        parts.append("no networked run recorded yet - run `fux update`")
+        parts.append("no networked run recorded yet - run `fux ingest`")
     else:
         parts.append(f"{summary.confirmed_last_run} confirmed by the last run")
     if summary.never_confirmed:
@@ -2137,7 +2137,7 @@ def _unfetched_note(root: Path, indexed: list[str]) -> list[str]:
     more = f" (+{len(missing) - 3} more)" if len(missing) > 3 else ""
     return [
         f"{len(missing)} listed URL(s) have never been fetched, so they are not in "
-        f"the index at all: {shown}{more} - run `fux update` (no hook will do it: "
+        f"the index at all: {shown}{more} - run `fux ingest` (no hook will do it: "
         f"SR-MAINTENANCE decision 5a)"
     ]
 
@@ -2145,7 +2145,7 @@ def _unfetched_note(root: Path, indexed: list[str]) -> list[str]:
 def _pinned_note(root: Path) -> list[str]:
     """`update=never` lines, counted — and the lossy pair named (W-113).
 
-    A pinned URL is a URL `fux update` will never go out for again, which is a
+    A pinned URL is a URL `fux ingest` will never go out for again, which is a
     fact somebody looking at a stale corpus needs and could otherwise learn only
     by reading every line of `.fux/sources/urls`.
 
@@ -2191,7 +2191,7 @@ def _pinned_note(root: Path) -> list[str]:
 def _parallel_policy(root: Path) -> str | None:
     """How many URLs a networked verb may open at once — W-83.
 
-    **The number a person needs before running `fux update` over a corporate
+    **The number a person needs before running `fux ingest` over a corporate
     wiki**, said by the one command whose job is to tell them what will happen.
     Without it the only way to learn the concurrency was to read `config.py`.
 
@@ -2201,7 +2201,7 @@ def _parallel_policy(root: Path) -> str | None:
     Python file** — reading it means importing it, which runs whatever is at
     that file's module level. `fux doctor` is the command a person runs when
     something is already wrong; it may not be the command that executes their
-    fetcher. So it names the rule and lets `fux update` apply it.
+    fetcher. So it names the rule and lets `fux ingest` apply it.
     """
     from .config import load
 

@@ -613,7 +613,36 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
   </div>
 </section>
 
-<!-- ============ 12 · WHAT THIS RUN DOES NOT SAY ======================== -->
+<!-- ============ 12 · READER PARITY  Node against Python ================ -->
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">Reader parity <span class="dim">/ Node against Python, over ONE index</span></p>
+    <h2>Do the two readers agree?</h2>
+    <p>🔴 <strong>Read this the opposite way from every other table on this report.</strong> Everywhere else a difference between two arms is the <em>finding</em>. Here the two arms are two <strong>readers of one committed index</strong> claiming identical output &mdash; same ids, same order, same locators, same band &mdash; so <strong>0 discordant is the expected result and anything else is a defect in one of them</strong>. SR&#8209;WORK&#8209;BENCHMARK decision 16.</p>
+<!-- fux:fill:parity -->
+    <p class="finding">{{the one-line finding, or: no number exists for this run}}</p>
+    <div class="tblwrap">
+      <table>
+        <thead><tr>
+          <th>pair</th>
+          <th class="num">queries<span class="dir flat">&mdash; neither</span></th>
+          <th class="num">identical lists<span class="dir up">&uarr; higher is better</span></th>
+          <th class="num">discordant<span class="dir down">&darr; lower is better; 0 is the only clean value</span></th>
+          <th class="num">earliest differing rank<span class="dir flat">&mdash; neither</span></th>
+          <th class="num">max |&Delta;score|<span class="dir down">&darr; lower is better</span></th>
+        </tr></thead>
+        <tbody>
+          <tr><td class="k">B &#124; B&#8209;node</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:13px;color:var(--ink-3);margin-top:8px"><strong>max |&Delta;score| is the number that had never been taken</strong> &mdash; two readers can agree on ORDER while their scores differ in the last places, which is what a <span class="mono">log()</span>/libm divergence looks like <em>before</em> it changes an ordering.</p>
+<!-- fux:end:parity -->
+    <p style="font-size:13px;color:var(--ink-3)">⚠ <strong>CAP&#8209;5 and the ingest/build half of CAP&#8209;6 have no Node column, by construction</strong> &mdash; the Node reader writes no index. <strong>The arms are A &middot; B &middot; B&#8209;node</strong>: a benchmark measures what ships, and the graph tier ships on, so there is no tier&#8209;off column.</p>
+  </div>
+</section>
+
+<!-- ============ 13 · WHAT THIS RUN DOES NOT SAY ======================== -->
 <section class="slide">
   <div class="wrap">
     <p class="eyebrow">Guard rails <span class="dim">/ what this run may never be used to say</span></p>
@@ -636,7 +665,7 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
 <div class="hint" id="hint">&larr; &rarr; to move</div>
 <div class="counter">
   <button class="navbtn" id="prev" aria-label="Previous slide">prev</button>
-  <span id="pos" aria-live="polite">01 / 12</span>
+  <span id="pos" aria-live="polite">01 / 13</span>
   <button class="navbtn" id="next" aria-label="Next slide">next</button>
 </div>
 <script>

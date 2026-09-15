@@ -10,7 +10,7 @@ feature: the capture set every benchmark run files
 owns: [tests/test_benchmark_capture.py@f6af3d328537]
 laws: []
 timestamp: 2026-09-13T00:00:00Z
-content_sha: 3159777140ed2f8639861eb3fb8dc8d4d92772c83600bffc52d849c95c4f9cba
+content_sha: 7492b431c1aa157714b8797ac78b30a113bf5a4ce15e87a012ef454786aeaafe
 ratifies: Arpit, 2026-09-13 — what a benchmark must always capture
 ---
 
@@ -502,8 +502,9 @@ run that would have carried the zero.
 > *"in benchmark I want few more numbers — this is for node search versus
 > Python search … ranked list, what moved, hit@k, answer layer and speed."*
 
-**`B-node` and `B-node-nograph` join CAP-1, CAP-2, CAP-3 and CAP-4**, in every
-run, on every tier the run uses. Arpit ruled *columns in every run* over a
+**`B-node` joins CAP-1, CAP-2, CAP-3 and CAP-4**, in every run, on every tier
+the run uses (⚠ as first written this said *and `B-node-nograph`*; 16a below
+struck the tier-off arm the same day). Arpit ruled *columns in every run* over a
 separate parity run: two readers that are only compared occasionally drift
 between comparisons, and the drift is invisible until someone looks.
 
@@ -535,8 +536,62 @@ and costs a real pass, because `answer` is a different verb — and its parity
 claim covers locators and the band, so a column comparing only
 answered/declined tests less than what is claimed.
 
-🔴 **RATIFIED 2026-09-15, NOT BUILT** — [W-188](../work/open/W-188-node-column-every-capture.md),
-which also carries the five further numbers proposed and not ruled: cold start
+✅ **RATIFIED AND BUILT 2026-09-15, and the numbers are still UNMEASURED** —
+the harness and the report carry the columns; **no run has been executed**
+(a Cowork bridge shell reaches neither the arm venvs nor the corpora).
+[W-188](../work/open/W-188-node-column-every-capture.md) stays open for the run,
+
+🔴 **16a. THE ARMS ARE `A` · `B` · `B-node`. THE TIER-OFF ARM IS NOT A
+BENCHMARK ARM** (Arpit, 2026-09-15: *"No need for no graph. We are setting a
+benchmark. So pair A, B, and B and B-node."*).
+
+**A benchmark measures what ships.** `[graph] ask_boost` and `ask_related`
+default to `true` (`src/fux/tune.py`, and the Node reader reads the same keys),
+so the shipped reader has the tier **on**. A tier-off column would put a
+configuration nobody is served into every run's tables, every run, forever.
+
+**Two pairs, and they still read in opposite directions:** `A|B` is the version
+delta and the finding; `B|B-node` is reader parity, where **0 discordant is
+expected and a difference is a defect**. The `tier` pair is deleted.
+
+⚠ **The attribution the tier-off arm was invented for is DONE and FILED, once**
+— decision 12a priced the tier at 36.9 ms · 243.1 ms · ~2.4 s, which is what
+stopped `B-node` 269.5 ms against `B` 231.2 ms being read as *"the Node reader
+is slower"*. **That run stands as filed history**; it does not become a standing
+column.
+
+🔴 **What the tier is WORTH is still unmeasured, and it is [W-161](../work/open/W-161-graph-composed-ask.md)'s,
+not a benchmark's.** Reproduce the probe with `[graph] ask_boost = false` in a
+work dir's `tune.toml` when that question is taken up. **Nothing in this record
+now measures it, and no document may say otherwise.**
+
+**What landed:** `bench.py` — `answer_node()` (the one pass the column costs),
+`--node-arms` on `hits` and `answers`, and a rank comparison generalised from
+one hard-coded `A`/`B` pair to `RANK_PAIRS` with **three kinds that read three
+different ways**:
+
+| pair | kind | a difference means |
+|---|---|---|
+| `A` ↔ `B` | `version` | the finding — this is CAP-2 |
+| `B` ↔ `B-node` | `reader` | 🔴 a **defect** in one reader: two readers, one index, identical output claimed |
+
+🔴 **Conflating the two would file a defect as a delta**, so the kind is on every
+row. ⚠ **A third kind, `tier`, existed for one hour on 2026-09-15 and was struck
+by 16a above** — the rows carry `pair_kind` so a future kind costs no migration.
+
+New evidence file **`parity.jsonl`** — per query per pair: identical, first
+differing rank, **max |Δscore|**, depth both sides. CAP-2's fill now counts the
+`version` pair only; a row with no `pair` predates the split and is read as the
+version pair.
+
+⚠ **A defect found while wiring it, and fixed:** `cmd_file` wrote CAP-4 to
+**`answers.jsonl`** — a name `.gitignore` bans **anywhere in the tree** (the
+sealed key's name, banned by name rather than by path). Decision 7 names the
+file `answer-layer.jsonl`, so the harness had been writing a file the repository
+refuses to carry, and the gate demanding it passed only where it sat untracked.
+
+**Also carried:**
+the five further numbers proposed and not ruled: cold start
 separated from query work (today's Node p50 is one process per query and
 carries `node` boot), peak RSS, the graph tier's effect on **ranking** rather
 than only latency, failure parity on a stale index, and the 10 000 tier for both

@@ -711,19 +711,20 @@ def test_url_is_gone(tmp_path):
     assert gone.returncode == 2  # argparse: not a choice
 
 
-def test_refresh_urls_survives_one_release_as_a_hidden_alias(tmp_path):
-    """The opposite call to `fux url`, and for a stated reason.
+def test_refresh_urls_is_gone_now_that_it_names_the_default(tmp_path):
+    """Its one release ran out, and W-177 is what made keeping it wrong.
 
-    It is a flag rather than a verb, it is older, and it is likelier to be in
-    somebody's CI — so it keeps working, hidden from `--help`, for one
-    release. `fux update` is what it now means.
+    W-63 kept `--refresh-urls` hidden rather than deleting it the way `fux url`
+    went: it was a flag rather than a verb, older, and likelier to be in
+    somebody's CI. **`fux ingest` absorbed `fux update` on 2026-09-15**
+    ([SR-CLI](../records/0101_cli-surface.md) decision 16e), so the flag would
+    now silently name *what already happens* — a hidden flag that means
+    nothing is worse than none.
     """
     _write_fixture(tmp_path)
     assert "--refresh-urls" not in _run(tmp_path, "ingest", "--help").stdout
-    # No [sources.url] configured, so it fails the same way it always did —
-    # what is asserted is that argparse still accepts the flag at all.
-    still_parses = _run(tmp_path, "ingest", "--refresh-urls", check=False)
-    assert still_parses.returncode != 2
+    gone = _run(tmp_path, "ingest", "--refresh-urls", check=False)
+    assert gone.returncode == 2  # argparse: unrecognized arguments
 
 
 # -- W-63: the source verbs, as a user --------------------------------------
@@ -817,7 +818,8 @@ def test_the_differential_law_survives_an_add_and_a_remove(tmp_path):
             assert scanned == accelerated, f"differential broken after {step}: {query!r}"
 
 
-def test_update_reingests_and_check_is_read_only(tmp_path):
+def test_ingest_reingests_and_check_is_read_only(tmp_path):
+    """⚠ **This was `fux update` until W-177** — same behaviour, one verb."""
     _write_fixture(tmp_path)
     _run(tmp_path, "ingest")
 
@@ -828,22 +830,36 @@ def test_update_reingests_and_check_is_read_only(tmp_path):
     )
 
     before = _shards(tmp_path)
-    check = _run(tmp_path, "update", "--check")
+    check = _run(tmp_path, "ingest", "--check")
     assert "stale" in check.stdout and "docs/pruning.md" in check.stdout
     assert _shards(tmp_path) == before  # --check wrote nothing
 
-    _run(tmp_path, "update")
+    _run(tmp_path, "ingest")
     assert _shards(tmp_path) != before
-    assert "nothing has drifted" in _run(tmp_path, "update", "--check").stdout
+    assert "nothing has drifted" in _run(tmp_path, "ingest", "--check").stdout
 
 
-def test_update_refuses_to_create_a_line(tmp_path):
-    """`add` and `remove` write lines; `update` never touches one."""
+def test_ingest_refuses_to_create_a_line(tmp_path):
+    """`add` and `remove` write lines; `ingest` never touches one."""
     _write_fixture(tmp_path)
     _run(tmp_path, "ingest")
-    refused = _run(tmp_path, "update", "docs/does-not-exist.md", check=False)
+    refused = _run(tmp_path, "ingest", "docs/does-not-exist.md", check=False)
     assert refused.returncode == 1
     assert "never creates a line" in refused.stderr
+
+
+def test_update_is_gone_with_no_alias(tmp_path):
+    """Deleted outright, on `fux url`'s precedent — three weeks old (W-177).
+
+    🔴 **Exit 2 is argparse's, and [SR-CLI](../records/0101_cli-surface.md)
+    decision 5 says fux never produces a 2.** Asserted as it behaves, not as
+    the record wishes; the contradiction is filed as W-193 and is not this
+    test's to resolve.
+    """
+    _write_fixture(tmp_path)
+    gone = _run(tmp_path, "update", check=False)
+    assert gone.returncode == 2
+    assert "invalid choice" in gone.stderr
 
 
 def test_add_of_a_file_does_not_override_the_type_allowlist(tmp_path):
@@ -962,10 +978,11 @@ def test_fetch_at_answer_false_answers_from_acquired_and_opens_no_socket(tmp_pat
     being loaded, configured, connected or called.
     """
     _url_repo(tmp_path)
-    # ⚠ `--refresh-urls`: a plain `ingest` never opens a socket (SR-MAINTENANCE
-    # decision 5a), so without it the URL is listed and not in the index, and
-    # this test would pass for the wrong reason.
-    _run(tmp_path, "ingest", "--refresh-urls")
+    # ⚠ **A bare `fux ingest` is what fetches now** (W-177). It used to need
+    # `--refresh-urls`, because a plain ingest never opened a socket; the flag
+    # is gone and the default verb does it. Without a fetch the URL is listed
+    # and not in the index, and this test would pass for the wrong reason.
+    _run(tmp_path, "ingest")
     assert (tmp_path / ".fux" / "acquired" / "manifest.json").exists()
 
     # Everything up to here was allowed to fetch; only what follows is on trial.
@@ -983,7 +1000,7 @@ def test_fetch_at_answer_false_answers_from_acquired_and_opens_no_socket(tmp_pat
 def test_the_default_still_fetches_so_no_repo_changes_meaning(tmp_path):
     """The other half of the same claim: silence is today's behaviour."""
     _url_repo(tmp_path)
-    _run(tmp_path, "ingest", "--refresh-urls")
+    _run(tmp_path, "ingest")
     (tmp_path / "calls.log").unlink()
 
     _run(tmp_path, "answer", "how do I restart the indexer", "--json")

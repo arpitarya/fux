@@ -8,7 +8,7 @@ description: Write or edit a Fux URL fetcher in .fux/fetchers/ (http.py, the sig
 Fux never opens a socket itself. A **fetcher** — a Python file committed in
 `.fux/fetchers/` — retrieves each URL's bytes; **`.fux/refusals.toml`** names the
 responses that are not the document (a sign-in page, an error shell). Fux
-imports a fetcher only for `fux add <URL>`, `fux update`, and `fux answer` citing
+imports a fetcher only for `fux add <URL>`, `fux ingest`, and `fux answer` citing
 a URL. `fux setup` writes the two shipped fetchers once; **after that they are
 the repo's, and fux never rewrites them.**
 
@@ -92,7 +92,7 @@ Declare more than `1` only if `fetch` is safe on many threads after a single
 
 ⚠ **`fux add` writes `fetch=http` unless given `--cdp`**, which bypasses a
 custom default fetcher. For the new-file route: `fux add <URL> --no-ingest`, delete `fetch=http`
-from the line in `.fux/sources/urls`, then `fux update <URL>`. A later `fux add`
+from the line in `.fux/sources/urls`, then `fux ingest <URL>`. A later `fux add`
 on that URL writes `fetch=http` back.
 
 ⚠ **`[sources.url.config]` goes to every fetcher that has URLs in the run**, and
@@ -207,7 +207,7 @@ Then fetch signed out and confirm `refused:` names your rule.
 
 ```bash
 fux add <URL>              # exit 1 + "the line is written; the fetch failed: …" on failure
-fux update <URL>           # for a listed URL; exit 0 even on failure — read the "! <url> — …" line
+fux ingest <URL>           # for a listed URL; exit 0 even on failure — read the "! <url> — …" line
 fux doctor --json          # "refusal rules": hits per rule, and rules that never fired
 ```
 
@@ -220,7 +220,7 @@ fux doctor --json          # "refusal rules": hits per rule, and rules that neve
   returning it throws away the content type the decoder plane needs.
 
 **When you finish:** say which files changed and which URLs now route or refuse
-differently; `fux update --all` re-fetches every URL under the new code.
+differently; `fux ingest --refetch-all` re-fetches every URL under the new code.
 
 ## Don't
 

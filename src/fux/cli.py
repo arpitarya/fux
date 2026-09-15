@@ -77,12 +77,6 @@ def _cmd_remove(args) -> int:
     return cmd_remove(args)
 
 
-def _cmd_update(args) -> int:
-    from .sources import cmd_update
-
-    return cmd_update(args)
-
-
 def _cmd_build(args) -> int:
     from .ingest import cmd_build
 
@@ -155,13 +149,14 @@ def _cmd_tune(args) -> int:
 
 
 #: The write verbs — the only ones that construct a `Progress` in `main`
-#: (W-64). `add`/`remove`/`update` joined it in W-63: they end in
-#: `ingest.run()`, so they inherit the bar from that seam rather than growing
-#: one of their own.
+#: (W-64). `add`/`remove` joined it in W-63: they end in `ingest.run()`, so
+#: they inherit the bar from that seam rather than growing one of their own.
+#: ⚠ **`update` was here until W-177 deleted the verb**; its row is not
+#: missing, it is `ingest`'s now.
 #: `inspect` joins these because its retrieval half is one full query per
 #: sampled document and its dictionary half re-tokenises the whole corpus —
 #: both are long enough that silence reads as a hang.
-_PROGRESS_COMMANDS = ("ingest", "build", "add", "remove", "update", "inspect")
+_PROGRESS_COMMANDS = ("ingest", "build", "add", "remove", "inspect")
 
 
 def _add_progress_flags(parser: argparse.ArgumentParser) -> None:
@@ -367,13 +362,75 @@ def build_parser() -> argparse.ArgumentParser:
     _add_output_flags(p_inspect)
     p_inspect.set_defaults(func=_cmd_inspect)
 
-    p_ingest = sub.add_parser("ingest", help="walk configured sources into the committed index")
+    # **The one verb over the corpus** (W-177, Arpit 2026-09-15). `fux update`
+    # is deleted and its whole surface is here: the first ingest and every
+    # re-ingest are the same command, for directories and URLs alike.
+    #
+    # ⚠ **A bare `fux ingest` now goes to the network**, which is the ruling
+    # that moves the L4 fence onto the default verb. Narrow-by-default survives
+    # the move untouched — W-82 ruling 3 is about *which* URLs, never which
+    # verb — so the bare form fetches the ones known to be stale and says so.
+    # `--no-fetch` is the offline form, and it is what `fux hooks` writes.
+    p_ingest = sub.add_parser(
+        "ingest",
+        help="walk configured sources into the committed index, re-fetching stale URLs",
+    )
+    p_ingest.add_argument(
+        "entry", nargs="?", help="one listed entry; omit for every configured source"
+    )
     p_ingest.add_argument("--list-skipped", action="store_true", help="print skipped files and why, then exit")
-    # Retired into `fux update` (W-63). Kept for one release as a hidden
-    # alias — it is a flag rather than a verb, it is older than `fux url` and
-    # more likely to be in someone's CI, and leaving it in costs nothing.
-    # `fux url` was deleted outright; this was not.
-    p_ingest.add_argument("--refresh-urls", action="store_true", help=argparse.SUPPRESS)
+    # ⚠ **`--check` and `--list-skipped` are two exit-early flags on one verb**
+    # now (W-177 DoD 3), and argparse has no opinion about which wins. SR-INGEST
+    # decision 21 rules `--check`: it is the whole-corpus freshness question,
+    # it is the one with a `--json` form, and it is the one a pipeline gates
+    # on. `--list-skipped` reports on a walk this invocation is not going to do.
+    p_ingest.add_argument(
+        "--check",
+        action="store_true",
+        help="read-only: report what has drifted, then exit 0. Offline; does not fetch",
+    )
+    # ⚠ **`--check` had no machine-readable output at all** (W-140 row 14,
+    # 2026-09-11), and it is the one form whose whole purpose is being read by
+    # something else: it exits **0 whether or not anything drifted** —
+    # deliberately, because drift is a fact and a non-zero exit would make *your
+    # docs changed* look like a broken command to every script that checks
+    # status. With no `--json`, the only way to act on the answer was to parse
+    # a table meant for a person.
+    p_ingest.add_argument(
+        "--json", action="store_true", default=None, help="machine-readable drift report (with --check)"
+    )
+    # W-82 ruling 3: narrow is the DEFAULT and this overrides it. There is
+    # deliberately no `--dirty`/`--stale`/`--changed` — if the dirty list is the
+    # right thing to refresh, it should not have to be asked for.
+    #
+    # ⚠ **Named `--all` on `fux update`, where it sat alone** (W-177 ruling 3).
+    # Beside `--full` it would read as its synonym, and the two are unrelated:
+    # `--full` re-extracts every *document*, `--refetch-all` fetches every
+    # *URL*. One of them touches the network and the other cannot.
+    p_ingest.add_argument(
+        "--refetch-all",
+        action="store_true",
+        help="fetch every listed URL, not just the ones known to be stale",
+    )
+    # SR-URL-FRESHNESS. A flag on the networked verb, never a new one: `fux
+    # retry` would be a second way to do what this already does, and SR-CLI
+    # decision 1 refuses that. The selector is url-state's own `fail_streak > 0`,
+    # which is the number that file exists to report.
+    p_ingest.add_argument(
+        "--failed",
+        action="store_true",
+        help="fetch only the URLs whose last run failed (fail_streak > 0)",
+    )
+    # The offline form, and the same flag with the same meaning `fux add`
+    # carries (W-177 open question 1, ruled (b)). It is public surface on
+    # purpose: CI and an air-gapped clone have to be able to ask for an offline
+    # ingest by hand. `fux hooks` writes it; `fux daemon` writes the bare verb.
+    # There is no `--offline` alias.
+    p_ingest.add_argument(
+        "--no-fetch",
+        action="store_true",
+        help="do not open the network; re-read what is on disk (what the git hooks run)",
+    )
     p_ingest.add_argument(
         "--full",
         action="store_true",
@@ -398,6 +455,12 @@ def build_parser() -> argparse.ArgumentParser:
     p_ingest.add_argument("--spawn-runner", action="store_true", help=argparse.SUPPRESS)
     p_ingest.add_argument("--runner", action="store_true", help=argparse.SUPPRESS)
     _add_progress_flags(p_ingest)
+    # SR-OUTPUT decision 15: a verb that reads `.fux/output.toml` must be able
+    # to ignore it. This arrived with `--check --json` (W-140 row 14) on the
+    # verb that used to own it, and moved here whole with W-177 — the escape
+    # hatch is how *is it me or the config?* stays one flag rather than an
+    # experiment.
+    _add_output_flags(p_ingest)
     p_ingest.set_defaults(func=_cmd_ingest)
 
     p_build = sub.add_parser(
@@ -424,9 +487,9 @@ def build_parser() -> argparse.ArgumentParser:
             "--no-update",
             action="store_true",
             help=(
-                "URLs: record update=never - pin this document. `fux update` will not "
-                "fetch it again. NOTE this add still fetches ONCE, which is what makes "
-                "the line ingestable; the flag governs every run after"
+                "URLs: record update=never - pin this document. `fux ingest` will not "
+                "fetch it again, not even under --refetch-all. NOTE this add still fetches "
+                "ONCE, which is what makes the line ingestable; the flag governs every run after"
             ),
         )
         p.add_argument("--ttl", metavar="D", help="URLs: record ttl=D - how long a citation may go unchecked at ask time (0, 30s, 15m, 1h, 7d)")
@@ -456,50 +519,6 @@ def build_parser() -> argparse.ArgumentParser:
     _add_progress_flags(p_remove)
     p_remove.set_defaults(func=_cmd_remove)
 
-    p_update = sub.add_parser(
-        "update", help="re-read what is already listed, re-fetching URLs (replaces `ingest --refresh-urls`)"
-    )
-    p_update.add_argument("entry", nargs="?", help="one listed entry; omit for all of them")
-    p_update.add_argument(
-        "--check",
-        action="store_true",
-        help="read-only: report what has drifted. Offline for files; does not fetch URLs",
-    )
-    # ⚠ **`--check` had no machine-readable output at all** (W-140 row 14,
-    # 2026-09-11), and it is the one verb whose whole purpose is being read by
-    # something else: it exits **0 whether or not anything drifted** —
-    # deliberately, because drift is a fact and a non-zero exit would make *your
-    # docs changed* look like a broken command to every script that checks
-    # status. With no `--json`, the only way to act on the answer was to parse
-    # a table meant for a person.
-    p_update.add_argument(
-        "--json", action="store_true", default=None, help="machine-readable drift report"
-    )
-    # W-82 ruling 3: narrow is the DEFAULT and this overrides it. There is
-    # deliberately no `--dirty`/`--stale`/`--changed` -- if the dirty list is the
-    # right thing to refresh, it should not have to be asked for.
-    p_update.add_argument(
-        "--all",
-        action="store_true",
-        help="fetch every listed URL, not just the ones known to be stale",
-    )
-    # SR-URL-FRESHNESS. A flag on the existing networked verb, never a new
-    # one: `fux retry` would be a second way to do what `update` already does,
-    # and SR-CLI decision 1 refuses that. The selector is url-state's own
-    # `fail_streak > 0`, which is the number that file exists to report.
-    p_update.add_argument(
-        "--failed",
-        action="store_true",
-        help="fetch only the URLs whose last run failed (fail_streak > 0)",
-    )
-    _add_progress_flags(p_update)
-    # SR-OUTPUT decision 15: a verb that reads `.fux/output.toml` must be able
-    # to ignore it. `update` began reading it when `--json` landed (W-140 row
-    # 14), and `test_every_verb_that_reads_the_file_can_bisect_it` said so
-    # before the change was committed — the escape hatch is how *is it me or
-    # the config?* stays one flag rather than an experiment.
-    _add_output_flags(p_update)
-    p_update.set_defaults(func=_cmd_update)
 
     def _query_parser(name: str, help_text: str):
         p = sub.add_parser(name, help=help_text)

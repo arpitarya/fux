@@ -171,7 +171,8 @@ def test_full_refuses_rather_than_stranding_url_records(tmp_path):
         _existing_index(tmp_path, full=True)
     message = str(excinfo.value)
     assert "url:https://example.com/one" in message, "the stranded record must be NAMED"
-    assert "fux update" in message, "the message must name the way forward"
+    assert "fux ingest" in message, "the message must name the way forward"
+    assert "fux update" not in message, "W-177 deleted that verb — naming it strands the reader"
     assert "fux.index.v1" in message, "and what it found"
 
 

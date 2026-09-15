@@ -32,8 +32,20 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-09-14** (Cowork, W-174).* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-09-15** (Cowork, inbox rulings).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
+
+### The Blocked-on-Arpit inbox is EMPTY (2026-09-15, Cowork)
+
+- **W-144 ruled (b)** — a second, lower `b` sweep (`0.4→0.3→0.2→0.15`, descending,
+  first-that-clears), **not runnable until a `verbose` control with regression
+  headroom is in the arm set.** Both existing controls are saturated. Step order is
+  in the item.
+- **W-177 ruled** — hook invocation is **`fux ingest --no-fetch`** (the flag `fux
+  add` already has), doctor strings name `fux ingest`, rename ships in **3.0**.
+  W-177 is 🟢 and buildable; its model line says Opus.
+- Nothing in the queue waits on Arpit. Next golden step is still an agent's
+  (W-136, prompt 4, a session that has never read `questions/`).
 
 ### The `fux.toml` audit — and a config table that was unusable for months (2026-09-14, Cowork)
 

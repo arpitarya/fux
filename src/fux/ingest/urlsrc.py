@@ -7,7 +7,7 @@ decoder plane, and normalizes the result into ingestable bytes (W-86 P8).
 All network code — transport, browser, auth, retries — lives on the consumer's
 side of that boundary; `src/fux/` stays offline and stdlib-only. Fetching runs
 only under the engine's two named fenced paths — `fux add <URL>`, scoped to the
-one URL, and `fux update` (law L4, [SR-CLI](../../records/0101_cli-surface.md)
+one URL, and `fux ingest` (law L4, [SR-CLI](../../records/0101_cli-surface.md)
 decision 1e). A plain ingest never imports a fetcher.
 
 The URL list is a committed *file*, `.fux/sources/urls`, parsed by the one
@@ -85,7 +85,7 @@ class UrlEntry:
     #: layer, because `archived` is a fact about one document rather than a
     #: policy about how to reach a source.
     archived: bool = False
-    #: SR-URL-LIST: whether `fux update` goes out for this URL **at all**.
+    #: SR-URL-LIST: whether `fux ingest` goes out for this URL **at all**.
     #: `"auto"` is today's behaviour; `"never"` pins the document and no socket
     #: is opened for it -- the fetcher is not even resolved, so a consumer's
     #: fetcher module is never imported on its account.
@@ -172,7 +172,7 @@ def resolve_urls(entries: list[sourcelist.Entry], source) -> list[UrlEntry]:
                     else getattr(source, "keep", True)
                 ),
                 # Same three layers again. Kept as text, not seconds: the
-                # value round-trips back into the file on `fux update`, and a
+                # value round-trips back into the file on `fux ingest`, and a
                 # resolved integer would rewrite `1h` as `3600` behind the
                 # consumer's back.
                 ttl=(
@@ -231,7 +231,7 @@ def configure_fetcher(module, config: dict) -> None:
 #:
 #: ⚠ **It shipped referenced by nothing, and that was the defect W-83 fixed.**
 #: `resolve_parallel(module, None)` returned `declared`, and the shipped
-#: `http.py` declares `8` — so an unconfigured `fux update` over a large list
+#: `http.py` declares `8` — so an unconfigured `fux ingest` over a large list
 #: opened **eight** concurrent connections while this constant sat in the same
 #: file stating the default was four and explaining why four was the polite
 #: number. A wrong constant that reads as authority is worse than no constant.

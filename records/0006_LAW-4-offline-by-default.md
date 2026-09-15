@@ -10,7 +10,7 @@ feature: the rationale, history and reopen-trigger of L4
 owns: []
 laws: [L4]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 5affa07c6fba764619763f35a8591cde370a9fc470fccbfc2e3f7047d2584861
+content_sha: 92bd3591612763305e971a8cfb5d842120ddb46d9de17ae2dd65e304fea24e9a
 ---
 
 # SR-LAW-4 — L4 — offline by default
@@ -31,14 +31,23 @@ content_sha: 5affa07c6fba764619763f35a8591cde370a9fc470fccbfc2e3f7047d2584861
 **The handle:** *Offline by default* — the one-line form from [SR-LAWS](0001_LAWS.md)'s
 table. ⚠ **A handle is not the law**; read the law in §2 below.
 
-**The default is no socket.** Ranking, ingest of local directories, the index, `find`, `doctor` and the whole accelerator are offline by construction, and an import fence test asserts that the modules on those paths cannot even import a transport.
+**The default is no socket.** Ranking, the index, `find`, `doctor` and the whole accelerator are offline by construction, and an import fence test asserts that the modules on those paths cannot even import a transport.
 
-**Two networked paths exist today**, both fenced, both opt-in, both announcing themselves on stderr:
+**Two networked paths exist today**, both fenced, both announcing themselves on stderr:
 
 | path | what it does |
 |---|---|
 | `fux add <URL>` | records the line **and fetches that one URL** |
-| `fux update` | re-reads what is already listed |
+| `fux ingest` | re-reads what is already listed, **and goes out for the URLs known to be stale**. `--no-fetch` is the offline form, and it is what the git hooks run |
+
+⚠ **The second row said `fux update` until 2026-09-15**, when Arpit deleted that
+verb and moved its whole surface onto `fux ingest` ([SR-CLI](0101_cli-surface.md)
+decision 16, W-177). **Two things changed and neither is this law.** *Ingest of
+local directories* left the by-construction list above — the default verb can
+open a socket now — and the fence moved with it: the import test asserts that
+`fux ingest --no-fetch` imports no transport and opens none. **The law's own
+text is untouched**, and §"The narrowing that already happened once" below is
+the record of why reading a count off this table is the mistake.
 
 **Network code lives in the consumer's repo, not in the package.** `fux setup` writes `http.py` and `cdp.py` into `.fux/fetchers/`, where they become the consumer's own code. That is why the package can keep zero network lines while URLs still work — and it is a decision of [SR-CDP-FETCHER](0118_cdp-fetcher.md), not of this law.
 
@@ -131,7 +140,7 @@ on 2026-09-06 at Arpit's ruling.
 ### Consequences
 
 - **Easier:** deployment in regulated and air-gapped environments, where *"it cannot reach the network"* is a checkbox somebody has to tick.
-- **Harder:** URL freshness needs a deliberate act. `ttl=` and `fux update` exist because the law will not let staleness fix itself in the background.
+- **Harder:** URL freshness needs a deliberate act. `ttl=` and the networked `fux ingest` exist because the law will not let staleness fix itself in the background.
 - ⚠ **L4 does not close the use-record gap.** [L8](0010_LAW-8-use-record.md)'s 2026-08-27 ratification dropped its transmission clause, and L4 is *offline by default* with an existing fenced path — a journal POSTed through that fence would not obviously violate it. **What holds is the code, not this law.**
 
 ### Alternatives considered

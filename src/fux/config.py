@@ -201,7 +201,7 @@ class UrlSource:
     enrich: bool = False
     #: SR-URL-LIST, the source-wide layer of `update`. A line still wins.
     #: `"auto"` (go out, today's behaviour) or `"never"` (this source is
-    #: pinned; `fux update` does not open a socket for it). ⚠ **Not a
+    #: pinned; `fux ingest` does not open a socket for it). ⚠ **Not a
     #: duration** -- `ttl` above is ask-time and this is update-time, and a
     #: second time-shaped key here would be read as the same knob.
     update: str = "auto"
@@ -550,7 +550,7 @@ def _load_url_source(path: Path, raw, urls_file: str) -> UrlSource | None:
     if update not in ("auto", "never"):
         raise FuxError(
             f'{path}: [sources.url] update must be "auto" or "never" (got {update!r}). '
-            "It is the source-wide default for whether `fux update` fetches these URLs "
+            "It is the source-wide default for whether `fux ingest` fetches these URLs "
             "at all; a line's own `update=` still wins. It takes no duration -- `ttl` is "
             "the ask-time knob and this one is update-time"
         )

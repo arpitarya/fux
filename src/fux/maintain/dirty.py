@@ -59,7 +59,7 @@ def is_readable(root: Path) -> bool:
     both to `[]` on purpose — it feeds reporting paths where "cannot tell"
     should degrade quietly to "nothing known pending".
 
-    ⚠ **A consumer that ACTS on the list needs the distinction.** `fux update`
+    ⚠ **A consumer that ACTS on the list needs the distinction.** `fux ingest`
     refreshes the dirty list by default (W-82 ruling 3), and an empty list means
     *fetch nothing*. A missing or unreadable list would therefore turn `update`
     into a silent no-op — **exactly the "the tail silently stops being

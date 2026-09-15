@@ -57,7 +57,7 @@ refuses.** A query succeeding proves nothing about `fux.toml`; the
 | `max_parallel` | **none — required** | integer ≥ 1; effective value is `min(this, fetcher's MAX_PARALLEL)` |
 | `keep` | `true` | retain fetched bytes in `.fux/acquired/` |
 | `ttl` | `"24h"` | the URL's declared freshness window — `0` or an integer + `s`/`m`/`h`/`d`; read `answer`'s verdict rather than assuming it (see `fux-answer`) |
-| `update` | `"auto"` | `"never"` pins these URLs: `fux update` does not fetch them |
+| `update` | `"auto"` | `"never"` pins these URLs: `fux ingest` does not fetch them |
 | `fetch_at_answer` | `true` | `false` = `fux answer` never opens a socket for these URLs; it verifies against `.fux/acquired/` instead |
 | `enrich` | `false` | whether `fux enrich` plans work for these URLs |
 | `sweep_minutes` | `60` | how often `fux daemon` re-checks URLs |

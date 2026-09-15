@@ -8,6 +8,47 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Removed — BREAKING, read this before upgrading a consumer
+
+- 🔴 **`fux update` is deleted. `fux ingest` is the one verb over the corpus**
+  ([W-177](work/open/W-177-ingest-absorbs-update.md); Arpit's ruling,
+  2026-09-15). The first ingest and every re-ingest, for directories and URLs
+  alike. **There is no deprecation alias** — `fux update` exits non-zero with
+  argparse's *invalid choice*.
+
+  | was | is |
+  |---|---|
+  | `fux update` | `fux ingest` |
+  | `fux update --all` | `fux ingest --refetch-all` |
+  | `fux update --check [--json]` | `fux ingest --check [--json]` |
+  | `fux update --failed` | `fux ingest --failed` |
+  | `fux update <entry>` | `fux ingest <entry>` |
+  | `fux ingest --refresh-urls` *(hidden)* | *(deleted — it is the default now)* |
+
+  - 🔴 **A bare `fux ingest` now GOES TO THE NETWORK.** It fetches the URLs
+    known to be stale and says so on stderr. **The offline form is
+    `fux ingest --no-fetch`** — the same flag, with the same meaning, that
+    `fux add` already carries. CI and air-gapped clones want that one.
+  - **`--all` is renamed because of where it lands.** On `update` it sat alone;
+    on `ingest` it sits beside `--full`, and *all* and *full* read as synonyms
+    while one selects **URLs** and the other re-extracts **documents**.
+  - **Your git hooks change, and `fux hooks` rewrites them.** `post-merge` now
+    runs `fux ingest --no-fetch`; `post-commit` is unchanged. **Split by
+    caller:** the daemon fetches, a git hook never does. Re-run `fux hooks`
+    after upgrading, or a merge will open sockets you did not ask for.
+  - **`fux doctor`'s remediation strings name `fux ingest`.** The report shape
+    is unchanged.
+  - **`--check` and `--list-skipped` are two exit-early flags on one verb now.**
+    Given both, **`--check` wins** — it is the one with a `--json` form and the
+    one a pipeline gates on
+    ([SR-INGEST](records/0106_ingest.md) decision 21b).
+  - ⚠ **What did NOT change:** which URLs a networked run goes out for (W-82
+    ruling 3 — narrow by default), pinned `update=never` lines (never fetched,
+    `--refetch-all` included), the transient-failure guarantee (a failed fetch
+    keeps the prior record and exits `0`), and **law L4**, whose text says
+    *paths*, plural, and never bounded how many
+    ([SR-LAW-4](records/0006_LAW-4-offline-by-default.md)).
+
 ### Changed — read this before upgrading a consumer
 
 - 🔴 **The committed index format is `fux.index.v3`, and an existing index must

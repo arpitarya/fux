@@ -7,6 +7,12 @@ filed: 2026-09-14
 ball: agent
 ---
 
+✅ **2026-09-15: the 2026-09-30 Codex gate is VOID — Codex is available now and
+delivered the golden question sets.** ⚠ **Those are not the paraphrases.** A
+paraphrase is written against a *correction*, blind, and no correction has been
+filed yet. The artifact is now [W-192](W-192-codex-blind-paraphrases.md); the
+harness below is agent work and never waited on any of this.
+
 # W-175 — does a correction generalise, or does it only fix its own phrasing?
 
 **Model: Opus for the design, Codex for the paraphrases** — the paraphrases

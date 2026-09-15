@@ -10,7 +10,7 @@ feature: "`.fux/fetchers/cdp.py` — the reference fetcher for documents behind 
 owns: []
 laws: [L1, L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 904c2f6f2b6c167a9f23012e9adfd9782b0cd534560e7490eedecddf409133fe
+content_sha: ec1f14f5fd21d0f8e8016991d8ba571d8fa910762d73c86a54309705a50aaa0a
 ---
 
 # SR-CDP-FETCHER — the browser fetcher
@@ -488,7 +488,7 @@ in [the filed fixture](../work/regression/2026-08-18-ingest-and-index/report.md)
 The lifecycle is the real thing; only the transport differs:
 
 ```console
-$ fux update
+$ fux ingest
   [fetcher] configure({'greeting': 'hello'})
   [fetcher] connect()
   [fetcher] close()
@@ -540,7 +540,7 @@ $ uv run pytest -q tests/ingest/test_cdp_fetcher.py
 a way that it can pick values from .env file also"*).
 
 ```
-1. the process environment          FUX_CDP_PORT=9333 fux update
+1. the process environment          FUX_CDP_PORT=9333 fux ingest
 2. .env at the repo root            FUX_CDP_PORT=9333
 3. [sources.url.config.cdp]         cdp_port = 9333
 4. the module default               CDP_PORT = 9222
@@ -601,7 +601,7 @@ a way that it can pick values from .env file also"*).
   guards it.
 - ⚠ **Decision 7 caps it at one worker, so a large URL list on `fetch=cdp` is
   strictly sequential** — the honest cost of a shared session, stated rather
-  than discovered when someone wonders why `fux update` is slow.
+  than discovered when someone wonders why `fux ingest` is slow.
 
 ### Alternatives considered
 

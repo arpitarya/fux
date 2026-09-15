@@ -10,7 +10,7 @@ feature: the freshness verdict vocabulary and the per-URL check interval
 owns: [src/fux/refer/freshness.py@6757eeeba7c6]
 laws: [L2, L3, L4]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: cca9ab7bf5c176eeb816c2e40e9fbc0a07eeacd42e3440693f5467d3710edb26
+content_sha: 44a0d3fa146f74ac2ff4c87461d2c30bcfdc1f9f07edd0d41a0896e82ac31206
 ---
 
 # SR-URL-FRESHNESS: what a citation may claim, and how often it has to earn it
@@ -344,14 +344,14 @@ has none, and whoever removes it should know that before deleting the seam.
 still the single definition, and `[sources.url] ttl` still validates through it
 rather than through a second copy ([SR-CONFIG](0113_config.md) decision 12).
 
-15. 🔴 **`ttl` is ASK-TIME. It does not reach `fux update`, and the attribute
-    that does is `update=`.** Two clocks sit on the same line and this is the
+15. 🔴 **`ttl` is ASK-TIME. It does not reach the networked ingest, and the
+    attribute that does is `update=`.** Two clocks sit on the same line and this is the
     sentence that keeps them apart.
 
     | attribute | when it acts | what it decides |
     |---|---|---|
     | **`ttl=`** *(this record)* | **ask time** — inside `fux answer` | how long a citation may go **unchecked** before fux re-verifies it |
-    | **`update=`** ([SR-URL-LIST](0116_url-list.md) decision 14) | **update time** — `fux update`, `fux ingest --refresh-urls` | whether fux goes back for the document **at all** |
+    | **`update=`** ([SR-URL-LIST](0116_url-list.md) decision 14) | **update time** — a networked `fux ingest`, `--refetch-all` included | whether fux goes back for the document **at all** |
 
     - **`ttl=0` is not `update=never`.** `ttl=0` means *check on every answer*
       — maximally networked. `update=never` means *never fetch again* —

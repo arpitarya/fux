@@ -149,7 +149,7 @@ def run(
 
     `only_urls` narrows **which listed URLs are fetched** on a networked run;
     every other listed URL is carried forward exactly as a failed fetch would
-    be. It is what lets `fux add <url>` and `fux update <url>` touch the
+    be. It is what lets `fux add <url>` and `fux ingest <url>` touch the
     network for one document without a second write path into the index —
     the whole run still ends in the one `write_index` call below, so a scoped
     fetch and a full refresh produce the same bytes for everything they agree
@@ -213,7 +213,10 @@ def run(
     validated_count = 0
     if refresh_urls:
         if config.url is None:
-            raise FuxError(f"--refresh-urls: no [sources.url] configured in {root / 'fux.toml'}")
+            raise FuxError(
+                f"a URL fetch was asked for, but there is no [sources.url] in "
+                f"{root / 'fux.toml'} to do it with. `fux setup` writes a fetcher"
+            )
         resolved = urlsrc.resolve_urls(urlsrc.read_urls(root, config.url.urls_file), config.url)
         url_meta = {f"url:{entry.url}": entry.meta for entry in resolved}
         # `url_meta` stays the **whole** list even under `only_urls`: it is what
@@ -245,7 +248,7 @@ def run(
         # wrote the line, fetched nothing and exited 1 (W-140 row 3, fixed
         # 2026-09-11). `cmd_add` passes the URL it just wrote, and nothing else
         # ever populates this set — a pin is still absolute for every later run,
-        # `--all` and `--full` included.
+        # `--refetch-all` and `--full` included.
         first_fetch = first_fetch or set()
         pinned = [e for e in to_fetch if e.update == "never" and e.url not in first_fetch]
         if pinned:
@@ -924,7 +927,7 @@ def _existing_index(root: Path, *, full: bool) -> dict[str, dict]:
             f"(_format={header.get('_format')!r}, analyzer={header.get('analyzer')!r}) "
             f"and holds {len(stranded)} url: record(s) that a re-ingest cannot rebuild "
             f"offline:\n  {shown}{more}\n"
-            f"Re-fetch them on a networked run instead: `fux update`."
+            f"Re-fetch them on a networked run instead: `fux ingest`."
         )
     return {}
 
@@ -1185,7 +1188,7 @@ def _stale_redaction_warnings(stranded: list[str]) -> list[str]:
         f"warning: {len(stranded)} url document(s) could not be re-extracted under the new "
         f"policy - no retained bytes: {shown}{more}.\n"
         "  Their records are unchanged and still hold text extracted under the OLD rules. "
-        "`fux update` fetches them; `keep=true` on the line retains the bytes so the next "
+        "`fux ingest` fetches them; `keep=true` on the line retains the bytes so the next "
         "policy change can reach them offline."
     ]
 
@@ -1338,7 +1341,7 @@ def _reusable(root: Path, existing: dict[str, dict], file_shas: dict[str, str]) 
     2. **The content sha is unchanged.** Extraction is a pure function of the
        document's bytes and its `loc`, both of which the sha and the id fix.
     3. **It is a `file:` record with `meta: plain`.** A `url:` record only
-       reappears on a `--refresh-urls` run, and a hashed record's display
+       reappears on a networked `fux ingest`, and a hashed record's display
        fields were deliberately never stored in a reusable form.
     """
     paths = store_mod.iter_shard_paths(root)

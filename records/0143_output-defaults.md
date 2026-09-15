@@ -10,10 +10,10 @@ amended: 2026-08-28
 date: 2026-08-27
 ratified: 2026-08-27
 feature: configurable output defaults
-owns: [src/fux/output_config.py@d8c53dfbf3c9]
+owns: [src/fux/output_config.py@8e8e57fade21]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: d29c553be3a518ebffbb10ba37ab2b13d1f44ab5d51ace80dccf3409bf559333
+content_sha: 3c3f571d255122101e435105ea8c9bd36fbfcb0b0868d1592f16355739eea4dd
 ---
 
 # SR-OUTPUT — output defaults are configurable, in a third file
@@ -501,7 +501,7 @@ null
     it, because only `ask` has the concept.
 
 ⚠ **No output default changed on 2026-08-28.** `fux doctor` gained a `url daemon`
-row and `fux update` gained `--all`; both print through the existing surfaces and
+row and `fux ingest` gained `--all`; both print through the existing surfaces and
 neither adds a gated flag or a `[verb]` key. Recorded because this record
 constrains **every** gated flag in `cli.py` to `default=None`, and `--all` is a
 plain `store_true` — it gates nothing and reads no config, so decision 10 does

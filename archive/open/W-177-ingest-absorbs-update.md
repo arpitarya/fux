@@ -119,7 +119,23 @@ test pins that a hook-invoked ingest opens no socket.
   it is `ingest`, ask whether the two skills still divide where they should —
   that is a question for Arpit, not a rewrite to perform.
 
-## Open questions — file, do not guess
+## ✅ Open questions RULED 2026-09-15 (Arpit, Cowork)
+
+1. **The hook's offline invocation is `fux ingest --no-fetch`** — option (b).
+   Same flag, same meaning as `fux add --no-fetch`; one SR row covers both. It
+   is a public surface flag, so CI and air-gapped clones can ask for an offline
+   ingest by hand. `fux hooks` writes it; `fux daemon` writes the bare verb. The
+   L4 fence test asserts an ingest invoked with `--no-fetch` imports no transport
+   and opens no socket. No `--offline` alias.
+2. **`fux doctor` remediation strings are reworded to name `fux ingest`**
+   (`fux ingest --check` for the freshness row). The report shape is unchanged.
+3. **The rename rides 3.0**, not a 2.1 patch — 3.0 is already the breaking
+   release. CHANGELOG carries a breaking-change block naming `fux update` →
+   `fux ingest` and `--all` → `--refetch-all`.
+
+The three questions as originally filed are kept below for the record.
+
+## Open questions as filed — now ruled above
 
 1. **What does the hook's offline invocation look like?** `fux ingest
    --offline`, `--no-fetch` (which `fux add` already uses for a URL line), or a

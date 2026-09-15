@@ -7,10 +7,10 @@ description: One canonical encoder, sharded doc-major JSONL, write-if-different;
 status: accepted
 date: 2026-08-18
 feature: generation and update of the committed index, and the refusal that keeps its derived accelerator from diverging
-owns: [src/fux/store@e54de1488824]
+owns: [src/fux/store@bce1c9ab0be2]
 laws: [L1, L2, L3, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: ef2d2178beb808af7adc52d019160e939696fd6002efe4107cdfafa1315d4c34
+content_sha: 07d33c33383bd144c1ed2193f5f5d96d6ce1a4742afc14d6b0e8f88fe6504ef6
 ---
 
 # SR-INDEX-LIFECYCLE — how the index is generated and updated
@@ -213,7 +213,7 @@ thing in the index that is not a function of a committed file.
   (`store/reader.py::foreign_url_ids`). No `url:` records → the old shards are
   discarded and every document is re-extracted from source, losing nothing a
   re-extraction does not restore. Any `url:` records → **refuse**, name them,
-  and point at `fux update`, which is the only thing that can rebuild them.
+  and point at `fux ingest`, which is the only thing that can rebuild them.
 - **A delta run on a foreign index** still refuses outright. Carry-forward
   genuinely cannot proceed across analyzers.
 - **`read_index` still refuses a foreign shard**, unchanged.
@@ -436,7 +436,7 @@ outside `terms` in record 'url:…/oncall'. `query/scan.py` counts it toward tha
 term's df from the raw bytes, and the accelerator counts from the postings, so
 the two paths would score this corpus differently. Refusing to build a divergent
 accelerator. This record's `title_h` predates the `h:` prefix
-(SR-INDEX-LIFECYCLE): re-run `fux update` to rewrite it.
+(SR-INDEX-LIFECYCLE): re-run `fux ingest` to rewrite it.
 ```
 
 **A corpus written today builds clean**, because the prefix means the scan's

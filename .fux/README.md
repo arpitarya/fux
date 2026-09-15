@@ -38,7 +38,7 @@ of THREE kinds:
 `fetchers/http.py` and `fetchers/cdp.py` are **your** code, committed
 to **your** repo. `fux setup` writes them once if they are missing;
 `fux ingest` never writes a fetcher at all. Fux loads one by path
-under `fux add <URL>` or `fux update`, and never rewrites it. Change the
+under `fux add <URL>` or `fux ingest`, and never rewrites it. Change the
 port, the transport, the extraction, anything.
 
 One consequence of living in a dotdir: linters that skip hidden
@@ -85,8 +85,8 @@ Flat verbs, no subcommand tree. `fux <verb> --help` for any of them.
 | group | verbs | what the group does |
 |---|---|---|
 | lifecycle | `setup` `doctor` `inspect` | set the repo up, check the environment, then X-ray the index it produced |
-| write | `ingest` `build` | `ingest` writes the committed index; `build` derives the local accelerator from it |
-| sources | `add` `remove` `update` `enrich` `correct` | maintain what is indexed. `add`/`remove` write lines; `update` re-fetches and writes none; `enrich` plans and validates a model's text; `correct` writes one question a PERSON typed onto the document that answers it |
+| write | `ingest` `build` | `ingest` writes the committed index - the first time and every time after, for directories and URLs alike, re-fetching the URLs known to be stale; `build` derives the local accelerator from it |
+| sources | `add` `remove` `enrich` `correct` | maintain what is indexed. `add`/`remove` write lines and end in an ingest; `enrich` plans and validates a model's text; `correct` writes one question a PERSON typed onto the document that answers it |
 | read | `ask` `find` `answer` `lexical` | the same question, differing only in how much each commits to. `lexical` is BM25F alone, frozen - the baseline `ask` is measured against |
 | graph | `explain` `graph` `path` | answer with relationships the documents stated, never with a ranking |
 | serve | `mcp` `daemon` | the only verbs that do not return |
@@ -120,7 +120,7 @@ there is no binding to install, version, or wait for.
 **Three things are the whole contract:**
 
 1. **`--json` on every read verb.** `ask`, `find`, `answer`, `explain`,
-   `graph`, `path`, `doctor`, `update`. Never parse the prose output -
+   `graph`, `path`, `doctor`, `ingest --check`. Never parse the prose output -
    it is for humans and it is allowed to change.
 2. **Exit codes.** `0` ok - `1` error - `2` blocking (strict mode) -
    `130` interrupted. Errors go to stderr as `error: <message>`.

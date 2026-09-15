@@ -53,8 +53,25 @@ decision 24); `--json` carries all of them unconditionally, as ruled. What it
 gives up: a consumer cannot show one prose signal and hide another.
 
 **Steps 4–10 are unchanged and still gated.** Every one needs golden
-unanswerable questions in enough number to clear the d19 floor — Codex,
-2026-09-30. Step 10's other gate, W-161, **is now built**.
+unanswerable questions in enough number to clear the d19 floor. Step 10's other
+gate, W-161, **is now built**.
+
+🔴 **CORRECTED 2026-09-15 — "Codex's key" is void wording, and the date gate with
+it.** Codex delivered both question sets today
+([`questions/set-1.jsonl`](../golden/questions/README.md), 125 rows), so the
+2026-09-30 availability gate is gone. But **there is no key and there never will
+be one an agent can reach** —
+[SR-LAW-11](../../records/0012_LAW-11-sealed-answer-key.md): the answers are
+Arpit's custody, and Claude is closed out of a paste as well as a file. **What
+gates 4–9 actually need is a SCORED run** — prompt 6, Codex scoring in a chat
+Arpit attends — which arrives through [W-136](W-136-golden-benchmark.md), not
+through a key this item could ever hold.
+
+⚠ **And nobody on this side can check the precondition.** *"Enough unanswerable
+questions to clear the d19 floor"* is unverifiable by any agent by design:
+`questions/` carries `{"id","question"}` and deliberately no `answerable` field,
+because that field hands over the abstention slice outright. **So this item must
+take the count from the scored run, never assert it beforehand.**
 
 ## Definition of done — per gate, in this order
 

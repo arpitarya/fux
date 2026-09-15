@@ -28,6 +28,26 @@ Rules:
 
 
 
+## 2026-09-15 — **W-177: `fux update` is deleted; `fux ingest` is the one verb**
+
+| item | what landed | evidence |
+|---|---|---|
+| **the verb is gone** | parser entry, `_cmd_update`, `sources.cmd_update` and the hidden `ingest --refresh-urls` alias, all deleted. **No deprecation shim** — W-63's reason for keeping `--refresh-urls` (older, likelier to be in CI) does not reach a three-week-old verb | [SR-CLI](../records/0101_cli-surface.md) decision 16 |
+| **the whole surface moved** | bare (fetch the stale URLs) · `--check` · `--json` · `--failed` · positional `<entry>` · `--all` renamed **`--refetch-all`**, because beside `--full` the old name read as its synonym while one selects URLs and the other re-extracts documents | decision 16b |
+| 🔴 **a bare `fux ingest` goes to the network** | the L4 fence moved off the default verb. `plan_url_refresh` decides and announces; `cmd_ingest` runs. Narrow-by-default is untouched — W-82 ruling 3 is about *which* URLs | [SR-URL-INGEST](../records/0107_url-ingest.md) decision 8 |
+| **the offline form is `--no-fetch`** | same flag, same meaning `fux add` carries. Public surface, for CI and air-gapped clones; no `--offline` alias | decision 16c |
+| **the hook/daemon split is by CALLER** | `fux hooks` writes `fux ingest --no-fetch` into `post-merge`; the daemon writes the bare verb; `--spawn-runner`/`--runner` are offline by construction | [SR-MAINTENANCE](../records/0129_hooks.md), decision 16d |
+| **the fence is a test, not an intention** | `test_a_hook_path_ingest_opens_no_socket` runs a real ingest with `socket.socket` monkeypatched to raise, against a **real consumer fetcher that opens one** and leaves a marker file — because ingest *catches* a fetcher exception and exits 0, so the marker is the only evidence that survives. Negative control run: without the flag, it trips | `tests/test_source_verbs.py` |
+| **`--check` beats `--list-skipped`** | two exit-early flags on one verb, ruled rather than left to argparse's order | [SR-INGEST](../records/0106_ingest.md) decision 21b |
+| **the surface captured** | a three-document, two-URL throwaway repo, the fetcher logging every call. Pinned `update=never` never fetched (`--refetch-all` included); `--no-fetch` calls it zero times | [run](regression/2026-09-15-ingest-absorbs-update/report.md) |
+| **no law changed** | SR-LAW-4 says *paths*, plural. Its §1 rationale table was edited (the row is `fux ingest` now); the law's text was not | [SR-LAW-4](../records/0006_LAW-4-offline-by-default.md) |
+| **blast radius** | 13 modules, 12 records, 6 shipped agent skills (re-rendered into `.claude/`, `.agents/`, `.kiro/`), the Node twin's `CLI_VERBS`, `.fux/README.md` and its template, README, GLOSSARY, handbook, CHANGELOG | this change |
+| 🔴 **found, not fixed: `fux update` exits `2`** | SR-CLI decision 5 reserves `2` and says fux never produces one. Argparse does, it predates W-177, and W-177 makes it reachable **from a command line valid in the released 2.0.1** — so a consumer's CI reads a rename as the runner breaking. Turning argparse's usage exit into `1` changes every verb's contract, so it is **Arpit's** | [W-193](open/W-193-argparse-exit-two.md) |
+
+**Both suites green, whole** — 4 782 unit, the e2e suite, and 36 Node tests.
+
+---
+
 ## 2026-09-15 — **both question sets exist; W-189 and W-145 close**
 
 | item | what landed | evidence |
