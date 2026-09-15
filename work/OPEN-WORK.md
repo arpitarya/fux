@@ -38,18 +38,16 @@ day it was filed. Nothing in the queue waits on a decision of his.
 - 🟣 **W-176** · `agent`, waiting on **2026-09-30** — **steps 1–3 landed 2026-09-15**: `weak` ⇒ `answerable: false`, the steering text, `failed`. The seven measured gates need Codex's key. [detail](open/W-176-abstention-gates.md)
 - 🟡 **W-170** · `agent`, waiting on W-181 — **BUILT 2026-09-15**, SR-OBSERVE `accepted`. Node out of scope (SR-NODE-SEARCH d18). Only the latency capture is owed. [detail](open/W-170-cage-search-leg.md)
 - 🟡 **W-148** · `agent`, waiting on W-179 — **rows 1–3 done 2026-09-15**: CI's corpus arm removed, §4 local, SR-WORK-BENCHMARK 12–13. N4 unmeasured; row 4 out of scope. [detail](open/W-148-what-the-two-readers-still-owe.md)
-- 🟡 **W-140** · `agent`, waiting on W-182 — row 12 landed 2026-09-15; row 21's runner-race flake is all that is left and has not reproduced in 11 attempts. [detail](open/W-140-guide-authoring-defects.md)
+- 🟡 **W-140** · `agent`, waiting on W-185 — row 21's stranding did **not** reproduce in 104 deliberate trials; a different race did and is W-185. [detail](open/W-140-guide-authoring-defects.md)
 - 🟢 **W-179** · `agent` — run the **Node latency column** in `fux-benchmark` (SR-WORK-BENCHMARK d12); split out W-161's in-memory graph rebuild or the number blames the reader. Unblocks W-148. [detail](open/W-179-node-latency-column.md)
+- 🟢 **W-185** · `agent` 🧨 — a concurrent `git add -A` dies on `.fux/index/<shard>.jsonl.tmp`, an untracked temp file in a **committed** directory. **Fires in `tests_e2e`, ~1 run in 3.** Unblocks W-140. [detail](open/W-185-index-temp-file-race.md)
 - 🟢 **W-181** · `agent` — the **observer latency capture**: pick the reference-vs-cage observer fork, then p50 `ask` with and without. Unblocks W-170. [detail](open/W-181-observer-latency-capture.md)
-- 🟢 **W-182** · `agent` — **make the runner race reproducible** under deliberate stress; the first success is a CAPTURE, not a fix. Unreproducible is a result. Unblocks W-140. [detail](open/W-182-reproduce-the-runner-race.md)
-- 🟢 **W-184** · `agent` — the **differential harness dies on a PNG** in a source dir, so its real-corpus arm has been dead and the synthetic one covered for it. [detail](open/W-184-differential-harness-utf8.md)
 
 ### testing
 
 
 - 🟢 **W-180** · `agent` — run the **frozen `b`-sweep** on the golden ladder in `fux-lab`; the threshold may not move, a null closes W-144. Unblocks W-144. [detail](open/W-180-b-sweep-run.md)
-- 🟢 **W-183** · `agent` — **design a non-circular quality endpoint** with headroom both ways, or refuse with the fork. C2 is the worked failure. Unblocks W-154. [detail](open/W-183-non-circular-quality-endpoint.md)
-- 🟡 **W-154** · `agent`, waiting on W-183 — **the price is measured** ([run](regression/2026-09-13-rerank-cost/report.md)); the benefit is not, and every obvious endpoint is circular. [detail](open/W-154-rerank-weight-cost.md)
+- 🟢 **W-154** · `agent` — **the instrument exists** (W-183, `agreement` 0.4141): run Part B, two arms × two verb paths, never pooled. ⚠ The `ask` arm's document-level screen runs FIRST. [detail](open/W-154-rerank-weight-cost.md)
 - 🟣 **W-136** · `arpit`, waiting on **2026-09-30** — everything an agent can do is done; **phase 5 scoring is Codex's hands** and is all that is left. [detail](open/W-136-golden-benchmark.md)
 - 🟣 **W-145** · `arpit`, waiting on **2026-09-30** — Codex regenerates the golden answer key; until then every golden number is `informed`. [detail](open/W-145-codex-regenerates-the-key.md)
 - 🟣 **W-87** · `agent`, waiting on W-145 — P2's `unanswerable` gate is measured (0/124); recall needs phase 5 and **Part B needs an uncontaminated key**. [detail](open/W-87-what-good-means.md)

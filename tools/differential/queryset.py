@@ -36,7 +36,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from fux.config import load
-from fux.ingest.gitdir import source_dirs, walk_sources
+from fux.ingest.gitdir import WalkedFile, source_dirs, walk_sources
 from fux.query.tokenize import tokenize
 
 #: The three questions frozen in the M1 handoff §9, before the engine existed.
@@ -66,6 +66,12 @@ class Vocabulary:
 
     #: (term, df) sorted by df descending, then term ascending.
     by_df: list[tuple[str, int]]
+    #: How many walked files were not UTF-8 and contributed no term. **Never
+    #: silent**: a query set that quietly shrinks is a harness that quietly
+    #: stops proving things (W-184).
+    skipped_undecodable: int = 0
+    #: The names of those files, sorted, so the number can be checked.
+    undecodable: tuple[str, ...] = ()
 
     @property
     def terms(self) -> list[str]:
@@ -79,14 +85,54 @@ class Vocabulary:
 
 
 def vocabulary(root: Path) -> Vocabulary:
-    """Tokenize the configured sources and count document frequency per term."""
+    """Tokenize the configured sources and count document frequency per term.
+
+    ⚠ **This walks what a SOURCE DIRECTORY holds, not what INGEST keeps**, and
+    the difference is deliberate (W-184 definition-of-done 2). `walk_sources`
+    yields every file under a configured directory, including the ones no
+    decoder claims; ingest then drops those, so a term found here may name no
+    indexed document. **That is the right set for a differential harness**: the
+    two sides have to agree on a miss exactly as they agree on a hit, and a
+    query nothing matches is one of the cheapest ways to disagree. It is the
+    wrong set for anything reasoning about the index's own vocabulary, which is
+    what `bench_r3.indexed_vocabulary` reads the offset table for.
+
+    ⚠ **A file that is not UTF-8 contributes nothing and is COUNTED.** Until
+    2026-09-15 this decoded every walked file and raised on the first PNG, so
+    `run.py --root .` could not run on this repository at all and the real-corpus
+    arm was dead while the synthetic one passed.
+    """
     config = load(root)
     walked, _ = walk_sources(root, source_dirs(root, config.dirs_file))
     df: dict[str, int] = {}
+    skipped: list[str] = []
     for walked_file in walked:
-        for term in set(tokenize(walked_file.content.decode("utf-8"))):
+        text = _as_text(walked_file, skipped)
+        if text is None:
+            continue
+        for term in set(tokenize(text)):
             df[term] = df.get(term, 0) + 1
-    return Vocabulary(by_df=sorted(df.items(), key=lambda kv: (-kv[1], kv[0])))
+    return Vocabulary(
+        by_df=sorted(df.items(), key=lambda kv: (-kv[1], kv[0])),
+        skipped_undecodable=len(skipped),
+        undecodable=tuple(sorted(skipped)),
+    )
+
+
+def _as_text(walked_file: WalkedFile, skipped: list[str]) -> str | None:
+    """`walked_file`'s bytes as text, or `None` after recording it as skipped.
+
+    ⚠ **Never `errors="replace"`.** A PNG decoded that way yields a page of
+    replacement characters that tokenize into terms no document contains, and
+    those terms then generate queries — so the harness would run, and quietly
+    measure a vocabulary the corpus does not have. Crashing was worse; guessing
+    is the failure that does not announce itself.
+    """
+    try:
+        return walked_file.content.decode("utf-8")
+    except UnicodeDecodeError:
+        skipped.append(walked_file.rel_path)
+        return None
 
 
 def generate(
@@ -104,10 +150,38 @@ def generate(
     Defaults are sized for a fast unit run over a repo-scale corpus. The lab
     raises them; the shape of the set does not change with the size.
     """
+    return generate_with_vocabulary(
+        root,
+        common=common,
+        median=median,
+        rare=rare,
+        pairs=pairs,
+        triples=triples,
+        goldens=goldens,
+    )[0]
+
+
+def generate_with_vocabulary(
+    root: Path,
+    *,
+    common: int = 120,
+    median: int = 120,
+    rare: int = 120,
+    pairs: int = 200,
+    triples: int = 100,
+    goldens: list[str] | None = None,
+) -> tuple[list[str], Vocabulary]:
+    """`generate`, and the `Vocabulary` it was drawn from.
+
+    ⚠ **The vocabulary is returned so a RUNNER can print what it skipped.**
+    `generate` alone hands back a list of strings, and a query set that silently
+    shrank because ten files stopped decoding looks exactly like one that did
+    not (W-184 definition-of-done 1).
+    """
     vocab = vocabulary(root)
     total = len(vocab.by_df)
     if total == 0:
-        return list(_finalize(ADVERSARIAL, R2_QUESTIONS, goldens or []))
+        return list(_finalize(ADVERSARIAL, R2_QUESTIONS, goldens or [])), vocab
 
     # 1 · the systematic bands. The high-df head is the trap B4 measured and
     # the only place block skipping can pay, so it is sampled first and hardest.
@@ -136,7 +210,7 @@ def generate(
         ]
         combos.append(" ".join(p for p in parts if p).strip())
 
-    return list(_finalize(singles, combos, ADVERSARIAL, R2_QUESTIONS, goldens or []))
+    return list(_finalize(singles, combos, ADVERSARIAL, R2_QUESTIONS, goldens or [])), vocab
 
 
 def _finalize(*groups) -> list[str]:

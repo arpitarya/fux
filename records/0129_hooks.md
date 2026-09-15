@@ -7,10 +7,10 @@ description: "post-commit DEFERS — it writes a dirty list and spawns a detache
 status: accepted
 date: 2026-08-20
 feature: maintenance — the hooks, the deferring runner, the write lock, and the URL freshness daemon
-owns: [src/fux/maintain@1e2ab181bdab, tools/maintenance-bench@23a6ade137a5]
+owns: [src/fux/maintain@1e2ab181bdab, tools/maintenance-bench@23a6ade137a5, tools/runner-race@98bd70ff092a]
 laws: [L3, L4, L5, L7]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 01f69487913e6dc326a2f38f293fbc5db09bc5172bcf875ef15ce00170816919
+content_sha: 3e96d29a902f67222cc537928b367bc866f1b0cfe7af27f96c6bc546ac0d23f0
 ---
 
 # SR-MAINTENANCE — keeping the index in step
@@ -534,6 +534,41 @@ handed the cost to the next `--fast` query.
 - **A missed build was never a wrong answer**, because `accel.is_fresh` checks
   the build stamp against the shards — it was a slower query and a plane that
   quietly stopped being maintained by the thing that maintains everything else.
+
+**1e. Deferral's cost is that a consumer's `git` can overlap a live writer, and
+on 2026-09-15 it was shown to LOSE.** Decision 1a returns before the re-index
+finishes, on purpose — that is the whole trade. The consequence nobody had priced
+is that an ordinary second `git add -A` legitimately runs while shards are being
+written, and `store/writer.py::_atomic_write` puts `<shard>.jsonl.tmp` **beside**
+the shard, inside a **committed** directory, untracked and un-ignored:
+
+```
+git add -A exited 128: fatal: unable to stat '.fux/index/7c.jsonl.tmp':
+  No such file or directory
+```
+
+**Captured 2 of 8** at `delay = 0.078 s` into a 0.391 s run and **0 of 96**
+elsewhere in the sweep — the distribution is the diagnosis, because 0.078 s is
+when shards are actually being written.
+[The run](../work/regression/2026-09-15-runner-race-soak/report.md);
+the fix is **W-185** and is deliberately not applied in the pass that captured it.
+
+⚠ **The sibling temp file is CORRECT and must stay a sibling.** `os.replace` is
+atomic only within one filesystem. What leaks is the *name*, not the strategy,
+and moving the file to `.fux/runtime/` would trade a rare `git` failure for a
+rare `OSError` in the writer.
+
+**1f. `tools/runner-race/` exists because waiting for a rare interleaving is not
+a plan.** The e2e flake of 2026-09-12 stayed green through **11** deliberate
+re-runs, three of them the exact shape it failed in. The soak calibrates how long
+one background re-index takes on the machine and then walks a second commit
+across it, dense at the tail where `release()` and
+`_hand_off_if_leftovers_are_new` are — **67 of 104 trials landed inside a live
+runner**, which the eleven re-runs could never demonstrate they had reached.
+
+⚠ **It changes nothing under `src/`, by design**, and that bounds what it can
+reach: the handoff window's surviving ordering needs a delay injected **inside**
+`run_once`, so **0 of 104 stranded is "unreproduced", never "closed"**.
 
 ### Consequences
 

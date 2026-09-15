@@ -1,0 +1,59 @@
+.......................................F
+=================================== FAILURES ===================================
+________ test_post_commit_defers_and_a_detached_runner_drains_the_list _________
+
+tmp_path = PosixPath('/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/pytest-of-arpitarya/pytest-549/test_post_commit_defers_and_a_0')
+
+    def test_post_commit_defers_and_a_detached_runner_drains_the_list(tmp_path):
+        """W-66 Phase 2, through the real hook, real git, and a real detached
+        process. The commit returns before the re-index has happened — that is
+        the whole of the fork's ruling — and the runner finishes it afterwards.
+    
+        **This absorbed `test_the_post_commit_hook_reindexes_after_a_commit` on
+        2026-08-27** (Arpit's call). The two had converged on the same corpus, the
+        same commit and the same assertion: the deleted one was written when
+        `post-commit` re-indexed **inline**, and once the fork resolved to deferral
+        its subject stopped existing. What it uniquely asserted — that a hook never
+        blocks a commit — is asserted here, and separately in
+        `test_a_hook_never_blocks_a_commit_even_when_fux_is_absent`.
+    
+        ⚠ **The deleted test also raced from 2026-08-22 to 2026-08-27**, reading the
+        index on the line after a commit that now returns before the work is done.
+        It failed about one run in three on a loaded machine — the shape a flake
+        takes before anyone calls it one. `_drain` is the fix, and it is used below.
+        """
+        make_repo(tmp_path, hooks=True)
+    
+        (tmp_path / "docs" / "new.md").write_text(doc("dirtylistterm"), encoding="utf-8")
+>       git(tmp_path, "add", "-A")
+
+tests_e2e/test_maintenance.py:337: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cwd = PosixPath('/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/pytest-of-arpitarya/pytest-549/test_post_commit_defers_and_a_0')
+check = True, args = ('add', '-A')
+
+    def git(cwd: Path, *args: str, check: bool = True) -> subprocess.CompletedProcess:
+        """`check=True` raises with git's OWN message, not just an exit code.
+    
+        `subprocess.run(check=True)` raises `CalledProcessError`, whose string is
+        `Command '[...]' returned non-zero exit status 128` — the stderr it
+        captured is on the exception and pytest never prints it. A flaky
+        `git add -A` in this file therefore said only *128* for as long as it had
+        been flaking (2026-09-13).
+        """
+        proc = subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True, encoding="utf-8")
+        if check and proc.returncode != 0:
+>           raise AssertionError(
+                f"git {' '.join(args)} exited {proc.returncode} in {cwd}\n"
+                f"stdout: {proc.stdout.strip()}\nstderr: {proc.stderr.strip()}"
+            )
+E           AssertionError: git add -A exited 128 in /private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/pytest-of-arpitarya/pytest-549/test_post_commit_defers_and_a_0
+E           stdout: 
+E           stderr: fatal: unable to stat '.fux/index/ad.jsonl.tmp': No such file or directory
+
+tests_e2e/test_maintenance.py:37: AssertionError
+=========================== short test summary info ============================
+FAILED tests_e2e/test_maintenance.py::test_post_commit_defers_and_a_detached_runner_drains_the_list
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 39 passed in 16.90s

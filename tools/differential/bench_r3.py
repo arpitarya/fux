@@ -34,6 +34,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parent))  # the harness's own modules
 
 from fux.derive import accel  # noqa: E402
 from fux.derive import format as fmt  # noqa: E402
@@ -71,18 +72,19 @@ def corpus_terms(root: Path) -> list[tuple[str, int]]:
 
 
 def source_vocabulary(root: Path) -> list[tuple[str, int]]:
-    """Plaintext terms with df, from the sources — hashes are not queryable."""
-    from fux.config import load
-    from fux.ingest.gitdir import source_dirs, walk_sources
-    from fux.query.tokenize import tokenize
+    """Plaintext terms with df, from the sources — hashes are not queryable.
 
-    config = load(root)
-    walked, _ = walk_sources(root, source_dirs(root, config.dirs_file))
-    df: dict[str, int] = {}
-    for f in walked:
-        for term in set(tokenize(f.content.decode("utf-8", errors="replace"))):
-            df[term] = df.get(term, 0) + 1
-    return sorted(df.items(), key=lambda kv: (-kv[1], kv[0]))
+    ⚠ **This used to decode with `errors="replace"` and it was the quieter half
+    of W-184.** `walk_sources` yields every file under a source directory,
+    binaries included; replacing the undecodable bytes turned a PNG header into
+    the term `png` and a page of replacement characters into whatever they
+    tokenized to. The harness ran, and measured a vocabulary the corpus does not
+    have. One shared helper now decides what counts as text, so the crashing
+    sibling and this one cannot diverge again.
+    """
+    from queryset import vocabulary
+
+    return vocabulary(root).by_df
 
 
 def time_queries(fn, queries: list[str], label: str, repeats: int = 3) -> Timing:

@@ -29,6 +29,74 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-15 — the green queue, worked continuously: W-184, W-183, W-182  ·  Claude Code (Opus 5)
+
+- **Asked:** implement all the green items, continuously, unblocking as I go.
+- **Triage first:** inbox empty, `work/BLOCKED.json` is `PROCEED`. 🔴 **But the
+  tree was not clean and HEAD was not the whole story.** The previous session
+  built W-168 step 1 and law L11 and **committed neither** — `NOW.md` said so in
+  its own last line — with `tests/test_sr_ownership.py` red on top, because
+  `SR-LAW-11` arrived owning no `src/` component and the pinned set had not been
+  told. Landed that first, and three more failures surfaced on the way.
+- **Did — the pile, plus a defect the pile was hiding:**
+  - Committed the previous session's work (`fux.index.v3`, the anchor field,
+    L11 + SR-WORK-GOLDEN + SR-WORK-GOVERNANCE) with the ownership pin it needed.
+  - 🔴 **`.fux/README.md`'s verb table had drifted from the template that
+    generates it, by three verbs.** `ensure_layout` is write-if-missing, so this
+    repository's copy and `store/fuxdir.py::_readme` are two artifacts; all four
+    tests in `test_verb_table_agreement.py` read the file and none read the
+    template, so a fresh `fux setup` handed out a short list and nothing could
+    tell. ⚠ **And the template is written with `.encode("ascii")`** — the em dash
+    my first fix put in it raises at the head of every ingest, but only where no
+    `.fux/README.md` exists yet, which is never here and always a new consumer's
+    first run. Two gates read `_readme()` now. SR-DOTFUX decision 6b.
+- **Did — W-184 (the differential harness):** it was dead in **three** ways.
+  `queryset.vocabulary` died on a PNG; `bench_r3.source_vocabulary` decoded the
+  same bytes with `errors="replace"` and **ran**, folding `png` into the corpus
+  vocabulary; and behind the crash, `compare()` still passed `archived_weight=`,
+  **removed by W-152 two days earlier**. The weight sweep rides `[priority]` now
+  — a better shape for W-73's bound than the global prior it replaced. **22 144
+  byte-identical comparisons, zero mismatches**, the first run through `run.py`
+  itself that ever reached a comparison. `tests/derive/test_differential_harness.py`
+  is the two-strike gate.
+- **Did — W-183 (the quality endpoint):** the contribution is **a test a
+  candidate can fail**, not a candidate. Score every passage with the reranker's
+  own objective and ask whether the true passage is the one it picks;
+  `agreement ≈ 1.00` is C2's circularity caught by arithmetic. Band `0.25`–`0.85`
+  **frozen in its own commit** (`9b32762f`) before the generator existed.
+  Measured: **0.4141 over 524 cited-decision contests, chance 0.0748** — inside.
+  W-154's Part B is pre-registered and the item goes 🟡→🟢 after three days.
+- **Did — W-182 (the runner race):** built the soak that walks a second commit
+  across a live runner's lifetime. **Two results.** The stranding row 21 waited
+  eleven attempts for did **not** reproduce — 0 of 104, with **67 trials landing
+  inside a live runner**, which those eleven could never show they reached. And a
+  **different** race did, twice: `git add -A` dies on
+  `.fux/index/<shard>.jsonl.tmp`, an untracked temp file in a **committed**
+  directory, 2 of 8 at the early-delay step and 0 of 96 elsewhere. **Probably the
+  2026-09-12 flake** — that test makes four hooked commits, each with `git add -A`.
+- **Decided / open:**
+  - **Nothing in `src/` changed for W-182**, per its own definition of done: the
+    first reproduction is a CAPTURE. The fix is **W-185**, with candidate C (a
+    dot-prefixed sibling) and the soak at `delay = 0.078` as its acceptance test.
+  - ⚠ **0 of 104 stranded is "unreproduced", not "closed"** — the surviving
+    ordering needs a delay injected inside `run_once`, which a capture pass may
+    not add.
+  - ⚠ **W-140 row 21 was probably aimed at the wrong window**, which is the
+    second mis-diagnosis on that row.
+  - **W-183's screen is necessary, not sufficient** — it cannot see circularity
+    through a third variable, and the two mitigations (per-record rates, the 80 %
+    quotation exclusion) are stated as mitigations rather than proofs.
+- **Then it fired in the real suite.** `tests_e2e` re-run three times with full
+  tracebacks written to files: **run 2 failed**,
+  `fatal: unable to stat '.fux/index/ad.jsonl.tmp'`, in
+  `test_post_commit_defers_and_a_detached_runner_drains_the_list` — a
+  **different** test from row 21's, same file, same `git add -A`, same mechanism.
+  🔴 **So W-185 has an observed failure in the shipped suite, ~1 run in 3.**
+  ⚠ An earlier occurrence of the same failure was thrown away by
+  `uv run pytest -q tests_e2e | tail -3`; the second-time loss is in
+  [LESSONS](LESSONS.md), and the near-miss is the lesson, not the recovery.
+- **Next:** W-185, then W-181 · W-179 · W-180.
+
 ## 2026-09-15 — W-168 step 1: anchor text, built  ·  Claude Code (Opus 5)
 
 - **Asked:** implement W-168.

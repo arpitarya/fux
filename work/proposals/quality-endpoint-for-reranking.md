@@ -20,7 +20,7 @@ design that was owed, and it is written to be falsifiable: it proposes a
 ## 1 · The bar, restated once
 
 An endpoint qualifies only if **all four** hold
-([W-183](../open/W-183-non-circular-quality-endpoint.md), which is
+(W-183, which is
 Part B's five properties with the environment clause folded in):
 
 1. **Headroom in both directions** — contests wrong in both arms, and contests
@@ -220,6 +220,6 @@ the fork above, and W-154 closes or waits on Arpit's word.
 [`tools/quality-controls/`](../../tools/quality-controls/)
 
 **Work** — [W-154](../open/W-154-rerank-weight-cost.md) ·
-[W-183](../open/W-183-non-circular-quality-endpoint.md) ·
+W-183 (closed 2026-09-15) ·
 [W-145](../open/W-145-codex-regenerates-the-key.md) ·
 [the Part A pre-registration](../regression/2026-09-13-rerank-cost/PRE-REGISTRATION.md)

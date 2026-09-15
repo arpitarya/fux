@@ -21,6 +21,44 @@ record is the rule and this file is the anecdote that motivated it.
 
 ---
 
+## 2026-09-15 — a flake fired, and I threw its traceback away with `| tail -3`
+
+🔴 **`tests_e2e/test_maintenance.py::test_post_commit_defers_and_a_detached_runner_drains_the_list`
+failed once in a combined run and passed on re-run — and I have nothing to show
+for it**, because the command was `uv run pytest -q tests_e2e 2>&1 | tail -3`.
+The summary line survived. The traceback did not.
+
+⚠ **This is the SECOND time this exact loss has happened on this test family.**
+`_drain`'s own docstring records the first: it returned `False` on the first
+unparseable `doctor` call *"and the payload that caused it was discarded, so the
+failure said only `assert False`"*. The helper was fixed. **The habit that threw
+the output away was not**, and it is mine, not the code's.
+
+**The remedy is judgement and belongs here:** a suite that is being run *because
+something intermittent is suspected* is redirected to a file, never piped
+through `tail`. `tail` is for a run you expect to pass.
+
+**The remedy took eight minutes and worked on the second try.** Re-run three
+times, `--tb=long`, redirected to `e2e-1.txt`/`-2`/`-3`. Run 2 failed and said:
+
+```
+fatal: unable to stat '.fux/index/ad.jsonl.tmp': No such file or directory
+```
+
+🔴 **Which is the race W-182 had captured in a throwaway repository an hour
+earlier** — so the discarded traceback had been the answer all along, and the
+only thing between not knowing and knowing was `> file` instead of `| tail`.
+Filed as [W-185](open/W-185-index-temp-file-race.md), with the traceback kept
+[as evidence](regression/2026-09-15-runner-race-soak/evidence/e2e-capture.txt).
+
+⚠ **Read the near-miss, not the recovery.** It happened to fire again within
+three runs. At 1 in 13 — which is the rate `_drain`'s docstring records for the
+last flake in this family — it would not have, and the session would have
+written *"an unexplained e2e failure, did not reproduce"* into the worklog while
+holding a filed work item that explained it.
+
+---
+
 ## 2026-09-15 — a green synthetic arm covering for a dead real one
 
 🔴 **`tools/differential/run.py` — the proof obligation for every ranking
@@ -48,7 +86,7 @@ byte-for-byte comparisons — had to be gathered through an **ad-hoc copy** of
 the harness in a scratch directory. The numbers are real and the comparison is
 the harness's own; the provenance is a workaround, and it is written into
 [SR-T1-ACCELERATOR](../records/0110_accelerator.md) decision 15b and
-[W-184](open/W-184-differential-harness-utf8.md) rather than left to be
+W-184 (closed 2026-09-15) rather than left to be
 rediscovered.
 
 ⚠ **The remedy is a rule and a repair, not judgement**, so it is W-184's: skip

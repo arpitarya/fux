@@ -7,10 +7,10 @@ description: A disposable term-major index under .fux/runtime/ that makes warm q
 status: accepted
 date: 2026-08-18
 feature: "`.fux/runtime/` — the derived index, `fux build`, and the block bound that makes skipping provable"
-owns: [src/fux/derive@d97158a8fa5b, tools/differential@44301711f1ed]
+owns: [src/fux/derive@d97158a8fa5b, tools/differential@c76c21f0ede2]
 laws: [L1, L3]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 00266fddd2d2307f69e9da0c9a68dc80a12b67abd7e3ac063db6f5593c026362
+content_sha: 23038fcb7e93653f4cc3c26475f00c216e5fa6a10f5fc149a5666d313af60b86
 ---
 
 # SR-T1-ACCELERATOR — the derived T1 accelerator
@@ -554,6 +554,43 @@ not `tools/differential/run.py`**, because `queryset.py::vocabulary` decodes
 every walked file as UTF-8 and this repository's source dirs now hold ten files
 that are not — a pre-existing harness defect, unrelated to this change, filed
 as **W-184**. The comparison performed is the harness's own.
+
+**15c. W-184 closed on 2026-09-15, and the harness was dead in TWO ways, not
+one.** Both were the same assumption — *every file under a source directory is
+text* — and only one of them announced itself.
+
+| site | what it did | how it read |
+|---|---|---|
+| `queryset.py::vocabulary` | `.decode("utf-8")` on every walked file | `UnicodeDecodeError` on the first PNG; `run.py --root .` never reached a comparison |
+| `bench_r3.py::source_vocabulary` | `.decode("utf-8", errors="replace")` on the same bytes | **ran**, and folded `png` and a page of replacement characters into the corpus vocabulary as terms no document contains |
+
+🔴 **The quiet one is the worse defect.** A harness that crashes gets fixed on
+the day somebody runs it. A harness that invents its own query set measures
+something nobody asked for and reports it green. One helper now decides what
+counts as text, `Vocabulary` carries the count and the names of what it skipped,
+and `run.py` prints them — a query set that shrinks because ten files stopped
+decoding must not look like one that did not.
+
+⚠ **And the run turned up a third break the moment it could reach one.**
+`compare()` passed `archived_weight=` to both `ask`s; **W-152 removed that
+prior on 2026-09-13** and no signature has accepted the keyword since, so every
+invocation raised `TypeError` before its first comparison. The weight sweep —
+`(1.0, 0.5, 2.0, 500.0)`, which exists to hold the W-73 bound at values that
+straddle unity — rides `[priority]` now, on a location prefix that covers part
+of the corpus and not all of it. **That is a better shape than the prior it
+replaced**: the bound has to survive *some* documents being scaled, and a
+global prior scaled everything it reached.
+
+**Measured, on this repository, 2026-09-15:** 692 queries × 4 `top` values ×
+4 weights × 2 skipping modes = **22 144 byte-identical comparisons, zero
+mismatches**, through `tools/differential/run.py` itself. Decision 15b's numbers
+stand as they are — they were gathered through the ad-hoc copy and say so.
+
+⚠ **What is still unguarded.** `tests/derive/test_differential_harness.py` holds
+the decode assumption and the shape of the weight sweep. It does **not** run the
+harness over a real corpus, because that is a fifteen-minute job and the unit
+suite is not where it belongs. **The real-corpus arm is still something a person
+has to run**, and the two days this one spent dead are what that costs.
 
 ### Consequences
 

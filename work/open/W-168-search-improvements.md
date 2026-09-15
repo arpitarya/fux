@@ -73,7 +73,7 @@ and it has no `VERDICT.md`.
   anchor length belongs in its `wlen` whether or not it matches.
 - ⚠ **`tools/differential/run.py` could not run on this repository** —
   `queryset.py` decodes every walked file as UTF-8 and ten are not. Pre-existing,
-  unrelated, filed as [W-184](W-184-differential-harness-utf8.md); the evidence
+  unrelated, filed as W-184 (closed 2026-09-15); the evidence
   was gathered through an ad-hoc copy of the same harness and is named as such.
 
 ### Records amended

@@ -7,10 +7,10 @@ description: "An R is a claim frozen before measurement; its threshold may never
 status: accepted
 date: 2026-08-22
 feature: the prediction system — the R ids, their register, the rules that make a frozen claim mean something, and the classification of the runs those claims are measured by
-owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@a6bc8b6a056c, tools/vector-gate@0023bff0cdef]
+owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@19e012a10288, tools/vector-gate@0023bff0cdef]
 laws: [L3]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 2dc4232f1db4b53440ddcf7f3a2b95bfef2642f77dd3e665467710cedbcf7be1
+content_sha: bdd538841912e261927c837ae467d08f1f37f158b6b9d5d181c085825f3f1867
 ---
 
 # SR-RS — the R predictions
@@ -540,6 +540,44 @@ close the P2 `recall@k` question W-87 filed:
   `doc`. `recall@k` over this set **is** `hit@k`; what remains is a
   completeness declaration (is the asserted `doc` the only relevant one?),
   `arpit` lane, tracked in [W-87](../work/open/W-87-what-good-means.md) P2.
+
+**15a. A CIRCULARITY SCREEN is a control, and it is the one that was missing**
+(2026-09-15, W-183). Decision 15's three controls ask *did the arm move something
+real*. None of them asks the question that killed C2: **is the endpoint's truth
+the feature's own objective?**
+
+`c = 0` on C2's proximity suite was quoted as `22 % → 100 %, 94 fixed, 0 broken`
+and it meant nothing, because the suite scored contests the reranker is built to
+win — and that was **argued** three times, never computed. So:
+
+> For every contest, score the candidates with the FEATURE's own objective and
+> report `agreement` — the share where the thing that objective picks is also
+> the true one — beside the **chance rate**.
+
+| `agreement` | the endpoint is |
+|---|---|
+| ≈ 1.00 | **circular**: the truth IS the objective |
+| ≈ chance | **independent**: a null from it says nothing about the feature |
+| between | usable |
+
+**The band is pre-registered with the endpoint and may not move afterwards**
+(decision 10b). [`cited_decision.py`](../tools/quality-controls/cited_decision.py)
+is the first implementation — `agreement` **0.4141** against a chance rate of
+**0.0748** over 524 contests drawn from this repository's own
+`SR-RS … decision 19`-shaped citations, ruled
+[here](../work/regression/2026-09-15-quality-endpoint-screen/VERDICT.md).
+
+⚠ **Necessary, not sufficient, and the gap is named rather than left to be
+found.** The screen catches truth-equals-objective. It cannot catch circularity
+through a **third variable** — an author who paraphrases what they cite writes a
+query dense in its words — and nothing mechanical can. What a candidate owes
+instead is a stated mitigation: `cited_decision.py` reports `agreement` per
+record so one dense document cannot carry the result, and drops a contest whose
+query shares more than 80 % of its terms with the true passage.
+
+⚠ **It screens an ENDPOINT, never a corpus.** A number measured on one tree
+transfers to no other, and the run that produced this one says **dogfood** in
+its own verdict.
 
 **16. When a pre-registration's live path is DELETED, the run keeps a mirror of
 it — the verdict is not edited.** Decision 1 freezes a pre-registration and

@@ -3,19 +3,6 @@ type: Pointer
 description: "One line: the current state and the immediate next step. Overwritten every session."
 ---
 
-✓ 2026-09-15 Claude Code: **W-168 step 1 is BUILT** — the anchor field, *what other documents call this one*, in both readers behind `[bm25f] anchor` **default `0.0`**. The words ride the **source's** edge (`at`/`al`); the per-target view folds at read time from `.fux/runtime/anchors/`, so no committed byte crosses a document boundary. `fux.index.v3` + `fux.runtime.v6`, repo re-ingested `--full`, vendored Node bundle rebuilt (mandatory — the old one pins v2 and refuses the new index). **5 536 byte-identical scan-vs-accelerator comparisons at the default and 5 536 at `anchor = 2.0`, 0 mismatches.** 13 records amended, [pre-registration](regression/2026-09-15-anchor-text/PRE-REGISTRATION.md) frozen.
+✓ 2026-09-15 Claude Code: **the green queue worked continuously — W-184, W-183 and W-182 CLOSED, W-154 and W-140 unblocked, W-185 filed.** The session opened on an uncommitted pile (W-168 step 1 + law L11, built by the previous session and committed by neither) with `tests/test_sr_ownership.py` red on top; that landed first, and **`.fux/README.md`'s verb table turned out to have drifted three verbs from the template that generates it** — every test read the file, none read the template, and a fresh `fux setup` was handing out a short list (SR-DOTFUX 6b). **W-184:** the differential harness was dead in **three** ways — a PNG killed the query set, `bench_r3` decoded the same bytes with `errors="replace"` and **ran**, and behind the crash `compare()` still passed `archived_weight=`, removed by W-152 two days earlier. **22 144 byte-identical comparisons** now, through `run.py` itself. **W-183:** the contribution is a test a candidate can fail — `agreement` **0.4141** over 524 cited-decision contests against a chance rate of **0.0748**, inside a band frozen in its own commit beforehand. **W-182:** the stranding did **not** reproduce (0 of 104, with 67 trials inside a live runner), and a **different** race did — `git add -A` dies on `.fux/index/<shard>.jsonl.tmp`, 2 of 8 at the early-delay step.
 
-→ **Next:** 🟢 **W-179 · W-180 · W-181 · W-182 · W-184** — all agent work, no blockers,
-inbox still empty. **W-168 is 🟣 until 2026-09-30**: obligations 8 and 10 need documents
-findable only through a linker's wording, and those are Codex's
-([SR-RS](../records/0133_predictions.md) d23 +
-[L11](../records/0012_LAW-11-sealed-answer-key.md)). ⚠ **New: W-184** —
-`tools/differential/run.py` dies on a PNG in a source dir, so **the real-corpus
-differential arm has been dead while the synthetic one covered for it**; this session's
-evidence came through an ad-hoc copy and says so. ⚠ **Two things for Arpit, neither
-blocking:** the edge carries **hashed terms, not the anchor string** (L2 — a readable
-string for `fux explain` is a second field and a second decision), and a document ranked
-#1 on its linkers' wording reports `coverage 0` with the query's word in
-`confidence.missing` — honest, deliberate, unmeasured. 🔴 **`tests/test_sr_ownership.py`
-is RED and was red before this session**: `SR-LAW-11` needs a `describes` row or a pin
-entry. That is the L11 change, **still staged and uncommitted**.
+→ **Next:** 🟢 **W-185 · W-181 · W-179 · W-180 · W-154**, inbox still empty. ⚠ **Two things stated rather than closed:** *0 of 104 stranded is unreproduced, never closed* — the surviving ordering needs a delay injected inside `run_once`, which a capture pass may not add; and **W-183's screen cannot see circularity through a third variable**, so its two mitigations are mitigations, not proofs. 🔴 **W-185 is not hypothetical: it fires in `tests_e2e`, about 1 run in 3** — `fatal: unable to stat '.fux/index/ad.jsonl.tmp'`, captured with its traceback after the first occurrence was thrown away by `| tail -3` ([LESSONS](LESSONS.md): the second such loss on this test family).
