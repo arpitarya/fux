@@ -51,7 +51,7 @@ here. Read that record before changing anything below it.
 - 🟣 **W-145** · `arpit`, waiting on **2026-09-30** — Codex regenerates the golden answer key; until then every golden number is `informed`. [detail](open/W-145-codex-regenerates-the-key.md)
 - 🟣 **W-87** · `agent`, waiting on W-145 — P2's `unanswerable` gate is measured (0/124); recall needs phase 5 and **Part B needs an uncontaminated key**. [detail](open/W-87-what-good-means.md)
 - 🟣 **W-175** · `agent`, waiting on **2026-09-30** — does a correction help OTHER phrasings? Ruled 2026-09-14: three arms (dogfood · fux's own tree · Codex), N=12 / M=5. Harness now; the numbers wait for Codex's blind paraphrases. [detail](open/W-175-correction-generalisation.md)
-- 🟢 **W-144** · `agent` — ruled **(d)** 2026-09-14: sweep `b ∈ {0.75, 0.6, 0.5, 0.4}` over the three measured families, ship the first value positive on all with controls holding; (b) + idf guard is the fallback. [detail](open/W-144-structure-aware-extraction.md)
+- 🟡 **W-144** · `agent`, waiting on a `fux-lab` run — **step 1 done 2026-09-15**: the sweep is [pre-registered](regression/2026-09-15-b-sweep/PRE-REGISTRATION.md), frozen, first-that-clears descending. Steps 2–4 are the run. [detail](open/W-144-structure-aware-extraction.md)
 
 ### adr update
 

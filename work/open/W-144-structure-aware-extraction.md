@@ -137,6 +137,25 @@ documents actually have.**
 ⚠ The transition is a cliff because all 30 probes are built identically. A real
 corpus gives a gradient; the cliff **locates** the threshold.
 
+## ✅ Step 1 done 2026-09-15 — the sweep is frozen
+
+[`work/regression/2026-09-15-b-sweep/PRE-REGISTRATION.md`](../regression/2026-09-15-b-sweep/PRE-REGISTRATION.md),
+committed before any number. **Steps 2–4 are the run**, and it is `fux-lab`'s:
+golden is local-only (W-148 row 1, Arpit 2026-09-14).
+
+**One thing the pre-registration adds that the ruling did not spell out —
+DESCENDING ORDER IS PART OF THE DECISION RULE.** *"Ship the first value that
+nets positive on all three"* is ambiguous about which order they are tried in,
+and it matters: `b = 0.4` is a long way from the literature's `0.75`, so **a
+sweep that reported *the best value* would pick the extreme whenever the curve
+is flat.** First-that-clears, descending, makes the shipped value the smallest
+departure that works.
+
+⚠ **And one consequence worth knowing before the run, not after:** `b` is a
+`[bm25f]` key and `fux setup` writes its value out in full — so a new default
+**diverges a fresh clone from any repo that has run setup**. That belongs in
+the CHANGELOG, and it is not a reason to skip the change.
+
 ## ✅ RULED 2026-09-14 (Arpit) — (d), lower `b`, measured first
 
 The compare doc's verdict block carries the ruling. **Agent work, in order:**
