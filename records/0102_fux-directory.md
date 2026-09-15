@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@836cc5ab2239, src/fux/setup.py@f229752922a2, tests/test_verb_table_agreement.py@2c2a8f52fb6c]
+owns: [src/fux/store/fuxdir.py@7b34fac195d3, src/fux/setup.py@af9f0203b42d, tests/test_verb_table_agreement.py@2c2a8f52fb6c]
 laws: [L2, L3, L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 91bc5b404e3ab3cfcec225c54ff8c128f477b4832d4c254afbddbc0f4c5b02c8
+content_sha: 93f701ef7c320f26cb95b534ee21e2f726f10304565afc194a645055d32e68d6
 ---
 
 # SR-DOTFUX — the `.fux/` directory
@@ -764,6 +764,17 @@ ruling and for the same reason.
   author saw written in their own file.
 
 ### Consequences
+
+- **`.fux/observers/` is the third committed consumer-owned directory**
+  (W-170, 2026-09-15), beside `fetchers/` and `decoders/`, and it is listed in
+  the generated `.fux/README` with the others.
+  ⚠ **`fux setup` seeds it with a README and NO observer**, which is the
+  asymmetry worth stating: a decoder and a fetcher have useful built-in
+  implementations to write out, and an observer has none — fux carries no
+  knowledge of any subscriber ([SR-OBSERVE](0157_observe.md) decision 8), so
+  there is nothing for it to put there. The directory and its README exist so
+  the extension point is **discoverable**; an empty directory git cannot commit
+  would be indistinguishable from a fux too old to have observers.
 
 - ✅ **The verb table in `.fux/README.md` is HELD EQUAL to SR-CLI §1**
   (2026-09-14, W-164 gate 2) by `tests/test_verb_table_agreement.py`. Two

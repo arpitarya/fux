@@ -322,6 +322,7 @@ def _layout(root: Path) -> list[Check]:
     checks.append(_pinned_without_bytes(root))
     checks.append(_fetcher_config_tables(root))
     checks.append(_suspended_pins(root))
+    checks.append(_observers(root))
     checks.append(_pii_health(root))
     checks.append(_refusal_health(root))
     checks.append(_decoder_bindings(root))
@@ -654,6 +655,54 @@ def _pinned_without_bytes(root: Path) -> Check:
         f"bytes: {', '.join(missing[:3])}"
         + (f" (+{len(missing) - 3} more)" if len(missing) > 3 else "")
         + " - every citation from these will be `unverified`. Set keep = true and re-ingest",
+        level="warn",
+    )
+
+
+def _observers(root: Path) -> Check:
+    """W-170. What is in `.fux/observers/`, and whether each one fired.
+
+    🔴 **A present-but-never-firing observer is the failure this row exists
+    for**, and it is silent by construction: the dispatcher is fail-open, so an
+    observer that raises on every run is skipped on every run and fux answers
+    normally. Without this row a consumer's analytics can be dead for weeks
+    while every query looks perfect — the same shape as a suspended pin, and
+    the same remedy: say so, and let a person decide.
+
+    ⚠ **`warn`, never `error`.** A broken observer answers no question wrongly.
+    The repository is not broken; somebody's telemetry is, and conflating the
+    two would make `fux doctor` exit non-zero in CI over a consumer's own file.
+
+    ⚠ **The liveness file describes the LAST run, so a first-ever `doctor` in a
+    repo that has never answered a query reports `not yet observed`** — which
+    is true and is not a finding. Reporting it as one would make every fresh
+    clone look broken.
+    """
+    name = "observers"
+    try:
+        from . import observe
+    except Exception:  # pragma: no cover - a check must not take out the command
+        return Check(name, True, "not available in this build")
+    try:
+        present = [p.name for p in observe.observers_in(root)]
+    except Exception:
+        return Check(name, True, "could not read .fux/observers/")
+    if not present:
+        return Check(name, True, "none installed")
+    state = observe.liveness(root)
+    if not state:
+        return Check(name, True, f"{len(present)} installed; not yet observed a run")
+    fired = set(state.get("fired", ()))
+    silent = sorted(n for n in present if n not in fired)
+    if not silent:
+        return Check(name, True, f"{len(present)} installed, all fired on the last run")
+    return Check(
+        name,
+        False,
+        f"{len(silent)} of {len(present)} observer(s) did NOT fire on the last run: "
+        f"{', '.join(silent)} - they raised or exceeded [observe] max_ms, and a "
+        "failing observer is skipped silently by design. Re-run with FUX_DEBUG=1 "
+        "to see which",
         level="warn",
     )
 

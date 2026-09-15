@@ -48,6 +48,12 @@ KNOWN_KEYS: tuple[str, ...] = (
     "sources.url.acquired_max_bytes",
     "index.shards",
     "agents.install",
+    # W-170. **`[observe] max_ms` is in `fux.toml` and not in `tune.toml`**,
+    # because it is not a ranking knob: it bounds how long fux WAITS for a
+    # consumer's analytics after the answer is already rendered, and cannot
+    # move a result. `tune.toml`'s boundary rule (SR-TUNE decision 1) is about
+    # what changes an answer; this changes nothing about one.
+    "observe.max_ms",
 )
 
 #: Tables fux accepts and does not look inside. **One entry, and it stays one.**
@@ -261,6 +267,17 @@ class Config:
     #: path here rather than having none.
     urls_file: str
     shards: int
+    #: `[observe] max_ms` — how long fux waits for one observer before
+    #: abandoning it (SR-OBSERVE decision 6). Small by default: a consumer's
+    #: analytics must not be able to make `fux ask` slow.
+    #:
+    #: ⚠ **It abandons a thread; it does not kill one.** Python cannot safely
+    #: interrupt arbitrary consumer code, so past the cap fux stops *waiting*
+    #: and the observer may keep running until the process exits. What the cap
+    #: guarantees is the half that matters — the verb's latency — and saying it
+    #: abandons rather than kills is the difference between a bound and a
+    #: promise fux cannot keep.
+    observe_max_ms: int = 50
     #: `[agents] install` — which vendors `fux setup` writes policy renderings
     #: for (SR-AGENT-POLICY decision 5). **Declared, never derived**: fux does
     #: not sniff for `.kiro/` or `.github/` and infer intent, which is the same
@@ -311,6 +328,14 @@ def load(root: Path) -> Config:
     if not isinstance(urls_file, str) or not urls_file.strip():
         raise FuxError(f"{path}: [sources] urls_file must be a path to a line-oriented URL list")
 
+    observe = data.get("observe", {})
+    observe_max_ms = observe.get("max_ms", 50)
+    if not isinstance(observe_max_ms, int) or isinstance(observe_max_ms, bool) or observe_max_ms < 1:
+        raise FuxError(
+            f"{path}: [observe] max_ms must be a positive integer of milliseconds "
+            f"(got {observe_max_ms!r}). It bounds how long fux waits for one "
+            f"`.fux/observers/` file after the answer has already been rendered"
+        )
     shards = data.get("index", {}).get("shards", FIXED_SHARDS)
     if shards != FIXED_SHARDS:
         raise FuxError(f"{path}: [index] shards must be {FIXED_SHARDS} this milestone (got {shards!r})")
@@ -363,6 +388,7 @@ def load(root: Path) -> Config:
         dirs_file=dirs_file.strip(),
         urls_file=urls_file.strip(),
         shards=shards,
+        observe_max_ms=observe_max_ms,
         agents=_load_agents(path, data.get("agents")),
         url=_load_url_source(path, sources.get("url"), urls_file.strip()),
     )

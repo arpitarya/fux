@@ -10,7 +10,7 @@ feature: the acquired plane
 owns: [src/fux/store/acquired.py@9897ee1fe4af]
 laws: []
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 5a0835c0d6451496fbcba70b5051bedab01483369d7c90f0c85ad328995e4b5c
+content_sha: 0094dda609c6b00c9a8e662cb7a49be4155f93535b75d166c9b72ef9e905d756
 ---
 
 # SR-ACQUIRED: fetched bytes are kept, in a plane that is neither committed nor derived
@@ -237,6 +237,13 @@ owning record was *touched*, never that it was read (CLAUDE.md §Law zero), so a
 co-owner's file changing under this one is exactly the case where a reader needs
 to be told *"not yours"* in writing.
 ### Consequences
+
+- **The observer hook reaches nothing here** (W-170, 2026-09-15). It shares
+  `config.py` and `store/fuxdir.py` with this record because `[observe] max_ms`
+  and `.fux/observers/` live beside the acquired plane's own keys and
+  directory — and it touches no acquired byte, no retention policy and no
+  budget. Stated so the freshness gate's demand for this record has an answer
+  in it rather than an empty edit.
 
 **Easier.** A citation can be checked offline against the exact bytes that produced it — a stronger claim than comparing two fetches, which is why `refer/source.py` verifies with the same fetcher a document was ingested with: *a document fetched two ways is two documents*. A retained original removes that whole class of false staleness, and the browser-session fetcher stops being needed at answer time.
 

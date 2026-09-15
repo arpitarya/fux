@@ -66,6 +66,51 @@ FETCHERS_DIR = "fetchers"
 #: runs — see `decoder_source` for why there is no `.py.txt` template.
 DECODERS_DIR = "decoders"
 
+#: What `fux setup` writes into `.fux/observers/`.
+_OBSERVERS_README = """\
+# `.fux/observers/` — tell your analytics what fux did, never what it read
+
+Drop a `*.py` file here with one function:
+
+```python
+def observe(record: dict) -> None:
+    ...  # append `record` somewhere; the return value is discarded
+```
+
+After a fux verb has **fully rendered** — stdout flushed, exit code fixed —
+every file here is called once, in sorted filename order, with one record:
+
+    verb · args_hash · band · answerable · n_results · n_related
+    refer_verdicts · ms · expand_used · q_arms · fux_version
+
+## What is NOT in it, and will not be
+
+The question. Any `--expand` text. A document id, a path, a snippet, the
+answer. Every value is a count, a boolean, a fixed name, or a hash — so this
+hook can tell you how fux is being used and can never tell you what anyone
+looked for. `args_hash` excludes the question too: it is a hash of the
+normalised FLAGS, so you can join a run to a command without fingerprinting
+the query.
+
+## What it cannot do
+
+Change anything. There is no return path, the record is a copy, and the
+dispatch runs after every write the verb makes. An observer that raises is
+skipped for that run; one that is slow is abandoned at `[observe] max_ms` in
+`fux.toml`. Your analytics cannot make `fux ask` wrong, and cannot make it
+slow.
+
+`fux doctor` lists the files here and whether each one fired on the last run.
+"""
+
+#: W-170. `.fux/observers/` — the third readable-source extension point, beside
+#: the two above. **Seeded with a README and no observer**, and the asymmetry
+#: with `decoders`/`fetchers` is deliberate: a decoder and a fetcher have
+#: useful built-in implementations, and an observer has none. fux carries no
+#: knowledge of any subscriber (SR-OBSERVE decision 8), so there is nothing for
+#: it to write here — a subscriber's own `setup` drops its own file in.
+OBSERVERS_DIR = "observers"
+
 #: vendor -> ((destination relative to the repo root, template under
 #: `templates/agents/`), …) — SR-AGENT-POLICY decisions 3 and 4.
 #:
@@ -1357,6 +1402,13 @@ def run(root: Path, *, agents: bool = True) -> SetupReport:
         _write_if_missing(
             directory / DECODERS_DIR / f"{name}.py", decoder_source(name), report, root
         )
+
+    # W-170 — the directory exists so a consumer can find it, with a README
+    # saying what goes in it. An empty directory git cannot commit would be
+    # indistinguishable from a fux too old to have observers.
+    _write_if_missing(
+        directory / OBSERVERS_DIR / "README.md", _OBSERVERS_README.encode("utf-8"), report, root
+    )
 
     _write_if_missing(root / DEFAULT_DIRS_FILE, _seed_dirs(root), report, root)
     _write_if_missing(root / DEFAULT_URLS_FILE, _urls_header().encode("utf-8"), report, root)

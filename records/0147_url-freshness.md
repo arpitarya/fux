@@ -10,7 +10,7 @@ feature: the freshness verdict vocabulary and the per-URL check interval
 owns: [src/fux/refer/freshness.py@6757eeeba7c6]
 laws: [L2, L3, L4]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 3f4992f9fe5b7387065c699283a8cb918eb88f994000dc0a53bb39281948c4be
+content_sha: cca9ab7bf5c176eeb816c2e40e9fbc0a07eeacd42e3440693f5467d3710edb26
 ---
 
 # SR-URL-FRESHNESS: what a citation may claim, and how often it has to earn it
@@ -499,6 +499,12 @@ owning record was *touched*, never that it was read (CLAUDE.md §Law zero), so a
 co-owner's file changing under this one is exactly the case where a reader needs
 to be told *"not yours"* in writing.
 ### Consequences
+
+- **The six verdicts are the observer record's vocabulary too** (W-170,
+  2026-09-15), counted rather than named against a document. A seventh verdict
+  added here appears there the same day, as a new key in a count map — which is
+  why the hook's schema calls `refer_verdicts` a map rather than enumerating
+  the six a second time.
 
 **Easier.** An offline or signed-out corpus keeps answering, with citations that
 say exactly what they are worth. A per-document check interval becomes a

@@ -10,7 +10,7 @@ feature: the rationale, history and reopen-trigger of L8
 owns: []
 laws: [L8]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 48460d70f7250206614c000b7b02130c466ccddbe80c50b40d87ad7872a64e08
+content_sha: 413fc4202fb456c8a994b42c774800c1e4f0ab3ad95dce00f8c720f9b1ca6dfc
 ---
 
 # SR-LAW-8 — L8 — a use record is never committed
@@ -150,6 +150,34 @@ on 2026-09-06 at Arpit's ruling.
 **3. Plaintext is legal and there is no law-level size bound.** *"A log you cannot read answers no question anyone actually asks of it."* A size bound remains a design default — Arpit's standing rule is **state the cost, do not clamp the knob**.
 
 **4. Transmission is NOT this law's subject.** Ruled explicitly. The trade was accepted and the trip-wire below replaces the clause.
+
+**A counts record handed to a consumer's own code is not a use record, and
+`.fux/runtime/observers.json` is** (W-170, 2026-09-15).
+
+Two things arrived with the observer hook and this law treats them differently:
+
+| | what it is | where it lives |
+|---|---|---|
+| the **record** handed to `observe()` | counts, a hash, names from a fixed vocabulary — **no question, no document, no answer** | nowhere; it is an argument, in memory, in the consumer's own process |
+| the **liveness file** `fux doctor` reads | *an observer fired on the last run* | `.fux/runtime/observers.json`, **gitignored** |
+
+**The first is not a use record at all.** It says a query happened and how big
+the answer was; it cannot say what was asked or what was returned, and
+`args_hash` excludes the question for exactly that reason — a hash *of* a
+question is still a fingerprint of it, and two consumers could join on it.
+
+**The second is one, and it is on a gitignored path**, which is this law's own
+test — *gitignored is the test, not `.fux/`*. It is one file, overwritten per
+run, carrying two lists of filenames.
+
+⚠ **What this law does NOT reach, stated because the gap is real:** once fux
+hands the record to consumer code, **where that code puts it is the consumer's
+decision and no law of fux's governs it.** A subscriber may write it anywhere,
+including a committed path in its own repository. What fux guarantees is that
+what it hands over cannot identify a question or a document — so the worst a
+careless subscriber can commit is a count. That is the whole reason the schema
+is closed and greped rather than merely documented.
+
 
 ### Consequences
 

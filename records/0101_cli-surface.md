@@ -7,10 +7,10 @@ description: Flat verbs in seven groups, one error boundary, three output modes.
 status: accepted
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@c78bc5296e7d, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@c6e607249ea0, src/fux/progress.py@925dccc045ce]
+owns: [src/fux/cli.py@ab77abe7a32c, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@c6e607249ea0, src/fux/progress.py@925dccc045ce]
 laws: [L1, L4, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: ba7b3de0adf8750e1e3d9f6bcee0f441605b3c13cd225171e88ea4c693cb484c
+content_sha: 9e6a2594849ac02a4a23fb6ab4f21426cd16c0f26e711996cbc4da3e1411c876
 ---
 
 # SR-CLI — the command-line surface
@@ -1070,6 +1070,24 @@ single source of both parsers precisely so they cannot drift (decision 12), and
 `lexical` has no tier by definition. Giving `lexical` its own parser to remove a
 flag that already does nothing would reintroduce the drift the factory exists to
 prevent.
+
+
+**15. `cli.main` has ONE post-verb dispatch point, and it is the last thing it
+does** (W-170).
+
+`args.func(args)` runs, its exit code is captured, stdout is flushed, and only
+then does anything in `.fux/observers/` run —
+[SR-OBSERVE](0157_observe.md). **That ordering is what makes *observe-only*
+structural rather than a rule somebody has to keep**: by the time consumer code
+runs there is nothing left for it to influence.
+
+⚠ **`fux mcp` is excluded by name**, not by accident: a long-lived server
+calling consumer code once per request is a different decision.
+
+⚠ **It never raises.** A hook that can fail a verb is a hook that makes fux
+look broken because somebody's analytics is. Everything in that path — finding
+the root, reading `fux.toml`, the dispatch itself — is wrapped, and a malformed
+`fux.toml` falls back to the default cap rather than failing twice.
 
 
 ### Consequences

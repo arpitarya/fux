@@ -4,13 +4,13 @@ kind: component
 name: SR-OBSERVE
 title: "SR-OBSERVE (0157) — `.fux/observers/`: the observe-only hook fux exposes after render, the third readable-source exemption"
 description: "After a verb has fully rendered, fux hands every file in `.fux/observers/` one frozen, counts-only fact record and discards whatever comes back. Nothing an observer does can change stdout, the exit code, the index or the next run; a raising or slow observer is skipped, named under FUX_DEBUG, and never fails the verb. fux ships no observer and imports none by name — cage is the first subscriber and fux does not know it. The seam, the record schema, the forbidden classes, the cap, and why the hook is after render and not before the verb."
-status: proposed
+status: accepted
 date: 2026-09-14
 feature: the observer hook — the extension point a consumer's analytics subscribe to
-owns: []
+owns: [src/fux/observe.py@4ea7874ba9c7]
 laws: [L1, L2, L3, L4, L8, L10]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 2aceca082a33e9c50aef9265988f5dc2e40340e9aa9e2c7b7e358731054a6a1c
+content_sha: e5f23befd89924b049432df8e9a255cf0a88fd44d6330df5f1b243a847541f2b
 ratifies: W-170
 ---
 
@@ -134,6 +134,61 @@ component.
    counts are not a use record of any document. L8: a record handed to the
    consumer's own code is not a network call and reaches no commit. L1: the
    dispatcher is stdlib.
+
+**10. BUILT 2026-09-15, and three things the build settled that the record had
+left to it.**
+
+**10a. 🔴 An observer's `print` reached the answer, and the fix is
+structural.** The first dispatcher ran observers with fux's own `sys.stdout` in
+place, so `ask --json` emitted valid JSON followed by an observer's line —
+consumer code on stdout, which decision 5 forbids. **fux's stdout is now taken
+away for the whole dispatch** and whatever an observer writes there is
+discarded (counted in one `FUX_DEBUG` line).
+
+⚠ **Swapped for the dispatch, not restored per observer, and the ordering is
+what makes that safe:** `dispatch` is the last thing `cli.main` does, so fux
+never prints again — while an observer **abandoned** at the cap keeps running
+and would otherwise print into a stream fux had handed back. The sink
+outliving the dispatch is correct rather than sloppy. **stderr is left alone**;
+nothing fux promises is on it.
+
+**Found by the hostile test, not by reading.** `test_output_is_byte_identical_with_a_misbehaving_observer`
+installs four observers that raise, sleep past the cap, print to stdout, and
+mutate and return a value, and asserts the bytes and the exit code are those of
+a repository with none.
+
+**10b. The cap ABANDONS a thread; it does not kill one.** Python cannot safely
+interrupt arbitrary consumer code — a signal lands on whichever thread the
+interpreter picks — so past `[observe] max_ms` fux stops **waiting** and the
+observer may run until the process exits. Decision 6 said *killed*; that word
+was wrong and this is the correction. **What the cap guarantees is the half
+that matters**: a consumer's analytics cannot make `fux ask` slow, only itself.
+Stating it as a kill would be a promise fux cannot keep.
+
+**10c. `[observe] max_ms` is in `fux.toml`, not `.fux/tune.toml`.** It is not a
+ranking knob: it bounds how long fux waits **after** the answer is rendered and
+cannot move a result. [SR-TUNE](0135_tuning.md) decision 1's boundary rule is
+about what changes an answer.
+
+**10d. The verb-to-dispatcher seam is a module-level dict, and the alternative
+was worse.** The dispatch point must be after the verb has rendered, so it
+cannot be inside the verb — but the counts exist only inside it. Threading an
+out-parameter through every handler's signature would put the hook into the
+call graph of the thing it is forbidden to touch. One process runs one verb, so
+there is nothing to interleave.
+
+**10e. `fux mcp` does not dispatch, by name.** A long-lived server calling
+consumer code once per request is a different decision with a different blast
+radius, and this record does not make it.
+
+**11. Node's half is NOT built, and is declared rather than missing.**
+Decision 1 requires it to ship with the Python half **or** be declared out of
+scope in [SR-NODE-SEARCH](0153_node-search.md) in the same change. It is
+declared: see that record's decision 18. The reason is not effort — it is that
+the Node reader has no equivalent of `cli.main`'s single post-render dispatch
+point for every verb, and inventing one to host a hook nobody subscribes to on
+that reader yet would be building the seam twice before the first subscriber
+exists on either.
 
 ### Consequences
 

@@ -11,7 +11,7 @@ feature: the confidence plane
 owns: [src/fux/query/confidence.py@e0641ff2c3be, tests/test_confidence_floor_off.py@f8e18c079a6e]
 laws: [L1, L3, L4]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: ba99ad91aeb3bcacdf153844257c2a0278d5a56c7a6a46baced2bf12d159abb7
+content_sha: 33216bf0dd13f2ac935022d0e52c402b9e6d1fc727ab5cf336a13f52af2179da
 ---
 
 # SR-CONFIDENCE — how much the index believes its own answer
@@ -655,6 +655,13 @@ answer the reader was shown, and the two verbs no longer show the same answer.
 
 
 ### Consequences
+
+- **`band` and `answerable` leave the process as counts, and nothing else of
+  this block does** (W-170, 2026-09-15). The observer record carries those two
+  values and no other part of the confidence block — no `missing`, which is the
+  consumer's own words, and no `coverage` floats. That is not an omission: the
+  hook's schema is closed to counts, names and hashes, and `missing` is the one
+  field here that is free text the person typed.
 
 - **The band is computed from the PINNED list, and that is the whole point**
   (2026-09-14, W-162). `run_query` applies a `fux correct --pin` before

@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@3407bf6ce8ad, src/fux/store/nodebundle.py@071a24a596dd]
+owns: [node@056ba375f6e7, src/fux/store/nodebundle.py@071a24a596dd]
 laws: [L1, L3, L4, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 65c5b21acf9c1306944edec74e7054bc599c029e110e7de575048deb9be95a32
+content_sha: 41483bd1cc3d0b8aedd4e75484504efdb7e7939f7f1b4ef79fbef627539fcae0
 ---
 
 # SR-NODE-SEARCH — the Node read plane
@@ -607,6 +607,32 @@ Python's `_boolean` and `_edge_kinds`). A key one reader refused and the other
 accepted would make one committed `tune.toml` valid in one runtime and an error
 in the other, which is the one asymmetry the config parity test exists to
 forbid.
+
+
+**18. 🔴 THE OBSERVER HOOK IS OUT OF SCOPE ON THIS READER, declared rather
+than missing** (W-170).
+
+[SR-OBSERVE](0157_observe.md) decision 1 requires Node's half to ship with the
+Python half **or** to be declared out of scope here, in the same change —
+*never silently missing*. This is that declaration.
+
+**The reason is not effort.** Python has one post-render dispatch point for
+every verb, `cli.main`, and the hook's whole guarantee comes from sitting
+there: after the exit code is fixed, after stdout is flushed, after every write
+the verb makes. **This reader has no equivalent** — `fux.mjs` dispatches per
+verb and each verb writes and returns on its own path — so hosting the hook
+would mean either inventing that seam or placing the call in five places, where
+*after everything* becomes five things to keep true instead of one.
+
+**Building it twice before the first subscriber exists on either reader is the
+trade this refuses.** `.fux/observers/*.mjs` stays reserved and unread; a
+subscriber that needs it on this reader is what makes the seam worth inventing,
+and this decision is what that change amends.
+
+⚠ **So a repository with observers installed produces records for its Python
+runs and none for its Node runs**, and a consumer joining the two will see a
+gap that is this decision rather than a bug. That is the cost, and it is stated
+so nobody diagnoses it twice.
 
 
 ### Consequences

@@ -15,6 +15,15 @@
  * rather than trusting the caller not to ask means a repository whose
  * `tune.toml` turns the tier on cannot make the frozen baseline verb stop
  * being a baseline, which is the whole value of having the verb.
+ *
+ * ⚠ **No observer hook on this reader.** Python calls `.fux/observers/` once a
+ * verb has fully rendered (`cli.main`); Node does not, and that is declared
+ * rather than missing — SR-NODE-SEARCH decision 18. The reason is that this
+ * reader has no single post-render dispatch point for every verb, so hosting
+ * the hook would mean placing the call in five places where *after everything*
+ * becomes five things to keep true. `.fux/observers/*.mjs` is reserved and
+ * unread. **A repo with observers installed therefore records its Python runs
+ * and not its Node runs**, which is this decision rather than a bug.
  */
 import { runFused } from "../query/run.mjs";
 import { headingsFor } from "../query/headings.mjs";

@@ -13,7 +13,7 @@ feature: configurable output defaults
 owns: [src/fux/output_config.py@d8c53dfbf3c9]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: fec3d87707fbdbb937e326908d8e9aa0d742e6867440d3df0d2ba08ed712f49e
+content_sha: 3185aecf690cb2dafee1e7f672e7c89cd92ec5cde574122a0b13dc6772b17ba2
 ---
 
 # SR-OUTPUT — output defaults are configurable, in a third file
@@ -771,6 +771,14 @@ express?* — and the answer would have to be yes for a specific signal, named,
 before a key is added for it.
 
 ### Consequences
+
+- **The observer record is not an output surface and has no key here**
+  (W-170, 2026-09-15). It reaches no stream a consumer reads — not stdout, not
+  stderr, not `--json` — and is handed to consumer code **after** every write
+  the verb makes. This file's subject is *how a result is SHOWN*; nothing about
+  the hook is shown. What it does touch is the one bound it must never cross,
+  and `cli.main` takes fux's stdout away for the dispatch precisely so an
+  observer's `print` cannot become part of an answer.
 
 - **The confidence-floor note is a stderr DECLARATION, and gains no
   `output.toml` key** (2026-09-14, W-164 gate 4). It follows the rule every other

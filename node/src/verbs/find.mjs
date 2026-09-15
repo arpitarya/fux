@@ -21,6 +21,10 @@
  * and a marker glued to one breaks the pipe this verb exists for. **A consumer
  * that needs to know reads `--json`**, which is the same answer `archived` has
  * always had here.
+ *
+ * ⚠ **No observer hook on this reader** — SR-NODE-SEARCH decision 18. Python
+ * calls `.fux/observers/` once a verb has fully rendered; Node does not, and it
+ * is declared rather than missing. See `verbs/ask.mjs` for the reason.
  */
 import { runFused } from "../query/run.mjs";
 import { headingsFor } from "../query/headings.mjs";

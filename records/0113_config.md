@@ -7,10 +7,10 @@ description: "A deliberately tiny config: what each key does, why the surface is
 status: accepted
 date: 2026-08-18
 feature: "`fux.toml` — discovery, schema, validation, and the keys that are refused rather than ignored"
-owns: [src/fux/config.py@1f1e08231fff]
+owns: [src/fux/config.py@e83604b36345]
 laws: [L4, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: b3118d96c1912ca51c7698f27ec6c52fcefa19562da11e330c90dd3e1c5a5a1b
+content_sha: 522bde9099243cf9ea06a1c5a4e64d6387ab45377e5ea36bd6fc24c14cd279df
 ---
 
 # SR-CONFIG — `fux.toml` and every property in it
@@ -461,6 +461,7 @@ at any value, with an error naming the new home.
 * sources.url.config
 + index.shards
 + agents.install
++ observe.max_ms
 - sources.dirs
 - sources.types_file
 - sources.url.urls
@@ -518,6 +519,19 @@ was told it errors, and it did not. The code lands with this line.
 does**, and `tests/test_sr_freshness.py` sees neither — it checks that an owning
 record was *touched* in a change, never what the record says. This is the W-83
 shape with the two halves swapped, and it is unguarded for the same reason.
+
+**`[observe] max_ms`** (W-170) — how long fux waits for one `.fux/observers/`
+file before abandoning it. Positive integer milliseconds, default `50`.
+
+**It is in `fux.toml` and not in `.fux/tune.toml`** because it is not a ranking
+knob: it bounds what happens **after** the answer is rendered and cannot move a
+result. [SR-TUNE](0135_tuning.md) decision 1's boundary rule is about what
+changes an answer.
+
+⚠ **It abandons, it does not kill** — [SR-OBSERVE](0157_observe.md) decision
+10b. Past the cap fux stops waiting; the observer may run until the process
+exits, because Python cannot safely interrupt arbitrary consumer code.
+
 
 ### Consequences
 

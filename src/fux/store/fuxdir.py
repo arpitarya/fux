@@ -40,6 +40,8 @@ COMMITTED: dict[str, str] = {
     # Windows consoles. An em-dash here fails the write, which is how this was
     # caught rather than shipped.
     "decoders": "consumer-owned code, one module per format. THESE COPIES ARE WHAT RUN, not the ones inside the installed package (SR-DECODE)",
+    # ASCII only, like every value in this table.
+    "observers": "consumer-owned code, one module per subscriber. Called AFTER a verb has fully rendered, with one record of COUNTS -- never the question, a path, or the answer. It cannot change an answer: no return path, and the dispatch runs after every write (SR-OBSERVE)",
     "enrich": "pinned enrichment text, one file per source content sha, plus `queue.tsv` (W-86 P6: what fux could NOT read and a model must). Committed, because a backlog is a team fact",
     # ASCII only, like every other value in these tables.
     "node": "the Node read plane (`fux-engine`) as ONE BUNDLED FILE plus its manifest -- build output, never fux's source (L10). Engine-owned and REWRITTEN on a version change, not write-if-missing, because nobody edits it and a stale copy is a wrong answer. In a monorepo it is a workspace member holding only a manifest (SR-NODE-SEARCH)",
@@ -98,7 +100,8 @@ CACHEDIR_TAG = (
 
 _GITIGNORE = (
     "# Gitignored planes, BY NAME. NEVER add `*` here: `.fux/index/`,\n"
-    "# `.fux/sources/`, `.fux/fetchers/` and `.fux/decoders/` are committed,\n"
+    "# `.fux/sources/`, `.fux/fetchers/`, `.fux/decoders/` and\n"
+    "# `.fux/observers/` are committed,\n"
     "# and a blanket ignore would drop them from git silently. `fux doctor`\n"
     "# checks exactly that.\n"
     "#\n"

@@ -1038,11 +1038,13 @@ def _ask_shaped(args, *, compose: bool) -> int:
         print(json_mod.dumps(payload, indent=2))
         _declare_pinned(results)
         _declare_archived(results)
+        _note_run(args, results, related, block)
         return 0
 
     if not results:
         _decline()
         _declare_confidence(block, _show_band(args))
+        _note_run(args, results, related, block)
         return 0
 
     # W-84 — the matched headings under each hit. **Indented, never on the
@@ -1085,7 +1087,34 @@ def _ask_shaped(args, *, compose: bool) -> int:
     _declare_pinned(results)
     _declare_archived(results)
     _declare_confidence(block, _show_band(args))
+    _note_run(args, results, related, block)
     return 0
+
+
+def _note_run(args, results, related, block) -> None:
+    """W-170 — the counts this run wants reported to `.fux/observers/`.
+
+    **Counts only, and the call site is after every render**, so there is
+    nothing left for a subscriber to influence even in principle. It writes
+    into a module-level dict that `cli.main` reads once the exit code is
+    fixed; nothing is dispatched from here.
+
+    🔴 **`args.query` is not passed and may not be.** Neither is the expansion
+    text, a document id, or a `loc`. The schema is closed
+    ([SR-OBSERVE](../../../records/0157_observe.md) decision 3) and
+    `tests/test_observe.py` greps every emitted record for those classes — but
+    the cheapest place to get it right is the call, so it is got right here.
+    """
+    from .. import observe
+
+    observe.note(
+        band=block.band if block is not None else None,
+        answerable=block.answerable if block is not None else None,
+        n_results=len(results),
+        n_related=len(related),
+        expand_used=bool(_expand_of(args)),
+        q_arms=len(_queries_of(args)),
+    )
 
 
 def _derivation_for(root: Path, args, results, path, signals, trace, tune):

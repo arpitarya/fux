@@ -8,6 +8,32 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Changed — read this before upgrading a consumer
+
+- 🔴 **`confidence.answerable` is now `false` for `weak` as well as `none`**
+  (W-176 gate 1). It was `band != "none"`. **A consumer that branches on
+  `band == "none"` is now wrong for half the refusals** and will answer from a
+  ranking that could not separate its own top two hits.
+  - **`weak` means the ranking could not choose.** SR-CONFIDENCE's band table
+    has always said *do not answer* on that row; the payload beside it said
+    `answerable: true`, and the field an agent branches on was the permissive
+    one.
+  - **This is why fux never abstained.** *Nothing scored above zero* is a state
+    no real corpus produces, so the refusal was structurally unreachable. Four
+    measured runs found the symptom — 20 of 20 blind unanswerable questions
+    answered, twice; 0 abstentions of 124 across five golden rungs; 10 of 10
+    planted unanswerables answered — and none could name the cause. It was one
+    expression.
+  - **`partial` is unchanged and stays answerable**, which is the whole
+    distinction: its defect is *nameable*, so you answer and say what is
+    missing. A `weak` has nothing to name.
+  - **New `confidence.failed` key** naming which gate refused
+    (`no_candidates`, `separation`); `[]` when nothing did. Always present.
+  - ⚠ **`[confidence] separation_floor = 0.0` now disables abstention on
+    separation entirely**, not just the `weak` label.
+  - **Branch on `answerable`.** It is correct for both refusals and stays
+    correct as W-176's remaining gates land.
+
 ### Added
 
 - 🔴 **`fux ask` follows links: a boosted tier and a labelled `related` tier**

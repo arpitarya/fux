@@ -10,6 +10,8 @@ from __future__ import annotations
 
 import argparse
 import sys
+import time
+from pathlib import Path
 
 from . import __version__
 from .errors import FuxError
@@ -1001,13 +1003,65 @@ def main(argv: list[str] | None = None) -> int:
         from .progress import Progress
 
         args.progress = Progress(no_progress=args.no_progress, force=args.force_progress)
+    # W-170 — the observer hook's dispatch point, and there is exactly one.
+    #
+    # 🔴 **After the verb has fully rendered and its exit code is fixed**, which
+    # is what makes *observe-only* structural rather than a rule somebody has to
+    # keep: there is nothing left for consumer code to influence. `code` is
+    # computed first, stdout is flushed, and only then does anything in
+    # `.fux/observers/` run — and its return value is discarded.
+    #
+    # ⚠ **`fux mcp` is excluded by name.** A long-lived server calling consumer
+    # code once per request is a different decision with a different blast
+    # radius, and SR-OBSERVE does not make it.
+    started = time.monotonic()
     try:
-        return args.func(args)
+        code = args.func(args)
     except FuxError as exc:
         print(f"error: {exc}", file=sys.stderr)
-        return exc.exit_code
+        code = exc.exit_code
     except KeyboardInterrupt:
         return 130
+    _observe(args, argv, int((time.monotonic() - started) * 1000))
+    return code
+
+
+def _observe(args, argv: list[str] | None, ms: int) -> None:
+    """Hand this run's counts to `.fux/observers/`. **Never raises.**
+
+    ⚠ **A repo with no `.fux/observers/` pays one `stat`** and nothing else —
+    the same shape `_apply_pin` takes for an unpinned query. The import is
+    local so `--version` stays instant (SR-CLI decision 7).
+    """
+    if args.command == "mcp":
+        return
+    try:
+        sys.stdout.flush()
+    except Exception:  # pragma: no cover - a hook must not fail a verb
+        pass
+    try:
+        from . import __version__, observe
+        from .config import find_root
+
+        root = find_root(Path.cwd())
+        if root is None:
+            return
+        cfg_max_ms = 50
+        try:
+            from .config import load as load_config
+
+            cfg_max_ms = load_config(root).observe_max_ms
+        except Exception:
+            # A malformed `fux.toml` already failed the verb if the verb needed
+            # it. It must not additionally fail the hook, and the default is
+            # the right fallback: a bound nobody chose is better than none.
+            pass
+        record = observe._record_from(
+            args.command, list(argv if argv is not None else sys.argv[1:]), ms, __version__
+        )
+        observe.dispatch(root, record, max_ms=cfg_max_ms)
+    except Exception:  # pragma: no cover - a hook must not fail a verb
+        pass
 
 
 if __name__ == "__main__":

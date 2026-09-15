@@ -10,7 +10,7 @@ feature: "`fux answer` — one answer, its footing stated, and the report of wha
 owns: []
 laws: [L1, L2, L3]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 538673e54011891076fbf471e27271b576161db2675dd2e3453cedeff0c6e662
+content_sha: 912dffddffabfe34f971ef4183578c78d6fc7991ba45b7b088581c0fd05b5bda
 ---
 
 # SR-ANSWER — the `answer` verb
@@ -445,6 +445,11 @@ code path by which it could, which is a stronger guarantee than a rule.
 
 
 ### Consequences
+
+- **`refer_verdicts` reaches an observer as a COUNT PER VERDICT, never a
+  citation** (W-170, 2026-09-15). `{"current": 2, "stale": 1}` says how the
+  refer plane did; it names no document, no path and no span. A subscriber can
+  see that freshness is degrading across a corpus and cannot see which page.
 
 - **A `fux correct --pin` reaches `answer`, not only `ask`** (2026-09-14,
   W-162). `answer` calls `run_query`, and the pin is applied inside it — so a

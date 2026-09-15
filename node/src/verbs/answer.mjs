@@ -7,6 +7,15 @@
  * 🔴 **It never fetches.** A `url:` document reads `.fux/acquired/` or the
  * answer falls back to `source: "index"` — so this verb can emit
  * `as-ingested` and `unverified`, and never `current` or `stale`, for a URL.
+ *
+ * ⚠ **No observer hook on this reader.** Python calls `.fux/observers/` once a
+ * verb has fully rendered (`cli.main`); Node does not, and that is declared
+ * rather than missing — SR-NODE-SEARCH decision 18. The reason is that this
+ * reader has no single post-render dispatch point for every verb, so hosting
+ * the hook would mean placing the call in five places where *after everything*
+ * becomes five things to keep true. `.fux/observers/*.mjs` is reserved and
+ * unread. **A repo with observers installed therefore records its Python runs
+ * and not its Node runs**, which is this decision rather than a bug.
  */
 import { runQuery } from "../query/run.mjs";
 import { recordFor } from "../store/reader.mjs";
