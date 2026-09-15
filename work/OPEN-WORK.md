@@ -25,12 +25,14 @@ here. Read that record before changing anything below it.
 |---|---|---|
 | 🔴 **W-144** — the `b` sweep FAILED its frozen rule and **the lever works below the range**: **(a)** the pre-registered fallback · **(b)** pre-register a LOWER range · **(c)** stop at `0.75`. [verdict](regression/2026-09-15-b-sweep/VERDICT.md) | 2026-09-15 | 0d |
 | ↳ **blocks:** W-144, and nothing else in the queue | | |
-| 🔴 **W-189** — **run prompt 2** (Codex writes set 1), then **prompt 3** (Claude writes set 2, fresh session). The corpus, the prompts and the scorer are ready; both keys are his to hold. [detail](open/W-189-two-question-sets.md) | 2026-09-15 | 0d |
-| ↳ **blocks:** W-190, W-145, W-136, and W-87's recall half | | |
 
-⚠ **Two rows, and the second gates the whole golden lane.** W-144 blocks only
-itself; **W-189 blocks every golden item**, because the benchmark has no
-questions until Arpit runs prompts 2 and 3.
+✅ **W-189 cleared 2026-09-15 and the golden lane is open.** He ran **prompt 2**
+(Codex, set 1 — 125 questions) and **prompt 3** (Claude, set 2 — 124); both
+`questions/set-N.jsonl` are in the tree — **staged, his to commit** — questions-only,
+and both keys are his.
+**W-145 closed as overtaken in the same change.** ⚠ **One row is left and it
+blocks only itself** — nothing in the queue is waiting on Arpit for the benchmark
+now; the next golden step is an agent's (W-136, prompt 4).
 
 ---
 
@@ -46,11 +48,9 @@ questions until Arpit runs prompts 2 and 3.
 
 
 - 🟢 **W-154** · `agent` 🧨 — Part B RAN and is **VOID**: 75 % of the `ask` regression is the query's own source document winning. Fix named (exclude the citing document); needs a NEW pre-registration. [detail](open/W-154-rerank-weight-cost.md)
-- 🔴 **W-189** · `arpit` — **two numbered question sets** (1 Codex, 2 Claude) and **no key file at all**; the six prompts are renumbered and ready. Left: **he runs prompt 2, then 3**. [detail](open/W-189-two-question-sets.md)
-- 🟡 **W-190** · `agent`, waiting on **W-189** — difficulty is a **count of discriminations**, not a label; schema + scorer BUILT 2026-09-15. The first real run needs a key. [detail](open/W-190-question-difficulty.md)
-- 🟡 **W-136** · `arpit`, waiting on **W-189** — ⚠ **its questions and key were deleted 2026-09-15**; the seed and the eight rungs survive. Scoring is a chat he attends now. [detail](open/W-136-golden-benchmark.md)
-- 🟡 **W-145** · `arpit`, waiting on **W-189** — ⚠ **overtaken**: the contaminated key it would regenerate was deleted 2026-09-15, and W-189's prompt 2 is what closes the need. [detail](open/W-145-codex-regenerates-the-key.md)
-- 🟣 **W-87** · `agent`, waiting on W-145 — P2's `unanswerable` gate is measured (0/124); recall needs phase 5 and **Part B needs an uncontaminated key**. [detail](open/W-87-what-good-means.md)
+- 🟡 **W-190** · `agent`, waiting on W-136 — difficulty is a **count of discriminations**, not a label; schema + scorer BUILT 2026-09-15. The questions exist; the first real number needs a **scored** rung (prompt 6). [detail](open/W-190-question-difficulty.md)
+- 🟢 **W-136** · `agent` — **both question sets landed 2026-09-15.** Next is **prompt 4** (verify the eight rungs), and 🔴 **it needs a session that has never read `questions/`**. Scoring stays a chat he attends. [detail](open/W-136-golden-benchmark.md)
+- 🟡 **W-87** · `agent`, waiting on W-136 — P2's `unanswerable` gate is measured (0/124). ✅ **Part B's blocker is gone** (set 1 is Codex-authored), so both halves now wait on phase 5. [detail](open/W-87-what-good-means.md)
 - 🟣 **W-175** · `agent`, waiting on **2026-09-30** — does a correction help OTHER phrasings? Ruled 2026-09-14: three arms (dogfood · fux's own tree · Codex), N=12 / M=5. Harness now; the numbers wait for Codex's blind paraphrases. [detail](open/W-175-correction-generalisation.md)
 - 🔴 **W-144** · `arpit` — the `b` sweep is RUN and **no pre-registered value clears**; the lever reaches the endpoint below the frozen range and nothing regresses down to `b = 0`. Three options in the inbox. [detail](open/W-144-structure-aware-extraction.md)
 - 🟢 **W-188** · `agent` — Node in CAP-1/2/3/4: **harness, parity file and report BUILT 2026-09-15**; the run is what is left, on Arpit's machine. [detail](open/W-188-node-column-every-capture.md)

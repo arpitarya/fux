@@ -10,10 +10,12 @@ timestamp: 2026-08-27T00:00:00Z
 
 # W-87 — define what "good" means, then measure
 
-> 🟣 **Gated on 2026-09-30** (Arpit, 2026-09-13). Both remaining inputs are
-> Codex's hands and his limit is exhausted: the recall half waits on
-> [W-136](W-136-golden-benchmark.md) phase 5, Part B on
-> [W-145](W-145-codex-regenerates-the-key.md). No decision is owed before then.
+> 🟡 **Updated 2026-09-15 — Part B's blocker is gone.** Codex authored **set 1**
+> (questions *and* answers) on 2026-09-15 and **W-145 closed as overtaken**, so an
+> uncontaminated key now exists. **Both halves now wait on the same thing:**
+> [W-136](W-136-golden-benchmark.md) phase 5. 🔴 **Part B must be scored on set 1**
+> — set 2 is Claude-authored and `informed` permanently, which is exactly the
+> defect Part B exists to avoid.
 
 ## ✅ PHASE 0 IS RULED — 2026-08-27 (Arpit), all six forks
 
@@ -612,11 +614,11 @@ on *"prove the daemon runs in a real repo"* — **the hold was right.**
 W-136 phases 2 and 4 are done to rung 1 000, with 620 per-query rows filed at
 [`work/regression/2026-09-12-golden-ladder/`](../regression/2026-09-12-golden-ladder/report.md).
 
-⚠ **Part B's contamination question is not settled by this.** The ladder's key
-is Claude-authored ([W-145](W-145-codex-regenerates-the-key.md)), so it is *not*
-yet the uncontaminable Part B corpus this item hoped for. It becomes one when
-Codex regenerates the key against the **same frozen ladder** — which is why the
-rungs were committed before the questions were opened.
+⚠ **Part B's contamination question was not settled by this** — at the time, the
+ladder's key was Claude-authored (W-145), so it was *not* yet the uncontaminable
+Part B corpus this item hoped for. ✅ **Settled on 2026-09-15:** Codex authored
+**set 1** against the **same frozen ladder** — which is why the rungs were
+committed before any question was opened — and W-145 closed as overtaken.
 
 ## 2026-09-12 — one P2 gate is measured; the rest still needs an uncontaminated key
 
@@ -637,22 +639,28 @@ unwritten.
 
 - **A clean-corpus `recall@k`** — needs the key, so it waits on W-136 phase 5.
 - **Part B** — ⚠ **the ladder is NOT yet the uncontaminable Part B corpus this
-  item hoped for.** Its key is Claude-authored ([W-145](W-145-codex-regenerates-the-key.md)).
+  item hoped for.** Its key is Claude-authored (W-145 (closed 2026-09-15 — [W-136](W-136-golden-benchmark.md) phase 5)).
   It becomes one when Codex regenerates the key against the **same frozen
   ladder**, which is why the rungs were committed before the questions were opened.
 
 🟡 **Waiting on W-136 phase 5**, not on a ruling and not on an environment.
 
-## 🔴 Re-balled 2026-09-12 — this is red, through W-145
+## 🔴 Re-balled 2026-09-12 — this is red, through W-145 — ✅ **LIFTED 2026-09-15**
 
 This item was 🟡 *waiting on W-136 phase 5*. **That is half true and the half it
 missed is the one that matters.**
 
 - **Clean-corpus `recall@k`** waits on phase 5, which is Codex's — 🟡 on its own.
-- 🔴 **Part B waits on [W-145](W-145-codex-regenerates-the-key.md)**, which is a
-  decision sitting with Arpit. Part B's whole point is a corpus with a key its
-  measurer cannot have contaminated, and the ladder's key is Claude-authored.
+- 🔴 **Part B waited on W-145**, a decision sitting with Arpit. Part B's whole
+  point is a corpus with a key its measurer cannot have contaminated, and the
+  ladder's key was Claude-authored.
 
 **Red wins** (OPEN-WORK rule 6): an item waiting on several things is 🔴 if any
-chain ends at Arpit. So this row is 🔴, and it belongs in **W-145's `↳ blocks:`
-sub-row** — which said *"nothing else in the queue"* until this was re-derived.
+chain ends at Arpit. That held until 2026-09-15.
+
+✅ **2026-09-15 — the chain no longer ends at Arpit.** He ran prompt 2, Codex
+authored set 1's questions and answers, and W-145 closed as overtaken. **Both
+halves now wait on [W-136](W-136-golden-benchmark.md) phase 5 alone**, so this
+row is 🟡, not 🔴. ⚠ **The reason the row was red is still worth keeping:** it
+was re-derived, not read off the queue, and W-145's `↳ blocks:` sub-row said
+*"nothing else in the queue"* while this sat underneath it.

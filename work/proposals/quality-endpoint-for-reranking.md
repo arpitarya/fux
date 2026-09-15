@@ -118,7 +118,7 @@ feature. Listed so it is not re-derived a fourth time.
 
 ### D · Codex-scored golden answers — *passes all four, and is not available*
 
-[W-145](../open/W-145-codex-regenerates-the-key.md). The honest instrument:
+W-145 (closed 2026-09-15 — [W-136](../open/W-136-golden-benchmark.md) phase 5). The honest instrument:
 truth authored by someone who is not the reranker, scored by someone who is not
 Claude. ⚠ **It is 🟣 on 2026-09-30**, so recommending it alone would leave W-154
 exactly as parked as it is now. **It is the reopen trigger for whatever §4
@@ -221,5 +221,5 @@ the fork above, and W-154 closes or waits on Arpit's word.
 
 **Work** — [W-154](../open/W-154-rerank-weight-cost.md) ·
 W-183 (closed 2026-09-15) ·
-[W-145](../open/W-145-codex-regenerates-the-key.md) ·
+W-145 (closed 2026-09-15 — [W-136](../open/W-136-golden-benchmark.md) phase 5) ·
 [the Part A pre-registration](../regression/2026-09-13-rerank-cost/PRE-REGISTRATION.md)

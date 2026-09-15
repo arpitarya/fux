@@ -28,18 +28,19 @@ table and is a 🟣 date gate in [OPEN-WORK](../OPEN-WORK.md).
 
 - **What this gate holds up**, moved here from the inbox sub-row: **[W-87](W-87-what-good-means.md)'s
   recall half** and **[W-144](W-144-structure-aware-extraction.md)'s cheap route**,
-  both of which read per-query scores off phase 5. Not [W-145](W-145-codex-regenerates-the-key.md)
-  — that governs what a number may *claim*, not whether it runs.
+  both of which read per-query scores off phase 5. **Not W-145** — that governed
+  what a number may *claim*, not whether it runs, and it closed as overtaken on
+  2026-09-15 when Codex authored set 1.
 
 ## State
 
 | phase | who | lane | state |
 |---|---|---|---|
-| 1. Seed + answer key | Codex, **stood in for by Claude 2026-09-12** | — | ✅ **done, provisionally** — 20 documents, `seed-dates.tsv`, 124-question key held in chat. Regenerated under [W-145](W-145-codex-regenerates-the-key.md) |
+| 1. Seed + question sets | Codex (set 1) and Claude (set 2) | — | ✅ **DONE for real 2026-09-15** — the 20 seed documents and `seed-dates.tsv` stand; the provisional Claude key was deleted and **Arpit ran prompt 2 and prompt 3**. [`questions/`](../golden/questions/README.md): set 1 is Codex's (125, `s1-001…s1-125`), set 2 is Claude's (124, `s2-001…s2-124`); **both questions-only, both keys Arpit's**. W-145 closed as overtaken |
 | 2. Extend 10 → 10 000, blind | Claude Code (Opus) | `agent` | ✅ **COMPLETE 2026-09-12 — all eight rungs to 10 000.** The first five were committed *before* the questions were opened (`92f5bff`); `rung-02000`/`05000`/`10000` were built later the same day from the **same committed generator and seed**, so what protects them is determinism rather than the clock — stated in [`golden/README.md`](../golden/README.md) rather than glossed. Nesting verified across all eight. |
 | 3. Freeze ladder, release questions | Codex | `arpit` — run prompt 3 | ⚠ **released early** on 2026-09-12, before the ladder existed — ids permuted so no band identifies the unanswerables. Phase 2 was on its honour and did not open `questions/`. |
 | 4. Run each rung | Claude Code | `agent` | ✅ **run on 2026-09-12** for the five rungs that existed then, under a committed pre-registration ([`work/regression/2026-09-12-golden-ladder/`](../regression/2026-09-12-golden-ladder/PRE-REGISTRATION.md)). ⚠ **`rung-02000`/`05000`/`10000` have NOT been run** — they were built after that run. Running them is cheap (the indexes are committed) but it needs its own pre-registration, because a run across eight rungs is not the run that was registered across five. |
-| 5. Score each rung | Codex | `arpit` — run prompt 5 | 🟣 **ready, gated on 2026-09-30** (Arpit, 2026-09-13 — Codex limit exhausted) — predictions and answers are filed for five rungs. Every number it produces is `informed` until [W-145](W-145-codex-regenerates-the-key.md) closes. |
+| 5. Score each set, per rung | Codex | `arpit` — run prompt 6 | 🟣 **gated on 2026-09-30** (Arpit, 2026-09-13 — Codex limit exhausted). ⚠ **The premise visibly changed on 2026-09-15**, when Codex authored set 1; **only Arpit lifts a date gate**, so it stands until he says otherwise. ✅ **Set 1 is no longer `informed` for key authorship** — W-145's defect is gone. 🔴 **Set 2 is `informed` permanently** (SR-LAW-11 decision 7). |
 
 ## Done in the filing change (2026-09-11)
 
@@ -54,7 +55,7 @@ table and is a 🟣 date gate in [OPEN-WORK](../OPEN-WORK.md).
 **Arpit's Codex quota was exhausted with phase 1 half done**: the ten seed
 documents had landed, the questions and answers had not. He ruled that Claude
 write the rest so phase 2 is not blocked, and that a work item be filed in the
-same breath for Codex to regenerate the key — [W-145](W-145-codex-regenerates-the-key.md),
+same breath for Codex to regenerate the key — W-145 (closed 2026-09-15 — [W-136](W-136-golden-benchmark.md) phase 5),
 which carries what is contaminated and what any number may claim.
 
 - **Twenty documents in `work/golden/seed/`.** Codex's ten, plus five
@@ -155,7 +156,7 @@ the benchmark.
 
 ⚠ **Two things phase 5 should know before it runs:**
 
-1. **Every number is `informed` until [W-145](W-145-codex-regenerates-the-key.md)
+1. **Every number is `informed` until W-145 (closed 2026-09-15 — [W-136](W-136-golden-benchmark.md) phase 5)
    closes** — the key is the Claude-authored stopgap.
 2. **Phase 4 covers five rungs, not eight.** The three new rungs are built and
    indexed but **not run**, and running them needs its own pre-registration —

@@ -14,6 +14,11 @@ timestamp: 2026-09-15T00:00:00Z
 field and it was a free-text label — unfalsifiable, un-re-derivable, and the
 foundation of any stratified claim anyone would later want to make.
 
+**Model: NONE — no Claude model executes what is left.** The schema and the
+scorer are built and tested; the remaining work is the **first real run over a
+key**, and no Claude session may see one (L11). It is Arpit's hands and Codex's
+([SR-WORK-LIFECYCLE](../../records/0058_WORK-lifecycle.md) decision 6).
+
 **Record:** [SR-WORK-GOLDEN](../../records/0066_WORK-golden.md) decision 13.
 **Schema:** [`work/golden/README.md`](../golden/README.md) §*Difficulty*.
 **Code:** [`tools/golden-difficulty/`](../../tools/golden-difficulty/).
@@ -56,7 +61,7 @@ false`. **`d <= 1` easy · `2` medium · `>= 3` hard**, and unanswerable is
 
 - 🟡 **The first real run**, over set 1's and set 2's keys, on each rung. **Needs
   a key, so it is Arpit's and Codex's hands** — waiting on
-  [W-189](W-189-two-question-sets.md), whose prompts 2 and 3 write them.
+  W-189 (closed 2026-09-15), whose prompts 2 and 3 wrote them — the released sets are [`work/golden/questions/`](../golden/questions/README.md).
 - ⚠ **The bands are provisional in one specific way**: `d <= 1 / 2 / >= 3` was
   chosen before any distribution over a real key existed. **If the first real run
   puts 80 % of questions in one band the thresholds are wrong, not the questions**

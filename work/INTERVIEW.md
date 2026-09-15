@@ -919,7 +919,7 @@ by agents.*
 
 - Arpit's Codex quota ran out mid-phase-1. He ruled that Claude write the
   feature-coverage documents and the **124-question answer key** so phase 2 is not
-  blocked, and that [W-145](open/W-145-codex-regenerates-the-key.md) be filed in
+  blocked, and that W-145 (filed then; closed as overtaken 2026-09-15) be filed in
   the same breath for Codex to regenerate it.
 - **The key is in the chat, not on disk.** He chose option (2). There is no
   `golden-answer/answers.jsonl` on this machine, and the one-rule prohibition is
@@ -2428,8 +2428,11 @@ session would remember is gone:
   `d ≤ 1` / `2` / `≥ 3`, unanswerable floored at hard, plus a per-rung distractor
   count. 🔴 Never derived from fux's own results. **The bands are movable only
   until a number is scored against them** (SR-RS 10b).
-- **Next on it: Arpit runs prompt 2, then prompt 3.** Nothing in the golden lane
-  is agent-closable until he does — [W-189](open/W-189-two-question-sets.md).
+- **Superseded 2026-09-15: he ran both.** Set 1 (Codex, 125 questions) and set 2
+  (Claude, 124) are in the tree — **staged, his to commit** — questions-only, and
+  both keys are his. The golden
+  lane is agent-closable again — next is **prompt 4**, and 🔴 **it needs a session
+  that has never read `questions/`** — [W-136](open/W-136-golden-benchmark.md).
 
 ### In flight: the 3.0.0-alpha.0 branch is open and empty of code (2026-09-13, Cowork)
 

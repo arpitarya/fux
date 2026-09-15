@@ -28,6 +28,20 @@ Rules:
 
 
 
+## 2026-09-15 — **both question sets exist; W-189 and W-145 close**
+
+| item | what landed | evidence |
+|---|---|---|
+| **set 1 — Codex** | **125 questions**, ids `s1-001…s1-125`, released by Arpit from prompt 2's block 1 (**staged, his to commit** — the process reserves that to him). He holds block 2 (the key) | [`questions/README.md`](golden/questions/README.md) |
+| **set 2 — Claude** | **124 questions**, ids `s2-001…s2-124`, from prompt 3's block 1, authored by a session that wrote no file and does not return | [SR-LAW-11](../records/0012_LAW-11-sealed-answer-key.md) decision 6 |
+| **verified without reading one** | field *names* checked before any value: `id` and `question` and **nothing else** — no answer, relevant, primary or answerable field. Then 0 duplicate ids, 0 cross-set collisions, both counts inside the prompts' 120–125 band | this change |
+| **W-189 closed** | the two sets exist and the key never became a file; prompts 4–6 were never its scope — they are W-136 phases | [`archive/README.md`](../archive/README.md) §`open/` |
+| **W-145 closed as OVERTAKEN** | the contaminated key it would regenerate was already deleted, and **set 1 is Codex-authored questions *and* answers** — the need it named | [`archive/README.md`](../archive/README.md) §`open/` |
+| **the queue re-balled** | inbox row cleared; **W-136 🟢** (prompt 4 next), **W-190 🟡 on W-136**, **W-87 🟡 on W-136** — it had been 🔴 through W-145 | [OPEN-WORK](OPEN-WORK.md) |
+| **25 dead links repointed** | across 8 live documents, at live successors rather than into `archive/` (rule 58); one **pre-existing** break from the renumbering fixed with them | `tests/test_doc_links.py` green |
+| **what it does NOT buy** | ⚠ **no rung ran and no number moved.** The instrument exists; **prompt 4 has not been run**, and 🔴 **the session that runs it must never have read `questions/`** — this one read the ids | [W-136](open/W-136-golden-benchmark.md) |
+| **owed to Arpit** | ⚠ a **LAW record was amended** (SR-LAW-11 decision 11 — its factual premise, not its normative sentence) and needs his ratification; ⚠ **W-136's 🟣 2026-09-30 gate rests on a premise Codex disproved today**, and only he lifts a date gate | [WORKLOG](WORKLOG.md) |
+
 ## 2026-09-15 — **the golden reset: six numbered prompts, two numbered sets**
 
 | item | what landed | evidence |
@@ -36,7 +50,7 @@ Rules:
 | **sets are numbered** | set 1 (Codex, `s1-001…`), set 2 (Claude, `s2-001…`) — the author is a fact about a set, not its identity | [SR-WORK-GOLDEN](../records/0066_WORK-golden.md) decision 8 |
 | **release → two blocks** | each authoring prompt ends with block 1 (ids + text, Arpit commits) and block 2 (the key, Arpit keeps). The freeze-and-release prompt is **retired, not deleted** | [`RETIRED-codex-release.md`](golden/prompts/RETIRED-codex-release.md) |
 | **the hand-off** | 🔴 prompt 5 records what fux **answered and cited**, not only what it ranked. **The only place a golden answer and a fux answer meet is a chat Arpit attends** | [`5-claude-run.md`](golden/prompts/5-claude-run.md) |
-| **the reset, stated** | the old key, `golden-answer/` and the 124 questions are deleted; **the seed corpus and eight rungs survive**; every old id is orphaned and **may not be compared** with anything scored from here | [`questions/README.md`](golden/questions/README.md) · [W-189](open/W-189-two-question-sets.md) |
+| **the reset, stated** | the old key, `golden-answer/` and the 124 questions are deleted; **the seed corpus and eight rungs survive**; every old id is orphaned and **may not be compared** with anything scored from here | [`questions/README.md`](golden/questions/README.md) · W-189 (closed 2026-09-15) |
 | **what it does NOT buy** | ⚠ **no set exists yet and no number moved.** W-189 is in the Blocked-on-Arpit inbox and gates W-190, W-145, W-136 and W-87's recall half | [OPEN-WORK](OPEN-WORK.md) |
 
 ## 2026-09-15 — **two golden question sets, and the answer key stops being a file**
@@ -46,9 +60,9 @@ Rules:
 | **L11 amended** | the law's subject moves from *the key directory is closed to Claude* to **the key is Arpit's custody and no agent may read one** — both sets one subject, **no key file anywhere an agent can reach**, the one route a paste and **Codex's alone**, Claude closed on every route | [SR-LAW-11](../records/0012_LAW-11-sealed-answer-key.md) decisions 2–4 |
 | **the authoring carve-out** | 🔴 exactly one handoff wide — the session that authors set A writes no file, hands the answers over in the chat, and **never runs a rung or returns**. Authorship buys no access | SR-LAW-11 decision 6 |
 | **two sets** | A (Claude, ids `a001…`) and B (Codex, ids `g001…`), same seed corpus and ladder, **run and reported apart**; 🔴 **never pooled** | [SR-WORK-GOLDEN](../records/0066_WORK-golden.md) decisions 8–11 |
-| **the per-run key question deleted** | *"(1) the file, or (2) the chat?"* removed from prompts 1, 3 and 5 — it had one answer left. Prompt 4 writes two prediction files; [`prompts/1a-claude-set-a.md`](golden/prompts/1a-claude-set-a.md) is new | SR-WORK-GOLDEN decision 10 |
+| **the per-run key question deleted** | *"(1) the file, or (2) the chat?"* removed from prompts 1, 3 and 5 — it had one answer left. Prompt 4 writes two prediction files; [`prompts/3-claude-questions.md`](golden/prompts/3-claude-questions.md) is new (**renumbered from `1a-claude-set-a.md`** later the same day) | SR-WORK-GOLDEN decision 10 |
 | **difficulty, built** | [`tools/golden-difficulty/`](../tools/golden-difficulty/) — a **count of the discriminations a question forces** (`d ≤ 1` easy / `2` medium / `≥ 3` hard, unanswerable **floored at hard**) plus a per-rung distractor count. 🔴 Never derived from fux's own results; 🔴 **refuses a key path inside the repository**. `--selftest` green on six synthetic fixtures | SR-WORK-GOLDEN decision 13 · [W-190](open/W-190-question-difficulty.md) |
-| **what it does NOT buy** | ⚠ **no number moved and no engine ran.** Set A is unwritten, both keys are still Arpit's to regenerate, and **every set A number will be `informed` permanently** — an assumption recorded in SR-LAW-11 decision 7, not Arpit's ruling | [W-189](open/W-189-two-question-sets.md) |
+| **what it does NOT buy** | ⚠ **no number moved and no engine ran.** Set A is unwritten, both keys are still Arpit's to regenerate, and **every set A number will be `informed` permanently** — an assumption recorded in SR-LAW-11 decision 7, not Arpit's ruling | [`questions/README.md`](golden/questions/README.md) · W-189 (closed 2026-09-15) |
 
 ## 2026-09-15 — **the benchmark's arms settle at `A` · `B` · `B-node`**
 
@@ -1586,7 +1600,7 @@ green.
 | **Not done** | Rungs **2 000 / 5 000 / 10 000 are not built** — Arpit capped the session at 1 000. Scoring is Codex's, phase 5 | [W-136](open/W-136-golden-benchmark.md) |
 
 ⚠ **`informed`, and no delta is stated in any direction** — the key is the
-Claude-authored stopgap ([W-145](open/W-145-codex-regenerates-the-key.md)). No
+Claude-authored stopgap (W-145, closed 2026-09-15 — [W-136](open/W-136-golden-benchmark.md) phase 5). No
 verdict, no threshold, no prediction closed.
 
 ---
