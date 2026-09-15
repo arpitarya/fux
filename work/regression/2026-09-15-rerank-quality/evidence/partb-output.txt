@@ -19,3 +19,16 @@ contests: 538   paths: ['ask', 'answer']
   425/538
   450/538
   475/538
+  500/538
+  525/538
+
+    path     n    off     on  better  worse  discordant    net
+     ask   538     57      7       2     52          54    -50
+  answer   538      4      2       1      3           4     -2
+
+headroom (SR-RS 22b), per path:
+       ask  improvement  479/538   regression    5/538 
+    answer  improvement  533/538   regression    1/538 
+
+🔴 The bar is the PRE-REGISTRATION's and this runner does not apply it.
+   A flip on `answer` and not on `ask` IS the refer-plane rescore (W-108).

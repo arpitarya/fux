@@ -9,6 +9,43 @@ timestamp: 2026-09-13T00:00:00Z
 filed: 2026-09-13
 ---
 
+## 🔴 PART B RAN 2026-09-15 AND IS **VOID** — the instrument, not the feature
+
+[Verdict](../regression/2026-09-15-rerank-quality/VERDICT.md).
+
+The gate the pre-registration demanded first **passed** — the document-level
+screen, `agreement` **0.5273** against chance **0.1587**. Then the `ask` arm read
+**net −50**, which looks like a decisive negative and is not:
+
+🔴 **39 of the 52 broken contests (75 %) are the query's OWN SOURCE document
+taking rank 1.** The queries are sentences lifted verbatim from citing
+documents, so the citing document is a *perfect* proximity match. **The reranker
+did exactly its job and the endpoint scored that as a miss.**
+
+⚠ **Both screens passed while the defect was present** (0.4141 passage-level,
+0.5273 document-level). A screen scores the candidates it is handed; neither was
+ever asked what else is in the corpus. **That is the blind spot the screen's own
+analysis named before any arm ran — now measured rather than predicted.**
+
+**The `answer` path gives nothing either:** 4 baseline hits in 538. So W-108's
+two-mechanism separation is undelivered too.
+
+### What this item needs next
+
+1. **Exclude the citing document from the candidate set**, per contest —
+   `source` is already on every contest, so it is a filter on the ranked list.
+2. **A NEW pre-registration, frozen first.** The bar does not move; the
+   instrument is what changes. Re-running under the old one would be a moving
+   threshold wearing a repair's clothes.
+3. **Fix two definitions in the same pass:** regression headroom means *right in
+   the BASELINE arm* (not *right in both* — post-hoc when an arm breaks things),
+   and the `answer` hit criterion needs to be usable.
+4. ⚠ **13 contests moved for reasons other than the source.** Above the floor of
+   6, but not by much — the corrected run may well be underpowered.
+
+**The price is still measured and the benefit is still unmeasured.**
+
+
 # W-154 — `rerank_weight`, restated as a cost question
 
 **Model: Opus** — it writes a pre-registration and calls a gate.
