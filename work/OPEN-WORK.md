@@ -34,8 +34,6 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🟢 **W-178** · `agent` — **consumer fetchers open like their decoders already do**: `fetch=` becomes a typed, shape-validated name. Ruled 2026-09-15. 🔴 No third fetcher is possible today. Ratified, not built. [detail](open/W-178-consumer-planes-open-sets.md)
-- 🟢 **W-177** · `agent` — **`fux update` is deleted; `fux ingest` absorbs its whole surface**, ruled 2026-09-15. Reverses W-63 decision 3; no law edit. [detail](open/W-177-ingest-absorbs-update.md)
 - 🟣 **W-161** · `agent`, waiting on **2026-09-30** — **BUILT 2026-09-15**, both readers, 0 discordant; both tiers ship on and unmeasured. Only the two arms remain, and they need Codex's link-dependent questions. [detail](open/W-161-graph-composed-ask.md)
 - 🔴 **W-168** · `agent` — the ten search improvements. **Step 1 scoped 2026-09-15, not started:** an anchor field makes a document's bytes depend on other documents while re-index is per-document. Needs the inbox ruling. [detail](open/W-168-search-improvements.md)
 - 🟣 **W-176** · `agent`, waiting on **2026-09-30** — **steps 1–3 landed 2026-09-15**: `weak` ⇒ `answerable: false`, the steering text, `failed`. The seven measured gates need Codex's key. [detail](open/W-176-abstention-gates.md)

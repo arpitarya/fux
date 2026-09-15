@@ -130,7 +130,7 @@ gating rule stands for every milestone after it**
 * [The SR register](../records/README.md) - the decisions of record. `PLAN.md` was archived 2026-08-18; milestone scope now lives in the item that will build it, under [`work/open/`](../work/open/README.md).
 * [Open work](../work/OPEN-WORK.md) - **the single live queue**, two concurrent lanes; finished items are deleted, not ticked.
 * [Implementation](../work/IMPLEMENTATION.md) - the milestone log: what shipped, when, and the outcome. What OPEN-WORK reconciles against.
-* [The paper](../work/paper/the-fux-index-paper.md) - the architecture of record, with figures and falsifiable predictions.
+* [The paper](paper/the-fux-index-paper.md) - the architecture of record, with figures and falsifiable predictions.
 * **The six diagrams**, redrawn from the code 2026-09-12 — [high-level](../work/architecture-high-level.svg) (what fux is, in three boxes) · [detailed](../work/architecture-detailed.svg) (every plane, what is committed and what is not) · [decoders](../work/architecture-decoders.svg) (how bytes fux cannot read become text it can) · [ask](../work/architecture-ask.svg) (the query path, and the law that lets there be two of them) · [answer](../work/architecture-answer.svg) (the refer plane and the five freshness verdicts) · [two readers](../work/architecture-two-readers.svg) (search in Python versus Node — every twin module, every Python-only component, and the three deliberate asymmetries).
 * [Model handoff interview](../work/INTERVIEW.md) - the state of play; read before substantive changes.
 * [Worklog](../work/WORKLOG.md) - per-exchange session trail, newest first.

@@ -3190,7 +3190,7 @@ Claude Opus 5 (1M context).
   [`archive/v0.26-implemented/PLAN-v0.26.md`](../archive/v0.26-implemented/PLAN-v0.26.md).
 
 - The replacement architecture is **index-and-refer**, specified in
-  [`paper/the-fux-index-paper.md`](paper/the-fux-index-paper.md): rank from a
+  [`paper/the-fux-index-paper.md`](../docs/paper/the-fux-index-paper.md): rank from a
   small index committed to git; fetch content from the systems that own it;
   verify at answer time.
 
@@ -3245,7 +3245,7 @@ the majority of the code for a minority of the value.
 committed index cannot be small and the architecture is falsified. So M1 runs
 *before* anything is built on it, including the package scaffold, against a
 threshold pre-registered in the [handoff](../archive/v0.30-rev1-planning/v0.30.0-m0-m1-gate-handoff.md)
-§5.4 and [paper §8](paper/the-fux-index-paper.md).
+§5.4 and [paper §8](../docs/paper/the-fux-index-paper.md).
 
 **Moving that threshold after seeing the numbers is the single worst thing a
 successor can do here.** A recorded negative that saves months of building is
