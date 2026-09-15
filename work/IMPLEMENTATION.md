@@ -28,6 +28,18 @@ Rules:
 
 
 
+## 2026-09-15 — **W-181 and W-170: the observer hook, priced**
+
+| item | what landed | evidence |
+|---|---|---|
+| **W-181** | 🟢→✅ **the seam is free, on two corpora an order of magnitude apart**: `+0.7 ms` p50 on fux's own repository and **`−0.3 ms`** on golden `rung-10000`. The negative one is the honest reading — **below the instrument's resolution, and it does not scale with the corpus**, which is the property that matters: the dispatch runs once per process, after the verb has rendered | [`2026-09-15-observer-latency`](regression/2026-09-15-observer-latency/report.md) · SR-OBSERVE decision 12 |
+| **the cap, tested against its real claim** | a **2 000 ms** observer adds **+63 ms**, not 2 000, against `[observe] max_ms` = 50. 🔴 **And `0 of 350` abandoned observers ever finished** — which is the reason to KEEP decision 10b's *abandoned* rather than reverse it: the observed death is a short-lived CLI process exiting first, and a longer one would see the write land | SR-OBSERVE decision 12a |
+| **the fork W-181 was filed with** | resolved: **a reference observer in fux**, run first. 🔴 **It prices the SEAM, never a subscriber** — cage's observer is the reopen trigger, and the reference observer's own docstring opens with that warning | `tools/observer-bench/` |
+| **W-170** | 🟡→✅ closed. Its last obligation was this capture; Node's half stays out of scope by declaration (SR-NODE-SEARCH decision 18) | SR-OBSERVE decision 12 · the item closed 2026-09-15 |
+| **W-186 filed** | ⚠ **every golden rung is unreadable by HEAD** — `fux.index.v2`, three `[ranking]` keys W-152 removed, and a `fux.toml` key W-164 moved, on **all eight**. Found taking a scratch copy for the second corpus; blocks W-180, W-154 Part B and W-175 | [W-186](open/W-186-golden-ladder-unreadable.md) |
+
+
+
 ## 2026-09-15 — **W-182 and W-185: a flake driven on purpose, diagnosed, and fixed**
 
 | item | what landed | evidence |

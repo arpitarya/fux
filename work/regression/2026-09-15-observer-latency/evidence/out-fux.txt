@@ -1,0 +1,10 @@
+corpus: /Users/arpitarya/my_programs/fux   queries: 40   repeats: 5
+
+fux's own repository (1 239 documents)
+  off  p50    181.7 ms   p95    304.0 ms
+  on   p50    182.3 ms   p95    306.5 ms
+  delta p50     +0.7 ms   p95     +2.5 ms
+  observer records written: 200 (expected 200)
+  slow p50    245.1 ms   p95    369.8 ms (observer sleeps 2000 ms)
+  delta vs off: p50    +63.5 ms -- the cap holds if this is about `[observe] max_ms`, not 2000
+  slow observer records written: 0 (of 200) -- how many ABANDONED threads finished anyway

@@ -1,0 +1,10 @@
+corpus: /private/tmp/claude-501/-Users-arpitarya-my-programs-fux/5726476a-954f-49b6-9bb5-4cc894435e68/scratchpad/rung-10000   queries: 30   repeats: 5
+
+golden rung-10000 (10 000 documents, scratch copy)
+  off  p50    194.2 ms   p95    256.6 ms
+  on   p50    193.9 ms   p95    256.0 ms
+  delta p50     -0.3 ms   p95     -0.6 ms
+  observer records written: 150 (expected 150)
+  slow p50    256.7 ms   p95    319.2 ms (observer sleeps 2000 ms)
+  delta vs off: p50    +62.5 ms -- the cap holds if this is about `[observe] max_ms`, not 2000
+  slow observer records written: 0 (of 150) -- how many ABANDONED threads finished anyway

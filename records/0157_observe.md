@@ -7,10 +7,10 @@ description: "After a verb has fully rendered, fux hands every file in `.fux/obs
 status: accepted
 date: 2026-09-14
 feature: the observer hook — the extension point a consumer's analytics subscribe to
-owns: [src/fux/observe.py@4ea7874ba9c7]
+owns: [src/fux/observe.py@4ea7874ba9c7, tools/observer-bench@e12d60cca125]
 laws: [L1, L2, L3, L4, L8, L10]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: e5f23befd89924b049432df8e9a255cf0a88fd44d6330df5f1b243a847541f2b
+content_sha: a9b3cfe11e3346c59a1477e0265f7b7d93615d5e433d39bd0dc2ee4f89c34071
 ratifies: W-170
 ---
 
@@ -81,7 +81,7 @@ flowchart LR
 
 ### Context
 
-Cage's search leg ([`work/open/W-170`](../work/open/W-170-cage-search-leg.md))
+Cage's search leg (W-170 (closed 2026-09-15))
 asked how often an agent reaches for fux instead of `grep`, and — the half
 only fux can answer — how often fux answered *weakly* and the agent went to
 `grep` within the next three steps. The transcript half cage reads on its own.
@@ -181,6 +181,45 @@ there is nothing to interleave.
 consumer code once per request is a different decision with a different blast
 radius, and this record does not make it.
 
+**12. MEASURED 2026-09-15 (W-181): the seam is free, and the cap's promise
+holds at the weaker wording decision 10b chose.**
+
+| | fux's repo (1 239 docs) | golden `rung-10000` |
+|---|---|---|
+| p50 `ask`, no observer | 181.7 ms | 194.2 ms |
+| p50 `ask`, reference observer | 182.3 ms | 193.9 ms |
+| **delta** | **+0.7 ms** | **−0.3 ms** |
+
+**The negative one is the honest reading of both**: the dispatch costs less than
+the run-to-run variation of starting an interpreter. ⚠ **And it does not scale
+with the corpus**, which is the property that matters — the dispatch runs once
+per process, after the verb has rendered (decision 10d), so everything corpus
+size drives has already happened. A number that *did* scale would have meant the
+hook was reaching into the verb.
+
+🔴 **What was priced is the SEAM, not a subscriber.** The reference observer
+appends a line and returns. Cage's writes cage's ledger, and that cost is cage's;
+**no number here may be reported as a subscriber's**. Cage's observer is the
+reopen trigger.
+
+**12a. The cap, tested against the claim it actually makes.** An observer that
+sleeps **2 000 ms** adds **+63.5 ms** (fux) and **+62.5 ms** (rung-10000) against
+`[observe] max_ms` = 50. *A consumer's analytics cannot make `fux ask` slow, only
+itself* — held, on both corpora.
+
+🔴 **And `0 of 350` abandoned observers ever wrote their line.** The slow
+observer writes after the sleep; across both sweeps, with a grace period, not one
+record appeared. **That is the reason to keep saying *abandoned* and not
+*killed*, rather than a reason to reverse 10b**: the observed death is a property
+of a short-lived CLI process exiting first, and a consumer whose process outlives
+the sleep would see the write land. The weaker promise is the true one.
+
+⚠ **Unmeasured and stated: the cost of N observers.** One was installed. The
+dispatch is a loop, so N cost N calls plus one directory listing — which is
+arithmetic, not a measurement.
+
+[The run](../work/regression/2026-09-15-observer-latency/report.md).
+
 **11. Node's half is NOT built, and is declared rather than missing.**
 Decision 1 requires it to ship with the Python half **or** be declared out of
 scope in [SR-NODE-SEARCH](0153_node-search.md) in the same change. It is
@@ -219,7 +258,7 @@ exists on either.
 
 ### Reference (required)
 
-- [`work/open/W-170`](../work/open/W-170-cage-search-leg.md) — the item; its
+- W-170 (closed 2026-09-15) — the item; its
   Definition of done is this record's build list
 - [SR-LAW-10](0011_LAW-10-bundled-output.md) decision 2 — the exemption
 - [SR-DECODE](0139_decode.md) · [SR-FETCHER](0117_fetcher.md) — the two sibling

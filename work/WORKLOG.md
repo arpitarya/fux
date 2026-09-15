@@ -106,8 +106,23 @@ play: the worklog is the granular, per-exchange trail.
   write-if-missing, so the fix reaches no existing repo** — a `fux doctor` warn
   row is the only thing that does, and that is **write-if-missing hiding a fix
   for the second time today**.
-- **Next:** W-181 · W-179 · W-180 · W-154. W-140 is 🟢 and its only remaining
-  question is a call, not work: close row 21 as unreproduced, or put it to Arpit.
+- **Did — W-181, and W-170 closed with it:** resolved its fork in favour of a
+  **reference observer in fux**, run first, because the seam's cost is fux's to
+  know and a subscriber's is not fux's to write. **`+0.7 ms` p50 on this repo and
+  `−0.3 ms` on golden `rung-10000`** — the negative one is the honest reading, and
+  **it does not scale with the corpus**, which is the property that matters. The
+  cap was tested against the claim it actually makes: a **2 000 ms** observer adds
+  **+63 ms**, not 2 000. 🔴 **And `0 of 350` abandoned observers ever finished** —
+  which is the reason to KEEP SR-OBSERVE 10b's *abandoned* rather than reverse it.
+- **Found on the way — W-186:** 🔴 **every one of the eight golden rungs is
+  unreadable by HEAD.** A `fux.index.v2` index, the three `[ranking]` priors
+  W-152 removed, and the `fux.toml` key W-164 moved — all three on all eight.
+  **Nothing detects it**: no test, hook or CI arm reads a rung, so a format bump
+  and two key retirements landed over nine days and the ladder went quiet. It
+  blocks W-180, W-154 Part B and W-175, which the queue had been calling ready.
+- **Next:** W-186 (it unblocks three), then W-179. W-140 is 🟢 and its only
+  remaining question is a call, not work: close row 21 as unreproduced, or put it
+  to Arpit.
 
 ## 2026-09-15 — W-168 step 1: anchor text, built  ·  Claude Code (Opus 5)
 

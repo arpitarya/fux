@@ -1,0 +1,2735 @@
+{
+  "root": "/private/tmp/claude-501/-Users-arpitarya-my-programs-fux/5726476a-954f-49b6-9bb5-4cc894435e68/scratchpad/rung-10000",
+  "label": "golden rung-10000 (10 000 documents, scratch copy)",
+  "queries": 30,
+  "repeats": 5,
+  "off_p50_ms": 194.21,
+  "off_p95_ms": 256.56,
+  "on_p50_ms": 193.92,
+  "on_p95_ms": 255.99,
+  "records_written": 150,
+  "cap_arm_sleep_ms": 2000.0,
+  "slow_p50_ms": 256.67,
+  "slow_p95_ms": 319.21,
+  "slow_records_written": 0,
+  "rows": [
+    {
+      "query": "owner",
+      "arm": "warmup",
+      "repeat": 0,
+      "ms": null
+    },
+    {
+      "query": "owner",
+      "arm": "warmup",
+      "repeat": 1,
+      "ms": null
+    },
+    {
+      "query": "owner",
+      "arm": "warmup",
+      "repeat": 2,
+      "ms": null
+    },
+    {
+      "query": "owner",
+      "arm": "off",
+      "repeat": 0,
+      "ms": 136.92791599896736
+    },
+    {
+      "query": "owner",
+      "arm": "on",
+      "repeat": 0,
+      "ms": 137.31999997980893
+    },
+    {
+      "query": "owner",
+      "arm": "off",
+      "repeat": 1,
+      "ms": 139.21212501008995
+    },
+    {
+      "query": "owner",
+      "arm": "on",
+      "repeat": 1,
+      "ms": 138.18708300823346
+    },
+    {
+      "query": "owner",
+      "arm": "off",
+      "repeat": 2,
+      "ms": 139.99245798913762
+    },
+    {
+      "query": "owner",
+      "arm": "on",
+      "repeat": 2,
+      "ms": 138.34679199499078
+    },
+    {
+      "query": "owner",
+      "arm": "off",
+      "repeat": 3,
+      "ms": 136.77287500468083
+    },
+    {
+      "query": "owner",
+      "arm": "on",
+      "repeat": 3,
+      "ms": 137.27099998504855
+    },
+    {
+      "query": "owner",
+      "arm": "off",
+      "repeat": 4,
+      "ms": 139.32250000652857
+    },
+    {
+      "query": "owner",
+      "arm": "on",
+      "repeat": 4,
+      "ms": 138.65679100854322
+    },
+    {
+      "query": "titl",
+      "arm": "off",
+      "repeat": 0,
+      "ms": 123.79933401825838
+    },
+    {
+      "query": "titl",
+      "arm": "on",
+      "repeat": 0,
+      "ms": 124.7832500084769
+    },
+    {
+      "query": "titl",
+      "arm": "off",
+      "repeat": 1,
+      "ms": 123.63904199446552
+    },
+    {
+      "query": "titl",
+      "arm": "on",
+      "repeat": 1,
+      "ms": 124.02695798664354
+    },
+    {
+      "query": "titl",
+      "arm": "off",
+      "repeat": 2,
+      "ms": 124.51016699196771
+    },
+    {
+      "query": "titl",
+      "arm": "on",
+      "repeat": 2,
+      "ms": 123.5704589926172
+    },
+    {
+      "query": "titl",
+      "arm": "off",
+      "repeat": 3,
+      "ms": 122.33879099949263
+    },
+    {
+      "query": "titl",
+      "arm": "on",
+      "repeat": 3,
+      "ms": 122.26695800200105
+    },
+    {
+      "query": "titl",
+      "arm": "off",
+      "repeat": 4,
+      "ms": 122.3840000166092
+    },
+    {
+      "query": "titl",
+      "arm": "on",
+      "repeat": 4,
+      "ms": 125.16912500723265
+    },
+    {
+      "query": "dai",
+      "arm": "off",
+      "repeat": 0,
+      "ms": 247.06333398353308
+    },
+    {
+      "query": "dai",
+      "arm": "on",
+      "repeat": 0,
+      "ms": 239.4174580113031
+    },
+    {
+      "query": "dai",
+      "arm": "off",
+      "repeat": 1,
+      "ms": 241.27816598047502
+    },
+    {
+      "query": "dai",
+      "arm": "on",
+      "repeat": 1,
+      "ms": 238.34275000263005
+    },
+    {
+      "query": "dai",
+      "arm": "off",
+      "repeat": 2,
+      "ms": 239.8957079858519
+    },
+    {
+      "query": "dai",
+      "arm": "on",
+      "repeat": 2,
+      "ms": 240.35012497915886
+    },
+    {
+      "query": "dai",
+      "arm": "off",
+      "repeat": 3,
+      "ms": 238.48670898587443
+    },
+    {
+      "query": "dai",
+      "arm": "on",
+      "repeat": 3,
+      "ms": 240.81204098183662
+    },
+    {
+      "query": "dai",
+      "arm": "off",
+      "repeat": 4,
+      "ms": 241.89566599670798
+    },
+    {
+      "query": "dai",
+      "arm": "on",
+      "repeat": 4,
+      "ms": 242.45529199833982
+    },
+    {
+      "query": "statu",
+      "arm": "off",
+      "repeat": 0,
+      "ms": 119.56916700000875
+    },
+    {
+      "query": "statu",
+      "arm": "on",
+      "repeat": 0,
+      "ms": 120.39695802377537
+    },
+    {
+      "query": "statu",
+      "arm": "off",
+      "repeat": 1,
+      "ms": 120.68970801192336
+    },
+    {
+      "query": "statu",
+      "arm": "on",
+      "repeat": 1,
+      "ms": 120.66041599609889
+    },
+    {
+      "query": "statu",
+      "arm": "off",
+      "repeat": 2,
+      "ms": 120.40854198858142
+    },
+    {
+      "query": "statu",
+      "arm": "on",
+      "repeat": 2,
+      "ms": 122.690332995262
+    },
+    {
+      "query": "statu",
+      "arm": "off",
+      "repeat": 3,
+      "ms": 121.19862501276657
+    },
+    {
+      "query": "statu",
+      "arm": "on",
+      "repeat": 3,
+      "ms": 121.23570800758898
+    },
+    {
+      "query": "statu",
+      "arm": "off",
+      "repeat": 4,
+      "ms": 118.96170899854042
+    },
+    {
+      "query": "statu",
+      "arm": "on",
+      "repeat": 4,
+      "ms": 120.59333402430639
+    },
+    {
+      "query": "effect",
+      "arm": "off",
+      "repeat": 0,
+      "ms": 121.64270901121199
+    },
+    {
+      "query": "effect",
+      "arm": "on",
+      "repeat": 0,
+      "ms": 126.58041701070033
+    },
+    {
+      "query": "effect",
+      "arm": "off",
+      "repeat": 1,
+      "ms": 119.24137501046062
+    },
+    {
+      "query": "effect",
+      "arm": "on",
+      "repeat": 1,
+      "ms": 118.43945900909603
+    },
+    {
+      "query": "effect",
+      "arm": "off",
+      "repeat": 2,
+      "ms": 117.85116701503284
+    },
+    {
+      "query": "effect",
+      "arm": "on",
+      "repeat": 2,
+      "ms": 118.86991700157523
+    },
+    {
+      "query": "effect",
+      "arm": "off",
+      "repeat": 3,
+      "ms": 119.38445799751207
+    },
+    {
+      "query": "effect",
+      "arm": "on",
+      "repeat": 3,
+      "ms": 118.22641600156203
+    },
+    {
+      "query": "effect",
+      "arm": "off",
+      "repeat": 4,
+      "ms": 119.00299999979325
+    },
+    {
+      "query": "effect",
+      "arm": "on",
+      "repeat": 4,
+      "ms": 118.31204101326875
+    },
+    {
+      "query": "date",
+      "arm": "off",
+      "repeat": 0,
+      "ms": 127.18666600994766
+    },
+    {
+      "query": "date",
+      "arm": "on",
+      "repeat": 0,
+      "ms": 127.14000002597459
+    },
+    {
+      "query": "date",
+      "arm": "off",
+      "repeat": 1,
+      "ms": 127.77804100187495
+    },
+    {
+      "query": "date",
+      "arm": "on",
+      "repeat": 1,
+      "ms": 126.69029101380147
+    },
+    {
+      "query": "date",
+      "arm": "off",
+      "repeat": 2,
+      "ms": 128.03070899099112
+    },
+    {
+      "query": "date",
+      "arm": "on",
+      "repeat": 2,
+      "ms": 126.66700000409037
+    },
+    {
+      "query": "date",
+      "arm": "off",
+      "repeat": 3,
+      "ms": 127.49383298796602
+    },
+    {
+      "query": "date",
+      "arm": "on",
+      "repeat": 3,
+      "ms": 127.18220800161362
+    },
+    {
+      "query": "date",
+      "arm": "off",
+      "repeat": 4,
+      "ms": 126.92058298853226
+    },
+    {
+      "query": "date",
+      "arm": "on",
+      "repeat": 4,
+      "ms": 126.86033299542032
+    },
+    {
+      "query": "effective_date",
+      "arm": "off",
+      "repeat": 0,
+      "ms": 146.01050000055693
+    },
+    {
+      "query": "effective_date",
+      "arm": "on",
+      "repeat": 0,
+      "ms": 148.6803330190014
+    },
+    {
+      "query": "effective_date",
+      "arm": "off",
+      "repeat": 1,
+      "ms": 147.2510000166949
+    },
+    {
+      "query": "effective_date",
+      "arm": "on",
+      "repeat": 1,
+      "ms": 148.02354099811055
+    },
+    {
+      "query": "effective_date",
+      "arm": "off",
+      "repeat": 2,
+      "ms": 149.49799998430535
+    },
+    {
+      "query": "effective_date",
+      "arm": "on",
+      "repeat": 2,
+      "ms": 149.15712497895584
+    },
+    {
+      "query": "effective_date",
+      "arm": "off",
+      "repeat": 3,
+      "ms": 148.33891598391347
+    },
+    {
+      "query": "effective_date",
+      "arm": "on",
+      "repeat": 3,
+      "ms": 149.89916599006392
+    },
+    {
+      "query": "effective_date",
+      "arm": "off",
+      "repeat": 4,
+      "ms": 146.73520799260587
+    },
+    {
+      "query": "effective_date",
+      "arm": "on",
+      "repeat": 4,
+      "ms": 148.37520802393556
+    },
+    {
+      "query": "custom",
+      "arm": "off",
+      "repeat": 0,
+      "ms": 279.18554199277423
+    },
+    {
+      "query": "custom",
+      "arm": "on",
+      "repeat": 0,
+      "ms": 278.1842080003116
+    },
+    {
+      "query": "custom",
+      "arm": "off",
+      "repeat": 1,
+      "ms": 279.2908329865895
+    },
+    {
+      "query": "custom",
+      "arm": "on",
+      "repeat": 1,
+      "ms": 277.9450420057401
+    },
+    {
+      "query": "custom",
+      "arm": "off",
+      "repeat": 2,
+      "ms": 276.2088750023395
+    },
+    {
+      "query": "custom",
+      "arm": "on",
+      "repeat": 2,
+      "ms": 277.7718330034986
+    },
+    {
+      "query": "custom",
+      "arm": "off",
+      "repeat": 3,
+      "ms": 273.6246660060715
+    },
+    {
+      "query": "custom",
+      "arm": "on",
+      "repeat": 3,
+      "ms": 277.7535409841221
+    },
+    {
+      "query": "custom",
+      "arm": "off",
+      "repeat": 4,
+      "ms": 278.4246249939315
+    },
+    {
+      "query": "custom",
+      "arm": "on",
+      "repeat": 4,
+      "ms": 276.7049169924576
+    },
+    {
+      "query": "room",
+      "arm": "off",
+      "repeat": 0,
+      "ms": 254.65954199898988
+    },
+    {
+      "query": "room",
+      "arm": "on",
+      "repeat": 0,
+      "ms": 254.55841701477766
+    },
+    {
+      "query": "room",
+      "arm": "off",
+      "repeat": 1,
+      "ms": 256.45908401929773
+    },
+    {
+      "query": "room",
+      "arm": "on",
+      "repeat": 1,
+      "ms": 255.3054589952808
+    },
+    {
+      "query": "room",
+      "arm": "off",
+      "repeat": 2,
+      "ms": 257.4254579958506
+    },
+    {
+      "query": "room",
+      "arm": "on",
+      "repeat": 2,
+      "ms": 256.4770829922054
+    },
+    {
+      "query": "room",
+      "arm": "off",
+      "repeat": 3,
+      "ms": 256.14608300384134
+    },
+    {
+      "query": "room",
+      "arm": "on",
+      "repeat": 3,
+      "ms": 256.84325001202524
+    },
+    {
+      "query": "room",
+      "arm": "off",
+      "repeat": 4,
+      "ms": 256.5912500140257
+    },
+    {
+      "query": "room",
+      "arm": "on",
+      "repeat": 4,
+      "ms": 255.68070900044404
+    },
+    {
+      "query": "minut",
+      "arm": "off",
+      "repeat": 0,
+      "ms": 253.4423750184942
+    },
+    {
+      "query": "minut",
+      "arm": "on",
+      "repeat": 0,
+      "ms": 254.92270800168626
+    },
+    {
+      "query": "minut",
+      "arm": "off",
+      "repeat": 1,
+      "ms": 254.99475002288818
+    },
+    {
+      "query": "minut",
+      "arm": "on",
+      "repeat": 1,
+      "ms": 255.90670798555948
+    },
+    {
+      "query": "minut",
+      "arm": "off",
+      "repeat": 2,
+      "ms": 259.09483298892155
+    },
+    {
+      "query": "minut",
+      "arm": "on",
+      "repeat": 2,
+      "ms": 254.1900830110535
+    },
+    {
+      "query": "minut",
+      "arm": "off",
+      "repeat": 3,
+      "ms": 254.75587500841357
+    },
+    {
+      "query": "minut",
+      "arm": "on",
+      "repeat": 3,
+      "ms": 254.64458300848491
+    },
+    {
+      "query": "minut",
+      "arm": "off",
+      "repeat": 4,
+      "ms": 255.08233302389272
+    },
+    {
+      "query": "minut",
+      "arm": "on",
+      "repeat": 4,
+      "ms": 256.49191698175855
+    },
+    {
+      "query": "site",
+      "arm": "off",
+      "repeat": 0,
+      "ms": 254.96758398367092
+    },
+    {
+      "query": "site",
+      "arm": "on",
+      "repeat": 0,
+      "ms": 258.26412497553974
+    },
+    {
+      "query": "site",
+      "arm": "off",
+      "repeat": 1,
+      "ms": 258.62291699741036
+    },
+    {
+      "query": "site",
+      "arm": "on",
+      "repeat": 1,
+      "ms": 255.8777919912245
+    },
+    {
+      "query": "site",
+      "arm": "off",
+      "repeat": 2,
+      "ms": 255.67404099274427
+    },
+    {
+      "query": "site",
+      "arm": "on",
+      "repeat": 2,
+      "ms": 255.9871659905184
+    },
+    {
+      "query": "site",
+      "arm": "off",
+      "repeat": 3,
+      "ms": 256.7689999996219
+    },
+    {
+      "query": "site",
+      "arm": "on",
+      "repeat": 3,
+      "ms": 255.73325000004843
+    },
+    {
+      "query": "site",
+      "arm": "off",
+      "repeat": 4,
+      "ms": 256.55662498320453
+    },
+    {
+      "query": "site",
+      "arm": "on",
+      "repeat": 4,
+      "ms": 257.0238329935819
+    },
+    {
+      "query": "befor",
+      "arm": "off",
+      "repeat": 0,
+      "ms": 236.8370420008432
+    },
+    {
+      "query": "befor",
+      "arm": "on",
+      "repeat": 0,
+      "ms": 237.08700001589023
+    },
+    {
+      "query": "befor",
+      "arm": "off",
+      "repeat": 1,
+      "ms": 236.6282089788001
+    },
+    {
+      "query": "befor",
+      "arm": "on",
+      "repeat": 1,
+      "ms": 239.06704198452644
+    },
+    {
+      "query": "befor",
+      "arm": "off",
+      "repeat": 2,
+      "ms": 235.3669159929268
+    },
+    {
+      "query": "befor",
+      "arm": "on",
+      "repeat": 2,
+      "ms": 236.4062079868745
+    },
+    {
+      "query": "befor",
+      "arm": "off",
+      "repeat": 3,
+      "ms": 234.96854098630138
+    },
+    {
+      "query": "befor",
+      "arm": "on",
+      "repeat": 3,
+      "ms": 237.00754099991173
+    },
+    {
+      "query": "befor",
+      "arm": "off",
+      "repeat": 4,
+      "ms": 236.60712499986403
+    },
+    {
+      "query": "befor",
+      "arm": "on",
+      "repeat": 4,
+      "ms": 236.31158299394883
+    },
+    {
+      "query": "sign",
+      "arm": "off",
+      "repeat": 0,
+      "ms": 199.98966701678
+    },
+    {
+      "query": "sign",
+      "arm": "on",
+      "repeat": 0,
+      "ms": 198.87362499139272
+    },
+    {
+      "query": "sign",
+      "arm": "off",
+      "repeat": 1,
+      "ms": 199.8604160035029
+    },
+    {
+      "query": "sign",
+      "arm": "on",
+      "repeat": 1,
+      "ms": 202.02408300247043
+    },
+    {
+      "query": "sign",
+      "arm": "off",
+      "repeat": 2,
+      "ms": 201.1129579914268
+    },
+    {
+      "query": "sign",
+      "arm": "on",
+      "repeat": 2,
+      "ms": 202.183250017697
+    },
+    {
+      "query": "sign",
+      "arm": "off",
+      "repeat": 3,
+      "ms": 208.21816701209173
+    },
+    {
+      "query": "sign",
+      "arm": "on",
+      "repeat": 3,
+      "ms": 201.48329102084972
+    },
+    {
+      "query": "sign",
+      "arm": "off",
+      "repeat": 4,
+      "ms": 200.42750000720844
+    },
+    {
+      "query": "sign",
+      "arm": "on",
+      "repeat": 4,
+      "ms": 200.31708397436887
+    },
+    {
+      "query": "replac",
+      "arm": "off",
+      "repeat": 0,
+      "ms": 231.17270797956735
+    },
+    {
+      "query": "replac",
+      "arm": "on",
+      "repeat": 0,
+      "ms": 229.8071249970235
+    },
+    {
+      "query": "replac",
+      "arm": "off",
+      "repeat": 1,
+      "ms": 230.66724999807775
+    },
+    {
+      "query": "replac",
+      "arm": "on",
+      "repeat": 1,
+      "ms": 229.15045797708444
+    },
+    {
+      "query": "replac",
+      "arm": "off",
+      "repeat": 2,
+      "ms": 231.56095802551135
+    },
+    {
+      "query": "replac",
+      "arm": "on",
+      "repeat": 2,
+      "ms": 230.73716700309888
+    },
+    {
+      "query": "replac",
+      "arm": "off",
+      "repeat": 3,
+      "ms": 230.090790981194
+    },
+    {
+      "query": "replac",
+      "arm": "on",
+      "repeat": 3,
+      "ms": 232.06999999820255
+    },
+    {
+      "query": "replac",
+      "arm": "off",
+      "repeat": 4,
+      "ms": 231.2225829809904
+    },
+    {
+      "query": "replac",
+      "arm": "on",
+      "repeat": 4,
+      "ms": 229.450791986892
+    },
+    {
+      "query": "forc",
+      "arm": "off",
+      "repeat": 0,
+      "ms": 118.0877500155475
+    },
+    {
+      "query": "forc",
+      "arm": "on",
+      "repeat": 0,
+      "ms": 121.61495801410638
+    },
+    {
+      "query": "forc",
+      "arm": "off",
+      "repeat": 1,
+      "ms": 117.05025000264868
+    },
+    {
+      "query": "forc",
+      "arm": "on",
+      "repeat": 1,
+      "ms": 118.44237500918098
+    },
+    {
+      "query": "forc",
+      "arm": "off",
+      "repeat": 2,
+      "ms": 118.71537499246188
+    },
+    {
+      "query": "forc",
+      "arm": "on",
+      "repeat": 2,
+      "ms": 116.19312499533407
+    },
+    {
+      "query": "forc",
+      "arm": "off",
+      "repeat": 3,
+      "ms": 116.29229199024849
+    },
+    {
+      "query": "forc",
+      "arm": "on",
+      "repeat": 3,
+      "ms": 117.49791700276546
+    },
+    {
+      "query": "forc",
+      "arm": "off",
+      "repeat": 4,
+      "ms": 118.04666699026711
+    },
+    {
+      "query": "forc",
+      "arm": "on",
+      "repeat": 4,
+      "ms": 116.45666600088589
+    },
+    {
+      "query": "in_force",
+      "arm": "off",
+      "repeat": 0,
+      "ms": 128.03941700258292
+    },
+    {
+      "query": "in_force",
+      "arm": "on",
+      "repeat": 0,
+      "ms": 129.21583399293013
+    },
+    {
+      "query": "in_force",
+      "arm": "off",
+      "repeat": 1,
+      "ms": 127.90504199801944
+    },
+    {
+      "query": "in_force",
+      "arm": "on",
+      "repeat": 1,
+      "ms": 130.50579198170453
+    },
+    {
+      "query": "in_force",
+      "arm": "off",
+      "repeat": 2,
+      "ms": 132.98945801216178
+    },
+    {
+      "query": "in_force",
+      "arm": "on",
+      "repeat": 2,
+      "ms": 131.36904197745025
+    },
+    {
+      "query": "in_force",
+      "arm": "off",
+      "repeat": 3,
+      "ms": 128.17850001738407
+    },
+    {
+      "query": "in_force",
+      "arm": "on",
+      "repeat": 3,
+      "ms": 130.4331250139512
+    },
+    {
+      "query": "in_force",
+      "arm": "off",
+      "repeat": 4,
+      "ms": 130.49554199096747
+    },
+    {
+      "query": "in_force",
+      "arm": "on",
+      "repeat": 4,
+      "ms": 130.59220800641924
+    },
+    {
+      "query": "allow",
+      "arm": "off",
+      "repeat": 0,
+      "ms": 206.92620798945427
+    },
+    {
+      "query": "allow",
+      "arm": "on",
+      "repeat": 0,
+      "ms": 210.80366699607112
+    },
+    {
+      "query": "allow",
+      "arm": "off",
+      "repeat": 1,
+      "ms": 210.9773749834858
+    },
+    {
+      "query": "allow",
+      "arm": "on",
+      "repeat": 1,
+      "ms": 210.15687499311753
+    },
+    {
+      "query": "allow",
+      "arm": "off",
+      "repeat": 2,
+      "ms": 207.07204099744558
+    },
+    {
+      "query": "allow",
+      "arm": "on",
+      "repeat": 2,
+      "ms": 208.80516699980944
+    },
+    {
+      "query": "allow",
+      "arm": "off",
+      "repeat": 3,
+      "ms": 208.62112499889918
+    },
+    {
+      "query": "allow",
+      "arm": "on",
+      "repeat": 3,
+      "ms": 208.6086249910295
+    },
+    {
+      "query": "allow",
+      "arm": "off",
+      "repeat": 4,
+      "ms": 208.3719999936875
+    },
+    {
+      "query": "allow",
+      "arm": "on",
+      "repeat": 4,
+      "ms": 208.5510000179056
+    },
+    {
+      "query": "critic",
+      "arm": "off",
+      "repeat": 0,
+      "ms": 230.32870900351554
+    },
+    {
+      "query": "critic",
+      "arm": "on",
+      "repeat": 0,
+      "ms": 231.20112501783296
+    },
+    {
+      "query": "critic",
+      "arm": "off",
+      "repeat": 1,
+      "ms": 231.48812502040528
+    },
+    {
+      "query": "critic",
+      "arm": "on",
+      "repeat": 1,
+      "ms": 232.85404199850745
+    },
+    {
+      "query": "critic",
+      "arm": "off",
+      "repeat": 2,
+      "ms": 231.70487498282455
+    },
+    {
+      "query": "critic",
+      "arm": "on",
+      "repeat": 2,
+      "ms": 229.9860000202898
+    },
+    {
+      "query": "critic",
+      "arm": "off",
+      "repeat": 3,
+      "ms": 231.59250000026077
+    },
+    {
+      "query": "critic",
+      "arm": "on",
+      "repeat": 3,
+      "ms": 230.9330420102924
+    },
+    {
+      "query": "critic",
+      "arm": "off",
+      "repeat": 4,
+      "ms": 230.12591700535268
+    },
+    {
+      "query": "critic",
+      "arm": "on",
+      "repeat": 4,
+      "ms": 233.26287500094622
+    },
+    {
+      "query": "cold",
+      "arm": "off",
+      "repeat": 0,
+      "ms": 205.8250000118278
+    },
+    {
+      "query": "cold",
+      "arm": "on",
+      "repeat": 0,
+      "ms": 204.6988339861855
+    },
+    {
+      "query": "cold",
+      "arm": "off",
+      "repeat": 1,
+      "ms": 205.56191701325588
+    },
+    {
+      "query": "cold",
+      "arm": "on",
+      "repeat": 1,
+      "ms": 207.10804100963287
+    },
+    {
+      "query": "cold",
+      "arm": "off",
+      "repeat": 2,
+      "ms": 206.05862498632632
+    },
+    {
+      "query": "cold",
+      "arm": "on",
+      "repeat": 2,
+      "ms": 203.92158400500193
+    },
+    {
+      "query": "cold",
+      "arm": "off",
+      "repeat": 3,
+      "ms": 205.88445899193175
+    },
+    {
+      "query": "cold",
+      "arm": "on",
+      "repeat": 3,
+      "ms": 202.86175000364892
+    },
+    {
+      "query": "cold",
+      "arm": "off",
+      "repeat": 4,
+      "ms": 204.67325000208803
+    },
+    {
+      "query": "cold",
+      "arm": "on",
+      "repeat": 4,
+      "ms": 207.00170801137574
+    },
+    {
+      "query": "after",
+      "arm": "off",
+      "repeat": 0,
+      "ms": 193.2817919878289
+    },
+    {
+      "query": "after",
+      "arm": "on",
+      "repeat": 0,
+      "ms": 194.47083299746737
+    },
+    {
+      "query": "after",
+      "arm": "off",
+      "repeat": 1,
+      "ms": 193.69329101755284
+    },
+    {
+      "query": "after",
+      "arm": "on",
+      "repeat": 1,
+      "ms": 193.89850000152364
+    },
+    {
+      "query": "after",
+      "arm": "off",
+      "repeat": 2,
+      "ms": 193.44258299679495
+    },
+    {
+      "query": "after",
+      "arm": "on",
+      "repeat": 2,
+      "ms": 193.1215000222437
+    },
+    {
+      "query": "after",
+      "arm": "off",
+      "repeat": 3,
+      "ms": 192.10345897590742
+    },
+    {
+      "query": "after",
+      "arm": "on",
+      "repeat": 3,
+      "ms": 193.8067500013858
+    },
+    {
+      "query": "after",
+      "arm": "off",
+      "repeat": 4,
+      "ms": 192.50887498492375
+    },
+    {
+      "query": "after",
+      "arm": "on",
+      "repeat": 4,
+      "ms": 193.61645801109262
+    },
+    {
+      "query": "check",
+      "arm": "off",
+      "repeat": 0,
+      "ms": 203.5897909954656
+    },
+    {
+      "query": "check",
+      "arm": "on",
+      "repeat": 0,
+      "ms": 202.62279201415367
+    },
+    {
+      "query": "check",
+      "arm": "off",
+      "repeat": 1,
+      "ms": 203.1132499978412
+    },
+    {
+      "query": "check",
+      "arm": "on",
+      "repeat": 1,
+      "ms": 203.8547089905478
+    },
+    {
+      "query": "check",
+      "arm": "off",
+      "repeat": 2,
+      "ms": 202.72491598734632
+    },
+    {
+      "query": "check",
+      "arm": "on",
+      "repeat": 2,
+      "ms": 203.74333302606829
+    },
+    {
+      "query": "check",
+      "arm": "off",
+      "repeat": 3,
+      "ms": 206.64316599140875
+    },
+    {
+      "query": "check",
+      "arm": "on",
+      "repeat": 3,
+      "ms": 205.26758299092762
+    },
+    {
+      "query": "check",
+      "arm": "off",
+      "repeat": 4,
+      "ms": 204.95708301314153
+    },
+    {
+      "query": "check",
+      "arm": "on",
+      "repeat": 4,
+      "ms": 203.91241600736976
+    },
+    {
+      "query": "shift",
+      "arm": "off",
+      "repeat": 0,
+      "ms": 195.01633298932575
+    },
+    {
+      "query": "shift",
+      "arm": "on",
+      "repeat": 0,
+      "ms": 195.85491600446403
+    },
+    {
+      "query": "shift",
+      "arm": "off",
+      "repeat": 1,
+      "ms": 193.52379202609882
+    },
+    {
+      "query": "shift",
+      "arm": "on",
+      "repeat": 1,
+      "ms": 197.97745801042765
+    },
+    {
+      "query": "shift",
+      "arm": "off",
+      "repeat": 2,
+      "ms": 195.32025000080466
+    },
+    {
+      "query": "shift",
+      "arm": "on",
+      "repeat": 2,
+      "ms": 194.02333299512975
+    },
+    {
+      "query": "shift",
+      "arm": "off",
+      "repeat": 3,
+      "ms": 195.14124997658655
+    },
+    {
+      "query": "shift",
+      "arm": "on",
+      "repeat": 3,
+      "ms": 193.3964169875253
+    },
+    {
+      "query": "shift",
+      "arm": "off",
+      "repeat": 4,
+      "ms": 198.23704098234884
+    },
+    {
+      "query": "shift",
+      "arm": "on",
+      "repeat": 4,
+      "ms": 193.68525000754744
+    },
+    {
+      "query": "appli",
+      "arm": "off",
+      "repeat": 0,
+      "ms": 200.03337500384077
+    },
+    {
+      "query": "appli",
+      "arm": "on",
+      "repeat": 0,
+      "ms": 203.86712500476278
+    },
+    {
+      "query": "appli",
+      "arm": "off",
+      "repeat": 1,
+      "ms": 201.9243329996243
+    },
+    {
+      "query": "appli",
+      "arm": "on",
+      "repeat": 1,
+      "ms": 203.10541699291207
+    },
+    {
+      "query": "appli",
+      "arm": "off",
+      "repeat": 2,
+      "ms": 200.1342500152532
+    },
+    {
+      "query": "appli",
+      "arm": "on",
+      "repeat": 2,
+      "ms": 200.8088750008028
+    },
+    {
+      "query": "appli",
+      "arm": "off",
+      "repeat": 3,
+      "ms": 203.33062499412335
+    },
+    {
+      "query": "appli",
+      "arm": "on",
+      "repeat": 3,
+      "ms": 203.25874999980442
+    },
+    {
+      "query": "appli",
+      "arm": "off",
+      "repeat": 4,
+      "ms": 201.57979099894874
+    },
+    {
+      "query": "appli",
+      "arm": "on",
+      "repeat": 4,
+      "ms": 208.39508299832232
+    },
+    {
+      "query": "time",
+      "arm": "off",
+      "repeat": 0,
+      "ms": 226.06979100964963
+    },
+    {
+      "query": "time",
+      "arm": "on",
+      "repeat": 0,
+      "ms": 226.4666249975562
+    },
+    {
+      "query": "time",
+      "arm": "off",
+      "repeat": 1,
+      "ms": 226.6857499780599
+    },
+    {
+      "query": "time",
+      "arm": "on",
+      "repeat": 1,
+      "ms": 226.06741701019928
+    },
+    {
+      "query": "time",
+      "arm": "off",
+      "repeat": 2,
+      "ms": 229.30741700110957
+    },
+    {
+      "query": "time",
+      "arm": "on",
+      "repeat": 2,
+      "ms": 225.95837502740324
+    },
+    {
+      "query": "time",
+      "arm": "off",
+      "repeat": 3,
+      "ms": 225.3444169764407
+    },
+    {
+      "query": "time",
+      "arm": "on",
+      "repeat": 3,
+      "ms": 225.96212499774992
+    },
+    {
+      "query": "time",
+      "arm": "off",
+      "repeat": 4,
+      "ms": 225.8908330113627
+    },
+    {
+      "query": "time",
+      "arm": "on",
+      "repeat": 4,
+      "ms": 225.0683750025928
+    },
+    {
+      "query": "2837",
+      "arm": "off",
+      "repeat": 0,
+      "ms": 115.2459160075523
+    },
+    {
+      "query": "2837",
+      "arm": "on",
+      "repeat": 0,
+      "ms": 116.77187497843988
+    },
+    {
+      "query": "2837",
+      "arm": "off",
+      "repeat": 1,
+      "ms": 114.40495899296366
+    },
+    {
+      "query": "2837",
+      "arm": "on",
+      "repeat": 1,
+      "ms": 114.94645802304149
+    },
+    {
+      "query": "2837",
+      "arm": "off",
+      "repeat": 2,
+      "ms": 114.79212500853464
+    },
+    {
+      "query": "2837",
+      "arm": "on",
+      "repeat": 2,
+      "ms": 115.38445900077932
+    },
+    {
+      "query": "2837",
+      "arm": "off",
+      "repeat": 3,
+      "ms": 114.27158399601467
+    },
+    {
+      "query": "2837",
+      "arm": "on",
+      "repeat": 3,
+      "ms": 116.55262499698438
+    },
+    {
+      "query": "2837",
+      "arm": "off",
+      "repeat": 4,
+      "ms": 116.70099999173544
+    },
+    {
+      "query": "2837",
+      "arm": "on",
+      "repeat": 4,
+      "ms": 118.32945799687877
+    },
+    {
+      "query": "2853",
+      "arm": "off",
+      "repeat": 0,
+      "ms": 115.85295799886808
+    },
+    {
+      "query": "2853",
+      "arm": "on",
+      "repeat": 0,
+      "ms": 118.23500000173226
+    },
+    {
+      "query": "2853",
+      "arm": "off",
+      "repeat": 1,
+      "ms": 117.70337499910966
+    },
+    {
+      "query": "2853",
+      "arm": "on",
+      "repeat": 1,
+      "ms": 118.22500001289882
+    },
+    {
+      "query": "2853",
+      "arm": "off",
+      "repeat": 2,
+      "ms": 116.20024999137968
+    },
+    {
+      "query": "2853",
+      "arm": "on",
+      "repeat": 2,
+      "ms": 118.02349999197759
+    },
+    {
+      "query": "2853",
+      "arm": "off",
+      "repeat": 3,
+      "ms": 115.93941698083654
+    },
+    {
+      "query": "2853",
+      "arm": "on",
+      "repeat": 3,
+      "ms": 118.63258300581947
+    },
+    {
+      "query": "2853",
+      "arm": "off",
+      "repeat": 4,
+      "ms": 116.76454098778777
+    },
+    {
+      "query": "2853",
+      "arm": "on",
+      "repeat": 4,
+      "ms": 118.78216700279154
+    },
+    {
+      "query": "2861",
+      "arm": "off",
+      "repeat": 0,
+      "ms": 115.25195799185894
+    },
+    {
+      "query": "2861",
+      "arm": "on",
+      "repeat": 0,
+      "ms": 116.9122910068836
+    },
+    {
+      "query": "2861",
+      "arm": "off",
+      "repeat": 1,
+      "ms": 116.14712499431334
+    },
+    {
+      "query": "2861",
+      "arm": "on",
+      "repeat": 1,
+      "ms": 115.87491701357067
+    },
+    {
+      "query": "2861",
+      "arm": "off",
+      "repeat": 2,
+      "ms": 117.32529100845568
+    },
+    {
+      "query": "2861",
+      "arm": "on",
+      "repeat": 2,
+      "ms": 115.22766700363718
+    },
+    {
+      "query": "2861",
+      "arm": "off",
+      "repeat": 3,
+      "ms": 115.79879198689014
+    },
+    {
+      "query": "2861",
+      "arm": "on",
+      "repeat": 3,
+      "ms": 117.26329100201838
+    },
+    {
+      "query": "2861",
+      "arm": "off",
+      "repeat": 4,
+      "ms": 116.48912500822917
+    },
+    {
+      "query": "2861",
+      "arm": "on",
+      "repeat": 4,
+      "ms": 117.34637501649559
+    },
+    {
+      "query": "2866",
+      "arm": "off",
+      "repeat": 0,
+      "ms": 116.41837499337271
+    },
+    {
+      "query": "2866",
+      "arm": "on",
+      "repeat": 0,
+      "ms": 115.87587499525398
+    },
+    {
+      "query": "2866",
+      "arm": "off",
+      "repeat": 1,
+      "ms": 114.33612499968149
+    },
+    {
+      "query": "2866",
+      "arm": "on",
+      "repeat": 1,
+      "ms": 116.77924997638911
+    },
+    {
+      "query": "2866",
+      "arm": "off",
+      "repeat": 2,
+      "ms": 140.0794999790378
+    },
+    {
+      "query": "2866",
+      "arm": "on",
+      "repeat": 2,
+      "ms": 117.55241599166766
+    },
+    {
+      "query": "2866",
+      "arm": "off",
+      "repeat": 3,
+      "ms": 117.06020898418501
+    },
+    {
+      "query": "2866",
+      "arm": "on",
+      "repeat": 3,
+      "ms": 116.92058300832286
+    },
+    {
+      "query": "2866",
+      "arm": "off",
+      "repeat": 4,
+      "ms": 115.3724160103593
+    },
+    {
+      "query": "2866",
+      "arm": "on",
+      "repeat": 4,
+      "ms": 115.650583000388
+    },
+    {
+      "query": "2874",
+      "arm": "off",
+      "repeat": 0,
+      "ms": 116.54783302219585
+    },
+    {
+      "query": "2874",
+      "arm": "on",
+      "repeat": 0,
+      "ms": 117.89666599361226
+    },
+    {
+      "query": "2874",
+      "arm": "off",
+      "repeat": 1,
+      "ms": 116.1248330026865
+    },
+    {
+      "query": "2874",
+      "arm": "on",
+      "repeat": 1,
+      "ms": 118.33787499926984
+    },
+    {
+      "query": "2874",
+      "arm": "off",
+      "repeat": 2,
+      "ms": 116.36537499725819
+    },
+    {
+      "query": "2874",
+      "arm": "on",
+      "repeat": 2,
+      "ms": 117.46083298930898
+    },
+    {
+      "query": "2874",
+      "arm": "off",
+      "repeat": 3,
+      "ms": 118.16095802350901
+    },
+    {
+      "query": "2874",
+      "arm": "on",
+      "repeat": 3,
+      "ms": 116.75266601378098
+    },
+    {
+      "query": "2874",
+      "arm": "off",
+      "repeat": 4,
+      "ms": 116.59049999434501
+    },
+    {
+      "query": "2874",
+      "arm": "on",
+      "repeat": 4,
+      "ms": 116.78300000494346
+    },
+    {
+      "query": "2903",
+      "arm": "off",
+      "repeat": 0,
+      "ms": 117.03300001681782
+    },
+    {
+      "query": "2903",
+      "arm": "on",
+      "repeat": 0,
+      "ms": 117.7439580205828
+    },
+    {
+      "query": "2903",
+      "arm": "off",
+      "repeat": 1,
+      "ms": 117.62212499161251
+    },
+    {
+      "query": "2903",
+      "arm": "on",
+      "repeat": 1,
+      "ms": 117.36208401271142
+    },
+    {
+      "query": "2903",
+      "arm": "off",
+      "repeat": 2,
+      "ms": 116.3024999841582
+    },
+    {
+      "query": "2903",
+      "arm": "on",
+      "repeat": 2,
+      "ms": 117.06979101290926
+    },
+    {
+      "query": "2903",
+      "arm": "off",
+      "repeat": 3,
+      "ms": 114.77054099668749
+    },
+    {
+      "query": "2903",
+      "arm": "on",
+      "repeat": 3,
+      "ms": 116.16291699465364
+    },
+    {
+      "query": "2903",
+      "arm": "off",
+      "repeat": 4,
+      "ms": 116.6157919797115
+    },
+    {
+      "query": "2903",
+      "arm": "on",
+      "repeat": 4,
+      "ms": 115.39650001213886
+    },
+    {
+      "query": "owner",
+      "arm": "slow",
+      "repeat": 0,
+      "ms": 202.66770798480138
+    },
+    {
+      "query": "owner",
+      "arm": "slow",
+      "repeat": 1,
+      "ms": 202.7041669934988
+    },
+    {
+      "query": "owner",
+      "arm": "slow",
+      "repeat": 2,
+      "ms": 202.21895800204948
+    },
+    {
+      "query": "owner",
+      "arm": "slow",
+      "repeat": 3,
+      "ms": 193.82483401568606
+    },
+    {
+      "query": "owner",
+      "arm": "slow",
+      "repeat": 4,
+      "ms": 201.0741670092102
+    },
+    {
+      "query": "titl",
+      "arm": "slow",
+      "repeat": 0,
+      "ms": 187.76670802617446
+    },
+    {
+      "query": "titl",
+      "arm": "slow",
+      "repeat": 1,
+      "ms": 188.5072499862872
+    },
+    {
+      "query": "titl",
+      "arm": "slow",
+      "repeat": 2,
+      "ms": 185.73354199179448
+    },
+    {
+      "query": "titl",
+      "arm": "slow",
+      "repeat": 3,
+      "ms": 177.77129099704325
+    },
+    {
+      "query": "titl",
+      "arm": "slow",
+      "repeat": 4,
+      "ms": 186.09762500273064
+    },
+    {
+      "query": "dai",
+      "arm": "slow",
+      "repeat": 0,
+      "ms": 301.7399999953341
+    },
+    {
+      "query": "dai",
+      "arm": "slow",
+      "repeat": 1,
+      "ms": 303.76120802247897
+    },
+    {
+      "query": "dai",
+      "arm": "slow",
+      "repeat": 2,
+      "ms": 302.7335829974618
+    },
+    {
+      "query": "dai",
+      "arm": "slow",
+      "repeat": 3,
+      "ms": 303.30979099380784
+    },
+    {
+      "query": "dai",
+      "arm": "slow",
+      "repeat": 4,
+      "ms": 301.8096669984516
+    },
+    {
+      "query": "statu",
+      "arm": "slow",
+      "repeat": 0,
+      "ms": 174.13020800449885
+    },
+    {
+      "query": "statu",
+      "arm": "slow",
+      "repeat": 1,
+      "ms": 182.7554589835927
+    },
+    {
+      "query": "statu",
+      "arm": "slow",
+      "repeat": 2,
+      "ms": 183.35474998457357
+    },
+    {
+      "query": "statu",
+      "arm": "slow",
+      "repeat": 3,
+      "ms": 186.4204999874346
+    },
+    {
+      "query": "statu",
+      "arm": "slow",
+      "repeat": 4,
+      "ms": 182.98595899250358
+    },
+    {
+      "query": "effect",
+      "arm": "slow",
+      "repeat": 0,
+      "ms": 180.1655409799423
+    },
+    {
+      "query": "effect",
+      "arm": "slow",
+      "repeat": 1,
+      "ms": 182.31866700807586
+    },
+    {
+      "query": "effect",
+      "arm": "slow",
+      "repeat": 2,
+      "ms": 182.2099159762729
+    },
+    {
+      "query": "effect",
+      "arm": "slow",
+      "repeat": 3,
+      "ms": 181.8279589933809
+    },
+    {
+      "query": "effect",
+      "arm": "slow",
+      "repeat": 4,
+      "ms": 180.79262500395998
+    },
+    {
+      "query": "date",
+      "arm": "slow",
+      "repeat": 0,
+      "ms": 190.12587500037625
+    },
+    {
+      "query": "date",
+      "arm": "slow",
+      "repeat": 1,
+      "ms": 180.57733299792744
+    },
+    {
+      "query": "date",
+      "arm": "slow",
+      "repeat": 2,
+      "ms": 179.97616599313915
+    },
+    {
+      "query": "date",
+      "arm": "slow",
+      "repeat": 3,
+      "ms": 188.63112499821
+    },
+    {
+      "query": "date",
+      "arm": "slow",
+      "repeat": 4,
+      "ms": 181.49033302324824
+    },
+    {
+      "query": "effective_date",
+      "arm": "slow",
+      "repeat": 0,
+      "ms": 210.06449998822063
+    },
+    {
+      "query": "effective_date",
+      "arm": "slow",
+      "repeat": 1,
+      "ms": 209.9899579770863
+    },
+    {
+      "query": "effective_date",
+      "arm": "slow",
+      "repeat": 2,
+      "ms": 210.03379198373295
+    },
+    {
+      "query": "effective_date",
+      "arm": "slow",
+      "repeat": 3,
+      "ms": 210.05458300351165
+    },
+    {
+      "query": "effective_date",
+      "arm": "slow",
+      "repeat": 4,
+      "ms": 212.3055830015801
+    },
+    {
+      "query": "custom",
+      "arm": "slow",
+      "repeat": 0,
+      "ms": 343.52454100735486
+    },
+    {
+      "query": "custom",
+      "arm": "slow",
+      "repeat": 1,
+      "ms": 337.8945830045268
+    },
+    {
+      "query": "custom",
+      "arm": "slow",
+      "repeat": 2,
+      "ms": 336.5897909970954
+    },
+    {
+      "query": "custom",
+      "arm": "slow",
+      "repeat": 3,
+      "ms": 339.045000000624
+    },
+    {
+      "query": "custom",
+      "arm": "slow",
+      "repeat": 4,
+      "ms": 338.69041700381786
+    },
+    {
+      "query": "room",
+      "arm": "slow",
+      "repeat": 0,
+      "ms": 317.6708749961108
+    },
+    {
+      "query": "room",
+      "arm": "slow",
+      "repeat": 1,
+      "ms": 319.7507080039941
+    },
+    {
+      "query": "room",
+      "arm": "slow",
+      "repeat": 2,
+      "ms": 322.24704200052656
+    },
+    {
+      "query": "room",
+      "arm": "slow",
+      "repeat": 3,
+      "ms": 319.21204199898057
+    },
+    {
+      "query": "room",
+      "arm": "slow",
+      "repeat": 4,
+      "ms": 318.8118749822024
+    },
+    {
+      "query": "minut",
+      "arm": "slow",
+      "repeat": 0,
+      "ms": 319.1489170130808
+    },
+    {
+      "query": "minut",
+      "arm": "slow",
+      "repeat": 1,
+      "ms": 317.05804099328816
+    },
+    {
+      "query": "minut",
+      "arm": "slow",
+      "repeat": 2,
+      "ms": 319.5497920096386
+    },
+    {
+      "query": "minut",
+      "arm": "slow",
+      "repeat": 3,
+      "ms": 315.59654098236933
+    },
+    {
+      "query": "minut",
+      "arm": "slow",
+      "repeat": 4,
+      "ms": 319.3726669996977
+    },
+    {
+      "query": "site",
+      "arm": "slow",
+      "repeat": 0,
+      "ms": 318.15524998819456
+    },
+    {
+      "query": "site",
+      "arm": "slow",
+      "repeat": 1,
+      "ms": 321.801707992563
+    },
+    {
+      "query": "site",
+      "arm": "slow",
+      "repeat": 2,
+      "ms": 316.98241698904894
+    },
+    {
+      "query": "site",
+      "arm": "slow",
+      "repeat": 3,
+      "ms": 317.119833023753
+    },
+    {
+      "query": "site",
+      "arm": "slow",
+      "repeat": 4,
+      "ms": 316.5955829899758
+    },
+    {
+      "query": "befor",
+      "arm": "slow",
+      "repeat": 0,
+      "ms": 303.51349999546073
+    },
+    {
+      "query": "befor",
+      "arm": "slow",
+      "repeat": 1,
+      "ms": 298.45220802235417
+    },
+    {
+      "query": "befor",
+      "arm": "slow",
+      "repeat": 2,
+      "ms": 298.5225839947816
+    },
+    {
+      "query": "befor",
+      "arm": "slow",
+      "repeat": 3,
+      "ms": 297.41608299082145
+    },
+    {
+      "query": "befor",
+      "arm": "slow",
+      "repeat": 4,
+      "ms": 299.0825829911046
+    },
+    {
+      "query": "sign",
+      "arm": "slow",
+      "repeat": 0,
+      "ms": 261.16129200090654
+    },
+    {
+      "query": "sign",
+      "arm": "slow",
+      "repeat": 1,
+      "ms": 256.3829999999143
+    },
+    {
+      "query": "sign",
+      "arm": "slow",
+      "repeat": 2,
+      "ms": 255.37566700950265
+    },
+    {
+      "query": "sign",
+      "arm": "slow",
+      "repeat": 3,
+      "ms": 265.99279200308956
+    },
+    {
+      "query": "sign",
+      "arm": "slow",
+      "repeat": 4,
+      "ms": 263.4801249951124
+    },
+    {
+      "query": "replac",
+      "arm": "slow",
+      "repeat": 0,
+      "ms": 295.6531660165638
+    },
+    {
+      "query": "replac",
+      "arm": "slow",
+      "repeat": 1,
+      "ms": 292.993041977752
+    },
+    {
+      "query": "replac",
+      "arm": "slow",
+      "repeat": 2,
+      "ms": 292.72300002048723
+    },
+    {
+      "query": "replac",
+      "arm": "slow",
+      "repeat": 3,
+      "ms": 294.3083749851212
+    },
+    {
+      "query": "replac",
+      "arm": "slow",
+      "repeat": 4,
+      "ms": 291.5000419889111
+    },
+    {
+      "query": "forc",
+      "arm": "slow",
+      "repeat": 0,
+      "ms": 182.3600830102805
+    },
+    {
+      "query": "forc",
+      "arm": "slow",
+      "repeat": 1,
+      "ms": 179.8258339986205
+    },
+    {
+      "query": "forc",
+      "arm": "slow",
+      "repeat": 2,
+      "ms": 172.06162499496713
+    },
+    {
+      "query": "forc",
+      "arm": "slow",
+      "repeat": 3,
+      "ms": 177.25454198080115
+    },
+    {
+      "query": "forc",
+      "arm": "slow",
+      "repeat": 4,
+      "ms": 181.93324998719618
+    },
+    {
+      "query": "in_force",
+      "arm": "slow",
+      "repeat": 0,
+      "ms": 192.2439170011785
+    },
+    {
+      "query": "in_force",
+      "arm": "slow",
+      "repeat": 1,
+      "ms": 193.7059999909252
+    },
+    {
+      "query": "in_force",
+      "arm": "slow",
+      "repeat": 2,
+      "ms": 185.27420901227742
+    },
+    {
+      "query": "in_force",
+      "arm": "slow",
+      "repeat": 3,
+      "ms": 194.38170801731758
+    },
+    {
+      "query": "in_force",
+      "arm": "slow",
+      "repeat": 4,
+      "ms": 193.0183750228025
+    },
+    {
+      "query": "allow",
+      "arm": "slow",
+      "repeat": 0,
+      "ms": 271.86141698621213
+    },
+    {
+      "query": "allow",
+      "arm": "slow",
+      "repeat": 1,
+      "ms": 270.5166669911705
+    },
+    {
+      "query": "allow",
+      "arm": "slow",
+      "repeat": 2,
+      "ms": 274.18062498327345
+    },
+    {
+      "query": "allow",
+      "arm": "slow",
+      "repeat": 3,
+      "ms": 270.02508399891667
+    },
+    {
+      "query": "allow",
+      "arm": "slow",
+      "repeat": 4,
+      "ms": 272.1949169936124
+    },
+    {
+      "query": "critic",
+      "arm": "slow",
+      "repeat": 0,
+      "ms": 289.25079098553397
+    },
+    {
+      "query": "critic",
+      "arm": "slow",
+      "repeat": 1,
+      "ms": 289.7692080005072
+    },
+    {
+      "query": "critic",
+      "arm": "slow",
+      "repeat": 2,
+      "ms": 293.2075419812463
+    },
+    {
+      "query": "critic",
+      "arm": "slow",
+      "repeat": 3,
+      "ms": 295.0086249911692
+    },
+    {
+      "query": "critic",
+      "arm": "slow",
+      "repeat": 4,
+      "ms": 293.4978750126902
+    },
+    {
+      "query": "cold",
+      "arm": "slow",
+      "repeat": 0,
+      "ms": 274.1673330019694
+    },
+    {
+      "query": "cold",
+      "arm": "slow",
+      "repeat": 1,
+      "ms": 267.9322079929989
+    },
+    {
+      "query": "cold",
+      "arm": "slow",
+      "repeat": 2,
+      "ms": 266.37683299486525
+    },
+    {
+      "query": "cold",
+      "arm": "slow",
+      "repeat": 3,
+      "ms": 268.57120799832046
+    },
+    {
+      "query": "cold",
+      "arm": "slow",
+      "repeat": 4,
+      "ms": 266.60295901820064
+    },
+    {
+      "query": "after",
+      "arm": "slow",
+      "repeat": 0,
+      "ms": 254.5612920075655
+    },
+    {
+      "query": "after",
+      "arm": "slow",
+      "repeat": 1,
+      "ms": 257.5809999834746
+    },
+    {
+      "query": "after",
+      "arm": "slow",
+      "repeat": 2,
+      "ms": 256.37020901194774
+    },
+    {
+      "query": "after",
+      "arm": "slow",
+      "repeat": 3,
+      "ms": 254.4923329842277
+    },
+    {
+      "query": "after",
+      "arm": "slow",
+      "repeat": 4,
+      "ms": 257.12158301030286
+    },
+    {
+      "query": "check",
+      "arm": "slow",
+      "repeat": 0,
+      "ms": 269.3787919997703
+    },
+    {
+      "query": "check",
+      "arm": "slow",
+      "repeat": 1,
+      "ms": 266.0990000003949
+    },
+    {
+      "query": "check",
+      "arm": "slow",
+      "repeat": 2,
+      "ms": 264.4654579926282
+    },
+    {
+      "query": "check",
+      "arm": "slow",
+      "repeat": 3,
+      "ms": 266.1573330115061
+    },
+    {
+      "query": "check",
+      "arm": "slow",
+      "repeat": 4,
+      "ms": 264.8000420012977
+    },
+    {
+      "query": "shift",
+      "arm": "slow",
+      "repeat": 0,
+      "ms": 258.2065419992432
+    },
+    {
+      "query": "shift",
+      "arm": "slow",
+      "repeat": 1,
+      "ms": 256.97687501087785
+    },
+    {
+      "query": "shift",
+      "arm": "slow",
+      "repeat": 2,
+      "ms": 257.5118340027984
+    },
+    {
+      "query": "shift",
+      "arm": "slow",
+      "repeat": 3,
+      "ms": 256.5582499955781
+    },
+    {
+      "query": "shift",
+      "arm": "slow",
+      "repeat": 4,
+      "ms": 256.6921660036314
+    },
+    {
+      "query": "appli",
+      "arm": "slow",
+      "repeat": 0,
+      "ms": 269.5249170064926
+    },
+    {
+      "query": "appli",
+      "arm": "slow",
+      "repeat": 1,
+      "ms": 263.9702500018757
+    },
+    {
+      "query": "appli",
+      "arm": "slow",
+      "repeat": 2,
+      "ms": 261.8899999943096
+    },
+    {
+      "query": "appli",
+      "arm": "slow",
+      "repeat": 3,
+      "ms": 263.96420801756904
+    },
+    {
+      "query": "appli",
+      "arm": "slow",
+      "repeat": 4,
+      "ms": 265.96049999352545
+    },
+    {
+      "query": "time",
+      "arm": "slow",
+      "repeat": 0,
+      "ms": 287.3183329938911
+    },
+    {
+      "query": "time",
+      "arm": "slow",
+      "repeat": 1,
+      "ms": 290.25062499567866
+    },
+    {
+      "query": "time",
+      "arm": "slow",
+      "repeat": 2,
+      "ms": 289.98000000137836
+    },
+    {
+      "query": "time",
+      "arm": "slow",
+      "repeat": 3,
+      "ms": 288.43554100603797
+    },
+    {
+      "query": "time",
+      "arm": "slow",
+      "repeat": 4,
+      "ms": 304.38270801096223
+    },
+    {
+      "query": "2837",
+      "arm": "slow",
+      "repeat": 0,
+      "ms": 179.4045830029063
+    },
+    {
+      "query": "2837",
+      "arm": "slow",
+      "repeat": 1,
+      "ms": 177.7731250040233
+    },
+    {
+      "query": "2837",
+      "arm": "slow",
+      "repeat": 2,
+      "ms": 179.14058300084434
+    },
+    {
+      "query": "2837",
+      "arm": "slow",
+      "repeat": 3,
+      "ms": 179.8189999826718
+    },
+    {
+      "query": "2837",
+      "arm": "slow",
+      "repeat": 4,
+      "ms": 179.49758400209248
+    },
+    {
+      "query": "2853",
+      "arm": "slow",
+      "repeat": 0,
+      "ms": 181.0257500037551
+    },
+    {
+      "query": "2853",
+      "arm": "slow",
+      "repeat": 1,
+      "ms": 177.59962499258108
+    },
+    {
+      "query": "2853",
+      "arm": "slow",
+      "repeat": 2,
+      "ms": 180.81545899622142
+    },
+    {
+      "query": "2853",
+      "arm": "slow",
+      "repeat": 3,
+      "ms": 179.09575000521727
+    },
+    {
+      "query": "2853",
+      "arm": "slow",
+      "repeat": 4,
+      "ms": 178.2488339813426
+    },
+    {
+      "query": "2861",
+      "arm": "slow",
+      "repeat": 0,
+      "ms": 179.01795799843967
+    },
+    {
+      "query": "2861",
+      "arm": "slow",
+      "repeat": 1,
+      "ms": 173.00908398465253
+    },
+    {
+      "query": "2861",
+      "arm": "slow",
+      "repeat": 2,
+      "ms": 177.83370800316334
+    },
+    {
+      "query": "2861",
+      "arm": "slow",
+      "repeat": 3,
+      "ms": 180.70595801691525
+    },
+    {
+      "query": "2861",
+      "arm": "slow",
+      "repeat": 4,
+      "ms": 175.49099997268058
+    },
+    {
+      "query": "2866",
+      "arm": "slow",
+      "repeat": 0,
+      "ms": 179.44908398203552
+    },
+    {
+      "query": "2866",
+      "arm": "slow",
+      "repeat": 1,
+      "ms": 180.73487500078045
+    },
+    {
+      "query": "2866",
+      "arm": "slow",
+      "repeat": 2,
+      "ms": 178.95445800968446
+    },
+    {
+      "query": "2866",
+      "arm": "slow",
+      "repeat": 3,
+      "ms": 180.2025840152055
+    },
+    {
+      "query": "2866",
+      "arm": "slow",
+      "repeat": 4,
+      "ms": 179.0008329844568
+    },
+    {
+      "query": "2874",
+      "arm": "slow",
+      "repeat": 0,
+      "ms": 179.50820797705092
+    },
+    {
+      "query": "2874",
+      "arm": "slow",
+      "repeat": 1,
+      "ms": 176.44320899853483
+    },
+    {
+      "query": "2874",
+      "arm": "slow",
+      "repeat": 2,
+      "ms": 171.99533298844472
+    },
+    {
+      "query": "2874",
+      "arm": "slow",
+      "repeat": 3,
+      "ms": 176.85058299684897
+    },
+    {
+      "query": "2874",
+      "arm": "slow",
+      "repeat": 4,
+      "ms": 180.81925000296906
+    },
+    {
+      "query": "2903",
+      "arm": "slow",
+      "repeat": 0,
+      "ms": 178.6323749984149
+    },
+    {
+      "query": "2903",
+      "arm": "slow",
+      "repeat": 1,
+      "ms": 179.63650001911446
+    },
+    {
+      "query": "2903",
+      "arm": "slow",
+      "repeat": 2,
+      "ms": 179.52354199951515
+    },
+    {
+      "query": "2903",
+      "arm": "slow",
+      "repeat": 3,
+      "ms": 181.6199170134496
+    },
+    {
+      "query": "2903",
+      "arm": "slow",
+      "repeat": 4,
+      "ms": 170.41900000185706
+    }
+  ]
+}
