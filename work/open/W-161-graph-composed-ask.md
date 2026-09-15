@@ -51,6 +51,48 @@ tier makes the two readers disagree, which the differential law will find. That
 is this item's to state in [SR-NODE-SEARCH](../../records/0153_node-search.md),
 not the harness's to discover.
 
+## ✅ BUILT 2026-09-15 — what landed, and what is left
+
+**Commits `13e17e55` (the engine) and `fb82494b` (the consumer surfaces).**
+DoD 1–6 and 8 are done on both readers; **DoD 7's two arms are all that
+remains**, and they wait on Codex (2026-09-30). The pre-registration was
+committed alone at `806e9ebe`, ahead of any composition code.
+
+**Three defects the build found in itself, before any measurement:**
+
+1. 🔴 **The PPR rank list must include the SEEDS.** `walk.expand()` drops them,
+   because that is `fux graph`'s question and not arm A's. With them excluded,
+   every seed gets a lexical RRF contribution alone (`1/61`) while every walked
+   neighbour gets lexical **plus** PPR (`1/67 + 1/61`) — so **every neighbour
+   outranks every seed on every query**. Measured here before the fix:
+   `ask "luhn verhoeff" --top 3` returned the documents the words ranked 6th,
+   7th and 9th. The composition calls `walk.ppr()` and ranks the whole
+   distribution. [SR-ASK](../../records/0103_ask.md) 13b.
+2. 🔴 **A route may name only an edge kind the walk followed.** With
+   `ask_kinds = "ref"` a route read `#2 via code`. SR-GRAPH 16d.
+3. 🔴 **`find` acquired the tier by inheritance** through `run_query`, before
+   anyone asked whether it should. Ruled: shares Tier A, never computes Tier B.
+   SR-ASK 13e.
+
+**Two things the item asked for that were resolved differently, both stated in
+records rather than quietly:**
+
+- **`related` is NOT an `.fux/output.toml` key** (the item implied the tier
+  would be shaped there). `[graph] ask_related` already states it, and a new
+  required output key breaks every consumer's committed file —
+  [SR-OUTPUT](../../records/0143_output-defaults.md) decision 23.
+- **The Node divergence the item told this record to declare is NARROWER than
+  expected.** Node composes the tier too, so the readers are byte-equal
+  wherever Python has a fresh plane. They diverge only where Python has none,
+  which is decision 9's existing asymmetry —
+  [SR-NODE-SEARCH](../../records/0153_node-search.md) decision 17. ⚠ It costs
+  Node a full record parse per `ask`; its latency is unmeasured (W-148 row 2).
+
+**The three debts W-160 handed over:** `link_idf` is now ON for `ask` and still
+unmeasured (arm A measures it); the byte-identity test was inverted, not
+deleted; SR-CONFIDENCE's owed graph guard is written and enforced
+([decision 15](../../records/0141_confidence.md)).
+
 ## Definition of done
 
 1. `ask` = `lexical` → `graph --seed <lexical top-k>` → split → confidence →

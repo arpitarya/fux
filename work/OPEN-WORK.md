@@ -32,7 +32,7 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🟢 **W-161** · `agent` — the graph-composed `ask`: boosted tier + labelled `related` tier, `answer` reads `ask`. W-160's atoms shipped 2026-09-14, inert. **W-156 ruled 2026-09-14**: evidence is SR-RS d19 on golden data; nothing waits. [detail](open/W-161-graph-composed-ask.md)
+- 🟣 **W-161** · `agent`, waiting on **2026-09-30** — **BUILT 2026-09-15**, both readers, 0 discordant; both tiers ship on and unmeasured. Only the two arms remain, and they need Codex's link-dependent questions. [detail](open/W-161-graph-composed-ask.md)
 - 🟢 **W-168** · `agent` — the ten search improvements as one program, ten gated steps (anchor text first, section units last); each step golden question → pre-registration → build → measure. Unblocked 2026-09-14 by the W-156 ruling. [detail](open/W-168-search-improvements.md)
 - 🟢 **W-176** · `agent` — the nine abstention gates, ruled (a) 2026-09-14: 1 + 9 + the output surface now; 4, 3, 2, 7, 8, 5 measured behind flags from **2026-09-30** (Codex's unanswerable key); 6 once W-161 has landed. [detail](open/W-176-abstention-gates.md)
 - 🟢 **W-170** · `agent` — `.fux/observers/`, the observe-only hook. Both rulings taken 2026-09-14: cage's compare **C**; SR-OBSERVE filed `proposed` with the L10 exemption named. Build it; the record flips to `accepted` in that change. [detail](open/W-170-cage-search-leg.md)
