@@ -21,6 +21,48 @@ record is the rule and this file is the anecdote that motivated it.
 
 ---
 
+## 2026-09-15 — "commit with explicit pathspecs" is not a rule you can follow mechanically
+
+**Second occurrence of a failure class, and a gate now exists** —
+[SR-WORK-SESSION](../records/0060_WORK-session.md) decision 13. The first is
+§*"a green working tree can hide a red HEAD"* below.
+
+**What happened.** W-177's session ran alongside another that was rebuilding
+the golden ladder. It knew this, said so in its first output, listed the
+directories it would stay off, and committed with an explicit pathspec — every
+part of CLAUDE.md's advice, followed. **It built the pathspec list from
+`git status`.** Three of the other session's staged files went into the commit:
+an inbox-guard hook, its script, and two work-item files.
+
+🔴 **The rule was followed and the defect happened anyway, which is the whole
+lesson.** *"Explicit pathspec"* names a **property of the command**, and the
+property was satisfied — the list was typed out, complete, and wrong. **An
+explicit pathspec derived from the tree is `git commit -a` with more typing.**
+The question a rule has to ask is not *did you name the paths* but **where did
+the names come from**, and only one answer is safe: from the change you made,
+never from the tree you made it in.
+
+**Nothing broke here**, which is worth saying because it is the reason this
+class survives: the swept files were complete, and `OPEN-WORK.md` already
+linked two of them, so the commit arguably *fixed* a dangling-link state. The
+cost was a commit message that does not describe its own commit — invisible
+until somebody bisects.
+
+**The gate** is [`scripts/commit-paths.py`](../scripts/commit-paths.py) with
+[`tests/test_commit_paths.py`](../tests/test_commit_paths.py). It refuses in
+**both** directions the pathspec is silent about: a dirty path you did not name
+(`--leave-behind` is how you say you meant it), and a named path that is not
+dirty — cause 2 below, the omitted restamp.
+
+⚠ **It is a tool, not a hook, and one of its tests asserts the hole.** A
+pathspec list that names the whole tree still passes it: no mechanism inside a
+shared checkout can tell which dirty file belongs to which session. What it
+buys is that leaving something behind becomes a decision in the shell history
+instead of an accident — and that taking somebody else's file means **typing
+its name**.
+
+---
+
 ## 2026-09-15 — an emptied Blocked-on-Arpit inbox is one line, not a recap
 
 Cowork emptied the inbox correctly (both rows ruled) but closed the section
