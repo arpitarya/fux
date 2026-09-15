@@ -269,6 +269,9 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
   color:var(--ink-3);font-size:14px;
 }
 .nonumber strong{color:var(--ink-2)}
+.finding{font-size:19px;line-height:1.45;color:var(--ink-2);margin:2px 0 18px;max-width:70ch}
+.finding strong{color:var(--ink-1)}
+
 </style>
 <div class="tick" id="tick"></div>
 
@@ -423,7 +426,8 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
 <section class="slide">
   <div class="wrap">
     <p class="eyebrow">3 &middot; CAP&#8209;3 <span class="dim">/ hit@k, 42 judged questions, scan path</span></p>
-    <h2>One query separates the two versions</h2>
+    <h2>CAP&#8209;3 &mdash; hit@k at 1, 5, 10, 20, 50</h2>
+    <p class="finding">One query separates the two versions</p>
     <div class="tblwrap">
       <table>
         <thead><tr><th>arm</th><th>version</th><th class="num">hit@1<span class="dir up">&uarr; higher is better</span></th><th class="num">hit@5<span class="dir up">&uarr; higher is better</span></th><th class="num">hit@10<span class="dir up">&uarr; higher is better</span></th><th class="num">hit@20<span class="dir up">&uarr; higher is better</span></th><th class="num">hit@50<span class="dir up">&uarr; higher is better</span></th></tr></thead>
@@ -532,8 +536,9 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
 <!-- 9 ----------------------------------------------------------------- -->
 <section class="slide">
   <div class="wrap">
-    <p class="eyebrow">4 &middot; CAP&#8209;4 <span class="dim">/ the result worth carrying out of this run</span></p>
-    <h2>The engine <em>knew</em>, said so &mdash; and still said <span class="mono" style="color:var(--fail)">answerable: true</span></h2>
+    <p class="eyebrow">4 &middot; CAP&#8209;4 <span class="dim">/ answered, declined, and the planted unanswerables</span></p>
+    <h2>CAP&#8209;4 &mdash; the answer layer</h2>
+    <p class="finding">The engine <em>knew</em>, said so &mdash; and still said <span class="mono" style="color:var(--fail)">answerable: true</span></p>
     <div class="tblwrap">
       <table>
         <thead><tr><th>question (arm B)</th><th>band</th><th>answerable</th><th class="num">coverage<span class="dir flat">&mdash; neither</span></th><th>missing</th></tr></thead>
@@ -555,8 +560,20 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
 <!-- 10 ---------------------------------------------------------------- -->
 <section class="slide">
   <div class="wrap">
-    <p class="eyebrow">5 &middot; CAP&#8209;2 <span class="dim">/ what moved between the versions</span></p>
-    <h2>29 of 60 lists differ &mdash; and almost none at the top</h2>
+    <p class="eyebrow">5 &middot; CAP&#8209;1 <span class="dim">/ the ranked lists each arm returned</span></p>
+    <h2>CAP&#8209;1 &mdash; the ranked lists</h2>
+    <p class="finding">120 ranked lists filed &mdash; the baseline the next run is read against.</p>
+    <p>The ordered document ids and scores, per query, per arm, per corpus. Read from this run&rsquo;s <span class="mono">evidence/ranked-lists.jsonl</span>; <strong>nothing was re&#8209;executed to produce this slide.</strong></p>
+    <div class="tblwrap"><table><thead><tr><th>arm</th><th>version</th><th class="num">lists filed<span class="dir flat">&mdash; neither</span></th><th class="num">queries<span class="dir flat">&mdash; neither</span></th><th class="num">results per list<span class="dir flat">&mdash; neither</span></th><th class="num">top&#8209;1 score<span class="dir flat">&mdash; neither; an engine&rsquo;s own scale</span></th></tr></thead><tbody><tr><td class="k">A</td><td class="k">1.0.0</td><td class="num">60</td><td class="num">60</td><td class="num">10</td><td class="num">4.96</td></tr><tr><td class="k">B</td><td class="k">2.0.0&#8209;alpha.7</td><td class="num">60</td><td class="num">60</td><td class="num">10</td><td class="num">4.96</td></tr></tbody></table></div>
+    <p style="font-size:13px;color:var(--ink-3);margin-top:8px">Medians, over <span class="mono">docs&#8209;00100</span>. <strong>Nothing here says which ordering is better</strong> &mdash; a score is an engine&rsquo;s own scale, and the two arms are two engines. What MOVED between them is the next slide.</p>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">5 &middot; CAP&#8209;2 <span class="dim">/ what moved, arm A &rarr; arm B</span></p>
+    <h2>CAP&#8209;2 &mdash; what moved between the arms</h2>
+    <p class="finding">29 of 60 lists differ &mdash; and almost none at the top</p>
     <figure class="chartbox">
       <svg viewBox="0 104 1000 196" role="img" aria-label="Histogram of the rank at which arm A and arm B first differ, across the 29 queries whose top-10 changed. Rank 1: one query. Rank 2: five. Rank 3: one. Rank 4: two. Rank 5: five. Rank 6: four. Rank 7: three. Rank 8: three. Rank 9: four. Rank 10: one.">
         <g font-family="IBM Plex Mono, monospace" font-size="11.5">
@@ -602,26 +619,36 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
 <!-- 11 ---------------------------------------------------------------- -->
 <section class="slide">
   <div class="wrap">
-    <p class="eyebrow">6 &middot; CAP&#8209;5 and CAP&#8209;6 <span class="dim">/ size, and a number that must not be quoted</span></p>
-    <h2>The index shrank. The clock cannot be trusted.</h2>
+    <p class="eyebrow">6 &middot; CAP&#8209;5 <span class="dim">/ the committed index</span></p>
+    <h2>CAP&#8209;5 &mdash; the committed index size</h2>
+    <p class="finding">The index shrank &mdash; &minus;5.1 % per document, same corpus.</p>
     <div class="grid g2">
       <div class="card">
         <p class="statlabel">CAP&#8209;5 &mdash; committed index size</p>
         <p class="stat">&minus;5.1 %<span class="dir down">&darr; lower is better</span></p>
         <p class="statnote">14 076 &rarr; <strong>13 360 bytes/document</strong> on 100 documents &mdash; 1.41 MB against 1.34 MB, <strong>84 shards each</strong>, same corpus. Deterministic, and unaffected by the machine.</p>
       </div>
+    </div>
+    <p><strong>Unaffected, and deterministic:</strong> the ranked lists, <span class="mono">hit@k</span>, and every answer verdict on this deck.</p>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">6 &middot; CAP&#8209;6 <span class="dim">/ speed, arms interleaved A B A B</span></p>
+    <h2>CAP&#8209;6 &mdash; the speed</h2>
+    <p class="finding">The clock cannot be trusted &mdash; another session was on the machine throughout.</p>
+    <div class="grid g2">
       <div class="card" style="border-color:var(--fail)">
         <p class="statlabel" style="color:var(--fail)">CAP&#8209;6 &mdash; speed &nbsp;<span class="pill fail">do not quote</span></p>
         <p class="stat" style="color:var(--fail)">51.3 &rarr; 72.6 ms<span class="dir down">&darr; lower is better</span></p>
         <p class="statnote">median&#8209;of&#8209;medians, p95 52.3 vs 74.3; ingest 3.9 s vs 1.8 s, build 0.14 s vs 0.19 s. <strong>Another session was working on this machine throughout.</strong></p>
       </div>
     </div>
-    <hr class="rule">
     <div class="callout warn"><p><strong>SETUP&#8209;BENCHMARK standing rule 0a records exactly this failure mode:</strong> a loaded machine does not produce noise, <em>it produces a clean, localised anomaly that reads like a finding</em>. Interleaving <span class="mono">A B A B</span> protects the <em>difference</em> and never the absolute number &mdash; and a 40 % gap across a major version is large enough that it deserves a quiet machine before anyone reasons from it.</p></div>
-    <p><strong>Unaffected, and deterministic:</strong> the ranked lists, <span class="mono">hit@k</span>, and every answer verdict on this deck.</p>
   </div>
 </section>
-<!-- 12 ---------------------------------------------------------------- -->
+
 <section class="slide">
   <div class="wrap">
     <p class="eyebrow">7 &middot; Controls and authorship <span class="dim">/ what makes the rest readable</span></p>
@@ -793,6 +820,7 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
       <li><strong>Re&#8209;time <span class="mono">docs&#8209;00100</span> and <span class="mono">docs&#8209;01000</span> on an idle machine</strong>, as its own run, and compare the <em>shape</em> of the two curves rather than either number. <span class="mono" style="color:var(--ink-3);font-size:12px">&rarr; agent lane</span></li>
     </ol>
     <p style="font-size:13px;color:var(--ink-3);margin:18px 0 0">The run is <span class="mono">work/regression/2026&#8209;09&#8209;13&#8209;benchmark&#8209;captures/</span> &mdash; <span class="mono">report.md</span>, <span class="mono">ANALYSIS.md</span>, <span class="mono">RANKDIFF.md</span>, <span class="mono">evidence/</span>. This presentation carries no number that run does not; <strong>anything that disagrees with it is this file being wrong.</strong></p>
+      <p style="font-size:13px;color:var(--ink-3);margin:14px 0 0"><strong>Rebuilt 2026&#8209;09&#8209;15 to the capture spine</strong> &mdash; SR&#8209;WORK&#8209;BENCHMARK decision 14: one slide per capture, titled by its CAP, CAP&#8209;7 none. <strong>No number changed and nothing was re&#8209;executed</strong>; CAP&#8209;1 gained a slide, read from this run&rsquo;s own <span class="mono">evidence/ranked-lists.jsonl</span>. The slide ORDER is this run&rsquo;s own narrative, not id order.</p>
   </div>
 </section>
 

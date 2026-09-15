@@ -107,6 +107,20 @@ dashboard, or read a temperature display while the vehicle is moving.
 reviewed by Fleet within two working days. A coaching call is not punishment;
 it is evidence that we noticed the risk.
 
+5.4. A temperature alarm must never be treated as permission to drive faster.
+Fleet Control shall first ask whether the driver is safe, parked, or able to
+reach a safe stopping point. Product-protection instructions come after the
+driver's immediate road safety is confirmed.
+
+5.5. If a customer asks the driver directly for location, temperature, or arrival
+time, the driver may answer only while parked. Customer-support staff shall not
+forward customer pressure to the driver as a driving instruction. The proper
+channel is Fleet Control.
+
+5.6. Telematics coaching records are confidential HR and Fleet records. They may
+be used in accident investigation, insurance defence, and safety audit, but they
+must not be posted in open operations chat groups for ridicule.
+
 ## 6. Hired trucks
 
 6.1. Hired-truck providers must receive this policy with the purchase order.
@@ -135,6 +149,20 @@ fitness-to-continue decision.
 7.4. Payroll shall not reward illegal or unsafe driving. Incentives based only
 on early arrival are prohibited.
 
+7.5. A driver who reports fatigue before departure shall not lose the trip
+attendance credit if Fleet Control verifies the report and assigns a replacement
+or rest plan. The report must be made before the driver begins the route unless
+the fatigue arises from an unexpected delay during duty.
+
+7.6. HR will keep a confidential fatigue support list for drivers with repeated
+night routes, family medical stress, or long commute patterns. The list is for
+support planning and shall not be used as a blacklist for future assignments.
+
+7.7. Route assistants and loaders may also report unsafe pressure. They are
+protected under this policy when they refuse to ride with an impaired driver,
+refuse to guide reversing in darkness without a torch, or report that a driver
+is being pushed beyond duty limits.
+
 ## 8. Records
 
 8.1. Dispatch notes, Tessaline or Kalpa trip reports, driver call logs, exception
@@ -148,3 +176,16 @@ for seven years.
 may be issued by the Fleet head, but HR must publish them within five working
 days.
 
+## 9. Discipline
+
+9.1. Deliberate falsification of a duty record, disabling a telematics device,
+driving after an instruction to stop, or ordering another person to hide a limit
+breach is gross misconduct.
+
+9.2. Ordinary delay, honest fatigue reporting, and refusal of unsafe instruction
+are not disciplinary matters. Managers shall separate delay explanation from
+safety blame in review meetings.
+
+9.3. Vendor drivers remain subject to their employer's discipline process, but
+Quillfern may suspend a vendor driver from Quillfern routes immediately when
+there is a serious safety concern.

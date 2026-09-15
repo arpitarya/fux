@@ -35,9 +35,9 @@ agent-closable; this row is a session output, not a stop.
 
 ### fux build
 
-- 🟣 **W-161** · `agent`, waiting on **2026-09-30** — **BUILT 2026-09-15**, both readers, 0 discordant; both tiers ship on and unmeasured. Only the two arms remain, and they need Codex's link-dependent questions. [detail](open/W-161-graph-composed-ask.md)
-- 🟣 **W-168** · `agent`, waiting on **2026-09-30** — the ten search improvements. **Step 1 BUILT 2026-09-15**: both readers, `[bm25f] anchor` default 0, `_format` v3, 0 discordant. Steps 8 and 10 need Codex's questions. [detail](open/W-168-search-improvements.md)
-- 🟣 **W-176** · `agent`, waiting on **2026-09-30** — **steps 1–3 landed 2026-09-15**: `weak` ⇒ `answerable: false`, the steering text, `failed`. The seven measured gates need Codex's key. [detail](open/W-176-abstention-gates.md)
+- 🟣 **W-161** · `agent`, waiting on **2026-09-30** — **BUILT 2026-09-15**; both tiers ship on and unmeasured. 🔴 **Both arms inert on the ladder — 0 `ref` edges**; they need linked documents, not questions. [detail](open/W-161-graph-composed-ask.md)
+- 🟣 **W-168** · `agent`, waiting on **2026-09-30** — the ten search improvements. **Step 1 BUILT 2026-09-15.** 🔴 **Step 8 needs linked documents, not questions** — 0/124 flips at every weight, a data defect (23b). [detail](open/W-168-search-improvements.md)
+- 🟣 **W-176** · `agent`, waiting on **2026-09-30** — **steps 1–3 landed 2026-09-15**. The seven gates need Codex's key; ⚠ **step 10 also needs links** — `unknown` is its only reachable outcome today. [detail](open/W-176-abstention-gates.md)
 
 ### testing
 
@@ -48,6 +48,7 @@ agent-closable; this row is a session output, not a stop.
 - 🟣 **W-87** · `agent`, waiting on W-145 — P2's `unanswerable` gate is measured (0/124); recall needs phase 5 and **Part B needs an uncontaminated key**. [detail](open/W-87-what-good-means.md)
 - 🟣 **W-175** · `agent`, waiting on **2026-09-30** — does a correction help OTHER phrasings? Ruled 2026-09-14: three arms (dogfood · fux's own tree · Codex), N=12 / M=5. Harness now; the numbers wait for Codex's blind paraphrases. [detail](open/W-175-correction-generalisation.md)
 - 🔴 **W-144** · `arpit` — the `b` sweep is RUN and **no pre-registered value clears**; the lever reaches the endpoint below the frozen range and nothing regresses down to `b = 0`. Three options in the inbox. [detail](open/W-144-structure-aware-extraction.md)
+- 🟢 **W-188** · `agent` — Node as a column in CAP-1/2/3/4, not just CAP-6: parity with Python, reported not gated. **Ratified 2026-09-15, not built.** [detail](open/W-188-node-column-every-capture.md)
 
 
 ---

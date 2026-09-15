@@ -60,6 +60,20 @@ data — never filed as a null**.
 | questions whose answer is the first, phrased in the linker's words | 23a's second sentence: the questions must depend on the input |
 | a `23c` coverage row naming both | the data declares what it exercises |
 
+⚠ **ADDENDUM 2026-09-15 — the data is now MEASURED absent, and no threshold
+below moves.** [The mechanism probe](../2026-09-15-anchor-mechanism/report.md)
+counted the ladder's edges: **0 anchor-bearing edges of 1 002, on all eight
+rungs** — every edge is `supersedes`, there is not one `ref` edge, and
+`work/golden/seed/` contains no link syntax at all. Measured consequence: **0 of
+124 top-1 and top-10 changes at every weight** on four rungs, `rung-10000`
+included, with a positive control proving the harness would have seen movement.
+
+**So §*What the data must contain* is unsatisfied as a fact rather than an
+assumption, and clause 5 of §*What this run may NOT do* is in force.** This
+addendum adds a citation and **changes no arm, no order, no clause and no
+number**; the decision rule is exactly as frozen. What it settles is that the
+Codex task is **corpus authorship first** — questions alone cannot satisfy it.
+
 **Codex's hands, not an agent's**, and not this session's:
 [SR-WORK-GOLDEN](../../../records/0066_WORK-golden.md) and
 [L11](../../../records/0012_LAW-11-sealed-answer-key.md). No Claude session

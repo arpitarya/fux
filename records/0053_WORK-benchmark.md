@@ -10,7 +10,7 @@ feature: the capture set every benchmark run files
 owns: [tests/test_benchmark_capture.py@f6af3d328537]
 laws: []
 timestamp: 2026-09-13T00:00:00Z
-content_sha: 95f733f022e262dc946f343444ad2d769653cd797b9538e80c1e998c17adf3f1
+content_sha: 3159777140ed2f8639861eb3fb8dc8d4d92772c83600bffc52d849c95c4f9cba
 ratifies: Arpit, 2026-09-13 — what a benchmark must always capture
 ---
 
@@ -495,6 +495,52 @@ finding a capture**, which the title already solves.
 `ingest`/`build` phase printed **`0.0 s`** — a fabricated zero, which decision 9
 forbids in as many words. It prints `—` now, and `2026-09-15-node-column` is the
 run that would have carried the zero.
+
+**16. THE NODE READER IS A COLUMN IN EVERY CAPTURE, not only in CAP-6** (Arpit,
+2026-09-15). Decision 12 put it in the latency table; this puts it in the rest.
+
+> *"in benchmark I want few more numbers — this is for node search versus
+> Python search … ranked list, what moved, hit@k, answer layer and speed."*
+
+**`B-node` and `B-node-nograph` join CAP-1, CAP-2, CAP-3 and CAP-4**, in every
+run, on every tier the run uses. Arpit ruled *columns in every run* over a
+separate parity run: two readers that are only compared occasionally drift
+between comparisons, and the drift is invisible until someone looks.
+
+🔴 **AND THE READING RULE IS THE OPPOSITE OF AN A/B PAIR.** `A` against `B` asks
+*what changed between two versions*, where a difference is the finding. `B`
+against `B-node` asks *do the two readers agree*, where **0 discordant is the
+expected result and any difference is a DEFECT in one of them** —
+[SR-NODE-SEARCH](0153_node-search.md)'s claim, and `node/README.md`'s: *same
+ids, same order, same locators, same band*. **Same table shape, opposite
+meaning, and the slide says so** — a reader who takes a reader disagreement for
+a quality delta has read a bug as a result.
+
+**It is reported, never gated** (Arpit, same exchange). Decision 4 keeps gates
+in `tests/`; a benchmark rules no threshold (decision 6). What the report
+carries is the **discordant count, the first differing rank, and max |Δscore|
+against a stated tolerance** — the float question
+`PRE-REGISTRATION-NODE`'s `log()` cell was left open on and that the retired
+N0–N4 table never measured.
+
+⚠ **CAP-5 and the ingest/build half of CAP-6 have NO Node column, by
+construction** — the Node reader writes no index. Those slides **say so**; a
+blank cell would read as a number nobody took.
+
+**Nearly all of it is retention, not measurement.**
+`fux-benchmark/bin/bench.py::ask_node` already runs `node fux.mjs ask --json`
+and **returns the ranked list beside the timing, which the harness then
+discards.** CAP-1 and CAP-3 are that list being kept. **CAP-4 is the exception**
+and costs a real pass, because `answer` is a different verb — and its parity
+claim covers locators and the band, so a column comparing only
+answered/declined tests less than what is claimed.
+
+🔴 **RATIFIED 2026-09-15, NOT BUILT** — [W-188](../work/open/W-188-node-column-every-capture.md),
+which also carries the five further numbers proposed and not ruled: cold start
+separated from query work (today's Node p50 is one process per query and
+carries `node` boot), peak RSS, the graph tier's effect on **ranking** rather
+than only latency, failure parity on a stale index, and the 10 000 tier for both
+readers.
 
 ### Consequences
 

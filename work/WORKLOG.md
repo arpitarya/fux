@@ -29,6 +29,58 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-15 — the ladder has no links: three items were waiting on the wrong thing  ·  Claude Code (Opus 5)
+
+- **Asked:** *"what can be unblocked with `work/golden/questions/questions.jsonl`"*, then — on being told the answer was *nothing, it has been readable since 2026-09-12* — **"go ahead and proceed with the build using those questions"**.
+- **Did:** built [`tools/quality-controls/anchor_probe.py`](../tools/quality-controls/anchor_probe.py) and filed [`2026-09-15-anchor-mechanism`](regression/2026-09-15-anchor-mechanism/report.md), a **mechanism probe** (SR-RS 22c), not the arms. 🔴 **The finding is that the golden ladder has no links at all**: **0 anchor-bearing edges of 1 002 on all eight rungs**, every edge `supersedes`, not one `ref`, and **zero** link syntax in `work/golden/seed/`. Measured **0 of 124 top-1/top-10 flips at every weight** on `rung-seed`, `00100`, `01000` and **`rung-10000`, the design point**. Built a **positive control** — a corpus where the target's vocabulary exists only in a linker's link text — where the same `rank()` moves it from **not even a candidate** at `0.0` to **top-1 at `2.0`**, proving the harness would have seen movement.
+- **Decided / open:** 🔴 **Three queued items name the wrong blocker and all three were corrected** — W-168 step 8 (its row said *"no Claude session opens the sealed key"*, which is true and is not why it is blocked), **both** of W-161's arms (`[graph] ask_kinds` follows **`ref` alone**, so `fux graph --seed` on a *superseded* document returns the seed and nothing else — arm A reorders nothing and arm B's `related` is empty for every query), and W-176 step 10, whose `unknown` degradation is **currently its only reachable outcome**. **They wait on link-bearing DOCUMENTS, not on Codex's questions**, and no question can create the edge the feature reads (SR-RS 23a). A **data defect under 23b** — so **no `VERDICT.md`**, and both frozen pre-registrations got dated addenda that **move no threshold**. 🔴 **Filed to the inbox for Arpit:** link the existing seed (breaks comparability with every filed ladder number), grow it with new linked documents, or build a sibling corpus — **not an agent's call**.
+- **Next:** Arpit's corpus choice decides what Codex is asked for on 2026-09-30; until then W-161/W-168/W-176 keep their dates. ⚠ **A concurrent session was extending `work/golden/seed/` throughout** (131 lines across 7 documents, staged, **0 containing link syntax**) — the corpus is being grown *without* the structure these three items need, which is the loop this entry exists to break. 🔴 **And `work/NOW.md` was broken the same way TWICE in one session** — the Cowork session prepended its line **above** the frontmatter block, so `test_okf_bundle.py::test_bundle_doc_declares_a_type` went red both times; repaired both times with **both sessions' entries kept**. **The two-strikes gate (SR-WORK-SESSION 13) needs nothing new: the test already exists and already catches it.** What it does not reach is the surface — Cowork does not run the suite, which is the same *"a red test on an uncommitted tree is invisible"* lesson wearing a second hat.
+
+## 2026-09-15 — the benchmark report's spine: one slide per CAP  ·  Cowork (Opus 5)
+
+- **Asked:** what does the benchmark measure and what does the report present —
+  then, on reading it: *"in benchmark final report the should have 1 slide each
+  for all caps independently comparing it to the previous versions with the
+  title of each and every cap"*.
+- **Did:** answered from [SR-WORK-BENCHMARK](../records/0053_WORK-benchmark.md)
+  and `work/benchmark/reports/`; **amended the record with decision 14** — the
+  report's spine is one slide per capture, titled `CAP-n — <name>`, each an
+  arm-A-against-arm-B comparison, framing slides kept; filed
+  **[W-187](open/W-187-report-cap-slide-spine.md)** with the spec, the hazards
+  and the marker/`<thead>` split. **Ratified, not built.**
+- **Decided / open:** 🔴 **CAP-7 gets no slide** — it *is* the report, and a
+  slide comparing it to the previous report carries no filed number (decision 5).
+  ⚠ **Today's template has no CAP-1 slide at all** and titles every section by
+  its finding rather than by its capture — so this is a real change, not a
+  rename, and template + emitter move in one commit or the emitter refuses.
+- **Then:** *“implement it”* — so it was **built in the same session**, not handed
+  off. `TEMPLATE.html` is now twelve slides with a **CAP-1 slide that did not
+  exist**; `report.py` gained `_fill_ranked` and the `ranked` marker and stopped
+  writing titles (13 `<h2>`s → `<p class="finding">`). W-187 archived, decision 14
+  marked BUILT.
+- **Verified:** rendered `2026-09-13-benchmark-captures` into a **scratch root** —
+  0 unfilled slots, 0 absent captures, marker-rename refusal still fires. ⚠ **No
+  filed report was touched** and 🔴 **the suites were not run** — no interpreter
+  on the bridge can import `fux`.
+- **Then, same session:** *“update the benchmark template and the existing
+  benchmark reports… if a number exists great add it… if it doesnt say that it
+  doesnt exist… in future capture that number”* — **decision 15**, and all five
+  filed runs rebuilt. `2026-09-15-node-column` **had no report at all** and now
+  has one. CAP-1 gained a slide with **120** filed lists on the 2026-09-13 deck
+  and **600** on l9; the two 2026-08-28 decks had their combined slides split.
+- **Found by doing it:** an absent `ingest`/`build` phase printed **`0.0 s`** — a
+  fabricated zero, which decision 9 forbids in as many words. It prints `—` now.
+- **Third ask:** *“node search versus Python search — ranked list, what moved,
+  hit@k, answer layer and speed”* → **decision 16** and
+  **[W-188](open/W-188-node-column-every-capture.md)**, ratified and **not
+  built**: the measurement needs node, the corpora and the arm venvs, none of
+  which a bridge shell can reach. 🔴 **The reading rule is the opposite of an
+  A/B pair** — 0 discordant is expected and a difference is a defect. Nearly
+  free: `ask_node` already returns the ranked list beside the timing and the
+  harness discards it.
+- **Next:** 🔴 nothing here was committed, and another session has files staged
+  in the tree — template and emitter must land in ONE commit.
+
 ## 2026-09-15 — the green queue, worked continuously: W-184, W-183, W-182  ·  Claude Code (Opus 5)
 
 - **Asked:** implement all the green items, continuously, unblocking as I go.

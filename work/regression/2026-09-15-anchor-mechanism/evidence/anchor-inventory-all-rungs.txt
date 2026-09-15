@@ -1,0 +1,8 @@
+rung-00100   docs    100  edges     12  anchor-bearing      0   kinds={'supersedes': 12}
+rung-00200   docs    200  edges     22  anchor-bearing      0   kinds={'supersedes': 22}
+rung-00500   docs    500  edges     52  anchor-bearing      0   kinds={'supersedes': 52}
+rung-01000   docs   1000  edges    102  anchor-bearing      0   kinds={'supersedes': 102}
+rung-02000   docs   2000  edges    202  anchor-bearing      0   kinds={'supersedes': 202}
+rung-05000   docs   5000  edges    502  anchor-bearing      0   kinds={'supersedes': 502}
+rung-10000   docs  10000  edges   1002  anchor-bearing      0   kinds={'supersedes': 1002}
+rung-seed    docs     20  edges      4  anchor-bearing      0   kinds={'supersedes': 4}

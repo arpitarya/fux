@@ -65,3 +65,24 @@ trusted during poor network coverage.
 Col. Sandhu's closing comment: "We will not chase a fashionable dashboard while
 our drivers and auditors know the present one. STABILITY FIRST; NOVELTY SECOND."
 
+## Rejected options
+
+Tessaline was rejected in 2023 because the API was not demonstrated on a live
+Quillfern route, the commercial proposal required a larger first-year payment,
+and the field-support rota for Nagpur was still being hired. The evaluation team
+liked the one-minute polling and the proposed exception export, but decided that
+those benefits were not enough to justify a complete change before the 2024
+vaccine season.
+
+A split model was also rejected. In that model, Kalpa would have stayed on
+trucks while warehouse probes moved to Tessaline. IT objected that two source
+systems would create audit confusion and double monthly reconciliation work.
+Finance objected that the split model removed volume discounts from both
+vendors.
+
+## Review trigger
+
+The review trigger is intentionally narrow. Complaints about dashboard colour,
+slow training, or ordinary device replacement do not count as major alert
+failures. A review may still be started by the Managing Director, but this ADR
+does not require one unless the patient-critical alert threshold above is met.

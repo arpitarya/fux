@@ -28,6 +28,27 @@ Rules:
 
 
 
+## 2026-09-15 — **every filed benchmark report rebuilt to the spine, and the missing one written**
+
+| item | what landed | evidence |
+|---|---|---|
+| **all five reports** | ✅ on the capture spine — six titled CAP slides each, CAP-7 none | [SR-WORK-BENCHMARK](../records/0053_WORK-benchmark.md) decision 15 |
+| 🔴 **a run with no report** | `2026-09-15-node-column` had none, and CAP-7 has been mandatory since 2026-09-13. Generated: **CAP-6 across four arms** read from its two `latency-<tier>.csv` files, **the substitution stated on the page**; the other five captures say they have no number | [`work/benchmark/reports/2026-09-15-node-column.html`](benchmark/reports/2026-09-15-node-column.html) |
+| **numbers that existed and were not shown** | CAP-1 now has its own slide **with numbers** on both runs that retained lists — **120** filed lists on 2026-09-13 (60 per arm, depth 10), **600** on l9. Neither was measured today; both were read from the run's own `ranked-lists.jsonl` | decision 15 |
+| **numbers that do not exist** | said so, per capture, with the run named that will carry it: CAP-1/CAP-2 on both 2026-08-28 runs, `hit@20`/`hit@50` on v1-vs-head, CAP-5/CAP-6 on contested | decision 15 |
+| ⚠ **a defect the rebuild found** | an absent `ingest`/`build` phase printed **`0.0 s`** — a fabricated zero, which decision 9 forbids outright. It prints `—` now; `2026-09-15-node-column` is the run that would have carried it | `fux-benchmark/bin/report.py` |
+| **what was NOT done** | 🔴 no engine ran, no corpus was touched, no filed row changed, and the hand-built content was **kept and re-titled** rather than replaced by emitter output — decision 11a's reason still holds | decision 15 |
+
+## 2026-09-15 — **W-187: the benchmark report's spine is one slide per capture**
+
+| item | what landed | evidence |
+|---|---|---|
+| **W-187** | 🟢→✅ **`TEMPLATE.html` is twelve slides**, `CAP-1 · CAP-2 · CAP-3 · headroom · CAP-4 · CAP-5 · CAP-6` between the framing slides, each CAP titled `CAP-n — <capture>` and comparing arm A against arm B | [SR-WORK-BENCHMARK](../records/0053_WORK-benchmark.md) decision 14 · [the item](../archive/open/W-187-report-cap-slide-spine.md) |
+| **CAP-1 had no slide at all** | 🔴 the ranked lists were only ever visible through CAP-2's rankdiff. `_fill_ranked` renders them per arm — lists filed, queries, results per list, median top-1 score — **every column `— neither`, because a score is an engine's own scale** | `fux-benchmark/bin/report.py` |
+| **the emitter stopped writing titles** | its **13** `<h2>`s became `<p class="finding">` subtitles under the template's own headings. Decision 10's argument, applied to titles: a title is a property of the **capture**, a finding is a property of the **run** | decision 14 |
+| **verified without touching a filed report** | `2026-09-13-benchmark-captures` rendered into a **scratch root**: 12 slides, **0 unfilled slots, 0 absent captures**, CAP-1 reading 60 lists per arm at depth 10. The absent-capture path was exercised too (the titled slide survives and says so), and a renamed marker still makes the emitter **refuse** | decision 9 · decision 11 |
+| **not done** | 🔴 **the test suites were not run** — a Cowork bridge shell has no interpreter that can import `fux`. `tests/test_benchmark_capture.py` checks filed reports and not the template, so nothing here covers the change | [`work/MACHINE.md`](MACHINE.md) |
+
 ## 2026-09-15 — **W-179: Node's latency measured, and the split is the whole result**
 
 | item | what landed | evidence |

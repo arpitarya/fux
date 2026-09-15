@@ -269,6 +269,9 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
   color:var(--ink-3);font-size:14px;
 }
 .nonumber strong{color:var(--ink-2)}
+.finding{font-size:19px;line-height:1.45;color:var(--ink-2);margin:2px 0 18px;max-width:70ch}
+.finding strong{color:var(--ink-1)}
+
 </style>
 <div class="tick" id="tick"></div>
 <main class="deck" id="deck">
@@ -372,8 +375,9 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
 
 <section class="slide">
   <div class="wrap">
-    <p class="eyebrow">CAP&#8209;3 <span class="dim">/ the ranking endpoint, in this suite's own terms</span></p>
-    <h2>Both arms, indistinguishable from guessing</h2>
+    <p class="eyebrow">CAP&#8209;3 <span class="dim">/ the ranking endpoint, in this suite&rsquo;s own terms</span></p>
+    <h2>CAP&#8209;3 &mdash; hit@k</h2>
+    <p class="finding">Both arms, indistinguishable from guessing</p>
     <div class="tblwrap">
       <table>
         <thead><tr>
@@ -425,8 +429,9 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
 
 <section class="slide">
   <div class="wrap">
-    <p class="eyebrow">CAP&#8209;4 <span class="dim">/ the answer layer</span></p>
-    <h2>Not asked by this run</h2>
+    <p class="eyebrow">CAP&#8209;4 <span class="dim">/ answered, declined, and the planted unanswerables</span></p>
+    <h2>CAP&#8209;4 &mdash; the answer layer</h2>
+    <p class="finding">Not asked by this run</p>
     <p class="nonumber"><strong>No number exists for this run.</strong> This is a <em>ranking</em> suite: it measures whether an engine puts the target first among four equally&#8209;evidenced candidates. <strong>It contains no unanswerable questions and never calls <span class="mono">answer</span></strong>, so there is nothing to report as answered, declined or fabricated. <strong>Not re&#8209;run to produce one.</strong></p>
     <div class="grid g2">
       <div class="card"><h3>Where the question was asked instead</h3><p>Its sibling on the same two arms &mdash; <span class="mono">2026&#8209;08&#8209;28&#8209;benchmark&#8209;v1&#8209;vs&#8209;head</span> &mdash; planted 20 unanswerables and <strong>both arms answered all 20</strong>. That run&rsquo;s CAP&#8209;4 section carries it.</p></div>
@@ -437,23 +442,38 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
 
 <section class="slide">
   <div class="wrap">
-    <p class="eyebrow">CAP&#8209;1 &middot; CAP&#8209;2 <span class="dim">/ the ranked lists, and what moved</span></p>
-    <h2>Not captured by this run</h2>
-    <p class="nonumber"><strong>No number exists for this run, in either capture.</strong> The filed rows are <strong>per&#8209;query outcomes</strong> &mdash; 1 900 of them, one per query per arm per tier, which is what makes every test above recomputable &mdash; but the <strong>ordered lists themselves were not retained</strong>, so there is no diff and no per&#8209;document rank delta. <strong>The run is frozen and was not re&#8209;executed.</strong></p>
+    <p class="eyebrow">CAP&#8209;1 <span class="dim">/ the ranked lists each arm returned</span></p>
+    <h2>CAP&#8209;1 &mdash; the ranked lists</h2>
+    <p class="nonumber"><strong>No number exists for this run &mdash; CAP&#8209;1 the ranked lists.</strong> The filed rows are <strong>per&#8209;query outcomes</strong> &mdash; 1 900 of them, one per query per arm per tier, which is what makes every test on this report recomputable &mdash; but the <strong>ordered lists themselves were not retained</strong>. <em>The run is frozen and was not re&#8209;executed to fill this &mdash; what is done is done, and the next run captures it.</em></p>
     <div class="callout"><p>Within the contest, the equivalent question <em>was</em> answered: <strong>all four candidates were visible in the top 10 in 120 of 120 clusters</strong>. That is a statement about the contest being joined, not about the corpus&#8209;wide ordering.</p></div>
   </div>
 </section>
 
 <section class="slide">
   <div class="wrap">
-    <p class="eyebrow">CAP&#8209;5 &middot; CAP&#8209;6 <span class="dim">/ index size and speed</span></p>
-    <h2>Neither was measured, and the run says so</h2>
+    <p class="eyebrow">CAP&#8209;2 <span class="dim">/ what moved, arm A &rarr; arm B</span></p>
+    <h2>CAP&#8209;2 &mdash; what moved between the arms</h2>
+    <p class="nonumber"><strong>No number exists for this run &mdash; CAP&#8209;2 what moved.</strong> With no retained lists there is no diff and no per&#8209;document rank delta. <em>The run is frozen and was not re&#8209;executed to fill this &mdash; what is done is done, and the next run captures it.</em></p>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">CAP&#8209;5 <span class="dim">/ the committed index</span></p>
+    <h2>CAP&#8209;5 &mdash; the committed index size</h2>
     <p class="nonumber"><strong>CAP&#8209;5 &mdash; committed index size: no number exists for this run.</strong> The plan measured quality only; no index byte count, bytes/document or shard count was taken on either corpus.</p>
-    <p class="nonumber"><strong>CAP&#8209;6 &mdash; speed: no number exists for this run.</strong> The report states it outright &mdash; <em>&ldquo;no wall&#8209;clock claim&hellip; latency was not re&#8209;measured and the previous run&rsquo;s B5/B6 stand unchallenged.&rdquo;</em> <strong>Not re&#8209;run to fill it</strong>, and the earlier run&rsquo;s numbers are that run&rsquo;s, on a different corpus.</p>
     <div class="grid g2">
       <div class="card"><h3>Why this is a deliberate gap</h3><p>The two arms and the two corpora were fixed so that <strong>only the instrument differed</strong> from the sibling run. Re&#8209;measuring bytes and latency would have added nothing the sibling did not already carry &mdash; and the sibling&rsquo;s numbers were taken on a different corpus, so <strong>they are not this run&rsquo;s.</strong></p></div>
       <div class="card"><h3>What the capture set changed</h3><p>From 2026&#8209;09&#8209;13 a run files <strong>all seven or is not filed as a benchmark</strong>. That is the rule this gap argued for: <strong>two sibling runs that cannot be read as one because each took a different half.</strong></p></div>
     </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">CAP&#8209;6 <span class="dim">/ speed, arms interleaved A B A B</span></p>
+    <h2>CAP&#8209;6 &mdash; the speed</h2>
+    <p class="nonumber"><strong>CAP&#8209;6 &mdash; speed: no number exists for this run.</strong> The report states it outright &mdash; <em>&ldquo;no wall&#8209;clock claim&hellip; latency was not re&#8209;measured and the previous run&rsquo;s B5/B6 stand unchallenged.&rdquo;</em> <strong>Not re&#8209;run to fill it</strong>, and the earlier run&rsquo;s numbers are that run&rsquo;s, on a different corpus.</p>
   </div>
 </section>
 
@@ -469,6 +489,7 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
     </div>
     <hr class="rule">
     <p style="font-size:13px;color:var(--ink-3);margin:18px 0 0">The run is <span class="mono">work/regression/2026&#8209;08&#8209;28&#8209;benchmark&#8209;contested/</span> &mdash; <span class="mono">report.md</span>, <span class="mono">ANALYSIS.md</span>, five <span class="mono">VERDICT</span> files, <span class="mono">DISCLOSURE&#8209;C6.md</span>, <span class="mono">evidence/rows/</span>. Frozen pre&#8209;registration: <span class="mono">work/benchmark/PRE-REGISTRATION-CONTESTED.md</span>. <strong>This report carries no number that run does not.</strong> What must be here at all: <span class="mono">records/0053_WORK-benchmark.md</span>.</p>
+      <p style="font-size:13px;color:var(--ink-3);margin:14px 0 0"><strong>Rebuilt 2026&#8209;09&#8209;15 to the capture spine</strong> &mdash; SR&#8209;WORK&#8209;BENCHMARK decision 14: one slide per capture, titled by its CAP, CAP&#8209;7 none. <strong>No number changed and nothing was re&#8209;executed</strong>; where a capture has none the slide says so. The slide ORDER is this run&rsquo;s own narrative, not id order &mdash; a rebuilt report keeps the argument it was written as.</p>
   </div>
 </section>
 

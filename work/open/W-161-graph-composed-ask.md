@@ -24,6 +24,21 @@ floor on golden data ([SR-LAW-0](../../records/0002_LAW-0-authority.md) decision
 still want link-dependent golden questions (SR-RS d23 — Codex's hands, never
 Claude's, **available 2026-09-30**); the build does not wait on them.
 
+🔴 **Corrected 2026-09-15 — questions are NOT what the arms are waiting on.**
+[The anchor mechanism probe](../regression/2026-09-15-anchor-mechanism/report.md)
+counted the ladder's edges: **0 `ref` edges on all eight rungs**, every edge
+`supersedes`, and no link syntax anywhere in `work/golden/seed/`.
+`[graph] ask_kinds` defaults to **`ref` alone**, so on the golden ladder the
+`ask` walk has nothing to follow — confirmed at the CLI, where
+`fux graph --seed` on a *superseded* document returns the seed and nothing else.
+
+**So both arms are inert on the ladder, not merely unquestioned:** arm A's RRF
+boost reorders nothing, and arm B's `related` is **empty for every query**, which
+makes *"the answer document appears in `related`"* unsatisfiable at any fraction.
+What Codex owes on 2026-09-30 is **linked documents first**, then the questions —
+and the corpus decision that implies is Arpit's, stated in
+[the analysis](../regression/2026-09-15-anchor-mechanism/ANALYSIS.md) §Unresolved.
+
 ## W-160's atoms shipped on 2026-09-14 — what that changes for this item
 
 **The mechanism is built and inert.** `fux lexical`, `fux graph --seed`, and

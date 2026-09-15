@@ -1,0 +1,297 @@
+{
+  "contests": 749,
+  "screened": 660,
+  "agreement": 0.5273,
+  "chance": 0.1587,
+  "band": [
+    0.25,
+    0.85
+  ],
+  "inside_band": true,
+  "per_source": {
+    "docs/GLOSSARY.md": {
+      "agree": 8,
+      "n": 13
+    },
+    "records/0001_LAWS.md": {
+      "agree": 2,
+      "n": 2
+    },
+    "records/0002_LAW-0-authority.md": {
+      "agree": 1,
+      "n": 3
+    },
+    "records/0006_LAW-4-offline-by-default.md": {
+      "agree": 3,
+      "n": 3
+    },
+    "records/0007_LAW-5-hashed-meta.md": {
+      "agree": 3,
+      "n": 3
+    },
+    "records/0010_LAW-8-use-record.md": {
+      "agree": 2,
+      "n": 3
+    },
+    "records/0011_LAW-10-bundled-output.md": {
+      "agree": 5,
+      "n": 5
+    },
+    "records/0053_WORK-benchmark.md": {
+      "agree": 3,
+      "n": 3
+    },
+    "records/0056_WORK-quality.md": {
+      "agree": 4,
+      "n": 4
+    },
+    "records/0101_cli-surface.md": {
+      "agree": 12,
+      "n": 23
+    },
+    "records/0102_fux-directory.md": {
+      "agree": 20,
+      "n": 28
+    },
+    "records/0103_ask.md": {
+      "agree": 11,
+      "n": 19
+    },
+    "records/0104_find.md": {
+      "agree": 4,
+      "n": 4
+    },
+    "records/0105_answer.md": {
+      "agree": 5,
+      "n": 12
+    },
+    "records/0106_ingest.md": {
+      "agree": 9,
+      "n": 14
+    },
+    "records/0107_url-ingest.md": {
+      "agree": 3,
+      "n": 3
+    },
+    "records/0109_index-record.md": {
+      "agree": 3,
+      "n": 5
+    },
+    "records/0110_accelerator.md": {
+      "agree": 3,
+      "n": 4
+    },
+    "records/0111_ranking.md": {
+      "agree": 2,
+      "n": 4
+    },
+    "records/0113_config.md": {
+      "agree": 8,
+      "n": 15
+    },
+    "records/0115_extracted-mode.md": {
+      "agree": 5,
+      "n": 6
+    },
+    "records/0116_url-list.md": {
+      "agree": 8,
+      "n": 12
+    },
+    "records/0117_fetcher.md": {
+      "agree": 4,
+      "n": 7
+    },
+    "records/0118_cdp-fetcher.md": {
+      "agree": 3,
+      "n": 5
+    },
+    "records/0119_http-fetcher.md": {
+      "agree": 4,
+      "n": 9
+    },
+    "records/0120_dir-list.md": {
+      "agree": 2,
+      "n": 7
+    },
+    "records/0126_graph.md": {
+      "agree": 5,
+      "n": 7
+    },
+    "records/0127_refer-plane.md": {
+      "agree": 3,
+      "n": 6
+    },
+    "records/0128_types-list.md": {
+      "agree": 7,
+      "n": 8
+    },
+    "records/0129_hooks.md": {
+      "agree": 1,
+      "n": 2
+    },
+    "records/0132_agent-policy.md": {
+      "agree": 4,
+      "n": 7
+    },
+    "records/0133_predictions.md": {
+      "agree": 3,
+      "n": 5
+    },
+    "records/0134_archived-content.md": {
+      "agree": 3,
+      "n": 9
+    },
+    "records/0135_tuning.md": {
+      "agree": 12,
+      "n": 18
+    },
+    "records/0136_mcp.md": {
+      "agree": 5,
+      "n": 8
+    },
+    "records/0137_enrich.md": {
+      "agree": 5,
+      "n": 10
+    },
+    "records/0138_rerank.md": {
+      "agree": 4,
+      "n": 5
+    },
+    "records/0139_decode.md": {
+      "agree": 9,
+      "n": 15
+    },
+    "records/0142_provenance.md": {
+      "agree": 4,
+      "n": 4
+    },
+    "records/0143_output-defaults.md": {
+      "agree": 5,
+      "n": 16
+    },
+    "records/0144_fuxignore.md": {
+      "agree": 1,
+      "n": 2
+    },
+    "records/0145_acquired-plane.md": {
+      "agree": 4,
+      "n": 9
+    },
+    "records/0146_refusals.md": {
+      "agree": 3,
+      "n": 5
+    },
+    "records/0147_url-freshness.md": {
+      "agree": 8,
+      "n": 9
+    },
+    "records/0148_pii.md": {
+      "agree": 7,
+      "n": 16
+    },
+    "records/0149_expand.md": {
+      "agree": 4,
+      "n": 7
+    },
+    "records/0150_tabular.md": {
+      "agree": 4,
+      "n": 5
+    },
+    "records/0151_chunking.md": {
+      "agree": 1,
+      "n": 2
+    },
+    "records/0152_doctor.md": {
+      "agree": 8,
+      "n": 20
+    },
+    "records/0153_node-search.md": {
+      "agree": 3,
+      "n": 4
+    },
+    "records/0154_api.md": {
+      "agree": 2,
+      "n": 2
+    },
+    "records/0157_observe.md": {
+      "agree": 3,
+      "n": 3
+    },
+    "records/BIBLIOGRAPHY.md": {
+      "agree": 7,
+      "n": 7
+    },
+    "work/BACKLOG.md": {
+      "agree": 9,
+      "n": 89
+    },
+    "work/DOC-REGISTRY.md": {
+      "agree": 7,
+      "n": 8
+    },
+    "work/IMPLEMENTATION.md": {
+      "agree": 23,
+      "n": 59
+    },
+    "work/INTERVIEW.md": {
+      "agree": 7,
+      "n": 11
+    },
+    "work/WORKLOG.md": {
+      "agree": 18,
+      "n": 31
+    },
+    "work/compare/README.md": {
+      "agree": 2,
+      "n": 2
+    },
+    "work/compare/ask-graph-expansion.compare.md": {
+      "agree": 1,
+      "n": 3
+    },
+    "work/compare/hook-at-scale.compare.md": {
+      "agree": 2,
+      "n": 2
+    },
+    "work/compare/maintenance-trigger.compare.md": {
+      "agree": 2,
+      "n": 2
+    },
+    "work/compare/table-tokens-in-flen.compare.md": {
+      "agree": 1,
+      "n": 2
+    },
+    "work/open/W-161-graph-composed-ask.md": {
+      "agree": 2,
+      "n": 5
+    },
+    "work/open/W-168-search-improvements.md": {
+      "agree": 2,
+      "n": 3
+    },
+    "work/open/W-87-what-good-means.md": {
+      "agree": 2,
+      "n": 3
+    },
+    "work/proposals/quality-endpoint-for-reranking.md": {
+      "agree": 2,
+      "n": 2
+    },
+    "work/regression/2026-09-15-index-temp-ignore/ANALYSIS.md": {
+      "agree": 0,
+      "n": 2
+    },
+    "work/regression/2026-09-15-node-column/report.md": {
+      "agree": 1,
+      "n": 2
+    },
+    "work/regression/2026-09-15-rerank-quality/PRE-REGISTRATION.md": {
+      "agree": 2,
+      "n": 3
+    },
+    "work/regression/README.md": {
+      "agree": 3,
+      "n": 4
+    }
+  }
+}

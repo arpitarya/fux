@@ -84,6 +84,13 @@ unanswerables; they are the frozen control.
 - 🟣 **The golden key must carry enough unanswerable questions** for the d19
   floor to be reachable. That is a Codex task, never Claude's, and Codex is
   available **2026-09-30**. Steps 1–3 do not wait; steps 4–10 do.
+- 🔴 **Step 10 has a second, harder gate found 2026-09-15: the ladder has no
+  links.** [The anchor mechanism probe](../regression/2026-09-15-anchor-mechanism/report.md)
+  counted **0 `ref` edges on all eight rungs**, and `[graph] ask_kinds` follows
+  `ref` alone — so the graph-coherence gate would return **`unknown` for every
+  question**, which is its specified link-poor degradation and is therefore
+  **currently its only reachable outcome**. It is testable in that state and
+  **not measurable** in any other, until the corpus carries links.
 - Step 10 also waits on [W-161](W-161-graph-composed-ask.md).
 
 ## Out of scope

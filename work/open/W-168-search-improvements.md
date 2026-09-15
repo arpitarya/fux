@@ -37,9 +37,9 @@ and it has no `VERDICT.md`.
 | 5 | the fold lands **once**, in the shared read path | ✅ in `rank()`; **5 536 byte-identical comparisons at `anchor = 2.0`, 0 mismatches** |
 | 6 | a `tune.toml` key, default 0 | ✅ `[bm25f] anchor` |
 | 7 | the Node reader folds identically | ✅ with its own fixture — the differential arm could not have caught a forgotten transcription |
-| 8 | golden question(s) | 🔴 **Codex's** — SR-RS d23, and no Claude session opens the sealed key |
+| 8 | 🔴 **link-bearing DOCUMENTS first, then golden question(s)** | 🔴 **Codex's** — and the reason here was wrong. The ladder carries **0 `ref` edges on all eight rungs** and `work/golden/seed/` has no link syntax at all ([measured](../regression/2026-09-15-anchor-mechanism/report.md)), so **no question can exercise this field** — SR-RS d23a wants the *input*, not the query. Key access was never the blocker |
 | 9 | frozen pre-registration | ✅ [filed](../regression/2026-09-15-anchor-text/PRE-REGISTRATION.md) |
-| 10 | measure → verdict → default on only on PASS | 🔴 **blocked on 8** |
+| 10 | measure → verdict → default on only on PASS | 🔴 **blocked on 8.** ⚠ The arms have still never run; a [mechanism probe](../regression/2026-09-15-anchor-mechanism/report.md) measured **0 of 124 flips at every weight on four rungs**, which is a **data defect (23b), not a null**, and rules nothing |
 
 ### Three decisions the build made that the ruling did not
 

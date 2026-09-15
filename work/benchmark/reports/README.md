@@ -32,16 +32,22 @@ the defect.
 
 ## What is here
 
+**All five were rebuilt to the capture spine on 2026-09-15** — one slide per
+capture, titled by its CAP, CAP-7 none
+([SR-WORK-BENCHMARK](../../../records/0053_WORK-benchmark.md) decisions 14 and
+15). 🔴 **No number changed and nothing was re-executed**: a capture with a
+filed number now has a titled slide carrying it, and one without keeps a titled
+slide that says so and that the next run captures it.
+
 | report | run | captures with a number | notes |
 |---|---|---|---|
-| [`2026-08-28-benchmark-v1-vs-head.html`](2026-08-28-benchmark-v1-vs-head.html) | [`2026-08-28-benchmark-v1-vs-head`](../../regression/2026-08-28-benchmark-v1-vs-head/report.md) | CAP-3 (partial) · CAP-4 · CAP-5 · CAP-6 | 🔴 **CAP-1, CAP-2 and `hit@20`/`hit@50` have none** — the ranked lists were not retained, and the capture set postdates the run by 16 days. Each says so in its own section |
-| [`2026-08-28-benchmark-contested.html`](2026-08-28-benchmark-contested.html) | [`2026-08-28-benchmark-contested`](../../regression/2026-08-28-benchmark-contested/report.md) | the ranking endpoint, in this suite's own terms | 🔴 **CAP-1, CAP-2, CAP-4, CAP-5 and CAP-6 have none.** A ranking suite: no unanswerables, no byte count, and the report states outright that latency was not measured |
-| [`2026-09-13-benchmark-captures.html`](2026-09-13-benchmark-captures.html) | [`2026-09-13-benchmark-captures`](../../regression/2026-09-13-benchmark-captures/report.md) | **all seven** | The first run to file the complete set. Slides 14–17 carry the **lineage** of all four benchmark runs and 🔴 **the cross-run pairs that may never be compared** |
+| [`2026-08-28-benchmark-v1-vs-head.html`](2026-08-28-benchmark-v1-vs-head.html) | [`2026-08-28-benchmark-v1-vs-head`](../../regression/2026-08-28-benchmark-v1-vs-head/report.md) | CAP-3 (partial) · CAP-4 · CAP-5 · CAP-6 | 🔴 **CAP-1, CAP-2 and `hit@20`/`hit@50` have none** — the lists were not retained and the capture set postdates the run by 16 days. Each now says so on **its own** slide |
+| [`2026-08-28-benchmark-contested.html`](2026-08-28-benchmark-contested.html) | [`2026-08-28-benchmark-contested`](../../regression/2026-08-28-benchmark-contested/report.md) | CAP-3, in this suite's own terms | 🔴 **CAP-1, CAP-2, CAP-5 and CAP-6 have none.** A ranking suite: no unanswerables, no byte count, and latency deliberately not re-measured |
+| [`2026-09-12-benchmark-l9.html`](2026-09-12-benchmark-l9.html) | [`2026-09-12-benchmark-l9`](../../regression/2026-09-12-benchmark-l9/report.md) | CAP-1 · CAP-5 · CAP-6 | Regenerated 2026-09-15. **CAP-1's 600 filed lists have their own slide now**; the old page carried them as a sentence inside CAP-2 |
+| [`2026-09-13-benchmark-captures.html`](2026-09-13-benchmark-captures.html) | [`2026-09-13-benchmark-captures`](../../regression/2026-09-13-benchmark-captures/report.md) | **all seven** | The first run to file the complete set. Hand-built and **kept** — re-titled, CAP-5 and CAP-6 split, and a **CAP-1 slide added** from its own `ranked-lists.jsonl`. Slides 16–19 carry the lineage of the four earlier runs |
+| [`2026-09-15-node-column.html`](2026-09-15-node-column.html) | [`2026-09-15-node-column`](../../regression/2026-09-15-node-column/report.md) | CAP-6, four arms | 🔴 **This run had no report until 2026-09-15**, and CAP-7 has been mandatory since 2026-09-13. CAP-6 is read from `latency-<tier>.csv` **with the substitution stated on the page**; the other five say they have no number |
 
-**One filed benchmark run has no report at all:**
-[`2026-09-12-benchmark-l9`](../../regression/2026-09-12-benchmark-l9/report.md).
-It predates both the capture set and this directory; its numbers are filed and
-were not re-run. Building its report is **W-158**, with the harness change.
+**Every filed benchmark run now has a report.** The gap W-158 named is closed.
 
 ## Three rules that are easy to get wrong
 

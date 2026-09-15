@@ -56,6 +56,30 @@ questions were authored against document content, not against link structure.
 mechanism it judges is the contamination the whole scheme exists to stop.
 **Codex is available 2026-09-30.**
 
+🔴 **ADDENDUM 2026-09-15 — it is worse than "the questions do not exist", and
+no threshold below moves.** [The anchor mechanism probe](../2026-09-15-anchor-mechanism/report.md)
+counted the ladder's edges directly: **0 `ref` edges on all eight rungs**, every
+edge `supersedes`, and no link syntax anywhere in `work/golden/seed/`.
+`[graph] ask_kinds` follows **`ref` alone**, so on this corpus the `ask` walk has
+nothing to traverse — `fux graph --seed` on a *superseded* document returns the
+seed and nothing else.
+
+**Consequence for each arm, by arithmetic rather than prediction:**
+
+- **Arm A**'s RRF boost fuses the lexical ranking with a walk that reaches no
+  document, so it reorders **nothing**; its no-harm direction is trivially
+  satisfied and its gain is structurally zero.
+- **Arm B**'s `related` is **empty for every query**, so *"the answer document
+  appears in `related`"* is unsatisfiable at **any** fraction, and the median
+  length cap is trivially met at 0.
+
+**So the missing input is link-bearing DOCUMENTS, not link-dependent
+questions** — and a question set authored against a link-free corpus would still
+measure nothing. This addendum **changes no arm, no floor, no fraction and no
+cap**; it records that §*What the data must contain* is unsatisfied as a measured
+fact, and that the corpus decision it implies is Arpit's
+([analysis](../2026-09-15-anchor-mechanism/ANALYSIS.md) §Unresolved).
+
 **So this file freezes the bar and the procedure; the set is filled in by
 whoever authors it, and the numbers come after.** The item may build; it may
 not produce a number.

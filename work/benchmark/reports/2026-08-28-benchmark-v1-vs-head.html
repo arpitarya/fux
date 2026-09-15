@@ -269,6 +269,9 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
   color:var(--ink-3);font-size:14px;
 }
 .nonumber strong{color:var(--ink-2)}
+.finding{font-size:19px;line-height:1.45;color:var(--ink-2);margin:2px 0 18px;max-width:70ch}
+.finding strong{color:var(--ink-1)}
+
 </style>
 <div class="tick" id="tick"></div>
 <main class="deck" id="deck">
@@ -377,8 +380,9 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
 
 <section class="slide">
   <div class="wrap">
-    <p class="eyebrow">CAP&#8209;3 <span class="dim">/ hit@k &mdash; and why it could not move</span></p>
-    <h2>Both arms perfect, on every tier</h2>
+    <p class="eyebrow">CAP&#8209;3 <span class="dim">/ hit@k against the planted key</span></p>
+    <h2>CAP&#8209;3 &mdash; hit@k at 1, 5, 10, 20, 50</h2>
+    <p class="finding">Both arms perfect, on every tier</p>
     <div class="tblwrap">
       <table>
         <thead><tr>
@@ -430,8 +434,9 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
 
 <section class="slide">
   <div class="wrap">
-    <p class="eyebrow">CAP&#8209;4 <span class="dim">/ the answer layer, and the 20 planted unanswerables</span></p>
-    <h2>Nothing declined, in either version</h2>
+    <p class="eyebrow">CAP&#8209;4 <span class="dim">/ answered, declined, and the planted unanswerables</span></p>
+    <h2>CAP&#8209;4 &mdash; the answer layer</h2>
+    <p class="finding">Nothing declined, in either version</p>
     <div class="tblwrap">
       <table>
         <thead><tr>
@@ -454,21 +459,33 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
 
 <section class="slide">
   <div class="wrap">
-    <p class="eyebrow">CAP&#8209;1 &middot; CAP&#8209;2 <span class="dim">/ the ranked lists, and what moved</span></p>
-    <h2>Not captured by this run</h2>
-    <p class="nonumber"><strong>No number exists for this run, in either capture.</strong> The ranked lists were <strong>not retained</strong> &mdash; the plan recorded pass/fail per query and discarded the ordering &mdash; so there is nothing to diff and no rank delta to file. <strong>The run is frozen and was not re&#8209;executed to produce them.</strong></p>
+    <p class="eyebrow">CAP&#8209;1 <span class="dim">/ the ranked lists each arm returned</span></p>
+    <h2>CAP&#8209;1 &mdash; the ranked lists</h2>
+    <p class="nonumber"><strong>No number exists for this run &mdash; CAP&#8209;1 the ranked lists.</strong> The ordered lists were <strong>not retained</strong>: the plan recorded pass/fail per query and discarded the ordering. <em>The run is frozen and was not re&#8209;executed to fill this &mdash; what is done is done, and the next run captures it.</em></p>
     <div class="grid g2">
       <div class="card"><h3>What this costs a reader</h3><p>Every statement about <em>where</em> the two engines agree rests on <span class="mono">hit@5</span> being 240/240 &mdash; which is a ceiling. <strong>Whether the orderings below rank 5 were identical is unknown and unknowable from what was filed.</strong></p></div>
       <div class="card"><h3>Why it is a section and not a deletion</h3><p>A missing section reads as a capture that was never required. <strong>This one was required from 2026&#8209;09&#8209;13</strong>, and this run predates it &mdash; which is exactly what a reader needs to know before comparing it with a later run.</p></div>
     </div>
     <p style="font-size:13px;color:var(--ink-3)">🔴 <strong>This run is also the first in the store to file PER&#8209;QUERY ROWS</strong> for every query, arm and tier &mdash; which is why its <span class="mono">b</span>, <span class="mono">c</span> and every test above can be recomputed by anybody.</p>
+
   </div>
 </section>
 
 <section class="slide">
   <div class="wrap">
-    <p class="eyebrow">CAP&#8209;5 <span class="dim">/ the committed index, and the wheel</span></p>
-    <h2>The index held; the wheel collapsed</h2>
+    <p class="eyebrow">CAP&#8209;2 <span class="dim">/ what moved, arm A &rarr; arm B</span></p>
+    <h2>CAP&#8209;2 &mdash; what moved between the arms</h2>
+    <p class="nonumber"><strong>No number exists for this run &mdash; CAP&#8209;2 what moved.</strong> With no retained lists there is nothing to diff: no document entered or left, and no per&#8209;document rank delta was filed. <em>The run is frozen and was not re&#8209;executed to fill this &mdash; what is done is done, and the next run captures it.</em></p>
+    <div class="callout"><p>Every statement about <em>where</em> the two engines agree rests on <span class="mono">hit@5</span> being 240/240 &mdash; a ceiling. <strong>Whether the orderings below rank 5 were identical is unknown and unknowable from what was filed.</strong></p></div>
+
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">CAP&#8209;5 <span class="dim">/ the committed index</span></p>
+    <h2>CAP&#8209;5 &mdash; the committed index size</h2>
+    <p class="finding">The index held; the wheel collapsed</p>
     <div class="tblwrap">
       <table>
         <thead><tr>
@@ -492,8 +509,9 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
 
 <section class="slide">
   <div class="wrap">
-    <p class="eyebrow">CAP&#8209;6 <span class="dim">/ speed, arms interleaved A B A B, tier 10 000</span></p>
-    <h2>Both bars cleared, with the slower engine</h2>
+    <p class="eyebrow">CAP&#8209;6 <span class="dim">/ speed, arms interleaved A B A B</span></p>
+    <h2>CAP&#8209;6 &mdash; the speed</h2>
+    <p class="finding">Both bars cleared, with the slower engine</p>
     <div class="tblwrap">
       <table>
         <thead><tr>
@@ -528,6 +546,7 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
     </div>
     <hr class="rule">
     <p style="font-size:13px;color:var(--ink-3);margin:18px 0 0">The run is <span class="mono">work/regression/2026&#8209;08&#8209;28&#8209;benchmark&#8209;v1&#8209;vs&#8209;head/</span> &mdash; <span class="mono">report.md</span>, <span class="mono">ANALYSIS.md</span>, six <span class="mono">VERDICT</span> files, <span class="mono">evidence/rows/</span>. Frozen pre&#8209;registration: <span class="mono">work/benchmark/PRE-REGISTRATION-V1-VS-HEAD.md</span>. <strong>This report carries no number that run does not.</strong> What must be here at all: <span class="mono">records/0053_WORK-benchmark.md</span>.</p>
+      <p style="font-size:13px;color:var(--ink-3);margin:14px 0 0"><strong>Rebuilt 2026&#8209;09&#8209;15 to the capture spine</strong> &mdash; SR&#8209;WORK&#8209;BENCHMARK decision 14: one slide per capture, titled by its CAP, CAP&#8209;7 none. <strong>No number changed and nothing was re&#8209;executed</strong>; where a capture has none the slide says so. The slide ORDER is this run&rsquo;s own narrative, not id order &mdash; a rebuilt report keeps the argument it was written as.</p>
   </div>
 </section>
 
