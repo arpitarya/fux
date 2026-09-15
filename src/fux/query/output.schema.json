@@ -166,7 +166,9 @@
                       "enum": ["grounded", "partial", "weak", "none"],
                       "doc": "best first; BRANCH ON THIS" },
       "answerable": { "type": "bool", "required": "always",
-                      "doc": "false means abstain -- a refusal, not a low score" },
+                      "doc": "false means abstain -- a refusal, not a low score. 🔴 IT COVERS BOTH `none` AND `weak` SINCE 2026-09-14 (W-176 gate 1). Before that it was `band != none`, so a `weak` -- the ranking could not separate the top hits -- came back `true` while the band table said do not answer. BRANCH ON THIS, never on `band == \"none\"`: the second is right for one of the two refusals" },
+      "failed":     { "type": "any",  "required": "always",
+                      "doc": "list[str] -- WHICH gate refused, by name. `answerable: false` says stop; this says what stopped it. Today: `no_candidates` (nothing scored above zero) and `separation` (the ranking could not choose). `[]` when nothing refused -- and `[]` on `partial`, which is NOT a refusal: its defect is already named in `missing` or `verified: stale`. Always present; an absent key could not be told from a fux too old to have gates (W-48), which is the one reading that would make a consumer answer where it should abstain. The names GROW: W-176's remaining gates each append one and change nothing else" },
       "coverage":   { "type": "any",  "required": "always",
                       "doc": "float 0.0-1.0; the fraction of the query's idf mass the CORPUS contains. Unchanged since it shipped -- a query whose terms sit in four different documents scores 1.0 here, correctly" },
       "doc_coverage": { "type": "any", "required": "always",
@@ -187,6 +189,7 @@
     "example": {
       "band": "partial",
       "answerable": true,
+      "failed": [],
       "coverage": 0.6127,
       "doc_coverage": 0.4413,
       "doc_coverage_floor": 0.0,

@@ -137,8 +137,24 @@ Checked top to bottom; the first true row wins.
 |---|---|---|
 | `none` | nothing scored (`answerable: false`) | **abstain.** Say the index has nothing on it |
 | `partial` | a query term appears nowhere in the corpus (`missing` non-empty), or `doc_coverage` is below a non-zero `doc_coverage_floor` | answer, and **name the missing terms** — or retry (section 6) |
-| `weak` | `separation < separation_floor` — top two are near-tied | do not conclude; report the top candidates, or sharpen the query |
+| `weak` | `separation < separation_floor` — top two are near-tied (**`answerable: false`**) | **abstain.** Say *the documents don't say*, then name what was searched and the top candidates |
 | `grounded` | otherwise | use it and cite it |
+
+🔴 **`answerable: false` covers BOTH `none` and `weak`.** Branch on
+`answerable` and you are right for both; branch on `band == "none"` and you
+will answer every `weak` — which is what fux itself did until 2026-09-14, and
+four separate measured runs caught the symptom (20 of 20 unanswerable
+questions answered, twice; 0 abstentions of 124 on five golden rungs) without
+naming the cause.
+
+**What abstaining sounds like.** Not a hedge — a hedge is what you write when
+you have something to name, and `weak` means there is nothing:
+
+> The documents don't say. I searched for *<the query>*; the closest
+> documents are `<loc>` and `<loc>`, and the ranking could not separate them.
+
+⚠ **`partial` is the one you hedge on**, because its defect is nameable:
+answer, and say which of your terms appear in no document.
 
 - **`missing`** holds your own words, as typed, that no document contains. It is
   the field to surface to a human.
@@ -216,7 +232,7 @@ match `rollback`, via stemming).
 |---|---|
 | `No confident matches.` on **stderr** / band `none`, every term in `missing` | the corpus does not use these words — re-ask with the corpus's words, or add `--expand` |
 | band `partial`, some terms in `missing` | replace or drop the missing term; keep the rest |
-| band `weak` | add the distinguishing term, or add a `-q` phrasing; if still `weak`, report the top 2–3 |
+| band `weak` | add the distinguishing term, or add a `-q` phrasing; **if still `weak`, abstain** — *the documents don't say* — and report the top 2–3 as candidates rather than as an answer |
 | right area, wrong folder | `fux find "<q>" --under <prefix> --top 20` |
 | the document you expect is not listed | raise `--top` — **filters never add results** |
 | `grounded` but low `doc_coverage` | check `headings`; the answer may need two documents |
@@ -299,7 +315,9 @@ If a result carries `"archived": true`, follow the `fux-archived-results` policy
 - **Don't compare fused scores with single-query scores**, or any scores across queries or repos.
 - **Don't expect `--under`, `--phrase` or `--all` to surface more** — raise `--top`.
 - **Don't parse stderr.** The no-match line lives there now, with every other note.
-- **Don't answer from `weak` or `none`** and cite the returned files as if they said it.
+- **Don't answer from `weak` or `none`** and cite the returned files as if they
+  said it. Both carry `answerable: false`, and it is a **refusal, not a low
+  score** — there is nothing to hedge with, so say *the documents don't say*.
 - **Don't re-run an identical query** hoping for a different ranking.
 
 Related skills: fux-usage, fux-correct, fux-answer, fux-graph, fux-sources, fux-index, fux-maintain, fux-config, fux-mcp, fux-fetcher, fux-pii, fux-decoder, fux-enrich, fux-archived-results.

@@ -13,7 +13,7 @@ feature: configurable output defaults
 owns: [src/fux/output_config.py@d8c53dfbf3c9]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 5b4d30a18c903f7be335a367450c74b7d55911156017f381fd2f1fcacaa59154
+content_sha: fec3d87707fbdbb937e326908d8e9aa0d742e6867440d3df0d2ba08ed712f49e
 ---
 
 # SR-OUTPUT — output defaults are configurable, in a third file
@@ -739,6 +739,36 @@ key in this file costs every existing consumer an edit.* That is affordable for
 a genuinely new rendering question and never affordable for a second spelling of
 an existing one. **The test to apply is decision 19's own: is there a state a
 reader could want that no current key can express?** For `related` there is not.
+
+**24. W-176's signals get ONE output key between them — the `band` key that
+already exists** (2026-09-15).
+
+[`abstention-gates`](../work/compare/abstention-gates.compare.md) §4 ruled on
+2026-09-13 that *"`output.toml` decides which appear, per verb, exactly as it
+decides the band today"*, with `--json` carrying all of them regardless. **The
+first half is honoured through the key that is already there, not through nine
+new ones**, and the reason is decision 23b's, multiplied:
+
+- `--json` carries every signal unconditionally, as ruled.
+- **The prose surface is gated by `band`**, which a consumer already sets.
+  A `weak` line that now says *do not answer* is the same line under the same
+  key, not a new question a config file has to answer.
+- **Nine new required keys would be nine breaking changes**, each one making
+  `fux ask` exit 1 in every repository whose `output.toml` predates it
+  (decision 19). Nine gates landing one at a time is nine upgrades that each
+  break every consumer — for signals that are all one question: *how much did
+  fux believe itself, and why not*.
+
+⚠ **What this gives up, stated:** a consumer cannot show `nqc` in prose while
+hiding `clarity`. That is a real loss and a small one — the prose surface is
+for a person reading stderr, and a person reading a confidence line wants the
+reason, not a subset of the reasons. A consumer who wants the signals
+individually is reading `--json`, where they are all present and always were.
+
+**If a per-signal prose key is ever genuinely wanted**, decision 23's test is
+the one to apply: *is there a state a reader could want that no current key can
+express?* — and the answer would have to be yes for a specific signal, named,
+before a key is added for it.
 
 ### Consequences
 

@@ -159,7 +159,7 @@ per document in `audit.documents[]` (`freshness`, `indexed_sha`, `fetched_sha`,
 | `--band` says | do |
 |---|---|
 | `none` (`answerable: false`) | abstain: "the index has nothing on this" |
-| `weak` | show the passages as candidates; do not state a conclusion |
+| `weak` | **abstain** (`answerable: false`) — *the documents don't say*; show the passages as candidates and name what was searched, never a conclusion |
 | `partial` | answer, and name `missing` terms or the `stale` source |
 | `grounded` | answer, citing each passage's `loc` and its verdict |
 

@@ -49,7 +49,7 @@ advantage is a warm process with no per-call start-up, and a client with no shel
 |---|---|
 | `grounded` | use the results and cite them |
 | `partial` | answer, but **name every term in `missing`** — or retry with `expand` (below) |
-| `weak` | the top hits are not separable — **report the candidates, not a conclusion** |
+| `weak` | the top hits are not separable — **`answerable: false`, so abstain**: say *the documents don't say*, then report the candidates. Never a conclusion |
 | `none` (`answerable: false`) | **do not answer from these results.** Say what was searched and stop |
 
 - **`k`** defaults to the server's resolved `[mcp] top` (§3), and the tool schema

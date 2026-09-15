@@ -7,10 +7,10 @@ description: "Fux's readers are AI agents, and an engine whose output is misread
 status: accepted
 date: 2026-08-22
 feature: the agent-facing policy and skill artifacts Fux ships, and their installer
-owns: [src/fux/templates/agents@3d1c361e1ea2]
+owns: [src/fux/templates/agents@43209a8b0645]
 laws: [L1, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: f5596abd5b4edb3835a6466819d02e725326653b9d1d3de70daf79abc3c496e1
+content_sha: 0fefd4038d6be06c7105b683e2b0026a7e22e296063a3f11478bd534e5ac4ecd
 ---
 
 # SR-AGENT-POLICY — shipping the policy, not just the facts

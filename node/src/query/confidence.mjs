@@ -59,8 +59,16 @@ export class Confidence {
   }
 
   /** **A refusal, not a low number.** An agent handed `0.3` will use it anyway
-   *  and hedge in prose; one handed `answerable: false` has nothing to hedge. */
-  get answerable() { return this.band !== NONE; }
+   *  and hedge in prose; one handed `answerable: false` has nothing to hedge.
+   *
+   * 🔴 **`weak` IS a refusal** (W-176 gate 1, ruled by Arpit 2026-09-14). This
+   * read `band !== NONE` until then, so `weak` — *the ranking could not
+   * separate the top hits* — came back `answerable: true` while SR-CONFIDENCE
+   * decision 3's own table said **do not answer** beside it. Two fields on one
+   * payload disagreeing, and the one an agent branches on was the permissive
+   * one. `partial` stays answerable: it is a NAMEABLE defect, and `weak` has
+   * nothing to name. */
+  get answerable() { return this.band !== NONE && this.band !== WEAK; }
 
   /** The same signals with the refer plane's verdict filled in. `answer` ranks
    *  before it fetches, so the verdict does not exist when the rest are
@@ -77,10 +85,27 @@ export class Confidence {
    *  `band` and `answerable` are written out rather than left derivable — a
    *  consumer re-implementing the band rules would be a second copy of this
    *  policy, in another language, drifting from the day it was written. */
+  /** **Which gate refused, by name** — W-176's output surface, step 3.
+   *
+   * `answerable: false` tells a consumer to stop; this tells it what stopped
+   * it. `[]` on `partial`, deliberately: `partial` is not a refusal, and its
+   * defect is already named in `missing` or `verified: stale`. **The shape
+   * lands before the gates that fill it**, so a consumer written today keeps
+   * working as each of W-176's eight measured gates appends a name here. */
+  get failed() {
+    if (this.band === NONE) return ["no_candidates"];
+    if (this.band === WEAK) return ["separation"];
+    return [];
+  }
+
   asDict() {
     return {
       band: this.band,
       answerable: this.answerable,
+      // Always present, `[]` when nothing refused — an absent key could not be
+      // told from a reader too old to have gates (W-48), which is the one
+      // reading that would make a consumer answer where it should abstain.
+      failed: this.failed,
       coverage: this.coverage,
       separation: this.separation,
       separation_floor: this.separationFloor,

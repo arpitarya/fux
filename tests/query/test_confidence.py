@@ -226,10 +226,13 @@ def test_as_dict_declares_band_and_answerable_rather_than_leaving_them_derivable
     assert payload["answerable"] is True
     assert payload["missing"] == ["pgbouncer"]
     assert set(payload) == {
-        "band", "answerable", "coverage", "doc_coverage", "separation",
+        "band", "answerable", "failed", "coverage", "doc_coverage", "separation",
         "separation_floor", "doc_coverage_floor",
         "support", "verified", "missing",
     }
+    # W-176 step 3 — `failed` names WHICH gate refused, and is `[]` on a
+    # `partial`, which is not a refusal at all.
+    assert payload["failed"] == []
     # The floors are published for the OPPOSITE reason to `band`: not so a
     # consumer can re-derive the verdict, but so it can see the verdict is not
     # comparable across repos that tuned differently (SR-CONFIDENCE 13).
@@ -559,3 +562,112 @@ def test_no_tune_recomputes_the_band_at_the_ENGINE_defaults():
         assert load(root).separation_floor == 0.9
         assert load(root, enabled=False).separation_floor == SEPARATION_FLOOR
         assert load(root, enabled=False) == DEFAULT_TUNE
+
+
+# ---------------------------------------------------------------------------
+# W-176 gate 1 — `weak` implies `answerable: false`
+# ---------------------------------------------------------------------------
+
+
+def test_weak_is_a_refusal_not_a_low_score():
+    """🔴 **The gate, and the defect it closes.**
+
+    Until 2026-09-14 `answerable` was `band != none`, so a `weak` block came
+    back `answerable: true` — while SR-CONFIDENCE decision 3's own table said
+    **do not answer** on the same row. Two fields on one payload disagreeing,
+    and the one an agent branches on was the permissive one.
+    """
+    block = _q("rollback procedure", {"rollback": 40, "procedure": 12}, [1.0, 0.98])
+    assert block.band == WEAK
+    assert block.answerable is False
+    assert block.as_dict()["answerable"] is False, "the payload, not just the property"
+
+
+def test_partial_stays_answerable_and_that_is_the_distinction():
+    """`partial` is a NAMEABLE defect; `weak` has nothing to name.
+
+    A consumer can answer a `partial` and say which term the corpus does not
+    contain. There is no equivalent sentence for a `weak` — the ranking simply
+    could not choose — which is why one abstains and the other does not.
+    """
+    block = _q("rollback mtls", {"rollback": 40}, [10.0, 1.0])
+    assert block.band == PARTIAL
+    assert block.missing, "the defect is nameable, which is what partial means"
+    assert block.answerable is True
+
+
+def test_the_band_table_and_answerable_cannot_disagree():
+    """**The gate proper.** Walks the whole band table and asserts `answerable`
+    is the exact complement of the two bands decision 3 tells a consumer not to
+    answer from.
+
+    A future band added to the table with no line here is the failure this
+    catches: it would arrive answerable by default, which is the direction that
+    loses silently.
+    """
+    refuse = {NONE, WEAK}
+    for band, block in (
+        (NONE, Confidence(0.0, 0.0, 0, "unverified", ())),
+        (WEAK, _q("rollback procedure", {"rollback": 40, "procedure": 12}, [1.0, 0.98])),
+        (PARTIAL, _q("rollback mtls", {"rollback": 40}, [10.0, 1.0])),
+        (GROUNDED, _q("rollback", {"rollback": 40}, [10.0, 1.0])),
+    ):
+        assert block.band == band, f"fixture does not produce {band}"
+        assert block.answerable is (band not in refuse), band
+
+
+def test_a_zero_floor_makes_every_answer_answerable_and_that_is_the_cost():
+    """⚠ The knob that turns the gate off, stated rather than clamped.
+
+    `separation_floor = 0.0` means no answer is ever `weak` — and now that
+    `weak` is the refusal, it also means **fux never abstains on separation at
+    all**. That was already a legal and loud setting; the gate makes it louder,
+    and a consumer who sets it should find this sentence.
+    """
+    block = _q("rollback procedure", {"rollback": 40, "procedure": 12},
+               [1.0, 1.0], separation_floor=0.0)
+    assert block.band == GROUNDED
+    assert block.answerable is True
+
+
+def test_failed_names_which_gate_refused():
+    """`answerable: false` says stop; `failed` says what stopped it.
+
+    ⚠ **The shape lands with gate 1, before the gates that fill it.** W-176's
+    eight measured gates each append a name here and change nothing else, so a
+    consumer written today keeps working as each one lands — which is the whole
+    reason this key exists now rather than with the gate that first needs it.
+    """
+    weak = _q("rollback procedure", {"rollback": 40, "procedure": 12}, [1.0, 0.98])
+    assert weak.band == WEAK and weak.answerable is False
+    assert weak.failed == ["separation"]
+
+    nothing = signals([], [], {}, 0, [])
+    assert nothing.band == NONE and nothing.failed == ["no_candidates"]
+
+    # `partial` is NOT a refusal: its defect is named in `missing`, and putting
+    # it here would make `failed` mean "something is imperfect" rather than
+    # "this is why you may not answer".
+    partial = _q("rollback mtls", {"rollback": 40}, [10.0, 1.0])
+    assert partial.band == PARTIAL and partial.answerable is True
+    assert partial.failed == []
+
+    grounded = _q("rollback", {"rollback": 40}, [10.0, 1.0])
+    assert grounded.band == GROUNDED and grounded.failed == []
+
+
+def test_every_refusal_names_at_least_one_failed_gate():
+    """The invariant that keeps the two keys honest: **`answerable: false` and
+    an empty `failed` is a refusal with no stated reason**, which is the state
+    an agent cannot report and a maintainer cannot debug.
+
+    A ninth gate added without a `failed` name would land in exactly that state
+    and pass every other test in this file.
+    """
+    for block in (
+        signals([], [], {}, 0, []),
+        _q("rollback procedure", {"rollback": 40, "procedure": 12}, [1.0, 0.98]),
+        _q("rollback mtls", {"rollback": 40}, [10.0, 1.0]),
+        _q("rollback", {"rollback": 40}, [10.0, 1.0]),
+    ):
+        assert bool(block.failed) is (block.answerable is False), block.band

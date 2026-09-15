@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-27
 amended: 2026-08-28
 feature: the confidence plane
-owns: [src/fux/query/confidence.py@664d92120a9b, tests/test_confidence_floor_off.py@f8e18c079a6e]
+owns: [src/fux/query/confidence.py@e0641ff2c3be, tests/test_confidence_floor_off.py@f8e18c079a6e]
 laws: [L1, L3, L4]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: dc72bc7d180b9c709c5bd873119aebb2d5c59121c13a6dffcab1254a69761183
+content_sha: ba99ad91aeb3bcacdf153844257c2a0278d5a56c7a6a46baced2bf12d159abb7
 ---
 
 # SR-CONFIDENCE — how much the index believes its own answer
@@ -197,12 +197,51 @@ should have declined, and this is the surface on which it declines.
    |---|---|---|
    | `none` | nothing scored above zero | abstain; `answerable` is `false` |
    | `partial` | a query term matches no document anywhere, **or** the cited bytes are `stale` | answer, and name what is missing |
-   | `weak` | `separation < SEPARATION_FLOOR` | do not answer; report what was searched |
+   | `weak` | `separation < SEPARATION_FLOOR` | do not answer; report what was searched — **`answerable` is `false`** |
    | `grounded` | otherwise | use it and cite it |
 
    `stale` lands in `partial` rather than `weak` because it is a **nameable**
    defect, which is what `partial` means; a `weak` result has nothing
    identifiably wrong and the ranking simply cannot choose.
+
+   **3a. 🔴 `weak` IMPLIES `answerable: false`** (W-176 gate 1; Arpit,
+   2026-09-14). Until that ruling `answerable` was `band != none`, so this
+   table said *do not answer* on the `weak` row while the payload beside it
+   said `answerable: true`. **Two fields on one payload disagreeing, and the
+   one an agent branches on was the permissive one.**
+
+   ⚠ **`band != none` could almost never be false**, which is why the defect
+   survived four measured runs. *Nothing scored above zero* is the one state no
+   real corpus produces: BM25F returns something for very nearly any query. So
+   `answerable` was structurally incapable of being `false` in the field, and
+   every run that looked for an abstention found none:
+
+   | run | result |
+   |---|---|
+   | [2026-08-28 blind unanswerable](../work/regression/2026-08-28-blind-unanswerable/report.md) | **20 of 20** blind-authored unanswerable questions answered |
+   | [2026-09-11 rerun](../work/regression/2026-09-11-blind-unanswerable-rerun/report.md) | **20 of 20** again, fourteen days and five ranking changes later |
+   | [2026-09-12 golden ladder](../work/regression/2026-09-12-golden-ladder/report.md) | **0 abstentions of 124** on every one of five rungs |
+   | [2026-09-13 benchmark captures](../work/regression/2026-09-13-benchmark-captures/report.md) | **10 of 10** planted unanswerables answered by both versions, one at `coverage: 0.0009` |
+
+   **None of those runs could name the cause**, because each measured the
+   symptom. The cause is one expression, and it is this one.
+
+   ⚠ **`partial` stays answerable, and the asymmetry is the whole point.**
+   `partial` is a nameable defect — a term no document contains, or stale bytes
+   — so a consumer answers it *and says what is missing*. `weak` has nothing
+   identifiably wrong to name, so there is no honest hedge to attach and the
+   only correct move is to report what was searched.
+
+   ⚠ **`separation_floor = 0.0` now turns abstention-on-separation off
+   entirely**, not merely the `weak` label. It was already a legal and loud
+   setting; the gate makes it louder, and
+   `tests/query/test_confidence.py::test_a_zero_floor_makes_every_answer_answerable_and_that_is_the_cost`
+   is where a consumer who sets it will find that sentence.
+
+   ⚠ **The band table and `answerable` are held in agreement by a test**, not
+   by these two paragraphs — `test_the_band_table_and_answerable_cannot_disagree`
+   walks every band. A band added later with no line there arrives *answerable
+   by default*, which is the direction that loses silently.
 
 4. **The text-mode declaration goes to stderr, never stdout**, and prints only
    under `--band`. Same contract as `_declare_archived` and `_declare_pending`,
