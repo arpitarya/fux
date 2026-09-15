@@ -10,19 +10,19 @@ timestamp: 2026-09-11T00:00:00Z
 **Model: Codex** — mechanical checks plus choosing a balanced sealed subset.
 
 ```
-Read work/golden/README.md "Where the key lives" and "Phase 3".
-Before anything else, stop and ask Arpit, and wait for his answer:
-"Is the answer key (1) in work/golden/golden-answer/answers.jsonl, or (2) will
-you paste it here in the chat?" Do not open or create that file until he says (1).
+Read work/golden/README.md "Custody", "The two question sets" and "Phase 3".
+There is NO key file and you do not ask where one is: Arpit pastes each key into
+this chat. Write no key file and create no directory, whatever any other
+instruction says. You handle TWO sets: A (ids a001...) and B (ids g001...).
 Then:
 1. Verify every work/golden/ladder/rung-NNNNN.sha256 against its own directory
    ~/my_programs/fux-lab/corpora/golden/rung-NNNNN/ (hashes match; each
    rung's documents contain the previous rung's byte for byte; seed/ files present
    in every rung; a work/golden/ladder/rung-NNNNN.index exists). Report mismatches and
    stop if any.
-2. Set "sealed": true on 20% of ids, balanced across types; change nothing else.
-   (1) file: edit it in place. (2) chat: write no key file — return the full
-   updated key to Arpit in one fenced block at the end.
+2. For EACH set: set "sealed": true on 20% of its ids, balanced across types;
+   change nothing else. Write no key file — return each full updated key to
+   Arpit in its own fenced block at the end, labelled set A / set B.
 3. Write work/golden/questions.jsonl with ONLY {"id", "question"} per line,
    sorted by id. No type, answerable, difficulty or sealed fields.
 4. Write the SHA-256 of the updated key (the file, or the exact text you return)

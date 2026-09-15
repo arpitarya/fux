@@ -28,6 +28,25 @@ Rules:
 
 
 
+## 2026-09-15 — **two golden question sets, and the answer key stops being a file**
+
+| item | what landed | evidence |
+|---|---|---|
+| **L11 amended** | the law's subject moves from *the key directory is closed to Claude* to **the key is Arpit's custody and no agent may read one** — both sets one subject, **no key file anywhere an agent can reach**, the one route a paste and **Codex's alone**, Claude closed on every route | [SR-LAW-11](../records/0012_LAW-11-sealed-answer-key.md) decisions 2–4 |
+| **the authoring carve-out** | 🔴 exactly one handoff wide — the session that authors set A writes no file, hands the answers over in the chat, and **never runs a rung or returns**. Authorship buys no access | SR-LAW-11 decision 6 |
+| **two sets** | A (Claude, ids `a001…`) and B (Codex, ids `g001…`), same seed corpus and ladder, **run and reported apart**; 🔴 **never pooled** | [SR-WORK-GOLDEN](../records/0066_WORK-golden.md) decisions 8–11 |
+| **the per-run key question deleted** | *"(1) the file, or (2) the chat?"* removed from prompts 1, 3 and 5 — it had one answer left. Prompt 4 writes two prediction files; [`prompts/1a-claude-set-a.md`](golden/prompts/1a-claude-set-a.md) is new | SR-WORK-GOLDEN decision 10 |
+| **difficulty, built** | [`tools/golden-difficulty/`](../tools/golden-difficulty/) — a **count of the discriminations a question forces** (`d ≤ 1` easy / `2` medium / `≥ 3` hard, unanswerable **floored at hard**) plus a per-rung distractor count. 🔴 Never derived from fux's own results; 🔴 **refuses a key path inside the repository**. `--selftest` green on six synthetic fixtures | SR-WORK-GOLDEN decision 13 · [W-190](open/W-190-question-difficulty.md) |
+| **what it does NOT buy** | ⚠ **no number moved and no engine ran.** Set A is unwritten, both keys are still Arpit's to regenerate, and **every set A number will be `informed` permanently** — an assumption recorded in SR-LAW-11 decision 7, not Arpit's ruling | [W-189](open/W-189-two-question-sets.md) |
+
+## 2026-09-15 — **the benchmark's arms settle at `A` · `B` · `B-node`**
+
+| item | what landed | evidence |
+|---|---|---|
+| **decision 16a** | 🔴 the tier-off arm is **not a benchmark arm** — a benchmark measures what ships, and `[graph] ask_boost`/`ask_related` default to `true`. `NODE_ARMS` is one entry; `RANK_PAIRS` is two | [SR-WORK-BENCHMARK](../records/0053_WORK-benchmark.md) decision 16a |
+| **what it costs** | 🔴 **the graph tier's VALUE stays unmeasured on both readers** and returns to [W-161](open/W-161-graph-composed-ask.md). Decision 12a's attribution run stands as filed history, not as a standing column | decision 16a |
+| **what it buys** | every run's tables carry only configurations a user is actually served, and one fewer pass per capture | decision 16a |
+
 ## 2026-09-15 — **the Node column wired into every capture (code), and a banned filename found**
 
 | item | what landed | evidence |

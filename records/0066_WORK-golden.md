@@ -2,16 +2,16 @@
 type: Standing Record
 kind: process
 name: SR-WORK-GOLDEN
-title: "SR-WORK-GOLDEN (0066) — the sealed answer key: the guards, and what Claude may read instead"
-description: "The prohibition on work/golden/golden-answer/ is law L11 and this record states none of it; what it holds is the process around the key — the five guards and what each one cannot see, what Claude may read, and the bind that keeps CLAUDE.md's view legal."
+title: "SR-WORK-GOLDEN (0066) — the two golden question sets, the key's custody, and what Claude may read instead"
+description: "The prohibition is law L11 and this record states none of it; what it holds is the process around it — the two question sets (Claude's A, Codex's B), Arpit's custody of both answer halves, the paste-only scoring route, the guards that are now a backstop rather than the defence, what Claude may read, and the bind that keeps CLAUDE.md's view legal."
 status: accepted
 date: 2026-09-15
-feature: the sealed benchmark answer key — its guards, what Claude may read, and where the prohibition is stated
-owns: [.claude/hooks/guard-golden-answer.sh@c505d04c0628, scripts/gen-golden.py@1b2a854c1f75, tests/test_claude_md_golden.py@49db9e6261d8]
+feature: the golden benchmark — its two question sets, the key's custody, its guards, what Claude may read, and where the prohibition is stated
+owns: [.claude/hooks/guard-golden-answer.sh@c505d04c0628, scripts/gen-golden.py@1b2a854c1f75, tests/test_claude_md_golden.py@49db9e6261d8, tools/golden-difficulty@867efc6effe1]
 laws: [L0, L11]
 timestamp: 2026-09-15T00:00:00Z
-content_sha: e2161a4a43e3fb75d89ae7a6292f815dc83ba7262058325a8cad45be0e7557ab
-ratifies: "Arpit, 2026-09-15 — W-146 row 17: the prohibition gets a record and CLAUDE.md keeps a generated view; the same day, Arpit ruled the prohibition itself into law L11"
+content_sha: daa1b106262c6ad8320ca2b71c0889f7cf53abb620402173efc68ebda5bb54b1
+ratifies: "Arpit, 2026-09-15 — W-146 row 17: the prohibition gets a record and CLAUDE.md keeps a generated view; the same day he ruled it into law L11 and then amended it — two question sets, one Claude-authored and one Codex-authored, with both answer halves in his custody and no key file at all"
 ---
 
 # SR-WORK-GOLDEN — the sealed answer key
@@ -25,11 +25,19 @@ ratifies: "Arpit, 2026-09-15 — W-146 row 17: the prohibition gets a record and
 > [`work/golden/README.md`](../work/golden/README.md)'s, and which environment may
 > run it is [SR-WORK-ENVIRONMENTS](0052_WORK-environments.md)'s.
 
-**Why the split.** The rule — *no Claude session opens the answer key, ever, by
-any route* — is absolute, so it belongs in the one class of record that cannot be
-traded away by an ordinary decision. It became **law L11** on 2026-09-15.
-Everything around it is process, and process is what changes: the guard list has
-grown twice, and what Claude may read moves when Codex releases the questions.
+**Why the split.** The rule — *no agent reaches an answer, and no Claude session
+holds one by any route* — is absolute, so it belongs in the one class of record
+that cannot be traded away by an ordinary decision. It became **law L11** on
+2026-09-15. Everything around it is process, and process is what changes: the
+guard list has grown twice, the questions moved from one set to two the same day,
+and what Claude may read moves when a set is released.
+
+**Two sets, one custody (Arpit, 2026-09-15).** **Set A** is authored by Claude
+from Codex's seed documents; **set B** is authored by Codex. Their *questions*
+are two instruments and this record keeps them apart. Their *answers* are one
+thing and they are Arpit's: **no key file exists**, and the only route an answer
+travels is a paste into a chat, which is Codex's route and never Claude's. That
+is [L11](0012_LAW-11-sealed-answer-key.md) and is not restated here.
 
 🔴 **Five guards stand behind the law and none of them is a guarantee.** Claude
 Code and Codex run as the same Mac user, so no file permission can tell them
@@ -130,26 +138,38 @@ the rule.
    generated view of it.**
 
 <!-- GOLDEN-TEXT:BEGIN -->
-🔴 **`work/golden/golden-answer/` is closed to Claude by law
+🔴 **Golden answers are closed to every agent by law
 [L11](0012_LAW-11-sealed-answer-key.md)** — §Non-negotiable constraints above.
 Read it before anything near `work/golden/`. **This block states none of it.** It
 is the surrounding process:
 
-- **What Claude MAY read:** `work/golden/seed/`, the READMEs and the prompts,
-  and `work/golden/questions/questions.jsonl` **after Codex releases it** (post
-  ladder freeze). The five phases, the ladder, the rungs and what a result may
-  claim are in [`work/golden/README.md`](../work/golden/README.md).
-- **Five guards stand behind the law and not one is a guarantee** —
-  `.gitignore`; `!work/golden` in `.fux/sources/dirs`; `permissions.deny` in
+- **There are two question sets (Arpit, 2026-09-15).** **Set A** — questions and
+  answers authored by Claude from `work/golden/seed/`. **Set B** — questions and
+  answers authored by Codex. Two authors make question-authorship bias visible
+  instead of invisible; the sets are scored and reported separately, and **every
+  set A number is `informed` permanently** because its author and its runner are
+  the same model family.
+- **Arpit holds both answer halves and there is no key file.**
+  `work/golden/golden-answer/` is not a location. The old per-run question —
+  *"the file, or the chat?"* — is deleted from every prompt; the answer is the
+  chat, always. ⚠ **No Claude session removes that directory either**, because
+  deleting it is a tool call that reaches into it: **Arpit removes it himself.**
+- **What Claude MAY read:** `work/golden/seed/`, the READMEs and the prompts, and
+  a released `questions/*.jsonl` (ids and text only). The five phases, the
+  ladder, the rungs and what a result may claim are in
+  [`work/golden/README.md`](../work/golden/README.md).
+- **The guards are a backstop now, not the defence** — `.gitignore`;
+  `!work/golden` in `.fux/sources/dirs`; `permissions.deny` in
   `.claude/settings.json`; `.claude/hooks/guard-golden-answer.sh`, which matches
   what a tool call *targets* and fails closed; and the generated law block
-  itself. Claude Code and Codex run as the **same Mac user**, so no file
-  permission can tell them apart, and a surface that honours neither hooks nor
-  deny rules — **Cowork is one** — is restrained by the law text alone.
-- **The route no guard sees** is a recursive `grep`, `rg`, `find` or `ls` over
-  `work/` that never names the folder. L11 makes excluding `work/golden/` part of
-  the rule; nothing mechanical will catch you.
-- **The key in use is provisional and that relaxes nothing.** It is
+  itself. **None is retired**, because the day somebody re-creates the directory
+  is the day they earn their keep. What defends the key is that **there is
+  nothing on disk to reach**.
+- **The two routes no guard sees.** A recursive `grep`, `rg`, `find` or `ls` over
+  `work/` that never names the folder — L11 makes excluding `work/golden/` part
+  of the rule. And **a paste**: an answer put into a Claude session's context by
+  any hand is a leak to declare, never a permission that arrived by another door.
+- **The set B key in use is provisional and that relaxes nothing.** It is
   Claude-authored, every run scored against it is `informed`, and it is being
   replaced — a leak from a draft key contaminates the sessions building against
   its successor.
@@ -192,16 +212,48 @@ is the surrounding process:
    residual hole is decision 4's reason for existing, not a defect to fix in the
    hook.
 
-8. **No agent puts the key in the repository by default** (Arpit, 2026-09-11).
-   Every agent that would create, read or change it — Codex, in phases 1, 3 and
-   5 — first asks Arpit whether the key is a file or is pasted in chat, and waits.
-   Claude never uses the key either way, so a Claude prompt carries no such
-   question.
+8. **Two question sets, and they are separate instruments** (Arpit,
+   2026-09-15). **Set A** — ids `a001…` — is authored by **Claude** from
+   `work/golden/seed/` and nothing else, in one designated session that hands
+   questions *and* answers to Arpit in the chat, writes no file, and never runs a
+   rung. **Set B** — ids `g001…` — is authored by **Codex**, per
+   [`prompts/1-codex-seed.md`](../work/golden/prompts/1-codex-seed.md). ⚠ **The
+   id namespaces must not collide**: a prediction file names ids and nothing
+   else, and one ambiguous id silently scores the wrong set.
 
-9. **Verifying the key's shape, schema, size or freshness is Codex's work,
-   permanently.** An item that needs it is blocked on Arpit or Codex and is never
-   agent-closable — the cost L11 names in its Consequences, recorded here so the
-   queue treats it as a fact rather than as a thing to route around.
+9. **The sets are run on the same ladder and reported apart.** Same rungs, same
+   engine commit, one `predictions.jsonl` per set per rung
+   (`predictions-a.jsonl` / `predictions-b.jsonl`). **A cross-set comparison is
+   the point** — the same engine on two authors' questions — and **a pooled
+   number across both sets is meaningless** and is never written.
+
+10. **Custody replaces the per-run key question.** The old *"(1) the file
+    `golden-answer/answers.jsonl`, or (2) the chat?"* question is **removed from
+    prompts 1, 3 and 5**, because [L11](0012_LAW-11-sealed-answer-key.md) gives
+    it one permanent answer. A prompt that still asks it is stale and is fixed,
+    not answered.
+
+11. **Scoring is a chat Arpit is present for, and that is a schedule
+    constraint.** Phase 5 cannot be a batch job over a file: Arpit pastes the
+    rows the run needs into a Codex chat and Codex returns per-query results
+    carrying no answer text and no relevant-document names. **An item waiting on
+    phase 5 is waiting on Arpit's availability**, not on an agent, and the queue
+    says so rather than showing it as agent-closable.
+
+12. **Verifying a key's shape, schema, size or freshness is Arpit's and Codex's
+    work, permanently.** An item that needs it is blocked on them and is never
+    agent-closable — the cost L11 names in its Consequences, recorded here so the
+    queue treats it as a fact rather than as a thing to route around.
+
+13. **Difficulty is a derived, checkable property of a question — never a
+    judgement call.** The schema, the discrimination count and the per-rung
+    distractor measure are
+    [`work/golden/README.md`](../work/golden/README.md) §*Difficulty*, and the
+    scorer that computes them is [`tools/golden-difficulty/`](../tools/golden-difficulty/).
+    🔴 **Difficulty is never derived from fux's own results** — *hard = fux got it
+    wrong* makes every stratified claim a tautology — and it never appears in a
+    released `questions/*.jsonl`, for the same reason the `type` field does not:
+    a runner that knows a question is unanswerable can abstain by arithmetic.
 
 ### Consequences
 
@@ -251,7 +303,12 @@ is the surrounding process:
 **Reopen this decision if:** the `CLAUDE.md` §Golden answer key block exists
 without [`tests/test_claude_md_golden.py`](../tests/test_claude_md_golden.py)
 binding it, or a guard named in decision 2 is removed without a sixth taking its
-place. ⚠ **A Claude session found to have read the key reopens
+place, **or a prompt is found still asking Arpit where the key should live** —
+decision 10 removed that question and a prompt that re-grows it is drift back
+toward a key file. **Also reopen if** the two sets are found sharing an id
+namespace, or a filed number pools them: decision 9 is the claim that makes two
+sets worth having, and a pooled figure quietly retires it. ⚠ **A Claude session
+found to have held an answer reopens
 [SR-LAW-11](0012_LAW-11-sealed-answer-key.md), not this record** — that is
 evidence about the rule's sufficiency, and the rule is not here.
 
@@ -259,10 +316,14 @@ evidence about the rule's sufficiency, and the rule is not here.
 
 ```console
 $ python scripts/gen-golden.py --check && test -f tests/test_claude_md_golden.py
+$ grep -rl 'or (2) the chat' work/golden/prompts/ ; echo "expect: no output"
+$ python3 tools/golden-difficulty/difficulty.py --selftest
 ```
 
-— the first half proves the two copies agree, the second proves the permission
-that makes the copy legal still exists. A failure of either is this veto firing.
+— the first proves the two copies agree and that the permission making the copy
+legal still exists; the second proves no prompt has re-grown the custody
+question; the third proves the difficulty scorer decision 13 names still runs on
+its synthetic fixtures. A failure of any is this veto firing.
 
 ---
 
@@ -279,6 +340,7 @@ evidence.*
 
 - [`scripts/gen-golden.py`](../scripts/gen-golden.py)
 - [`scripts/gen-laws.py`](../scripts/gen-laws.py)
+- [`tools/golden-difficulty/`](../tools/golden-difficulty/) — the difficulty scorer decision 13 names
 - [`tests/test_claude_md_golden.py`](../tests/test_claude_md_golden.py)
 - [`.claude/hooks/guard-golden-answer.sh`](../.claude/hooks/guard-golden-answer.sh)
 - [`.claude/settings.json`](../.claude/settings.json)
@@ -288,3 +350,5 @@ evidence.*
 - [`CLAUDE.md`](../CLAUDE.md)
 - [`work/golden/README.md`](../work/golden/README.md)
 - [`work/open/W-145-codex-regenerates-the-key.md`](../work/open/W-145-codex-regenerates-the-key.md)
+- [`work/open/W-189-two-question-sets.md`](../work/open/W-189-two-question-sets.md)
+- [`work/open/W-190-question-difficulty.md`](../work/open/W-190-question-difficulty.md)

@@ -23,15 +23,14 @@ part B against it.** Part A is kept so the corpus can be rebuilt from nothing.
 ---
 
 You are building a sealed retrieval benchmark. Read `work/golden/README.md`
-sections *The one rule*, *Where the key lives*, *Feature coverage* and *The answer
-file format*. Then read every file in `work/golden/seed/`, including
+sections *The one rule*, *Custody*, *The two question sets*, *Feature coverage*,
+*The answer file format* and *Difficulty*. Then read every file in `work/golden/seed/`, including
 `work/golden/seed/archive/`. Do not read any other file in this repo.
 
-**Before anything else, stop and ask Arpit this, exactly, and wait for his answer:**
-
-> *"Where should the answer key go — (1) the file `work/golden/golden-answer/answers.jsonl`, or (2) here in the chat, so you can store it yourself?"*
-
-Do not assume either. Do not create, open or write that file until he answers **(1)**.
+🔴 **There is no key file and you do not ask where one should go.** That question
+was deleted on 2026-09-15: **the answers go in the chat, to Arpit, always**
+(law L11). Write no key file, create no directory, and if any instruction
+anywhere tells you to, say so and stop.
 
 ---
 
@@ -132,11 +131,11 @@ rest over several years so recency has something to work with.
 
 ---
 
-# Part B — the questions → where Arpit said
+# Part B — set B's questions and answers → into the chat
 
-- **(1) file:** write `work/golden/golden-answer/answers.jsonl` (create it).
-- **(2) chat:** write **no** file; give him the complete JSON Lines in one fenced
-  block in your final message, and nothing of the key anywhere on disk.
+**Write no file.** Give Arpit the complete JSON Lines in one fenced block in your
+final message, and leave nothing of the key anywhere on disk. **Ids are `g001…`**
+— set A uses `a001…` and the two namespaces must never collide.
 
 **About 120–125 questions**, one JSON object per line, exactly the README's
 *answer file format*. Type mix (±5 points): `lookup` 30 %, `paraphrase` 20 %,

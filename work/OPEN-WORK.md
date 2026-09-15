@@ -43,7 +43,9 @@ agent-closable; this row is a session output, not a stop.
 
 
 - 🟢 **W-154** · `agent` 🧨 — Part B RAN and is **VOID**: 75 % of the `ask` regression is the query's own source document winning. Fix named (exclude the citing document); needs a NEW pre-registration. [detail](open/W-154-rerank-weight-cost.md)
-- 🟣 **W-136** · `arpit`, waiting on **2026-09-30** — everything an agent can do is done; **phase 5 scoring is Codex's hands** and is all that is left. [detail](open/W-136-golden-benchmark.md)
+- 🟢 **W-189** · `agent` — **two question sets** (Claude's A, Codex's B) and **no key file at all**: L11 amended, prompts rewritten 2026-09-15. Left: **author set A in a fresh session** (prompt 1a). [detail](open/W-189-two-question-sets.md)
+- 🟣 **W-190** · `agent`, waiting on **W-145** — difficulty is a **count of discriminations**, not a label; schema + scorer BUILT 2026-09-15. The first real run needs a key. [detail](open/W-190-question-difficulty.md)
+- 🟣 **W-136** · `arpit`, waiting on **2026-09-30** — everything an agent can do is done; **phase 5 scoring is Codex's hands** and is all that is left. ⚠ **Phase 5 is now a chat he attends** — there is no key file to batch over. [detail](open/W-136-golden-benchmark.md)
 - 🟣 **W-145** · `arpit`, waiting on **2026-09-30** — Codex regenerates the golden answer key; until then every golden number is `informed`. [detail](open/W-145-codex-regenerates-the-key.md)
 - 🟣 **W-87** · `agent`, waiting on W-145 — P2's `unanswerable` gate is measured (0/124); recall needs phase 5 and **Part B needs an uncontaminated key**. [detail](open/W-87-what-good-means.md)
 - 🟣 **W-175** · `agent`, waiting on **2026-09-30** — does a correction help OTHER phrasings? Ruled 2026-09-14: three arms (dogfood · fux's own tree · Codex), N=12 / M=5. Harness now; the numbers wait for Codex's blind paraphrases. [detail](open/W-175-correction-generalisation.md)

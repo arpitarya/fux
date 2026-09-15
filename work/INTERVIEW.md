@@ -2396,6 +2396,34 @@ the reason is that the measuring environments are gone.**
 *Updated **2026-09-12** (Claude Code, Opus) — maintainer line: this session.*
 *Updated **2026-09-13** (Cowork, Opus) — maintainer line: this session.*
 
+### The golden key is no longer a file (2026-09-15, Cowork)
+
+**Read this before touching anything near `work/golden/`.** The shape a previous
+session would remember is gone:
+
+- **There are two question sets**, not one — **A** authored by Claude over
+  Codex's seed documents (ids `a001…`), **B** authored by Codex (ids `g001…`).
+  Same corpus, same ladder, **run and reported apart and never pooled**.
+- **No answer key exists as a file.** Arpit holds both and pastes what a run
+  needs; the *"(1) the file, or (2) the chat?"* question is **deleted** from
+  prompts 1, 3 and 5. A prompt that still asks it is stale.
+- 🔴 **Law [L11](../records/0012_LAW-11-sealed-answer-key.md) now closes every
+  agent out of a key file and closes Claude out of a paste too.** The one
+  exception is **authoring set A**, one handoff wide: that session writes no
+  file, hands the answers to Arpit in the chat, and **never runs a rung or
+  returns**.
+- ⚠ **`work/golden/golden-answer/` is Arpit's to delete.** No agent may, because
+  deleting is a tool call that reaches into it. Its existence authorizes nothing.
+- ⚠ **Set A will never be `blind`** — author and runner are one model family.
+  That is an assumption filed as SR-LAW-11 decision 7, not Arpit's ruling.
+- **Difficulty is a count now, not a label** — `tools/golden-difficulty/`,
+  `d ≤ 1` / `2` / `≥ 3`, unanswerable floored at hard, plus a per-rung distractor
+  count. 🔴 Never derived from fux's own results. **The bands are movable only
+  until a number is scored against them** (SR-RS 10b).
+- **Next on it:** author set A with `prompts/1a-claude-set-a.md`, in a session
+  that has never run a rung or read `questions/`. That is [W-189](open/W-189-two-question-sets.md)'s
+  only agent-closable piece.
+
 ### In flight: the 3.0.0-alpha.0 branch is open and empty of code (2026-09-13, Cowork)
 
 - **W-160** is the first build item on `release/3.0.0-alpha.0` — the two atoms
