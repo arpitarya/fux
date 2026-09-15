@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+from pathlib import Path
 
 import pytest
 
@@ -238,3 +239,70 @@ def test_a_missing_header_is_not_reported_as_a_version_skew(tmp_path):
     message = str(exc.value)
     assert "no _format header" in message
     assert "different version" not in message
+
+
+# --- W-185: the transient a write leaves in a COMMITTED directory -------------
+#
+# 🔴 **`_atomic_write` writes `<shard>.jsonl.tmp` beside the shard, and
+# `.fux/index/` is committed.** `post-commit` defers, so a consumer's next
+# `git add -A` legitimately overlaps a live writer, lists the temp file, and
+# fails to stat it once the rename lands:
+#
+#     fatal: unable to stat '.fux/index/ad.jsonl.tmp': No such file or directory
+#
+# Captured in `tests_e2e` on 2026-09-15 (~1 run in 3 that day) and driven
+# deliberately by `tools/runner-race/soak.py`. **The sibling rename is correct
+# and stays** — `os.replace` is atomic only within one filesystem — so what the
+# fix moves is the ignore rule, measured at 0 failures in 3 871 `git add -A`
+# runs against 2 335 of 3 933 without it.
+
+
+def test_the_generated_gitignore_covers_the_shard_temp_file():
+    """The template a NEW consumer is given, and the name `_atomic_write` uses.
+
+    ⚠ **Held together deliberately.** The two live in different modules, and a
+    rename in either one would leave the other correct and the pair useless —
+    which is exactly the drift that put this failure in front of a consumer.
+    """
+    import fnmatch
+
+    from fux.store.fuxdir import _GITIGNORE
+
+    patterns = [
+        line.strip()
+        for line in _GITIGNORE.splitlines()
+        if line.strip() and not line.startswith("#")
+    ]
+    # The name `_atomic_write` actually produces, derived rather than spelled.
+    shard = Path("00.jsonl")
+    temp_name = shard.with_suffix(shard.suffix + ".tmp").name
+    assert any(
+        fnmatch.fnmatch(f"index/{temp_name}", pattern) for pattern in patterns
+    ), (
+        f"nothing in the generated .fux/.gitignore matches index/{temp_name}: {patterns}\n\n"
+        "A background re-index leaves that file in a COMMITTED directory for the "
+        "duration of a rename, and a concurrent `git add -A` dies on it (W-185)."
+    )
+
+
+def test_the_gitignore_never_blanket_ignores_a_committed_plane():
+    """The other half: the fix must not have bought the window with a `*`.
+
+    `.fux/.gitignore`'s own header says NEVER add `*` — a blanket rule would
+    drop `index/`, `sources/`, `fetchers/`, `decoders/` and `observers/` out of
+    git silently, which is a far worse failure than the one being fixed.
+    """
+    import fnmatch
+
+    from fux.store.fuxdir import _GITIGNORE
+
+    patterns = [
+        line.strip()
+        for line in _GITIGNORE.splitlines()
+        if line.strip() and not line.startswith("#")
+    ]
+    for plane in ("index/00.jsonl", "sources/dirs", "fetchers/http.py",
+                  "decoders/csv.py", "observers/README.md"):
+        assert not any(fnmatch.fnmatch(plane, p) for p in patterns), (
+            f"the generated .fux/.gitignore would ignore {plane} - it is COMMITTED"
+        )

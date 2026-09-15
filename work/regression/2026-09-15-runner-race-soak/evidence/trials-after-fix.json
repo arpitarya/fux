@@ -1,0 +1,2498 @@
+[
+  {
+    "index": 0,
+    "delay": 0.078,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 0,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-000-dvps71gg/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 1,
+    "delay": 0.078,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-001-dxu4e3u0/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 2,
+    "delay": 0.078,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 0,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-002-yw9ezd7u/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 3,
+    "delay": 0.078,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-003-jzfdymko/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 4,
+    "delay": 0.078,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-004-ijfrh13f/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 5,
+    "delay": 0.078,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 0,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-005-fv_rdocu/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 6,
+    "delay": 0.078,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 0,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-006-z53xe0pd/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 7,
+    "delay": 0.078,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 0,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 3
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-007-vaasyjl4/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 8,
+    "delay": 0.194,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-008-_3fis57_/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 9,
+    "delay": 0.194,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-009-sxgojfmi/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 10,
+    "delay": 0.194,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-010-uo344_ga/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 11,
+    "delay": 0.194,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-011-1vji05yd/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 12,
+    "delay": 0.194,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-012-5503w991/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 13,
+    "delay": 0.194,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-013-nz_e4olr/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 14,
+    "delay": 0.194,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-014-ba2pev1e/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 15,
+    "delay": 0.194,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-015-4t0kpx81/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 16,
+    "delay": 0.291,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-016-p3s_6049/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 17,
+    "delay": 0.291,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-017-bok40n90/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 18,
+    "delay": 0.291,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-018-apm62puw/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 19,
+    "delay": 0.291,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-019-4wai1obs/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 20,
+    "delay": 0.291,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-020-3kecdd7u/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 21,
+    "delay": 0.291,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-021-_17e_ml5/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 22,
+    "delay": 0.291,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-022-ymzdjrxd/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 23,
+    "delay": 0.291,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-023-80jrvo3j/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 24,
+    "delay": 0.342,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-024-7136r7ys/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 25,
+    "delay": 0.342,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-025-l0fobr7k/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 26,
+    "delay": 0.342,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-026-nmk_varp/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 27,
+    "delay": 0.342,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-027-yq2o8al8/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 28,
+    "delay": 0.342,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-028-t51a3m8e/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 29,
+    "delay": 0.342,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-029-jk51p9pz/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 30,
+    "delay": 0.342,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-030-ryji0by4/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 31,
+    "delay": 0.342,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-031-04zgby15/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 32,
+    "delay": 0.357,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-032-la75gqyv/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 33,
+    "delay": 0.357,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-033-f_frk62v/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 34,
+    "delay": 0.357,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-034-l7_4q8cv/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 35,
+    "delay": 0.357,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-035-3gzg3er8/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 36,
+    "delay": 0.357,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-036-vvlkni04/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 37,
+    "delay": 0.357,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-037-aqrf_ogf/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 38,
+    "delay": 0.357,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-038-zaanf80k/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 39,
+    "delay": 0.357,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-039-sqd1u_0x/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 40,
+    "delay": 0.369,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-040-uje8i58n/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 41,
+    "delay": 0.369,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-041-dmsilsh5/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 42,
+    "delay": 0.369,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-042-13te024y/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 43,
+    "delay": 0.369,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-043-bgmactch/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 44,
+    "delay": 0.369,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-044-c323scth/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 45,
+    "delay": 0.369,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-045-vlfc_tcr/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 46,
+    "delay": 0.369,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-046-xjo1h7nr/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 47,
+    "delay": 0.369,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-047-8zzy0jnl/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 48,
+    "delay": 0.377,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-048-rwcjj13p/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 49,
+    "delay": 0.377,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-049-jvqkac57/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 50,
+    "delay": 0.377,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-050-6cv0vyzc/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 51,
+    "delay": 0.377,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-051-82mbigmk/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 52,
+    "delay": 0.377,
+    "observed_run_seconds": 0.35317016698536463,
+    "second_commit_landed_inside_the_run": false,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-052-qt3thuwx/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 53,
+    "delay": 0.377,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-053-ptlotpl2/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 54,
+    "delay": 0.377,
+    "observed_run_seconds": 0.35970599998836406,
+    "second_commit_landed_inside_the_run": false,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-054-q4z9t8th/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 55,
+    "delay": 0.377,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-055-upm26zef/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 56,
+    "delay": 0.384,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-056-t3sqz2yh/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 57,
+    "delay": 0.384,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-057-vfh2ws5w/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 58,
+    "delay": 0.384,
+    "observed_run_seconds": 0.3564583749976009,
+    "second_commit_landed_inside_the_run": false,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-058-p8klyprt/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 59,
+    "delay": 0.384,
+    "observed_run_seconds": 0.36766462499508634,
+    "second_commit_landed_inside_the_run": false,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-059-6mkz9iwq/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 60,
+    "delay": 0.384,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-060-vowmtydp/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 61,
+    "delay": 0.384,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-061-g_n_qn_d/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 62,
+    "delay": 0.384,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-062-7pui5261/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 63,
+    "delay": 0.384,
+    "observed_run_seconds": 0.37670558399986476,
+    "second_commit_landed_inside_the_run": false,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-063-yd39tfev/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 64,
+    "delay": 0.388,
+    "observed_run_seconds": 0.3853879579983186,
+    "second_commit_landed_inside_the_run": false,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-064-zlvhh1z8/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 65,
+    "delay": 0.388,
+    "observed_run_seconds": 0.3764350829878822,
+    "second_commit_landed_inside_the_run": false,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-065-y6enxtl9/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 66,
+    "delay": 0.388,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-066-1igft22o/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 67,
+    "delay": 0.388,
+    "observed_run_seconds": 0.3765447080077138,
+    "second_commit_landed_inside_the_run": false,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-067-qredmmxv/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 68,
+    "delay": 0.388,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-068-ybsohxkt/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 69,
+    "delay": 0.388,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": false,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-069-3vuko6j_/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 70,
+    "delay": 0.388,
+    "observed_run_seconds": 0.36967370900674723,
+    "second_commit_landed_inside_the_run": false,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-070-d5_ol9sz/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 71,
+    "delay": 0.388,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-071-vrp5wz3n/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 72,
+    "delay": 0.392,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-072-6s7q7m9x/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 73,
+    "delay": 0.392,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-073-gox7hm68/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 74,
+    "delay": 0.392,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-074-helcoup2/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 75,
+    "delay": 0.392,
+    "observed_run_seconds": 0.38185950001934543,
+    "second_commit_landed_inside_the_run": false,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-075-2ojysqm3/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 76,
+    "delay": 0.392,
+    "observed_run_seconds": 0.3850117920082994,
+    "second_commit_landed_inside_the_run": false,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-076-o7edbbw0/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 77,
+    "delay": 0.392,
+    "observed_run_seconds": 0.3712437500071246,
+    "second_commit_landed_inside_the_run": false,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-077-hzh9iv4e/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 78,
+    "delay": 0.392,
+    "observed_run_seconds": 0.3893310840066988,
+    "second_commit_landed_inside_the_run": false,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-078-yqs15c63/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 79,
+    "delay": 0.392,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-079-i1yi6_rm/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 80,
+    "delay": 0.4,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": false,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-080-4p9u1vl2/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 81,
+    "delay": 0.4,
+    "observed_run_seconds": 0.37458870801492594,
+    "second_commit_landed_inside_the_run": false,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-081-mac1ljio/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 82,
+    "delay": 0.4,
+    "observed_run_seconds": 0.3848552920098882,
+    "second_commit_landed_inside_the_run": false,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-082-82h8amfc/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 83,
+    "delay": 0.4,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-083-_aaqklqm/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 84,
+    "delay": 0.4,
+    "observed_run_seconds": 0.3880520419916138,
+    "second_commit_landed_inside_the_run": false,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-084-cfddbw5d/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 85,
+    "delay": 0.4,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-085-x6fhlygj/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 86,
+    "delay": 0.4,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-086-ui_s1n2j/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 87,
+    "delay": 0.4,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-087-j1blbcgu/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 88,
+    "delay": 0.419,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-088-4yux6szw/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 89,
+    "delay": 0.419,
+    "observed_run_seconds": 0.38984937500208616,
+    "second_commit_landed_inside_the_run": false,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-089-s2l2vook/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 90,
+    "delay": 0.419,
+    "observed_run_seconds": 0.37429562502074987,
+    "second_commit_landed_inside_the_run": false,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-090-zdmk4w7n/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 91,
+    "delay": 0.419,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-091-6_6yqi3c/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 92,
+    "delay": 0.419,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-092-e4n2i_2i/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 93,
+    "delay": 0.419,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-093-cc7yzm0m/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 94,
+    "delay": 0.419,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-094-okg_m1a_/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 95,
+    "delay": 0.419,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-095-89jsrk_q/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 96,
+    "delay": 0.466,
+    "observed_run_seconds": null,
+    "second_commit_landed_inside_the_run": true,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-096-1ou2mgex/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 97,
+    "delay": 0.466,
+    "observed_run_seconds": 0.3885441250167787,
+    "second_commit_landed_inside_the_run": false,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-097-tcrkhe91/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 98,
+    "delay": 0.466,
+    "observed_run_seconds": 0.3714009999821428,
+    "second_commit_landed_inside_the_run": false,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-098-cvhjpji6/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 99,
+    "delay": 0.466,
+    "observed_run_seconds": 0.38270495799952187,
+    "second_commit_landed_inside_the_run": false,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-099-fbkkzacg/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 100,
+    "delay": 0.466,
+    "observed_run_seconds": 0.36536758302827366,
+    "second_commit_landed_inside_the_run": false,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-100-29lod5uc/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 101,
+    "delay": 0.466,
+    "observed_run_seconds": 0.39432191601372324,
+    "second_commit_landed_inside_the_run": false,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-101-tslydcgr/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 102,
+    "delay": 0.466,
+    "observed_run_seconds": 0.39510429100482725,
+    "second_commit_landed_inside_the_run": false,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-102-1hit3a2h/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  },
+  {
+    "index": 103,
+    "delay": 0.466,
+    "observed_run_seconds": 0.3827029579842929,
+    "second_commit_landed_inside_the_run": false,
+    "staging_lost": "",
+    "stranded": false,
+    "findable": true,
+    "final_state": {
+      "last_run": {
+        "accelerator": "built",
+        "changed": 1,
+        "docs": 602,
+        "outcome": "ok",
+        "passes": 1
+      },
+      "lock": "free",
+      "lock_path": "/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/fux-race-103-ivnppi2d/repo/.fux/runtime/write.lock",
+      "pending": 0,
+      "pid": null,
+      "running": false
+    },
+    "note": ""
+  }
+]

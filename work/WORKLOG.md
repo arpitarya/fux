@@ -95,7 +95,19 @@ play: the worklog is the granular, per-exchange trail.
   ⚠ An earlier occurrence of the same failure was thrown away by
   `uv run pytest -q tests_e2e | tail -3`; the second-time loss is in
   [LESSONS](LESSONS.md), and the near-miss is the lesson, not the recovery.
-- **Next:** W-185, then W-181 · W-179 · W-180.
+- **Did — W-185, the same session, as its own pass:** 🔴 **both candidates the
+  capture pass proposed were wrong.** Moving the temp file out of the plane
+  breaks `os.replace`'s atomicity; a dot-prefixed name does not escape an `-A`
+  walk, because git does not skip dotfiles. **The ignore rule is the fix**, and
+  it was settled by a two-arm probe rather than by argument: **0 `git add -A`
+  failures in 3 871 runs against 2 335 of 3 933**. The soak's staging losses go
+  **2 → 0** while the after arm reached the window **more** often (77 vs 67), and
+  six `test_maintenance.py` runs are green. ⚠ **`.fux/.gitignore` is
+  write-if-missing, so the fix reaches no existing repo** — a `fux doctor` warn
+  row is the only thing that does, and that is **write-if-missing hiding a fix
+  for the second time today**.
+- **Next:** W-181 · W-179 · W-180 · W-154. W-140 is 🟢 and its only remaining
+  question is a call, not work: close row 21 as unreproduced, or put it to Arpit.
 
 ## 2026-09-15 — W-168 step 1: anchor text, built  ·  Claude Code (Opus 5)
 

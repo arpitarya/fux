@@ -38,9 +38,8 @@ day it was filed. Nothing in the queue waits on a decision of his.
 - 🟣 **W-176** · `agent`, waiting on **2026-09-30** — **steps 1–3 landed 2026-09-15**: `weak` ⇒ `answerable: false`, the steering text, `failed`. The seven measured gates need Codex's key. [detail](open/W-176-abstention-gates.md)
 - 🟡 **W-170** · `agent`, waiting on W-181 — **BUILT 2026-09-15**, SR-OBSERVE `accepted`. Node out of scope (SR-NODE-SEARCH d18). Only the latency capture is owed. [detail](open/W-170-cage-search-leg.md)
 - 🟡 **W-148** · `agent`, waiting on W-179 — **rows 1–3 done 2026-09-15**: CI's corpus arm removed, §4 local, SR-WORK-BENCHMARK 12–13. N4 unmeasured; row 4 out of scope. [detail](open/W-148-what-the-two-readers-still-owe.md)
-- 🟡 **W-140** · `agent`, waiting on W-185 — row 21's stranding did **not** reproduce in 104 deliberate trials; a different race did and is W-185. [detail](open/W-140-guide-authoring-defects.md)
+- 🟢 **W-140** · `agent` — row 21 answered: the stranding is **unreproduced** in 104 deliberate trials and the race that did fire is fixed (W-185). What is left is whether to close it or put it to Arpit. [detail](open/W-140-guide-authoring-defects.md)
 - 🟢 **W-179** · `agent` — run the **Node latency column** in `fux-benchmark` (SR-WORK-BENCHMARK d12); split out W-161's in-memory graph rebuild or the number blames the reader. Unblocks W-148. [detail](open/W-179-node-latency-column.md)
-- 🟢 **W-185** · `agent` 🧨 — a concurrent `git add -A` dies on `.fux/index/<shard>.jsonl.tmp`, an untracked temp file in a **committed** directory. **Fires in `tests_e2e`, ~1 run in 3.** Unblocks W-140. [detail](open/W-185-index-temp-file-race.md)
 - 🟢 **W-181** · `agent` — the **observer latency capture**: pick the reference-vs-cage observer fork, then p50 `ask` with and without. Unblocks W-170. [detail](open/W-181-observer-latency-capture.md)
 
 ### testing

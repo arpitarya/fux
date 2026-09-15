@@ -11,7 +11,7 @@ owns: [node@df209f8aa1fe, src/fux/store/nodebundle.py@071a24a596dd]
 laws: [L1, L3, L4, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 49f9bb3b18c517d61ebd292bb29e4c4867ddffefd4b30897763a2ff0e2b00973
+content_sha: 3a24247643b0fca5356783a09b0295f1975a6c3fd2ce2c817aba6c30369b1a3d
 ---
 
 # SR-NODE-SEARCH — the Node read plane
@@ -33,6 +33,19 @@ differential law, and **every difference is a defect until
 otherwise.**
 
 ## §2 — For agents
+
+⚠ **2026-09-15 — `store/fuxdir.py` and `doctor.py` changed under this record and
+NOTHING this record decides moved.** W-185 added `index/*.jsonl.tmp` to
+`_GITIGNORE` and an `index temp files ignored` row to `doctor`. This record
+describes `ensure_node_reader` and friends in the first file and `_node_reader`
+/ `_installed_reader` in the second; **none of them is touched**, and
+`node/node_modules/` is listed exactly as W-149 left it.
+
+⚠ **Said out loud rather than left to the freshness gate**, which proves a
+record was *touched* and never that it was read: the changed symbol is a module
+CONSTANT, and the gate resolves top-level `def`/`class` names only, so a
+constant edit deliberately reads as *every symbol* and demands every describer.
+
 
 ### Context
 

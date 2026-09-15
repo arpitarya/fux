@@ -127,6 +127,27 @@ _GITIGNORE = (
     # would also ignore one a consumer keeps elsewhere under `.fux/`, and this
     # file's whole discipline is that nothing is ignored by accident.
     + "node/node_modules/\n"
+    # 🔴 **The transient a WRITE leaves in a COMMITTED directory** (W-185,
+    # 2026-09-15). `store/writer.py::_atomic_write` writes
+    # `index/<shard>.jsonl.tmp` beside the shard and renames it -- the sibling
+    # is required, because `os.replace` is atomic only within one filesystem.
+    # `post-commit` DEFERS (SR-MAINTENANCE decision 1a), so a consumer's next
+    # `git add -A` legitimately overlaps a live writer, lists the temp file, and
+    # then cannot stat it:
+    #
+    #     fatal: unable to stat '.fux/index/ad.jsonl.tmp': No such file or directory
+    #
+    # ⚠ **This line IS the fix, and it was measured rather than argued.** A
+    # controlled probe -- the same rename churn, with and without the rule --
+    # gives **0 failures in 3 871 `git add -A` runs ignored** against **2 335 of
+    # 3 933 unignored**. The earlier reasoning that an ignore rule "cannot close
+    # the window because git stats what it listed" is wrong: an excluded path is
+    # never walked.
+    #
+    # **Scoped to the plane and to the suffix**, never `*.tmp` and never `*`:
+    # this file's whole discipline is that nothing is ignored by accident, and a
+    # bare `*.tmp` would also hide a consumer's own file anywhere under `.fux/`.
+    + "index/*.jsonl.tmp\n"
 )
 
 

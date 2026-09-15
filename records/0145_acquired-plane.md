@@ -10,7 +10,7 @@ feature: the acquired plane
 owns: [src/fux/store/acquired.py@9897ee1fe4af]
 laws: []
 timestamp: 2026-09-01T00:00:00Z
-content_sha: ef95512304c457da9168657cb2d0b8f0d90e9f3a868113ef534aa9df68954d20
+content_sha: 69bcf0261b5c3bc1a1c1e9f80b2930ebe055cbe6fb3355d6116b5fa91edf702c
 ---
 
 # SR-ACQUIRED: fetched bytes are kept, in a plane that is neither committed nor derived
@@ -255,6 +255,18 @@ to be told *"not yours"* in writing.
   — a constant change deliberately reads as *every symbol*. So the demand will
   come back on the next template edit, and the answer is this bullet.
   [SR-DOTFUX](0102_fux-directory.md) decision 6b is the co-location itself.
+
+- **W-185's `.gitignore` line is a TRANSIENT, not a plane** (2026-09-15). It is
+  the one change to `_GITIGNORE` that this record genuinely describes and still
+  decides nothing here: `acquired/` is listed exactly as it was, and
+  `index/*.jsonl.tmp` names a file that exists for the duration of an
+  `os.replace` inside the **committed** index plane
+  ([SR-DOTFUX](0102_fux-directory.md) decision 6c). **Nothing acquired is
+  ignored differently, and nothing about retention moved.** ⚠ The distinction
+  is this record's whole subject, which is why the bullet is worth writing: a
+  reader who saw `_GITIGNORE` change would reasonably check whether a **fourth
+  category** had appeared beside committed, derived and acquired. It has not —
+  a transient is not a plane.
 
 **Easier.** A citation can be checked offline against the exact bytes that produced it — a stronger claim than comparing two fetches, which is why `refer/source.py` verifies with the same fetcher a document was ingested with: *a document fetched two ways is two documents*. A retained original removes that whole class of false staleness, and the browser-session fetcher stops being needed at answer time.
 

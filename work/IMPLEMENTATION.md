@@ -28,6 +28,18 @@ Rules:
 
 
 
+## 2026-09-15 — **W-182 and W-185: a flake driven on purpose, diagnosed, and fixed**
+
+| item | what landed | evidence |
+|---|---|---|
+| **W-182** | 🟢→✅ **the soak that walks a second commit across a live runner's lifetime**, and **two results**. The stranding W-140 row 21 waited eleven attempts for did **not** reproduce — 0 of 104, with **67 trials landing inside a live runner**, the interleaving those eleven could never show they reached. ⚠ **Unreproduced, not closed**: the surviving ordering needs a delay injected inside `run_once`, which a capture pass may not add | [`2026-09-15-runner-race-soak`](regression/2026-09-15-runner-race-soak/report.md) · SR-MAINTENANCE decisions 1e–1f |
+| **the race that DID fire** | `git add -A` dies on `.fux/index/<shard>.jsonl.tmp` — an untracked temp file in a **committed** directory, left there by `_atomic_write` for the duration of a rename while `post-commit` deferred. **2 of 8 at the early-delay step, 0 of 96 elsewhere**, and 🔴 **then in `tests_e2e` itself**, run 2 of 3 | [the traceback](regression/2026-09-15-runner-race-soak/evidence/e2e-capture.txt) |
+| **W-185** | 🟢→✅ **one ignore line, and the number has a control**: `index/*.jsonl.tmp` gives **0 `git add -A` failures in 3 871 runs** against **2 335 of 3 933** without it. The soak's staging losses go **2 → 0** while the after arm reached the window **more** often (77 vs 67), and six consecutive `test_maintenance.py` runs are green where the file failed 1 in 3 hours earlier | [`2026-09-15-index-temp-ignore`](regression/2026-09-15-index-temp-ignore/report.md) · SR-DOTFUX decision 6c |
+| **what was NOT changed** | **`_atomic_write`.** The sibling rename is required — `os.replace` is atomic only within one filesystem — and the item's other candidate was wrong too: git does not skip dotfiles. 🔴 **Both of W-185's original candidates were wrong**, and the correction is noted in place rather than silently applied | [the correction](regression/2026-09-15-runner-race-soak/ANALYSIS.md) §3b |
+| **the row the fix cannot replace** | `fux doctor`'s `index temp files ignored`, **`warn`**. 🔴 **`.fux/.gitignore` is write-if-missing, so the fix reaches no existing repository** — the second time in one day that write-if-missing hid a fix, after `.fux/README.md`'s verb table | SR-DOCTOR decision 11 |
+
+
+
 ## 2026-09-15 — **W-184 and W-183: a dead proof obligation, and an instrument that can fail**
 
 | item | what landed | evidence |

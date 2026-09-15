@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@3e0a9d91c4a7, src/fux/setup.py@af9f0203b42d, tests/test_verb_table_agreement.py@1e7999ffd28f]
+owns: [src/fux/store/fuxdir.py@2b1bd5523b9f, src/fux/setup.py@af9f0203b42d, tests/test_verb_table_agreement.py@1e7999ffd28f]
 laws: [L2, L3, L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 8684abdd94979b1395f5353b0679444e8e7ac016e14cdd140ea98d42c77dd0a5
+content_sha: f8deae295273c63273860fe3d7949abec7b76eafb88b002e35540380c547a319
 ---
 
 # SR-DOTFUX — the `.fux/` directory
@@ -480,6 +480,38 @@ the README: `.gitignore` has the same two copies and the same silence. The
 narrow gate is the one that was buildable — *does the template still name every
 verb* — and it covers one file. The rest of the shape is unguarded and is named
 here so the next drift is recognised rather than rediscovered.
+
+**6c. The generated `.gitignore` also covers a TRANSIENT, and that is a third
+kind of entry** (2026-09-15, W-185). Decision 3's rule — the file names the
+ignored *directories* and never a blanket — is unchanged; what is added is a
+file that exists for the duration of a rename:
+
+```
+index/*.jsonl.tmp
+```
+
+`store/writer.py::_atomic_write` writes `<shard>.jsonl.tmp` **beside** the shard,
+because `os.replace` is atomic only within one filesystem, and `.fux/index/` is
+**committed**. `post-commit` defers ([SR-MAINTENANCE](0129_hooks.md) decision
+1a), so a consumer's next `git add -A` legitimately overlaps a live writer:
+
+```
+fatal: unable to stat '.fux/index/ad.jsonl.tmp': No such file or directory
+```
+
+**Measured, with a control:** the same rename churn gives **0 failures in 3 871
+`git add -A` runs** with the rule and **2 335 of 3 933** without it. ⚠ **The
+earlier reasoning that an ignore rule could not help — *git stats what it
+listed* — is wrong**: an excluded path is never walked.
+
+⚠ **Scoped to the plane and the suffix, never `*.tmp` and never `*`.** A bare
+`*.tmp` would hide a consumer's own file anywhere under `.fux/`, which is the
+accident this file's whole discipline exists to prevent.
+
+🔴 **And write-if-missing means the fix does not reach a single existing
+repository** — decision 6b's hazard, firing a second time within a day, on the
+other annotatable file. So `fux doctor` gains a **`warn` row**, `index temp files
+ignored`, which is the only thing that reaches a repo set up before 2026-09-15.
 
 **7. `fetchers/` is consumer code and fux never rewrites it.** It is loaded by
 path, and only under the two fenced paths — `fux add <URL>` and `fux update`.

@@ -279,6 +279,8 @@ def _layout(root: Path) -> list[Check]:
             )
         )
 
+    checks.append(_index_temp_ignored(root))
+
     fux_dir = root / fuxdir.FUX_DIR
     extras = sorted(p.name for p in fux_dir.iterdir() if p.name not in fuxdir.DECLARED) if fux_dir.is_dir() else []
     checks.append(
@@ -2472,6 +2474,48 @@ def _is_git_tracked(root: Path, path: Path) -> bool:
     except (OSError, subprocess.SubprocessError):
         return False
     return result.returncode == 0
+
+
+def _index_temp_ignored(root: Path) -> Check:
+    """`.fux/index/<shard>.jsonl.tmp` must be gitignored (W-185, 2026-09-15).
+
+    🔴 **Because this row exists for the repositories the fix cannot reach.**
+    `.fux/.gitignore` is write-if-missing ([SR-DOTFUX](records/0102) decision
+    6a: engine-owned, annotatable), so a repository set up before 2026-09-15 has
+    a `.gitignore` without the line and **will never be given one**. A row is
+    the only thing that reaches it.
+
+    **What goes wrong without it.** `store/writer.py::_atomic_write` writes the
+    temp file beside the shard, inside a committed directory, and `post-commit`
+    defers — so a consumer's next `git add -A` overlaps a live writer, lists the
+    temp file and cannot stat it::
+
+        fatal: unable to stat '.fux/index/ad.jsonl.tmp': No such file or directory
+
+    Measured at **2 335 failures in 3 933 `git add -A` runs** against a writer
+    renaming shards, and **0 in 3 871** with the rule in place.
+
+    ⚠ **`warn`, not `error`.** Nothing is wrong with the index, no answer is
+    affected, and the failure needs a concurrent writer — a repository that
+    never commits twice in a row will never see it. It is still worth a line,
+    because when it does fire the message is about fux's internals and the
+    consumer has no way to connect the two.
+    """
+    name = "index temp files ignored"
+    probe = root / fuxdir.FUX_DIR / "index" / "00.jsonl.tmp"
+    ignored = _is_git_ignored(root, probe)
+    if ignored is None:
+        return Check(name, True, "skipped (not a git checkout)")
+    if ignored:
+        return Check(name, True, "a write in flight cannot break a concurrent `git add`")
+    return Check(
+        name,
+        False,
+        "add `index/*.jsonl.tmp` to .fux/.gitignore - a background re-index "
+        "leaves a temp file in the committed index directory, and a `git add -A` "
+        "running at that moment fails with `unable to stat` (W-185)",
+        level="warn",
+    )
 
 
 def _is_git_ignored(root: Path, path: Path) -> bool | None:

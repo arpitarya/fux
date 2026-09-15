@@ -7,11 +7,11 @@ description: "One record owns the health-check surface. Every check names a caus
 status: accepted
 date: 2026-09-11
 feature: "`fux doctor` — the read-only, offline health command and its check register"
-owns: [src/fux/doctor.py@0b7b0d8ef957, tests/test_doctor_register_is_complete.py@6c3d2378d45f]
+owns: [src/fux/doctor.py@f5ce38d8a703, tests/test_doctor_register_is_complete.py@6c3d2378d45f]
 laws: [L4, L8]
 ratifies: "Arpit, 2026-09-11 — *create a new adr for doctor*"
 timestamp: 2026-09-11T00:00:00Z
-content_sha: 1c7f2e96fd734994b7b4d5697a6c5fdf47a4002fe72a97e3b16b88bc5edd49ce
+content_sha: e260b0b6c738d226a787d4bd543e0ee04ebb1d7ceb6a3b716fa2097223174601
 ---
 
 # SR-DOCTOR — the health command, and who owns its rows
@@ -157,6 +157,7 @@ authoritative about the row.**
 | `.fux/ writable` | error | the directory can be created and written | [SR-DOTFUX](0102_fux-directory.md) |
 | `index not gitignored` | error | a `.fux/*` blanket silently eating the committed index | [SR-DOTFUX](0102_fux-directory.md) |
 | `.fux/ layout declared` | warn | undeclared entries at `.fux/`'s top level | [SR-DOTFUX](0102_fux-directory.md) |
+| `index temp files ignored` | warn | `.fux/index/<shard>.jsonl.tmp` not gitignored — a background re-index leaves it in the **committed** index plane for the duration of a rename, and a `git add -A` running at that moment dies `unable to stat`. ⚠ **The row exists because the fix cannot reach the repos that need it**: `.fux/.gitignore` is write-if-missing (decision 11) | [SR-DOTFUX](0102_fux-directory.md) decision 6c |
 | `pii rules` | **error** when absent | a missing `.fux/pii.toml`; otherwise compiles every pattern offline and states the scope. ⚠ It cannot see an over-broad rule and says so — only [`tools/pii-probe/`](../tools/pii-probe/) can | [SR-PII](0148_pii.md) decision 17 |
 | `acquired plane` | warn, **error** on gitignore | blob count, total bytes, the 80 %-of-cap warning, and the gitignore assertion | [SR-ACQUIRED](0145_acquired-plane.md) |
 | `pinned url bytes` | warn | with `[sources.url] fetch_at_answer = false`, the listed urls with no retained bytes — every citation from those is `unverified` | [SR-URL-FRESHNESS](0147_url-freshness.md) decision 16 |
@@ -314,6 +315,25 @@ shape for **this** file specifically:
   `fux.toml loads` row quotes the config loader. A second parser here would
   answer a question the real one does not ask — decision 6's *name the fix*
   with the fix's own words.
+
+**11. The `index temp files ignored` row, and it exists ONLY because the fix
+cannot reach the repositories that need it** (2026-09-15, W-185).
+
+`store/writer.py::_atomic_write` leaves `<shard>.jsonl.tmp` in the **committed**
+index directory for the duration of a rename, and `post-commit` defers — so a
+consumer's next `git add -A` can list it and then fail to stat it. The fix is one
+line in `.fux/.gitignore` ([SR-DOTFUX](0102_fux-directory.md) decision 6c).
+
+🔴 **`.fux/.gitignore` is write-if-missing.** A repository set up before
+2026-09-15 has a copy without the line and **will never be given one**. A row is
+the only thing that reaches it, which is decision 6's *name the fix* doing the
+work an upgrade cannot.
+
+**`warn`, not `error`**, and the line between them is decision 3's: no verb
+refuses, the index is correct, no answer moves, and the failure needs a
+concurrent writer. What makes it worth a row anyway is that when it does fire,
+**the message is about fux's internals** and nothing connects the two for the
+person reading it.
 
 **The redaction note names an instrument the reader has** (W-140 row 18,
 2026-09-11). It ended *see tools/pii-probe/* — a path that exists in the fux

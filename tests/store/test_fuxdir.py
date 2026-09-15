@@ -70,6 +70,14 @@ def test_gitignore_lists_the_derived_planes_the_blobs_and_the_bytecode(tmp_path)
     vendored (SR-NODE-SEARCH decision 13). Listed by PATH rather than by name
     — `node_modules/` alone would also ignore one a consumer keeps elsewhere
     under `.fux/`, and nothing here is ignored by accident.
+
+    🔴 **`index/*.jsonl.tmp` is a SIXTH and the only one that is not a
+    directory** (W-185, 2026-09-15): the transient `_atomic_write` leaves in the
+    **committed** index plane for the duration of a rename. `post-commit`
+    defers, so a consumer's next `git add -A` can list it and then fail to stat
+    it — measured at 2 335 failures in 3 933 runs without the rule and 0 in
+    3 871 with it. Scoped to the plane and the suffix, because a bare `*.tmp`
+    would hide a consumer's own file anywhere under `.fux/`.
     """
     fuxdir.ensure_layout(tmp_path)
     text = (tmp_path / ".fux" / ".gitignore").read_text(encoding="utf-8")
@@ -78,6 +86,7 @@ def test_gitignore_lists_the_derived_planes_the_blobs_and_the_bytecode(tmp_path)
         *(f"{name}/" for name in (*fuxdir.DERIVED, *fuxdir.ACQUIRED)),
         "__pycache__/",
         "node/node_modules/",
+        "index/*.jsonl.tmp",
     ]
     assert "*" not in entries
     for committed in fuxdir.COMMITTED:  # a committed plane must never be listed

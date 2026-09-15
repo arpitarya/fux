@@ -69,12 +69,38 @@ and an acceptance test in two places.
 different test — which is evidence that the exposure is the *helper*, not either
 test's own logic.
 
+## 3b · 🔴 CORRECTION, same day — §2's assessment of candidate A was WRONG
+
+**Noted rather than silently applied**, per the per-run contract.
+
+§2 said of candidate A (*ignore `*.tmp` under `.fux/index/`*): *"it does not
+close the window — `git add -A` can still stat a path it listed before the
+rename."* **That is false, and it was reasoning where a measurement was
+available.** An excluded path is not walked at all, so there is no stat to fail.
+
+A controlled probe — one process renaming `d/<nn>.jsonl.tmp` onto
+`d/<nn>.jsonl` in a loop, another running `git add -A` as fast as it can, with
+and without the ignore rule:
+
+| arm | result |
+|---|---|
+| **ignore rule present** | **0 failures in 3 871 `git add -A` runs** |
+| **no ignore rule** (control) | **2 335 failures in 3 933** |
+
+**So candidate A is the fix**, and candidate C's premise — that a dot-prefixed
+name escapes an `-A` walk — is also wrong: git does not skip dotfiles, and
+`.doctor-probe` is kept out of the way by an **ignore rule**, not by its name.
+
+⚠ **The control is what makes this readable.** Without the second arm, *"0
+failures after the change"* would be indistinguishable from a window that
+simply did not open that afternoon.
+
 ## 4 · The specific changes
 
 | # | change | repro |
 |---|---|---|
 | 1 | `tools/runner-race/soak.py` — the harness, which W-182 owed | `python tools/runner-race/soak.py --trials 8 --docs 600` |
-| 2 | **W-185 filed** — the temp-file race, with candidate C and the acceptance test | `work/open/W-185-index-temp-file-race.md` |
+| 2 | **W-185 filed** — the temp-file race, with the acceptance test. ⚠ **Closed the same day**, and §3b corrects which candidate was right | [the fix](../2026-09-15-index-temp-ignore/report.md) |
 | 3 | W-140 row 21's status moves from *waiting* to *unreproduced, with a different race found in its place* | `work/OPEN-WORK.md` |
 
 ## 5 · Unresolved

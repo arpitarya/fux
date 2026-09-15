@@ -48,7 +48,7 @@ fatal: unable to stat '.fux/index/ad.jsonl.tmp': No such file or directory
 🔴 **Which is the race W-182 had captured in a throwaway repository an hour
 earlier** — so the discarded traceback had been the answer all along, and the
 only thing between not knowing and knowing was `> file` instead of `| tail`.
-Filed as [W-185](open/W-185-index-temp-file-race.md), with the traceback kept
+Filed and fixed the same day as W-185, with the traceback kept
 [as evidence](regression/2026-09-15-runner-race-soak/evidence/e2e-capture.txt).
 
 ⚠ **Read the near-miss, not the recovery.** It happened to fire again within

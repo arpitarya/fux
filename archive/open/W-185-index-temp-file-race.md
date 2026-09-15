@@ -40,15 +40,15 @@ message about fux's internals, on a repository where nothing is wrong.**
 
 ## Definition of done
 
-1. **A temp name an `-A` walk does not pick up, still a sibling.** Candidate C in
-   the analysis — `.<shard>.jsonl.tmp` — keeps the same-filesystem guarantee that
-   makes `os.replace` atomic. ⚠ **Do not move the temp file to
-   `.fux/runtime/`**: a cross-filesystem `os.replace` raises, and *"normally the
-   same filesystem"* is not a guarantee a writer may rest on.
-2. **The generated `.fux/.gitignore` gains the name**, by name and never as `*`.
-   ⚠ It does **not** close the window on its own — `git add` can still fail to
-   stat a path it listed before the rename — so it is the second half of the fix,
-   not the fix.
+1. 🔴 **The ignore rule IS the fix, and the analysis said otherwise.** Corrected
+   by measurement rather than argument — a controlled probe gives **0 failures in
+   3 871 `git add -A` runs** with the rule against **2 335 of 3 933** without it.
+   An excluded path is never walked, so there is no stat to fail.
+   [The correction](../regression/2026-09-15-runner-race-soak/ANALYSIS.md) §3b.
+2. **`_atomic_write` is UNCHANGED.** The sibling rename is correct — `os.replace`
+   is atomic only within one filesystem — and candidate C's premise was wrong
+   too: git does not skip dotfiles. `.doctor-probe` is kept out of the way by an
+   ignore rule, not by its name.
 3. **`displaycache.py` has the same shape** (`path.with_suffix(".tmp")`) and
    writes under `.fux/runtime/`, which is gitignored. **Check rather than
    assume**, and say which it is.

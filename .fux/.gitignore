@@ -12,5 +12,8 @@ runtime/
 acquired/
 __pycache__/
 node/node_modules/
+index/*.jsonl.tmp
 
+# A local annotation, kept: `fux doctor` writes `.doctor-probe` to test
+# writability and removes it. Not in the generated template.
 .doctor-probe
