@@ -287,6 +287,18 @@ quality — that is the lab's. See
 [SETUP-BENCHMARK](../work/setup/fux-benchmark.md) and
 [SR-WORK-ENVIRONMENTS](../records/0052_WORK-environments.md).
 
+**Boosted tier** <a id="boosted-tier"></a> — `fux ask`'s main result list
+after W-161: the documents BM25F retrieved, **re-ordered** by
+`RRF(lexical rank, PPR rank)` over a walk out of the query's own top-k. A row
+the walk reached carries `boosted`; a row it **moved** also carries a `route`
+like `#7 -> #2 via graph`. 🔴 **It is the one list fux prints that may not be
+monotone in its own score** — the order is a rank fusion and the number is
+still BM25F — and the per-row marker is what makes that legible rather than
+mysterious. Distinct from the [related tier](#related-tier), which is not a
+result list at all. Both ship on and **unmeasured**; the frozen bar is
+[`2026-09-14-graph-ask`](../work/regression/2026-09-14-graph-ask/PRE-REGISTRATION.md).
+See [SR-ASK](../records/0103_ask.md) decision 13.
+
 **Fux-lab** — The scratch measurement environment (`~/my_programs/fux-lab/`),
 one directory per environment, each with its own venv and baselines, and the
 [golden ladder](../work/golden/README.md) as its corpus. It commits nothing; its
@@ -296,12 +308,27 @@ which is a repo law. What it may measure and how large a corpus it may use are
 
 **`fux lexical` (the verb)** <a id="lexical-the-verb"></a> — BM25F over the
 committed index, then the proximity reranker, then RRF over any `-q`
-phrasings. **No graph stage, ever.** Byte-identical to `fux ask` today and
-**frozen**: a future component added to the lexical core becomes a new verb or
-a tunable, never a change to this one. It is the baseline arm for every ranking
+phrasings. **No graph stage, ever.** It WAS byte-identical to `fux ask`; W-161
+gave `ask` a [boosted tier](#boosted-tier) and the two parted, which is exactly
+what this verb exists for. **Frozen**: a future component added to the lexical
+core becomes a new verb or a tunable, never a change to this one — and a repo
+whose `tune.toml` turns the graph tier on cannot turn it on here. It is the baseline arm for every ranking
 verdict and the stable arm of the Python/Node differential law — which is worth
 a verb precisely because `ask --scan` stops meaning *the words alone* the moment
 `ask` grows a stage. See [SR-CLI](../records/0101_cli-surface.md) decision 12.
+
+**Related tier** <a id="related-tier"></a> — `fux ask`'s second list
+(W-161): documents the walk reached that **no query word matched at all**, so
+BM25F could not have retrieved them at any depth. Each row carries the `route`
+it was reached by (`#2 via ref` — the best-ranked result that links to it, and
+the edge kind). 🔴 **Never counted as an answer, never in the confidence band,
+never merged into `results`** — a document with no lexical match sitting among
+real matches *looks like* a match, and the label is the only thing keeping
+`ask` honest about what it **found** versus what it **followed**. `fux answer`
+does fetch them and re-score on the bytes, because the refer plane reads the
+document rather than the index. Absent (not `[]`) when the tier did not run.
+`fux find` never has one — it pipes bare paths. See
+[SR-ASK](../records/0103_ask.md) decision 13.
 
 **FuxVec** — The from-scratch stdlib dense engine: sign-quantizes a 256-dim
 int8 embedding into a **256-bit code** (32 B/doc), scans by Hamming distance,

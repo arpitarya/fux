@@ -115,7 +115,11 @@ function fuxSearch(root, args, top) {
   // W-109. Same slot as the CLI's `--expand`, same weight, same guard: a
   // document matching only expansion terms is dropped in `rank()`.
   const expand = String(args.expand ?? "");
-  const { results, confidence } = runQuery(root, query, k, {
+  // W-161 — this surface takes BOTH tiers. An agent is the reader the related
+  // tier was built for: it cannot run `fux graph` as a follow-up the way a
+  // person can, and `next` has been telling it to call `fux_related` for
+  // neighbours since the tool existed.
+  const { results, related, confidence } = runQuery(root, query, k, {
     wantConfidence: true, expand,
   });
   const records = results.length ? recordsById(root) : new Map();
@@ -143,6 +147,20 @@ function fuxSearch(root, args, top) {
   });
   return {
     results: out,
+    // 🔴 **Its own key, never merged into `results`.** These documents matched
+    // NO query word; they are here because the documents above link to them.
+    // An agent reading them as matches cites a document the question's own
+    // words never reached — with a real path and a real sha beside it, which
+    // is the most convincing shape a wrong answer has.
+    //
+    // **Unconditional, like `confidence`:** a tool call cannot pass a flag, so
+    // an absent key could only mean *this server predates the tier* (W-48).
+    // NOT `score` — a related document has none, and naming the walk mass
+    // `score` would make every agent that sorts on it interleave the lists.
+    related: (related ?? []).map((r) => ({
+      path: r.loc, title: r.title, mass: pyRound(r.mass, 6),
+      archived: r.archived, route: r.route,
+    })),
     // Node has no accelerator; the scan is the only path, and saying anything
     // else would be a lie about which one answered.
     ranked_by: "scan",
@@ -150,7 +168,10 @@ function fuxSearch(root, args, top) {
     // ranked list cannot otherwise tell "these documents answer your question"
     // from "these are the closest things in a corpus that never discusses it".
     confidence: confidence ? confidence.asDict() : null,
-    next: "call fux_passage with a path to read a span, or fux_related for neighbours",
+    next: "call fux_passage with a path to read a span, or fux_related for neighbours. "
+      + "`related` here is already the neighbourhood of THIS query's answers -- "
+      + "documents no query word matched, so never cite one as a match without "
+      + "reading it with fux_passage first",
   };
 }
 

@@ -27,6 +27,22 @@ Resolve the `fux` command first — see the `fux-usage` skill (`fux` → `uv run
 **Start from `ask`, then walk:** find the right document, then `explain` or
 `path` on the `loc` it returned.
 
+⚠ **`ask` already walks one hop for you** (W-161). Its `related` list is the
+`ref`-only, hub-damped, one-hop neighbourhood of its own answers — so **check
+`related` before reaching for `graph`**, and use `graph` when you want the
+other edge kinds, more than one hop, or a walk from documents you name rather
+than from a query. The two are different walks on purpose:
+
+| | `fux graph` (orientation) | `ask`'s `related` (answering) |
+|---|---|---|
+| edge kinds | **all** of them | `ref` only — a `tag` is a hub, not a link somebody drew |
+| hub damping | off | **on** |
+| hops | unbounded by the walk | **one** |
+
+🔴 **`fux graph "<q>"` seeds from `lexical`, not from `ask`** — so its seeds are
+the words' own top-k and do not move when the graph tier moves. That is what
+keeps `graph "<q>"` equal to `graph --seed <lexical top-k>`.
+
 ## 2 · What an edge is — extracted at ingest, never guessed
 
 **Every edge is something the document itself wrote.** No model runs; nothing is

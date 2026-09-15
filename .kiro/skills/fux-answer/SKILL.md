@@ -88,6 +88,28 @@ such as `note: nothing has changed since you last asked this.`
 
 `text` is verbatim from the fetched bytes — frontmatter and table pipes included.
 
+## 4a · 🔴 `answer` can cite a document no query word matched
+
+`fux answer` reads `fux ask`, and since W-161 `ask` returns two tiers. **Both
+are fetched and re-scored on the fetched bytes**, so the winner can be a
+document the words never retrieved — one the ranked results merely **link to**.
+
+That is deliberate and it is usually right: the tier exists because BM25F
+retrieves by shared vocabulary, and the record a runbook points at often uses
+none of the runbook's words. The refer plane reads the **document**, not the
+index, so a linked document with nothing in it loses on its own bytes.
+
+**What it means for how you report:**
+
+- **The passage is still real and still verified** — same fetch, same sha, same
+  freshness verdict. Nothing about the citation is weaker.
+- ⚠ **But the confidence band describes the lexical tier only.** A `grounded`
+  band beside a citation that came from a link is not a claim about that link.
+  If the answer matters, say which document it came from and let the reader see
+  that the question's own words are not in it.
+- To rule the tier out entirely, `fux ask --no-related` first and answer from
+  that, or set `[graph] ask_related = false`.
+
 ## 5 · Locators
 
 | form | when | how to use it |

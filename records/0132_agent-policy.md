@@ -7,10 +7,10 @@ description: "Fux's readers are AI agents, and an engine whose output is misread
 status: accepted
 date: 2026-08-22
 feature: the agent-facing policy and skill artifacts Fux ships, and their installer
-owns: [src/fux/templates/agents@c3fe1ff52e6e]
+owns: [src/fux/templates/agents@3d1c361e1ea2]
 laws: [L1, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 29e5eaa9cff7313fee3e723339151c6bb1122ce69f7ca8df7e657a233ec2a741
+content_sha: f5596abd5b4edb3835a6466819d02e725326653b9d1d3de70daf79abc3c496e1
 ---
 
 # SR-AGENT-POLICY — shipping the policy, not just the facts
@@ -725,6 +725,25 @@ to all three skill surfaces, per decision 15.
   [SR-CONFIG](0113_config.md) decision 14 made unknown keys refuse by name. An
   agent reading it would have assured a consumer that a typo in `fux.toml` was
   harmless. Fixed in the same change as the feature, which is the rule.
+
+**The three search guides carry the two-tier `ask`** (W-161).
+
+`SEARCH-SKILL`, `ANSWER-SKILL` and `GRAPH-SKILL` gain the tier, and each says
+the part its own reader will get wrong:
+
+| guide | what it had to say |
+|---|---|
+| **search** | `related` is not a result, and **`results` is not sorted by `score`** — a consumer re-sorting by score has thrown the graph away and re-derived the lexical ranking |
+| **answer** | `answer` can cite a document **no query word matched**, the citation is still verified, **but the band describes the lexical tier only** |
+| **graph** | `ask` already walks one hop, so check `related` first; `graph` is for the other edge kinds, more hops, or seeds you name — and the two are **different walks** |
+
+⚠ **All four copies move together.** The template under
+[`src/fux/templates/agents/`](../src/fux/templates/agents/) is the source, and
+`.claude/`, `.agents/` and `.kiro/` are checked byte-equal against it by
+`tests/test_setup_agents.py`. Editing one copy and shipping is the drift that
+test exists for — and it caught exactly that here, three times, once per
+directory.
+
 
 ### Consequences
 

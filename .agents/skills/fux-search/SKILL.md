@@ -34,8 +34,9 @@ confidence block is not printed at all.
 reranker, then RRF over any `-q` phrasings. **No graph stage, ever.** It takes
 every flag `ask` takes and returns `ask`'s exact output shape.
 
-- 🔴 **It is not a better `ask`, and it is not a faster one.** Today the two
-  return **byte-identical** output, and a test holds them equal.
+- 🔴 **It is not a better `ask`, and it is not a faster one.** It is `ask`
+  **without the graph tier** — the two returned byte-identical output until
+  W-161 gave `ask` one, and they now legitimately differ.
 - **Reach for it only when you were asked for a baseline** — comparing a
   ranking change, or checking whether a result came from the words or from
   something else. For an ordinary question, use `ask`.
@@ -72,7 +73,11 @@ turns one of those on, the only way back is `--no-output-config`.
 ```json
 {"results": [{"id": "file:docs/mesh.md", "title": "Service mesh", "loc": "docs/mesh.md",
               "score": 5.9021, "archived": false, "tie": false,
+              "boosted": true, "route": "#7 -> #2 via graph",
               "headings": ["Rollback procedure"]}],
+ "related": [{"id": "file:records/0111_ranking.md", "title": "SR-RANKING (0111)",
+              "loc": "records/0111_ranking.md", "mass": 0.0413,
+              "archived": false, "route": "#2 via ref"}],
  "confidence": {"band": "partial", "answerable": true, "missing": ["mtls"], "...": "..."},
  "fused": true, "path": "scan", "derivation": {"...": "..."}}
 ```
@@ -84,6 +89,9 @@ turns one of those on, the only way back is `--no-output-config`.
 | `headings` | `ask` unless `--no-sections`; `find` always | up to 3 committed headings matching the query; `[]` = none matched |
 | `tie` | always | `true`: this row's rounded score equals another candidate's, so its position came from the tie-break, not the ranking |
 | `archived` | always | retired source — follow the `fux-archived-results` policy |
+| `boosted` | always | `true`: the graph walk out of the top-k reached this document, so its position is a rank fusion and not the words alone |
+| `route` | always | `#7 -> #2 via graph` when the boost **moved** this row; `null` otherwise |
+| `related[]` | `ask`, unless `--no-related` or the tier is off | 🔴 **NOT results** — section 3a |
 | `confidence` | only with `--band` | section 4 |
 | `fused` | only with more than one phrasing | `score` is an RRF score |
 | `path` / `derivation` | only with `--explain` / `--why` | diagnostics |
@@ -93,6 +101,33 @@ is not band `none`; re-run with `--band`.
 
 **`headings` is your section pointer.** It is the finest unit `ask` can honestly
 give. Open the document and go to that heading, or use `fux answer` for lines.
+
+## 3a · 🔴 `related` is NOT a result, and `results` is NOT sorted by score
+
+Two things changed about `ask`'s shape and both can mislead you quietly.
+
+**`related` holds documents that matched NO query word.** They are there
+because the ranked results above **link** to them — the record a runbook points
+at, the decision a guide cites — which BM25F cannot retrieve at any depth,
+because it retrieves by shared vocabulary and there is none.
+
+- **Never cite one as a match.** Read it first (`fux answer`, or open the
+  `loc`), and when you use it **say you followed a link to it** rather than
+  found it. Its `route` names the result it came from and the edge kind.
+- `mass` is a walk statistic, **not a score**. It says how well connected the
+  document is to the answers, and nothing about whether it answers the
+  question. Do not compare it with a `score`; do not sort the two lists
+  together.
+- **Absent ≠ empty.** `[]` means *no neighbours*; an absent key means the tier
+  did not run — `--no-related`, `[graph] ask_related = false`, `fux lexical`,
+  or a repo with no `fux build`.
+
+**And `results` may not be in score order.** The boosted tier orders by
+`RRF(lexical rank, PPR rank)` while still printing BM25F, so row 2 can score
+higher than row 1. **If you re-sort by `score` you have thrown the graph away
+and re-derived the lexical ranking** — which is a legitimate thing to want, and
+`fux lexical` is the verb that returns it honestly. The rows that would move
+are exactly the ones carrying a `route`.
 
 ## 4 · The confidence block
 

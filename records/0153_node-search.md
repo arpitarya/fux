@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@15442fe10b25, src/fux/store/nodebundle.py@071a24a596dd]
+owns: [node@2d5ca5e50e55, src/fux/store/nodebundle.py@071a24a596dd]
 laws: [L1, L3, L4, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: d846285d9a84d7c7f6110259b0801dd959de4c9fc6dd73048cba5e5f7af4e85b
+content_sha: b8763fea3b3a4f7f9d3190196cfee95858d0afb63f9097b946a6b8d69a5d4111
 ---
 
 # SR-NODE-SEARCH — the Node read plane

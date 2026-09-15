@@ -13,7 +13,7 @@ feature: configurable output defaults
 owns: [src/fux/output_config.py@d8c53dfbf3c9]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 84babb3ecd17d42fc6c4ac8113878d67a8ae47ca26d3d085275dbf7d4f7aaf6d
+content_sha: 5b4d30a18c903f7be335a367450c74b7d55911156017f381fd2f1fcacaa59154
 ---
 
 # SR-OUTPUT — output defaults are configurable, in a third file
@@ -723,6 +723,16 @@ whose `.fux/output.toml` predates this version** — the precise failure decisio
 already has. Measured, not predicted: it was added, `test_apply_output_defaults`
 went red on a fixture, and this repository's own `ask` refused until the key was
 written in by hand.
+
+**23c. Nor is it an `[mcp]` key, and there the reason is the opposite one.**
+`MCP_KEYS` is `top` alone. `related` is **unconditional** on `fux_search` —
+decision 11's reasoning for the confidence block, applied unchanged: a tool call
+cannot pass a flag, so an absent key on that surface could only mean *this
+server predates the tier*, which is the W-48 trap rather than a setting. **A
+`[mcp] related` key would be a way to hide a list from an agent that has no way
+to ask for it back**, and the failure mode it creates — an agent that never
+learns the neighbourhood exists — is silent at both ends.
+[SR-MCP](0136_mcp.md) owns the tool's half of this.
 
 ⚠ **The general rule this makes explicit, and it was implicit before:** *a new
 key in this file costs every existing consumer an edit.* That is affordable for

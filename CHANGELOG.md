@@ -8,6 +8,46 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Added
+
+- 🔴 **`fux ask` follows links: a boosted tier and a labelled `related` tier**
+  (W-161). `ask` is now `lexical` → graph walk → split → confidence → refer.
+  BM25F retrieves by shared vocabulary, so a document that never uses your
+  words cannot be retrieved at any depth however central it is; the walk out of
+  the top-k finds those.
+  - **Tier A (boosted)** re-orders the documents BM25F retrieved by
+    `RRF(lexical rank, PPR rank)`. **A row the walk moved carries its move** —
+    `(graph #7 -> #2)` in text, `boosted` + `route` in `--json`.
+  - **Tier B (`related`)** is a separate list of documents *no query word
+    matched*, each with the route it was reached by (`#2 via ref`). **Never
+    counted as an answer and never in the confidence band.** `fux answer` does
+    fetch them and re-score on the bytes.
+  - ⚠ **`results` may no longer be monotone in `score`.** The order is a rank
+    fusion; the number is still BM25F. **A consumer re-sorting by `score` is
+    re-deriving the lexical order** — which is a real thing to want, and
+    `fux lexical` is the verb that returns it.
+  - **New keys on every hit:** `boosted` (bool) and `route` (str | null), in
+    `--json`, `fux.api` and the Node reader alike. Additive; `false`/`null` is
+    the claim, never an absence.
+  - **`fux_search` over MCP carries `related` unconditionally**, because a tool
+    call cannot pass a flag.
+  - **Off with:** `--no-related` per call; `[graph] ask_boost = false` /
+    `ask_related = false` per repository; `--no-tune` turns the whole tier off
+    with everything else. Six new `[graph]` keys — the two booleans are
+    separate so either arm can be withdrawn without touching the other.
+  - ⚠ **Unmeasured, and deliberately shipped that way.** Ratified on design;
+    the two arms are frozen in
+    [`work/regression/2026-09-14-graph-ask/`](work/regression/2026-09-14-graph-ask/PRE-REGISTRATION.md)
+    and cannot be measured until the golden key carries link-dependent
+    questions. **If either arm fails, that arm's default becomes `false`.**
+  - **No new `.fux/output.toml` key**, so no existing config file breaks.
+  - **`fux find` shares the boost and never gets `related`** — two
+    ranked-document verbs must rank one corpus one way, but `find` pipes bare
+    paths. **`fux lexical` is unchanged**, which is what it is for.
+  - ⚠ **Node pays a full record parse per `ask`** while the tier is on: it
+    rebuilds the graph plane in memory rather than requiring `fux build`. Its
+    query latency is unmeasured.
+
 ### Changed
 
 - 🔴 **`No confident matches.` goes to STDERR on `ask`, `find` and `answer`** —
