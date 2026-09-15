@@ -1,0 +1,37 @@
+corpus n=450   avg_wlen 532.7
+probe-term df: 2-14
+
+baseline b=0.75 (shipped). One lever moves; `flen` is the shipped one in every arm.
+
+   family    n  hit@1 b=0.75   hit@1 b=0.6    hit@1 b=0.5    hit@1 b=0.4  
+     main   30      0 /30         0 /30         0 /30         0 /30   
+  inverse   30     30 /30        30 /30        30 /30        30 /30   
+  placebo   30     30 /30        30 /30        30 /30        30 /30   
+     dump   30     30 /30        30 /30        30 /30        30 /30   
+  content   30      0 /30         0 /30         0 /30         0 /30   
+
+Paired against the baseline, per family (b = better, w = worse, net = b - w):
+
+   family      b  better  worse  discordant    net         p  outcome
+     main    0.6       0      0           0     +0    1.0000  inconclusive
+  inverse    0.6       0      0           0     +0    1.0000  inconclusive
+  placebo    0.6       0      0           0     +0    1.0000  inconclusive
+     dump    0.6       0      0           0     +0    1.0000  inconclusive
+  content    0.6       0      0           0     +0    1.0000  inconclusive
+
+     main    0.5       0      0           0     +0    1.0000  inconclusive
+  inverse    0.5       0      0           0     +0    1.0000  inconclusive
+  placebo    0.5       0      0           0     +0    1.0000  inconclusive
+     dump    0.5       0      0           0     +0    1.0000  inconclusive
+  content    0.5       0      0           0     +0    1.0000  inconclusive
+
+     main    0.4       0      0           0     +0    1.0000  inconclusive
+  inverse    0.4       0      0           0     +0    1.0000  inconclusive
+  placebo    0.4       0      0           0     +0    1.0000  inconclusive
+     dump    0.4       0      0           0     +0    1.0000  inconclusive
+  content    0.4       0      0           0     +0    1.0000  inconclusive
+
+🔴 The decision rule is the PRE-REGISTRATION's, and this command does not apply it:
+   the first value, descending, netting positive on dump AND content AND main,
+   with `inverse` moving the other way and `placebo` not moving, and the net
+   clearing SR-RS decision 19's floor. An ambiguous result goes to Arpit.

@@ -131,9 +131,23 @@ play: the worklog is the granular, per-exchange trail.
   saw a match. ⚠ **Nothing detects the next one**, and that is named rather than
   half-built: the check that would needs the corpus, and `ladder_check.py`'s
   whole virtue is that it does not.
-- **Next:** W-179 (the Node latency column — the harness half is written, the run
-  is not), then W-180 · W-154. W-140 is 🟢 and its only remaining question is a
-  call, not work: close row 21 as unreproduced, or put it to Arpit.
+- **Did — W-180, the frozen `b` sweep:** `FAIL`. **No pre-registered value
+  clears** — `0.6`, `0.5` and `0.4` leave all five families exactly where `0.75`
+  does, 0 discordant everywhere. 🔴 **But the lever is not inert**, and checking
+  that was the whole difference: a mechanism probe outside the arms (SR-RS 22c)
+  puts `content`'s crossover at **`b ≤ 0.3`** and `main`'s at **`b ≤ 0.15`**,
+  monotone in `b`. **The frozen range was set above the effect** — the mirror
+  image of the hazard the descending rule guards against, and invisible without
+  the probe. 🔴 **And option (d) lacks option (b)'s defect**: `dump`, the family
+  W-155 showed (b) DESTROYED, holds 30/30 down to `b = 0`. ⚠ **Both controls are
+  saturated**, so *nothing regresses* is consistent with safety and is not
+  evidence of it. **W-144 goes to Arpit with three named options** — picking
+  `0.15` because the probe found it is the moving-threshold failure the rule
+  exists to prevent.
+- **Did — W-140 closed** (row 21 as *unreproduced*, not proven closed).
+- **Next:** W-179's sweep is running; then W-154. ⚠ **The first tier's numbers
+  were measured while I ran the unit suite on the same machine** — re-running
+  clean rather than filing them.
 
 ## 2026-09-15 — W-168 step 1: anchor text, built  ·  Claude Code (Opus 5)
 

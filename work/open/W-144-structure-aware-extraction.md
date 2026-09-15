@@ -8,6 +8,35 @@ lane: agent
 timestamp: 2026-09-12T00:00:00Z
 ---
 
+## 🔴 THE SWEEP IS RUN, AND NO PRE-REGISTERED VALUE CLEARS (2026-09-15)
+
+[Verdict](../regression/2026-09-15-b-sweep/VERDICT.md) · `FAIL`.
+
+`b = 0.6`, `0.5` and `0.4` leave **all five families exactly where `0.75` does**
+— 0 discordant pairs, everywhere. The pre-registration's fallback fires.
+
+🔴 **But the lever is not inert.** A mechanism probe outside the arms
+(SR-RS 22c) puts the crossovers **below the frozen floor**:
+
+| family | flips between |
+|---|---|
+| `content` — the table IS the answer | **0.4 and 0.3** |
+| `main` — prose with a table appendix | **0.2 and 0.15** |
+
+🔴 **And option (d) does not have option (b)'s defect.** `dump` — the family
+W-155 showed option (b) **destroyed** — holds **30/30 down to `b = 0`**.
+Lowering `b` rescales every document's length together; excluding table tokens
+rewrote one document's length by ~7×.
+
+⚠ **Both controls are saturated** (30/30 in every arm), so *nothing regresses*
+is consistent with safety and **is not evidence of it**.
+
+**Three options, in the inbox** — take the pre-registered fallback, pre-register
+a lower range, or stop at `0.75`. **Not taken here**: picking `0.15` because the
+probe found it is the moving-threshold failure the descending rule exists to
+prevent.
+
+
 # W-144 — structure-aware extraction, graduated
 
 **Model: Opus** — it is a ranking change gated on a pre-registered measurement,

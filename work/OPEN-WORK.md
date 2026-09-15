@@ -23,9 +23,11 @@ here. Read that record before changing anything below it.
 
 | what he decides | filed | age |
 |---|---|---|
+| 🔴 **W-144** — the `b` sweep FAILED its frozen rule and **the lever works below the range**: **(a)** the pre-registered fallback · **(b)** pre-register a LOWER range · **(c)** stop at `0.75`. [verdict](regression/2026-09-15-b-sweep/VERDICT.md) | 2026-09-15 | 0d |
+| ↳ **blocks:** W-144, and nothing else in the queue | | |
 
-*Empty since 2026-09-15* — W-168 step 1 was the last row and he ruled it (c) the
-day it was filed. Nothing in the queue waits on a decision of his.
+⚠ **It blocks W-144 and nothing else.** Every other item below is
+agent-closable; this row is a session output, not a stop.
 
 ---
 
@@ -42,13 +44,12 @@ day it was filed. Nothing in the queue waits on a decision of his.
 ### testing
 
 
-- 🟢 **W-180** · `agent` — run the **frozen `b`-sweep** on the golden ladder in `fux-lab`; the threshold may not move, a null closes W-144. Unblocks W-144. [detail](open/W-180-b-sweep-run.md)
 - 🟢 **W-154** · `agent` — the instrument exists (W-183, `agreement` 0.4141) and the ladder loads again. ⚠ The `ask` arm's document-level screen runs FIRST. [detail](open/W-154-rerank-weight-cost.md)
 - 🟣 **W-136** · `arpit`, waiting on **2026-09-30** — everything an agent can do is done; **phase 5 scoring is Codex's hands** and is all that is left. [detail](open/W-136-golden-benchmark.md)
 - 🟣 **W-145** · `arpit`, waiting on **2026-09-30** — Codex regenerates the golden answer key; until then every golden number is `informed`. [detail](open/W-145-codex-regenerates-the-key.md)
 - 🟣 **W-87** · `agent`, waiting on W-145 — P2's `unanswerable` gate is measured (0/124); recall needs phase 5 and **Part B needs an uncontaminated key**. [detail](open/W-87-what-good-means.md)
 - 🟣 **W-175** · `agent`, waiting on **2026-09-30** — does a correction help OTHER phrasings? Ruled 2026-09-14: three arms (dogfood · fux's own tree · Codex), N=12 / M=5. Harness now; the numbers wait for Codex's blind paraphrases. [detail](open/W-175-correction-generalisation.md)
-- 🟡 **W-144** · `agent`, waiting on W-180 — **step 1 done 2026-09-15**: the sweep is [pre-registered](regression/2026-09-15-b-sweep/PRE-REGISTRATION.md) and frozen. Steps 2–4 are the run. [detail](open/W-144-structure-aware-extraction.md)
+- 🔴 **W-144** · `arpit` — the `b` sweep is RUN and **no pre-registered value clears**; the lever reaches the endpoint below the frozen range and nothing regresses down to `b = 0`. Three options in the inbox. [detail](open/W-144-structure-aware-extraction.md)
 
 
 ---
