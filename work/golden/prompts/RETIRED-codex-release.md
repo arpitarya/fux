@@ -1,8 +1,28 @@
 ---
 type: Prompt
-title: "Prompt 3 — Codex freezes the ladder and releases the questions"
+title: "RETIRED — the freeze-and-release prompt (its three jobs moved on 2026-09-15)"
 item: W-136
 timestamp: 2026-09-11T00:00:00Z
+---
+
+# RETIRED — the freeze-and-release prompt
+
+🔴 **Do not run this.** It is kept because nothing here gets deleted, not because
+it still works: it asks *"is the answer key (1) in the file, or (2) in the
+chat?"*, a question [L11](../../../records/0012_LAW-11-sealed-answer-key.md)
+deleted on 2026-09-15 by giving it one permanent answer.
+
+**Where its three jobs went, 2026-09-15:**
+
+| it used to | now |
+|---|---|
+| verify every rung manifest against its directory | [prompt 4](4-claude-corpus.md), which starts by checking the eight existing rungs |
+| mark 20 % of ids `sealed` | [prompt 2](2-codex-questions.md) and [prompt 3](3-claude-questions.md) — the author marks its own holdout |
+| emit the questions-only file | the same two prompts, as **block 1** of the two-block handoff; block 2 is the key, which Arpit keeps |
+
+**Restoring it as a live step is Arpit's call**, and it would need the custody
+question cut out first. The text below is the 2026-09-14 version, unchanged.
+
 ---
 
 # Prompt 3 — Codex: freeze the ladder and release the questions

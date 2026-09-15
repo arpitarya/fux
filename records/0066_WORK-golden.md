@@ -7,10 +7,10 @@ description: "The prohibition is law L11 and this record states none of it; what
 status: accepted
 date: 2026-09-15
 feature: the golden benchmark — its two question sets, the key's custody, its guards, what Claude may read, and where the prohibition is stated
-owns: [.claude/hooks/guard-golden-answer.sh@c505d04c0628, scripts/gen-golden.py@1b2a854c1f75, tests/test_claude_md_golden.py@49db9e6261d8, tools/golden-difficulty@867efc6effe1]
+owns: [.claude/hooks/guard-golden-answer.sh@c505d04c0628, scripts/gen-golden.py@1b2a854c1f75, tests/test_claude_md_golden.py@49db9e6261d8, tools/golden-difficulty@90dcae7328b7]
 laws: [L0, L11]
 timestamp: 2026-09-15T00:00:00Z
-content_sha: daa1b106262c6ad8320ca2b71c0889f7cf53abb620402173efc68ebda5bb54b1
+content_sha: fcb465c97a60d1a7b6dacb212f36c01c2d551704fa2a37d67825db4c9191d256
 ratifies: "Arpit, 2026-09-15 — W-146 row 17: the prohibition gets a record and CLAUDE.md keeps a generated view; the same day he ruled it into law L11 and then amended it — two question sets, one Claude-authored and one Codex-authored, with both answer halves in his custody and no key file at all"
 ---
 
@@ -32,9 +32,9 @@ that cannot be traded away by an ordinary decision. It became **law L11** on
 guard list has grown twice, the questions moved from one set to two the same day,
 and what Claude may read moves when a set is released.
 
-**Two sets, one custody (Arpit, 2026-09-15).** **Set A** is authored by Claude
-from Codex's seed documents; **set B** is authored by Codex. Their *questions*
-are two instruments and this record keeps them apart. Their *answers* are one
+**Two sets, one custody (Arpit, 2026-09-15).** **Set 1** is authored by Codex;
+**set 2** is authored by Claude, over the same Codex-written seed documents.
+Their *questions* are two instruments and this record keeps them apart. Their *answers* are one
 thing and they are Arpit's: **no key file exists**, and the only route an answer
 travels is a paste into a chat, which is Codex's route and never Claude's. That
 is [L11](0012_LAW-11-sealed-answer-key.md) and is not restated here.
@@ -143,20 +143,20 @@ the rule.
 Read it before anything near `work/golden/`. **This block states none of it.** It
 is the surrounding process:
 
-- **There are two question sets (Arpit, 2026-09-15).** **Set A** — questions and
-  answers authored by Claude from `work/golden/seed/`. **Set B** — questions and
-  answers authored by Codex. Two authors make question-authorship bias visible
-  instead of invisible; the sets are scored and reported separately, and **every
-  set A number is `informed` permanently** because its author and its runner are
+- **There are two question sets (Arpit, 2026-09-15).** **Set 1** — questions and
+  answers authored by **Codex**. **Set 2** — questions and answers authored by
+  **Claude**, from `work/golden/seed/` only. Two authors make question-authorship
+  bias visible instead of invisible; the sets are scored and reported separately, and **every
+  set 2 number is `informed` permanently** because its author and its runner are
   the same model family.
 - **Arpit holds both answer halves and there is no key file.**
-  `work/golden/golden-answer/` is not a location. The old per-run question —
-  *"the file, or the chat?"* — is deleted from every prompt; the answer is the
-  chat, always. ⚠ **No Claude session removes that directory either**, because
-  deleting it is a tool call that reaches into it: **Arpit removes it himself.**
+  `work/golden/golden-answer/` **was deleted by Arpit on 2026-09-15** and is not
+  a location. The old per-run question — *"the file, or the chat?"* — is gone
+  from every prompt; the answer is the chat, always. ⚠ **If it ever reappears, no
+  Claude session removes it** — deleting is a tool call that reaches into it.
 - **What Claude MAY read:** `work/golden/seed/`, the READMEs and the prompts, and
-  a released `questions/*.jsonl` (ids and text only). The five phases, the
-  ladder, the rungs and what a result may claim are in
+  a released `questions/set-N.jsonl` (ids and text only). **The six prompts**,
+  the ladder, the rungs and what a result may claim are in
   [`work/golden/README.md`](../work/golden/README.md).
 - **The guards are a backstop now, not the defence** — `.gitignore`;
   `!work/golden` in `.fux/sources/dirs`; `permissions.deny` in
@@ -169,10 +169,11 @@ is the surrounding process:
   `work/` that never names the folder — L11 makes excluding `work/golden/` part
   of the rule. And **a paste**: an answer put into a Claude session's context by
   any hand is a leak to declare, never a permission that arrived by another door.
-- **The set B key in use is provisional and that relaxes nothing.** It is
-  Claude-authored, every run scored against it is `informed`, and it is being
-  replaced — a leak from a draft key contaminates the sessions building against
-  its successor.
+- **Both sets were reset on 2026-09-15 and neither exists yet.** Arpit deleted
+  the provisional Claude-authored key and the 124 released questions; the seed
+  corpus and the ladder survived. **Every id from the old set is orphaned and
+  never reused**, so a filed number from it may not be compared with anything
+  scored on set 1 or set 2.
 <!-- GOLDEN-TEXT:END -->
 
 3. **The generator and its bind.**
@@ -213,17 +214,22 @@ is the surrounding process:
    hook.
 
 8. **Two question sets, and they are separate instruments** (Arpit,
-   2026-09-15). **Set A** — ids `a001…` — is authored by **Claude** from
-   `work/golden/seed/` and nothing else, in one designated session that hands
-   questions *and* answers to Arpit in the chat, writes no file, and never runs a
-   rung. **Set B** — ids `g001…` — is authored by **Codex**, per
-   [`prompts/1-codex-seed.md`](../work/golden/prompts/1-codex-seed.md). ⚠ **The
-   id namespaces must not collide**: a prediction file names ids and nothing
-   else, and one ambiguous id silently scores the wrong set.
+   2026-09-15). **Set 1** — ids `s1-001…` — is authored by **Codex**, per
+   [`prompts/2-codex-questions.md`](../work/golden/prompts/2-codex-questions.md).
+   **Set 2** — ids `s2-001…` — is authored by **Claude** from `work/golden/seed/`
+   and nothing else, per
+   [`prompts/3-claude-questions.md`](../work/golden/prompts/3-claude-questions.md),
+   in one designated session that hands questions *and* answers to Arpit in the
+   chat, writes no file, and never runs a rung. ⚠ **The id namespaces must not
+   collide**: a prediction file names ids and nothing else, and one ambiguous id
+   silently scores the wrong set. ⚠ **The sets are numbered, not named after
+   their author** (Arpit, 2026-09-15) — the author is a fact about a set, not its
+   identity, and a number survives a change of author.
 
 9. **The sets are run on the same ladder and reported apart.** Same rungs, same
    engine commit, one `predictions.jsonl` per set per rung
-   (`predictions-a.jsonl` / `predictions-b.jsonl`). **A cross-set comparison is
+   (`predictions-set-1.jsonl` / `predictions-set-2.jsonl`), plus one
+   `handoff-set-N.jsonl` carrying what fux answered. **A cross-set comparison is
    the point** — the same engine on two authors' questions — and **a pooled
    number across both sets is meaningless** and is never written.
 

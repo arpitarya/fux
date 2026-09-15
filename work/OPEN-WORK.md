@@ -25,9 +25,12 @@ here. Read that record before changing anything below it.
 |---|---|---|
 | 🔴 **W-144** — the `b` sweep FAILED its frozen rule and **the lever works below the range**: **(a)** the pre-registered fallback · **(b)** pre-register a LOWER range · **(c)** stop at `0.75`. [verdict](regression/2026-09-15-b-sweep/VERDICT.md) | 2026-09-15 | 0d |
 | ↳ **blocks:** W-144, and nothing else in the queue | | |
+| 🔴 **W-189** — **run prompt 2** (Codex writes set 1), then **prompt 3** (Claude writes set 2, fresh session). The corpus, the prompts and the scorer are ready; both keys are his to hold. [detail](open/W-189-two-question-sets.md) | 2026-09-15 | 0d |
+| ↳ **blocks:** W-190, W-145, W-136, and W-87's recall half | | |
 
-⚠ **It blocks W-144 and nothing else.** Every other item below is
-agent-closable; this row is a session output, not a stop.
+⚠ **Two rows, and the second gates the whole golden lane.** W-144 blocks only
+itself; **W-189 blocks every golden item**, because the benchmark has no
+questions until Arpit runs prompts 2 and 3.
 
 ---
 
@@ -43,10 +46,10 @@ agent-closable; this row is a session output, not a stop.
 
 
 - 🟢 **W-154** · `agent` 🧨 — Part B RAN and is **VOID**: 75 % of the `ask` regression is the query's own source document winning. Fix named (exclude the citing document); needs a NEW pre-registration. [detail](open/W-154-rerank-weight-cost.md)
-- 🟢 **W-189** · `agent` — **two question sets** (Claude's A, Codex's B) and **no key file at all**: L11 amended, prompts rewritten 2026-09-15. Left: **author set A in a fresh session** (prompt 1a). [detail](open/W-189-two-question-sets.md)
-- 🟣 **W-190** · `agent`, waiting on **W-145** — difficulty is a **count of discriminations**, not a label; schema + scorer BUILT 2026-09-15. The first real run needs a key. [detail](open/W-190-question-difficulty.md)
-- 🟣 **W-136** · `arpit`, waiting on **2026-09-30** — everything an agent can do is done; **phase 5 scoring is Codex's hands** and is all that is left. ⚠ **Phase 5 is now a chat he attends** — there is no key file to batch over. [detail](open/W-136-golden-benchmark.md)
-- 🟣 **W-145** · `arpit`, waiting on **2026-09-30** — Codex regenerates the golden answer key; until then every golden number is `informed`. [detail](open/W-145-codex-regenerates-the-key.md)
+- 🔴 **W-189** · `arpit` — **two numbered question sets** (1 Codex, 2 Claude) and **no key file at all**; the six prompts are renumbered and ready. Left: **he runs prompt 2, then 3**. [detail](open/W-189-two-question-sets.md)
+- 🟡 **W-190** · `agent`, waiting on **W-189** — difficulty is a **count of discriminations**, not a label; schema + scorer BUILT 2026-09-15. The first real run needs a key. [detail](open/W-190-question-difficulty.md)
+- 🟡 **W-136** · `arpit`, waiting on **W-189** — ⚠ **its questions and key were deleted 2026-09-15**; the seed and the eight rungs survive. Scoring is a chat he attends now. [detail](open/W-136-golden-benchmark.md)
+- 🟡 **W-145** · `arpit`, waiting on **W-189** — ⚠ **overtaken**: the contaminated key it would regenerate was deleted 2026-09-15, and W-189's prompt 2 is what closes the need. [detail](open/W-145-codex-regenerates-the-key.md)
 - 🟣 **W-87** · `agent`, waiting on W-145 — P2's `unanswerable` gate is measured (0/124); recall needs phase 5 and **Part B needs an uncontaminated key**. [detail](open/W-87-what-good-means.md)
 - 🟣 **W-175** · `agent`, waiting on **2026-09-30** — does a correction help OTHER phrasings? Ruled 2026-09-14: three arms (dogfood · fux's own tree · Codex), N=12 / M=5. Harness now; the numbers wait for Codex's blind paraphrases. [detail](open/W-175-correction-generalisation.md)
 - 🔴 **W-144** · `arpit` — the `b` sweep is RUN and **no pre-registered value clears**; the lever reaches the endpoint below the frozen range and nothing regresses down to `b = 0`. Three options in the inbox. [detail](open/W-144-structure-aware-extraction.md)

@@ -54,9 +54,9 @@ false`. **`d <= 1` easy · `2` medium · `>= 3` hard**, and unanswerable is
 
 ## What is left
 
-- 🟣 **The first real run**, over a regenerated set B key and an authored set A
-  key, on each rung. **Needs a key, so it is Arpit's and Codex's hands** —
-  waiting on [W-145](W-145-codex-regenerates-the-key.md) (gated 2026-09-30).
+- 🟡 **The first real run**, over set 1's and set 2's keys, on each rung. **Needs
+  a key, so it is Arpit's and Codex's hands** — waiting on
+  [W-189](W-189-two-question-sets.md), whose prompts 2 and 3 write them.
 - ⚠ **The bands are provisional in one specific way**: `d <= 1 / 2 / >= 3` was
   chosen before any distribution over a real key existed. **If the first real run
   puts 80 % of questions in one band the thresholds are wrong, not the questions**
@@ -66,8 +66,9 @@ false`. **`d <= 1` easy · `2` medium · `>= 3` hard**, and unanswerable is
 
 ## Two defects it inherits, neither closable here
 
-- **The provisional set B key's existing `difficulty` labels are the same
-  contaminated artifact as the rest of it.** They are regenerated under W-145,
-  never patched in place.
+- **There is nothing to score yet.** Arpit deleted both the provisional key and
+  the released questions on 2026-09-15, so the first difficulty output will be
+  computed on set 1 and set 2 from scratch — **no old label is carried forward or
+  patched.**
 - **Difficulty is not quality.** A vague question with one relevant document
   scores `easy` and is still a bad question. Nothing here grades a key.

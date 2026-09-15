@@ -2396,33 +2396,40 @@ the reason is that the measuring environments are gone.**
 *Updated **2026-09-12** (Claude Code, Opus) — maintainer line: this session.*
 *Updated **2026-09-13** (Cowork, Opus) — maintainer line: this session.*
 
-### The golden key is no longer a file (2026-09-15, Cowork)
+### The golden benchmark was reset and rebuilt (2026-09-15, Cowork)
 
 **Read this before touching anything near `work/golden/`.** The shape a previous
 session would remember is gone:
 
-- **There are two question sets**, not one — **A** authored by Claude over
-  Codex's seed documents (ids `a001…`), **B** authored by Codex (ids `g001…`).
-  Same corpus, same ladder, **run and reported apart and never pooled**.
+- 🔴 **Arpit deleted the answer key, `golden-answer/`, and the 124 released
+  questions.** **The seed corpus and the eight ladder rungs survive** and are
+  unchanged. Every old id (`g001…`) is **orphaned and never reused** — a filed
+  number from them may not be compared with anything scored from here on.
+- **There are two question sets, numbered, not named after their author** —
+  **set 1** by Codex (`s1-001…`), **set 2** by Claude from `seed/` only
+  (`s2-001…`). Same corpus, same ladder, **run and reported apart, never pooled**.
 - **No answer key exists as a file.** Arpit holds both and pastes what a run
-  needs; the *"(1) the file, or (2) the chat?"* question is **deleted** from
-  prompts 1, 3 and 5. A prompt that still asks it is stale.
-- 🔴 **Law [L11](../records/0012_LAW-11-sealed-answer-key.md) now closes every
-  agent out of a key file and closes Claude out of a paste too.** The one
-  exception is **authoring set A**, one handoff wide: that session writes no
-  file, hands the answers to Arpit in the chat, and **never runs a rung or
-  returns**.
-- ⚠ **`work/golden/golden-answer/` is Arpit's to delete.** No agent may, because
-  deleting is a tool call that reaches into it. Its existence authorizes nothing.
-- ⚠ **Set A will never be `blind`** — author and runner are one model family.
+  needs; the *"the file, or the chat?"* question is **deleted** from every prompt.
+  A prompt that still asks it is stale.
+- **Six prompts now, numbered in the order he runs them:** 1 seed (documents
+  only) · 2 Codex writes set 1 · 3 Claude writes set 2 · 4 corpus, blind ·
+  5 run + **hand-off** · 6 Codex scores. `RETIRED-codex-release.md` is kept and
+  must not be run.
+- 🔴 **Prompt 5's hand-off is the design.** It carries what fux **answered and
+  cited**, not only what it ranked, and Arpit walks it to Codex. **The only place
+  a golden answer and a fux answer ever meet is a chat he is sitting in.**
+- 🔴 **Law [L11](../records/0012_LAW-11-sealed-answer-key.md) closes every agent
+  out of a key file and closes Claude out of a paste too.** The one exception is
+  **authoring set 2**, one handoff wide: that session writes no file, hands the
+  answers over in the chat, and **never runs a rung or returns**.
+- ⚠ **Set 2 will never be `blind`** — author and runner are one model family.
   That is an assumption filed as SR-LAW-11 decision 7, not Arpit's ruling.
 - **Difficulty is a count now, not a label** — `tools/golden-difficulty/`,
   `d ≤ 1` / `2` / `≥ 3`, unanswerable floored at hard, plus a per-rung distractor
   count. 🔴 Never derived from fux's own results. **The bands are movable only
   until a number is scored against them** (SR-RS 10b).
-- **Next on it:** author set A with `prompts/1a-claude-set-a.md`, in a session
-  that has never run a rung or read `questions/`. That is [W-189](open/W-189-two-question-sets.md)'s
-  only agent-closable piece.
+- **Next on it: Arpit runs prompt 2, then prompt 3.** Nothing in the golden lane
+  is agent-closable until he does — [W-189](open/W-189-two-question-sets.md).
 
 ### In flight: the 3.0.0-alpha.0 branch is open and empty of code (2026-09-13, Cowork)
 

@@ -29,7 +29,7 @@ forces**, derived from the key and the corpus and re-derivable by anyone.
 python3 tools/golden-difficulty/difficulty.py --selftest      # synthetic fixtures, no key
 
 python3 tools/golden-difficulty/difficulty.py \
-    --key ~/keys/golden-set-b.jsonl \
+    --key ~/keys/golden-set-1.jsonl \
     --corpus ~/my_programs/fux-lab/corpora/golden/rung-01000 \
     --rung rung-01000 --out difficulty-rung-01000.jsonl
 ```

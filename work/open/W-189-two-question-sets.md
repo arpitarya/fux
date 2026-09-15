@@ -2,7 +2,7 @@
 type: OpenItem
 id: W-189
 title: "W-189 — two golden question sets, and the key's custody"
-description: "Arpit, 2026-09-15: a second question set authored by Claude over Codex's seed documents, alongside Codex's own; and neither set's answers may be reached by any agent — no key file, pastes only, Claude closed on every route. Law L11 amended, SR-WORK-GOLDEN amended, prompts rewritten; what is left is authoring set A and Arpit removing the retired directory."
+description: "Arpit, 2026-09-15: two numbered question sets over the same Codex-written seed corpus — set 1 by Codex, set 2 by Claude — and neither set's answers may be reached by any agent: no key file, pastes only, Claude closed on every route. Law L11 amended, SR-WORK-GOLDEN amended, the prompts renumbered into a six-step sequence; what is left is Arpit running them."
 status: open
 lane: agent
 timestamp: 2026-09-15T00:00:00Z
@@ -31,44 +31,81 @@ A**, and it needs a session that has touched nothing else in the benchmark.
 
 | | before | after |
 |---|---|---|
-| question sets | one, Codex's | **two** — A (Claude) and B (Codex), same seed corpus and ladder |
+| question sets | one, Codex's | **two, numbered** — set 1 (Codex) and set 2 (Claude), same seed corpus and ladder |
 | the key | a sanctioned file, `golden-answer/answers.jsonl`, readable by Codex | **no file at all**; Arpit holds both, pastes what a run needs |
 | who is closed out | Claude | **every agent**, from a file; Claude additionally from a paste |
 | the per-run question | *"the file, or the chat?"*, in prompts 1, 3 and 5 | **deleted** — it had one answer left |
+| the prompts | five, phase-named, seed and questions in one | **six, numbered in the order Arpit runs them** |
+| release | a separate Codex freeze-and-release prompt | **two blocks at the end of each authoring prompt** — one he commits, one he keeps |
+
+⚠ **The sets are numbered, not named after their author** (Arpit, 2026-09-15).
+The author is a fact about a set, not its identity, and a number survives a
+change of author where *"the Claude set"* would quietly become a lie.
 
 ## Done in the filing change
 
 - **L11 amended** — custody, both sets as one subject, the paste route as Codex's
-  alone, and the **authoring carve-out**: one session writes set A's questions and
+  alone, and the **authoring carve-out**: one session writes set 2's questions and
   answers, hands them over in the chat, writes no file, and never returns.
 - **SR-WORK-GOLDEN decisions 8–13** — the two sets and their id namespaces,
   running them on the same ladder and reporting them apart, custody replacing the
-  per-run question, phase 5 as a chat Arpit attends, and difficulty (W-190).
-- **Prompts 1, 3, 4 and 5 rewritten**; **[`prompts/1a-claude-set-a.md`](../golden/prompts/1a-claude-set-a.md)
-  written** — the set A authoring prompt, with its own read-fence.
-- **`work/golden/README.md`** — *Custody*, *The two question sets*, the phase
-  table, per-set predictions and per-set scoring.
+  per-run question, scoring as a chat Arpit attends, and difficulty (W-190).
+- **The six prompts**, renumbered into the order Arpit runs them:
+
+  | # | who | what |
+  |---|---|---|
+  | 1 | Codex | the seed corpus — **documents only** now |
+  | 2 | Codex | **set 1** questions + answers, two blocks in the chat |
+  | 3 | Claude | **set 2** questions + answers, two blocks in the chat |
+  | 4 | Claude Code | verify / build the corpus, blind |
+  | 5 | Claude Code | run both sets, write `handoff-set-N.jsonl` + `report.md` |
+  | 6 | Codex | score, against the key Arpit pastes |
+
+- **The freeze-and-release prompt is retired, not deleted** —
+  [`prompts/RETIRED-codex-release.md`](../golden/prompts/RETIRED-codex-release.md)
+  says where each of its three jobs went (Arpit, 2026-09-15: *"do not delete the
+  prompts, keep the prompts"*).
+- 🔴 **The hand-off is new and is the point of the design.** Prompt 5 writes what
+  fux **answered and cited**, not only what it ranked; Arpit carries that to Codex.
+  **The only place a golden answer and a fux answer are ever together is a chat he
+  is sitting in**, and the party holding both is a person.
+- **`work/golden/README.md`** — the reset, *Custody*, *The two question sets*, the
+  six-prompt spine, per-set predictions and per-set scoring.
+- **`work/golden/questions/README.md`** recreated for the two new files.
 
 ## What is left
 
 | what | who | state |
 |---|---|---|
-| **Author set A** (prompt 1a) | **Claude, a fresh session** | 🟢 **the only agent-closable piece.** ⚠ Not this session and not any session that has run a rung or read `questions/` |
-| Regenerate set B's key | Codex | covered by [W-145](W-145-codex-regenerates-the-key.md), gated 2026-09-30 |
-| Release both sets as `questions/set-a.jsonl` + `set-b.jsonl` | Codex, phase 3 | after both keys exist |
-| Run and score both sets per rung | Claude Code, then Codex | after release; [W-136](W-136-golden-benchmark.md) |
-| **Remove `work/golden/golden-answer/`** | **Arpit, by hand** | ⚠ **blocks nothing, and no agent may do it** — deleting is a tool call that reaches into it (L11 decision 5). Its existence authorizes nothing meanwhile, so this is housekeeping, not a queue blocker |
+| Delete the old key, questions and `golden-answer/` | Arpit | ✅ **done 2026-09-15** |
+| Seed corpus | — | ✅ **unchanged and kept** — prompt 1 is not being re-run |
+| **Prompt 2 — set 1** | **Arpit → Codex** | 🔴 **the next thing to run** |
+| **Prompt 3 — set 2** | **Arpit → Claude, a fresh session** | 🔴 after prompt 2. ⚠ Not a session that has run a rung or read `questions/` |
+| Commit block 1 of each as `questions/set-N.jsonl` | Arpit | after 2 and 3 |
+| Prompt 4 — verify the eight rungs | Claude Code | the ladder survived, so this is a check |
+| Prompt 5 — run both sets, write the hand-off | Claude Code | per rung |
+| Prompt 6 — score | Arpit → Codex, keys pasted | per rung |
+
+🔴 **Everything left is Arpit running a prompt.** No piece of this is
+agent-closable on its own, which is why the row is red rather than green: the two
+places answers exist are both in his hands, by design.
 
 ## Two things a later session will want stated
 
-- 🔴 **Set A can never claim `blind`.** Its author and its runner are the same
-  model family, so no separation of sessions buys a clean delta. **Set A is for
-  comparing question authorship against set B**, and every number measured on it
+- 🔴 **Set 2 can never claim `blind`.** Its author and its runner are the same
+  model family, so no separation of sessions buys a clean delta. **Set 2 is for
+  comparing question authorship against set 1**, and every number measured on it
   carries `informed` permanently. ⚠ **This is an assumption, not Arpit's ruling** —
   he was offered the choice on 2026-09-15 and left it open; it is the
   conservative reading, recorded in [SR-LAW-11](../../records/0012_LAW-11-sealed-answer-key.md)
   decision 7 so nobody has to guess twice. A ruling the other way amends that
   decision and nothing else.
-- ⚠ **The id namespaces are load-bearing.** `a001…` and `g001…`. A prediction
+- ⚠ **The id namespaces are load-bearing.** `s1-001…` and `s2-001…`. A prediction
   file carries ids and nothing else; one collision scores the wrong set and
   nothing anywhere contradicts the number.
+- 🔴 **The old ids are orphaned, not superseded.** `g001…` and everything scored
+  against them are filed history; **no number from them may be compared with set 1
+  or set 2.** The corpus is the same, the instrument is not.
+- ⚠ **[W-145](W-145-codex-regenerates-the-key.md) is overtaken by this item** —
+  it asked Codex to regenerate the contaminated key, and that key no longer
+  exists. Prompt 2 is what closes the need it named.

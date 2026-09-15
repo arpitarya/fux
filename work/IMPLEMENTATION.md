@@ -28,6 +28,17 @@ Rules:
 
 
 
+## 2026-09-15 — **the golden reset: six numbered prompts, two numbered sets**
+
+| item | what landed | evidence |
+|---|---|---|
+| **the pipeline** | six prompts in the order Arpit runs them — 1 seed (documents only) · 2 Codex set 1 · 3 Claude set 2 · 4 corpus, blind · 5 run + hand-off · 6 score. **Prompt 1 no longer writes questions**, which is what let one prompt be re-run without disturbing the other | [`work/golden/prompts/`](golden/prompts/) |
+| **sets are numbered** | set 1 (Codex, `s1-001…`), set 2 (Claude, `s2-001…`) — the author is a fact about a set, not its identity | [SR-WORK-GOLDEN](../records/0066_WORK-golden.md) decision 8 |
+| **release → two blocks** | each authoring prompt ends with block 1 (ids + text, Arpit commits) and block 2 (the key, Arpit keeps). The freeze-and-release prompt is **retired, not deleted** | [`RETIRED-codex-release.md`](golden/prompts/RETIRED-codex-release.md) |
+| **the hand-off** | 🔴 prompt 5 records what fux **answered and cited**, not only what it ranked. **The only place a golden answer and a fux answer meet is a chat Arpit attends** | [`5-claude-run.md`](golden/prompts/5-claude-run.md) |
+| **the reset, stated** | the old key, `golden-answer/` and the 124 questions are deleted; **the seed corpus and eight rungs survive**; every old id is orphaned and **may not be compared** with anything scored from here | [`questions/README.md`](golden/questions/README.md) · [W-189](open/W-189-two-question-sets.md) |
+| **what it does NOT buy** | ⚠ **no set exists yet and no number moved.** W-189 is in the Blocked-on-Arpit inbox and gates W-190, W-145, W-136 and W-87's recall half | [OPEN-WORK](OPEN-WORK.md) |
+
 ## 2026-09-15 — **two golden question sets, and the answer key stops being a file**
 
 | item | what landed | evidence |

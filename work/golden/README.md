@@ -31,24 +31,25 @@ neither, and says only what each guard stops:
 | `.claude/hooks/guard-golden-answer.sh` | any Claude Code tool call — Bash included — that **targets** the folder by path |
 | `CLAUDE.md` §Non-negotiable constraints — L11's generated view | everything above cannot reach: **Cowork**, and a recursive `grep` that never names the folder |
 
-⚠ **There is no key file to back up any more** — see *Custody* below. What the
-guards now defend is a directory that should hold nothing; none is retired,
-because the day somebody re-creates it is the day they earn their keep.
+⚠ **There is no key file, anywhere, and `golden-answer/` was deleted on
+2026-09-15** — see *Custody* below. What the guards defend now is a directory
+that holds nothing; **none is retired**, because the day somebody re-creates it
+is the day they earn their keep. 🔴 **The route none of them covers is a paste** —
+an answer put into a Claude session's context by any hand — and that is prose in
+the law, not a guard.
 
-### ⚠ The set B key in use today is Claude-authored and provisional (2026-09-12)
+### 🔴 The 2026-09-15 reset — both sets are gone and neither is written yet
 
-**Arpit's Codex quota ran out with phase 1 half done**, so he ruled that Claude
-write the feature-coverage documents and the key rather than leave phase 2
-blocked. **Nothing leaked** — no Claude session read a key it was not meant to.
-The defect is upstream: the same model family authored the questions and will
-grow the corpus and run the engine, so the *"Claude wrote the brief but no facts"*
-property below is **false for the key and for documents 11–15 and `seed/archive/`**.
-The base ten documents are still Codex's.
+**Arpit deleted the provisional Claude-authored key and the 124 released
+questions**, along with `golden-answer/`. **The seed corpus and the eight ladder
+rungs survived** — they are the golden data set and nothing about them changed.
 
-**Consequence, binding:** every run scored against this key is `informed`, and
-**no delta measured against it may be stated**. Codex regenerates the key under
-[W-145](../open/W-145-codex-regenerates-the-key.md); the stopgap is destroyed
-when it does.
+- **Every id from the old set (`g001…`) is orphaned and never reused.** Filed
+  predictions and regression rows keyed to them stay as history and **may not be
+  compared** with anything scored on set 1 or set 2.
+- **Start at [prompt 2](prompts/2-codex-questions.md).** Prompt 1 rebuilds the
+  corpus from nothing and is not needed.
+
 
 ### Custody — Arpit holds both sets, and there is no key file (2026-09-15)
 
@@ -67,34 +68,42 @@ none of it — what follows is only what it means for a run.
   nothing.
 - **Scoring is a chat Arpit is present for.** He pastes the rows a run needs into
   a Codex chat; Codex returns per-query results with no answer text and no
-  relevant-document names. **An item waiting on phase 5 waits on his
+  relevant-document names. **An item waiting on phase 6 waits on his
   availability**, not on an agent.
 
 ### The two question sets (2026-09-15)
 
 **Same seed corpus, same ladder, two authors, reported apart.**
 
-| | set A | set B |
+| | **set 1** | **set 2** |
 |---|---|---|
-| questions **and** answers written by | **Claude**, from `seed/` only | **Codex** |
-| ids | `a001…` | `g001…` |
-| released file | `questions/set-a.jsonl` | `questions/set-b.jsonl` (today: `questions/questions.jsonl`) |
-| predictions | `predictions-a.jsonl` per rung | `predictions-b.jsonl` per rung |
-| what a number may claim | 🔴 **`informed`, permanently** | `blind` on the first scored run, per [SR-RS](../../records/0133_predictions.md) |
+| questions **and** answers written by | **Codex** — [prompt 2](prompts/2-codex-questions.md) | **Claude**, from `seed/` only — [prompt 3](prompts/3-claude-questions.md) |
+| ids | `s1-001…` | `s2-001…` |
+| released file | `questions/set-1.jsonl` | `questions/set-2.jsonl` |
+| predictions / hand-off | `predictions-set-1.jsonl` · `handoff-set-1.jsonl` | `predictions-set-2.jsonl` · `handoff-set-2.jsonl` |
+| what a number may claim | `blind` on the first scored run, per [SR-RS](../../records/0133_predictions.md) | 🔴 **`informed`, permanently** |
+
+⚠ **They are numbered, not named after their author** (Arpit, 2026-09-15). The
+author is a fact about a set, not its identity — and a number survives a change
+of author, where *"the Claude set"* would quietly become a lie.
 
 - **Why two.** A benchmark whose questions come from one author measures that
   author's idea of a question as much as it measures the engine. **Two authors
   make that bias visible instead of invisible** — the same engine, the same
   corpus, two question sets, and the gap between them is the measurement.
-- 🔴 **Set A is authored in ONE session that then leaves.** It reads `seed/` and
+- 🔴 **Set 2 is authored in ONE session that then leaves.** It reads `seed/` and
   nothing else, hands the questions *and* answers to Arpit **in the chat**,
   writes no file, and **never runs a rung, scores anything, or returns**. From
-  that handoff on, set A's answers are as closed to Claude as set B's —
+  that handoff on, set 2's answers are as closed to Claude as set 1's —
   authorship buys no access.
-- 🔴 **Set A can never be `blind`**, because its author and its runner are the
+- 🔴 **Set 2 can never be `blind`**, because its author and its runner are the
   same model family. It is bought for question-authorship comparison, **not for a
-  clean delta**, and every document stating a set A number states that label
+  clean delta**, and every document stating a set 2 number states that label
   beside it.
+- **Each author hands over TWO blocks.** Block 1 is `{"id","question"}` only —
+  Arpit commits it as `questions/set-N.jsonl`. Block 2 is the full key — **he
+  keeps it, and it never touches disk.** That is what replaced the old
+  freeze-and-release step.
 - ⚠ **The id namespaces must not collide.** A prediction file names ids and
   nothing else; one ambiguous id silently scores the wrong set.
 - ⚠ **Never pool the two sets into one figure.** The comparison *between* them is
@@ -108,14 +117,13 @@ work/golden/
   seed/                     the seed documents (Codex writes; Claude may read)
   seed/archive/             seed documents that are history — each rung declares it archived=true
   seed-dates.tsv            one date per seed document; each rung commits the file at that date
-  golden-answer/                🚫 NOT a location — no key file, ever (see Custody)
-  questions/set-a.jsonl         set A: ids + text only — Claude-authored questions
-  questions/set-b.jsonl         set B: ids + text only — Codex-authored questions
-  questions/questions.jsonl     set B as released 2026-09-12; becomes set-b.jsonl at regeneration
-  questions/README.md           what they omit, and the cost of them existing before the freeze
+  golden-answer/                🚫 deleted 2026-09-15 — NOT a location, no key file, ever
+  questions/set-1.jsonl         set 1: ids + text only — Codex-authored questions
+  questions/set-2.jsonl         set 2: ids + text only — Claude-authored questions
+  questions/README.md           what they omit, and the cost of them existing before the corpus
   ladder/rung-NNNNN.sha256      frozen manifests: which files make each rung, by hash
   ladder/rung-NNNNN.index       the engine version AND COMMIT, and the index root hash, each rung was built with
-  prompts/                  the five paste-ready prompts, one per phase
+  prompts/                  the SIX paste-ready prompts, in the order Arpit runs them
 ```
 
 **The ladder corpus itself lives in `~/my_programs/fux-lab/corpora/golden/`**,
@@ -161,29 +169,46 @@ waits on 10 000.
 
 ---
 
-## Who does what
+## The six prompts, in the order Arpit runs them
 
-| phase | who | reads | writes | prompt |
+**One prompt per step, and he runs them himself** — the pipeline is deliberately
+not a pipeline an agent can drive end to end, because the two places answers exist
+are both in his hands.
+
+| # | who | reads | writes | prompt |
 |---|---|---|---|---|
-| **1. Seed + set B** (incl. feature coverage) | Codex | nothing from fux | `seed/`, `seed/archive/`, `seed-dates.tsv`; set B's questions **and answers into the chat** | [`prompts/1-codex-seed.md`](prompts/1-codex-seed.md) |
-| **1a. Set A** | Claude, **one session that then leaves** | `seed/` **only** | set A's questions **and answers into the chat** — no file | [`prompts/1a-claude-set-a.md`](prompts/1a-claude-set-a.md) |
-| **2. Extend** | Claude Code | `seed/` **only** | corpus in fux-lab + `ladder/*.sha256` | [`prompts/2-claude-extend.md`](prompts/2-claude-extend.md) |
-| **3. Freeze & release** | Codex | the manifests + both keys, pasted | `questions/set-a.jsonl` and `set-b.jsonl`; marks the sealed subset in each key | [`prompts/3-codex-release.md`](prompts/3-codex-release.md) |
-| **4. Run** | Claude Code | the ladder + the released question files | `predictions-a.jsonl` and `predictions-b.jsonl` per rung | [`prompts/4-claude-run.md`](prompts/4-claude-run.md) |
-| **5. Score** | Codex | predictions + the keys, pasted by Arpit | per-query results **without answers**, per set | [`prompts/5-codex-score.md`](prompts/5-codex-score.md) |
+| **1** | Codex | nothing from fux | `seed/`, `seed/archive/`, `seed-dates.tsv` — **documents only** | [`1-codex-seed.md`](prompts/1-codex-seed.md) |
+| **2** | Codex | `seed/` | **set 1** questions + answers → **two blocks in the chat** | [`2-codex-questions.md`](prompts/2-codex-questions.md) |
+| **3** | Claude, **one session that then leaves** | `seed/` **only** | **set 2** questions + answers → **two blocks in the chat**, no file | [`3-claude-questions.md`](prompts/3-claude-questions.md) |
+| **4** | Claude Code | `seed/` **only** | verifies the eight rungs; builds or repairs the corpus in fux-lab + `ladder/*.sha256` | [`4-claude-corpus.md`](prompts/4-claude-corpus.md) |
+| **5** | Claude Code | the ladder + `questions/set-1.jsonl` and `set-2.jsonl` | `predictions-set-N.jsonl`, **`handoff-set-N.jsonl`** and `report.md` | [`5-claude-run.md`](prompts/5-claude-run.md) |
+| **6** | Codex | the hand-off files + **both keys, pasted by Arpit** | per-query results **without answers**, per set | [`6-codex-score.md`](prompts/6-codex-score.md) |
 
-**Order is load-bearing.** Questions are released only after **every** rung is
-frozen. A rung built after release was built by a session that could have seen
-the questions, so it is `informed` for good.
+**Between 2/3 and 4, Arpit commits block 1 of each handoff** as
+`questions/set-1.jsonl` and `set-2.jsonl`, and keeps block 2 — the key — himself.
 
-⚠ **That order is broken on purpose since 2026-09-12** (Arpit): `questions/` exists
-before the ladder does, so a chat agent can read it instead of asking him. **Phase 2
-is therefore on its honour** — the session extending the corpus reads `seed/` and
-nothing else, and says so in its report. Nothing mechanical enforces this.
+**Between 5 and 6, he carries the two `handoff-set-N.jsonl` files to Codex** and
+pastes the keys there. 🔴 **That hop is the whole design**: it is the only point
+where a question's answer and fux's answer are ever in the same place, and the
+party holding both is a person, not an agent.
+
+⚠ **[`prompts/RETIRED-codex-release.md`](prompts/RETIRED-codex-release.md) is kept
+and must not be run.** Its three jobs moved on 2026-09-15 — the file says where.
+
+### Order is load-bearing, and one part of it is only honour
+
+**Prompt 4 should run before 2 and 3.** A rung built by a session that could have
+read a question is `informed` for good, and `questions/` is on disk from the
+moment Arpit commits block 1.
+
+⚠ **Where the order cannot be kept, prompt 4 is on its honour** — the session
+building the corpus reads `seed/` and nothing else and says so in its report.
+**Nothing mechanical enforces this**, which is why it is written here in full
+rather than assumed.
 
 ---
 
-## Phase 1 — Seed (Codex)
+## Phase 1 — the seed corpus (Codex)
 
 - **The company and the ten documents are specified in
   [`prompts/1-codex-seed.md`](prompts/1-codex-seed.md)** — *Quillfern Cold
@@ -196,13 +221,18 @@ nothing else, and says so in its report. Nothing mechanical enforces this.
 - ⚠ **Claude wrote the brief — the company, the cast and the document roster —
   but no facts.** Every number, date, threshold, incident and decision is Codex's
   invention, so the answer-bearing details were never authored by Claude.
-- **Feature coverage is part of prompt 1 (Arpit, 2026-09-12; it was prompt 1b
-  until then):** superseding pairs with `supersedes:` in frontmatter, archived
-  documents under `seed/archive/`, a date per seed in `seed-dates.tsv`, and
-  intent-split questions that depend on them — see *Feature coverage* below.
-  `1b-codex-feature-coverage.md` was merged into prompt 1 and deleted.
+- **Feature coverage is part of prompt 1:** superseding pairs with `supersedes:`
+  in frontmatter, archived documents under `seed/archive/`, and a date per seed in
+  `seed-dates.tsv` — see *Feature coverage* below.
+- ⚠ **Prompt 1 writes documents only since 2026-09-15.** The questions that used
+  to be its part B are now prompts 2 and 3, one per set.
 
-- **~120–125 questions**, roughly:
+---
+
+## Phases 2 and 3 — the two question sets
+
+**Both prompts obey the same contract**; only the author and the id prefix differ.
+Each produces **~120–125 questions**, roughly:
 
 | type | share | tests |
 |---|---:|---|
@@ -224,7 +254,7 @@ nothing else, and says so in its report. Nothing mechanical enforces this.
 
 - `relevant` = **every** document that helps answer it; `primary` = the best one.
 - `unanswerable` → `answerable: false`, `relevant: []`, `answer: ""`.
-- `sealed` is set in phase 3, not phase 1.
+- `sealed` is marked by the author, in its own key block — prompts 2 and 3.
 - 🔴 **`difficulty` is not hand-written.** It is the object
   [`tools/golden-difficulty/`](../../tools/golden-difficulty/) computes — see
   *Difficulty* below — and an author who types `"difficulty": "medium"` has
@@ -284,16 +314,16 @@ than no band.
 ```
 
 **Store the components, not just the band.** An unexplained `"medium"` cannot be
-checked by anyone; the flag list can, and it lets phase 5 report **which
+checked by anyone; the flag list can, and it lets phase 6 report **which
 discrimination failed** rather than only which bucket did.
 
 🔴 **`difficulty` never ships in a released `questions/*.jsonl`** — same reason
 as `type` and `answerable`: a runner that can see a question is unanswerable
 abstains by arithmetic, and the abstention slice then measures nothing.
 
-⚠ **The labels in the provisional set B key are the same contaminated artifact as
-the rest of it.** They are regenerated with the key under
-[W-145](../open/W-145-codex-regenerates-the-key.md), not patched in place.
+⚠ **Neither key exists yet**, so nothing carries a difficulty label today. The
+scorer runs for the first time once set 1 and set 2 are written —
+[W-190](../open/W-190-question-difficulty.md).
 
 ---
 
@@ -306,17 +336,17 @@ on data that contains the input it acts on.** This table is that declaration.
 | feature | input fux reads | set up by | documents that exercise it | questions |
 |---|---|---|---|---:|
 | `superseded_weight` | `supersedes:` in the newer doc's frontmatter | Codex, [prompt 1](prompts/1-codex-seed.md) part A §3 | 4 pairs: `11-decision-telematics-vendor-2026.md` → `05-…-2023.md` · `12-rate-card-2026-h2.md` → `07-rate-card-and-surcharges.md` · `13-dock-scheduling-rules-2026.md` → `09-dock-scheduling-wiki-export.html` · `15-customer-notification-matrix-2026.md` → `14-…-2025.md` | 12 |
-| `archived_weight` | a directory declared `archived=true` | Codex places files in `seed/archive/`; each rung declares it (phase 2) | 5 docs in `seed/archive/`: `a01-sop-temperature-excursion-rev2.md` · `a02-kalpa-alert-routing-guide-2021.md` · `a03-dock-scheduling-wiki-2021.html` · `a04-driver-hours-policy-2019.md` · `a05-induction-checklist-2020.txt` | 9 |
-| `recency_half_life_days` | commit time per file | Codex writes `seed-dates.tsv`; each rung commits at those dates (phase 2) | all 20 seed documents, dated 2019-08-12 → 2026-07-01 | 7 |
+| `archived_weight` | a directory declared `archived=true` | Codex places files in `seed/archive/`; each rung declares it (phase 4) | 5 docs in `seed/archive/`: `a01-sop-temperature-excursion-rev2.md` · `a02-kalpa-alert-routing-guide-2021.md` · `a03-dock-scheduling-wiki-2021.html` · `a04-driver-hours-policy-2019.md` · `a05-induction-checklist-2020.txt` | 9 |
+| `recency_half_life_days` | commit time per file | Codex writes `seed-dates.tsv`; each rung commits at those dates (phase 4) | all 20 seed documents, dated 2019-08-12 → 2026-07-01 | 7 |
 | abstention | unanswerable questions | Codex, prompt 1 | — | ~10 % of the key |
-| `heading` negative control | heading-matched distractors | Claude, phase 2 `sibling` documents | 32 at rung 100, rising to 392 at rung 1 000 — `ext/sibling/` documents reusing the seed documents' **headings and document types** (Temperature Excursion Response SOP, Rate card and surcharges, Customer notification matrix, Dock scheduling rules, …) with a different company, people, facilities and every number changed | — |
+| `heading` negative control | heading-matched distractors | Claude, phase 4 `sibling` documents | 32 at rung 100, rising to 392 at rung 1 000 — `ext/sibling/` documents reusing the seed documents' **headings and document types** (Temperature Excursion Response SOP, Rate card and surcharges, Customer notification matrix, Dock scheduling rules, …) with a different company, people, facilities and every number changed | — |
 
 A feature with no row, or a row still showing *(filled by …)*, **is not measurable
 yet** — say so in the pre-registration instead of running.
 
 ---
 
-## Phase 2 — Extend the ladder (Claude Code, blind)
+## Phase 4 — the corpus (Claude Code, blind)
 
 **Rungs: seed → 100 → 200 → 500 → 1 000 → 2 000 → 5 000 → 10 000.** Nested: each
 rung is the previous one plus new files, so the seed documents are in every rung.
@@ -420,25 +450,27 @@ seed documents are in `rung-10000`.
 
 ---
 
-## Phase 3 — Freeze and release (Codex)
+## Between the prompts — what Arpit commits, and what he keeps
 
-1. Check every manifest against its rung directory (hashes match; each rung's
-   documents contain the previous rung's, byte for byte; seed files in every rung).
-2. **Sealed holdout:** mark **20 %** of ids `sealed: true`, spread across types.
-   Their results are only ever reported **in aggregate** — a clean holdout that
-   survives Claude seeing per-query scores for the rest.
-3. Write `questions/questions.jsonl` — `{"id", "question"}` **only**. No type, no
-   `answerable`, no difficulty, no sealed flag. **Ids must carry no type signal** —
-   permute the rows before numbering them, or the `unanswerable` slice can be
-   abstained on by arithmetic. ⚠ **Since 2026-09-12 this file is written in phase 1,
-   not phase 3** (Arpit), so a chat agent can run a rung without being handed the
-   questions; [`questions/README.md`](questions/README.md) carries what that costs.
-4. Record the key's SHA-256 in `ladder/KEY.sha256`. Any later change to the key
-   changes the hash, and a changed key is a new `key_version`, never an edit.
+**This replaced the freeze-and-release step on 2026-09-15.** Each authoring
+prompt ends with two fenced blocks and he splits them:
+
+1. **Block 1 → the repository.** `{"id", "question"}` only, committed as
+   `questions/set-1.jsonl` / `set-2.jsonl`. No `type`, no `answerable`, no
+   `difficulty`, no `sealed`. 🔴 **Ids carry no type signal** — each author
+   permutes its rows before numbering, or the `unanswerable` slice can be
+   abstained on by arithmetic.
+2. **Block 2 → Arpit.** The full key, all fields, **including the 20 % sealed
+   holdout the author marked**. It never touches disk; he pastes it into prompt 6
+   when a run needs scoring.
+
+⚠ **`ladder/KEY.sha256` is not written any more.** It pinned a key file, and
+there is no key file — the pin now lives with whoever holds the key, which is the
+point of custody. A changed key is still a new `key_version`, never an edit.
 
 ---
 
-## Phase 4 — Run (Claude Code)
+## Phase 5 — Run and hand off (Claude Code)
 
 - **Pre-register first**, per run: `work/regression/<date>-golden-rung-NNNNN/PRE-REGISTRATION.md`
   — engine sha, rung, metrics with `k` named, and the headroom disclosure SR-RS
@@ -449,39 +481,59 @@ seed documents are in `rung-10000`.
   the record, and say so in the report.
 - **Rungs are independent**, so they can run in parallel. A lab environment points
   at the rung directory with one pinned engine version.
-- For every question, from inside the rung directory:
-  `fux ask "<question>" --json --band --top 10`.
-- **`predictions-a.jsonl` and `predictions-b.jsonl`**, one line per question:
-  `{"id", "ranked": [paths…], "answerable": bool, "band": "…"}`. **One file per
-  set**, never one file for both — the ids are what phase 5 joins on, and a
+- For every question, from inside the rung directory, **two calls**:
+  `fux ask "<question>" --json --band --top 10` and `fux answer "<question>" --json`.
+- **`predictions-set-1.jsonl` and `predictions-set-2.jsonl`**, one line per
+  question: `{"id", "ranked": [paths…], "answerable": bool, "band": "…"}`. **One
+  file per set**, never one for both — the ids are what phase 6 joins on, and a
   merged file makes a mis-join silent.
+- 🔴 **`handoff-set-N.jsonl` is the artifact Arpit carries to Codex** — per
+  question: the question, **what fux answered and cited**, the ranked paths, the
+  band, the rung and the engine commit. **It contains no golden answer**, because
+  no Claude session has one.
+- **`report.md`** says what happened: counts, band distribution, how many
+  questions fux declined, what looked wrong. 🔴 **It never says whether an answer
+  is right** — that word first appears in phase 6, from Codex.
 
 ---
 
-## Phase 5 — Score (Codex)
+## Phase 6 — Score (Codex)
 
-- Compare predictions with the key. **Return no answer text and no relevant
+- Compare the hand-off with the key **Arpit pastes**. **Return no answer text and no relevant
   document names.**
 - **Per-query rows** (non-sealed ids): `id, set, rung, difficulty_band,
   hit@1, hit@5, recall@5, rank_first_relevant, abstained, abstain_correct` →
   `work/regression/<date>-golden-rung-NNNNN/evidence/per-query-<set>.csv`.
   **`set` and `difficulty_band` are columns so the report can stratify**; the
   band comes from the key, never from these rows.
-- **Report the sets apart.** Set A and set B get their own aggregates, and the
+- **Report the sets apart.** Set 1 and set 2 get their own aggregates, and the
   gap between them is a finding in its own right. 🔴 **A figure pooled across both
   sets is never written** — it erases the only thing two sets buy.
 - **Sealed ids:** one aggregate row per metric, never per query.
 - **Pooling keeps the key complete as the corpus grows:** for every question, judge
   each **top-5 result that is not in `relevant`**. If it genuinely answers the
   question, add it to `relevant` with `added_at_rung`, bump `key_version`, and
-  re-score. Report only *how many* were added.
+  re-score. Report only *how many* were added, and hand the updated key back to
+  Arpit in a fenced block — never to a file.
+- **Judge the answer text too**, which is new: whether `answer_text` is supported
+  by its own citations, and whether it agrees with the key. Counts per set and per
+  difficulty band — `supported_and_correct`, `supported_but_wrong`, `unsupported`,
+  `declined`.
 
 ---
 
 ## What a result may and may not claim
 
-- **The first scored run on a frozen ladder is `blind`.** Once Claude has seen
-  per-query scores, any engine or config change made afterwards is `informed`
-  for the non-sealed ids. The sealed aggregate stays the clean comparison.
+- **Set 1's first scored run on a frozen ladder is `blind`.** Once Claude has
+  seen per-query scores, any engine or config change made afterwards is
+  `informed` for the non-sealed ids. The sealed aggregate stays the clean
+  comparison.
+- 🔴 **Set 2 is `informed` from its first number and stays that way** — its
+  author and its runner are the same model family, and no separation of sessions
+  changes that. It is bought for **comparison against set 1**, not for a delta.
+- 🔴 **Nothing scored on set 1 or set 2 may be compared with a number from the
+  deleted 2026-09-12 key.** Those ids are gone and were never re-used; the
+  corpus is the same but the instrument is not.
 - **A delta follows SR-RS**: paired, discordant-count floor, headroom per direction.
-- **No threshold is moved** after a number exists.
+- **No threshold is moved** after a number exists — **including the difficulty
+  bands**, which are movable only until the first number is scored against them.
