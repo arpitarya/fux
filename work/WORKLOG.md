@@ -78,8 +78,23 @@ play: the worklog is the granular, per-exchange trail.
   A/B pair** — 0 discordant is expected and a difference is a defect. Nearly
   free: `ask_node` already returns the ranked list beside the timing and the
   harness discards it.
-- **Next:** 🔴 nothing here was committed, and another session has files staged
-  in the tree — template and emitter must land in ONE commit.
+- **Then built, same session:** `bench.py` — `answer_node()`, `--node-arms` on
+  `hits` and `answers`, and the rank comparison generalised from one hard-coded
+  `A`/`B` pair to `RANK_PAIRS` with **three kinds**: `version` (the finding),
+  `reader` (🔴 a defect — two readers, one index) and `tier` (the graph tier
+  doing something, which is W-161's unmeasured value). New `parity.jsonl`
+  carries identical / first differing rank / **max |Δscore|**. `report.py` and
+  `TEMPLATE.html` gained a reader-parity slide; CAP-2 now counts the `version`
+  pair only. Exercised on a synthetic fixture, both callout branches.
+- **Found while wiring it:** `cmd_file` wrote CAP-4 to **`answers.jsonl`**, a
+  name `.gitignore` bans anywhere in the tree — so the harness had been writing
+  a file the repository refuses to carry. Now `answer-layer.jsonl`, as decision
+  7 always said.
+- **Next:** 🔴 **W-188's numbers do not exist yet** — the run needs the arm
+  venvs and the corpora. ⚠ `answer_node` has never executed once: check by hand
+  that Node's `--band` payload carries `confidence` before the sweep, or every
+  Node row reads `answered`. Nothing here was committed, and another session is
+  writing in the tree.
 
 ## 2026-09-15 — the green queue, worked continuously: W-184, W-183, W-182  ·  Claude Code (Opus 5)
 
@@ -209,9 +224,33 @@ play: the worklog is the granular, per-exchange trail.
 - 🔴 **The load-bearing number is W-161's, not W-179's.** Its tiers *ship on and
   unmeasured*; one is now priced, on one reader, with its VALUE still unmeasured
   on either.
-- **Next:** W-154 is the last 🟢. ⚠ `docs-00100`'s absolute numbers were measured
-  under a concurrent unit-suite run of mine — interleaving protects the
-  difference, never the absolute, and the report says so.
+- **Did — W-154 Part B, and it is VOID.** The gate the pre-registration demanded
+  first **passed** (document-level screen, `agreement` 0.5273 against chance
+  0.1587). Then the `ask` arm read **net −50** — the shape of a decisive negative
+  — and 🔴 **39 of the 52 broken contests (75 %) are the query's OWN SOURCE
+  document taking rank 1.** The queries are sentences lifted verbatim from citing
+  documents, so the citing document is a perfect proximity match. **The reranker
+  did its job and the endpoint scored it as a miss.** Traced by hand on one
+  contest before anything was written down.
+  ⚠ **Both screens passed while the defect was present** — they score the
+  candidates they are **handed** and neither was asked what else is in the
+  corpus. That is the blind spot the screen's own analysis named before any arm
+  ran, now measured rather than predicted. **W-154 does not close**; the fix
+  needs its own pre-registration.
+- **Did — W-179's 10 000 tier**, which narrowed my own earlier wording: the Node
+  reader is **sub-linear**, not flat (26.3 → 26.4 → 42.7 ms across a 100×
+  corpus), while the graph tier goes 37 → 243 → **3 157 ms**. The tier-off arm
+  clears N4's retired `p95 ≤ 150 ms` fence at every tier; the shipped arm misses
+  by 36× at 10 000.
+- **Next:** W-154's corrected endpoint (exclude the citing document), under a new
+  pre-registration. ⚠ **13 contests moved for reasons other than the source** —
+  above the floor of 6, but not by much, so the corrected run may be
+  underpowered.
+- ⚠ **A concurrent Cowork session shared this machine and this tree.** It surfaced
+  through the queue's in-flight marker rather than in advance; every absolute
+  latency in the Node column is contended and the report says which claims
+  survive. It also staged files of mine — the shared docs are committed with a
+  note saying whose edits they carry.
 
 ## 2026-09-15 — W-168 step 1: anchor text, built  ·  Claude Code (Opus 5)
 
