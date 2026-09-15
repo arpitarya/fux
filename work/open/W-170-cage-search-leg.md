@@ -25,6 +25,40 @@ decision 2 now names `.fux/observers/` as the third exemption with his ruling in
 **Nothing blocks the build.** Landing it flips SR-OBSERVE to `accepted`, fills its
 `owns`, and deletes the `SR-OBSERVE` pin in `tests/test_sr_ownership.py`.
 
+## ✅ BUILT 2026-09-15 — `fd674584`
+
+DoD 1–8 are done on the Python reader. **Two things are NOT, and both are
+stated rather than quietly closed:**
+
+1. 🟡 **Node's half is declared OUT OF SCOPE**, which DoD 1 explicitly allows
+   (*"or Node declared out of scope in SR-NODE-SEARCH"*) —
+   [decision 18](../../records/0153_node-search.md). Python has one post-render
+   dispatch point for every verb and the hook's guarantee comes from sitting
+   there; this reader has none, so hosting it would mean five call sites where
+   *after everything* becomes five things to keep true. ⚠ **A repo with
+   observers records its Python runs and not its Node runs.**
+2. 🟡 **The latency capture is not filed.** The keep/remove call wants p50 `ask`
+   with no observer against one with a subscriber's, on this repo and the
+   largest golden rung. **The byte-identity half is discharged by test** — the
+   load-bearing one, with a hostile observer — and the latency half needs a
+   real subscriber's observer, which is the consumer's to write (DoD 7), and a
+   golden rung, which is `fux-lab`'s.
+
+**Three defects the build found in itself:**
+
+- 🔴 **An observer's `print` reached the answer.** The first dispatcher left
+  fux's own `sys.stdout` in place, so `ask --json` emitted valid JSON followed
+  by the observer's line — consumer code on stdout, which DoD 3 forbids. Fixed
+  structurally: stdout is taken away for the whole dispatch. **Found by the
+  hostile test**, which is the one thing in this item that had to be written to
+  fail.
+- ⚠ **The cap ABANDONS a thread; it cannot kill one.** SR-OBSERVE decision 6
+  said *killed* and that word was wrong — Python cannot safely interrupt
+  arbitrary consumer code. Corrected in decision 10b: what the cap guarantees
+  is that a consumer's analytics cannot make `fux ask` slow, only itself.
+- ⚠ **fux named a subscriber**, in the new module's own docstring, by quoting
+  the ruling verbatim. DoD 7's grep caught it.
+
 ## Definition of done
 
 1. **The extension point.** `.fux/observers/*.py` (Python) and, on the Node reader,
