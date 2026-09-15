@@ -7,10 +7,10 @@ description: One canonical encoder, sharded doc-major JSONL, write-if-different;
 status: accepted
 date: 2026-08-18
 feature: generation and update of the committed index, and the refusal that keeps its derived accelerator from diverging
-owns: [src/fux/store@b9c242b1cfaf]
+owns: [src/fux/store@4e0800c422a2]
 laws: [L1, L2, L3, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: aaf92dfab6ce33394a883c72c5dc968935bad42ebf11a5f1d21f7fd2dab25b3b
+content_sha: f16833119bc3d665aedb0eec8df8c6022a56c41587253f3a6041a9a89bbaff5a
 ---
 
 # SR-INDEX-LIFECYCLE — how the index is generated and updated
