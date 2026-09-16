@@ -8,6 +8,47 @@ lane: arpit
 timestamp: 2026-09-11T00:00:00Z
 ---
 
+## ✅ PHASE 5 RAN on `rung-00100` (2026-09-16) — the hand-offs are ready for Arpit
+
+[The run](../regression/2026-09-16-golden-rung-00100/report.md). 249 questions,
+498 `fux` calls, both sets kept apart at every step.
+
+🔴 **It files NO SCORE and none may be inferred from it.** *Correct* first
+appears in [prompt 6](../golden/prompts/6-codex-score.md)'s output, from Codex,
+against a key Arpit pastes there.
+
+**What he gives Codex**, self-contained, one line per question:
+
+- `work/regression/2026-09-16-golden-rung-00100/evidence/handoff-set-1.jsonl` — 125
+- `work/regression/2026-09-16-golden-rung-00100/evidence/handoff-set-2.jsonl` — 124
+
+| | set 1 (Codex) | set 2 (Claude, `informed`) |
+|---|---:|---:|
+| declined | **36 — 28.8 %** | **52 — 41.9 %** |
+| `grounded` / `partial` / `weak` | 52 / 37 / 36 | 32 / 40 / **52** |
+| empty ranked · uncited | 0 · 0 | 0 · 0 |
+
+🔴 **Finding 1 — authorship is visible in the instrument.** Same corpus, same
+engine, same day; **set 2 declines half again as often**. **It is not a claim
+that either set is better** — nothing was scored, and whether those declines are
+right is the key's property. **It is what two authors were commissioned to
+expose.**
+
+🔴 **Finding 2 — `weak` and `declined` coincide EXACTLY, 249 of 249.** Not
+correlated, identical. SR-CONFIDENCE's gate as ruled on 2026-09-14, observed at
+corpus scale — and it means the two columns above carry **one** number.
+
+⚠ **`[bm25f] b` moved `0.75 → 0.15` hours before this ran**, so every ranked
+order is the new ranker's and **nothing scored from these hand-offs may be
+compared with a pre-2026-09-16 golden number.** `engine_commit` is on every row.
+
+⚠ **No re-ingest**: the engine version matches the rung's stamp and only the
+commit differs. Corpus verified first — **100/100 documents against the manifest,
+`seed_drift` NONE**.
+
+**Next: prompt 6 — Codex scores, in a chat Arpit attends.** No Claude session
+takes part, and the other seven rungs are unrun.
+
 # W-136 — the sealed golden benchmark
 
 **Model: NONE — no Claude model executes this.** Phase 5 is **Codex's**, run

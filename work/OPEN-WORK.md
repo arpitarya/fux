@@ -23,8 +23,11 @@ here. Read that record before changing anything below it.
 
 | what he decides | filed | age |
 |---|---|---|
+| 🔴 **W-136** — phase 5 ran and both hand-offs are written. **Whether to release a key for scoring, and when**, is his by [L11](../records/0012_LAW-11-sealed-answer-key.md): the one route an answer travels is a paste, at his choice. [detail](open/W-136-golden-benchmark.md) | 2026-09-16 | 0d |
+| ↳ **blocks:** W-87, W-176, W-190, W-191, and through W-191 also W-161 | | |
 
-*Empty since 2026-09-16 — W-144 and W-193 both ruled; the next gate is W-136 phase 5, prompt 5 then scoring in a chat Arpit attends.*
+⚠ **It is the only row, and it holds up five items.** Everything phase 5 could
+produce is produced; nothing an agent may do moves it.
 
 ---
 
@@ -32,17 +35,17 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🟡 **W-161** · `agent`, waiting on W-191 — **BUILT 2026-09-15**; both tiers ship on and unmeasured. 🔴 **Both arms inert — 0 `ref` edges on the ladder**; they need linked documents, and Codex's questions are not that. [detail](open/W-161-graph-composed-ask.md)
+- 🔴 **W-161** · `agent`, waiting on W-191 — **BUILT 2026-09-15**; both tiers ship on and unmeasured. 🔴 **Both arms inert — 0 `ref` edges on the ladder**; they need linked documents, and Codex's questions are not that. [detail](open/W-161-graph-composed-ask.md)
 - 🟢 **W-168** · `agent` — the ten search improvements. **Step 1 BUILT 2026-09-15**; both question sets released, so steps 2–7 and 9 are runnable now. Step 8 is inert until W-191 lands. [detail](open/W-168-search-improvements.md)
-- 🟡 **W-176** · `agent`, waiting on W-136 — **steps 1–3 landed 2026-09-15**. Gates 4–9 need a SCORED run (prompt 6), not a key — no key exists (L11). ⚠ **Step 10 needs links, W-191.** [detail](open/W-176-abstention-gates.md)
-- 🟡 **W-191** · `agent` 🧨, waiting on W-136 — **specified 2026-09-16**: [prompt 7](golden/prompts/7-codex-link-bearing-seed.md) written, `ref` census generated and gateable. The documents are **Codex's**. [detail](open/W-191-the-ladder-carries-no-links.md)
+- 🔴 **W-176** · `agent`, waiting on W-136 — **steps 1–3 landed 2026-09-15**. Gates 4–9 need a SCORED run (prompt 6), not a key — no key exists (L11). ⚠ **Step 10 needs links, W-191.** [detail](open/W-176-abstention-gates.md)
+- 🔴 **W-191** · `agent` 🧨, waiting on W-136 — **specified 2026-09-16**: [prompt 7](golden/prompts/7-codex-link-bearing-seed.md) written, `ref` census generated and gateable. The documents are **Codex's**. [detail](open/W-191-the-ladder-carries-no-links.md)
 
 ### testing
 
 
-- 🟡 **W-190** · `agent`, waiting on W-136 — difficulty is a **count of discriminations**, not a label; schema + scorer BUILT 2026-09-15. The questions exist; the first real number needs a **scored** rung (prompt 6). [detail](open/W-190-question-difficulty.md)
-- 🟢 **W-136** · `agent` — **prompt 4 RAN 2026-09-15 and the ladder was STALE**: all eight rungs rebuilt from the current seed, `ext/` byte-identical, gate shipped. Next is **prompt 5** (run both sets), then scoring in a chat Arpit attends. [detail](open/W-136-golden-benchmark.md)
-- 🟡 **W-87** · `agent`, waiting on W-136 — P2's `unanswerable` gate is measured (0/124). ✅ **Part B's blocker is gone** (set 1 is Codex-authored), so both halves now wait on phase 5. [detail](open/W-87-what-good-means.md)
+- 🔴 **W-190** · `agent`, waiting on W-136 — difficulty is a **count of discriminations**, not a label; schema + scorer BUILT 2026-09-15. The questions exist; the first real number needs a **scored** rung (prompt 6). [detail](open/W-190-question-difficulty.md)
+- 🔴 **W-136** · `arpit` — **phase 5 RAN on `rung-00100` 2026-09-16**; both hand-offs are written and file no score. **Next is prompt 6 — Codex scores, in a chat he attends.** [detail](open/W-136-golden-benchmark.md)
+- 🔴 **W-87** · `agent`, waiting on W-136 — P2's `unanswerable` gate is measured (0/124). ✅ **Part B's blocker is gone** (set 1 is Codex-authored), so both halves now wait on phase 5. [detail](open/W-87-what-good-means.md)
 - 🟢 **W-175** · `agent` — does a correction help OTHER phrasings? **Pre-registration frozen and the Codex prompt written 2026-09-15** (W-192). The harness is what is left; every number waits on paraphrases only Codex may write. [detail](open/W-175-correction-generalisation.md)
 
 
