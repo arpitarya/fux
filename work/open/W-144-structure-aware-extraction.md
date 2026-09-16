@@ -8,6 +8,66 @@ lane: agent
 timestamp: 2026-09-12T00:00:00Z
 ---
 
+## 🔴 STEP 1 IS DONE, AND IT FOUND THAT THE RULE CANNOT BE SATISFIED (2026-09-16)
+
+[The control probe](../regression/2026-09-16-b-sweep-2-control/report.md).
+
+✅ **Your condition is discharged.** `verbose` exists, and it is proven to lose
+rather than argued to be able to: two prose-only documents, a concise brief with
+6 occurrences against a report **3× as long with 7**. It **holds 30/30 at every
+value in the ruled range** `{0.4, 0.3, 0.2, 0.15}` and **breaks to 0/30 at
+`b = 0`**, `p = 0.0000` on 30 discordant pairs.
+
+⚠ **The extra occurrence is the design.** With equal `tf` the two documents
+merely **tie** as `b → 0`, and a tie is not a regression anyone can read off a
+hit count. At 7 against 6 the verbose document wins outright once length stops
+being paid for, so the control fires as a flip.
+
+🔴 **And it earned its keep in the same probe.** `b = 0` and `b = 0.15` are
+**indistinguishable on every instrument the arm set had before it**: `main` +30,
+`content` +30, `dump`/`inverse`/`placebo` unchanged — at both. The blind spot you
+named was real, and it was exactly one value wide.
+
+✅ **The crossovers replicate** on the new corpus (adding 30 terms moves every
+probe term's `df`, now 2–12): `content` between 0.4 and 0.3, `main` between 0.2
+and 0.15.
+
+### 🔴 The question, and why the run has NOT started
+
+**The ruled rule is unsatisfiable as written.** It asks for the first descending
+value that
+
+> nets positive on all three families — **`dump`**, `content` and `main`, each
+> individually, none negative
+
+**`dump` sits at 30/30 at the baseline.** Its correct answer is the prose
+document, which already wins at `b = 0.75`, so it can **hold or break and never
+net positive** — at any value, forever.
+
+**`dump` is described as a family and behaves as a control.** Its own generator
+says the prose document is *"correct in BOTH arms"* and that collapsing the
+dump's length *"must not change that"*. It was grouped with `content` and `main`
+because all three are *table* families, and the rule inherited the grouping.
+
+| reading | what the sweep returns |
+|---|---|
+| **(1) strict** — net > 0 on all three | **no value clears, ever.** W-144 closes as a measured negative on a technicality |
+| **(2) positive where there is headroom, non-negative everywhere** | **`b = 0.15` clears** — `main` +30, `content` +30, `dump` +0, all three controls holding |
+
+🔴 **Not chosen here.** A pre-registered threshold may never move
+([SR-RS](../../records/0133_predictions.md) decision 10b), and a runner picking
+the reading after seeing which one passes is moving it with extra steps. **No
+pre-registration is frozen and no sweep has run.**
+
+⚠ **Worth knowing before you rule:** reading (2) makes `b = 0.15` the answer, and
+`0.15` is a long way from the literature's `0.75` — which is the discomfort the
+descending rule and the new control were both built for. Reading (1) throws away
+a lever that demonstrably works on two of three benefit families.
+
+⚠ **This would have been cheaper to catch before the 2026-09-15 sweep**, and was
+not: `dump` read `+0` in every column, and **a saturated family and an inert
+lever produce the same number**.
+
 ## ✅ RULED 2026-09-15 (Arpit, Cowork) — (b), a LOWER range, gated on a control that can lose
 
 **Ruling: option (b)** of the three the verdict put up — pre-register a lower `b`

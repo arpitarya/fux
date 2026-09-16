@@ -23,12 +23,15 @@ here. Read that record before changing anything below it.
 
 | what he decides | filed | age |
 |---|---|---|
-| 🔴 **W-193** — argparse exits `2`; SR-CLI decision 5 reserves `2` and says fux never produces one. Leave it, take it, or split it. [detail](open/W-193-argparse-exit-two.md) | 2026-09-15 | 0d |
+| 🔴 **W-144** — the ruled `b` rule cannot be satisfied: `dump` is saturated at baseline and can never *net positive*. Strict → nothing clears, ever; non-negative-where-saturated → `b=0.15`. [detail](open/W-144-structure-aware-extraction.md) | 2026-09-16 | 0d |
+| ↳ **blocks:** W-144, and nothing else in the queue | | |
+| 🔴 **W-193** — argparse exits `2`; SR-CLI decision 5 reserves `2` and says fux never produces one. Leave it, take it, or split it. [detail](open/W-193-argparse-exit-two.md) | 2026-09-15 | 1d |
 | ↳ **blocks:** nothing else in the queue | | |
 
-⚠ **It blocks nothing.** The exit code is wrong in a way no queued item
-waits on; every other row below is agent-closable, and this is a session
-output rather than a stop.
+⚠ **W-144's row is the only one that stops anything**, and it stops only W-144:
+its control family is built and proven, and the sweep cannot start until the
+rule's reading is his. W-193 blocks nothing. Every other row below is
+agent-closable.
 
 ---
 
@@ -50,7 +53,7 @@ output rather than a stop.
 - 🟢 **W-136** · `agent` — **prompt 4 RAN 2026-09-15 and the ladder was STALE**: all eight rungs rebuilt from the current seed, `ext/` byte-identical, gate shipped. Next is **prompt 5** (run both sets), then scoring in a chat Arpit attends. [detail](open/W-136-golden-benchmark.md)
 - 🟡 **W-87** · `agent`, waiting on W-136 — P2's `unanswerable` gate is measured (0/124). ✅ **Part B's blocker is gone** (set 1 is Codex-authored), so both halves now wait on phase 5. [detail](open/W-87-what-good-means.md)
 - 🟢 **W-175** · `agent` — does a correction help OTHER phrasings? **Pre-registration frozen and the Codex prompt written 2026-09-15** (W-192). The harness is what is left; every number waits on paraphrases only Codex may write. [detail](open/W-175-correction-generalisation.md)
-- 🟢 **W-144** · `agent` — the `b` sweep FAILED its frozen range; **ruled (b) 2026-09-15**: a LOWER descending range, pre-registered separately, **after** a control family with headroom. [detail](open/W-144-structure-aware-extraction.md)
+- 🔴 **W-144** · `arpit` — ✅ the control that can lose is BUILT and proven (`verbose`: 30/30 → 0/30 at `b=0`). 🔴 **The ruled rule is unsatisfiable**: `dump` is saturated at baseline and can never net positive. [detail](open/W-144-structure-aware-extraction.md)
 - 🟢 **W-188** · `agent` — Node in CAP-1/2/3/4: **harness, parity file and report BUILT 2026-09-15**; the run is what is left, on Arpit's machine. [detail](open/W-188-node-column-every-capture.md)
 
 

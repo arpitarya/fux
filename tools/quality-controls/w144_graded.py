@@ -122,6 +122,11 @@ TERMS = terms(90)
 #: gap in its own recommendation, and these close it.
 TABLE_TERMS = terms(150)[90:]
 
+#: W-144's `verbose` control, on terms 150–179. **Appended, never interleaved**,
+#: for the reason the slice above gives: `terms(n)` is a prefix of
+#: `terms(n + k)`, so extending the list cannot renumber a probe that exists.
+VERBOSE_TERMS = terms(180)[150:]
+
 #: The families whose table carries the term, and which document is correct.
 #:
 #: - **`dump`** is the HARM case and the one the pre-registered question turns
@@ -135,6 +140,13 @@ TABLE_TERMS = terms(150)[90:]
 #: `content` CANNOT answer the question — there the table-heavy document is the
 #: better answer, so promoting it is correct by construction.
 TABLE_FAMILIES = ("dump", "content")
+
+#: Every family, in report order. 🔴 **One tuple, because five call sites each
+#: spelled the list out** — and when `verbose` landed (2026-09-15) four of them
+#: would have gone on reporting five families while the corpus held six, which is
+#: a control that silently stops being reported. A control nobody prints is a
+#: control that does not exist.
+ALL_FAMILIES = ("main", "inverse", "placebo", *TABLE_FAMILIES, "verbose")
 
 PROSE_WORDS = (
     "consignment despatch tolerance interval calibration schedule handover "
@@ -311,6 +323,51 @@ def cmd_gen(a) -> int:
         probes.append({"id": f"{fam[0]}{i:03d}", "family": fam, "term": term,
                        "query": term, "relevant": subj, "rival": rival, "why": why})
 
+    # ---- W-144 (b): the control that CAN LOSE ------------------------------
+    #
+    # 🔴 **Arpit's condition on ruling (b), 2026-09-15**: the lower-`b` run does
+    # not start until the arm set carries a control family with **regression
+    # headroom**. `inverse` and `placebo` are saturated 30/30 in every arm, so
+    # *"nothing regresses"* on them is consistent with safety and is **not
+    # evidence of it** — a control that cannot lose reports nothing.
+    #
+    # **`verbose` can lose, and it is aimed at exactly what lowering `b` does.**
+    # `b` is the length-normalisation strength: at `0.75` a document is penalised
+    # for saying the same thing at greater length, and at `0` it is not penalised
+    # at all. So:
+    #
+    # | | prose | occurrences of the term |
+    # |---|---|---|
+    # | **concise** — *correct in both arms* | `P` | **6** |
+    # | **verbose** — the rival | **~3 × `P`** | **7** |
+    #
+    # ⚠ **The rival gets MORE occurrences, and that is the whole design.** With
+    # equal tf the two would merely TIE as `b → 0`, and a tie is not a regression
+    # anybody can read. At 7 against 6 the verbose document **wins outright**
+    # once normalisation stops paying for its length — so the control fires as a
+    # flip rather than as a tie-break, and *which* value it fires at is the
+    # number the run is for.
+    #
+    # **Expected direction, frozen before any number:** concise wins at `b =
+    # 0.75`; the family holds at every lower value the sweep tries, or the value
+    # is refused however well `dump`, `content` and `main` do.
+    VERBOSE_MULTIPLIER = 3
+    for k, term in enumerate(VERBOSE_TERMS):
+        i = len(TERMS) + len(TABLE_TERMS) + k
+        concise = f"docs/{i:03d}-{term}-brief.md"
+        verbose = f"docs/{i:03d}-{term}-report.md"
+        files[concise] = _doc(f"{term.title()} brief", _prose(rng, term, 6, P), None)
+        files[verbose] = _doc(f"{term.title()} report",
+                              _prose(rng, term, 7, P * VERBOSE_MULTIPLIER), None)
+        probes.append({
+            "id": f"v{i:03d}", "family": "verbose", "term": term, "query": term,
+            "relevant": concise, "rival": verbose,
+            "why": ("no table anywhere: a concise brief with 6 occurrences against a report "
+                    f"{VERBOSE_MULTIPLIER}x as long with 7. The brief is correct in BOTH arms. "
+                    "It is the control with REGRESSION HEADROOM — as `b` falls, length stops "
+                    "being paid for and the longer document's extra occurrence wins"),
+        })
+
     # Filler. Each mentions several probe terms ONCE, so every probe term's `df`
     # lands in the tens — the single change that unsaturates the endpoint the
     # 2026-09-12 run could not move.
@@ -319,7 +376,14 @@ def cmd_gen(a) -> int:
     # `df` differs from the 2026-09-12 corpus. That is why this corpus's `main`
     # numbers are a REPLICATION and not a continuation, and the pre-registration
     # says so before any of them existed.
-    ALL_TERMS = TERMS + TABLE_TERMS
+    #
+    # 🔴 **And it samples all 180 since `verbose` landed (2026-09-15), which
+    # moves `df` again.** Every family's `df` shifts when the term pool grows,
+    # so a corpus with `verbose` in it is **not** the corpus the 2026-09-15
+    # `b` sweep ran on. The sweep that uses it is a **separate run** — Arpit's
+    # ruling says so in as many words — and its `main`/`dump`/`content` numbers
+    # may not be continued from that one's.
+    ALL_TERMS = TERMS + TABLE_TERMS + VERBOSE_TERMS
     for j in range(a.filler):
         picks = rng.sample(ALL_TERMS, 5)
         body = "\n".join(
@@ -333,7 +397,7 @@ def cmd_gen(a) -> int:
         p.write_text(body, encoding="utf-8")
     (dest / "probes.jsonl").write_text(
         "".join(json.dumps(p, sort_keys=True) + "\n" for p in probes), encoding="utf-8")
-    for fam in ("main", "inverse", "placebo", *TABLE_FAMILIES):
+    for fam in ALL_FAMILIES:
         print(f"  {fam:<8} {sum(1 for p in probes if p['family'] == fam)}")
     print(f"{len(files)} documents, {len(probes)} probes -> {dest}")
     return 0
@@ -428,7 +492,7 @@ def cmd_run(a) -> int:
     print(f"{'family':>9}  {'n':>3}  {'hit@1 shipped':>14}  {'hit@1 no-table':>15}  "
           f"{'discordant':>11}  {'net':>5}")
     res = {}
-    for fam in ("main", "inverse", "placebo", *TABLE_FAMILIES):
+    for fam in ALL_FAMILIES:
         f_ = [r_ for r_ in out if r_["family"] == fam]
         s = sum(1 for r_ in f_ if r_["hit1_shipped"])
         c = sum(1 for r_ in f_ if r_["hit1_cf"])
@@ -676,7 +740,7 @@ def cmd_bsweep(a) -> int:
     header = f"{'family':>9}  {'n':>3}  " + "  ".join(f"hit@1 b={v:<5}" for v in values)
     print(header)
     summary: dict[str, dict] = {}
-    for fam in ("main", "inverse", "placebo", *TABLE_FAMILIES):
+    for fam in ALL_FAMILIES:
         fam_rows = [r for r in rows if r["family"] == fam]
         if not fam_rows:
             continue
@@ -691,7 +755,7 @@ def cmd_bsweep(a) -> int:
     print(f"{'family':>9}  {'b':>5}  {'better':>6}  {'worse':>5}  {'discordant':>10}  {'net':>5}  {'p':>8}  outcome")
     verdicts: dict[str, dict] = {}
     for v in values[1:]:
-        for fam in ("main", "inverse", "placebo", *TABLE_FAMILIES):
+        for fam in ALL_FAMILIES:
             fam_rows = [r for r in rows if r["family"] == fam]
             if not fam_rows:
                 continue

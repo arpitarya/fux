@@ -7,10 +7,10 @@ description: "An R is a claim frozen before measurement; its threshold may never
 status: accepted
 date: 2026-08-22
 feature: the prediction system — the R ids, their register, the rules that make a frozen claim mean something, and the classification of the runs those claims are measured by
-owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@bdeb7e434c5e, tools/vector-gate@0023bff0cdef]
+owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@de5b73bd9f76, tools/vector-gate@0023bff0cdef]
 laws: [L3]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: c2b7eaa76d0df49ac42e574f800f53bdb4f9cb279b0fba622e2c0c4d644a9021
+content_sha: 76267b93f5d75bc77857e728b2e387b4fb3174affa1afe43b26bf8afa694456a
 ---
 
 # SR-RS — the R predictions
@@ -911,6 +911,54 @@ on it while saying what it rests on.
 **22d. Zero headroom in a direction → Inconclusive in that direction.** Never
 *"no detected change"*. A null measured where nothing could have moved is the
 absence of a measurement, not the presence of a negative result.
+
+**22e. 🔴 A CONTROL is held to 22d too, and a saturated one reports nothing**
+(Arpit, 2026-09-15, as the condition on W-144's ruling; generalised here
+2026-09-16).
+
+> *"the run does not start until the arm set carries a control family with
+> regression headroom. Both existing controls are saturated 30/30 in every arm,
+> so 'nothing regresses' on the probe is consistent with safety and is not
+> evidence of it."*
+
+**22b and 22d have always been read as being about the ENDPOINT.** They are
+about any family whose count a verdict leans on, and a control is exactly that:
+its whole job is to be able to go wrong.
+
+- **A control that cannot lose is decoration.** *Nothing regressed* on a family
+  that is right in every arm at every value is a sentence about the family, not
+  about the treatment — and it reads identically whether the treatment is safe
+  or catastrophic.
+- **An arm set needs at least one control with non-zero regression headroom
+  that has been SHOWN to spend it**, at some value, even one outside the range
+  under test. Demonstrated, not argued: [the W-144 probe](../work/regression/2026-09-16-b-sweep-2-control/report.md)
+  put `verbose` at 30/30 across the whole ruled range and **0/30 at `b = 0`**,
+  which is what makes its holding informative inside the range.
+- 🔴 **The value of this is measurable and was measured.** Without that family,
+  `b = 0` and `b = 0.15` are **indistinguishable on every other instrument in
+  the set**. The blind spot was one value wide.
+
+⚠ **Saturation in ONE direction is the design, not a defect.** A benefit family
+is built wrong at the baseline or the lever has nothing to fix; a control is
+built right at it or it cannot report. **22b's table is read per family**, and a
+report that flags a benefit family's zero regression headroom as a fault is
+reading the design as a fault.
+
+**22f. Regression headroom is measured in the BASELINE arm** (2026-09-16).
+
+22b says *"not wrong in both arms"*, which on a two-arm run is *right in the
+baseline **or** right in the treatment*. 🔴 **Counting *right in both* instead is
+post-hoc**: it reports what **survived** the treatment rather than what was **at
+risk** going in, so it shrinks exactly when an arm is breaking things and the
+endpoint looks like it had less to lose the worse the arm did.
+
+**The baseline is knowable before any treatment runs**, which is what lets it be
+declared in advance — and it is what
+[the W-154 reachability check](../work/regression/2026-09-16-rerank-endpoint-reachability/report.md)
+computed with no arms at all, on the way to finding an endpoint that was zero in
+a direction before ~2 000 subprocesses were spent on it. ⚠ **The VOID Part B run
+defined it the other way**, and its own verdict names that as the second thing
+to fix.
 
 **22e. No minimum, and this is deliberate.** There is no threshold on how much
 headroom is *enough*. Disclosure plus 22d is the entire rule. **A floor here
