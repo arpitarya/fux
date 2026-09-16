@@ -14,8 +14,8 @@ supersedes: archive/paper/the-fux-index-paper-v0.2.md
 *v1.0 — 2026-09-14 · supersedes v0.2 (2026-08-09), kept byte-for-byte at
 [`archive/paper/`](../../archive/paper/the-fux-index-paper-v0.2.md)*
 
-> **How to read this paper.** It describes fux **as it ships** at `2.0.1`
-> and on the `3.0.0-alpha.0` branch, not as it was designed. Every claim is
+> **How to read this paper.** It describes fux **as it ships** at
+> `3.0.0-alpha.0`, not as it was designed. Every claim is
 > traceable: a decision cites its Standing Record by name (`SR-RANKING d3`),
 > a number cites the run under `work/regression/` that produced it and the
 > class the run was filed under (*blind* or *informed*, [§8](#8-evaluation-discipline)).

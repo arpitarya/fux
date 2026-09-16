@@ -8,6 +8,28 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+## [3.0.0-alpha.0] - 2026-09-16
+
+**A major, and the two breaking changes are the reason.** `fux update` is gone —
+`fux ingest` is the one verb over the corpus — and the committed index format is
+`fux.index.v3`, which an existing index must be rebuilt into. Everything below
+had accumulated unreleased since `2.0.1` on 2026-09-14; the four things a
+consumer feels are:
+
+- 🔴 **`fux update` is deleted** and a bare `fux ingest` now goes to the network.
+  The offline form is `fux ingest --no-fetch`, and `fux hooks` must be re-run.
+- 🔴 **`fux.index.v3`** — rebuild required, and the ingest summary says so.
+- 🔴 **`[bm25f] b` defaults to `0.15`, not `0.75`** — the first ranking default
+  here that is MEASURED rather than inherited, so **every score changes**.
+- 🔴 **`confidence.answerable` is `false` for `weak` as well as `none`**, and
+  `No confident matches.` moved to stderr.
+
+Added since `2.0.1`: anchor text as a sixth BM25F field, link-following on
+`fux ask`, `fux correct`, `fux inspect`, `fux lexical`, `fux graph --seed`, and
+`fetch=` taking any fetcher name.
+
+⚠ **This is an alpha and npm serves it under the `alpha` tag, not `latest`.**
+
 ### Removed — BREAKING, read this before upgrading a consumer
 
 - 🔴 **`fux update` is deleted. `fux ingest` is the one verb over the corpus**
