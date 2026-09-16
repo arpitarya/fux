@@ -7,10 +7,10 @@ description: A disposable term-major index under .fux/runtime/ that makes warm q
 status: accepted
 date: 2026-08-18
 feature: "`.fux/runtime/` — the derived index, `fux build`, and the block bound that makes skipping provable"
-owns: [src/fux/derive@28c69c111b2e, tools/differential@179a82d1d2a8]
+owns: [src/fux/derive@28c69c111b2e, tools/differential@1934e54fe0ca]
 laws: [L1, L3]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 4388cdb8366c5ed47a16cb6f5015f3a0379596215f625f4fd11c2ceff609ab69
+content_sha: 6720c5937c546dbd0bd22b1b26889685222380e0a886524401ca24c493a4a13e
 ---
 
 # SR-T1-ACCELERATOR — the derived T1 accelerator
@@ -478,10 +478,32 @@ compile, run and answer differently, so the comparison is on **answers**. The
 bundle is BUILT per run (`node_arm.bundle_entry`) rather than read off disk,
 because a bundle on disk could be from another checkout.
 
-**Whole payloads rather than a field list, for the graph lane**, because those
-verbs carry no score to tolerance: every byte of meaning is in the structure,
-and comparing a field list is exactly what would let two readers emit different
-key names indefinitely.
+**Whole payloads rather than a field list, for the graph lane**, because
+comparing a field list is exactly what would let two readers emit different key
+names indefinitely. **Structure, key names and ORDER are byte-equal; `score`
+goes through `round(…, 9)` first** — [SR-RANKING](0111_ranking.md) decision 8a,
+which is a statement about the engine's scores and not about which verb printed
+one.
+
+⚠ **This paragraph said those verbs "carry no score to tolerance" until
+2026-09-16, and every node of a `graph` payload carries a `score`.** So
+`compare_verb` held the graph lane to the score's LAST BIT while `_fields`
+beside it applied the ruled contract — one lane stricter than the engine's own
+promise, by accident rather than by decision.
+
+🔴 **The two defects hid each other, and that is the part worth keeping.** The
+graph lane only runs on a fresh derived plane, `node-arm.yml` never built one,
+so **the lane had never run in CI at all** — the wrong comparison sat behind a
+lane that was skipping, and the skip sat behind a workflow nobody had reason to
+doubt. The first CI run that built the plane went red at **1 of 225** on
+`graph 'pii redaction'`: `11.780650569089822` against `11.780650569089824`,
+**identical node order**, a ~2e-16 relative difference against the `~1e-9` that
+decision 8a says would void it — `log`'s one-ulp disagreement between two
+libms, measured, which is the phenomenon 8a exists for and the reason the OS
+matrix exists. ✅ Held now by
+[`tests/test_differential_arm.py`](../tests/test_differential_arm.py), which
+pins the measured payload pair verbatim and asserts that order, key names and a
+difference above the contract all still fail.
 
 ⚠ **Two exclusions, both by NAME and neither by a loosened comparison** —
 `ranked_by` (SR-NODE-SEARCH decision 10: Python's MCP surface opts into the

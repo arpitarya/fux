@@ -11,7 +11,7 @@ owns: [node@e0c57e2eb08e, src/fux/store/nodebundle.py@071a24a596dd]
 laws: [L1, L3, L4, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 3862dbb768405aa29af861651006a5327533b089004a80f5ef741bed9c8d72b6
+content_sha: 2565f76964b46438991b9b9de617c5b569366c20562dcb1298716a8e3f3d76aa
 ---
 
 # SR-NODE-SEARCH — the Node read plane
@@ -616,6 +616,29 @@ to `.fux/index/`, not merely the checkout. Measured both ways at the fix: 44 of
 stop a harness from misattributing it — it only makes the misattribution
 diagnosable after the fact. What stops it is removing the divergence from the
 arm's environment, which is what a build step does and what a paragraph cannot.
+
+**17c. 🔴 Building the plane switched the GRAPH LANE on in CI for the first
+time, and it was comparing by the wrong rule** (2026-09-16, same session).
+
+The lane skips without a fresh derived plane, so **it had never run in CI at
+all** — `node-arm.yml` built nothing, and the comparison count gives the tell:
+**202 without the lane, 225 with it.** Its first run went red at **1 of 225**.
+
+**Nothing was wrong with either reader.** `Arm.compare_verb` — a symbol this
+record claims by name — compared graph payloads to the score's last bit, which
+is stricter than the cross-runtime contract [SR-RANKING](0111_ranking.md)
+decision 8a rules and than the ranking lane beside it already applied. The
+premise, and what it cost, are [SR-ACCELERATOR](0110_accelerator.md) decision
+14's; this decision states none of it and records only the consequence **for
+this reader**: Node's graph verbs were never in breach, and no number measured
+against them before 2026-09-16 was measuring what it claimed to.
+
+⚠ **Two defects, and each one hid the other.** A skipping lane cannot fail, so
+its comparison was never exercised; a comparison that was never exercised gave
+nobody a reason to ask why the lane was quiet. **That is the same shape as 17b
+one level down** — a paragraph asserting a property, and nothing checking it —
+which is why the close is [`tests/test_differential_arm.py`](../tests/test_differential_arm.py)
+rather than a third paragraph.
 
 **17a. 🔴 And it is not free on this reader.** Rebuilding the plane parses
 **every** committed record — the work the B2 prefilter exists to avoid — so a
