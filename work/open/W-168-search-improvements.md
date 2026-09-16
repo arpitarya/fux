@@ -20,6 +20,59 @@ repeated). **W-156 ruled 2026-09-14:** every step is a ranking change and lands 
 the single-corpus sentence is gone ([SR-LAW-0](../../records/0002_LAW-0-authority.md)
 decision 2a). Nothing agent-side waits.
 
+## 🔴 Step 2 is STOPPED BEFORE IT STARTS (2026-09-16) — by this item's own rule
+
+[The survival check](../regression/2026-09-16-identifier-survival/report.md).
+
+**The proposal's §0: *"Build the golden question before the feature, or the
+verdict is theatre."*** Measured:
+
+| question set | questions | carrying an identifier |
+|---|---:|---:|
+| set 1 | 125 | **4** |
+| set 2 | 124 | **0** |
+
+**4 is below the floor of all floors.** A net of 6 is the minimum that clears α at
+*any* discordant count, and 4 questions cannot produce 6 flips — so **no arm on
+this set can return a result**, whatever the field does. A **data defect
+(d23b), fixed in the data, never a null.**
+
+🔴 **This is [W-191](W-191-the-ladder-carries-no-links.md)'s lesson applied one
+step earlier.** There, a link feature was built and measured on a corpus with 0
+`ref` edges, and `0 of 124 flips` was filed as a number before anybody counted
+the input. Here the counting came first, at the cost of a few seconds.
+
+### ✅ The premise is TRUE, and worse than the proposal stated
+
+**0 of 33 distinct identifiers survive the analyzer whole.** Not *some* — zero.
+**3 are MANGLED rather than split**, producing a string no document contains:
+
+| identifier | tokens | |
+|---|---|---|
+| `DAIRY-2` | `['dairi', '2']` | `dairi` is nowhere in the corpus |
+| `KFS-2014` | `['kf', '2014']` | the `S` is gone |
+| `QCL-OPS-DOCK-03` | `['qcl', 'op', 'dock', '03']` | `OPS` became `op` |
+
+🔴 **And the SEPARATOR decides the outcome** — `ERR_2031` survives whole,
+`RF-118` does not. Coverage today is an accident of punctuation, and the
+underscore case **already half-works**, which is the more dangerous state: a
+build measured only on those would show a small gain from a field that changes
+nothing for them.
+
+### What step 2 needs before it may start
+
+1. 🔴 **Id-queries — [prompt 8](../golden/prompts/8-codex-identifier-questions.md),
+   Codex's.** ⚠ **Unlike W-191, the documents are fine** (51 tokens across all
+   20); only the questions are missing, which is a smaller ask.
+2. ⚠ **A design decision, named and NOT taken:** an unstemmed field needs
+   **committed postings**, so unlike step 1's anchor field it cannot fold at read
+   time and cannot avoid a `_format` change
+   ([SR-INDEX-LIFECYCLE](../../records/0108_index-lifecycle.md) decision 9.1).
+   **Whether it rides 3.0's existing unreleased bump belongs in the build's own
+   pre-registration.**
+
+---
+
 ## ✅ Step 1 BUILT 2026-09-15 — obligations 1–7 and 9 shipped; 8 and 10 are Codex's
 
 **Claude Code, 2026-09-15.** The mechanism is in both readers, behind

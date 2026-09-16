@@ -1,0 +1,33 @@
+{"identifier": "BV-4437", "mangled": false, "separator": "-", "survives_whole": false, "tokens": ["bv", "4437"]}
+{"identifier": "BV-QA-2025-0312", "mangled": false, "separator": "-", "survives_whole": false, "tokens": ["bv", "qa", "2025", "0312"]}
+{"identifier": "CBE-FROZEN", "mangled": false, "separator": "-", "survives_whole": false, "tokens": ["cbe", "frozen"]}
+{"identifier": "CBE-PHARMA", "mangled": false, "separator": "-", "survives_whole": false, "tokens": ["cbe", "pharma"]}
+{"identifier": "COLD-1", "mangled": false, "separator": "-", "survives_whole": false, "tokens": ["cold", "1"]}
+{"identifier": "DAIRY-2", "mangled": true, "separator": "-", "survives_whole": false, "tokens": ["dairi", "2"]}
+{"identifier": "GHY-7", "mangled": false, "separator": "-", "survives_whole": false, "tokens": ["ghy", "7"]}
+{"identifier": "KFS-2014", "mangled": true, "separator": "-", "survives_whole": false, "tokens": ["kf", "2014"]}
+{"identifier": "KV-NGP-C2-07", "mangled": false, "separator": "-", "survives_whole": false, "tokens": ["kv", "ngp", "c2", "07"]}
+{"identifier": "NGP-MNT-552", "mangled": false, "separator": "-", "survives_whole": false, "tokens": ["ngp", "mnt", "552"]}
+{"identifier": "NGP-PNR-18", "mangled": false, "separator": "-", "survives_whole": false, "tokens": ["ngp", "pnr", "18"]}
+{"identifier": "QCL-CS-MTX-02", "mangled": false, "separator": "-", "survives_whole": false, "tokens": ["qcl", "cs", "mtx", "02"]}
+{"identifier": "QCL-CS-MTX-03", "mangled": false, "separator": "-", "survives_whole": false, "tokens": ["qcl", "cs", "mtx", "03"]}
+{"identifier": "QCL-F-09", "mangled": false, "separator": "-", "survives_whole": false, "tokens": ["qcl", "f", "09"]}
+{"identifier": "QCL-F-17", "mangled": false, "separator": "-", "survives_whole": false, "tokens": ["qcl", "f", "17"]}
+{"identifier": "QCL-F-22", "mangled": false, "separator": "-", "survives_whole": false, "tokens": ["qcl", "f", "22"]}
+{"identifier": "QCL-IT-ADR-08", "mangled": false, "separator": "-", "survives_whole": false, "tokens": ["qcl", "adr", "08"]}
+{"identifier": "QCL-OPS-DOCK-03", "mangled": true, "separator": "-", "survives_whole": false, "tokens": ["qcl", "op", "dock", "03"]}
+{"identifier": "QCL-QA-SOP-17", "mangled": false, "separator": "-", "survives_whole": false, "tokens": ["qcl", "qa", "sop", "17"]}
+{"identifier": "QF-FY26-TSL-044", "mangled": false, "separator": "-", "survives_whole": false, "tokens": ["qf", "fy26", "tsl", "044"]}
+{"identifier": "RF-118", "mangled": false, "separator": "-", "survives_whole": false, "tokens": ["rf", "118"]}
+{"identifier": "RF-203", "mangled": false, "separator": "-", "survives_whole": false, "tokens": ["rf", "203"]}
+{"identifier": "RF-221", "mangled": false, "separator": "-", "survives_whole": false, "tokens": ["rf", "221"]}
+{"identifier": "ROTA-9A", "mangled": false, "separator": "-", "survives_whole": false, "tokens": ["rota", "9a"]}
+{"identifier": "ROTA-9B", "mangled": false, "separator": "-", "survives_whole": false, "tokens": ["rota", "9b"]}
+{"identifier": "SANDHU-EXC", "mangled": false, "separator": "-", "survives_whole": false, "tokens": ["sandhu", "exc"]}
+{"identifier": "TSL-NGP-C2-07", "mangled": false, "separator": "-", "survives_whole": false, "tokens": ["tsl", "ngp", "c2", "07"]}
+{"identifier": "TSL-NGP-C3-02", "mangled": false, "separator": "-", "survives_whole": false, "tokens": ["tsl", "ngp", "c3", "02"]}
+{"identifier": "TSL-NGP-F1-04", "mangled": false, "separator": "-", "survives_whole": false, "tokens": ["tsl", "ngp", "f1", "04"]}
+{"identifier": "TSL-RF-118-A", "mangled": false, "separator": "-", "survives_whole": false, "tokens": ["tsl", "rf", "118"]}
+{"identifier": "TSL-RF-221-A", "mangled": false, "separator": "-", "survives_whole": false, "tokens": ["tsl", "rf", "221"]}
+{"identifier": "WIKI-NGP-DOCK-12", "mangled": false, "separator": "-", "survives_whole": false, "tokens": ["wiki", "ngp", "dock", "12"]}
+{"identifier": "WIKI-NGP-DOCK-41", "mangled": false, "separator": "-", "survives_whole": false, "tokens": ["wiki", "ngp", "dock", "41"]}

@@ -27,11 +27,14 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** W-87, W-176, W-190, W-191, and through W-191 also W-161 | | |
 | 🔴 **W-175** — the blind paraphrases exist only if he runs the Codex prompt. The harness is built and refuses to run without them; no agent may author one. [detail](open/W-175-correction-generalisation.md) | 2026-09-16 | 0d |
 | ↳ **blocks:** W-175, and nothing else in the queue | | |
+| 🔴 **W-168** — step 2 needs id-queries: 0 of 33 identifiers survive the analyzer, but only 4 of 249 questions ask by one. [prompt 8](golden/prompts/8-codex-identifier-questions.md) is written and is Codex's. [detail](open/W-168-search-improvements.md) | 2026-09-16 | 0d |
+| ↳ **blocks:** W-168, and nothing else in the queue | | |
 
-⚠ **Both rows are a HAND, not a decision** — running a prompt and pasting a key.
-Everything an agent may do on them is done: W-136's hand-offs are written and
-W-175's harness is built. **Between them they hold up six items**, and the only
-green row left is W-168.
+⚠ **All three are a HAND, not a decision** — running a prompt, pasting a key.
+**Everything an agent may do on every open item is done**: W-136's hand-offs are
+written, W-175's harness is built, and W-168 step 2's premise is measured with
+its prompt written. 🔴 **The queue has no green row.** What every remaining item
+needs is Codex output that only Arpit can commission.
 
 ---
 
@@ -40,7 +43,7 @@ green row left is W-168.
 ### fux build
 
 - 🔴 **W-161** · `agent`, waiting on W-191 — **BUILT 2026-09-15**; both tiers ship on and unmeasured. 🔴 **Both arms inert — 0 `ref` edges on the ladder**; they need linked documents, and Codex's questions are not that. [detail](open/W-161-graph-composed-ask.md)
-- 🟢 **W-168** · `agent` — the ten search improvements. **Step 1 BUILT 2026-09-15**; both question sets released, so steps 2–7 and 9 are runnable now. Step 8 is inert until W-191 lands. [detail](open/W-168-search-improvements.md)
+- 🔴 **W-168** · `agent` — step 1 shipped; **step 2 STOPPED before it started**: 0 of 33 ids survive the analyzer, but only 4 of 249 questions ask by one — below the floor. [detail](open/W-168-search-improvements.md)
 - 🔴 **W-176** · `agent`, waiting on W-136 — **steps 1–3 landed 2026-09-15**. Gates 4–9 need a SCORED run (prompt 6), not a key — no key exists (L11). ⚠ **Step 10 needs links, W-191.** [detail](open/W-176-abstention-gates.md)
 - 🔴 **W-191** · `agent` 🧨, waiting on W-136 — **specified 2026-09-16**: [prompt 7](golden/prompts/7-codex-link-bearing-seed.md) written, `ref` census generated and gateable. The documents are **Codex's**. [detail](open/W-191-the-ladder-carries-no-links.md)
 

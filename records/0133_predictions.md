@@ -7,10 +7,10 @@ description: "An R is a claim frozen before measurement; its threshold may never
 status: accepted
 date: 2026-08-22
 feature: the prediction system — the R ids, their register, the rules that make a frozen claim mean something, and the classification of the runs those claims are measured by
-owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@e0ea7f60111e, tools/vector-gate@0023bff0cdef]
+owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@67d969467bcd, tools/vector-gate@0023bff0cdef]
 laws: [L3]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: d6585a304009893c65c2b03f17e46926cf2f3eae25e509a42c5293ed5390e69e
+content_sha: 3d3baa8f59cb56e8ecb0488d71a77bfddfd181ae712e1e5fa3a7052517c909aa
 ---
 
 # SR-RS — the R predictions
@@ -1029,6 +1029,31 @@ items were waiting on that corpus.
   and that count comes from a scored run or not at all. The rule is: **where the
   input is visible in the committed index, a run that depends on it says how much
   there is, mechanically, before it starts.**
+
+🔴 **23d. The DOCUMENTS having the input is half the check. The QUESTIONS have to
+ask for it** (2026-09-16).
+
+23a says test data must contain the input **and** that *"the questions must also
+depend on that input"*. **The second half is the one that gets skipped**, because
+the first is the one that fails loudly.
+
+**Two measured cases, two days apart, and they fail differently:**
+
+| | what was missing | what fixes it |
+|---|---|---|
+| [W-191](../work/open/W-191-the-ladder-carries-no-links.md) | **the input** — 0 `ref` edges on all eight rungs | link-bearing **documents** |
+| [W-168 step 2](../work/regression/2026-09-16-identifier-survival/report.md) | **the questions** — 51 identifier tokens across all 20 seed documents, and **4 of 249 questions ask by one** | **id-queries** |
+
+🔴 **The second is harder to see and cheaper to fix.** A corpus census comes back
+healthy — the tokens are there — and a run proceeds to an `INCONCLUSIVE` nobody
+predicted. **So a precondition check counts the questions too**, and
+[`identifier_survival.py`](../tools/quality-controls/identifier_survival.py)
+**exits 2 when the id-bearing question count is below the floor of all floors**,
+for the same reason the edge census exits 2 on zero.
+
+⚠ **Below the floor is not "a small sample".** 4 questions cannot produce 6
+flips, so **no split of them clears α** — the run is not underpowered, it is
+*unable*, and decision 19's table says so without any data.
 
 **23b-i. ⚠ Satisfying 23a collided with the one-archive law, and the law's
 test was narrowed rather than the data moved** (2026-09-12). *"A prior that

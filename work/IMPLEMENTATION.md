@@ -28,6 +28,24 @@ Rules:
 
 
 
+## 2026-09-16 — **the queue empties of agent work: W-188, W-193, W-144 close; phase 5 runs**
+
+| item | what landed | evidence |
+|---|---|---|
+| ✅ **W-188 CLOSED** | the Node column ran: **60/60 ranked lists identical, max &#124;Δscore&#124; = 0.000000**, hit@k identical, **0 of 52** answer rows differing. `answer_node` executed for the first time and its named hazard did not materialise | [run](regression/2026-09-16-node-column/report.md) |
+| ✅ **W-193 CLOSED** | `2` is argparse's; decision 5 amended, the dead strict-mode reservation **retired**, and a structural test asserts no `FuxError` site produces one | [SR-CLI](../records/0101_cli-surface.md) decision 5 |
+| ✅ **W-144 CLOSED — and it SHIPPED a ranking default** | `PASS` at **`b = 0.15`**, the first descending value moving **both** benefit families with all four controls holding. **SR-RANKING decision 3 now carries the first default there that is measured rather than inherited**, and **22 144 byte-identical** scan-vs-accelerator comparisons back it | [verdict](regression/2026-09-16-b-sweep-2/VERDICT.md) |
+| 🔴 **why `0.15` and not `0.3`** | the benefit families cross at **different** values, and the rule requires **both**. A rule asking for *either* would have shipped `0.3` and left half the mechanism unmeasured behind a passing verdict | [analysis](regression/2026-09-16-b-sweep-2/ANALYSIS.md) |
+| ✅ **W-136 phase 5 RAN** | 249 questions, 498 calls, both sets apart, **no score** — the hand-offs are Arpit's to give Codex | [run](regression/2026-09-16-golden-rung-00100/report.md) |
+| 🔴 **phase 5's two findings** | **set 2 declines 41.9 % against set 1's 28.8 %** — authorship visible in the instrument, and **not** a claim either set is better; and **`weak` ⟺ `declined` exactly, 249 of 249**, SR-CONFIDENCE's gate observed at scale | same |
+| ✅ **W-175's harness** | built, and **refuses to run without paraphrases** — it may author neither the corrections nor the blind paraphrases | `tools/quality-controls/correction_generalisation.py` |
+| 🔴 **W-168 step 2 STOPPED before it started** | **0 of 33 identifiers survive the analyzer** (3 *mangled* — `DAIRY-2` → `dairi`), so the premise is true and worse than stated — **but only 4 of 249 questions ask by an id**, below the floor. W-191's lesson applied one step earlier, before ~500 subprocesses | [run](regression/2026-09-16-identifier-survival/report.md) |
+| 🔴 **the queue has NO green row** | every open item now needs Codex output only Arpit can commission: prompt 6 (scoring), the paraphrase prompt, prompt 7 (links), prompt 8 (id-queries) | [OPEN-WORK](OPEN-WORK.md) |
+
+**Both suites green, whole** — 4 886 unit, 144 e2e, 36 Node.
+
+---
+
 ## 2026-09-16 — **W-154 ANSWERED, and W-191 specified: three runs, two about the instrument**
 
 | item | what landed | evidence |
