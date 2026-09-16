@@ -30,6 +30,36 @@ filed yet.
 **What is left here is the harness**, which is agent work and never waited on
 any of this.
 
+## ✅ THE HARNESS IS BUILT (2026-09-16) — and it refuses to run without paraphrases
+
+[`tools/quality-controls/correction_generalisation.py`](../../tools/quality-controls/correction_generalisation.py).
+
+Per correction: measure every paraphrase **before**, file the correction's **own**
+question with `fux correct`, re-ingest, measure **again**. One row per paraphrase
+per arm, with `before`/`after`, and the paired counts printed. **It applies no
+bar** — that is [the pre-registration](../regression/2026-09-15-correction-generalisation/PRE-REGISTRATION.md)'s.
+
+🔴 **It files the correction's OWN question and never a paraphrase.** Filing a
+paraphrase would measure whether a question helps itself, which is the thing
+document expansion was *not* chosen for.
+
+🔴 **It takes the paraphrases as a FILE and exits 1 without one.** It may author
+neither input: the corrections must come from real failures on a corpus the
+measurer did not grade, and the paraphrases must be written **blind by Codex** —
+a paraphrase written by anyone who has seen the correction is the correction's
+own wording in disguise, and a leaked one produces a filed number shaped exactly
+like a clean one.
+
+**Regression headroom is measured in the BASELINE arm** ([SR-RS](../../records/0133_predictions.md)
+22f), and `--no-fetch` is used on the re-ingest so the run cannot depend on a
+network (W-177 made the bare verb networked).
+
+**So: everything an agent may do here is done.** What is left is Arpit running
+[the Codex prompt](../regression/2026-09-15-correction-generalisation/prompt-codex-paraphrases.md),
+arm (iii) first.
+
+---
+
 # W-175 — does a correction generalise, or does it only fix its own phrasing?
 
 **Model: Opus for the design, Codex for the paraphrases** — the paraphrases

@@ -7,10 +7,10 @@ description: "An R is a claim frozen before measurement; its threshold may never
 status: accepted
 date: 2026-08-22
 feature: the prediction system — the R ids, their register, the rules that make a frozen claim mean something, and the classification of the runs those claims are measured by
-owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@7ad608062530, tools/vector-gate@0023bff0cdef]
+owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@e0ea7f60111e, tools/vector-gate@0023bff0cdef]
 laws: [L3]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: c1b7604051e2bceb9e3be5b53186817bdbea3d769a28a698f1b27cc5850f9b2a
+content_sha: d6585a304009893c65c2b03f17e46926cf2f3eae25e509a42c5293ed5390e69e
 ---
 
 # SR-RS — the R predictions
