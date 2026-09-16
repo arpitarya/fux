@@ -28,6 +28,23 @@ Rules:
 
 
 
+## 2026-09-15 — **W-192: the arm order is ruled and the blind-paraphrase prompt exists**
+
+| item | what landed | evidence |
+|---|---|---|
+| **the pre-registration is frozen** | before a single correction exists, quoting the compare doc's §6 rather than restating it. N = 12 / M = 5, paired, top-3 of the corrected document | [PRE-REGISTRATION](regression/2026-09-15-correction-generalisation/PRE-REGISTRATION.md) |
+| **the bar is computed, not asserted** | decision 19's table for the observed flips; **a net of 6 is the floor of all floors** and nets of 1–5 clear α at no discordant count, so a net of 5 is a measured negative with no further arithmetic | [SR-RS](../records/0133_predictions.md) decision 19 |
+| **the tilt check is a conjunction** | no golden answerable question may lose its top-1, **not** traded off against the net — a mechanism that fixes 12 corrections by reordering the corpus is a regression with a good anecdote | the compare doc §6 |
+| **the arm order is RULED** | **(iii) Codex end-to-end first** — no upstream, and the only arm whose corpus the measurer never graded, which is the compare doc's own condition. Then (ii) fux's own tree, then (i) dogfood — last because twelve real failures are accrued, not scheduled | this change |
+| 🔴 **blindness is IN the prompt** | the paraphraser sees the question and never the correction, the document or a score; no `ask`/`find`/`answer` on the questions; a question already seen is **skipped and declared**. **A leaked paraphrase produces a filed number shaped exactly like a clean one**, and there is no downstream check for it | [the prompt](regression/2026-09-15-correction-generalisation/prompt-codex-paraphrases.md) |
+| **an arm short of 12 is reported at the N it ran** | never topped up with invented failures, never pooled with another arm to reach 12 | the pre-registration |
+| **W-175 is 🟢 now** | the harness is what is left, and it never waited on any of this | [OPEN-WORK](OPEN-WORK.md) |
+
+**Nothing measured, and nothing may be** until Codex writes the paraphrases.
+The directory is legally half-empty under §Per-run contract.
+
+---
+
 ## 2026-09-15 — **W-178: a consumer's fetchers open the same way their decoders do**
 
 | item | what landed | evidence |

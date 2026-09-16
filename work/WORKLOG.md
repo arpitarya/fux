@@ -29,6 +29,15 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-15 — W-192 CLOSED: the arm order is ruled, and blindness is in the prompt  ·  Claude Code (Opus 5)
+- **Did:** froze [the pre-registration](regression/2026-09-15-correction-generalisation/PRE-REGISTRATION.md) **before a single correction exists**, quoting the compare doc's §6 rather than restating it in looser words, and wrote [the Codex prompt](regression/2026-09-15-correction-generalisation/prompt-codex-paraphrases.md).
+- **Ruled the arm order: (iii) Codex end-to-end, then (ii) fux's own tree, then (i) dogfood.** (iii) is first because it has no upstream **and** because it is the only arm whose corpus the measurer never graded — the compare doc's own condition, which no other arm satisfies. (i) is last **not because it matters least**: it is the only arm made of real use, and twelve real failures are accrued rather than scheduled.
+- 🔴 **The blindness clause is written INTO the prompt, not assumed.** A paraphrase written by anyone who has seen the correction is the correction's own wording in disguise — and **a leaked paraphrase produces a filed number shaped exactly like a clean one**. There is no downstream check for it, which is the same hazard shape L11 names for the answer key. So the prompt forbids opening the document, reading `.fux/enrich/`, and running `ask`/`find`/`answer` on the questions, and tells Codex to **skip and declare** any question it has already seen.
+- **The bar is arithmetic, and it tracks the FLIPS, not the 60 pairs.** Decision 19's table, with the sentence that decides most of it stated where a reader will hit it: a net of 6 is the floor of all floors, and **nets of 1–5 cannot clear α at any discordant count** — so a net of 5 is a measured negative needing no further computation. The tilt check is a **conjunction**, never a trade: a mechanism that fixes 12 corrections by reordering the rest of the corpus is a regression with a good anecdote.
+- **Decided / open:** an arm that returns fewer than 12 corrections is reported at the N it actually ran — never topped up with invented failures, never pooled with another arm to reach 12.
+- **W-175 is 🟢**; its harness is what is left and never waited on any of this.
+- **Next:** W-154 (Part B is VOID and needs a new pre-registration), then W-144.
+
 ## 2026-09-15 — W-178 SHIPPED: a consumer's fetchers open the way their decoders already did  ·  Claude Code (Opus 5)
 - **Asked:** the same standing instruction — implement the open-work items and close them.
 - **Did:** `fetch=` is a **typed attribute validated by name shape**, so a consumer drops `.fux/fetchers/glassbox.py` in, writes `fetch=glassbox`, and ingests — no engine change, no release. The validator **reuses the decoder name regex** rather than growing a second: fetchers and decoders are one consumer-plane pattern, and [SR-DECODE](../records/0139_decode.md) now says so.

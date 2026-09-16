@@ -10,8 +10,25 @@ ball: agent
 ✅ **2026-09-15: the 2026-09-30 Codex gate is VOID — Codex is available now and
 delivered the golden question sets.** ⚠ **Those are not the paraphrases.** A
 paraphrase is written against a *correction*, blind, and no correction has been
-filed yet. The artifact is now [W-192](W-192-codex-blind-paraphrases.md); the
-harness below is agent work and never waited on any of this.
+filed yet.
+
+✅ **W-192 CLOSED the same day and this item is 🟢.** Two of the three things
+*"Agent work now"* asks for are done:
+
+- **The pre-registration is frozen** —
+  [`work/regression/2026-09-15-correction-generalisation/PRE-REGISTRATION.md`](../regression/2026-09-15-correction-generalisation/PRE-REGISTRATION.md),
+  quoting the compare doc's §6 rather than restating it, with decision 19's
+  floor computed for N = 12 / M = 5 and the tilt check stated as a conjunction.
+- **The Codex prompt is written** —
+  [`prompt-codex-paraphrases.md`](../regression/2026-09-15-correction-generalisation/prompt-codex-paraphrases.md),
+  with the blindness clause **in the prompt** rather than assumed.
+- **The arm order is RULED: (iii) first, then (ii), then (i).** (iii) has no
+  upstream *and* is the only arm whose corpus the measurer never graded, which
+  is the compare doc's own condition. (i) is last because twelve real failures
+  are accrued, not scheduled.
+
+**What is left here is the harness**, which is agent work and never waited on
+any of this.
 
 # W-175 — does a correction generalise, or does it only fix its own phrasing?
 

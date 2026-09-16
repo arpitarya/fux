@@ -49,8 +49,7 @@ output rather than a stop.
 - 🟡 **W-190** · `agent`, waiting on W-136 — difficulty is a **count of discriminations**, not a label; schema + scorer BUILT 2026-09-15. The questions exist; the first real number needs a **scored** rung (prompt 6). [detail](open/W-190-question-difficulty.md)
 - 🟢 **W-136** · `agent` — **prompt 4 RAN 2026-09-15 and the ladder was STALE**: all eight rungs rebuilt from the current seed, `ext/` byte-identical, gate shipped. Next is **prompt 5** (run both sets), then scoring in a chat Arpit attends. [detail](open/W-136-golden-benchmark.md)
 - 🟡 **W-87** · `agent`, waiting on W-136 — P2's `unanswerable` gate is measured (0/124). ✅ **Part B's blocker is gone** (set 1 is Codex-authored), so both halves now wait on phase 5. [detail](open/W-87-what-good-means.md)
-- 🟢 **W-192** · `agent` — **write the Codex prompt for the blind paraphrases** and name the arm order; (iii) has no upstream. Unblocks W-175. [detail](open/W-192-codex-blind-paraphrases.md)
-- 🟡 **W-175** · `agent`, waiting on W-192 — does a correction help OTHER phrasings? Three arms, N=12 / M=5. ⚠ **Codex's question sets are NOT the paraphrases**; the harness is agent work and does not wait. [detail](open/W-175-correction-generalisation.md)
+- 🟢 **W-175** · `agent` — does a correction help OTHER phrasings? **Pre-registration frozen and the Codex prompt written 2026-09-15** (W-192). The harness is what is left; every number waits on paraphrases only Codex may write. [detail](open/W-175-correction-generalisation.md)
 - 🟢 **W-144** · `agent` — the `b` sweep FAILED its frozen range; **ruled (b) 2026-09-15**: a LOWER descending range, pre-registered separately, **after** a control family with headroom. [detail](open/W-144-structure-aware-extraction.md)
 - 🟢 **W-188** · `agent` — Node in CAP-1/2/3/4: **harness, parity file and report BUILT 2026-09-15**; the run is what is left, on Arpit's machine. [detail](open/W-188-node-column-every-capture.md)
 
