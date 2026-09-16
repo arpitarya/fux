@@ -148,6 +148,22 @@ TABLE_FAMILIES = ("dump", "content")
 #: control that does not exist.
 ALL_FAMILIES = ("main", "inverse", "placebo", *TABLE_FAMILIES, "verbose")
 
+#: The families a value must IMPROVE, and the families it must not break.
+#:
+#: 🔴 **`dump` is a CONTROL** (Arpit, 2026-09-16). The 2026-09-15 rule asked for a
+#: value *netting positive* on it, and it sits at 30/30 at the baseline — its
+#: correct answer is the prose document, which already wins at `b = 0.75` — so
+#: the rule was unsatisfiable at any `b`, forever. It was grouped with `content`
+#: and `main` because all three are *table* families, and the rule inherited the
+#: grouping. **Its own `TABLE_FAMILIES` comment above already called the prose
+#: document correct in both arms**, which is a control's definition.
+#:
+#: ⚠ **It keeps its teeth.** W-155 drove it 30/30 → 0/30; catching exactly that
+#: is a control's job. A value that clears the benefit families while `dump`
+#: regresses FAILS.
+BENEFIT_FAMILIES = ("content", "main")
+CONTROL_FAMILIES = ("inverse", "placebo", "dump", "verbose")
+
 PROSE_WORDS = (
     "consignment despatch tolerance interval calibration schedule handover "
     "register escalation supervisor ambient variance corridor threshold "
@@ -713,11 +729,21 @@ def _score_at_b(corpus: Path, probes: list[dict], values: tuple[float, ...]) -> 
 def cmd_bsweep(a) -> int:
     """W-180 — the FROZEN `b` sweep, run. The bar is not in this file.
 
-    🔴 **The decision rule is `work/regression/2026-09-15-b-sweep/PRE-REGISTRATION.md`'s
-    and it may not move** (SR-RS decision 10b): ship the FIRST value, in
-    descending order, that nets positive on `dump`, `content` AND `main`, with
-    `inverse` moving the other way and `placebo` not moving, and with the net
-    clearing decision 19's floor for the discordant count observed.
+    🔴 **The decision rule is the pre-registration's and it may not move**
+    (SR-RS decision 10b). ⚠ **Which pre-registration changed on 2026-09-16**:
+    [`2026-09-16-b-sweep-2`](../../work/regression/2026-09-16-b-sweep-2/PRE-REGISTRATION.md)
+    supersedes the 2026-09-15 one in place, and the rule reads:
+
+        the FIRST value, in descending order, that nets positive on `content`
+        AND `main`, each individually and neither negative, with EVERY control
+        holding — `inverse`, `placebo`, `verbose` and `dump` — and with the net
+        clearing decision 19's floor for the discordant count observed.
+
+    🔴 **`dump` moved from the benefit families to the controls.** It sits at
+    30/30 at the baseline and can never net positive, so the old rule was
+    unsatisfiable at any `b`. The justification is its ROLE, quoted from this
+    file's own `TABLE_FAMILIES` comment — *"the prose document is correct"*, in
+    both arms — and not the fact that reclassifying it makes a value clear.
 
     ⚠ **Descending order is the rule, not a convenience.** A sweep that reported
     *the best value* would pick the extreme whenever the curve is flat; the first
@@ -768,9 +794,12 @@ def cmd_bsweep(a) -> int:
         print()
 
     print("🔴 The decision rule is the PRE-REGISTRATION's, and this command does not apply it:")
-    print("   the first value, descending, netting positive on dump AND content AND main,")
-    print("   with `inverse` moving the other way and `placebo` not moving, and the net")
-    print("   clearing SR-RS decision 19's floor. An ambiguous result goes to Arpit.")
+    print("   the first value, DESCENDING, netting positive on `content` AND `main` —")
+    print("   each individually, neither negative — with EVERY control holding")
+    print(f"   ({', '.join(CONTROL_FAMILIES)}), and the net clearing SR-RS decision 19's")
+    print("   floor for the discordant count observed. An ambiguous result goes to Arpit.")
+    print("   ⚠ `dump` is a CONTROL since 2026-09-16, not a benefit family: it is 30/30")
+    print("      at the baseline and can never net positive.")
 
     if a.json:
         Path(a.json).write_text(json.dumps(

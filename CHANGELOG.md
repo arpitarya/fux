@@ -86,6 +86,29 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
     `<duration>` for every typed attribute, so a fresh `fux setup` would have
     written `fetch=<duration>`. The placeholder is the attribute's now.
 
+### Changed — RANKING, read this before upgrading a consumer
+
+- 🔴 **`[bm25f] b` defaults to `0.15`, not `0.75`. Every score in the engine
+  changes.** ([W-144](work/regression/2026-09-16-b-sweep-2/VERDICT.md); Arpit's
+  ruling, 2026-09-16.) `b` is the strength of BM25's length normalisation, and
+  **a table inflates a document's length with tokens that say nothing about the
+  query** — so at `0.75` a document is punished for an appendix it did not ask
+  to be measured on.
+  - **Measured, under a rule frozen before the sweep**: the first value,
+    descending `0.4 → 0.3 → 0.2 → 0.15`, that improves both benefit families
+    with every control holding. `0.4` moves neither; `0.3` and `0.2` fix the
+    rate-card case and leave the prose-with-appendix case where `0.75` does;
+    **`0.15` moves both** — `+30` each, `p = 0.0000` against a required net
+    of 12.
+  - ⚠ **One synthetic corpus, and the run is `informed`.** 510 generated
+    documents built so the mechanism can move. It says a lower `b` ranks better
+    **on documents shaped like these**.
+  - **No re-ingest is needed** — `b` is applied at query time.
+  - 🔴 **`fux setup` writes `b` out in full**, so a repo set up before this
+    upgrade keeps `0.75` in its committed `.fux/tune.toml` and **will not move**.
+    Change the line, or delete it to take the new default. A fresh clone and a
+    set-up repo now rank differently unless you do.
+
 ### Changed — read this before upgrading a consumer
 
 - 🔴 **The committed index format is `fux.index.v3`, and an existing index must

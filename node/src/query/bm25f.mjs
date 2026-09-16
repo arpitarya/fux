@@ -11,7 +11,14 @@ if (FIELD_WEIGHTS.length !== TF_FIELDS.length) {
   throw new Error("field weights must align with TF_FIELDS");
 }
 export const K1 = 1.2;
-export const B = 0.75;
+//: 🔴 **`0.15`, not the literature's `0.75`, and that is MEASURED** — W-144's
+//: verdict, 2026-09-16. `b` is the strength of length normalisation, and a table
+//: inflates a document's length with tokens that say nothing about the query. The
+//: frozen rule took the FIRST value, descending, that moved both benefit families
+//: with every control holding; `0.15` is that value (+30 each, p = 0.0000).
+//: ⚠ One synthetic corpus, `informed`. Twin of `query/bm25f.py`'s `B`, and
+//: `tests/test_node_config_parity.py` holds the two equal.
+export const B = 0.15;
 
 export class Scoring {
   constructor(k1 = K1, b = B, weights = FIELD_WEIGHTS, anchor = 0.0) {

@@ -8,6 +8,54 @@ lane: agent
 timestamp: 2026-09-12T00:00:00Z
 ---
 
+## ✅ CLOSED 2026-09-16 — `PASS` at `b = 0.15`, shipped
+
+[Verdict](../regression/2026-09-16-b-sweep-2/VERDICT.md) · **`PASS`**.
+
+| `b` | `content` | `main` | controls | clears? |
+|---|---:|---:|---|---|
+| 0.4 | +0 | +0 | all hold | no — neither benefit family moves |
+| 0.3 | **+30** | +0 | all hold | no — `main` does not net positive |
+| 0.2 | **+30** | +0 | all hold | no — same |
+| **0.15** | **+30** | **+30** | **all four hold** | ✅ **yes** |
+
+Both benefit families at `0.15`: `p = 0.0000` on 30 discordant pairs, against a
+required net of **12**.
+
+🔴 **Why `0.15` and not `0.3`.** The two benefit families cross at **different**
+values — `content` (a rate card whose subject *is* its rows) between 0.4 and 0.3,
+`main` (prose with a table appendix) between 0.2 and 0.15. **The rule requires
+both.** A rule asking for *either* would have shipped `0.3` and left half the
+mechanism unmeasured behind a passing verdict.
+
+✅ **The controls' holding is a measurement, not a tautology** — `verbose` is
+proven able to lose (30/30 → **0/30 at `b = 0`**), and without it `b = 0` and
+`b = 0.15` are indistinguishable on every other instrument. ✅ **`dump` holds**,
+which is the specific harm W-155 showed option (b) causing.
+
+### Step 4, discharged
+
+| | |
+|---|---|
+| **shipped** | `B = 0.15` in `src/fux/query/bm25f.py` **and** `node/src/query/bm25f.mjs`; `.fux/tune.toml` |
+| **records** | SR-RANKING decision 3 — 🔴 **the first default here that is MEASURED rather than inherited** — plus SR-TUNING, SR-ASK, SR-NODE-SEARCH |
+| **L3 / byte equality** | ✅ **22 144 comparisons, byte-identical in every mode**; Node parity test green, bundle rebuilds |
+| **CHANGELOG** | a ranking block naming the value, the reason, and the upgrade trap |
+
+🔴 **The upgrade trap, stated in the CHANGELOG because nothing else would catch
+it:** `fux setup` writes `b` out in full, so **a repo set up before this keeps
+`0.75` and will not move.** A fresh clone and a set-up repo now rank differently
+until the line is changed or deleted.
+
+⚠ **One synthetic corpus, `informed`.** 510 generated documents built so the
+mechanism *can* move. It says a lower `b` ranks better **on documents shaped like
+these**; fux's own docs tree is the reopen-trigger evidence and was not run.
+
+⚠ **No fux test pinned `b`'s value**, so the suites passing is not evidence the
+change is right. The differential is; the sweep is what says it is better.
+
+---
+
 ## ✅ RULED 2026-09-16 (Arpit, Cowork) — `dump` is a CONTROL; the range and first-that-clears stand
 
 **Ruling: this is a specification defect in the decision rule, not a threshold to

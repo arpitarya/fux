@@ -15,7 +15,7 @@
 
 [bm25f]
 k1                      = 1.2      # term-frequency saturation
-b                       = 0.75     # length normalisation, 0 = off, 1 = full
+b                       = 0.15     # length normalisation, 0 = off, 1 = full
 # The five field weights, in index order. 0 means "ignore this field".
 body                    = 1.0
 heading                 = 3.0

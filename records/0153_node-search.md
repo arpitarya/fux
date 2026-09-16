@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@a9f259542551, src/fux/store/nodebundle.py@071a24a596dd]
+owns: [node@7440e800e920, src/fux/store/nodebundle.py@071a24a596dd]
 laws: [L1, L3, L4, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 38b4ed9994b31084d500dba38bda29578ff45a38edeebd47572cbfd50e87c9c6
+content_sha: 82c6a54ce985692f653eed22b57e3de393612b4058d6d7abbc627e47e3c45351
 ---
 
 # SR-NODE-SEARCH — the Node read plane
@@ -701,6 +701,19 @@ the fact rather than asserting that somebody edited a file. It matters here
 specifically: `query/__init__.py` catches a refusal from this parser and
 degrades to *no archived directories*, so two readers with different attribute
 sets return **different archived sets from the same committed file**.
+
+⚠ **`B` moved `0.75 → 0.15` in BOTH readers on 2026-09-16**
+([SR-RANKING](0111_ranking.md) decision 3, W-144). `node/src/query/bm25f.mjs`
+carries the constant and `tests/test_node_config_parity.py` holds the two equal,
+so the change is one line on each side and a parity test that fails if only one
+moves.
+
+🔴 **This is the case the two-reader discipline exists for.** A ranking default
+that moved in Python and not in Node would produce **two readers of one index
+returning different orders** — the defect the parity pair in
+[SR-WORK-BENCHMARK](0053_WORK-benchmark.md) decision 16 reports as a bug rather
+than a finding, and the one a differential arm on an unchanged corpus could not
+catch, because both readers would still agree with themselves.
 
 ### Consequences
 

@@ -1,0 +1,51 @@
+corpus n=510   avg_wlen 566.2
+probe-term df: 2-12
+
+baseline b=0.75 (shipped). One lever moves; `flen` is the shipped one in every arm.
+
+   family    n  hit@1 b=0.75   hit@1 b=0.4    hit@1 b=0.3    hit@1 b=0.2    hit@1 b=0.15 
+     main   30      0 /30         0 /30         0 /30         0 /30        30 /30   
+  inverse   30     30 /30        30 /30        30 /30        30 /30        30 /30   
+  placebo   30     30 /30        30 /30        30 /30        30 /30        30 /30   
+     dump   30     30 /30        30 /30        30 /30        30 /30        30 /30   
+  content   30      0 /30         0 /30        30 /30        30 /30        30 /30   
+  verbose   30     30 /30        30 /30        30 /30        30 /30        30 /30   
+
+Paired against the baseline, per family (b = better, w = worse, net = b - w):
+
+   family      b  better  worse  discordant    net         p  outcome
+     main    0.4       0      0           0     +0    1.0000  inconclusive
+  inverse    0.4       0      0           0     +0    1.0000  inconclusive
+  placebo    0.4       0      0           0     +0    1.0000  inconclusive
+     dump    0.4       0      0           0     +0    1.0000  inconclusive
+  content    0.4       0      0           0     +0    1.0000  inconclusive
+  verbose    0.4       0      0           0     +0    1.0000  inconclusive
+
+     main    0.3       0      0           0     +0    1.0000  inconclusive
+  inverse    0.3       0      0           0     +0    1.0000  inconclusive
+  placebo    0.3       0      0           0     +0    1.0000  inconclusive
+     dump    0.3       0      0           0     +0    1.0000  inconclusive
+  content    0.3      30      0          30    +30    0.0000  b=0.3 RANKS BETTER
+  verbose    0.3       0      0           0     +0    1.0000  inconclusive
+
+     main    0.2       0      0           0     +0    1.0000  inconclusive
+  inverse    0.2       0      0           0     +0    1.0000  inconclusive
+  placebo    0.2       0      0           0     +0    1.0000  inconclusive
+     dump    0.2       0      0           0     +0    1.0000  inconclusive
+  content    0.2      30      0          30    +30    0.0000  b=0.2 RANKS BETTER
+  verbose    0.2       0      0           0     +0    1.0000  inconclusive
+
+     main   0.15      30      0          30    +30    0.0000  b=0.15 RANKS BETTER
+  inverse   0.15       0      0           0     +0    1.0000  inconclusive
+  placebo   0.15       0      0           0     +0    1.0000  inconclusive
+     dump   0.15       0      0           0     +0    1.0000  inconclusive
+  content   0.15      30      0          30    +30    0.0000  b=0.15 RANKS BETTER
+  verbose   0.15       0      0           0     +0    1.0000  inconclusive
+
+🔴 The decision rule is the PRE-REGISTRATION's, and this command does not apply it:
+   the first value, DESCENDING, netting positive on `content` AND `main` —
+   each individually, neither negative — with EVERY control holding
+   (inverse, placebo, dump, verbose), and the net clearing SR-RS decision 19's
+   floor for the discordant count observed. An ambiguous result goes to Arpit.
+   ⚠ `dump` is a CONTROL since 2026-09-16, not a benefit family: it is 30/30
+      at the baseline and can never net positive.

@@ -7,10 +7,10 @@ description: BM25F over five fields, weight-then-saturate once, with one scorer 
 status: accepted
 date: 2026-08-18
 feature: scoring, ordering, and the analyzer they share with ingest
-owns: [src/fux/query/rank.py@aeee6408bcf8, src/fux/query/bm25f.py@720cf2ef6fdf, src/fux/query/tokenize.py@1d8ff4a42048, src/fux/query/analyzer.py@4a6a03793628, src/fux/query/stem.py@728155482c94]
+owns: [src/fux/query/rank.py@aeee6408bcf8, src/fux/query/bm25f.py@f325494f6ba8, src/fux/query/tokenize.py@1d8ff4a42048, src/fux/query/analyzer.py@4a6a03793628, src/fux/query/stem.py@728155482c94]
 laws: [L1, L3]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 1bc1480dfe0c6cd3df914e3ceed0411292c3490778c9cff37c38836d8a23a590
+content_sha: a26b5cea3887dcb5bbc5573c93ebf11a94da91c82c7bd1f124d13c50ac5e8c2e
 ---
 
 # SR-RANKING — how documents are scored and ordered
@@ -138,7 +138,7 @@ xychart-beta
   tf 1 -> 2 buys +0.375.   tf 12 -> 50 buys +0.148.
   The curve can never reach 2.2, however often a word appears.
 
-  source: computed from src/fux/query/bm25f.py (K1=1.2, B=0.75)
+  source: computed from src/fux/query/bm25f.py (K1=1.2, B=0.75 — the default at the time of this capture; it is 0.15 from 2026-09-16, decision 3)
 ```
 
 </details>
@@ -158,7 +158,7 @@ at 3.0, `idf` at 1.0:
      400                0.9565
 
   Four times the length costs roughly half the contribution.
-  source: computed from src/fux/query/bm25f.py (K1=1.2, B=0.75)
+  source: computed from src/fux/query/bm25f.py (K1=1.2, B=0.75 — the default at the time of this capture; it is 0.15 from 2026-09-16, decision 3)
 ```
 
 </details>
@@ -206,17 +206,40 @@ present thinly in all five would then beat a term that genuinely dominates one.
 iterates over the *posting* rather than over the weights, so a body-only tf of
 `[1]` costs nothing for the four fields it does not carry.
 
-**3. The defaults are `K1 = 1.2`, `B = 0.75`, and `FIELD_WEIGHTS = (1.0, 3.0,
+**3. The defaults are `K1 = 1.2`, `B = 0.15`, and `FIELD_WEIGHTS = (1.0, 3.0,
 2.0, 1.5, 1.0)`** — body 1.0, heading 3.0, title 2.0, path 1.5, `ctx` 1.0,
 aligned index-for-index with `TF_FIELDS`, and `bm25f.py` asserts the two are the
 same length. A silent misalignment would weight `title` as `path` and produce a
 ranking that is plausible and wrong, which is the failure mode with no symptom.
 
-⚠ **`K1`, `B`, heading and body are carried forward from the archived engine, so
-its recorded numbers remain a free correctness check. `title`, `path` and `ctx`
-are carried forward from nothing** — they are defensible starting points, not
-measured optima. Listing five numbers in one breath would dress three guesses as
-calibration.
+🔴 **`B` was `0.75` — the literature's value — until 2026-09-16, and `0.15` is
+the first default here that is MEASURED rather than inherited**
+([W-144](../work/regression/2026-09-16-b-sweep-2/VERDICT.md)).
+
+`b` is the strength of length normalisation, and **a table inflates a document's
+length with tokens that say nothing about the query** — so at `0.75` a document
+is punished for an appendix it did not ask to be measured on. Under a rule frozen
+before the sweep — *the first value, descending `0.4 → 0.3 → 0.2 → 0.15`, that
+nets positive on both benefit families with every control holding* — `0.4` moves
+neither family, `0.3` and `0.2` fix the rate-card case and leave the
+prose-with-appendix case exactly where `0.75` does, and **`0.15` moves both**:
+`+30` each, `p = 0.0000` on 30 discordant pairs against a required net of 12,
+with `inverse`, `placebo`, `dump` and `verbose` all holding.
+
+⚠ **Descending order is what makes it `0.15` and not something lower.** The rule
+reports the smallest departure from `0.75` that works, never the best value.
+
+⚠ **One synthetic corpus, and the run is `informed`.** 510 generated documents
+built so the mechanism *can* move. It says a lower `b` ranks better **on
+documents shaped like these**; real-corpus evidence is W-144's reopen trigger.
+**A default shipped on one synthetic corpus is why this paragraph exists rather
+than a silent value change.**
+
+⚠ **`K1`, heading and body are still carried forward from the archived engine, so
+its recorded numbers remain a free correctness check — but `B` is no longer one
+of them.** `title`, `path` and `ctx` are carried forward from nothing: defensible
+starting points, not measured optima. Listing them in one breath would dress
+guesses as calibration.
 
 ⚠ **None of the seven is a constant.** They are the module-level defaults, and
 `[bm25f]` in `.fux/tune.toml` can replace any of them per query
@@ -617,7 +640,7 @@ grep -rn 'from .tokenize import\|from ..query.tokenize import' src/fux/
 
 # 4. the defaults still match the archived baseline the checks rest on
 grep -nE 'FIELD_WEIGHTS: |^K1|^B ' src/fux/query/bm25f.py
-# expect: (1.0, 3.0, 2.0, 1.5, 1.0), 1.2, 0.75 — body and heading unmoved.
+# expect: (1.0, 3.0, 2.0, 1.5, 1.0), 1.2, 0.15 — body and heading unmoved.
 # These are DEFAULTS; `.fux/tune.toml` replaces any of them per query, so the
 # archived-baseline claim holds for `ask --no-tune` and for an unconfigured repo.
 

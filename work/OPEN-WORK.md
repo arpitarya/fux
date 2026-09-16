@@ -44,7 +44,6 @@ here. Read that record before changing anything below it.
 - 🟢 **W-136** · `agent` — **prompt 4 RAN 2026-09-15 and the ladder was STALE**: all eight rungs rebuilt from the current seed, `ext/` byte-identical, gate shipped. Next is **prompt 5** (run both sets), then scoring in a chat Arpit attends. [detail](open/W-136-golden-benchmark.md)
 - 🟡 **W-87** · `agent`, waiting on W-136 — P2's `unanswerable` gate is measured (0/124). ✅ **Part B's blocker is gone** (set 1 is Codex-authored), so both halves now wait on phase 5. [detail](open/W-87-what-good-means.md)
 - 🟢 **W-175** · `agent` — does a correction help OTHER phrasings? **Pre-registration frozen and the Codex prompt written 2026-09-15** (W-192). The harness is what is left; every number waits on paraphrases only Codex may write. [detail](open/W-175-correction-generalisation.md)
-- 🟢 **W-144** · `agent` — RULED 2026-09-16: `dump` is a CONTROL, not a benefit family; range and first-that-clears stand. Re-freeze the pre-registration, then run. [detail](open/W-144-structure-aware-extraction.md)
 
 
 ---

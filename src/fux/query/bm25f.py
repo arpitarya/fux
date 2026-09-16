@@ -72,7 +72,34 @@ BODY_WEIGHT = FIELD_WEIGHTS[TF_FIELDS.index("body")]
 HEADING_WEIGHT = FIELD_WEIGHTS[TF_FIELDS.index("heading")]
 
 K1 = 1.2
-B = 0.75
+
+#: 🔴 **`b` is `0.15`, not the literature's `0.75`, and that is MEASURED**
+#: ([W-144](../../../work/regression/2026-09-16-b-sweep-2/VERDICT.md), 2026-09-16).
+#:
+#: `b` is the strength of BM25's length normalisation. At `0.75` a document is
+#: penalised hard for its length — and a **table inflates that length with
+#: tokens that say nothing about the query**, so a document is punished for an
+#: appendix it did not ask to be measured on.
+#:
+#: **The frozen rule was: the FIRST value, descending `0.4 → 0.3 → 0.2 → 0.15`,
+#: that nets positive on both benefit families with every control holding.**
+#: `0.4` moves neither; `0.3` and `0.2` fix the rate-card family and leave the
+#: prose-with-appendix family exactly where `0.75` does; **`0.15` moves both** —
+#: `+30` each, `p = 0.0000` on 30 discordant pairs against a required net of 12,
+#: with `inverse`, `placebo`, `dump` and `verbose` all holding.
+#:
+#: ⚠ **Descending order is what makes it `0.15` and not something lower.** The
+#: rule reports the smallest departure from `0.75` that works, never the best
+#: value, and it stops at the first one.
+#:
+#: ⚠ **One synthetic corpus, `informed`.** 510 generated documents built so the
+#: mechanism *can* move. It says a lower `b` ranks better **on documents shaped
+#: like these** — prose with table appendices, rate cards whose subject is their
+#: rows, data dumps. Real-corpus evidence is W-144's reopen trigger.
+#:
+#: 🔴 **Changing this changes every score in the engine.** The Node twin carries
+#: the same constant and `tests/test_node_config_parity.py` holds the two equal.
+B = 0.15
 
 
 @dataclass(frozen=True)

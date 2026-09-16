@@ -27,7 +27,7 @@ agent can do is done. The decision is made, so this left the *Blocked on Arpit*
 table and is a 🟣 date gate in [OPEN-WORK](../OPEN-WORK.md).
 
 - **What this gate holds up**, moved here from the inbox sub-row: **[W-87](W-87-what-good-means.md)'s
-  recall half** and **[W-144](W-144-structure-aware-extraction.md)'s cheap route**,
+  recall half** and **[W-144](../../archive/open/W-144-structure-aware-extraction.md)'s cheap route**,
   both of which read per-query scores off phase 5. **Not W-145** — that governed
   what a number may *claim*, not whether it runs, and it closed as overtaken on
   2026-09-15 when Codex authored set 1.

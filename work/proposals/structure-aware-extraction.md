@@ -72,7 +72,7 @@ contain a table fux can see.
 
 ✅ **THE TRIGGER FIRED, and this file did not move until 2026-09-12.**
 `src/fux/decode/docx.py`, `pptx.py` and `xlsx.py` all ship. Graduated into
-**[W-144](../open/W-144-structure-aware-extraction.md)**, blocked on W-136's
+**[W-144](../../archive/open/W-144-structure-aware-extraction.md)**, blocked on W-136's
 golden corpus because the proposal's own text asks for a pre-registration and a
 verdict at 10 000 documents rather than an argument.
 

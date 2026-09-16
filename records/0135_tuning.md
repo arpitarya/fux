@@ -11,7 +11,7 @@ feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error 
 owns: [src/fux/tune.py@97814aaa4a31]
 laws: [L1, L3, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: fc3ed2094d891138a351a266374eeccf34a5ac1fd67c105d763a266f495b52d3
+content_sha: d7986a7a3f485b38bd778603d1dd08d0d2a57ef8c1f7ba61a92379705e1a4265
 ---
 
 # SR-TUNE — the tunables file, and per-source priority
@@ -274,7 +274,7 @@ here; the shipped file carries them.*
 
 [bm25f]                    # k1, b, and the five field weights in TF_FIELDS order
 k1      = 1.2
-b       = 0.75
+b       = 0.15             # 0.75 until 2026-09-16 — SR-RANKING decision 3, W-144
 body    = 1.0
 heading = 3.0
 title   = 2.0

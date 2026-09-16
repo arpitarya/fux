@@ -14,7 +14,7 @@ not *"is the number real"* (it is) but *"is a synthetic threshold enough to move
 a default that every corpus inherits"*.
 
 **Found:** [`proposals/structure-aware-extraction.md`](../proposals/structure-aware-extraction.md),
-graduated as [W-144](../open/W-144-structure-aware-extraction.md) when W-86's P4
+graduated as [W-144](../../archive/open/W-144-structure-aware-extraction.md) when W-86's P4
 landed. **Owning records:** [SR-EXTRACTED](../../records/0115_extracted-mode.md)
 (what `extract.py` builds) and [SR-RANKING](../../records/0111_ranking.md)
 (what the fields mean). Neither decides this today.
@@ -243,7 +243,7 @@ it touches, and this one is.
 **What that does NOT do:** it does not make (a) right. `main` and `content` are
 both 30/30 the other way; (b) fixes two cases and breaks a third. **The
 recommendation this document carries is therefore the one thing W-155 leaves
-open, and it is Arpit's** ([W-144](../open/W-144-structure-aware-extraction.md)).
+open, and it is Arpit's** ([W-144](../../archive/open/W-144-structure-aware-extraction.md)).
 
 ---
 
