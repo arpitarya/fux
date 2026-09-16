@@ -340,9 +340,40 @@ on data that contains the input it acts on.** This table is that declaration.
 | `recency` | commit time per file | Codex writes `seed-dates.tsv`; each rung commits at those dates (phase 4) | all 20 seed documents, dated 2019-08-12 → 2026-07-01 | 7 |
 | abstention | unanswerable questions | Codex, prompt 2 | — | 12 |
 | `heading` negative control | heading-matched distractors | Claude, phase 4 `sibling` documents | 32 at rung 100, rising to 392 at rung 1 000 — `ext/sibling/` documents reusing the seed documents' **headings and document types** (Temperature Excursion Response SOP, Rate card and surcharges, Customer notification matrix, Dock scheduling rules, …) with a different company, people, facilities and every number changed | — |
+| **anchor text · graph walk · graph coherence** | a `ref` edge — an inline markdown link in a body whose target resolves to another ingested document | 🔴 **NOBODY. `ref` edges: 0 on every rung** — requested as [prompt 7](prompts/7-codex-link-bearing-seed.md), not yet written | **0 measurable** |
 
 A feature with no row, or a row still showing *(filled by …)*, **is not measurable
 yet** — say so in the pre-registration instead of running.
+
+### 🔴 The `ref`-edge census, per rung — measured 2026-09-16
+
+**Every edge in this corpus is a `supersedes` edge.** There is no link syntax
+anywhere in `seed/`, so three features measure nothing
+([W-191](../open/W-191-the-ladder-carries-no-links.md)):
+
+| rung | docs | edges | **`ref`** | `supersedes` |
+|---|---:|---:|---:|---:|
+| `rung-seed` | 20 | 4 | **0** | 4 |
+| `rung-00100` | 100 | 12 | **0** | 12 |
+| `rung-00200` | 200 | 22 | **0** | 22 |
+| `rung-00500` | 500 | 52 | **0** | 52 |
+| `rung-01000` | 1 000 | 102 | **0** | 102 |
+| `rung-02000` | 2 000 | 202 | **0** | 202 |
+| `rung-05000` | 5 000 | 502 | **0** | 502 |
+| `rung-10000` | 10 000 | 1 002 | **0** | 1 002 |
+
+⚠ **This table is regenerated, never hand-maintained** —
+[`tools/quality-controls/ref_edge_census.py`](../../tools/quality-controls/ref_edge_census.py),
+which **exits 2 when a corpus has no `ref` edges** so a link-dependent run can
+gate on it rather than rediscover this. It counts what the **engine wrote**, not
+what a document looks like: an inline link whose target does not resolve is
+dropped silently, so a corpus can be full of markdown links and carry no edges —
+which a hand-count cannot see.
+
+🔴 **Nothing detected this for weeks.** The rungs were frozen, verified, nested
+and re-verified while a link-ranking feature was measured against them and filed
+**0 of 124 flips at every weight**. [SR-RS](../../records/0133_predictions.md)
+decision 23: **missing input is a data defect, not a null.**
 
 ---
 

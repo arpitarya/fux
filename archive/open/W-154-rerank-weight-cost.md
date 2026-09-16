@@ -9,6 +9,56 @@ timestamp: 2026-09-13T00:00:00Z
 filed: 2026-09-13
 ---
 
+## ✅ ANSWERED 2026-09-16 — the feature does NOT earn its latency on `ask`
+
+[Verdict](../regression/2026-09-16-rerank-quality-b2/VERDICT.md) · **`FAIL`**.
+
+**`rerank_weight = 1.0` makes `ask` worse.** 7 better against **47 worse**, net
+**40** on 54 discordant contests, `p = 0.0000` against a required 16, with
+**both headrooms open** (420 improvement, 118 regression).
+
+**Read with Part A, that is a complete answer to this item's question.** Part A
+priced the feature at **+15 to +19 ms p50, flat in corpus size**; Part B says the
+thing you would pay that for makes results worse here. `rerank_weight` stays at
+`0.0` — where it already was — **now with a measured reason rather than a held
+request**, and the default remains Arpit's to move.
+
+### The three things the re-run had to fix, and it fixed them
+
+| the VOID verdict asked for | what happened |
+|---|---|
+| **exclude the citing document** | done; baseline **3.3 % → 21.9 %**, close to the 18.3 % [the reachability check](../regression/2026-09-16-rerank-endpoint-reachability/report.md) predicted before the bar was written |
+| **a NEW pre-registration, frozen first** | [frozen and committed ALONE](../regression/2026-09-16-rerank-quality-b2/PRE-REGISTRATION.md), so the freeze is checkable in `git log`. **The bar did not move** — decision 19's floor unchanged |
+| **fix two definitions** | regression headroom is **right in the BASELINE**, not right in both — now [SR-RS](../../records/0133_predictions.md) **22f**; and the `answer` criterion was **measured out** rather than loosened |
+
+### 🔴 The `answer` path was measured out, not skipped
+
+**0 of 120 at baseline, on both candidate criteria** — the VOID run's own
+top-passage overlap, and the same source-exclusion repair one level down. Zero
+regression headroom is `INCONCLUSIVE` by construction (22d), so the arm was
+declared out of scope **in the pre-registration, in advance**, rather than run
+to file a foregone conclusion.
+
+⚠ **The first explanation for it was wrong and was caught before it was frozen
+into a rationale.** *"The citing document monopolises the passage set"* —
+measured, answers carry 19.4 passages on average, the citing document is present
+in 30 of 30 and is the **only** document in **0 of 30**.
+
+### 🔴 What is still open, and it is not this item's
+
+**W-108's two-mechanism separation is undelivered**, and the pre-registration
+said so before the arm ran: `ask` never fetches, so **the refer plane's rescore
+is unpriced**. It needs a contest generator whose queries are **not lifted
+verbatim from a corpus document** — a different instrument, not a flag on this
+one.
+
+⚠ **And the exclusion turned out to be incomplete**, which the run reports rather
+than leaving for the next one: **28 of the 47 breaks were won by another document
+quoting the citing sentence**. The direction survives a sensitivity check
+(net 12 on 26 discordant, `p = 0.0290`, at exactly the floor) — but **widening
+the exclusion is not the fix**, because an exclusion set that grows until the
+result is clean is not an endpoint.
+
 ## 🔴 PART B RAN 2026-09-15 AND IS **VOID** — the instrument, not the feature
 
 [Verdict](../regression/2026-09-15-rerank-quality/VERDICT.md).

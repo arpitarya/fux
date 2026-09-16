@@ -7,10 +7,10 @@ description: "An R is a claim frozen before measurement; its threshold may never
 status: accepted
 date: 2026-08-22
 feature: the prediction system — the R ids, their register, the rules that make a frozen claim mean something, and the classification of the runs those claims are measured by
-owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@de5b73bd9f76, tools/vector-gate@0023bff0cdef]
+owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@f43d258fba27, tools/vector-gate@0023bff0cdef]
 laws: [L3]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 76267b93f5d75bc77857e728b2e387b4fb3174affa1afe43b26bf8afa694456a
+content_sha: 20595d61e5b2c1966d2699a2ac62026e26d3a103725a9f25578604de6f8a646d
 ---
 
 # SR-RS — the R predictions
@@ -1006,6 +1006,29 @@ four-priors precondition check: `supersedes:` declared nowhere, so three priors
 moved 0 of 50 at every value) is not filed as *"no detected change"* and is not
 Inconclusive-and-done: the data is extended so the feature can move it, and the
 measurement is re-planned. Decision 22d still governs any run that does go ahead.
+
+**23c. 🔴 Where the input is COUNTABLE, count it — before the run, with a check
+that can fail** (2026-09-16).
+
+23a and 23b were stated as a discipline and read as a reminder, and a reminder
+did not hold: the golden ladder was frozen, verified, nested and re-verified for
+weeks with **0 `ref` edges on all eight rungs**, while a link-ranking feature was
+measured against it and filed **0 of 124 flips at every weight**. Three separate
+items were waiting on that corpus.
+
+- **[`ref_edge_census.py`](../tools/quality-controls/ref_edge_census.py) is that
+  check for links**, and **it exits 2 when a corpus has none**, so a
+  link-dependent run gates on it rather than rediscovering the defect.
+- 🔴 **It counts what the ENGINE WROTE, never what a document looks like.** An
+  inline link whose target does not resolve is dropped silently by
+  `edges._resolve_ref` — so a corpus can be full of markdown links and carry no
+  edges at all. **A hand-count or a reviewer reading the documents cannot see
+  that**, and it is the failure mode a countable input is most likely to have.
+- ⚠ **This does not generalise to every input.** *Unanswerable questions* cannot
+  be counted without reading answers ([L11](0012_LAW-11-sealed-answer-key.md)),
+  and that count comes from a scored run or not at all. The rule is: **where the
+  input is visible in the committed index, a run that depends on it says how much
+  there is, mechanically, before it starts.**
 
 **23b-i. ⚠ Satisfying 23a collided with the one-archive law, and the law's
 test was narrowed rather than the data moved** (2026-09-12). *"A prior that

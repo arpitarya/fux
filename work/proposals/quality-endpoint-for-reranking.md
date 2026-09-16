@@ -8,7 +8,7 @@ timestamp: 2026-09-15T00:00:00Z
 
 # A quality endpoint for proximity reranking
 
-**W-183's output.** [W-154](../open/W-154-rerank-weight-cost.md) has the price of
+**W-183's output.** [W-154](../../archive/open/W-154-rerank-weight-cost.md) has the price of
 proximity reranking measured and the benefit unmeasured, because Part B of its
 [pre-registration](../regression/2026-09-13-rerank-cost/PRE-REGISTRATION.md)
 names the quality endpoint as **unbuilt** rather than inventing one. This is the
@@ -219,7 +219,7 @@ the fork above, and W-154 closes or waits on Arpit's word.
 [`src/fux/refer/_rescore.py`](../../src/fux/refer/_rescore.py) ·
 [`tools/quality-controls/`](../../tools/quality-controls/)
 
-**Work** — [W-154](../open/W-154-rerank-weight-cost.md) ·
+**Work** — [W-154](../../archive/open/W-154-rerank-weight-cost.md) ·
 W-183 (closed 2026-09-15) ·
 W-145 (closed 2026-09-15 — [W-136](../open/W-136-golden-benchmark.md) phase 5) ·
 [the Part A pre-registration](../regression/2026-09-13-rerank-cost/PRE-REGISTRATION.md)

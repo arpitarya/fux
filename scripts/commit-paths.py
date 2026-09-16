@@ -51,13 +51,22 @@ def _git(*args: str) -> str:
     ).stdout
 
 
-def dirty_paths(root: Path) -> set[str]:
-    """Every path `git status` would show, renames counted at BOTH ends.
+def dirty_paths(root: Path) -> tuple[set[str], list[tuple[str, str]]]:
+    """Every path `git status` would show, plus the staged renames it found.
 
-    A rename is two paths to git and one edit to a person; missing the old one
-    leaves a delete uncommitted and the tree half-renamed.
+    A rename is **two paths to git and one edit to a person**. Both ends are
+    returned in the set, because missing the old one leaves a delete
+    uncommitted and the tree half-renamed — and the pairs are returned
+    alongside so naming either end can account for both.
+
+    ⚠ **The pairing was added by USING this tool** (2026-09-16). `git commit
+    --only` cannot take the old path of an already-staged rename as a pathspec
+    — *"did not match any files"* — so requiring both names made a legal commit
+    impossible to express, and the obvious workaround, `--leave-behind` on the
+    old path, would have been a claim that the deletion was left on purpose.
     """
     out: set[str] = set()
+    renames: list[tuple[str, str]] = []
     data = _git("status", "--porcelain", "-z").split("\0")
     i = 0
     while i < len(data):
@@ -68,10 +77,12 @@ def dirty_paths(root: Path) -> set[str]:
         status, path = rec[:2], rec[3:]
         if status[0] == "R":
             i += 1
-            out.add(data[i])
+            old_path = data[i]
+            out.add(old_path)
+            renames.append((old_path, path))
         out.add(path)
         i += 1
-    return out
+    return out, renames
 
 
 def _covered(path: str, named: set[str]) -> bool:
@@ -103,9 +114,17 @@ def main(argv: list[str] | None = None) -> int:
         ap.error("one of -m/--message or -F/--file is required")
 
     root = Path(_git("rev-parse", "--show-toplevel").strip())
-    dirty = dirty_paths(root)
+    dirty, renames = dirty_paths(root)
     named = set(args.paths)
     leaving = set(args.leave_behind)
+
+    # 🔴 **Both ends of a rename must be NAMED, and that is not pedantry.**
+    # `git commit --only -- <new>` alone commits the addition and leaves the
+    # deletion in HEAD — a half-renamed tree that is green locally and broken
+    # on a clone. Verified: naming both gives `R100 old new`; naming one gives
+    # `create mode` and nothing else. So the accounting below stays strict, and
+    # `renames` exists only to make the refusal message say which pair.
+    rename_of = {new: old for old, new in renames}
 
     # Direction 1 — you named something that is not dirty. Usually a typo, and
     # a typo'd pathspec commits less than you think and reports success.
@@ -124,9 +143,15 @@ def main(argv: list[str] | None = None) -> int:
         p for p in dirty if not _covered(p, named) and not _covered(p, leaving)
     )
     if unaccounted:
+        shown = [
+            f"{p}   (the OLD end of a rename to {new}; name it too)"
+            if (new := next((n for n, o in rename_of.items() if o == p), None))
+            else p
+            for p in unaccounted
+        ]
         print(
             f"{len(unaccounted)} dirty path(s) are neither named nor left behind:\n  "
-            + "\n  ".join(unaccounted)
+            + "\n  ".join(shown)
             + "\n\nName them, or pass --leave-behind for each. On a shared checkout "
             "these are usually ANOTHER SESSION'S staged work, and taking them is "
             "how a commit message stops describing its own commit.",
@@ -144,16 +169,25 @@ def main(argv: list[str] | None = None) -> int:
     # first. `git add -- <named>` is safe here precisely because the accounting
     # above has already run: it adds what the caller named and nothing else, and
     # `--only` below keeps everything else in the index out of the commit.
+    #
+    # ⚠ **A path that is gone from the worktree is NOT passed to `git add`**, and
+    # this cost a commit on 2026-09-16. The old end of an already-staged rename,
+    # and a staged deletion, match nothing on disk — `git add` fails the whole
+    # invocation on one of them. `git commit --only` takes them happily, which
+    # is the only place they are needed.
+    to_add = sorted(p for p in named if (root / p).exists())
     cmd = ["git", "commit"]
     cmd += ["-F", args.file] if args.file else ["-m", args.message]
     cmd += ["--only", "--", *sorted(named)]
     if args.dry_run:
-        print("git add --", *sorted(named))
+        if to_add:
+            print("git add --", *to_add)
         print(" ".join(cmd))
         return 0
-    add = subprocess.run(["git", "add", "--", *sorted(named)])
-    if add.returncode != 0:
-        return add.returncode
+    if to_add:
+        add = subprocess.run(["git", "add", "--", *to_add])
+        if add.returncode != 0:
+            return add.returncode
     return subprocess.run(cmd).returncode
 
 

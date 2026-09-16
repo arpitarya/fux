@@ -128,3 +128,37 @@ def test_the_whole_tree_as_a_pathspec_still_takes_theirs(repo):
     assert done.returncode == 0, done.stderr
     files = sorted(_git(repo, "show", "--name-only", "--format=", "HEAD").split())
     assert files == ["mine.txt", "theirs.txt"]
+
+
+def test_a_rename_commits_BOTH_ends_when_both_are_named(repo):
+    """🔴 **The half-rename this tool exists to make impossible.**
+
+    `git commit --only -- <new>` commits the addition and leaves the deletion in
+    HEAD: a tree that is green locally and broken on a clone. Naming both ends
+    gives `R100 old new`. Verified against git directly on 2026-09-16, because
+    the refusal above is only worth having if the accepted form is correct.
+    """
+    _git(repo, "mv", "seed", "renamed")
+    done = _run(repo, "-m", "feat: rename", "--leave-behind", "theirs.txt",
+                "--leave-behind", "mine.txt", "--", "renamed", "seed")
+    assert done.returncode == 0, done.stderr
+    changed = _git(repo, "show", "--name-status", "--format=", "HEAD").split()
+    assert changed[0].startswith("R"), f"not recorded as a rename: {changed}"
+    assert "seed" in changed and "renamed" in changed
+    assert "seed" not in _git(repo, "ls-files")
+
+
+def test_a_vanished_path_is_not_passed_to_git_add(repo):
+    """⚠ **The bug that cost a commit on 2026-09-16.**
+
+    `git add -- <path>` fails the WHOLE invocation on one path that matches
+    nothing on disk — and the old end of a staged rename matches nothing. It is
+    needed only by `git commit --only`, which takes it happily.
+    """
+    _git(repo, "mv", "seed", "renamed")
+    done = _run(repo, "--dry-run", "-m", "x", "--leave-behind", "theirs.txt",
+                "--leave-behind", "mine.txt", "--", "renamed", "seed")
+    assert done.returncode == 0, done.stderr
+    add_line = next(l for l in done.stdout.splitlines() if l.startswith("git add"))
+    assert "renamed" in add_line
+    assert "seed" not in add_line.split(), "a path that is gone must not reach `git add`"
