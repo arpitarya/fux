@@ -1,0 +1,39 @@
+{
+  "n": 120,
+  "seed": 154,
+  "ask_target_at_1": {
+    "n": 120,
+    "hits": 4,
+    "rate": 0.0333,
+    "regression_headroom": 4,
+    "improvement_headroom": 116
+  },
+  "ask_source_at_1": {
+    "n": 120,
+    "hits": 105,
+    "rate": 0.875,
+    "regression_headroom": 105,
+    "improvement_headroom": 15
+  },
+  "ask_target_at_1_excl": {
+    "n": 120,
+    "hits": 22,
+    "rate": 0.1833,
+    "regression_headroom": 22,
+    "improvement_headroom": 98
+  },
+  "answer_top_overlap": {
+    "n": 120,
+    "hits": 0,
+    "rate": 0.0,
+    "regression_headroom": 0,
+    "improvement_headroom": 120
+  },
+  "answer_best_nonsource_overlap": {
+    "n": 120,
+    "hits": 0,
+    "rate": 0.0,
+    "regression_headroom": 0,
+    "improvement_headroom": 120
+  }
+}

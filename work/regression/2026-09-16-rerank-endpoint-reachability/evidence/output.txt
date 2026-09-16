@@ -1,0 +1,17 @@
+tree: /Users/arpitarya/my_programs/fux
+contests: 120   seed: 154
+baseline only — this runner changes no configuration and writes nothing
+
+  25/120
+  50/120
+  75/120
+  100/120
+
+                       criterion   hits    rate  headroom (regression / improvement)
+                 ask_target_at_1      4    3.3%     4 / 116 
+                 ask_source_at_1    105   87.5%   105 / 15  
+            ask_target_at_1_excl     22   18.3%    22 / 98  
+              answer_top_overlap      0    0.0%     0 / 120    <- ZERO IN A DIRECTION: INCONCLUSIVE by construction (22d)
+   answer_best_nonsource_overlap      0    0.0%     0 / 120    <- ZERO IN A DIRECTION: INCONCLUSIVE by construction (22d)
+
+🔴 This applies no bar and rules nothing. It says which endpoints CAN be measured.
