@@ -22,12 +22,22 @@
  * would make the tier absent precisely where this reader is the only one
  * present.
  *
- * **So the two readers are byte-equal wherever Python has a fresh plane** —
- * which is every corpus the differential arm runs on, because the golden ladder
- * rungs are built — and diverge only on a corpus with no fresh build, where
- * Python has no tier and Node has one. That is decision 9's existing asymmetry
- * showing through a new surface, not a new one, and SR-NODE-SEARCH decision 16
- * states it rather than leaving the harness to find it.
+ * **So the two readers are byte-equal wherever Python has a fresh plane**, and
+ * diverge only on a corpus with no fresh build, where Python has no tier and
+ * Node has one. That is decision 9's existing asymmetry showing through a new
+ * surface, not a new one, and SR-NODE-SEARCH decision 16 states it rather than
+ * leaving the harness to find it.
+ *
+ * ⚠ **This paragraph claimed a fresh plane was "every corpus the differential
+ * arm runs on, because the golden ladder rungs are built" — and that was wrong
+ * about the arm that actually gates a merge.** `node-arm.yml` runs the arm over
+ * THIS repo from a bare checkout, where nothing had built anything, so CI sat at
+ * **44 of 202 discordant** on 2026-09-16 with the workflow reporting it as a
+ * Node transcription defect. Nothing was wrong with either reader. The ladder
+ * rungs were built; this repo was not, and the sentence generalised from the
+ * corpus that happened to be fine to the one that was not. `node-arm.yml` runs
+ * `fux build` before both arms now, and a STALE plane counts as absent, which is
+ * why the adversarial step rebuilds too.
  *
  * ⚠ **And it is not free.** Rebuilding the plane parses every committed record,
  * which is the work the B2 prefilter exists to avoid — so a Node `ask` with the

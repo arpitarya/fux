@@ -47,6 +47,22 @@ jobs:
         working-directory: node
         run: node --test
 
+      - name: build the derived plane — the arm is meaningless without it
+        # 🔴 **A fresh checkout has no `.fux/runtime/`, and that alone makes the
+        # arm red.** W-161's graph tier reads Python's derived
+        # `.fux/runtime/graph.json`; Node has no such file and rebuilds the plane
+        # in memory from the committed records instead (SR-NODE-SEARCH decisions
+        # 9 and 16). So Python with no fresh plane has NO TIER and Node has one,
+        # and the two disagree **by ratified design** — measured here at **44 of
+        # 202 discordant** on 2026-09-16, every one of them that asymmetry.
+        #
+        # `compose.mjs` says the readers are byte-equal "wherever Python has a
+        # fresh plane — which is every corpus the differential arm runs on,
+        # because the golden ladder rungs are built". That was true of the
+        # ladder and was never true of THIS repo in CI, where nothing built
+        # anything. `fux build` is what makes the sentence true here.
+        run: fux build
+
       - name: the differential arm — TRANSCRIPTION (this repo)
         # ⚠ `--python-tune off` is deliberate and is not a loosened bar.
         #
@@ -59,8 +75,16 @@ jobs:
         #
         # So CI runs the arm that can attribute a failure: `--no-tune` on the
         # Python side is *the engine's own answer* (SR-TUNE decision 11),
-        # which is exactly what Node implements. A discordance in this step is
-        # a Node transcription defect and nothing else.
+        # which is exactly what Node implements.
+        #
+        # ⚠ **This comment read "a discordance in this step is a Node
+        # transcription defect and nothing else" until 2026-09-16, and W-161
+        # made that false.** The graph tier gave the two readers a second,
+        # LEGITIMATE way to differ — Python's derived plane against Node's
+        # in-memory one — which the step cannot tell from a transcription
+        # defect. The `fux build` above removes that second way rather than
+        # documenting it, so the sentence is true again *because of the step
+        # before it*, not on its own.
         #
         # 🔴 The CONTRACT arm — tune applied — runs on the golden rungs, whose
         # tune is all-defaults, so there the two arms are the same run. See the
@@ -71,8 +95,14 @@ jobs:
         # W-107 H1 and H2 are invisible on ordinary data: H1 needs two
         # documents whose scores tie exactly AND whose ids straddle U+FFFF,
         # and no real corpus has been written to contain one.
+        #
+        # ⚠ **`fux build` again, and for the same reason.** `adversarial_corpus.py`
+        # REWRITES `.fux/index/`, which leaves the plane built above stale — and
+        # `compose.py` has no tier on a stale plane exactly as it has none on an
+        # absent one, so skipping this rebuild puts the divergence straight back.
         run: |
           python tools/differential/adversarial_corpus.py .
+          fux build
           python tools/differential/node_arm.py . --python-tune off
 
       - name: N2 — the graph plane digest

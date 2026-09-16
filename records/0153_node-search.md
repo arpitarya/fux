@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@c64ad6b12f33, src/fux/store/nodebundle.py@071a24a596dd]
+owns: [node@e0c57e2eb08e, src/fux/store/nodebundle.py@071a24a596dd]
 laws: [L1, L3, L4, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 3c603da0e57e5714612de7602eaf6e10137737ab4674029ee3eabe5daeebb6b5
+content_sha: 3862dbb768405aa29af861651006a5327533b089004a80f5ef741bed9c8d72b6
 ---
 
 # SR-NODE-SEARCH — the Node read plane
@@ -584,12 +584,38 @@ that behaviour *"the right one for its audience"*: this reader exists for a
 clone with no Python, and `.fux/runtime/` is written by `fux build`, which is
 Python.
 
-**So the two readers are byte-equal wherever Python has a fresh plane** — which
-is every corpus the differential arm runs on, because the golden ladder's rungs
-are built — **and diverge on a corpus with no fresh build**, where Python has no
-tier and Node has one. That is decision 9's existing asymmetry showing through a
-new surface. ⚠ **It is stated here rather than left for the harness to
-discover**, which is what W-161's item required of this record.
+**So the two readers are byte-equal wherever Python has a fresh plane**, **and
+diverge on a corpus with no fresh build**, where Python has no tier and Node has
+one. That is decision 9's existing asymmetry showing through a new surface.
+
+**17b. 🔴 The generalisation this decision made about CI was WRONG, and the
+harness discovered it exactly as the sentence above promised it would not**
+(2026-09-16, cutting `3.0.0-alpha.0`).
+
+⚠ **What decision 17 said until now:** that the readers are byte-equal *"wherever
+Python has a fresh plane — which is every corpus the differential arm runs on,
+because the golden ladder's rungs are built"*, and that the asymmetry *"is stated
+here rather than left for the harness to discover"*. The first clause was the
+defect and the second is what it cost.
+
+🔴 **`node-arm.yml` runs the arm over THIS repo from a bare checkout**, not over
+a ladder rung. Nothing in that workflow ever built anything, so `.fux/runtime/`
+did not exist, Python had no tier, Node had one, and **all six matrix jobs went
+red at 44 of 202 discordant** — with the step's own comment attributing it to *"a
+Node transcription defect and nothing else"*. **Both readers were correct.** The
+ladder's rungs are built; this repo was not, and the decision generalised from
+the corpus that happened to be fine to the one that gates a merge.
+
+✅ **The gate, not a note:** `node-arm.yml` runs `fux build` before the arm, and
+again after `adversarial_corpus.py` rewrites the index — **a STALE plane is the
+same as an absent one to `compose.py`**, so the rebuild has to follow every write
+to `.fux/index/`, not merely the checkout. Measured both ways at the fix: 44 of
+202 without it, **0 of 225 with it**.
+
+⚠ **The general lesson is the one worth keeping.** A stated asymmetry does not
+stop a harness from misattributing it — it only makes the misattribution
+diagnosable after the fact. What stops it is removing the divergence from the
+arm's environment, which is what a build step does and what a paragraph cannot.
 
 **17a. 🔴 And it is not free on this reader.** Rebuilding the plane parses
 **every** committed record — the work the B2 prefilter exists to avoid — so a

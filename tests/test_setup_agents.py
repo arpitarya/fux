@@ -16,6 +16,7 @@ check it" runs this file with `-k "announces or optout"`.
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import pytest
@@ -687,6 +688,15 @@ def test_co_owned_surface_template_is_valid_json():
         json.loads(setup_mod.agent_template_bytes(by_path[rel]).decode("utf-8"))
 
 
+@pytest.mark.skipif(
+    os.name == "nt",
+    reason=(
+        "the POSIX exec bit does not exist on Windows: `chmod(0o755)` is a near "
+        "no-op there and `st_mode & 0o111` is 0 for every regular file, so this "
+        "asserts a property the platform cannot carry. What it guards — a `.sh` "
+        "hook a POSIX runner will not execute — is not a failure mode Windows has."
+    ),
+)
 def test_the_hook_surface_is_written_executable(tmp_path):
     """Decision 5. A hook written 0644 fails silently — nothing reports it."""
     root = _fresh(tmp_path)

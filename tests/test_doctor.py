@@ -1673,7 +1673,12 @@ def test_a_retired_starter_is_reported(tmp_path, monkeypatch):
 
     root = _drift_repo(tmp_path)
     body = "# an old starter\n"
-    (root / ".fux" / "refusals.toml").write_text(body, encoding="utf-8")
+    # `write_bytes`, NOT `write_text`: the row under test is a BYTE equality
+    # (`_starter_refusals_untouched` hashes `read_bytes()`), and `write_text`
+    # translates "\n" to "\r\n" on Windows — so the fixture would hash one
+    # thing and the file would hold another, and the row would be right to
+    # report no match. The defect was the test's, never doctor's.
+    (root / ".fux" / "refusals.toml").write_bytes(body.encode("utf-8"))
     monkeypatch.setattr(
         doctor, "RETIRED_REFUSAL_STARTERS", (hashlib.sha256(body.encode()).hexdigest(),)
     )
