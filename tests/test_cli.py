@@ -383,3 +383,59 @@ def test_a_shard_with_conflict_markers_says_so(tmp_path):
     )
     with pytest.raises(FuxError, match="unresolved merge conflict markers"):
         store.read_index(tmp_path)
+
+
+def test_a_usage_error_exits_2_and_a_fux_error_exits_1(tmp_path, monkeypatch, capsys):
+    """SR-CLI decision 5, as amended 2026-09-16 (W-193).
+
+    **fux produces `0`, `1`, `130`. `argparse` produces `2`**, for a usage error
+    raised before `cli.main`'s boundary exists — so decision 4's *"`main` is the
+    only boundary"* holds exactly: the one place fux renders an error never sees
+    a `2`.
+
+    🔴 **The old wording — *"`2` is reserved and not produced"* — was true of
+    `FuxError` and misleading about the process**, and W-177 turned that from a
+    latent wrong sentence into a real consequence: `fux update` shipped in 2.0.1,
+    is in people's pipelines, and now returns a `2`. A job that reads anything
+    non-`1` as *the runner broke* sees an outage where a verb was renamed.
+
+    **Both halves are pinned**, because the contract is the pair and not either
+    number alone.
+    """
+    from fux.cli import main
+
+    # argparse: an unknown verb never reaches the boundary.
+    with pytest.raises(SystemExit) as exc:
+        main(["definitely-not-a-verb"])
+    assert exc.value.code == 2
+    assert "invalid choice" in capsys.readouterr().err
+
+    # argparse: an unknown FLAG on a real verb, same path, same code.
+    with pytest.raises(SystemExit) as exc:
+        main(["ingest", "--definitely-not-a-flag"])
+    assert exc.value.code == 2
+    capsys.readouterr()  # drain, so the next assertion reads only its own output
+
+    # A FuxError reaches the boundary and renders there — exit 1, `error: …`.
+    monkeypatch.chdir(tmp_path)
+    assert main(["ingest"]) == 1
+    assert capsys.readouterr().err.startswith("error: ")
+
+
+def test_no_fux_error_site_passes_exit_code_2():
+    """The half of decision 5 the amendment KEPT, asserted structurally.
+
+    The amendment documents argparse's `2`; it does not license fux code to
+    produce one. A `raise FuxError(..., exit_code=2)` would make the two sources
+    indistinguishable to a consumer, which is the whole thing the ruling fixed.
+    """
+    import pathlib
+
+    root = pathlib.Path(__file__).resolve().parents[1] / "src" / "fux"
+    offenders = [
+        f"{path.relative_to(root)}:{i}"
+        for path in root.rglob("*.py")
+        for i, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1)
+        if "exit_code=2" in line.replace(" ", "")
+    ]
+    assert not offenders, f"a FuxError site passes exit_code=2: {offenders}"

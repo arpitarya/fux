@@ -12,6 +12,22 @@ ball: agent
 
 # W-193 — the exit code nobody decided
 
+## ✅ SHIPPED 2026-09-16 — all five steps
+
+| # | what landed |
+|---|---|
+| 1 | **[SR-CLI](../../records/0101_cli-surface.md) decision 5 amended.** *"`2` is reserved and not produced"* and *"do not treat `2` as live"* are **gone**; it now says fux produces `0`/`1`/`130` and argparse produces `2` **before `cli.main`'s boundary is reached** — so decision 4's *"`main` is the only boundary"* holds exactly rather than approximately |
+| 2 | **`CLAUDE.md` §Error contract follows the record and states nothing of its own.** Its note now records that **both** earlier forms were wrong, and that the second was wrong in a way that reached consumers |
+| 3 | **CHANGELOG names the `2` a consumer will see**, beside the rename: *a `1` is fux failing; a `2` here is the verb being gone* |
+| 4 | **Two tests.** An unknown verb **and** an unknown flag exit `2` with argparse's message; a `FuxError` path still exits `1` with `error: …`. Pinned as a **pair**, because the contract is the pair and not either number alone |
+| 5 | ✅ **No `src/` change was needed**, as the ruling required — and a structural test now asserts no `raise FuxError` site passes `exit_code=2`, so the amendment cannot be read as licensing one |
+
+🔴 **The half the amendment KEPT is the half worth guarding.** Documenting
+argparse's `2` does not license fux code to produce one — that would make the two
+sources indistinguishable to a consumer, which is exactly what the ruling fixed.
+
+---
+
 ## ✅ RULED 2026-09-16 (Arpit, Cowork) — option 1: leave `2` to argparse, amend decision 5
 
 **Ruling: option 1.** `2` stays argparse's de-facto usage code, and

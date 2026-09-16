@@ -10,7 +10,7 @@ feature: the `fux` command-line interface — every verb, its flags, its exit co
 owns: [src/fux/cli.py@9a75c5894fb0, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@b9295123f1b4, src/fux/progress.py@925dccc045ce]
 laws: [L1, L4, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 9f5b552f938d9833f5e6ce7cfe075486a25aca64f23dd2add23931eef64cb9ca
+content_sha: 4abed18f6623d2fe22438b5eb0df21d42168c59e3f12f53c0449637f2c310b14
 ---
 
 # SR-CLI — the command-line surface
@@ -302,10 +302,33 @@ its exemptions and why are [SR-PII](0148_pii.md) decision 17's, not this
 record's; what this record owns is the placement — **before dispatch**, so a
 verb added later is gated without its author knowing the gate exists.
 
-**5. Exit codes: `0` ok · `1` error · `130` interrupted. `2` is reserved and
-not produced** — no `raise FuxError` site passes `exit_code=2`. It is kept in
-the contract for strict-mode hooks; a `2` appearing later narrows behaviour and
-is compatible. Do not treat `2` as live.
+**5. Exit codes: fux produces `0` ok · `1` error · `130` interrupted.
+`argparse` produces `2` for a usage error, before this contract applies at all**
+(amended by Arpit 2026-09-16, W-193).
+
+**No `raise FuxError` site passes `exit_code=2` and none may.** The `2` comes
+from `ArgumentParser.error`, which calls `sys.exit(2)` **before `cli.main`'s
+boundary is ever reached** — so decision 4's *"`main` is the only boundary"*
+holds exactly: the one place fux renders an error never sees it.
+
+**A consumer sees `2` for an unknown verb, an unknown flag, or a malformed
+command line**, with argparse's usage message on stderr. That is the convention
+their tooling already assumes.
+
+⚠ **The strict-mode reservation on `2` is RETIRED, and the retirement is the
+point of the amendment.** This decision read *"`2` is reserved and not
+produced … do not treat `2` as live"* — a statement about `FuxError` that a
+reader could only take as a statement about the process. **A reservation nothing
+could ever claim is what makes a consumer read `fux update` → `2` as *the runner
+broke* rather than *the verb is gone*,** and W-177 is what turned that from a
+latent wrong sentence into a real consequence: `fux update` was in the released
+2.0.1 and is in people's pipelines.
+
+**Not taken** (W-193's other two options): overriding `ArgumentParser.error` to
+raise `FuxError` — it changes the exit code of every malformed command line fux
+has ever accepted, on the strength of one deleted verb; and renumbering the
+reservation — it keeps a dead reservation alive and documents two meanings on
+one code.
 
 **6. "No confident matches." is exit 0, and goes to STDERR.** An honest decline
 is a successful answer, not a failure. Callers test the output, not the exit

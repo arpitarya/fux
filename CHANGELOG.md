@@ -42,6 +42,15 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
     Given both, **`--check` wins** — it is the one with a `--json` form and the
     one a pipeline gates on
     ([SR-INGEST](records/0106_ingest.md) decision 21b).
+  - 🔴 **`fux update` exits `2`, not `1`, and your pipeline needs to know which.**
+    `2` is argparse's usage-error code — an unknown verb, raised before fux's own
+    error boundary exists — and it comes with argparse's usage message on stderr
+    naming the valid verbs. **A `1` is fux failing; a `2` here is the verb being
+    gone.** A job that treats anything non-`1` as *the runner broke* will read
+    this upgrade as an outage. ([SR-CLI](records/0101_cli-surface.md) decision 5,
+    amended 2026-09-16: fux produces `0`, `1`, `130`; argparse produces `2`. The
+    old *"`2` is reserved and not produced"* is retired — it was a statement
+    about `FuxError` that read as a statement about the process.)
   - ⚠ **What did NOT change:** which URLs a networked run goes out for (W-82
     ruling 3 — narrow by default), pinned `update=never` lines (never fetched,
     `--refetch-all` included), the transient-failure guarantee (a failed fetch

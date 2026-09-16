@@ -435,10 +435,13 @@ archive/     THE ONE ARCHIVE — everything retired, mirroring the live tree
 Catch and render only at the boundaries; internals keep raising; one flat
 `FuxError` and **no subclass hierarchy**.
 
-⚠ **This section said exit `2` meant *blocking (strict)*. SR-CLI decision 5
-says `2` is reserved and NOT PRODUCED** — no `raise FuxError` site passes it.
-The two disagreed, both read as correct, and the record is the one that is
-right. That is the restatement hazard L0 names, found by folding the copy out.
+⚠ **Both earlier forms of this paragraph were wrong, and the second was wrong
+in a way that reached consumers.** It first said exit `2` meant *blocking
+(strict)*; SR-CLI decision 5 then said `2` was *reserved and not produced*. **The
+record was right about `FuxError` and misleading about the process** — argparse
+exits `2` for any usage error, before the boundary exists. Decision 5 was amended
+on 2026-09-16 (W-193) and the strict-mode reservation is retired. **Read the
+record; this section states nothing of its own.**
 
 ## Build & test
 
