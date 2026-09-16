@@ -10,7 +10,7 @@ feature: the freshness verdict vocabulary and the per-URL check interval
 owns: [src/fux/refer/freshness.py@6757eeeba7c6]
 laws: [L2, L3, L4]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 44a0d3fa146f74ac2ff4c87461d2c30bcfdc1f9f07edd0d41a0896e82ac31206
+content_sha: 744c2910b23af7a965e698efcf5fcd6932979969e10b906c5c5b0b184acca6cc
 ---
 
 # SR-URL-FRESHNESS: what a citation may claim, and how often it has to earn it
@@ -217,6 +217,15 @@ docstring.
     second parser. **`--ttl` on the CLI is validated by that same callable**, so
     `--ttl 1x` and a hand-written `ttl=1x` fail identically. Two validators
     would drift.
+
+    ⚠ **The FIRST, and no longer the only one on this list** (2026-09-15).
+    `fetch=` became typed with [SR-URL-LIST](0116_url-list.md) decision 15, and
+    that is what forced `Attribute` to carry its own header `placeholder`:
+    `_urls_header()` had hardcoded `<duration>` for every attribute with no
+    `values`, which was indistinguishable from correct while `ttl` was alone.
+    **The machinery this decision built was right; the one constant beside it
+    was a single-user assumption**, and it stayed invisible for exactly as long
+    as the single user did.
 
 11. **The effective interval is `min(policy.cache_ttl_seconds, declared)` — a
     line may narrow it and can never widen it.** Both halves answer a different

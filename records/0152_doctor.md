@@ -7,11 +7,11 @@ description: "One record owns the health-check surface. Every check names a caus
 status: accepted
 date: 2026-09-11
 feature: "`fux doctor` — the read-only, offline health command and its check register"
-owns: [src/fux/doctor.py@fdd7d3fd867b, tests/test_doctor_register_is_complete.py@6c3d2378d45f]
+owns: [src/fux/doctor.py@01e9eff0f0c6, tests/test_doctor_register_is_complete.py@6c3d2378d45f]
 laws: [L4, L8]
 ratifies: "Arpit, 2026-09-11 — *create a new adr for doctor*"
 timestamp: 2026-09-11T00:00:00Z
-content_sha: a6bb68c903e9fd666307d8a9830e765bdcbf98fe5ae5006ea0be601181651b96
+content_sha: fa5d8c1a22788acd54f313c0113b7c718b51d48470d4cb80814825fa550121d0
 ---
 
 # SR-DOCTOR — the health command, and who owns its rows
@@ -162,6 +162,7 @@ authoritative about the row.**
 | `acquired plane` | warn, **error** on gitignore | blob count, total bytes, the 80 %-of-cap warning, and the gitignore assertion | [SR-ACQUIRED](0145_acquired-plane.md) |
 | `pinned url bytes` | warn | with `[sources.url] fetch_at_answer = false`, the listed urls with no retained bytes — every citation from those is `unverified` | [SR-URL-FRESHNESS](0147_url-freshness.md) decision 16 |
 | `fetcher config tables` | **error** | a `[sources.url.config.<name>]` sub-table naming no `.py` in the fetchers directory — its keys reach no fetcher at all | [SR-CONFIG](0113_config.md) decision 8a |
+| `fetcher bindings` | **error** | a URL line whose `fetch=<name>` names no `.py` in the fetchers directory — every fetch through it fails at ingest time, on somebody else's machine. **The mirror of `decoder bindings`**, and the price of `fetch=` being an open set: a typo parses now ([SR-URL-LIST](0116_url-list.md) decision 15). ⚠ **It reads the LIST, not the index** — the opposite choice from `decoder bindings` and right for a different reason: a binding is interesting when it matches no *document*, a fetcher name is wrong when it matches no *file*, and that is true the moment the line is written | [SR-URL-LIST](0116_url-list.md) decision 15 |
 | `observers` | warn | a file in `.fux/observers/` that **did not fire on the last run** — it raised or exceeded `[observe] max_ms`. Named because the dispatcher is fail-open by design, so a dead observer is silent and every query still looks perfect. `not yet observed` in a repo that has never answered a query is a state, not a finding | [SR-OBSERVE](0157_observe.md) decision 7 |
 | `correction pins` | warn | a `fux correct --pin` that is **silently not applying** — its document changed since the pin was made, or left the corpus. Named because a suspended pin is invisible at query time: the query just ranks normally | [SR-ENRICH](0137_enrich.md) decision 19 |
 | `refusal rules` | warn, **error** when the file will not parse | how many rules load, how many responses each has refused, and **the rules that have never fired** — what a typo'd condition looks like | [SR-REFUSAL](0146_refusals.md) decision 11 |

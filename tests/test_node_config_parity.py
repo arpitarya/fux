@@ -200,3 +200,40 @@ def test_the_node_pii_gate_path_is_the_python_one():
     assert spelled, "node/fux.mjs no longer spells the PII gate path"
     parts = re.findall(r'"([^"]*)"', spelled.group(1))
     assert parts == list(rules_path(Path(".")).parts[-2:])
+
+
+def test_the_dirs_attribute_set_is_the_python_one():
+    """🔴 **The gap `test_node_twins`'s narrowing leaves open, closed by parity.**
+
+    `node/src/ingest/sourcelist.mjs` mirrors the **`dirs` half** of
+    `src/fux/ingest/sourcelist.py` — Node never fetches, so the `urls` spec
+    decides nothing there. The freshness check therefore narrows that twin to
+    `parse`, the shared grammar engine; a change to the `dirs` **attribute
+    tuple** lives at module level, outside any `def`, and git's hunk-context
+    header cannot name it.
+
+    So the tuple is held by its VALUE rather than by whether anyone edited the
+    file, which is the better check of the two: `query/__init__.py` catches a
+    refusal from this parser and degrades to *no archived directories*, so a
+    Node reader with a different attribute set returns a **different archived
+    set from the same committed file** — the loud half and the lenient half
+    disagreeing, which is worse than either alone.
+    """
+    from fux.ingest.sourcelist import DIRS
+
+    source = _source("ingest/sourcelist.mjs")
+    body = re.search(r"const DIRS_ATTRIBUTES = \[(.*?)\n\];", source, re.S)
+    assert body, "no `DIRS_ATTRIBUTES` in ingest/sourcelist.mjs"
+
+    rows = re.findall(
+        r'\[\s*"([a-z_]+)"\s*,\s*\[([^\]]*)\]\s*,\s*"([a-z]+)"', body.group(1)
+    )
+    node = [
+        (name, tuple(v.strip().strip('"') for v in vals.split(",")), default)
+        for name, vals, default in rows
+    ]
+    python = [(a.name, a.values, a.default) for a in DIRS.attributes]
+    assert node == python, (
+        "the two readers disagree about `.fux/sources/dirs`:\n"
+        f"  node:   {node}\n  python: {python}"
+    )

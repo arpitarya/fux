@@ -323,6 +323,7 @@ def _layout(root: Path) -> list[Check]:
     checks.append(_acquired_health(root))
     checks.append(_pinned_without_bytes(root))
     checks.append(_fetcher_config_tables(root))
+    checks.append(_fetcher_bindings(root))
     checks.append(_suspended_pins(root))
     checks.append(_observers(root))
     checks.append(_pii_health(root))
@@ -592,6 +593,82 @@ def _fetcher_config_tables(root: Path) -> Check:
         + f" name(s) no fetcher: {fetchers_dir}/ has {sorted(stems) or 'nothing'}. "
         "These keys reach NO fetcher and nothing else says so - rename the table "
         "to the fetcher's filename without .py, or delete it",
+    )
+
+
+def _fetcher_bindings(root: Path) -> Check:
+    """`fetch=<name>` on a URL line that names no fetcher file.
+
+    **W-178, the mirror of `_decoder_bindings`.** Since `fetch=` became a typed
+    attribute the grammar accepts any module-stem name, which is what lets a
+    consumer drop `.fux/fetchers/glassbox.py` in and write `fetch=glassbox`. The
+    price of an open set is that a **typo** now parses: `fetch=glasbox` is a
+    perfectly legal line naming a file nobody wrote.
+
+    🔴 **Without this row, that line is discovered by the next person's ingest
+    dying.** `urlsrc._fetcher_path()` raises with a clear message — at fetch
+    time, on somebody else's machine, mid-run. **Exactly the argument W-101
+    item 2 made for `_decoder_bindings`**, and the reason the two are a pair.
+
+    ⚠ **It reads the LIST, not the index**, which is the opposite choice from
+    `_decoder_bindings` and is right for a different reason. A binding is
+    interesting when it matches no *document*; a fetcher name is wrong when it
+    matches no *file*, and that is true the moment the line is written — before
+    any ingest, which is the moment a person can still fix it cheaply.
+
+    ⚠ **Offline, like every doctor check.** It lists a directory and never
+    imports a fetcher: importing one runs consumer code that may `connect()`,
+    and [SR-DOCTOR](../../records/0152_doctor.md) is the command somebody runs
+    when something is already wrong.
+    """
+    from .config import load as load_config
+    from .ingest import sourcelist, urlsrc
+
+    name = "fetcher bindings"
+    try:
+        config = load_config(root)
+    except FuxError:
+        return Check(name, True, "no readable fux.toml - another check owns that")
+    if config.url is None:
+        return Check(name, True, "no [sources.url] - no URL lines to resolve")
+
+    path = root / config.url.urls_file
+    if not path.is_file():
+        return Check(name, True, f"no {config.url.urls_file} yet")
+    try:
+        entries = sourcelist.parse(
+            path.read_text(encoding="utf-8"), sourcelist.URLS, origin=config.url.urls_file
+        )
+    except (FuxError, OSError) as exc:
+        return Check(name, False, f"{config.url.urls_file}: {exc}")
+
+    resolved = urlsrc.resolve_urls(entries, config.url)
+    if not resolved:
+        return Check(name, True, "no URL lines listed")
+
+    fetchers_dir = (root / config.url.fetcher).parent
+    try:
+        stems = {p.stem for p in fetchers_dir.glob("*.py")}
+    except OSError:
+        stems = set()
+
+    wanted = sorted({e.fetch for e in resolved})
+    missing = [n for n in wanted if n not in stems]
+    if not missing:
+        return Check(
+            name,
+            True,
+            f"{len(wanted)} fetcher name(s) in use, each resolving to a file in "
+            f"{fetchers_dir.name}/",
+        )
+    shown = ", ".join(missing[:3])
+    more = f" (+{len(missing) - 3} more)" if len(missing) > 3 else ""
+    return Check(
+        name,
+        False,
+        f"{len(missing)} URL line(s) name a fetcher with no file: {shown}{more}. "
+        f"{fetchers_dir}/ has {sorted(stems) or 'nothing'}. Every fetch through one of "
+        "these fails at ingest time - write the module, or fix the `fetch=` name",
     )
 
 

@@ -428,7 +428,17 @@ verifies a `url:` citation against its source unless
 the system lives here, outside `src/fux/`, which is how the
 [`$0`](#0-the-zero-dollar-law) offline-by-default laws survive URL ingestion.
 Tunables arrive through the opaque `[sources.url.config]` table, never as
-typed keys in fux's schema. See [SR-URL-INGEST](../records/0107_url-ingest.md),
+typed keys in fux's schema.
+
+**The set is open.** `fetch=<name>` on a URL line resolves to
+`<fetchers dir>/<name>.py`, so a fetcher you write is a fetcher fux can use —
+no engine change and no release, exactly as `.fux/decoders/` already works
+(**fetchers and decoders are one consumer-plane pattern**). The line grammar
+validates the *shape* of the name and never imports the module to check it:
+importing a fetcher runs code that may open a browser, and reading a config
+file may not do that. `fux doctor`'s `fetcher bindings` row reports a name with
+no file. See [SR-URL-LIST](../records/0116_url-list.md) decision 15,
+[SR-URL-INGEST](../records/0107_url-ingest.md),
 [SR-DOTFUX](../records/0102_fux-directory.md).
 
 **`fetch_at_answer`** — The `fux.toml` boolean that decides whether

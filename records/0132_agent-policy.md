@@ -7,10 +7,10 @@ description: "Fux's readers are AI agents, and an engine whose output is misread
 status: accepted
 date: 2026-08-22
 feature: the agent-facing policy and skill artifacts Fux ships, and their installer
-owns: [src/fux/templates/agents@d88094bdc334]
+owns: [src/fux/templates/agents@2b5e9319349f]
 laws: [L1, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 53aca8ebaaa77749faeee8f93f94b3615a3dbfb4490f8046d40baff0f741aa07
+content_sha: 51653954eb20ddaa5c204bf3e624881a28b48ab6e7178218b9df5f521976de5f
 ---
 
 # SR-AGENT-POLICY — shipping the policy, not just the facts
@@ -744,6 +744,20 @@ the part its own reader will get wrong:
 test exists for — and it caught exactly that here, three times, once per
 directory.
 
+
+⚠ **Two shipped skills changed with the surface, twice in one day**
+(2026-09-15). `fux-sources` and `fux-maintain` follow W-177 (`fux update` is
+deleted; a bare `fux ingest` fetches and `--no-fetch` is the offline form), and
+`fux-sources` and `fux-fetcher` follow W-178 (`fetch=` is a name, not an enum).
+
+🔴 **A skill that describes a deleted verb is worse than one that describes
+nothing**, because an agent acts on it: `fux update --check` in a pipeline is a
+non-zero exit that reads as the runner breaking, not as a rename. The templates
+are the source and this repository's own `.claude/`, `.agents/` and `.kiro/`
+copies are rendered from them —
+`tests/test_setup_agents.py::test_this_repos_own_agent_files_still_match_the_templates_that_ship`
+is what stops the two drifting, and it is the check that caught both renders
+here.
 
 ### Consequences
 

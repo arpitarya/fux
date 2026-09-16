@@ -100,10 +100,25 @@ def load_fetcher(root: Path, rel_path: str):
     """Import a consumer fetcher file; fail loudly if it's unusable."""
     path = root / rel_path
     if not path.is_file():
+        # ⚠ **The message has to cover a name fux never shipped** (W-178). It
+        # said *"run `fux setup` to write the shipped fetchers"* and nothing
+        # else — correct while `fetch=` was an enum of `http` and `cdp`, and
+        # actively misleading for `fetch=glasbox`, where `fux setup` writes two
+        # files and none of them is the one the line names. So it names the
+        # sibling files that DO exist, which is the fix for a typo, and keeps
+        # the setup hint for the case where the directory is simply empty.
+        try:
+            siblings = sorted(p.stem for p in path.parent.glob("*.py"))
+        except OSError:  # pragma: no cover - an unreadable directory
+            siblings = []
+        beside = (
+            f" {path.parent.name}/ has {siblings}, so check the `fetch=` name on the line"
+            if siblings
+            else " run `fux setup` to write the shipped fetchers into .fux/fetchers/"
+        )
         raise FuxError(
-            f"fetcher not found: {rel_path} (looked in {path}) — run `fux setup` to write "
-            "the shipped fetchers into .fux/fetchers/, or point [sources.url] fetcher at "
-            "your own file"
+            f"fetcher not found: {rel_path} (looked in {path}) —{beside}, or point "
+            "[sources.url] fetcher at your own file. `fux doctor` reports this before a run"
         )
     spec = importlib.util.spec_from_file_location("fux_url_fetcher", path)
     if spec is None or spec.loader is None:

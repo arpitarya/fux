@@ -37,7 +37,6 @@ output rather than a stop.
 ### fux build
 
 - 🔴 **W-193** · `arpit` — argparse produces exit `2`; SR-CLI decision 5 reserves it and says fux never does. Found by W-177's capture. Three options filed. [detail](open/W-193-argparse-exit-two.md)
-- 🟢 **W-178** · `agent` — `fetch=` becomes a **typed attribute validated by name shape**, not an enum of shipped fetchers; a consumer drops in `.fux/fetchers/<name>.py`. Ratified not built. [detail](open/W-178-consumer-planes-open-sets.md)
 - 🟡 **W-161** · `agent`, waiting on W-191 — **BUILT 2026-09-15**; both tiers ship on and unmeasured. 🔴 **Both arms inert — 0 `ref` edges on the ladder**; they need linked documents, and Codex's questions are not that. [detail](open/W-161-graph-composed-ask.md)
 - 🟢 **W-168** · `agent` — the ten search improvements. **Step 1 BUILT 2026-09-15**; both question sets released, so steps 2–7 and 9 are runnable now. Step 8 is inert until W-191 lands. [detail](open/W-168-search-improvements.md)
 - 🟡 **W-176** · `agent`, waiting on W-136 — **steps 1–3 landed 2026-09-15**. Gates 4–9 need a SCORED run (prompt 6), not a key — no key exists (L11). ⚠ **Step 10 needs links, W-191.** [detail](open/W-176-abstention-gates.md)

@@ -47,10 +47,30 @@ def test_ttl_is_typed_not_an_enum():
 
 
 def test_enum_attributes_are_unchanged():
-    # The enum is still the right shape for everything that has one.
-    for name in ("fetch", "meta", "keep"):
+    """The enum is still the right shape for everything that has one.
+
+    ⚠ **`fetch` left this list on 2026-09-15** (W-178). It is not a policy value
+    with a closed set — it names a **file** in a directory the consumer owns,
+    and `meta`, `keep`, `archived`, `enrich` and `update` still are.
+    """
+    for name in ("meta", "keep", "archived", "enrich", "update"):
         attr = next(a for a in sourcelist.URLS.attributes if a.name == name)
         assert attr.values and attr.validate is None
+
+
+def test_ttl_and_fetch_are_the_two_typed_attributes_and_spell_differently():
+    """🔴 **The header defect W-178 had to fix before flipping `fetch`.**
+
+    `_urls_header()` hardcoded `<duration>` for every attribute with no
+    `values` — true while `ttl` was alone, and it would have written
+    `fetch=<duration>` into every repo `fux setup` touches. The placeholder is
+    the attribute's now, and this is what stops the two typed ones collapsing
+    back onto one constant.
+    """
+    typed = {a.name: a for a in sourcelist.URLS.attributes if not a.values}
+    assert set(typed) == {"ttl", "fetch"}
+    assert typed["ttl"].spelling() == "ttl=<duration>"
+    assert typed["fetch"].spelling() == "fetch=<name>"
 
 
 def test_ttl_defaults_to_a_day_not_to_zero():

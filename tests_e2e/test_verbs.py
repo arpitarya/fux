@@ -1015,3 +1015,76 @@ def test_a_misspelled_flag_is_refused_rather_than_silently_ignored(tmp_path):
     done = _run(tmp_path, "doctor", check=False)
     assert done.returncode != 0
     assert "not a fux.toml key" in (done.stdout + done.stderr)
+
+
+# -- W-178: a consumer's own fetcher, through the real CLI -------------------
+
+
+def test_a_consumer_drops_a_fetcher_in_and_names_it_on_a_line(tmp_path):
+    """🔴 **W-178's definition of done, as a user: no engine change, no release.**
+
+    A consumer writes `.fux/fetchers/glassbox.py`, puts `fetch=glassbox` on a
+    URL line, and ingests. Before 2026-09-15 the grammar rejected that value
+    before anything read the file — `fetch` was an enum of the two fetchers fux
+    happens to ship, while `urlsrc._fetcher_path()` and its own docstring both
+    already described the open behaviour as fact.
+
+    **Asserted on the INDEX, not on the exit code.** A run that swallowed the
+    fetch and exited 0 is the failure this is aimed at: the document has to be
+    findable, with the bytes the consumer's own module returned.
+    """
+    (tmp_path / "fux.toml").write_text(
+        "[sources]\n"
+        "[sources.url]\n"
+        'fetcher = ".fux/fetchers/http.py"\n'
+        "max_parallel = 4\n",
+        encoding="utf-8",
+    )
+    fux = tmp_path / ".fux"
+    (fux / "sources").mkdir(parents=True, exist_ok=True)
+    (fux / "sources" / "dirs").write_text("", encoding="utf-8")
+    (fux / "sources" / "urls").write_text(
+        "https://wiki.test/rota fetch=glassbox meta=plain\n", encoding="utf-8"
+    )
+    (fux / "pii.toml").write_text("", encoding="utf-8")
+    fetchers = fux / "fetchers"
+    fetchers.mkdir(parents=True, exist_ok=True)
+    # The shipped default has to exist too: `[sources.url] fetcher` names it,
+    # and its PARENT is the directory `fetch=` resolves names against.
+    (fetchers / "http.py").write_text("def fetch(url):\n    return ''\n", encoding="utf-8")
+    (fetchers / "glassbox.py").write_text(
+        "def fetch(url):\n"
+        "    return '# The pager rota\\n\\nglassbox carried this one\\n'\n",
+        encoding="utf-8",
+    )
+
+    out = _run(tmp_path, "ingest").stdout
+    assert "ingested" in out
+    assert "glassbox carried this one" in _run(tmp_path, "answer", "pager rota").stdout
+
+
+def test_a_fetcher_name_with_no_file_is_a_doctor_finding_not_a_parse_error(tmp_path):
+    """The price of an open set, and where it is paid.
+
+    `fetch=glasbox` used to be a grammar error at read time. It parses now — so
+    `fux doctor` has to be the thing that says the file is missing, or the
+    typo surfaces as the next person's ingest dying mid-run.
+    """
+    (tmp_path / "fux.toml").write_text(
+        "[sources]\n"
+        "[sources.url]\n"
+        'fetcher = ".fux/fetchers/http.py"\n'
+        "max_parallel = 4\n",
+        encoding="utf-8",
+    )
+    fux = tmp_path / ".fux"
+    (fux / "sources").mkdir(parents=True, exist_ok=True)
+    (fux / "sources" / "dirs").write_text("", encoding="utf-8")
+    (fux / "sources" / "urls").write_text("https://wiki.test/rota fetch=glasbox\n", encoding="utf-8")
+    (fux / "pii.toml").write_text("", encoding="utf-8")
+    (fux / "fetchers").mkdir(parents=True, exist_ok=True)
+    (fux / "fetchers" / "http.py").write_text("def fetch(url):\n    return ''\n", encoding="utf-8")
+
+    done = _run(tmp_path, "doctor", check=False)
+    assert "fetcher bindings" in done.stdout
+    assert "glasbox" in done.stdout

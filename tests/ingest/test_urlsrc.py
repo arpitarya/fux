@@ -540,10 +540,51 @@ def test_fetch_routes_per_line_and_only_loads_what_it_needs(tmp_path):
     assert index["url:https://x.test/b"]["title_h"] == title_hash("Rendered")
 
 
-def test_a_missing_fetcher_names_setup(tmp_path):
-    _init(tmp_path, urls=["https://x.test/a fetch=cdp"])
-    with pytest.raises(FuxError, match=r"fetcher not found: cdp\.py.*fux setup"):
+def test_a_missing_fetcher_names_setup_when_nothing_is_beside_it(tmp_path):
+    """Nothing in the directory, so `fux setup` IS the remedy."""
+    _write_toml(
+        tmp_path,
+        '[sources]\n[sources.url]\nfetcher = ".fux/fetchers/http.py"\nmax_parallel = 4\n',
+    )
+    (tmp_path / "docs").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "docs" / "a.md").write_text("# Doc A\n\nrepo body\n", encoding="utf-8")
+    _write_urls(tmp_path, ["https://x.test/a fetch=cdp"])
+    with pytest.raises(FuxError, match=r"fetcher not found: \.fux/fetchers/cdp\.py.*fux setup"):
         run(tmp_path, refresh_urls=True)
+
+
+def test_a_missing_fetcher_names_ITS_SIBLINGS_when_there_are_any(tmp_path):
+    """🔴 **The message was wrong for the case W-178 created** (2026-09-15).
+
+    `fetch=` names any module in the fetchers directory now, so the common
+    failure is a **typo** — `glasbox` beside a real `glassbox.py`. The old
+    message said *"run `fux setup` to write the shipped fetchers"* and nothing
+    else: correct for an empty directory, and actively misleading here, because
+    `fux setup` writes two files and neither is the one the line names.
+
+    ⚠ **And the stakes are why it matters.** `load_fetcher` raises rather than
+    skipping the line, so a one-character typo exits 1 and indexes **zero**
+    documents — see `work/regression/2026-09-15-consumer-fetchers/ANALYSIS.md`.
+    The message is the whole interface at that moment.
+    """
+    _write_toml(
+        tmp_path,
+        '[sources]\n[sources.url]\nfetcher = ".fux/fetchers/http.py"\nmax_parallel = 4\n',
+    )
+    (tmp_path / "docs").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "docs" / "a.md").write_text("# Doc A\n\nrepo body\n", encoding="utf-8")
+    _write_urls(tmp_path, ["https://x.test/a fetch=glasbox"])
+    fetchers = tmp_path / ".fux" / "fetchers"
+    fetchers.mkdir(parents=True, exist_ok=True)
+    for stem in ("http", "glassbox"):
+        (fetchers / f"{stem}.py").write_text("def fetch(url):\n    return ''\n", encoding="utf-8")
+
+    with pytest.raises(FuxError) as exc:
+        run(tmp_path, refresh_urls=True)
+    message = str(exc.value)
+    assert "glassbox" in message, "the file that IS there must be named"
+    assert "fux setup" not in message, "setup does not write the module being asked for"
+    assert "fux doctor" in message, "the check that would have caught it first"
 
 
 # -- the hashed-meta defect (W-47): ingest-then-build on the L5 default -----

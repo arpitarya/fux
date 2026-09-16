@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@c984699b459a, src/fux/setup.py@03aa5d79b50e, tests/test_verb_table_agreement.py@1e7999ffd28f]
+owns: [src/fux/store/fuxdir.py@c984699b459a, src/fux/setup.py@bfb301dda08d, tests/test_verb_table_agreement.py@1e7999ffd28f]
 laws: [L2, L3, L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: dd9b3e38e2f02da6157ca436ce479f9e2c13be1ed723fbf7e50a482d26c5a966
+content_sha: c319d2e4abc8b6dfac2e71d5b4c4a1044b9c5a95fca77512bbdacd949098936f
 ---
 
 # SR-DOTFUX — the `.fux/` directory
@@ -823,6 +823,21 @@ ruling and for the same reason.
   on a key whose `false` value stops network access — and for `update` it means
   a repo scaffolded today keeps fetching on `fux ingest`, which is what its
   author saw written in their own file.
+
+⚠ **The starter `.fux/sources/urls` header derives its attribute table, and
+that derivation carried a wrong constant until 2026-09-15** (W-178).
+`_urls_header()` printed `<duration>` for every attribute with no enum values —
+correct while `ttl` was the only typed one, and the moment
+[SR-URL-LIST](0116_url-list.md) decision 15 made `fetch=` typed it would have
+written `fetch=<duration>` into **every repo `fux setup` touches**.
+
+🔴 **That is W-140 row 18 arriving through its own fix.** The header went stale
+by being *transcribed*; the remedy was to *derive* it; and this was the
+derivation itself asserting something only one attribute made true. The
+placeholder is `Attribute.placeholder` now — a field on the thing that knows,
+not a special case in this module. **Write-if-missing is what makes it matter:**
+a wrong header reaches new repos only, so this repository's own copy would have
+stayed right while every fresh setup handed out the defect.
 
 ### Consequences
 

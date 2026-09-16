@@ -10,7 +10,7 @@ feature: the acquired plane
 owns: [src/fux/store/acquired.py@9897ee1fe4af]
 laws: []
 timestamp: 2026-09-01T00:00:00Z
-content_sha: a206982343b9b607a919119a9211eb7c0d4fd4dc00e5812e3f1da7d24ac6b27f
+content_sha: 619a720273554e5462de7b34cc9da6fe6d2d18be72f746bc7830ca2f07a5617b
 ---
 
 # SR-ACQUIRED: fetched bytes are kept, in a plane that is neither committed nor derived
@@ -236,6 +236,12 @@ bounded and evicted by `run_seq` (decision 8).
 owning record was *touched*, never that it was read (CLAUDE.md §Law zero), so a
 co-owner's file changing under this one is exactly the case where a reader needs
 to be told *"not yours"* in writing.
+⚠ **`keep` stays a closed enum** (2026-09-15). [SR-URL-LIST](0116_url-list.md)
+decision 15 made `fetch=` typed and validated by name shape; `keep` is a policy
+value with a genuinely closed set — `true` or `false`, and no third answer is
+coherent — so it is untouched. **Only `fetch` names a file**, which is the whole
+basis of that loosening.
+
 ### Consequences
 
 - **The observer hook reaches nothing here** (W-170, 2026-09-15). It shares

@@ -480,10 +480,35 @@ def test_the_urls_header_is_derived_from_the_spec(tmp_path):
 
 
 def test_the_urls_header_does_not_promise_a_full_sweep(tmp_path):
-    """`fux update` stopped re-fetching every line when narrow-by-default landed."""
+    """The networked verb stopped re-fetching every line when narrow-by-default
+    landed (W-82 ruling 3), and `fux update` itself was deleted by W-177."""
     from fux.setup import _urls_header
 
-    assert "re-fetches every line" not in _urls_header()
+    header = _urls_header()
+    assert "re-fetches every line" not in header
+    assert "fux update" not in header, "W-177 deleted that verb"
+
+
+def test_the_header_prints_no_duration_for_a_non_duration_attribute():
+    """🔴 **W-140 row 18 returning through its own fix, caught by a test.**
+
+    `_urls_header()` hardcoded `<duration>` for every attribute with no enum
+    `values` — indistinguishable from correct while `ttl` was the only typed
+    one. W-178 made `fetch` typed, and without this the header would have said
+    `fetch=<duration>` in **every repo `fux setup` touches**, while this
+    repository's own copy stayed right (it is write-if-missing).
+
+    So the assertion is on the *general* rule, not on `fetch`: no attribute may
+    print a placeholder that belongs to another attribute's type.
+    """
+    from fux.ingest.sourcelist import URLS
+    from fux.setup import _urls_header
+
+    header = _urls_header()
+    for attr in URLS.attributes:
+        assert attr.spelling() in header, f"{attr.name} is not spelled by its own rule"
+    assert header.count("<duration>") == 1, "only `ttl` is a duration"
+    assert "fetch=<duration>" not in header
 
 
 def test_the_starter_pii_file_points_at_a_probe_the_consumer_has(tmp_path):

@@ -651,10 +651,19 @@ def url_config_tables() -> str:
     there only when every fetcher a repo loads knows it, and fux cannot know
     that for a fetcher somebody writes tomorrow.
     """
+    # ⚠ **"your fetchers", plural and open** (W-178, 2026-09-15). `fetch=` is a
+    # typed attribute now, so the set is whatever `.fux/fetchers/*.py` holds --
+    # the two below are the ones fux SHIPS, not the ones a repo may use. The
+    # per-table comments are correct as written; this block's wording is what
+    # used to imply the set was two.
     lines = [
         "# Handed to your fetcher's configure() verbatim; fux reads no key inside.",
         "# A key at THIS level goes to every fetcher -- only put one here that all",
         "# of yours know, because each configure() refuses a key it does not.",
+        "#",
+        "# One sub-table per fetcher, named after its file without `.py`. The two",
+        "# below ship with fux; add a table for any fetcher you drop into",
+        "# .fux/fetchers/ and name on a URL line with `fetch=<name>`.",
         "[sources.url.config]",
         "",
     ]
@@ -715,10 +724,14 @@ def _urls_header() -> str:
     """
     from .ingest.sourcelist import URLS
 
-    pairs = [
-        (f"{a.name}={'|'.join(a.values) if a.values else '<duration>'}", a.default)
-        for a in URLS.attributes
-    ]
+    # 🔴 **The placeholder comes from the ATTRIBUTE now** (W-178, 2026-09-15).
+    # This line hardcoded `<duration>` for every attribute with no `values` —
+    # correct while `ttl` was the only typed one, and the moment `fetch` became
+    # typed it would have written `fetch=<duration>` into every repo `fux setup`
+    # touches. ⚠ **That is W-140 row 18 returning through the fix for it:** the
+    # header went stale by being transcribed, was repaired by being *derived*,
+    # and this was the derivation itself carrying the wrong constant.
+    pairs = [(a.spelling(), a.default) for a in URLS.attributes]
     width = max(len(spelling) for spelling, _ in pairs)
     table = "\n".join(f"#   {spelling:<{width}}  default {default}" for spelling, default in pairs)
     return f"""\

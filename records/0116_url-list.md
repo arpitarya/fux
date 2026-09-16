@@ -7,10 +7,10 @@ description: "One URL per line in a committed file, deduped and sorted by the lo
 status: accepted
 date: 2026-08-19
 feature: "`.fux/sources/urls` — the file format itself, and the one grammar both committed source lists are parsed by"
-owns: [src/fux/ingest/sourcelist.py@55a5f3e2ee67]
+owns: [src/fux/ingest/sourcelist.py@a0a2c0f43077]
 laws: [L2, L3, L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: ecf7fb3d2e9967c972d583d3f53a411adf450422ea88bf01a8376105242dbad1
+content_sha: b42d7350f45dd2e8581743ec023b6a432de81087ccc569cdc7c215f5e32f8c31
 ---
 
 # SR-URL-LIST — the committed URL list
@@ -36,8 +36,12 @@ after the URL, `.gitattributes`-style. **There are two, and the set is closed.**
 
 | attribute | values | default | decides |
 |---|---|---|---|
-| **`fetch`** | `http` · `cdp` | `http` | who retrieves the document |
+| **`fetch`** | **any module name** — `http`, `cdp`, or a `.py` the consumer put in the fetchers directory | `http` | who retrieves the document |
 | **`meta`** | `plain` · `hashed` | `hashed` | whether the index may hold readable display text |
+
+⚠ **`fetch` was an enum of the two shipped fetchers until 2026-09-15**, when
+decision 15 made it typed. **Closed KEYS, open VALUES** — the two are different
+loosenings and only the second happened.
 
 ```console
 $ cat .fux/sources/urls
@@ -53,8 +57,8 @@ today stays valid.
 This record exists separately from [SR-URL-INGEST](0107_url-ingest.md) because
 the two answer different questions: that record owns **what fetches a URL**,
 this one owns **what the file says**. `fetch=` is the seam between them — this
-record fixes the *grammar* and the closed set of attributes; the fetcher records
-define what `fetch=` selects. **The writer is [SR-CLI](0101_cli-surface.md)'s**
+record fixes the *grammar* and the closed set of attribute **keys**; the fetcher
+records define what a `fetch=` name selects. **The writer is [SR-CLI](0101_cli-surface.md)'s**
 — this record decides what a line *means*, that one decides what the command
 does.
 
@@ -204,6 +208,13 @@ which is deliberately the one test in that file that does **not** derive from
 the spec — so an eighth attribute arrives as a single failing assertion naming
 itself rather than as silence. **It did exactly that for `archived`, and then
 again for `update` on the same day.**
+
+⚠ **"Closed" is about KEYS and has never been about values** — decision 15
+(2026-09-15) opens `fetch=`'s values while leaving this decision untouched, and
+the distinction is worth stating because the two read as one loosening. An
+unknown **key** is still a loud error with nothing legitimate to reject; an
+unknown `fetch=` **value** is now a name whose file the consumer may not have
+written yet, which is `fux doctor`'s to report.
 
 ⚠ **`archived` also makes `DIRS`' attribute set a strict SUBSET of `URLS`'**,
 which was not true before and cost a test its second half: the old
@@ -433,6 +444,65 @@ written live; a tuning number defers), and what it costs are stated once in
 values, not the line-beats-source-wide resolution. What changed is that a repo
 scaffolded today can read `update = "auto"` and discover `"never"` exists
 without leaving the file.
+
+**15. 🔴 `fetch=` is a TYPED attribute validated by NAME SHAPE, not an enum of
+the fetchers fux ships** (Arpit, 2026-09-15, Cowork; W-178).
+
+> *"I want a pattern where a consumer can build custom fetchers as well as
+> custom decoders. They just put the file in those directories and then use
+> flags and format file to map them."*
+
+**A consumer drops `.fux/fetchers/glassbox.py` in, writes `fetch=glassbox`, and
+ingests** — no engine change, no fux release. It is the pattern
+[`.fux/decoders/`](0139_decode.md) has shipped since 2026-09-01, made
+symmetrical: **fetchers and decoders are one consumer-plane pattern**, so a
+future change to either is a question about the other.
+
+**15a. The validator checks SHAPE and never existence.** A module stem —
+lowercase letters, digits and underscores, not leading `_`, no `.py` suffix, no
+directory part — deliberately the same regex `decoder=` uses, because two
+regexes for one idea is how they drift.
+
+🔴 **The reason for that split is stronger here than for decoders.**
+`_decoder_reason` does not consult the registry because reading a config file
+must not depend on importing every decoder. Importing a **fetcher** to validate
+one line would run module-level consumer code that may `connect()` to a
+browser — **so reading a committed file would open a socket to decide whether a
+line is well-formed**, on a path L4 fences. Existence is
+`urlsrc._fetcher_path`'s at use time and `fux doctor`'s ahead of time
+([SR-DOCTOR](0152_doctor.md), the `fetcher bindings` row).
+
+**15b. The default stays `"http"`, not `""`.** `render_line` omits an attribute
+whose default is empty; a URL line that stopped stating `fetch=` would break
+decision 12. That exception exists for `types.decoder` and must not spread by
+accident.
+
+**15c. The header's placeholder is the ATTRIBUTE's now.** `_urls_header()`
+hardcoded `<duration>` for every attribute with no `values` — correct while
+`ttl` was the only typed one, and the moment `fetch` joined it would have
+written `fetch=<duration>` into every repo `fux setup` touches.
+⚠ **That is W-140 row 18 returning through its own fix:** the header went stale
+by being transcribed, was repaired by being *derived*, and the derivation
+carried the wrong constant. `Attribute.placeholder` is the field, and there is
+no special case in `setup.py`.
+
+**15d. What this does NOT open.** `meta`, `keep`, `archived`, `enrich` and
+`update` stay enums — policy values with a genuinely closed set, and only
+`fetch` names a **file**. The attribute **key** set stays closed at seven
+(decision 11); an eighth is still a change to this record.
+
+**15e. What the grammar had been asserting, and for how long.** The closed
+tuple `("http", "cdp")` sat here while `urlsrc._fetcher_path()` resolved
+`fetch=<name>` to `<fetchers dir>/<name>.py` and **that module's own docstring
+stated the open behaviour as fact**. 🔴 **The docstring and the validator had
+drifted and nothing noticed** — the W-83 class — which is why this item existed
+before the ruling arrived rather than because of it.
+
+**15f. The price of an open set, stated.** `fetch=glasbox` is a legal line
+naming a file nobody wrote. It used to be a grammar error; it is now an ingest
+failure on somebody else's machine, mid-run — **which is exactly the argument
+W-101 item 2 made for `decoder bindings`**, so `fux doctor` gains the mirroring
+row rather than the loosening shipping unguarded.
 
 ### Consequences
 

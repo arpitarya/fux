@@ -74,12 +74,18 @@ have: *a third fetcher of any kind is currently impossible*, and neither
 [SR-URL-LIST](../../records/0116_url-list.md) nor
 [SR-CDP-FETCHER](../../records/0118_cdp-fetcher.md) says it should be.
 
-✅ **Ruled and filed 2026-09-15 as
-[W-178](../open/W-178-consumer-planes-open-sets.md)**, which goes further than
-this proposal asked: Arpit ruled the **symmetry** — a consumer drops a file into
-`.fux/fetchers/` or `.fux/decoders/` and maps it with a flag or the formats file,
-and the fetcher side is the half that does not yet work. ⚠ **That item is
-independent of this proposal and commits to nothing in it.**
+✅ **Ruled, and SHIPPED the same day** (W-178, 2026-09-15) — it went further
+than this proposal asked: Arpit ruled the **symmetry**, so a consumer drops a
+file into `.fux/fetchers/` or `.fux/decoders/` and maps it with a flag or the
+formats file. `fetch=` is a typed attribute now, validated by name shape, and
+`fetch=glassbox` resolving to `.fux/fetchers/glassbox.py` is a **shipped
+behaviour** rather than a request this proposal has to make
+([SR-URL-LIST](../../records/0116_url-list.md) decision 15,
+[the capture](../regression/2026-09-15-consumer-fetchers/report.md) — whose
+fixture is literally named `glassbox`). ⚠ **That item was independent of this
+proposal and committed to nothing in it**, which is still true: the mechanism
+exists, and whether Glassbox sessions belong in the URL list at all is §6's
+question and remains open.
 
 **The other blocker is already gone.** The per-fetcher config slice
 (`[sources.url.config.cdp]` / `.http]`) landed, so a third fetcher no longer has
@@ -247,8 +253,9 @@ script in one consumer's repo and fux needs to know nothing about it.
 
 1. **§2's closed `fetch=` tuple** is a defect in its own right — the docstring
    and the validator disagree, and *no* third fetcher is possible today.
-   ✅ **Ruled and filed as [W-178](../open/W-178-consumer-planes-open-sets.md)
-   on 2026-09-15**, ratified and not built.
+   ✅ **Ruled, filed and SHIPPED on 2026-09-15** (W-178) — `fetch=` is typed,
+   the docstring and the validator agree, and a third fetcher is possible.
+   [SR-URL-LIST](../../records/0116_url-list.md) decision 15.
 2. **§5's privacy fork** can be ruled at any time and is worth ruling once, for
    every future generated corpus, rather than per vendor.
 

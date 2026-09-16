@@ -11,7 +11,7 @@ owns: [node@a9f259542551, src/fux/store/nodebundle.py@071a24a596dd]
 laws: [L1, L3, L4, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 977da710d6eef257e04b37c9befc1891619d69e6bd82ffe4371cc2bdbc6cc68c
+content_sha: 38b4ed9994b31084d500dba38bda29578ff45a38edeebd47572cbfd50e87c9c6
 ---
 
 # SR-NODE-SEARCH — the Node read plane
@@ -682,6 +682,25 @@ reason the bundle is regenerated in the same commit as the bump.
 steering into `.fux/node/`**, which had not been regenerated since. Stated here
 because a commit that says *anchor text* and moves 60 KB of bundle owes the
 reader the reason.
+
+⚠ **`node/src/ingest/sourcelist.mjs` is narrowed for freshness, and the gap is
+covered by parity instead** (2026-09-15, W-178). That module is the **`dirs`
+half** of `src/fux/ingest/sourcelist.py` — Node never fetches (decision 3), so
+`fetch`, `meta`, `keep`, `ttl` and `update` decide nothing there. A change
+entirely inside the `URLS` spec therefore reported the twin as behind, and
+porting it would have meant teaching this reader a grammar for a list it does
+not read.
+
+🔴 **The narrowing leaves one thing uncovered and it is named rather than
+accepted.** `test_node_twins` narrows by git's hunk-context header, which names
+an enclosing `def`; the `dirs` **attribute tuple** is a module-level constant
+and has none. So that half is held by
+`test_node_config_parity.py::test_the_dirs_attribute_set_is_the_python_one`,
+which compares the two tuples by value — the stronger check, because it asserts
+the fact rather than asserting that somebody edited a file. It matters here
+specifically: `query/__init__.py` catches a refusal from this parser and
+degrades to *no archived directories*, so two readers with different attribute
+sets return **different archived sets from the same committed file**.
 
 ### Consequences
 

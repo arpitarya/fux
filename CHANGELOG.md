@@ -49,6 +49,34 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
     *paths*, plural, and never bounded how many
     ([SR-LAW-4](records/0006_LAW-4-offline-by-default.md)).
 
+### Added
+
+- **`fetch=` on a URL line takes ANY fetcher name** — a consumer drops
+  `.fux/fetchers/glassbox.py` in, writes `fetch=glassbox`, and ingests; no
+  engine change and no fux release ([W-178](work/open/W-178-consumer-planes-open-sets.md);
+  Arpit's ruling, 2026-09-15).
+  - **It is the pattern `.fux/decoders/` already shipped**, made symmetrical:
+    **fetchers and decoders are one consumer-plane pattern**, and the `fetch=`
+    validator reuses the decoder name regex rather than growing a second one.
+  - **Shape only, never existence.** Lowercase letters, digits and underscores,
+    no leading `_`, no `.py`, no directory part. Importing a fetcher to check a
+    config line would run consumer code that may open a browser, so a
+    **committed file would open a socket to decide whether a line is
+    well-formed** — on a path L4 fences.
+  - 🔴 **A typo parses now.** `fetch=glasbox` is a legal line naming a file
+    nobody wrote, where the old enum refused it at read time. **`fux doctor`
+    gains a `fetcher bindings` row** — the mirror of `decoder bindings` — so it
+    surfaces before an ingest dies mid-run on somebody else's machine.
+  - **`meta`, `keep`, `archived`, `enrich` and `update` stay enums**, and the
+    attribute **key** set stays closed at seven. Open values, closed keys.
+  - ⚠ **Every URL list valid today stays valid**, and `fux add --cdp` / `--http`
+    are unchanged. There is deliberately **no `--fetch <name>` flag**: for a
+    custom fetcher, `fux add <URL> --no-ingest`, edit the `fetch=` value, then
+    `fux ingest <URL>`.
+  - **Fixed on the way:** `.fux/sources/urls`' generated header printed
+    `<duration>` for every typed attribute, so a fresh `fux setup` would have
+    written `fetch=<duration>`. The placeholder is the attribute's now.
+
 ### Changed — read this before upgrading a consumer
 
 - 🔴 **The committed index format is `fux.index.v3`, and an existing index must

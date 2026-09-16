@@ -140,8 +140,10 @@ Agents are fux's primary reader.
   ([SR-DECODE](records/0139_decode.md)).
 - **Web pages and wikis.** `fux add <url>` fetches through a fetcher in
   `.fux/fetchers/`: `http.py` for a plain GET, or `cdp.py` (`--cdp`) to use the
-  session your signed-in Chrome already holds. Both are yours to edit
-  ([SR-FETCHER](records/0117_fetcher.md)).
+  session your signed-in Chrome already holds. Both are yours to edit — and
+  **`fetch=<name>` on a URL line resolves to any `.py` you put in that
+  directory**, the same way `.fux/decoders/` already works
+  ([SR-FETCHER](records/0117_fetcher.md), [SR-URL-LIST](records/0116_url-list.md)).
 - **Offline unless you ask.** Only explicit, opt-in commands touch the network,
   and they say so on stderr ([L4](records/0006_LAW-4-offline-by-default.md)).
 - **Sensitive text.** `.fux/pii.toml` redacts matches from the committed index

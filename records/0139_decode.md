@@ -10,7 +10,7 @@ feature: the decoder plane — the protocol, the registry, the consumer seam and
 owns: [src/fux/decode@f1f696d64383, src/fux/templates/agents/DECODER-SKILL.md@474a416bcc42]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-26T00:00:00Z
-content_sha: d2b8b556f61113266d469831bfd3f335881f07deaf37eb6ca8e177382357f662
+content_sha: 02edd77d64cc5cd3a08d657a94e6e247d3312a4be34eee82cd3d2894bd21c5f1
 ---
 
 # SR-DECODE — bytes become Markdown in one place
@@ -639,6 +639,19 @@ reasonably wonder whether a third consumer changes the caching argument: it
 does not. `_RECORDS` is parsed once per `run()` and reset at the top of each,
 which is exactly why it was built that way — the note in `doctor.py` says
 *three checks need per-record fields*, and it is now four.
+
+⚠ **Decoders and fetchers are ONE consumer-plane pattern, and since
+2026-09-15 they are spelled the same way** ([SR-URL-LIST](0116_url-list.md)
+decision 15, W-178). `.fux/decoders/<name>.py` + a `[decoders]` binding, and
+`.fux/fetchers/<name>.py` + `fetch=<name>` on a URL line: a module stem
+validated by **shape only**, existence checked where the name is used and
+reported ahead of time by `fux doctor`. The `fetch=` validator deliberately
+reuses this record's regex rather than growing a second one.
+
+🔴 **So a future change to either plane is a question about the other.** That is
+the statement W-178 asked this record for, and it is the reason `fetch=`'s
+loosening needed no new mechanism: the precedent was here, shipped, with its
+own doctor row and its own split between shape and existence.
 
 ### Consequences
 

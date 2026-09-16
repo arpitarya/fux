@@ -81,6 +81,27 @@ NARROWED = {
     # `run_query` is still caught by this row, and a printing change is still
     # caught by theirs. Narrowing the verbs too would leave the pair unguarded.
     "query/run.mjs": "run_query",
+    # `sourcelist.py` parses BOTH committed source lists; `sourcelist.mjs` is
+    # the **`dirs` half only**, and its own header says so — Node never fetches
+    # ([SR-NODE-SEARCH](../records/0153_node-search.md) decision 3), so `fetch`,
+    # `meta`, `keep`, `ttl` and `update` decide nothing on that side. The one
+    # fact that crosses is which directories are declared `archived=true`.
+    #
+    # ⚠ **Added 2026-09-15 by W-178**, which made `fetch=` a typed attribute:
+    # a change entirely inside the `URLS` spec reported `sourcelist.mjs` as
+    # behind, and porting it would have meant teaching the Node reader a
+    # grammar for a list it does not read. Same shape as `ingest/gitdir.mjs`
+    # above, for the same reason.
+    #
+    # 🔴 **Narrowed to `parse`, and that leaves a gap this mechanism cannot
+    # close.** The Node side also mirrors the `dirs` **attribute tuple**
+    # (`DIRS_ATTRIBUTES`), which lives at module level — and narrowing works off
+    # git's hunk-context header, which names an enclosing `def`. A constant has
+    # none. So that half is covered by a **parity** test instead:
+    # `test_node_config_parity.py::test_the_dirs_attribute_set_is_the_python_one`
+    # holds the two tuples equal, which is the stronger check anyway — it
+    # asserts the fact rather than asserting that somebody edited a file.
+    "ingest/sourcelist.mjs": "parse",
 }
 
 _DECLARED = re.compile(r"`?(src/fux/[A-Za-z0-9_/]+\.py)`?")

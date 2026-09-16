@@ -28,6 +28,26 @@ Rules:
 
 
 
+## 2026-09-15 — **W-178: a consumer's fetchers open the same way their decoders do**
+
+| item | what landed | evidence |
+|---|---|---|
+| **`fetch=` is typed** | `Attribute("fetch", (), "http", validate=_fetcher_reason)` — a module stem, shape-validated. `fetch=glassbox` resolves to `.fux/fetchers/glassbox.py`, which the consumer owns | [SR-URL-LIST](../records/0116_url-list.md) decision 15 |
+| **one pattern, not two** | the validator reuses the **decoder** name regex rather than growing a second: fetchers and decoders are one consumer-plane pattern, and a future change to either is a question about the other | [SR-DECODE](../records/0139_decode.md) |
+| 🔴 **shape, never existence** | importing a fetcher to validate a line runs consumer code that may `connect()` — **reading a committed file would open a socket to decide whether a line is well-formed**, on a path L4 fences. Stronger than the decoder's own reason for the same split | decision 15a |
+| **the header defect, caught first** | `_urls_header()` hardcoded `<duration>` for every attribute with no `values`. Flipping `fetch` would have written `fetch=<duration>` into **every repo `fux setup` touches** — W-140 row 18 returning through its own fix. `Attribute.placeholder` is the field; no special case in `setup.py` | decision 15c |
+| **`fux doctor` gains `fetcher bindings`** | the mirror of `decoder bindings`. ⚠ **It reads the LIST, not the index** — a binding is interesting when it matches no *document*, a fetcher name is wrong when it matches no *file*, and that is true the moment the line is written | [SR-DOCTOR](../records/0152_doctor.md) |
+| **the default stays `"http"`** | not `""` — `render_line`'s empty-default exception would otherwise fire and a generated URL line would stop stating `fetch=` | decision 15b |
+| **the drift that predated the ruling** | the closed tuple sat in the grammar while `urlsrc._fetcher_path()` **and that module's own docstring** described the open behaviour as fact. The W-83 class; the item existed before the ruling arrived | decision 15e |
+| **captured** | a consumer's `glassbox.py` answers a real query, cited and `current`; the doctor row passes, then catches `fetch=glasbox` | [run](regression/2026-09-15-consumer-fetchers/report.md) |
+| 🔴 **measured, not predicted** | a missing fetcher is **not a per-line skip — it is a whole-run failure**. `fux ingest` exits 1 and indexes **zero** documents, URL-free directories included. The transient-failure guarantee covers a fetch that *fails*, never a fetcher that cannot be *loaded*, and that was written down nowhere. **Not escalated** — a per-line skip would mean silently indexing a subset of the corpus | [SR-REFUSAL](../records/0146_refusals.md) |
+| **fixed on the way** | `load_fetcher`'s error said *"run `fux setup`"* — right for an empty directory, misleading beside a real `glassbox.py`. It lists the sibling stems now | `tests/ingest/test_urlsrc.py` |
+| **Node** | `ingest/sourcelist.mjs` narrowed to `parse` (it is the `dirs` half; Node never fetches), and the gap that narrowing leaves is closed by a **parity** test on the `dirs` attribute tuple — the stronger check | [SR-NODE-SEARCH](../records/0153_node-search.md) |
+
+**Both suites green, whole** — 4 813 unit, 144 e2e, 36 Node.
+
+---
+
 ## 2026-09-15 — **W-177: `fux update` is deleted; `fux ingest` is the one verb**
 
 | item | what landed | evidence |

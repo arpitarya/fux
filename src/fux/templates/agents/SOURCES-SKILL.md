@@ -60,9 +60,17 @@ attribute is another `fux add` on the same entry — it is an upsert.
   `file:line`. Two lines for one entry with **different** attributes is an error.
 - File order is irrelevant: the loader dedupes and sorts.
 - `dirs` attributes: `archived`, `enrich` (`true`/`false`, default `false`).
-- `urls` attributes: `fetch` (`http`|`cdp`), `meta` (`hashed`|`plain`), `keep`,
-  `enrich`, `archived` (`true`/`false`), `ttl` (`0` or `<int>s|m|h|d`),
-  `update` (`auto`|`never`).
+- `urls` attributes: `fetch` (**any fetcher name** — see below), `meta`
+  (`hashed`|`plain`), `keep`, `enrich`, `archived` (`true`/`false`), `ttl`
+  (`0` or `<int>s|m|h|d`), `update` (`auto`|`never`).
+- 🔴 **`fetch=` is a NAME, not an enum** (3.0). It resolves to
+  `<fetchers dir>/<name>.py`, so `fetch=confluence` works the moment you write
+  `.fux/fetchers/confluence.py` — the same pattern `.fux/decoders/` already
+  uses. The grammar checks shape only; `fux doctor`'s `fetcher bindings` row
+  reports a name with no file, and a **typo now parses**. The `fux-fetcher`
+  skill covers writing one.
+- **The attribute KEYS stay closed at seven.** Open values, closed keys — an
+  unknown key is still a loud error naming `file:line`.
 - `!<glob>` in `dirs` subtracts a path and everything under it. `*` does not
   cross `/`; `**` is any depth. There is no un-exclude.
 
@@ -88,7 +96,7 @@ entry.
 | flag | records | valid for |
 |---|---|---|
 | `--archived` | `archived=true` | dirs, urls |
-| `--cdp` / `--http` | `fetch=` | urls |
+| `--cdp` / `--http` | `fetch=cdp` / `fetch=http` — the two shipped fetchers. **There is no `--fetch <name>` flag**: for a custom one, `fux add <URL> --no-ingest`, edit the `fetch=` value, then `fux ingest <URL>` | urls |
 | `--plain` / `--hashed` | `meta=` | urls |
 | `--keep` / `--no-keep` | `keep=` | urls |
 | `--ttl D` | `ttl=D` (`0`, `30s`, `15m`, `1h`, `7d`) | urls |

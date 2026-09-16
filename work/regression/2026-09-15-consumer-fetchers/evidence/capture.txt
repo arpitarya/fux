@@ -1,0 +1,55 @@
+# `fetch=<name>` — a consumer's own fetcher — W-178, 2026-09-15
+#
+# Produced by: sh evidence/fixture.sh /tmp/demo && cd /tmp/demo && sh evidence/capture.sh
+# Nothing here touched a network: both fetchers are local files in the fixture.
+
+$ fux ingest
+fetching  2 listed URL(s) (network) — no dirty list yet, so nothing is known to be stale
+note: fux_url_fetcher declares MAX_PARALLEL = 1; max_parallel = 4 clamped to 1 - exceeding a fetcher's declared maximum is a correctness violation, not a preference
+note: fux_url_fetcher declares MAX_PARALLEL = 1; max_parallel = 4 clamped to 1 - exceeding a fetcher's declared maximum is a correctness violation, not a preference
+ingested 3 docs (3 changed, 0 carried forward), 0 not indexed, 0 skipped, 3 shards written
+accelerator: 25 terms, 25 blocks, 30 postings (derived, not committed)
+# exit 0
+
+$ fux answer pager rota
+# The pager rota
+
+# The pager rota
+
+glassbox carried this one, and fux ships no such module
+
+  -- https://wiki.test/rota:L1-L3 (sha 0ade98fe262f, current)
+
+# Onboarding
+
+---
+title: Onboarding
+---
+
+# Onboarding
+
+A new joiner reads the pager rota first.
+
+  -- docs/onboarding.md:L1-L6 (sha f6aaf5285810, current)
+
+# exit 0
+
+$ fux doctor | grep 'fetcher bindings'
+[OK] fetcher optional functions: .fux/fetchers/http.py does not implement `validate()` (SR-FETCHER decision 12) - re-fetches every URL body even when unchanged; `is_rate_limited()` (SR-FETCHER decision 13) - cannot tell a 429 from a hard failure. Your fetcher is yours and fux will not rewrite it: copy the function from `fux setup`'s current template, or ignore this if it does not suit your network
+[OK] url sources: 2 url: record(s), 2 confirmed by the last run, fetches <= 4 at a time (max_parallel; also capped by your fetcher's MAX_PARALLEL)
+[OK] fetcher config tables: no [sources.url.config] to check
+[OK] fetcher bindings: 2 fetcher name(s) in use, each resolving to a file in fetchers/
+
+--- now the typo: fetch=glasbox, one letter short ---
+$ fux doctor | grep fetcher
+[OK] fetcher optional functions: .fux/fetchers/http.py does not implement `validate()` (SR-FETCHER decision 12) - re-fetches every URL body even when unchanged; `is_rate_limited()` (SR-FETCHER decision 13) - cannot tell a 429 from a hard failure. Your fetcher is yours and fux will not rewrite it: copy the function from `fux setup`'s current template, or ignore this if it does not suit your network
+[OK] url sources: 2 url: record(s), 2 confirmed by the last run, fetches <= 4 at a time (max_parallel; also capped by your fetcher's MAX_PARALLEL)
+[OK] fetcher config tables: no [sources.url.config] to check
+[FAIL] fetcher bindings: 1 URL line(s) name a fetcher with no file: glasbox. /tmp/demo/.fux/fetchers/ has ['glassbox', 'http']. Every fetch through one of these fails at ingest time - write the module, or fix the `fetch=` name
+# doctor exit 0
+
+$ fux ingest
+fetching  2 listed URL(s) (network) — no dirty list yet, so nothing is known to be stale
+error: fetcher not found: .fux/fetchers/glasbox.py (looked in /tmp/demo/.fux/fetchers/glasbox.py) — fetchers/ has ['glassbox', 'http'], so check the `fetch=` name on the line, or point [sources.url] fetcher at your own file. `fux doctor` reports this before a run
+# exit 1
+

@@ -10,7 +10,7 @@ feature: refusal detection before decode
 owns: [src/fux/ingest/refusals.py@adf187806c43, src/fux/templates/refusals.toml.txt@bdf2356bc679, tools/refusal-probe@76b6f6b7f4aa]
 laws: [L1, L3]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: ab61ac5a2d68048713c23f48fb48270502a0e590dcebcb67250f350f9193d7a2
+content_sha: 45f0620bd588a4b8d4053391a6eb0a9e6f600fa72898d376dcb1e8a0341d8102
 ---
 
 # SR-REFUSAL: a sign-in wall is not a document, and only the bytes may say so
@@ -380,6 +380,21 @@ still in `fetch_all`, still after `_unpack` and before persist and decode.
 owning record was *touched*, never that it was read (CLAUDE.md §Law zero), so a
 co-owner's file changing under this one is exactly the case where a reader needs
 to be told *"not yours"* in writing.
+⚠ **Refusal is per-URL; a missing FETCHER is per-run** (2026-09-15, W-178).
+This record's whole shape rests on a refusal being a skip: the URL is recorded,
+the run continues, and `fux doctor` counts it. `load_fetcher` raises instead —
+so a `fetch=` name with no file exits 1 and indexes **zero** documents, every
+URL-free directory in the corpus included.
+
+🔴 **That is not a regression and it is not a gap in this record** — the same
+blast radius existed for a mistyped `[sources.url] fetcher` path long before
+`fetch=` became an open set. It is named here because the *population* grew:
+[SR-URL-LIST](0116_url-list.md) decision 15 turned a bad `fetch=` value from a
+parse error at read time into a runtime failure, and a reader of this record
+could otherwise reasonably assume the refusal machinery covers it. It does not,
+and making it do so would mean a repo silently indexing a subset of its corpus —
+[the measured case](../work/regression/2026-09-15-consumer-fetchers/ANALYSIS.md).
+
 ### Consequences
 
 - ✅ **A never-edited, superseded starter is REPORTED (2026-09-14, W-163).**

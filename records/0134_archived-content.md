@@ -10,7 +10,7 @@ feature: what happens once a document is declared archived — the record proper
 owns: [tools/archived-signal-eval@30fb75fa7476]
 laws: [L3, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 5669b411ce18db1675dd73e3487fdbc2c8a97fcc29521586853c729b8f3becb7
+content_sha: 6f266a6dba4494ee8fd9f055b7a3071401f26a40a9bc62868fef68cc96abd3f8
 ---
 
 # SR-ARCHIVED-CONTENT — what "archived" does, once a document carries it
@@ -405,6 +405,13 @@ Whether a retired linker's wording *should* count as much as a live one's is a
 real question, and it is **not answered here and not in
 [the pre-registration](../work/regression/2026-09-15-anchor-text/PRE-REGISTRATION.md)** —
 raising it would be a second lever in one arm.
+
+⚠ **`archived` stays a closed enum on both lists** (2026-09-15).
+[SR-URL-LIST](0116_url-list.md) decision 15 opened `fetch=`'s values because it
+names a **file** in a directory the consumer owns. `archived` names neither a
+file nor a module — it is a declaration about a document, `true` or `false` —
+so decision 1a's two-value set is untouched, and an unknown value is still the
+loud error it always was.
 
 ### Consequences
 
