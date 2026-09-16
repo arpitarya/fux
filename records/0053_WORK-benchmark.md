@@ -10,7 +10,7 @@ feature: the capture set every benchmark run files
 owns: [tests/test_benchmark_capture.py@f6af3d328537]
 laws: []
 timestamp: 2026-09-13T00:00:00Z
-content_sha: 7492b431c1aa157714b8797ac78b30a113bf5a4ce15e87a012ef454786aeaafe
+content_sha: 5c97598821fe06c6c83cfc2e6c398a4445ea9135b1c847d1d4136aca4f86488f
 ratifies: Arpit, 2026-09-13 — what a benchmark must always capture
 ---
 
@@ -536,10 +536,29 @@ and costs a real pass, because `answer` is a different verb — and its parity
 claim covers locators and the band, so a column comparing only
 answered/declined tests less than what is claimed.
 
-✅ **RATIFIED AND BUILT 2026-09-15, and the numbers are still UNMEASURED** —
-the harness and the report carry the columns; **no run has been executed**
+✅ **RATIFIED AND BUILT 2026-09-15; MEASURED 2026-09-16 and reader parity is
+EXACT.** [The run](../work/regression/2026-09-16-node-column/report.md) on
+`docs-00100`: **`B|B-node` 60 of 60 ranked lists identical, max |Δscore| =
+0.000000**, hit@k identical at every k, and **0 of 52** answer-layer rows
+differing in verdict, band or citation.
+
+🔴 **The zero is the cell `PRE-REGISTRATION-NODE`'s `log()` left unmeasured, and
+it is stronger than *the lists match*** — two readers can agree on order from
+different arithmetic; this says they compute the same numbers. `A|B` for
+contrast: 29 of 60 differ, max |Δscore| 0.754.
+
+⚠ **`answer_node` had never executed**, and this decision's own warning — a
+missing `confidence` block would make every Node row read `answered` — **did not
+materialise**: Node carries the full block, differing from Python only in JSON
+float rendering. **It produces no error when absent**, which is why the check was
+worth running before the sweep rather than after it.
+
+W-188 closed on that run. The original ratification text follows:
+
+⚠ **As ratified (2026-09-15), the numbers were UNMEASURED** — the harness and the
+report carried the columns and **no run had been executed**
 (a Cowork bridge shell reaches neither the arm venvs nor the corpora).
-[W-188](../work/open/W-188-node-column-every-capture.md) stays open for the run,
+[W-188](../archive/open/W-188-node-column-every-capture.md) stayed open for the run,
 
 🔴 **16a. THE ARMS ARE `A` · `B` · `B-node`. THE TIER-OFF ARM IS NOT A
 BENCHMARK ARM** (Arpit, 2026-09-15: *"No need for no graph. We are setting a

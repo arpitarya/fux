@@ -29,6 +29,12 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-16 — the inbox walked and emptied: W-144 re-ruled, W-193 ruled  ·  Cowork (Opus 5)
+- **Asked:** *"what are the blockers on me? Explain them to me one by one with example and ratify them."*
+- **Did:** presented both inbox rows with a worked example and a recommendation; Arpit ruled both. Filed the rulings into [`OPEN-WORK.md`](OPEN-WORK.md) (inbox emptied per rule 45a, both rows re-balled 🟢 `agent`), [`W-144`](open/W-144-structure-aware-extraction.md), [`W-193`](open/W-193-argparse-exit-two.md), and [`INTERVIEW.md`](INTERVIEW.md) §1. No `src/`, `tests/` or `records/` touched — Cowork ratifies, Claude Code builds.
+- **Decided:** **W-144 → `dump` is a CONTROL.** The 2026-09-15 rule was unsatisfiable (`dump` saturated 30/30 at baseline, so it can never *net positive*); ruled a **specification defect**, not a moved threshold, on the strength of `dump`'s own generator calling the prose document correct in both arms. Benefit families `content` + `main`; controls `inverse`, `placebo`, `verbose`, `dump`; range, descending order and first-that-clears unchanged. Pre-registration is **re-frozen**, not edited. **W-193 → option 1:** `2` stays argparse's usage code, SR-CLI decision 5 amended to say so, the dead strict-mode reservation retired, and the CHANGELOG must name the exit code beside the `fux update` → `fux ingest` rename.
+- **Next:** agent work on both. W-144: re-freeze `PRE-REGISTRATION.md` in a new `<date>-b-sweep-2/` with the reclassification's reason in it, then run in `fux-lab`. W-193: amend SR-CLI, follow with `CLAUDE.md` §Error contract, CHANGELOG and one test. ⚠ The queue's next gate is W-136 phase 5 — prompt 5, then scoring in a chat Arpit attends.
+
 ## 2026-09-16 — W-154 ANSWERED, W-144 and W-191 handed on: three runs, two about the instrument  ·  Claude Code (Opus 5)
 - **Asked:** the same standing instruction — implement the open-work items and close them.
 - 🔴 **W-154 CLOSES: `FAIL`.** `rerank_weight = 1.0` makes `ask` **worse** — 7 better against **47 worse**, net **40** on 54 discordant, `p = 0.0000` against a required 16, with **both headrooms open** (420 improvement, 118 regression). Read with Part A's **+15 to +19 ms p50**, that is a complete answer to the item's own question: the thing you would pay that for makes results worse here. `rerank_weight` stays at `0.0` — where it already was — now with a **measured reason** rather than a held request.

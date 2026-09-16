@@ -12,6 +12,59 @@ ball: agent
 
 # W-188 — Node as a column in CAP-1, CAP-2, CAP-3 and CAP-4
 
+## ✅ CLOSED 2026-09-16 — the run happened, and reader parity is EXACT
+
+[The run](../regression/2026-09-16-node-column/report.md), `docs-00100`.
+
+| pair | kind | identical | discordant | max &#124;Δscore&#124; |
+|---|---|---:|---:|---:|
+| `A`&#124;`B` | version — the finding | 31 / 60 | 29 | 0.754260 |
+| **`B`&#124;`B-node`** | **reader — a difference is a defect** | **60 / 60** | **0** | **0.000000** |
+
+**hit@k identical at every k**; **0 of 52** answer-layer rows differ in verdict,
+band or citation, with `coverage` identical on all 52.
+
+🔴 **`max |Δscore| = 0.000000` is a stronger claim than *the lists match*.** Two
+readers can agree on order from different arithmetic — ties broken alike by luck,
+or scores differing below the sort's resolution. Zero says they compute **the
+same numbers**, and it is the cell `PRE-REGISTRATION-NODE`'s `log()` left
+unmeasured.
+
+### The named hazard did not materialise, and checking it was still right
+
+This file warned: *"`answer_node` has never run once — if Node's `--band` payload
+has no `confidence` block, every Node row will read `answered`... check one
+question by hand first."*
+
+**Checked by hand, then measured.** Node carries the full block — `band`,
+`answerable`, `failed`, `coverage`, `separation`, `separation_floor`,
+`doc_coverage`, `support`, `verified`, `missing` — differing from Python only in
+JSON float rendering (`0` against `0.0`).
+
+⚠ **Worth the command anyway.** A missing block produces **no error** — just a
+column of plausible numbers saying the reader never declines, which reads as a
+finding about the reader rather than a schema gap.
+
+### Two things the run states rather than smooths
+
+- **`B-node` has 600 non-warmup latency rows to `A`/`B`'s 602.** Chased, not
+  assumed: the extras are `class: ingest` and `class: build`, which the Node
+  reader does not perform by construction — the same reason CAP-5 gets no Node
+  column.
+- **All three arms fabricate on 10 of 10 planted unanswerables.** Known shape,
+  **fourth occurrence**, and [W-176](W-176-abstention-gates.md)'s, not this run's.
+
+⚠ **One tier.** `docs-01000` and `docs-10000` are not run, and the latency here
+does **not** restate [W-179](../regression/2026-09-15-node-column/report.md)'s
+flat-in-corpus-size finding, which needed three.
+
+⚠ **A trap filed in [`MACHINE.md`](../MACHINE.md):** `python3` on this machine is
+**3.9.6** and `bench.py report` needs `tomllib` (3.11+). Every other subcommand
+runs on 3.9, so the failure lands *after* the measurement and looks like a broken
+harness.
+
+---
+
 ✅ **THE HARNESS AND THE REPORT ARE BUILT (2026-09-15). The RUN is what is
 left.** `bench.py` gained `answer_node`, `--node-arms` on `hits` and `answers`,
 `RANK_PAIRS` with the `version`/`reader`/`tier` split, and `parity.jsonl`;

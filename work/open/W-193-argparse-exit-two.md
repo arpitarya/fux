@@ -7,10 +7,45 @@ status: open
 lane: agent
 timestamp: 2026-09-15T00:00:00Z
 filed: 2026-09-15
-ball: arpit
+ball: agent
 ---
 
 # W-193 — the exit code nobody decided
+
+## ✅ RULED 2026-09-16 (Arpit, Cowork) — option 1: leave `2` to argparse, amend decision 5
+
+**Ruling: option 1.** `2` stays argparse's de-facto usage code, and
+[SR-CLI](../../records/0101_cli-surface.md) decision 5 is amended to say so:
+**fux produces `0`, `1`, `130`; `argparse` produces `2` for a usage error raised
+before `cli.main`'s boundary is reached.** The strict-mode reservation on `2` is
+**retired** — it was never live, and a reservation nothing could claim is exactly
+what makes a consumer read `fux update` → `2` as *the runner broke* rather than
+*the verb is gone*.
+
+**Not taken:** (2) overriding `ArgumentParser.error` — it changes the exit code
+of **every malformed command line fux has ever accepted**, on the strength of one
+deleted verb, and `2`-for-usage is the convention a consumer's tooling already
+assumes; (3) renumbering the reservation — it keeps a dead reservation alive and
+leaves two meanings documented on one code.
+
+**Agent work, in order:**
+
+1. **Amend SR-CLI decision 5** to the wording above, in the same change as
+   anything else it touches (rule 52). Delete *"`2` is reserved and not
+   produced"* and *"Do not treat `2` as live"*; state where the `2` comes from
+   and that no `raise FuxError` site produces one.
+2. **`CLAUDE.md` §Error contract** follows the record; it states no rule of its
+   own.
+3. **CHANGELOG**, under 3.0's breaking block: `fux update` is gone, `fux ingest`
+   replaces it, **and the exit code a consumer will now see is `2` with an
+   argparse usage message** — so a pipeline can tell a rename from an outage.
+   The existing note says the verb is gone and stops there.
+4. **A test pins it:** an unknown verb exits `2` with argparse's message on
+   stderr, and a `FuxError` path still exits `1`.
+5. ⚠ **No `exit_code=2` is introduced anywhere.** The amendment documents
+   argparse's behaviour; it does not license fux code to produce a `2`. If the
+   work turns out to need a `src/` change, **stop and re-inbox**.
+
 
 **Model: Sonnet** once ruled; the ruling is Arpit's.
 

@@ -32,20 +32,29 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-09-15** (Cowork, inbox rulings).* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-09-16** (Cowork, inbox rulings).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### The Blocked-on-Arpit inbox is EMPTY (2026-09-15, Cowork)
+### The Blocked-on-Arpit inbox is EMPTY (2026-09-16, Cowork)
 
-- **W-144 ruled (b)** — a second, lower `b` sweep (`0.4→0.3→0.2→0.15`, descending,
-  first-that-clears), **not runnable until a `verbose` control with regression
-  headroom is in the arm set.** Both existing controls are saturated. Step order is
-  in the item.
-- **W-177 ruled** — hook invocation is **`fux ingest --no-fetch`** (the flag `fux
-  add` already has), doctor strings name `fux ingest`, rename ships in **3.0**.
-  W-177 is 🟢 and buildable; its model line says Opus.
-- Nothing in the queue waits on Arpit. Next golden step is still an agent's
-  (W-136, prompt 4, a session that has never read `questions/`).
+- **W-144 ruled again — `dump` is a CONTROL.** The 2026-09-15 rule (*net positive
+  on `dump`, `content` and `main`*) was **unsatisfiable**: `dump` sits at 30/30 at
+  baseline and can never net positive. Arpit ruled it a **specification defect**,
+  not a threshold to move — `dump` was grouped with the benefit families because
+  all three are *table* families, and its own generator calls the prose document
+  correct in both arms. Benefit families are now `content` + `main`; controls are
+  `inverse`, `placebo`, `verbose` **and `dump`**. Range `{0.4→0.3→0.2→0.15}`,
+  descending, first-that-clears, and every other step: **unchanged**. Next is a
+  **re-frozen** `PRE-REGISTRATION.md` in a new `<date>-b-sweep-2/` stating the
+  reclassification's reason, then the run in `fux-lab`. Step 1 (`verbose`) is ✅.
+- **W-193 ruled — option 1, leave `2` to argparse.** SR-CLI decision 5 is amended
+  to *fux produces `0`, `1`, `130`; argparse produces `2` for a usage error before
+  the boundary*, and the **strict-mode reservation on `2` is retired**. CHANGELOG
+  must name the `fux update` → `fux ingest` rename **and** the `2` a consumer will
+  see, so a pipeline can tell a rename from an outage. No `src/` change expected;
+  if one is needed, stop and re-inbox.
+- Nothing in the queue waits on Arpit. The next gate is **W-136 phase 5** — prompt
+  5 (run both sets), then scoring in a chat Arpit attends.
 
 ### The `fux.toml` audit — and a config table that was unusable for months (2026-09-14, Cowork)
 

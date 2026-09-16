@@ -8,6 +8,49 @@ lane: agent
 timestamp: 2026-09-12T00:00:00Z
 ---
 
+## ✅ RULED 2026-09-16 (Arpit, Cowork) — `dump` is a CONTROL; the range and first-that-clears stand
+
+**Ruling: this is a specification defect in the decision rule, not a threshold to
+move.** `dump` was grouped with `content` and `main` because all three are
+*table* families, and the rule inherited the grouping. **Its own generator says
+the prose document is *"correct in BOTH arms"*, and that collapsing the dump's
+length *"must not change that"*** — that is the definition of a control, and it
+was written down before any number existed.
+
+**`dump` moves to the control set.** The decision rule reads:
+
+> the first descending value that **nets positive on `content` and `main`**,
+> each individually, neither negative, with **every control holding** —
+> `inverse`, `placebo`, `verbose` **and `dump`**.
+
+**Unchanged from the 2026-09-15 ruling:** the range `b ∈ {0.4 → 0.3 → 0.2 →
+0.15}`, **descending**, first-that-clears; the `verbose` control, its expected
+direction and its floor; the SR-RS d19 pair-count floor; and steps 4–5 (ship on
+clear, amend SR-TUNING and SR-RANKING in the same change, L3 check, two-reader
+byte equality, CHANGELOG line — `fux setup` writes `b` out in full).
+
+⚠ **Why this is not the moving-threshold failure**
+([SR-RS](../../records/0133_predictions.md) decision 10b): the justification is
+`dump`'s **role, quoted from its generator**, not the fact that it makes a value
+clear. The reclassification would be correct if the sweep had never run.
+**Re-freeze `PRE-REGISTRATION.md` with that reason written into it**, in a new
+`work/regression/<date>-b-sweep-2/`, before the first number. The 2026-09-15
+pre-registration is **superseded in place, not edited**.
+
+⚠ **`dump` keeps its teeth.** W-155 showed option (b) drove it 30/30 → 0/30;
+catching exactly that is a control's job here, and it holds 30/30 down to
+`b = 0`. **If a value clears `content` and `main` while `dump` regresses, the run
+FAILS.** Same bar.
+
+⚠ **Reading (2) is the likely outcome, not the reason.** `b = 0.15` is a long
+way from the literature's `0.75`; that is what the descending order and the
+`verbose` control are for, and neither is optional.
+
+**Agent work:** the 2026-09-15 order, with step 2's decision rule replaced by the
+one above. **Step 1 is ✅ discharged** — `verbose` is built and proven
+(30/30 across the ruled range, 0/30 at `b = 0`, `p = 0.0000`). Next is the
+re-frozen pre-registration, then the run in `fux-lab`.
+
 ## 🔴 STEP 1 IS DONE, AND IT FOUND THAT THE RULE CANNOT BE SATISFIED (2026-09-16)
 
 [The control probe](../regression/2026-09-16-b-sweep-2-control/report.md).
