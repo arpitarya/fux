@@ -8,6 +8,15 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+## [3.0.0-alpha.1] - 2026-09-17
+
+⚠ **A version bump and nothing else. The engine is byte-identical to
+`3.0.0-alpha.0`** — no `src/`, `node/`, `pyproject.toml` or `hatch_build.py`
+line differs between the two tags. Cut on Arpit's instruction with that stated
+in advance. **There is no reason for a consumer on `3.0.0-alpha.0` to move**,
+and everything `3.0.0-alpha.0` says below still describes this release.
+
+
 ## [3.0.0-alpha.0] - 2026-09-17
 
 **A major, and the two breaking changes are the reason.** `fux update` is gone —
