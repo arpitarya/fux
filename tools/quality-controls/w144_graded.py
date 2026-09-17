@@ -122,6 +122,11 @@ TERMS = terms(90)
 #: gap in its own recommendation, and these close it.
 TABLE_TERMS = terms(150)[90:]
 
+#: W-144's `verbose` control, on terms 150–179. **Appended, never interleaved**,
+#: for the reason the slice above gives: `terms(n)` is a prefix of
+#: `terms(n + k)`, so extending the list cannot renumber a probe that exists.
+VERBOSE_TERMS = terms(180)[150:]
+
 #: The families whose table carries the term, and which document is correct.
 #:
 #: - **`dump`** is the HARM case and the one the pre-registered question turns
@@ -135,6 +140,29 @@ TABLE_TERMS = terms(150)[90:]
 #: `content` CANNOT answer the question — there the table-heavy document is the
 #: better answer, so promoting it is correct by construction.
 TABLE_FAMILIES = ("dump", "content")
+
+#: Every family, in report order. 🔴 **One tuple, because five call sites each
+#: spelled the list out** — and when `verbose` landed (2026-09-15) four of them
+#: would have gone on reporting five families while the corpus held six, which is
+#: a control that silently stops being reported. A control nobody prints is a
+#: control that does not exist.
+ALL_FAMILIES = ("main", "inverse", "placebo", *TABLE_FAMILIES, "verbose")
+
+#: The families a value must IMPROVE, and the families it must not break.
+#:
+#: 🔴 **`dump` is a CONTROL** (Arpit, 2026-09-16). The 2026-09-15 rule asked for a
+#: value *netting positive* on it, and it sits at 30/30 at the baseline — its
+#: correct answer is the prose document, which already wins at `b = 0.75` — so
+#: the rule was unsatisfiable at any `b`, forever. It was grouped with `content`
+#: and `main` because all three are *table* families, and the rule inherited the
+#: grouping. **Its own `TABLE_FAMILIES` comment above already called the prose
+#: document correct in both arms**, which is a control's definition.
+#:
+#: ⚠ **It keeps its teeth.** W-155 drove it 30/30 → 0/30; catching exactly that
+#: is a control's job. A value that clears the benefit families while `dump`
+#: regresses FAILS.
+BENEFIT_FAMILIES = ("content", "main")
+CONTROL_FAMILIES = ("inverse", "placebo", "dump", "verbose")
 
 PROSE_WORDS = (
     "consignment despatch tolerance interval calibration schedule handover "
@@ -311,6 +339,51 @@ def cmd_gen(a) -> int:
         probes.append({"id": f"{fam[0]}{i:03d}", "family": fam, "term": term,
                        "query": term, "relevant": subj, "rival": rival, "why": why})
 
+    # ---- W-144 (b): the control that CAN LOSE ------------------------------
+    #
+    # 🔴 **Arpit's condition on ruling (b), 2026-09-15**: the lower-`b` run does
+    # not start until the arm set carries a control family with **regression
+    # headroom**. `inverse` and `placebo` are saturated 30/30 in every arm, so
+    # *"nothing regresses"* on them is consistent with safety and is **not
+    # evidence of it** — a control that cannot lose reports nothing.
+    #
+    # **`verbose` can lose, and it is aimed at exactly what lowering `b` does.**
+    # `b` is the length-normalisation strength: at `0.75` a document is penalised
+    # for saying the same thing at greater length, and at `0` it is not penalised
+    # at all. So:
+    #
+    # | | prose | occurrences of the term |
+    # |---|---|---|
+    # | **concise** — *correct in both arms* | `P` | **6** |
+    # | **verbose** — the rival | **~3 × `P`** | **7** |
+    #
+    # ⚠ **The rival gets MORE occurrences, and that is the whole design.** With
+    # equal tf the two would merely TIE as `b → 0`, and a tie is not a regression
+    # anybody can read. At 7 against 6 the verbose document **wins outright**
+    # once normalisation stops paying for its length — so the control fires as a
+    # flip rather than as a tie-break, and *which* value it fires at is the
+    # number the run is for.
+    #
+    # **Expected direction, frozen before any number:** concise wins at `b =
+    # 0.75`; the family holds at every lower value the sweep tries, or the value
+    # is refused however well `dump`, `content` and `main` do.
+    VERBOSE_MULTIPLIER = 3
+    for k, term in enumerate(VERBOSE_TERMS):
+        i = len(TERMS) + len(TABLE_TERMS) + k
+        concise = f"docs/{i:03d}-{term}-brief.md"
+        verbose = f"docs/{i:03d}-{term}-report.md"
+        files[concise] = _doc(f"{term.title()} brief", _prose(rng, term, 6, P), None)
+        files[verbose] = _doc(f"{term.title()} report",
+                              _prose(rng, term, 7, P * VERBOSE_MULTIPLIER), None)
+        probes.append({
+            "id": f"v{i:03d}", "family": "verbose", "term": term, "query": term,
+            "relevant": concise, "rival": verbose,
+            "why": ("no table anywhere: a concise brief with 6 occurrences against a report "
+                    f"{VERBOSE_MULTIPLIER}x as long with 7. The brief is correct in BOTH arms. "
+                    "It is the control with REGRESSION HEADROOM — as `b` falls, length stops "
+                    "being paid for and the longer document's extra occurrence wins"),
+        })
+
     # Filler. Each mentions several probe terms ONCE, so every probe term's `df`
     # lands in the tens — the single change that unsaturates the endpoint the
     # 2026-09-12 run could not move.
@@ -319,7 +392,14 @@ def cmd_gen(a) -> int:
     # `df` differs from the 2026-09-12 corpus. That is why this corpus's `main`
     # numbers are a REPLICATION and not a continuation, and the pre-registration
     # says so before any of them existed.
-    ALL_TERMS = TERMS + TABLE_TERMS
+    #
+    # 🔴 **And it samples all 180 since `verbose` landed (2026-09-15), which
+    # moves `df` again.** Every family's `df` shifts when the term pool grows,
+    # so a corpus with `verbose` in it is **not** the corpus the 2026-09-15
+    # `b` sweep ran on. The sweep that uses it is a **separate run** — Arpit's
+    # ruling says so in as many words — and its `main`/`dump`/`content` numbers
+    # may not be continued from that one's.
+    ALL_TERMS = TERMS + TABLE_TERMS + VERBOSE_TERMS
     for j in range(a.filler):
         picks = rng.sample(ALL_TERMS, 5)
         body = "\n".join(
@@ -333,7 +413,7 @@ def cmd_gen(a) -> int:
         p.write_text(body, encoding="utf-8")
     (dest / "probes.jsonl").write_text(
         "".join(json.dumps(p, sort_keys=True) + "\n" for p in probes), encoding="utf-8")
-    for fam in ("main", "inverse", "placebo", *TABLE_FAMILIES):
+    for fam in ALL_FAMILIES:
         print(f"  {fam:<8} {sum(1 for p in probes if p['family'] == fam)}")
     print(f"{len(files)} documents, {len(probes)} probes -> {dest}")
     return 0
@@ -428,7 +508,7 @@ def cmd_run(a) -> int:
     print(f"{'family':>9}  {'n':>3}  {'hit@1 shipped':>14}  {'hit@1 no-table':>15}  "
           f"{'discordant':>11}  {'net':>5}")
     res = {}
-    for fam in ("main", "inverse", "placebo", *TABLE_FAMILIES):
+    for fam in ALL_FAMILIES:
         f_ = [r_ for r_ in out if r_["family"] == fam]
         s = sum(1 for r_ in f_ if r_["hit1_shipped"])
         c = sum(1 for r_ in f_ if r_["hit1_cf"])
@@ -584,6 +664,150 @@ def cmd_sweep(a) -> int:
     return 0
 
 
+def _score_at_b(corpus: Path, probes: list[dict], values: tuple[float, ...]) -> dict:
+    """Rank every probe at each `b`, with the SHIPPED `flen` in every arm.
+
+    🔴 **One lever moves and it is `b`.** The counterfactual `flen` that
+    `_score` computes is NOT used here: W-144's option (b) was ruled out on
+    2026-09-14 and option (d) — lower `b` — is what the sweep tests. Two levers
+    in one arm cannot attribute a delta, which the pre-registration says in
+    those words.
+
+    The index is ingested and built once; `b` is a **query-time** parameter, so
+    every arm reads the same committed bytes. That is the property that makes
+    this a clean ablation rather than four corpora.
+    """
+    r = subprocess.run([str(PY), "-c",
+                        "import sys;from fux.cli import main;"
+                        "sys.argv=['fux','ingest','--full'];rc=main();"
+                        "sys.argv=['fux','build'];raise SystemExit(rc or main())"],
+                       cwd=str(corpus), text=True, encoding="utf-8", capture_output=True, check=False)
+    if r.returncode != 0:
+        sys.stderr.write(r.stdout + r.stderr)
+        raise SystemExit("ingest/build failed")
+
+    from fux.query.bm25f import DEFAULT_SCORING, Scoring, derive_wlen, score_record
+    from fux.query.scan import query_term_hashes
+    from fux.store import TF_FIELDS, reader
+
+    records = [rec for rec in reader.read_index(corpus).values() if rec.get("loc")]
+    n = len(records)
+    prepared, total = [], 0.0
+    for rec in records:
+        flen = list(rec.get("flen") or [])
+        if not flen:
+            continue
+        flen += [0] * (len(TF_FIELDS) - len(flen))
+        total += derive_wlen(flen)
+        prepared.append((rec, flen))
+    avg = total / n
+
+    scorings = {v: Scoring(b=v) for v in values}
+    per_probe: list[dict] = []
+    for p in probes:
+        hashes = query_term_hashes(p["query"])
+        df = {h: 0 for h in hashes}
+        for rec, _f in prepared:
+            for h in hashes:
+                if h in rec.get("terms", {}):
+                    df[h] += 1
+        row = {**p, "df": max(df.values()) if df else 0}
+        for value, scoring in scorings.items():
+            ranked = []
+            for rec, flen in prepared:
+                score = score_record(rec.get("terms", {}), flen, hashes, df, n, avg, scoring)
+                if score > 0:
+                    ranked.append((score, rec["loc"]))
+            top = [loc for _s, loc in sorted(ranked, key=lambda t: (-t[0], t[1]))][:10]
+            row[f"top_b{value}"] = top
+            row[f"hit1_b{value}"] = bool(top) and top[0] == p["relevant"]
+        per_probe.append(row)
+    assert DEFAULT_SCORING.b == 0.75, "the baseline moved; the pre-registration names 0.75"
+    return {"n": n, "avg_wlen": avg, "rows": per_probe}
+
+
+def cmd_bsweep(a) -> int:
+    """W-180 — the FROZEN `b` sweep, run. The bar is not in this file.
+
+    🔴 **The decision rule is the pre-registration's and it may not move**
+    (SR-RS decision 10b). ⚠ **Which pre-registration changed on 2026-09-16**:
+    [`2026-09-16-b-sweep-2`](../../work/regression/2026-09-16-b-sweep-2/PRE-REGISTRATION.md)
+    supersedes the 2026-09-15 one in place, and the rule reads:
+
+        the FIRST value, in descending order, that nets positive on `content`
+        AND `main`, each individually and neither negative, with EVERY control
+        holding — `inverse`, `placebo`, `verbose` and `dump` — and with the net
+        clearing decision 19's floor for the discordant count observed.
+
+    🔴 **`dump` moved from the benefit families to the controls.** It sits at
+    30/30 at the baseline and can never net positive, so the old rule was
+    unsatisfiable at any `b`. The justification is its ROLE, quoted from this
+    file's own `TABLE_FAMILIES` comment — *"the prose document is correct"*, in
+    both arms — and not the fact that reclassifying it makes a value clear.
+
+    ⚠ **Descending order is the rule, not a convenience.** A sweep that reported
+    *the best value* would pick the extreme whenever the curve is flat; the first
+    value that clears is the smallest departure that works.
+
+    This command prints what each value did. **It does not adjudicate** — an
+    ambiguous result goes to Arpit under the pre-registration's own rule 4.
+    """
+    corpus = Path(a.corpus)
+    probes = [json.loads(l) for l in (corpus / "probes.jsonl").read_text().splitlines()
+              if l.strip()]
+    values = tuple(a.values)
+    result = _score_at_b(corpus, probes, values)
+    rows = result["rows"]
+    base = values[0]
+
+    print(f"corpus n={result['n']}   avg_wlen {result['avg_wlen']:.1f}")
+    print(f"probe-term df: {min(r['df'] for r in rows)}-{max(r['df'] for r in rows)}")
+    print(f"\nbaseline b={base} (shipped). One lever moves; `flen` is the shipped one in every arm.\n")
+    header = f"{'family':>9}  {'n':>3}  " + "  ".join(f"hit@1 b={v:<5}" for v in values)
+    print(header)
+    summary: dict[str, dict] = {}
+    for fam in ALL_FAMILIES:
+        fam_rows = [r for r in rows if r["family"] == fam]
+        if not fam_rows:
+            continue
+        cells = []
+        for v in values:
+            cells.append(f"{sum(1 for r in fam_rows if r[f'hit1_b{v}']):>5} /{len(fam_rows):<5}")
+        print(f"{fam:>9}  {len(fam_rows):>3}  " + "  ".join(cells))
+        summary[fam] = {"n": len(fam_rows),
+                        **{f"hit1_b{v}": sum(1 for r in fam_rows if r[f"hit1_b{v}"]) for v in values}}
+
+    print("\nPaired against the baseline, per family (b = better, w = worse, net = b - w):\n")
+    print(f"{'family':>9}  {'b':>5}  {'better':>6}  {'worse':>5}  {'discordant':>10}  {'net':>5}  {'p':>8}  outcome")
+    verdicts: dict[str, dict] = {}
+    for v in values[1:]:
+        for fam in ALL_FAMILIES:
+            fam_rows = [r for r in rows if r["family"] == fam]
+            if not fam_rows:
+                continue
+            better = sum(1 for r in fam_rows if r[f"hit1_b{v}"] and not r[f"hit1_b{base}"])
+            worse = sum(1 for r in fam_rows if r[f"hit1_b{base}"] and not r[f"hit1_b{v}"])
+            rule = vrule(better, worse, better=f"b={v} RANKS BETTER", worse=f"b={base} RANKS BETTER")
+            print(f"{fam:>9}  {v:>5}  {better:>6}  {worse:>5}  {better + worse:>10}  "
+                  f"{better - worse:>+5}  {rule['p']:>8.4f}  {rule['outcome']}")
+            verdicts.setdefault(str(v), {})[fam] = {"better": better, "worse": worse, **rule}
+        print()
+
+    print("🔴 The decision rule is the PRE-REGISTRATION's, and this command does not apply it:")
+    print("   the first value, DESCENDING, netting positive on `content` AND `main` —")
+    print("   each individually, neither negative — with EVERY control holding")
+    print(f"   ({', '.join(CONTROL_FAMILIES)}), and the net clearing SR-RS decision 19's")
+    print("   floor for the discordant count observed. An ambiguous result goes to Arpit.")
+    print("   ⚠ `dump` is a CONTROL since 2026-09-16, not a benefit family: it is 30/30")
+    print("      at the baseline and can never net positive.")
+
+    if a.json:
+        Path(a.json).write_text(json.dumps(
+            {"values": list(values), "n": result["n"], "avg_wlen": result["avg_wlen"],
+             "summary": summary, "paired": verdicts, "rows": rows}, indent=2), encoding="utf-8")
+    return 0
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     sub = ap.add_subparsers(dest="verb", required=True)
@@ -600,6 +824,12 @@ def main() -> int:
     s.add_argument("--filler", type=int, default=150)
     s.add_argument("--prose", type=int, default=400)
     s.add_argument("--json"); s.set_defaults(fn=cmd_sweep)
+    bs = sub.add_parser("bsweep", help="W-180: the frozen `b` sweep, shipped `flen` in every arm")
+    bs.add_argument("--corpus", required=True)
+    bs.add_argument("--values", type=float, nargs="+", default=[0.75, 0.6, 0.5, 0.4],
+                    help="the baseline FIRST, then the treatments in the pre-registered "
+                         "descending order — 0.75 0.6 0.5 0.4")
+    bs.add_argument("--json"); bs.set_defaults(fn=cmd_bsweep)
     a = ap.parse_args()
     return a.fn(a)
 

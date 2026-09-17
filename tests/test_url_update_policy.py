@@ -140,8 +140,15 @@ def test_never_plus_keep_false_is_legal():
 
 def test_never_plus_keep_true_is_the_coherent_pair():
     """More offline, with the grain of L4: the bytes are in `.fux/acquired/`,
-    `answer` verifies against them and reports `as-ingested`, and no socket
-    opens."""
+    so a fetch that fails or is forbidden verifies against them and reports
+    `as-ingested` rather than `unverified`.
+
+    ⚠ **This docstring said "and no socket opens" and that was wrong**
+    (corrected 2026-09-14, W-174). `update=` is the UPDATE-time clock;
+    SR-URL-FRESHNESS decision 15 says in as many words that it *"still does not
+    keep `answer` offline"*. The knob that closes the socket at ask time is
+    `[sources.url] fetch_at_answer` (decision 16).
+    """
     (entry,) = _resolve("https://x.test/a update=never")
     assert entry.update == "never" and entry.keep is True
 
@@ -151,7 +158,7 @@ def test_doctor_counts_pinned_lines_and_names_the_lossy_ones(tmp_path):
 
     (tmp_path / ".git").mkdir()
     (tmp_path / "fux.toml").write_text(
-        '[sources.url]\nmax_parallel = 4\nurls_file = ".fux/sources/urls"\n', encoding="utf-8"
+        '[sources]\nurls_file = ".fux/sources/urls"\n[sources.url]\nmax_parallel = 4\n', encoding="utf-8"
     )
     urls = tmp_path / ".fux" / "sources" / "urls"
     urls.parent.mkdir(parents=True)
@@ -174,7 +181,7 @@ def test_doctor_says_nothing_when_no_line_is_pinned(tmp_path):
 
     (tmp_path / ".git").mkdir()
     (tmp_path / "fux.toml").write_text(
-        '[sources.url]\nmax_parallel = 4\nurls_file = ".fux/sources/urls"\n', encoding="utf-8"
+        '[sources]\nurls_file = ".fux/sources/urls"\n[sources.url]\nmax_parallel = 4\n', encoding="utf-8"
     )
     urls = tmp_path / ".fux" / "sources" / "urls"
     urls.parent.mkdir(parents=True)

@@ -47,6 +47,22 @@ jobs:
         working-directory: node
         run: node --test
 
+      - name: build the derived plane — the arm is meaningless without it
+        # 🔴 **A fresh checkout has no `.fux/runtime/`, and that alone makes the
+        # arm red.** W-161's graph tier reads Python's derived
+        # `.fux/runtime/graph.json`; Node has no such file and rebuilds the plane
+        # in memory from the committed records instead (SR-NODE-SEARCH decisions
+        # 9 and 16). So Python with no fresh plane has NO TIER and Node has one,
+        # and the two disagree **by ratified design** — measured here at **44 of
+        # 202 discordant** on 2026-09-16, every one of them that asymmetry.
+        #
+        # `compose.mjs` says the readers are byte-equal "wherever Python has a
+        # fresh plane — which is every corpus the differential arm runs on,
+        # because the golden ladder rungs are built". That was true of the
+        # ladder and was never true of THIS repo in CI, where nothing built
+        # anything. `fux build` is what makes the sentence true here.
+        run: fux build
+
       - name: the differential arm — TRANSCRIPTION (this repo)
         # ⚠ `--python-tune off` is deliberate and is not a loosened bar.
         #
@@ -59,8 +75,16 @@ jobs:
         #
         # So CI runs the arm that can attribute a failure: `--no-tune` on the
         # Python side is *the engine's own answer* (SR-TUNE decision 11),
-        # which is exactly what Node implements. A discordance in this step is
-        # a Node transcription defect and nothing else.
+        # which is exactly what Node implements.
+        #
+        # ⚠ **This comment read "a discordance in this step is a Node
+        # transcription defect and nothing else" until 2026-09-16, and W-161
+        # made that false.** The graph tier gave the two readers a second,
+        # LEGITIMATE way to differ — Python's derived plane against Node's
+        # in-memory one — which the step cannot tell from a transcription
+        # defect. The `fux build` above removes that second way rather than
+        # documenting it, so the sentence is true again *because of the step
+        # before it*, not on its own.
         #
         # 🔴 The CONTRACT arm — tune applied — runs on the golden rungs, whose
         # tune is all-defaults, so there the two arms are the same run. See the
@@ -71,8 +95,14 @@ jobs:
         # W-107 H1 and H2 are invisible on ordinary data: H1 needs two
         # documents whose scores tie exactly AND whose ids straddle U+FFFF,
         # and no real corpus has been written to contain one.
+        #
+        # ⚠ **`fux build` again, and for the same reason.** `adversarial_corpus.py`
+        # REWRITES `.fux/index/`, which leaves the plane built above stale — and
+        # `compose.py` has no tier on a stale plane exactly as it has none on an
+        # absent one, so skipping this rebuild puts the divergence straight back.
         run: |
           python tools/differential/adversarial_corpus.py .
+          fux build
           python tools/differential/node_arm.py . --python-tune off
 
       - name: N2 — the graph plane digest
@@ -83,24 +113,26 @@ jobs:
         run: python tools/differential/graph_arm.py .
 
   ladder:
-    # PRE-REG-NODE-2 §4's cadence: `rung-00100` and `rung-10000` on every push,
-    # all eight nightly and before a release.
+    # 🔴 **THE GOLDEN CORPUS IS NOT FOR CI.** Ruled by Arpit on 2026-09-14
+    # (W-148 row 1): golden runs **local-only, in `fux-lab`** — no self-hosted
+    # runner, no committed rung, no portable builder. The three routes out were
+    # named and none was taken.
     #
-    # 🔴 **A GitHub runner cannot meet it, and this job says so rather than
-    # pretending.** The ladder *corpus* is not in this repo — only its
-    # manifests are (`work/golden/ladder/*.{index,sha256}`, 2.2 MB); the rungs
-    # themselves live in `fux-lab` because [SR-WORK-ENVIRONMENTS] gives every measurement to that
-    # environment, and rung-10000 alone is 120 MB. Regenerating one here would
-    # mean running `build_golden_rung.py`, which hard-codes two absolute paths
-    # on Arpit's machine.
+    # So this job checks the **manifests and nothing else**: `ladder_check.py`
+    # proves `rungs.py` resolves and verifies what `work/golden/ladder/` holds
+    # (2.2 MB of `*.{index,sha256}`), which is the half CI can honestly do.
     #
-    # What this job does have is the manifests, so it proves the *instrument*
-    # is wired: `rungs.py` resolves and verifies, and the arm runs the moment a
-    # corpus is present. Where `FUX_GOLDEN_CORPORA` points at one — a lab
-    # checkout, a self-hosted runner — the same command is the real thing.
+    # ⚠ **The `FUX_GOLDEN_CORPORA` arm was here and is REMOVED**, not disabled.
+    # It ran the real differential arm whenever a repository variable happened
+    # to point at a corpus — so the cadence PRE-REG-NODE-2 §4 asks for was
+    # *conditionally* met by a setting nobody could see from the tree, and a
+    # green tick meant either "the arm passed" or "there was no corpus". A
+    # conditional arm that skips silently is how `find` went a month without
+    # its tune file. **The cadence is LOCAL**, stated in the pre-registration
+    # rather than implied by a variable.
     #
     # [SR-WORK-ENVIRONMENTS]: records/0052_WORK-environments.md
-    name: golden ladder (fux-lab corpora)
+    name: golden ladder manifests (the corpus is local-only)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -118,16 +150,3 @@ jobs:
       - name: the ladder manifests are readable and self-consistent
         run: python tools/differential/ladder_check.py
 
-      - name: the arm on rung-00100 and rung-10000, when the corpora are here
-        env:
-          FUX_GOLDEN_CORPORA: ${{ vars.FUX_GOLDEN_CORPORA }}
-        run: |
-          if [ -z "$FUX_GOLDEN_CORPORA" ] || [ ! -d "$FUX_GOLDEN_CORPORA" ]; then
-            echo "::notice::the ladder corpus is not on this runner — PRE-REG-NODE-2 §4's"
-            echo "::notice::per-push cadence is met in fux-lab, not here. See W-107."
-            exit 0
-          fi
-          for rung in rung-00100 rung-10000; do
-            python tools/differential/node_arm.py --rung "$rung"
-            python tools/differential/graph_arm.py --rung "$rung"
-          done

@@ -78,10 +78,17 @@ class Attribute:
     ⚠ **`values` is empty for a TYPED attribute, and `validate` carries the
     rule instead.** Every attribute was a closed enum until `ttl` (SR-URL-
     FRESHNESS): a duration is an unbounded value, and there is no tuple of
-    legal ones to write. The enum is still the default and still the right
-    shape for `fetch`, `meta`, `archived` and `keep` -- a typed attribute is
-    the exception, and its validator must produce the same *kind* of error the
-    enum does, naming what was wrong rather than what was expected.
+    legal ones to write. The enum is still the default, and it is still the
+    right shape for `meta`, `archived`, `enrich`, `update` and `keep` -- those
+    are **policy values with a genuinely closed set**. A typed attribute's
+    validator must produce the same *kind* of error the enum does, naming what
+    was wrong rather than what was expected.
+
+    ⚠ **This docstring named `fetch` among the enums until 2026-09-15**, when
+    W-178 (Arpit's ruling) made it typed: `fetch=` names a **file**, not a
+    policy, and `.fux/fetchers/<name>.py` is the consumer's to add. A docstring
+    asserting the opposite of the code is the defect that item was filed over,
+    so it is corrected here rather than left as history.
     """
 
     name: str
@@ -90,6 +97,23 @@ class Attribute:
     #: `None` -> the value is legal. A string -> why it is not. Consulted only
     #: when `values` is empty.
     validate: Callable[[str], str | None] | None = None
+    #: What a generated HEADER prints on the right of `=` for a typed
+    #: attribute. 🔴 **It is a field rather than a special case in `setup.py`**,
+    #: which hardcoded `<duration>` for every attribute with no `values` — true
+    #: while `ttl` was the only one, and it would have printed
+    #: `fetch=<duration>` into every repo `fux setup` touches the moment a
+    #: second typed attribute landed. **W-140 row 18 is that header going stale
+    #: by being transcribed**; it was fixed by being *derived*, and this is the
+    #: derivation itself being wrong. Ignored when `values` is non-empty.
+    placeholder: str = "<value>"
+
+    def spelling(self) -> str:
+        """`name=a|b|c` for an enum, `name=<placeholder>` for a typed one.
+
+        The one place a header may ask what an attribute looks like, so the two
+        kinds cannot drift apart in a file somebody transcribed.
+        """
+        return f"{self.name}={'|'.join(self.values) if self.values else self.placeholder}"
 
     def reject(self, raw: str) -> str | None:
         """Why `raw` is not a legal value here, or `None`."""
@@ -236,6 +260,41 @@ _DECODER_HELP = (
 )
 
 
+#: A fetcher name is a MODULE STEM -- `cdp`, never `cdp.py` and never
+#: `.fux/fetchers/cdp.py`. It is the same key `urlsrc._fetcher_path()` joins to
+#: the fetchers directory, so the line and the resolver cannot disagree about
+#: what they are naming. Deliberately the same shape as `_DECODER_NAME_RE`:
+#: fetchers and decoders are the same consumer-plane pattern, and two regexes
+#: for one idea is how they would drift.
+_FETCHER_NAME_RE = re.compile(r"[a-z0-9][a-z0-9_]*")
+
+_FETCHER_HELP = (
+    "must be a fetcher module name - lowercase letters, digits and underscores, "
+    "not starting with `_`, with no `.py` suffix and no directory part. It "
+    "resolves to <fetchers dir>/<name>.py, beside the file [sources.url] fetcher "
+    "names; `fux doctor` reports a name with no file"
+)
+
+
+def _fetcher_reason(raw: str) -> str | None:
+    """Why `raw` is not a fetcher name, or `None`. **Shape only.**
+
+    🔴 **Whether the file exists is deliberately NOT checked here, and the
+    reason is stronger than the decoder's.** `_decoder_reason` does not reach
+    the registry because reading a config file must not depend on importing
+    every decoder. Here, importing a fetcher to validate one line would run
+    module-level consumer code that may `connect()` to a browser — so reading a
+    committed file would open a socket to decide whether a line is well-formed,
+    on a path L4 fences.
+
+    Existence is checked where the name is used (`urlsrc._fetcher_path`, which
+    raises naming the missing file) and reported ahead of time by `fux doctor`.
+    Same split `dirs` already makes: any repo-relative path is accepted here and
+    existence is `doctor`'s.
+    """
+    return None if _FETCHER_NAME_RE.fullmatch(raw) else _FETCHER_HELP
+
+
 def _decoder_reason(raw: str) -> str | None:
     """Why `raw` is not a decoder name, or `None`. **Shape only.**
 
@@ -260,7 +319,18 @@ def _decoder_reason(raw: str) -> str | None:
 URLS = ListSpec(
     kind="urls",
     attributes=(
-        Attribute("fetch", ("http", "cdp"), "http"),
+        # 🔴 **Typed, not an enum** (W-178; Arpit, 2026-09-15). `fetch=` names a
+        # FILE — `<fetchers dir>/<name>.py` — and the consumer owns that
+        # directory, exactly as they own `.fux/decoders/`. A closed tuple of
+        # the two fetchers fux happens to ship made a third one impossible
+        # while `urlsrc._fetcher_path()` and this module's own docstring both
+        # already described the open behaviour as fact. **The validator and the
+        # docstring had drifted and nothing noticed** — the W-83 class.
+        #
+        # ⚠ **The default is `"http"`, NOT `""`.** `render_line`'s
+        # empty-default exception would otherwise fire and a generated URL line
+        # would stop stating `fetch=`, which SR-URL-LIST decision 12 requires.
+        Attribute("fetch", (), "http", validate=_fetcher_reason, placeholder="<name>"),
         Attribute("meta", ("plain", "hashed"), "hashed"),
         # SR-ACQUIRED. Retain the bytes this URL returned.
         #
@@ -279,7 +349,7 @@ URLS = ListSpec(
         # into a network operation against a warm p95 of 27.2 ms, which is a
         # cost nobody asked for; a day is generous enough to be invisible and
         # short enough to catch a document that moved.
-        Attribute("ttl", (), "24h", validate=_ttl_reason),
+        Attribute("ttl", (), "24h", validate=_ttl_reason, placeholder="<duration>"),
         # SR-PII/W-99: the same attribute the `dirs` list carries, and it
         # means the same thing. A `url:` document is enrichable because
         # `.fux/acquired/` holds its bytes locally -- before the acquired

@@ -7,10 +7,10 @@ description: "The ref/tag/code edges ingest already extracts become a queryable 
 status: accepted
 date: 2026-08-20
 feature: the graph lane — three relational verbs, a derived plane, and a lazy walk
-owns: [src/fux/graph@f6edc21355ad, tools/graph-bench@9c330ea14b42]
+owns: [src/fux/graph@190867c8ad31, tools/graph-bench@9c330ea14b42]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 1675bb9b7a40d5517059cfe8e0c06075fe6d1541c4d3386674e76e4f84db58d7
+content_sha: aba1b4d7e48d95f02ae857de2397265f87c14b02a3b2dfbef514ad67d2ec28ce
 ---
 
 # SR-GRAPH — the graph lane
@@ -239,6 +239,62 @@ cannot read two different files — a neighbourhood around seeds ranked under
 weights that did not choose them is the failure that would make the saving worth
 nothing.
 
+**13. `graph --seed <id>…` walks from documents you name, and the query form is
+DEFINED as `--seed` over the query's top-k.** (W-160 — the second atom.)
+
+One function returns both forms' seeds, so nothing can disagree about
+`seed_depth`, about mass order, or about which candidate generator ran. Mass
+follows **argument order** — the same rank-mass rule decision 12's walk already
+applies to a ranked top-k — so reversing the seeds reverses the walk, and a
+test asserts it does.
+
+**A hand-named seed carries `rank`, never a score.** See
+[SR-CLI](0101_cli-surface.md) decision 13 for why, including the
+`1.0` / `1` divergence that settled it.
+
+**14. Three walk parameters are EXPOSED and INERT, ahead of the change that
+uses them.** (W-160 DoD 4.)
+
+| parameter | default | what it does when set |
+|---|---|---|
+| `kinds` | `ALL_KINDS` — every kind | walk only these edge kinds. `{"ref"}` is the case W-161 wants: *follow what the document linked to, not what it was tagged with*, because a tag is a hub that pulls unrelated documents together |
+| `link_idf_on` | `False` | divide an edge's weight by `link_idf(in_degree of its target)`. **The parameter most likely to move a ranking**, which is why it ships off |
+| `max_hops` | `None` | refuse mass to a node further than `n` hops from any seed. Inert at any value `>= iterations`, since three iterations already bound reach at three hops |
+
+⚠ **Why expose them before using them.** W-161 is a ranking change and owes
+[SR-RS](0133_predictions.md) decision 19's paired floor; the mechanism is not a
+ranking change and owes nothing. **Landing both together would make
+*"the walk moved"* and *"`ask` composes the walk"* one indivisible diff**, and
+no measurement could attribute a delta to either.
+
+⚠ **Inertness is a TEST, not a claim** —
+`tests/graph/test_walk_parameters_are_inert.py`, which also asserts each
+parameter **does** something when set. A knob inert at every setting is dead
+code wearing a feature's name, and the inertness half would pass for it too.
+
+⚠ **`ALL_KINDS` returns `graph.neighbours` untouched, not a filtered copy that
+keeps everything.** `neighbours` is pre-sorted and the walk accumulates floats
+over it in that order; rebuilding the list is equal today and one refactor away
+from not being.
+
+**15. `link_idf(n) = 1 / (1 + ln(1 + n))`, and it is deliberately not
+`1/n`.** A node nothing points at is `1.0`; `CLAUDE.md`, with 180 inbound edges
+on this repository, is about `0.16`. **Named after IDF because it is the same
+idea** — a link everybody makes says little about the document it comes from,
+exactly as a term on every document says little about the document holding it.
+`1/n` would make a hub weightless and turn *widely cited* into *ignored*; the
+log keeps a hub in the walk while stopping it from dominating it.
+
+⚠ **Nothing measures it yet**, which is the whole reason it ships off. W-161 is
+the item that has to, on whatever evidence rule W-156 settles.
+
+⚠ **It is the first place a `log1p` reaches the walk, and the two readers agree
+to `round(9)` rather than bit-for-bit** — measured on this repository, identical
+ordering, last-digit differences in four scores. That is
+[SR-NODE-SEARCH](0153_node-search.md) decision 1's stated contract and not a
+port defect; it is written down here so nobody reads a last digit as one when
+W-161 turns the parameter on.
+
 **A verb refuses a node nothing knows about, and says which end.** `path`
 validated neither `FROM` nor `TO` until 2026-09-11 (W-140 row 12): a typo
 printed *No route from … within N hop(s)* and exited **0**, byte-identical to
@@ -264,6 +320,134 @@ decision above names). **Capping the argument, warning above a threshold, or
 bounding the walk's work are three different answers** with different costs to
 a small graph, and picking one silently inside a defect fix would be the wrong
 place to decide it. Filed in `work/OPEN-WORK.md`.
+
+**16. 🔴 *`ask` IS UNTOUCHED* IS SUPERSEDED. The graph plane reaches `ask`**
+(W-161; Arpit, 2026-09-13).
+
+This record pinned *the graph lane does not move `ask`* with
+`tests_e2e/test_relational.py::test_the_graph_lane_does_not_move_ask`, because
+at the time the walk's value was unproven and `ask` was the reference surface.
+**The person who may reopen it did.** The rule is void; the test was inverted
+rather than deleted — see 16a — and the composition is
+[SR-ASK](0103_ask.md) decision 13.
+
+**16a. What replaced the pinning test, and why the inversion kept a half of
+it.** The old test asserted two things at once and only one of them died. *The
+graph plane must not reach `ask`* is now false by design; **the accelerator and
+the scan must return the same bytes** was always the real content and still
+holds — the tier runs after both candidate paths and reads the same derived
+plane, so a divergence there means the tier is reading something path-dependent.
+Deleting the test would have lost that, and the three composition tests beside
+it do not cover it: they compare verbs, not candidate paths.
+
+**16b. `fux graph "<q>"` seeds from `lexical`, and after W-161 that has to be
+written in code.** Decision 13 defines the query form as `--seed` over the
+query's top-k. While `ask` and `lexical` were one body, calling `run_query` gave
+that for free; now `ask` composes a tier, and seeding the walk from a list the
+walk already re-ordered would make `fux graph "<q>"` **a walk over its own
+output** — the seeds would move when the tier moved, `graph "<q>"` would stop
+equalling `graph --seed <lexical top-k>`, and the orientation verb would become
+path-dependent with nothing saying so. Both readers force the tier off for the
+seed query.
+
+**16c. The `ask` walk and the `graph` walk are DIFFERENT WALKS, deliberately.**
+Decision 14 exposed three parameters for exactly this moment, and here is what
+each caller sets:
+
+| | `fux graph` (orientation) | `ask`'s tier (answering) |
+|---|---|---|
+| `kinds` | `ALL_KINDS` | `ref` only — a `tag` edge makes the graph bipartite and one shared tag is a 200-document hub |
+| `link_idf_on` | `False` | `True` — a link everybody makes says little about the document it comes from |
+| `max_hops` | `None` | `1` — for orientation two hops is right; for an answer a second-hop document is a guess about a guess |
+
+⚠ **So a composition test may not compare `ask`'s `related` against bare
+`fux graph` output.** It has to pass `--kinds ref --link-idf --max-hops 1`, or
+it is comparing two different walks and calling the difference a failure.
+
+**16d. A `related` row's route names only an edge kind the walk was allowed to
+follow.** Found on the first real run against this repository: with
+`ask_kinds = "ref"` the route read `#2 via code`, crediting an edge the walk was
+forbidden to follow and had not followed — the walk had arrived through a `ref`
+edge and a `code` edge merely also existed between the same two documents.
+**A route a reader cannot verify is worse than no route**, and this tier's whole
+claim to honesty is that its provenance can be checked.
+
+
+**17. `routes()` IS BOUNDED BY WORK, AND A CUT-SHORT SEARCH SAYS SO**
+(W-140 row 12; Arpit, 2026-09-14 — option (c) of
+[`path-hops-bound`](../work/compare/path-hops-bound.compare.md)).
+
+`routes()` takes a `budget` of **node expansions** (`walk.EXPANSION_BUDGET`,
+200 000) and returns `(routes, truncated)`.
+
+**17a. A WORK bound, not a depth bound, and the distinction is the ruling.**
+Capping `--hops` was option (a) and is *a pre-registered threshold in
+everything but name*: measured on one corpus, shipped to every corpus, wrong on
+the first corpus shaped differently. **Work is the same on every corpus; depth
+is not.** `--hops` keeps meaning exactly what it means today.
+
+**17b. 🔴 `truncated` describes the SEARCH, never the result set.** A truncated
+search that found three routes may have missed a better one, so the flag cannot
+be an empty-list sentinel — which is why it is a second return value.
+
+> *"no route within 6 hops"* and *"no route found in the first 200 000
+> expansions"* are **different claims**, and `fux path` has shipped this exact
+> ambiguity once already.
+
+**17c. It is in `--json`, and that is the half that matters.** stderr is
+invisible to exactly the callers most likely to ask for a deep walk. Always
+present; `false` is a claim, not an absence (W-48). Text mode gets the honest
+sentence when nothing was found and a trailing note when routes were.
+
+⚠ **There is no MCP surface for it, because there is no `path` tool.** The
+compare doc's *"`--json` and MCP carry `truncated`"* names a surface that does
+not exist — `fux_related` returns a neighbourhood, not a route. **Stated rather
+than quietly dropped**: if a `fux_path` tool is ever added, this field is part
+of its contract from the first commit.
+
+**17d. The budget is NOT tunable**, for this record's standing reason: a tune
+file that could widen a search would make `--hops 2` mean different things in
+two repositories, and a route is evidence about a corpus rather than a
+preference.
+
+⚠ **200 000 is a number somebody picked**, and what makes it defensible is not
+the value — it is that exceeding it is **reported** rather than absorbed. The
+failure mode is a stated *incomplete* instead of a confident *no route*.
+
+**17e. The cost, stated: `fux path` can now return an INCOMPLETE result**, and
+every consumer has one more state to handle. That is real, and it is the reason
+option (a) was tempting. It is accepted because the alternative is a verb that
+**hangs** — and a hang is also an incomplete result, one that says nothing at
+all.
+
+
+**18. A `ref` edge carries anchor terms, and the graph plane does NOT**
+(W-168 step 1, 2026-09-15).
+
+The committed edge gained `at` and `al`. `Edge`, `edges_from_records` and
+`graph.json` are **untouched**: they lift `src`, `kind`, `dst`, `grade` and
+nothing else, so the plane's bytes, its schema and its byte-identity assertion
+across two builds are unchanged.
+
+🔴 **The reverse map ranking needs is a SEPARATE derived structure**, in
+`.fux/runtime/anchors/`, and keeping it out of `graph.json` is deliberate: the
+graph plane is read whole by `explain`, `graph` and `path`, and a query needs
+one term's in-edges, not every edge's words. Sharded by term hash, it opens one
+small file per query term.
+
+**It is the same argument this record already makes about communities**, one
+level down. Edges are committed because they are **local and diffable**;
+communities are derived because they are **global and would not be**. A
+per-target anchor view is global in exactly that sense — every linker
+contributes to it — so it is folded at read time, which is what keeps a
+one-file commit from producing a corpus-wide diff and what kept
+[L3](0005_LAW-3-deterministic.md) out of the conversation entirely.
+
+⚠ **Step 5 of [W-168](../work/open/W-168-search-improvements.md) —
+supersession-aware ranking — reads this same in-edge map.** *"The successor
+inherits the target's anchor text"* is a second read-time fold over one
+structure, not a second cross-document committed byte. Nothing about it is built
+yet.
 
 ### Consequences
 

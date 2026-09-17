@@ -1,0 +1,34 @@
+tree: /private/tmp/claude-501/-Users-arpitarya-my-programs-fux/5726476a-954f-49b6-9bb5-4cc894435e68/scratchpad/fuxtree
+contests: 538   paths: ['ask', 'answer']
+  25/538
+  50/538
+  75/538
+  100/538
+  125/538
+  150/538
+  175/538
+  200/538
+  225/538
+  250/538
+  275/538
+  300/538
+  325/538
+  350/538
+  375/538
+  400/538
+  425/538
+  450/538
+  475/538
+  500/538
+  525/538
+
+    path     n    off     on  better  worse  discordant    net
+     ask   538     57      7       2     52          54    -50
+  answer   538      4      2       1      3           4     -2
+
+headroom (SR-RS 22b), per path:
+       ask  improvement  479/538   regression    5/538 
+    answer  improvement  533/538   regression    1/538 
+
+🔴 The bar is the PRE-REGISTRATION's and this runner does not apply it.
+   A flip on `answer` and not on `ask` IS the refer-plane rescore (W-108).

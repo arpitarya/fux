@@ -6,12 +6,12 @@ title: SR-CONFIDENCE (0141) — how much the index believes its own answer
 description: "Four deterministic signals and one band, emitted with every answer, so a consuming agent can tell a grounded result from the closest thing in a corpus that never discusses the question."
 status: accepted
 date: 2026-08-27
-amended: 2026-08-28
+amended: 2026-09-15
 feature: the confidence plane
-owns: [src/fux/query/confidence.py@664d92120a9b]
+owns: [src/fux/query/confidence.py@e0641ff2c3be, tests/test_confidence_floor_off.py@f8e18c079a6e]
 laws: [L1, L3, L4]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 47fc7da2a8d37cc8bd606892a3c2b2e67f33604f643b6c41713285a5289c35eb
+content_sha: 23d8e8898ebc69d529af4ac81c965a0618313e986c018b906613bbc77bd86890
 ---
 
 # SR-CONFIDENCE — how much the index believes its own answer
@@ -197,12 +197,51 @@ should have declined, and this is the surface on which it declines.
    |---|---|---|
    | `none` | nothing scored above zero | abstain; `answerable` is `false` |
    | `partial` | a query term matches no document anywhere, **or** the cited bytes are `stale` | answer, and name what is missing |
-   | `weak` | `separation < SEPARATION_FLOOR` | do not answer; report what was searched |
+   | `weak` | `separation < SEPARATION_FLOOR` | do not answer; report what was searched — **`answerable` is `false`** |
    | `grounded` | otherwise | use it and cite it |
 
    `stale` lands in `partial` rather than `weak` because it is a **nameable**
    defect, which is what `partial` means; a `weak` result has nothing
    identifiably wrong and the ranking simply cannot choose.
+
+   **3a. 🔴 `weak` IMPLIES `answerable: false`** (W-176 gate 1; Arpit,
+   2026-09-14). Until that ruling `answerable` was `band != none`, so this
+   table said *do not answer* on the `weak` row while the payload beside it
+   said `answerable: true`. **Two fields on one payload disagreeing, and the
+   one an agent branches on was the permissive one.**
+
+   ⚠ **`band != none` could almost never be false**, which is why the defect
+   survived four measured runs. *Nothing scored above zero* is the one state no
+   real corpus produces: BM25F returns something for very nearly any query. So
+   `answerable` was structurally incapable of being `false` in the field, and
+   every run that looked for an abstention found none:
+
+   | run | result |
+   |---|---|
+   | [2026-08-28 blind unanswerable](../work/regression/2026-08-28-blind-unanswerable/report.md) | **20 of 20** blind-authored unanswerable questions answered |
+   | [2026-09-11 rerun](../work/regression/2026-09-11-blind-unanswerable-rerun/report.md) | **20 of 20** again, fourteen days and five ranking changes later |
+   | [2026-09-12 golden ladder](../work/regression/2026-09-12-golden-ladder/report.md) | **0 abstentions of 124** on every one of five rungs |
+   | [2026-09-13 benchmark captures](../work/regression/2026-09-13-benchmark-captures/report.md) | **10 of 10** planted unanswerables answered by both versions, one at `coverage: 0.0009` |
+
+   **None of those runs could name the cause**, because each measured the
+   symptom. The cause is one expression, and it is this one.
+
+   ⚠ **`partial` stays answerable, and the asymmetry is the whole point.**
+   `partial` is a nameable defect — a term no document contains, or stale bytes
+   — so a consumer answers it *and says what is missing*. `weak` has nothing
+   identifiably wrong to name, so there is no honest hedge to attach and the
+   only correct move is to report what was searched.
+
+   ⚠ **`separation_floor = 0.0` now turns abstention-on-separation off
+   entirely**, not merely the `weak` label. It was already a legal and loud
+   setting; the gate makes it louder, and
+   `tests/query/test_confidence.py::test_a_zero_floor_makes_every_answer_answerable_and_that_is_the_cost`
+   is where a consumer who sets it will find that sentence.
+
+   ⚠ **The band table and `answerable` are held in agreement by a test**, not
+   by these two paragraphs — `test_the_band_table_and_answerable_cannot_disagree`
+   walks every band. A band added later with no line there arrives *answerable
+   by default*, which is the direction that loses silently.
 
 4. **The text-mode declaration goes to stderr, never stdout**, and prints only
    under `--band`. Same contract as `_declare_archived` and `_declare_pending`,
@@ -340,9 +379,38 @@ doc_coverage_floor = 0.0   # engine default; 0.0 = the clause is OFF
 
 - ⚠ **What decision 7 was buying, now unguarded, stated plainly.** A consumer
   can set `separation_floor = 0.0` and **no answer is ever `weak` again**. That
-  is tuning away the *signal* rather than the ranking, it is silent, and
-  **nothing mechanical catches it.** A session reading a `grounded` from a
-  tuned repo learns less than it thinks it does.
+  is tuning away the *signal* rather than the ranking, and a session reading a
+  `grounded` from a tuned repo learns less than it thinks it does.
+
+  ✅ **It is no longer SILENT, and no longer uncaught (2026-09-14, W-164 gate 4).**
+  This bullet ended *"it is silent, and **nothing mechanical catches it**"* from
+  the day the reversal was accepted. Two surfaces now say so, from **one string**
+  (`doctor.FLOOR_OFF_NOTE` — two accounts of one fact is how they drift):
+
+  1. **`fux doctor`'s `confidence floors` row**, for whoever goes looking.
+  2. **A once-per-PROCESS note on `ask`'s stderr**, for whoever does not. The
+     person reading a `grounded` is the one who needs to know what it is worth,
+     and they are not running `doctor`. Once per process rather than per call: a
+     shell loop is a hundred processes and says it a hundred times, correctly;
+     `fux mcp` is one and says it once.
+
+  🔴 **It reports and never refuses**, which is this decision's own reasoning
+  applied to its own remedy: a check that rejected the value would be decision 7
+  coming back in a new costume.
+
+  ⚠ **Suppressed under `--json` and MCP**, and that is not politeness. `--json`
+  is a contract whose stdout is captured and diffed, and MCP's transport carries
+  no free-text channel to a human. **Both still carry the floor in the
+  `confidence` block** — point 1 below, *"the load-bearing half of the
+  reversal"* — which is exactly what makes suppressing the prose legitimate
+  rather than a silence. `tests/test_confidence_floor_off.py` asserts the block
+  still carries it on the very call where the note is withheld.
+
+  ⚠ **A merely LOW floor is not reported.** `0.02` is a judgement about a corpus
+  and the block publishes it; only **zero** makes `weak` unreachable, which
+  changes what the band can *say* rather than where it sits.
+  **`doc_coverage_floor = 0.0` is that clause's shipped default** and is never
+  reported — firing on it would fire on every repo there is.
 
 - **Two things replace the prohibition, and both are weaker than it was.**
 
@@ -554,7 +622,110 @@ deliberately NOT narrowed yet: this record's reach in that module spans nine
 functions including `cmd_ask` and `run_query`, so a short list would switch the
 gate off silently — worse than the line you are reading.
 
+**15. THE GRAPH HALF OF DECISION 4'S GUARD, which §Consequences named as owed
+and W-161 owes** — **a graph-lifted #1 may LOWER the band and may never raise
+it.**
+
+Decision 4 stops an expansion term raising a document's own band by never
+handing `_fill_confidence` the expansion. **The graph tier needs an active
+guard instead, because it adds no terms** — it changes *which document the band
+is describing*.
+
+`rank()` computes `top_doc_hashes` from the document it ranked first. When the
+walk promotes a different one, that field describes a document the reader was
+never shown. Both obvious answers are wrong on their own:
+
+| | why it fails |
+|---|---|
+| leave it | the band describes a document nobody saw |
+| recompute it for the shown document | a document the **links** lifted arrives with a higher `doc_coverage` than the words ever gave it — which is precisely a graph-lifted document raising its own band |
+
+**So: recompute for the shown document, and keep the lexical #1's value
+whenever the shown document's is higher.** The band then describes the answer on
+the page, and the tier can only ever cost confidence.
+
+⚠ **Weighted by `idf`, not counted.** `doc_coverage` is an idf-weighted sum, so
+a count comparison would let three common terms outrank one rare one and
+**reverse the guard on exactly the queries where it matters.** `query/__init__.py::_band_guard`,
+and its Node twin `run.mjs::bandGuard`.
+
+⚠ **`fux lexical --band` and `fux ask --band` now legitimately differ**, which
+§Consequences predicted. The difference is informative: the band describes the
+answer the reader was shown, and the two verbs no longer show the same answer.
+
+
+
+**16. An anchor-reached document reports the query's word as `missing`, and
+that is correct** (W-168 step 1, 2026-09-15).
+
+`top_doc_hashes` — decision 2's seam, and what `doc_coverage` is computed from
+— is *which of the query's terms the top-ranked document itself contains*, read
+off `record["terms"]`. Anchor terms are in no committed posting and are not in
+`terms`, so a document ranked #1 purely on what its linkers call it reports
+**coverage 0** and names the word in `confidence.missing`.
+
+🔴 **Not a defect, and deliberately not patched.** The band answers *what does
+the top document itself say?*, and the honest answer for such a document is
+*not this word — other documents use it about me*. A reader told `partial`, with
+the term named, can see exactly that and go and check. Folding anchor terms into
+`top_doc_hashes` would report full coverage for a document that does not contain
+the term, which is the one thing this block exists to stop.
+
+⚠ **The interaction is UNMEASURED and is not in
+[the pre-registration](../work/regression/2026-09-15-anchor-text/PRE-REGISTRATION.md)'s
+decision rule.** If turning the field on pushes a class of answers into
+`partial` or `weak`, that is a finding for Arpit and a second question — not a
+reason to widen the seam mid-run.
+
+**16a. The seam itself is untouched, so both paths still agree.**
+`top_doc_hashes` is derived in `rank()`, which both candidate generators reach
+with the same record dicts, so decision 8's guarantee — `--fast` and `--scan`
+cannot disagree about how confident fux is — holds with the field on. Asserted
+at `anchor = 2.0` by the 2026-09-15 differential run.
+
 ### Consequences
+
+- **`band` and `answerable` leave the process as counts, and nothing else of
+  this block does** (W-170, 2026-09-15). The observer record carries those two
+  values and no other part of the confidence block — no `missing`, which is the
+  consumer's own words, and no `coverage` floats. That is not an omission: the
+  hook's schema is closed to counts, names and hashes, and `missing` is the one
+  field here that is free text the person typed.
+
+- **The band is computed from the PINNED list, and that is the whole point**
+  (2026-09-14, W-162). `run_query` applies a `fux correct --pin` before
+  `_fill_confidence` runs, so **a pinned #1 that the corpus barely supports
+  still says `weak`.**
+
+  🔴 **The other order would have been a lie with a person's name on it.**
+  Banding the pre-pin list would report the confidence of an answer nobody was
+  shown, and the pinned row would arrive with a `strong` band it had not
+  earned — the one case where a reader is least able to check, because a human
+  put the document there on purpose. **A pin decides the ORDER; it may not
+  decide how much the index believes itself.**
+
+- **`fux lexical --band` emits the same block as `fux ask --band`**
+  (2026-09-14, W-160), because it is the same body and the band is built from
+  the final result list. Asserted rather than assumed: the freeze test compares
+  `--band` output among the flag combinations it walks.
+
+  ⚠ **After [W-161](../work/open/W-161-graph-composed-ask.md) the two will
+  legitimately differ**, and the difference will be informative rather than a
+  defect: the band describes *the answer the reader was shown*, so a graph-lifted
+  document has to be able to move it. **What must not happen is a document
+  lifted by the graph tier raising its own band** — the same guard decision 4
+  already states for expansion terms, which `_fill_confidence` enforces by
+  receiving the original query and never the expansion. W-161 owes the graph
+  half of that guard.
+
+- **The "stderr, never stdout" family gained a third member on 2026-09-14**
+  (W-165 fix 2). `_declare_confidence` and `_declare_archived` have always
+  written to stderr for the reason decision 4 gives — `find` pipes bare paths,
+  `--json` is a contract, and both of these *declare* rather than gate. The
+  no-match line `No confident matches.` did not, and was the last prose on
+  stdout; it does now. **Nothing about the band moved**: it is still gated on
+  `--band`, still computed on the final list, still on stderr. What changed is
+  that the stream is no longer split between two kinds of note.
 
 **`support` is bounded by `--top`, and cannot honestly be a corpus-wide count.**
 A corpus-wide *"47 documents matched"* would be the more useful number. The

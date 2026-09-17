@@ -32,8 +32,143 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-09-13**.* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-09-16** (Cowork, inbox rulings).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
+
+### The Blocked-on-Arpit inbox is EMPTY (2026-09-16, Cowork)
+
+- **W-144 ruled again — `dump` is a CONTROL.** The 2026-09-15 rule (*net positive
+  on `dump`, `content` and `main`*) was **unsatisfiable**: `dump` sits at 30/30 at
+  baseline and can never net positive. Arpit ruled it a **specification defect**,
+  not a threshold to move — `dump` was grouped with the benefit families because
+  all three are *table* families, and its own generator calls the prose document
+  correct in both arms. Benefit families are now `content` + `main`; controls are
+  `inverse`, `placebo`, `verbose` **and `dump`**. Range `{0.4→0.3→0.2→0.15}`,
+  descending, first-that-clears, and every other step: **unchanged**. Next is a
+  **re-frozen** `PRE-REGISTRATION.md` in a new `<date>-b-sweep-2/` stating the
+  reclassification's reason, then the run in `fux-lab`. Step 1 (`verbose`) is ✅.
+- **W-193 ruled — option 1, leave `2` to argparse.** SR-CLI decision 5 is amended
+  to *fux produces `0`, `1`, `130`; argparse produces `2` for a usage error before
+  the boundary*, and the **strict-mode reservation on `2` is retired**. CHANGELOG
+  must name the `fux update` → `fux ingest` rename **and** the `2` a consumer will
+  see, so a pipeline can tell a rename from an outage. No `src/` change expected;
+  if one is needed, stop and re-inbox.
+- Nothing in the queue waits on Arpit. The next gate is **W-136 phase 5** — prompt
+  5 (run both sets), then scoring in a chat Arpit attends.
+
+### The `fux.toml` audit — and a config table that was unusable for months (2026-09-14, Cowork)
+
+- **`[sources] urls_file`** now sits beside `dirs_file`; `[sources.url]
+  urls_file` is refused by name. The move makes an always-true separation
+  visible: **`[sources.url]`'s presence enables fetching, the key only names
+  the list.**
+- **Every closed-domain key is written live** — `meta`, `keep`, `enrich`,
+  `update`, `fetch_at_answer`. `ttl`, `sweep_minutes` and `acquired_max_bytes`
+  stay out because their defaults can move.
+- 🔴 **`[sources.url.config]` was BROKEN for any repo loading both shipped
+  fetchers, and had been since it existed.** One table went verbatim to every
+  fetcher; each `configure()` **raises** on a key it does not know; so
+  `cdp_port` refused `http.py` and `timeout_s` refused `cdp.py`, and the only
+  working value was the empty table. **That is why it shipped commented out** —
+  the symptom was in the file for months and read as caution. It is now a
+  shared level plus `[sources.url.config.<fetcher stem>]`, with the scaffolded
+  sub-tables **derived from the fetchers by `ast`** (never executed — `cdp.py`
+  carries network code).
+- **The adapter cap is intact and the distinction is exact:** fux matches a
+  **table name** against a filename it already knows (`fetch=<name>`'s own
+  rule). It still declares no key inside, and a test asserts that.
+- **`.env`/environment beat `fux.toml`** for every `cdp.py` key
+  (`FUX_CDP_PORT`, …). `fux.toml` is committed; one port pins every clone.
+- ⚠ **`Config.agents` defaulted to three vendors of four.** Dead and wrong —
+  the worse half, because a stale default reads as authority.
+- ⚠ **Contract change:** a `dict` at the top of `[sources.url.config]` no
+  longer reaches `configure()`; only the top level is namespaced.
+
+### `fetch_at_answer` — the never-fetch mode now has a selector, W-174 SHIPPED (2026-09-14, Cowork)
+
+- **`[sources.url] fetch_at_answer`**, bool, default `true`. `false` pins every
+  `url:` citation to `.fux/acquired/` at answer time: no fetcher loaded, no
+  `connect()`, no socket, verdict `as-ingested`. Built, tested (12 unit + 3
+  e2e), eight records amended, W-174 archived. **Not committed** — see the
+  concurrency note below.
+- 🔴 **The finding worth carrying:** the behaviour already existed.
+  `freshness.Policy(mode=NEVER)` and `refer/_obtain`'s never-branch have
+  shipped since the module did, **with tests**, and `refer_answer.py` wrote
+  `Policy(mode=ALWAYS, …)` literally. **A branch with a test and no selector
+  reads exactly like a branch in use** — nothing in this repo catches that, and
+  `freshness.py`'s own docstring had been naming the unreachable caller in
+  prose the whole time.
+- ⚠ **Do not confuse it with the two neighbours.** `--no-refer` turns the refer
+  plane off (no rescoring, no line ranges, no verification); `update=never` is
+  the **update-time** clock. Decision 16 of SR-URL-FRESHNESS is the third cell
+  of decision 15's table and states all three.
+- **Two wrong sentences were found by reading the records under the code.**
+  SR-ACQUIRED claimed `update=never keep=true` meant *"no socket opens"* — never
+  true. The `fux-config` guide told agents unknown `fux.toml` keys were
+  *"silently ignored"* — wrong since SR-CONFIG decision 14. Both corrected here.
+- **Node is settled and owes nothing:** it never fetches (W-107 R6), so it has
+  always behaved as `fetch_at_answer = false`; under `false` the two readers'
+  `url:` verdicts converge exactly.
+- **Three follow-on rulings by Arpit, same day, on the scaffolded `fux.toml`:**
+  `fetch_at_answer` and `update` are written **live with their defaults** (they
+  had both been commented), and the starter is now a real template file,
+  `src/fux/templates/fux.toml.txt`, read like `pii.toml.txt` and the fetchers.
+- 🔴 **The live-keys ruling generalises, and the rule is worth carrying:** a
+  `fux.toml` key whose **value domain is closed and small** — `meta`,
+  `update`, `fetch_at_answer` — is written out with its default, because the
+  written line is the complete menu and nobody greps a record for a flag they
+  do not know exists. A key whose default is a **number that may rise** —
+  `acquired_max_bytes`, `sweep_minutes` — stays out, so raising it reaches
+  every repo. **The test is *can this value go stale?*, not *is it
+  important?*.** The cost is on the record: a future change of default will not
+  reach a scaffolded repo.
+- ⚠ **`{default}` is substituted, not `.format`ted**, now that the template is
+  an editable file — `format` would raise on any `{` a later doc edit adds.
+
+- ⚠ **Tree state when this was written:** a concurrent session holds a large
+  staged changeset and uncommitted `src/` edits. Four suite rows are red and
+  **all of them theirs.** Two remain as of the last full run —
+  `test_doc_links` (their cage proposal's sibling-repo link). The others
+  cleared while this session ran — and ⚠ **that session COMMITTED this one's
+  record edits inside `92aa5960` and `cf591586`.** Not harmful here, but it is
+  CLAUDE.md §two-sessions' named hazard, observed a second time: re-derive
+  `git status` immediately before staging, and commit with explicit
+  pathspecs.
+
+### The backlog was swept: four new 🟢 items, three stale sentences fixed (2026-09-14, Cowork)
+
+- **W-163** (eight `fux doctor` rows), **W-164** (four small gates), **W-165**
+  (three CLI honesty fixes), **W-166** (carry-forward invalidation) — all
+  promoted from `BACKLOG.md`, all 🟢 `agent`, each with a handoff. **Six 🟢
+  items now sit in the queue with W-160 and W-162**; nothing agent-side is
+  blocked.
+- Three records corrected as statements of fact (B-032, B-239, B-240) and
+  restamped. **Do not "fix" `records/0149_expand.md`'s hash** — its staged
+  copy belongs to another session.
+- What stays in the backlog stays for a reason: `unruled` is Arpit's,
+  `unmeasured` waits on golden, `cost` never graduates.
+
+### 3.0.0-alpha.0 has a branch and five work documents — nothing built (2026-09-13, Cowork)
+
+- **Branch `release/3.0.0-alpha.0`** off `main`. **The version is NOT bumped** —
+  `src/fux/__init__.py` and the three Node sites move together under
+  `check-version-parity.py`, and that is Claude Code's first commit on the branch.
+- **Ratified by Arpit, filed as accepted:** [ask-graph-expansion](compare/ask-graph-expansion.compare.md)
+  — `fux lexical` and `fux graph --seed` are atoms, `ask` = their composition,
+  a *boosted* tier and a labelled *related* tier, `answer` reads `ask`, Node
+  gains the graph plane → **W-160** (atoms, 🟢) and **W-161** (the composed
+  `ask`, 🔴 blocked on W-156). [fux-correct](compare/fux-correct.compare.md) —
+  a human question line on the enrichment file, rare `--pin`, eval row, guide
+  skill + agent steering → **W-162** (🟢).
+- **Proposed, not ruled:** [abstention-gates](compare/abstention-gates.compare.md)
+  (which gates; **the shape is ruled**: a gate chain, every signal returned,
+  `output.toml` decides visibility), [search-improvements-v3](proposals/search-improvements-v3.md)
+  (ten ideas, each graduates alone), [fux-inspect](../archive/proposals/fux-inspect.md).
+- **Standing constraint on all of it:** every ranking change lands behind
+  **W-156** and needs golden questions that exercise it (SR-RS d23). Link-
+  dependent and unanswerable questions in the key are **Codex's hands**.
+- **Immediate next step:** Arpit reads the two accepted compare docs; Claude
+  Code takes W-160 on the branch.
 
 ### 🔴 SIX ITEMS BUILT IN ONE SESSION, AND NOTHING IS COMMITTED (2026-09-13, Claude Code)
 
@@ -465,7 +600,7 @@ nothing else**. Four more surfaces had been transcribed and never checked, and
    transcriptions — and not more arm coverage.
 
 ⚠ **Four obligations did NOT close** and are
-[W-148](open/W-148-what-the-two-readers-still-owe.md), `lane: arpit`: CI cannot
+W-148 (closed 2026-09-15), `lane: arpit`: CI cannot
 reach a golden corpus (three routes, none chosen), Node's latency has no
 instrument (`fux-benchmark` unbuilt), `log-probe.yml` has never run, and
 SR-API's renderer split is staged. **Two are his calls.**
@@ -805,7 +940,7 @@ by agents.*
 
 - Arpit's Codex quota ran out mid-phase-1. He ruled that Claude write the
   feature-coverage documents and the **124-question answer key** so phase 2 is not
-  blocked, and that [W-145](open/W-145-codex-regenerates-the-key.md) be filed in
+  blocked, and that W-145 (filed then; closed as overtaken 2026-09-15) be filed in
   the same breath for Codex to regenerate it.
 - **The key is in the chat, not on disk.** He chose option (2). There is no
   `golden-answer/answers.jsonl` on this machine, and the one-rule prohibition is
@@ -962,10 +1097,10 @@ control rebuild, W-96's paragraph.
 
 ### The inbox has a proposed answer per row; Arpit ratifies, Opus executes (2026-09-05, later)
 
-**Read [`proposals/unblock-2026-09-05.md`](proposals/unblock-2026-09-05.md)
+**Read [`proposals/unblock-2026-09-05.md`](../archive/proposals/unblock-2026-09-05.md)
 before working anything on the `arpit` lane.** Eleven rows were blocked, six
 past the 5-day threshold; each now has a proposed default (`R-1`…`R-11`) with
-its evidence, and [the prompt beside it](proposals/unblock-2026-09-05-claude-code-prompt.md)
+its evidence, and [the prompt beside it](../archive/proposals/unblock-2026-09-05-claude-code-prompt.md)
 is the ratification vehicle — a bracket per line, blank means blocker.
 
 🔴 **Three rows turned out to be facts, not decisions, on re-derivation:**
@@ -2280,6 +2415,55 @@ the reason is that the measuring environments are gone.**
 ## 2 · In flight, and the immediate next step
 
 *Updated **2026-09-12** (Claude Code, Opus) — maintainer line: this session.*
+*Updated **2026-09-13** (Cowork, Opus) — maintainer line: this session.*
+
+### The golden benchmark was reset and rebuilt (2026-09-15, Cowork)
+
+**Read this before touching anything near `work/golden/`.** The shape a previous
+session would remember is gone:
+
+- 🔴 **Arpit deleted the answer key, `golden-answer/`, and the 124 released
+  questions.** **The seed corpus and the eight ladder rungs survive** and are
+  unchanged. Every old id (`g001…`) is **orphaned and never reused** — a filed
+  number from them may not be compared with anything scored from here on.
+- **There are two question sets, numbered, not named after their author** —
+  **set 1** by Codex (`s1-001…`), **set 2** by Claude from `seed/` only
+  (`s2-001…`). Same corpus, same ladder, **run and reported apart, never pooled**.
+- **No answer key exists as a file.** Arpit holds both and pastes what a run
+  needs; the *"the file, or the chat?"* question is **deleted** from every prompt.
+  A prompt that still asks it is stale.
+- **Six prompts now, numbered in the order he runs them:** 1 seed (documents
+  only) · 2 Codex writes set 1 · 3 Claude writes set 2 · 4 corpus, blind ·
+  5 run + **hand-off** · 6 Codex scores. `RETIRED-codex-release.md` is kept and
+  must not be run.
+- 🔴 **Prompt 5's hand-off is the design.** It carries what fux **answered and
+  cited**, not only what it ranked, and Arpit walks it to Codex. **The only place
+  a golden answer and a fux answer ever meet is a chat he is sitting in.**
+- 🔴 **Law [L11](../records/0012_LAW-11-sealed-answer-key.md) closes every agent
+  out of a key file and closes Claude out of a paste too.** The one exception is
+  **authoring set 2**, one handoff wide: that session writes no file, hands the
+  answers over in the chat, and **never runs a rung or returns**.
+- ⚠ **Set 2 will never be `blind`** — author and runner are one model family.
+  That is an assumption filed as SR-LAW-11 decision 7, not Arpit's ruling.
+- **Difficulty is a count now, not a label** — `tools/golden-difficulty/`,
+  `d ≤ 1` / `2` / `≥ 3`, unanswerable floored at hard, plus a per-rung distractor
+  count. 🔴 Never derived from fux's own results. **The bands are movable only
+  until a number is scored against them** (SR-RS 10b).
+- **Superseded 2026-09-15: he ran both.** Set 1 (Codex, 125 questions) and set 2
+  (Claude, 124) are in the tree — **staged, his to commit** — questions-only, and
+  both keys are his. The golden
+  lane is agent-closable again — next is **prompt 4**, and 🔴 **it needs a session
+  that has never read `questions/`** — [W-136](open/W-136-golden-benchmark.md).
+
+### In flight: the 3.0.0-alpha.0 branch is open and empty of code (2026-09-13, Cowork)
+
+- **W-160** is the first build item on `release/3.0.0-alpha.0` — the two atoms
+  and the Node graph plane; **not a ranking change**, so nothing gates it.
+- **W-162** (`fux correct`) is the second; also ungated.
+- **W-161** waits on W-156 and on W-160. Do not start it.
+- **Immediate next step:** bump the version on the branch (all four sites,
+  parity green), then W-160.
+
 
 ### DONE, not in flight: the benchmark's first run is filed (2026-09-12, Claude Code)
 
@@ -2333,7 +2517,7 @@ byte-equal by [`tests/test_claude_md_laws.py`](../tests/test_claude_md_laws.py).
   [`tests/test_sr_config_keys.py`](../tests/test_sr_config_keys.py) holds
   SR-CONFIG ↔ `config.py` and SR-TUNE ↔ `tune.py` equal in both directions, and
   **an unknown `fux.toml` key is now refused by name** rather than ignored.
-- **[W-146](open/W-146-the-rest-of-l0.md) is what is left**, and it is Arpit's: the
+- **[W-146](../archive/open/W-146-the-rest-of-l0.md) is what is left**, and it is Arpit's: the
   26-row inventory naming eleven `CLAUDE.md` sections that are technical and
   unhoused, plus two rulings — whether `SR-WORK-QUEUE` is written, and how far
   *never restates* reaches into docstrings. ⚠ **This session applied the narrow
@@ -3065,7 +3249,7 @@ Claude Opus 5 (1M context).
   [`archive/v0.26-implemented/PLAN-v0.26.md`](../archive/v0.26-implemented/PLAN-v0.26.md).
 
 - The replacement architecture is **index-and-refer**, specified in
-  [`paper/the-fux-index-paper.md`](paper/the-fux-index-paper.md): rank from a
+  [`paper/the-fux-index-paper.md`](../docs/paper/the-fux-index-paper.md): rank from a
   small index committed to git; fetch content from the systems that own it;
   verify at answer time.
 
@@ -3120,7 +3304,7 @@ the majority of the code for a minority of the value.
 committed index cannot be small and the architecture is falsified. So M1 runs
 *before* anything is built on it, including the package scaffold, against a
 threshold pre-registered in the [handoff](../archive/v0.30-rev1-planning/v0.30.0-m0-m1-gate-handoff.md)
-§5.4 and [paper §8](paper/the-fux-index-paper.md).
+§5.4 and [paper §8](../docs/paper/the-fux-index-paper.md).
 
 **Moving that threshold after seeing the numbers is the single worst thing a
 successor can do here.** A recorded negative that saves months of building is

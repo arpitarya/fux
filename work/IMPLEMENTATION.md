@@ -28,6 +28,385 @@ Rules:
 
 
 
+## 2026-09-16 — **the queue empties of agent work: W-188, W-193, W-144 close; phase 5 runs**
+
+| item | what landed | evidence |
+|---|---|---|
+| ✅ **W-188 CLOSED** | the Node column ran: **60/60 ranked lists identical, max &#124;Δscore&#124; = 0.000000**, hit@k identical, **0 of 52** answer rows differing. `answer_node` executed for the first time and its named hazard did not materialise | [run](regression/2026-09-16-node-column/report.md) |
+| ✅ **W-193 CLOSED** | `2` is argparse's; decision 5 amended, the dead strict-mode reservation **retired**, and a structural test asserts no `FuxError` site produces one | [SR-CLI](../records/0101_cli-surface.md) decision 5 |
+| ✅ **W-144 CLOSED — and it SHIPPED a ranking default** | `PASS` at **`b = 0.15`**, the first descending value moving **both** benefit families with all four controls holding. **SR-RANKING decision 3 now carries the first default there that is measured rather than inherited**, and **22 144 byte-identical** scan-vs-accelerator comparisons back it | [verdict](regression/2026-09-16-b-sweep-2/VERDICT.md) |
+| 🔴 **why `0.15` and not `0.3`** | the benefit families cross at **different** values, and the rule requires **both**. A rule asking for *either* would have shipped `0.3` and left half the mechanism unmeasured behind a passing verdict | [analysis](regression/2026-09-16-b-sweep-2/ANALYSIS.md) |
+| ✅ **W-136 phase 5 RAN** | 249 questions, 498 calls, both sets apart, **no score** — the hand-offs are Arpit's to give Codex | [run](regression/2026-09-16-golden-rung-00100/report.md) |
+| 🔴 **phase 5's two findings** | **set 2 declines 41.9 % against set 1's 28.8 %** — authorship visible in the instrument, and **not** a claim either set is better; and **`weak` ⟺ `declined` exactly, 249 of 249**, SR-CONFIDENCE's gate observed at scale | same |
+| ✅ **W-175's harness** | built, and **refuses to run without paraphrases** — it may author neither the corrections nor the blind paraphrases | `tools/quality-controls/correction_generalisation.py` |
+| 🔴 **W-168 step 2 STOPPED before it started** | **0 of 33 identifiers survive the analyzer** (3 *mangled* — `DAIRY-2` → `dairi`), so the premise is true and worse than stated — **but only 4 of 249 questions ask by an id**, below the floor. W-191's lesson applied one step earlier, before ~500 subprocesses | [run](regression/2026-09-16-identifier-survival/report.md) |
+| 🔴 **the queue has NO green row** | every open item now needs Codex output only Arpit can commission: prompt 6 (scoring), the paraphrase prompt, prompt 7 (links), prompt 8 (id-queries) | [OPEN-WORK](OPEN-WORK.md) |
+
+**Both suites green, whole** — 4 886 unit, 144 e2e, 36 Node.
+
+---
+
+## 2026-09-16 — **W-154 ANSWERED, and W-191 specified: three runs, two about the instrument**
+
+| item | what landed | evidence |
+|---|---|---|
+| 🔴 **W-154 closes: `FAIL`** | `rerank_weight = 1.0` makes `ask` **worse** — 7 better against 47 worse, net **40** on 54 discordant, `p = 0.0000` against a required 16, **both headrooms open**. Read with Part A's **+15 to +19 ms p50**, the item's own question is answered | [verdict](regression/2026-09-16-rerank-quality-b2/VERDICT.md) |
+| **the repair worked** | baseline **3.3 % → 21.9 %** once the citing document is excluded — close to the 18.3 % predicted before the bar was written | [reachability](regression/2026-09-16-rerank-endpoint-reachability/report.md) |
+| **the bar never moved** | decision 19's floor identical across all three runs; the new pre-registration **committed alone** so the freeze is checkable in `git log` | [PRE-REG](regression/2026-09-16-rerank-quality-b2/PRE-REGISTRATION.md) |
+| 🔴 **a path measured OUT, not skipped** | both `answer` criteria **0 of 120** at baseline → `INCONCLUSIVE` by construction, so it was declared out of scope **in advance** rather than run for ~1 080 subprocesses to file a foregone conclusion. **W-108's two-mechanism separation stays undelivered, with a measured reason** | 22d |
+| ⚠ **a wrong story caught before it was frozen** | *"the citing document monopolises the passage set"* — measured, answers carry **19.4 passages**, it is present in 30/30 and the **only** document in **0/30**. A frozen document would have carried a false sentence justifying a right decision | the reachability check |
+| 🔴 **the run reported its own repair incomplete** | **28 of 47 breaks won by another document QUOTING the citing sentence** — this repo quotes itself heavily, so removing one `source` leaves the others. Direction **survives** at net 12 on 26 discordant, `p = 0.0290`, **at exactly the floor**. **Widening the exclusion is not the fix**: an exclusion set that grows until the result is clean is not an endpoint | [analysis](regression/2026-09-16-rerank-quality-b2/ANALYSIS.md) |
+| **SR-RS gains 22e and 22f** | a **control** is held to 22d too — a saturated one reports nothing, and an arm set needs one **shown** to spend its headroom; and regression headroom is measured **in the baseline arm**, because *right in both* reports what survived rather than what was at risk | [SR-RS](../records/0133_predictions.md) |
+| ✅ **W-144's control is built and proven** | `verbose` holds 30/30 across the ruled range and **breaks to 0/30 at `b = 0`**. Without it, `b = 0` and `b = 0.15` are **indistinguishable on every other instrument** — the blind spot was one value wide | [probe](regression/2026-09-16-b-sweep-2-control/report.md) |
+| 🔴 **W-144 → Arpit** | the ruled rule is **unsatisfiable**: `dump` is saturated at baseline and can never *net positive*. Strict → nothing ever clears; non-negative-where-saturated → `b = 0.15`. **Not chosen by the runner** | [W-144](../archive/open/W-144-structure-aware-extraction.md) |
+| ✅ **W-191 specified** | [prompt 7](golden/prompts/7-codex-link-bearing-seed.md) — 12 links, **3 documents findable ONLY by their anchor text**, one dense cluster; documents are **Codex's**. The per-rung `ref` census is **generated and exits 2 on zero**, so a link run gates rather than rediscovers | [census](../tools/quality-controls/ref_edge_census.py) |
+
+**Both suites green, whole.**
+
+---
+
+## 2026-09-15 — **W-192: the arm order is ruled and the blind-paraphrase prompt exists**
+
+| item | what landed | evidence |
+|---|---|---|
+| **the pre-registration is frozen** | before a single correction exists, quoting the compare doc's §6 rather than restating it. N = 12 / M = 5, paired, top-3 of the corrected document | [PRE-REGISTRATION](regression/2026-09-15-correction-generalisation/PRE-REGISTRATION.md) |
+| **the bar is computed, not asserted** | decision 19's table for the observed flips; **a net of 6 is the floor of all floors** and nets of 1–5 clear α at no discordant count, so a net of 5 is a measured negative with no further arithmetic | [SR-RS](../records/0133_predictions.md) decision 19 |
+| **the tilt check is a conjunction** | no golden answerable question may lose its top-1, **not** traded off against the net — a mechanism that fixes 12 corrections by reordering the corpus is a regression with a good anecdote | the compare doc §6 |
+| **the arm order is RULED** | **(iii) Codex end-to-end first** — no upstream, and the only arm whose corpus the measurer never graded, which is the compare doc's own condition. Then (ii) fux's own tree, then (i) dogfood — last because twelve real failures are accrued, not scheduled | this change |
+| 🔴 **blindness is IN the prompt** | the paraphraser sees the question and never the correction, the document or a score; no `ask`/`find`/`answer` on the questions; a question already seen is **skipped and declared**. **A leaked paraphrase produces a filed number shaped exactly like a clean one**, and there is no downstream check for it | [the prompt](regression/2026-09-15-correction-generalisation/prompt-codex-paraphrases.md) |
+| **an arm short of 12 is reported at the N it ran** | never topped up with invented failures, never pooled with another arm to reach 12 | the pre-registration |
+| **W-175 is 🟢 now** | the harness is what is left, and it never waited on any of this | [OPEN-WORK](OPEN-WORK.md) |
+
+**Nothing measured, and nothing may be** until Codex writes the paraphrases.
+The directory is legally half-empty under §Per-run contract.
+
+---
+
+## 2026-09-15 — **W-178: a consumer's fetchers open the same way their decoders do**
+
+| item | what landed | evidence |
+|---|---|---|
+| **`fetch=` is typed** | `Attribute("fetch", (), "http", validate=_fetcher_reason)` — a module stem, shape-validated. `fetch=glassbox` resolves to `.fux/fetchers/glassbox.py`, which the consumer owns | [SR-URL-LIST](../records/0116_url-list.md) decision 15 |
+| **one pattern, not two** | the validator reuses the **decoder** name regex rather than growing a second: fetchers and decoders are one consumer-plane pattern, and a future change to either is a question about the other | [SR-DECODE](../records/0139_decode.md) |
+| 🔴 **shape, never existence** | importing a fetcher to validate a line runs consumer code that may `connect()` — **reading a committed file would open a socket to decide whether a line is well-formed**, on a path L4 fences. Stronger than the decoder's own reason for the same split | decision 15a |
+| **the header defect, caught first** | `_urls_header()` hardcoded `<duration>` for every attribute with no `values`. Flipping `fetch` would have written `fetch=<duration>` into **every repo `fux setup` touches** — W-140 row 18 returning through its own fix. `Attribute.placeholder` is the field; no special case in `setup.py` | decision 15c |
+| **`fux doctor` gains `fetcher bindings`** | the mirror of `decoder bindings`. ⚠ **It reads the LIST, not the index** — a binding is interesting when it matches no *document*, a fetcher name is wrong when it matches no *file*, and that is true the moment the line is written | [SR-DOCTOR](../records/0152_doctor.md) |
+| **the default stays `"http"`** | not `""` — `render_line`'s empty-default exception would otherwise fire and a generated URL line would stop stating `fetch=` | decision 15b |
+| **the drift that predated the ruling** | the closed tuple sat in the grammar while `urlsrc._fetcher_path()` **and that module's own docstring** described the open behaviour as fact. The W-83 class; the item existed before the ruling arrived | decision 15e |
+| **captured** | a consumer's `glassbox.py` answers a real query, cited and `current`; the doctor row passes, then catches `fetch=glasbox` | [run](regression/2026-09-15-consumer-fetchers/report.md) |
+| 🔴 **measured, not predicted** | a missing fetcher is **not a per-line skip — it is a whole-run failure**. `fux ingest` exits 1 and indexes **zero** documents, URL-free directories included. The transient-failure guarantee covers a fetch that *fails*, never a fetcher that cannot be *loaded*, and that was written down nowhere. **Not escalated** — a per-line skip would mean silently indexing a subset of the corpus | [SR-REFUSAL](../records/0146_refusals.md) |
+| **fixed on the way** | `load_fetcher`'s error said *"run `fux setup`"* — right for an empty directory, misleading beside a real `glassbox.py`. It lists the sibling stems now | `tests/ingest/test_urlsrc.py` |
+| **Node** | `ingest/sourcelist.mjs` narrowed to `parse` (it is the `dirs` half; Node never fetches), and the gap that narrowing leaves is closed by a **parity** test on the `dirs` attribute tuple — the stronger check | [SR-NODE-SEARCH](../records/0153_node-search.md) |
+
+**Both suites green, whole** — 4 813 unit, 144 e2e, 36 Node.
+
+---
+
+## 2026-09-15 — **W-177: `fux update` is deleted; `fux ingest` is the one verb**
+
+| item | what landed | evidence |
+|---|---|---|
+| **the verb is gone** | parser entry, `_cmd_update`, `sources.cmd_update` and the hidden `ingest --refresh-urls` alias, all deleted. **No deprecation shim** — W-63's reason for keeping `--refresh-urls` (older, likelier to be in CI) does not reach a three-week-old verb | [SR-CLI](../records/0101_cli-surface.md) decision 16 |
+| **the whole surface moved** | bare (fetch the stale URLs) · `--check` · `--json` · `--failed` · positional `<entry>` · `--all` renamed **`--refetch-all`**, because beside `--full` the old name read as its synonym while one selects URLs and the other re-extracts documents | decision 16b |
+| 🔴 **a bare `fux ingest` goes to the network** | the L4 fence moved off the default verb. `plan_url_refresh` decides and announces; `cmd_ingest` runs. Narrow-by-default is untouched — W-82 ruling 3 is about *which* URLs | [SR-URL-INGEST](../records/0107_url-ingest.md) decision 8 |
+| **the offline form is `--no-fetch`** | same flag, same meaning `fux add` carries. Public surface, for CI and air-gapped clones; no `--offline` alias | decision 16c |
+| **the hook/daemon split is by CALLER** | `fux hooks` writes `fux ingest --no-fetch` into `post-merge`; the daemon writes the bare verb; `--spawn-runner`/`--runner` are offline by construction | [SR-MAINTENANCE](../records/0129_hooks.md), decision 16d |
+| **the fence is a test, not an intention** | `test_a_hook_path_ingest_opens_no_socket` runs a real ingest with `socket.socket` monkeypatched to raise, against a **real consumer fetcher that opens one** and leaves a marker file — because ingest *catches* a fetcher exception and exits 0, so the marker is the only evidence that survives. Negative control run: without the flag, it trips | `tests/test_source_verbs.py` |
+| **`--check` beats `--list-skipped`** | two exit-early flags on one verb, ruled rather than left to argparse's order | [SR-INGEST](../records/0106_ingest.md) decision 21b |
+| **the surface captured** | a three-document, two-URL throwaway repo, the fetcher logging every call. Pinned `update=never` never fetched (`--refetch-all` included); `--no-fetch` calls it zero times | [run](regression/2026-09-15-ingest-absorbs-update/report.md) |
+| **no law changed** | SR-LAW-4 says *paths*, plural. Its §1 rationale table was edited (the row is `fux ingest` now); the law's text was not | [SR-LAW-4](../records/0006_LAW-4-offline-by-default.md) |
+| **blast radius** | 13 modules, 12 records, 6 shipped agent skills (re-rendered into `.claude/`, `.agents/`, `.kiro/`), the Node twin's `CLI_VERBS`, `.fux/README.md` and its template, README, GLOSSARY, handbook, CHANGELOG | this change |
+| 🔴 **found, not fixed: `fux update` exits `2`** | SR-CLI decision 5 reserves `2` and says fux never produces one. Argparse does, it predates W-177, and W-177 makes it reachable **from a command line valid in the released 2.0.1** — so a consumer's CI reads a rename as the runner breaking. Turning argparse's usage exit into `1` changes every verb's contract, so it is **Arpit's** | [W-193](../archive/open/W-193-argparse-exit-two.md) |
+
+**Both suites green, whole** — 4 782 unit, the e2e suite, and 36 Node tests.
+
+---
+
+## 2026-09-15 — **both question sets exist; W-189 and W-145 close**
+
+| item | what landed | evidence |
+|---|---|---|
+| **set 1 — Codex** | **125 questions**, ids `s1-001…s1-125`, released by Arpit from prompt 2's block 1 (**staged, his to commit** — the process reserves that to him). He holds block 2 (the key) | [`questions/README.md`](golden/questions/README.md) |
+| **set 2 — Claude** | **124 questions**, ids `s2-001…s2-124`, from prompt 3's block 1, authored by a session that wrote no file and does not return | [SR-LAW-11](../records/0012_LAW-11-sealed-answer-key.md) decision 6 |
+| **verified without reading one** | field *names* checked before any value: `id` and `question` and **nothing else** — no answer, relevant, primary or answerable field. Then 0 duplicate ids, 0 cross-set collisions, both counts inside the prompts' 120–125 band | this change |
+| **W-189 closed** | the two sets exist and the key never became a file; prompts 4–6 were never its scope — they are W-136 phases | [`archive/README.md`](../archive/README.md) §`open/` |
+| **W-145 closed as OVERTAKEN** | the contaminated key it would regenerate was already deleted, and **set 1 is Codex-authored questions *and* answers** — the need it named | [`archive/README.md`](../archive/README.md) §`open/` |
+| **the queue re-balled** | inbox row cleared; **W-136 🟢** (prompt 4 next), **W-190 🟡 on W-136**, **W-87 🟡 on W-136** — it had been 🔴 through W-145 | [OPEN-WORK](OPEN-WORK.md) |
+| **25 dead links repointed** | across 8 live documents, at live successors rather than into `archive/` (rule 58); one **pre-existing** break from the renumbering fixed with them | `tests/test_doc_links.py` green |
+| **what it does NOT buy** | ⚠ **no rung ran and no number moved.** The instrument exists; **prompt 4 has not been run**, and 🔴 **the session that runs it must never have read `questions/`** — this one read the ids | [W-136](open/W-136-golden-benchmark.md) |
+| **owed to Arpit** | ⚠ a **LAW record was amended** (SR-LAW-11 decision 11 — its factual premise, not its normative sentence) and needs his ratification; ⚠ **W-136's 🟣 2026-09-30 gate rests on a premise Codex disproved today**, and only he lifts a date gate | [WORKLOG](WORKLOG.md) |
+
+## 2026-09-15 — **the golden reset: six numbered prompts, two numbered sets**
+
+| item | what landed | evidence |
+|---|---|---|
+| **the pipeline** | six prompts in the order Arpit runs them — 1 seed (documents only) · 2 Codex set 1 · 3 Claude set 2 · 4 corpus, blind · 5 run + hand-off · 6 score. **Prompt 1 no longer writes questions**, which is what let one prompt be re-run without disturbing the other | [`work/golden/prompts/`](golden/prompts/) |
+| **sets are numbered** | set 1 (Codex, `s1-001…`), set 2 (Claude, `s2-001…`) — the author is a fact about a set, not its identity | [SR-WORK-GOLDEN](../records/0066_WORK-golden.md) decision 8 |
+| **release → two blocks** | each authoring prompt ends with block 1 (ids + text, Arpit commits) and block 2 (the key, Arpit keeps). The freeze-and-release prompt is **retired, not deleted** | [`RETIRED-codex-release.md`](golden/prompts/RETIRED-codex-release.md) |
+| **the hand-off** | 🔴 prompt 5 records what fux **answered and cited**, not only what it ranked. **The only place a golden answer and a fux answer meet is a chat Arpit attends** | [`5-claude-run.md`](golden/prompts/5-claude-run.md) |
+| **the reset, stated** | the old key, `golden-answer/` and the 124 questions are deleted; **the seed corpus and eight rungs survive**; every old id is orphaned and **may not be compared** with anything scored from here | [`questions/README.md`](golden/questions/README.md) · W-189 (closed 2026-09-15) |
+| **what it does NOT buy** | ⚠ **no set exists yet and no number moved.** W-189 is in the Blocked-on-Arpit inbox and gates W-190, W-145, W-136 and W-87's recall half | [OPEN-WORK](OPEN-WORK.md) |
+
+## 2026-09-15 — **two golden question sets, and the answer key stops being a file**
+
+| item | what landed | evidence |
+|---|---|---|
+| **L11 amended** | the law's subject moves from *the key directory is closed to Claude* to **the key is Arpit's custody and no agent may read one** — both sets one subject, **no key file anywhere an agent can reach**, the one route a paste and **Codex's alone**, Claude closed on every route | [SR-LAW-11](../records/0012_LAW-11-sealed-answer-key.md) decisions 2–4 |
+| **the authoring carve-out** | 🔴 exactly one handoff wide — the session that authors set A writes no file, hands the answers over in the chat, and **never runs a rung or returns**. Authorship buys no access | SR-LAW-11 decision 6 |
+| **two sets** | A (Claude, ids `a001…`) and B (Codex, ids `g001…`), same seed corpus and ladder, **run and reported apart**; 🔴 **never pooled** | [SR-WORK-GOLDEN](../records/0066_WORK-golden.md) decisions 8–11 |
+| **the per-run key question deleted** | *"(1) the file, or (2) the chat?"* removed from prompts 1, 3 and 5 — it had one answer left. Prompt 4 writes two prediction files; [`prompts/3-claude-questions.md`](golden/prompts/3-claude-questions.md) is new (**renumbered from `1a-claude-set-a.md`** later the same day) | SR-WORK-GOLDEN decision 10 |
+| **difficulty, built** | [`tools/golden-difficulty/`](../tools/golden-difficulty/) — a **count of the discriminations a question forces** (`d ≤ 1` easy / `2` medium / `≥ 3` hard, unanswerable **floored at hard**) plus a per-rung distractor count. 🔴 Never derived from fux's own results; 🔴 **refuses a key path inside the repository**. `--selftest` green on six synthetic fixtures | SR-WORK-GOLDEN decision 13 · [W-190](open/W-190-question-difficulty.md) |
+| **what it does NOT buy** | ⚠ **no number moved and no engine ran.** Set A is unwritten, both keys are still Arpit's to regenerate, and **every set A number will be `informed` permanently** — an assumption recorded in SR-LAW-11 decision 7, not Arpit's ruling | [`questions/README.md`](golden/questions/README.md) · W-189 (closed 2026-09-15) |
+
+## 2026-09-15 — **the benchmark's arms settle at `A` · `B` · `B-node`**
+
+| item | what landed | evidence |
+|---|---|---|
+| **decision 16a** | 🔴 the tier-off arm is **not a benchmark arm** — a benchmark measures what ships, and `[graph] ask_boost`/`ask_related` default to `true`. `NODE_ARMS` is one entry; `RANK_PAIRS` is two | [SR-WORK-BENCHMARK](../records/0053_WORK-benchmark.md) decision 16a |
+| **what it costs** | 🔴 **the graph tier's VALUE stays unmeasured on both readers** and returns to [W-161](open/W-161-graph-composed-ask.md). Decision 12a's attribution run stands as filed history, not as a standing column | decision 16a |
+| **what it buys** | every run's tables carry only configurations a user is actually served, and one fewer pass per capture | decision 16a |
+
+## 2026-09-15 — **the Node column wired into every capture (code), and a banned filename found**
+
+| item | what landed | evidence |
+|---|---|---|
+| **W-188, the harness** | `answer_node()`; `--node-arms` on `hits` and `answers`; `RANK_PAIRS` replacing the hard-coded `A`/`B` pair; **`parity.jsonl`** (identical · first differing rank · **max \|Δscore\|** · depth) | [SR-WORK-BENCHMARK](../records/0053_WORK-benchmark.md) decision 16 · `fux-benchmark/bin/bench.py` |
+| 🔴 **three pair kinds, three readings** | `version` = the finding · `reader` = **a defect in one reader** (two readers, one index, identical output claimed) · `tier` = **the graph tier doing something** (W-161's value, unmeasured on either reader). Conflating the last two files a finding as a bug, so the kind is on every row | decision 16's table |
+| **the report** | a reader-parity slide with the opposite-reading warning and separate callouts per kind; **CAP-2 now counts the `version` pair only** — a row with no `pair` predates the split | `report.py` · `TEMPLATE.html` (13 slides) |
+| ⚠ **a banned filename, found and fixed** | `cmd_file` wrote CAP-4 to **`answers.jsonl`** — a name `.gitignore` bans **anywhere in the tree** (the sealed key's name). Decision 7 always said `answer-layer.jsonl`; the harness had been writing a file the repo refuses to carry, and the gate demanding it passed only where it sat untracked | decision 7's closing paragraph |
+| 🔴 **what does NOT exist** | **a number.** No run has executed — a Cowork bridge shell reaches neither the arm venvs nor the corpora. Verified on a **synthetic fixture** only: four arms through CAP-1/CAP-3/CAP-4 and both parity branches | [W-188](../archive/open/W-188-node-column-every-capture.md) |
+| ⚠ **the first thing the run must check** | `answer_node` has never executed. If Node's `--band` payload carries no `confidence` block, **every Node row reads `answered`** and the column looks like a fabrication machine | W-188 |
+
+## 2026-09-15 — **every filed benchmark report rebuilt to the spine, and the missing one written**
+
+| item | what landed | evidence |
+|---|---|---|
+| **all five reports** | ✅ on the capture spine — six titled CAP slides each, CAP-7 none | [SR-WORK-BENCHMARK](../records/0053_WORK-benchmark.md) decision 15 |
+| 🔴 **a run with no report** | `2026-09-15-node-column` had none, and CAP-7 has been mandatory since 2026-09-13. Generated: **CAP-6 across four arms** read from its two `latency-<tier>.csv` files, **the substitution stated on the page**; the other five captures say they have no number | [`work/benchmark/reports/2026-09-15-node-column.html`](benchmark/reports/2026-09-15-node-column.html) |
+| **numbers that existed and were not shown** | CAP-1 now has its own slide **with numbers** on both runs that retained lists — **120** filed lists on 2026-09-13 (60 per arm, depth 10), **600** on l9. Neither was measured today; both were read from the run's own `ranked-lists.jsonl` | decision 15 |
+| **numbers that do not exist** | said so, per capture, with the run named that will carry it: CAP-1/CAP-2 on both 2026-08-28 runs, `hit@20`/`hit@50` on v1-vs-head, CAP-5/CAP-6 on contested | decision 15 |
+| ⚠ **a defect the rebuild found** | an absent `ingest`/`build` phase printed **`0.0 s`** — a fabricated zero, which decision 9 forbids outright. It prints `—` now; `2026-09-15-node-column` is the run that would have carried it | `fux-benchmark/bin/report.py` |
+| **what was NOT done** | 🔴 no engine ran, no corpus was touched, no filed row changed, and the hand-built content was **kept and re-titled** rather than replaced by emitter output — decision 11a's reason still holds | decision 15 |
+
+## 2026-09-15 — **W-187: the benchmark report's spine is one slide per capture**
+
+| item | what landed | evidence |
+|---|---|---|
+| **W-187** | 🟢→✅ **`TEMPLATE.html` is twelve slides**, `CAP-1 · CAP-2 · CAP-3 · headroom · CAP-4 · CAP-5 · CAP-6` between the framing slides, each CAP titled `CAP-n — <capture>` and comparing arm A against arm B | [SR-WORK-BENCHMARK](../records/0053_WORK-benchmark.md) decision 14 · [the item](../archive/open/W-187-report-cap-slide-spine.md) |
+| **CAP-1 had no slide at all** | 🔴 the ranked lists were only ever visible through CAP-2's rankdiff. `_fill_ranked` renders them per arm — lists filed, queries, results per list, median top-1 score — **every column `— neither`, because a score is an engine's own scale** | `fux-benchmark/bin/report.py` |
+| **the emitter stopped writing titles** | its **13** `<h2>`s became `<p class="finding">` subtitles under the template's own headings. Decision 10's argument, applied to titles: a title is a property of the **capture**, a finding is a property of the **run** | decision 14 |
+| **verified without touching a filed report** | `2026-09-13-benchmark-captures` rendered into a **scratch root**: 12 slides, **0 unfilled slots, 0 absent captures**, CAP-1 reading 60 lists per arm at depth 10. The absent-capture path was exercised too (the titled slide survives and says so), and a renamed marker still makes the emitter **refuse** | decision 9 · decision 11 |
+| **not done** | 🔴 **the test suites were not run** — a Cowork bridge shell has no interpreter that can import `fux`. `tests/test_benchmark_capture.py` checks filed reports and not the template, so nothing here covers the change | [`work/MACHINE.md`](MACHINE.md) |
+
+## 2026-09-15 — **W-179: Node's latency measured, and the split is the whole result**
+
+| item | what landed | evidence |
+|---|---|---|
+| **W-179** | 🟢→✅ **the Node column, populated beside Python's** — four arms interleaved inside every repeat, so all four see the same machine | [`2026-09-15-node-column`](regression/2026-09-15-node-column/report.md) · SR-WORK-BENCHMARK decision 12a |
+| **the finding** | 🔴 **The Node reader is FLAT in corpus size**: **26.3 → 26.4 ms** across a 10× corpus, ~a third of Python's at 100 documents and a **ninth** at 1 000. Every bit of its growth is W-161's in-memory graph rebuild — **36.9 ms** at 100, **243.1 ms** at 1 000, **~2.4 s** at 10 000 | the report |
+| **why decision 12 demanded the split** | ⚠ **Without the fourth arm the column says the opposite.** `B-node` 269.5 ms against Python's 231.2 ms reads as *the Node reader is slower*; it is **8.7× faster**, and a tier that ships **on and unmeasured** costs ten times the reader. **The wrong answer would have been believed** | decision 12's second paragraph |
+| **N4** | has **a number where it had none**, and is **NOT ruled** — a benchmark rules no threshold (decision 6). Which number it gets depends entirely on the arm: the tier-off arm clears the retired `p95 ≤ 150 ms` fence by 5×, the shipped arm misses it by 1.8× at 1 000 documents | SR-WORK-BENCHMARK decision 12a |
+| **W-148** | 🟡→✅ closes with row 2. Rows 1 and 3 landed 2026-09-15; row 4 (the renderer split) was out of scope and stays out | [the item](../archive/open/W-148-what-the-two-readers-still-owe.md) |
+| **the load-bearing result is W-161's** | 🔴 its two tiers *ship on and unmeasured*; **one is now priced, on one reader**. The tier's price on Python is a different run (it reads a derived file), and **the tier's VALUE is unmeasured on either** — gated on Codex. A cost without a benefit is half an argument | W-161 |
+
+
+
+## 2026-09-15 — **W-180: the `b` sweep ran, and the frozen range missed the effect**
+
+| item | what landed | evidence |
+|---|---|---|
+| **W-180** | 🟢→✅ the frozen sweep is **run**, and the verdict is **`FAIL`: no pre-registered value clears.** `0.6`, `0.5` and `0.4` leave all five families exactly where `0.75` does — **0 discordant, everywhere** | [`2026-09-15-b-sweep`](regression/2026-09-15-b-sweep/VERDICT.md) |
+| **the lever is NOT inert** | 🔴 A mechanism probe outside the arms (SR-RS 22c, run because a null from an endpoint that could not move is the absence of a measurement) puts `content`'s crossover at **`b ≤ 0.3`** and `main`'s at **`b ≤ 0.15`**, monotone in `b`. **The frozen range was set above the effect** — the mirror image of the hazard the descending rule guards against | `evidence/crossover.txt` |
+| **option (d) lacks option (b)'s defect** | 🔴 `dump` — the family **W-155 showed option (b) DESTROYED** — holds **30/30 down to `b = 0`**. Lowering `b` rescales every document together; excluding table tokens rewrote one document's length ~7×. **That asymmetry is the strongest argument in the run, and it argues for (d) rather than for a value of it** | the report §"the other half" |
+| ⚠ **both controls saturated** | `inverse` and `placebo` are 30/30 in every arm down to `b = 0`, so *nothing regresses* is **consistent with safety and not evidence of it**. A lower range needs a control that can move | the analysis §2 |
+| **W-144 → Arpit** | 🟡→🔴, three named options. **Not resolved here**: picking `0.15` because the probe found it is the moving-threshold failure the rule exists to prevent | `work/OPEN-WORK.md` inbox |
+
+
+
+## 2026-09-15 — **W-140 closed: the last row was answered by not reproducing**
+
+| item | what landed | evidence |
+|---|---|---|
+| **W-140** | 🟢→✅ closed. Row 12 landed 2026-09-14/15; row 21 is answered | [the item](../archive/open/W-140-guide-authoring-defects.md) |
+| **row 21's outcome** | 🔴 **UNREPRODUCED, not proven closed.** The stranding never fired in **104 deliberate trials, 67 of them with the second commit inside a live runner** — which the eleven previous re-runs could never show they had reached. ⚠ `_hand_off_if_leftovers_are_new` re-reads the dirty list after `release`, and the surviving ordering needs a delay injected **inside `run_once`**, which a capture pass may not add. **If it fires again the row reopens, and the instrument is that delay, not another wait** | [the soak](regression/2026-09-15-runner-race-soak/report.md) |
+| **what actually failed** | a different race — `git add -A` on `.fux/index/<shard>.jsonl.tmp` — in the soak twice and in `tests_e2e` once. Fixed as W-185. ⚠ **Nothing proves the 2026-09-12 failure was either one**: that output was never captured | [the fix](regression/2026-09-15-index-temp-ignore/report.md) |
+
+
+
+## 2026-09-15 — **W-186: the golden ladder was dead and nothing said so**
+
+| item | what landed | evidence |
+|---|---|---|
+| **W-186** | 🟢→✅ **all eight rungs re-ingested at `fux.index.v3`, re-stamped, and answering.** Three refusals on every rung — the `[ranking]` priors W-152 retired (2026-09-13), the `fux.toml` key W-164 moved (2026-09-14), and a v2 index against an engine writing v3 (2026-09-15). 🔴 **Each is a good decision whose blast radius nobody swept** | [`2026-09-15-ladder-reingest`](regression/2026-09-15-ladder-reingest/report.md) |
+| **no document moved** | The manifests are untouched and the **per-document check is clean on all eight** — 100 to 10 000 hashes per rung against manifests written weeks earlier by another session. Nesting re-verified. ⚠ `verify()`'s index-root half is **circular** here (it compares against the stamp this run wrote); the document half is what carries it | `tools/differential/ladder_check.py` |
+| **the stamp gained a field** | 🔴 `engine_commit:`. The engine that wrote `v3` reports **`fux 2.0.1`**, and the **published** 2.0.1 writes `v2` — so *"check the engine version matches"* compared two engines that cannot read each other's index **and saw a match**. Between releases the version string is the last release's | [`work/golden/README.md`](golden/README.md) |
+| **unblocked** | W-180, W-154 Part B, W-175 — three items the queue had been calling ready | `work/OPEN-WORK.md` |
+| **NOT fixed, and named** | ⚠ **Nothing detects the next one.** The check that would — one `ask` per rung — needs the corpus, and `ladder_check.py`'s whole virtue is that it does not. A lab-side script is a decision about `fux-lab`, not a line to add while clearing a backlog | [the analysis](regression/2026-09-15-ladder-reingest/ANALYSIS.md) §2 |
+
+
+
+## 2026-09-15 — **W-181 and W-170: the observer hook, priced**
+
+| item | what landed | evidence |
+|---|---|---|
+| **W-181** | 🟢→✅ **the seam is free, on two corpora an order of magnitude apart**: `+0.7 ms` p50 on fux's own repository and **`−0.3 ms`** on golden `rung-10000`. The negative one is the honest reading — **below the instrument's resolution, and it does not scale with the corpus**, which is the property that matters: the dispatch runs once per process, after the verb has rendered | [`2026-09-15-observer-latency`](regression/2026-09-15-observer-latency/report.md) · SR-OBSERVE decision 12 |
+| **the cap, tested against its real claim** | a **2 000 ms** observer adds **+63 ms**, not 2 000, against `[observe] max_ms` = 50. 🔴 **And `0 of 350` abandoned observers ever finished** — which is the reason to KEEP decision 10b's *abandoned* rather than reverse it: the observed death is a short-lived CLI process exiting first, and a longer one would see the write land | SR-OBSERVE decision 12a |
+| **the fork W-181 was filed with** | resolved: **a reference observer in fux**, run first. 🔴 **It prices the SEAM, never a subscriber** — cage's observer is the reopen trigger, and the reference observer's own docstring opens with that warning | `tools/observer-bench/` |
+| **W-170** | 🟡→✅ closed. Its last obligation was this capture; Node's half stays out of scope by declaration (SR-NODE-SEARCH decision 18) | SR-OBSERVE decision 12 · the item closed 2026-09-15 |
+| **W-186 filed** | ⚠ **every golden rung is unreadable by HEAD** — `fux.index.v2`, three `[ranking]` keys W-152 removed, and a `fux.toml` key W-164 moved, on **all eight**. Found taking a scratch copy for the second corpus; blocks W-180, W-154 Part B and W-175 | W-186 (closed the same day) |
+
+
+
+## 2026-09-15 — **W-182 and W-185: a flake driven on purpose, diagnosed, and fixed**
+
+| item | what landed | evidence |
+|---|---|---|
+| **W-182** | 🟢→✅ **the soak that walks a second commit across a live runner's lifetime**, and **two results**. The stranding W-140 row 21 waited eleven attempts for did **not** reproduce — 0 of 104, with **67 trials landing inside a live runner**, the interleaving those eleven could never show they reached. ⚠ **Unreproduced, not closed**: the surviving ordering needs a delay injected inside `run_once`, which a capture pass may not add | [`2026-09-15-runner-race-soak`](regression/2026-09-15-runner-race-soak/report.md) · SR-MAINTENANCE decisions 1e–1f |
+| **the race that DID fire** | `git add -A` dies on `.fux/index/<shard>.jsonl.tmp` — an untracked temp file in a **committed** directory, left there by `_atomic_write` for the duration of a rename while `post-commit` deferred. **2 of 8 at the early-delay step, 0 of 96 elsewhere**, and 🔴 **then in `tests_e2e` itself**, run 2 of 3 | [the traceback](regression/2026-09-15-runner-race-soak/evidence/e2e-capture.txt) |
+| **W-185** | 🟢→✅ **one ignore line, and the number has a control**: `index/*.jsonl.tmp` gives **0 `git add -A` failures in 3 871 runs** against **2 335 of 3 933** without it. The soak's staging losses go **2 → 0** while the after arm reached the window **more** often (77 vs 67), and six consecutive `test_maintenance.py` runs are green where the file failed 1 in 3 hours earlier | [`2026-09-15-index-temp-ignore`](regression/2026-09-15-index-temp-ignore/report.md) · SR-DOTFUX decision 6c |
+| **what was NOT changed** | **`_atomic_write`.** The sibling rename is required — `os.replace` is atomic only within one filesystem — and the item's other candidate was wrong too: git does not skip dotfiles. 🔴 **Both of W-185's original candidates were wrong**, and the correction is noted in place rather than silently applied | [the correction](regression/2026-09-15-runner-race-soak/ANALYSIS.md) §3b |
+| **the row the fix cannot replace** | `fux doctor`'s `index temp files ignored`, **`warn`**. 🔴 **`.fux/.gitignore` is write-if-missing, so the fix reaches no existing repository** — the second time in one day that write-if-missing hid a fix, after `.fux/README.md`'s verb table | SR-DOCTOR decision 11 |
+
+
+
+## 2026-09-15 — **W-184 and W-183: a dead proof obligation, and an instrument that can fail**
+
+| item | what landed | evidence |
+|---|---|---|
+| **W-184** | 🟢→✅ **the differential harness runs on this repository again — 22 144 byte-identical comparisons, zero mismatches, through `run.py` itself.** It had been dead in **three** ways and only one of them announced itself: `queryset.vocabulary` died on a PNG; `bench_r3.source_vocabulary` decoded the same bytes with `errors="replace"` and **ran**, folding `png` and a page of replacement characters into the corpus vocabulary; and behind the crash, `compare()` was still passing `archived_weight=`, which **W-152 removed on 2026-09-13**. 🔴 **The quiet one is the worse defect** — a harness that crashes gets fixed; one that invents its own query set reports green | [`2026-09-15-differential-repaired`](regression/2026-09-15-differential-repaired/report.md) · SR-T1-ACCELERATOR decision 15c |
+| **the weight sweep, re-based** | `(1.0, 0.5, 2.0, 500.0)` rides `[priority]` now, on a location prefix that scales part of the corpus and not all of it. **A better shape for W-73's bound than the global prior it replaced**: the bound has to survive *some* documents being scaled | `tools/differential/run.py --priority-prefix` |
+| **the gate** | `tests/derive/test_differential_harness.py` — the first test that **imports** the harness. Holds the decode assumption (a binary file in a source dir, the skip counted and named, `errors="replace"` rejected by assertion) and the shape of the weight sweep. [SR-WORK-SESSION](../records/0060_WORK-session.md) decision 13 discharged on the second occurrence | ⚠ **the real-corpus arm is still a person's job** — 14 minutes, not a unit test |
+| **W-183** | 🟢→✅ **a quality endpoint for proximity reranking, and a SCREEN that could have rejected it.** *"Non-circular"* had been judged by argument three times; the screen computes it — score every passage with the reranker's **own** objective and ask whether the true passage is the one it picks. **`agreement` 0.4141** over 524 cited-decision contests, against a chance rate of **0.0748**, inside a band frozen one commit earlier | [`2026-09-15-quality-endpoint-screen`](regression/2026-09-15-quality-endpoint-screen/VERDICT.md) · [the proposal](proposals/quality-endpoint-for-reranking.md) |
+| **W-154 unblocked** | 🟡→🟢 after three days. Its Part B has a frozen pre-registration and an instrument; the honest status moves from *"the benefit is unmeasurable"* to *"the benefit is unmeasured"*. ⚠ **The `ask` arm owes a document-level screen of its own, and it runs FIRST** — written into the pre-registration so a later session cannot choose between a number it likes and a screen it did not run | [`2026-09-15-rerank-quality`](regression/2026-09-15-rerank-quality/PRE-REGISTRATION.md) |
+| **the `.fux/README.md` drift** | `ensure_layout` is write-if-missing, so this repo's copy and `store/fuxdir.py::_readme` are two artifacts that drift in silence — and had, by three verbs (`inspect`, `correct`, `lexical`). Every test was green because all four read the file. Two gates now read the template | SR-DOTFUX decision 6b |
+
+
+
+## 2026-09-15 — **W-168 step 1: anchor text, built behind a tunable at zero**
+
+| item | what landed | evidence |
+|---|---|---|
+| **W-168 step 1** | 🟢→🟣 **the anchor field — what OTHER documents call this one — in both readers, behind `[bm25f] anchor`, default `0.0`.** Obligations 1–7 and 9 of the item's ten. 🔴 **A RETRIEVAL change, not a scoring one**: with it on, `fux ask` returns documents containing **none** of the query's words, reached through their linkers' wording. The words are committed on the **source's** edge (`at`/`al`) and the per-target view is folded at read time from `.fux/runtime/anchors/`, so **no committed byte crosses a document boundary** — Arpit's option (c), 2026-09-15 | [SR-INGEST](../records/0106_ingest.md) 17 · [SR-RANKING](../records/0111_ranking.md) 12 · [SR-T1-ACCELERATOR](../records/0110_accelerator.md) 15 · [pre-reg](regression/2026-09-15-anchor-text/PRE-REGISTRATION.md) |
+| **the differential** | **692 queries × 4 `top` × 2 skipping modes over this repo's 1 237 documents: 5 536 byte-identical scan-vs-accelerator comparisons at the default and 5 536 at `anchor = 2.0`, 0 mismatches.** Plus a Node twin on a purpose-built corpus — the differential arm could not have caught a forgotten transcription, because a corpus with no linker-worded document exercises no anchor branch | [SR-T1-ACCELERATOR](../records/0110_accelerator.md) 15b · [SR-NODE-SEARCH](../records/0153_node-search.md) 19 |
+| **format bumps** | `fux.index.v3` (a property appeared — decision 9.1) and `fux.runtime.v6` (the anchor plane, `alen`, `total_anchor_len`). This repo re-ingested with `--full`; **the vendored Node bundle re-built, which was mandatory** — the old one pins `v2` and refuses the new index outright | [SR-INDEX-LIFECYCLE](../records/0108_index-lifecycle.md) 14 |
+| **13 records amended** | SR-INGEST · SR-EXTRACTED · SR-INDEX-LIFECYCLE · SR-RANKING · SR-T1-ACCELERATOR · SR-TUNE · SR-GRAPH · SR-ASK · SR-EXPAND · SR-CONFIDENCE · SR-PII · SR-ARCHIVED-CONTENT · SR-NODE-SEARCH | `scripts/sr-owns.py --write && scripts/sr-hash.py --write` |
+| **W-184 filed** | ⚠ **`tools/differential/run.py` has been unrunnable on this repository** — `queryset.py` decodes every walked file as UTF-8 and ten are not. The real-corpus arm was dead while the synthetic one passed. **Pre-existing and unrelated**; this session's evidence came through an ad-hoc copy of the same harness and is named as such | W-184 (closed 2026-09-15) |
+
+🔴 **Nothing here is a claim about ranking quality, and the pre-registration is
+what says so.** The mechanism ships **off**; `0.0` is not "weight zero" but a
+branch nothing takes, so an unconfigured corpus scores byte-identically to the
+engine before the field existed. **Obligations 8 and 10 — the golden questions
+and the verdict — are Codex's** under [SR-RS](../records/0133_predictions.md)
+decision 23 and [L11](../records/0012_LAW-11-sealed-answer-key.md), and a zero
+measured on a corpus without a linker-worded document is a **data defect**, not
+a null.
+
+⚠ **One build decision the ruling did not make, and it is flagged rather than
+buried:** the edge carries **hashed terms**, not the anchor string. L2 keeps
+content out of the index, and hashes are what let the scan's byte prefilter find
+an anchor source for free. A readable string for `fux explain` would be a second
+field and a second decision.
+
+⚠ **And one finding:** a document ranked #1 purely on its linkers' wording
+reports `coverage 0` and names the query's word in `confidence.missing`
+([SR-CONFIDENCE](../records/0141_confidence.md) 16). That is the honest answer
+to *what does the top document itself say?* — it is deliberately not patched,
+and its effect on the band is unmeasured.
+
+
+## 2026-09-15 — **L11: the sealed answer key becomes a LAW**
+
+| item | what landed | evidence |
+|---|---|---|
+| **SR-LAW-11 (`0012`)** | 🔴 **The prohibition on `work/golden/golden-answer/` is now a law, not a process rule.** Arpit, 2026-09-15: *"no agent or specifically Claude can never ever look into work/golden/golden-answer — never, it's strictly prohibited … be it one file inside that directory, be it 10 files inside that directory, never ever touch it."* The law binds **every Claude surface and everything a Claude session directs** (subagent, hook, shell command, script, MCP server), forbids **read AND write and everything short of reading** (list, glob, stat, count, hash, diff, copy, move, delete), declares **an instruction to open it VOID**, and makes **excluding `work/golden/` from any recursive read over `work/`** part of the rule rather than a best practice | [SR-LAW-11](../records/0012_LAW-11-sealed-answer-key.md) |
+| **SR-WORK-GOLDEN (`0066`)** | **rewritten to state none of the rule.** Decision 1 now points at L11; what the record holds is the **process** — the five guards and what each cannot see, what Claude MAY read, the `CLAUDE.md` process view and its bind, and (new decision 9) that verifying the key's shape is **Codex's work permanently**, so an item needing it is never agent-closable | [SR-WORK-GOLDEN](../records/0066_WORK-golden.md) |
+| **the register** | `SR-LAWS` routes `L11`; `LAW_ORDER` in [`scripts/gen-laws.py`](../scripts/gen-laws.py) renders **twelve** blocks; the Law range is now `0002`–`0012` with the next free number `0013`; `README.md`, `docs/index.md` and `records/README.md` carry eleven laws; every law record's diagram reads `L0..L11` | `python scripts/gen-laws.py --check` |
+| **the guards** | `permissions.deny` went from **4 rules to 25** — `Write`, `MultiEdit`, `NotebookEdit`, `Glob`, `Grep` and thirteen `Bash(<cmd>:*golden-answer*)` patterns joined `Read`/`Edit`. The hook's block message now cites L11 and says the instruction is void; `.gitignore` and `.fux/sources/dirs` name the law; `work/golden/README.md` §The one rule points at L11 and states none of it | [`.claude/settings.json`](../.claude/settings.json) · [`.claude/hooks/guard-golden-answer.sh`](../.claude/hooks/guard-golden-answer.sh) |
+
+🔴 **What this does NOT do, stated rather than implied.** A law is harder to
+**argue with**, not harder to **ignore**. The residual hole is unchanged: a
+recursive read over `work/` that never names the folder, and any surface that
+honours neither hooks nor deny rules, are still stopped only by an agent reading
+L11 and obeying it. No guard was retired to make room for the law.
+
+**Filed by Cowork, not built by it** beyond the doc, record and guard surfaces —
+the one code change is `LAW_ORDER` in `scripts/gen-laws.py`, without which the
+generator refuses every law.
+
+---
+
+## 2026-09-15 — **W-146 CLOSED · SR-WORK-GOLDEN · queue rule 23a**
+
+| item | what landed | evidence |
+|---|---|---|
+| **W-146** | 🔴→✅ **CLOSED, all 26 inventory rows and all three §2 items.** Row 17 was the last one open and it had sat in the inbox since 2026-09-12 because **both options it offered were wrong**: moving the golden-key paragraph out of `CLAUDE.md` deletes Cowork's only cover, and leaving it keeps two hand-maintained copies that can disagree while both look correct. Arpit ruled the third shape on 2026-09-15 — **[SR-LAW-0](../records/0002_LAW-0-authority.md) decision 5's generated, test-bound view, applied a second time.** The item file is archived | [SR-WORK-GOLDEN](../records/0066_WORK-golden.md) · `archive/README.md` §`open/` |
+| **SR-WORK-GOLDEN** | **the sealed answer key's prohibition has a home** — who may read the key, who may not, and **five guards of which not one is a guarantee** (Claude Code and Codex run as the same Mac user). `CLAUDE.md` §Golden answer key is now generated by [`scripts/gen-golden.py`](../scripts/gen-golden.py) and bound by [`tests/test_claude_md_golden.py`](../tests/test_claude_md_golden.py); `work/golden/README.md` **lost its second copy of the rule**, which nothing had noticed because no record owned either one. The record claims `guard-golden-answer.sh`, left deliberately unowned by [SR-WORK-BLOCKERS](../records/0064_WORK-blockers.md) decision 10 | [SR-WORK-GOLDEN](../records/0066_WORK-golden.md) 1–8 |
+| **queue rule 23a** | **a 🟡 row now names the ITEM it waits on, or says `not a queue item` in those words** (Arpit, 2026-09-15). 🔴 **All five live 🟡 rows said the second** — *a subscriber*, *a `fux-benchmark` Node column*, *one captured flake*, *a non-circular quality endpoint*, *a `fux-lab` run` — so **nothing in the queue is waiting on anything anyone has filed**, which the old rule made invisible: a noun phrase satisfied it, and a row that clears itself looked identical to one that never will | [SR-WORK-OPEN-QUEUE](../records/0051_WORK-open-queue.md) 23a + decision 8 |
+
+**Two suites green, whole.** `CLAUDE.md` now carries **two** generated blocks, and
+each is legal only while its own test exists.
+
+⚠ **Not committed by this session:** the abandoned Cowork changesets in the tree
+(`SR-WORK-GOVERNANCE`/`0065`, `W-177`, `W-178`, the glassbox proposal). Adopting
+or discarding them is Arpit's, and `records/README.md` is shared with them.
+
+---
+
+## 2026-09-15 — **W-161 · W-176 · W-170 · W-148 · W-140 · W-146 · W-144 SHIPPED or advanced**
+
+| item | what landed | evidence |
+|---|---|---|
+| **W-161** | 🟢→🟣 **the graph-composed `ask`**, both readers, **0 discordant** on `results` and `related` across 15 verb × query comparisons. Tier A re-orders by `RRF(lexical, PPR)`; Tier B is a labelled `related` list of documents no query word matched. `answer` reads both tiers. Only the two measured arms remain (Codex, 2026-09-30) | [SR-ASK](../records/0103_ask.md) 13a–e · [pre-reg](regression/2026-09-14-graph-ask/PRE-REGISTRATION.md), committed alone at `806e9ebe` |
+| **W-176** | 🟢→🟣 **steps 1–3.** `weak` ⇒ `answerable: false`; the steering text on two MCP tool descriptions and three guides; `failed` names which gate refused. Seven measured gates wait on Codex | [SR-CONFIDENCE](../records/0141_confidence.md) 3a · [SR-OUTPUT](../records/0143_output-defaults.md) 24 |
+| **W-170** | 🟢→🟡 **`.fux/observers/` built.** Counts only, no return path, fail-open, bounded. Node declared out of scope. Only the latency capture is owed and it needs a subscriber's observer | [SR-OBSERVE](../records/0157_observe.md) `accepted`, 10–11 · [SR-NODE-SEARCH](../records/0153_node-search.md) 18 |
+| **W-148** | 🟢→🟡 **rows 1–3.** CI's conditional corpus arm REMOVED; §4's cadence amended to local; Node is a benchmark COLUMN; the harness is scratch and says so | [SR-WORK-BENCHMARK](../records/0053_WORK-benchmark.md) 12–13 |
+| **W-140** | 🟢→🟡 **row 12.** `routes()` bounded by WORK, not depth; `truncated` in text and `--json` on both readers | [SR-GRAPH](../records/0126_graph.md) 17a–e |
+| **W-146** | 🟢→🔴 **the docstring gate.** Green on its first run — no drift existed; step 2 had nothing to do. Row 17 is Arpit's | [SR-LAW-0](../records/0002_LAW-0-authority.md) 4b |
+| **W-144** | 🟢→🟡 **step 1.** The `b` sweep frozen, first-that-clears **descending** | [pre-reg](regression/2026-09-15-b-sweep/PRE-REGISTRATION.md) |
+| **W-168** | 🟢→🔴 **scoped, not started.** An anchor field makes a document's bytes depend on other documents while re-index is per-document | inbox row, 2026-09-15 |
+
+🔴 **Six defects the builds found in themselves, none by a test that already
+existed.** ① W-161's PPR rank list excluded the **seeds**, so every walked
+neighbour outranked every seed on every query — arithmetic, not tuning, and
+`ask "luhn verhoeff" --top 3` returned the words' 6th, 7th and 9th. ② A
+`related` route named an edge kind the walk never followed. ③ `find` acquired
+the tier by inheritance. ④ An observer's `print` reached the answer. ⑤
+SR-OBSERVE said the cap *kills* a slow observer; Python cannot, so it
+**abandons**. ⑥ fux named a subscriber in its own docstring.
+
+🔴 **And the finding that explains four earlier runs.** `answerable` was
+`band != none`, and *nothing scored above zero* is a state no real corpus
+produces — the refusal was **structurally unreachable**. 20/20 twice, 0 of 124
+on five rungs, 10/10 planted: four runs measured the symptom, none named the
+cause, and it was one expression.
+
+⚠ **Two breaking changes for a consumer**, both in the CHANGELOG: `results` is
+no longer monotone in `score`, and `answerable` changed meaning. The second was
+missing from the CHANGELOG until a peer session caught it.
+
+## 2026-09-14 — the governance map becomes a record, and stops carrying counts
+
+**Landed** (docs and records only; no code). `work/governance.md` — the map of
+what governs this repo, the last governance document with no owner and no gate —
+is now [SR-WORK-GOVERNANCE](../records/0065_WORK-governance.md) and the file is
+in `archive/`, with a successor row in [`archive/README.md`](../archive/README.md).
+
+**Evidence:** the record itself, and the reason it is shaped the way it is. The
+old file's counts were recounted on 2026-08-25 *after* drifting and had drifted
+again by 2026-09-14 — `open/` read 5 against 14 on disk, `regression/` 29
+against 71, the register 41 against 82. Arpit ruled counts out entirely rather
+than recounted a third time; the directory is its own count.
+
+**Also landed:** the register's `process` count (17 → 18), the WORK range's
+next-free number (`0065` → `0066`), the reserved-and-empty tail corrected to
+`0066`–`0100`, `B-246` and `B-247` filed `unruled`, and
+`SR-WORK-GOVERNANCE` pinned in `tests/test_sr_ownership.py` as a record no
+`src/` change can reach.
+
+⚠ **The completeness of the map is not checked by anything** and is not
+checkable against an open-ended set of future steering files — it is decision 8's
+obligation and the record's veto condition.
+
 ## 2026-09-14 — **2.0.1 released**: both consumer extension points were broken, and the tests that were missing found a third bug
 
 **Shipped** (`2.0.1`, PyPI + npm). Records touched:
@@ -69,11 +448,392 @@ still carries `"bin": { "fux": "./fux.mjs" }`, so this is the **second**
 release the warning has fired on and it is no longer a one-off to check after
 approving — it is a defect with two occurrences.
 
-⚠ **`main` and `release/3.0.0-alpha.0` now carry the same fetcher fix in two
-different shapes** — `urlsrc.config_for()` here, `UrlSource.config_for` in
-`3709d40f` there, the latter with `[sources] urls_file`, `.env` overrides and a
-doctor row this patch does not carry. **That merge will conflict and the
-resolution is a judgment call, not a mechanical one.**
+⚠ **`main` and `release/3.0.0-alpha.0` carried the same fetcher fix in two
+different shapes** — `urlsrc.config_for()` on `main`, `UrlSource.config_for` in
+`3709d40f` here, the latter with `[sources] urls_file`, `.env` overrides and a
+doctor row the patch did not carry. **Merged into this branch 2026-09-14, 22
+conflicts, resolved toward `UrlSource.config_for()`**: one resolution point for
+`ingest/urlsrc.py` and `query/refer_answer.py` alike, `main`'s implementation
+and its three tests dropped as covered by `tests/test_config.py`. The `.xlsx`
+decoder fix came across whole — it exists nowhere else.
+## 2026-09-14 — **W-173 SHIPPED**: the `CLAUDE.md` extraction finished, and three rules that had no home
+
+**Shipped in full.** `CLAUDE.md` **668 → 437 lines**; `tests` 4441,
+`node --test` 36. Every fold the item named is done.
+
+⚠ **437, not the item's estimated ~330, and the estimate is what was wrong.**
+It counted the lines coming *out* and not the eight pointer stubs going *in* —
+each names its record and the decisions to read, which is the whole point of a
+pointer and costs ~15 lines. The alternative was a bare link, which is how the
+next session fails to find the rule.
+
+| fold | where it went |
+|---|---|
+| §Conformance runs + §A pre-registered threshold | **SR-RS decisions 10a and 10b** |
+| §Law zero | **SR-LAW-0 decision 1a** (the three obligations) + **SR-WORK-OWNERSHIP 2a** (the gate, its install line, the 13-of-25 measurement) |
+| §The SR standing rules | [`records/README.md`](../records/README.md) |
+| §Layout | [`docs/index.md`](../docs/index.md) §The tree; a twelve-line tree stays |
+| §Hard-won build knowledge | [`work/LESSONS.md`](LESSONS.md) — a **log**, because a record carries no history |
+| §Build & test gotchas | [`work/MACHINE.md`](MACHINE.md); the five commands stay |
+| §Error contract | **SR-CLI decisions 4 and 5** |
+| §Triage first | **SR-WORK-OPEN-QUEUE rules 32–34, 39–45** |
+
+**Three rules turned out to have no record home, and folding is what found
+each one:**
+
+1. 🔴 **The two-strikes rule was stated in `CLAUDE.md` and NOWHERE ELSE**, while
+   SR-LAW-0, SR-WORK-OPEN-QUEUE, SR-RS and SR-OUTPUT all cited *"`CLAUDE.md`'s
+   two-strikes rule"* as authority. Under L0 that made a **generated,
+   explicitly non-normative** file the normative home of a rule four records
+   rest on — and deleting §Triage first would have deleted the only statement
+   of it. Now **SR-WORK-SESSION decision 13**, with all four citations
+   repointed.
+2. 🔴 **SR-RS explicitly deferred to `CLAUDE.md`**: *"`CLAUDE.md` §Conformance
+   runs carries it as a numbered obligation."* The record that explains the rule
+   pointed at the file that is not allowed to state one. Inverted.
+3. **`records/README.md` was missing two of the six standing rules it was
+   supposed to own** — the ownership table's executable twin, and *records live
+   in `records/` and nowhere else*. Added before the copy was deleted.
+
+**And one live contradiction the fold exposed.** §Error contract said exit `2`
+means *blocking (strict)*; **SR-CLI decision 5 says `2` is reserved and NOT
+produced** — no `raise FuxError` site passes it. Two sentences, both reading as
+correct, in a repository whose whole L0 argument is that this happens. The
+record is right and the copy is gone.
+
+**Item 9 — the owed test — is built**, and building it found something the item
+did not anticipate: `tests/test_handoff_names_its_model.py` asserts every open
+item names what should execute it, **and two items have no Claude model at
+all.** W-136 and W-145 are Codex's, on Arpit's account; the benchmark's premise
+is that no Claude session sees the answers, and a Claude model executing W-145
+would reproduce the contamination it exists to remove. So the honest shape is a
+**required line that may say `NONE — <who, and why not a model>`** rather than
+an exemption nobody would revisit. SR-WORK-LIFECYCLE decision 12's debt is paid;
+its second clause — no second handoff directory — went in with it, and **naming
+the retired path in the record was itself caught** by `test_archive_law.py`.
+
+**Item 8's sub-question answered: yes, the test should already have been
+failing.** `test_work_queue_rules_have_one_home.py`'s fingerprint set did not
+carry rules 41 or 42, so §Triage first's hand-written copy of the 5-day rule and
+the `↳ blocks:` sub-row sat there from 2026-08-12 to 2026-09-14 with the check
+green. Two fingerprints added — ⚠ and the set is a **sample, not a proof**: it
+catches only a restatement worded the way the record words it.
+
+**Out of scope and untouched:** a `--brief` laws block (Arpit ruled the full
+block stays), SR-WORK-SCALE 15 and SR-WORK-SESSION 13a's deliberately-open
+gaps, and **§What we are building** — whether it becomes `0065` SR-WORK-SCOPE is
+the item's own open question and nobody has ruled it.
+
+**Records:** SR-LAW-0 · SR-WORK-OWNERSHIP · SR-WORK-SESSION · SR-WORK-LIFECYCLE
+· SR-RS · SR-CLI · `records/README.md`. **Docs:** `docs/index.md`,
+`work/LESSONS.md` (new), `work/MACHINE.md`, DOC-REGISTRY.
+**Tests:** the new model-line gate, two fingerprints, three messages repointed
+off `CLAUDE.md`.
+
+---
+
+## 2026-09-14 — **W-158 SHIPPED**: the harness renders CAP-7 from the template, and the l9 report exists
+
+**Shipped**, with one part deliberately not done and one exposure named rather
+than fixed. `tests/test_benchmark_capture.py` passes **unchanged**, as DoD 5
+required.
+
+`fux-benchmark/bin/report.py <run>` now renders
+`work/benchmark/reports/TEMPLATE.html` into
+`work/benchmark/reports/<run>.html` — nothing into the run directory — by
+substituting the template's `{{TOKENS}}` and filling ten
+`fux:fill:NAME` / `fux:end:NAME` regions from `evidence/`.
+
+| what landed | what it found |
+|---|---|
+| the marker contract | **Everything outside a marker is copied through byte for byte**, so every numeric header keeps the direction marker the TEMPLATE puts on it. The emitter writes exactly one direction anywhere. That is decision 10 enforced structurally rather than carefully: a direction written in the emitter would be restated per report and two reports could disagree |
+| the `2026-09-12-benchmark-l9` report, from its filed rows | **Five `nonumber` sections** — CAP-2, CAP-3, CAP-3 headroom, CAP-4 and (before the substitution below) CAP-5 — each naming which capture and why, and each saying the run was not re-executed |
+| CAP-5 after all | 🔴 **The numbers were filed under another name.** The run wrote no `index-size.csv` and its `ARMS.toml` carries `index_bytes` and `corpus_docs` per arm per corpus — the same measurement. Read, and **the substitution is stated on the page**: a silent one would have the report claim a capture the run's own file list does not have |
+| the contaminated latencies | The run filed no `latency_warning` key, and its `report.md` says *EVERY ABSOLUTE LATENCY IS CONTAMINATED*. The emitter **quotes that, attributed, in the latency callout** — explicit key first, the run's own report second, **never a keyword sniff** |
+| the cover | The run's `report.md` `description` becomes the lead and its `classification` the label, quoted. *A generated sentence about what a run meant is the one thing this emitter must not write* |
+| 🔴 **my own template edit broke the template** | I wrote the marker names in full — with a literal `-->` — inside the authoring comment, which **closed the comment early**, and the first generated report carried the template's how-to instructions as visible page text. The names are now spelled without their delimiters, with the reason beside them |
+| 🔴 **the first reader read nothing and the page said so in every cell** | `ARMS.toml` is `[[arm]]`, an array of tables, **one per arm per corpus**. My reader guessed `[A]`/`[B]` sections, so the arms table printed *not filed* seven rows deep while the file sat there with every value in it. Same for the null control: `differed` is a **list of query ids**, and the card read `[] differed`. **Read the evidence, then write the reader** |
+| the tiers note, which nobody asked for | `ARMS.toml` records **7 tiers built** and `ranked-lists.jsonl` has **5**. Reporting the second as the first would have dropped two tiers the run indexed and then said nothing about, so the cover names them: *No CAP-1 rows for: docs-00100, docs-10000* |
+| determinism | Byte-identical over two runs. The date is the **run directory's**, never today's — a report regenerated a year later must say when the run executed |
+
+⚠ **DoD's out-of-scope clause fired, and the three hand-built reports are left
+exactly as they are.** It permits regenerating them only if the generated shape
+differs *and the diff carries no new number*. Regenerating
+`2026-09-13-benchmark-captures` was tried and **rejected on the evidence**: the
+generated page **loses** the hand-built per-corpus hit@k breakdown and **adds**
+index-bytes and latency figures the hand-built page does not carry. So a
+generated report is **thinner than a hand-authored one** — the CAP-2 figure is
+an inline SVG a person draws, and the emitter **says so in the figure's place**
+rather than omitting it. From the next run onward the emitter is the report.
+
+🔴 **The exposure this item created, named and not fixed.**
+`~/my_programs/fux-benchmark` is a git repo with **zero commits** and every file
+untracked, so the code that now enforces decisions 8–10 exists on **one
+machine** — and nothing in fux would notice it going, because
+`tests/test_benchmark_capture.py` checks that a report was *filed*, never that
+anything can still generate one. **Committing in that environment is not my
+call**: it would change what SR-WORK-ENVIRONMENTS says the environment is.
+Filed as a third row on W-148 (closed 2026-09-15)
+with three shapes for Arpit, and stated in SR-WORK-BENCHMARK decision 11b where
+the decisions it undermines are stated.
+
+**Records:** SR-WORK-BENCHMARK (decision 11, 11a, 11b).
+**Files in this repo:** `TEMPLATE.html` (the markers), the l9 report,
+DOC-REGISTRY, W-148. **The emitter itself is in the sibling environment** and is
+the half that is not durable.
+
+---
+
+## 2026-09-14 — **W-162 SHIPPED**: `fux correct`, and four claims that were false until somebody ran them
+
+**Shipped in full.** `tests` 4418, `tests_e2e` 136, `node --test` 36.
+
+`fux correct "<question>" <doc>` writes **one question a person typed** onto the
+document that answers it — same file `fux enrich` writes, same `ctx` field,
+different author. Plus `--pin`, `--reaffirm`, `--no-pin`, `--list`; the eval
+file; `--why`'s authorship; a `doctor` row; and the guide skill whose first
+section is *propose the command, do not run it*.
+
+| what landed | what it found |
+|---|---|
+| the human line, marked `corrections: N` in the frontmatter | The marker sits in the half that is **never indexed** and the text in the half that **is**, which is forced by SR-ENRICH decision 8 rather than chosen |
+| `.fux/eval/corrections.tsv`, committed and sorted | The durable record — a regenerating agent rewrites the enrichment file wholesale, marker included, so the eval file is the half fux can actually enforce |
+| `--check` reports a human line and never refuses it | 🔴 **And a correction with no `?` escaped the check entirely.** `is_question` is *a line ending in `?`*; a correction files the words people **search** with, which need not be a question. `fux correct "pomegranate molasses" <doc>` was reported `ok` while the line retrieved nothing. Every human line is now checked whatever its punctuation — found by filing one, not by a test |
+| the negative-correction refusal | 🔴 **Its first pattern refused an ordinary question.** A 40-character window with `use` in the verb list matched *"how do I **stop** the supervisor and **use** the rollback script?"*. Narrowed to a negation plus a serving verb within two words, `use` dropped — and the false-positive cases are in the test now, because a wrong refusal costs somebody a correction they were right to file and they only learn by rephrasing until it is accepted |
+| every refusal before any write | 🔴 **The first cut printed `wrote .fux/enrich/<sha>.md` and THEN `error:`** — exiting 1 having already changed the repository. Caught by running the suspended-pin path |
+| `--pin`, applied after the ranking and after the reranker | `rank()` never sees it, so `--why` still shows the ranking that ran with the pin on top. A pinned document the ranking never returned is inserted with `score: 0.0`, the honest number. **The band is built from the pinned list**, so a weakly-supported pin still says `weak` |
+| suspension, and `--reaffirm` | A plain re-run does **not** release a suspended pin; only a human saying *still true* does |
+| `fux doctor`'s `correction pins` row | 🔴 **And a second defect with it: a `level="warn"` row with `ok=True` renders `[OK]`.** `cmd_doctor` reads `ok` for the MARK and `level` for the exit code. **`pinned url bytes`, which I committed earlier today, printed `[OK]` beside *every citation from these will be `unverified`*** — the disclosure SR-URL-FRESHNESS decision 16 chose over a refusal, disclosing nothing. Both fixed; a test now asserts the **rendered line**, because asserting the fields is what let it ship |
+| `--why`'s `ctx_via` — `human` / `model` / `both` / `unattributed` | The index cannot answer this and is not asked to: `ctx` is one field. The answer comes from re-reading the enrichment file and analyzing its two halves, one file read per **shown** document |
+| the pin on both readers | `fux correct` is Python-only (Node never writes), but the **effect** crosses: `node/src/correct.mjs` reads the same file and applies the same rule. stdout, stderr and `--json` compared identical with a pin firing |
+| 🔴 **a claim in SR-ANSWER that was false when written** | The note I added said `answer` surfaces a pin via `"pinned": true` on the result. **`answer --json` carried no such key at all.** Adding one would have put it on the index path and not the refer path — `pinned` exists on an `AskResult` and not on a refer citation — and **a key on one path only is worse than a key on neither**, because a consumer reading `citation.pinned` gets `false` from the refer path for a question that genuinely is pinned. The stderr note now fires before either branch, on every path and both readers, and the record says that instead |
+| the `POLICY.md` location the item named | ⚠ **Corrected, not executed.** DoD 11 put the *propose, never write* rule in `POLICY.md` — whose verbatim block is the **archived-content** policy, byte-pinned across nine renderings. The rule went where it fires instead: `fux-correct`'s own description and Don't list (*Use ONLY when explicitly asked*, the same shape `fux-enrich`/`fux-decoder`/`fux-fetcher` carry) and a row in `fux-search` and `fux-answer`, which are the surfaces where an agent notices the wrong document |
+
+**Records:** SR-ENRICH (decisions 19, 19a, 19b — the verb, the pin, the
+authorship) · SR-CLI · SR-DOCTOR (the row, and the `[OK]`/`[WARN]` rule) ·
+SR-PROVENANCE · SR-ANSWER (corrected) · SR-CONFIDENCE · SR-PII · SR-TUNE
+(**`pinned` is not a tunable and may not become one**) · SR-API · SR-NODE-SEARCH
+· SR-AGENT-POLICY (the twelfth guide skill).
+**Tests:** +29 unit, +18 e2e, plus the doctor rendering gate.
+**Out of scope and untouched:** raising `ctx`'s weight so corrections bite
+harder — a ranking change, W-156's rule. And the **generalisation measurement**
+the compare doc pre-registered (N corrections, M blind paraphrases) is **not
+done**: the mechanism is kept on tests, and the claim that a human line helps
+phrasings other than its own is **unmeasured**. Filed as W-175.
+
+---
+
+## 2026-09-14 — **W-160 SHIPPED**: the two atoms, and three defects the freeze found
+
+**Shipped in full.** `tests` 4386, `tests_e2e` 133, `node --test` 36.
+
+**`fux lexical`** — BM25F → rerank → RRF, no graph stage, **frozen** to `ask`'s
+output shape. **`fux graph --seed <id>…`** — the walk from documents you name,
+mass by argument order, with the query form now *defined* as `--seed` over the
+query's top-k. **Three walk parameters exposed and inert.** Not a ranking
+change: nothing `ask` returns moves.
+
+| what landed | what it found |
+|---|---|
+| `fux lexical`, from one parser factory shared with `ask` | 🔴 **`lexical` was absent from `output_config.CLI_VERBS`, and the two verbs printed differently from one ranking.** A verb absent from that table has no key resolved at all, so `args.sections` stayed `None`, `getattr(args, "sections", True)` read it as falsy, and `ask` printed `§` heading lines while `lexical` printed none. **Nothing failed**: the file loaded, the query ran, the scores were identical. W-140 row 14's trap through a different door — and comparing only `--json` would still have missed it, because `headings` is in the payload either way |
+| `lexical` reads `[cli.ask]`'s subtable (`VERB_READS`) | ⚠ **The alternative was a breaking change to every existing `output.toml`.** That file is a complete declaration, and `explain` is refused at the shared `[cli]` level by name — so a `[cli.lexical]` subtable would have made every repo that already has the file **exit 1 on a verb they had never run.** Measured, not predicted: it happened here on the first run. The shared-key count is now over SUBTABLES, so the alias does not loosen a validation as a side effect |
+| `graph --seed`, with `score: null` and `rank` | 🔴 **The first cut printed the walk's `1/(i+1)` mass, and seed 0's mass is exactly `1.0` — which `json.dumps` writes `1.0` and `JSON.stringify` writes `1`.** A differential divergence on the first line of the new output, from a value no ranking would ever produce. `pyRepr` exists in `compat/pyfloat.mjs` for exactly this and **had no caller**, because a BM25F score is never an exact integer. `null` is `null` in both — and the number that diverged was one no reader should have been comparing |
+| the minhash-style banding is not the point here, but the same class of error was | 🔴 **`--max-hops 1` was asserted at the CLI and passed nothing**: the relational fixture is shallow enough that everything reachable is already within one hop of a seed. The bound is proved on a graph built to have depth; the e2e test says so rather than quietly dropping the assertion |
+| three exposed walk parameters, inert | Each has **two** tests: the default is a no-op to the float, **and** a non-default value changes something. A knob inert at every setting is dead code wearing a feature's name, and the inertness half alone would pass for it |
+| `link_idf(n) = 1/(1+ln(1+n))` | ⚠ **The first `log1p` on the query path, and the two readers agree to `round(9)` rather than bit-for-bit** — measured here with `--link-idf` on: identical ordering, four scores differing in the last digit. That is SR-NODE-SEARCH decision 1's contract; BM25F's own `idf` has always depended on libm `log` the same way and simply happened to agree exactly |
+| MCP `fux_related` | 🔴 **The item's gap-check row was wrong.** It asked for `fux_related` to be *"re-implemented over `graph --seed` (same output, one code path)"* — and `fux_related` is not a walk: it returns the edges a document states, not a PPR neighbourhood. The output cannot be both. **The row's second half is done**: both readers now lift `Edge`s through `edges_from_records` and read `Graph`'s adjacency, so *what points at this* has one definition instead of a third comprehension |
+| the Node graph plane (DoD 5) | **Already built** — W-107 Phase 3 shipped it, and SR-NODE-SEARCH decision 9 records the asymmetry as a *build requirement*, not an absence. What W-160 added on Node is `lexical` (the same function as `ask`) and `--seed`. The digest arm is **IDENTICAL on this repo, 875 nodes / 5 708 edges** — ⚠ and **trivially identical on golden rung 1 000, which has 0 edges**, so that run proves nothing and is not cited as if it did |
+
+**Records:** SR-CLI (decisions 11–13) · SR-GRAPH (13–15) · SR-NODE-SEARCH ·
+SR-MCP (the corrected row) · SR-ASK (`ask` is now the composed verb) ·
+SR-ANSWER (`answer` does **not** go through the freeze, and why) ·
+SR-CONFIDENCE (`lexical --band` is the same block, and what W-161 owes) ·
+SR-PII (decision 17's *a new verb is gated without anyone remembering*,
+exercised twice and unmoved) · SR-OUTPUT via `output_config`.
+**Tests:** +11 unit (walk inertness) +2 CLI gates +9 e2e.
+**Out of scope and untouched:** anything that changes what `ask` returns —
+that is [W-161](open/W-161-graph-composed-ask.md), which waits on W-156.
+
+---
+
+## 2026-09-14 — **W-169 SHIPPED**: `fux inspect`, and the check that failed its own rule
+
+**Shipped in full**, both suites green whole (`tests` 4 371, `tests_e2e` 108,
+`node --test` 36).
+
+**`fux inspect`** — six lenses over the committed index, read-only, offline,
+deterministic. Boilerplate (which words are on everything, with `df`, IDF, Zipf
+slope, Heaps β) · findability · length and fields · duplication and templates ·
+analyzer coverage · graph. `--json` for agents; `report.md` + `report.json`
+under the gitignored `.fux/runtime/inspect/`.
+
+| what landed | what it found |
+|---|---|
+| six lenses, each proven on a **planted corpus** — one plant per lens | 🔴 **Two plants were wrong and the tests said so.** `filler.md` was meant to have no distinctive term and was perfectly findable **by its own file name** — a path token is indexed vocabulary — so the plant is now named after the boilerplate word itself. And the twins differed by one sentence on a 16-term body: Jaccard **16/22 = 0.73**, a true negative for a pair that was supposed to be a plant |
+| the three provisional floors, measured on **all seven golden rungs** plus two planted corpora ([run](regression/2026-09-14-inspect-floors/report.md)) | 🔴 **`findable share` FAILED its own pre-registered rule and ships descriptive.** 1.000 on every rung **and** 1.000 on forty copies of one runbook. **Structural, not a threshold**: a fingerprint is the document's own rarest terms and a document's path is unique by construction, so anything with one rare term retrieves itself. The flag moved to the exhaustive *unreachable share* — 0.0000 on every rung, 0.0370 on the planted-lens corpus |
+| `boilerplate share <= 0.60` | ⚠ **The weakest of the three, and it says so.** Every golden rung is **0.47**; this repo is **0.072**. A bound near the honest-looking 0.25 would flag all seven rungs, which the frozen rule forbids |
+| the local hash → word dictionary, gitignored under `.fux/runtime/inspect/` | 🔴 **It would have named redacted values.** Built from raw bytes it printed exactly what `pii.toml` exists to remove, under hashes the index does not carry (`[PII:name]` is what ingest hashed). It now imports `redact` and applies it to the body **and the frontmatter title**, before headings are cut out. `tests_e2e/test_inspect_verb.py::test_the_dictionary_never_names_a_value_pii_toml_redacts` plants one in both places |
+| the minhash duplication lens | 🔴 **The signature was being used as a second FILTER and threw away real pairs.** At a true Jaccard of 0.818 a 64-permutation estimate has SE ≈ 0.048, so `estimate >= 0.80` discards a genuine pair about a third of the time. Banding narrows candidates; the **exact** set intersection decides. Caught by a unit test that planted that exact pair and got an empty list |
+| the full count beside every truncated list | 🔴 **Found on this verb's own first run here**: the orphan list read `20` — which is what a cap of 20 looks like — and the real number is **341**; pairs read 20 and are **250** |
+| **the golden ladder, measured** | 🔴 **A by-product nobody asked for: the ladder is ONE VOCABULARY spread over more documents.** 9 619 terms at 100 docs → 20 163 at 10 000 (100× the documents, **2.1×** the vocabulary); Heaps β **0.599 → 0.20**; Zipf slope **−2.36** against −0.96 here and ≈ −1 for prose; median document vocabulary flat at 521–526 on every rung. **Does not** invalidate a same-rung comparison; **does** bound what the ladder generalises about term distributions. Evidence for [W-156](../archive/open/W-156-prevalence-outside-golden.md), not an answer to it |
+
+**Records:** SR-INSPECT (new, `0156`) · SR-CLI (the verb, the lifecycle group) ·
+SR-DOCTOR is untouched and the boundary is stated in SR-INSPECT decision 1 ·
+SR-PII (the dictionary consumes redacted text) · SR-DOTFUX and
+SR-AGENT-POLICY (the eleventh guide skill; no pointer, no auto guide, and why).
+**Tests:** 26 unit + 15 e2e + the lever-table gate + `inspect` added to the
+progress-surface invariant. **Owed:** nothing re-measures the floors when the
+ladder changes — stated in the record and in the ANALYSIS rather than left
+implicit.
+
+---
+
+## 2026-09-14 — **the `fux.toml` audit**: four rulings, and a table nobody could use
+
+**Shipped**, uncommitted. Arpit, in one sitting: move `urls_file` beside
+`dirs_file`; never ship a commented key; audit the props; let `cdp_port` come
+from `.env`.
+
+| what landed | what it found |
+|---|---|
+| `[sources] urls_file`, old spelling refused by name | The move makes a separation visible that was always true: **`[sources.url]`'s PRESENCE enables fetching**, the key only names the list. Two call sites lost a `config.url is not None else DEFAULT_URLS_FILE` fallback that could disagree with the file |
+| `keep` and `enrich` written live, joining `update` and `fetch_at_answer` | The closed-domain rule applied to the rest of the table. `ttl`, `sweep_minutes`, `acquired_max_bytes` stay out — their defaults can move |
+| **`[sources.url.config]` split: shared level + one sub-table per fetcher** | 🔴 **The flat table was BROKEN for any repo loading both shipped fetchers, and had been since it existed.** It went verbatim to every fetcher and each `configure()` **raises** on a key it does not know: `cdp_port` refused `http.py`, `timeout_s` refused `cdp.py`. The only working value was the empty table — **which is why the block shipped commented out.** The symptom sat in the scaffolded file for months, read as caution, and was never traced |
+| the sub-tables **derived** from the fetchers by `ast` | Two constraints at once: a transcribed table goes stale (`_urls_header()`'s scar, W-140 row 18), and `cdp.py` must never *execute* inside the package (SR-CDP-FETCHER decision 8). Parsing gives both. A computed default (`MAX_BYTES = 8 * 1024 * 1024`) is skipped rather than guessed — absent means the fetcher's own constant applies, which is correct; a wrong literal would not be |
+| `.env` + environment overrides for every `cdp.py` key | 🔴 **They beat `fux.toml`, and reversing that makes the feature pointless** — `fux.toml` is committed, so one `cdp_port` pins every machine that clones the repo. Only urgent because the scaffolded file now writes the key live. `bool` coerced explicitly: `bool("false")` is `True`, which for `FUX_LAUNCH_CHROME=false` would launch a signed-out Chrome and return login pages |
+| `fux doctor` row `fetcher config tables` | A sub-table naming no fetcher reaches **none**, silently — decision 14's defect one level down. A row, not a loader refusal: deciding whether `wiki` is a typo means listing `.fux/fetchers/`, a filesystem question inside a TOML parser |
+| ⚠ **`Config.agents` was wrong** | It defaulted to three vendors of four — Codex missing, from before Codex existed. Dead (every caller goes through `load()`) **and** wrong, which is the worse half: a stale default reads as authority. Now `KNOWN_AGENTS`, the constant lifted above the class so there is one list |
+
+**A change of contract, named:** a `dict` at the top of `[sources.url.config]`
+used to reach `configure()` and is now read as a per-fetcher table. Only the
+**top** level is namespaced; anything inside a fetcher's own table is verbatim.
+
+**Records:** SR-CONFIG (decisions 8a and 11a) · SR-FETCHER · SR-CDP-FETCHER ·
+SR-DOTFUX · SR-DOCTOR, plus not-yours notes on the six co-owners of
+`urlsrc.py`, `run.py`, `refer_answer.py` and `setup.py`. **Tests:** 20.
+
+---
+
+## 2026-09-14 — **W-174**: a mode that was built, tested and unreachable
+
+**Shipped**, uncommitted at the time of writing — both suites green on the
+slice; the four red rows on the whole tree belong to a concurrent session's
+in-flight work (`test_doc_links`, `test_no_work_item_is_lost`,
+`test_open_work_rows_are_short::…blocks_subrow`, `test_sr_freshness` naming
+SR-AGENT-POLICY / SR-NODE-SEARCH / SR-PII).
+
+**`[sources.url] fetch_at_answer`** — a `fux.toml` boolean. `false` pins every
+`url:` citation to `.fux/acquired/` at answer time: no fetcher is loaded, no
+`connect()` runs, no socket opens, and the verdict is `as-ingested`.
+
+| what landed | what it found |
+|---|---|
+| the config key + declaration in SR-CONFIG's key block; `Policy(mode=NEVER)` selected in `refer_answer.py` | 🔴 **The whole behaviour already existed.** `freshness.Policy(mode=NEVER)` and `_obtain`'s never-branch have shipped since the module existed, with tests. `query/refer_answer.py` wrote `Policy(mode=ALWAYS, …)` literally — so `freshness.py`'s own documented third caller (*"CI, or a replayed `--audit` bundle: never"*) could never be selected. **A branch with a test and no selector reads exactly like a branch in use** |
+| the early return **before the fetcher is loaded** | Found by a test asserting the fetcher's log file does not exist. The first cut returned the mode but still resolved, `configure()`d and `connect()`ed the fetcher — and for `cdp.py` that attaches to a signed-in Chrome. *Expensive and interactive at answer time* is the cost SR-ACQUIRED exists to remove; paying it and then not fetching is the worst of both |
+| `fux doctor` row `pinned url bytes` (warn) | Arpit ruled **disclosed, never refused** for the no-retained-bytes case |
+| `--cache-ttl` declared inert under `never` | W-140 row 6 from the other end: a knob that cannot act must say so |
+| SR-ACQUIRED's pairing table corrected | 🔴 **A record said *"`update=never keep=true` … and no socket opens"* and that was never true.** `update=` is the update-time clock; SR-URL-FRESHNESS decision 15 says so in as many words two records away. A test docstring carried the same wrong sentence. Both corrected |
+| the `fux-config` guide corrected | 🔴 **It told agents *"any other unknown key is silently ignored"*** — wrong since SR-CONFIG decision 14 refused unknown keys by name. An agent reading it would have told a consumer their typo was harmless |
+| **`templates/fux.toml.txt`** (Arpit: *"create a template like others"*) | The starter left `setup.py`'s triple-quoted string for a file beside `pii.toml.txt`, `refusals.toml.txt` and the two fetchers. `{default}` is now **substituted, not `.format`ted** — W-83's property unchanged, but a `{` someone later adds to a comment in an *editable file* would have raised out of `fux setup`. No packaging change: `packages = ["src/fux"]` already ships every file under the package |
+| ⚠ **`fetch_at_answer` AND `update` written LIVE** (Arpit's ruling) | The first cut wrote `#fetch_at_answer = true`; `update` had been commented since it was added. Ruled: write both with their defaults. **The trade is real** — an uncommented default does not follow a future change of default — and the ruling generalises into a rule rather than two exceptions: a key whose **value domain is closed and small** (`meta`, `update`, `fetch_at_answer`) is written out, because the written line is the complete menu and nobody greps a record for a flag they do not know exists; a key whose default is a **number that may rise** (`acquired_max_bytes`, `sweep_minutes`) stays out, so raising it reaches every repo. The test is *can this value go stale?* |
+| ⚠ **this repo's own `fux.toml`** | Found by Arpit: the first pass added `#fetch_at_answer = true` to `setup._CONFIG` — the file `fux setup` writes into a **new** repo — and not to fux's own `fux.toml`, which `setup` will not overwrite. The key worked; it was invisible where he looked. Both carry the commented default now |
+| the Node question, settled | **Nothing owed.** `node/src/refer/source.mjs` and `freshness.mjs` both state that Node never fetches (W-107 R6), so the Node reader has always behaved as `fetch_at_answer = false`. Under `false` the two readers' `url:` verdicts converge exactly — this key does not diverge them |
+
+**Records:** SR-URL-FRESHNESS (decision 16, the third clock cell) · SR-CONFIG
+(key block + decision 12) · SR-ANSWER (the seam) · SR-ASK · SR-REFER ·
+SR-ACQUIRED · SR-DOCTOR · SR-DOTFUX. **Tests:** 12 unit + 3 e2e.
+
+---
+
+## 2026-09-14 — **W-159, W-163, W-164**: a wrong diagnosis, eight rows, and four gates that were all red first
+
+**Shipped** on `release/3.0.0-alpha.0` — `053d712a` (W-159), `77d7de34`
+(W-163), `edddadac` (W-164). Unreleased.
+
+| item | what landed | what it found |
+|---|---|---|
+| **W-159** | `_is_node_shim` split out and tested on every platform; the Windows skip gone | 🔴 **The item's own diagnosis was wrong.** *"The row cannot fire on Windows"* rested on a skipped test; `shutil.which` honours PATHEXT, which is how it finds npm's `fux.cmd`. The **fixture** was unbuildable, not the row. And a **real false positive**: a `.exe` read for the word `node` would report an ordinary Python `fux` as the Node reader |
+| **W-163** | eight `fux doctor` setup-drift rows, all report-only, all `warn`, **all kept** | A false positive in my own row, caught by the item's keep-call *before it shipped* — `output.toml current` reported six keys missing from fux's own correct file, because that file nests per verb. Then five real `fux-lab` corpora: every warning a true positive, one repo clean |
+| **W-164** | four gates — backlog row shape, verb-table agreement, doctor-register completeness, confidence-floor disclosure | **Every one red on the live tree first**, which was the item's bar. `B-129` at 444/400 chars · **SR-CLI §1 missing `fux output`** · `tune.toml loads` unregistered since 2026-09-11 · SR-CONFIDENCE decision 13's own *"nothing mechanical catches it"* |
+
+**Records closed from *stated* to *fixed*:** SR-WORK-BACKLOG (`built: no` →
+`yes`, and it owns its test at last), SR-CONFIDENCE decision 13,
+SR-AGENT-POLICY 16, SR-DOTFUX 6, SR-REFUSAL, SR-TUNE 4, SR-OUTPUT 14, SR-TYPES,
+SR-DIR-LIST, SR-HTTP-FETCHER, SR-NODE-SEARCH's platform claim.
+
+**Outcome: green in the working tree** — 4409 unit + 89 e2e + 36 Node.
+
+⚠ **A clean checkout of `edddadac` fails two tests, and the cause is not this
+work.** `records/0132` links `0155_agent-surfaces.md` and `0102`/`0132`'s
+`owns:` hashes name sources the commit does not carry — all of them a
+concurrent session's uncommitted files, which rode in on records this work also
+had to touch. **Two attempts to fix it were blocked** (committing that
+session's records; overwriting them to strip their edits out) and **both
+blocks were right**. It resolves the moment that session commits.
+
+⚠ **Two judgement calls that need finding later, not discovering:**
+`doctor.RETIRED_REFUSAL_STARTERS` must be **appended to by hand** when the
+refusal starter changes, or W-163's row cannot fire; and W-164 gate 4 was
+**widened past its DoD** to `find` and `answer` on both readers, because a note
+on one of three would have made SR-FIND decision 6's *"the same rule as `ask`"*
+false for the second time in one week.
+
+⚠ **Still owed:** the shipped `fux-search` skill tells agents the no-match line
+is on stdout. The correction is written and **uncommitted** — it collides with
+that same session's `templates/agents/` work.
+
+## 2026-09-14 — **W-165 + W-166**: five surfaces the records already owed
+
+**Shipped** on `release/3.0.0-alpha.0`, commit `b77b9058`. Unreleased — the
+`[Unreleased]` section of [`CHANGELOG.md`](../CHANGELOG.md) carries the user-
+facing form, including the one breaking change.
+
+**Records closed, all five from *stated* to *fixed*:**
+[SR-FUXIGNORE](../records/0144_fuxignore.md) 5a–5b (veto condition 3
+**discharged**) · [SR-DECODE](../records/0139_decode.md) 11a ·
+[SR-INGEST](../records/0106_ingest.md) Consequences (two bullets) ·
+[SR-PII](../records/0148_pii.md) (the 🔴 before decision 18) ·
+[SR-FIND](../records/0104_find.md) decision 6 + its **veto replaced**.
+Also amended: SR-ASK, SR-ANSWER, SR-CLI, SR-DIR-LIST, SR-DOCTOR (two new rows),
+SR-NODE-SEARCH, SR-CONFIDENCE, SR-OUTPUT, SR-ARCHIVED-CONTENT, SR-EXTRACTED,
+SR-TABULAR.
+
+**What landed**
+
+| # | change | the record's own words before it |
+|---|---|---|
+| 1 | `No confident matches.` → **stderr** on `ask`/`find`/`answer`, both readers | *"goes to stdout… in a pipe that is a line of prose where a path was expected"* |
+| 2 | `fux remove` writes an **anchored** pattern to `.fux/.fuxignore` | *"a migration we now owe"* |
+| 3 | the ingest summary counts deletions | *"`0 shards written` can accompany a deletion… mildly under-informative"* |
+| 4 | a **decoder digest** in the reuse key, per extension | *"There is no decoder digest. **Stated, not fixed**"* |
+| 5 | `extract.RULES_VERSION` in the reuse key; `url:` records re-extracted from `.fux/acquired/` | *"the data needed to honour a new rule is present and unused"* |
+
+**Outcome: green.** 4341 unit + 89 e2e + 36 Node pass. Verified from a **clean
+checkout of the commit** in a throwaway worktree (924 pass) after an earlier
+amend produced a commit whose `run.py` imported a module that commit did not
+contain — see the WORKLOG entry.
+
+**Three reds on the working tree are a concurrent session's and were red before
+this one started**: `test_no_work_item_is_lost` and
+`test_open_work_rows_are_short` (OPEN-WORK mid-renumber) and
+`test_sr_freshness::test_working_tree_is_not_mid_violation` (SR-NODE-SEARCH
+owns files that session has staged).
+
+⚠ **No measurement, and none was owed.** These are surface and
+maintenance-path fixes; nothing here changes what an unchanged corpus scores.
+The differential arm and `test_the_graph_lane_does_not_move_ask` stay green.
+
+⚠ **The keep/remove call for W-166 is a test, not a number.**
+`test_a_no_op_delta_re_extracts_nothing` is the gate its handoff asked for: a
+digest scoped too coarsely would turn every engine release into a full
+re-ingest of every consumer's repo. **The first ingest after this lands
+re-extracts every document once** — the accepted price, stated in the changelog.
+
+⚠ **Held back deliberately:** the shipped `fux-search` skill still tells agents
+the sentence is on stdout and to `grep -qx` it before piping. The correction is
+written and sits uncommitted in `src/fux/templates/agents/SEARCH-SKILL.md` plus
+three mirrors, because it collides with a concurrent session's in-flight
+`templates/agents/` work.
 
 ## 2026-09-13 — **2.0.0 released**: the alpha line promoted, and two gates that only CI could see
 
@@ -100,8 +860,13 @@ the same bundler here **keeps** `bin: {"fux": "./fux.mjs"}`, and the published
 this may be npm 11.x normalising rather than dropping. **It is unverifiable
 until the stage is approved** — a staged version has no public metadata. If the
 bin is gone, `npm i -g fux-engine` installs no `fux` command, which is the
-mitigation R1a ships and what [W-159](open/W-159-windows-shadowing-row.md)
-already concerns itself with.
+mitigation R1a ships and what W-159 already concerned itself with. ⚠ **W-159
+closed 2026-09-14** (archived at
+[`archive/open/W-159-windows-shadowing-row.md`](../archive/open/W-159-windows-shadowing-row.md),
+named and not cited); the live successor for the PATH row is
+[SR-NODE-SEARCH](../records/0153_node-search.md), which now states which
+platforms it covers, and [SR-DOCTOR](../records/0152_doctor.md)'s `fux on PATH`
+row.
 
 **What was released.** No behaviour was written for the release itself: the
 eight `2.0.0-alpha.*` pre-releases plus everything that had accumulated
@@ -288,7 +1053,7 @@ not measured"*. It is measured:
   *register them* or *rename them* is right is a ruling. Recorded in the run's
   [ANALYSIS](regression/2026-09-13-table-is-the-answer/ANALYSIS.md) §5.
 - **Nothing ships.** (b), (c) and (d) are untouched; the recommendation is
-  Arpit's ([W-144](open/W-144-structure-aware-extraction.md)). The compare doc's
+  Arpit's ([W-144](../archive/open/W-144-structure-aware-extraction.md)). The compare doc's
   §3 and §4 are amended; [SR-RS](../records/0133_predictions.md)'s instrument
   table gains the probes.
 
@@ -456,7 +1221,7 @@ follow the evidence rather than pick a constant. File archived at
 | `superseded_weight` | **closed** — supersession is a fact, not a weight | W-151 — **shipped 2026-09-13**, the row above |
 | `archived_weight` | **closed** — the flag already reaches every caller | W-152 — **shipped 2026-09-13**, the row above |
 | `recency_half_life_days` | **closed** — at ≤365 days history-seeking goes to 0/13 | W-152 — **shipped 2026-09-13** — with W-153 (**shipped 2026-09-13**) for the gap it leaves |
-| `rerank_weight` | **not the same question** — split out and restated as cost | [W-154](open/W-154-rerank-weight-cost.md) |
+| `rerank_weight` | **not the same question** — split out and restated as cost | [W-154](../archive/open/W-154-rerank-weight-cost.md) |
 
 **The finding that made all four the same answer:** at the shipped defaults the
 system already scores **11–12/13 current-seeking and 8–9/13 history-seeking**,
@@ -525,7 +1290,7 @@ against the register.
 
 ## 2026-09-13 — the queue's rules have a home: SR-WORK-OPEN-QUEUE, and the WORK range
 
-**Shipped.** [W-146](open/W-146-the-rest-of-l0.md) ruling 1 answered — *yes,
+**Shipped.** [W-146](../archive/open/W-146-the-rest-of-l0.md) ruling 1 answered — *yes,
 the record is written* — and its inventory row 13 lands. The discipline was
 stated in `CLAUDE.md` **and** in `OPEN-WORK.md`'s footer and owned by no record;
 it is now stated once and rendered twice.
@@ -619,7 +1384,7 @@ SR-DOTFUX / SR-PII / SR-URL-FRESHNESS) and **none of them owns anything this
 change touched** — re-derived, not assumed.
 
 ⚠ **Four obligations did NOT close and are carried, not dropped** —
-[W-148](open/W-148-what-the-two-readers-still-owe.md): CI cannot reach a golden
+W-148 (closed 2026-09-15): CI cannot reach a golden
 corpus (three routes, none chosen), Node's latency has no instrument
 (`fux-benchmark` unbuilt), `log-probe.yml` has never run (not on
 `origin/main`), and SR-API's renderer split is staged. **Two are Arpit's
@@ -839,9 +1604,9 @@ sets, every version pinned identically.
 | what | outcome | evidence |
 |---|---|---|
 | **The arm** | **Zero divergence at every level.** arm64 vs x86-64 (Rosetta), `torch 2.2.2` / `sentence-transformers 2.7.0` / `numpy 1.26.4` / `BAAI/bge-small-en-v1.5`: cosine **1.000000** minimum, **119/119** chunk and **124/124** query int8 vectors byte-identical, **0 of 93 312** codes differing, **0/124** top-5 orderings discordant | [the run](regression/2026-09-12-vector-gate-crossarch/report.md) |
-| **What it means** | 🔴 **It inverts where 2026-09-05 pointed.** Two *implementations* on one architecture: 0 of 125 identical, 41/50 discordant. Two *architectures* running one implementation: nothing. **The variable is the implementation, not the machine** — W-112's determinism claim narrows from *same clone + same build + same CPU* to **same build** | [W-112](open/W-112-vector-plane.md) |
+| **What it means** | 🔴 **It inverts where 2026-09-05 pointed.** Two *implementations* on one architecture: 0 of 125 identical, 41/50 discordant. Two *architectures* running one implementation: nothing. **The variable is the implementation, not the machine** — W-112's determinism claim narrows from *same clone + same build + same CPU* to **same build** | [W-112](../archive/open/W-112-vector-plane.md) |
 | **Corpus** | the golden ladder's `rung-seed` — 11 markdown documents → 119 chunks, all 124 questions. L9's data, not the playground's | [`work/golden/`](golden/README.md) |
-| 🔴 **What it does NOT do** | **It does not revive the vector plane.** DENSE-CHUNK's bar was untestable in 2026-09-05 (unreadable index) and is untestable now for a *new* reason: **the ladder's questions carry no rank contract**, because their key is sealed. A corpus that can carry the bar does not exist | [W-112](open/W-112-vector-plane.md) |
+| 🔴 **What it does NOT do** | **It does not revive the vector plane.** DENSE-CHUNK's bar was untestable in 2026-09-05 (unreadable index) and is untestable now for a *new* reason: **the ladder's questions carry no rank contract**, because their key is sealed. A corpus that can carry the bar does not exist | [W-112](../archive/open/W-112-vector-plane.md) |
 | ⚠ **The caveat, stated not buried** | Rosetta runs the x86-64 **build** translated onto arm64. It answers *does the x86-64 build differ* — no — and only **stands in** for *does native x86-64 hardware differ*: under it the x86 kernels see no AVX-512, the exact mechanism that would break bit-equality. **Not quotable for a Linux/x86 runner** | [report §What this changes](regression/2026-09-12-vector-gate-crossarch/report.md) |
 
 ⚠ **`informed`, and no delta stated against 2026-09-05** — different corpus,
@@ -868,7 +1633,7 @@ edited.
 | **The guard** | [`tests/test_work_environments.py`](../tests/test_work_environments.py) — **two rules, both mechanical**: no non-docstring string literal under `src/ tools/ tests/ scripts/` may name the environment (a path is built from literals; a comment recording history is not), and **every remaining mention is named in the test with a reason**, checked in both directions so the list cannot rot | SR-WORK-ENVIRONMENTS veto 1 |
 | **The instrument that survived** | `tools/differential/playground_grade.py` → **`goldens_grade.py`**: `--corpus`/`--goldens` required, no default, grading logic byte-unchanged so its filed count is still reproducible | [SR-ACCELERATOR](../records/0110_accelerator.md) |
 | **Five records** | SR-RS · SR-WORK-QUALITY · SR-ACCELERATOR · SR-CONFIDENCE · SR-ANSWER, plus `GLOSSARY`. Four gained `L9` in `laws:`; SR-ANSWER got a provenance note instead, because its mention is a citation of a filed run and not a procedure the law governs | the records |
-| **Two plans marked void in part** | [RUNBOOK-TUNER](benchmark/RUNBOOK-TUNER.md) and [the 2026-09-05 unblock](proposals/unblock-2026-09-05.md) — banners naming which legs died and what each needs now | L0: void in the conflicting part |
+| **Two plans marked void in part** | [RUNBOOK-TUNER](benchmark/RUNBOOK-TUNER.md) and [the 2026-09-05 unblock](../archive/proposals/unblock-2026-09-05.md) — banners naming which legs died and what each needs now | L0: void in the conflicting part |
 | 🔴 **W-97's veto leg has no instrument, and cannot get one** | its blocker is not *unblocked*, it is **dead**: a veto needs a per-query rank contract, the ladder's questions carry none because the key is sealed, and authoring one inside the run that uses it is the contamination the whole scheme exists to stop | [W-97](../archive/open/W-97-tuner-knob-sweep.md) |
 | 🔴 **`recall@k` went backwards, not forwards** | SR-WORK-QUALITY said the blocker was *migration* of an annotated file. That file is out of reach, so the blocker is now **no golden set that declares a relevance set at all** | [SR-WORK-QUALITY](../records/0056_WORK-quality.md) |
 
@@ -929,7 +1694,7 @@ green.
 | **Not done** | Rungs **2 000 / 5 000 / 10 000 are not built** — Arpit capped the session at 1 000. Scoring is Codex's, phase 5 | [W-136](open/W-136-golden-benchmark.md) |
 
 ⚠ **`informed`, and no delta is stated in any direction** — the key is the
-Claude-authored stopgap ([W-145](open/W-145-codex-regenerates-the-key.md)). No
+Claude-authored stopgap (W-145, closed 2026-09-15 — [W-136](open/W-136-golden-benchmark.md) phase 5). No
 verdict, no threshold, no prediction closed.
 
 ---
@@ -973,7 +1738,7 @@ re-derived on macOS before it was touched (rule 4); every one held up as filed.
 | **Row 18** | Four statements `fux setup` shipped into consumer repos that were untrue: no `__pycache__/` ignore beside the committed Python, the `AGENTS.md` snippet re-printed on every run, a `urls` header claiming *two attributes* of seven, and a probe path that is in the repository and not the wheel | `009b3f1` · SR-DOTFUX · SR-PII decision 20 |
 | **Row 8** | **Moved to W-122, not fixed.** Rejecting an unknown `fux.toml` key needs a key set to validate against — which is W-122's gate R-2. A second hand-written set would build the duplicate source of truth that item exists to remove | `4be982c` · W-122's detail file carries it |
 | 🔴 **Row 19, and the correction** | The merge-driver e2e test failed twice, got a gate, **failed again**, and the third failure gave the real answer: it asserted `ver == 2`, which counts sha changes against whichever checked-out index a pass compared with — observed at 1 and at 4. It asserts the merged file's content sha now. **The merge driver was never the defect** | `009b3f1` · two sessions' suspicion pointed at the driver because the failing assertion sat under it |
-| **What is left** | **6 code rows** — 6, 7, 12's `--hops` fork, 14, 16, 20 — **and all 13 record/code disagreements**, none critical | [`work/open/W-140-guide-authoring-defects.md`](open/W-140-guide-authoring-defects.md) |
+| **What is left** | **6 code rows** — 6, 7, 12's `--hops` fork, 14, 16, 20 — **and all 13 record/code disagreements**, none critical | `W-140` — ⚠ **closed 2026-09-15**, and this row's *"6 code rows left"* is the state as of the day it was written |
 
 ⚠ **Nine of the twelve had a guide describing the defect as behaviour.** Every
 fix deleted a workaround from a skill `fux setup` ships, which is
@@ -1406,7 +2171,7 @@ concurrent session's in-flight deletion of
 `OPEN-WORK.md`'s rules, which are stated twice and owned nowhere; and how far
 *never restates* reaches into docstrings — this session applied the narrow reading
 and touched no docstring. Both are named in
-[`work/open/W-146-the-rest-of-l0.md`](open/W-146-the-rest-of-l0.md), which carries
+[`archive/open/W-146-the-rest-of-l0.md`](../archive/open/W-146-the-rest-of-l0.md), which carries
 W-122's inventory verbatim.
 
 ## W-114 — the fourth vendor, and `fux-enrich` on every skill surface (2026-09-06)
@@ -3362,6 +4127,12 @@ it closed by ratification, not by landing; see the W-27 row above.
 | P-SUPERSEDE | **FAIL** (2026-08-25) — `[ranking] superseded_weight` against a frozen **>= 1 fixed / 0 broken** bar. **The prior FIRED for the first time since it shipped** (it needs a frontmatter `supersedes:` key; the playground declared supersession in prose only, so the flag had never set). At `0.5`: **fixes `q015`** — the canonical failure — and breaks `q022`/`q033`. At `0.25`: four breaks. **The control is clean**: the frontmatter edit alone fixes 0, breaks 0. **Every broken query has the SUPERSEDED document as its correct answer**, so the diagnosis is one cause, not four: **supersession belongs to the QUERY'S INTENT, not the document**, and a per-document multiplier cannot express it. ⚠ `informed`; ±2 on 50 queries is below decision 14's floor — the **direction** carries, the magnitude does not | [P-SUPERSEDE](regression/2026-08-25-supersession-and-reranker-default/VERDICT.md) |
 | DENSE-CHUNK | **FAIL** (2026-08-24) — the per-chunk dense lane against its own **>= 3-fixed / 0-broken** bar: measured **0 fixed, 2 broken**, at every setting that fires. **0 fixed is the number that matters**; the bar needs 3. The cause is structural rather than tuning: `embed/model.py` **mean-pools static token vectors** (no layers, no attention), so the lane is **as order-blind as BM25F** — and `always` mode breaks **`q015`**, the current-vs-superseded query a semantic lane was most expected to rescue. **Phase 7 was right that per-chunk beats per-document and wrong that the unit was the binding constraint** — the pooling is. `[dense] mode` stays `off`; the committed vectors stay, because they cost nothing at rest and a better pooling reuses them unchanged | [DENSE-CHUNK](regression/2026-08-24-dense-lane-gate/VERDICT.md) ⚠ **2026-08-25: the verdict STANDS and its subject is GONE.** The lane, the model, the committed `vectors` and `[dense]` were deleted on Arpit's instruction. The clause *"the committed vectors stay, because they cost nothing at rest"* was wrong on its own terms — they were **23.0 % of the committed index** ([measured](regression/2026-08-25-model-removal/report.md)) — and it is moot either way. **The verdict itself is frozen and unedited**; its frozen pre-registration is mirrored into the run, since the module carrying it was deleted (SR-RS decision 16). |
 | W-110 definition-of-done gate | **VOID** (ruled 2026-09-06, Arpit) — questions-instead-of-prose enrichment, against W-110's own definition of done: *net ≥ 6 on `recall@k`*. 🔴 **The bar never fixed `k`**, and the run clears it at `k=1` (+7) and at no other `k`, so the instrument decided and the **bar** could not rule. `VOID` is the fifth outcome, added to [SR-RS](../records/0133_predictions.md) for this ruling — not PASS, not FAIL, not INCONCLUSIVE. ⚠ **The second finding is where the bar lived**: a definition of done inside a work item is edited alongside the work it governs, so nothing ever forced it to be complete first. [SR-WORK-QUALITY](../records/0056_WORK-quality.md) decision 2a is written so this cannot recur. The feature stays shipped on its defect argument and is recorded as **BUILT AND UNPROVEN** | [W110-DOC2QUERY](regression/2026-09-05-doc2query/VERDICT.md) |
+| W-169-FLOORS | **PASS** (2026-09-14) — `fux inspect`'s three flagged checks, against the criterion in [`proposals/fux-inspect.md`](../archive/proposals/fux-inspect.md) §3/§5b and W-169 DoD 5: *a bound must not flag a healthy golden rung, and a number with no admissible bound ships descriptive*. **Two bounds ship provisional** — `unreachable share <= 0.01` (0.0000 on all seven rungs, 0.0370 on the planted-lens corpus) and `near-duplicate share <= 0.20` (0.0000 on all seven, 1.0000 on planted-bad). 🔴 **`findable share` has NO admissible bound and ships DESCRIPTIVE: 1.000 on every rung AND 1.000 on forty copies of one runbook.** Structural, not a threshold — a fingerprint is the document's own rarest terms and a document's path is unique indexed vocabulary, so anything with one rare term retrieves itself. ⚠ **`PASS` means the CRITERION was decidable on all four numbers and was not loosened** — it does not mean four checks passed; one lost its flag. ⚠ **`boilerplate share` ships weak at 0.60**: every rung is 0.47 against this repo's 0.072, so no tighter bound is admissible. ⚠ **This run's own first draft mis-stated its pre-registration provenance** and the correction is in the frozen file's §1: the criterion predates the verb (`df257ad5`, `91255adb`), the FILE does not. `blind` | [VERDICT](regression/2026-09-14-inspect-floors/VERDICT.md) |
+| W-144-B-SWEEP-2 | ✅ **PASS at `b = 0.15`** (2026-09-16) — the first value in the frozen descending order `0.4 → 0.3 → 0.2 → 0.15` that nets positive on **both** benefit families: `content` **+30** and `main` **+30**, `p = 0.0000` each on 30 discordant pairs against a required net of **12**, with **all four controls holding** (`inverse`, `placebo`, `verbose`, `dump`). `0.4` moves neither family; `0.3` and `0.2` fix the rate-card case and leave prose-with-appendix exactly where `0.75` does. **Descending order is what makes it `0.15` and not lower** — the rule reports the smallest departure from `0.75` that works. ✅ **The controls' holding is informative because one of them is proven able to lose**: `verbose` 30/30 → **0/30 at `b = 0`**, and without it `b = 0` and `b = 0.15` are indistinguishable on every other instrument. **Shipped** as the `[bm25f] b` default in both readers. ⚠ **One synthetic corpus, `informed`** — 510 generated documents; real-corpus evidence is the reopen trigger | [W-144-B-SWEEP-2](regression/2026-09-16-b-sweep-2/VERDICT.md) |
+| W-154-PART-B2 | 🔴 **FAIL** (2026-09-16) — `rerank_weight = 1.0` makes `ask` **worse** on the de-contaminated endpoint: 7 better against **47 worse**, net **40** on 54 discordant, `p = 0.0000` against a required 16, with **both headrooms open** (420 improvement, 118 regression). **The repair worked** — baseline **3.3 % → 21.9 %** once the citing document is excluded — and **the bar did not move**: decision 19's floor unchanged, the pre-registration committed **alone** so the freeze is checkable in `git log`. 🔴 **The run found its own repair incomplete and reported it**: **28 of the 47 breaks were won by another document QUOTING the citing sentence**, because this repository quotes itself heavily. The direction **survives** — net 12 on 26 discordant, `p = 0.0290`, at exactly the floor — and **widening the exclusion is not the fix**, because an exclusion set that grows until the result is clean is not an endpoint. ⚠ **The `answer` path was MEASURED OUT in advance** (0 of 120 on both criteria), so **W-108's two-mechanism separation is still undelivered** and was declared so before the arm ran. Read with Part A's +15 to +19 ms p50, W-154's question is answered and the item closes | [W-154-PART-B2](regression/2026-09-16-rerank-quality-b2/VERDICT.md) |
+| W-154-PART-B | **VOID** (2026-09-15) — proximity reranking against the frozen Part B rule. The `ask` arm reads **net −50** and it is **not a negative**: 🔴 **39 of the 52 broken contests (75 %) are the query's OWN SOURCE document taking rank 1**, because the queries are sentences lifted verbatim from citing documents and a proximity reranker is built to find the document containing a phrase contiguously. **It found it, and the endpoint scored that as a miss.** The `answer` arm has **4 baseline hits in 538** — no signal, so W-108's two-mechanism split is not delivered either. ⚠ **Both screens passed while the defect was present** (0.4141 passage, 0.5273 document): they score the candidates they are handed and never asked what else is in the corpus. Fix named — exclude the citing document — and it needs its OWN pre-registration | [W-154-PART-B](regression/2026-09-15-rerank-quality/VERDICT.md) |
+| W-144-B-SWEEP | **FAIL** (2026-09-15) — lowering `b` against the frozen rule *first value in `0.6 → 0.5 → 0.4` netting positive on all three families*. **No value clears**: 0 discordant on all five families at every pre-registered value. 🔴 **But the lever is NOT inert** — a mechanism probe outside the arms (SR-RS 22c) puts `content`'s crossover at `b ≤ 0.3` and `main`'s at `b ≤ 0.15`, so **the frozen range was set above the effect**. 🔴 **And option (d) lacks option (b)'s defect**: `dump` — the family W-155 showed (b) DESTROYED — holds 30/30 down to `b = 0`. ⚠ **Both controls are saturated**, so *nothing regresses* is consistent with safety and is not evidence of it. Widening the range is a NEW pre-registration and **Arpit's** | [W-144-B-SWEEP](regression/2026-09-15-b-sweep/VERDICT.md) |
+| W-183-SCREEN | **PASS** (2026-09-15) — the cited-decision endpoint against the circularity band frozen one commit earlier at `9b32762f`: **`agreement` 0.4141** over 524 screened contests, inside `0.25`–`0.85`, at **5.5×** the 0.0748 chance rate. 🔴 **The point is that it could have FAILED from either side** — `≈ 1.00` is C2's circularity caught by arithmetic instead of argued about, `≈ chance` is a null generator, and `cited_decision.py` exits 1 naming which. Spread over 29 records, median per-record rate 0.368, largest contributor (n = 58) **below** the aggregate. ⚠ **Says nothing about whether proximity reranking helps** — no arm ran; it measures the instrument. Unblocks W-154's Part B | [W-183-SCREEN](regression/2026-09-15-quality-endpoint-screen/VERDICT.md) |
 | W-155 | **PASS** (2026-09-13) — the table-is-the-answer probes, against the frozen question *does excluding table cells from `flen` promote a document above a better answer?* 🔴 **YES, 30 of 30.** When the query term is a **row label** in a document that says nothing about it, the counterfactual takes `hit@1` from **30/30 to 0/30** (p < 0.0001, net 30 against a bar of 12). The mirror family is 30/30 the other way — (b) **fixes** the rate-card case. **So (b)'s effect is decided by WHERE the term sits, not by whether the table is an appendix, and `flen` cannot see the difference.** Both controls hold; verification gate 450/450; `main` reproduces the 2026-09-12 run exactly on a different corpus. ⚠ **`PASS` means the question was ANSWERED** — the answer runs against (b)'s stated case, and the recommendation stays Arpit's (W-144). ⚠ **The YES is the WEAK kind, declared in the pre-registration before the run**: the probe author was looking for the harm. **The arithmetic is not weak** — (b) cuts the dump's length ~7× while leaving its `tf`. `informed` | [VERDICT-W155](regression/2026-09-13-table-is-the-answer/VERDICT.md) |
 | W44-SIGNAL | **WARRANTED** (2026-08-22) — live-intent contamination@5 **32.00 pts** against a 25 pt bar; findability guard **93.33 %** against a 60 % floor. Discharged [SR-ARCHIVED-CONTENT](../records/0134_archived-content.md) decision 5's gate, which Arpit **also** lifted by instruction the same session — the pre-registration was frozen first, so the number is evidence rather than a formality. Licenses the marker and disclaimer only; the demotion default stays [W-52](../archive/open/W-52-df-over-the-union.md)'s | [W44-SIGNAL](regression/2026-08-22-archived-signal/VERDICT.md) |
 | P1 | **FAIL** — full postings, permanently | [P1-RERUN](regression/2026-08-09-pruning-rerun/VERDICT.md) |

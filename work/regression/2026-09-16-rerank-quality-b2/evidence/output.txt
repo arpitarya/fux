@@ -1,0 +1,33 @@
+tree: /private/tmp/claude-501/-Users-arpitarya-my-programs-fux/bfdf0f61-9b1d-4f48-97d7-5a4381f3dc8b/scratchpad/lab
+contests: 538   paths: ['ask']
+  25/538
+  50/538
+  75/538
+  100/538
+  125/538
+  150/538
+  175/538
+  200/538
+  225/538
+  250/538
+  275/538
+  300/538
+  325/538
+  350/538
+  375/538
+  400/538
+  425/538
+  450/538
+  475/538
+  500/538
+  525/538
+
+    path     n    off     on  better  worse  discordant    net
+     ask   538    118     78       7     47          54    -40
+
+headroom (SR-RS 22b) — measured in the BASELINE arm, per path:
+       ask  improvement  420/538   regression  118/538 
+
+🔴 The bar is the PRE-REGISTRATION's and this runner does not apply it.
+   `ask` only: this prices PROXIMITY RERANKING and nothing else.
+   W-108's two-mechanism separation is NOT delivered — `ask` never fetches.

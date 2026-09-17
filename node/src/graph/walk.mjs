@@ -55,10 +55,78 @@ export const EXTRACTED_GRADE = 10;
  * module reads on purpose**: the parity artefact above is a joint property of
  * `iterations` and `laziness`, and a caller that could set one without the
  * other would be able to reintroduce it silently. */
+//: **The three walk parameters W-161 will turn on for `ask`, exposed and
+//: INERT at their defaults** (W-160). Twin of `walk.py`'s block — see it for
+//: why the mechanism lands before the composition that uses it.
+//:
+//: `ALL_KINDS` is the sentinel for *no selection*, spelled rather than `null`
+//: so a call site reads as a choice.
+export const ALL_KINDS = null;
+
+//: The edge kinds `ingest/edges.py` mints.
+export const EDGE_KINDS = ["ref", "tag", "code", "supersedes"];
+
+/** `graph.neighbours(node)`, optionally narrowed to some edge kinds.
+ *
+ * ⚠ **`ALL_KINDS` returns `graph.neighbours` UNTOUCHED, not a filtered copy
+ * that happens to keep everything.** `neighbours` is pre-sorted and the walk
+ * accumulates floats over it in that order; rebuilding the array would be
+ * equal today and is one refactor away from not being. */
+function narrow(graph, node, kinds) {
+  const neighbours = graph.neighbours(node);
+  if (kinds === ALL_KINDS) return neighbours;
+  const keep = new Set();
+  for (const edge of graph.outEdges(node)) if (kinds.has(edge.kind)) keep.add(edge.dst);
+  for (const edge of graph.edges) {
+    if (edge.dst === node && kinds.has(edge.kind)) keep.add(edge.src);
+  }
+  return neighbours.filter(([n]) => keep.has(n));
+}
+
+/** How many edges point AT each node. The input to `linkIdf`. */
+function inDegree(graph) {
+  const counts = new Map();
+  for (const edge of graph.edges) counts.set(edge.dst, (counts.get(edge.dst) ?? 0) + 1);
+  return counts;
+}
+
+/** An inbound edge's discount, by how many other documents point at it.
+ *
+ * `1 / (1 + ln(1 + inDegree))`. **Named after IDF because it is the same
+ * idea**, and deliberately not `1/inDegree`, which would make a hub weightless
+ * and turn *widely cited* into *ignored*. Twin of `walk.py::link_idf`. */
+export function linkIdf(inDeg) {
+  return 1.0 / (1.0 + Math.log1p(Math.max(inDeg, 0)));
+}
+
+/** Every node within `maxHops` undirected steps of a seed, seeds included.
+ *  Over `neighbours`, the same adjacency the walk uses — a bound computed over
+ *  `outEdges` would exclude a node the walk can still reach backwards. */
+function hopsFromSeeds(graph, seeds, maxHops) {
+  let frontier = new Set(seeds);
+  const seen = new Set(seeds);
+  for (let i = 0; i < Math.max(maxHops, 0); i++) {
+    const next = new Set();
+    for (const node of [...frontier].sort(cmpCodePoints)) {
+      for (const [neighbour] of graph.neighbours(node)) {
+        if (!seen.has(neighbour)) { seen.add(neighbour); next.add(neighbour); }
+      }
+    }
+    if (!next.size) break;
+    frontier = next;
+  }
+  return seen;
+}
+
 export function ppr(graph, seeds, {
   damping = DAMPING, iterations = ITERATIONS, laziness = LAZINESS,
+  kinds = ALL_KINDS, linkIdfOn = false, maxHops = null,
 } = {}) {
   if (!seeds.length || !graph.edges.length) return new Map();
+  const hopOf = maxHops !== null && maxHops !== undefined
+    ? hopsFromSeeds(graph, seeds, maxHops)
+    : null;
+  const inbound = linkIdfOn ? inDegree(graph) : null;
 
   const seedMass = new Map();
   seeds.forEach((doc, i) => { if (!seedMass.has(doc)) seedMass.set(doc, 1.0 / (i + 1)); });
@@ -74,7 +142,11 @@ export function ppr(graph, seeds, {
       const mass = scores.get(node);
       // Laziness: part of the mass stays where it is.
       next.set(node, (next.get(node) ?? 0.0) + damping * laziness * mass);
-      const neighbours = graph.neighbours(node);
+      let neighbours = narrow(graph, node, kinds);
+      if (hopOf !== null) neighbours = neighbours.filter(([n]) => hopOf.has(n));
+      if (inbound !== null) {
+        neighbours = neighbours.map(([n, g]) => [n, g * linkIdf(inbound.get(n) ?? 0)]);
+      }
       let outWeight = 0;
       for (const [, grade] of neighbours) outWeight += grade;
       if (!outWeight) continue;
@@ -97,9 +169,12 @@ export function ppr(graph, seeds, {
  * many nodes come back, `ppr` decides what the numbers mean. */
 export function expand(graph, seeds, {
   limit, minScore = 0.0, damping = DAMPING, iterations = ITERATIONS, laziness = LAZINESS,
+  kinds = ALL_KINDS, linkIdfOn = false, maxHops = null,
 } = {}) {
   const seedSet = new Set(seeds);
-  const walked = ppr(graph, seeds, { damping, iterations, laziness });
+  const walked = ppr(graph, seeds, {
+    damping, iterations, laziness, kinds, linkIdfOn, maxHops,
+  });
   const ranked = [...walked].filter(([node, score]) => !seedSet.has(node) && score >= minScore);
   ranked.sort((a, b) => (a[1] !== b[1] ? (a[1] > b[1] ? -1 : 1) : cmpCodePoints(a[0], b[0])));
   return ranked.slice(0, limit);
@@ -130,12 +205,36 @@ export function reliability(hops, { hopDecay = HOP_DECAY } = {}) {
  * enumeration is bounded by `hops`, a CLI argument and deliberately not a
  * tunable — a tune file that could widen a search would make `--hops 2` mean
  * different things in two repos. */
-export function routes(graph, src, dst, { hops, limit = 10, hopDecay = HOP_DECAY } = {}) {
-  if (hops < 1 || src === dst) return [];
+/**
+ * How many node expansions one `routes()` search may spend. Twin of Python's
+ * `walk.EXPANSION_BUDGET` and it must stay equal — the truncation point is
+ * asserted byte-equal across the two readers.
+ *
+ * 🔴 A **work** bound, not a depth bound (Arpit, 2026-09-14, option (c)).
+ * Capping `--hops` would be a pre-registered threshold in everything but name:
+ * measured on one corpus and shipped to every corpus. Work is the same on
+ * every corpus; depth is not. **Not tunable** — a tune file that could widen a
+ * search would make `--hops 2` mean different things in two repositories.
+ */
+export const EXPANSION_BUDGET = 200000;
+
+/** `{routes, truncated}`. **`truncated` describes the SEARCH, not the result
+ *  set** — a truncated search that found three routes may have missed a better
+ *  one, and *"no route within 6 hops"* is a different claim from *"no route
+ *  found in the first 200 000 expansions"*. Returning the first when the
+ *  second is true is a confident answer to a question that was not finished. */
+export function routes(
+  graph, src, dst, { hops, limit = 10, hopDecay = HOP_DECAY, budget = EXPANSION_BUDGET } = {},
+) {
+  if (hops < 1 || src === dst) return { routes: [], truncated: false };
 
   const found = [];
+  let spent = 0;
+  let truncated = false;
   const walk = (node, trail, seen) => {
-    if (trail.length >= hops) return;
+    if (truncated || trail.length >= hops) return;
+    spent += 1;
+    if (spent > budget) { truncated = true; return; }
     for (const edge of graph.outEdges(node)) {
       if (seen.has(edge.dst)) continue;
       const step = [...trail, edge];
@@ -144,6 +243,7 @@ export function routes(graph, src, dst, { hops, limit = 10, hopDecay = HOP_DECAY
         continue;  // a longer route to the same place is not more evidence
       }
       walk(edge.dst, step, new Set([...seen, edge.dst]));
+      if (truncated) return;
     }
   };
   walk(src, [], new Set([src]));
@@ -159,5 +259,5 @@ export function routes(graph, src, dst, { hops, limit = 10, hopDecay = HOP_DECAY
     }
     return a.hops.length - b.hops.length;
   });
-  return found.slice(0, limit);
+  return { routes: found.slice(0, limit), truncated };
 }

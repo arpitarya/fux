@@ -43,6 +43,9 @@ import { B, FIELD_WEIGHTS, K1, Scoring } from "../query/bm25f.mjs";
 import { DOC_COVERAGE_FLOOR, SEPARATION_FLOOR } from "../query/confidence.mjs";
 import { TF_FIELDS } from "../store/format.mjs";
 import { cmpCodePoints } from "../compat/pyfloat.mjs";
+// `ask_kinds` is validated against the kinds the index mints, at load — the
+// same list `graph --kinds` refuses against at the CLI boundary.
+import { EDGE_KINDS } from "../graph/walk.mjs";
 
 export const TUNE_NAME = ".fux/tune.toml";
 
@@ -62,9 +65,20 @@ export const INDEX_TABLE = "index";
 
 //: The closed key set. Table -> keys. Adding one here is a change to SR-TUNE.
 const SCHEMA = {
-  bm25f: ["k1", "b", ...FIELD_KEYS],
+  bm25f: ["k1", "b", ...FIELD_KEYS, "anchor"],
   ranking: ["rerank_weight", "expand_weight"],
-  graph: ["damping", "iterations", "laziness", "hop_decay", "expand_limit", "seed_depth"],
+  // The six `ask_*` keys are W-161's graph tier. They are parsed and carried
+  // here so a consumer's committed `tune.toml` is accepted identically by both
+  // readers; whether the Node reader COMPOSES the tier is
+  // SR-NODE-SEARCH's, and today it does not — see the divergence note there.
+  // A key this reader refused and Python accepted would make the same file
+  // valid in one reader and an error in the other, which is the one asymmetry
+  // the config parity test exists to forbid.
+  graph: [
+    "damping", "iterations", "laziness", "hop_decay", "expand_limit", "seed_depth",
+    "ask_boost", "ask_related", "ask_kinds", "ask_link_idf", "ask_max_hops",
+    "ask_related_limit",
+  ],
   refer: ["budget", "per_doc_fraction", "min_passage_bytes", "max_passage_bytes"],
   confidence: ["separation_floor", "doc_coverage_floor"],
   // ⚠ THE EXCEPTION — read by ingest, changes committed bytes, untouched by
@@ -123,6 +137,11 @@ export class Tune {
     this.k1 = K1;
     this.b = B;
     this.fieldWeights = FIELD_WEIGHTS;
+    // W-168 step 1 — the anchor field, folded at read time from other
+    // documents' edges. NOT in `fieldWeights`: that array is aligned with
+    // TF_FIELDS, the five fields a record commits an `flen` for. 0 = off, and
+    // off is the default until a pre-registered run says otherwise.
+    this.anchorWeight = 0.0;
     // [ranking]
     // The three DOCUMENT priors were removed on 2026-09-13 (W-151, W-152).
     this.rerankWeight = 0.0;
@@ -134,6 +153,13 @@ export class Tune {
     this.hopDecay = 0.5;
     this.expandLimit = 10;
     this.seedDepth = 5;
+    // W-161's graph tier. Carried, not composed — see SCHEMA above.
+    this.askBoost = true;
+    this.askRelated = true;
+    this.askKinds = "ref";
+    this.askLinkIdf = true;
+    this.askMaxHops = 1;
+    this.askRelatedLimit = 5;
     // [confidence]
     this.separationFloor = SEPARATION_FLOOR;
     this.docCoverageFloor = DOC_COVERAGE_FLOOR;
@@ -151,7 +177,7 @@ export class Tune {
   }
 
   /** The three-part BM25F parameter set, as one object. */
-  get scoring() { return new Scoring(this.k1, this.b, this.fieldWeights); }
+  get scoring() { return new Scoring(this.k1, this.b, this.fieldWeights, this.anchorWeight); }
 }
 
 export const DEFAULT_TUNE = new Tune();
@@ -231,6 +257,48 @@ function atLeast(c, tbl, table, key, value, dflt, floor) {
     return dflt;
   }
   return value;
+}
+
+/**
+ * A strict boolean. `1`/`0` are refused rather than coerced — the twin of
+ * Python's `_boolean`, and for its reason: a consumer who writes
+ * `ask_boost = 1` is told the key is a boolean instead of getting a silent
+ * `true` out of a file that never said so.
+ */
+function boolean(c, table, key, value, dflt) {
+  if (typeof value !== "boolean") {
+    c.add(`[${table}] ${key} must be true or false (got ${repr(value)})`);
+    return dflt;
+  }
+  return value;
+}
+
+/**
+ * A comma-separated list of edge kinds the index actually mints.
+ *
+ * Validated at LOAD rather than where a walk would run: an unknown kind walks
+ * nothing, and a walk over no edges returns an empty neighbourhood that cannot
+ * be told from a corpus with no links at all.
+ */
+function edgeKinds(c, table, key, value, dflt) {
+  if (typeof value !== "string") {
+    c.add(`[${table}] ${key} must be a string (got ${repr(value)})`);
+    return dflt;
+  }
+  const named = value.split(",").map((k) => k.trim()).filter((k) => k.length > 0);
+  if (named.length === 0) {
+    c.add(`[${table}] ${key} names no edge kind; the kinds this index mints are ${EDGE_KINDS.join(", ")}`);
+    return dflt;
+  }
+  const unknown = [...new Set(named.filter((k) => !EDGE_KINDS.includes(k)))].sort();
+  if (unknown.length > 0) {
+    c.add(
+      `[${table}] ${key} names ${unknown.join(", ")}, which is not an edge kind; ` +
+      `the kinds this index mints are ${EDGE_KINDS.join(", ")}`,
+    );
+    return dflt;
+  }
+  return named.join(",");
 }
 
 function has(table, key) {
@@ -346,6 +414,10 @@ export function loadTune(root, { enabled = true } = {}) {
     if (has(bm25f, key)) weights[i] = nonNegative(c, "bm25f", key, bm25f[key], FIELD_WEIGHTS[i]);
   });
 
+  const anchorWeight = has(bm25f, "anchor")
+    ? nonNegative(c, "bm25f", "anchor", bm25f.anchor, 0.0)
+    : 0.0;
+
   const ranking = data.ranking ?? {};
   const pick = (table, name, key, dflt, fn = nonNegative) =>
     (has(table, key) ? fn(c, name, key, table[key], dflt) : dflt);
@@ -363,6 +435,18 @@ export function loadTune(root, { enabled = true } = {}) {
     ? atLeast(c, graph, "graph", "expand_limit", graph.expand_limit, 10, 1) : 10;
   const seedDepth = has(graph, "seed_depth")
     ? atLeast(c, graph, "graph", "seed_depth", graph.seed_depth, 5, 1) : 5;
+  const askBoost = has(graph, "ask_boost")
+    ? boolean(c, "graph", "ask_boost", graph.ask_boost, true) : true;
+  const askRelated = has(graph, "ask_related")
+    ? boolean(c, "graph", "ask_related", graph.ask_related, true) : true;
+  const askKinds = has(graph, "ask_kinds")
+    ? edgeKinds(c, "graph", "ask_kinds", graph.ask_kinds, "ref") : "ref";
+  const askLinkIdf = has(graph, "ask_link_idf")
+    ? boolean(c, "graph", "ask_link_idf", graph.ask_link_idf, true) : true;
+  const askMaxHops = has(graph, "ask_max_hops")
+    ? atLeast(c, graph, "graph", "ask_max_hops", graph.ask_max_hops, 1, 1) : 1;
+  const askRelatedLimit = has(graph, "ask_related_limit")
+    ? atLeast(c, graph, "graph", "ask_related_limit", graph.ask_related_limit, 5, 1) : 5;
 
   const conf = data.confidence ?? {};
   const separationFloor = pick(conf, "confidence", "separation_floor", SEPARATION_FLOOR, fraction);
@@ -418,9 +502,10 @@ export function loadTune(root, { enabled = true } = {}) {
   c.raiseIfAny();
 
   return new Tune({
-    k1, b, fieldWeights: weights,
+    k1, b, fieldWeights: weights, anchorWeight,
     rerankWeight, expandWeight,
     damping, iterations, laziness, hopDecay, expandLimit, seedDepth,
+    askBoost, askRelated, askKinds, askLinkIdf, askMaxHops, askRelatedLimit,
     separationFloor, docCoverageFloor,
     budget, perDocFraction, minPassageBytes: minPassage, maxPassageBytes: maxPassage,
     priority,

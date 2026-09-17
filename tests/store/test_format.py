@@ -41,7 +41,7 @@ def test_shard_distribution_across_many_ids_is_not_degenerate():
 
 
 def test_header_carries_format_analyzer_and_tf_fields():
-    assert HEADER["_format"] == "fux.index.v2"
+    assert HEADER["_format"] == "fux.index.v3"
     assert HEADER["analyzer"]
     assert HEADER["tf_fields"] == ["body", "heading", "title", "path", "ctx"]
 

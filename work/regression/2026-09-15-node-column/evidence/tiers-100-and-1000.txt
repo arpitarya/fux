@@ -1,0 +1,17 @@
+=== docs-00100 ===
+
+docs-00100 · scan · n=5 after 2 warm-ups
+arm  version         median-of-medians   p95 of medians
+A                1.0.0                      51.9ms           52.8ms
+B                2.0.1                      77.7ms           78.8ms
+B-node           node reader                63.2ms           63.8ms
+B-node-nograph   node reader                26.3ms           26.7ms
+=== docs-01000 ===
+
+docs-01000 · scan · n=5 after 2 warm-ups
+arm  version         median-of-medians   p95 of medians
+A                1.0.0                     208.0ms          212.8ms
+B                2.0.1                     231.2ms          238.2ms
+B-node           node reader               269.5ms          276.7ms
+B-node-nograph   node reader                26.4ms           26.8ms
+=== docs-10000 ===

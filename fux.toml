@@ -10,31 +10,51 @@
 # describes a key can drift from the record that decides it while both still
 # look correct (SR-LAW-0 decision 4). A key fux does not know is REFUSED by
 # name, so a typo here fails loudly instead of sitting inert.
+#
+# Every key fux writes here is LIVE and carries the value fux itself applies.
+# What is NOT written is deliberate: a key whose default is a number that may
+# rise (acquired_max_bytes, sweep_minutes, ttl) is left out so raising it
+# reaches this repo without an edit.
 
+# The two source lists, together: one names the directories, one names the URLs.
 [sources]
 dirs_file = ".fux/sources/dirs"
+urls_file = ".fux/sources/urls"
 
-# Presence of this table enables URL ingestion. Nothing is fetched until a URL
-# is listed in .fux/sources/urls, and only `fux add <URL>` lists one.
+# Presence of THIS table is what enables URL ingestion -- `urls_file` above
+# only names the list. Nothing is fetched until a URL is listed in it, and
+# only `fux add <URL>` lists one.
 [sources.url]
-fetcher      = ".fux/fetchers/http.py"
-urls_file    = ".fux/sources/urls"
-meta         = "hashed"
-#update      = "auto"
+fetcher         = ".fux/fetchers/http.py"
+meta            = "hashed"
+keep            = true
+enrich          = false
+update          = "auto"
+fetch_at_answer = true
 
 # REQUIRED, and may not be commented out: a repo that CAN fetch has to say how
 # hard, in a number a person can read. Comment it out and fux refuses to load.
 max_parallel = 4
 
-# Passed to your fetcher's configure(); fux sorts this table by SHAPE, never by
-# meaning. A scalar here is shared and reaches every fetcher. A sub-table
-# reaches only the fetcher it names -- keep a fetcher-specific key there, or
-# the other fetcher is handed it and refuses the key it does not know.
-#[sources.url.config]
-#[sources.url.config.cdp]
-#cdp_port  = 9222
-#[sources.url.config.http]
-#timeout_s = 30
+# Handed to your fetcher's configure() verbatim; fux reads no key inside.
+# A key at THIS level goes to every fetcher -- only put one here that all
+# of yours know, because each configure() refuses a key it does not.
+[sources.url.config]
+
+# Only .fux/fetchers/cdp.py receives these.
+[sources.url.config.cdp]
+cdp_host             = "127.0.0.1"
+cdp_port             = 9222
+chrome_binaries      = ["google-chrome", "chromium", "chromium-browser", "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", "/Applications/Chromium.app/Contents/MacOS/Chromium"]
+fetcher_max_parallel = 1
+launch_chrome        = false
+load_timeout_s       = 30.0
+
+# Only .fux/fetchers/http.py receives these.
+[sources.url.config.http]
+fetcher_max_parallel = 8
+timeout_s            = 30.0
+user_agent           = "fux/0.x (+https://github.com/arpitarya/fux)"
 
 [index]
 shards = 256

@@ -10,7 +10,7 @@ feature: the acquired plane
 owns: [src/fux/store/acquired.py@9897ee1fe4af]
 laws: []
 timestamp: 2026-09-01T00:00:00Z
-content_sha: a773e97c0800c6e0c33e34b209ea508d19fe1fefaa00030e06c1e67457744105
+content_sha: 619a720273554e5462de7b34cc9da6fe6d2d18be72f746bc7830ca2f07a5617b
 ---
 
 # SR-ACQUIRED: fetched bytes are kept, in a plane that is neither committed nor derived
@@ -163,13 +163,36 @@ again*, and the two pairings are not equivalent:
 
 | pairing | what a citation is worth |
 |---|---|
-| `update=never keep=true` | **the coherent one.** The bytes are here, `fux answer` verifies against them and reports `as-ingested`, and no socket opens. *More* offline, with the grain of L4 |
-| `update=never keep=false` | **legal and lossy.** Nothing was retained and nothing will be fetched, so the document is frozen at whatever statistics its last ingest produced with nothing to check it against |
+| `update=never keep=true` | **the coherent one.** The bytes are here, and a fetch that fails or is forbidden verifies against them and reports `as-ingested` |
+| `update=never keep=false` | **legal and lossy.** Nothing was retained and no *update* will fetch again, so the document is frozen at whatever statistics its last ingest produced with nothing to check it against |
 
 **The lossy pair is disclosed, never refused** — `fux doctor` counts the pinned
 lines and names the ones with no retained bytes. It is coherent for a document
 that genuinely never changes and surprising to have chosen by accident, which is
 a warning's shape rather than a refusal's.
+
+⚠ **The first row said *"and no socket opens"* and that was WRONG for as long as
+it stood** (corrected 2026-09-14, W-174). `update=` is the **update-time**
+clock: it stops `fux ingest` and `ingest --refresh-urls`, and
+[SR-URL-FRESHNESS](0147_url-freshness.md) decision 15 says in as many words
+that it *"still does not keep `answer` offline"*. A pinned line still opened a
+socket on every answer. **The sentence read as authority and described
+behaviour the code never had** — Law zero's third obligation, found by reading
+the record under code that was being changed.
+
+**The knob that does close the socket is `[sources.url] fetch_at_answer`**
+(decision 16 of that record, W-174), and it makes a third pairing the coherent
+one for an answer-time reader:
+
+| pairing | what a citation is worth |
+|---|---|
+| `fetch_at_answer = false` + `keep = true` | **fully offline, and verified.** No socket at ask time, and every `url:` citation is compared against the exact bytes its record was built from — `as-ingested` |
+| `fetch_at_answer = false` + `keep = false` | **the lossy pair again, one clock over.** Nothing retained and nothing fetched: every citation is `unverified`. Disclosed by `fux doctor`'s `pinned url bytes` row, never refused |
+
+**This is the strongest case on record for the plane existing.** Without
+retained bytes, a never-fetch policy degrades every URL citation to
+`unverified` — indistinguishable from never having looked, which is the exact
+failure `.fux/acquired/` was built to end.
 
 ⚠ **Touched twice by changes to `.fux/.gitignore`'s generator that this record
 does not describe.** `__pycache__/` joined the file on 2026-09-11, and
@@ -204,7 +227,7 @@ landed one commit later — see SR-CONFIG after decision 15.
 
 **2026-09-14 — `src/fux/ingest/urlsrc.py` changed under this record and NOTHING this record
 decides moved.** `fetch_all` now hands each fetcher its own slice of `[sources.url.config]`
-instead of the whole table ([SR-FETCHER](0117_fetcher.md) decision 8). Retention
+instead of the whole table ([SR-CONFIG](0113_config.md) decision 8a). Retention
 is untouched: still in `fetch_all` and never inside a fetcher (decision 5),
 still ordered `_unpack` -> refusal -> persist -> decode (decision 6), still
 bounded and evicted by `run_seq` (decision 8).
@@ -213,7 +236,43 @@ bounded and evicted by `run_seq` (decision 8).
 owning record was *touched*, never that it was read (CLAUDE.md §Law zero), so a
 co-owner's file changing under this one is exactly the case where a reader needs
 to be told *"not yours"* in writing.
+⚠ **`keep` stays a closed enum** (2026-09-15). [SR-URL-LIST](0116_url-list.md)
+decision 15 made `fetch=` typed and validated by name shape; `keep` is a policy
+value with a genuinely closed set — `true` or `false`, and no third answer is
+coherent — so it is untouched. **Only `fetch` names a file**, which is the whole
+basis of that loosening.
+
 ### Consequences
+
+- **The observer hook reaches nothing here** (W-170, 2026-09-15). It shares
+  `config.py` and `store/fuxdir.py` with this record because `[observe] max_ms`
+  and `.fux/observers/` live beside the acquired plane's own keys and
+  directory — and it touches no acquired byte, no retention policy and no
+  budget. Stated so the freshness gate's demand for this record has an answer
+  in it rather than an empty edit.
+
+- **The `.fux/README.md` template reaches nothing here either** (2026-09-15).
+  `store/fuxdir.py::_readme` renders the file a NEW consumer is handed, and its
+  verb table had drifted three verbs behind the parser; fixing it moved a
+  function in a file this record describes for the `ACQUIRED` declaration and
+  the `.gitignore` line. **Neither moved.** ⚠ The narrowing qualifier cannot
+  cover this case: the two things this record describes in that file are
+  **module constants**, and the gate resolves top-level `def`/`class` names only
+  — a constant change deliberately reads as *every symbol*. So the demand will
+  come back on the next template edit, and the answer is this bullet.
+  [SR-DOTFUX](0102_fux-directory.md) decision 6b is the co-location itself.
+
+- **W-185's `.gitignore` line is a TRANSIENT, not a plane** (2026-09-15). It is
+  the one change to `_GITIGNORE` that this record genuinely describes and still
+  decides nothing here: `acquired/` is listed exactly as it was, and
+  `index/*.jsonl.tmp` names a file that exists for the duration of an
+  `os.replace` inside the **committed** index plane
+  ([SR-DOTFUX](0102_fux-directory.md) decision 6c). **Nothing acquired is
+  ignored differently, and nothing about retention moved.** ⚠ The distinction
+  is this record's whole subject, which is why the bullet is worth writing: a
+  reader who saw `_GITIGNORE` change would reasonably check whether a **fourth
+  category** had appeared beside committed, derived and acquired. It has not —
+  a transient is not a plane.
 
 **Easier.** A citation can be checked offline against the exact bytes that produced it — a stronger claim than comparing two fetches, which is why `refer/source.py` verifies with the same fetcher a document was ingested with: *a document fetched two ways is two documents*. A retained original removes that whole class of false staleness, and the browser-session fetcher stops being needed at answer time.
 

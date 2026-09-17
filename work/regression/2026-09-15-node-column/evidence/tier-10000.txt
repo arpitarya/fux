@@ -1,0 +1,7 @@
+
+docs-10000 · scan · n=3 after 1 warm-ups
+arm  version         median-of-medians   p95 of medians
+A                1.0.0                    2009.3ms         3999.4ms
+B                2.0.1                    1952.2ms         4458.6ms
+B-node           node reader              3200.3ms         5488.6ms
+B-node-nograph   node reader                42.7ms           83.7ms

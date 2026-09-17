@@ -28,8 +28,14 @@ export class Expansion {
   /** 🔴 The hallucinated-citation guard. A record matching ONLY expansion
    *  terms is not a weak answer to rank low — it is an answer to a question
    *  nobody asked, and `rank()` drops it outright. */
-  matches(terms) {
+  /** W-168 step 1: an ANCHOR match is a match. A document reachable only by
+   *  what its linkers called it carries none of the query's hashes in its own
+   *  `terms`, so this guard would drop it before it was ever scored. It is not
+   *  a hallucination — `--expand` hands fux words a MODEL invented; an anchor
+   *  term is a word a human linker wrote in a committed document. */
+  matches(terms, anchorTf = null) {
     for (const h of this.required) if (h in terms) return true;
+    if (anchorTf !== null) { for (const h of this.required) if (h in anchorTf) return true; }
     return false;
   }
 

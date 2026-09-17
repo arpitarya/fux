@@ -24,7 +24,7 @@
 # ── EVERY CONDITION IS PURE OVER THE BYTES. THIS IS NOT AN OVERSIGHT ─────────
 #
 # There is no `status`, no `final_url_host`, no "were you redirected" here, and
-# there never will be while ADR-FETCHER decision 13 stands. Fux does not read a
+# there never will be while SR-FETCHER decision 13 stands. Fux does not read a
 # status code, a header, or an error string -- a fetcher knows it speaks HTTP,
 # and fux deliberately does not. `content_type` is in this file because a MIME
 # type is FORMAT vocabulary, which is fux's business; a 302 is TRANSPORT

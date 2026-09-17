@@ -57,8 +57,8 @@ def test_parser_has_the_verb_surface():
 
     lifecycle `setup`/`doctor` set the repo up and check it · write
     `ingest`/`build` — one writes the committed plane, one derives from it ·
-    sources **`add`/`remove`/`update`** maintain what is indexed (W-63,
-    replacing `url`) · read `ask`/`find`/`answer` differ only in how much they
+    sources **`add`/`remove`** maintain what is indexed (W-63, replacing `url`;
+    `update` joined them there and W-177 folded it into `ingest`) · read `ask`/`find`/`answer` differ only in how much they
     commit to · **graph `explain`/`graph`/`path` answer with relationships
     rather than with rankings** (M3) · maintenance `hooks` wires the
     repository up to keep its own index in step (M5).
@@ -81,14 +81,23 @@ def test_parser_has_the_verb_surface():
     further in: `tune` prints what changes WHICH documents come back, `output`
     prints what changes how they are SHOWN. Both print and neither writes.
 
+    SR-INSPECT added **`inspect`** — the index X-ray. It sits beside `doctor`
+    rather than inside it: `doctor` checks the environment and `inspect` checks
+    the index, and the remedies do not overlap.
+
     Six, not four, and the count was never the mental model — which is why
     adding one costs a line here and a line in SR-CLI rather than a redesign.
 
     **`url` is gone, not deprecated** (W-63). It was four days old, pre-1.0,
-    and its whole surface is `fux add <URL>` / `fux remove <URL>`. The flag
-    `ingest --refresh-urls` was the opposite call — older, likelier to be in
-    someone's CI — and survives one release as a hidden alias for
-    `fux update`, which is asserted below.
+    and its whole surface is `fux add <URL>` / `fux remove <URL>`.
+
+    🔴 **`update` is gone too, and so is the hidden `--refresh-urls` alias**
+    (W-177, Arpit 2026-09-15). `fux ingest` absorbed the whole verb — the first
+    ingest and every re-ingest, dirs and URLs alike — so the alias now names
+    the default behaviour of the flag's own verb, which is worse than no alias
+    at all. **No deprecation shim:** W-63 kept `--refresh-urls` because it was
+    older and likelier to be in someone's CI, and `update` was three weeks old
+    when it went. The break rides 3.0.
     """
     parser = build_parser()
     sub_actions = [a for a in parser._subparsers._group_actions if a.dest == "command"]
@@ -99,7 +108,6 @@ def test_parser_has_the_verb_surface():
         "build",
         "add",
         "remove",
-        "update",
         "output",
         "ask",
         "find",
@@ -120,7 +128,59 @@ def test_parser_has_the_verb_surface():
         # a receipt FILE rather than a query, so every flag on the query parser
         # -- `--top`, `--fast`, `--no-tune` -- would be meaningless on it.
         "verify",
+        # SR-INSPECT (W-169). A verb rather than a flag on `doctor`, because
+        # the two answer different questions with different remedies: `doctor`
+        # checks the ENVIRONMENT, whose fix is a command or a config edit, and
+        # `inspect` checks the INDEX, whose fix is a change to the corpus.
+        "inspect",
+        # SR-CLI decision 12 (W-160). The lexical core, named and FROZEN.
+        # `ask --scan` already computed it; the verb makes it a contract, so
+        # that when W-161 gives `ask` a graph tier there is still a verb whose
+        # answer is only what the words say.
+        "lexical",
+        # SR-ENRICH decision 19 (W-162). A verb rather than a flag on
+        # `enrich`, and the reason is the AUTHOR: `enrich` plans and validates
+        # text a model wrote; this writes a line a person typed, and the two
+        # have different provenance, different survival under regeneration and
+        # different `--check` treatment.
+        "correct",
     }
+
+
+def test_lexical_takes_exactly_the_flags_ask_takes():
+    """SR-CLI decision 12's freeze, at the parser.
+
+    ⚠ **A flag `lexical` does not accept is a freeze that has already broken**
+    — `lexical` claims to be `ask`'s output shape, and a caller that can pass
+    `--why` to one and not the other has two verbs, not one body. Held by
+    construction (`_ask_shaped_parser` builds both) and asserted here, because
+    *by construction* is one refactor from *by accident*.
+    """
+    parser = build_parser()
+    (command,) = [a for a in parser._subparsers._group_actions if a.dest == "command"]
+
+    def flags(name: str) -> set[str]:
+        return {
+            option
+            for action in command.choices[name]._actions
+            for option in action.option_strings
+        }
+
+    assert flags("lexical") == flags("ask"), sorted(flags("lexical") ^ flags("ask"))
+    # And the positional, which `option_strings` does not cover.
+    positionals = lambda n: [a.dest for a in command.choices[n]._actions if not a.option_strings]
+    assert positionals("lexical") == positionals("ask") == ["query"]
+
+
+def test_graph_takes_a_query_or_seeds_and_argparse_enforces_neither():
+    """SR-CLI decision 13: the *one of the two is required* check is NOT in
+    argparse, deliberately — a mutually-exclusive group with `required=True`
+    refuses a positional. So the parser must accept both-absent and
+    both-present, and `cmd_graph` is what refuses them by name."""
+    parser = build_parser()
+    for argv in (["graph"], ["graph", "q", "--seed", "a.md"]):
+        args = parser.parse_args(argv)  # must not raise
+        assert args.command == "graph"
 
 
 def test_no_verb_grows_a_subcommand_tree():
@@ -318,8 +378,64 @@ def test_a_shard_with_conflict_markers_says_so(tmp_path):
     index = tmp_path / ".fux" / "index"
     index.mkdir(parents=True)
     (index / "00.jsonl").write_text(
-        '{"_format":"fux.index.v2"}\n<<<<<<< ours\n{"id":"a"}\n=======\n{"id":"b"}\n>>>>>>> theirs\n',
+        '{"_format":"fux.index.v3"}\n<<<<<<< ours\n{"id":"a"}\n=======\n{"id":"b"}\n>>>>>>> theirs\n',
         encoding="utf-8",
     )
     with pytest.raises(FuxError, match="unresolved merge conflict markers"):
         store.read_index(tmp_path)
+
+
+def test_a_usage_error_exits_2_and_a_fux_error_exits_1(tmp_path, monkeypatch, capsys):
+    """SR-CLI decision 5, as amended 2026-09-16 (W-193).
+
+    **fux produces `0`, `1`, `130`. `argparse` produces `2`**, for a usage error
+    raised before `cli.main`'s boundary exists — so decision 4's *"`main` is the
+    only boundary"* holds exactly: the one place fux renders an error never sees
+    a `2`.
+
+    🔴 **The old wording — *"`2` is reserved and not produced"* — was true of
+    `FuxError` and misleading about the process**, and W-177 turned that from a
+    latent wrong sentence into a real consequence: `fux update` shipped in 2.0.1,
+    is in people's pipelines, and now returns a `2`. A job that reads anything
+    non-`1` as *the runner broke* sees an outage where a verb was renamed.
+
+    **Both halves are pinned**, because the contract is the pair and not either
+    number alone.
+    """
+    from fux.cli import main
+
+    # argparse: an unknown verb never reaches the boundary.
+    with pytest.raises(SystemExit) as exc:
+        main(["definitely-not-a-verb"])
+    assert exc.value.code == 2
+    assert "invalid choice" in capsys.readouterr().err
+
+    # argparse: an unknown FLAG on a real verb, same path, same code.
+    with pytest.raises(SystemExit) as exc:
+        main(["ingest", "--definitely-not-a-flag"])
+    assert exc.value.code == 2
+    capsys.readouterr()  # drain, so the next assertion reads only its own output
+
+    # A FuxError reaches the boundary and renders there — exit 1, `error: …`.
+    monkeypatch.chdir(tmp_path)
+    assert main(["ingest"]) == 1
+    assert capsys.readouterr().err.startswith("error: ")
+
+
+def test_no_fux_error_site_passes_exit_code_2():
+    """The half of decision 5 the amendment KEPT, asserted structurally.
+
+    The amendment documents argparse's `2`; it does not license fux code to
+    produce one. A `raise FuxError(..., exit_code=2)` would make the two sources
+    indistinguishable to a consumer, which is the whole thing the ruling fixed.
+    """
+    import pathlib
+
+    root = pathlib.Path(__file__).resolve().parents[1] / "src" / "fux"
+    offenders = [
+        f"{path.relative_to(root)}:{i}"
+        for path in root.rglob("*.py")
+        for i, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1)
+        if "exit_code=2" in line.replace(" ", "")
+    ]
+    assert not offenders, f"a FuxError site passes exit_code=2: {offenders}"

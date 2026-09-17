@@ -15,6 +15,7 @@ from pathlib import Path
 import pytest
 
 from fux import setup as setup_mod
+from fux.ingest.urlsrc import DEFAULT_MAX_PARALLEL
 from fux.store import fuxdir
 
 TEMPLATES = Path(__file__).resolve().parents[1] / "src" / "fux" / "templates"
@@ -342,8 +343,9 @@ def test_the_written_config_names_max_parallel_uncommented(tmp_path):
 
 def test_the_configs_stated_default_is_the_one_the_engine_applies(tmp_path):
     """The gate, not the trust. A number typed into the template drifts from the
-    constant beside it — which is the defect W-83 fixed one file over. `_CONFIG`
-    interpolates `DEFAULT_MAX_PARALLEL`; this fails if anyone flattens it."""
+    constant beside it — which is the defect W-83 fixed one file over.
+    `config_text()` substitutes `DEFAULT_MAX_PARALLEL` into
+    `templates/fux.toml.txt`; this fails if anyone flattens it."""
     from fux.config import load
     from fux.ingest.urlsrc import DEFAULT_MAX_PARALLEL
 
@@ -478,10 +480,35 @@ def test_the_urls_header_is_derived_from_the_spec(tmp_path):
 
 
 def test_the_urls_header_does_not_promise_a_full_sweep(tmp_path):
-    """`fux update` stopped re-fetching every line when narrow-by-default landed."""
+    """The networked verb stopped re-fetching every line when narrow-by-default
+    landed (W-82 ruling 3), and `fux update` itself was deleted by W-177."""
     from fux.setup import _urls_header
 
-    assert "re-fetches every line" not in _urls_header()
+    header = _urls_header()
+    assert "re-fetches every line" not in header
+    assert "fux update" not in header, "W-177 deleted that verb"
+
+
+def test_the_header_prints_no_duration_for_a_non_duration_attribute():
+    """🔴 **W-140 row 18 returning through its own fix, caught by a test.**
+
+    `_urls_header()` hardcoded `<duration>` for every attribute with no enum
+    `values` — indistinguishable from correct while `ttl` was the only typed
+    one. W-178 made `fetch` typed, and without this the header would have said
+    `fetch=<duration>` in **every repo `fux setup` touches**, while this
+    repository's own copy stayed right (it is write-if-missing).
+
+    So the assertion is on the *general* rule, not on `fetch`: no attribute may
+    print a placeholder that belongs to another attribute's type.
+    """
+    from fux.ingest.sourcelist import URLS
+    from fux.setup import _urls_header
+
+    header = _urls_header()
+    for attr in URLS.attributes:
+        assert attr.spelling() in header, f"{attr.name} is not spelled by its own rule"
+    assert header.count("<duration>") == 1, "only `ttl` is a duration"
+    assert "fetch=<duration>" not in header
 
 
 def test_the_starter_pii_file_points_at_a_probe_the_consumer_has(tmp_path):
@@ -495,3 +522,113 @@ def test_the_starter_pii_file_points_at_a_probe_the_consumer_has(tmp_path):
     starter = template_bytes("pii.toml.txt").decode("utf-8")
     assert "python3 tools/pii-probe/probe.py" not in starter
     assert "fux-pii" in starter, "name the skill that actually carries the script"
+
+
+def test_the_scaffolded_config_is_a_template_file_not_a_string(tmp_path):
+    """Arpit, 2026-09-14: *"create a template for fux.toml file like others."*
+
+    The starter lives at `templates/fux.toml.txt` and is READ, like
+    `pii.toml.txt` and the two fetchers. This fails if anyone inlines it back
+    into `setup.py` — where a stray quote in a config comment becomes a syntax
+    error in the engine.
+    """
+    from importlib import resources
+
+    shipped = (resources.files("fux") / "templates" / "fux.toml.txt").read_text(encoding="utf-8")
+    assert "[sources.url]" in shipped
+    assert "{default}" in shipped, "the template holds the placeholder; setup substitutes it"
+    assert "{url_config}" in shipped, "the fetcher tables are DERIVED, never typed here"
+    expected = shipped.replace("{default}", str(DEFAULT_MAX_PARALLEL))
+    expected = expected.replace("{url_config}", setup_mod.url_config_tables())
+    assert setup_mod.config_text() == expected
+
+
+def test_a_brace_in_the_template_cannot_break_setup(tmp_path, monkeypatch):
+    """Why `str.replace` and not `str.format`.
+
+    The template is an editable file now, so a `{` added to a comment must be
+    written through verbatim rather than raising `KeyError` out of `fux setup`.
+    """
+    doctored = '# see {docs} for detail\n[sources]\n[sources.url]\nmax_parallel = {default}\n'
+    monkeypatch.setattr(setup_mod, "template_bytes", lambda name: doctored.encode("utf-8"))
+    out = setup_mod.config_text()
+    assert "{docs}" in out
+    assert f"max_parallel = {DEFAULT_MAX_PARALLEL}" in out
+
+
+def test_the_two_valued_url_keys_are_written_live_with_their_defaults(tmp_path):
+    """Arpit's ruling, 2026-09-14. A closed, small value domain is written out;
+    a tuning number defers to the engine (SR-DOTFUX).
+
+    The written line is the complete menu — a reader learns the key *and* its
+    alternatives without leaving the file.
+    """
+    from fux.config import load
+
+    setup_mod.run(tmp_path)
+    written = (tmp_path / "fux.toml").read_text(encoding="utf-8")
+    assert 'update          = "auto"' in written
+    assert "fetch_at_answer = true" in written
+    assert "keep            = true" in written
+    assert "enrich          = false" in written
+    # Written live and still the engine's own defaults — not a second opinion.
+    config = load(tmp_path)
+    assert config.url.update == "auto"
+    assert config.url.fetch_at_answer is True
+    # The deferring keys stay OUT: their defaults are numbers that may move.
+    # Assigned lines only — the header names them in prose, saying why.
+    assigned = {
+        line.split("=")[0].strip()
+        for line in written.splitlines()
+        if "=" in line and not line.lstrip().startswith(("#", "["))
+    }
+    assert "acquired_max_bytes" not in assigned
+    assert "sweep_minutes" not in assigned
+    assert "ttl" not in assigned
+
+
+def test_the_fetcher_config_tables_are_derived_from_the_fetchers(tmp_path):
+    """Derived, never transcribed — the `_urls_header()` lesson (W-140 row 18).
+
+    The values in `[sources.url.config.<stem>]` must be the fetcher's own
+    defaults, read out of the shipped file, so editing a fetcher's default
+    cannot leave the scaffolded config saying something else.
+    """
+    tables = setup_mod.url_config_tables()
+    assert "[sources.url.config.http]" in tables
+    assert "[sources.url.config.cdp]" in tables
+    for template, key, needle in (
+        ("cdp.py.txt", "cdp_port", "CDP_PORT"),
+        ("http.py.txt", "timeout_s", "TIMEOUT_S"),
+    ):
+        derived = setup_mod.fetcher_defaults(template)
+        source = setup_mod.template_bytes(template).decode("utf-8")
+        assert f"{needle} = {derived[key]!r}" in source or f"{needle} = {derived[key]}" in source
+
+
+def test_the_fetchers_are_parsed_not_executed(tmp_path, monkeypatch):
+    """`cdp.py` carries network code and must never run inside the package
+    (SR-CDP-FETCHER decision 8) — least of all from `fux setup`."""
+    import subprocess
+
+    def explode(*a, **k):  # pragma: no cover - the point is that it is not called
+        raise AssertionError("fux setup executed a fetcher")
+
+    monkeypatch.setattr(subprocess, "Popen", explode)
+    monkeypatch.setattr(subprocess, "run", explode)
+    assert setup_mod.fetcher_defaults("cdp.py.txt")["cdp_port"] == 9222
+
+
+def test_no_fetcher_receives_another_fetchers_keys(tmp_path):
+    """End to end: the scaffolded file must LOAD and hand http.py only keys
+    http.py knows. Writing `cdp_port` flat is what made this impossible, and is
+    why the block shipped commented out."""
+    from fux.config import load
+
+    setup_mod.run(tmp_path)
+    url = load(tmp_path).url
+    http_keys = set(url.config_for(".fux/fetchers/http.py"))
+    cdp_keys = set(url.config_for(".fux/fetchers/cdp.py"))
+    assert "cdp_port" not in http_keys
+    assert "timeout_s" not in cdp_keys
+    assert "cdp_port" in cdp_keys

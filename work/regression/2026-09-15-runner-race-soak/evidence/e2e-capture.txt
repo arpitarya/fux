@@ -1,0 +1,29 @@
+tests_e2e/test_maintenance.py:337: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cwd = PosixPath('/private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/pytest-of-arpitarya/pytest-549/test_post_commit_defers_and_a_0')
+check = True, args = ('add', '-A')
+
+    def git(cwd: Path, *args: str, check: bool = True) -> subprocess.CompletedProcess:
+        """`check=True` raises with git's OWN message, not just an exit code.
+    
+        `subprocess.run(check=True)` raises `CalledProcessError`, whose string is
+        `Command '[...]' returned non-zero exit status 128` — the stderr it
+        captured is on the exception and pytest never prints it. A flaky
+        `git add -A` in this file therefore said only *128* for as long as it had
+        been flaking (2026-09-13).
+        """
+        proc = subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True, encoding="utf-8")
+        if check and proc.returncode != 0:
+>           raise AssertionError(
+                f"git {' '.join(args)} exited {proc.returncode} in {cwd}\n"
+                f"stdout: {proc.stdout.strip()}\nstderr: {proc.stderr.strip()}"
+            )
+E           AssertionError: git add -A exited 128 in /private/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/pytest-of-arpitarya/pytest-549/test_post_commit_defers_and_a_0
+E           stdout: 
+E           stderr: fatal: unable to stat '.fux/index/ad.jsonl.tmp': No such file or directory
+
+tests_e2e/test_maintenance.py:37: AssertionError
+=========================== short test summary info ============================
+FAILED tests_e2e/test_maintenance.py::test_post_commit_defers_and_a_detached_runner_drains_the_list
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!

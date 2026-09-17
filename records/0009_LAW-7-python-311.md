@@ -10,7 +10,7 @@ feature: the rationale, history and reopen-trigger of L7
 owns: []
 laws: [L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: d7ab9d71e50e4f517f94a34bebde7238b9154df10db4fabaffe9a390bd404221
+content_sha: eaeb4c1301f94f5bf0fb33780cf295c6b7794ae4c0768c29d039525f5ddba528
 ---
 
 # SR-LAW-7 — L7 — Python ≥ 3.11
@@ -50,7 +50,7 @@ table. ⚠ **A handle is not the law**; read the law in §2 below.
 ```mermaid
 flowchart LR
     R["SR-LAW-7<br/>(THIS RECORD — states law L7)"]
-    N["SR-LAWS<br/>(the handles L0..L10 — routes, never states)"]
+    N["SR-LAWS<br/>(the handles L0..L11 — routes, never states)"]
     C["CLAUDE.md §Non-negotiable constraints<br/>(GENERATED from the records · test-bound)"]
     B["records bound by L7<br/>(cite the number, never restate)"]
     R --> C
@@ -71,7 +71,7 @@ flowchart LR
         (GENERATED -- not the source)
 
                SR-LAWS
-     (the handles L0..L10 -- routes, never states)
+     (the handles L0..L11 -- routes, never states)
                    |
           +--------+---------+
           v                  v

@@ -23,7 +23,7 @@ import { applyOutputDefaults, loadOutput } from "./src/config/output.mjs";
 // shapes are authored in `src/index.mjs`, which stays `api.py`'s twin.
 import { open, Index } from "./src/index.mjs";
 
-const VERSION = "2.0.1";
+const VERSION = "3.0.0-alpha.0";
 
 /** The PII gate's path, spelled here the way `cli.py` and `api.py` spell it.
  *
@@ -91,6 +91,12 @@ function parseArgs(argv) {
     else if (a === "--no-refer") out.noRefer = true;
     else if (a === "--audit") out.audit = true;
     else if (a === "--hops") out.hops = parseInt(argv[++i], 10);
+    // W-160's second atom. Repeatable, and ARGUMENT ORDER is the mass order —
+    // the same rank-mass rule the query form applies to top-k.
+    else if (a === "--seed") (out.seed ||= []).push(argv[++i]);
+    else if (a === "--kinds") out.kinds = argv[++i];
+    else if (a === "--link-idf") out.linkIdf = true;
+    else if (a === "--max-hops") out.maxHops = parseInt(argv[++i], 10);
     else if (a.startsWith("--")) { out.unknown = a; }
     else out._.push(a);
   }
@@ -111,7 +117,8 @@ function main(argv) {
     process.stdout.write(
       `fux ${VERSION} (node ${process.versions.node}) — the read plane\n\n` +
       `  fux find <query> [--json] [--top N] [--under DIR] [--phrase P] [--all]\n` +
-      `  fux ask|answer|explain|graph|path|mcp      (Phases 2-3)\n\n` +
+      `  fux ask|lexical|answer|explain|graph|path|mcp      (Phases 2-3)\n` +
+      `  fux graph --seed <id> [--seed <id>...]     walk from documents you name\n\n` +
       `Reads an index Python wrote. It never writes and never fetches.\n`,
     );
     return verb ? 0 : 1;
@@ -157,7 +164,16 @@ function main(argv) {
       case "find":
         return runFind(root, args);
       case "ask":
-        return runAsk(root, args);
+        return runAsk(root, args, { compose: true });
+      // **W-160's first atom, and W-161 is the change that split it.**
+      // `fux lexical` is the lexical core — BM25F, the proximity reranker and
+      // `-q` fusion, and NO graph stage, ever (SR-CLI decision 12). It was the
+      // same call as `ask` until `ask` grew a tier; now it is the same
+      // function with the tier forced off, which is the narrowest possible
+      // parting and keeps the freeze checkable in one argument rather than in
+      // a second handler that could drift.
+      case "lexical":
+        return runAsk(root, args, { compose: false });
       case "answer":
         return runAnswer(root, args);
       case "explain":

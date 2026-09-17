@@ -3,7 +3,7 @@
 Local, gitignored state under `.fux/runtime/` (SR-DOTFUX's home for derived
 planes) recording, per listed URL, **how the last few networked runs went**.
 It exists because of one asymmetry: a file change is an event git observes, and
-a URL change is not. Between `fux update` runs the `url:` half of the index is a
+a URL change is not. Between `fux ingest` runs the `url:` half of the index is a
 mosaic of whenever each URL last happened to be fetched, and until now **nothing
 anywhere reported how old any of it was**.
 

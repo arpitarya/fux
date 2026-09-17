@@ -8,11 +8,11 @@ status: accepted
 date: 2026-08-27
 ratified: 2026-08-27
 feature: answer provenance — the derivation, the receipt, the journal and verification
-owns: [src/fux/query/provenance.py@2755fe84e48c]
+owns: [src/fux/query/provenance.py@dbe6e4c4fe9f]
 laws: [L1, L3, L4, L8]
 ratifies: W-91
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 2c60caf741204aa79ba503515c1e611c321083333fb8a375119ee7f1bef8768e
+content_sha: de84aff13ee84f15026aeac26d3416287565622f89c95ad55a13fda517c23862
 ---
 
 # SR-PROVENANCE — fux does not keep an audit trail; it makes one derivable
@@ -421,6 +421,31 @@ re-run, and a refer-path receipt was compared against bytes fetched right then.
   docstring named that hazard and guarded the receipt's shape against it while
   the comparison itself still read one field. Cited documents compare as
   `(name, sha)` now.
+
+**16. A hit carries `boosted` and `route`, and the derivation is unchanged by
+them** (W-161).
+
+`route` is provenance in this record's own sense — *where did this come from,
+in a form a reader can check* — and it comes in two spellings that must not be
+confused:
+
+| where | shape | means |
+|---|---|---|
+| a `results[]` row | `#7 -> #2 via graph` | this row was **moved** by the boosted tier, from lexical rank 7 to displayed rank 2 |
+| a `related[]` row | `#2 via ref` | the best-ranked **result** that links to this document, and the edge kind the walk followed |
+
+**`--why` is deliberately NOT extended.** Its subject is *why this document
+scored what it scored* — matched terms, the cut line, rerank and tune deltas —
+and the tier changes no score. Folding a walk into the derivation would make
+`--why` answer two questions under one name, and the row's own `boosted` /
+`route` already answer the second one where a reader is looking.
+
+⚠ **`route` on a result is `None` for an unboosted row, and there `None` is an
+absence rather than a claim** — the exception to this record's usual rule. An
+unboosted row has no route because no walk reached it, and `boosted: false`
+already says so; a second key claiming the same absence would be the
+restatement L0 forbids inside one payload.
+
 
 ### Consequences
 

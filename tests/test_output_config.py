@@ -678,9 +678,23 @@ def test_every_verb_that_reads_the_file_can_bisect_it():
 # -- `sections` on `ask` (SR-OUTPUT decision 21) --------------------------
 
 
-def test_sections_is_declared_for_ask_only():
+def test_sections_is_declared_for_the_ask_SUBTABLE_only():
+    """⚠ **Two rows, one declaration** (W-160).
+
+    `fux lexical` is frozen byte-identical to `ask` and declares `ask`'s keys,
+    so `sections` now appears in two `CLI_VERBS` rows. It is still **one**
+    declaration: `VERB_READS` routes `lexical` through `[cli.ask]`, so there is
+    no second table a consumer could set it in, and `subtable_for` is what
+    every check counts by. Asserting *one row* here would have forced either a
+    `[cli.lexical]` subtable — which can make the two verbs differ, which is
+    what the freeze forbids — or dropping the key from `lexical`, which makes
+    `.fux/output.toml` unable to reach it at all.
+    """
+    from fux.output_config import subtable_for
+
     assert "sections" in CLI_VERBS["ask"]
-    assert all("sections" not in keys for verb, keys in CLI_VERBS.items() if verb != "ask")
+    declarers = {subtable_for(verb) for verb, keys in CLI_VERBS.items() if "sections" in keys}
+    assert declarers == {"ask"}, declarers
     assert "sections" not in MCP_KEYS, (
         "MCP returns structured results; `§` lines are a text rendering and the "
         "`headings` field is what an agent reads"

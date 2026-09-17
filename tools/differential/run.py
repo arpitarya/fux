@@ -33,7 +33,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from fux.derive import accel  # noqa: E402
 from fux.query import scan  # noqa: E402
-from queryset import generate  # noqa: E402
+from fux.query.rank import Weighting  # noqa: E402
+from queryset import generate_with_vocabulary  # noqa: E402
 
 
 def payload(results) -> str:
@@ -88,6 +89,22 @@ class Report:
 #: 4.0 or 25.0 — the block bound is tight but the slack between a weak
 #: posting and its block's `mx` is real, and a small weight does not eat it.
 #: A sweep that stops at "a plausible configuration" measures floating point.
+#:
+#: 🔴 **The LEVER these values ride changed on 2026-09-13 and this harness was
+#: not told.** They used to be `archived_weight`, passed as a keyword to both
+#: `ask`s; W-152 removed that prior — along with `superseded_weight` and
+#: `recency_half_life_days` — after VERDICT-W143 measured that no single global
+#: value cleared the bar. `ask()` has not accepted the keyword since, so every
+#: invocation of this harness raised `TypeError` before its first comparison,
+#: and **nothing noticed for two days** because the one arm anybody ran is
+#: `tests/derive/test_differential.py`, which builds its own corpora and calls
+#: `compare()` with its own arguments.
+#:
+#: **`[priority]` is the weight that survived** (SR-TUNE decision 8), so the
+#: sweep rides it now: a per-location multiplier on one prefix of the corpus.
+#: That is a strictly better shape for W-73's property than the prior was —
+#: the bound has to hold when SOME documents are scaled and others are not, and
+#: a prefix splits the corpus where a global prior scaled everything it touched.
 WEIGHTS = (1.0, 0.5, 2.0, 500.0)
 
 
@@ -99,11 +116,17 @@ def compare(
     modes: tuple[str, ...] = ("off", "on"),
     weights: tuple[float, ...] = WEIGHTS,
     archived_dirs: frozenset[str] = frozenset(),
+    priority_prefix: str | None = None,
 ) -> Report:
     """Run every query down both paths, at every `top`, in every mode, and diff.
 
     Both skipping modes are compared against the *same* scan oracle: skipping
     must be loss-free, so turning it on may not move a single byte either.
+
+    `priority_prefix` is the document-location prefix each weight in `weights`
+    is applied to via `[priority]`. `None` runs the sweep at no weighting at
+    all, which is the pre-W-73 shape and proves less — callers that have a
+    corpus should name a prefix that covers part of it.
     """
     mismatches: list[Mismatch] = []
     scan_seconds = 0.0
@@ -113,7 +136,15 @@ def compare(
     for query in queries:
         for top in tops:
             for weight in weights:
-                kw = {"archived_weight": weight, "archived_dirs": archived_dirs}
+                weighting = (
+                    Weighting(
+                        archived_dirs=archived_dirs,
+                        priority=((priority_prefix, weight),),
+                    )
+                    if priority_prefix is not None
+                    else None
+                )
+                kw = {"archived_dirs": archived_dirs, "weighting": weighting}
                 t0 = time.perf_counter()
                 expected = payload(scan.ask(root, query, top=top, **kw))
                 scan_seconds += time.perf_counter() - t0
@@ -131,6 +162,21 @@ def compare(
     return Report(len(queries), checks, mismatches, scan_seconds, accel_seconds)
 
 
+def _default_priority_prefix(root: Path) -> str | None:
+    """The first configured source DIRECTORY, or `None` if there are only files.
+
+    Deterministic because `source_dirs` returns a sorted, deduped list — L3
+    applies to the harness too, or a mismatch is not reproducible.
+    """
+    from fux.config import load
+    from fux.ingest.gitdir import source_dirs
+
+    for entry in source_dirs(root, load(root).dirs_file):
+        if (root / entry).is_dir():
+            return entry
+    return None
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="differential: accelerator vs scan, byte-for-byte")
     parser.add_argument("--root", type=Path, default=Path("."))
@@ -144,6 +190,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--full", action="store_true", help="the wide sweep (lab); default is the fast set")
     parser.add_argument("--goldens", type=Path, help="a JSON file of golden queries to fold in")
     parser.add_argument(
+        "--priority-prefix",
+        help="the `[priority]` location prefix the weight sweep rides "
+        "(default: the first configured source DIRECTORY, so part of the corpus "
+        "is scaled and part is not — which is what W-73's bound has to survive)",
+    )
+    parser.add_argument(
         "--skipping",
         choices=("off", "on", "both"),
         default="both",
@@ -154,12 +206,24 @@ def main(argv: list[str] | None = None) -> int:
     root = args.root.resolve()
     goldens = _load_goldens(args.goldens) if args.goldens else None
     sizes = dict(common=600, median=600, rare=600, pairs=1200, triples=600) if args.full else {}
-    queries = generate(root, goldens=goldens, **sizes)
+    queries, vocab = generate_with_vocabulary(root, goldens=goldens, **sizes)
+    prefix = args.priority_prefix or _default_priority_prefix(root)
 
     modes = ("off", "on") if args.skipping == "both" else (args.skipping,)
-    report = compare(root, queries, tops=tuple(args.tops), modes=modes)
+    report = compare(
+        root, queries, tops=tuple(args.tops), modes=modes, priority_prefix=prefix
+    )
 
     print(f"queries: {report.queries}   tops: {args.tops}   modes: {', '.join(modes)}")
+    print(f"weights: {list(WEIGHTS)} on `[priority]` prefix {prefix!r}")
+    if vocab.skipped_undecodable:
+        # ⚠ Named, never a silent shrink: these files contributed no term, so
+        # the query set is smaller than the corpus would suggest (W-184).
+        print(
+            f"undecodable: {vocab.skipped_undecodable} file(s) walked but not UTF-8, "
+            f"contributing no terms — {', '.join(vocab.undecodable[:5])}"
+            + (" ..." if vocab.skipped_undecodable > 5 else "")
+        )
     print(f"comparisons: {report.checks}")
     print(f"scan:  {report.scan_seconds * 1000:9.1f} ms total")
     print(f"accel: {report.accel_seconds * 1000:9.1f} ms total")

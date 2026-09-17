@@ -269,6 +269,8 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
   color:var(--ink-3);font-size:14px;
 }
 .nonumber strong{color:var(--ink-2)}
+.finding{font-size:19px;line-height:1.45;color:var(--ink-2);margin:2px 0 18px;max-width:70ch}
+.finding strong{color:var(--ink-1)}
 </style>
 <!--
   ===========================================================================
@@ -292,10 +294,40 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
     3. fill each CAP section from the FILED ROWS under that run's evidence/.
        The report carries no number the filed run does not; where the two
        disagree the report is wrong.
+
+    OR DO NOT COPY IT AT ALL -- `fux-benchmark/bin/report.py <run>` renders
+    this file for you (W-158). It substitutes the {{TOKENS}} below and replaces
+    every region between a `fux:fill:NAME` marker comment and its
+    `fux:end:NAME` partner with rows computed from `evidence/`.
+
+    ⚠ The two marker names are written WITHOUT their comment delimiters in
+    this paragraph on purpose: an HTML comment cannot contain the closing
+    delimiter, and spelling them in full here ENDED THIS COMMENT EARLY -- the
+    first generated report carried these instructions as visible page text.
+
+    🔴 **THE MARKERS ARE THE CONTRACT BETWEEN THIS FILE AND THAT EMITTER.**
+    Everything OUTSIDE them -- this comment, the CSS, the direction markers on
+    every numeric header, slide 2's how-to-read table, slide 11's guard rails --
+    is copied through verbatim, so a change to any of it reaches the next
+    generated report with no code change. That is the point: the headers and
+    their direction markers live HERE and the emitter never writes one.
+
+    ⚠ **Renaming or deleting a marker breaks the emitter, and it says so** --
+    it refuses rather than silently dropping a section. Moving a marker is
+    fine; the emitter finds them by name.
     4. a capture this run has no number for KEEPS ITS SECTION and says so --
        use <p class="nonumber">. Deleting the section hides the gap.
     5. every number carries a direction: <span class="dir up">/<dir down>/
        <dir flat>. A chart with no direction is not finished.
+    6. THE SPINE IS ONE SLIDE PER CAPTURE -- SR-WORK-BENCHMARK decision 14.
+       CAP-1..CAP-6 each have their own slide, in id order, TITLED BY THEIR CAP,
+       each comparing arm A against arm B. The <h2> title lives OUTSIDE the
+       marker, like the direction markers do, so the emitter never writes one;
+       what it writes inside the marker is the one-line finding, as
+       <p class="finding">. CAP-7 HAS NO SLIDE: CAP-7 is this report, and a
+       slide comparing it to the previous report carries no filed number.
+       The framing slides -- cover, how to read, the arms, the null control,
+       headroom, guard rails -- surround the spine and never replace a CAP.
 
   {{TOKENS}}
     {{RUN}}          the run id, e.g. 2026-09-13-benchmark-captures
@@ -309,7 +341,6 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
 <div class="tick" id="tick"></div>
 
 <main class="deck" id="deck">
-
 <!-- ============ 1 · COVER ================================================ -->
 <section class="slide">
   <div class="wrap">
@@ -317,12 +348,14 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
     <h1>{{TITLE}}</h1>
     <p class="lead" style="max-width:62ch">{{ONE_PARAGRAPH: what this run was for, and what it is not. A benchmark rules no threshold.}}</p>
     <hr class="rule">
+<!-- fux:fill:cover_stats -->
     <div class="grid g4">
       <div><p class="statlabel">Arms</p><p class="stat sm">{{ARM_A}} &rarr; {{ARM_B}}</p><p class="statnote">{{how each was installed}}</p></div>
       <div><p class="statlabel">Corpora</p><p class="stat sm">{{CORPORA}}</p><p class="statnote">{{tiers run, and tiers not run}}</p></div>
       <div><p class="statlabel">Questions</p><p class="stat sm">{{N}}</p><p class="statnote">{{judged / timing / planted unanswerable}}</p></div>
       <div><p class="statlabel">Classification</p><p class="stat sm">{{CLASSIFICATION}}</p><p class="statnote">no threshold ruled &mdash; SR-WORK-BENCHMARK decision 6</p></div>
     </div>
+<!-- fux:end:cover_stats -->
   </div>
 </section>
 
@@ -353,6 +386,7 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
   <div class="wrap">
     <p class="eyebrow">The arms <span class="dim">/ evidence/ARMS.toml</span></p>
     <h2>Two engines, byte&#8209;checked against one corpus</h2>
+<!-- fux:fill:arms -->
     <div class="tblwrap">
       <table>
         <thead><tr><th>&nbsp;</th><th>arm A</th><th>arm B</th></tr></thead>
@@ -367,6 +401,7 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
       </table>
     </div>
     <div class="callout"><p>{{Anything that makes this run non-reproducible -- an editable install of a dirty tree, an uncommitted change, a machine that was not quiet -- is stated HERE, not discovered later.}}</p></div>
+<!-- fux:end:arms -->
   </div>
 </section>
 
@@ -377,11 +412,13 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
     <p class="eyebrow">The null control <span class="dim">/ run first, as it always is</span></p>
     <h2>Arm A against itself</h2>
     <div class="grid g2">
+<!-- fux:fill:nullcontrol -->
       <div class="card">
         <p class="statlabel">nullcontrol &middot; {{corpus}} &middot; {{path}}</p>
         <p class="stat sm">{{n}} differed<span class="dir down">&darr; lower is better</span></p>
         <p class="statnote">{{Identical ranked lists on every query, or the run stops here.}}</p>
       </div>
+<!-- fux:end:nullcontrol -->
       <div class="card">
         <h3>Why it is first</h3>
         <p>Ordering is deterministic. <strong>A difference between two runs of the same arm is a broken harness, not a finding</strong> &mdash; and it would be invisible in every table after this one.</p>
@@ -390,11 +427,61 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
   </div>
 </section>
 
-<!-- ============ 5 · CAP-3  hit@k ========================================= -->
+<!-- ============ 5 · CAP-1  the ranked lists ============================ -->
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">CAP&#8209;1 <span class="dim">/ the ranked lists each arm returned</span></p>
+    <h2>CAP&#8209;1 &mdash; the ranked lists</h2>
+    <p>The ordered document ids and scores, <strong>per query, per arm, per corpus</strong>. It is filed whether or not anything moved, because it is the artefact the <em>next</em> run is compared against.</p>
+<!-- fux:fill:ranked -->
+    <p class="finding">{{the one-line finding, or: no number exists for this run}}</p>
+    <div class="tblwrap">
+      <table>
+        <thead><tr>
+          <th>arm</th><th>version</th>
+          <th class="num">lists filed<span class="dir flat">&mdash; neither</span></th>
+          <th class="num">queries<span class="dir flat">&mdash; neither</span></th>
+          <th class="num">results per list<span class="dir flat">&mdash; neither</span></th>
+          <th class="num">top&#8209;1 score<span class="dir flat">&mdash; neither</span></th>
+        </tr></thead>
+        <tbody>
+          <tr><td class="k">A</td><td class="k">{{ARM_A}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td></tr>
+          <tr><td class="k">B</td><td class="k">{{ARM_B}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:13px;color:var(--ink-3);margin-top:8px"><strong>Nothing on this slide says which ordering is better</strong> &mdash; scores from two engines are not comparable to each other. What moved is CAP&#8209;2's; this is what each arm returned.</p>
+    <!-- when this run retained no lists: replace the table with
+    <p class="nonumber"><strong>No number exists for this run.</strong> {{why -- e.g. the lists were not retained. Say which, and do not re-run to fill it.}}</p>
+    -->
+<!-- fux:end:ranked -->
+  </div>
+</section>
+
+<!-- ============ 6 · CAP-2  what moved between the arms ================= -->
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">CAP&#8209;2 <span class="dim">/ what moved, arm A &rarr; arm B</span></p>
+    <h2>CAP&#8209;2 &mdash; what moved between the arms</h2>
+<!-- fux:fill:rankdiff -->
+    <p class="finding">{{n}} of {{N}} lists differ &mdash; {{and where}}</p>
+    <figure class="chartbox">
+      {{ INLINE SVG: first-differing-rank histogram, or the chart this run's CAP-2 rows support.
+         Label the axes. Put the direction marker in the caption, not on the bars. }}
+      <figcaption>{{what the chart is over}} &middot; <strong>first differing rank <span class="dir flat">&mdash; neither; a change is a signal, not a score</span></strong> &mdash; a difference at rank 1 is a changed top answer, which is worth a look; nothing here says which ordering is better.</figcaption>
+    </figure>
+    <div class="callout" style="margin-top:16px"><p>{{entered / left counts, and the one sentence a reader should take away}}</p></div>
+<!-- fux:end:rankdiff -->
+  </div>
+</section>
+
+<!-- ============ 7 · CAP-3  hit@k ======================================= -->
 <section class="slide">
   <div class="wrap">
     <p class="eyebrow">CAP&#8209;3 <span class="dim">/ hit@k against the planted key</span></p>
-    <h2>{{the one-line finding, or: no number exists for this run}}</h2>
+    <h2>CAP&#8209;3 &mdash; hit@k at 1, 5, 10, 20, 50</h2>
+<!-- fux:fill:hits -->
+    <p class="finding">{{the one-line finding, or: no number exists for this run}}</p>
     <div class="tblwrap">
       <table>
         <thead><tr>
@@ -415,15 +502,17 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
     <!-- when this run has no key: replace the table with
     <p class="nonumber"><strong>No number exists for this run.</strong> {{why -- e.g. the corpus carried no key, so hit@k could not be computed. Say which, and do not re-run to fill it.}}</p>
     -->
+<!-- fux:end:hits -->
   </div>
 </section>
 
-<!-- ============ 6 · CAP-3  headroom, BOTH directions ===================== -->
+<!-- ============ 8 · CAP-3 framing  headroom, both directions =========== -->
 <section class="slide">
   <div class="wrap">
     <p class="eyebrow">CAP&#8209;3 <span class="dim">/ headroom, stated in both directions</span></p>
     <h2>How much could have moved at all</h2>
     <p>One score answers neither question. <strong>Improvement headroom</strong> is the questions wrong in <em>both</em> arms &mdash; the most that could have been fixed. <strong>Regression headroom</strong> is the questions right in both &mdash; the most that could have broken.</p>
+<!-- fux:fill:headroom -->
     <div class="tblwrap">
       <table>
         <thead><tr>
@@ -441,14 +530,17 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
       </table>
     </div>
     <div class="callout warn" style="margin-top:16px"><p><strong>Zero headroom is not agreement.</strong> Where the improvement column is 0 no delta is representable, so equal scores there report a <em>ceiling</em>, never a match. Say which rows are ceilings.</p></div>
+<!-- fux:end:headroom -->
   </div>
 </section>
 
-<!-- ============ 7 · CAP-4  the answer layer ============================== -->
+<!-- ============ 9 · CAP-4  the answer layer ============================ -->
 <section class="slide">
   <div class="wrap">
-    <p class="eyebrow">CAP&#8209;4 <span class="dim">/ the answer layer, and the planted unanswerables</span></p>
-    <h2>{{the one-line finding}}</h2>
+    <p class="eyebrow">CAP&#8209;4 <span class="dim">/ answered, declined, and the planted unanswerables</span></p>
+    <h2>CAP&#8209;4 &mdash; the answer layer</h2>
+<!-- fux:fill:answers -->
+    <p class="finding">{{the one-line finding}}</p>
     <div class="tblwrap">
       <table>
         <thead><tr>
@@ -465,28 +557,17 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
     </div>
     <p style="font-size:13px;color:var(--ink-3);margin-top:8px"><strong>fabricated</strong> = answered a question planted to have no answer. <strong>Higher <span class="mono">declined</span> is better only on the planted unanswerables</strong> &mdash; on the judged set, declining is a miss. Say which set each column is over.</p>
     <div class="callout">{{Any asymmetry between the arms -- a flag one version does not have -- is stated, not smoothed.}}</div>
+<!-- fux:end:answers -->
   </div>
 </section>
 
-<!-- ============ 8 · CAP-1 / CAP-2  what moved ============================ -->
-<section class="slide">
-  <div class="wrap">
-    <p class="eyebrow">CAP&#8209;1 &middot; CAP&#8209;2 <span class="dim">/ the ranked lists, and what moved between them</span></p>
-    <h2>{{n}} of {{N}} lists differ &mdash; {{and where}}</h2>
-    <figure class="chartbox">
-      {{ INLINE SVG: first-differing-rank histogram, or the chart this run's CAP-2 rows support.
-         Label the axes. Put the direction marker in the caption, not on the bars. }}
-      <figcaption>{{what the chart is over}} &middot; <strong>first differing rank <span class="dir flat">&mdash; neither; a change is a signal, not a score</span></strong> &mdash; a difference at rank 1 is a changed top answer, which is worth a look; nothing here says which ordering is better.</figcaption>
-    </figure>
-    <div class="callout" style="margin-top:16px"><p>{{entered / left counts, and the one sentence a reader should take away}}</p></div>
-  </div>
-</section>
-
-<!-- ============ 9 · CAP-5  index size ==================================== -->
+<!-- ============ 10 · CAP-5  the committed index size =================== -->
 <section class="slide">
   <div class="wrap">
     <p class="eyebrow">CAP&#8209;5 <span class="dim">/ the committed index</span></p>
-    <h2>{{one line}}</h2>
+    <h2>CAP&#8209;5 &mdash; the committed index size</h2>
+<!-- fux:fill:size -->
+    <p class="finding">{{one line}}</p>
     <div class="tblwrap">
       <table>
         <thead><tr>
@@ -501,17 +582,17 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
       </table>
     </div>
     <p style="font-size:13px;color:var(--ink-3)">Deterministic &mdash; unaffected by what else the machine was doing.</p>
+<!-- fux:end:size -->
   </div>
 </section>
 
-<!-- ============ 10 · CAP-6  speed ========================================
-     The capture most easily destroyed by a shared machine. If the machine was
-     not quiet, the numbers stay and carry the warning -- they are never deleted
-     and never quietly reported. -->
+<!-- ============ 11 · CAP-6  the speed ================================== -->
 <section class="slide">
   <div class="wrap">
     <p class="eyebrow">CAP&#8209;6 <span class="dim">/ speed, arms interleaved A B A B</span></p>
-    <h2>{{one line}} {{<span class="pill fail">do not quote</span> when the machine was not quiet}}</h2>
+    <h2>CAP&#8209;6 &mdash; the speed</h2>
+<!-- fux:fill:latency -->
+    <p class="finding">{{one line}} {{<span class="pill fail">do not quote</span> when the machine was not quiet}}</p>
     <div class="tblwrap">
       <table>
         <thead><tr>
@@ -528,22 +609,54 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
       </table>
     </div>
     <div class="callout warn" style="margin-top:16px"><p><strong>State whether the machine was quiet.</strong> A loaded machine does not produce noise &mdash; <em>it produces a clean, localised anomaly that reads like a finding.</em> Interleaving <span class="mono">A B A B</span> protects the <strong>difference</strong> and never the absolute number.</p></div>
+<!-- fux:end:latency -->
   </div>
 </section>
 
-<!-- ============ 11 · WHAT THIS RUN DOES NOT SAY ========================== -->
+<!-- ============ 12 · READER PARITY  Node against Python ================ -->
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">Reader parity <span class="dim">/ Node against Python, over ONE index</span></p>
+    <h2>Do the two readers agree?</h2>
+    <p>🔴 <strong>Read this the opposite way from every other table on this report.</strong> Everywhere else a difference between two arms is the <em>finding</em>. Here the two arms are two <strong>readers of one committed index</strong> claiming identical output &mdash; same ids, same order, same locators, same band &mdash; so <strong>0 discordant is the expected result and anything else is a defect in one of them</strong>. SR&#8209;WORK&#8209;BENCHMARK decision 16.</p>
+<!-- fux:fill:parity -->
+    <p class="finding">{{the one-line finding, or: no number exists for this run}}</p>
+    <div class="tblwrap">
+      <table>
+        <thead><tr>
+          <th>pair</th>
+          <th class="num">queries<span class="dir flat">&mdash; neither</span></th>
+          <th class="num">identical lists<span class="dir up">&uarr; higher is better</span></th>
+          <th class="num">discordant<span class="dir down">&darr; lower is better; 0 is the only clean value</span></th>
+          <th class="num">earliest differing rank<span class="dir flat">&mdash; neither</span></th>
+          <th class="num">max |&Delta;score|<span class="dir down">&darr; lower is better</span></th>
+        </tr></thead>
+        <tbody>
+          <tr><td class="k">B &#124; B&#8209;node</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td><td class="num">{{}}</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:13px;color:var(--ink-3);margin-top:8px"><strong>max |&Delta;score| is the number that had never been taken</strong> &mdash; two readers can agree on ORDER while their scores differ in the last places, which is what a <span class="mono">log()</span>/libm divergence looks like <em>before</em> it changes an ordering.</p>
+<!-- fux:end:parity -->
+    <p style="font-size:13px;color:var(--ink-3)">⚠ <strong>CAP&#8209;5 and the ingest/build half of CAP&#8209;6 have no Node column, by construction</strong> &mdash; the Node reader writes no index. <strong>The arms are A &middot; B &middot; B&#8209;node</strong>: a benchmark measures what ships, and the graph tier ships on, so there is no tier&#8209;off column.</p>
+  </div>
+</section>
+
+<!-- ============ 13 · WHAT THIS RUN DOES NOT SAY ======================== -->
 <section class="slide">
   <div class="wrap">
     <p class="eyebrow">Guard rails <span class="dim">/ what this run may never be used to say</span></p>
     <h2>What this run does <em>not</em> do</h2>
     <div class="grid g4">
       <div class="card"><h3>It rules no threshold</h3><p>SR&#8209;WORK&#8209;BENCHMARK decision 6 &mdash; <strong>no pass/fail anywhere</strong>. A bar is a pre&#8209;registration with its own id space and its own verdict.</p></div>
+<!-- fux:fill:guardrails -->
       <div class="card"><h3>{{scope limit}}</h3><p>{{tiers not run, paths not run, arms not compared}}</p></div>
       <div class="card"><h3>{{classification limit}}</h3><p>{{what informed costs this run, or what blind buys it}}</p></div>
       <div class="card"><h3>{{captures with no number}}</h3><p>{{named here as well as in their own section, so the gaps are countable from one slide}}</p></div>
+<!-- fux:end:guardrails -->
     </div>
     <hr class="rule">
-    <p style="font-size:13px;color:var(--ink-3);margin:18px 0 0">The run is <span class="mono">work/regression/{{RUN}}/</span> &mdash; <span class="mono">report.md</span>, <span class="mono">ANALYSIS.md</span>, <span class="mono">evidence/</span>. <strong>This report carries no number that run does not; anything that disagrees with it is this file being wrong.</strong> What must be here at all: <span class="mono">records/0053_WORK-benchmark.md</span>.</p>
+    <p style="font-size:13px;color:var(--ink-3);margin:18px 0 0"><strong>CAP&#8209;7 has no slide of its own: CAP&#8209;7 <em>is</em> this report</strong> &mdash; SR&#8209;WORK&#8209;BENCHMARK decision 14. Where it came from is on the cover. The run is <span class="mono">work/regression/{{RUN}}/</span> &mdash; <span class="mono">report.md</span>, <span class="mono">ANALYSIS.md</span>, <span class="mono">evidence/</span>. <strong>This report carries no number that run does not; anything that disagrees with it is this file being wrong.</strong> What must be here at all: <span class="mono">records/0053_WORK-benchmark.md</span>.</p>
   </div>
 </section>
 
@@ -552,7 +665,7 @@ th .dir,td .dir{display:inline-block;margin:3px 0 0;font-size:9.5px}
 <div class="hint" id="hint">&larr; &rarr; to move</div>
 <div class="counter">
   <button class="navbtn" id="prev" aria-label="Previous slide">prev</button>
-  <span id="pos" aria-live="polite">01 / 11</span>
+  <span id="pos" aria-live="polite">01 / 13</span>
   <button class="navbtn" id="next" aria-label="Next slide">next</button>
 </div>
 <script>

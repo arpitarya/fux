@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@836cc5ab2239, src/fux/setup.py@d3e9d88f4dd4]
+owns: [src/fux/store/fuxdir.py@c984699b459a, src/fux/setup.py@bfb301dda08d, tests/test_verb_table_agreement.py@1e7999ffd28f]
 laws: [L2, L3, L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 3e758a5a5effc2c438b2b1d40eedb0479ea3c54119c83766832e5dbb048c964c
+content_sha: c319d2e4abc8b6dfac2e71d5b4c4a1044b9c5a95fca77512bbdacd949098936f
 ---
 
 # SR-DOTFUX — the `.fux/` directory
@@ -452,8 +452,69 @@ exposure rather than a hypothetical. `_prune_node_reader` deletes everything the
 declared shape does not name, **`node_modules/` excepted**: that holds shape C's
 installed reader, and removing it would leave a manifest pointing at nothing.
 
+**6b. The write-if-missing shape has a second copy, and it is the one nobody
+reads.** Added 2026-09-15. `README.md` is *engine-owned, annotatable*: written
+once and never again, so **this repository's `.fux/README.md` and the template
+in `store/fuxdir.py::_readme` that a NEW consumer is handed are two artifacts
+that drift apart in silence.** A fresh `fux setup` does not read this
+repository's copy.
+
+🔴 **They had drifted, and the drift was the verb table.** On 2026-09-15 the
+committed copy listed `inspect`, `correct` and `lexical` and the template listed
+none of the three — three verbs that shipped between 2026-09-06 and 2026-09-14,
+each one hand-added to the file in front of whoever added it. Every test in
+`tests/test_verb_table_agreement.py` was green throughout, because all of them
+read `.fux/README.md`. **A consumer setting fux up that day was handed a short
+list, and the repository that defines the verbs could not tell.**
+
+**So the template is held to the parser too**, by the same third party decision
+6's table is: `build_parser()`. Two tests now read `_readme()` rather than the
+file — one for the verbs, one for the encoding, because `ensure_layout` writes
+the template with `.encode("ascii")` and a single em dash in it raises
+`UnicodeEncodeError` **only in a repository that has no `.fux/README.md` yet**.
+That failure cannot land here. It lands on a new consumer's first ingest, and
+the fix that introduced this decision hit it on the way past.
+
+⚠ **This is the general shape of every write-if-missing file**, not a fact about
+the README: `.gitignore` has the same two copies and the same silence. The
+narrow gate is the one that was buildable — *does the template still name every
+verb* — and it covers one file. The rest of the shape is unguarded and is named
+here so the next drift is recognised rather than rediscovered.
+
+**6c. The generated `.gitignore` also covers a TRANSIENT, and that is a third
+kind of entry** (2026-09-15, W-185). Decision 3's rule — the file names the
+ignored *directories* and never a blanket — is unchanged; what is added is a
+file that exists for the duration of a rename:
+
+```
+index/*.jsonl.tmp
+```
+
+`store/writer.py::_atomic_write` writes `<shard>.jsonl.tmp` **beside** the shard,
+because `os.replace` is atomic only within one filesystem, and `.fux/index/` is
+**committed**. `post-commit` defers ([SR-MAINTENANCE](0129_hooks.md) decision
+1a), so a consumer's next `git add -A` legitimately overlaps a live writer:
+
+```
+fatal: unable to stat '.fux/index/ad.jsonl.tmp': No such file or directory
+```
+
+**Measured, with a control:** the same rename churn gives **0 failures in 3 871
+`git add -A` runs** with the rule and **2 335 of 3 933** without it. ⚠ **The
+earlier reasoning that an ignore rule could not help — *git stats what it
+listed* — is wrong**: an excluded path is never walked.
+
+⚠ **Scoped to the plane and the suffix, never `*.tmp` and never `*`.** A bare
+`*.tmp` would hide a consumer's own file anywhere under `.fux/`, which is the
+accident this file's whole discipline exists to prevent.
+
+🔴 **And write-if-missing means the fix does not reach a single existing
+repository** — decision 6b's hazard, firing a second time within a day, on the
+other annotatable file. So `fux doctor` gains a **`warn` row**, `index temp files
+ignored`, which is the only thing that reaches a repo set up before 2026-09-15.
+
 **7. `fetchers/` is consumer code and fux never rewrites it.** It is loaded by
-path, and only under the two fenced paths — `fux add <URL>` and `fux update`.
+path, and only under the two fenced paths — `fux add <URL>` and `fux ingest`.
 The two files fux can put there ship as package data with an extension Python's
 import machinery cannot resolve, so **fux copies them and never imports them**
 ([SR-FETCHER](0117_fetcher.md) decision 1). One known consequence, accepted:
@@ -534,9 +595,14 @@ with it:**
 
 ⚠ **`.claude/rules/` joined the outside set on 2026-09-11, and the set grew from
 eighteen files to eighty-four** ([SR-AGENT-POLICY](0132_agent-policy.md) decision
-15): ten guide skills on four surfaces, seven path-scoped pointers on three
-vendors, and five Kiro auto guides, beside the existing seventeen vendor files
-and `AGENTS.md`. Still write-if-missing, still announced
+15): **eleven** guide skills on four surfaces — `fux-inspect` joined on
+2026-09-14 with [SR-INSPECT](0156_inspect.md) — seven path-scoped pointers on
+three vendors, and five Kiro auto guides, beside the existing seventeen vendor
+files and `AGENTS.md`. ⚠ **`fux-inspect` gets no path-scoped pointer and no
+Kiro auto guide, and the asymmetry is the rule rather than an omission:** a
+pointer fires when an agent edits one of fux's own committed files and
+`inspect` writes none, and an auto guide fires on a description match, which
+would have an agent volunteering critiques of a corpus nobody asked about. Still write-if-missing, still announced
 path by path, still one `--no-agents` away. ⚠ **The announcement is now long**
 — that is the contract working, not a defect: veto condition 1 is *every* path
 named. **The ambient cost moved too**: on a Kiro CLI without inclusion modes the
@@ -566,7 +632,7 @@ this record binds:
   importing it runs whatever sits at that file's module level. **`doctor` is
   the command a person runs when something is already wrong** — it must stay
   out of the business of executing consumer code. It names the `min(...)` rule
-  and leaves `fux update` to apply it. `tests/test_doctor.py` plants a fetcher
+  and leaves `fux ingest` to apply it. `tests/test_doctor.py` plants a fetcher
   whose module body raises and asserts the check still returns.
 
 ⚠ **`doctor.py` renders another plane's state and that is deliberate.** The
@@ -658,7 +724,7 @@ litter beside the modules `fux setup` writes into `.fux/decoders/` and
 
 **The starter `.fux/sources/urls` header is DERIVED from the list spec**, not
 transcribed. It said *"Two attributes, and the set is closed"* while the spec
-had grown to seven, and *"`fux update` re-fetches every line"*, which stopped
+had grown to seven, and *"`fux ingest` re-fetches every line"*, which stopped
 being true when narrow-by-default landed and again when `update=never` did.
 Every repo set up in between committed both sentences. `_seed_types` already
 had the rule this needed — *derived, never transcribed* — so the file cannot
@@ -688,7 +754,126 @@ generator and a skill surface the package did not yet produce.
 a record ahead of its code is as misleading as one behind it, and the freshness
 check can see neither.
 
+**The scaffolded `fux.toml` was rebuilt on 2026-09-14, in four of Arpit's
+rulings in one sitting.** What it writes now, and the rule behind each:
+
+| what | why |
+|---|---|
+| `[sources] urls_file` beside `dirs_file` | the two committed lists are one kind of thing ([SR-CONFIG](0113_config.md) decision 11a) |
+| `keep`, `enrich`, `update`, `fetch_at_answer`, `meta` written **live** | closed, small value domains — the written line is the complete menu |
+| `ttl`, `sweep_minutes`, `acquired_max_bytes` **absent** | defaults that may move; leaving them out is how a new value reaches this repo without an edit |
+| `[sources.url.config]` + one sub-table **per shipped fetcher**, live | one flat table refused every mixed-fetcher repo (decision 8a) |
+| those sub-tables **derived** from the fetchers, by `ast`, never executed | a transcribed table goes stale — `_urls_header()` is the scar (W-140 row 18); `cdp.py` must never run inside the package (SR-CDP-FETCHER decision 8) |
+
+⚠ **The header now says what is NOT in the file and why**, because a reader who
+sees `keep` written and `ttl` missing will otherwise read the absence as an
+oversight rather than a rule.
+
+**`fux.toml`'s starter is a TEMPLATE FILE now, not a string in `setup.py`**
+(Arpit, 2026-09-14: *"create a template for fux.toml file like others"*).
+`templates/fux.toml.txt`, read through `template_bytes` beside
+`pii.toml.txt`, `refusals.toml.txt` and the two fetchers.
+
+- **Read, never imported** — and for a `.toml` that phrase means something
+  different than it does for `cdp.py.txt`. The fetchers are un-importable
+  because they carry network code that has no business inside an offline
+  package (SR-CDP-FETCHER decision 8). This one is a file because **a starter a
+  consumer is meant to open and edit belongs in a file they can open**, where a
+  stray quote is a typo in a config and not a syntax error in the engine.
+- ⚠ **`{default}` is now SUBSTITUTED, not `.format`ted**, and the change of
+  mechanism is the point. W-83's property is unchanged — the number written and
+  the number applied are one object, asserted by `tests/test_setup.py` — but
+  `str.format` on an **editable file** raises on any future `{` someone adds to
+  a comment, which would turn a documentation edit into a broken `fux setup`.
+- **No packaging change was needed**: `pyproject.toml` declares
+  `packages = ["src/fux"]`, so the wheel already carries every file under the
+  package, which is why the four existing `.txt` templates ship.
+
+**The scaffolded `fux.toml` writes the two-valued `[sources.url]` keys LIVE,
+with their defaults** (W-174, 2026-09-14, Arpit's ruling): `update = "auto"`
+and `fetch_at_answer = true`, beside `meta = "hashed"`. **`update` was
+commented from the day it existed and is now uncommented too**, in the same
+ruling and for the same reason.
+
+- **It carries a value and explains nothing**, which is the only form this file
+  allows: a comment that *describes* a key can drift from the record that
+  decides it while both still look correct (SR-LAW-0 decision 4). A key and its
+  value cannot drift into a wrong explanation, because they are not one.
+- ⚠ **Written live, and that was Arpit's ruling on 2026-09-14** — the first cut
+  wrote `fetch_at_answer` commented, and `update` had been commented since it
+  was added. **The argument against, stated so the trade is on the record:** an
+  uncommented default freezes today's value into every repo `fux setup`
+  touches, so a future change of default would not reach them.
+- **The line the ruling draws is the SHAPE OF THE VALUE, and it is a rule
+  rather than two exceptions.** A key whose domain is **closed and small** —
+  `meta` (`hashed`/`plain`), `update` (`auto`/`never`), `fetch_at_answer`
+  (`true`/`false`) — is written live with its default: the written line is the
+  complete menu, so a reader learns the key *and* its alternatives without
+  leaving the file, and nobody greps a record for a flag they do not know
+  exists. A key whose default is a **number that may rise** stays out:
+  `acquired_max_bytes` defers to `None` precisely so raising the store's bound
+  reaches every repo that never thought about it, and `sweep_minutes` is the
+  same shape. `max_parallel` is neither — it is required, with no default at
+  all (W-85).
+- ⚠ **So the test is not "is it important" but "can this value go stale?"**
+  A closed two-value domain cannot; a tuning number can.
+- **What it costs, named:** if fux ever flips either default, existing repos
+  keep the old behaviour until someone edits the line. For `fetch_at_answer`
+  that is the safer direction — explicit behaviour surviving a default change,
+  on a key whose `false` value stops network access — and for `update` it means
+  a repo scaffolded today keeps fetching on `fux ingest`, which is what its
+  author saw written in their own file.
+
+⚠ **The starter `.fux/sources/urls` header derives its attribute table, and
+that derivation carried a wrong constant until 2026-09-15** (W-178).
+`_urls_header()` printed `<duration>` for every attribute with no enum values —
+correct while `ttl` was the only typed one, and the moment
+[SR-URL-LIST](0116_url-list.md) decision 15 made `fetch=` typed it would have
+written `fetch=<duration>` into **every repo `fux setup` touches**.
+
+🔴 **That is W-140 row 18 arriving through its own fix.** The header went stale
+by being *transcribed*; the remedy was to *derive* it; and this was the
+derivation itself asserting something only one attribute made true. The
+placeholder is `Attribute.placeholder` now — a field on the thing that knows,
+not a special case in this module. **Write-if-missing is what makes it matter:**
+a wrong header reaches new repos only, so this repository's own copy would have
+stayed right while every fresh setup handed out the defect.
+
 ### Consequences
+
+- **`.fux/observers/` is the third committed consumer-owned directory**
+  (W-170, 2026-09-15), beside `fetchers/` and `decoders/`, and it is listed in
+  the generated `.fux/README` with the others.
+  ⚠ **`fux setup` seeds it with a README and NO observer**, which is the
+  asymmetry worth stating: a decoder and a fetcher have useful built-in
+  implementations to write out, and an observer has none — fux carries no
+  knowledge of any subscriber ([SR-OBSERVE](0157_observe.md) decision 8), so
+  there is nothing for it to put there. The directory and its README exist so
+  the extension point is **discoverable**; an empty directory git cannot commit
+  would be indistinguishable from a fux too old to have observers.
+
+- ✅ **The verb table in `.fux/README.md` is HELD EQUAL to SR-CLI §1**
+  (2026-09-14, W-164 gate 2) by `tests/test_verb_table_agreement.py`. Two
+  hand-maintained copies of one list with nothing comparing them, and
+  🔴 **they had already drifted**: the `maintenance` group read
+  `hooks · tune · verify` in the record and `hooks tune output verify` here.
+  **`fux output` is a real verb**, so the RECORD was the stale copy — the
+  direction that matters under L0, since every other artifact defers to it.
+  🔴 **`build_parser()` is the third party, and is what settles a disagreement.**
+  Comparing two documents can only say they differ; a session that guessed had an
+  even chance of editing this file to match a stale record.
+  ⚠ **The prose is NOT compared.** The two say the same thing in different words
+  on purpose — this file is written for a consumer looking at their own `.fux/`,
+  the record for whoever is deciding — and holding them byte-equal would be the
+  restatement L0 forbids wearing a test's clothes.
+- ✅ **Decision 6's write-once freeze is now VISIBLE for `.fux/README.md`**
+  (2026-09-14, W-163). `fux doctor`'s `` `.fux/README.md` current `` row compares
+  the file's **section set** against the current template's and names what is
+  absent. ⚠ **Sections, not bytes, and that is the whole care in it**: the file
+  is write-if-missing exactly so a consumer's annotations survive, so a byte
+  comparison would fire on every repo where somebody added a note — a row wrong
+  more often than right. An extra heading is the feature. Registered in
+  [SR-DOCTOR](0152_doctor.md).
 
 - **The dotdir is safe to explain in one table.** A newcomer's first question —
   "what do I commit?" — is answered by a file fux generates.
@@ -714,7 +899,7 @@ check can see neither.
   out of a health command is the worst possible answer to *"what is wrong"*.
 - ⚠ **Two of the new checks report on the PAST, not on now.** `refusal rules`
   and `freshness verdicts` read counters that networked runs and journalled
-  answers wrote. A repo that has never run `fux update`, or never passed
+  answers wrote. A repo that has never run `fux ingest`, or never passed
   `--journal`, is told it has **no data** — never shown a zero it would read as
   *"nothing was refused"* or *"nothing was as-ingested"*.
 - **A committed file needs a row in `COMMITTED_FILES`, not just a mention

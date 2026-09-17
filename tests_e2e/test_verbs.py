@@ -477,20 +477,45 @@ def test_ask_json_reports_which_path_answered_when_explain_is_set(tmp_path):
     assert fast["path"] == "accelerator"
 
 
-def test_find_still_prints_prose_on_the_no_match_path(tmp_path):
-    """W-48 item 3, decided and left alone — pinned so the decision is visible.
+def test_the_no_match_prose_is_on_stderr_and_stdout_is_empty(tmp_path):
+    """W-165 fix 2 — the golden updated BY HAND, in the change that moved it.
 
-    All three verbs say the same thing for the same condition; `--json` is the
-    machine-readable form. SR-FIND ties reopening this to a real script
-    observed breaking on it, and no such script has been observed.
+    **It asserted the opposite until 2026-09-14.** W-48 item 3 had left the
+    sentence on stdout and SR-FIND tied reopening to *"a real script observed
+    breaking on it"*. No script was ever observed, and the reopen came from the
+    other direction: the surface is documented as needing a `grep -qx` guard
+    before a caller may pipe `find`, which is a contract made of a string.
+
+    **Empty stdout is the assertion that matters** — that is what makes an empty
+    result read as zero paths rather than one that happens to be prose.
+
+    The exit code stays 0 (SR-CLI decision 6: an honest decline is a successful
+    run) and the wording is unchanged, so a consumer matching the text keeps
+    matching it on the other stream.
     """
     _write_fixture(tmp_path)
     _run(tmp_path, "ingest")
 
-    result = _run(tmp_path, "find", "zzzz nothing")
+    for verb in ("find", "ask", "answer"):
+        result = _run(tmp_path, verb, "zzzz nothing")
+        assert result.returncode == 0, verb
+        assert result.stdout == "", verb
+        assert result.stderr.strip() == "No confident matches.", verb
+
+
+def test_the_no_match_json_never_carried_the_prose(tmp_path):
+    """`--json` is unaffected by the stream move, because it never printed it.
+
+    The companion to the test above: a JSON caller's contract is `results: []`
+    and it is the same before and after W-165 fix 2, on both streams.
+    """
+    _write_fixture(tmp_path)
+    _run(tmp_path, "ingest")
+
+    result = _run(tmp_path, "find", "zzzz nothing", "--json")
     assert result.returncode == 0
-    assert result.stdout.strip() == "No confident matches."
-    assert result.stderr == ""
+    assert json.loads(result.stdout) == {"results": []}
+    assert "No confident matches." not in result.stderr
 
 
 def test_derived_plane_is_gitignored(tmp_path):
@@ -686,19 +711,20 @@ def test_url_is_gone(tmp_path):
     assert gone.returncode == 2  # argparse: not a choice
 
 
-def test_refresh_urls_survives_one_release_as_a_hidden_alias(tmp_path):
-    """The opposite call to `fux url`, and for a stated reason.
+def test_refresh_urls_is_gone_now_that_it_names_the_default(tmp_path):
+    """Its one release ran out, and W-177 is what made keeping it wrong.
 
-    It is a flag rather than a verb, it is older, and it is likelier to be in
-    somebody's CI — so it keeps working, hidden from `--help`, for one
-    release. `fux update` is what it now means.
+    W-63 kept `--refresh-urls` hidden rather than deleting it the way `fux url`
+    went: it was a flag rather than a verb, older, and likelier to be in
+    somebody's CI. **`fux ingest` absorbed `fux update` on 2026-09-15**
+    ([SR-CLI](../records/0101_cli-surface.md) decision 16e), so the flag would
+    now silently name *what already happens* — a hidden flag that means
+    nothing is worse than none.
     """
     _write_fixture(tmp_path)
     assert "--refresh-urls" not in _run(tmp_path, "ingest", "--help").stdout
-    # No [sources.url] configured, so it fails the same way it always did —
-    # what is asserted is that argparse still accepts the flag at all.
-    still_parses = _run(tmp_path, "ingest", "--refresh-urls", check=False)
-    assert still_parses.returncode != 2
+    gone = _run(tmp_path, "ingest", "--refresh-urls", check=False)
+    assert gone.returncode == 2  # argparse: unrecognized arguments
 
 
 # -- W-63: the source verbs, as a user --------------------------------------
@@ -753,11 +779,13 @@ def test_remove_takes_the_document_out_of_the_index_and_the_graph(tmp_path):
     assert "pruning.md" in _run(tmp_path, "find", "pruning").stdout
 
     out = _run(tmp_path, "remove", "docs/pruning.md").stdout
-    assert "excluded  !docs/pruning.md" in out  # covered by `docs`, so an exclusion
+    # W-165 fix 1: the exclusion is a `.fuxignore` line now, anchored with a
+    # leading `/` so it cannot also drop an `archive/docs/pruning.md`.
+    assert "excluded  /docs/pruning.md" in out  # covered by `docs`, so an exclusion
     assert "dropped file:docs/pruning.md from the index" in out
 
     assert "pruning.md" not in _run(tmp_path, "find", "pruning").stdout
-    assert "No confident matches." in _run(tmp_path, "ask", "why did pruning fail").stdout
+    assert "No confident matches." in _run(tmp_path, "ask", "why did pruning fail").stderr
 
     gone = _run(tmp_path, "explain", "docs/pruning.md", check=False)
     assert gone.returncode != 0
@@ -790,7 +818,8 @@ def test_the_differential_law_survives_an_add_and_a_remove(tmp_path):
             assert scanned == accelerated, f"differential broken after {step}: {query!r}"
 
 
-def test_update_reingests_and_check_is_read_only(tmp_path):
+def test_ingest_reingests_and_check_is_read_only(tmp_path):
+    """⚠ **This was `fux update` until W-177** — same behaviour, one verb."""
     _write_fixture(tmp_path)
     _run(tmp_path, "ingest")
 
@@ -801,22 +830,36 @@ def test_update_reingests_and_check_is_read_only(tmp_path):
     )
 
     before = _shards(tmp_path)
-    check = _run(tmp_path, "update", "--check")
+    check = _run(tmp_path, "ingest", "--check")
     assert "stale" in check.stdout and "docs/pruning.md" in check.stdout
     assert _shards(tmp_path) == before  # --check wrote nothing
 
-    _run(tmp_path, "update")
+    _run(tmp_path, "ingest")
     assert _shards(tmp_path) != before
-    assert "nothing has drifted" in _run(tmp_path, "update", "--check").stdout
+    assert "nothing has drifted" in _run(tmp_path, "ingest", "--check").stdout
 
 
-def test_update_refuses_to_create_a_line(tmp_path):
-    """`add` and `remove` write lines; `update` never touches one."""
+def test_ingest_refuses_to_create_a_line(tmp_path):
+    """`add` and `remove` write lines; `ingest` never touches one."""
     _write_fixture(tmp_path)
     _run(tmp_path, "ingest")
-    refused = _run(tmp_path, "update", "docs/does-not-exist.md", check=False)
+    refused = _run(tmp_path, "ingest", "docs/does-not-exist.md", check=False)
     assert refused.returncode == 1
     assert "never creates a line" in refused.stderr
+
+
+def test_update_is_gone_with_no_alias(tmp_path):
+    """Deleted outright, on `fux url`'s precedent — three weeks old (W-177).
+
+    🔴 **Exit 2 is argparse's, and [SR-CLI](../records/0101_cli-surface.md)
+    decision 5 says fux never produces a 2.** Asserted as it behaves, not as
+    the record wishes; the contradiction is filed as W-193 and is not this
+    test's to resolve.
+    """
+    _write_fixture(tmp_path)
+    gone = _run(tmp_path, "update", check=False)
+    assert gone.returncode == 2
+    assert "invalid choice" in gone.stderr
 
 
 def test_add_of_a_file_does_not_override_the_type_allowlist(tmp_path):
@@ -883,3 +926,165 @@ def test_dry_run_writes_no_bytes_anywhere(tmp_path):
 
     assert dirs.read_bytes() == before_list
     assert _shards(tmp_path) == before_shards
+
+
+# -- W-174: `fetch_at_answer = false`, through the real CLI -------------------
+
+#: Logs every lifecycle call. **The absence of this file after `answer` is the
+#: assertion** — stronger than reading a mode out of the JSON, because it
+#: proves no consumer code ran at all, not merely that no fetch was attempted.
+_LOGGING_FETCHER = '''\
+import pathlib
+
+LOG = pathlib.Path(__file__).with_name("calls.log")
+
+def _log(line):
+    with LOG.open("a", encoding="utf-8") as f:
+        f.write(line + "\\n")
+
+def connect():
+    _log("connect")
+
+def close():
+    _log("close")
+
+def fetch(url):
+    _log("fetch:" + url)
+    return "# Runbook\\n\\nRestart the indexer with `fux build --force`.\\n"
+'''
+
+
+def _url_repo(tmp_path: Path, *, extra: str = "") -> None:
+    (tmp_path / "fux.toml").write_text(
+        "[sources]\n"
+        "[sources.url]\n"
+        'fetcher = "mw.py"\n'
+        "max_parallel = 4\n" + extra,
+        encoding="utf-8",
+    )
+    (tmp_path / "mw.py").write_text(_LOGGING_FETCHER, encoding="utf-8")
+    fux = tmp_path / ".fux"
+    (fux / "sources").mkdir(parents=True, exist_ok=True)
+    (fux / "sources" / "dirs").write_text("", encoding="utf-8")
+    (fux / "sources" / "urls").write_text("https://x.test/runbook\n", encoding="utf-8")
+    (fux / "pii.toml").write_text("", encoding="utf-8")
+
+
+def test_fetch_at_answer_false_answers_from_acquired_and_opens_no_socket(tmp_path):
+    """The whole feature, as a user sees it.
+
+    Ingest retains the bytes (`keep` defaults to true), then the flag goes on
+    and `answer` must produce a real, verified citation without the fetcher
+    being loaded, configured, connected or called.
+    """
+    _url_repo(tmp_path)
+    # ⚠ **A bare `fux ingest` is what fetches now** (W-177). It used to need
+    # `--refresh-urls`, because a plain ingest never opened a socket; the flag
+    # is gone and the default verb does it. Without a fetch the URL is listed
+    # and not in the index, and this test would pass for the wrong reason.
+    _run(tmp_path, "ingest")
+    assert (tmp_path / ".fux" / "acquired" / "manifest.json").exists()
+
+    # Everything up to here was allowed to fetch; only what follows is on trial.
+    (tmp_path / "calls.log").unlink()
+    _url_repo(tmp_path, extra="fetch_at_answer = false\n")
+
+    out = _run(tmp_path, "answer", "how do I restart the indexer", "--json").stdout
+    payload = json.loads(out)
+
+    assert payload["source"] == "refer"
+    assert payload["citation"]["freshness"] == "as-ingested"
+    assert not (tmp_path / "calls.log").exists(), "the fetcher was touched under `never`"
+
+
+def test_the_default_still_fetches_so_no_repo_changes_meaning(tmp_path):
+    """The other half of the same claim: silence is today's behaviour."""
+    _url_repo(tmp_path)
+    _run(tmp_path, "ingest")
+    (tmp_path / "calls.log").unlink()
+
+    _run(tmp_path, "answer", "how do I restart the indexer", "--json")
+    log = (tmp_path / "calls.log").read_text(encoding="utf-8")
+    assert "fetch:https://x.test/runbook" in log
+
+
+def test_a_misspelled_flag_is_refused_rather_than_silently_ignored(tmp_path):
+    """The failure this key would otherwise have: a consumer who believes they
+    are offline, and is not."""
+    _url_repo(tmp_path, extra="fetch_at_anwser = false\n")
+    done = _run(tmp_path, "doctor", check=False)
+    assert done.returncode != 0
+    assert "not a fux.toml key" in (done.stdout + done.stderr)
+
+
+# -- W-178: a consumer's own fetcher, through the real CLI -------------------
+
+
+def test_a_consumer_drops_a_fetcher_in_and_names_it_on_a_line(tmp_path):
+    """🔴 **W-178's definition of done, as a user: no engine change, no release.**
+
+    A consumer writes `.fux/fetchers/glassbox.py`, puts `fetch=glassbox` on a
+    URL line, and ingests. Before 2026-09-15 the grammar rejected that value
+    before anything read the file — `fetch` was an enum of the two fetchers fux
+    happens to ship, while `urlsrc._fetcher_path()` and its own docstring both
+    already described the open behaviour as fact.
+
+    **Asserted on the INDEX, not on the exit code.** A run that swallowed the
+    fetch and exited 0 is the failure this is aimed at: the document has to be
+    findable, with the bytes the consumer's own module returned.
+    """
+    (tmp_path / "fux.toml").write_text(
+        "[sources]\n"
+        "[sources.url]\n"
+        'fetcher = ".fux/fetchers/http.py"\n'
+        "max_parallel = 4\n",
+        encoding="utf-8",
+    )
+    fux = tmp_path / ".fux"
+    (fux / "sources").mkdir(parents=True, exist_ok=True)
+    (fux / "sources" / "dirs").write_text("", encoding="utf-8")
+    (fux / "sources" / "urls").write_text(
+        "https://wiki.test/rota fetch=glassbox meta=plain\n", encoding="utf-8"
+    )
+    (fux / "pii.toml").write_text("", encoding="utf-8")
+    fetchers = fux / "fetchers"
+    fetchers.mkdir(parents=True, exist_ok=True)
+    # The shipped default has to exist too: `[sources.url] fetcher` names it,
+    # and its PARENT is the directory `fetch=` resolves names against.
+    (fetchers / "http.py").write_text("def fetch(url):\n    return ''\n", encoding="utf-8")
+    (fetchers / "glassbox.py").write_text(
+        "def fetch(url):\n"
+        "    return '# The pager rota\\n\\nglassbox carried this one\\n'\n",
+        encoding="utf-8",
+    )
+
+    out = _run(tmp_path, "ingest").stdout
+    assert "ingested" in out
+    assert "glassbox carried this one" in _run(tmp_path, "answer", "pager rota").stdout
+
+
+def test_a_fetcher_name_with_no_file_is_a_doctor_finding_not_a_parse_error(tmp_path):
+    """The price of an open set, and where it is paid.
+
+    `fetch=glasbox` used to be a grammar error at read time. It parses now — so
+    `fux doctor` has to be the thing that says the file is missing, or the
+    typo surfaces as the next person's ingest dying mid-run.
+    """
+    (tmp_path / "fux.toml").write_text(
+        "[sources]\n"
+        "[sources.url]\n"
+        'fetcher = ".fux/fetchers/http.py"\n'
+        "max_parallel = 4\n",
+        encoding="utf-8",
+    )
+    fux = tmp_path / ".fux"
+    (fux / "sources").mkdir(parents=True, exist_ok=True)
+    (fux / "sources" / "dirs").write_text("", encoding="utf-8")
+    (fux / "sources" / "urls").write_text("https://wiki.test/rota fetch=glasbox\n", encoding="utf-8")
+    (fux / "pii.toml").write_text("", encoding="utf-8")
+    (fux / "fetchers").mkdir(parents=True, exist_ok=True)
+    (fux / "fetchers" / "http.py").write_text("def fetch(url):\n    return ''\n", encoding="utf-8")
+
+    done = _run(tmp_path, "doctor", check=False)
+    assert "fetcher bindings" in done.stdout
+    assert "glasbox" in done.stdout

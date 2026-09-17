@@ -51,7 +51,7 @@ At 1M documents — **a deferred target since 2026-08-21, not the design point (
 from the measured 10.8 KB/doc at 100k, archived ADR-0011) and duplicates
 content whose owners (git dirs, Confluence, SharePoint) keep evolving it —
 recreating the drift disease Fux exists to cure. The paper
-([`../paper/the-fux-index-paper.md`](../paper/the-fux-index-paper.md))
+([`../paper/the-fux-index-paper.md`](../../docs/paper/the-fux-index-paper.md))
 formalizes the alternative.
 
 ## Options

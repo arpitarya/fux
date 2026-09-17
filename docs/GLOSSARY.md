@@ -18,6 +18,14 @@ trigger).*
 
 ---
 
+**Acquired plane** — `.fux/acquired/`: the bytes a fetch returned, kept. A
+third category beside committed and derived — **gitignored like derived, and
+not rebuildable**, because a blob can only be re-*acquired*, and only while the
+source still exists. It is what lets a `url:` citation be verified with no
+network: the verdict becomes `as-ingested` rather than `unverified`. Bounded by
+`acquired_max_bytes`, evicted oldest-first by run counter, never by a clock.
+See [SR-ACQUIRED](../records/0145_acquired-plane.md).
+
 **Adapter** — A per-source-system reader on the [refer](#refer-mode) path:
 given a [locator](#locator) and a version, it returns bytes. v0.30 ships
 exactly three — git-dir, generic HTTP (conditional GET), Confluence REST —
@@ -30,6 +38,19 @@ and the cap is a decision, not a backlog. MCP is the endgame and is parked as
 2026-08-09); the archived engine's SRs 0001–0015 live at
 [`archive/v0.26-docs/adr/`](../archive/v0.26-docs/adr/) and are always cited
 as "archived SR-NNNN". See [CLAUDE.md](../CLAUDE.md), [adr/README](../records/README.md).
+
+**Agent surface** — Any file fux writes into a consumer's repository that an AI
+coding agent reads or runs. Classified by **what it does**, never by which
+vendor reads it: **instructing** (skills · steering · rules · instructions ·
+`agents` files — prose an agent may or may not load), **acting** (hooks ·
+settings · commands · subagents · output styles — it fires, gates or is
+invoked), **protocol** (MCP tool and parameter descriptions — no file is
+involved) and **emitted** (what a command prints: errors, `--why`, `doctor`
+rows, the confidence block). ⚠ *Agent-steering files* in `CLAUDE.md` and
+*vendor surfaces* in SR-AGENT-POLICY are **the same thing**; both defer to this
+entry. Do not call the category "steering" — that is one of its members. See
+[SR-AGENT-SURFACES](../records/0155_agent-surfaces.md); the vendor roster is
+[SR-AGENT-POLICY](../records/0132_agent-policy.md).
 
 **AI-assisted mode** — See [enriched mode](#enriched-mode).
 
@@ -46,6 +67,14 @@ per-process — distinct from the [TTL fetch cache](#ttl-fetch-cache), which is
 on disk. Megiddo & Modha, FAST 2003 (paper ref [11]). See
 [SR-CACHE](../records/0131_cache.md) decisions 2–5,
 [cache-policy](../work/compare/cache-policy.compare.md).
+
+**Atom (a ranking atom)** — A named, single-purpose ranking component with a
+frozen output contract, kept separate so a composed verb can be built out of
+atoms and still be attributable. Fux has two:
+[`fux lexical`](#lexical-the-verb) — the words alone — and `fux graph --seed`,
+the walk from given seeds. **The point of an atom is the baseline**: once `ask`
+composes stages, a comparison needs an arm that cannot quietly acquire one.
+See [SR-CLI](../records/0101_cli-surface.md) decisions 12–13.
 
 **BIC (Binary Interpolative Coding)** — The posting-list codec for the
 [wire format](#wire-format): recursively encodes a sorted docid list against
@@ -66,6 +95,15 @@ archived engine: BM25 with *fielded* term frequency — heading (3.0), path
 (2.0), body (1.0) summed first, then saturated once (k1=1.2, b=0.75). Not
 per-field BM25 glued together. Ported at [M4](../archive/open/W-24-m4-refer-plane.md); it is also the single
 scorer both arms of the [pruning eval](#pruning-eval-the-gate) run through.
+
+**Boilerplate term** — A term whose document frequency is **at or above half
+the corpus**, so `idf(df, n)` is at most `ln 2` ≈ 0.69 and it separates almost
+nothing. Named as a *share* rather than as an IDF floor on purpose: an absolute
+floor moves with `n`, so the same word would be boilerplate on one rung of a
+corpus and not the next. `fux inspect`'s first lens names them — `tldr`,
+`status`, `owner`, a template heading — and reports the share of **postings**
+they carry, because a handful of such terms can be most of the index's bytes.
+See [SR-INSPECT](../records/0156_inspect.md) decisions 6 and 8.
 
 **Chunk** — The passage unit: a heading-bounded slice of a document
 (256–512 token target, code fences and tables atomic), carrying its heading
@@ -92,7 +130,7 @@ convention. Lives in [`work/compare/`](../work/compare/README.md).
 the [ledger](#ledger-l). The single exception is per-source
 [`snapshot` mode](#snapshot-mode), which is explicit and opt-in. This is what
 makes the committed artifact small, ACL-safe, and never stale-by-accumulation.
-See [CLAUDE.md §Non-negotiable constraints](../CLAUDE.md), named by [SR-LAWS](../records/0001_LAWS.md), [paper §3](../work/paper/the-fux-index-paper.md).
+See [CLAUDE.md §Non-negotiable constraints](../CLAUDE.md), named by [SR-LAWS](../records/0001_LAWS.md), [paper §3](paper/the-fux-index-paper.md).
 
 **Determinism** — Same sources → byte-identical index and root hash; same
 question → same answer. No wall-clock output, no model in the maintenance
@@ -230,6 +268,17 @@ self-describing `README.md` and a `.gitignore` naming **only** the derived
 dirs, never `*`. Both are write-if-missing; anything undeclared is a `fux
 doctor` warning. See [SR-DOTFUX](../records/0102_fux-directory.md).
 
+**Findability** — Whether any query can reach a document at all —
+retrievability in the IR literature (Azzopardi, de Rijke and Balog, SIGIR
+2007), and the one property of an index that matters before ranking does. Fux
+answers it two ways and keeps them apart: **exhaustively**, by whether a
+document carries any [distinctive term](#boilerplate-term) at all, and by
+**sample**, by whether a document comes back in the top 3 for its own most
+distinctive words. ⚠ **The sampled half is near 1.0 on almost every corpus,
+healthy or not** — a fingerprint is built from a document's own rarest terms
+and its path is part of its indexed vocabulary — so it is reported and carries
+no floor. See [SR-INSPECT](../records/0156_inspect.md) decisions 7 and 9a.
+
 **Fux-benchmark** — The two-version timing harness
 (`~/my_programs/fux-benchmark/`): its own corpora, a fixed query set with no
 answer key, and every run timing each query and keeping the ranked list it
@@ -238,12 +287,48 @@ quality — that is the lab's. See
 [SETUP-BENCHMARK](../work/setup/fux-benchmark.md) and
 [SR-WORK-ENVIRONMENTS](../records/0052_WORK-environments.md).
 
+**Boosted tier** <a id="boosted-tier"></a> — `fux ask`'s main result list
+after W-161: the documents BM25F retrieved, **re-ordered** by
+`RRF(lexical rank, PPR rank)` over a walk out of the query's own top-k. A row
+the walk reached carries `boosted`; a row it **moved** also carries a `route`
+like `#7 -> #2 via graph`. 🔴 **It is the one list fux prints that may not be
+monotone in its own score** — the order is a rank fusion and the number is
+still BM25F — and the per-row marker is what makes that legible rather than
+mysterious. Distinct from the [related tier](#related-tier), which is not a
+result list at all. Both ship on and **unmeasured**; the frozen bar is
+[`2026-09-14-graph-ask`](../work/regression/2026-09-14-graph-ask/PRE-REGISTRATION.md).
+See [SR-ASK](../records/0103_ask.md) decision 13.
+
 **Fux-lab** — The scratch measurement environment (`~/my_programs/fux-lab/`),
 one directory per environment, each with its own venv and baselines, and the
 [golden ladder](../work/golden/README.md) as its corpus. It commits nothing; its
 **evidence is filed** into [`work/regression/`](../work/regression/README.md),
 which is a repo law. What it may measure and how large a corpus it may use are
 [SR-WORK-ENVIRONMENTS](../records/0052_WORK-environments.md)'s. See [SETUP-LAB](../work/setup/fux-lab.md).
+
+**`fux lexical` (the verb)** <a id="lexical-the-verb"></a> — BM25F over the
+committed index, then the proximity reranker, then RRF over any `-q`
+phrasings. **No graph stage, ever.** It WAS byte-identical to `fux ask`; W-161
+gave `ask` a [boosted tier](#boosted-tier) and the two parted, which is exactly
+what this verb exists for. **Frozen**: a future component added to the lexical
+core becomes a new verb or a tunable, never a change to this one — and a repo
+whose `tune.toml` turns the graph tier on cannot turn it on here. It is the baseline arm for every ranking
+verdict and the stable arm of the Python/Node differential law — which is worth
+a verb precisely because `ask --scan` stops meaning *the words alone* the moment
+`ask` grows a stage. See [SR-CLI](../records/0101_cli-surface.md) decision 12.
+
+**Related tier** <a id="related-tier"></a> — `fux ask`'s second list
+(W-161): documents the walk reached that **no query word matched at all**, so
+BM25F could not have retrieved them at any depth. Each row carries the `route`
+it was reached by (`#2 via ref` — the best-ranked result that links to it, and
+the edge kind). 🔴 **Never counted as an answer, never in the confidence band,
+never merged into `results`** — a document with no lexical match sitting among
+real matches *looks like* a match, and the label is the only thing keeping
+`ask` honest about what it **found** versus what it **followed**. `fux answer`
+does fetch them and re-score on the bytes, because the refer plane reads the
+document rather than the index. Absent (not `[]`) when the tier did not run.
+`fux find` never has one — it pipes bare paths. See
+[SR-ASK](../records/0103_ask.md) decision 13.
 
 **FuxVec** — The from-scratch stdlib dense engine: sign-quantizes a 256-dim
 int8 embedding into a **256-bit code** (32 B/doc), scans by Hamming distance,
@@ -284,6 +369,15 @@ treated as zero. **Zero headroom in a direction makes a null *Inconclusive*, not
 ACL-mismatch leak where a repo-cloner without source access could read
 index-derived summaries. `plain` is opt-in, enforced at write time (not in
 documentation). See [meta-privacy](../work/compare/meta-privacy.compare.md).
+
+**Link-IDF** — An inbound edge's discount in the graph walk:
+`1 / (1 + ln(1 + in_degree of its target))`. A node nothing points at is
+`1.0`; `CLAUDE.md`, with 180 inbound edges on this repository, is about `0.16`.
+**The same idea as IDF** — a link everybody makes says little about the
+document it comes from — and deliberately **not** `1/in_degree`, which would
+make a hub weightless and turn *widely cited* into *ignored*. **Ships off
+(`--link-idf`) and is measured by nobody yet.** See
+[SR-GRAPH](../records/0126_graph.md) decision 15.
 
 **Impact quantization** — Storing each posting's precomputed score
 contribution as a **4-bit** bucket against a global scale recorded in the
@@ -327,13 +421,34 @@ What an [adapter](#adapter) needs to fetch the bytes back.
 
 **Fetcher (URL)** — The **consumer's own** Python file, committed at
 `.fux/fetchers/cdp.py`, that turns a URL into markdown. Fux imports it by
-path — only under `fux add <URL>` or `fux update` — and calls
+path — under `fux add <URL>`, `fux ingest`, and **`fux answer`**, which
+verifies a `url:` citation against its source unless
+[`fetch_at_answer`](#fetch-at-answer) is off — and calls
 `configure(config)` / `connect()` / `fetch(url)` / `close()`. Every socket in
 the system lives here, outside `src/fux/`, which is how the
 [`$0`](#0-the-zero-dollar-law) offline-by-default laws survive URL ingestion.
 Tunables arrive through the opaque `[sources.url.config]` table, never as
-typed keys in fux's schema. See [SR-URL-INGEST](../records/0107_url-ingest.md),
+typed keys in fux's schema.
+
+**The set is open.** `fetch=<name>` on a URL line resolves to
+`<fetchers dir>/<name>.py`, so a fetcher you write is a fetcher fux can use —
+no engine change and no release, exactly as `.fux/decoders/` already works
+(**fetchers and decoders are one consumer-plane pattern**). The line grammar
+validates the *shape* of the name and never imports the module to check it:
+importing a fetcher runs code that may open a browser, and reading a config
+file may not do that. `fux doctor`'s `fetcher bindings` row reports a name with
+no file. See [SR-URL-LIST](../records/0116_url-list.md) decision 15,
+[SR-URL-INGEST](../records/0107_url-ingest.md),
 [SR-DOTFUX](../records/0102_fux-directory.md).
+
+**`fetch_at_answer`** — The `fux.toml` boolean that decides whether
+`fux answer` may open a socket **at all**. `true` (the default) is the
+verifying path: fetch each `url:` citation and compare shas. `false` pins every
+one of them to `.fux/acquired/` — no fetcher is loaded, no
+`connect()` runs, and the verdict is `as-ingested` against the retained bytes
+(or `unverified` with none). **Not `--no-refer`**, which turns the refer plane
+off entirely, and **not `update=never`**, which is the update-time clock. See
+[SR-URL-FRESHNESS](../records/0147_url-freshness.md) decision 16.
 
 **MPH (minimal perfect hash)** — A collision-free term→slot map at ~2–3
 bits/key, the planned `D/` dictionary upgrade (~15 MB saving at 10⁶ docs — **deferred-target arithmetic**; the design point is 10 000 since 2026-08-21).
@@ -364,12 +479,25 @@ is 10 000 documents (W-65, 2026-08-22). Listed: P1 pruning holds quality · P2 w
 ≤ 300 ms @1M · P4 cold external answer ≤ 3 s · P5 clone→first answer ≤ 5 min ·
 P6 concurrent-ingest merges cleanly · P7 20-doc commit re-indexes < 1 s.
 Status lives in [OPEN-WORK §2](../work/OPEN-WORK.md). See
-[paper §8](../work/paper/the-fux-index-paper.md).
+[paper §8](paper/the-fux-index-paper.md).
 
 **Planes (`L/ P/ D/ V/ E/ M/`)** — The six key ranges of the
 [keyspace](#keyspace-one-mst): ledger, postings, dictionary+df, dense codes,
 edges, doc meta. "Plane" is a *namespace inside one tree*, not a separate
 file or store.
+
+**Pin (a correction pin)** — `fux correct --pin` forcing one document to #1
+for **one exact question**, matched on the analyzed form. Solr's
+`QueryElevationComponent` is the precedent, and the brittleness is the point: a
+pin fixes one phrasing, which is why the [correction](#correction)'s body line —
+which generalises — is the default and the pin is the rare escape hatch.
+Applied **after** the ranking and after the reranker, so it never enters a
+score and `--why` still shows the ranking that actually ran; a pinned document
+the ranking never returned is inserted with `score: 0.0`, which is the honest
+number. **Suspended** when its document's content sha moves, until a human
+`fux correct --reaffirm`s it — `fux doctor`'s `correction pins` row names every
+suspended one, because suspension is silent at query time. See
+[SR-ENRICH](../records/0137_enrich.md) decision 19a.
 
 **PPR-lite** — Personalized PageRank restricted to the seed neighbourhood
 (damping 0.85, exactly 3 iterations, sorted traversal). A *fixed* iteration
@@ -440,6 +568,24 @@ commits a machine-made Markdown copy with provenance frontmatter, for
 air-gap availability, PR-reviewed change tracking, or audit retention. The
 archived frontmatter parser's home in v0.30. Built at [M6](../archive/open/W-26-m6-scale-t2.md).
 
+**Template family** — Two or more documents with an **identical heading
+set** — the same form filled in more than once. The *set*, never the sequence:
+a filled-in template reorders its sections and is still the same template.
+Distinct from a **near-duplicate pair**, which is two documents whose *term
+sets* overlap at Jaccard ≥ 0.80: a family shares its shape and differs in its
+content, and reporting them as one finding would hide the difference that
+decides the remedy. `fux inspect`'s fourth lens names both. See
+[SR-INSPECT](../records/0156_inspect.md) decision 6.
+
+**Seed (graph)** — A node the PPR walk starts from. Either the top-k of a
+query's ranking (`fux graph "<q>"`) or documents named by hand
+(`fux graph --seed <id>…`), and the two are the same walk: **the query form is
+DEFINED as the seed form over the query's top-k.** Mass follows **argument
+order** for named seeds, the same rank-mass rule the query form applies to a
+ranked top-k. ⚠ A hand-named seed reports `rank` and `"score": null` — there is
+no ranking behind it, so there is no score. See
+[SR-GRAPH](../records/0126_graph.md) decision 13.
+
 **TTL fetch cache** — *Time-to-live.* The on-disk, **gitignored**, per-machine
 store at `.fux/runtime/fetch-cache/` that answers *"do I need to fetch this at
 all?"*: an entry fetched less than `cache_ttl_seconds` ago is served without
@@ -470,9 +616,9 @@ read from the committed `.fux/sources/urls` (one per line), fetched through
 the consumer's [fetcher](#fetcher-url), and indexed exactly like repo
 files with [hashed meta](#hashed-meta-meta--hashed) by default. Fux ships
 **no** URL adapter — the adapter cap is untouched, because the fetching code
-is the consumer's. Fetching happens only under `fux add <URL>` or `fux update`; a plain
-ingest carries every `url:` record forward byte-identically. See
-[SR-URL-INGEST](../records/0107_url-ingest.md).
+is the consumer's. Fetching happens only under `fux add <URL>` or `fux ingest`;
+`fux ingest --no-fetch` carries every `url:` record forward byte-identically and
+opens no socket. See [SR-URL-INGEST](../records/0107_url-ingest.md).
 
 **Use record (the law, L8)** — Anything durable fux keeps about **someone using
 it**, as opposed to about the corpus: query keys, citation history, counters. L8

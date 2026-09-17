@@ -8,7 +8,413 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
-Nothing yet.
+## [3.0.0-alpha.0] - 2026-09-16
+
+**A major, and the two breaking changes are the reason.** `fux update` is gone —
+`fux ingest` is the one verb over the corpus — and the committed index format is
+`fux.index.v3`, which an existing index must be rebuilt into. Everything below
+had accumulated unreleased since `2.0.1` on 2026-09-14; the four things a
+consumer feels are:
+
+- 🔴 **`fux update` is deleted** and a bare `fux ingest` now goes to the network.
+  The offline form is `fux ingest --no-fetch`, and `fux hooks` must be re-run.
+- 🔴 **`fux.index.v3`** — rebuild required, and the ingest summary says so.
+- 🔴 **`[bm25f] b` defaults to `0.15`, not `0.75`** — the first ranking default
+  here that is MEASURED rather than inherited, so **every score changes**.
+- 🔴 **`confidence.answerable` is `false` for `weak` as well as `none`**, and
+  `No confident matches.` moved to stderr.
+
+Added since `2.0.1`: anchor text as a sixth BM25F field, link-following on
+`fux ask`, `fux correct`, `fux inspect`, `fux lexical`, `fux graph --seed`, and
+`fetch=` taking any fetcher name.
+
+⚠ **This is an alpha and npm serves it under the `alpha` tag, not `latest`.**
+
+### Removed — BREAKING, read this before upgrading a consumer
+
+- 🔴 **`fux update` is deleted. `fux ingest` is the one verb over the corpus**
+  ([W-177](work/open/W-177-ingest-absorbs-update.md); Arpit's ruling,
+  2026-09-15). The first ingest and every re-ingest, for directories and URLs
+  alike. **There is no deprecation alias** — `fux update` exits non-zero with
+  argparse's *invalid choice*.
+
+  | was | is |
+  |---|---|
+  | `fux update` | `fux ingest` |
+  | `fux update --all` | `fux ingest --refetch-all` |
+  | `fux update --check [--json]` | `fux ingest --check [--json]` |
+  | `fux update --failed` | `fux ingest --failed` |
+  | `fux update <entry>` | `fux ingest <entry>` |
+  | `fux ingest --refresh-urls` *(hidden)* | *(deleted — it is the default now)* |
+
+  - 🔴 **A bare `fux ingest` now GOES TO THE NETWORK.** It fetches the URLs
+    known to be stale and says so on stderr. **The offline form is
+    `fux ingest --no-fetch`** — the same flag, with the same meaning, that
+    `fux add` already carries. CI and air-gapped clones want that one.
+  - **`--all` is renamed because of where it lands.** On `update` it sat alone;
+    on `ingest` it sits beside `--full`, and *all* and *full* read as synonyms
+    while one selects **URLs** and the other re-extracts **documents**.
+  - **Your git hooks change, and `fux hooks` rewrites them.** `post-merge` now
+    runs `fux ingest --no-fetch`; `post-commit` is unchanged. **Split by
+    caller:** the daemon fetches, a git hook never does. Re-run `fux hooks`
+    after upgrading, or a merge will open sockets you did not ask for.
+  - **`fux doctor`'s remediation strings name `fux ingest`.** The report shape
+    is unchanged.
+  - **`--check` and `--list-skipped` are two exit-early flags on one verb now.**
+    Given both, **`--check` wins** — it is the one with a `--json` form and the
+    one a pipeline gates on
+    ([SR-INGEST](records/0106_ingest.md) decision 21b).
+  - 🔴 **`fux update` exits `2`, not `1`, and your pipeline needs to know which.**
+    `2` is argparse's usage-error code — an unknown verb, raised before fux's own
+    error boundary exists — and it comes with argparse's usage message on stderr
+    naming the valid verbs. **A `1` is fux failing; a `2` here is the verb being
+    gone.** A job that treats anything non-`1` as *the runner broke* will read
+    this upgrade as an outage. ([SR-CLI](records/0101_cli-surface.md) decision 5,
+    amended 2026-09-16: fux produces `0`, `1`, `130`; argparse produces `2`. The
+    old *"`2` is reserved and not produced"* is retired — it was a statement
+    about `FuxError` that read as a statement about the process.)
+  - ⚠ **What did NOT change:** which URLs a networked run goes out for (W-82
+    ruling 3 — narrow by default), pinned `update=never` lines (never fetched,
+    `--refetch-all` included), the transient-failure guarantee (a failed fetch
+    keeps the prior record and exits `0`), and **law L4**, whose text says
+    *paths*, plural, and never bounded how many
+    ([SR-LAW-4](records/0006_LAW-4-offline-by-default.md)).
+
+### Added
+
+- **`fetch=` on a URL line takes ANY fetcher name** — a consumer drops
+  `.fux/fetchers/glassbox.py` in, writes `fetch=glassbox`, and ingests; no
+  engine change and no fux release ([W-178](work/open/W-178-consumer-planes-open-sets.md);
+  Arpit's ruling, 2026-09-15).
+  - **It is the pattern `.fux/decoders/` already shipped**, made symmetrical:
+    **fetchers and decoders are one consumer-plane pattern**, and the `fetch=`
+    validator reuses the decoder name regex rather than growing a second one.
+  - **Shape only, never existence.** Lowercase letters, digits and underscores,
+    no leading `_`, no `.py`, no directory part. Importing a fetcher to check a
+    config line would run consumer code that may open a browser, so a
+    **committed file would open a socket to decide whether a line is
+    well-formed** — on a path L4 fences.
+  - 🔴 **A typo parses now.** `fetch=glasbox` is a legal line naming a file
+    nobody wrote, where the old enum refused it at read time. **`fux doctor`
+    gains a `fetcher bindings` row** — the mirror of `decoder bindings` — so it
+    surfaces before an ingest dies mid-run on somebody else's machine.
+  - **`meta`, `keep`, `archived`, `enrich` and `update` stay enums**, and the
+    attribute **key** set stays closed at seven. Open values, closed keys.
+  - ⚠ **Every URL list valid today stays valid**, and `fux add --cdp` / `--http`
+    are unchanged. There is deliberately **no `--fetch <name>` flag**: for a
+    custom fetcher, `fux add <URL> --no-ingest`, edit the `fetch=` value, then
+    `fux ingest <URL>`.
+  - **Fixed on the way:** `.fux/sources/urls`' generated header printed
+    `<duration>` for every typed attribute, so a fresh `fux setup` would have
+    written `fetch=<duration>`. The placeholder is the attribute's now.
+
+### Changed — RANKING, read this before upgrading a consumer
+
+- 🔴 **`[bm25f] b` defaults to `0.15`, not `0.75`. Every score in the engine
+  changes.** ([W-144](work/regression/2026-09-16-b-sweep-2/VERDICT.md); Arpit's
+  ruling, 2026-09-16.) `b` is the strength of BM25's length normalisation, and
+  **a table inflates a document's length with tokens that say nothing about the
+  query** — so at `0.75` a document is punished for an appendix it did not ask
+  to be measured on.
+  - **Measured, under a rule frozen before the sweep**: the first value,
+    descending `0.4 → 0.3 → 0.2 → 0.15`, that improves both benefit families
+    with every control holding. `0.4` moves neither; `0.3` and `0.2` fix the
+    rate-card case and leave the prose-with-appendix case where `0.75` does;
+    **`0.15` moves both** — `+30` each, `p = 0.0000` against a required net
+    of 12.
+  - ⚠ **One synthetic corpus, and the run is `informed`.** 510 generated
+    documents built so the mechanism can move. It says a lower `b` ranks better
+    **on documents shaped like these**.
+  - **No re-ingest is needed** — `b` is applied at query time.
+  - 🔴 **`fux setup` writes `b` out in full**, so a repo set up before this
+    upgrade keeps `0.75` in its committed `.fux/tune.toml` and **will not move**.
+    Change the line, or delete it to take the new default. A fresh clone and a
+    set-up repo now rank differently unless you do.
+
+### Changed — read this before upgrading a consumer
+
+- 🔴 **The committed index format is `fux.index.v3`, and an existing index must
+  be rewritten: `fux ingest --full`.** There is no in-place migration and
+  `store/reader.py` refuses a v2 shard rather than misreading one. ⚠ **Do NOT
+  delete `.fux/index/` by hand** — `url:` records are the one thing in it no
+  re-extraction can rebuild, and `--full` refuses rather than stranding them,
+  naming each.
+  - **What appeared:** a `ref` edge now carries `at` (anchor term hash → count,
+    from the **link text the source document wrote**) and `al` (the token
+    total). The `_format` bump is
+    [SR-INDEX-LIFECYCLE](records/0108_index-lifecycle.md) decision 9.1 firing —
+    *a property appeared, and a reader cannot know what it is missing.*
+  - **`analyzer` and `tf_fields` are UNCHANGED**, so no term hash changes
+    meaning and no `df` moves.
+  - 🔴 **A vendored Node reader must be re-bundled with the same upgrade.**
+    `.fux/node/fux.mjs` pins the schema string it was built with, so a
+    re-ingested corpus and a stale bundle are a hard refusal. `fux setup`
+    rewrites it.
+  - **Nothing about ranking changes on upgrade** — see below.
+
+### Added
+
+- **Anchor text: what OTHER documents call this one, as a sixth BM25F field**
+  ([W-168](work/open/W-168-search-improvements.md) step 1; Arpit's ruling,
+  2026-09-15). Every other field is something a document says about itself.
+  - **`[bm25f] anchor`, default `0.0` — OFF, and unmeasured.** `0.0` is not
+    "weight zero": every anchor branch in the engine tests it and is skipped, so
+    an unconfigured corpus scores **byte-identically** to the engine before the
+    field existed. Measured: 5 536 byte-identical scan-vs-accelerator
+    comparisons at the default, and 5 536 more at `anchor = 2.0`.
+  - 🔴 **It is a RETRIEVAL change, not just a scoring one.** With it on, `fux
+    ask` can return a document that contains **none** of the query's words —
+    reached through what its linkers call it. That is the point; *a document is
+    never a candidate for a word it does not contain* is the sentence it exists
+    to stop being true.
+  - **The words are committed on the SOURCE's edge**, never on the target's
+    record, so editing one document never rewrites another's committed bytes.
+    The per-target view ranking needs is folded at read time from
+    `.fux/runtime/anchors/` — derived, gitignored, rebuilt by `fux build`.
+  - **Terms, not text.** An anchor is stored as hashed terms, like every other
+    posting: link text is content, and [L2](records/0004_LAW-2-content-never-durable.md)
+    keeps content out of the index.
+  - ⚠ **Turning it on is not recommended yet.** The frozen bar is
+    [`2026-09-15-anchor-text`](work/regression/2026-09-15-anchor-text/PRE-REGISTRATION.md)
+    and it has no verdict. **No claim about ranking quality is made.**
+
+- 🔴 **`confidence.answerable` is now `false` for `weak` as well as `none`**
+  (W-176 gate 1). It was `band != "none"`. **A consumer that branches on
+  `band == "none"` is now wrong for half the refusals** and will answer from a
+  ranking that could not separate its own top two hits.
+  - **`weak` means the ranking could not choose.** SR-CONFIDENCE's band table
+    has always said *do not answer* on that row; the payload beside it said
+    `answerable: true`, and the field an agent branches on was the permissive
+    one.
+  - **This is why fux never abstained.** *Nothing scored above zero* is a state
+    no real corpus produces, so the refusal was structurally unreachable. Four
+    measured runs found the symptom — 20 of 20 blind unanswerable questions
+    answered, twice; 0 abstentions of 124 across five golden rungs; 10 of 10
+    planted unanswerables answered — and none could name the cause. It was one
+    expression.
+  - **`partial` is unchanged and stays answerable**, which is the whole
+    distinction: its defect is *nameable*, so you answer and say what is
+    missing. A `weak` has nothing to name.
+  - **New `confidence.failed` key** naming which gate refused
+    (`no_candidates`, `separation`); `[]` when nothing did. Always present.
+  - ⚠ **`[confidence] separation_floor = 0.0` now disables abstention on
+    separation entirely**, not just the `weak` label.
+  - **Branch on `answerable`.** It is correct for both refusals and stays
+    correct as W-176's remaining gates land.
+
+### Added
+
+- 🔴 **`fux ask` follows links: a boosted tier and a labelled `related` tier**
+  (W-161). `ask` is now `lexical` → graph walk → split → confidence → refer.
+  BM25F retrieves by shared vocabulary, so a document that never uses your
+  words cannot be retrieved at any depth however central it is; the walk out of
+  the top-k finds those.
+  - **Tier A (boosted)** re-orders the documents BM25F retrieved by
+    `RRF(lexical rank, PPR rank)`. **A row the walk moved carries its move** —
+    `(graph #7 -> #2)` in text, `boosted` + `route` in `--json`.
+  - **Tier B (`related`)** is a separate list of documents *no query word
+    matched*, each with the route it was reached by (`#2 via ref`). **Never
+    counted as an answer and never in the confidence band.** `fux answer` does
+    fetch them and re-score on the bytes.
+  - ⚠ **`results` may no longer be monotone in `score`.** The order is a rank
+    fusion; the number is still BM25F. **A consumer re-sorting by `score` is
+    re-deriving the lexical order** — which is a real thing to want, and
+    `fux lexical` is the verb that returns it.
+  - **New keys on every hit:** `boosted` (bool) and `route` (str | null), in
+    `--json`, `fux.api` and the Node reader alike. Additive; `false`/`null` is
+    the claim, never an absence.
+  - **`fux_search` over MCP carries `related` unconditionally**, because a tool
+    call cannot pass a flag.
+  - **Off with:** `--no-related` per call; `[graph] ask_boost = false` /
+    `ask_related = false` per repository; `--no-tune` turns the whole tier off
+    with everything else. Six new `[graph]` keys — the two booleans are
+    separate so either arm can be withdrawn without touching the other.
+  - ⚠ **Unmeasured, and deliberately shipped that way.** Ratified on design;
+    the two arms are frozen in
+    [`work/regression/2026-09-14-graph-ask/`](work/regression/2026-09-14-graph-ask/PRE-REGISTRATION.md)
+    and cannot be measured until the golden key carries link-dependent
+    questions. **If either arm fails, that arm's default becomes `false`.**
+  - **No new `.fux/output.toml` key**, so no existing config file breaks.
+  - **`fux find` shares the boost and never gets `related`** — two
+    ranked-document verbs must rank one corpus one way, but `find` pipes bare
+    paths. **`fux lexical` is unchanged**, which is what it is for.
+  - ⚠ **Node pays a full record parse per `ask`** while the tier is on: it
+    rebuilds the graph plane in memory rather than requiring `fux build`. Its
+    query latency is unmeasured.
+
+### Changed
+
+- 🔴 **`No confident matches.` goes to STDERR on `ask`, `find` and `answer`** —
+  a **breaking change to a documented surface**, and the one thing in this entry
+  to read before upgrading. `fux find` exists to be piped, and a line of prose on
+  the stream that otherwise holds nothing but paths turns an empty result into
+  one fake path. **stdout is now empty on the no-match path.**
+  - **Unchanged:** exit code `0` (an honest decline is a successful run),
+    `--json` (which never printed the sentence — the empty case is still
+    `{"results": []}`), and the wording, so a consumer matching the text keeps
+    matching it on the other stream.
+  - **If you guard with `grep -qx "No confident matches."` before piping**, that
+    guard is now unnecessary and still harmless.
+  - **`fux graph` still prints it on stdout**, deliberately and in both readers.
+  - Both readers moved in one change.
+    [SR-FIND](records/0104_find.md) decision 6 · [SR-ASK](records/0103_ask.md)
+    decision 7 · [SR-ANSWER](records/0105_answer.md) decision 7 ·
+    [SR-CLI](records/0101_cli-surface.md) decision 6.
+- **`fux remove` writes its exclusion to `.fux/.fuxignore`**, not as a `!` line
+  in `.fux/sources/dirs`. The pattern is **anchored** (`/docs/a.md`), with a
+  trailing `/` for a directory, because a bare name in that grammar means *at any
+  depth*. `!` lines already in `dirs` **keep working and are left exactly alone**;
+  `fux doctor`'s new `dirs exclusions migrated` row names each survivor with the
+  one-line move. `fux add` refuses a path `.fux/.fuxignore` excludes, for the same
+  reason it always refused a `!` line — there is no un-exclude by design.
+  [SR-FUXIGNORE](records/0144_fuxignore.md) decisions 5a–5b ·
+  [SR-DIR-LIST](records/0120_dir-list.md) decision 2d.
+
+### Fixed
+
+- 🔴 **Three ways a carried-forward record silently kept stale bytes.** Ingest
+  reuses a document's extracted record when its source bytes are unchanged; two
+  other inputs to extraction were not in that key, and one class of record was
+  never re-processed at all. Each was already named in its record as *stated,
+  not fixed*.
+
+  **⚠ The first `fux ingest` after upgrading re-extracts every document, once.**
+  That is the price of the new keys taking effect, it is paid on one run, and a
+  no-op ingest after it re-extracts nothing — pinned by a test, because a digest
+  scoped too coarsely would turn every future release into the same full pass.
+
+  - **A decoder change now invalidates the documents it read.** Every built-in
+    decoder declares `VERSION`; a consumer decoder in `.fux/decoders/` is
+    digested by its file sha. **Keyed per extension**, so a `.pptx` fix
+    re-extracts slides and leaves the markdown corpus alone.
+    [SR-DECODE](records/0139_decode.md) decision 11a.
+  - **An extraction-rule change now reaches unchanged documents.**
+    `extract.RULES_VERSION` joins the `[index]` caps in the reuse key. Corpus-
+    wide, because those rules run on every document.
+    [SR-INGEST](records/0106_ingest.md) Consequences.
+  - **A `url:` record is re-extracted from `.fux/acquired/`** when a PII,
+    decoder or extraction-rule change lands — **offline**, from bytes already on
+    disk. Before this, a `url:` record carried forward verbatim whenever the
+    fetch did not happen, and under `update=never` that was permanent, `--full`
+    included: a new redaction rule could not reach it, ever.
+    [SR-PII](records/0148_pii.md).
+
+  **A URL with no retained bytes is stranded, never dropped** — its record is
+  left exactly as it is, the run warns, and `fux doctor`'s new
+  `url redaction current` row names it. `keep=true` on the line is what lets the
+  next policy change reach it offline.
+
+  ⚠ **For maintainers of this repo:** `VERSION` and `RULES_VERSION` are bumped
+  **by hand**, in the change that edits the module. Two tests fail a changed
+  module whose constant did not move, so it is a recorded decision either way.
+
+### Added
+
+- **`fux correct "<question>" <doc>` — the words people ASK with, written onto
+  the document that answers.** It appends one human-authored question to that
+  document's existing `.fux/enrich/<sha>.md` and is indexed as the same `ctx`
+  field as the model-written questions beside it: **same file, same field,
+  different author.** doc2query's deterministic cousin; no new directory, no new
+  ranking code.
+  - **The marker is `corrections: N` in the frontmatter** — *the last N body
+    lines are human* — so it sits in the half that is never indexed while the
+    text sits in the half that is. `.fux/eval/corrections.tsv` (committed,
+    sorted) is the durable record.
+  - **`fux enrich --check` REPORTS a human line and never refuses it**, and the
+    file stays indexed. A correction is by definition a question that failed
+    retrieval. **Every human line is checked whatever its punctuation** — a
+    correction with no `?` is checked too.
+  - **A negative correction is refused** with the pointer: *"don't serve X"* is
+    `supersedes` / `archived=`, corpus-wide. **A PII match is refused, not
+    redacted** — `[PII:…]` as vocabulary retrieves nothing. **A refused command
+    writes nothing.**
+  - **No wall clock**: `generated:` derives from the document's committed
+    `mtime`, so the bytes do not depend on when the command ran.
+  - **`--pin`** forces one document to #1 for one exact question, **after** the
+    ranking and after the reranker — `"pinned": true`, `[pinned]` in text, a
+    `note:` on stderr, and the confidence band still computed from the pinned
+    list so a weakly-supported pin still says `weak`. **Suspended when the
+    document changes**, released only by `fux correct --reaffirm`, and named by
+    `fux doctor`'s new `correction pins` row.
+  - **`--why` says who wrote a `ctx` term**: `ctx_via` is `human`, `model`,
+    `both` or `unattributed`.
+  - **Both readers apply a pin.** `fux correct` is Python-only (the Node reader
+    never writes), but the effect crosses.
+  - Ships with the `fux-correct` guide skill on all four agent surfaces, whose
+    first section is **propose the command, do not run it**.
+    [SR-ENRICH](records/0137_enrich.md) decisions 19, 19a, 19b.
+
+### Fixed (this release)
+
+- 🔴 **`fux doctor`'s `pinned url bytes` row printed `[OK]`** beside *every
+  citation from these will be `unverified`*. `cmd_doctor` takes the exit code
+  from `ok` only for `level == "error"` rows, so a `warn` row's `ok=True` meant
+  *print `[OK]`* — the row disclosed nothing. `ok=False, level="warn"` renders
+  `[WARN]` and still exits 0, which is what *disclosed, never refused* meant.
+  A test now asserts the **rendered line**.
+
+- **`fux lexical` — the lexical core, named and frozen.** BM25F, then the
+  proximity reranker, then RRF over any `-q` phrasings. **No graph stage,
+  ever.** It takes every flag `ask` takes and returns `ask`'s exact output
+  shape — **byte-identical today**, and held so by a test.
+  - **It is not a better `ask` and not a faster one.** It is the baseline arm
+    every ranking verdict needs, kept separate because `ask --scan` stops
+    meaning *the words alone* the moment `ask` grows a stage.
+  - **Frozen by contract:** a future component added to the lexical core
+    becomes a new verb or a tunable, never a change to this one.
+  - On the Node reader it is the **same function** as `ask`, so the freeze
+    holds there by construction.
+    [SR-CLI](records/0101_cli-surface.md) decision 12.
+- **`fux graph --seed <id> [--seed <id>…]`** — the walk from documents you
+  name, with no query in the way. Mass follows **argument order**, and
+  `fux graph "<q>"` is now *defined* as `--seed` over the query's top-k, with a
+  test asserting the two agree.
+  - ⚠ **A hand-named seed reports `"score": null` and `"rank": n`.** There is
+    no ranking behind it; the query form's seeds still carry their BM25F score.
+  - A query and `--seed` together are refused, and so is neither; a seed that
+    is not in the index is refused by name rather than walking from nowhere.
+    [SR-GRAPH](records/0126_graph.md) decision 13.
+- **Three graph-walk flags, `--kinds`, `--link-idf` and `--max-hops`, all OFF
+  by default and inert at their defaults.** They exist so the mechanism the
+  graph-composed `ask` needs can be driven and measured *before* `ask`
+  composes it — landing both together would make one diff nobody could
+  attribute a delta to. 🔴 **No measurement supports any setting of them yet.**
+  [SR-GRAPH](records/0126_graph.md) decisions 14–15.
+
+- **`fux inspect` — the index X-ray.** Six lenses over the committed index, all
+  read-only: **boilerplate** (which words are on every document, with `df`, IDF,
+  the Zipf slope and Heaps β), **findability** (documents no query can reach),
+  **length and fields** (per-field totals and the vocabulary percentiles that
+  killed index pruning here), **duplication and templates** (minhash pairs and
+  identical heading sets), **analyzer coverage** (what never became a term), and
+  **graph** (orphans, hubs, community sizes). `--json` for agents; a Markdown
+  report and its JSON twin under the gitignored `.fux/runtime/inspect/`.
+  - **Every finding names the lever that would change it and applies none** —
+    stopwords, `.fuxignore`, `archived=`, `supersedes`, `fux enrich`, a decoder.
+  - **Three checks carry a flag, and every floor prints the word *provisional*.**
+    `fux inspect` **exits 0 whatever it finds**: a flag is attention, not a
+    failure. There is no one-number index score.
+  - **The words come from a gitignored, locally rebuilt hash → word dictionary**
+    — the committed index holds term hashes, and still does. Nothing new is
+    committed, nothing is fetched, and the report carries no timestamp, so it is
+    byte-identical over an unchanged index.
+  - Ships with the `fux-inspect` guide skill on all four agent surfaces.
+    [SR-INSPECT](records/0156_inspect.md) ·
+    [the floors run](work/regression/2026-09-14-inspect-floors/report.md).
+
+- **The ingest summary counts deletions** — `…, N records deleted`, present only
+  when `N > 0`. `write_index` writes the whole index, so a removal is an
+  *absence*: every other number on that line could sit still while a document
+  left the corpus, `0 shards written` included.
+  [SR-INGEST](records/0106_ingest.md) Consequences.
+- **`fux doctor`: `dirs exclusions migrated`** — a `warn` row listing the `!`
+  lines left in `.fux/sources/dirs`. Distinct from the duplicate warning, which
+  fires only when a pattern sits in both files; this one fires on every survivor.
+  [SR-DOCTOR](records/0152_doctor.md).
+- **`fux doctor`: `url redaction current`** — a `warn` row naming the `url:`
+  documents a policy change could not reach for want of retained bytes. ⚠ It
+  reads from derived state, so it does not travel with a cloned index.
+  [SR-DOCTOR](records/0152_doctor.md).
 
 ## [2.0.1] - 2026-09-14
 

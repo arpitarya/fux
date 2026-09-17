@@ -11,19 +11,33 @@ if (FIELD_WEIGHTS.length !== TF_FIELDS.length) {
   throw new Error("field weights must align with TF_FIELDS");
 }
 export const K1 = 1.2;
-export const B = 0.75;
+//: 🔴 **`0.15`, not the literature's `0.75`, and that is MEASURED** — W-144's
+//: verdict, 2026-09-16. `b` is the strength of length normalisation, and a table
+//: inflates a document's length with tokens that say nothing about the query. The
+//: frozen rule took the FIRST value, descending, that moved both benefit families
+//: with every control holding; `0.15` is that value (+30 each, p = 0.0000).
+//: ⚠ One synthetic corpus, `informed`. Twin of `query/bm25f.py`'s `B`, and
+//: `tests/test_node_config_parity.py` holds the two equal.
+export const B = 0.15;
 
 export class Scoring {
-  constructor(k1 = K1, b = B, weights = FIELD_WEIGHTS) {
+  constructor(k1 = K1, b = B, weights = FIELD_WEIGHTS, anchor = 0.0) {
     this.k1 = k1; this.b = b; this.weights = weights;
+    /** W-168 step 1 — the anchor field's weight, default 0 (OFF). Kept out of
+     *  `weights` because that array is aligned index-for-index with TF_FIELDS,
+     *  the five fields a record commits an `flen` for; anchor has no committed
+     *  slot and is folded at read time from other documents' edges. */
+    this.anchor = anchor;
     Object.freeze(this);
   }
   /** True when this is the engine default, so callers can skip work. */
   get trivial() {
-    return this.k1 === K1 && this.b === B
+    return this.k1 === K1 && this.b === B && this.anchor === 0.0
       && this.weights.length === FIELD_WEIGHTS.length
       && this.weights.every((w, i) => w === FIELD_WEIGHTS[i]);
   }
+  /** The one test for *is the anchor fold live?* — twin of `Scoring.anchor_on`. */
+  get anchorOn() { return this.anchor !== 0.0; }
 }
 
 export const DEFAULT_SCORING = new Scoring();
@@ -50,13 +64,17 @@ export function weightedTf(tf, scoring = DEFAULT_SCORING) {
 /** The length normaliser, from committed per-field counts and live weights.
  *  **The one place this arithmetic exists** — four callers need it, and four
  *  copies is how they drift. */
-export function deriveWlen(flen, scoring = DEFAULT_SCORING) {
+export function deriveWlen(flen, scoring = DEFAULT_SCORING, anchorLen = 0) {
   let total = 0.0;
   const weights = scoring.weights;
   for (let i = 0; i < flen.length; i++) {
     const count = flen[i];
     if (count) total += weights[i] * count;
   }
+  // W-168 step 1: a heavily linked-to document is a LONGER document. Leaving
+  // anchor out of the normaliser is what lets a link farm max out a term with
+  // no length price, so it is in, at the weight the numerator uses.
+  if (anchorLen) total += scoring.anchor * anchorLen;
   return total;
 }
 
@@ -69,16 +87,31 @@ export function deriveWlen(flen, scoring = DEFAULT_SCORING) {
  */
 export function scoreRecord(
   terms, flen, queryHashes, df, n, avgWlen,
-  scoring = DEFAULT_SCORING, termWeights = null,
+  scoring = DEFAULT_SCORING, termWeights = null, anchorTf = null, anchorLen = 0,
 ) {
   if (n <= 0 || avgWlen <= 0) return 0.0;
-  const wlen = typeof flen === "number" ? flen : deriveWlen(flen, scoring);
+  let wlen;
+  if (typeof flen === "number") wlen = flen;
+  else wlen = anchorTf !== null ? deriveWlen(flen, scoring, anchorLen) : deriveWlen(flen, scoring);
   const k1 = scoring.k1, b = scoring.b;
+  const anchorWeight = scoring.anchor;
   let total = 0.0;
   for (const h of queryHashes) {
     const tf = terms[h];
-    if (tf === undefined) continue;
-    const wtf = weightedTf(tf, scoring);
+    let wtf;
+    if (anchorTf === null) {
+      // ⚠ No arithmetic at all when the field is off — not a multiply by zero.
+      if (tf === undefined) continue;
+      wtf = weightedTf(tf, scoring);
+    } else {
+      // 🔴 `tf === undefined` is NOT a reason to skip: a document whose own
+      // body never uses the word can still be reached by what its linkers
+      // called it. That is the retrieval half of W-168 step 1, and this early
+      // return was the second place it would have died silently.
+      wtf = tf === undefined ? 0.0 : weightedTf(tf, scoring);
+      const count = anchorTf[h];
+      if (count) wtf += anchorWeight * count;
+    }
     if (wtf === 0) continue;
     const denom = wtf + k1 * (1 - b + b * wlen / avgWlen);
     let contribution = idf(df[h] ?? 0, n) * wtf * (k1 + 1) / denom;

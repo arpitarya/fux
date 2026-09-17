@@ -89,7 +89,14 @@ BLOCK_SIZE = 128
 #: and this project has already been bitten once by trusting a schema string
 #: that someone forgot to move (see `DOCS_FIELDS` below). Refusing the plane
 #: costs one rebuild of a disposable directory.
-RUNTIME_SCHEMA = "fux.runtime.v5"
+#: v6 (2026-09-15, W-168 step 1): the ANCHOR plane. `anchors/<prefix>.json`
+#: holds the reverse map term -> [(docidx, count)] folded from the `at` maps on
+#: the committed edges; `docs.jsonl` carries each document's `alen`; and
+#: `stats.json` carries `total_anchor_len`. All three are derived from the
+#: committed shards alone and gitignored — which is the whole of Arpit's
+#: 2026-09-15 ruling: the words are committed on the SOURCE's edge, and the
+#: per-target fold that ranking needs is rebuilt, never committed.
+RUNTIME_SCHEMA = "fux.runtime.v6"
 
 #: v3 (W-76 Phase 1 record half): `mx` and `mnw` become PER-FIELD arrays.
 #:
@@ -120,9 +127,24 @@ ENTRY_SIZE = ENTRY_STRUCT.size  # 62
 #:
 #: A schema string only moves when someone remembers to move it. This field
 #: set moves whenever the table does, because it IS the table.
-DOCS_FIELDS = ("id", "loc", "title", "flen", "archived", "superseded", "mtime")
+#:
+#: `alen` (W-168 step 1) is the document's anchor token total. It is in the doc
+#: table rather than in the anchor shards because **every candidate needs it
+#: and only a matching candidate needs its terms**: a heavily-linked document
+#: is a longer document, so its `wlen` carries the length whether or not a
+#: single anchor word matches the query. Reading it from anywhere else would
+#: mean one more file open per candidate.
+DOCS_FIELDS = ("id", "loc", "title", "flen", "archived", "superseded", "mtime", "alen")
 
 DOCS_NAME = "docs.jsonl"
+#: W-168 step 1. Sharded by the term hash's first byte, mirroring `postings/`
+#: and the committed store, for the same reason: a query reads one small file
+#: per term instead of a corpus-wide map. Whole-file JSON rather than the
+#: block-and-offset-table shape `postings/` uses — anchor postings are a small
+#: fraction of body postings (link text is a handful of words, bodies are
+#: thousands), so a bisectable fixed-width table would buy nothing and add a
+#: second binary layout to keep in step.
+ANCHORS_DIR = "anchors"
 STATS_NAME = "stats.json"
 MANIFEST_NAME = "manifest.json"
 STAMP_NAME = "stamp.json"
@@ -144,6 +166,14 @@ def runtime_dir(root: Path) -> Path:
 
 def postings_dir(root: Path) -> Path:
     return runtime_dir(root) / POSTINGS_DIR
+
+
+def anchors_dir(root: Path) -> Path:
+    return runtime_dir(root) / ANCHORS_DIR
+
+
+def anchors_path(root: Path, prefix: str) -> Path:
+    return anchors_dir(root) / f"{prefix}.json"
 
 
 def postings_path(root: Path, prefix: str) -> Path:

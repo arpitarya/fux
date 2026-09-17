@@ -463,6 +463,87 @@ def write_blocks(root: Path, *, not_indexed, skipped) -> None:
     path.write_text(text, encoding="utf-8")
 
 
+def exclusion_pattern(rel_path: str, *, is_dir: bool) -> str:
+    """The `.fuxignore` line that excludes exactly `rel_path` and nothing else.
+
+    **Anchored with a leading `/`, always.** A bare `docs` in this grammar means
+    *any file or directory named `docs`, at any depth*, so writing the path
+    verbatim for `fux remove docs` would also drop `archive/docs` and
+    `vendor/x/docs` — a removal nobody asked for, visible only as documents
+    quietly missing from the next index. The leading `/` pins it to the repo
+    root, which is the frame `.fux/sources/dirs` entries are already written in.
+
+    **A trailing `/` when it is a directory**, so a *file* of the same name that
+    appears later is not swept up by a line written about a directory.
+    """
+    return "/" + rel_path.rstrip("/") + ("/" if is_dir else "")
+
+
+def add_exclusion(root: Path, rel_path: str, *, is_dir: bool) -> str:
+    """Exclude `rel_path` by writing a hand-line. Returns the line written.
+
+    **Below the fux blocks, at the end of the file** — last match wins here, so
+    the end is the position that actually decides, and it is the same position a
+    person editing by hand would reach for.
+
+    **Raises when a hand-written pattern already excludes the path.** Removing
+    something already removed is an error and not a quiet success — the contract
+    the `!`-line form kept, and the one a caller's exit code depends on. It also
+    keeps this file from growing lines that change nothing, each of which
+    `duplicate_warnings` would then report as a conflict fux created itself.
+
+    Also raises for a path that cannot survive the round trip — see `writable`.
+    Refusing is the loud direction: a mangled line ignores a *different* file,
+    silently.
+    """
+    line = exclusion_pattern(rel_path, is_dir=is_dir)
+    if not writable(line):
+        raise FuxError(
+            f"{rel_path} cannot be written as a {IGNORE_FILE} line: a `#` after whitespace, "
+            "leading or trailing whitespace, or a newline would parse back as a different "
+            "path. Exclude it by hand with a pattern that does round-trip"
+        )
+
+    covering = read(root).decide(rel_path.rstrip("/"), is_dir=is_dir, hand_only=True)
+    if covering.ignored and covering.rule is not None:
+        raise FuxError(
+            f"{rel_path} is already excluded by {IGNORE_FILE}:{covering.rule.lineno} "
+            f"(`{covering.rule.raw}`), which is left alone. Nothing further to remove — "
+            "delete that pattern to put it back"
+        )
+
+    path = root / IGNORE_FILE
+    text = path.read_text(encoding="utf-8") if path.is_file() else ""
+    if text and not text.endswith("\n"):
+        text += "\n"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text + line + "\n", encoding="utf-8", newline="\n")
+    return line
+
+
+def dirs_exclusion_notes(root: Path, *, dirs_file: str) -> list[str]:
+    """One line per surviving `!` entry in the `dirs` list, with the move.
+
+    **`!` lines there are read forever and written never** (W-165 fix 1). They
+    keep working, so this is a note and not a failure — but the two files spell
+    `!` with opposite meanings, and every survivor is one copy-paste away from
+    a person writing `!docs` in `.fuxignore` expecting it to subtract.
+
+    Distinct from `duplicate_warnings`, which fires only when a pattern is in
+    *both* files. This fires on every survivor, including the ones nothing
+    duplicates, because the migration is owed for those too.
+
+    **ASCII only**, for the same reason `reason()` is.
+    """
+    return [
+        f"`!{pattern}` in {dirs_file}:{lineno} still excludes, and still works. "
+        f"`fux remove` writes {IGNORE_FILE} now: move it there as `"
+        f"{exclusion_pattern(pattern, is_dir=False)}` and delete this line "
+        f"- `!` subtracts in {dirs_file} and RE-INCLUDES in {IGNORE_FILE}"
+        for pattern, lineno in sorted(_exclusions(root, dirs_file).items())
+    ]
+
+
 def _render_block(name: str, pairs) -> str:
     lines = [_OPEN.format(name=name), *_BLURB[name]]
     width = max((len(p) for p, _ in pairs), default=0)

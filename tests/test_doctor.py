@@ -604,7 +604,7 @@ def _url_repo(root, fetcher_body: str) -> None:
         'dirs_file = ".fux/sources/dirs"\n'
         "[sources.url]\n"
         'fetcher = ".fux/fetchers/http.py"\n'
-        'urls_file = ".fux/sources/urls"\n'
+        
         "max_parallel = 4\n",
         encoding="utf-8",
     )
@@ -661,7 +661,7 @@ def test_the_shipped_template_implements_every_optional_function(tmp_path):
         'dirs_file = ".fux/sources/dirs"\n'
         "[sources.url]\n"
         'fetcher = ".fux/fetchers/http.py"\n'
-        'urls_file = ".fux/sources/urls"\n'
+        
         "max_parallel = 4\n",
         encoding="utf-8",
     )
@@ -1295,14 +1295,40 @@ def test_no_tune_file_is_not_a_problem(tmp_path):
 # being a row that cannot fire.
 
 
-def _fake_bin(directory, body):
+#: npm's Windows launcher, in the shape it actually writes one.
+NPM_CMD_SHIM = (
+    "@ECHO off\r\nSETLOCAL\r\n"
+    'CALL :find_dp0\r\n'
+    'IF EXIST "%dp0%\\node.exe" (SET "_prog=%dp0%\\node.exe") ELSE (SET "_prog=node")\r\n'
+    'endLocal & "%_prog%" "%dp0%\\node_modules\\fux-engine\\fux.mjs" %*\r\n'
+)
+
+#: npm's Unix launcher: a symlink to a script that begins with a shebang.
+NPM_UNIX_SHIM = "#!/usr/bin/env node\nimport('../fux.mjs')\n"
+
+
+def _fake_bin(directory, body, name=None):
+    """A launcher `shutil.which('fux')` can actually resolve **on this platform**.
+
+    ⚠ **The name is platform-dependent and that is the whole of W-159's test
+    half.** `which` honours PATHEXT, so an extensionless `fux` is invisible on
+    Windows — `npm i -g fux-engine` writes `fux.cmd` there. The fixture wrote the
+    Unix shape unconditionally, the Windows job could not resolve it, and the
+    test was skipped with a reason that blamed the ROW. The row was fine; the
+    fixture was building a file Windows would never find.
+    """
     import stat
 
     directory.mkdir(parents=True, exist_ok=True)
-    p = directory / "fux"
+    p = directory / (name or ("fux.cmd" if os.name == "nt" else "fux"))
     p.write_text(body, encoding="utf-8")
     p.chmod(p.stat().st_mode | stat.S_IEXEC)
     return p
+
+
+def _node_shim_body():
+    """The body npm writes on this platform."""
+    return NPM_CMD_SHIM if os.name == "nt" else NPM_UNIX_SHIM
 
 
 def test_no_fux_on_path_is_not_a_problem(monkeypatch, tmp_path):
@@ -1326,29 +1352,21 @@ def test_this_interpreters_fux_resolving_first_is_fine(monkeypatch):
     assert "this interpreter's" in row.detail
 
 
-@pytest.mark.skipif(
-    os.name == "nt",
-    reason=(
-        "the shim this builds cannot be found on Windows: `shutil.which` honours "
-        "PATHEXT, so an extensionless `fux` is invisible there and npm installs "
-        "`fux.cmd` instead. The ROW is what is unbuilt, not the test — W-159"
-    ),
-)
 def test_a_node_fux_shadowing_python_is_reported(monkeypatch, tmp_path):
-    """The whole point: a `#!/usr/bin/env node` shim earlier on PATH.
+    """The whole point: npm's launcher earlier on PATH than Python's.
 
-    ⚠ **Unix only, and the gap is real rather than cosmetic.** `_fux_on_path`
-    finds the shadowing binary with `shutil.which("fux")`, which on Windows
-    resolves through PATHEXT — so it sees `fux.cmd`/`fux.exe` and never an
-    extensionless shim, while `npm i -g fux-engine` writes exactly a `fux.cmd`
-    there. The row therefore cannot fire on the platform, and this test cannot
-    construct the situation. Filed as W-159; skipping is the honest state, and
-    a passing test on Windows would have been the dishonest one.
+    ⚠ **This was SKIPPED on Windows until 2026-09-14 (W-159), and the skip
+    reason blamed the wrong thing.** It read *"the ROW is what is unbuilt, not
+    the test"*. The row is built and fires there: `shutil.which` resolves
+    through PATHEXT, which is precisely how it finds the `fux.cmd` npm writes.
+    What could not be constructed was this fixture's **extensionless** shim, and
+    a skipped test was read back as evidence about the code it could not reach.
+    `_fake_bin` builds the shape the platform actually uses now.
     """
     import sys
     from pathlib import Path
 
-    _fake_bin(tmp_path / "npm", "#!/usr/bin/env node\nimport('../fux.mjs')\n")
+    _fake_bin(tmp_path / "npm", _node_shim_body())
     monkeypatch.setenv(
         "PATH", f"{tmp_path / 'npm'}{os.pathsep}{Path(sys.executable).parent}"
     )
@@ -1359,12 +1377,60 @@ def test_a_node_fux_shadowing_python_is_reported(monkeypatch, tmp_path):
     assert "--version" in row.detail, "the row must name the one command that disambiguates"
 
 
+# -- the classifier, on every platform (W-159) ------------------------------
+
+
+def test_both_npm_shim_shapes_are_recognised_everywhere(tmp_path):
+    """⚠ **Neither end-to-end test can run on both platforms**, so this does.
+
+    `which('fux')` finds `fux.cmd` only on Windows and extensionless `fux` only
+    on Unix — so the row's own test exercises one shape per platform, forever,
+    and the half that was actually wrong (what counts as a node launcher) would
+    stay half-covered. Split out as `_is_node_shim` to be testable here.
+    """
+    unix = _fake_bin(tmp_path / "u", NPM_UNIX_SHIM, name="fux")
+    win = _fake_bin(tmp_path / "w", NPM_CMD_SHIM, name="fux.cmd")
+    assert doctor._is_node_shim(unix), "the `#!/usr/bin/env node` shebang shape"
+    assert doctor._is_node_shim(win), "npm's `fux.cmd`, which has no shebang at all"
+
+
+def test_a_powershell_shim_counts_too(tmp_path):
+    """npm writes `fux.ps1` beside `fux.cmd`; PATHEXT can be configured to reach it."""
+    ps1 = _fake_bin(tmp_path / "p", '$exe="node"\n& "$exe" "$PSScriptRoot/fux.mjs" $args\n', name="fux.ps1")
+    assert doctor._is_node_shim(ps1)
+
+
+def test_an_unrelated_shell_script_is_not_a_node_shim(tmp_path):
+    assert not doctor._is_node_shim(_fake_bin(tmp_path / "o", "#!/bin/sh\necho unrelated\n", name="fux"))
+
+
+def test_a_compiled_launcher_is_never_read_as_text(tmp_path):
+    """🔴 **The false positive this fix closes.**
+
+    A Windows console script is a small `.exe`, and the classifier used to read
+    whatever `which` returned with `errors="replace"` and look for the word
+    `node` in the first 512 bytes. Three letters occurring by chance in a
+    binary would have reported an ordinary Python `fux` as the Node reader —
+    telling someone their working install only reads, which is the exact
+    misdiagnosis this row exists to prevent.
+    """
+    directory = tmp_path / "bin"
+    directory.mkdir()
+    exe = directory / "fux.exe"
+    exe.write_bytes(b"MZ\x90\x00" + b"\x00" * 64 + b"node" + b"\x00" * 64)
+    assert not doctor._is_node_shim(exe), "a .exe is a binary launcher, not a shim"
+
+
+def test_a_missing_launcher_is_not_a_node_shim(tmp_path):
+    assert not doctor._is_node_shim(tmp_path / "nope" / "fux")
+
+
 def test_some_other_fux_is_reported_but_not_blamed_on_node(monkeypatch, tmp_path):
     """An unrelated `fux` on PATH is worth saying; calling it the Node reader is not."""
     import sys
     from pathlib import Path
 
-    _fake_bin(tmp_path / "other", "#!/bin/sh\necho unrelated\n")
+    _fake_bin(tmp_path / "other", "#!/bin/sh\necho unrelated\n")  # platform-shaped name
     monkeypatch.setenv(
         "PATH", f"{tmp_path / 'other'}{os.pathsep}{Path(sys.executable).parent}"
     )
@@ -1379,3 +1445,483 @@ def test_doctor_run_includes_the_row(tmp_path):
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
     names = [c.name for c in doctor.run(tmp_path)]
     assert "fux on PATH" in names
+
+
+# -- W-165 fix 1: the `!` lines `fux remove` no longer writes ----------------
+
+
+def _corpus_with_dirs(tmp_path, dirs_text: str):
+    """A minimal repo whose `dirs` list says exactly `dirs_text`."""
+    (tmp_path / ".git").mkdir()
+    (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
+    (tmp_path / ".fux" / "sources").mkdir(parents=True)
+    (tmp_path / ".fux" / "sources" / "dirs").write_text(dirs_text, encoding="utf-8")
+    return tmp_path
+
+
+def test_no_bang_lines_is_a_clean_migration_row(tmp_path):
+    checks = doctor.run(_corpus_with_dirs(tmp_path, "docs\n"))
+    row = next(c for c in checks if c.name == "dirs exclusions migrated")
+    assert row.ok
+    assert ".fux/.fuxignore" in row.detail
+
+
+def test_a_surviving_bang_line_is_named_with_its_move(tmp_path):
+    """The note lists the survivor and the one-line move — and stays a `warn`.
+
+    `!` lines in `dirs` keep being READ (SR-DIR-LIST decision 2a); breaking them
+    would be a silent re-inclusion, which is the worse direction. So the row
+    reports and never fails the command.
+    """
+    root = _corpus_with_dirs(tmp_path, "docs\n!docs/secret.md\n")
+    row = next(c for c in doctor.run(root) if c.name == "dirs exclusions migrated")
+    assert not row.ok
+    assert row.level == "warn"
+    assert "docs/secret.md" in row.detail
+    assert "/docs/secret.md" in row.detail  # the anchored pattern to write instead
+    assert row.detail.isascii()  # printed, and a Windows console must encode it
+
+
+def test_the_migration_row_fires_without_a_duplicate(tmp_path):
+    """⚠ Distinct from `_ignore_health`'s duplicate finding, which needs BOTH files.
+
+    The survivors nothing duplicates are the ones no other check would mention,
+    and they are the ones the migration is actually owed for.
+    """
+    root = _corpus_with_dirs(tmp_path, "docs\n!docs/secret.md\n")
+    checks = {c.name: c for c in doctor.run(root)}
+    assert checks["fuxignore usable"].ok  # nothing duplicated — that row is clean
+    assert not checks["dirs exclusions migrated"].ok
+
+
+# -- W-163: the setup-drift rows --------------------------------------------
+#
+# 🔴 **One cause, eight rows.** `fux setup` writes once and never rewrites, so
+# everything in a template freezes in every repo set up before the template
+# changed, and nothing tells the repo. Each row below has a source record that
+# named `fux doctor` as the place this should be visible.
+#
+# ⚠ Every one is `warn` and report-only. None stops a verb; an error here would
+# make doctor red on working repos, which is how people learn to ignore it.
+
+
+def _drift_repo(tmp_path):
+    """A minimal repo the drift rows can read, with nothing planted."""
+    (tmp_path / ".git").mkdir()
+    (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
+    (tmp_path / ".fux" / "sources").mkdir(parents=True)
+    (tmp_path / ".fux" / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
+    # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
+    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "docs" / "a.md").write_text("# A\n\nbody\n", encoding="utf-8")
+    return tmp_path
+
+
+def _row(tmp_path, name):
+    return next(c for c in doctor.run(tmp_path) if c.name == name)
+
+
+def test_every_drift_row_is_a_warning_and_none_is_an_error(tmp_path):
+    """The shared property, asserted once rather than eight times.
+
+    A row that failed the command would make `fux doctor` exit non-zero on a
+    repo where nothing is broken — drift is not breakage, and a red doctor
+    people learn to ignore is worse than no doctor.
+    """
+    root = _drift_repo(tmp_path)
+    # Plant every condition at once, so the assertion is over rows that are
+    # actually FIRING. `level` is only consulted when `ok` is false — asserting
+    # it on a passing row tests nothing and fails on the dataclass default.
+    (root / ".github" / "skills").mkdir(parents=True)
+    (root / ".fux" / "README.md").write_text("# old\n", encoding="utf-8")
+    (root / ".fux" / "tune.toml").write_text("[bm25f]\nk1 = 1.2\n", encoding="utf-8")
+    (root / ".fux" / "output.toml").write_text("[cli]\ntop = 5\n", encoding="utf-8")
+    (root / ".fux" / "formats.toml").write_text('include = ["*.md", "*.zzz"]\n', encoding="utf-8")
+    (root / ".fux" / "sources" / "dirs").write_text("docs\nhandbook\n", encoding="utf-8")
+
+    rows = {c.name: c for c in doctor.run(root)}
+    assert set(DRIFT_ROWS) <= set(rows), f"missing rows: {sorted(set(DRIFT_ROWS) - set(rows))}"
+
+    fired = [n for n in DRIFT_ROWS if not rows[n].ok]
+    assert len(fired) >= 6, f"only {fired} fired with every condition planted"
+    assert all(rows[n].level == "warn" for n in fired), (
+        "a drift row failed the COMMAND: " + str([n for n in fired if rows[n].level != "warn"])
+    )
+    assert all(rows[n].detail.isascii() for n in fired), "printed text reaches a Windows console"
+
+
+#: The eight rows W-163 added. Named once; every test below reads this.
+DRIFT_ROWS = (
+    "retired agent folders",
+    "README.md current",
+    "refusal rules current",
+    "tune.toml current",
+    "output.toml current",
+    "declared types are readable",
+    "listed directories exist",
+    "url extraction depth",
+)
+
+
+def test_a_clean_repo_fires_none_of_them(tmp_path):
+    """Silence is the common case, and a row that cannot be silent is useless.
+
+    ⚠ **Scoped to W-163's eight**, not to every warn row. `output.toml present`
+    and `ranking priors` fire on a bare repo *correctly* — they are disclosures
+    about a repo that has not been configured, not drift — and asserting over
+    every row would make this test fail whenever some unrelated row started
+    telling the truth about a minimal fixture.
+    """
+    rows = {c.name: c for c in doctor.run(_drift_repo(tmp_path))}
+    noisy = [n for n in DRIFT_ROWS if not rows[n].ok]
+    assert noisy == [], f"these fired on a repo with nothing planted: {noisy}"
+
+
+# -- retired agent folders ---------------------------------------------------
+
+
+def test_a_retired_skill_folder_is_named_with_its_vendor(tmp_path):
+    root = _drift_repo(tmp_path)
+    (root / ".github" / "skills").mkdir(parents=True)
+    row = _row(root, "retired agent folders")
+    assert not row.ok
+    assert ".github/skills" in row.detail
+    assert "DUPLICATES" in row.detail, "the duplicate IS the defect, not the unread folder"
+    assert row.detail.isascii()
+
+
+def test_both_retired_folders_are_named_when_both_exist(tmp_path):
+    root = _drift_repo(tmp_path)
+    (root / ".github" / "skills").mkdir(parents=True)
+    (root / ".codex" / "skills").mkdir(parents=True)
+    detail = _row(root, "retired agent folders").detail
+    assert ".github/skills" in detail and ".codex/skills" in detail
+
+
+def test_the_live_skills_directory_is_not_reported(tmp_path):
+    """`.agents/skills/` is where they live now — reporting it would be absurd."""
+    root = _drift_repo(tmp_path)
+    (root / ".agents" / "skills").mkdir(parents=True)
+    assert _row(root, "retired agent folders").ok
+
+
+# -- the .fux/README.md section set -----------------------------------------
+
+
+def test_a_readme_missing_template_sections_is_reported(tmp_path):
+    root = _drift_repo(tmp_path)
+    (root / ".fux" / "README.md").write_text("# .fux\n\nan old one\n", encoding="utf-8")
+    row = _row(root, "README.md current")
+    assert not row.ok
+    assert "section(s)" in row.detail
+
+
+def test_a_readme_a_consumer_annotated_is_NOT_reported(tmp_path):
+    """⚠ **Sections, not bytes**, and this is why.
+
+    The file is write-if-missing precisely so a consumer's notes survive. A byte
+    comparison would fire on every repo where somebody added a line — a row
+    wrong more often than right. An EXTRA heading is the feature, not drift.
+    """
+    from fux.store import fuxdir
+
+    root = _drift_repo(tmp_path)
+    (root / ".fux" / "README.md").write_text(
+        fuxdir._readme() + "\n## Our own notes\n\nread the runbook first.\n",
+        encoding="utf-8",
+    )
+    assert _row(root, "README.md current").ok
+
+
+def test_the_current_template_satisfies_its_own_row(tmp_path):
+    """A freshly written README must never be reported as stale."""
+    from fux.store import fuxdir
+
+    root = _drift_repo(tmp_path)
+    (root / ".fux" / "README.md").write_text(fuxdir._readme(), encoding="utf-8")
+    assert _row(root, "README.md current").ok
+
+
+# -- the retired refusal starter --------------------------------------------
+
+
+def test_the_current_refusal_starter_is_not_listed_as_retired():
+    """🔴 **The one way this row can be catastrophically wrong.**
+
+    `RETIRED_REFUSAL_STARTERS` holds digests of starters fux has REPLACED. Adding
+    the current one would report every freshly set-up repo in the world as
+    carrying stale rules — the row firing on exactly the population it exists to
+    exclude.
+    """
+    import hashlib
+    from pathlib import Path
+
+    import fux
+
+    starter = Path(fux.__file__).parent / "templates" / "refusals.toml.txt"
+    digest = hashlib.sha256(starter.read_bytes()).hexdigest()
+    assert digest not in doctor.RETIRED_REFUSAL_STARTERS, (
+        "the CURRENT starter is listed as retired: every repo set up today would "
+        "be reported as frozen. Append the OUTGOING digest when the starter changes, "
+        "never the incoming one"
+    )
+
+
+def test_a_retired_starter_is_reported(tmp_path, monkeypatch):
+    import hashlib
+
+    root = _drift_repo(tmp_path)
+    body = "# an old starter\n"
+    # `write_bytes`, NOT `write_text`: the row under test is a BYTE equality
+    # (`_starter_refusals_untouched` hashes `read_bytes()`), and `write_text`
+    # translates "\n" to "\r\n" on Windows — so the fixture would hash one
+    # thing and the file would hold another, and the row would be right to
+    # report no match. The defect was the test's, never doctor's.
+    (root / ".fux" / "refusals.toml").write_bytes(body.encode("utf-8"))
+    monkeypatch.setattr(
+        doctor, "RETIRED_REFUSAL_STARTERS", (hashlib.sha256(body.encode()).hexdigest(),)
+    )
+    row = _row(root, "refusal rules current")
+    assert not row.ok
+    assert "REPLACED" in row.detail
+
+
+def test_an_edited_refusals_file_is_never_reported(tmp_path, monkeypatch):
+    import hashlib
+
+    root = _drift_repo(tmp_path)
+    (root / ".fux" / "refusals.toml").write_text("# ours\n", encoding="utf-8")
+    monkeypatch.setattr(
+        doctor, "RETIRED_REFUSAL_STARTERS", (hashlib.sha256(b"# an old starter\n").hexdigest(),)
+    )
+    assert _row(root, "refusal rules current").ok
+
+
+# -- frozen tunables and output defaults ------------------------------------
+
+
+def test_a_tune_file_missing_a_key_the_engine_gained_is_reported(tmp_path):
+    root = _drift_repo(tmp_path)
+    (root / ".fux" / "tune.toml").write_text("[bm25f]\nk1 = 1.2\n", encoding="utf-8")
+    row = _row(root, "tune.toml current")
+    assert not row.ok
+    assert "nothing is broken" in row.detail, "a frozen knob is drift, not breakage"
+
+
+def test_a_complete_tune_file_is_not_reported(tmp_path):
+    """The file `fux tune` itself writes must satisfy its own row."""
+    from fux import tune as tune_mod
+
+    root = _drift_repo(tmp_path)
+    lines = []
+    for table, keys in tune_mod._SCHEMA.items():
+        lines.append(f"[{table}]")
+        lines += [f"{key} = 0" for key in keys]
+    (root / ".fux" / "tune.toml").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    assert _row(root, "tune.toml current").ok
+
+
+def test_an_absent_tune_file_is_not_frozen(tmp_path):
+    """⚠ Absent is engine defaults, deliberately — `tune.toml loads` says so already."""
+    assert _row(_drift_repo(tmp_path), "tune.toml current").ok
+
+
+def test_this_repos_own_output_toml_satisfies_the_row():
+    """🔴 **The false positive W-163's keep-call caught, pinned so it cannot return.**
+
+    The first build expected `cli.explain`, `cli.hops`, `cli.no_refer` and three
+    more at those exact paths, and reported **six keys missing from a file that
+    carries every one of them** — `.fux/output.toml` nests per verb on purpose
+    (`[cli.ask] explain`, `[cli.path] hops`, `[cli.json] enabled`), because a
+    rendering default means different things to different verbs.
+
+    Two fixes, both found by running the row rather than reading it: compare
+    NAMES not paths, and count a TABLE name as a knob name — `json` is
+    configured at `[cli.json] enabled`, so the name is on the table.
+    """
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    if not (root / ".fux" / "output.toml").is_file():  # pragma: no cover
+        pytest.skip("this checkout has no .fux/output.toml")
+    row = next(c for c in doctor._frozen_keys(root) if c.name == "output.toml current")
+    assert row.ok, row.detail
+
+
+def test_an_output_file_genuinely_missing_a_knob_is_reported(tmp_path):
+    root = _drift_repo(tmp_path)
+    (root / ".fux" / "output.toml").write_text("[cli]\ntop = 5\n", encoding="utf-8")
+    row = _row(root, "output.toml current")
+    assert not row.ok
+    assert "band" in row.detail
+
+
+# -- an unbound declared type ------------------------------------------------
+
+
+def test_a_declared_type_no_decoder_reads_is_reported(tmp_path):
+    root = _drift_repo(tmp_path)
+    (root / ".fux" / "formats.toml").write_text(
+        'include = ["*.md", "*.zzz"]\n', encoding="utf-8"
+    )
+    row = _row(root, "declared types are readable")
+    assert not row.ok
+    assert ".zzz" in row.detail
+
+
+def test_prose_types_are_never_reported_as_unbound(tmp_path):
+    """⚠ Markdown and plain text are read by `extract.py`, not by a decoder.
+
+    Having no decoder is their normal state; reporting it would fire on the
+    single most common line in the file.
+    """
+    root = _drift_repo(tmp_path)
+    (root / ".fux" / "formats.toml").write_text(
+        'include = ["*.md", "*.txt", "*.rst", "*.adoc", "*.org", "*.markdown"]\n',
+        encoding="utf-8",
+    )
+    assert _row(root, "declared types are readable").ok
+
+
+def test_a_glob_naming_no_extension_claims_nothing_and_is_not_reported(tmp_path):
+    """`docs/**` makes no claim about a format, so there is nothing to resolve."""
+    root = _drift_repo(tmp_path)
+    (root / ".fux" / "formats.toml").write_text(
+        'include = ["*.md", "docs/**"]\n', encoding="utf-8"
+    )
+    assert _row(root, "declared types are readable").ok
+
+
+# -- a listed directory that is not on disk ---------------------------------
+
+
+def test_a_listed_path_that_is_not_on_disk_is_reported(tmp_path):
+    root = _drift_repo(tmp_path)
+    (root / ".fux" / "sources" / "dirs").write_text("docs\nhandbook\n", encoding="utf-8")
+    row = _row(root, "listed directories exist")
+    assert not row.ok
+    assert "handbook" in row.detail
+    assert "exit 1" in row.detail, "the consequence is real: walk_sources raises on it"
+
+
+def test_an_exclusion_matching_nothing_is_not_reported(tmp_path):
+    """⚠ A `!` line names a PATTERN. One matching nothing today is what a
+    pattern is for, and reporting it would be reporting a non-event."""
+    root = _drift_repo(tmp_path)
+    (root / ".fux" / "sources" / "dirs").write_text(
+        "docs\n!docs/nothing-here\n", encoding="utf-8"
+    )
+    assert _row(root, "listed directories exist").ok
+
+
+# -- thin url extraction (advisory) -----------------------------------------
+
+
+def test_thin_urls_is_silent_without_an_acquired_plane(tmp_path):
+    row = _row(_drift_repo(tmp_path), "url extraction depth")
+    assert row.ok
+    assert "no" in row.detail.lower()
+
+
+# -- pinned url bytes (W-174) ------------------------------------------------
+
+
+def _pinned_repo(tmp_path, *, urls=("https://x.test/a",), flag="fetch_at_answer = false\n"):
+    root = _drift_repo(tmp_path)
+    (root / "fux.toml").write_text(
+        "[sources]\n[sources.url]\nmax_parallel = 4\n" + flag, encoding="utf-8"
+    )
+    (root / ".fux" / "sources" / "urls").write_text(
+        "".join(f"{u}\n" for u in urls), encoding="utf-8"
+    )
+    return root
+
+
+def test_pinned_row_is_silent_while_fetch_at_answer_is_on(tmp_path):
+    """The default. There is nothing to warn about while fux may still look."""
+    row = _row(_pinned_repo(tmp_path, flag=""), "pinned url bytes")
+    assert row.ok
+    assert "fetch_at_answer is on" in row.detail
+
+
+def test_pinned_row_names_the_urls_with_no_retained_bytes(tmp_path):
+    """🔴 **This test asserted `row.ok` and that made the row print `[OK]`.**
+
+    *Disclosed, never refused* (Arpit, 2026-09-14) is about the **exit code**,
+    and `cmd_doctor` takes the exit code from `ok` **only for `level ==
+    "error"` rows** — a `warn` row cannot fail the command whatever its `ok`
+    is. What `ok` decides is the MARK: `True` renders `[OK]`.
+
+    So the first version of this row printed
+
+        [OK] pinned url bytes: ... every citation from these will be `unverified`
+
+    which discloses nothing — `[OK]` is what a reader scans past. Corrected
+    2026-09-14 (W-162, which hit the same trap on its own new row): `ok=False`
+    for the mark, `level="warn"` for the exit code, and **the rendered line is
+    asserted below** rather than only the fields, because asserting the fields
+    is what let this ship.
+    """
+    root = _pinned_repo(tmp_path, urls=("https://x.test/a", "https://x.test/b"))
+    row = _row(root, "pinned url bytes")
+    assert row.level == "warn"      # never refuses: `cmd_doctor` ignores `ok` here
+    assert not row.ok               # ...and therefore renders [WARN], not [OK]
+    assert "2 of 2" in row.detail
+    assert "https://x.test/a" in row.detail
+    assert "unverified" in row.detail
+
+
+def test_a_warn_row_renders_WARN_and_still_exits_zero(tmp_path, capsys):
+    """The property the two rows above are about, asserted on the RENDERING.
+
+    ⚠ **Fields are not the contract a reader meets.** `level` and `ok` are how
+    the mark and the exit code are computed; what a person sees is the line,
+    and the line is what was wrong. This asserts both halves at once — the
+    mark says `WARN`, and the command still succeeds.
+    """
+    import types
+
+    from fux.doctor import Check, cmd_doctor
+
+    root = _pinned_repo(tmp_path, urls=("https://x.test/a",))
+    monkey = _row(root, "pinned url bytes")
+    assert monkey.level == "warn" and not monkey.ok
+
+    # Render a minimal set through the real renderer rather than the real run,
+    # so this asserts the mark rule and not this repository's health.
+    import fux.doctor as doctor_mod
+
+    original = doctor_mod.run
+    doctor_mod.run = lambda *a, **k: [
+        Check("ok row", True, "fine"),
+        Check("warn row", False, "a real finding", level="warn"),
+    ]
+    try:
+        code = cmd_doctor(types.SimpleNamespace(json=False))
+    finally:
+        doctor_mod.run = original
+    out = capsys.readouterr().out
+    assert "[OK] ok row" in out, out
+    assert "[WARN] warn row" in out, out
+    assert code == 0, "a warn row must not fail the command"
+
+
+def test_pinned_row_is_quiet_when_every_url_has_bytes(tmp_path):
+    from fux.store import acquired
+
+    root = _pinned_repo(tmp_path)
+    blob = acquired.save(root, "https://x.test/a", b"# A\n\nbody\n", "text/markdown", ".md")
+    acquired.write_manifest(root, {"https://x.test/a": blob})
+    row = _row(root, "pinned url bytes")
+    assert row.ok
+    assert row.level == "error"  # i.e. the default level: an ok row, not a warning
+    assert "as-ingested" in row.detail
+
+
+def test_pinned_row_never_raises_on_an_unreadable_repo(tmp_path):
+    """A traceback out of a health command is the worst answer to *what is
+    wrong*. Every reader on this path degrades, and this one is no exception."""
+    (tmp_path / "fux.toml").write_text("[sources\n", encoding="utf-8")  # invalid TOML
+    row = _row(tmp_path, "pinned url bytes")
+    assert row.ok

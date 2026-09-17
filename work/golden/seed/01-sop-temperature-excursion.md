@@ -167,6 +167,21 @@ employees must witness the destruction seal.
 7.4. Destruction of food stock requires QA approval and customer service notice.
 Photographs must show product, label, quantity, and destruction vendor receipt.
 
+7.5. Stock value shall be taken from the current Finance schedule, not from a
+driver challan, customer claim email, or verbal estimate. Where the customer
+declares a higher insured value, Finance records both the Quillfern book value
+and the declared value in the investigation file.
+
+7.6. Quarantine stock must not be used for training, sampling, staff sale,
+vendor demonstration, or repacking practice. Once a pallet enters quarantine,
+only QA may release it from the red chain area. A DC manager may improve the
+physical protection of the stock, but may not change its quality status.
+
+7.7. Partial destruction is permitted only when batch, lot, carton, or pallet
+identity is clear enough to separate affected and unaffected stock. If identity
+is unclear, QA shall treat the mixed stock as affected until the customer gives
+written acceptance of a narrower disposition.
+
 ## 8. Dock and staging rules
 
 8.1. A dock is not a temperature-controlled room. Staging time begins when the
@@ -202,6 +217,28 @@ in writing.
 9.4. Sensor configuration changes must be requested through QA and IT together.
 No DC staff may change threshold values directly in Tessaline.
 
+## 10. Training and drills
+
+10.1. Every warehouse shift lead, fleet controller, and customer service agent
+who handles cold-chain accounts must complete excursion training once each
+calendar year. New joiners must complete the same training before they are
+assigned unsupervised night duty.
+
+10.2. Nagpur shall run one night-shift drill every quarter because it is the
+central hub and handles the largest mix of pharma, dairy, and frozen movements.
+Guwahati and Coimbatore shall each run at least two drills per year. A drill
+must include one missing-record problem, not only a simple high-temperature
+alarm.
+
+10.3. Training records must show attendance, scenario, trainer, questions raised
+by staff, and any local confusion found during the drill. Repeating a slide deck
+without recording staff questions is not enough evidence for this SOP.
+
+10.4. If a drill finds that staff are using a shortcut, hiding an alarm, calling
+the wrong group, or relying on an obsolete document, QA must open a corrective
+action. The corrective action may be simple, but it must name the obsolete habit
+plainly.
+
 ## 10. Closure
 
 10.1. The QA head or nominated deputy closes pharma critical investigations. The
@@ -236,4 +273,3 @@ During business hours, QA desk extension 440 answers routine excursion queries.
 During night shift, the shift lead opens the event and calls Compliance-Red for
 pharma critical stock. A new driver who sees a reefer alarm must call Fleet
 Control first and must not wait until reaching the destination.
-

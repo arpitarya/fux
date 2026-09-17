@@ -54,8 +54,14 @@
                     "doc": "W-111. This result's rounded score EQUALS another candidate's, so its position was decided by the declared tie-break (superseded -> recency -> priority -> id) rather than by the ranking. Computed over the FULL sorted list before truncation, so the last row of a `--top 5` is marked even when the document it ties with is off the page. `false` is a claim, not an absence" },
       "score":    { "type": "any",  "required": "always", "doc": "float; the one place a float is legal, because this is output and not a committed byte" },
       "archived": { "type": "bool", "required": "always", "doc": "BRANCH ON THIS, never on the prose note" },
+      "pinned":   { "type": "bool", "required": "always",
+                    "doc": "W-162. A human filed `fux correct --pin` for this EXACT question (analyzed form), so this document was moved to #1 AFTER the ranking and after the reranker. It is not part of the sort key and not a score: `score` is still whatever the ranking gave it, and `0.0` means the ranking never scored it at all because it was not a candidate -- the case a pin exists for. `false` is a claim, not an absence (W-48). A pin whose document's content sha has moved is SUSPENDED and silently not applied; `fux doctor`'s `correction pins` row names every one" },
       "mtime":    { "type": "any",  "required": "always",
                     "doc": "W-153. int | null -- the document's committed git commit timestamp in whole UNIX SECONDS, the index's own encoding and never a second date format. `null` is a CLAIM: this document carries no committed date, which is what a corpus copied OUT of its repository produces for every one of its documents. It is not an absence, and the key never simply disappears (W-48). It EXPOSES a fact and orders nothing -- `mtime` reaches the sort only through the declared tie-break, at an equal score" },
+      "boosted":  { "type": "bool", "required": "always",
+                    "doc": "W-161. The graph walk out of the lexical top-k reached this document, so the boosted tier's RRF used a PPR rank for it as well as a lexical one. It marks a row the WALK REACHED, not a row that MOVED -- a walked document already at #1 is still the reason #1 is #1. It is not part of the sort key and not a score. 🔴 IT IS THE ONE REASON `results` MAY NOT BE MONOTONE IN `score`: under the boost a row can outrank a higher-scoring one, and this key plus `route` is what says so on the row that causes it. `false` is a claim, not an absence (W-48)" },
+      "route":    { "type": "any",  "required": "always",
+                    "doc": "str | null -- W-161. Where the boost came from, as a reader can check it: `#7 -> #2 via graph`. `null` on every unboosted row, and here `null` IS an absence rather than a claim, because an unboosted row has no route and `boosted: false` already says why. Distinct from a `related` entry's `route`, which names the seed and the edge kind" },
       "headings": { "type": "any",  "required": "sections_requested",
                     "doc": "list[str] -- the document's headings matching the query, best first, at most 3. PRESENT WHENEVER ASKED FOR, and then always: `[]` means nothing matched, or the record is `hashed` and carries no display text at all (L5) -- an absent key would otherwise be indistinguishable from an older fux (W-48). The one way to make it absent is to say so: `ask --no-sections`, or `[cli.ask] sections = false` (SR-OUTPUT decision 21). Unconditional on `find`, which has no such key" }
     },
@@ -66,8 +72,56 @@
       "tie": false,
       "score": 5.9021,
       "archived": false,
+      "pinned": false,
+      "boosted": false,
+      "route": null,
       "mtime": 1788330315,
       "headings": ["Rollback procedure"]
+    }
+  },
+
+  "related_result": {
+    "_doc": [
+      "One element of `fux ask --json`'s `related` array -- W-161's TIER B.",
+      "",
+      "A DOCUMENT THE WORDS COULD NOT RETRIEVE AND THE LINKS COULD. BM25F",
+      "retrieves by shared vocabulary, so a document that never uses the",
+      "query's words cannot be retrieved by it at any depth, however central it",
+      "is. These are the documents the query's best answers LINK TO.",
+      "",
+      "🔴 IT IS NOT A MATCH AND MUST NOT BE RENDERED AS ONE. It is not counted",
+      "as an answer, it never feeds the confidence band, and it carries NO",
+      "`score` -- having none is the definition of the tier. A consumer that",
+      "merges `related` into `results` has undone the only thing keeping `ask`",
+      "honest about what it found versus what it followed.",
+      "",
+      "ABSENT MEANS NOT ASKED FOR OR NOT AVAILABLE, never `no neighbours`:",
+      "`ask --no-related`, `[cli.ask] related = false`, `[graph] ask_related =",
+      "false`, and a repository with no fresh `fux build` all produce an absent",
+      "key. `[]` is what `no neighbours` looks like.",
+      "",
+      "UNMEASURED AT THE TIME OF WRITING. The tier ships on by Arpit's",
+      "ratification (2026-09-13) and its two arms are frozen in",
+      "`work/regression/2026-09-14-graph-ask/PRE-REGISTRATION.md`, unmeasured",
+      "until the golden key carries link-dependent questions."
+    ],
+    "fields": {
+      "id":       { "type": "str",  "required": "always", "doc": "the committed record's id" },
+      "title":    { "type": "str",  "required": "always", "doc": "display title, or a labelled hash under L5" },
+      "loc":      { "type": "str",  "required": "always", "doc": "path or URL -- no line range, exactly as on a hit" },
+      "mass":     { "type": "any",  "required": "always",
+                    "doc": "float -- the walk's PPR mass. 🔴 NOT A SCORE AND NOT COMPARABLE WITH ONE. It is the share of a personalized random walk's stationary mass that landed here, so it says how well connected this document is to the query's best answers and says NOTHING about whether it answers the question. Ordering `related` by it is right; comparing it with a `score` is a category error" },
+      "archived": { "type": "bool", "required": "always", "doc": "BRANCH ON THIS, never on the prose note -- as on a hit" },
+      "route":    { "type": "str",  "required": "always",
+                    "doc": "How it was reached, in a form a reader can check: `#2 via ref` -- the BEST-RANKED result that links to it, and the edge kind. `via the walk` when no result links to it directly, which means it arrived at more than one hop. A route is not decoration: a labelled document with no stated provenance is indistinguishable from a match, which is the one thing this tier must never look like" }
+    },
+    "example": {
+      "id": "file:records/0111_ranking.md",
+      "title": "SR-RANKING (0111)",
+      "loc": "records/0111_ranking.md",
+      "mass": 0.0413,
+      "archived": false,
+      "route": "#2 via ref"
     }
   },
 
@@ -112,7 +166,9 @@
                       "enum": ["grounded", "partial", "weak", "none"],
                       "doc": "best first; BRANCH ON THIS" },
       "answerable": { "type": "bool", "required": "always",
-                      "doc": "false means abstain -- a refusal, not a low score" },
+                      "doc": "false means abstain -- a refusal, not a low score. 🔴 IT COVERS BOTH `none` AND `weak` SINCE 2026-09-14 (W-176 gate 1). Before that it was `band != none`, so a `weak` -- the ranking could not separate the top hits -- came back `true` while the band table said do not answer. BRANCH ON THIS, never on `band == \"none\"`: the second is right for one of the two refusals" },
+      "failed":     { "type": "any",  "required": "always",
+                      "doc": "list[str] -- WHICH gate refused, by name. `answerable: false` says stop; this says what stopped it. Today: `no_candidates` (nothing scored above zero) and `separation` (the ranking could not choose). `[]` when nothing refused -- and `[]` on `partial`, which is NOT a refusal: its defect is already named in `missing` or `verified: stale`. Always present; an absent key could not be told from a fux too old to have gates (W-48), which is the one reading that would make a consumer answer where it should abstain. The names GROW: W-176's remaining gates each append one and change nothing else" },
       "coverage":   { "type": "any",  "required": "always",
                       "doc": "float 0.0-1.0; the fraction of the query's idf mass the CORPUS contains. Unchanged since it shipped -- a query whose terms sit in four different documents scores 1.0 here, correctly" },
       "doc_coverage": { "type": "any", "required": "always",
@@ -133,6 +189,7 @@
     "example": {
       "band": "partial",
       "answerable": true,
+      "failed": [],
       "coverage": 0.6127,
       "doc_coverage": 0.4413,
       "doc_coverage_floor": 0.0,

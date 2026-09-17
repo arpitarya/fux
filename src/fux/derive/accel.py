@@ -97,6 +97,7 @@ class Runtime:
         self._stats: dict | None = None
         self._offsets: dict[str, bytes] = {}
         self._postings: dict[str, bytes] = {}
+        self._anchors: dict[str, dict] = {}
 
     @property
     def stats(self) -> dict:
@@ -122,6 +123,21 @@ class Runtime:
             path = fmt.postings_path(self.root, prefix)
             self._postings[prefix] = path.read_bytes() if path.exists() else b""
         return self._postings[prefix]
+
+    def anchor_postings(self, term: str) -> list[tuple[int, int]]:
+        """`(docidx, anchor tf)` for one term — W-168 step 1's reverse map.
+
+        One small JSON file per term-hash prefix, loaded lazily and cached, so
+        a two-term query opens at most two of the 256. **Empty when nobody
+        links using this word**, and empty when the plane predates the field —
+        `is_fresh` refuses a pre-v6 runtime, so that second case reaches a
+        rebuild rather than a query.
+        """
+        prefix = fmt.term_prefix(term)
+        if prefix not in self._anchors:
+            path = fmt.anchors_path(self.root, prefix)
+            self._anchors[prefix] = json.loads(path.read_bytes()) if path.exists() else {}
+        return [(int(idx), int(count)) for idx, count in self._anchors[prefix].get(term, ())]
 
     def blocks_for(self, term: str) -> list[Block]:
         """Every block of a term, by one bisect over the fixed-width table."""
@@ -274,9 +290,16 @@ def accel_candidates(
     # `tune.toml` field weight moved `avg_wlen` on the scan path and not on
     # this one — the same corpus, two `avg_wlen`s, and a differential-law break
     # that a rebuild would have been needed to repair.
+    # `total_anchor_len` joins the denominator at the query's own anchor
+    # weight, exactly as `query/scan.py` sums it off the raw bytes. Absent on a
+    # pre-v6 plane — `is_fresh` refuses one, so `.get` here is the direct-call
+    # door and not a migration, and `0` is the right reading of "this plane
+    # holds no anchors".
     corpus = Corpus(
         n=stats["n"],
-        total_wlen=derive_wlen(list(stats["total_flen"]), scoring),
+        total_wlen=derive_wlen(
+            list(stats["total_flen"]), scoring, int(stats.get("total_anchor_len", 0))
+        ),
     )
     if corpus.n == 0:
         return [], dict.fromkeys(query_hashes, 0), corpus
@@ -295,10 +318,35 @@ def accel_candidates(
     opened: set[str] = set()
     read_blocks: dict[str, set[int]] = {h: set() for h in query_hashes}
 
+    # 🔴 **W-168 step 1 — the anchor seed, and it happens BEFORE the skipping
+    # loop for a reason that is the whole correctness argument.**
+    #
+    # `block_bound` bounds what a document can score from the POSTINGS. An
+    # anchor contribution is not in the postings, so a document whose score
+    # comes from a linker's wording is not bounded by it, and skipping would
+    # lose it — the W-73 class of defect, on a new term.
+    #
+    # Seeding every anchor-matching document up front makes the existing bound
+    # sound again, unchanged: after this loop, **every document with a non-zero
+    # anchor contribution for any query term is already a candidate**, so an
+    # *unseen* document's anchor contribution is zero by construction and
+    # `block_bound` bounds it exactly as it did before. The other direction is
+    # safe too — anchor length only ever raises a candidate's `wlen`, and
+    # `mnw` under-estimates `wlen`, which pushes the bound up.
+    #
+    # It is cheap because anchor postings are link text: a handful of words per
+    # edge against thousands per body.
+    anchor_tf: dict[int, dict[str, int]] = {}
+    if scoring.anchor_on:
+        for term in query_hashes:
+            for docidx, count in runtime.anchor_postings(term):
+                anchor_tf.setdefault(docidx, {})[term] = count
+                hits.setdefault(docidx, {})
+
     for term in order:
         if skipping and hits and _cannot_reach(
             runtime, blocks, df, opened, order, hits, docs, corpus, top, avg_wlen,
-            weighting, scoring, expansion,
+            weighting, scoring, expansion, anchor_tf,
         ):
             break
         for block in blocks[term]:
@@ -313,6 +361,7 @@ def accel_candidates(
     # candidate are read.
     _fill_deferred(runtime, blocks, opened, query_hashes, hits, read_blocks)
 
+    anchor_on = scoring.anchor_on
     candidates = [
         {
             "id": docs[docidx]["id"],
@@ -326,12 +375,23 @@ def accel_candidates(
         }
         for docidx, terms in hits.items()
     ]
+    if anchor_on:
+        # **On EVERY candidate, including the ones with no anchor match at
+        # all.** `atf` may be empty; `alen` may not be, and a document that is
+        # linked-to is a longer document whether or not the query's words are
+        # what its linkers used. Attaching `atf` only where it is non-empty
+        # would drop those documents' anchor length out of `wlen` on this path
+        # and not on the scan's — silent, data-dependent divergence, which is
+        # the one failure this plane exists to make impossible.
+        for candidate, docidx in zip(candidates, hits, strict=True):
+            candidate["atf"] = anchor_tf.get(docidx, {})
+            candidate["alen"] = docs[docidx].get("alen", 0)
     return candidates, df, corpus
 
 
 def _cannot_reach(
     runtime, blocks, df, opened, order, hits, docs, corpus, top, avg_wlen,
-    weighting=None, scoring: Scoring = DEFAULT_SCORING, expansion=None,
+    weighting=None, scoring: Scoring = DEFAULT_SCORING, expansion=None, anchor_tf=None,
 ) -> bool:
     """True when no unseen document can enter the top `top`.
 
@@ -358,6 +418,20 @@ def _cannot_reach(
     ⚠ **`weighting.maximum` still multiplies the whole sum afterwards.** The
     two scalings compose: one prices the *terms*, the other the *document*, and
     dropping either reintroduces a different unbounded bound.
+
+    ## W-168 step 1: the ceiling gets NO anchor term, and that is exact
+
+    An anchor contribution is not in the postings, so `block_bound` does not
+    bound it — which would be the W-73 defect again if an unseen document could
+    have one. It cannot: `accel_candidates` seeds **every** anchor-matching
+    document as a candidate before this test is ever reached, so *unseen*
+    means *no anchor contribution* by construction. The ceiling is therefore
+    exact rather than merely conservative, and nothing here needed widening.
+
+    `theta`, by contrast, DOES carry the fold — a real candidate's real score
+    includes its anchor terms. A higher `theta` skips more, and that is sound
+    for the same reason: it is compared against a ceiling over documents that
+    provably have no anchor component.
     """
     if weighting is None:
         weighting = Weighting()
@@ -380,7 +454,7 @@ def _cannot_reach(
 
     theta = _kth_score(
         hits, docs, [h for h in order if h in opened], df, corpus, top, avg_wlen,
-        weighting, scoring, expansion,
+        weighting, scoring, expansion, anchor_tf,
     )
     if theta is None:
         return False
@@ -391,7 +465,7 @@ def _cannot_reach(
 
 def _kth_score(
     hits, docs, opened_order, df, corpus, top, avg_wlen,
-    weighting=None, scoring: Scoring = DEFAULT_SCORING, expansion=None,
+    weighting=None, scoring: Scoring = DEFAULT_SCORING, expansion=None, anchor_tf=None,
 ) -> float | None:
     """The `top`-th best **weighted** score among current candidates.
 
@@ -425,8 +499,9 @@ def _kth_score(
     """
     if weighting is None:
         weighting = Weighting()
+    anchor_on = anchor_tf is not None and scoring.anchor_on
     guarded = (
-        {i: t for i, t in hits.items() if expansion.matches(t)}
+        {i: t for i, t in hits.items() if expansion.matches(t, anchor_tf.get(i) if anchor_on else None)}
         if expansion is not None and not expansion.trivial
         else hits
     )
@@ -438,9 +513,17 @@ def _kth_score(
     scores = []
     for docidx, terms in guarded.items():
         record_terms = {term: list(tf) for term, tf in terms.items()}
+        # ⚠ **The fold is here too, and it must be.** `theta` is compared
+        # against a ceiling in the same units; scoring a candidate WITHOUT its
+        # anchor terms while `rank()` scores it WITH them would under-estimate
+        # `theta`, which is safe, and then report a k-th best that no longer
+        # matches the ranking anyone sees. Same rule the `expansion` weights
+        # follow one paragraph up.
         s = score_record(
             record_terms, docs[docidx]["flen"], opened_order, df, corpus.n, avg_wlen, scoring,
             term_weights,
+            anchor_tf.get(docidx, {}) if anchor_on else None,
+            docs[docidx].get("alen", 0) if anchor_on else 0,
         )
         if not weighting.trivial:
             s *= weighting.of(docs[docidx])

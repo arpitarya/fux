@@ -25,8 +25,9 @@ import { runQuery } from "../query/run.mjs";
 import { headingsFor } from "../query/headings.mjs";
 import { iterShardPaths, rawRecordLines } from "../store/reader.mjs";
 import { contentSha } from "../store/format.mjs";
-import { pyRound } from "../compat/pyfloat.mjs";
+import { cmpCodePoints, pyRound } from "../compat/pyfloat.mjs";
 import { loadOutput } from "../config/output.mjs";
+import { Graph, edgesFromRecords } from "../graph/model.mjs";
 import { FuxError } from "../errors.mjs";
 
 export const PROTOCOL_VERSION = "2024-11-05";
@@ -114,7 +115,11 @@ function fuxSearch(root, args, top) {
   // W-109. Same slot as the CLI's `--expand`, same weight, same guard: a
   // document matching only expansion terms is dropped in `rank()`.
   const expand = String(args.expand ?? "");
-  const { results, confidence } = runQuery(root, query, k, {
+  // W-161 — this surface takes BOTH tiers. An agent is the reader the related
+  // tier was built for: it cannot run `fux graph` as a follow-up the way a
+  // person can, and `next` has been telling it to call `fux_related` for
+  // neighbours since the tool existed.
+  const { results, related, confidence } = runQuery(root, query, k, {
     wantConfidence: true, expand,
   });
   const records = results.length ? recordsById(root) : new Map();
@@ -142,6 +147,20 @@ function fuxSearch(root, args, top) {
   });
   return {
     results: out,
+    // 🔴 **Its own key, never merged into `results`.** These documents matched
+    // NO query word; they are here because the documents above link to them.
+    // An agent reading them as matches cites a document the question's own
+    // words never reached — with a real path and a real sha beside it, which
+    // is the most convincing shape a wrong answer has.
+    //
+    // **Unconditional, like `confidence`:** a tool call cannot pass a flag, so
+    // an absent key could only mean *this server predates the tier* (W-48).
+    // NOT `score` — a related document has none, and naming the walk mass
+    // `score` would make every agent that sorts on it interleave the lists.
+    related: (related ?? []).map((r) => ({
+      path: r.loc, title: r.title, mass: pyRound(r.mass, 6),
+      archived: r.archived, route: r.route,
+    })),
     // Node has no accelerator; the scan is the only path, and saying anything
     // else would be a lie about which one answered.
     ranked_by: "scan",
@@ -149,7 +168,10 @@ function fuxSearch(root, args, top) {
     // ranked list cannot otherwise tell "these documents answer your question"
     // from "these are the closest things in a corpus that never discusses it".
     confidence: confidence ? confidence.asDict() : null,
-    next: "call fux_passage with a path to read a span, or fux_related for neighbours",
+    next: "call fux_passage with a path to read a span, or fux_related for neighbours. "
+      + "`related` here is already the neighbourhood of THIS query's answers -- "
+      + "documents no query word matched, so never cite one as a match without "
+      + "reading it with fux_passage first",
   };
 }
 
@@ -187,6 +209,19 @@ function fuxPassage(root, args) {
   };
 }
 
+/** One document's edges, both directions.
+ *
+ * 🔴 **Not a seeded walk**, though W-160's gap-check row asked for it to be
+ * *"re-implemented over `graph --seed` (same output, one code path)"*. A PPR
+ * neighbourhood returns ranked nodes the document never mentioned; this
+ * returns the edges the document states. The output cannot be both.
+ *
+ * **The row's second half stands and is done here**: the inbound scan lifts
+ * `Edge`s through `edgesFromRecords` and reads `Graph`'s own adjacency, so
+ * *what points at this* has ONE definition rather than a third comprehension
+ * beside the plane and the verbs. Twin of `mcp.py::_related`; built in memory,
+ * never from `.fux/runtime/graph.json`, because MCP answers in a clone with no
+ * build. */
 function fuxRelated(root, args) {
   const rel = args.path ?? "";
   const docId = rel.startsWith("file:") || rel.startsWith("url:") ? rel : `file:${rel}`;
@@ -194,14 +229,12 @@ function fuxRelated(root, args) {
   const record = records.get(docId);
   if (record === undefined) throw new FuxError(`'${rel}' is not in the index`);
 
-  const inbound = [];
-  for (const other of records.values()) {
-    for (const edge of other.edges ?? []) {
-      if (edge.dst === docId) inbound.push({ path: other.loc, kind: edge.kind });
-    }
-  }
+  const graph = new Graph(edgesFromRecords([...records.values()]));
+  const inbound = graph.edges
+    .filter((e) => e.dst === docId && records.has(e.src))
+    .map((e) => ({ path: records.get(e.src).loc, kind: e.kind }));
   inbound.sort((a, b) => (a.kind < b.kind ? -1 : a.kind > b.kind ? 1
-    : a.path < b.path ? -1 : a.path > b.path ? 1 : 0));
+    : cmpCodePoints(a.path, b.path)));
   return {
     path: record.loc,
     title: record.title ?? "",
@@ -224,7 +257,7 @@ export function handle(root, message, top) {
     return ok(id, {
       protocolVersion: PROTOCOL_VERSION,
       capabilities: { tools: {} },
-      serverInfo: { name: "fux", version: "2.0.1" },
+      serverInfo: { name: "fux", version: "3.0.0-alpha.0" },
     });
   }
   if (method === "tools/list") return ok(id, { tools: tools(top) });

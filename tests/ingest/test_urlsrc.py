@@ -12,7 +12,7 @@ from fux import store
 from fux.config import load as load_config
 from fux.errors import FuxError
 from fux.ingest.run import run
-from fux.ingest.urlsrc import UrlEntry, config_for, fetch_all, load_fetcher, read_urls
+from fux.ingest.urlsrc import UrlEntry, fetch_all, load_fetcher, read_urls
 from fux.query.tokenize import tokenize
 from fux.store.format import term_hash, title_hash
 
@@ -212,69 +212,29 @@ def test_fetch_all_calls_hooks_once_and_skips_failures(tmp_path):
 _RECORDER = 'import pathlib\n_LOG = pathlib.Path(__file__).with_name("log.txt")\n'
 
 
-def test_a_scalar_is_shared_and_a_sub_table_reaches_only_its_own_fetcher(tmp_path):
-    """🔴 **The table went VERBATIM to every fetcher, and that was a defect with a
-    live victim.** Each shipped `configure()` raises on a key it does not know, so
-    one fetcher's tunable made the OTHER fetcher refuse the whole run — `cdp_port`
-    in `[sources.url.config]` refused `http.py`, and a repo could therefore
-    configure **at most one** of the two shipped fetchers.
+def test_config_table_reaches_configure_verbatim(tmp_path):
+    """Shared keys reach every fetcher, and anything INSIDE a fetcher's own
+    table is still passed through untouched.
 
-    The slice is by SHAPE, never by meaning
-    ([SR-FETCHER](../../records/0117_fetcher.md) decision 8): a scalar is shared
-    and reaches everyone, a sub-table belongs to the fetcher whose name it carries,
-    and ⚠ **a sub-table is never passed down as a key** — which is what leaves the
-    other fetcher's strictness intact.
+    ⚠ **The top level is namespaced now, and that is a real change of contract**
+    (2026-09-14). A `dict` at the top level is read as a per-fetcher table and
+    does **not** reach `configure()`; one level down, inside that fetcher's own
+    table, nesting is verbatim exactly as before. The whole flat table used to
+    go to every fetcher — which is what made a two-fetcher repo unconfigurable,
+    since each `configure()` refuses the other's keys.
     """
-    (tmp_path / "mw.py").write_text(
-        _RECORDER
-        + 'def configure(config):\n'
-        '    _LOG.write_text(repr(sorted(config.items())))\n'
-        'def fetch(url):\n'
-        '    return "# T\\n\\nbody\\n"\n',
-        encoding="utf-8",
-    )
-    table = {
-        "fetcher_max_parallel": 2,  # a scalar: shared, reaches every fetcher
-        "mw": {"own_key": "mine"},  # this fetcher's own table, by file stem
-        "other": {"cdp_port": 9333},  # another fetcher's — never read, never an error
-    }
-    fetch_all(tmp_path, _entries(["https://x.test/a"]), table)
-    seen = (tmp_path / "log.txt").read_text(encoding="utf-8")
-    assert seen == repr([("fetcher_max_parallel", 2), ("own_key", "mine")])
-
-
-def test_a_fetchers_own_key_wins_a_clash_with_the_shared_level(tmp_path):
-    """Shared first, own second — so a repo can set a default for every fetcher
-    and still override it for one. Both tables are insertion-ordered from
-    `tomllib`, so the merge is deterministic (L3)."""
-    (tmp_path / "mw.py").write_text(
-        _RECORDER
-        + 'def configure(config):\n'
-        '    _LOG.write_text(repr(sorted(config.items())))\n'
-        'def fetch(url):\n'
-        '    return "# T\\n\\nbody\\n"\n',
-        encoding="utf-8",
-    )
-    fetch_all(
+    _init(
         tmp_path,
-        _entries(["https://x.test/a"]),
-        {"timeout_s": 30, "mw": {"timeout_s": 5}},
+        urls=["https://x.test/a"],
+        config='flag = true\n[sources.url.config.mw]\ncdp_port = 9333\nnested = {deep = [1, 2]}\n',
     )
-    assert (tmp_path / "log.txt").read_text(encoding="utf-8") == repr([("timeout_s", 5)])
+    from fux.config import load
 
-
-def test_config_for_slices_by_shape_and_leaves_an_unknown_fetcher_unread():
-    """The rule itself, without the fetch machinery around it.
-
-    ⚠ **A sub-table naming a fetcher this run never loads is simply NOT READ**,
-    not an error — a repo may carry config for a fetcher used only on another
-    branch, and erroring there would punish the thing the design is for."""
-    table = {"shared": 1, "cdp": {"cdp_port": 9222}, "http": {"timeout_s": 30}}
-    assert config_for(table, "cdp") == {"shared": 1, "cdp_port": 9222}
-    assert config_for(table, "http") == {"shared": 1, "timeout_s": 30}
-    assert config_for(table, "nobody") == {"shared": 1}
-    assert config_for(table, None) == {"shared": 1}
-
+    cfg = load(tmp_path)
+    got = cfg.url.config_for("mw.py")
+    assert got == {"flag": True, "cdp_port": 9333, "nested": {"deep": [1, 2]}}
+    # A fetcher that is not `mw` sees the shared key and nothing else.
+    assert cfg.url.config_for(".fux/fetchers/other.py") == {"flag": True}
 
 def test_configure_is_optional_and_absent_table_is_empty(tmp_path):
     (tmp_path / "mw.py").write_text(
@@ -489,7 +449,10 @@ def test_file_doc_gets_ref_edge_to_ingested_url(tmp_path):
     )
     run(tmp_path, refresh_urls=True)
     edges = store.read_index(tmp_path)["file:docs/a.md"]["edges"]
-    assert {"kind": "ref", "dst": "url:https://x.test/a", "grade": 10} in edges
+    # The anchor keys ride along on a `ref` edge (W-168 step 1); this test is
+    # about which URL resolves, so they are stripped rather than asserted.
+    bare = [{k: v for k, v in e.items() if k not in ("at", "al")} for e in edges]
+    assert {"kind": "ref", "dst": "url:https://x.test/a", "grade": 10} in bare
     assert not any(e["dst"] == "url:https://x.test/other" for e in edges)  # dangling stays dropped
 
 
@@ -577,10 +540,51 @@ def test_fetch_routes_per_line_and_only_loads_what_it_needs(tmp_path):
     assert index["url:https://x.test/b"]["title_h"] == title_hash("Rendered")
 
 
-def test_a_missing_fetcher_names_setup(tmp_path):
-    _init(tmp_path, urls=["https://x.test/a fetch=cdp"])
-    with pytest.raises(FuxError, match=r"fetcher not found: cdp\.py.*fux setup"):
+def test_a_missing_fetcher_names_setup_when_nothing_is_beside_it(tmp_path):
+    """Nothing in the directory, so `fux setup` IS the remedy."""
+    _write_toml(
+        tmp_path,
+        '[sources]\n[sources.url]\nfetcher = ".fux/fetchers/http.py"\nmax_parallel = 4\n',
+    )
+    (tmp_path / "docs").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "docs" / "a.md").write_text("# Doc A\n\nrepo body\n", encoding="utf-8")
+    _write_urls(tmp_path, ["https://x.test/a fetch=cdp"])
+    with pytest.raises(FuxError, match=r"fetcher not found: \.fux/fetchers/cdp\.py.*fux setup"):
         run(tmp_path, refresh_urls=True)
+
+
+def test_a_missing_fetcher_names_ITS_SIBLINGS_when_there_are_any(tmp_path):
+    """🔴 **The message was wrong for the case W-178 created** (2026-09-15).
+
+    `fetch=` names any module in the fetchers directory now, so the common
+    failure is a **typo** — `glasbox` beside a real `glassbox.py`. The old
+    message said *"run `fux setup` to write the shipped fetchers"* and nothing
+    else: correct for an empty directory, and actively misleading here, because
+    `fux setup` writes two files and neither is the one the line names.
+
+    ⚠ **And the stakes are why it matters.** `load_fetcher` raises rather than
+    skipping the line, so a one-character typo exits 1 and indexes **zero**
+    documents — see `work/regression/2026-09-15-consumer-fetchers/ANALYSIS.md`.
+    The message is the whole interface at that moment.
+    """
+    _write_toml(
+        tmp_path,
+        '[sources]\n[sources.url]\nfetcher = ".fux/fetchers/http.py"\nmax_parallel = 4\n',
+    )
+    (tmp_path / "docs").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "docs" / "a.md").write_text("# Doc A\n\nrepo body\n", encoding="utf-8")
+    _write_urls(tmp_path, ["https://x.test/a fetch=glasbox"])
+    fetchers = tmp_path / ".fux" / "fetchers"
+    fetchers.mkdir(parents=True, exist_ok=True)
+    for stem in ("http", "glassbox"):
+        (fetchers / f"{stem}.py").write_text("def fetch(url):\n    return ''\n", encoding="utf-8")
+
+    with pytest.raises(FuxError) as exc:
+        run(tmp_path, refresh_urls=True)
+    message = str(exc.value)
+    assert "glassbox" in message, "the file that IS there must be named"
+    assert "fux setup" not in message, "setup does not write the module being asked for"
+    assert "fux doctor" in message, "the check that would have caught it first"
 
 
 # -- the hashed-meta defect (W-47): ingest-then-build on the L5 default -----

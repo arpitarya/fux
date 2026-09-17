@@ -1,0 +1,13 @@
+flowchart TB
+  classDef step fill:#eef3f8,stroke:#5b7fa6,color:#1c2b3a
+  classDef gate fill:#fbeeee,stroke:#b85c5c,color:#3a1414
+  classDef out fill:#fff4e0,stroke:#c98a1b,color:#3a2a08
+  classDef src fill:#eefaf0,stroke:#3f9a5a,color:#12301c
+  R["rank in the index (same path as ask)"]:::step
+  T["refer the top 3 (ANSWER_TOP) in one refer() call"]:::step
+  F["fetch bytes through the CONSUMER's fetcher<br/>file: → working tree · url: → http.py / cdp.py<br/>core imports no transport (L4)"]:::src
+  V{"verify by content sha"}:::gate
+  L["verdict, first match wins:<br/>cached → as-ingested → unverified → current / stale"]:::gate
+  S["seat passages inside the byte budget (8000)<br/>best passage first, then greedy; rescore weight 0.0"]:::step
+  O["one answer + citations: path, sha, verdict<br/>--audit · --receipt (in-toto) · --journal · fux verify"]:::out
+  R --> T --> F --> V --> L --> S --> O

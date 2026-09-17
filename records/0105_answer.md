@@ -10,7 +10,7 @@ feature: "`fux answer` — one answer, its footing stated, and the report of wha
 owns: []
 laws: [L1, L2, L3]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: f4c23b8fded235b28a2d21fc1da146cb55003935148be9fb1c8caca394bbe67a
+content_sha: 912dffddffabfe34f971ef4183578c78d6fc7991ba45b7b088581c0fd05b5bda
 ---
 
 # SR-ANSWER — the `answer` verb
@@ -179,6 +179,13 @@ emits `{"answer": null, "citation": null, "source": "index"}`. **`"source"` is
 present on every branch**, because it is the key callers switch on — an absent
 key is a trap, not a signal. It carries two live values: `"refer"` (fetched and
 re-scored) and `"index"` (fallback, or nothing to refer to).
+
+⚠ **Amended 2026-09-14 (W-165 fix 2): the sentence goes to STDERR.** It was on
+stdout from the day the verb shipped. **Exit code 0, `--json` and the wording are
+all unchanged** — the fix is about the stream and nothing else, so a consumer
+matching the text keeps matching it, on the other stream. All three query verbs
+moved in one change, because SR-FIND decision 6 is *"the same rule as `ask`"* and
+a split would have made that sentence false.
 
 **8. Refer is opt-out, not opt-in.** `--no-refer` keeps the index-only path.
 This follows [SR-REFER](0127_refer-plane.md)'s own reasoning: a `file:`
@@ -379,19 +386,112 @@ verb's fetching path** (W-140 rows 6 and 7, 2026-09-11).
   index alone now, and a receipt from a refer answer is `unverifiable` rather
   than compared against bytes fetched on the spot.
 
+**`answer`'s freshness policy is READ FROM CONFIG, not written in this module**
+(W-174, 2026-09-14). `query/refer_answer.py` built `Policy(mode=ALWAYS, …)`
+literally; it now builds `ALWAYS` or `NEVER` from
+`[sources.url] fetch_at_answer`. The decision, the name and what the two
+neighbouring attributes do instead are stated once in
+[SR-URL-FRESHNESS](0147_url-freshness.md) decision 16 and are **not restated
+here**; what belongs to this record is the seam:
+
+- **The value rides out of `_load_fetchers`**, as a third return value, rather
+  than being read by `answer_via_refer`. Config is loaded there already, on the
+  only path that needs it — and a second read could pick up a different file,
+  which is the argument this module already makes about `tune`.
+- ⚠ **The no-`url:`-candidate property is preserved**: an all-`file:` candidate
+  set still loads no config, imports no module and connects to nothing. It
+  returns `True` because the question was never asked, not as a default.
+- ⚠ **`not routes` returns the REAL value.** Config *was* read on that path, so
+  stamping `always` into the receipt for a repo that said `never` would be the
+  silent-policy-swap failure `Policy.as_record` exists to close.
+- **`--cache-ttl` under `fetch_at_answer = false` prints a note on stderr** and
+  is otherwise inert. Same contract as this module's other declarations: stderr
+  so a piped stdout stays parseable, ASCII so a Windows codepage cannot crash
+  `print()`.
+
 
 **2026-09-14 — `src/fux/query/refer_answer.py` changed under this record and NOTHING this record
-decides moved.** `_load_fetchers` passes the fetcher's own slice of the config table to
-`configure()` rather than the whole table ([SR-FETCHER](0117_fetcher.md)
-decision 8) — a one-line change that keeps this module's resolution identical to
+decides moved.** `_load_fetchers` passes `config.url.config_for(entry.fetcher_path)` to
+`configure()` rather than the whole table ([SR-CONFIG](0113_config.md) decision
+8a) — a one-line change that keeps this module's resolution identical to
 `ingest/urlsrc.py`'s, which is the property this record's §Reference already
-insists on. The candidate list, the dispatch and the policy seam are unchanged.
+insists on. The candidate list, the dispatch and the policy seam are
+unchanged.
 
 ⚠ **Said out loud rather than left to the freshness gate.** That check proves an
 owning record was *touched*, never that it was read (CLAUDE.md §Law zero), so a
 co-owner's file changing under this one is exactly the case where a reader needs
 to be told *"not yours"* in writing.
+**14. `answer` READS `ask`, both tiers — and the band is Tier A's alone**
+(W-161; Arpit overrode the draft that had it read `lexical`).
+
+A Tier B document is fetched and passage-scored on the bytes like any other
+candidate. **That is the point rather than a concession:** Tier B's weakness is
+that no query word matched the *index*, and the refer plane reads the document
+itself — so a related document with nothing in it survives nowhere, and one
+that genuinely answers is found by the same re-score that judges every other
+candidate.
+
+**14a. Tier A is offered to the refer plane first, and the order is the
+tie-break.** `refer()` scores on fetched bytes and picks a winner; when it
+cannot separate two candidates, the list order decides, and **a document the
+words found should win that tie against one only a link reached.**
+
+**14b. The band does not move, and that is structural rather than careful.**
+`_fill_confidence` runs inside `run_query` over the Tier A list; the combined
+candidate list is assembled afterwards and reaches only the refer plane. **A
+linked document cannot raise how much the index believes itself** — there is no
+code path by which it could, which is a stronger guarantee than a rule.
+
+
 ### Consequences
+
+- **`refer_verdicts` reaches an observer as a COUNT PER VERDICT, never a
+  citation** (W-170, 2026-09-15). `{"current": 2, "stale": 1}` says how the
+  refer plane did; it names no document, no path and no span. A subscriber can
+  see that freshness is degrading across a corpus and cannot see which page.
+
+- **A `fux correct --pin` reaches `answer`, not only `ask`** (2026-09-14,
+  W-162). `answer` calls `run_query`, and the pin is applied inside it — so a
+  pinned question's answer is **quoted from the pinned document**, with its
+  line range and its freshness verdict, exactly as any other citation. That is
+  the intended reach: a person who pinned a question wants *the answer*, not a
+  reordered list they then have to read.
+
+  ⚠ **What carries the pin on `answer` is the `note:` on STDERR, and nothing
+  else.** There is no `[pinned]` marker — `answer` returns one document, not a
+  list — and **there is deliberately no `pinned` key on the citation.** The
+  citation is built from an `AskResult` on the index path and from a
+  refer-plane citation on the refer path, and `pinned` exists only on the
+  first; a key present on one path and absent on the other is **worse than a
+  key on neither**, because a consumer reading `citation.pinned` would get
+  `false` from the refer path for a question that genuinely is pinned. So
+  `cmd_answer` emits the note from `results[:1]` **before either branch**, and
+  it therefore fires on every path and on both readers.
+
+  🔴 **This was wrong in this record first.** The note here claimed
+  `"pinned": true` on the result, `answer --json` carried no such key at all,
+  and the claim was written before anyone ran the command. Corrected the same
+  day by running it.
+
+- **`answer` does NOT go through the frozen `lexical` body, and that is
+  deliberate** (2026-09-14, W-160). It calls `run_query` directly, so
+  [SR-CLI](0101_cli-surface.md) decision 12's freeze does not reach it — the
+  freeze is on a *verb's output shape*, not on the ranking function both share.
+  **`answer` reading `ask` is
+  [W-161](../work/open/W-161-graph-composed-ask.md)'s change**, and it is a
+  ranking change: today `answer` ranks lexically whatever `ask` does, and after
+  W-161 it would inherit `ask`'s graph tier. Named here so the two items' scopes
+  cannot be confused for each other.
+
+- **`answer` says the confidence floor is off, once per process** (2026-09-14,
+  W-164 gate 4). ⚠ **W-164's definition of done named `ask` only**, and stopping
+  there would have made [SR-FIND](0104_find.md) decision 6's *"the same rule as
+  `ask`"* false for the second time in one week — this verb publishes the same
+  band from the same floor. It costs nothing: the note is once per PROCESS, so a
+  session using two verbs still hears it once. Suppressed under `--json`, whose
+  `confidence` block carries the floor in parseable form.
+  [SR-CONFIDENCE](0141_confidence.md) decision 13.
 
 - **The passage carries the document's frontmatter block.** `refer/_chunk.py`
   chunks the fetched bytes as fetched — it does not strip the YAML frontmatter

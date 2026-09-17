@@ -103,7 +103,7 @@ class ScopeReport:
     #: Documents in this scope that fell outside a `TARGET` selector. Reported
     #: so a filtered run can never read as a scope being complete (W-104).
     filtered: int = 0
-    #: W-110, doc2query--. `(path, [(question, rank|None)])` for every
+    #: W-110, doc2query--. `(path, [(question, rank|None, is_human)])` for every
     #: enrichment holding a question that does not retrieve its own document.
     #: Separate from `malformed` and `pii` for their reason: the remedy differs
     #: again — this one is fixed by rewriting the *question*, and a reader told
@@ -294,7 +294,21 @@ def plan(
                 misses = _unretrievable(root, path, record, self_retrieval_k)
                 if misses:
                     unretrievable.append((_shown(path, root), misses))
-                    continue
+                    # 🔴 **W-162: a file whose ONLY failures are HUMAN lines is
+                    # still `ok`.** A correction is by definition a question
+                    # that failed retrieval — that is the case it exists for —
+                    # so refusing it would refuse the feature. The line is
+                    # REPORTED and marked `human`; the count is unaffected.
+                    #
+                    # ⚠ **This is not leniency.** A human line that still does
+                    # not retrieve its document after an ingest is worth
+                    # looking at: either the ingest has not run, or the
+                    # correction genuinely does not bite. The report says so;
+                    # what it must not do is make the file unindexable, which
+                    # would delete the correction's effect as the price of
+                    # telling you about it.
+                    if any(not is_human for _q, _r, is_human in misses):
+                        continue
             ok += 1
         reports.append(
             ScopeReport(scope, len(records), ok, missing, stale, malformed,
@@ -345,8 +359,24 @@ def _unretrievable(root: Path, path: Path, record: dict, k: int) -> list[tuple[s
         text = path.read_text(encoding="utf-8")
     except OSError:
         return []
+    from .correct import human_lines as _human_lines
+
+    human = set(_human_lines(text))
+    # 🔴 **Every HUMAN line is checked, `?` or not.** `is_question` is
+    # deliberately shallow — a line ending in `?` — because the enrich skill
+    # asks a model for one question per line and a cleverer test would refuse
+    # lines somebody wrote on purpose. **A correction is not bound by that
+    # convention**: `fux correct "calder rollback procedure" <doc>` files the
+    # words a person actually searches with, which need not be a question.
+    #
+    # ⚠ **Before this, such a correction escaped the check entirely** — found
+    # by filing one and watching `--check` report the file as `ok` while the
+    # line retrieved nothing. A gap that quiet is worse than a refusal: the one
+    # surface that tells you a correction is not working said it was fine.
     questions = [
-        line.strip() for line in text[match_end(text):].splitlines() if is_question(line)
+        line.strip()
+        for line in text[match_end(text):].splitlines()
+        if is_question(line) or line.strip() in human
     ]
     if not questions:
         return []
@@ -358,7 +388,7 @@ def _unretrievable(root: Path, path: Path, record: dict, k: int) -> list[tuple[s
 
     tune = dataclasses.replace(Tune(), field_weights=_FILTER_WEIGHTS)
     doc_id = record.get("id", "")
-    failures: list[tuple[str, int | None]] = []
+    failures: list[tuple[str, int | None, bool]] = []
     for question in questions:
         try:
             results, _ = run_query(root, question, k, force_scan=False, tune=tune)
@@ -366,7 +396,7 @@ def _unretrievable(root: Path, path: Path, record: dict, k: int) -> list[tuple[s
             return []
         ids = [r.id for r in results]
         if doc_id not in ids:
-            failures.append((question, None))
+            failures.append((question, None, question in human))
     return failures
 
 
@@ -683,8 +713,18 @@ def _render_check(reports: list[ScopeReport], *, target: str | None = None) -> i
             bits.append(f"{len(report.pii)} carrying PII")
             bad += len(report.pii)
         if report.unretrievable:
-            bits.append(f"{len(report.unretrievable)} with unretrievable questions")
-            bad += len(report.unretrievable)
+            model_failing = [
+                (path, misses)
+                for path, misses in report.unretrievable
+                if any(not is_human for _q, _r, is_human in misses)
+            ]
+            human_only = len(report.unretrievable) - len(model_failing)
+            if model_failing:
+                bits.append(f"{len(model_failing)} with unretrievable questions")
+                bad += len(model_failing)
+            if human_only:
+                # Reported, never counted as bad — W-162.
+                bits.append(f"{human_only} with human line(s) not yet retrieving")
         suffix = "  " + " · ".join(bits) if bits else "  ok"
         print(f"  {report.scope:<28} {report.ok}/{report.total}{suffix}")
         for path, why in report.malformed:
@@ -695,10 +735,14 @@ def _render_check(reports: list[ScopeReport], *, target: str | None = None) -> i
             # does "this file contains PII".
             print(f"      refused: {path} — matches .fux/pii.toml rule(s): {', '.join(names)}")
         for path, misses in report.unretrievable:
-            for question, rank in misses:
+            for question, rank, is_human in misses:
                 where = "absent from the ranking" if rank is None else f"rank {rank}"
+                # **`reported` vs `refused`, and the word is the whole
+                # difference.** A refused file is not indexed; a reported human
+                # line is indexed and is simply not working yet.
+                verb = "reported (human)" if is_human else "refused"
                 print(
-                    f"      refused: {path} — does not retrieve its document "
+                    f"      {verb}: {path} — does not retrieve its document "
                     f"({where}, wanted top {SELF_RETRIEVAL_K}): {question}"
                 )
     if any(r.pii for r in reports):
@@ -710,7 +754,24 @@ def _render_check(reports: list[ScopeReport], *, target: str | None = None) -> i
             "a redacted enrichment body indexes `[PII:email]` as vocabulary, which is "
             "worse than useless."
         )
-    if any(r.unretrievable for r in reports):
+    if any(
+        any(is_human for _q, _r, is_human in misses)
+        for r in reports
+        for _p, misses in r.unretrievable
+    ):
+        print(
+            "\nA HUMAN line that does not retrieve its document is REPORTED, never "
+            "refused, and the file is still indexed.\n"
+            "A correction is by definition a question that failed retrieval — that is "
+            "what it is for. Check\nthat `fux ingest` has run since it was written; if "
+            "it has, the correction is not biting and\n`fux correct --list` shows "
+            "whether a `--pin` was also asked for."
+        )
+    if any(
+        any(not is_human for _q, _r, is_human in misses)
+        for r in reports
+        for _p, misses in r.unretrievable
+    ):
         print(
             "\nA question that does not retrieve its own document adds terms that "
             "pull OTHER documents up.\n"

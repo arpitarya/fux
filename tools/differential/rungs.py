@@ -20,10 +20,12 @@ corpus it did not measure — and a Node/Python comparison is exactly the shape
 of run where that failure is invisible, because *both* readers would see the
 same drifted bytes and agree perfectly.
 
-🔴 **Never reads `work/golden/questions/` or `work/golden/golden-answer/`.**
+🔴 **Never reads `work/golden/questions/` or any path holding an answer.**
 The arm compares two readers against each other and needs no ground truth
 (PRE-REG-NODE-2 §4); the manifests name `seed/` and `ext/` documents only, and
-this module reads nothing outside them.
+the one directory this module opens under `work/golden/` is `seed/`, which
+[L11](../../records/0012_LAW-11-sealed-answer-key.md) permits — `seed_drift()`
+needs the live bytes to know a rung has gone stale.
 """
 
 from __future__ import annotations
@@ -35,6 +37,10 @@ from pathlib import Path
 #: This repository — where the committed manifests live. Not the corpus.
 REPO = Path(__file__).resolve().parents[2]
 LADDER = REPO / "work" / "golden" / "ladder"
+
+#: The live seed corpus every rung copies. The ONE directory under
+#: `work/golden/` this module may read (L11); `questions/` is never touched.
+SEED = REPO / "work" / "golden" / "seed"
 
 #: Where the ladder corpus lives. `FUX_GOLDEN_CORPORA` overrides it, which is
 #: what lets a second lab checkout run the arm without editing this file.
@@ -89,6 +95,58 @@ def documents(name: str) -> list[tuple[str, str]]:
             raise RungError(f"{path}: unparseable manifest line {line!r}")
         rows.append((parts[0], parts[1]))
     return rows
+
+
+def seed_documents() -> dict[str, str]:
+    """`{path: sha256}` for the LIVE `work/golden/seed/`, keyed as a rung holds it.
+
+    Paths are `seed/<name>` because that is how `build_golden_rung.py` copies
+    them into a rung and how the manifests name them.
+    """
+    out: dict[str, str] = {}
+    for path in sorted(SEED.rglob("*")):
+        if path.is_file():
+            rel = "seed/" + path.relative_to(SEED).as_posix()
+            out[rel] = hashlib.sha256(path.read_bytes()).hexdigest()
+    return out
+
+
+def seed_drift(name: str) -> list[str]:
+    """Every way rung `name`'s manifest disagrees with the live seed. Empty = clean.
+
+    🔴 **This is the check nothing had, and its absence cost the ladder twice.**
+    `verify()` compares a rung against its manifest and `ladder_check` compares
+    the manifests against each other — so on 2026-09-15, when seven of the
+    twenty seed documents grew by 131 lines in this repo, all eight rungs went
+    on agreeing with themselves perfectly while carrying the OLD text. A rung
+    whose seed has moved answers questions written against words it does not
+    contain, and the number that comes back is indistinguishable from a real
+    one.
+
+    The `ext/` half is deliberately NOT checked here: it lives only in the lab
+    and is reproducible from the committed generator, which is `verify()`'s job.
+    """
+    live = seed_documents()
+    frozen = {rel: sha for sha, rel in documents(name) if rel.startswith("seed/")}
+
+    problems: list[str] = []
+    missing = sorted(set(live) - set(frozen))
+    extra = sorted(set(frozen) - set(live))
+    drifted = sorted(rel for rel in set(live) & set(frozen) if live[rel] != frozen[rel])
+    if missing:
+        problems.append(
+            f"{name}: {len(missing)} seed document(s) absent from the manifest: {missing[:3]}"
+        )
+    if extra:
+        problems.append(
+            f"{name}: {len(extra)} manifest seed path(s) no longer in work/golden/seed/: {extra[:3]}"
+        )
+    if drifted:
+        problems.append(
+            f"{name}: {len(drifted)} seed document(s) changed since the rung was frozen "
+            f"— rebuild it (prompt 4) or the rung answers against stale text: {drifted[:3]}"
+        )
+    return problems
 
 
 def index_root_sha256(root: Path) -> str:

@@ -22,7 +22,7 @@
  */
 import { buildPlane } from "../graph/plane.mjs";
 import { TAG_PREFIX } from "../graph/model.mjs";
-import { expand, routes } from "../graph/walk.mjs";
+import { ALL_KINDS, EDGE_KINDS, EXPANSION_BUDGET, expand, routes } from "../graph/walk.mjs";
 import { iterShardPaths, rawRecordLines } from "../store/reader.mjs";
 import { runQuery } from "../query/run.mjs";
 import { loadTune } from "../config/tune.mjs";
@@ -120,17 +120,87 @@ export function runExplain(root, args) {
   return 0;
 }
 
-/** The neighbourhood around a query's best answers. */
-export function runGraph(root, args) {
+/** The three W-160 parameters off `args`, as `expand` wants them.
+ *  All three resolve to their inert values when the flags are absent. */
+function walkParameters(args) {
+  let kinds = ALL_KINDS;
+  if (args.kinds) {
+    const named = args.kinds.split(",").map((k) => k.trim()).filter(Boolean);
+    const unknown = named.filter((k) => !EDGE_KINDS.includes(k)).sort();
+    if (unknown.length) {
+      throw new FuxError(
+        `--kinds names ${unknown.join(", ")}, which is not an edge kind. ` +
+        `The kinds this index mints are ${EDGE_KINDS.join(", ")}`,
+      );
+    }
+    kinds = new Set(named);
+  }
+  return {
+    kinds,
+    linkIdfOn: args.linkIdf === true,
+    maxHops: args.maxHops ?? null,
+  };
+}
+
+/** `[seed rows, seed ids]` — from `--seed`, or from the query's top-k.
+ *
+ * ⚠ **The query form is DEFINED as `--seed` over `lexical`'s top-k**, which is
+ * why both come back through one function: two code paths would be free to
+ * disagree about `seedDepth`, about mass order, or about which candidate
+ * generator ran. Twin of `graph/__init__.py::_seeds_of`. */
+function seedsOf(root, args, records, plane, tune) {
+  const given = args.seed ?? [];
   const query = args._.join(" ");
-  const plane = buildPlane(allRecords(root));
+  if (given.length && query) {
+    throw new FuxError(
+      'pass a query or --seed, not both. `fux graph "<q>"` walks from the ' +
+      "query's best answers; `fux graph --seed <id>` walks from the documents " +
+      "you name, in the order you name them",
+    );
+  }
+  if (given.length) {
+    const seeds = given.map(resolveDoc);
+    for (const seed of seeds) refuseUnknown(records, plane, seed, " (--seed)");
+    // 🔴 **`score` is `null` and `rank` carries the order.** A seed named by
+    // hand has a rank and not a ranking, and the walk's internal `1/(i+1)`
+    // mass would be a third incomparable number in that column. It would also
+    // DIVERGE: seed 0's mass is exactly 1.0, which Python writes `1.0` and
+    // `JSON.stringify` writes `1`. `null` is `null` in both. Twin of
+    // `graph/__init__.py::_seeds_of`.
+    return [
+      seeds.map((s, i) => ({ path: locOf(s), id: s, role: "seed", score: null, rank: i + 1 })),
+      seeds,
+    ];
+  }
+  if (!query) {
+    throw new FuxError(
+      "`fux graph` needs a query or at least one --seed. " +
+      '`fux graph "how does ranking work"` walks from the best answers; ' +
+      "`fux graph --seed docs/a.md` walks from a document you name",
+    );
+  }
+  // 🔴 **The seed query is `lexical`, NOT `ask`** — `compose: false`. After
+  // W-161 `ask` composes a graph tier, and seeding the walk from a list the
+  // walk already re-ordered would make `fux graph "<q>"` a walk over its own
+  // output: the seeds would move when the tier moved, and the orientation verb
+  // would quietly become path-dependent. SR-GRAPH decision 13.
+  const { results } = runQuery(root, query, tune.seedDepth, { tune, compose: false });
+  return [
+    results.map((r) => ({ path: locOf(r.id), id: r.id, role: "seed", score: r.score })),
+    results.map((r) => r.id),
+  ];
+}
+
+/** The neighbourhood around a query's best answers, or around named seeds. */
+export function runGraph(root, args) {
+  const records = allRecords(root);
+  const plane = buildPlane(records);
   // Loaded ONCE and used twice — for the seed query and for the walk. Two loads
   // could disagree if the file changed between them, producing a neighbourhood
   // around seeds that were ranked under different weights.
   const tune = loadTune(root, { enabled: args.noTune !== true });
 
-  const { results } = runQuery(root, query, tune.seedDepth, { tune });
-  const seeds = results.map((r) => r.id);
+  const [seedRows, seeds] = seedsOf(root, args, records, plane, tune);
 
   // `seedDepth` and `expandLimit` are separately tunable because they answer
   // different questions: how much of the ranking to trust as a starting point,
@@ -140,10 +210,11 @@ export function runGraph(root, args) {
     damping: tune.damping,
     iterations: tune.iterations,
     laziness: tune.laziness,
+    ...walkParameters(args),
   });
 
   const nodes = [
-    ...results.map((r) => ({ path: locOf(r.id), id: r.id, role: "seed", score: r.score })),
+    ...seedRows,
     ...expanded.map(([node, score]) => ({ path: locOf(node), id: node, role: "expanded", score })),
   ];
 
@@ -153,7 +224,11 @@ export function runGraph(root, args) {
   }
   if (!nodes.length) { process.stdout.write("No confident matches.\n"); return 0; }
   for (const node of nodes) {
-    process.stdout.write(`${node.score.toFixed(4)}  ${node.role.padEnd(8)} ${node.path}\n`);
+    // A hand-named seed has no score — its column carries `#rank` instead.
+    const cell = node.score !== null && node.score !== undefined
+      ? node.score.toFixed(4)
+      : `#${node.rank}`.padStart(6);
+    process.stdout.write(`${cell}  ${node.role.padEnd(8)} ${node.path}\n`);
   }
   return 0;
 }
@@ -177,7 +252,7 @@ export function runPath(root, args) {
   // `--hops` bounds the search and stays a CLI argument; `hop_decay` only
   // orders what the search found.
   const tune = loadTune(root, { enabled: args.noTune !== true });
-  const found = routes(plane.graph, src, dst, { hops, hopDecay: tune.hopDecay });
+  const { routes: found, truncated } = routes(plane.graph, src, dst, { hops, hopDecay: tune.hopDecay });
 
   if (args.json) {
     process.stdout.write(JSON.stringify({
@@ -187,17 +262,37 @@ export function runPath(root, args) {
         hops: route.hops.map((e) => ({ kind: e.kind, src: e.src, dst: e.dst, grade: e.grade })),
         reliability: route.reliability,
       })),
+      // 🔴 **The half that matters.** stderr is invisible to exactly the
+      // callers most likely to ask for a deep walk, so the boolean is in the
+      // payload. Always present; `false` is a claim, not an absence (W-48).
+      truncated,
     }, null, 2) + "\n");
     return 0;
   }
 
   if (!found.length) {
-    process.stdout.write(`No route from ${src} to ${dst} within ${hops} hop(s).\n`);
+    if (truncated) {
+      // ⚠ Two different claims, and this is the one that was being made
+      // wrongly: *no route within N hops* asserts the search finished.
+      process.stdout.write(
+        `No route from ${src} to ${dst} found within ${hops} hop(s) - the search was ` +
+        `cut short after ${EXPANSION_BUDGET} steps. This is NOT the same as no route ` +
+        "existing; narrow it with fewer --hops, or start from a more specific document.\n",
+      );
+    } else {
+      process.stdout.write(`No route from ${src} to ${dst} within ${hops} hop(s).\n`);
+    }
     return 0;
   }
   for (const route of found) {
     const trail = route.hops.map((e) => `[${e.kind}] ${e.dst}`).join(" -> ");
     process.stdout.write(`${route.reliability.toFixed(4)}  ${src} -> ${trail}\n`);
+  }
+  if (truncated) {
+    process.stdout.write(
+      `\n(the search was cut short after ${EXPANSION_BUDGET} steps - there may be ` +
+      "routes, including better ones, that were not reached)\n",
+    );
   }
   return 0;
 }

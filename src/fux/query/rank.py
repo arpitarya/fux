@@ -60,6 +60,39 @@ class AskResult:
     #: `recency_half_life_days` opened (W-152) and W-153 named rather than left
     #: to be discovered.
     mtime: int | None = None
+    #: W-162. A human filed `fux correct --pin` for **this exact question**, so
+    #: this document was moved to #1 after ranking.
+    #:
+    #: 🔴 **It is NOT part of the sort key and NOT a score.** `rank()` never
+    #: sees it: the pin is applied by `run_query` after the ranking is
+    #: complete, so `--why`'s derivation still describes the ranking that
+    #: actually ran and the reader can see the pin *on top of* it rather than
+    #: baked into it. A pin that changed the score would make the ranking
+    #: unreadable for exactly the query somebody had to intervene on.
+    #:
+    #: **`False` is a claim, not an absence** — the key is on every hit (W-48).
+    pinned: bool = False
+    #: W-161. The graph walk out of the lexical top-k reached this document, so
+    #: the boosted tier's RRF used a PPR rank for it as well as a lexical one.
+    #:
+    #: 🔴 **It marks a row the WALK REACHED, not a row that moved.** A walked
+    #: document that was already #1 is still the reason #1 is #1, and marking
+    #: only movers would hide the tier's effect exactly where it agreed with
+    #: the words — which is the case a reader most needs to be able to see,
+    #: because it is the one that looks like nothing happened.
+    #:
+    #: **Like `pinned`, it is not part of the sort key and not a score.**
+    #: `rank()` never sees it: the tier is applied by `run_query` after the
+    #: lexical core is complete. What it explains is the one list fux prints
+    #: whose second row may score higher than its first — see
+    #: [`compose.py`](compose.py) for why that shape was chosen here and
+    #: rejected for `-q` fusion.
+    boosted: bool = False
+    #: Where the boost came from, as a reader can check it:
+    #: `#7 → #2 via graph`. `None` on every unboosted row, and `None` is an
+    #: absence here rather than a claim — an unboosted row has no route because
+    #: no walk reached it, which the `boosted` key already says.
+    route: str | None = None
 
 
 @dataclass(frozen=True)
@@ -297,11 +330,32 @@ def rank(
         weighting = Weighting(archived_dirs=archived_dirs)
     demote = not weighting.trivial
 
+    # 🔴 **W-168 step 1 — the anchor fold lands HERE, once, for both paths.**
+    #
+    # Each candidate generator attaches two keys to the record dicts it hands
+    # over: `atf` (this document's anchor term counts, restricted to the
+    # query's hashes) and `alen` (its anchor token total). The scan folds them
+    # out of the `at` maps on the committed edges of the documents that link
+    # here; `derive/accel.py` reads the same numbers out of the anchor plane it
+    # built from those same bytes.
+    #
+    # **The fold is one line, in the one function both paths reach**, which is
+    # what makes it checkable: [`accel.py`](../derive/accel.py) states the
+    # contract as *"the accelerator generates candidates and statistics, never
+    # scores"*, so a fold written into the accelerator alone would ship
+    # `--fast`/`--scan` drift — data-dependent, silent, and visible only on the
+    # documents somebody linked to.
+    #
+    # `None` when the anchor field is off, and `None` performs no arithmetic:
+    # see `score_record`.
+    anchor_on = scoring.anchor_on
+
     scored = []
     for record in candidates:
         terms = record.get("terms", {})
+        anchor_tf = record.get("atf") if anchor_on else None
         # 🔴 The hallucinated-citation guard, before anything is scored.
-        if not expansion.matches(terms):
+        if not expansion.matches(terms, anchor_tf):
             continue
         s = score_record(
             terms,
@@ -312,6 +366,8 @@ def rank(
             avg_wlen,
             scoring,
             term_weights,
+            anchor_tf,
+            record.get("alen", 0) if anchor_on else 0,
         )
         archived = _record_is_archived(record, weighting.archived_dirs)
         if demote:

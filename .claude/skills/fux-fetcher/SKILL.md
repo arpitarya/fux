@@ -8,7 +8,7 @@ description: Write or edit a Fux URL fetcher in .fux/fetchers/ (http.py, the sig
 Fux never opens a socket itself. A **fetcher** — a Python file committed in
 `.fux/fetchers/` — retrieves each URL's bytes; **`.fux/refusals.toml`** names the
 responses that are not the document (a sign-in page, an error shell). Fux
-imports a fetcher only for `fux add <URL>`, `fux update`, and `fux answer` citing
+imports a fetcher only for `fux add <URL>`, `fux ingest`, and `fux answer` citing
 a URL. `fux setup` writes the two shipped fetchers once; **after that they are
 the repo's, and fux never rewrites them.**
 
@@ -78,8 +78,12 @@ Declare more than `1` only if `fetch` is safe on many threads after a single
 
 ## 3 · Routing a URL to a fetcher
 
-- **`fetch=` takes `http` or `cdp` and nothing else.** A name resolves to
-  `<directory of [sources.url] fetcher>/<name>.py`.
+- 🔴 **`fetch=` takes ANY fetcher name** — `http`, `cdp`, or a module you drop
+  into the fetchers directory yourself. A name resolves to
+  `<directory of [sources.url] fetcher>/<name>.py`. The grammar checks the
+  **shape** only (lowercase letters, digits and underscores, no leading `_`, no
+  `.py`, no directory part); whether the file exists is `fux doctor`'s
+  `fetcher bindings` row and, failing that, the next ingest's error.
 - **A line with no `fetch=` uses the file `[sources.url] fetcher` names.**
 - **Nothing escalates.** A GET that returns a useless shell returns it every run;
   a human changes the line.
@@ -88,12 +92,19 @@ Declare more than `1` only if `fetch` is safe on many threads after a single
 |---|---|
 | every URL through a modified GET | edit `.fux/fetchers/http.py` in place |
 | one URL through the browser | `fux add <URL> --cdp` — rewrites that line |
-| a new `.fux/fetchers/confluence.py` | point `[sources.url] fetcher` at it, and keep `fetch=` **off** its lines |
+| **some URLs** through a new `.fux/fetchers/confluence.py` | write the file, then put `fetch=confluence` on those lines |
+| **every** URL through a new fetcher | write the file, point `[sources.url] fetcher` at it, and keep `fetch=` **off** its lines |
 
-⚠ **`fux add` writes `fetch=http` unless given `--cdp`**, which bypasses a
-custom default fetcher. For the new-file route: `fux add <URL> --no-ingest`, delete `fetch=http`
-from the line in `.fux/sources/urls`, then `fux update <URL>`. A later `fux add`
-on that URL writes `fetch=http` back.
+⚠ **`fux add` writes `fetch=http` unless given `--cdp`**, and there is **no
+`--fetch <name>` flag** — the two flags name the two shipped fetchers. For a
+custom one: `fux add <URL> --no-ingest`, edit the `fetch=` value on the line in
+`.fux/sources/urls`, then `fux ingest <URL>`. A later `fux add` on that URL
+writes `fetch=http` back.
+
+⚠ **A typo in a custom name now PARSES.** `fetch=conflunce` is a legal line
+naming a file nobody wrote — the price of an open set. `fux doctor` reports it
+(`fetcher bindings`); without that check it surfaces as the next person's
+ingest dying mid-run.
 
 ⚠ **`[sources.url.config]` goes to every fetcher that has URLs in the run**, and
 both shipped `configure()`s raise on a key they do not know. Only
@@ -207,7 +218,7 @@ Then fetch signed out and confirm `refused:` names your rule.
 
 ```bash
 fux add <URL>              # exit 1 + "the line is written; the fetch failed: …" on failure
-fux update <URL>           # for a listed URL; exit 0 even on failure — read the "! <url> — …" line
+fux ingest <URL>           # for a listed URL; exit 0 even on failure — read the "! <url> — …" line
 fux doctor --json          # "refusal rules": hits per rule, and rules that never fired
 ```
 
@@ -220,7 +231,7 @@ fux doctor --json          # "refusal rules": hits per rule, and rules that neve
   returning it throws away the content type the decoder plane needs.
 
 **When you finish:** say which files changed and which URLs now route or refuse
-differently; `fux update --all` re-fetches every URL under the new code.
+differently; `fux ingest --refetch-all` re-fetches every URL under the new code.
 
 ## Don't
 

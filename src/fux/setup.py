@@ -57,12 +57,59 @@ FETCHERS = {"http.py": "http.py.txt", "cdp.py": "cdp.py.txt"}
 #: The starter refusal rules, shipped as package data like the fetchers.
 REFUSALS_TEMPLATE = "refusals.toml.txt"
 PII_TEMPLATE = "pii.toml.txt"
+#: The scaffolded `fux.toml`, shipped the same way. See `config_text`.
+CONFIG_TEMPLATE = "fux.toml.txt"
 
 FETCHERS_DIR = "fetchers"
 
 #: W-86 P7. Every built-in decoder is copied here at setup and the copy is what
 #: runs — see `decoder_source` for why there is no `.py.txt` template.
 DECODERS_DIR = "decoders"
+
+#: What `fux setup` writes into `.fux/observers/`.
+_OBSERVERS_README = """\
+# `.fux/observers/` — tell your analytics what fux did, never what it read
+
+Drop a `*.py` file here with one function:
+
+```python
+def observe(record: dict) -> None:
+    ...  # append `record` somewhere; the return value is discarded
+```
+
+After a fux verb has **fully rendered** — stdout flushed, exit code fixed —
+every file here is called once, in sorted filename order, with one record:
+
+    verb · args_hash · band · answerable · n_results · n_related
+    refer_verdicts · ms · expand_used · q_arms · fux_version
+
+## What is NOT in it, and will not be
+
+The question. Any `--expand` text. A document id, a path, a snippet, the
+answer. Every value is a count, a boolean, a fixed name, or a hash — so this
+hook can tell you how fux is being used and can never tell you what anyone
+looked for. `args_hash` excludes the question too: it is a hash of the
+normalised FLAGS, so you can join a run to a command without fingerprinting
+the query.
+
+## What it cannot do
+
+Change anything. There is no return path, the record is a copy, and the
+dispatch runs after every write the verb makes. An observer that raises is
+skipped for that run; one that is slow is abandoned at `[observe] max_ms` in
+`fux.toml`. Your analytics cannot make `fux ask` wrong, and cannot make it
+slow.
+
+`fux doctor` lists the files here and whether each one fired on the last run.
+"""
+
+#: W-170. `.fux/observers/` — the third readable-source extension point, beside
+#: the two above. **Seeded with a README and no observer**, and the asymmetry
+#: with `decoders`/`fetchers` is deliberate: a decoder and a fetcher have
+#: useful built-in implementations, and an observer has none. fux carries no
+#: knowledge of any subscriber (SR-OBSERVE decision 8), so there is nothing for
+#: it to write here — a subscriber's own `setup` drops its own file in.
+OBSERVERS_DIR = "observers"
 
 #: vendor -> ((destination relative to the repo root, template under
 #: `templates/agents/`), …) — SR-AGENT-POLICY decisions 3 and 4.
@@ -116,6 +163,17 @@ GUIDE_SKILLS: tuple[tuple[str, str], ...] = (
     ("fux-config", "CONFIG-SKILL.md"),
     ("fux-fetcher", "FETCHER-SKILL.md"),
     ("fux-pii", "PII-SKILL.md"),
+    # `fux-inspect` writes nothing at all -- it is the only guide here whose
+    # verb is read-only end to end (SR-INSPECT decision 1). It still ships as a
+    # SKILL rather than as ambient steering: its whole job is to be reached
+    # when somebody asks about the shape of a corpus, and an agent that read it
+    # on every request would start volunteering index critiques.
+    ("fux-inspect", "INSPECT-SKILL.md"),
+    # `fux-correct` writes COMMITTED files and changes what the index holds, so
+    # it is a skill and never ambient (decision 9a) -- and its own first
+    # section is *propose the command, do not run it*, because the moment an
+    # agent notices a bad result is exactly when it would be tempted to.
+    ("fux-correct", "CORRECT-SKILL.md"),
 )
 
 #: **Path-scoped pointers** (decision 15): a short rule that loads when an agent
@@ -169,6 +227,77 @@ SHARED_SKILLS: tuple[tuple[str, str], ...] = (
 )
 
 
+#: **The five Claude-native surfaces beyond the document kinds**
+#: (SR-AGENT-SURFACES decision 2, Arpit 2026-09-14). Skills, steering, rules,
+#: instructions and `agents` files all INSTRUCT; these five do something else --
+#: they fire on a tool call, gate a permission, are invoked by name, run as a
+#: scoped agent, or shape a reply. They are **Claude-only on purpose**: no other
+#: vendor fux ships to has an equivalent, and inventing one would be a rendering
+#: with nothing to render into.
+#:
+#: WARNING **Every one goes through `_write_if_missing`.** A consumer's own
+#: `settings.json`, hook or command is never touched -- decision 6's rule, and
+#: the reason `settings.json` gets the `AGENTS.md` treatment (write if absent,
+#: announce the snippet if not) rather than a merge nobody asked for.
+#: WARNING **The Claude-only claim was FALSE and is corrected here**
+#: (SR-AGENT-SURFACES decision 3a, 2026-09-14). Codex, Kiro and Copilot all ship
+#: repo-level acting surfaces. Two real bounds survive: output styles are
+#: Claude-only, and Codex slash-prompts live in `~/.codex/prompts/` and are
+#: "not shared through your repository", so fux cannot write one.
+KIRO_SURFACES: tuple[tuple[str, str], ...] = (
+    (".kiro/hooks/fux-index-hint.json", "kiro-hook-fux-index-hint.json"),
+    (".kiro/hooks/fux-index-hint.sh", "hook-fux-index-hint.sh"),
+    (".kiro/agents/fux-researcher.md", "kiro-agent-fux-researcher.md"),
+)
+
+#: WARNING `.codex/hooks.json` is a whole-file config a consumer may already
+#: own -- CO_OWNED, like `.claude/settings.json`. Its subagent is not.
+CODEX_SURFACES: tuple[tuple[str, str], ...] = (
+    (".codex/hooks.json", "codex-hooks.json"),
+    (".codex/hooks/fux-index-hint.sh", "hook-fux-index-hint.sh"),
+    (".codex/agents/fux-researcher.md", "codex-agent-fux-researcher.md"),
+)
+
+#: Copilot has no hook surface. It has the richest COMMAND surface of the four
+#: -- prompt files carry `argument-hint` and `tools` natively -- and an agent
+#: surface versioned by commit SHA that works in the IDE, the CLI and the cloud.
+COPILOT_SURFACES: tuple[tuple[str, str], ...] = (
+    (".github/prompts/fux-search.prompt.md", "copilot-prompt-fux-search.prompt.md"),
+    (".github/prompts/fux-answer.prompt.md", "copilot-prompt-fux-answer.prompt.md"),
+    (".github/prompts/fux-verify.prompt.md", "copilot-prompt-fux-verify.prompt.md"),
+    (".github/agents/fux-researcher.md", "copilot-agent-fux-researcher.md"),
+)
+
+CLAUDE_SURFACES: tuple[tuple[str, str], ...] = (
+    (".claude/hooks/fux-index-hint.sh", "hook-fux-index-hint.sh"),
+    (".claude/commands/fux-search.md", "command-fux-search.md"),
+    (".claude/commands/fux-answer.md", "command-fux-answer.md"),
+    (".claude/commands/fux-verify.md", "command-fux-verify.md"),
+    (".claude/agents/fux-researcher.md", "subagent-fux-researcher.md"),
+    (".claude/output-styles/fux-cited.md", "output-style-fux-cited.md"),
+    (".claude/settings.json", "settings-claude.json"),
+)
+
+#: Surfaces the CONSUMER owns and fux only seeds. Written when absent, never
+#: over an existing file, and deliberately **exempt from the template drift
+#: test**: this repo's own `.claude/settings.json` carries deny rules and hooks
+#: that are nothing to do with fux, and so will every real consumer's.
+#: SR-AGENT-SURFACES decision 6.
+CO_OWNED_SURFACES: frozenset[str] = frozenset(
+    {".claude/settings.json", ".codex/hooks.json"}
+)
+
+#: The one surface above that must be **executable** to do anything at all.
+#: A hook written 0644 fails silently: the runner reports nothing and the hint
+#: never appears.
+EXECUTABLE_SURFACES: frozenset[str] = frozenset(
+    {
+        ".claude/hooks/fux-index-hint.sh",
+        ".kiro/hooks/fux-index-hint.sh",
+        ".codex/hooks/fux-index-hint.sh",
+    }
+)
+
 AGENT_FILES: dict[str, tuple[tuple[str, str], ...]] = {
     # `fux-enrich` is **INVOKED, never ambient** (W-76 Phase 8) -- and the rule
     # is *never ambient*, which was never the same thing as *claude only*.
@@ -209,6 +338,7 @@ AGENT_FILES: dict[str, tuple[tuple[str, str], ...]] = {
         (".claude/skills/fux-decoder/SKILL.md", "DECODER-SKILL.md"),
         *_guide_skills(".claude/skills"),
         *((f".claude/rules/fux-{t}-files.md", f"rule-fux-{t}-files.md") for t in PATH_SCOPED_TOPICS),
+        *CLAUDE_SURFACES,
     ),
     "copilot": (
         (".github/agents/fux.agent.md", "fux.agent.md"),
@@ -240,6 +370,7 @@ AGENT_FILES: dict[str, tuple[tuple[str, str], ...]] = {
             (f".github/instructions/fux-{t}-files.instructions.md", f"fux-{t}-files.instructions.md")
             for t in PATH_SCOPED_TOPICS
         ),
+        *COPILOT_SURFACES,
     ),
     "kiro": (
         (".kiro/steering/fux-archived-results.md", "steering-fux-archived-results.md"),
@@ -256,6 +387,7 @@ AGENT_FILES: dict[str, tuple[tuple[str, str], ...]] = {
         *_guide_skills(".kiro/skills"),
         *((f".kiro/steering/fux-{t}-files.md", f"steering-fux-{t}-files.md") for t in PATH_SCOPED_TOPICS),
         *((f".kiro/steering/fux-{t}-guide.md", f"steering-fux-{t}-guide.md") for t in AUTO_GUIDE_TOPICS),
+        *KIRO_SURFACES,
     ),
     # **Codex is decision 3 EXERCISED, not amended** — *"adding a fourth is a
     # template plus a rendering plus a row, not a new decision"*. It costs no
@@ -276,7 +408,7 @@ AGENT_FILES: dict[str, tuple[tuple[str, str], ...]] = {
     # wrong?* — yes, and a skill has to be loaded to apply.
     # **`AGENTS_MD_VENDORS` below is the consequence**, and it is not optional.
     #
-    "codex": SHARED_SKILLS,
+    "codex": SHARED_SKILLS + CODEX_SURFACES,
 }
 
 #: Vendors whose ONLY always-on surface is the repo-root `AGENTS.md`.
@@ -444,59 +576,133 @@ _FUXIGNORE = """\
 """
 
 
-_CONFIG = """\
-# fux.toml -- POLICY, not corpus. What gets indexed is `.fux/sources/dirs` and
-# `.fux/sources/urls`, one entry per line.
-#
-# EVERY KEY, WHAT IT MEANS AND WHAT IT DEFAULTS TO IS IN ONE PLACE:
-#   https://github.com/arpitarya/fux/blob/main/records/0113_config.md
-# Ranking knobs are not here at all -- they live in .fux/tune.toml (SR-TUNE):
-#   https://github.com/arpitarya/fux/blob/main/records/0135_tuning.md
-#
-# This file does not explain its own keys, deliberately: a comment that
-# describes a key can drift from the record that decides it while both still
-# look correct (SR-LAW-0 decision 4). A key fux does not know is REFUSED by
-# name, so a typo here fails loudly instead of sitting inert.
+def _toml_scalar(value) -> str:
+    """One Python default as the TOML literal a consumer would have typed."""
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if isinstance(value, str):
+        return '"' + value.replace("\\", "\\\\").replace('"', '\\"') + '"'
+    if isinstance(value, (int, float)):
+        return repr(value)
+    if isinstance(value, (tuple, list)):
+        return "[" + ", ".join(_toml_scalar(v) for v in value) + "]"
+    raise TypeError(type(value).__name__)
 
-[sources]
-dirs_file = ".fux/sources/dirs"
 
-# Presence of this table enables URL ingestion. Nothing is fetched until a URL
-# is listed in .fux/sources/urls, and only `fux add <URL>` lists one.
-[sources.url]
-fetcher      = ".fux/fetchers/http.py"
-urls_file    = ".fux/sources/urls"
-meta         = "hashed"
-#update      = "auto"
+def fetcher_defaults(name: str) -> "dict[str, object]":
+    """A shipped fetcher's tunables and their current defaults — **read by
+    `ast`, never executed.**
 
-# REQUIRED, and may not be commented out: a repo that CAN fetch has to say how
-# hard, in a number a person can read. Comment it out and fux refuses to load.
-max_parallel = {default}
+    ⚠ **The fetchers are package data precisely so they are not imported**
+    (SR-CDP-FETCHER decision 8): `cdp.py` carries network code that has no
+    business running inside an offline package, and `fux setup` is the last
+    place that should launch a browser. So this parses the file and reads two
+    things statically: the `_SETTINGS` map (config key -> module global) and
+    the module-level assignment to each of those globals.
 
-# Passed to your fetcher's configure(); fux sorts this table by SHAPE, never by
-# meaning. A scalar here is shared and reaches every fetcher. A sub-table
-# reaches only the fetcher it names -- keep a fetcher-specific key there, or
-# the other fetcher is handed it and refuses the key it does not know.
-#[sources.url.config]
-#[sources.url.config.cdp]
-#cdp_port  = 9222
-#[sources.url.config.http]
-#timeout_s = 30
+    **Derived, never transcribed.** The alternative was typing the values into
+    `templates/fux.toml.txt`, and this repo has already paid for that once —
+    `_urls_header()` below carries the same lesson (W-140 row 18: the table was
+    transcribed and went stale).
 
-[index]
-shards = 256
+    A value whose default is not a plain literal is skipped rather than
+    guessed: a key absent from the scaffolded file falls back to the fetcher's
+    own constant, which is correct, where a wrong literal would not be.
+    """
+    import ast
 
-# Which agent vendors `fux setup` writes archived-results policy for. These
-# files land OUTSIDE .fux/ -- in .claude/, .github/, .kiro/ and AGENTS.md at the
-# repo root -- which is why the default is spelled out rather than left
-# implicit. Delete a name to stop installing it; [] installs none.
-[agents]
-install = ["claude", "codex", "copilot", "kiro"]
-""".format(default=DEFAULT_MAX_PARALLEL)
-#: ⚠ **`{default}` is interpolated, not typed** (W-83). The number in the
-#: written `fux.toml` and the number the engine actually applies are the same
-#: object, so the comment cannot drift from the behaviour the way the constant
-#: itself did before W-83 made it effective. `tests/test_setup.py` asserts it.
+    tree = ast.parse(template_bytes(name).decode("utf-8"))
+    globals_: dict[str, object] = {}
+    settings: dict[str, str] = {}
+    for node in tree.body:
+        if not isinstance(node, ast.Assign) or len(node.targets) != 1:
+            continue
+        target = node.targets[0]
+        if not isinstance(target, ast.Name):
+            continue
+        if target.id == "_SETTINGS" and isinstance(node.value, ast.Dict):
+            for k, v in zip(node.value.keys, node.value.values):
+                if isinstance(k, ast.Constant) and isinstance(v, ast.Tuple) and v.elts:
+                    first = v.elts[0]
+                    if isinstance(first, ast.Constant):
+                        settings[k.value] = first.value
+            continue
+        try:
+            globals_[target.id] = ast.literal_eval(node.value)
+        except (ValueError, SyntaxError):
+            continue  # a computed default -- the fetcher's own value stands
+    out: dict[str, object] = {}
+    for key, global_name in settings.items():
+        if global_name in globals_:
+            out[key] = globals_[global_name]
+    return out
+
+
+def url_config_tables() -> str:
+    """`[sources.url.config]` and one sub-table per shipped fetcher.
+
+    ⚠ **Two tables, because one was BROKEN for any repo using both** (Arpit,
+    2026-09-14). The single flat table went verbatim to every fetcher and each
+    `configure()` raises on a key it does not know, so `cdp_port` made
+    `http.py` refuse and `timeout_s` made `cdp.py` refuse. The scaffolded file
+    could only ever comment the block out, which is how it shipped.
+
+    The shared table stays, and stays **empty in the scaffold**: a key belongs
+    there only when every fetcher a repo loads knows it, and fux cannot know
+    that for a fetcher somebody writes tomorrow.
+    """
+    # ⚠ **"your fetchers", plural and open** (W-178, 2026-09-15). `fetch=` is a
+    # typed attribute now, so the set is whatever `.fux/fetchers/*.py` holds --
+    # the two below are the ones fux SHIPS, not the ones a repo may use. The
+    # per-table comments are correct as written; this block's wording is what
+    # used to imply the set was two.
+    lines = [
+        "# Handed to your fetcher's configure() verbatim; fux reads no key inside.",
+        "# A key at THIS level goes to every fetcher -- only put one here that all",
+        "# of yours know, because each configure() refuses a key it does not.",
+        "#",
+        "# One sub-table per fetcher, named after its file without `.py`. The two",
+        "# below ship with fux; add a table for any fetcher you drop into",
+        "# .fux/fetchers/ and name on a URL line with `fetch=<name>`.",
+        "[sources.url.config]",
+        "",
+    ]
+    for generated, template in sorted(FETCHERS.items()):
+        stem = generated.removesuffix(".py")
+        defaults = fetcher_defaults(template)
+        if not defaults:  # pragma: no cover - a fetcher with no tunables
+            continue
+        lines.append(f"# Only .fux/fetchers/{generated} receives these.")
+        lines.append(f"[sources.url.config.{stem}]")
+        width = max(len(k) for k in defaults)
+        for key in sorted(defaults):
+            lines.append(f"{key.ljust(width)} = {_toml_scalar(defaults[key])}")
+        lines.append("")
+    return "\n".join(lines).rstrip("\n") + "\n"
+
+
+def config_text() -> str:
+    """The scaffolded `fux.toml`, read out of the wheel like every other starter.
+
+    ⚠ **It was a triple-quoted constant in this module until 2026-09-14**
+    (Arpit: *"create a template for fux.toml file like others"*). It is now
+    `templates/fux.toml.txt`, beside `pii.toml.txt`, `refusals.toml.txt` and
+    the two fetchers — **read, never imported**, which for a `.toml` is a
+    statement about where it lives rather than about safety: a starter a
+    consumer is meant to read and edit belongs in a file they can open, not
+    inside a Python string where a stray quote is a syntax error in the engine.
+
+    ⚠ **`{default}` is SUBSTITUTED, not `.format`ted** (W-83's property, a
+    safer mechanism). The number in the written `fux.toml` and the number the
+    engine applies are the same object, so the file cannot drift from the
+    behaviour. `str.replace` rather than `str.format` **because the template is
+    now an editable file**: `format` would raise on any future `{` someone adds
+    to a comment, turning a doc edit into a broken `fux setup`.
+    `tests/test_setup.py` asserts the substitution happened.
+    """
+    text = template_bytes(CONFIG_TEMPLATE).decode("utf-8")
+    text = text.replace("{default}", str(DEFAULT_MAX_PARALLEL))
+    return text.replace("{url_config}", url_config_tables())
 
 def _urls_header() -> str:
     """The starter `.fux/sources/urls`, with its attribute table DERIVED.
@@ -508,16 +714,24 @@ def _urls_header() -> str:
     *"`fux update` re-fetches every line"*, which stopped being true when
     narrow-by-default landed (W-82 ruling 3) and again when `update=never` did.
     Every repo set up in between got both sentences committed into it.
+    ⚠ **The verb in that quote is `update` because that is what it SAID**; the
+    verb it names is `fux ingest` from 2026-09-15 (W-177), and a rename that
+    silently corrected the history would hide the defect this docstring exists
+    to record.
 
     `_seed_types` already had the rule: **derived, never transcribed**, so the
     file cannot disagree with the engine that wrote it.
     """
     from .ingest.sourcelist import URLS
 
-    pairs = [
-        (f"{a.name}={'|'.join(a.values) if a.values else '<duration>'}", a.default)
-        for a in URLS.attributes
-    ]
+    # 🔴 **The placeholder comes from the ATTRIBUTE now** (W-178, 2026-09-15).
+    # This line hardcoded `<duration>` for every attribute with no `values` —
+    # correct while `ttl` was the only typed one, and the moment `fetch` became
+    # typed it would have written `fetch=<duration>` into every repo `fux setup`
+    # touches. ⚠ **That is W-140 row 18 returning through the fix for it:** the
+    # header went stale by being transcribed, was repaired by being *derived*,
+    # and this was the derivation itself carrying the wrong constant.
+    pairs = [(a.spelling(), a.default) for a in URLS.attributes]
     width = max(len(spelling) for spelling, _ in pairs)
     table = "\n".join(f"#   {spelling:<{width}}  default {default}" for spelling, default in pairs)
     return f"""\
@@ -531,8 +745,8 @@ def _urls_header() -> str:
 #   https://wiki.corp/display/ENG/runbook  fetch=cdp  meta=hashed ttl=7d
 #
 # `fux add <URL>` writes a line here with every attribute stated, and fetches
-# that one URL once. `fux update` re-fetches the lines known to be stale --
-# `--all` every line, `--failed` the ones whose last run failed, and never a
+# that one URL once. `fux ingest` re-fetches the lines known to be stale --
+# `--refetch-all` every line, `--failed` the ones whose last run failed, and never a
 # line that says `update=never`. Those are the engine's two networked paths;
 # every other command is offline. See SR-URL-LIST.
 """
@@ -803,6 +1017,10 @@ def _write_agents(root: Path, report: SetupReport, agents: tuple[str, ...]) -> N
             before = len(report.written)
             _write_if_missing(path, agent_template_bytes(template), report, root)
             if len(report.written) > before:
+                # A hook written 0644 fails silently -- the runner reports
+                # nothing and the hint never appears. Decision 5.
+                if rel in EXECUTABLE_SURFACES:
+                    path.chmod(0o755)
                 # Recorded at the moment of writing, from the same branch that
                 # wrote it, so the announcement cannot drift out of step with
                 # the filesystem. Veto condition 1 is exactly this list being
@@ -1202,6 +1420,13 @@ def run(root: Path, *, agents: bool = True) -> SetupReport:
             directory / DECODERS_DIR / f"{name}.py", decoder_source(name), report, root
         )
 
+    # W-170 — the directory exists so a consumer can find it, with a README
+    # saying what goes in it. An empty directory git cannot commit would be
+    # indistinguishable from a fux too old to have observers.
+    _write_if_missing(
+        directory / OBSERVERS_DIR / "README.md", _OBSERVERS_README.encode("utf-8"), report, root
+    )
+
     _write_if_missing(root / DEFAULT_DIRS_FILE, _seed_dirs(root), report, root)
     _write_if_missing(root / DEFAULT_URLS_FILE, _urls_header().encode("utf-8"), report, root)
     # Header only, no patterns: an ignore file that arrives with guesses in it
@@ -1231,7 +1456,7 @@ def run(root: Path, *, agents: bool = True) -> SetupReport:
     # starter's safe rules arrive enabled; the consumer edits or empties them,
     # and a repo that already has the file keeps it -- empty or not.
     _write_if_missing(pii.rules_path(root), template_bytes(PII_TEMPLATE), report, root)
-    _write_if_missing(root / CONFIG_NAME, _CONFIG.encode("utf-8"), report, root)
+    _write_if_missing(root / CONFIG_NAME, config_text().encode("utf-8"), report, root)
     # Every key commented out, so a fresh repo runs on the engine's own
     # defaults and the file is a menu rather than a configuration (SR-TUNE
     # decisions 2 and 3). Write-if-missing like everything else here: this is

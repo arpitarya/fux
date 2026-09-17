@@ -102,6 +102,17 @@ OPERATING_GUIDES = frozenset(
     {f"{g}-SKILL.md" for g in (
         "SEARCH", "ANSWER", "GRAPH", "INDEX", "MAINTAIN", "MCP",
         "SOURCES", "CONFIG", "FETCHER", "PII",
+        # SR-INSPECT's guide. An operating guide like the ten above, and it
+        # points AT `fux-archived-results` rather than carrying the block —
+        # `inspect` reports statistics over a whole corpus and never hands a
+        # reader a document to act on, so there is no archived result in its
+        # output to misread.
+        "INSPECT",
+        # SR-ENRICH decision 19's guide. An operating guide, and it points at
+        # `fux-archived-results` as well as REFUSING to correct an archived
+        # document at all — *`supersedes` / `archived=` is the fix* is in its
+        # own Don't list, which is a stronger statement than the block's.
+        "CORRECT",
     )}
     | {f"steering-fux-{t}-files.md" for t in (
         "sources", "decoder", "enrich", "fetcher", "pii", "config", "index",
@@ -118,11 +129,56 @@ OPERATING_GUIDES = frozenset(
 )
 
 
+#: **The ACTING surfaces that are procedures or formatting, not policy**
+#: (SR-AGENT-SURFACES decision 3). A THIRD exemption, kept separate from the two
+#: above so none of them quietly absorbs another.
+#:
+#: A slash command is a procedure invoked deliberately by name; an output style
+#: is formatting. Neither states a position on how to read an archived result,
+#: and each points AT `fux-archived-results` — decision 2's reason again: a
+#: second copy of the block is a second thing to drift.
+#:
+#: 🔴 **`subagent-fux-researcher.md` is deliberately NOT here.** It is an agent
+#: that returns cited results, so decision 9's test — *does an agent that has
+#: never heard of Fux still need this sentence to avoid being wrong?* — answers
+#: yes, and it carries the block verbatim like any other rendering. The hook
+#: (`.sh`) and the seeded settings (`.json`) are not `*.md` and never reach this
+#: glob at all.
+ACTING_SURFACES = frozenset(
+    {
+        "command-fux-search.md",
+        "command-fux-answer.md",
+        "command-fux-verify.md",
+        "output-style-fux-cited.md",
+        # Copilot's prompt files are the same procedures with native frontmatter
+        # (SR-AGENT-SURFACES decision 3a). Same class, same exemption.
+        "copilot-prompt-fux-search.prompt.md",
+        "copilot-prompt-fux-answer.prompt.md",
+        "copilot-prompt-fux-verify.prompt.md",
+    }
+)
+
+
+def test_the_acting_surface_exemptions_are_deliberate():
+    """Pin the third escape hatch, the same way as the first two."""
+    from fux import setup as setup_mod
+
+    assert len(ACTING_SURFACES) == 7
+    assert not ACTING_SURFACES & NOT_A_POLICY_RENDERING
+    assert not ACTING_SURFACES & OPERATING_GUIDES
+    shipped = {tpl for files in setup_mod.AGENT_FILES.values() for _rel, tpl in files}
+    assert ACTING_SURFACES <= shipped, sorted(ACTING_SURFACES - shipped)
+    # the subagent is NOT exempt, and that is the point
+    assert "subagent-fux-researcher.md" not in ACTING_SURFACES
+
+
 def renderings() -> list[Path]:
     return sorted(
         p
         for p in AGENTS.glob("*.md")
-        if p.name not in NOT_A_POLICY_RENDERING and p.name not in OPERATING_GUIDES
+        if p.name not in NOT_A_POLICY_RENDERING
+        and p.name not in OPERATING_GUIDES
+        and p.name not in ACTING_SURFACES
     )
 
 
@@ -133,7 +189,7 @@ def test_the_operating_guides_are_deliberate():
     exempt a file that does not exist yet from a check it should face."""
     from fux import setup as setup_mod
 
-    assert len(OPERATING_GUIDES) == 36
+    assert len(OPERATING_GUIDES) == 38
     assert not OPERATING_GUIDES & NOT_A_POLICY_RENDERING
     shipped = {tpl for files in setup_mod.AGENT_FILES.values() for _rel, tpl in files}
     assert OPERATING_GUIDES <= shipped, sorted(OPERATING_GUIDES - shipped)
@@ -178,8 +234,16 @@ def test_the_block_is_substantial():
 
 
 def test_there_are_renderings_to_check():
-    """A vacuous pass is the failure mode this whole file exists to avoid."""
-    assert len(renderings()) == 5, [p.name for p in renderings()]
+    """A vacuous pass is the failure mode this whole file exists to avoid.
+
+    **Nine since 2026-09-14**, not five — the subagent shipped to all four
+    vendors once decision 3a corrected the Claude-only claim: `subagent-fux-researcher.md` is the
+    first ACTING surface to carry the policy, and it carries it for the reason
+    every other rendering does — it returns cited results, so an agent running
+    it can launder a retired design into plain prose exactly as a skill-driven
+    one can (SR-AGENT-SURFACES decision 3; SR-AGENT-POLICY decision 9's test).
+    """
+    assert len(renderings()) == 9, [p.name for p in renderings()]
 
 
 @pytest.mark.parametrize("path", renderings(), ids=lambda p: p.name)

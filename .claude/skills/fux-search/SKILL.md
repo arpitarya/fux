@@ -1,6 +1,6 @@
 ---
 name: fux-search
-description: Search the Fux index in depth with `fux ask` and `fux find` — flags, the --json fields, the confidence band (band, answerable, missing), --why, -q fusion, --expand for vocabulary gaps, and find's folder and phrase filters. Use when asked to "search the docs", "find where X is documented", "why did this rank", "fux ask returned nothing" or "narrow results to a folder". Read-only and offline; for exact line ranges use fux-answer.
+description: Search the Fux index in depth with `fux ask`, `fux find` and the frozen `fux lexical` baseline — flags, the --json fields, the confidence band (band, answerable, missing), --why, -q fusion, --expand for vocabulary gaps, and find's folder and phrase filters. Use when asked to "search the docs", "find where X is documented", "why did this rank", "fux ask returned nothing" or "narrow results to a folder". Read-only and offline; for exact line ranges use fux-answer.
 ---
 
 # Searching with `fux ask` and `fux find`
@@ -19,18 +19,38 @@ writes, and neither needs the network. Resolve the `fux` command first — see t
 | only documents containing an exact phrase | `fux find "<q>" --phrase "blue green deploy"` |
 | "why did this rank" / "why is X above Y" | `fux ask "<q>" --why --json` |
 | two ways of saying the same thing | `fux ask "<q>" -q "<other phrasing>" --json --band` |
-| the corpus probably uses different words | `fux ask "<q>" --expand "<words the doc would use>" --json --band` |
+| the corpus probably uses different words | `fux ask "<q>" --expand "<a passage YOU write — section 5a>" --json --band` |
 | is my result caused by repo config? | re-run with `--no-tune`, then with `--no-output-config` |
+| a frozen BM25F baseline to compare against | `fux lexical "<q>" --json` — §1a |
 | the exact lines that answer it | not here — `fux answer` (see `fux-answer`) |
+| fux served the wrong document and you know the right one | **propose** `fux correct "<q>" <doc>` in your reply and stop — see `fux-correct`. It writes committed files; never run it unasked |
 
 **Always pass `--band` when you will act on the result.** Without it the
 confidence block is not printed at all.
+
+## 1a · `fux lexical` — the frozen baseline, and when NOT to use it
+
+`fux lexical` ranks on **the words alone**: BM25F, then the proximity
+reranker, then RRF over any `-q` phrasings. **No graph stage, ever.** It takes
+every flag `ask` takes and returns `ask`'s exact output shape.
+
+- 🔴 **It is not a better `ask`, and it is not a faster one.** It is `ask`
+  **without the graph tier** — the two returned byte-identical output until
+  W-161 gave `ask` one, and they now legitimately differ.
+- **Reach for it only when you were asked for a baseline** — comparing a
+  ranking change, or checking whether a result came from the words or from
+  something else. For an ordinary question, use `ask`.
+- **It is frozen by contract.** A future component added to the lexical core
+  becomes a new verb or a tunable, never a change to this one. That is what
+  makes it usable as a baseline at all.
+- ⚠ **Do not report a `lexical` result as "what fux thinks".** If `ask` and
+  `lexical` ever differ, `ask` is the answer and the difference is the finding.
 
 ## 2 · Flags, verified
 
 | flag | `ask` | `find` | effect |
 |---|:-:|:-:|---|
-| `--json` | ✓ | ✓ | machine-readable payload; **prefer it** |
+| `--json` | ✓ | ✓ | machine-readable payload; **prefer it**. Every `ask` row below also holds for `fux lexical`, which takes `ask`'s whole flag surface |
 | `--top N` | ✓ | ✓ | max results (engine default 5; `.fux/output.toml` may change it) |
 | `--band` | ✓ | ✓ | emit the `confidence` block (JSON) or a `confidence:` line (stderr) |
 | `-q TEXT` / `--query TEXT` | ✓ | ✓ | another phrasing; repeatable; rankings fused by RRF |
@@ -53,7 +73,11 @@ turns one of those on, the only way back is `--no-output-config`.
 ```json
 {"results": [{"id": "file:docs/mesh.md", "title": "Service mesh", "loc": "docs/mesh.md",
               "score": 5.9021, "archived": false, "tie": false,
+              "boosted": true, "route": "#7 -> #2 via graph",
               "headings": ["Rollback procedure"]}],
+ "related": [{"id": "file:records/0111_ranking.md", "title": "SR-RANKING (0111)",
+              "loc": "records/0111_ranking.md", "mass": 0.0413,
+              "archived": false, "route": "#2 via ref"}],
  "confidence": {"band": "partial", "answerable": true, "missing": ["mtls"], "...": "..."},
  "fused": true, "path": "scan", "derivation": {"...": "..."}}
 ```
@@ -65,6 +89,9 @@ turns one of those on, the only way back is `--no-output-config`.
 | `headings` | `ask` unless `--no-sections`; `find` always | up to 3 committed headings matching the query; `[]` = none matched |
 | `tie` | always | `true`: this row's rounded score equals another candidate's, so its position came from the tie-break, not the ranking |
 | `archived` | always | retired source — follow the `fux-archived-results` policy |
+| `boosted` | always | `true`: the graph walk out of the top-k reached this document, so its position is a rank fusion and not the words alone |
+| `route` | always | `#7 -> #2 via graph` when the boost **moved** this row; `null` otherwise |
+| `related[]` | `ask`, unless `--no-related` or the tier is off | 🔴 **NOT results** — section 3a |
 | `confidence` | only with `--band` | section 4 |
 | `fused` | only with more than one phrasing | `score` is an RRF score |
 | `path` / `derivation` | only with `--explain` / `--why` | diagnostics |
@@ -75,6 +102,33 @@ is not band `none`; re-run with `--band`.
 **`headings` is your section pointer.** It is the finest unit `ask` can honestly
 give. Open the document and go to that heading, or use `fux answer` for lines.
 
+## 3a · 🔴 `related` is NOT a result, and `results` is NOT sorted by score
+
+Two things changed about `ask`'s shape and both can mislead you quietly.
+
+**`related` holds documents that matched NO query word.** They are there
+because the ranked results above **link** to them — the record a runbook points
+at, the decision a guide cites — which BM25F cannot retrieve at any depth,
+because it retrieves by shared vocabulary and there is none.
+
+- **Never cite one as a match.** Read it first (`fux answer`, or open the
+  `loc`), and when you use it **say you followed a link to it** rather than
+  found it. Its `route` names the result it came from and the edge kind.
+- `mass` is a walk statistic, **not a score**. It says how well connected the
+  document is to the answers, and nothing about whether it answers the
+  question. Do not compare it with a `score`; do not sort the two lists
+  together.
+- **Absent ≠ empty.** `[]` means *no neighbours*; an absent key means the tier
+  did not run — `--no-related`, `[graph] ask_related = false`, `fux lexical`,
+  or a repo with no `fux build`.
+
+**And `results` may not be in score order.** The boosted tier orders by
+`RRF(lexical rank, PPR rank)` while still printing BM25F, so row 2 can score
+higher than row 1. **If you re-sort by `score` you have thrown the graph away
+and re-derived the lexical ranking** — which is a legitimate thing to want, and
+`fux lexical` is the verb that returns it honestly. The rows that would move
+are exactly the ones carrying a `route`.
+
 ## 4 · The confidence block
 
 Checked top to bottom; the first true row wins.
@@ -83,8 +137,24 @@ Checked top to bottom; the first true row wins.
 |---|---|---|
 | `none` | nothing scored (`answerable: false`) | **abstain.** Say the index has nothing on it |
 | `partial` | a query term appears nowhere in the corpus (`missing` non-empty), or `doc_coverage` is below a non-zero `doc_coverage_floor` | answer, and **name the missing terms** — or retry (section 6) |
-| `weak` | `separation < separation_floor` — top two are near-tied | do not conclude; report the top candidates, or sharpen the query |
+| `weak` | `separation < separation_floor` — top two are near-tied (**`answerable: false`**) | **abstain.** Say *the documents don't say*, then name what was searched and the top candidates |
 | `grounded` | otherwise | use it and cite it |
+
+🔴 **`answerable: false` covers BOTH `none` and `weak`.** Branch on
+`answerable` and you are right for both; branch on `band == "none"` and you
+will answer every `weak` — which is what fux itself did until 2026-09-14, and
+four separate measured runs caught the symptom (20 of 20 unanswerable
+questions answered, twice; 0 abstentions of 124 on five golden rungs) without
+naming the cause.
+
+**What abstaining sounds like.** Not a hedge — a hedge is what you write when
+you have something to name, and `weak` means there is nothing:
+
+> The documents don't say. I searched for *<the query>*; the closest
+> documents are `<loc>` and `<loc>`, and the ranking could not separate them.
+
+⚠ **`partial` is the one you hedge on**, because its defect is nameable:
+answer, and say which of your terms appear in no document.
 
 - **`missing`** holds your own words, as typed, that no document contains. It is
   the field to surface to a human.
@@ -111,7 +181,43 @@ Checked top to bottom; the first true row wins.
   deeper fusion.
 - **`--expand`:** expansion terms score below your own words, and a document that
   matches **only** expansion terms is dropped. `missing` still describes your
-  question, not the expansion.
+  question, not the expansion. **You write the text — section 5a.**
+
+## 5a · `--expand` — YOU are the author, and what to write
+
+🔴 **Fux never writes the expansion. It cannot.** No fux path may call a model,
+so there is no `--auto-expand` and there never will be. **You are the model in
+this loop**: you write the text, fux scores it deterministically, and the
+receipt replays it. If you skip this, `--expand` does nothing.
+
+**Write a short passage that answers the question in the words the document
+would use — not a list of synonyms.** Two or three sentences, as if you were
+the document. Guessing wrong is cheap; a document matching only your words is
+dropped, so the floor is "no change", never a wrong citation.
+
+```console
+# the question uses "outage"; the document is titled
+# "checkout unavailable for 47 minutes" and never says "outage"
+
+fux ask "what caused the outage" --json --band \
+  --expand "Checkout was unavailable for 47 minutes. The payment service
+            returned 503 after a config rollout. Recovery was a rollback."
+```
+
+**Do it in this order:**
+
+1. Ask plainly first. Read `confidence.missing` — those are the words the
+   corpus does **not** have.
+2. Only if the band is `none` or `partial`, write the passage using what you
+   know of the corpus's own vocabulary (headings you have seen, `fux find`
+   output, the folder's house terms).
+3. Re-ask **once** with `--expand`. If it is still thin, report honestly — do
+   not keep rewriting the passage.
+
+⚠ **`-q` is a different tool and they do not combine into one mechanism.** Use
+`-q` when you know two real *phrasings* of the question (their rankings are
+fused by RRF); use `--expand` when you are guessing at the *document's*
+vocabulary (one ranking, extra terms at a discount).
 - **Results are deterministic** for the same index, tune file and working tree
   (with `[ranking] rerank_weight` above 0, the reranker reads local files).
   Retrying an identical command is wasted time.
@@ -124,9 +230,9 @@ match `rollback`, via stemming).
 
 | signal | next move |
 |---|---|
-| `No confident matches.` / band `none`, every term in `missing` | the corpus does not use these words — re-ask with the corpus's words, or add `--expand` |
+| `No confident matches.` on **stderr** / band `none`, every term in `missing` | the corpus does not use these words — re-ask with the corpus's words, or add `--expand` |
 | band `partial`, some terms in `missing` | replace or drop the missing term; keep the rest |
-| band `weak` | add the distinguishing term, or add a `-q` phrasing; if still `weak`, report the top 2–3 |
+| band `weak` | add the distinguishing term, or add a `-q` phrasing; **if still `weak`, abstain** — *the documents don't say* — and report the top 2–3 as candidates rather than as an answer |
 | right area, wrong folder | `fux find "<q>" --under <prefix> --top 20` |
 | the document you expect is not listed | raise `--top` — **filters never add results** |
 | `grounded` but low `doc_coverage` | check `headings`; the answer may need two documents |
@@ -165,8 +271,10 @@ With a tune file present, `--why` runs a second, untuned query.
 ## 8 · `find` in a pipe
 
 - **stdout is bare locations**, one per line. Every note goes to stderr.
-- ⚠ **`No confident matches.` is printed on stdout, exit 0.** Guard before
-  piping, or use `--json`, where the empty case is `{"results": []}`.
+- ✅ **`No confident matches.` goes to STDERR, exit 0** (since 2.1.0). stdout is
+  **empty** on the no-match path, so a pipe sees zero lines and needs no guard.
+  ⚠ **It was on stdout before that**, which is why older notes tell you to
+  `grep -qx` it out first; that guard is harmless and no longer needed.
 - **`url:` documents appear as URLs**; a pipe may receive both kinds.
 - Filters run **after** ranking, on the top `--top` results. A `[filter] … removed
   N` line on stderr says what went; the band still describes the unfiltered list.
@@ -174,8 +282,9 @@ With a tune file present, `--why` runs a second, untuned query.
   files, and **keeps** `url:` documents it cannot read offline.
 
 ```bash
+# stdout is paths or nothing, so `xargs` on an empty file is a no-op.
 fux find "retry policy" --under services/ --top 20 > hits.txt
-grep -qx "No confident matches." hits.txt || xargs grep -n "max_retries" < hits.txt
+xargs grep -n "max_retries" < hits.txt
 ```
 
 ## 9 · Defaults, paths, notes and exit codes
@@ -205,8 +314,10 @@ If a result carries `"archived": true`, follow the `fux-archived-results` policy
 - **Don't read a missing `confidence` key as `none`.** You forgot `--band`.
 - **Don't compare fused scores with single-query scores**, or any scores across queries or repos.
 - **Don't expect `--under`, `--phrase` or `--all` to surface more** — raise `--top`.
-- **Don't pipe `find` stdout without guarding** for the `No confident matches.` line.
-- **Don't answer from `weak` or `none`** and cite the returned files as if they said it.
+- **Don't parse stderr.** The no-match line lives there now, with every other note.
+- **Don't answer from `weak` or `none`** and cite the returned files as if they
+  said it. Both carry `answerable: false`, and it is a **refusal, not a low
+  score** — there is nothing to hedge with, so say *the documents don't say*.
 - **Don't re-run an identical query** hoping for a different ranking.
 
-Related skills: fux-usage, fux-answer, fux-graph, fux-sources, fux-index, fux-maintain, fux-config, fux-mcp, fux-fetcher, fux-pii, fux-decoder, fux-enrich, fux-archived-results.
+Related skills: fux-usage, fux-correct, fux-answer, fux-graph, fux-sources, fux-index, fux-maintain, fux-config, fux-mcp, fux-fetcher, fux-pii, fux-decoder, fux-enrich, fux-archived-results.

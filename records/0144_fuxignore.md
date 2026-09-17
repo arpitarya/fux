@@ -7,10 +7,10 @@ description: "Exclusion moves out of the source lists into one .gitignore-shaped
 status: accepted
 date: 2026-08-27
 feature: the `.fux/.fuxignore` exclusion file
-owns: [src/fux/ingest/fuxignore.py@ab3de0ea9c1c]
+owns: [src/fux/ingest/fuxignore.py@a21305b84b0b]
 laws: [L1, L3]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: ccde9b4105bd8453ebb19abc905fd7668d94998633712f592e445f6db0b77f53
+content_sha: 59d568152292035ae266e4595bdae7c8030dcb171bd76a8ad9135a5953f30b34
 ---
 
 # SR-FUXIGNORE — one file says what fux does not index
@@ -206,10 +206,48 @@ nothing for a decoder or an analyzer to read either way, so a switch here would
 only move the emptiness one layer down.
 
 **5. The `!` lines in `sources/dirs` still work, and `.fuxignore` is their new
-home.** They are not removed: `fux remove <path>` writes one (SR-DIR-LIST
-decision 2d), and a repo that has one must keep working. **A pattern stated in
-both places raises a warning** naming both `file:lineno` and saying which line to
-delete — the `dirs` one.
+home.** They are not removed, and a repo that has one must keep working. **A
+pattern stated in both places raises a warning** naming both `file:lineno` and
+saying which line to delete — the `dirs` one.
+
+**5a. And since 2026-09-14, `fux remove` WRITES here.** The migration
+Consequences called *"a migration we now owe"* is paid; veto condition 3 is
+discharged. The write path is `fuxignore.add_exclusion`, and four properties are
+the whole of it:
+
+| property | why it is load-bearing |
+|---|---|
+| **the line is ANCHORED — `/docs/a.md`, never `docs/a.md`** | a bare name in this grammar means *at any depth*, so `fux remove docs` would also have dropped `archive/docs` and `vendor/x/docs`. The removal nobody asked for, visible only as documents quietly missing from the next index. The leading `/` pins it to the frame `sources/dirs` entries are already written in |
+| **a directory gets a trailing `/`** | so a *file* of that name appearing later is not swept up by a line written about a directory |
+| **it goes BELOW the fux blocks, at the end** | last match wins here, so the end is the position that actually decides — and the same place a person editing by hand would write |
+| **a path a hand-written pattern already covers RAISES** | removing something already removed is an error, which is the contract the `!`-line form kept and a caller's exit code depends on. A second line that changes nothing is also a `duplicate_warnings` conflict fux created itself |
+
+⚠ **`fux add` needed a second guard in the same change, and this is the sharp
+edge.** `add` refused a path excluded by a `!` line in `dirs` — *"there is no
+un-exclude by design"* — and consulted **only that file**. Moving the write
+target here would have turned `add` into the un-exclude that refusal exists to
+prevent: `fux remove docs/a.md` then `fux add docs/a.md` writes a line that
+`.fuxignore` goes on beating, so the command reports success and indexes
+nothing. `cmd_add` now consults this file with `hand_only=True` and refuses with
+the pattern's `file:lineno`. **A moved write target is not a local change** — the
+reader on the other side of it had an assumption, and nothing mechanical was
+holding the pair together.
+
+**5b. A surviving `!` line is migrated by a person, never as a side effect.**
+`fux remove` on a path an existing `!` line already excludes **leaves that line
+exactly as it is** and raises. Rewriting it there would be a migration performed
+by a verb that was asked to remove something already removed, in a file the
+caller did not name. `fux doctor`'s **`dirs exclusions migrated`** row is where
+the move is offered — one line per survivor, with the anchored pattern to write
+instead, at a moment the reader chose.
+
+⚠ **That row is `warn` and never an error**, because `!` lines here keep being
+*read* ([SR-DIR-LIST](0120_dir-list.md) decision 2a). Failing on one would make
+`doctor` red for a repo that is working correctly, and the fix for red-by-default
+is people ignoring it. **It is also a different finding from the duplicate
+warning above:** that one needs the pattern in *both* files. This one fires on
+*every* survivor — including the ones nothing duplicates, which are precisely the
+ones no other check would ever mention.
 
 ⚠ **Amended 2026-09-11: the types half of this decision is gone.** It read *"the
 `!` lines in `sources/dirs` and `sources/types` still work"*. The types list is
@@ -369,9 +407,19 @@ same question.
 - **The file is now as long as the corpus is unindexable.** On this repo the
   `not indexed` block is in the hundreds of lines. Hand-written patterns are the
   lever: `__pycache__/` and `*.py[cod]` alone keep 257 lines out of it.
-- **We now owe a migration**: `fux remove` still writes `!` into `sources/dirs`
-  (SR-DIR-LIST decision 2d) when `.fuxignore` is the stated home for
-  exclusions. Filed in [`work/OPEN-WORK.md`](../work/OPEN-WORK.md).
+- ✅ **The migration is paid (2026-09-14, W-165 fix 1).** This bullet read *"we
+  now owe a migration: `fux remove` still writes `!` into `sources/dirs` when
+  `.fuxignore` is the stated home for exclusions"* from the day this record was
+  accepted. `fux remove` writes here now — decision 5a — and veto condition 3 is
+  discharged. **What the debt cost while it stood:** every exclusion a consumer
+  created for that period is a `!` line in the other file, in the spelling that
+  means the opposite thing, and no ingest will ever migrate one. Decision 5b is
+  why, and `fux doctor` is where each is named.
+- **The anchoring rule is a behaviour change a reader should expect.** The old
+  `!docs` in `sources/dirs` was a literal path-prefix match against that list's
+  own grammar; `/docs/` here is a gitignore pattern. They agree for every path
+  `fux remove` can be handed — and a *hand-written* `docs` in this file still
+  means any depth, which is the grammar and is not being changed.
 
 ### Alternatives considered
 
@@ -445,8 +493,11 @@ same question.
    file is the wrong shape and nesting has earned its cost.
 2. **`!` is measurably used to admit a format with no decoder**, i.e. the
    raw-bytes escape hatch has become a habit rather than an escape hatch.
-3. **`fux remove` still writes into `sources/dirs`** after this record says
-   `.fuxignore` is where exclusions live — the debt named in Consequences.
+3. ✅ **DISCHARGED 2026-09-14 — and kept as a condition, not deleted.**
+   `fux remove` no longer writes into `sources/dirs` (decision 5a). The check
+   below is the one that would catch a regression, so it stays: a veto that is
+   currently false is a condition still being checked, which is the whole point
+   of stating conditions rather than awaiting events.
 4. **The duplicate warning has fired on a repo where the two lines had already
    drifted apart**, which would make the warning too late and the case for an
    error.
@@ -463,8 +514,15 @@ same question.
 # 2 — a `!` line admitting something no decoder claims
 grep -n '^!' .fux/.fuxignore
 
-# 3 — the migration debt, open until this prints nothing
-grep -rn 'sources/dirs' src/fux/sources.py | grep -i 'exclu\|remove'
+# 3 — the exclusion write path is `.fuxignore` and nothing else.
+#     ⚠ The grep this replaced looked for the STRING `sources/dirs` near
+#     "remove" in sources.py, which stayed green through the whole debt and
+#     would have stayed green after it was paid: the path is reached through
+#     `list_path`, not spelled at the call site. It was a check that could
+#     not fire. This one exercises the verb.
+fux remove docs/some-covered-file.md --dry-run
+# expect: `would exclude /docs/some-covered-file.md` ... `in .fux/.fuxignore`
+git diff --stat .fux/sources/dirs     # must be empty after a real `fux remove`
 
 # 4 — duplicates, if any, with both line numbers
 fux ingest --list-skipped 2>&1 >/dev/null

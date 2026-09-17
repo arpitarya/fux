@@ -239,8 +239,8 @@ def test_measured_run_declares_blind_or_informed(run: Path) -> None:
     got = str(meta.get("classification", "")).strip().lower()
     assert got in CLASSIFICATIONS, (
         f"{run.name}: report needs `classification: blind` or `classification: informed` "
-        f"in its frontmatter, got {got or 'nothing'!r}. See CLAUDE.md "
-        "(§Conformance runs) and SR-RS decision 11. A run whose artifacts were "
+        f"in its frontmatter, got {got or 'nothing'!r}. See "
+        "SR-RS decisions 10a and 11. A run whose artifacts were "
         "authored with the evaluation queries in hand produces a number that looks "
         "exactly like a clean one -- the label is the only thing that separates them. "
         "If this is a surface capture, say so in the report and the rule does not apply."
@@ -301,7 +301,7 @@ def row_runs() -> list[Path]:
 def test_measured_run_files_its_per_query_rows(run: Path) -> None:
     found = sorted((run / "evidence").rglob("*.jsonl")) if (run / "evidence").is_dir() else []
     assert found, (
-        f"{run.name}: no per-query rows under evidence/. CLAUDE.md (§Conformance runs), "
+        f"{run.name}: no per-query rows under evidence/. SR-RS decision 15, "
         "ruled by Arpit 2026-08-28 -- one row per query per arm, pass/fail, written as "
         "the run goes. A summary count is not enough and never was: nobody, including "
         "the author, can re-test a paired result from totals. If this run genuinely has "

@@ -41,6 +41,12 @@ const ROOTS = ["cli", "mcp"];
 //: the question of WHICH chain the others walk.
 export const CLI_VERBS = {
   ask: ["band", "top", "explain", "sections"],
+  //: 🔴 **`ask`'s keys exactly.** `fux lexical` is frozen byte-identical to
+  //: `ask` (SR-CLI decision 12), and a verb absent from this table has no key
+  //: resolved at all — which on the Python side printed `ask` with `§` heading
+  //: lines and `lexical` without them, from one ranking. Same table, same
+  //: reason, both readers.
+  lexical: ["band", "top", "explain", "sections"],
   find: ["band", "top"],
   answer: ["band", "no_refer", "journal"],
   explain: [],
@@ -49,8 +55,45 @@ export const CLI_VERBS = {
   doctor: [],
   hooks: [],
   daemon: [],
-  update: [],
+  //: `ingest` is PYTHON-ONLY as a verb (this reader never writes an index) and
+  //: is declared for the same reason `inspect` and `correct` below are: this
+  //: table is what `.fux/output.toml` may SAY, not a verb list, so a repo whose
+  //: file carries `[cli.json] ingest = true` must validate on both readers.
+  //: ⚠ **It was `update: []` until 2026-09-15** — W-177 deleted that verb and
+  //: `fux ingest` absorbed `--check --json`, which is the key this row exists
+  //: to make resolvable (SR-CLI decision 16).
+  ingest: [],
+  //: `inspect` is PYTHON-ONLY as a verb (its dictionary build re-tokenises
+  //: the sources, which is an ingest-side job Node has no home for yet) and
+  //: is still declared here, because this table is not a verb list — it is
+  //: what `.fux/output.toml` is allowed to say. A repo whose file carries
+  //: `[cli.json] inspect = true` must VALIDATE on both readers, or the same
+  //: committed config is legal for one and an error for the other.
+  inspect: [],
+  //: `correct` is PYTHON-ONLY as a verb (it writes committed files and this
+  //: reader never writes) and is declared for the same reason `inspect` is:
+  //: this table is what `.fux/output.toml` may SAY, so a repo whose file
+  //: carries `[cli.json] correct = true` must validate on both readers.
+  correct: [],
 };
+
+//: 🔴 **The one verb that reads ANOTHER verb's subtable**, and it is a fact
+//: about the freeze rather than a convenience (W-160). `fux lexical` is frozen
+//: byte-identical to `fux ask`, so a consumer's committed `output.toml` must
+//: not be able to make the two differ — `[cli.lexical] sections = false`
+//: beside `[cli.ask] sections = true` would do exactly that, silently, with
+//: both files valid. Giving `lexical` its own subtable would also have made
+//: every repo that already has an `output.toml` exit 1 on a verb they had
+//: never run, because `explain` is refused at the shared `[cli]` level by name.
+//: **One entry, no mechanism**; a second needs its own reason beside the first.
+//: Twin of `output_config.VERB_READS`.
+export const VERB_READS = { lexical: "ask" };
+
+/** Whose `[cli.<verb>]` subtable this verb resolves through. Identity for
+ *  every verb but `lexical`. A function so both resolvers walk one answer. */
+export function subtableFor(verb) {
+  return VERB_READS[verb] ?? verb;
+}
 
 //: `[mcp]`'s closed key set. `top` only. No `json` (an MCP result is always
 //: JSON) and no `band` (the confidence block is unconditional there).
@@ -133,7 +176,7 @@ export class OutputDefaults {
     }
     if (cliValue !== null && cliValue !== undefined) return Boolean(cliValue);
     if (this.bypass) return Boolean(BUILT_IN.json);
-    const perVerb = this.jsonVerb[verb] ?? {};
+    const perVerb = this.jsonVerb[subtableFor(verb)] ?? {};
     if ("enabled" in perVerb) return Boolean(perVerb.enabled);
     if ("enabled" in this.jsonShared) return Boolean(this.jsonShared.enabled);
     throw new FuxError(
@@ -157,17 +200,18 @@ export class OutputDefaults {
     }
     if (cliValue !== null && cliValue !== undefined) return cliValue;
     if (this.bypass) return BUILT_IN[key];
+    const table = subtableFor(verb);
     if (asJson) {
-      const perVerb = this.jsonVerb[verb] ?? {};
+      const perVerb = this.jsonVerb[table] ?? {};
       if (key in perVerb) return perVerb[key];
       if (key in this.jsonShared) return this.jsonShared[key];
     }
-    const perVerb = this.cliVerb[verb] ?? {};
+    const perVerb = this.cliVerb[table] ?? {};
     if (key in perVerb) return perVerb[key];
     if (key in this.cliShared) return this.cliShared[key];
     const where = asJson
-      ? `[cli.json.${verb}], [cli.json], [cli.${verb}] or [cli]`
-      : `[cli.${verb}] or [cli]`;
+      ? `[cli.json.${table}], [cli.json], [cli.${table}] or [cli]`
+      : `[cli.${table}] or [cli]`;
     throw new FuxError(
       `${OUTPUT_NAME} does not set \`${key}\` for \`${verb}\` — add it under ` +
       `${where} (e.g. \`${key} = ${JSON.stringify(BUILT_IN[key])}\`). Run \`fux output\` to ` +

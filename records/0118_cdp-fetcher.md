@@ -10,7 +10,7 @@ feature: "`.fux/fetchers/cdp.py` — the reference fetcher for documents behind 
 owns: []
 laws: [L1, L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 9c68aa761d443ddbfe12873146c1fcf7e2628a58a40ce29ccaca672ea9808f73
+content_sha: ec1f14f5fd21d0f8e8016991d8ba571d8fa910762d73c86a54309705a50aaa0a
 ---
 
 # SR-CDP-FETCHER — the browser fetcher
@@ -488,7 +488,7 @@ in [the filed fixture](../work/regression/2026-08-18-ingest-and-index/report.md)
 The lifecycle is the real thing; only the transport differs:
 
 ```console
-$ fux update
+$ fux ingest
   [fetcher] configure({'greeting': 'hello'})
   [fetcher] connect()
   [fetcher] close()
@@ -535,6 +535,45 @@ $ uv run pytest -q tests/ingest/test_cdp_fetcher.py
 27 passed in 0.04s
 ```
 
+**`cdp_port` — and every other key here — can come from the environment or a
+`.env`, and those BEAT `fux.toml`** (Arpit, 2026-09-14: *"cdp_port define it in
+a way that it can pick values from .env file also"*).
+
+```
+1. the process environment          FUX_CDP_PORT=9333 fux ingest
+2. .env at the repo root            FUX_CDP_PORT=9333
+3. [sources.url.config.cdp]         cdp_port = 9333
+4. the module default               CDP_PORT = 9222
+```
+
+- 🔴 **The environment beats the file, and reversing that would make the
+  feature pointless.** `fux.toml` is **committed**: one `cdp_port` in it pins
+  every machine that clones the repo, and the debugging port a person's
+  signed-in Chrome happens to be on is the most machine-specific value this
+  fetcher has. It became urgent the moment the scaffolded `fux.toml` started
+  writing `cdp_port = 9222` live ([SR-DOTFUX](0102_fux-directory.md)) — before
+  that the key was absent and the default simply applied.
+- **One mechanical rule, no table of special cases:** `FUX_` + the config key
+  upper-cased. `cdp_port` → `FUX_CDP_PORT`, `launch_chrome` →
+  `FUX_LAUNCH_CHROME`. Derived from `_SETTINGS`, so a key added there gets an
+  override without a second list to update.
+- ⚠ **`bool` is coerced HERE, not by `_SETTINGS`.** `bool("false")` is `True`,
+  which for `FUX_LAUNCH_CHROME=false` would launch a signed-out Chrome and
+  return login pages for everything — the exact failure `LAUNCH_CHROME = False`
+  exists to prevent. `1/true/yes/on` and `0/false/no/off`, anything else raises.
+- **Only `FUX_`-prefixed names are read from `.env`, and no value is ever
+  logged.** A `.env` is where people keep secrets; this file has no business
+  seeing the rest of it, and a test asserts it rather than trusting the comment.
+- **The parser is deliberately small** — `KEY=value`, `#` comments, optional
+  `export`, optional quotes. No interpolation, no multi-line values: a `.env`
+  needing those is one this should not be guessing at. Stdlib only, so
+  [L1](0003_LAW-1-zero-cost.md) is untouched — no `python-dotenv`.
+- **The root is found by walking up for `fux.toml` or `.git`**, so running
+  `fux` from a subdirectory still finds the repo's `.env`.
+- ⚠ **No determinism question.** None of these keys reaches a committed byte:
+  they decide *how to reach* Chrome, never what a document says.
+  [L3](0005_LAW-3-deterministic.md) is unaffected.
+
 ### Consequences
 
 - **A browser must exist on the machine that ingests.** Fine for a developer
@@ -562,7 +601,7 @@ $ uv run pytest -q tests/ingest/test_cdp_fetcher.py
   guards it.
 - ⚠ **Decision 7 caps it at one worker, so a large URL list on `fetch=cdp` is
   strictly sequential** — the honest cost of a shared session, stated rather
-  than discovered when someone wonders why `fux update` is slow.
+  than discovered when someone wonders why `fux ingest` is slow.
 
 ### Alternatives considered
 

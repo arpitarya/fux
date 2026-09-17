@@ -228,6 +228,61 @@ has the network but not the key, the device has the key but not the network.
 
 ---
 
+## Two test invocations that fail for reasons that are not failures (2026-09-14)
+
+**Both are surface quirks and neither is a defect in the code**, which is why
+they live here rather than in `CLAUDE.md` (W-173).
+
+| you typed | what happens | what to type |
+|---|---|---|
+| `node --test node/test` | `MODULE_NOT_FOUND` | `node --test node/test/*.test.mjs` |
+| a hand-built test repo with no `.fux/pii.toml` | **every CLI verb refuses**, `ingest` included | `: > .fux/pii.toml` — an empty file is enough |
+
+🔴 **`node --test node/test` reads as a test failure and is not one.** Without
+the glob, Node resolves the bare directory as a **module path** rather than as a
+test directory, so it reports a missing module — and a session that has just
+changed the Node reader reads `MODULE_NOT_FOUND` as *I broke the reader*.
+
+**The `pii.toml` refusal is by design** — [SR-PII](../records/0148_pii.md)
+decision 17: a repository with no ruleset does not get to index anything, and
+the gate sits before dispatch so a verb added later is covered without anyone
+remembering. It costs one line in every fixture that builds a repo by hand, and
+the alternative is a repo that silently indexes with no redaction policy.
+
+⚠ **A test file that predates the rule is the likeliest thing to trip it**, and
+the symptom is the same refusal on every verb rather than a message about
+fixtures.
+
+## `python3` on Arpit's Mac is 3.9, and `bench.py report` needs 3.11 (2026-09-16)
+
+**Found at the end of a benchmark run**, which is the worst place for it.
+
+```console
+$ python3 -V
+Python 3.9.6                       # the system interpreter, /usr/bin/python3
+$ python3 bin/bench.py report --dest <fux>/work/regression/<run>
+  File ".../bin/report.py", line 120, in _arms_toml
+    import tomllib
+ModuleNotFoundError: No module named 'tomllib'
+```
+
+🔴 **Every other `bench.py` subcommand runs fine on 3.9.** `prepare`, `latency`,
+`hits`, `answers`, `rankdiff` and `file` all work — so the failure lands
+**after** several minutes of measurement, on the one step that produces the HTML,
+and it reads as a broken harness rather than a wrong interpreter.
+
+**The evidence is already written when it fires**, so nothing is lost. Re-run
+that one line with any 3.11+ interpreter:
+
+```bash
+~/my_programs/fux/.venv/bin/python bin/bench.py report --dest <fux>/work/regression/<run>
+```
+
+⚠ **Do not "fix" it by running the whole harness under fux's venv.** The arms
+have their own venvs on purpose — `arms/A/venv` is `fux-engine` 1.0.0 and
+`arms/B/venv` is 2.0.1 — and `bench.py` shells into them. The driver's
+interpreter only has to be new enough to read a TOML file.
+
 ## macOS vs CI — the case-insensitivity trap
 
 The macOS filesystem is case-**insensitive**. A link written as

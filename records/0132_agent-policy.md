@@ -7,10 +7,10 @@ description: "Fux's readers are AI agents, and an engine whose output is misread
 status: accepted
 date: 2026-08-22
 feature: the agent-facing policy and skill artifacts Fux ships, and their installer
-owns: [src/fux/templates/agents@c4cf58405e78]
+owns: [src/fux/templates/agents@2b5e9319349f]
 laws: [L1, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 13581ccbd50e2def528b83966326b198459ead5faf4a4d7c1221ea21715b495e
+content_sha: 51653954eb20ddaa5c204bf3e624881a28b48ab6e7178218b9df5f521976de5f
 ---
 
 # SR-AGENT-POLICY — shipping the policy, not just the facts
@@ -508,11 +508,21 @@ skills … for Claude, Codex and Copilot as well"*; on being shown decision 9,
 9a and veto 5b, he chose **all** of: skills, Kiro steering, and steering for the
 committed-write topics too).
 
+**15d. A FOURTH kind since 2026-09-14 — the acting surfaces.** `CLAUDE_SURFACES`
+adds a hook, a seeded `settings.json`, three commands, a subagent and an output
+style, Claude-only. **The word for all of them, and the taxonomy that separates
+instructing from acting, is [SR-AGENT-SURFACES](0155_agent-surfaces.md)** —
+stated there once, and not restated here. This record keeps what it always
+owned: the vendor roster, the opt-out, the announcement, and byte agreement.
+⚠ Two of the new surfaces do not behave like the three kinds below:
+`.claude/settings.json` is **co-owned** (seeded, never overwritten, exempt from
+the drift test) and the hook is **executable or inert**.
+
 **15a. What ships.** Three kinds, each from hand-written templates:
 
 | kind | count | destinations | loads |
 |---|---|---|---|
-| **guide skills** — `fux-search`, `fux-answer`, `fux-graph`, `fux-index`, `fux-maintain`, `fux-mcp`, `fux-sources`, `fux-config`, `fux-fetcher`, `fux-pii` | 10 templates | every vendor's skill surface, byte-identical (decision 10) — three directories since decision 16 | on a description match, or when invoked |
+| **guide skills** — `fux-search`, `fux-answer`, `fux-graph`, `fux-index`, `fux-maintain`, `fux-mcp`, `fux-sources`, `fux-config`, `fux-fetcher`, `fux-pii`, `fux-inspect` | 11 templates | every vendor's skill surface, byte-identical (decision 10) — three directories since decision 16 | on a description match, or when invoked |
 | **path-scoped pointers** — `sources`, `decoder`, `enrich`, `fetcher`, `pii`, `config`, `index` | 7 topics × 3 templates | `.kiro/steering/fux-<t>-files.md` (`fileMatch`), `.claude/rules/fux-<t>-files.md` (`paths:`), `.github/instructions/fux-<t>-files.instructions.md` (`applyTo:` explicit globs) | when the agent works on that plane's own files under `.fux/` or `fux.toml` |
 | **Kiro auto guides** — `usage`, `search`, `answer`, `graph`, `mcp` | 5 templates | `.kiro/steering/fux-<t>-guide.md` (`inclusion: auto`) | on a description match |
 
@@ -520,6 +530,16 @@ committed-write topics too).
 `setup.GUIDE_SKILLS`, `PATH_SCOPED_TOPICS` and `AUTO_GUIDE_TOPICS` are the
 roster; `AGENT_FILES` expands them, so the table is still the whole of the
 routing.
+
+⚠ **`fux-inspect` joined on 2026-09-14 ([SR-INSPECT](0156_inspect.md)), and it
+is the first guide whose verb writes nothing at all** — not a committed file,
+not a gitignored one a consumer decides about. It still gets **no path-scoped
+pointer and no Kiro auto guide**, and the reasons are 15d's two halves read the
+other way round: a pointer fires while an agent is in one of fux's own committed
+files and `inspect` touches none, and an auto guide fires on a description
+match, which would have an agent volunteering critiques of a corpus nobody
+asked it about. **A read-only verb is not automatically ambient-safe**, which is
+the sentence this roster would otherwise invite somebody to assume.
 
 **15b. A pointer is rules plus a skill name, never a procedure.** Each ends
 `Full procedure: the <skill> skill.`, names a skill its own vendor receives, and
@@ -554,7 +574,7 @@ ruling.** On a Kiro CLI that ignores `fileMatch`, the `fux-decoder-files` and
 `fux-enrich-files` pointers enter every request. What bounds it: they carry no
 procedure, they say *only when a human asked*, and they are byte-bounded.
 
-**15e. Codex gets the ten skills and no pointer.** It has no path-scoped
+**15e. Codex gets every guide skill and no pointer.** It has no path-scoped
 surface: its always-on context is `AGENTS.md`, and a nested `AGENTS.md` loads
 only on the path from the working directory up, so one under `.fux/` would
 almost never load. `AGENTS.md` is **not** grown to list the guides — veto 6.
@@ -571,7 +591,7 @@ it states behaviour rather than linking a record — the same shape
 from the code, not from the records**, and cross-checking them turned up
 disagreements between records and code, and defects in the code, filed in
 `work/OPEN-WORK.md` rather than papered over here. Where a guide names a
-workaround for a defect (`fux add <URL> --no-update`, `fux update --failed`, a
+workaround for a defect (`fux add <URL> --no-update`, `fux ingest --failed`, a
 URL citation the shipped fetchers cannot verify), **fixing the defect must edit
 the guide in the same change** — the templates ship in the same wheel as the
 code. Nothing enforces that; this sentence is the guard.
@@ -691,7 +711,65 @@ since decision 11.
 row still fails even though Copilot writes the same paths.
 
 
+**Two guide skills changed with the code they describe** (W-174, 2026-09-14) —
+`CONFIG-SKILL.md` and `ANSWER-SKILL.md`, edited as **templates** and re-rendered
+to all three skill surfaces, per decision 15.
+
+- `fux-config` gains `fetch_at_answer`, a three-row table separating it from
+  `ttl` and `update=never`, and the `--no-refer` distinction.
+- `fux-answer` gains the sentence that matters at citation time: under
+  `fetch_at_answer = false`, **`as-ingested` is the normal verdict and the
+  source was never asked**, so an agent must not report it as unreachable.
+- 🔴 **A live defect went with it.** `fux-config` told agents *"any other
+  unknown key is silently ignored"* — wrong since
+  [SR-CONFIG](0113_config.md) decision 14 made unknown keys refuse by name. An
+  agent reading it would have assured a consumer that a typo in `fux.toml` was
+  harmless. Fixed in the same change as the feature, which is the rule.
+
+**The three search guides carry the two-tier `ask`** (W-161).
+
+`SEARCH-SKILL`, `ANSWER-SKILL` and `GRAPH-SKILL` gain the tier, and each says
+the part its own reader will get wrong:
+
+| guide | what it had to say |
+|---|---|
+| **search** | `related` is not a result, and **`results` is not sorted by `score`** — a consumer re-sorting by score has thrown the graph away and re-derived the lexical ranking |
+| **answer** | `answer` can cite a document **no query word matched**, the citation is still verified, **but the band describes the lexical tier only** |
+| **graph** | `ask` already walks one hop, so check `related` first; `graph` is for the other edge kinds, more hops, or seeds you name — and the two are **different walks** |
+
+⚠ **All four copies move together.** The template under
+[`src/fux/templates/agents/`](../src/fux/templates/agents/) is the source, and
+`.claude/`, `.agents/` and `.kiro/` are checked byte-equal against it by
+`tests/test_setup_agents.py`. Editing one copy and shipping is the drift that
+test exists for — and it caught exactly that here, three times, once per
+directory.
+
+
+⚠ **Two shipped skills changed with the surface, twice in one day**
+(2026-09-15). `fux-sources` and `fux-maintain` follow W-177 (`fux update` is
+deleted; a bare `fux ingest` fetches and `--no-fetch` is the offline form), and
+`fux-sources` and `fux-fetcher` follow W-178 (`fetch=` is a name, not an enum).
+
+🔴 **A skill that describes a deleted verb is worse than one that describes
+nothing**, because an agent acts on it: `fux update --check` in a pipeline is a
+non-zero exit that reads as the runner breaking, not as a rename. The templates
+are the source and this repository's own `.claude/`, `.agents/` and `.kiro/`
+copies are rendered from them —
+`tests/test_setup_agents.py::test_this_repos_own_agent_files_still_match_the_templates_that_ship`
+is what stops the two drifting, and it is the check that caught both renders
+here.
+
 ### Consequences
+
+- ✅ **The retired skill folders are REPORTED (2026-09-14, W-163).**
+  `fux doctor`'s `retired agent folders` row names `.codex/skills/` and
+  `.github/skills/` when a repo set up before decision 16 still has them.
+  🔴 **The DUPLICATE is the defect, not the unread folder.** Copilot reads
+  `.agents/skills/` **and** `.github/skills/`, so every skill appears twice and
+  the older copy is free to disagree with the newer one while both read as
+  correct. **Delete is the whole remedy**, which is why this is a row and not a
+  rewrite: the folder may hold files fux never wrote, and removing a directory it
+  did not create is not something `fux setup` has ever been allowed to do.
 
 - ⚠ **Fux owns FOUR third-party formats it does not control.** This is a real
   maintenance liability and it is not hypothetical: **between drafting these

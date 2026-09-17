@@ -7,11 +7,11 @@ description: "One record owns the health-check surface. Every check names a caus
 status: accepted
 date: 2026-09-11
 feature: "`fux doctor` — the read-only, offline health command and its check register"
-owns: [src/fux/doctor.py@e924a085d794]
+owns: [src/fux/doctor.py@01e9eff0f0c6, tests/test_doctor_register_is_complete.py@6c3d2378d45f]
 laws: [L4, L8]
 ratifies: "Arpit, 2026-09-11 — *create a new adr for doctor*"
 timestamp: 2026-09-11T00:00:00Z
-content_sha: 08d16a08b165379235c6b8c7f8361b54dee46121ef3d87191565a4c967b960d8
+content_sha: fa5d8c1a22788acd54f313c0113b7c718b51d48470d4cb80814825fa550121d0
 ---
 
 # SR-DOCTOR — the health command, and who owns its rows
@@ -157,18 +157,35 @@ authoritative about the row.**
 | `.fux/ writable` | error | the directory can be created and written | [SR-DOTFUX](0102_fux-directory.md) |
 | `index not gitignored` | error | a `.fux/*` blanket silently eating the committed index | [SR-DOTFUX](0102_fux-directory.md) |
 | `.fux/ layout declared` | warn | undeclared entries at `.fux/`'s top level | [SR-DOTFUX](0102_fux-directory.md) |
+| `index temp files ignored` | warn | `.fux/index/<shard>.jsonl.tmp` not gitignored — a background re-index leaves it in the **committed** index plane for the duration of a rename, and a `git add -A` running at that moment dies `unable to stat`. ⚠ **The row exists because the fix cannot reach the repos that need it**: `.fux/.gitignore` is write-if-missing (decision 11) | [SR-DOTFUX](0102_fux-directory.md) decision 6c |
 | `pii rules` | **error** when absent | a missing `.fux/pii.toml`; otherwise compiles every pattern offline and states the scope. ⚠ It cannot see an over-broad rule and says so — only [`tools/pii-probe/`](../tools/pii-probe/) can | [SR-PII](0148_pii.md) decision 17 |
 | `acquired plane` | warn, **error** on gitignore | blob count, total bytes, the 80 %-of-cap warning, and the gitignore assertion | [SR-ACQUIRED](0145_acquired-plane.md) |
+| `pinned url bytes` | warn | with `[sources.url] fetch_at_answer = false`, the listed urls with no retained bytes — every citation from those is `unverified` | [SR-URL-FRESHNESS](0147_url-freshness.md) decision 16 |
+| `fetcher config tables` | **error** | a `[sources.url.config.<name>]` sub-table naming no `.py` in the fetchers directory — its keys reach no fetcher at all | [SR-CONFIG](0113_config.md) decision 8a |
+| `fetcher bindings` | **error** | a URL line whose `fetch=<name>` names no `.py` in the fetchers directory — every fetch through it fails at ingest time, on somebody else's machine. **The mirror of `decoder bindings`**, and the price of `fetch=` being an open set: a typo parses now ([SR-URL-LIST](0116_url-list.md) decision 15). ⚠ **It reads the LIST, not the index** — the opposite choice from `decoder bindings` and right for a different reason: a binding is interesting when it matches no *document*, a fetcher name is wrong when it matches no *file*, and that is true the moment the line is written | [SR-URL-LIST](0116_url-list.md) decision 15 |
+| `observers` | warn | a file in `.fux/observers/` that **did not fire on the last run** — it raised or exceeded `[observe] max_ms`. Named because the dispatcher is fail-open by design, so a dead observer is silent and every query still looks perfect. `not yet observed` in a repo that has never answered a query is a state, not a finding | [SR-OBSERVE](0157_observe.md) decision 7 |
+| `correction pins` | warn | a `fux correct --pin` that is **silently not applying** — its document changed since the pin was made, or left the corpus. Named because a suspended pin is invisible at query time: the query just ranks normally | [SR-ENRICH](0137_enrich.md) decision 19 |
 | `refusal rules` | warn, **error** when the file will not parse | how many rules load, how many responses each has refused, and **the rules that have never fired** — what a typo'd condition looks like | [SR-REFUSAL](0146_refusals.md) decision 11 |
 | `decoder bindings` | warn, **error** when the registry will not build | the one binding fault no ingest can catch: a `[decoders]` binding on an extension **no indexed document has** | [SR-DECODE](0139_decode.md) |
 | `recency prior` | warn | whether any document carries an `mtime` — a corpus copied out of its git repository loses every one | [SR-INGEST](0106_ingest.md) |
 | `freshness verdicts` | warn | `freshness_counts` and `AS_INGESTED_VETO_SHARE` — the veto instrument, shared verbatim with SR-ACQUIRED's identical one so the quarter has one home | [SR-URL-FRESHNESS](0147_url-freshness.md) |
 | `ranking priors` | warn | every prior that is wired, reads its input and multiplies by one — **and the count of documents it would have acted on**. It refuses to recommend a value | [SR-ARCHIVED-CONTENT](0134_archived-content.md) · [SR-TUNE](0135_tuning.md) |
 | `output.toml present` | warn | absent means every output default is the engine's own and none can be changed | [SR-OUTPUT](0143_output-defaults.md) decision 20 |
+| `tune.toml loads` | warn, **error** when the file will not parse | 🔴 **A broken `.fux/tune.toml` left doctor GREEN until 2026-09-11** (W-140 row 13), which is the worst shape for this file: `fux ingest` reads only `[index]`, so a bad ranking knob does not stop an ingest by design (SR-TUNE decision 13) while `ask`, `find` and `answer` refuse. The repo indexes cleanly, every row is fine, and every query fails. ⚠ **Absent is NOT an error** — that is a repo running engine defaults. It calls `tune.load` rather than re-parsing: a second parser answers a question the real one does not ask | [SR-TUNE](0135_tuning.md) decision 13 |
 | `types list usable` | error | a types list with no live pattern — `read_types` refuses it, so ingest stops | [SR-TYPES](0128_types-list.md) decision 10 |
 | `fuxignore usable` | warn, **error** when the patterns will not parse | the `.fuxignore` patterns parse, and duplicates | [SR-FUXIGNORE](0144_fuxignore.md) |
+| `dirs exclusions migrated` | warn | the `!` lines still in `.fux/sources/dirs`, each with the anchored pattern to write instead. `fux remove` stopped writing them on 2026-09-14 (SR-FUXIGNORE decision 5a) and they are read forever, so this reports and never fails. ⚠ **Not the duplicate finding above** — that one needs the pattern in *both* files; this fires on every survivor, including the ones nothing duplicates, which are the ones no other row would mention | [SR-FUXIGNORE](0144_fuxignore.md) decisions 5a–5b · [SR-DIR-LIST](0120_dir-list.md) decision 2d |
+| `url redaction current` | warn | the `url:` documents a policy change could not reach — no retained bytes in `.fux/acquired/`, so their records still hold text extracted under the OLD rules. **Never an error**: the record is not wrong about its source, and only a fetch can clear it, so failing here would make `doctor` red until someone goes online. ⚠ **Derived state, so it does not travel with a cloned index** — a fresh clone reads clean until its own ingest re-derives the fact | [SR-PII](0148_pii.md) · [SR-INGEST](0106_ingest.md) · [SR-ACQUIRED](0145_acquired-plane.md) |
+| `retired agent folders` | warn | `.codex/skills/` or `.github/skills/` left behind by an older `setup`. **The DUPLICATE is the defect**: Copilot reads `.agents/skills/` *and* `.github/skills/`, so every skill appears twice and the older copy is free to disagree while both look correct. Delete is the whole remedy, and `fux setup` will not, because the folder may hold files fux did not write | [SR-AGENT-POLICY](0132_agent-policy.md) decision 16 |
+| `README.md current` | warn | the file's SECTION SET against the current template's. ⚠ **Sections, not bytes**: the file is write-if-missing so a consumer's notes survive, and a byte comparison would fire on every repo where somebody added a line. An EXTRA heading is the feature, never drift | [SR-DOTFUX](0102_fux-directory.md) decision 6 |
+| `refusal rules current` | warn | `.fux/refusals.toml` byte-equal to a starter fux has **REPLACED** — never edited, and refusing by rules fux stopped shipping. ⚠ **Matching the CURRENT starter is not a finding**; a repo set up yesterday looks exactly like that. Fires only on a digest in `doctor.RETIRED_REFUSAL_STARTERS`, **which is appended to by hand in the change that edits the starter** — fux ships one starter, so "equal to a previous one" is otherwise unanswerable from the tree | [SR-REFUSAL](0146_refusals.md) |
+| `tune.toml current` · `output.toml current` | warn | a key the engine has gained that the consumer's file does not mention. Write-if-missing means it never will, so the knob exists and the one file meant to show it does not. ⚠ **Absent is not frozen** — that is engine defaults, deliberately, and each file's own `loads`/`present` row says so | [SR-TUNE](0135_tuning.md) decision 4 · [SR-OUTPUT](0143_output-defaults.md) decision 14 |
+| `declared types are readable` | warn | an include glob in `.fux/formats.toml` naming an extension no built-in and no `.fux/decoders/` decoder claims. ⚠ **Not the `decoder bindings` row**, which fires on a binding no indexed document matches; this one fires on a declared type nothing can READ — the documents are walked and then indexed as raw bytes or skipped, while a committed file says they are documents. **Prose suffixes are exempt**: `extract.py` reads them, so having no decoder is their normal state | [SR-TYPES](0128_types-list.md) |
+| `listed directories exist` | warn | a non-exclusion line in `.fux/sources/dirs` naming a path not on disk. 🔴 **`walk_sources` RAISES on this**, so the next `fux ingest` exits 1 — `fux add` refuses such a path, and a line that arrived another way had nothing checking it. Still `warn`: ingest is where it stops, and a directory not checked out on this branch is a legitimate state for an afternoon | [SR-DIR-LIST](0120_dir-list.md) |
+| `url extraction depth` | warn | a `url:` record whose extracted text is under `THIN_URL_SHARE` of its retained bytes — the `http` fetcher runs no JavaScript, so a single-page app returns a full-size shell and decodes to its nav bar. Read from the committed index and `.fux/acquired/`, never a fetch. ⚠ **Advisory and deliberately loose**: it surfaces the obvious case and adjudicates no extraction quality; `--cdp` is the remedy and whether a page needs one is the consumer's call | [SR-HTTP-FETCHER](0119_http-fetcher.md) |
+| `confidence floors` | warn | `[confidence] separation_floor = 0.0` in `.fux/tune.toml`, which makes `weak` UNREACHABLE for every answer in the repo. 🔴 [SR-CONFIDENCE](0141_confidence.md) decision 13 says of itself that *"nothing mechanical catches it"*; this is the catch. **Reports, never refuses** — zero is a legal value and decision 13 reversed a lock on exactly the reasoning that fux states costs rather than clamping knobs. ⚠ **A merely LOW floor is not reported**: only zero changes what the band can SAY. ⚠ **`doc_coverage_floor = 0.0` is that clause's shipped default** and is never reported. The same sentence is printed once per process on `ask`'s stderr, suppressed under `--json` and MCP | [SR-CONFIDENCE](0141_confidence.md) decision 13 |
 | `fetcher optional functions` | warn | which of `validate()` / `is_rate_limited()` the consumer's fetcher implements — **read as text, never imported** | [SR-FETCHER](0117_fetcher.md) decisions 12–13 |
-| `url sources` | warn | per-URL health from the committed index, **the listed URLs that have never been fetched and so have no record at all** (SR-MAINTENANCE decision 5a's stated cost, built 2026-09-12), the concurrency policy, and **the `update=never` count with the `keep=false` ones named** — a pinned URL is one `fux update` will never go out for again, which is otherwise learnable only by reading every line of the list | [SR-URL-LIST](0116_url-list.md) decisions 14/14b |
+| `url sources` | warn | per-URL health from the committed index, **the listed URLs that have never been fetched and so have no record at all** (SR-MAINTENANCE decision 5a's stated cost, built 2026-09-12), the concurrency policy, and **the `update=never` count with the `keep=false` ones named** — a pinned URL is one `fux ingest` will never go out for again, which is otherwise learnable only by reading every line of the list | [SR-URL-LIST](0116_url-list.md) decisions 14/14b |
 | `background runner` | warn | is a runner live, how many documents pend, is the lock held or stale, did the last run fail. **Read-only: a stale lock is named, never cleared** | [SR-MAINTENANCE](0129_hooks.md) decision 1c |
 | `url daemon` | warn | the refresh daemon's state | [SR-URL-FRESHNESS](0147_url-freshness.md) |
 
@@ -183,7 +200,7 @@ failure `tune.toml` taught (decision 10). The table said `warn` for all three.
 
 | `accelerator` | warn | built, fresh or stale against the committed index | [SR-T1-ACCELERATOR](0110_accelerator.md) |
 | `node reader` | warn | `.fux/node/`'s `package.json` version against the engine's, **its SHAPE, and whether that shape can actually RUN** (amended 2026-09-12, L10). **The one drift `doctor` can still see** under the fourth `.fux/` shape: the vendored bundle is overwritten on a version difference, so a repo whose owner has not run `setup` or `ingest` since upgrading ships a reader that may not understand the index beside it. Three things beyond the version, because the two shapes fail differently: a **stale `src/` tree** still sitting beside the bundle (fux's own source in a consumer's repository — it means `setup` has not run since the prune shipped), a **shape-C manifest with no `node_modules/.bin/fux`** resolving anywhere `.fux/fux` would look (decision 15's *half-configured is not a state*, observed rather than assumed away), and **which shape** it is at all. Never an error — Python answers without it | [SR-NODE-SEARCH](0153_node-search.md) |
-| `fux on PATH` | warn | **which `fux` the shell resolves.** `npm i -g fux-engine` puts a second `fux` on PATH with a **different verb set**, so `fux ingest` can answer *"this only reads"* on a machine where Python fux would have worked. The row names the resolved path and points at `fux --version`, which is the one command that disambiguates. ⚠ **Read as text, never executed** — doctor does not run a binary the environment chose for it, which is the same rule the `fetcher optional functions` row follows. Deferred until 2026-09-12 on the premise *"no global bin ships in the first npm release"*; the bin shipped and Arpit ruled it stays, so the premise is gone. | [SR-NODE-SEARCH](0153_node-search.md) R1a |
+| `fux on PATH` | warn | **which `fux` the shell resolves.** `npm i -g fux-engine` puts a second `fux` on PATH with a **different verb set**, so `fux ingest` can answer *"this only reads"* on a machine where Python fux would have worked. The row names the resolved path and points at `fux --version`, which is the one command that disambiguates. ⚠ **Read as text, never executed** — doctor does not run a binary the environment chose for it, which is the same rule the `fetcher optional functions` row follows. ⚠ **Amended 2026-09-14 (W-159): "read as text" now excludes a compiled launcher.** A Windows console script is a `.exe`, and reading one with `errors="replace"` to look for the word `node` would report an ordinary Python `fux` as the Node reader whenever those three letters occurred by chance in its bytes — the exact misdiagnosis this row exists to prevent. **The row covers all three platforms**; it was believed Windows-blind on the evidence of a test skipped there, and the fixture was what could not be built, not the row. Deferred until 2026-09-12 on the premise *"no global bin ships in the first npm release"*; the bin shipped and Arpit ruled it stays, so the premise is gone. | [SR-NODE-SEARCH](0153_node-search.md) R1a |
 
 **3. `warn` is the default; `error` is reserved for a repo a verb will refuse.**
 A check fails the command **only** when some other fux command will not run
@@ -300,13 +317,111 @@ shape for **this** file specifically:
   answer a question the real one does not ask — decision 6's *name the fix*
   with the fix's own words.
 
+**11. The `index temp files ignored` row, and it exists ONLY because the fix
+cannot reach the repositories that need it** (2026-09-15, W-185).
+
+`store/writer.py::_atomic_write` leaves `<shard>.jsonl.tmp` in the **committed**
+index directory for the duration of a rename, and `post-commit` defers — so a
+consumer's next `git add -A` can list it and then fail to stat it. The fix is one
+line in `.fux/.gitignore` ([SR-DOTFUX](0102_fux-directory.md) decision 6c).
+
+🔴 **`.fux/.gitignore` is write-if-missing.** A repository set up before
+2026-09-15 has a copy without the line and **will never be given one**. A row is
+the only thing that reaches it, which is decision 6's *name the fix* doing the
+work an upgrade cannot.
+
+**`warn`, not `error`**, and the line between them is decision 3's: no verb
+refuses, the index is correct, no answer moves, and the failure needs a
+concurrent writer. What makes it worth a row anyway is that when it does fire,
+**the message is about fux's internals** and nothing connects the two for the
+person reading it.
+
 **The redaction note names an instrument the reader has** (W-140 row 18,
 2026-09-11). It ended *see tools/pii-probe/* — a path that exists in the fux
 repository and in no consumer's install. It names the `fux-pii` skill instead,
 which `fux setup` wrote into their repo. See
 [SR-PII](0148_pii.md) decision 20.
 
+**`correction pins` — the row for a human decision that quietly stopped
+applying** (W-162).
+
+A `fux correct --pin` forces one document to #1 for one exact question. When the
+document changes under it the pin is **suspended**: the query path simply ranks
+normally and says nothing, because a pin whose document was rewritten is a claim
+nobody has checked since the day it was made. **That silence is correct at query
+time and wrong over months**, which is precisely the shape this verb exists
+for — something that was true, is not, and nothing says so.
+
+⚠ **`warn`, and the remedy needs a person.** The repository is not broken: it
+answers with the ranking. Only somebody who reads the document can say whether
+it still answers the question, so the row names `fux correct --reaffirm` and
+`--no-pin` and does neither.
+
+🔴 **`ok=False` with `level="warn"` is what renders `[WARN]`, and getting that
+backwards ships a finding as `[OK]`.** `cmd_doctor` takes the exit code from
+`ok` **only for `level == "error"` rows**, so a `warn` row cannot fail the
+command whatever its `ok` is — and `ok=True` therefore means *print `[OK]`*.
+Both this row and `pinned url bytes` shipped that way first, the second of them
+with *every citation from these will be `unverified`* beside an `[OK]`. Fixed
+together, and `tests/test_doctor.py::test_a_warn_row_renders_WARN_and_still_exits_zero`
+asserts the **rendered line** rather than the fields, because asserting the
+fields is what let it through.
+
+**`pinned url bytes` — the row that discloses what `fetch_at_answer = false`
+costs** (W-174, 2026-09-14). `doctor._pinned_without_bytes`: when
+`[sources.url] fetch_at_answer` is false, it counts the listed URLs with no
+entry in `acquired/manifest.json` and **warns** with the count and the first
+three.
+
+- **`warn`, never `error`.** The combination is legal — Arpit ruled
+  *disclosed, never refused* — and the precedent is
+  [SR-ACQUIRED](0145_acquired-plane.md)'s handling of the equally lossy
+  `update=never keep=false` pair.
+- **Silent while the flag is on**, which is the default: there is nothing to
+  warn about while fux may still go and look. It reports `ok` with the reason
+  rather than omitting the row, so the register stays a fixed list.
+- **Reads only what is on disk** — `fux.toml`, the url list, the manifest. No
+  fetch, and an unreadable config or list is another check's finding, never a
+  traceback out of a health command.
+
+**The `observers` row** (W-170). Lists what is in `.fux/observers/` and
+whether each file fired on the last run.
+
+🔴 **A present-but-never-firing observer is silent by construction** — the
+dispatcher is fail-open, so one that raises on every run is skipped on every
+run and fux answers perfectly. Without this row a consumer's analytics can be
+dead for weeks with nothing to show for it. Same shape as the suspended-pin row
+and the same remedy: say so, and let a person decide.
+
+⚠ **`warn`, never `error`** — a broken observer answers no question wrongly, so
+the repository is not broken; conflating the two would make `fux doctor` exit
+non-zero in CI over a consumer's own file.
+
+⚠ **A repo that has never answered a query reports *not yet observed*, and that
+is not a finding.** The liveness file describes the last run; treating its
+absence as a failure would make every fresh clone look broken.
+
+
 ### Consequences
+
+- ✅ **The register is HELD COMPLETE against the code (2026-09-14, W-164 gate 3)**
+  by `tests/test_doctor_register_is_complete.py`, in both directions: a row that
+  exists and is unregistered is an undocumented surface, and a row that is
+  registered and does not exist is worse — this record then says `fux doctor`
+  reports something it does not, which a reader cannot check without running the
+  command and counting.
+  🔴 **It was red on its first run, on a pre-existing gap**: `tune.toml loads`
+  shipped on 2026-09-11 and was never registered.
+  ⚠ **The names are read by RUNNING `doctor`, not by parsing `doctor.py`.** A
+  static scan finds the `Check(...)` calls, but a row's NAME is a literal inside
+  a branch, several per function. Running it on an empty directory produces
+  exactly the set a user sees. **The cost, stated:** a row that appears only
+  under a condition the fixture cannot create goes unchecked — `url daemon` is
+  the live example, listed in that test's `CONDITIONAL` **by name**, never by
+  pattern, because a regex exemption grows to cover what nobody meant to exempt.
+  ⚠ **One row was RENAMED to make this possible**: the README check was
+  `` `.fux/README.md` current ``, whose embedded backticks no table cell can
+  carry unambiguously. It is `README.md current`, like every other row name.
 
 - ✅ **A change to one check opens two records, not eight** — this one, and the
   subject record if the check's *meaning* changed rather than its rendering.

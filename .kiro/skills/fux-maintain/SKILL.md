@@ -1,6 +1,6 @@
 ---
 name: fux-maintain
-description: Keep a Fux index current — `fux hooks` and the fux-merge-index driver, `fux daemon start|stop|status`, `fux update --check`, the background re-index, and resolving a merge conflict in .fux/index without hand-editing. Use for "keep the fux index up to date automatically", "install fux hooks", "are hooks wired", "start the freshness daemon" or "merge conflict in .fux/index". Installing hooks or starting the daemon — only when explicitly asked.
+description: Keep a Fux index current — `fux hooks` and the fux-merge-index driver, `fux daemon start|stop|status`, `fux ingest --check` and `fux ingest --no-fetch`, the background re-index, and resolving a merge conflict in .fux/index without hand-editing. Use for "keep the fux index up to date automatically", "install fux hooks", "are hooks wired", "start the freshness daemon" or "merge conflict in .fux/index". Installing hooks or starting the daemon — only when explicitly asked.
 ---
 
 # Keeping the Fux index current
@@ -25,7 +25,7 @@ Resolve the `fux` command first — see the `fux-usage` skill (`fux` → `uv run
 | "are hooks wired" | `fux hooks --json` — §2 |
 | "install fux hooks" / "keep it up to date automatically" | `fux hooks`, then verify with `--json` — §2, §3 |
 | "start the freshness daemon" | `fux daemon start` — §4 |
-| "is the index stale" | `fux update --check` — §5 |
+| "is the index stale" | `fux ingest --check` — §5 |
 | "merge conflict in .fux/index" | §6. Never edit the JSONL |
 | "check it in CI" | §7 |
 
@@ -101,14 +101,18 @@ a bare `fux hooks` only reports. Use `fux hooks --install --no-output-config`.
 | `last_run` | `null` or `{outcome: ok\|stopped\|failed, …}`; `failed` carries `error` |
 
 - **`fux ask` says so on stderr** while work is pending: `fux: N changed path(s) pending re-index`.
-- **An explicit write wins.** `fux ingest`, `add`, `remove` and `update` stop a
+- **An explicit write wins.** `fux ingest`, `add` and `remove` stop a
   live runner cooperatively, then run. `fux ingest --stop` stops it without
   running and clears a stale lock.
 - **`fux answer` remembers what it cited.** A repeat prints
   `note: nothing has changed since you last asked this.` or which sources moved.
   A report on stderr, never a replayed answer.
-- **No hook ever touches the network.** A URL line added by hand waits for
-  `fux update` or the daemon.
+- 🔴 **No hook ever touches the network, and since 3.0 that takes a flag.**
+  `fux ingest` absorbed `fux update`, so the bare verb fetches — `fux hooks`
+  therefore writes **`fux ingest --no-fetch`** into `post-merge`, and
+  `post-commit` spawns a detached runner that is offline by construction. The
+  daemon writes the bare verb. **Split by caller, not by flag default.** A URL
+  line added by hand waits for a `fux ingest` you run, or for the daemon.
 
 ---
 
@@ -140,11 +144,11 @@ interpreter, never installed as a service, never started by setup or hooks.
 
 ---
 
-## 5 · `fux update --check` — drift, read-only
+## 5 · `fux ingest --check` — drift, read-only
 
 ```bash
-fux update --check            # or: fux update --check docs/rollback.md
-fux update --check --json     # {"drifted": [...], "fresh": N, "unchecked_urls": N}
+fux ingest --check            # or: fux ingest --check docs/rollback.md
+fux ingest --check --json     # {"drifted": [...], "fresh": N, "unchecked_urls": N}
 ```
 
 **Offline, and it writes nothing.** Each indexed file's bytes are compared with
@@ -157,9 +161,12 @@ changed* look like a broken command to every script that checks status. **Read
 `drifted` in the JSON**, or treat any `stale`/`gone` line as drift; for a yes/no
 gate use §7.
 
-**Reconcile with `fux update`** — it re-ingests and re-fetches only URLs
-recorded as changed (every URL when nothing is recorded yet); `--all` fetches
-all. It touches the network — see `fux-sources`.
+**Reconcile with `fux ingest`** — it re-ingests and re-fetches only URLs
+recorded as changed (every URL when nothing is recorded yet); `--refetch-all`
+fetches all. It touches the network — see `fux-sources`.
+
+⚠ **`--check` and `--list-skipped` are two exit-early flags on one verb now.**
+Given both, `--check` wins.
 
 ---
 
@@ -189,7 +196,7 @@ git add .fux/index .fux/.fuxignore .fux/enrich   # commit when asked
 ```
 
 - **Which side you keep does not matter for file documents** — ingest
-  re-derives them. For a `url:` record the kept side stands until the next `fux update`.
+  re-derives them. For a `url:` record the kept side stands until the next `fux ingest`.
 - **`post-merge` does not run on a conflicted merge** — the manual `fux ingest` is the only re-index.
 
 ---
@@ -220,7 +227,7 @@ git add .fux/index .fux/.fuxignore .fux/enrich   # commit when asked
 - **Don't trust `fux hooks` exit 0** — `REFUSED` lines exit 0 too. Read `--json`.
 - **Don't delete `write.lock` while a runner or daemon is alive** — `fux ingest --stop` is the safe clear.
 - **Don't kill the daemon** — a kill mid-write can leave a partial shard. Use `fux daemon stop`.
-- **Don't gate CI on `fux update --check`'s EXIT CODE** — it is always 0. Gate
+- **Don't gate CI on `fux ingest --check`'s EXIT CODE** — it is always 0. Gate
   on `--json`'s `drifted` being empty, or use §7.
 
 Related skills: fux-usage, fux-search, fux-answer, fux-graph, fux-sources, fux-index, fux-config, fux-mcp, fux-fetcher, fux-pii, fux-decoder, fux-enrich, fux-archived-results.

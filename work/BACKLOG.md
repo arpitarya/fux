@@ -19,13 +19,15 @@ not trim it, and do not read it top-down as a priority order** —
 [SR-WORK-BACKLOG](../records/0055_WORK-backlog.md) rules 3 and 28.
 
 ⚠ **The first sweep is a claim, not a proof.** Rows `B-001`–`B-241` come from
-one reading of all seventy records on 2026-09-13. **Every row is individually
+one reading of all seventy records on 2026-09-13; `B-242`–`B-244` were filed and promoted the same day (2026-09-14) — W-168, W-169, W-170; `B-245` is W-112 parked (2026-09-14); `B-175` left the same day, promoted as W-176. **Every row is individually
 traceable to the sentence it cites; the set's completeness is not proven** and
 no session should treat this file as exhaustive.
 
-**Nothing here is in [`OPEN-WORK.md`](OPEN-WORK.md).** Thirteen items the records
-name are held by the queue instead and carry no row here: W-87, W-112, W-136,
-W-140, W-144, W-145, W-146, W-147, W-148, W-154, W-155, W-156, W-157.
+**Nothing here is in [`OPEN-WORK.md`](OPEN-WORK.md).** Items the records name
+that the queue holds instead carry no row here: W-87, W-136, W-140,
+W-144, W-145, W-146, W-147, W-148, W-154, W-155, W-157, and — promoted
+from rows here on 2026-09-14 — W-163 (eight doctor rows), W-164 (four gates),
+W-165 (three CLI fixes), W-166 (carry-forward invalidation), W-168 (search improvements), W-169 (`fux inspect`), W-170 (cage search leg), W-176 (the nine abstention gates, from B-175).
 
 ---
 
@@ -33,7 +35,6 @@ W-140, W-144, W-145, W-146, W-147, W-148, W-154, W-155, W-156, W-157.
 
 | id | what is outstanding | named in | what closes it |
 |---|---|---|---|
-| B-001 | `tests/test_backlog_rows_are_short.py` does not exist, so this file's own rules 11–16 are enforced by nothing and its record lands `built: no` | [SR-WORK-BACKLOG](../records/0055_WORK-backlog.md) decision 7 | Write the test; this record then owns it |
 | B-002 | The dirty list "alone buys no speedup" — the runner still calls today's `fux ingest`, which walks the corpus; the list's input is unused | [SR-MAINTENANCE](../records/0129_hooks.md) decision 1a, point 3 | An incremental re-index that consumes the dirty list |
 | B-003 | A `git diff` delta hook is not built, "and the reason is a number" — a one-document re-ingest under 5 s | [SR-MAINTENANCE](../records/0129_hooks.md) Consequences | Re-measure; build only if the number moves |
 | B-004 | The designed wire encoding is unbuilt, so the 2.429× pack figure is against "today's plain-JSON placeholder" | [SR-INDEX-LIFECYCLE](../records/0108_index-lifecycle.md) Consequences | Build the encoding, then re-measure the ratio |
@@ -41,30 +42,15 @@ W-140, W-144, W-145, W-146, W-147, W-148, W-154, W-155, W-156, W-157.
 | B-006 | Accepting SR-ENRICH "does not authorize the work — the sign-off half has not been given" | [SR-ENRICH](../records/0137_enrich.md) decision 6 | Arpit signs off the enriched mode |
 | B-007 | Nothing consumes the decoder queue — `fux enrich` still derives its worklist from declared scope | [SR-DECODE](../records/0139_decode.md) decision 12 ⚠ | A decision merging *discovered* with *declared* scope |
 | B-008 | The `doc`-suffix decoder rename is "NOT backward compatible, and no migration was written"; a stale `.fux/decoders/` gives an upgrading consumer a broken install | [SR-DECODE](../records/0139_decode.md) decision 17 🔴 · [SR-DOTFUX](../records/0102_fux-directory.md) decision 6a | A migration, or a documented manual upgrade step |
-| B-009 | A decoder change does not invalidate carried extraction — only `fux ingest --full` applies the fix. "There is no decoder digest. Stated, not fixed." | [SR-DECODE](../records/0139_decode.md) decision 11a 🔴 | A decoder digest in the ingest reuse key |
-| B-010 | A new extraction rule does not reach an unchanged document until that document changes or `--full` runs | [SR-INGEST](../records/0106_ingest.md) Consequences | A digest for the rule, as PII and `[index]` got |
-| B-011 | No `url:` record is re-redacted until its bytes are fetched again, `--full` included — "the data needed is present and unused. Recorded, not fixed" | [SR-PII](../records/0148_pii.md) the 🔴 before decision 18 · [SR-INGEST](../records/0106_ingest.md) pinned-URL filter | Re-extract carried `url:` records from `.fux/acquired/` |
 | B-012 | A URL skip is recorded nowhere and prints on every networked run; W-88's report-once promise covers files only | [SR-INGEST](../records/0106_ingest.md) Consequences ⚠ · [SR-FUXIGNORE](../records/0144_fuxignore.md) | A URL-keyed record of already-reported skips |
 | B-013 | Engine upgrades do not reach a consumer's `.fux/decoders/`; four real defects "would each have needed every consumer to refresh their copy" | [SR-DECODE](../records/0139_decode.md) decision 10 ⚠ · [SR-DOTFUX](../records/0102_fux-directory.md) decision 8 | A hash stamp, or a consumer-side refresh path |
 | B-014 | The fetcher optional-functions gap is "made visible, not closed" — the consumer still copies `validate()`/`is_rate_limited()` in themselves | [SR-FETCHER](../records/0117_fetcher.md) decision 12 ⚠ · [SR-DOTFUX](../records/0102_fux-directory.md) decision 6 | A consumer-side refresh path for template changes |
-| B-015 | `fux setup` never deletes: a repo set up before 2026-09-12 keeps its old `.codex/skills/` and `.github/skills/`, and Copilot can then see four copies | [SR-AGENT-POLICY](../records/0132_agent-policy.md) decision 16 · [SR-DOTFUX](../records/0102_fux-directory.md) decision 6 ⚠ | A prune, or a `doctor` row naming the retired folders |
-| B-016 | The rewritten `.fux/README.md` sections reach existing repos "only when someone deletes the file, and nothing prompts them to" | [SR-DOTFUX](../records/0102_fux-directory.md) the 2026-09-12 amendment | A `doctor` row, or an accepted permanent gap |
-| B-017 | Write-if-missing means no existing repo gets the new refusal rules: it keeps starter rules that refuse its own wiki, and nothing tells it | [SR-REFUSAL](../records/0146_refusals.md) the W-140 row-17 block ⚠ | A `doctor` row or migration for stale starter rules |
-| B-018 | The tunables freeze at setup; the remedy is "a loader refusal or a `fux doctor` check, never a rewrite, and neither is built" | [SR-TUNE](../records/0135_tuning.md) decision 4 ⚠ | Build the loader refusal or the doctor check |
-| B-019 | Output defaults freeze at setup the same way — a later `BUILT_IN` change never reaches a repo that has run `fux setup` | [SR-OUTPUT](../records/0143_output-defaults.md) decision 14 | A loader refusal or `doctor` check for stale key sets |
 | B-020 | An orphaned `[priority]` entry is "UNBUILT as of 2026-09-12 — silently inert today"; the check needs the source lists at tune-load time, "a seam that does not exist yet" | [SR-TUNE](../records/0135_tuning.md) decision 10a 🔴 | A tune-load seam carrying the source lists, plus a doctor row |
-| B-021 | A type-declared binding that resolves to no decoder gets no warning — "Nothing reports the gap today; `fux doctor` is where that would go" | [SR-TYPES](../records/0128_types-list.md) Consequences ⚠ | A `doctor` row resolving declared bindings |
-| B-022 | An entry in the directory list that does not exist on disk is "an obvious check available" in `fux doctor` — "named here so it is not invented twice" | [SR-DIR-LIST](../records/0120_dir-list.md) Consequences | Add the row to `doctor` |
-| B-023 | "Which of my URLs came back suspiciously thin?" is answerable in `fux doctor` as an advisory, and is not built | [SR-HTTP-FETCHER](../records/0119_http-fetcher.md) Consequences | Add the advisory row to `doctor` |
-| B-024 | We now owe a migration: `fux remove` still writes `!` into `.fux/sources/dirs` while `.fuxignore` is the stated home for exclusions | [SR-FUXIGNORE](../records/0144_fuxignore.md) Consequences · [SR-DIR-LIST](../records/0120_dir-list.md) decision 2a ⚠ | `fux remove` writes into `.fux/.fuxignore` |
 | B-025 | A pinned URL line written by hand "is still never fetched, and that is a real gap" — no record, no document, and nothing says so | [SR-URL-LIST](../records/0116_url-list.md) decision 14 ⚠ | SR-MAINTENANCE 5a's never-fetched reporting |
 | B-026 | A permanently dead URL lives in the index forever; `doctor` makes it legible, not gone | [SR-DOTFUX](../records/0102_fux-directory.md) decision 10 | A declared retirement path for dead URLs |
 | B-027 | `ttl=` bounds the TTL fetch cache and nothing else — it does not influence which URLs `fux daemon` sweeps first | [SR-URL-FRESHNESS](../records/0147_url-freshness.md) Consequences, *Owed* | Feed `ttl` into the daemon's sweep ordering |
 | B-028 | The display cache holds only `title`, so `phrases` "is not materialised" and `fux answer` on a hashed document shows an empty phrase list | [SR-RECORD](../records/0109_index-record.md) Consequences | Cache phrases too, or accept the partial restoration |
-| B-029 | `No confident matches.` goes to stdout, in a pipe, where a path was expected; a script must check for empty output instead | [SR-FIND](../records/0104_find.md) Consequences | Move it to stderr on all three verbs together |
-| B-030 | `0 shards written` can accompany a deletion — "mildly under-informative when reading a run log" | [SR-INGEST](../records/0106_ingest.md) Consequences | A deletions count in the summary line |
 | B-031 | The write verbs have no `--json`; a machine-readable `add` needs a shape for *recorded, fetched, ingested* | [SR-CLI](../records/0101_cli-surface.md) Consequences | A caller who needs it, then a declared shape |
-| B-032 | Node reads no `.fux/tune.toml` at all — 90 of 174 comparisons ran against 0 on fux's own repo | [SR-T1-ACCELERATOR](../records/0110_accelerator.md) decision 13 | Node reads `.fux/tune.toml` |
 | B-033 | `verify`, `--why`, `--receipt` and `--journal` "have no Node twin at all" — a stated absence, not a covered one | [SR-NODE-SEARCH](../records/0153_node-search.md) Consequences ⚠ | Node twins, or a ruled permanent subset |
 | B-034 | Holding the index open across MCP calls is "a real and unbuilt want… It needs its own decision, and is not made here" | [SR-MCP](../records/0136_mcp.md) Consequences 🔴 | A record deciding a resident index and its staleness |
 | B-035 | The benchmark corpora do not exist — the 1 000-line table-and-diagram documents need a generator, and five of the seven tiers are new | [SR-WORK-ENVIRONMENTS](../records/0052_WORK-environments.md) Consequences | Write the generator and emit all seven tiers |
@@ -79,8 +65,6 @@ W-140, W-144, W-145, W-146, W-147, W-148, W-154, W-155, W-156, W-157.
 | B-044 | Cascade ranking is "unbuilt and unmeasured, deliberately" — flat chunking is why row precision costs 20 000 scored passages | [SR-CHUNKING](../records/0151_chunking.md) §What is NOT done · [SR-TABULAR](../records/0150_tabular.md) Consequences 🔴 | Stage-1 `recall@k` above ~0.98 more cheaply than flat |
 | B-045 | Answer-time verification fixes correctness and cannot fix recall: a changed URL outside the candidate window is never cited, fetched, or noticed | [SR-URL-INGEST](../records/0107_url-ingest.md) decision 9 ⚠ | The daemon, or a scheduled `fux update --all` |
 | B-046 | The three W-136-era controls must move: the ladder from `fux-benchmark/corpora/golden/` into `fux-lab` | [SR-WORK-ENVIRONMENTS](../records/0052_WORK-environments.md) Consequences | Move the ladder into the lab |
-| B-239 | `SR-REFUSAL`'s *Also owed* paragraph says `fux doctor` does not report refusals — **contradicted by its own decision 11**, which built exactly that | [SR-REFUSAL](../records/0146_refusals.md) Consequences, *Also owed* | Delete the stale paragraph |
-| B-240 | `SR-CONFIG`'s *include-only, with no exclusions* claim is stale — `!` and `.fuxignore` both exist | [SR-CONFIG](../records/0113_config.md) Consequences ⚠ | Correct the sentence |
 | B-241 | The reverse half of the dirs/urls attribute test "was deleted rather than re-pointed at a substitute" — no attribute is `dirs`-only now | [SR-URL-LIST](../records/0116_url-list.md) decision 11 ⚠ | A `dirs`-only attribute, or nothing |
 
 ---
@@ -106,13 +90,10 @@ W-140, W-144, W-145, W-146, W-147, W-148, W-154, W-155, W-156, W-157.
 | B-061 | Nothing detects a missing `describes` row — "the gate can only enforce what the table already says", and the seed table is four hand-verified rows | [SR-WORK-OWNERSHIP](../records/0054_WORK-ownership.md) Consequences | Audit the relation without an unverified bulk fill |
 | B-062 | A symbol list that is too short disables a record silently and nothing can check for it; most rows are left whole deliberately | [SR-WORK-OWNERSHIP](../records/0054_WORK-ownership.md) decision 10 ⚠ · [SR-CONFIDENCE](../records/0141_confidence.md) the 2026-09-11 ⚠ · [SR-ASK](../records/0103_ask.md) ⚠ | Narrow rows by hand-verified reading, one at a time |
 | B-063 | Directory-level ownership lets a change be discharged against the wrong record — rewriting `bm25f.py` satisfies the gate by touching SR-ASK | [SR-ASK](../records/0103_ask.md) Consequences ⚠ | Symbol-level ownership, or a second owning-record rule |
-| B-064 | The doctor register "is a table someone must maintain… nothing detects a missing row. A new check added without a row here is invisible" | [SR-DOCTOR](../records/0152_doctor.md) Consequences ⚠ | A test deriving the register from the code's checks |
 | B-065 | Nothing checks two of the three MCP tool descriptions against what their handlers do — "every gate here checks that documentation is TRUE; none checks that it is COMPLETE" | [SR-MCP](../records/0136_mcp.md) Consequences ⚠ | A gate comparing each description to its handler |
 | B-066 | `node/` publishes to npm on its own, so a consumer can hold a build whose descriptions never met the assertion — "no mechanism, only a release habit" | [SR-MCP](../records/0136_mcp.md) decision 11 ⚠ | A publish-time check on the npm tarball |
-| B-067 | The `.fux/README.md` verb-group table duplicates SR-CLI §1 and "nothing checks it" | [SR-DOTFUX](../records/0102_fux-directory.md) the 2026-09-12 amendment ⚠ | A test holding the two tables equal |
 | B-068 | Fixing a defect must edit the vendor guide in the same change — "Nothing enforces that; this sentence is the guard" | [SR-AGENT-POLICY](../records/0132_agent-policy.md) decision 15g | A gate coupling guide workarounds to their defects |
 | B-069 | Veto 3's check on four third-party formats: "No command can check this. It is a periodic read of the vendor URLs" | [SR-AGENT-POLICY](../records/0132_agent-policy.md) veto §How to check, item 3 | A scheduled vendor-doc review, or a fetch-and-diff check |
-| B-070 | A consumer can set `separation_floor = 0.0` so no answer is ever `weak` again; it is silent and "nothing mechanical catches it" | [SR-CONFIDENCE](../records/0141_confidence.md) decision 13 ⚠ | A check that flags a floor tuned to zero |
 | B-071 | The key-parity gate "checks that the key exists on both sides, never what it means — a record could describe `ttl` as a byte count and the gate would stay green" | [SR-URL-FRESHNESS](../records/0147_url-freshness.md) the ⚠ after the SR-CONFIG note | A gate that binds a key's meaning, not just its name |
 | B-072 | Pruning "looks like a size win and is measured as a recall loss", is forbidden outside a signed-off item, and has no mechanical gate | [SR-POSTINGS](../records/0112_postings.md) Consequences ⚠ | A check flagging pruning in a diff |
 | B-073 | `.fux/pii.toml` is outside the template-drift gate, so "a correction to the starter does not reach this repo, and only a reader will notice" | [SR-PII](../records/0148_pii.md) decision 17 ⚠ | A drift check that tolerates deliberate divergence |
@@ -178,15 +159,16 @@ W-140, W-144, W-145, W-146, W-147, W-148, W-154, W-155, W-156, W-157.
 | B-126 | `explain`, `graph` and `path` "cannot be compared on a corpus with no fresh build" — Python requires `fux build` and Node does not | [SR-NODE-SEARCH](../records/0153_node-search.md) decision 9 ⚠ | A golden corpus with a fresh build in the arm |
 | B-127 | The corpus behind SR-ANSWER decisions 11–13 was retired: "the run stands as filed and cannot be re-run where it was run" | [SR-ANSWER](../records/0105_answer.md) Reference ⚠ | A live graded corpus to re-measure the three decisions on |
 | B-128 | The timing set keeps no key — "a key for it can only be built by re-reading the corpus" — so CAP-3's query set is unstated | [SR-WORK-BENCHMARK](../records/0053_WORK-benchmark.md) Consequences ⚠ | Decide CAP-3's query set, or plant a key for timing |
-| B-129 | Both benchmark arms answered 10 of 10 planted unanswerables with a citation — "the fourth recorded occurrence of the abstention shape" | [SR-WORK-BENCHMARK](../records/0053_WORK-benchmark.md) Consequences 🔴 · [SR-RS](../records/0133_predictions.md) decision 15 🔴 | Abstention built and measured — [`abstention-gate.md`](proposals/abstention-gate.md) |
+| B-129 | Both benchmark arms answered 10 of 10 planted unanswerables with a citation — "the fourth recorded occurrence of the abstention shape" | [SR-WORK-BENCHMARK](../records/0053_WORK-benchmark.md) Consequences 🔴 · [SR-RS](../records/0133_predictions.md) decision 15 🔴 | Abstention built and measured — [`compare/abstention-gates.compare.md`](compare/abstention-gates.compare.md) |
 | B-130 | One decoy of fifteen unanswerable questions "is reported `grounded`… No ruling on R10 catches it" | [SR-RS](../records/0133_predictions.md) decision 15 ⚠ · [SR-CONFIDENCE](../records/0141_confidence.md) decision 12 | A per-document coverage decision, ruled and built |
 | B-131 | The seal is "EXERCISED, not PROVEN — its first adjudicating use needs an artifact authored after it existed" | [SR-RS](../records/0133_predictions.md) decision 15 🔴 | One run whose artifact author saw only the visible 35 |
 | B-132 | Two RRF arms at `--top 5` fuse shallowly: a document ranked 6th in both arms is invisible to the fusion | [SR-EXPAND](../records/0149_expand.md) Consequences | A deeper fusion decision, or a higher `--top` |
-| B-133 | PRF/RM3 is "deterministic and buildable", out of scope by W-109 rather than refused on quality, and "may be measured as an arm" | [SR-EXPAND](../records/0149_expand.md) Alternatives considered | Measure PRF as an arm, or rule it out |
+| B-133 | PRF/RM3 is "deterministic and buildable", out of scope by W-109 rather than refused on quality, and "may be measured as an arm" | [SR-EXPAND](../records/0149_expand.md) Alternatives considered | Measure PRF as an arm, or rule it out — now idea #4 of [`proposals/search-improvements-v3.md`](proposals/search-improvements-v3.md) |
 | B-134 | Display width is not `len()`: a path holding a CJK character or emoji renders two columns and can still wrap. "No test covers it" | [SR-CLI](../records/0101_cli-surface.md) decision 12 ⚠ | A width-aware measure plus a test in `test_progress.py` |
 | B-135 | The double-load hazard "is unchanged and still unmeasured" — Copilot sees two same-name skill copies | [SR-AGENT-POLICY](../records/0132_agent-policy.md) decision 14a ⚠ | Observe or rule out a duplicate-name error in Copilot |
 | B-136 | The SR-OUTPUT build's test evidence was measured against a local mirror: "Re-run `pytest -q tests` on the real repo before treating this as landed" | [SR-OUTPUT](../records/0143_output-defaults.md) Reference ⚠ | Run both suites on the real repo and record it |
 | B-137 | A judgment supply in the hundreds is "legal to collect and still not collected" — the L8 reversal "unblocks that pressure rather than resolving it" | [SR-LAWS](../records/0001_LAWS.md) decision 8 · [SR-LAW-8](../records/0010_LAW-8-use-record.md) Consequences | Decide and record whether the query log is collected |
+| B-245 | The vector plane (`fux embed`, `.fux/vectors/`, `--qvec`, RRF fusion) — closed unbuilt 2026-09-14: its gate can never fire, no corpus carries DENSE-CHUNK's bar. Determinism is *same embedder build* only | [SR-RS](../records/0133_predictions.md) d19 · archived W-112 | **Reopen only when both hold:** a rank-contract corpus exists **and** doc2query's ceiling is measured. Compare doc first |
 
 ---
 
@@ -196,7 +178,7 @@ W-140, W-144, W-145, W-146, W-147, W-148, W-154, W-155, W-156, W-157.
 |---|---|---|---|
 | B-138 | `--hops` is unbounded — "a fork this record has not resolved"; `--hops 7` on ~960 docs runs over a minute, and three answers are on the table with none picked | [SR-GRAPH](../records/0126_graph.md) decision 12 ⚠ | A ruling between cap, warn, or bounding the walk |
 | B-139 | `_apply_output_defaults` raises where it used to fall back, so every repo predating `.fux/output.toml` hard-fails `ask`/`find`; SR-PII 17 breaks them the same way | [SR-CLI](../records/0101_cli-surface.md) Consequences 🔴 · [SR-OUTPUT](../records/0143_output-defaults.md) decision 20a ⚠ | Rule the fork: fall back, migrate, or keep the hard-fail |
-| B-140 | No abstention was implemented; "the band is still reported and gates nothing (that call is Arpit's, and open)" | [SR-CONFIDENCE](../records/0141_confidence.md) decision 14 ⚠ · [SR-ANSWER](../records/0105_answer.md) Consequences 🔴 | Arpit rules whether a band gates an answer |
+| B-140 | No abstention was implemented; "the band is still reported and gates nothing (that call is Arpit's, and open)" | [SR-CONFIDENCE](../records/0141_confidence.md) decision 14 ⚠ · [SR-ANSWER](../records/0105_answer.md) Consequences 🔴 | Arpit rules whether a band gates an answer — the gate chain is proposed in [`compare/abstention-gates.compare.md`](compare/abstention-gates.compare.md) |
 | B-141 | Silent-at-`grounded` was reversed under `--band` as "a sub-call made when the ruling was applied rather than one Arpit stated" | [SR-CONFIDENCE](../records/0141_confidence.md) decision 4 ⚠ | Arpit confirms or reverses the one line in `Confidence.line()` |
 | B-142 | Decision 6 said fux may not pick a second abstention threshold; a consumer now can — "a real hole in the argument, accepted rather than argued away" | [SR-CONFIDENCE](../records/0141_confidence.md) decision 13 ⚠ | Arpit rules whether a repo-local floor may exist |
 | B-143 | The query-side lens — `--intent`, `--as-of`, `--no-archived`, surfacing the supersession chain — is "an unopened fork with no compare doc and is not authorised" | [SR-TUNE](../records/0135_tuning.md) decision 15 ⚠ · [SR-ARCHIVED-CONTENT](../records/0134_archived-content.md) decision 6 🔴 · [SR-API](../records/0154_api.md) decision 7 ⚠ | A compare doc, then Arpit's ruling |
@@ -236,15 +218,13 @@ W-140, W-144, W-145, W-146, W-147, W-148, W-154, W-155, W-156, W-157.
 
 *Every file in that directory has a row here and only here; the proposal keeps
 its own lifecycle, its own graduation trigger, and its own README row.
-[`search-v3.md`](proposals/search-v3.md) and
-[`structure-aware-extraction.md`](proposals/structure-aware-extraction.md) carry
-no row: what remains of each is **W-112** and **W-144** in the queue.*
+[`structure-aware-extraction.md`](proposals/structure-aware-extraction.md) and
+[`search-improvements-v3.md`](proposals/search-improvements-v3.md) carry
+no row: what remains of each is **W-144** and **W-168** in the queue.*
 
 | id | what is outstanding | named in | what closes it |
 |---|---|---|---|
-| B-175 | The abstention gate — fux answers all 20 blind-authored unanswerables twice; options A disclose, B gate quality claims, C build and measure. Recommends B then C | [`abstention-gate.md`](proposals/abstention-gate.md) | Arpit picks |
 | B-176 | Positioning — `graduated` and kept: GitHub About and topics still need Arpit's `gh`, the PyPI page changes on the next upload, and §5's `code`→`path` rename is a live fork | [`positioning-documents-not-code.md`](proposals/positioning-documents-not-code.md) | The three remaining surfaces, and the rename ruling |
-| B-177 | The 2026-09-05 unblock — a proposed ruling for every inbox row, `R-1`…`R-11`, with the evidence beside each. "Nothing implemented, nothing defaulted" | [`unblock-2026-09-05.md`](proposals/unblock-2026-09-05.md) + [its prompt](proposals/unblock-2026-09-05-claude-code-prompt.md) | Arpit strikes or accepts each line |
 | B-178 | SR review 2026-08-28 — five rules each broken in 20–45 of 47 records, record-vs-record only, and some of the lint has since landed "which nobody has reconciled against this list" | [`adr-review-2026-08-28.md`](proposals/adr-review-2026-08-28.md) | Reconcile the list against what shipped, then bulk-pass |
 | B-179 | Code + architecture review 2026-08-28 — ran on a cloud mirror with a wedged shell, "so every P0/P1 is to reproduce" | [`architecture-review-2026-08-28.md`](proposals/architecture-review-2026-08-28.md) | Verify item by item on the real tree |
 | B-180 | Ranking tuning — the instrument, not the optimiser; its trigger is 50 committed judgments on a fux corpus **and** a ranking decision waiting, which is W-97 | [`ranking-tuning.md`](proposals/ranking-tuning.md) | 50 judgments on W-136's golden data |
@@ -255,6 +235,10 @@ no row: what remains of each is **W-112** and **W-144** in the queue.*
 | B-185 | Research-to-Spec — evidence-backed specs where every claim cites the corpus at a commit | [`research-to-spec.md`](proposals/research-to-spec.md) | No trigger stated — the row it is owed |
 | B-186 | Knowledge diff and time-travel — `fux diff` / `fux log`, asking questions of past knowledge; a natural fit for the one-root-hash keyspace | [`knowledge-diff.md`](proposals/knowledge-diff.md) | No trigger stated — the row it is owed |
 | B-187 | Agent search-API landscape — a research note and the evidence base the refer-plane proposals cited, kept because two live records still ground on it | [`agent-search-landscape.md`](proposals/agent-search-landscape.md) | Nothing; it is grounding, not work |
+| B-246 | `WORKLOG.md` archive-and-truncate — append-only and growing forever; a yearly or v-major cut into `archive/worklog/YYYY.md` would cap the live file under the one-archive law. Parked since 2026-08-21, never litigated | [SR-WORK-GOVERNANCE](../records/0065_WORK-governance.md) Consequences | Arpit rules on the cut, or rules it never happens |
+| B-247 | `DOC-REGISTRY.md` scoped to untested prose — its unique value is the docs nothing else checks (`WORKLOG`, `MACHINE`, `GLOSSARY`, the paper); SRs and `setup/` have dedicated tests. Parked since 2026-08-21, never litigated | [SR-WORK-GOVERNANCE](../records/0065_WORK-governance.md) Consequences | Arpit rules on the scope, or rules it stays whole |
+| B-248 | Glassbox sessions — the ask is counts and cross-session joins, which fux does not do; the sketch is materialise-then-index. 🔴 `fetch=`'s value set is closed at `sourcelist.py:263` while `urlsrc.py` resolves by filename | [`glassbox-sessions.md`](proposals/glassbox-sessions.md) | A second event-stream source is asked for |
+| B-249 | A non-circular quality endpoint for proximity reranking — five candidates, and a mechanical SCREEN (`agreement` against the reranker's own objective, band `0.25`-`0.85`) that can disqualify the recommendation before an arm runs | [`quality-endpoint-for-reranking.md`](proposals/quality-endpoint-for-reranking.md) | The screen's number decides: W-154's Part B, or the fork to Arpit |
 
 ---
 

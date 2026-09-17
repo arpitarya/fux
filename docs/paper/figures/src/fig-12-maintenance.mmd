@@ -1,0 +1,17 @@
+flowchart LR
+  classDef ev fill:#eef3f8,stroke:#5b7fa6,color:#1c2b3a
+  classDef act fill:#eefaf0,stroke:#3f9a5a,color:#12301c
+  classDef law fill:#fbeeee,stroke:#b85c5c,color:#3a1414
+  C["git commit"]:::ev
+  PC["post-commit hook — DEFERS<br/>writes a dirty list, spawns a detached runner, returns<br/>(R5 measured 44 s at 100k inline; now git's cost only)"]:::act
+  RN["one-shot runner<br/>delta ingest under write.lock"]:::act
+  PM["post-merge → re-ingest<br/>post-checkout → rebuild derived"]:::act
+  MD["fux-merge-index driver<br/>line-by-line last-writer-wins on (ver, sha)<br/>refuses in four cases, both sides intact"]:::act
+  DA["fux daemon (human-started only)<br/>sweeps url: sources every 60 min"]:::act
+  L["never blocks · never touches the network · best-effort (L4)"]:::law
+  C --> PC --> RN
+  C --> PM
+  C -. "merge conflict on .fux/index" .-> MD
+  DA -.-> RN
+  PC --- L
+  PM --- L

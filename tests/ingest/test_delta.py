@@ -94,6 +94,48 @@ def test_byte_identical_after_a_deletion(corpus):
     assert _digest(corpus) == after_delta
 
 
+# -- W-165 fix 3: a deletion is an absence, so it needs a counter ----------
+
+
+def test_a_run_that_drops_nothing_counts_no_deletions(corpus):
+    assert run(corpus).deleted_count == 0
+
+
+def test_a_deleted_document_is_counted(corpus):
+    """The number the summary line prints, and the reason it exists.
+
+    `write_index` writes the WHOLE index, so a removal is a record that simply
+    is not there this time. Every other number on the summary line can stay put
+    while a document leaves — `0 shards written` included, when the shard it
+    sat in holds others whose bytes did not change — and the one thing that
+    happened goes unnamed. SR-INGEST Consequences.
+    """
+    (corpus / "docs" / "doc-3.md").unlink()
+    assert run(corpus).deleted_count == 1
+
+
+def test_deletions_are_counted_across_a_whole_directory(corpus):
+    for i in (0, 1, 2):
+        (corpus / "docs" / f"doc-{i}.md").unlink()
+    assert run(corpus).deleted_count == 3
+
+
+def test_an_addition_is_not_a_deletion(corpus):
+    (corpus / "docs" / "doc-9.md").write_text(_doc(9), encoding="utf-8")
+    report = run(corpus)
+    assert report.deleted_count == 0
+    assert report.changed_count >= 1
+
+
+def test_a_full_run_on_an_unchanged_corpus_counts_no_deletions(corpus):
+    """⚠ `--full` re-extracts everything; it does not re-*delete* everything.
+
+    The diff is against the prior index's ids, which `--full` still reads for a
+    corpus this reader wrote — so re-extraction moves `changed`, never this.
+    """
+    assert run(corpus, full=True).deleted_count == 0
+
+
 # -- what reuse is gated on -------------------------------------------------
 
 

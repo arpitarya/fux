@@ -167,8 +167,39 @@ def test_an_unknown_key_is_a_loud_error_naming_file_and_line():
 
 
 def test_an_unknown_value_is_a_loud_error_naming_file_and_line():
-    with pytest.raises(FuxError, match=r"list:1: fetch='playwright' is not one of http, cdp"):
-        _parse("https://x.test/a fetch=playwright")
+    """⚠ **This asserted on `fetch=` until W-178 made it typed** (2026-09-15).
+
+    `fetch=playwright` is a **legal line** now — it names
+    `.fux/fetchers/playwright.py`, which is the consumer's to write. `meta` is
+    still a genuinely closed policy enum, so the *file:line* half of the
+    contract is asserted on that instead of being deleted with the old value.
+    """
+    with pytest.raises(FuxError, match=r"list:1: meta='raw' is not one of plain, hashed"):
+        _parse("https://x.test/a meta=raw")
+
+
+def test_a_fetcher_name_nobody_shipped_parses(tmp_path):
+    """🔴 **The whole of W-178, in one line of config.**
+
+    A consumer drops `.fux/fetchers/glassbox.py` in and writes `fetch=glassbox`.
+    The grammar validated **shape only** from that day; whether the file exists
+    is `fux doctor`'s (`fetcher bindings`) and `urlsrc._fetcher_path`'s.
+    """
+    (entry,) = _parse("https://x.test/a fetch=glassbox")
+    assert entry.attrs["fetch"] == "glassbox"
+
+
+@pytest.mark.parametrize("bad", ["Glassbox", "cdp.py", "../evil", "_shared", ""])
+def test_a_fetcher_name_that_is_not_a_module_stem_is_refused(bad):
+    """Open VALUES, not open syntax — and the four refusals are the reason.
+
+    A capitalised name, a `.py` suffix and a directory part would each resolve
+    to a path that is not what the writer meant; `_shared` is the leading
+    underscore that marks a helper the decoder registry skips, kept out here so
+    the two consumer planes spell a name the same way.
+    """
+    with pytest.raises(FuxError, match="fetcher module name"):
+        _parse(f"https://x.test/a fetch={bad}")
 
 
 def test_a_bare_flag_is_not_the_grammar():
@@ -252,3 +283,30 @@ def test_a_rendered_line_round_trips_and_is_complete():
     assert entry.value == "https://x.test/a"
     assert entry.attrs == _defaults(fetch="cdp")
     assert entry.is_complete()
+
+
+def test_a_custom_fetcher_name_round_trips(tmp_path):
+    """W-178: the writer must survive a value fux does not ship.
+
+    A typed attribute is where a writer most easily stops round-tripping —
+    `render_line` states every attribute, and a validator the writer's own
+    output fails would make `fux add` produce a file `fux ingest` refuses.
+    """
+    line = sourcelist.render_line("https://x.test/a", {"fetch": "glassbox"}, sourcelist.URLS)
+    assert "fetch=glassbox" in line
+    (entry,) = _parse(line)
+    assert entry.attrs == _defaults(fetch="glassbox")
+    assert entry.is_complete()
+
+
+def test_fetch_is_still_stated_at_its_default():
+    """🔴 **The reason `fetch`'s default is `"http"` and not `""`** (W-178 15b).
+
+    `render_line` omits an attribute whose default is EMPTY — the exception
+    `types.decoder` needed, because a bare `decoder=` states no policy. A typed
+    `fetch` with an empty default would inherit that exception silently and
+    every generated URL line would stop stating `fetch=`, which SR-URL-LIST
+    decision 12 forbids. Nothing in the grammar would have complained.
+    """
+    line = sourcelist.render_line("https://x.test/a", {}, sourcelist.URLS)
+    assert "fetch=http" in line

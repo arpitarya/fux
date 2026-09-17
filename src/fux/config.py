@@ -35,18 +35,25 @@ FIXED_SHARDS = 256  # not yet configurable — shard = blake2b(id, digest_size=1
 #: a key cannot exist in the code and not in the record, or the reverse.
 KNOWN_KEYS: tuple[str, ...] = (
     "sources.dirs_file",
+    "sources.urls_file",
     "sources.url.fetcher",
-    "sources.url.urls_file",
     "sources.url.meta",
     "sources.url.keep",
     "sources.url.ttl",
     "sources.url.enrich",
     "sources.url.update",
+    "sources.url.fetch_at_answer",
     "sources.url.max_parallel",
     "sources.url.sweep_minutes",
     "sources.url.acquired_max_bytes",
     "index.shards",
     "agents.install",
+    # W-170. **`[observe] max_ms` is in `fux.toml` and not in `tune.toml`**,
+    # because it is not a ranking knob: it bounds how long fux WAITS for a
+    # consumer's analytics after the answer is already rendered, and cannot
+    # move a result. `tune.toml`'s boundary rule (SR-TUNE decision 1) is about
+    # what changes an answer; this changes nothing about one.
+    "observe.max_ms",
 )
 
 #: Tables fux accepts and does not look inside. **One entry, and it stays one.**
@@ -63,6 +70,7 @@ REFUSED_KEYS: tuple[str, ...] = (
     "sources.dirs",
     "sources.types_file",
     "sources.url.urls",
+    "sources.url.urls_file",
     "sources.url.middleware",
     "ranking",
     "dense",
@@ -92,6 +100,26 @@ DEFAULT_TYPES_FILE = ".fux/formats.toml"
 LEGACY_TYPES_FILE = ".fux/sources/types"
 
 
+#: The vendors `[agents] install` may name. Closed, and validated, because a
+#: typo here fails **silently** in the worst way: the policy file a consumer
+#: asked for is simply never written, and nothing says so.
+KNOWN_AGENTS = ("claude", "codex", "copilot", "kiro")
+
+
+def fetcher_config(table: dict, fetcher_path: str) -> dict:
+    """One fetcher's slice of a two-level `[sources.url.config]`.
+
+    Shared scalars first, then the sub-table named for the fetcher's file stem
+    over them. A module-level function, not only a `UrlSource` method, because
+    `ingest/urlsrc.fetch_all` holds the raw table rather than the object and
+    two copies of this arithmetic is how the ingest path and the answer path
+    end up configuring a fetcher differently.
+    """
+    shared = {k: v for k, v in table.items() if not isinstance(v, dict)}
+    own = table.get(Path(fetcher_path).stem)
+    return {**shared, **own} if isinstance(own, dict) else shared
+
+
 @dataclass
 class UrlSource:
     """`[sources.url]` — consumer-fetcher URL ingestion (SR-URL-INGEST/0011).
@@ -103,19 +131,33 @@ class UrlSource:
       your fetchers is a one-line change (SR-FETCHER decision 5). The default
       is `.fux/fetchers/http.py` — a plain GET, which is what a URL with no
       attributes means (SR-HTTP-FETCHER decision 1).
-    - `urls_file` — repo-root-relative path to the line-oriented URL list. The
-      list is a *file*, not a TOML array: a 5k-entry inline array is one diff
-      hunk and one merge conflict, the same argument that sharded the index.
+    - `urls_file` — resolved from **`[sources] urls_file`**, not from this
+      table (2026-09-14). It is carried here so every caller that already holds
+      a `UrlSource` keeps one field to read. The list is a *file*, not a TOML
+      array: a 5k-entry inline array is one diff hunk and one merge conflict,
+      the same argument that sharded the index.
     - `meta` — privacy policy for display fields; `"hashed"` by default (L5),
       `"plain"` an explicit per-source opt-in for public content. It is the
       source-wide *floor*: a URL line may loosen it to `plain` for one public
       document, and there is deliberately no way to make one line stricter.
-    - `config` — the `[sources.url.config]` table, passed **verbatim** to the
-      fetcher's optional `configure(config)` hook. Fux validates that it is
-      a table and never reads a key inside it: core knows there *is* config,
-      never what it *means*. Same discipline as PEP 518's `[tool.*]` tables,
-      and it is what keeps the adapter cap from leaking one fetcher's
-      vocabulary into fux's config schema.
+    - `config` — the `[sources.url.config]` table, handed to the fetcher's
+      optional `configure(config)` hook. Fux validates that it is a table and
+      **never reads a key inside it**: core knows there *is* config, never what
+      it *means*. Same discipline as PEP 518's `[tool.*]` tables, and it is what
+      keeps the adapter cap from leaking one fetcher's vocabulary into fux's
+      config schema.
+      ⚠ **Since 2026-09-14 it has two levels, and `config_for` is the only
+      thing that reads them** (Arpit: *"create 2 separate tables, 1 for http and
+      1 for cdp"*). Scalar keys at the top are **shared** — handed to every
+      fetcher; a **sub-table is named for a fetcher's file stem** and is handed
+      only to that one. **Fux still reads no KEY** — it matches a table name
+      against a filename it already knows, which is the same information
+      `fetch=<name>` resolution already uses (SR-FETCHER decision 5).
+      ⚠ **The flat form was BROKEN for any repo using both shipped fetchers.**
+      One table went verbatim to both, and each `configure()` raises on a key
+      it does not know, so `cdp_port` made `http.py` refuse and `timeout_s`
+      made `cdp.py` refuse. The only configurable state for a mixed repo was
+      the empty table.
     - `max_parallel` — how many URLs may be fetched at once (W-82 §3.3).
       ⚠ **REQUIRED whenever `[sources.url]` exists** (W-85, Arpit: *"never
       commented. If it is commented, throw an error that the value has to be
@@ -159,16 +201,49 @@ class UrlSource:
     enrich: bool = False
     #: SR-URL-LIST, the source-wide layer of `update`. A line still wins.
     #: `"auto"` (go out, today's behaviour) or `"never"` (this source is
-    #: pinned; `fux update` does not open a socket for it). ⚠ **Not a
+    #: pinned; `fux ingest` does not open a socket for it). ⚠ **Not a
     #: duration** -- `ttl` above is ask-time and this is update-time, and a
     #: second time-shaped key here would be read as the same knob.
     update: str = "auto"
+    #: SR-URL-FRESHNESS decision 16 -- may `fux answer` open a socket for these
+    #: URLs at all? `True` is today's behaviour; `False` pins every `url:`
+    #: citation to `.fux/acquired/` and the verdict becomes `as-ingested`.
+    #: ⚠ **The name states its CLOCK, and that is the whole reason it is three
+    #: words.** Decision 15 keeps two clocks apart on one line -- `ttl` is
+    #: ask-time *how often*, `update` is update-time *at all* -- and this is
+    #: the third cell: ask-time *at all*. `offline` was rejected (it collides
+    #: with L4's vocabulary and reads as the whole engine) and `pinned` was
+    #: rejected (one word over both clocks, which is the merge decision 15
+    #: exists to prevent). **No line-level layer**, like `acquired_max_bytes`:
+    #: it answers *"how do I reach these pages?"*, which a source answers for
+    #: all of them at once (SR-ACQUIRED, the two-layer/three-layer test).
+    fetch_at_answer: bool = True
     #: SR-ACQUIRED decision 8 -- the bound on `.fux/acquired/`, in bytes.
     #: `None` means the store's own `DEFAULT_MAX_BYTES`. **There is no
     #: line-level layer**, unlike `keep`: a cap is a property of the disk the
     #: store sits on, not of one URL, and a per-line override could only ever
     #: raise somebody else's bound.
     acquired_max_bytes: int | None = None
+
+    def config_for(self, fetcher_path: str) -> dict:
+        """What `configure()` receives for the fetcher at `fetcher_path`.
+
+        Shared scalars, then that fetcher's own sub-table over them — so a
+        per-fetcher value wins, and a key meant for another fetcher never
+        reaches this one.
+
+        **Keyed on the file STEM**, so `.fux/fetchers/cdp.py` takes
+        `[sources.url.config.cdp]`. That is the same name `fetch=<name>` already
+        resolves against, so there is one naming rule rather than two.
+
+        ⚠ **A sub-table naming no fetcher is silently ignored here**, because
+        the loader may not stat the fetchers directory to decide whether a
+        config file is valid. `fux doctor`'s `fetcher config tables` row is
+        where that becomes visible — a table quietly not read is a setting its
+        author believes is in force, which is the defect
+        [SR-CONFIG](0113_config.md) decision 14 exists for.
+        """
+        return fetcher_config(self.config, fetcher_path)
 
 
 @dataclass
@@ -184,14 +259,38 @@ class Config:
 
     root: Path
     dirs_file: str
+    #: The committed URL list. ⚠ **It sits HERE, beside `dirs_file`, and moved
+    #: out of `[sources.url]` on 2026-09-14** (Arpit): the two source lists are
+    #: one kind of thing and belong in one place. **`[sources.url]`'s presence
+    #: still enables URL ingestion** — this key names the file, it does not turn
+    #: anything on, which is why a repo with no `[sources.url]` still resolves a
+    #: path here rather than having none.
+    urls_file: str
     shards: int
+    #: `[observe] max_ms` — how long fux waits for one observer before
+    #: abandoning it (SR-OBSERVE decision 6). Small by default: a consumer's
+    #: analytics must not be able to make `fux ask` slow.
+    #:
+    #: ⚠ **It abandons a thread; it does not kill one.** Python cannot safely
+    #: interrupt arbitrary consumer code, so past the cap fux stops *waiting*
+    #: and the observer may keep running until the process exits. What the cap
+    #: guarantees is the half that matters — the verb's latency — and saying it
+    #: abandons rather than kills is the difference between a bound and a
+    #: promise fux cannot keep.
+    observe_max_ms: int = 50
     #: `[agents] install` — which vendors `fux setup` writes policy renderings
     #: for (SR-AGENT-POLICY decision 5). **Declared, never derived**: fux does
     #: not sniff for `.kiro/` or `.github/` and infer intent, which is the same
     #: derivation SR-DIR-LIST decision 4 refused for `archived`. Defaults to
     #: all three, and `setup` writes that default out **in full** so a consumer
     #: can see and edit it without reading the source. `[]` installs none.
-    agents: tuple[str, ...] = ("claude", "copilot", "kiro")
+    #: ⚠ **`KNOWN_AGENTS`, not a literal.** This read `("claude", "copilot",
+    #: "kiro")` — three of four — from before Codex was added, and every caller
+    #: goes through `load()`, which passes `_load_agents`'s own answer. So it
+    #: was dead AND wrong, which is the worse half: a stale default reads as
+    #: authority to anyone constructing a `Config` by hand. Found 2026-09-14;
+    #: the constant moved above this class so there is one list, not two.
+    agents: tuple[str, ...] = KNOWN_AGENTS
     url: UrlSource | None = None
 
 
@@ -225,7 +324,18 @@ def load(root: Path) -> Config:
     dirs_file = sources.get("dirs_file", DEFAULT_DIRS_FILE)
     if not isinstance(dirs_file, str) or not dirs_file.strip():
         raise FuxError(f"{path}: [sources] dirs_file must be a path to a line-oriented directory list")
+    urls_file = sources.get("urls_file", DEFAULT_URLS_FILE)
+    if not isinstance(urls_file, str) or not urls_file.strip():
+        raise FuxError(f"{path}: [sources] urls_file must be a path to a line-oriented URL list")
 
+    observe = data.get("observe", {})
+    observe_max_ms = observe.get("max_ms", 50)
+    if not isinstance(observe_max_ms, int) or isinstance(observe_max_ms, bool) or observe_max_ms < 1:
+        raise FuxError(
+            f"{path}: [observe] max_ms must be a positive integer of milliseconds "
+            f"(got {observe_max_ms!r}). It bounds how long fux waits for one "
+            f"`.fux/observers/` file after the answer has already been rendered"
+        )
     shards = data.get("index", {}).get("shards", FIXED_SHARDS)
     if shards != FIXED_SHARDS:
         raise FuxError(f"{path}: [index] shards must be {FIXED_SHARDS} this milestone (got {shards!r})")
@@ -276,9 +386,11 @@ def load(root: Path) -> Config:
     return Config(
         root=root,
         dirs_file=dirs_file.strip(),
+        urls_file=urls_file.strip(),
         shards=shards,
+        observe_max_ms=observe_max_ms,
         agents=_load_agents(path, data.get("agents")),
-        url=_load_url_source(path, sources.get("url")),
+        url=_load_url_source(path, sources.get("url"), urls_file.strip()),
     )
 
 
@@ -345,10 +457,6 @@ def _refuse_unknown_keys(path: Path, data: dict) -> None:
     walk(data, "")
 
 
-#: The vendors `[agents] install` may name. Closed, and validated, because a
-#: typo here fails **silently** in the worst way: the policy file a consumer
-#: asked for is simply never written, and nothing says so.
-KNOWN_AGENTS = ("claude", "codex", "copilot", "kiro")
 
 
 def _load_agents(path: Path, raw) -> tuple[str, ...]:
@@ -382,7 +490,7 @@ def _load_agents(path: Path, raw) -> tuple[str, ...]:
     return tuple(a for a in KNOWN_AGENTS if a in install)
 
 
-def _load_url_source(path: Path, raw) -> UrlSource | None:
+def _load_url_source(path: Path, raw, urls_file: str) -> UrlSource | None:
     if raw is None:
         return None
     if not isinstance(raw, dict):
@@ -391,6 +499,13 @@ def _load_url_source(path: Path, raw) -> UrlSource | None:
         raise FuxError(
             f"{path}: [sources.url] urls is not a TOML key any more — put one URL per line in "
             f"{DEFAULT_URLS_FILE} (or point urls_file elsewhere)"
+        )
+    if "urls_file" in raw:
+        raise FuxError(
+            f"{path}: [sources.url] urls_file moved to [sources] urls_file — it names the "
+            f"committed URL list, so it belongs beside dirs_file rather than inside the table "
+            f"whose PRESENCE enables fetching. Move the key up one level and delete it here "
+            f"(2026-09-14)"
         )
     if "middleware" in raw:
         raise FuxError(
@@ -401,9 +516,6 @@ def _load_url_source(path: Path, raw) -> UrlSource | None:
     fetcher = raw.get("fetcher", DEFAULT_FETCHER)
     if not isinstance(fetcher, str) or not fetcher.strip():
         raise FuxError(f"{path}: [sources.url] fetcher must be a path to a consumer-owned .py file")
-    urls_file = raw.get("urls_file", DEFAULT_URLS_FILE)
-    if not isinstance(urls_file, str) or not urls_file.strip():
-        raise FuxError(f"{path}: [sources.url] urls_file must be a path to a line-oriented URL list")
     meta = raw.get("meta", "hashed")
     if meta not in ("hashed", "plain"):
         raise FuxError(f"{path}: [sources.url] meta must be \"hashed\" or \"plain\" (got {meta!r})")
@@ -438,9 +550,17 @@ def _load_url_source(path: Path, raw) -> UrlSource | None:
     if update not in ("auto", "never"):
         raise FuxError(
             f'{path}: [sources.url] update must be "auto" or "never" (got {update!r}). '
-            "It is the source-wide default for whether `fux update` fetches these URLs "
+            "It is the source-wide default for whether `fux ingest` fetches these URLs "
             "at all; a line's own `update=` still wins. It takes no duration -- `ttl` is "
             "the ask-time knob and this one is update-time"
+        )
+    fetch_at_answer = raw.get("fetch_at_answer", True)
+    if not isinstance(fetch_at_answer, bool):
+        raise FuxError(
+            f"{path}: [sources.url] fetch_at_answer must be true or false "
+            f"(got {fetch_at_answer!r}). It decides whether `fux answer` may open a "
+            "socket for these URLs at all; false answers from .fux/acquired/ instead. "
+            "It is ask-time, like `ttl` -- `update` is the update-time knob"
         )
     config = raw.get("config", {})
     if not isinstance(config, dict):  # the ONLY validation fux does on it
@@ -517,12 +637,13 @@ def _load_url_source(path: Path, raw) -> UrlSource | None:
             )
     return UrlSource(
         fetcher=fetcher.strip(),
-        urls_file=urls_file.strip(),
+        urls_file=urls_file,
         meta=meta,
         keep=keep,
         ttl=ttl,
         enrich=enrich,
         update=update,
+        fetch_at_answer=fetch_at_answer,
         config=dict(config),
         max_parallel=max_parallel,
         sweep_minutes=sweep_minutes,

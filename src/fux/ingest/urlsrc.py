@@ -7,7 +7,7 @@ decoder plane, and normalizes the result into ingestable bytes (W-86 P8).
 All network code — transport, browser, auth, retries — lives on the consumer's
 side of that boundary; `src/fux/` stays offline and stdlib-only. Fetching runs
 only under the engine's two named fenced paths — `fux add <URL>`, scoped to the
-one URL, and `fux update` (law L4, [SR-CLI](../../records/0101_cli-surface.md)
+one URL, and `fux ingest` (law L4, [SR-CLI](../../records/0101_cli-surface.md)
 decision 1e). A plain ingest never imports a fetcher.
 
 The URL list is a committed *file*, `.fux/sources/urls`, parsed by the one
@@ -85,7 +85,7 @@ class UrlEntry:
     #: layer, because `archived` is a fact about one document rather than a
     #: policy about how to reach a source.
     archived: bool = False
-    #: SR-URL-LIST: whether `fux update` goes out for this URL **at all**.
+    #: SR-URL-LIST: whether `fux ingest` goes out for this URL **at all**.
     #: `"auto"` is today's behaviour; `"never"` pins the document and no socket
     #: is opened for it -- the fetcher is not even resolved, so a consumer's
     #: fetcher module is never imported on its account.
@@ -100,10 +100,25 @@ def load_fetcher(root: Path, rel_path: str):
     """Import a consumer fetcher file; fail loudly if it's unusable."""
     path = root / rel_path
     if not path.is_file():
+        # ⚠ **The message has to cover a name fux never shipped** (W-178). It
+        # said *"run `fux setup` to write the shipped fetchers"* and nothing
+        # else — correct while `fetch=` was an enum of `http` and `cdp`, and
+        # actively misleading for `fetch=glasbox`, where `fux setup` writes two
+        # files and none of them is the one the line names. So it names the
+        # sibling files that DO exist, which is the fix for a typo, and keeps
+        # the setup hint for the case where the directory is simply empty.
+        try:
+            siblings = sorted(p.stem for p in path.parent.glob("*.py"))
+        except OSError:  # pragma: no cover - an unreadable directory
+            siblings = []
+        beside = (
+            f" {path.parent.name}/ has {siblings}, so check the `fetch=` name on the line"
+            if siblings
+            else " run `fux setup` to write the shipped fetchers into .fux/fetchers/"
+        )
         raise FuxError(
-            f"fetcher not found: {rel_path} (looked in {path}) — run `fux setup` to write "
-            "the shipped fetchers into .fux/fetchers/, or point [sources.url] fetcher at "
-            "your own file"
+            f"fetcher not found: {rel_path} (looked in {path}) —{beside}, or point "
+            "[sources.url] fetcher at your own file. `fux doctor` reports this before a run"
         )
     spec = importlib.util.spec_from_file_location("fux_url_fetcher", path)
     if spec is None or spec.loader is None:
@@ -172,7 +187,7 @@ def resolve_urls(entries: list[sourcelist.Entry], source) -> list[UrlEntry]:
                     else getattr(source, "keep", True)
                 ),
                 # Same three layers again. Kept as text, not seconds: the
-                # value round-trips back into the file on `fux update`, and a
+                # value round-trips back into the file on `fux ingest`, and a
                 # resolved integer would rewrite `1h` as `3600` behind the
                 # consumer's back.
                 ttl=(
@@ -199,69 +214,25 @@ def resolve_urls(entries: list[sourcelist.Entry], source) -> list[UrlEntry]:
     return resolved
 
 
-def config_for(config: dict, fetcher: str | None) -> dict:
-    """The slice of `[sources.url.config]` ONE fetcher is handed.
-
-    ⚠ **The table used to go to every fetcher verbatim, and that was a defect
-    with a live victim.** Each shipped `configure()` raises on a key it does
-    not know — deliberately, because a typo'd tunable that does nothing is
-    found three ingests later — so one fetcher's tunable made the OTHER
-    fetcher refuse the whole run:
-
-        [sources.url.config]
-        cdp_port = 9222          # cdp.py's key
-
-        $ fux add https://example.com/handbook     # resolves to http.py
-        error: [sources.url] fetcher configure() failed: [sources.url.config]
-        unknown key(s): cdp_port — known keys: fetcher_max_parallel, …
-
-    A repo could therefore configure **at most one** of the two shipped
-    fetchers, and `fetcher_max_parallel` had to be spelled the same in both
-    files purely to survive the collision (see the long note beside it in
-    `http.py`).
-
-    The shape of the fix, and why it is this shape:
-
-    * **A scalar at the top level is SHARED** and still reaches every fetcher,
-      so `fetcher_max_parallel` keeps working and no existing repo changes.
-    * **A sub-table belongs to the fetcher it is named for** —
-      `[sources.url.config.cdp]` reaches `cdp.py` and reaches nothing else.
-      The name is the fetcher file's stem, which is already how
-      `fetcher_for()` resolves `fetch=cdp`.
-    * **A sub-table is never passed down as a key**, so `http.py` does not see
-      `cdp` and its strictness is untouched. **Do not loosen that strictness**
-      — it is what catches the typo this function's sub-tables now make
-      addressable.
-
-    A sub-table naming a fetcher this run never loads is simply not read.
-    That is deliberate: a repo may carry config for a fetcher used only on
-    another branch, and making it an error would punish the thing the design
-    is for.
-    """
-    #: Shared first, own second, so the fetcher's own table wins a clash. Both
-    #: are insertion-ordered from `tomllib`, so the merge is deterministic (L3).
-    merged = {key: value for key, value in config.items() if not isinstance(value, dict)}
-    if fetcher is not None:
-        own = config.get(fetcher)
-        if isinstance(own, dict):
-            merged.update(own)
-    return merged
-
-
-def configure_fetcher(module, config: dict, fetcher_path: str | None = None) -> None:
+def configure_fetcher(module, config: dict) -> None:
     """Hand this fetcher's slice of `[sources.url.config]` to its `configure`.
 
-    Fux still never inspects a key — `config_for` sorts the table by shape
-    (scalar vs sub-table), never by meaning. A `configure` that raises is a
-    misconfiguration, not a per-URL failure, so it stops the run rather than
-    degrading into skips.
+    Keys are passed verbatim — fux never inspects one. A `configure` that
+    raises is a misconfiguration, not a per-URL failure, so it stops the run
+    rather than degrading into skips.
+
+    ⚠ **`config` is already the RESOLVED slice** (shared keys + this fetcher's
+    sub-table); `UrlSource.config_for` does the resolution, in one place, for
+    this caller and for `query/refer_answer.py` alike. Handing the whole table
+    here is what broke every mixed-fetcher repo before 2026-09-14: each
+    `configure()` raises on a key it does not know, so the other fetcher's keys
+    refused this one.
     """
     hook = getattr(module, "configure", None)
     if not callable(hook):
         return
-    fetcher = PurePosixPath(fetcher_path).stem if fetcher_path else None
     try:
-        hook(config_for(config, fetcher))
+        hook(dict(config))
     except Exception as exc:
         raise FuxError(f"[sources.url] fetcher configure() failed: {exc}") from exc
 
@@ -275,7 +246,7 @@ def configure_fetcher(module, config: dict, fetcher_path: str | None = None) -> 
 #:
 #: ⚠ **It shipped referenced by nothing, and that was the defect W-83 fixed.**
 #: `resolve_parallel(module, None)` returned `declared`, and the shipped
-#: `http.py` declares `8` — so an unconfigured `fux update` over a large list
+#: `http.py` declares `8` — so an unconfigured `fux ingest` over a large list
 #: opened **eight** concurrent connections while this constant sat in the same
 #: file stating the default was four and explaining why four was the polite
 #: number. A wrong constant that reads as authority is worse than no constant.
@@ -720,6 +691,11 @@ def fetch_all(
     #: pool and a per-fetch manifest write is a corruption.
     acquired_blobs: dict[str, acquired.Blob] = dict(acquired.read_manifest(root)) if keep_urls else {}
 
+    # Imported here, not at module scope: `fux.config` imports
+    # `ingest.sourcelist` for the duration grammar, so a top-level import the
+    # other way is a cycle.
+    from ..config import fetcher_config
+
     groups: dict[str, list[str]] = {}
     for entry in entries:
         groups.setdefault(entry.fetcher_path, []).append(entry.url)
@@ -738,7 +714,7 @@ def fetch_all(
     token_shas: dict[str, str] = {}
     for fetcher_path in sorted(groups):
         module = load_fetcher(root, fetcher_path)
-        configure_fetcher(module, config or {}, fetcher_path)
+        configure_fetcher(module, fetcher_config(config or {}, fetcher_path))
         connect = getattr(module, "connect", None)
         close = getattr(module, "close", None)
         if callable(connect):

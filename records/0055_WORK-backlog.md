@@ -7,10 +7,10 @@ description: "The second work file, and the last one: everything this repo has n
 status: accepted
 date: 2026-09-13
 feature: the discipline of the backlog — the named-but-unclaimed, its five classes, and the promotion path into the queue
-owns: []
+owns: [tests/test_backlog_rows_are_short.py@834b4f2dae7c]
 laws: [L0]
 timestamp: 2026-09-13T00:00:00Z
-content_sha: 9eeefcd231f0d15eead3e08a56a3033356aa96a65b75772004ff8aa957f623c1
+content_sha: 108be96829d6e171b4bbf23c2192708ba66f9f7cc20351057317c2470df9a8bb
 ---
 
 # SR-WORK-BACKLOG — how BACKLOG.md works
@@ -245,10 +245,35 @@ sentence each, spread across seventy files and 1.4 MB.
    contract is that a process record owns its enforcement
    ([SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 11), and the test that
    would enforce rules 11–16 — `tests/test_backlog_rows_are_short.py`, the
-   sibling of the queue's — **is not written**. This record therefore lands
-   ungated by its own standard, `built: no` in the register, and **that hole is
-   itself the first row in the file it governs.** Writing a rule and calling it
-   enforced is the failure both this record and the queue's exist to name.
+   sibling of the queue's — **was not written**. This record landed ungated by
+   its own standard, `built: no` in the register, and **that hole was itself the
+   first row in the file it governs.** Writing a rule and calling it enforced is
+   the failure both this record and the queue's exist to name.
+
+   ✅ **CLOSED 2026-09-14 (W-164 gate 1, from B-001).**
+   `tests/test_backlog_rows_are_short.py` enforces rules 11–16 and the register
+   reads `built: yes`.
+
+   🔴 **It was red on the live file on its first run, and twice — one defect
+   and one misreading, which is worth telling apart:**
+
+   - **A real rule-13 violation.** `B-129` ran to 444 characters against a cap
+     of 400, carrying a trailing *"(was: …)"* whose parenthesis was never even
+     closed. Trimmed to 385; the live successor it points at was already named.
+   - **A misreading of rule 11, in the test.** The first draft asserted the ids
+     ascend down the whole file and reported `B-241` before `B-047` as a defect.
+     **It is not one.** Rule 14 makes the class the group heading, so this file
+     is five ordered sections and a row's position is its CLASS, not its age —
+     *filing order* is about assignment, and it survives grouping. The check
+     narrowed to "ascending within each section", which is still worth having:
+     a row out of order inside one is a row somebody inserted rather than
+     appended.
+
+   ⚠ **What the gate does NOT check, and cannot.** Rule 15 asks for a location
+   *inside* the cited source — a decision number, a section, the ⚠ line. That
+   the file exists is checkable; that the sentence there says what the row claims
+   is not. **The row's own accuracy stays a human obligation**, exactly as the
+   queue's rule 4 does. So does which of the five classes a row belongs in.
 
 8. **A law outranks this record, and so does the queue.** These rules govern
    what is remembered, never what is done next.

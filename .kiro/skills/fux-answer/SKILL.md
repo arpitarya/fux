@@ -29,7 +29,7 @@ touches the text. Resolve the `fux` command first — see the `fux-usage` skill
 |---|---|
 | `--json` | the payload in section 4; **prefer it** |
 | `--band` | add the `confidence` block (JSON) or a `confidence:` line (stderr) |
-| `--expand TEXT` | extra terms the document probably uses, scored at a discount |
+| `--expand TEXT` | extra terms the document probably uses, scored at a discount. **You write this text — fux never generates it** (see `fux-search` §5a); it is recorded in the receipt and replayed by `fux verify` |
 | `--no-refer` | read nothing; answer from the index's title and headings |
 | `--audit` | add `audit`: every document looked at, both shas, the budget spent |
 | `--receipt` | add `receipt`: a re-runnable record for `fux verify` |
@@ -88,6 +88,28 @@ such as `note: nothing has changed since you last asked this.`
 
 `text` is verbatim from the fetched bytes — frontmatter and table pipes included.
 
+## 4a · 🔴 `answer` can cite a document no query word matched
+
+`fux answer` reads `fux ask`, and since W-161 `ask` returns two tiers. **Both
+are fetched and re-scored on the fetched bytes**, so the winner can be a
+document the words never retrieved — one the ranked results merely **link to**.
+
+That is deliberate and it is usually right: the tier exists because BM25F
+retrieves by shared vocabulary, and the record a runbook points at often uses
+none of the runbook's words. The refer plane reads the **document**, not the
+index, so a linked document with nothing in it loses on its own bytes.
+
+**What it means for how you report:**
+
+- **The passage is still real and still verified** — same fetch, same sha, same
+  freshness verdict. Nothing about the citation is weaker.
+- ⚠ **But the confidence band describes the lexical tier only.** A `grounded`
+  band beside a citation that came from a link is not a claim about that link.
+  If the answer matters, say which document it came from and let the reader see
+  that the question's own words are not in it.
+- To rule the tier out entirely, `fux ask --no-related` first and answer from
+  that, or set `[graph] ask_related = false`.
+
 ## 5 · Locators
 
 | form | when | how to use it |
@@ -106,7 +128,7 @@ per document in `audit.documents[]` (`freshness`, `indexed_sha`, `fetched_sha`,
 |---|---|---|
 | `current` | read now; matches what was indexed | cite plainly with `loc` |
 | `stale` | read now; **changed since indexing** | quote it — it is the **current** text — and say the index is behind (a stale winner drops the band to `partial`) |
-| `as-ingested` | source unreachable; compared against the bytes kept in `.fux/acquired/` at ingest (retained unless the URL line says `keep=false`) | "as of the last ingest; the source could not be reached" |
+| `as-ingested` | source unreachable **or not consulted**; compared against the bytes kept in `.fux/acquired/` at ingest (retained unless the URL line says `keep=false`) | "as of the last ingest" — say *could not be reached* only if a fetch was actually tried |
 | `cached` | served from the local fetch cache — **only when you pass `--cache-ttl`** | "checked recently, not just now" |
 | `unverified` | not read — no fetcher, fetch failed, or file gone from the working tree | that document supplied **no passage**; never call it confirmed |
 
@@ -119,6 +141,13 @@ per document in `audit.documents[]` (`freshness`, `indexed_sha`, `fetched_sha`,
   is update-time and does NOT keep `answer` offline** — that is by design
   (SR-URL-FRESHNESS decision 15), not a defect. Read `citation.freshness` (or
   `--audit`) rather than assuming what was fetched.
+- ⚠ **`[sources.url] fetch_at_answer = false` makes `as-ingested` the NORMAL
+  verdict, not a degradation.** The repo has said *never open a socket when
+  answering*; no fetch was attempted, so **do not report the source as
+  unreachable** — it was never asked. Check `fux.toml` before writing that
+  sentence, or read `--audit`'s recorded policy, where `mode` is `never`.
+  **This is not `--no-refer`**: the passage was still re-scored on real bytes
+  and the line range is real.
 - ⚠ **A `note` naming the fetcher** — it raised, returned no bytes, or returned
   a type no decoder claims — means the live fetch was not used: the verdict is
   `as-ingested` (kept bytes) or `unverified`, never `current`. The note says
@@ -130,7 +159,7 @@ per document in `audit.documents[]` (`freshness`, `indexed_sha`, `fetched_sha`,
 | `--band` says | do |
 |---|---|
 | `none` (`answerable: false`) | abstain: "the index has nothing on this" |
-| `weak` | show the passages as candidates; do not state a conclusion |
+| `weak` | **abstain** (`answerable: false`) — *the documents don't say*; show the passages as candidates and name what was searched, never a conclusion |
 | `partial` | answer, and name `missing` terms or the `stale` source |
 | `grounded` | answer, citing each passage's `loc` and its verdict |
 
@@ -200,6 +229,9 @@ off flag, so use `--no-output-config` to bypass.
 - **Don't report `fux verify` without `--rerun` as proof** of anything.
 - **Don't use `ask` or `find` for line ranges**, and don't pass `--top` or `-q` to `answer`.
 - **Don't enable `--journal` unasked** — it records questions in plaintext.
+- **Don't run `fux correct` because the answer was wrong** — say which document
+  should have answered and **propose** the command (`fux-correct`). It writes
+  committed files and records a claim under somebody's name.
 - **Don't loop on an unreachable URL**; report it as unverified.
 
 Related skills: fux-usage, fux-search, fux-graph, fux-sources, fux-index, fux-maintain, fux-config, fux-mcp, fux-fetcher, fux-pii, fux-decoder, fux-enrich, fux-archived-results.

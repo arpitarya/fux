@@ -1,4 +1,4 @@
-# Which files are documents, and which decoder reads each one. See ADR-TYPES.
+# Which files are documents, and which decoder reads each one. See SR-TYPES.
 #
 # THIS FILE IS OPTIONAL. Delete it and the built-in default applies -- an
 # absent file never means "index everything" and never means "index nothing".
@@ -8,13 +8,13 @@
 # WHAT IS BELOW IS THAT DEFAULT, written out at `fux setup`: prose, plus every
 # format a built-in decoder reads. It is spelled out rather than left implicit
 # so you can see what fux considers a document without reading its source
-# (ADR-TYPES decision 10). From here it is YOURS -- setup never rewrites this
+# (SR-TYPES decision 10). From here it is YOURS -- setup never rewrites this
 # file, so the list stays exactly as you leave it.
 #
 # TWO KEYS, AND ONLY TWO. `include` lists globs that are already text.
 # `[decoders]` maps an extension to the module that reads it -- and a bound
 # extension IS a document, so it is never repeated in `include`. Any other key
-# is an error (ADR-TYPES decision 12).
+# is an error (SR-TYPES decision 12).
 #
 # NOTHING HERE SUBTRACTS. To keep files out, write the pattern in
 # .fux/.fuxignore, which is read first and outranks this file.
@@ -48,7 +48,7 @@ include = [
 # extension = "decoder module". THIS IS THE MAP: without it, "which decoder
 # reads .csv" is a property of the code installed on a machine, and two people
 # with different .fux/decoders/ could commit different indexes from the same
-# sources with nothing saying so (ADR-TYPES decision 11).
+# sources with nothing saying so (SR-TYPES decision 11).
 #
 # THE BINDING IS CHECKED, NOT TRUSTED. A module that does not exist stops the
 # run, and so does taking an extension AWAY from the decoder that claims it and

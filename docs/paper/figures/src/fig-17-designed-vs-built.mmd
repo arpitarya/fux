@@ -1,0 +1,31 @@
+flowchart LR
+  classDef d fill:#f4f4f4,stroke:#999,color:#555,stroke-dasharray: 5 5
+  classDef b fill:#eefaf0,stroke:#3f9a5a,color:#12301c
+  classDef x fill:#fbeeee,stroke:#b85c5c,color:#3a1414
+  subgraph V02["v0.2 design (2026-08-09)"]
+    direction TB
+    d1["one MST keyspace, six prefixes L/ P/ D/ V/ E/ M/"]:::d
+    d2["KL top-128 pruned postings"]:::d
+    d3["32-byte dense binary codes"]:::d
+    d4["BIC + Elias-Fano wire format,<br/>mmap'd runtime segments"]:::d
+    d5["CRDT / MST merge"]:::d
+    d6["≈220 ms warm at 10⁶ docs"]:::d
+    d7["index-and-refer: rank in a small committed index,<br/>fetch the cited docs, verify per answer"]:::b
+  end
+  subgraph V10["what shipped (2.0.1 → 3.0.0-alpha.0)"]
+    direction TB
+    b1["256 canonical JSONL shards; git is the Merkle tree"]:::b
+    b2["FULL postings, permanently<br/>(P1 FAIL: −35.9 pts recall@20 at 6 % retention)"]:::x
+    b3["no vector lane<br/>(DENSE-CHUNK 0 fixed / 2 broken; wheel 6.84 MB → 233 KB)"]:::x
+    b4["JSONL blocks of 128 + 62-byte .idx (T1);<br/>the default path is the plain scan"]:::b
+    b5["git merge driver, last-writer-wins on (ver, sha)"]:::b
+    b6["12.46 ms warm p95 at 10⁴ docs (T1) · 50.2 ms scan"]:::b
+    b7["shipped and measured — the load-bearing part survived"]:::b
+  end
+  d1 --> b1
+  d2 --> b2
+  d3 --> b3
+  d4 --> b4
+  d5 --> b5
+  d6 --> b6
+  d7 --> b7

@@ -1,0 +1,668 @@
+{
+  "boilerplate": {
+    "boilerplate_postings": 2600,
+    "boilerplate_share": 0.9848484848484849,
+    "boilerplate_terms": 65,
+    "hapax": 40,
+    "hapax_share": 0.38095238095238093,
+    "heaps_beta": 0.14812958745873228,
+    "heaps_k": 26.88247447335963,
+    "lever": "`[index]` stopwords, or an analyzer amendment \u2014 an index change, with its own record",
+    "terms": 105,
+    "top": [
+      {
+        "df": 40,
+        "hash": "0337d7900d1c9626",
+        "idf": 0.012270092591814401,
+        "share": 1.0,
+        "word": "Check"
+      },
+      {
+        "df": 40,
+        "hash": "0733984953d3c71a",
+        "idf": 0.012270092591814401,
+        "share": 1.0,
+        "word": "procedure"
+      },
+      {
+        "df": 40,
+        "hash": "0c588200b741b914",
+        "idf": 0.012270092591814401,
+        "share": 1.0,
+        "word": "minutes"
+      },
+      {
+        "df": 40,
+        "hash": "0dbf1f29732de6c6",
+        "idf": 0.012270092591814401,
+        "share": 1.0,
+        "word": "incident"
+      },
+      {
+        "df": 40,
+        "hash": "11013979cc35d5fe",
+        "idf": 0.012270092591814401,
+        "share": 1.0,
+        "word": "Steps"
+      },
+      {
+        "df": 40,
+        "hash": "180eea0a868ca9dc",
+        "idf": 0.012270092591814401,
+        "share": 1.0,
+        "word": "error"
+      },
+      {
+        "df": 40,
+        "hash": "1e71f1693fb2e8f7",
+        "idf": 0.012270092591814401,
+        "share": 1.0,
+        "word": "open"
+      },
+      {
+        "df": 40,
+        "hash": "1fc5bd8679f757f5",
+        "idf": 0.012270092591814401,
+        "share": 1.0,
+        "word": "md"
+      },
+      {
+        "df": 40,
+        "hash": "21351e1f7e3b2dd1",
+        "idf": 0.012270092591814401,
+        "share": 1.0,
+        "word": "drain"
+      },
+      {
+        "df": 40,
+        "hash": "2797b5a98adfaa98",
+        "idf": 0.012270092591814401,
+        "share": 1.0,
+        "word": "endpoint"
+      },
+      {
+        "df": 40,
+        "hash": "28c75a0dd665d89d",
+        "idf": 0.012270092591814401,
+        "share": 1.0,
+        "word": "balancer"
+      },
+      {
+        "df": 40,
+        "hash": "2bf17e6dcf8ac4bc",
+        "idf": 0.012270092591814401,
+        "share": 1.0,
+        "word": "outcome"
+      },
+      {
+        "df": 40,
+        "hash": "34f37939e6127af2",
+        "idf": 0.012270092591814401,
+        "share": 1.0,
+        "word": "traffic"
+      },
+      {
+        "df": 40,
+        "hash": "34f945643f202ca7",
+        "idf": 0.012270092591814401,
+        "share": 1.0,
+        "word": "engineer"
+      },
+      {
+        "df": 40,
+        "hash": "3654ada0606cdab8",
+        "idf": 0.012270092591814401,
+        "share": 1.0,
+        "word": "close"
+      },
+      {
+        "df": 40,
+        "hash": "3b8157d3b50e9b1d",
+        "idf": 0.012270092591814401,
+        "share": 1.0,
+        "word": "page"
+      },
+      {
+        "df": 40,
+        "hash": "3cd0bc92281511de",
+        "idf": 0.012270092591814401,
+        "share": 1.0,
+        "word": "Re"
+      },
+      {
+        "df": 40,
+        "hash": "3e2a0a887a17047d",
+        "idf": 0.012270092591814401,
+        "share": 1.0,
+        "word": "add"
+      },
+      {
+        "df": 40,
+        "hash": "3e3b15d70f9569ea",
+        "idf": 0.012270092591814401,
+        "share": 1.0,
+        "word": "served"
+      },
+      {
+        "df": 40,
+        "hash": "4418cb899ab125cf",
+        "idf": 0.012270092591814401,
+        "share": 1.0,
+        "word": "within"
+      }
+    ],
+    "zipf_slope": -1.4304517732263
+  },
+  "checks": [
+    {
+      "detail": "0 of 40 documents carry no distinctive term at all, so no query can select them (EXHAUSTIVE - every document was checked)",
+      "flagged": false,
+      "floor": {
+        "bound": 0.01,
+        "direction": "max",
+        "provisional": true,
+        "source": "work/regression/2026-09-14-inspect-floors/"
+      },
+      "name": "unreachable share",
+      "status": "ok",
+      "value": 0.0
+    },
+    {
+      "detail": "2600 of 2640 postings carry one of 65 term(s) on half the corpus or more",
+      "flagged": true,
+      "floor": {
+        "bound": 0.6,
+        "direction": "max",
+        "provisional": true,
+        "source": "work/regression/2026-09-14-inspect-floors/"
+      },
+      "name": "boilerplate share",
+      "status": "attention",
+      "value": 0.9848484848484849
+    },
+    {
+      "detail": "40 of 40 documents are one half of a near-duplicate pair (Jaccard >= 0.80); 780 pair(s)",
+      "flagged": true,
+      "floor": {
+        "bound": 0.2,
+        "direction": "max",
+        "provisional": true,
+        "source": "work/regression/2026-09-14-inspect-floors/"
+      },
+      "name": "near-duplicate share",
+      "status": "attention",
+      "value": 1.0
+    },
+    {
+      "detail": "40 of 40 documents are returned in the top 3 for their own most distinctive words (every document)",
+      "flagged": false,
+      "floor": null,
+      "name": "findable share",
+      "status": "descriptive",
+      "value": 1.0
+    }
+  ],
+  "corpus": {
+    "boilerplate_df": 20.0,
+    "distinctive_df": 4.0,
+    "documents": 40,
+    "edges": 0,
+    "postings": 2640,
+    "shards": {
+      "09.jsonl": "f2f18c7973013ca71cb02c2a882e1f291b554a6c",
+      "14.jsonl": "2f4443144f58818a110f630ed67da98bc6258882",
+      "18.jsonl": "6e4a7d34d05c1be63f9663a1b4cffb01e109c2ed",
+      "22.jsonl": "7fe3e730109fd14cc1b37882695e33c049e0fad1",
+      "28.jsonl": "c458cbd5d4fc10b27794817c62f80a953edb9b27",
+      "2f.jsonl": "460644ffe442b37e70cfdc48a7c58ac75e567c3d",
+      "38.jsonl": "f2582d5a71463f27a84f6ff3e20d31fe928ae612",
+      "3e.jsonl": "d4bc38c8b5bbadd15de3a8faf77cea1918386b5a",
+      "40.jsonl": "3f7801d94ac8fa753604a97d474ebcd2f91b6cec",
+      "56.jsonl": "b9b9ed9372427f6948f6b7b44a18b682dcf25c81",
+      "5a.jsonl": "86ac233fc4b839e0affcc2756e0d4fb6119df389",
+      "5c.jsonl": "7020679741cb514414d7534a7498cbd5cf75d869",
+      "5f.jsonl": "175273c7e9c3d15403b0b64ab41368256354aea3",
+      "68.jsonl": "395f46c2e9dc1fda7f96d15db9c7dc4b4485aefc",
+      "69.jsonl": "8a1de02766cedcb3f2913b7372a465e21b0e5a32",
+      "6c.jsonl": "6d96041f59b0e3d6bc6ca8a182229d36c8ab5f95",
+      "6d.jsonl": "bd5a478531811f985cc5407dab119dd66f512589",
+      "76.jsonl": "f3a6f6adda9ab0665c2187c9fc2f6c64f7a85f0a",
+      "80.jsonl": "60f23f3c9a2ea787cda22e8829e4d4213f6473ec",
+      "81.jsonl": "cd915d85d07867ddd2e1ebd724214dcc7665840a",
+      "85.jsonl": "fbb2b2aa35ed5fc4cbd885617628f04eb1eda2e2",
+      "87.jsonl": "9dd421c413cd8eaf48aec236cb5e114c1cb0822a",
+      "91.jsonl": "ef791a08e9f451ae01a9c7cc628aa290a4671321",
+      "97.jsonl": "26861b5a6b836e4edf2aa64643d40ee9cbfc7998",
+      "9b.jsonl": "10bd5336a41542ecbd10f5c4b545a5d97d605a44",
+      "b5.jsonl": "6c29e38971f902199f69bf7d8bbaa601eff53645",
+      "b9.jsonl": "5491c0c39d105f87d95def4c915611834dc42877",
+      "ba.jsonl": "966a2cbc42f9ba15d80b36cc700301e3c9c98eac",
+      "c5.jsonl": "a9eb4266770ce9a7c63fc1c563694cdf37624244",
+      "c9.jsonl": "b129960025e3b567573b3ba8babe07912603e6fd",
+      "cb.jsonl": "d14607f920de1e24d70b528765cb59ff71afaa3c",
+      "df.jsonl": "6762fcae13b7a95a786a8fa0e78b589c5ddc79ef",
+      "e2.jsonl": "38c3551cde773cad5ad290a3926ba86df0bbc182",
+      "e6.jsonl": "86a19cab244897da73a61a9a8b4eef0d8ce22444",
+      "e7.jsonl": "0d4d9d6f7021d50e861732564e429f8c2d321f2b",
+      "ee.jsonl": "edbc81f0a19de5b3a86639ab505eb97e748a3a3a",
+      "f2.jsonl": "5fc6a53f76d8d539a9419ac2382124ef23057146",
+      "f6.jsonl": "bd8c1e3b724a09077f8de43fa065e5a2c23f8713",
+      "fb.jsonl": "8b706bbfc41ef4cd3e755d4dc1bb03ee539df464"
+    },
+    "terms": 105
+  },
+  "coverage": {
+    "dictionary_coverage": 1.0,
+    "kept": 5880,
+    "kept_share": 0.620253164556962,
+    "lever": "a decoder (`fux-decoder`), or leave it in `.fux/enrich/queue.tsv` for a model to describe",
+    "named_terms": 105,
+    "no_content": [],
+    "queued": [],
+    "raw_runs": 9480,
+    "total_terms": 105,
+    "undecodable": [],
+    "unreadable": []
+  },
+  "duplication": {
+    "documents_in_a_family": 40,
+    "documents_in_a_pair": 40,
+    "families": [
+      {
+        "headings": "Preconditions \u00b7 Rollback \u00b7 Runbook \u00b7 Steps",
+        "members": [
+          "file:docs/runbook-00.md",
+          "file:docs/runbook-01.md",
+          "file:docs/runbook-02.md",
+          "file:docs/runbook-03.md",
+          "file:docs/runbook-04.md",
+          "file:docs/runbook-05.md",
+          "file:docs/runbook-06.md",
+          "file:docs/runbook-07.md",
+          "file:docs/runbook-08.md",
+          "file:docs/runbook-09.md",
+          "file:docs/runbook-10.md",
+          "file:docs/runbook-11.md",
+          "file:docs/runbook-12.md",
+          "file:docs/runbook-13.md",
+          "file:docs/runbook-14.md",
+          "file:docs/runbook-15.md",
+          "file:docs/runbook-16.md",
+          "file:docs/runbook-17.md",
+          "file:docs/runbook-18.md",
+          "file:docs/runbook-19.md",
+          "file:docs/runbook-20.md",
+          "file:docs/runbook-21.md",
+          "file:docs/runbook-22.md",
+          "file:docs/runbook-23.md",
+          "file:docs/runbook-24.md",
+          "file:docs/runbook-25.md",
+          "file:docs/runbook-26.md",
+          "file:docs/runbook-27.md",
+          "file:docs/runbook-28.md",
+          "file:docs/runbook-29.md",
+          "file:docs/runbook-30.md",
+          "file:docs/runbook-31.md",
+          "file:docs/runbook-32.md",
+          "file:docs/runbook-33.md",
+          "file:docs/runbook-34.md",
+          "file:docs/runbook-35.md",
+          "file:docs/runbook-36.md",
+          "file:docs/runbook-37.md",
+          "file:docs/runbook-38.md",
+          "file:docs/runbook-39.md"
+        ]
+      }
+    ],
+    "family_count": 1,
+    "lever": "`.fuxignore`, `archived=`, or `supersedes` on the one that is current",
+    "near_duplicate_share": 1.0,
+    "near_duplicates": [
+      {
+        "a": "file:docs/runbook-00.md",
+        "b": "file:docs/runbook-01.md",
+        "jaccard": 0.9701492537313433
+      },
+      {
+        "a": "file:docs/runbook-00.md",
+        "b": "file:docs/runbook-02.md",
+        "jaccard": 0.9701492537313433
+      },
+      {
+        "a": "file:docs/runbook-00.md",
+        "b": "file:docs/runbook-03.md",
+        "jaccard": 0.9701492537313433
+      },
+      {
+        "a": "file:docs/runbook-00.md",
+        "b": "file:docs/runbook-04.md",
+        "jaccard": 0.9701492537313433
+      },
+      {
+        "a": "file:docs/runbook-00.md",
+        "b": "file:docs/runbook-05.md",
+        "jaccard": 0.9701492537313433
+      },
+      {
+        "a": "file:docs/runbook-00.md",
+        "b": "file:docs/runbook-06.md",
+        "jaccard": 0.9701492537313433
+      },
+      {
+        "a": "file:docs/runbook-00.md",
+        "b": "file:docs/runbook-07.md",
+        "jaccard": 0.9701492537313433
+      },
+      {
+        "a": "file:docs/runbook-00.md",
+        "b": "file:docs/runbook-08.md",
+        "jaccard": 0.9701492537313433
+      },
+      {
+        "a": "file:docs/runbook-00.md",
+        "b": "file:docs/runbook-09.md",
+        "jaccard": 0.9701492537313433
+      },
+      {
+        "a": "file:docs/runbook-00.md",
+        "b": "file:docs/runbook-10.md",
+        "jaccard": 0.9701492537313433
+      },
+      {
+        "a": "file:docs/runbook-00.md",
+        "b": "file:docs/runbook-11.md",
+        "jaccard": 0.9701492537313433
+      },
+      {
+        "a": "file:docs/runbook-00.md",
+        "b": "file:docs/runbook-12.md",
+        "jaccard": 0.9701492537313433
+      },
+      {
+        "a": "file:docs/runbook-00.md",
+        "b": "file:docs/runbook-13.md",
+        "jaccard": 0.9701492537313433
+      },
+      {
+        "a": "file:docs/runbook-00.md",
+        "b": "file:docs/runbook-14.md",
+        "jaccard": 0.9701492537313433
+      },
+      {
+        "a": "file:docs/runbook-00.md",
+        "b": "file:docs/runbook-15.md",
+        "jaccard": 0.9701492537313433
+      },
+      {
+        "a": "file:docs/runbook-00.md",
+        "b": "file:docs/runbook-16.md",
+        "jaccard": 0.9701492537313433
+      },
+      {
+        "a": "file:docs/runbook-00.md",
+        "b": "file:docs/runbook-17.md",
+        "jaccard": 0.9701492537313433
+      },
+      {
+        "a": "file:docs/runbook-00.md",
+        "b": "file:docs/runbook-18.md",
+        "jaccard": 0.9701492537313433
+      },
+      {
+        "a": "file:docs/runbook-00.md",
+        "b": "file:docs/runbook-19.md",
+        "jaccard": 0.9701492537313433
+      },
+      {
+        "a": "file:docs/runbook-00.md",
+        "b": "file:docs/runbook-20.md",
+        "jaccard": 0.9701492537313433
+      }
+    ],
+    "pair_count": 780
+  },
+  "findability": {
+    "fewest_distinctive": [
+      {
+        "distinctive": 1,
+        "id": "file:docs/runbook-00.md"
+      },
+      {
+        "distinctive": 1,
+        "id": "file:docs/runbook-01.md"
+      },
+      {
+        "distinctive": 1,
+        "id": "file:docs/runbook-02.md"
+      },
+      {
+        "distinctive": 1,
+        "id": "file:docs/runbook-03.md"
+      },
+      {
+        "distinctive": 1,
+        "id": "file:docs/runbook-04.md"
+      },
+      {
+        "distinctive": 1,
+        "id": "file:docs/runbook-05.md"
+      },
+      {
+        "distinctive": 1,
+        "id": "file:docs/runbook-06.md"
+      },
+      {
+        "distinctive": 1,
+        "id": "file:docs/runbook-07.md"
+      },
+      {
+        "distinctive": 1,
+        "id": "file:docs/runbook-08.md"
+      },
+      {
+        "distinctive": 1,
+        "id": "file:docs/runbook-09.md"
+      },
+      {
+        "distinctive": 1,
+        "id": "file:docs/runbook-10.md"
+      },
+      {
+        "distinctive": 1,
+        "id": "file:docs/runbook-11.md"
+      },
+      {
+        "distinctive": 1,
+        "id": "file:docs/runbook-12.md"
+      },
+      {
+        "distinctive": 1,
+        "id": "file:docs/runbook-13.md"
+      },
+      {
+        "distinctive": 1,
+        "id": "file:docs/runbook-14.md"
+      },
+      {
+        "distinctive": 1,
+        "id": "file:docs/runbook-15.md"
+      },
+      {
+        "distinctive": 1,
+        "id": "file:docs/runbook-16.md"
+      },
+      {
+        "distinctive": 1,
+        "id": "file:docs/runbook-17.md"
+      },
+      {
+        "distinctive": 1,
+        "id": "file:docs/runbook-18.md"
+      },
+      {
+        "distinctive": 1,
+        "id": "file:docs/runbook-19.md"
+      }
+    ],
+    "findable_share": 1.0,
+    "lever": "`fux enrich`, `fux correct`, or fix the source",
+    "misses": [],
+    "retrieved": 40,
+    "sample_is_whole_corpus": true,
+    "sampled": 40,
+    "unfindable": [],
+    "unfindable_count": 0
+  },
+  "graph": {
+    "communities": [],
+    "community_count": 0,
+    "edges": 0,
+    "hubs": [],
+    "lever": "link-IDF and the graph-composed `ask` (W-161) \u2014 until then, add a link from a document that is read",
+    "nodes": 0,
+    "orphan_count": 40,
+    "orphans": [
+      "file:docs/runbook-00.md",
+      "file:docs/runbook-01.md",
+      "file:docs/runbook-02.md",
+      "file:docs/runbook-03.md",
+      "file:docs/runbook-04.md",
+      "file:docs/runbook-05.md",
+      "file:docs/runbook-06.md",
+      "file:docs/runbook-07.md",
+      "file:docs/runbook-08.md",
+      "file:docs/runbook-09.md",
+      "file:docs/runbook-10.md",
+      "file:docs/runbook-11.md",
+      "file:docs/runbook-12.md",
+      "file:docs/runbook-13.md",
+      "file:docs/runbook-14.md",
+      "file:docs/runbook-15.md",
+      "file:docs/runbook-16.md",
+      "file:docs/runbook-17.md",
+      "file:docs/runbook-18.md",
+      "file:docs/runbook-19.md"
+    ],
+    "singleton_communities": 0
+  },
+  "lengths": {
+    "body_tokens": {
+      "max": 138,
+      "min": 138,
+      "p10": 138,
+      "p50": 138,
+      "p90": 138
+    },
+    "ctx_over_body": [],
+    "distinct_terms": {
+      "max": 66,
+      "min": 66,
+      "p10": 66,
+      "p50": 66,
+      "p90": 66
+    },
+    "empty_title": [],
+    "fields": {
+      "body": 5520,
+      "ctx": 0,
+      "heading": 160,
+      "path": 160,
+      "title": 40
+    },
+    "longest": [
+      {
+        "body_tokens": 138,
+        "id": "file:docs/runbook-39.md"
+      },
+      {
+        "body_tokens": 138,
+        "id": "file:docs/runbook-38.md"
+      },
+      {
+        "body_tokens": 138,
+        "id": "file:docs/runbook-37.md"
+      },
+      {
+        "body_tokens": 138,
+        "id": "file:docs/runbook-36.md"
+      },
+      {
+        "body_tokens": 138,
+        "id": "file:docs/runbook-35.md"
+      },
+      {
+        "body_tokens": 138,
+        "id": "file:docs/runbook-34.md"
+      },
+      {
+        "body_tokens": 138,
+        "id": "file:docs/runbook-33.md"
+      },
+      {
+        "body_tokens": 138,
+        "id": "file:docs/runbook-32.md"
+      },
+      {
+        "body_tokens": 138,
+        "id": "file:docs/runbook-31.md"
+      },
+      {
+        "body_tokens": 138,
+        "id": "file:docs/runbook-30.md"
+      }
+    ],
+    "no_headings": [],
+    "shortest": [
+      {
+        "body_tokens": 138,
+        "id": "file:docs/runbook-00.md"
+      },
+      {
+        "body_tokens": 138,
+        "id": "file:docs/runbook-01.md"
+      },
+      {
+        "body_tokens": 138,
+        "id": "file:docs/runbook-02.md"
+      },
+      {
+        "body_tokens": 138,
+        "id": "file:docs/runbook-03.md"
+      },
+      {
+        "body_tokens": 138,
+        "id": "file:docs/runbook-04.md"
+      },
+      {
+        "body_tokens": 138,
+        "id": "file:docs/runbook-05.md"
+      },
+      {
+        "body_tokens": 138,
+        "id": "file:docs/runbook-06.md"
+      },
+      {
+        "body_tokens": 138,
+        "id": "file:docs/runbook-07.md"
+      },
+      {
+        "body_tokens": 138,
+        "id": "file:docs/runbook-08.md"
+      },
+      {
+        "body_tokens": 138,
+        "id": "file:docs/runbook-09.md"
+      }
+    ]
+  },
+  "levers": {
+    "boilerplate term": "`[index]` stopwords, or an analyzer amendment \u2014 an index change, with its own record",
+    "file-name-only document": "a decoder (`fux-decoder`), or leave it in `.fux/enrich/queue.tsv` for a model to describe",
+    "hub": "link-IDF and the graph-composed `ask` (W-161) \u2014 until then, nothing: a hub is a fact about the corpus",
+    "near-duplicate pair": "`.fuxignore`, `archived=`, or `supersedes` on the one that is current",
+    "orphan": "link-IDF and the graph-composed `ask` (W-161) \u2014 until then, add a link from a document that is read",
+    "template family": "`.fuxignore`, `archived=`, or `supersedes` on the one that is current",
+    "unfindable document": "`fux enrich`, `fux correct`, or fix the source",
+    "unreadable document": "re-ingest, or `keep = true` on the url line so the bytes are retained"
+  }
+}

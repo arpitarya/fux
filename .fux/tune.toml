@@ -15,13 +15,18 @@
 
 [bm25f]
 k1                      = 1.2      # term-frequency saturation
-b                       = 0.75     # length normalisation, 0 = off, 1 = full
+b                       = 0.15     # length normalisation, 0 = off, 1 = full
 # The five field weights, in index order. 0 means "ignore this field".
 body                    = 1.0
 heading                 = 3.0
 title                   = 2.0
 path                    = 1.5
 ctx                     = 1.0
+# The sixth field is ANCHOR: what OTHER documents call this one when they link
+# to it (W-168 step 1). Folded in at read time from their edges -- it is in no
+# committed posting, so moving this needs no re-ingest. 0 = OFF, and off is the
+# default: UNMEASURED, and it turns on only on a passing pre-registered run.
+anchor                  = 0.0
 
 [ranking]
 rerank_weight           = 0.3   # 0 = off; the proximity reranker's uplift
@@ -36,6 +41,14 @@ laziness     = 0.5
 hop_decay    = 0.5
 expand_limit = 10
 seed_depth   = 5
+# The graph tier on `ask` (W-161). The two booleans are separate so a failing
+# arm can be withdrawn without touching the other; both are UNMEASURED today.
+ask_boost         = true   # arm A: re-order the window by RRF(lexical, PPR)
+ask_related       = true   # arm B: the labelled `related` list
+ask_kinds         = "ref"    # `ref` alone; a `tag` edge is a hub, not a link
+ask_link_idf      = true   # hub damping, ON here and off for `fux graph`
+ask_max_hops      = 1      # one hop; a second-hop document is a guess
+ask_related_limit = 5
 
 [refer]                         # answer, and the refer plane
 budget            = 8000       # bytes of assembled passage

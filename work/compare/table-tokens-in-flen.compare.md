@@ -14,7 +14,7 @@ not *"is the number real"* (it is) but *"is a synthetic threshold enough to move
 a default that every corpus inherits"*.
 
 **Found:** [`proposals/structure-aware-extraction.md`](../proposals/structure-aware-extraction.md),
-graduated as [W-144](../open/W-144-structure-aware-extraction.md) when W-86's P4
+graduated as [W-144](../../archive/open/W-144-structure-aware-extraction.md) when W-86's P4
 landed. **Owning records:** [SR-EXTRACTED](../../records/0115_extracted-mode.md)
 (what `extract.py` builds) and [SR-RANKING](../../records/0111_ranking.md)
 (what the fields mean). Neither decides this today.
@@ -25,13 +25,16 @@ landed. **Owning records:** [SR-EXTRACTED](../../records/0115_extracted-mode.md)
 
 | | |
 |---|---|
-| **status** | **proposed** — Arpit accepts or overrides |
-| **the call** | **(b) exclude table-row tokens from the `body` field length only**, leaving their *terms* fully indexed |
-| **confidence** | **high on the mechanism and the direction, medium on the default.** Two corpora agree on direction; neither is a production corpus |
+| **status** | **DECIDED — Arpit ruled (d) on 2026-09-14**, after W-155 showed (b) breaks the data-dump case totally |
+| **the call** | **(d) lower `b`, measured first.** Sweep `b ∈ {0.75, 0.6, 0.5, 0.4}` over the three existing families (`dump` · `content` · `main`) with both controls, on the golden ladder **and** on fux's own `records/` + `work/` + `docs/` tree. **Ship the first value that nets positive on all three families with controls holding** as the default in `tune.toml [bm25f]`. **If no value does,** fall back to **(b) plus an idf guard** — a document whose only match is a row label may not win on length alone. **No sixth field (c) in 3.0** |
+| **why (d) over (b)** | (b) is right for two document shapes and wrong for a third, and `flen` cannot tell them apart; (d) makes no structural claim about tables and is reversible per consumer. Its cost — global, blunt, never measured here — is exactly why the ruling is *measured first* |
+| **confidence** | **high on the mechanism and the direction, unmeasured on the value.** No run in this project has moved `b`; the sweep is the instrument |
 | **reopen-trigger** | **A corpus outside `work/golden/` and outside `tools/quality-controls/` shows a table share above 0.29 on more than 10 % of its documents *and* a graded query set over it disagrees with this verdict.** Checkable today against any repo with goldens |
 
-⚠ **Nothing is implemented.** `CLAUDE.md` §Conformance runs — *never ship a
-ranking/behaviour change off a single synthetic corpus* — and this is one.
+**Evidence rule:** [SR-RS](../../records/0133_predictions.md) decision 19's paired
+floor, on golden data ([SR-LAW-0](../../records/0002_LAW-0-authority.md) decision 2a —
+the single-corpus sentence is gone). The second corpus in the sweep is for the
+reopen-trigger, not for the verdict.
 
 ---
 
@@ -240,7 +243,7 @@ it touches, and this one is.
 **What that does NOT do:** it does not make (a) right. `main` and `content` are
 both 30/30 the other way; (b) fixes two cases and breaks a third. **The
 recommendation this document carries is therefore the one thing W-155 leaves
-open, and it is Arpit's** ([W-144](../open/W-144-structure-aware-extraction.md)).
+open, and it is Arpit's** ([W-144](../../archive/open/W-144-structure-aware-extraction.md)).
 
 ---
 

@@ -10,7 +10,7 @@ feature: the authority of records — where a rule lives, which record wins, and
 owns: []
 laws: [L0]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: c9f65a1461bce13570fa23cece8e7535c8da0b113b3bff2057625ea35be00ee2
+content_sha: d825dd0e3183198b1dcbdd64c6252c9126e3b1f180823b7b84cb8ca75968dc9e
 ---
 
 # SR-LAW-0 — L0 — SRs are the only source of truth
@@ -136,11 +136,58 @@ artifact — `CLAUDE.md`, a schema file, a config comment, a skill, a README, a
 diagram, a docstring — **links to it and never restates it**. A change is made
 in the record first; everything else keeps pointing.
 
+**1a. The records are always up to date — IN THE CHANGE THAT MAKES THEM
+WRONG.** (Arpit, 2026-08-18, emphatic and standing: *always* make sure the SRs
+are up to date. Not at the end of the milestone, not when someone asks.)
+
+Three obligations, and none is optional:
+
+1. **No behaviour change lands without its record updated in the same change.**
+   Same commit, not the next one.
+2. **If a change genuinely touches no recorded decision, say so out loud** —
+   `no SR affected`, on its own line in the commit message. **That is a claim
+   under your name in git history, which is the point. Silence is not an
+   answer.**
+3. **Before a session ends, re-read the records you touched code under.** A
+   record describing behaviour the code no longer has is **worse than no
+   record: it reads as authority.**
+
+⚠ **Obligations 1 and 2 are enforced; obligation 3 is not, and cannot be.**
+[SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 3 is the gate, and what it
+proves is that an owning record was **touched** — it never reads the record. **A
+record can be amended into self-contradiction in the same commit and every
+mechanical check fux has will pass.** W-83 is the case: an accepted amendment
+contradicted itself, the code implemented the wrong sentence, and CI was green
+the whole way.
+
+**So obligation 3 is the only thing covering coherence.** Ruled 2026-08-27
+(W-82 ruling 18) as *stated rather than mechanised*, because the two-strikes
+rule ([SR-WORK-SESSION](0060_WORK-session.md) decision 13) makes a **second**
+recorded occurrence the trigger for a gate, and this has happened once.
+
+⚠ **Stated here from 2026-09-14** (W-173, accepted by Arpit). It had been
+stated in `CLAUDE.md` §Law zero — a hand-written second copy of this record's
+own subject, which decision 4's test classes as a restatement and decision 1
+therefore forbids.
+
 **2. Precedence.** The Law records `SR-LAW-0` … `SR-WORK-ENVIRONMENTS` outrank every
 other SR. **A record that conflicts with a Law is void in the conflicting
 part** — a defect to fix on contact, never a trade-off to weigh. An ordinary
 record may narrow a law's application to its own subject; it may never widen,
 except, or contradict one.
+
+**2a. On contact, the conflicting sentence is DELETED from the lower document —
+never softened, never footnoted, never left standing beside a pointer.** (Arpit,
+2026-09-14, ruling on W-156: *"SRs are the only standing records and are
+prioritised over everything else. If there is a conflict, the SR is prioritised
+and the other document is cleared of it."*) The order is fixed: a Law record
+outranks an ordinary record, and any record outranks every non-record artifact
+in decision 1's list. The first case: SR-WORK-ENVIRONMENTS decision 2 (*every
+measurement runs in `fux-lab` on the golden test data*) and SR-RS's former
+sentence *"never ship a ranking change off a single synthetic corpus"* could not
+both hold, so the sentence left SR-RS. **The single-corpus rule is gone; the
+evidence a ranking change needs is SR-RS decision 19's paired floor on golden
+data, and nothing else.**
 
 **3. Amendment is entrenched.** A Law record changes **only on Arpit's ruling,
 named in the record**. An ordinary SR a session may accept under the
@@ -153,9 +200,56 @@ that is routed around.
 
 | kind | example | verdict |
 |---|---|---|
-| **describes** a rule a second time | a `doc:` string in a schema file; a `fux.toml` comment explaining what a key means | 🔴 forbidden — becomes a link |
+| **describes** a rule a second time | a `doc:` string in a schema file; a `fux.toml` comment explaining what a key means; **a docstring's table of keys and their defaults** | 🔴 forbidden — becomes a link |
+| **explains** mechanism or rationale beside the code | a docstring saying *why* `UrlSource` resolves in this order, or *how* a walk terminates | ✅ permitted — prose about the code is not a second statement of a rule (Arpit, 2026-09-14, W-146: the narrow reading) |
 | **implements** it | `config.py` naming the key it parses | ✅ permitted — it *is* the thing the record governs |
 | **enforces** it | a runtime-loaded schema, a test | ✅ permitted — an executable check, not a second statement |
+
+**4a. The docstring gate.** A docstring may name a key; it may not carry a
+default the record does not. `tests/test_docstring_defaults.py` (owed by W-146)
+extracts every `key = value` / `default: value` literal from docstrings under
+`src/fux/` and asserts each equals the value the owning record declares —
+that is what turns the narrow reading from judgment into an enforcement, and
+closes the exposure that `UrlSource` and SR-CONFIG could disagree while both
+looked correct.
+
+**4b. BUILT 2026-09-15 (W-146), and three things it found are worth more than
+the gate.**
+
+**① The exposure is real in principle and there was NO DRIFT in practice.**
+`UrlSource`'s docstring, SR-CONFIG decision 5 and `config.py`'s loader all agree
+today: `.fux/fetchers/http.py` and `"hashed"`, three artifacts, one value each.
+**A gate that goes green on its first run is the good outcome**, not a wasted
+one — the alternative was finding out later.
+
+**② Step 2 of W-146 found NOTHING TO DO.** Its instruction was *turn any
+docstring that is only a key-and-default table into a one-line link*. There is
+no such docstring under `src/fux/`. The narrow reading had already been applied
+correctly on 2026-09-14 — the two artifacts whose whole content was descriptions
+of keys (`config.schema.json` and `fux setup`'s `fux.toml` comments) were
+removed then, and nothing else qualified.
+
+**③ 🔴 The gate asserts against the CODE, not the record, and that is a
+deliberate narrowing of 4a's wording.** A record declares a key's **existence**
+— the `keys` block is dotted paths and sigils — and may name a value only in
+prose, which decision 6 says cannot make a key real. A parser reading values out
+of prose would be guessing. So: the **name** is bound to the record by
+`tests/test_sr_config_keys.py`, in both directions; the **value** is bound to
+the loader by `tests/test_docstring_defaults.py`; and a docstring can drift from
+neither. **The claim narrows, the enforcement does not.**
+
+⚠ **And a fourth, about gates rather than about docstrings.** The first version
+matched a bare `` `key = value` `` anywhere in a docstring and produced **twelve
+false positives**, then eight — every inline example of that shape, and every
+TOML key whose name collided with a Python parameter in the same module. **A
+gate that fires wrongly is worse than one that does not fire**: it teaches every
+reader to pass over it, which is how SR-FIND veto 4 grepped a line that does not
+exist and read as passing for weeks. The pattern now requires a default claim to
+**say** it is one, and the file carries a self-test proving it can still fail.
+
+⚠ **The cost of that narrowing, stated: the gate is thin.** One claim in the
+whole tree is checkable today. It is a tripwire for a drift that has not
+happened yet, not a survey of the codebase.
 
 **The test in one sentence:** *could this artifact and the record disagree
 while both still look correct?* If yes, it is a restatement. If it would
@@ -227,7 +321,7 @@ once a conflict is found; it does not find one.
 🔴 **A record contradicting itself inside one file is still ungated**, exactly
 as it was before L0. Both strikes that motivated this law would have been
 caught by the source clause; neither would have been caught by a parser
-reading for contradiction. The two-strikes rule is answered by removing the
+reading for contradiction. The two-strikes rule ([SR-WORK-SESSION](0060_WORK-session.md) decision 13) is answered by removing the
 duplication, not by inventing a check that cannot exist.
 
 ### Alternatives considered
@@ -243,7 +337,7 @@ duplication, not by inventing a check that cannot exist.
 ### Reference (required)
 
 - Arpit's ruling, 2026-09-06 — quoted verbatim in §2 Context.
-- [`work/IMPLEMENTATION.md`](../work/IMPLEMENTATION.md) §W-122 — the migration this record authorises, as it landed. Its item file was deleted with its queue row (OPEN-WORK rule 2); what remains open is [W-146](../work/open/W-146-the-rest-of-l0.md).
+- [`work/IMPLEMENTATION.md`](../work/IMPLEMENTATION.md) §W-122 — the migration this record authorises, as it landed. Its item file was deleted with its queue row (OPEN-WORK rule 2). **W-146 carried the remainder and closed 2026-09-15** — its last row became [SR-WORK-GOLDEN](0066_WORK-golden.md), the second generated view decision 5 permits; the item file is [archived](../archive/open/W-146-the-rest-of-l0.md).
 - **The two strikes:** `acquired_max_bytes` — named in a record and the ownership table, never parsed, `NameError` on every retaining fetch (2026-09-01); `max_parallel` — two contradicting sentences in one accepted amendment, the code implementing the wrong one ([`archive/open/W-83-the-unconfigured-fetch-ceiling.md`](../archive/open/W-83-the-unconfigured-fetch-ceiling.md)).
 - **Precedent for a generated view:** [SR-TUNE](0135_tuning.md) already names `tune.specimen()` in `src/fux/tune.py` as the authority for `.fux/tune.toml`.
 - US Constitution, Article VI, Clause 2 (the Supremacy Clause) and Article V (the amendment path) — the two-level shape and the reason entrenchment is part of it, not an addition to it.

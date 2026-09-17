@@ -12,6 +12,19 @@
  * `find` exists to be piped, and anything else on stdout is read by `xargs` as
  * a filename (SR-DIR-LIST decision 12). Every note goes to stderr; the flags
  * are carried in `--json`, which is where a machine reader should look.
+ *
+ * ⚠ **`find` shows no `[pinned]` marker, on either reader, and that is the
+ * bare-paths rule above rather than an omission** (W-162). A pin DOES apply
+ * here — it is applied in `runQuery`, so a pinned document is first in `find`'s
+ * list too — and `find --json` carries `pinned` on the result like every other
+ * field. What `find` does not do is annotate stdout, because stdout is paths
+ * and a marker glued to one breaks the pipe this verb exists for. **A consumer
+ * that needs to know reads `--json`**, which is the same answer `archived` has
+ * always had here.
+ *
+ * ⚠ **No observer hook on this reader** — SR-NODE-SEARCH decision 18. Python
+ * calls `.fux/observers/` once a verb has fully rendered; Node does not, and it
+ * is declared rather than missing. See `verbs/ask.mjs` for the reason.
  */
 import { runFused } from "../query/run.mjs";
 import { headingsFor } from "../query/headings.mjs";
@@ -109,6 +122,53 @@ export function declareConfidence(block, show) {
   process.stderr.write((block.line() || `confidence: ${block.band}.`) + "\n");
 }
 
+/** The honest decline, shared by `ask`, `find` and `answer`. **stderr since
+ *  2026-09-14** (W-165 fix 2): `find` exists to be piped, so a prose sentence on
+ *  the stream that otherwise holds nothing but paths turns an empty result into
+ *  one fake path. Exit code, wording and `--json` are all unchanged — the fix is
+ *  about the stream and nothing else. Digest-equal with the Python reader's
+ *  `_decline`. ASCII only.
+ *
+ *  `fux graph` still writes it to stdout in both readers; W-165's scope is the
+ *  three query verbs and widening it silently would be an unrecorded change. */
+export const NO_MATCHES = "No confident matches.";
+
+export function decline() {
+  process.stderr.write(NO_MATCHES + "\n");
+}
+
+/** The one sentence `fux doctor` prints, ported verbatim from
+ *  `doctor.FLOOR_OFF_NOTE` (W-164 gate 4). ASCII only — a Windows console's
+ *  default codepage must be able to encode it. */
+export const FLOOR_OFF_NOTE =
+  "`[confidence] separation_floor = 0.0` in .fux/tune.toml: NO answer in this repo " +
+  "can ever be `weak` again. That tunes away the SIGNAL, not the ranking - a " +
+  "`grounded` here does not mean what a `grounded` elsewhere means. The band " +
+  "publishes the floor it was judged under (`--band`, or the `confidence` block in " +
+  "`--json`), which is the only way a reader can tell. Raise it, or keep it and " +
+  "know what the band is worth";
+
+//: Said once per process, not per call — the Python twin's rule. A shell loop is
+//: a hundred processes and says it a hundred times, correctly; one long-lived
+//: reader says it once, which is the difference between a note and a nag.
+let floorNoteSaid = false;
+
+/** Twin of `_declare_floor_off` in `src/fux/query/__init__.py`.
+ *
+ * SR-CONFIDENCE decision 13 says of itself that nothing mechanical catches a
+ * floor tuned to zero. Both readers catch it now: Node reads `.fux/tune.toml`
+ * through `runQuery` (SR-NODE-SEARCH decision 8), so a repo answering from the
+ * Node reader would otherwise be the one place the note went unsaid.
+ *
+ * `quiet` is `--json`: a contract whose stdout is captured and diffed, and whose
+ * `confidence` block already carries the floor in parseable form. */
+export function declareFloorOff(tune, quiet) {
+  if (quiet || floorNoteSaid) return;
+  if (!tune || tune.separationFloor !== 0) return;
+  floorNoteSaid = true;
+  process.stderr.write(`fux: ${FLOOR_OFF_NOTE}\n`);
+}
+
 export function runFind(root, args) {
   const query = args._.join(" ");
   const queries = [query, ...(args.q || [])];
@@ -116,7 +176,15 @@ export function runFind(root, args) {
 
   const { results: ranked, confidence, fused, tune } = runFused(root, queries, top, {
     useTune: args.noTune !== true, wantConfidence: true, expand: args.expand ?? "",
+    // W-161 — **Tier A yes, Tier B never.** `find` is `ask`'s terse sibling and
+    // must rank the same corpus the same way, or the two verbs disagree; but it
+    // is also the verb for piping bare paths, so a labelled second block would
+    // be read by `xargs` as filenames. Saying `related: false` here rather than
+    // simply not rendering it also skips the work — on this reader that is a
+    // `recordFor` per candidate on top of a full plane rebuild.
+    related: false,
   });
+  declareFloorOff(tune, Boolean(args.json));
   const [results, dropped] = filtered(root, ranked, query, args);
   declareFilters(args, dropped);
 
@@ -134,7 +202,7 @@ export function runFind(root, args) {
   }
 
   if (!results.length) {
-    process.stdout.write("No confident matches.\n");
+    decline();
     declareConfidence(confidence, args.band);
     return 0;
   }

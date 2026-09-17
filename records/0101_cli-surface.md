@@ -7,10 +7,10 @@ description: Flat verbs in seven groups, one error boundary, three output modes.
 status: accepted
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@4f87294070d9, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@74ed15facf94, src/fux/progress.py@925dccc045ce]
+owns: [src/fux/cli.py@9a75c5894fb0, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@b9295123f1b4, src/fux/progress.py@925dccc045ce]
 laws: [L1, L4, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: ee942205a3b5413752ffb8f0da49f0f711bcbef5fd8b539174db282ae45ce9b5
+content_sha: 4abed18f6623d2fe22438b5eb0df21d42168c59e3f12f53c0449637f2c310b14
 ---
 
 # SR-CLI — the command-line surface
@@ -21,13 +21,27 @@ content_sha: ee942205a3b5413752ffb8f0da49f0f711bcbef5fd8b539174db282ae45ce9b5
 
 | group | verbs | |
 |---|---|---|
-| **lifecycle** | `setup` · `doctor` | set the repo up, then check it |
-| **write** | `ingest` · `build` | one writes the committed plane, one derives from it |
-| **sources** | `add` · `remove` · `update` · `enrich` | maintain what is indexed — `add` and `remove` write lines, `update` never touches one, `enrich` writes no committed byte at all |
-| **read** | `ask` · `find` · `answer` | differ only in how much they commit to |
+| **lifecycle** | `setup` · `doctor` · `inspect` | set the repo up, check the environment, then X-ray the index — `doctor`'s fix is a command or a config edit, `inspect`'s is a change to the corpus ([SR-INSPECT](0156_inspect.md)) |
+| **write** | `ingest` · `build` | one writes the committed plane, one derives from it. **`ingest` is the first ingest AND every re-ingest**, directories and URLs alike — decision 16 |
+| **sources** | `add` · `remove` · `enrich` · `correct` | maintain what is indexed — `add` and `remove` write lines and end in an ingest, `enrich` plans and validates a MODEL's text, and `correct` writes one question a PERSON typed ([SR-ENRICH](0137_enrich.md) decision 19). ⚠ **`update` was a fourth verb here and decision 16 deleted it** |
+| **read** | `ask` · `find` · `answer` · `lexical` | differ only in how much they commit to. `lexical` is the words alone, **frozen** — decision 12 |
 | **graph** | `explain` · `graph` · `path` | answer with **relationships**, never with a ranking |
 | **serve** | `mcp` · `daemon` | long-running processes; the only verbs that do not return |
-| **maintenance** | `hooks` · `tune` · `verify` | wire the repository to keep its own index in step, print the tunables, and re-run a provenance receipt against this tree |
+| **maintenance** | `hooks` · `tune` · `output` · `verify` | wire the repository to keep its own index in step, print the tunables and the output defaults, and re-run a provenance receipt against this tree |
+
+⚠ **`output` was missing from this table until 2026-09-14 (W-164 gate 2).**
+The verb shipped with [SR-OUTPUT](0143_output-defaults.md) and
+`.fux/README.md`'s own verb table listed it; this one did not, in the table this
+record explicitly *"promises to keep true"*. Two hand-maintained copies of one
+list with nothing comparing them, and **the record was the stale copy** — which
+is the direction that matters under L0, because every other artifact is supposed
+to defer to this one. `tests/test_verb_table_agreement.py` holds the two tables
+and `build_parser()` together now.
+
+🔴 **The parser is what settles a disagreement, and that is the whole design of
+that test.** Comparing two documents can only say they differ; it cannot say
+which is right, and a session that guessed had an even chance of editing the
+README to match a stale record.
 
 **The grouping is the mental model; the count is not.** What a verb does to the
 two planes survives a new verb where a count does not — which is why the table
@@ -140,7 +154,7 @@ teeth for this project specifically —
 the constraint. A new verb takes flags or positionals, never a subcommand tree,
 and lands in one of the groups in §1 or argues for a new one in this record.
 
-**1a. `add` / `remove` / `update` maintain the corpus, over all three source
+**1a. `add` / `remove` maintain the corpus, over all three source
 lists.** The entry picks the list — anything with a `scheme://` is a URL,
 `--types` says type pattern, everything else is `dirs`, which already accepts a
 directory *or* a single file. The common cases need no flag at all, which is
@@ -159,13 +173,17 @@ excludes** — the types list has no subtraction, so a pattern that is not in it
 is an error naming `.fux/.fuxignore`. A leftover `.fux/sources/types` stops every
 verb until `fux setup` converts it.
 
-**1b. `add` and `remove` write lines; `update` never touches one.** One
-sentence, and it is the whole reason three verbs do not overlap. Attribute
+**1b. `add` and `remove` write lines; `ingest` never touches one.** One
+sentence, and it is the whole reason the verbs do not overlap. Attribute
 edits belong to `add`, which is already an upsert. Re-reading a source belongs
-to `update`, which is why `fux update <entry>` can take an entry without that
+to `ingest`, which is why `fux ingest <entry>` can take an entry without that
 meaning "create it" — an entry nobody listed is a loud error, because an
-`update` that silently created lines would be a second `add`. Re-fetching is
-re-reading, so it is `update`'s.
+`ingest <entry>` that silently created lines would be a second `add`.
+Re-fetching is re-reading, so it is `ingest`'s.
+
+⚠ **This sentence named `update` until 2026-09-15**, when decision 16 deleted
+that verb and moved its whole surface here. The rule did not change; the verb
+under it did.
 
 **1c. `fux add <URL>` fetches that one URL.** Scoped to the URL just added,
 announced on stderr, `--no-fetch` to opt out. Recording a URL without fetching
@@ -191,8 +209,13 @@ line because a site was down would make the committed list a function of
 network weather.
 
 **1d. The engine has exactly two named networked paths, and this record names
-them**: `fux add <URL>` and `fux update`. Both are fenced, both are opt-in per
-invocation, both announce on stderr that they went out.
+them**: `fux add <URL>` and `fux ingest`. Both are fenced, both announce on
+stderr that they went out.
+
+⚠ **"Opt-in per invocation" stopped being true of the second one on
+2026-09-15** (decision 16). A bare `fux ingest` goes to the network, so the
+opt-in is now the *verb* rather than a flag on it, and the opt-**out** is
+`--no-fetch`. **The count is not the law and never was** — see decision 16.
 
 **L4's text does not change, and must not.** It reads *"network access only
 inside explicit, fenced, opt-in paths"* — already plural, already satisfied.
@@ -279,14 +302,45 @@ its exemptions and why are [SR-PII](0148_pii.md) decision 17's, not this
 record's; what this record owns is the placement — **before dispatch**, so a
 verb added later is gated without its author knowing the gate exists.
 
-**5. Exit codes: `0` ok · `1` error · `130` interrupted. `2` is reserved and
-not produced** — no `raise FuxError` site passes `exit_code=2`. It is kept in
-the contract for strict-mode hooks; a `2` appearing later narrows behaviour and
-is compatible. Do not treat `2` as live.
+**5. Exit codes: fux produces `0` ok · `1` error · `130` interrupted.
+`argparse` produces `2` for a usage error, before this contract applies at all**
+(amended by Arpit 2026-09-16, W-193).
 
-**6. "No confident matches." is exit 0.** An honest decline is a successful
-answer, not a failure. Callers test the output, not the exit code, for
-emptiness — `--json` is the reliable way to do that.
+**No `raise FuxError` site passes `exit_code=2` and none may.** The `2` comes
+from `ArgumentParser.error`, which calls `sys.exit(2)` **before `cli.main`'s
+boundary is ever reached** — so decision 4's *"`main` is the only boundary"*
+holds exactly: the one place fux renders an error never sees it.
+
+**A consumer sees `2` for an unknown verb, an unknown flag, or a malformed
+command line**, with argparse's usage message on stderr. That is the convention
+their tooling already assumes.
+
+⚠ **The strict-mode reservation on `2` is RETIRED, and the retirement is the
+point of the amendment.** This decision read *"`2` is reserved and not
+produced … do not treat `2` as live"* — a statement about `FuxError` that a
+reader could only take as a statement about the process. **A reservation nothing
+could ever claim is what makes a consumer read `fux update` → `2` as *the runner
+broke* rather than *the verb is gone*,** and W-177 is what turned that from a
+latent wrong sentence into a real consequence: `fux update` was in the released
+2.0.1 and is in people's pipelines.
+
+**Not taken** (W-193's other two options): overriding `ArgumentParser.error` to
+raise `FuxError` — it changes the exit code of every malformed command line fux
+has ever accepted, on the strength of one deleted verb; and renumbering the
+reservation — it keeps a dead reservation alive and documents two meanings on
+one code.
+
+**6. "No confident matches." is exit 0, and goes to STDERR.** An honest decline
+is a successful answer, not a failure. Callers test the output, not the exit
+code, for emptiness — `--json` is the reliable way to do that.
+
+⚠ **The stream half was added 2026-09-14 (W-165 fix 2).** The exit code is
+unchanged and is the decision this clause was always about; what moved is where
+the sentence is written, so that `fux find`'s stdout carries paths and nothing
+else. Stated on all three query verbs at once — [SR-ASK](0103_ask.md) decision 7,
+[SR-FIND](0104_find.md) decision 6, [SR-ANSWER](0105_answer.md) decision 7 —
+because *"the same rule as `ask`"* is what those records say and a split would
+have made it false. **`fux graph` still writes it to stdout**, in both readers.
 
 **7. Off-by-default flags are decisions.** `--fast` opts into the derived
 accelerator and is off by default: the scan needs no build step and the
@@ -329,6 +383,68 @@ scope is calls rather than literals** because `store/canonical.py` and
 `ingest/urlsrc.py` hold U+2028/U+2029/U+0085 as the sentinels they *strip*, and
 a guard that flags the code defending against a character is one people learn
 to switch off.
+
+**11. `fux inspect` is a verb, not a flag on `doctor`.** Stated once in
+[SR-INSPECT](0156_inspect.md) decision 1; the boundary is the remedy, not the
+subject — `doctor`'s finding is fixed by a command or a config edit and
+`inspect`'s by a change to the corpus.
+
+**12. 🔴 `fux lexical` and `fux ask` are TWO VERBS OVER ONE BODY, and `lexical`
+is FROZEN.** (W-160.)
+
+`ask --scan` already computed BM25F alone. What this adds is a **contract**:
+
+- **`lexical` is BM25F → rerank → RRF over `-q`. No graph stage, ever.**
+- **A future component added to the lexical core is a NEW VERB or a TUNABLE,
+  never a change to this one.** That sentence is the whole decision; everything
+  else here is what makes it hold.
+- **It exists because [W-161](../work/open/W-161-graph-composed-ask.md) gives
+  `ask` a graph tier.** After that, `ask --scan` is no longer *the words alone*
+  — and nothing would have said so. Every ranking verdict needs a baseline arm
+  that cannot quietly acquire a stage.
+
+⚠ **Two things make the freeze real rather than asserted, and both were found
+by running it rather than by reasoning about it.**
+
+1. **One parser factory, not two flag blocks.** `_ask_shaped_parser` builds both
+   verbs' surface, so a flag added to `ask` reaches `lexical` by construction.
+   Two hand-kept copies would drift the moment one gained a flag, and the drift
+   would be invisible — both parsers would work.
+2. 🔴 **`lexical` must appear in `output_config.CLI_VERBS`, and omitting it made
+   the two verbs print differently from one ranking.** A verb absent from that
+   table has **no key resolved at all**, so `args.sections` stayed `None`,
+   `getattr(args, "sections", True)` read it as falsy, and `ask` printed `§`
+   heading lines while `lexical` printed none. Nothing failed: the file loaded,
+   the query ran, the scores were identical. It is
+   [SR-OUTPUT](0143_output-defaults.md)'s W-140 row 14 trap — *an absent entry
+   never resolves `--json`* — arriving through a different door.
+   **And `lexical` reads `[cli.ask]`'s subtable** (`VERB_READS`), because a
+   subtable of its own would let a consumer's committed file make the two verbs
+   differ, and would have made every repo that already has an `output.toml`
+   exit 1 on a verb they had never run.
+
+**The gate is `tests_e2e/test_relational.py::test_lexical_is_byte_identical_to_ask`,
+and it compares TEXT and `--json`** — comparing only `--json` would have missed
+the `§` defect, because `headings` is in the payload either way.
+
+**13. `fux graph` takes a query OR `--seed`, and the query form is DEFINED as
+the seed form over the query's top-k.** (W-160.) Mass follows **argument
+order**, the same rank-mass rule the query form applies to top-k.
+
+⚠ **Not an argparse mutually-exclusive group, because one of the two is
+required and argparse cannot say both** — such a group refuses a positional. The
+check lives in `cmd_graph`, where it can name which of the two mistakes was
+made, and both mistakes have their own test.
+
+⚠ **A hand-named seed reports `score: null` and `rank: n`, not a score.** The
+query form's seed score is a BM25F number a reader can line up against `ask`'s
+output; there is none here. Printing the walk's internal `1/(i+1)` mass would
+put a **third** incomparable value in a column SR-GRAPH already warns not to
+compare across roles — and it diverged: seed 0's mass is exactly `1.0`, which
+`json.dumps` writes `1.0` and `JSON.stringify` writes `1`. **A differential
+divergence on the first line of the new output, from a value no ranking would
+ever produce**, caught by running both readers rather than by a test. `null` is
+`null` in both.
 
 **10a. And the stream itself is UTF-8, on every platform** (amended
 2026-09-13, found by the Windows e2e suite's first run).
@@ -566,7 +682,7 @@ accelerator rebuilt from the committed index: 3 docs, 78 terms, 78 blocks, 82 po
 # exit 0
 ```
 
-#### `fux add` / `fux remove` / `fux update` — maintain what is indexed
+#### `fux add` / `fux remove` — maintain what is indexed
 
 **`add` records and then does the work** — one of the engine's two named
 networked paths when the entry is a URL, and it says so on stderr:
@@ -612,33 +728,65 @@ only by a listed ancestor is subtracted with the `!` the grammar already has:
 
 ```console
 $ fux remove handbook
-removed   handbook archived=false
+removed   handbook
   in .fux/sources/dirs
-ingested 3 docs (0 changed, 3 carried forward), 0 skipped, 0 shards written
-accelerator: 22 terms, 22 blocks, 23 postings (derived, not committed)
+ingested 2 docs (0 changed, 2 carried forward), 0 not indexed, 0 skipped, 0 shards written, 1 records deleted
+accelerator: 7 terms, 7 blocks, 9 postings (derived, not committed)
   dropped file:handbook/rota.md from the index
 # exit 0
 
 $ fux remove docs/onboarding.md
-excluded  !docs/onboarding.md
-  in .fux/sources/dirs — docs still listed; this path is subtracted from it
-ingested 2 docs (0 changed, 2 carried forward), 1 skipped, 0 shards written
-  skip docs/onboarding.md: excluded by !docs/onboarding.md
-accelerator: 15 terms, 15 blocks, 15 postings (derived, not committed)
+excluded  /docs/onboarding.md
+  in .fux/.fuxignore — docs still listed; this path is subtracted from it
+ingested 1 docs (0 changed, 1 carried forward), 1 not indexed, 0 skipped, 0 shards written, 1 records deleted
+  (1 already recorded in .fux/.fuxignore; 'fux ingest --list-skipped' lists them all)
+accelerator: 4 terms, 4 blocks, 4 postings (derived, not committed)
   dropped file:docs/onboarding.md from the index
 # exit 0
+
+$ fux remove docs/onboarding.md
+[stderr] error: docs/onboarding.md is already excluded by .fux/.fuxignore:1 (`/docs/onboarding.md`), which is left alone. Nothing further to remove — delete that pattern to put it back
+# exit 1
 
 $ fux remove elsewhere/nope.md
 [stderr] error: elsewhere/nope.md is not in <root>/.fux/sources/dirs: it has no line of its own, and no listed entry covers it. Both were checked. `fux add elsewhere/nope.md` would list it; nothing needs removing
 # exit 1
 ```
 
-**`update` re-reads; `--check` writes nothing** and is offline for files:
+⚠ **Three things in that transcript changed on 2026-09-14 and every one is
+captured from the shipped CLI, not written by hand** (W-165):
+
+1. **`excluded  /docs/onboarding.md` … `in .fux/.fuxignore`** — the exclusion
+   moved next door (SR-FUXIGNORE decision 5a), and so did the `in …` line, which
+   would otherwise point a reader at a file `git diff` shows unchanged. It is
+   anchored with a leading `/`, because a bare name in that grammar means *at any
+   depth*.
+2. **`, 1 records deleted`** — the summary counts what left (SR-INGEST
+   Consequences). Present only when the count is non-zero.
+3. **Removing it twice is exit 1.** Removing something already removed is an
+   error, which is the contract the `!`-line form kept.
+
+**`fux ingest` re-reads; `--check` writes nothing** and is offline for files:
 
 ```console
-$ fux update --check
+$ fux ingest --check
   fresh  2 others
 nothing has drifted.
+# exit 0
+```
+
+**And the bare verb says what it is about to go out for** (decision 16a):
+
+```console
+$ fux ingest
+fetching  1 of 1 listed URL(s) (network) — 1 known stale. `fux ingest --refetch-all` fetches every one
+ingested 4 docs (1 changed, 3 carried forward), 0 not indexed, 0 skipped, 1 shards written
+accelerator: 24 terms, 24 blocks, 25 postings (derived, not committed)
+# exit 0
+
+$ fux ingest --no-fetch
+ingested 4 docs (0 changed, 4 carried forward), 0 not indexed, 0 skipped, 0 shards written
+accelerator: 24 terms, 24 blocks, 25 postings (derived, not committed)
 # exit 0
 ```
 
@@ -678,9 +826,12 @@ refusing.
 | `--plain` / `--hashed` | `add` | URLs: record `meta=`. Same rule |
 | `--archived` | `add` | dirs: record `archived=true` |
 | `--no-ingest` | `add` · `remove` | edit the line only — the `git remote add` behaviour, on request |
-| `--no-fetch` | `add` | URLs: record and ingest offline |
+| `--no-fetch` | `add` · `ingest` | URLs: record and ingest offline. On `ingest` it is the whole offline form |
 | `--dry-run` | `add` · `remove` | print the line and the plan; write nothing |
-| `--check` | `update` | read-only drift report; does not fetch |
+| `--check` | `ingest` | read-only drift report; does not fetch. Beats `--list-skipped` when both are given ([SR-INGEST](0106_ingest.md) decision 21) |
+| `--refetch-all` | `ingest` | fetch every listed URL, not only the stale ones. **Named `--all` on `fux update`** — decision 16b |
+| `--failed` | `ingest` | fetch only the URLs whose last run failed; the most specific selector |
+| `--no-fetch` | `ingest` | open no socket. Same flag, same meaning as on `add`; what `fux hooks` writes |
 
 #### `fux ask` — ranked results with scores
 
@@ -837,14 +988,15 @@ usage: fux [-h] [--version] {…} ...      # … verb list omitted; it is build_
 
 ---
 
-⚠ **`fux update --all` added 2026-08-28** (W-82 ruling 3). `update` now refreshes
-only the URLs the dirty list names; `--all` forces the full sweep. **There is
+⚠ **`fux update --all` added 2026-08-28** (W-82 ruling 3), **and it is
+`fux ingest --refetch-all` since 2026-09-15** (decision 16b). The verb refreshes
+only the URLs the dirty list names; the flag forces the full sweep. **There is
 deliberately no `--dirty`/`--stale`/`--changed`** — if the dirty list is the right
 thing to refresh, it should not have to be asked for. A behaviour change to a
 shipped verb, free now and a deprecation cycle once anyone scripts it. See
 [SR-URL-INGEST](0107_url-ingest.md) decision 8.
 
-⚠ **`fux update` prints a validated-URL count from 2026-08-28.** One line:
+⚠ **The networked verb prints a validated-URL count from 2026-08-28.** One line:
 `N URL(s) unchanged by validate(); no body fetched`. **An optimisation that
 fails silently in the safe direction looks identical to one that never ran**, so
 the count is the only way a person can tell `validate()` is working. Silent when
@@ -879,7 +1031,7 @@ design.
 
 **`fux add <URL> --no-update`** records `update=never`
 ([SR-URL-LIST](0116_url-list.md) decision 14): this document is pinned and
-`fux update` will not fetch it again.
+`fux ingest` will not fetch it again, `--refetch-all` included.
 
 ⚠ **That `add` still fetches ONCE, and `--help` says so rather than only this
 record.** One fetch is what makes the line ingestable at all — a pinned URL that
@@ -894,7 +1046,7 @@ to the ordinary narrow pass, so it fetched the **stale** set and reported that
 as a success. Nothing in the surface capture could show it: the flag parsed, the
 command exited 0, and the summary was a true statement about a different
 selection. Fixed 2026-09-11 (W-140 row 4); `--failed` is the most specific
-selector and wins over `--all`, because answering a narrower request with a
+selector and wins over `--refetch-all`, because answering a narrower request with a
 wider sweep is the same defect wearing a different hat.
 
 **What this costs the capture:** a verbatim capture proves a flag is *accepted*,
@@ -925,7 +1077,8 @@ first flag whose value is a duration, and it is parsed by
 ([SR-URL-FRESHNESS](0147_url-freshness.md) decision 10). A second duration
 parser on this surface would be the drift that decision exists to prevent.
 
-**`fux update --check --json`** (W-140 row 14, 2026-09-12). The verb whose
+**`fux ingest --check --json`** (W-140 row 14, 2026-09-12; `fux update --check
+--json` until decision 16 moved the verb). The form whose
 entire purpose is being read by something else had no machine-readable output —
 and it **exits 0 whether or not anything drifted**, deliberately, because drift
 is a fact and a non-zero exit would make *your docs changed* look like a broken
@@ -937,10 +1090,127 @@ on the answer: parse a table meant for a person.
 - **The structured view is built beside the text, never parsed out of it** —
   one traversal, two renderings. A JSON view derived from a human table is a
   second format that can disagree with the first.
-- **`update` joins `CLI_VERBS` with an EMPTY key tuple**, like `doctor` and
+- **`ingest` joins `CLI_VERBS` with an EMPTY key tuple**, like `doctor` and
   `hooks`: the empty tuple is the declaration that this verb is shaped by
   [SR-OUTPUT](0143_output-defaults.md), and an absent entry would leave
   `--json` unresolvable from `[cli.json]`.
+
+**14. `ask` and `lexical` part on ONE ARGUMENT, and `--related` is a pair with
+no config key behind it** (W-161).
+
+**14a. The freeze survived the split, and this is how.** Decision 12 froze
+`fux lexical` — *a future component added to the lexical core is a new verb or
+a tunable, never a change to this one*. W-161 added the graph tier to `ask`, and
+the two verbs now differ. They are still **one body**: `_ask_shaped(args, *,
+compose)`, which forces both `[graph] ask_*` booleans off when `compose` is
+false. **Forcing rather than trusting the caller is the load-bearing half** — a
+repository whose `tune.toml` turns the tier on must not be able to make the
+frozen baseline verb stop being a baseline, and every ranking verdict in this
+repository cites `lexical` as its control.
+
+**14b. `--related` / `--no-related` is a pair, and is NOT backed by
+`.fux/output.toml`.** A pair for `--sections`' reason
+([SR-OUTPUT](0143_output-defaults.md) decision 10): the tier is on by default,
+so a bare `store_true` could only ever turn it on again. **Why it has no key in
+that file is [SR-OUTPUT](0143_output-defaults.md) decision 23**, which owns the
+question and is not restated here. What this record carries is the flag's own
+resolution: `None` means *the tune decides* — `[graph] ask_related` — which is
+`--no-tune`'s own shape.
+
+⚠ **The flag reaches `lexical` too and is inert there.** `_ask_flags` is the
+single source of both parsers precisely so they cannot drift (decision 12), and
+`lexical` has no tier by definition. Giving `lexical` its own parser to remove a
+flag that already does nothing would reintroduce the drift the factory exists to
+prevent.
+
+
+**15. `cli.main` has ONE post-verb dispatch point, and it is the last thing it
+does** (W-170).
+
+`args.func(args)` runs, its exit code is captured, stdout is flushed, and only
+then does anything in `.fux/observers/` run —
+[SR-OBSERVE](0157_observe.md). **That ordering is what makes *observe-only*
+structural rather than a rule somebody has to keep**: by the time consumer code
+runs there is nothing left for it to influence.
+
+⚠ **`fux mcp` is excluded by name**, not by accident: a long-lived server
+calling consumer code once per request is a different decision.
+
+⚠ **It never raises.** A hook that can fail a verb is a hook that makes fux
+look broken because somebody's analytics is. Everything in that path — finding
+the root, reading `fux.toml`, the dispatch itself — is wrapped, and a malformed
+`fux.toml` falls back to the default cap rather than failing twice.
+
+
+**16. 🔴 `fux update` is DELETED and `fux ingest` absorbs its whole surface**
+(Arpit, 2026-09-15, Cowork; W-177). **One verb over the corpus:** the first
+ingest and every re-ingest, for directories and URLs alike.
+
+> *"Remove `fux update` completely. I want `--check` to be there in ingest as
+> well. `--all`, `--failed`. Everything that is there in update, move it to
+> ingest. The first time you ingest something you'll be using `fux ingest`;
+> next time when you're trying to update something you'll still be using `fux
+> ingest`, be it for directories, be it for URLs."*
+
+**16a. A bare `fux ingest` goes to the network.** It fetches the URLs known to
+be stale and announces it on stderr. **Narrow-by-default survives the move
+untouched** — [SR-URL-INGEST](0107_url-ingest.md) and W-82 ruling 3 are about
+*which* URLs, never which verb, and nothing here reopens them.
+
+**16b. The flags, and the one rename.**
+
+| on `update` | on `ingest` | owned by |
+|---|---|---|
+| *(bare)* | *(bare)* — fetch the stale URLs | this record, [SR-INGEST](0106_ingest.md) |
+| `--all` | **`--refetch-all`** | [SR-URL-INGEST](0107_url-ingest.md) |
+| `--failed` | `--failed`, still the most specific selector | [SR-URL-FRESHNESS](0147_url-freshness.md) |
+| `--check` | `--check` — read-only, offline, **exit 0 always** | [SR-INGEST](0106_ingest.md) |
+| `--json` | `--json`, the drift report | [SR-OUTPUT](0143_output-defaults.md) decision 15 |
+| `<entry>` | positional `<entry>`, one listed entry | this record, decision 1b |
+| — | **`--no-fetch`**, the offline form | this record, decision 16c |
+
+**`--all` is renamed because of where it lands.** On `update` it sat alone; on
+`ingest` it sits beside `--full`, and *all* and *full* read as synonyms while
+one selects **URLs** and the other re-extracts **documents**. One of them opens
+a socket and the other cannot.
+
+**16c. The offline form is `fux ingest --no-fetch`** — the same flag, with the
+same meaning, that `fux add` already carries. It is **public surface on
+purpose**: CI and an air-gapped clone have to be able to ask for an offline
+ingest by hand. **No `--offline` alias.**
+
+**16d. The hook/daemon split is by CALLER, not by flag default.** `fux hooks`
+writes `--no-fetch` into `post-merge`; `fux daemon` writes the bare verb. The
+freshness daemon is the thing whose job *is* freshness; a git hook stays
+local-only. `--spawn-runner` and `--runner` inherit whichever side spawned
+them, and the hook side is offline by construction.
+
+**16e. No deprecation alias, and the hidden `--refresh-urls` goes too.** W-63
+deleted `fux url` outright and kept `ingest --refresh-urls` only because that
+flag was older and likelier to be in someone's CI. `update` was **three weeks
+old** and the same argument does not reach it. `--refresh-urls` is worse than
+gone: on the verb it now sits on it would silently name *what already happens*.
+**The break rides 3.0**, not a 2.1 patch — 3.0 is already the breaking release
+— and `CHANGELOG.md` carries a breaking-change block.
+
+**16f. What this REVERSES, and why that is legal.**
+[W-63](../archive/open/W-63-source-verbs.md) decision 3 folded
+`fux ingest --refresh-urls` into `fux update` so the engine would have exactly
+two networked paths, *both explicitly named*. This reverses that; the paths are
+`fux add <URL>` and `fux ingest` now.
+
+🔴 **No law changes, and the reason is in the law.**
+[SR-LAW-4](0006_LAW-4-offline-by-default.md) says *paths*, plural, and its own
+§"The narrowing that already happened once" is the record of exactly this
+mistake — **reading a count as the rule** — being made before. Decision 1d's
+count was a fact about the surface of the day, never a constraint on it.
+
+⚠ **What the move costs.** `fux ingest` was offline *by construction* and the
+import fence asserted that the modules on its path cannot import a transport.
+After this it cannot be. **The fence does not disappear — it moves**: the L4
+test now asserts that an ingest invoked with `--no-fetch` imports no transport
+and opens no socket, which is the invocation the git hooks actually run.
+
 
 ### Consequences
 

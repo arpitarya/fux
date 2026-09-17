@@ -1,19 +1,28 @@
-"""`fux add` / `fux remove` / `fux update` — the corpus, as a first-class verb.
+"""`fux add` / `fux remove` — the corpus, as a first-class verb.
+
+⚠ **`fux update` was the third verb here and W-177 deleted it** (Arpit,
+2026-09-15). Everything it did is `fux ingest` now — the first ingest and every
+re-ingest, dirs and URLs alike — and what is left in this file is the planning
+half: `plan_url_refresh`, `check_drift`, `_narrow`, `_locate`, `_check`.
 
 The three committed source lists (`.fux/sources/dirs`, `.fux/sources/urls` and
 `.fux/formats.toml`) are what fux indexes. Until W-63 only one of them had a command — `fux url` — so
 the corpus, the thing the whole engine is about, was the part of fux you
 maintained by hand.
 
-## One sentence keeps three verbs from overlapping
+## One sentence keeps the verbs from overlapping
 
-**`add` and `remove` write lines; `update` never touches one.**
+**`add` and `remove` write lines; `ingest` never touches one.**
 
 Everything else follows. Attribute edits belong to `add`, which is already an
-upsert. Re-reading a source belongs to `update`, which is why it can take an
-entry without that meaning "create it". And `fux update` subsumes
-`fux ingest --refresh-urls`, which leaves the engine with exactly **two**
-named networked paths instead of three: `fux add <URL>` and `fux update`.
+upsert. Re-reading a source belongs to `ingest`, which is why it can take an
+entry without that meaning "create it". The engine has exactly **two** named
+networked paths: `fux add <URL>` and `fux ingest`.
+
+⚠ **W-63 made that count three-becomes-two and read it as the point.** It is
+not — [SR-LAW-4](../../records/0006_LAW-4-offline-by-default.md) says *paths*,
+plural, and never bounded how many. W-177 moved the fence onto the default verb
+and the count stayed at two by coincidence, not by rule.
 
 ## `add` does the work, and that is a decision
 
@@ -74,12 +83,11 @@ from pathlib import Path
 from .config import (
     CONFIG_NAME,
     DEFAULT_TYPES_FILE,
-    DEFAULT_URLS_FILE,
     find_root,
     load,
 )
 from .errors import FuxError
-from .ingest import sourcelist, typesfile
+from .ingest import fuxignore, sourcelist, typesfile
 
 # -- which list, and where it lives ----------------------------------------
 
@@ -144,7 +152,7 @@ def list_path(root: Path, spec: sourcelist.ListSpec) -> Path:
     """
     if spec is sourcelist.URLS:
         config = load(root)
-        return root / (config.url.urls_file if config.url is not None else DEFAULT_URLS_FILE)
+        return root / config.urls_file
     if spec is sourcelist.DIRS:
         return root / load(root).dirs_file
     return root / DEFAULT_TYPES_FILE
@@ -415,7 +423,9 @@ def _covering_ancestor(value: str, entries: list[sourcelist.Entry]) -> str | Non
     return None
 
 
-def remove_or_exclude(path: Path, spec: sourcelist.ListSpec, value: str) -> tuple[str, str, str]:
+def remove_or_exclude(
+    root: Path, path: Path, spec: sourcelist.ListSpec, value: str
+) -> tuple[str, str, str]:
     """Take `value` out of the corpus. Returns `(action, line, detail)`.
 
     **Two ways in, so two ways out** (W-63 decision 4). A path with its own
@@ -430,6 +440,13 @@ def remove_or_exclude(path: Path, spec: sourcelist.ListSpec, value: str) -> tupl
     The verb says which branch it took, because "removed" and "excluded" are
     different facts about the file and a reader of the diff needs to know
     which one they are looking at.
+
+    ⚠ **The exclusion is written into `.fux/.fuxignore`, not as a `!` line
+    here** (W-165 fix 1). `!` in `dirs` keeps being *read* — SR-DIR-LIST
+    decision 2a, and every line anyone already wrote goes on working — but
+    `.fuxignore` is where exclusion lives (SR-FUXIGNORE), and a verb that kept
+    writing into the older of two spellings was the migration that record
+    called *"a migration we now owe"*. `fux doctor` names the survivors.
     """
     if spec is sourcelist.TYPES:
         typesfile.check_legacy(_types_root(path))
@@ -452,9 +469,16 @@ def remove_or_exclude(path: Path, spec: sourcelist.ListSpec, value: str) -> tupl
         )
 
     if any(e.value == value and e.exclude for e in entries):
+        # **The `!` line is left exactly as it is.** It already excludes, so
+        # there is nothing to do; rewriting it into `.fuxignore` here would be
+        # a migration performed as a side effect of a verb that was asked to
+        # remove something already removed. `doctor` is where the move is
+        # offered, at a moment the reader chose (W-165 fix 1).
         raise FuxError(
-            f"{value} is already excluded in {path}. `!` subtracts and nothing adds back, so "
-            "there is nothing further to remove — delete the `!` line to put it back"
+            f"{value} is already excluded by a `!` line in {path}, which is left alone. "
+            "`!` subtracts there and nothing adds back, so there is nothing further to "
+            f"remove — delete that line to put it back. Exclusions are written to "
+            f"{fuxignore.IGNORE_FILE} now; `fux doctor` names the `!` lines still here"
         )
 
     ancestor = _covering_ancestor(value, entries)
@@ -464,10 +488,7 @@ def remove_or_exclude(path: Path, spec: sourcelist.ListSpec, value: str) -> tupl
             f"Both were checked. `fux add {value}` would list it; nothing needs removing"
         )
 
-    lines = (path.read_text(encoding="utf-8") if path.is_file() else "").split("\n")
-    line = f"!{value}"
-    lines.insert(_insert_at(lines, line), line)
-    _write(path, lines)
+    line = fuxignore.add_exclusion(root, value, is_dir=(root / value).is_dir())
     return "excluded", line, f"{ancestor} still listed; this path is subtracted from it"
 
 
@@ -541,7 +562,7 @@ def _drop_acquired(root: Path, spec: sourcelist.ListSpec, entry: str) -> None:
 
     SR-ACQUIRED decision 9 keeps sweeping and eviction apart, and this is
     neither: it is the removal that makes a blob unreferenced in the first
-    place. The blob FILE is left for `fux update`'s sweep rather than unlinked
+    place. The blob FILE is left for `fux ingest`'s sweep rather than unlinked
     here — content addressing means two URLs can share one blob, and deleting
     it because one of them went would silently break the other.
 
@@ -622,6 +643,23 @@ def cmd_add(args) -> int:
             f"{entry} is excluded in {_rel(root, path)}. There is no un-exclude by design — "
             f"`!` subtracts and nothing adds back, so delete the `!{entry}` line to index it again"
         )
+    # **The same refusal for the file `remove` writes to now** (W-165 fix 1).
+    # Without this, moving the write target would have quietly turned `add`
+    # into the un-exclude the line above exists to refuse: `fux remove docs/a.md`
+    # then `fux add docs/a.md` would have written a line that the `.fuxignore`
+    # pattern goes on beating, so the command would report success and index
+    # nothing. Refusing is the loud direction, and it names the file to edit.
+    if spec is sourcelist.DIRS:
+        verdict = fuxignore.read(root).decide(
+            entry, is_dir=(root / entry).is_dir(), hand_only=True
+        )
+        if verdict.ignored and verdict.rule is not None:
+            raise FuxError(
+                f"{entry} is excluded by {fuxignore.IGNORE_FILE}:{verdict.rule.lineno} "
+                f"(`{verdict.rule.raw}`), which is consulted first and would keep beating any "
+                f"line written here. There is no un-exclude by design — delete that pattern, or "
+                f"write `!{entry}` below it, to index it again"
+            )
     # A line that breaks the next ingest is worse than a refused command:
     # `walk_sources` raises on a configured source that is not on disk, so a
     # typo'd `add` would otherwise take the whole corpus down until someone
@@ -675,7 +713,7 @@ def cmd_add(args) -> int:
         if load(root).url is None:
             print(
                 f"  no [sources.url] in {CONFIG_NAME}, so nothing can fetch this line yet — "
-                "`fux setup` writes a fetcher; `fux update` fetches once one exists",
+                "`fux setup` writes a fetcher; `fux ingest` fetches once one exists",
                 file=sys.stderr,
             )
         else:
@@ -804,16 +842,37 @@ def cmd_remove(args) -> int:
                     f"{entry} is not in {_rel(root, path)}: no line of its own, and no listed "
                     "entry covers it. Both were checked"
                 )
-            print(f"would exclude !{entry} — covered by {ancestor}, which stays listed")
+            if any(e.value == entry and e.exclude for e in entries):
+                raise FuxError(
+                    f"{entry} is already excluded by a `!` line in {_rel(root, path)}, which "
+                    "would be left alone. Delete that line to put it back"
+                )
+            is_dir = (root / entry).is_dir()
+            pattern = fuxignore.exclusion_pattern(entry, is_dir=is_dir)
+            covering = fuxignore.read(root).decide(entry, is_dir=is_dir, hand_only=True)
+            if covering.ignored and covering.rule is not None:
+                print(
+                    f"would write nothing — `{covering.rule.raw}` at "
+                    f"{fuxignore.IGNORE_FILE}:{covering.rule.lineno} already excludes {entry}"
+                )
+                return 0
+            print(f"would exclude {pattern} — covered by {ancestor}, which stays listed")
+            print(f"  in {fuxignore.IGNORE_FILE}, leaving {_rel(root, path)} untouched")
+            return 0
         print(f"  in {_rel(root, path)}")
         return 0
 
     before = _index_ids(root) if not getattr(args, "no_ingest", False) else set()
     before_edges = _inbound_edges(root) if before else {}
 
-    action, line, detail = remove_or_exclude(path, spec, entry)
+    action, line, detail = remove_or_exclude(root, path, spec, entry)
     print(f"{action:9s} {line}")
-    print(f"  in {_rel(root, path)}" + (f" — {detail}" if detail else ""))
+    # **The file the line was actually written to**, which stopped being one
+    # file on 2026-09-14: a deletion edits the source list, an exclusion writes
+    # `.fux/.fuxignore` (W-165 fix 1). Naming the list either way would point a
+    # reader at a file `git diff` shows unchanged.
+    written = _rel(root, path) if action == "removed" else fuxignore.IGNORE_FILE
+    print(f"  in {written}" + (f" — {detail}" if detail else ""))
     _drop_acquired(root, spec, entry)
 
     if getattr(args, "no_ingest", False):
@@ -853,87 +912,120 @@ def _inbound_edges(root: Path) -> dict[str, int]:
     return counts
 
 
-def cmd_update(args) -> int:
-    """Re-read what is already listed. **It never writes a line.**"""
+def plan_url_refresh(root: Path, args) -> tuple[bool, set[str] | None]:
+    """Which URLs this ingest fetches, and the one stderr line that says so.
+
+    **`fux ingest`'s networked half** (W-177, Arpit 2026-09-15). This was
+    `cmd_update`'s body until the verb was deleted; it is a planner now rather
+    than a command, because `cmd_ingest` owns the run and this only decides
+    what the run is allowed to go out for.
+
+    Returns `(refresh, only_urls)` exactly as `ingest_and_report` takes them —
+    `only_urls=None` with `refresh=True` means *every listed URL*, and the
+    empty set means *none*, which are opposite things (see `_narrow`).
+
+    ⚠ **`--no-fetch` short-circuits before anything is read.** The offline form
+    must not depend on `[sources.url]` parsing, on the dirty list, or on any
+    announcement — L4's fence test asserts a `--no-fetch` ingest opens no
+    socket, and the cheapest way to keep that true is to decide it first.
+    """
     import sys
 
-    root = _root()
-    entry = getattr(args, "entry", None)
-    if getattr(args, "check", False):
-        return _check(root, entry, as_json=bool(getattr(args, "json", False)))
-
     config = load(root)
-    refresh = False
-    only_urls = None
+    entry = getattr(args, "entry", None)
+    # ⚠ **Located BEFORE `--no-fetch` is honoured, deliberately.** An entry
+    # nobody listed is a typo, and `fux ingest --no-fetch typo` must not
+    # quietly re-ingest the whole corpus and report success. Reading two local
+    # files costs the fence nothing — L4 is about opening a socket, not about
+    # opening `.fux/sources/`.
+    spec = _locate(root, entry) if entry else None
+
+    if getattr(args, "no_fetch", False):
+        return False, None
 
     if entry:
-        spec = _locate(root, entry)
-        if spec is sourcelist.URLS:
-            if config.url is None:
-                raise FuxError(
-                    f"{entry} is listed, but there is no [sources.url] in {CONFIG_NAME} to fetch "
-                    "it with. `fux setup` writes a fetcher"
-                )
-            refresh, only_urls = True, {entry}
-            print(f"fetching  {entry} (network — this entry only)", file=sys.stderr)
-    else:
-        # No `[sources.url]` means the URL half has nothing to do — **not an
-        # error**, unlike the `--refresh-urls` this verb replaces. `update`
-        # means "re-read my sources", and a repo with only directories has
-        # sources to re-read.
-        #
-        # An **empty** list counts as nothing to do, for the same reason. The
-        # surface capture caught this announcing "fetching every listed URL
-        # (network)" against a list with no lines in it — a claim about the
-        # network that was not true, which is the one thing an L4 announcement
-        # may never be.
-        listed = _read(list_path(root, sourcelist.URLS), sourcelist.URLS) if config.url else []
-        refresh = bool(listed)
-        if refresh:
-            only_urls, why = _narrow(
-                root,
-                listed,
-                all_urls=getattr(args, "all", False),
-                failed_only=getattr(args, "failed", False),
+        if spec is not sourcelist.URLS:
+            return False, None
+        if config.url is None:
+            raise FuxError(
+                f"{entry} is listed, but there is no [sources.url] in {CONFIG_NAME} to fetch "
+                "it with. `fux setup` writes a fetcher"
             )
-            if only_urls is not None and not only_urls:
-                print(f"nothing to fetch — {why}", file=sys.stderr)
-                refresh = False
-            elif only_urls is not None:
-                print(
-                    f"fetching  {len(only_urls)} of {len(listed)} listed URL(s) "
-                    f"(network) — {why}. `fux update --all` fetches every one",
-                    file=sys.stderr,
-                )
-            else:
-                print(
-                    f"fetching  {len(listed)} listed URL(s) (network) — {why}",
-                    file=sys.stderr,
-                )
+        print(f"fetching  {entry} (network — this entry only)", file=sys.stderr)
+        return True, {entry}
 
-    report = _ingest(root, args, refresh_urls=refresh, only_urls=only_urls)
-    # Fork 3: a saved fetch is worth one line. An optimisation nobody can see is
-    # one nobody can verify — and `validate` is exactly the kind that fails
-    # silently in the safe direction, so a run where it stopped working looks
-    # identical to one where it never ran.
+    # No `[sources.url]` means the URL half has nothing to do — **not an
+    # error**, unlike the `--refresh-urls` this absorbed. `ingest` means
+    # "re-read my sources", and a repo with only directories has sources to
+    # re-read.
+    #
+    # An **empty** list counts as nothing to do, for the same reason. The
+    # surface capture caught this announcing "fetching every listed URL
+    # (network)" against a list with no lines in it — a claim about the
+    # network that was not true, which is the one thing an L4 announcement
+    # may never be.
+    listed = _read(list_path(root, sourcelist.URLS), sourcelist.URLS) if config.url else []
+    if not listed:
+        return False, None
+
+    only_urls, why = _narrow(
+        root,
+        listed,
+        all_urls=getattr(args, "refetch_all", False),
+        failed_only=getattr(args, "failed", False),
+    )
+    if only_urls is not None and not only_urls:
+        print(f"nothing to fetch — {why}", file=sys.stderr)
+        return False, None
+    if only_urls is not None:
+        print(
+            f"fetching  {len(only_urls)} of {len(listed)} listed URL(s) "
+            f"(network) — {why}. `fux ingest --refetch-all` fetches every one",
+            file=sys.stderr,
+        )
+    else:
+        print(f"fetching  {len(listed)} listed URL(s) (network) — {why}", file=sys.stderr)
+    return True, only_urls
+
+
+def report_url_outcomes(report) -> None:
+    """The two URL lines every networked ingest owes, on stderr.
+
+    Fork 3 of W-63: a saved fetch is worth one line. An optimisation nobody can
+    see is one nobody can verify — and `validate` is exactly the kind that fails
+    silently in the safe direction, so a run where it stopped working looks
+    identical to one where it never ran.
+
+    The second is the transient-failure guarantee made visible (W-177 DoD 6): a
+    listed URL whose fetch failed keeps its prior record, the exit stays `0`,
+    and the only thing that says so is this line.
+    """
+    import sys
+
     if getattr(report, "validated", 0):
         print(
             f"  {report.validated} URL(s) unchanged by validate(); no body fetched",
             file=sys.stderr,
         )
-    for s in report.skipped:
+    for s in getattr(report, "skipped", ()) or ():
         if s.rel_path.startswith(("http://", "https://")):
             print(f"  ! {s.rel_path} — {s.reason}; prior record kept", file=sys.stderr)
-    return 0
+
+
+def check_drift(root: Path, entry: str | None, *, as_json: bool = False) -> int:
+    """`fux ingest --check` — what has drifted, writing nothing. See `_check`."""
+    return _check(root, entry, as_json=as_json)
 
 
 def _narrow(root: Path, listed, *, all_urls: bool, failed_only: bool = False):
-    """Which URLs `fux update` fetches, and one line saying why.
+    """Which URLs `fux ingest` fetches, and one line saying why.
 
-    **W-82 ruling 3, landed 2026-08-28:** narrow is the DEFAULT and `--all`
-    overrides. *"If the dirty list is the right thing to refresh, it should not
-    have to be asked for. A user typing `fux update` wants a current index, not
-    a network sweep."*
+    **W-82 ruling 3, landed 2026-08-28:** narrow is the DEFAULT and
+    `--refetch-all` overrides. *"If the dirty list is the right thing to
+    refresh, it should not have to be asked for. A user typing `fux update`
+    wants a current index, not a network sweep."* ⚠ **The ruling is about which
+    URLs, not which verb** — W-177 moved the verb under it and reopened
+    nothing.
 
     Returns `(None, why)` for a full sweep, or `(set_of_urls, why)` for a narrow
     one — `None` and the empty set mean opposite things, which is the whole
@@ -943,7 +1035,7 @@ def _narrow(root: Path, listed, *, all_urls: bool, failed_only: bool = False):
     collapses missing-and-unreadable to `[]` because it feeds reporting paths;
     a consumer that *acts* on the list cannot afford that, because empty means
     *fetch nothing*. A repo that has never run the hook, or whose runtime
-    directory was wiped, would otherwise have `fux update` quietly stop
+    directory was wiped, would otherwise have `fux ingest` quietly stop
     fetching — **the exact "the tail silently stops being refreshed" failure
     ruling 3 warns about**, arriving through a tolerance rather than a decision.
     Fail safe, not fail silent.
@@ -951,7 +1043,7 @@ def _narrow(root: Path, listed, *, all_urls: bool, failed_only: bool = False):
     ⚠ **Ruling 3 and ruling 10 land together.** With narrow as the default the
     tail is refreshed by the daemon and by nothing else, so a repo that runs no
     daemon and never commits a URL change will not re-fetch. That is why the
-    announcement always names `--all`.
+    announcement always names `--refetch-all`.
     """
     from .maintain import dirty as dirty_mod
 
@@ -960,7 +1052,7 @@ def _narrow(root: Path, listed, *, all_urls: bool, failed_only: bool = False):
     # pass, so it fetched the *stale* set and reported it as a success — a flag
     # that silently does something else is worse than one that errors.
     #
-    # **It is the most specific selector, so it wins over `--all`.** Asking for
+    # **It is the most specific selector, so it wins over `--refetch-all`.** Asking for
     # the failures and getting a full sweep would be the same defect again in a
     # different costume, and argparse cannot express "more specific" — only
     # "mutually exclusive", which would break every script already passing both.
@@ -975,7 +1067,7 @@ def _narrow(root: Path, listed, *, all_urls: bool, failed_only: bool = False):
         }
         return failing, f"{len(failing)} with a failing last run (`--failed`)"
     if all_urls:
-        return None, "`--all`"
+        return None, "`--refetch-all`"
     if not dirty_mod.is_readable(root):
         return None, "no dirty list yet, so nothing is known to be stale"
 
@@ -988,9 +1080,9 @@ def _narrow(root: Path, listed, *, all_urls: bool, failed_only: bool = False):
 def _locate(root: Path, entry: str) -> sourcelist.ListSpec:
     """Which list already declares `entry`, or a loud error.
 
-    `update` re-reads what is listed; it does not create. An entry nobody
+    `ingest` re-reads what is listed; it does not create. An entry nobody
     listed is a typo or a misremembered path, and creating it silently is how
-    `update` would quietly become a second `add`.
+    `ingest <entry>` would quietly become a second `add`.
     """
     for spec in (sourcelist.URLS, sourcelist.DIRS, sourcelist.TYPES):
         path = list_path(root, spec)
@@ -998,12 +1090,12 @@ def _locate(root: Path, entry: str) -> sourcelist.ListSpec:
         if any(e.value == candidate and not e.exclude for e in _read(path, spec)):
             return spec
     raise FuxError(
-        f"{entry} is not in any source list, so there is nothing to update. "
-        f"`fux add {entry}` lists it — `update` never creates a line"
+        f"{entry} is not in any source list, so there is nothing to ingest. "
+        f"`fux add {entry}` lists it — `ingest` never creates a line"
     )
 
 
-# -- `fux update --check` --------------------------------------------------
+# -- `fux ingest --check` --------------------------------------------------
 
 
 def _check(root: Path, entry: str | None, *, as_json: bool = False) -> int:
@@ -1092,7 +1184,7 @@ def _check(root: Path, entry: str | None, *, as_json: bool = False) -> int:
     if fresh:
         print(f"  fresh  {fresh} others")
     if stale:
-        print(f"{len(stale)} stale. `fux update` reconciles them.")
+        print(f"{len(stale)} stale. `fux ingest` reconciles them.")
     else:
         print("nothing has drifted.")
     # **Exit 0 either way.** Drift is a fact, not a failure — a non-zero exit

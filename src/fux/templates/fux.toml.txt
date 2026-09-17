@@ -1,0 +1,48 @@
+# fux.toml -- POLICY, not corpus. What gets indexed is `.fux/sources/dirs` and
+# `.fux/sources/urls`, one entry per line.
+#
+# EVERY KEY, WHAT IT MEANS AND WHAT IT DEFAULTS TO IS IN ONE PLACE:
+#   https://github.com/arpitarya/fux/blob/main/records/0113_config.md
+# Ranking knobs are not here at all -- they live in .fux/tune.toml (SR-TUNE):
+#   https://github.com/arpitarya/fux/blob/main/records/0135_tuning.md
+#
+# This file does not explain its own keys, deliberately: a comment that
+# describes a key can drift from the record that decides it while both still
+# look correct (SR-LAW-0 decision 4). A key fux does not know is REFUSED by
+# name, so a typo here fails loudly instead of sitting inert.
+#
+# Every key fux writes here is LIVE and carries the value fux itself applies.
+# What is NOT written is deliberate: a key whose default is a number that may
+# rise (acquired_max_bytes, sweep_minutes, ttl) is left out so raising it
+# reaches this repo without an edit.
+
+# The two source lists, together: one names the directories, one names the URLs.
+[sources]
+dirs_file = ".fux/sources/dirs"
+urls_file = ".fux/sources/urls"
+
+# Presence of THIS table is what enables URL ingestion -- `urls_file` above
+# only names the list. Nothing is fetched until a URL is listed in it, and
+# only `fux add <URL>` lists one.
+[sources.url]
+fetcher         = ".fux/fetchers/http.py"
+meta            = "hashed"
+keep            = true
+enrich          = false
+update          = "auto"
+fetch_at_answer = true
+
+# REQUIRED, and may not be commented out: a repo that CAN fetch has to say how
+# hard, in a number a person can read. Comment it out and fux refuses to load.
+max_parallel = {default}
+
+{url_config}
+[index]
+shards = 256
+
+# Which agent vendors `fux setup` writes archived-results policy for. These
+# files land OUTSIDE .fux/ -- in .claude/, .github/, .kiro/ and AGENTS.md at the
+# repo root -- which is why the default is spelled out rather than left
+# implicit. Delete a name to stop installing it; [] installs none.
+[agents]
+install = ["claude", "codex", "copilot", "kiro"]

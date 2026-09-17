@@ -1,0 +1,16 @@
+flowchart LR
+  classDef step fill:#eef3f8,stroke:#5b7fa6,color:#1c2b3a
+  classDef out fill:#fff4e0,stroke:#c98a1b,color:#3a2a08
+  classDef fut fill:#f4f4f4,stroke:#999,color:#555,stroke-dasharray: 5 5
+  E["edges from every record<br/>[src, kind, dst, grade]<br/>ref · tag · code"]:::step
+  G["graph.json (derived)<br/>rebuilt by fux build — or in memory by Node"]:::step
+  P["PPR-lite walk<br/>damping 0.85 · 3 iterations · laziness 0.5<br/>seeds = query top-k or --seed ids"]:::step
+  C["communities — label propagation<br/>in sorted(nodes) order, derived never committed"]:::step
+  V1["fux explain &lt;doc&gt;<br/>outbound edges + community"]:::out
+  V2["fux graph &lt;q&gt; | --seed<br/>ranked neighbourhood"]:::out
+  V3["fux path A B --hops N<br/>reliability = Π grade × 0.5 per hop<br/>W-140: work budget + truncated flag"]:::out
+  W["W-161 (open): graph-composed ask<br/>boosted tier via RRF + labelled related tier<br/>ask is UNTOUCHED today, asserted by test"]:::fut
+  E --> G --> P --> V2
+  G --> C --> V1
+  G --> V3
+  P -.-> W

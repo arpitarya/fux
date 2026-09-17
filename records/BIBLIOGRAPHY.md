@@ -45,9 +45,25 @@ file disagree, **the record wins and this file is the defect.**
 | Broder, Carmel, Herscovici, Soffer & Zien, *Efficient query evaluation using a two-level retrieval process* (CIKM 2003) | WAND. The upper-bound invariant a skip must never violate. | **BUILT** — the accelerator's bound check, and the reason a tuning knob may not break it. [SR-TUNE](0135_tuning.md). |
 | Craswell, Robertson, Zaragoza & Taylor, *Relevance weighting for query independent evidence* (SIGIR 2005) | The saturating transform for query-independent features (recency, authority, priors). | **NOT BUILT — deferred by name.** [SR-TUNE](0135_tuning.md) records it as the correct shape for a future prior and ships the multiplicative form instead. |
 | LUCENE-6819, *Deprecate index-time boosts* | Lucene's own removal of boosts baked into stored values. | **NOT BUILT** — a ranking preference may never be fused into a committed value. It is why boosts live in `.fux/tune.toml` and nowhere in the index. [SR-TUNE](0135_tuning.md). |
-| Cormack, Clarke & Büttcher, *Reciprocal Rank Fusion outperforms Condorcet and individual Rank Learning Methods* (SIGIR 2009) | RRF, and the constant `k = 60`. Fuse **ranks**, never scores on unrelated scales. | **BUILT** — `query/fuse.py`, multi-query `-q` fusion, and the fusion inside `--expand`. [SR-EXPAND](0149_expand.md). `k = 60` is the paper's, untuned, and deliberately not a `tune.toml` key. |
+| Cormack, Clarke & Büttcher, *Reciprocal Rank Fusion outperforms Condorcet and individual Rank Learning Methods* (SIGIR 2009) | RRF, and the constant `k = 60`. Fuse **ranks**, never scores on unrelated scales. | **BUILT** — `query/fuse.py`, and it is **`-q` multi-query fusion ONLY**. ⚠ **This row said "and the fusion inside `--expand`" until 2026-09-14. That was wrong** and is corrected here: `--expand` does no fusion at all — it is a weighted term multiplier inside a *single* `rank()` call (`query/expand.py`), and the two mechanisms never meet. [SR-EXPAND](0149_expand.md). `k = 60` is the paper's, untuned, and deliberately not a `tune.toml` key. Because RRF sums small reciprocals, a fused answer reports the confidence band of the **first** query's own ranking and flags `fused: true`. |
 | arXiv 2605.18561 — identifier-aware tokenization for BM25 on code | Splitting identifiers is the single largest lift available to BM25; the best BM25 *variant* adds ~0.2 % on top of it. | **BUILT** — `query/analyzer.py` emits whole **and** parts (`getUserName` → `getusername`, `get`, `user`, `name`). It is also the argument for **not** chasing BM25 variants. |
 | Porter, *An algorithm for suffix stripping* (1980), with the Snowball `voc.txt`/`output.txt` vectors | The stemmer, and a published conformance vocabulary. | **BUILT** — `query/stem.py`, stdlib-only, and pinned term-for-term against the published vectors in the Node port's differential arm. |
+
+### 1b · The ten parked ranking ideas — one paper each
+
+*All ten sit behind **W-156** in [`../work/proposals/search-improvements-v3.md`](../work/proposals/search-improvements-v3.md)
+(filed 2026-09-13, Arpit: *"keep all ten of them"*). Each is its own ranking
+change with its own golden questions and its own pre-registration — so each
+paper below is **PARKED**, and the number in brackets is the idea it grounds.*
+
+| source | what it is | status |
+|---|---|---|
+| Craswell, Hawking & Robertson, *Effective site finding using link anchor information* (SIGIR 2001) | Index the words other documents use when **linking** to a document. | **PARKED [1]** — the anchor-text field. Also the reason hubs must be **damped** in the accepted graph-expanded `ask` ([`../work/compare/ask-graph-expansion.compare.md`](../work/compare/ask-graph-expansion.compare.md)), so it is the one paper here with a foot in a shipped decision. |
+| Lavrenko & Croft, *Relevance-based language models* (SIGIR 2001); Abdul-Jaleel et al., *UMass at TREC 2004* (RM3) | Pseudo-relevance feedback: pull distinctive terms from the top-k and re-query once. | **PARKED [4]** — an auto-filled `--expand`. ⚠ Filed with its own warning: *drift is real; pre-register or don't build.* |
+| Metzler & Croft, *A Markov random field model for term dependencies* (SIGIR 2005) | The sequential dependence model — score ordered and unordered term windows. | **PARKED [6]** — phrase sense (*"index lock"* vs *"lock the index"*) **without a positional index**, scored in refer on the fetched bytes. This is the cheap answer to the cost Zobel & Moffat priced and SR-ASK declined. |
+| Carbonell & Goldstein, *The Use of MMR, Diversity-Based Reranking* (SIGIR 1998) | Maximal marginal relevance — trade a little relevance for coverage. | **PARKED [7]** — swap the 5th hit when the top-5 share one graph community. ⚠ *Measure — it can hurt precision.* |
+| Jardine & van Rijsbergen, *The use of hierarchic clustering in information retrieval* (1971) | The cluster hypothesis: closely associated documents tend to be relevant to the same request. | **PARKED [7]** — the justification for diversifying by community at all, and cited again by the abstention work as the basis for graph coherence. |
+| Kamps et al., element / section retrieval at **INEX** | Rank sections, back off to the document. | **PARKED [10]** — the largest of the ten: a plane change, and a major release of its own. |
 
 ### 1a · The tuning literature — read in full, **PARKED in full**
 
@@ -65,13 +81,27 @@ session does not re-read them to reach the same parked conclusion.*
 | Lipani et al., *A systematic approach to normalization in probabilistic models* | Length normalisation as a systematic family, not a constant. | **PARKED** — the second-order argument in the same direction. |
 | Svore & Burges, *A Machine Learning Approach for Improved BM25 Retrieval* | The identifiability degeneracy — several parameter sets score identically. | **PARKED** — the reason a tuned number needs a stability interval, not just a maximum. |
 
+### 1c · Corpus diagnostics — the `fux inspect` proposal
+
+*Four classical results behind a proposed read-only verb that X-rays the index:
+which words are on every document, which documents no query can reach, and
+which are near-duplicates. [`../archive/proposals/fux-inspect.md`](../archive/proposals/fux-inspect.md),
+filed 2026-09-13.*
+
+| source | what it is | status |
+|---|---|---|
+| Zipf, *Human Behavior and the Principle of Least Effort* (1949) | Term frequency follows a power law — a handful of words carry almost no information. | **PROPOSED** — the boilerplate lens: terms with `df/N` high and IDF ≈ 0 score nothing and bloat postings. The *"TLDR"* words Arpit asked to see. |
+| Heaps, *Information Retrieval: Computational and Theoretical Aspects* (1978) | Vocabulary size grows as a sublinear power of corpus size. | **PROPOSED** — the fit that says whether a corpus's vocabulary is behaving normally, or whether a template is flattening it. |
+| Broder, *On the resemblance and containment of documents* (1997) | MinHash — estimate set resemblance from a small signature. | **PROPOSED** — near-duplicate pairs and **template families** over hashed term sets. Duplicates split `df` and confuse ranking; this is the answer to *"did they create a similar index?"* |
+| Azzopardi, de Rijke & Balog, *Building simulated queries for known-item topics* (SIGIR 2007) | **Retrievability** — whether a document can be reached by any plausible query at all. | **PROPOSED** — the findability lens, and the sharpest idea in the proposal: *a document no query can reach is stored, not indexed.* |
+
 ---
 
 ## 2 · Index structure, compression and storage
 
 > 🔴 **This is the section where reading stopped code from being written.**
 > The paper's committed-index design rests on these; the engine ships almost
-> none of them, and [`work/paper/the-fux-index-paper.md`](../work/paper/the-fux-index-paper.md)'s
+> none of them, and [`docs/paper/the-fux-index-paper.md`](../docs/paper/the-fux-index-paper.md)'s
 > status banner is the record of that.
 
 | source | what it is | what depends on it — or what it stopped |
@@ -114,6 +144,7 @@ session does not re-read them to reach the same parked conclusion.*
 | Page, Brin, Motwani & Winograd, *The PageRank Citation Ranking: Bringing Order to the Web* (1999) | Random-surfer centrality, and the 0.85 damping constant. | **BUILT** — the graph plane's centrality and its damping default, taken from the paper rather than tuned. [SR-GRAPH](0126_graph.md). |
 | Raghavan, Albert & Kumara, *Near linear time algorithm to detect community structures in large-scale networks* (Phys. Rev. E 76, 2007) | Label propagation — communities in near-linear time, no parameter to pick. | **BUILT** — `fux graph`'s communities, and the near-linear bound is what makes it affordable on a hook. |
 | Levin & Peres, *Markov Chains and Mixing Times*, §1.3 | Lazy chains as the standard device for removing periodicity. | **BUILT** — the walk is lazy for this reason and no other. |
+| Haveliwala, *Topic-Sensitive PageRank* (WWW 2002) | A personalised restart vector — the walk biased toward a set of seed documents rather than the whole corpus. | **ACCEPTED, not yet built** — the seeding behind `fux graph --seed` and the graph-expanded `ask` ratified 2026-09-13. The seeds are the lexical top-k, **taken by rank, not score**. |
 | Valiant, *The complexity of enumerating and reliability problems* (SIAM J. Comput. 8(3), 1979) | Counting simple paths is **#P-complete**. | **NOT BUILT** — unbounded path enumeration. It is why `fux path` has a `--hops` ceiling and says so honestly instead of pretending completeness. [`work/compare/path-hops-bound.compare.md`](../work/compare/path-hops-bound.compare.md). |
 | Yen, *Finding the K Shortest Loopless Paths in a Network* (Management Science 17(11), 1971) | The bounded alternative to enumeration. | **NOT BUILT — named as the replacement** if the enumeration is ever swapped out. |
 
@@ -127,7 +158,9 @@ session does not re-read them to reach the same parked conclusion.*
 | Jagerman, Zhuang, Qin, Wang & Bendersky, *Query Expansion by Prompting Large Language Models* (2023) | Chain-of-thought is the best expansion prompt for BM25, and beats classical PRF. | **BUILT** — the prompt guidance in the expand skill, and the argument against building PRF. |
 | Nogueira & Lin, *docTTTTTquery* / doc2query | Document-side expansion, using **training** queries only — the split enforced mechanically. | **BUILT** — `fux enrich`. And its most important contribution is negative: *document-side enrichment is not novel; doing it **without** the train/test split is what was novel here.* [SR-RS](0133_predictions.md). |
 | Gospodinov, MacAvaney & Macdonald, *Doc2Query−−* (2023) | Generated queries bloat the index ~33 %; filtering them back out recovers most of it. | **NOT BUILT** — no filtering step exists; the bloat is accepted and named. |
-| RM3 / pseudo-relevance feedback (classical) | The model-free expansion alternative. | **NOT BUILT** — known to *hurt* on short-passage corpora and help on long newswire. Recorded as *"may be measured, never assumed."* |
+| RM3 / pseudo-relevance feedback (classical) | The model-free expansion alternative. | **NOT BUILT** — known to *hurt* on short-passage corpora and help on long newswire. Recorded as *"may be measured, never assumed."* Its papers are now filed in §1b [4]. |
+| Nogueira, Yang, Lin & Cho, *Document expansion by query prediction* (2019) | doc2query proper — predict the questions a document answers and append them to it. | **ACCEPTED 2026-09-13** — the ancestor of `fux correct`: a **human**-authored question line appended to the document's existing enrichment file. Same mechanism, different author, and authorship is carried as provenance. [`../work/compare/fux-correct.compare.md`](../work/compare/fux-correct.compare.md). |
+| Rocchio, *Relevance feedback in information retrieval*, in Salton (ed.), *The SMART Retrieval System* (1971) | Move the query toward the document the user chose. | **NOT BUILT — and correctly identified as already present.** Query-time only, nothing persists, which is exactly what `--expand` does by hand. Considered as option (c) for `fux correct` and passed over for the durable mechanism. |
 
 ---
 
@@ -165,7 +198,7 @@ session does not re-read them to reach the same parked conclusion.*
 | Cronen-Townsend, Zhou & Croft, *Predicting Query Performance* (SIGIR 2002) | Retrieval-time difficulty is computable **without relevance judgments**. | **BUILT** — the confidence band exists at all because of this. [SR-CONFIDENCE](0141_confidence.md). |
 | Shtok, Kurland, Carmel, Raiber & Markovits, *Predicting Query Performance by Query-Drift Estimation* (TOIS 2012) | Score dispersion among the top results as the difficulty signal. | **BUILT** — the band's actual statistic. |
 | Rajpurkar, Jia & Liang, *Know What You Don't Know: Unanswerable Questions for SQuAD* (ACL 2018) | Answerable/unanswerable pairing as an evaluation design. | **NOT BUILT — and it exposed a hole.** Blind-authored unanswerable questions were run twice: **fux abstained 0 times out of 20.** |
-| Kamath, Jia & Liang, *Selective Question Answering under Domain Shift* (ACL 2020) | Risk–coverage under shift; the El-Yaniv lineage applied to QA. | **PARKED** — [`work/proposals/abstention-gate.md`](../work/proposals/abstention-gate.md), awaiting Arpit's pick between disclose / gate / build. |
+| Kamath, Jia & Liang, *Selective Question Answering under Domain Shift* (ACL 2020) | Risk–coverage under shift; the El-Yaniv lineage applied to QA. | **PARKED** — [`archive/proposals/abstention-gate.md`](../archive/proposals/abstention-gate.md) (archived 2026-09-14; live successor W-176), awaiting Arpit's pick between disclose / gate / build. |
 | El-Yaniv & Wiener, *On the Foundations of Noise-free Selective Classification* (JMLR 11, 2010) | The formalism for a reject option. | **PARKED** — same proposal. |
 | *Machine Learning with a Reject Option: A Survey* (Chow's rule) | Only the **cost ratio** moves the reject threshold, never the absolute costs. | **PARKED** — the arithmetic an abstention gate would use. |
 | *Performance measures for classification systems with rejection* | The threshold as `(C_r − C_c)/(C_e − C_c)`. | **PARKED**. |
@@ -173,6 +206,7 @@ session does not re-read them to reach the same parked conclusion.*
 | *Why Language Models Hallucinate* (2025) | The confidence-target form `penalty = t/(1−t)`, with natural anchors `t = 0.5 / 0.75 / 0.9`. | **PARKED** — the scoring form [SR-WORK-QUALITY](0056_WORK-quality.md) would adopt. |
 | *Evaluating large language models for accuracy incentivizes hallucinations*, **Nature (2026)** | Accuracy-only scoring rewards guessing over abstention. | **METHOD — non-negotiable.** It is why [SR-WORK-QUALITY](0056_WORK-quality.md) decision 5 exists: fux may not publish an accuracy-only headline. |
 | *I-CALM — Incentivizing Confidence-Aware Abstention* | Abstention is far more sensitive to the abstention **reward** than to the error penalty. | **PARKED**. |
+| Harabagiu, Moldovan et al., *FALCON: boosting knowledge for answer engines* (TREC-9, 2000) | Answer-type matching: *how many* expects a number, *when* a date, *who* a capitalised name. | **PROPOSED — and it is the load-bearing one.** Of nine candidate abstention mechanisms, the answer-type check is the **only** one that reaches the u017 class: a question assembled from the corpus's own words, which every term-overlap signal scores highly. [`../work/compare/abstention-gates.compare.md`](../work/compare/abstention-gates.compare.md). |
 | *Hallucinations Undermine Trust; Metacognition is a Way Forward* | The open rubric and the Utility–Error curve. | **NOT BUILT** — the blended single number is refused; the curve is the shape, if ever. |
 
 ---
@@ -262,6 +296,7 @@ way a paper is: they decide a byte, not a preference.*
 | **Chrome DevTools Protocol**, `Fetch` domain · **Fetch Standard** §CORS-safelisted response headers | **BUILT** — the CDP fetcher's interception, and why an in-page cross-origin fetch cannot see `ETag`. |
 | Claude Agent Skills · Codex skills · GitHub Copilot agent skills · Kiro steering · VS Code agent skills | **BUILT** — the four vendor surfaces `fux setup` writes. [SR-AGENT-POLICY](0132_agent-policy.md). |
 | `cargo add` · `helm repo add` · `uv` · Python `argparse` · ripgrep types · GitHub Linguist overrides · Sphinx `source_suffix` and two-phase build · Bazel hermeticity · Lucene `IndexWriter` · `git gc --auto` · Homebrew `brew doctor` · `scrapy-playwright` · SQLite file format · Elastic `_explain` / `indices_boost` · Solr DisMax · SLSA · in-toto · W3C PROV-O · EU AI Act Art. 12 · Google SRE Workbook · `SOURCE_DATE_EPOCH` | **Prior art**, each cited once for one decision. The two that decided *against* something: **Elasticsearch `indices_boost`**'s first-match rule (unusable, so fux went multiplicative) and **`brew doctor`**'s documented drift into warning on supported configurations (the failure `fux doctor` guards against). |
+| Apache Solr `QueryElevationComponent` (`elevate.xml`) · Elasticsearch *Pinned query* · SharePoint promoted results | **PRIOR ART, narrowed to a rare escape hatch** — an exact query forced to rank #1 from a committed file. Kept as `fux correct --pin` and deliberately not the main mechanism: it fixes one phrasing and leaves the next one wrong. |
 | **Automatic browser fallback**, as argued by its proponents | **REFUSED** — the one entry here listed because fux does the opposite: a browser fetch is **per-request opt-in**, never an automatic escalation. [SR-HTTP-FETCHER](0119_http-fetcher.md). |
 
 ---
@@ -289,6 +324,8 @@ way a paper is: they decide a byte, not a preference.*
 - **Never soften a negative row.** *Falsified*, *refused*, *deleted*,
   *overridden* are the accurate words, and the rows that carry them are the
   most useful ones in the file.
+
+**Last full sweep: 2026-09-13**, re-run the same day against the five documents filed after the first pass — [`fux-inspect`](../archive/proposals/fux-inspect.md), [`search-improvements-v3`](../work/proposals/search-improvements-v3.md), [`abstention-gates`](../work/compare/abstention-gates.compare.md), [`fux-correct`](../work/compare/fux-correct.compare.md) and [`ask-graph-expansion`](../work/compare/ask-graph-expansion.compare.md) — which added 16 sources and moved three rows. ⚠ **The first pass read only each document's final `References` block**; these five carry theirs under `## Reference` (singular) or inline, so a sweep matches both and reads the body, not just the tail.
 
 **Known gap.** `work/regression/**` run reports are not swept for citations —
 runs cite the records, not the other way round. If that ever stops being true,

@@ -1,0 +1,738 @@
+{
+  "boilerplate": {
+    "boilerplate_postings": 495830,
+    "boilerplate_share": 0.47479060396643535,
+    "boilerplate_terms": 277,
+    "hapax": 2000,
+    "hapax_share": 0.1644331168297295,
+    "heaps_beta": 0.15079823063952716,
+    "heaps_k": 1125.5312267372344,
+    "lever": "`[index]` stopwords, or an analyzer amendment \u2014 an index change, with its own record",
+    "terms": 12163,
+    "top": [
+      {
+        "df": 2000,
+        "hash": "090c0b54b2eaf9f5",
+        "idf": 0.00024990628644367546,
+        "share": 1.0,
+        "word": "plate"
+      },
+      {
+        "df": 2000,
+        "hash": "0bb18b7efcfc6dac",
+        "idf": 0.00024990628644367546,
+        "share": 1.0,
+        "word": "promote"
+      },
+      {
+        "df": 2000,
+        "hash": "0f94f0504fedd7fe",
+        "idf": 0.00024990628644367546,
+        "share": 1.0,
+        "word": "projection"
+      },
+      {
+        "df": 2000,
+        "hash": "10d8a524b02f1d4f",
+        "idf": 0.00024990628644367546,
+        "share": 1.0,
+        "word": "E"
+      },
+      {
+        "df": 2000,
+        "hash": "118595f5e3b4d5c5",
+        "idf": 0.00024990628644367546,
+        "share": 1.0,
+        "word": "backfill"
+      },
+      {
+        "df": 2000,
+        "hash": "138e2d373e66b39f",
+        "idf": 0.00024990628644367546,
+        "share": 1.0,
+        "word": "rotate"
+      },
+      {
+        "df": 2000,
+        "hash": "13efe51f2e734d83",
+        "idf": 0.00024990628644367546,
+        "share": 1.0,
+        "word": "deprecated"
+      },
+      {
+        "df": 2000,
+        "hash": "182d7cbac174658f",
+        "idf": 0.00024990628644367546,
+        "share": 1.0,
+        "word": "18"
+      },
+      {
+        "df": 2000,
+        "hash": "197a9d64cb2d63fc",
+        "idf": 0.00024990628644367546,
+        "share": 1.0,
+        "word": "handbook"
+      },
+      {
+        "df": 2000,
+        "hash": "1b3d182df7f1004c",
+        "idf": 0.00024990628644367546,
+        "share": 1.0,
+        "word": "6"
+      },
+      {
+        "df": 2000,
+        "hash": "1bf41ef6fd6f6f6c",
+        "idf": 0.00024990628644367546,
+        "share": 1.0,
+        "word": "2"
+      },
+      {
+        "df": 2000,
+        "hash": "1fc5bd8679f757f5",
+        "idf": 0.00024990628644367546,
+        "share": 1.0,
+        "word": "md"
+      },
+      {
+        "df": 2000,
+        "hash": "20398d138e4d7bb4",
+        "idf": 0.00024990628644367546,
+        "share": 1.0,
+        "word": "17"
+      },
+      {
+        "df": 2000,
+        "hash": "205f187209253bb6",
+        "idf": 0.00024990628644367546,
+        "share": 1.0,
+        "word": "canopy"
+      },
+      {
+        "df": 2000,
+        "hash": "259ed3239b1b748c",
+        "idf": 0.00024990628644367546,
+        "share": 1.0,
+        "word": "flowchart"
+      },
+      {
+        "df": 2000,
+        "hash": "26b7cd1c7226bc32",
+        "idf": 0.00024990628644367546,
+        "share": 1.0,
+        "word": "degraded"
+      },
+      {
+        "df": 2000,
+        "hash": "2aae046c85347148",
+        "idf": 0.00024990628644367546,
+        "share": 1.0,
+        "word": "brood"
+      },
+      {
+        "df": 2000,
+        "hash": "3537ed74d4bb898d",
+        "idf": 0.00024990628644367546,
+        "share": 1.0,
+        "word": "region"
+      },
+      {
+        "df": 2000,
+        "hash": "3654ada0606cdab8",
+        "idf": 0.00024990628644367546,
+        "share": 1.0,
+        "word": "closes"
+      },
+      {
+        "df": 2000,
+        "hash": "3705a5f529607144",
+        "idf": 0.00024990628644367546,
+        "share": 1.0,
+        "word": "resample"
+      }
+    ],
+    "zipf_slope": -2.3157308589067678
+  },
+  "checks": [
+    {
+      "detail": "0 of 2000 documents carry no distinctive term at all, so no query can select them (EXHAUSTIVE - every document was checked)",
+      "flagged": false,
+      "floor": {
+        "bound": 0.01,
+        "direction": "max",
+        "provisional": true,
+        "source": "work/regression/2026-09-14-inspect-floors/"
+      },
+      "name": "unreachable share",
+      "status": "ok",
+      "value": 0.0
+    },
+    {
+      "detail": "495830 of 1044313 postings carry one of 277 term(s) on half the corpus or more",
+      "flagged": false,
+      "floor": {
+        "bound": 0.6,
+        "direction": "max",
+        "provisional": true,
+        "source": "work/regression/2026-09-14-inspect-floors/"
+      },
+      "name": "boilerplate share",
+      "status": "ok",
+      "value": 0.47479060396643535
+    },
+    {
+      "detail": "0 of 2000 documents are one half of a near-duplicate pair (Jaccard >= 0.80); 0 pair(s)",
+      "flagged": false,
+      "floor": {
+        "bound": 0.2,
+        "direction": "max",
+        "provisional": true,
+        "source": "work/regression/2026-09-14-inspect-floors/"
+      },
+      "name": "near-duplicate share",
+      "status": "ok",
+      "value": 0.0
+    },
+    {
+      "detail": "100 of 100 documents are returned in the top 3 for their own most distinctive words (an evenly spaced SAMPLE - the share is an estimate)",
+      "flagged": false,
+      "floor": null,
+      "name": "findable share",
+      "status": "descriptive",
+      "value": 1.0
+    }
+  ],
+  "corpus": {
+    "boilerplate_df": 1000.0,
+    "distinctive_df": 200.0,
+    "documents": 2000,
+    "edges": 0,
+    "postings": 1044313,
+    "shards": {
+      "00.jsonl": "21cda70ffa32c6cbdd7af8f656e88b32c5f5d65e",
+      "01.jsonl": "d8f9ca91d10f0ad13664c8b8de393b62d5d092d7",
+      "02.jsonl": "5cad1d49bd517e37fc907b5f5a85d020201246aa",
+      "03.jsonl": "040fc8e02ba42da2f81a32f7aa8127969392f465",
+      "04.jsonl": "0613e95262f53ced83ece3a1e2fa01066d07c16b",
+      "05.jsonl": "61164d9b190271980d5a0ebde87b50482c3d402c",
+      "06.jsonl": "cb58745209b3b23151442f23e836f4d88a475629",
+      "07.jsonl": "9d308781f9dd3c53c2db450f4acb373c6026451d",
+      "08.jsonl": "2c812f099a164920626722e1786d13dcec1c3b7f",
+      "09.jsonl": "7ea957fdaae69a17fdc788f092d86c17b25040a1",
+      "0a.jsonl": "ce694d1c4d25a6ef7186cd3365e4854065c15277",
+      "0b.jsonl": "3ba7313c299947ce3b0cf99c0ba3178f837e31d9",
+      "0c.jsonl": "eb8f1a1770b846584202c6797789c91cf1af15d4",
+      "0d.jsonl": "873e490b1b69a4c1a06db43d96d2a609dbd7933b",
+      "0e.jsonl": "82b725435548555cdc06733ebdf46a2ea16288dc",
+      "0f.jsonl": "fcdc1b9461c880cb4251ba9ce2938e00f45b040e",
+      "10.jsonl": "ab58584de5b04271f349fed6e81105f98cefa674",
+      "11.jsonl": "3c6b4c5dc89a5f1e7b52d6ccd3a0e0fd188a9eeb",
+      "12.jsonl": "7a80d8317fe1d2855bb8c0ae3aa196d6a8a2effa",
+      "13.jsonl": "8ca5be754ccb7cd73b7173204e58c422301e6779",
+      "14.jsonl": "91f4d8c98cc706e915374751ee001d31e351b294",
+      "15.jsonl": "953677c5e99a9957734e7fe3b181f7a1fc9f8677",
+      "16.jsonl": "191e0fd6feaa6f8f4972cf085fe42668de1368b6",
+      "17.jsonl": "096900e3eabbd10651a0175b1673f2f01a6329d1",
+      "18.jsonl": "2d38582187a8647e7c43e52c70372514ea2eae40",
+      "19.jsonl": "48b39b6335ba331d2e56f6cbdef9311325a0db9d",
+      "1a.jsonl": "b0e62d79efd0667e743e92c270d049255d1316db",
+      "1b.jsonl": "8b75717a7181b64b26711d679f7d2725477b09a0",
+      "1c.jsonl": "e6dfb62a2bcd30dc7dd805cbcd15f8c1aaede085",
+      "1d.jsonl": "47dfae33d473b50af1badf73e61cea56d8f41ab8",
+      "1e.jsonl": "39e0917ca016930585484d79a7067f80426395c8",
+      "1f.jsonl": "b8197cb613eafc995b717891ae6f05daa193e363",
+      "20.jsonl": "2a984df155bf9c127ba4f85fd63bf106557ac8d8",
+      "21.jsonl": "85a4a640bd2582bfc3f67854e3d3b7e0540a4513",
+      "22.jsonl": "9ff1e276a778b2c0da67f49a7d9b48e0e9a7dc17",
+      "23.jsonl": "7ffb299a4445ee528de86c254a523c725a892266",
+      "24.jsonl": "03c8e4f6204fa24f126041e890bf10883db70999",
+      "25.jsonl": "a94284ec491a5d38849889e59702291f4c2b4a3d",
+      "26.jsonl": "f007c09c5a9c5ddd492ca76443dfe3722975c79d",
+      "27.jsonl": "246cd7f38d049e3aada796f6775c4eaebcd77452",
+      "28.jsonl": "2cd8fa43b7e8a29f367ac4bedeb01aa91d9bf347",
+      "29.jsonl": "88bac452a4dc99a0406c072caa0c0d6c220a3292",
+      "2a.jsonl": "d08f99c61dcfe51a288bf0fb2635a142e2641ed9",
+      "2b.jsonl": "bcf6604b4c533e40290825faf4230bdf5c04b792",
+      "2c.jsonl": "d72d4fb801bd05cd6bb6c5d9d9064f1b5981d9dd",
+      "2d.jsonl": "1a2138d0fe0c0099f448fbab96fb8b3d19ba13e3",
+      "2e.jsonl": "fe2ea7d1dfdaef87d38cd291423488f0ec8f375e",
+      "2f.jsonl": "57dbde72309712ffe2a22981b2fd938b3b84cf5b",
+      "30.jsonl": "b9ac33a77596c14484ecfdfd4aea4da99610924c",
+      "31.jsonl": "601fc2220b36d3a749a5f4051ca8c8376963ed63",
+      "32.jsonl": "1f9dafb9cfdf72eb72e64bb94b91f80c77deccd8",
+      "33.jsonl": "6eae0fddaaabc7692daf8431c006610f81d90a4e",
+      "34.jsonl": "e4a14efe115499942179346490c250b23c1aa34f",
+      "35.jsonl": "9042ce5a787b8499730fda3fd29e37595e1b704e",
+      "36.jsonl": "f37e6c1c8867cc94fa752b6c82ea4fd1400073a7",
+      "37.jsonl": "6f2a17f2f8bf6ace86b0ba2aeb89c351de754e4b",
+      "38.jsonl": "ec483f003e27665f1c05c17fedd127f36da2d6c2",
+      "39.jsonl": "ee0c76e970cddba34bdbeba8fb3cbebabd749c42",
+      "3a.jsonl": "325e73031f1b745bf9dd0d41ba77e2a458e1ca7e",
+      "3b.jsonl": "b8d6122eaa3618144b01d30ea336e69e3b93c079",
+      "3c.jsonl": "89f94d634e32f87bd5f4d17714fbdc5d1eb12133",
+      "3d.jsonl": "456dc5384f5732208cdf4d24a7659b83ae35ba91",
+      "3e.jsonl": "e451e70bd0ae3aab6a214dba3451077bc7e6d0d2",
+      "3f.jsonl": "a2309befff186427953a6282298579c4400cd804",
+      "40.jsonl": "910efeb6d9140ac1b4d3be5396b6f89311b99123",
+      "41.jsonl": "f0f2a4b10b59d1f34e5106b133ce3f34cdb405c4",
+      "42.jsonl": "bf7083c4d95a2f5b418a2faab4e618e829af90dc",
+      "43.jsonl": "f30c6ba30fed4496ec786da0cb8b786c2bdcd741",
+      "44.jsonl": "99ad4a752ae09123eaaba5203b2a448b9ae473f6",
+      "45.jsonl": "3005e4eeb03556d2860cbc2dfb55f48cb65fc14d",
+      "46.jsonl": "06ba7b369c196e0d92b1ff4ad12141e7d53326e8",
+      "47.jsonl": "6be2b491901888a113a48a6926547ba96bd7b63e",
+      "48.jsonl": "fbb3f33209b3733e1518b31156a2da23f7b6dc22",
+      "49.jsonl": "12486aada1b2a3efe8964a1d6bc9b6d42c06c390",
+      "4a.jsonl": "a56ecabb5a8c830fff5c5d36010085900b7f3250",
+      "4b.jsonl": "262010599dfa21b7f5978eb5c7bb38be1d4ca6db",
+      "4c.jsonl": "02275e60ca7ac15d9bfa519baa51ee57e8340475",
+      "4d.jsonl": "aba82226a2469bb6b88780b95885120b82b15483",
+      "4e.jsonl": "1670aae65070027f2335d2460729ef03d59db94f",
+      "4f.jsonl": "5f3765d61484ea9c3eeedc43934c3da74b3d4d5d",
+      "50.jsonl": "f407d31fa7b3a47a63c8ddb7183268a593a81600",
+      "51.jsonl": "618475c607f976bdacce1cf418b3126d148c94fe",
+      "52.jsonl": "457f6c39d40b19c81aacfa7e0461b5d12e1e70f0",
+      "53.jsonl": "27739f912fbf7bca16a0b8faa6759f510eba3462",
+      "54.jsonl": "de994a773b2d285f17328aff9307841cd6fcfe71",
+      "55.jsonl": "b8b587bad9b9e94c9c0295f9d1eb29fca8fad5d4",
+      "56.jsonl": "1e9f2e02caf73bfa801d993541c97131066c6626",
+      "57.jsonl": "f16a934fb233698f7e6d998541a69dd7e4930df2",
+      "58.jsonl": "530cad726f2fd168ff8bee321663c8d96b50e882",
+      "59.jsonl": "b45e393e42f24cc2c4aea9f2c99f717eafd147bb",
+      "5a.jsonl": "e6072efe4aeb4d72fa82be37b0d4045f10e4bbd5",
+      "5b.jsonl": "be53e2de8020369b2292cb5480de673009148b44",
+      "5c.jsonl": "5320ad5427453e3a64a9cf0a9cb6601f05706789",
+      "5d.jsonl": "d3f9242e75c450ba20bf4cec3641fa44a2d55349",
+      "5e.jsonl": "c7a43d2030fe6512e190e828112916fa57914d5a",
+      "5f.jsonl": "1a9932c3301ba98b31b96e2ad802dee39c2a3364",
+      "60.jsonl": "25ae2f489320ce0faf4e5c9c843d3bd184c0d9fa",
+      "61.jsonl": "4f640addb4761a04ee2b03c889e58a26cb352ef2",
+      "62.jsonl": "b1c8cc7d7920cbba66b4da759422ca87d5ab465e",
+      "63.jsonl": "d2e8515a523490eda7dcde331795da9a50f83e57",
+      "64.jsonl": "181ba9ba3c61be4207599846fef9e5ccba4a00f7",
+      "65.jsonl": "c8642fde587fe59fbb4681b1efb274f0f25c0f7a",
+      "66.jsonl": "ed54c208f4d3e26079bad610ea3d212ccbcb622f",
+      "67.jsonl": "a7efe4732a274683974f0b1f7cfc820e9a8b5ac9",
+      "68.jsonl": "2c5c588638f9cb6812d1223145e6be6adb652666",
+      "69.jsonl": "3d3793e9072cfe474d20fa2e313f4bdd48fe74c4",
+      "6a.jsonl": "95abdb2d035052a42ed9eb18df5ef50661c9a5d3",
+      "6b.jsonl": "86edf62aab700fcdbc303113c7dccc329222b0ef",
+      "6c.jsonl": "7159ca914142932f7f9c80a7a2cf8a02bb319571",
+      "6d.jsonl": "4541b552f2d56485197ff511cb324cc052ccb399",
+      "6e.jsonl": "2f4582420aebdd7ebb9dcdcda43cf06b53de4cfd",
+      "6f.jsonl": "8a46a535bef5240d2bd93230e5516c1c38c747bc",
+      "70.jsonl": "80db73a9ca6fe0502a6b240a43b7372c183e63b8",
+      "71.jsonl": "5949c2f2a9cd4c8892384dae89b00226b8e21a30",
+      "72.jsonl": "8feaea0ceaf65cdfbadef3ba691711585777fc78",
+      "73.jsonl": "786871f388daef29dbe57912ca33c634b16df8a1",
+      "74.jsonl": "e151d4c06501ccf43816e9735c8d74df3046d4a2",
+      "75.jsonl": "a3178bd7011f81bbb19c1a362c430971ae6f7a37",
+      "76.jsonl": "14ad13d29060a29b344c4f067e2ed5295cfe056f",
+      "77.jsonl": "df52bd089b525c98e0eb9f193447afea13e56ce3",
+      "78.jsonl": "242eb8c83af4302d86718faf3741f1a5f72fb229",
+      "79.jsonl": "72431976e512cd2ed564f96eb2d65b7af9024f15",
+      "7a.jsonl": "42529a5976c7301d8f5ea9f8c9a943f394ef5cb9",
+      "7b.jsonl": "77cf5559800f2a07c2d1cbd318ad2c02416b0da6",
+      "7c.jsonl": "5f4a408fe5e5740479703186519a31517a5cd85f",
+      "7d.jsonl": "a8f931161ec58479fc7df8e7bd10beebccb5dc92",
+      "7e.jsonl": "cd77a915f326393a71cfc3bae2a5ae3e49a1cfc5",
+      "7f.jsonl": "cdf034f4ac330790fb505fb7b65ef2a5b43e7b0a",
+      "80.jsonl": "04f4f0d53f259b8186346c19e65ae64cc2f7be8e",
+      "81.jsonl": "13238e78a29bff42e364307152dbc5ef90e45c1d",
+      "82.jsonl": "252707bc7a470eef32a3f3c8dde6471d92b4bca1",
+      "83.jsonl": "72cb45df56838408c085c476d1e62a9f683aa3d2",
+      "84.jsonl": "6ee719d9c418a521860c85efb1637745af26651b",
+      "85.jsonl": "98272da970edd272fbe0f4de85d8c59de370b5ff",
+      "86.jsonl": "be0ba6b06b6acc36053bd2217bf86e210f0d55fe",
+      "87.jsonl": "28513af755a13279b045119533d915ebd97878d8",
+      "88.jsonl": "623742a9d75a9cf1f519e3808205a51a8ced2617",
+      "89.jsonl": "e93a96cc6650b7c5f962e543bd0742ff0c52702b",
+      "8a.jsonl": "2c887e96d324a1a6885267f2439df92a6f9e0962",
+      "8b.jsonl": "a0d338a62e2a1c47389aea373eaf57ffa01065a6",
+      "8c.jsonl": "c211533c0d38f4fcbfb638b1af126cc3217175e4",
+      "8d.jsonl": "9ed292b578c223280043b085e98a63fb74153bbc",
+      "8e.jsonl": "f5bbb2171a7d0a0c6cf4b6783e67d2ad57f00846",
+      "8f.jsonl": "feab1d8a230c0fa9b6bc3c6ea6b1e9f6afa8366f",
+      "90.jsonl": "0c9d2a97f4c95ec32ded0af04dd64fbde969165e",
+      "91.jsonl": "5184557ddcd7ac55e86e3371abaffbb03ef4c9e6",
+      "92.jsonl": "4cdb919ce7a621e45a01d9f7f7978f3fa79d9214",
+      "93.jsonl": "ce8eae7a364f6b2b0c68e0f5f781c56148f27868",
+      "94.jsonl": "27b85f78aeb0e019e3b18309bfed57b202703ce7",
+      "95.jsonl": "06a59a42a049ac70e22bcecab559d4334579d578",
+      "96.jsonl": "dbb1dec5cc34b2a555252b5ac45bc617b37a2381",
+      "97.jsonl": "3df31dd82d2602fce6a118da6a7a89a198d2ba38",
+      "98.jsonl": "ce61df006e6e0091978076a031617f43ac0e3aed",
+      "99.jsonl": "1617ab7d103cd6c5a7ed5e38cacbdc2d02dec8aa",
+      "9a.jsonl": "05469e58a75fc7c64ff085528e21271c383723d5",
+      "9b.jsonl": "dcf6c874f13a4d49eb5c04f2713bd37fa8f23ac6",
+      "9c.jsonl": "94d84485e5f58590a1122a634e92b6454af820d4",
+      "9d.jsonl": "315e43f22d8cb5da0b5464547f5c605ea92bef4c",
+      "9e.jsonl": "979cf17b1291f5c1fb3b3b013790dde9a19d3059",
+      "9f.jsonl": "856922094cf6acbb45bfa3aace05454427a6e41b",
+      "a0.jsonl": "2161f3aa33a87cec6082d2e95f61b0d718b3b7d3",
+      "a1.jsonl": "5ec133c7679307bc129267fc45f2e6e53ae7cd09",
+      "a2.jsonl": "a1fa159ddc1d46fd57cfb2b979652925b28a3c6c",
+      "a3.jsonl": "668e8165b1d87764236ed7a28cc569945e34b3a1",
+      "a4.jsonl": "d578fa1a1e0f1c55849bdcc7b189789edc85bfbe",
+      "a5.jsonl": "6860c16c993ead3f8272903df745515ef24a12c8",
+      "a6.jsonl": "5d88f8020d0c4c6f8e6df4fb98f90edcd41664ea",
+      "a7.jsonl": "bccfa545b74e0059453b9bab48495c8ca285e979",
+      "a8.jsonl": "e257883ab3810ec2b3f989ba96711560c1e6838d",
+      "a9.jsonl": "92fb94c263cddb46ca152f05ad5eb9b5c805d061",
+      "aa.jsonl": "297540cbdb23540f0bd536b6b2aa0b106e9ff8d9",
+      "ab.jsonl": "184d90d7351a2ab1b48c2f0f81f72e4add14b860",
+      "ac.jsonl": "cb101ad373fc3f13695766d20e4404f023b0631f",
+      "ad.jsonl": "aeacb21c6296c013d45f688b750c98df4ef1d6cf",
+      "ae.jsonl": "2900112a67ef1765a47ec1ddd340325796f95137",
+      "af.jsonl": "17eaef309658b5e43b1e12ba41bf45f3684bd5d5",
+      "b0.jsonl": "18950d7690adb775eb74a303de821ebfe5e90cf5",
+      "b1.jsonl": "9942fd4ef61fd1c8a16ba64973d68f03379d586c",
+      "b2.jsonl": "8f05958ea566f8d7c35ec11780de8f0ab260815d",
+      "b3.jsonl": "e437157ff43a0244c51c5696bec435c59da37603",
+      "b4.jsonl": "21dc23a8e95fe791c21f2116077e9341e40a4b19",
+      "b5.jsonl": "bd5fc0870a322f2f85d42eda891ba2cfd666eb39",
+      "b6.jsonl": "a4d30a84fa872dcf7ff451288def9010b9c0e590",
+      "b7.jsonl": "3d2aca63b677eb5b5aef1f4003e840ea0cb606be",
+      "b8.jsonl": "29b5b2a0f4c01bb1d6aaaa9e2f201930a867c1bd",
+      "b9.jsonl": "1ded698f23fdc30294167d7c73bafef06d6b58c4",
+      "ba.jsonl": "ea091d5cd5f04176cc275a3476142bbb5fcd35e6",
+      "bb.jsonl": "a4d672b794b971bcc48b890b71bff88a22924336",
+      "bc.jsonl": "7d3021d11c50d753f09bdfce563f4cf7aa21e949",
+      "bd.jsonl": "de58fac94d591731e9bfc1fcbbce0c58253fa858",
+      "be.jsonl": "885ecc63c95c9a0a257f00e411dc01fc6e06550f",
+      "bf.jsonl": "8cefd5e4142ad9784c7fec0524e657308f1c7bfb",
+      "c0.jsonl": "303876df6fd91685d36f6ca6909d82338733ed9a",
+      "c1.jsonl": "3aa516c3c0549ce7737f757c9dea6b04d61ed9df",
+      "c2.jsonl": "c43dd31f48e0eace6152c9699206cb51ed111490",
+      "c3.jsonl": "9087ecb82e4024de774c36298363b00e08ecb3a3",
+      "c4.jsonl": "49b5d5e5202c3e3ac04f30b31446f2f5a2f12396",
+      "c5.jsonl": "cfaa0761115744c134f159e8a44b34721a553fb3",
+      "c6.jsonl": "040350d1130d34047399cacacf315db520159838",
+      "c7.jsonl": "985a9322f519c91bdfdf701e2c9de91c6b7c2a26",
+      "c8.jsonl": "9c4e90327b386bb5a2238c32cabfb9f21efefbf5",
+      "c9.jsonl": "b49f04e02324b453dffc137a92e5c5643f22a0fa",
+      "ca.jsonl": "147bf06400d5cc27429c3fb005bdf56ef5c56e97",
+      "cb.jsonl": "a2260100daed165485fce0b9b9300bf8a0060172",
+      "cc.jsonl": "7b1b8146d45c0d62a8122eb976dc431e680a4a86",
+      "cd.jsonl": "33bc8d82f25be7f920cb11da95d760b39380fe87",
+      "ce.jsonl": "9dde498c28b2c9d722fbe37358f1dd9386370a97",
+      "cf.jsonl": "9298c97cce63bec50b1cc5512e6c3c8578416e25",
+      "d0.jsonl": "2c4e3cf66a59dd02cdd655f51a41a03c5d31bb7c",
+      "d1.jsonl": "1669841a84a9f538745e797719033b07972ccb8d",
+      "d2.jsonl": "899fe0b873a948ed9a444141d42b0ba1bbad7302",
+      "d3.jsonl": "e4f2dc52cd8fbe97f61628a6b61995422f8b11fe",
+      "d4.jsonl": "f17c81182129d960f2d417a7f97801c8d9951d14",
+      "d5.jsonl": "cf1503cc169cb0938f2c97ec0db8e784c64d452f",
+      "d6.jsonl": "66946b5d7905ce4de3fe8f3f5c8e21e7143501bd",
+      "d7.jsonl": "707d2a11e170ffe3f13419f9557ad276237cd405",
+      "d8.jsonl": "7beec0f670ea914a00b02804a03da87e7971b114",
+      "d9.jsonl": "1772abc87876b45c1d9031795874247c10723bef",
+      "da.jsonl": "b721b2f6771bf73df06f3de8a5fbc61ccba73145",
+      "db.jsonl": "26a70017cd246a896990601241f6956d4241caf8",
+      "dc.jsonl": "678b2056587eceff472ca575dcbe33b18d8f807e",
+      "dd.jsonl": "d49a85c14d8608d49f55608fa4395f694e991b4a",
+      "de.jsonl": "accbff90f5ece38d55e82514e8dfea760045deb3",
+      "df.jsonl": "ce766c04a9e2faa084267d8bdc46e3ef59415c49",
+      "e0.jsonl": "52ef2c77bf1c01f59c8e24e19166f0b0da08ed80",
+      "e1.jsonl": "04221cb0e414205ff3eb68a8fe917dd8b6d02c51",
+      "e2.jsonl": "4491d9a4c7d5b3f682b1d84711caab1346101785",
+      "e3.jsonl": "c66e61e816e8466e5aaf87e6d8917327b3c1a312",
+      "e4.jsonl": "25052fd2c64a52803a74324adefaa6bf98c98c68",
+      "e5.jsonl": "bc0839cc55cc1d68e2e39f19201cbcc73bb2a6f3",
+      "e6.jsonl": "d68b1f4c18b4bba86d674c17d86d5be3dc5a3231",
+      "e7.jsonl": "d42ddb4cde8744c17c9ec47199dc1b72d8ab8681",
+      "e8.jsonl": "8e31511712c0f3eb9a66b9e66c6528603886f3bd",
+      "e9.jsonl": "c93236fe8d150c4cb41c9ccfd9570c3b78f59208",
+      "ea.jsonl": "0bc192358ebd84078f118b57a9570b7494c45c70",
+      "eb.jsonl": "549613d6e68e5e5550bfb49665d12ffee327a32d",
+      "ec.jsonl": "f6ec238c588fc0d33a91b2bf71d5c6a997bd2c86",
+      "ed.jsonl": "a2727e91990c0ac94e50a57d08bcbe50ce559e96",
+      "ee.jsonl": "2891e42a308945e31a2e1117759a1ff641e7bc7c",
+      "ef.jsonl": "a447b21176cc574c5145c3372cc92757465c9066",
+      "f0.jsonl": "fa43829dfceefdbbfdb049b5ee5443e153a587a8",
+      "f1.jsonl": "385eec4c0e2eb9e7f797cac7757a983b21b66288",
+      "f2.jsonl": "a2b5139f2ff84bd2b97ddbcbfc08274cc76a0f90",
+      "f3.jsonl": "69b61fb9ef1e314ad89073033a070b931946779e",
+      "f4.jsonl": "d951fbdea8392842c237e929c23d4ee7ca89d489",
+      "f5.jsonl": "647c71550c53d9eab82d566c30cf3182a6d3c5c0",
+      "f6.jsonl": "1646dacdd230bf52a8629804b98a3aa784b263ab",
+      "f7.jsonl": "aafc6b5a4a6f31ec7af78a12e23fd2311338bb61",
+      "f8.jsonl": "97781b363bda583db9045d1f28676270caf03eaf",
+      "f9.jsonl": "a31f0d52237848c31af567387f1c35531ea9c5e8",
+      "fa.jsonl": "7fcc9b4140e6c99a2f747fc65f6ec7ae4695e963",
+      "fb.jsonl": "5618e3ff8c7ccfd9f6310e64925f6c4b658e2edf",
+      "fc.jsonl": "275627a42a8672e103243e63dea49c0b37f0b498",
+      "fd.jsonl": "8abaedfa7fd825c59a684d0b1e1950571f2dd9a6",
+      "fe.jsonl": "6f598764a9d9d1f38275384620fbb06a439e4477",
+      "ff.jsonl": "96c0ac7521e330f3b81143a7291399979724643c"
+    },
+    "terms": 12163
+  },
+  "coverage": {
+    "dictionary_coverage": 1.0,
+    "kept": 9148609,
+    "kept_share": 0.8330634040339876,
+    "lever": "a decoder (`fux-decoder`), or leave it in `.fux/enrich/queue.tsv` for a model to describe",
+    "named_terms": 12163,
+    "no_content": [],
+    "queued": [],
+    "raw_runs": 10981888,
+    "total_terms": 12163,
+    "undecodable": [],
+    "unreadable": []
+  },
+  "duplication": {
+    "documents_in_a_family": 0,
+    "documents_in_a_pair": 0,
+    "families": [],
+    "family_count": 0,
+    "lever": "`.fuxignore`, `archived=`, or `supersedes` on the one that is current",
+    "near_duplicate_share": 0.0,
+    "near_duplicates": [],
+    "pair_count": 0
+  },
+  "findability": {
+    "fewest_distinctive": [
+      {
+        "distinctive": 194,
+        "id": "file:docs/01571-metallurgy-emulsion.md"
+      },
+      {
+        "distinctive": 196,
+        "id": "file:docs/00295-seismology-trellis.md"
+      },
+      {
+        "distinctive": 197,
+        "id": "file:docs/00935-seismology-brood.md"
+      },
+      {
+        "distinctive": 197,
+        "id": "file:docs/00999-viticulture-canopy.md"
+      },
+      {
+        "distinctive": 198,
+        "id": "file:docs/01289-viticulture-sounding.md"
+      },
+      {
+        "distinctive": 200,
+        "id": "file:docs/01167-lithography-graft.md"
+      },
+      {
+        "distinctive": 201,
+        "id": "file:docs/00846-horticulture-projection.md"
+      },
+      {
+        "distinctive": 203,
+        "id": "file:docs/00390-freight-canopy.md"
+      },
+      {
+        "distinctive": 203,
+        "id": "file:docs/00863-apiculture-rootstock.md"
+      },
+      {
+        "distinctive": 205,
+        "id": "file:docs/00425-seismology-catchment.md"
+      },
+      {
+        "distinctive": 205,
+        "id": "file:docs/01411-metallurgy-tolerance.md"
+      },
+      {
+        "distinctive": 205,
+        "id": "file:docs/01922-hydrology-aquifer.md"
+      },
+      {
+        "distinctive": 205,
+        "id": "file:docs/01998-bathymetry-canopy.md"
+      },
+      {
+        "distinctive": 206,
+        "id": "file:docs/00571-metallurgy-emulsion.md"
+      },
+      {
+        "distinctive": 206,
+        "id": "file:docs/00585-seismology-echogram.md"
+      },
+      {
+        "distinctive": 206,
+        "id": "file:docs/00842-hydrology-projection.md"
+      },
+      {
+        "distinctive": 206,
+        "id": "file:docs/01678-bathymetry-plate.md"
+      },
+      {
+        "distinctive": 207,
+        "id": "file:docs/01649-viticulture-projection.md"
+      },
+      {
+        "distinctive": 207,
+        "id": "file:docs/01885-seismology-sounding.md"
+      },
+      {
+        "distinctive": 208,
+        "id": "file:docs/00957-lithography-epicentre.md"
+      }
+    ],
+    "findable_share": 1.0,
+    "lever": "`fux enrich`, `fux correct`, or fix the source",
+    "misses": [],
+    "retrieved": 100,
+    "sample_is_whole_corpus": false,
+    "sampled": 100,
+    "unfindable": [],
+    "unfindable_count": 0
+  },
+  "graph": {
+    "communities": [],
+    "community_count": 0,
+    "edges": 0,
+    "hubs": [],
+    "lever": "link-IDF and the graph-composed `ask` (W-161) \u2014 until then, add a link from a document that is read",
+    "nodes": 0,
+    "orphan_count": 2000,
+    "orphans": [
+      "file:docs/00000-freight-manifest.md",
+      "file:docs/00001-metallurgy-manifest.md",
+      "file:docs/00002-hydrology-manifest.md",
+      "file:docs/00003-apiculture-manifest.md",
+      "file:docs/00004-cartography-manifest.md",
+      "file:docs/00005-seismology-manifest.md",
+      "file:docs/00006-horticulture-manifest.md",
+      "file:docs/00007-lithography-manifest.md",
+      "file:docs/00008-bathymetry-manifest.md",
+      "file:docs/00009-viticulture-manifest.md",
+      "file:docs/00010-freight-tolerance.md",
+      "file:docs/00011-metallurgy-tolerance.md",
+      "file:docs/00012-hydrology-tolerance.md",
+      "file:docs/00013-apiculture-tolerance.md",
+      "file:docs/00014-cartography-tolerance.md",
+      "file:docs/00015-seismology-tolerance.md",
+      "file:docs/00016-horticulture-tolerance.md",
+      "file:docs/00017-lithography-tolerance.md",
+      "file:docs/00018-bathymetry-tolerance.md",
+      "file:docs/00019-viticulture-tolerance.md"
+    ],
+    "singleton_communities": 0
+  },
+  "lengths": {
+    "body_tokens": {
+      "max": 5415,
+      "min": 3246,
+      "p10": 3436,
+      "p50": 4709,
+      "p90": 5113
+    },
+    "ctx_over_body": [],
+    "distinct_terms": {
+      "max": 616,
+      "min": 437,
+      "p10": 484,
+      "p50": 522,
+      "p90": 561
+    },
+    "empty_title": [],
+    "fields": {
+      "body": 8980315,
+      "ctx": 0,
+      "heading": 148294,
+      "path": 10000,
+      "title": 10000
+    },
+    "longest": [
+      {
+        "body_tokens": 5415,
+        "id": "file:docs/00962-hydrology-graft.md"
+      },
+      {
+        "body_tokens": 5405,
+        "id": "file:docs/00710-freight-annealing.md"
+      },
+      {
+        "body_tokens": 5383,
+        "id": "file:docs/00498-bathymetry-trellis.md"
+      },
+      {
+        "body_tokens": 5369,
+        "id": "file:docs/01034-cartography-colony.md"
+      },
+      {
+        "body_tokens": 5356,
+        "id": "file:docs/01294-cartography-trellis.md"
+      },
+      {
+        "body_tokens": 5347,
+        "id": "file:docs/01738-bathymetry-brood.md"
+      },
+      {
+        "body_tokens": 5319,
+        "id": "file:docs/01994-cartography-canopy.md"
+      },
+      {
+        "body_tokens": 5306,
+        "id": "file:docs/00210-freight-tolerance.md"
+      },
+      {
+        "body_tokens": 5302,
+        "id": "file:docs/01798-bathymetry-canopy.md"
+      },
+      {
+        "body_tokens": 5301,
+        "id": "file:docs/01458-bathymetry-tremor.md"
+      }
+    ],
+    "no_headings": [],
+    "shortest": [
+      {
+        "body_tokens": 3246,
+        "id": "file:docs/00504-cartography-ledger.md"
+      },
+      {
+        "body_tokens": 3247,
+        "id": "file:docs/00772-hydrology-emulsion.md"
+      },
+      {
+        "body_tokens": 3255,
+        "id": "file:docs/00692-hydrology-trellis.md"
+      },
+      {
+        "body_tokens": 3275,
+        "id": "file:docs/00124-cartography-aquifer.md"
+      },
+      {
+        "body_tokens": 3281,
+        "id": "file:docs/00956-horticulture-epicentre.md"
+      },
+      {
+        "body_tokens": 3286,
+        "id": "file:docs/00640-freight-projection.md"
+      },
+      {
+        "body_tokens": 3287,
+        "id": "file:docs/01788-bathymetry-echogram.md"
+      },
+      {
+        "body_tokens": 3290,
+        "id": "file:docs/00356-horticulture-epicentre.md"
+      },
+      {
+        "body_tokens": 3301,
+        "id": "file:docs/01260-freight-rootstock.md"
+      },
+      {
+        "body_tokens": 3307,
+        "id": "file:docs/00668-bathymetry-rootstock.md"
+      }
+    ]
+  },
+  "levers": {
+    "boilerplate term": "`[index]` stopwords, or an analyzer amendment \u2014 an index change, with its own record",
+    "file-name-only document": "a decoder (`fux-decoder`), or leave it in `.fux/enrich/queue.tsv` for a model to describe",
+    "hub": "link-IDF and the graph-composed `ask` (W-161) \u2014 until then, nothing: a hub is a fact about the corpus",
+    "near-duplicate pair": "`.fuxignore`, `archived=`, or `supersedes` on the one that is current",
+    "orphan": "link-IDF and the graph-composed `ask` (W-161) \u2014 until then, add a link from a document that is read",
+    "template family": "`.fuxignore`, `archived=`, or `supersedes` on the one that is current",
+    "unfindable document": "`fux enrich`, `fux correct`, or fix the source",
+    "unreadable document": "re-ingest, or `keep = true` on the url line so the bytes are retained"
+  }
+}

@@ -93,12 +93,36 @@ the arm even when every score agrees at `round(9)`.
 | Node | **20 and 22**, the LTS pair the CI matrix names |
 | OS / libm | **ubuntu (glibc)**, **macOS arm64 (Apple libm)**, **windows** — all three |
 
-### Cadence — ✅ ruled by Arpit 2026-09-12
+### Cadence — ✅ ruled 2026-09-12, **RE-RULED LOCAL 2026-09-14** (W-148 row 1)
 
-| when | rungs |
-|---|---|
-| **every push**, both readers, full OS × Node matrix | **`rung-00100` and `rung-10000`** — the two ends |
-| **nightly, and before any release** | **all eight** |
+🔴 **AMENDED, not silently edited.** The cadence below was written as a CI
+cadence — *every push*, *the full OS × Node matrix* — and **a GitHub runner
+could never meet it**, because the ladder corpus is not in this repository and
+is not going to be. Arpit ruled on 2026-09-14: **the golden corpus is not for
+CI.** Golden runs **local-only, in `fux-lab`**; no self-hosted runner, no
+committed rung, no portable builder.
+
+**What that changes, precisely:** *every push* and *nightly* become **every
+change to either reader** and **before any release**, run by hand in `fux-lab`.
+The rungs, the matrix and the bar are untouched — only where and when.
+
+⚠ **The `FUX_GOLDEN_CORPORA` arm in `node-arm.yml` is REMOVED**, not disabled.
+It ran the real arm whenever a repository variable happened to point at a
+corpus, so a green tick meant either *the arm passed* or *there was no corpus*,
+and nothing in the tree said which. CI now checks the **manifests only**
+(`ladder_check.py`) and says so in its job name.
+
+| when | rungs | where |
+|---|---|---|
+| **every change to either reader**, full OS × Node matrix as available | **`rung-00100` and `rung-10000`** — the two ends | `fux-lab`, by hand |
+| **before any release** | **all eight** | `fux-lab`, by hand |
+| every push | the ladder **manifests** only — the instrument, not the measurement | CI |
+
+⚠ **The matrix is a local one now, and one machine is not three OSes.** A local
+run covers the OS and Node version that machine has. **That is a real loss** and
+it is the price of the ruling: the cross-OS half of §4 is now *aspirational
+until somebody runs it there*, rather than something CI was quietly failing to
+do.
 
 **Why the ends and not all eight per push.** The 100 rung exercises every code
 path cheaply; the 10 000 rung is the only one that can expose anything
@@ -108,9 +132,21 @@ kind — so per push they buy coverage that is nearly free to get nightly, at
 it is the latency: slow CI is what teaches people to skip CI**, and an arm
 people route around is worth less than one that runs on two rungs.
 
-✅ **The ladder is committed to this repo** (2.2 MB, 8 rungs, tracked), so CI
-can run the same rungs fux-lab runs. **fux-lab is where a measurement is
-*filed* from; it is not a place the data only exists.**
+🔴 **CORRECTED 2026-09-14 — this paragraph was WRONG, in the direction that
+flatters.** It read: *"The ladder is committed to this repo (2.2 MB, 8 rungs,
+tracked), so CI can run the same rungs fux-lab runs."*
+
+**What is committed is the ladder's MANIFESTS** —
+`work/golden/ladder/*.{index,sha256}`, and 2.2 MB is *their* size. **The rungs
+themselves are not committed and cannot be**: `rung-10000` alone is 120 MB, and
+[L2](../../records/0004_LAW-2-content-never-durable.md) is the law the whole
+architecture rests on. So *"CI can run the same rungs"* was never true, and the
+conditional arm that appeared to act on it is what made the falsehood survive a
+year of green ticks.
+
+**What is still true:** a measurement is *filed* from `fux-lab` into
+[`work/regression/`](../regression/README.md), and the manifests are what let
+any environment verify it is looking at the same rung.
 
 🔴 **`work/golden/golden-answer/` is not read by this arm and not by any Claude
 session.** The arm compares **two readers against each other**, never against

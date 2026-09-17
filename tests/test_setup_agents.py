@@ -16,6 +16,7 @@ check it" runs this file with `-k "announces or optout"`.
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import pytest
@@ -132,6 +133,10 @@ def test_a_partial_declaration_installs_exactly_what_it_names(tmp_path):
         + [f".kiro/skills/{name}/SKILL.md" for name in guides]
         + [f".kiro/steering/fux-{t}-files.md" for t in setup_mod.PATH_SCOPED_TOPICS]
         + [f".kiro/steering/fux-{t}-guide.md" for t in setup_mod.AUTO_GUIDE_TOPICS]
+        # SR-AGENT-SURFACES decision 3a: Kiro ships repo-level hooks (12
+        # triggers, `PreToolUse` among them) and repo-level custom agents.
+        # Derived from the roster rather than retyped, so the two cannot drift.
+        + [rel for rel, _tpl in setup_mod.KIRO_SURFACES]
     )
 
 
@@ -438,9 +443,25 @@ def test_this_repos_own_agent_files_still_match_the_templates_that_ship():
     second, in a different shape, so it is gated in the change that records it.
 
     **If this fails: edit the TEMPLATE, delete the rendering, re-run
-    `fux setup`.** Never the other way round."""
+    `fux setup`.** Never the other way round.
+
+    🔴 **`setup_mod.CO_OWNED_SURFACES` is exempt, and the exemption is a
+    finding, not a waiver** (SR-AGENT-SURFACES decision 6). `.claude/settings.json`
+    is a file the CONSUMER owns and fux only seeds: this repo's own copy carries
+    Arpit's golden-answer deny rules and five hooks that have nothing to do with
+    fux. Byte equality is the wrong assertion for a surface somebody else also
+    writes to — it would fail for every real consumer, and the only way to make
+    it pass would be to overwrite their settings, which is precisely what
+    decision 6 forbids. What IS asserted for these: the template stays valid
+    JSON, and it is never written over an existing file
+    (`test_co_owned_surface_is_never_written_over`)."""
     root = Path(__file__).resolve().parents[1]
-    pairs = [(rel, tpl) for files in setup_mod.AGENT_FILES.values() for rel, tpl in files]
+    pairs = [
+        (rel, tpl)
+        for files in setup_mod.AGENT_FILES.values()
+        for rel, tpl in files
+        if rel not in setup_mod.CO_OWNED_SURFACES
+    ]
     # the vendor-neutral root file lives outside `AGENT_FILES` (W-82 ruling 16)
     # and drifts by exactly the same mechanism, so it is added by hand here too.
     pairs.append((setup_mod.AGENTS_FILE, setup_mod.AGENTS_TEMPLATE))
@@ -471,13 +492,21 @@ def test_every_committed_write_skill_reaches_every_skill_surface():
 
 
 def test_every_operating_guide_reaches_every_skill_surface_and_no_ambient_one():
-    """SR-AGENT-POLICY decision 15 (Arpit, 2026-09-11). The ten operating
-    guides are decision 14a's roster rule applied ten more times: one template,
-    all four skill surfaces, and never an `instructions/` or `steering/`
-    destination -- four of them (`fux-sources`, `fux-config`, `fux-fetcher`,
-    `fux-pii`) write committed files, and decision 9a is a predicate on the
-    surface, not on a list of names."""
-    assert len(setup_mod.GUIDE_SKILLS) == 10
+    """SR-AGENT-POLICY decision 15 (Arpit, 2026-09-11). The operating guides are
+    decision 14a's roster rule applied once per guide: one template, all four
+    skill surfaces, and never an `instructions/` or `steering/` destination --
+    four of them (`fux-sources`, `fux-config`, `fux-fetcher`, `fux-pii`) write
+    committed files, and decision 9a is a predicate on the surface, not on a
+    list of names.
+
+    **Twelve since 2026-09-14** — `fux-inspect` (SR-INSPECT) and `fux-correct`
+    (SR-ENRICH decision 19) both joined that day, at the two ends of the
+    spectrum this rule covers. `inspect` writes nothing at all; `correct`
+    writes committed files and records a claim under somebody's name, and its
+    own first section is *propose the command, do not run it* — because the
+    moment an agent notices a bad result is exactly when it would be tempted.
+    """
+    assert len(setup_mod.GUIDE_SKILLS) == 12
     for name, template in setup_mod.GUIDE_SKILLS:
         assert _surfaces(template) == SKILL_SURFACES, template
         for files in setup_mod.AGENT_FILES.values():
@@ -501,6 +530,10 @@ def test_codex_alone_still_gets_the_root_agents_file(tmp_path):
             ".agents/skills/fux-decoder/SKILL.md",
             ".agents/skills/fux-enrich/SKILL.md",
             ".agents/skills/fux-usage/SKILL.md",
+            # decision 3a: Codex has documented repo-level hooks and subagents
+            ".codex/agents/fux-researcher.md",
+            ".codex/hooks.json",
+            ".codex/hooks/fux-index-hint.sh",
             "AGENTS.md",
         ]
         # decision 15: the guides reach Codex as skills; Codex has no
@@ -525,7 +558,13 @@ def test_codex_and_copilot_write_the_one_directory_codex_reads():
         assert skills, vendor
         assert all(rel.startswith(".agents/skills/") for rel in skills), vendor
     every = [rel for files in setup_mod.AGENT_FILES.values() for rel, _tpl in files]
-    assert not [rel for rel in every if rel.startswith((".codex/", ".github/skills/"))]
+    # 🔴 **Narrowed 2026-09-14 from `.codex/` to `.codex/skills/`.** Veto 3 fired
+    # on the SKILLS path -- `.codex/skills` is not a path Codex's docs list. It
+    # never said anything about `.codex/hooks.json` or `.codex/agents/`, which
+    # ARE documented and which fux now writes (SR-AGENT-SURFACES decision 3a).
+    # A blanket ban on the vendor's whole directory read as a finding when it
+    # was only ever a finding about one path inside it.
+    assert not [rel for rel in every if rel.startswith((".codex/skills/", ".github/skills/"))]
 
 
 def test_codex_and_copilot_skill_rosters_are_identical():
@@ -615,3 +654,52 @@ def test_this_repos_own_decoders_still_match_the_package_modules():
         "were copied from, so a fix in src/fux/decode/ is not what runs here:\n  "
         + "\n  ".join(drift)
     )
+
+
+def test_co_owned_surface_is_never_written_over(tmp_path):
+    """Decision 6. A consumer's `settings.json` survives `fux setup` untouched.
+
+    The failure this prevents is not hypothetical: this repository's own
+    `.claude/settings.json` carries deny rules protecting the sealed golden
+    answer key. A setup that overwrote it would silently remove the guard that
+    keeps an evaluation set out of a model's context.
+    """
+    import json
+
+    root = _fresh(tmp_path)
+    mine = {"permissions": {"deny": ["Read(**/secret/**)"]}}
+    for rel in setup_mod.CO_OWNED_SURFACES:
+        path = root / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(mine), encoding="utf-8")
+
+    setup_mod.run(root)
+
+    for rel in setup_mod.CO_OWNED_SURFACES:
+        assert json.loads((root / rel).read_text(encoding="utf-8")) == mine, rel
+
+
+def test_co_owned_surface_template_is_valid_json():
+    """What replaces byte equality for a co-owned surface: it must still parse."""
+    import json
+
+    by_path = {rel: tpl for files in setup_mod.AGENT_FILES.values() for rel, tpl in files}
+    for rel in setup_mod.CO_OWNED_SURFACES:
+        json.loads(setup_mod.agent_template_bytes(by_path[rel]).decode("utf-8"))
+
+
+@pytest.mark.skipif(
+    os.name == "nt",
+    reason=(
+        "the POSIX exec bit does not exist on Windows: `chmod(0o755)` is a near "
+        "no-op there and `st_mode & 0o111` is 0 for every regular file, so this "
+        "asserts a property the platform cannot carry. What it guards — a `.sh` "
+        "hook a POSIX runner will not execute — is not a failure mode Windows has."
+    ),
+)
+def test_the_hook_surface_is_written_executable(tmp_path):
+    """Decision 5. A hook written 0644 fails silently — nothing reports it."""
+    root = _fresh(tmp_path)
+    setup_mod.run(root)
+    for rel in setup_mod.EXECUTABLE_SURFACES:
+        assert (root / rel).stat().st_mode & 0o111, f"{rel} is not executable"

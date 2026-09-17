@@ -1,0 +1,8 @@
+queries: 692   tops: [1, 5, 20, 50]   modes: off, on
+weights: [1.0, 0.5, 2.0, 500.0] on `[priority]` prefix 'archive'
+undecodable: 10 file(s) walked but not UTF-8, contributing no terms — archive/v0.1/fux/assets/fux-lockup.png, archive/v0.26/tests_e2e/corpus/assets/logo.png, archive/v0.26/tests_e2e/corpus/office/spec.docx, archive/v0.26/tests_e2e/site/logo.png, docs/architecture-answer.png ...
+comparisons: 22144
+scan:   763733.7 ms total
+accel:   75939.2 ms total
+
+DIFFERENTIAL GREEN — 22144 comparisons, byte-identical in every mode

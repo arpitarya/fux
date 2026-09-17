@@ -6,12 +6,12 @@ title: "SR-TUNE (0135) — the tunables file, and per-source priority"
 description: "`.fux/tune.toml` — a committed, setup-written, never-rewritten file holding every knob that changes ordering, plus one declared exception (`[index]`: `max_phrases`, `max_table_rows`) that changes the index; plus a per-source preference weight in either direction, where fux states the cost and refuses only what is broken."
 status: accepted
 date: 2026-08-22
-amended: 2026-09-11
+amended: 2026-09-15
 feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error contract, and per-source preference weights
-owns: [src/fux/tune.py@2303b6568596]
+owns: [src/fux/tune.py@97814aaa4a31]
 laws: [L1, L3, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: b483530f27b62cd1e0c974dfea5e07a1e033b0221c9917ffb734c0195b8e9edd
+content_sha: d7986a7a3f485b38bd778603d1dd08d0d2a57ef8c1f7ba61a92379705e1a4265
 ---
 
 # SR-TUNE — the tunables file, and per-source priority
@@ -274,7 +274,7 @@ here; the shipped file carries them.*
 
 [bm25f]                    # k1, b, and the five field weights in TF_FIELDS order
 k1      = 1.2
-b       = 0.75
+b       = 0.15             # 0.75 until 2026-09-16 — SR-RANKING decision 3, W-144
 body    = 1.0
 heading = 3.0
 title   = 2.0
@@ -728,6 +728,7 @@ reads · `*` an **open** table whose keys are the consumer's own.
 + bm25f.title
 + bm25f.path
 + bm25f.ctx
++ bm25f.anchor
 + ranking.rerank_weight
 + ranking.expand_weight
 + graph.damping
@@ -736,6 +737,12 @@ reads · `*` an **open** table whose keys are the consumer's own.
 + graph.hop_decay
 + graph.expand_limit
 + graph.seed_depth
++ graph.ask_boost
++ graph.ask_related
++ graph.ask_kinds
++ graph.ask_link_idf
++ graph.ask_max_hops
++ graph.ask_related_limit
 + refer.budget
 + refer.per_doc_fraction
 + refer.min_passage_bytes
@@ -774,9 +781,9 @@ and neither is a document prior.**
   document moves the correct value. A number nobody can hold still is not a
   default waiting to be found.
 - **Nothing ranks differently.** It shipped at `1.0`, so `Weighting.of()`
-  returned the same float before and after. This is a cleanup, and it is
-  therefore **not** the ranking change *"never ship one off a single synthetic
-  corpus"* forbids — nothing ships.
+  returned the same float before and after. This is a cleanup, not a ranking
+  change, so [SR-RS](0133_predictions.md) decision 19's paired floor is not
+  owed — nothing ships.
 - **The FACT survives untouched** — `supersedes:` frontmatter, the `superseded`
   record property, the graph edge, `fux explain`, and
   [SR-RANKING](0111_ranking.md)'s declared tie-break, which still puts a live
@@ -843,7 +850,104 @@ the query-side mechanism — an `--intent` flag, an `--as-of` date lens, or
 surfacing the supersession chain instead of ranking for it. It is an **unopened
 fork with no compare doc.**
 
+**16. `[graph]`'s six `ask_*` keys — the graph tier's, and the two booleans
+exist so the arms can be withdrawn separately** (W-161, 2026-09-14).
+
+| key | default | what it is |
+|---|---|---|
+| `ask_boost` | `true` | arm A — re-order the lexical window by `RRF(lexical rank, PPR rank)` |
+| `ask_related` | `true` | arm B — the labelled `related` list of link-reached documents with no lexical match |
+| `ask_kinds` | `"ref"` | which edge kinds the `ask` walk follows |
+| `ask_link_idf` | `true` | hub damping, on for `ask` |
+| `ask_max_hops` | `1` | one hop |
+| `ask_related_limit` | `5` | the cap on the `related` list |
+
+**They are in `[graph]` and not in `[ranking]` because they configure the graph
+plane's walk**, and they **do not move `fux graph`**: that verb keeps
+`ALL_KINDS`, `link_idf_on = False` and `max_hops = None`, because orientation
+and answering want different walks —
+[SR-GRAPH](0126_graph.md) decision 14 exposed the three parameters for exactly
+this, and the compare doc ruled the two callers may differ.
+
+🔴 **Two of the six are ranking defaults that ship ON and UNMEASURED**, and that
+is stated rather than buried. It is the state the ratified compare doc puts them
+in: Arpit accepted the two-tier `ask` on 2026-09-13, and the measurement needs
+link-dependent golden questions that only Codex may author
+([SR-RS](0133_predictions.md) decision 23, available 2026-09-30). The frozen
+bar is [`work/regression/2026-09-14-graph-ask/PRE-REGISTRATION.md`](../work/regression/2026-09-14-graph-ask/PRE-REGISTRATION.md),
+committed before a line of the composition existed, and **each boolean is how
+its arm is withdrawn without touching the other** — which is the reason there
+are two booleans and not one `ask_graph`.
+
+⚠ **`ask_boost` is the first key in this file that can change the ORDER of
+`ask` without changing a score**, and decision 1's boundary rule still holds
+for it: the index stays byte-identical, and `--no-tune` turns the tier off with
+everything else. What it breaks is a weaker assumption nothing had written
+down — that `ask`'s printed order is monotone in its printed score. It is not,
+under the boost, and the row that causes it carries `boosted` and its route so
+the exception is annotated where it happens.
+
+
+**17. `[bm25f] anchor`, default `0.0`** (W-168 step 1, 2026-09-15) — the
+anchor field's weight, and the sixth key in a table whose other five are the
+committed fields.
+
+- **In `[bm25f]` and not in `[ranking]`**, because it is a field weight in the
+  same formula `k1` and `b` sit in, not a document prior. It is carried on
+  `Scoring` with them, for the reason decision 6 gives: every number there
+  appears on both sides of the same fraction, and a caller that passes some of
+  them reweights half a formula.
+- **Outside `_FIELD_KEYS`**, which is `TF_FIELDS` and is aligned
+  index-for-index with `FIELD_WEIGHTS`. Anchor is folded at read time and has no
+  committed `flen` slot; padding it into the aligned tuple would claim a sixth
+  committed field and leave every record's `flen` one short.
+- 🔴 **Moving it needs NO re-ingest**, which is decision 6a's property holding
+  for a new field: nothing stored is a function of it. `total_anchor_len` and
+  `alen` are raw counts, weighted at query time on both paths, exactly as
+  `total_flen` is.
+- **`0.0` is off, and off is arithmetic-free.** Every anchor branch tests it and
+  is skipped, so an unconfigured corpus scores byte-identically to the engine
+  before the field existed — the `expand_weight` precedent, and the reason
+  `--no-tune` remains a real off-switch here.
+
+⚠ **UNMEASURED, and the default is not a recommendation.** [SR-RS](0133_predictions.md)
+decision 19; the frozen bar is
+[`2026-09-15-anchor-text`](../work/regression/2026-09-15-anchor-text/PRE-REGISTRATION.md).
+⚠ **Defaulting it on later would change every consumer's ranking on upgrade**
+unless their `tune.toml` pins it — and `fux setup` writes every value out in
+full, so a repo that has run setup keeps `0.0` and a fresh clone would get the
+new one. That divergence belongs in the CHANGELOG on the day it happens.
+
 ### Consequences
+
+- 🔴 **`pinned` is not a tunable and may not become one** (2026-09-14, W-162).
+  A `fux correct --pin` is an **editorial override applied after the ranking**:
+  `rank()` never sees it, it has no weight, and there is deliberately no
+  `[ranking] pin_weight`.
+
+  **A weight is the obvious next request and it is the wrong shape.** A pin is
+  either in force or it is not — *this document, this exact question, #1* — and
+  a number in front of it would turn a person's decision into one more signal
+  competing with the scorer, at a strength nobody could measure. The knob that
+  *does* exist for *how much corrections count* is `ctx`'s field weight, which
+  is a **ranking change** and owes [SR-RS](0133_predictions.md) decision 19's
+  paired floor rather than a new key here.
+
+  ⚠ **What this leaves unguarded**: nothing stops somebody adding such a key,
+  because `Tune`'s key set is validated against itself and a new key is just a
+  new key. This is a stated bound, not a gate.
+
+- ✅ **A frozen `.fux/tune.toml` is REPORTED (2026-09-14, W-163).**
+  `fux doctor`'s `tune.toml current` row names every `table.key` the engine has
+  gained that the consumer's file does not mention. The file is write-if-missing
+  (SR-DOTFUX decision 6), so it never will — reading resolves to the engine
+  default, **nothing is broken**, and what is lost is that the consumer cannot
+  SEE the knob exists in the one file whose entire purpose is to show them.
+  ⚠ **Absent is not frozen**: a repo with no `tune.toml` is running engine
+  defaults deliberately, and `tune.toml loads` already says so.
+  ⚠ **The expected key set is DERIVED from `_SCHEMA`, never listed in `doctor.py`**
+  — a second copy would be free to disagree while both look correct, and the
+  failure is silent: the row simply stops reporting a key nobody remembered.
 
 - ⚠ **Veto conditions 1 and 4 fired on 2026-09-11, by ruling** — a tune key
   reaches the index, and a committed field (`phrases`, and every term of a

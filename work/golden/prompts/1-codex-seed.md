@@ -1,41 +1,44 @@
 ---
 type: Prompt
-title: "Prompt 1 — Codex writes the seed corpus and the answer key"
+title: "Prompt 1 — Codex writes the seed corpus (documents only)"
 item: W-136
 timestamp: 2026-09-12T00:00:00Z
 ---
 
-# Prompt 1 — Codex: write the seed corpus and the answer key
+# Prompt 1 — Codex: write the seed corpus
 
-**Model: Codex, highest reasoning setting** — the questions ARE the benchmark;
-a vague or leaky question set cannot be repaired later without a new key.
+**Model: Codex, highest reasoning setting** — the corpus decides what every
+question can possibly be about, and a tidy or self-consistent corpus measures a
+world nobody has.
 
-⚠ **Prompt 1b was merged into this file on 2026-09-12** (Arpit). Feature coverage —
-supersession, archiving and recency — is **part A section 3** below, not a separate
-run. There is no `1b-codex-feature-coverage.md` any more.
+🔴 **This prompt writes DOCUMENTS ONLY.** Questions and answers moved out of it
+on 2026-09-15 (Arpit): **set 1 is [prompt 2](2-codex-questions.md)** and **set 2
+is [prompt 3](3-claude-questions.md)**. A prompt that both writes the corpus and
+writes questions about it cannot be re-run for one without disturbing the other.
 
-⚠ **The corpus in `work/golden/seed/` already exists** (twenty documents, written
-2026-09-11 and 2026-09-12). **If it is still there, skip part A entirely and do
-part B against it.** Part A is kept so the corpus can be rebuilt from nothing.
+⚠ **You almost certainly do not need this prompt.** The twenty seed documents
+exist and are unchanged; **`work/golden/seed/` is the golden data set and it
+survived the 2026-09-15 reset** — only the questions and answers were deleted.
+Run this only to rebuild the corpus from nothing.
+
+⚠ **Feature coverage — supersession, archiving and recency — is section 3
+below**, not a separate run. There is no `1b-codex-feature-coverage.md`.
 
 **Paste everything below the line into Codex, from the root of the `fux` repo.**
 
 ---
 
 You are building a sealed retrieval benchmark. Read `work/golden/README.md`
-sections *The one rule*, *Where the key lives*, *Feature coverage* and *The answer
-file format*. Then read every file in `work/golden/seed/`, including
+sections *The one rule*, *Custody* and *Feature coverage*. Then read every file in `work/golden/seed/`, including
 `work/golden/seed/archive/`. Do not read any other file in this repo.
 
-**Before anything else, stop and ask Arpit this, exactly, and wait for his answer:**
-
-> *"Where should the answer key go — (1) the file `work/golden/golden-answer/answers.jsonl`, or (2) here in the chat, so you can store it yourself?"*
-
-Do not assume either. Do not create, open or write that file until he answers **(1)**.
+🔴 **Write no questions and no answers here.** This prompt produces documents,
+`seed-dates.tsv` and nothing else. There is no key file anywhere and you never
+ask where one should go — that question was deleted on 2026-09-15.
 
 ---
 
-# Part A — the corpus (skip if `work/golden/seed/` is already populated)
+# The corpus
 
 ## The company — Quillfern Cold Logistics Pvt. Ltd. (fictional)
 
@@ -132,59 +135,9 @@ rest over several years so recency has something to work with.
 
 ---
 
-# Part B — the questions → where Arpit said
+## When you are done
 
-- **(1) file:** write `work/golden/golden-answer/answers.jsonl` (create it).
-- **(2) chat:** write **no** file; give him the complete JSON Lines in one fenced
-  block in your final message, and nothing of the key anywhere on disk.
+Print the file list, the word count per document, and `OK`. **Write nothing
+else** — no questions, no answers, no key file, no `golden-answer/` directory.
 
-**About 120–125 questions**, one JSON object per line, exactly the README's
-*answer file format*. Type mix (±5 points): `lookup` 30 %, `paraphrase` 20 %,
-`multi-doc` 20 %, `temporal` 15 %, `unanswerable` 10 %, `negation` 5 %.
-
-- Ask the way staff actually ask — a new driver, a finance analyst, an auditor, a
-  customer-support agent. Short, vague, typo-prone questions are welcome.
-- **Paraphrase** questions share no content words with their evidence quote.
-- **Unanswerable** questions sound answerable from this corpus.
-- **When documents conflict**, the question must make the time frame clear, or be
-  `temporal` with an answer that names which document is current and why.
-- `relevant` lists **every** document that helps; `primary` is the best one;
-  `evidence` quotes the deciding text verbatim (for `.eml` / `.html` / `.yaml`, the
-  visible text as written). A quote may be matched with runs of whitespace
-  collapsed, so a quote that spans a wrapped line is fine.
-- Leave `"sealed": false`, `"key_version": 1`.
-
-## Two extra fields on every line
-
-`"intent": "current" | "history" | "neutral"` and
-`"exercises": ["superseded_weight" | "archived_weight" | "recency", …]` (empty
-list when the question exercises none of them).
-
-| feature | minimum questions | how |
-|---|---:|---|
-| `superseded_weight` | **8** | per pair, one **current-seeking** (answer = the newer doc) and one **history-seeking** (answer = the older doc) |
-| `archived_weight` | **8** | half history-seeking (answer = the archived doc), half current-seeking where the archived doc is the tempting wrong answer |
-| `recency` | **6** | questions where the newer of two same-topic documents is correct, and **at least 2** where the older one is |
-
-Never mention the words *superseded*, *archived* or *latest* in more than a third
-of these questions — the engine must earn the ranking, not match the word.
-
-## Self-check, then stop
-
-- Every path in `relevant` / `primary` / `evidence` exists; every quote appears
-  verbatim in its file under whitespace-collapsed comparison; ids unique
-  `g001`…; type shares within ±5 points; per-feature minimums and intent splits
-  met; `primary` is inside `relevant`; every `unanswerable` row has
-  `answerable: false`, `relevant: []`, `primary: null`, `answer: ""`.
-- Every `supersedes:` path exists; every archived file is under `seed/archive/`;
-  `seed-dates.tsv` has exactly one line per seed file and satisfies the ordering
-  rules in part A section 4.
-- Update the *Feature coverage* table in `work/golden/README.md` with the **file
-  names** of the pairs and archived documents and the **counts** of questions per
-  feature — **never question text, ids or answers** in that file.
-- **(1) file:** print only the counts per type and per feature, the word count per
-  file, and `OK`.
-- **(2) chat:** print the counts, the word counts, `OK`, then the key in one fenced
-  block — and confirm no key file exists on disk.
-- **Never** put a question, answer or quote in any file other than the answer key,
-  and never in `seed/`.
+**Next:** [prompt 2](2-codex-questions.md) writes set 1 over this corpus.

@@ -8,10 +8,10 @@ status: accepted
 date: 2026-09-06
 amended: 2026-09-11
 feature: tabular documents — row granularity, the admitted-row limit, and what a table citation is
-owns: [src/fux/decode/csv.py@39d7b24591a4, src/fux/decode/xlsx.py@7b931a49f243, src/fux/decode/_limits.py@5970a244258a]
+owns: [src/fux/decode/csv.py@3dcdf4365361, src/fux/decode/xlsx.py@a54a416685f2, src/fux/decode/_limits.py@5970a244258a]
 laws: [L1, L2, L3]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: 452fa657156814ec3e309ab723191b547a6957148bfa763c3f203615fadad81d
+content_sha: c81d42a572a5f55ccac21430e22abf3aad67bef4cbf1eb976dc0e1a40f47acf8
 ---
 
 # SR-TABULAR — a table is a list of rows, and a row is the unit of an answer
@@ -186,6 +186,18 @@ cannot do the work. The correct row outranks the next-best in **42/48
 (0.875)**.
 
 ### Consequences
+
+- **Both decoders declare a `VERSION`, and it is in the reuse key** (2026-09-14,
+  W-166, [SR-DECODE](0139_decode.md) decision 11a). A change to how a table
+  becomes text — the cell cap, the truncation notice, the separator sniff — moves
+  no document's bytes, so before this it reached an existing corpus only on
+  `fux ingest --full`. **Bump `VERSION` in the same change**, and the next ingest
+  re-extracts the `.csv`/`.tsv` or `.xlsx`/`.xlsm` documents and nothing else.
+
+  ⚠ **A decoder's blast radius is every extension it claims**, not the one in
+  front of you: `csv.py` binds `.csv` *and* `.tsv`, `xlsx.py` binds `.xlsx` *and*
+  `.xlsm`. Pinned by `tests/decode/test_decoder_versions.py`, which checks a
+  multi-extension decoder for exactly that reason.
 
 - 🔴 **Query latency is the price, and it was accepted with the number in
   hand.** `rescore` is O(passages), and a table now yields one passage per row:

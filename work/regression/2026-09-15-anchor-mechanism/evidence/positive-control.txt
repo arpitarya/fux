@@ -1,0 +1,8 @@
+inventory: {'documents': 3, 'edges': 1, 'anchor_bearing': 1, 'kinds': {'ref': 1}}
+
+query: 'zarvox throughput ceiling'  (these words appear ONLY in a-linker's link text)
+  anchor=0.0  -> [('docs/a-linker.md', 3.283)]
+  anchor=0.5  -> [('docs/a-linker.md', 3.3), ('docs/b-target.md', 1.478)]
+  anchor=1.0  -> [('docs/a-linker.md', 3.317), ('docs/b-target.md', 2.389)]
+  anchor=2.0  -> [('docs/b-target.md', 3.455), ('docs/a-linker.md', 3.349)]
+  anchor=3.0  -> [('docs/b-target.md', 4.061), ('docs/a-linker.md', 3.38)]

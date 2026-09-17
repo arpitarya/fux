@@ -23,16 +23,18 @@ here. Read that record before changing anything below it.
 
 | what he decides | filed | age |
 |---|---|---|
-| 🔴 **W-146** — one ruling: does *never restates* reach into docstrings? `UrlSource` can state a wrong default and SR-CONFIG's key-tree gate stays green — it checks names, not values. [detail](open/W-146-the-rest-of-l0.md) | 2026-09-12 | 2d |
-| ↳ **blocks:** nothing else in the queue — they decide whether two named exposures get closed, not whether work runs | | |
-| 🔴 **W-112** — W-106 closed **without a PASS and cannot produce one** (no corpus carries DENSE-CHUNK's bar). Proceed on the narrowed claim, wait for an instrument, or close? [detail](open/W-112-vector-plane.md) | 2026-09-12 | 2d |
-| ↳ **blocks:** nothing else in the queue — search-v3's last item, and the only one left of §5 | | |
-| 🔴 **W-156** — every measurement must be on golden data; golden is one synthetic corpus; so *never ship a ranking change off one* can never be met. Which rule gives? [detail](open/W-156-prevalence-outside-golden.md) | 2026-09-13 | 1d |
-| ↳ **blocks:** nothing else in the queue — it decides what evidence a ranking change may HAVE, not whether work runs | | |
-| 🔴 **W-144** — excluding table cells from `flen` **ranks better** ([verdict](regression/2026-09-12-reaim-and-instruments/VERDICT-W144.md)); one synthetic corpus may not ship a ranking change, so accept or override [the compare doc](compare/table-tokens-in-flen.compare.md). | 2026-09-12 | 2d |
-| ↳ **blocks:** nothing else in the queue — the measurement is filed and the code is written; what is missing is the call | | |
-| 🔴 **W-148** — two calls left over from W-107: how CI reaches a golden corpus (self-hosted runner / commit `rung-00100` / portable builder), and whether `fux-benchmark` gets built or Node's latency stays unmeasured. [detail](open/W-148-what-the-two-readers-still-owe.md) | 2026-09-12 | 2d |
-| ↳ **blocks:** nothing else in the queue — the Node plane is built and measured; these decide where a future measurement runs and what it may CLAIM | | |
+| 🔴 **W-136** — phase 5 ran and both hand-offs are written. **Whether to release a key for scoring, and when**, is his by [L11](../records/0012_LAW-11-sealed-answer-key.md): the one route an answer travels is a paste, at his choice. [detail](open/W-136-golden-benchmark.md) | 2026-09-16 | 0d |
+| ↳ **blocks:** W-87, W-176, W-190, W-191, and through W-191 also W-161 | | |
+| 🔴 **W-175** — the blind paraphrases exist only if he runs the Codex prompt. The harness is built and refuses to run without them; no agent may author one. [detail](open/W-175-correction-generalisation.md) | 2026-09-16 | 0d |
+| ↳ **blocks:** W-175, and nothing else in the queue | | |
+| 🔴 **W-168** — step 2 needs id-queries: 0 of 33 identifiers survive the analyzer, but only 4 of 249 questions ask by one. [prompt 8](golden/prompts/8-codex-identifier-questions.md) is written and is Codex's. [detail](open/W-168-search-improvements.md) | 2026-09-16 | 0d |
+| ↳ **blocks:** W-168, and nothing else in the queue | | |
+
+⚠ **All three are a HAND, not a decision** — running a prompt, pasting a key.
+**Everything an agent may do on every open item is done**: W-136's hand-offs are
+written, W-175's harness is built, and W-168 step 2's premise is measured with
+its prompt written. 🔴 **The queue has no green row.** What every remaining item
+needs is Codex output that only Arpit can commission.
 
 ---
 
@@ -40,25 +42,18 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🟡 **W-140** · `agent`, waiting on Arpit's `--hops` ruling — **1 code row left**: a runner-race flake **not reproduced in 11 attempts**, deliberately unchanged. 20 closed. [detail](open/W-140-guide-authoring-defects.md)
-- 🔴 **W-148** · `arpit` — what the two readers still owe: CI cannot reach the golden corpora, Node's latency has no instrument, and the renderer split is staged. [detail](open/W-148-what-the-two-readers-still-owe.md)
-- 🔴 **W-112** · `arpit` — the vector plane. W-106 closed without a PASS **and cannot produce one**: no corpus carries DENSE-CHUNK's bar. Determinism narrowed to *same embedder build*. [detail](open/W-112-vector-plane.md)
+- 🔴 **W-161** · `agent`, waiting on W-191 — **BUILT 2026-09-15**; both tiers ship on and unmeasured. 🔴 **Both arms inert — 0 `ref` edges on the ladder**; they need linked documents, and Codex's questions are not that. [detail](open/W-161-graph-composed-ask.md)
+- 🔴 **W-168** · `agent` — step 1 shipped; **step 2 STOPPED before it started**: 0 of 33 ids survive the analyzer, but only 4 of 249 questions ask by one — below the floor. [detail](open/W-168-search-improvements.md)
+- 🔴 **W-176** · `agent`, waiting on W-136 — **steps 1–3 landed 2026-09-15**. Gates 4–9 need a SCORED run (prompt 6), not a key — no key exists (L11). ⚠ **Step 10 needs links, W-191.** [detail](open/W-176-abstention-gates.md)
+- 🔴 **W-191** · `agent` 🧨, waiting on W-136 — **specified 2026-09-16**: [prompt 7](golden/prompts/7-codex-link-bearing-seed.md) written, `ref` census generated and gateable. The documents are **Codex's**. [detail](open/W-191-the-ladder-carries-no-links.md)
 
 ### testing
 
-- 🟢 **W-159** · `agent` — `fux doctor`'s shadowing row **cannot fire on Windows**: `shutil.which` resolves through PATHEXT and npm writes `fux.cmd`, not a shebang shim. [detail](open/W-159-windows-shadowing-row.md)
-- 🟢 **W-158** · `agent` — the benchmark harness must emit its CAP-7 report from the template, and `2026-09-12-benchmark-l9` still has none. **Filed rows only; no run re-executed.** [detail](open/W-158-the-harness-emits-the-templated-report.md)
 
-- 🟡 **W-154** · `agent`, waiting on a quality endpoint that does not exist — **the price is measured** ([run](regression/2026-09-13-rerank-cost/report.md)); the benefit is not, and every obvious endpoint is circular. [detail](open/W-154-rerank-weight-cost.md)
-- 🟣 **W-136** · `arpit`, waiting on **2026-09-30** — everything an agent can do is done; **phase 5 scoring is Codex's hands** and is all that is left. [detail](open/W-136-golden-benchmark.md)
-- 🟣 **W-145** · `arpit`, waiting on **2026-09-30** — Codex regenerates the golden answer key; until then every golden number is `informed`. [detail](open/W-145-codex-regenerates-the-key.md)
-- 🟣 **W-87** · `agent`, waiting on W-145 — P2's `unanswerable` gate is measured (0/124); recall needs phase 5 and **Part B needs an uncontaminated key**. [detail](open/W-87-what-good-means.md)
-- 🔴 **W-144** · `arpit` — **W-155 answered the last open test: YES, (b) over-promotes a data dump** ([verdict](regression/2026-09-13-table-is-the-answer/VERDICT.md)). Accept, move to (c)/(d), or wait on W-156. [detail](open/W-144-structure-aware-extraction.md)
+- 🔴 **W-190** · `agent`, waiting on W-136 — difficulty is a **count of discriminations**, not a label; schema + scorer BUILT 2026-09-15. The questions exist; the first real number needs a **scored** rung (prompt 6). [detail](open/W-190-question-difficulty.md)
+- 🔴 **W-136** · `arpit` — **phase 5 RAN on `rung-00100` 2026-09-16**; both hand-offs are written and file no score. **Next is prompt 6 — Codex scores, in a chat he attends.** [detail](open/W-136-golden-benchmark.md)
+- 🔴 **W-87** · `agent`, waiting on W-136 — P2's `unanswerable` gate is measured (0/124). ✅ **Part B's blocker is gone** (set 1 is Codex-authored), so both halves now wait on phase 5. [detail](open/W-87-what-good-means.md)
+- 🔴 **W-175** · `agent` — **harness BUILT 2026-09-16** and it refuses to run without paraphrases. Every number waits on Arpit running [the Codex prompt](regression/2026-09-15-correction-generalisation/prompt-codex-paraphrases.md). [detail](open/W-175-correction-generalisation.md)
 
-### adr update
-
-- 🔴 **W-156** · `arpit` — the environments rule and the single-corpus rule cannot both hold; the resolution decides what evidence any ranking change may have. [detail](open/W-156-prevalence-outside-golden.md)
-
-- 🔴 **W-146** · `arpit` — L0's remainder: ten unhoused `CLAUDE.md` sections want records, and one ruling is owed. [detail](open/W-146-the-rest-of-l0.md)
 
 ---

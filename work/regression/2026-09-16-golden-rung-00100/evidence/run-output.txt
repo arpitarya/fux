@@ -1,0 +1,16 @@
+set-1: 125 questions on rung-00100
+  25/125
+  50/125
+  75/125
+  100/125
+  125/125
+  wrote predictions-set-1.jsonl and handoff-set-1.jsonl
+
+set-2: 124 questions on rung-00100
+  25/124
+  50/124
+  75/124
+  100/124
+  wrote predictions-set-2.jsonl and handoff-set-2.jsonl
+
+🔴 No score is computed here and none may be. Scoring is prompt 6's, from Codex.

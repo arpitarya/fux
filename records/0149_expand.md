@@ -7,11 +7,11 @@ description: "`--expand` scores agent-supplied terms at a lower weight beside th
 status: accepted
 date: 2026-09-05
 feature: agent-side query expansion and multi-query fusion
-owns: [src/fux/query/expand.py@c4c8d5671973, src/fux/query/fuse.py@749673d52166]
+owns: [src/fux/query/expand.py@19b697b80e8c, src/fux/query/fuse.py@749673d52166]
 laws: [3, 4, 8]
 ratifies: W-109
 timestamp: 2026-09-05T00:00:00Z
-content_sha: ec724601b51f754ec27cac623b36792651632f827cdb6e4224fc5c5e8f6dc067
+content_sha: e1719f97846bbed19c9e92e4a0bca22dd503b7df42643669c102e19e59fb7edf
 ---
 
 # SR-EXPAND: the caller supplies the vocabulary, and fuses its own phrasings
@@ -225,6 +225,52 @@ reason that has nothing to do with the corpus. ⚠ **L8**: the expansion is a
 *use record*, so it lives on the receipt and the journal, both gitignored, and
 reaches no committed byte.
 
+**14. The refusal holds for Tier A; Tier B is LABELLED, not returned as a
+match** (W-161). Stated here so this record and
+[SR-ASK](0103_ask.md) decision 13 cannot be read as contradicting.
+
+Decision 1's refusal is *a document matching only supplied terms is never
+returned*. W-161's `related` tier returns documents matching **no** supplied
+term and no query term at all, which reads like a wider version of the same
+thing and is not:
+
+- **Tier A is unchanged.** A boosted document is a document `rank()` scored,
+  which means it matched an original query term; the expansion guard in
+  `rank()` runs before any of this and drops an expansion-only candidate
+  exactly as before. The walk re-orders what survived that guard.
+- **Tier B is not returned as a match.** It is a separate list, under its own
+  key, never counted as an answer, never in the confidence band, with a route
+  on every row. **What decision 1 forbids is a hallucinated citation wearing a
+  match's clothes**; a labelled neighbour with its provenance printed beside it
+  is the opposite artifact.
+- 🔴 **And the tier applies the refusal itself, one level down.** A walked
+  document is Tier B only if its committed record holds none of the
+  **original** query's term hashes — never the expansion's. A document that
+  matches only words a model invented is not `related` to a question nobody
+  asked, and testing against the expansion's hashes would have re-opened
+  decision 1 through the back door.
+
+
+
+**15. An ANCHOR match passes the hallucinated-citation guard** (W-168 step 1,
+2026-09-15). `Expansion.matches` takes the candidate's anchor terms alongside
+its own `terms`, and a document carrying a required hash in either is kept.
+
+🔴 **It had to be said here or the retrieval change was dead on arrival.** A
+document reachable only through what its linkers call it carries **none** of the
+query's hashes in its own `terms`, so this guard — whose test was *vacuous*
+until now, because every candidate matched by construction — would have dropped
+it before it was ever scored.
+
+🔴 **And the distinction is what makes relaxing it legitimate rather than
+convenient.** This guard refuses **invented vocabulary**: `--expand` hands fux
+words a *model* wrote about a document, and returning that document with a fresh
+`sha` beside it is a hallucinated citation with provenance attached. An anchor
+term is a word a **human linker** wrote, extracted deterministically from a
+committed document, pointing at this one. `required` is still the user's own
+hashes in both cases — what changed is where a match may be found, not what
+counts as one.
+
 ### Consequences
 
 - **The committed index is untouched.** `--expand` and `-q` are query-time
@@ -240,6 +286,26 @@ reaches no committed byte.
   deliberately misleading expansion among documents that all match; that is a
   trust boundary this record does not close, and `--expand` is opt-in per call
   rather than a mode.
+- ⚠ **A slot nobody is told to fill is an unused slot — closed 2026-09-14.**
+  This record says the caller supplies the vocabulary; until now **the guide
+  skills never said so**. They listed `--expand` as a flag and told an agent to
+  "add `--expand`" on a thin result, with a placeholder (`<words the doc would
+  use>`) that pointed at **synonyms** — the weaker form Query2doc is explicitly
+  not. An agent reading only the guide could reasonably assume fux expands.
+  `SEARCH-SKILL.md` §5a now states the authorship, the passage shape, the
+  order of operations, and that `-q` is a different tool; `ANSWER-SKILL.md` and
+  the steering pointer carry one line each. **No engine behaviour changed** —
+  this closes a documentation gap that made decision 1 unreachable in practice.
+- 🔴 **Extended to ALL FIVE agent-facing kinds the same day (Arpit): skills,
+  steering, rules, instructions and the `agents` files.** The first pass fixed the
+  skills only, and the worse defect was elsewhere: `USAGE-SKILL.md`,
+  `fux-usage.instructions.md` and `MCP-SKILL.md` each shipped a **worked example in
+  the keyword-soup form** (`--expand "checkout unavailable 47 minutes incident
+  timeline"`) — an agent copying it got the weaker variant Query2doc measures
+  *against*, while believing it had followed the guide. All five kinds now carry the
+  authorship and the passage shape; `rule-*` files are file-scoped and teach no
+  searching, so they carry nothing. ⚠ **A guide that names a flag is not a guide that
+  gets it used** — and a wrong worked example is worse than none.
 - **Two RRF arms at `--top 5` fuse shallowly.** Decision 11's cost, stated: a
   document ranked 6th in both arms is invisible to the fusion. Raising `--top`
   is the whole remedy.

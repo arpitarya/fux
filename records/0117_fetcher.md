@@ -7,10 +7,10 @@ description: "Fux never fetches; a consumer-owned fetcher file does. One fetcher
 status: accepted
 date: 2026-08-19
 feature: the fetch contract, what it is called, and the two shipped templates
-owns: [src/fux/ingest/urlsrc.py@ec9456b28921, src/fux/templates@5729dbeeaccc]
+owns: [src/fux/ingest/urlsrc.py@7bf4e2993691, src/fux/templates@f657a10fc656]
 laws: [L1, L3, L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: e78b2e411cb42ba04ba6b2e68b75f76420808307d0c83c1948ffe9bd8553a431
+content_sha: bdeea83b9ff7e43fce6dc9e8c033e9cb1ca4951fd7f16c82baaa05f30d5bdc67
 ---
 
 # SR-FETCHER — the consumer-owned fetcher
@@ -19,7 +19,7 @@ content_sha: e78b2e411cb42ba04ba6b2e68b75f76420808307d0c83c1948ffe9bd8553a431
 
 **Fux never fetches. Your fetcher does.** A Python file in your repo, named in
 `fux.toml`, loaded by path, called once per URL under either fenced path —
-`fux add <URL>` (that URL only) or `fux update` (all of them). Core holds **zero
+`fux add <URL>` (that URL only) or `fux ingest` (all of them). Core holds **zero
 network lines**, and that is the property this record exists to keep true.
 
 The file is called a *fetcher* and not middleware. Middleware composes: Django,
@@ -40,7 +40,7 @@ per-URL attribute all say one word.
 
 ```mermaid
 flowchart LR
-    L[".fux/sources/urls<br/>fetch= declares which"] --> R["fux add &lt;URL&gt; · fux update"]
+    L[".fux/sources/urls<br/>fetch= declares which"] --> R["fux add &lt;URL&gt; · fux ingest"]
     R --> P["load by path<br/>fux.toml [sources.url] fetcher"]
     P --> F[".fux/fetchers/*.py<br/>YOUR code"]
     F --> B["bytes + Content-Type"]
@@ -53,7 +53,7 @@ flowchart LR
 <summary><b>ASCII twin</b> — the same diagram, for terminals, diffs, and any reader without a Mermaid renderer</summary>
 
 ```text
-  .fux/sources/urls          fux add <URL> · fux update
+  .fux/sources/urls          fux add <URL> · fux ingest
   (fetch= declares which) -->  |  load by path from fux.toml
                                v
                      .fux/fetchers/*.py   <-- YOUR code, fux never rewrites it
@@ -92,7 +92,7 @@ MAX_PARALLEL = 1                 # optional module constant; absent means 1
 The retired key stops the run and says what to do:
 
 ```console
-$ fux update
+$ fux ingest
 error: fux.toml: [sources.url] middleware was renamed to fetcher — rename the
 key, and move the file from .fux/middleware/ to .fux/fetchers/ (SR-FETCHER)
 # exit 1
@@ -202,11 +202,18 @@ the wrong thing.
 MEANS.** A scalar at the top level is **shared** and reaches every fetcher; a
 **sub-table belongs to the fetcher whose name it carries** —
 `[sources.url.config.cdp]` reaches `cdp.py` and reaches nothing else.
-`urlsrc.config_for()` is the whole of the rule and it sorts entries by
-`isinstance(value, dict)`, never by what a key is called. The table is still the
-back door through which the adapter cap would otherwise leak: a `cdp_port` in
-fux's schema is fux knowing about Chrome, and a sub-table keeps it out of the
-schema exactly as verbatim passing did.
+`UrlSource.config_for()` in `config.py` is the whole of the rule and it sorts
+entries by `isinstance(value, dict)`, never by what a key is called. The table
+is still the back door through which the adapter cap would otherwise leak: a
+`cdp_port` in fux's schema is fux knowing about Chrome, and a sub-table keeps
+it out of the schema exactly as verbatim passing did.
+
+⚠ **The resolution lives in ONE place and this record does not own it.**
+`UrlSource.config_for()` resolves the slice for `ingest/urlsrc.py` and
+`query/refer_answer.py` alike, so `configure_fetcher` receives a table that is
+**already this fetcher's** — it never sees the whole of `[sources.url.config]`.
+The key shape is [SR-CONFIG](0113_config.md) decision 8a's; what is stated here
+is the fetcher-facing contract, which is the half a fetcher author reads.
 
     [sources.url.config]
     fetcher_max_parallel = 2      # scalar  -> every fetcher
@@ -396,7 +403,7 @@ every request, and it is re-fetched every run while three stable URLs are not.
   working as designed rather than a defect in it.
 - **A validated URL is neither a fetch nor a skip**, and is counted separately —
   its prior record is correct and carried forward, which is the opposite of a
-  failure. `fux update` prints the count, because **an optimisation that fails
+  failure. `fux ingest` prints the count, because **an optimisation that fails
   silently in the safe direction looks identical to one that never ran.**
 
 **13. `is_rate_limited(exc) -> bool` — the optional sixth function. Ratified by
@@ -479,6 +486,23 @@ rather than an optimisation.** `update=never`
   decides which fetcher to load.
 - **Checkable:** a fetcher file that raises at import time, and a list whose
   every line is pinned, must complete an ingest.
+
+**A fetcher now receives its OWN slice of `[sources.url.config]`, not the whole
+table** (2026-09-14). Scalars at the top are shared; `[sources.url.config.<stem>]`
+reaches only the fetcher whose file is `<stem>.py`. The shape, the defect it
+fixes and why the adapter cap is untouched are stated once in
+[SR-CONFIG](0113_config.md) decision 8a.
+
+⚠ **What belongs to THIS record is the naming rule, because it is already
+ours.** The sub-table is keyed on the fetcher's file stem — the same name
+decision 5's `fetch=<name>` resolves against `<fetcher dir>/<name>.py`. One
+naming rule serves both, so a consumer who knows `fetch=cdp` already knows
+`[sources.url.config.cdp]`, and there is no second convention to document or
+drift.
+
+⚠ **The `configure()` contract is unchanged**: it is still handed a plain dict
+and still refuses a key it does not know. What changed is which keys arrive —
+which is precisely why refusing was safe to keep.
 
 ### Consequences
 

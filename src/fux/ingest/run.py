@@ -77,13 +77,12 @@ from pathlib import Path
 
 from .. import store as store_mod
 from .. import tune as tune_mod
-from ..config import DEFAULT_URLS_FILE
 from ..config import load as load_config
 from ..errors import FuxError
 from ..progress import NULL as _NULL_PROGRESS
 from . import edges as edges_mod
 from . import extract as extract_mod
-from . import fuxignore, gitdir, sourcelist, urlsrc
+from . import decoderdigest, fuxignore, gitdir, sourcelist, urlsrc
 from .edges import TAG_PREFIX
 from .gitdir import (
     UNFETCHED,
@@ -120,6 +119,20 @@ class IngestReport:
     #: and was carried forward, which is the opposite of a failure. Counted
     #: separately so a healthy run cannot read as a broken one.
     validated: int = 0
+    #: Records that were in the prior index and are not in this one — a source
+    #: line deleted, a file removed, a path newly excluded.
+    #:
+    #: **Counted because `write_index` writes the whole index and a deletion is
+    #: therefore an absence** (W-165 fix 3, SR-INGEST Consequences). `ingested
+    #: 3 docs (0 changed, 3 carried forward) ... 0 shards written` is what a run
+    #: that dropped a document used to print when its shard happened to hold
+    #: others: every number stayed put and the one thing that happened went
+    #: unnamed. An absence has no counter of its own unless one is kept.
+    #:
+    #: ⚠ **Zero when `--full` discharged a foreign index.** `_existing_index`
+    #: returns `{}` there, so there is nothing to diff against and the honest
+    #: count is none — not an inferred one.
+    deleted_count: int = 0
 
 
 def run(
@@ -136,7 +149,7 @@ def run(
 
     `only_urls` narrows **which listed URLs are fetched** on a networked run;
     every other listed URL is carried forward exactly as a failed fetch would
-    be. It is what lets `fux add <url>` and `fux update <url>` touch the
+    be. It is what lets `fux add <url>` and `fux ingest <url>` touch the
     network for one document without a second write path into the index —
     the whole run still ends in the one `write_index` call below, so a scoped
     fetch and a full refresh produce the same bytes for everything they agree
@@ -200,7 +213,10 @@ def run(
     validated_count = 0
     if refresh_urls:
         if config.url is None:
-            raise FuxError(f"--refresh-urls: no [sources.url] configured in {root / 'fux.toml'}")
+            raise FuxError(
+                f"a URL fetch was asked for, but there is no [sources.url] in "
+                f"{root / 'fux.toml'} to do it with. `fux setup` writes a fetcher"
+            )
         resolved = urlsrc.resolve_urls(urlsrc.read_urls(root, config.url.urls_file), config.url)
         url_meta = {f"url:{entry.url}": entry.meta for entry in resolved}
         # `url_meta` stays the **whole** list even under `only_urls`: it is what
@@ -232,7 +248,7 @@ def run(
         # wrote the line, fetched nothing and exited 1 (W-140 row 3, fixed
         # 2026-09-11). `cmd_add` passes the URL it just wrote, and nothing else
         # ever populates this set — a pin is still absolute for every later run,
-        # `--all` and `--full` included.
+        # `--refetch-all` and `--full` included.
         first_fetch = first_fetch or set()
         pinned = [e for e in to_fetch if e.update == "never" and e.url not in first_fetch]
         if pinned:
@@ -389,6 +405,42 @@ def run(
     # because enrichment is per document: one rewritten file must re-extract
     # one document, not the corpus.
     reusable = _drop_changed_enrichment(root, reusable, file_shas)
+    # 🔴 **W-166. A decoder is the OTHER input to extraction, and it was not in
+    # the key either.** SR-DECODE decision 11a said so in as many words — *"There
+    # is no decoder digest. Stated, not fixed."* — so a fix to `pdf.py` reached an
+    # unchanged PDF only on `--full`, and a corpus that never ran one went on
+    # serving text the current code would not produce.
+    #
+    # **Per EXTENSION, not corpus-wide**, which is the whole design call: a
+    # global digest would re-extract the entire markdown corpus for a `.pptx`
+    # fix, and a routine engine release would re-ingest every consumer's repo.
+    # Keyed by extension, a bumped decoder re-extracts its own documents and
+    # nothing else. The same shape `_drop_changed_enrichment` uses one line
+    # above, and for the same reason.
+    decoder_digests = decoderdigest.binding_digests(root)
+    reusable = _drop_changed_decoders(root, reusable, decoder_digests)
+    # 🔴 **W-166 DoD 3. A `url:` record was never re-redacted, and its bytes
+    # were sitting on disk.** SR-PII's own words before decision 18: *"the data
+    # needed to honour a new rule is present and unused."* `_pii_ruleset_moved`
+    # invalidates carried extraction for `file:` documents because they are
+    # re-read from the working tree; a `url:` document has no working tree, so
+    # its record carried forward VERBATIM — and under `update=never` that is
+    # permanent, `--full` included.
+    #
+    # `.fux/acquired/` holds the bytes for every `keep=true` line. This routes
+    # them back through the one `parse -> redact -> extract` path rather than
+    # opening a second one, which is what keeps the re-derived record
+    # byte-identical to a freshly fetched one (L3).
+    if carried and (pii_moved or extract_moved or _decoders_moved(root, decoder_digests)):
+        reacquired, stranded, reacquired_meta = _reacquire_urls(root, carried, config)
+        for doc_id in reacquired:
+            carried.pop(doc_id, None)
+        fresh |= reacquired
+        url_meta |= reacquired_meta
+        _record_stale_redaction(root, stranded)
+        warnings.extend(_stale_redaction_warnings(stranded))
+    else:
+        _record_stale_redaction(root, [])
     # URL documents still arrive as fetcher-produced markdown, so they keep the
     # prose path untouched. That changes when fork H makes `fetch()` return
     # bytes; until it is ruled, nothing here moves.
@@ -594,7 +646,14 @@ def run(
             )
         # Edges last, and never reused: they are the one field the rest of the
         # corpus can change without this document changing.
-        record["edges"] = edges_mod.resolve(doc_id, scans[doc_id], known_ids, by_basename)
+        #
+        # `tracker.hash_of` is the RUN's tracker, the same one `hash_terms`
+        # uses above: anchor terms (W-168 step 1) are hashed in the same
+        # currency as body terms, through the one object that can see a
+        # cross-document collision.
+        record["edges"] = edges_mod.resolve(
+            doc_id, scans[doc_id], known_ids, by_basename, tracker.hash_of
+        )
         record["ver"] = ver_for(doc_id, record["sha"])
         records.append(record)
 
@@ -609,7 +668,9 @@ def run(
             mode="extracted",
             terms=store_mod.hash_terms(fields.terms, tracker),
             flen=store_mod.trim(fields.flen),
-            edges=edges_mod.resolve(doc_id, scans[doc_id], known_ids, by_basename),
+            edges=edges_mod.resolve(
+                doc_id, scans[doc_id], known_ids, by_basename, tracker.hash_of
+            ),
         )
         record["ver"] = ver_for(doc_id, record["sha"])
         # Absent when false, exactly as on the `file:` side above.
@@ -687,6 +748,10 @@ def run(
     # was stopped or died never reaches this line, so the list survives it.
     dirty_mod.discard(root, covered)
     _record_extract_config_digest(root, extract_digest)
+    # W-166: after `write_index`, for `extract-config-digest`'s reason — a run
+    # stopped before this line left the OLD records in the shards, and a digest
+    # already claiming the new decoder would let the next delta run reuse them.
+    _record_decoder_digests(root, decoder_digests)
     _record_pii_digest(root, pii_rules)
 
     # W-101 item 4. **Written here and nowhere earlier**: a run that was
@@ -710,6 +775,7 @@ def run(
         reused_count=len(reusable),
         warnings=warnings,
         validated=validated_count,
+        deleted_count=len(existing.keys() - {record["id"] for record in records}),
     )
 
 
@@ -861,7 +927,7 @@ def _existing_index(root: Path, *, full: bool) -> dict[str, dict]:
             f"(_format={header.get('_format')!r}, analyzer={header.get('analyzer')!r}) "
             f"and holds {len(stranded)} url: record(s) that a re-ingest cannot rebuild "
             f"offline:\n  {shown}{more}\n"
-            f"Re-fetch them on a networked run instead: `fux update`."
+            f"Re-fetch them on a networked run instead: `fux ingest`."
         )
     return {}
 
@@ -885,10 +951,34 @@ EXTRACT_CONFIG_DIGEST_FILE = "extract-config-digest"
 #: `pii-digest` precedent, per document because enrichment is per document.
 ENRICH_DIGEST_FILE = "enrich-digests.json"
 
+#: `{extension: digest}` as of the last COMPLETED run (W-166). Per extension for
+#: the reason `binding_digests` gives: a corpus-wide decoder digest would
+#: re-extract every document on any decoder change, which makes a routine engine
+#: release a full re-ingest of every consumer's repo.
+DECODER_DIGEST_FILE = "decoder-digests.json"
+
 
 def _extract_config_digest(limits) -> str:
-    """`[index]`'s values, as one comparable string."""
-    return f"max_phrases={limits.max_phrases}\nmax_table_rows={limits.max_table_rows}"
+    """`[index]`'s values **and `extract.py`'s rule version**, as one string.
+
+    ⚠ **`rules=` joined this on 2026-09-14 (W-166).** The digest covered the two
+    tunable caps and not the code that reads them, so a changed extraction rule
+    reached an unchanged document only on `--full` — SR-INGEST's Consequences
+    filed that as the carry-forward's defining property rather than as a defect.
+    It is both: the property is real for *inputs the engine cannot see*, and a
+    constant in fux's own tree is not one of those.
+
+    **One digest rather than a second file**, because the two move together and
+    for the same reason: something that decides what extraction produces changed,
+    and every document must be re-extracted. A separate `rules-digest` would be a
+    second thing to record after `write_index`, with a second chance to record it
+    in the wrong order.
+    """
+    return (
+        f"max_phrases={limits.max_phrases}\n"
+        f"max_table_rows={limits.max_table_rows}\n"
+        f"rules={extract_mod.RULES_VERSION}"
+    )
 
 
 def _read_extract_config_digest(root: Path) -> str:
@@ -974,6 +1064,220 @@ def _record_pii_digest(root: Path, rules) -> None:
         pass
 
 
+def _decoders_moved(root: Path, current: dict[str, str]) -> bool:
+    """Has any decoder binding changed since the last completed run?
+
+    The corpus-wide question, for the `url:` path. `_drop_changed_decoders` asks
+    the per-extension one because it can see which document used which decoder;
+    a retained URL's extension is the URL's, which says nothing about the
+    content-type its blob actually carried, so the honest scope here is "any".
+    """
+    from ..store import fuxdir
+
+    try:
+        previous = json.loads(
+            (fuxdir.fux_dir(root) / "runtime" / DECODER_DIGEST_FILE).read_text(encoding="utf-8")
+        )
+    except (OSError, ValueError):
+        return True  # never run, or unreadable: re-derive. Wasteful once, never wrong.
+    return previous != current
+
+
+def _reacquire_urls(
+    root: Path, carried: dict[str, dict], config
+) -> tuple[dict[str, bytes], list[str], dict[str, str]]:
+    """Retained `url:` bytes, ready to re-enter the fresh path.
+
+    Returns `(bytes_by_doc_id, stranded_locs, meta_by_doc_id)`.
+
+    **`refer.source.from_acquired` is IMPORTED, never reimplemented.** It decodes
+    and sanitizes the blob exactly as ingest did, which is the whole reason the
+    re-derived record's `sha` still equals the indexed one — a `sha` fingerprints
+    the SOURCE, and an index storing the sha of redacted text would report every
+    redacted document as permanently stale against its own unchanged source. A
+    second copy of that pipeline is how the two would drift by one line and make
+    that true anyway.
+
+    **The URL list is read here, offline.** `resolve_urls(read_urls(...))` opens
+    two committed files and no socket, so `meta` and the rest resolve on a plain
+    `fux ingest` — which is the gap SR-PII named as *"the fresh-record path
+    resolves `meta` and `archived` from the URL list, which an offline run does
+    not read"*. It does now, on this path.
+
+    ⚠ **A URL with no retained blob is STRANDED, not silently kept.** Nothing
+    can re-redact it without the network, so its record stays exactly as it is
+    and its `loc` comes back for `doctor` to name. The alternative — dropping it
+    — would delete a document because a policy changed, which is the one thing a
+    redaction change must never do.
+
+    **Never raises.** A blob that will not decode is stranded like an absent one;
+    a re-derivation that fails must not fail an ingest that otherwise succeeded.
+    """
+    from ..refer import source as source_mod
+
+    if config.url is None:
+        return {}, [], {}
+    try:
+        resolved = urlsrc.resolve_urls(urlsrc.read_urls(root, config.url.urls_file), config.url)
+    except (FuxError, OSError):
+        return {}, [], {}
+    entries = {f"url:{entry.url}": entry for entry in resolved}
+
+    out: dict[str, bytes] = {}
+    meta: dict[str, str] = {}
+    stranded: list[str] = []
+    # Sorted: the same tree must give the same index on two machines (L3), and
+    # this set feeds `fresh`, whose iteration order decides record order.
+    for doc_id in sorted(carried):
+        entry = entries.get(doc_id)
+        if entry is None:
+            continue  # de-listed; reconciliation drops it, not this
+        loc = _loc_of(doc_id)
+        fetched = source_mod.from_acquired(root, doc_id, loc)
+        if fetched is None:
+            stranded.append(loc)
+            continue
+        out[doc_id] = fetched.content
+        meta[doc_id] = entry.meta
+    return out, stranded, meta
+
+
+#: `url:` documents a policy change could not reach, as of the last run. Derived
+#: and gitignored — it is a report, and a report that could fail an ingest would
+#: be worse than no report (SR-MAINTENANCE decision 3's reasoning).
+STALE_REDACTION_FILE = "stale-redaction.json"
+
+
+def _record_stale_redaction(root: Path, stranded: list[str]) -> None:
+    """Remember which URLs a policy change could not reach. Best-effort.
+
+    ⚠ **Written to derived state, NOT onto the committed record.** W-166's
+    definition of done says *"the record is marked `stale-redaction`"*, and this
+    is the one place the build departs from it, deliberately: a new record field
+    is a schema change, which bumps `store.HEADER`, which invalidates every
+    carried field in every consumer's index and charges a full re-ingest — to
+    carry a flag that is true only until the next successful fetch. The fact is
+    per-run and derived, so it lives where the other per-run derived facts do.
+
+    **What is given up by that choice, stated rather than discovered:** the flag
+    does not travel with a cloned index. A teammate who clones the repo sees a
+    clean `doctor` for a document this machine knows is stale, until their own
+    ingest re-derives the state. The committed alternative costs every consumer
+    a full re-ingest; this costs one run on one machine.
+    """
+    from ..store import fuxdir
+
+    try:
+        fuxdir.derived_dir(root, "runtime")
+        path = fuxdir.fux_dir(root) / "runtime" / STALE_REDACTION_FILE
+        if stranded:
+            path.write_text(json.dumps(sorted(stranded), sort_keys=True), encoding="utf-8")
+        else:
+            path.unlink(missing_ok=True)
+    except OSError:
+        pass
+
+
+def _stale_redaction_warnings(stranded: list[str]) -> list[str]:
+    """One advisory line naming what a policy edit could not reach. **ASCII only.**"""
+    if not stranded:
+        return []
+    shown = ", ".join(sorted(stranded)[:3])
+    more = f" and {len(stranded) - 3} more" if len(stranded) > 3 else ""
+    return [
+        f"warning: {len(stranded)} url document(s) could not be re-extracted under the new "
+        f"policy - no retained bytes: {shown}{more}.\n"
+        "  Their records are unchanged and still hold text extracted under the OLD rules. "
+        "`fux ingest` fetches them; `keep=true` on the line retains the bytes so the next "
+        "policy change can reach them offline."
+    ]
+
+
+def _drop_changed_decoders(
+    root: Path, reusable: dict[str, dict], current: dict[str, str]
+) -> dict[str, dict]:
+    """Remove from `reusable` every document read by a decoder that has moved.
+
+    **Per extension** — see `decode.binding_digests` for why that line is where
+    the design sits. A `pdf@2` -> `pdf@3` bump drops the `.pdf` records and
+    nothing else; the markdown corpus beside them is untouched.
+
+    ⚠ **A binding that APPEARS or DISAPPEARS counts as a move**, both directions.
+    Dropping a `.fux/decoders/logdoc.py` means `.log` files stop being decoded
+    and are read as raw bytes or not at all, which is as much a change to what
+    the index holds as editing it — and a comparison keyed only on the digests
+    present today would carry the old extraction forward with nothing on disk
+    explaining it. `previous | current` is the key set for that reason.
+
+    **A document with no binding is never dropped here.** Markdown and plain
+    text are read by `extract.py`, not by a decoder, so they have no entry and
+    `_extract_rules_moved` is what covers them.
+
+    **The state is derived and gitignored** — `runtime/` — and is rebuilt by
+    being wrong once, exactly like the `pii.toml` and enrichment digests. A run
+    that cannot read it re-extracts everything with a binding: wasteful once,
+    never wrong.
+    """
+    from ..store import fuxdir
+
+    if not reusable:
+        return reusable
+
+    path = fuxdir.fux_dir(root) / "runtime" / DECODER_DIGEST_FILE
+    try:
+        previous = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        previous = {}
+    if not isinstance(previous, dict):
+        previous = {}
+
+    moved = {
+        ext
+        for ext in set(previous) | set(current)
+        if previous.get(ext) != current.get(ext)
+    }
+    if not moved:
+        return reusable
+    return {
+        doc_id: record
+        for doc_id, record in reusable.items()
+        if _binding_suffix(record.get("loc", "")) not in moved
+    }
+
+
+def _binding_suffix(loc: str) -> str:
+    """The extension a decoder binding is keyed on, lowercased — `""` if none.
+
+    **`decode._suffix`'s rule, by import and not restated**: two readers for one
+    question is how the reuse key and the registry end up disagreeing about
+    which decoder read a document, and the disagreement would be invisible —
+    a record carried forward under a binding that never claimed it.
+    """
+    from .. import decode as decode_pkg
+
+    return decode_pkg._suffix(loc)
+
+
+def _record_decoder_digests(root: Path, digests: dict[str, str]) -> None:
+    """Remember the bindings — **called only once `write_index` has returned**.
+
+    `extract-config-digest`'s ordering, for `extract-config-digest`'s reason: a
+    run stopped between the comparison and the write left the OLD records in the
+    shards, and a file already claiming the new decoder would let the next delta
+    run reuse them. The bug that ordering was introduced to fix (SR-PII decision
+    11) is the same bug here with a different digest.
+    """
+    from ..store import fuxdir
+
+    try:
+        fuxdir.derived_dir(root, "runtime")
+        (fuxdir.fux_dir(root) / "runtime" / DECODER_DIGEST_FILE).write_text(
+            json.dumps(digests, sort_keys=True), encoding="utf-8"
+        )
+    except OSError:
+        pass  # the next run re-extracts too; never a reason to fail an ingest
+
+
 def _drop_changed_enrichment(
     root: Path, reusable: dict[str, dict], file_shas: dict[str, str]
 ) -> dict[str, dict]:
@@ -1037,7 +1341,7 @@ def _reusable(root: Path, existing: dict[str, dict], file_shas: dict[str, str]) 
     2. **The content sha is unchanged.** Extraction is a pure function of the
        document's bytes and its `loc`, both of which the sha and the id fix.
     3. **It is a `file:` record with `meta: plain`.** A `url:` record only
-       reappears on a `--refresh-urls` run, and a hashed record's display
+       reappears on a networked `fux ingest`, and a hashed record's display
        fields were deliberately never stored in a reusable form.
     """
     paths = store_mod.iter_shard_paths(root)
@@ -1141,7 +1445,7 @@ def _listed_url_ids(root: Path, config, existing_urls: dict[str, dict]) -> set[s
     """
     if not existing_urls:
         return set()
-    rel_path = config.url.urls_file if config.url is not None else DEFAULT_URLS_FILE
+    rel_path = config.urls_file
     entries = sourcelist.read(
         root,
         rel_path,
@@ -1172,7 +1476,7 @@ def _archived_url_ids(root: Path, config) -> set[str]:
     caller only asks when `url:` records exist, and a missing list with
     surviving records is already `_listed_url_ids`' loud error.
     """
-    rel_path = config.url.urls_file if config.url is not None else DEFAULT_URLS_FILE
+    rel_path = config.urls_file
     if not (root / rel_path).is_file():
         return set()
     entries = sourcelist.read(root, rel_path, sourcelist.URLS, missing_hint="")

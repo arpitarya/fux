@@ -94,6 +94,7 @@ import base64
 import hashlib
 import json
 import os
+import pathlib
 import shutil
 import socket
 import struct
@@ -105,9 +106,22 @@ from html.parser import HTMLParser
 from typing import NamedTuple
 from urllib.parse import urljoin, urlsplit
 
-# ============= CONFIG — defaults; [sources.url.config] wins =============
+# ====== CONFIG — defaults; .env and the environment win over fux.toml ======
 # Each name below maps to a snake_case key in fux.toml's
-# `[sources.url.config]` table (see `configure` at the bottom of this file).
+# `[sources.url.config.cdp]` table (see `configure` at the bottom of this file).
+#
+# PRECEDENCE, most explicit first:
+#
+#   1. the process environment      FUX_CDP_PORT=9333 fux update
+#   2. a `.env` file at the repo root   FUX_CDP_PORT=9333
+#   3. [sources.url.config.cdp] in fux.toml
+#   4. the defaults below
+#
+# ⚠ The environment beats fux.toml, and that ordering is the point. `fux.toml`
+# is COMMITTED: one number in it pins every machine that clones the repo, and
+# the debugging port a person's signed-in Chrome happens to be on is the most
+# machine-specific value this fetcher has. If the file won, `.env` could never
+# say anything.
 
 CDP_HOST = "127.0.0.1"
 CDP_PORT = 9222
@@ -975,12 +989,100 @@ _RETIRED = {
 #: key belongs in this table. A tunable only one file has is still a constant.
 
 
+#: Where an env override is read from. `cdp_port` -> `FUX_CDP_PORT`, and the
+#: same mechanical rule for every key in `_SETTINGS` — one rule, so there is no
+#: table of special cases to keep in step with the one above.
+_ENV_PREFIX = "FUX_"
+
+
+def _dotenv_values() -> dict:
+    """`FUX_*` assignments from a `.env` at the repo root, or `{}`.
+
+    **Only `FUX_`-prefixed names are read, and nothing is ever logged.** A
+    `.env` is where people keep secrets; this file has no business seeing the
+    rest of it, and saying so is cheaper than being trusted not to.
+
+    Stdlib only and deliberately small: `KEY=value`, `#` comments, blank lines,
+    optional `export `, optional surrounding quotes. No interpolation, no
+    multi-line values — a `.env` that needs those is one this should not be
+    guessing at.
+    """
+    root = pathlib.Path.cwd()
+    for candidate in (root, *root.parents):
+        if (candidate / "fux.toml").is_file() or (candidate / ".git").exists():
+            root = candidate
+            break
+    path = root / ".env"
+    if not path.is_file():
+        return {}
+    out = {}
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError:
+        return {}
+    for line in text.splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        if line.startswith("export "):
+            line = line[len("export "):].lstrip()
+        key, _, value = line.partition("=")
+        key = key.strip()
+        if not key.startswith(_ENV_PREFIX):
+            continue
+        value = value.strip()
+        if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
+            value = value[1:-1]
+        out[key] = value
+    return out
+
+
+def _env_overrides() -> dict:
+    """Config-key -> raw string, from the process environment then `.env`.
+
+    The process environment wins: a value typed on the command line for one run
+    must beat a file somebody wrote last month.
+    """
+    dotenv = _dotenv_values()
+    out = {}
+    for key in _SETTINGS:
+        name = _ENV_PREFIX + key.upper()
+        if name in os.environ:
+            out[key] = os.environ[name]
+        elif name in dotenv:
+            out[key] = dotenv[name]
+    return out
+
+
+def _coerce_env(key: str, raw: str):
+    """A string from the environment, in the type `_SETTINGS` declares.
+
+    `bool` is handled here rather than by the `_SETTINGS` coercion, because
+    `bool("false")` is `True` and that is the single worst available answer for
+    `FUX_LAUNCH_CHROME=false`.
+    """
+    _name, coerce = _SETTINGS[key]
+    if coerce is bool:
+        lowered = raw.strip().lower()
+        if lowered in ("1", "true", "yes", "on"):
+            return True
+        if lowered in ("0", "false", "no", "off"):
+            return False
+        raise FetcherError(f"{_ENV_PREFIX}{key.upper()}: expected a boolean, got {raw!r}")
+    if coerce is tuple:
+        return tuple(part.strip() for part in raw.split(",") if part.strip())
+    return coerce(raw)
+
+
 def configure(config: dict) -> None:
-    """Called once after import with `[sources.url.config]` from fux.toml.
+    """Called once after import with `[sources.url.config.cdp]` from fux.toml.
 
     Overrides the CONFIG defaults above. An unknown key raises rather than
     being silently ignored — a typo'd tunable that does nothing is the kind
     of failure you find three renders later.
+
+    ⚠ **Then the environment and `.env` override THAT** — see the precedence
+    note beside the defaults for why that direction and not the other.
     """
     for key in sorted(set(config) & set(_RETIRED)):
         raise FetcherError(f"[sources.url.config] {key} is retired: {_RETIRED[key]}")
@@ -995,7 +1097,14 @@ def configure(config: dict) -> None:
         try:
             globals()[name] = coerce(value)
         except (TypeError, ValueError) as exc:
-            raise FetcherError(f"[sources.url.config] {key}: {exc}") from exc
+            raise FetcherError(f"[sources.url.config.cdp] {key}: {exc}") from exc
+    # Last, so it wins.
+    for key, raw in _env_overrides().items():
+        name, _coerce = _SETTINGS[key]
+        try:
+            globals()[name] = _coerce_env(key, raw)
+        except (TypeError, ValueError) as exc:
+            raise FetcherError(f"{_ENV_PREFIX}{key.upper()}: {exc}") from exc
 
 
 def connect() -> None:

@@ -118,13 +118,33 @@ class Result:
     #: `None` for a document outside git history. Always present; `None` is the
     #: claim *no committed date*, never "this fux is too old to say".
     mtime: int | None = None
+    #: W-162. A human pinned this document to this exact question, so its
+    #: position was set after the ranking. `score` is still the ranking's own
+    #: number, and `0.0` means the ranking never scored it — the case a pin
+    #: exists for. Always present; `False` is a claim (W-48).
+    pinned: bool = False
+    #: W-161. The graph walk out of the lexical top-k reached this document, so
+    #: the boosted tier's RRF used a PPR rank for it as well as a lexical one.
+    #: Marks a row the walk REACHED, not one that moved. Always present;
+    #: `False` is a claim (W-48).
+    #:
+    #: 🔴 **It is the one reason a `results` list may not be monotone in
+    #: `score`.** A library caller sorting by `score` is re-deriving the lexical
+    #: order and discarding the graph's contribution — `route` says which rows
+    #: that would move.
+    boosted: bool = False
+    #: W-161. `#7 -> #2 via graph` on a boosted row that moved, `None`
+    #: otherwise. Here `None` IS an absence: an unboosted row has no route, and
+    #: `boosted` already says so.
+    route: str | None = None
     headings: list[str] = field(default_factory=list)
 
     def as_dict(self) -> dict:
         return {
             "id": self.id, "loc": self.loc, "title": self.title,
             "score": self.score, "archived": self.archived, "tie": self.tie,
-            "mtime": self.mtime,
+            "mtime": self.mtime, "pinned": self.pinned,
+            "boosted": self.boosted, "route": self.route,
             "headings": list(self.headings),
         }
 
@@ -205,7 +225,8 @@ class Index:
 
         results = [
             Result(id=r.id, loc=r.loc, title=r.title, score=r.score,
-                   archived=r.archived, tie=r.tie, mtime=r.mtime)
+                   archived=r.archived, tie=r.tie, mtime=r.mtime, pinned=r.pinned,
+                   boosted=r.boosted, route=r.route)
             for r in run_query(self.root, query, top)[0]
         ]
         if under is not None:
@@ -249,7 +270,8 @@ class Index:
 
         rows = [
             Result(id=r.id, loc=r.loc, title=r.title, score=r.score,
-                   archived=r.archived, tie=r.tie, mtime=r.mtime,
+                   archived=r.archived, tie=r.tie, mtime=r.mtime, pinned=r.pinned,
+                   boosted=r.boosted, route=r.route,
                    headings=headings_for(self._record(r.id), query) if sections else [])
             for r in results
         ]

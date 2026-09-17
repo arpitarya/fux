@@ -12,7 +12,7 @@
     "order in this file cannot reach a committed byte. What CAN reach one is the",
     "field set, the defaults and omit_when -- which is why `schema` below must",
     "match store/format.py's SCHEMA_ID: two fux versions with different shapes",
-    "must never both call their output fux.index.v2.",
+    "must never both call their output fux.index.v3.",
     "",
     "omit_when: a field equal to this value is LEFT OUT of the record rather",
     "than written as false. That is SR-ARCHIVED-CONTENT decision 1 -- a live",
@@ -25,10 +25,23 @@
     "carried: true marks a pure function of bytes that have not changed, so a",
     "delta ingest may reuse the prior value instead of re-extracting. `edges` is",
     "deliberately NOT carried: it is the one field the rest of the corpus can",
-    "change without this document changing."
+    "change without this document changing.",
+    "",
+    "EDGES, W-168 step 1 (2026-09-15, _format v3). Each entry is an object:",
+    "{kind, dst, grade}, and a `ref` edge also carries `at` (anchor term hash",
+    "-> count, from the LINK TEXT this document wrote) and `al` (the token",
+    "total, == sum of at's values; derive/_build.py asserts it). The words ride",
+    "the SOURCE document's edge, never the target's record -- that is the whole",
+    "of Arpit's 2026-09-15 ruling, option (c). An `anchor` field on the TARGET,",
+    "built from what everyone else calls it, would make a committed",
+    "per-document byte a function of other documents; editing B would move A's",
+    "bytes while the dirty list marked only B, and a full ingest and an",
+    "incremental re-index would produce different indexes from the same",
+    "sources. Terms, not text: link text is content, and L2 keeps content out",
+    "of the index."
   ],
 
-  "schema": "fux.index.v2",
+  "schema": "fux.index.v3",
 
   "fields": {
     "id":         { "type": "str",  "required": "always" },
@@ -78,7 +91,10 @@
       "phrases": ["Why we chose Helix", "Rollback procedure"],
       "terms": { "000219ac0fa26dbb": [5, 2, 1], "8f1c2d3e4a5b6071": [1] },
       "flen": [412, 9, 2, 3],
-      "edges": ["file:docs/adr-storage.md"],
+      "edges": [
+        { "al": 2, "at": { "000219ac0fa26dbb": 1, "8f1c2d3e4a5b6071": 1 },
+          "dst": "file:docs/adr-storage.md", "grade": 10, "kind": "ref" }
+      ],
       "mtime": 1787688862
     },
 

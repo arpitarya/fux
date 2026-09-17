@@ -7,10 +7,10 @@ description: "Decoding gets one home, one protocol, and a consumer seam where th
 status: accepted
 date: 2026-08-26
 feature: the decoder plane — the protocol, the registry, the consumer seam and the enrichment queue
-owns: [src/fux/decode@de1d51fa6042, src/fux/templates/agents/DECODER-SKILL.md@474a416bcc42]
+owns: [src/fux/decode@f1f696d64383, src/fux/templates/agents/DECODER-SKILL.md@474a416bcc42]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-26T00:00:00Z
-content_sha: a1e1077a99ff4126911a01d6c0362220a830e27c12d76a361e675d131b951795
+content_sha: 02edd77d64cc5cd3a08d657a94e6e247d3312a4be34eee82cd3d2894bd21c5f1
 ---
 
 # SR-DECODE — bytes become Markdown in one place
@@ -284,12 +284,42 @@ records as SIBLINGS beneath it.** Measured 2026-09-11 and fixed the same day.
   did not move in W-115, and widening a defect fix into an unmeasured
   improvement is how a repair becomes a ranking change nobody measured.
   Recorded so it is a decision next time rather than a discovery.
-- 🔴 **A decoder change does NOT invalidate carried extraction.** Reuse is keyed
-  on the document's content sha, and a decoder fix moves no document's bytes —
-  so `fux ingest` carries the old records forward and **only `fux ingest --full`
-  applies the fix.** The same hole `pii.toml` and `[index]` each closed with a
-  digest; there is no decoder digest. **Stated, not fixed** — it is
-  [SR-INGEST](0106_ingest.md)'s reuse key, not this record's.
+- ✅ **A decoder change invalidates carried extraction — FIXED 2026-09-14
+  (W-166).** This bullet read *"there is no decoder digest. **Stated, not
+  fixed**"* from the day this record was accepted. Reuse was keyed on the
+  document's content sha, a decoder fix moves no document's bytes, so `fux
+  ingest` carried the old records forward and **only `fux ingest --full` applied
+  the fix** — while the run reported success and `fux doctor` stayed green.
+
+  **Every decoder now declares `VERSION`**, and
+  [`ingest/decoderdigest.py`](../src/fux/ingest/decoderdigest.py) puts it in the
+  reuse key. **Bump it in the same change as any edit that can move what
+  `decode()` returns**; leaving it alone is the claim the edit cannot.
+  `tests/decode/test_decoder_versions.py` fails a changed module whose constant
+  did not move, so it is a decision rather than an omission either way.
+
+  ⚠ **Keyed per EXTENSION, and that is the design call, not an optimisation.**
+  A corpus-wide decoder digest would re-extract the whole markdown corpus for a
+  `.pptx` fix — and would turn every routine engine release into a full
+  re-ingest of every consumer's repository. Keyed by extension, a bumped decoder
+  re-extracts its own documents and nothing else. **The keep test is a no-op
+  delta re-extracting zero**, pinned by
+  `tests/ingest/test_carry_forward_invalidation.py`.
+
+  ⚠ **A consumer decoder is digested by its BYTES, not by a constant.** fux can
+  ask a hand bump of its own tree and hold it with a test; it can ask nothing of
+  `.fux/decoders/logdoc.py` and hold nothing about it, and a forgotten bump there
+  would silently pin a whole format to stale extraction. The price is that a
+  whitespace edit re-extracts that format — the cheap direction of being wrong.
+
+  ⚠ **It lives in `ingest/`, not here, and the reason is worth keeping.** The
+  first shape put it beside `registry()`, and `tests/test_node_twins.py` refused
+  it: `node/src/decode/registry.mjs` is this module's twin, Node **reads** an
+  index and never builds one, so the change would have left that twin
+  permanently behind for a function Node must never grow. Porting it would have
+  been dead code; narrowing the twin check would have opened a hole over the
+  decode path's real behaviour. Reading `Decoder.origin` — which the registry
+  already publishes — gets the same answer from outside.
 
 **12. The enrichment queue — what fux could not read, written down.** Before
 this, **nothing in fux could *say* a document needs a model.**
@@ -609,6 +639,19 @@ reasonably wonder whether a third consumer changes the caching argument: it
 does not. `_RECORDS` is parsed once per `run()` and reset at the top of each,
 which is exactly why it was built that way — the note in `doctor.py` says
 *three checks need per-record fields*, and it is now four.
+
+⚠ **Decoders and fetchers are ONE consumer-plane pattern, and since
+2026-09-15 they are spelled the same way** ([SR-URL-LIST](0116_url-list.md)
+decision 15, W-178). `.fux/decoders/<name>.py` + a `[decoders]` binding, and
+`.fux/fetchers/<name>.py` + `fetch=<name>` on a URL line: a module stem
+validated by **shape only**, existence checked where the name is used and
+reported ahead of time by `fux doctor`. The `fetch=` validator deliberately
+reuses this record's regex rather than growing a second one.
+
+🔴 **So a future change to either plane is a question about the other.** That is
+the statement W-178 asked this record for, and it is the reason `fetch=`'s
+loosening needed no new mechanism: the precedent was here, shipped, with its
+own doctor row and its own split between shape and existence.
 
 ### Consequences
 

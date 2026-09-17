@@ -10,7 +10,7 @@ feature: what happens once a document is declared archived — the record proper
 owns: [tools/archived-signal-eval@30fb75fa7476]
 laws: [L3, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 731a66aae9e1ed05ff4dd7b23672f1c6dda925f217713ee7f6c890fd3aaa412a
+content_sha: 6f266a6dba4494ee8fd9f055b7a3071401f26a40a9bc62868fef68cc96abd3f8
 ---
 
 # SR-ARCHIVED-CONTENT — what "archived" does, once a document carries it
@@ -375,17 +375,69 @@ it was. ⚠ **An `archived=true` line and an `update=never` line are independent
 pinning a retired page is legal and means what both words mean.
 
 
-**2026-09-14 — `src/fux/ingest/urlsrc.py` changed under this record and NOTHING this record
-decides moved.** Per-fetcher `[sources.url.config]` resolution — a scalar is shared, a
-sub-table reaches only the fetcher it names ([SR-FETCHER](0117_fetcher.md)
-decision 8). `UrlEntry.archived`, its deliberate TWO layers, and
-`_archived_url_ids` are untouched.
+**2026-09-14 — `src/fux/ingest/urlsrc.py and src/fux/ingest/run.py` changed under this record and NOTHING this record
+decides moved.** Two unrelated edits: per-fetcher `[sources.url.config]` resolution in
+`urlsrc` ([SR-CONFIG](0113_config.md) decision 8a), and in `run.py` a
+`config.url is not None else DEFAULT_URLS_FILE` fallback collapsing to
+`config.urls_file` now that the key sits in `[sources]` (decision 11a).
+`UrlEntry.archived`, its deliberate TWO layers, and `_archived_url_ids` are
+untouched.
 
 ⚠ **Said out loud rather than left to the freshness gate.** That check proves an
 owning record was *touched*, never that it was read (CLAUDE.md §Law zero), so a
 co-owner's file changing under this one is exactly the case where a reader needs
 to be told *"not yours"* in writing.
+
+**9. An archived document's anchor terms are folded like any other's**
+(W-168 step 1, 2026-09-15), and no new weight arrives with them.
+
+The three document priors were removed on 2026-09-13, and decision 2's veto —
+*the marker does not move the ranking* — became structural rather than a
+consequence of a default. **The anchor field does not reintroduce one.** It is a
+*field weight*, applied to a term's contribution exactly as `body` and `heading`
+are; `archived` reaches ranking only through the declared tie-break, at an equal
+score, and reaches a reader through the marker. Neither moved.
+
+⚠ **A live document can now be reached through a retired one's link text, and
+the reverse.** The edge is a fact about the source, `archived` is a fact about
+each document, and both are reported; nothing here scales a score by either.
+Whether a retired linker's wording *should* count as much as a live one's is a
+real question, and it is **not answered here and not in
+[the pre-registration](../work/regression/2026-09-15-anchor-text/PRE-REGISTRATION.md)** —
+raising it would be a second lever in one arm.
+
+⚠ **`archived` stays a closed enum on both lists** (2026-09-15).
+[SR-URL-LIST](0116_url-list.md) decision 15 opened `fetch=`'s values because it
+names a **file** in a directory the consumer owns. `archived` names neither a
+file nor a module — it is a declaration about a document, `true` or `false` —
+so decision 1a's two-value set is untouched, and an unknown value is still the
+loud error it always was.
+
 ### Consequences
+
+- **A re-derived `url:` record keeps its archived declaration** (2026-09-14,
+  W-166). A policy change now re-extracts a retained `url:` record from
+  `.fux/acquired/` instead of carrying it forward, and that path builds the
+  record through `_with_archived` like any other fresh one — so `archived=true`
+  on the line still reaches it without a fetch, which is decision 1a's whole
+  point. ⚠ **A STRANDED record — no retained bytes — is left untouched**, so its
+  archived flag is as correct as it ever was: nothing about it is re-derived,
+  including this.
+- ⚠ **A bare `fux ingest` reaches `_with_archived` through a FETCH now**
+  (2026-09-15, W-177). `fux ingest` absorbed `fux update`
+  ([SR-CLI](0101_cli-surface.md) decision 16), so the default verb goes out for
+  the URLs known to be stale and re-derives their records rather than carrying
+  them forward. **Decision 1a is unaffected** — `archived=true` on the line
+  reaches a record on the fetch path and on the carry-forward path alike, which
+  is why it was written that way. The offline behaviour this record describes is
+  `fux ingest --no-fetch`'s.
+- **The archived note's stream is now the rule rather than the exception**
+  (2026-09-14, W-165 fix 2). Decision 3's note has always gone to stderr, and
+  the reason given — a `[archived]` prefix on stdout would be read as part of a
+  filename — was the same argument that finally moved `No confident matches.`
+  there. **Nothing here changed**; what changed is that the verb no longer
+  writes prose to stdout at all, so this note is no longer the odd one out and a
+  caller reading stdout gets locators or nothing.
 
 - ⚠ **`is_archived_loc()` has exactly one definition**, used by both the ingest
   stamp and the query-time marker. **Two copies of that predicate is a

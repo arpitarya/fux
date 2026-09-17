@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@d634c7430c10, src/fux/store/nodebundle.py@071a24a596dd]
+owns: [node@e0c57e2eb08e, src/fux/store/nodebundle.py@071a24a596dd]
 laws: [L1, L3, L4, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 11325ed23d9b5775b1e839a891afa18ea5e65ed7d514625ed9322f55716689a6
+content_sha: 2565f76964b46438991b9b9de617c5b569366c20562dcb1298716a8e3f3d76aa
 ---
 
 # SR-NODE-SEARCH — the Node read plane
@@ -34,6 +34,19 @@ otherwise.**
 
 ## §2 — For agents
 
+⚠ **2026-09-15 — `store/fuxdir.py` and `doctor.py` changed under this record and
+NOTHING this record decides moved.** W-185 added `index/*.jsonl.tmp` to
+`_GITIGNORE` and an `index temp files ignored` row to `doctor`. This record
+describes `ensure_node_reader` and friends in the first file and `_node_reader`
+/ `_installed_reader` in the second; **none of them is touched**, and
+`node/node_modules/` is listed exactly as W-149 left it.
+
+⚠ **Said out loud rather than left to the freshness gate**, which proves a
+record was *touched* and never that it was read: the changed symbol is a module
+CONSTANT, and the gate resolves top-level `def`/`class` names only, so a
+constant edit deliberately reads as *every symbol* and demands every describer.
+
+
 ### Context
 
 W-107 carried the plan; **it closed on 2026-09-12** and this record carries the
@@ -43,7 +56,7 @@ and [`2026-09-12-node-arm-rungs`](../work/regression/2026-09-12-node-arm-rungs/r
 never the retired item — its file is named in
 [`archive/README.md`](../archive/README.md) and may not back a live claim.
 What it could **not** close is
-[W-148](../work/open/W-148-what-the-two-readers-still-owe.md).
+W-148 (closed 2026-09-15).
 
 ⚠ **Decisions 9-11 were all found on one day, 2026-09-12, by pointing the
 differential arm at surfaces it had never covered** — the graph verbs, the MCP
@@ -551,18 +564,300 @@ make shape C available.
 
 
 **2026-09-14 — `src/fux/setup.py` changed under this record and NOTHING this record
-decides moved.** The scaffolded `fux.toml`'s `[sources.url.config]` block now shows the
-per-fetcher sub-tables ([SR-FETCHER](0117_fetcher.md) decision 8).
+decides moved.** The scaffolded `fux.toml` moved into `templates/fux.toml.txt` and grew
+derived per-fetcher config tables ([SR-DOTFUX](0102_fux-directory.md)).
 `detect_workspace`, `wire_workspace` and `_yarn_berry_linker` — the monorepo
-half of what this record owns in that file — are untouched, and no byte of
-`node/` changed.
+half of decision 15, which is what this record owns in that file — are
+untouched, and no byte of `node/` changed.
 
 ⚠ **Said out loud rather than left to the freshness gate.** That check proves an
 owning record was *touched*, never that it was read (CLAUDE.md §Law zero), so a
 co-owner's file changing under this one is exactly the case where a reader needs
 to be told *"not yours"* in writing.
+**17. THE GRAPH TIER IS ON BOTH READERS, and the asymmetry it inherits is
+decision 9's, not a new one** (W-161).
+
+Node composes W-161's two tiers. It does **not** read Python's derived
+`.fux/runtime/graph.json` — it rebuilds the plane in memory from the committed
+records, exactly as `verbs/graph.mjs` already does, because decision 9 ruled
+that behaviour *"the right one for its audience"*: this reader exists for a
+clone with no Python, and `.fux/runtime/` is written by `fux build`, which is
+Python.
+
+**So the two readers are byte-equal wherever Python has a fresh plane**, **and
+diverge on a corpus with no fresh build**, where Python has no tier and Node has
+one. That is decision 9's existing asymmetry showing through a new surface.
+
+**17b. 🔴 The generalisation this decision made about CI was WRONG, and the
+harness discovered it exactly as the sentence above promised it would not**
+(2026-09-16, cutting `3.0.0-alpha.0`).
+
+⚠ **What decision 17 said until now:** that the readers are byte-equal *"wherever
+Python has a fresh plane — which is every corpus the differential arm runs on,
+because the golden ladder's rungs are built"*, and that the asymmetry *"is stated
+here rather than left for the harness to discover"*. The first clause was the
+defect and the second is what it cost.
+
+🔴 **`node-arm.yml` runs the arm over THIS repo from a bare checkout**, not over
+a ladder rung. Nothing in that workflow ever built anything, so `.fux/runtime/`
+did not exist, Python had no tier, Node had one, and **all six matrix jobs went
+red at 44 of 202 discordant** — with the step's own comment attributing it to *"a
+Node transcription defect and nothing else"*. **Both readers were correct.** The
+ladder's rungs are built; this repo was not, and the decision generalised from
+the corpus that happened to be fine to the one that gates a merge.
+
+✅ **The gate, not a note:** `node-arm.yml` runs `fux build` before the arm, and
+again after `adversarial_corpus.py` rewrites the index — **a STALE plane is the
+same as an absent one to `compose.py`**, so the rebuild has to follow every write
+to `.fux/index/`, not merely the checkout. Measured both ways at the fix: 44 of
+202 without it, **0 of 225 with it**.
+
+⚠ **The general lesson is the one worth keeping.** A stated asymmetry does not
+stop a harness from misattributing it — it only makes the misattribution
+diagnosable after the fact. What stops it is removing the divergence from the
+arm's environment, which is what a build step does and what a paragraph cannot.
+
+**17c. 🔴 Building the plane switched the GRAPH LANE on in CI for the first
+time, and it was comparing by the wrong rule** (2026-09-16, same session).
+
+The lane skips without a fresh derived plane, so **it had never run in CI at
+all** — `node-arm.yml` built nothing, and the comparison count gives the tell:
+**202 without the lane, 225 with it.** Its first run went red at **1 of 225**.
+
+**Nothing was wrong with either reader.** `Arm.compare_verb` — a symbol this
+record claims by name — compared graph payloads to the score's last bit, which
+is stricter than the cross-runtime contract [SR-RANKING](0111_ranking.md)
+decision 8a rules and than the ranking lane beside it already applied. The
+premise, and what it cost, are [SR-ACCELERATOR](0110_accelerator.md) decision
+14's; this decision states none of it and records only the consequence **for
+this reader**: Node's graph verbs were never in breach, and no number measured
+against them before 2026-09-16 was measuring what it claimed to.
+
+⚠ **Two defects, and each one hid the other.** A skipping lane cannot fail, so
+its comparison was never exercised; a comparison that was never exercised gave
+nobody a reason to ask why the lane was quiet. **That is the same shape as 17b
+one level down** — a paragraph asserting a property, and nothing checking it —
+which is why the close is [`tests/test_differential_arm.py`](../tests/test_differential_arm.py)
+rather than a third paragraph.
+
+**17a. 🔴 And it is not free on this reader.** Rebuilding the plane parses
+**every** committed record — the work the B2 prefilter exists to avoid — so a
+Node `ask` with the tier on pays a full parse that its lexical answer does not.
+Python reads one JSON file. **Node's query latency is unmeasured**
+(W-148 (closed 2026-09-15) row 2 — the
+instrument does not exist), and this is now one more reason it should not stay
+that way. `[graph] ask_boost = false` and `ask_related = false` turn it off.
+
+**17b. `fux lexical` and `fux ask` are no longer the same call.** They were one
+function on this reader and equal by construction; `fux.mjs` now dispatches
+`ask` with `compose: true` and `lexical` with `compose: false`, and `runQuery`
+forces both tier booleans off on that argument rather than trusting the caller.
+**A repository whose `tune.toml` turns the tier on must not be able to make the
+frozen baseline verb stop being a baseline** — every ranking verdict in this
+repo cites `lexical` as its control.
+
+**17c. ⚠ `Object.create` + `Object.assign`, never a `{...spread}`, to override
+a `Tune`.** `Tune.scoring` is a **prototype getter**; spreading an instance into
+an object literal keeps the own properties and silently drops it, so
+`resolved.scoring` would be `undefined` and every score would be computed at
+default weights — on the frozen baseline verb, with nothing failing. Caught
+while writing 17b, not by a test.
+
+**17d. The six `[graph] ask_*` keys are PARSED AND CARRIED by this reader's
+tune loader**, and validated identically (`boolean` and `edgeKinds` are twins of
+Python's `_boolean` and `_edge_kinds`). A key one reader refused and the other
+accepted would make one committed `tune.toml` valid in one runtime and an error
+in the other, which is the one asymmetry the config parity test exists to
+forbid.
+
+
+**18. 🔴 THE OBSERVER HOOK IS OUT OF SCOPE ON THIS READER, declared rather
+than missing** (W-170).
+
+[SR-OBSERVE](0157_observe.md) decision 1 requires Node's half to ship with the
+Python half **or** to be declared out of scope here, in the same change —
+*never silently missing*. This is that declaration.
+
+**The reason is not effort.** Python has one post-render dispatch point for
+every verb, `cli.main`, and the hook's whole guarantee comes from sitting
+there: after the exit code is fixed, after stdout is flushed, after every write
+the verb makes. **This reader has no equivalent** — `fux.mjs` dispatches per
+verb and each verb writes and returns on its own path — so hosting the hook
+would mean either inventing that seam or placing the call in five places, where
+*after everything* becomes five things to keep true instead of one.
+
+**Building it twice before the first subscriber exists on either reader is the
+trade this refuses.** `.fux/observers/*.mjs` stays reserved and unread; a
+subscriber that needs it on this reader is what makes the seam worth inventing,
+and this decision is what that change amends.
+
+⚠ **So a repository with observers installed produces records for its Python
+runs and none for its Node runs**, and a consumer joining the two will see a
+gap that is this decision rather than a bug. That is the cost, and it is stated
+so nobody diagnoses it twice.
+
+
+
+**19. The Node reader folds anchors identically, and it brought its own
+corpus** (W-168 step 1, 2026-09-15).
+
+`scan.mjs`, `bm25f.mjs`, `rank.mjs`, `expand.mjs` and `config/tune.mjs` carry
+the same anchor path their Python twins do: the byte regex over every line, the
+`at` fold on parsed lines, the second targeted pass through `recordFor`, `atf`
+and `alen` on every candidate, and `[bm25f] anchor` read out of
+`.fux/tune.toml`.
+
+🔴 **The differential arm could not have caught a forgotten transcription
+here.** It answers *do the two readers disagree on this corpus?* — and a corpus
+with no document reachable only through a linker's wording exercises no anchor
+branch, so a Node half that was never written would agree with itself. So the
+feature ships its own fixture: `tests/query/test_anchor_node_twin.py` builds a
+corpus that contains the input, switches the key on **in the file a consumer
+would edit**, and compares both readers. With the key on the target ranks #1 in
+both; with it off, it is unreachable in both.
+
+⚠ **Compared on parsed values, never stdout bytes** — hazard H2: Python prints
+`--json` with `ensure_ascii=True` and `JSON.stringify` does not. `score` after
+`round(9)`, decision 8a's tolerance.
+
+**19a. `SCHEMA_ID` moved to `fux.index.v3` on the Node side in the same
+change**, and **the vendored bundle had to be rebuilt or it would have refused
+this repository's index outright.** `.fux/node/fux.mjs` pins the schema string
+it was bundled with, so a re-ingested corpus and a stale bundle are a hard
+refusal rather than a degradation — which is the right failure, and is the
+reason the bundle is regenerated in the same commit as the bump.
+
+⚠ **That rebuild also carried W-161's `related` payload and W-176's `weak`
+steering into `.fux/node/`**, which had not been regenerated since. Stated here
+because a commit that says *anchor text* and moves 60 KB of bundle owes the
+reader the reason.
+
+⚠ **`node/src/ingest/sourcelist.mjs` is narrowed for freshness, and the gap is
+covered by parity instead** (2026-09-15, W-178). That module is the **`dirs`
+half** of `src/fux/ingest/sourcelist.py` — Node never fetches (decision 3), so
+`fetch`, `meta`, `keep`, `ttl` and `update` decide nothing there. A change
+entirely inside the `URLS` spec therefore reported the twin as behind, and
+porting it would have meant teaching this reader a grammar for a list it does
+not read.
+
+🔴 **The narrowing leaves one thing uncovered and it is named rather than
+accepted.** `test_node_twins` narrows by git's hunk-context header, which names
+an enclosing `def`; the `dirs` **attribute tuple** is a module-level constant
+and has none. So that half is held by
+`test_node_config_parity.py::test_the_dirs_attribute_set_is_the_python_one`,
+which compares the two tuples by value — the stronger check, because it asserts
+the fact rather than asserting that somebody edited a file. It matters here
+specifically: `query/__init__.py` catches a refusal from this parser and
+degrades to *no archived directories*, so two readers with different attribute
+sets return **different archived sets from the same committed file**.
+
+⚠ **`B` moved `0.75 → 0.15` in BOTH readers on 2026-09-16**
+([SR-RANKING](0111_ranking.md) decision 3, W-144). `node/src/query/bm25f.mjs`
+carries the constant and `tests/test_node_config_parity.py` holds the two equal,
+so the change is one line on each side and a parity test that fails if only one
+moves.
+
+🔴 **This is the case the two-reader discipline exists for.** A ranking default
+that moved in Python and not in Node would produce **two readers of one index
+returning different orders** — the defect the parity pair in
+[SR-WORK-BENCHMARK](0053_WORK-benchmark.md) decision 16 reports as a bug rather
+than a finding, and the one a differential arm on an unchanged corpus could not
+catch, because both readers would still agree with themselves.
+
 ### Consequences
 
+- **`routes()` returns `(routes, truncated)` on both readers, and the budget is
+  the same number on both** (W-140 row 12, 2026-09-15). `EXPANSION_BUDGET` is a
+  constant in each and must stay equal: the truncation point is a function of
+  the index — `out_edges` is sorted on both sides — so two readers on one index
+  cut at the same place, and a different budget would make them disagree about
+  whether a search finished.
+  ⚠ **Verified byte-equal on the `path --json` payload.** The one difference
+  found is `"reliability": 1.0` against `1`, which is `json.dumps` against
+  `JSON.stringify` and is this record's own known divergence, present in the
+  confidence block too and **not W-140's**.
+
+- **`fux lexical` is ONE FUNCTION on this reader, and that is stronger than the
+  test that holds the Python pair equal** (2026-09-14, W-160). `fux.mjs`
+  dispatches `ask` and `lexical` to the same `runAsk`, so the freeze holds by
+  construction here — decision 10's agreement-by-construction device applied to
+  a verb rather than to bytes. Python has two entry points over one body, held
+  equal by `tests_e2e/test_relational.py::test_lexical_is_byte_identical_to_ask`.
+
+  ⚠ **When [W-161](../work/open/W-161-graph-composed-ask.md) gives Python's
+  `ask` a graph tier, this is the case that splits**, and the differential law
+  will then compare a Python `ask` that has one against a Node `ask` that does
+  not. **That divergence is W-161's to declare**, in this record, before it
+  lands — not something for the harness to discover.
+
+- **`graph --seed` and the three walk parameters are on both readers** (W-160),
+  with `--seed` reporting `score: null` and `rank` in both. That last choice was
+  forced by a divergence rather than chosen for taste: the first cut reported
+  the walk's `1/(i+1)` mass, and seed 0's mass is exactly `1.0` — which
+  `json.dumps` writes `1.0` and `JSON.stringify` writes `1`. **`pyRepr` exists
+  in `compat/pyfloat.mjs` for precisely this and had no caller**, because a
+  BM25F score is never an exact integer; the new output was the first value that
+  could be one. `null` is `null` in both, and the number that was diverging was
+  one no reader should have been comparing anyway.
+
+- ⚠ **`link_idf` is the first `log1p` on the query path, and the two readers
+  agree to `round(9)` rather than bit-for-bit.** Measured on this repository
+  with `--link-idf` on: identical node ordering, four scores differing in the
+  last digit or two. **That is decision 1's contract**, and BM25F's own `idf`
+  has always depended on libm `log` in the same way — it simply happened to
+  agree exactly on the corpora anyone compared. Recorded so that when W-161
+  turns the parameter on, a last-digit difference is read as the contract
+  working rather than as a port defect.
+
+- **`fetch_at_answer = false` COLLAPSES decision 4's asymmetry, from Python's
+  side** (2026-09-14, W-174). `[sources.url] fetch_at_answer = false` tells
+  `fux answer` never to open a socket for `url:` documents; Python then does
+  exactly what decision 3 says Node always does — read `.fux/acquired/` if the
+  blob was retained, fall back to the index if not — so for such a repo the
+  table's two divergent rows go away: no `current`/`stale` on a URL from either
+  reader, and no `cached` from either.
+
+  ⚠ **Node needs no change for this, and that is the point.** There is no
+  transport in `node/` to switch off, so the flag is inert there and the two
+  readers agree by construction. **The asymmetry is NOT retired** — it is the
+  default behaviour with the flag on, which is what ships — and Node still
+  cannot *offer* the verdicts Python offers by default. What is recorded here is
+  that a consumer can now choose the symmetric half, and that choosing it costs
+  them the strongest verdicts rather than buying them anything Node lacked.
+
+- **W-163's eight `fux doctor` rows changed `doctor.py` and changed NOTHING this
+  record describes** (2026-09-14). Stated here because the freshness gate was
+  right to ask and the answer is worth writing down rather than waving through.
+
+  `records/README.md` gives this record `src/fux/doctor.py::_node_reader,_installed_reader`
+  — the `node reader` row and the PATH row's helper — and neither moved. What the
+  gate saw is that the change **inserted 494 lines in one hunk**, which made
+  `changed_symbols` return *"could not tell"*: a hunk that starts between two
+  top-level blocks maps to no enclosing symbol. **The narrowing then correctly
+  refuses to narrow** — *"a gate may only narrow on a fact, never on a guess"* —
+  and demands every describer.
+
+  ⚠ **That is the check working, not a false positive**, and the remedy is this
+  paragraph rather than a looser rule: the alternative is a narrowing that
+  guesses, and a gate that guesses narrow is a gate that stops firing.
+
+- **The no-match sentence moved to stderr in BOTH readers, in one change**
+  (2026-09-14, W-165 fix 2). `decline()` in `node/src/verbs/find.mjs` is the twin
+  of `_decline()` in `src/fux/query/__init__.py`; `ask` and `answer` import it
+  rather than each holding the literal, on both sides. Exit codes, wording and
+  `--json` are unchanged. **`fux graph` still writes it to stdout in both** —
+  named so the asymmetry is recorded rather than found.
+
+  ⚠ **`tests/test_node_twins.py` did not catch a thing here, and the fix was to
+  narrow it.** `node/src/query/run.mjs` declares `src/fux/query/__init__.py` as
+  its twin, and so do the three verb modules — a one-to-many mapping the record
+  already had. A change to what a verb *prints* moves the Python module without
+  touching anything `runQuery` mirrors, so the check reported `run.mjs` as behind
+  while the three files carrying the change sat updated beside it. `run.mjs` is
+  now in `NARROWED` against `run_query`, which is what its own header has always
+  said it mirrors: *"twin of the PURE half"*. **The three verb modules stay
+  unnarrowed** — narrowing those too would leave the printing half unguarded,
+  which is the failure this row exists to describe.
 - **`fux` names two binaries when both are installed globally.** `--version`
   reports the runtime (`fux 2.0.0-alpha.7 (node 22.9.0)`), an unsupported verb
   signposts the other, and `fux doctor` reports a node `fux` earlier on PATH.
@@ -577,9 +872,37 @@ to be told *"not yours"* in writing.
   `fux doctor` PATH row, deferred *because* nothing was going to shadow
   Python's `fux`; that premise died with the clause and the row **landed the
   same day** — `doctor._fux_on_path`, a `warn` that names the resolved path and
-  points at `fux --version`. It **reads the shim's shebang and never executes
-  it**: doctor does not run a binary the environment chose for it. Registered
-  in [SR-DOCTOR](0152_doctor.md) §2.
+  points at `fux --version`. It **reads the launcher and never executes it**:
+  doctor does not run a binary the environment chose for it. Registered in
+  [SR-DOCTOR](0152_doctor.md) §2.
+
+  ⚠ **Amended 2026-09-14 (W-159): "reads the shim's SHEBANG" was the Unix
+  half of the rule, stated as the whole of it.** npm writes no shebang on
+  Windows — it writes a `fux.cmd` whose body names `node` — so the sentence
+  described a mechanism that is absent on the platform where two globally
+  installed `fux` binaries are most likely. `_is_node_shim` reads both shapes.
+
+  **The row covers Windows, macOS and Linux.** W-159 was filed believing it
+  could not fire on Windows, on the evidence of a test skipped there. **That
+  reading was wrong, and the correction is the finding**: `shutil.which` honours
+  PATHEXT, which is exactly how it resolves the `fux.cmd` npm installs. What
+  could not be built on Windows was the *test's* extensionless shim — a fixture
+  defect read back as a claim about the code it could not reach. The fixture is
+  platform-shaped now and the skip is gone.
+
+  🔴 **And the platform sweep found a real false positive.** The classifier
+  read whatever `which` returned as text with `errors="replace"` and asked
+  whether `node` appeared in the first 512 bytes. **A Windows console script is
+  a `.exe`** — a small binary launcher — and three letters occurring by chance in
+  its bytes would have told someone their working Python `fux` was the Node
+  reader and only reads. A compiled binary is not a shim and is no longer read;
+  `tests/test_doctor.py::test_a_compiled_launcher_is_never_read_as_text` pins it.
+
+  ⚠ **`_is_node_shim` is split out so it can be tested on EVERY platform.**
+  Neither end-to-end shape is reachable on both — `which('fux')` finds
+  `fux.cmd` only on Windows and an extensionless `fux` only on Unix — so the
+  row's own test exercises one shape per platform forever, and the half that was
+  actually wrong would have stayed half-covered.
 - ✅ **The 47-file vendored tree is GONE as of 2026-09-12 — decisions 13-16
   replaced it and W-149 built them.** The paragraph below is kept as the
   measurement that produced the ruling rather than rewritten; **it describes
@@ -662,7 +985,7 @@ to be told *"not yours"* in writing.
 - **W-149 is CLOSED** (2026-09-12) — decisions 13-16's build item. Its outcome
   is in [`work/IMPLEMENTATION.md`](../work/IMPLEMENTATION.md); the item file
   is deleted, per OPEN-WORK rule 2, and is **named, never cited** ·
-  [W-148](../work/open/W-148-what-the-two-readers-still-owe.md) — what W-107
+  W-148 (closed 2026-09-15) — what W-107
   could not close. ⚠ **W-107 itself is retired and is NAMED, never cited**
   (`CLAUDE.md` §"Archive is not evidence")
 - npm workspaces <https://docs.npmjs.com/cli/using-npm/workspaces> · pnpm

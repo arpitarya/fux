@@ -95,11 +95,12 @@ non-empty. `missing` names the terms of your question that appear **nowhere in
 this corpus**.
 
 **The retry:** re-ask with the word the corpus would use, or keep the question
-and add `--expand` - a handful of words you expect the document to use:
+and add `--expand`. **YOU write this text — fux never generates it** (no fux path may call a model). Write 2-3 sentences that ANSWER the question in the words the document would use — a short passage, **not a keyword list**; the keyword form is the weaker one the research measured against.
 
 ```bash
 fux ask "what happened during the checkout outage" \
-    --expand "checkout unavailable 47 minutes incident timeline"
+    --expand "Checkout was unavailable for 47 minutes. The payment service
+              returned 503 after a config rollout. Recovery was a rollback."
 ```
 
 Expansion terms score **below** your own words, and a document matching *only*

@@ -6,13 +6,13 @@ title: "SR-EXTRACTED (0115) — the extracted ingest mode"
 description: "The deterministic ingest mode, ratified by name. Everything is taken from the document; nothing is invented; every guarantee in the paper is stated for this mode and no other."
 status: accepted
 date: 2026-08-19
-amended: 2026-09-11
+amended: 2026-09-15
 feature: the `extracted` ingest mode — the value in every committed record's `mode` property, and the contract it asserts
-owns: [src/fux/ingest/extract.py@dc7043e223f0]
+owns: [src/fux/ingest/extract.py@db4fc8f68ac0]
 laws: [L1, L2, L3, L4]
 ratifies: W-30
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 62fbbb62a41aa534d16e1084bfd4f8739d9d7607aec565e406cde9fd8b5b67ca
+content_sha: a90ebdcf2f05698d84c9e6d8b57c358ed69caa98180aa3b0592ab453888ef75d
 ---
 
 # SR-EXTRACTED — the deterministic ingest mode
@@ -287,7 +287,39 @@ max_phrases`, default **32** (Arpit, 2026-09-11; it was a hard-coded `12`).
   cap reaches unchanged documents** — [SR-INGEST](0106_ingest.md)'s
   `[index]` digest.
 
+
+**10. The same-sources-same-bytes guarantee now covers the link text**
+(W-168 step 1, 2026-09-15). A `ref` edge carries the analyzed, hashed terms of
+the anchor text the document wrote — extraction-only and deterministic like
+every other field here: the words are **taken from** the document, nothing is
+invented, and no model is consulted.
+
+⚠ **They are taken from the REDACTED body**, downstream of `ingest/run.py`'s
+redaction pass, exactly as `terms` and the edge scan already were
+([SR-PII](0148_pii.md) decision 3). Anchor text is prose, so it can carry a
+secret as readily as a heading can.
+
+⚠ **Edges are still not carried forward, and anchor terms inherit that.** They
+are re-resolved every run because the rest of the corpus can change what a link
+resolves to — so `RULES_VERSION` in `extract.py` does not gate them, and no
+re-extraction is owed for an edit to how they are taken.
+
 ### Consequences
+
+- **`extract.RULES_VERSION` is now the reuse key's handle on this module**
+  (2026-09-14, W-166). Extracted mode's promise is that every field is *taken
+  from* the document — which makes the rules in `extract.py` an input to the
+  index exactly as the document's bytes are, and they were not in the key.
+  A changed rule reached an unchanged document only on `fux ingest --full`.
+  **Bump the constant in the same change as any edit that can move what this
+  module returns**; `tests/ingest/test_extract_rules_version.py` fails a changed
+  module whose constant did not move.
+
+  ⚠ **A bump costs a full re-extraction of the corpus, and that is why it is a
+  constant rather than a sha of the file.** These rules run on every document, so
+  there is no smaller set to invalidate — a sha would charge that price for a
+  comment. The judgement of whether an edit can move a byte of output is the
+  author's, made once, in writing, on one line.
 
 - ⚠ **Decision 9 changes committed bytes on the next ingest of every existing
   corpus**: any document with more than 12 headings gains up to 20 `phrases`.

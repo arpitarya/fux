@@ -1,0 +1,1681 @@
+run,arm,version,corpus,path,query_id,class,repeat,warmup,ms
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q001,rare,0,1,257.112
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q001,rare,0,1,279.165
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q001,rare,0,1,271.209
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q001,rare,0,1,26.401
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q001,rare,1,1,211.173
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q001,rare,1,1,234.621
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q001,rare,1,1,269.586
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q001,rare,1,1,26.063
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q001,rare,2,0,212.853
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q001,rare,2,0,233.488
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q001,rare,2,0,288.111
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q001,rare,2,0,26.125
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q001,rare,3,0,210.847
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q001,rare,3,0,233.844
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q001,rare,3,0,270.499
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q001,rare,3,0,26.451
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q001,rare,4,0,208.614
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q001,rare,4,0,233.561
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q001,rare,4,0,272.324
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q001,rare,4,0,26.437
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q001,rare,5,0,210.883
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q001,rare,5,0,234.567
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q001,rare,5,0,270.911
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q001,rare,5,0,26.490
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q001,rare,6,0,211.299
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q001,rare,6,0,235.249
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q001,rare,6,0,272.720
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q001,rare,6,0,26.349
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q002,rare,0,1,212.720
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q002,rare,0,1,231.990
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q002,rare,0,1,272.478
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q002,rare,0,1,26.335
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q002,rare,1,1,210.329
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q002,rare,1,1,236.313
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q002,rare,1,1,272.219
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q002,rare,1,1,26.270
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q002,rare,2,0,211.260
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q002,rare,2,0,232.252
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q002,rare,2,0,271.429
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q002,rare,2,0,26.386
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q002,rare,3,0,209.363
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q002,rare,3,0,242.192
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q002,rare,3,0,280.076
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q002,rare,3,0,26.799
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q002,rare,4,0,217.436
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q002,rare,4,0,247.050
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q002,rare,4,0,279.865
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q002,rare,4,0,27.353
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q002,rare,5,0,214.019
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q002,rare,5,0,241.505
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q002,rare,5,0,280.704
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q002,rare,5,0,26.808
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q002,rare,6,0,212.801
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q002,rare,6,0,237.826
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q002,rare,6,0,276.036
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q002,rare,6,0,27.359
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q003,rare,0,1,218.111
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q003,rare,0,1,240.151
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q003,rare,0,1,276.826
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q003,rare,0,1,26.697
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q003,rare,1,1,215.176
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q003,rare,1,1,240.225
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q003,rare,1,1,276.791
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q003,rare,1,1,26.932
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q003,rare,2,0,211.785
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q003,rare,2,0,237.093
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q003,rare,2,0,278.826
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q003,rare,2,0,27.267
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q003,rare,3,0,216.673
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q003,rare,3,0,240.765
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q003,rare,3,0,275.925
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q003,rare,3,0,26.570
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q003,rare,4,0,215.471
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q003,rare,4,0,240.887
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q003,rare,4,0,276.004
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q003,rare,4,0,26.720
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q003,rare,5,0,215.678
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q003,rare,5,0,238.944
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q003,rare,5,0,280.149
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q003,rare,5,0,26.702
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q003,rare,6,0,214.689
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q003,rare,6,0,237.778
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q003,rare,6,0,276.161
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q003,rare,6,0,26.968
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q004,rare,0,1,213.476
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q004,rare,0,1,237.479
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q004,rare,0,1,277.611
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q004,rare,0,1,27.068
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q004,rare,1,1,221.052
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q004,rare,1,1,242.785
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q004,rare,1,1,284.586
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q004,rare,1,1,28.960
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q004,rare,2,0,222.737
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q004,rare,2,0,243.529
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q004,rare,2,0,283.721
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q004,rare,2,0,26.585
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q004,rare,3,0,219.250
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q004,rare,3,0,232.571
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q004,rare,3,0,278.093
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q004,rare,3,0,26.770
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q004,rare,4,0,216.085
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q004,rare,4,0,245.827
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q004,rare,4,0,274.251
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q004,rare,4,0,26.881
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q004,rare,5,0,214.104
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q004,rare,5,0,242.256
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q004,rare,5,0,278.751
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q004,rare,5,0,26.453
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q004,rare,6,0,218.134
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q004,rare,6,0,244.774
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q004,rare,6,0,276.245
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q004,rare,6,0,26.965
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q005,rare,0,1,212.029
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q005,rare,0,1,236.264
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q005,rare,0,1,284.820
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q005,rare,0,1,27.214
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q005,rare,1,1,213.956
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q005,rare,1,1,232.020
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q005,rare,1,1,270.743
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q005,rare,1,1,26.064
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q005,rare,2,0,210.791
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q005,rare,2,0,231.738
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q005,rare,2,0,270.956
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q005,rare,2,0,26.381
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q005,rare,3,0,215.416
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q005,rare,3,0,233.110
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q005,rare,3,0,270.636
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q005,rare,3,0,26.123
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q005,rare,4,0,207.527
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q005,rare,4,0,233.280
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q005,rare,4,0,269.296
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q005,rare,4,0,25.942
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q005,rare,5,0,207.855
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q005,rare,5,0,233.042
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q005,rare,5,0,269.953
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q005,rare,5,0,26.554
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q005,rare,6,0,210.693
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q005,rare,6,0,229.742
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q005,rare,6,0,271.825
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q005,rare,6,0,26.223
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q006,rare,0,1,210.436
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q006,rare,0,1,235.246
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q006,rare,0,1,269.855
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q006,rare,0,1,26.290
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q006,rare,1,1,207.142
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q006,rare,1,1,230.099
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q006,rare,1,1,268.594
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q006,rare,1,1,26.380
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q006,rare,2,0,208.252
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q006,rare,2,0,233.629
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q006,rare,2,0,270.420
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q006,rare,2,0,26.303
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q006,rare,3,0,212.538
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q006,rare,3,0,232.802
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q006,rare,3,0,268.733
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q006,rare,3,0,26.389
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q006,rare,4,0,208.348
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q006,rare,4,0,235.378
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q006,rare,4,0,268.642
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q006,rare,4,0,26.478
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q006,rare,5,0,210.763
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q006,rare,5,0,230.025
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q006,rare,5,0,268.879
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q006,rare,5,0,26.724
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q006,rare,6,0,210.820
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q006,rare,6,0,231.478
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q006,rare,6,0,269.974
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q006,rare,6,0,26.244
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q007,rare,0,1,209.808
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q007,rare,0,1,231.250
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q007,rare,0,1,271.618
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q007,rare,0,1,26.582
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q007,rare,1,1,206.646
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q007,rare,1,1,234.078
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q007,rare,1,1,269.019
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q007,rare,1,1,26.655
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q007,rare,2,0,209.128
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q007,rare,2,0,232.665
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q007,rare,2,0,271.385
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q007,rare,2,0,26.231
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q007,rare,3,0,207.270
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q007,rare,3,0,228.726
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q007,rare,3,0,268.557
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q007,rare,3,0,26.832
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q007,rare,4,0,209.883
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q007,rare,4,0,233.166
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q007,rare,4,0,269.636
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q007,rare,4,0,25.995
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q007,rare,5,0,205.680
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q007,rare,5,0,230.018
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q007,rare,5,0,269.343
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q007,rare,5,0,26.460
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q007,rare,6,0,209.279
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q007,rare,6,0,231.121
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q007,rare,6,0,270.028
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q007,rare,6,0,26.319
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q008,rare,0,1,211.043
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q008,rare,0,1,229.740
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q008,rare,0,1,269.841
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q008,rare,0,1,26.262
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q008,rare,1,1,212.130
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q008,rare,1,1,233.741
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q008,rare,1,1,270.376
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q008,rare,1,1,26.570
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q008,rare,2,0,211.858
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q008,rare,2,0,236.952
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q008,rare,2,0,269.327
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q008,rare,2,0,26.262
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q008,rare,3,0,209.586
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q008,rare,3,0,230.714
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q008,rare,3,0,269.150
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q008,rare,3,0,26.362
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q008,rare,4,0,209.532
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q008,rare,4,0,233.430
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q008,rare,4,0,269.069
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q008,rare,4,0,26.303
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q008,rare,5,0,208.037
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q008,rare,5,0,234.656
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q008,rare,5,0,270.274
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q008,rare,5,0,26.695
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q008,rare,6,0,208.281
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q008,rare,6,0,233.163
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q008,rare,6,0,270.257
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q008,rare,6,0,26.331
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q009,rare,0,1,207.502
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q009,rare,0,1,234.526
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q009,rare,0,1,270.156
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q009,rare,0,1,26.510
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q009,rare,1,1,210.752
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q009,rare,1,1,232.733
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q009,rare,1,1,266.613
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q009,rare,1,1,26.486
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q009,rare,2,0,208.548
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q009,rare,2,0,233.843
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q009,rare,2,0,270.217
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q009,rare,2,0,26.456
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q009,rare,3,0,209.403
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q009,rare,3,0,230.876
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q009,rare,3,0,269.490
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q009,rare,3,0,26.329
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q009,rare,4,0,210.577
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q009,rare,4,0,234.165
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q009,rare,4,0,269.098
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q009,rare,4,0,25.928
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q009,rare,5,0,206.361
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q009,rare,5,0,232.063
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q009,rare,5,0,270.902
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q009,rare,5,0,26.300
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q009,rare,6,0,208.211
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q009,rare,6,0,233.109
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q009,rare,6,0,270.334
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q009,rare,6,0,26.091
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q010,rare,0,1,211.755
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q010,rare,0,1,232.169
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q010,rare,0,1,268.391
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q010,rare,0,1,26.624
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q010,rare,1,1,207.144
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q010,rare,1,1,234.889
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q010,rare,1,1,267.740
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q010,rare,1,1,26.407
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q010,rare,2,0,211.684
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q010,rare,2,0,229.546
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q010,rare,2,0,272.144
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q010,rare,2,0,26.444
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q010,rare,3,0,207.554
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q010,rare,3,0,234.849
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q010,rare,3,0,271.705
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q010,rare,3,0,26.232
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q010,rare,4,0,212.067
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q010,rare,4,0,229.620
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q010,rare,4,0,269.384
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q010,rare,4,0,26.469
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q010,rare,5,0,208.052
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q010,rare,5,0,232.853
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q010,rare,5,0,268.475
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q010,rare,5,0,25.972
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q010,rare,6,0,209.761
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q010,rare,6,0,235.016
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q010,rare,6,0,273.868
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q010,rare,6,0,26.439
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q011,common,0,1,212.052
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q011,common,0,1,235.478
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q011,common,0,1,278.280
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q011,common,0,1,29.424
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q011,common,1,1,209.569
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q011,common,1,1,232.619
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q011,common,1,1,281.228
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q011,common,1,1,27.223
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q011,common,2,0,213.283
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q011,common,2,0,238.930
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q011,common,2,0,273.306
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q011,common,2,0,26.997
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q011,common,3,0,212.743
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q011,common,3,0,235.803
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q011,common,3,0,266.030
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q011,common,3,0,26.285
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q011,common,4,0,203.679
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q011,common,4,0,225.698
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q011,common,4,0,267.482
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q011,common,4,0,26.380
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q011,common,5,0,202.729
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q011,common,5,0,225.100
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q011,common,5,0,265.056
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q011,common,5,0,26.350
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q011,common,6,0,206.017
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q011,common,6,0,235.945
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q011,common,6,0,272.350
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q011,common,6,0,27.079
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q012,common,0,1,206.542
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q012,common,0,1,234.581
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q012,common,0,1,275.239
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q012,common,0,1,26.822
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q012,common,1,1,210.925
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q012,common,1,1,238.224
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q012,common,1,1,275.058
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q012,common,1,1,26.870
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q012,common,2,0,208.640
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q012,common,2,0,233.477
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q012,common,2,0,278.640
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q012,common,2,0,28.350
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q012,common,3,0,213.713
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q012,common,3,0,236.823
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q012,common,3,0,276.937
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q012,common,3,0,26.400
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q012,common,4,0,210.767
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q012,common,4,0,237.502
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q012,common,4,0,276.593
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q012,common,4,0,26.663
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q012,common,5,0,213.328
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q012,common,5,0,238.939
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q012,common,5,0,276.407
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q012,common,5,0,26.837
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q012,common,6,0,210.413
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q012,common,6,0,239.303
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q012,common,6,0,278.267
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q012,common,6,0,27.188
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q013,common,0,1,209.592
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q013,common,0,1,234.132
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q013,common,0,1,275.040
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q013,common,0,1,27.177
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q013,common,1,1,211.072
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q013,common,1,1,233.620
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q013,common,1,1,272.835
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q013,common,1,1,27.352
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q013,common,2,0,210.501
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q013,common,2,0,233.776
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q013,common,2,0,275.411
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q013,common,2,0,27.083
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q013,common,3,0,208.863
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q013,common,3,0,228.716
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q013,common,3,0,275.781
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q013,common,3,0,27.119
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q013,common,4,0,211.965
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q013,common,4,0,234.434
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q013,common,4,0,277.922
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q013,common,4,0,27.118
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q013,common,5,0,211.778
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q013,common,5,0,236.451
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q013,common,5,0,275.470
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q013,common,5,0,26.613
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q013,common,6,0,213.142
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q013,common,6,0,235.790
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q013,common,6,0,276.580
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q013,common,6,0,26.822
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q014,common,0,1,206.770
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q014,common,0,1,234.357
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q014,common,0,1,275.079
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q014,common,0,1,26.785
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q014,common,1,1,209.070
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q014,common,1,1,239.484
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q014,common,1,1,276.418
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q014,common,1,1,26.298
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q014,common,2,0,210.258
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q014,common,2,0,238.218
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q014,common,2,0,273.157
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q014,common,2,0,27.489
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q014,common,3,0,210.932
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q014,common,3,0,235.415
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q014,common,3,0,278.325
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q014,common,3,0,26.724
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q014,common,4,0,209.732
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q014,common,4,0,237.466
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q014,common,4,0,283.925
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q014,common,4,0,26.845
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q014,common,5,0,210.538
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q014,common,5,0,239.377
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q014,common,5,0,276.393
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q014,common,5,0,26.766
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q014,common,6,0,207.811
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q014,common,6,0,239.919
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q014,common,6,0,276.661
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q014,common,6,0,26.912
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q015,common,0,1,206.509
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q015,common,0,1,232.725
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q015,common,0,1,274.629
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q015,common,0,1,26.956
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q015,common,1,1,210.232
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q015,common,1,1,232.029
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q015,common,1,1,276.150
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q015,common,1,1,26.705
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q015,common,2,0,209.673
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q015,common,2,0,235.332
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q015,common,2,0,272.803
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q015,common,2,0,26.542
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q015,common,3,0,206.691
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q015,common,3,0,234.152
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q015,common,3,0,284.397
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q015,common,3,0,27.037
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q015,common,4,0,208.031
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q015,common,4,0,231.373
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q015,common,4,0,272.062
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q015,common,4,0,26.792
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q015,common,5,0,206.308
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q015,common,5,0,235.736
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q015,common,5,0,274.748
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q015,common,5,0,26.895
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q015,common,6,0,206.262
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q015,common,6,0,229.253
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q015,common,6,0,270.271
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q015,common,6,0,27.077
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q016,common,0,1,208.856
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q016,common,0,1,239.988
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q016,common,0,1,274.837
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q016,common,0,1,27.195
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q016,common,1,1,210.914
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q016,common,1,1,230.068
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q016,common,1,1,277.787
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q016,common,1,1,26.676
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q016,common,2,0,211.270
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q016,common,2,0,234.331
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q016,common,2,0,280.601
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q016,common,2,0,26.937
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q016,common,3,0,210.916
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q016,common,3,0,236.711
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q016,common,3,0,278.534
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q016,common,3,0,26.781
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q016,common,4,0,208.809
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q016,common,4,0,224.384
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q016,common,4,0,263.660
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q016,common,4,0,26.353
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q016,common,5,0,202.932
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q016,common,5,0,222.838
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q016,common,5,0,268.839
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q016,common,5,0,26.254
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q016,common,6,0,202.311
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q016,common,6,0,225.263
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q016,common,6,0,265.254
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q016,common,6,0,26.041
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q017,common,0,1,202.903
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q017,common,0,1,227.841
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q017,common,0,1,267.867
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q017,common,0,1,26.351
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q017,common,1,1,202.394
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q017,common,1,1,225.141
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q017,common,1,1,275.741
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q017,common,1,1,27.456
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q017,common,2,0,206.427
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q017,common,2,0,228.020
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q017,common,2,0,265.490
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q017,common,2,0,26.527
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q017,common,3,0,202.277
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q017,common,3,0,224.584
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q017,common,3,0,265.545
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q017,common,3,0,26.282
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q017,common,4,0,203.579
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q017,common,4,0,226.292
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q017,common,4,0,267.261
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q017,common,4,0,26.293
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q017,common,5,0,203.997
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q017,common,5,0,230.393
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q017,common,5,0,265.483
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q017,common,5,0,26.252
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q017,common,6,0,202.967
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q017,common,6,0,227.883
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q017,common,6,0,264.639
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q017,common,6,0,26.378
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q018,common,0,1,201.020
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q018,common,0,1,224.354
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q018,common,0,1,261.975
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q018,common,0,1,26.123
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q018,common,1,1,200.822
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q018,common,1,1,224.639
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q018,common,1,1,263.964
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q018,common,1,1,25.992
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q018,common,2,0,202.126
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q018,common,2,0,222.620
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q018,common,2,0,262.763
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q018,common,2,0,26.177
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q018,common,3,0,201.414
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q018,common,3,0,222.020
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q018,common,3,0,262.828
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q018,common,3,0,26.054
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q018,common,4,0,202.259
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q018,common,4,0,225.420
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q018,common,4,0,264.055
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q018,common,4,0,26.635
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q018,common,5,0,200.151
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q018,common,5,0,224.631
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q018,common,5,0,261.212
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q018,common,5,0,25.848
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q018,common,6,0,199.566
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q018,common,6,0,223.644
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q018,common,6,0,263.746
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q018,common,6,0,26.777
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q019,rare+common,0,1,207.533
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q019,rare+common,0,1,232.416
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q019,rare+common,0,1,269.391
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q019,rare+common,0,1,26.196
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q019,rare+common,1,1,208.714
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q019,rare+common,1,1,241.374
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q019,rare+common,1,1,268.042
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q019,rare+common,1,1,25.977
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q019,rare+common,2,0,208.579
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q019,rare+common,2,0,232.671
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q019,rare+common,2,0,269.521
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q019,rare+common,2,0,26.214
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q019,rare+common,3,0,207.911
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q019,rare+common,3,0,234.033
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q019,rare+common,3,0,268.793
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q019,rare+common,3,0,26.701
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q019,rare+common,4,0,211.960
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q019,rare+common,4,0,233.404
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q019,rare+common,4,0,266.814
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q019,rare+common,4,0,26.155
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q019,rare+common,5,0,211.649
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q019,rare+common,5,0,235.232
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q019,rare+common,5,0,270.164
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q019,rare+common,5,0,26.514
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q019,rare+common,6,0,220.828
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q019,rare+common,6,0,230.992
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q019,rare+common,6,0,272.205
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q019,rare+common,6,0,28.089
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q020,rare+common,0,1,211.007
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q020,rare+common,0,1,231.330
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q020,rare+common,0,1,269.898
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q020,rare+common,0,1,26.285
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q020,rare+common,1,1,211.162
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q020,rare+common,1,1,234.078
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q020,rare+common,1,1,269.117
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q020,rare+common,1,1,26.225
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q020,rare+common,2,0,210.772
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q020,rare+common,2,0,234.832
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q020,rare+common,2,0,269.284
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q020,rare+common,2,0,26.410
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q020,rare+common,3,0,212.071
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q020,rare+common,3,0,233.348
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q020,rare+common,3,0,272.320
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q020,rare+common,3,0,25.747
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q020,rare+common,4,0,210.182
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q020,rare+common,4,0,235.255
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q020,rare+common,4,0,268.613
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q020,rare+common,4,0,26.376
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q020,rare+common,5,0,210.165
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q020,rare+common,5,0,233.112
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q020,rare+common,5,0,269.697
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q020,rare+common,5,0,27.561
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q020,rare+common,6,0,210.711
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q020,rare+common,6,0,233.104
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q020,rare+common,6,0,269.876
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q020,rare+common,6,0,26.278
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q021,rare+common,0,1,210.395
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q021,rare+common,0,1,234.907
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q021,rare+common,0,1,269.169
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q021,rare+common,0,1,26.220
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q021,rare+common,1,1,211.626
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q021,rare+common,1,1,242.564
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q021,rare+common,1,1,270.671
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q021,rare+common,1,1,26.415
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q021,rare+common,2,0,212.372
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q021,rare+common,2,0,229.277
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q021,rare+common,2,0,270.103
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q021,rare+common,2,0,26.514
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q021,rare+common,3,0,210.248
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q021,rare+common,3,0,233.332
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q021,rare+common,3,0,267.513
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q021,rare+common,3,0,26.450
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q021,rare+common,4,0,209.690
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q021,rare+common,4,0,230.538
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q021,rare+common,4,0,269.415
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q021,rare+common,4,0,26.735
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q021,rare+common,5,0,210.611
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q021,rare+common,5,0,233.747
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q021,rare+common,5,0,269.096
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q021,rare+common,5,0,26.028
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q021,rare+common,6,0,208.396
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q021,rare+common,6,0,232.819
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q021,rare+common,6,0,270.480
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q021,rare+common,6,0,26.575
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q022,rare+common,0,1,210.269
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q022,rare+common,0,1,235.634
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q022,rare+common,0,1,268.602
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q022,rare+common,0,1,26.347
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q022,rare+common,1,1,211.482
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q022,rare+common,1,1,232.691
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q022,rare+common,1,1,268.774
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q022,rare+common,1,1,26.146
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q022,rare+common,2,0,209.396
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q022,rare+common,2,0,234.048
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q022,rare+common,2,0,270.054
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q022,rare+common,2,0,26.221
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q022,rare+common,3,0,210.641
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q022,rare+common,3,0,234.914
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q022,rare+common,3,0,269.767
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q022,rare+common,3,0,26.703
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q022,rare+common,4,0,209.441
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q022,rare+common,4,0,234.704
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q022,rare+common,4,0,270.254
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q022,rare+common,4,0,26.616
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q022,rare+common,5,0,209.663
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q022,rare+common,5,0,232.494
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q022,rare+common,5,0,274.501
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q022,rare+common,5,0,26.421
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q022,rare+common,6,0,211.397
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q022,rare+common,6,0,233.377
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q022,rare+common,6,0,268.577
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q022,rare+common,6,0,26.524
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q023,rare+common,0,1,210.754
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q023,rare+common,0,1,234.093
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q023,rare+common,0,1,270.341
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q023,rare+common,0,1,26.495
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q023,rare+common,1,1,209.761
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q023,rare+common,1,1,236.922
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q023,rare+common,1,1,288.700
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q023,rare+common,1,1,26.526
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q023,rare+common,2,0,211.347
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q023,rare+common,2,0,234.069
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q023,rare+common,2,0,270.758
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q023,rare+common,2,0,26.847
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q023,rare+common,3,0,212.246
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q023,rare+common,3,0,233.171
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q023,rare+common,3,0,271.381
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q023,rare+common,3,0,26.366
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q023,rare+common,4,0,212.296
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q023,rare+common,4,0,232.888
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q023,rare+common,4,0,269.431
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q023,rare+common,4,0,26.188
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q023,rare+common,5,0,209.893
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q023,rare+common,5,0,235.007
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q023,rare+common,5,0,272.349
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q023,rare+common,5,0,26.103
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q023,rare+common,6,0,211.362
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q023,rare+common,6,0,233.807
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q023,rare+common,6,0,267.647
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q023,rare+common,6,0,26.545
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q024,rare+common,0,1,210.162
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q024,rare+common,0,1,233.483
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q024,rare+common,0,1,273.343
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q024,rare+common,0,1,26.017
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q024,rare+common,1,1,208.133
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q024,rare+common,1,1,237.767
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q024,rare+common,1,1,269.087
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q024,rare+common,1,1,26.180
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q024,rare+common,2,0,209.931
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q024,rare+common,2,0,231.281
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q024,rare+common,2,0,272.600
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q024,rare+common,2,0,26.486
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q024,rare+common,3,0,209.433
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q024,rare+common,3,0,234.056
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q024,rare+common,3,0,281.568
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q024,rare+common,3,0,26.963
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q024,rare+common,4,0,264.739
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q024,rare+common,4,0,237.946
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q024,rare+common,4,0,270.740
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q024,rare+common,4,0,26.419
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q024,rare+common,5,0,210.174
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q024,rare+common,5,0,232.372
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q024,rare+common,5,0,271.635
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q024,rare+common,5,0,26.234
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q024,rare+common,6,0,209.919
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q024,rare+common,6,0,235.549
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q024,rare+common,6,0,270.379
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q024,rare+common,6,0,26.397
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q025,rare+common,0,1,210.821
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q025,rare+common,0,1,235.514
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q025,rare+common,0,1,275.367
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q025,rare+common,0,1,26.405
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q025,rare+common,1,1,210.151
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q025,rare+common,1,1,231.883
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q025,rare+common,1,1,270.815
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q025,rare+common,1,1,26.775
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q025,rare+common,2,0,211.651
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q025,rare+common,2,0,235.241
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q025,rare+common,2,0,272.919
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q025,rare+common,2,0,26.446
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q025,rare+common,3,0,209.729
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q025,rare+common,3,0,234.520
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q025,rare+common,3,0,273.966
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q025,rare+common,3,0,26.427
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q025,rare+common,4,0,210.930
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q025,rare+common,4,0,232.969
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q025,rare+common,4,0,271.029
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q025,rare+common,4,0,26.442
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q025,rare+common,5,0,209.327
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q025,rare+common,5,0,234.558
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q025,rare+common,5,0,272.159
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q025,rare+common,5,0,26.554
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q025,rare+common,6,0,211.490
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q025,rare+common,6,0,232.631
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q025,rare+common,6,0,271.711
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q025,rare+common,6,0,26.522
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q026,rare+common,0,1,210.862
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q026,rare+common,0,1,234.551
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q026,rare+common,0,1,273.495
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q026,rare+common,0,1,26.755
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q026,rare+common,1,1,212.287
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q026,rare+common,1,1,234.217
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q026,rare+common,1,1,273.474
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q026,rare+common,1,1,26.478
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q026,rare+common,2,0,214.144
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q026,rare+common,2,0,234.088
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q026,rare+common,2,0,272.703
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q026,rare+common,2,0,26.242
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q026,rare+common,3,0,224.104
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q026,rare+common,3,0,235.023
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q026,rare+common,3,0,271.002
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q026,rare+common,3,0,25.957
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q026,rare+common,4,0,211.529
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q026,rare+common,4,0,239.308
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q026,rare+common,4,0,271.826
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q026,rare+common,4,0,26.269
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q026,rare+common,5,0,213.063
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q026,rare+common,5,0,236.227
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q026,rare+common,5,0,273.405
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q026,rare+common,5,0,26.412
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q026,rare+common,6,0,211.507
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q026,rare+common,6,0,232.810
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q026,rare+common,6,0,277.702
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q026,rare+common,6,0,26.408
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q027,common+common,0,1,200.714
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q027,common+common,0,1,227.897
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q027,common+common,0,1,269.232
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q027,common+common,0,1,26.387
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q027,common+common,1,1,201.162
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q027,common+common,1,1,227.712
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q027,common+common,1,1,281.484
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q027,common+common,1,1,27.877
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q027,common+common,2,0,203.737
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q027,common+common,2,0,228.813
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q027,common+common,2,0,268.595
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q027,common+common,2,0,26.284
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q027,common+common,3,0,201.427
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q027,common+common,3,0,227.000
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q027,common+common,3,0,264.619
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q027,common+common,3,0,26.231
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q027,common+common,4,0,200.808
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q027,common+common,4,0,229.260
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q027,common+common,4,0,269.179
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q027,common+common,4,0,26.380
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q027,common+common,5,0,198.186
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q027,common+common,5,0,229.386
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q027,common+common,5,0,268.684
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q027,common+common,5,0,26.028
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q027,common+common,6,0,202.852
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q027,common+common,6,0,225.799
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q027,common+common,6,0,267.696
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q027,common+common,6,0,26.607
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q028,common+common,0,1,202.956
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q028,common+common,0,1,227.810
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q028,common+common,0,1,265.800
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q028,common+common,0,1,26.170
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q028,common+common,1,1,202.498
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q028,common+common,1,1,224.649
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q028,common+common,1,1,266.528
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q028,common+common,1,1,26.455
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q028,common+common,2,0,210.432
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q028,common+common,2,0,226.081
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q028,common+common,2,0,267.454
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q028,common+common,2,0,26.955
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q028,common+common,3,0,203.677
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q028,common+common,3,0,222.888
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q028,common+common,3,0,264.628
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q028,common+common,3,0,26.225
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q028,common+common,4,0,205.807
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q028,common+common,4,0,233.895
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q028,common+common,4,0,267.923
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q028,common+common,4,0,26.608
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q028,common+common,5,0,207.490
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q028,common+common,5,0,226.289
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q028,common+common,5,0,266.027
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q028,common+common,5,0,26.062
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q028,common+common,6,0,201.107
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q028,common+common,6,0,226.177
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q028,common+common,6,0,267.676
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q028,common+common,6,0,26.345
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q029,common+common,0,1,202.730
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q029,common+common,0,1,229.604
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q029,common+common,0,1,270.064
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q029,common+common,0,1,26.714
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q029,common+common,1,1,200.442
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q029,common+common,1,1,226.667
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q029,common+common,1,1,269.012
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q029,common+common,1,1,26.575
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q029,common+common,2,0,202.322
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q029,common+common,2,0,230.374
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q029,common+common,2,0,270.456
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q029,common+common,2,0,26.225
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q029,common+common,3,0,201.753
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q029,common+common,3,0,226.136
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q029,common+common,3,0,271.290
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q029,common+common,3,0,26.488
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q029,common+common,4,0,203.842
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q029,common+common,4,0,228.139
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q029,common+common,4,0,268.135
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q029,common+common,4,0,26.150
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q029,common+common,5,0,202.768
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q029,common+common,5,0,225.600
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q029,common+common,5,0,271.310
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q029,common+common,5,0,26.918
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q029,common+common,6,0,202.926
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q029,common+common,6,0,230.273
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q029,common+common,6,0,277.302
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q029,common+common,6,0,26.488
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q030,common+common,0,1,206.003
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q030,common+common,0,1,234.302
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q030,common+common,0,1,267.427
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q030,common+common,0,1,26.192
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q030,common+common,1,1,205.082
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q030,common+common,1,1,228.003
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q030,common+common,1,1,266.766
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q030,common+common,1,1,26.174
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q030,common+common,2,0,204.909
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q030,common+common,2,0,223.899
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q030,common+common,2,0,269.328
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q030,common+common,2,0,26.339
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q030,common+common,3,0,206.377
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q030,common+common,3,0,228.093
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q030,common+common,3,0,268.829
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q030,common+common,3,0,26.580
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q030,common+common,4,0,207.030
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q030,common+common,4,0,229.118
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q030,common+common,4,0,265.135
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q030,common+common,4,0,26.366
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q030,common+common,5,0,206.296
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q030,common+common,5,0,226.912
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q030,common+common,5,0,271.338
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q030,common+common,5,0,26.220
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q030,common+common,6,0,207.487
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q030,common+common,6,0,227.772
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q030,common+common,6,0,268.153
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q030,common+common,6,0,26.438
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q031,common+common,0,1,203.505
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q031,common+common,0,1,221.536
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q031,common+common,0,1,265.767
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q031,common+common,0,1,26.500
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q031,common+common,1,1,204.845
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q031,common+common,1,1,224.409
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q031,common+common,1,1,265.826
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q031,common+common,1,1,26.449
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q031,common+common,2,0,201.966
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q031,common+common,2,0,229.879
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q031,common+common,2,0,266.102
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q031,common+common,2,0,26.310
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q031,common+common,3,0,204.406
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q031,common+common,3,0,222.898
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q031,common+common,3,0,264.302
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q031,common+common,3,0,26.751
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q031,common+common,4,0,203.579
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q031,common+common,4,0,227.127
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q031,common+common,4,0,263.805
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q031,common+common,4,0,26.452
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q031,common+common,5,0,205.766
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q031,common+common,5,0,226.393
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q031,common+common,5,0,265.640
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q031,common+common,5,0,26.958
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q031,common+common,6,0,218.700
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q031,common+common,6,0,230.186
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q031,common+common,6,0,268.002
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q031,common+common,6,0,26.098
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q032,common+common,0,1,205.722
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q032,common+common,0,1,229.035
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q032,common+common,0,1,269.914
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q032,common+common,0,1,26.625
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q032,common+common,1,1,205.390
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q032,common+common,1,1,226.820
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q032,common+common,1,1,268.530
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q032,common+common,1,1,26.299
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q032,common+common,2,0,205.055
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q032,common+common,2,0,229.170
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q032,common+common,2,0,267.503
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q032,common+common,2,0,26.336
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q032,common+common,3,0,209.223
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q032,common+common,3,0,227.981
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q032,common+common,3,0,266.743
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q032,common+common,3,0,26.382
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q032,common+common,4,0,205.774
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q032,common+common,4,0,227.510
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q032,common+common,4,0,268.108
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q032,common+common,4,0,26.688
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q032,common+common,5,0,209.606
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q032,common+common,5,0,228.959
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q032,common+common,5,0,267.927
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q032,common+common,5,0,26.345
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q032,common+common,6,0,205.499
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q032,common+common,6,0,229.756
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q032,common+common,6,0,273.889
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q032,common+common,6,0,26.506
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q033,common+common,0,1,203.555
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q033,common+common,0,1,225.253
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q033,common+common,0,1,267.094
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q033,common+common,0,1,26.445
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q033,common+common,1,1,203.211
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q033,common+common,1,1,223.439
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q033,common+common,1,1,266.518
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q033,common+common,1,1,26.301
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q033,common+common,2,0,204.630
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q033,common+common,2,0,228.606
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q033,common+common,2,0,268.829
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q033,common+common,2,0,26.620
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q033,common+common,3,0,205.032
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q033,common+common,3,0,232.573
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q033,common+common,3,0,267.470
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q033,common+common,3,0,26.693
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q033,common+common,4,0,201.278
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q033,common+common,4,0,227.203
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q033,common+common,4,0,266.642
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q033,common+common,4,0,26.806
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q033,common+common,5,0,207.166
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q033,common+common,5,0,224.579
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q033,common+common,5,0,276.488
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q033,common+common,5,0,26.535
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q033,common+common,6,0,204.122
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q033,common+common,6,0,227.899
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q033,common+common,6,0,267.411
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q033,common+common,6,0,26.508
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q034,common+common,0,1,208.111
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q034,common+common,0,1,230.597
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q034,common+common,0,1,271.551
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q034,common+common,0,1,26.727
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q034,common+common,1,1,205.614
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q034,common+common,1,1,228.041
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q034,common+common,1,1,269.099
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q034,common+common,1,1,26.506
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q034,common+common,2,0,208.160
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q034,common+common,2,0,229.574
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q034,common+common,2,0,270.272
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q034,common+common,2,0,26.724
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q034,common+common,3,0,208.463
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q034,common+common,3,0,237.751
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q034,common+common,3,0,268.687
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q034,common+common,3,0,26.352
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q034,common+common,4,0,206.455
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q034,common+common,4,0,236.814
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q034,common+common,4,0,270.000
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q034,common+common,4,0,26.379
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q034,common+common,5,0,210.498
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q034,common+common,5,0,229.521
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q034,common+common,5,0,269.647
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q034,common+common,5,0,26.032
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q034,common+common,6,0,210.082
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q034,common+common,6,0,230.897
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q034,common+common,6,0,269.518
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q034,common+common,6,0,26.430
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q035,phrase,0,1,199.955
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q035,phrase,0,1,230.187
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q035,phrase,0,1,267.325
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q035,phrase,0,1,26.269
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q035,phrase,1,1,210.130
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q035,phrase,1,1,242.205
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q035,phrase,1,1,266.418
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q035,phrase,1,1,26.100
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q035,phrase,2,0,204.273
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q035,phrase,2,0,227.869
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q035,phrase,2,0,268.929
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q035,phrase,2,0,26.374
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q035,phrase,3,0,201.986
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q035,phrase,3,0,230.556
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q035,phrase,3,0,267.570
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q035,phrase,3,0,26.659
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q035,phrase,4,0,199.868
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q035,phrase,4,0,225.638
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q035,phrase,4,0,266.605
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q035,phrase,4,0,26.281
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q035,phrase,5,0,203.958
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q035,phrase,5,0,227.685
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q035,phrase,5,0,267.684
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q035,phrase,5,0,26.611
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q035,phrase,6,0,201.191
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q035,phrase,6,0,229.640
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q035,phrase,6,0,275.702
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q035,phrase,6,0,26.290
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q036,phrase,0,1,202.637
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q036,phrase,0,1,230.488
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q036,phrase,0,1,265.551
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q036,phrase,0,1,26.503
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q036,phrase,1,1,201.510
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q036,phrase,1,1,228.306
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q036,phrase,1,1,266.862
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q036,phrase,1,1,26.214
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q036,phrase,2,0,206.728
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q036,phrase,2,0,227.008
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q036,phrase,2,0,266.122
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q036,phrase,2,0,26.593
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q036,phrase,3,0,202.449
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q036,phrase,3,0,229.780
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q036,phrase,3,0,268.863
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q036,phrase,3,0,26.476
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q036,phrase,4,0,202.249
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q036,phrase,4,0,233.382
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q036,phrase,4,0,271.294
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q036,phrase,4,0,29.070
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q036,phrase,5,0,204.335
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q036,phrase,5,0,229.254
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q036,phrase,5,0,269.488
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q036,phrase,5,0,26.658
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q036,phrase,6,0,206.489
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q036,phrase,6,0,231.006
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q036,phrase,6,0,269.619
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q036,phrase,6,0,26.516
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q037,phrase,0,1,208.243
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q037,phrase,0,1,229.502
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q037,phrase,0,1,266.583
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q037,phrase,0,1,26.430
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q037,phrase,1,1,208.849
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q037,phrase,1,1,233.790
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q037,phrase,1,1,267.907
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q037,phrase,1,1,26.983
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q037,phrase,2,0,207.548
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q037,phrase,2,0,226.145
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q037,phrase,2,0,267.324
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q037,phrase,2,0,26.309
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q037,phrase,3,0,207.686
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q037,phrase,3,0,228.488
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q037,phrase,3,0,267.172
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q037,phrase,3,0,26.607
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q037,phrase,4,0,209.552
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q037,phrase,4,0,227.459
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q037,phrase,4,0,267.342
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q037,phrase,4,0,26.120
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q037,phrase,5,0,211.589
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q037,phrase,5,0,228.208
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q037,phrase,5,0,270.331
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q037,phrase,5,0,26.657
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q037,phrase,6,0,210.322
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q037,phrase,6,0,227.772
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q037,phrase,6,0,265.988
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q037,phrase,6,0,26.187
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q038,phrase,0,1,206.056
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q038,phrase,0,1,228.766
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q038,phrase,0,1,266.547
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q038,phrase,0,1,26.574
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q038,phrase,1,1,204.148
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q038,phrase,1,1,228.705
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q038,phrase,1,1,273.285
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q038,phrase,1,1,26.111
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q038,phrase,2,0,205.008
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q038,phrase,2,0,227.371
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q038,phrase,2,0,268.266
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q038,phrase,2,0,26.517
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q038,phrase,3,0,207.784
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q038,phrase,3,0,224.651
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q038,phrase,3,0,270.386
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q038,phrase,3,0,26.378
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q038,phrase,4,0,204.559
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q038,phrase,4,0,228.385
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q038,phrase,4,0,268.786
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q038,phrase,4,0,26.739
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q038,phrase,5,0,206.136
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q038,phrase,5,0,228.736
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q038,phrase,5,0,267.310
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q038,phrase,5,0,26.202
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q038,phrase,6,0,210.354
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q038,phrase,6,0,234.404
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q038,phrase,6,0,271.422
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q038,phrase,6,0,27.041
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q039,phrase,0,1,204.506
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q039,phrase,0,1,231.472
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q039,phrase,0,1,267.107
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q039,phrase,0,1,26.433
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q039,phrase,1,1,205.425
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q039,phrase,1,1,235.181
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q039,phrase,1,1,270.487
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q039,phrase,1,1,27.795
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q039,phrase,2,0,201.416
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q039,phrase,2,0,230.857
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q039,phrase,2,0,269.342
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q039,phrase,2,0,28.942
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q039,phrase,3,0,204.201
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q039,phrase,3,0,230.078
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q039,phrase,3,0,270.607
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q039,phrase,3,0,26.031
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q039,phrase,4,0,202.466
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q039,phrase,4,0,231.441
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q039,phrase,4,0,270.338
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q039,phrase,4,0,26.414
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q039,phrase,5,0,201.963
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q039,phrase,5,0,230.837
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q039,phrase,5,0,272.798
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q039,phrase,5,0,26.349
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q039,phrase,6,0,204.348
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q039,phrase,6,0,229.665
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q039,phrase,6,0,268.556
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q039,phrase,6,0,26.977
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q040,phrase,0,1,208.967
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q040,phrase,0,1,231.573
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q040,phrase,0,1,269.449
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q040,phrase,0,1,26.593
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q040,phrase,1,1,204.695
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q040,phrase,1,1,229.894
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q040,phrase,1,1,267.809
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q040,phrase,1,1,26.283
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q040,phrase,2,0,202.109
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q040,phrase,2,0,232.836
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q040,phrase,2,0,270.720
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q040,phrase,2,0,26.680
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q040,phrase,3,0,204.488
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q040,phrase,3,0,228.362
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q040,phrase,3,0,270.380
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q040,phrase,3,0,26.507
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q040,phrase,4,0,204.516
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q040,phrase,4,0,230.248
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q040,phrase,4,0,267.866
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q040,phrase,4,0,26.285
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q040,phrase,5,0,202.773
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q040,phrase,5,0,229.972
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q040,phrase,5,0,267.143
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q040,phrase,5,0,26.244
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q040,phrase,6,0,203.096
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q040,phrase,6,0,230.491
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q040,phrase,6,0,268.821
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q040,phrase,6,0,26.237
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q041,phrase,0,1,202.916
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q041,phrase,0,1,231.208
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q041,phrase,0,1,271.049
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q041,phrase,0,1,26.107
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q041,phrase,1,1,206.029
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q041,phrase,1,1,229.355
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q041,phrase,1,1,269.816
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q041,phrase,1,1,26.673
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q041,phrase,2,0,207.225
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q041,phrase,2,0,232.419
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q041,phrase,2,0,268.625
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q041,phrase,2,0,26.689
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q041,phrase,3,0,204.911
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q041,phrase,3,0,229.207
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q041,phrase,3,0,272.005
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q041,phrase,3,0,26.424
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q041,phrase,4,0,206.620
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q041,phrase,4,0,229.262
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q041,phrase,4,0,268.212
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q041,phrase,4,0,26.758
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q041,phrase,5,0,207.407
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q041,phrase,5,0,231.968
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q041,phrase,5,0,270.418
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q041,phrase,5,0,26.517
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q041,phrase,6,0,206.867
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q041,phrase,6,0,229.578
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q041,phrase,6,0,267.674
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q041,phrase,6,0,26.407
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q042,phrase,0,1,203.461
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q042,phrase,0,1,225.325
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q042,phrase,0,1,265.572
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q042,phrase,0,1,26.652
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q042,phrase,1,1,207.167
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q042,phrase,1,1,227.253
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q042,phrase,1,1,265.491
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q042,phrase,1,1,26.478
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q042,phrase,2,0,206.121
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q042,phrase,2,0,224.408
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q042,phrase,2,0,269.941
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q042,phrase,2,0,26.199
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q042,phrase,3,0,205.320
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q042,phrase,3,0,226.519
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q042,phrase,3,0,265.448
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q042,phrase,3,0,25.934
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q042,phrase,4,0,203.373
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q042,phrase,4,0,232.758
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q042,phrase,4,0,266.165
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q042,phrase,4,0,26.197
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q042,phrase,5,0,206.577
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q042,phrase,5,0,225.531
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q042,phrase,5,0,267.653
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q042,phrase,5,0,27.831
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q042,phrase,6,0,205.086
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q042,phrase,6,0,229.772
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q042,phrase,6,0,266.230
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q042,phrase,6,0,26.516
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q043,natural,0,1,209.743
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q043,natural,0,1,230.799
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q043,natural,0,1,275.032
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q043,natural,0,1,26.344
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q043,natural,1,1,210.171
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q043,natural,1,1,231.688
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q043,natural,1,1,272.762
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q043,natural,1,1,26.325
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q043,natural,2,0,210.759
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q043,natural,2,0,230.226
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q043,natural,2,0,274.107
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q043,natural,2,0,26.494
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q043,natural,3,0,211.735
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q043,natural,3,0,234.391
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q043,natural,3,0,272.904
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q043,natural,3,0,26.696
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q043,natural,4,0,207.367
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q043,natural,4,0,232.624
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q043,natural,4,0,271.127
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q043,natural,4,0,26.396
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q043,natural,5,0,210.120
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q043,natural,5,0,231.309
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q043,natural,5,0,271.364
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q043,natural,5,0,26.485
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q043,natural,6,0,209.068
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q043,natural,6,0,231.801
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q043,natural,6,0,273.047
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q043,natural,6,0,26.359
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q044,natural,0,1,210.144
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q044,natural,0,1,230.908
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q044,natural,0,1,271.642
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q044,natural,0,1,26.375
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q044,natural,1,1,208.760
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q044,natural,1,1,233.493
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q044,natural,1,1,269.872
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q044,natural,1,1,26.644
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q044,natural,2,0,207.974
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q044,natural,2,0,231.606
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q044,natural,2,0,271.125
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q044,natural,2,0,26.749
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q044,natural,3,0,208.151
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q044,natural,3,0,231.850
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q044,natural,3,0,271.386
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q044,natural,3,0,26.558
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q044,natural,4,0,210.474
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q044,natural,4,0,239.076
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q044,natural,4,0,271.397
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q044,natural,4,0,26.225
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q044,natural,5,0,210.380
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q044,natural,5,0,234.286
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q044,natural,5,0,271.916
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q044,natural,5,0,26.503
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q044,natural,6,0,207.852
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q044,natural,6,0,232.834
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q044,natural,6,0,273.761
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q044,natural,6,0,26.118
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q045,natural,0,1,211.802
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q045,natural,0,1,236.832
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q045,natural,0,1,272.369
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q045,natural,0,1,26.722
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q045,natural,1,1,214.081
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q045,natural,1,1,236.942
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q045,natural,1,1,274.036
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q045,natural,1,1,26.420
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q045,natural,2,0,209.351
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q045,natural,2,0,234.355
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q045,natural,2,0,272.528
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q045,natural,2,0,26.624
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q045,natural,3,0,216.020
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q045,natural,3,0,245.619
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q045,natural,3,0,273.816
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q045,natural,3,0,26.411
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q045,natural,4,0,210.856
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q045,natural,4,0,235.777
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q045,natural,4,0,273.514
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q045,natural,4,0,26.658
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q045,natural,5,0,207.965
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q045,natural,5,0,238.624
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q045,natural,5,0,277.526
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q045,natural,5,0,26.031
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q045,natural,6,0,209.212
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q045,natural,6,0,231.668
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q045,natural,6,0,271.832
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q045,natural,6,0,26.199
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q046,natural,0,1,206.611
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q046,natural,0,1,230.876
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q046,natural,0,1,270.514
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q046,natural,0,1,26.418
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q046,natural,1,1,211.294
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q046,natural,1,1,230.546
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q046,natural,1,1,274.514
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q046,natural,1,1,26.337
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q046,natural,2,0,207.359
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q046,natural,2,0,231.183
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q046,natural,2,0,270.283
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q046,natural,2,0,26.301
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q046,natural,3,0,208.710
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q046,natural,3,0,230.427
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q046,natural,3,0,270.527
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q046,natural,3,0,26.516
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q046,natural,4,0,208.955
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q046,natural,4,0,233.044
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q046,natural,4,0,270.915
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q046,natural,4,0,26.285
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q046,natural,5,0,208.522
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q046,natural,5,0,236.161
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q046,natural,5,0,270.262
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q046,natural,5,0,26.286
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q046,natural,6,0,204.886
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q046,natural,6,0,229.933
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q046,natural,6,0,270.461
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q046,natural,6,0,26.403
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q047,natural,0,1,210.134
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q047,natural,0,1,235.366
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q047,natural,0,1,273.813
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q047,natural,0,1,26.106
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q047,natural,1,1,208.310
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q047,natural,1,1,233.682
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q047,natural,1,1,274.263
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q047,natural,1,1,26.672
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q047,natural,2,0,210.217
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q047,natural,2,0,237.978
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q047,natural,2,0,273.161
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q047,natural,2,0,26.425
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q047,natural,3,0,209.287
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q047,natural,3,0,234.720
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q047,natural,3,0,280.625
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q047,natural,3,0,26.144
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q047,natural,4,0,205.235
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q047,natural,4,0,239.168
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q047,natural,4,0,272.821
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q047,natural,4,0,26.601
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q047,natural,5,0,209.528
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q047,natural,5,0,234.736
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q047,natural,5,0,272.258
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q047,natural,5,0,26.472
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q047,natural,6,0,209.621
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q047,natural,6,0,234.389
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q047,natural,6,0,273.199
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q047,natural,6,0,26.500
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q048,natural,0,1,213.448
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q048,natural,0,1,229.087
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q048,natural,0,1,271.005
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q048,natural,0,1,26.617
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q048,natural,1,1,211.564
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q048,natural,1,1,231.416
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q048,natural,1,1,272.876
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q048,natural,1,1,26.539
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q048,natural,2,0,211.113
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q048,natural,2,0,233.851
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q048,natural,2,0,272.296
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q048,natural,2,0,26.309
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q048,natural,3,0,208.681
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q048,natural,3,0,230.485
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q048,natural,3,0,270.190
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q048,natural,3,0,26.842
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q048,natural,4,0,210.850
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q048,natural,4,0,234.629
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q048,natural,4,0,271.362
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q048,natural,4,0,26.060
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q048,natural,5,0,209.362
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q048,natural,5,0,231.260
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q048,natural,5,0,271.744
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q048,natural,5,0,30.880
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q048,natural,6,0,211.981
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q048,natural,6,0,233.668
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q048,natural,6,0,271.269
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q048,natural,6,0,26.286
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q049,natural,0,1,204.727
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q049,natural,0,1,234.720
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q049,natural,0,1,272.111
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q049,natural,0,1,26.501
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q049,natural,1,1,207.640
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q049,natural,1,1,239.382
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q049,natural,1,1,270.417
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q049,natural,1,1,26.238
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q049,natural,2,0,207.730
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q049,natural,2,0,231.971
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q049,natural,2,0,270.462
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q049,natural,2,0,27.403
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q049,natural,3,0,208.584
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q049,natural,3,0,232.272
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q049,natural,3,0,271.697
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q049,natural,3,0,26.436
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q049,natural,4,0,207.323
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q049,natural,4,0,234.162
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q049,natural,4,0,271.041
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q049,natural,4,0,27.301
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q049,natural,5,0,206.629
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q049,natural,5,0,234.439
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q049,natural,5,0,273.300
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q049,natural,5,0,27.045
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q049,natural,6,0,207.034
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q049,natural,6,0,233.773
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q049,natural,6,0,271.892
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q049,natural,6,0,26.478
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q050,natural,0,1,207.322
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q050,natural,0,1,231.210
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q050,natural,0,1,268.087
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q050,natural,0,1,26.474
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q050,natural,1,1,206.390
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q050,natural,1,1,231.336
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q050,natural,1,1,269.724
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q050,natural,1,1,26.486
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q050,natural,2,0,207.932
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q050,natural,2,0,232.376
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q050,natural,2,0,271.441
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q050,natural,2,0,26.948
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q050,natural,3,0,209.197
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q050,natural,3,0,230.352
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q050,natural,3,0,269.713
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q050,natural,3,0,26.404
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q050,natural,4,0,207.135
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q050,natural,4,0,235.423
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q050,natural,4,0,270.078
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q050,natural,4,0,26.671
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q050,natural,5,0,203.470
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q050,natural,5,0,226.637
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q050,natural,5,0,271.021
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q050,natural,5,0,26.338
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q050,natural,6,0,209.591
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q050,natural,6,0,235.428
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q050,natural,6,0,268.814
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q050,natural,6,0,26.431
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q051,domain,0,1,72.632
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q051,domain,0,1,102.366
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q051,domain,0,1,185.121
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q051,domain,0,1,26.543
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q051,domain,1,1,72.261
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q051,domain,1,1,103.422
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q051,domain,1,1,182.183
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q051,domain,1,1,26.698
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q051,domain,2,0,72.035
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q051,domain,2,0,102.511
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q051,domain,2,0,186.675
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q051,domain,2,0,26.265
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q051,domain,3,0,72.283
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q051,domain,3,0,104.227
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q051,domain,3,0,183.148
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q051,domain,3,0,26.365
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q051,domain,4,0,73.307
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q051,domain,4,0,103.841
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q051,domain,4,0,181.103
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q051,domain,4,0,26.117
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q051,domain,5,0,73.479
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q051,domain,5,0,104.464
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q051,domain,5,0,183.183
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q051,domain,5,0,26.785
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q051,domain,6,0,72.197
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q051,domain,6,0,103.721
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q051,domain,6,0,190.692
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q051,domain,6,0,26.499
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q052,domain,0,1,69.935
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q052,domain,0,1,100.442
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q052,domain,0,1,185.470
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q052,domain,0,1,26.127
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q052,domain,1,1,71.733
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q052,domain,1,1,101.485
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q052,domain,1,1,182.864
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q052,domain,1,1,26.458
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q052,domain,2,0,71.088
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q052,domain,2,0,100.616
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q052,domain,2,0,183.330
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q052,domain,2,0,26.285
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q052,domain,3,0,71.191
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q052,domain,3,0,101.109
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q052,domain,3,0,188.305
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q052,domain,3,0,26.335
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q052,domain,4,0,71.547
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q052,domain,4,0,102.465
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q052,domain,4,0,183.322
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q052,domain,4,0,26.284
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q052,domain,5,0,70.992
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q052,domain,5,0,100.243
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q052,domain,5,0,188.732
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q052,domain,5,0,26.392
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q052,domain,6,0,71.154
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q052,domain,6,0,102.663
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q052,domain,6,0,183.026
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q052,domain,6,0,26.275
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q053,domain,0,1,71.360
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q053,domain,0,1,103.300
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q053,domain,0,1,182.472
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q053,domain,0,1,26.042
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q053,domain,1,1,71.798
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q053,domain,1,1,102.436
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q053,domain,1,1,183.356
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q053,domain,1,1,26.731
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q053,domain,2,0,72.871
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q053,domain,2,0,102.346
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q053,domain,2,0,184.584
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q053,domain,2,0,26.498
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q053,domain,3,0,73.947
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q053,domain,3,0,108.478
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q053,domain,3,0,183.465
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q053,domain,3,0,26.360
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q053,domain,4,0,73.879
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q053,domain,4,0,105.292
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q053,domain,4,0,183.118
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q053,domain,4,0,26.355
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q053,domain,5,0,73.975
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q053,domain,5,0,105.684
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q053,domain,5,0,183.305
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q053,domain,5,0,26.337
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q053,domain,6,0,71.218
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q053,domain,6,0,103.198
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q053,domain,6,0,181.553
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q053,domain,6,0,26.605
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q054,domain,0,1,70.415
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q054,domain,0,1,102.176
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q054,domain,0,1,183.208
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q054,domain,0,1,27.263
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q054,domain,1,1,72.583
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q054,domain,1,1,102.486
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q054,domain,1,1,182.870
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q054,domain,1,1,26.300
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q054,domain,2,0,70.694
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q054,domain,2,0,105.723
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q054,domain,2,0,197.615
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q054,domain,2,0,26.248
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q054,domain,3,0,72.363
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q054,domain,3,0,102.163
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q054,domain,3,0,184.391
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q054,domain,3,0,25.976
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q054,domain,4,0,72.017
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q054,domain,4,0,100.529
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q054,domain,4,0,180.918
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q054,domain,4,0,26.554
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q054,domain,5,0,72.107
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q054,domain,5,0,100.453
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q054,domain,5,0,182.442
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q054,domain,5,0,26.240
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q054,domain,6,0,71.100
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q054,domain,6,0,104.482
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q054,domain,6,0,179.726
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q054,domain,6,0,26.337
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q055,domain,0,1,71.244
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q055,domain,0,1,101.630
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q055,domain,0,1,183.824
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q055,domain,0,1,26.684
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q055,domain,1,1,70.094
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q055,domain,1,1,103.232
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q055,domain,1,1,182.239
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q055,domain,1,1,26.220
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q055,domain,2,0,71.672
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q055,domain,2,0,102.937
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q055,domain,2,0,182.955
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q055,domain,2,0,26.426
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q055,domain,3,0,70.915
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q055,domain,3,0,101.390
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q055,domain,3,0,181.089
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q055,domain,3,0,26.368
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q055,domain,4,0,71.160
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q055,domain,4,0,101.872
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q055,domain,4,0,183.626
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q055,domain,4,0,26.421
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q055,domain,5,0,71.860
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q055,domain,5,0,102.466
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q055,domain,5,0,180.299
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q055,domain,5,0,26.888
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q055,domain,6,0,70.411
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q055,domain,6,0,101.721
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q055,domain,6,0,183.457
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q055,domain,6,0,26.505
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q056,domain,0,1,73.069
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q056,domain,0,1,100.313
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q056,domain,0,1,188.291
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q056,domain,0,1,26.950
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q056,domain,1,1,71.842
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q056,domain,1,1,102.842
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q056,domain,1,1,184.903
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q056,domain,1,1,26.202
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q056,domain,2,0,74.059
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q056,domain,2,0,102.708
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q056,domain,2,0,181.751
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q056,domain,2,0,26.662
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q056,domain,3,0,73.336
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q056,domain,3,0,102.185
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q056,domain,3,0,187.115
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q056,domain,3,0,26.705
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q056,domain,4,0,73.993
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q056,domain,4,0,102.821
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q056,domain,4,0,186.099
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q056,domain,4,0,26.322
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q056,domain,5,0,73.641
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q056,domain,5,0,102.338
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q056,domain,5,0,183.072
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q056,domain,5,0,26.044
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q056,domain,6,0,72.361
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q056,domain,6,0,102.965
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q056,domain,6,0,185.838
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q056,domain,6,0,26.642
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q057,domain,0,1,69.887
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q057,domain,0,1,103.412
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q057,domain,0,1,185.426
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q057,domain,0,1,26.540
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q057,domain,1,1,70.131
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q057,domain,1,1,101.959
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q057,domain,1,1,182.151
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q057,domain,1,1,26.055
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q057,domain,2,0,71.644
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q057,domain,2,0,100.761
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q057,domain,2,0,182.016
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q057,domain,2,0,26.746
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q057,domain,3,0,71.002
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q057,domain,3,0,100.494
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q057,domain,3,0,182.806
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q057,domain,3,0,26.773
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q057,domain,4,0,70.826
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q057,domain,4,0,101.941
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q057,domain,4,0,182.743
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q057,domain,4,0,26.367
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q057,domain,5,0,71.812
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q057,domain,5,0,101.377
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q057,domain,5,0,181.809
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q057,domain,5,0,26.231
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q057,domain,6,0,71.553
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q057,domain,6,0,101.290
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q057,domain,6,0,182.281
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q057,domain,6,0,26.603
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q058,domain,0,1,73.004
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q058,domain,0,1,103.055
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q058,domain,0,1,188.232
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q058,domain,0,1,26.431
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q058,domain,1,1,72.849
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q058,domain,1,1,100.571
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q058,domain,1,1,187.706
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q058,domain,1,1,26.539
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q058,domain,2,0,72.819
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q058,domain,2,0,100.590
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q058,domain,2,0,186.640
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q058,domain,2,0,26.204
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q058,domain,3,0,72.710
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q058,domain,3,0,101.009
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q058,domain,3,0,181.705
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q058,domain,3,0,26.285
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q058,domain,4,0,73.379
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q058,domain,4,0,100.775
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q058,domain,4,0,187.112
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q058,domain,4,0,26.451
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q058,domain,5,0,73.192
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q058,domain,5,0,102.501
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q058,domain,5,0,187.972
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q058,domain,5,0,26.090
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q058,domain,6,0,73.222
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q058,domain,6,0,105.335
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q058,domain,6,0,185.520
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q058,domain,6,0,26.293
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q059,domain,0,1,70.577
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q059,domain,0,1,100.843
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q059,domain,0,1,183.804
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q059,domain,0,1,26.813
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q059,domain,1,1,71.185
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q059,domain,1,1,103.326
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q059,domain,1,1,184.674
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q059,domain,1,1,26.033
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q059,domain,2,0,70.454
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q059,domain,2,0,103.445
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q059,domain,2,0,182.104
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q059,domain,2,0,25.879
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q059,domain,3,0,72.479
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q059,domain,3,0,102.086
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q059,domain,3,0,185.043
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q059,domain,3,0,26.331
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q059,domain,4,0,71.627
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q059,domain,4,0,102.135
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q059,domain,4,0,180.511
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q059,domain,4,0,26.442
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q059,domain,5,0,70.519
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q059,domain,5,0,106.727
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q059,domain,5,0,184.453
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q059,domain,5,0,26.395
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q059,domain,6,0,70.627
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q059,domain,6,0,103.544
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q059,domain,6,0,181.341
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q059,domain,6,0,26.307
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q060,domain,0,1,70.924
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q060,domain,0,1,100.393
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q060,domain,0,1,183.775
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q060,domain,0,1,26.350
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q060,domain,1,1,71.548
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q060,domain,1,1,101.603
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q060,domain,1,1,186.672
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q060,domain,1,1,26.132
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q060,domain,2,0,71.706
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q060,domain,2,0,101.526
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q060,domain,2,0,183.727
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q060,domain,2,0,26.190
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q060,domain,3,0,71.699
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q060,domain,3,0,102.160
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q060,domain,3,0,188.532
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q060,domain,3,0,26.167
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q060,domain,4,0,70.982
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q060,domain,4,0,102.838
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q060,domain,4,0,188.366
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q060,domain,4,0,26.505
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q060,domain,5,0,71.532
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q060,domain,5,0,101.632
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q060,domain,5,0,180.520
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q060,domain,5,0,26.602
+2026-09-15-node-column,A,1.0.0,docs-01000,scan,q060,domain,6,0,71.044
+2026-09-15-node-column,B,2.0.1,docs-01000,scan,q060,domain,6,0,104.493
+2026-09-15-node-column,B-node,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q060,domain,6,0,187.326
+2026-09-15-node-column,B-node-nograph,fux 2.0.1 (node 24.13.0) — the read plane,docs-01000,node,q060,domain,6,0,26.305

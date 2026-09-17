@@ -28,6 +28,7 @@ from pathlib import Path
 from ..config import find_root
 from ..errors import FuxError
 from . import plane as plane_mod
+from . import walk as walk_mod
 from .model import TAG_PREFIX
 from .walk import expand, routes
 
@@ -169,27 +170,119 @@ def cmd_explain(args) -> int:
     return 0
 
 
-def cmd_graph(args) -> int:
-    """The neighbourhood around a query's best answers."""
+def _walk_parameters(args) -> dict:
+    """The three W-160 parameters off `args`, as `expand` wants them.
+
+    **All three resolve to their inert values when the flags are absent**, so
+    `fux graph "<q>"` with no flags walks exactly the walk it walked before
+    they existed — `tests_e2e/test_relational.py` asserts that byte for byte.
+    """
+    raw = getattr(args, "kinds", None)
+    kinds = None
+    if raw:
+        named = [k.strip() for k in raw.split(",") if k.strip()]
+        unknown = sorted(set(named) - set(walk_mod.EDGE_KINDS))
+        if unknown:
+            raise FuxError(
+                f"--kinds names {', '.join(unknown)}, which is not an edge kind. "
+                f"The kinds this index mints are {', '.join(walk_mod.EDGE_KINDS)}"
+            )
+        kinds = frozenset(named)
+    return {
+        "kinds": kinds,
+        "link_idf_on": bool(getattr(args, "link_idf", False)),
+        "max_hops": getattr(args, "max_hops", None),
+    }
+
+
+def _seeds_of(root: Path, args, plane, tune):
+    """`(seed rows, seed ids)` — from `--seed`, or from the query's top-k.
+
+    ⚠ **The query form is DEFINED as `--seed` over `lexical`'s top-k**, which
+    is why this returns both forms through one function: two code paths would
+    be free to disagree about `seed_depth`, about mass order, or about which
+    candidate generator ran, and the equivalence W-160 claims would hold only
+    until somebody touched one of them.
+    """
+    given = getattr(args, "seed", None)
+    if given and args.query:
+        raise FuxError(
+            "pass a query or --seed, not both. `fux graph \"<q>\"` walks from the "
+            "query's best answers; `fux graph --seed <id>` walks from the documents "
+            "you name, in the order you name them"
+        )
+    if given:
+        seeds = [_resolve_doc(root, s) for s in given]
+        for seed in seeds:
+            # Both ends validated before the walk, exactly as `path` does: a
+            # typo'd seed would otherwise walk from nowhere and report an empty
+            # neighbourhood, which reads as *this document is isolated*.
+            _refuse_unknown(root, plane, seed, flag=" (--seed)")
+        # 🔴 **`score` is `null` and `rank` carries the order, and BOTH halves
+        # of that are deliberate.**
+        #
+        # *Why not a score:* a seed named by hand has a rank and not a ranking.
+        # The query form's seed score is a BM25F number a reader can line up
+        # against `ask`'s output; there is no such number here, and printing
+        # the walk's internal `1/(i+1)` mass would put a **third** incomparable
+        # value in a column SR-GRAPH already warns not to compare across roles.
+        #
+        # *Why it matters beyond taste:* the first cut did print the mass, and
+        # seed 0's mass is exactly `1.0` — which `json.dumps` writes as `1.0`
+        # and `JSON.stringify` writes as `1`. **A differential divergence on
+        # the first line of the new output**, from a value no ranking would
+        # ever produce, caught by running both readers rather than by a test.
+        # `null` is `null` in both.
+        rows = [
+            {"path": _loc_of(s), "id": s, "role": "seed", "score": None, "rank": i + 1}
+            for i, s in enumerate(seeds)
+        ]
+        return rows, seeds
+    if not args.query:
+        raise FuxError(
+            "`fux graph` needs a query or at least one --seed. "
+            "`fux graph \"how does ranking work\"` walks from the best answers; "
+            "`fux graph --seed docs/a.md` walks from a document you name"
+        )
     from ..query import run_query
 
+    # Scan by default, `--fast` opts into the accelerator for the seed query
+    # — same choice and same mutually-exclusive `--scan` as `ask` (SR-ASK).
+    #
+    # 🔴 **The seed query is `lexical`, NOT `ask`, and after W-161 that has to
+    # be said in code rather than inherited.** SR-GRAPH decision 13 defines the
+    # query form as `--seed` over the query's top-k; while `ask` and `lexical`
+    # were one body, calling `run_query` gave that for free. Now `ask` composes
+    # a graph tier, and seeding the walk from a list the walk already re-ordered
+    # would make `fux graph "<q>"` a walk over its own output — the seeds would
+    # move when the tier moved, `graph "<q>" != graph --seed <lexical top-k>`,
+    # and the orientation verb would quietly become path-dependent.
+    import dataclasses
+
+    results, _ = run_query(
+        root,
+        args.query,
+        tune.seed_depth,
+        force_scan=not getattr(args, "fast", False),
+        tune=dataclasses.replace(tune, ask_boost=False, ask_related=False),
+    )
+    rows = [
+        {"path": _loc_of(r.id), "id": r.id, "role": "seed", "score": r.score}
+        for r in results
+    ]
+    return rows, [r.id for r in results]
+
+
+def cmd_graph(args) -> int:
+    """The neighbourhood around a query's best answers, or around named seeds."""
     root = _root()
     from ..query import _declare_no_accelerator
 
     _declare_no_accelerator(root)
     plane = plane_mod.load(root)
 
-    # Scan by default, `--fast` opts into the accelerator for the seed query
-    # — same choice and same mutually-exclusive `--scan` as `ask` (SR-ASK).
     tune = _tune_for(root, args)
-    results, _ = run_query(
-        root,
-        args.query,
-        tune.seed_depth,
-        force_scan=not getattr(args, "fast", False),
-        tune=tune,
-    )
-    seeds = [r.id for r in results]
+    seed_rows, seeds = _seeds_of(root, args, plane, tune)
     # `seed_depth` and `expand_limit` are the two sizes this verb reports, and
     # they are separately tunable because they answer different questions: how
     # much of the ranking to trust as a starting point, and how far the walk
@@ -202,12 +295,10 @@ def cmd_graph(args) -> int:
         damping=tune.damping,
         iterations=tune.iterations,
         laziness=tune.laziness,
+        **_walk_parameters(args),
     )
 
-    nodes = [
-        {"path": _loc_of(r.id), "id": r.id, "role": "seed", "score": r.score}
-        for r in results
-    ] + [
+    nodes = seed_rows + [
         {"path": _loc_of(node), "id": node, "role": "expanded", "score": score}
         for node, score in expanded
     ]
@@ -221,7 +312,10 @@ def cmd_graph(args) -> int:
         return 0
 
     for node in nodes:
-        print(f"{node['score']:.4f}  {node['role']:<8} {node['path']}")
+        # A hand-named seed has no score — its column carries `#rank` instead.
+        # `0.0000` there would be a claim, and the wrong one.
+        cell = f"{node['score']:.4f}" if node["score"] is not None else f"{'#' + str(node['rank']):>6}"
+        print(f"{cell}  {node['role']:<8} {node['path']}")
     return 0
 
 
@@ -239,7 +333,9 @@ def cmd_path(args) -> int:
     # `--hops` bounds the search and stays a CLI argument; `hop_decay` only
     # orders what the search found. See `walk.routes` for why the boundary is
     # there rather than one step over.
-    found = routes(plane.graph, src, dst, hops=args.hops, hop_decay=_tune_for(root, args).hop_decay)
+    found, truncated = routes(
+        plane.graph, src, dst, hops=args.hops, hop_decay=_tune_for(root, args).hop_decay
+    )
 
     if args.json:
         print(
@@ -257,6 +353,14 @@ def cmd_path(args) -> int:
                         }
                         for route in found
                     ],
+                    # 🔴 **The half that matters** (W-140 row 12, Arpit
+                    # 2026-09-14). A truncated search that returned `[]` is not
+                    # *no route*, and a truncated search that returned three is
+                    # not *these three*. **stderr is invisible to exactly the
+                    # callers most likely to ask for a deep walk**, so the
+                    # boolean is in the payload. Always present; `false` is a
+                    # claim, not an absence (W-48).
+                    "truncated": truncated,
                 },
                 indent=2,
             )
@@ -264,12 +368,29 @@ def cmd_path(args) -> int:
         return 0
 
     if not found:
-        print(f"No route from {src} to {dst} within {args.hops} hop(s).")
+        if truncated:
+            # ⚠ **Two different claims, and this is the one that was being made
+            # wrongly.** *No route within N hops* asserts the search finished.
+            print(
+                f"No route from {src} to {dst} found within {args.hops} hop(s) - "
+                f"the search was cut short after {walk_mod.EXPANSION_BUDGET} steps. "
+                "This is NOT the same as no route existing; narrow it with fewer "
+                "--hops, or start from a more specific document."
+            )
+        else:
+            print(f"No route from {src} to {dst} within {args.hops} hop(s).")
         return 0
 
     for route in found:
         trail = " -> ".join(f"[{e.kind}] {e.dst}" for e in route.hops)
         print(f"{route.reliability:.4f}  {src} -> {trail}")
+    if truncated:
+        # A trailing note, not a prefix: the routes are real and are the
+        # answer; what is uncertain is whether a better one was missed.
+        print(
+            f"\n(the search was cut short after {walk_mod.EXPANSION_BUDGET} steps - "
+            "there may be routes, including better ones, that were not reached)"
+        )
     return 0
 
 

@@ -7,10 +7,10 @@ description: "An R is a claim frozen before measurement; its threshold may never
 status: accepted
 date: 2026-08-22
 feature: the prediction system — the R ids, their register, the rules that make a frozen claim mean something, and the classification of the runs those claims are measured by
-owns: [tests/test_regression_runs.py@f359951081fc, tools/t2-eval@cc5410393ce4, tools/quality-controls@a6bc8b6a056c, tools/vector-gate@0023bff0cdef]
+owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@67d969467bcd, tools/vector-gate@0023bff0cdef]
 laws: [L3]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: fd8bbf0b66c44d53381e326f519066d09cc593411a445fa325f73f4780e5d60b
+content_sha: 3d3baa8f59cb56e8ecb0488d71a77bfddfd181ae712e1e5fa3a7052517c909aa
 ---
 
 # SR-RS — the R predictions
@@ -216,6 +216,55 @@ that measured a prediction is prediction apparatus even after the feature
 question is settled, and an unowned component is one whose contract can change
 with no record updating. **This is a backstop, not a preference**: a harness
 moves to its feature's record the moment one exists.
+
+**10a. EVERY MEASURED RUN IS FILED, and this is what filing one means.**
+(Arpit; the normative home from 2026-09-14, previously `CLAUDE.md`
+§Conformance runs.)
+
+The measurement environments are scratch and commit nothing
+([SR-WORK-ENVIRONMENTS](0052_WORK-environments.md)). **Their evidence is not.**
+Every run's report, its diagnosis and its raw data are filed into
+[`work/regression/`](../work/regression/README.md), so engine changes are made
+from measured data rather than from memory. **Binding, exactly as the
+documentation law is.**
+
+**The per-run contract — what artifacts a run owes — is stated once in
+[`work/regression/README.md`](../work/regression/README.md) §Per-run contract
+and is not repeated here.** What this record states is what the *numbers* in it
+may claim: decisions 11 through 19a.
+
+⚠ **A verdict is not an SR.** When a run adjudicates a pre-registered
+prediction the ruling is a `VERDICT.md` beside its evidence — `type: Verdict`,
+with the prediction id and the frozen pre-registration's path. An SR records a
+decision somebody can supersede; **nothing supersedes a measurement except a
+better measurement**, which is a new run with its own verdict. The *decisions*
+that rest on a verdict live in `records/` and cite it. Enforced by
+`tests/test_regression_runs.py`.
+
+**10b. A pre-registered threshold may never move.** When a decision is gated on
+a measurement, **write the threshold, the metric definitions and the slice
+definitions down before producing a number, and commit that file first.** Then
+measure against it.
+
+- **A recorded NEGATIVE that stops months of building is a *successful*
+  outcome, not a failed task.** Report it plainly.
+- **A result between *clearly passes* and *clearly fails* is written up as
+  AMBIGUOUS and handed to Arpit.** Do not adjudicate it, and do not restate the
+  threshold in looser words.
+- **Post-hoc analysis is allowed and often valuable** — label it **post-hoc**
+  and keep it out of the verdict.
+- **If the measurement turns out not to test what the threshold assumed, say
+  THAT**, rather than reporting the number as if it did.
+- **The reproduce command must actually reproduce.** Findings that warrant a
+  change graduate to [`work/proposals/`](../work/proposals/README.md) and, when
+  accepted, to a record. **The evidence a ranking change needs is decision 19's
+  paired floor, measured in `fux-lab` on the golden test data** —
+  [SR-WORK-ENVIRONMENTS](0052_WORK-environments.md) decision 2 names the only
+  place a measurement runs, and [SR-LAW-0](0002_LAW-0-authority.md) decision 2a
+  is why no second corpus is demanded here.
+
+[`tools/pruning-eval/PRE-REGISTRATION.md`](../tools/pruning-eval/PRE-REGISTRATION.md)
+is the worked example.
 
 **11. Every measured run is `blind` or `informed`, and declares which.** A run
 is **blind** only if *every* artifact it depends on was authored without access
@@ -492,6 +541,69 @@ close the P2 `recall@k` question W-87 filed:
   completeness declaration (is the asserted `doc` the only relevant one?),
   `arpit` lane, tracked in [W-87](../work/open/W-87-what-good-means.md) P2.
 
+**15a. A CIRCULARITY SCREEN is a control, and it is the one that was missing**
+(2026-09-15, W-183). Decision 15's three controls ask *did the arm move something
+real*. None of them asks the question that killed C2: **is the endpoint's truth
+the feature's own objective?**
+
+`c = 0` on C2's proximity suite was quoted as `22 % → 100 %, 94 fixed, 0 broken`
+and it meant nothing, because the suite scored contests the reranker is built to
+win — and that was **argued** three times, never computed. So:
+
+> For every contest, score the candidates with the FEATURE's own objective and
+> report `agreement` — the share where the thing that objective picks is also
+> the true one — beside the **chance rate**.
+
+| `agreement` | the endpoint is |
+|---|---|
+| ≈ 1.00 | **circular**: the truth IS the objective |
+| ≈ chance | **independent**: a null from it says nothing about the feature |
+| between | usable |
+
+**The band is pre-registered with the endpoint and may not move afterwards**
+(decision 10b). [`cited_decision.py`](../tools/quality-controls/cited_decision.py)
+is the first implementation — `agreement` **0.4141** against a chance rate of
+**0.0748** over 524 contests drawn from this repository's own
+`SR-RS … decision 19`-shaped citations, ruled
+[here](../work/regression/2026-09-15-quality-endpoint-screen/VERDICT.md).
+
+⚠ **Necessary, not sufficient, and the gap is named rather than left to be
+found.** The screen catches truth-equals-objective. It cannot catch circularity
+through a **third variable** — an author who paraphrases what they cite writes a
+query dense in its words — and nothing mechanical can. What a candidate owes
+instead is a stated mitigation: `cited_decision.py` reports `agreement` per
+record so one dense document cannot carry the result, and drops a contest whose
+query shares more than 80 % of its terms with the true passage.
+
+⚠ **It screens an ENDPOINT, never a corpus.** A number measured on one tree
+transfers to no other, and the run that produced this one says **dogfood** in
+its own verdict.
+
+**15b. A frozen sweep gets its OWN arm in the instrument, and the instrument
+does not adjudicate** (2026-09-15, W-180). `w144_graded.py` was built for
+W-144's option (b) — shipped `flen` against a table-excluded counterfactual.
+Arpit ruled **(d)**, *lower `b`*, on 2026-09-14, so the arm the
+[pre-registration](../work/regression/2026-09-15-b-sweep/PRE-REGISTRATION.md)
+needs is a different one: **the shipped `flen` in every arm, and `b` the only
+thing that moves.**
+
+`bsweep` is that arm. Two properties are worth stating because both are easy to
+lose:
+
+- **The index is ingested once.** `b` is a **query-time** parameter, so all four
+  values read the same committed bytes. Four corpora would have introduced a
+  second difference into an ablation whose whole point is that one lever moves.
+- 🔴 **The command prints what each value did and applies no bar.** The decision
+  rule — *first value, descending, netting positive on all three families with
+  both controls holding and the net clearing decision 19's floor* — lives in the
+  frozen pre-registration, and a harness that also encoded it would be a second
+  copy of a threshold that may not move. It prints the rule and says it is not
+  applying it.
+
+⚠ **The counterfactual `flen` is deliberately NOT computed in this arm.** Option
+(b) was ruled out; carrying it alongside would put two levers in one run, which
+is what the pre-registration forbids in those words.
+
 **16. When a pre-registration's live path is DELETED, the run keeps a mirror of
 it — the verdict is not edited.** Decision 1 freezes a pre-registration and
 decision 5 freezes a verdict, and between them they assume the file the verdict
@@ -633,8 +745,14 @@ set"* implies the bar tracks the set size; **it tracks the flips.** Replacing
   so we can check in detail"* — **per-query results, one row per query per arm,
   filed under `evidence/`.** It is strictly stronger and strictly cheaper to
   comply with: `b`, `c`, the discordant count and every later test are all
-  derivable from per-query rows, and from nothing else. `CLAUDE.md`
-  §Conformance runs carries it as a numbered obligation.
+  derivable from per-query rows, and from nothing else.
+
+  🔴 **Decision 19a states it, and this record is its only home from
+  2026-09-14.** It read *"`CLAUDE.md` §Conformance runs carries it as a
+  numbered obligation"* — and `CLAUDE.md` did, which made a **generated**,
+  explicitly non-normative file the normative home of a rule this record
+  explains. That is the inversion L0 forbids, and W-173 corrected it by moving
+  the obligation here and leaving `CLAUDE.md` a pointer.
 - ⚠ **CORRECTION, 2026-08-28 — this record and the run's `ANALYSIS.md` both
   stated the reranker case wrongly, in the GENEROUS direction.** Both said the
   `28 → 32` net of **4** *"clears α only if exactly 4 flipped and all 4 went one
@@ -727,7 +845,8 @@ never that it is the right file.
 row per query? per arm?* — cannot be written without knowing each run's arm
 structure in advance, and shipping an approximation that passes is the
 moving-threshold failure in another costume. **Whether a second recorded
-instance of the W-83 shape triggers CLAUDE.md's two-strikes gate is Arpit's
+instance of the W-83 shape triggers the two-strikes gate
+([SR-WORK-SESSION](0060_WORK-session.md) decision 13) is Arpit's
 call**, and it sits in the queue as a ruling rather than as a task.
 
 **21c. A paired comparison must assert that both arms resolved the SAME
@@ -793,6 +912,54 @@ on it while saying what it rests on.
 *"no detected change"*. A null measured where nothing could have moved is the
 absence of a measurement, not the presence of a negative result.
 
+**22e. 🔴 A CONTROL is held to 22d too, and a saturated one reports nothing**
+(Arpit, 2026-09-15, as the condition on W-144's ruling; generalised here
+2026-09-16).
+
+> *"the run does not start until the arm set carries a control family with
+> regression headroom. Both existing controls are saturated 30/30 in every arm,
+> so 'nothing regresses' on the probe is consistent with safety and is not
+> evidence of it."*
+
+**22b and 22d have always been read as being about the ENDPOINT.** They are
+about any family whose count a verdict leans on, and a control is exactly that:
+its whole job is to be able to go wrong.
+
+- **A control that cannot lose is decoration.** *Nothing regressed* on a family
+  that is right in every arm at every value is a sentence about the family, not
+  about the treatment — and it reads identically whether the treatment is safe
+  or catastrophic.
+- **An arm set needs at least one control with non-zero regression headroom
+  that has been SHOWN to spend it**, at some value, even one outside the range
+  under test. Demonstrated, not argued: [the W-144 probe](../work/regression/2026-09-16-b-sweep-2-control/report.md)
+  put `verbose` at 30/30 across the whole ruled range and **0/30 at `b = 0`**,
+  which is what makes its holding informative inside the range.
+- 🔴 **The value of this is measurable and was measured.** Without that family,
+  `b = 0` and `b = 0.15` are **indistinguishable on every other instrument in
+  the set**. The blind spot was one value wide.
+
+⚠ **Saturation in ONE direction is the design, not a defect.** A benefit family
+is built wrong at the baseline or the lever has nothing to fix; a control is
+built right at it or it cannot report. **22b's table is read per family**, and a
+report that flags a benefit family's zero regression headroom as a fault is
+reading the design as a fault.
+
+**22f. Regression headroom is measured in the BASELINE arm** (2026-09-16).
+
+22b says *"not wrong in both arms"*, which on a two-arm run is *right in the
+baseline **or** right in the treatment*. 🔴 **Counting *right in both* instead is
+post-hoc**: it reports what **survived** the treatment rather than what was **at
+risk** going in, so it shrinks exactly when an arm is breaking things and the
+endpoint looks like it had less to lose the worse the arm did.
+
+**The baseline is knowable before any treatment runs**, which is what lets it be
+declared in advance — and it is what
+[the W-154 reachability check](../work/regression/2026-09-16-rerank-endpoint-reachability/report.md)
+computed with no arms at all, on the way to finding an endpoint that was zero in
+a direction before ~2 000 subprocesses were spent on it. ⚠ **The VOID Part B run
+defined it the other way**, and its own verdict names that as the second thing
+to fix.
+
 **22e. No minimum, and this is deliberate.** There is no threshold on how much
 headroom is *enough*. Disclosure plus 22d is the entire rule. **A floor here
 would be a pre-registered threshold invented after the fact**, which
@@ -839,6 +1006,54 @@ four-priors precondition check: `supersedes:` declared nowhere, so three priors
 moved 0 of 50 at every value) is not filed as *"no detected change"* and is not
 Inconclusive-and-done: the data is extended so the feature can move it, and the
 measurement is re-planned. Decision 22d still governs any run that does go ahead.
+
+**23c. 🔴 Where the input is COUNTABLE, count it — before the run, with a check
+that can fail** (2026-09-16).
+
+23a and 23b were stated as a discipline and read as a reminder, and a reminder
+did not hold: the golden ladder was frozen, verified, nested and re-verified for
+weeks with **0 `ref` edges on all eight rungs**, while a link-ranking feature was
+measured against it and filed **0 of 124 flips at every weight**. Three separate
+items were waiting on that corpus.
+
+- **[`ref_edge_census.py`](../tools/quality-controls/ref_edge_census.py) is that
+  check for links**, and **it exits 2 when a corpus has none**, so a
+  link-dependent run gates on it rather than rediscovering the defect.
+- 🔴 **It counts what the ENGINE WROTE, never what a document looks like.** An
+  inline link whose target does not resolve is dropped silently by
+  `edges._resolve_ref` — so a corpus can be full of markdown links and carry no
+  edges at all. **A hand-count or a reviewer reading the documents cannot see
+  that**, and it is the failure mode a countable input is most likely to have.
+- ⚠ **This does not generalise to every input.** *Unanswerable questions* cannot
+  be counted without reading answers ([L11](0012_LAW-11-sealed-answer-key.md)),
+  and that count comes from a scored run or not at all. The rule is: **where the
+  input is visible in the committed index, a run that depends on it says how much
+  there is, mechanically, before it starts.**
+
+🔴 **23d. The DOCUMENTS having the input is half the check. The QUESTIONS have to
+ask for it** (2026-09-16).
+
+23a says test data must contain the input **and** that *"the questions must also
+depend on that input"*. **The second half is the one that gets skipped**, because
+the first is the one that fails loudly.
+
+**Two measured cases, two days apart, and they fail differently:**
+
+| | what was missing | what fixes it |
+|---|---|---|
+| [W-191](../work/open/W-191-the-ladder-carries-no-links.md) | **the input** — 0 `ref` edges on all eight rungs | link-bearing **documents** |
+| [W-168 step 2](../work/regression/2026-09-16-identifier-survival/report.md) | **the questions** — 51 identifier tokens across all 20 seed documents, and **4 of 249 questions ask by one** | **id-queries** |
+
+🔴 **The second is harder to see and cheaper to fix.** A corpus census comes back
+healthy — the tokens are there — and a run proceeds to an `INCONCLUSIVE` nobody
+predicted. **So a precondition check counts the questions too**, and
+[`identifier_survival.py`](../tools/quality-controls/identifier_survival.py)
+**exits 2 when the id-bearing question count is below the floor of all floors**,
+for the same reason the edge census exits 2 on zero.
+
+⚠ **Below the floor is not "a small sample".** 4 questions cannot produce 6
+flips, so **no split of them clears α** — the run is not underpowered, it is
+*unable*, and decision 19's table says so without any data.
 
 **23b-i. ⚠ Satisfying 23a collided with the one-archive law, and the law's
 test was narrowed rather than the data moved** (2026-09-12). *"A prior that

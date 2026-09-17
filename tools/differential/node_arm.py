@@ -239,17 +239,41 @@ class Arm:
     def compare_verb(self, verb: str, argv: tuple[str, ...], *, tunable: bool = True) -> list[str]:
         """One non-ranking verb, both CLIs, compared as WHOLE parsed payloads.
 
-        Whole-payload rather than a field list, deliberately: `explain`, `graph`
-        and `path` carry no score to tolerance, so every byte of meaning is in
-        the structure — and comparing a field list is exactly what would let the
-        two emit different KEY NAMES without the arm noticing.
+        Whole-payload rather than a field list, deliberately: comparing a field
+        list is exactly what would let the two emit different KEY NAMES without
+        the arm noticing. **Structure and order stay byte-equal**; the one thing
+        held to a tolerance is `score`, and it is held to the ruled one.
+
+        🔴 **`score` goes through `round(…, 9)` first — SR-RANKING decision 8a,
+        Arpit's ruling of 2026-09-06 — and this docstring claimed the opposite
+        until 2026-09-16.** It said `explain`, `graph` and `path` *"carry no
+        score to tolerance, so every byte of meaning is in the structure"*, and
+        every node of a `graph` payload carries a `score`. So `py == nd` held
+        the graph lane to the score's LAST BIT while the ranking lane beside it
+        applied the contract, and the two lanes disagreed about what the engine
+        promises.
+
+        ⚠ **It went unnoticed because the graph lane had never run in CI.**
+        `graph_lane_ready` needs a fresh derived plane, `node-arm.yml` never
+        built one, and the lane skipped silently — so the first CI run that
+        built the plane (this one) went red at **1 of 225** on
+        `graph 'pii redaction'`: `11.780650569089822` against
+        `11.780650569089824`, identical node order, a ~2e-16 relative
+        difference against the `~1e-9` that decision 8a says would void it.
+        That is `log`'s one-ulp disagreement between two libms, which is the
+        measured phenomenon 8a exists for and the reason the OS matrix exists.
+
+        **This is the ruled contract reaching a lane that was exempt by
+        accident, not a bar being lowered to pass.** Order is untouched and
+        stays byte-equal, which is the half 8a explicitly licenses nothing
+        about.
 
         `tunable=False` is `explain`, which takes no `--no-tune` on either side
         because it reads no tunable.
         """
         flags = ("--no-tune",) if (tunable and not self.use_tune) else ()
-        py = self.python_cli(verb, argv + flags)
-        nd = self.node(verb, argv[0], None, tuple(argv[1:]) + flags)
+        py = _scores_at_round9(self.python_cli(verb, argv + flags))
+        nd = _scores_at_round9(self.node(verb, argv[0], None, tuple(argv[1:]) + flags))
         if py == nd:
             return []
         return [f"{verb} {' '.join(argv)!r}: python={json.dumps(py, sort_keys=True)[:400]} "
@@ -487,6 +511,28 @@ print(json.dumps({
                 f"(raw python={p['score']!r} node={n['score']!r})"
             )
         return out
+
+
+def _scores_at_round9(obj):
+    """Every `score` in a parsed payload at `round(…, 9)`, everything else as-is.
+
+    The whole-payload twin of `_fields`' score clause — SR-RANKING decision 8a
+    is a statement about the engine's scores, not about which verb printed one,
+    and applying it in one lane and not the other is how `graph` came to be held
+    to a stricter contract than `find`.
+
+    **Only the value under a `score` key moves.** Keys, order, types and every
+    other value are untouched, so a renamed field or a reordered list is as
+    visible as it was before — which is what whole-payload comparison is for.
+    """
+    if isinstance(obj, dict):
+        return {
+            k: round(v, 9) if k == "score" and isinstance(v, float) else _scores_at_round9(v)
+            for k, v in obj.items()
+        }
+    if isinstance(obj, list):
+        return [_scores_at_round9(v) for v in obj]
+    return obj
 
 
 def corpus_queries(root: Path, cap: int) -> list[str]:

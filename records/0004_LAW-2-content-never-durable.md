@@ -10,7 +10,7 @@ feature: the rationale, history and reopen-trigger of L2
 owns: []
 laws: [L2]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: ecb8522d9e277bd319284793037564027f0049e273fcc1b1b3bae72ac5b3536e
+content_sha: 5fadef1d413b4e1cd79720bbf4a972c427578d0a2e04e73bf61a9c92c0a809be
 ---
 
 # SR-LAW-2 — L2 — content is never durable outside its source system
@@ -50,7 +50,7 @@ table. ⚠ **A handle is not the law**; read the law in §2 below.
 ```mermaid
 flowchart LR
     R["SR-LAW-2<br/>(THIS RECORD — states law L2)"]
-    N["SR-LAWS<br/>(the handles L0..L10 — routes, never states)"]
+    N["SR-LAWS<br/>(the handles L0..L11 — routes, never states)"]
     C["CLAUDE.md §Non-negotiable constraints<br/>(GENERATED from the records · test-bound)"]
     B["records bound by L2<br/>(cite the number, never restate)"]
     R --> C
@@ -71,7 +71,7 @@ flowchart LR
         (GENERATED -- not the source)
 
                SR-LAWS
-     (the handles L0..L10 -- routes, never states)
+     (the handles L0..L11 -- routes, never states)
                    |
           +--------+---------+
           v                  v

@@ -7,6 +7,15 @@
  * 🔴 **It never fetches.** A `url:` document reads `.fux/acquired/` or the
  * answer falls back to `source: "index"` — so this verb can emit
  * `as-ingested` and `unverified`, and never `current` or `stale`, for a URL.
+ *
+ * ⚠ **No observer hook on this reader.** Python calls `.fux/observers/` once a
+ * verb has fully rendered (`cli.main`); Node does not, and that is declared
+ * rather than missing — SR-NODE-SEARCH decision 18. The reason is that this
+ * reader has no single post-render dispatch point for every verb, so hosting
+ * the hook would mean placing the call in five places where *after everything*
+ * becomes five things to keep true. `.fux/observers/*.mjs` is reserved and
+ * unread. **A repo with observers installed therefore records its Python runs
+ * and not its Node runs**, which is this decision rather than a bug.
  */
 import { runQuery } from "../query/run.mjs";
 import { recordFor } from "../store/reader.mjs";
@@ -17,6 +26,8 @@ import { Verdict } from "../refer/freshness.mjs";
 import { resolve, readLocal, fromAcquired, GIT } from "../refer/source.mjs";
 import { passageBoost } from "../query/rerank.mjs";
 import { alreadyTextGlobs, isAlreadyText } from "../decode/registry.mjs";
+import { declareFloorOff, decline } from "./find.mjs";
+import { declarePinned } from "./ask.mjs";
 
 /** `answer` refers the top 3 — W-108. One question and no `-q`: an RRF score
  *  would make the three incomparable. */
@@ -75,9 +86,15 @@ export function answerPayload(root, args) {
   // ⚠ **`answer` takes ONE question and no `-q`** (SR-ANSWER decision 4): the
   // verb means one answer. `--expand` applies exactly as it does to `ask`,
   // because expanding a question is not asking a second one.
-  const { results, confidence, tune } = runQuery(root, query, ANSWER_TOP, {
+  // W-161 — **`answer` reads `ask`, both tiers.** A Tier B document is fetched
+  // and passage-scored on the bytes like any other candidate, and one with
+  // nothing in it survives nowhere: the refer plane re-scores on the fetched
+  // text and has no idea which tier a candidate came from. That is the point —
+  // Tier B's weakness is that no query word matched the INDEX.
+  const { results, related, confidence, tune } = runQuery(root, query, ANSWER_TOP, {
     useTune: args.noTune !== true, wantConfidence: true, expand: args.expand ?? "",
   });
+  declareFloorOff(tune, Boolean(args.json));
   const band = (block, freshness) => {
     if (!block || !args.band) return undefined;
     return freshness ? block.withVerified(freshness).asDict() : block.asDict();
@@ -89,6 +106,13 @@ export function answerPayload(root, args) {
     if (b) payload.confidence = b;
     return { payload, freshness: null, results };
   }
+  // W-162 — before either rendering branch, so the note reaches the reader
+  // whichever path answers. `answer` is the surface where *a human chose this
+  // source* matters most and is least visible: one document comes back and
+  // there is no list beside it to weigh. **No `pinned` key on the citation** —
+  // see `query/__init__.py` for why a key on one path only is worse than none.
+  declarePinned(results.slice(0, 1));
+
 
   // --no-refer: skip reading the source entirely. `verified` STAYS
   // "unverified" — deliberately not upgraded, because nothing was checked.
@@ -111,7 +135,11 @@ export function answerPayload(root, args) {
   // Resolved ONCE per answer, not once per candidate: it is a committed file
   // read, and three candidates is three reads of the same bytes.
   const textGlobs = alreadyTextGlobs(root);
-  for (const r of results) {
+  // ⚠ **Tier A first and Tier B after it, always.** The refer plane picks a
+  // winner on fetched bytes; this order is the tie-break when it cannot
+  // separate two, and a document the words found should win that tie against
+  // one only a link reached.
+  for (const r of [...results, ...(related ?? [])]) {
     const record = recordFor(root, r.id);
     if (!record) continue;
     const got = obtain(root, record, textGlobs);
@@ -189,7 +217,7 @@ export function runAnswer(root, args) {
 
   if (args.json || payload.answer === null) {
     if (!args.json && payload.answer === null) {
-      process.stdout.write("No confident matches.\n");
+      decline();
       return 0;
     }
     process.stdout.write(JSON.stringify(payload, null, 2) + "\n");

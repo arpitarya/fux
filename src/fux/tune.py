@@ -133,7 +133,7 @@ INDEX_TABLE = "index"
 #: The closed key set. Table -> keys. Adding a key here is a change to
 #: SR-TUNE, not a convenience (decision 5).
 _SCHEMA: dict[str, tuple[str, ...]] = {
-    "bm25f": ("k1", "b", *_FIELD_KEYS),
+    "bm25f": ("k1", "b", *_FIELD_KEYS, "anchor"),
     "ranking": ("rerank_weight", "expand_weight"),
     "graph": (
         "damping",
@@ -142,6 +142,18 @@ _SCHEMA: dict[str, tuple[str, ...]] = {
         "hop_decay",
         "expand_limit",
         "seed_depth",
+        # W-161. The six `ask_*` keys are the graph tier's, and they are in the
+        # `[graph]` table rather than in `[ranking]` because the walk they
+        # configure is the graph plane's walk. **They do not move `fux graph`**
+        # — that verb keeps `kinds = ALL_KINDS`, `link_idf_on = False`,
+        # `max_hops = None`, because orientation and answering want different
+        # walks and the compare doc ruled they may differ.
+        "ask_boost",
+        "ask_related",
+        "ask_kinds",
+        "ask_link_idf",
+        "ask_max_hops",
+        "ask_related_limit",
     ),
     "refer": ("budget", "per_doc_fraction", "min_passage_bytes", "max_passage_bytes"),
     "confidence": ("separation_floor", "doc_coverage_floor"),
@@ -213,6 +225,17 @@ class Tune:
     k1: float = K1
     b: float = B
     field_weights: tuple[float, ...] = FIELD_WEIGHTS
+    #: W-168 step 1 — the anchor field: what other documents call this one when
+    #: they link to it. **`0.0` is OFF and is the default**, per SR-RS decision
+    #: 19: a ranking change ships behind a tunable at zero and is defaulted on
+    #: only by a PASS on a frozen pre-registration. Unmeasured today.
+    #:
+    #: ⚠ **Not in `field_weights`, deliberately.** That tuple is aligned
+    #: index-for-index with `TF_FIELDS`, the five fields a record COMMITS an
+    #: `flen` for; anchor is folded at read time out of other documents' edges
+    #: and has no committed slot. Padding it in would claim a sixth committed
+    #: field and leave every `flen` one short — see `query/bm25f.py`.
+    anchor_weight: float = 0.0
 
     # [ranking]
     #: ⚠ **Three document priors stood here and all three are GONE**, ruled by
@@ -245,6 +268,38 @@ class Tune:
     expand_limit: int = 10
     seed_depth: int = 5
 
+    # [graph] — the W-161 graph tier on `ask`. Six keys, and the two booleans
+    # at the top are the ones that exist so the pre-registration's two arms can
+    # be removed independently of each other
+    # (`work/regression/2026-09-14-graph-ask/PRE-REGISTRATION.md`).
+    #
+    # 🔴 **Both ship ON and both are UNMEASURED**, which is the state the
+    # ratified compare doc puts them in, not an oversight: Arpit accepted the
+    # two-tier `ask` on 2026-09-13 and the measurement needs link-dependent
+    # golden questions that only Codex may author (2026-09-30). The keys are how
+    # a failing arm is withdrawn without touching the other.
+    #: Arm A — re-order the lexical window by `RRF(lexical rank, PPR rank)`.
+    ask_boost: bool = True
+    #: Arm B — the labelled `related` list of link-reached documents with no
+    #: lexical match. `--no-related` is the per-call opt-out.
+    ask_related: bool = True
+    #: Which edge kinds the `ask` walk follows. `ref` alone by default:
+    #: a `tag` edge makes the graph bipartite and one shared tag becomes a
+    #: 200-document hub, which is a hub pulling unrelated documents together
+    #: rather than a link anybody drew between two documents.
+    ask_kinds: str = "ref"
+    #: Hub damping, ON for `ask` and off for `graph`. A link everybody makes
+    #: says little about the document it comes from.
+    ask_link_idf: bool = True
+    #: One hop. For orientation two is right; for an answer a second-hop
+    #: document is a guess about a guess.
+    ask_max_hops: int = 1
+    #: The cap on the `related` list. `related` is a length cost on every
+    #: query, including every one it never helps, which is why the
+    #: pre-registration measures median length across the whole set and not
+    #: across the subset the tier is for.
+    ask_related_limit: int = 5
+
     # [confidence]
     #: ⚠ **The `grounded`/`weak` cutoff, and the only tunable in this class that
     #: is UNMEASURED at its default.** R10 is still owed; a repo-local value is
@@ -269,7 +324,9 @@ class Tune:
     @property
     def scoring(self) -> Scoring:
         """The three-part BM25F parameter set, as one object."""
-        return Scoring(k1=self.k1, b=self.b, weights=self.field_weights)
+        return Scoring(
+            k1=self.k1, b=self.b, weights=self.field_weights, anchor=self.anchor_weight
+        )
 
     @property
     def trivial(self) -> bool:
@@ -307,6 +364,48 @@ class _Collector:
         more = len(self.errors) - len(shown)
         tail = f"\n  ... and {more} more" if more > 0 else ""
         raise FuxError(f"{self.path}:\n  " + "\n  ".join(shown) + tail)
+
+
+def _boolean(c: _Collector, table: str, key: str, value: object, default: bool) -> bool:
+    """A strict boolean. `1`/`0` are refused rather than coerced.
+
+    ⚠ **`isinstance(1, bool)` is False but `isinstance(True, int)` is True**,
+    which is why every numeric validator above already excludes `bool` by name.
+    This is the same fence from the other side: a consumer who writes
+    `ask_boost = 1` gets told the key is a boolean, instead of getting a silent
+    `True` from a file that does not say so.
+    """
+    if not isinstance(value, bool):
+        c.add(f"[{table}] {key} must be true or false (got {value!r})")
+        return default
+    return value
+
+
+def _edge_kinds(c: _Collector, table: str, key: str, value: object, default: str) -> str:
+    """A comma-separated list of edge kinds the index actually mints.
+
+    Validated **here**, at load, rather than where the walk runs: an unknown
+    kind silently walks nothing, and a walk over no edges returns an empty
+    neighbourhood that is indistinguishable from a corpus with no links. The
+    same reasoning `graph --kinds` applies at the CLI boundary
+    (`graph/__init__.py::_walk_parameters`), applied to the committed file.
+    """
+    if not isinstance(value, str):
+        c.add(f"[{table}] {key} must be a string (got {value!r})")
+        return default
+    from .graph import walk as walk_mod
+
+    named = [k.strip() for k in value.split(",") if k.strip()]
+    if not named:
+        c.add(f"[{table}] {key} names no edge kind; the kinds this index mints are "
+              f"{', '.join(walk_mod.EDGE_KINDS)}")
+        return default
+    unknown = sorted(set(named) - set(walk_mod.EDGE_KINDS))
+    if unknown:
+        c.add(f"[{table}] {key} names {', '.join(unknown)}, which is not an edge kind; "
+              f"the kinds this index mints are {', '.join(walk_mod.EDGE_KINDS)}")
+        return default
+    return ",".join(named)
 
 
 def _number(c: _Collector, table: str, key: str, value: object, default: float) -> float:
@@ -518,6 +617,11 @@ def load(root: Path, *, enabled: bool = True) -> Tune:
             # Zero is legal here and means *ignore this field* — that is a
             # ranking choice, not the source exclusion decision 9a refuses.
             weights[i] = _non_negative(c, "bm25f", key, bm25f[key], FIELD_WEIGHTS[i])
+    anchor_weight = (
+        _non_negative(c, "bm25f", "anchor", bm25f["anchor"], 0.0)
+        if "anchor" in bm25f
+        else 0.0
+    )
 
     ranking = data.get("ranking", {})
     rerank_weight = (
@@ -549,6 +653,34 @@ def load(root: Path, *, enabled: bool = True) -> Tune:
     )
     seed_depth = (
         _at_least(c, "graph", "seed_depth", graph["seed_depth"], 5, 1) if "seed_depth" in graph else 5
+    )
+    ask_boost = (
+        _boolean(c, "graph", "ask_boost", graph["ask_boost"], True) if "ask_boost" in graph else True
+    )
+    ask_related = (
+        _boolean(c, "graph", "ask_related", graph["ask_related"], True)
+        if "ask_related" in graph
+        else True
+    )
+    ask_kinds = (
+        _edge_kinds(c, "graph", "ask_kinds", graph["ask_kinds"], "ref")
+        if "ask_kinds" in graph
+        else "ref"
+    )
+    ask_link_idf = (
+        _boolean(c, "graph", "ask_link_idf", graph["ask_link_idf"], True)
+        if "ask_link_idf" in graph
+        else True
+    )
+    ask_max_hops = (
+        _at_least(c, "graph", "ask_max_hops", graph["ask_max_hops"], 1, 1)
+        if "ask_max_hops" in graph
+        else 1
+    )
+    ask_related_limit = (
+        _at_least(c, "graph", "ask_related_limit", graph["ask_related_limit"], 5, 1)
+        if "ask_related_limit" in graph
+        else 5
     )
 
     conf = data.get("confidence", {})
@@ -622,6 +754,7 @@ def load(root: Path, *, enabled: bool = True) -> Tune:
 
     return Tune(
         k1=k1,
+        anchor_weight=anchor_weight,
         b=b,
         field_weights=tuple(weights),
         rerank_weight=rerank_weight,
@@ -632,6 +765,12 @@ def load(root: Path, *, enabled: bool = True) -> Tune:
         hop_decay=hop_decay,
         expand_limit=expand_limit,
         seed_depth=seed_depth,
+        ask_boost=ask_boost,
+        ask_related=ask_related,
+        ask_kinds=ask_kinds,
+        ask_link_idf=ask_link_idf,
+        ask_max_hops=ask_max_hops,
+        ask_related_limit=ask_related_limit,
         separation_floor=separation_floor,
         doc_coverage_floor=doc_coverage_floor,
         budget=budget,
@@ -672,6 +811,14 @@ def specimen() -> str:
     fields = "\n".join(
         f"{key:<23} = {FIELD_WEIGHTS[i]}" for i, key in enumerate(_FIELD_KEYS)
     )
+    # 🔴 **TOML spells a boolean lowercase and Python's `repr` does not**, so an
+    # f-string interpolating a `bool` writes `True` — which this module's own
+    # loader then refuses as an unknown bare word. The specimen is asserted
+    # round-trippable by `tests/test_tune.py`; without this it would have
+    # shipped a file `fux setup` writes and `fux ask` cannot read.
+    ask_boost = str(d.ask_boost).lower()
+    ask_related = str(d.ask_related).lower()
+    ask_link_idf = str(d.ask_link_idf).lower()
     return f"""\
 # .fux/tune.toml -- HOW results are ordered, plus [index]: how much of a
 # document is indexed.
@@ -693,6 +840,11 @@ k1                      = {K1}      # term-frequency saturation
 b                       = {B}     # length normalisation, 0 = off, 1 = full
 # The five field weights, in index order. 0 means "ignore this field".
 {fields}
+# The sixth field is ANCHOR: what OTHER documents call this one when they link
+# to it (W-168 step 1). Folded in at read time from their edges -- it is in no
+# committed posting, so moving this needs no re-ingest. 0 = OFF, and off is the
+# default: UNMEASURED, and it turns on only on a passing pre-registered run.
+anchor                  = {d.anchor_weight}
 
 [ranking]
 rerank_weight           = {d.rerank_weight}   # 0 = off; the proximity reranker's uplift
@@ -707,6 +859,14 @@ laziness     = {d.laziness}
 hop_decay    = {d.hop_decay}
 expand_limit = {d.expand_limit}
 seed_depth   = {d.seed_depth}
+# The graph tier on `ask` (W-161). The two booleans are separate so a failing
+# arm can be withdrawn without touching the other; both are UNMEASURED today.
+ask_boost         = {ask_boost}   # arm A: re-order the window by RRF(lexical, PPR)
+ask_related       = {ask_related}   # arm B: the labelled `related` list
+ask_kinds         = "{d.ask_kinds}"    # `ref` alone; a `tag` edge is a hub, not a link
+ask_link_idf      = {ask_link_idf}   # hub damping, ON here and off for `fux graph`
+ask_max_hops      = {d.ask_max_hops}      # one hop; a second-hop document is a guess
+ask_related_limit = {d.ask_related_limit}
 
 [refer]                         # answer, and the refer plane
 budget            = {d.budget}       # bytes of assembled passage

@@ -427,6 +427,14 @@ def test_the_freshness_gate_actually_consults_describers() -> None:
 #: The pin is deliberate: a record that GAINS coverage, or a new record that
 #: arrives with none, lands as one failing assertion naming itself.
 _UNREACHABLE_BY_THE_GATE = {
+    # Case 1, and a third shape worth naming: **SR-AGENT-SURFACES owns no
+    # component because its subject is a TAXONOMY** -- what an agent surface is,
+    # and which class each kind belongs to. The rosters it classifies
+    # (`CLAUDE_SURFACES`, `CO_OWNED_SURFACES`, `EXECUTABLE_SURFACES`) live in
+    # `src/fux/setup.py`, which SR-AGENT-POLICY owns and must keep owning: one
+    # component, one owner. A change to that file opens SR-AGENT-POLICY, which
+    # is correct -- the roster is policy; the word for it is this record.
+    "SR-AGENT-SURFACES",
     "SR-CACHEDIR-TAG", "SR-CDP-FETCHER", "SR-DIR-LIST", "SR-DOCS-TABLE",
     "SR-FIND", "SR-HTTP-FETCHER", "SR-LAW-0", "SR-LAW-1", "SR-LAW-2",
     "SR-LAW-3", "SR-LAW-4", "SR-LAW-5", "SR-LAW-6", "SR-LAW-7",
@@ -440,6 +448,50 @@ _UNREACHABLE_BY_THE_GATE = {
     # to the engine can make a backlog row true or false, so the freshness
     # gate cannot reach it — by design, like its sibling SR-WORK-OPEN-QUEUE.
     "SR-WORK-BACKLOG",
+    # The eight WORK records the 2026-09-14 `CLAUDE.md` extraction filled,
+    # `0057`–`0064`. Every one of them is here for SR-WORK-OPEN-QUEUE's reason
+    # and not SR-ANSWER's: **their subject is how work is done**, so no change
+    # under `src/` can make any of them true or false. Four are not ungated —
+    # they own their enforcement outside `src/`, and each of those tests had no
+    # owner at all before this change: SR-WORK-DOCS (`test_doc_registry.py`,
+    # `test_doc_links.py`), SR-WORK-OKF (`test_okf_bundle.py`),
+    # SR-WORK-ARCHIVE (`test_archive_law.py`), SR-WORK-RELEASE
+    # (`check-version-parity.py`, `test_version_parity.py`), and
+    # SR-WORK-BLOCKERS (the three `.claude/hooks/` scripts).
+    # ⚠ The remaining three own nothing and say so in their own decisions —
+    # SR-WORK-SCALE 15, SR-WORK-LIFECYCLE 12, SR-WORK-SESSION 13 — under
+    # SR-WORK-OWNERSHIP decision 7: each names the case rather than inventing a
+    # component, because a checker for *what a sentence may claim*, *the order
+    # work happens in*, or *whether a handoff is true* would grade the wrong
+    # thing and read as authority while doing it.
+    "SR-WORK-SCALE", "SR-WORK-LIFECYCLE", "SR-WORK-DOCS", "SR-WORK-SESSION",
+    "SR-WORK-OKF", "SR-WORK-ARCHIVE", "SR-WORK-RELEASE", "SR-WORK-BLOCKERS",
+    # SR-WORK-GOVERNANCE (2026-09-14) owns no component and never will: it is
+    # the MAP of what governs what, converted from `work/governance.md`. Its
+    # subject is the inventory of governing files, so no change under `src/`
+    # can make a row of it true or false. It owns no test either, and says so
+    # under SR-WORK-OWNERSHIP decision 7: the only check worth having would be
+    # *"is this map complete"*, and completeness against an open-ended set of
+    # future steering files is exactly the thing a checker cannot grade —
+    # which is why it is decision 8's obligation and the record's veto
+    # condition instead.
+    "SR-WORK-GOVERNANCE",
+    # SR-WORK-GOLDEN (2026-09-15) owns three components and not one of them
+    # is under `src/`: the PreToolUse hook that guards the sealed answer key,
+    # the generator behind `CLAUDE.md`'s view of the prohibition, and the test
+    # that binds the two. Its subject is **who may read a file**, so no change
+    # to the engine can make it true or false — the SR-WORK-OPEN-QUEUE case,
+    # not the SR-ANSWER one. It is unreachable only by THIS set's question,
+    # which asks whether a change under `src/` can demand a record.
+    "SR-WORK-GOLDEN",
+    # SR-LAW-11 (2026-09-15) is the sealed-answer-key prohibition, and it owns
+    # no `src/` component for the same reason its process record SR-WORK-GOLDEN
+    # owns none: its subject is **who may read a directory**, enforced outside
+    # the engine by a PreToolUse hook, a deny rule, `.gitignore` and the
+    # generated law block. No change under `src/` can make the law true or
+    # false, so the freshness gate cannot reach it — the SR-WORK-OPEN-QUEUE
+    # case, not the SR-ANSWER one.
+    "SR-LAW-11",
 }
 
 

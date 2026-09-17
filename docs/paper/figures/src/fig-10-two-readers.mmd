@@ -1,0 +1,16 @@
+flowchart LR
+  classDef py fill:#eef3f8,stroke:#5b7fa6,color:#1c2b3a
+  classDef nd fill:#eefaf0,stroke:#3f9a5a,color:#12301c
+  classDef idx fill:#fff4e0,stroke:#c98a1b,color:#3a2a08
+  classDef law fill:#fbeeee,stroke:#b85c5c,color:#3a1414
+  I["the committed index<br/>+ tune.toml + output.toml"]:::idx
+  P["PYTHON — writes and reads<br/>every verb; the only thing that writes a committed byte<br/>scan or T1 accelerator · decoders · fetchers"]:::py
+  N["NODE — reads only, npm fux-engine<br/>find ask answer explain graph path mcp<br/>zero dependencies · always scan · never fetches<br/>graph rebuilt in memory"]:::nd
+  B["served as ONE bundle: .fux/node/fux.mjs (L10)<br/>consumer sees build output, never source"]:::law
+  D["differential law, third arm:<br/>ordering byte-equal · scores equal after round(9)<br/>six surfaces · 0 of 775 discordant at rung-10000"]:::law
+  I --> P
+  I --> N
+  N --- B
+  P <-- "same bytes out" --> N
+  P --- D
+  N --- D

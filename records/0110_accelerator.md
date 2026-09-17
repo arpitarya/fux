@@ -7,10 +7,10 @@ description: A disposable term-major index under .fux/runtime/ that makes warm q
 status: accepted
 date: 2026-08-18
 feature: "`.fux/runtime/` — the derived index, `fux build`, and the block bound that makes skipping provable"
-owns: [src/fux/derive@08c8ff2c8767, tools/differential@f4c752e76d2a]
+owns: [src/fux/derive@28c69c111b2e, tools/differential@1934e54fe0ca]
 laws: [L1, L3]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 5a8a3e49dc361f535917358fc368de875996cdd3e10fc4ff7647fefbe4389780
+content_sha: 6720c5937c546dbd0bd22b1b26889685222380e0a886524401ca24c493a4a13e
 ---
 
 # SR-T1-ACCELERATOR — the derived T1 accelerator
@@ -442,9 +442,11 @@ checks gets authored to pass.
 
 **They are the same run on a corpus whose tune is all-defaults**, which is
 every golden rung. They differ on fux's own repo — 90 of 174 comparisons
-against 0 — because **Node reads no `tune.toml` at all**
-([SR-NODE-SEARCH](0153_node-search.md) decision 8 records that gap; it is
-that record's to close, not this one's).
+against 0 — because, **when this was measured, Node read no `tune.toml` at
+all**. ⚠ **Closed 2026-09-12** ([SR-NODE-SEARCH](0153_node-search.md) decision
+8): the reader now reads `.fux/tune.toml` and `.fux/output.toml`, and this repo
+went 90 of 174 discordant to 0 of 199. The two arms still exist — the
+diagnostic pattern below is why — and on this repo they now agree.
 
 ⚠ **This is the diagnostic-arm pattern this repo already learned once** —
 `CLAUDE.md` §"Hard-won build knowledge", M1: keep an arm that *does* borrow the
@@ -476,10 +478,32 @@ compile, run and answer differently, so the comparison is on **answers**. The
 bundle is BUILT per run (`node_arm.bundle_entry`) rather than read off disk,
 because a bundle on disk could be from another checkout.
 
-**Whole payloads rather than a field list, for the graph lane**, because those
-verbs carry no score to tolerance: every byte of meaning is in the structure,
-and comparing a field list is exactly what would let two readers emit different
-key names indefinitely.
+**Whole payloads rather than a field list, for the graph lane**, because
+comparing a field list is exactly what would let two readers emit different key
+names indefinitely. **Structure, key names and ORDER are byte-equal; `score`
+goes through `round(…, 9)` first** — [SR-RANKING](0111_ranking.md) decision 8a,
+which is a statement about the engine's scores and not about which verb printed
+one.
+
+⚠ **This paragraph said those verbs "carry no score to tolerance" until
+2026-09-16, and every node of a `graph` payload carries a `score`.** So
+`compare_verb` held the graph lane to the score's LAST BIT while `_fields`
+beside it applied the ruled contract — one lane stricter than the engine's own
+promise, by accident rather than by decision.
+
+🔴 **The two defects hid each other, and that is the part worth keeping.** The
+graph lane only runs on a fresh derived plane, `node-arm.yml` never built one,
+so **the lane had never run in CI at all** — the wrong comparison sat behind a
+lane that was skipping, and the skip sat behind a workflow nobody had reason to
+doubt. The first CI run that built the plane went red at **1 of 225** on
+`graph 'pii redaction'`: `11.780650569089822` against `11.780650569089824`,
+**identical node order**, a ~2e-16 relative difference against the `~1e-9` that
+decision 8a says would void it — `log`'s one-ulp disagreement between two
+libms, measured, which is the phenomenon 8a exists for and the reason the OS
+matrix exists. ✅ Held now by
+[`tests/test_differential_arm.py`](../tests/test_differential_arm.py), which
+pins the measured payload pair verbatim and asserts that order, key names and a
+difference above the contract all still fail.
 
 ⚠ **Two exclusions, both by NAME and neither by a loosened comparison** —
 `ranked_by` (SR-NODE-SEARCH decision 10: Python's MCP surface opts into the
@@ -495,8 +519,115 @@ plane.** Python's graph verbs refuse without `fux build` and Node's do not
 (SR-NODE-SEARCH decision 9), so there is nothing to compare there — and a lane
 that silently does not run is the failure decision 13 is about.
 
+
+**15. The anchor seed happens BEFORE the skipping loop, and that ordering is
+the whole correctness argument** (W-168 step 1, 2026-09-15).
+
+`block_bound` bounds what a document can score **from the postings**. An anchor
+contribution is not in the postings, so a document whose score comes from a
+linker's wording is not bounded by it — and skipping would lose it. That is the
+W-73 defect exactly: a bound that no longer bounds.
+
+**Seeding every anchor-matching document up front makes the existing bound
+sound again, unchanged.** After the seed, every document with a non-zero anchor
+contribution for any query term is already a candidate, so an *unseen*
+document's anchor contribution is **zero by construction** and `block_bound`
+bounds it as it always did. The ceiling is therefore **exact** rather than
+merely conservative, and nothing in it needed widening.
+
+- **The other direction is safe too.** Anchor length only ever raises a
+  candidate's `wlen`, and `mnw` under-estimates `wlen`, which pushes the bound
+  **up** — the one error direction that never loses a document.
+- **`theta` DOES carry the fold**, and must: a real candidate's real score
+  includes its anchor terms. A higher `theta` skips more, which is sound
+  because it is compared against a ceiling over documents that provably have
+  none. Scoring a candidate without its anchor terms while `rank()` scores it
+  with them would report a k-th best that no longer matches the ranking anyone
+  sees — the same rule `--expand`'s per-term weights follow in `_kth_score`.
+- **It is cheap.** Anchor postings are link text: a handful of words per edge
+  against thousands per body.
+
+**15a. `fux.runtime.v6` — the anchor plane.** `anchors/<prefix>.json` holds the
+reverse map term → `[(docidx, count)]`; `docs.jsonl` carries each document's
+`alen`; `stats.json` carries `total_anchor_len`. All three are folded from the
+committed shards alone and gitignored, which is the whole of Arpit's ruling:
+**the words are committed on the source's edge, and the per-target view ranking
+needs is rebuilt, never committed.**
+
+- **Sharded by the term hash's first byte**, mirroring `postings/` and the
+  committed store, so a query opens one small file per term rather than a
+  corpus-wide map.
+- **Whole-file JSON, not the block-and-offset shape `postings/` uses.** Anchor
+  postings are a small fraction of body postings, so a bisectable fixed-width
+  table would buy nothing and add a second binary layout to keep in step.
+- **`alen` is in the doc table, not the anchor shards**, because every
+  candidate needs it and only a *matching* candidate needs its terms — a linked
+  document is longer whether or not a single anchor word matches.
+- **`DOCS_FIELDS` moved with the table**, which is the 2026-08-23 lesson that
+  field set exists for: a key added while the schema string stayed put left an
+  accelerator built minutes earlier still being read, and the two paths weighted
+  the same document differently.
+
+**15b. The differential arm ran at anchor ON as well as off.** 692 queries × 4
+`top` values × 2 skipping modes over this repository's 1 237 documents:
+**5 536 byte-identical comparisons at the default and 5 536 at `anchor = 2.0`,
+zero mismatches** (2026-09-15). ⚠ **Run through an ad-hoc copy of the harness,
+not `tools/differential/run.py`**, because `queryset.py::vocabulary` decodes
+every walked file as UTF-8 and this repository's source dirs now hold ten files
+that are not — a pre-existing harness defect, unrelated to this change, filed
+as **W-184**. The comparison performed is the harness's own.
+
+**15c. W-184 closed on 2026-09-15, and the harness was dead in TWO ways, not
+one.** Both were the same assumption — *every file under a source directory is
+text* — and only one of them announced itself.
+
+| site | what it did | how it read |
+|---|---|---|
+| `queryset.py::vocabulary` | `.decode("utf-8")` on every walked file | `UnicodeDecodeError` on the first PNG; `run.py --root .` never reached a comparison |
+| `bench_r3.py::source_vocabulary` | `.decode("utf-8", errors="replace")` on the same bytes | **ran**, and folded `png` and a page of replacement characters into the corpus vocabulary as terms no document contains |
+
+🔴 **The quiet one is the worse defect.** A harness that crashes gets fixed on
+the day somebody runs it. A harness that invents its own query set measures
+something nobody asked for and reports it green. One helper now decides what
+counts as text, `Vocabulary` carries the count and the names of what it skipped,
+and `run.py` prints them — a query set that shrinks because ten files stopped
+decoding must not look like one that did not.
+
+⚠ **And the run turned up a third break the moment it could reach one.**
+`compare()` passed `archived_weight=` to both `ask`s; **W-152 removed that
+prior on 2026-09-13** and no signature has accepted the keyword since, so every
+invocation raised `TypeError` before its first comparison. The weight sweep —
+`(1.0, 0.5, 2.0, 500.0)`, which exists to hold the W-73 bound at values that
+straddle unity — rides `[priority]` now, on a location prefix that covers part
+of the corpus and not all of it. **That is a better shape than the prior it
+replaced**: the bound has to survive *some* documents being scaled, and a
+global prior scaled everything it reached.
+
+**Measured, on this repository, 2026-09-15:** 692 queries × 4 `top` values ×
+4 weights × 2 skipping modes = **22 144 byte-identical comparisons, zero
+mismatches**, through `tools/differential/run.py` itself. Decision 15b's numbers
+stand as they are — they were gathered through the ad-hoc copy and say so.
+
+⚠ **What is still unguarded.** `tests/derive/test_differential_harness.py` holds
+the decode assumption and the shape of the weight sweep. It does **not** run the
+harness over a real corpus, because that is a fifteen-minute job and the unit
+suite is not where it belongs. **The real-corpus arm is still something a person
+has to run**, and the two days this one spent dead are what that costs.
+
 ### Consequences
 
+- ⚠ **`tools/differential/` also carries the golden ladder's custody, and
+  that is an accident of location rather than a decision of this record**
+  (2026-09-15, W-136 prompt 4). `rungs.py` and `ladder_check.py` resolve and
+  verify a golden rung for the Node differential arm, and they gained
+  `seed_drift()` — the check that a frozen rung still holds the seed corpus
+  this repository has — after all eight rungs were found frozen against a
+  superseded seed while every existing check passed. **Nothing about the
+  accelerator changed**; the harness's directory is simply where the ladder's
+  join between manifest and corpus already lived. **Whether ladder custody
+  should own its own record is Arpit's**, and it is noted here rather than
+  decided, because a component this record owns may not change without the
+  record saying so.
 - **The differential law now covers the confidence block too.** `accel.ask`
   threads `stats_out` straight through to `rank()`, so both generators derive
   `df` over the same query hashes and report the same `n`, and `--fast` and

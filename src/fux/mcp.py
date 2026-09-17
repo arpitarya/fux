@@ -85,8 +85,15 @@ def _tools(top: int) -> list[dict]:
             "all -- say what was searched and stop. If `confidence.band` is "
             "'partial', answer but name every term in `confidence.missing`: those "
             "are words from the question that appear in no document here. If it is "
-            "'weak', the ranking could not separate the top hits, so report the "
-            "candidates rather than a conclusion."
+            "'weak', the ranking could not separate the top hits -- `answerable` is "
+            "false there too, so abstain: say that the documents do not say, name "
+            "what was searched, and report the candidates rather than a conclusion. "
+            "The payload also carries "
+            "`related`: documents that NO query word matched, returned because "
+            "the ranked results above LINK to them, each with the `route` it was "
+            "reached by. They are not matches and must never be cited as one -- "
+            "read a related document with fux_passage before you use it, and say "
+            "that you followed a link to it rather than found it."
         ),
         "inputSchema": {
             "type": "object",
@@ -185,8 +192,15 @@ def _search(root: Path, args: dict, *, top: int) -> dict:
     from .store import read_index
 
     signals: dict = {}
+    # W-161 — this surface takes BOTH tiers. An agent is the reader the related
+    # tier was built for: it cannot run `fux graph` as a follow-up the way a
+    # person can, and `next` has been telling it to call `fux_related` for
+    # neighbours since the tool existed. Handing it the neighbours it would
+    # have asked for saves the round trip it was told to make.
+    related: list = []
     results, path = run_query(
-        root, query, k, force_scan=False, confidence_out=signals, expand=expand
+        root, query, k, force_scan=False, confidence_out=signals, expand=expand,
+        related_out=related,
     )
     block = signals.get("confidence")
     records = read_index(root) if results else {}
@@ -221,6 +235,31 @@ def _search(root: Path, args: dict, *, top: int) -> dict:
         )
     return {
         "results": out,
+        # 🔴 **ITS OWN KEY, AND NEVER MERGED INTO `results`.** These documents
+        # matched NO query word; they are here because the documents above link
+        # to them. An agent that reads them as matches will cite a document the
+        # question's own words never reached — with a real path and a real sha
+        # beside it, which is the most convincing shape a wrong answer has.
+        # `route` on every row is what makes that checkable.
+        #
+        # **Unconditional, like `confidence` and for its reason:** a tool call
+        # cannot pass a flag, so there is nothing for an absent key to mean
+        # except *this server is older than the tier* — the W-48 trap. `[]` is
+        # what *no neighbours* looks like.
+        "related": [
+            {
+                "path": r.loc,
+                "title": r.title,
+                # NOT `score`. A related document has none — that is the
+                # definition of the tier — and `mass` is a walk statistic on a
+                # scale nothing else here shares. Naming it `score` would make
+                # every agent that sorts on `score` interleave the two lists.
+                "mass": round(r.mass, 6),
+                "archived": r.archived,
+                "route": r.route,
+            }
+            for r in related
+        ],
         "ranked_by": path,
         # SR-CONFIDENCE. **The single most important key on this surface**, and
         # the reason the record exists: an agent handed a ranked list cannot
@@ -247,7 +286,12 @@ def _search(root: Path, args: dict, *, top: int) -> dict:
         # just the committed heading text, filtered to what the query asked
         # about. It narrows WHICH document to open and WHERE to look in it,
         # which is the decision an agent makes before it spends a `fux_passage`.
-        "next": "call fux_passage with a path to read a span, or fux_related for neighbours",
+        "next": (
+            "call fux_passage with a path to read a span, or fux_related for neighbours. "
+            "`related` here is already the neighbourhood of THIS query's answers -- "
+            "documents no query word matched, so never cite one as a match without "
+            "reading it with fux_passage first"
+        ),
     }
 
 
@@ -277,6 +321,34 @@ def _passage(root: Path, args: dict) -> dict:
 
 
 def _related(root: Path, args: dict) -> dict:
+    """One document's edges, both directions.
+
+    🔴 **This is NOT a seeded walk, and W-160's gap-check row said it was**
+    (the correction is [SR-MCP](../../records/0136_mcp.md) §Consequences; the
+    item shipped and archived on 2026-09-14). That row asked for it to be
+    *"re-implemented over `graph --seed` (same output, one code path)"*, and the
+    two halves of that are incompatible: `graph --seed` returns a **PPR
+    neighbourhood** — ranked nodes with scores, including nodes two hops out
+    that this document never mentioned — while `fux_related` returns **the
+    edges this document actually states**, in both directions, with their
+    kinds. Routing it through the walk would have changed what an agent gets
+    while the row promised it would not.
+
+    **What the row was actually right about is the second half: one code path.**
+    The inbound scan here used to re-derive adjacency by walking every record's
+    `edges` array with its own comprehension — a third definition of *what
+    points at this*, beside `graph/model.py::Graph` and the plane. It now lifts
+    the same `Edge`s through `edges_from_records` and reads `Graph`'s own
+    adjacency, so there is one definition and this surface cannot drift from the
+    verbs.
+
+    ⚠ **Built in memory, never loaded from `.fux/runtime/graph.json`.** MCP must
+    answer in a clone that has never run `fux build`
+    ([SR-NODE-SEARCH](../../records/0153_node-search.md) decision 9 is the same
+    asymmetry one reader over), and `plane.load` refuses without a fresh one.
+    The records are already in hand, so the adjacency costs one pass over them.
+    """
+    from .graph.model import Graph, edges_from_records
     from .store import read_index
 
     rel = args.get("path") or ""
@@ -286,11 +358,11 @@ def _related(root: Path, args: dict) -> dict:
     if record is None:
         raise FuxError(f"{rel!r} is not in the index")
 
+    graph = Graph(edges_from_records(list(records.values())))
     inbound = [
-        {"path": other["loc"], "kind": edge["kind"]}
-        for other in records.values()
-        for edge in other.get("edges", ())
-        if edge.get("dst") == doc_id
+        {"path": records[edge.src]["loc"], "kind": edge.kind}
+        for edge in graph.edges
+        if edge.dst == doc_id and edge.src in records
     ]
     return {
         "path": record["loc"],

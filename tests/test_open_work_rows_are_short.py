@@ -31,6 +31,11 @@ CLAUDE.md's two-strikes rule makes the second time the trigger for a gate.
    such a chain on one that does; **red wins, then purple**. A 🟡 row names what
    it waits on and reaches neither a decision nor a date. A 🟢 row waits on
    nothing. A 🔺 row does not wait on a row without 🔺.
+6a. **A 🟡 row names the ITEM, or says there is none** (rule 23a, Arpit
+   2026-09-15). `waiting on W-nn` with the bare id when the blocker is in the
+   queue; the words `not a queue item` when it is not. A noun phrase alone --
+   *"waiting on a subscriber"* -- satisfied rule 6 while hiding which of two
+   opposite states the row was in.
 
    ⚠ **Not checkable:** whether 🧨 is true, and whether Arpit, rather than an
    agent, added a 🔺. Both are stated in rule 6 and rest on judgment.
@@ -174,6 +179,13 @@ _INBOX_LEAD = re.compile(r"^\|\s*(\S+)( 🧨)?( 🔺)? \*\*(W-\d+)\b")
 _WAITS = re.compile(r"\b(blocked on|after|waiting on|waits on)\b", re.IGNORECASE)
 _WAITS_ON_ID = re.compile(r"\b(?:blocked on|after|waiting on|waits on)\s+(W-\d+)", re.IGNORECASE)
 
+#: Rule 23a (Arpit, 2026-09-15). A 🟡 row waiting on something that is NOT a
+#: queue item says so **in these words**, so the two states are distinguishable
+#: by reading rather than by guessing at a noun phrase. It is a fixed phrase for
+#: the same reason rule 27's verb list is fixed: a blocker named any other way
+#: names one no check can see.
+_NOT_A_QUEUE_ITEM = re.compile(r"not a queue item", re.IGNORECASE)
+
 
 def marked_items() -> dict[str, tuple[int, str, bool, str]]:
     """W-nn -> (line, ball, has 🔺, row text) for every open item with a parseable lead."""
@@ -288,6 +300,37 @@ def test_yellow_names_what_it_waits_on_and_green_waits_on_nothing() -> None:
     assert not bad, "OPEN-WORK rule 6:\n  " + "\n  ".join(bad)
 
 
+def test_every_yellow_row_names_an_id_or_says_there_is_none() -> None:
+    """Rule 23a. Saying *what* you wait on is not the same as saying *which item*.
+
+    🔴 **The two states this separates are opposites, and the old rule let them
+    look identical.** A row waiting on `W-145` clears itself the day W-145
+    lands; a row waiting on *"a subscriber"* clears itself never, because
+    nothing in the queue is tracking a subscriber. Both used to read as
+    *"waiting on a thing"*, so a session triaging the queue could not tell which
+    rows were live and which were parked.
+
+    ⚠ **What this does NOT check is whether the claim is true** -- a row may say
+    `not a queue item` about something that is one. That is rule 46's re-derive,
+    a human obligation, and approximating it here (grepping the row's nouns
+    against the item titles) is the `test_open_work_is_not_stale` gap in a new
+    costume: it would pass on the wrong file and fail on prose it does not
+    understand.
+    """
+    bad = []
+    for wid, (line, ball, _, text) in marked_items().items():
+        if ball != "🟡":
+            continue
+        if _WAITS_ON_ID.search(text) or _NOT_A_QUEUE_ITEM.search(text):
+            continue
+        bad.append(
+            f"L{line}: {wid} is 🟡 but names no blocking item. Rule 23a: write "
+            f"`waiting on W-nn` with the bare id, or say `not a queue item` "
+            f"when nothing in the queue is what it waits for."
+        )
+    assert not bad, "OPEN-WORK rule 23a:\n  " + "\n  ".join(bad)
+
+
 def test_a_do_first_item_is_not_waiting_on_a_normal_one() -> None:
     """🔺 on a waiting row is dead weight if what it waits on is in normal order.
 
@@ -349,7 +392,13 @@ def test_every_inbox_row_is_followed_by_its_blocks_subrow() -> None:
         f"L{line}: {wid} has no `| ↳ **blocks:** ... | | |` row directly beneath it."
         for wid, (line, sub) in blocks_subrows().items() if sub is None
     ]
-    assert blocks_subrows(), "no decision rows parsed out of *Blocked on Arpit*"
+    if not blocks_subrows():
+        from test_open_work_is_not_stale import _inbox_declared_empty
+
+        assert _inbox_declared_empty(), (
+            "no decision rows parsed out of *Blocked on Arpit*, and the file does not "
+            "declare the inbox empty (`*Empty since YYYY-MM-DD` under the table)."
+        )
     assert not bad, (
         "OPEN-WORK rule 10: under every *Blocked on Arpit* row, name the work that decision "
         "holds up -- or `nothing else in the queue`.\n  " + "\n  ".join(bad)

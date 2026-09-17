@@ -10,7 +10,7 @@ feature: "`.fux/sources/dirs` — what the engine indexes, what is subtracted fr
 owns: []
 laws: [L3, L6]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 637c84e15816cecbed2fd754436dbb8da1af07034a54026b739728d56883f204
+content_sha: 409be35789e25893a1e1911a49b0902c4966b457ff1fac4fe63846913af03b28
 ---
 
 # SR-DIR-LIST — the committed directory list
@@ -122,8 +122,10 @@ error rather than a last-wins merge. **One grammar, two files** — ⚠ three un
 paths — **and anything beneath them** — from every included root.
 
 ⚠ **Exclusion's home is [`.fux/.fuxignore`](0144_fuxignore.md), and this is the
-deprecated spelling.** It still parses, still works, and is still what
-`fux remove` writes (decision 2d) — nothing that already runs is broken. But
+deprecated spelling.** It still parses and still works — nothing that already
+runs is broken — but **since 2026-09-14 it is READ and never WRITTEN** (decision
+2d, SR-FUXIGNORE decision 5a). A `!` line here is now only ever one a person
+wrote or one `fux remove` wrote before that date. But
 `.fuxignore` is read **first**, `fux ingest` warns when the same pattern appears
 in both files naming this one as the line to delete, and **`!` means the
 opposite there**: it subtracts here and re-includes there. That collision is
@@ -161,13 +163,26 @@ make `work/regression/*/evidence` also match
 is the explicit any-depth form, and the matcher is hand-rolled like every other
 codec here (L1).
 
-**2d. Removal reuses `!`, and which branch it took is stated.**
+**2d. Removal has two branches, and which one it took is stated.**
 `fux remove <path>` has two cases and they are not interchangeable:
 
 | the path | how it leaves | why |
 |---|---|---|
-| has its own line | the line is deleted | it is there because someone listed it |
-| is covered by a listed ancestor | `!<path>` is written | it is there because an ancestor is listed, and the ancestor should stay |
+| has its own line | the line is deleted **here** | it is there because someone listed it |
+| is covered by a listed ancestor | an anchored pattern is written to **`.fux/.fuxignore`** | it is there because an ancestor is listed, and the ancestor should stay |
+
+⚠ **Amended 2026-09-14 (W-165 fix 1): the second branch writes next door.** It
+read *"`!<path>` is written"* and meant into this file, which is what made
+SR-FUXIGNORE's *"a migration we now owe"* a debt rather than a plan. **The
+branching logic is unchanged** — two ways in, two ways out — and only the
+destination moved. The first branch still edits this file, because a line
+somebody wrote here is still deleted from here.
+
+**A `!` line already in this file is left exactly alone**, and `fux remove` on a
+path one of them excludes raises rather than migrating it: a verb asked to remove
+something already removed has no business rewriting a file the caller did not
+name. `fux doctor`'s `dirs exclusions migrated` row offers the move instead —
+SR-FUXIGNORE decision 5b.
 
 **The grammar already had subtraction, so nothing was invented.** The
 alternative — deleting the ancestor's line and re-adding its siblings — is a
@@ -221,6 +236,18 @@ carries meaning here (decision 3) in a way it does not there. Same grammar,
 different authorship, and the reader is lenient for both.
 
 ### Consequences
+
+- ✅ **A listed path that is not on disk is REPORTED (2026-09-14, W-163).**
+  `fux doctor`'s `listed directories exist` row names it. 🔴 **This is not
+  cosmetic: `walk_sources` RAISES on it**, so the next `fux ingest` in that repo
+  exits 1 — which is precisely why `fux add` refuses a path that does not exist,
+  and a line that arrived any other way (a hand edit, a branch switch, a moved
+  directory) had nothing checking it until the ingest failed.
+  ⚠ **Still a `warn`.** Ingest is where it stops and says so clearly; making
+  `doctor` red as well would fire on a branch where a documented directory is
+  simply not checked out, which is a legitimate state to be in for an afternoon.
+  ⚠ **Exclusions are not checked** — a `!` line names a pattern, and one matching
+  nothing today is what a pattern is for.
 
 - **A single file was always a legal entry.** `_candidate_paths` branches on
   `base.is_file()`, so `fux add docs/onboarding.md` needed no list, no attribute

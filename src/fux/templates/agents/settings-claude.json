@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(fux:*)",
+      "Bash(uv run fux:*)",
+      "Bash(./.venv/bin/fux:*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Grep",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/fux-index-hint.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -10,6 +10,8 @@ from __future__ import annotations
 
 import argparse
 import sys
+import time
+from pathlib import Path
 
 from . import __version__
 from .errors import FuxError
@@ -27,6 +29,12 @@ def _cmd_doctor(args) -> int:
     return cmd_doctor(args)
 
 
+def _cmd_inspect(args) -> int:
+    from .inspect import cmd_inspect
+
+    return cmd_inspect(args)
+
+
 def _cmd_ingest(args) -> int:
     from .ingest import cmd_ingest
 
@@ -37,6 +45,12 @@ def _cmd_ask(args) -> int:
     from .query import cmd_ask
 
     return cmd_ask(args)
+
+
+def _cmd_lexical(args) -> int:
+    from .query import cmd_lexical
+
+    return cmd_lexical(args)
 
 
 def _cmd_find(args) -> int:
@@ -63,16 +77,16 @@ def _cmd_remove(args) -> int:
     return cmd_remove(args)
 
 
-def _cmd_update(args) -> int:
-    from .sources import cmd_update
-
-    return cmd_update(args)
-
-
 def _cmd_build(args) -> int:
     from .ingest import cmd_build
 
     return cmd_build(args)
+
+
+def _cmd_correct(args) -> int:
+    from .correct import cmd_correct
+
+    return cmd_correct(args)
 
 
 def _cmd_enrich(args) -> int:
@@ -135,10 +149,14 @@ def _cmd_tune(args) -> int:
 
 
 #: The write verbs — the only ones that construct a `Progress` in `main`
-#: (W-64). `add`/`remove`/`update` joined it in W-63: they end in
-#: `ingest.run()`, so they inherit the bar from that seam rather than growing
-#: one of their own.
-_PROGRESS_COMMANDS = ("ingest", "build", "add", "remove", "update")
+#: (W-64). `add`/`remove` joined it in W-63: they end in `ingest.run()`, so
+#: they inherit the bar from that seam rather than growing one of their own.
+#: ⚠ **`update` was here until W-177 deleted the verb**; its row is not
+#: missing, it is `ingest`'s now.
+#: `inspect` joins these because its retrieval half is one full query per
+#: sampled document and its dictionary half re-tokenises the whole corpus —
+#: both are long enough that silence reads as a hang.
+_PROGRESS_COMMANDS = ("ingest", "build", "add", "remove", "inspect")
 
 
 def _add_progress_flags(parser: argparse.ArgumentParser) -> None:
@@ -313,13 +331,106 @@ def build_parser() -> argparse.ArgumentParser:
     _add_output_flags(p_doctor)
     p_doctor.set_defaults(func=_cmd_doctor)
 
-    p_ingest = sub.add_parser("ingest", help="walk configured sources into the committed index")
+    # `inspect` reads the INDEX; `doctor` checks the ENVIRONMENT (SR-INSPECT
+    # decision 1). A flag on `doctor` would have made one command answer two
+    # questions with two different remedies — a config edit versus a change to
+    # the corpus — and the two lists would have been read as one.
+    p_inspect = sub.add_parser(
+        "inspect", help="what the index looks like: boilerplate, unfindable documents, duplicates"
+    )
+    p_inspect.add_argument("--json", action="store_true", default=None, help="machine-readable report")
+    p_inspect.add_argument(
+        "--top",
+        type=int,
+        default=20,
+        metavar="N",
+        help="how many rows each named list shows (the counts beside them are never truncated)",
+    )
+    p_inspect.add_argument(
+        "--retrieval-sample",
+        type=int,
+        default=None,
+        metavar="N",
+        help="documents to test by retrieval; 0 means every one of them (one full query each)",
+    )
+    p_inspect.add_argument(
+        "--rebuild-dictionary",
+        action="store_true",
+        help="re-tokenise the sources even when the cached hash-to-word dictionary is current",
+    )
+    _add_progress_flags(p_inspect)
+    _add_output_flags(p_inspect)
+    p_inspect.set_defaults(func=_cmd_inspect)
+
+    # **The one verb over the corpus** (W-177, Arpit 2026-09-15). `fux update`
+    # is deleted and its whole surface is here: the first ingest and every
+    # re-ingest are the same command, for directories and URLs alike.
+    #
+    # ⚠ **A bare `fux ingest` now goes to the network**, which is the ruling
+    # that moves the L4 fence onto the default verb. Narrow-by-default survives
+    # the move untouched — W-82 ruling 3 is about *which* URLs, never which
+    # verb — so the bare form fetches the ones known to be stale and says so.
+    # `--no-fetch` is the offline form, and it is what `fux hooks` writes.
+    p_ingest = sub.add_parser(
+        "ingest",
+        help="walk configured sources into the committed index, re-fetching stale URLs",
+    )
+    p_ingest.add_argument(
+        "entry", nargs="?", help="one listed entry; omit for every configured source"
+    )
     p_ingest.add_argument("--list-skipped", action="store_true", help="print skipped files and why, then exit")
-    # Retired into `fux update` (W-63). Kept for one release as a hidden
-    # alias — it is a flag rather than a verb, it is older than `fux url` and
-    # more likely to be in someone's CI, and leaving it in costs nothing.
-    # `fux url` was deleted outright; this was not.
-    p_ingest.add_argument("--refresh-urls", action="store_true", help=argparse.SUPPRESS)
+    # ⚠ **`--check` and `--list-skipped` are two exit-early flags on one verb**
+    # now (W-177 DoD 3), and argparse has no opinion about which wins. SR-INGEST
+    # decision 21 rules `--check`: it is the whole-corpus freshness question,
+    # it is the one with a `--json` form, and it is the one a pipeline gates
+    # on. `--list-skipped` reports on a walk this invocation is not going to do.
+    p_ingest.add_argument(
+        "--check",
+        action="store_true",
+        help="read-only: report what has drifted, then exit 0. Offline; does not fetch",
+    )
+    # ⚠ **`--check` had no machine-readable output at all** (W-140 row 14,
+    # 2026-09-11), and it is the one form whose whole purpose is being read by
+    # something else: it exits **0 whether or not anything drifted** —
+    # deliberately, because drift is a fact and a non-zero exit would make *your
+    # docs changed* look like a broken command to every script that checks
+    # status. With no `--json`, the only way to act on the answer was to parse
+    # a table meant for a person.
+    p_ingest.add_argument(
+        "--json", action="store_true", default=None, help="machine-readable drift report (with --check)"
+    )
+    # W-82 ruling 3: narrow is the DEFAULT and this overrides it. There is
+    # deliberately no `--dirty`/`--stale`/`--changed` — if the dirty list is the
+    # right thing to refresh, it should not have to be asked for.
+    #
+    # ⚠ **Named `--all` on `fux update`, where it sat alone** (W-177 ruling 3).
+    # Beside `--full` it would read as its synonym, and the two are unrelated:
+    # `--full` re-extracts every *document*, `--refetch-all` fetches every
+    # *URL*. One of them touches the network and the other cannot.
+    p_ingest.add_argument(
+        "--refetch-all",
+        action="store_true",
+        help="fetch every listed URL, not just the ones known to be stale",
+    )
+    # SR-URL-FRESHNESS. A flag on the networked verb, never a new one: `fux
+    # retry` would be a second way to do what this already does, and SR-CLI
+    # decision 1 refuses that. The selector is url-state's own `fail_streak > 0`,
+    # which is the number that file exists to report.
+    p_ingest.add_argument(
+        "--failed",
+        action="store_true",
+        help="fetch only the URLs whose last run failed (fail_streak > 0)",
+    )
+    # The offline form, and the same flag with the same meaning `fux add`
+    # carries (W-177 open question 1, ruled (b)). It is public surface on
+    # purpose: CI and an air-gapped clone have to be able to ask for an offline
+    # ingest by hand. `fux hooks` writes it; `fux daemon` writes the bare verb.
+    # There is no `--offline` alias.
+    p_ingest.add_argument(
+        "--no-fetch",
+        action="store_true",
+        help="do not open the network; re-read what is on disk (what the git hooks run)",
+    )
     p_ingest.add_argument(
         "--full",
         action="store_true",
@@ -344,6 +455,12 @@ def build_parser() -> argparse.ArgumentParser:
     p_ingest.add_argument("--spawn-runner", action="store_true", help=argparse.SUPPRESS)
     p_ingest.add_argument("--runner", action="store_true", help=argparse.SUPPRESS)
     _add_progress_flags(p_ingest)
+    # SR-OUTPUT decision 15: a verb that reads `.fux/output.toml` must be able
+    # to ignore it. This arrived with `--check --json` (W-140 row 14) on the
+    # verb that used to own it, and moved here whole with W-177 — the escape
+    # hatch is how *is it me or the config?* stays one flag rather than an
+    # experiment.
+    _add_output_flags(p_ingest)
     p_ingest.set_defaults(func=_cmd_ingest)
 
     p_build = sub.add_parser(
@@ -370,9 +487,9 @@ def build_parser() -> argparse.ArgumentParser:
             "--no-update",
             action="store_true",
             help=(
-                "URLs: record update=never - pin this document. `fux update` will not "
-                "fetch it again. NOTE this add still fetches ONCE, which is what makes "
-                "the line ingestable; the flag governs every run after"
+                "URLs: record update=never - pin this document. `fux ingest` will not "
+                "fetch it again, not even under --refetch-all. NOTE this add still fetches "
+                "ONCE, which is what makes the line ingestable; the flag governs every run after"
             ),
         )
         p.add_argument("--ttl", metavar="D", help="URLs: record ttl=D - how long a citation may go unchecked at ask time (0, 30s, 15m, 1h, 7d)")
@@ -402,50 +519,6 @@ def build_parser() -> argparse.ArgumentParser:
     _add_progress_flags(p_remove)
     p_remove.set_defaults(func=_cmd_remove)
 
-    p_update = sub.add_parser(
-        "update", help="re-read what is already listed, re-fetching URLs (replaces `ingest --refresh-urls`)"
-    )
-    p_update.add_argument("entry", nargs="?", help="one listed entry; omit for all of them")
-    p_update.add_argument(
-        "--check",
-        action="store_true",
-        help="read-only: report what has drifted. Offline for files; does not fetch URLs",
-    )
-    # ⚠ **`--check` had no machine-readable output at all** (W-140 row 14,
-    # 2026-09-11), and it is the one verb whose whole purpose is being read by
-    # something else: it exits **0 whether or not anything drifted** —
-    # deliberately, because drift is a fact and a non-zero exit would make *your
-    # docs changed* look like a broken command to every script that checks
-    # status. With no `--json`, the only way to act on the answer was to parse
-    # a table meant for a person.
-    p_update.add_argument(
-        "--json", action="store_true", default=None, help="machine-readable drift report"
-    )
-    # W-82 ruling 3: narrow is the DEFAULT and this overrides it. There is
-    # deliberately no `--dirty`/`--stale`/`--changed` -- if the dirty list is the
-    # right thing to refresh, it should not have to be asked for.
-    p_update.add_argument(
-        "--all",
-        action="store_true",
-        help="fetch every listed URL, not just the ones known to be stale",
-    )
-    # SR-URL-FRESHNESS. A flag on the existing networked verb, never a new
-    # one: `fux retry` would be a second way to do what `update` already does,
-    # and SR-CLI decision 1 refuses that. The selector is url-state's own
-    # `fail_streak > 0`, which is the number that file exists to report.
-    p_update.add_argument(
-        "--failed",
-        action="store_true",
-        help="fetch only the URLs whose last run failed (fail_streak > 0)",
-    )
-    _add_progress_flags(p_update)
-    # SR-OUTPUT decision 15: a verb that reads `.fux/output.toml` must be able
-    # to ignore it. `update` began reading it when `--json` landed (W-140 row
-    # 14), and `test_every_verb_that_reads_the_file_can_bisect_it` said so
-    # before the change was committed — the escape hatch is how *is it me or
-    # the config?* stays one flag rather than an experiment.
-    _add_output_flags(p_update)
-    p_update.set_defaults(func=_cmd_update)
 
     def _query_parser(name: str, help_text: str):
         p = sub.add_parser(name, help=help_text)
@@ -481,42 +554,98 @@ def build_parser() -> argparse.ArgumentParser:
         _add_output_flags(p, band=True)
         return p
 
-    p_ask = _query_parser("ask", "answer a question from the committed index, with citations")
-    p_ask.add_argument("--top", type=int, default=None, metavar="N", help=_top_help())
-    p_ask.add_argument("--explain", action="store_true", default=None, help="report which path answered")
-    # W-84's matched `§ heading` lines. ⚠ **A pair, not a `store_true`** — the
-    # lines are ON by default, so a `store_true` could only ever turn them on
-    # again and `.fux/output.toml` could never turn them off from the command
-    # line. `default=None` on BOTH halves is SR-OUTPUT decision 10: an absent
-    # flag has to be distinguishable from an explicit one, or the file's value
-    # is unreachable and nothing fails to say so.
-    sections = p_ask.add_mutually_exclusive_group()
-    sections.add_argument(
-        "--sections", dest="sections", action="store_true", default=None,
-        help="show the matched section headings under each hit (default)",
-    )
-    sections.add_argument(
-        "--no-sections", dest="sections", action="store_false", default=None,
-        help="omit the matched section headings, in text and in --json alike",
-    )
-    # SR-PROVENANCE. A separate flag from `--explain`, not an extension of it:
-    # `--explain` answers "which code path ran" and `--why` answers "why this
-    # document" — different questions, different costs. `--why` runs a second
-    # query when a tune file exists, and folding that cost into a flag people
-    # already pass for latency debugging would be a surprise.
-    p_ask.add_argument(
-        "--why", action="store_true",
-        help="how the ranking got here: matched terms, the cut line, rerank and tune deltas",
-    )
-    # W-109. **Repeatable, and fused in RANK space** — each phrasing is ranked
-    # on its own and the lists are combined by RRF (k = 60). `dest="also"`
-    # because `query` is already the positional: the first question is
-    # syntactically primary, which is what lets `--band` name one query.
-    p_ask.add_argument(
-        "-q", "--query", dest="also", action="append", metavar="TEXT",
-        help="another phrasing of the same question; results are fused by RRF (repeatable)",
-    )
+    def _ask_shaped_parser(name: str, help_text: str):
+        """`ask`'s whole flag surface, for the two verbs that must share it.
+
+        ⚠ **A factory rather than two blocks, because `fux lexical` is FROZEN
+        to `ask`'s output shape** (SR-CLI decision 12, W-160). Two hand-kept
+        copies of this list would drift the moment one verb gained a flag, and
+        the drift would be invisible: both parsers would work, and the frozen
+        verb would quietly stop accepting what its own contract says it takes.
+        `tests/test_cli.py::test_lexical_takes_exactly_the_flags_ask_takes` is
+        the gate; this factory is what makes it pass by construction.
+        """
+        p = _query_parser(name, help_text)
+        p.add_argument("--top", type=int, default=None, metavar="N", help=_top_help())
+        p.add_argument("--explain", action="store_true", default=None, help="report which path answered")
+        # W-84's matched `§ heading` lines. ⚠ **A pair, not a `store_true`** — the
+        # lines are ON by default, so a `store_true` could only ever turn them on
+        # again and `.fux/output.toml` could never turn them off from the command
+        # line. `default=None` on BOTH halves is SR-OUTPUT decision 10: an absent
+        # flag has to be distinguishable from an explicit one, or the file's value
+        # is unreachable and nothing fails to say so.
+        sections = p.add_mutually_exclusive_group()
+        sections.add_argument(
+            "--sections", dest="sections", action="store_true", default=None,
+            help="show the matched section headings under each hit (default)",
+        )
+        sections.add_argument(
+            "--no-sections", dest="sections", action="store_false", default=None,
+            help="omit the matched section headings, in text and in --json alike",
+        )
+        # W-161's Tier B opt-out. **A pair, like `--sections`**, so that both
+        # directions are reachable from the command line and an absent flag stays
+        # distinguishable from an explicit one.
+        #
+        # 🔴 **It is NOT backed by a key in `.fux/output.toml`, deliberately.**
+        # `[graph] ask_related` already states *do I want the related tier?* for
+        # this repository; a second statement in the rendering file would be the
+        # restatement [SR-LAW-0](../records/0002_LAW-0-authority.md) forbids —
+        # the two could disagree while both looked correct — and, because an
+        # unset output key is a hard error (SR-OUTPUT decision 19), it would
+        # **break every consumer's committed `output.toml` on upgrade** to add a
+        # knob that duplicates one they already have. `None` here means *the
+        # tune decides*, which is `--no-tune`'s own shape.
+        #
+        # ⚠ **It reaches `lexical` too, and is INERT there.** This factory is the
+        # single source of both parsers precisely so the two cannot drift
+        # (SR-CLI decision 12), and `fux lexical` has no graph tier **by
+        # definition** — it is the lexical core, frozen. So the flag parses and
+        # changes nothing there. The alternative was giving `lexical` its own
+        # parser, which is the drift this factory exists to prevent, to remove a
+        # flag that already does nothing.
+        related = p.add_mutually_exclusive_group()
+        related.add_argument(
+            "--related", dest="related", action="store_true", default=None,
+            help="show documents the answers link to but no query word matched (default)",
+        )
+        related.add_argument(
+            "--no-related", dest="related", action="store_false", default=None,
+            help="omit the related tier, in text and in --json alike",
+        )
+        # SR-PROVENANCE. A separate flag from `--explain`, not an extension of it:
+        # `--explain` answers "which code path ran" and `--why` answers "why this
+        # document" — different questions, different costs. `--why` runs a second
+        # query when a tune file exists, and folding that cost into a flag people
+        # already pass for latency debugging would be a surprise.
+        p.add_argument(
+            "--why", action="store_true",
+            help="how the ranking got here: matched terms, the cut line, rerank and tune deltas",
+        )
+        # W-109. **Repeatable, and fused in RANK space** — each phrasing is ranked
+        # on its own and the lists are combined by RRF (k = 60). `dest="also"`
+        # because `query` is already the positional: the first question is
+        # syntactically primary, which is what lets `--band` name one query.
+        p.add_argument(
+            "-q", "--query", dest="also", action="append", metavar="TEXT",
+            help="another phrasing of the same question; results are fused by RRF (repeatable)",
+        )
+        return p
+
+    p_ask = _ask_shaped_parser("ask", "answer a question from the committed index, with citations")
     p_ask.set_defaults(func=_cmd_ask)
+
+    # **W-160's first atom: BM25F alone, named and FROZEN.** `ask --scan`
+    # already *is* the lexical core; this makes it a contract — the baseline
+    # arm for every ranking verdict and for the Python/Node differential law.
+    # It exists so that when `ask` grows a graph tier (W-161) there is still a
+    # verb whose answer is *only* what the words say, and a test can hold the
+    # two apart. **A future component added to the lexical core is a new verb
+    # or a tunable, never a change to this one** (SR-CLI decision 12).
+    p_lexical = _ask_shaped_parser(
+        "lexical", "rank on the words alone — BM25F, frozen; the baseline `ask` is measured against"
+    )
+    p_lexical.set_defaults(func=_cmd_lexical)
 
     p_find = _query_parser("find", "ranked document locations, one per line")
     p_find.add_argument("--top", type=int, default=None, metavar="N", help=_top_help())
@@ -635,6 +764,37 @@ def build_parser() -> argparse.ArgumentParser:
     # W-76 Phase 5. A verb rather than a flag on `ask`: it is a long-running
     # server, not a query, and SR-CLI's four groups gain a fifth consumer-facing
     # one rather than overloading the read verbs.
+    # **W-162.** A verb rather than a flag on `enrich`, and the reason is the
+    # author: `enrich` plans and validates text a MODEL wrote; this writes a
+    # line a PERSON typed, and the two have different provenance, different
+    # survival rules under regeneration, and different `--check` treatment.
+    # Folding them would make one command answer to two authors.
+    p_correct = sub.add_parser(
+        "correct",
+        help="add the words people ASK with to the document that answers — one human question line",
+    )
+    p_correct.add_argument("question", nargs="?", help="the question somebody would type")
+    p_correct.add_argument("doc", nargs="?", help="the document that answers it — a `loc` or an id")
+    p_correct.add_argument(
+        "--pin",
+        action="store_true",
+        help="also force this document to #1 for this EXACT question. Rare, and suspended when the document changes",
+    )
+    p_correct.add_argument(
+        "--no-pin",
+        action="store_true",
+        help="drop an existing pin for this question while keeping the correction",
+    )
+    p_correct.add_argument(
+        "--reaffirm",
+        action="store_true",
+        help="re-file an existing correction against the document as it is now, releasing a suspended pin",
+    )
+    p_correct.add_argument("--list", action="store_true", help="every filed correction, and any suspended pin")
+    p_correct.add_argument("--json", action="store_true", default=None, help="machine-readable output")
+    _add_output_flags(p_correct)
+    p_correct.set_defaults(func=_cmd_correct)
+
     p_mcp = sub.add_parser(
         "mcp", help="serve the index over MCP on stdio, for coding agents"
     )
@@ -690,8 +850,29 @@ def build_parser() -> argparse.ArgumentParser:
     _add_output_flags(p_explain)
     p_explain.set_defaults(func=_cmd_explain)
 
-    p_graph = sub.add_parser("graph", help="the neighbourhood around a query's best answers")
-    p_graph.add_argument("query", help="natural-language question")
+    p_graph = sub.add_parser(
+        "graph", help="the neighbourhood around a query's best answers, or around documents you name"
+    )
+    # **W-160's second atom.** The walk gets a life without a query. `query`
+    # becomes optional and `--seed` is its alternative — and the query form is
+    # now DEFINED as `--seed` over `lexical`'s top-k, which is what
+    # `tests_e2e/test_relational.py::test_graph_query_equals_graph_over_lexical_seeds`
+    # asserts rather than assumes.
+    #
+    # ⚠ **Not mutually exclusive via argparse, because one of them is
+    # REQUIRED and argparse cannot say both.** A mutually-exclusive group with
+    # `required=True` refuses a positional, so the check is in `cmd_graph`,
+    # where it can name which of the two mistakes was made.
+    p_graph.add_argument(
+        "query", nargs="?", help="natural-language question; omit it and pass --seed instead"
+    )
+    p_graph.add_argument(
+        "--seed",
+        action="append",
+        metavar="ID",
+        help="walk from these documents instead of from a query's best answers. "
+        "Mass follows ARGUMENT ORDER, the same rank-mass rule the query form applies to top-k (repeatable)",
+    )
     p_graph.add_argument("--json", action="store_true", default=None, help="machine-readable output")
     graph_path_group = p_graph.add_mutually_exclusive_group()
     graph_path_group.add_argument(
@@ -703,6 +884,28 @@ def build_parser() -> argparse.ArgumentParser:
         "--scan",
         action="store_true",
         help="force the reference scan path for the seeds (the default)",
+    )
+    # **Exposed and INERT at their defaults** (W-160 DoD 4). They exist on
+    # `graph` so the mechanism W-161 needs can be driven and measured before
+    # `ask` composes it — landing the mechanism and the composition together
+    # would make one diff nobody can attribute a delta to.
+    p_graph.add_argument(
+        "--kinds",
+        metavar="KIND[,KIND]",
+        default=None,
+        help="walk only these edge kinds (ref, tag, code, supersedes). Default: all of them",
+    )
+    p_graph.add_argument(
+        "--link-idf",
+        action="store_true",
+        help="discount an edge by how many documents point at its target, so a hub does not dominate. Off by default and measured by nobody yet",
+    )
+    p_graph.add_argument(
+        "--max-hops",
+        type=int,
+        default=None,
+        metavar="N",
+        help="refuse mass to a node further than N hops from any seed. Default: unbounded (the walk's own iteration count already reaches three)",
     )
     _add_tune_flag(p_graph)
     _add_output_flags(p_graph)
@@ -819,13 +1022,65 @@ def main(argv: list[str] | None = None) -> int:
         from .progress import Progress
 
         args.progress = Progress(no_progress=args.no_progress, force=args.force_progress)
+    # W-170 — the observer hook's dispatch point, and there is exactly one.
+    #
+    # 🔴 **After the verb has fully rendered and its exit code is fixed**, which
+    # is what makes *observe-only* structural rather than a rule somebody has to
+    # keep: there is nothing left for consumer code to influence. `code` is
+    # computed first, stdout is flushed, and only then does anything in
+    # `.fux/observers/` run — and its return value is discarded.
+    #
+    # ⚠ **`fux mcp` is excluded by name.** A long-lived server calling consumer
+    # code once per request is a different decision with a different blast
+    # radius, and SR-OBSERVE does not make it.
+    started = time.monotonic()
     try:
-        return args.func(args)
+        code = args.func(args)
     except FuxError as exc:
         print(f"error: {exc}", file=sys.stderr)
-        return exc.exit_code
+        code = exc.exit_code
     except KeyboardInterrupt:
         return 130
+    _observe(args, argv, int((time.monotonic() - started) * 1000))
+    return code
+
+
+def _observe(args, argv: list[str] | None, ms: int) -> None:
+    """Hand this run's counts to `.fux/observers/`. **Never raises.**
+
+    ⚠ **A repo with no `.fux/observers/` pays one `stat`** and nothing else —
+    the same shape `_apply_pin` takes for an unpinned query. The import is
+    local so `--version` stays instant (SR-CLI decision 7).
+    """
+    if args.command == "mcp":
+        return
+    try:
+        sys.stdout.flush()
+    except Exception:  # pragma: no cover - a hook must not fail a verb
+        pass
+    try:
+        from . import __version__, observe
+        from .config import find_root
+
+        root = find_root(Path.cwd())
+        if root is None:
+            return
+        cfg_max_ms = 50
+        try:
+            from .config import load as load_config
+
+            cfg_max_ms = load_config(root).observe_max_ms
+        except Exception:
+            # A malformed `fux.toml` already failed the verb if the verb needed
+            # it. It must not additionally fail the hook, and the default is
+            # the right fallback: a bound nobody chose is better than none.
+            pass
+        record = observe._record_from(
+            args.command, list(argv if argv is not None else sys.argv[1:]), ms, __version__
+        )
+        observe.dispatch(root, record, max_ms=cfg_max_ms)
+    except Exception:  # pragma: no cover - a hook must not fail a verb
+        pass
 
 
 if __name__ == "__main__":

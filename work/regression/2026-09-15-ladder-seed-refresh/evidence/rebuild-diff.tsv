@@ -1,0 +1,9 @@
+# rung	ext_manifest_lines_changed	seed_manifest_lines_changed	coverage_lines_changed	old_index_root	new_index_root
+rung-seed	0	14	0	6230b878a9c2	cc9720665f24
+rung-00100	0	14	0	7fcc885916c9	b29f07a5d791
+rung-00200	0	14	0	07d45fc0dbb4	5cfcf1f50221
+rung-00500	0	14	0	286e16f2ae80	137688707be6
+rung-01000	0	14	0	c86ade78dee4	8126d51a8eeb
+rung-02000	0	14	0	4d3a37432fcb	9f671e68862d
+rung-05000	0	14	0	beb97ef9093b	6213d811541f
+rung-10000	0	14	0	7209a2c7ea0e	09e907ddb9da

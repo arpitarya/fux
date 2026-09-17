@@ -5,13 +5,13 @@ name: SR-INGEST
 title: SR-INGEST (0106) — how ingest works
 description: "Re-resolve every edge every run; carry unchanged documents' extraction forward. Write only shards whose bytes changed. Skips are reported once, counted by class, and recorded in the committed `.fux/.fuxignore`; deletions honoured, output byte-identical."
 status: accepted
-amended: 2026-09-11
+amended: 2026-09-15
 date: 2026-08-18
 feature: the `fux ingest` pipeline — sources to committed records
-owns: [src/fux/ingest@34eb1cd9a49b, src/fux/ingest/priors.py@8ffcc632a4be]
+owns: [src/fux/ingest@1a2e0e64e3f0, src/fux/ingest/priors.py@8ffcc632a4be]
 laws: [L2, L3, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 8bbbd1dca46940fd37c09b1c6578ada2088869407b1fbaf0cbe9188b45dd210e
+content_sha: ac1b2040378fc57dd2de27be13f1711cde8dd2b8a7560b4af338735584531aa1
 ---
 
 # SR-INGEST — how ingest works
@@ -485,6 +485,71 @@ file is the only place that holds both the config and the fetch plane, so it is
 the only place the value can cross, and stating that here is what stops the
 next version reaching sideways for it again.
 
+
+**17. Anchor terms ride the edge, and the edge rides the SOURCE document**
+(W-168 step 1; Arpit, 2026-09-15, option (c) of three). A `ref` edge carries
+`at` — anchor term hash to count, taken from the **link text** this document
+wrote — and `al`, the token total.
+
+**The invariant this protects is sharper than "no cross-document
+dependencies"**, and naming it wrongly is how the specified form of the feature
+nearly shipped:
+
+> **A committed per-document byte is a function of that document alone.
+> Everything corpus-wide is a read-time fold.**
+
+`df` and `avg_wlen` are corpus-wide and cost nothing, because they are
+**counted at read time**. An `anchor` field on the TARGET, built from what
+everyone else calls it, would have been the first thing in the engine to break
+the invariant: editing `B` would move `A`'s committed bytes while the dirty
+list marked only `B`, so a full `fux ingest` and an incremental re-index would
+produce **different indexes from the same sources**.
+
+⚠ **That is [L3](0005_LAW-3-deterministic.md) failing on the INCREMENTAL path
+only, which is the worst shape for it.** The full-ingest path stays
+byte-reproducible, so every test and every CI check that rebuilds from scratch
+passes, and the drift appears only in a working repository that has been edited
+over time. **Nothing in this repo would have caught it**, which is why
+`tests/ingest/test_anchor_is_source_local.py` tests the property rather than a
+symptom.
+
+⚠ **It was not reachable today, and that is not a reason it was safe.**
+`maintain/runner.py`'s `record_head` says in terms that *"`fux ingest`
+re-indexes the whole corpus regardless of what the list says"*, and `B-002`
+records that the dirty list's input is unused. The hazard was **B-002's
+inheritance** — building step 1 first would have planted it where nothing would
+find it.
+
+**17a. Terms, never the anchor string.** Link text is a verbatim fragment of
+the source document's prose, so committing it plainly would put content in the
+index ([L2](0004_LAW-2-content-never-durable.md)) and would need L5's
+hashed-meta branch on top. A term hash is a *statistic*, which is what the
+index holds — and it is the currency `terms` is already written in, so
+`query/scan.py`'s byte prefilter finds an anchor source by the substring check
+it already runs, at no extra cost.
+
+**17b. Hashed through the RUN's single `CollisionTracker`.** `resolve()` takes
+`hash_of` as a required parameter with **no default** — an anchor-less fallback
+would be a silent off-switch on a retrieval feature, which is the one kind of
+bug a query cannot show you. Passed in rather than imported so `ingest/edges.py`
+stays free of `store`, and so a caller cannot hash anchor terms with a *second*
+tracker that could not see a cross-document collision.
+
+**17c. Merged per target, absent when empty.** `edges` has always been
+deduplicated by `(kind, dst)`, so two links from `B` to `A` are one edge and
+their words are one bag. A link whose text is empty, punctuation or all
+stopwords adds **no keys at all** — absent rather than `{}`/`0`, the same rule
+`omit_when` follows, so a record's shape stays what it was. Only `ref` edges
+can carry them: a `tag`, `code` or `supersedes` edge has no link text.
+
+**17d. `al` is redundant and the build asserts it.** `al == sum(at.values())`
+by construction; it exists so `query/scan.py` can read a document's anchor
+length off raw bytes with one integer capture, on every line in the corpus,
+without a parse. Redundancy nothing checks is redundancy that drifts, and this
+one would drift into `avg_wlen` — a corpus-wide denominator — on the scan path
+alone. `derive/_build.py::_assert_invariants` refuses to build an index where
+they disagree, or where one is present without the other.
+
 ### What it looks like
 
 Verbatim from
@@ -627,6 +692,38 @@ committed byte** — `loc` and `id` are addresses, and this walk's output is
 unchanged. Why it is a note rather than a redaction, and why silence was
 rejected, is [SR-PII](0148_pii.md) decision 19b.
 
+**21. `fux ingest` is the ONE verb over the corpus, and `--check` beats
+`--list-skipped`** (Arpit, 2026-09-15; W-177).
+
+`fux update` is deleted and its whole surface lands here — the flag table, the
+rename of `--all` to `--refetch-all`, the offline `--no-fetch`, and the
+hook/daemon split — all of which is stated once in
+[SR-CLI](0101_cli-surface.md) decision 16 and **not repeated**. What belongs to
+*this* record is what the walk now owes:
+
+**21a. The bare verb fetches, so the walk has a networked entry.** `cmd_ingest`
+plans the URL refresh before it runs, announces it on stderr, and prints the
+two URL lines after — the validated count and one `! <url> — <reason>; prior
+record kept` per failure. **Exit stays `0` when a fetch fails.** A listed URL
+whose fetch failed keeps its prior record; the run is not a failure because a
+site was down, and the only thing that says so is that line.
+
+**21b. `--check` wins over `--list-skipped`, and the order is RULED rather than
+argparse's.** Both are read-only, offline, and print-then-exit, so giving both
+was previously answered by whichever `if` came first in the file — a behaviour
+nobody decided and a test could not name.
+
+- **`--check` is the whole-corpus freshness question**, it is the one with a
+  `--json` form, and it is the one a pipeline gates on. Answering
+  `--list-skipped` while a machine asked for the drift report would hand back a
+  table nothing can parse.
+- **`--list-skipped` reports on a walk this invocation is not going to do.**
+  Under `--check` nothing is walked and nothing is written, so its answer would
+  describe the *last* run, silently.
+- **Neither runs an ingest**, and a test asserts that too: the failure worth
+  guarding is not the ordering alone but an exit-early flag that stopped
+  exiting.
+
 ### Consequences
 
 - **Ingest cost is O(corpus) in parsing and edge resolution, O(changed) in
@@ -639,10 +736,42 @@ rejected, is [SR-PII](0148_pii.md) decision 19b.
   one of them is not detected on a delta run. `fux ingest --full` is the
   complete check. This is a real narrowing of a "fails loudly" guarantee and is
   written down rather than hoped about.
-- **A new extraction rule does not reach an unchanged document** until that
-  document changes or `--full` runs. That is the carry-forward's defining
-  property and it outlives any particular field;
-  [`run.py`](../src/fux/ingest/run.py)'s module docstring says the same.
+- ✅ **A new extraction rule reaches an unchanged document — FIXED 2026-09-14
+  (W-166).** This bullet said it *"does not… until that document changes or
+  `--full` runs"*, and called that *"the carry-forward's defining property"*.
+
+  **It is the defining property for inputs the engine cannot see, and a constant
+  in fux's own tree is not one of those.** `extract.RULES_VERSION` is in the
+  reuse key — folded into `extract-config-digest` beside the two `[index]` caps,
+  because the three move together and for the same reason: something that decides
+  what extraction produces changed, so every document must be re-extracted.
+
+  ⚠ **Corpus-wide, unlike the decoder digests, and the asymmetry is deliberate.**
+  A decoder is bound to an extension, so the documents it read are identifiable.
+  These rules run on every document fux extracts, so there is no smaller set to
+  invalidate — which is exactly why it is a constant somebody bumps rather than
+  a sha of the module, whose every whitespace edit would charge a full
+  re-extraction. `tests/ingest/test_extract_rules_version.py` fails a changed
+  `extract.py` whose constant did not move, and separately asserts the constant
+  is actually IN the digest — without that second half a diligent author could
+  bump it forever and change nothing.
+
+  **What genuinely remains the carry-forward's property:** anything outside the
+  source tree and outside the committed inputs. A library upgrade under a
+  decoder, a locale, a Python version. Those have no digest and are not getting
+  one; `--full` is still the complete answer.
+- ✅ **A `url:` record is re-extracted from `.fux/acquired/` — NEW 2026-09-14
+  (W-166).** A policy change (PII, decoder or extraction rule) re-derives every
+  `url:` record whose bytes are retained, **offline**, through the one
+  `parse -> redact -> extract` path. Previously a `url:` record carried forward
+  verbatim whenever the fetch did not happen, which under `update=never` was
+  permanent — `--full` included. [SR-PII](0148_pii.md)'s own words for it:
+  *"the data needed to honour a new rule is present and unused."*
+
+  ⚠ **A URL with no retained blob is STRANDED, never dropped.** Its record is
+  left exactly as it is and named by `fux doctor`'s `url redaction current` row.
+  Deleting a document because a policy changed is the one thing a redaction
+  change must not do.
 - **`fux ingest --stop` and the runner takeover change nothing about what a run
   computes.** Delta-ness is decided by comparing content shas (decision 1b),
   **never by reading the dirty list** — the list is advisory, and a run that
@@ -683,8 +812,24 @@ rejected, is [SR-PII](0148_pii.md) decision 19b.
 - **A `not indexed` count of zero is now a meaningful statement** — every
   omission from the index was a file fux could not read, which is worth
   knowing and was previously unsayable.
-- **`0 shards written` can accompany a deletion**, since removing a shard is not
-  a write. True, and mildly under-informative when reading a run log.
+- ✅ **`0 shards written` can accompany a deletion**, since removing a shard is
+  not a write. **Fixed 2026-09-14 (W-165 fix 3): the summary counts deletions.**
+  `IngestReport.deleted_count` is the prior index's ids minus this run's, and the
+  line gains `, N records deleted` — **only when N > 0**, because a trailing
+  `, 0 records deleted` on every run is noise on the one line every verb ends
+  with, and the clause exists to make a removal visible.
+
+  ⚠ **This was filed as *"mildly under-informative"* and it is worse than that.**
+  `write_index` writes the WHOLE index, so a deletion is an **absence** — there
+  is no counter unless one is kept. Every other number on the line can sit still
+  while a document leaves: `0 changed`, `3 carried forward`, and `0 shards
+  written` whenever the departing document's shard still holds others whose bytes
+  did not move. The run that dropped a document and the run that did nothing
+  printed the same line.
+
+  **Zero when `--full` discharged a foreign index**, where `_existing_index`
+  returns `{}` and there is nothing to diff — the honest count, not an inferred
+  one.
 - **Re-ingest is safe to run on a hook**, which is what the maintenance plane
   depends on.
 - **`fux remove` became possible.** Decision 9 is its precondition: a verb that
@@ -701,7 +846,7 @@ rejected, is [SR-PII](0148_pii.md) decision 19b.
   writes the extracted title to `.fux/runtime/display-cache/`, keyed by `sha` —
   a write, not a fetch, so ingest's cost does not measurably change and L4 is
   untouched by construction. A *carried-forward* `hashed` record whose cache has
-  gone cold is refused by `store/writer.py`, naming `fux update` as the fix,
+  gone cold is refused by `store/writer.py`, naming `fux ingest` as the fix,
   rather than committing a record no reader can ever show a title for. Full
   rationale on [SR-RECORD](0109_index-record.md).
 - **Two Unicode defects are fixed and stay fixed.** `parse.py` decodes with

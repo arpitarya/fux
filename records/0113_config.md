@@ -7,10 +7,10 @@ description: "A deliberately tiny config: what each key does, why the surface is
 status: accepted
 date: 2026-08-18
 feature: "`fux.toml` — discovery, schema, validation, and the keys that are refused rather than ignored"
-owns: [src/fux/config.py@1d1fec929d78]
+owns: [src/fux/config.py@80082dd02b86]
 laws: [L4, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 307f87e059097a3f5d089faf28755ca61ed98dcddab8edc5e1603357c1ee209b
+content_sha: a05ad203aa030255fea9e9ccf08a38abace15048b0bfaed789f11c50a2227879
 ---
 
 # SR-CONFIG — `fux.toml` and every property in it
@@ -172,7 +172,7 @@ value is an error, not a silent override: the shard function is
 tree. The key exists so the number is *visible* rather than folklore.
 
 **4. `[sources.url]` is entirely optional.** Absent means no URL source, and
-`fux update` has nothing to do.
+`fux ingest` has nothing to do.
 
 **5. `fetcher` and `urls_file` default to `.fux/fetchers/http.py` and
 `.fux/sources/urls`.** Both are repo-relative paths, and both defaults are the
@@ -263,6 +263,48 @@ ranking value either. It is **operational**, so it sits beside the other
 passed to the fetcher's `configure()` verbatim. Fux never reads a key inside it,
 and must never gain a reason to.
 
+**8a. 🔴 It has TWO LEVELS since 2026-09-14, because one level was broken for
+any repo that used both shipped fetchers** (Arpit: *"how about create 2
+separate tables, 1 for http and 1 for cdp"*).
+
+**The defect, stated plainly.** One table was handed verbatim to *every*
+fetcher, and both shipped `configure()` implementations **raise** on a key they
+do not know. `http.py` knows `timeout_s`, `user_agent`, `max_bytes`; `cdp.py`
+knows `cdp_port`, `cdp_host`, `launch_chrome`, `load_timeout_s`. Only
+`fetcher_max_parallel` is shared. So in a repo loading both, `cdp_port` made
+every `http.py` fetch refuse and `timeout_s` made every `cdp.py` fetch refuse:
+**the sole configurable state was the empty table.** That is why the scaffolded
+`fux.toml` could only ever ship the block commented out — a fact visible in the
+file for months and never traced to its cause.
+
+**The shape:**
+
+| where | who gets it |
+|---|---|
+| a scalar at the top of `[sources.url.config]` | **every** fetcher |
+| `[sources.url.config.<stem>]` | **only** the fetcher whose file is `<stem>.py` |
+
+- **`config.py::fetcher_config` is the only thing that reads either level**, and
+  `UrlSource.config_for` delegates to it, so the ingest path and the answer path
+  cannot resolve a fetcher differently.
+- ⚠ **The adapter cap is NOT breached, and the distinction is exact.** Decision
+  8 forbids fux declaring a *key* — `cdp_port` must never appear in
+  `KNOWN_KEYS`, and `tests/test_config.py` asserts no `sources.url.config.*`
+  key is declared. What fux matches here is a **table name against a filename it
+  already knows**, which is the same information `fetch=<name>` resolution has
+  used since [SR-FETCHER](0117_fetcher.md) decision 5. One naming rule, not two.
+- **Only the TOP level is namespaced.** Everything inside a fetcher's own table
+  passes through verbatim, nesting included, so a fetcher that wants structured
+  config still gets it.
+- ⚠ **This is a change of contract and it costs something**: a `dict` at the
+  top level used to reach `configure()` and now does not. A consumer who nested
+  config for one fetcher moves it one level, under that fetcher's name.
+- **A sub-table naming no fetcher is ignored by the loader and caught by
+  `doctor`** — `fetcher config tables`. Deciding whether `wiki` is a typo means
+  listing `.fux/fetchers/`, which is a filesystem question and has no business
+  in a TOML parser. Refusing there would also make `fux.toml` unloadable on a
+  machine that has not run `fux setup`.
+
 **9. `[agents] install` is a closed, validated set** — `claude`, `codex`,
 `copilot`, `kiro` — naming which vendors `fux setup` writes policy renderings
 for ([SR-AGENT-POLICY](0132_agent-policy.md) decision 5). ⚠ **`codex` joined
@@ -322,6 +364,22 @@ non-negative numbers with **`bool` rejected explicitly**, because `bool` is an
 `int` subclass in Python and `archived_weight = true` would otherwise parse
 silently as `1`.
 
+**11a. `urls_file` lives in `[sources]`, beside `dirs_file`** (Arpit,
+2026-09-14). The two committed source lists are one kind of thing and are now
+named in one place; `[sources.url] urls_file` is **refused by name** with the
+new home in the message.
+
+- ⚠ **`[sources.url]`'s PRESENCE still enables URL ingestion.** The key names
+  the list; it does not turn anything on. That separation is what the move
+  makes visible rather than changing: a repo with no `[sources.url]` still
+  resolves a path — `fux add <URL>` needs one to write into — and still fetches
+  nothing.
+- `UrlSource.urls_file` keeps carrying the resolved value, so the twelve
+  call sites that hold a `UrlSource` read one field as before. `Config.urls_file`
+  is what the two call sites without one now read, in place of a
+  `config.url is not None else DEFAULT_URLS_FILE` conditional that can no
+  longer disagree with the file.
+
 **12. `[sources.url]` gained four keys on 2026-09-01, and every one of them is
 a source-wide *layer*, not a setting.** `keep` ([SR-ACQUIRED](0145_acquired-plane.md)),
 `ttl` ([SR-URL-FRESHNESS](0147_url-freshness.md)) and `enrich`
@@ -343,6 +401,14 @@ resolves all of them.
   raise somebody else's bound. `None` means the store's own default rather than
   a number frozen here, so raising that default does not require editing every
   `fux.toml` that never thought about the question.
+- ⚠ **`fetch_at_answer` is the SECOND key with no line-level layer** (W-174,
+  2026-09-14), and it is not an exception for `acquired_max_bytes`'s reason.
+  That one is a property of the disk; this one is a property of *reaching the
+  source*, and [SR-ACQUIRED](0145_acquired-plane.md)'s own two-layer test says
+  a source-wide layer means something exactly when the attribute answers
+  *"how do I reach these pages?"* — which is the question it asks. A line layer
+  is therefore **possible and deliberately not built**; it would need its own
+  argument, not an extension of this one.
 
 ⚠ **`acquired_max_bytes` was documented before it was parsed, and that is the
 defect this decision closes.** SR-ACQUIRED decision 8 named the key and the
@@ -381,22 +447,25 @@ at any value, with an error naming the new home.
 
 ```keys
 + sources.dirs_file
++ sources.urls_file
 + sources.url.fetcher
-+ sources.url.urls_file
 + sources.url.meta
 + sources.url.keep
 + sources.url.ttl
 + sources.url.enrich
 + sources.url.update
++ sources.url.fetch_at_answer
 + sources.url.max_parallel
 + sources.url.sweep_minutes
 + sources.url.acquired_max_bytes
 * sources.url.config
 + index.shards
 + agents.install
++ observe.max_ms
 - sources.dirs
 - sources.types_file
 - sources.url.urls
+- sources.url.urls_file
 - sources.url.middleware
 - ranking
 - dense
@@ -451,6 +520,19 @@ does**, and `tests/test_sr_freshness.py` sees neither — it checks that an owni
 record was *touched* in a change, never what the record says. This is the W-83
 shape with the two halves swapped, and it is unguarded for the same reason.
 
+**`[observe] max_ms`** (W-170) — how long fux waits for one `.fux/observers/`
+file before abandoning it. Positive integer milliseconds, default `50`.
+
+**It is in `fux.toml` and not in `.fux/tune.toml`** because it is not a ranking
+knob: it bounds what happens **after** the answer is rendered and cannot move a
+result. [SR-TUNE](0135_tuning.md) decision 1's boundary rule is about what
+changes an answer.
+
+⚠ **It abandons, it does not kill** — [SR-OBSERVE](0157_observe.md) decision
+10b. Past the cap fux stops waiting; the observer may run until the process
+exits, because Python cannot safely interrupt arbitrary consumer code.
+
+
 ### Consequences
 
 - **The config fits on a screen**, so a new consumer reads all of it.
@@ -475,9 +557,13 @@ shape with the two halves swapped, and it is unguarded for the same reason.
   the default path. The schema entry is deleted and the key is now a loud error
   in `load()`, the same treatment `[sources] dirs` gets; held by
   `tests/test_config.py::test_a_types_file_key_is_refused_by_name`.
-- ⚠ **The directory list is include-only, with no exclusions** — so committed
-  measurement evidence under `work/regression/` contaminates the corpus it
-  measures. That cost is stated rather than discovered.
+- ⚠ **The directory list was include-only, with no exclusions, when this was
+  written** — so committed measurement evidence under `work/regression/`
+  contaminated the corpus it measures. **No longer true (corrected 2026-09-14):**
+  a `!` line in `.fux/sources/dirs` ([SR-DIR-LIST](0120_dir-list.md) decision 2a)
+  and [`.fux/.fuxignore`](0144_fuxignore.md) both exclude; what remains owed is
+  that `fux remove` still writes `!` where `.fuxignore` is the stated home
+  ([SR-FUXIGNORE](0144_fuxignore.md) Consequences).
 - ⚠ **`[sources.url]` now ships live in a scaffolded repo, and one behaviour
   changes with it.** `fux add <URL>` used to record the line and print *"no
   `[sources.url]` in fux.toml, so nothing can fetch this line yet"*; in a repo
@@ -492,7 +578,7 @@ shape with the two halves swapped, and it is unguarded for the same reason.
   every mechanical check will pass.** This record once stated *"`None` means
   whatever the fetcher declares"* four paragraphs above *"default `4` when a
   fetcher declares more"*; the code implemented the second sentence's opposite,
-  and an unconfigured `fux update` opened eight concurrent connections to one
+  and an unconfigured `fux ingest` opened eight concurrent connections to one
   intranet host. **The freshness gate checks that a record was *touched*, never
   that it is *coherent*.** That is the reason this record carries no amendment
   layers at all.

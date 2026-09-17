@@ -13,7 +13,7 @@ owns: []
 laws: [0]
 ratifies: W-82 ruling 4
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 57832926c4aff0c61922ff665a45d4c8173cdb60cc909b6e11fad05851dda073
+content_sha: 1696c383dd7671363dcd164c4e3d227ea70ce61768dd1979e87e62f7537b1fd1
 ---
 
 # SR-WORK-OWNERSHIP — `owns` and `describes`
@@ -122,6 +122,32 @@ src/fux/query/rank.py        SR-RANKING         SR-TUNE
    answer, not a judgement call"*, and two relations in one row make it
    ambiguous which one the gate is enforcing. The markers exist so both tests
    parse rather than hard-code — a table a test hard-codes is two sources.
+
+2a. **The gate runs in two places, and the `commit-msg` hook is installed by
+    hand.** `tests/test_sr_freshness.py` runs in CI on every push (with
+    `fetch-depth: 0`, so the runner can see the history it audits).
+    `scripts/sr-guard.sh` is the same check at the moment it is cheapest to
+    obey:
+
+    ```bash
+    ln -sf ../../scripts/sr-guard.sh .git/hooks/commit-msg
+    ```
+
+    ⚠ **`commit-msg`, never `pre-commit`**, and the reason is mechanical: the
+    check has to **read the commit message** to honour
+    [SR-LAW-0](0002_LAW-0-authority.md) decision 1a's `no SR affected` escape
+    hatch, and at `pre-commit` time that message does not exist — what sits in
+    `.git/COMMIT_EDITMSG` then is the *previous* commit's leftover text, so a
+    hook installed there checks the wrong thing and passes.
+
+    🔴 **Why it is enforced rather than trusted, measured rather than assumed.**
+    Replayed over the **25 commits before the check existed, 13 of them**
+    changed an owned component and updated no record. The prose rule had been
+    in `CLAUDE.md` the whole time. **That is the measured case for a check**,
+    and it is the reason this gate is not a style preference.
+
+    ⚠ **Bypassing with `--no-verify` leaves no trace**, which is why CI runs the
+    same check from the commits rather than from the hook.
 
 3. **The freshness gate demands the owner AND every describer.** One change, in
    `owning_records`, and the whole gate widens; nothing else in it moves.

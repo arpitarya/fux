@@ -250,7 +250,7 @@ def test_the_scaffolded_fux_toml_has_no_decode_table():
 
     from fux import setup
 
-    assert "decode" not in tomllib.loads(setup._CONFIG)
+    assert "decode" not in tomllib.loads(setup.config_text())
 
 
 def test_a_types_file_key_is_refused_by_name(tmp_path):
@@ -264,3 +264,148 @@ def test_a_types_file_key_is_refused_by_name(tmp_path):
     (tmp_path / "fux.toml").write_text('[sources]\ntypes_file = "x"\n', encoding="utf-8")
     with pytest.raises(FuxError, match="types_file is not a key"):
         load(tmp_path)
+
+
+# -- W-174: `[sources.url] fetch_at_answer` -----------------------------------
+
+
+def test_fetch_at_answer_defaults_to_true(tmp_path):
+    """Silence is today's behaviour, so no existing repo changes meaning."""
+    _write(tmp_path, "[sources]\n[sources.url]\nmax_parallel = 4\n")
+    assert load(tmp_path).url.fetch_at_answer is True
+
+
+def test_fetch_at_answer_is_read(tmp_path):
+    _write(tmp_path, "[sources]\n[sources.url]\nmax_parallel = 4\nfetch_at_answer = false\n")
+    assert load(tmp_path).url.fetch_at_answer is False
+
+
+def test_fetch_at_answer_rejects_a_non_bool(tmp_path):
+    """Type, not truthiness — SR-CONFIG decision 11. `"false"` is a string and
+    would otherwise be truthy, which is the opposite of what was typed."""
+    _write(tmp_path, '[sources]\n[sources.url]\nmax_parallel = 4\nfetch_at_answer = "false"\n')
+    with pytest.raises(FuxError, match="fetch_at_answer must be true or false"):
+        load(tmp_path)
+
+
+def test_fetch_at_answer_has_no_line_level_layer(tmp_path):
+    """SR-CONFIG decision 12: possible, and deliberately not built.
+
+    The twin of `test_archived_has_no_source_wide_layer` in the other
+    direction — that one asserts a source-wide layer stays absent, this one
+    asserts the LINE layer does. A line growing `fetch_at_answer=` silently
+    would give one URL a policy the bundle's single recorded mode cannot
+    express.
+    """
+    from fux.ingest.urlsrc import UrlEntry
+
+    assert not hasattr(UrlEntry, "fetch_at_answer")
+
+
+def test_a_misspelled_fetch_at_answer_is_refused_by_name(tmp_path):
+    """The whole point of the declared key list: a typo cannot restore the
+    default silently, leaving a consumer believing they are offline."""
+    _write(tmp_path, "[sources]\n[sources.url]\nmax_parallel = 4\nfetch_at_anwser = false\n")
+    with pytest.raises(FuxError, match="not a fux.toml key"):
+        load(tmp_path)
+
+
+# -- urls_file moved up beside dirs_file (2026-09-14) -------------------------
+
+
+def test_urls_file_is_read_from_the_sources_table(tmp_path):
+    _write(tmp_path, '[sources]\nurls_file = "docs/urls.txt"\n[sources.url]\nmax_parallel = 4\n')
+    config = load(tmp_path)
+    assert config.urls_file == "docs/urls.txt"
+    # Carried onto UrlSource too, so every existing caller keeps one field.
+    assert config.url.urls_file == "docs/urls.txt"
+
+
+def test_urls_file_resolves_without_a_sources_url_table(tmp_path):
+    """It names the list; `[sources.url]` is what turns fetching ON. A repo
+    with no `[sources.url]` still has a path — `fux add <URL>` needs one."""
+    _write(tmp_path, "[sources]\n")
+    config = load(tmp_path)
+    assert config.url is None
+    assert config.urls_file == ".fux/sources/urls"
+
+
+def test_the_old_spelling_is_refused_by_name_with_its_new_home(tmp_path):
+    _write(tmp_path, '[sources]\n[sources.url]\nmax_parallel = 4\nurls_file = "x"\n')
+    with pytest.raises(FuxError, match=r"urls_file moved to \[sources\] urls_file"):
+        load(tmp_path)
+
+
+# -- the two-level [sources.url.config] table (2026-09-14) --------------------
+
+
+def _two_level(tmp_path):
+    _write(
+        tmp_path,
+        "[sources]\n[sources.url]\nmax_parallel = 4\n"
+        "[sources.url.config]\nshared = 1\n"
+        "[sources.url.config.http]\ntimeout_s = 5.0\n"
+        "[sources.url.config.cdp]\ncdp_port = 9333\n",
+    )
+    return load(tmp_path).url
+
+
+def test_a_fetcher_gets_the_shared_keys_and_only_its_own(tmp_path):
+    """The bug this fixes: one flat table went to EVERY fetcher, and each
+    `configure()` raises on a key it does not know — so `cdp_port` made
+    `http.py` refuse and `timeout_s` made `cdp.py` refuse. A repo using both
+    could configure neither."""
+    url = _two_level(tmp_path)
+    assert url.config_for(".fux/fetchers/http.py") == {"shared": 1, "timeout_s": 5.0}
+    assert url.config_for(".fux/fetchers/cdp.py") == {"shared": 1, "cdp_port": 9333}
+
+
+def test_a_fetcher_with_no_table_of_its_own_still_gets_the_shared_keys(tmp_path):
+    assert _two_level(tmp_path).config_for(".fux/fetchers/wiki.py") == {"shared": 1}
+
+
+def test_a_per_fetcher_value_wins_over_a_shared_one(tmp_path):
+    _write(
+        tmp_path,
+        "[sources]\n[sources.url]\nmax_parallel = 4\n"
+        "[sources.url.config]\ntimeout_s = 1.0\n"
+        "[sources.url.config.http]\ntimeout_s = 9.0\n",
+    )
+    url = load(tmp_path).url
+    assert url.config_for("http.py")["timeout_s"] == 9.0
+    assert url.config_for("cdp.py")["timeout_s"] == 1.0
+
+
+def test_only_the_TOP_level_is_namespaced(tmp_path):
+    """One level of namespacing, and everything below it is verbatim — so a
+    fetcher that wants nested config still gets it, inside its own table."""
+    _write(
+        tmp_path,
+        "[sources]\n[sources.url]\nmax_parallel = 4\n"
+        "[sources.url.config.http]\nnested = {deep = [1, 2]}\n",
+    )
+    assert load(tmp_path).url.config_for("http.py") == {"nested": {"deep": [1, 2]}}
+
+
+def test_fux_still_reads_no_KEY_inside_the_table(tmp_path):
+    """The adapter cap holds. Fux matches a TABLE NAME against a filename it
+    already knows; it never declares or validates a key inside."""
+    from fux.config import KNOWN_KEYS
+
+    assert not [k for k in KNOWN_KEYS if k.startswith("sources.url.config.")]
+    _write(
+        tmp_path,
+        "[sources]\n[sources.url]\nmax_parallel = 4\n"
+        "[sources.url.config.http]\nsomething_fux_never_heard_of = true\n",
+    )
+    assert load(tmp_path).url.config_for("http.py") == {"something_fux_never_heard_of": True}
+
+
+def test_the_agents_default_is_the_known_list_not_a_stale_literal(tmp_path):
+    """It read three of four vendors — Codex missing — from before Codex was
+    added. Dead (every caller goes through `load`) and wrong, which is worse:
+    a stale default reads as authority."""
+    from fux.config import KNOWN_AGENTS, Config
+
+    assert Config.__dataclass_fields__["agents"].default == KNOWN_AGENTS
+    assert "codex" in KNOWN_AGENTS

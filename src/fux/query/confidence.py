@@ -269,8 +269,58 @@ class Confidence:
         handed `answerable: false` has nothing to hedge with. That asymmetry is
         the reason this is a boolean and not the bottom of a scale
         (SR-CONFIDENCE decision 5).
+
+        🔴 **`weak` IS a refusal** (W-176 gate 1, ruled by Arpit 2026-09-14).
+        Until then this read `band != NONE`, so `weak` — *the ranking could not
+        separate the top hits* — came back `answerable: true`, and decision 3's
+        own table said **do not answer** beside it. **Two fields on one payload
+        disagreeing, and the one an agent branches on was the permissive one.**
+
+        That gap is what four recorded runs measured, none of which could name
+        it: 20 of 20 blind-authored unanswerable questions answered, twice; 0
+        abstentions of 124 on five golden rungs; 10 of 10 planted unanswerables
+        answered by both versions, one at `coverage: 0.0009`. **`answerable`
+        was structurally incapable of being false unless nothing scored at
+        all** — and *nothing scored at all* is the one case no corpus produces,
+        because BM25F returns something for almost any query.
+
+        ⚠ **`partial` stays answerable, and that is the whole distinction.**
+        `partial` is a **nameable** defect — a term nothing contains, or bytes
+        that are stale — so a consumer can answer and say what is missing.
+        `weak` has nothing identifiably wrong; the ranking simply could not
+        choose, and there is nothing to name in a hedge.
         """
-        return self.band != NONE
+        return self.band not in (NONE, WEAK)
+
+    @property
+    def failed(self) -> list[str]:
+        """**Which gate refused, by name** — W-176's output surface, step 3.
+
+        `answerable: false` tells a consumer to stop; this tells it *what
+        stopped it*, which is the difference between an agent that says
+        nothing and one that says why. The two the engine can refuse on today:
+
+        | name | when |
+        |---|---|
+        | `no_candidates` | nothing in the index scored above zero |
+        | `separation` | `separation < separation_floor` — the ranking could not choose |
+
+        ⚠ **It is empty on `partial`, deliberately.** `partial` is not a
+        refusal — nothing gated it — and its defect is already named, in
+        `missing` or in `verified: stale`. Putting `partial` here would make
+        `failed` mean *something is imperfect* instead of *this is why you may
+        not answer*, and the second is the only reading a consumer can act on.
+
+        **The shape exists before the gates that fill it**, which is the point
+        of landing it with gate 1: the eight measured gates of W-176 append a
+        name here and change nothing else about the payload, so a consumer
+        written today keeps working as each one lands.
+        """
+        if self.band == NONE:
+            return ["no_candidates"]
+        if self.band == WEAK:
+            return ["separation"]
+        return []
 
     def with_verified(self, verdict: str) -> "Confidence":
         """The same signals with the refer plane's verdict filled in.
@@ -300,6 +350,11 @@ class Confidence:
         return {
             "band": self.band,
             "answerable": self.answerable,
+            # W-176 step 3. **Always present, `[]` when nothing refused** — an
+            # absent key could not be told from a fux too old to have gates
+            # (W-48), which is the one reading that would make a consumer
+            # answer where it should abstain.
+            "failed": self.failed,
             "coverage": self.coverage,
             "separation": self.separation,
             "separation_floor": self.separation_floor,
@@ -334,7 +389,8 @@ class Confidence:
         return (
             "confidence: weak - the ranking cannot separate the top results"
             f" (separation {self.separation:.2f}, floor {self.separation_floor:.2f})."
-            " Report what was searched rather than a conclusion."
+            " Do not answer: say the documents do not say, and report what was"
+            " searched."
         )
 
 

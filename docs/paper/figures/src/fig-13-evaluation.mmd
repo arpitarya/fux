@@ -1,0 +1,14 @@
+flowchart LR
+  classDef s fill:#eef3f8,stroke:#5b7fa6,color:#1c2b3a
+  classDef g fill:#fbeeee,stroke:#b85c5c,color:#3a1414
+  classDef o fill:#fff4e0,stroke:#c98a1b,color:#3a2a08
+  classDef e fill:#eefaf0,stroke:#3f9a5a,color:#12301c
+  PR["PRE-REGISTRATION.md<br/>question · bar · both directions (d22)<br/>frozen before a number exists"]:::s
+  CL{"blind or informed?<br/>every artifact authored<br/>without queries, judgments, scores?"}:::g
+  ENV["fux-lab — the only place a number is made<br/>golden data only, ≤ 10 000 docs<br/>(playground = Arpit's hands · benchmark = version vs version)"]:::e
+  RUN["run → report.md · ANALYSIS.md · evidence/<br/>per-query rows, one per query per arm (d19a)"]:::s
+  FL{"paired floor (d19):<br/>McNemar on discordant pairs<br/>net ≥ 6 is the floor of all floors"}:::g
+  V["VERDICT.md<br/>PASS · FAIL · INCONCLUSIVE · VOID (Arpit only) · RETIRED"]:::o
+  K["golden answer key — sealed<br/>readable by Arpit, Codex, ChatGPT<br/>NO Claude session, by any tool"]:::g
+  PR --> CL --> ENV --> RUN --> FL --> V
+  K -. "scores phase 5 (Codex, 2026-09-30)" .-> RUN

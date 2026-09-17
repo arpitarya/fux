@@ -18,6 +18,7 @@ history or design — you query it, and you cite what you find.
 ```bash
 fux ask "<question>" --top 5 --json   # ranked results with scores and flags
 fux answer "<question>"               # a single cited answer, verbatim spans
+fux ask "<question>" --expand "<passage>"   # YOU write the passage; fux never does
 fux find "<question>"                 # bare paths, safe to pipe
 ```
 

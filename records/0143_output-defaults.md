@@ -10,10 +10,10 @@ amended: 2026-08-28
 date: 2026-08-27
 ratified: 2026-08-27
 feature: configurable output defaults
-owns: [src/fux/output_config.py@bb73da35f5b1]
+owns: [src/fux/output_config.py@8e8e57fade21]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 8662d257396dc8008a9efb19f595a8a4caa70924e54ede239f28b2912df90dc7
+content_sha: 3c3f571d255122101e435105ea8c9bd36fbfcb0b0868d1592f16355739eea4dd
 ---
 
 # SR-OUTPUT — output defaults are configurable, in a third file
@@ -501,7 +501,7 @@ null
     it, because only `ask` has the concept.
 
 ⚠ **No output default changed on 2026-08-28.** `fux doctor` gained a `url daemon`
-row and `fux update` gained `--all`; both print through the existing surfaces and
+row and `fux ingest` gained `--all`; both print through the existing surfaces and
 neither adds a gated flag or a `[verb]` key. Recorded because this record
 constrains **every** gated flag in `cli.py` to `default=None`, and `--all` is a
 plain `store_true` — it gates nothing and reads no config, so decision 10 does
@@ -668,7 +668,7 @@ keys`.
     - **L8 is untouched by this.** The journal is gitignored, local, and never
       reaches a committed byte — [SR-LAWS](0001_LAWS.md) decision 8. What the
       committed key holds is the *instruction to journal*, never the journal.
-    - Found 2026-09-12 re-deriving [W-140](../work/open/W-140-guide-authoring-defects.md)
+    - Found 2026-09-12 re-deriving W-140 (closed 2026-09-15)
       row 3 against the code; ruled 2026-09-13.
 
 **22. Both readers fold this file in, at the same place, since 2026-09-12.**
@@ -697,7 +697,124 @@ process whose premise is staying resident.
 drifted **refusal** produces an error on one side and an answer on the other,
 which a harness reports as a crash rather than as a finding.
 
+**23. 🔴 `related` IS NOT A KEY IN THIS FILE, and the refusal is a decision
+rather than an omission** (W-161, 2026-09-14).
+
+W-161 gave `fux ask` a labelled `related` tier with a `--related` /
+`--no-related` flag pair. Every other flag pair on `ask` — `--sections` above
+all — has a key here. **This one does not, for two reasons, and either alone
+would be enough.**
+
+**23a. `[graph] ask_related` already states it, and two statements could
+disagree.** [SR-TUNE](0135_tuning.md) decision 16's `ask_related` answers *do I
+want the related tier in this repository?* A key here would answer the same
+question in a second file, and the two could disagree while both looked
+correct — the restatement [SR-LAW-0](0002_LAW-0-authority.md) decision 1
+forbids, arriving through the door this file is most exposed to. ⚠ **The
+`[cli]`/`[graph]` split does not rescue it.** The honest reading of *compute it
+but do not show it* is that nobody wants it: a tier a reader never sees is
+latency and nothing else.
+
+**23b. Decision 19 makes every new key a BREAKING CHANGE to every committed
+file, and that price buys nothing here.** An unset key is a hard error, by
+design. So adding `related` would make `fux ask` **exit 1 in every repository
+whose `.fux/output.toml` predates this version** — the precise failure decision
+19's own ⚠ note describes — in order to ship a knob duplicating one the consumer
+already has. Measured, not predicted: it was added, `test_apply_output_defaults`
+went red on a fixture, and this repository's own `ask` refused until the key was
+written in by hand.
+
+**23c. Nor is it an `[mcp]` key, and there the reason is the opposite one.**
+`MCP_KEYS` is `top` alone. `related` is **unconditional** on `fux_search` —
+decision 11's reasoning for the confidence block, applied unchanged: a tool call
+cannot pass a flag, so an absent key on that surface could only mean *this
+server predates the tier*, which is the W-48 trap rather than a setting. **A
+`[mcp] related` key would be a way to hide a list from an agent that has no way
+to ask for it back**, and the failure mode it creates — an agent that never
+learns the neighbourhood exists — is silent at both ends.
+[SR-MCP](0136_mcp.md) owns the tool's half of this.
+
+⚠ **The general rule this makes explicit, and it was implicit before:** *a new
+key in this file costs every existing consumer an edit.* That is affordable for
+a genuinely new rendering question and never affordable for a second spelling of
+an existing one. **The test to apply is decision 19's own: is there a state a
+reader could want that no current key can express?** For `related` there is not.
+
+**24. W-176's signals get ONE output key between them — the `band` key that
+already exists** (2026-09-15).
+
+[`abstention-gates`](../work/compare/abstention-gates.compare.md) §4 ruled on
+2026-09-13 that *"`output.toml` decides which appear, per verb, exactly as it
+decides the band today"*, with `--json` carrying all of them regardless. **The
+first half is honoured through the key that is already there, not through nine
+new ones**, and the reason is decision 23b's, multiplied:
+
+- `--json` carries every signal unconditionally, as ruled.
+- **The prose surface is gated by `band`**, which a consumer already sets.
+  A `weak` line that now says *do not answer* is the same line under the same
+  key, not a new question a config file has to answer.
+- **Nine new required keys would be nine breaking changes**, each one making
+  `fux ask` exit 1 in every repository whose `output.toml` predates it
+  (decision 19). Nine gates landing one at a time is nine upgrades that each
+  break every consumer — for signals that are all one question: *how much did
+  fux believe itself, and why not*.
+
+⚠ **What this gives up, stated:** a consumer cannot show `nqc` in prose while
+hiding `clarity`. That is a real loss and a small one — the prose surface is
+for a person reading stderr, and a person reading a confidence line wants the
+reason, not a subset of the reasons. A consumer who wants the signals
+individually is reading `--json`, where they are all present and always were.
+
+**If a per-signal prose key is ever genuinely wanted**, decision 23's test is
+the one to apply: *is there a state a reader could want that no current key can
+express?* — and the answer would have to be yes for a specific signal, named,
+before a key is added for it.
+
 ### Consequences
+
+- **The observer record is not an output surface and has no key here**
+  (W-170, 2026-09-15). It reaches no stream a consumer reads — not stdout, not
+  stderr, not `--json` — and is handed to consumer code **after** every write
+  the verb makes. This file's subject is *how a result is SHOWN*; nothing about
+  the hook is shown. What it does touch is the one bound it must never cross,
+  and `cli.main` takes fux's stdout away for the dispatch precisely so an
+  observer's `print` cannot become part of an answer.
+
+- **The confidence-floor note is a stderr DECLARATION, and gains no
+  `output.toml` key** (2026-09-14, W-164 gate 4). It follows the rule every other
+  declaration on this path follows — stderr, suppressed under `--json` and MCP,
+  never gating the answer. ⚠ **It is deliberately not configurable.** A caller
+  who could switch it off would be switching off the one sentence that says their
+  `grounded` is not comparable to anybody else's, which is the misreading
+  [SR-CONFIDENCE](0141_confidence.md) decision 13 left unguarded. A knob here
+  would be a new way to produce the defect the note exists to close.
+
+- ✅ **A frozen `.fux/output.toml` is REPORTED (2026-09-14, W-163)**, the
+  companion to SR-TUNE's row and with the same reasoning: a key the engine gained
+  resolves to its default, nothing breaks, and the file meant to show the knob
+  does not mention it.
+  🔴 **Its first build was a FALSE POSITIVE on fux's own repository**, and
+  W-163's keep-call is what caught it before the row shipped. Expecting
+  `cli.explain`, `cli.hops`, `cli.no_refer` and three more at those exact paths
+  reported **six keys missing from a file carrying every one of them** — because
+  this file **nests per verb on purpose**: `explain` under `[cli.ask]`, `hops`
+  under `[cli.path]`, `no_refer` and `journal` under `[cli.answer]`, `enabled`
+  under `[cli.json]`. A rendering default means different things to different
+  verbs, which is decision 11's own shape.
+  **So the row asks whether the file MENTIONS a knob, not where** — comparing
+  names, and counting a TABLE name as a name, since `json` is configured at
+  `[cli.json] enabled`. Looser on purpose: a key moved between tables goes
+  unflagged, and the row is not wrong on every correctly-written file.
+  Pinned by `tests/test_doctor.py::test_this_repos_own_output_toml_satisfies_the_row`.
+
+- **The no-match line is a rendering decision, and it moved to stderr on
+  2026-09-14** (W-165 fix 2, [SR-FIND](0104_find.md) decision 6). It is emitted
+  from `cmd_ask` / `cmd_find` / `cmd_answer`, which this record already reaches
+  into for `_show_band` and `_gated`. ⚠ **It is NOT configurable and gains no
+  `output.toml` key.** A caller that could turn the decline off would get a
+  silent, exit-0, empty answer — the one output this file's whole subject is
+  making harder to misread. The stream is the fix; a knob would be a new way to
+  produce the defect.
 
 ⚠ **Two defects this build produced and caught, recorded because neither was
 catchable by the tests that existed when they were written.**
@@ -707,7 +824,8 @@ catchable by the tests that existed when they were written.**
   `fux.query.find_root` and never reach the CLI's own import — and the failure
   appeared only on a real `python -m fux ask`, as an `ImportError` on **every
   verb**. Caught by *running* it. Gated now by a test that exercises the seam
-  with no monkeypatching at all (CLAUDE.md, two strikes).
+  with no monkeypatching at all ([SR-WORK-SESSION](0060_WORK-session.md)
+  decision 13, two strikes).
 - **`answer --no-refer` and five verb-level `--json` flags were left at
   `default=False`.** Decision 10's failure, in the wild, on the first build
   that could produce it: the file would silently never take effect for those

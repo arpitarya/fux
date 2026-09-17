@@ -1,0 +1,28 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "grep|rg|ripgrep|shell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".codex/hooks/fux-index-hint.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "shell|apply_patch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".codex/hooks/guard-open-work-inbox.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

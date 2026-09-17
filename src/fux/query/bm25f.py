@@ -25,6 +25,26 @@ bound and the refer plane cannot drift apart.
 
 Corpus statistics (`df`, `n`, `avg_wlen`) remain inputs, never derived inside
 this module.
+
+## The sixth field is `anchor`, and it is NOT in `TF_FIELDS`
+
+W-168 step 1. A document's anchor terms are the words **other documents use
+when they link to it**, and they are folded in here at read time from
+`Scoring.anchor` — default `0.0`, so an unconfigured corpus does exactly the
+arithmetic it did before the field existed.
+
+🔴 **It is deliberately outside the `weights`/`TF_FIELDS` tuple.** The five
+are *committed* fields: each has an entry in the record's own `flen`, and the
+index-for-index alignment between `FIELD_WEIGHTS` and `TF_FIELDS` is asserted
+below because a misalignment would weight `title` as `path`. Anchor has no
+`flen` slot and never enters the committed postings — it is assembled per
+query from the `at` maps on **other documents'** edges. Padding it into the
+aligned tuple would claim a committed field that does not exist, and would
+make every record's `flen` one short.
+
+⚠ **`anchor_tf is None` performs no arithmetic at all** — not a multiply by
+zero. Same rule, and the same reason, as `term_weights`: the differential law
+must not pick up a last-bit difference from the feature merely being present.
 """
 
 from __future__ import annotations
@@ -52,7 +72,34 @@ BODY_WEIGHT = FIELD_WEIGHTS[TF_FIELDS.index("body")]
 HEADING_WEIGHT = FIELD_WEIGHTS[TF_FIELDS.index("heading")]
 
 K1 = 1.2
-B = 0.75
+
+#: 🔴 **`b` is `0.15`, not the literature's `0.75`, and that is MEASURED**
+#: ([W-144](../../../work/regression/2026-09-16-b-sweep-2/VERDICT.md), 2026-09-16).
+#:
+#: `b` is the strength of BM25's length normalisation. At `0.75` a document is
+#: penalised hard for its length — and a **table inflates that length with
+#: tokens that say nothing about the query**, so a document is punished for an
+#: appendix it did not ask to be measured on.
+#:
+#: **The frozen rule was: the FIRST value, descending `0.4 → 0.3 → 0.2 → 0.15`,
+#: that nets positive on both benefit families with every control holding.**
+#: `0.4` moves neither; `0.3` and `0.2` fix the rate-card family and leave the
+#: prose-with-appendix family exactly where `0.75` does; **`0.15` moves both** —
+#: `+30` each, `p = 0.0000` on 30 discordant pairs against a required net of 12,
+#: with `inverse`, `placebo`, `dump` and `verbose` all holding.
+#:
+#: ⚠ **Descending order is what makes it `0.15` and not something lower.** The
+#: rule reports the smallest departure from `0.75` that works, never the best
+#: value, and it stops at the first one.
+#:
+#: ⚠ **One synthetic corpus, `informed`.** 510 generated documents built so the
+#: mechanism *can* move. It says a lower `b` ranks better **on documents shaped
+#: like these** — prose with table appendices, rate cards whose subject is their
+#: rows, data dumps. Real-corpus evidence is W-144's reopen trigger.
+#:
+#: 🔴 **Changing this changes every score in the engine.** The Node twin carries
+#: the same constant and `tests/test_node_config_parity.py` holds the two equal.
+B = 0.15
 
 
 @dataclass(frozen=True)
@@ -79,11 +126,34 @@ class Scoring:
     k1: float = K1
     b: float = B
     weights: tuple[float, ...] = FIELD_WEIGHTS
+    #: W-168 step 1 — the anchor field's weight. **Default `0.0`: off**, per
+    #: SR-RS decision 19 (a ranking change ships behind a tunable, default off,
+    #: and turns on only on a PASS). `0.0` is not "weight zero": every anchor
+    #: branch in the engine tests this and is skipped entirely, so a corpus
+    #: that configures nothing pays no cost on either candidate path and
+    #: scores byte-identically to the build before anchor text existed.
+    anchor: float = 0.0
 
     @property
     def trivial(self) -> bool:
         """True when this is the engine default, so callers can skip work."""
-        return self.k1 == K1 and self.b == B and self.weights == FIELD_WEIGHTS
+        return (
+            self.k1 == K1
+            and self.b == B
+            and self.weights == FIELD_WEIGHTS
+            and self.anchor == 0.0
+        )
+
+    @property
+    def anchor_on(self) -> bool:
+        """The one test for *is the anchor fold live?*
+
+        Read by both candidate generators and by the build. One spelling,
+        because a generator that folds anchors and one that does not is the
+        differential law failing — and it would fail data-dependently, on the
+        documents nobody linked to.
+        """
+        return self.anchor != 0.0
 
 
 #: The engine defaults. `tune.load()` returns this when `.fux/tune.toml` is
@@ -111,19 +181,29 @@ def weighted_tf(tf: list[int], scoring: Scoring = DEFAULT_SCORING) -> float:
     return total
 
 
-def derive_wlen(flen: list[int], scoring: Scoring = DEFAULT_SCORING) -> float:
+def derive_wlen(
+    flen: list[int], scoring: Scoring = DEFAULT_SCORING, anchor_len: int = 0
+) -> float:
     """The length normaliser, from committed per-field counts and live weights.
 
     **The one place this arithmetic exists.** Four callers need it — ingest's
     equality gate, the scan's corpus statistics, the accelerator's block bound,
     and the refer plane's passage rescore — and four copies of it is how they
     drift.
+
+    `anchor_len` is W-168's sixth field: the document's anchor token count,
+    or the corpus total when the caller is summing `avg_wlen`. **A document
+    heavily linked-to is a LONGER document** — leaving anchor out of the
+    normaliser is what lets a link farm max out a term with no length price,
+    so it is in, at the same weight the numerator uses.
     """
     total = 0.0
     weights = scoring.weights
     for i, count in enumerate(flen):
         if count:
             total += weights[i] * count
+    if anchor_len:
+        total += scoring.anchor * anchor_len
     return total
 
 
@@ -136,6 +216,8 @@ def score_record(
     avg_wlen: float,
     scoring: Scoring = DEFAULT_SCORING,
     term_weights: dict[str, float] | None = None,
+    anchor_tf: dict[str, int] | None = None,
+    anchor_len: int = 0,
 ) -> float:
     """Sum of each matched query term's weight-then-saturate contribution.
 
@@ -154,17 +236,50 @@ def score_record(
     it did before the parameter existed and the accelerator/scan differential
     law cannot pick up a last-bit difference from the feature being present.
     `query/expand.py::Expansion.trivial` is what callers test.
+
+    ## `anchor_tf` / `anchor_len` — W-168 step 1's read-time sixth field
+
+    `anchor_tf` is this document's anchor term counts *for the query's hashes*,
+    folded by the candidate generator from the `at` maps on the edges of the
+    documents that link here. `anchor_len` is its token total, which joins
+    `wlen`.
+
+    🔴 **Weighted into `wtf`, never scored as a second BM25.** BM25F is
+    weight-then-saturate **once** — summing a separate per-field BM25 is the
+    thing CLAUDE.md's law names, and it is what makes an anchor match on a
+    short document able to outrank a full body match. One `wtf`, one
+    saturation.
+
+    ⚠ **`None` performs no arithmetic at all**, exactly as `term_weights`
+    does: an unconfigured corpus must do the float operations it did before
+    this parameter existed, or the accelerator/scan differential picks up a
+    last-bit difference from the feature being present.
+
+    🔴 **`tf is None` is no longer a reason to skip the term.** A document
+    whose own body never uses the word can still be reached by it — that is
+    the retrieval half of step 1, and the early `continue` here was the second
+    place (after candidate generation) where it would have silently died.
     """
     if n <= 0 or avg_wlen <= 0:
         return 0.0
-    wlen = float(flen) if isinstance(flen, (int, float)) else derive_wlen(flen, scoring)
+    if isinstance(flen, (int, float)):
+        wlen = float(flen)
+    else:
+        wlen = derive_wlen(flen, scoring, anchor_len) if anchor_tf is not None else derive_wlen(flen, scoring)
     k1, b = scoring.k1, scoring.b
+    anchor_weight = scoring.anchor
     total = 0.0
     for h in query_hashes:
         tf = terms.get(h)
-        if tf is None:
-            continue
-        wtf = weighted_tf(tf, scoring)
+        if anchor_tf is None:
+            if tf is None:
+                continue
+            wtf = weighted_tf(tf, scoring)
+        else:
+            wtf = weighted_tf(tf, scoring) if tf is not None else 0.0
+            count = anchor_tf.get(h)
+            if count:
+                wtf += anchor_weight * count
         if wtf == 0:
             continue
         denom = wtf + k1 * (1 - b + b * wlen / avg_wlen)

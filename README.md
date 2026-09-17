@@ -104,11 +104,15 @@ keeps the derived and fetched parts out of git ([SR-DOTFUX](records/0102_fux-dir
 | Index another folder, file or URL | `fux add <path-or-url>` |
 | Mark a folder as history | `fux add old/2023-platform --archived` |
 | Stop indexing something | `fux remove <entry>`, or a line in `.fux/.fuxignore` |
-| Re-read sources and re-fetch URLs | `fux update` (`--check` only reports drift) |
+| Re-read sources and re-fetch URLs | `fux ingest` — the same verb as the first time. `--check` only reports drift; `--no-fetch` stays offline |
 | Follow links between documents | `fux explain <doc>` · `fux graph "…"` · `fux path <a> <b>` |
+| Explore around documents you name | `fux graph --seed <doc> [--seed <doc>…]` |
+| The same ranking from the words alone | `fux lexical "…"` — BM25F, frozen; the baseline, not a better `ask` |
+| Fix a wrong answer, durably | `fux correct "<the question people ask>" <the doc that answers it>` |
 | Re-index automatically on commit and merge | `fux hooks` |
 | A re-runnable answer receipt | `fux answer --receipt "…"`, later `fux verify <receipt>` |
 | Check the setup | `fux doctor` (read-only, offline) |
+| See what the index looks like | `fux inspect` — boilerplate words, documents no query can reach, duplicates, orphans |
 
 Full surface: `fux --help` and [SR-CLI](records/0101_cli-surface.md).
 
@@ -136,8 +140,10 @@ Agents are fux's primary reader.
   ([SR-DECODE](records/0139_decode.md)).
 - **Web pages and wikis.** `fux add <url>` fetches through a fetcher in
   `.fux/fetchers/`: `http.py` for a plain GET, or `cdp.py` (`--cdp`) to use the
-  session your signed-in Chrome already holds. Both are yours to edit
-  ([SR-FETCHER](records/0117_fetcher.md)).
+  session your signed-in Chrome already holds. Both are yours to edit — and
+  **`fetch=<name>` on a URL line resolves to any `.py` you put in that
+  directory**, the same way `.fux/decoders/` already works
+  ([SR-FETCHER](records/0117_fetcher.md), [SR-URL-LIST](records/0116_url-list.md)).
 - **Offline unless you ask.** Only explicit, opt-in commands touch the network,
   and they say so on stderr ([L4](records/0006_LAW-4-offline-by-default.md)).
 - **Sensitive text.** `.fux/pii.toml` redacts matches from the committed index
@@ -164,7 +170,7 @@ Claims ship with a pre-registered bar and a published run — including the ones
 
 ## Design rules
 
-Fux is built under ten laws, each with its own record in the
+Fux is built under eleven laws, each with its own record in the
 [SR register](records/README.md) ([SR-LAWS](records/0001_LAWS.md)):
 [L0 SRs are the source of truth](records/0002_LAW-0-authority.md) ·
 [L1 `$0`, FOSS-only](records/0003_LAW-1-zero-cost.md) ·
@@ -175,14 +181,15 @@ Fux is built under ten laws, each with its own record in the
 [L6 say "index"](records/0008_LAW-6-say-index.md) ·
 [L7 Python ≥ 3.11](records/0009_LAW-7-python-311.md) ·
 [L8 use record never committed](records/0010_LAW-8-use-record.md) ·
-[L10 build output, never source](records/0011_LAW-10-bundled-output.md).
+[L10 build output, never source](records/0011_LAW-10-bundled-output.md) ·
+[L11 the sealed answer key is closed to Claude](records/0012_LAW-11-sealed-answer-key.md).
 
 ## Reading order
 
 1. [`docs/index.md`](docs/index.md) — the map of every doc in the repo
 2. [The SR register](records/README.md) — every decision of record
 3. [Detailed architecture diagram](work/architecture-detailed.svg) — every plane, what is committed and what is not, and the two query paths
-4. [The paper](work/paper/the-fux-index-paper.md) — design and falsifiable predictions (a draft; its status note lists what changed)
+4. [The paper](docs/paper/the-fux-index-paper.md) — the architecture of record, v1.0 (2026-09-14): what ships, what was measured, what was designed and not built, and the open work — with twenty diagrams
 5. [Sibling environments](work/setup/README.md) — the sandbox, the measurement lab and the benchmark harness that sit next to this repo
 6. [`CLAUDE.md`](CLAUDE.md) — how work is done here, for people and agents
 

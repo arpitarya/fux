@@ -24,6 +24,14 @@ from __future__ import annotations
 from fux.decode import _ooxml, _xml
 from fux.decode._zip import SafeZip, ZipTooBig, numeric_key
 
+#: **The reuse key's handle on this decoder** (W-166). Bump it by hand in the
+#: same change as any edit that can change what `decode()` returns, and the next
+#: `fux ingest` re-extracts the documents bound to THIS decoder and no others.
+#: Leaving it alone is the claim that the edit cannot move a byte of output.
+#: `tests/decode/test_decoder_versions.py` fails on a changed module that did
+#: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
+VERSION = 1
+
 EXTENSIONS = (".pptx", ".pptm")
 
 #: A slide is a complete unit: one passage per slide, never merged into

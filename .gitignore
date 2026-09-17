@@ -37,10 +37,13 @@ venv/
 
 _to_delete/
 
-# The golden benchmark's answer key — Arpit, Codex and ChatGPT only; Claude never
-# reads it. Kept out of git so it never reaches history or a remote, and so `rg`
-# and Claude Code's Grep skip it by default. Back it up by hand. See
-# work/golden/README.md §The one rule.
+# The golden benchmark's answer key — Arpit, Codex and ChatGPT only; NO Claude
+# session opens it, ever, by any route. That is LAW L11 —
+# records/0012_LAW-11-sealed-answer-key.md, generated into CLAUDE.md
+# §Non-negotiable constraints. Kept out of git so it never reaches history or a
+# remote, and so `rg` and Claude Code's Grep skip it by default. Back it up by
+# hand. This entry is ONE OF FIVE GUARDS and not one of them is a guarantee —
+# records/0066_WORK-golden.md; the process is work/golden/README.md.
 work/golden/golden-answer/
 
 # 🔴 AND ANYWHERE ELSE IT LANDS — added 2026-09-12 after the rule above was

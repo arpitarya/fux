@@ -1,0 +1,30 @@
+20 seed documents: 51 identifier tokens, 33 distinct
+
+      analyzer outcome  count
+        survives whole  0
+      split into parts  33
+MANGLED (a letter lost)  3
+
+  BV-4437        -> ['bv', '4437']
+  BV-QA-2025-0312 -> ['bv', 'qa', '2025', '0312']
+  CBE-FROZEN     -> ['cbe', 'frozen']
+  CBE-PHARMA     -> ['cbe', 'pharma']
+  COLD-1         -> ['cold', '1']
+  DAIRY-2        -> ['dairi', '2']   🔴 MANGLED
+  GHY-7          -> ['ghy', '7']
+  KFS-2014       -> ['kf', '2014']   🔴 MANGLED
+  KV-NGP-C2-07   -> ['kv', 'ngp', 'c2', '07']
+  NGP-MNT-552    -> ['ngp', 'mnt', '552']
+  NGP-PNR-18     -> ['ngp', 'pnr', '18']
+  QCL-CS-MTX-02  -> ['qcl', 'cs', 'mtx', '02']
+  … 21 more
+
+  question set  questions  with an identifier
+         set-1        125                   4
+         set-2        124                   0
+         TOTAL        249                   4
+
+🔴 4 id-bearing questions is BELOW SR-RS decision 19's floor of all
+   floors (a net of 6). No arm on this set can clear alpha at any split,
+   so the feature cannot be given a verdict here — a DATA DEFECT (d23b),
+   fixed in the data, never filed as a null.

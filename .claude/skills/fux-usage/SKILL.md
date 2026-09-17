@@ -58,10 +58,20 @@ Three rules that make the ladder safe rather than clever:
 | `fux answer "<q>"` | one cited answer, fetched and re-scored on the source's current bytes | you want the answer, with a freshness verdict |
 | `fux explain <loc>` | the edges out of one document (outbound only) | you are asking what a document depends on |
 | `fux graph "<q>"` | the neighbourhood around a query's best answers | you are orienting in an unfamiliar area |
+| `fux graph --seed <loc>` | the neighbourhood around documents YOU name | you already know the starting point and do not want a query in the way |
 | `fux path <a> <b>` | how two documents connect | you suspect a relationship and want the chain |
+| `fux lexical "<q>"` | the same shape as `ask`, from the words alone | you are comparing against a baseline. **Otherwise use `ask`** |
+| `fux inspect` | what the whole index looks like | you are asked whether the corpus itself is any good |
+| `fux correct "<q>" <doc>` | writes one human question onto a document | **only when asked.** Propose it when fux served the wrong document; it commits a file |
 
-**Each verb has a deeper skill:** `fux-search` (ask, find), `fux-answer`
-(answer, verify), `fux-graph` (explain, graph, path). See section 7 for the rest.
+**`fux ask` is the default. `fux lexical` is not a better `ask`** - it is the
+frozen BM25F baseline, kept so a ranking comparison has a stable arm. Today the
+two return identical output; reach for `lexical` only when you have been asked
+for a baseline.
+
+**Each verb has a deeper skill:** `fux-search` (ask, find, lexical),
+`fux-answer` (answer, verify), `fux-graph` (explain, graph, path),
+`fux-inspect` (inspect), `fux-correct` (correct). See section 7 for the rest.
 
 **Prefer `--json` everywhere it is offered.** It gives you `score`, `loc` and
 `archived` as fields rather than as prose you have to parse. **Branch on the
@@ -99,12 +109,12 @@ this corpus**.
 **The retry, in order of preference:**
 
 1. **Re-ask with the word the corpus would use.** Replace the missing term.
-2. **Or keep your question and add `--expand`** - a handful of words you expect
-   the document to use:
+2. **Or keep your question and add `--expand`.** **YOU write this text — fux never generates it** (no fux path may call a model). Write 2-3 sentences that ANSWER the question in the words the document would use — a short passage, **not a keyword list**; the keyword form is the weaker one the research measured against.
 
    ```bash
    fux ask "what happened during the checkout outage" \
-       --expand "checkout unavailable 47 minutes incident timeline"
+       --expand "Checkout was unavailable for 47 minutes. The payment service
+                 returned 503 after a config rollout. Recovery was a rollback."
    ```
 
    Expansion terms are scored **below** your own words, and a document that

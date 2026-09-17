@@ -10,7 +10,7 @@ feature: the file-type allowlist and `.fux/formats.toml`
 owns: [src/fux/ingest/typesfile.py@127aed84458a]
 laws: [L1, L3]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 344206ca848e58eeec2225cd1fcac72c0e04d66f7052ea48f8cd610e3da88f38
+content_sha: 4b54e89743fbeb598fbbb9a88a99e46bcf62d2e3cd698f7d9f63bd21e8de0291
 ---
 
 # SR-TYPES — which files are documents
@@ -456,6 +456,19 @@ a `csv` binding admits `*.csv`, so either silent answer would move the allowlist
 nothing had ever read it.
 
 ### Consequences
+
+- ✅ **A declared type nothing can READ is REPORTED (2026-09-14, W-163).**
+  `fux doctor`'s `declared types are readable` row names an include glob whose
+  extension no built-in and no `.fux/decoders/` decoder claims: the documents
+  match, are walked, and are then indexed as raw bytes or skipped — while this
+  committed file says they are documents.
+  ⚠ **Not the same finding as SR-DECODE's `decoder bindings` row**, which fires
+  on a `[decoders]` binding whose extension no indexed document has. One is a
+  declaration reaching nothing; the other is a binding nothing reaches.
+  ⚠ **Prose suffixes are exempt and always will be.** `.md`, `.txt`, `.rst`,
+  `.adoc`, `.org` and `.markdown` are read by `extract.py` rather than by a
+  decoder, so having none is their normal state — reporting it would fire on the
+  most common line in the file.
 
 - ⚠ **Narrowing what counts as a document is a ranking change, and this record
   does not claim it is an improvement.** Records disappear on the next ingest

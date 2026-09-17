@@ -40,7 +40,7 @@ def repo(tmp_path, monkeypatch):
     """A repo with URL sources declared, which is what a sweep needs."""
     (tmp_path / "fux.toml").write_text(
         "[sources]\n\n[sources.url]\n"
-        'urls_file = ".fux/sources/urls"\nmax_parallel = 4\n',
+        'max_parallel = 4\n',
         encoding="utf-8",
     )
     sources = tmp_path / ".fux" / "sources"

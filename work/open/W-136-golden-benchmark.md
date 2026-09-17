@@ -8,7 +8,55 @@ lane: arpit
 timestamp: 2026-09-11T00:00:00Z
 ---
 
+## ✅ PHASE 5 RAN on `rung-00100` (2026-09-16) — the hand-offs are ready for Arpit
+
+[The run](../regression/2026-09-16-golden-rung-00100/report.md). 249 questions,
+498 `fux` calls, both sets kept apart at every step.
+
+🔴 **It files NO SCORE and none may be inferred from it.** *Correct* first
+appears in [prompt 6](../golden/prompts/6-codex-score.md)'s output, from Codex,
+against a key Arpit pastes there.
+
+**What he gives Codex**, self-contained, one line per question:
+
+- `work/regression/2026-09-16-golden-rung-00100/evidence/handoff-set-1.jsonl` — 125
+- `work/regression/2026-09-16-golden-rung-00100/evidence/handoff-set-2.jsonl` — 124
+
+| | set 1 (Codex) | set 2 (Claude, `informed`) |
+|---|---:|---:|
+| declined | **36 — 28.8 %** | **52 — 41.9 %** |
+| `grounded` / `partial` / `weak` | 52 / 37 / 36 | 32 / 40 / **52** |
+| empty ranked · uncited | 0 · 0 | 0 · 0 |
+
+🔴 **Finding 1 — authorship is visible in the instrument.** Same corpus, same
+engine, same day; **set 2 declines half again as often**. **It is not a claim
+that either set is better** — nothing was scored, and whether those declines are
+right is the key's property. **It is what two authors were commissioned to
+expose.**
+
+🔴 **Finding 2 — `weak` and `declined` coincide EXACTLY, 249 of 249.** Not
+correlated, identical. SR-CONFIDENCE's gate as ruled on 2026-09-14, observed at
+corpus scale — and it means the two columns above carry **one** number.
+
+⚠ **`[bm25f] b` moved `0.75 → 0.15` hours before this ran**, so every ranked
+order is the new ranker's and **nothing scored from these hand-offs may be
+compared with a pre-2026-09-16 golden number.** `engine_commit` is on every row.
+
+⚠ **No re-ingest**: the engine version matches the rung's stamp and only the
+commit differs. Corpus verified first — **100/100 documents against the manifest,
+`seed_drift` NONE**.
+
+**Next: prompt 6 — Codex scores, in a chat Arpit attends.** No Claude session
+takes part, and the other seven rungs are unrun.
+
 # W-136 — the sealed golden benchmark
+
+**Model: NONE — no Claude model executes this.** Phase 5 is **Codex's**, run
+on Arpit's account, and the whole point of the instrument is that no Claude
+session sees the answers. Stated rather than left blank so
+[SR-WORK-LIFECYCLE](../../records/0058_WORK-lifecycle.md) decision 6 has an
+answer here: *what would execute this* is a real question with a real answer,
+and the answer is not one of the three models.
 
 **The process is [`work/golden/README.md`](../golden/README.md)** — stated there
 once; this file carries only state. Prompts: [`work/golden/prompts/`](../golden/prompts/).
@@ -20,19 +68,51 @@ agent can do is done. The decision is made, so this left the *Blocked on Arpit*
 table and is a 🟣 date gate in [OPEN-WORK](../OPEN-WORK.md).
 
 - **What this gate holds up**, moved here from the inbox sub-row: **[W-87](W-87-what-good-means.md)'s
-  recall half** and **[W-144](W-144-structure-aware-extraction.md)'s cheap route**,
-  both of which read per-query scores off phase 5. Not [W-145](W-145-codex-regenerates-the-key.md)
-  — that governs what a number may *claim*, not whether it runs.
+  recall half** and **[W-144](../../archive/open/W-144-structure-aware-extraction.md)'s cheap route**,
+  both of which read per-query scores off phase 5. **Not W-145** — that governed
+  what a number may *claim*, not whether it runs, and it closed as overtaken on
+  2026-09-15 when Codex authored set 1.
 
 ## State
 
 | phase | who | lane | state |
 |---|---|---|---|
-| 1. Seed + answer key | Codex, **stood in for by Claude 2026-09-12** | — | ✅ **done, provisionally** — 20 documents, `seed-dates.tsv`, 124-question key held in chat. Regenerated under [W-145](W-145-codex-regenerates-the-key.md) |
-| 2. Extend 10 → 10 000, blind | Claude Code (Opus) | `agent` | ✅ **COMPLETE 2026-09-12 — all eight rungs to 10 000.** The first five were committed *before* the questions were opened (`92f5bff`); `rung-02000`/`05000`/`10000` were built later the same day from the **same committed generator and seed**, so what protects them is determinism rather than the clock — stated in [`golden/README.md`](../golden/README.md) rather than glossed. Nesting verified across all eight. |
+| 1. Seed + question sets | Codex (set 1) and Claude (set 2) | — | ✅ **DONE for real 2026-09-15** — the 20 seed documents and `seed-dates.tsv` stand; the provisional Claude key was deleted and **Arpit ran prompt 2 and prompt 3**. [`questions/`](../golden/questions/README.md): set 1 is Codex's (125, `s1-001…s1-125`), set 2 is Claude's (124, `s2-001…s2-124`); **both questions-only, both keys Arpit's**. W-145 closed as overtaken |
+| 2. Extend 10 → 10 000, blind | Claude Code (Opus) | `agent` | ✅ **COMPLETE 2026-09-12 — all eight rungs to 10 000.** The first five were committed *before* the questions were opened (`92f5bff`); `rung-02000`/`05000`/`10000` were built later the same day from the **same committed generator and seed**, so what protects them is determinism rather than the clock — stated in [`golden/README.md`](../golden/README.md) rather than glossed. Nesting verified across all eight. 🔴 **RE-FROZEN 2026-09-15** — prompt 4's check found all eight rungs holding a **superseded seed** and rebuilt them; see below. |
 | 3. Freeze ladder, release questions | Codex | `arpit` — run prompt 3 | ⚠ **released early** on 2026-09-12, before the ladder existed — ids permuted so no band identifies the unanswerables. Phase 2 was on its honour and did not open `questions/`. |
 | 4. Run each rung | Claude Code | `agent` | ✅ **run on 2026-09-12** for the five rungs that existed then, under a committed pre-registration ([`work/regression/2026-09-12-golden-ladder/`](../regression/2026-09-12-golden-ladder/PRE-REGISTRATION.md)). ⚠ **`rung-02000`/`05000`/`10000` have NOT been run** — they were built after that run. Running them is cheap (the indexes are committed) but it needs its own pre-registration, because a run across eight rungs is not the run that was registered across five. |
-| 5. Score each rung | Codex | `arpit` — run prompt 5 | 🟣 **ready, gated on 2026-09-30** (Arpit, 2026-09-13 — Codex limit exhausted) — predictions and answers are filed for five rungs. Every number it produces is `informed` until [W-145](W-145-codex-regenerates-the-key.md) closes. |
+| 5. Score each set, per rung | Codex | `arpit` — run prompt 6 | 🟣 **gated on 2026-09-30** (Arpit, 2026-09-13 — Codex limit exhausted). ⚠ **The premise visibly changed on 2026-09-15**, when Codex authored set 1; **only Arpit lifts a date gate**, so it stands until he says otherwise. ✅ **Set 1 is no longer `informed` for key authorship** — W-145's defect is gone. 🔴 **Set 2 is `informed` permanently** (SR-LAW-11 decision 7). |
+
+## 🔴 Prompt 4 ran 2026-09-15 — and the ladder was stale
+
+**The check failed, which is why the prompt is a check.** All eight rungs had
+been frozen on 2026-09-12; `0aa4bbcf` then extended **7 of the 20 documents in
+`work/golden/seed/` by 131 lines** on 2026-09-15, and **both question sets were
+authored after that**. Every rung still carried the old bytes, and nothing saw
+it: `verify()` compares a rung to its own manifest and `ladder_check` compares
+the manifests to each other — neither asks whether `seed/` is the seed the repo
+has.
+
+- **All eight rebuilt and re-frozen** from the current seed with the
+  **unmodified** 2026-09-12 builder and generator.
+- 🔴 **`ext/` byte-identical on all eight** — 18 800 generated documents,
+  **0 drift**, re-derived three days later at a different engine commit. The
+  determinism claim is measured now.
+- **Every coverage count unchanged**; 14 manifest lines moved per rung; every
+  rung answers at `fux.index.v3` with **0 seed files on any skip list**.
+- **Two strikes → a gate** ([SR-WORK-SESSION](../../records/0060_WORK-session.md)
+  decision 13; W-186 was strike one): `rungs.seed_drift()`, `ladder_check.py`
+  check 4 and [`tests/test_golden_ladder_seed.py`](../../tests/test_golden_ladder_seed.py).
+- **Blind** — `work/golden/seed/` and nothing else under `work/golden/` was read.
+- Filed: [`2026-09-15-ladder-seed-refresh`](../regression/2026-09-15-ladder-seed-refresh/report.md).
+
+⚠ **Every number filed against the old rungs names a corpus that is gone** —
+caused by the seed moving, not by the rebuild. No pre-registration pins a rung
+index root, so no threshold moved.
+
+⚠ **A rung is a COPY of `seed/`.** Touching a seed document in this repo
+invalidates all eight until they are rebuilt — the gate is what makes that loud
+instead of silent.
 
 ## Done in the filing change (2026-09-11)
 
@@ -47,7 +127,7 @@ table and is a 🟣 date gate in [OPEN-WORK](../OPEN-WORK.md).
 **Arpit's Codex quota was exhausted with phase 1 half done**: the ten seed
 documents had landed, the questions and answers had not. He ruled that Claude
 write the rest so phase 2 is not blocked, and that a work item be filed in the
-same breath for Codex to regenerate the key — [W-145](W-145-codex-regenerates-the-key.md),
+same breath for Codex to regenerate the key — W-145 (closed 2026-09-15 — [W-136](W-136-golden-benchmark.md) phase 5),
 which carries what is contaminated and what any number may claim.
 
 - **Twenty documents in `work/golden/seed/`.** Codex's ten, plus five
@@ -148,7 +228,7 @@ the benchmark.
 
 ⚠ **Two things phase 5 should know before it runs:**
 
-1. **Every number is `informed` until [W-145](W-145-codex-regenerates-the-key.md)
+1. **Every number is `informed` until W-145 (closed 2026-09-15 — [W-136](W-136-golden-benchmark.md) phase 5)
    closes** — the key is the Claude-authored stopgap.
 2. **Phase 4 covers five rungs, not eight.** The three new rungs are built and
    indexed but **not run**, and running them needs its own pre-registration —

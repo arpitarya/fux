@@ -10,7 +10,7 @@ feature: refusal detection before decode
 owns: [src/fux/ingest/refusals.py@adf187806c43, src/fux/templates/refusals.toml.txt@bdf2356bc679, tools/refusal-probe@76b6f6b7f4aa]
 laws: [L1, L3]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: c03fc19bcec3300e071059208f0121013157eedd676ce64899f12c1518d2d6fc
+content_sha: 45f0620bd588a4b8d4053391a6eb0a9e6f600fa72898d376dcb1e8a0341d8102
 ---
 
 # SR-REFUSAL: a sign-in wall is not a document, and only the bytes may say so
@@ -238,7 +238,16 @@ was written. The document in the index is the viewer's chrome.
     workbook, not diagnose a viewer.
 
 11. **Every networked run counts its refusals by rule, and `fux doctor`
-    reports them** (W-101, 2026-09-05). A refusal rule is the one piece of
+    reports them** (W-101, 2026-09-05).
+
+    ⚠ **Which command that is changed on 2026-09-15, and it widened the
+    population.** `fux ingest` absorbed `fux update`
+    ([SR-CLI](0101_cli-surface.md) decision 16), so the run that counts
+    refusals is now the **default verb** rather than a second one somebody
+    chose to type. **Nothing in this decision moves** — the count is taken in
+    `fetch_all()` and a run with nothing to fetch still records nothing — but
+    the *"only surface was the run's own output, which scrolls away"* problem
+    below gets larger, because far more runs now have output to scroll away. A refusal rule is the one piece of
     consumer policy whose correct behaviour and whose catastrophic behaviour
     are indistinguishable from outside: a rule matching every response empties
     the `url:` half of the corpus, and an empty corpus looks exactly like one
@@ -363,7 +372,7 @@ those is the document, not an auth wall. `.action`, `.aspx`, `.asp`, `.php` and
 
 **2026-09-14 — `src/fux/ingest/urlsrc.py` changed under this record and NOTHING this record
 decides moved.** The line that changed is the `configure()` call — each fetcher is handed its
-own slice of `[sources.url.config]` ([SR-FETCHER](0117_fetcher.md) decision 8).
+own slice of `[sources.url.config]` ([SR-CONFIG](0113_config.md) decision 8a).
 The refusal check's **position** is what this record owns and it has not moved:
 still in `fetch_all`, still after `_unpack` and before persist and decode.
 
@@ -371,7 +380,42 @@ still in `fetch_all`, still after `_unpack` and before persist and decode.
 owning record was *touched*, never that it was read (CLAUDE.md §Law zero), so a
 co-owner's file changing under this one is exactly the case where a reader needs
 to be told *"not yours"* in writing.
+⚠ **Refusal is per-URL; a missing FETCHER is per-run** (2026-09-15, W-178).
+This record's whole shape rests on a refusal being a skip: the URL is recorded,
+the run continues, and `fux doctor` counts it. `load_fetcher` raises instead —
+so a `fetch=` name with no file exits 1 and indexes **zero** documents, every
+URL-free directory in the corpus included.
+
+🔴 **That is not a regression and it is not a gap in this record** — the same
+blast radius existed for a mistyped `[sources.url] fetcher` path long before
+`fetch=` became an open set. It is named here because the *population* grew:
+[SR-URL-LIST](0116_url-list.md) decision 15 turned a bad `fetch=` value from a
+parse error at read time into a runtime failure, and a reader of this record
+could otherwise reasonably assume the refusal machinery covers it. It does not,
+and making it do so would mean a repo silently indexing a subset of its corpus —
+[the measured case](../work/regression/2026-09-15-consumer-fetchers/ANALYSIS.md).
+
 ### Consequences
+
+- ✅ **A never-edited, superseded starter is REPORTED (2026-09-14, W-163).**
+  `fux doctor`'s `refusal rules current` row fires when `.fux/refusals.toml` is
+  byte-identical to a starter fux has **REPLACED**: rules that decide what enters
+  the index, shipped as a starting point, that nobody ever looked at and that fux
+  itself has moved on from.
+  ⚠ **Byte equality is the right test here and the opposite call from the
+  `.fux/README.md` row**, which compares sections. That file is prose a consumer
+  annotates; this one is policy, and identical-to-the-starter means unexamined.
+  🔴 **Matching the CURRENT starter is NOT a finding** — a repo set up yesterday
+  is supposed to look exactly like that, and conflating the two would report every
+  fresh `fux setup` in the world as frozen.
+  🔴 **`doctor.RETIRED_REFUSAL_STARTERS` is appended to BY HAND in the same
+  change that edits `templates/refusals.toml.txt`.** fux ships exactly one
+  starter, so *"byte-equal to a previous starter"* is unanswerable from the tree
+  alone; without the outgoing digest the row cannot fire. It is **empty today,
+  and that is correct rather than unfinished** — the starter has not been
+  replaced since it shipped.
+  `tests/test_doctor.py::test_the_current_refusal_starter_is_not_listed_as_retired`
+  fails if the current digest is ever added by mistake.
 
 **Easier.** A refusal that used to become a record now becomes a skip with a
 reason a human can act on, and the reason names the fix rather than the
@@ -392,10 +436,6 @@ observation and it needed a separate mechanism — the thin-decode warning in
 `urlsrc._warn_if_thin`, which is `(words/KB) < 2.0` **and** `words < 50`, an OR
 away from firing on real short documents. It warns and never refuses, because
 "the decoder found little" is not the same claim as "this is not the document".
-
-**Also owed, and filed in [`work/OPEN-WORK.md`](../work/OPEN-WORK.md):**
-`fux doctor` does not report how many URLs were refused, or by which rule, so
-an over-broad rule is visible only in a run's own output.
 
 ### Alternatives considered
 

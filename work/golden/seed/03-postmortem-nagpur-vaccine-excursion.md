@@ -46,6 +46,18 @@ treated customer notice as a same-day item after QA review. That is not
 acceptable for patient critical stock. The revised procedure must require
 customer notice within two hours after confirmation.
 
+The incident also consumed most of the night shift's available quarantine space.
+Two dairy returns were left in the outer holding lane while Q-3 was cleared for
+the vaccine pallets. No dairy spoilage was confirmed, but the congestion made
+the response slower and showed that pharma critical quarantine cannot depend on
+moving unrelated stock at the last minute.
+
+Customer service received three different numbers during the morning: 18,400
+vials affected, 13,200 vials destroyed, and 5,200 vials conditionally released.
+All three numbers were true in their own context, but the first customer draft
+mixed them together. The final notice separated affected quantity, destroyed
+quantity, and released quantity.
+
 ## Root cause
 
 The immediate cause was warm air ingress through a torn door curtain and door
@@ -84,3 +96,8 @@ and a shorter vaccine high-duration trigger. If the telematics vendor changes,
 the first acceptance test must prove night alerts reach Compliance-Red, not only
 the DC manager.
 
+I have deliberately left the rough timeline language in place because the audit
+packet should show how the team understood the event on the day. Later SOP
+revisions may be cleaner, but this note is the incident record, not a training
+poster. Any future reader should compare it with the live SOP before using its
+thresholds.

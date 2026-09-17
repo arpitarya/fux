@@ -180,7 +180,7 @@ from the working tree under the new rules.
 - ⚠ **URL documents are re-redacted only when their bytes are fetched again.**
   An offline `fux ingest` — `--full` included — carries URL records as they
   are, and an `update=never` URL is never re-fetched. After a rule change, run
-  `fux update --all` and confirm.
+  `fux ingest --refetch-all` and confirm.
 - **Enrichment:** `fux enrich --check` refuses a file whose body matches a rule
   (`refused: … matches .fux/pii.toml rule(s): …`). Rewrite the sentence; do not
   paste a redaction into it.

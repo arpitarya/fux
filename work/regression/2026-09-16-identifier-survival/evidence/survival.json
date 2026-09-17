@@ -1,0 +1,313 @@
+{
+  "distinct": 33,
+  "identifier_tokens": 51,
+  "mangled": [
+    {
+      "token": "DAIRY-2",
+      "tokens": [
+        "dairi",
+        "2"
+      ]
+    },
+    {
+      "token": "KFS-2014",
+      "tokens": [
+        "kf",
+        "2014"
+      ]
+    },
+    {
+      "token": "QCL-OPS-DOCK-03",
+      "tokens": [
+        "qcl",
+        "op",
+        "dock",
+        "03"
+      ]
+    }
+  ],
+  "questions": {
+    "set-1": {
+      "ids": [
+        "s1-012",
+        "s1-013",
+        "s1-030",
+        "s1-120"
+      ],
+      "questions": 125,
+      "with_identifier": 4
+    },
+    "set-2": {
+      "ids": [],
+      "questions": 124,
+      "with_identifier": 0
+    }
+  },
+  "seed_documents": 20,
+  "split": [
+    {
+      "token": "BV-4437",
+      "tokens": [
+        "bv",
+        "4437"
+      ]
+    },
+    {
+      "token": "BV-QA-2025-0312",
+      "tokens": [
+        "bv",
+        "qa",
+        "2025",
+        "0312"
+      ]
+    },
+    {
+      "token": "CBE-FROZEN",
+      "tokens": [
+        "cbe",
+        "frozen"
+      ]
+    },
+    {
+      "token": "CBE-PHARMA",
+      "tokens": [
+        "cbe",
+        "pharma"
+      ]
+    },
+    {
+      "token": "COLD-1",
+      "tokens": [
+        "cold",
+        "1"
+      ]
+    },
+    {
+      "token": "DAIRY-2",
+      "tokens": [
+        "dairi",
+        "2"
+      ]
+    },
+    {
+      "token": "GHY-7",
+      "tokens": [
+        "ghy",
+        "7"
+      ]
+    },
+    {
+      "token": "KFS-2014",
+      "tokens": [
+        "kf",
+        "2014"
+      ]
+    },
+    {
+      "token": "KV-NGP-C2-07",
+      "tokens": [
+        "kv",
+        "ngp",
+        "c2",
+        "07"
+      ]
+    },
+    {
+      "token": "NGP-MNT-552",
+      "tokens": [
+        "ngp",
+        "mnt",
+        "552"
+      ]
+    },
+    {
+      "token": "NGP-PNR-18",
+      "tokens": [
+        "ngp",
+        "pnr",
+        "18"
+      ]
+    },
+    {
+      "token": "QCL-CS-MTX-02",
+      "tokens": [
+        "qcl",
+        "cs",
+        "mtx",
+        "02"
+      ]
+    },
+    {
+      "token": "QCL-CS-MTX-03",
+      "tokens": [
+        "qcl",
+        "cs",
+        "mtx",
+        "03"
+      ]
+    },
+    {
+      "token": "QCL-F-09",
+      "tokens": [
+        "qcl",
+        "f",
+        "09"
+      ]
+    },
+    {
+      "token": "QCL-F-17",
+      "tokens": [
+        "qcl",
+        "f",
+        "17"
+      ]
+    },
+    {
+      "token": "QCL-F-22",
+      "tokens": [
+        "qcl",
+        "f",
+        "22"
+      ]
+    },
+    {
+      "token": "QCL-IT-ADR-08",
+      "tokens": [
+        "qcl",
+        "adr",
+        "08"
+      ]
+    },
+    {
+      "token": "QCL-OPS-DOCK-03",
+      "tokens": [
+        "qcl",
+        "op",
+        "dock",
+        "03"
+      ]
+    },
+    {
+      "token": "QCL-QA-SOP-17",
+      "tokens": [
+        "qcl",
+        "qa",
+        "sop",
+        "17"
+      ]
+    },
+    {
+      "token": "QF-FY26-TSL-044",
+      "tokens": [
+        "qf",
+        "fy26",
+        "tsl",
+        "044"
+      ]
+    },
+    {
+      "token": "RF-118",
+      "tokens": [
+        "rf",
+        "118"
+      ]
+    },
+    {
+      "token": "RF-203",
+      "tokens": [
+        "rf",
+        "203"
+      ]
+    },
+    {
+      "token": "RF-221",
+      "tokens": [
+        "rf",
+        "221"
+      ]
+    },
+    {
+      "token": "ROTA-9A",
+      "tokens": [
+        "rota",
+        "9a"
+      ]
+    },
+    {
+      "token": "ROTA-9B",
+      "tokens": [
+        "rota",
+        "9b"
+      ]
+    },
+    {
+      "token": "SANDHU-EXC",
+      "tokens": [
+        "sandhu",
+        "exc"
+      ]
+    },
+    {
+      "token": "TSL-NGP-C2-07",
+      "tokens": [
+        "tsl",
+        "ngp",
+        "c2",
+        "07"
+      ]
+    },
+    {
+      "token": "TSL-NGP-C3-02",
+      "tokens": [
+        "tsl",
+        "ngp",
+        "c3",
+        "02"
+      ]
+    },
+    {
+      "token": "TSL-NGP-F1-04",
+      "tokens": [
+        "tsl",
+        "ngp",
+        "f1",
+        "04"
+      ]
+    },
+    {
+      "token": "TSL-RF-118-A",
+      "tokens": [
+        "tsl",
+        "rf",
+        "118"
+      ]
+    },
+    {
+      "token": "TSL-RF-221-A",
+      "tokens": [
+        "tsl",
+        "rf",
+        "221"
+      ]
+    },
+    {
+      "token": "WIKI-NGP-DOCK-12",
+      "tokens": [
+        "wiki",
+        "ngp",
+        "dock",
+        "12"
+      ]
+    },
+    {
+      "token": "WIKI-NGP-DOCK-41",
+      "tokens": [
+        "wiki",
+        "ngp",
+        "dock",
+        "41"
+      ]
+    }
+  ],
+  "survives_whole": []
+}

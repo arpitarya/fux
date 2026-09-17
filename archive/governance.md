@@ -1,0 +1,145 @@
+---
+type: Governance
+description: "Map of the files that govern this repo: what each governs, who reads it, what enforces it."
+---
+
+# GOVERNANCE — how this repo's process is documented, and by what
+
+**How to use this file.** ⚠ **Counts here were recounted 2026-08-25 and had drifted badly** — `open/` said 7 when it was 5, `regression/` said 13 when it was 29, the register said 33 when it was 41. A file whose whole job is to be the index cannot be the one that is stale, so the counts now carry the date they were taken.
+
+**Fux is governed by ~90 markdown/JSON files spread
+across `CLAUDE.md`, `docs/`, `work/`, and `tests/`. This is the map: what each
+governs, who reads it (agent, human, or both), what enforces it, and where the
+weight could come out. It does not replace any file below — it is the index
+none of them currently is.
+
+## 1. The steering files (repo root)
+
+| file | governs | audience | enforced by | update trigger |
+|---|---|---|---|---|
+| `CLAUDE.md` | the whole agent contract: laws, lifecycle, doc discipline, litmus test, blockers, answer-length | **agent** (primary) | convention only — no test reads it | any rule changes |
+| `README.md` | what fux is, for someone outside the process | **human** | none | status/architecture changes |
+| `DOGFOOD.md` | "fux used on itself" — one standing obligation | both | none | every version bump |
+| `CHANGELOG.md` | release history | human | convention | every release |
+
+## 2. `work/` — the live session-memory layer
+
+| file/dir | governs | audience | enforced by | update trigger |
+|---|---|---|---|---|
+| `OPEN-WORK.md` | the single live queue, two lanes (`agent`/`arpit`) | both | none directly | same change as the work it tracks |
+| `open/W-nn-*.md` (**5 files**, recounted 2026-08-25) | one detail spec per open item | agent (executor) | none | opened with the item, deleted with it |
+| `BLOCKED.json` | the machine-readable gate state | agent | `stop-if-blocked.sh` hook | a session blocks or unblocks |
+| `INTERVIEW.md` (72 KB) | cold-start state of play for a successor session | agent | none | during the session, not at the end |
+| `IMPLEMENTATION.md` (28 KB) | milestone log — what shipped, when | both | none | a milestone lands |
+| `WORKLOG.md` (305 KB, append-only) | per-session trail | both (audit trail) | none — but CLAUDE.md requires it every session | every session |
+| `NOW.md` (a handful of lines; overwritten every session) | one-line current-state pointer | both | none | every session transition |
+| `MACHINE.md` | environment/surface quirks (4 surfaces) | agent | none | a surface breaks in a new way |
+| `DOC-REGISTRY.md` (62 KB) | per-doc freshness table for **live** docs | both | `tests/test_doc_registry.py` | any registered doc is touched |
+| `compare/*.md` (**21 docs + README**, recounted 2026-09-12 — seven now in `archive/compare/`) | live forks — verdict + reopen-trigger | both | none | fork opens/closes/reopen-trigger fires |
+| `proposals/*.md` (**16 docs + README**, recounted 2026-09-12 — none of the 16 met the archive bar; the `ideal/` set and eight proposals are already archived) | parked, undecided ideas | both | none | filed, graduates, or rejected |
+| `regression/<date>-<run>/` (**29 runs**, recounted 2026-08-25) | measured evidence other docs cite | both | `tests/test_regression_runs.py` | every measurement run |
+| `setup/*.md` (3 docs + README) | how the three siblings are stood up; their jobs are [SR-WORK-ENVIRONMENTS](../records/0052_WORK-environments.md)'s | human (mostly) | `tests/test_setup_docs.py`, `tests/test_work_environments.py` | any sibling changes |
+| `paper/the-fux-index-paper.md` | architecture of record + falsifiable predictions | both | none | architecture changes / a prediction is measured |
+| `architecture-*.svg` (**6 diagrams**, recounted 2026-09-14; the proposal target sheet archived that day with W-112) | visual architecture; `docs/architecture-*.png` are rendered from them | human | none | the plane, verb, reader or record shape one draws changes |
+
+## 3. `docs/` — what the project *is*
+
+| file/dir | governs | audience | enforced by | update trigger |
+|---|---|---|---|---|
+| `docs/index.md` | bundle root, reading order across `docs/`+`work/` | both | none | either tree's structure changes |
+| `docs/GLOSSARY.md` (24 KB) | recurring terms, defined once | human | none | a term is coined or redefined |
+| `records/README.md` | the SR register: convention, ownership, state | both | none directly (feeds the tests below) | a record's state changes |
+| `records/000N_*.md` (**41 live records**, recounted 2026-08-25) | one decision per completed feature/measurement | both (§1 human, §2 agent, per-record) | `test_sr_frontmatter.py`, `test_sr_freshness.py`, `test_sr_ownership.py`, `test_sr_owns_consistency.py` | the owning code changes |
+| `records/TEMPLATE.md` | the shape new SRs must follow | agent (author) | none | convention changes |
+| `records/RULE-SINCE` | the freshness gate's audit baseline | agent (tooling) | read by `test_sr_freshness.py` | the gate's rule tightens |
+
+**SR maintenance is remitted to the SR hooks, not to prose.** Law zero —
+"SRs are always up to date" — is enforced by `scripts/sr-guard.sh` running
+as a `commit-msg` hook (`ln -sf ../../scripts/sr-guard.sh
+.git/hooks/commit-msg` — **not** `pre-commit`, because the `no SR affected`
+escape hatch needs the commit message, which doesn't exist yet at
+`pre-commit` time) plus `tests/test_sr_freshness.py` running the identical
+check in CI. A commit that touches an SR-owned path without touching that
+path's owning record is rejected. Nobody has to remember to reconcile a
+record by discipline — the gate remembers for them.
+
+## 4. `archive/` — retired, not evidence
+
+One archive at the repo root, mirroring the live tree (`archive/adr/`,
+`archive/open/`, `archive/handoff/`, …). Enforced by `tests/test_archive_law.py`
+— a second archive anywhere else fails CI. Named in prose, never cited as
+grounding.
+
+## 5. What enforces any of this
+
+| test | checks |
+|---|---|
+| `test_sr_freshness.py` | a changed SR-owned file's **owning** record was touched in the same commit |
+| `test_sr_frontmatter.py` | the 6-key frontmatter block, name/status consistency |
+| `test_sr_ownership.py` / `test_sr_owns_consistency.py` | `**Owns:**` lines match the register, no path owned twice |
+| `test_archive_law.py` | exactly one `archive/` directory exists |
+| `test_doc_registry.py` | `DOC-REGISTRY.md` rows match live docs |
+| `test_setup_docs.py` | `work/setup/*.md` carry the required frontmatter |
+| `test_regression_runs.py` | a `regression/` run has the required artifacts |
+| `.claude/hooks/stop-if-blocked.sh` | a session cannot end with an unsurfaced `BLOCKED.json` |
+| `.claude/hooks/require-progress.sh`, `inject-inbox.sh`, `session-lock.sh` | session-level agent behavior, not doc content |
+| `scripts/sr-guard.sh` (+ `commit-msg` hook) | commit-time SR-ownership check |
+
+**8 of ~18 test files in `tests/` guard prose/process, not engine
+correctness by file count** — but PRIORITY.md P7's audit (2026-08-21) read
+all of them and found the "~30% of tests guard prose" figure does not
+reproduce: the dedicated set is 35 of 836 tests (≈4%) once
+`test_frontmatter.py` (the stdlib parser's own tests, not a governance
+check) is correctly excluded from the count. Corrected here on contact
+rather than repeated.
+
+---
+
+## P7 landed, 2026-08-21 — this section is now a partial post-mortem, not a live proposal
+
+**This section was written as input to `PRIORITY.md` P7 while P7 was still
+open.** P7 has since been decided and applied — see
+[`archive/proposals/process-diet.md`](../archive/proposals/process-diet.md) for the actual
+four candidates put to Arpit and his verdict on each (only the `Cost:` line
+was accepted and dropped; `NOW.md` stays separate from `INTERVIEW.md`, on
+the grounds that they serve different read patterns, not just different
+sizes). `PRIORITY.md` itself is now archived
+([`archive/README.md`](../archive/README.md)); `OPEN-WORK.md` is the live
+queue, as it always was.
+
+**Two ideas below were not among P7's four candidates and were not decided
+in that round** — left here, explicitly parked rather than acted on or
+lost:
+
+1. ~~`NOW.md` duplicates `PRIORITY.md`'s state; delete it.~~ **Decided
+   against, 2026-08-21** (P7): the two serve different read patterns — a
+   hook reads `NOW.md` unconditionally on every prompt, `INTERVIEW.md` is
+   read deliberately once per session.
+2. `IMPLEMENTATION.md` and `OPEN-WORK.md` are not a merge candidate —
+   confirmed, this reasoning matches Arpit's actual ruling.
+3. **`WORKLOG.md` archive-and-truncate — not litigated in P7, still parked.**
+   305 KB and growing forever; a yearly (or v-major) cut into
+   `archive/worklog/YYYY.md` would keep the audit trail under the one-archive
+   law while capping the live file's growth. Worth its own proposal if this
+   becomes a real cost, not decided here.
+4. ~~The mandatory `Cost:` line is dead weight.~~ **Accepted and applied,
+   2026-08-21** (P7) — dropped from CLAUDE.md and `WORKLOG.md`'s template.
+5. **`DOC-REGISTRY.md` scoped to only untested prose — not litigated in P7,
+   still parked.** The registry's real unique value is covering docs nothing
+   else checks (`WORKLOG.md`, `MACHINE.md`, `GLOSSARY.md`, the paper); SRs
+   and `setup/` already have dedicated tests. Worth its own proposal, same as
+   item 3.
+6. `regression/` and `compare/` are not candidates for cutting — confirmed,
+   they are the "ground truth over prose" evidence layer CLAUDE.md's own rule
+   requires.
+7. SR maintenance is remitted to the SR hooks, not a diet candidate —
+   confirmed, unchanged.
+
+**On audience split:** almost nothing here is agent-only or human-only —
+`CLAUDE.md`, `OPEN-WORK.md`, `BLOCKED.json`, and the `open/W-nn` specs skew
+agent (an agent reads them to decide what to do next); `README.md`,
+`GLOSSARY.md`, and the two architecture SVGs skew human (nobody automates
+against a diagram). Everything else — SRs, `compare/`, `proposals/`,
+`regression/`, `WORKLOG.md`, `INTERVIEW.md` — is written for both by design
+(the "§1 for humans / §2 for agents" split inside each SR is the same idea
+applied per-file).

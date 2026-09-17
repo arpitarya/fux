@@ -13,6 +13,7 @@ offline — it never touches the fetcher or the network.
 
 from __future__ import annotations
 
+import json
 import subprocess
 import sys
 from dataclasses import dataclass
@@ -139,7 +140,7 @@ def _daemon(root: Path) -> Check | None:
     ⚠ **The case this exists for is `outcome: "ok"` with `skipped > 0`** — a
     sweep that looked healthy and did not index everything. Two of seven URLs
     were skipped in the 2026-08-27 real-network run and nothing said so outside
-    a foreground `fux update`.
+    a foreground `fux ingest`.
     """
     from .maintain import daemon as daemon_mod
 
@@ -168,7 +169,7 @@ def _daemon(root: Path) -> Check | None:
             "url daemon",
             False,
             f"{where}; the last sweep reported ok but did not index {skipped} document(s) "
-            f"({reason}) - run `fux update` to see them all",
+            f"({reason}) - run `fux ingest` to see them all",
             level="warn",
         )
     detail = f"{where}; last sweep {outcome}"
@@ -278,6 +279,8 @@ def _layout(root: Path) -> list[Check]:
             )
         )
 
+    checks.append(_index_temp_ignored(root))
+
     fux_dir = root / fuxdir.FUX_DIR
     extras = sorted(p.name for p in fux_dir.iterdir() if p.name not in fuxdir.DECLARED) if fux_dir.is_dir() else []
     checks.append(
@@ -294,6 +297,20 @@ def _layout(root: Path) -> list[Check]:
     checks.append(_tune_config_health(root))
     checks.append(_types_health(root))
     checks.append(_ignore_health(root))
+    checks.append(_dirs_exclusions_migrated(root))
+    checks.append(_stale_redaction(root))
+    # W-163 — the setup-drift rows. Grouped here, after the files they read
+    # have each had their own "does it load" row: a stale key set is only worth
+    # reporting about a file that parses, and two rows saying different things
+    # about one broken file is how a reader learns to trust neither.
+    checks.append(_retired_agent_folders(root))
+    checks.append(_readme_current(root))
+    checks.append(_starter_refusals_untouched(root))
+    checks.extend(_frozen_keys(root))
+    checks.append(_unbound_types(root))
+    checks.append(_listed_dirs_exist(root))
+    checks.append(_thin_urls(root))
+    checks.append(_confidence_floors(root))
     checks.append(_fetcher_capabilities(root))
     checks.append(_accelerator(root))
     checks.append(_node_reader(root))
@@ -304,6 +321,11 @@ def _layout(root: Path) -> list[Check]:
         checks.append(daemon_check)
     checks.append(_url_health(root))
     checks.append(_acquired_health(root))
+    checks.append(_pinned_without_bytes(root))
+    checks.append(_fetcher_config_tables(root))
+    checks.append(_fetcher_bindings(root))
+    checks.append(_suspended_pins(root))
+    checks.append(_observers(root))
     checks.append(_pii_health(root))
     checks.append(_refusal_health(root))
     checks.append(_decoder_bindings(root))
@@ -526,6 +548,294 @@ def _redaction_note(root: Path, rules) -> str:
     return note
 
 
+def _fetcher_config_tables(root: Path) -> Check:
+    """`[sources.url.config.<name>]` sub-tables that name no fetcher file.
+
+    **The whole point of the two-level table is that a key reaches exactly one
+    fetcher** — so a sub-table whose name matches no `.py` in the fetchers
+    directory reaches *none*, silently. That is the defect
+    [SR-CONFIG](../../records/0113_config.md) decision 14 exists for, one level
+    down: a setting its author believes is in force.
+
+    ⚠ **A row here rather than a refusal in `config.load`**, and the reason is
+    which module may touch the disk. The loader parses a file; deciding whether
+    `[sources.url.config.wiki]` is a typo means listing
+    `.fux/fetchers/` — a filesystem question, in a function whose job is TOML.
+    `doctor` is the module that already asks filesystem questions about config.
+    """
+    from .config import load as load_config
+
+    name = "fetcher config tables"
+    try:
+        config = load_config(root)
+    except FuxError:
+        return Check(name, True, "no readable fux.toml - another check owns that")
+    if config.url is None or not config.url.config:
+        return Check(name, True, "no [sources.url.config] to check")
+
+    named = sorted(k for k, v in config.url.config.items() if isinstance(v, dict))
+    if not named:
+        return Check(name, True, "only shared keys - every fetcher gets them")
+
+    fetchers_dir = (root / config.url.fetcher).parent
+    try:
+        stems = {p.stem for p in fetchers_dir.glob("*.py")}
+    except OSError:
+        stems = set()
+    orphans = [n for n in named if n not in stems]
+    if not orphans:
+        return Check(name, True, f"{len(named)} per-fetcher table(s), each naming a fetcher on disk")
+    return Check(
+        name,
+        False,
+        f"[sources.url.config.{orphans[0]}]"
+        + (f" and {len(orphans) - 1} more" if len(orphans) > 1 else "")
+        + f" name(s) no fetcher: {fetchers_dir}/ has {sorted(stems) or 'nothing'}. "
+        "These keys reach NO fetcher and nothing else says so - rename the table "
+        "to the fetcher's filename without .py, or delete it",
+    )
+
+
+def _fetcher_bindings(root: Path) -> Check:
+    """`fetch=<name>` on a URL line that names no fetcher file.
+
+    **W-178, the mirror of `_decoder_bindings`.** Since `fetch=` became a typed
+    attribute the grammar accepts any module-stem name, which is what lets a
+    consumer drop `.fux/fetchers/glassbox.py` in and write `fetch=glassbox`. The
+    price of an open set is that a **typo** now parses: `fetch=glasbox` is a
+    perfectly legal line naming a file nobody wrote.
+
+    🔴 **Without this row, that line is discovered by the next person's ingest
+    dying.** `urlsrc._fetcher_path()` raises with a clear message — at fetch
+    time, on somebody else's machine, mid-run. **Exactly the argument W-101
+    item 2 made for `_decoder_bindings`**, and the reason the two are a pair.
+
+    ⚠ **It reads the LIST, not the index**, which is the opposite choice from
+    `_decoder_bindings` and is right for a different reason. A binding is
+    interesting when it matches no *document*; a fetcher name is wrong when it
+    matches no *file*, and that is true the moment the line is written — before
+    any ingest, which is the moment a person can still fix it cheaply.
+
+    ⚠ **Offline, like every doctor check.** It lists a directory and never
+    imports a fetcher: importing one runs consumer code that may `connect()`,
+    and [SR-DOCTOR](../../records/0152_doctor.md) is the command somebody runs
+    when something is already wrong.
+    """
+    from .config import load as load_config
+    from .ingest import sourcelist, urlsrc
+
+    name = "fetcher bindings"
+    try:
+        config = load_config(root)
+    except FuxError:
+        return Check(name, True, "no readable fux.toml - another check owns that")
+    if config.url is None:
+        return Check(name, True, "no [sources.url] - no URL lines to resolve")
+
+    path = root / config.url.urls_file
+    if not path.is_file():
+        return Check(name, True, f"no {config.url.urls_file} yet")
+    try:
+        entries = sourcelist.parse(
+            path.read_text(encoding="utf-8"), sourcelist.URLS, origin=config.url.urls_file
+        )
+    except (FuxError, OSError) as exc:
+        return Check(name, False, f"{config.url.urls_file}: {exc}")
+
+    resolved = urlsrc.resolve_urls(entries, config.url)
+    if not resolved:
+        return Check(name, True, "no URL lines listed")
+
+    fetchers_dir = (root / config.url.fetcher).parent
+    try:
+        stems = {p.stem for p in fetchers_dir.glob("*.py")}
+    except OSError:
+        stems = set()
+
+    wanted = sorted({e.fetch for e in resolved})
+    missing = [n for n in wanted if n not in stems]
+    if not missing:
+        return Check(
+            name,
+            True,
+            f"{len(wanted)} fetcher name(s) in use, each resolving to a file in "
+            f"{fetchers_dir.name}/",
+        )
+    shown = ", ".join(missing[:3])
+    more = f" (+{len(missing) - 3} more)" if len(missing) > 3 else ""
+    return Check(
+        name,
+        False,
+        f"{len(missing)} URL line(s) name a fetcher with no file: {shown}{more}. "
+        f"{fetchers_dir}/ has {sorted(stems) or 'nothing'}. Every fetch through one of "
+        "these fails at ingest time - write the module, or fix the `fetch=` name",
+    )
+
+
+def _pinned_without_bytes(root: Path) -> Check:
+    """`fetch_at_answer = false` with URLs that have no retained bytes.
+
+    **The disclosure SR-URL-FRESHNESS decision 16 chose over a refusal**
+    (Arpit, 2026-09-14). `[sources.url] fetch_at_answer = false` says *never
+    open a socket at answer time*; a URL with nothing in `.fux/acquired/` then
+    has nothing to verify against, and every citation from it comes back
+    `unverified` — honest, and silently much weaker than the consumer thinks.
+
+    ⚠ **Refusing at load would have been the wrong shape**, and the precedent
+    is this plane's own: [SR-ACQUIRED](../../records/0145_acquired-plane.md)
+    resolves the equally lossy `update=never keep=false` pair as *disclosed,
+    never refused*, because the combination is coherent for a document that
+    genuinely never changes and merely surprising to have chosen by accident.
+    A repo mid-migration — `fetch_at_answer` set before a re-ingest with
+    `keep=true` — would be locked out by a refusal for no benefit.
+
+    **Silent when the flag is on**, which is the default: there is nothing to
+    warn about while fux may still go and look.
+    """
+    from .config import load as load_config
+    from .ingest import urlsrc
+    from .store import acquired
+
+    name = "pinned url bytes"
+    try:
+        config = load_config(root)
+    except FuxError:
+        return Check(name, True, "no readable fux.toml - another check owns that")
+    if config.url is None or config.url.fetch_at_answer:
+        return Check(name, True, "fetch_at_answer is on - answers may verify against the source")
+
+    try:
+        entries = urlsrc.resolve_urls(urlsrc.read_urls(root, config.url.urls_file), config.url)
+    except (FuxError, OSError):
+        return Check(name, True, "no readable url list - another check owns that")
+    if not entries:
+        return Check(name, True, "fetch_at_answer is off, and no url is listed")
+
+    try:
+        manifest = acquired.read_manifest(root)
+    except (FuxError, OSError):
+        manifest = {}
+    missing = sorted(e.url for e in entries if e.url not in manifest)
+    if not missing:
+        return Check(
+            name,
+            True,
+            f"fetch_at_answer is off; all {len(entries)} url(s) have retained bytes - "
+            "citations verify as `as-ingested`",
+        )
+    # 🔴 **`ok=False`, or this row renders `[OK]`** — see `_suspended_pins`.
+    # It shipped as `ok=True, level="warn"` on 2026-09-14 and printed `[OK]`
+    # beside *every citation from these will be `unverified`*, which is the
+    # disclosure decision 16 chose over a refusal saying nothing at all.
+    return Check(
+        name,
+        False,
+        f"fetch_at_answer is off and {len(missing)} of {len(entries)} url(s) have NO retained "
+        f"bytes: {', '.join(missing[:3])}"
+        + (f" (+{len(missing) - 3} more)" if len(missing) > 3 else "")
+        + " - every citation from these will be `unverified`. Set keep = true and re-ingest",
+        level="warn",
+    )
+
+
+def _observers(root: Path) -> Check:
+    """W-170. What is in `.fux/observers/`, and whether each one fired.
+
+    🔴 **A present-but-never-firing observer is the failure this row exists
+    for**, and it is silent by construction: the dispatcher is fail-open, so an
+    observer that raises on every run is skipped on every run and fux answers
+    normally. Without this row a consumer's analytics can be dead for weeks
+    while every query looks perfect — the same shape as a suspended pin, and
+    the same remedy: say so, and let a person decide.
+
+    ⚠ **`warn`, never `error`.** A broken observer answers no question wrongly.
+    The repository is not broken; somebody's telemetry is, and conflating the
+    two would make `fux doctor` exit non-zero in CI over a consumer's own file.
+
+    ⚠ **The liveness file describes the LAST run, so a first-ever `doctor` in a
+    repo that has never answered a query reports `not yet observed`** — which
+    is true and is not a finding. Reporting it as one would make every fresh
+    clone look broken.
+    """
+    name = "observers"
+    try:
+        from . import observe
+    except Exception:  # pragma: no cover - a check must not take out the command
+        return Check(name, True, "not available in this build")
+    try:
+        present = [p.name for p in observe.observers_in(root)]
+    except Exception:
+        return Check(name, True, "could not read .fux/observers/")
+    if not present:
+        return Check(name, True, "none installed")
+    state = observe.liveness(root)
+    if not state:
+        return Check(name, True, f"{len(present)} installed; not yet observed a run")
+    fired = set(state.get("fired", ()))
+    silent = sorted(n for n in present if n not in fired)
+    if not silent:
+        return Check(name, True, f"{len(present)} installed, all fired on the last run")
+    return Check(
+        name,
+        False,
+        f"{len(silent)} of {len(present)} observer(s) did NOT fire on the last run: "
+        f"{', '.join(silent)} - they raised or exceeded [observe] max_ms, and a "
+        "failing observer is skipped silently by design. Re-run with FUX_DEBUG=1 "
+        "to see which",
+        level="warn",
+    )
+
+
+def _suspended_pins(root: Path) -> Check:
+    """W-162. A `fux correct --pin` whose document has moved under it.
+
+    **A suspended pin is silent at query time, deliberately** — the query
+    simply ranks normally — so without this row a person who pinned a question
+    months ago has no way to learn that their pin stopped applying. That is the
+    exact shape of failure `fux doctor` exists for: something that *was* true,
+    is not, and says nothing.
+
+    ⚠ **`warn`, never `error`.** A stale pin answers correctly — it answers
+    with the ranking — so the repository is not broken. And the remedy needs a
+    human to read the document and decide, which `doctor` must not do for them.
+    """
+    name = "correction pins"
+    try:
+        from .correct import load_corrections, suspended_pins
+    except Exception:  # pragma: no cover - a check must not take out the command
+        return Check(name, True, "not available in this build")
+    try:
+        rows = load_corrections(root)
+    except Exception:
+        return Check(name, True, "no readable corrections file")
+    pins = [c for c in rows if c.pin]
+    if not rows:
+        return Check(name, True, "no corrections filed")
+    if not pins:
+        return Check(name, True, f"{len(rows)} correction(s), no pins")
+    try:
+        stale = suspended_pins(root)
+    except Exception:
+        return Check(name, True, f"{len(pins)} pin(s); could not read the index to check them")
+    if not stale:
+        return Check(name, True, f"{len(pins)} pin(s), all applying")
+    shown = "; ".join(f"{c.loc} ({why})" for c, why in stale[:3])
+    more = f" (+{len(stale) - 3} more)" if len(stale) > 3 else ""
+    # 🔴 **`ok=False` with `level="warn"` is what renders `[WARN]`.** `cmd_doctor`
+    # reads `ok` for the mark and `level` for the exit code, so `ok=True,
+    # level="warn"` prints `[OK]` — which is right for an informational row
+    # (*idle, nothing pending*) and wrong for a finding. The first cut of this
+    # row had it that way and disclosed a suspended pin as `[OK]`.
+    return Check(
+        name,
+        False,
+        f"{len(stale)} of {len(pins)} pin(s) SUSPENDED and silently not applying: {shown}{more}"
+        " - read the document, then `fux correct --reaffirm \"<question>\" <doc>`,"
+        " or `--no-pin` to keep the correction without the pin",
+        level="warn",
+    )
+
+
 def _acquired_health(root: Path) -> Check:
     """`.fux/acquired/` — how much is retained, and whether it is gitignored.
 
@@ -571,7 +881,7 @@ def _acquired_health(root: Path) -> Check:
     if ignored is None:
         detail += " (gitignore unchecked: not a git checkout)"
     if orphans > 0:
-        detail += f" - {orphans} unreferenced, swept on the next `fux update`"
+        detail += f" - {orphans} unreferenced, swept on the next `fux ingest`"
     cap = acquired.DEFAULT_MAX_BYTES
     if total > cap * 0.8:
         return Check(
@@ -604,7 +914,7 @@ def _refusal_health(root: Path) -> Check:
 
     ⚠ **Offline, and the count is therefore about the PAST.** Doctor never
     fetches, so it reports what networked runs recorded. A repo that has never
-    run `fux update` has nothing here and is told that rather than shown a zero
+    run `fux ingest` has nothing here and is told that rather than shown a zero
     it would read as *"nothing was refused"*.
 
     ⚠ **A warning, never an error.** Refusing sign-in walls is the feature
@@ -644,7 +954,7 @@ def _refusal_health(root: Path) -> Check:
     if not counted:
         parts.append(
             "no networked run has recorded a refusal yet - the count starts at the "
-            "next `fux update`"
+            "next `fux ingest`"
         )
         return Check("refusal rules", True, ", ".join(parts), level="warn")
 
@@ -1124,6 +1434,639 @@ def _ignore_health(root: Path) -> Check:
     )
 
 
+def _stale_redaction(root: Path) -> Check:
+    """`url:` documents the last policy change could not reach (W-166 DoD 3).
+
+    A PII, decoder or extraction-rule change re-derives every `url:` record whose
+    bytes are retained in `.fux/acquired/`. One with no retained blob cannot be
+    re-derived offline at all, so **its record is left exactly as it is** —
+    dropping a document because a policy changed is the one thing a redaction
+    change must never do — and it is named here instead.
+
+    ⚠ **`warn`, and the reason is worth stating.** The record is not wrong about
+    its source; it is extracted under rules that have since moved. The fix needs
+    the network (`fux ingest`), which `doctor` is not going to take on a user's
+    behalf, and failing the command for a condition only a fetch can clear would
+    make `doctor` red until someone goes online.
+
+    ⚠ **Derived state, so it does not travel with a cloned index** — see
+    `run._record_stale_redaction` for what that trade bought. A fresh clone reads
+    clean here until its own ingest re-derives the fact.
+
+    **ASCII only** - it is printed, and printed text reaches a Windows console.
+    """
+    from .ingest.run import STALE_REDACTION_FILE
+    from .store import fuxdir
+
+    path = fuxdir.fux_dir(root) / "runtime" / STALE_REDACTION_FILE
+    try:
+        stranded = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        stranded = []
+    if not isinstance(stranded, list) or not stranded:
+        return Check(
+            "url redaction current",
+            True,
+            "every url record was re-extracted under the current rules, or none needed to be",
+        )
+    shown = ", ".join(sorted(str(s) for s in stranded)[:3])
+    more = f" and {len(stranded) - 3} more" if len(stranded) > 3 else ""
+    return Check(
+        "url redaction current",
+        False,
+        f"{len(stranded)} url document(s) still hold text extracted under the OLD rules "
+        f"- no retained bytes to re-extract from: {shown}{more}. "
+        "`fux ingest` fetches them; `keep=true` on the line retains the bytes so the next "
+        "policy change can reach them offline",
+        level="warn",
+    )
+
+
+def _dirs_exclusions_migrated(root: Path) -> Check:
+    """`!` lines still in `.fux/sources/dirs`, and the one-line move for each.
+
+    **`fux remove` stopped writing them on 2026-09-14** (W-165 fix 1): the
+    exclusion goes to `.fux/.fuxignore`, which SR-FUXIGNORE made the one place a
+    path is kept out of the index. The `!` lines already written keep being read
+    — SR-DIR-LIST decision 2a, and breaking them would be a silent re-inclusion,
+    which is the worse direction — so this is a `warn` and never an error.
+
+    ⚠ **Not the same finding as `_ignore_health`'s duplicate.** That one fires
+    when a pattern is in *both* files and is about the two spellings drifting
+    apart. This fires on *every* survivor, duplicated or not, because the
+    migration is owed for the ones nothing duplicates too — and those are the
+    ones no other check would ever mention.
+
+    **ASCII only** - it is printed, and printed text reaches a Windows console.
+    """
+    from .ingest import fuxignore
+
+    try:
+        notes = fuxignore.dirs_exclusion_notes(root, dirs_file=DEFAULT_DIRS_FILE)
+    except (FuxError, OSError) as exc:
+        return Check("dirs exclusions migrated", False, f"{DEFAULT_DIRS_FILE}: {exc}", level="warn")
+    if not notes:
+        return Check(
+            "dirs exclusions migrated",
+            True,
+            f"no `!` lines in {DEFAULT_DIRS_FILE} - exclusions live in {fuxignore.IGNORE_FILE}",
+        )
+    return Check(
+        "dirs exclusions migrated",
+        False,
+        f"{len(notes)} `!` line(s) left in {DEFAULT_DIRS_FILE}. " + " ".join(notes),
+        level="warn",
+    )
+
+
+# -- W-163: the setup-drift rows -------------------------------------------
+#
+# 🔴 **One cause, eight rows.** `fux setup` writes once and NEVER rewrites
+# ([SR-DOTFUX](../../records/0102_fux-directory.md) decision 6), so everything
+# that ships in a template **freezes in every repo that ran setup before the
+# template changed**, and nothing tells the repo. Five records each named
+# `fux doctor` as the place that should say so and none was built; three more
+# name checks doctor can run today over declarations it already reads.
+#
+# ⚠ **Report-only, every one of them.** Decision 1 of SR-DOCTOR: doctor names,
+# it never rewrites. A row that grew a `--fix` would be taking decision 6's fork
+# without anybody ruling it.
+#
+# ⚠ **`warn`, every one of them.** None of these stops a verb. A frozen tunable
+# is a repo running an older default, a missing directory is a line somebody
+# has yet to create — these are drift, not breakage, and an error here would
+# make `doctor` red on working repos, which is how people learn to ignore it.
+
+
+#: Skill directories a vendor stopped reading. `(path, why, what to do)`.
+#:
+#: SR-AGENT-POLICY decision 16 (2026-09-12): Codex and Copilot both read
+#: `.agents/skills/`, so the two vendor-specific copies were retired. A repo set
+#: up before that still has them, and **Copilot then sees two copies of every
+#: skill** — the duplicate is the defect, not the folder.
+_RETIRED_AGENT_DIRS = (
+    (".codex/skills", "Codex reads `.agents/skills/` now"),
+    (".github/skills", "Copilot reads `.agents/skills/` now, and sees DUPLICATES while this exists"),
+)
+
+
+def _retired_agent_folders(root: Path) -> Check:
+    """Skill folders a vendor stopped reading, left behind by an older `setup`.
+
+    **The duplicate is the defect.** `.github/skills/` is not merely unread —
+    Copilot reads `.agents/skills/` *and* it, so every skill appears twice, with
+    the older copy free to disagree with the newer one while both look correct.
+
+    **Delete is the whole remedy**, which is why this is a row and not a rewrite:
+    the folder may hold a consumer's own files, and `fux setup` removing a
+    directory it did not write is not a thing it has ever been allowed to do.
+    """
+    present = [(rel, why) for rel, why in _RETIRED_AGENT_DIRS if (root / rel).is_dir()]
+    if not present:
+        return Check("retired agent folders", True, "none - skills live in `.agents/skills/`")
+    return Check(
+        "retired agent folders",
+        False,
+        "; ".join(
+            f"`{rel}` still exists ({why}); delete it - `fux setup` will not, "
+            "because it may hold files fux did not write"
+            for rel, why in present
+        ),
+        level="warn",
+    )
+
+
+def _readme_current(root: Path) -> Check:
+    """`.fux/README.md`'s section set against the template's.
+
+    **Sections, not bytes.** The file is a consumer's to annotate — SR-DOTFUX
+    decision 6 is write-if-missing precisely so their edits survive — so a byte
+    comparison would fire on every repo where someone added a note, which is a
+    row that is wrong more often than it is right. A **missing section** is the
+    thing that means "this predates a change to what `.fux/` holds".
+
+    ⚠ **Extra sections are NOT reported.** A consumer heading fux never wrote is
+    the feature, not drift.
+    """
+    from .store import fuxdir
+
+    path = root / ".fux" / "README.md"
+    if not path.is_file():
+        return Check("README.md current", True, "absent - nothing to be stale")
+    builder = getattr(fuxdir, "_readme", None)
+    if builder is None:  # pragma: no cover - the template is not optional today
+        return Check("README.md current", True, "no template to compare against")
+    try:
+        template = builder()
+    except Exception:  # pragma: no cover - a template that will not build is its own bug
+        return Check("README.md current", True, "the template did not build")
+    missing = sorted(_headings(template) - _headings(path.read_text(encoding="utf-8", errors="replace")))
+    if not missing:
+        return Check("README.md current", True, "every section the template carries is present")
+    return Check(
+        "README.md current",
+        False,
+        f"{len(missing)} section(s) the current template carries are absent: "
+        + ", ".join(f"`{m}`" for m in missing[:4])
+        + (f" and {len(missing) - 4} more" if len(missing) > 4 else "")
+        + ". `fux setup` writes this file once and never rewrites it, so it froze when "
+        "this repo was set up; copy the missing sections in, or delete the file and "
+        "re-run `fux setup` to get the current one",
+        level="warn",
+    )
+
+
+def _headings(text: str) -> set[str]:
+    """Markdown ATX headings, normalised. Shared by the README row and its test."""
+    return {
+        line.lstrip("#").strip()
+        for line in text.splitlines()
+        if line.startswith("#") and line.lstrip("#").strip()
+    }
+
+
+#: sha256 of every refusal starter fux has SHIPPED AND REPLACED.
+#:
+#: 🔴 **Append the outgoing digest here in the same change that edits
+#: `templates/refusals.toml.txt`.** That is the whole mechanism, and without it
+#: this row cannot fire: fux ships exactly one starter, so *"byte-equal to a
+#: PREVIOUS starter"* — the condition SR-REFUSAL names — is unanswerable from
+#: the tree alone. A repo whose file matches the current starter is **new**, not
+#: frozen, and reporting the two alike would make the row wrong on every fresh
+#: `fux setup`.
+#:
+#: ⚠ **Empty today, and that is correct rather than unfinished.** The starter
+#: has not been replaced since it shipped, so there is no superseded digest to
+#: hold. `tests/test_doctor.py::test_the_current_refusal_starter_is_not_listed_as_retired`
+#: fails if the current one is ever added here by mistake, which would report
+#: every repo in the world as frozen.
+RETIRED_REFUSAL_STARTERS: tuple[str, ...] = ()
+
+
+def _starter_refusals_untouched(root: Path) -> Check:
+    """`.fux/refusals.toml` byte-equal to a starter fux has since replaced.
+
+    **Byte equality is the right test here, and the opposite call from the
+    README row above.** These are rules that decide what enters the index,
+    shipped as a starting point for a consumer to adapt to their own sign-in
+    pages. A file identical to a *retired* starter is one nobody ever looked at,
+    still refusing by rules fux itself stopped shipping.
+
+    ⚠ **Matching the CURRENT starter is not a finding.** A repo set up yesterday
+    is supposed to look exactly like that. The row fires only on a digest in
+    `RETIRED_REFUSAL_STARTERS`, which is the only shape that means *frozen* as
+    opposed to *new* — and which is why that tuple has to be appended to by
+    hand when the starter changes.
+    """
+    import hashlib
+
+    path = root / ".fux" / "refusals.toml"
+    if not path.is_file():
+        return Check("refusal rules current", True, "`.fux/refusals.toml` absent")
+    try:
+        digest = hashlib.sha256(path.read_bytes()).hexdigest()
+    except OSError as exc:
+        return Check("refusal rules current", True, f"`.fux/refusals.toml`: {exc}")
+    if digest not in RETIRED_REFUSAL_STARTERS:
+        return Check(
+            "refusal rules current",
+            True,
+            "`.fux/refusals.toml` is not a starter fux has retired",
+        )
+    return Check(
+        "refusal rules current",
+        False,
+        "`.fux/refusals.toml` is byte-identical to a starter fux has since REPLACED - "
+        "it has never been edited, and the rules it carries are ones fux stopped "
+        "shipping. Compare it against `fux setup`'s current starter and take what "
+        "applies to your sign-in pages; `fux setup` will not rewrite it",
+        level="warn",
+    )
+
+
+def _frozen_keys(root: Path) -> list[Check]:
+    """`.fux/tune.toml` and `.fux/output.toml` against the keys the engine now has.
+
+    **A key the engine gained is a key the consumer's file does not mention**,
+    and because both files are write-if-missing it will never gain it. Reading
+    resolves to the engine default, so nothing is broken — what is lost is that
+    the consumer cannot SEE the knob exists, in the one file whose whole purpose
+    is to show them.
+
+    ⚠ **Absent is not frozen.** A repo with no `tune.toml` is running engine
+    defaults deliberately and `_tune_config_health` already says so. This row is
+    about a file that exists and is incomplete.
+    """
+    return [
+        _frozen_one(
+            root,
+            ".fux/tune.toml",
+            "tune.toml current",
+            _tune_expected_keys(),
+            "`fux tune > .fux/tune.toml` rewrites it with every current key "
+            "(NOTE: it rewrites VALUES too - diff before you keep it)",
+        ),
+        _frozen_one(
+            root,
+            ".fux/output.toml",
+            "output.toml current",
+            _output_expected_keys(),
+            "`fux output > .fux/output.toml` rewrites it with every current key "
+            "(NOTE: it rewrites VALUES too - diff before you keep it)",
+            by_name=True,
+        ),
+    ]
+
+
+def _frozen_one(
+    root: Path, rel: str, name: str, expected: set[str], remedy: str, *, by_name: bool = False
+) -> Check:
+    """One file's key set against the engine's. `by_name` compares LEAF NAMES.
+
+    🔴 **`by_name` exists because the path comparison was a false positive on
+    fux's own repository**, caught by W-163's own keep-call before the row
+    shipped. `.fux/output.toml` is deliberately NESTED PER VERB — `explain`
+    lives under `[cli.ask]`, `hops` under `[cli.path]`, `no_refer` and `journal`
+    under `[cli.answer]`, `enabled` under `[cli.json]` — because a rendering
+    default means different things to different verbs (SR-OUTPUT). Expecting
+    `cli.explain` reported six keys missing from a file that carries all of
+    them, in the right places.
+
+    **So the question this row asks is "does the file MENTION this knob", not
+    "at this exact path".** Looser, deliberately: the cost is that a key moved
+    between tables would not be flagged, and the benefit is that the row is not
+    wrong on every correctly-written file.
+
+    `.fux/tune.toml` keeps the path comparison. Its schema *is* `table.key` with
+    no nesting choice to make, so the exact path is answerable there and a
+    tighter check is free.
+    """
+    path = root / rel
+    if not path.is_file():
+        return Check(name, True, f"{rel} absent - engine defaults, nothing to freeze")
+    try:
+        import tomllib
+
+        data = tomllib.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        # Its own row already reports an unparseable file; saying so twice with
+        # two different wordings is how a reader learns to trust neither.
+        return Check(name, True, f"{rel}: not parsed here - see the `loads` row")
+    present = _leaf_keys(data)
+    if by_name:
+        # ⚠ **Every segment, not just the last.** `json` is a knob whose value
+        # lives at `[cli.json] enabled` — the TABLE carries the name and the leaf
+        # is `enabled`. Comparing final segments alone reported `json` missing
+        # from a file that configures it, which is the same false positive as
+        # the path comparison wearing a different hat. Caught by running the row
+        # on this repository, which is what W-163's keep-call is for.
+        present = {segment for path in present for segment in path.split(".")}
+    missing = sorted(expected - present)
+    if not missing:
+        return Check(name, True, f"{rel}: every key the engine now carries is present")
+    return Check(
+        name,
+        False,
+        f"{rel} is missing {len(missing)} key(s) the engine now has: "
+        + ", ".join(f"`{m}`" for m in missing[:5])
+        + (f" and {len(missing) - 5} more" if len(missing) > 5 else "")
+        + f". They resolve to the engine default, so nothing is broken - but this file "
+        f"is where you would change them and it does not mention them. {remedy}",
+        level="warn",
+    )
+
+
+def _leaf_keys(data: dict, prefix: str = "") -> set[str]:
+    """`{"cli": {"top": 5}}` -> `{"cli.top"}`. Tables are paths, leaves are keys."""
+    out: set[str] = set()
+    for key, value in data.items():
+        path = f"{prefix}{key}"
+        if isinstance(value, dict):
+            out |= _leaf_keys(value, f"{path}.")
+        else:
+            out.add(path)
+    return out
+
+
+def _tune_expected_keys() -> set[str]:
+    """Every `table.key` the current tune schema carries — **derived, not listed**.
+
+    A hand-written list here would be a second statement of the schema, free to
+    disagree with it while both look correct. That is the restatement L0 forbids,
+    and the failure mode is silent: the row stops reporting a key nobody added.
+    """
+    from . import tune as tune_mod
+
+    return {
+        f"{table}.{key}"
+        for table, keys in tune_mod._SCHEMA.items()
+        for key in keys
+    }
+
+
+def _output_expected_keys() -> set[str]:
+    """Every knob name the output schema carries — **names, not paths**.
+
+    See `_frozen_one`'s `by_name`: this file nests per verb on purpose, so a
+    path is the wrong unit of comparison and asking for one reported fux's own
+    correctly-written `output.toml` as missing six keys.
+
+    **Derived from `BUILT_IN`, never listed here.** A second copy of the key set
+    is free to disagree with the schema while both look correct, and the failure
+    is silent — the row simply stops reporting a knob nobody remembered to add.
+    """
+    return set(output_config.BUILT_IN) | set(output_config.MCP_KEYS)
+
+
+def _unbound_types(root: Path) -> Check:
+    """A declared type that resolves to no decoder at all.
+
+    ⚠ **Not the same finding as SR-DECODE's `decoder bindings` row**, which
+    fires on a `[decoders]` binding whose extension no indexed document has.
+    This one fires on a **declared include glob** that reaches a format nothing
+    can read: the documents match, get walked, and are skipped or indexed as raw
+    bytes — with the type list saying, in a committed file, that they are
+    documents.
+
+    **Markdown and plain text are exempt and always will be.** They are read by
+    `extract.py`, not by a decoder, so *having no decoder* is their normal state
+    rather than a fault.
+    """
+    from . import decode as decode_mod
+    from .ingest import typesfile
+
+    try:
+        listed = typesfile.read(root, DEFAULT_TYPES_FILE)
+    except (FuxError, OSError):
+        return Check("declared types are readable", True, "types list not parsed here - see its own row")
+    if listed is None or not listed.allow:
+        return Check("declared types are readable", True, "no declared types to check")
+
+    try:
+        known = set(decode_mod.registry(root)) | _PROSE_SUFFIXES
+    except (FuxError, OSError):
+        # A binding naming a module that does not exist, or a consumer decoder
+        # that will not import. **`decoder bindings` is the row for that** — it
+        # names the module and the fix. Reporting it here as well, in different
+        # words, is how a reader learns to trust neither row.
+        return Check(
+            "declared types are readable",
+            True,
+            "the decoder registry did not build - see the `decoder bindings` row",
+        )
+    unbound = sorted(
+        {
+            suffix
+            for glob in listed.include
+            if (suffix := _glob_suffix(glob)) and suffix not in known
+        }
+    )
+    if not unbound:
+        return Check(
+            "declared types are readable",
+            True,
+            f"every declared type resolves to a decoder or is prose ({len(listed.include)} glob(s))",
+        )
+    return Check(
+        "declared types are readable",
+        False,
+        f"{len(unbound)} declared type(s) resolve to no decoder and are not prose: "
+        + ", ".join(f"`{s}`" for s in unbound[:6])
+        + (f" and {len(unbound) - 6} more" if len(unbound) > 6 else "")
+        + ". Matching documents are walked and then indexed as raw bytes or skipped, "
+        "while `.fux/formats.toml` says they are documents. Write a decoder in "
+        "`.fux/decoders/`, or drop the glob",
+        level="warn",
+    )
+
+
+#: Read by `extract.py` rather than by a decoder, so having none is correct.
+_PROSE_SUFFIXES = frozenset({".md", ".markdown", ".txt", ".rst", ".adoc", ".org"})
+
+
+def _glob_suffix(glob: str) -> str:
+    """`*.pdf` -> `.pdf`. `""` for a glob that names no single extension.
+
+    A glob like `docs/**` or `*` claims no extension, so there is nothing to
+    resolve and nothing to report — reporting one would be inventing a claim the
+    consumer did not make.
+    """
+    name = glob.rsplit("/", 1)[-1]
+    if not name.startswith("*.") or "*" in name[2:] or "?" in name or "[" in name:
+        return ""
+    return name[1:].lower()
+
+
+def _listed_dirs_exist(root: Path) -> Check:
+    """A line in `.fux/sources/dirs` naming a path that is not on disk.
+
+    🔴 **This is not cosmetic: `walk_sources` RAISES on it**, so the next
+    `fux ingest` in this repo exits 1 — which is why `fux add` refuses a path
+    that does not exist. A line that got there another way (a hand edit, a
+    branch switch, a directory someone moved) has nothing checking it until the
+    ingest fails.
+
+    **Still a `warn`.** Doctor reports; the ingest is where it stops, and it
+    already says so clearly. Making this an error would mean `doctor` and
+    `ingest` both refuse on a branch where a documented directory is simply not
+    checked out, which is a legitimate state to be in for an afternoon.
+
+    ⚠ **Exclusions are not checked.** A `!` line names a pattern, not a path,
+    and a pattern matching nothing today is exactly what a pattern is for.
+    """
+    from .ingest import sourcelist
+
+    path = root / DEFAULT_DIRS_FILE
+    if not path.is_file():
+        return Check("listed directories exist", True, f"{DEFAULT_DIRS_FILE} absent")
+    try:
+        entries = sourcelist.parse(
+            path.read_text(encoding="utf-8"), sourcelist.DIRS, origin=str(path)
+        )
+    except (FuxError, OSError) as exc:
+        return Check("listed directories exist", False, f"{DEFAULT_DIRS_FILE}: {exc}", level="warn")
+
+    gone = [e.value for e in entries if not e.exclude and not (root / e.value).exists()]
+    if not gone:
+        return Check(
+            "listed directories exist",
+            True,
+            f"every listed path is on disk ({len(entries)} entr(y/ies))",
+        )
+    return Check(
+        "listed directories exist",
+        False,
+        f"{len(gone)} listed path(s) are not on disk: "
+        + ", ".join(f"`{g}`" for g in gone[:5])
+        + (f" and {len(gone) - 5} more" if len(gone) > 5 else "")
+        + f". `fux ingest` RAISES on this, so the next one will exit 1 - "
+        f"`fux remove <path>` drops the line, or restore the directory",
+        level="warn",
+    )
+
+
+#: A `url:` record whose extracted text is below this share of its retained
+#: bytes is *suspiciously thin* — almost certainly a page whose real content
+#: arrived by JavaScript the `http` fetcher does not run.
+#:
+#: ⚠ **Advisory, and a SHARE rather than a byte count.** A genuinely short page
+#: is fine; a 400 KB HTML document that extracted 300 characters is a sign-in
+#: wall or an app shell. The floor is deliberately generous: this row exists to
+#: surface the obvious case, never to adjudicate extraction quality, and a
+#: tighter number would need evidence nobody has gathered.
+THIN_URL_SHARE = 0.01
+#: Below this many characters, the share is meaningless and the absolute number
+#: is the signal.
+THIN_URL_CHARS = 200
+
+
+def _thin_urls(root: Path) -> Check:
+    """`url:` documents that extracted almost nothing from a large fetch.
+
+    **The shape it catches:** the `http` fetcher runs no JavaScript, so a
+    single-page app returns a full-size HTML shell and decodes to a nav bar.
+    The document indexes, the run reports success, and the page is in the corpus
+    answering nothing — [SR-HTTP-FETCHER](../../records/0119_http-fetcher.md)
+    named `doctor` as where that should be visible.
+
+    **Read from the committed index and `.fux/acquired/`**, both already on
+    disk. No fetch, no network, no second opinion about the page.
+
+    ⚠ **Advisory and deliberately loose.** It reports; `cdp.py` is the remedy
+    for a page that needs a browser, and whether a given page needs one is the
+    consumer's call about their own wiki.
+    """
+    from .store import acquired
+
+    try:
+        manifest = acquired.read_manifest(root)
+    except (FuxError, OSError):
+        return Check("url extraction depth", True, "no acquired plane to compare against")
+    if not manifest:
+        return Check("url extraction depth", True, "no retained url bytes to compare against")
+
+    thin: list[str] = []
+    for doc_id, record in _records(root).items():
+        if not doc_id.startswith("url:"):
+            continue
+        blob = manifest.get(record.get("loc", ""))
+        if blob is None:
+            continue
+        raw = getattr(blob, "bytes", None) or getattr(blob, "size", 0)
+        extracted = sum(record.get("flen", ())) if record.get("flen") else 0
+        if not raw or extracted >= THIN_URL_CHARS:
+            continue
+        if extracted / raw < THIN_URL_SHARE:
+            thin.append(record.get("loc", doc_id))
+
+    if not thin:
+        return Check("url extraction depth", True, "no url document extracted suspiciously little")
+    return Check(
+        "url extraction depth",
+        False,
+        f"{len(thin)} url document(s) extracted almost nothing from a full-size fetch: "
+        + ", ".join(sorted(thin)[:3])
+        + (f" and {len(thin) - 3} more" if len(thin) > 3 else "")
+        + ". The `http` fetcher runs no JavaScript, so an app shell decodes to its nav bar. "
+        "`fux add <url> --cdp` fetches through a signed-in Chrome instead",
+        level="warn",
+    )
+
+
+def _confidence_floors(root: Path) -> Check:
+    """A confidence floor tuned to zero — the knob that turns a band OFF silently.
+
+    🔴 **SR-CONFIDENCE decision 13's own words, about itself:** *"A consumer can
+    set `separation_floor = 0.0` and no answer is ever `weak` again. That is
+    tuning away the SIGNAL rather than the ranking, it is silent, and **nothing
+    mechanical catches it.**"* This is the mechanical catch (W-164 gate 4).
+
+    **It reports; it never refuses.** Decision 13 reversed a prohibition on
+    exactly the reasoning that fux states costs rather than clamping knobs, and a
+    row that refused the value would be decision 7 coming back in a new costume.
+    Zero is a legal value; what it is not is a value a reader of the band should
+    have to discover.
+
+    ⚠ **`doc_coverage_floor = 0.0` is the ENGINE DEFAULT and is not reported.**
+    That clause ships off — decision 13's own comment says `0.0 = the clause is
+    OFF` — so firing on it would fire on every repo in the world. Only
+    `separation_floor` has a non-zero default to be tuned away from, and only a
+    `doc_coverage_floor` that was raised and then returned to zero would be
+    interesting, which is not something the file can tell us.
+    """
+    from . import tune as tune_mod
+
+    path = root / tune_mod.TUNE_NAME
+    if not path.is_file():
+        return Check("confidence floors", True, "engine defaults - no floor is tuned off")
+    try:
+        resolved = tune_mod.load(root)
+    except (FuxError, OSError):
+        return Check("confidence floors", True, "tune.toml not parsed here - see its own row")
+    if getattr(resolved, "separation_floor", None) != 0.0:
+        return Check(
+            "confidence floors",
+            True,
+            f"separation_floor = {getattr(resolved, 'separation_floor', '?')} - "
+            "`weak` can still be reached",
+        )
+    return Check("confidence floors", False, FLOOR_OFF_NOTE, level="warn")
+
+
+#: The one sentence both surfaces print. **One string, two callers** — `doctor`'s
+#: row and `ask`'s first-of-process note would otherwise drift into two accounts
+#: of one fact. **ASCII only**: it is printed, and printed text reaches a Windows
+#: console.
+FLOOR_OFF_NOTE = (
+    "`[confidence] separation_floor = 0.0` in .fux/tune.toml: NO answer in this repo "
+    "can ever be `weak` again. That tunes away the SIGNAL, not the ranking - a "
+    "`grounded` here does not mean what a `grounded` elsewhere means. The band "
+    "publishes the floor it was judged under (`--band`, or the `confidence` block in "
+    "`--json`), which is the only way a reader can tell. Raise it, or keep it and "
+    "know what the band is worth"
+)
+
+
 def _url_health(root: Path) -> Check:
     """The `url:` half of the corpus, reported (W-82 §3.1).
 
@@ -1204,7 +2147,7 @@ def _url_health(root: Path) -> Check:
 
     parts = [f"{summary.indexed} url: record(s)"]
     if summary.run_seq == 0:
-        parts.append("no networked run recorded yet - run `fux update`")
+        parts.append("no networked run recorded yet - run `fux ingest`")
     else:
         parts.append(f"{summary.confirmed_last_run} confirmed by the last run")
     if summary.never_confirmed:
@@ -1271,7 +2214,7 @@ def _unfetched_note(root: Path, indexed: list[str]) -> list[str]:
     more = f" (+{len(missing) - 3} more)" if len(missing) > 3 else ""
     return [
         f"{len(missing)} listed URL(s) have never been fetched, so they are not in "
-        f"the index at all: {shown}{more} - run `fux update` (no hook will do it: "
+        f"the index at all: {shown}{more} - run `fux ingest` (no hook will do it: "
         f"SR-MAINTENANCE decision 5a)"
     ]
 
@@ -1279,7 +2222,7 @@ def _unfetched_note(root: Path, indexed: list[str]) -> list[str]:
 def _pinned_note(root: Path) -> list[str]:
     """`update=never` lines, counted — and the lossy pair named (W-113).
 
-    A pinned URL is a URL `fux update` will never go out for again, which is a
+    A pinned URL is a URL `fux ingest` will never go out for again, which is a
     fact somebody looking at a stale corpus needs and could otherwise learn only
     by reading every line of `.fux/sources/urls`.
 
@@ -1325,7 +2268,7 @@ def _pinned_note(root: Path) -> list[str]:
 def _parallel_policy(root: Path) -> str | None:
     """How many URLs a networked verb may open at once — W-83.
 
-    **The number a person needs before running `fux update` over a corporate
+    **The number a person needs before running `fux ingest` over a corporate
     wiki**, said by the one command whose job is to tell them what will happen.
     Without it the only way to learn the concurrency was to read `config.py`.
 
@@ -1335,7 +2278,7 @@ def _parallel_policy(root: Path) -> str | None:
     Python file** — reading it means importing it, which runs whatever is at
     that file's module level. `fux doctor` is the command a person runs when
     something is already wrong; it may not be the command that executes their
-    fetcher. So it names the rule and lets `fux update` apply it.
+    fetcher. So it names the rule and lets `fux ingest` apply it.
     """
     from .config import load
 
@@ -1441,6 +2384,53 @@ def _installed_reader(root: Path) -> "Path | None":
     return None
 
 
+#: Extensions a launcher shim can have, across the platforms fux ships on.
+#:
+#: ⚠ **`.exe` is deliberately absent, and that is a correctness fix, not tidying**
+#: (W-159). The classifier read whatever `shutil.which` returned as text with
+#: `errors="replace"` and asked whether the word `node` appeared in the first
+#: 512 bytes. A Windows console script IS a `.exe` — a small binary launcher —
+#: and three letters occurring by chance in its bytes would have reported a
+#: perfectly ordinary Python `fux` as the Node reader. A compiled binary is not
+#: a shim and is never read.
+_SHIM_SUFFIXES = frozenset({"", ".cmd", ".bat", ".ps1", ".mjs", ".js", ".sh"})
+
+
+def _is_node_shim(path: Path) -> bool:
+    """Does this launcher hand off to node? **Read, never run** (W-159).
+
+    Doctor never executes a binary it found on PATH — that is an arbitrary
+    executable chosen by the environment, and shelling out to ask what it is
+    would be the diagnostic tool doing the unsafe thing it exists to warn about.
+
+    **Two shapes, because npm writes two.** On Unix the bin is a symlink to a
+    `#!/usr/bin/env node` script; on Windows it is a `fux.cmd` whose body names
+    `node` — *there is no shebang there at all*, which is why "look for a
+    shebang" was never the rule, only ever the Unix half of one.
+
+    **Split out of `_fux_on_path` so it can be tested on every platform.** The
+    end-to-end row needs `shutil.which` to resolve a shim, and `which` honours
+    PATHEXT — so an extensionless `fux` is invisible on Windows and a `fux.cmd`
+    is invisible to a Unix lookup of `fux`. Neither shape can be exercised
+    end-to-end on both platforms, and the classification is the part that was
+    actually wrong.
+    """
+    try:
+        target = path.resolve()
+    except OSError:
+        return False
+    suffix = target.suffix.lower()
+    if suffix == ".mjs":
+        return True
+    if suffix not in _SHIM_SUFFIXES:
+        return False  # a compiled launcher; not a shim, and not read as text
+    try:
+        head = target.read_text(encoding="utf-8", errors="replace")[:512]
+    except OSError:
+        return False
+    return "node" in head
+
+
 def _fux_on_path() -> Check:
     """Which `fux` does this shell resolve -- Python's, or the Node reader's?
 
@@ -1465,7 +2455,15 @@ def _fux_on_path() -> Check:
     **No subprocess.** Doctor never runs a binary it found on PATH -- that is
     an arbitrary executable chosen by the environment, and shelling out to it
     to ask what it is would be the diagnostic tool doing the unsafe thing it
-    exists to warn about. The shebang answers the question.
+    exists to warn about. `_is_node_shim` reads the launcher instead.
+
+    ⚠ **Amended 2026-09-14 (W-159): this said "the shebang answers the
+    question", and on Windows there is no shebang.** npm writes a `fux.cmd`
+    whose body names `node`; `shutil.which` finds it, because PATHEXT is exactly
+    what it resolves through. **So the row does fire on Windows for the real npm
+    shape** — what could not be constructed there was the TEST's extensionless
+    shim, and the item that filed this read the skipped test as evidence about
+    the row. One of those was broken and it was the fixture.
     """
     import shutil
 
@@ -1482,16 +2480,7 @@ def _fux_on_path() -> Check:
     except OSError:
         pass
 
-    # Read the shim rather than run it. npm's Unix bin is a symlink to a
-    # `#!/usr/bin/env node` script; its Windows `fux.cmd` names node in the
-    # body. Either way the word appears in the first few hundred bytes.
-    head = ""
-    try:
-        target = Path(found).resolve()
-        head = target.read_text(encoding="utf-8", errors="replace")[:512]
-        node_ish = "node" in head or target.suffix == ".mjs"
-    except OSError:
-        node_ish = False
+    node_ish = _is_node_shim(Path(found))
 
     if not node_ish:
         return Check(
@@ -1562,6 +2551,48 @@ def _is_git_tracked(root: Path, path: Path) -> bool:
     except (OSError, subprocess.SubprocessError):
         return False
     return result.returncode == 0
+
+
+def _index_temp_ignored(root: Path) -> Check:
+    """`.fux/index/<shard>.jsonl.tmp` must be gitignored (W-185, 2026-09-15).
+
+    🔴 **Because this row exists for the repositories the fix cannot reach.**
+    `.fux/.gitignore` is write-if-missing ([SR-DOTFUX](records/0102) decision
+    6a: engine-owned, annotatable), so a repository set up before 2026-09-15 has
+    a `.gitignore` without the line and **will never be given one**. A row is
+    the only thing that reaches it.
+
+    **What goes wrong without it.** `store/writer.py::_atomic_write` writes the
+    temp file beside the shard, inside a committed directory, and `post-commit`
+    defers — so a consumer's next `git add -A` overlaps a live writer, lists the
+    temp file and cannot stat it::
+
+        fatal: unable to stat '.fux/index/ad.jsonl.tmp': No such file or directory
+
+    Measured at **2 335 failures in 3 933 `git add -A` runs** against a writer
+    renaming shards, and **0 in 3 871** with the rule in place.
+
+    ⚠ **`warn`, not `error`.** Nothing is wrong with the index, no answer is
+    affected, and the failure needs a concurrent writer — a repository that
+    never commits twice in a row will never see it. It is still worth a line,
+    because when it does fire the message is about fux's internals and the
+    consumer has no way to connect the two.
+    """
+    name = "index temp files ignored"
+    probe = root / fuxdir.FUX_DIR / "index" / "00.jsonl.tmp"
+    ignored = _is_git_ignored(root, probe)
+    if ignored is None:
+        return Check(name, True, "skipped (not a git checkout)")
+    if ignored:
+        return Check(name, True, "a write in flight cannot break a concurrent `git add`")
+    return Check(
+        name,
+        False,
+        "add `index/*.jsonl.tmp` to .fux/.gitignore - a background re-index "
+        "leaves a temp file in the committed index directory, and a `git add -A` "
+        "running at that moment fails with `unable to stat` (W-185)",
+        level="warn",
+    )
 
 
 def _is_git_ignored(root: Path, path: Path) -> bool | None:

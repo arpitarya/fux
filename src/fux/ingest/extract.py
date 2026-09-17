@@ -9,6 +9,29 @@ bundle, so this module has no dependency outside the analyzer.
 
 from __future__ import annotations
 
+#: **The reuse key's handle on THIS module** (W-166). Ingest reuses a document's
+#: extracted record when its source bytes are unchanged; the rules in this file
+#: are the other input, and they were not in the key. SR-INGEST's Consequences
+#: said so from the start — *"a new extraction rule does not reach an unchanged
+#: document until that document changes or `--full` runs"* — and filed it as the
+#: carry-forward's defining property rather than as a thing to fix.
+#:
+#: **Bump it by hand in the same change as any edit that can change what this
+#: module returns**, and the next `fux ingest` re-extracts every document.
+#: Leaving it alone is the claim that the edit cannot move a byte of output — a
+#: comment, a docstring, a renamed local.
+#:
+#: ⚠ **This one is corpus-wide, unlike the decoder digests**, and that asymmetry
+#: is deliberate rather than an oversight. A decoder is bound to an extension, so
+#: the documents it read are identifiable; these rules run on every document
+#: fux extracts, so there is no smaller set to invalidate. A bump costs one full
+#: re-extraction — which is why it is a constant somebody bumps rather than a
+#: sha of this file, whose every whitespace edit would charge that price.
+#:
+#: `tests/ingest/test_extract_rules_version.py` fails on a working tree that
+#: changed this module and did not bump this constant.
+RULES_VERSION = 1
+
 import re
 from collections import Counter
 from dataclasses import dataclass

@@ -40,6 +40,8 @@ COMMITTED: dict[str, str] = {
     # Windows consoles. An em-dash here fails the write, which is how this was
     # caught rather than shipped.
     "decoders": "consumer-owned code, one module per format. THESE COPIES ARE WHAT RUN, not the ones inside the installed package (SR-DECODE)",
+    # ASCII only, like every value in this table.
+    "observers": "consumer-owned code, one module per subscriber. Called AFTER a verb has fully rendered, with one record of COUNTS -- never the question, a path, or the answer. It cannot change an answer: no return path, and the dispatch runs after every write (SR-OBSERVE)",
     "enrich": "pinned enrichment text, one file per source content sha, plus `queue.tsv` (W-86 P6: what fux could NOT read and a model must). Committed, because a backlog is a team fact",
     # ASCII only, like every other value in these tables.
     "node": "the Node read plane (`fux-engine`) as ONE BUNDLED FILE plus its manifest -- build output, never fux's source (L10). Engine-owned and REWRITTEN on a version change, not write-if-missing, because nobody edits it and a stale copy is a wrong answer. In a monorepo it is a workspace member holding only a manifest (SR-NODE-SEARCH)",
@@ -98,7 +100,8 @@ CACHEDIR_TAG = (
 
 _GITIGNORE = (
     "# Gitignored planes, BY NAME. NEVER add `*` here: `.fux/index/`,\n"
-    "# `.fux/sources/`, `.fux/fetchers/` and `.fux/decoders/` are committed,\n"
+    "# `.fux/sources/`, `.fux/fetchers/`, `.fux/decoders/` and\n"
+    "# `.fux/observers/` are committed,\n"
     "# and a blanket ignore would drop them from git silently. `fux doctor`\n"
     "# checks exactly that.\n"
     "#\n"
@@ -124,6 +127,27 @@ _GITIGNORE = (
     # would also ignore one a consumer keeps elsewhere under `.fux/`, and this
     # file's whole discipline is that nothing is ignored by accident.
     + "node/node_modules/\n"
+    # 🔴 **The transient a WRITE leaves in a COMMITTED directory** (W-185,
+    # 2026-09-15). `store/writer.py::_atomic_write` writes
+    # `index/<shard>.jsonl.tmp` beside the shard and renames it -- the sibling
+    # is required, because `os.replace` is atomic only within one filesystem.
+    # `post-commit` DEFERS (SR-MAINTENANCE decision 1a), so a consumer's next
+    # `git add -A` legitimately overlaps a live writer, lists the temp file, and
+    # then cannot stat it:
+    #
+    #     fatal: unable to stat '.fux/index/ad.jsonl.tmp': No such file or directory
+    #
+    # ⚠ **This line IS the fix, and it was measured rather than argued.** A
+    # controlled probe -- the same rename churn, with and without the rule --
+    # gives **0 failures in 3 871 `git add -A` runs ignored** against **2 335 of
+    # 3 933 unignored**. The earlier reasoning that an ignore rule "cannot close
+    # the window because git stats what it listed" is wrong: an excluded path is
+    # never walked.
+    #
+    # **Scoped to the plane and to the suffix**, never `*.tmp` and never `*`:
+    # this file's whole discipline is that nothing is ignored by accident, and a
+    # bare `*.tmp` would also hide a consumer's own file anywhere under `.fux/`.
+    + "index/*.jsonl.tmp\n"
 )
 
 
@@ -161,7 +185,7 @@ def _readme() -> str:
         "`fetchers/http.py` and `fetchers/cdp.py` are **your** code, committed",
         "to **your** repo. `fux setup` writes them once if they are missing;",
         "`fux ingest` never writes a fetcher at all. Fux loads one by path",
-        "under `fux add <URL>` or `fux update`, and never rewrites it. Change the",
+        "under `fux add <URL>` or `fux ingest`, and never rewrites it. Change the",
         "port, the transport, the extraction, anything.",
         "",
         "One consequence of living in a dotdir: linters that skip hidden",
@@ -207,10 +231,10 @@ def _readme() -> str:
         "",
         "| group | verbs | what the group does |",
         "|---|---|---|",
-        "| lifecycle | `setup` `doctor` | set the repo up, then check it |",
-        "| write | `ingest` `build` | `ingest` writes the committed index; `build` derives the local accelerator from it |",
-        "| sources | `add` `remove` `update` `enrich` | maintain what is indexed. `add`/`remove` write lines; `update` re-fetches and writes none; `enrich` writes no committed byte at all |",
-        "| read | `ask` `find` `answer` | the same question, differing only in how much each commits to |",
+        "| lifecycle | `setup` `doctor` `inspect` | set the repo up, check the environment, then X-ray the index it produced |",
+        "| write | `ingest` `build` | `ingest` writes the committed index - the first time and every time after, for directories and URLs alike, re-fetching the URLs known to be stale; `build` derives the local accelerator from it |",
+        "| sources | `add` `remove` `enrich` `correct` | maintain what is indexed. `add`/`remove` write lines and end in an ingest; `enrich` plans and validates a model's text; `correct` writes one question a PERSON typed onto the document that answers it |",
+        "| read | `ask` `find` `answer` `lexical` | the same question, differing only in how much each commits to. `lexical` is BM25F alone, frozen - the baseline `ask` is measured against |",
         "| graph | `explain` `graph` `path` | answer with relationships the documents stated, never with a ranking |",
         "| serve | `mcp` `daemon` | the only verbs that do not return |",
         "| maintenance | `hooks` `tune` `output` `verify` | wire git to keep the index in step; print or set the tunables; re-run a receipt |",

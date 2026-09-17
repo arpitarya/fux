@@ -2,7 +2,7 @@
 type: Compare Doc
 title: "`fux path --hops` is unbounded — cap the argument, warn, or bound the walk"
 description: "Simple-path enumeration on a documentation graph grows ~11x per hop above 4: measured 0.65s at --hops 2 and 84.6s at --hops 6 on a 738-node, 4 446-edge index. Three ways to bound it, one recommendation, and the property that decides between them — whether a truncated search can still tell the truth."
-status: proposed
+status: decided
 timestamp: 2026-09-12T00:00:00Z
 filed: 2026-09-12
 ---
@@ -12,7 +12,7 @@ filed: 2026-09-12
 **Model: Opus** — it is a fork with no obviously right answer, and the wrong one
 degrades an honest empty result into an ambiguous one.
 
-**Found:** [W-140](../open/W-140-guide-authoring-defects.md) row 12, the third
+**Found:** W-140 (closed 2026-09-15) row 12, the third
 of three halves; the other two were defects and are fixed
 ([SR-GRAPH](../../records/0126_graph.md)). **Owning record:** SR-GRAPH,
 §Consequences, which states the problem and decides nothing.
@@ -90,7 +90,7 @@ it was truncated.
 
 ---
 
-## 3 · Proposed verdict — **(c), with (b)'s message as the truncation notice**
+## 3 · Verdict — **(c), with (b)'s message as the truncation notice** — DECIDED, Arpit 2026-09-14
 
 **Bound the walk's work, and make a truncated search say so in every rendering.**
 
@@ -116,7 +116,11 @@ it is the reason (a) is tempting. It is accepted because **the alternative is a
 verb that can hang**, and a hang is also an incomplete result — one that says
 nothing at all.
 
-🔴 **Not implemented. Arpit rules; this document proposes.**
+✅ **Ruled by Arpit on 2026-09-14: (c) as written above.** Not yet implemented —
+the build is W-140 row 12's last third: `budget` in `routes()`, the
+`(routes, truncated)` return, the three renderings, the `truncated` field in
+`--json` and MCP, SR-GRAPH amended in the same change, and the two-reader
+byte-equality check on the Node twin.
 
 ---
 

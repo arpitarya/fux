@@ -1,0 +1,33 @@
+# Generated into the RUN's evidence, never kept at the harness root:
+# a manifest beside the harness describes whatever the harness is today.
+run = "2026-09-16-node-column"
+
+[[arm]]
+name = "A"
+version = "1.0.0"
+python = "3.11.15"
+install = "pip install fux-engine==1.0.0"
+corpus = "docs-00100"
+corpus_docs = 100
+corpus_sha256 = "670fb9513e8ae4828461a2533b441ed691476c836930902ddce682415ed5a54e"
+queries_sha256 = "544e8f2337a90faea7be809ca4cf26160c32cb5171192d7ed626065cfbe92017"
+index_sha256 = "9b861bb8aa245b80b19901f3c4cf198241f9fc3113fa118eaccb9bbf5abf099f"
+index_bytes = 1407555
+ingest_ms = 3842.4
+build_ms = 143.0
+enrich_present = false
+
+[[arm]]
+name = "B"
+version = "2.0.1"
+python = "3.11.15"
+install = "pip install -e ../fux"
+corpus = "docs-00100"
+corpus_docs = 100
+corpus_sha256 = "670fb9513e8ae4828461a2533b441ed691476c836930902ddce682415ed5a54e"
+queries_sha256 = "544e8f2337a90faea7be809ca4cf26160c32cb5171192d7ed626065cfbe92017"
+index_sha256 = "2dbccd163a74cd4f7cdc0362afb8ac247fe36818e9c1cbdbe227cd327c0d0d99"
+index_bytes = 1335981
+ingest_ms = 1816.8
+build_ms = 190.5
+enrich_present = false

@@ -7,10 +7,10 @@ description: One canonical encoder, sharded doc-major JSONL, write-if-different;
 status: accepted
 date: 2026-08-18
 feature: generation and update of the committed index, and the refusal that keeps its derived accelerator from diverging
-owns: [src/fux/store@b9c242b1cfaf]
+owns: [src/fux/store@bce1c9ab0be2]
 laws: [L1, L2, L3, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: aaf92dfab6ce33394a883c72c5dc968935bad42ebf11a5f1d21f7fd2dab25b3b
+content_sha: 07d33c33383bd144c1ed2193f5f5d96d6ce1a4742afc14d6b0e8f88fe6504ef6
 ---
 
 # SR-INDEX-LIFECYCLE — how the index is generated and updated
@@ -213,7 +213,7 @@ thing in the index that is not a function of a committed file.
   (`store/reader.py::foreign_url_ids`). No `url:` records → the old shards are
   discarded and every document is re-extracted from source, losing nothing a
   re-extraction does not restore. Any `url:` records → **refuse**, name them,
-  and point at `fux update`, which is the only thing that can rebuild them.
+  and point at `fux ingest`, which is the only thing that can rebuild them.
 - **A delta run on a foreign index** still refuses outright. Carry-forward
   genuinely cannot proceed across analyzers.
 - **`read_index` still refuses a foreign shard**, unchanged.
@@ -332,6 +332,42 @@ matching entry in `.fux/runtime/display-cache/` (keyed by `sha`) is refused.
 The cache is gitignored runtime state, same tier as the accelerator, so decision
 5 already covers it. Full rationale on [SR-RECORD](0109_index-record.md).
 
+
+**14. `_format` bumped to `fux.index.v3` on 2026-09-15** (W-168 step 1), and
+decision 9 is what decided it rather than a judgement call. A `ref` edge gained
+`at` and `al`, so **a property appeared** — 9.1's first condition — and the
+reason 9.1 exists is exactly this case: *a reader cannot know what it is
+missing*. A v2 index has no `at` anywhere, and nothing distinguishes *this
+corpus links without words* from *this index predates anchor text*. That is the
+W-48 trap, on the edge.
+
+- **`analyzer` is untouched, by 9.2's own reasoning.** Anchor terms go through
+  the same `query/tokenize.py` every other term does, so no hash changes
+  meaning and no `df` moves.
+- **`tf_fields` is untouched.** Anchor is a **read-time** field with no
+  committed `flen` slot; it is folded from other documents' edges and enters no
+  posting. Adding it to `TF_FIELDS` would claim a sixth committed field that
+  does not exist.
+- **The migration is the one decision 10a already names**: `fux ingest --full`,
+  through the foreign-index seam, which refuses rather than stranding `url:`
+  records. There is no in-place path and none was added.
+- ⚠ **The cost is a whole-corpus diff**, which 9's closing paragraph calls
+  asymmetric and a reason NOT to bump for a display field. It is paid here
+  because the property set moved, which is the case 9.1 carves out.
+
+**14a. The build's stray-hash tripwire admits an edge's anchor terms.**
+`derive/_build.py::_assert_invariants` refused any quoted 16-hex token outside
+`terms`; `at` keys are exactly that, deliberately, because it is what lets the
+scan's prefilter find an anchor source for free. They join the allowed set
+rather than the check being relaxed.
+
+⚠ **The check is no longer the thing its message says, and already was not.**
+`query/scan.py` counts `df` from the **parsed** record's `terms` keys, not from
+the substring match, so a stray hash costs a wasted parse and cannot inflate a
+`df`. It is kept as a tripwire on a record shape nobody meant to write — and it
+is what would catch anchor terms being smuggled into the postings, which is
+option (a) shipped under (c)'s name.
+
 ### What it looks like
 
 Verbatim from
@@ -400,7 +436,7 @@ outside `terms` in record 'url:…/oncall'. `query/scan.py` counts it toward tha
 term's df from the raw bytes, and the accelerator counts from the postings, so
 the two paths would score this corpus differently. Refusing to build a divergent
 accelerator. This record's `title_h` predates the `h:` prefix
-(SR-INDEX-LIFECYCLE): re-run `fux update` to rewrite it.
+(SR-INDEX-LIFECYCLE): re-run `fux ingest` to rewrite it.
 ```
 
 **A corpus written today builds clean**, because the prefix means the scan's

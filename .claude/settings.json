@@ -2,9 +2,30 @@
   "permissions": {
     "deny": [
       "Read(**/golden-answer/**)",
-      "Edit(**/golden-answer/**)",
       "Read(./work/golden/golden-answer/**)",
-      "Edit(./work/golden/golden-answer/**)"
+      "Edit(**/golden-answer/**)",
+      "Edit(./work/golden/golden-answer/**)",
+      "Write(**/golden-answer/**)",
+      "Write(./work/golden/golden-answer/**)",
+      "MultiEdit(**/golden-answer/**)",
+      "MultiEdit(./work/golden/golden-answer/**)",
+      "NotebookEdit(**/golden-answer/**)",
+      "Glob(**/golden-answer/**)",
+      "Grep(**/golden-answer/**)",
+      "Bash(cat:*golden-answer*)",
+      "Bash(ls:*golden-answer*)",
+      "Bash(head:*golden-answer*)",
+      "Bash(tail:*golden-answer*)",
+      "Bash(grep:*golden-answer*)",
+      "Bash(rg:*golden-answer*)",
+      "Bash(find:*golden-answer*)",
+      "Bash(wc:*golden-answer*)",
+      "Bash(shasum:*golden-answer*)",
+      "Bash(md5:*golden-answer*)",
+      "Bash(cp:*golden-answer*)",
+      "Bash(mv:*golden-answer*)",
+      "Bash(rm:*golden-answer*)",
+      "Bash(open:*golden-answer*)"
     ]
   },
   "hooks": {
@@ -52,6 +73,17 @@
           {
             "type": "command",
             "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/session-lock.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/guard-open-work-inbox.sh"
           }
         ]
       }

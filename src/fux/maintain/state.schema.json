@@ -163,7 +163,7 @@
       "were the same bare \"failed\", so a misconfigured repository failed forever",
       "with nothing to go on. And an \"ok\" sweep could skip URLs SILENTLY -- two",
       "of seven did in the 2026-08-27 real-network run, and the only surface that",
-      "said so was a foreground `fux update` nobody runs.",
+      "said so was a foreground `fux ingest` nobody runs.",
       "",
       "`reason` EXPLAINS SOMETHING OR IS ABSENT. It is never an empty string: a",
       "field that is always present and usually empty is one a reader learns to",
@@ -171,7 +171,7 @@
       "",
       "BOUNDED AT 300 CHARACTERS. This file is rewritten every sweep, and an",
       "unbounded field on it is how a runtime file grows without anyone deciding",
-      "it should. The count says how many were skipped; `fux update` and the",
+      "it should. The count says how many were skipped; `fux ingest` and the",
       "enrich queue carry the detail."
     ],
     "fields": {

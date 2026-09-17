@@ -7,11 +7,11 @@ description: "The live queue's discipline has one home, and this is it. Fifty-ei
 status: accepted
 date: 2026-09-13
 feature: the discipline of the single live work queue — its rules, its markers, and the three tests that enforce them
-owns: [tests/test_open_work_rows_are_short.py@d590c19ef8ed, tests/test_open_work_is_not_stale.py@c41cd5e600be, tests/test_no_work_item_is_lost.py@26c600758acf]
+owns: [tests/test_open_work_rows_are_short.py@01fe412431ad, tests/test_open_work_is_not_stale.py@453a93cbbbaa, tests/test_no_work_item_is_lost.py@3c6a033612b2]
 laws: [L0]
 ratifies: W-146 ruling 1 · Arpit 2026-09-13 (archive, never delete)
 timestamp: 2026-09-13T00:00:00Z
-content_sha: 0d53c017e0859fa2c833a3a595d9f7de0f0556152b9c8708d374cba81e6aa236
+content_sha: bfe398da0bc69a0c8554f6c6900c47bab601870cf5efbdcfb22535d189b201d0
 ---
 
 # SR-WORK-OPEN-QUEUE — how OPEN-WORK works
@@ -131,6 +131,33 @@ that is the only thing the file says.
     behind it names the item it waits on.
 23. 🟡 **waiting on another item, or on Codex, whose chain ends at neither Arpit
     nor a date** — the row names what.
+23a. **A 🟡 row names its blocker as a queue item, and if none exists the row's
+    own edit creates one** (Arpit, 2026-09-15). The row says
+    `waiting on W-nn` — **the bare id, right after the verb** — so rule 27's verb
+    list, rule 42's `↳ blocks:` sub-row and the ball checks all read the same
+    edge.
+    ⚠ **There is no second form.** *"Waiting on a subscriber"*, *"waiting on a
+    run"*, *"waiting on an endpoint that does not exist"* — each of these is
+    **an unfiled work item wearing a blocker's clothes**. It reads as blocked,
+    nothing in the queue can clear it, and no session can tell whether it is
+    still true. **File the item, in the same edit, and point the row at it.**
+23b. **What the filed item contains** (Arpit, 2026-09-15): *"at least we know
+    what to do"* is the bar. The new item states **what the missing thing is,
+    what producing it takes, and who or what can produce it** — a run on a named
+    environment, a design with a named output, a harness that makes a
+    non-deterministic failure reproducible. It is a real item with a real
+    definition of done, not a placeholder that renames the wait.
+    ⚠ **A blocker that cannot be turned into an item is not a blocker — it is a
+    reason to close.** If nobody can say what would produce the missing thing,
+    the waiting row's honest outcomes are *close it and record why the question
+    is unanswerable*, or *put the fork to Arpit*. **Neither is staying 🟡.**
+23c. ⚠ **This supersedes the `— not a queue item` form**, added earlier the same
+    day and used on five rows before it was overruled. It was written as an
+    honesty mechanism — name the absence so a stuck row is visible as one — and
+    the naming was right. **What it got wrong is stopping there**: a row that
+    admits nothing can clear it has already done the analysis that produces the
+    item, and leaving it unfiled spends that analysis every time a session
+    re-reads the row.
 24. 🟢 **no blockers, good to go.**
 25. **Red wins, then purple.** An item waiting on several things is 🔴 if any
     chain ends at Arpit, else 🟣 if any chain ends at a date.
@@ -176,6 +203,22 @@ that is the only thing the file says.
 43. **An item waiting on a decision joins that sub-row in the same edit.**
 44. **An inbox row is always 🔴.** A date gate is not a decision owed.
 45. **A row points only at things that exist.**
+45a. **An empty inbox is declared, never inferred.** When no ruling is owed, the
+    table stays (header only) and the line directly beneath it begins
+    `*Empty since YYYY-MM-DD` and names the next gate. The parser guards in
+    `tests/test_open_work_is_not_stale.py` and `tests/test_open_work_rows_are_short.py`
+    accept an empty table only on that declaration — a table that is merely
+    empty is a moved heading until proven otherwise. (First emptied 2026-09-14.)
+    ⚠ **A Cowork session violated this on 2026-09-15** — emptied the table
+    correctly but closed it with a multi-paragraph recap instead of the one
+    declaration line ([`work/LESSONS.md`](../work/LESSONS.md)). Two PostToolUse
+    guards now surface the same check inside the session rather than only at
+    the next test run — `scripts/check-open-work-inbox.py`, run from
+    [`.claude/hooks/guard-open-work-inbox.sh`](../.claude/hooks/guard-open-work-inbox.sh)
+    (blocks) and
+    [`.codex/hooks/guard-open-work-inbox.sh`](../.codex/hooks/guard-open-work-inbox.sh)
+    (advisory — Codex's PostToolUse deny contract is unconfirmed here). **Neither
+    is the rule; the two tests above are, and stay maintained.**
 
 **G · Standing, and forbidden**
 
@@ -233,8 +276,9 @@ artifact and the record disagree while both still look correct?*
 **The exposure was not hypothetical and it fired twice.**
 [W-122](../work/IMPLEMENTATION.md)'s inventory named the gap on 2026-09-12. On
 2026-09-13 a session added a fourth ball and had to hand-edit both copies to
-keep them equal, with nothing checking the two. `CLAUDE.md`'s two-strikes rule
-makes the second occurrence the trigger for a gate.
+keep them equal, with nothing checking the two. The two-strikes rule
+([SR-WORK-SESSION](0060_WORK-session.md) decision 13) makes the second
+occurrence the trigger for a gate.
 
 **And the enforcement had no owner.** The two tests that enforce most of these
 rules could name no owning record, so the freshness gate could never demand
@@ -333,6 +377,16 @@ both `↳ blocks:` checks validating a single row for two days, green throughout
    [`archive/README.md`](../archive/README.md) §*Recovered 2026-09-13*, and the
    outcome is [`work/IMPLEMENTATION.md`](../work/IMPLEMENTATION.md).
 
+8. **A 🟡 row names the item it waits on, or says there is none** (Arpit,
+   2026-09-15) — rule 23a. The queue already required a 🟡 row to say *what* it
+   waits on, and every one of the five live 🟡 rows satisfied that with a noun:
+   *a subscriber*, *a `fux-lab` run*, *one captured failure*. **None of them
+   named an id, and none of them could** — which the rule made invisible rather
+   than legible. A reader could not tell a row waiting on tracked work from a
+   row waiting on something nobody had filed, and those are opposite states:
+   the first clears itself when its blocker lands, the second never clears.
+   `tests/test_open_work_rows_are_short.py` enforces the two forms.
+
 ### Consequences
 
 - **A rule changes in exactly one place and appears in exactly one place.**
@@ -342,6 +396,26 @@ both `↳ blocks:` checks validating a single row for two days, green throughout
   record fails the freshness gate. That is the hole the register named for
   itself in [SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7, closed here for this
   subject.
+- **Rule 55's *renumbered* clause has a third shape, and the gate now names
+  it** (2026-09-14). A renumber is a closure and archives — but only if the file
+  was ever staged. On 2026-09-14 two sessions filed minutes apart: one filed
+  `W-167`, renumbered its own item to `W-173`, and neither draft was ever
+  staged; the other had already renumbered its three items to W-168/169/170,
+  leaving **171 and 172 allocated to nobody**. All three ids resolve to no file
+  and none of them can, so `test_no_work_item_is_lost.py` carries them as
+  `RENUMBER_WAKE_2026_09_14` and
+  [`archive/README.md`](../archive/README.md) §*The 2026-09-14 id collision*
+  names each with its successor or with the fact that it has none.
+
+  ⚠ **This is a fourth exemption category, not a stretch of an existing one.**
+  `UNRECOVERABLE` means *real, closed, and its bytes are gone* — W-167 was
+  never closed, it was **renamed while live**, and `NEVER_ALLOCATED` means
+  *named nowhere*, which 171 and 172 are not: `WORKLOG.md` names them, as
+  holes. Collapsing them into either set would have made both sets lie, and the
+  sets are the only durable statement of what the recovery could and could not
+  reach. **The lesson rule 55 did not have: contiguity is not worth a renumber
+  when another session is filing** — the holes cost more than the gap in the
+  numbering would have.
 - ⚠ **Roughly twenty of the fifty-three rules are enforced by nothing** — 1, 2,
   5, 7, 11, 12, 29, 30, 32, 33, 35, 36, 37, 38, 47, 48, 50, 51 and 53. Writing
   them down does not gate them, and this record does not claim it does. What

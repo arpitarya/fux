@@ -7,10 +7,10 @@ description: BM25F over five fields, weight-then-saturate once, with one scorer 
 status: accepted
 date: 2026-08-18
 feature: scoring, ordering, and the analyzer they share with ingest
-owns: [src/fux/query/rank.py@49b799e3a709, src/fux/query/bm25f.py@60ec353f1d84, src/fux/query/tokenize.py@1d8ff4a42048, src/fux/query/analyzer.py@4a6a03793628, src/fux/query/stem.py@728155482c94]
+owns: [src/fux/query/rank.py@aeee6408bcf8, src/fux/query/bm25f.py@f325494f6ba8, src/fux/query/tokenize.py@1d8ff4a42048, src/fux/query/analyzer.py@4a6a03793628, src/fux/query/stem.py@728155482c94]
 laws: [L1, L3]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: a985410ab7b20e179b52e24843bc3af435e0fac4486efb3c0c80838a6a708789
+content_sha: a26b5cea3887dcb5bbc5573c93ebf11a94da91c82c7bd1f124d13c50ac5e8c2e
 ---
 
 # SR-RANKING — how documents are scored and ordered
@@ -138,7 +138,7 @@ xychart-beta
   tf 1 -> 2 buys +0.375.   tf 12 -> 50 buys +0.148.
   The curve can never reach 2.2, however often a word appears.
 
-  source: computed from src/fux/query/bm25f.py (K1=1.2, B=0.75)
+  source: computed from src/fux/query/bm25f.py (K1=1.2, B=0.75 — the default at the time of this capture; it is 0.15 from 2026-09-16, decision 3)
 ```
 
 </details>
@@ -158,7 +158,7 @@ at 3.0, `idf` at 1.0:
      400                0.9565
 
   Four times the length costs roughly half the contribution.
-  source: computed from src/fux/query/bm25f.py (K1=1.2, B=0.75)
+  source: computed from src/fux/query/bm25f.py (K1=1.2, B=0.75 — the default at the time of this capture; it is 0.15 from 2026-09-16, decision 3)
 ```
 
 </details>
@@ -206,17 +206,40 @@ present thinly in all five would then beat a term that genuinely dominates one.
 iterates over the *posting* rather than over the weights, so a body-only tf of
 `[1]` costs nothing for the four fields it does not carry.
 
-**3. The defaults are `K1 = 1.2`, `B = 0.75`, and `FIELD_WEIGHTS = (1.0, 3.0,
+**3. The defaults are `K1 = 1.2`, `B = 0.15`, and `FIELD_WEIGHTS = (1.0, 3.0,
 2.0, 1.5, 1.0)`** — body 1.0, heading 3.0, title 2.0, path 1.5, `ctx` 1.0,
 aligned index-for-index with `TF_FIELDS`, and `bm25f.py` asserts the two are the
 same length. A silent misalignment would weight `title` as `path` and produce a
 ranking that is plausible and wrong, which is the failure mode with no symptom.
 
-⚠ **`K1`, `B`, heading and body are carried forward from the archived engine, so
-its recorded numbers remain a free correctness check. `title`, `path` and `ctx`
-are carried forward from nothing** — they are defensible starting points, not
-measured optima. Listing five numbers in one breath would dress three guesses as
-calibration.
+🔴 **`B` was `0.75` — the literature's value — until 2026-09-16, and `0.15` is
+the first default here that is MEASURED rather than inherited**
+([W-144](../work/regression/2026-09-16-b-sweep-2/VERDICT.md)).
+
+`b` is the strength of length normalisation, and **a table inflates a document's
+length with tokens that say nothing about the query** — so at `0.75` a document
+is punished for an appendix it did not ask to be measured on. Under a rule frozen
+before the sweep — *the first value, descending `0.4 → 0.3 → 0.2 → 0.15`, that
+nets positive on both benefit families with every control holding* — `0.4` moves
+neither family, `0.3` and `0.2` fix the rate-card case and leave the
+prose-with-appendix case exactly where `0.75` does, and **`0.15` moves both**:
+`+30` each, `p = 0.0000` on 30 discordant pairs against a required net of 12,
+with `inverse`, `placebo`, `dump` and `verbose` all holding.
+
+⚠ **Descending order is what makes it `0.15` and not something lower.** The rule
+reports the smallest departure from `0.75` that works, never the best value.
+
+⚠ **One synthetic corpus, and the run is `informed`.** 510 generated documents
+built so the mechanism *can* move. It says a lower `b` ranks better **on
+documents shaped like these**; real-corpus evidence is W-144's reopen trigger.
+**A default shipped on one synthetic corpus is why this paragraph exists rather
+than a silent value change.**
+
+⚠ **`K1`, heading and body are still carried forward from the archived engine, so
+its recorded numbers remain a free correctness check — but `B` is no longer one
+of them.** `title`, `path` and `ctx` are carried forward from nothing: defensible
+starting points, not measured optima. Listing them in one breath would dress
+guesses as calibration.
 
 ⚠ **None of the seven is a constant.** They are the module-level defaults, and
 `[bm25f]` in `.fux/tune.toml` can replace any of them per query
@@ -406,6 +429,90 @@ un-mark it. `false` is a claim, not an absence.
 dicts, and the key reads only fields both generators already carry
 (`superseded`, `mtime`, `loc`).
 
+**A hit carries `boosted` and `route`, and neither is in the sort key**
+(W-161).
+
+`rank()` sets neither: the graph tier is composed by `run_query` after the
+lexical core is complete, exactly as `pinned` is. What they explain is the one
+list fux prints that **may not be monotone in `score`** — under the boosted
+tier a row can outrank a higher-scoring one, because the order is
+`RRF(lexical rank, PPR rank)` while the number printed is still BM25F.
+
+🔴 **A caller that re-sorts `results` by `score` is discarding the graph's
+contribution and re-deriving the lexical order.** That is a legitimate thing to
+want — it is what `fux lexical` returns — but it should be asked for by name
+rather than arrived at by sorting. `route` names exactly the rows such a sort
+would move.
+
+`boosted` marks a row the walk **reached**, not one that moved: a walked
+document already at #1 is still the reason #1 is #1, and marking only movers
+would hide the tier's effect exactly where it agreed with the words — the case
+a reader most needs to see, because it is the one that looks like nothing
+happened. [SR-ASK](0103_ask.md) decision 13 carries the composition.
+
+
+
+**12. `anchor` is the sixth BM25F field, folded at READ time, and it is not in
+`TF_FIELDS`** (W-168 step 1, 2026-09-15). A document's anchor terms are the
+words **other documents use when they link to it** — every other field is
+something the document says about itself.
+
+- **Weighted into `wtf`, never scored as a second BM25.** BM25F is
+  weight-then-saturate **once**; summing a separate per-field BM25 is what this
+  record's own law forbids, and it is what would let an anchor match on a short
+  document outrank a full body match. One `wtf`, one saturation.
+- **`alen` joins `wlen`.** A heavily linked-to document is a **longer**
+  document. Leaving anchor out of the normaliser is what would let a link farm
+  max out a term with no length price, so it is in, at the weight the numerator
+  uses — and it is the only guard in the engine against the failure direction
+  the [pre-registration](../work/regression/2026-09-15-anchor-text/PRE-REGISTRATION.md)
+  names, because **anchor tf is unbounded in the number of linkers** where body
+  tf is bounded by one document's length.
+- 🔴 **Anchor terms are in no committed posting, so they are in no `df`.**
+  Switching the field on cannot move `idf` for anything. That is also forced:
+  `derive/accel.py` counts `df` from the postings alone, so counting them on the
+  scan side would be an immediate differential-law break.
+- **Outside the `weights` tuple, deliberately.** That tuple is aligned
+  index-for-index with `TF_FIELDS` — the five fields a record commits an `flen`
+  for — and the alignment is asserted at import because a misalignment would
+  weight `title` as `path`. Anchor has no committed slot.
+
+**12a. `tf is None` stopped being a reason to skip a term.** `score_record`
+returned early for a document whose own `terms` lack the hash. **That early
+return was the second place the retrieval change would have died silently** —
+the first being candidate generation — and both had to move or the fold would
+have been dead code for exactly the documents it exists for.
+
+**12b. The fold lands in `rank()`, once, for both candidate paths.** Each
+generator attaches `atf` and `alen` to the record dicts it hands over, and
+`rank()` reads them the way it reads `flen`. The differential law then stays
+what this record and `derive/accel.py` already make it — **a property of the
+candidate set** — rather than a hope about two copies of an arithmetic.
+
+⚠ **Both keys go on EVERY candidate when the field is on, `atf` empty or not.**
+A document that is linked-to is a longer document whether or not the query's
+words are what its linkers used; attaching them only where `atf` is non-empty
+would drop that length out of `wlen` on one path and not the other, silently
+and only on linked documents.
+
+**12c. `0.0` is OFF, not "weight zero".** Every anchor branch in the engine
+tests it and is skipped entirely, so an unconfigured corpus does the float
+arithmetic it did before the field existed. Same rule, and the same reason, as
+`--expand`'s `term_weights`: the differential law must not pick up a last-bit
+difference from a feature merely being present, and the evidence gathered at
+the default stands unmodified. **Measured 2026-09-15**: 692 queries × 4 `top`
+values × 2 skipping modes over this repository's 1 237 documents — **5 536
+byte-identical comparisons at the default and 5 536 at `anchor = 2.0`, zero
+mismatches.**
+
+**12d. It ships off and is UNMEASURED.** [SR-RS](0133_predictions.md) decision
+19: a ranking change ships behind a tunable at zero and is defaulted on only by
+a PASS on a frozen pre-registration. That pre-registration is
+[`2026-09-15-anchor-text`](../work/regression/2026-09-15-anchor-text/PRE-REGISTRATION.md),
+and the data it needs — documents findable only through a linker's wording —
+does not exist yet. **No claim about ranking quality is made or may be made
+until it has a `VERDICT.md`.**
+
 ### Consequences
 
 - **The differential law is achievable at all.** One scorer in one order is what
@@ -533,7 +640,7 @@ grep -rn 'from .tokenize import\|from ..query.tokenize import' src/fux/
 
 # 4. the defaults still match the archived baseline the checks rest on
 grep -nE 'FIELD_WEIGHTS: |^K1|^B ' src/fux/query/bm25f.py
-# expect: (1.0, 3.0, 2.0, 1.5, 1.0), 1.2, 0.75 — body and heading unmoved.
+# expect: (1.0, 3.0, 2.0, 1.5, 1.0), 1.2, 0.15 — body and heading unmoved.
 # These are DEFAULTS; `.fux/tune.toml` replaces any of them per query, so the
 # archived-baseline claim holds for `ask --no-tune` and for an unconfigured repo.
 
