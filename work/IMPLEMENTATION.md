@@ -28,6 +28,65 @@ Rules:
 
 
 
+
+## 2026-09-17 — **3.0.0-alpha.0 released**: the first major, live on both registries on the new direct-publish path
+
+**Shipped** (`3.0.0-alpha.0`, PyPI + npm). No records changed — the release
+carries what `release/3.0.0-alpha.0` had already landed, merged whole.
+
+**Released 2026-09-17 (UTC).** Tag `v3.0.0-alpha.0` · merge commit `92922855`
+· PR [#48](https://github.com/arpitarya/fux/pull/48) (81 commits, 1 007 files)
+· [publish run 35191354119](https://github.com/arpitarya/fux/actions/runs/35191354119)
+— all three jobs green.
+
+🔴 **The merge commit's tree is byte-identical to the tested branch tip**
+(`a53792b7` for both `92922855^{tree}` and `5bbcb597^{tree}`), and `main` had
+**0 commits** the branch did not carry. So the pre-merge green — CI runs
+[35125515537](https://github.com/arpitarya/fux/actions/runs/35125515537) and
+[35125509911](https://github.com/arpitarya/fux/actions/runs/35125509911), both
+on `5bbcb597` — is evidence about the released tree and not merely about its
+ancestor. That equality is the check, not the assumption.
+
+| registry | state |
+|---|---|
+| **PyPI** | **`fux-engine` 3.0.0a0 is live** — `fux_engine-3.0.0a0-py3-none-any.whl` (954.2 KB) + `.tar.gz` (17.1 MB), OIDC, both with publish attestations. ⚠ **`info.version` still reads `2.0.1`** and that is correct: a pre-release never becomes PyPI's stable pointer, so the JSON API is the wrong place to confirm one — `/simple/` and the per-version endpoint are the right ones |
+| **npm** | **`fux-engine@3.0.0-alpha.0` is live under tag `alpha`**; `latest` still points at `2.0.1`, which is the intent. 4 files, 101.2 kB packed / 320.3 kB unpacked, provenance signed to [transparency log 2874676898](https://search.sigstore.dev/?logIndex=2874676898) |
+
+✅ **The first release on the direct-publish path, and it worked.**
+[SR-WORK-RELEASE](../records/0063_WORK-release.md) decision 8 replaced the
+staged npm approval on 2026-09-14 and decision 8a said the switch reaches *the
+next release* — this is that release. **npm published without a human, in 19
+seconds**, and the `Allow npm publish` precondition that lives outside this
+repository held. Decision 8a's other clause also resolved itself: `2.0.0` and
+`2.0.1` are no longer staged, and npm `latest` is `2.0.1` rather than the
+`2.0.0-alpha.7` that paragraph warned about.
+
+**Verified against the published artefacts, not against CI.**
+
+| check | result |
+|---|---|
+| install from PyPI and run | `fux 3.0.0-alpha.0` |
+| the headline breaking change, black-box | `fux update` → `invalid choice: 'update'`, and the message lists all 22 surviving verbs |
+| the npm tarball's contents | exactly `fux.mjs`, `package.json`, `mcp-tools.json`, `README.md` — **no `src/`**, which is [L10](../records/0011_LAW-10-bundled-output.md) holding at the registry rather than in the workflow that asserts it |
+| the npm `bin` end to end | `npm install fux-engine@3.0.0-alpha.0` links `fux → ../fux-engine/fux.mjs` and it runs: `fux 3.0.0-alpha.0 (node 24.13.0)` |
+
+🔴 **A standing claim in this file is WRONG, and the correction is the finding.**
+The 2026-09-14 entry calls npm's `"bin[fux]" script name fux.mjs was invalid and
+removed` warning *"a defect with two occurrences"*. It fired a **third** time
+here — and the published metadata carries `{"fux": "fux.mjs"}` on `2.0.1` and on
+`3.0.0-alpha.0` alike. **npm normalised `./fux.mjs` to `fux.mjs`; it did not
+remove the entry**, and the installed binary runs. The warning's wording is what
+was believed, never the registry state. **So no gate is owed** — what was owed
+was grounding a claim in the artefact instead of in a log line, and two prior
+sessions read the warning without doing it. ⚠ **Dropping the `./` in
+[`node/package.json`](../node/package.json) would silence it**; not done here,
+because changing the published package's shape is not part of releasing it.
+
+**Both suites green, whole, before the merge** — 4 893 unit (2 skipped), 145
+e2e, 36 Node; version parity across all 4 sites and the built bundle.
+
+---
+
 ## 2026-09-16 — **the queue empties of agent work: W-188, W-193, W-144 close; phase 5 runs**
 
 | item | what landed | evidence |

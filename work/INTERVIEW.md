@@ -32,8 +32,41 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-09-16** (Cowork, inbox rulings).* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-09-17** (Claude Code, 3.0.0-alpha.0 released).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
+
+### 3.0.0-alpha.0 is MERGED and RELEASED — the branch is gone (2026-09-17, Claude Code)
+
+- **`release/3.0.0-alpha.0` is merged into `main`** as `92922855`
+  (PR [#48](https://github.com/arpitarya/fux/pull/48), 81 commits, 1 007 files)
+  and **published**: tag `v3.0.0-alpha.0`, PyPI `3.0.0a0`, npm
+  `3.0.0-alpha.0` under tag **`alpha`**. `latest` stays at `2.0.1` on both
+  registries, which is what a pre-release is for. **Two sections below are
+  overtaken by this** and say so.
+- 🔴 **The merge was grounded on tree equality, and a successor should copy
+  the check.** `main` carried **0** commits the branch did not, and
+  `92922855^{tree}` == `5bbcb597^{tree}`. That is what makes the pre-merge
+  green — 4 893 unit, 145 e2e, 36 Node, version parity across four sites and
+  the built bundle, CI green on that exact sha — evidence about the **released**
+  tree rather than about its ancestor. Merge first and the same green proves
+  nothing about what shipped.
+- ✅ **[SR-WORK-RELEASE](../records/0063_WORK-release.md) decision 8a is spent.**
+  Its *"the switch reaches the NEXT release"* was this one: npm published
+  directly, **no human, 19 seconds**, and the `Allow npm publish` precondition
+  that lives at npmjs.com rather than in this tree held. The `2.0.0` and
+  `2.0.1` staging backlog it warned about is also gone.
+- 🔴 **A two-strikes candidate turned out not to be a defect at all.** npm's
+  `"bin[fux]" script name fux.mjs was invalid and removed` warning has now
+  fired on three releases — but the registry carries `{"fux": "fux.mjs"}` on
+  `2.0.1` and `3.0.0-alpha.0` alike, and `npm install` links a `fux` binary
+  that runs. **npm normalised `./fux.mjs`; it never removed the entry.** Two
+  sessions had recorded it as a defect from the log line alone. **Check the
+  artefact, not the warning** — and dropping the `./` in `node/package.json`
+  would silence it, which this session deliberately did not do mid-release.
+- **Verified black-box, not from CI:** `fux --version` → `fux 3.0.0-alpha.0`;
+  `fux update` → `invalid choice: 'update'` (the headline break); the npm
+  tarball is the four-file bundle with **no `src/`**, which is
+  [L10](../records/0011_LAW-10-bundled-output.md) holding at the registry.
 
 ### The Blocked-on-Arpit inbox is EMPTY (2026-09-16, Cowork)
 
@@ -149,6 +182,10 @@ valuable judgement, but not the state of play.
   `unmeasured` waits on golden, `cost` never graduates.
 
 ### 3.0.0-alpha.0 has a branch and five work documents — nothing built (2026-09-13, Cowork)
+
+⚠ **Overtaken 2026-09-17: the branch is merged and `3.0.0-alpha.0` is
+released.** Kept as the plan it was — what it says about *what was intended*
+is still true; what it says about the live state is not.
 
 - **Branch `release/3.0.0-alpha.0`** off `main`. **The version is NOT bumped** —
   `src/fux/__init__.py` and the three Node sites move together under
@@ -2456,6 +2493,9 @@ session would remember is gone:
   that has never read `questions/`** — [W-136](open/W-136-golden-benchmark.md).
 
 ### In flight: the 3.0.0-alpha.0 branch is open and empty of code (2026-09-13, Cowork)
+
+⚠ **Overtaken 2026-09-17: nothing here is in flight.** The branch is merged,
+W-160 and W-162 shipped, and the release is on both registries.
 
 - **W-160** is the first build item on `release/3.0.0-alpha.0` — the two atoms
   and the Node graph plane; **not a ranking change**, so nothing gates it.

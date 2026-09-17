@@ -23,11 +23,11 @@ here. Read that record before changing anything below it.
 
 | what he decides | filed | age |
 |---|---|---|
-| 🔴 **W-136** — phase 5 ran and both hand-offs are written. **Whether to release a key for scoring, and when**, is his by [L11](../records/0012_LAW-11-sealed-answer-key.md): the one route an answer travels is a paste, at his choice. [detail](open/W-136-golden-benchmark.md) | 2026-09-16 | 0d |
+| 🔴 **W-136** — phase 5 ran and both hand-offs are written. **Whether to release a key for scoring, and when**, is his by [L11](../records/0012_LAW-11-sealed-answer-key.md): the one route an answer travels is a paste, at his choice. [detail](open/W-136-golden-benchmark.md) | 2026-09-16 | 1d |
 | ↳ **blocks:** W-87, W-176, W-190, W-191, and through W-191 also W-161 | | |
-| 🔴 **W-175** — the blind paraphrases exist only if he runs the Codex prompt. The harness is built and refuses to run without them; no agent may author one. [detail](open/W-175-correction-generalisation.md) | 2026-09-16 | 0d |
+| 🔴 **W-175** — the blind paraphrases exist only if he runs the Codex prompt. The harness is built and refuses to run without them; no agent may author one. [detail](open/W-175-correction-generalisation.md) | 2026-09-16 | 1d |
 | ↳ **blocks:** W-175, and nothing else in the queue | | |
-| 🔴 **W-168** — step 2 needs id-queries: 0 of 33 identifiers survive the analyzer, but only 4 of 249 questions ask by one. [prompt 8](golden/prompts/8-codex-identifier-questions.md) is written and is Codex's. [detail](open/W-168-search-improvements.md) | 2026-09-16 | 0d |
+| 🔴 **W-168** — step 2 needs id-queries: 0 of 33 identifiers survive the analyzer, but only 4 of 249 questions ask by one. [prompt 8](golden/prompts/8-codex-identifier-questions.md) is written and is Codex's. [detail](open/W-168-search-improvements.md) | 2026-09-16 | 1d |
 | ↳ **blocks:** W-168, and nothing else in the queue | | |
 
 ⚠ **All three are a HAND, not a decision** — running a prompt, pasting a key.

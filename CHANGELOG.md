@@ -8,7 +8,7 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
-## [3.0.0-alpha.0] - 2026-09-16
+## [3.0.0-alpha.0] - 2026-09-17
 
 **A major, and the two breaking changes are the reason.** `fux update` is gone —
 `fux ingest` is the one verb over the corpus — and the committed index format is
