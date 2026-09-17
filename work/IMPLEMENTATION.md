@@ -29,6 +29,55 @@ Rules:
 
 
 
+
+## 2026-09-17 — **3.0.0-alpha.1 released**: a version bump carrying nothing, cut on instruction
+
+**Shipped** (`3.0.0-alpha.1`, PyPI + npm). Records touched: **SR-LAWS** and
+**SR-NODE-SEARCH**, re-stamped only — no decision changed.
+
+**Released 2026-09-17 (UTC).** Tag `v3.0.0-alpha.1` · commit `e25338a5` ·
+[publish run 35254145949](https://github.com/arpitarya/fux/actions/runs/35254145949)
+— all three jobs green. CI and node-arm green on `e25338a5` before the tag was cut.
+
+⚠ **This release carries no engine change, and the row exists to say so.**
+`git diff v3.0.0-alpha.0..v3.0.0-alpha.1 -- src/ node/ pyproject.toml
+hatch_build.py` is **empty**: only the four version sites and `CHANGELOG.md`
+move. **A consumer on `3.0.0-alpha.0` has no reason to upgrade**, and the
+changelog section and the GitHub release notes both lead with that.
+
+**Cut on Arpit's instruction, with the emptiness stated to him first and
+reaffirmed.** Two alternatives were offered and declined: wait and let the next
+alpha carry **W-194**'s `fux.index` v4 break, or fold in the one real change
+available (`node/package.json`'s `bin` losing its `./`). Recorded because the
+version number is spent either way — **PyPI never permits a version to be
+reused**, so `3.0.0a1` can now never mean anything else.
+
+| registry | state |
+|---|---|
+| **PyPI** | **`fux-engine` 3.0.0a1 is live** — wheel + sdist, OIDC, attested |
+| **npm** | **`fux-engine@3.0.0-alpha.1` under tag `alpha`**; `latest` still `2.0.1` |
+
+**Verified from the published artefacts:** `fux --version` → `fux 3.0.0-alpha.1`
+from PyPI, and `fux 3.0.0-alpha.1 (node 24.13.0)` from the npm bin.
+
+🔴 **A version bump turns the tree RED until two records are re-stamped, and
+that is worth knowing before the next one.** `SR-LAWS` owns
+`src/fux/__init__.py` and `SR-NODE-SEARCH` owns `node/`, so bumping the four
+sites failed `test_sr_owns_hash.py` and `test_sr_freshness.py` — **2 failures
+that are procedure, not breakage**. `python scripts/sr-owns.py --write &&
+python scripts/sr-hash.py --write` clears it. ⚠ **Run the stamper dry first**:
+it writes *every* stale component, and this tree had a concurrent session's
+work in it. Here it reported exactly the two, so nothing of theirs was blessed.
+
+**Both suites green, whole** — 4 895 unit (2 skipped), 145 e2e, 36 Node; parity
+across all four sites and the built bundle.
+
+⚠ **A concurrent session was filing W-194, prompt 6E and W-175 throughout.**
+Nothing under `work/golden/`, `work/open/`, `OPEN-WORK.md` or `WORKLOG.md` was
+touched by this session, and every commit used explicit pathspecs.
+
+---
+
 ## 2026-09-17 — **3.0.0-alpha.0 released**: the first major, live on both registries on the new direct-publish path
 
 **Shipped** (`3.0.0-alpha.0`, PyPI + npm). No records changed — the release
