@@ -55,6 +55,26 @@ moved to the archive on 2026-09-14.
 *Newest first. Every `.md` in this directory has a row; a file with no row is
 the defect this ordering exists to make visible.*
 
+## Filed 2026-09-18
+
+* [Exact identifier match — the two analyzer defects, and the four ways it is
+  solved elsewhere](identifier-exact-match.md) — research for **W-168 step 2**,
+  written after the [survival run](../regression/2026-09-16-identifier-survival/report.md)
+  measured 0 of 33 identifiers surviving. Names the cause at line level: **D1**
+  `_WORD_RE`'s class holds `_` but not `-`, `.` or `/`, so the docstring's
+  *"whole AND parts"* promise is kept for `snake_case` and quietly broken for
+  every other separator; **D2** `should_stem` protects digits and underscores
+  but not all-letter acronyms, so Porter turns `KFS` into `kf`. ⚠ **Corrects the
+  run's claim that a mangled id is unreachable** — ingest and query import the
+  same `analyze()`, so it matches; what is lost is **precision**, one rare term
+  becoming two common ones. Sets out four shipped solutions cheapest-first
+  (`WordDelimiterGraphFilter`'s preserve-original · `KeywordRepeatFilter`'s
+  stemmed-and-unstemmed-in-one-field · Elasticsearch multi-fields, which is step
+  2 as written · trigram/sparse-gram planes, out of scope) and argues **(a) is a
+  precondition of (c), not an alternative**. Proposes **gate A**, an
+  analyzer-survival before/after that needs no Codex output.
+  **Graduates when W-168 step 2's pre-registration is written.**
+
 ## Filed 2026-09-15
 
 * [Glassbox sessions — event streams as a fux corpus](glassbox-sessions.md) —

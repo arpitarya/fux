@@ -1,0 +1,118 @@
+[
+ {
+  "q": "why does the tool refuse to call the network on its own",
+  "t": "records/0006_LAW-4-offline-by-default.md"
+ },
+ {
+  "q": "is it okay to keep a copy of the wiki page locally",
+  "t": "records/0004_LAW-2-content-never-durable.md"
+ },
+ {
+  "q": "where do I look up who last asked a question",
+  "t": "records/0010_LAW-8-use-record.md"
+ },
+ {
+  "q": "what makes two runs on the same input produce the same bytes",
+  "t": "records/0005_LAW-3-deterministic.md"
+ },
+ {
+  "q": "who is allowed to change a rule that other documents depend on",
+  "t": "records/0002_LAW-0-authority.md"
+ },
+ {
+  "q": "where are downloaded web page bytes kept between runs",
+  "t": "records/0145_acquired-plane.md"
+ },
+ {
+  "q": "how long before a web source is considered out of date",
+  "t": "records/0147_url-freshness.md"
+ },
+ {
+  "q": "how are long documents split into pieces",
+  "t": "records/0151_chunking.md"
+ },
+ {
+  "q": "how does the javascript side find its way to the engine",
+  "t": "records/0153_node-search.md"
+ },
+ {
+  "q": "is there a way to call this from my own program instead of the shell",
+  "t": "records/0154_api.md"
+ },
+ {
+  "q": "how do I get told when someone runs a query",
+  "t": "records/0157_observe.md"
+ },
+ {
+  "q": "how do I prove an answer came from where it says",
+  "t": "records/0142_provenance.md"
+ },
+ {
+  "q": "can I change how much output the commands print by default",
+  "t": "records/0143_output-defaults.md"
+ },
+ {
+  "q": "how do I stop a folder from being indexed",
+  "t": "records/0144_fuxignore.md"
+ },
+ {
+  "q": "what happens when two branches both changed the index",
+  "t": "records/0130_merge-driver.md"
+ },
+ {
+  "q": "how do I make the index update itself on every commit",
+  "t": "records/0129_hooks.md"
+ },
+ {
+  "q": "two processes writing at once, what protects the files",
+  "t": "records/0140_locks.md"
+ },
+ {
+  "q": "how do I serve this to an ai coding assistant",
+  "t": "records/0136_mcp.md"
+ },
+ {
+  "q": "how do I reorder results using a second pass",
+  "t": "records/0138_rerank.md"
+ },
+ {
+  "q": "where do I put a converter for a file type you do not know",
+  "t": "records/0139_decode.md"
+ },
+ {
+  "q": "how do I widen a query when the words don't match the docs",
+  "t": "records/0149_expand.md"
+ },
+ {
+  "q": "how do i see which documents are unreachable by any search",
+  "t": "records/0156_inspect.md"
+ },
+ {
+  "q": "what does retired documentation do to search results",
+  "t": "records/0134_archived-content.md"
+ },
+ {
+  "q": "which files should I commit and which are generated",
+  "t": "records/0102_fux-directory.md"
+ },
+ {
+  "q": "what happens if a file has no known format",
+  "t": "records/0128_types-list.md"
+ },
+ {
+  "q": "how do I get the single best passage rather than a list",
+  "t": "records/0105_answer.md"
+ },
+ {
+  "q": "how do I run a task that needs a decision from the owner",
+  "t": "records/0064_WORK-blockers.md"
+ },
+ {
+  "q": "how big a corpus are we allowed to promise for",
+  "t": "records/0057_WORK-scale.md"
+ },
+ {
+  "q": "what counts as a question being hard",
+  "t": "records/0066_WORK-golden.md"
+ }
+]

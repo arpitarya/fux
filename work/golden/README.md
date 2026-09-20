@@ -195,6 +195,13 @@ party holding both is a person, not an agent.
 ⚠ **[`prompts/RETIRED-codex-release.md`](prompts/RETIRED-codex-release.md) is kept
 and must not be run.** Its three jobs moved on 2026-09-15 — the file says where.
 
+⚠ **[`prompts/6E-codex-score-ephemeral.md`](prompts/6E-codex-score-ephemeral.md)
+is prompt 6 by subtraction** (Arpit, 2026-09-17): it writes no file, stores no
+key, and does not pool — so **its numbers are lower bounds and are NOT a filed
+run** under [SR-RS](../../records/0133_predictions.md) decision 10a, and may be
+cited nowhere. It answers *"where does the engine stand"* in a chat that is then
+closed. **Prompt 6 is still the one that produces evidence.**
+
 ### Order is load-bearing, and one part of it is only honour
 
 **Prompt 4 should run before 2 and 3.** A rung built by a session that could have

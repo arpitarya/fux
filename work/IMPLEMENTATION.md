@@ -30,6 +30,53 @@ Rules:
 
 
 
+## 2026-09-17 — 🔴 **an L11 breach declared, the `rung-00100` run filed and fenced, and the two-strikes gate built**
+
+**Shipped:** [`tests/test_golden_key_never_committed.py`](../tests/test_golden_key_never_committed.py)
+— 19 tests, green. **Evidence:** [`2026-09-16-golden-rung-00100`](regression/2026-09-16-golden-rung-00100/ANALYSIS.md)
+(scored overlay). **Items:** [W-196](../archive/open/W-196-l11-breach-2026-09-17.md),
+[W-197](open/W-197-stray-key-directory.md),
+[W-195](open/W-195-difficulty-band-breakdown.md) — all three filed open, none closed.
+**Records touched: none.** The change SR-WORK-GOLDEN may need is **proposed to
+Arpit, not written** — a law-adjacent decision is his
+([SR-LAW-0](../records/0002_LAW-0-authority.md) decision 3).
+
+🔴 **The outcome recorded here is a negative, and it belongs here for that
+reason** (rule 3). A **Cowork Claude** session was pasted **both golden answer
+keys** and scored the `rung-00100` hand-offs in chat.
+[L11](../records/0012_LAW-11-sealed-answer-key.md) gives that route to **Codex
+alone**; the instruction was void on the law's face and the session complied.
+**Set 1's blind status — the benchmark's only clean authorship story — is
+spent.**
+
+**What landed, and what deliberately did not:**
+
+| | |
+|---|---|
+| **the run** | filed with a breach banner, a provenance block, a scored overlay, and the `## Authorship` table the per-run contract row 7 had required since 2026-08-25 and the report **had never carried** |
+| **the labels** | set 1 `informed (L11 breach 2026-09-17)` · set 2 `informed` permanently · **no count in the run is labelled `blind`** |
+| **the numbers** | 🔴 **non-citable, for two independent reasons** — [prompt 6E](golden/prompts/6E-codex-score-ephemeral.md)'s own rule, and the breach. **Never pooled across sets** |
+| **the gate** | refuses a committed path under a sealed-key directory **on both spellings**, answered from `git ls-files` so nothing is opened; and refuses any committed file carrying a golden id beside a key-only field |
+| **not shipped** | 🔴 **no engine change, no proposal, no tuning move** was made off these numbers, and none may be |
+| **not edited** | 🔴 **`PRE-REGISTRATION.md`** — a frozen pre-registration is never edited (SR-RS decisions 1, 10b) |
+| **still blocked** | **W-87 · W-176 · W-190 · W-191 · W-195** — 6E files no per-query rows, so decision 19's paired floor is uncomputable |
+
+**The measured finding, and it is the one worth carrying forward:** **the
+abstention gate is the ceiling on every metric above it.** declined-but-answerable
+**33 of 113** (set 1) and **48 of 112** (set 2), against **3** and **4** correct
+abstentions — **11–12× the count.** ⚠ **It may not be cited**, which is exactly
+why the gate that keeps the *next* number clean is the thing this change
+actually shipped.
+
+⚠ **The gate catches the downstream half only, and its docstring leads with
+that.** A hook matches what a tool call targets; **a key arriving in a chat is
+not a tool call.** What it catches is a key reaching a **committed** byte —
+where a leak stops being an incident and becomes permanent and citable. ⚠ **Its
+first run flagged one of the guards** (`guard-golden-answer.sh`, on a substring
+match) and was anchored to a path component, with both directions proved by
+parametrised cases including the hand-off row shape that would have made it
+unusable.
+
 ## 2026-09-17 — **3.0.0-alpha.1 released**: a version bump carrying nothing, cut on instruction
 
 **Shipped** (`3.0.0-alpha.1`, PyPI + npm). Records touched: **SR-LAWS** and

@@ -20,6 +20,35 @@ repeated). **W-156 ruled 2026-09-14:** every step is a ranking change and lands 
 the single-corpus sentence is gone ([SR-LAW-0](../../records/0002_LAW-0-authority.md)
 decision 2a). Nothing agent-side waits.
 
+## ✅ MEASURED 2026-09-18 — step 2's stopping reason was wrong, and so was the premise's consequence
+
+**Arpit, 2026-09-18:** *"Codex is not going to run it. You go ahead and run it."*
+So this session wrote the 33 id-queries (one per identifier, targets by grep
+over the seed, no key) and ran the baseline on rung-00100, 01000 and 10000:
+[the run](../regression/2026-09-18-identifier-headroom/report.md) · `informed`.
+
+| rung | primary hit@3 | headroom |
+|---|---:|---:|
+| 100 | **30/33** | 3 |
+| 1 000 | 29/33 | 4 |
+| 10 000 | **30/33** | 3 |
+
+- 🔴 **Mangling is symmetric.** `dairi` IS in the index — the document is
+  analyzed by the same analyzer. Split identifiers retrieve at ~90 % top-3 at
+  every rung. The survival report compared query tokens to raw text.
+- 🔴 **Headroom is 3–4 of 33, below the floor of 6 flips, on every rung.**
+  Step 2 cannot be given a verdict on this corpus **whatever questions are
+  written** — prompt 8 does not unblock it. What is missing is identifiers of
+  the failing shape (a shared prefix + short number, `PROJ-123`) in the seed.
+- 🔴 **The absolute misses are frontmatter-only identifiers**, unindexed by
+  `parse.py`'s meta/body split — a different defect, filed as
+  [W-201](W-201-frontmatter-scalars-not-indexed.md).
+
+**Step 2 stays stopped, for the corrected reason.** Prompt 8 is withdrawn as
+the unblock; the unblock is a seed with the failing shape, which is a Codex
+corpus-prompt note, or a ruling to descope the field until a consumer corpus
+shows the shape.
+
 ## 🔴 Step 2 is STOPPED BEFORE IT STARTS (2026-09-16) — by this item's own rule
 
 [The survival check](../regression/2026-09-16-identifier-survival/report.md).
@@ -70,6 +99,37 @@ nothing for them.
    ([SR-INDEX-LIFECYCLE](../../records/0108_index-lifecycle.md) decision 9.1).
    **Whether it rides 3.0's existing unreleased bump belongs in the build's own
    pre-registration.**
+
+### ✅ Research filed 2026-09-18 — [`proposals/identifier-exact-match.md`](../proposals/identifier-exact-match.md)
+
+**Arpit asked 2026-09-18 how this is solved elsewhere, and for a before/after
+test either side of the build.** Filed, not decided. Three things in it change
+what step 2 is:
+
+1. **The cause is two lines in [`query/analyzer.py`](../../src/fux/query/analyzer.py),
+   and neither is a missing field.** **D1** — `_WORD_RE`'s class holds `_` and
+   not `-`, `.` or `/`, so the module's own *"whole AND parts are both emitted"*
+   is kept for `snake_case` and silently broken for every other separator; that
+   **is** the underscore/hyphen asymmetry. **D2** — `should_stem` protects
+   digits and underscores but not all-letter acronyms, so Porter takes `kfs` to
+   `kf` and `dairy` to `dairi`. Reproduced against the shipped code.
+2. ⚠ **A correction to the survival run.** Its §1 says a mangled id *"cannot be
+   reached at all"*. **Ingest and query import the same `analyze()`**, so
+   `DAIRY-2` typed as a query produces the same `['dairi', '2']` the document
+   wrote and **does** match. What is lost is **precision** — one rare term
+   becomes two common ones, sibling ids collide on `rf`, and the band reports
+   `missing: dairi`. Step 2 is a ranking fix, not a recall fix, which is what
+   keeps [SR-RS](../../records/0133_predictions.md) d19's paired floor the right bar.
+3. 🟢 **Gate A — a before/after that does NOT wait on Codex.** Re-run
+   `tools/quality-controls/identifier_survival.py` against the 33 frozen rows:
+   before is measured (0 of 33), after must be 33 of 33 with 0 mangled. It
+   falsifies a broken fix in seconds. ⚠ **It is a mechanism probe, never a
+   ranking verdict** — only prompt 8's gate B can say the corpus got better.
+
+⚠ **The four families are ordered cheapest-first in the proposal, and (a)
+preserve-original is a PRECONDITION of (c) the separate field**, not an
+alternative to it: a new field still has to be fed by a tokenizer that cannot
+see past a hyphen. **The current framing of step 2 has that ordering backwards.**
 
 ---
 

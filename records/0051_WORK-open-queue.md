@@ -7,11 +7,11 @@ description: "The live queue's discipline has one home, and this is it. Fifty-ei
 status: accepted
 date: 2026-09-13
 feature: the discipline of the single live work queue — its rules, its markers, and the three tests that enforce them
-owns: [tests/test_open_work_rows_are_short.py@01fe412431ad, tests/test_open_work_is_not_stale.py@453a93cbbbaa, tests/test_no_work_item_is_lost.py@3c6a033612b2]
+owns: [tests/test_open_work_rows_are_short.py@01fe412431ad, tests/test_open_work_is_not_stale.py@f117a1469989, tests/test_no_work_item_is_lost.py@3c6a033612b2]
 laws: [L0]
 ratifies: W-146 ruling 1 · Arpit 2026-09-13 (archive, never delete)
 timestamp: 2026-09-13T00:00:00Z
-content_sha: bfe398da0bc69a0c8554f6c6900c47bab601870cf5efbdcfb22535d189b201d0
+content_sha: 281f859669a437150ee8ac0f661f34fc8b035d0549542c099d943a4c48cb54d0
 ---
 
 # SR-WORK-OPEN-QUEUE — how OPEN-WORK works
@@ -203,22 +203,38 @@ that is the only thing the file says.
 43. **An item waiting on a decision joins that sub-row in the same edit.**
 44. **An inbox row is always 🔴.** A date gate is not a decision owed.
 45. **A row points only at things that exist.**
-45a. **An empty inbox is declared, never inferred.** When no ruling is owed, the
-    table stays (header only) and the line directly beneath it begins
-    `*Empty since YYYY-MM-DD` and names the next gate. The parser guards in
-    `tests/test_open_work_is_not_stale.py` and `tests/test_open_work_rows_are_short.py`
-    accept an empty table only on that declaration — a table that is merely
-    empty is a moved heading until proven otherwise. (First emptied 2026-09-14.)
-    ⚠ **A Cowork session violated this on 2026-09-15** — emptied the table
-    correctly but closed it with a multi-paragraph recap instead of the one
-    declaration line ([`work/LESSONS.md`](../work/LESSONS.md)). Two PostToolUse
-    guards now surface the same check inside the session rather than only at
-    the next test run — `scripts/check-open-work-inbox.py`, run from
+45a. **The inbox section carries its table and nothing else — populated or
+    empty.** When rulings are owed the table carries its rows and the section
+    closes; when none is owed the table stays (header only) and the line
+    directly beneath it begins `*Empty since YYYY-MM-DD` and names the next
+    gate. **In neither case does anything follow the table** — not a recap of
+    the rulings, not a note on which rows are now green, not a sentence
+    explaining what the rows have in common. That is rule 2 and veto condition
+    2 restated for the one section that keeps attracting prose, because it is
+    the section a session reads last and feels moved to summarise. The parser
+    guards in `tests/test_open_work_is_not_stale.py` and
+    `tests/test_open_work_rows_are_short.py` accept an empty table only on that
+    declaration — a table that is merely empty is a moved heading until proven
+    otherwise. (First emptied 2026-09-14.)
+    ⚠ **Violated twice, and the second time straight through the gate built
+    for the first.** 2026-09-15: a Cowork session emptied the table correctly
+    but closed it with a multi-paragraph recap
+    ([`work/LESSONS.md`](../work/LESSONS.md));
+    `scripts/check-open-work-inbox.py` was written to catch it, run from
     [`.claude/hooks/guard-open-work-inbox.sh`](../.claude/hooks/guard-open-work-inbox.sh)
     (blocks) and
     [`.codex/hooks/guard-open-work-inbox.sh`](../.codex/hooks/guard-open-work-inbox.sh)
-    (advisory — Codex's PostToolUse deny contract is unconfirmed here). **Neither
-    is the rule; the two tests above are, and stay maintained.**
+    (advisory — Codex's PostToolUse deny contract is unconfirmed here).
+    2026-09-18 (Arpit): two paragraphs of recap under a **populated** table.
+    The script detects it and **the script never ran** — the Claude hook
+    matched `Write|Edit|MultiEdit` and the prose arrived through `Bash`, which
+    is how a session edits files whenever it is told to prefer the shell. Two
+    repairs, both in the change that recorded the second occurrence: the
+    matcher names `Bash`, and
+    `test_the_inbox_carries_only_its_table` in
+    `tests/test_open_work_is_not_stale.py` runs the same check at CI, so the
+    gate no longer depends on which tool wrote the file. **Neither hook is the
+    rule; the two tests above are, and stay maintained.**
 
 **G · Standing, and forbidden**
 

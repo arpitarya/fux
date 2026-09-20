@@ -23,18 +23,14 @@ here. Read that record before changing anything below it.
 
 | what he decides | filed | age |
 |---|---|---|
-| 🔴 **W-136** — phase 5 ran and both hand-offs are written. **Whether to release a key for scoring, and when**, is his by [L11](../records/0012_LAW-11-sealed-answer-key.md): the one route an answer travels is a paste, at his choice. [detail](open/W-136-golden-benchmark.md) | 2026-09-16 | 1d |
-| ↳ **blocks:** W-87, W-176, W-190, W-191, and through W-191 also W-161 | | |
-| 🔴 **W-175** — the blind paraphrases exist only if he runs the Codex prompt. The harness is built and refuses to run without them; no agent may author one. [detail](open/W-175-correction-generalisation.md) | 2026-09-16 | 1d |
+| 🔴 **W-136** — the detailed scoring pass over the benchmark is PAUSED by your 2026-09-18 ruling ("6E is enough for now"), so no per-question scores exist. Only you can restart it, and most of the queue sits behind that. [detail](open/W-136-golden-benchmark.md) | 2026-09-16 | 4d |
+| ↳ **blocks:** W-87, W-176, W-190, W-191, W-195, and through W-191 also W-161 | | |
+| 🔴 **W-175** — the test needs the questions reworded by Codex, blind, and only you can run that prompt. The harness is built and refuses to start without them; no agent may write them. [detail](open/W-175-correction-generalisation.md) | 2026-09-16 | 4d |
 | ↳ **blocks:** W-175, and nothing else in the queue | | |
-| 🔴 **W-168** — step 2 needs id-queries: 0 of 33 identifiers survive the analyzer, but only 4 of 249 questions ask by one. [prompt 8](golden/prompts/8-codex-identifier-questions.md) is written and is Codex's. [detail](open/W-168-search-improvements.md) | 2026-09-16 | 1d |
+| 🔴 **W-168** — **measured 2026-09-18: code search already works ~90 % at every rung** (chopped codes still match). Room for a fix: 3–4 of 33, below the floor. His: drop step 2, or ask Codex for a seed with `PROJ-123`-style codes. [detail](open/W-168-search-improvements.md) | 2026-09-16 | 4d |
 | ↳ **blocks:** W-168, and nothing else in the queue | | |
-
-⚠ **All three are a HAND, not a decision** — running a prompt, pasting a key.
-**Everything an agent may do on every open item is done**: W-136's hand-offs are
-written, W-175's harness is built, and W-168 step 2's premise is measured with
-its prompt written. 🔴 **The queue has no green row.** What every remaining item
-needs is Codex output that only Arpit can commission.
+| 🔴 **W-201** — **a code that appears only in a file's front-matter (`doc_id:`) can't be searched at all** — that header block is never indexed. His: which header keys get indexed, and as title-strength or body-strength. [detail](open/W-201-frontmatter-scalars-not-indexed.md) | 2026-09-18 | 2d |
+| ↳ **blocks:** nothing else in the queue | | |
 
 ---
 
@@ -42,18 +38,25 @@ needs is Codex output that only Arpit can commission.
 
 ### fux build
 
-- 🔴 **W-161** · `agent`, waiting on W-191 — **BUILT 2026-09-15**; both tiers ship on and unmeasured. 🔴 **Both arms inert — 0 `ref` edges on the ladder**; they need linked documents, and Codex's questions are not that. [detail](open/W-161-graph-composed-ask.md)
-- 🔴 **W-168** · `agent` — step 1 shipped; **step 2 STOPPED before it started**: 0 of 33 ids survive the analyzer, but only 4 of 249 questions ask by one — below the floor. [detail](open/W-168-search-improvements.md)
-- 🔴 **W-176** · `agent`, waiting on W-136 — **steps 1–3 landed 2026-09-15**. Gates 4–9 need a SCORED run (prompt 6), not a key — no key exists (L11). ⚠ **Step 10 needs links, W-191.** [detail](open/W-176-abstention-gates.md)
-- 🔴 **W-191** · `agent` 🧨, waiting on W-136 — **specified 2026-09-16**: [prompt 7](golden/prompts/7-codex-link-bearing-seed.md) written, `ref` census generated and gateable. The documents are **Codex's**. [detail](open/W-191-the-ladder-carries-no-links.md)
+- 🟢 **W-199** · `agent` — **agreed 2026-09-18, not built**: every URL source states up front how to download it and how to read what comes back, fixed once at `fux add`. **Breaking** by your ruling. [detail](open/W-199-fetcher-routing.md)
+- 🟢 **W-200** · `agent` — **agreed 2026-09-18, not built**: keep a local log of how each document got indexed — which downloader and reader made it, from which bytes, and whether it worked. [detail](open/W-200-ingest-provenance.md)
+- 🟢 **W-194** · `agent` — **agreed 2026-09-17, not built**: drop hashed metadata entirely — URL records keep plain titles, the display cache goes, the index format steps to v4 and law L5 retires. [detail](open/W-194-delete-hashed-meta.md)
+- 🔴 **W-161** · `agent`, waiting on W-191 — built 2026-09-15 and shipped switched on, but never measured: no document in the test corpus links to another, so both arms of the feature have nothing to work on. [detail](open/W-161-graph-composed-ask.md)
+- 🔴 **W-168** · `agent` — step 1 (link text) shipped. **Step 2 measured 2026-09-18: code search already works ~90 %, room for a fix is 3–4 of 33** — prompt 8 won't change that. Waits on his call. [detail](open/W-168-search-improvements.md)
+- 🔴 **W-201** · `arpit` — **front-matter values are never indexed**, so a `doc_id:` that lives only there is unreachable. 3 of 33 seed codes. Which keys, which field — his. [detail](open/W-201-frontmatter-scalars-not-indexed.md)
+- 🔴 **W-176** · `agent`, waiting on W-136 — steps 1–3 landed 2026-09-15; the rest need scored benchmark results that are paused, so the "say nothing when unsure" fix may end up built, unmeasured and left off. [detail](open/W-176-abstention-gates.md)
+- 🔴 **W-191** · `agent` 🧨, waiting on W-136 — spec'd 2026-09-16: [prompt 7](golden/prompts/7-codex-link-bearing-seed.md) is written and the count of document-to-document links can now be gated on. Codex writes the documents. [detail](open/W-191-the-ladder-carries-no-links.md)
 
 ### testing
 
 
-- 🔴 **W-190** · `agent`, waiting on W-136 — difficulty is a **count of discriminations**, not a label; schema + scorer BUILT 2026-09-15. The questions exist; the first real number needs a **scored** rung (prompt 6). [detail](open/W-190-question-difficulty.md)
-- 🔴 **W-136** · `arpit` — **phase 5 RAN on `rung-00100` 2026-09-16**; both hand-offs are written and file no score. **Next is prompt 6 — Codex scores, in a chat he attends.** [detail](open/W-136-golden-benchmark.md)
-- 🔴 **W-87** · `agent`, waiting on W-136 — P2's `unanswerable` gate is measured (0/124). ✅ **Part B's blocker is gone** (set 1 is Codex-authored), so both halves now wait on phase 5. [detail](open/W-87-what-good-means.md)
-- 🔴 **W-175** · `agent` — **harness BUILT 2026-09-16** and it refuses to run without paraphrases. Every number waits on Arpit running [the Codex prompt](regression/2026-09-15-correction-generalisation/prompt-codex-paraphrases.md). [detail](open/W-175-correction-generalisation.md)
+- 🔴 **W-190** · `agent`, waiting on W-136 — a question's difficulty is counted, not labelled by hand; the scorer was built 2026-09-15, but the answer key carries no difficulty yet, so no question is rated. [detail](open/W-190-question-difficulty.md)
+- 🔴 **W-195** · `agent`, waiting on W-190 — we cannot yet say "fux does well on easy questions and badly on hard ones": the key has no difficulty field to split the results by, and it may not be guessed. [detail](open/W-195-difficulty-band-breakdown.md)
+- 🟡 **W-197** · `arpit`, waiting on W-198 — ruled 2026-09-18: the stray answers folder stays on disk, spelled `golden-answers/`, with both spellings guarded. Closes when W-198 lands. [detail](open/W-197-stray-key-directory.md)
+- 🟢 **W-198** · `agent` — **agreed 2026-09-18, not built**: allow one guarded local folder for the answer key, make `golden-answers/` its name, and widen every guard to cover both spellings. [detail](open/W-198-golden-answers-canonical.md)
+- 🔴 **W-136** · `arpit` — the benchmark ran 2026-09-16 and produced a rough score with no per-question detail. The detailed pass is paused by your ruling; W-87, W-176 and W-191 sit behind you restarting it. [detail](open/W-136-golden-benchmark.md)
+- 🔴 **W-87** · `agent`, waiting on W-136 — what a good answer means: the refuse-to-answer half is measured (0 of 124 missed), and the other half is unblocked now Codex wrote set 1. Both need the scored run. [detail](open/W-87-what-good-means.md)
+- 🔴 **W-175** · `agent` — run of 2026-09-18: correcting a question helped none of its 60 rewordings, and the original itself reached the top 3 only 4 times in 12. A weight sweep comes first. [detail](open/W-175-correction-generalisation.md)
 
 
 ---

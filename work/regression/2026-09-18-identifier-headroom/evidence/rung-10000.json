@@ -1,0 +1,608 @@
+[
+ {
+  "id": "idq-01",
+  "identifier": "BV-4437",
+  "question": "how many vials were in BharatVac order BV-4437",
+  "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md",
+  "relevant": [
+   "seed/03-postmortem-nagpur-vaccine-excursion.md"
+  ],
+  "rank_primary_q": 1,
+  "rank_anyrelevant_q": 1,
+  "rank_primary_bare": 1,
+  "n_results": 20,
+  "top3": [
+   "seed/03-postmortem-nagpur-vaccine-excursion.md",
+   "seed/07-rate-card-and-surcharges.md",
+   "seed/04-night-shift-handover-log.txt"
+  ]
+ },
+ {
+  "id": "idq-02",
+  "identifier": "BV-QA-2025-0312",
+  "question": "what was the write-off booked under BV-QA-2025-0312",
+  "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md",
+  "relevant": [
+   "seed/03-postmortem-nagpur-vaccine-excursion.md"
+  ],
+  "rank_primary_q": 1,
+  "rank_anyrelevant_q": 1,
+  "rank_primary_bare": 1,
+  "n_results": 20,
+  "top3": [
+   "seed/03-postmortem-nagpur-vaccine-excursion.md",
+   "seed/14-customer-notification-matrix-2025.md",
+   "seed/archive/a05-induction-checklist-2020.txt"
+  ]
+ },
+ {
+  "id": "idq-03",
+  "identifier": "CBE-FROZEN",
+  "question": "what are the thresholds for CBE-FROZEN",
+  "primary": "seed/02-sensor-thresholds.yaml",
+  "relevant": [
+   "seed/02-sensor-thresholds.yaml"
+  ],
+  "rank_primary_q": 1,
+  "rank_anyrelevant_q": 1,
+  "rank_primary_bare": 1,
+  "n_results": 20,
+  "top3": [
+   "seed/02-sensor-thresholds.yaml",
+   "ext/archive/02525-decision-retired.md",
+   "ext/archive/08905-ratecard-retired.md"
+  ]
+ },
+ {
+  "id": "idq-04",
+  "identifier": "CBE-PHARMA",
+  "question": "CBE-PHARMA temperature limits",
+  "primary": "seed/02-sensor-thresholds.yaml",
+  "relevant": [
+   "seed/02-sensor-thresholds.yaml"
+  ],
+  "rank_primary_q": 1,
+  "rank_anyrelevant_q": 1,
+  "rank_primary_bare": 1,
+  "n_results": 20,
+  "top3": [
+   "seed/02-sensor-thresholds.yaml",
+   "seed/01-sop-temperature-excursion.md",
+   "seed/archive/a01-sop-temperature-excursion-rev2.md"
+  ]
+ },
+ {
+  "id": "idq-05",
+  "identifier": "G-COLD-1",
+  "question": "what does profile G-COLD-1 allow",
+  "primary": "seed/02-sensor-thresholds.yaml",
+  "relevant": [
+   "seed/02-sensor-thresholds.yaml"
+  ],
+  "rank_primary_q": 1,
+  "rank_anyrelevant_q": 1,
+  "rank_primary_bare": 1,
+  "n_results": 20,
+  "top3": [
+   "seed/02-sensor-thresholds.yaml",
+   "ext/sibling/a02-vantorix-sensor-thresholds.yaml",
+   "seed/13-dock-scheduling-rules-2026.md"
+  ]
+ },
+ {
+  "id": "idq-06",
+  "identifier": "G-DAIRY-2",
+  "question": "settings for G-DAIRY-2",
+  "primary": "seed/02-sensor-thresholds.yaml",
+  "relevant": [
+   "seed/02-sensor-thresholds.yaml"
+  ],
+  "rank_primary_q": 2,
+  "rank_anyrelevant_q": 2,
+  "rank_primary_bare": 1,
+  "n_results": 20,
+  "top3": [
+   "ext/sibling/a08-sundari-notification-matrix.md",
+   "seed/02-sensor-thresholds.yaml",
+   "seed/13-dock-scheduling-rules-2026.md"
+  ]
+ },
+ {
+  "id": "idq-07",
+  "identifier": "GHY-7",
+  "question": "what happened with truck GHY-7 on the night shift",
+  "primary": "seed/04-night-shift-handover-log.txt",
+  "relevant": [
+   "seed/04-night-shift-handover-log.txt"
+  ],
+  "rank_primary_q": 1,
+  "rank_anyrelevant_q": 1,
+  "rank_primary_bare": 2,
+  "n_results": 20,
+  "top3": [
+   "seed/04-night-shift-handover-log.txt",
+   "seed/02-sensor-thresholds.yaml",
+   "ext/sibling/a04-okapi-night-handover.txt"
+  ]
+ },
+ {
+  "id": "idq-08",
+  "identifier": "KFS-2014",
+  "question": "which vendor is KFS-2014",
+  "primary": "seed/02-sensor-thresholds.yaml",
+  "relevant": [
+   "seed/02-sensor-thresholds.yaml",
+   "seed/archive/a02-kalpa-alert-routing-guide-2021.md"
+  ],
+  "rank_primary_q": 2,
+  "rank_anyrelevant_q": 1,
+  "rank_primary_bare": 13,
+  "n_results": 20,
+  "top3": [
+   "seed/archive/a02-kalpa-alert-routing-guide-2021.md",
+   "seed/02-sensor-thresholds.yaml",
+   "ext/filler/03718-bicycle.txt"
+  ]
+ },
+ {
+  "id": "idq-09",
+  "identifier": "KV-NGP-C2-07",
+  "question": "when did probe KV-NGP-C2-07 start reading high",
+  "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md",
+  "relevant": [
+   "seed/03-postmortem-nagpur-vaccine-excursion.md"
+  ],
+  "rank_primary_q": 1,
+  "rank_anyrelevant_q": 1,
+  "rank_primary_bare": 1,
+  "n_results": 20,
+  "top3": [
+   "seed/03-postmortem-nagpur-vaccine-excursion.md",
+   "seed/02-sensor-thresholds.yaml",
+   "ext/sibling/05563-postmortem.md"
+  ]
+ },
+ {
+  "id": "idq-10",
+  "identifier": "NGP-MNT-552",
+  "question": "what work was invoiced as NGP-MNT-552",
+  "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md",
+  "relevant": [
+   "seed/03-postmortem-nagpur-vaccine-excursion.md"
+  ],
+  "rank_primary_q": 1,
+  "rank_anyrelevant_q": 1,
+  "rank_primary_bare": 1,
+  "n_results": 20,
+  "top3": [
+   "seed/03-postmortem-nagpur-vaccine-excursion.md",
+   "seed/10-new-joiner-faq.md",
+   "seed/09-dock-scheduling-wiki-export.html"
+  ]
+ },
+ {
+  "id": "idq-11",
+  "identifier": "NGP-PNR-18",
+  "question": "what did the NGP-PNR-18 driver report",
+  "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md",
+  "relevant": [
+   "seed/03-postmortem-nagpur-vaccine-excursion.md"
+  ],
+  "rank_primary_q": 1,
+  "rank_anyrelevant_q": 1,
+  "rank_primary_bare": 1,
+  "n_results": 20,
+  "top3": [
+   "seed/03-postmortem-nagpur-vaccine-excursion.md",
+   "seed/09-dock-scheduling-wiki-export.html",
+   "seed/10-new-joiner-faq.md"
+  ]
+ },
+ {
+  "id": "idq-12",
+  "identifier": "QCL-CS-MTX-02",
+  "question": "open QCL-CS-MTX-02",
+  "primary": "seed/14-customer-notification-matrix-2025.md",
+  "relevant": [
+   "seed/14-customer-notification-matrix-2025.md"
+  ],
+  "rank_primary_q": 2,
+  "rank_anyrelevant_q": 2,
+  "rank_primary_bare": 1,
+  "n_results": 20,
+  "top3": [
+   "seed/15-customer-notification-matrix-2026.md",
+   "seed/14-customer-notification-matrix-2025.md",
+   "seed/02-sensor-thresholds.yaml"
+  ]
+ },
+ {
+  "id": "idq-13",
+  "identifier": "QCL-CS-MTX-03",
+  "question": "what is QCL-CS-MTX-03",
+  "primary": "seed/15-customer-notification-matrix-2026.md",
+  "relevant": [
+   "seed/15-customer-notification-matrix-2026.md"
+  ],
+  "rank_primary_q": 2,
+  "rank_anyrelevant_q": 2,
+  "rank_primary_bare": 2,
+  "n_results": 20,
+  "top3": [
+   "seed/14-customer-notification-matrix-2025.md",
+   "seed/15-customer-notification-matrix-2026.md",
+   "ext/filler/07108-release-notes.md"
+  ]
+ },
+ {
+  "id": "idq-14",
+  "identifier": "QCL-F-09",
+  "question": "when do I fill in form QCL-F-09",
+  "primary": "seed/01-sop-temperature-excursion.md",
+  "relevant": [
+   "seed/01-sop-temperature-excursion.md"
+  ],
+  "rank_primary_q": 2,
+  "rank_anyrelevant_q": 2,
+  "rank_primary_bare": 3,
+  "n_results": 20,
+  "top3": [
+   "seed/14-customer-notification-matrix-2025.md",
+   "seed/01-sop-temperature-excursion.md",
+   "seed/15-customer-notification-matrix-2026.md"
+  ]
+ },
+ {
+  "id": "idq-15",
+  "identifier": "QCL-F-17",
+  "question": "what goes into QCL-F-17",
+  "primary": "seed/01-sop-temperature-excursion.md",
+  "relevant": [
+   "seed/01-sop-temperature-excursion.md",
+   "seed/14-customer-notification-matrix-2025.md",
+   "seed/15-customer-notification-matrix-2026.md"
+  ],
+  "rank_primary_q": 3,
+  "rank_anyrelevant_q": 1,
+  "rank_primary_bare": 3,
+  "n_results": 20,
+  "top3": [
+   "seed/14-customer-notification-matrix-2025.md",
+   "seed/15-customer-notification-matrix-2026.md",
+   "seed/01-sop-temperature-excursion.md"
+  ]
+ },
+ {
+  "id": "idq-16",
+  "identifier": "QCL-F-22",
+  "question": "what is register QCL-F-22 for",
+  "primary": "seed/01-sop-temperature-excursion.md",
+  "relevant": [
+   "seed/01-sop-temperature-excursion.md"
+  ],
+  "rank_primary_q": 4,
+  "rank_anyrelevant_q": 4,
+  "rank_primary_bare": 3,
+  "n_results": 20,
+  "top3": [
+   "seed/14-customer-notification-matrix-2025.md",
+   "seed/15-customer-notification-matrix-2026.md",
+   "ext/sibling/a04-okapi-night-handover.txt"
+  ]
+ },
+ {
+  "id": "idq-17",
+  "identifier": "QCL-IT-ADR-08",
+  "question": "show me QCL-IT-ADR-08",
+  "primary": "seed/11-decision-telematics-vendor-2026.md",
+  "relevant": [
+   "seed/11-decision-telematics-vendor-2026.md"
+  ],
+  "rank_primary_q": null,
+  "rank_anyrelevant_q": null,
+  "rank_primary_bare": null,
+  "n_results": 20,
+  "top3": [
+   "seed/05-decision-telematics-vendor-2023.md",
+   "ext/archive/a19-norvell-telematics-decision-2022.md",
+   "ext/sibling/a05-norvell-telematics-decision-2026.md"
+  ]
+ },
+ {
+  "id": "idq-18",
+  "identifier": "QCL-OPS-DOCK-03",
+  "question": "what does QCL-OPS-DOCK-03 say",
+  "primary": "seed/13-dock-scheduling-rules-2026.md",
+  "relevant": [
+   "seed/13-dock-scheduling-rules-2026.md"
+  ],
+  "rank_primary_q": 2,
+  "rank_anyrelevant_q": 2,
+  "rank_primary_bare": 7,
+  "n_results": 20,
+  "top3": [
+   "seed/14-customer-notification-matrix-2025.md",
+   "seed/13-dock-scheduling-rules-2026.md",
+   "seed/15-customer-notification-matrix-2026.md"
+  ]
+ },
+ {
+  "id": "idq-19",
+  "identifier": "QCL-QA-SOP-17",
+  "question": "where is QCL-QA-SOP-17",
+  "primary": "seed/01-sop-temperature-excursion.md",
+  "relevant": [
+   "seed/01-sop-temperature-excursion.md",
+   "seed/02-sensor-thresholds.yaml",
+   "seed/13-dock-scheduling-rules-2026.md",
+   "seed/14-customer-notification-matrix-2025.md",
+   "seed/15-customer-notification-matrix-2026.md",
+   "seed/archive/a01-sop-temperature-excursion-rev2.md"
+  ],
+  "rank_primary_q": 3,
+  "rank_anyrelevant_q": 1,
+  "rank_primary_bare": 3,
+  "n_results": 20,
+  "top3": [
+   "seed/14-customer-notification-matrix-2025.md",
+   "seed/15-customer-notification-matrix-2026.md",
+   "seed/01-sop-temperature-excursion.md"
+  ]
+ },
+ {
+  "id": "idq-20",
+  "identifier": "QF-FY26-TSL-044",
+  "question": "what is the value of PO QF-FY26-TSL-044",
+  "primary": "seed/06-re-fw-telematics-cutover.eml",
+  "relevant": [
+   "seed/06-re-fw-telematics-cutover.eml",
+   "seed/11-decision-telematics-vendor-2026.md"
+  ],
+  "rank_primary_q": 2,
+  "rank_anyrelevant_q": 1,
+  "rank_primary_bare": 2,
+  "n_results": 20,
+  "top3": [
+   "seed/11-decision-telematics-vendor-2026.md",
+   "seed/06-re-fw-telematics-cutover.eml",
+   "seed/02-sensor-thresholds.yaml"
+  ]
+ },
+ {
+  "id": "idq-21",
+  "identifier": "RF-118",
+  "question": "is RF-118 a pilot asset",
+  "primary": "seed/06-re-fw-telematics-cutover.eml",
+  "relevant": [
+   "seed/06-re-fw-telematics-cutover.eml",
+   "seed/04-night-shift-handover-log.txt"
+  ],
+  "rank_primary_q": 1,
+  "rank_anyrelevant_q": 1,
+  "rank_primary_bare": 2,
+  "n_results": 20,
+  "top3": [
+   "seed/06-re-fw-telematics-cutover.eml",
+   "seed/02-sensor-thresholds.yaml",
+   "seed/04-night-shift-handover-log.txt"
+  ]
+ },
+ {
+  "id": "idq-22",
+  "identifier": "RF-203",
+  "question": "what was moved on RF-203",
+  "primary": "seed/04-night-shift-handover-log.txt",
+  "relevant": [
+   "seed/04-night-shift-handover-log.txt"
+  ],
+  "rank_primary_q": 1,
+  "rank_anyrelevant_q": 1,
+  "rank_primary_bare": 1,
+  "n_results": 20,
+  "top3": [
+   "seed/04-night-shift-handover-log.txt",
+   "seed/02-sensor-thresholds.yaml",
+   "ext/adjacent/03471-payroll.yaml"
+  ]
+ },
+ {
+  "id": "idq-23",
+  "identifier": "RF-221",
+  "question": "RF-221 dock 3 incident",
+  "primary": "seed/04-night-shift-handover-log.txt",
+  "relevant": [
+   "seed/04-night-shift-handover-log.txt"
+  ],
+  "rank_primary_q": 2,
+  "rank_anyrelevant_q": 2,
+  "rank_primary_bare": 2,
+  "n_results": 20,
+  "top3": [
+   "seed/02-sensor-thresholds.yaml",
+   "seed/04-night-shift-handover-log.txt",
+   "ext/adjacent/08934-payroll.yaml"
+  ]
+ },
+ {
+  "id": "idq-24",
+  "identifier": "ROTA-9A",
+  "question": "which lots were affected, ROTA-9A",
+  "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md",
+  "relevant": [
+   "seed/03-postmortem-nagpur-vaccine-excursion.md"
+  ],
+  "rank_primary_q": 1,
+  "rank_anyrelevant_q": 1,
+  "rank_primary_bare": 1,
+  "n_results": 20,
+  "top3": [
+   "seed/03-postmortem-nagpur-vaccine-excursion.md",
+   "seed/archive/a02-kalpa-alert-routing-guide-2021.md",
+   "seed/01-sop-temperature-excursion.md"
+  ]
+ },
+ {
+  "id": "idq-25",
+  "identifier": "ROTA-9B",
+  "question": "was lot ROTA-9B destroyed",
+  "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md",
+  "relevant": [
+   "seed/03-postmortem-nagpur-vaccine-excursion.md"
+  ],
+  "rank_primary_q": 1,
+  "rank_anyrelevant_q": 1,
+  "rank_primary_bare": 1,
+  "n_results": 20,
+  "top3": [
+   "seed/03-postmortem-nagpur-vaccine-excursion.md",
+   "seed/archive/a02-kalpa-alert-routing-guide-2021.md",
+   "seed/01-sop-temperature-excursion.md"
+  ]
+ },
+ {
+  "id": "idq-26",
+  "identifier": "SANDHU-EXC",
+  "question": "when is code SANDHU-EXC logged",
+  "primary": "seed/08-driver-hours-and-safety-policy.md",
+  "relevant": [
+   "seed/08-driver-hours-and-safety-policy.md"
+  ],
+  "rank_primary_q": 4,
+  "rank_anyrelevant_q": 4,
+  "rank_primary_bare": 6,
+  "n_results": 20,
+  "top3": [
+   "seed/archive/a02-kalpa-alert-routing-guide-2021.md",
+   "seed/06-re-fw-telematics-cutover.eml",
+   "seed/04-night-shift-handover-log.txt"
+  ]
+ },
+ {
+  "id": "idq-27",
+  "identifier": "TSL-NGP-C2-07",
+  "question": "which room is sensor TSL-NGP-C2-07 in",
+  "primary": "seed/02-sensor-thresholds.yaml",
+  "relevant": [
+   "seed/02-sensor-thresholds.yaml",
+   "seed/04-night-shift-handover-log.txt",
+   "seed/06-re-fw-telematics-cutover.eml"
+  ],
+  "rank_primary_q": 1,
+  "rank_anyrelevant_q": 1,
+  "rank_primary_bare": 1,
+  "n_results": 20,
+  "top3": [
+   "seed/02-sensor-thresholds.yaml",
+   "seed/03-postmortem-nagpur-vaccine-excursion.md",
+   "seed/06-re-fw-telematics-cutover.eml"
+  ]
+ },
+ {
+  "id": "idq-28",
+  "identifier": "TSL-NGP-C3-02",
+  "question": "TSL-NGP-C3-02",
+  "primary": "seed/02-sensor-thresholds.yaml",
+  "relevant": [
+   "seed/02-sensor-thresholds.yaml"
+  ],
+  "rank_primary_q": 1,
+  "rank_anyrelevant_q": 1,
+  "rank_primary_bare": 1,
+  "n_results": 20,
+  "top3": [
+   "seed/02-sensor-thresholds.yaml",
+   "seed/09-dock-scheduling-wiki-export.html",
+   "seed/03-postmortem-nagpur-vaccine-excursion.md"
+  ]
+ },
+ {
+  "id": "idq-29",
+  "identifier": "TSL-NGP-F1-04",
+  "question": "what does TSL-NGP-F1-04 monitor",
+  "primary": "seed/02-sensor-thresholds.yaml",
+  "relevant": [
+   "seed/02-sensor-thresholds.yaml"
+  ],
+  "rank_primary_q": 1,
+  "rank_anyrelevant_q": 1,
+  "rank_primary_bare": 1,
+  "n_results": 20,
+  "top3": [
+   "seed/02-sensor-thresholds.yaml",
+   "ext/sibling/03970-postmortem.md",
+   "seed/04-night-shift-handover-log.txt"
+  ]
+ },
+ {
+  "id": "idq-30",
+  "identifier": "TSL-RF-118-A",
+  "question": "which truck carries TSL-RF-118-A",
+  "primary": "seed/02-sensor-thresholds.yaml",
+  "relevant": [
+   "seed/02-sensor-thresholds.yaml"
+  ],
+  "rank_primary_q": 1,
+  "rank_anyrelevant_q": 1,
+  "rank_primary_bare": 1,
+  "n_results": 20,
+  "top3": [
+   "seed/02-sensor-thresholds.yaml",
+   "seed/06-re-fw-telematics-cutover.eml",
+   "seed/04-night-shift-handover-log.txt"
+  ]
+ },
+ {
+  "id": "idq-31",
+  "identifier": "TSL-RF-221-A",
+  "question": "sensor TSL-RF-221-A",
+  "primary": "seed/02-sensor-thresholds.yaml",
+  "relevant": [
+   "seed/02-sensor-thresholds.yaml"
+  ],
+  "rank_primary_q": 1,
+  "rank_anyrelevant_q": 1,
+  "rank_primary_bare": 1,
+  "n_results": 20,
+  "top3": [
+   "seed/02-sensor-thresholds.yaml",
+   "seed/04-night-shift-handover-log.txt",
+   "seed/06-re-fw-telematics-cutover.eml"
+  ]
+ },
+ {
+  "id": "idq-32",
+  "identifier": "WIKI-NGP-DOCK-12",
+  "question": "who last edited WIKI-NGP-DOCK-12",
+  "primary": "seed/archive/a03-dock-scheduling-wiki-2021.html",
+  "relevant": [
+   "seed/archive/a03-dock-scheduling-wiki-2021.html"
+  ],
+  "rank_primary_q": 1,
+  "rank_anyrelevant_q": 1,
+  "rank_primary_bare": 1,
+  "n_results": 20,
+  "top3": [
+   "seed/archive/a03-dock-scheduling-wiki-2021.html",
+   "seed/09-dock-scheduling-wiki-export.html",
+   "ext/sibling/07879-dockwiki.html"
+  ]
+ },
+ {
+  "id": "idq-33",
+  "identifier": "WIKI-NGP-DOCK-41",
+  "question": "page WIKI-NGP-DOCK-41",
+  "primary": "seed/09-dock-scheduling-wiki-export.html",
+  "relevant": [
+   "seed/09-dock-scheduling-wiki-export.html"
+  ],
+  "rank_primary_q": 2,
+  "rank_anyrelevant_q": 2,
+  "rank_primary_bare": 1,
+  "n_results": 20,
+  "top3": [
+   "seed/archive/a03-dock-scheduling-wiki-2021.html",
+   "seed/09-dock-scheduling-wiki-export.html",
+   "seed/13-dock-scheduling-rules-2026.md"
+  ]
+ }
+]

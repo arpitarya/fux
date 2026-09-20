@@ -1,0 +1,426 @@
+{
+ "own": [
+  [
+   "CG-01",
+   null,
+   18
+  ],
+  [
+   "CG-02",
+   20,
+   5
+  ],
+  [
+   "CG-03",
+   8,
+   4
+  ],
+  [
+   "CG-04",
+   null,
+   5
+  ],
+  [
+   "CG-05",
+   null,
+   2
+  ],
+  [
+   "CG-06",
+   null,
+   11
+  ],
+  [
+   "CG-07",
+   15,
+   9
+  ],
+  [
+   "CG-08",
+   5,
+   1
+  ],
+  [
+   "CG-09",
+   12,
+   7
+  ],
+  [
+   "CG-10",
+   19,
+   3
+  ],
+  [
+   "CG-11",
+   14,
+   4
+  ],
+  [
+   "CG-12",
+   5,
+   1
+  ]
+ ],
+ "paraphrases": [
+  [
+   "CG-01",
+   "does fux go online without asking",
+   null,
+   null
+  ],
+  [
+   "CG-01",
+   "is internet access disabled by default",
+   17,
+   17
+  ],
+  [
+   "CG-01",
+   "when is it allowed to make http requests",
+   null,
+   null
+  ],
+  [
+   "CG-01",
+   "why do I have to opt in before it fetches anything remote",
+   null,
+   null
+  ],
+  [
+   "CG-01",
+   "can it phone home",
+   null,
+   null
+  ],
+  [
+   "CG-02",
+   "is there a log of past searches",
+   13,
+   13
+  ],
+  [
+   "CG-02",
+   "does it remember what people queried",
+   null,
+   null
+  ],
+  [
+   "CG-02",
+   "can I see query history",
+   16,
+   16
+  ],
+  [
+   "CG-02",
+   "are questions people typed stored anywhere",
+   null,
+   null
+  ],
+  [
+   "CG-02",
+   "audit trail of who searched what",
+   null,
+   null
+  ],
+  [
+   "CG-03",
+   "does it save a copy of fetched pages",
+   5,
+   5
+  ],
+  [
+   "CG-03",
+   "where does the raw html go after a fetch",
+   null,
+   null
+  ],
+  [
+   "CG-03",
+   "is fetched content retained on disk",
+   1,
+   1
+  ],
+  [
+   "CG-03",
+   "local storage of remote documents",
+   null,
+   null
+  ],
+  [
+   "CG-03",
+   "can I find the page it pulled last time",
+   4,
+   4
+  ],
+  [
+   "CG-04",
+   "when does a url get refetched",
+   5,
+   5
+  ],
+  [
+   "CG-04",
+   "what is the expiry on a remote page",
+   12,
+   12
+  ],
+  [
+   "CG-04",
+   "how stale can a web document be before it is refreshed",
+   null,
+   12
+  ],
+  [
+   "CG-04",
+   "time to live for urls",
+   1,
+   1
+  ],
+  [
+   "CG-04",
+   "does it re-download pages periodically",
+   10,
+   9
+  ],
+  [
+   "CG-05",
+   "what is the unit a big file is broken into",
+   1,
+   1
+  ],
+  [
+   "CG-05",
+   "how does it segment a large page",
+   3,
+   3
+  ],
+  [
+   "CG-05",
+   "are documents divided before indexing",
+   null,
+   null
+  ],
+  [
+   "CG-05",
+   "what determines where one passage ends and the next begins",
+   2,
+   2
+  ],
+  [
+   "CG-05",
+   "max size of a single indexed section",
+   1,
+   1
+  ],
+  [
+   "CG-06",
+   "can I hook into searches as they happen",
+   15,
+   15
+  ],
+  [
+   "CG-06",
+   "is there a callback after each ask",
+   8,
+   8
+  ],
+  [
+   "CG-06",
+   "notify me on every lookup",
+   null,
+   null
+  ],
+  [
+   "CG-06",
+   "subscribe to query events",
+   1,
+   1
+  ],
+  [
+   "CG-06",
+   "run my own script whenever fux answers",
+   null,
+   null
+  ],
+  [
+   "CG-07",
+   "exclude a directory from the corpus",
+   1,
+   1
+  ],
+  [
+   "CG-07",
+   "skip these files when ingesting",
+   2,
+   2
+  ],
+  [
+   "CG-07",
+   "is there an ignore file like gitignore",
+   2,
+   2
+  ],
+  [
+   "CG-07",
+   "keep node_modules out of the index",
+   null,
+   null
+  ],
+  [
+   "CG-07",
+   "blacklist a path",
+   2,
+   2
+  ],
+  [
+   "CG-08",
+   "resolving a git conflict in the index files",
+   1,
+   1
+  ],
+  [
+   "CG-08",
+   "merging when both sides touched the committed index",
+   1,
+   1
+  ],
+  [
+   "CG-08",
+   "why does git not choke on index conflicts",
+   1,
+   1
+  ],
+  [
+   "CG-08",
+   "branch merge with index changes on each side",
+   1,
+   1
+  ],
+  [
+   "CG-08",
+   "how are conflicting index shards reconciled",
+   4,
+   4
+  ],
+  [
+   "CG-09",
+   "automatic reindex after commit",
+   12,
+   12
+  ],
+  [
+   "CG-09",
+   "keep the index in sync with git without running commands",
+   5,
+   5
+  ],
+  [
+   "CG-09",
+   "install the git integration",
+   8,
+   8
+  ],
+  [
+   "CG-09",
+   "post-commit refresh of the corpus",
+   2,
+   2
+  ],
+  [
+   "CG-09",
+   "does it wire into git automatically",
+   5,
+   5
+  ],
+  [
+   "CG-10",
+   "connect fux to claude code",
+   6,
+   6
+  ],
+  [
+   "CG-10",
+   "expose the search as a tool for an agent",
+   1,
+   1
+  ],
+  [
+   "CG-10",
+   "model context protocol support",
+   15,
+   15
+  ],
+  [
+   "CG-10",
+   "let cursor or copilot query the index",
+   null,
+   null
+  ],
+  [
+   "CG-10",
+   "run it as a server the assistant can call",
+   3,
+   1
+  ],
+  [
+   "CG-11",
+   "is there a reranker",
+   1,
+   1
+  ],
+  [
+   "CG-11",
+   "second stage scoring of the top hits",
+   null,
+   null
+  ],
+  [
+   "CG-11",
+   "refine the ranking after the first retrieval",
+   11,
+   11
+  ],
+  [
+   "CG-11",
+   "can results be rescored on the passage text",
+   3,
+   3
+  ],
+  [
+   "CG-11",
+   "two stage retrieval",
+   null,
+   null
+  ],
+  [
+   "CG-12",
+   "find docs that no query will ever return",
+   null,
+   null
+  ],
+  [
+   "CG-12",
+   "which files are effectively invisible to the index",
+   null,
+   null
+  ],
+  [
+   "CG-12",
+   "dead documents in the corpus",
+   null,
+   null
+  ],
+  [
+   "CG-12",
+   "is there a report on index coverage",
+   13,
+   13
+  ],
+  [
+   "CG-12",
+   "show me pages nobody can find",
+   null,
+   null
+  ]
+ ]
+}

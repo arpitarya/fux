@@ -57,6 +57,39 @@ false`. **`d <= 1` easy · `2` medium · `>= 3` hard**, and unanswerable is
 - **README, schema section, and the `difficulty` note in the answer-file format**
   — an author who types `"difficulty": "medium"` has written a label, not a field.
 
+## 🔴 2026-09-17 — `key_version 1` carries no band at all, and no agent may add one
+
+**Measured on contact, not assumed.** The 2026-09-17 scoring of
+[`rung-00100`](../regression/2026-09-16-golden-rung-00100/ANALYSIS.md) tried to
+run [prompt 6E](../golden/prompts/6E-codex-score-ephemeral.md) step 7 — *"break
+every count down by the key's `difficulty_band`"* — and **could not**. As
+reported by that session, **neither key carries `difficulty`,
+`difficulty_static` or `difficulty_band`**; the fields present are `id`,
+`question`, `answer`, `answerable`, `relevant`, `primary`, `evidence`, `type`,
+`sealed`, `key_version`, `intent`, `exercises`.
+
+⚠ **Recorded as reported, never verified** — checking a key's shape is Arpit's
+and Codex's work, permanently
+([SR-WORK-GOLDEN](../../records/0066_WORK-golden.md) decision 12).
+
+🔴 **The band is computed FROM THE KEY, by Arpit or Codex, and never by a Claude
+session.** `difficulty.py` takes the key as input — that is the whole of why this
+half of the item is not agent-closable, and why the tool **refuses a key path
+inside the repository** rather than trusting its caller. **No Claude session runs
+it, hands it a key, or receives its output row by row**, and a band that arrives
+any other way is not this item's output.
+
+**So the queue now carries the consequence separately**:
+[W-195](W-195-difficulty-band-breakdown.md), waiting on this item — the
+`rung-00100` counts have no per-band breakdown and will not get one until the key
+has a band.
+
+⚠ **The provisional bands are still un-frozen, and that is the one piece of good
+news here.** `d <= 1 / 2 / >= 3` may still be moved, because **nothing has been
+scored against them** — the 2026-09-17 run could not stratify at all
+([SR-RS](../../records/0133_predictions.md) decision 10b). That window closes the
+first time a number is filed by band.
+
 ## What is left
 
 - 🟡 **The first real run**, over set 1's and set 2's keys, on each rung. **Needs

@@ -279,3 +279,38 @@ def test_the_header_states_the_right_number_of_overdue_rows() -> None:
         "The header is a claim about the table beneath it and goes stale the same way "
         "any other claim does."
     )
+
+
+def test_the_inbox_carries_only_its_table() -> None:
+    """Rule 45a, the half that had no gate: prose under a POPULATED table.
+
+    `scripts/check-open-work-inbox.py` has detected this since 2026-09-15 and
+    on 2026-09-18 it detected nothing, because it only ever ran from a
+    PostToolUse hook matching `Write|Edit|MultiEdit` and the two recap
+    paragraphs arrived through `Bash` -- which is how a session edits files
+    whenever it is told to prefer the shell. **A guard bound to a tool name is
+    not a gate**; this runs the same check where the tool that wrote the file
+    cannot matter.
+
+    The script is the single implementation, imported rather than
+    reimplemented, so the hook and the suite cannot drift into disagreeing
+    about what rule 45a permits.
+    """
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(
+        "check_open_work_inbox", ROOT / "scripts" / "check-open-work-inbox.py"
+    )
+    assert spec and spec.loader, "scripts/check-open-work-inbox.py is not importable"
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    error = module.check(QUEUE)
+    assert error is None, (
+        f"work/OPEN-WORK.md -- {error}\n\n"
+        "SR-WORK-OPEN-QUEUE rule 45a: the *Blocked on Arpit* section carries its "
+        "table and nothing else, populated or empty. A recap of the rulings, a "
+        "note on which rows are now green, or a sentence saying what the rows "
+        "have in common all belong in the row's detail file or the WORKLOG -- "
+        "the queue is the list."
+    )

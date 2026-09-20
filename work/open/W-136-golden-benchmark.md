@@ -8,6 +8,26 @@ lane: arpit
 timestamp: 2026-09-11T00:00:00Z
 ---
 
+## 🔴 2026-09-17 — the hand-offs WERE scored, by the wrong party, in an L11 breach
+
+**A Cowork Claude session was pasted both keys and scored them in chat**, in
+[prompt 6E](../golden/prompts/6E-codex-score-ephemeral.md)'s shape.
+[L11](../../records/0012_LAW-11-sealed-answer-key.md) gives the paste route to
+**Codex alone**; the instruction was void and the session complied.
+**[W-196](../../archive/open/W-196-l11-breach-2026-09-17.md)** carries it, and it is Arpit's ruling.
+
+| | |
+|---|---|
+| filed | [the run](../regression/2026-09-16-golden-rung-00100/ANALYSIS.md) — fenced, every number non-citable |
+| set 1 | 🔴 **no longer blind** — `informed (L11 breach 2026-09-17)` |
+| set 2 | `informed`, permanently, as before |
+| **prompt 6** | 🔴 **STILL UNRUN.** 6E files no per-query rows, so **W-87, W-176, W-190, W-191 and W-195 stay blocked** |
+
+⚠ **Phase 5 is therefore *both* done and not done**, and the distinction is the
+one that matters: the engine's standing on `rung-00100` is known to Arpit, and
+**no evidence exists that any document may cite.** The section below stands as
+filed on 2026-09-16 and is not edited.
+
 ## ✅ PHASE 5 RAN on `rung-00100` (2026-09-16) — the hand-offs are ready for Arpit
 
 [The run](../regression/2026-09-16-golden-rung-00100/report.md). 249 questions,
@@ -48,6 +68,24 @@ commit differs. Corpus verified first — **100/100 documents against the manife
 
 **Next: prompt 6 — Codex scores, in a chat Arpit attends.** No Claude session
 takes part, and the other seven rungs are unrun.
+
+## Two routes to a score (Arpit, 2026-09-17)
+
+He asked for *"a prompt where nothing gets saved in the memory and which just
+generated the score and nothing else"*, so there are now two, and **choosing
+between them is choosing what the number may be used for**:
+
+| | [prompt 6](../golden/prompts/6-codex-score.md) | [prompt 6E](../golden/prompts/6E-codex-score-ephemeral.md) |
+|---|---|---|
+| writes | per-query + sealed-aggregate CSVs under `work/regression/` | **nothing** |
+| pools unjudged top-5 hits | yes | **no — every figure is a lower bound** |
+| returns updated keys | yes, `key_version` advances | **no** |
+| the number may be cited | yes | 🔴 **no — not in a record, a compare doc, a work item, or against another golden number** |
+| unblocks W-87 / W-176 / W-190 / W-191 | yes | **no** — those need filed per-query rows |
+
+⚠ **6E does not close this item.** It tells him where the engine stands; it
+produces no evidence, so the five items behind W-136 stay blocked until prompt 6
+runs. Running 6E first costs one extra key exposure and nothing else.
 
 # W-136 — the sealed golden benchmark
 
@@ -242,3 +280,24 @@ the benchmark.
   not is **content, not size**: 1 of 800 `.md`/`.txt` documents carries a `#`
   inside a code fence, and a bigger draw from the same generator has the same
   proportion.
+
+## ✅ RULED 2026-09-18 (Arpit) — prompt 6 is DEFERRED; 6E is enough for now
+
+Asked whether to run prompt 6 on the `rung-00100` hand-offs now, later paired
+with W-176's after-run, or skip it: **"Skip prompt 6 — 6E is enough for now."**
+
+**What this means for the queue, written so nobody re-derives it:**
+
+- The hand-offs stay on disk, stamped with `engine_commit`. They do not rot; the
+  ruling can be lifted later and prompt 6 run on exactly these files.
+- **No per-query rows exist and none will until the ruling is lifted.** W-87,
+  W-176 gates 4–9 and W-191 wait on a scored run and stay 🔴 — blocked on Arpit,
+  because only he lifts a "not now."
+- ⚠ **W-176 can be built and cannot land.** The 6E numbers are the strongest
+  signal the project has — over 90% of declines wrong, the gate abstaining more
+  on answerable than unanswerable — and the band fix is an obvious build. But
+  CLAUDE.md's sequencing rule says a milestone does not start while its gating
+  prediction is unmeasured, and without rows there is no floor to clear. **A
+  session that builds it files it as unmeasured, and does not switch it on.**
+- The other seven rungs are unrun. Phase 5 on them is unaffected by this ruling;
+  scoring them is.

@@ -1,0 +1,10 @@
+{
+  "arm": "ii",
+  "n": 60,
+  "better": 0,
+  "worse": 0,
+  "discordant": 0,
+  "net": 0,
+  "improvement_headroom": 40,
+  "regression_headroom": 20
+}

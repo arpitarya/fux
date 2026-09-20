@@ -29,6 +29,132 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-18 — the queue reads like English again, and W-168's cause turns out to be two lines  ·  Cowork (Opus 5)
+- **Asked:** Arpit, on W-168 at the top of the inbox — *"it's very hard to understand what you're talking about ... it needs to be a bit more human ... I'm not a PhD holder"*, and then: research how the unstemmed-identifier problem is solved elsewhere, with test cases run **before** the fix and **after** it.
+- **Did (the queue):** every inbox and open row in [`OPEN-WORK.md`](OPEN-WORK.md) reworded into plain English — a code like `KFS-2014` instead of *0 of 33 identifiers survive the analyzer*. **No ball, id, lane, wait edge or detail link changed**, and `test_open_work_rows_are_short` passes all 14 checks; `test_doc_links` and `test_record_paths_resolve` pass too.
+- **Did (the research):** [`proposals/identifier-exact-match.md`](proposals/identifier-exact-match.md) filed, plus a pointer block in [`open/W-168-search-improvements.md`](open/W-168-search-improvements.md) and **+4 sources** in [BIBLIOGRAPHY](../records/BIBLIOGRAPHY.md) §1b under **[3]**.
+- 🔴 **Decided / open — the cause is NOT a missing field.** **D1** `_WORD_RE`'s class holds `_` and not `-`, `.` or `/`, so *"whole AND parts"* is kept for `snake_case` and silently broken for every other separator — that is the underscore/hyphen asymmetry, at line level. **D2** `should_stem` protects digits and underscores but not all-letter acronyms, so Porter takes `kfs` to `kf`. Both in `query/analyzer.py`. Reproduced against the shipped code.
+- ⚠ **A correction to the survival run:** its *"a query spelled the way a person spells it cannot reach that piece at all"* is too strong — ingest and query import the same `analyze()`, so `DAIRY-2` matches `['dairi','2']`. **The loss is precision, not recall**: one rare term becomes two common ones. Step 2 stays a ranking fix under SR-RS d19.
+- **Next:** 🟢 **gate A** — re-run `tools/quality-controls/identifier_survival.py` before and after any analyzer change (before is measured: 0 of 33). It needs no Codex output, unlike gate B, which still waits on prompt 8.
+
+## 2026-09-18 — the queue grew a recap again, and the guard built for the first one never ran  ·  Claude Code (Opus 5)
+- **Asked:** Arpit, naming the two paragraphs under *Blocked on Arpit* directly — *"above lines in open work are non sense lines should never be added"*. A standing correction, not a one-off cleanup.
+- **Did:** deleted both paragraphs from [`work/OPEN-WORK.md`](OPEN-WORK.md) — the *"first three are a HAND, not a decision"* recap and the *"W-196 and W-197 were both ruled"* one. The inbox is its table and closes. **Nothing else in the file was touched**, and no row's text, ball or age changed.
+- 🔴 **The finding is not the prose — it is that this is strike two and the gate from strike one was never armed.** 2026-09-15 put narrative under an *emptied* table; `scripts/check-open-work-inbox.py` plus two PostToolUse hooks were written that day. The script **detects today's case correctly** — it exits 1 on the file as found — and **it never ran**: `.claude/settings.json` matched `Write|Edit|MultiEdit`, and the prose arrived through `Bash`. **A session told to prefer the shell edits every file that way**, so the matcher guarded nothing for three days while reading as green.
+- **Did (the gate — two strikes, [SR-WORK-SESSION](../records/0060_WORK-session.md) decision 13):** two repairs, both in this change. (1) `Bash` and `NotebookEdit` added to the PostToolUse matcher, with the reason written into the hook's header so the next narrowing has to argue with it. (2) **`test_the_inbox_carries_only_its_table`** in `tests/test_open_work_is_not_stale.py` — it **imports** `check-open-work-inbox.py` rather than reimplementing it, so the hook and the suite cannot drift about what rule 45a permits, and it runs where the writing tool cannot matter. Proved to bite: clean copy `None`, a copy with one reintroduced paragraph errors.
+- **Did (the record first, L0):** **rule 45a is amended and its scope was wrong before.** It read *"an empty inbox is declared, never inferred"* and spoke only of the emptied table; the script has always checked the populated case too, so the rule under-stated its own enforcement. It now reads *"the inbox section carries its table and nothing else — populated or empty"*, and carries both violations with the blind spot named. `owns:` re-stamped and `content_sha` recomputed by `scripts/sr-owns.py` / `scripts/sr-hash.py`.
+- **Decided / open:** ⚠ **Veto condition 2 already covered this** — *"`OPEN-WORK.md` grows a section that is not the list"* — and a veto condition is a thing a human checks, which is exactly the enforcement that failed here twice. **No rule was missing; a check was.** ⚠ **The generalisation was checked, not asserted.** Every hook matcher in `.claude/settings.json` and `.codex/hooks.json` was read. Codex's side was **never** exposed — it matches `shell|apply_patch` and would have caught this. One same-class hole remains and is named rather than fixed here: **`session-lock.sh` is PreToolUse on `Write|Edit|MultiEdit|NotebookEdit`**, so a `sed` edit takes no lock — which is [SR-WORK-SESSION](../records/0060_WORK-session.md) decisions 10–12's concurrent-session hazard, a different record's business, and not a thing to change inside a queue-hygiene fix.
+- **Next:** 🟢 **W-194** — delete `meta=hashed`, ratified 2026-09-17 and buildable now; 🟢 **W-198** and the two 2026-09-18 ratifications (W-199, W-200) behind it.
+
+## 2026-09-17 — 🔴 L11 BREACH declared: both golden keys were pasted into a Cowork Claude session  ·  Claude Code (Opus 5)
+- **Asked:** file the scored `rung-00100` golden run into `work/regression/2026-09-16-golden-rung-00100/`, and declare the breach that produced it. Filing only; no engine code.
+- 🔴 **The breach, stated as a breach and not an incident note.** A **Cowork Claude** session was pasted **both answer keys** — set 1 (125 rows), set 2 (124 rows), `key_version 1` — and scored them in chat, in [prompt 6E](golden/prompts/6E-codex-score-ephemeral.md)'s shape. **[L11](../records/0012_LAW-11-sealed-answer-key.md) reserves the paste route to Codex alone and closes it to every Claude session on every surface, Cowork by name.** The instruction to score was **void on the law's face** (decision 8: *say so and stop rather than comply*) and the session complied instead. **Nobody worked around a guard** — L11's own Consequences say the paste route is covered by prose and nothing else. Filed as **[W-196](../archive/open/W-196-l11-breach-2026-09-17.md)**, 🔴 in the inbox. **This session was pasted no key and requested none.**
+- 🔴 **What it cost: set 1's blind status, permanently until Arpit rules.** It was the benchmark's only half with a clean authorship story. **His ruling, two options, neither an agent's:** re-author set 1 through Codex and orphan its ids, or keep it and relabel it `informed` permanently. ⚠ **The cheap option is not obviously right** — relabelling keeps the instrument and retires the property it existed for.
+- **Did — the run is filed, and it is fenced.** `report.md` gains a 🔴 banner, a **scored overlay** section and the `## Authorship` table the per-run contract row 7 has required since 2026-08-25 and the report **never carried**; `ANALYSIS.md` is rewritten around a provenance block with the 2026-09-16 pre-scoring analysis kept unedited below it. **Every set 1 number reads `informed (L11 breach 2026-09-17)`, every set 2 number `informed`; no count in the run is labelled `blind`.** Both sets kept apart — **no mean, no total, no "both sets" row**. Index row and DOC-REGISTRY bumped.
+- 🔴 **Nothing here is citable, for two independent reasons**, and both are written into the run: **6E's own rule** (*no record, compare doc, CHANGELOG entry or work item, and no comparison with any other golden number*), and the breach. **No per-query rows exist**, so SR-RS decision 19's paired floor is uncomputable and **W-87, W-176, W-190, W-191 and W-195 stay blocked.** **Not reproducible by any agent** — scoring needs a key — recorded as provenance, not as a gap to close. **No engine change was proposed or made off these numbers.**
+- **The finding the report ends on:** **the abstention gate is the ceiling.** declined-but-answerable **33 of 113** (set 1) and **48 of 112** (set 2) against **3** and **4** correct abstentions. ⚠ **The instruction's own wording said "3–4×" and it was changed, not copied** — `33/3 = 11.0`, `48/4 = 12.0`; as rates it is 1.17× and 1.29×; the nearest 3–4× in the data is set 1's ratio between the two *error directions* (`33/9 = 3.7`), where set 2 reads `6.0`. **Direction and force unchanged, multiplier honest, substitution noted in the report.**
+- ⚠ **Two things the numbers do not support as tightly as they read.** `unsupported = 0` is checked on **79** rows and **unestablished on 170** — the rest cite generated siblings that are not committed, which is **a limit of the check, not a pass** — and **the 79's row set is not reconstructible** from the committed evidence (re-deriving gives 96 all-citations-committed, or 65 excluding declines). And **~12 rows were marginal judgement calls**, which is larger than most differences anyone would want to claim on a set this size.
+- 🔴 **The difficulty breakdown is BLOCKED, filed as such.** `key_version 1` carries no `difficulty` / `difficulty_static` / `difficulty_band` — reported by the scoring session, **recorded as reported and not verified** (checking a key's shape is Arpit's and Codex's, SR-WORK-GOLDEN decision 12). **So prompt 6E step 7 is unsatisfiable, which is a defect in the prompt.** **No band was derived from `type`, from the hand-off rows, or from fux's results.** New **[W-195](open/W-195-difficulty-band-breakdown.md)**, waiting on W-190, whose file now states the band is computed from the key by Arpit or Codex and **never by a Claude session**.
+- 🔴 **A plural spelling of the sealed directory is reported present in the tree** — **[W-197](open/W-197-stray-key-directory.md)**, 🔴 in the inbox. **It was not opened, listed, stat'd, globbed, hashed or deleted, and its existence was not even confirmed**: confirming it is a tool call reaching a path that may hold a key (L11 decision 5), and **deleting it is Arpit's** (*"until he does, its continued existence authorizes nothing"*). **Every guard in this repo was written against the singular spelling.**
+- 🔴 **TWO STRIKES → A GATE, built in this change.** **Strike one, 2026-09-13**: a `grep -r` over `work/` matched a key filename and put the path plus one key string into a Cowork context. **Strike two: this.** Two routes, **one class — golden-key material reaching a Claude context** — and they are precisely the two routes L11 names as unguarded. ⚠ **The class judgement is argued, not assumed**, because decision 13 is explicit that two unrelated mistakes are two mistakes. **[`tests/test_golden_key_never_committed.py`](../tests/test_golden_key_never_committed.py)**: 19 tests, green. It refuses a committed path under a sealed-key directory **on both spellings, answered from `git ls-files` so nothing is opened**, and refuses any committed file carrying a golden id beside a key-only field. 🔴 **It does not catch a paste and says so in its own docstring** — a hook matches what a tool call targets, and a key arriving in a chat is not a tool call. **It catches the downstream half**, where a leak becomes permanent and citable.
+- ⚠ **The gate's first run found a false positive and the fix is recorded in the file:** a substring match on `golden-answer` flagged `.claude/hooks/guard-golden-answer.sh` — **one of the guards.** Anchored to a path component instead, with both directions proved by parametrised cases, including the hand-off row shape (a golden id beside `answerable` and `answer_text`) that would otherwise have made the gate unusable.
+- 🔴 **`PRE-REGISTRATION.md` was NOT edited**, although the filing instruction listed it among the files to update. **A frozen pre-registration is never edited** (SR-RS decisions 1 and 10b; decision 18 is the worked precedent of correcting one from elsewhere). Everything that would have gone in it went into `ANALYSIS.md`.
+- **Proposed, deliberately not written:** SR-WORK-GOLDEN has **no decision covering a key that has already reached a Claude context.** L11 decision 10 says *declare it*; nothing says what the benchmark then **is**. **Arpit's ruling**, carried in W-196.
+- ⚠ **A queue deviation, named:** the instruction asked for a 🟡 row for W-195. **It is 🔴** — W-195 waits on W-190, whose chain ends at Arpit, and rule 25 is *red wins*. The row says `waiting on W-190` so rule 27's verb list still reads the edge, which is the shape W-161 already uses.
+- ⚠ **And a miss of my own:** rule 33 wants every 🔴 decision named in the session's **first** output, and my first line was a plan instead. Named here and in the closing answer.
+- **Next:** 🔴 **W-196 and W-197 are Arpit's and they are new today.** 🟢 **W-194 is still the queue's one green row** and is buildable now.
+
+## 2026-09-17 — 3.0.0-alpha.1 cut and published, carrying nothing  ·  Claude Code (Opus 5)
+- **Asked:** *"release the alpha version"* — after `3.0.0-alpha.0` had already gone out earlier in the same session. Checked ground truth rather than re-running: already live, `[Unreleased]` empty. Asked what was meant; **"cut 3.0.0-alpha.1"**.
+- **Pushed back once, with the two facts that had arrived since:** nothing shipped had changed (`git diff v3.0.0-alpha.0..main -- src/ node/ pyproject.toml hatch_build.py` empty), and a concurrent session had just ratified **W-194** — `meta=hashed` deleted, `fux.index` → v4, **L5 retires** — which is what a `3.0.0` alpha line exists to carry. Offered: wait for W-194, fold in the `node/package.json` `bin` fix, or cut it identical. **Arpit reaffirmed: cut it identical.** Done as asked.
+- **Did:** bumped all four version sites, added a `CHANGELOG.md` section that **leads with the release being empty**, committed `e25338a5`, waited for CI green on that exact sha, then tag `v3.0.0-alpha.1` (pre-release) → [publish run 35254145949](https://github.com/arpitarya/fux/actions/runs/35254145949). **PyPI `3.0.0a1`** and **npm `3.0.0-alpha.1` under `alpha`**, both installed from the registry and run: `fux 3.0.0-alpha.1`.
+- **Decided / open:** 🔴 **A version bump turns the tree RED, and it is procedure rather than breakage** — `SR-LAWS` owns `src/fux/__init__.py`, `SR-NODE-SEARCH` owns `node/`, so `test_sr_owns_hash.py` and `test_sr_freshness.py` fail until `scripts/sr-owns.py --write && scripts/sr-hash.py --write`. ⚠ **Run the stamper DRY first** — it writes *every* stale component, and this tree held another session's work; it reported exactly the two, so nothing of theirs was blessed. ⚠ **The number is spent regardless** — PyPI never permits a version to be reused, so `3.0.0a1` can never mean anything else.
+- **Concurrent session, declared:** W-194, `prompts/6E-codex-score-ephemeral.md`, W-175 and W-136 were being written and **staged** throughout. **Nothing of theirs was touched**; all three of this session's commits named their paths explicitly. **This entry was written last and deliberately left for whoever commits `WORKLOG.md` next**, because that file carried their staged entry and committing it would have taken their work.
+- **Next:** 🟢 **W-194 is the queue's one green row** and is buildable now — and it is the change the next alpha should carry.
+
+## 2026-09-18 — W-168 step 2 measured: ~90 % of id-queries already hit; the misses are unindexed frontmatter  ·  Cowork (Fable 5.1)
+- **Asked:** walk W-168; then *"Codex is not going to run it. You go ahead and
+  run it."*
+- **Did:** wrote 33 id-queries (one per seed identifier, targets by grep over
+  the seed, no key), copied rung-00100 / 01000 / 10000 out of `fux-lab` (folder
+  access granted in-session), re-ingested each copy on `7259bab7`, probed both
+  the question and the bare identifier:
+  [the run](regression/2026-09-18-identifier-headroom/report.md). **Primary
+  top-3: 30 / 29 / 30 of 33.** Mangling is symmetric — `dairi` is in the index.
+  **Headroom for the field: 3–4 of 33 at every rung, below the floor.** The
+  absolute miss, `QCL-IT-ADR-08`, lives only in frontmatter and `parse.py`
+  indexes body alone — confirmed with `find ADR` / `find Deshmukh`. Filed
+  **W-201** (which frontmatter keys are indexed — his). Corrected W-168's step 2
+  section and rows; prompt 8 withdrawn as the unblock. README row, registry
+  bump. **W-200 was taken by the other live session** (ingest provenance) — my
+  item became W-201; their plain-language rewrite of the queue rows was kept.
+- **Decided / open:** W-168 step 2 → his: drop the field, or commission a seed
+  with `PROJ-123`-shaped ids. W-201 → his: which keys, which field.
+- **Next:** all five original blockers walked. Claude Code has W-194, W-198,
+  W-199, W-200 green, plus W-175's two harness defects.
+
+## 2026-09-18 — five blockers walked; W-196/W-197 ruled; W-136 deferred; W-175 measured informed  ·  Cowork (Fable 5.1)
+- **Asked:** explain every blocker on him with examples and ratify one by one.
+- **Did:** **W-197** — he inspected the plural directory: it holds answer docs and
+  **stays**; filed [W-198](open/W-198-golden-answers-canonical.md) (L11 decision 3
+  amended, `golden-answers/` canonical, both spellings globbed, Cowork-mount
+  exposure recorded), W-197 🟡 on it. **W-196** — ruled *nothing*: exposure was at
+  scoring time, after the run; set 1 keeps its status; closed and archived, links
+  repointed. **W-136** — prompt 6 **deferred** ("6E is enough for now"); W-87,
+  W-176 g4–9, W-191 stay 🔴 on him lifting it; W-176's fix may be built but not
+  switched on. **W-175** — on his instruction, ran an **informed** arm with
+  Claude-authored corrections and paraphrases on fux's own records:
+  [the run](regression/2026-09-18-correction-generalisation-informed/report.md).
+  **0 of 60 paraphrases crossed top-3**; 12/12 own-questions rose at rank@20 but
+  only 4/12 reached top-3 at `ctx = 1.0`. Filed with README row and registry
+  bump; **no VERDICT.md** — the blind arm still decides. Corrected an earlier
+  statement in chat: this session received a scorer's report, not the keys.
+- **Decided / open:** W-168 (prompt 8) not yet walked. **A `ctx` weight sweep
+  with its own pre-registration precedes any generalisation verdict.** Another
+  session was live in the queue (W-199) — left alone.
+- **Next:** W-168; then Claude Code takes W-198 and W-194 (both 🟢) and W-175's
+  two harness defects.
+
+## 2026-09-17 — W-175's harness smoke-tested; two defects found  ·  Cowork (Opus 5)
+- **Asked:** *"W-175 you do the correction and create a report."* Pushed back —
+  the corrections and paraphrases are the two inputs an agent may not author, and
+  a Claude-written pair yields a number shaped exactly like a clean one. He chose
+  **B, the harness smoke test**.
+- **Did:** built a 3.12 venv and a 24-document throwaway corpus **outside the
+  repo**, wrote fixture paraphrases labelled `SMOKE-TEST ONLY — NOT blind, NOT
+  Codex`, and ran
+  [`correction_generalisation.py`](../tools/quality-controls/correction_generalisation.py)
+  end to end. Full path executes, exit 0; `.fux/enrich/` correct; every branch of
+  the arithmetic fired; SR-RS 22d's guard behaved on both a degenerate and a
+  healthy fixture. Findings written into
+  [W-175](open/W-175-correction-generalisation.md). **Nothing filed under
+  `work/regression/` and no number may be cited.** Scratch deleted; `git status`
+  clean throughout.
+- **Decided / open:** 🔴 **two defects to fix before the real run** — the
+  re-ingest return value is discarded, so a failed re-ingest is indistinguishable
+  from a true null; and corrections that fail to file still emit rows, biasing
+  the paired count toward the null. A third, lesser: a row with no target exits 0
+  with a tidy `0/0` table. ⚠ **Correction to a standing belief:** a Cowork bridge
+  shell **can** run fux — the blocker was only that `.venv/` is a macOS
+  virtualenv. A Linux venv built with `uv` outside the repo works.
+- **Next:** Claude Code fixes the two defects; the real run still waits on
+  Arpit running the Codex paraphrase prompt, arm (iii) first.
+
+## 2026-09-17 — `meta=hashed` ruled out of existence; W-194 filed  ·  Cowork (Opus 5)
+- **Asked:** *"url meta=hashed remove it keep only plain."*
+- **Did:** established that `meta` is a URL-only attribute with exactly two
+  values, so removing `hashed` removes the attribute and retires **L5**. Mapped
+  the blast radius — 40 source files, both language twins, 22 records, 15 test
+  modules, the shipped agent skills and the paper figures. Filed
+  [W-194](open/W-194-delete-hashed-meta.md) and its 🟢 row. **Nothing built.**
+- **Decided / open:** two scoping calls answered in-chat — **delete outright**
+  (the `fux update` precedent, no deprecation window) and **drop `title_h` from
+  the shape, `fux.index` → v4** (existing indexes rebuild). The ACL-mismatch
+  leak L5 closed becomes an **accepted, documented exposure**; the superseding
+  record must say so and keep the reopen trigger. Open: nothing — W-194 is
+  buildable as written.
+- **Next:** Claude Code builds W-194. It is the queue's only green row.
+
 ## 2026-09-17 — 3.0.0-alpha.0 merged to `main` and published to both registries  ·  Claude Code (Opus 5)
 - **Asked:** *"merge everything to main branch and release the alpha version. Publish it as well."*
 - **Did:** verified before merging, not after — both suites whole (**4 893 unit / 2 skipped · 145 e2e · 36 Node**), version parity across all four sites plus the built bundle, and CI green on the **exact** HEAD sha `5bbcb597`. Merged [#48](https://github.com/arpitarya/fux/pull/48) (81 commits, 1 007 files) as merge commit `92922855`; cut tag `v3.0.0-alpha.0` as a **pre-release**, with the `CHANGELOG.md` section as its notes. [Publish run 35191354119](https://github.com/arpitarya/fux/actions/runs/35191354119) green in both jobs. `CHANGELOG.md`'s `3.0.0-alpha.0` date corrected `2026-09-16` → `2026-09-17`, the day it actually went out.

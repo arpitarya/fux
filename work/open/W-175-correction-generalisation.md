@@ -58,6 +58,56 @@ network (W-177 made the bare verb networked).
 [the Codex prompt](../regression/2026-09-15-correction-generalisation/prompt-codex-paraphrases.md),
 arm (iii) first.
 
+## ✅ SMOKE-TESTED 2026-09-17 (Cowork) — it runs end to end, and it has two defects
+
+**Arpit, 2026-09-17: *"B — harness smoke test."*** Run on a **throwaway corpus
+outside the repo**, with **Claude-written fixture paraphrases** explicitly
+labelled `SMOKE-TEST ONLY — NOT blind, NOT Codex`. 🔴 **No number below is
+evidence, nothing was filed under `work/regression/`, and none of it may be
+cited.** The scratch tree is deleted.
+
+**What was proved.** 24-document corpus, 4 corrections, 12 paraphrases. The
+whole path executes: before-measure → `fux correct` → `ingest --no-fetch` →
+after-measure → row emission → summary JSON, exit 0. `.fux/enrich/` carried four
+files with `model: none (human correction)` and `corrections: 1`, as designed.
+Every branch of the arithmetic fired at least once — `better=1`, `worse=0`,
+`discordant=1`, and both headroom directions non-zero, so SR-RS **22d's
+INCONCLUSIVE guard correctly stayed silent** (it fired, correctly, on an earlier
+fixture where every paraphrase already hit).
+
+### 🔴 Two defects to fix BEFORE the real run
+
+1. **`reingest()`'s return value is discarded** — `run.py` line 132, `if filed:
+   reingest(tree)`. If the re-ingest fails, `after` is measured against a
+   **stale index** and the correction reads as *"did not generalise."* **A
+   broken step and a true null are indistinguishable in the output** — the exact
+   failure mode this item exists to avoid. It must be a hard stop.
+2. **Corrections that fail to file still emit rows** — `filed=False` is printed
+   to stderr and the run continues; `usable` filters only on `None`, never on
+   `filed`. Each unfiled correction then contributes M rows with
+   `before == after` **guaranteed**, inflating the denominator and biasing the
+   paired count toward the null. Exclude them, or stop.
+
+⚠ **Third, lesser:** a paraphrase row with no `should_win`/`target` is skipped
+with a stderr line and the run still exits **0**, printing a tidy `0/0`
+inconclusive table. A fixture whose targets are all missing therefore looks like
+a result. (A nonexistent `--tree` does exit 1, via traceback.)
+
+### What the smoke test could NOT prove
+
+- **Nothing about whether corrections generalise.** The fixtures are the
+  measurer's own words; that is the disqualifying condition, deliberately
+  accepted here because the subject under test was the runner, not fux.
+- **Discriminating power at the real N.** On a 4-document corpus every
+  paraphrase hit before the correction — top-3 of 4 documents is not a test.
+  🔴 **Check both headroom directions are non-zero on the real corpus before
+  trusting any net**, exactly as 22d says.
+
+**Environment note.** The harness ran from a **Cowork bridge shell**, against a
+3.12 venv built outside the repo with `uv` — so [the standing note that a bridge
+session cannot run fux](../MACHINE.md) is about the **macOS `.venv/`**, not about
+the VM. Nothing was written into the repo; `git status` stayed clean.
+
 ---
 
 # W-175 — does a correction generalise, or does it only fix its own phrasing?
@@ -157,3 +207,33 @@ Three of its inputs are not mine to produce:
 
 SR-ENRICH (decision 19's keep/remove) · the compare doc's verdict block ·
 a `VERDICT.md` beside the evidence.
+
+## ✅ INFORMED RUN 2026-09-18 (Cowork, on Arpit's instruction) — 0 of 60 paraphrases moved
+
+**Arpit, 2026-09-18:** *"You go ahead and generate a set of questions and
+answers, and then try to test it out. See how that correction works."* — an
+explicit override of the authorship rule above, for one arm, filed as what it is.
+
+[The run](../regression/2026-09-18-correction-generalisation-informed/report.md)
+· [analysis](../regression/2026-09-18-correction-generalisation-informed/ANALYSIS.md).
+**`informed` twice over** — corrections and paraphrases both Claude's, corpus
+fux's own `records/` + `docs/`. 🔴 **It files no `VERDICT.md` and does not rule
+keep/remove**; the pre-registration's blindness condition is unmet and the Codex
+arm (iii) is still the one that decides.
+
+| endpoint | result |
+|---|---|
+| top-3, 60 paraphrases, before → after | **0 discordant, net 0** — the frozen table's *impossible* row; headroom 40 / 20, so not a ceiling |
+| rank@20, the correction's **own** question (12) | **12 of 12 rose**; **4 of 12** reached top-3 |
+| rank@20, paraphrases (60) | **3 of 60 rose**, each sharing a token with its correction line; **0 fell** |
+
+**Reading:** the `ctx` line lifts exactly the words it carries. That is the
+compare doc's **(a)** — *one phrasing fixed, the next still wrong* — observed,
+not predicted. ⚠ **And a weight question comes first:** at `ctx = 1.0` a
+correction cannot fix its **own** phrasing 8 times in 12 on 96 documents. A
+`ctx` sweep with its own pre-registration (ANALYSIS change A) belongs before any
+generalisation verdict, blind or otherwise — a transfer test on a field too weak
+to win its own case measures nothing.
+
+**Unchanged by this run:** the harness, the pre-registration, the two defects
+above, and what Arpit's hand is — the Codex paraphrase prompt, arm (iii) first.

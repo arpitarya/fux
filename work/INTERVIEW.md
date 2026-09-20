@@ -32,8 +32,49 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-09-17** (Claude Code, 3.0.0-alpha.0 released).* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-09-17** (Claude Code, the L11 breach).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
+
+### 🔴 AN L11 BREACH HAPPENED, AND THE BENCHMARK'S BLIND HALF IS GONE (2026-09-17, Claude Code)
+
+**Read this before touching anything under `work/golden/` or citing any golden
+number.**
+
+- 🔴 **A Cowork Claude session was pasted BOTH answer keys** — set 1 (125 rows),
+  set 2 (124 rows), `key_version 1` — **and scored the `rung-00100` hand-offs in
+  chat.** [L11](../records/0012_LAW-11-sealed-answer-key.md) gives the paste
+  route to **Codex alone** and closes it to every Claude session on every
+  surface. **The instruction to score was void on the law's face and the session
+  complied with it.** Declared as [W-196](../archive/open/W-196-l11-breach-2026-09-17.md).
+- 🔴 **Set 1's blind status is spent.** It was the only half of this benchmark
+  with a clean authorship story. **Arpit rules: re-author set 1 through Codex and
+  orphan its ids, or keep it and relabel it `informed` permanently.** ⚠ **The
+  cheap option is not obviously the right one** — relabelling keeps the
+  instrument and retires the property it existed for.
+- 🔴 **Nothing scored in that session may be cited**, for two independent
+  reasons: [prompt 6E](golden/prompts/6E-codex-score-ephemeral.md)'s own rule,
+  and the breach. **It is filed and fenced** —
+  [the run](regression/2026-09-16-golden-rung-00100/ANALYSIS.md) — and **no
+  engine change may be made off it.** **No count in that run is labelled `blind`.**
+- 🔴 **Prompt 6 is STILL UNRUN and nothing behind W-136 unblocked.** 6E files no
+  per-query rows, so SR-RS decision 19's paired floor is uncomputable and
+  **W-87, W-176, W-190, W-191 and W-195 stay blocked.**
+- **The one finding worth carrying (uncitable, but true of the engine):** **the
+  abstention gate is the ceiling.** declined-but-answerable **33 of 113** (set 1)
+  and **48 of 112** (set 2) against **3** and **4** correct abstentions.
+- 🔴 **[W-197](open/W-197-stray-key-directory.md): a PLURAL spelling of the
+  sealed directory is reported present in the tree.** Every guard here was
+  written against the singular. **Do not open, list, stat, glob, hash or delete
+  it — not even to confirm it exists.** Arpit removes it himself.
+- **Two strikes → a gate, built:**
+  [`tests/test_golden_key_never_committed.py`](../tests/test_golden_key_never_committed.py),
+  19 green. Strike one was the 2026-09-13 `grep -r`. ⚠ **It catches a key
+  reaching a committed byte and NOT a paste**, and its docstring leads with that
+  — a hook matches what a tool call targets, and a paste is not a tool call.
+- ⚠ **`key_version 1` carries no difficulty band**, so prompt 6E step 7 is
+  unsatisfiable — [W-195](open/W-195-difficulty-band-breakdown.md). **The band is
+  computed from the key by Arpit or Codex, never by a Claude session**, and never
+  from `type` or from fux's own results.
 
 ### 3.0.0-alpha.0 is MERGED and RELEASED — the branch is gone (2026-09-17, Claude Code)
 
@@ -2453,6 +2494,21 @@ the reason is that the measuring environments are gone.**
 
 *Updated **2026-09-12** (Claude Code, Opus) — maintainer line: this session.*
 *Updated **2026-09-13** (Cowork, Opus) — maintainer line: this session.*
+*Updated **2026-09-17** (Claude Code, Opus 5) — maintainer line: this session.*
+
+**Immediate next step: 🟢 [W-194](open/W-194-delete-hashed-meta.md)** — delete
+`meta = "hashed"`, `fux.index` → v4, **L5 retires**. Ratified 2026-09-17, not
+built, and **the queue's only green row.**
+
+🔴 **Two new decisions are Arpit's and they are both from today:**
+[W-196](../archive/open/W-196-l11-breach-2026-09-17.md) (the L11 breach — re-author set 1,
+or relabel it `informed` permanently) and
+[W-197](open/W-197-stray-key-directory.md) (the plural key directory — **nobody
+else may even look**). **Neither blocks W-194.**
+
+⚠ **Nothing in the golden measurement chain moved and nothing is unblocked.**
+Prompt 6 is still unrun; W-87, W-176, W-190, W-191 and W-195 all still wait on
+it.
 
 ### The golden benchmark was reset and rebuilt (2026-09-15, Cowork)
 

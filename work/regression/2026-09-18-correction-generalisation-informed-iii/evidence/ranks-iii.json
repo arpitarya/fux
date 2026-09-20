@@ -1,0 +1,453 @@
+[
+  {
+    "kind": "own_question",
+    "correction_id": "c-02",
+    "rank_before": null,
+    "rank_after": 7
+  },
+  {
+    "kind": "own_question",
+    "correction_id": "c-03",
+    "rank_before": 4,
+    "rank_after": 1
+  },
+  {
+    "kind": "own_question",
+    "correction_id": "c-04",
+    "rank_before": 15,
+    "rank_after": 1
+  },
+  {
+    "kind": "own_question",
+    "correction_id": "c-05",
+    "rank_before": null,
+    "rank_after": 8
+  },
+  {
+    "kind": "own_question",
+    "correction_id": "c-06",
+    "rank_before": null,
+    "rank_after": 1
+  },
+  {
+    "kind": "own_question",
+    "correction_id": "c-07",
+    "rank_before": null,
+    "rank_after": 6
+  },
+  {
+    "kind": "own_question",
+    "correction_id": "c-08",
+    "rank_before": 11,
+    "rank_after": 1
+  },
+  {
+    "kind": "own_question",
+    "correction_id": "c-09",
+    "rank_before": 4,
+    "rank_after": 1
+  },
+  {
+    "kind": "own_question",
+    "correction_id": "c-10",
+    "rank_before": null,
+    "rank_after": 11
+  },
+  {
+    "kind": "own_question",
+    "correction_id": "c-11",
+    "rank_before": 7,
+    "rank_after": 2
+  },
+  {
+    "kind": "own_question",
+    "correction_id": "c-12",
+    "rank_before": 16,
+    "rank_after": 2
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-02",
+    "paraphrase": "prevent repo deletion org policy setting",
+    "rank_before": 1,
+    "rank_after": 1
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-02",
+    "paraphrase": "Is there a way to make sure only owners, and nobody below them, are able to remove or transfer a project?",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-02",
+    "paraphrase": "how do i lock down repo deltion so a team lead cant nuke a codebase by acident",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-02",
+    "paraphrase": "Someone wiped a project last quarter \u2014 what control keeps that from happening again account-wide?",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-02",
+    "paraphrase": "For our audit we need destructive actions on code repositories confined to a named group; which policy governs that?",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-03",
+    "paraphrase": "actions script injection risk",
+    "rank_before": 1,
+    "rank_after": 1
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-03",
+    "paraphrase": "What is the security problem with interpolating user-supplied text from an event payload directly into a shell command in a workflow?",
+    "rank_before": 14,
+    "rank_after": 14
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-03",
+    "paraphrase": "why is it bad to use ${{ github.event.issue.title }} inside a run comand",
+    "rank_before": 2,
+    "rank_after": 2
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-03",
+    "paraphrase": "A contributor could write something clever in a bug report and it ends up executing on our builder \u2014 how does that happen?",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-03",
+    "paraphrase": "Explain the attack where attacker-controlled context values get expanded into a pipeline command before the shell ever sees them.",
+    "rank_before": 3,
+    "rank_after": 3
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-04",
+    "paraphrase": "share one codespace with a teammate simultaneously",
+    "rank_before": 8,
+    "rank_after": 8
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-04",
+    "paraphrase": "Is a cloud dev environment usable by more than one developer concurrently, or is it bound to a single account?",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-04",
+    "paraphrase": "can me and my coworker work in one codepsace together at teh same moment",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-04",
+    "paraphrase": "I want to pair program inside my remote container without handing over my credentials \u2014 is that supported?",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-04",
+    "paraphrase": "Do our on-demand development environments allow joint sessions, or does each engineer need a separate instance?",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-05",
+    "paraphrase": "send edits back to original repo from a fork",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-05",
+    "paraphrase": "After copying someone else's project into my own account and fixing something, how do I offer that fix upstream?",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-05",
+    "paraphrase": "how do i submit my changes back to the orignal repositry i copied from",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-05",
+    "paraphrase": "I fixed a typo in an open source library on my own copy \u2014 who reviews it and how do I get it in front of them?",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-05",
+    "paraphrase": "What is the workflow for opening a request against the upstream branch from my personal clone?",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-06",
+    "paraphrase": "grant issue deletion permission to a member",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-06",
+    "paraphrase": "Which permission level does a person need before they can permanently remove a bug report, and how do I give it to them?",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-06",
+    "paraphrase": "how do i alow a teammate to delet isues in our repos",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-06",
+    "paraphrase": "Spam tickets keep piling up and my triager says the remove option is greyed out for her \u2014 what do I change?",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-06",
+    "paraphrase": "What role assignment enables destructive removal of tracker items for a user in our account?",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-07",
+    "paraphrase": "revoke org membership offboarding",
+    "rank_before": 1,
+    "rank_after": 1
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-07",
+    "paraphrase": "An employee left the company today; what are the steps to take away their access to all of our team's repositories at once?",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-07",
+    "paraphrase": "how do i kick a persn out of our github org",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-07",
+    "paraphrase": "A contractor's engagement ended \u2014 where do I go so they no longer appear in our people list at all?",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-07",
+    "paraphrase": "During offboarding, which action deprovisions a user from the whole account rather than from one project?",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-08",
+    "paraphrase": "restrict notifications to a verified domain",
+    "rank_before": 1,
+    "rank_after": 1
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-08",
+    "paraphrase": "Can we make sure work-related activity alerts only ever land in company inboxes and never in someone's private mail?",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-08",
+    "paraphrase": "how do we force notifcations to go to our corprate domain instead of gmail acounts",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-08",
+    "paraphrase": "Our security review flagged that build failure messages reach whatever address a developer signed up with \u2014 what setting fixes that?",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-08",
+    "paraphrase": "Which control confines outbound activity mail for the account to an approved domain we own?",
+    "rank_before": 4,
+    "rank_after": 4
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-09",
+    "paraphrase": "apply suggestion from code review and commit it",
+    "rank_before": 1,
+    "rank_after": 1
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-09",
+    "paraphrase": "My teammate proposed exact replacement lines in a comment on my branch \u2014 how do I take them without editing the file myself?",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-09",
+    "paraphrase": "how do i commit the code somone suggsted in a review coment",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-09",
+    "paraphrase": "There's a little block in the feedback with a button-looking thing \u2014 what do I press to make that edit real?",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-09",
+    "paraphrase": "What is the procedure for merging inline proposed edits from a reviewer into my branch, one at a time or in a batch?",
+    "rank_before": 3,
+    "rank_after": 3
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-10",
+    "paraphrase": "multiple jobs in one workflow yaml",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-10",
+    "paraphrase": "In a single automation file, how do I define several separate units of work that run in parallel or in sequence?",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-10",
+    "paraphrase": "how do i add a secnod job to my worklow file",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-10",
+    "paraphrase": "I want build and test to happen on different runners from the same trigger \u2014 what does that config look like?",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-10",
+    "paraphrase": "What is the syntax for declaring several jobs, with dependencies between them, in one pipeline definition?",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-11",
+    "paraphrase": "restrict pull request approval rights account wide",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-11",
+    "paraphrase": "Is there an account-level setting that controls which people are allowed to sign off on proposed code changes?",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-11",
+    "paraphrase": "how do we limmit approval rights on PRs across all our repos",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-11",
+    "paraphrase": "Anyone in the company can currently give a green tick on a change \u2014 how do we narrow that down to a smaller group?",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-11",
+    "paraphrase": "For separation of duties, which control confines review sign-off authority to designated staff across our account?",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-12",
+    "paraphrase": "codespaces support contact channel",
+    "rank_before": 13,
+    "rank_after": 12
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-12",
+    "paraphrase": "Where do I raise a ticket when my cloud development environment is broken and the documentation does not cover it?",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-12",
+    "paraphrase": "who do i contct when my codespce wont start and i need offical help",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-12",
+    "paraphrase": "My remote workspace has been stuck for a day and my team can't unblock me \u2014 where does a problem like this go?",
+    "rank_before": null,
+    "rank_after": null
+  },
+  {
+    "kind": "paraphrase",
+    "correction_id": "c-12",
+    "paraphrase": "What is the escalation route to the vendor's assistance team for issues with hosted dev environments?",
+    "rank_before": null,
+    "rank_after": null
+  }
+]

@@ -79,7 +79,7 @@
     ],
     "PostToolUse": [
       {
-        "matcher": "Write|Edit|MultiEdit",
+        "matcher": "Write|Edit|MultiEdit|NotebookEdit|Bash",
         "hooks": [
           {
             "type": "command",

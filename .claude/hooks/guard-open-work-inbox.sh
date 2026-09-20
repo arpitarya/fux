@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
-# PostToolUse(Write|Edit|MultiEdit) — catches a malformed "Blocked on Arpit"
-# section the moment a session writes one, instead of at the next test run.
+# PostToolUse(Write|Edit|MultiEdit|NotebookEdit|Bash) — catches a malformed
+# "Blocked on Arpit" section the moment a session writes one, instead of at
+# the next test run.
+#
+# 🔴 `Bash` is in the matcher because leaving it out cost the guard its
+# second catch: on 2026-09-18 two paragraphs of recap landed under a populated
+# table through `sed`, and this hook never fired. A session told to prefer the
+# shell edits every file that way, so a matcher naming only the edit tools
+# guards nothing. The gate is tests/test_open_work_is_not_stale.py; this is the
+# in-session copy of it.
 #
 # The rule enforced is SR-WORK-OPEN-QUEUE rule 45a — stated once there, NOT
 # here (L0): an emptied inbox table is followed by exactly one

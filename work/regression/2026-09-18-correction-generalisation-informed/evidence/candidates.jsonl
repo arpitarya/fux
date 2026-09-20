@@ -1,0 +1,45 @@
+{"q":"can I add a paid API if it makes results better","t":"records/0003_LAW-1-zero-cost.md"}
+{"q":"why does the tool refuse to call the network on its own","t":"records/0006_LAW-4-offline-by-default.md"}
+{"q":"is it okay to keep a copy of the wiki page locally","t":"records/0004_LAW-2-content-never-durable.md"}
+{"q":"where do I look up who last asked a question","t":"records/0010_LAW-8-use-record.md"}
+{"q":"what ships to the npm consumer, the source or something compiled","t":"records/0011_LAW-10-bundled-output.md"}
+{"q":"why is it called an index and not a database","t":"records/0008_LAW-6-say-index.md"}
+{"q":"which python versions are supported","t":"records/0009_LAW-7-python-311.md"}
+{"q":"what makes two runs on the same input produce the same bytes","t":"records/0005_LAW-3-deterministic.md"}
+{"q":"who is allowed to change a rule that other documents depend on","t":"records/0002_LAW-0-authority.md"}
+{"q":"how do I know if a page is behind a login wall","t":"records/0146_refusals.md"}
+{"q":"where are downloaded web page bytes kept between runs","t":"records/0145_acquired-plane.md"}
+{"q":"how long before a web source is considered out of date","t":"records/0147_url-freshness.md"}
+{"q":"what stops credit card numbers ending up in the committed files","t":"records/0148_pii.md"}
+{"q":"how do I read spreadsheets into the corpus","t":"records/0150_tabular.md"}
+{"q":"how are long documents split into pieces","t":"records/0151_chunking.md"}
+{"q":"what does the health check command verify","t":"records/0152_doctor.md"}
+{"q":"how does the javascript side find its way to the engine","t":"records/0153_node-search.md"}
+{"q":"is there a way to call this from my own program instead of the shell","t":"records/0154_api.md"}
+{"q":"how do I get told when someone runs a query","t":"records/0157_observe.md"}
+{"q":"why did the search give me a bad match and how do I see the reasoning","t":"records/0141_confidence.md"}
+{"q":"how do I prove an answer came from where it says","t":"records/0142_provenance.md"}
+{"q":"can I change how much output the commands print by default","t":"records/0143_output-defaults.md"}
+{"q":"how do I stop a folder from being indexed","t":"records/0144_fuxignore.md"}
+{"q":"what happens when two branches both changed the index","t":"records/0130_merge-driver.md"}
+{"q":"how do I make the index update itself on every commit","t":"records/0129_hooks.md"}
+{"q":"two processes writing at once, what protects the files","t":"records/0140_locks.md"}
+{"q":"how do I serve this to an ai coding assistant","t":"records/0136_mcp.md"}
+{"q":"how do I reorder results using a second pass","t":"records/0138_rerank.md"}
+{"q":"where do I put a converter for a file type you do not know","t":"records/0139_decode.md"}
+{"q":"how do I widen a query when the words don't match the docs","t":"records/0149_expand.md"}
+{"q":"how do i see which documents are unreachable by any search","t":"records/0156_inspect.md"}
+{"q":"where are ranking weights configured","t":"records/0135_tuning.md"}
+{"q":"what does retired documentation do to search results","t":"records/0134_archived-content.md"}
+{"q":"how do I follow links from one document to related ones","t":"records/0126_graph.md"}
+{"q":"which files should I commit and which are generated","t":"records/0102_fux-directory.md"}
+{"q":"how is a page fetched with my browser cookies","t":"records/0118_cdp-fetcher.md"}
+{"q":"what happens if a file has no known format","t":"records/0128_types-list.md"}
+{"q":"why is there a CACHEDIR.TAG file","t":"records/0121_cachedir-tag.md"}
+{"q":"what exit codes do the commands return","t":"records/0101_cli-surface.md"}
+{"q":"how do I get the single best passage rather than a list","t":"records/0105_answer.md"}
+{"q":"how do I run a task that needs a decision from the owner","t":"records/0064_WORK-blockers.md"}
+{"q":"how big a corpus are we allowed to promise for","t":"records/0057_WORK-scale.md"}
+{"q":"how do I publish a new version","t":"records/0063_WORK-release.md"}
+{"q":"what do I have to write before finishing a session","t":"records/0060_WORK-session.md"}
+{"q":"what counts as a question being hard","t":"records/0066_WORK-golden.md"}
