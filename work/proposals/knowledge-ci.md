@@ -27,8 +27,16 @@ trust in one week. Deliberately parked until the engine dogfoods clean.
 confidence floor post as non-blocking review comments citing doc + line +
 sha. Advisory first, blocking never before a measured false-positive rate.
 
-**Graduation trigger.** M6 lands and the fux repo itself runs (a)
-green for two weeks; then (b) prototypes against this repo's own SRs.
+**Graduation trigger.** 🔴 **Restated 2026-09-20 without M6 or M4** (W-206 B1):
+**fux's own CI runs `fux ingest --check` green for two weeks**; then (b)
+prototypes against this repo's own records.
+
+⚠ **The milestone names had to go.** The trigger read *"M6 lands and…"*, and the
+milestone plan they belong to is retired — a condition nobody can evaluate is a
+wish, which is what this directory's own rule forbids. **The restatement is the
+same condition in checkable words**: `fux ingest --check` is the verb that
+exists today, and *green for two weeks on this repo* is a fact anyone can read
+off CI.
 
 **References.** Council visionary seat (WORKLOG 2026-08-09) · paper §1.1
 (agents act on answers) · the Fux founding objective (deviations can't

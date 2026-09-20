@@ -2,7 +2,7 @@
 type: Compare Doc
 title: "Table cells inflate `flen` — exclude them, weight them down, or leave the length alone"
 description: "A markdown table's cells count toward a document's body length, so BM25F's length normalisation reads a table-heavy document as denser than it is. Measured: the shipped ranker loses to a less relevant document above a table share of ~0.29, a share a third of the golden ladder exceeds. Three ways to respond, one recommendation, and the property that decides between them."
-status: proposed
+status: decided (Arpit, 2026-09-16, option d — `b = 0.15`, W-144 PASS)
 timestamp: 2026-09-12T00:00:00Z
 filed: 2026-09-12
 ---

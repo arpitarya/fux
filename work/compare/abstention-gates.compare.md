@@ -2,7 +2,7 @@
 type: Compare Doc
 title: "Abstention — which gates decide `answerable`, and how the signals combine"
 description: "Graduates option C of the abstention-gate proposal. fux says `answerable: true` on all 20 blind-authored unanswerable questions because the boolean is false only when nothing scores. Nine candidate mechanisms in two gates — a retrieval gate (IDF-weighted coverage, QPP, graph coherence, identifier hard-fail) and an answer gate (passage co-occurrence, answer-type check, verification floor) — plus C2 and consumer steering. Ruled by Arpit 2026-09-13: the verdict is a GATE CHAIN, never a blended number, and every independent signal is RETURNED as its own field, visibility set in output.toml. Which gates ship, and their floors, is proposed, not accepted."
-status: proposed
+status: decided (Arpit, 2026-09-14, option a)
 timestamp: 2026-09-13T00:00:00Z
 filed: 2026-09-13
 ---

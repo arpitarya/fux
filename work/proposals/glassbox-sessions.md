@@ -55,24 +55,38 @@ Three things that already exist make it fit better than it has any right to:
 
 ---
 
-## 2. 🔴 One line in `src/` blocks it today
+## 2. ✅ The blocker is GONE — shipped 2026-09-15
 
-The `fetch=` attribute's **value set is closed**, not open:
+🔴 **STRUCK 2026-09-20 (W-206 B1). This section described a live blocker and it
+had not been one for five days.**
+
+The `fetch=` attribute's value set **was** closed:
 
 ```python
-# src/fux/ingest/sourcelist.py:263
+# src/fux/ingest/sourcelist.py:263, until 2026-09-15
 Attribute("fetch", ("http", "cdp"), "http"),
 ```
 
-A line saying `fetch=glassbox` is rejected by the grammar before `urlsrc.py`
-ever gets to resolve the name to a file. ⚠ **The module docstring and the
-resolution logic already support an open set; the validator does not.** The two
-have drifted, and this proposal is what found it.
+so `fetch=glassbox` was rejected by the grammar before `urlsrc.py` could resolve
+the name to a file — while the module docstring and the resolution logic already
+described an open set. **The W-83 class**, and this proposal is what found it.
 
-**This is the W-83 class** — a record describing behaviour the code does not
-have: *a third fetcher of any kind is currently impossible*, and neither
-[SR-URL-LIST](../../records/0116_url-list.md) nor
-[SR-CDP-FETCHER](../../records/0118_cdp-fetcher.md) says it should be.
+✅ **W-178 made it typed on 2026-09-15** (Arpit's ruling): `fetch=` names a
+**file**, the grammar validates the *shape* of the name only, and
+`.fux/decoders/`-style consumer ownership reaches `.fux/fetchers/` too —
+[SR-URL-LIST](../../records/0116_url-list.md) decision 15. A third fetcher is
+possible today and `tests_e2e/test_verbs.py` proves it end to end with a
+consumer's own `glassbox.py`.
+
+⚠ **It moved again on 2026-09-20** (W-199): `fetch=` is now **mandatory** on
+every line, there is **no default fetcher**, and a host map lives in
+`[sources.url.routes]` — so the connection point this proposal needs is not only
+open, it is routed.
+
+🔴 **What still blocks this proposal is §6, not §2** — the two forks about what
+to index (dossiers, not DOM snapshots) and whether thousands of session lines
+break `sources/urls`' human-ordered premise. **The graduation trigger is
+unchanged**: a second event-stream source being asked for.
 
 ✅ **Ruled, and SHIPPED the same day** (W-178, 2026-09-15) — it went further
 than this proposal asked: Arpit ruled the **symmetry**, so a consumer drops a

@@ -13,6 +13,8 @@ are the directory's; nothing about the findings changed.
 
 # SR review — 2026-08-28
 
+⚠ **THE REGISTER IS 88 RECORDS NOW, NOT 47** (checked 2026-09-20, W-206 B1). Every count below is **as of 2026-08-28** and none has been re-derived; *"broken in 20–45 of 47"* says nothing about the 41 records filed since. **The graduation trigger is unchanged** — lint tests plus one bulk pass — and some of it has landed (`test_sr_ownership`, `test_sr_freshness`, `test_sr_content_hash`, the `describes` relation) **without anyone reconciling this list against it**.
+
 **Scope.** All 47 live records in `records/` plus `README.md`, `TEMPLATE.md`, `RULE-SINCE`, read against the register's own rules. Only `records/` was read; every claim about `src/` or `tests/` below is *record-vs-record*, not record-vs-code. Line numbers are from the files as of 2026-08-28.
 
 **One-line verdict.** The rule set is excellent; the records don't follow it, and nothing mechanical notices. Five rules (`no history`, `ten keys`, `veto = checkable`, `References = index of the body`, `never an archived doc as grounding`) are each broken in 20–45 of 47 records. The fix is not 47 rewrites — it is ~6 new lint tests, then one bulk pass, then `RULE-SINCE` moves.

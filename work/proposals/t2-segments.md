@@ -1,6 +1,5 @@
 ---
 type: Proposal
-name: t2-segments
 title: "T2 segments — measured, and not built"
 description: "M6's first question, answered by measurement: the T1 accelerator answers in 12.46 ms worst-case at the 10 000-document design point against a 150 ms bar, so the mmap byte-aligned segment tier is not built. The name is spent on a decision not to build, the tier-auto knob is not created, and the reopen condition is a number rather than a size."
 status: proposed

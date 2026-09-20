@@ -182,7 +182,7 @@ reproducibility, that is the worse trade.
 | | state |
 |---|---|
 | **retrieval metrics** | hit@5 and MRR, used since the archived engine. Real, reproducible, and **never declared as the contract** |
-| **the query mix** | **undeclared.** 50 goldens in the playground, provenance and class balance unstated |
+| **the query mix** | **undeclared.** 50 goldens in the playground, provenance and class balance unstated. ⚠ **That environment was retired 2026-09-11** (L9); the live query sets are the golden ladder's |
 | **unanswerable** | **not measured at all.** Fux can decline; nothing scores whether it declines *well* |
 | **cost model** | **implicit and flat** — a fabricated citation and an honest decline score identically |
 | **the judged gate** | **not measured** |
@@ -322,7 +322,13 @@ future sessions can be held to.
 **Costs, stated rather than discovered:**
 
 - **`recall@k` is not computed today.** It needs known-relevant sets per query,
-  which is real annotation work on the 50 goldens.
+  which is real annotation work. ⚠ **This said *"on the 50 goldens"*** — the
+  **playground** goldens, and that environment was retired by
+  [SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md) on 2026-09-11
+  (L9). The annotation work did not go away; **its home is the golden ladder**,
+  where the two released question sets carry `relevant` lists and a `complete`
+  flag. Corrected 2026-09-20 (W-206 A1), the same correction the bullet below
+  already carried.
 - **The `unanswerable` class does not exist** and must be authored — and
   authored **blind**, or it contaminates the set it is meant to test (the W-78
   lesson). ⚠ **This said *"in the playground"***; that environment was retired
@@ -346,8 +352,14 @@ Reopen this verdict when **any** becomes true:
 3. **A judged series and the deterministic series disagree on direction across
    three consecutive runs** — one of the two is measuring the wrong thing, and
    which one is not obvious in advance.
-4. **The ±2-query resolution floor is measured** rather than assumed. It is
-   currently a placeholder, and every "no detected change" ruling rests on it.
+4. 🔴 **SPENT — fired 2026-08-28** (recorded 2026-09-20, W-206 A1). *"The
+   ±2-query resolution floor is measured rather than assumed."* It was:
+   [SR-RS](../../records/0133_predictions.md) decision 19 replaced the
+   placeholder with a **measured paired floor whose minimum is a net of 6
+   flips**, tracking the flips rather than the set size. Every *"no detected
+   change"* ruling now rests on that, not on the ±2. **This condition cannot
+   fire again.** ⚠ **Triggers 1, 3 and 5 are untouched and still live**, which
+   is why this doc stays in `work/compare/`.
 5. **`unanswerable` weighting is changed after a score has been seen** — that is
    the moving-threshold failure in a different costume, and it voids fork 3.
 

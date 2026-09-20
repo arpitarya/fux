@@ -49,6 +49,15 @@ timestamp: 2026-08-24T00:00:00Z
 > or (4) **a run needs to state a delta and cannot**, because every eligible
 > author is exposed — the case §4 predicts a ban would create and this wording
 > was chosen to avoid.
+>
+> 🔴 **TRIGGER 3 FIRED on 2026-08-28** (recorded 2026-09-20, W-206 A1).
+> Author-to-author variance was ruled on and the provisional **±2 queries was
+> retired**: [SR-RS](../../records/0133_predictions.md) decision 19 now carries a
+> measured paired floor whose minimum is **a net of 6 flips**, and it tracks the
+> flips rather than the set size. **Decision 14's placeholder is gone, which is
+> exactly what trigger 3 asked for**, so this condition is spent and cannot fire
+> again. ⚠ **Triggers 1, 2 and 4 are untouched and still live**, which is why
+> this doc stays in `work/compare/`.
 
 ## 0 · Three corrections to fux's own filed claims
 

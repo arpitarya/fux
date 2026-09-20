@@ -33,4 +33,4 @@ gateway, or the moment a fourth adapter request appears (the cap holding
 is the signal the endgame is needed).
 
 **References.** Council visionary seat + DA cross-examination (WORKLOG
-2026-08-09) · PLAN M5 cap · paper §2 (adjacent tools).
+2026-08-09) · [SR-FETCHER](../../records/0117_fetcher.md)'s adapter cap (⚠ *was* "PLAN M5 cap" — that plan is retired) · paper §2 (adjacent tools).

@@ -332,8 +332,22 @@ distributions, log base 2.
 3. **Fux gains a second statistical universe for another reason** (per-team
    ACL-scoped indexes, multi-tenant corpora). Then C's cost is already paid and
    the calculus changes.
-4. **`archived_weight` is removed or made non-configurable.** D depends on it
-   existing.
+4. 🔴 **FIRED 2026-09-13, and it fired in the direction that REMOVES an
+   option** (recorded 2026-09-20, W-206 A1). `archived_weight` was **deleted**
+   by W-152, with `recency_multiplier` and `recency_half_life_days` — all three
+   shipped as no-ops, so no ranking changed. **Option D depended on that knob
+   existing and is therefore gone**, and the verdict now rests on **A alone**
+   (*leave `df` over the union*), which it still supports: A never needed a
+   lever, it needed the divergence not to matter.
+
+   ⚠ **Trigger 2 became UNWORDABLE in the same change.** It reads *"with
+   `archived_weight` already in use"* — a precondition nothing can now satisfy.
+   It is not spent and it is not live; **it cannot be evaluated**, and saying so
+   is better than leaving a reader to discover that the knob it names does not
+   exist. Rewording it is a new decision, not a correction.
+
+   **Triggers 1 and 3 are untouched and still live**, which is why this doc
+   stays in `work/compare/`.
 
 ## 9 · References
 

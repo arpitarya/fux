@@ -63,9 +63,31 @@ a mirror with a wedged shell, so **every finding is to verify, not to act on**.
 
 1. **Every ranking prior HEAD added ships as a no-op** (`superseded_weight=1.0`, `recency=0`, `rerank_weight=0.0`) — on priors, HEAD *is* 1.0.0. OPEN-WORK already knows; the missing piece is `fux doctor` saying "this corpus declares `supersedes:` and the prior is off." Disclosure, not a ranking change.
 2. **Per-field length normalisation.** Current BM25F normalises on one weighted doc length; a title hit is penalised by body length. Real BM25F is per-field `b_f`, `avg_flen_f` — the data (`flen`, `total_flen`) is already committed. Block bound stays valid. Gate on a blind run.
+   ⚠ **Cross-reference added 2026-09-20 (W-206 B1): the length-normalisation
+   question was ANSWERED from a different direction by W-144**, closed
+   2026-09-16 — not with per-field `b_f` but by **lowering the single `b` to
+   `0.15`**, measured PASS on both benefit families with all four controls
+   holding ([SR-RANKING](../../records/0111_ranking.md) decision 3, the first
+   default there that is measured rather than inherited). **Per-field `b_f`
+   is neither shipped nor refused**; what changed is that the symptom this
+   item names — a table-heavy document reading as denser than it is — was
+   addressed more cheaply, so the case for the bigger change is now weaker
+   and needs re-making rather than assuming.
 3. **Unicode analyzer** (A.14) — it's a quality item as much as a bug.
+   ✅ **Cross-reference added 2026-09-20 (W-206 B1): this is now
+   [W-205](../open/W-205-identifiers-reachable-and-whole.md).** The analyzer's
+   identifier handling was measured in 2026-09 and is **two defects, not one**
+   — `_WORD_RE`'s class holds `_` but not `-`/`.`/`/`, and `should_stem`
+   protects digits but not all-letter fragments — plus a **third** W-202
+   found: a segment spelling a stopword is deleted outright. ⚠ **A.14's own
+   claim is unverified** on the current tree, as this file's header warns.
 4. **Heading-ancestry tokens into `ctx` at ingest** (H1>H2 path as terms). Structure-preserving chunking beat fine-grained semantic splitting in the 2026 36-strategy study (nDCG@5 0.459 vs <0.244 fixed-char); Chroma found ~200-token no-overlap best. Your chunker is close; measure the size knob.
 5. **Deterministic RM3 pseudo-relevance feedback** over the committed `terms` of the top-k (fixed k, t). Offline, byte-deterministic, one `Scoring` field. The only query-side signal you don't have.
+   ✅ **Cross-reference added 2026-09-20 (W-206 B1): this is item #4 of
+   [`search-improvements-v3`](search-improvements-v3.md)**, which graduated
+   into [W-168](../open/W-168-search-improvements.md) and is one of its
+   outstanding steps 3–10. **The same idea, filed twice** — the review found
+   it independently, and neither file knew about the other until now.
 6. **Reranker: enable after a *blind* re-measure only.** C2 showed 94 fixed / 0 broken on a headroom suite and +4/0 on hand-graded text — both `informed`. Also `rerank.py:728` only reranks `file:` docs, never `url:` — that's a gap regardless of the default.
 7. **Cite BM25S** for the eager-impact idea (your 4-bit impacts are that) — grounding for the paper, free.
 8. **Don't build:** dense lane (correctly deleted), RRF (one lane), learned-sparse at query time. Inference-free learned sparse (arXiv 2411.04403, doc-side only, 1.1× BM25 latency) is the one model-assisted thing that fits — as an `enrich` output emitting term weights, never in `ingest`.

@@ -29,6 +29,16 @@ the standing rule that `ask` does not read it), [SR-EXPAND](../../records/0149_e
 Node plane, already built) · [W-161 → W-204](../open/W-204-golden-outputs-scoring-and-version-benchmark.md) (the
 composed `ask`, a ranking change — waits on W-156).
 
+🔴 **UPDATED 2026-09-20 (W-206 A1): W-161 SHIPPED on 2026-09-15, and it shipped
+UNMEASURED.** Both tiers — the RRF-boosted tier and the labelled `related` tier
+— are live in the Python and Node readers. **What this doc still tracks is what
+they are WORTH**, which was never measured: the paired floor of
+[SR-RS](../../records/0133_predictions.md) decision 19 needs link-dependent
+questions, and the ladder carries **0 `ref` edges on all eight rungs**. That is
+W-204 phase E, after set 3's link-bearing documents land — so *"waits on W-156"*
+below is history: **W-156 was ruled 2026-09-14** and the build did not wait for
+the measurement.
+
 ---
 
 ## Verdict block
@@ -173,12 +183,18 @@ fux ask "<q>"                   ==  lexical ─► graph ─► split ─► con
 
 ## 6 · Gates, and the reopen trigger
 
-- **W-156** decides what evidence a ranking change may have. W-161 does not
-  start until it is ruled.
+- ⚠ **W-156** decides what evidence a ranking change may have, and this bullet
+  said *"W-161 does not start until it is ruled"*. **W-156 was ruled 2026-09-14
+  and W-161 shipped 2026-09-15 — unmeasured.** The gate that remains is not the
+  build, it is the evidence: the arms are W-204 phase E.
 - **Golden must carry link-dependent questions** ([SR-RS](../../records/0133_predictions.md)
   decision 23) — questions whose answer is reachable only through a `ref`
-  edge. Today's set almost certainly has none; that is a Codex task on the
-  key, never Claude's.
+  edge. ⚠ **"Almost certainly has none" was MEASURED and is now known:
+  0 `ref` edges on all eight rungs.** ⚠ **And it is no longer a Codex task** —
+  Arpit ruled 2026-09-20 that no feature waits on Codex, so **Claude authors set
+  3** with the link-bearing documents
+  ([SR-WORK-GOLDEN](../../records/0066_WORK-golden.md) decision 14). Every
+  number measured on it is `informed` permanently.
 - **A new prediction id at 10 000 documents**, pre-registered both ways:
   recall gain on link-dependent questions, and no regression on the rest.
 - **Reopen this verdict if:** the composition tests cannot be made to hold
