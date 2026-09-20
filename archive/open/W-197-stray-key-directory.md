@@ -3,11 +3,12 @@ type: OpenItem
 id: W-197
 title: "W-197 — a plural key directory exists in the tree and no agent may touch it"
 description: "work/golden/golden-answers/ (plural) is reported present in the working tree. CLAUDE.md §Golden answer key says no key file any agent can reach exists. Arpit inspects and removes it if it holds answers — deleting it is a tool call that reaches into it, so no agent may, on either spelling."
-status: open
+status: closed
 lane: arpit
 timestamp: 2026-09-17T00:00:00Z
 filed: 2026-09-17
 ball: arpit
+closed: 2026-09-20
 ---
 
 # W-197 — the plural key directory
@@ -78,6 +79,21 @@ spellings, and **amend L11** to permit a local, gitignored, agent-closed key
 directory — the Cowork-mount exposure recorded as accepted.
 
 **Step 2 above ("remove it") is superseded by the ruling.** The work is
-[W-198](W-198-golden-answers-canonical.md); this item closes when it lands.
+[W-198](../../work/open/W-198-golden-answers-canonical.md); this item closes when it lands.
 🔴 **Decision 5 is unchanged** — no agent aims any tool at the directory, on
 either spelling, before or after.
+
+## ✅ CLOSED 2026-09-20 — W-198 landed
+
+[W-198](../../work/open/W-198-golden-answers-canonical.md) is built:
+[SR-LAW-11](../../records/0012_LAW-11-sealed-answer-key.md) decision 3 now
+permits the directory at one address, its veto condition turns on a key
+**outside** that address or **committed** on any ref, and all six guards cover
+both spellings with
+[`tests/test_golden_key_guards.py`](../../tests/test_golden_key_guards.py)
+failing if one narrows.
+
+🔴 **Nothing in this item's history was ever aimed at the directory, and nothing
+in its closing is either.** The item closes on the record of a ruling, not on an
+inspection — Arpit did the inspecting, which is the only way this item could
+have closed at all.

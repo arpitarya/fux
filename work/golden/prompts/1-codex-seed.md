@@ -138,6 +138,8 @@ rest over several years so recency has something to work with.
 ## When you are done
 
 Print the file list, the word count per document, and `OK`. **Write nothing
-else** — no questions, no answers, no key file, no `golden-answer/` directory.
+else** — no questions, no answers, no key file, and nothing under
+`work/golden/golden-answers/` or its older singular spelling. That directory is
+Arpit's (law L11 decision 3); writing into it is not yours to do.
 
 **Next:** [prompt 2](2-codex-questions.md) writes set 1 over this corpus.

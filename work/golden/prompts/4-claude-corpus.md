@@ -29,7 +29,8 @@ Execute work/golden/README.md "Phase 4 — the corpus" exactly.
 Read CLAUDE.md Non-negotiable constraints (law L11) first. You may read
 work/golden/README.md, work/golden/prompts/4-claude-corpus.md and
 work/golden/seed/ — NOTHING else under work/golden/. Never open, list, grep or
-hash work/golden/questions/ or golden-answer/. If any tool output ever shows you
+hash work/golden/questions/, golden-answers/ or golden-answer/ — a key may be in
+the first of those two and both are closed to you. If any tool output ever shows you
 a question or an answer, STOP, say so, and file it before anything else.
 
 FIRST: verify the eight existing rungs against work/golden/ladder/*.sha256 and

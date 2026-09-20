@@ -34,7 +34,7 @@ the tree happens to contain, not knowledge documents it publishes:
 | outside the bundle | why |
 |---|---|
 | `work/regression/*/evidence/**` | raw run material — model output, generated corpora, captured stdout. Evidence is cited *by* a document; it is not one. |
-| `work/golden/seed/**`, `work/golden/golden-answer/**`, `work/golden/questions/questions.jsonl` | the sealed benchmark's test data, authored outside this lane ([`work/golden/README.md`](../work/golden/README.md)). Editing it to satisfy a docs rule would corrupt the instrument. `questions/README.md` is a document and stays in the bundle; the `.jsonl` beside it is emitted from the key. |
+| `work/golden/seed/**`, `work/golden/golden-answers/**` (and the older singular spelling), `work/golden/questions/questions.jsonl` | the sealed benchmark's test data, authored outside this lane ([`work/golden/README.md`](../work/golden/README.md)). Editing it to satisfy a docs rule would corrupt the instrument. `questions/README.md` is a document and stays in the bundle; the `.jsonl` beside it is emitted from the key. |
 | repo-root `CLAUDE.md`, `README.md` | tool entry points, outside `docs/`+`work/` to begin with. |
 
 **Filed regression runs before 2026-08-25 are exempt by baseline, not by

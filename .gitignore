@@ -37,13 +37,20 @@ venv/
 
 _to_delete/
 
-# The golden benchmark's answer key — Arpit, Codex and ChatGPT only; NO Claude
-# session opens it, ever, by any route. That is LAW L11 —
-# records/0012_LAW-11-sealed-answer-key.md, generated into CLAUDE.md
-# §Non-negotiable constraints. Kept out of git so it never reaches history or a
-# remote, and so `rg` and Claude Code's Grep skip it by default. Back it up by
-# hand. This entry is ONE OF FIVE GUARDS and not one of them is a guarantee —
-# records/0066_WORK-golden.md; the process is work/golden/README.md.
+# The golden benchmark's answer key — Arpit's, and no agent reads it by any
+# route. That is LAW L11 — records/0012_LAW-11-sealed-answer-key.md, generated
+# into CLAUDE.md §Non-negotiable constraints.
+#
+# ⚠ Since L11 decision 3 (Arpit, 2026-09-18) a key MAY exist on his machine, at
+# ONE address — `work/golden/golden-answers/`, the plural, canonical spelling.
+# Staying out of git is half of what makes that permission safe: never in
+# history, never on a remote, and skipped by `rg` and Claude Code's Grep by
+# default. Back it up by hand. The singular line below stays because a guard
+# that covers only the live spelling is a guard that reads green while the other
+# one is open. This entry is ONE OF FIVE GUARDS and not one of them is a
+# guarantee — records/0066_WORK-golden.md; the process is work/golden/README.md,
+# and tests/test_golden_key_guards.py fails if any of the five narrows.
+work/golden/golden-answers/
 work/golden/golden-answer/
 
 # 🔴 AND ANYWHERE ELSE IT LANDS — added 2026-09-12 after the rule above was
@@ -54,6 +61,14 @@ work/golden/golden-answer/
 #
 # ⚠ The name is the thing to ignore, not the location. A key that leaks does not
 # fail loudly — it yields a benchmark number that looks clean, forever.
+# ⚠ NO TRAILING SLASH, and that is the whole point of this line. A pattern
+# ending in `/` matches a DIRECTORY, so `**/golden-answer/` covered the singular
+# spelling only while the directory existed — after Arpit deleted it on
+# 2026-09-15 the pattern matched nothing, and a key written back to that exact
+# path would have been trackable. Found by tests/test_golden_key_guards.py on
+# 2026-09-20. This form matches a file or a directory, on either spelling, at
+# any depth.
+**/golden-answer*
 **/golden-answer/
 **/golden-answers*
 **/answers.jsonl

@@ -62,7 +62,7 @@ number.**
 - **The one finding worth carrying (uncitable, but true of the engine):** **the
   abstention gate is the ceiling.** declined-but-answerable **33 of 113** (set 1)
   and **48 of 112** (set 2) against **3** and **4** correct abstentions.
-- 🔴 **[W-197](open/W-197-stray-key-directory.md): a PLURAL spelling of the
+- 🔴 **[W-197](../archive/open/W-197-stray-key-directory.md): a PLURAL spelling of the
   sealed directory is reported present in the tree.** Every guard here was
   written against the singular. **Do not open, list, stat, glob, hash or delete
   it — not even to confirm it exists.** Arpit removes it himself.
@@ -2503,7 +2503,7 @@ built, and **the queue's only green row.**
 🔴 **Two new decisions are Arpit's and they are both from today:**
 [W-196](../archive/open/W-196-l11-breach-2026-09-17.md) (the L11 breach — re-author set 1,
 or relabel it `informed` permanently) and
-[W-197](open/W-197-stray-key-directory.md) (the plural key directory — **nobody
+[W-197](../archive/open/W-197-stray-key-directory.md) (the plural key directory — **nobody
 else may even look**). **Neither blocks W-194.**
 
 ⚠ **Nothing in the golden measurement chain moved and nothing is unblocked.**

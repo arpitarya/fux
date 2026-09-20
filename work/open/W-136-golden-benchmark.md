@@ -196,7 +196,15 @@ which carries what is contaminated and what any number may claim.
 - Claude wrote the company, cast and roster; **Codex invents every fact.**
   Spec: [`prompts/1-codex-seed.md`](../golden/prompts/1-codex-seed.md).
 
-## Where the key lives (Arpit, 2026-09-11)
+## Where the key lives (Arpit, 2026-09-11 — SUPERSEDED TWICE)
+
+⚠ **History. Do not act on this section.** The live answer is
+[L11](../../records/0012_LAW-11-sealed-answer-key.md) decision 3: a key may live
+at **`work/golden/golden-answers/`**, on Arpit's machine, gitignored, and closed
+to every agent on both spellings. The per-run *file-or-chat* question below was
+deleted on **2026-09-15** and the directory was permitted again on **2026-09-18**
+([W-198](../../archive/open/W-198-golden-answers-canonical.md)); neither change restored the
+question, because the route to a scoring turn is the chat, always.
 
 - **Never in the directory by default.** Codex asks in phases 1, 3 and 5: *(1) the
   file `golden-answer/answers.jsonl`, or (2) the chat?* — and waits. The placeholder

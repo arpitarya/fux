@@ -14,10 +14,13 @@ wrong* turns every stratified claim into a tautology and destroys the only thing
 the field is for. Nothing in this file reads a prediction, a score or an index.
 
 🔴 **This script never runs against a key inside the repository**, and it refuses
-rather than trusting the caller — `work/golden/golden-answer/` is not a location
-and no key file exists under this tree
-([SR-LAW-11](../../records/0012_LAW-11-sealed-answer-key.md)). The key is Arpit's;
-he or Codex points this at it from wherever he keeps it.
+rather than trusting the caller. ⚠ **That refusal got MORE important on
+2026-09-18, not less:** L11 decision 3 permits a key to exist under this tree, at
+`work/golden/golden-answers/`, and decision 5 still closes it to every agent
+([SR-LAW-11](../../records/0012_LAW-11-sealed-answer-key.md)). A path under
+either spelling is refused here **because it may now resolve**, which is exactly
+when trusting the caller stops being harmless. The key is Arpit's; he or Codex
+points this at it from wherever he chooses.
 
 ## The two numbers
 
@@ -266,11 +269,18 @@ def run(key_path: Path, corpus: Path, rung: str) -> list[dict]:
 
 
 def _guard_key_path(key_path: Path) -> None:
-    """Refuse a key inside this repository. **No key file exists here** (L11).
+    """Refuse a key inside this repository (L11).
 
     This is the one place the tool could be turned into the thing the law
     forbids — *"just point it at the repo copy"* — so it fails closed rather
     than trusting the caller's intent.
+
+    ⚠ **Amended 2026-09-18.** This used to refuse on the ground that *no key
+    file exists here*. L11 decision 3 permits one, at
+    ``work/golden/golden-answers/``, so the premise is gone and **the refusal
+    matters more**: the path it rejects may now resolve to a real key. The
+    check is unchanged — anything under the repo root — because it never
+    depended on the directory being empty.
     """
     repo = Path(__file__).resolve().parents[2]
     try:
@@ -279,7 +289,8 @@ def _guard_key_path(key_path: Path) -> None:
         return
     raise SystemExit(
         f"difficulty: refusing a key inside the repository ({key_path}). "
-        "No answer key lives under this tree — SR-LAW-11. Point this at Arpit's copy."
+        "A key under this tree is Arpit's and closed to every agent — SR-LAW-11 "
+        "decision 5, on both spellings. Point this at his copy, from outside the repo."
     )
 
 

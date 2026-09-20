@@ -22,9 +22,11 @@ rung at a time and say which one.
 ```
 Execute work/golden/README.md "Phase 5 — Run" for rung <RUNG> (e.g. rung-00100).
 Read CLAUDE.md Non-negotiable constraints (law L11) and Conformance runs first.
-There is NO golden answer key anywhere and no answer reaches you by any route, a
-paste included. If one does, STOP, say so, and file it before anything else.
-Never open work/golden/golden-answer/ — it was deleted and is not a location.
+No answer reaches you by any route, a paste included. If one does, STOP, say so,
+and file it before anything else. A key MAY be on this machine since 2026-09-18,
+at work/golden/golden-answers/ — it is Arpit's, and it is closed to you exactly
+as the older spelling work/golden/golden-answer/ is. Never open, list, glob,
+stat, hash or count either.
 
 Read the questions from work/golden/questions/set-1.jsonl and set-2.jsonl. They
 are already there; do not ask anyone for them. Run BOTH sets, keeping them apart

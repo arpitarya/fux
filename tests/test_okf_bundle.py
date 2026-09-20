@@ -18,9 +18,11 @@ repo calls *a record that reads as authority*.
 
 - `work/regression/*/evidence/**` — raw run material: model output, generated
   corpora, captured stdout. Evidence is cited *by* a document; it is not one.
-- `work/golden/seed/**` and `work/golden/golden-answer/**` — the sealed
-  benchmark's test data, authored outside this lane. Editing it to satisfy a
-  docs rule would corrupt the instrument it is.
+- `work/golden/seed/**`, `work/golden/golden-answers/**` and the older singular
+  spelling — the sealed benchmark's test data, authored outside this lane.
+  Editing it to satisfy a docs rule would corrupt the instrument it is, and
+  since L11 decision 3 the answers directory may actually hold a key, which no
+  agent opens for any reason including this one.
 - Filed regression runs before `FROZEN_SINCE` — `report.md` and `ANALYSIS.md`
   in those directories are frozen. `tests/test_regression_runs.py` baselines its
   own classification rule on the same date for the same stated reason: *turning
@@ -56,6 +58,10 @@ _RUN_DATE = re.compile(r"^work/regression/(\d{4}-\d{2}-\d{2})-")
 #: Not knowledge documents. See the module docstring for why each is a boundary.
 EXCLUDED_PREFIXES = (
     "work/golden/seed/",
+    # Both spellings. `golden-answers/` is canonical since L11 decision 3
+    # (Arpit, 2026-09-18); the singular stays because a boundary that covers
+    # only the live name is a boundary that reads green while the other is open.
+    "work/golden/golden-answers/",
     "work/golden/golden-answer/",
 )
 

@@ -43,6 +43,17 @@ reading high"*) and the bare identifier alone.
   decision 19's floor of all floors is a net of 6. **A field that fixed every
   miss could not clear α on this corpus.** This is 22d's *inconclusive by
   headroom*, measured before a line of the field was built.
+- 🔴 **Regression headroom is 29–30 of 33, and it is ten times the
+  improvement headroom.** [SR-RS](../../../records/0133_predictions.md) decision
+  22b asks for **both** directions, because they answer different questions and
+  one number answers neither. **Improvement headroom** — the queries no arm gets
+  right — is 3–4. **Regression headroom** — the queries a change could *break* —
+  is every query currently in the top 3: **30, 29 and 30**. ⚠ **This is a
+  single-arm baseline**, so neither figure is a paired count across two arms; the
+  regression figure is the exposure a second arm would be measured against, and
+  it is stated rather than omitted because omitting it is what makes a 3-of-33
+  upside look like a free change. **An identifier field risks ten documents for
+  every one it could win**, and that asymmetry is the run's second finding.
 - hit@1 falls 25 → 19 with corpus size — siblings (`-02` vs `-03`, the 2025 and
   2026 matrices) compete for rank 1. Top-3 does not move.
 

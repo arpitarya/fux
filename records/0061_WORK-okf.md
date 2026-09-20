@@ -7,10 +7,10 @@ description: "Fux's documentation follows Google's Open Knowledge Format v0.1: t
 status: accepted
 date: 2026-09-14
 feature: conformance to the Open Knowledge Format, and the three declared boundaries of the bundle
-owns: [tests/test_okf_bundle.py@a1d328c679bd]
+owns: [tests/test_okf_bundle.py@449982f576db]
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 350e8167c1fa5c05620cf7d1dcb9f3618386ff5e8f4631fa00da5f39a7c3055a
+content_sha: aab216e943b40819b453d09b15704acc133884cbfd1267cac25dfc9a68a0da4f
 ---
 
 # SR-WORK-OKF — the repo is an OKF knowledge bundle

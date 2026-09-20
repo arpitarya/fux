@@ -222,12 +222,15 @@ each to its record; that is all it does now.
   one.** An *answer* here means any answer text, evidence quote, `relevant` or
   `primary` list, or `answerable` flag of a golden question, **in either set** —
   the Codex-authored **set 1** and the Claude-authored **set 2** are one subject
-  under this law. 🔴 **No answer key exists as a file any agent can reach.**
-  `work/golden/golden-answer/` is not a location and never becomes one: **no
-  agent** creates, writes, reads, opens, lists, stats, globs, counts, hashes,
-  diffs, copies, moves, indexes, format-checks or deletes anything in it or in
-  any other path holding a key, and **one answer is the same breach as a
-  hundred**. **The one route an answer travels is Arpit pasting it into a
+  under this law. 🔴 **A key may exist, in exactly one place, and no agent may
+  reach it.** That place is **`work/golden/golden-answers/`** — Arpit's, on his
+  machine, **gitignored and never committed on any ref** — and it is closed
+  absolutely: **no agent** creates, writes, reads, opens, lists, stats, globs,
+  counts, hashes, diffs, copies, moves, indexes, format-checks or deletes
+  anything in it, in the older singular spelling `work/golden/golden-answer/`,
+  or in any other path holding a key, and **one answer is the same breach as a
+  hundred**. **A key found anywhere else, or on any committed ref, is a breach
+  to declare.** **The one route an answer travels is Arpit pasting it into a
   chat**, at his choice, for scoring or review — and **that route is Codex's
   alone**. 🔴 **No Claude session** — Cowork, Claude Code, a subagent, a hook, a
   script it writes, a tool or MCP server it calls — **reads, receives, requests
@@ -384,26 +387,35 @@ is the surrounding process:
   bias visible instead of invisible; the sets are scored and reported separately, and **every
   set 2 number is `informed` permanently** because its author and its runner are
   the same model family.
-- **Arpit holds both answer halves and there is no key file.**
-  `work/golden/golden-answer/` **was deleted by Arpit on 2026-09-15** and is not
-  a location. The old per-run question — *"the file, or the chat?"* — is gone
-  from every prompt; the answer is the chat, always. ⚠ **If it ever reappears, no
-  Claude session removes it** — deleting is a tool call that reaches into it.
+- **Arpit holds both answer halves, and since 2026-09-18 a key may sit on his
+  machine at one address.** That address is **`work/golden/golden-answers/`** —
+  gitignored, never committed, **closed to every agent on both spellings** by
+  L11 decision 5. He deleted the old singular directory on 2026-09-15 and ruled
+  the plural one permitted three days later, on W-197; **the deletion is not
+  erased by the permission**, it is why there is now exactly one name. The
+  per-run question — *"the file, or the chat?"* — stays gone from every prompt;
+  the answer to a scoring turn is the chat, always. ⚠ **No Claude session
+  creates, empties or removes either directory** — each is a tool call that
+  reaches into it.
 - **What Claude MAY read:** `work/golden/seed/`, the READMEs and the prompts, and
   a released `questions/set-N.jsonl` (ids and text only). **The six prompts**,
   the ladder, the rungs and what a result may claim are in
   [`work/golden/README.md`](work/golden/README.md).
-- **The guards are a backstop now, not the defence** — `.gitignore`;
-  `!work/golden` in `.fux/sources/dirs`; `permissions.deny` in
+- 🔴 **The guards are the defence again, because there is something on disk.**
+  `.gitignore`; `!work/golden` in `.fux/sources/dirs`; `permissions.deny` in
   `.claude/settings.json`; `.claude/hooks/guard-golden-answer.sh`, which matches
-  what a tool call *targets* and fails closed; and the generated law block
-  itself. **None is retired**, because the day somebody re-creates the directory
-  is the day they earn their keep. What defends the key is that **there is
-  nothing on disk to reach**.
-- **The two routes no guard sees.** A recursive `grep`, `rg`, `find` or `ls` over
-  `work/` that never names the folder — L11 makes excluding `work/golden/` part
-  of the rule. And **a paste**: an answer put into a Claude session's context by
+  what a tool call *targets* and fails closed; the generated law block itself;
+  and two tests — `test_golden_key_guards.py`, which fails if a guard stops
+  covering **either spelling**, and `test_golden_key_never_committed.py`, which
+  answers from `git ls-files` and opens nothing. ⚠ **Between 2026-09-15 and
+  2026-09-18 this bullet said the guards were a backstop around an empty room.
+  The room is not empty.**
+- **The three routes no guard sees.** A recursive `grep`, `rg`, `find` or `ls`
+  over `work/` that never names the folder — L11 makes excluding `work/golden/`
+  part of the rule. **A paste**: an answer put into a Claude session's context by
   any hand is a leak to declare, never a permission that arrived by another door.
+  And **a Cowork session's mount**, which reaches the directory with a plain
+  shell call that no deny rule and no hook sees — **accepted, not closed.**
 - **Both sets were reset on 2026-09-15 and neither exists yet.** Arpit deleted
   the provisional Claude-authored key and the 124 released questions; the seed
   corpus and the ladder survived. **Every id from the old set is orphaned and

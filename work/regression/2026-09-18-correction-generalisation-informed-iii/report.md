@@ -89,6 +89,29 @@ regression 8/55 — both non-zero.** 22d's INCONCLUSIVE guard is silent. **This 
 not a ceiling effect**: 47 of 55 paraphrases had room to enter the top 3 and none
 did.
 
+## Authorship
+
+⚠ **Added 2026-09-20 by a later session.** The run was filed on 2026-09-18
+without this section, which the per-run contract has required since 2026-08-25
+([SR-RS](../../../records/0133_predictions.md) decision 13) — `test_measured_run_
+names_who_authored_what` was red on `main` for two days. **The table below is
+reconstructed from the report's own body and from the WORKLOG entry for that
+session, not from the author's testimony**, and anything it cannot establish it
+says so rather than assuming.
+
+| artifact | author | could reach |
+|---|---|---|
+| the corpus (1006 documents, `github/docs`) | third-party, ungraded — not authored for this run | — |
+| the 11 corrections (from real `fux ask` failures) | Claude (Cowork, Fable 5.1), the running session | the before-scores, by construction — a miss **was** the selection rule |
+| the 55 paraphrases | Claude, a **separate session that used zero tools** and was shown the question strings and nothing else | the twelve question strings; **not** the corpus, a document, a path, a rank, a correction, or any per-paraphrase score |
+| the brief given to that session | §B of [the Codex prompt](../2026-09-15-correction-generalisation/prompt-codex-paraphrases.md), verbatim | published, so the steer is auditable |
+| the harness | `tools/quality-controls/correction_generalisation.py`, **patched during the run** — see §The harness was patched | — |
+| the analysis | Claude, the running session | everything above |
+
+🔴 **`informed`, permanently, and it meets only one of decision 11's two
+conditions** — §Why `informed` above argues the access half and concedes the
+other. **Never compared with a blind run and never used to state a delta.**
+
 ## The diagnostic that says what actually happened
 
 Not the pre-registered endpoint. Rank@20, pristine tree vs corrected tree.

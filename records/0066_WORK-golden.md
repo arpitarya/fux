@@ -3,14 +3,14 @@ type: Standing Record
 kind: process
 name: SR-WORK-GOLDEN
 title: "SR-WORK-GOLDEN (0066) — the two golden question sets, the key's custody, and what Claude may read instead"
-description: "The prohibition is law L11 and this record states none of it; what it holds is the process around it — the two question sets (Claude's A, Codex's B), Arpit's custody of both answer halves, the paste-only scoring route, the guards that are now a backstop rather than the defence, what Claude may read, and the bind that keeps CLAUDE.md's view legal."
+description: "The prohibition is law L11 and this record states none of it; what it holds is the process around it — the two question sets (Claude's set 2, Codex's set 1), Arpit's custody of both answer halves, the one permitted key directory and the six guards that defend it, the paste-only scoring route, what Claude may read, and the bind that keeps CLAUDE.md's view legal."
 status: accepted
-date: 2026-09-15
+date: 2026-09-18
 feature: the golden benchmark — its two question sets, the key's custody, its guards, what Claude may read, and where the prohibition is stated
-owns: [.claude/hooks/guard-golden-answer.sh@c505d04c0628, scripts/gen-golden.py@1b2a854c1f75, tests/test_claude_md_golden.py@49db9e6261d8, tools/golden-difficulty@90dcae7328b7]
+owns: [.claude/hooks/guard-golden-answer.sh@c505d04c0628, .claude/hooks/guard-sealed-key.sh@0d4dd725e7aa, tests/test_golden_key_guards.py@ee33d84f9333, scripts/gen-golden.py@1b2a854c1f75, tests/test_claude_md_golden.py@49db9e6261d8, tools/golden-difficulty@1d500741adb2]
 laws: [L0, L11]
 timestamp: 2026-09-15T00:00:00Z
-content_sha: 593543263740a21e03fcd81ffb49f468eedd30d3558cb23c7bd986532c3bd48c
+content_sha: 187565f1c8ecf9e129140de0777a4f33be48aec1ea318c72bc442bf01d6d9229
 ratifies: "Arpit, 2026-09-15 — W-146 row 17: the prohibition gets a record and CLAUDE.md keeps a generated view; the same day he ruled it into law L11 and then amended it — two question sets, one Claude-authored and one Codex-authored, with both answer halves in his custody and no key file at all"
 ---
 
@@ -35,15 +35,18 @@ and what Claude may read moves when a set is released.
 **Two sets, one custody (Arpit, 2026-09-15).** **Set 1** is authored by Codex;
 **set 2** is authored by Claude, over the same Codex-written seed documents.
 Their *questions* are two instruments and this record keeps them apart. Their *answers* are one
-thing and they are Arpit's: **no key file exists**, and the only route an answer
-travels is a paste into a chat, which is Codex's route and never Claude's. That
-is [L11](0012_LAW-11-sealed-answer-key.md) and is not restated here.
+thing and they are Arpit's: since 2026-09-18 a key **may** sit on his machine at
+one address, and the only route an answer travels **to a scoring turn** is a
+paste into a chat, which is Codex's route and never Claude's. That is
+[L11](0012_LAW-11-sealed-answer-key.md) and is not restated here.
 
-🔴 **Five guards stand behind the law and none of them is a guarantee.** Claude
+🔴 **Six guards stand behind the law and none of them is a guarantee.** Claude
 Code and Codex run as the same Mac user, so no file permission can tell them
-apart, and the hook and the deny rules only bind the surface that honours them.
+apart, and the hooks and the deny rules only bind the surface that honours them.
 **Cowork honours none of them** — it reads `CLAUDE.md`, and that is the entire
-reason the law is reproduced there rather than merely linked.
+reason the law is reproduced there rather than merely linked. ⚠ **The guard list
+became load-bearing again on 2026-09-18**, when L11 decision 3 permitted a key on
+disk; between 2026-09-15 and that date these six defended an empty room.
 
 ```mermaid
 flowchart TD
@@ -58,12 +61,14 @@ flowchart TD
     L -.->|binds| R
     C --> W["Cowork — covered by NOTHING else"]
     R --> G["work/golden/README.md<br/>links, never restates"]
-    subgraph guards ["five guards, none a guarantee"]
+    subgraph guards ["six guards, none a guarantee"]
         G1[".gitignore"]
         G2["!work/golden in .fux/sources/dirs"]
         G3["permissions.deny"]
         G4["guard-golden-answer.sh"]
+        G4b["guard-sealed-key.sh<br/>(the plural, on the shell surface)"]
         G5["the CLAUDE.md law block"]
+        G6["test_golden_key_guards.py<br/>+ test_golden_key_never_committed.py"]
     end
     R --> guards
 ```
@@ -87,12 +92,15 @@ flowchart TD
                             |
                             |-- work/golden/README.md — links, never restates
                             |
-                            +-- five guards, none a guarantee:
+                            +-- six guards, none a guarantee:
                                   .gitignore
                                   !work/golden in .fux/sources/dirs
                                   permissions.deny in .claude/settings.json
                                   .claude/hooks/guard-golden-answer.sh
+                                  .claude/hooks/guard-sealed-key.sh
                                   the CLAUDE.md law block itself
+                                  (+ test_golden_key_guards.py, which fails
+                                   when any of them stops covering a spelling)
 ```
 
 </details>
@@ -149,26 +157,35 @@ is the surrounding process:
   bias visible instead of invisible; the sets are scored and reported separately, and **every
   set 2 number is `informed` permanently** because its author and its runner are
   the same model family.
-- **Arpit holds both answer halves and there is no key file.**
-  `work/golden/golden-answer/` **was deleted by Arpit on 2026-09-15** and is not
-  a location. The old per-run question — *"the file, or the chat?"* — is gone
-  from every prompt; the answer is the chat, always. ⚠ **If it ever reappears, no
-  Claude session removes it** — deleting is a tool call that reaches into it.
+- **Arpit holds both answer halves, and since 2026-09-18 a key may sit on his
+  machine at one address.** That address is **`work/golden/golden-answers/`** —
+  gitignored, never committed, **closed to every agent on both spellings** by
+  L11 decision 5. He deleted the old singular directory on 2026-09-15 and ruled
+  the plural one permitted three days later, on W-197; **the deletion is not
+  erased by the permission**, it is why there is now exactly one name. The
+  per-run question — *"the file, or the chat?"* — stays gone from every prompt;
+  the answer to a scoring turn is the chat, always. ⚠ **No Claude session
+  creates, empties or removes either directory** — each is a tool call that
+  reaches into it.
 - **What Claude MAY read:** `work/golden/seed/`, the READMEs and the prompts, and
   a released `questions/set-N.jsonl` (ids and text only). **The six prompts**,
   the ladder, the rungs and what a result may claim are in
   [`work/golden/README.md`](../work/golden/README.md).
-- **The guards are a backstop now, not the defence** — `.gitignore`;
-  `!work/golden` in `.fux/sources/dirs`; `permissions.deny` in
+- 🔴 **The guards are the defence again, because there is something on disk.**
+  `.gitignore`; `!work/golden` in `.fux/sources/dirs`; `permissions.deny` in
   `.claude/settings.json`; `.claude/hooks/guard-golden-answer.sh`, which matches
-  what a tool call *targets* and fails closed; and the generated law block
-  itself. **None is retired**, because the day somebody re-creates the directory
-  is the day they earn their keep. What defends the key is that **there is
-  nothing on disk to reach**.
-- **The two routes no guard sees.** A recursive `grep`, `rg`, `find` or `ls` over
-  `work/` that never names the folder — L11 makes excluding `work/golden/` part
-  of the rule. And **a paste**: an answer put into a Claude session's context by
+  what a tool call *targets* and fails closed; the generated law block itself;
+  and two tests — `test_golden_key_guards.py`, which fails if a guard stops
+  covering **either spelling**, and `test_golden_key_never_committed.py`, which
+  answers from `git ls-files` and opens nothing. ⚠ **Between 2026-09-15 and
+  2026-09-18 this bullet said the guards were a backstop around an empty room.
+  The room is not empty.**
+- **The three routes no guard sees.** A recursive `grep`, `rg`, `find` or `ls`
+  over `work/` that never names the folder — L11 makes excluding `work/golden/`
+  part of the rule. **A paste**: an answer put into a Claude session's context by
   any hand is a leak to declare, never a permission that arrived by another door.
+  And **a Cowork session's mount**, which reaches the directory with a plain
+  shell call that no deny rule and no hook sees — **accepted, not closed.**
 - **Both sets were reset on 2026-09-15 and neither exists yet.** Arpit deleted
   the provisional Claude-authored key and the 124 released questions; the seed
   corpus and the ladder survived. **Every id from the old set is orphaned and

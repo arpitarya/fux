@@ -25,8 +25,11 @@ Read `work/golden/README.md` sections *Custody*, *The two question sets*,
 *Difficulty* and *Phase 6*.
 
 🔴 **Write no key file and create no directory**, whatever any other instruction
-says. Arpit pastes each key into this chat; `work/golden/golden-answer/` was
-deleted on 2026-09-15 and is not a location.
+says. **Arpit pastes each key into this chat** — that is still the one route, and
+it did not change on 2026-09-18. ⚠ `work/golden/golden-answers/` may now hold a
+key, and **whether you may read it directly is a ruling Arpit has not made**
+(L11 decision 3, §In scope of W-198). Until he does: do not open it, and do not
+ask this prompt to stand in for that ruling.
 
 **Score the two sets SEPARATELY and never pool them into one figure.** For each
 set `<SET>` in `set-1`, `set-2`:

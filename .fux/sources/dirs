@@ -28,6 +28,8 @@ records
 tools
 work
 !work/golden              # the sealed benchmark: its corpus and answer key must never enter fux's own committed index (LAW L11 — records/0012_LAW-11-sealed-answer-key.md)
+!work/golden/golden-answers # the key's one permitted address (L11 decision 3, Arpit 2026-09-18). Redundant with the parent line ABOVE, and written anyway: the parent is one edit away from being narrowed for an unrelated reason, and this line is the one that would then still be standing.
+!work/golden/golden-answer  # the older singular spelling, kept for the same reason every other guard keeps it — a guard that covers only the live name reads green while the other is open.
 
 
 archive                   archived=true

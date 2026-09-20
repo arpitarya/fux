@@ -39,8 +39,10 @@ and `work/golden/seed-dates.tsv`.
 - **Never `work/golden/questions/`** — set 1's questions are there once Arpit
   commits them. Reading them makes set 2 a derivative of set 1 and destroys the
   one thing two sets buy.
-- **Never `work/golden/golden-answer/`** — deleted on 2026-09-15, not a location,
-  and reaching into it is a breach of law L11 whatever the reason.
+- **Never `work/golden/golden-answers/`, nor its older singular spelling** —
+  since 2026-09-18 a key may be in there, which makes reaching into it worse
+  rather than better. Reaching in **at all** — read, list, glob, stat, hash,
+  count, delete — is a breach of law L11 decision 5, whatever the reason.
 - **Never a recursive `grep`, `rg`, `find` or `ls` over `work/`** without
   excluding `work/golden/`. That is the route no guard sees.
 

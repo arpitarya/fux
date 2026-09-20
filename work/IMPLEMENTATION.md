@@ -35,7 +35,7 @@ Rules:
 **Shipped:** [`tests/test_golden_key_never_committed.py`](../tests/test_golden_key_never_committed.py)
 — 19 tests, green. **Evidence:** [`2026-09-16-golden-rung-00100`](regression/2026-09-16-golden-rung-00100/ANALYSIS.md)
 (scored overlay). **Items:** [W-196](../archive/open/W-196-l11-breach-2026-09-17.md),
-[W-197](open/W-197-stray-key-directory.md),
+[W-197](../archive/open/W-197-stray-key-directory.md),
 [W-195](open/W-195-difficulty-band-breakdown.md) — all three filed open, none closed.
 **Records touched: none.** The change SR-WORK-GOLDEN may need is **proposed to
 Arpit, not written** — a law-adjacent decision is his

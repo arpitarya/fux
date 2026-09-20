@@ -52,8 +52,6 @@ here. Read that record before changing anything below it.
 
 - 🔴 **W-190** · `agent`, waiting on W-136 — a question's difficulty is counted, not labelled by hand; the scorer was built 2026-09-15, but the answer key carries no difficulty yet, so no question is rated. [detail](open/W-190-question-difficulty.md)
 - 🔴 **W-195** · `agent`, waiting on W-190 — we cannot yet say "fux does well on easy questions and badly on hard ones": the key has no difficulty field to split the results by, and it may not be guessed. [detail](open/W-195-difficulty-band-breakdown.md)
-- 🟡 **W-197** · `arpit`, waiting on W-198 — ruled 2026-09-18: the stray answers folder stays on disk, spelled `golden-answers/`, with both spellings guarded. Closes when W-198 lands. [detail](open/W-197-stray-key-directory.md)
-- 🟢 **W-198** · `agent` — **agreed 2026-09-18, not built**: allow one guarded local folder for the answer key, make `golden-answers/` its name, and widen every guard to cover both spellings. [detail](open/W-198-golden-answers-canonical.md)
 - 🔴 **W-136** · `arpit` — the benchmark ran 2026-09-16 and produced a rough score with no per-question detail. The detailed pass is paused by your ruling; W-87, W-176 and W-191 sit behind you restarting it. [detail](open/W-136-golden-benchmark.md)
 - 🔴 **W-87** · `agent`, waiting on W-136 — what a good answer means: the refuse-to-answer half is measured (0 of 124 missed), and the other half is unblocked now Codex wrote set 1. Both need the scored run. [detail](open/W-87-what-good-means.md)
 - 🔴 **W-175** · `agent` — run of 2026-09-18: correcting a question helped none of its 60 rewordings, and the original itself reached the top 3 only 4 times in 12. A weight sweep comes first. [detail](open/W-175-correction-generalisation.md)
