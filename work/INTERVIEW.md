@@ -32,8 +32,39 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-09-17** (Claude Code, the L11 breach).* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-09-20** (Claude Code, the three green rows).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
+
+### 🔴 THE QUEUE HAS NO GREEN ROWS LEFT (2026-09-20)
+
+**Everything agent-closable is closed.** W-198, W-194 and W-200 shipped in one
+session; W-197 closed with W-198. **Every remaining item waits on Arpit** —
+W-136 (4d), W-175 (4d), W-168 (4d), W-201 (2d), W-199 (0d) — and the rest wait
+behind them. A session arriving here should read the inbox and **stop**, which
+is what [SR-WORK-OPEN-QUEUE](../records/0051_WORK-open-queue.md) rules 32–34
+require.
+
+**Three things a new session most needs to know from that work:**
+
+1. 🔴 **`fux.index` is `v4` and law `L5` is RETIRED.** `meta` and `title_h` no
+   longer exist; a URL record carries a plain `title` and `phrases` like any
+   other. **A v3 index is refused by name** — `fux ingest` then `fux build`.
+   The ACL-mismatch leak L5 closed is an **accepted, documented exposure**
+   ([SR-LAW-5](../records/0007_LAW-5-hashed-meta.md), superseded). **Ten live
+   laws, twelve numbers.**
+2. 🔴 **A key directory is permitted again, at exactly one address** —
+   `work/golden/golden-answers/`, gitignored, and **closed to every agent on
+   both spellings**. L11 decision 3 permits it to *exist*; decision 5 still
+   forbids reaching it. There are **six** guards now, and
+   `tests/test_golden_key_guards.py` fails if any narrows. ⚠ **Two files cannot
+   be edited by any Claude session** — `guard-golden-answer.sh` and W-198's own
+   archived item file — because the hook's TARGET check is a bare substring and
+   both filenames contain it. Filed for Arpit.
+3. ⚠ **Two ratified specs were wrong about the tree and one of them was a
+   defect.** W-200 named a file path that is L8's consent-gated answer journal;
+   W-194's reuse gate silently disabled every delta ingest **with a
+   byte-identical index and no error**. Both are written up in their archived
+   item files. **Read a spec's claims about the tree as claims, not facts.**
 
 ### 🔴 AN L11 BREACH HAPPENED, AND THE BENCHMARK'S BLIND HALF IS GONE (2026-09-17, Claude Code)
 
