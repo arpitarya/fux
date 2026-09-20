@@ -83,7 +83,7 @@ from ..errors import FuxError
 from ..progress import NULL as _NULL_PROGRESS
 from . import edges as edges_mod
 from . import extract as extract_mod
-from . import decoderdigest, fuxignore, gitdir, ingestlog, sourcelist, urlsrc
+from . import decoderdigest, fuxignore, gitdir, ingestlog, register, sourcelist, urlsrc
 from .edges import TAG_PREFIX
 from .gitdir import (
     UNFETCHED,
@@ -793,6 +793,19 @@ def run(
         run_seq=_current_run_seq(root),
     )
 
+    # W-199 D4 — the COMMITTED register, beside the index it describes. Written
+    # after `write_index` for the ledger's reason, and from the same provenance
+    # map, so the committed file and the per-run ledger cannot disagree about
+    # which decoder produced a record. 🔴 It carries no run id and no clock: two
+    # ingests from the same sources write it once (L3), which is what makes a
+    # derived file safe to commit.
+    _record_register(
+        root,
+        records=records,
+        url_provenance=url_provenance,
+        decoder_digests=decoder_digests,
+    )
+
     return IngestReport(
         written_shards=written,
         doc_count=len(records),
@@ -1280,6 +1293,31 @@ def _record_provenance(
         )
 
     ingestlog.write(root, rows)
+
+
+def _record_register(
+    root: Path,
+    *,
+    records: list[dict],
+    url_provenance: dict[str, tuple[str, str | None]],
+    decoder_digests: dict[str, str],
+) -> None:
+    """Write `.fux/index/REGISTER` for this index (W-199 D4). **Never raises.**
+
+    ⚠ **Built from the records, never from the ledger's rows.** The ledger
+    carries skips and a `run_seq`, and both are facts about a run; a register
+    derived from it would change bytes when a transient fetch failed. The one
+    thing the two share is `provenance`, so they agree about decoders by
+    construction and about nothing else.
+    """
+    provenance: dict[str, tuple[str, str | None]] = {}
+    for record in records:
+        doc_id = record.get("id", "")
+        if record.get("src") == "url":
+            provenance[doc_id] = url_provenance.get(doc_id, (ingestlog.PROSE, None))
+        else:
+            provenance[doc_id] = (_decoder_for_loc(record.get("loc", ""), decoder_digests), None)
+    register.write(root, register.rows_from(records, provenance))
 
 
 def _decoder_for_loc(loc: str, digests: dict[str, str]) -> str:

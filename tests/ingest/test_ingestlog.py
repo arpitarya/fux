@@ -36,6 +36,21 @@ import pytest
 from fux.ingest import ingestlog as provenance
 from fux.ingest.run import run
 
+
+def _write_fetcher(root, text, name="mw.py", encoding="utf-8"):
+    """Write a fixture fetcher where the resolver looks for it.
+
+    ⚠ **`.fux/fetchers/` is the only place now.** Until 2026-09-20 a fixture
+    could put a fetcher anywhere and point `[sources.url] fetcher` at it; that
+    key is deleted (W-199 D2) and the directory is fixed, so the fixture creates
+    it rather than relying on `fux setup` having run.
+    """
+    path = root / ".fux" / "fetchers" / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+    return path
+
+
 FETCHER = '''\
 def fetch(url):
     return "# Page " + url.rsplit("/", 1)[-1] + chr(10) * 2 + "fetched body" + chr(10)
@@ -47,8 +62,8 @@ def _repo(tmp_path, *, urls=(), files=None):
     files = files if files is not None else {"docs/a.md": "# Doc A\n\nrepo body\n"}
     toml = "[sources]\n"
     if urls:
-        toml += '[sources.url]\nfetcher = "mw.py"\nmax_parallel = 4\n'
-        (tmp_path / "mw.py").write_text(FETCHER, encoding="utf-8")
+        toml += '[sources.url]\nmax_parallel = 4\n'
+        _write_fetcher(tmp_path, FETCHER)
     (tmp_path / "fux.toml").write_text(toml, encoding="utf-8")
     fux = tmp_path / ".fux"
     (fux / "sources").mkdir(parents=True, exist_ok=True)
@@ -258,7 +273,7 @@ def test_the_ledger_is_not_the_answer_journal(tmp_path):
 
 
 def test_a_url_row_carries_its_fetcher_and_decoder(tmp_path):
-    root = _repo(tmp_path, urls=["https://x.test/a"])
+    root = _repo(tmp_path, urls=["https://x.test/a fetch=mw"])
     run(root, refresh_urls=True)
     row = _rows(root)["url:https://x.test/a"]
     assert row["kind"] == "url"
@@ -281,8 +296,8 @@ def test_a_skipped_url_gets_a_row_saying_why(tmp_path):
     one*, and no row is right for it. A URL is listed explicitly, so a fetch
     that fails is always a skip.
     """
-    root = _repo(tmp_path, urls=["https://x.test/gone"])
-    (root / "mw.py").write_text(
+    root = _repo(tmp_path, urls=["https://x.test/gone fetch=mw"])
+    _write_fetcher(root, 
         "def fetch(url):\n    raise RuntimeError('404 not found')\n", encoding="utf-8"
     )
     run(root, refresh_urls=True)

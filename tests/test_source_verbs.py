@@ -36,8 +36,26 @@ def _args(entry=None, **flags):
 
 @pytest.fixture
 def repo(tmp_path):
-    (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
-    (tmp_path / ".fux" / "sources").mkdir(parents=True)
+    # 🔴 **A routes table, because `fux add <url>` now RESOLVES a fetcher and
+    # refuses when nothing matches** (W-199 D1, 2026-09-20). Before that it
+    # wrote `fetch=http` from the engine default; there is no default any more,
+    # so a fixture repo that means to accept a URL has to say which fetcher
+    # reaches it — which is the behaviour under test in several cases below.
+    (tmp_path / "fux.toml").write_text(
+        '[sources]\n[sources.url]\nmax_parallel = 4\n'
+        '[sources.url.routes]\n"x.test" = "http"\n"*.x.test" = "http"\n'
+        '"wiki.test" = "http"\n"example.com" = "http"\n',
+        encoding="utf-8",
+    )
+    fetchers = tmp_path / ".fux" / "fetchers"
+    fetchers.mkdir(parents=True)
+    (fetchers / "http.py").write_text(
+        'def fetch(url):\n    return "# T\\n\\nbody\\n"\n', encoding="utf-8"
+    )
+    (fetchers / "cdp.py").write_text(
+        'def fetch(url):\n    return "# T\\n\\nbody\\n"\n', encoding="utf-8"
+    )
+    (tmp_path / ".fux" / "sources").mkdir(parents=True, exist_ok=True)
     (tmp_path / ".fux" / "sources" / "urls").write_text("# my list\n", encoding="utf-8")
     (tmp_path / ".fux" / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
     # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
@@ -409,7 +427,7 @@ def test_removing_a_url_always_deletes_the_line(repo, monkeypatch, capsys):
     """`urls` has no exclusions, so there is only ever one branch to take."""
     _add(repo, monkeypatch, _args("https://x.test/a"))
     _remove(repo, monkeypatch, _args("https://x.test/a"))
-    assert "https://x.test/a" not in _urls(repo)
+    assert "https://x.test/a fetch=http" not in _urls(repo)
     assert "removed" in capsys.readouterr().out
 
 
@@ -423,7 +441,7 @@ def test_removing_a_url_deletes_its_line_and_nothing_else(repo, monkeypatch):
     _add(repo, monkeypatch, _args("https://x.test/b"))
     _remove(repo, monkeypatch, _args("https://x.test/a"))
     text = _urls(repo)
-    assert "https://x.test/a" not in text
+    assert "https://x.test/a fetch=http" not in text
     assert "https://x.test/b fetch=http" in text
     assert "# my list" in text
 
@@ -581,7 +599,7 @@ def test_the_module_imports_no_network_library():
 
 def test_add_with_no_fetch_opens_nothing(repo, monkeypatch, capsys):
     _add(repo, monkeypatch, _args("https://x.test/a", no_fetch=True))
-    assert "https://x.test/a" in _urls(repo)
+    assert "https://x.test/a fetch=http" in _urls(repo)
     assert "fetching" not in capsys.readouterr().err
 
 
@@ -594,7 +612,7 @@ def _url_repo(repo):
     """
     (repo / "fux.toml").write_text(
         '[sources]\nurls_file = ".fux/sources/urls"\n'
-        '[sources.url]\nfetcher = ".fux/fetchers/http.py"\nmax_parallel = 4\n',
+        '[sources.url]\nmax_parallel = 4\n',
         encoding="utf-8",
     )
     (repo / ".fux" / "sources" / "urls").write_text(
@@ -702,7 +720,7 @@ def test_bare_add_lists_every_list(repo, monkeypatch, capsys):
 
 
 def test_listing_marks_a_line_fux_did_not_write(repo, monkeypatch, capsys):
-    (repo / ".fux" / "sources" / "urls").write_text("https://x.test/a\n", encoding="utf-8")
+    (repo / ".fux" / "sources" / "urls").write_text("https://x.test/a fetch=http\n", encoding="utf-8")
     _add(repo, monkeypatch, _args(None))
     out = capsys.readouterr().out
     assert "* https://x.test/a" in out
@@ -732,7 +750,6 @@ def test_a_cli_written_line_states_the_repo_policy_not_the_engine_default(tmp_pa
 
     (tmp_path / "fux.toml").write_text(
         "[sources]\n\n[sources.url]\n"
-        'fetcher = ".fux/fetchers/cdp.py"\n'
         'ttl = "7d"\n'
         "keep = false\n"
         'update = "never"\n'
@@ -744,11 +761,21 @@ def test_a_cli_written_line_states_the_repo_policy_not_the_engine_default(tmp_pa
     listing.write_text("", encoding="utf-8")
 
     defaults = _source_defaults(tmp_path, sourcelist.URLS)
-    _, line, _ = add(listing, "https://wiki.test/p", {}, sourcelist.URLS, defaults)
+    _, line, _ = add(listing, "https://wiki.test/p", {"fetch": "cdp"}, sourcelist.URLS, defaults)
 
     assert "ttl=7d" in line
-    assert "fetch=cdp" in line, "the fetcher path's stem is what `fetch=` names"
     assert "keep=false" in line and "update=never" in line
+
+    # ⚠ **`fetch` LEFT the source-wide layer on 2026-09-20** (W-199 D2). This
+    # case used to prove that `[sources.url] fetcher = ".fux/fetchers/cdp.py"`
+    # reached a CLI-written line; that key is deleted, and `fux add` resolves a
+    # stem per URL instead. The three attributes above still carry the layer
+    # W-140 row 5 was about, and `fetch` arrives as a resolved override.
+    assert "fetch=cdp" in line
+    assert "fetch" not in defaults, (
+        "`fetch` must not come back as a source-wide default - there is no default "
+        "fetcher, and a silent one is what W-199 D2 deleted"
+    )
 
 
 def test_an_explicit_flag_still_beats_the_repo_policy(tmp_path):
@@ -764,7 +791,7 @@ def test_an_explicit_flag_still_beats_the_repo_policy(tmp_path):
     listing.write_text("", encoding="utf-8")
 
     defaults = _source_defaults(tmp_path, sourcelist.URLS)
-    _, line, _ = add(listing, "https://wiki.test/p", {"ttl": "30s"}, sourcelist.URLS, defaults)
+    _, line, _ = add(listing, "https://wiki.test/p fetch=http", {"ttl": "30s"}, sourcelist.URLS, defaults)
     assert "ttl=30s" in line, "the flag beats the repo policy, which beats the built-in"
 
 

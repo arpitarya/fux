@@ -45,7 +45,6 @@ def _repo(tmp_path, *, keep=True):
     (tmp_path / "docs" / "a.md").write_text("# A\n\nbody\n", encoding="utf-8")
     (tmp_path / "fux.toml").write_text(
         "[sources]\n\n[sources.url]\n"
-        'fetcher = ".fux/fetchers/http.py"\n'
         "max_parallel = 2\n",
         encoding="utf-8",
     )

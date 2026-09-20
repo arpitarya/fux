@@ -187,7 +187,14 @@ def install(root: Path) -> HookReport:
 
 def _register_merge_driver(root: Path) -> str:
     """`git config merge.fux-index.driver` — local to this repo, never global."""
-    command = "fux-merge-index %O %A %B"
+    # ⚠ **`%P` is the FOURTH argument and it is load-bearing.** `%A` is a
+    # temporary file git creates for the result, so its basename is
+    # `.merge_file_XXXXXX` and tells the driver nothing about which file is
+    # being merged. `.fux/index/` holds two committed shapes now — the `*.jsonl`
+    # shards and W-199's TSV `REGISTER` — and the driver has to know which it
+    # has. Added 2026-09-20; before it, the register conflicted on a merge that
+    # resolved every shard cleanly.
+    command = "fux-merge-index %O %A %B %P"
     for key, value in (
         (f"merge.{MERGE_DRIVER_NAME}.name", "fux index: line-wise last-writer-wins on (ver, sha)"),
         (f"merge.{MERGE_DRIVER_NAME}.driver", command),
@@ -207,14 +214,23 @@ def _write_gitattributes(root: Path) -> None:
     frequently already says things about their own tree.
     """
     path = root / ".gitattributes"
-    line = f".fux/index/*.jsonl merge={MERGE_DRIVER_NAME}"
+    # 🔴 **Both committed files under `.fux/index/`, not just the shards.**
+    # `REGISTER` (W-199 D4) landed in that directory while this line matched
+    # `*.jsonl` alone, so a merge that resolved every shard cleanly conflicted
+    # on the register — a machine plane conflicting on the mere fact that two
+    # people worked at once, which is the thing this driver exists to prevent.
+    lines = [
+        f".fux/index/*.jsonl merge={MERGE_DRIVER_NAME}",
+        f".fux/index/REGISTER merge={MERGE_DRIVER_NAME}",
+    ]
     existing = path.read_text(encoding="utf-8") if path.exists() else ""
-    if line in existing:
+    missing = [line for line in lines if line not in existing]
+    if not missing:
         return
     prefix = "" if not existing or existing.endswith("\n") else "\n"
     path.write_text(
         existing + prefix + "\n# fux: the committed index merges line by line, never textually.\n"
-        + line + "\n",
+        + "\n".join(missing) + "\n",
         encoding="utf-8",
     )
 

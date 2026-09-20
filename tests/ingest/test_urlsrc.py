@@ -16,6 +16,21 @@ from fux.ingest.urlsrc import UrlEntry, fetch_all, load_fetcher, read_urls
 from fux.query.tokenize import tokenize
 from fux.store.format import term_hash
 
+
+def _write_fetcher(root, text, name="mw.py", encoding="utf-8"):
+    """Write a fixture fetcher where the resolver looks for it.
+
+    ⚠ **`.fux/fetchers/` is the only place now.** Until 2026-09-20 a fixture
+    could put a fetcher anywhere and point `[sources.url] fetcher` at it; that
+    key is deleted (W-199 D2) and the directory is fixed, so the fixture creates
+    it rather than relying on `fux setup` having run.
+    """
+    path = root / ".fux" / "fetchers" / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+    return path
+
+
 FAKE_FETCHER = '''\
 CALLS = {"connect": 0, "close": 0, "fetch": []}
 
@@ -41,8 +56,15 @@ def _urls(tmp_path, rel=URLS_FILE):
     return [e.value for e in read_urls(tmp_path, rel)]
 
 
-def _entries(urls, fetcher="mw.py"):
-    """Hand-resolved entries, so `fetch_all` can be exercised without a config."""
+def _entries(urls, fetcher=".fux/fetchers/mw.py"):
+    """Hand-resolved entries, so `fetch_all` can be exercised without a config.
+
+    ⚠ **`fetcher_path` is a PATH and `fetch` is a stem.** They were both `mw.py`
+    while the fetchers directory was wherever `[sources.url] fetcher` pointed;
+    since 2026-09-20 the directory is fixed at `.fux/fetchers/` and a stem
+    resolves against it, so the two are different strings and the default here
+    is the path `fetcher_for("mw")` would produce.
+    """
     return [UrlEntry(url=u, fetch="mw", fetcher_path=fetcher) for u in urls]
 
 
@@ -57,18 +79,43 @@ def _write_toml(tmp_path, text, dirs=("docs",)):
 
 
 def _write_urls(tmp_path, lines):
+    """Write a URL list, filling in `fetch=` where the case does not state one.
+
+    🔴 **Every URL line must state its fetcher since 2026-09-20** (W-199 D2;
+    SR-URL-LIST decision 16) — there is no source-wide default left to inherit.
+    Most cases here are about something else entirely, so the helper supplies
+    the fixture's own `mw` fetcher rather than every call site repeating it.
+    **A case that is about the fetcher states its own `fetch=` and this leaves
+    it alone**, which is what keeps the grammar cases honest.
+    """
     path = tmp_path / URLS_FILE
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text("".join(f"{line}\n" for line in lines), encoding="utf-8")
+    out = []
+    for line in lines:
+        stripped = line.strip()
+        # ⚠ **A `#` inside a URL is a FRAGMENT, not a comment** — only a line
+        # that STARTS with `#` is one. Splitting on the first `#` hid a
+        # `fetch=` that sat after a fragment and double-appended one.
+        is_comment = stripped.startswith("#") or not stripped
+        if not is_comment and not stripped.startswith("!") and "fetch=" not in stripped:
+            # ⚠ **Before any TRAILING comment.** Appending at the end put
+            # `fetch=mw` inside `# trailing note`, so the line still had no
+            # fetcher and the helper silently did nothing. A `#` that starts
+            # the line is a comment; one after a URL may be a fragment, so the
+            # split is on ` #` with the space.
+            head, sep, tail = line.partition(" #")
+            line = f"{head.rstrip()} fetch=mw{(' #' + tail) if sep else ''}"
+        out.append(line)
+    path.write_text("".join(f"{line}\n" for line in out), encoding="utf-8")
 
 
 def _init(tmp_path, *, urls, files=None, fetcher=FAKE_FETCHER, config=None):
     files = files if files is not None else {"docs/a.md": "# Doc A\n\nrepo body\n"}
-    url_lines = '[sources.url]\nfetcher = "mw.py"\nmax_parallel = 4\n'
+    url_lines = '[sources.url]\nmax_parallel = 4\n'
     if config is not None:
         url_lines += "[sources.url.config]\n" + config
     _write_toml(tmp_path, "[sources]\n" + url_lines)
-    (tmp_path / "mw.py").write_text(fetcher, encoding="utf-8")
+    _write_fetcher(tmp_path, fetcher)
     _write_urls(tmp_path, urls)
     for rel, text in files.items():
         path = tmp_path / rel
@@ -82,7 +129,7 @@ def _init(tmp_path, *, urls, files=None, fetcher=FAKE_FETCHER, config=None):
 def test_config_parses_url_source(tmp_path):
     _init(tmp_path, urls=["https://x.test/a"])
     cfg = load_config(tmp_path)
-    assert cfg.url.fetcher == "mw.py"
+    assert cfg.url.routes == {}  # `fetcher` was deleted 2026-09-20 (W-199 D2)
     assert cfg.url.urls_file == ".fux/sources/urls"
     assert cfg.url.config == {}
     assert not hasattr(cfg.url, "meta"), "`meta` is deleted (W-194), not defaulted"
@@ -91,10 +138,11 @@ def test_config_parses_url_source(tmp_path):
 def test_config_paths_default_into_the_fux_dir(tmp_path):
     _write_toml(tmp_path, "[sources]\n[sources.url]\nmax_parallel = 4\n")
     cfg = load_config(tmp_path)
-    # The default is the plain-GET fetcher: a line with no `fetch=` means
-    # `fetch=http` (SR-HTTP-FETCHER decision 1), and this key is the
-    # source-wide setting for that attribute.
-    assert cfg.url.fetcher == ".fux/fetchers/http.py"
+    # 🔴 **There is no default fetcher any more** (W-199 D2, 2026-09-20). A
+    # line with no `fetch=` does not mean `fetch=http`; it fails to parse. What
+    # this key's slot holds now is the routes table, empty until a repo writes
+    # one, and an empty table resolves nothing rather than falling back.
+    assert cfg.url.routes == {}
     assert cfg.url.urls_file == ".fux/sources/urls"
 
 
@@ -103,7 +151,7 @@ def test_config_rejects_a_meta_key_outright(tmp_path):
     `meta = "cleartext"` — the key is unknown, and an unknown key in a
     committed config is a named error, never a warning or a silent ignore."""
     (tmp_path / "fux.toml").write_text(
-        '[sources]\n[sources.url]\nmax_parallel = 4\nfetcher = "mw.py"\nmeta = "plain"\n'
+        '[sources]\n[sources.url]\nmax_parallel = 4\nmeta = "plain"\n'
     )
     with pytest.raises(FuxError, match=r"\[sources\.url\] meta is not a fux\.toml key"):
         load_config(tmp_path)
@@ -122,7 +170,7 @@ def test_config_table_is_opaque_but_must_be_a_table(tmp_path):
     assert load_config(tmp_path).url.config == {"cdp_port": 9333, "anything_at_all": "fux never reads this"}
 
     (tmp_path / "fux.toml").write_text(
-        '[sources]\n[sources.url]\nmax_parallel = 4\nfetcher = "mw.py"\nconfig = 9222\n'
+        '[sources]\n[sources.url]\nmax_parallel = 4\nconfig = 9222\n'
     )
     with pytest.raises(FuxError, match=r"\[sources.url.config\] must be a table"):
         load_config(tmp_path)
@@ -186,20 +234,20 @@ def test_missing_fetcher_file_fails_loudly(tmp_path):
 
 
 def test_fetcher_without_fetch_fails_loudly(tmp_path):
-    (tmp_path / "mw.py").write_text("x = 1\n", encoding="utf-8")
+    _write_fetcher(tmp_path, "x = 1\n")
     with pytest.raises(FuxError, match="no fetch"):
-        load_fetcher(tmp_path, "mw.py")
+        load_fetcher(tmp_path, ".fux/fetchers/mw.py")
 
 
 def test_fetch_all_calls_hooks_once_and_skips_failures(tmp_path):
-    (tmp_path / "mw.py").write_text(FAKE_FETCHER, encoding="utf-8")
+    _write_fetcher(tmp_path, FAKE_FETCHER)
     fetched, skipped = fetch_all(
         tmp_path, _entries(["https://x.test/b", "https://x.test/boom", "https://x.test/a"])
     )
     assert [f.url for f in fetched] == ["https://x.test/a", "https://x.test/b"]  # sorted, deterministic
     assert [s.rel_path for s in skipped] == ["https://x.test/boom"]
     assert "no such page" in skipped[0].reason
-    module = load_fetcher(tmp_path, "mw.py")  # fresh module: counters reset
+    module = load_fetcher(tmp_path, ".fux/fetchers/mw.py")  # fresh module: counters reset
     assert callable(module.connect) and callable(module.close)
 
 
@@ -227,13 +275,13 @@ def test_config_table_reaches_configure_verbatim(tmp_path):
     from fux.config import load
 
     cfg = load(tmp_path)
-    got = cfg.url.config_for("mw.py")
+    got = cfg.url.config_for(".fux/fetchers/mw.py")
     assert got == {"flag": True, "cdp_port": 9333, "nested": {"deep": [1, 2]}}
     # A fetcher that is not `mw` sees the shared key and nothing else.
     assert cfg.url.config_for(".fux/fetchers/other.py") == {"flag": True}
 
 def test_configure_is_optional_and_absent_table_is_empty(tmp_path):
-    (tmp_path / "mw.py").write_text(
+    _write_fetcher(tmp_path, 
         _RECORDER
         + 'def configure(config):\n'
         '    _LOG.write_text(repr(config))\n'
@@ -242,15 +290,15 @@ def test_configure_is_optional_and_absent_table_is_empty(tmp_path):
         encoding="utf-8",
     )
     fetch_all(tmp_path, _entries(["https://x.test/a"]))  # no table passed at all
-    assert (tmp_path / "log.txt").read_text(encoding="utf-8") == "{}"
+    assert (tmp_path / ".fux" / "fetchers" / "log.txt").read_text(encoding="utf-8") == "{}"
 
-    (tmp_path / "mw.py").write_text('def fetch(url):\n    return "# T\\n\\nbody\\n"\n', encoding="utf-8")
+    _write_fetcher(tmp_path, 'def fetch(url):\n    return "# T\\n\\nbody\\n"\n', encoding="utf-8")
     fetched, _ = fetch_all(tmp_path, _entries(["https://x.test/a"]), {"k": 1})  # no configure defined
     assert len(fetched) == 1
 
 
 def test_configure_runs_before_connect(tmp_path):
-    (tmp_path / "mw.py").write_text(
+    _write_fetcher(tmp_path, 
         _RECORDER
         + 'ORDER = []\n'
         'def configure(config):\n'
@@ -263,11 +311,11 @@ def test_configure_runs_before_connect(tmp_path):
         encoding="utf-8",
     )
     fetch_all(tmp_path, _entries(["https://x.test/a"]), {})
-    assert (tmp_path / "log.txt").read_text(encoding="utf-8") == "configure,connect"
+    assert (tmp_path / ".fux" / "fetchers" / "log.txt").read_text(encoding="utf-8") == "configure,connect"
 
 
 def test_configure_raising_is_a_loud_failure_not_a_skip(tmp_path):
-    (tmp_path / "mw.py").write_text(
+    _write_fetcher(tmp_path, 
         'def configure(config):\n    raise ValueError("unknown key: prot")\n'
         'def fetch(url):\n    return "# T\\n\\nbody\\n"\n',
         encoding="utf-8",
@@ -277,7 +325,7 @@ def test_configure_raising_is_a_loud_failure_not_a_skip(tmp_path):
 
 
 def test_fetch_all_sanitizes_hostile_line_separators(tmp_path):
-    (tmp_path / "mw.py").write_text(
+    _write_fetcher(tmp_path, 
         'def fetch(url):\n    return "# T\\n\\nbefore\\u2028after \\u2029 \\u0085 end\\n"\n',
         encoding="utf-8",
     )
@@ -313,7 +361,7 @@ def test_plain_ingest_is_offline_and_carries_urls_forward(tmp_path):
     run(tmp_path, refresh_urls=True)
     before = {p: p.read_bytes() for p in store.iter_shard_paths(tmp_path)}
 
-    (tmp_path / "mw.py").write_text("def fetch(url):\n    raise AssertionError('network on offline run')\n", encoding="utf-8")
+    _write_fetcher(tmp_path, "def fetch(url):\n    raise AssertionError('network on offline run')\n", encoding="utf-8")
     report = run(tmp_path)  # no flag: must not import or call the fetcher
     after = {p: p.read_bytes() for p in store.iter_shard_paths(tmp_path)}
     assert before == after
@@ -335,7 +383,7 @@ def test_failed_refresh_keeps_prior_record(tmp_path):
     run(tmp_path, refresh_urls=True)
     prior = store.read_index(tmp_path)["url:https://x.test/a"]
 
-    (tmp_path / "mw.py").write_text("def fetch(url):\n    raise RuntimeError('site down')\n", encoding="utf-8")
+    _write_fetcher(tmp_path, "def fetch(url):\n    raise RuntimeError('site down')\n", encoding="utf-8")
     report = run(tmp_path, refresh_urls=True)
     assert store.read_index(tmp_path)["url:https://x.test/a"] == prior
     assert any("site down" in s.reason for s in report.skipped)
@@ -358,7 +406,7 @@ def test_a_delisted_url_disappears_on_an_offline_run(tmp_path):
     assert "url:https://x.test/b" in store.read_index(tmp_path)
 
     _write_urls(tmp_path, ["https://x.test/a"])  # b de-listed; nothing else changes
-    (tmp_path / "mw.py").write_text(
+    _write_fetcher(tmp_path, 
         "def fetch(url):\n    raise AssertionError('network on an offline run')\n", encoding="utf-8"
     )
     run(tmp_path)  # no flag, no fetcher call
@@ -380,7 +428,7 @@ def test_a_still_listed_url_whose_fetch_fails_keeps_its_record(tmp_path):
     run(tmp_path, refresh_urls=True)
     prior = store.read_index(tmp_path)["url:https://x.test/a"]
 
-    (tmp_path / "mw.py").write_text(
+    _write_fetcher(tmp_path, 
         "def fetch(url):\n    raise RuntimeError('site down')\n", encoding="utf-8"
     )
     run(tmp_path, refresh_urls=True)  # networked, and the fetch fails
@@ -420,7 +468,7 @@ def test_ver_bumps_when_fetched_content_changes(tmp_path):
     run(tmp_path, refresh_urls=True)
     assert store.read_index(tmp_path)["url:https://x.test/a"]["ver"] == 1
 
-    (tmp_path / "mw.py").write_text('def fetch(url):\n    return "# Page a\\n\\nnew body\\n"\n', encoding="utf-8")
+    _write_fetcher(tmp_path, 'def fetch(url):\n    return "# Page a\\n\\nnew body\\n"\n', encoding="utf-8")
     run(tmp_path, refresh_urls=True)
     assert store.read_index(tmp_path)["url:https://x.test/a"]["ver"] == 2
 
@@ -519,7 +567,7 @@ def test_a_line_attribute_beats_the_source_wide_setting(tmp_path):
     W-194 deleted it, and `fetch` is now the only attribute with all three
     layers. A line that declares one wins for its own URL and no other."""
     _init(tmp_path, urls=["https://x.test/a fetch=cdp", "https://x.test/b"])
-    (tmp_path / "cdp.py").write_text(CDP_FETCHER, encoding="utf-8")
+    _write_fetcher(tmp_path, CDP_FETCHER, name="cdp.py")
     run(tmp_path, refresh_urls=True)
     index = store.read_index(tmp_path)
     assert index["url:https://x.test/a"]["title"] == "Rendered"   # the line's fetcher
@@ -534,7 +582,7 @@ def fetch(url):
 def test_fetch_routes_per_line_and_only_loads_what_it_needs(tmp_path):
     """`fetch=` picks a file in the fetcher directory; nothing else is imported."""
     _init(tmp_path, urls=["https://x.test/a", "https://x.test/b fetch=cdp"])
-    (tmp_path / "cdp.py").write_text(CDP_FETCHER, encoding="utf-8")
+    _write_fetcher(tmp_path, CDP_FETCHER, name="cdp.py")
     (tmp_path / "http.py").write_text(  # named by no line: must never be imported
         "raise AssertionError('a fetcher no line names must never be imported')",
         encoding="utf-8",
@@ -549,7 +597,7 @@ def test_a_missing_fetcher_names_setup_when_nothing_is_beside_it(tmp_path):
     """Nothing in the directory, so `fux setup` IS the remedy."""
     _write_toml(
         tmp_path,
-        '[sources]\n[sources.url]\nfetcher = ".fux/fetchers/http.py"\nmax_parallel = 4\n',
+        '[sources]\n[sources.url]\nmax_parallel = 4\n',
     )
     (tmp_path / "docs").mkdir(parents=True, exist_ok=True)
     (tmp_path / "docs" / "a.md").write_text("# Doc A\n\nrepo body\n", encoding="utf-8")
@@ -574,7 +622,7 @@ def test_a_missing_fetcher_names_ITS_SIBLINGS_when_there_are_any(tmp_path):
     """
     _write_toml(
         tmp_path,
-        '[sources]\n[sources.url]\nfetcher = ".fux/fetchers/http.py"\nmax_parallel = 4\n',
+        '[sources]\n[sources.url]\nmax_parallel = 4\n',
     )
     (tmp_path / "docs").mkdir(parents=True, exist_ok=True)
     (tmp_path / "docs" / "a.md").write_text("# Doc A\n\nrepo body\n", encoding="utf-8")

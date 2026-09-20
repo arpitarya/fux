@@ -13,6 +13,24 @@ Living in a dotdir has one consequence worth knowing: linters that skip
 hidden directories by default (ruff does) will not lint this file. That is
 deliberate — it is your code, not a fux CI target.
 
+**This file claims no routes, and that is deliberate.** A fetcher may declare a
+module-level `ROUTES` map — host pattern to fetcher stem — which fux reads with
+`ast` and **never by importing this file**, and which `fux add` consults when no
+`--fetch` was given:
+
+    ROUTES = {
+        "example.com": "http",              # that host exactly
+        "*.wiki.example.com": "http",       # subdomains -- NOT the apex
+        "intranet.example.com:8443": "http",
+        "re:^.*\\.sharepoint\\.com$": "http",  # compiled and anchored at load
+    }
+
+**The shipped fetchers claim nothing**, because a shipped claim would make
+fux's opinion about somebody else's hosts arrive with an install. Yours may
+claim whatever you like. 🔴 **Two patterns matching one host is a hard error
+naming both** — there is no non-arbitrary order between two regexes, and
+guessing one builds a plausible index retrieved by the wrong fetcher.
+
 The contract fux relies on — keep these names:
 
     configure(config: dict) -> None  # optional; once after import, before connect()

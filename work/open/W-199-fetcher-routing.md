@@ -23,6 +23,61 @@ or the response's `Content-Type` through the decoder registry, refuses when
 nothing maps; ingest decodes by the declared stem; `fux doctor` checks every
 `decoder=` resolves. The W-200 provenance finding this item owes reads that field.
 
+## ✅ D1–D4 AND THE DOCTOR ROWS ARE BUILT — 2026-09-20 (Claude Code)
+
+**Shipped, in the ruled order D2 → D1 → D3 → D4 → doctor.** DoD items **1–9 are
+met**; ⚠ **item 10 — the `decoder=` half of the pipe ruling — is NOT built** and
+is why this item stays open. It arrived in the addendum above during the same
+session and was outside the prompt that built this.
+
+| | what landed |
+|---|---|
+| **D2** | `[sources.url] fetcher` **deleted** — refused by name, `CHANGELOG` under *Removed — BREAKING*. `fetch=` is a **required** attribute: a line without one fails to parse, naming the line and the word to add. |
+| **D1** | `fux add --fetch <stem>`; without it the routes table then the module claims resolve one, and **nothing matching REFUSES**, naming the host tried and the stems on disk. |
+| **D3** | `ingest/routes.py` — four pattern shapes, `re:` compiled **and anchored at load**, claims read with `ast` and never imported, collisions refused rather than sorted. |
+| **D4** | `.fux/index/REGISTER`, committed, L3-bound; `ingest/register.py`. |
+| doctor | `fetcher routes`, `pinned fetchers`, `register`. |
+
+**Records:** SR-FETCHER 16, SR-URL-LIST 16, SR-CONFIG 16, SR-INGEST 22,
+SR-DOCTOR's three rows, SR-CLI, SR-DOTFUX, SR-MERGE-DRIVER. GLOSSARY gains
+*route · pin · claim · register*. Templates carry a commented `ROUTES` example,
+twins refreshed, the two agent guides re-copied into all three vendor trees.
+
+🔴 **Four things this spec did not predict, each found by a test:**
+
+1. 🔴 **The register conflicted on merge.** It is committed inside
+   `.fux/index/`, where the merge driver was bound to `*.jsonl` alone — so a
+   merge that resolved **every shard cleanly** conflicted on the register, which
+   is precisely the *machine planes never conflict because two people worked at
+   once* property the driver exists for. Fixed by binding it and by passing
+   **`%P`**: `%A` is a temp file whose basename tells the driver nothing.
+   ⚠ **A repo registered before today passes three arguments and will refuse a
+   register rather than merge it** — `fux hooks` re-registers.
+2. 🔴 **The ruling's `outcome` column could not survive its own L3 rule.**
+   `indexed` then `reused` is what it says on two runs from identical sources,
+   which breaks the byte-identity the same decision requires. **`kind` replaced
+   it**; the run-shaped outcome is what W-200's ledger already carries.
+3. 🔴 **`fux add` was silently re-routing an existing pin.** Re-adding a URL to
+   change its `ttl` overwrote its `fetch=` with whatever the table now said —
+   the opposite of D1's *every line is a pin*. An existing line's `fetch=` is now
+   left alone. Found by `test_an_unflagged_attribute_keeps_what_the_line_already_said`.
+4. ⚠ **A doctor detail quoted a `FuxError` into its text**, and a `FuxError`
+   message may hold an em dash — which crashes `fux doctor` on a Windows console
+   exactly when the repo is already broken. The row now says *see that row*.
+
+⚠ **"Node: no change" held, and the twin gate still fired.** `sourcelist.mjs`
+is the `dirs` half only, so nothing about `fetch=` reaches it — but Python's
+`parse` gained a generic required-attribute check, and a `dirs` attribute made
+required later would have Python refusing a line Node accepts, with
+`query/__init__` degrading to *no archived directories* and the two readers
+returning different archived sets from one file. **The concept is ported as a
+dead branch** rather than exempted.
+
+⚠ **What the test fixtures cost, stated:** ~110 cases across 14 modules carried
+either the deleted key or a bare URL line. They are rewritten, not exempted.
+
+---
+
 ## ✅ RULED 2026-09-20 (Arpit, Cowork) — D1, D2, D3 and a fourth deliverable
 
 **D1 — `fetch=` is never empty and never defaulted.** *"The set should never be

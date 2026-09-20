@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@c984699b459a, src/fux/setup.py@ffe39c973497, tests/test_verb_table_agreement.py@1e7999ffd28f]
+owns: [src/fux/store/fuxdir.py@c984699b459a, src/fux/setup.py@f60d5c17f43e, tests/test_verb_table_agreement.py@1e7999ffd28f]
 laws: [L2, L3, L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: b4c94d365ae813fd9e5a5c6c785993b85e92994489bf174c1270c9f627272a85
+content_sha: ab44244aba69c81aa158e7f5619ae0f3d7a7d43eb3fdf8954ce17c68fd1faf38
 ---
 
 # SR-DOTFUX — the `.fux/` directory
@@ -856,6 +856,14 @@ is a different kind of thing from the two beside it.
 
 ⚠ **If Arpit would rather it have its own `DECLARED` row like `acquired/`, that
 is a one-line change** — the argument above is a judgement, not a constraint.
+
+**`fux setup` stopped writing `[sources.url] fetcher` on 2026-09-20** (W-199
+D2). The key is deleted, so the scaffolded `fux.toml` carries a commented
+`[sources.url.routes]` example instead, and the generated `.fux/sources/urls`
+header prints `fetch=<name>` as **REQUIRED - no default** rather than naming a
+default it no longer has. ⚠ **That line is DERIVED from the attribute**, which
+is what stops it going stale the way W-140 row 18's transcribed table did — the
+derivation now reads `Attribute.required` as well as `Attribute.default`.
 
 ### Consequences
 

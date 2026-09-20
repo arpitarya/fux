@@ -7,10 +7,10 @@ description: Flat verbs in seven groups, one error boundary, three output modes.
 status: accepted
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@104881b78675, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@1e4212c25c9e, src/fux/progress.py@925dccc045ce]
+owns: [src/fux/cli.py@f9d609b1b3cc, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@002524c0ea96, src/fux/progress.py@925dccc045ce]
 laws: [L1, L4, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: de541fa3d95d383b200d1ba18ed2f5ae5b87a583b9c6ff5f2795266c1ed701ca
+content_sha: ed22ae22b5d8bd640a8e69812cd6815c63328586d8d3bb6799e3343359e90b2f
 ---
 
 # SR-CLI — the command-line surface
@@ -1211,6 +1211,15 @@ After this it cannot be. **The fence does not disappear — it moves**: the L4
 test now asserts that an ingest invoked with `--no-fetch` imports no transport
 and opens no socket, which is the invocation the git hooks actually run.
 
+
+**`fux add --fetch <stem>`** (W-199 D1, 2026-09-20) — the general form of
+`--cdp` / `--http`, which stay as the two aliases they always were. 🔴 **Without
+it, `fux add <url>` RESOLVES a stem** through `[sources.url.routes]` and the
+fetchers' `ROUTES` claims, and **refuses** when nothing matches, naming the host
+it tried and the stems on disk. There is no default fetcher to fall back to
+([SR-FETCHER](0117_fetcher.md) decision 16). ⚠ **An existing line's `fetch=` is
+left alone on a re-add** — the line is a pin a human meant, and re-adding a URL
+to change its `ttl` must not silently re-route it.
 
 ### Consequences
 

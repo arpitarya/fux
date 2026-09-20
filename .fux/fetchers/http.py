@@ -3,19 +3,38 @@
 **This file belongs to you, not to fux. It is committed to your repo, at
 `.fux/fetchers/http.py`, and fux will never rewrite it.** `fux setup` writes it
 once if it is missing; after that it is yours. Fux reads it by path under
-`fux add <URL>` or `fux update`, calls it once per URL to RETRIEVE
+`fux add <URL>` or `fux ingest`, calls it once per URL to RETRIEVE
 the bytes, decodes those itself, and indexes the result exactly like a repo
 file. Edit anything — add headers, a
 proxy, an auth token from your environment, a retry. Fux imports none of that, only this file's entry points.
 
-**This is the default fetcher.** A line in `.fux/sources/urls` with no `fetch=`
-attribute comes here. A line that says `fetch=cdp` goes to `cdp.py` instead,
-and **nothing escalates automatically** — not on a non-2xx, not on an empty
-body, not on a page that is obviously a rendered shell. A plain GET that
-returns something useless returns something useless, and a human writes
-`fetch=cdp` on that line. A classifier deciding what "too thin" means is how a
-navigation bar gets indexed as a runbook. A tiny `wlen` in the index is the
-signal that a page needed a browser, and it is one a human reads once.
+**There is NO default fetcher** (2026-09-20). Every line in `.fux/sources/urls`
+states its own `fetch=`, and a line without one fails to load. A line that says
+`fetch=http` comes here; `fetch=cdp` goes to `cdp.py` instead, and **nothing
+escalates automatically** — not on a non-2xx, not on an empty body, not on a
+page that is obviously a rendered shell. A plain GET that returns something
+useless returns something useless, and a human writes `fetch=cdp` on that line.
+A classifier deciding what "too thin" means is how a navigation bar gets
+indexed as a runbook. A tiny `wlen` in the index is the signal that a page
+needed a browser, and it is one a human reads once.
+
+**This file claims no routes, and that is deliberate.** A fetcher may declare a
+module-level `ROUTES` map — host pattern to fetcher stem — which fux reads with
+`ast` and **never by importing this file**, and which `fux add` consults when no
+`--fetch` was given:
+
+    ROUTES = {
+        "example.com": "http",              # that host exactly
+        "*.wiki.example.com": "http",       # subdomains -- NOT the apex
+        "intranet.example.com:8443": "http",
+        "re:^.*\\.sharepoint\\.com$": "http",  # compiled and anchored at load
+    }
+
+**The shipped fetchers claim nothing**, because a shipped claim would make
+fux's opinion about somebody else's hosts arrive with an install. Yours may
+claim whatever you like. 🔴 **Two patterns matching one host is a hard error
+naming both** — there is no non-arbitrary order between two regexes, and
+guessing one builds a plausible index retrieved by the wrong fetcher.
 
 Living in a dotdir has one consequence worth knowing: linters that skip hidden
 directories by default (ruff does) will not lint this file. That is deliberate

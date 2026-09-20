@@ -103,8 +103,15 @@ def test_setup_writes_both_fetchers_and_both_source_lists(tmp_path):
 
 
 def test_the_default_fetcher_path_resolves_to_a_file_after_setup(tmp_path):
-    """W-51: `DEFAULT_FETCHER` named a file that did not exist."""
-    from fux.config import DEFAULT_FETCHER
+    """W-51: the shipped plain-GET fetcher must exist where a stem resolves to it.
+
+    ⚠ **`DEFAULT_FETCHER` is gone** (W-199 D2, 2026-09-20) — there is no default
+    fetcher any more. What survives of W-51's lesson is narrower and still
+    worth a test: `fetch=http` resolves to `<FETCHERS_DIR>/http.py`, and `fux
+    setup` has to have put a file there.
+    """
+    from fux.config import FETCHERS_DIR
+    DEFAULT_FETCHER = f"{FETCHERS_DIR}/http.py"
 
     setup_mod.run(tmp_path)
     assert (tmp_path / DEFAULT_FETCHER).is_file()

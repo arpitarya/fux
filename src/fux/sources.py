@@ -83,6 +83,7 @@ from pathlib import Path
 from .config import (
     CONFIG_NAME,
     DEFAULT_TYPES_FILE,
+    FETCHERS_DIR,
     find_root,
     load,
 )
@@ -312,10 +313,12 @@ def _source_defaults(root: Path, spec: sourcelist.ListSpec) -> dict[str, str]:
         return {}
     if url is None:
         return {}
-    # `fetcher` is a PATH and `fetch=` is a stem: `.fux/fetchers/cdp.py` -> `cdp`
-    # (SR-FETCHER decision 5, one key carrying both).
+    # ⚠ **`fetch` is NOT here any more.** `[sources.url] fetcher` was the
+    # source-wide layer for it and was deleted on 2026-09-20 (W-199 D2): there
+    # is no policy to inherit, so `fux add` RESOLVES a stem through the routes
+    # table and the module claims (`_resolved_fetch`) and refuses when nothing
+    # matches. The other four still have a source-wide layer and still read it.
     return {
-        "fetch": Path(url.fetcher).stem,
         "keep": "true" if url.keep else "false",
         "ttl": url.ttl,
         "enrich": "true" if url.enrich else "false",
@@ -333,8 +336,9 @@ def add(
     """Add or update one line. Returns `(action, new_line, previous_line)`.
 
     `source_defaults` is the **source-wide policy** — `[sources.url]`'s
-    `fetcher`, `keep`, `ttl`, `enrich` and `update` — resolved by the
-    caller.
+    `keep`, `ttl`, `enrich` and `update` — resolved by the caller. ⚠ **`fetch`
+    left this set on 2026-09-20**: it has no source-wide layer any more, and
+    the caller resolves it per URL instead (W-199 D1).
 
     ⚠ **Without it, `fux add` overrode the consumer's own configuration**
     (W-140 row 5, fixed 2026-09-11). Every generated line states every
@@ -494,6 +498,47 @@ def remove_or_exclude(
 # -- flags -> recorded attributes ------------------------------------------
 
 
+def _resolved_fetch(root: Path, url: str) -> str:
+    """The fetcher stem `fux add` writes for `url`, or a refusal naming both halves.
+
+    🔴 **`fux add` never writes a line it could not resolve** (Arpit, 2026-09-20,
+    W-199 D1): *"It should be a mandatory argument when we are doing an add so
+    that the fetcher gets defined."* `--fetch <stem>` wins; otherwise the routes
+    table, then the module claims. **Nothing matching is a refusal**, not a
+    fall back to plain HTTP, because there is no default layer left.
+
+    ⚠ **The refusal names the host it tried AND the stems on disk**, because the
+    two failures look identical from the outside and need different fixes: the
+    consumer either has no fetcher for that host, or has one and has not routed
+    it.
+    """
+    from .ingest import urlsrc
+
+    fetchers_dir = root / FETCHERS_DIR
+    try:
+        source = load(root).url
+    except FuxError:
+        source = None
+    stem = urlsrc.resolve_fetch(url, source, fetchers_dir) if source is not None else None
+    if stem is not None:
+        return stem
+
+    try:
+        on_disk = sorted(p.stem for p in fetchers_dir.glob("*.py"))
+    except OSError:
+        on_disk = []
+    host = urlsrc.routes.normalise_host(url)
+    have = ", ".join(on_disk) if on_disk else "none — run `fux setup`"
+    raise FuxError(
+        f"no fetcher resolves for {host!r}: nothing in [sources.url.routes] matches it and "
+        f"no ROUTES claim in {FETCHERS_DIR}/ does either. "
+        f"Fetchers on disk: {have}. "
+        f"Write `--fetch <stem>` on this command, or add a route "
+        f'(`[sources.url.routes]` `"{host}" = "<stem>"`). '
+        f"There is no default fetcher (W-199, 2026-09-20)"
+    )
+
+
 def _overrides(args, spec: sourcelist.ListSpec) -> dict[str, str]:
     """Flags -> the attributes to record. Two flags for one attribute is an error.
 
@@ -507,6 +552,8 @@ def _overrides(args, spec: sourcelist.ListSpec) -> dict[str, str]:
     way in as well as on the way out.
     """
     pairs = (
+        # ⚠ `--fetch <stem>` is VALUED and is handled after this loop; `--cdp`
+        # and `--http` remain as the two aliases they always were.
         ("fetch", ("cdp", "http")),
         ("archived", ("archived",)),
         ("keep", ("keep", "no_keep")),
@@ -552,6 +599,25 @@ def _overrides(args, spec: sourcelist.ListSpec) -> dict[str, str]:
         if fault is not None:
             raise FuxError(f"--ttl {ttl!r} {fault}")
         overrides["ttl"] = ttl
+    # 🔴 **`--fetch <stem>` — the PIN, and it wins over every route** (W-199 D1).
+    # Validated by the grammar's own `_fetcher_reason`, so `--fetch cdp.py` and a
+    # hand-written `fetch=cdp.py` fail identically; two validators would drift.
+    fetch = getattr(args, "fetch", None)
+    if fetch is not None:
+        attribute = spec.attribute("fetch")
+        if attribute is None:
+            raise FuxError(
+                f"--fetch sets `fetch`, which `{spec.kind}` does not have. Its attribute set "
+                f"is closed and is {', '.join(spec.names) if spec.names else 'empty'}"
+            )
+        if "fetch" in overrides:
+            raise FuxError(
+                f"--fetch {fetch!r} and --{overrides['fetch']} both set `fetch` — pick one"
+            )
+        fault = attribute.reject(fetch)
+        if fault is not None:
+            raise FuxError(f"--fetch {fetch!r} {fault}")
+        overrides["fetch"] = fetch
     return overrides
 
 
@@ -634,6 +700,27 @@ def cmd_add(args) -> int:
         raise FuxError(f"{reason}: {entry!r}")
     overrides = _overrides(args, spec)
     source_defaults = _source_defaults(root, spec)
+    # 🔴 **Every written URL line states the fetcher it resolved to** (W-199 D1).
+    # The pin from `--fetch`/`--cdp`/`--http` wins; otherwise the routes table
+    # and then the module claims decide, and nothing matching REFUSES rather
+    # than falling back — there is no default fetcher any more.
+    #
+    # ⚠ **An existing line's `fetch=` is left alone, and that is not an
+    # optimisation.** Re-adding a URL to change some other attribute must not
+    # silently re-route it: the line is a PIN a human meant (SR-URL-LIST
+    # decision 16), and a route added later deliberately does not move it. Found
+    # by `test_an_unflagged_attribute_keeps_what_the_line_already_said` — a
+    # second `fux add` with no fetch flag was overwriting the first one's
+    # `fetch=cdp` with whatever the table now said.
+    if spec is sourcelist.URLS and "fetch" not in overrides:
+        existing = next(
+            (e for e in _read(list_path(root, spec), spec)
+             if e.value == entry and not e.exclude and "fetch" in e.declared),
+            None,
+        )
+        overrides["fetch"] = (
+            existing.attrs["fetch"] if existing is not None else _resolved_fetch(root, entry)
+        )
 
     entries = _read(path, spec)
     if any(e.value == entry and e.exclude for e in entries):

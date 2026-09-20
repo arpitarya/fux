@@ -168,6 +168,40 @@ def _conflict_text(ours: str, theirs: str, ids: list[str]) -> str:
     )
 
 
+#: The committed register's filename, so the driver can recognise it without
+#: importing the ingest plane (this module is a console script and stays thin).
+_REGISTER_NAME = "REGISTER"
+
+
+def _merge_register(ours: str, theirs: str) -> str:
+    """Union the two sides on `loc`, sorted, header preserved.
+
+    **There is no conflict case and that is deliberate.** A register line is
+    derived from the index beside it; two sides disagreeing about one `loc`
+    means the two indexes disagree, which the shard driver has already resolved
+    by the time this runs. Taking either line and letting the next `fux ingest`
+    rewrite the file is strictly better than stopping a merge over a file nobody
+    edits by hand.
+
+    ⚠ **Ours wins a same-`loc` disagreement**, matching the shard driver's
+    instinct of never silently preferring the remote — and the choice cannot
+    survive an ingest, so it decides nothing durable.
+    """
+    header = ""
+    rows: dict[str, str] = {}
+    for text in (theirs, ours):  # `ours` second so it overwrites
+        for line in text.splitlines():
+            if line.startswith("#"):
+                header = header or line
+                continue
+            if not line:
+                continue
+            rows[line.split("\t", 1)[0]] = line
+    body = "\n".join(rows[loc] for loc in sorted(rows))
+    head = header or "# loc\tkind\tsha\tdecoder\tfetcher"
+    return f"{head}\n{body}\n" if body else f"{head}\n"
+
+
 def main(argv: list[str] | None = None) -> int:
     # The second console script gets the same UTF-8 stdio as `fux` — one
     # encoding per artefact, not per entry point. See `cli._stdio_utf8`.
@@ -176,10 +210,34 @@ def main(argv: list[str] | None = None) -> int:
     _stdio_utf8()
     argv = list(sys.argv[1:] if argv is None else argv)
     if len(argv) < 3:
-        print("usage: fux-merge-index <ancestor> <ours> <theirs>", file=sys.stderr)
+        print("usage: fux-merge-index <ancestor> <ours> <theirs> [pathname]", file=sys.stderr)
         return 2
 
     ancestor, ours, theirs = (Path(a) for a in argv[:3])
+
+    # 🔴 **`.fux/index/REGISTER` is merged too, and by a different rule** (W-199
+    # D4, 2026-09-20). It is a committed TSV, one sorted line per indexed
+    # document, and it landed inside the shard directory where the driver was
+    # bound to `*.jsonl` alone — so **a merge that resolved every shard cleanly
+    # conflicted on the register**, caught by `tests_e2e/test_maintenance.py`.
+    #
+    # A register line is keyed on `loc` and is **fully derived from the index
+    # beside it**, so the union of two sides is the right answer and there is
+    # nothing to lose by taking it: the next `fux ingest` rewrites the file from
+    # the merged index anyway. ⚠ **That is why it cannot conflict** — unlike a
+    # shard, where two sides editing one document at the same revision is a real
+    # disagreement about content.
+    # `%P` when git supplied it; `%A`'s name is a temp file and cannot answer.
+    pathname = argv[3] if len(argv) > 3 else ""
+    if pathname.endswith(_REGISTER_NAME):
+        ours.write_text(
+            _merge_register(
+                ours.read_text(encoding="utf-8"),
+                theirs.read_text(encoding="utf-8"),
+            ),
+            encoding="utf-8", newline="\n",
+        )
+        return 0
     # Reading with the default `newline=None` is deliberate: universal-newline
     # translation normalizes CRLF/CR/LF alike to `\n`, so a file checked out
     # with CRLF (Windows) parses identically to one checked out with LF. The

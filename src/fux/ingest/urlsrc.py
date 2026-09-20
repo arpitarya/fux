@@ -55,7 +55,8 @@ from pathlib import Path, PurePosixPath
 
 from ..errors import FuxError
 from ..store import acquired
-from . import ingestlog, refusals, sourcelist
+from .. import config
+from . import ingestlog, refusals, routes, sourcelist
 from .gitdir import UNFETCHED, Skipped
 
 _HOSTILE_LINE_BREAKS = ("\u2028", "\u2029", "\u0085")
@@ -162,9 +163,41 @@ def read_urls(root: Path, rel_path: str) -> list[sourcelist.Entry]:
     )
 
 
-def fetcher_for(fetch_name: str, source_fetcher: str) -> str:
-    """`fetch=<name>` -> `<fetchers dir>/<name>.py`, the dir from the config key."""
-    return str(PurePosixPath(PurePosixPath(source_fetcher).parent) / f"{fetch_name}.py")
+def fetcher_for(fetch_name: str) -> str:
+    """`fetch=<name>` -> `.fux/fetchers/<name>.py`.
+
+    ⚠ **The directory is fixed since 2026-09-20.** It used to be the parent of
+    `[sources.url] fetcher`, so a consumer could relocate every fetcher with one
+    key; that key is deleted (W-199 D2) and the directory is
+    [SR-DOTFUX](../../../records/0102_fux-directory.md)'s declared
+    `.fux/fetchers/`, which is where it always pointed in practice.
+    """
+    return str(PurePosixPath(config.FETCHERS_DIR) / f"{fetch_name}.py")
+
+
+def resolve_fetch(url: str, source, fetchers_dir: Path | None = None) -> str | None:
+    """The fetcher stem for `url` from the BINDING then the CLAIMS, or `None`.
+
+    🔴 **The pin is not consulted here.** A line's `fetch=` already won before
+    this is reached — this is what `fux add` calls when it has no pin to write
+    down yet. There is **no default layer** to fall through to (W-199 D2), so
+    `None` means *fux cannot retrieve this URL* and the caller refuses.
+    """
+    host = routes.normalise_host(url)
+    binding = routes.validate(
+        getattr(source, "routes", {}) or {}, where="fux.toml: [sources.url.routes]"
+    )
+    stem = routes.resolve(host, binding, where="fux.toml: [sources.url.routes]")
+    if stem is not None:
+        return stem
+    if fetchers_dir is None:
+        return None
+    claimed = routes.claims(fetchers_dir)
+    table = routes.validate(
+        {pattern: stem for pattern, (stem, _) in claimed.items()},
+        where=f"{fetchers_dir}: a ROUTES claim",
+    )
+    return routes.resolve(host, table, where=f"{fetchers_dir}: a ROUTES claim")
 
 
 def resolve_urls(entries: list[sourcelist.Entry], source) -> list[UrlEntry]:
@@ -173,16 +206,19 @@ def resolve_urls(entries: list[sourcelist.Entry], source) -> list[UrlEntry]:
     `source` is the `UrlSource` config block. A line that *declared* an
     attribute wins; a line that did not takes the source-wide setting, which is
     itself defaulted by `config.py`.
+
+    ⚠ **`fetch` no longer has a source-wide layer** — `sourcelist.parse` refuses
+    a URL line that does not state one, so by the time an `Entry` exists its
+    `fetch` is always the line's own (W-199 D1/D2).
     """
-    source_fetch = PurePosixPath(source.fetcher).stem
     resolved: list[UrlEntry] = []
     for entry in entries:
-        fetch = entry.attrs["fetch"] if "fetch" in entry.declared else source_fetch
+        fetch = entry.attrs["fetch"]
         resolved.append(
             UrlEntry(
                 url=entry.value,
                 fetch=fetch,
-                fetcher_path=fetcher_for(fetch, source.fetcher),
+                fetcher_path=fetcher_for(fetch),
                 # Three layers, same order as `fetch`: built-in default, then
                 # `[sources.url] keep`, then the line. A line that DECLARED
                 # `keep=` wins; one that said nothing takes the source-wide

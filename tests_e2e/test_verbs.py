@@ -18,6 +18,21 @@ import sys
 from pathlib import Path
 
 
+def _write_fetcher(root, text, name="mw.py", encoding="utf-8"):
+    """Write a fixture fetcher where the resolver looks for it.
+
+    ⚠ **`.fux/fetchers/` is the only place now.** Until 2026-09-20 a fixture
+    could put a fetcher anywhere and point `[sources.url] fetcher` at it; that
+    key is deleted (W-199 D2) and the directory is fixed, so the fixture creates
+    it rather than relying on `fux setup` having run.
+    """
+    path = root / ".fux" / "fetchers" / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+    return path
+
+
+
 def _run(cwd: Path, *args: str, check: bool = True) -> subprocess.CompletedProcess:
     return subprocess.run(
         [sys.executable, "-m", "fux.cli", *args], cwd=cwd, capture_output=True, text=True, encoding="utf-8", check=check
@@ -958,15 +973,14 @@ def _url_repo(tmp_path: Path, *, extra: str = "") -> None:
     (tmp_path / "fux.toml").write_text(
         "[sources]\n"
         "[sources.url]\n"
-        'fetcher = "mw.py"\n'
         "max_parallel = 4\n" + extra,
         encoding="utf-8",
     )
-    (tmp_path / "mw.py").write_text(_LOGGING_FETCHER, encoding="utf-8")
+    _write_fetcher(tmp_path, _LOGGING_FETCHER)
     fux = tmp_path / ".fux"
     (fux / "sources").mkdir(parents=True, exist_ok=True)
     (fux / "sources" / "dirs").write_text("", encoding="utf-8")
-    (fux / "sources" / "urls").write_text("https://x.test/runbook\n", encoding="utf-8")
+    (fux / "sources" / "urls").write_text("https://x.test/runbook fetch=mw\n", encoding="utf-8")
     (fux / "pii.toml").write_text("", encoding="utf-8")
 
 
@@ -986,7 +1000,7 @@ def test_fetch_at_answer_false_answers_from_acquired_and_opens_no_socket(tmp_pat
     assert (tmp_path / ".fux" / "acquired" / "manifest.json").exists()
 
     # Everything up to here was allowed to fetch; only what follows is on trial.
-    (tmp_path / "calls.log").unlink()
+    (tmp_path / ".fux" / "fetchers" / "calls.log").unlink()
     _url_repo(tmp_path, extra="fetch_at_answer = false\n")
 
     out = _run(tmp_path, "answer", "how do I restart the indexer", "--json").stdout
@@ -994,17 +1008,17 @@ def test_fetch_at_answer_false_answers_from_acquired_and_opens_no_socket(tmp_pat
 
     assert payload["source"] == "refer"
     assert payload["citation"]["freshness"] == "as-ingested"
-    assert not (tmp_path / "calls.log").exists(), "the fetcher was touched under `never`"
+    assert not (tmp_path / ".fux" / "fetchers" / "calls.log").exists(), "the fetcher was touched under `never`"
 
 
 def test_the_default_still_fetches_so_no_repo_changes_meaning(tmp_path):
     """The other half of the same claim: silence is today's behaviour."""
     _url_repo(tmp_path)
     _run(tmp_path, "ingest")
-    (tmp_path / "calls.log").unlink()
+    (tmp_path / ".fux" / "fetchers" / "calls.log").unlink()
 
     _run(tmp_path, "answer", "how do I restart the indexer", "--json")
-    log = (tmp_path / "calls.log").read_text(encoding="utf-8")
+    log = (tmp_path / ".fux" / "fetchers" / "calls.log").read_text(encoding="utf-8")
     assert "fetch:https://x.test/runbook" in log
 
 
@@ -1036,7 +1050,6 @@ def test_a_consumer_drops_a_fetcher_in_and_names_it_on_a_line(tmp_path):
     (tmp_path / "fux.toml").write_text(
         "[sources]\n"
         "[sources.url]\n"
-        'fetcher = ".fux/fetchers/http.py"\n'
         "max_parallel = 4\n",
         encoding="utf-8",
     )
@@ -1073,7 +1086,6 @@ def test_a_fetcher_name_with_no_file_is_a_doctor_finding_not_a_parse_error(tmp_p
     (tmp_path / "fux.toml").write_text(
         "[sources]\n"
         "[sources.url]\n"
-        'fetcher = ".fux/fetchers/http.py"\n'
         "max_parallel = 4\n",
         encoding="utf-8",
     )

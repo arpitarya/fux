@@ -437,7 +437,7 @@ Tunables arrive through the opaque `[sources.url.config]` table, never as
 typed keys in fux's schema.
 
 **The set is open.** `fetch=<name>` on a URL line resolves to
-`<fetchers dir>/<name>.py`, so a fetcher you write is a fetcher fux can use —
+`.fux/fetchers/<name>.py`, so a fetcher you write is a fetcher fux can use —
 no engine change and no release, exactly as `.fux/decoders/` already works
 (**fetchers and decoders are one consumer-plane pattern**). The line grammar
 validates the *shape* of the name and never imports the module to check it:
@@ -446,6 +446,39 @@ file may not do that. `fux doctor`'s `fetcher bindings` row reports a name with
 no file. See [SR-URL-LIST](../records/0116_url-list.md) decision 15,
 [SR-URL-INGEST](../records/0107_url-ingest.md),
 [SR-DOTFUX](../records/0102_fux-directory.md).
+
+**Route · pin · claim · register** — The four words W-199 added on 2026-09-20,
+and they are one mechanism plus its bookkeeping.
+
+- **Pin** — the `fetch=<stem>` a URL line **states**. It is mandatory on every
+  line and it beats everything: `fux add` resolves a stem once and writes it
+  down, so **a route changed later does not move an existing line**. That cost
+  is Arpit's ruling, not an oversight, and `fux doctor`'s `pinned fetchers` row
+  is where it becomes visible.
+- **Route** — an entry in `fux.toml`'s `[sources.url.routes]`: a host pattern
+  to a fetcher stem. Four shapes — `example.com`, `*.example.com` (⚠ **not** the
+  apex), `example.com:8443`, and `re:<regex>`, compiled and anchored at load.
+  🔴 **Two patterns matching one host is a hard error naming both**: between two
+  regexes there is no specificity order that is not arbitrary, and guessing one
+  builds a plausible index retrieved by the wrong fetcher.
+- **Claim** — a module-level `ROUTES` map inside a fetcher, **read with `ast`
+  and never by importing the file**. It is the layer that makes *drop a file in
+  and it works* true, and the shipped fetchers claim nothing.
+- 🔴 **There is no default layer.** `[sources.url] fetcher` was deleted; a URL
+  that resolves to nothing is an error naming the hosts tried and the stems on
+  disk.
+- **Register** — `.fux/index/REGISTER`, **committed** beside the index: one
+  sorted line per indexed document, `loc · kind · sha · decoder · fetcher`.
+  Distinct from W-200's gitignored per-run ledger: the ledger answers *"what did
+  this ingest do?"*, the register answers *"what is in here, and what read
+  it?"*. Bound by [L3](../records/0005_LAW-3-deterministic.md) — no clock, no
+  run id, byte-identical across runs — which is the only reason a derived file
+  may be committed.
+
+See [SR-FETCHER](../records/0117_fetcher.md) decision 16,
+[SR-URL-LIST](../records/0116_url-list.md) decision 16,
+[SR-CONFIG](../records/0113_config.md) decision 16,
+[SR-INGEST](../records/0106_ingest.md) decision 22.
 
 **`fetch_at_answer`** — The `fux.toml` boolean that decides whether
 `fux answer` may open a socket **at all**. `true` (the default) is the

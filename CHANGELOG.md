@@ -8,7 +8,73 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Removed — BREAKING
+
+- 🔴 **`[sources.url] fetcher` is deleted, and `fetch=` is now mandatory on
+  every URL line** (W-199, Arpit 2026-09-20: *"There is no default fetch. It is
+  a mandatory argument. About backward compatibility, let it break."*).
+
+  **What breaks, and how it tells you.** A `fux.toml` still carrying the key
+  **fails to load by name**, with an error naming the key and its replacement.
+  A hand-written URL line with no `fetch=` **fails to parse**, naming the line
+  and the word to add. No rewrite, no lenient read — the `fux update` (W-177)
+  and `meta=` (W-194) precedent.
+
+  ```toml
+  # before
+  [sources.url]
+  fetcher = ".fux/fetchers/http.py"     # the source-wide default for fetch=
+
+  # after — no default; a host map instead
+  [sources.url.routes]
+  "example.com"               = "http"
+  "*.wiki.example.com"        = "cdp"     # NOT example.com itself
+  "re:^.*\\.sharepoint\\.com$"  = "cdp"
+  ```
+
+  ⚠ **A line already saying `fetch=http` is a valid pin and keeps working.**
+  Only the absence breaks.
+
+  🔴 **One capability is lost and is not coming back**: the deleted key's parent
+  directory located every fetcher file, so pointing it elsewhere relocated them
+  all. The directory is now fixed at `.fux/fetchers/`. It was never documented
+  as a relocation mechanism; it worked as one.
+
 ### Added
+
+- **Fetcher routing — a URL resolves to a fetcher the way a file resolves to a
+  decoder** (W-199). Three layers and no fourth: the line's `fetch=` **pin**
+  beats `fux.toml`'s `[sources.url.routes]` **binding**, which beats a fetcher
+  module's `ROUTES` **claim**. `fux add <url>` resolves a stem once and writes
+  it into the line; `--fetch <stem>` pins it explicitly, and **nothing
+  resolving is a refusal** naming the hosts tried and the fetchers on disk.
+
+  🔴 **A claim is read with `ast` and never imported** — `fux doctor` is offline
+  by contract and a fetcher is free to open a session at module level.
+  🔴 **Two patterns matching one host is a hard error naming both**, rather than
+  a guessed order: guessing builds a plausible index retrieved by the wrong
+  fetcher, and nothing downstream detects it.
+
+  Three new `fux doctor` rows: `fetcher routes` (a route naming no file, a
+  claim collision, a route matching no listed URL), `pinned fetchers` (*N
+  line(s) pin a fetcher the routes table would now resolve differently* — it
+  reports and never rewrites), and `register`.
+
+- **`fux ingest` writes `.fux/index/REGISTER`, committed** (W-199 D4) — one
+  sorted line per indexed document: `loc · kind · sha · decoder · fetcher`.
+  Distinct from W-200's gitignored per-run ledger: that answers *"what did this
+  ingest do?"*, this answers *"what is in here, and what read it?"*.
+
+  🔴 **Bound by L3 and that is why it may be committed**: no clock, no run id,
+  sorted by `loc`, byte-identical across runs from the same sources — asserted
+  by a test that ingests twice.
+
+  ⚠ **The ruling named a fifth column, `outcome`, and it is not here.**
+  `indexed` then `reused` is what it would say on two runs from identical
+  sources, which breaks the byte-identity the same ruling requires. `kind`
+  replaced it; the run-shaped outcome is what the per-run ledger already
+  carries.
+
 
 - **`fux doctor` gains a `provenance` row, and `fux ingest` writes
   `.fux/runtime/ingest-log.jsonl`** (W-200) — one line per document a run

@@ -3,7 +3,7 @@
 **This file belongs to you, not to fux. It is committed to your repo, at
 `.fux/fetchers/cdp.py`, and fux will never rewrite it.** Fux writes it once
 if it is missing and reads it by path from `fux.toml`
-(`[sources.url] fetcher`) under `fux add <URL>` or `fux update`, calls it to
+(`[sources.url] fetcher`) under `fux add <URL>` or `fux ingest`, calls it to
 turn each URL into markdown, and indexes the result exactly like a repo file.
 Edit anything — port, launch flags, wait strategy, extraction, even the whole
 transport (swap in `websockets` or Playwright if you'd rather carry a
@@ -12,6 +12,24 @@ dependency; fux never imports those, only this file's entry points).
 Living in a dotdir has one consequence worth knowing: linters that skip
 hidden directories by default (ruff does) will not lint this file. That is
 deliberate — it is your code, not a fux CI target.
+
+**This file claims no routes, and that is deliberate.** A fetcher may declare a
+module-level `ROUTES` map — host pattern to fetcher stem — which fux reads with
+`ast` and **never by importing this file**, and which `fux add` consults when no
+`--fetch` was given:
+
+    ROUTES = {
+        "example.com": "http",              # that host exactly
+        "*.wiki.example.com": "http",       # subdomains -- NOT the apex
+        "intranet.example.com:8443": "http",
+        "re:^.*\\.sharepoint\\.com$": "http",  # compiled and anchored at load
+    }
+
+**The shipped fetchers claim nothing**, because a shipped claim would make
+fux's opinion about somebody else's hosts arrive with an install. Yours may
+claim whatever you like. 🔴 **Two patterns matching one host is a hard error
+naming both** — there is no non-arbitrary order between two regexes, and
+guessing one builds a plausible index retrieved by the wrong fetcher.
 
 The contract fux relies on — keep these names:
 
@@ -112,7 +130,7 @@ from urllib.parse import urljoin, urlsplit
 #
 # PRECEDENCE, most explicit first:
 #
-#   1. the process environment      FUX_CDP_PORT=9333 fux update
+#   1. the process environment      FUX_CDP_PORT=9333 fux ingest
 #   2. a `.env` file at the repo root   FUX_CDP_PORT=9333
 #   3. [sources.url.config.cdp] in fux.toml
 #   4. the defaults below

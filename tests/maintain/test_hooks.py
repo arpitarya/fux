@@ -123,7 +123,13 @@ def test_pre_commit_is_deliberately_not_installed(repo):
 def test_install_registers_the_merge_driver_locally(repo):
     hooks.install(repo)
     driver = _git(repo, "config", "--local", "--get", f"merge.{hooks.MERGE_DRIVER_NAME}.driver")
-    assert driver == "fux-merge-index %O %A %B"
+    assert driver == "fux-merge-index %O %A %B %P", (
+        "`%P` is the pathname and it is load-bearing: `%A` is a TEMP file git "
+        "creates for the result, so its basename tells the driver nothing about "
+        "which file is being merged. `.fux/index/` holds two committed shapes "
+        "now - the `*.jsonl` shards and W-199's TSV `REGISTER` - and they merge "
+        "by different rules"
+    )
 
 
 def test_install_wires_gitattributes_and_keeps_what_was_there(repo):
@@ -135,10 +141,22 @@ def test_install_wires_gitattributes_and_keeps_what_was_there(repo):
 
 
 def test_gitattributes_is_not_appended_to_twice(repo):
+    """⚠ **TWO lines now, not one** (W-199 D4, 2026-09-20).
+
+    `.fux/index/` holds two committed shapes — the `*.jsonl` shards and the TSV
+    `REGISTER` — and the driver has to be bound to both. It was bound to
+    `*.jsonl` alone when the register landed, so a merge that resolved every
+    shard cleanly conflicted on the register: a machine plane conflicting on
+    the mere fact that two people worked at once, which is the thing this
+    driver exists to prevent. What this case is about is **idempotence** — a
+    second `install` appends nothing.
+    """
     hooks.install(repo)
     hooks.install(repo)
     text = (repo / ".gitattributes").read_text(encoding="utf-8")
-    assert text.count(f"merge={hooks.MERGE_DRIVER_NAME}") == 1
+    assert text.count(f"merge={hooks.MERGE_DRIVER_NAME}") == 2
+    assert text.count(".fux/index/*.jsonl") == 1
+    assert text.count(".fux/index/REGISTER") == 1
 
 
 # -- status and uninstall ---------------------------------------------------
@@ -151,7 +169,7 @@ def test_status_reports_absent_then_fux_then_other(repo):
     hooks.install(repo)
     state = hooks.status(repo)
     assert state["hooks"]["post-commit"] == "fux"
-    assert state["merge_driver"] == "fux-merge-index %O %A %B"
+    assert state["merge_driver"] == "fux-merge-index %O %A %B %P"
     assert state["gitattributes"] is True
 
     (repo / ".git" / "hooks" / "post-commit").write_text("#!/bin/sh\n", encoding="utf-8")

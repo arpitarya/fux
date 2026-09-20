@@ -51,7 +51,7 @@ refuses.** A query succeeding proves nothing about `fux.toml`; the
 |---|---|---|
 | `[sources] dirs_file` | `.fux/sources/dirs` | the committed directory list |
 | `[sources.url]` *(table)* | absent | its **presence** enables URL ingestion |
-| `fetcher` | `.fux/fetchers/http.py` | fetcher for lines with no `fetch=`; its directory is where `fetch=<name>` resolves |
+| `routes` | `{}` | host pattern -> fetcher stem, consulted by `fux add`. 🔴 **`fetcher` was DELETED 2026-09-20** — there is no default fetcher, every URL line states its own `fetch=`, and a repo still carrying the old key fails to load by name |
 | `urls_file` | `.fux/sources/urls` | the committed URL list |
 | `max_parallel` | **none — required** | integer ≥ 1; effective value is `min(this, fetcher's MAX_PARALLEL)` |
 | `keep` | `true` | retain fetched bytes in `.fux/acquired/` |

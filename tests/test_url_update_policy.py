@@ -24,9 +24,24 @@ from fux.errors import FuxError
 from fux.ingest import sourcelist, urlsrc
 
 
+def _write_fetcher(root, text, name="mw.py", encoding="utf-8"):
+    """Write a fixture fetcher where the resolver looks for it.
+
+    ⚠ **`.fux/fetchers/` is the only place now.** Until 2026-09-20 a fixture
+    could put a fetcher anywhere and point `[sources.url] fetcher` at it; that
+    key is deleted (W-199 D2) and the directory is fixed, so the fixture creates
+    it rather than relying on `fux setup` having run.
+    """
+    path = root / ".fux" / "fetchers" / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+    return path
+
+
+
 def _source(**overrides):
     base = dict(
-        fetcher=".fux/fetchers/http.py",
+        routes={},
         urls_file=".fux/sources/urls",
         keep=True,
         ttl="24h",
@@ -48,27 +63,27 @@ def _resolve(text, **source_overrides):
 def test_silence_resolves_to_auto_so_no_existing_repo_moves():
     """🔴 The URL list is COMMITTED. A default that is not the status quo would
     change what every existing clone does the moment it upgrades."""
-    (entry,) = _resolve("https://x.test/a")
+    (entry,) = _resolve("https://x.test/a fetch=mw")
     assert entry.update == "auto"
 
 
 def test_the_source_wide_layer_applies_to_a_silent_line():
-    (entry,) = _resolve("https://x.test/a", update="never")
+    (entry,) = _resolve("https://x.test/a fetch=mw", update="never")
     assert entry.update == "never"
 
 
 def test_a_line_that_declared_it_beats_the_source_wide_value():
     """Both directions — a source-wide pin must be exemptable per line, or
     pinning a wiki would mean pinning every page in it forever."""
-    (pinned,) = _resolve("https://x.test/a update=never")
+    (pinned,) = _resolve("https://x.test/a update=never fetch=mw")
     assert pinned.update == "never"
-    (exempt,) = _resolve("https://x.test/a update=auto", update="never")
+    (exempt,) = _resolve("https://x.test/a update=auto fetch=mw", update="never")
     assert exempt.update == "auto"
 
 
 def test_an_unknown_value_is_refused_by_the_grammar_naming_the_line():
     with pytest.raises(FuxError, match=r"list:1: update='sometimes' is not one of auto, never"):
-        sourcelist.parse("https://x.test/a update=sometimes", sourcelist.URLS, origin="list")
+        sourcelist.parse("https://x.test/a update=sometimes fetch=mw", sourcelist.URLS, origin="list")
 
 
 def test_an_unknown_source_wide_value_is_refused_by_the_loader(tmp_path):
@@ -111,7 +126,7 @@ def test_a_pinned_url_never_reaches_the_fetcher(tmp_path, monkeypatch):
     monkeypatch.setattr(urlsrc, "load_fetcher", _never)
     monkeypatch.setattr(run_mod.urlsrc, "load_fetcher", _never)
 
-    entries = _resolve("https://x.test/a update=never\nhttps://x.test/b update=never")
+    entries = _resolve("https://x.test/a update=never fetch=mw\nhttps://x.test/b update=never fetch=mw")
     fetched, skipped = urlsrc.fetch_all(
         tmp_path, [e for e in entries if e.update != "never"], {}, max_parallel=1
     )
@@ -133,7 +148,7 @@ def test_a_pinned_url_is_a_policy_skip_not_an_unfetched_one():
 def test_never_plus_keep_false_is_legal():
     """It is coherent for a document that truly never changes, and surprising
     to have chosen by accident — which is a warning's shape, not a refusal's."""
-    (entry,) = _resolve("https://x.test/a update=never keep=false")
+    (entry,) = _resolve("https://x.test/a update=never keep=false fetch=mw")
     assert entry.update == "never" and entry.keep is False
 
 
@@ -148,7 +163,7 @@ def test_never_plus_keep_true_is_the_coherent_pair():
     keep `answer` offline"*. The knob that closes the socket at ask time is
     `[sources.url] fetch_at_answer` (decision 16).
     """
-    (entry,) = _resolve("https://x.test/a update=never")
+    (entry,) = _resolve("https://x.test/a update=never fetch=mw")
     assert entry.update == "never" and entry.keep is True
 
 
@@ -162,9 +177,9 @@ def test_doctor_counts_pinned_lines_and_names_the_lossy_ones(tmp_path):
     urls = tmp_path / ".fux" / "sources" / "urls"
     urls.parent.mkdir(parents=True)
     urls.write_text(
-        "https://x.test/pinned update=never\n"
-        "https://x.test/lossy update=never keep=false\n"
-        "https://x.test/live\n",
+        "https://x.test/pinned update=never fetch=mw\n"
+        "https://x.test/lossy update=never keep=false fetch=mw\n"
+        "https://x.test/live fetch=mw\n",
         encoding="utf-8",
     )
     parts = doctor._pinned_note(tmp_path)
@@ -184,7 +199,7 @@ def test_doctor_says_nothing_when_no_line_is_pinned(tmp_path):
     )
     urls = tmp_path / ".fux" / "sources" / "urls"
     urls.parent.mkdir(parents=True)
-    urls.write_text("https://x.test/live\n", encoding="utf-8")
+    urls.write_text("https://x.test/live fetch=mw\n", encoding="utf-8")
     assert doctor._pinned_note(tmp_path) == []
 
 
@@ -229,10 +244,14 @@ def _repo(tmp_path, urls, fetcher=FAKE):
     tmp_path.mkdir(parents=True, exist_ok=True)
     (tmp_path / "fux.toml").write_text(
         '[sources]\ndirs_file = ".fux/sources/dirs"\n'
-        '[sources.url]\nfetcher = "mw.py"\nmax_parallel = 4\n',
+        '[sources.url]\nmax_parallel = 4\n'
+        # 🔴 `fux add <url>` resolves a fetcher and REFUSES when nothing
+        # matches (W-199 D1) — a fixture repo that means to accept a URL has
+        # to say which fetcher reaches it.
+        '[sources.url.routes]\n"x.test" = "mw"\n',
         encoding="utf-8",
     )
-    (tmp_path / "mw.py").write_text(fetcher, encoding="utf-8")
+    _write_fetcher(tmp_path, fetcher)
     fux = tmp_path / ".fux"
     (fux / "sources").mkdir(parents=True)
     (fux / "sources" / "urls").write_text("\n".join(urls) + "\n", encoding="utf-8")
@@ -254,7 +273,7 @@ def test_ingest_skips_a_pinned_url_without_importing_the_fetcher(tmp_path):
     """
     from fux.ingest.run import run
 
-    _repo(tmp_path, ["https://x.test/pinned update=never"], fetcher=EXPLODING)
+    _repo(tmp_path, ["https://x.test/pinned update=never fetch=mw"], fetcher=EXPLODING)
     report = run(tmp_path, refresh_urls=True)
     pinned = [s for s in report.skipped if s.rel_path == "https://x.test/pinned"]
     assert len(pinned) == 1
@@ -266,7 +285,7 @@ def test_a_mixed_list_fetches_the_live_line_and_pins_the_other(tmp_path):
     from fux import store
     from fux.ingest.run import run
 
-    _repo(tmp_path, ["https://x.test/live", "https://x.test/pinned update=never"])
+    _repo(tmp_path, ["https://x.test/live fetch=mw", "https://x.test/pinned update=never fetch=mw"])
     run(tmp_path, refresh_urls=True)
     index = store.read_index(tmp_path)
     assert "url:https://x.test/live" in index
@@ -285,14 +304,14 @@ def test_pinning_a_url_AFTER_it_was_indexed_keeps_its_record(tmp_path):
     from fux import store
     from fux.ingest.run import run
 
-    root = _repo(tmp_path, ["https://x.test/doc"])
+    root = _repo(tmp_path, ["https://x.test/doc fetch=mw"])
     run(root, refresh_urls=True)
     assert "url:https://x.test/doc" in store.read_index(root)
 
     (root / ".fux" / "sources" / "urls").write_text(
-        "https://x.test/doc update=never\n", encoding="utf-8"
+        "https://x.test/doc update=never fetch=mw\n", encoding="utf-8"
     )
-    (root / "mw.py").write_text(EXPLODING, encoding="utf-8")
+    _write_fetcher(root, EXPLODING)
     run(root, refresh_urls=True)
     assert "url:https://x.test/doc" in store.read_index(root)
 
@@ -303,8 +322,8 @@ def test_a_corpus_that_declares_nothing_is_byte_identical(tmp_path):
     from fux import store
     from fux.ingest.run import run
 
-    a = _repo(tmp_path / "a", ["https://x.test/doc"])
-    b = _repo(tmp_path / "b", ["https://x.test/doc update=auto"])
+    a = _repo(tmp_path / "a", ["https://x.test/doc fetch=mw"])
+    b = _repo(tmp_path / "b", ["https://x.test/doc update=auto fetch=mw"])
     run(a, refresh_urls=True)
     run(b, refresh_urls=True)
     assert store.read_index(a) == store.read_index(b)
@@ -325,7 +344,7 @@ def test_the_add_that_writes_a_pinned_line_still_fetches_it_once(tmp_path):
     from fux import store
     from fux.ingest.run import run
 
-    _repo(tmp_path, ["https://x.test/pinned update=never"])
+    _repo(tmp_path, ["https://x.test/pinned update=never fetch=mw"])
     report = run(tmp_path, refresh_urls=True, first_fetch={"https://x.test/pinned"})
 
     assert "url:https://x.test/pinned" in store.read_index(tmp_path)
@@ -339,7 +358,7 @@ def test_the_exemption_is_that_url_and_no_other(tmp_path):
 
     _repo(
         tmp_path,
-        ["https://x.test/added update=never", "https://x.test/other update=never"],
+        ["https://x.test/added update=never fetch=mw", "https://x.test/other update=never fetch=mw"],
     )
     run(tmp_path, refresh_urls=True, first_fetch={"https://x.test/added"})
 
@@ -352,7 +371,7 @@ def test_a_later_run_pins_the_line_the_add_fetched(tmp_path):
     """The flag governs every run after — including `--all` and `--full`."""
     from fux.ingest.run import run
 
-    _repo(tmp_path, ["https://x.test/pinned update=never"])
+    _repo(tmp_path, ["https://x.test/pinned update=never fetch=mw"])
     run(tmp_path, refresh_urls=True, first_fetch={"https://x.test/pinned"})
 
     report = run(tmp_path, refresh_urls=True, full=True)

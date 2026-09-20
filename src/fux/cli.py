@@ -476,8 +476,14 @@ def build_parser() -> argparse.ArgumentParser:
         """The attribute flags. Each is checked against the list the entry
         dispatched to, so `--cdp` on a directory is an error, not a no-op."""
         p.add_argument("--types", action="store_true", help="the entry is a file-type pattern (.fux/formats.toml)")
-        p.add_argument("--cdp", action="store_true", help="URLs: record fetch=cdp")
-        p.add_argument("--http", action="store_true", help="URLs: record fetch=http (the default)")
+        # 🔴 **`--fetch <stem>` is the general form; `--cdp`/`--http` are the two
+        # aliases that predate it** (W-199 D1). There is no default fetcher, so
+        # `fux add <url>` with none of these RESOLVES a stem from
+        # `[sources.url.routes]` and the modules' `ROUTES` claims — and refuses
+        # when nothing matches, naming the host and the stems on disk.
+        p.add_argument("--fetch", metavar="STEM", help="URLs: record fetch=STEM - a file in .fux/fetchers/. Without it, the routes table and the modules' ROUTES claims decide, and nothing matching refuses")
+        p.add_argument("--cdp", action="store_true", help="URLs: record fetch=cdp (alias for --fetch cdp)")
+        p.add_argument("--http", action="store_true", help="URLs: record fetch=http (alias for --fetch http)")
         p.add_argument("--archived", action="store_true", help="dirs: record archived=true")
         p.add_argument("--keep", action="store_true", help="URLs: record keep=true - retain the fetched bytes in .fux/acquired/ (the default)")
         p.add_argument("--no-keep", action="store_true", help="URLs: record keep=false - do not retain the fetched bytes")

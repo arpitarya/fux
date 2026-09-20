@@ -30,6 +30,62 @@ Rules:
 
 
 
+## 2026-09-20 — **W-199: fetchers route like decoders, the default fetcher is deleted, and the index gains a committed register**
+
+**Shipped:** [`src/fux/ingest/routes.py`](../src/fux/ingest/routes.py) ·
+[`src/fux/ingest/register.py`](../src/fux/ingest/register.py) · three `fux doctor`
+rows · `fux add --fetch` · `[sources.url.routes]`.
+**Evidence:** none — it is a build, not a measurement.
+**Items:** [W-199](open/W-199-fetcher-routing.md) — **DoD 1–9 met, item stays open on DoD 10.**
+**Records touched:** SR-FETCHER 16, SR-URL-LIST 16, SR-CONFIG 16, SR-INGEST 22,
+SR-DOCTOR (three rows), SR-CLI, SR-DOTFUX, SR-MERGE-DRIVER.
+
+🔴 **BREAKING, by ruling.** *"There is no default fetch. It is a mandatory
+argument. About backward compatibility, let it break."* `[sources.url] fetcher`
+is refused by name; a URL line without `fetch=` fails to parse. Both errors name
+the thing and the fix. ⚠ **One capability is lost and is not coming back** — the
+deleted key's parent directory located every fetcher, so pointing it elsewhere
+relocated them all. The directory is fixed at `.fux/fetchers/` now. It was never
+documented as a relocation mechanism; it worked as one.
+
+**Three layers and no fourth**: the line's `fetch=` **pin** beats
+`[sources.url.routes]`, which beats a module's `ROUTES` **claim**. Four pattern
+shapes including `re:`, compiled **and anchored at load**. Claims read with
+`ast` and **never imported** — `doctor` is offline by contract and a fetcher may
+open a session at import. **Two patterns matching one host is a hard error
+naming both**, because a guessed order builds a plausible index retrieved by the
+wrong fetcher and nothing downstream detects it.
+
+🔴 **Four things the spec did not predict, each found by a test rather than by
+review:**
+
+1. **The committed register conflicted on merge.** It lives in `.fux/index/`
+   where the driver was bound to `*.jsonl`, so a merge that resolved every shard
+   cleanly conflicted on the register — the exact *machine planes never conflict
+   because two people worked at once* property the driver exists for. Fixed by
+   binding it **and** by passing `%P`: `%A` is a temp file whose basename tells
+   the driver nothing. ⚠ **A repo registered before today passes three arguments
+   and refuses a register rather than merging it**; `fux hooks` re-registers.
+2. **The ruling's `outcome` column could not survive its own L3 rule.**
+   `indexed` then `reused` from identical sources breaks the byte-identity the
+   same decision demands, and the test asserting *two ingests write it once*
+   would have failed on an otherwise-correct file. **`kind` replaced it.**
+3. **`fux add` silently re-routed an existing pin** — re-adding a URL to change
+   its `ttl` overwrote its `fetch=`. The opposite of *every line is a pin*.
+4. **A doctor detail quoted a `FuxError` into its text**, and those messages
+   carry em dashes — which crashes `fux doctor` on a Windows console exactly
+   when the repo is already broken.
+
+⚠ **"Node: no change" held and the twin gate still fired**, correctly: Python's
+`parse` gained a generic required-attribute check, and a `dirs` attribute made
+required later would have Python refusing a line Node accepts — with
+`query/__init__` degrading to *no archived directories*, so the two readers
+return different archived sets from one committed file. **Ported as a dead
+branch** rather than exempted.
+
+⚠ **~110 test cases across 14 modules** carried the deleted key or a bare URL
+line. Rewritten, not exempted.
+
 ## 2026-09-20 — **W-202: what the analyzer does to an identifier, frozen on both readers — and a third defect nobody had named**
 
 **Shipped:** [`tests/query/identifier-fixture.json`](../tests/query/identifier-fixture.json) ·

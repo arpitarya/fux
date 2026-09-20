@@ -32,7 +32,7 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🟢 **W-199** · `agent` — **ruled 2026-09-20**: `fetch=` mandatory on every line and on `fux add`, no default fetcher, regex routes + `ROUTES` claims, and a committed ingest register beside the index. Breaking, by ruling. [detail](open/W-199-fetcher-routing.md)
+- 🟢 **W-199** · `agent` — D1–D4 and the three doctor rows **BUILT 2026-09-20**; what is left is DoD 10, the `decoder=` half of the pipe ruling, added to this item mid-session. [detail](open/W-199-fetcher-routing.md)
 - 🟡 **W-168** · `agent`, waiting on W-204 — steps 3–10 of the ranking ideas; step 2 moved to W-205. Ruled 2026-09-20: Codex adds `RF-118`-shaped ids to the seed in the prompt-7 pass. [detail](open/W-168-search-improvements.md)
 - 🟢 **W-205** · `agent` — identifiers, reachable then whole. Ruled 2026-09-20: part 1 (front-matter ids → title, decoder claim + `formats.toml` binding) builds now; part 2 (the analyzer chops `KFS-2014`) measures on set 3. [detail](open/W-205-identifiers-reachable-and-whole.md)
 

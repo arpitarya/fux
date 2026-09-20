@@ -7,10 +7,10 @@ description: "post-commit DEFERS — it writes a dirty list and spawns a detache
 status: accepted
 date: 2026-08-20
 feature: maintenance — the hooks, the deferring runner, the write lock, and the URL freshness daemon
-owns: [src/fux/maintain@70ceb83a6071, tools/maintenance-bench@23a6ade137a5, tools/runner-race@98bd70ff092a]
+owns: [src/fux/maintain@6e92e762b4c4, tools/maintenance-bench@23a6ade137a5, tools/runner-race@98bd70ff092a]
 laws: [L3, L4, L5, L7]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 41421c3cc05de04e7aa8a67c0245e9595ac8d67bb9fe90ae11eb81c9f4f2ba55
+content_sha: 57eb5ef596eb22a95e0b84926f37a76cca9c505d973b50652d7b6b909059f8a4
 ---
 
 # SR-MAINTENANCE — keeping the index in step

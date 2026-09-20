@@ -21,6 +21,7 @@ from fux.query.refer_answer import _load_fetchers, answer_via_refer
 FAKE_FETCHER = '''\
 import pathlib
 
+
 LOG = pathlib.Path(__file__).with_name("calls.log")
 
 def _log(line):
@@ -42,18 +43,36 @@ def fetch(url):
 '''
 
 
+def _write_fetcher(root, text, name="mw.py", encoding="utf-8"):
+    """Write a fixture fetcher where the resolver looks for it.
+
+    ⚠ **`.fux/fetchers/` is the only place now.** Until 2026-09-20 a fixture
+    could put a fetcher anywhere and point `[sources.url] fetcher` at it; that
+    key is deleted (W-199 D2) and the directory is fixed, so the fixture creates
+    it rather than relying on `fux setup` having run.
+    """
+    path = root / ".fux" / "fetchers" / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+    return path
+
+
+
 def _sha(text: str) -> str:
     return store.content_sha(text.encode("utf-8"))
 
 
 def _init_url_repo(tmp_path, *, url="https://x.test/a", config_table=""):
     (tmp_path / "fux.toml").write_text(
-        '[sources]\n[sources.url]\nmax_parallel = 4\nfetcher = "mw.py"\n' + config_table, encoding="utf-8"
+        '[sources]\n[sources.url]\nmax_parallel = 4\n' + config_table, encoding="utf-8"
     )
-    (tmp_path / "mw.py").write_text(FAKE_FETCHER, encoding="utf-8")
+    _write_fetcher(tmp_path, FAKE_FETCHER)
     urls_path = tmp_path / ".fux" / "sources" / "urls"
     urls_path.parent.mkdir(parents=True, exist_ok=True)
-    urls_path.write_text(f"{url}\n", encoding="utf-8")
+    # 🔴 Every URL line states its fetcher since 2026-09-20 (W-199 D2). A case
+    # that pins a different one passes it in `url` and this leaves it alone.
+    line = url if "fetch=" in url else f"{url} fetch=mw"
+    urls_path.write_text(f"{line}\n", encoding="utf-8")
 
 
 # -- file: needs no fetcher at all ------------------------------------------
@@ -97,7 +116,7 @@ def test_connect_and_close_bracket_the_fetch(tmp_path):
     fetch("https://x.test/a")
     close()
 
-    log = (tmp_path / "calls.log").read_text(encoding="utf-8").splitlines()
+    log = (tmp_path / ".fux" / "fetchers" / "calls.log").read_text(encoding="utf-8").splitlines()
     assert "connect" in log
     assert log.index("connect") < log.index("fetch:https://x.test/a") < log.index("close")
 
@@ -110,7 +129,7 @@ def test_configure_receives_the_opaque_config_table(tmp_path):
     finally:
         close()
 
-    log = (tmp_path / "calls.log").read_text(encoding="utf-8").splitlines()
+    log = (tmp_path / ".fux" / "fetchers" / "calls.log").read_text(encoding="utf-8").splitlines()
     assert any(line.startswith("configure:") and "port" in line and "9222" in line for line in log)
 
 
@@ -135,7 +154,7 @@ def test_a_missing_fetcher_file_degrades_to_none(tmp_path):
     refer plane's own graceful `unverified` verdict is what should take
     over, not a crash here."""
     _init_url_repo(tmp_path)
-    (tmp_path / "mw.py").unlink()
+    (tmp_path / ".fux" / "fetchers" / "mw.py").unlink()
     fetch, close, _fa = _load_fetchers(tmp_path, [("url:https://x.test/a", "https://x.test/a", "sha")])
     assert fetch is None
     close()
@@ -145,7 +164,7 @@ def test_answer_via_refer_degrades_to_none_when_the_fetcher_is_missing(tmp_path)
     """The full path: a configured but un-set-up url: source answers `None`,
     never raises, so `cmd_answer` can fall back to the index-only path."""
     _init_url_repo(tmp_path)
-    (tmp_path / "mw.py").unlink()
+    (tmp_path / ".fux" / "fetchers" / "mw.py").unlink()
     bundle = answer_via_refer(
         tmp_path, "page", [("url:https://x.test/a", "https://x.test/a", "deadbeef")]
     )
@@ -230,7 +249,7 @@ def test_a_file_only_candidate_set_loads_no_fetcher(tmp_path):
     fetch, close, _fa = _load_fetchers(tmp_path, [("file:a.md", "a.md", "sha")])
     assert fetch is None
     close()
-    assert not (tmp_path / "calls.log").exists()
+    assert not (tmp_path / ".fux" / "fetchers" / "calls.log").exists()
 
 
 def test_two_urls_behind_different_fetchers_each_get_their_own(tmp_path):
@@ -245,7 +264,7 @@ def test_two_urls_behind_different_fetchers_each_get_their_own(tmp_path):
     and they are exactly the pair the failure is about: `http.py` sees a
     rendered page's shell, `cdp.py` sees the page."""
     (tmp_path / "fux.toml").write_text(
-        '[sources]\n[sources.url]\nmax_parallel = 4\nfetcher = ".fux/fetchers/http.py"\n',
+        '[sources]\n[sources.url]\nmax_parallel = 4\n',
         encoding="utf-8",
     )
     fetchers = tmp_path / ".fux" / "fetchers"
@@ -259,7 +278,7 @@ def test_two_urls_behind_different_fetchers_each_get_their_own(tmp_path):
         )
     urls = tmp_path / ".fux" / "sources" / "urls"
     urls.parent.mkdir(parents=True, exist_ok=True)
-    urls.write_text("https://x.test/a\nhttps://x.test/b  fetch=cdp\n", encoding="utf-8")
+    urls.write_text("https://x.test/a fetch=http\nhttps://x.test/b  fetch=cdp\n", encoding="utf-8")
 
     fetch, close, _fa = _load_fetchers(
         tmp_path,
@@ -281,7 +300,7 @@ def test_two_urls_behind_different_fetchers_each_get_their_own(tmp_path):
 def test_two_urls_behind_one_fetcher_connect_once(tmp_path):
     _init_url_repo(tmp_path, url="https://x.test/a")
     (tmp_path / ".fux" / "sources" / "urls").write_text(
-        "https://x.test/a\nhttps://x.test/b\n", encoding="utf-8"
+        "https://x.test/a fetch=mw\nhttps://x.test/b fetch=mw\n", encoding="utf-8"
     )
     fetch, close, _fa = _load_fetchers(
         tmp_path,
@@ -293,7 +312,7 @@ def test_two_urls_behind_one_fetcher_connect_once(tmp_path):
         fetch("https://x.test/b")
     finally:
         close()
-    log = (tmp_path / "calls.log").read_text(encoding="utf-8").splitlines()
+    log = (tmp_path / ".fux" / "fetchers" / "calls.log").read_text(encoding="utf-8").splitlines()
     assert log.count("connect") == 1
     assert log.count("close") == 1
 
@@ -379,7 +398,8 @@ def test_a_file_only_candidate_set_reads_no_config_at_all(tmp_path):
 def test_never_verifies_against_acquired_and_never_opens_a_socket(tmp_path):
     """The whole point, end to end through `answer_via_refer`.
 
-    The fake fetcher logs every call to `calls.log`, so *no log file at all* is
+    The fake fetcher logs every call to `.fux/fetchers/calls.log` — beside
+    itself, which is where it moved on 2026-09-20 — so *no log file at all* is
     the assertion that no socket was opened — stronger than trusting a mode
     string. Under `never` the fetcher is not even loaded, so `configure()` and
     `connect()` never run either.
@@ -400,7 +420,7 @@ def test_never_verifies_against_acquired_and_never_opens_a_socket(tmp_path):
     assert bundle is not None
     assert bundle.policy["mode"] == "never"
     assert bundle.documents[0].verdict.label == "as-ingested"
-    assert not (tmp_path / "calls.log").exists()
+    assert not (tmp_path / ".fux" / "fetchers" / "calls.log").exists()
 
 
 def test_never_with_no_retained_bytes_is_unverified_not_a_crash(tmp_path):
@@ -411,7 +431,7 @@ def test_never_with_no_retained_bytes_is_unverified_not_a_crash(tmp_path):
         tmp_path, "nothing retained", [("url:https://x.test/a", "https://x.test/a", "sha")]
     )
     assert bundle is None or bundle.documents[0].verdict.label == "unverified"
-    assert not (tmp_path / "calls.log").exists()
+    assert not (tmp_path / ".fux" / "fetchers" / "calls.log").exists()
 
 
 def test_cache_ttl_is_declared_inert_rather_than_silently_dropped(tmp_path, capsys):

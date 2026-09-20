@@ -7,10 +7,10 @@ description: "A deliberately tiny config: what each key does, why the surface is
 status: accepted
 date: 2026-08-18
 feature: "`fux.toml` — discovery, schema, validation, and the keys that are refused rather than ignored"
-owns: [src/fux/config.py@0fe83cd69dac]
+owns: [src/fux/config.py@e7ab20d676db]
 laws: [L4, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 73174bd533bab60c3267a2cbed8fbfea120a437fc5ad91b05914570a4fd1801f
+content_sha: 48ba0f4b31d27c91fce3421932c5d4dd36cf5dbf021c42044db6f93db91aabf3
 ---
 
 # SR-CONFIG — `fux.toml` and every property in it
@@ -457,7 +457,7 @@ at any value, with an error naming the new home.
 ```keys
 + sources.dirs_file
 + sources.urls_file
-+ sources.url.fetcher
++ sources.url.routes
 + sources.url.keep
 + sources.url.ttl
 + sources.url.enrich
@@ -475,6 +475,7 @@ at any value, with an error naming the new home.
 - sources.url.urls
 - sources.url.urls_file
 - sources.url.middleware
+- sources.url.fetcher
 - ranking
 - dense
 - decode
@@ -497,6 +498,40 @@ since it existed ([SR-TUNE](0135_tuning.md)), and this is that behaviour, here.
 requires a set of real keys to compare against, and hand-writing a second set
 inside `config.py` would have built the duplicate source of truth L0 exists to
 remove. **One set, in the record, bound to the code by a parser.**
+
+**16. `[sources.url] fetcher` is DELETED; `[sources.url.routes]` replaces it,
+and the two are not the same shape** (Arpit, 2026-09-20, W-199).
+
+**16a. The deletion is a refusal, not a removal.** `fetcher` moves to the `-`
+rows, so a repo still carrying it **fails to load by name**, with an error
+naming the key and its replacement. *"There is no default fetch. It is a
+mandatory argument. About backward compatibility, let it break."* Same shape as
+`fux update` (W-177) and `meta=` (W-194): no deprecation window, no lenient
+read, a `CHANGELOG` entry under *Removed — BREAKING*.
+
+⚠ **It did two jobs and only one of them survives.** `fetcher` was the
+source-wide default for `fetch=` **and** the thing whose parent directory
+located every fetcher file. The default is gone by ruling; the directory is now
+simply `.fux/fetchers/`, which is where [SR-DOTFUX](0102_fux-directory.md)
+declares it and where it always was. 🔴 **A consumer who had relocated their
+fetchers by pointing this key elsewhere loses that**, and the record says so
+rather than leaving them to find out — it was never documented as a relocation
+mechanism, but it worked as one.
+
+**16b. `routes` is a BINDING, and that is why it is `+` and not `*`.** It is a
+`dict[str, str]` — host pattern to fetcher stem — **read by fux**, validated at
+load for the four shapes of [SR-FETCHER](0117_fetcher.md) decision 16c, with
+`re:` patterns compiled and anchored there. A bad pattern is a named error at
+load, not a surprise at fetch time.
+
+🔴 **Keep it in a different paragraph from `[sources.url.config]`, always.** That
+table is `*` — fux passes it through and reads no key inside it, because its
+contents are one fetcher's vocabulary and the adapter cap (decision 8) keeps
+them out of fux's surface. **`routes` is the opposite**: fux reads every key and
+every value, because deciding which fetcher retrieves a URL is fux's job.
+⚠ **The two sit under the same `[sources.url]` prefix and a reader skimming for
+the adapter-cap argument will apply it to the wrong one** — which is why the
+sigils differ and why this paragraph exists.
 
 **15. `config.schema.json` is DELETED** (2026-09-12). Every field in it was a
 `doc:` string describing a key — *"describes a rule a second time"*, which

@@ -20,7 +20,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from . import __version__
-from .config import DEFAULT_DIRS_FILE, DEFAULT_TYPES_FILE, find_root
+from .config import DEFAULT_DIRS_FILE, DEFAULT_TYPES_FILE, FETCHERS_DIR, find_root
 from .errors import FuxError
 from . import output_config
 from .store import fuxdir
@@ -324,6 +324,9 @@ def _layout(root: Path) -> list[Check]:
     checks.append(_pinned_without_bytes(root))
     checks.append(_fetcher_config_tables(root))
     checks.append(_fetcher_bindings(root))
+    checks.append(_fetcher_routes(root))
+    checks.append(_pinned_fetchers(root))
+    checks.append(_register(root))
     checks.append(_suspended_pins(root))
     checks.append(_observers(root))
     checks.append(_pii_health(root))
@@ -578,7 +581,7 @@ def _fetcher_config_tables(root: Path) -> Check:
     if not named:
         return Check(name, True, "only shared keys - every fetcher gets them")
 
-    fetchers_dir = (root / config.url.fetcher).parent
+    fetchers_dir = root / FETCHERS_DIR
     try:
         stems = {p.stem for p in fetchers_dir.glob("*.py")}
     except OSError:
@@ -594,6 +597,209 @@ def _fetcher_config_tables(root: Path) -> Check:
         + f" name(s) no fetcher: {fetchers_dir}/ has {sorted(stems) or 'nothing'}. "
         "These keys reach NO fetcher and nothing else says so - rename the table "
         "to the fetcher's filename without .py, or delete it",
+    )
+
+
+def _fetcher_routes(root: Path) -> Check:
+    """The host-to-fetcher map — SR-FETCHER decision 16's three faults.
+
+    🔴 **Offline, and it never imports a fetcher.** `ROUTES` is read with `ast`
+    (`ingest/routes.claims`), for the reason `_fetcher_capabilities` reads a
+    fetcher as text: importing consumer Python on `doctor`'s path is L4 lost
+    where nothing would notice — a fetcher is free to open a session at import.
+
+    Three faults, and the levels differ because the costs do:
+
+    - **failure** — a route naming no file on disk. Every URL it matches is
+      unfetchable and `fux add` will refuse.
+    - **failure** — a claim collision: two `ROUTES` patterns matching one host.
+      There is no non-arbitrary order between two regexes, and guessing one
+      builds a **plausible index retrieved by the wrong fetcher**, which nothing
+      downstream detects.
+    - **finding** — a route matching no listed URL. Usually a typo, occasionally
+      a table written before the URLs are added, so it is never an error alone.
+    """
+    from .config import load as load_config
+    from .ingest import routes as routes_mod
+    from .ingest import sourcelist
+
+    name = "fetcher routes"
+    try:
+        config = load_config(root)
+    except FuxError:
+        # ⚠ **The exception is NOT quoted into the detail.** A `FuxError`'s
+        # message is prose written for a person and may hold an em dash, and a
+        # detail must be ASCII for a Windows console
+        # (`test_every_check_detail_is_ascii_in_every_branch`). The `fux.toml
+        # loads` row already prints the real message, so quoting it here would
+        # be a second copy that can crash the command exactly when the repo is
+        # already broken.
+        return Check(name, True, "skipped (fux.toml does not load - see that row)", level="warn")
+    if config.url is None:
+        return Check(name, True, "skipped (no [sources.url] - this repo does not fetch)", level="warn")
+
+    table = dict(getattr(config.url, "routes", {}) or {})
+    fetchers_dir = root / FETCHERS_DIR
+    try:
+        claimed = routes_mod.claims(fetchers_dir)
+    except FuxError as exc:
+        return Check(name, False, str(exc))
+    if not table and not claimed:
+        return Check(name, True, "no routes and no ROUTES claim - every line is a pin", level="warn")
+
+    try:
+        stems = {p.stem for p in fetchers_dir.glob("*.py")}
+    except OSError:
+        stems = set()
+
+    dangling = sorted(
+        f"{pattern} -> {stem}"
+        for pattern, stem in list(table.items()) + [(p, s) for p, (s, _) in claimed.items()]
+        if stem not in stems
+    )
+    if dangling:
+        return Check(
+            name, False,
+            f"{len(dangling)} route(s) name a fetcher that is not in {FETCHERS_DIR}/: "
+            f"{', '.join(dangling)}. Every URL they match is unfetchable",
+        )
+
+    try:
+        entries = sourcelist.parse(
+            (root / config.url.urls_file).read_text(encoding="utf-8"),
+            sourcelist.URLS, origin=config.url.urls_file,
+        )
+    except (OSError, FuxError):
+        entries = []
+
+    hosts = {routes_mod.normalise_host(e.value) for e in entries if not e.exclude}
+    merged = {**{p: s for p, (s, _) in claimed.items()}, **table}
+    try:
+        compiled = routes_mod.validate(merged, where=f"{root}: routes")
+    except FuxError as exc:
+        return Check(name, False, str(exc))
+    for host in sorted(hosts):
+        try:
+            routes_mod.resolve(host, compiled, where=f"{root}: routes")
+        except FuxError as exc:
+            return Check(name, False, str(exc))
+
+    unused = sorted(
+        pattern for pattern, (_, compiled_re) in compiled.items()
+        if not any(routes_mod._matches(pattern, compiled_re, h) for h in hosts)
+    )
+    total = len(compiled)
+    if not unused:
+        return Check(name, True, f"{total} route(s), each matching a listed URL")
+    return Check(
+        name, False,
+        f"{total} route(s); {len(unused)} match no listed URL: {', '.join(unused)}. "
+        f"Usually a typo, occasionally a table written before the URLs",
+        level="warn",
+    )
+
+
+def _pinned_fetchers(root: Path) -> Check:
+    """Lines whose `fetch=` pin disagrees with what the routes table now says.
+
+    🔴 **The whole cost of SR-URL-LIST decision 16, made visible.** Arpit ruled
+    that every line states a resolved stem, so a route changed later moves
+    nothing — this row is the only thing that tells a consumer their table and
+    their list have drifted apart, and it names the one-line fix per line.
+
+    ⚠ **It reports and never rewrites.** fux editing the meaning of a committed
+    file is what this repository refused when it declined an
+    `ingest --unpin-default`.
+    """
+    from .config import load as load_config
+    from .ingest import routes as routes_mod
+    from .ingest import sourcelist
+
+    name = "pinned fetchers"
+    try:
+        config = load_config(root)
+    except FuxError:
+        return Check(name, True, "skipped (fux.toml does not load)", level="warn")
+    if config.url is None:
+        return Check(name, True, "skipped (no [sources.url])", level="warn")
+    table = dict(getattr(config.url, "routes", {}) or {})
+    if not table:
+        return Check(name, True, "no routes table - nothing for a pin to disagree with", level="warn")
+    try:
+        entries = sourcelist.parse(
+            (root / config.url.urls_file).read_text(encoding="utf-8"),
+            sourcelist.URLS, origin=config.url.urls_file,
+        )
+        compiled = routes_mod.validate(table, where="fux.toml: [sources.url.routes]")
+    except (OSError, FuxError):
+        return Check(name, True, "skipped (the list or the table does not read)", level="warn")
+
+    drifted = []
+    for entry in entries:
+        if entry.exclude:
+            continue
+        pinned = entry.attrs.get("fetch")
+        try:
+            routed = routes_mod.resolve(
+                routes_mod.normalise_host(entry.value), compiled,
+                where="fux.toml: [sources.url.routes]",
+            )
+        except FuxError:
+            continue
+        if routed is not None and pinned != routed:
+            drifted.append(f"{entry.value} pins {pinned}, routes say {routed}")
+    if not drifted:
+        return Check(name, True, f"{len(entries)} line(s), every pin agreeing with the routes table")
+    return Check(
+        name, False,
+        f"{len(drifted)} line(s) pin a fetcher the routes table would now resolve differently: "
+        f"{'; '.join(drifted[:5])}"
+        f"{'' if len(drifted) <= 5 else f', and {len(drifted) - 5} more'}. "
+        f"Every line is a pin by design - edit the line, or leave it",
+        level="warn",
+    )
+
+
+def _register(root: Path) -> Check:
+    """`.fux/index/REGISTER` against the index it claims to describe.
+
+    Drift means **the register was committed from a different ingest than the
+    index beside it** — the one thing a committed derived file can get wrong,
+    and the one nobody reads closely enough to catch by eye.
+    """
+    from .ingest import register as register_mod
+    from .store import reader as reader_mod
+
+    name = "register"
+    rows = register_mod.read(root)
+    try:
+        index = reader_mod.read_index(root)
+    except Exception:  # pragma: no cover - no readable index is other rows' business
+        return Check(name, True, "skipped (no readable index)", level="warn")
+    if not index:
+        return Check(name, True, "no index to describe", level="warn")
+    if not rows:
+        return Check(
+            name, False,
+            f"no {register_mod.NAME} beside an index of {len(index)} document(s) - "
+            f"run `fux ingest` to write one",
+            level="warn",
+        )
+    locs = {r.get("loc", "") for r in index.values()}
+    missing = sorted(locs - set(rows))
+    extra = sorted(set(rows) - locs)
+    if not missing and not extra:
+        return Check(name, True, f"{len(rows)} line(s), agreeing with the index")
+    parts = []
+    if missing:
+        parts.append(f"{len(missing)} indexed document(s) with no register line ({missing[0]})")
+    if extra:
+        parts.append(f"{len(extra)} register line(s) for nothing in the index ({extra[0]})")
+    return Check(
+        name, False,
+        "; ".join(parts) + " - the register was committed from a different ingest "
+        "than the index beside it; `fux ingest` rewrites it",
+        level="warn",
     )
 
 
@@ -647,7 +853,7 @@ def _fetcher_bindings(root: Path) -> Check:
     if not resolved:
         return Check(name, True, "no URL lines listed")
 
-    fetchers_dir = (root / config.url.fetcher).parent
+    fetchers_dir = root / FETCHERS_DIR
     try:
         stems = {p.stem for p in fetchers_dir.glob("*.py")}
     except OSError:
@@ -1446,7 +1652,11 @@ def _fetcher_capabilities(root: Path) -> Check:
         # No `[sources.url]` at all: this repo does not fetch, so which
         # optional functions its fetcher implements is not a fact about it.
         return Check(name, True, "skipped (no [sources.url] - this repo does not fetch)", level="warn")
-    rel = url_source.fetcher
+    # ⚠ **`[sources.url] fetcher` is deleted** (W-199 D2), so there is no one
+    # fetcher to read any more. This row reports the optional functions of the
+    # fetchers actually on disk, and names the shipped plain-GET one when it is
+    # there, because that is the file a consumer is most likely asking about.
+    rel = f"{FETCHERS_DIR}/http.py"
     path = root / rel
     if not path.is_file():
         return Check(name, True, f"{rel}: absent - run `fux setup` to write the shipped fetchers", level="warn")

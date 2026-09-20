@@ -306,12 +306,12 @@ def test_url_check_names_listed_urls_that_have_never_been_fetched(tmp_path):
     )
     urls = tmp_path / ".fux" / "sources" / "urls"
     urls.parent.mkdir(parents=True, exist_ok=True)
-    urls.write_text("https://a\nhttps://never-fetched\n", encoding="utf-8")
+    urls.write_text("https://a fetch=http\nhttps://never-fetched fetch=http\n", encoding="utf-8")
 
     check = _check(doctor.run(tmp_path), "url sources")
     assert "1 listed URL(s) have never been fetched" in check.detail
     assert "https://never-fetched" in check.detail
-    assert "https://a" not in check.detail.split("never been fetched")[1], (
+    assert "https://a fetch=http" not in check.detail.split("never been fetched")[1], (
         "a URL that IS indexed must not be reported as unfetched"
     )
 
@@ -501,7 +501,7 @@ def test_url_state_carries_no_wall_clock(tmp_path):
     from fux.maintain import urlstate
 
     (tmp_path / "fux.toml").write_text("", encoding="utf-8")
-    urlstate.observe(tmp_path, fetched={"https://a": "sha"}, failed=[], listed=["https://a"])
+    urlstate.observe(tmp_path, fetched={"https://a fetch=http": "sha"}, failed=[], listed=["https://a"])
     raw = json.loads((tmp_path / ".fux" / "runtime" / urlstate.STATE_NAME).read_text(encoding="utf-8"))
 
     flat = json.dumps(raw)
@@ -600,7 +600,6 @@ def _url_repo(root, fetcher_body: str) -> None:
         "[sources]\n"
         'dirs_file = ".fux/sources/dirs"\n'
         "[sources.url]\n"
-        'fetcher = ".fux/fetchers/http.py"\n'
         
         "max_parallel = 4\n",
         encoding="utf-8",
@@ -657,7 +656,6 @@ def test_the_shipped_template_implements_every_optional_function(tmp_path):
         "[sources]\n"
         'dirs_file = ".fux/sources/dirs"\n'
         "[sources.url]\n"
-        'fetcher = ".fux/fetchers/http.py"\n'
         
         "max_parallel = 4\n",
         encoding="utf-8",
@@ -807,7 +805,7 @@ def test_a_surviving_url_document_keeps_the_refusal_line_quiet(tmp_path):
     _git_repo(tmp_path)
     _refusals_toml(tmp_path, "sso")
     urlstate.record_refusals(tmp_path, {"sso": 2})
-    write_index(tmp_path, [_record(doc_id="url:https://x/a", loc="https://x/a")])
+    write_index(tmp_path, [_record(doc_id="url:https://x/a", loc="https://x/a fetch=http")])
     check = _check(doctor.run(tmp_path), "refusal rules")
     assert check.ok
 
@@ -855,14 +853,14 @@ def test_refusal_returns_the_rule_name_structurally(tmp_path):
         origin="t",
     )
     body = b"<html>Sign in</html>"
-    assert refusals.refusal(rules, "https://x/a", "text/html", body) == ("sso", "sign in")
-    assert refusals.refused(rules, "https://x/a", "text/html", body) == "sign in [sso]"
+    assert refusals.refusal(rules, "https://x/a fetch=http", "text/html", body) == ("sso", "sign in")
+    assert refusals.refused(rules, "https://x/a fetch=http", "text/html", body) == "sign in [sso]"
 
 
 def test_the_magic_floor_is_counted_under_its_reserved_name():
     from fux.ingest import refusals
 
-    hit = refusals.refusal((), "https://x/a.pdf", "application/pdf", b"<html>nope")
+    hit = refusals.refusal((), "https://x/a.pdf fetch=http", "application/pdf", b"<html>nope")
     assert hit is not None
     assert hit[0] == refusals.MAGIC_FLOOR
 
@@ -1823,7 +1821,7 @@ def test_thin_urls_is_silent_without_an_acquired_plane(tmp_path):
 # -- pinned url bytes (W-174) ------------------------------------------------
 
 
-def _pinned_repo(tmp_path, *, urls=("https://x.test/a",), flag="fetch_at_answer = false\n"):
+def _pinned_repo(tmp_path, *, urls=("https://x.test/a fetch=http",), flag="fetch_at_answer = false\n"):
     root = _drift_repo(tmp_path)
     (root / "fux.toml").write_text(
         "[sources]\n[sources.url]\nmax_parallel = 4\n" + flag, encoding="utf-8"
@@ -1859,7 +1857,7 @@ def test_pinned_row_names_the_urls_with_no_retained_bytes(tmp_path):
     asserted below** rather than only the fields, because asserting the fields
     is what let this ship.
     """
-    root = _pinned_repo(tmp_path, urls=("https://x.test/a", "https://x.test/b"))
+    root = _pinned_repo(tmp_path, urls=("https://x.test/a fetch=http", "https://x.test/b fetch=http"))
     row = _row(root, "pinned url bytes")
     assert row.level == "warn"      # never refuses: `cmd_doctor` ignores `ok` here
     assert not row.ok               # ...and therefore renders [WARN], not [OK]
@@ -1880,7 +1878,7 @@ def test_a_warn_row_renders_WARN_and_still_exits_zero(tmp_path, capsys):
 
     from fux.doctor import Check, cmd_doctor
 
-    root = _pinned_repo(tmp_path, urls=("https://x.test/a",))
+    root = _pinned_repo(tmp_path, urls=("https://x.test/a fetch=http",))
     monkey = _row(root, "pinned url bytes")
     assert monkey.level == "warn" and not monkey.ok
 

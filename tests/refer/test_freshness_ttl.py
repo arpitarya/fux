@@ -84,14 +84,14 @@ def test_ttl_defaults_to_a_day_not_to_zero():
 
 def test_a_bad_ttl_on_a_line_is_refused_with_the_rule(tmp_path):
     urls = tmp_path / "urls"
-    urls.write_text("https://x/a ttl=1x\n")
+    urls.write_text("https://x/a ttl=1x fetch=http\n")
     with pytest.raises(FuxError, match="ttl='1x'"):
         sourcelist.read(tmp_path, "urls", sourcelist.URLS, missing_hint="")
 
 
 def test_a_good_ttl_on_a_line_parses(tmp_path):
     urls = tmp_path / "urls"
-    urls.write_text("https://x/a ttl=15m keep=false\n")
+    urls.write_text("https://x/a ttl=15m keep=false fetch=http\n")
     entries = sourcelist.read(tmp_path, "urls", sourcelist.URLS, missing_hint="")
     assert entries[0].attrs["ttl"] == "15m"
     assert entries[0].attrs["keep"] == "false"
@@ -100,11 +100,14 @@ def test_a_good_ttl_on_a_line_parses(tmp_path):
 
 def test_an_undeclared_line_takes_the_defaults(tmp_path):
     urls = tmp_path / "urls"
-    urls.write_text("https://x/a\n")
+    urls.write_text("https://x/a fetch=http\n")
     entry = sourcelist.read(tmp_path, "urls", sourcelist.URLS, missing_hint="")[0]
     assert entry.attrs["ttl"] == "24h"
     assert entry.attrs["keep"] == "true"      # SR-ACQUIRED: keep is on by default
-    assert entry.declared == frozenset()
+    # ⚠ A URL line always declares `fetch` since 2026-09-20 (W-199 D2) — the
+    # fixture supplies it and the grammar requires it. The leniency this case
+    # is about is `ttl`: undeclared, so the source-wide layer still applies.
+    assert entry.declared == frozenset({"fetch"})
 
 
 # -- the sixth verdict ------------------------------------------------------

@@ -7,10 +7,10 @@ description: "One URL per line in a committed file, deduped and sorted by the lo
 status: accepted
 date: 2026-08-19
 feature: "`.fux/sources/urls` — the file format itself, and the one grammar both committed source lists are parsed by"
-owns: [src/fux/ingest/sourcelist.py@622d83561c10]
+owns: [src/fux/ingest/sourcelist.py@1fb64881a387]
 laws: [L2, L3, L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 914a99d8a7385c4648a9c8fbb370453bc526b35a806fdb4a016f7cefe0b20965
+content_sha: 42fb64856eb68443395b239f050387fe021212dee3a1937512c5e6c7be7c915d
 ---
 
 # SR-URL-LIST — the committed URL list

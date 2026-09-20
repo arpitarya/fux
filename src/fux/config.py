@@ -36,7 +36,7 @@ FIXED_SHARDS = 256  # not yet configurable — shard = blake2b(id, digest_size=1
 KNOWN_KEYS: tuple[str, ...] = (
     "sources.dirs_file",
     "sources.urls_file",
-    "sources.url.fetcher",
+    "sources.url.routes",
     "sources.url.keep",
     "sources.url.ttl",
     "sources.url.enrich",
@@ -71,6 +71,7 @@ REFUSED_KEYS: tuple[str, ...] = (
     "sources.url.urls",
     "sources.url.urls_file",
     "sources.url.middleware",
+    "sources.url.fetcher",
     "ranking",
     "dense",
     "decode",
@@ -85,7 +86,20 @@ def find_root(start: Path | None = None) -> Path | None:
     return None
 
 
-DEFAULT_FETCHER = ".fux/fetchers/http.py"
+#: Where a `fetch=<stem>` resolves: `<FETCHERS_DIR>/<stem>.py`.
+#:
+#: ⚠ **This replaced `DEFAULT_FETCHER` on 2026-09-20** (W-199 D2). That constant
+#: did two jobs — it was the source-wide default for `fetch=` **and** its parent
+#: directory located every fetcher file. Arpit deleted the default outright
+#: (*"There is no default fetch"*), and the directory was never a separate
+#: decision: [SR-DOTFUX](../../records/0102_fux-directory.md) declares
+#: `.fux/fetchers/` and that is where it always was.
+#:
+#: 🔴 **A consumer who had relocated their fetchers by pointing
+#: `[sources.url] fetcher` at another directory loses that**, and the refusal
+#: message says so. It was never documented as a relocation mechanism; it
+#: worked as one.
+FETCHERS_DIR = ".fux/fetchers"
 DEFAULT_URLS_FILE = ".fux/sources/urls"
 DEFAULT_DIRS_FILE = ".fux/sources/dirs"
 #: Optional. Absent means the built-in allowlist in `gitdir.DEFAULT_TYPES`.
@@ -103,6 +117,28 @@ LEGACY_TYPES_FILE = ".fux/sources/types"
 #: typo here fails **silently** in the worst way: the policy file a consumer
 #: asked for is simply never written, and nothing says so.
 KNOWN_AGENTS = ("claude", "codex", "copilot", "kiro")
+
+
+def _url_routes(path: Path, raw) -> dict[str, str]:
+    """`[sources.url.routes]` — a host map fux READS, validated at load.
+
+    ⚠ **Validated here rather than at first use**, so a bad pattern is a named
+    error when the config loads — `fux doctor` sees it offline, and nobody
+    discovers it mid-fetch. The grammar and the collision rule live in
+    `ingest/routes.py`; this function only checks the table's shape and hands
+    it over.
+    """
+    if not isinstance(raw, dict):
+        raise FuxError(
+            f"{path}: [sources.url.routes] must be a table of "
+            f'pattern = "<fetcher stem>" (got {type(raw).__name__})'
+        )
+    # Imported inside the function for the same reason `sourcelist` is:
+    # `ingest/__init__` imports this module, so a top-level import is a cycle.
+    from .ingest import routes as _routes
+
+    _routes.validate({str(k): v for k, v in raw.items()}, where=f"{path}: [sources.url.routes]")
+    return {str(k): str(v) for k, v in raw.items()}
 
 
 def fetcher_config(table: dict, fetcher_path: str) -> dict:
@@ -123,18 +159,18 @@ def fetcher_config(table: dict, fetcher_path: str) -> dict:
 class UrlSource:
     """`[sources.url]` — consumer-fetcher URL ingestion (SR-URL-INGEST/0011).
 
-    - `fetcher` — repo-root-relative path to a consumer-owned Python file, and
-      the **source-wide setting for `fetch`**: a URL line that declares no
-      `fetch=` uses this file, and a line that declares `fetch=<name>` uses
-      `<this file's directory>/<name>.py`. One key carries both, so relocating
-      your fetchers is a one-line change (SR-FETCHER decision 5). The default
-      is `.fux/fetchers/http.py` — a plain GET, which is what a URL with no
-      attributes means (SR-HTTP-FETCHER decision 1).
-    - `urls_file` — resolved from **`[sources] urls_file`**, not from this
-      table (2026-09-14). It is carried here so every caller that already holds
-      a `UrlSource` keeps one field to read. The list is a *file*, not a TOML
-      array: a 5k-entry inline array is one diff hunk and one merge conflict,
-      the same argument that sharded the index.
+    - `routes` — a host-to-fetcher map, `{pattern = "<stem>"}`, consulted by
+      `fux add` when no `--fetch` was given (SR-FETCHER decision 16). Four
+      pattern shapes: `example.com`, `*.example.com` (⚠ **not** the apex),
+      `example.com:8443`, and `re:<regex>` compiled and anchored at load.
+      🔴 **Two patterns matching one host is a hard error naming both** — there
+      is no non-arbitrary order between two regexes, and a guessed one builds a
+      plausible index with the wrong fetcher.
+      ⚠ **There is no `fetcher` key any more.** It was the source-wide default
+      for `fetch=` and it was deleted on 2026-09-20 (W-199 D2): every URL line
+      states its own fetcher, and a repo carrying the old key fails to load by
+      name.
+
     - `config` — the `[sources.url.config]` table, handed to the fetcher's
       optional `configure(config)` hook. Fux validates that it is a table and
       **never reads a key inside it**: core knows there *is* config, never what
@@ -169,7 +205,14 @@ class UrlSource:
       belongs beside the other `[sources.url]` keys.
     """
 
-    fetcher: str
+    #: `{host pattern: fetcher stem}` — [SR-CONFIG](../../records/0113_config.md)
+    #: decision 16b. 🔴 **A BINDING fux reads, not an opaque table it passes
+    #: through.** `[sources.url.config]` is the opaque one, and the two sit under
+    #: the same prefix: the adapter-cap argument applies to that one and never to
+    #: this one, because deciding which fetcher retrieves a URL is fux's job.
+    #: Validated at load; `re:` patterns are compiled and anchored there, so a
+    #: bad pattern is a named error before a byte moves.
+    routes: dict[str, str]
     urls_file: str
     #: SR-ACQUIRED, the source-wide layer of `keep`. A line still wins.
     keep: bool
@@ -507,9 +550,14 @@ def _load_url_source(path: Path, raw, urls_file: str) -> UrlSource | None:
             "rename the key, and move the file from .fux/middleware/ to .fux/fetchers/ "
             "(SR-FETCHER, 2026-08-19)"
         )
-    fetcher = raw.get("fetcher", DEFAULT_FETCHER)
-    if not isinstance(fetcher, str) or not fetcher.strip():
-        raise FuxError(f"{path}: [sources.url] fetcher must be a path to a consumer-owned .py file")
+    if "fetcher" in raw:
+        raise FuxError(
+            f"{path}: [sources.url] fetcher was DELETED on 2026-09-20 — there is no default "
+            "fetcher. Every URL line states its own `fetch=<stem>`, and a host map lives in "
+            "[sources.url.routes]. Delete this key; fetchers are read from .fux/fetchers/. "
+            "(W-199, SR-CONFIG decision 16)"
+        )
+    routes = _url_routes(path, raw.get("routes", {}))
     keep = raw.get("keep", True)
     if not isinstance(keep, bool):
         raise FuxError(
@@ -627,7 +675,7 @@ def _load_url_source(path: Path, raw, urls_file: str) -> UrlSource | None:
                 f"(got {acquired_max_bytes}). To retain nothing, set keep = false"
             )
     return UrlSource(
-        fetcher=fetcher.strip(),
+        routes=routes,
         urls_file=urls_file,
         keep=keep,
         ttl=ttl,

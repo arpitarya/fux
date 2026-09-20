@@ -21,7 +21,7 @@ from fux.doctor import _fetcher_bindings
 def _repo(tmp_path, *, urls: str, fetchers=("http",)):
     (tmp_path / "fux.toml").write_text(
         '[sources]\nurls_file = ".fux/sources/urls"\n'
-        '[sources.url]\nfetcher = ".fux/fetchers/http.py"\nmax_parallel = 4\n',
+        '[sources.url]\nmax_parallel = 4\n',
         encoding="utf-8",
     )
     (tmp_path / ".fux" / "sources").mkdir(parents=True)

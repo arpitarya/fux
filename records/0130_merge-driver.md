@@ -7,10 +7,10 @@ description: "The merge driver for .fux/index/*.jsonl. A shard is a header plus 
 status: accepted
 date: 2026-08-21
 feature: the merge driver for the committed index
-owns: [src/fux/maintain/mergedriver.py@8066b90a98a8]
+owns: [src/fux/maintain/mergedriver.py@f8b0c118dec2]
 laws: [L1, L3]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 74e190291c2c8d97d43a035011b08c6402fbfdfccd2b252b6cc7088882d1b1eb
+content_sha: e06884331ad43aa5b2eaf88f946dc22fbeb5f47aa13558f4d0bf0b348f466a71
 ---
 
 # SR-MERGE-DRIVER — a machine plane that never conflicts on adjacency
@@ -236,6 +236,30 @@ reads as corruption.
   statistics, so `--ours` and `--theirs` lose nothing `fux ingest` will not
   rebuild from the merged working tree. Without that sentence the reader is
   making a choice between colleagues' indexes that does not exist.
+
+**The register merges too, and by a different rule** (W-199 D4, 2026-09-20).
+`.fux/index/` holds two committed shapes now — the `*.jsonl` shards and the TSV
+`REGISTER` — and this driver was bound to the shards alone, so **a merge that
+resolved every shard cleanly conflicted on the register**. That is a machine
+plane conflicting on the mere fact that two people worked at once, which is the
+one thing this driver exists to prevent; `tests_e2e/test_maintenance.py` caught
+it the day the register landed.
+
+- **The union on `loc`, sorted, and there is no conflict case.** A register line
+  is fully derived from the index beside it, so two sides disagreeing about one
+  `loc` means the two indexes disagree — which the shard half has already
+  resolved by the time this runs. ⚠ **Ours wins a same-`loc` disagreement**,
+  matching this driver's instinct of never silently preferring the remote, and
+  the choice cannot survive an ingest, so it decides nothing durable.
+- 🔴 **`%P` is now the fourth argument, and it is load-bearing.** `%A` is a
+  temporary file git creates for the result, so its basename is
+  `.merge_file_XXXXXX` and says nothing about which file is being merged. With
+  two shapes under one directory the driver has to be told. ⚠ **A repo whose
+  `merge.fux-index.driver` was registered before 2026-09-20 passes only three
+  arguments** — the driver then treats a register as a shard and refuses it as
+  unparseable rather than merging it wrongly. `fux hooks` re-registers.
+- **`.gitattributes` gains a second line**, appended write-if-missing per line
+  like the first.
 
 ### Consequences
 

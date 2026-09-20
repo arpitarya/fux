@@ -79,12 +79,16 @@ Declare more than `1` only if `fetch` is safe on many threads after a single
 ## 3 · Routing a URL to a fetcher
 
 - 🔴 **`fetch=` takes ANY fetcher name** — `http`, `cdp`, or a module you drop
-  into the fetchers directory yourself. A name resolves to
-  `<directory of [sources.url] fetcher>/<name>.py`. The grammar checks the
-  **shape** only (lowercase letters, digits and underscores, no leading `_`, no
-  `.py`, no directory part); whether the file exists is `fux doctor`'s
-  `fetcher bindings` row and, failing that, the next ingest's error.
-- **A line with no `fetch=` uses the file `[sources.url] fetcher` names.**
+  into `.fux/fetchers/` yourself. A name resolves to
+  `.fux/fetchers/<name>.py`. The grammar checks the **shape** only (lowercase
+  letters, digits and underscores, no leading `_`, no `.py`, no directory
+  part); whether the file exists is `fux doctor`'s `fetcher bindings` row and,
+  failing that, the next ingest's error.
+- 🔴 **`fetch=` is MANDATORY and there is no default fetcher** (2026-09-20). A
+  line without one **fails to load**, naming the line and the word to add.
+- **Three layers, and no fourth:** the line's `fetch=` **pin** beats
+  `fux.toml`'s `[sources.url.routes]` **binding**, which beats a fetcher
+  module's `ROUTES` **claim**. `fux add` resolves one and writes it down.
 - **Nothing escalates.** A GET that returns a useless shell returns it every run;
   a human changes the line.
 
@@ -92,14 +96,29 @@ Declare more than `1` only if `fetch` is safe on many threads after a single
 |---|---|
 | every URL through a modified GET | edit `.fux/fetchers/http.py` in place |
 | one URL through the browser | `fux add <URL> --cdp` — rewrites that line |
-| **some URLs** through a new `.fux/fetchers/confluence.py` | write the file, then put `fetch=confluence` on those lines |
-| **every** URL through a new fetcher | write the file, point `[sources.url] fetcher` at it, and keep `fetch=` **off** its lines |
+| **some URLs** through a new `.fux/fetchers/confluence.py` | write the file, then `fux add <URL> --fetch confluence` |
+| **every URL on a host** through a new fetcher | write the file, then add a route: `[sources.url.routes]` `"wiki.corp" = "confluence"` |
 
-⚠ **`fux add` writes `fetch=http` unless given `--cdp`**, and there is **no
-`--fetch <name>` flag** — the two flags name the two shipped fetchers. For a
-custom one: `fux add <URL> --no-ingest`, edit the `fetch=` value on the line in
-`.fux/sources/urls`, then `fux ingest <URL>`. A later `fux add` on that URL
-writes `fetch=http` back.
+**Route patterns — four shapes**, in the table or in a module's `ROUTES`:
+
+```toml
+[sources.url.routes]
+"example.com"               = "http"
+"*.wiki.example.com"        = "cdp"     # subdomains -- NOT example.com itself
+"intranet.example.com:8443" = "cdp"
+"re:^.*\\.sharepoint\\.com$"  = "cdp"     # compiled and anchored at load
+```
+
+🔴 **Two patterns matching one host is a hard error naming both.** There is no
+non-arbitrary order between two regexes, so ambiguity is refused rather than
+sorted — guessing builds a plausible index retrieved by the wrong fetcher.
+
+⚠ **`fux add` REFUSES a URL nothing resolves for**, naming the host it tried and
+the fetchers on disk. Give it `--fetch <name>`, or add a route.
+
+⚠ **Every written line is a PIN, so a route changed later does not move it.**
+`fux doctor`'s `pinned fetchers` row names the lines that have drifted from the
+table; it reports and never rewrites.
 
 ⚠ **A typo in a custom name now PARSES.** `fetch=conflunce` is a legal line
 naming a file nobody wrote — the price of an open set. `fux doctor` reports it

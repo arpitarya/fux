@@ -25,7 +25,6 @@ urls_file = ".fux/sources/urls"
 # only names the list. Nothing is fetched until a URL is listed in it, and
 # only `fux add <URL>` lists one.
 [sources.url]
-fetcher         = ".fux/fetchers/http.py"
 keep            = true
 enrich          = false
 update          = "auto"
@@ -34,6 +33,24 @@ fetch_at_answer = true
 # REQUIRED, and may not be commented out: a repo that CAN fetch has to say how
 # hard, in a number a person can read. Comment it out and fux refuses to load.
 max_parallel = 4
+
+# A host map: which fetcher retrieves which host, consulted by `fux add` when
+# no --fetch was given. fux READS every key here -- unlike [sources.url.config]
+# below, which it passes through untouched.
+#
+# Four pattern shapes. A wildcard does NOT match the apex, and two patterns
+# matching one host is a hard error naming both (there is no non-arbitrary
+# order between two regexes, and guessing one builds a plausible index with
+# the wrong fetcher).
+#
+#   [sources.url.routes]
+#   "example.com"                     = "http"
+#   "*.wiki.example.com"              = "cdp"      # not example.com itself
+#   "intranet.example.com:8443"       = "cdp"
+#   "re:^.*\\.sharepoint\\.com$"        = "cdp"      # compiled + anchored at load
+#
+# There is NO default fetcher (2026-09-20): every URL line states its own
+# `fetch=`, and `fux add` refuses a URL nothing resolves for.
 
 # Handed to your fetcher's configure() verbatim; fux reads no key inside.
 # A key at THIS level goes to every fetcher -- only put one here that all

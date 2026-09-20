@@ -10,7 +10,7 @@ module existing (SR-DOTFUX decision 6, SR-FETCHER decision 6):
 
 **`ensure_layout` must never write a fetcher.** That is what keeps `fux ingest`
 from putting 28 KB of WebSocket code into a repo that only wanted an index. It
-is also why `DEFAULT_FETCHER` can name a file that exists: setup put it there,
+is also why `.fux/fetchers/http.py` can be relied on to exist: setup put it there,
 because someone ran setup.
 
 The two fetchers ship in the wheel as **package data under `templates/`, with
@@ -731,9 +731,17 @@ def _urls_header() -> str:
     # touches. ⚠ **That is W-140 row 18 returning through the fix for it:** the
     # header went stale by being transcribed, was repaired by being *derived*,
     # and this was the derivation itself carrying the wrong constant.
-    pairs = [(a.spelling(), a.default) for a in URLS.attributes]
+    # 🔴 **A REQUIRED attribute has no default to print** (W-199 D2,
+    # 2026-09-20). `fetch` carries a `default` for `render_line`'s benefit while
+    # a line is being constructed, and printing it here would tell every repo
+    # `fux setup` touches that a line may omit it — which is exactly the stale
+    # header this function exists to prevent, one layer deeper.
+    pairs = [
+        (a.spelling(), "REQUIRED - no default" if a.required else f"default {a.default}")
+        for a in URLS.attributes
+    ]
     width = max(len(spelling) for spelling, _ in pairs)
-    table = "\n".join(f"#   {spelling:<{width}}  default {default}" for spelling, default in pairs)
+    table = "\n".join(f"#   {spelling:<{width}}  {note}" for spelling, note in pairs)
     return f"""\
 # The URLs fux indexes. One per line. `#` starts a comment at the start of a
 # line or after whitespace -- NOT inside a URL, so a fragment survives.
@@ -743,6 +751,10 @@ def _urls_header() -> str:
 #
 #   https://example.com/handbook/oncall    fetch=http
 #   https://wiki.corp/display/ENG/runbook  fetch=cdp  ttl=7d
+#
+# `fetch=` is MANDATORY on every line -- there is no default fetcher, and a
+# line without one fails to load (SR-URL-LIST decision 16, 2026-09-20). Put a
+# host map in `[sources.url.routes]` and `fux add` resolves it for you.
 #
 # `fux add <URL>` writes a line here with every attribute stated, and fetches
 # that one URL once. `fux ingest` re-fetches the lines known to be stale --

@@ -14,7 +14,7 @@ from fux import enrich as enrich_mod
 from fux.ingest import sourcelist
 from fux.store import acquired
 
-LOC = "https://wiki/runbook"
+LOC = "https://wiki/runbook fetch=http"
 HTML = "text/html; charset=utf-8"
 PAGE = (
     b"<!DOCTYPE html><html><head><title>Deploy runbook</title></head><body>"
@@ -28,7 +28,6 @@ def _repo(tmp_path, line, source_enrich=None):
     extra = f"enrich = {str(source_enrich).lower()}\n" if source_enrich is not None else ""
     (tmp_path / "fux.toml").write_text(
         "[sources.url]\n"
-        'fetcher = ".fux/fetchers/http.py"\n'
         "max_parallel = 2\n" + extra
     )
     return tmp_path
@@ -56,7 +55,7 @@ def test_it_is_off_by_default_like_the_dirs_list():
 
 
 def test_a_line_can_declare_it(tmp_path):
-    (tmp_path / "urls").write_text("https://x/a enrich=true\n")
+    (tmp_path / "urls").write_text("https://x/a enrich=true fetch=http\n")
     entry = sourcelist.read(tmp_path, "urls", sourcelist.URLS, missing_hint="")[0]
     assert entry.attrs["enrich"] == "true"
     assert "enrich" in entry.declared
@@ -66,20 +65,20 @@ def test_a_line_can_declare_it(tmp_path):
 
 
 def test_an_undeclared_line_with_no_source_setting_is_off(tmp_path):
-    root = _repo(tmp_path, "https://x/a")
+    root = _repo(tmp_path, "https://x/a fetch=http")
     assert enrich_mod._enrich_urls(root) == set()
 
 
 def test_the_source_wide_setting_turns_a_bare_line_on(tmp_path):
-    root = _repo(tmp_path, "https://x/a", source_enrich=True)
+    root = _repo(tmp_path, "https://x/a fetch=http", source_enrich=True)
     assert enrich_mod._enrich_urls(root) == {"https://x/a"}
 
 
 def test_a_line_beats_the_source_wide_setting_in_both_directions(tmp_path):
-    root = _repo(tmp_path, "https://x/a enrich=false", source_enrich=True)
+    root = _repo(tmp_path, "https://x/a enrich=false fetch=http", source_enrich=True)
     assert enrich_mod._enrich_urls(root) == set()
 
-    root2 = _repo(tmp_path / "b", "https://x/a enrich=true", source_enrich=False)
+    root2 = _repo(tmp_path / "b", "https://x/a enrich=true fetch=http", source_enrich=False)
     assert enrich_mod._enrich_urls(root2) == {"https://x/a"}
 
 

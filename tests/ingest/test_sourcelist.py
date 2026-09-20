@@ -13,8 +13,44 @@ from fux.errors import FuxError
 from fux.ingest import sourcelist
 
 
+def _fill_fetch(text, spec):
+    """Supply `fetch=` on any URL line that does not state one.
+
+    🔴 **`fetch=` is REQUIRED on a URL line since 2026-09-20** (W-199 D2;
+    SR-URL-LIST decision 16) — there is no default left to inherit. Nearly every
+    case in this file is about something else (comments, duplicates, fragments,
+    the `dirs` grammar), so the helper fills it in rather than every literal
+    repeating it. **A case about `fetch` itself states its own and this leaves
+    it alone.**
+
+    ⚠ **Inserted BEFORE a trailing comment**, because `# note` at the end of a
+    line would otherwise swallow it and the helper would silently do nothing.
+    ⚠ **A `#` inside a URL is a FRAGMENT** — only ` #` (with the space) or a
+    line that starts with `#` is a comment, which is the file grammar's own rule.
+
+    ⚠ **The value filled in is `http`, which is the ATTRIBUTE's own `default`.**
+    That keeps `_defaults()` comparable: a case asserting *an absent attribute
+    is its default* would otherwise fail on the one attribute the helper
+    supplied, which is the helper distorting the thing under test.
+    """
+    if spec is not sourcelist.URLS:
+        return text
+    out = []
+    for line in text.split("\n"):
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#") or stripped.startswith("!"):
+            out.append(line)
+            continue
+        if "fetch=" in stripped or not stripped.lower().startswith(("http://", "https://")):
+            out.append(line)
+            continue
+        head, sep, tail = line.partition(" #")
+        out.append(f"{head.rstrip()} fetch=http{(' #' + tail) if sep else ''}")
+    return "\n".join(out)
+
+
 def _parse(text, spec=sourcelist.URLS):
-    return sourcelist.parse(text, spec, origin="list")
+    return sourcelist.parse(_fill_fetch(text, spec), spec, origin="list")
 
 
 def _values(text, spec=sourcelist.URLS):
@@ -136,10 +172,22 @@ def test_archived_has_no_source_wide_layer():
 
 
 def test_absent_attributes_take_their_defaults_and_are_not_declared():
+    """⚠ **A URL line always declares `fetch` now** (W-199 D2, 2026-09-20).
+
+    The leniency being asserted is about every OTHER attribute: an absent one
+    is its default and is not `declared`, so a later reader can tell a stated
+    policy from an inherited one. `fetch` left that set because it has no
+    source-wide layer to inherit from any more — the line states it or fails to
+    parse — so `declared` can never be empty on a URL line again.
+    """
     (entry,) = _parse("https://x.test/a")
     assert entry.attrs == _defaults()
-    assert entry.declared == frozenset()
+    assert entry.declared == frozenset({"fetch"})
     assert not entry.is_complete()
+
+    # The `dirs` grammar has no required attribute, so the empty case lives here.
+    (dir_entry,) = _parse("docs", sourcelist.DIRS)
+    assert dir_entry.declared == frozenset()
 
 
 def test_a_line_stating_every_attribute_is_complete():
@@ -222,7 +270,10 @@ def test_a_duplicate_is_compared_on_resolved_attributes_not_on_the_text():
     """The reader is lenient: an absent attribute *is* its default."""
     (entry,) = _parse("https://x.test/a\nhttps://x.test/a keep=true")
     assert entry.attrs == _defaults()
-    assert entry.declared == {"keep"}  # the more explicit of the two survives
+    # ⚠ `fetch` rides along on both lines now — the helper supplies it, and the
+    # grammar requires it. What this case is about is `keep`: the more explicit
+    # of the two duplicate lines survives.
+    assert entry.declared == {"keep", "fetch"}
 
 
 # -- the per-file halves ---------------------------------------------------

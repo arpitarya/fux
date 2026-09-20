@@ -106,6 +106,14 @@ class Attribute:
     #: by being transcribed**; it was fixed by being *derived*, and this is the
     #: derivation itself being wrong. Ignored when `values` is non-empty.
     placeholder: str = "<value>"
+    #: 🔴 **A line that does not STATE this attribute fails to parse.** Only
+    #: `fetch` is required (W-199 D1/D2; SR-URL-LIST decision 16): there is no
+    #: source-wide fallback to inherit from any more, and an unstated fetcher is
+    #: not a policy fux can resolve later — it is *fux cannot retrieve this at
+    #: all*. ⚠ **`default` is still read**, by `defaults()` and `render_line`,
+    #: so a required attribute keeps a sane value for a line being CONSTRUCTED;
+    #: what is refused is a line on disk that omits it.
+    required: bool = False
 
     def spelling(self) -> str:
         """`name=a|b|c` for an enum, `name=<placeholder>` for a typed one.
@@ -271,8 +279,8 @@ _FETCHER_NAME_RE = re.compile(r"[a-z0-9][a-z0-9_]*")
 _FETCHER_HELP = (
     "must be a fetcher module name - lowercase letters, digits and underscores, "
     "not starting with `_`, with no `.py` suffix and no directory part. It "
-    "resolves to <fetchers dir>/<name>.py, beside the file [sources.url] fetcher "
-    "names; `fux doctor` reports a name with no file"
+    "resolves to .fux/fetchers/<name>.py. A host map lives in [sources.url.routes]; "
+    "`fux doctor` reports a name with no file"
 )
 
 
@@ -330,7 +338,20 @@ URLS = ListSpec(
         # ⚠ **The default is `"http"`, NOT `""`.** `render_line`'s
         # empty-default exception would otherwise fire and a generated URL line
         # would stop stating `fetch=`, which SR-URL-LIST decision 12 requires.
-        Attribute("fetch", (), "http", validate=_fetcher_reason, placeholder="<name>"),
+        # 🔴 **REQUIRED since 2026-09-20** (Arpit, W-199 D1/D2). `[sources.url]
+        # fetcher` is deleted, so there is no source-wide layer to fall back to
+        # and no engine default: a URL line either names its fetcher or fux
+        # cannot retrieve it. Arpit: *"There is no default fetch. It is a
+        # mandatory argument. About backward compatibility, let it break."*
+        #
+        # ⚠ **The `default` below is NOT a fallback for a line on disk** — a
+        # line that omits `fetch=` raises. It is what `render_line` uses while
+        # CONSTRUCTING a line, and `fux add` always overwrites it with the stem
+        # it resolved, so it is never what gets written.
+        Attribute(
+            "fetch", (), "http", validate=_fetcher_reason,
+            placeholder="<name>", required=True,
+        ),
         # SR-ACQUIRED. Retain the bytes this URL returned.
         #
         # ⚠ **Default TRUE, and it was `false` for one day.** The argument for
@@ -540,6 +561,21 @@ def parse(text: str, spec: ListSpec, *, origin: str) -> list[Entry]:
                 raise FuxError(f"{origin}:{lineno}: {key}={raw_value!r} {fault}")
             attrs[key] = raw_value
             declared.add(key)
+
+        # 🔴 A required attribute is checked AFTER the loop, because the fault
+        # is an absence and there is no token to hang it on. An exclusion
+        # carries no attributes at all, so it is exempt by construction.
+        if not exclude:
+            for attribute in spec.attributes:
+                if attribute.required and attribute.name not in declared:
+                    raise FuxError(
+                        f"{origin}:{lineno}: {value!r} does not state "
+                        f"`{attribute.name}=` and there is no default for it — write "
+                        f"`{value} {attribute.name}=<name>` naming a file in "
+                        f".fux/fetchers/, or let `fux add` resolve it for you. "
+                        f"([sources.url] fetcher was deleted on 2026-09-20; "
+                        f"SR-URL-LIST decision 16)"
+                    )
 
         entry = Entry(
             value=value,
