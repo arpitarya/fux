@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@54b87937e653, src/fux/store/nodebundle.py@071a24a596dd]
+owns: [node@27842f19569b, src/fux/store/nodebundle.py@071a24a596dd]
 laws: [L1, L3, L4, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 33b45ab84d50ed66245904291b6d4d8b448c39d6fe73c5105077e29ebbf28ea2
+content_sha: ea51aa89e99b47c34605a93a46f3059d7b06a30ce7a2e12d4033b4fc5b9d427e
 ---
 
 # SR-NODE-SEARCH — the Node read plane
@@ -138,6 +138,18 @@ twin changes in the working tree and its `.mjs` does not** — which the
 differential arm structurally cannot catch, because a Node module nobody
 updated still agrees with itself and only disagrees with Python on a corpus
 that exercises the changed branch.
+
+✅ **A second bind landed 2026-09-20, on the analyzer specifically:
+`node/test/analyzer.test.mjs` and `tests/query/test_identifier_analyzer_fixture.py`
+read the SAME committed fixture**, `tests/query/identifier-fixture.json` (W-202).
+It answers a question the twin test cannot: `test_node_twins.py` fails when a
+Python twin changes and its `.mjs` does not, which catches **omission** — it
+cannot catch a transcription that was *attempted* and got a character wrong.
+🔴 **The analyzer is where that matters most**, because ingest and query both
+run it and a one-step divergence is a **silent no-match with no error to see**:
+the Node reader hashes a string the Python-built index never wrote. ⚠ **Two
+copies of that fixture would defeat it** — one gets updated, the other
+forgotten — which is why there is one file and both suites read it.
 
 **The exemption list is short and visible, and that is the point** — it is
 exactly where the divergence risk concentrates:

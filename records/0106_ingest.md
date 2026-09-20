@@ -11,7 +11,7 @@ feature: the `fux ingest` pipeline — sources to committed records
 owns: [src/fux/ingest/ingestlog.py@73e117c1e919, src/fux/ingest@77cbab3a2c84, src/fux/ingest/priors.py@8ffcc632a4be]
 laws: [L2, L3, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: c3148afb668392db559c40f192f9c4b747a1f7334dc5836faab225d9321ce374
+content_sha: 211e5a238c1e3ff7992f98da885985ad246b87e5ea045f5f20b20c2ab96dde2b
 ---
 
 # SR-INGEST — how ingest works
@@ -779,6 +779,105 @@ what** — one join away from three files that nobody could make.
   which *is* L8's. Both docstrings now open by naming the other.
 - **No cap and no rotation.** ~200 B x 10 000 documents is 2 MB; a rotation
   policy is a second thing to be wrong about, and the file is one `rm` from gone.
+
+**23. WHICH METADATA KEYS REACH THE INDEX, and into which field** (Arpit,
+2026-09-20, W-205 part 1). Until this decision, `parse()` returned
+`ParsedDoc(meta, body)` and **only `body` reached the postings**; `title` was
+read out of `meta` and everything else was dropped. **Nothing recorded that** —
+neither this record nor [SR-DECODE](0139_decode.md) said which front-matter keys
+were searchable, so *"a `doc_id:` you can read is not one you can search"* was
+true, undocumented, and measured: **3 of the golden seed's 33 identifiers are
+frontmatter-only, and `QCL-IT-ADR-08` was absent from the top 50 at every rung.**
+
+**23a. The resolver, and the order.** `parse.meta_fields(decoder)` returns a
+closed `dict[str, str]` — metadata key to index field — resolved in one order:
+
+| | layer | where |
+|---|---|---|
+| 1 | **binding** | `.fux/formats.toml [meta]` ([SR-TYPES](0128_types-list.md) decision 13) |
+| 2 | **claim** | the decoder's `META_FIELDS` ([SR-DECODE](0139_decode.md) decision 20) |
+| 3 | **engine default** | `doc_id` · `id` · `aliases` → `title`; `tags` → `ctx` |
+
+**A key absent from the resolved dict is not indexed.** That is the closed list,
+per decoder rather than global.
+
+**23b. Identity keys reach `title`, at weight 2.0, and that is the ruling.**
+*"An identifier is how a person names the document"* — typing it should rank
+like typing the title. `ctx` (1.0) would make it one body word among ten
+thousand, which for a high-`idf` identifier is the wrong strength. **No new
+field**: a sixth field is a wire-format change, and the two that exist carry the
+two strengths that matter.
+
+**23c. 🔴 No person key by default.** `owner`, `author`, `contributors` are
+excluded from the engine default. A consumer may bind one in `[meta]`
+explicitly, and [SR-PII](0148_pii.md) runs on the value before it enters a
+posting list. ⚠ **`tags` → `ctx` is in the default and a tag is not a name** —
+but a consumer whose `tags` hold people has made a different file, and the
+`none` binding is how they say so.
+
+**23d. 🔴 The values go in THROUGH the analyzer, not beside it.** A resolved
+value is appended to its field's token stream and analyzed exactly as body text
+is — same `analyze()`, same splitting, same stemming. **Which is why this
+decision does not make an identifier whole**, only reachable: `QCL-IT-ADR-08`
+enters the index and then loses its `IT` segment to the stopword list and its
+hyphens to `_WORD_RE`, precisely as it would in the body
+([`tests/query/test_identifier_analyzer_fixture.py`](../tests/query/test_identifier_analyzer_fixture.py),
+W-202). **Part 1 buys reachability; wholeness is a separate change**, and a
+pre-registration that expects an exact-match win from this decision alone has
+mis-stated its endpoint.
+
+⚠ **Option D — index every scalar — was refused.** `status: rushed-review` is in
+the golden seed today, and *"everything in `meta` is searchable"* puts names and
+workflow noise into posting lists without SR-PII's gate ever being asked. The
+cost of the closed list is that a consumer must say what is searchable; the cost
+of the open one is that they find out afterwards.
+
+**22. THE COMMITTED REGISTER — one sorted line per document, beside the index**
+(Arpit, 2026-09-20, W-199 D4). *"A log file should be generated of every document
+that is indexed, and because we are maintaining the index we should maintain that
+log file as well — today there is nowhere we document what files and URLs were
+ingested."*
+
+**`.fux/index/REGISTER`**, committed, one line per document in the index:
+`loc` · `sha` · `decoder@version` · `fetcher` (URLs only) · `outcome`.
+
+🔴 **Bound by [L3](0005_LAW-3-deterministic.md), and that is what makes it
+committable at all.** No wall clock, no run id, no ordering that depends on how
+the walk happened to schedule — **sorted by `loc`**, and byte-identical across
+runs from the same sources. It is derived from the same inputs as the index
+beside it, so it changes exactly when the index changes.
+[`tests/…`](../tests/) asserts two consecutive `fux ingest` runs write it once.
+
+🔴 **Bound by [L2](0004_LAW-2-content-never-durable.md): paths and hashes, never
+content.** A `sha` is not content and a `loc` is not a quote.
+
+🔴 **NOT bound by [L8](0010_LAW-8-use-record.md), and the distinction is the
+whole reason this file may be committed when W-200's may not.** L8 governs *the
+record of who went looking*; this records **what the corpus is**. A register line
+names a document that exists whether or not anybody ever queried it. ⚠ **It must
+never grow a field that names a question, a query or a reader** — the moment it
+does, it becomes an L8 artifact sitting on a committed path, which is the
+prohibition L8 exists for.
+
+**22a. It is not W-200's ledger, and they are not redundant.**
+
+| | `.fux/runtime/ingest-log.jsonl` (W-200) | `.fux/index/REGISTER` (this) |
+|---|---|---|
+| committed? | **no** — gitignored, derived | **yes** |
+| scope | **one run**, what that run consumed | **the corpus**, what the index holds |
+| bound by | nothing durable | L3 byte-identity |
+| answers | *"what did this ingest do?"* | *"what is in here, and what read it?"* |
+
+**The ledger is advisory and per-run; the register is a committed statement about
+the index.** A run that skipped a document writes it in the ledger and leaves the
+register alone, because the register describes the index and the document is not
+in it.
+
+**22b. `fux doctor` compares the two planes and reports drift.** A document in
+the index with no register line, or a register line naming a document the index
+does not hold, means **the register was committed from a different ingest than
+the index beside it** — the one thing a committed derived file can get wrong, and
+the one thing nobody reads closely enough to catch by eye.
 
 ### Consequences
 

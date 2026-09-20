@@ -10,7 +10,7 @@ feature: the decoder plane — the protocol, the registry, the consumer seam and
 owns: [src/fux/decode@f1f696d64383, src/fux/templates/agents/DECODER-SKILL.md@474a416bcc42]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-26T00:00:00Z
-content_sha: 02edd77d64cc5cd3a08d657a94e6e247d3312a4be34eee82cd3d2894bd21c5f1
+content_sha: ab2482675d0b565b3824048a099cb7abea4365d7e26d4d2bdc728ebca93a1ecd
 ---
 
 # SR-DECODE — bytes become Markdown in one place
@@ -568,6 +568,46 @@ tidy-up.
   that is not about ODF. An extension nothing claims returns `None` anyway, so
   both would have kept passing and proved nothing — the vacuous-pass shape this
   repo has recorded before. They run on `.docx` now.
+
+**20. `META_FIELDS` — a decoder says which of its metadata keys are identity,
+and the pattern is `EXTENSIONS`' third instance.** Ruled by Arpit 2026-09-20
+(W-205 part 1), on his ask: *"The decoder should have some kind of pattern in
+how individual properties are going to be ingested. Or is there a generic way
+that can be implemented?"*
+
+**20a. The claim.** A decoder module may declare a module-level
+`META_FIELDS: dict[str, str]` mapping **one of its own metadata keys** to the
+index field that key's value should reach:
+
+```python
+META_FIELDS = {"doc_id": "title", "aliases": "title", "tags": "ctx"}
+```
+
+**Per decoder, not global, and that is the whole reason it is a claim.** A YAML
+front-matter decoder's identity key is `doc_id`; an `.eml` decoder's is
+`Message-ID`. One global list in a config file would be wrong for both and would
+force a consumer to edit config before their own decoder's keys could be found
+at all. The three-layer resolution — binding ▸ claim ▸ engine default — is
+[SR-INGEST](0106_ingest.md) decision 23.
+
+**20b. Read on the same import path as `EXTENSIONS`, and that is a deliberate
+difference from `ROUTES`.** A decoder is already imported to decode; reading one
+more module attribute costs nothing and adds no new trust. ⚠ **[SR-FETCHER](0117_fetcher.md)
+decision 16d reads `ROUTES` with `ast` and never imports** — because a *fetcher*
+would otherwise be imported on the offline path, where importing consumer code
+breaks L4. **The two rules differ because the risk differs**, and a session
+copying one to the other has copied the wrong half.
+
+**20c. A key not in the resolved map is not indexed, and the closed list is per
+decoder.** That is the auditable shape [W-201](../archive/open/W-201-frontmatter-scalars-not-indexed.md)
+asked for, without a global list: what is searchable is visible in the decoder
+that produced it, or overridden in `.fux/formats.toml [meta]`
+([SR-TYPES](0128_types-list.md) decision 13).
+
+**20d. A claim may name a person key; the engine default never does.** `owner`,
+`author`, `contributors` are names, and [SR-PII](0148_pii.md) runs on the value
+before it enters a posting list. A consumer who binds one has decided that
+deliberately, in a committed file; **fux never decides it for them.**
 
 **19. A decoder declares NOTHING about chunking. The protocol is still two
 names.** ⚠ **`CHUNK` was added and retired on the same day, 2026-09-06** — a

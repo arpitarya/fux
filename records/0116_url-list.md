@@ -10,7 +10,7 @@ feature: "`.fux/sources/urls` — the file format itself, and the one grammar bo
 owns: [src/fux/ingest/sourcelist.py@622d83561c10]
 laws: [L2, L3, L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 42443962ca34c95f96dcf97c505ca6ecc39977beaeb94d3ed90cda9771697009
+content_sha: 914a99d8a7385c4648a9c8fbb370453bc526b35a806fdb4a016f7cefe0b20965
 ---
 
 # SR-URL-LIST — the committed URL list
@@ -510,6 +510,35 @@ naming a file nobody wrote. It used to be a grammar error; it is now an ingest
 failure on somebody else's machine, mid-run — **which is exactly the argument
 W-101 item 2 made for `decoder bindings`**, so `fux doctor` gains the mirroring
 row rather than the loosening shipping unguarded.
+
+**16. `fetch=` is MANDATORY on every URL line, and decision 12 stands
+unnarrowed** (Arpit, 2026-09-20, W-199). A line with no `fetch=` **fails to
+load**, with an error naming the line and the one word that fixes it. There is no
+source-wide fallback to inherit from: `[sources.url] fetcher` is deleted
+([SR-CONFIG](0113_config.md), [SR-FETCHER](0117_fetcher.md) decision 16a).
+
+🔴 **This is the one attribute the 2026-09-01 empty-default narrowing does NOT
+reach, and the difference is worth stating.** `decoder=` may be empty because *no
+binding declared* is a real, sayable policy — the extension resolves it. **There
+is no corresponding fact for `fetch=`**: a URL with no fetcher is not *"resolve
+it later"*, it is *"fux cannot retrieve this at all"*, and an empty value would
+encode a question rather than an answer.
+
+⚠ **The recommended alternative was the opposite and Arpit rejected it.** W-199's
+D1 proposed `fetch=""` meaning *routed* — the table consulted at every ingest, so
+a route changed later moves every line at once. His ruling: *"The set should never
+be empty. It should be a mandatory argument when we are doing an add so that the
+fetcher gets defined."* **What that costs is the fifty-copies problem the routing
+item existed to remove**, and the cost is real: `fux add` resolves the route
+**once**, writes the stem, and a later route change moves nothing. It is bounded
+by a `fux doctor` finding — *"N line(s) pin a fetcher the routes table would now
+resolve differently"* — and the consumer edits. **Named here because a session
+reading decision 16 alone would otherwise re-propose the empty form.**
+
+⚠ **It breaks existing lists, by ruling.** *"About backward compatibility, let
+it break."* A line already saying `fetch=http` is a **valid pin** and keeps
+working; a hand-written line without one stops the load. No rewrite, no lenient
+read — the `fux update` precedent (W-177) and the `meta=` precedent (W-194).
 
 ### Consequences
 

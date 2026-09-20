@@ -7,6 +7,20 @@ timestamp: 2026-09-16T00:00:00Z
 
 # Prompt 7 — Codex: give the seed corpus links
 
+⚠ **OPTIONAL, and on no critical path since 2026-09-20.** Arpit ruled that day
+that **no feature waits on Codex**: the link-bearing documents this prompt asks
+for are now carried by **set 3**, authored by Claude under
+[prompt 3](3-claude-questions.md) part B
+([SR-WORK-GOLDEN](../../../records/0066_WORK-golden.md) decision 14). **Nothing
+is blocked on this prompt any more.**
+
+🔴 **It is kept, and it is still worth running whenever Codex is available**, for
+the reason below: links written by the party that will measure them are links
+whose shape the measurer already knows. **Set 3's links are `informed`
+permanently and Codex's would not be** — so running this later buys a cleaner
+arm, and the two are then reported apart like any other authorship pair, never
+pooled.
+
 **Model: Codex, highest reasoning setting.** These documents decide whether three
 separate measurements mean anything, and a corpus written by the session that
 will measure it is a corpus whose shape that session already knows.

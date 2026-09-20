@@ -1,12 +1,12 @@
 ---
 type: Index
-description: "Index of the sealed golden benchmark: the two question sets, the seed corpus, the prompts, the difficulty rubric, and the one rule."
+description: "Index of the sealed golden benchmark: the three question sets, the seed corpus, the prompts, the difficulty rubric, and the one rule."
 ---
 
 # `work/golden/` — the sealed golden benchmark
 
 **The test data for `fux-lab` — and only for `fux-lab`, per [SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md): seed documents written by
-Codex, TWO question sets over them — one Claude-authored, one Codex-authored —
+Codex, THREE question sets over them — one Codex-authored, two Claude-authored —
 whose answers no agent ever reads, and a corpus ladder Claude grows from 10 to
 10 000 documents without ever seeing a question.**
 
@@ -87,43 +87,55 @@ similar restriction to both."*
   relevant-document names. **An item waiting on phase 6 waits on his
   availability**, not on an agent.
 
-### The two question sets (2026-09-15)
+### The three question sets (2026-09-15; set 3 added 2026-09-20)
 
-**Same seed corpus, same ladder, two authors, reported apart.**
+**Same seed corpus, same ladder, two authors, reported apart — never pooled.**
 
-| | **set 1** | **set 2** |
-|---|---|---|
-| questions **and** answers written by | **Codex** — [prompt 2](prompts/2-codex-questions.md) | **Claude**, from `seed/` only — [prompt 3](prompts/3-claude-questions.md) |
-| ids | `s1-001…` | `s2-001…` |
-| released file | `questions/set-1.jsonl` | `questions/set-2.jsonl` |
-| predictions / hand-off | `predictions-set-1.jsonl` · `handoff-set-1.jsonl` | `predictions-set-2.jsonl` · `handoff-set-2.jsonl` |
-| what a number may claim | `blind` on the first scored run, per [SR-RS](../../records/0133_predictions.md) | 🔴 **`informed`, permanently** |
+| | **set 1** | **set 2** | **set 3** |
+|---|---|---|---|
+| questions **and** answers written by | **Codex** — [prompt 2](prompts/2-codex-questions.md) | **Claude**, from `seed/` only — [prompt 3](prompts/3-claude-questions.md) | **Claude**, from `seed/` only — [prompt 3](prompts/3-claude-questions.md) |
+| ids | `s1-001…` | `s2-001…` | `s3-001…` |
+| released file | `questions/set-1.jsonl` | `questions/set-2.jsonl` | `questions/set-3.jsonl` |
+| predictions / hand-off | `predictions-set-1.jsonl` · `handoff-set-1.jsonl` | `predictions-set-2.jsonl` · `handoff-set-2.jsonl` | `predictions-set-3.jsonl` · `handoff-set-3.jsonl` |
+| what a number may claim | `blind` on the first scored run, per [SR-RS](../../records/0133_predictions.md) | 🔴 **`informed`, permanently** | 🔴 **`informed`, permanently** |
+| why it exists | the externally-authored arm | authorship-bias comparison against set 1 | **the inputs the seed does not carry** — `RF-118`-shaped identifiers and link-bearing documents |
 
 ⚠ **They are numbered, not named after their author** (Arpit, 2026-09-15). The
 author is a fact about a set, not its identity — and a number survives a change
 of author, where *"the Claude set"* would quietly become a lie.
 
-- **Why two.** A benchmark whose questions come from one author measures that
-  author's idea of a question as much as it measures the engine. **Two authors
-  make that bias visible instead of invisible** — the same engine, the same
-  corpus, two question sets, and the gap between them is the measurement.
-- 🔴 **Set 2 is authored in ONE session that then leaves.** It reads `seed/` and
-  nothing else, hands the questions *and* answers to Arpit **in the chat**,
-  writes no file, and **never runs a rung, scores anything, or returns**. From
-  that handoff on, set 2's answers are as closed to Claude as set 1's —
-  authorship buys no access.
-- 🔴 **Set 2 can never be `blind`**, because its author and its runner are the
-  same model family. It is bought for question-authorship comparison, **not for a
-  clean delta**, and every document stating a set 2 number states that label
-  beside it.
+- **Why more than one.** A benchmark whose questions come from one author
+  measures that author's idea of a question as much as it measures the engine.
+  **Two authors make that bias visible instead of invisible** — the same engine,
+  the same corpus, and the gap between the sets is the measurement.
+- 🔴 **Why set 3 (Arpit, 2026-09-20): *"no feature waits on Codex."*** Three
+  measurements were stuck not on a design question but on a **corpus** — the seed
+  carries no `PROJ-123`-shaped identifier and **0 `ref` edges on all eight
+  rungs** — and under [SR-RS](../../records/0133_predictions.md) decision 23 a
+  missing input is a **data defect, not a null**, so they were `unmeasurable` and
+  filed as such. Set 3 carries those inputs. **The standing rule is
+  [SR-WORK-GOLDEN](../../records/0066_WORK-golden.md) decision 14**: an
+  agent-authored set is created whenever a measurement would otherwise wait on
+  Codex. ⚠ **It is not a way to rescue a disappointing number** — the trigger is
+  a missing input, checkable *before* any arm runs.
+- 🔴 **Each agent-authored set is authored in ONE session that then leaves, and
+  the carve-out is PER SET.** That session reads `seed/` and nothing else, hands
+  the questions *and* answers to Arpit **in the chat**, writes no file, and
+  **never runs a rung, scores anything, or returns**. From that handoff on the
+  set's answers are as closed to Claude as set 1's — authorship buys no access,
+  and authoring set 3 gives nobody reach into set 1 or set 2
+  ([L11](../../records/0012_LAW-11-sealed-answer-key.md) decision 6).
+- 🔴 **Set 2 and set 3 can never be `blind`**, because author and runner are the
+  same model family. They are bought for comparison, **not for a clean delta**,
+  and every document stating one of their numbers states that label beside it.
 - **Each author hands over TWO blocks.** Block 1 is `{"id","question"}` only —
   Arpit commits it as `questions/set-N.jsonl`. Block 2 is the full key — **he
   keeps it, and it never touches disk.** That is what replaced the old
   freeze-and-release step.
 - ⚠ **The id namespaces must not collide.** A prediction file names ids and
   nothing else; one ambiguous id silently scores the wrong set.
-- ⚠ **Never pool the two sets into one figure.** The comparison *between* them is
-  the point; a mean across both erases it and means nothing on its own.
+- ⚠ **Never pool the sets into one figure.** The comparison *between* them is
+  the point; a mean across them erases it and means nothing on its own.
 
 ## Layout
 
@@ -137,6 +149,7 @@ work/golden/
   golden-answer/                🚫 the older singular spelling — deleted 2026-09-15, still guarded
   questions/set-1.jsonl         set 1: ids + text only — Codex-authored questions
   questions/set-2.jsonl         set 2: ids + text only — Claude-authored questions
+  questions/set-3.jsonl         set 3: ids + text only — Claude-authored, the failing shapes + links
   questions/README.md           what they omit, and the cost of them existing before the corpus
   ladder/rung-NNNNN.sha256      frozen manifests: which files make each rung, by hash
   ladder/rung-NNNNN.index       the engine version AND COMMIT, and the index root hash, each rung was built with
@@ -186,7 +199,7 @@ waits on 10 000.
 
 ---
 
-## The six prompts, in the order Arpit runs them
+## The prompts, in the order Arpit runs them
 
 **One prompt per step, and he runs them himself** — the pipeline is deliberately
 not a pipeline an agent can drive end to end, because the two places answers exist
@@ -196,13 +209,25 @@ are both in his hands.
 |---|---|---|---|---|
 | **1** | Codex | nothing from fux | `seed/`, `seed/archive/`, `seed-dates.tsv` — **documents only** | [`1-codex-seed.md`](prompts/1-codex-seed.md) |
 | **2** | Codex | `seed/` | **set 1** questions + answers → **two blocks in the chat** | [`2-codex-questions.md`](prompts/2-codex-questions.md) |
-| **3** | Claude, **one session that then leaves** | `seed/` **only** | **set 2** questions + answers → **two blocks in the chat**, no file | [`3-claude-questions.md`](prompts/3-claude-questions.md) |
+| **3** | Claude, **one session per set, that then leaves** | `seed/` **only** | **set N** questions + answers → **two blocks in the chat**, no file; a third block of **seed additions** when that set carries a missing input (set 3 does) | [`3-claude-questions.md`](prompts/3-claude-questions.md) |
 | **4** | Claude Code | `seed/` **only** | verifies the eight rungs; builds or repairs the corpus in fux-lab + `ladder/*.sha256` | [`4-claude-corpus.md`](prompts/4-claude-corpus.md) |
-| **5** | Claude Code | the ladder + `questions/set-1.jsonl` and `set-2.jsonl` | `predictions-set-N.jsonl`, **`handoff-set-N.jsonl`** and `report.md` | [`5-claude-run.md`](prompts/5-claude-run.md) |
-| **6** | Codex | the hand-off files + **both keys, pasted by Arpit** | per-query results **without answers**, per set | [`6-codex-score.md`](prompts/6-codex-score.md) |
+| **5** | Claude Code | the ladder + every released `questions/set-N.jsonl` | `predictions-set-N.jsonl`, **`handoff-set-N.jsonl`** and `report.md`, **one pair per set** | [`5-claude-run.md`](prompts/5-claude-run.md) |
+| **6** | Codex | the hand-off files + **the keys, pasted by Arpit** | per-query results **without answers**, per set | [`6-codex-score.md`](prompts/6-codex-score.md) |
 
 **Between 2/3 and 4, Arpit commits block 1 of each handoff** as
-`questions/set-1.jsonl` and `set-2.jsonl`, and keeps block 2 — the key — himself.
+`questions/set-N.jsonl`, and keeps block 2 — the key — himself. **Prompt 3 is run
+once per agent-authored set**, in its own session; when that set carries seed
+additions (block 3) he commits them into `seed/` and **prompt 4 rebuilds the
+ladder** before anything is run.
+
+⚠ **[`prompts/7-codex-link-bearing-seed.md`](prompts/7-codex-link-bearing-seed.md)
+and [`prompts/8-codex-identifier-questions.md`](prompts/8-codex-identifier-questions.md)
+are OPTIONAL and on no critical path** (Arpit, 2026-09-20: *"no feature waits on
+Codex"*). What they were blocking is carried by set 3. **Prompt 7 is still worth
+running whenever Codex is free** — its links would be `blind` where set 3's are
+`informed` permanently — and prompt 8 was **withdrawn** as an unblock by the
+2026-09-18 headroom run, which measured the headroom below the floor whatever
+questions are written.
 
 **Between 5 and 6, he carries the two `handoff-set-N.jsonl` files to Codex** and
 pastes the keys there. 🔴 **That hop is the whole design**: it is the only point

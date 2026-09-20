@@ -2,7 +2,7 @@
 type: Standing Record
 kind: component
 name: SR-TYPES
-title: "SR-TYPES (0128) — which files are documents: a built-in allowlist, overridable by .fux/formats.toml and by .fuxignore"
+title: "SR-TYPES (0128) — which files are documents, and which metadata keys are searchable: a built-in allowlist, overridable by .fux/formats.toml and by .fuxignore"
 description: "Prose plus every format a built-in decoder reads is compiled in as an allowlist; a committed types file replaces it, and .fux/.fuxignore outranks it in both directions. Absent means the default, never everything and never nothing."
 status: accepted
 date: 2026-08-20
@@ -10,7 +10,7 @@ feature: the file-type allowlist and `.fux/formats.toml`
 owns: [src/fux/ingest/typesfile.py@127aed84458a]
 laws: [L1, L3]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 4b54e89743fbeb598fbbb9a88a99e46bcf62d2e3cd698f7d9f63bd21e8de0291
+content_sha: 88b29325776410e918dc6b332bf5306ac6b02beae7e8bf3542f3ad67b036e9cc
 ---
 
 # SR-TYPES — which files are documents
@@ -380,7 +380,14 @@ include = [          # already text: no decoder in the path
 csv = "csv"
 geojson = "json"
 "tar.gz" = "zip"     # a dotted extension is quoted, or TOML nests it
+
+[meta]               # metadata key = the index field its value reaches
+doc_id = "title"     # W-205 part 1; `none` silences a decoder's own claim
+owner = "none"
 ```
+
+⚠ **`[meta]` is a THIRD key, added 2026-09-20 — the shape is no longer two.**
+See decision 13.
 
 | fork | ruled |
 |---|---|
@@ -402,6 +409,31 @@ names stay** (`typesfile.py`, `read_types`, `--types`, SR-TYPES): renaming the
 flag breaks every script that calls it, for a cosmetic gain. ⚠ **`types.toml`
 has no refusal path**: it was committed locally and never pushed or released, so
 no repo but this one ever held it, and this repo was renamed in the same change.
+
+**13. `[meta]` — the third key, and the binding half of the decoder's
+`META_FIELDS` claim** (Arpit, 2026-09-20, W-205 part 1). Same shape as
+`[decoders]`: a flat table, consumer-owned, committed, and **it outranks the
+claim**, exactly as `[decoders]` outranks a built-in's `EXTENSIONS` (decision 13
+of [SR-DECODE](0139_decode.md) is the claim; this is the binding).
+
+- **Key = a metadata key a decoder emits. Value = the index field its value
+  reaches**, or the literal **`none`** to silence a claim the decoder makes.
+- **Validated at load**, like every other key here: a value naming no real index
+  field is a named error at the key (`meta.doc_id`), on decision 12's F6 rule.
+- 🔴 **It is one table for the repo, while the claim is per decoder** — so a
+  consumer binding `doc_id = "ctx"` moves it for every decoder that emits
+  `doc_id`. That is the intended trade: the claim is where per-format knowledge
+  lives, the binding is where a repo states one policy. A consumer who needs
+  per-decoder control edits the decoder, which is theirs.
+- ⚠ **`[meta] owner = "none"` is the only way to un-index a person key a
+  consumer decoder claims**, and it is worth knowing before a decoder is
+  installed rather than after.
+
+⚠ **This record said *"a closed TWO-key shape"* until 2026-09-20**, in its own
+title and in decision 12's F2 fork. The shape is three keys now. **F2's
+reasoning is untouched** — `[meta]` is a flat table for the same reason
+`[decoders]` is: its entries are not order-sensitive, so an ordered array would
+spend TOML's verbosity on an order nothing reads.
 
 **Why a reversal of a recorded rejection was acceptable.** §Alternatives
 rejected *"a `[sources] types` TOML array"* for three reasons. Two do not reach

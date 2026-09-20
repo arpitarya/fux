@@ -10,7 +10,7 @@ feature: the fetch contract, what it is called, and the two shipped templates
 owns: [src/fux/ingest/urlsrc.py@c70f75a105a4, src/fux/templates@fed5e86d54b0]
 laws: [L1, L3, L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 9f703a76048972eab99ec7aa42b21b6a97670fe90dc6ab6ed3bd1acd3405ed1f
+content_sha: 9803132c3d223f95d164e295d19031c91b3281dbe85a5b96a9037162b9e0e2ab
 ---
 
 # SR-FETCHER — the consumer-owned fetcher
@@ -503,6 +503,89 @@ drift.
 ⚠ **The `configure()` contract is unchanged**: it is still handed a plain dict
 and still refuses a key it does not know. What changed is which keys arrive —
 which is precisely why refusing was safe to keep.
+
+**16. ROUTING — a URL resolves to a fetcher the way a file resolves to a
+decoder.** Ruled by Arpit 2026-09-20 (W-199), on his 2026-09-18 ask: *"Similar
+to how we have formats for TOML, we have decoders and they are mapped to
+extensions. I want to build fetchers in a similar way."*
+
+**16a. Three layers, and there is no fourth.** The key is the URL's **host**:
+
+| layer | where | wins over |
+|---|---|---|
+| **pin** | the URL line's `fetch=<stem>` | everything |
+| **binding** | `fux.toml [sources.url.routes]` | the claim |
+| **claim** | `ROUTES` in the fetcher module | — |
+
+🔴 **There is no default layer, and that is a deletion, not an omission.**
+`[sources.url] fetcher` is **gone** ([SR-CONFIG](0113_config.md)). Arpit: *"There
+is no default fetch. It is a mandatory argument. About backward compatibility,
+let it break."* A URL line that names no fetcher and resolves to none is an
+**error** — the run stops and says which line and what to write — never a quiet
+fall back to plain HTTP.
+
+**16b. Every line states its fetcher, because `fux add` resolves it once and
+writes it down.** Arpit: *"The set should never be empty. It should be a
+mandatory argument when we are doing an add so that the fetcher gets defined."*
+`fux add` takes `--fetch <stem>`, else resolves through the binding and then the
+claims, and **refuses** when nothing matches — printing the hosts it tried and
+the fetcher stems on disk. [SR-URL-LIST](0116_url-list.md) decision 12 therefore
+stands **unnarrowed**: `fetch=` is on every generated line.
+
+⚠ **What that gives up, said aloud rather than discovered.** Every written line
+is a **pin**, so a route changed later does **not** move an existing line. The
+*routed = empty* form — where a blank `fetch=` means *ask the table every time* —
+was the recommendation and Arpit **rejected** it. The cost is bounded by a
+doctor finding (16e) rather than left invisible, and the consumer edits.
+
+**16c. A pattern may be a regex, and ambiguity is refused rather than sorted.**
+Arpit: *"We can have a regex kind of way where a default fetcher can be
+defined."* Four shapes, in the binding and in a claim alike:
+
+| shape | matches |
+|---|---|
+| `example.com` | that host exactly |
+| `*.example.com` | its subdomains — ⚠ **not the apex** |
+| `example.com:8443` | that host and port |
+| `re:^.*\.sharepoint\.com$` | the normalised host, **compiled and anchored at load** |
+
+🔴 **Two patterns matching one host is a hard error naming both.** Between two
+regexes there is no specificity order that is not arbitrary, and the failure a
+guessed order produces is **a plausible index built by the wrong fetcher** —
+which nothing downstream detects. Among the literal shapes the order is
+`host:port` ▸ `host` ▸ `*.host`; a regex never competes on specificity, it
+collides. ⚠ **This is stricter than the decoder plane on purpose**: `registry()`
+resolves a decoder collision last-consumer-wins, and the cost of being wrong
+there is one file read by the wrong reader, not a corpus fetched by one.
+
+**16d. A claim is read with `ast`, never imported — and that is a law, not a
+preference.** `ROUTES` is a module-level literal `dict[str, str]`, parsed from
+source. **Anything else is a hard error naming the file and the line**; no
+`ROUTES` means no claims. 🔴 **Importing a fetcher to resolve a route would run
+consumer code on the offline path**, which is L4 lost at the one point nothing
+would notice: `fux doctor` is offline by contract, and `fux ingest --check`
+promises it opens no network. The precedent is `doctor._fetcher_capabilities`,
+which already reads a fetcher as text, and the gate is the same monkeypatch
+shape as `tests/test_doctor_fetcher_bindings.py::test_it_never_imports_a_fetcher`.
+
+**16e. One resolver, and `fux doctor` reports what it cannot fix.**
+`urlsrc.resolve_urls()` is the only place a URL becomes a fetcher path; the
+answer path reaches it through that function and never re-derives one. `fux
+doctor` gains, all offline: a **failure** when a route names no file on disk; a
+**finding** when a route matches no listed URL; a **failure** on a claim
+collision; and 16b's finding — *"N line(s) pin a fetcher the routes table would
+now resolve differently"*.
+
+**16f. The shipped templates claim nothing, and say why.** `http.py` and
+`cdp.py` carry a **commented** `ROUTES` example only. A shipped claim would make
+fux's opinion about somebody's hosts arrive with an install, and the adapter cap
+([SR-ENRICH](0137_enrich.md)) is the same argument: fux ships the mechanism and
+declares no host it does not own.
+
+⚠ **Decision 5's *declared, never detected* is not weakened by any of this.** A
+host map is **declared** — committed in `fux.toml` or written in a file the
+consumer owns — and read before a byte moves. Nothing here inspects a response,
+sniffs a payload, or escalates from one fetcher to another.
 
 ### Consequences
 

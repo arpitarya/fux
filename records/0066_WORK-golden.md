@@ -10,7 +10,7 @@ feature: the golden benchmark — its two question sets, the key's custody, its 
 owns: [.claude/hooks/guard-golden-answer.sh@c505d04c0628, .claude/hooks/guard-sealed-key.sh@0d4dd725e7aa, tests/test_golden_key_guards.py@ee33d84f9333, scripts/gen-golden.py@1b2a854c1f75, tests/test_claude_md_golden.py@49db9e6261d8, tools/golden-difficulty@94f4740b9c02]
 laws: [L0, L11]
 timestamp: 2026-09-15T00:00:00Z
-content_sha: 34a6d65e4761abd3cdd406f422d74c2712bea796b2e0d9426f11bcb7cb4e901c
+content_sha: d371b3d71b635f537fd86c263f2e376f1f2023c76de4784bef454fd64bd5720f
 ratifies: "Arpit, 2026-09-15 — W-146 row 17: the prohibition gets a record and CLAUDE.md keeps a generated view; the same day he ruled it into law L11 and then amended it — two question sets, one Claude-authored and one Codex-authored, with both answer halves in his custody and no key file at all"
 ---
 
@@ -151,12 +151,21 @@ the rule.
 Read it before anything near `work/golden/`. **This block states none of it.** It
 is the surrounding process:
 
-- **There are two question sets (Arpit, 2026-09-15).** **Set 1** — questions and
-  answers authored by **Codex**. **Set 2** — questions and answers authored by
-  **Claude**, from `work/golden/seed/` only. Two authors make question-authorship
-  bias visible instead of invisible; the sets are scored and reported separately, and **every
-  set 2 number is `informed` permanently** because its author and its runner are
+- **There are three question sets.** **Set 1** — questions and answers authored
+  by **Codex** (Arpit, 2026-09-15). **Set 2** — authored by **Claude** from
+  `work/golden/seed/` only (same ruling). **Set 3** — authored by **Claude**
+  (Arpit, 2026-09-20), carrying the failing-shape identifiers and the
+  link-bearing documents that three measurements were blocked on. Two authors
+  make question-authorship bias visible instead of invisible; the sets are scored
+  and reported separately, and **every number on an agent-authored set — set 2
+  and set 3 — is `informed` permanently**, because its author and its runner are
   the same model family.
+- 🔴 **An agent-authored set is created whenever a measurement would otherwise
+  wait on Codex** (Arpit, 2026-09-20: *"no feature waits on Codex"*). The cost is
+  that the set is `informed` for ever and can never be the clean arm; the thing
+  it buys is that a measurement blocked on another party's availability becomes a
+  measurement that can be run. **Set 1 stays the only externally-authored set**,
+  and a claim that needs a set Claude did not write still needs set 1.
 - **Arpit holds both answer halves, and since 2026-09-18 a key may sit on his
   machine at one address.** That address is **`work/golden/golden-answers/`** —
   gitignored, never committed, **closed to every agent on both spellings** by
@@ -230,13 +239,15 @@ is the surrounding process:
    residual hole is decision 4's reason for existing, not a defect to fix in the
    hook.
 
-8. **Two question sets, and they are separate instruments** (Arpit,
-   2026-09-15). **Set 1** — ids `s1-001…` — is authored by **Codex**, per
+8. **Three question sets, and they are separate instruments** (Arpit,
+   2026-09-15 for the first two; 2026-09-20 for the third). **Set 1** — ids
+   `s1-001…` — is authored by **Codex**, per
    [`prompts/2-codex-questions.md`](../work/golden/prompts/2-codex-questions.md).
-   **Set 2** — ids `s2-001…` — is authored by **Claude** from `work/golden/seed/`
-   and nothing else, per
+   **Set 2** — ids `s2-001…` — and **set 3** — ids `s3-001…` — are authored by
+   **Claude** from `work/golden/seed/` and nothing else, per
    [`prompts/3-claude-questions.md`](../work/golden/prompts/3-claude-questions.md),
-   in one designated session that hands questions *and* answers to Arpit in the
+   which is written for **set N** rather than for one set; each is written in its
+   own designated session that hands questions *and* answers to Arpit in the
    chat, writes no file, and never runs a rung. ⚠ **The id namespaces must not
    collide**: a prediction file names ids and nothing else, and one ambiguous id
    silently scores the wrong set. ⚠ **The sets are numbered, not named after
@@ -277,6 +288,41 @@ is the surrounding process:
     wrong* makes every stratified claim a tautology — and it never appears in a
     released `questions/*.jsonl`, for the same reason the `type` field does not:
     a runner that knows a question is unanswerable can abstain by arithmetic.
+
+14. **An agent-authored set is created whenever a measurement would otherwise
+    wait on Codex** (Arpit, 2026-09-20 — *"no feature waits on Codex"*). It is a
+    **standing rule**, not a one-off permission for set 3: when a feature's
+    evidence needs input the golden data does not carry — a failing identifier
+    shape, link-bearing documents, a paraphrase family — Claude authors a new
+    numbered set for it rather than the item sitting 🟡 on another party's
+    availability.
+
+    🔴 **What it costs, and the cost is permanent.** Every number on such a set is
+    `informed` for ever ([L11](0012_LAW-11-sealed-answer-key.md) decision 7), so
+    it can never be the clean arm and never grounds a generalisation estimate.
+    **Set 1 remains the only externally-authored set**, and a claim that needs one
+    still needs set 1 and still waits.
+
+    🔴 **What it buys, and why the trade is worth naming.** Before this rule,
+    *"the test data does not contain the input this feature acts on"* made an item
+    **unmeasurable** under [SR-RS](0133_predictions.md) decision 23 — filed as
+    such, never reported as a null, and stuck. Three items sat there at once
+    (W-161's arms, W-176 gate 6, the identifier families now in W-205 part 2).
+    **An `informed` measurement is worth more than no measurement**, provided the
+    label travels with every number, which decision 9's never-pool rule and
+    SR-RS's classification already enforce.
+
+    ⚠ **It does not license authoring a set to rescue a result.** The trigger is a
+    **missing input**, checkable before any arm runs — the corpus does not contain
+    the thing the feature acts on. A set written after a disappointing number, to
+    give it somewhere better to land, is the failure
+    [SR-RS](0133_predictions.md) decision 10b exists to stop, and this rule is not
+    a way around it.
+
+    ⚠ **Each set costs one authoring session under L11's carve-out, and the
+    carve-out is per set** — one session, chat only, no file, and that session
+    never returns to the benchmark. Authoring set 3 gives nobody reach into set 1
+    or set 2.
 
 ### Consequences
 
