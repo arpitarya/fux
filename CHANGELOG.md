@@ -8,6 +8,30 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Added
+
+- **`fux doctor` gains a `provenance` row, and `fux ingest` writes
+  `.fux/runtime/ingest-log.jsonl`** (W-200) — one line per document a run
+  consumed: which decoder read it and at what version, which fetcher retrieved
+  it for a URL, from which bytes, with what outcome. **Gitignored, derived and
+  advisory**: delete it and nothing is lost; the next ingest writes it again.
+
+  It answers the question three existing files each answer a third of —
+  *"which decoder, at which version, produced THIS record, from which bytes,
+  fetched by what"* — and the doctor row catches the one decoder fault a plain
+  `fux ingest` cannot fix: **a record produced before a binding existed**. The
+  reuse key only catches a decoder whose digest *moved since the last run*, so
+  the row names `fux ingest --full`.
+
+  ```bash
+  jq -r 'select(.outcome|startswith("skipped")) | .loc + "  " + .outcome' \
+    .fux/runtime/ingest-log.jsonl
+  fux doctor --json | jq .provenance      # {} when there is no ledger yet
+  ```
+
+  **Nothing committed changed** — no record field, no schema, no `_format`
+  bump — and nothing at query time reads it.
+
 ### Removed — BREAKING
 
 - 🔴 **`meta = "hashed"` is deleted outright, and law L5 retires with it**

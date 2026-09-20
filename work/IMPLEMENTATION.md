@@ -30,6 +30,36 @@ Rules:
 
 
 
+## 2026-09-20 — **W-200: one runtime line per consumed document, and the spec's own path was L8's journal**
+
+**Shipped:** [`src/fux/ingest/ingestlog.py`](../src/fux/ingest/ingestlog.py) ·
+`.fux/runtime/ingest-log.jsonl` · `fux doctor`'s `provenance` row and its
+`--json` block · [`tests/ingest/test_ingestlog.py`](../tests/ingest/test_ingestlog.py)
+(18) and [`tests/test_doctor_ingestlog.py`](../tests/test_doctor_ingestlog.py)
+(8, incl. an `ast` import fence). **Item:**
+[W-200](../archive/open/W-200-ingest-provenance.md), closed and archived.
+**5 011 unit tests, 144 e2e, 36 node — all green.** **No committed byte
+changed**: no record field, no schema, no `_format` bump.
+
+| what landed | where |
+|---|---|
+| **The join nobody could make.** [W-166](../archive/open/W-166-carry-forward-invalidation.md) knew the decoder **per extension**; `docs.jsonl` knew the documents; `url-state.json` knew URL health. **Nothing knew which decoder, at which version, produced THIS record, from which bytes, fetched by what.** One line per consumed document now says it: `id` · `kind` · `loc` · `decoder` · `fetcher` (URLs) · `raw_sha` · `raw_bytes` · `wlen` · `outcome` · `run_seq` | [SR-INGEST](../records/0106_ingest.md) decision 19 |
+| 🔴 **The spec's file path was a defect, and the e2e suite is what caught it.** W-200 named `.fux/runtime/provenance.jsonl` — **already `fux.query.provenance`'s answer journal**, an L8 use record written **only under explicit consent** (W-147: the flag *and* the output-TOML key, Arpit 2026-09-13). Writing the ledger there made **every `fux ingest` create a consent-gated file**, reported verbatim as *"a journal appeared with no consent of any kind"*. **L8 outranks a work item**, so the file became `ingest-log.jsonl` and the module `ingest/ingestlog.py`. ⚠ **The module name was separately taken too**, which had already cost a pytest basename collision with `tests/query/test_provenance.py` | [L8](../records/0010_LAW-8-use-record.md) · [SR-PROVENANCE](../records/0142_provenance.md) |
+| **Both halves of that collision are pinned by tests, not by memory.** `test_the_ledger_is_not_the_answer_journal` asserts the two paths differ and that an ingest creates no journal; the import fence matches a **fully qualified module name** rather than the word `provenance`, because a substring would flag every query module that legitimately imports the receipts — the same false positive `test_golden_key_never_committed.py` hit on its first run | [`tests/test_doctor_ingestlog.py`](../tests/test_doctor_ingestlog.py) |
+| **`fux doctor` gains the one decoder fault a plain `fux ingest` cannot fix**: a record produced by a decoder the tree no longer carries at that version. The reuse key catches a digest that *moved since the last run*; a record written before a binding existed agrees with nothing and no delta run looks at it again. **The row names `--full`**, because naming the wrong remedy is worse than no row. ⚠ **No ledger is not a finding**, and `--json` returns an **absent block** rather than zeros — a caller told `stale_decoders: 0` where nothing was checked has been told something false in the direction that matters | [SR-DOCTOR](../records/0152_doctor.md) |
+| 🔴 **A `reused` row carries the decoder that produced the REUSED record**, read back from the prior ledger, never the tree's current one. The other way round every row would agree with the tree by construction — on exactly the records that were **not** re-extracted, which is the only population the finding is about — and the doctor row could never fire. `unknown` when there is no prior row: **absent and unknown are different** | [SR-INGEST](../records/0106_ingest.md) decision 19 |
+| **The URL decoder is captured at fetch time, not re-derived.** `FetchedUrl` carries two advisory fields set inside the fetch loop by the same `_fetched_rel_path` call that decided which decoder actually ran. Re-deriving from the URL afterwards would be wrong exactly where it matters — a server declaring `application/pdf` on an extensionless URL. **Nothing on the ingest path branches on either field**, and SR-FETCHER decision 5's *declared, never detected* is untouched | [SR-URL-INGEST](../records/0107_url-ingest.md) · [SR-FETCHER](../records/0117_fetcher.md) |
+| ⚠ **`runtime/` is documented as *"rebuildable from the committed index"* and three of its files are not.** `url-state.json` and `enrich-progress.tsv` are **observed during a run** and can only be re-observed; this ledger is the third. The category existed and was unnamed. SR-DOTFUX names it in **one sentence rather than a `DECLARED` row** — the file lives *inside* `runtime/`, so ADR-DOTFUX veto condition 1 was never in play, and a top-level row would say it is a different kind of thing from the two beside it. **If Arpit prefers a row, that is a one-line change** | [SR-DOTFUX](../records/0102_fux-directory.md) |
+| **Clock-free (L3), best-effort, and off the hot path — each asserted rather than intended.** `run_seq` never `time.time()`; `write` swallows its own `OSError` because a ledger that can fail a run is worse than no ledger; and an `ast` fence over `query/`, `refer/` and `derive/` proves nothing at query time reads it. ⚠ **`run_seq` never moves in a file-only corpus**, so every row there reads `0` — correct and slightly useless, and the alternative is a second counter to keep consistent for a field nothing branches on | [`tests/ingest/test_ingestlog.py`](../tests/ingest/test_ingestlog.py) |
+| 🔴 **W-199 was mis-balled 🟢 `agent` in the queue from the day it was filed**, while its own frontmatter said `ball: arpit` and its §Decisions hold three unruled calls. **The row was wrong and the file was right.** Corrected to 🔴 `arpit` and filed into the inbox; **nothing was built against the recommended defaults**, because D1 changes what every generated URL line says and building on the old one makes every route dead on every existing line **while the tests pass anyway** — the W-83 class | [W-199](../work/open/W-199-fetcher-routing.md) |
+
+**Not done, and named:** `fux doctor`'s **second** provenance finding — *"M
+URL(s) whose declared `decoder=` disagrees with the last observed
+`content_type`"* — is **not built and not stubbed.** It is W-199's hook, and
+W-199 is blocked on three rulings. No `fux provenance` verb: `grep`, `jq` and
+`doctor` cover it, and a verb waits for a third reader. No cap and no rotation
+on a 2 MB file that is one `rm` from gone.
+
 ## 2026-09-20 — **W-198 and W-194: the key gets a guarded address, and hashed display meta is deleted with law L5**
 
 **Shipped:** [`.claude/hooks/guard-sealed-key.sh`](../.claude/hooks/guard-sealed-key.sh)

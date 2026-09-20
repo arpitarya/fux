@@ -83,7 +83,7 @@ from ..errors import FuxError
 from ..progress import NULL as _NULL_PROGRESS
 from . import edges as edges_mod
 from . import extract as extract_mod
-from . import decoderdigest, fuxignore, gitdir, sourcelist, urlsrc
+from . import decoderdigest, fuxignore, gitdir, ingestlog, sourcelist, urlsrc
 from .edges import TAG_PREFIX
 from .gitdir import (
     UNFETCHED,
@@ -205,6 +205,11 @@ def run(
     existing_urls = {doc_id: rec for doc_id, rec in existing.items() if doc_id.startswith("url:")}
 
     fresh: dict[str, bytes] = {}  # url doc_id -> fetched content, this run only
+    #: W-200, advisory: what read and what retrieved each fresh URL. Populated
+    #: from `FetchedUrl`, never re-derived — the content type is authoritative
+    #: and the URL's extension is a hint. Empty on an offline run, which is why
+    #: a carried URL row reads its decoder from the prior ledger instead.
+    url_provenance: dict[str, tuple[str, str | None]] = {}
     carried: dict[str, dict] = {}  # url doc_id -> prior record, reused verbatim
     #: Every `url:` doc id the committed list names, resolved. ⚠ **Was
     #: `url_meta: dict[doc_id, meta]` until W-194** deleted `meta`; only the
@@ -300,6 +305,9 @@ def run(
                 carried[doc_id] = existing_urls[doc_id]
         skipped = skipped + url_skipped + url_skipped_pinned
         fresh = {f"url:{fu.url}": fu.content for fu in fetched}
+        url_provenance = {
+            f"url:{fu.url}": (fu.decoder, fu.fetcher) for fu in fetched
+        }
         # W-82 3.1: record how this run went, per URL. Only on the networked
         # path -- an offline `fux ingest` fetches nothing, so it learns nothing
         # about any URL, and bumping the run counter there would age every URL
@@ -767,6 +775,24 @@ def run(
         documents=len(parsed),
     )
 
+    # W-200 — one line per consumed document, naming what read it and what
+    # retrieved it. **After `write_index`**, for `decoder-digests`' reason: a
+    # run stopped before the write left the OLD records in the shards, and a
+    # ledger already claiming this run's decoders would describe records that
+    # were never committed. **Best-effort**: `provenance.write` swallows its own
+    # `OSError`, because a ledger that can fail a run is worse than no ledger.
+    _record_provenance(
+        root,
+        records=records,
+        fresh=fresh,
+        reusable=reusable,
+        carried=carried,
+        skipped=skipped,
+        url_provenance=url_provenance,
+        decoder_digests=decoder_digests,
+        run_seq=_current_run_seq(root),
+    )
+
     return IngestReport(
         written_shards=written,
         doc_count=len(records),
@@ -1149,6 +1175,123 @@ def _reacquire_urls(
 #: and gitignored — it is a report, and a report that could fail an ingest would
 #: be worse than no report (SR-MAINTENANCE decision 3's reasoning).
 STALE_REDACTION_FILE = "stale-redaction.json"
+
+
+
+
+def _current_run_seq(root: Path) -> int:
+    """`url-state.json`'s counter, or `0`. **Never raises.**
+
+    W-200's rows are stamped with a **run counter, never a clock** (L3), and
+    this is the counter the repo already has: it increments once per run that
+    fetched anything, which is why `url-state.json` owns it. **A file-only
+    corpus never bumps it**, so every row in such a repo reads `0` — correct
+    and slightly useless, and the honest alternative (a second counter that
+    ticks on every ingest) is a second piece of state to keep consistent for a
+    field nothing branches on.
+    """
+    try:
+        from ..maintain import urlstate
+
+        return int(urlstate.read(root).run_seq)
+    except Exception:  # noqa: BLE001 - an advisory stamp must never fail a run
+        return 0
+
+
+def _record_provenance(
+    root: Path,
+    *,
+    records: list[dict],
+    fresh: dict[str, bytes],
+    reusable: dict[str, dict],
+    carried: dict[str, dict],
+    skipped: list,
+    url_provenance: dict[str, tuple[str, str | None]],
+    decoder_digests: dict[str, str],
+    run_seq: int,
+) -> None:
+    """Build and write this run's provenance ledger (W-200). **Never raises.**
+
+    One row per document the run **consumed** — every committed record, plus
+    every skip, because *"nothing was indexed from this path and here is why"*
+    is the question the ledger is most often opened for and it is the one
+    `docs.jsonl` can never answer.
+
+    ⚠ **A `reused` row carries the decoder that produced the REUSED record**,
+    read back from the prior ledger, never the tree's current one. Writing the
+    current digest there would make `doctor`'s stale-decoder finding
+    unfireable: every row would agree with the tree by construction, on exactly
+    the records that were not re-extracted. `unknown` when there is no prior
+    row, which is honest — absent and unknown are different.
+    """
+    prior = ingestlog.read(root)
+    by_id = {r["id"]: r for r in records}
+    rows: list[ingestlog.Row] = []
+
+    for doc_id, record in sorted(by_id.items()):
+        loc = record.get("loc", "")
+        is_url = record.get("src") == "url"
+        if doc_id in fresh:
+            outcome = "indexed"
+        elif doc_id in reusable or doc_id in carried:
+            outcome = "reused"
+        else:
+            outcome = "indexed"
+        if outcome == "reused":
+            was = prior.get(doc_id)
+            decoder = was.decoder if was is not None else ingestlog.UNKNOWN
+            fetcher = was.fetcher if was is not None else None
+        elif is_url:
+            decoder, fetcher = url_provenance.get(doc_id, (ingestlog.PROSE, None))
+        else:
+            decoder, fetcher = _decoder_for_loc(loc, decoder_digests), None
+        rows.append(
+            ingestlog.Row(
+                id=doc_id,
+                kind="url" if is_url else "file",
+                loc=loc,
+                outcome=outcome,
+                run_seq=run_seq,
+                decoder=decoder,
+                fetcher=fetcher,
+                raw_sha=record.get("sha"),
+                raw_bytes=len(fresh[doc_id]) if doc_id in fresh else None,
+                wlen=sum(record["flen"]) if record.get("flen") else None,
+            )
+        )
+
+    for entry in skipped:
+        rel = getattr(entry, "rel_path", "")
+        if not rel:
+            continue
+        is_url = "://" in rel
+        doc_id = f"url:{rel}" if is_url else f"file:{rel}"
+        if doc_id in by_id:
+            continue  # a skip that still produced a record is the record's row
+        rows.append(
+            ingestlog.Row(
+                id=doc_id,
+                kind="url" if is_url else "file",
+                loc=rel,
+                outcome=f"skipped:{getattr(entry, 'reason', '') or 'unknown'}",
+                run_seq=run_seq,
+                decoder=_decoder_for_loc(rel, decoder_digests) if not is_url else ingestlog.PROSE,
+            )
+        )
+
+    ingestlog.write(root, rows)
+
+
+def _decoder_for_loc(loc: str, digests: dict[str, str]) -> str:
+    """The decoder digest bound to `loc`'s extension, or `prose`.
+
+    **Read from the map `decoderdigest` already built for the reuse key** — the
+    same object the delta path consults — so the ledger and the reuse decision
+    can never disagree about which decoder is in force. Markdown and plain text
+    carry no binding and read `prose`, which is what W-166 already says.
+    """
+    suffix = Path(loc).suffix.lower()
+    return digests.get(suffix, ingestlog.PROSE)
 
 
 def _record_stale_redaction(root: Path, stranded: list[str]) -> None:

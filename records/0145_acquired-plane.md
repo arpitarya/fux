@@ -10,7 +10,7 @@ feature: the acquired plane
 owns: [src/fux/store/acquired.py@9897ee1fe4af]
 laws: []
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 759178f128508d53786fb1b8dd4b96a1124055a02c4274fa7a43702b6feb87b2
+content_sha: eaee27b85079b083b04ee62c0663651686f2cd2b5a0607fa2f97e74019251503
 ---
 
 # SR-ACQUIRED: fetched bytes are kept, in a plane that is neither committed nor derived
@@ -244,6 +244,13 @@ basis of that loosening.
 
 ### Consequences
 
+- ⚠ **W-200 (2026-09-20) added the ingest provenance ledger**,
+  `.fux/runtime/ingest-log.jsonl` — one runtime line per consumed document
+  naming its decoder and, for a URL, its fetcher
+  ([SR-INGEST](0106_ingest.md) decision 19). The ledger is gitignored and the committed record is untouched — **which fetcher retrieved a document is still not on it**, exactly as this record ruled; being observable in runtime state is the whole point and the argument must not migrate. **This record's decisions
+  are unaffected**, and the line is here because the freshness gate asks a
+  describer to say so rather than to be silent.
+
 - **The observer hook reaches nothing here** (W-170, 2026-09-15). It shares
   `config.py` and `store/fuxdir.py` with this record because `[observe] max_ms`
   and `.fux/observers/` live beside the acquired plane's own keys and
@@ -282,7 +289,7 @@ basis of that loosening.
 
 **The last owed item closed 2026-09-05 (W-101).** `fux doctor` now reports the `as-ingested` share — `doctor.freshness_counts()`, rendered as the `freshness verdicts` check and, machine-readably, as `fux doctor --json`'s `freshness` block. **The veto below can be run.**
 
-⚠ **What it can be run *against* is narrower than the veto's wording, and that limit is stated rather than hidden.** A freshness verdict exists only at answer time, and the only thing that persists one is the **opt-in** receipt journal (`--journal`, `.fux/runtime/provenance.jsonl`, gitignored — L8). So the share is computed over **journalled answers**, not over every answer ever given, and a repo that has never journalled reports **unknown** rather than a zero share. Collapsing those two would let a repo that never looked read as one that looked and found nothing. **Nothing new is retained to make this work**: the journal already existed, and if it is off there is no number.
+⚠ **What it can be run *against* is narrower than the veto's wording, and that limit is stated rather than hidden.** A freshness verdict exists only at answer time, and the only thing that persists one is the **opt-in** receipt journal (`--journal`, `.fux/runtime/ingest-log.jsonl`, gitignored — L8). So the share is computed over **journalled answers**, not over every answer ever given, and a repo that has never journalled reports **unknown** rather than a zero share. Collapsing those two would let a repo that never looked read as one that looked and found nothing. **Nothing new is retained to make this work**: the journal already existed, and if it is off there is no number.
 
 ### Alternatives considered
 

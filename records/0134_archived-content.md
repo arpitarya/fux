@@ -10,7 +10,7 @@ feature: what happens once a document is declared archived — the record proper
 owns: [tools/archived-signal-eval@30fb75fa7476]
 laws: [L3, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 2578b2dd3a91520fea603c791ec4b2d91a208f363dbf7258075423da8f172432
+content_sha: 1d06ba8eccec64c2a0b931404c693b305af51230fd05b9e0deca2f96844c2bfa
 ---
 
 # SR-ARCHIVED-CONTENT — what "archived" does, once a document carries it
@@ -414,6 +414,13 @@ so decision 1a's two-value set is untouched, and an unknown value is still the
 loud error it always was.
 
 ### Consequences
+
+- ⚠ **W-200 (2026-09-20) added the ingest provenance ledger**,
+  `.fux/runtime/ingest-log.jsonl` — one runtime line per consumed document
+  naming its decoder and, for a URL, its fetcher
+  ([SR-INGEST](0106_ingest.md) decision 19). An `archived=true` source's documents get rows like any other; `archived` is a fact about a document and the ledger records how the document was READ, so the two never meet. **This record's decisions
+  are unaffected**, and the line is here because the freshness gate asks a
+  describer to say so rather than to be silent.
 
 - **A re-derived `url:` record keeps its archived declaration** (2026-09-14,
   W-166). A policy change now re-extracts a retained `url:` record from

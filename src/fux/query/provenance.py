@@ -1,5 +1,11 @@
 """How the returned output got generated — SR-PROVENANCE.
 
+🔴 **NOT `fux.ingest.ingestlog`, which is the opposite of this file.** That one
+is W-200's **ingest ledger** — what decoder and fetcher produced each *record* —
+and it records nothing about a query, which is why L8 does not reach it. **This
+file is about what somebody ASKED**, so L8 does. `tests/test_doctor_provenance.py`
+fences the query plane off from the other one by fully qualified name.
+
 Fux already tells a caller **what** it used (the citation, with a `sha`) and
 **how much it believes it** ([SR-CONFIDENCE](../../../records/0141_confidence.md)).
 It has never told anyone **how it got there**, or **what it left out**. This

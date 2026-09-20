@@ -10,7 +10,7 @@ feature: refusal detection before decode
 owns: [src/fux/ingest/refusals.py@adf187806c43, src/fux/templates/refusals.toml.txt@bdf2356bc679, tools/refusal-probe@76b6f6b7f4aa]
 laws: [L1, L3]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 58787bb2e17e20a2f6c46fbe045e9dc8af4d55de0b03b33e3af37613aeff0357
+content_sha: dc5c81dbd463ca0a675d5fa0be8a069a34bf5d8c7f1692b3b799624644688f10
 ---
 
 # SR-REFUSAL: a sign-in wall is not a document, and only the bytes may say so
@@ -396,6 +396,13 @@ and making it do so would mean a repo silently indexing a subset of its corpus �
 [the measured case](../work/regression/2026-09-15-consumer-fetchers/ANALYSIS.md).
 
 ### Consequences
+
+- ⚠ **W-200 (2026-09-20) added the ingest provenance ledger**,
+  `.fux/runtime/ingest-log.jsonl` — one runtime line per consumed document
+  naming its decoder and, for a URL, its fetcher
+  ([SR-INGEST](0106_ingest.md) decision 19). A refused URL gets a `skipped:` row carrying the refusal reason, which is the one place a refusal becomes visible after the run that produced it. The matcher itself is unchanged. **This record's decisions
+  are unaffected**, and the line is here because the freshness gate asks a
+  describer to say so rather than to be silent.
 
 - ⚠ **W-194 (2026-09-20) moved a component this record describes, and changed
   nothing it decides.** Hashed display meta was deleted outright: `meta` and

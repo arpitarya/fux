@@ -168,6 +168,29 @@ fetches all. It touches the network — see `fux-sources`.
 ⚠ **`--check` and `--list-skipped` are two exit-early flags on one verb now.**
 Given both, `--check` wins.
 
+### `.fux/runtime/ingest-log.jsonl` — what read each document
+
+One line per document the last ingest consumed: its `decoder` (and version),
+its `fetcher` for a URL, `raw_sha`, `raw_bytes`, `wlen`, an `outcome`
+(`indexed` · `reused` · `skipped:<reason>`) and a `run_seq`. **Gitignored,
+derived, advisory** — delete it and nothing is lost; the next ingest writes it
+again.
+
+```bash
+jq -r 'select(.outcome|startswith("skipped")) | .loc + "  " + .outcome' \
+  .fux/runtime/ingest-log.jsonl          # why nothing was indexed from a path
+jq -r '.decoder' .fux/runtime/ingest-log.jsonl | sort | uniq -c
+```
+
+**It is the one place that answers *"which decoder, at which version, produced
+THIS record, from which bytes, fetched by what"*** — a question `docs.jsonl`,
+`decoder-digests.json` and `url-state.json` each answer a third of.
+`fux doctor`'s `provenance` row reads it; **nothing at query time does.**
+
+⚠ **A `reused` row carries the decoder that produced the record, not the
+tree's current one.** That is deliberate — the other way round, the doctor row
+could never fire.
+
 ---
 
 ## 6 · Merge conflict in `.fux/index/`

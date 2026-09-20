@@ -10,7 +10,7 @@ feature: the freshness verdict vocabulary and the per-URL check interval
 owns: [src/fux/refer/freshness.py@6757eeeba7c6]
 laws: [L2, L3, L4]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: abb6b88c1f6228b9c40bb4484ada5d6fa0607ad005019ccbcf818cc4317a3749
+content_sha: 5387dd6091ca42f130bf055aff228b3e2fb29767255e267564ddb684b9db056c
 ---
 
 # SR-URL-FRESHNESS: what a citation may claim, and how often it has to earn it
@@ -508,6 +508,13 @@ owning record was *touched*, never that it was read (CLAUDE.md §Law zero), so a
 co-owner's file changing under this one is exactly the case where a reader needs
 to be told *"not yours"* in writing.
 ### Consequences
+
+- ⚠ **W-200 (2026-09-20) added the ingest provenance ledger**,
+  `.fux/runtime/ingest-log.jsonl` — one runtime line per consumed document
+  naming its decoder and, for a URL, its fetcher
+  ([SR-INGEST](0106_ingest.md) decision 19). It stamps rows with `run_seq`, **read** from `url-state.json` and never written there — this record's counter keeps its single writer. **This record's decisions
+  are unaffected**, and the line is here because the freshness gate asks a
+  describer to say so rather than to be silent.
 
 - **The six verdicts are the observer record's vocabulary too** (W-170,
   2026-09-15), counted rather than named against a document. A seventh verdict

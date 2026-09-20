@@ -17,6 +17,15 @@ carries, adds a config key, adds a resolver with a specificity order, adds two
 doctor checks, and amends four records. The wrong default silently pins every
 existing repo.
 
+🔴 **FILED INTO THE INBOX 2026-09-20.** This item's queue row read `🟢 agent`
+from the day it was written, while its own frontmatter said `ball: arpit` and
+its §Decisions hold three unruled calls. **The row was wrong and the file was
+right**; the row now reads `🔴 arpit` and D1–D3 are in *Blocked on Arpit*.
+⚠ **Nothing was built against the recommended defaults**, because D1 changes
+what every generated URL line says and hazard 1 is explicit that building on the
+old default makes every route dead on every existing line **while the tests pass
+anyway** — the W-83 class.
+
 ⚠ **RATIFIED IN SHAPE, NOT BUILT.** The pattern is
 [`work/proposals/fetcher-routing.md`](../proposals/fetcher-routing.md); this
 file is the spec and the state. No `src/`, `node/` or `tests/` line has changed.
@@ -109,6 +118,11 @@ Two smaller calls, decided here unless he objects: **collisions are hard errors*
 **In:** the grammar default, the config key, the resolver, the `ast` claim
 reader, the two doctor checks, `fux add` flags, templates and their twins,
 records, the fetcher/config/sources agent guides, GLOSSARY.
+
+⚠ **One thing W-200 left waiting on this** (2026-09-20): `fux doctor`'s second
+provenance finding — *"M URL(s) whose declared `decoder=` disagrees with the
+last observed `content_type`"* — is **not built and not stubbed**. It is this
+item's hook; it lands when D1–D3 are ruled and the routing exists.
 
 **Out — filed as their own items if wanted:**
 

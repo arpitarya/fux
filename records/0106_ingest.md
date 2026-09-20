@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-15
 date: 2026-08-18
 feature: the `fux ingest` pipeline — sources to committed records
-owns: [src/fux/ingest@c42b00b0fcdb, src/fux/ingest/priors.py@8ffcc632a4be]
+owns: [src/fux/ingest/ingestlog.py@73e117c1e919, src/fux/ingest@77cbab3a2c84, src/fux/ingest/priors.py@8ffcc632a4be]
 laws: [L2, L3, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 8052ad228e3f29b48502a00f292f1c98ddb9bfc7447df9c96f1adcc3337b036c
+content_sha: c3148afb668392db559c40f192f9c4b747a1f7334dc5836faab225d9321ce374
 ---
 
 # SR-INGEST — how ingest works
@@ -732,6 +732,53 @@ nobody decided and a test could not name.
 - **Neither runs an ingest**, and a test asserts that too: the failure worth
   guarding is not the ordering alone but an exit-early flag that stopped
   exiting.
+
+
+
+**19. One runtime line per consumed document — the ingest provenance ledger**
+(Arpit, 2026-09-18, W-200). *"Create a log file of the files that are being
+consumed as well as the URLs that are being consumed, with what decoders were
+used, what version they were used, and just some kind of information."*
+
+`.fux/runtime/ingest-log.jsonl`, one JSON object per document the run consumed,
+keys sorted, sorted by `id`. `id` · `kind` · `loc` · `decoder` · `fetcher`
+(URLs only) · `raw_sha` · `raw_bytes` · `wlen` · `outcome` · `run_seq`.
+
+**The gap it closes:** [W-166](../archive/open/W-166-carry-forward-invalidation.md) put the
+decoder into the reuse key **per extension**; `docs.jsonl` says what is in the
+index; `url-state.json` says whether a URL is healthy. **Nothing said which
+decoder, at which version, produced THIS record, from which bytes, fetched by
+what** — one join away from three files that nobody could make.
+
+- **Runtime, never committed.** A consumer decoder's sha differs between two
+  machines, so a committed field would state a fact true on one of them — the
+  argument that kept the blob sha off the record
+  ([SR-ACQUIRED](0145_acquired-plane.md)). **The cost is that it does not travel
+  with a clone.**
+- **Clock-free** (L3): `run_seq`, the counter `url-state.json` already owns,
+  never `time.time()`. **The cost is that *"when"* is answerable only as *"how
+  many networked runs ago"***, and in a file-only corpus `run_seq` never moves.
+- **Best-effort**, written once and atomically at the end of the run, after
+  `write_index` — the `_record_refusals` precedent. **A ledger that can fail a
+  run is worse than no ledger**, so `provenance.write` swallows its own
+  `OSError`.
+- **Its own file, not columns on `docs.jsonl`**, which is the query hot path.
+  `tests/test_doctor_provenance.py` fences the query, refer and derive planes
+  off it by fully qualified name.
+- 🔴 **A `reused` row carries the decoder that produced the REUSED record**,
+  read back from the prior ledger — not the tree's current one. The other way
+  round, every row would agree with the tree by construction, on exactly the
+  records that were not re-extracted, and `doctor`'s stale-decoder finding could
+  never fire. `unknown` when there is no prior row: **absent and unknown are
+  different**.
+- ⚠ **It is not a use record and L8 does not reach it.** It records what
+  *ingest* did, never what anyone asked, and **it must never grow a query
+  field** — the moment a line here names a question, the file becomes something
+  [L8](0010_LAW-8-use-record.md) governs. 🔴 **There is a second module called
+  `provenance`** — `fux.query.provenance`, SR-PROVENANCE's answer receipts,
+  which *is* L8's. Both docstrings now open by naming the other.
+- **No cap and no rotation.** ~200 B x 10 000 documents is 2 MB; a rotation
+  policy is a second thing to be wrong about, and the file is one `rm` from gone.
 
 ### Consequences
 

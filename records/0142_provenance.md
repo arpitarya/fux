@@ -8,11 +8,11 @@ status: accepted
 date: 2026-08-27
 ratified: 2026-08-27
 feature: answer provenance — the derivation, the receipt, the journal and verification
-owns: [src/fux/query/provenance.py@dbe6e4c4fe9f]
+owns: [src/fux/query/provenance.py@f84f2a7aea74]
 laws: [L1, L3, L4, L8]
 ratifies: W-91
 timestamp: 2026-08-27T00:00:00Z
-content_sha: de84aff13ee84f15026aeac26d3416287565622f89c95ad55a13fda517c23862
+content_sha: 0a6f05790b8163e700048aaaaf7a209aa9215b16da48173c6453c4f01012ff99
 ---
 
 # SR-PROVENANCE — fux does not keep an audit trail; it makes one derivable
@@ -448,6 +448,13 @@ restatement L0 forbids inside one payload.
 
 
 ### Consequences
+
+- ⚠ **W-200 (2026-09-20) added the ingest provenance ledger**,
+  `.fux/runtime/ingest-log.jsonl` — one runtime line per consumed document
+  naming its decoder and, for a URL, its fetcher
+  ([SR-INGEST](0106_ingest.md) decision 19). 🔴 **The new module is `fux.ingest.ingestlog` and it is NOT this record's subject.** This record owns `fux.query.provenance` — answer **receipts**, what somebody asked, which L8 governs. The other records what ingest did and must never grow a query field. The names collided because W-200's spec chose that path and nobody noticed this one; both docstrings now open by naming the other, and `tests/test_doctor_provenance.py` fences the query plane off the ledger by fully qualified name. **This record's decisions
+  are unaffected**, and the line is here because the freshness gate asks a
+  describer to say so rather than to be silent.
 
 - **Easier:** a wrong ranking is diagnosable from the output — matched terms,
   the cut line, and whether a tune edit moved it. An answer can be checked

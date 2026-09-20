@@ -329,6 +329,7 @@ def _layout(root: Path) -> list[Check]:
     checks.append(_pii_health(root))
     checks.append(_refusal_health(root))
     checks.append(_decoder_bindings(root))
+    checks.append(_provenance(root))
     checks.append(_recency_prior(root))
     checks.append(_no_op_priors(root))
     checks.append(_freshness_share(root))
@@ -983,6 +984,91 @@ def _refusal_health(root: Path) -> Check:
             level="warn",
         )
     return Check("refusal rules", True, ", ".join(parts), level="warn")
+
+
+
+
+def provenance_counts(root: Path) -> dict:
+    """`{rows, stale_decoders}` for `doctor --json`, or `{}` when no ledger exists.
+
+    ⚠ **`{}` means UNKNOWN, not clean**, and that distinction is the whole
+    reason this is a block rather than two keys that default to zero. A repo
+    that has not ingested since W-200 landed has no ledger, and a caller told
+    `stale_decoders: 0` there would be told something nothing checked.
+
+    **Never raises.** A caller reading `doctor --json` in CI must not have its
+    pipeline broken by an advisory, derived file.
+    """
+    from .ingest import decoderdigest, ingestlog
+
+    try:
+        if not ingestlog.path_for(root).is_file():
+            return {}
+        return {
+            "rows": len(ingestlog.read(root)),
+            "stale_decoders": ingestlog.stale_decoder_count(
+                root, decoderdigest.binding_digests(root)
+            ),
+        }
+    except (OSError, FuxError):
+        return {}
+
+
+def _provenance(root: Path) -> Check:
+    """Do the records in the index still match the decoders that made them? (W-200)
+
+    Reads `.fux/runtime/provenance.jsonl` — one row per document the last
+    ingest consumed, naming the decoder digest that produced it — and compares
+    each row against the digest that decoder carries **now**.
+
+    🔴 **This is the case a plain `fux ingest` does NOT fix, which is the whole
+    reason for the row.** The reuse key catches a decoder whose digest *moved*
+    since the last run ([W-166](../../archive/open/W-166-decoder-digest.md)) and
+    re-extracts its documents. It cannot catch a record written **before the
+    binding existed**, or one carried through a run where the digest map could
+    not be read: those records agree with nothing and no delta run will look at
+    them again. `fux ingest --full` is the fix, and the row says so.
+
+    ⚠ **Absent is not a finding.** A repo that has not ingested since this
+    landed has no ledger, and reporting that as a problem would put a warning
+    in front of every consumer on upgrade for a file that is advisory, derived
+    and one `fux ingest` from existing. **`warn`, never `error`**, for the same
+    reason: nothing about the index is wrong, only possibly stale.
+
+    Read-only and offline. It opens two runtime files and imports no decoder.
+    """
+    from .ingest import decoderdigest, ingestlog
+
+    if not ingestlog.path_for(root).is_file():
+        return Check(
+            "provenance",
+            True,
+            "no ledger yet - `.fux/runtime/provenance.jsonl` is written by the next "
+            "`fux ingest`. Advisory and derived; nothing reads it at query time",
+            level="warn",
+        )
+    try:
+        current = decoderdigest.binding_digests(root)
+    except FuxError as exc:
+        return Check("provenance", False, f"decoder bindings do not resolve: {exc}")
+
+    stale = ingestlog.stale_decoder_count(root, current)
+    if stale:
+        return Check(
+            "provenance",
+            False,
+            f"{stale} record(s) were produced by a decoder whose digest differs from "
+            "the tree's - run `fux ingest --full` to re-extract them. A plain "
+            "`fux ingest` will NOT: the reuse key only catches a decoder that moved "
+            "since the last run",
+            level="warn",
+        )
+    rows = len(ingestlog.read(root))
+    return Check(
+        "provenance",
+        True,
+        f"{rows} record(s) match the decoders that produced them",
+    )
 
 
 def _decoder_bindings(root: Path) -> Check:
@@ -2647,6 +2733,12 @@ def cmd_doctor(args) -> int:
             # object means no receipts are journalled, which is *unknown* and
             # not a zero share; `freshness_counts` says why they are different.
             payload["freshness"] = freshness_counts(root)
+            # W-200, for the `runner`/`freshness` reason: a caller checking
+            # whether its index is still the one its decoders would produce
+            # must not have to parse an English sentence out of `detail`.
+            # **Absent counts and zero counts are different** — an empty
+            # object means no ledger, which is *unknown*, not *clean*.
+            payload["provenance"] = provenance_counts(root)
         print(json_mod.dumps(payload, indent=2, sort_keys=True))
         return exit_code
 

@@ -10,7 +10,7 @@ feature: the `url:` source and how ingestion behaves around the fetcher boundary
 owns: []
 laws: [L2, L4, L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 3bdf66ce9b66339b3f29f5df2500853432b510836e2a52c95cc5ccd3db6fcec4
+content_sha: 9d9c1fb1066ffd703c7777ca0b0ada903a8ed78d47a434a893e8eaf68caca52f
 ---
 
 # SR-URL-INGEST — URL ingestion through a consumer-owned fetcher
@@ -275,6 +275,24 @@ written down.**
   is the whole remedy, and it is a command somebody has to remember. **Stated as
   a cost rather than solved**, because solving it means either fetching on a path
   that is supposed to be offline, or a background process nobody asked to start.
+
+
+
+**A URL row in the provenance ledger carries the fetcher that retrieved it**
+(W-200, 2026-09-18). `<stem>@sha:<16 hex>` — **fetchers have no `VERSION`**,
+because a consumer owns the file and fux can require nothing of it, so its sha
+*is* its version. That is the rule a consumer-owned decoder already follows
+([SR-DECODE](0139_decode.md) decision 11a), applied unchanged.
+
+⚠ **The decoder on a URL row is resolved where it is KNOWN, not re-derived
+later.** `FetchedUrl` carries it out of the fetch loop, set by the same
+`_fetched_rel_path` call that decided which decoder actually ran — declared
+content type first, the URL's extension second. Deriving it afterwards from the
+URL alone would be wrong exactly where it matters: a server declaring
+`application/pdf` on an extensionless URL. **The ledger is runtime and
+gitignored** ([SR-INGEST](0106_ingest.md) decision 19); nothing about the
+committed record changed, and which fetcher retrieved a document is still
+**not** on it ([SR-ACQUIRED](0145_acquired-plane.md)).
 
 ### Consequences
 

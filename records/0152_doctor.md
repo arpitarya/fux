@@ -7,11 +7,11 @@ description: "One record owns the health-check surface. Every check names a caus
 status: accepted
 date: 2026-09-11
 feature: "`fux doctor` — the read-only, offline health command and its check register"
-owns: [src/fux/doctor.py@01e9eff0f0c6, tests/test_doctor_register_is_complete.py@6c3d2378d45f]
+owns: [src/fux/doctor.py@b26be4799ec6, tests/test_doctor_register_is_complete.py@6c3d2378d45f]
 laws: [L4, L8]
 ratifies: "Arpit, 2026-09-11 — *create a new adr for doctor*"
 timestamp: 2026-09-11T00:00:00Z
-content_sha: fa5d8c1a22788acd54f313c0113b7c718b51d48470d4cb80814825fa550121d0
+content_sha: 9b0a643f49bed51217f83611bb73f4b1c1e4e12184072a11fee08c3a280d340d
 ---
 
 # SR-DOCTOR — the health command, and who owns its rows
@@ -167,6 +167,7 @@ authoritative about the row.**
 | `correction pins` | warn | a `fux correct --pin` that is **silently not applying** — its document changed since the pin was made, or left the corpus. Named because a suspended pin is invisible at query time: the query just ranks normally | [SR-ENRICH](0137_enrich.md) decision 19 |
 | `refusal rules` | warn, **error** when the file will not parse | how many rules load, how many responses each has refused, and **the rules that have never fired** — what a typo'd condition looks like | [SR-REFUSAL](0146_refusals.md) decision 11 |
 | `decoder bindings` | warn, **error** when the registry will not build | the one binding fault no ingest can catch: a `[decoders]` binding on an extension **no indexed document has** | [SR-DECODE](0139_decode.md) |
+| `provenance` | **warn**, never error | the decoder fault `decoder bindings` and the reuse key both miss: a **record already in the index** that was produced by a decoder the tree no longer carries at that version. The reuse key catches a digest that *moved since the last run*; a record written before a binding existed agrees with nothing, and **no delta run will look at it again** — `fux ingest --full` is the fix and the row names it. ⚠ **No ledger is NOT a finding**: `.fux/runtime/ingest-log.jsonl` is advisory, derived and gitignored, and warning every consumer on upgrade about a file one `fux ingest` creates is how a row becomes one people skip. ⚠ **`prose` and `unknown` rows are never counted** — no binding claims Markdown, and `unknown` means the ledger predates the row, so counting either would report a number no command can bring down | [SR-INGEST](0106_ingest.md) (W-200) |
 | `recency prior` | warn | whether any document carries an `mtime` — a corpus copied out of its git repository loses every one | [SR-INGEST](0106_ingest.md) |
 | `freshness verdicts` | warn | `freshness_counts` and `AS_INGESTED_VETO_SHARE` — the veto instrument, shared verbatim with SR-ACQUIRED's identical one so the quarter has one home | [SR-URL-FRESHNESS](0147_url-freshness.md) |
 | `ranking priors` | warn | every prior that is wired, reads its input and multiplies by one — **and the count of documents it would have acted on**. It refuses to recommend a value | [SR-ARCHIVED-CONTENT](0134_archived-content.md) · [SR-TUNE](0135_tuning.md) |

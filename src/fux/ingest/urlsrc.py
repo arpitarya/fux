@@ -55,7 +55,7 @@ from pathlib import Path, PurePosixPath
 
 from ..errors import FuxError
 from ..store import acquired
-from . import refusals, sourcelist
+from . import ingestlog, refusals, sourcelist
 from .gitdir import UNFETCHED, Skipped
 
 _HOSTILE_LINE_BREAKS = ("\u2028", "\u2029", "\u0085")
@@ -65,6 +65,14 @@ _HOSTILE_LINE_BREAKS = ("\u2028", "\u2029", "\u0085")
 class FetchedUrl:
     url: str
     content: bytes
+    #: W-200 provenance, and **advisory only** — nothing on the ingest path
+    #: branches on either. `decoder` is the `decoderdigest` string for whatever
+    #: read the fetched bytes (`prose` when the type was already prose, which
+    #: is the common case for an HTML page a fetcher rendered); `fetcher` is
+    #: `<stem>@sha:<16 hex>` for the consumer file that retrieved them.
+    #: Defaulted so every existing construction and test keeps working.
+    decoder: str = "prose"
+    fetcher: str | None = None
 
 
 @dataclass(frozen=True)
@@ -790,7 +798,18 @@ def fetch_all(
                     skipped.append(Skipped(rel_path=url, reason="fetcher returned no text"))
                     continue
                 _warn_if_thin(url, raw, markdown)
-                fetched.append(FetchedUrl(url=url, content=sanitize(markdown)))
+                # W-200: which decoder actually read these bytes, recorded
+                # where it is KNOWN rather than re-derived later from the URL's
+                # extension — the header is authoritative and the extension is
+                # *"often absent and occasionally a lie"* (`_decode_fetched`).
+                fetched.append(
+                    FetchedUrl(
+                        url=url,
+                        content=sanitize(markdown),
+                        decoder=_decoder_name_for(content_type, url, root),
+                        fetcher=ingestlog.fetcher_digest(root / fetcher_path),
+                    )
+                )
         finally:
             if callable(close):
                 try:
@@ -1015,6 +1034,34 @@ def _decode_fetched(
 #: from `None` (nothing claims this type), because the two produce opposite
 #: outcomes and a bare `None` cannot say which one happened.
 _PROSE = "\x00prose"
+
+
+def _decoder_name_for(content_type: str, url: str, root: Path | None) -> str:
+    """The `decoderdigest` string for whatever read these fetched bytes (W-200).
+
+    **Resolved the same way `_decode_fetched` resolves it** — declared type
+    first, the URL's extension second — by calling `_fetched_rel_path`, so this
+    can never name a decoder other than the one that actually ran. Deriving it
+    later from the URL alone would have been wrong exactly where it matters: a
+    server declaring `application/pdf` on an extensionless URL.
+
+    Returns `ingestlog.PROSE` when the bytes were already prose (the common
+    case) and when nothing claims the type, because in the second case nothing
+    reached the index either — a skipped URL writes a `skipped:` row and never
+    gets here.
+    """
+    from .. import decode as decode_mod
+
+    mime = _mime_of(content_type)
+    rel = _fetched_rel_path(mime, url, root)
+    if rel is _PROSE or rel is None:
+        return ingestlog.PROSE
+    decoder = decode_mod.registry(root).get(PurePosixPath(rel).suffix.lower())
+    if decoder is None:
+        return ingestlog.PROSE
+    from . import decoderdigest
+
+    return decoderdigest.of(decoder)
 
 
 def _fetched_rel_path(mime: str, url: str, root: Path | None) -> str | None:

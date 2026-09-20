@@ -2,11 +2,12 @@
 type: OpenItem
 id: W-200
 title: "W-200 — ingest provenance: one runtime line per document naming its fetcher, decoder and version"
-description: "Arpit's ask 2026-09-18 — record, per consumed file and URL, which decoder (and version) and which fetcher produced its record, from which bytes, with what outcome. Filed as `.fux/runtime/provenance.jsonl`: gitignored, clock-free, content-free, best-effort, read by `fux doctor` and by nobody at query time. RATIFIED, NOT BUILT."
-status: open
+description: "Arpit's ask 2026-09-18 — record, per consumed file and URL, which decoder (and version) and which fetcher produced its record, from which bytes, with what outcome. Filed as `.fux/runtime/provenance.jsonl`: gitignored, clock-free, content-free, best-effort, read by `fux doctor` and by nobody at query time. BUILT 2026-09-20, at `.fux/runtime/ingest-log.jsonl` — NOT the path this spec named, which was already L8's consent-gated answer journal."
+status: closed
 lane: agent
 timestamp: 2026-09-18T00:00:00Z
 filed: 2026-09-18
+closed: 2026-09-20
 ball: agent
 ---
 
@@ -15,7 +16,7 @@ ball: agent
 **Model: Sonnet** — one new runtime file, one writer at the end of ingest, one
 doctor row. No committed byte changes, no grammar, no record shape.
 
-⚠ **RATIFIED, NOT BUILT.** No `src/`, `node/` or `tests/` line has changed.
+✅ **BUILT 2026-09-20** — see §Built at the end. **The file and the module are not at the paths this spec names**, and the reason is a defect this spec would have shipped.
 
 ## The ask
 
@@ -158,3 +159,76 @@ owns that).
    there is no prior row.
 5. **Size.** ~200 B × 10 000 = 2 MB. No cap, no rotation; state that so nobody
    adds one.
+
+---
+
+## ✅ Built 2026-09-20 (Claude Code, Opus 5)
+
+**Every numbered item in *Definition of done* landed.** Four differences from
+the spec, and **the first one is a defect this spec would have shipped.**
+
+### 1. 🔴 The spec's file path was already L8's consent-gated answer journal
+
+This item says `.fux/runtime/provenance.jsonl`. **That is
+`fux.query.provenance`'s journal** — SR-PROVENANCE's answer receipts, an L8 use
+record written **only under explicit consent**: the `--journal` flag *and* the
+`[output]` key, both required, ruled by Arpit on 2026-09-13 (W-147, *"I need the
+flag as well as output TOML configuration"*).
+
+**Writing this ledger there would have made every `fux ingest` create a file
+that is supposed to require consent.** Caught by
+`tests_e2e/test_verbs.py::test_both_journal_consent_surfaces_write_and_neither
+_alone_is_removable`, whose message is exactly *"a journal appeared with no
+consent of any kind"*.
+
+**[L8](../../records/0010_LAW-8-use-record.md) outranks a work item**, so the
+path moved to **`.fux/runtime/ingest-log.jsonl`**, and the module moved with it
+to **`src/fux/ingest/ingestlog.py`** — leaving two modules named `provenance`
+writing differently-named files is the same trap one layer up, and the module
+collision had already cost a pytest basename clash
+(`tests/query/test_provenance.py` exists). ⚠ **Both are now pinned by tests**:
+`test_the_ledger_is_not_the_answer_journal` asserts the paths differ, and the
+import fence matches on the fully qualified module name rather than the word.
+
+### 2. `fuxdir.py` gets a SENTENCE, not a `DECLARED` row
+
+Hazard 1 asks whether the file needs its own row like `acquired/`. **It does
+not**: it lives *inside* `runtime/`, which is already declared, so the veto
+condition was never in play. What the hazard is right about is that
+`fuxdir.py` calls `runtime/` *"rebuildable from the committed index"* and this
+file is not — **and neither are `url-state.json` or `enrich-progress.tsv`,
+which were already there.** The category existed and was unnamed; SR-DOTFUX now
+names it in one sentence, which is what the hazard asked for. ⚠ **If Arpit
+would rather it have its own row, that is a one-line change** — the argument is
+a judgement, not a constraint.
+
+### 3. The URL decoder is captured at fetch time, not re-derived
+
+The spec's rows show a `decoder` on URL rows without saying where it comes
+from. **Re-deriving it later from the URL would be wrong exactly where it
+matters** — a server declaring `application/pdf` on an extensionless URL — so
+`FetchedUrl` carries two new advisory fields (`decoder`, `fetcher`), set inside
+the fetch loop by the same `_fetched_rel_path` call that decided which decoder
+actually ran. Both are defaulted, **nothing on the ingest path branches on
+either**, and SR-FETCHER decision 5's *declared, never detected* is untouched.
+
+### 4. The doctor row is ONE finding, not two
+
+DoD 4 asks for a second finding — *"M URL(s) whose declared `decoder=`
+disagrees with the last observed `content_type`"* — and says it lands only once
+W-199 has. **W-199 has not landed and is blocked on three rulings**, so that
+finding is not built and is not stubbed. The stale-decoder finding is built,
+and `doctor --json` exposes `{rows, stale_decoders}` — ⚠ **as an absent block
+rather than zeros when there is no ledger**, because a caller told
+`stale_decoders: 0` where nothing was checked has been told something false in
+the direction that matters.
+
+### What this did NOT do
+
+- **Nothing committed changed.** No record field, no schema, no `_format` bump.
+- **Nothing at query time reads it**, and that is asserted by an `ast` import
+  fence over `query/`, `refer/` and `derive/` rather than intended.
+- **No `fux provenance` verb.** `grep`, `jq` and `doctor` cover it; a verb waits
+  for a third reader.
+- **No cap and no rotation.** 2 MB at the design point; the file is one `rm`
+  from gone, and a rotation policy is a second thing to be wrong about.

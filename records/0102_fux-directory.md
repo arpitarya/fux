@@ -11,7 +11,7 @@ feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants
 owns: [src/fux/store/fuxdir.py@c984699b459a, src/fux/setup.py@ffe39c973497, tests/test_verb_table_agreement.py@1e7999ffd28f]
 laws: [L2, L3, L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 156fa4a37f23f515ce3376c0bb94a067197278963b10e49a639f421adfc923f1
+content_sha: b4c94d365ae813fd9e5a5c6c785993b85e92994489bf174c1270c9f627272a85
 ---
 
 # SR-DOTFUX — the `.fux/` directory
@@ -839,6 +839,23 @@ placeholder is `Attribute.placeholder` now — a field on the thing that knows,
 not a special case in this module. **Write-if-missing is what makes it matter:**
 a wrong header reaches new repos only, so this repository's own copy would have
 stayed right while every fresh setup handed out the defect.
+
+
+
+⚠ **`runtime/` holds one more OBSERVED file since 2026-09-20** (W-200):
+`provenance.jsonl`, one line per document the last ingest consumed.
+
+🔴 **This row says `runtime/` is *"rebuildable from the committed index by
+`fux build`"* and that is not true of this file, nor of two that were already
+there.** `url-state.json` and `enrich-progress.tsv` are *observed during a run*
+and can only be re-observed, never rebuilt — so the category exists, was
+unnamed, and now has a third member. **The precedent is stated rather than
+new**, which is why this is a sentence and not a `DECLARED` row: all three are
+advisory, deletable and local, and giving one its own top-level row would say it
+is a different kind of thing from the two beside it.
+
+⚠ **If Arpit would rather it have its own `DECLARED` row like `acquired/`, that
+is a one-line change** — the argument above is a judgement, not a constraint.
 
 ### Consequences
 

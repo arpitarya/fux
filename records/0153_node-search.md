@@ -11,7 +11,7 @@ owns: [node@54b87937e653, src/fux/store/nodebundle.py@071a24a596dd]
 laws: [L1, L3, L4, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 73b27f26284fb55f65f7bb4bd69a8d42ebbd223d87961df09ca5fd2b3c764e50
+content_sha: edc346688b3c4a72edb7a729550b68ca295d430943676e81d835c035d9125b56
 ---
 
 # SR-NODE-SEARCH — the Node read plane
@@ -765,6 +765,13 @@ than a finding, and the one a differential arm on an unchanged corpus could not
 catch, because both readers would still agree with themselves.
 
 ### Consequences
+
+- ⚠ **W-200 (2026-09-20) added the ingest provenance ledger**,
+  `.fux/runtime/ingest-log.jsonl` — one runtime line per consumed document
+  naming its decoder and, for a URL, its fetcher
+  ([SR-INGEST](0106_ingest.md) decision 19). Nothing in `node/` reads or writes it — the Node plane reads an index and never builds one, so there is no twin to port and none is owed. **This record's decisions
+  are unaffected**, and the line is here because the freshness gate asks a
+  describer to say so rather than to be silent.
 
 - **`routes()` returns `(routes, truncated)` on both readers, and the budget is
   the same number on both** (W-140 row 12, 2026-09-15). `EXPANSION_BUDGET` is a

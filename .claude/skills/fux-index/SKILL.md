@@ -97,6 +97,7 @@ mode prints `[OK]`, `[WARN]` or `[FAIL]` per row.
 | `fuxignore usable` | error on parse · warn on duplicates | a pattern in both `.fuxignore` and `sources/dirs` |
 | `pii rules` | error when missing/invalid · warn when empty | ingest refuses without the file |
 | `refusal rules` · `decoder bindings` | error when the file/binding will not load · else warn | a hand-written binding matching no indexed document is a warn |
+| `provenance` | warn, never error | a record in the index was produced by a decoder the tree no longer carries at that version. **`fux ingest --full` is the fix — a plain `fux ingest` will not do it**, because the reuse key only catches a decoder that MOVED since the last run. No ledger yet is not a finding |
 | `acquired plane` | **error if not gitignored** · warn near cap | fetched source bytes visible to git |
 | `.fux/ layout declared` · `output.toml present` | warn | undeclared entry under `.fux/` · no output defaults file |
 | `accelerator` | warn | not built, stale, or tracked by git — §5 |

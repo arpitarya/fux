@@ -531,6 +531,26 @@ numbers it produced stand as filed, and the reconciliation is W-138. Replaced
 `examples/playground/`, deleted 2026-08-12. See
 [SETUP-PLAYGROUND](../work/setup/fux-playground.md).
 
+**Provenance — TWO things with this name, and they are opposites.**
+
+1. **Answer receipts** (`fux answer --receipt`, `fux.query.provenance`,
+   SR-PROVENANCE) — how an *answer* was produced and what it left out. It
+   records what somebody **asked**, so
+   [L8](../records/0010_LAW-8-use-record.md) governs it.
+2. **The ingest ledger** (`.fux/runtime/ingest-log.jsonl`,
+   `fux.ingest.ingestlog`, W-200) — one line per document the last ingest
+   consumed: which decoder read it and at what version, which fetcher retrieved
+   it, from which bytes, and with what outcome. It records what **ingest** did
+   and nothing about a query, so **L8 does not reach it — and it must never
+   grow a query field.**
+
+⚠ **The collision was not noticed when W-200 named the path** (2026-09-18).
+Python resolves the two correctly — different packages, relative imports — so
+what it can cost is a reader taking one for the other. Both module docstrings
+now open by naming the other, and `tests/test_doctor_provenance.py` fences the
+query plane off the ledger by fully qualified name. The ledger is gitignored,
+derived and advisory: delete it and nothing is lost.
+
 **Pruning (static, top-k)** — Permanently dropping low-value postings at index
 build time so the committed index is small. v0.30 uses **document-centric**
 pruning via [KL term selection](#kl-term-selection) at k=128 (k=64 under

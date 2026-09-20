@@ -7,10 +7,10 @@ description: "Fux never fetches; a consumer-owned fetcher file does. One fetcher
 status: accepted
 date: 2026-08-19
 feature: the fetch contract, what it is called, and the two shipped templates
-owns: [src/fux/ingest/urlsrc.py@da875a2495c2, src/fux/templates@8f6251ffc3ba]
+owns: [src/fux/ingest/urlsrc.py@c70f75a105a4, src/fux/templates@fed5e86d54b0]
 laws: [L1, L3, L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 9138cfae517c8cc2526079a82937a784083aaec7b849839ff13302fc9c28e519
+content_sha: 9f703a76048972eab99ec7aa42b21b6a97670fe90dc6ab6ed3bd1acd3405ed1f
 ---
 
 # SR-FETCHER — the consumer-owned fetcher
@@ -505,6 +505,14 @@ and still refuses a key it does not know. What changed is which keys arrive —
 which is precisely why refusing was safe to keep.
 
 ### Consequences
+
+- ⚠ **W-200 (2026-09-20) added two advisory fields to `FetchedUrl`** —
+  `decoder` and `fetcher` — and **nothing on the ingest path branches on
+  either**. Both are defaulted, so every existing construction and test is
+  unaffected. **Decision 5's *declared, never detected* is untouched**: the
+  fetcher is still chosen by a line and never escalated to; what is new is that
+  the run *records* which file ran, which is a fact about the run rather than a
+  policy about the source.
 
 - 🔴 **W-194 (2026-09-20) removed a layer from `urlsrc.resolve_urls` and a key
   from the shipped `fux.toml` template — both components this record owns.**
