@@ -10,6 +10,8 @@ filed: 2026-09-20
 ball: agent
 ---
 
+> 🔴 **MERGED INTO [W-205](W-205-identifiers-reachable-and-whole.md) on 2026-09-20 (Arpit).** This row left the queue; the work continues there. This file is history from that date — the archive move (queue rules 54–58) is owed by the next Claude Code change.
+
 # W-203 — what actually breaks an identifier, and the four ways it has been fixed
 
 **Model: Opus** — it edits the one module ingest and query both import, and a

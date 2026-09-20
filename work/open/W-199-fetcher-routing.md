@@ -4,11 +4,64 @@ id: W-199
 title: "W-199 — fetcher routing: a URL resolves to a fetcher the way a file resolves to a decoder"
 description: "Arpit's ask 2026-09-18 — build fetchers the way decoders are built: a module claim (`ROUTES`), a committed binding (`[sources.url.routes]`), a per-line pin (`fetch=`), one resolver, `fux doctor` findings. Key is the URL host. Pattern in work/proposals/fetcher-routing.md. Three decisions are Arpit's before it is buildable. RATIFIED IN SHAPE, NOT BUILT."
 status: open
+ruled: 2026-09-20
 lane: agent
 timestamp: 2026-09-18T00:00:00Z
 filed: 2026-09-18
-ball: arpit
+ball: agent
 ---
+
+## ✅ RULED 2026-09-20 (Arpit, Cowork) — D1, D2, D3 and a fourth deliverable
+
+**D1 — `fetch=` is never empty and never defaulted.** *"The set should never be
+empty. It should be a mandatory argument when we are doing an add so that the
+fetcher gets defined."* So: every URL line **states** `fetch=<stem>` (SR-URL-LIST
+decision 12 stands, unnarrowed); `fux add` writes the stem it **resolved** —
+`--fetch <stem>` if given, else the routes table / module claims (D3) — and
+**refuses** when nothing resolves, printing the hosts it tried and the fetcher
+stems on disk. The recommended *routed = empty* form is **rejected**. ⚠ What
+this gives up, said aloud: a route changed later does not move an existing line
+— every line is a pin. `fux doctor` gains a finding *"N line(s) pin a fetcher the
+routes table would now resolve differently"*, and the consumer edits.
+
+**D2 — no default fetcher; break.** *"There is no default fetch. It is a
+mandatory argument. About backward compatibility, let it break."* So:
+`[sources.url] fetcher` is **deleted** from `config.py`, the schema, the
+template and this repo's `fux.toml`; a line without `fetch=` fails to load with
+an error naming the line and the fix; no rewrite, no lenient read. Called out in
+`CHANGELOG.md` under *Removed — BREAKING* (the W-177/W-194 shape) and one line
+in `README.md`. Existing lines that say `fetch=http` are valid pins and keep
+working.
+
+**D3 — module claims, yes; patterns may be regex.** *"I agree with what is
+recommended. We can have a regex kind of way where a default fetcher can be
+defined."* So: `ROUTES` read with `ast`, never imported; the routes table and a
+`ROUTES` claim accept the three host shapes **and** a `re:` prefixed pattern
+(`"re:^.*\\.sharepoint\\.com$" = "cdp"`), compiled at load, anchored, matched
+against the normalised host. **Two patterns matching one host is a hard error**
+naming both — there is no specificity order between two regexes, so ambiguity
+is refused, not sorted. The table is where a *default-by-pattern* lives; there is
+no default-by-nothing (D2).
+
+**D4 — a committed register of what was ingested.** *"A log file should be
+generated of every document that is indexed, and because we are maintaining the
+index we should maintain that log file as well — today there is nowhere we
+document what files and URLs were ingested."* W-200's
+`.fux/runtime/ingest-log.jsonl` is gitignored and advisory; this is different:
+**`.fux/index/REGISTER`** (name provisional), committed beside the index, one
+sorted line per document — `loc · sha · decoder@version · fetcher (URLs) · outcome`.
+🔴 Bound by **L3**: no wall clock, no run id, sorted by `loc`, byte-identical
+across runs from the same sources — it is derived from the same inputs as the
+index and a test asserts `fux ingest` twice writes it once. Bound by **L2**: paths
+and hashes, never content. **Not L8**: it records the corpus, not who asked. SR-INGEST
+gains the decision; `fux doctor` compares it to the ledger plane and reports
+drift.
+
+**Ball → 🟢 `agent`.** Nothing here waits on Arpit. Build order: D2 → D1 → D3 →
+D4 → doctor rows, one pre-registration for the byte-identity claims (D4 and the
+*no routes = unchanged* claim of DoD 8). **DoD items 1, 2, 6 and 8 below are read
+through this block where they differ.**
+
 
 # W-199 — fetcher routing
 

@@ -132,9 +132,30 @@ def _ids(directory: Path) -> dict[int, list[str]]:
 
 
 def test_there_are_work_items_to_check() -> None:
-    """A collector that matches nothing is a test that always passes."""
+    """A collector that matches nothing is a test that always passes.
+
+    ⚠ **The live floor used to be a magic number (`> 5`) and it fired on correct
+    content on 2026-09-20**, when W-201 and W-203 archived into W-205 and the
+    queue fell to exactly five rows. That is not a broken filter — it is
+    [SR-WORK-OPEN-QUEUE](../records/0051_WORK-open-queue.md) rule 3 working:
+    *"its length is the signal of how much is actually pending"*. A floor that
+    forbids the queue from emptying grades the wrong thing, and a check that
+    fires on correct content is how a check gets switched off rather than fixed
+    (`tests/test_archive_law.py` and `tests/test_windows_console_safe.py` both
+    pay for that lesson).
+
+    **So the live half is checked STRUCTURALLY instead**: every `W-nn-…md` on
+    disk is collected, whatever the count. A broken regex fails that and an
+    empty queue does not. The archived floor stays a number because
+    `archive/open/` only ever grows — rule 54 forbids deleting from it.
+    """
     live, archived = _ids(LIVE), _ids(ARCHIVED)
-    assert len(live) > 5, f"only {len(live)} live items collected -- the filter is wrong"
+
+    on_disk = {int(m.group(1)) for p in LIVE.iterdir() if (m := _ID.match(p.name))} if LIVE.is_dir() else set()
+    assert set(live) == on_disk, (
+        f"the collector saw {sorted(live)} but `work/open/` holds {sorted(on_disk)} -- the filter is wrong"
+    )
+    assert LIVE.is_dir() and any(LIVE.glob("W-*.md")), "work/open/ holds no item file at all"
     assert len(archived) > 50, f"only {len(archived)} archived items -- the filter is wrong"
 
 

@@ -32,6 +32,58 @@ does the archive mechanics.
 
 ---
 
+## ✅ RULED 2026-09-20 (Arpit, Cowork) — no feature waits on Codex; Claude authors **set 3**
+
+*"A feature should not be held hostage because Codex needs to run a change. When
+test data is needed and it is urgent, Claude creates it — you have the questions,
+let me know when you need the answers. After the current run, Claude creates
+another set — call it set 3 — and adds the `RF-118 / RF-119` shape of ids so
+that it can be unlocked and we can move on."*
+
+**What this changes here — inputs I-2 and I-3 stop being Codex's:**
+
+| | before | now |
+|---|---|---|
+| **I-2** link-bearing + id-bearing seed documents | prompt 7, Codex | **set 3, Claude** — one authoring session, after phase A is filed (it is) |
+| **I-3** paraphrases for W-175 | Codex | **a blind Claude session**, the same authoring shape; unchanged in substance, only the author |
+| **I-1** prompt 9 | Arpit | unchanged — the key opens on his paste |
+
+**Set 3, defined:**
+
+- **Seed additions** in `work/golden/seed/` (Claude-written, committed): documents
+  carrying **identifiers of the failing shape** — a shared prefix plus a short
+  number, siblings that differ only in the number (`RF-118 / RF-119 / RF-120`,
+  `PROJ-123 / PROJ-124`), in body text **and** in front-matter `doc_id:` — and
+  the **link-bearing documents** prompt 7 specified (12 links among existing
+  documents, 3 documents findable only by anchor text, one 4+ cluster), so W-191's
+  census exits 0 and one ladder rebuild serves both.
+- **Questions + answers** — `s3-001…`, the prompt-3 contract (same type mix, the
+  answer-file format, `difficulty` computed not typed), **plus** an id-query per
+  new identifier and the link-dependent questions W-161/W-176-gate-6 need.
+- **The authoring route is L11 decision 6's, unchanged**: one session reads
+  `seed/` and writes the seed additions; writes `questions/set-3.jsonl` (ids + text);
+  hands the **answers to Arpit in the chat**, writes no key file, never runs a rung,
+  and leaves. From that handoff set 3 is closed to Claude exactly as sets 1 and 2 —
+  until prompt 9. **Every set 3 number is `informed`, permanently**, for the same
+  reason set 2's are; after prompt 9 that is every number anyway.
+- **Then:** prompt 4 rebuilds all eight rungs (set 3's documents enter `seed/`, so
+  every rung carries them); phase A re-runs on the rebuilt ladder for all three
+  sets — this is the *"run twice"* the default above already priced in; the first
+  phase A stays filed as the pre-set-3 baseline.
+
+⚠ **Codex is not excluded — it is not waited on.** If Arpit runs prompt 7 later,
+its documents join `seed/` like any other and the ladder rebuilds again. Two
+authors of seed documents make authorship visible, which was the point of two
+sets; a third author does not undo it.
+
+**Records this ruling touches (next Claude Code change, not this file):**
+[SR-WORK-GOLDEN](../../records/0066_WORK-golden.md) decision 2 gains set 3 and
+the standing rule *"an agent-authored set is created whenever a measurement would
+otherwise wait on Codex"*; L11 decision 6's authoring carve-out is cited as
+applying per set; `work/golden/README.md` §The two question sets becomes three;
+prompt 3 is generalised to *"prompt 3 — Claude authors set N"* with a
+**seed-additions** part, and prompt 7 is marked *optional, Codex, whenever*.
+
 ## What this item absorbs — eight rows become one
 
 | was | what it owed | where it lives now |
@@ -84,8 +136,8 @@ A, B, C or D.** They are listed as inputs, not blockers, so the ball stays 🟢:
 | input | who | what it unlocks | if it never arrives |
 |---|---|---|---|
 | **I-1** prompt 9 pasted into Claude Code | Arpit | phase C, therefore D and E | A and B still produce every per-rung document and the unscored three-engine comparison; the final score does not exist |
-| **I-2** prompt 7 — link-bearing seed documents | Codex, via Arpit | W-161's arms, W-176 gate 6, W-168 step 8 (phase E) | those three stay `unmeasurable`, filed as such, and are never reported as null effects (SR-RS decision 23) |
-| **I-3** Codex paraphrases for W-175, arm (iii) | Codex, via Arpit | W-175's measurement (phase E) | the harness stays built and unrun |
+| **I-2** set 3 seed additions (links + `RF-118`-shaped ids) | **Claude** (ruled 2026-09-20; was prompt 7, Codex) | W-161's arms, W-176 gate 6, W-168 step 8 (phase E) | those three stay `unmeasurable`, filed as such, and are never reported as null effects (SR-RS decision 23) |
+| **I-3** blind paraphrases for W-175, arm (iii) | **a blind Claude session** (ruled 2026-09-20; was Codex) | W-175's measurement (phase E) | the harness stays built and unrun |
 
 **Decision taken with a default — Arpit may override:** **A does not wait for
 I-2.** If prompt 7 lands later, all eight rungs are rebuilt (prompt 4) and A is

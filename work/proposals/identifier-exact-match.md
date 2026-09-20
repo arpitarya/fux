@@ -8,7 +8,7 @@ timestamp: 2026-09-18T00:00:00Z
 
 # Exact identifier match — what actually breaks, and what everyone else does about it
 
-✅ **GRADUATED 2026-09-20 into [`W-203`](../open/W-203-identifier-analyzer-defects.md)
+✅ **GRADUATED 2026-09-20 into [`W-203` → `W-205`](../open/W-205-identifiers-reachable-and-whole.md)
 (the two defects and the four families) and [`W-202`](../open/W-202-identifier-analyzer-gate.md)
 (gate A, the frozen fixture).** This file stays because it is the reasoning the
 two items cite rather than repeat — the option set, the prior art and the

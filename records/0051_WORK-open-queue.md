@@ -7,11 +7,11 @@ description: "The live queue's discipline has one home, and this is it. Fifty-ei
 status: accepted
 date: 2026-09-13
 feature: the discipline of the single live work queue — its rules, its markers, and the three tests that enforce them
-owns: [tests/test_open_work_rows_are_short.py@01fe412431ad, tests/test_open_work_is_not_stale.py@f117a1469989, tests/test_no_work_item_is_lost.py@3c6a033612b2]
+owns: [tests/test_open_work_rows_are_short.py@01fe412431ad, tests/test_open_work_is_not_stale.py@f117a1469989, tests/test_no_work_item_is_lost.py@c6a42118bf27]
 laws: [L0]
 ratifies: W-146 ruling 1 · Arpit 2026-09-13 (archive, never delete)
 timestamp: 2026-09-13T00:00:00Z
-content_sha: 281f859669a437150ee8ac0f661f34fc8b035d0549542c099d943a4c48cb54d0
+content_sha: 1a4e36a3d686f66cb75188c6861f7f43adc3466436d403d46071358842c732fd
 ---
 
 # SR-WORK-OPEN-QUEUE — how OPEN-WORK works
@@ -392,6 +392,17 @@ both `↳ blocks:` checks validating a single row for two days, green throughout
    the per-file map is
    [`archive/README.md`](../archive/README.md) §*Recovered 2026-09-13*, and the
    outcome is [`work/IMPLEMENTATION.md`](../work/IMPLEMENTATION.md).
+
+   ⚠ **That gate's own anti-vacuity floor fired on correct content on
+   2026-09-20 and was rebuilt.** It asserted *more than five live items* — a
+   guard against a collector that matches nothing — and W-201 and W-203
+   archiving into W-205 took the queue to exactly five. **A floor on the number
+   of open rows grades the opposite of rule 3**, whose whole claim is that the
+   file's length is the signal of what is pending; taken literally it makes
+   finishing work a test failure. The live half is now checked **structurally**
+   — every `W-nn-…md` on disk is collected, whatever the count — which a broken
+   regex fails and an empty queue does not. The archived floor stays a number,
+   because rule 54 forbids `archive/open/` from ever shrinking.
 
 8. **A 🟡 row names the item it waits on, or says there is none** (Arpit,
    2026-09-15) — rule 23a. The queue already required a 🟡 row to say *what* it

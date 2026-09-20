@@ -7,6 +7,21 @@ filed: 2026-09-14
 ball: agent
 ---
 
+## ✅ RULED 2026-09-20 (Arpit, Cowork) — step 2 leaves this item
+
+*"W-168 — I agree, let's go with the recommended approach."* So: **Codex adds
+identifiers of the failing shape** (shared prefix + short number — `RF-118 /
+RF-119 / RF-120`, `PROJ-123 / PROJ-124`) **to the seed with W-191's link-bearing documents, so the ladder is rebuilt
+once. Later the same day: Claude authors both as set 3** — W-204 input **I-2** —
+and no step here waits on Codex.
+
+**Step 2 (the exact identifier field) is no longer here** — it is part 2 of
+[W-205](W-205-identifiers-reachable-and-whole.md), merged with the frontmatter
+and analyzer defects on Arpit's ruling that they are one subject. Steps 3–10
+stay. **Ball → 🟡, waiting on W-204** (every remaining step needs a golden
+question or document that only that item's inputs produce).
+
+
 # W-168 — the ten search improvements, one program
 
 **Model: Opus for #4, #8, #9, #10 (drift, bias, a plane change); Sonnet for the rest once
@@ -42,7 +57,7 @@ over the seed, no key) and ran the baseline on rung-00100, 01000 and 10000:
   the failing shape (a shared prefix + short number, `PROJ-123`) in the seed.
 - 🔴 **The absolute misses are frontmatter-only identifiers**, unindexed by
   `parse.py`'s meta/body split — a different defect, filed as
-  [W-201](W-201-frontmatter-scalars-not-indexed.md).
+  [W-201 → W-205](W-205-identifiers-reachable-and-whole.md).
 
 **Step 2 stays stopped, for the corrected reason.** Prompt 8 is withdrawn as
 the unblock; the unblock is a seed with the failing shape, which is a Codex
@@ -102,7 +117,7 @@ nothing for them.
 
 ### ✅ Research filed 2026-09-18, GRADUATED 2026-09-20 — [`proposals/identifier-exact-match.md`](../proposals/identifier-exact-match.md)
 
-🔴 **It is now two items, and neither is step 2.** [W-203](W-203-identifier-analyzer-defects.md)
+🔴 **It is now two items, and neither is step 2.** [W-203 → W-205](W-205-identifiers-reachable-and-whole.md)
 carries the two analyzer defects and the four families, **waiting on this item** — not on a
 design question, on a seed corpus of the failing shape. [W-202](W-202-identifier-analyzer-gate.md)
 is 🟢 and waits on nothing: freeze what the analyzer does to the 33 ids as a test, so any

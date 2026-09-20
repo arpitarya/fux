@@ -24,9 +24,9 @@ the half that waits on nothing.
 ## Why it earns a row of its own
 
 **Every other identifier thread is blocked and this one is not.** W-168 step 2
-needs a seed corpus of the failing shape; [W-201](W-201-frontmatter-scalars-not-indexed.md)
+needs a seed corpus of the failing shape; [W-201 → W-205](W-205-identifiers-reachable-and-whole.md)
 needs Arpit's ruling on which frontmatter keys are indexed;
-[W-203](W-203-identifier-analyzer-defects.md) waits on W-168. **None of them can
+[W-203 → W-205](W-205-identifiers-reachable-and-whole.md) waits on W-168. **None of them can
 be measured against a before-state that is not written down**, and the
 before-state currently lives in two regression reports that disagree with each
 other.

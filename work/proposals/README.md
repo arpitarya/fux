@@ -73,7 +73,7 @@ the defect this ordering exists to make visible.*
   2 as written · trigram/sparse-gram planes, out of scope) and argues **(a) is a
   precondition of (c), not an alternative**. Proposes **gate A**, an
   analyzer-survival before/after that needs no Codex output.
-  ✅ **GRADUATED 2026-09-20 → [W-203](../open/W-203-identifier-analyzer-defects.md)**
+  ✅ **GRADUATED 2026-09-20 → [W-203 → W-205](../open/W-205-identifiers-reachable-and-whole.md)**
   (the defects and the families) **and [W-202](../open/W-202-identifier-analyzer-gate.md)**
   (the frozen fixture). Kept here as the argument the two items cite.
 

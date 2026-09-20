@@ -10,6 +10,8 @@ filed: 2026-09-18
 ball: arpit
 ---
 
+> 🔴 **MERGED INTO [W-205](W-205-identifiers-reachable-and-whole.md) on 2026-09-20 (Arpit).** This row left the queue; the work continues there. This file is history from that date — the archive move (queue rules 54–58) is owed by the next Claude Code change.
+
 # W-200 — a `doc_id:` you can read is not one you can search
 
 **Model: Opus for the ruling's spec; Sonnet to build once ruled** — it is a
