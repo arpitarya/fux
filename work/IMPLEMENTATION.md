@@ -30,6 +30,83 @@ Rules:
 
 
 
+## 2026-09-20 — **W-204 phase A: the whole ladder's outputs at one frozen engine, and two repairs the rungs needed before they would load**
+
+**Shipped:** [`tools/quality-controls/rung_outputs.py`](../tools/quality-controls/rung_outputs.py)
+(+ 20 tests) · three additive changes to [`golden_run.py`](../tools/quality-controls/golden_run.py).
+**Evidence:** [`2026-09-20-golden-ladder-outputs`](regression/2026-09-20-golden-ladder-outputs/report.md)
+— 3 984 calls, eight rungs, both sets, `classification: informed`.
+**Items:** [W-204](open/W-204-golden-outputs-scoring-and-version-benchmark.md) phase A **done**; its row stays 🟢 for phase B.
+Eight absorbed items archived: W-136, W-87, W-190, W-195, W-191, W-176, W-161, W-175.
+**Records touched:** [SR-RS](../records/0133_predictions.md) (a paragraph for the new reporting artifact, `owns:` re-stamped);
+SR-WORK-QUALITY and SR-WORK-GOLDEN re-stamped; ten records repointed off the archived items.
+
+🔴 **The deliverable files no score, and that is the point.** One
+`RUNG-NNNNN.md` per rung — id, question, top-10 `ask` locators with band and
+`answerable`, the answer text or the decline, the cited locators, the freshness
+verdict — **and no correctness column anywhere.** *Correct* is phase D's, after
+Arpit opens the key. The document is **generated** from the same hand-off rows
+phase D will score, so the readable artifact cannot drift from its evidence;
+a test asserts that no question section ever carries a verdict.
+
+🔴 **Neither rung would load at HEAD, and both repairs were declared before the
+first call rather than discovered during it.** Every rung's `fux.toml` carried
+`meta = "hashed"`, which HEAD **refuses by name** after W-194 — `fux doctor`
+failed on it and the corpus was unreadable. And every rung's `.fux/tune.toml`
+had held `b = 0.75` since 2026-09-12: **W-144's upgrade trap, observed in the
+wild** — `fux setup` writes `b` out in full, so a repository set up before the
+ruling keeps the old value forever. The run set all eight to HEAD's measured
+`0.15`.
+
+🔴 **Which surfaced a defect in a filed run, and it is Arpit's to rule.** The
+2026-09-16 `rung-00100` run states `b = 0.15` in **both** its frozen
+pre-registration and its report, while that rung's `tune.toml` held `0.75`
+before it and holds it now, unmodified, and prompt 5's command line carries no
+`--no-tune`. **The filed report was not edited** — a filed measurement is
+frozen. ⚠ **And it can no longer be re-run**: this run's own re-ingest
+overwrote the v3 index the check would need, which is itself a reason the
+ruling is his rather than a session's.
+
+**Two findings that reproduce across a 500× corpus range**, at a different `b`,
+a different index format and a different engine than the run that first saw
+them — which is worth more than either original observation:
+
+- **`band: weak` ⇔ `answerable: false`, 3 984 of 3 984 rows, no exception.**
+  Band and decline carry one number, so a reader comparing them compares a
+  thing with itself.
+- **Set 2 declines more than set 1 at every rung**, 7.7 to 17.1 points, widening
+  with corpus size. 🔴 **Not a claim that either set is better or harder** —
+  only a key separates *more unanswerable questions* from *worse recall on set
+  2's phrasing*.
+
+**One finding that is new**, and it is about the confidence band: from 100
+documents up, **every** band transition is `grounded ↔ weak` — **43 of 43** —
+and the `partial` set is byte-identical at all seven rungs. It lost members
+once, on the 20 → 100 step, and **gained one at no point in the ladder.** The
+operative gate is binary and `partial` responds to nothing the ladder varies.
+⚠ **Whether that is a defect or the design is SR-CONFIDENCE's**, and a run with
+no key cannot tell a well-behaved invariant from a dead branch — so it is filed
+as a question, not a verdict.
+
+⚠ **Nothing else looked wrong, and that is a statement about the RUN**: 0 empty
+ranked lists in 3 984, 0 uncited and 0 null answers in 1 992, freshness
+`current` on all 1 992, 0 failed calls. A confidently wrong answer is
+indistinguishable from a confidently right one from here.
+
+⚠ **The re-ingest is filed as a step of the run, not hidden.** v3 → v4 forced
+it, and **`--no-fetch` alone is refused** — the engine names `--full` as the
+only route across a format bump. All eight ladder stamps re-written; every
+`index_root_sha256` moved, as the pre-registration predicted.
+
+⚠ **A process defect worth the line:** the archive move broke a frozen verdict's
+pointer (`2026-08-27-p3-sha-stability/VERDICT.md` → the now-archived W-87), and
+`tests/test_regression_runs.py` — which catches it — was not among the five
+tests the session was told to run. Repaired as that test prescribes: the
+pre-registration **mirrored** into the run at its nearest committed state, the
+verdict untouched, the `≥ 80 %` threshold byte-identical in both versions.
+**Closing an item can invalidate a frozen artifact three directories away, and
+only the whole suite sees it.**
+
 ## 2026-09-20 — **W-200: one runtime line per consumed document, and the spec's own path was L8's journal**
 
 **Shipped:** [`src/fux/ingest/ingestlog.py`](../src/fux/ingest/ingestlog.py) ·
