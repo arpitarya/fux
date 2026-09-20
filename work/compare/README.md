@@ -19,16 +19,29 @@ which, it is a proposal.
 become *true* for the comparison to be worth redoing, in terms someone can
 check today. A trigger phrased as an event to await never fires.
 
-The verdict block sits at the **top** of every doc — status, the call,
+**The verdict block sits at the top of every doc** — status, the call,
 confidence, and the reopen-trigger — so a reader gets the decision without the
 debate, and the debate without archaeology. v0.26-era compare docs are archived
 at [`archive/v0.26-docs/compare/`](../../archive/v0.26-docs/compare/).
 
-One doc per genuine fork in the v0.30 design. **The verdict block sits at the
-top of every doc** — status, the call, confidence, and the reopen-trigger —
-so a reader (human or agent) gets the decision without the debate, and the
-debate without archaeology. v0.26-era compare docs are archived at
-[`archive/v0.26-docs/compare/`](../../archive/v0.26-docs/compare/).
+🔴 **Eight live forks, down from 24 on 2026-09-20**
+([W-206](../open/W-206-compare-and-proposals-sweep.md)). **Sixteen left**, and
+the split is worth knowing before you go looking for one:
+
+- **Nine were MERGED into their owning record** — the verdict and the
+  reopen-trigger both live there now, so the row in
+  [`archive/compare/README.md`](../../archive/compare/README.md) says *"the
+  trigger lives in `<record>` `<decision>`"* rather than why it cannot fire.
+  **The fork is still checkable; it is checkable somewhere better.**
+- **Seven had triggers that can no longer fire** — a premise that died, a
+  precondition that was deleted, a target above the measurement ceiling.
+
+⚠ **Two of the nine needed a PORT before they could move**: `index-lock`'s
+NFS/SMB trigger was absent from [SR-LOCKS](../../records/0140_locks.md) and
+`maintenance-trigger`'s half-written-shard condition was absent from
+[SR-MAINTENANCE](../../records/0129_hooks.md). Archiving first would have
+deleted the only written statement of each — which is why the rule is *port,
+then move*, in that order and in one change.
 
 | doc | fork | verdict | status |
 |-----|------|---------|--------|

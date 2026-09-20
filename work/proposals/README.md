@@ -21,7 +21,10 @@ stops being parked. Without one it is a wish, and it will sit here forever.
 row carries the graduation trigger and nothing else, and it is filed and deleted
 in the same change as the proposal ([SR-WORK-BACKLOG](../../records/0055_WORK-backlog.md)
 rules 6 and 27). A proposal whose remainder has become a `W-nn` carries no row —
-`structure-aware-extraction.md` (W-144) and `search-improvements-v3.md` (W-168) are the two today.
+`search-improvements-v3.md` (W-168) is the only one today. ⚠ **It was one of two
+until 2026-09-20**, when `structure-aware-extraction.md` archived: W-144 closed
+2026-09-16 and its boundary argument moved into
+[SR-DECODE](../../records/0139_decode.md) §Alternatives.
 
 Per OKF, every file here carries frontmatter:
 
@@ -77,6 +80,22 @@ the defect this ordering exists to make visible.*
   (the defects and the families) **and [W-202](../../archive/open/W-202-identifier-analyzer-gate.md)**
   (the frozen fixture). Kept here as the argument the two items cite.
 
+* [The fetcher pipe — a URL line declares its fetcher AND its decoder](fetcher-routing.md)
+  — Arpit's ruling of **2026-09-18**: a fetcher emits bytes in a format a decoder
+  reads, the decoder turns them into Markdown, and the URL line states **both**
+  halves — `fetch=<stem> decoder=<stem>` — written once at `fux add` and never
+  re-derived. §2 is the pattern, §3 the **sixteen** edge cases.
+  ✅ **GRADUATED 2026-09-18 → [W-199](../open/W-199-fetcher-routing.md).**
+  ⚠ **It had NO row here until 2026-09-20** — the defect this index's ordering
+  note exists to make visible, found by [W-206](../open/W-206-compare-and-proposals-sweep.md).
+  🔴 **Reconciled in the same change: this file and W-199 are ONE spec.** Arpit
+  ruled twice, two days apart, and the rulings compose — the **pipe** (this
+  file) and **routing** (W-199 D1–D4, 2026-09-20). Its §3 edge case 14 said
+  `ROUTES` was *"dropped by this ruling"*; true of the pipe ruling and
+  **superseded** by the routing one, so it now carries the note.
+  **Kept here, not archived:** the `decoder=` half is **W-199 DoD line 10 and is
+  not built**. Routing shipped 2026-09-20.
+
 ## Filed 2026-09-15
 
 * [Glassbox sessions — event streams as a fux corpus](glassbox-sessions.md) —
@@ -105,27 +124,6 @@ the defect this ordering exists to make visible.*
   git-derived authority prior, an intent → doc-type prior, section-level units. Each
   graduates alone, behind W-156, with its own golden question and pre-registration.
 
-## Filed 2026-09-11
-
-* [Positioning — written knowledge, not code](../../archive/proposals/positioning-documents-not-code.md)
-  — ✅ **`graduated`: RULED AND APPLIED by Arpit 2026-09-12.** Why fux was filed
-  next to AST/code-graph tools: **it parses no code and, by default, indexes
-  none** (`.py` → *not an indexed file type*); the misfiling traced to
-  v0.1–v0.26, which did, plus *"AI-assisted codebases"*, the `codebase`
-  keyword, the *Quality Assurance* classifier and the paper's non-existent
-  *symbol edges*. **All six surfaces fixed**, plus the agent templates.
-  🔴 **Arpit overruled the proposal's own framing** — it said *"the documents
-  around your code"*, which keeps code as the reference point; the shipped
-  tagline is *"A search index for your written knowledge"*, with no "code",
-  "codebase" or "organization" in it. §5's `code`→`path` rename was **declined**
-  in favour of a glossary definition. §6 went to **option (b)**: the ALL-CAPS
-  exemption is retired, 18 trackers typed, evidence and sealed golden data
-  declared outside the bundle, frozen pre-2026-08-25 runs exempt by the repo's
-  own baseline — and `tests/test_okf_bundle.py` now gates it (237 docs, 0
-  failures) so the claim and the tree cannot drift again.
-  **Kept here, not archived:** GitHub About/topics still need Arpit's `gh`, the
-  PyPI page changes only on the next upload, and §5's rename is a live fork.
-
 ## Filed 2026-08-28 — two reviews
 
 ⚠ **Both are findings to verify, not landed facts, and each says so.** Neither
@@ -146,19 +144,6 @@ re-derives its claims first.
   run**, so every P0/P1 is to reproduce. **Graduates item by item as each is
   verified on the real tree.**
 
-## Filed 2026-08-26
-
-* [Structure-aware extraction](../../archive/proposals/structure-aware-extraction.md) — tables, code
-  fences and lists as **fields, not decoders**. By the time a decoder finishes,
-  a table **is already Markdown**, and weighting it is `extract.py`'s job.
-  ⚠ **The boundary is the load-bearing part:** in decoders, every
-  consumer-owned decoder re-implements ranking policy in code fux cannot test
-  or version; in `extract.py`, one implementation and every format inherits it
-  free. Names the strongest concrete suspicion — **table cells inflate `flen`,
-  so BM25 length normalisation makes a table-heavy document read as denser than
-  it is**. **Graduates when W-86's P4 (OOXML) lands**; a ranking change then
-  needs a pre-registration and a verdict at 10 000 documents, never an argument.
-
 ## Filed 2026-08-22
 
 * [Ranking tuning, and the utility that would do it](ranking-tuning.md) —
@@ -177,10 +162,16 @@ re-derives its claims first.
   is *"≥ 50 committed judgments on a fux corpus **and** a ranking decision
   waiting on them"* (§9); the hybrid default is named one paragraph later as
   *the candidate that would trip it first*, not as the condition. **The
-  condition is alive**: the decision waiting on it is **W-97**, and what it
-  needs is 50 judgments on a corpus that is still an instrument —
-  [SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md) voided the playground, so
-  that is W-136's golden data. Pre-registration:
+  condition is alive**, and ⚠ **both items it named are gone** (repointed
+  2026-09-20): **W-97 is archived** and **W-136 merged into W-204**. The
+  condition itself is unchanged — *50 judgments on a fux corpus and a ranking
+  decision waiting* — and both halves now sit in one place:
+  [W-204](../open/W-204-golden-outputs-scoring-and-version-benchmark.md)'s
+  scoring pass is where judgments arrive, and phase D's per-query rows are what
+  the next ranking decision waits on.
+  [SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md) voided the
+  playground, so the golden ladder is the only corpus this can run on.
+  Pre-registration:
   [`../benchmark/PRE-REGISTRATION-TUNER.md`](../benchmark/PRE-REGISTRATION-TUNER.md).
   **Kept here, not archived:** [SR-LAWS](../../records/0001_LAWS.md) and
   [SR-TUNE](../../records/0135_tuning.md) both cite its §8 survey in their
@@ -195,18 +186,6 @@ re-derives its claims first.
   a trigger is remembered*. **Graduates if a measured warm p95 exceeds 150 ms**
   — a number, never a corpus size. ⚠ Two frozen files still cite it as an SR
   and always will; see its head.
-
-## Filed 2026-08-10
-
-* [Agent search-API landscape](../../archive/proposals/agent-search-landscape.md) — research note, not
-  a build item: Parallel / Perplexity / Exa / Brave independently arrived at
-  three index-and-refer decisions, and the corpus they *cannot* reach names
-  Fux's wedge. **The evidence base the refer-plane proposals cited.**
-  *(Both of those graduated and were archived 2026-08-20 when M4's core landed;
-  their live successor is [SR-REFER](../../records/0127_refer-plane.md). One
-  shipped with its central knob deliberately refused — the reasoning is in the
-  record and the open question is
-  [W-58](../../archive/open/W-58-no-recorded-ingest-time.md).)*
 
 ## Filed 2026-08-09 — for the v0.30 architecture
 
@@ -225,17 +204,6 @@ re-derives its claims first.
 Both are *strengthened* by the v0.30 index-and-refer rebuild: the MST keyspace
 gives them their substrate natively.
 
-* [Research-to-Spec](../../archive/proposals/research-to-spec.md) — evidence-backed specs; every claim
-  cites the corpus at a commit.
-* [Knowledge diff & time-travel](../../archive/proposals/knowledge-diff.md) — `fux diff` / `fux log`;
-  ask questions of past knowledge. A natural fit for the one-root-hash keyspace.
-
-*(The third survivor, **audit evidence trail**, graduated 2026-08-27 into
-[SR-PROVENANCE](../../records/0142_provenance.md) and was **archived
-2026-09-05** — see below. The fourth idea from that ideation, the
-**product-memory corpus**, graduated into the v0.26 plan; its successor concept
-is the committed index + ledger of the current architecture.)*
-
 ---
 
 # Left this directory
@@ -247,6 +215,12 @@ backing a live claim.
 
 | left | when | why, and the live successor |
 |---|---|---|
+| [`quality-endpoint-for-reranking.md`](../../archive/proposals/quality-endpoint-for-reranking.md) | 2026-09-20 | **Its trigger fired, then its successor closed FAIL.** The [screen](../regression/2026-09-15-quality-endpoint-screen/VERDICT.md) returned `agreement` **0.4141** against a chance rate of 0.0748, inside a band frozen one commit earlier; it graduated into **W-154**, and W-154 closed **FAIL** 2026-09-16 — proximity reranking does not earn its latency on `ask`. ⚠ **`archive/README.md` called it a *live successor* of W-183 until the day it archived.** Live successors: [W-154's FAIL](../regression/2026-09-16-rerank-quality-b2/VERDICT.md) · the screen's verdict |
+| [`structure-aware-extraction.md`](../../archive/proposals/structure-aware-extraction.md) | 2026-09-20 | **Graduated → W-144, closed 2026-09-16.** Its suspicion — table cells inflating `flen` — was measured and answered, but **not by the fields it proposed**: by lowering `b` to `0.15`, the first measured default in [SR-RANKING](../../records/0111_ranking.md) decision 3. 🔴 Its load-bearing half, the argument that **consumer decoders owning ranking policy is a worse defect than a missing field**, lives in [SR-DECODE](../../records/0139_decode.md) §Alternatives — which is where that record's Reference block was repointed, since an archived doc may not back a live claim |
+| [`agent-search-landscape.md`](../../archive/proposals/agent-search-landscape.md) | 2026-09-20 | ⚠ **Its keep-reason was false.** It was held because *"two live records ground on it"*; only [`BIBLIOGRAPHY.md`](../../records/BIBLIOGRAPHY.md) §11 names it, and a bibliography naming an archived document is exactly what SR-WORK-ARCHIVE decision 4 permits. The research stands: four agent search APIs independently arrived at three index-and-refer decisions. Live successors: `BIBLIOGRAPHY.md` §11 · [SR-REFER](../../records/0127_refer-plane.md) |
+| [`positioning-documents-not-code.md`](../../archive/proposals/positioning-documents-not-code.md) | 2026-09-20 | **All six surfaces shipped**, and Arpit **overruled the proposal's own framing**: it argued *"the documents around your code"*, which keeps code as the reference point, and the shipped tagline is *"A search index for your written knowledge"*. §5's rename was declined **by the file itself**; §6 went to option (b) and `test_okf_bundle.py` gates it. ⚠ **One line is left and it is not a reason to keep the file: GitHub About/topics is Arpit's `gh`** |
+| [`knowledge-diff.md`](../../archive/proposals/knowledge-diff.md) | 2026-09-20 | **No graduation trigger — a wish**, which this file's own rule forbids, and its backlog row said so. 2026-07 era, before the rebuild. 🔴 The primitives it wanted shipped 2026-08-27 as [SR-PROVENANCE](../../records/0142_provenance.md): `--receipt`, `--audit`, `ask --why`, `fux verify`. What it does **not** give is time-travel over past commits — a new decision, not this file's remainder |
+| [`research-to-spec.md`](../../archive/proposals/research-to-spec.md) | 2026-09-20 | **Same shape, same era, same answer** — no trigger, 2026-07, evidence-backed specs where every claim cites the corpus at a commit, which is what a receipt is. Live successor: [SR-PROVENANCE](../../records/0142_provenance.md) |
 | [`search-v3-claude-code-prompt.md`](../../archive/proposals/search-v3-claude-code-prompt.md) | 2026-09-12 | **Executed in full on 2026-09-05** — Arpit ratified `search-v3.md` §8 through it and five of the seven items closed. It said so itself: *kept... not because anything in it is still to do*, which is this file's own definition of archivable. No live document cited it. Live successors: [`search-v3.md`](../../archive/proposals/search-v3.md) for what remains, and **W-107** and **W-112** |
 | [`audit-evidence-trail.md`](../../archive/proposals/audit-evidence-trail.md) | 2026-09-05 | **Graduated 2026-08-27 → [SR-PROVENANCE](../../records/0142_provenance.md)**; `fux answer --audit`, `--receipt`, `--journal`, `ask --why` and `fux verify` all shipped. It then sat here nine days against this file's own lifecycle rule — **the move was late, the decision never changed.** ⚠ Its graduation trigger, *an enterprise design partner materializes*, **never fired and could not**: it waited on somebody else's arrival rather than naming a condition anyone here could check |
 | [`node-search-port.md`](../../archive/proposals/node-search-port.md) · [`agent-run-embeddings.md`](../../archive/proposals/agent-run-embeddings.md) · [`retrieval-quality-per-verb.md`](../../archive/proposals/retrieval-quality-per-verb.md) | 2026-09-05 | **Superseded 2026-09-04** by [`search-v3.md`](../../archive/proposals/search-v3.md), which folded all three in whole. Live successors: **W-107**, **W-112**, and **W-108 … W-111**. ⚠ `search-v3.md` said they were *"deleted in the same change"* — **they never were**, and they sat here unindexed for two days |
