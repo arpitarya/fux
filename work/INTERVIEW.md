@@ -35,6 +35,38 @@ valuable judgement, but not the state of play.
 *Updated **2026-09-20** (Claude Code, the three green rows).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
+### 📁 `work/compare/` AND `work/proposals/` WERE SWEPT (2026-09-20, Claude Code, last)
+
+**If you are looking for a compare doc or a proposal and cannot find it, it
+moved.** W-206: **compare 24 → 8, proposals 17 → 10**. Sixteen and six went to
+`archive/`, each with a row naming its live successor.
+
+- **Nine of the sixteen were MERGED into their owning record**, not closed. Their
+  verdict *and* reopen-trigger live in the record now, and
+  [`archive/compare/README.md`](../archive/compare/README.md) carries a **second
+  permitted form** of its move sentence — *"the trigger lives in `<record>`
+  `<decision>`"* — added on Arpit's default. **Without it those nine would have
+  stayed live for ever precisely because their triggers were checkable.**
+- 🔴 **Port, then move, in that order and in one change.** Two triggers existed
+  *only* in a doc about to archive: SR-LOCKS veto 4 (NFS/SMB, where `O_EXCL` is
+  racy) and SR-MAINTENANCE veto 10 (a failed re-index leaving a half-written
+  committed shard).
+- ⚠ **A link into `archive/` is fine; a claim grounded there is not.**
+  [SR-WORK-ARCHIVE](../records/0062_WORK-archive.md) decisions 4–5, and 17
+  files' links were repointed on exactly that basis.
+
+**Three traps this sweep hit that the next one will too:**
+
+1. 🔴 **Archiving a doc can break a frozen verdict three directories away**, and
+   **`test_doc_links` cannot see it** — `work/regression/**` is frozen-by-law
+   and exempt. **Only the whole suite catches it.** Twice in two sessions now.
+2. ⚠ **`src/fux/decode/*.py` are VERSIONED.** A docstring edit bumps the
+   decoder's version and invalidates carry-forward for every document of that
+   type in every repo. `csv.py` keeps a stale link on purpose.
+3. ⚠ **`work/DOC-REGISTRY.md` rule 1 forbids a row pointing into `archive/`**,
+   including for `archive/README.md` itself. A work item asked for one; the rule
+   won, and the reason is recorded beside the rule.
+
 ### 🔴 THE DAY'S RULINGS ARE BUILT, AND ONE THING IS NOT (2026-09-20, Claude Code, later)
 
 **What a session arriving cold most needs from this day, in order:**
@@ -866,7 +898,7 @@ sibling*, which is a `hit@1` question against a key — **W-136 phase 5's job**.
 part: the shipped ranker starts losing between a table share of **0.26 and
 0.29**, against a ladder median of **0.344**. 🔴 **It does not ship**: one
 synthetic corpus may not move a ranking default, so it is
-[a compare doc](compare/table-tokens-in-flen.compare.md) with a proposed verdict
+[a compare doc](../archive/compare/table-tokens-in-flen.compare.md) with a proposed verdict
 and a gap named out loud — **no probe has a table that IS the answer**, so a rate
 card whose subject is its rows is untested and is what a reviewer should press on.
 
@@ -1132,7 +1164,7 @@ by agents.*
 - 🔴 **On Arpit's hands:** `pytest -q` on the Mac (the device VM is 3.10, no
   pytest), and the **GitHub About + topics**, which still carry the old
   positioning and are a strong classifier signal.
-- **Full record:** [`proposals/positioning-documents-not-code.md`](proposals/positioning-documents-not-code.md),
+- **Full record:** [`proposals/positioning-documents-not-code.md`](../archive/proposals/positioning-documents-not-code.md),
   graduation block at the top.
 
 ### The golden key is Claude's, and that is a known defect (2026-09-12, Cowork)
@@ -2174,7 +2206,7 @@ as a **new item with a new id** if wanted.
 **No code moved. Three findings did.** Arpit asked whether fux could interpret
 PDFs, decks, spreadsheets, JSON and YAML;
 [W-86](../archive/open/W-86-the-decoder-plane.md) is the plan, and
-[`compare/index-lock.compare.md`](compare/index-lock.compare.md) is the lock
+[`compare/index-lock.compare.md`](../archive/compare/index-lock.compare.md) is the lock
 fork he told the session to research and call itself.
 
 1. **The decoder plane already exists, in the wrong place, twice.**
