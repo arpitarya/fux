@@ -10,7 +10,7 @@ feature: the index write lock and the files around it
 owns: []
 laws: [L1, L2, L3, L7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 50aa85d4df5b19464568b7b5951b53c932a1e7f99a68fe02f28fcc9fe0949f10
+content_sha: 347f54c6067b39c6e6abe564d739a5fc79aa5fcc5bc60f54f9f335618e979820
 ---
 
 # SR-LOCKS — the one lock fux owns
@@ -222,6 +222,21 @@ the takeover reporter and the `required=True` refusal all print it.
 2. A read verb acquires or waits on a lock.
 3. The lock stops being gitignored — i.e. a `write.lock` could reach a commit,
    which would put a pid inside the committed plane and break L3.
+4. 🔴 **A consumer runs `fux` against a repo on a NETWORK FILESYSTEM** — NFS,
+   SMB, a mounted enterprise home directory. **`O_EXCL` is documented as racy on
+   NFS**, so the pid-file mutex stops being sound the day that is a supported
+   surface, and decision 1's whole argument — *one syscall, no read-then-write
+   window* — is a claim about local filesystems only.
+
+   ⚠ **Ported from [`index-lock.compare.md`](../archive/compare/index-lock.compare.md)
+   on 2026-09-20** (W-206 A2), where it had been the fork's reopen-trigger and
+   was **absent from this record**. The compare doc archived in the same change;
+   the trigger had to land here first or archiving it would have deleted the
+   only written statement of it.
+
+   **It is checkable today, and not by grepping `src/`** — no code change makes
+   it true or false. The check is *asking where a pilot's repo lives*, which is
+   why there is no capture for it below.
 
 **How to check them:**
 

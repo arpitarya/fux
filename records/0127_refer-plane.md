@@ -7,10 +7,10 @@ description: "Fux still does not fetch — the refer plane reuses the consumer-f
 status: accepted
 date: 2026-08-20
 feature: the refer plane — fetch, verify, chunk, re-score, assemble
-owns: [src/fux/refer@30eed86dbb60, tools/refer-bench@cfdb47b24af2, tools/refer-budget-sweep@db9ff8233332]
+owns: [src/fux/refer@51ebc07f901d, tools/refer-bench@cfdb47b24af2, tools/refer-budget-sweep@db9ff8233332]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: ea64d0bdbaa909944fc131a87da80859edc2055ba97ba3178e3f524c12409913
+content_sha: d6b6e84550d021d583cf154fd99fdc1137bc6c544c3a746e3893f95786114770
 ---
 
 # SR-REFER — the refer plane

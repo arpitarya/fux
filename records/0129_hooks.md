@@ -10,7 +10,7 @@ feature: maintenance — the hooks, the deferring runner, the write lock, and th
 owns: [src/fux/maintain@6e92e762b4c4, tools/maintenance-bench@23a6ade137a5, tools/runner-race@98bd70ff092a]
 laws: [L3, L4, L5, L7]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 57eb5ef596eb22a95e0b84926f37a76cca9c505d973b50652d7b6b909059f8a4
+content_sha: 30fec48f9451eec5bc014cddb47f9bc57a4ef5bb94781c1b4b3ffb996ea10a5b
 ---
 
 # SR-MAINTENANCE — keeping the index in step
@@ -802,7 +802,26 @@ re-index; and that the successor is spawned carrying the marker at all).
    check is a positive control precisely because `"ok"` was reported by a sweep
    that did nothing for a day. If the end-to-end capture is ever replaced by a
    mock-only gate, this fires.
-10. **A hook-driven test passes with `fux` unreachable on `PATH`.** The hook's
+10. 🔴 **A failed re-index leaves a HALF-WRITTEN committed shard.** The whole
+    deferral bet is that an interrupted background run costs nothing but a stale
+    index — a *stale* index is still a readable one. A shard written partially is
+    not: it is a committed byte nobody can read, on the one plane the repository
+    commits.
+
+    ⚠ **Ported from [`maintenance-trigger.compare.md`](../archive/compare/maintenance-trigger.compare.md)
+    on 2026-09-20** (W-206 A2), where it was one of three reopen conditions and
+    was **the only one this record did not already carry** — R5's half fired on
+    2026-08-20 and was answered by the deferring hook, and R6's half is the merge
+    harness. ⚠ **That doc cites the deferral as "decision 1d"; this record numbers
+    it 1a**, and 1a is the one it means. The compare doc archived in the same
+    change, so the trigger had to land here first.
+
+    **It is adjacent to veto 5** — *"a stop leaves a partial shard"* — and not the
+    same condition: veto 5 is about a **cooperative stop** being a kill, and this
+    is about a **failure** at any point, stop or not. Both are checkable in
+    `tests_e2e/test_maintenance.py`.
+
+11. **A hook-driven test passes with `fux` unreachable on `PATH`.** The hook's
     first line is `command -v fux >/dev/null 2>&1 || exit 0`, so an absent
     install turns every hook into a no-op that reports success.
     `tests_e2e/test_maintenance.py::test_the_hook_environment_can_actually_find_fux`

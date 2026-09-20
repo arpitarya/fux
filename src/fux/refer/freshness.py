@@ -24,19 +24,28 @@ The proposal's shape was `{max_age_seconds, timeout_seconds}`, with age
 measured "against the ledger's recorded `sha@index` provenance, not wall clock
 at query time".
 
-**There is no such provenance.** A committed record carries
-`id · src · loc · sha · ver · mode · meta · title · phrases · terms · wlen ·
-edges` (SR-RECORD) — `ver` is a monotonic revision counter, not a time, and
-nothing else in the record is temporal. `.fux/runtime/stamp.json` holds
-filesystem mtimes but is derived and *explicitly excluded* from the
-byte-identity assertion precisely because mtimes are not reproducible.
+🔴 **This paragraph used to say "there is no such provenance" and that has been
+WRONG since 2026-08-25.** A committed record carries **`mtime`**
+([SR-RECORD](../../../records/0109_index-record.md)) — git's commit time for the
+document, present whenever git could supply one — so the engine *can* compute an
+age now, and the original reason for not shipping `max_age_seconds` is gone.
+The stale text survived because the compare doc it was reciting
+([`record-freshness`](../../../archive/compare/record-freshness.compare.md),
+archived 2026-09-20) was never re-read after the field landed. **Corrected under
+W-206.**
 
-So the engine cannot compute an age, and shipping `max_age_seconds` would mean
-shipping a knob that silently does nothing — the worst available outcome,
-because a caller passing `max_age_seconds=60` would reasonably believe they had
-bounded their staleness. Adding a recorded ingest time is a change to
-SR-RECORD with a real determinism question attached (it would have to derive
-from `SOURCE_DATE_EPOCH` or source mtime), and that is its own decision.
+**What remains true is the narrower half**, and it is still why the knob is not
+here: `mtime` is **git's** time, not fux's record of when it last *looked*.
+`max_age_seconds` as the proposal meant it — *"age against the ledger's recorded
+`sha@index` provenance"* — still has no field behind it, because nothing records
+when a citation was last verified. A knob keyed on `mtime` would answer *"how
+old is this document"*, which a caller asking *"how stale is my answer"* would
+reasonably misread, and shipping a knob that silently answers a different
+question is the worst available outcome.
+
+⚠ **So this is now a decision, not an impossibility.** Adding a verified-at time
+is a change to SR-RECORD with a real determinism question attached, and that is
+its own call.
 
 **Filed as W-58.** What ships is what can be honest:
 

@@ -7,10 +7,10 @@ description: "How fresh a url: citation is, said in six positions that never col
 status: accepted
 date: 2026-09-01
 feature: the freshness verdict vocabulary and the per-URL check interval
-owns: [src/fux/refer/freshness.py@6757eeeba7c6]
+owns: [src/fux/refer/freshness.py@c2205bbff313]
 laws: [L2, L3, L4]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 5387dd6091ca42f130bf055aff228b3e2fb29767255e267564ddb684b9db056c
+content_sha: b82f6a89bdd7494523b48e0b91fe561f49c11184e5cb3cca6691edf06b36ee88
 ---
 
 # SR-URL-FRESHNESS: what a citation may claim, and how often it has to earn it
@@ -566,10 +566,24 @@ asserts the prose no longer says *four-state*.
   cached bytes as soon as anyone added a URL. Rejected by decision 11 — and the
   `min` is why the default value is harmless rather than load-bearing.
 - **`max_age_seconds` on the policy.** Rejected before this record, and the
-  argument still stands: the committed record carries no ingest time, so an age
-  bound could not be honoured. `ttl=` is not that knob wearing a new name — it
-  bounds *how long a check may be skipped*, which is a wall-clock question the
-  TTL store is already the one place allowed to answer.
+  rejection stands — **but not on the ground written here until 2026-09-20.**
+  ⚠ *"The committed record carries no ingest time"* is **dead**: `mtime` is a
+  committed field ([SR-RECORD](0109_index-record.md)) and
+  `[ranking] recency_half_life_days` already reads it.
+  [SR-REFER](0127_refer-plane.md) decision 4 vacated that premise and says it
+  may not be cited; **this block was still reciting it**, and W-206 found it.
+
+  **What the refusal rests on now** is SR-REFER decision 4's own argument, which
+  never needed the absence of a timestamp: fux compares sanitized shas, so **age
+  is the wrong question** — a ten-second-old and a ten-day-old *unchanged*
+  document are the same object, and an age bound would decline to reuse one
+  while reusing the other with nothing about the index differing.
+  ⚠ **And `mtime` still would not serve it**: it is git's commit time for the
+  document, not fux's record of when it last *looked*, so a knob keyed on it
+  answers *"how old is this document"* to a caller asking *"how stale is my
+  answer"*. `ttl=` is not that knob wearing a new name — it bounds *how long a
+  check may be skipped*, which is a wall-clock question the TTL store is already
+  the one place allowed to answer.
 - **Storing `ttl` resolved to seconds on `UrlEntry`.** Rejected by decision 9:
   the value round-trips into a committed file, and rewriting a consumer's `1h`
   as `3600` behind their back is the kind of diff that makes people stop
