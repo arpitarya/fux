@@ -11,7 +11,7 @@ owns: [node@54b87937e653, src/fux/store/nodebundle.py@071a24a596dd]
 laws: [L1, L3, L4, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: edc346688b3c4a72edb7a729550b68ca295d430943676e81d835c035d9125b56
+content_sha: 33b45ab84d50ed66245904291b6d4d8b448c39d6fe73c5105077e29ebbf28ea2
 ---
 
 # SR-NODE-SEARCH — the Node read plane
@@ -791,7 +791,7 @@ catch, because both readers would still agree with themselves.
   a verb rather than to bytes. Python has two entry points over one body, held
   equal by `tests_e2e/test_relational.py::test_lexical_is_byte_identical_to_ask`.
 
-  ⚠ **When [W-161](../work/open/W-161-graph-composed-ask.md) gives Python's
+  ⚠ **When [W-161 → W-204](../work/open/W-204-golden-outputs-scoring-and-version-benchmark.md) gives Python's
   `ask` a graph tier, this is the case that splits**, and the differential law
   will then compare a Python `ask` that has one against a Node `ask` that does
   not. **That divergence is W-161's to declare**, in this record, before it

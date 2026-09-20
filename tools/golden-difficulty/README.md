@@ -7,7 +7,7 @@ forces**, derived from the key and the corpus and re-derivable by anyone.
 - **Owner:** [SR-WORK-GOLDEN](../../records/0066_WORK-golden.md) decision 13.
 - **Schema and bands:** [`work/golden/README.md`](../../work/golden/README.md)
   §*Difficulty* — stated once there, not here.
-- **Item:** [W-190](../../work/open/W-190-question-difficulty.md).
+- **Item:** [W-190 → W-204](../../work/open/W-204-golden-outputs-scoring-and-version-benchmark.md).
 
 ## The three rules it exists to enforce
 

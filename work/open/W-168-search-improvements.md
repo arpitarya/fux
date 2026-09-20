@@ -66,7 +66,7 @@ verdict is theatre."*** Measured:
 this set can return a result**, whatever the field does. A **data defect
 (d23b), fixed in the data, never a null.**
 
-🔴 **This is [W-191](W-191-the-ladder-carries-no-links.md)'s lesson applied one
+🔴 **This is [W-191 → W-204](W-204-golden-outputs-scoring-and-version-benchmark.md)'s lesson applied one
 step earlier.** There, a link feature was built and measured on a corpus with 0
 `ref` edges, and `0 of 124 flips` was filed as a number before anybody counted
 the input. Here the counting came first, at the cost of a few seconds.
@@ -100,7 +100,14 @@ nothing for them.
    **Whether it rides 3.0's existing unreleased bump belongs in the build's own
    pre-registration.**
 
-### ✅ Research filed 2026-09-18 — [`proposals/identifier-exact-match.md`](../proposals/identifier-exact-match.md)
+### ✅ Research filed 2026-09-18, GRADUATED 2026-09-20 — [`proposals/identifier-exact-match.md`](../proposals/identifier-exact-match.md)
+
+🔴 **It is now two items, and neither is step 2.** [W-203](W-203-identifier-analyzer-defects.md)
+carries the two analyzer defects and the four families, **waiting on this item** — not on a
+design question, on a seed corpus of the failing shape. [W-202](W-202-identifier-analyzer-gate.md)
+is 🟢 and waits on nothing: freeze what the analyzer does to the 33 ids as a test, so any
+later change shows as a diff. ⚠ **Step 2 as written picks family (c), the separate field —
+and (a) preserve-original is a PRECONDITION of it, not an alternative.**
 
 **Arpit asked 2026-09-18 how this is solved elsewhere, and for a before/after
 test either side of the build.** Filed, not decided. Three things in it change

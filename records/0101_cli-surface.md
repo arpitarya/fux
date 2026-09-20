@@ -10,7 +10,7 @@ feature: the `fux` command-line interface — every verb, its flags, its exit co
 owns: [src/fux/cli.py@104881b78675, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@1e4212c25c9e, src/fux/progress.py@925dccc045ce]
 laws: [L1, L4, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 696d4c9a28ecdad4fd141de5c1a72a074d639e5ee96250ccf85aca55e33dabe7
+content_sha: de541fa3d95d383b200d1ba18ed2f5ae5b87a583b9c6ff5f2795266c1ed701ca
 ---
 
 # SR-CLI — the command-line surface
@@ -398,7 +398,7 @@ is FROZEN.** (W-160.)
 - **A future component added to the lexical core is a NEW VERB or a TUNABLE,
   never a change to this one.** That sentence is the whole decision; everything
   else here is what makes it hold.
-- **It exists because [W-161](../work/open/W-161-graph-composed-ask.md) gives
+- **It exists because [W-161 → W-204](../work/open/W-204-golden-outputs-scoring-and-version-benchmark.md) gives
   `ask` a graph tier.** After that, `ask --scan` is no longer *the words alone*
   — and nothing would have said so. Every ranking verdict needs a baseline arm
   that cannot quietly acquire a stage.

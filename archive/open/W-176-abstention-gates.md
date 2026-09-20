@@ -7,6 +7,8 @@ filed: 2026-09-14
 ball: agent
 ---
 
+> 🔴 **MERGED INTO [W-204](W-204-golden-outputs-scoring-and-version-benchmark.md) on 2026-09-20 (Arpit).** This row left the queue; the work continues there. This file is history from that date — the archive move (queue rules 54–58) is owed by W-204's Claude Code prompt.
+
 # W-176 — the nine abstention gates, one program
 
 **Model: Opus for gates 4, 5 and 6 (an answer-type grammar, two IR estimators, a

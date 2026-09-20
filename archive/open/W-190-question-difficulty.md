@@ -8,6 +8,8 @@ lane: agent
 timestamp: 2026-09-15T00:00:00Z
 ---
 
+> 🔴 **MERGED INTO [W-204](W-204-golden-outputs-scoring-and-version-benchmark.md) on 2026-09-20 (Arpit).** This row left the queue; the work continues there. This file is history from that date — the archive move (queue rules 54–58) is owed by W-204's Claude Code prompt.
+
 # W-190 — question difficulty as a count, not a judgement
 
 **Filed and built 2026-09-15 (Cowork).** The key already carried a `difficulty`

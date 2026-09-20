@@ -65,7 +65,7 @@ else.** Read it there. This document does not restate it
   without reading the lab.
 - ⚠ **Rungs 2 000, 5 000 and 10 000 are not built.** Arpit capped the
   2026-09-12 session at 1 000. A measurement that needs a larger rung builds it
-  first — [W-136](../open/W-136-golden-benchmark.md).
+  first — [W-136 → W-204](../open/W-204-golden-outputs-scoring-and-version-benchmark.md).
 - 🔴 **The answer key is never in the lab, and never in an agent's hands.** It
   sits beside the benchmark in [`work/golden/`](../golden/README.md), gitignored,
   under the one rule that document states.

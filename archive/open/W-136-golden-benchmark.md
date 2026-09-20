@@ -8,6 +8,8 @@ lane: arpit
 timestamp: 2026-09-11T00:00:00Z
 ---
 
+> 🔴 **MERGED INTO [W-204](W-204-golden-outputs-scoring-and-version-benchmark.md) on 2026-09-20 (Arpit).** This row left the queue; the work continues there. This file is history from that date — the archive move (queue rules 54–58) is owed by W-204's Claude Code prompt.
+
 ## 🔴 2026-09-17 — the hand-offs WERE scored, by the wrong party, in an L11 breach
 
 **A Cowork Claude session was pasted both keys and scored them in chat**, in

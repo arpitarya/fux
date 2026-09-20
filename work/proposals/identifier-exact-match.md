@@ -2,14 +2,25 @@
 type: Proposal
 title: "Exact identifier match — the two analyzer defects behind it, and the four ways the field has been solved elsewhere"
 description: "Research for W-168 step 2. Names the line-level cause of the 0-of-33 survival result, corrects the claim that a mangled identifier is unreachable (query and index run the same analyzer, so the loss is PRECISION, not recall), sets out the four solution families used in practice cheapest-first, and proposes an analyzer-level before/after gate that does not wait on Codex."
-status: proposed
+status: graduated
 timestamp: 2026-09-18T00:00:00Z
 ---
 
 # Exact identifier match — what actually breaks, and what everyone else does about it
 
-**Graduation trigger:** W-168 step 2's pre-registration is written. This file is
-the option set that pre-registration chooses from; it decides nothing.
+✅ **GRADUATED 2026-09-20 into [`W-203`](../open/W-203-identifier-analyzer-defects.md)
+(the two defects and the four families) and [`W-202`](../open/W-202-identifier-analyzer-gate.md)
+(gate A, the frozen fixture).** This file stays because it is the reasoning the
+two items cite rather than repeat — the option set, the prior art and the
+correction. **The items are the state; this is the argument.**
+
+⚠ **One thing in it was overtaken the same week.** §5's gate B said prompt 8
+would unblock the ranking verdict. The
+[headroom run](../regression/2026-09-18-identifier-headroom/report.md) of
+2026-09-18 measured the gap at **3–4 of 33 on every rung**, below the floor of 6,
+so **no questions can unblock it** — what is missing is a seed corpus carrying the
+failing shape. W-203 carries the corrected version; §5 below is left as written
+rather than silently repaired.
 
 **Scope.** Research only. Nothing here is built, and
 [SR-RS](../../records/0133_predictions.md) decision 19's paired floor still
@@ -160,7 +171,7 @@ for, and it **falsifies a broken fix in seconds** without spending a benchmark.
 
 ⚠ **Gate A is not a ranking verdict and must never be reported as one.** It proves
 the term exists; only gate B can say the corpus is better. The two are filed
-separately for the same reason [W-191](../open/W-191-the-ladder-carries-no-links.md)
+separately for the same reason [W-191 → W-204](../open/W-204-golden-outputs-scoring-and-version-benchmark.md)
 is a lesson: a mechanism probe is not an arm.
 
 ## 6 · References

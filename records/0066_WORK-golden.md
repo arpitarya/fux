@@ -10,7 +10,7 @@ feature: the golden benchmark — its two question sets, the key's custody, its 
 owns: [.claude/hooks/guard-golden-answer.sh@c505d04c0628, .claude/hooks/guard-sealed-key.sh@0d4dd725e7aa, tests/test_golden_key_guards.py@ee33d84f9333, scripts/gen-golden.py@1b2a854c1f75, tests/test_claude_md_golden.py@49db9e6261d8, tools/golden-difficulty@1d500741adb2]
 laws: [L0, L11]
 timestamp: 2026-09-15T00:00:00Z
-content_sha: 187565f1c8ecf9e129140de0777a4f33be48aec1ea318c72bc442bf01d6d9229
+content_sha: ff643635f8d16c687302b5ef0bf89c7be7c4df9deec631e8db35f80c41cb931a
 ratifies: "Arpit, 2026-09-15 — W-146 row 17: the prohibition gets a record and CLAUDE.md keeps a generated view; the same day he ruled it into law L11 and then amended it — two question sets, one Claude-authored and one Codex-authored, with both answer halves in his custody and no key file at all"
 ---
 
@@ -373,5 +373,5 @@ evidence.*
 - [`CLAUDE.md`](../CLAUDE.md)
 - [`work/golden/README.md`](../work/golden/README.md)
 - [`work/golden/questions/README.md`](../work/golden/questions/README.md)
-- [`work/open/W-136-golden-benchmark.md`](../work/open/W-136-golden-benchmark.md)
-- [`work/open/W-190-question-difficulty.md`](../work/open/W-190-question-difficulty.md)
+- [`work/open/W-136-golden-benchmark.md`](../archive/open/W-136-golden-benchmark.md)
+- [`work/open/W-190-question-difficulty.md`](../archive/open/W-190-question-difficulty.md)

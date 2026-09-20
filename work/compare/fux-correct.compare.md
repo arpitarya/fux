@@ -22,7 +22,7 @@ refusal), [SR-PROVENANCE](../../records/0142_provenance.md).
 [SR-ENRICH](../../records/0137_enrich.md) decisions 19, 19a and 19b;
 [`work/IMPLEMENTATION.md`](../IMPLEMENTATION.md) §2026-09-14 W-162 is the
 account of what shipping it found. 🔴 **§6's generalisation measurement was
-NOT done** and is [W-175](../open/W-175-correction-generalisation.md) — the
+NOT done** and is [W-175 → W-204](../open/W-204-golden-outputs-scoring-and-version-benchmark.md) — the
 one claim that made (b) beat (a) is still unmeasured, and this doc's §5
 reopen trigger is what fires if it fails.
 

@@ -10,12 +10,12 @@ feature: the quality contract — what a fux quality number means
 owns: [tools/quality@2cd260debf27]
 laws: [L1, L2, L3, L4, L8]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: b477de96630c3fc333d754d9d581c1c67bca4c92d903b5ab2ba42e251052250e
+content_sha: 0a85aa58c6d079c2ec66ca05ac0dd684381ea92676ef23246a865ff31aa3ce30
 ---
 
 # SR-WORK-QUALITY — what "good" means
 
-**This record ratifies [W-87](../work/open/W-87-what-good-means.md) Phase 0**
+**This record ratifies [W-87 → W-204](../work/open/W-204-golden-outputs-scoring-and-version-benchmark.md) Phase 0**
 — all six forks, ruled by Arpit on 2026-08-27.
 
 ## §1 — For humans
@@ -375,7 +375,7 @@ future session can be held to.
   2026-08-20 lab wipe along with their generator, so the measurement half of
   W-87 remains blocked on inputs this record cannot supply.
 
-**The debt is filed**, in [W-87](../work/open/W-87-what-good-means.md)
+**The debt is filed**, in [W-87 → W-204](../work/open/W-204-golden-outputs-scoring-and-version-benchmark.md)
 (phases P1–P5). The law question decision 11 declined to settle was W-89, and it
 is **closed**: [SR-LAWS](0001_LAWS.md) decision 8 ruled it as a new law, `L8`,
 on 2026-08-27.
@@ -467,7 +467,7 @@ evidence.*
 **Project docs**
 
 - [`work/compare/what-good-means.compare.md`](../work/compare/what-good-means.compare.md)
-- [`work/open/W-87-what-good-means.md`](../work/open/W-87-what-good-means.md)
+- [`work/open/W-87-what-good-means.md`](../archive/open/W-87-what-good-means.md)
 - [`work/open/W-89-does-l2-reach-a-query-log.md`](../archive/open/W-89-does-l2-reach-a-query-log.md)
 
 **Papers and specifications**

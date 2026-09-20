@@ -10,7 +10,7 @@ Codex, TWO question sets over them — one Claude-authored, one Codex-authored �
 whose answers no agent ever reads, and a corpus ladder Claude grows from 10 to
 10 000 documents without ever seeing a question.**
 
-Ruled by Arpit, 2026-09-11. Tracked as [W-136](../open/W-136-golden-benchmark.md).
+Ruled by Arpit, 2026-09-11. Tracked as [W-136 → W-204](../open/W-204-golden-outputs-scoring-and-version-benchmark.md).
 
 ---
 
@@ -347,7 +347,7 @@ abstains by arithmetic, and the abstention slice then measures nothing.
 
 ⚠ **Neither key exists yet**, so nothing carries a difficulty label today. The
 scorer runs for the first time once set 1 and set 2 are written —
-[W-190](../open/W-190-question-difficulty.md).
+[W-190 → W-204](../open/W-204-golden-outputs-scoring-and-version-benchmark.md).
 
 ---
 
@@ -373,7 +373,7 @@ yet** — say so in the pre-registration instead of running.
 
 **Every edge in this corpus is a `supersedes` edge.** There is no link syntax
 anywhere in `seed/`, so three features measure nothing
-([W-191](../open/W-191-the-ladder-carries-no-links.md)):
+([W-191 → W-204](../open/W-204-golden-outputs-scoring-and-version-benchmark.md)):
 
 | rung | docs | edges | **`ref`** | `supersedes` |
 |---|---:|---:|---:|---:|

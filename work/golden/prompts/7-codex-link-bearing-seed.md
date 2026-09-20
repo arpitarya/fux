@@ -12,7 +12,7 @@ separate measurements mean anything, and a corpus written by the session that
 will measure it is a corpus whose shape that session already knows.
 
 🔴 **Why Codex and not Claude.** Same rule as prompts 1 and 2:
-[W-191](../../open/W-191-the-ladder-carries-no-links.md) **specifies and
+[W-191 → W-204](../../open/W-204-golden-outputs-scoring-and-version-benchmark.md) **specifies and
 requests**; it does not write seed content. A link-ranking feature measured on
 links the measurer authored is measuring its own handwriting.
 

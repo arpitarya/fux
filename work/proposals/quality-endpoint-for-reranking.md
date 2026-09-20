@@ -118,7 +118,7 @@ feature. Listed so it is not re-derived a fourth time.
 
 ### D · Codex-scored golden answers — *passes all four, and is not available*
 
-W-145 (closed 2026-09-15 — [W-136](../open/W-136-golden-benchmark.md) phase 5). The honest instrument:
+W-145 (closed 2026-09-15 — [W-136 → W-204](../open/W-204-golden-outputs-scoring-and-version-benchmark.md) phase 5). The honest instrument:
 truth authored by someone who is not the reranker, scored by someone who is not
 Claude. ⚠ **It is 🟣 on 2026-09-30**, so recommending it alone would leave W-154
 exactly as parked as it is now. **It is the reopen trigger for whatever §4
@@ -150,7 +150,7 @@ as of 2026-09-15** — two orders of magnitude above the floor.
 **The environment is `fux-lab`** on scratch copies, per SR-WORK-ENVIRONMENTS
 decision 2 — and the corpus is **fux's own tree**, which is dogfood and must be
 labelled dogfood in the verdict, the same disclosure
-[W-175](../open/W-175-correction-generalisation.md) carries for its first arm.
+[W-175 → W-204](../open/W-204-golden-outputs-scoring-and-version-benchmark.md) carries for its first arm.
 
 ⚠ **The residual risk, stated rather than buried.** A citing sentence often
 *paraphrases the decision it cites*, and a paraphrase is dense in the decision's
@@ -221,5 +221,5 @@ the fork above, and W-154 closes or waits on Arpit's word.
 
 **Work** — [W-154](../../archive/open/W-154-rerank-weight-cost.md) ·
 W-183 (closed 2026-09-15) ·
-W-145 (closed 2026-09-15 — [W-136](../open/W-136-golden-benchmark.md) phase 5) ·
+W-145 (closed 2026-09-15 — [W-136 → W-204](../open/W-204-golden-outputs-scoring-and-version-benchmark.md) phase 5) ·
 [the Part A pre-registration](../regression/2026-09-13-rerank-cost/PRE-REGISTRATION.md)

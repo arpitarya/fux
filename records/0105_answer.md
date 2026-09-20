@@ -10,7 +10,7 @@ feature: "`fux answer` — one answer, its footing stated, and the report of wha
 owns: []
 laws: [L1, L2, L3]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 17292ee91ad7e5f44960b590c10b695b932e3ad3bfd0bdc090bdd69ba38b65d4
+content_sha: acca92c1fdede7f9ab3231ca350343be50a96bbf3c7846143e98b63d0daa76ad
 ---
 
 # SR-ANSWER — the `answer` verb
@@ -487,7 +487,7 @@ code path by which it could, which is a stronger guarantee than a rule.
   [SR-CLI](0101_cli-surface.md) decision 12's freeze does not reach it — the
   freeze is on a *verb's output shape*, not on the ranking function both share.
   **`answer` reading `ask` is
-  [W-161](../work/open/W-161-graph-composed-ask.md)'s change**, and it is a
+  [W-161 → W-204](../work/open/W-204-golden-outputs-scoring-and-version-benchmark.md)'s change**, and it is a
   ranking change: today `answer` ranks lexically whatever `ask` does, and after
   W-161 it would inherit `ask`'s graph tier. Named here so the two items' scopes
   cannot be confused for each other.

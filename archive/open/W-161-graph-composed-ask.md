@@ -7,6 +7,8 @@ filed: 2026-09-13
 ball: agent
 ---
 
+> 🔴 **MERGED INTO [W-204](W-204-golden-outputs-scoring-and-version-benchmark.md) on 2026-09-20 (Arpit).** This row left the queue; the work continues there. This file is history from that date — the archive move (queue rules 54–58) is owed by W-204's Claude Code prompt.
+
 # W-161 — the graph-composed `ask`, two tiers
 
 **Model: Opus.** Calls a gate, supersedes an accepted decision (SR-GRAPH's

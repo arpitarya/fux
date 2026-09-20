@@ -103,7 +103,7 @@ number.**
   reaching a committed byte and NOT a paste**, and its docstring leads with that
   — a hook matches what a tool call targets, and a paste is not a tool call.
 - ⚠ **`key_version 1` carries no difficulty band**, so prompt 6E step 7 is
-  unsatisfiable — [W-195](open/W-195-difficulty-band-breakdown.md). **The band is
+  unsatisfiable — [W-195 → W-204](open/W-204-golden-outputs-scoring-and-version-benchmark.md). **The band is
   computed from the key by Arpit or Codex, never by a Claude session**, and never
   from `type` or from fux's own results.
 
@@ -2577,7 +2577,7 @@ session would remember is gone:
   (Claude, 124) are in the tree — **staged, his to commit** — questions-only, and
   both keys are his. The golden
   lane is agent-closable again — next is **prompt 4**, and 🔴 **it needs a session
-  that has never read `questions/`** — [W-136](open/W-136-golden-benchmark.md).
+  that has never read `questions/`** — [W-136 → W-204](open/W-204-golden-outputs-scoring-and-version-benchmark.md).
 
 ### In flight: the 3.0.0-alpha.0 branch is open and empty of code (2026-09-13, Cowork)
 

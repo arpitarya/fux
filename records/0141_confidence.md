@@ -11,7 +11,7 @@ feature: the confidence plane
 owns: [src/fux/query/confidence.py@e0641ff2c3be, tests/test_confidence_floor_off.py@f8e18c079a6e]
 laws: [L1, L3, L4]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: a5ffb15c74cc8898caa78436fb4c1f53dfe326a6a7d1a21ea7c1dc8a10bd411e
+content_sha: ed24ec5ae7891739a2b992ef41dc27d63bc4b756ec7bde60900ff27c62117201
 ---
 
 # SR-CONFIDENCE — how much the index believes its own answer
@@ -717,7 +717,7 @@ at `anchor = 2.0` by the 2026-09-15 differential run.
   the final result list. Asserted rather than assumed: the freeze test compares
   `--band` output among the flag combinations it walks.
 
-  ⚠ **After [W-161](../work/open/W-161-graph-composed-ask.md) the two will
+  ⚠ **After [W-161 → W-204](../work/open/W-204-golden-outputs-scoring-and-version-benchmark.md) the two will
   legitimately differ**, and the difference will be informative rather than a
   defect: the band describes *the answer the reader was shown*, so a graph-lifted
   document has to be able to move it. **What must not happen is a document

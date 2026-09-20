@@ -26,7 +26,7 @@ the standing rule that `ask` does not read it), [SR-EXPAND](../../records/0149_e
 **Items:** **W-160** — the atoms, **shipped 2026-09-14**; see
 [SR-CLI](../../records/0101_cli-surface.md) decisions 12–13 and
 [SR-GRAPH](../../records/0126_graph.md) decisions 13–15 (the atoms and the
-Node plane, already built) · [W-161](../open/W-161-graph-composed-ask.md) (the
+Node plane, already built) · [W-161 → W-204](../open/W-204-golden-outputs-scoring-and-version-benchmark.md) (the
 composed `ask`, a ranking change — waits on W-156).
 
 ---

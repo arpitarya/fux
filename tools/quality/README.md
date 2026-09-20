@@ -44,5 +44,5 @@ point, not an oversight.
 - [SR-WORK-QUALITY](../../records/0056_WORK-quality.md) — the contract
 - [`work/compare/what-good-means.compare.md`](../../work/compare/what-good-means.compare.md)
   — the research behind it
-- [`work/open/W-87-what-good-means.md`](../../work/open/W-87-what-good-means.md)
+- [`work/open/W-87-what-good-means.md`](../../archive/open/W-87-what-good-means.md)
   — the remaining phases

@@ -101,7 +101,7 @@ half-removed.
 — 19 tests, green. **Evidence:** [`2026-09-16-golden-rung-00100`](regression/2026-09-16-golden-rung-00100/ANALYSIS.md)
 (scored overlay). **Items:** [W-196](../archive/open/W-196-l11-breach-2026-09-17.md),
 [W-197](../archive/open/W-197-stray-key-directory.md),
-[W-195](open/W-195-difficulty-band-breakdown.md) — all three filed open, none closed.
+[W-195 → W-204](open/W-204-golden-outputs-scoring-and-version-benchmark.md) — all three filed open, none closed.
 **Records touched: none.** The change SR-WORK-GOLDEN may need is **proposed to
 Arpit, not written** — a law-adjacent decision is his
 ([SR-LAW-0](../records/0002_LAW-0-authority.md) decision 3).
@@ -353,7 +353,7 @@ The directory is legally half-empty under §Per-run contract.
 | **W-145 closed as OVERTAKEN** | the contaminated key it would regenerate was already deleted, and **set 1 is Codex-authored questions *and* answers** — the need it named | [`archive/README.md`](../archive/README.md) §`open/` |
 | **the queue re-balled** | inbox row cleared; **W-136 🟢** (prompt 4 next), **W-190 🟡 on W-136**, **W-87 🟡 on W-136** — it had been 🔴 through W-145 | [OPEN-WORK](OPEN-WORK.md) |
 | **25 dead links repointed** | across 8 live documents, at live successors rather than into `archive/` (rule 58); one **pre-existing** break from the renumbering fixed with them | `tests/test_doc_links.py` green |
-| **what it does NOT buy** | ⚠ **no rung ran and no number moved.** The instrument exists; **prompt 4 has not been run**, and 🔴 **the session that runs it must never have read `questions/`** — this one read the ids | [W-136](open/W-136-golden-benchmark.md) |
+| **what it does NOT buy** | ⚠ **no rung ran and no number moved.** The instrument exists; **prompt 4 has not been run**, and 🔴 **the session that runs it must never have read `questions/`** — this one read the ids | [W-136 → W-204](open/W-204-golden-outputs-scoring-and-version-benchmark.md) |
 | **owed to Arpit** | ⚠ a **LAW record was amended** (SR-LAW-11 decision 11 — its factual premise, not its normative sentence) and needs his ratification; ⚠ **W-136's 🟣 2026-09-30 gate rests on a premise Codex disproved today**, and only he lifts a date gate | [WORKLOG](WORKLOG.md) |
 
 ## 2026-09-15 — **the golden reset: six numbered prompts, two numbered sets**
@@ -375,7 +375,7 @@ The directory is legally half-empty under §Per-run contract.
 | **the authoring carve-out** | 🔴 exactly one handoff wide — the session that authors set A writes no file, hands the answers over in the chat, and **never runs a rung or returns**. Authorship buys no access | SR-LAW-11 decision 6 |
 | **two sets** | A (Claude, ids `a001…`) and B (Codex, ids `g001…`), same seed corpus and ladder, **run and reported apart**; 🔴 **never pooled** | [SR-WORK-GOLDEN](../records/0066_WORK-golden.md) decisions 8–11 |
 | **the per-run key question deleted** | *"(1) the file, or (2) the chat?"* removed from prompts 1, 3 and 5 — it had one answer left. Prompt 4 writes two prediction files; [`prompts/3-claude-questions.md`](golden/prompts/3-claude-questions.md) is new (**renumbered from `1a-claude-set-a.md`** later the same day) | SR-WORK-GOLDEN decision 10 |
-| **difficulty, built** | [`tools/golden-difficulty/`](../tools/golden-difficulty/) — a **count of the discriminations a question forces** (`d ≤ 1` easy / `2` medium / `≥ 3` hard, unanswerable **floored at hard**) plus a per-rung distractor count. 🔴 Never derived from fux's own results; 🔴 **refuses a key path inside the repository**. `--selftest` green on six synthetic fixtures | SR-WORK-GOLDEN decision 13 · [W-190](open/W-190-question-difficulty.md) |
+| **difficulty, built** | [`tools/golden-difficulty/`](../tools/golden-difficulty/) — a **count of the discriminations a question forces** (`d ≤ 1` easy / `2` medium / `≥ 3` hard, unanswerable **floored at hard**) plus a per-rung distractor count. 🔴 Never derived from fux's own results; 🔴 **refuses a key path inside the repository**. `--selftest` green on six synthetic fixtures | SR-WORK-GOLDEN decision 13 · [W-190 → W-204](open/W-204-golden-outputs-scoring-and-version-benchmark.md) |
 | **what it does NOT buy** | ⚠ **no number moved and no engine ran.** Set A is unwritten, both keys are still Arpit's to regenerate, and **every set A number will be `informed` permanently** — an assumption recorded in SR-LAW-11 decision 7, not Arpit's ruling | [`questions/README.md`](golden/questions/README.md) · W-189 (closed 2026-09-15) |
 
 ## 2026-09-15 — **the benchmark's arms settle at `A` · `B` · `B-node`**
@@ -383,7 +383,7 @@ The directory is legally half-empty under §Per-run contract.
 | item | what landed | evidence |
 |---|---|---|
 | **decision 16a** | 🔴 the tier-off arm is **not a benchmark arm** — a benchmark measures what ships, and `[graph] ask_boost`/`ask_related` default to `true`. `NODE_ARMS` is one entry; `RANK_PAIRS` is two | [SR-WORK-BENCHMARK](../records/0053_WORK-benchmark.md) decision 16a |
-| **what it costs** | 🔴 **the graph tier's VALUE stays unmeasured on both readers** and returns to [W-161](open/W-161-graph-composed-ask.md). Decision 12a's attribution run stands as filed history, not as a standing column | decision 16a |
+| **what it costs** | 🔴 **the graph tier's VALUE stays unmeasured on both readers** and returns to [W-161 → W-204](open/W-204-golden-outputs-scoring-and-version-benchmark.md). Decision 12a's attribution run stands as filed history, not as a standing column | decision 16a |
 | **what it buys** | every run's tables carry only configurations a user is actually served, and one fewer pass per capture | decision 16a |
 
 ## 2026-09-15 — **the Node column wired into every capture (code), and a banned filename found**
@@ -872,7 +872,7 @@ SR-PII (decision 17's *a new verb is gated without anyone remembering*,
 exercised twice and unmoved) · SR-OUTPUT via `output_config`.
 **Tests:** +11 unit (walk inertness) +2 CLI gates +9 e2e.
 **Out of scope and untouched:** anything that changes what `ask` returns —
-that is [W-161](open/W-161-graph-composed-ask.md), which waits on W-156.
+that is [W-161 → W-204](open/W-204-golden-outputs-scoring-and-version-benchmark.md), which waits on W-156.
 
 ---
 
@@ -1911,10 +1911,10 @@ green.
 | **Supersession** | 🔴 Retired above successor in **74 of 145** co-ranked pairs at `rung-seed`. ⚠ **`fux answer` recovers what `fux ask` inverts** — the endpoint decides whether the defect is visible | [analysis §2](regression/2026-09-12-golden-ladder/ANALYSIS.md) |
 | **Recall ceiling** | 30 of 124 have no `seed/` path in the top 5 at rung 1 000 → **`hit@5` ≤ 94/124 by structure**. Cannot be separated from the `heading` control working, and says so | [report §5](regression/2026-09-12-golden-ladder/report.md) |
 | **W-143's corpus** | ✅ **Exists.** 145 co-ranked pairs, 102 declared `superseded` records, 103 archived, every document dated. The inversion count is a **key-free** endpoint | [W-143](../archive/open/W-143-four-no-op-priors.md) |
-| **Not done** | Rungs **2 000 / 5 000 / 10 000 are not built** — Arpit capped the session at 1 000. Scoring is Codex's, phase 5 | [W-136](open/W-136-golden-benchmark.md) |
+| **Not done** | Rungs **2 000 / 5 000 / 10 000 are not built** — Arpit capped the session at 1 000. Scoring is Codex's, phase 5 | [W-136 → W-204](open/W-204-golden-outputs-scoring-and-version-benchmark.md) |
 
 ⚠ **`informed`, and no delta is stated in any direction** — the key is the
-Claude-authored stopgap (W-145, closed 2026-09-15 — [W-136](open/W-136-golden-benchmark.md) phase 5). No
+Claude-authored stopgap (W-145, closed 2026-09-15 — [W-136 → W-204](open/W-204-golden-outputs-scoring-and-version-benchmark.md) phase 5). No
 verdict, no threshold, no prediction closed.
 
 ---
@@ -3176,7 +3176,7 @@ running it surfaced three unrelated defects, all now closed:
   its first run's "0 asserted" report vacuous rather than a finding. Fixed and
   re-run: all 50 goldens assert exactly one `doc`; `recall@k` over this set
   **is** `hit@k`. What remains is a one-line completeness declaration,
-  `arpit` lane, tracked in [W-87](open/W-87-what-good-means.md) P2.
+  `arpit` lane, tracked in [W-87 → W-204](open/W-204-golden-outputs-scoring-and-version-benchmark.md) P2.
 - **Three SR-owned files from Wave 5's uncommitted diff had no owning-record
   touch** (`test_working_tree_is_not_mid_violation`): `output.schema.json`'s
   two new required fields under SR-ASK, `query/__init__.py`'s shared file

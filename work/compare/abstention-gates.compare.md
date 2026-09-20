@@ -28,7 +28,7 @@ there are untouched by this doc and still owed a ruling.
 
 | | |
 |---|---|
-| **status** | **DECIDED — Arpit ruled option (a) on 2026-09-14: all nine gates, in the order §5 gives, each behind its own flag (default off), each kept or removed on its own §6b row.** Promoted as [W-176](../open/W-176-abstention-gates.md). The floors stay provisional until the golden key carries enough unanswerable questions (Codex, **2026-09-30**) |
+| **status** | **DECIDED — Arpit ruled option (a) on 2026-09-14: all nine gates, in the order §5 gives, each behind its own flag (default off), each kept or removed on its own §6b row.** Promoted as [W-176 → W-204](../open/W-204-golden-outputs-scoring-and-version-benchmark.md). The floors stay provisional until the golden key carries enough unanswerable questions (Codex, **2026-09-30**) |
 | **ruled 1** | **the verdict is a gate chain — weakest link — never a blended number.** `answerable` = every gate passed; `band` = how comfortably. One failed gate ⇒ `answerable: false`, and the output names *which* gate and why |
 | **ruled 2** | **every independent signal is returned as its own field** — NQC, clarity, coherence, IDF-coverage, co-occurrence, answer-type — with visibility configured in **`.fux/output.toml`**, the surface the band uses today |
 | **the order (ruled)** | **1 + 9 now** — no measurement; then **4 + 3** (the u017 class); then **2, 7, 8**; then **5**; **6 after W-161**. One gate per arm, never two |

@@ -10,7 +10,7 @@ feature: the prediction system — the R ids, their register, the rules that mak
 owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@67d969467bcd, tools/vector-gate@0023bff0cdef]
 laws: [L3]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 3d3baa8f59cb56e8ecb0488d71a77bfddfd181ae712e1e5fa3a7052517c909aa
+content_sha: 15795511e2ef5837fe4b30c95b0e369b89bb5ed234d3ca54a83e681bf26305b3
 ---
 
 # SR-RS — the R predictions
@@ -393,7 +393,7 @@ would have closed it cannot: the fault is the endpoint, and there is no third
 field to aim it at. A replacement would have to ask a different *question* —
 *does the correct seed document rank above every sibling* — which is a `hit@1`
 question against a key, and therefore
-[W-136](../work/open/W-136-golden-benchmark.md) phase 5's job rather than a
+[W-136 → W-204](../work/open/W-204-golden-outputs-scoring-and-version-benchmark.md) phase 5's job rather than a
 control's.
 
 ⚠ **The mechanical half of the lesson IS shipped**, so this cannot recur
@@ -539,7 +539,7 @@ close the P2 `recall@k` question W-87 filed:
   `fux-playground/check.py` — and re-run: all 50 goldens assert exactly one
   `doc`. `recall@k` over this set **is** `hit@k`; what remains is a
   completeness declaration (is the asserted `doc` the only relevant one?),
-  `arpit` lane, tracked in [W-87](../work/open/W-87-what-good-means.md) P2.
+  `arpit` lane, tracked in [W-87 → W-204](../work/open/W-204-golden-outputs-scoring-and-version-benchmark.md) P2.
 
 **15a. A CIRCULARITY SCREEN is a control, and it is the one that was missing**
 (2026-09-15, W-183). Decision 15's three controls ask *did the arm move something
@@ -1041,7 +1041,7 @@ the first is the one that fails loudly.
 
 | | what was missing | what fixes it |
 |---|---|---|
-| [W-191](../work/open/W-191-the-ladder-carries-no-links.md) | **the input** — 0 `ref` edges on all eight rungs | link-bearing **documents** |
+| [W-191 → W-204](../work/open/W-204-golden-outputs-scoring-and-version-benchmark.md) | **the input** — 0 `ref` edges on all eight rungs | link-bearing **documents** |
 | [W-168 step 2](../work/regression/2026-09-16-identifier-survival/report.md) | **the questions** — 51 identifier tokens across all 20 seed documents, and **4 of 249 questions ask by one** | **id-queries** |
 
 🔴 **The second is harder to see and cheaper to fix.** A corpus census comes back
