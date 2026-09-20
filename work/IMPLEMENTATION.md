@@ -30,6 +30,54 @@ Rules:
 
 
 
+## 2026-09-20 — **W-202: what the analyzer does to an identifier, frozen on both readers — and a third defect nobody had named**
+
+**Shipped:** [`tests/query/identifier-fixture.json`](../tests/query/identifier-fixture.json) ·
+[`tests/query/test_identifier_analyzer_fixture.py`](../tests/query/test_identifier_analyzer_fixture.py) (49) ·
+[`node/test/analyzer.test.mjs`](../node/test/analyzer.test.mjs) (46).
+**Evidence:** none — it compares nothing and files no number.
+**Items:** [W-202](../archive/open/W-202-identifier-analyzer-gate.md) **closed and archived**.
+**Records touched: none** — it adds a test and states no rule.
+
+🔴 **One fixture, two readers, and that is the design.** `analyzer.mjs`
+transcribes `analyzer.py`, and a one-step divergence between them is a **silent
+no-match with no error to see** — the Node reader hashes a string the
+Python-built index never wrote. Two copies of the fixture would let Python's be
+updated and Node's forgotten, which is the precise drift the fixture exists to
+catch, so both suites read the **same committed JSON**.
+
+🔴 **A third defect class, and neither W-201 nor W-203 named it: a segment that
+spells a stopword is DELETED, not stemmed.**
+
+- `QCL-IT-ADR-08` loses `IT`. That is the identifier W-205 part 1 exists for, so
+  it carries **two independent defects** — frontmatter-invisible, *and*
+  segment-dropping once it does reach the index. **Part 1 alone will not make it
+  whole.**
+- `TSL-RF-118-A` and `TSL-RF-221-A` lose their trailing `A`, leaving them
+  **indistinguishable from `TSL-RF-118` and `TSL-RF-221`** with no token left to
+  tell them apart.
+
+**Recorded, not ruled** — no stopword was changed and none may be here.
+
+🔴 **The item's own definition of done was wrong about which separator was
+missing.** DoD 3 warned that *"a fixture of underscore ids alone passes while
+proving nothing"*; **all 33 seed identifiers are hyphenated**, so the gap is the
+mirror image of the one it predicted. The `CONTRAST` block — `ERR_2031`,
+`RF_118`, `SKU.4471`, `QCL/IT/ADR/08`, `BM25F`, `sha256`, `mTLS`, `v1.0.0` — is
+therefore load-bearing rather than decorative, and a test asserts the seed is
+all-hyphen so that a future seed adding `PROJ_123` fails loudly instead of
+quietly covering one branch.
+
+✅ **The corrected counts are now executable**: **0 of 33 survive whole**, and
+**3 are mangled, not 1** — the substring detector's error is pinned by a test
+asserting `kf` is *not* one of `KFS-2014`'s own segments. `getUserName` →
+`getusernam` stays in the fixture as **correct**, because query and ingest stem
+identically and the symmetry is what the headroom run measured.
+
+⚠ **Filed in `tests/`, not `tools/`.** The prompt said `tools/…`; W-202's own
+definition of done says *"touches `tests/` only"*, and a gate that lives outside
+`pytest`'s collection is a gate CI never runs.
+
 ## 2026-09-20 — **W-204 phase A: the whole ladder's outputs at one frozen engine, and two repairs the rungs needed before they would load**
 
 **Shipped:** [`tools/quality-controls/rung_outputs.py`](../tools/quality-controls/rung_outputs.py)

@@ -11,6 +11,18 @@ filed: 2026-09-18
 ball: agent
 ---
 
+**Addendum 2026-09-20 (W-206 review) — one spec, two rulings that compose.**
+[`proposals/fetcher-routing.md`](../proposals/fetcher-routing.md) is the **pipe**
+ruling of 2026-09-18 (`decoder=<stem>` **required** on every URL line, written once
+at `fux add`, no default, break on old lists); this item is the **routing** ruling
+of 2026-09-20 (`fetch=<stem>` mandatory, resolved routes → claims → refuse). Its
+edge case 14 ("no host table") is **superseded** by D3 above; everything else in
+its §2–§3 (16 cases, not twenty) stands and is part of this spec. **DoD gains
+line 10: `decoder=` per the pipe ruling** — `fux add` fills it from `--decoder`
+or the response's `Content-Type` through the decoder registry, refuses when
+nothing maps; ingest decodes by the declared stem; `fux doctor` checks every
+`decoder=` resolves. The W-200 provenance finding this item owes reads that field.
+
 ## ✅ RULED 2026-09-20 (Arpit, Cowork) — D1, D2, D3 and a fourth deliverable
 
 **D1 — `fetch=` is never empty and never defaulted.** *"The set should never be

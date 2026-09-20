@@ -119,7 +119,7 @@ nothing for them.
 
 🔴 **It is now two items, and neither is step 2.** [W-203 → W-205](W-205-identifiers-reachable-and-whole.md)
 carries the two analyzer defects and the four families, **waiting on this item** — not on a
-design question, on a seed corpus of the failing shape. [W-202](W-202-identifier-analyzer-gate.md)
+design question, on a seed corpus of the failing shape. [W-202](../../archive/open/W-202-identifier-analyzer-gate.md)
 is 🟢 and waits on nothing: freeze what the analyzer does to the 33 ids as a test, so any
 later change shows as a diff. ⚠ **Step 2 as written picks family (c), the separate field —
 and (a) preserve-original is a PRECONDITION of it, not an alternative.**

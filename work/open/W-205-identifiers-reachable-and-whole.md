@@ -21,7 +21,7 @@ divergence between the two sides is a silent no-match with no error to see.
 multiple work items for the same kind of thing."* Absorbs
 [W-201](../../archive/open/W-201-frontmatter-scalars-not-indexed.md),
 [W-203](../../archive/open/W-203-identifier-analyzer-defects.md) and **W-168
-step 2** (the exact identifier field). [W-202](W-202-identifier-analyzer-gate.md)
+step 2** (the exact identifier field). [W-202](../../archive/open/W-202-identifier-analyzer-gate.md)
 stays its own row: it is the *before* fixture (⚠ the two links above move to `archive/open/` with the files), green, and both parts here diff
 against it.
 
