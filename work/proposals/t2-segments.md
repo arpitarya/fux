@@ -129,7 +129,7 @@ stop, and `graph-plane-format.compare.md` §6 had already recommended the R3
 precedent for exactly this reason.
 
 **3. The `[index] tier = t0|t1|t2|auto` knob is not created.** It appears in
-[`index-format.compare.md`](../compare/index-format.compare.md) §3 and
+[`index-format.compare.md`](../../archive/compare/index-format.compare.md) §3 and
 has never existed in code. **A knob with two reachable values and no third
 implementation is surface pretending to be capability**, and the rule
 *"tier-auto flips by measurement, never by hand"* governs nothing until there
@@ -169,7 +169,7 @@ gets an answer built for a speed problem.
   R9 within 15 % of R3. That is a consistency argument, not a measurement on
   real prose at 10 000 documents — which does not exist and is owed.
 - **The graph plane's option D loses its vehicle**, exactly as
-  [`graph-plane-format.compare.md`](../compare/graph-plane-format.compare.md)
+  [`graph-plane-format.compare.md`](../../archive/compare/graph-plane-format.compare.md)
   predicted: *"If the answer is no, option D has no vehicle."* That doc already
   ruled A and said B, not D, is what 50 000 inherits. Nothing to change there;
   noted so the prediction is seen to have landed.
@@ -206,7 +206,7 @@ gets an answer built for a speed problem.
 - [R3's run](../regression/2026-08-12-m2-accelerator/report.md) — where
   the 150 ms bar and the 27.2 ms precedent come from, and whose ANALYSIS said
   T2 must not be pre-built.
-- [`index-format.compare.md`](../compare/index-format.compare.md) §3 —
+- [`index-format.compare.md`](../../archive/compare/index-format.compare.md) §3 —
   the tier table T2 is a row of.
 - `wire-format.compare.md` (archived 2026-08-25) — the
   segment design, kept intact for the day the bar is crossed.

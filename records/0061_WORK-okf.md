@@ -10,7 +10,7 @@ feature: conformance to the Open Knowledge Format, and the three declared bounda
 owns: [tests/test_okf_bundle.py@449982f576db]
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: aab216e943b40819b453d09b15704acc133884cbfd1267cac25dfc9a68a0da4f
+content_sha: 851e8f0209387c0b6ec4afec31c83833970c3ffc66006cbec076da1ea7f292a7
 ---
 
 # SR-WORK-OKF — the repo is an OKF knowledge bundle
@@ -83,7 +83,7 @@ root index spans whatever the trees are.
 🔴 **The exemption that had to go.** `CLAUDE.md` used to say *"ALL-CAPS markdown
 files carry no YAML frontmatter… exempt from the `type` requirement"*. The spec
 has no such rule. Measured in
-[`work/proposals/positioning-documents-not-code.md`](../work/proposals/positioning-documents-not-code.md)
+[`work/proposals/positioning-documents-not-code.md`](../archive/proposals/positioning-documents-not-code.md)
 §6: **94 of 314 files failed the bar the repo was claiming to meet.** The rule
 had been prose and nothing else since adoption.
 
@@ -162,7 +162,7 @@ had been prose and nothing else since adoption.
 - [The annotated OKF guide](https://okf.md/spec/) — the readable companion.
 - [`tests/test_okf_bundle.py`](../tests/test_okf_bundle.py) — this record's
   enforcement; its docstring states why each of the three boundaries is one.
-- [`work/proposals/positioning-documents-not-code.md`](../work/proposals/positioning-documents-not-code.md)
+- [`work/proposals/positioning-documents-not-code.md`](../archive/proposals/positioning-documents-not-code.md)
   §6 — the measurement that found 94 of 314 files failing the claimed bar.
 
 ### Veto condition
@@ -195,7 +195,7 @@ evidence.*
 **Project docs**
 
 - [`docs/index.md`](../docs/index.md)
-- [`work/proposals/positioning-documents-not-code.md`](../work/proposals/positioning-documents-not-code.md)
+- [`work/proposals/positioning-documents-not-code.md`](../archive/proposals/positioning-documents-not-code.md)
 - [`work/golden/README.md`](../work/golden/README.md)
 
 **Papers and specifications**

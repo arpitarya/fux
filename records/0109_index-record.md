@@ -10,7 +10,7 @@ feature: the committed record schema — `fux.index.v2`
 owns: []
 laws: [L2, L3, L5, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: cc68eb86de5b96b38e86f010e670508c14873ed1f5939133ddb37803625153e3
+content_sha: 8e00023a785b644124dcef91ee39d1ce200cdfa6807ade04814897b2ebf4a926
 ---
 
 # SR-RECORD — one line of the committed index
@@ -315,7 +315,7 @@ paraphrase of the other.
   out-of-band provisioning story for every query client) for a narrower gain
   than it looks like, since volume leakage (`terms`' tf, `flen`) reconstructs
   regardless of how the term keys were hashed. See
-  [`meta-privacy.compare.md`](../work/compare/meta-privacy.compare.md).
+  [`meta-privacy.compare.md`](../archive/compare/meta-privacy.compare.md).
 
 ### Alternatives considered
 
@@ -357,7 +357,7 @@ paraphrase of the other.
   — `display_title` in
   [`store/format.py`](../src/fux/store/format.py); the verdicts that argued the
   mode —
-  [`work/compare/meta-privacy.compare.md`](../work/compare/meta-privacy.compare.md).
+  [`work/compare/meta-privacy.compare.md`](../archive/compare/meta-privacy.compare.md).
 - Real records, both `plain` and `hashed`, as of 2026-08-18 —
   [`work/regression/2026-08-18-ingest-and-index/`](../work/regression/2026-08-18-ingest-and-index/report.md) §2 and §6.
 - Canonical JSON, the prior art the encoder follows — RFC 8785:
@@ -422,7 +422,7 @@ evidence.*
 
 **Project docs**
 
-- [`work/compare/meta-privacy.compare.md`](../work/compare/meta-privacy.compare.md)
+- [`work/compare/meta-privacy.compare.md`](../archive/compare/meta-privacy.compare.md)
 
 **Papers and specifications**
 

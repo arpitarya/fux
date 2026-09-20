@@ -10,7 +10,7 @@ feature: the index write lock and the files around it
 owns: []
 laws: [L1, L2, L3, L7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 347f54c6067b39c6e6abe564d739a5fc79aa5fcc5bc60f54f9f335618e979820
+content_sha: 8acf14638d1309b941aff54ccceeb7e64c2b18935f636075b90bee04f07ab6bd
 ---
 
 # SR-LOCKS — the one lock fux owns
@@ -184,7 +184,7 @@ the takeover reporter and the `required=True` refusal all print it.
   status. Re-checked against the consumer-dependency ruling and unchanged —
   `filelock` and `portalocker` are third-party runtime code and stay refused
   under L1
-  ([`work/compare/index-lock.compare.md`](../work/compare/index-lock.compare.md) §4).
+  ([`work/compare/index-lock.compare.md`](../archive/compare/index-lock.compare.md) §4).
 - **A lock on the read path** — rejected by decision 2.
 - **A daemon-specific lock** — rejected by decision 1: two locks, one resource.
 - **A blocking or queueing acquire** — rejected. A background runner that loses
@@ -199,14 +199,14 @@ the takeover reporter and the `required=True` refusal all print it.
 - **Merging the mutex and the enrichment queue into one file** — rejected
   before this record existed: a mutex must be gitignored and a queue must be
   committed, and no `.gitignore` can express half a file
-  ([`work/compare/index-lock.compare.md`](../work/compare/index-lock.compare.md),
+  ([`work/compare/index-lock.compare.md`](../archive/compare/index-lock.compare.md),
   verdict B).
 
 ### Reference (required)
 
 - [`src/fux/maintain/runner.py`](../src/fux/maintain/runner.py) — the lock,
   the stop, and the status surface, with the reasoning in the module docstring
-- [`work/compare/index-lock.compare.md`](../work/compare/index-lock.compare.md)
+- [`work/compare/index-lock.compare.md`](../archive/compare/index-lock.compare.md)
   — the fork that ruled one file or two, and re-checked L1 against the
   consumer-dependency ruling
 - [`tests/ingest/test_queue.py`](../tests/ingest/test_queue.py) — the race
@@ -300,5 +300,5 @@ evidence.*
 
 **Project docs**
 
-- [`work/compare/index-lock.compare.md`](../work/compare/index-lock.compare.md)
+- [`work/compare/index-lock.compare.md`](../archive/compare/index-lock.compare.md)
 - [`work/MACHINE.md`](../work/MACHINE.md)

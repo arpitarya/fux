@@ -10,7 +10,7 @@ feature: the file-type allowlist and `.fux/formats.toml`
 owns: [src/fux/ingest/typesfile.py@127aed84458a]
 laws: [L1, L3]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 88b29325776410e918dc6b332bf5306ac6b02beae7e8bf3542f3ad67b036e9cc
+content_sha: 1fc1406c03b49aa816cddb4246b057b666542d0f181842c6bf6e4199ccd18e1e
 ---
 
 # SR-TYPES — which files are documents
@@ -546,7 +546,7 @@ nothing had ever read it.
 ### Alternatives considered
 
 Full matrix in
-[`work/compare/file-type-filter.compare.md`](../work/compare/file-type-filter.compare.md);
+[`work/compare/file-type-filter.compare.md`](../archive/compare/file-type-filter.compare.md);
 the short version:
 
 - **A types file with no built-in default.** Rejected: every consumer writes the
@@ -615,7 +615,7 @@ the short version:
   scheme, which is the same "the config binds, the module is checked" shape —
   <https://docs.djangoproject.com/en/stable/ref/settings/#engine>
 - The verdict and its matrix:
-  [`work/compare/file-type-filter.compare.md`](../work/compare/file-type-filter.compare.md)
+  [`work/compare/file-type-filter.compare.md`](../archive/compare/file-type-filter.compare.md)
 - **Sphinx `source_suffix`** — allowlist by extension; an unlisted suffix is
   simply not a source —
   <https://www.sphinx-doc.org/en/master/usage/configuration.html>
@@ -701,7 +701,7 @@ evidence.*
 
 **Project docs**
 
-- [`work/compare/file-type-filter.compare.md`](../work/compare/file-type-filter.compare.md)
+- [`work/compare/file-type-filter.compare.md`](../archive/compare/file-type-filter.compare.md)
 
 **Papers and specifications**
 

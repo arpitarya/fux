@@ -10,7 +10,7 @@ feature: the refer plane's two caches, and the wall between them
 owns: [src/fux/refer/arc.py@cdf032d55979, src/fux/refer/fetchcache.py@0236aed37e30]
 laws: [L1, L2, L3, L5]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 3eea9dd3eb97783cd39dbdcf5a50759a4777b6048b0063b9966de55fa435a813
+content_sha: 30696733df9a5b9bc8bce4eff2802cb9ce01624b7200319cd02bc7452035f274
 ---
 
 # SR-CACHE — two caches, and the wall between them
@@ -127,9 +127,9 @@ is a separate record: a different failure mode (a wrong answer, or a leaked
 byte, rather than a missing citation), a different law surface (L2 and L5, not
 just L3), and two files that a future change will touch together and touch
 alone. The replacement-policy fork was settled in
-[`cache-policy.compare.md`](../work/compare/cache-policy.compare.md), and the
+[`cache-policy.compare.md`](../archive/compare/cache-policy.compare.md), and the
 TTL fork in
-[`refer-fetch-cache.compare.md`](../work/compare/refer-fetch-cache.compare.md).
+[`refer-fetch-cache.compare.md`](../archive/compare/refer-fetch-cache.compare.md).
 
 ### Decision
 
@@ -204,7 +204,7 @@ non-reproducible, gitignored, never reaching a committed record. The clock is
 local note about *when we last looked*; the other would be a committed claim
 about *when a document was ingested*, and that question closed separately as
 *no* ([SR-REFER](0127_refer-plane.md) decision 4, and
-[`record-freshness.compare.md`](../work/compare/record-freshness.compare.md)).
+[`record-freshness.compare.md`](../archive/compare/record-freshness.compare.md)).
 
 **9. The TTL store is bounded on disk, evicting oldest `fetched_at` first.**
 `max_bytes`, default **500 MB** — a number chosen here, not specified — bounds
@@ -282,7 +282,7 @@ comparison against a live source.
 - **`max_age_seconds` on the committed record instead of a local TTL.**
   Rejected and closed elsewhere — the record carries no ingest time and adding
   one breaks reproducibility
-  ([`record-freshness.compare.md`](../work/compare/record-freshness.compare.md),
+  ([`record-freshness.compare.md`](../archive/compare/record-freshness.compare.md),
   Arpit's verdict D). The TTL lives in gitignored cache metadata precisely so
   that decision stays untouched.
 - **Serving a TTL hit as `current`.** Rejected: decision 7. It would make the
@@ -314,8 +314,8 @@ comparison against a live source.
   context decision 6 exists for —
   <https://developer.atlassian.com/cloud/confluence/rate-limiting/>
 - The forks this record does not re-argue —
-  [`cache-policy.compare.md`](../work/compare/cache-policy.compare.md) ·
-  [`refer-fetch-cache.compare.md`](../work/compare/refer-fetch-cache.compare.md)
+  [`cache-policy.compare.md`](../archive/compare/cache-policy.compare.md) ·
+  [`refer-fetch-cache.compare.md`](../archive/compare/refer-fetch-cache.compare.md)
 - The measured run that exercised the warm path —
   [R4-REFER](../work/regression/2026-08-20-refer-plane-r4/VERDICT.md)
 - The parent record — [SR-REFER](0127_refer-plane.md), decisions 4, 6 and 7
@@ -396,9 +396,9 @@ evidence.*
 **Project docs**
 
 - [`../GLOSSARY.md`](../docs/GLOSSARY.md)
-- [`work/compare/cache-policy.compare.md`](../work/compare/cache-policy.compare.md)
-- [`work/compare/record-freshness.compare.md`](../work/compare/record-freshness.compare.md)
-- [`work/compare/refer-fetch-cache.compare.md`](../work/compare/refer-fetch-cache.compare.md)
+- [`work/compare/cache-policy.compare.md`](../archive/compare/cache-policy.compare.md)
+- [`work/compare/record-freshness.compare.md`](../archive/compare/record-freshness.compare.md)
+- [`work/compare/refer-fetch-cache.compare.md`](../archive/compare/refer-fetch-cache.compare.md)
 
 **Papers and specifications**
 

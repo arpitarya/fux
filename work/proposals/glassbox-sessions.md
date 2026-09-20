@@ -248,7 +248,7 @@ for fux to index a corpus that is *generated*, *high-volume*, *privacy-bearing*
 and *not written by a human* — and RUM, Sentry replays, Datadog and FullStory are
 all the same shape. The positioning ruling of 2026-09-12 was
 *"a search index for your written knowledge"*
-([`positioning-documents-not-code.md`](positioning-documents-not-code.md), B-176).
+([`positioning-documents-not-code.md`](../../archive/proposals/positioning-documents-not-code.md), B-176).
 
 🔴 **A session transcript is not written knowledge.** An *incident dossier*
 arguably is — it is a written finding about a system, of exactly the kind fux
@@ -295,5 +295,5 @@ script in one consumer's repo and fux needs to know nothing about it.
 - [SR-ACQUIRED](../../records/0145_acquired-plane.md) · [SR-URL-FRESHNESS](../../records/0147_url-freshness.md) · [SR-REFUSAL](../../records/0146_refusals.md) — retained bytes, freshness verdicts, the fail-closed refusal predicate
 - [SR-PII](../../records/0148_pii.md) · [SR-DOTFUX](../../records/0102_fux-directory.md) — redaction's closed validator set; which planes are committed
 - [SR-PROVENANCE](../../records/0142_provenance.md) — `--receipt`, `--audit`, `fux verify`
-- [`mcp-adapters.md`](mcp-adapters.md) (B-182) · [`positioning-documents-not-code.md`](positioning-documents-not-code.md) (B-176)
+- [`mcp-adapters.md`](mcp-adapters.md) (B-182) · [`positioning-documents-not-code.md`](../../archive/proposals/positioning-documents-not-code.md) (B-176)
 - [Glassbox platform](https://www.glassbox.com/platform/) · [Glassbox integrations](https://www.glassbox.com/platform/integrations/)

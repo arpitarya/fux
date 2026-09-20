@@ -10,7 +10,7 @@ feature: the agent-facing policy and skill artifacts Fux ships, and their instal
 owns: [src/fux/templates/agents@17949617d8d4]
 laws: [L1, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: d831e167552feaf09e306d4beebdcf7953accf44fd0b589c6d18cda1b8a147f6
+content_sha: 3256f11cfff378bbc644a071757025ee12ebc7eb1d9672c20b4025a0a4ca0ad1
 ---
 
 # SR-AGENT-POLICY — shipping the policy, not just the facts
@@ -105,7 +105,7 @@ $ fux setup --no-agents
 pages — and a repository is one place it can live, not what fux is about.
 *"Codebase"* named the wrong thing and was one of the six surfaces that keep
 fux misfiled next to AST/code-graph tools (Arpit's ruling, from
-[`work/proposals/positioning-documents-not-code.md`](../work/proposals/positioning-documents-not-code.md)).
+[`work/proposals/positioning-documents-not-code.md`](../archive/proposals/positioning-documents-not-code.md)).
 
 **`policy-version` stays at 1, deliberately.** Decision 8's version exists to
 make a **stale policy** identifiable. This is a noun swap in the usage half —
@@ -433,7 +433,7 @@ agents can invoke `fux enrich`.
 
 **14. Copilot gets `.github/skills/`, and the fork closed A rather than C**
 (Arpit, 2026-09-06). ⚠ **The directory moved to `.agents/skills/` on 2026-09-12
-(decision 16); the argument for writing Copilot its own skills stands unchanged.** [`copilot-skill-surface`](../work/compare/copilot-skill-surface.compare.md)
+(decision 16); the argument for writing Copilot its own skills stands unchanged.** [`copilot-skill-surface`](../archive/compare/copilot-skill-surface.compare.md)
 proposed **C — write nothing new**, on the ground that Copilot already reads
 `.claude/skills` and the duplicate-name behaviour is unmeasured. **Overruled,
 and the doc's own crux is weaker than it was written:**
@@ -689,7 +689,7 @@ since decision 11.
 
 - **Copilot's double-load is back to two copies** (`.claude/skills` and
   `.agents/skills`), the state decision 14 argued from.
-  [`copilot-skill-surface`](../work/compare/copilot-skill-surface.compare.md)'s
+  [`copilot-skill-surface`](../archive/compare/copilot-skill-surface.compare.md)'s
   reopen-trigger — an **observed** duplicate-name error — is unchanged.
 - ⚠ **Existing repositories keep their old `.codex/skills/` and
   `.github/skills/`.** `fux setup` is write-if-missing and never deletes, so a
@@ -815,7 +815,7 @@ here.
 | **Opt-in behind a flag** | **drafted this way and overruled.** A flag nobody knows about means the policy layer exists in the product and in no repository, and the failure it prevents is *silent*. The trust concern the flag answered is instead met by decision 6's mandatory announcement plus `--no-agents` |
 | **Generate the renderings from the canonical policy** | a handful of short files do not earn a generator; decision 2's conformance test buys the same guarantee at a fraction of the machinery |
 | **Ship the skills as steering too, "so they always apply"** | rejected under decision 9a: a skill that writes committed code and changes ranking must never enter every request |
-| **Write `.github/skills/fux-decoder/` now that Copilot has a skill surface** | ✅ **ACCEPTED BY RULING, 2026-09-11** — see decision 14a. It was deferred here, not rejected: Copilot already reads `.claude/skills` (decision 13), so this writes a *second* copy under one `name:`, and whether that collides is still **not known**. What changed is not that evidence — it is Arpit's ruling that the `install = ["copilot"]` hole outweighs an unmeasured duplicate-name risk whose worst case is a hard error, not divergent instructions. `fux-usage` came with it. [`copilot-skill-surface`](../work/compare/copilot-skill-surface.compare.md)'s reopen-trigger — an **observed** error — is unchanged and still live |
+| **Write `.github/skills/fux-decoder/` now that Copilot has a skill surface** | ✅ **ACCEPTED BY RULING, 2026-09-11** — see decision 14a. It was deferred here, not rejected: Copilot already reads `.claude/skills` (decision 13), so this writes a *second* copy under one `name:`, and whether that collides is still **not known**. What changed is not that evidence — it is Arpit's ruling that the `install = ["copilot"]` hole outweighs an unmeasured duplicate-name risk whose worst case is a hard error, not divergent instructions. `fux-usage` came with it. [`copilot-skill-surface`](../archive/compare/copilot-skill-surface.compare.md)'s reopen-trigger — an **observed** error — is unchanged and still live |
 | **Keep Codex in `.codex/skills/`, or write both that and `.agents/skills/`** | rejected in decision 16 (W-141): Codex's docs list only `.agents/skills`, a skill that never loads fails silently, and a second directory would show Copilot three copies |
 | **Give Codex its own `AGENTS.md` template** | it already has the right one. `AGENTS.md` is vendor-neutral by W-82 ruling 16 and carries the verbatim block; a Codex-specific copy would be a second rendering of a policy that has exactly one |
 

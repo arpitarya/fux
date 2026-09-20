@@ -37,7 +37,7 @@ timestamp: 2026-09-11T00:00:00Z
 
 - 🔴 **This reverses a recorded rejection.** SR-TYPES §Alternatives: *"A
   `[sources] types` TOML array. Rejected: the shape SR-DIR-LIST had just moved
-  away from."* Also [file-type-filter](file-type-filter.compare.md) option D.
+  away from."* Also [file-type-filter](../../archive/compare/file-type-filter.compare.md) option D.
   §3 re-reads each reason against this proposal.
 
 - 🔴 **The chat question that picked a shape carried a false premise, and it
@@ -245,7 +245,7 @@ Redo this comparison if any of these is true:
 - SR-DIR-LIST — [`records/0120_dir-list.md`](../../records/0120_dir-list.md): decisions 1, 2, 2b; §Alternatives.
 - SR-FUXIGNORE — [`records/0144_fuxignore.md`](../../records/0144_fuxignore.md): decision 5.
 - SR-DECODE — [`records/0139_decode.md`](../../records/0139_decode.md): decisions 13 and 17.
-- [file-type-filter](file-type-filter.compare.md) — option D and its matrix.
+- [file-type-filter](../../archive/compare/file-type-filter.compare.md) — option D and its matrix.
 - Code: [`sourcelist.py`](../../src/fux/ingest/sourcelist.py) (`parse`, `TYPES`), [`sources.py`](../../src/fux/sources.py), [`decode/__init__.py`](../../src/fux/decode/__init__.py) (`_declared_bindings`, `_bound_extension`, `_bind`), [`gitdir.py`](../../src/fux/ingest/gitdir.py) (`read_types`, the dot-skip), `config.schema.json` (deleted 2026-09-12 by W-122's consolidation; the declared key block in [SR-CONFIG](../../records/0113_config.md) decision 13 replaced it).
 - TOML v1.0.0 — duplicate keys invalid; multi-line arrays with trailing commas and comments — <https://toml.io/en/v1.0.0>
 - Python `tomllib` — read-only, added in 3.11 — <https://docs.python.org/3/library/tomllib.html>

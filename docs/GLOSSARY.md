@@ -66,7 +66,7 @@ LRU's hot set, and here a miss costs a network fetch. In-memory and
 per-process — distinct from the [TTL fetch cache](#ttl-fetch-cache), which is
 on disk. Megiddo & Modha, FAST 2003 (paper ref [11]). See
 [SR-CACHE](../records/0131_cache.md) decisions 2–5,
-[cache-policy](../work/compare/cache-policy.compare.md).
+[cache-policy](../archive/compare/cache-policy.compare.md).
 
 **Atom (a ranking atom)** — A named, single-purpose ranking component with a
 frozen output contract, kept separate so a composed verb can be built out of
@@ -142,7 +142,9 @@ The property behind goldens, merge safety, and the audit story.
 Blocked postings (128 per line) plus a fixed-width binary
 [offset table](#offset-table); it makes warm `ask` fast and is bound by the
 [differential law](#differential-law). Deleting it costs a `fux build` and
-nothing else. Tier T1 in the [index-format compare doc](../work/compare/index-format.compare.md)
+nothing else. Tier T1 in [SR-POSTINGS](../records/0112_postings.md) — the fork was argued in
+[`index-format`](../archive/compare/index-format.compare.md), **archived 2026-09-20**, and the
+decision lives in the record
 §3. See [SR-T1-ACCELERATOR](../records/0110_accelerator.md).
 
 **Block / block line** — One line of the accelerator's postings file, holding
@@ -374,7 +376,7 @@ that leak is an **accepted, documented exposure** — use `.fux/pii.toml` to kee
 a value out of the committed index, or do not index the page.
 `meta=` in a URL line or in `[sources.url]` is now a **named load error**, not
 an ignored key. See [SR-LAW-5](../records/0007_LAW-5-hashed-meta.md)
-(superseded) and [meta-privacy](../work/compare/meta-privacy.compare.md).
+(superseded) and [meta-privacy](../archive/compare/meta-privacy.compare.md).
 
 **Link-IDF** — An inbound edge's discount in the graph walk:
 `1 / (1 + ln(1 + in_degree of its target))`. A node nothing points at is
@@ -597,7 +599,9 @@ that measures [P1](#p-predictions-p1p7) before any of M2–M6 is built. One
 scorer ([BM25F](#bm25f)), three corpora, k ∈ {baseline, 128, 64}, varying
 **only the index**. Its verdict is [P1-GATE](../work/regression/2026-08-09-pruning-eval/VERDICT.md);
 a FAIL terminates the plan and reopens
-[storage-architecture](../work/compare/storage-architecture.compare.md).
+[SR-REFER](../records/0127_refer-plane.md) and [L2](../records/0004_LAW-2-content-never-durable.md)
+— argued in [`storage-architecture`](../archive/compare/storage-architecture.compare.md),
+**archived 2026-09-20**.
 
 **Refer (mode)** — The default per-source policy: the index keeps statistics,
 **never content**; the answer path fetches the cited documents from their
@@ -619,7 +623,9 @@ Ported at [M4](../archive/open/W-24-m4-refer-plane.md) from archived ADR-0007.
 with per-block max impact and skip pointers, decoded at native speed via
 `memoryview.cast`. Large (~2.5 GB at 10⁶ — **a deferred target**, not the design point; see [Litmus](../CLAUDE.md)) and disposable — the mirror image of
 the [wire format](#wire-format). See
-[storage-architecture](../work/compare/storage-architecture.compare.md).
+[SR-REFER](../records/0127_refer-plane.md) and [L2](../records/0004_LAW-2-content-never-durable.md)
+— argued in [`storage-architecture`](../archive/compare/storage-architecture.compare.md),
+**archived 2026-09-20**.
 
 **Snapshot (mode)** — The explicit per-source opt-out from
 [content-never-durable](#content-never-durable-the-law): Fux additionally
@@ -658,7 +664,7 @@ caching whatever the TTL says. Disk-bounded, oldest-`fetched_at` evicted first.
 **The only place in the engine that reads a wall clock.** Its existence is a
 rate-limit answer, not a latency one — an agent asking ten questions about one
 runbook must not fetch it ten times. See [SR-CACHE](../records/0131_cache.md)
-decisions 6–11, [refer-fetch-cache](../work/compare/refer-fetch-cache.compare.md).
+decisions 6–11, [refer-fetch-cache](../archive/compare/refer-fetch-cache.compare.md).
 
 **`cached` (the fourth verdict)** — One of the four freshness labels the
 [refer](#refer-mode) path reports: `current` · `stale` · `unverified` ·

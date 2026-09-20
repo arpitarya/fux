@@ -50,7 +50,7 @@ again"*, and **that file has never existed** (found 2026-09-12 by
 `tests/test_doc_links.py`, which counts links to files that are not there).
 
 - **The drift it claimed to prevent is measured and real:**
-  [the positioning proposal](../work/proposals/positioning-documents-not-code.md)
+  [the positioning proposal](../archive/proposals/positioning-documents-not-code.md)
   §6 found **94 of 314 files** failing a conformance bar this repo asserts in
   prose and checks nowhere.
 - ⚠ **The test is not written here on purpose.** It would fail on all 94 today,

@@ -148,7 +148,7 @@ W-165 (three CLI fixes), W-166 (carry-forward invalidation), W-168 (search impro
 | B-115 | Decision 15 "remains unmeasured" — no endpoint touched `pdf`/`rtf`/`csv`/`jsonl` heading emission; decision 16 is "INCONCLUSIVE, not a null" | [SR-DECODE](../records/0139_decode.md) Consequences ⚠ and 🔴 | Endpoints over those four formats, and over `phrases` noise |
 | B-116 | `toml`, `yaml` and `ini` emit no filename title — "pre-existing… not changed here. Recorded so it is a decision next time" | [SR-DECODE](../records/0139_decode.md) decision 11a ⚠ | Measure, then emit a title or rule it out |
 | B-117 | The repeated table header is scored, so every band of a table gains a uniform uplift against non-table passages | [SR-REFER](../records/0127_refer-plane.md) decision 25 ⚠ | Measure the uplift, or stop scoring the repeated header |
-| B-118 | 98 % of a 9.54 s `fux graph` sits in `plane.load()` — "the format question is worth arguing with numbers", filed and unresolved | [SR-GRAPH](../records/0126_graph.md) Consequences ⚠ | Rule [`graph-plane-format.compare.md`](compare/graph-plane-format.compare.md) |
+| B-118 | 98 % of a 9.54 s `fux graph` sits in `plane.load()` — "the format question is worth arguing with numbers", filed and unresolved | [SR-GRAPH](../records/0126_graph.md) Consequences ⚠ | Rule [`graph-plane-format.compare.md`](../archive/compare/graph-plane-format.compare.md) |
 | B-119 | The refer plane fetches serially, so the latency bound "is a statement about the source's latency at k=10, not about fux" | [SR-REFER](../records/0127_refer-plane.md) veto 1 ⚠ | Parallel fetch, or re-measure and re-register the bound |
 | B-120 | ~2.6 s per document per query at the 20 000-row tabular default, multiplied by a multi-document `ask --refer` | [SR-TABULAR](../records/0150_tabular.md) Consequences 🔴 | Cascade ranking, or the declined degrade-to-bands constant |
 | B-121 | "Raising the row limit is also an index-size change, not only a latency one" | [SR-TABULAR](../records/0150_tabular.md) Consequences ⚠ | A measured index-size budget for tabular corpora |
@@ -218,13 +218,17 @@ W-165 (three CLI fixes), W-166 (carry-forward invalidation), W-168 (search impro
 
 *Every file in that directory has a row here and only here; the proposal keeps
 its own lifecycle, its own graduation trigger, and its own README row.
-[`structure-aware-extraction.md`](proposals/structure-aware-extraction.md) and
-[`search-improvements-v3.md`](proposals/search-improvements-v3.md) carry
-no row: what remains of each is **W-144** and **W-168** in the queue.*
+[`search-improvements-v3.md`](proposals/search-improvements-v3.md) carries no
+row: what remains of it is **W-168** in the queue.*
+
+⚠ **`structure-aware-extraction.md` was the other exception and it ARCHIVED on
+2026-09-20** (W-206 B2) — W-144 closed 2026-09-16, and its boundary argument
+lives in [SR-DECODE](../records/0139_decode.md) §Alternatives. **Five rows left
+this table in the same change** — B-176, B-185, B-186, B-187 and B-249 — each
+with its proposal.
 
 | id | what is outstanding | named in | what closes it |
 |---|---|---|---|
-| B-176 | Positioning — `graduated` and kept: GitHub About and topics still need Arpit's `gh`, the PyPI page changes on the next upload, and §5's `code`→`path` rename is a live fork | [`positioning-documents-not-code.md`](proposals/positioning-documents-not-code.md) | The three remaining surfaces, and the rename ruling |
 | B-178 | SR review 2026-08-28 — five rules each broken in 20–45 of 47 records, record-vs-record only, and some of the lint has since landed "which nobody has reconciled against this list" | [`adr-review-2026-08-28.md`](proposals/adr-review-2026-08-28.md) | Reconcile the list against what shipped, then bulk-pass |
 | B-179 | Code + architecture review 2026-08-28 — ran on a cloud mirror with a wedged shell, "so every P0/P1 is to reproduce" | [`architecture-review-2026-08-28.md`](proposals/architecture-review-2026-08-28.md) | Verify item by item on the real tree |
 | B-180 | Ranking tuning — the instrument, not the optimiser. ⚠ Its trigger named **W-97** (archived) and **W-136** (merged); both halves are [W-204](open/W-204-golden-outputs-scoring-and-version-benchmark.md) now | [`ranking-tuning.md`](proposals/ranking-tuning.md) | 50 judgments from W-204 phase D |
@@ -232,13 +236,9 @@ no row: what remains of each is **W-144** and **W-168** in the queue.*
 | B-182 | MCP as the adapter endgame — one protocol instead of per-app adapters, on the org's own auth | [`mcp-adapters.md`](proposals/mcp-adapters.md) | The first MCP-gateway design partner, or a fourth adapter request |
 | B-183 | Knowledge CI — PRs fail when the index is stale; decisions the diff contradicts surface as cited review comments | [`knowledge-ci.md`](proposals/knowledge-ci.md) | M6 dogfoods green for two weeks |
 | B-184 | Wavelet-tree self-index — the preserved option C of the keyspace compare | [`wavelet-self-index.md`](proposals/wavelet-self-index.md) | A law change, or a P5 bottleneck |
-| B-185 | Research-to-Spec — evidence-backed specs where every claim cites the corpus at a commit | [`research-to-spec.md`](proposals/research-to-spec.md) | No trigger stated — the row it is owed |
-| B-186 | Knowledge diff and time-travel — `fux diff` / `fux log`, asking questions of past knowledge; a natural fit for the one-root-hash keyspace | [`knowledge-diff.md`](proposals/knowledge-diff.md) | No trigger stated — the row it is owed |
-| B-187 | Agent search-API landscape — a research note and the evidence base the refer-plane proposals cited, kept because two live records still ground on it | [`agent-search-landscape.md`](proposals/agent-search-landscape.md) | Nothing; it is grounding, not work |
 | B-246 | `WORKLOG.md` archive-and-truncate — append-only and growing forever; a yearly or v-major cut into `archive/worklog/YYYY.md` would cap the live file under the one-archive law. Parked since 2026-08-21, never litigated | [SR-WORK-GOVERNANCE](../records/0065_WORK-governance.md) Consequences | Arpit rules on the cut, or rules it never happens |
 | B-247 | `DOC-REGISTRY.md` scoped to untested prose — its unique value is the docs nothing else checks (`WORKLOG`, `MACHINE`, `GLOSSARY`, the paper); SRs and `setup/` have dedicated tests. Parked since 2026-08-21, never litigated | [SR-WORK-GOVERNANCE](../records/0065_WORK-governance.md) Consequences | Arpit rules on the scope, or rules it stays whole |
 | B-248 | Glassbox sessions — counts and cross-session joins, which fux does not do; the sketch is materialise-then-index. ⚠ The `fetch=` closed-tuple blocker is **struck** (W-178, then W-199) | [`glassbox-sessions.md`](proposals/glassbox-sessions.md) | A second event-stream source is asked for |
-| B-249 | A non-circular quality endpoint for proximity reranking — five candidates, and a mechanical SCREEN (`agreement` against the reranker's own objective, band `0.25`-`0.85`) that can disqualify the recommendation before an arm runs | [`quality-endpoint-for-reranking.md`](proposals/quality-endpoint-for-reranking.md) | The screen's number decides: W-154's Part B, or the fork to Arpit |
 
 ---
 

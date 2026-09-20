@@ -10,7 +10,7 @@ feature: the decoder plane — the protocol, the registry, the consumer seam and
 owns: [src/fux/decode@f1f696d64383, src/fux/templates/agents/DECODER-SKILL.md@474a416bcc42]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-26T00:00:00Z
-content_sha: ab2482675d0b565b3824048a099cb7abea4365d7e26d4d2bdc728ebca93a1ecd
+content_sha: 9ff51db2a2871e8bcf3fa431fae007c0e384016a496951de0630848c83803230
 ---
 
 # SR-DECODE — bytes become Markdown in one place
@@ -753,8 +753,11 @@ own doctor row and its own split between shape and existence.
 - **Decoders for in-document structure (tables, code fences).** Rejected as a
   category — by the time a decoder finishes, a table *is* Markdown, and
   weighting it is `extract.py`'s job. **Consumer code owning ranking policy is a
-  worse defect than a missing field.** See
-  [`proposals/structure-aware-extraction.md`](../work/proposals/structure-aware-extraction.md).
+  worse defect than a missing field.** The proposal that argued it is
+  [`structure-aware-extraction`](../archive/proposals/structure-aware-extraction.md),
+  **archived 2026-09-20** once W-144 closed — it may be named, never cited as
+  backing this (SR-WORK-ARCHIVE decisions 4–5). **The argument is the paragraph
+  above it**, which is why archiving the proposal took nothing away.
 
 ### Reference (required)
 
@@ -846,7 +849,14 @@ evidence.*
 
 **Project docs**
 
-- [`work/proposals/structure-aware-extraction.md`](../work/proposals/structure-aware-extraction.md)
+- 🔴 **`work/proposals/structure-aware-extraction.md` LEFT this block on
+  2026-09-20** (W-206 B2). It archived when W-144 closed, and
+  [SR-WORK-ARCHIVE](0062_WORK-archive.md) decision 5 forbids an archived
+  document backing a live claim. **What grounded this record is the decision the
+  proposal graduated into, and that is where the block points now:**
+  [SR-RANKING](0111_ranking.md) decision 3 (`b = 0.15`, measured) and this
+  record's own §Alternatives paragraph on decoders-for-structure. Decision 6's
+  rule applied: the link was repointed at the live successor, not deleted.
 
 **Papers and specifications** *(consulted 2026-09-06, filed 2026-09-11)*
 

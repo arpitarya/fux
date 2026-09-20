@@ -10,7 +10,7 @@ feature: "`.fux/sources/dirs` — what the engine indexes, what is subtracted fr
 owns: []
 laws: [L3, L6]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 409be35789e25893a1e1911a49b0902c4966b457ff1fac4fe63846913af03b28
+content_sha: ed2e374c4a88ff21ea507bb6ae99d0e7d3497e1bc9d8abc582488fa81c886e36
 ---
 
 # SR-DIR-LIST — the committed directory list
@@ -141,7 +141,7 @@ and the symptom is that attribute values carry no whitespace and no quoting
 ([SR-URL-LIST](0116_url-list.md) decision 8) while a repeated key is an error
 (decision 10) — so two exclusions would have needed a comma sub-grammar the
 format has never had. Argued in
-[`work/compare/source-exclusion.compare.md`](../work/compare/source-exclusion.compare.md).
+[`work/compare/source-exclusion.compare.md`](../archive/compare/source-exclusion.compare.md).
 
 **2b. Exclusions in THIS file are order-independent, and there is no
 un-exclude.** The loader sorts, so file order cannot change a committed byte —
@@ -311,7 +311,7 @@ different authorship, and the reader is lenient for both.
   §Finding 2 and its
   [`ANALYSIS.md`](../work/regression/2026-08-12-r2-close/ANALYSIS.md) §2.
 - The exclusion fork —
-  [`work/compare/source-exclusion.compare.md`](../work/compare/source-exclusion.compare.md).
+  [`work/compare/source-exclusion.compare.md`](../archive/compare/source-exclusion.compare.md).
 - **What the declaration triggers, not decided here** —
   [SR-ARCHIVED-CONTENT](0134_archived-content.md).
 - Prior art for per-entry attributes on a line-oriented committed file —
@@ -372,7 +372,7 @@ evidence.*
 
 **Project docs**
 
-- [`work/compare/source-exclusion.compare.md`](../work/compare/source-exclusion.compare.md)
+- [`work/compare/source-exclusion.compare.md`](../archive/compare/source-exclusion.compare.md)
 
 **Papers and specifications**
 

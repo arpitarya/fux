@@ -7,10 +7,10 @@ description: "The ref/tag/code edges ingest already extracts become a queryable 
 status: accepted
 date: 2026-08-20
 feature: the graph lane — three relational verbs, a derived plane, and a lazy walk
-owns: [src/fux/graph@190867c8ad31, tools/graph-bench@9c330ea14b42]
+owns: [src/fux/graph@568321939097, tools/graph-bench@9c330ea14b42]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: aba1b4d7e48d95f02ae857de2397265f87c14b02a3b2dfbef514ad67d2ec28ce
+content_sha: 761cfbac8e36422310feb6cb5aa1f5e4754769f3bac083d251879e8851d83966
 ---
 
 # SR-GRAPH — the graph lane
@@ -375,7 +375,7 @@ claim to honesty is that its provenance can be checked.
 
 **17. `routes()` IS BOUNDED BY WORK, AND A CUT-SHORT SEARCH SAYS SO**
 (W-140 row 12; Arpit, 2026-09-14 — option (c) of
-[`path-hops-bound`](../work/compare/path-hops-bound.compare.md)).
+[`path-hops-bound`](../archive/compare/path-hops-bound.compare.md)).
 
 `routes()` takes a `budget` of **node expansions** (`walk.EXPANSION_BUDGET`,
 200 000) and returns `(routes, truncated)`.
@@ -527,7 +527,7 @@ yet.
   does not reopen decision 8 by itself — the profile is explicitly not a gate
   and no threshold was pre-registered — but it is real evidence the format
   question is worth arguing with numbers, filed as
-  [`graph-plane-format.compare.md`](../work/compare/graph-plane-format.compare.md).
+  [`graph-plane-format.compare.md`](../archive/compare/graph-plane-format.compare.md).
   **Decisions 5 and 7 are untouched by that finding.**
 
 ### Alternatives considered
@@ -672,7 +672,7 @@ evidence.*
 
 **Project docs**
 
-- [`work/compare/graph-plane-format.compare.md`](../work/compare/graph-plane-format.compare.md)
+- [`work/compare/graph-plane-format.compare.md`](../archive/compare/graph-plane-format.compare.md)
 
 **Papers and specifications**
 

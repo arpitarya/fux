@@ -107,7 +107,7 @@ the defect this ordering exists to make visible.*
 
 ## Filed 2026-09-11
 
-* [Positioning — written knowledge, not code](positioning-documents-not-code.md)
+* [Positioning — written knowledge, not code](../../archive/proposals/positioning-documents-not-code.md)
   — ✅ **`graduated`: RULED AND APPLIED by Arpit 2026-09-12.** Why fux was filed
   next to AST/code-graph tools: **it parses no code and, by default, indexes
   none** (`.py` → *not an indexed file type*); the misfiling traced to
@@ -148,7 +148,7 @@ re-derives its claims first.
 
 ## Filed 2026-08-26
 
-* [Structure-aware extraction](structure-aware-extraction.md) — tables, code
+* [Structure-aware extraction](../../archive/proposals/structure-aware-extraction.md) — tables, code
   fences and lists as **fields, not decoders**. By the time a decoder finishes,
   a table **is already Markdown**, and weighting it is `extract.py`'s job.
   ⚠ **The boundary is the load-bearing part:** in decoders, every
@@ -198,7 +198,7 @@ re-derives its claims first.
 
 ## Filed 2026-08-10
 
-* [Agent search-API landscape](agent-search-landscape.md) — research note, not
+* [Agent search-API landscape](../../archive/proposals/agent-search-landscape.md) — research note, not
   a build item: Parallel / Perplexity / Exa / Brave independently arrived at
   three index-and-refer decisions, and the corpus they *cannot* reach names
   Fux's wedge. **The evidence base the refer-plane proposals cited.**
@@ -225,9 +225,9 @@ re-derives its claims first.
 Both are *strengthened* by the v0.30 index-and-refer rebuild: the MST keyspace
 gives them their substrate natively.
 
-* [Research-to-Spec](research-to-spec.md) — evidence-backed specs; every claim
+* [Research-to-Spec](../../archive/proposals/research-to-spec.md) — evidence-backed specs; every claim
   cites the corpus at a commit.
-* [Knowledge diff & time-travel](knowledge-diff.md) — `fux diff` / `fux log`;
+* [Knowledge diff & time-travel](../../archive/proposals/knowledge-diff.md) — `fux diff` / `fux log`;
   ask questions of past knowledge. A natural fit for the one-root-hash keyspace.
 
 *(The third survivor, **audit evidence trail**, graduated 2026-08-27 into

@@ -10,7 +10,7 @@ feature: maintenance — the hooks, the deferring runner, the write lock, and th
 owns: [src/fux/maintain@6e92e762b4c4, tools/maintenance-bench@23a6ade137a5, tools/runner-race@98bd70ff092a]
 laws: [L3, L4, L5, L7]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 30fec48f9451eec5bc014cddb47f9bc57a4ef5bb94781c1b4b3ffb996ea10a5b
+content_sha: 34967c2556b0a4d1bcd22f25f7d398cf6d744ce826be4907d76762493c3cdb62
 ---
 
 # SR-MAINTENANCE — keeping the index in step
@@ -107,7 +107,7 @@ history, and decision 7 below carries what became of it.)
 ### Decision
 
 **0. Hooks are the mechanism**, ruled in
-[`maintenance-trigger.compare.md`](../work/compare/maintenance-trigger.compare.md)
+[`maintenance-trigger.compare.md`](../archive/compare/maintenance-trigger.compare.md)
 over a CI-triggered rebuild (a bot committing over the human's diff defeats the
 doc-major diffable design), a local watch daemon, and the manual status quo.
 That verdict is cited here, not re-argued. **What this record decides is
@@ -675,7 +675,7 @@ places. **An offline run never touches it**, exactly like `observe`.
   sentence saying it went; the harness at
   [`tools/maintenance-bench/`](../tools/maintenance-bench/).
 - The accepted verdicts this record implements:
-  [`maintenance-trigger.compare.md`](../work/compare/maintenance-trigger.compare.md)
+  [`maintenance-trigger.compare.md`](../archive/compare/maintenance-trigger.compare.md)
   (hooks are the mechanism) and
   [`hook-at-scale.compare.md`](../work/compare/hook-at-scale.compare.md)
   (**B — the hook defers**, and its §5 on why a one-shot runner is not the
@@ -888,7 +888,7 @@ evidence.*
 **Project docs**
 
 - [`work/compare/hook-at-scale.compare.md`](../work/compare/hook-at-scale.compare.md)
-- [`work/compare/maintenance-trigger.compare.md`](../work/compare/maintenance-trigger.compare.md)
+- [`work/compare/maintenance-trigger.compare.md`](../archive/compare/maintenance-trigger.compare.md)
 
 **Papers and specifications**
 

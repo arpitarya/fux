@@ -10,7 +10,7 @@ feature: the refer plane — fetch, verify, chunk, re-score, assemble
 owns: [src/fux/refer@51ebc07f901d, tools/refer-bench@cfdb47b24af2, tools/refer-budget-sweep@db9ff8233332]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: d6b6e84550d021d583cf154fd99fdc1137bc6c544c3a746e3893f95786114770
+content_sha: f89f67803a2c8df517fe732c68bd1544bed71727b6314b5d8c1caf7c177f0c15
 ---
 
 # SR-REFER — the refer plane
@@ -644,9 +644,9 @@ selector reads, to anyone auditing the plane, exactly like a branch in use.
   [`src/fux/ingest/urlsrc.py`](../src/fux/ingest/urlsrc.py).
 - The record's field set, which is why decision 4 exists:
   [SR-RECORD](0109_index-record.md); the freshness fork it settles:
-  [`work/compare/record-freshness.compare.md`](../work/compare/record-freshness.compare.md).
+  [`work/compare/record-freshness.compare.md`](../archive/compare/record-freshness.compare.md).
 - The caches: [SR-CACHE](0131_cache.md), and the fork it settles:
-  [`work/compare/cache-policy.compare.md`](../work/compare/cache-policy.compare.md).
+  [`work/compare/cache-policy.compare.md`](../archive/compare/cache-policy.compare.md).
 - Megiddo & Modha, *ARC: A Self-Tuning, Low Overhead Replacement Cache*
   (FAST '03) — the cache and its scan resistance:
   <https://www.usenix.org/legacy/events/fast03/tech/full_papers/megiddo/megiddo.pdf>
@@ -776,8 +776,8 @@ evidence.*
 
 **Project docs**
 
-- [`work/compare/cache-policy.compare.md`](../work/compare/cache-policy.compare.md)
-- [`work/compare/record-freshness.compare.md`](../work/compare/record-freshness.compare.md)
+- [`work/compare/cache-policy.compare.md`](../archive/compare/cache-policy.compare.md)
+- [`work/compare/record-freshness.compare.md`](../archive/compare/record-freshness.compare.md)
 
 **Papers and specifications**
 

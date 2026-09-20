@@ -304,7 +304,7 @@ class Route:
 #: How many node expansions one `routes()` search may spend before it stops.
 #:
 #: 🔴 **A WORK bound, not a depth bound, and that is the whole ruling**
-#: (Arpit, 2026-09-14 — [`path-hops-bound`](../../../work/compare/path-hops-bound.compare.md)
+#: (Arpit, 2026-09-14 — [`path-hops-bound`](../../../archive/compare/path-hops-bound.compare.md)
 #: option (c)). Capping `--hops` would have been a pre-registered threshold in
 #: everything but name: measured on one corpus, shipped to every corpus, and
 #: wrong on the first corpus shaped differently. **Work is the same on every

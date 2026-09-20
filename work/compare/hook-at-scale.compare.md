@@ -103,7 +103,7 @@ of those** is the fork, and it has more than two viable answers, so it is here
 rather than assumed in a commit.
 
 **This is not a re-litigation of
-[`maintenance-trigger.compare.md`](maintenance-trigger.compare.md).** That
+[`maintenance-trigger.compare.md`](../../archive/compare/maintenance-trigger.compare.md).** That
 document chose *git hooks* over CI, a watch daemon and manual, and nothing
 measured here disturbs that choice — the hook is still the right trigger. What
 is in question is what the hook **does when it fires**.
@@ -167,7 +167,7 @@ index, so the lag stays visible.
 > written because it is what the fork looked like before the ruling.** The
 > mechanism is a **detached one-shot runner** — *not* the lazy-on-next-use form
 > this section guessed at, and *not* the watch daemon
-> [`maintenance-trigger.compare.md`](maintenance-trigger.compare.md) rejected;
+> [`maintenance-trigger.compare.md`](../../archive/compare/maintenance-trigger.compare.md) rejected;
 > §5 works through why the rejection does not transfer. The widened window is
 > answered by **`fux ask` declaring the pending count**, which converts it from
 > a silent lag into a stated one.
@@ -214,7 +214,7 @@ size.
 ## §5 — Why the detached runner is *not* the daemon that was rejected
 
 **This verdict was checked against
-[`maintenance-trigger.compare.md`](maintenance-trigger.compare.md) before it was
+[`maintenance-trigger.compare.md`](../../archive/compare/maintenance-trigger.compare.md) before it was
 taken, because that document is `accepted` and rejected an option that sounds
 like this one.** It is not the same option.
 
@@ -292,7 +292,7 @@ whoever ruled.** The old `reaches the bound at 100k (×3)` and `holds at 10⁶
 - The veto that fired — [SR-MAINTENANCE](../../records/0129_hooks.md)
   condition 1.
 - The trigger choice this does **not** reopen —
-  [`maintenance-trigger.compare.md`](maintenance-trigger.compare.md).
+  [`maintenance-trigger.compare.md`](../../archive/compare/maintenance-trigger.compare.md).
 - Prior art for deferring index maintenance off the write path: Lucene's
   near-real-time segment model, where writes append and merging is a background
   concern rather than part of the commit —
