@@ -35,7 +35,54 @@ valuable judgement, but not the state of play.
 *Updated **2026-09-20** (Claude Code, the three green rows).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
+### ✅ W-204 IS THE GREEN ROW, AND PHASE A IS DONE (2026-09-20, Claude Code)
+
+⚠ **This supersedes the block below, which was true for part of the same day.**
+Arpit merged the whole golden/test-data chain into **[W-204](open/W-204-golden-outputs-scoring-and-version-benchmark.md)**,
+which is 🟢 and has four phases. **Phase A ran and is filed** —
+[`2026-09-20-golden-ladder-outputs`](regression/2026-09-20-golden-ladder-outputs/report.md):
+3 984 calls, all eight rungs, both sets, both verbs, frozen engine `538f3497`,
+`classification: informed`, **no score and no correctness column**. Eight
+absorbed items (W-136, W-87, W-190, W-195, W-191, W-176, W-161, W-175) are in
+`archive/open/` — **the block below names two of them as live inbox rows and
+they are not.**
+
+**Four things a session arriving cold most needs from that run:**
+
+1. 🔴 **A rung directory can silently override the engine's ranker.** Every rung
+   held `b = 0.75` in its own `.fux/tune.toml`, written by `fux setup` on
+   2026-09-12 — **W-144's upgrade trap, observed in the wild.** Phase A set all
+   eight to HEAD's measured `0.15` and said so before the first call. **Check
+   the corpus's `tune.toml`, never the engine default, before claiming what a
+   run ranked at.**
+2. 🔴 **Which is how a defect in a filed run surfaced, and it is Arpit's.** The
+   2026-09-16 `rung-00100` run states `b = 0.15` in both its frozen
+   pre-registration and its report; that rung's `tune.toml` held `0.75` before
+   it and holds it now, unmodified, and prompt 5 carries no `--no-tune`. **The
+   filed report was NOT edited.** ⚠ **The check can no longer be run** — phase
+   A's own re-ingest overwrote the v3 index it would need.
+3. 🔴 **The confidence band's middle is inert to corpus size.** From 100
+   documents up, **every** band transition is `grounded ↔ weak` — 43 of 43 — and
+   the `partial` set is byte-identical at all seven rungs. It gains a member at
+   **no point** in the ladder. Together with `weak` ⇔ `answerable: false` on
+   3 984 of 3 984 rows, the operative gate is **binary**. Whether that is a
+   defect or the design is SR-CONFIDENCE's; a run with no key cannot tell a
+   well-behaved invariant from a dead branch.
+4. ⚠ **`ingest --no-fetch` alone is refused across a format bump.** The engine
+   names `--full` as the only route, and `--full` is safe only where no `url:`
+   record exists.
+
+**Immediate next step: W-204 phase B** — read phase A's ✅ banner in the item
+first; it lists three things B inherits, including that the `v1.0.0` and
+`v2.0.1` arms **require** the `fux.toml` key HEAD refuses, so the arms cannot
+share one.
+
 ### 🔴 THE QUEUE HAS NO GREEN ROWS LEFT (2026-09-20)
+
+⚠ **Superseded the same day — see the block above.** Kept because its three
+numbered lessons about v4, the key directory and specs-that-are-wrong-about-the-tree
+are still current; its *queue* claims are not.
+
 
 **Everything agent-closable is closed.** W-198, W-194 and W-200 shipped in one
 session; W-197 closed with W-198. **Every remaining item waits on Arpit** —
@@ -2527,19 +2574,27 @@ the reason is that the measuring environments are gone.**
 *Updated **2026-09-13** (Cowork, Opus) — maintainer line: this session.*
 *Updated **2026-09-17** (Claude Code, Opus 5) — maintainer line: this session.*
 
-**Immediate next step: 🟢 [W-194](../archive/open/W-194-delete-hashed-meta.md)** — delete
-`meta = "hashed"`, `fux.index` → v4, **L5 retires**. Ratified 2026-09-17, not
-built, and **the queue's only green row.**
+*Updated **2026-09-20** (Claude Code, Opus 5) — maintainer line: this session.*
 
-🔴 **Two new decisions are Arpit's and they are both from today:**
-[W-196](../archive/open/W-196-l11-breach-2026-09-17.md) (the L11 breach — re-author set 1,
-or relabel it `informed` permanently) and
-[W-197](../archive/open/W-197-stray-key-directory.md) (the plural key directory — **nobody
-else may even look**). **Neither blocks W-194.**
+**Immediate next step: 🟢 [W-204](open/W-204-golden-outputs-scoring-and-version-benchmark.md) phase B**
+— `v1.0.0` · `v2.0.1` · `HEAD` on the same eight rungs, HEAD's rows being phase
+A's. **Its pre-registration can now name the sha phase A froze**
+(`538f34978141a54b28b78b7ea76d36969cf63aa0`), which is what it was waiting on.
+🔴 **Read phase A's ✅ banner in the item before starting** — it lists three
+things B inherits, the sharpest being that `v1.0.0` and `v2.0.1` **require** the
+`fux.toml` key HEAD refuses by name, so **the three arms cannot share a
+`fux.toml`** and the arms manifest has to record one per arm.
 
-⚠ **Nothing in the golden measurement chain moved and nothing is unblocked.**
-Prompt 6 is still unrun; W-87, W-176, W-190, W-191 and W-195 all still wait on
-it.
+**Phase A is DONE and filed** —
+[`2026-09-20-golden-ladder-outputs`](regression/2026-09-20-golden-ladder-outputs/report.md).
+✅ **W-194 shipped 2026-09-17** and this block used to name it as next; that is
+history now.
+
+⚠ **The golden measurement chain is unblocked on the agent side and blocked on
+one paste.** Phases A and B run and commit **before** Arpit pastes prompt 9;
+only then does any Claude session see a key, and only then can phase D score.
+**W-87, W-176, W-190, W-191 and W-195 no longer exist as rows** — they are
+W-204's phases D and E, and their files are in `archive/open/`.
 
 ### The golden benchmark was reset and rebuilt (2026-09-15, Cowork)
 
