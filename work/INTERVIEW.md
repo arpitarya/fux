@@ -35,6 +35,51 @@ valuable judgement, but not the state of play.
 *Updated **2026-09-20** (Claude Code, the three green rows).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
+### 🔴 THE DAY'S RULINGS ARE BUILT, AND ONE THING IS NOT (2026-09-20, Claude Code, later)
+
+**What a session arriving cold most needs from this day, in order:**
+
+1. 🔴 **There are THREE question sets, and L11 moved to allow it.** Arpit ruled
+   *"no feature waits on Codex"*: Claude authors **set 3**, carrying the
+   `PROJ-123`-shaped identifiers and the link-bearing documents three
+   measurements were stuck on. **L11 decision 6's authoring carve-out is now PER
+   SET** — it could not be executed otherwise — and
+   [SR-WORK-GOLDEN](../records/0066_WORK-golden.md) decision 14 is the standing
+   rule: an agent-authored set is created whenever a measurement would otherwise
+   wait on Codex. ⚠ **Every number on such a set is `informed` for ever**, and
+   **set 1 stays the only externally-authored arm**. ⚠ **It is not a way to
+   rescue a disappointing number** — the trigger is a *missing input*, checkable
+   before any arm runs.
+2. 🔴 **W-199 is BUILT and BREAKING.** There is **no default fetcher**:
+   `[sources.url] fetcher` is refused by name and a URL line without `fetch=`
+   fails to parse. A host map lives in `[sources.url.routes]`; a fetcher may
+   claim hosts with `ROUTES`, **read with `ast` and never imported**. **Two
+   patterns matching one host is a hard error**, never a guessed order.
+   ⚠ **`fux hooks` must be re-run on any repo whose merge driver was registered
+   before today** — the driver takes `%P` now, and an old registration will
+   refuse the new committed `REGISTER` rather than merge it.
+3. 🔴 **There are THREE identifier defects, not two.** W-202's fixture found the
+   third: **a segment that spells a stopword is DELETED**. `QCL-IT-ADR-08` loses
+   its `IT`; `TSL-RF-118-A` and `TSL-RF-221-A` lose their `A` and become
+   indistinguishable from `TSL-RF-118` and `TSL-RF-221`. **So W-205 part 1 alone
+   will not make `QCL-IT-ADR-08` whole** — it buys reachability, and the values
+   go in *through the same analyzer*
+   ([SR-INGEST](../records/0106_ingest.md) decision 23d). A pre-registration
+   expecting an exact-match win from part 1 has mis-stated its endpoint.
+4. ⚠ **A spec's own claims about the tree are claims.** Four of W-199's were
+   wrong and every one was caught by a test rather than by review — the register
+   conflicting on merge, the `outcome` column that could not survive its own L3
+   rule, `fux add` re-routing an existing pin, and a doctor detail that crashes a
+   Windows console. **Read a definition of done as a hypothesis.**
+
+**Immediate next step: 🟢 [W-205](open/W-205-identifiers-reachable-and-whole.md)
+part 1** — **not started**. Its records are already written
+([SR-DECODE](../records/0139_decode.md) decision 20,
+[SR-TYPES](../records/0128_types-list.md) decision 13, SR-INGEST decision 23), so
+it has its spec; it owes the pre-registration, the build on both readers, and a
+measured run on `rung-00100` and `rung-10000` with a `VERDICT`. Also open:
+**W-199 DoD 10**, the `decoder=` half of the pipe ruling.
+
 ### ✅ W-204 IS THE GREEN ROW, AND PHASE A IS DONE (2026-09-20, Claude Code)
 
 ⚠ **This supersedes the block below, which was true for part of the same day.**
@@ -2576,7 +2621,12 @@ the reason is that the measuring environments are gone.**
 
 *Updated **2026-09-20** (Claude Code, Opus 5) — maintainer line: this session.*
 
-**Immediate next step: 🟢 [W-204](open/W-204-golden-outputs-scoring-and-version-benchmark.md) phase B**
+⚠ **Superseded later the same day — see §1's newest block.** The immediate next
+step is **W-205 part 1**; W-204 phase B is still real and still unstarted, and it
+now also waits on **set 3** being authored and the ladder rebuilt, which changes
+what phase A's frozen sha is worth.
+
+**Was: 🟢 [W-204](open/W-204-golden-outputs-scoring-and-version-benchmark.md) phase B**
 — `v1.0.0` · `v2.0.1` · `HEAD` on the same eight rungs, HEAD's rows being phase
 A's. **Its pre-registration can now name the sha phase A froze**
 (`538f34978141a54b28b78b7ea76d36969cf63aa0`), which is what it was waiting on.
