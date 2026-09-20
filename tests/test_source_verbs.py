@@ -155,7 +155,7 @@ def test_a_trailing_slash_is_the_same_directory(repo, monkeypatch, capsys):
 
 def test_a_written_line_carries_every_attribute_even_at_its_default(repo, monkeypatch):
     _add(repo, monkeypatch, _args("https://x.test/a"))
-    assert "https://x.test/a fetch=http meta=hashed" in _urls(repo)
+    assert "https://x.test/a fetch=http" in _urls(repo)
 
 
 def test_a_dirs_line_carries_its_attribute_too(repo, monkeypatch):
@@ -233,13 +233,13 @@ def test_a_leftover_line_grammar_types_file_stops_the_verb(repo, monkeypatch):
 
 def test_flags_decide_what_is_recorded(repo, monkeypatch):
     _add(repo, monkeypatch, _args("https://x.test/a", cdp=True, plain=True))
-    assert "https://x.test/a fetch=cdp meta=plain" in _urls(repo)
+    assert "https://x.test/a fetch=cdp" in _urls(repo)
 
 
 def test_an_unflagged_attribute_keeps_what_the_line_already_said(repo, monkeypatch):
     _add(repo, monkeypatch, _args("https://x.test/a", cdp=True, plain=True))
     _add(repo, monkeypatch, _args("https://x.test/a", hashed=True))
-    assert "https://x.test/a fetch=cdp meta=hashed" in _urls(repo)
+    assert "https://x.test/a fetch=cdp" in _urls(repo)
 
 
 def test_two_flags_for_one_attribute_is_an_error(repo, monkeypatch):
@@ -266,7 +266,7 @@ def test_archived_is_now_legal_on_a_url_too(repo, monkeypatch):
     order the two lists were built in.
     """
     _add(repo, monkeypatch, _args("https://x.test/a", archived=True))
-    assert "https://x.test/a fetch=http meta=hashed keep=true ttl=24h enrich=false archived=true" in _urls(repo)
+    assert "https://x.test/a fetch=http keep=true ttl=24h enrich=false archived=true" in _urls(repo)
 
 
 def test_a_non_http_url_is_refused_before_anything_is_written(repo, monkeypatch):
@@ -317,7 +317,7 @@ def test_adding_something_a_hand_written_ignore_covers_is_an_error(repo, monkeyp
 
 def test_a_grouping_comment_survives_an_edit(repo, monkeypatch):
     path = repo / ".fux" / "sources" / "urls"
-    path.write_text("# team A\nhttps://x.test/a fetch=http meta=hashed\n\n# team B\n", encoding="utf-8")
+    path.write_text("# team A\nhttps://x.test/a fetch=http\n\n# team B\n", encoding="utf-8")
     _add(repo, monkeypatch, _args("https://x.test/a", plain=True))
     text = _urls(repo)
     assert "# team A" in text and "# team B" in text
@@ -325,7 +325,7 @@ def test_a_grouping_comment_survives_an_edit(repo, monkeypatch):
 
 def test_a_trailing_comment_survives_an_edit(repo, monkeypatch):
     path = repo / ".fux" / "sources" / "urls"
-    path.write_text("https://x.test/a fetch=http meta=hashed  # the runbook\n", encoding="utf-8")
+    path.write_text("https://x.test/a fetch=http  # the runbook\n", encoding="utf-8")
     _add(repo, monkeypatch, _args("https://x.test/a", cdp=True))
     assert "# the runbook" in _urls(repo)
 
@@ -352,7 +352,7 @@ def test_the_file_is_written_lf_only_regardless_of_host_os(repo, monkeypatch):
 
 def test_a_fragment_bearing_url_round_trips_through_the_command(repo, monkeypatch):
     _add(repo, monkeypatch, _args("https://x.test/page#section"))
-    assert "https://x.test/page#section fetch=http meta=hashed" in _urls(repo)
+    assert "https://x.test/page#section fetch=http" in _urls(repo)
 
 
 def test_two_urls_differing_only_by_fragment_get_two_lines(repo, monkeypatch):
@@ -424,7 +424,7 @@ def test_removing_a_url_deletes_its_line_and_nothing_else(repo, monkeypatch):
     _remove(repo, monkeypatch, _args("https://x.test/a"))
     text = _urls(repo)
     assert "https://x.test/a" not in text
-    assert "https://x.test/b fetch=http meta=hashed" in text
+    assert "https://x.test/b fetch=http" in text
     assert "# my list" in text
 
 
@@ -463,7 +463,7 @@ def test_dry_run_add_writes_no_bytes(repo, monkeypatch, capsys):
     _add(repo, monkeypatch, _args("https://x.test/a", dry_run=True))
     assert (repo / ".fux" / "sources" / "urls").read_bytes() == before
     out = capsys.readouterr().out
-    assert "would add" in out and "fetch=http meta=hashed" in out
+    assert "would add" in out and "fetch=http" in out
 
 
 def test_dry_run_remove_writes_no_bytes_and_names_the_branch(repo, monkeypatch, capsys):
@@ -598,7 +598,7 @@ def _url_repo(repo):
         encoding="utf-8",
     )
     (repo / ".fux" / "sources" / "urls").write_text(
-        "https://x.test/a fetch=http meta=hashed keep=true ttl=24h "
+        "https://x.test/a fetch=http keep=true ttl=24h "
         "enrich=false archived=false update=auto\n",
         encoding="utf-8",
     )
@@ -698,7 +698,7 @@ def test_bare_add_lists_every_list(repo, monkeypatch, capsys):
     _add(repo, monkeypatch, _args(None))
     out = capsys.readouterr().out
     assert "sources/dirs" in out and "sources/urls" in out and ".fux/formats.toml" in out
-    assert "https://x.test/a fetch=http meta=hashed" in out
+    assert "https://x.test/a fetch=http" in out
 
 
 def test_listing_marks_a_line_fux_did_not_write(repo, monkeypatch, capsys):
@@ -733,7 +733,6 @@ def test_a_cli_written_line_states_the_repo_policy_not_the_engine_default(tmp_pa
     (tmp_path / "fux.toml").write_text(
         "[sources]\n\n[sources.url]\n"
         'fetcher = ".fux/fetchers/cdp.py"\n'
-        'meta = "plain"\n'
         'ttl = "7d"\n'
         "keep = false\n"
         'update = "never"\n'
@@ -747,7 +746,7 @@ def test_a_cli_written_line_states_the_repo_policy_not_the_engine_default(tmp_pa
     defaults = _source_defaults(tmp_path, sourcelist.URLS)
     _, line, _ = add(listing, "https://wiki.test/p", {}, sourcelist.URLS, defaults)
 
-    assert "ttl=7d" in line and "meta=plain" in line
+    assert "ttl=7d" in line
     assert "fetch=cdp" in line, "the fetcher path's stem is what `fetch=` names"
     assert "keep=false" in line and "update=never" in line
 
@@ -758,15 +757,15 @@ def test_an_explicit_flag_still_beats_the_repo_policy(tmp_path):
     from fux.sources import _source_defaults, add
 
     (tmp_path / "fux.toml").write_text(
-        '[sources]\n\n[sources.url]\nmeta = "plain"\nmax_parallel = 1\n', encoding="utf-8"
+        '[sources]\n\n[sources.url]\nttl = "7d"\nmax_parallel = 1\n', encoding="utf-8"
     )
     listing = tmp_path / ".fux" / "sources" / "urls"
     listing.parent.mkdir(parents=True)
     listing.write_text("", encoding="utf-8")
 
     defaults = _source_defaults(tmp_path, sourcelist.URLS)
-    _, line, _ = add(listing, "https://wiki.test/p", {"meta": "hashed"}, sourcelist.URLS, defaults)
-    assert "meta=hashed" in line
+    _, line, _ = add(listing, "https://wiki.test/p", {"ttl": "30s"}, sourcelist.URLS, defaults)
+    assert "ttl=30s" in line, "the flag beats the repo policy, which beats the built-in"
 
 
 def test_a_repo_with_no_sources_url_is_untouched(tmp_path):

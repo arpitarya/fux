@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@c984699b459a, src/fux/setup.py@bfb301dda08d, tests/test_verb_table_agreement.py@1e7999ffd28f]
+owns: [src/fux/store/fuxdir.py@c984699b459a, src/fux/setup.py@ffe39c973497, tests/test_verb_table_agreement.py@1e7999ffd28f]
 laws: [L2, L3, L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: c319d2e4abc8b6dfac2e71d5b4c4a1044b9c5a95fca77512bbdacd949098936f
+content_sha: 156fa4a37f23f515ce3376c0bb94a067197278963b10e49a639f421adfc923f1
 ---
 
 # SR-DOTFUX — the `.fux/` directory
@@ -760,7 +760,7 @@ rulings in one sitting.** What it writes now, and the rule behind each:
 | what | why |
 |---|---|
 | `[sources] urls_file` beside `dirs_file` | the two committed lists are one kind of thing ([SR-CONFIG](0113_config.md) decision 11a) |
-| `keep`, `enrich`, `update`, `fetch_at_answer`, `meta` written **live** | closed, small value domains — the written line is the complete menu |
+| `keep`, `enrich`, `update`, `fetch_at_answer` written **live** | closed, small value domains — the written line is the complete menu. ⚠ `meta` was in this list until W-194 deleted the key, 2026-09-20 |
 | `ttl`, `sweep_minutes`, `acquired_max_bytes` **absent** | defaults that may move; leaving them out is how a new value reaches this repo without an edit |
 | `[sources.url.config]` + one sub-table **per shipped fetcher**, live | one flat table refused every mixed-fetcher repo (decision 8a) |
 | those sub-tables **derived** from the fetchers, by `ast`, never executed | a transcribed table goes stale — `_urls_header()` is the scar (W-140 row 18); `cdp.py` must never run inside the package (SR-CDP-FETCHER decision 8) |
@@ -791,7 +791,8 @@ oversight rather than a rule.
 
 **The scaffolded `fux.toml` writes the two-valued `[sources.url]` keys LIVE,
 with their defaults** (W-174, 2026-09-14, Arpit's ruling): `update = "auto"`
-and `fetch_at_answer = true`, beside `meta = "hashed"`. **`update` was
+and `fetch_at_answer = true`. (⚠ `meta = "hashed"` was written beside them
+until W-194 deleted the key on 2026-09-20.) **`update` was
 commented from the day it existed and is now uncommented too**, in the same
 ruling and for the same reason.
 
@@ -806,7 +807,7 @@ ruling and for the same reason.
   touches, so a future change of default would not reach them.
 - **The line the ruling draws is the SHAPE OF THE VALUE, and it is a rule
   rather than two exceptions.** A key whose domain is **closed and small** —
-  `meta` (`hashed`/`plain`), `update` (`auto`/`never`), `fetch_at_answer`
+  `update` (`auto`/`never`), `fetch_at_answer` (`true`/`false`), `keep`
   (`true`/`false`) — is written live with its default: the written line is the
   complete menu, so a reader learns the key *and* its alternatives without
   leaving the file, and nobody greps a record for a flag they do not know

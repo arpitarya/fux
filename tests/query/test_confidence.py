@@ -266,7 +266,6 @@ def _record(**overrides) -> dict:
         "src": "git",
         "loc": "docs/mesh.md",
         "mode": "extracted",
-        "meta": "plain",
         "sha": content_sha(DOC_ID.encode("utf-8")),
         "title": "The mesh",
         "phrases": ["Rollback procedure"],

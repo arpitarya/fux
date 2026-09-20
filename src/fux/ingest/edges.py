@@ -38,7 +38,9 @@ linker, re-index it alone, assert the target's committed bytes did not move.
 [L2](../../records/0004_LAW-2-content-never-durable.md) — content is never
 durable outside its source system. Link text is a verbatim fragment of the
 source document's prose, so committing it plainly would put content in the
-index and would need L5's hashed-meta branch on top. A term hash is a
+index. (It would also have needed L5's hashed-meta branch on top — true when
+this was written, and L5 retired with W-194 on 2026-09-20. **L2 is what carries
+the argument** and it is untouched.) A term hash is a
 *statistic*, which is what the index holds, and it is already the currency
 `terms` is written in — so the scan's byte prefilter finds an anchor source
 by the same substring check it already runs, at no extra cost.

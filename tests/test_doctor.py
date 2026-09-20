@@ -199,7 +199,6 @@ def test_accelerator_reports_fresh_after_a_build(tmp_path):
                 "src": "git",
                 "loc": "a.md",
                 "mode": "extracted",
-                "meta": "plain",
                 "title": "A",
                 "phrases": [],
                 "terms": {term_hash("alpha"): [1, 0]},
@@ -224,7 +223,6 @@ def test_accelerator_goes_stale_when_the_index_changes(tmp_path):
         "src": "git",
         "loc": "a.md",
         "mode": "extracted",
-        "meta": "plain",
         "title": "A",
         "phrases": [],
         "terms": {term_hash("alpha"): [1, 0]},
@@ -255,7 +253,6 @@ def _url_index(tmp_path, urls):
                 # `hashed` is L5's default for non-git sources and the writer
                 # refuses readable text under it — correct, and not what this
                 # test is about.
-                "meta": "plain",
                 "title": "T",
                 "phrases": [],
                 "terms": {term_hash("alpha"): [1, 0]},
@@ -739,7 +736,6 @@ def _record(doc_id="file:a.md", loc="a.md", **extra):
         "src": "git",
         "loc": loc,
         "mode": "extracted",
-        "meta": "plain",
         "title": "A",
         "phrases": [],
         "terms": {},

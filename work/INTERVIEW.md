@@ -2496,7 +2496,7 @@ the reason is that the measuring environments are gone.**
 *Updated **2026-09-13** (Cowork, Opus) — maintainer line: this session.*
 *Updated **2026-09-17** (Claude Code, Opus 5) — maintainer line: this session.*
 
-**Immediate next step: 🟢 [W-194](open/W-194-delete-hashed-meta.md)** — delete
+**Immediate next step: 🟢 [W-194](../archive/open/W-194-delete-hashed-meta.md)** — delete
 `meta = "hashed"`, `fux.index` → v4, **L5 retires**. Ratified 2026-09-17, not
 built, and **the queue's only green row.**
 

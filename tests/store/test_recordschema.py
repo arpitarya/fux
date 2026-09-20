@@ -22,7 +22,7 @@ from fux.store import canonical, recordschema, writer
 def _git_record(**over):
     base = dict(
         id="file:a.md", src="git", loc="a.md", sha="abc123", ver=1,
-        mode="extracted", meta="plain", title="A", phrases=["H"],
+        mode="extracted", title="A", phrases=["H"],
         terms={"0123456789abcdef": [1, 0, 0, 0, 0]}, flen=[4], edges=[],
     )
     base.update(over)
@@ -46,11 +46,10 @@ def test_building_through_the_template_is_byte_identical_to_the_inline_dict():
         "sha": "abc123",
         "ver": 0,
         "mode": "extracted",
-        "meta": "plain",
     }
     built = recordschema.build(
         id="file:a.md", src="git", loc="a.md", sha="abc123",
-        ver=0, mode="extracted", meta="plain",
+        ver=0, mode="extracted",
     )
     assert canonical.canonical_dumps(built) == canonical.canonical_dumps(inline)
 
@@ -60,7 +59,7 @@ def test_key_order_in_the_template_cannot_reach_a_committed_byte():
     presentational. Asserted rather than assumed — if this ever stops being
     true, the schema silently becomes a wire format."""
     a = recordschema.build(id="file:a.md", src="git", loc="a.md", sha="s", ver=0,
-                          mode="extracted", meta="plain")
+                          mode="extracted")
     b = {k: a[k] for k in reversed(list(a))}
     assert canonical.canonical_dumps(a) == canonical.canonical_dumps(b)
 
@@ -100,8 +99,8 @@ def test_every_field_ingest_writes_is_declared():
     """The both-directions half. A field the code writes and the schema does
     not declare is exactly the drift this file exists to stop."""
     written = {
-        "id", "src", "loc", "sha", "ver", "mode", "meta",
-        "title", "phrases", "title_h", "terms", "flen", "edges",
+        "id", "src", "loc", "sha", "ver", "mode",
+        "title", "phrases", "terms", "flen", "edges",
         "archived", "superseded", "mtime",
     }
     assert written == set(recordschema.shape().fields)
@@ -121,16 +120,16 @@ def test_omit_when_false_leaves_the_field_out_entirely():
     """SR-ARCHIVED-CONTENT decision 1: absent, not false, so a live record's
     shape is unchanged and no existing consumer's parse breaks."""
     record = recordschema.build(id="file:a.md", src="git", loc="a.md", sha="s",
-                               ver=0, mode="extracted", meta="plain", archived=False)
+                               ver=0, mode="extracted", archived=False)
     assert "archived" not in record
 
     marked = recordschema.build(id="file:a.md", src="git", loc="a.md", sha="s",
-                               ver=0, mode="extracted", meta="plain", archived=True)
+                               ver=0, mode="extracted", archived=True)
     assert marked["archived"] is True
 
 
 def test_defaults_apply_only_to_always_required_fields():
-    record = recordschema.build(id="file:a.md", src="git", loc="a.md", sha="s", meta="plain")
+    record = recordschema.build(id="file:a.md", src="git", loc="a.md", sha="s")
     assert record["ver"] == 0 and record["mode"] == "extracted"
     assert "title" not in record  # optional and unset stays absent
 
@@ -149,21 +148,20 @@ def test_a_missing_required_field_is_named():
         recordschema.validate(record)
 
 
-def test_a_non_git_record_must_state_meta():
-    """A missing value means something bypassed the resolution layer, and
-    guessing on its behalf is the failure L5 prevents."""
-    record = _git_record(id="url:https://x", src="url", loc="https://x")
-    del record["meta"]
-    with pytest.raises(FuxError, match="non-git"):
-        recordschema.validate(record)
-
-
-def test_a_hashed_record_must_carry_title_h():
-    record = _git_record(id="url:https://x", src="url", loc="https://x", meta="hashed")
-    del record["title"]
-    del record["phrases"]
-    with pytest.raises(FuxError, match="title_h"):
-        recordschema.validate(record)
+def test_meta_and_title_h_are_refused_as_undeclared_fields():
+    """⚠ **REPLACES `test_a_non_git_record_must_state_meta` and
+    `test_a_hashed_record_must_carry_title_h`.** Both asserted L5's shape: a
+    non-git record had to state `meta`, and a hashed one had to carry
+    `title_h`. W-194 (Arpit, 2026-09-20) deleted both fields, so what is
+    asserted now is the other half of the same property — **a record still
+    carrying them does not validate.** Deleted, not deprecated: the
+    `fux update` precedent (W-177), no accept-and-ignore.
+    """
+    for dead in ("meta", "title_h"):
+        record = _git_record(id="url:https://x", src="url", loc="https://x")
+        record[dead] = "anything"
+        with pytest.raises(FuxError, match=f"undeclared field.*{dead}"):
+            recordschema.validate(record)
 
 
 def test_an_enum_outside_its_set_is_refused():
@@ -184,9 +182,10 @@ def test_writing_false_where_the_template_says_omit_is_refused():
 
 
 def test_validate_is_not_called_on_the_write_path(tmp_path):
-    """Deliberate: `write_index` enforces L5's meta policy and
-    `canonical_dumps` refuses floats, nulls and hostile text. A third gate on
-    the hot path would re-check what those two already guarantee.
+    """Deliberate: `canonical_dumps` refuses floats, nulls and hostile text.
+    A second gate on the hot path would re-check what it already guarantees.
+    (⚠ `write_index`'s L5 meta policy was the other one named here until W-194
+    deleted the rule and the law on 2026-09-20.)
 
     Asserted by writing a record with an undeclared field — `validate` would
     reject it, and the writer does not.
@@ -245,19 +244,26 @@ def test_the_examples_encode_to_real_committed_lines():
         assert line.endswith(b"\n") and json.loads(line)["id"] == record["id"]
 
 
-def test_the_hashed_example_carries_no_display_text():
-    """L5, asserted on the example a reader will copy. A hashed record holds
-    `title_h` and nothing readable — and `write_index` refuses one that does,
-    so an example carrying `title` would be uncommittable."""
+def test_the_url_example_is_shaped_like_the_git_one():
+    """⚠ **REPLACES `test_the_hashed_example_carries_no_display_text`**, which
+    asserted L5 on the example a reader copies: a hashed record held `title_h`
+    and nothing readable. W-194 deleted the fork, so the two examples now
+    differ only in `src`, `loc` and the id — and this asserts exactly that,
+    because an example that quietly kept a dead field is how a consumer learns
+    a shape fux no longer writes."""
     import json
     from importlib import resources
 
     raw = json.loads(
         (resources.files("fux.store") / recordschema.SCHEMA_NAME).read_text("utf-8")
     )
-    hashed = raw["examples"]["url_hashed"]
-    assert hashed["meta"] == "hashed" and "title_h" in hashed
-    assert not set(hashed) & set(recordschema.display_fields())
+    url = {k: v for k, v in raw["examples"]["url"].items() if not k.startswith("_")}
+    git = {k: v for k, v in raw["examples"]["git"].items() if not k.startswith("_")}
+    assert "meta" not in url and "title_h" not in url
+    assert url["src"] == "url" and git["src"] == "git"
+    assert set(recordschema.display_fields()) <= set(url), (
+        "the url example must carry display text now — that IS the W-194 change"
+    )
 
 
 def test_the_git_example_omits_archived_rather_than_writing_false():

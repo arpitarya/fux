@@ -7,10 +7,10 @@ description: "A deliberately tiny config: what each key does, why the surface is
 status: accepted
 date: 2026-08-18
 feature: "`fux.toml` — discovery, schema, validation, and the keys that are refused rather than ignored"
-owns: [src/fux/config.py@80082dd02b86]
+owns: [src/fux/config.py@0fe83cd69dac]
 laws: [L4, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: a05ad203aa030255fea9e9ccf08a38abace15048b0bfaed789f11c50a2227879
+content_sha: 73174bd533bab60c3267a2cbed8fbfea120a437fc5ad91b05914570a4fd1801f
 ---
 
 # SR-CONFIG — `fux.toml` and every property in it
@@ -49,7 +49,7 @@ flowchart TD
     S --> D["dirs_file — optional<br/>default .fux/sources/dirs"]
     S --> U["[sources.url] — optional"]
     U --> M["fetcher · urls_file<br/>paths, defaulted"]
-    U --> ME["meta · keep · ttl · enrich · update<br/>source-wide LAYERS — a URL line wins"]
+    U --> ME["keep · ttl · enrich · update<br/>source-wide LAYERS — a URL line wins"]
     U --> MP["max_parallel — REQUIRED<br/>when the table is present"]
     U --> SW["sweep_minutes · acquired_max_bytes<br/>defaulted; no line-level layer"]
     U --> CF["[sources.url.config]<br/>PASSED THROUGH, never read"]
@@ -74,7 +74,6 @@ flowchart TD
      |     +-- [sources.url]   optional -- the whole URL source
      |           +-- fetcher       path, default .fux/fetchers/http.py
      |           +-- urls_file     path, default .fux/sources/urls
-     |           +-- meta          "hashed" (default) | "plain"
      |           +-- keep          true (default) | false     -- a LAYER
      |           +-- ttl           "24h" (default), a duration -- a LAYER
      |           +-- enrich        false (default) | true     -- a LAYER
@@ -114,7 +113,6 @@ dirs_file = ".fux/sources/dirs"      # optional; this IS the default
 [sources.url]
 fetcher      = ".fux/fetchers/http.py"  # YOUR code; fux loads it by path
 urls_file    = ".fux/sources/urls"      # one URL per line, a file not an array
-meta         = "hashed"                 # the default; "plain" for public content
 keep         = true                     # retain fetched bytes in .fux/acquired/
 ttl          = "24h"                    # ask-time: how long a citation may go unchecked
 enrich       = false                    # whether `fux enrich` plans work for these URLs
@@ -136,7 +134,7 @@ A rejected key, named precisely rather than defaulted:
 
 ```console
 $ fux ingest
-error: /repo/fux.toml: [sources.url] meta must be "hashed" or "plain" (got 'hased')
+error: /repo/fux.toml: [sources.url] ttl must be a duration like 15m, 1h or 7d (got 'soon')
 # exit 1
 ```
 
@@ -196,9 +194,20 @@ their fetchers somewhere other than `.fux/fetchers/` moves all of them at once
 and no line has to know. A second key naming the directory would be two values
 that must agree.
 
-**6. `meta` is `"hashed"` by default, `"plain"` by explicit opt-in.** Hashed
-closes an ACL-mismatch leak, so the default is a safety property rather than a
-preference. Any other value is an error.
+**6. `meta` is DELETED.** ⚠ **Amended 2026-09-20 (Arpit, W-194).** This
+decision read: *`meta` is `"hashed"` by default, `"plain"` by explicit opt-in.
+Hashed closes an ACL-mismatch leak, so the default is a safety property rather
+than a preference.* **The key is gone from `[sources.url]`, deleted outright on
+the `fux update` precedent (W-177)** — not accepted-and-ignored, not
+deprecated. A `fux.toml` still carrying it **fails to load with a named
+error**, because an unknown key in a committed config is a setting somebody
+believes is in force.
+
+🔴 **What the deletion gives up is real:** the ACL-mismatch leak L5 closed is
+now an **accepted, documented exposure**. The reasoning above was right about
+the leak and lost on cost —
+[SR-LAW-5](0007_LAW-5-hashed-meta.md) keeps the argument, the citation and the
+reopen trigger.
 
 **7. `max_parallel` is REQUIRED whenever `[sources.url]` is present**, and it is
 the only key in the file with no default.
@@ -384,7 +393,7 @@ new home in the message.
 a source-wide *layer*, not a setting.** `keep` ([SR-ACQUIRED](0145_acquired-plane.md)),
 `ttl` ([SR-URL-FRESHNESS](0147_url-freshness.md)) and `enrich`
 ([SR-PII](0148_pii.md)) each sit between the built-in default and the URL
-line, exactly as `meta` and `fetcher` already did — **a line that declared the
+line, exactly as `fetcher` already did — **a line that declared the
 attribute always wins**, and `urlsrc.resolve_urls` is the one place that
 resolves all of them.
 
@@ -449,7 +458,6 @@ at any value, with an error naming the new home.
 + sources.dirs_file
 + sources.urls_file
 + sources.url.fetcher
-+ sources.url.meta
 + sources.url.keep
 + sources.url.ttl
 + sources.url.enrich
@@ -593,8 +601,10 @@ exits, because Python cannot safely interrupt arbitrary consumer code.
   schema and breaches the adapter cap through the back door.
 - **Make `shards` configurable.** Rejected until measured. It is a
   format-affecting constant.
-- **Default `meta` to `"plain"` for readability.** Rejected: the default has to
-  be the safe one, and hashed is the ACL-safe one.
+- **Default `meta` to `"plain"` for readability.** Rejected at the time: the
+  default has to be the safe one, and hashed is the ACL-safe one. ⚠ **Overtaken
+  2026-09-20** — Arpit deleted the key rather than re-defaulting it (W-194), so
+  the readable shape won by a route this row did not consider.
 - **Accept unknown keys silently** for forward compatibility. Rejected: a typo
   in `urls_file` that silently indexes nothing is indistinguishable from a
   retrieval bug.

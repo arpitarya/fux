@@ -7,10 +7,10 @@ description: A disposable term-major index under .fux/runtime/ that makes warm q
 status: accepted
 date: 2026-08-18
 feature: "`.fux/runtime/` — the derived index, `fux build`, and the block bound that makes skipping provable"
-owns: [src/fux/derive@28c69c111b2e, tools/differential@1934e54fe0ca]
+owns: [src/fux/derive@0ffb225704ee, tools/differential@1934e54fe0ca]
 laws: [L1, L3]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 6720c5937c546dbd0bd22b1b26889685222380e0a886524401ca24c493a4a13e
+content_sha: 0115837a49affdec9dc9670422ed63cd2520143c0869983a64181e29785aac99
 ---
 
 # SR-T1-ACCELERATOR — the derived T1 accelerator
@@ -683,8 +683,11 @@ has to run**, and the two days this one spent dead are what that costs.
 - **A corpus with hashed URL records once had no accelerator at all** and paid
   4 248.8 ms rather than 27.2 ms — the whole accelerator result forfeited by
   following the documentation. Fixed in the *field shape*, never in this
-  record's invariant ([SR-RECORD](0109_index-record.md) rule 2); the
-  differential harness now carries a hashed record, which it never had.
+  record's invariant ([SR-RECORD](0109_index-record.md) rule 2). ⚠ **W-194
+  deleted the field and the law on 2026-09-20**, so the harness's hashed fixture
+  lost its reason to exist; it carries a **`url:` record** now — W-47's actual
+  finding was that this harness had never seen one at all — and the stray-hash
+  tripwire is exercised directly rather than as a side effect of `title_h`.
 - **`tools/differential/` now holds THREE arms, not one** (2026-09-12,
   [SR-NODE-SEARCH](0153_node-search.md)). This record owns the directory, so
   it says what is in it; the arms' *bars* belong to the records whose claims

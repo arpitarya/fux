@@ -197,8 +197,6 @@ each to its record; that is all it does now.
   call a model — not to be "smarter" at ingest, not to summarize, not once.
 - **L4** · **Offline by default.** Network access only inside explicit, fenced,
   opt-in paths. An import fence test enforces it.
-- **L5** · **Hashed meta is the default** for non-git sources, enforced at write time.
-  It closes an ACL-mismatch leak, so it is not a configuration preference.
 - **L6** · **Say "index", not "db".** What Fux commits is an index — statistics that
   make documents findable. A council ruling, and it is load-bearing vocabulary.
 - **L7** · **Python ≥ 3.11** (`tomllib`, modern typing). Match the surrounding style.

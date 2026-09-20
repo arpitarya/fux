@@ -117,7 +117,7 @@ export function applyPin(root, query, results, top) {
     if (record === undefined) return results;
     found = {
       id: docId,
-      title: record.title ?? (record.title_h ?? "").replace(/^h:/, ""),
+      title: record.title ?? "",  // W-194: `title_h` no longer exists
       loc: record.loc ?? "",
       score: 0.0,
       archived: Boolean(record.archived ?? false),

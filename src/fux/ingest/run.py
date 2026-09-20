@@ -57,10 +57,11 @@ claim about *another* document, so a carried record can point at something
 this run no longer holds. `_without_dangling_edges` drops those, which is what
 keeps the derived graph plane free of targets no verb can explain.
 
-Which fetcher runs, and whether a URL's display fields are hashed, are both
-**per line** (SR-URL-LIST decision 10): `urlsrc.resolve_urls` layers the
-built-in default, the source-wide `[sources.url]` setting and the line, and
-everything below it reads one already-resolved answer.
+Which fetcher runs is **per line** (SR-URL-LIST decision 10):
+`urlsrc.resolve_urls` layers the built-in default, the source-wide
+`[sources.url]` setting and the line, and everything below it reads one
+already-resolved answer. ⚠ *"and whether a URL's display fields are hashed"*
+stood here until W-194 deleted hashed meta (2026-09-20).
 
 Every run calls `ensure_layout` first, so a fresh clone gets its `.fux/`
 README and narrow `.gitignore` before anything is written into the directory
@@ -205,7 +206,11 @@ def run(
 
     fresh: dict[str, bytes] = {}  # url doc_id -> fetched content, this run only
     carried: dict[str, dict] = {}  # url doc_id -> prior record, reused verbatim
-    url_meta: dict[str, str] = {}  # url doc_id -> the `meta` policy its line resolved to
+    #: Every `url:` doc id the committed list names, resolved. ⚠ **Was
+    #: `url_meta: dict[doc_id, meta]` until W-194** deleted `meta`; only the
+    #: KEYS were ever used below — reconciliation and carry-forward key on
+    #: them — so it is the set it always wanted to be.
+    url_listed: set[str] = set()
     #: URL documents whose bytes arrived and yielded nothing — the same
     #: discovered need for a model that an unreadable file is (SR-FETCHER
     #: decision 11, ruled 2026-08-28).
@@ -218,8 +223,8 @@ def run(
                 f"{root / 'fux.toml'} to do it with. `fux setup` writes a fetcher"
             )
         resolved = urlsrc.resolve_urls(urlsrc.read_urls(root, config.url.urls_file), config.url)
-        url_meta = {f"url:{entry.url}": entry.meta for entry in resolved}
-        # `url_meta` stays the **whole** list even under `only_urls`: it is what
+        url_listed = {f"url:{entry.url}" for entry in resolved}
+        # `url_listed` stays the **whole** list even under `only_urls`: it is what
         # reconciliation and carry-forward key on, so narrowing it here would
         # turn a scoped fetch into a corpus-wide deletion.
         to_fetch = resolved if only_urls is None else [e for e in resolved if e.url in only_urls]
@@ -237,7 +242,7 @@ def run(
         # *the declaration did its job*, which is exactly this; `UNFETCHED`
         # would say the bytes failed to arrive and put the URL in front of
         # someone as a problem. The record carries forward below through
-        # `url_meta`, untouched -- pinning freezes a document, it never drops
+        # `url_listed`, untouched -- pinning freezes a document, it never drops
         # one.
         #
         # ⚠ **ONE exemption, and it is the one the record always named:
@@ -304,7 +309,7 @@ def run(
             root,
             fetched=fetched,
             skipped=url_skipped,
-            listed=[doc_id[4:] for doc_id in url_meta],
+            listed=sorted(doc_id[4:] for doc_id in url_listed),
             token_shas=validation.get("token_shas") or {},
         )
         # A URL whose bytes arrived and yielded nothing needs a MODEL, exactly as
@@ -330,7 +335,7 @@ def run(
                     reason=s.reason,
                 )
             )
-        for doc_id in url_meta:
+        for doc_id in sorted(url_listed):
             if doc_id not in fresh and doc_id in existing_urls:
                 carried[doc_id] = existing_urls[doc_id]  # failed fetch keeps the prior record
     else:
@@ -432,11 +437,11 @@ def run(
     # opening a second one, which is what keeps the re-derived record
     # byte-identical to a freshly fetched one (L3).
     if carried and (pii_moved or extract_moved or _decoders_moved(root, decoder_digests)):
-        reacquired, stranded, reacquired_meta = _reacquire_urls(root, carried, config)
+        reacquired, stranded, reacquired_ids = _reacquire_urls(root, carried, config)
         for doc_id in reacquired:
             carried.pop(doc_id, None)
         fresh |= reacquired
-        url_meta |= reacquired_meta
+        url_listed |= reacquired_ids
         _record_stale_redaction(root, stranded)
         warnings.extend(_stale_redaction_warnings(stranded))
     else:
@@ -484,10 +489,11 @@ def run(
                 body, hits = pii_mod.redact(pii_rules, doc.body)
                 # ⚠ **The frontmatter title is the THIRD source of committed
                 # vocabulary and it was unredacted until 2026-09-11** (W-140
-                # row 2). `_title` prefers `meta["title"]` over any heading, and
-                # that string is committed verbatim as `record["title"]` on a
-                # plain-meta record AND tokenized into the title field on every
-                # record. A body could say `[PII:email]` while the title beside
+                # row 2). `_title` prefers `meta["title"]` over any heading,
+                # and that string is committed verbatim as `record["title"]`
+                # AND tokenized into the title field on every record. (`meta`
+                # here is the PARSED FRONTMATTER, not the deleted record field
+                # of the same name — W-194 removed that one and not this.) A body could say `[PII:email]` while the title beside
                 # it said the address. Headings were always safe — they are cut
                 # from the body, after this pass.
                 meta = doc.meta
@@ -584,7 +590,7 @@ def run(
     records: list[dict] = []
     changed = 0
     # SR-ARCHIVED-CONTENT decision 1: a record from a declared-archived source
-    # says so on the record, the way `mode` and `meta` already do, so a record
+    # says so on the record, the way `mode` already does, so a record
     # read years later states the rule it was written under instead of having it
     # re-derived by whoever reads it. **Declared, never a path convention** —
     # this reads the same `.fux/sources/dirs` line the grammar parses.
@@ -624,7 +630,6 @@ def run(
             sha=file_shas[doc_id],
             ver=0,
             mode="extracted",
-            meta="plain",
         )
         # Absent when false, so a live record's shape is unchanged and no
         # existing consumer's parse breaks (decision 1).
@@ -676,19 +681,14 @@ def run(
         # Absent when false, exactly as on the `file:` side above.
         if doc_id in archived_url_srcs:
             record["archived"] = True
-        # Per-URL, not per-source: a line may opt one public document out of
-        # hashing (SR-URL-LIST decision 10). It only ever loosens.
-        if url_meta.get(doc_id) == "plain":
-            record["meta"] = "plain"
-            record["title"] = fields.title
-            record["phrases"] = fields.phrases
-        else:  # hashed meta — the non-git default (L5); no display text leaks
-            record["meta"] = "hashed"
-            record["title_h"] = store_mod.title_hash(fields.title)
-            # Materialise-first (P5): the bytes are already in hand this run,
-            # so this costs a write, not a fetch. `write_index` refuses to
-            # commit this record without it (`store/writer.py`).
-            store_mod.DisplayCache(root).put(record["sha"], doc_id, fields.title)
+        # ⚠ **W-194, 2026-09-20 — the privacy fork is gone.** This was the one
+        # place a `url:` record forked in shape: `meta=plain` wrote `title` and
+        # `phrases`, and the default `meta=hashed` wrote `title_h` plus a
+        # display-cache entry, because L5 made hashing the non-git default.
+        # Arpit ruled the whole mechanism deleted, so a url record is written
+        # exactly like a git one and there is nothing left to branch on.
+        record["title"] = fields.title
+        record["phrases"] = fields.phrases
         records.append(record)
 
     # `known_ids` is exactly this run's final id set — every parsed document
@@ -1085,10 +1085,13 @@ def _decoders_moved(root: Path, current: dict[str, str]) -> bool:
 
 def _reacquire_urls(
     root: Path, carried: dict[str, dict], config
-) -> tuple[dict[str, bytes], list[str], dict[str, str]]:
+) -> tuple[dict[str, bytes], list[str], set[str]]:
     """Retained `url:` bytes, ready to re-enter the fresh path.
 
-    Returns `(bytes_by_doc_id, stranded_locs, meta_by_doc_id)`.
+    Returns `(bytes_by_doc_id, stranded_locs, doc_ids_seen)`. ⚠ **The third
+    value was `meta_by_doc_id` until W-194** (2026-09-20) deleted `meta`; it is
+    now just the ids this path resolved, which is what the caller actually
+    needed from it — `url_listed` keys reconciliation and carry-forward.
 
     **`refer.source.from_acquired` is IMPORTED, never reimplemented.** It decodes
     and sanitizes the blob exactly as ingest did, which is the whole reason the
@@ -1099,10 +1102,10 @@ def _reacquire_urls(
     that true anyway.
 
     **The URL list is read here, offline.** `resolve_urls(read_urls(...))` opens
-    two committed files and no socket, so `meta` and the rest resolve on a plain
-    `fux ingest` — which is the gap SR-PII named as *"the fresh-record path
-    resolves `meta` and `archived` from the URL list, which an offline run does
-    not read"*. It does now, on this path.
+    two committed files and no socket, so `archived` and the rest resolve on a
+    plain `fux ingest` — which is the gap SR-PII named as *"the fresh-record
+    path resolves `meta` and `archived` from the URL list, which an offline run
+    does not read"*. It does now, on this path, and `meta` no longer exists.
 
     ⚠ **A URL with no retained blob is STRANDED, not silently kept.** Nothing
     can re-redact it without the network, so its record stays exactly as it is
@@ -1116,15 +1119,15 @@ def _reacquire_urls(
     from ..refer import source as source_mod
 
     if config.url is None:
-        return {}, [], {}
+        return {}, [], set()
     try:
         resolved = urlsrc.resolve_urls(urlsrc.read_urls(root, config.url.urls_file), config.url)
     except (FuxError, OSError):
-        return {}, [], {}
+        return {}, [], set()
     entries = {f"url:{entry.url}": entry for entry in resolved}
 
     out: dict[str, bytes] = {}
-    meta: dict[str, str] = {}
+    seen: set[str] = set()
     stranded: list[str] = []
     # Sorted: the same tree must give the same index on two machines (L3), and
     # this set feeds `fresh`, whose iteration order decides record order.
@@ -1138,8 +1141,8 @@ def _reacquire_urls(
             stranded.append(loc)
             continue
         out[doc_id] = fetched.content
-        meta[doc_id] = entry.meta
-    return out, stranded, meta
+        seen.add(doc_id)
+    return out, stranded, seen
 
 
 #: `url:` documents a policy change could not reach, as of the last run. Derived
@@ -1340,9 +1343,18 @@ def _reusable(root: Path, existing: dict[str, dict], file_shas: dict[str, str]) 
        afterwards and would break the differential law quietly.
     2. **The content sha is unchanged.** Extraction is a pure function of the
        document's bytes and its `loc`, both of which the sha and the id fix.
-    3. **It is a `file:` record with `meta: plain`.** A `url:` record only
-       reappears on a networked `fux ingest`, and a hashed record's display
-       fields were deliberately never stored in a reusable form.
+    3. **It is a `file:` record.** A `url:` record only reappears on a
+       networked `fux ingest`, so its bytes are not in hand here to carry
+       anything forward from.
+
+    🔴 **Condition 3 read `src == "git" and meta == "plain"` until W-194**
+    (2026-09-20), and deleting `meta` turned it into `False` for every record
+    in the corpus — **`reused_count` went to 0 and every ingest became a full
+    ingest.** Nothing raised, nothing warned, and the index stayed
+    byte-identical, because a full re-extraction produces exactly what the
+    carried fields held; the only symptom was the run taking longer. Caught by
+    `tests/ingest/test_delta.py`, which asserts the COUNT rather than the
+    bytes — which is why that test is worth more than it looks.
     """
     paths = store_mod.iter_shard_paths(root)
     if not paths:
@@ -1355,7 +1367,6 @@ def _reusable(root: Path, existing: dict[str, dict], file_shas: dict[str, str]) 
         for doc_id, record in existing.items()
         if file_shas.get(doc_id) == record.get("sha")
         and record.get("src") == "git"
-        and record.get("meta") == "plain"
     }
 
 

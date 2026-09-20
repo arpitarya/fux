@@ -23,7 +23,7 @@ from fux.store import term_hash, write_index
 def _rec(doc_id, title, flen, terms, **extra) -> dict:
     record = {
         "id": doc_id, "src": "git", "loc": doc_id.removeprefix("file:"),
-        "mode": "extracted", "meta": "plain", "title": title,
+        "mode": "extracted", "title": title,
         "phrases": [], "terms": terms, "flen": flen, "edges": [],
     }
     record.update(extra)

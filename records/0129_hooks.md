@@ -10,7 +10,7 @@ feature: maintenance — the hooks, the deferring runner, the write lock, and th
 owns: [src/fux/maintain@70ceb83a6071, tools/maintenance-bench@23a6ade137a5, tools/runner-race@98bd70ff092a]
 laws: [L3, L4, L5, L7]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 81d44f2417b3ec5fd60348a413f5f4660c390c6c11196758b0fb2a2a2cebbcf7
+content_sha: 41421c3cc05de04e7aa8a67c0245e9595ac8d67bb9fe90ae11eb81c9f4f2ba55
 ---
 
 # SR-MAINTENANCE — keeping the index in step
@@ -101,7 +101,8 @@ has: it goes stale the moment content changes, and it conflicts whenever two
 people touch the same shard. The staleness half is this record; the conflict
 half is [SR-MERGE-DRIVER](0130_merge-driver.md). Meanwhile L5 — hashed meta for
 non-git sources — was a rule enforced by the one code path that happened to
-implement it.
+implement it. (⚠ **L5 was retired on 2026-09-20**, W-194; this paragraph is
+history, and decision 7 below carries what became of it.)
 
 ### Decision
 
@@ -300,11 +301,15 @@ specifically proposed and specifically refused.
 4 and 5's refuse-rather-than-clobber policy. **What the driver does is
 [SR-MERGE-DRIVER](0130_merge-driver.md)'s.**
 
-**7. L5 is enforced in `write_index`, per record, before any shard is touched.**
-A non-git record must **state** `meta`; a missing value means the policy layer
-was bypassed and is refused rather than defaulted, because guessing on a
-caller's behalf is the leak the law exists to close. `hashed` must carry
-`title_h` and **no `title` and no `phrases`**.
+**7. ⚠ RETIRED 2026-09-20 (Arpit, W-194), with the law.** This read: *L5 is
+enforced in `write_index`, per record, before any shard is touched* — a non-git
+record had to **state** `meta`, and `hashed` had to carry `title_h` and no
+`title` or `phrases`. **`assert_meta_policy` is deleted and L5 is superseded.**
+
+🔴 **What this decision was actually about survives it:** a rule enforced in one
+*caller* is a convention; a rule enforced in `write_index` is a property of the
+index. That is why the hook plane could rely on it, and it is the reason any
+future write-path rule belongs in the same place.
 
 **8. One lock, `write.lock`, and every index writer holds it.** `ingest`,
 `build`, `add`, `remove` and `update` all pass through `write_lock(root)`.
@@ -664,8 +669,10 @@ places. **An offline run never touches it**, exactly like `observe`.
 
 - The code: [`src/fux/maintain/`](../src/fux/maintain/) — `hooks.py`,
   `runner.py`, `daemon.py`, `dirty.py`, `urlstate.py`, `lastcited.py` and
-  `state.schema.json`; the write-time law at `assert_meta_policy` in
-  [`src/fux/store/writer.py`](../src/fux/store/writer.py); the harness at
+  `state.schema.json`; ⚠ **the write-time law at `assert_meta_policy` in
+  `store/writer.py` was DELETED on 2026-09-20** (W-194) and is named rather
+  than linked, because a link to a symbol that is not there is worse than a
+  sentence saying it went; the harness at
   [`tools/maintenance-bench/`](../tools/maintenance-bench/).
 - The accepted verdicts this record implements:
   [`maintenance-trigger.compare.md`](../work/compare/maintenance-trigger.compare.md)

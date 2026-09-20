@@ -103,7 +103,7 @@ the ones the rest of this paper uses.
 | **L2** | Content is never durable outside its source system; the index holds statistics; the one exception is an explicit per-source `snapshot` policy | SR-LAW-2 |
 | **L3** | Deterministic: same sources → byte-identical index and root hash; no wall clock, no unseeded randomness, no set-order dependence, no model in the maintenance path | SR-LAW-3 |
 | **L4** | Offline by default; network only inside explicit, fenced, opt-in paths; an import-fence test enforces it | SR-LAW-4 |
-| **L5** | Hashed meta is the default for non-git sources, enforced at write time — it closes an ACL-mismatch leak | SR-LAW-5 |
+| ~~**L5**~~ | **RETIRED 2026-09-20.** Hashed meta was the default for non-git sources, enforced at write time, closing an ACL-mismatch leak. The mechanism was deleted outright and the leak is now an **accepted, documented exposure**. The handle is never reused | SR-LAW-5 (superseded) |
 | **L6** | Say *index*, never *db* | SR-LAW-6 |
 | **L7** | Python ≥ 3.11 | SR-LAW-7 |
 | **L8** | A use record is never committed — *gitignored* is the test | SR-LAW-8 |
@@ -223,10 +223,9 @@ classDiagram
     flen : per-field token counts
     mtime : last git commit timestamp
     superseded and archived : only when true
-    title or title_h (hashed)
+    title and heading phrases
     edges : src kind dst grade
     mode : extracted or enriched
-    meta : plain or hashed
   }
   class NeverCommitted {
     wlen — derived at query time from flen
@@ -245,8 +244,11 @@ ledger (`sha` of the *raw* bytes taken before redaction, `ver` that bumps only
 when the document's own `sha` changes); retrieval statistics (`terms` as
 `{hash: [tf per field]}` with trailing zeros omitted, `flen` per field);
 priors (`mtime` from the last git commit, `superseded`/`archived` only when
-true); display (`title`, or `title_h` when meta is hashed); the graph (`edges`,
-re-resolved every run); and policy (`mode`, `meta`). What it never carries is
+true); display (`title` and `phrases`); the graph (`edges`, re-resolved every
+run); and policy (`mode`). ⚠ **Display used to fork on privacy** — `title_h`
+instead of `title`/`phrases` when `meta` was `hashed` — and `meta` was the
+second policy field; **both were deleted on 2026-09-20 and `_format` stepped to
+v4** (SR-LAW-5, superseded). What it never carries is
 as important: weighted length `wlen` is derived at query time from `flen` and
 the current weights, so retuning a field weight never touches a committed byte;
 no score, no rank, no content, no vector.
@@ -287,10 +289,9 @@ flowchart LR
   R["4 · REDACT — pii.toml<br/>body + frontmatter title, never the path<br/>reaches the committed index only"]
   X["5 · EXTRACT<br/>title · heading phrases · terms (tf per field)<br/>flen per field · analyzer v2"]
   E["6 · RESOLVE EDGES — every run<br/>ref · tag · code · grades EXTRACTED 10 / AMBIG 8 / INFERRED 6"]
-  M["meta: hashed for non-git sources (L5)<br/>enforced inside write_index"]
   O["7 · WRITE<br/>canonical JSON · sorted keys · NFC · no floats<br/>shard = blake2b(id) → write-if-different"]
   CF["carry-forward when sha, header, PII digest,<br/>caps, enrichment sha, decoder VERSION unchanged<br/>(edges never carried)"]
-  W --> D --> H --> R --> X --> E --> M --> O
+  W --> D --> H --> R --> X --> E --> O
   D -. "cannot decode" .-> Q
   H -. "unchanged" .-> CF -.-> O
 ```
@@ -300,8 +301,8 @@ flowchart LR
 **Walk.** `.fuxignore` is read first and outranks everything; then
 `sources/dirs` (one path per line, `!` excludes, `archived=true` and
 `enrich=true` attributes), `sources/urls` (per-line `fetch=`, `ttl=`, `keep=`,
-`meta=`, `archived=`), and `formats.toml`'s `include` globs and `[decoders]`
-table.
+`enrich=`, `archived=`, `update=`), and `formats.toml`'s `include` globs and
+`[decoders]` table. (⚠ `meta=` was a seventh URL attribute until 2026-09-20.)
 
 **Decode.** Seventeen built-in decoders — csv, docx, drawio, html, image, ini,
 json, jsonl, mail, pdf, pptx, rtf, svg, toml, xlsx, xml, yaml — are listed by
@@ -315,8 +316,11 @@ become one passage per row, capped by `[index] max_table_rows` (default
 under `pii.toml` then runs on the body and frontmatter title (never the path)
 and reaches the committed index only — acquired bytes, refer passages and
 `fux answer` quotes are unredacted, which is the asymmetry the design intends.
-For any non-git source, `meta: hashed` is enforced inside `write_index` per
-record before a shard is touched (L5; SR-INDEX-LIFECYCLE d13).
+⚠ **There used to be a second gate here and it was deleted on 2026-09-20**:
+for any non-git source, `meta: hashed` was enforced inside `write_index` per
+record before a shard was touched (L5; SR-INDEX-LIFECYCLE d13). **The placement
+argument outlives the rule** — a check that lives in one caller is a convention,
+not a property of the index — and it is why redaction sits where it does.
 
 **Extract.** Title, heading phrases, `terms` with a tf per field, and `flen`
 per field. The analyzer is v2: split identifiers, lowercase, drop stopwords,
@@ -1147,9 +1151,10 @@ informed, from a playground set; the blind instrument exists and is unscored.
 Abstention is, today, the absence of any match. BM25F's `title`, `path` and
 `ctx` weights and `expand_weight` are recorded starting points, not measured
 values, and the one measured attempt to tune priors found no global value that
-does not trade one intent for another. Hashed meta trades `explain`-surface
-readability for leak safety. The design point is 10 000 documents and nothing
-here is claimed above it.
+does not trade one intent for another. ⚠ **Hashed meta traded `explain`-surface
+readability for leak safety and was removed on 2026-09-20** — the readability is
+bought back and the ACL-mismatch leak is now accepted rather than closed. The
+design point is 10 000 documents and nothing here is claimed above it.
 
 ---
 

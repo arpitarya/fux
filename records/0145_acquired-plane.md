@@ -10,7 +10,7 @@ feature: the acquired plane
 owns: [src/fux/store/acquired.py@9897ee1fe4af]
 laws: []
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 619a720273554e5462de7b34cc9da6fe6d2d18be72f746bc7830ca2f07a5617b
+content_sha: 759178f128508d53786fb1b8dd4b96a1124055a02c4274fa7a43702b6feb87b2
 ---
 
 # SR-ACQUIRED: fetched bytes are kept, in a plane that is neither committed nor derived
@@ -89,7 +89,7 @@ None is solved by the two caches that already exist, and `refer/fetchcache.py` s
 1. **`.fux/acquired/` is a third category in `fuxdir.py`, beside `COMMITTED` and `DERIVED`.** It is gitignored and carries `CACHEDIR.TAG` like a derived plane, and it is **not rebuildable** — which is why it is not one.
 2. **The layout is `acquired/objects/<sha256[:2]>/<sha256><ext>` plus `acquired/manifest.json`.** The extension comes from `_TYPE_EXT`, so a blob is both decoder-dispatchable and openable by a human. Sharding follows the index's own convention.
 3. **The blob sha is not a field on the index record.** A sha on a committed record states a fact true on one machine: two developers pull the same repo, one has the bytes, and the record claims both do. The url→sha map lives in `manifest.json`, gitignored and advisory — the same shape and guarantees as `url-state.json`. **The record shape does not change.**
-4. **`keep` is a line attribute defaulting to `true`**, resolved through the same three layers as `meta`: built-in default, then `[sources.url] keep`, then the line. `keep=false` or `--no-keep` opts out.
+4. **`keep` is a line attribute defaulting to `true`**, resolved through the same three layers as `fetch`: built-in default, then `[sources.url] keep`, then the line. (⚠ `meta` was the worked example here until W-194 deleted it, 2026-09-20.) `keep=false` or `--no-keep` opts out.
    ⚠ **It defaulted to `false` for one day.** The argument for off-by-default was a stranger's 9 000-URL corpus quietly filling a disk. Decision 8 answers that directly — the store is bounded and evicts — and once the blast radius is bounded, defaulting off means almost nobody gets the thing the plane exists for.
 5. **Retention happens in `fetch_all()`, never inside a fetcher.** W-86 P8 removed conversion from `http.py` and `cdp.py` because it lived there as two hand-maintained copies that a comment asked to keep identical and nothing checked. Retention in the fetchers repeats that defect exactly, and would make *which fetcher retrieved a document* observable again. Above the boundary, every fetcher gains retention with no line changed in any of them.
 6. **The order is `_unpack` → refusal check → persist → decode.** A refusal is never stored. Retaining a login page would keep the wrong bytes *and* make them look authoritative.
@@ -109,7 +109,7 @@ None is solved by the two caches that already exist, and `refer/fetchcache.py` s
     disagree about it, which is the opposite of what a committed index value may
     do. Same file, different question — and it is `fux.toml`'s question, because
     `fux.toml` is where policy about *reaching* sources already lives (`fetcher`,
-    `max_parallel`, `meta`).
+    `max_parallel`).
 
 9. **Sweeping and eviction are different acts.** `sweep()` removes blobs no URL points at — unreachable by construction, so nothing citable is lost. `evict()` removes something still referenced. Keeping them apart is what makes the second one safe to reason about.
 10. **Only `url:` documents are retained.** A `file:` document is already on disk; a second copy would be nonsense.

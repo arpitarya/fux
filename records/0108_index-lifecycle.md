@@ -7,10 +7,10 @@ description: One canonical encoder, sharded doc-major JSONL, write-if-different;
 status: accepted
 date: 2026-08-18
 feature: generation and update of the committed index, and the refusal that keeps its derived accelerator from diverging
-owns: [src/fux/store@bce1c9ab0be2]
+owns: [src/fux/store@8225b66efa55]
 laws: [L1, L2, L3, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 07d33c33383bd144c1ed2193f5f5d96d6ce1a4742afc14d6b0e8f88fe6504ef6
+content_sha: 26a834f8eba406e6f986fc5e462c7f705921e67ed5b29d234700d4840d52744e
 ---
 
 # SR-INDEX-LIFECYCLE — how the index is generated and updated
@@ -272,11 +272,16 @@ Four properties hold it in place:
 - **What *can* reach a byte is the field set, the defaults and `omit_when`**,
   which is why the schema's `schema` string must equal `SCHEMA_ID`: two fux
   versions with different shapes must never both call their output
-  `fux.index.v2`.
-- ⚠ **`validate()` is deliberately not on the write path.** `write_index`
-  already enforces the one rule that closes a leak (L5's meta policy) and
-  `canonical_dumps` already refuses floats, nulls and hostile text; a third gate
-  on the hot path would re-check what those two guarantee. It is a tool for
+  `fux.index.v4`. ⚠ **v3 → v4 on 2026-09-20** (W-194): `meta` and `title_h`
+  left the record, and **a property disappearing bumps `_format` for the same
+  reason one appearing does** (decision 9.1) — a v3 index holds records a v4
+  reader has no rule for, and *"this record has no title"* would otherwise be
+  indistinguishable from *"this index predates plain titles"*.
+- ⚠ **`validate()` is deliberately not on the write path.** `canonical_dumps`
+  already refuses floats, nulls and hostile text; a second gate on the hot path
+  would re-check what it guarantees. (⚠ `write_index`'s L5 meta policy was the
+  other gate named here until W-194 deleted the rule and the law, 2026-09-20 —
+  so there is one, not two.) It is a tool for
   tests and for callers building records by hand — and **a test asserts the
   writer does not call it**, so the distinction cannot rot into an assumption.
 - **`build()` refuses an undeclared field.** A typo'd key used to sail into the
@@ -318,19 +323,21 @@ written is still a lie about what a record looks like. The offset entry's
 example is packed and round-tripped. **A test asserts every shape has one**,
 since a shape without an example is a shape somebody will guess at.
 
-**13. L5 is enforced inside `write_index`**, per record, **before any shard is
-touched**. It lived in one caller, so any second writer could have put a private
-document's title into a committed shard and nothing would have refused. A
-rejected batch now leaves the index exactly as it was, and there is no path into
-a committed shard that skips the check. A non-git record must *state* `meta`; a
-missing value is refused rather than defaulted, because guessing on a caller's
-behalf is the leak the law exists to close.
+**13. ⚠ RETIRED 2026-09-20 (Arpit, W-194), with the law it enforced.** This
+decision read: *L5 is enforced inside `write_index`, per record, before any
+shard is touched* — it had lived in one caller, so any second writer could have
+put a private document's title into a committed shard and nothing would have
+refused; a non-git record had to *state* `meta`, and a missing value was refused
+rather than defaulted. `assert_meta_policy` carried a second refusal in the same
+call: a `hashed` record with no matching entry in
+`.fux/runtime/display-cache/` was refused.
 
-`assert_meta_policy` carries a second per-record refusal in the same call — one
-door, one lock, extended rather than duplicated: a `hashed` record with no
-matching entry in `.fux/runtime/display-cache/` (keyed by `sha`) is refused.
-The cache is gitignored runtime state, same tier as the accelerator, so decision
-5 already covers it. Full rationale on [SR-RECORD](0109_index-record.md).
+**`assert_meta_policy` and the display cache are both deleted.** 🔴 **The
+placement argument is what survives and it is worth more than the rule was**:
+*a check that lives in one caller is a convention, not a property of the
+index* — which is why a future write-path rule belongs in `write_index` and
+nowhere else. The leak L5 closed is an accepted exposure
+([SR-LAW-5](0007_LAW-5-hashed-meta.md), superseded).
 
 
 **14. `_format` bumped to `fux.index.v3` on 2026-09-15** (W-168 step 1), and
@@ -382,7 +389,7 @@ addressing, per-shard shas in the manifest — are unchanged.
 ```console
 $ head -c 240 .fux/index/2e.jsonl
 {"_format":"fux.index.v1","analyzer":"v1","tf_fields":["heading","body"]}
-{"code":"MlLhv73WJJYbpSiyUpUqGlZkY-rXcOv3D1-yqmU5txU","edges":[],"id":"file:docs/refer.md","loc":"docs/refer.md","meta":"plain","mode":"extracted","phrases":["The ref
+{"code":"MlLhv73WJJYbpSiyUpUqGlZkY-rXcOv3D1-yqmU5txU","edges":[],"id":"file:docs/refer.md","loc":"docs/refer.md","mode":"extracted","phrases":["The ref
 ```
 
 **Shard addressing, verified against the files on disk:**
@@ -427,7 +434,11 @@ $ fux doctor
 
 **A refused build** — the invariant doing its job, exit 1, on an index written
 before `title_h` gained its `h:` prefix. Decision 9 is why the message names a
-re-ingest rather than a version bump:
+re-ingest rather than a version bump. ⚠ **This exact session cannot happen any
+more** — `title_h` was deleted on 2026-09-20 (W-194) and the migration hint went
+with it — **and the invariant it shows is untouched**: a quoted 16-hex token
+outside `terms` still refuses the build, and a `title` that happens to be 16 hex
+characters can still be one:
 
 ```console
 $ fux build
@@ -439,9 +450,11 @@ accelerator. This record's `title_h` predates the `h:` prefix
 (SR-INDEX-LIFECYCLE): re-run `fux ingest` to rewrite it.
 ```
 
-**A corpus written today builds clean**, because the prefix means the scan's
-pattern cannot match `title_h` at all — the two paths agree by construction, and
-the differential harness carries a hashed record to prove it.
+**A corpus written today builds clean**, because there is no field that can
+carry a bare hash: the two paths agree by construction. ⚠ Until 2026-09-20 the
+reason was the `h:` prefix, and the differential harness carried a hashed record
+to prove it; it carries a `url:` record now, and exercises the stray-hash
+tripwire directly instead.
 
 **An engine upgrade must say so, and say what to do.** Amended 2026-08-27, on
 [the R10 run](../work/regression/2026-08-27-r10-separation-floor/ANALYSIS.md) §2.
@@ -493,7 +506,9 @@ the three to be merged, did not.
   the correct trade, and it bit once: hashed URL records always tripped it, so
   the L5 default shipped an index no build would accept. **The invariant was not
   the bug; the field shape was.** Recorded here because the refusal *looks* like
-  an accelerator defect and is not.
+  an accelerator defect and is not. ⚠ **The field, and the law that defaulted to
+  it, were deleted on 2026-09-20** (W-194) — so the one case that ever bit is
+  gone and the trade stands unchanged.
 - **256 shards is fixed, not configurable.** `[index] shards` documents the
   value rather than setting it; changing it rewrites every path in the tree.
 - **An analyzer bump owes a full re-ingest on every existing index.** Until it
@@ -525,9 +540,10 @@ the three to be merged, did not.
 - **Trust the accelerator and reconcile later.** Rejected outright: a wrong
   answer that arrives fast is the failure this engine is built to refuse.
 - **Validate every record on the write path.** Rejected under decision 11: it
-  re-checks what the encoder and the meta policy already guarantee, on the hot
-  path, and a gate that duplicates another gate is the one that gets loosened
-  first.
+  re-checks what the encoder already guarantees, on the hot path, and a gate
+  that duplicates another gate is the one that gets loosened first. ⚠ **The meta
+  policy was the second guarantee named here** and W-194 deleted it on
+  2026-09-20; the rejection rests on the encoder alone now, and still holds.
 
 ### Reference (required)
 
@@ -546,7 +562,7 @@ the three to be merged, did not.
   [`derive/runtime.schema.json`](../src/fux/derive/runtime.schema.json).
 - The write-time refusals — `assert_meta_policy` in
   [`store/writer.py`](../src/fux/store/writer.py); the cache it checks —
-  [`store/displaycache.py`](../src/fux/store/displaycache.py).
+  `store/displaycache.py` (deleted 2026-09-20, W-194).
 - Artifacts and staleness behaviour, captured —
   [`work/regression/2026-08-18-ingest-and-index/`](../work/regression/2026-08-18-ingest-and-index/report.md) §§2–5.
 - The measured basis for the accelerator and the differential law —
@@ -605,7 +621,7 @@ evidence.*
 - [`src/fux/derive/runtime.schema.json`](../src/fux/derive/runtime.schema.json)
 - [`src/fux/store/canonical.py`](../src/fux/store/canonical.py)
 - [`src/fux/store/collisions.py`](../src/fux/store/collisions.py)
-- [`src/fux/store/displaycache.py`](../src/fux/store/displaycache.py)
+- `src/fux/store/displaycache.py` — **DELETED 2026-09-20 (W-194)**, named rather than linked
 - [`src/fux/store/format.py`](../src/fux/store/format.py)
 - [`src/fux/store/index-record.schema.json`](../src/fux/store/index-record.schema.json)
 - [`src/fux/store/recordschema.py`](../src/fux/store/recordschema.py)

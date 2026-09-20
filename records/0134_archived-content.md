@@ -10,7 +10,7 @@ feature: what happens once a document is declared archived — the record proper
 owns: [tools/archived-signal-eval@30fb75fa7476]
 laws: [L3, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 6f266a6dba4494ee8fd9f055b7a3071401f26a40a9bc62868fef68cc96abd3f8
+content_sha: 2578b2dd3a91520fea603c791ec4b2d91a208f363dbf7258075423da8f172432
 ---
 
 # SR-ARCHIVED-CONTENT — what "archived" does, once a document carries it
@@ -153,7 +153,7 @@ to prevent.
 ### Decision
 
 **1. A record from an archived source carries `archived: true`**, written at
-ingest and stored per record — the way `mode` and `meta` already are, and for
+ingest and stored per record — the way `mode` already is, and for
 [SR-RECORD](0109_index-record.md)'s reason: **a record read years later states
 the rule it was written under rather than having it inferred by whoever reads
 it.** Absent when false, so no existing record changes shape.

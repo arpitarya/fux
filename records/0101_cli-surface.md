@@ -7,10 +7,10 @@ description: Flat verbs in seven groups, one error boundary, three output modes.
 status: accepted
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@9a75c5894fb0, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@b9295123f1b4, src/fux/progress.py@925dccc045ce]
+owns: [src/fux/cli.py@104881b78675, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@1e4212c25c9e, src/fux/progress.py@925dccc045ce]
 laws: [L1, L4, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 4abed18f6623d2fe22438b5eb0df21d42168c59e3f12f53c0449637f2c310b14
+content_sha: 696d4c9a28ecdad4fd141de5c1a72a074d639e5ee96250ccf85aca55e33dabe7
 ---
 
 # SR-CLI — the command-line surface
@@ -696,8 +696,8 @@ ingested 3 docs (1 changed, 2 carried forward), 1 skipped, 1 shards written
 accelerator: 20 terms, 20 blocks, 21 postings (derived, not committed)
 # exit 0
 
-$ fux add https://wiki.corp/runbook --cdp --plain
-added     https://wiki.corp/runbook fetch=cdp meta=plain
+$ fux add https://wiki.corp/runbook --cdp --no-keep
+added     https://wiki.corp/runbook fetch=cdp keep=false
   in .fux/sources/urls
 ingested 4 docs (1 changed, 3 carried forward), 1 skipped, 1 shards written
   skip docs/architecture.pdf: not an indexed file type
@@ -810,7 +810,7 @@ $ fux add
   *.rst
   *.txt
 .fux/sources/urls:
-  https://wiki.corp/runbook fetch=cdp meta=plain
+  https://wiki.corp/runbook fetch=cdp keep=false
 # exit 0
 ```
 
@@ -823,7 +823,7 @@ refusing.
 |---|---|---|
 | `--types` | `add` · `remove` | the entry is a file-type pattern, not a path, edited in `.fux/formats.toml` (SR-TYPES decision 12). ⚠ Since 2026-09-01 `add` also records the binding — a `[decoders]` line naming the module that would have read the pattern anyway, resolved from the LIVE registry so the written line preserves today's dispatch rather than describing it ([SR-TYPES](0128_types-list.md) decision 11). There is **no `--decoder` flag**: the binding is a property of the extension, so overriding one is a file edit, not a per-invocation choice |
 | `--cdp` / `--http` | `add` | URLs: record `fetch=`. Both at once is an error, not a silent pick |
-| `--plain` / `--hashed` | `add` | URLs: record `meta=`. Same rule |
+| ~~`--plain` / `--hashed`~~ | `add` | **REMOVED 2026-09-20** (W-194) — they recorded `meta=`, which no longer exists. The flags are gone rather than accepted-and-ignored, so a script still passing one **fails at argparse** instead of silently recording nothing |
 | `--archived` | `add` | dirs: record `archived=true` |
 | `--no-ingest` | `add` · `remove` | edit the line only — the `git remote add` behaviour, on request |
 | `--no-fetch` | `add` · `ingest` | URLs: record and ingest offline. On `ingest` it is the whole offline form |

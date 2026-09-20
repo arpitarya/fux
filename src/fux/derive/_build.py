@@ -290,15 +290,14 @@ def _assert_invariants(path: Path, lineno: int, line: bytes, record: dict) -> No
     stray = quoted - term_keys
     if stray:
         example = sorted(stray)[0].decode("ascii")
-        # The one shape this ever legitimately had: a `title_h` written before
-        # the prefix landed. Name the migration rather than the symptom — the
-        # record is not corrupt, it is old, and re-ingesting fixes it.
+        # ⚠ **The one legitimate shape this ever had is gone** (W-194,
+        # 2026-09-20): a bare 16-hex `title_h` written before the `h:` prefix
+        # landed. `title_h` is deleted with `meta`, so any stray quoted hex now
+        # really is a term key somewhere it should not be. The special-cased
+        # migration hint is removed rather than left to fire on a field that
+        # cannot exist; a v3 index carrying one is refused by `store/reader.py`
+        # with a rebuild instruction before it ever reaches here.
         migration = ""
-        if record.get("title_h") == example:
-            migration = (
-                " This record's `title_h` predates the `h:` prefix "
-                "(SR-INDEX-LIFECYCLE): re-run `fux ingest` to rewrite it."
-            )
         raise FuxError(
             f"{path}:{lineno}: the quoted 16-hex token {example!r} appears outside `terms` in "
             f"record {record.get('id')!r}. `query/scan.py` counts it toward that term's df from "

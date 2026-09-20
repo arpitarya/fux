@@ -316,7 +316,6 @@ def _source_defaults(root: Path, spec: sourcelist.ListSpec) -> dict[str, str]:
     # (SR-FETCHER decision 5, one key carrying both).
     return {
         "fetch": Path(url.fetcher).stem,
-        "meta": url.meta,
         "keep": "true" if url.keep else "false",
         "ttl": url.ttl,
         "enrich": "true" if url.enrich else "false",
@@ -334,7 +333,7 @@ def add(
     """Add or update one line. Returns `(action, new_line, previous_line)`.
 
     `source_defaults` is the **source-wide policy** — `[sources.url]`'s
-    `fetcher`, `meta`, `keep`, `ttl`, `enrich` and `update` — resolved by the
+    `fetcher`, `keep`, `ttl`, `enrich` and `update` — resolved by the
     caller.
 
     ⚠ **Without it, `fux add` overrode the consumer's own configuration**
@@ -509,7 +508,6 @@ def _overrides(args, spec: sourcelist.ListSpec) -> dict[str, str]:
     """
     pairs = (
         ("fetch", ("cdp", "http")),
-        ("meta", ("plain", "hashed")),
         ("archived", ("archived",)),
         ("keep", ("keep", "no_keep")),
         ("update", ("no_update",)),

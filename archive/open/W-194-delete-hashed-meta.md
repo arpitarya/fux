@@ -2,11 +2,12 @@
 type: OpenItem
 id: W-194
 title: "W-194 — delete meta=hashed: URL records are plain, the meta knob goes, L5 retires"
-description: "Arpit's ruling 2026-09-17 — hashed meta is removed outright. `meta` exists for URLs only, so removing `hashed` deletes the whole attribute, the `title_h` field, the display cache and the write-time policy assert, and retires L5. fux.index bumps to v4. RATIFIED, NOT BUILT."
-status: open
+description: "BUILT 2026-09-20. Arpit's ruling 2026-09-17 — hashed meta is removed outright. `meta` exists for URLs only, so removing `hashed` deletes the whole attribute, the `title_h` field, the display cache and the write-time policy assert, and retires L5. fux.index bumps to v4. BUILT 2026-09-20."
+status: closed
 lane: agent
 timestamp: 2026-09-17T00:00:00Z
 filed: 2026-09-17
+closed: 2026-09-20
 ball: agent
 ---
 
@@ -16,8 +17,9 @@ ball: agent
 the index schema. Three record classes move together and a laws test is
 byte-gated on the result.
 
-⚠ **RATIFIED, NOT BUILT.** This file is the decision and the spec. No `src/`,
-`node/` or `tests/` line has changed.
+✅ **BUILT 2026-09-20 (Claude Code, Opus 5).** This file is the decision and the
+spec; **§Built at the end is what actually landed**, including six places the
+delivered change differs from what is written below.
 
 ## The ruling
 
@@ -74,8 +76,9 @@ point at this and both need the same sentence.
 7. `fux doctor --json` no longer reports `hashed_meta`.
 8. `query/headings.py`'s "a `hashed` record carries no `phrases`" branch is gone
    from both the Python and the `node/src/query/headings.mjs` twin.
-9. CLAUDE.md's generated §Non-negotiable constraints shows eleven live laws with
-   L5 struck; `tests/test_claude_md_laws.py` passes byte-equal.
+9. CLAUDE.md's generated §Non-negotiable constraints shows **ten** live laws
+   with L5 struck (the spec said eleven and miscounted — L9 was already retired,
+   so twelve numbers minus two gaps is ten); `tests/test_claude_md_laws.py` passes byte-equal.
 10. A migration note in CHANGELOG: **v3 indexes must be rebuilt** (`fux ingest`
     then `fux build`), and any URL source line carrying `meta=` must be edited.
 
@@ -150,3 +153,90 @@ now the *only* thing standing) · `0110_accelerator` (683–687) · `README.md` 
 3. **Twins.** Python/node, Mermaid/ASCII, Mermaid/SVG, templates/`.agents`+
    `.claude`+`.kiro`. Four kinds of pair in one change; each has bitten before.
 4. **The law handle.** L5 is never reused. Eleven live laws, twelve numbers.
+
+---
+
+## ✅ Built 2026-09-20 (Claude Code, Opus 5)
+
+**All ten items in *Definition of done* landed, plus the records, the docs, both
+language twins and the shipped skills.** Six places the delivered change differs
+from this spec, named rather than left to be found.
+
+### 1. 🔴 Deleting `meta` silently disabled every delta ingest, and nothing failed
+
+`ingest/run.py::_reusable` gated carry-forward on
+`src == "git" **and** meta == "plain"`. Deleting the field made the second
+clause `False` for every record in every corpus: **`reused_count` went to 0 and
+every `fux ingest` became a full re-extract.** Nothing raised, nothing warned,
+and **the committed index stayed byte-identical** — a full re-extraction
+produces exactly what the carried fields held — so the only symptom was the run
+taking longer.
+
+**Caught by `tests/ingest/test_delta.py`, which asserts the COUNT and not the
+bytes.** A test written against the output would have passed. That is the whole
+argument for asserting the mechanism as well as the result, and it is why the
+condition now carries the incident in its own docstring.
+
+### 2. `store/displaycache.py` had no `DECLARED` row to remove
+
+Item 6 says to delete the row in `fuxdir.py`'s `DECLARED` and warns that
+removing it without removing the directory trips ADR-DOTFUX veto condition 1.
+**There was no row.** The cache lived at `.fux/runtime/display-cache/` — a
+*child* of `runtime/`, which is the declared entry — so `DECLARED` is untouched
+and the veto condition was never in play. The file and its tests are deleted.
+
+### 3. `fux doctor` had no `hashed_meta` row either
+
+Item 7 asks for it to stop reporting one. `doctor.py` has never mentioned
+`hashed`; the only match in the whole suite was a comment in `test_doctor.py`.
+Nothing to remove.
+
+### 4. The law generator needed a new rule, not just a list edit
+
+`scripts/gen-laws.py` finds a law by its `LAW-TEXT` marker, and this spec keeps
+SR-LAW-5 on disk at `status: superseded` — so the retired law kept rendering
+into `CLAUDE.md` as if it still bound. **The generator now skips a record at
+`status: superseded`**, which is a rule about retirement rather than a hard-coded
+exception. The alternative — deleting the block — would have left the one
+artifact that says what the rule *was* no longer saying it, and every historical
+citation of L5 pointing at a record that had quietly stopped stating it.
+**L9's precedent did not apply**: that record left the `*_LAW-*.md` glob by being
+renamed, and L5 stays a law record because it never stopped being one — it
+stopped being *in force*.
+
+### 5. The differential harness's fixture was rewritten, not deleted
+
+Hazard-adjacent: this spec says the hashed fixtures *"lose their reason to
+exist"* and that the harness needs a different distinguishing record.
+`_hashed()` became **`_url()`** — W-47's actual finding was that the harness had
+never carried a `url:` record **at all**, which is still true of every other
+fixture there. The `title_h` migration test became
+**`test_a_stray_quoted_hash_still_stops_the_build`**, which exercises the
+tripwire directly through a `title` that happens to be 16 hex characters: rarer
+than the old default, and not impossible.
+
+### 6. ⚠ A regeneration step overwrote two committed config files, and was reverted
+
+Rewriting the vendor agent copies by looping over `setup.AGENT_FILES`
+**clobbered `.claude/settings.json` and `.codex/hooks.json`** — files `fux setup`
+seeds and never overwrites, and which in this repo carry the sealed-key deny
+rules and hooks that W-198 had just widened. Restored from `HEAD` in the same
+session; the 30 deny rules and both guard hooks are intact, and
+`tests/test_golden_key_guards.py` proves it. **Named here because the safe loop
+and the unsafe one look identical**, and the repo's own record
+([SR-AGENT-SURFACES](../../records/0155_agent-surfaces.md)) already says
+`settings.json` is co-owned and exempt from the drift test for exactly this
+reason.
+
+### What this change does NOT do
+
+- **It does not stop fux hashing anything.** Terms are still hashed for every
+  document and `.fux/pii.toml` is untouched — **display text only**, as §In
+  scope says. The PII record's own argument never rested on L5; it rested on the
+  gap L5 left, and that gap is unchanged.
+- **It does not touch `lastcited.py`'s hashed question keys** (L8's) or the
+  cache's hashed filenames (SR-CACHE).
+- **It leaves `rank()` a pure function of the record**, which it now is by
+  construction rather than by care: the P5 display-cache seam
+  (`_resolve_title` / `_title_from`) is a no-op and is kept only because SR-ASK
+  decision 10 names it.

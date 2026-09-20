@@ -7,10 +7,10 @@ description: "Fux never fetches; a consumer-owned fetcher file does. One fetcher
 status: accepted
 date: 2026-08-19
 feature: the fetch contract, what it is called, and the two shipped templates
-owns: [src/fux/ingest/urlsrc.py@7bf4e2993691, src/fux/templates@f657a10fc656]
+owns: [src/fux/ingest/urlsrc.py@da875a2495c2, src/fux/templates@8f6251ffc3ba]
 laws: [L1, L3, L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: bdeea83b9ff7e43fce6dc9e8c033e9cb1ca4951fd7f16c82baaa05f30d5bdc67
+content_sha: 9138cfae517c8cc2526079a82937a784083aaec7b849839ff13302fc9c28e519
 ---
 
 # SR-FETCHER — the consumer-owned fetcher
@@ -505,6 +505,22 @@ and still refuses a key it does not know. What changed is which keys arrive —
 which is precisely why refusing was safe to keep.
 
 ### Consequences
+
+- 🔴 **W-194 (2026-09-20) removed a layer from `urlsrc.resolve_urls` and a key
+  from the shipped `fux.toml` template — both components this record owns.**
+  `meta` is deleted outright (Arpit's ruling), so `UrlEntry` no longer carries
+  it, `resolve_urls` resolves **one** attribute through all three layers
+  (`fetch`), and `templates/fux.toml.txt` no longer writes
+  `meta = "hashed"` into every repo `fux setup` touches.
+  - **Decision 5 is untouched and is what made this cheap.** *Declared, never
+    detected* — a fetcher is chosen by a line, never escalated to — means
+    removing a *policy* attribute cannot change which fetcher runs for any URL.
+  - ⚠ **`resolve_urls` now has one worked example of the three-layer rule where
+    it had two**, which matters for anyone reading the docstring to learn the
+    pattern. The rule is unchanged; the illustration thinned.
+  - **A repo whose committed list still says `meta=` fails to load with a named
+    error**, because the attribute key set is closed — the same mechanism that
+    refuses a typo. No deprecation window, on the `fux update` precedent (W-177).
 
 - **The contract survived gaining a second caller unchanged.** The refer plane
   needed a fetch and nothing more, so it reuses this contract instead of adding

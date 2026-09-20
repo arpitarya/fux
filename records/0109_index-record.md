@@ -10,7 +10,7 @@ feature: the committed record schema — `fux.index.v2`
 owns: []
 laws: [L2, L3, L5, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: e875c42928ac2c8a4bf000b5bb06666452bca9d335eae88b45d871f8285179f1
+content_sha: cc68eb86de5b96b38e86f010e670508c14873ed1f5939133ddb37803625153e3
 ---
 
 # SR-RECORD — one line of the committed index
@@ -27,13 +27,20 @@ in a pull request for the rest of the project's life. Content fails that test
 by law. So does anything derivable — it belongs in the runtime plane, which is
 rebuilt and never reviewed.
 
-**Fifteen property names, plus `title_h` — and which of them a given line
-carries is not fixed.** Two reasons a property is conditional, and privacy is
-only the first:
+**Fourteen property names — and which of them a given line carries is not
+fixed.**
 
-- **Privacy forks two.** A `hashed` record carries `title_h` **instead of**
-  `title` and `phrases`, so no display text from a non-git source ever lands in
-  git.
+🔴 **THE PRIVACY FORK IS GONE. Amended 2026-09-20 (Arpit, W-194).** This
+section read *"fifteen property names, plus `title_h`"*, and its first reason a
+property was conditional was: **Privacy forks two** — *a `hashed` record carries
+`title_h` instead of `title` and `phrases`, so no display text from a non-git
+source ever lands in git.* **`meta` and `title_h` are deleted**, `fux.index` is
+**v4**, and a url record is shaped exactly like a git one. ⚠ **The leak that
+fork closed — a title alone telling a reader that a document they cannot open
+exists — is an ACCEPTED, DOCUMENTED EXPOSURE**, and
+[SR-LAW-5](0007_LAW-5-hashed-meta.md) (superseded) keeps the argument and the
+reopen trigger. One reason a property is conditional is left:
+
 - **Three are written only when they say something.** `archived` and
   `superseded` appear only when true, and `mtime` only when git could supply a
   commit timestamp. These are *facts most documents do not have*: a file outside
@@ -51,11 +58,10 @@ flowchart TD
     L["one JSONL line"] --> ID["IDENTITY<br/>id · src · loc"]
     L --> LED["LEDGER<br/>sha · ver"]
     L --> RET["RETRIEVAL<br/>terms · flen"]
-    L --> DIS["DISPLAY<br/>title · phrases  — or  title_h"]
+    L --> DIS["DISPLAY<br/>title · phrases"]
     L --> GRA["GRAPH<br/>edges"]
     L --> PRI["PRIORS<br/>mtime · superseded · archived"]
-    L --> POL["POLICY<br/>mode · meta"]
-    DIS -.->|"meta = hashed<br/>-> title_h only"| POL
+    L --> POL["POLICY<br/>mode"]
     RET -.->|"wlen is DERIVED,<br/>never committed"| WL["bm25f.derive_wlen(flen, weights)"]
 ```
 
@@ -71,13 +77,13 @@ flowchart TD
         |                     |
         |                     +-- wlen is DERIVED at query time,
         |                         bm25f.derive_wlen(flen, weights)
-        +-- DISPLAY    title · phrases      -- or --   title_h
-        +-- PRIORS     mtime · superseded · archived   ^
-        +-- GRAPH      edges                           |
-        +-- POLICY     mode · meta                     |
-                             |                         |
-                             +-- meta = "hashed" ------+
-                                 no display text reaches git
+        +-- DISPLAY    title · phrases
+        +-- PRIORS     mtime · superseded · archived
+        +-- GRAPH      edges
+        +-- POLICY     mode
+
+   (W-194, 2026-09-20: DISPLAY used to read "title · phrases -- or -- title_h",
+    with POLICY's `meta = "hashed"` deciding which. Both fields are deleted.)
 ```
 
 </details>
@@ -123,25 +129,29 @@ path-only term is `[0, 0, 0, 1]` for the same reason. There is no `wlen` on the
 line at all. `archived` is present *because it is true*; `superseded` is absent
 because it is false.
 
-And a `hashed` record — **no `title`, no `phrases`**. This block is an
-**illustration, not a capture**: every record in this corpus is `meta: "plain"`,
-so there is no live hashed record to capture, and its `flen` is elided rather
-than invented — the point of the block is the privacy fork, and a fabricated
-length would teach nothing while reading exactly like a measurement.
+And a **`url:` record**, which since W-194 differs from the one above only in
+`src`, `loc` and the shape of the id. This block is an **illustration, not a
+capture** — this corpus indexes no URL — and its `flen` is elided rather than
+invented, because a fabricated length would teach nothing while reading exactly
+like a measurement.
 
 ```json
 {
   "id": "url:https://example.invalid/handbook/oncall",
   "loc": "https://example.invalid/handbook/oncall",
-  "meta": "hashed",
   "mode": "extracted",
+  "phrases": [ "Escalation path", "Who to page" ],
   "flen": [ "…" ],
   "sha": "2643f1afb68339f2f808d85f67aad193b820dd86",
   "src": "url",
-  "title_h": "h:30aef0c52cf11116",
+  "title": "Oncall handbook",
   "ver": 1
 }
 ```
+
+⚠ **Until 2026-09-20 this block showed a `hashed` record — `"meta": "hashed"`,
+`"title_h": "h:30aef0c52cf11116"`, and no `title` or `phrases` — and the point
+of it was the privacy fork.** There is no such record now.
 
 ---
 
@@ -238,9 +248,8 @@ accelerator's pruning bound.
 
 | property | purpose |
 |---|---|
-| `title` | shown in results. **Present only when `meta` is `"plain"`** |
-| `phrases` | heading-derived phrases — what [SR-ANSWER](0105_answer.md) returns, and what [SR-ASK](0103_ask.md) decision 8 cites as `§` headings. **`"plain"` only** |
-| `title_h` | `"h:"` + the term hash of the title, **instead of** `title`/`phrases` when `meta` is `"hashed"`. Enough to identify, not enough to read *from the committed bytes*; a warm display cache can still show a title — see Consequences |
+| `title` | shown in results. ⚠ **Read *"present only when `meta` is `\"plain\"`"* until W-194** (2026-09-20) deleted `meta`; every record may carry it now |
+| `phrases` | heading-derived phrases — what [SR-ANSWER](0105_answer.md) returns, and what [SR-ASK](0103_ask.md) decision 8 cites as `§` headings. Same amendment as `title` |
 
 **Graph and policy:**
 
@@ -248,7 +257,6 @@ accelerator's pruning bound.
 |---|---|
 | `edges` | resolved links to other `id`s. Re-resolved corpus-wide on every ingest, because a new document can resolve a previously dangling link |
 | `mode` | how the record was built — `"extracted"` (deterministic, offline) or `"enriched"` (model-assisted). Records which contract produced these bytes |
-| `meta` | the privacy policy actually applied: `"plain"` or `"hashed"`. Recorded per record rather than inferred from config, so a record read years later still says what rule it was written under |
 
 **Two rules over the whole line:**
 
@@ -257,10 +265,12 @@ accelerator's pruning bound.
    the write boundary, not trusted of callers.
 2. **No quoted 16-hex token may appear outside `terms`.** `query/scan.py`
    derives `df` from raw bytes, so any other 16-hex string would be counted as a
-   term by one query path and not the other. **`title_h` is written as
-   `"h:" + <16 hex>`** for exactly this reason: a character between the opening
-   quote and the hex makes the scan's pattern unable to match, so the two paths
-   agree by construction rather than by check.
+   term by one query path and not the other. ⚠ **`title_h` was written as
+   `"h:" + <16 hex>` for exactly this reason** — a character between the opening
+   quote and the hex made the scan's pattern unable to match, so the two paths
+   agreed by construction rather than by check. **The field is deleted (W-194)
+   and the rule is not**: a `title` that happens to be 16 hex characters still
+   trips it, and `tests/derive/test_differential.py` exercises that directly.
 
 **The shape is declared once, in
 [`store/index-record.schema.json`](../src/fux/store/index-record.schema.json).**
@@ -273,31 +283,25 @@ paraphrase of the other.
 
 - **A document's change is one line in one shard**, so `git diff` is readable
   and merges land per document.
-- **Hashed records rank, and read only through the display cache.** Ingest
-  already holds a non-git document's bytes in memory before it writes the
-  record, so it also writes the title to `.fux/runtime/display-cache/` —
-  gitignored, keyed by `sha`, never committed — **before** `store/writer.py`
-  will accept the record (`assert_meta_policy` refuses a `hashed` record with no
-  cache entry for its `sha`). `store.display_title(record, cache=...)` is the
-  one place every reader-facing surface resolves the title from: the committed
-  line still carries only `title_h`, and a warm cache is what turns that back
-  into text a reader sees.
-  - A **cold** cache — evicted, or a record whose ingest predates the feature —
-    degrades to `"<hash> (uncached — title unavailable)"` rather than a bare
-    hash a reader cannot tell from a working system.
-  - **`phrases` is not materialised.** The cache holds only `title`, so
-    `fux answer` on a hashed document shows a real title with an empty phrase
-    list — not a full parity restoration.
-  - **Ranking is untouched.** `rank()`'s call sites pass no cache, so a score is
-    still a pure function of the committed record. This is a display-layer fix,
-    not a scoring one.
+- 🔴 **The display cache is DELETED, with the fork it served** (W-194,
+  2026-09-20). This consequence described the whole P5 machinery — ingest wrote
+  the title to a gitignored `.fux/runtime/display-cache/` keyed by `sha`
+  **before** `store/writer.py` would accept a hashed record, `display_title`
+  resolved through it, a cold cache degraded to
+  `"<hash> (uncached — title unavailable)"` rather than a bare hash, `phrases`
+  was never materialised, and ranking passed no cache so a score stayed a pure
+  function of the record. **None of it exists.** `display_title(record)` is
+  `record["title"]`, and the only property worth carrying forward is the last
+  one: **ranking is still a pure function of the committed record**, which it
+  now is by construction rather than by care.
 - **`title_h` used to break rule 2, and the fix was the field, not the rule.** A
   bare 16-hex token outside `terms` made the accelerator refuse to build over
   any corpus containing one — so the `hashed` default, an L5 default, shipped an
   index no `fux build` would accept. Fixed by prefixing the value rather than
-  relaxing the invariant: the invariant is what stands between the engine and a
-  fast wrong answer, and a check that has to be remembered is worse than a shape
-  that cannot be got wrong.
+  relaxing the invariant. ⚠ **Kept here although the field is gone**, because
+  the lesson is about the invariant and not about `title_h`: the invariant is
+  what stands between the engine and a fast wrong answer, and a check that has
+  to be remembered is worse than a shape that cannot be got wrong.
 - **Adding a property is a schema change**, requiring an `_format` bump and a
   re-ingest of every corpus. That cost is the point: it is what keeps the
   committed plane from accumulating conveniences.
@@ -315,9 +319,12 @@ paraphrase of the other.
 
 ### Alternatives considered
 
-- **Store the title alongside `title_h` for hashed records.** Rejected: it
-  defeats the mode entirely — the display text is exactly what must not reach
-  git.
+- **Store the title alongside `title_h` for hashed records.** Rejected at the
+  time: it defeats the mode entirely — the display text is exactly what must not
+  reach git. ⚠ **Overtaken 2026-09-20**: Arpit deleted the mode, so the title is
+  stored and there is no `title_h` beside it. **This row was right about the
+  trade and the trade was taken deliberately** (W-194), which is a different
+  thing from the row having been wrong.
 - **Derive the length from `terms` instead of committing anything.** Rejected,
   and the reason is why the committed source is `flen` rather than `terms`:
   `terms` holds post-stopword tokens, so summing them is not the document's
@@ -343,14 +350,15 @@ paraphrase of the other.
   [`index-record.schema.json`](../src/fux/store/index-record.schema.json);
   the encoder — [`canonical.py`](../src/fux/store/canonical.py); record
   construction — [`src/fux/ingest/run.py`](../src/fux/ingest/run.py).
-- The display cache —
-  [`src/fux/store/displaycache.py`](../src/fux/store/displaycache.py); the
-  write-time refusal — `assert_meta_policy` in
-  [`store/writer.py`](../src/fux/store/writer.py); the resolution every verb
-  shares — `display_title` in
-  [`store/format.py`](../src/fux/store/format.py); the verdicts —
+- ⚠ **The display cache (`store/displaycache.py`) and the write-time refusal
+  (`assert_meta_policy`) were deleted by W-194 on 2026-09-20** and are named
+  here rather than linked, because a link to a file that is not there is worse
+  than a sentence saying it was removed. The resolution every verb still shares
+  — `display_title` in
+  [`store/format.py`](../src/fux/store/format.py); the verdicts that argued the
+  mode —
   [`work/compare/meta-privacy.compare.md`](../work/compare/meta-privacy.compare.md).
-- Real records, both `plain` and `hashed` —
+- Real records, both `plain` and `hashed`, as of 2026-08-18 —
   [`work/regression/2026-08-18-ingest-and-index/`](../work/regression/2026-08-18-ingest-and-index/report.md) §2 and §6.
 - Canonical JSON, the prior art the encoder follows — RFC 8785:
   https://www.rfc-editor.org/rfc/rfc8785
@@ -403,7 +411,7 @@ evidence.*
 - [`src/fux/ingest/run.py`](../src/fux/ingest/run.py)
 - [`src/fux/query/bm25f.py`](../src/fux/query/bm25f.py)
 - [`src/fux/store/canonical.py`](../src/fux/store/canonical.py)
-- [`src/fux/store/displaycache.py`](../src/fux/store/displaycache.py)
+- `src/fux/store/displaycache.py` — **DELETED 2026-09-20 (W-194)**, named rather than linked
 - [`src/fux/store/format.py`](../src/fux/store/format.py)
 - [`src/fux/store/index-record.schema.json`](../src/fux/store/index-record.schema.json)
 - [`src/fux/store/writer.py`](../src/fux/store/writer.py)

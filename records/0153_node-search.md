@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@34453fe07ebf, src/fux/store/nodebundle.py@071a24a596dd]
+owns: [node@54b87937e653, src/fux/store/nodebundle.py@071a24a596dd]
 laws: [L1, L3, L4, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 85216ccee9a014e4cc248e4ab5816077a3da9e12098324684fd4d931bf9288bc
+content_sha: 73b27f26284fb55f65f7bb4bd69a8d42ebbd223d87961df09ca5fd2b3c764e50
 ---
 
 # SR-NODE-SEARCH — the Node read plane
@@ -735,7 +735,7 @@ reader the reason.
 ⚠ **`node/src/ingest/sourcelist.mjs` is narrowed for freshness, and the gap is
 covered by parity instead** (2026-09-15, W-178). That module is the **`dirs`
 half** of `src/fux/ingest/sourcelist.py` — Node never fetches (decision 3), so
-`fetch`, `meta`, `keep`, `ttl` and `update` decide nothing there. A change
+`fetch`, `keep`, `ttl` and `update` decide nothing there. A change
 entirely inside the `URLS` spec therefore reported the twin as behind, and
 porting it would have meant teaching this reader a grammar for a list it does
 not read.

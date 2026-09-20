@@ -478,8 +478,6 @@ def build_parser() -> argparse.ArgumentParser:
         p.add_argument("--types", action="store_true", help="the entry is a file-type pattern (.fux/formats.toml)")
         p.add_argument("--cdp", action="store_true", help="URLs: record fetch=cdp")
         p.add_argument("--http", action="store_true", help="URLs: record fetch=http (the default)")
-        p.add_argument("--plain", action="store_true", help="URLs: record meta=plain — readable display text in the index")
-        p.add_argument("--hashed", action="store_true", help="URLs: record meta=hashed (the default)")
         p.add_argument("--archived", action="store_true", help="dirs: record archived=true")
         p.add_argument("--keep", action="store_true", help="URLs: record keep=true - retain the fetched bytes in .fux/acquired/ (the default)")
         p.add_argument("--no-keep", action="store_true", help="URLs: record keep=false - do not retain the fetched bytes")

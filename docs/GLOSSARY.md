@@ -364,11 +364,17 @@ treated as zero. **Zero headroom in a direction makes a null *Inconclusive*, not
 *no detected change*.** There is deliberately no minimum. See
 [SR-RS](../records/0133_predictions.md) decision 22.
 
-**Hashed meta (`meta = hashed`)** — The **default** for every non-git source:
-`M/` stores term and phrase *hashes*, never readable text. Closes the
-ACL-mismatch leak where a repo-cloner without source access could read
-index-derived summaries. `plain` is opt-in, enforced at write time (not in
-documentation). See [meta-privacy](../work/compare/meta-privacy.compare.md).
+**Hashed meta (`meta = hashed`)** — 🔴 **REMOVED in fux 3.x (W-194, Arpit,
+2026-09-20), together with law L5.** It was the **default** for every non-git
+source: the record stored a title *hash* and no readable `title` or `phrases`,
+closing the ACL-mismatch leak where a repo-cloner without source access could
+learn that a document exists and what it is called. `plain` was the opt-in,
+enforced at write time. **Every record now commits readable display text**, and
+that leak is an **accepted, documented exposure** — use `.fux/pii.toml` to keep
+a value out of the committed index, or do not index the page.
+`meta=` in a URL line or in `[sources.url]` is now a **named load error**, not
+an ignored key. See [SR-LAW-5](../records/0007_LAW-5-hashed-meta.md)
+(superseded) and [meta-privacy](../work/compare/meta-privacy.compare.md).
 
 **Link-IDF** — An inbound edge's discount in the graph walk:
 `1 / (1 + ln(1 + in_degree of its target))`. A node nothing points at is
@@ -411,7 +417,7 @@ pruning, which can empty a document entirely). Büttcher & Clarke, CIKM 2006
 
 **Ledger (`L/`)** — The committed source-of-record plane: one entry per
 document — [locator](#locator), `sha@index` (the content hash *as indexed*),
-`mode`, `meta`, version info. It answers *what is in the corpus, from where,
+`mode`, version info. It answers *what is in the corpus, from where,
 at which version* without holding any content, and its sort order defines
 [doc-ids](#doc-id). Replaces the archived `fux.lock`.
 
@@ -614,7 +620,10 @@ location. See [SR-CACHE](../records/0131_cache.md) decision 7,
 **URL source (`[sources.url]`)** — The `src: "url"` ingestion path: URLs are
 read from the committed `.fux/sources/urls` (one per line), fetched through
 the consumer's [fetcher](#fetcher-url), and indexed exactly like repo
-files with [hashed meta](#hashed-meta-meta--hashed) by default. Fux ships
+files. ⚠ **Until fux 3.x they were indexed with
+[hashed meta](#hashed-meta-meta--hashed) by default**; W-194 removed that, so a
+URL record carries a readable `title` and `phrases` exactly as a repo file does.
+Fux ships
 **no** URL adapter — the adapter cap is untouched, because the fetching code
 is the consumer's. Fetching happens only under `fux add <URL>` or `fux ingest`;
 `fux ingest --no-fetch` carries every `url:` record forward byte-identically and

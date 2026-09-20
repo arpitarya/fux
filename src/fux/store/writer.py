@@ -1,30 +1,30 @@
 """The canonical writer: records in, deterministic shard files out.
 
-## L5 is enforced here, at write time, and that placement is the point
+## L5 was enforced here, at write time, and the law retired on 2026-09-20
 
-**Hashed meta is the default for non-git sources, enforced at write time**
+**Hashed meta was the default for non-git sources, enforced at write time**
 (L5). Until M5 that enforcement lived in `ingest/run.py`, which is to say it
 lived in *one caller* — so it was a convention that happened to hold rather
-than a property of the index. Any second writer (an enrichment pass, a
-migration script, a test fixture, a consumer using the library) could write a
-record carrying a private document's title into a committed file, and nothing
-would have said no.
+than a property of the index. The move here was right: any second writer (an
+enrichment pass, a migration script, a test fixture, a consumer using the
+library) could otherwise write a private document's title into a committed
+file, and nothing would have said no.
 
-It closes an **ACL-mismatch leak**: a document readable by fifty people inside
-Confluence becomes a title readable by everyone with the repo. That is why L5
-is a law rather than a configuration preference, and why the check is here
-rather than in the path that happens to be used today.
+It closed an **ACL-mismatch leak**: a document readable by fifty people inside
+Confluence becomes a title readable by everyone with the repo. **That leak is
+real and is now accepted.** L5 was not wrong about it; it lost on cost.
 
-The rule, in full:
+⚠ **W-194, 2026-09-20 — THE RULE IS GONE, and so is `assert_meta_policy`.**
+Arpit ruled `meta=hashed` deleted outright: every record now carries plain
+display text, `meta` and `title_h` no longer exist, and **law L5 retires with
+the mechanism**. What the check enforced cannot be violated by a shape that no
+longer exists.
 
-- A `git` record may say what it likes; the repo already holds its bytes.
-- A **non-git** record must state `meta` explicitly. A missing value means
-  something bypassed the resolution layer, and guessing on its behalf is
-  exactly the failure this prevents.
-- `meta: "hashed"` must carry **no display text** — no `title`, no `phrases` —
-  and must carry `title_h`.
-- `meta: "plain"` is legal and is an explicit, per-document opt-out
-  (SR-URL-LIST decision 10). It has to be *said*.
+🔴 **The leak L5 closed is now an ACCEPTED, DOCUMENTED EXPOSURE, not a solved
+problem** — a title alone tells a reader that a document they cannot open
+exists. [SR-LAW-5](../../../records/0007_LAW-5-hashed-meta.md) is kept at
+`status: superseded` with its reopen trigger and its citation, because a reopen
+is cheaper than a rediscovery.
 
 
 Always a full, deterministic rewrite of every shard implied by the given
@@ -45,7 +45,6 @@ from pathlib import Path
 from ..errors import FuxError
 from .canonical import canonical_dumps
 from .collisions import CollisionTracker
-from .displaycache import DisplayCache
 from . import recordschema
 from .format import HEADER, index_dir, shard_for, shard_path
 
@@ -73,7 +72,6 @@ def write_index(root: Path, records: list[dict]) -> list[Path]:
         if doc_id in seen_ids:
             raise FuxError(f"duplicate id in index write: {doc_id!r}")
         seen_ids.add(doc_id)
-        assert_meta_policy(record, root)
         by_shard.setdefault(shard_for(doc_id), []).append(record)
 
     directory = index_dir(root)
@@ -98,61 +96,16 @@ def write_index(root: Path, records: list[dict]) -> list[Path]:
     return written
 
 
-#: Fields that carry text a human can read. A `hashed` record may hold none of
-#: them: the whole point is that the index reveals nothing the source system
-#: would not have shown this reader.
 #: Fields that carry text a human can read, **read from the record schema**
 #: rather than restated here (W-83b). This tuple and the record's shape used to
-#: live in different modules and agreed only by habit: adding a display field
-#: meant remembering to touch this line, and forgetting was SILENT -- the field
-#: shipped and L5's check simply did not look at it.
+#: live in different modules and agreed only by habit.
+#:
+#: ⚠ **Nothing reads it any more** (W-194): `assert_meta_policy` was its only
+#: consumer and every record may now carry every one of these. It is kept
+#: because `recordschema.display_fields()` is still the one place that says
+#: which fields are human-readable, and a future rule about display text
+#: should find it here rather than invent a second list.
 DISPLAY_FIELDS = recordschema.display_fields()
-
-
-def assert_meta_policy(record: dict, root: Path) -> None:
-    """Refuse to write a non-git record that leaks display text (L5).
-
-    Raises `FuxError` naming the document and the fix. Called per record by
-    `write_index`, so **there is no path into a committed shard that skips
-    it** — which is the difference between a law and a habit.
-    """
-    if record.get("src") == "git":
-        return
-
-    doc_id = record.get("id", "<no id>")
-    meta = record.get("meta")
-    if meta is None:
-        raise FuxError(
-            f"{doc_id}: a non-git record must state `meta` explicitly. Its absence means the "
-            "policy layer was bypassed, and the default (`hashed`, L5) is not applied here on "
-            "purpose — guessing on a caller's behalf is the leak this check exists to stop"
-        )
-    if meta not in ("plain", "hashed"):
-        raise FuxError(f"{doc_id}: meta must be 'plain' or 'hashed', got {meta!r}")
-
-    if meta == "hashed":
-        leaked = [f for f in DISPLAY_FIELDS if f in record]
-        if leaked:
-            raise FuxError(
-                f"{doc_id}: meta is 'hashed' but the record carries {', '.join(leaked)}. "
-                "A hashed record holds `title_h` and no readable text — this is the "
-                "ACL-mismatch leak L5 exists to close. Either drop the field, or declare "
-                "`meta=plain` on that source line if the document really is public"
-            )
-        if "title_h" not in record:
-            raise FuxError(
-                f"{doc_id}: meta is 'hashed' but there is no `title_h`. A record with neither "
-                "a title nor a title hash cannot be cited by any verb"
-            )
-        sha = record.get("sha")
-        if sha is None or DisplayCache(root).get(sha) is None:
-            raise FuxError(
-                f"{doc_id}: meta is 'hashed' but no display-cache entry exists for its sha "
-                f"({sha!r}). A hashed record's bytes must be materialised into the local "
-                "display cache before the record is committed — `title_h` alone leaves no "
-                "reader-facing surface able to show a real title (P5, materialise-first). "
-                "Re-run ingest with a live fetch for this document to repopulate it"
-            )
 
 
 def _atomic_write(path: Path, data: bytes) -> None:

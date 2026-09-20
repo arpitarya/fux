@@ -14,7 +14,7 @@ index every teammate clones.
   `!X` exclusion.
 - **`archived=true` is declared, never inferred** from a path or a title.
 - **`!path` excludes in `.fux/sources/dirs` but RE-INCLUDES in `.fux/.fuxignore`.**
-- **`meta=plain` commits readable titles** for anyone who clones the repo.
+- **A URL record commits a readable title and headings** for anyone who clones the repo. (`meta=` used to control this and was removed in fux 3.x; a line still carrying it will not load.)
 - After a hand edit, run `fux ingest` and commit `.fux/` in the same change.
 
 Full procedure: the `fux-sources` skill.

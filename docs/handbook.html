@@ -661,7 +661,7 @@ body.present #progress{display:block}
         <rect x="68" y="310" width="261" height="76" rx="8" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.2"/>
         <text x="84" y="332" font-size="11.5" fill="var(--d-ink)" font-weight="600">identity</text>
         <text x="84" y="352" font-size="10.5" fill="var(--d-body)">id · src · loc · sha · ver</text>
-        <text x="84" y="370" font-size="10.5" fill="var(--d-body)">mode · meta</text>
+        <text x="84" y="370" font-size="10.5" fill="var(--d-body)">mode</text>
 
         <rect x="349" y="310" width="261" height="76" rx="8" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.2"/>
         <text x="365" y="332" font-size="11.5" fill="var(--d-ink)" font-weight="600">retrieval</text>
@@ -759,7 +759,7 @@ body.present #progress{display:block}
         <text x="48" y="864" font-size="11" fill="var(--d-body)">never cited, and nothing noticed. It buys RECALL, not correctness: a changed document could never be mis-answered, only fail to surface.</text>
 
         <line x1="48" y1="886" x2="1192" y2="886" stroke="var(--d-rule)" stroke-width="1"/>
-        <text x="48" y="908" font-size="10.5" fill="var(--d-body)">L1 stdlib only · L2 no durable content · L3 deterministic — the sort, not the loop · L4 offline by default · L5 hashed meta · L6 say "index" · L7 Python ≥ 3.11 · L8 no use record committed</text>
+        <text x="48" y="908" font-size="10.5" fill="var(--d-body)">L1 stdlib only · L2 no durable content · L3 deterministic — the sort, not the loop · L4 offline by default · L6 say "index" · L7 Python ≥ 3.11 · L8 no use record committed</text>
       </svg>
     </div>
   </figure>
@@ -933,13 +933,17 @@ body.present #progress{display:block}
   <div class="note warn">
     <strong>"Hashed" is not "anonymous" — be precise about which.</strong> The <em>terms</em> are
     hashed, so a shard cannot be read back as prose. But the same line also carries the document's
-    <code>loc</code> (its path or URL) and, when the source's <code>meta</code> is
-    <code>plain</code> — the default for a git repo — its <code>title</code> and heading-derived
-    <code>phrases</code>, in clear. Set <code>meta = hashed</code> (the enforced default for
-    non-git sources, L5) and those become a single <code>title_h</code> instead, with the readable
-    title kept only in the gitignored display cache. So: a shard never reveals a document's
-    <em>prose</em>; whether it reveals a document's <em>name</em> is a per-source policy you choose.
-    See SR-RECORD (<code>0010</code>).
+    <code>loc</code> (its path or URL), its <code>title</code> and its heading-derived
+    <code>phrases</code>, <strong>in clear, for every source</strong>. So: a shard never reveals a
+    document's <em>prose</em>; it always reveals its <em>name</em>.
+    <br><br>
+    <strong>This was a per-source policy until fux 3.x and is not one any more.</strong>
+    <code>meta = hashed</code> was the enforced default for non-git sources (law L5): the record
+    carried a single <code>title_h</code>, with the readable title only in a gitignored display
+    cache. <strong>W-194 deleted the mechanism and retired L5</strong>, so the ACL-mismatch leak it
+    closed — a title alone telling a reader that a document they cannot open exists — is now an
+    <strong>accepted exposure</strong>. Keep a value out of the index with
+    <code>.fux/pii.toml</code>, or do not index the page. See SR-RECORD and SR-LAW-5.
   </div>
   </figure>
 </section>
@@ -2234,7 +2238,7 @@ uv run pytest -q tests_e2e      # the package as a user: the real CLI via subpro
         <rect x="40" y="112" width="240" height="84" rx="10" fill="var(--d-accent-bg)" stroke="var(--d-accent)" stroke-width="1.7"/>
         <text x="56" y="136" font-size="12" fill="var(--d-ink)" font-weight="600">.fux/sources/urls</text>
         <text x="56" y="156" font-size="10.5" fill="var(--d-body)">one URL per line, plus</text>
-        <text x="56" y="172" font-size="10.5" fill="var(--d-body)">fetch= and meta= attributes</text>
+        <text x="56" y="172" font-size="10.5" fill="var(--d-body)">fetch= and ttl= attributes</text>
         <text x="56" y="189" font-size="10.5" fill="var(--d-dim)">routing is DECLARED, not sniffed</text>
 
         <rect x="296" y="112" width="240" height="84" rx="10" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.4"/>
@@ -2437,7 +2441,7 @@ def decode(path: Path, rel_path: str) -&gt; str | None: ...</code></pre>
           nothing.</td><td>—</td></tr>
       <tr><td><code>fux add [entry]</code></td>
         <td>List a directory, a file or a URL — and ingest it. Omit the entry to list everything.</td>
-        <td><code>--types --cdp --http --plain --hashed --archived --no-ingest --no-fetch --dry-run</code></td></tr>
+        <td><code>--types --cdp --http --archived --keep --no-keep --no-update --ttl --no-ingest --no-fetch --dry-run</code></td></tr>
       <tr><td><code>fux remove &lt;entry&gt;</code></td>
         <td>Delete its line, or exclude it if an ancestor is listed.</td>
         <td><code>--types --no-ingest --dry-run</code></td></tr>
@@ -2614,8 +2618,10 @@ def decode(path: Path, rel_path: str) -&gt; str | None: ...</code></pre>
     Same sources produce a byte-identical index. Nothing calls a model to build one.</span></div>
   <div class="law"><b>L4</b><span><strong>Offline by default.</strong> Network access only inside
     explicit, fenced, opt-in paths — <code>fux add &lt;URL&gt;</code> and <code>fux ingest</code>.</span></div>
-  <div class="law"><b>L5</b><span><strong>Hashed meta is the default</strong> for non-git sources,
-    enforced at write time. It closes an ACL-mismatch leak.</span></div>
+  <div class="law"><b>L5</b><span><s><strong>Hashed meta is the default</strong> for non-git
+    sources, enforced at write time.</s> <strong>RETIRED in 3.x</strong> — the mechanism was
+    deleted and the ACL-mismatch leak it closed is now an accepted exposure. The handle is never
+    reused; there are ten live laws and twelve numbers.</span></div>
   <div class="law"><b>L6</b><span><strong>Say "index", not "db".</strong> Load-bearing vocabulary.</span></div>
   <div class="law"><b>L7</b><span><strong>Python ≥ 3.11.</strong></span></div>
   <div class="law"><b>L8</b><span><strong>A use record is never committed.</strong> Fux may record

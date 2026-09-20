@@ -44,7 +44,7 @@ The grammar, in one place:
   accepting it silently would be the kind of no-op configuration this grammar's
   strictness exists to prevent.
 
-The attribute sets are closed and per file: `fetch` + `meta` for `urls`,
+The attribute sets are closed and per file: `fetch` for `urls`,
 `archived` for `dirs`. (`types` was the third file until 2026-09-11; it is
 `.fux/formats.toml` now, read by `typesfile` — see `TYPES` below.) Adding one is a change
 to the owning record, which is what makes the unknown-key error safe to be
@@ -79,7 +79,7 @@ class Attribute:
     rule instead.** Every attribute was a closed enum until `ttl` (SR-URL-
     FRESHNESS): a duration is an unbounded value, and there is no tuple of
     legal ones to write. The enum is still the default, and it is still the
-    right shape for `meta`, `archived`, `enrich`, `update` and `keep` -- those
+    right shape for `archived`, `enrich`, `update` and `keep` -- those
     are **policy values with a genuinely closed set**. A typed attribute's
     validator must produce the same *kind* of error the enum does, naming what
     was wrong rather than what was expected.
@@ -331,7 +331,6 @@ URLS = ListSpec(
         # empty-default exception would otherwise fire and a generated URL line
         # would stop stating `fetch=`, which SR-URL-LIST decision 12 requires.
         Attribute("fetch", (), "http", validate=_fetcher_reason, placeholder="<name>"),
-        Attribute("meta", ("plain", "hashed"), "hashed"),
         # SR-ACQUIRED. Retain the bytes this URL returned.
         #
         # ⚠ **Default TRUE, and it was `false` for one day.** The argument for
@@ -435,7 +434,7 @@ def strip_comment(raw: str) -> str:
     """Drop a trailing comment. `#` counts only at line start or after whitespace.
 
     This is forced, not chosen: under a whitespace-delimited grammar,
-    `https://x/a#frag meta=plain` cannot parse at all if `#` means a comment
+    `https://x/a#frag keep=false` cannot parse at all if `#` means a comment
     everywhere. It is also the fix for the silent fragment truncation.
     """
     if raw.lstrip().startswith("#"):
@@ -593,7 +592,7 @@ def render_line(value: str, attrs: dict[str, str], spec: ListSpec) -> str:
     that a generated line states its policy so a change is a one-word diff —
     and a bare `decoder=` states no policy and cannot be diffed into one. It
     would put four dead characters on every prose line in the types file. No
-    other attribute is affected: `fetch`, `meta`, `keep`, `ttl`, `archived` and
+    other attribute is affected: `fetch`, `keep`, `ttl`, `archived` and
     `enrich` all have real defaults, so all are still written at their default.
     """
     defaults = spec.defaults()

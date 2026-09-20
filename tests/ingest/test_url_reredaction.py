@@ -38,7 +38,7 @@ RULE = '[[rule]]\nname = "token"\npattern = "zarquon[0-9]{4}"\n'
 
 def _repo(tmp_path, *, keep=True):
     (tmp_path / ".fux" / "sources").mkdir(parents=True)
-    line = f"{LOC} fetch=http meta=plain keep={'true' if keep else 'false'}\n"
+    line = f"{LOC} fetch=http keep={'true' if keep else 'false'}\n"
     (tmp_path / ".fux" / "sources" / "urls").write_text(line, encoding="utf-8")
     (tmp_path / ".fux" / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
     (tmp_path / "docs").mkdir()

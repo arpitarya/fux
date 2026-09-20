@@ -1961,8 +1961,16 @@ def _resolve_title(root: Path, doc_id: str, fallback_title: str) -> str:
     (`store.display_title`'s docstring). This is a *second*, display-only
     lookup, after the accelerator and scan paths have already produced
     byte-identical results, so applying it uniformly here can never make the
-    two paths disagree. Re-reads one shard rather than trusting
-    `fallback_title`'s shape to reveal whether the record is hashed.
+    two paths disagree.
+
+    ⚠ **W-194, 2026-09-20 — this is now a NO-OP that costs a shard read.**
+    It existed to upgrade a `hashed` record's opaque `title_h` into the real
+    title held in the display cache. `meta`, `title_h` and the cache are
+    deleted, so `display_title(record)` is `record["title"]`, which is exactly
+    what `rank()` already put in `fallback_title`. **Kept rather than inlined**
+    because SR-ASK cites `_resolve_title` by name and P5 decided the seam;
+    removing it is a record change, not a cleanup. `_title_from` below is the
+    one a caller holding the record should use — it reads no shard.
     """
     return _title_from(root, _record_for(root, doc_id), fallback_title)
 
@@ -1980,7 +1988,7 @@ def _title_from(root: Path, record: dict | None, fallback_title: str) -> str:
 
     if record is None:
         return fallback_title
-    return store_mod.display_title(record, cache=store_mod.DisplayCache(root))
+    return store_mod.display_title(record) or fallback_title
 
 
 def _as_dict(root: Path, result: AskResult, query: str, *, sections: bool = True) -> dict:

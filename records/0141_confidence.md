@@ -11,7 +11,7 @@ feature: the confidence plane
 owns: [src/fux/query/confidence.py@e0641ff2c3be, tests/test_confidence_floor_off.py@f8e18c079a6e]
 laws: [L1, L3, L4]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 23d8e8898ebc69d529af4ac81c965a0618313e986c018b906613bbc77bd86890
+content_sha: a5ffb15c74cc8898caa78436fb4c1f53dfe326a6a7d1a21ea7c1dc8a10bd411e
 ---
 
 # SR-CONFIDENCE — how much the index believes its own answer
@@ -684,6 +684,14 @@ cannot disagree about how confident fux is — holds with the field on. Asserted
 at `anchor = 2.0` by the 2026-09-15 differential run.
 
 ### Consequences
+
+- ⚠ **W-194 (2026-09-20) moved a component this record describes, and changed
+  nothing it decides.** Hashed display meta was deleted outright: `meta` and
+  `title_h` left the record shape, `store/displaycache.py` and
+  `assert_meta_policy` were deleted, `fux.index` stepped to **v4**, and law L5
+  retired ([SR-LAW-5](0007_LAW-5-hashed-meta.md), superseded). Nothing in `query/confidence.py` changed. The four signals and the band are computed from `terms`, `flen` and the query — none of which W-194 touched — and a `url:` result now carries a readable title where it used to carry a hash, which is a display fact and not a confidence one.
+  **This record's decisions are unaffected**, and the line is here because the
+  freshness gate asks a describer to say so rather than to be silent.
 
 - **`band` and `answerable` leave the process as counts, and nothing else of
   this block does** (W-170, 2026-09-15). The observer record carries those two

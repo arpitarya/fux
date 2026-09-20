@@ -10,7 +10,7 @@ feature: "`.fux/fetchers/cdp.py` — the reference fetcher for documents behind 
 owns: []
 laws: [L1, L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: ec1f14f5fd21d0f8e8016991d8ba571d8fa910762d73c86a54309705a50aaa0a
+content_sha: b98d007b22d410fe2b1cc802de7e520f607d128c90c1357314e92b89698db9e8
 ---
 
 # SR-CDP-FETCHER — the browser fetcher
@@ -504,7 +504,12 @@ deletion.
 `fetch=` is a routing decision, not a property of the document. Captured with
 `meta` at its `hashed` default — note `title_h`, its `h:` prefix
 ([SR-RECORD](0109_index-record.md) rule 2), and the absence of
-`title`/`phrases`. The capture predates the `flen` field and is not edited:
+`title`/`phrases`. ⚠ **Two things below are no longer what fux writes, and the
+capture is left unedited because a capture is evidence:** `flen` replaced
+`wlen`, and **W-194 deleted `meta` and `title_h` on 2026-09-20**, so a record
+taken today carries `title` and `phrases` and neither field shown here. **The
+decision this example illustrates is untouched** — nothing in the record says a
+browser was involved:
 
 ```json
 {

@@ -38,7 +38,6 @@ def _rec(doc_id, title, word, *, edges=(), superseded=False, phrases=(), mtime=N
         "src": "git",
         "loc": doc_id.removeprefix("file:"),
         "mode": "extracted",
-        "meta": "plain",
         "title": title,
         "phrases": list(phrases),
         "terms": {term_hash(word): tf},

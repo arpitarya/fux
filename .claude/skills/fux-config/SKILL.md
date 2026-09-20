@@ -53,7 +53,6 @@ refuses.** A query succeeding proves nothing about `fux.toml`; the
 | `[sources.url]` *(table)* | absent | its **presence** enables URL ingestion |
 | `fetcher` | `.fux/fetchers/http.py` | fetcher for lines with no `fetch=`; its directory is where `fetch=<name>` resolves |
 | `urls_file` | `.fux/sources/urls` | the committed URL list |
-| `meta` | `"hashed"` | `"hashed"` or `"plain"` — whether display text is readable in the index |
 | `max_parallel` | **none — required** | integer ≥ 1; effective value is `min(this, fetcher's MAX_PARALLEL)` |
 | `keep` | `true` | retain fetched bytes in `.fux/acquired/` |
 | `ttl` | `"24h"` | the URL's declared freshness window — `0` or an integer + `s`/`m`/`h`/`d`; read `answer`'s verdict rather than assuming it (see `fux-answer`) |
@@ -66,7 +65,7 @@ refuses.** A query succeeding proves nothing about `fux.toml`; the
 | `[index] shards` | `256` | documents the value; any other number is an error |
 | `[agents] install` | all of `claude`, `codex`, `copilot`, `kiro` | vendors `fux setup` writes files for; `[]` = none |
 
-**`meta`, `keep`, `ttl`, `update` and `enrich` are source-wide defaults** — a
+**`keep`, `ttl`, `update` and `enrich` are source-wide defaults** — a
 line in the URL list that sets the same attribute wins for its own URL.
 **`fetch_at_answer` and `acquired_max_bytes` are not**: they have no line-level
 form, so the `fux.toml` value is the only value.

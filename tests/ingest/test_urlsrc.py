@@ -1,6 +1,6 @@
 """URL source (SR-URL-INGEST, relocated by SR-DOTFUX): the consumer-fetcher
 contract, the committed line-oriented URL list, the opaque config table,
-offline-by-default carry-forward, hashed-meta default, and determinism. No
+offline-by-default carry-forward, and determinism. No
 test here touches the network — the fetcher under test is a fake written
 into the tmp repo, which is exactly the trust boundary the design draws."""
 
@@ -14,7 +14,7 @@ from fux.errors import FuxError
 from fux.ingest.run import run
 from fux.ingest.urlsrc import UrlEntry, fetch_all, load_fetcher, read_urls
 from fux.query.tokenize import tokenize
-from fux.store.format import term_hash, title_hash
+from fux.store.format import term_hash
 
 FAKE_FETCHER = '''\
 CALLS = {"connect": 0, "close": 0, "fetch": []}
@@ -41,9 +41,9 @@ def _urls(tmp_path, rel=URLS_FILE):
     return [e.value for e in read_urls(tmp_path, rel)]
 
 
-def _entries(urls, fetcher="mw.py", meta="hashed"):
+def _entries(urls, fetcher="mw.py"):
     """Hand-resolved entries, so `fetch_all` can be exercised without a config."""
-    return [UrlEntry(url=u, fetch="mw", meta=meta, fetcher_path=fetcher) for u in urls]
+    return [UrlEntry(url=u, fetch="mw", fetcher_path=fetcher) for u in urls]
 
 
 def _write_toml(tmp_path, text, dirs=("docs",)):
@@ -62,11 +62,9 @@ def _write_urls(tmp_path, lines):
     path.write_text("".join(f"{line}\n" for line in lines), encoding="utf-8")
 
 
-def _init(tmp_path, *, urls, meta=None, files=None, fetcher=FAKE_FETCHER, config=None):
+def _init(tmp_path, *, urls, files=None, fetcher=FAKE_FETCHER, config=None):
     files = files if files is not None else {"docs/a.md": "# Doc A\n\nrepo body\n"}
     url_lines = '[sources.url]\nfetcher = "mw.py"\nmax_parallel = 4\n'
-    if meta is not None:
-        url_lines += f'meta = "{meta}"\n'
     if config is not None:
         url_lines += "[sources.url.config]\n" + config
     _write_toml(tmp_path, "[sources]\n" + url_lines)
@@ -82,17 +80,12 @@ def _init(tmp_path, *, urls, meta=None, files=None, fetcher=FAKE_FETCHER, config
 
 
 def test_config_parses_url_source(tmp_path):
-    _init(tmp_path, urls=["https://x.test/a"], meta="plain")
+    _init(tmp_path, urls=["https://x.test/a"])
     cfg = load_config(tmp_path)
     assert cfg.url.fetcher == "mw.py"
     assert cfg.url.urls_file == ".fux/sources/urls"
-    assert cfg.url.meta == "plain"
     assert cfg.url.config == {}
-
-
-def test_config_meta_defaults_to_hashed(tmp_path):
-    _init(tmp_path, urls=[])
-    assert load_config(tmp_path).url.meta == "hashed"
+    assert not hasattr(cfg.url, "meta"), "`meta` is deleted (W-194), not defaulted"
 
 
 def test_config_paths_default_into_the_fux_dir(tmp_path):
@@ -105,11 +98,14 @@ def test_config_paths_default_into_the_fux_dir(tmp_path):
     assert cfg.url.urls_file == ".fux/sources/urls"
 
 
-def test_config_rejects_bad_meta(tmp_path):
+def test_config_rejects_a_meta_key_outright(tmp_path):
+    """W-194: deleted, not deprecated. `meta = "plain"` is as dead as
+    `meta = "cleartext"` — the key is unknown, and an unknown key in a
+    committed config is a named error, never a warning or a silent ignore."""
     (tmp_path / "fux.toml").write_text(
-        '[sources]\n[sources.url]\nmax_parallel = 4\nfetcher = "mw.py"\nmeta = "cleartext"\n'
+        '[sources]\n[sources.url]\nmax_parallel = 4\nfetcher = "mw.py"\nmeta = "plain"\n'
     )
-    with pytest.raises(FuxError, match="meta must be"):
+    with pytest.raises(FuxError, match=r"\[sources\.url\] meta is not a fux\.toml key"):
         load_config(tmp_path)
 
 
@@ -293,27 +289,23 @@ def test_fetch_all_sanitizes_hostile_line_separators(tmp_path):
 # -- ingest wiring ---------------------------------------------------------
 
 
-def test_refresh_ingests_urls_with_hashed_meta_default(tmp_path):
+def test_refresh_ingests_urls_with_plain_display_text(tmp_path):
+    """⚠ **REWRITTEN for W-194.** This asserted the opposite: `meta == "hashed"`,
+    a `title_h`, and *no display text leaks*. That was L5's default and the
+    whole shape is deleted — a url record now carries `title` and `phrases`
+    exactly as a git record does. **The ACL-mismatch leak it prevented is
+    accepted, not closed** (SR-LAW-5, superseded)."""
     _init(tmp_path, urls=["https://x.test/a"])
     report = run(tmp_path, refresh_urls=True)
     assert report.doc_count == 2
     record = store.read_index(tmp_path)["url:https://x.test/a"]
     assert record["src"] == "url"
     assert record["loc"] == "https://x.test/a"
-    assert record["meta"] == "hashed"
-    assert record["title_h"] == title_hash("Page a")
-    assert "title" not in record and "phrases" not in record  # no display text leaks
-    # v2 hashes the ANALYZED term, not the raw word — "rendered" stems to "render"
-    assert term_hash(tokenize("rendered")[0]) in record["terms"]
-
-
-def test_plain_meta_is_an_explicit_opt_in(tmp_path):
-    _init(tmp_path, urls=["https://x.test/a"], meta="plain")
-    run(tmp_path, refresh_urls=True)
-    record = store.read_index(tmp_path)["url:https://x.test/a"]
-    assert record["meta"] == "plain"
     assert record["title"] == "Page a"
     assert record["phrases"] == ["Page a"]
+    assert "meta" not in record and "title_h" not in record
+    # v2 hashes the ANALYZED term, not the raw word — "rendered" stems to "render"
+    assert term_hash(tokenize("rendered")[0]) in record["terms"]
 
 
 def test_plain_ingest_is_offline_and_carries_urls_forward(tmp_path):
@@ -471,38 +463,49 @@ def test_two_urls_differing_only_by_fragment_are_two_entries(tmp_path):
 
 
 def test_a_fragment_bearing_line_can_still_carry_attributes(tmp_path):
-    _write_urls(tmp_path, ["https://x.test/p#frag meta=plain  # public"])
+    _write_urls(tmp_path, ["https://x.test/p#frag keep=false  # public"])
     (entry,) = read_urls(tmp_path, URLS_FILE)
     assert entry.value == "https://x.test/p#frag"
-    assert entry.attrs["meta"] == "plain"
+    assert entry.attrs["keep"] == "false"
 
 
 def test_an_unknown_attribute_errors_at_file_lineno(tmp_path):
-    _write_urls(tmp_path, ["https://x.test/a", "https://x.test/b mata=plain"])
-    with pytest.raises(FuxError, match=r"urls:2: unknown attribute 'mata'"):
+    _write_urls(tmp_path, ["https://x.test/a", "https://x.test/b kep=false"])
+    with pytest.raises(FuxError, match=r"urls:2: unknown attribute 'kep'"):
         read_urls(tmp_path, URLS_FILE)
 
 
 def test_an_unknown_attribute_value_errors_at_file_lineno(tmp_path):
-    _write_urls(tmp_path, ["https://x.test/a meta=cleartext"])
-    with pytest.raises(FuxError, match=r"urls:1: meta='cleartext' is not one of"):
+    _write_urls(tmp_path, ["https://x.test/a keep=maybe"])
+    with pytest.raises(FuxError, match=r"urls:1: keep='maybe' is not one of"):
+        read_urls(tmp_path, URLS_FILE)
+
+
+def test_a_line_still_carrying_meta_is_a_named_error(tmp_path):
+    """W-194 deleted `meta` outright, on the `fux update` precedent (W-177):
+    no deprecation window and no accept-and-ignore. A repo whose committed
+    list still says `meta=hashed` **fails to load, by name and line**, because
+    the attribute set is closed — which is the same mechanism that would
+    refuse a typo, and is why nothing extra had to be written to get it."""
+    _write_urls(tmp_path, ["https://x.test/a meta=hashed"])
+    with pytest.raises(FuxError, match=r"urls:1: unknown attribute 'meta'"):
         read_urls(tmp_path, URLS_FILE)
 
 
 def test_a_duplicate_with_conflicting_attributes_names_both_lines(tmp_path):
-    _write_urls(tmp_path, ["https://x.test/a meta=plain", "# note", "https://x.test/a fetch=cdp"])
+    _write_urls(tmp_path, ["https://x.test/a keep=false", "# note", "https://x.test/a fetch=cdp"])
     with pytest.raises(FuxError, match=r"urls:1 and .*urls:3"):
         read_urls(tmp_path, URLS_FILE)
 
 
 def test_a_duplicate_that_agrees_is_a_merge_artefact_not_an_error(tmp_path):
-    _write_urls(tmp_path, ["https://x.test/a meta=hashed", "https://x.test/a"])
+    _write_urls(tmp_path, ["https://x.test/a keep=true", "https://x.test/a"])
     (entry,) = read_urls(tmp_path, URLS_FILE)
-    assert entry.attrs["meta"] == "hashed"  # absent means the default; they agree
+    assert entry.attrs["keep"] == "true"  # absent means the default; they agree
 
 
 def test_file_order_does_not_change_the_parsed_set(tmp_path):
-    lines = ["https://x.test/c fetch=cdp", "https://x.test/a", "https://x.test/b meta=plain"]
+    lines = ["https://x.test/c fetch=cdp", "https://x.test/a", "https://x.test/b keep=false"]
     _write_urls(tmp_path, lines)
     forward = read_urls(tmp_path, URLS_FILE)
     _write_urls(tmp_path, list(reversed(lines)))
@@ -512,13 +515,15 @@ def test_file_order_does_not_change_the_parsed_set(tmp_path):
 
 
 def test_a_line_attribute_beats_the_source_wide_setting(tmp_path):
-    """Decision 10: `meta` only ever loosens, and only for its own URL."""
-    _init(tmp_path, urls=["https://x.test/a meta=plain", "https://x.test/b"])
+    """Decision 10, on `fetch` — ⚠ `meta` was this test's worked example until
+    W-194 deleted it, and `fetch` is now the only attribute with all three
+    layers. A line that declares one wins for its own URL and no other."""
+    _init(tmp_path, urls=["https://x.test/a fetch=cdp", "https://x.test/b"])
+    (tmp_path / "cdp.py").write_text(CDP_FETCHER, encoding="utf-8")
     run(tmp_path, refresh_urls=True)
     index = store.read_index(tmp_path)
-    assert index["url:https://x.test/a"]["meta"] == "plain"
-    assert index["url:https://x.test/a"]["title"] == "Page a"
-    assert index["url:https://x.test/b"]["meta"] == "hashed"  # the source-wide floor holds
+    assert index["url:https://x.test/a"]["title"] == "Rendered"   # the line's fetcher
+    assert index["url:https://x.test/b"]["title"] == "Page b"     # the source-wide one
 
 CDP_FETCHER = """
 def fetch(url):
@@ -536,8 +541,8 @@ def test_fetch_routes_per_line_and_only_loads_what_it_needs(tmp_path):
     )
     run(tmp_path, refresh_urls=True)
     index = store.read_index(tmp_path)
-    assert index["url:https://x.test/a"]["title_h"] == title_hash("Page a")
-    assert index["url:https://x.test/b"]["title_h"] == title_hash("Rendered")
+    assert index["url:https://x.test/a"]["title"] == "Page a"
+    assert index["url:https://x.test/b"]["title"] == "Rendered"
 
 
 def test_a_missing_fetcher_names_setup_when_nothing_is_beside_it(tmp_path):
@@ -587,14 +592,23 @@ def test_a_missing_fetcher_names_ITS_SIBLINGS_when_there_are_any(tmp_path):
     assert "fux doctor" in message, "the check that would have caught it first"
 
 
-# -- the hashed-meta defect (W-47): ingest-then-build on the L5 default -----
+# -- W-47's defect, and what survives it after W-194 ------------------------
 
 
-def test_the_hashed_default_produces_an_index_the_build_accepts(tmp_path):
-    """The measured defect: `meta = "hashed"` wrote an index no build took.
+def test_a_url_ingest_produces_an_index_the_build_accepts(tmp_path):
+    """⚠ **The measured defect this guards is GONE** (W-194, 2026-09-20).
 
-    27.2 ms became 4 248.8 ms at RFC scale, the whole M2 result forfeited by
-    following the documentation. The fix is the field shape, not the check.
+    It was: `meta = "hashed"` wrote a bare 16-hex `title_h`, which is a quoted
+    16-hex token outside `terms`, which the scan counts toward a df and the
+    accelerator does not — so `fux build` refused the index. **27.2 ms became
+    4 248.8 ms at RFC scale, the whole M2 result forfeited by following the
+    documentation.** `title_h` no longer exists, so the default cannot produce
+    that index.
+
+    **Kept because ingest-then-build on a url corpus is still the path nobody
+    else exercises end to end**, and the stray-quoted-hash tripwire it used to
+    trip is still armed — `tests/derive/test_differential.py` exercises that
+    directly now.
     """
     from fux.derive import build
 
@@ -604,8 +618,11 @@ def test_the_hashed_default_produces_an_index_the_build_accepts(tmp_path):
     assert report.docs == 3
 
 
-def test_title_h_is_not_a_bare_16_hex_token(tmp_path):
-    """The scan finds df by looking for `"<16 hex>"` in the raw record bytes."""
+def test_a_url_record_carries_no_bare_16_hex_token(tmp_path):
+    """The scan finds df by looking for `"<16 hex>"` in the raw record bytes,
+    so any quoted 16-hex value outside `terms` makes the two paths disagree.
+    `title_h` was the field that did it; the invariant outlives the field."""
+    import json
     import re
 
     _init(tmp_path, urls=["https://x.test/a"])
@@ -616,19 +633,19 @@ def test_title_h_is_not_a_bare_16_hex_token(tmp_path):
             if '"src":"url"' not in record:
                 continue
             quoted = set(re.findall(r'"([0-9a-f]{16})"', record))
-            import json
-
             assert quoted <= set(json.loads(record)["terms"])
 
 
-def test_a_hashed_record_still_shows_its_opaque_title(tmp_path):
-    """Enough to identify a document across two answers, never enough to read."""
+def test_a_url_record_shows_its_real_title(tmp_path):
+    """⚠ **REWRITTEN.** This asserted the opposite — *"enough to identify a
+    document across two answers, never enough to read"* — and checked that a
+    verb showed `term_hash("Page a")`. W-194 deleted the opaque title."""
     from fux.query import scan
 
     _init(tmp_path, urls=["https://x.test/a"])
     run(tmp_path, refresh_urls=True)
     (result,) = [r for r in scan.ask(tmp_path, "rendered", top=5) if r.id.startswith("url:")]
-    assert result.title == term_hash("Page a")  # the prefix is storage, not display
+    assert result.title == "Page a"
 
 
 # -- W-63 defect 2: a carried record's edges are re-checked, never trusted ---

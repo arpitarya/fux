@@ -19,7 +19,6 @@ def _rec(doc_id, title, terms, edges=()) -> dict:
         "src": "git",
         "loc": doc_id.removeprefix("file:"),
         "mode": "extracted",
-        "meta": "plain",
         "title": title,
         "phrases": [],
         "terms": terms,

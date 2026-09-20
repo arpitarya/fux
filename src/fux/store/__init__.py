@@ -8,7 +8,6 @@ from __future__ import annotations
 from . import recordschema
 from .canonical import canonical_dumps
 from .collisions import CollisionTracker
-from .displaycache import DisplayCache
 from .fuxdir import COMMITTED, DECLARED, DERIVED, FUX_DIR, derived_dir, ensure_layout, fux_dir
 from .format import (
     ANALYZER_VERSION,
@@ -16,14 +15,12 @@ from .format import (
     INDEX_DIR,
     SCHEMA_ID,
     TF_FIELDS,
-    TITLE_HASH_PREFIX,
     content_sha,
     display_title,
     index_dir,
     shard_for,
     shard_path,
     term_hash,
-    title_hash,
 )
 from .reader import (
     foreign_url_ids,
@@ -48,9 +45,7 @@ __all__ = [
     "INDEX_DIR",
     "SCHEMA_ID",
     "TF_FIELDS",
-    "TITLE_HASH_PREFIX",
     "CollisionTracker",
-    "DisplayCache",
     "canonical_dumps",
     "content_sha",
     "display_title",
@@ -70,6 +65,5 @@ __all__ = [
     "shard_path",
     "term_hash",
     "trim",
-    "title_hash",
     "write_index",
 ]

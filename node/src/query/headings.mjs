@@ -2,7 +2,8 @@
  *
  * Twin of `headings.py`. Runs after `run_query` returns, over the record's
  * committed `phrases`, so it can never reach a score. `[]` for a missing
- * record, a `hashed` one, or a query no heading matches.
+ * record, one with no headings, or a query no heading matches. (It also read
+ * `[]` for a `hashed` record; W-194 deleted that shape on 2026-09-20.)
  *
  * Owned, with its Python twin, by [SR-ASK](../../../records/0103_ask.md).
  */

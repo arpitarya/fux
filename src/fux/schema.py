@@ -267,8 +267,11 @@ class Schema:
         """`{name: example}` for every example this schema carries.
 
         Both `example` (one) and `examples` (a named map) are supported, because
-        a shape with two genuinely different forms — a git record and a hashed
-        url record — is badly served by being made to pick one.
+        a shape with two genuinely different forms is badly served by being made
+        to pick one. ⚠ The worked case was a git record and a hashed url record;
+        W-194 collapsed those two into one shape on 2026-09-20, and the index
+        record schema still carries both examples because `src` and `loc` still
+        differ. **The mechanism is unchanged and is not url-specific.**
         """
         found: dict = {}
         if "example" in self.raw:

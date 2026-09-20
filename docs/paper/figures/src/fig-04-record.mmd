@@ -14,11 +14,10 @@ classDiagram
     flen : per-field token counts
     mtime : last git commit timestamp
     superseded and archived : only when true
-    title or title_h (hashed)
-    phrases (plain meta only)
+    title
+    phrases : heading-derived
     edges : src kind dst grade
     mode : extracted or enriched
-    meta : plain or hashed
   }
   class NeverCommitted {
     wlen — derived at query time from flen

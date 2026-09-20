@@ -45,9 +45,12 @@ every `ask` result has always carried.
   the reason SR-RERANK is carved out of SR-ASK's directory claim. This reads
   one committed record and nothing else.
 
-A `hashed` record carries no `phrases` at all — `store/writer.py` refuses to
-write display text for one (L5) — so it yields nothing here by construction
-rather than by a special case.
+⚠ **One branch's worth of reasoning retired on 2026-09-20 (W-194).** This
+said: *a `hashed` record carries no `phrases` at all — `store/writer.py`
+refuses to write display text for one (L5) — so it yields nothing here by
+construction rather than by a special case.* There is no hashed record now.
+**The empty-`phrases` path is unchanged and still reached** — by a document
+with no headings — which is why there was never a special case to delete.
 """
 
 from __future__ import annotations
@@ -66,8 +69,8 @@ __all__ = ["MAX_HEADINGS", "headings_for"]
 def headings_for(record: dict | None, query: str, *, limit: int = MAX_HEADINGS) -> list[str]:
     """The record's headings that match `query`, best first, at most `limit`.
 
-    Empty for a missing record, a record with no `phrases` (a `hashed` one, or
-    a document with no headings), or a query no heading matches.
+    Empty for a missing record, a record with no `phrases` (a document with
+    no headings), or a query no heading matches.
     """
     if not record:
         return []

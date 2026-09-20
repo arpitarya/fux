@@ -8,6 +8,46 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Removed — BREAKING
+
+- 🔴 **`meta = "hashed"` is deleted outright, and law L5 retires with it**
+  (Arpit, W-194). `meta` existed for URL sources only, with two values; removing
+  `hashed` leaves an attribute with one value, which is not an attribute. So the
+  whole thing goes: the `[sources.url] meta` key, the `meta=` attribute on a
+  `.fux/sources/urls` line, the `--plain` / `--hashed` flags on `fux add`, the
+  `title_h` record field, `store/displaycache.py`, `assert_meta_policy`, and the
+  `fux doctor` row.
+
+  **Migration, and there is no automatic one:**
+
+  1. **Delete `meta = …` from `[sources.url]` in `fux.toml`.** A file still
+     carrying it **fails to load with a named error** — fux refuses a key it does
+     not read rather than ignoring it, because an ignored key is a setting you
+     believe is in force.
+  2. **Delete `meta=…` from every line in `.fux/sources/urls`.** The attribute
+     set is closed, so a line still carrying one is a named parse error at that
+     file and line.
+  3. **Rebuild: `fux ingest` then `fux build`.** `fux.index` steps from **v3 to
+     v4** and there is no in-place migration; a v3 index is refused by name with
+     that instruction. ⚠ **Do not delete `.fux/index/` by hand** — `url:` records
+     are the one thing in it no re-extraction can rebuild.
+  4. **Drop `--plain` / `--hashed` from any script.** They are removed, not
+     accepted-and-ignored, so a script passing one fails at argument parsing
+     rather than silently recording nothing.
+
+  🔴 **What you give up, stated plainly.** L5 closed a real **ACL-mismatch
+  leak**: a URL record used to commit a title *hash*, so a document readable by
+  fifty people inside your wiki did not become a title readable by everyone with
+  the repo. **Every URL record now commits a readable `title` and `phrases`.**
+  That leak is an **accepted, documented exposure**, not a solved problem — use
+  `.fux/pii.toml` to keep a value out of the committed index, or do not index the
+  page. `records/0007_LAW-5-hashed-meta.md` keeps the argument and the reopen
+  trigger.
+
+  ⚠ **This is not about PII and does not change what fux hashes.** Terms are
+  still hashed for every document, and `.fux/pii.toml` is untouched. W-194
+  changed **display text only**.
+
 ## [3.0.0-alpha.1] - 2026-09-17
 
 ⚠ **A version bump and nothing else. The engine is byte-identical to

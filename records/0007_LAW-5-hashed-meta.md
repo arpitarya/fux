@@ -2,20 +2,39 @@
 type: Standing Record
 kind: law
 name: SR-LAW-5
-title: "SR-LAW-5 (0007) — L5 — hashed meta is the default for non-git sources"
-description: "Enforced at write time, not offered as a setting: it closes an ACL-mismatch leak where a title alone tells a reader that a document they cannot open exists."
-status: accepted
-date: 2026-08-18
+title: "SR-LAW-5 (0007) — L5 — hashed meta was the default for non-git sources (RETIRED 2026-09-20)"
+description: "RETIRED 2026-09-20 (Arpit, W-194) — hashed display meta was deleted outright, and the law retired with the mechanism. The ACL-mismatch leak it closed, where a title alone tells a reader that a document they cannot open exists, is now an ACCEPTED, DOCUMENTED EXPOSURE. Kept for the argument, the citation and the reopen trigger; the handle L5 is never reused."
+status: superseded
+date: 2026-09-20
 feature: the rationale, history and reopen-trigger of L5
 owns: []
-laws: [L5]
-timestamp: 2026-08-18T00:00:00Z
-content_sha: 84e5eb84ffdfde6c7efec657eb33d5c08f6ea38fae6d6a4a588bb052453c7111
+laws: []
+timestamp: 2026-09-20T00:00:00Z
+content_sha: 60cc3c369dbd40d787f31893247d47e1505b19d7f062b4ee3318b11646702a7d
 ---
 
-# SR-LAW-5 — L5 — hashed meta is the default for non-git sources
+# SR-LAW-5 — L5 — hashed meta was the default for non-git sources
 
-## §1 — For humans
+🔴 **RETIRED 2026-09-20. L5 binds nothing and `CLAUDE.md` no longer carries it.**
+
+> **Arpit, 2026-09-17:** *"url meta=hashed remove it keep only plain."*
+
+The mechanism is deleted — `meta`, `title_h`, `store/displaycache.py`,
+`assert_meta_policy` and the `--plain`/`--hashed` flags are gone, and
+`fux.index` stepped to **v4** (W-194).
+**There is no residue of the law once the mechanism is gone**, so it retires the
+way **L9 did on 2026-09-13**: struck through in
+[SR-LAWS](0001_LAWS.md)'s table with a dated note, this record kept, and **the
+handle L5 never reused.**
+
+⚠ **What the retirement does NOT undo, and this is the part worth keeping the
+record for.** L5 closed a real **ACL-mismatch leak**: a title alone tells a
+reader that a document they cannot open exists. That leak is now an **accepted,
+documented exposure, not a solved problem.** Everything below states the case
+that was made for closing it, unedited — a reopen is cheaper than a
+rediscovery, and the reopen trigger at the end still means what it says.
+
+## §1 — For humans (as written while the law was in force)
 
 > **This record is the HOME of law L5 — §2's first block IS the law**, and the
 > rest of this record is its rationale: why it exists, what it has cost, how its

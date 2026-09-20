@@ -13,7 +13,7 @@ The shape existed in four places and agreed with itself only by habit:
 |---|---|
 | `ingest/run.py` | assembled the dict — **twice**, once for `git` and once for `url` |
 | `ingest/run.py` | `EXTRACTED_FIELDS` — which fields a delta ingest may carry |
-| `store/writer.py` | `DISPLAY_FIELDS` — which fields L5 forbids on a hashed record |
+| `store/writer.py` | `DISPLAY_FIELDS` — which fields L5 forbade on a hashed record (L5 retired 2026-09-20, W-194; the list is kept, nothing reads it) |
 | SR-RECORD | the prose description everyone reads |
 
 **Nothing compared them.** Adding a display field meant remembering to touch a
@@ -28,13 +28,13 @@ narrower than it reads.
 `canonical_dumps` sorts keys, so the order in the schema is presentation and
 cannot reach the index. The field set, the defaults and `omit_when` *can*, which
 is why `schema` in the schema must equal `format.SCHEMA_ID` — two fux versions
-with different shapes must never both call their output `fux.index.v2`.
+with different shapes must never both call their output `fux.index.v4`.
 
-**It is not a validator that runs on every write.** `write_index` already
-enforces the one rule that closes a leak (L5's meta policy) and
-`canonical_dumps` already refuses floats, nulls and hostile text. Adding a
-third gate on the hot path would cost time to re-check what those two already
-guarantee. `validate()` here is for tests and for callers building records by
+**It is not a validator that runs on every write.** `canonical_dumps` already refuses
+floats, nulls and hostile text. ⚠ **`write_index` used to enforce L5's meta
+policy here too; W-194 deleted both the policy and the law**, so
+`canonical_dumps` is now the only thing on the write path. Adding a gate on the
+hot path would cost time to re-check what it already guarantees. `validate()` here is for tests and for callers building records by
 hand — it is a tool, not a checkpoint.
 """
 
@@ -195,13 +195,15 @@ def validate(record: dict) -> None:
         if name not in record:
             if field.required == "always":
                 raise FuxError(f"{doc_id}: missing required field {name!r}")
+            # ⚠ `non-git` is a live `required` value with NO field using it
+            # since W-194 deleted `meta` (2026-09-20). Kept rather than
+            # removed: the schema is data, a consumer's fork may still declare
+            # it, and a branch that silently stopped being reachable is a
+            # cheaper thing to keep than a `KeyError` on somebody else's file.
             if field.required == "non-git" and record.get("src") not in (None, "git"):
                 raise FuxError(
-                    f"{doc_id}: {name!r} is required for a non-git record. A missing value means "
-                    "something bypassed the resolution layer, and guessing is the failure L5 prevents"
+                    f"{doc_id}: {name!r} is required for a non-git record"
                 )
-            if field.required == "when-hashed" and record.get("meta") == "hashed":
-                raise FuxError(f"{doc_id}: {name!r} is required when meta is 'hashed'")
             continue
 
         value = record[name]

@@ -37,7 +37,6 @@ KNOWN_KEYS: tuple[str, ...] = (
     "sources.dirs_file",
     "sources.urls_file",
     "sources.url.fetcher",
-    "sources.url.meta",
     "sources.url.keep",
     "sources.url.ttl",
     "sources.url.enrich",
@@ -136,10 +135,6 @@ class UrlSource:
       a `UrlSource` keeps one field to read. The list is a *file*, not a TOML
       array: a 5k-entry inline array is one diff hunk and one merge conflict,
       the same argument that sharded the index.
-    - `meta` — privacy policy for display fields; `"hashed"` by default (L5),
-      `"plain"` an explicit per-source opt-in for public content. It is the
-      source-wide *floor*: a URL line may loosen it to `plain` for one public
-      document, and there is deliberately no way to make one line stricter.
     - `config` — the `[sources.url.config]` table, handed to the fetcher's
       optional `configure(config)` hook. Fux validates that it is a table and
       **never reads a key inside it**: core knows there *is* config, never what
@@ -176,7 +171,6 @@ class UrlSource:
 
     fetcher: str
     urls_file: str
-    meta: str  # "hashed" | "plain"
     #: SR-ACQUIRED, the source-wide layer of `keep`. A line still wins.
     keep: bool
     #: SR-URL-FRESHNESS, the source-wide layer of `ttl`. A line still wins.
@@ -516,9 +510,6 @@ def _load_url_source(path: Path, raw, urls_file: str) -> UrlSource | None:
     fetcher = raw.get("fetcher", DEFAULT_FETCHER)
     if not isinstance(fetcher, str) or not fetcher.strip():
         raise FuxError(f"{path}: [sources.url] fetcher must be a path to a consumer-owned .py file")
-    meta = raw.get("meta", "hashed")
-    if meta not in ("hashed", "plain"):
-        raise FuxError(f"{path}: [sources.url] meta must be \"hashed\" or \"plain\" (got {meta!r})")
     keep = raw.get("keep", True)
     if not isinstance(keep, bool):
         raise FuxError(
@@ -638,7 +629,6 @@ def _load_url_source(path: Path, raw, urls_file: str) -> UrlSource | None:
     return UrlSource(
         fetcher=fetcher.strip(),
         urls_file=urls_file,
-        meta=meta,
         keep=keep,
         ttl=ttl,
         enrich=enrich,

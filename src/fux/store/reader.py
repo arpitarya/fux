@@ -1,7 +1,10 @@
 """The canonical reader: shard files in, `(header, records)` out.
 
-Permissive about record content (readers must accept both `meta:"plain"` and
-`meta:"hashed"` forms from day one — §7), strict about shape: every shard
+Permissive about record content, strict about shape. ⚠ **The content clause
+used to read *"readers must accept both `meta:\"plain\"` and `meta:\"hashed\"`
+forms from day one"* (§7); W-194 deleted `meta` on 2026-09-20 and there is one
+form now.** The permissiveness is unchanged and still load-bearing — a record
+may carry fields this reader does not know. What is strict is shape: every shard
 must open with a valid `_format` header pinning the same schema/analyzer/
 tf-field order this reader was built for, or the shard is refused rather than
 silently misread (a reversed `tf_fields`, for instance, would invert every

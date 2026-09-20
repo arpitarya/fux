@@ -44,13 +44,19 @@ ROOT = Path(__file__).resolve().parents[1]
 SR_DIR = ROOT / "records"
 CLAUDE_MD = ROOT / "CLAUDE.md"
 
-#: The twelve handles, in the order the block renders them. L0 first because it
-#: is the law that governs the others; L11 last because it is the newest.
-#: The live law handles, in order. ⚠ **L9 is absent and the gap is deliberate**:
-#: the environment rule became SR-WORK-ENVIRONMENTS on 2026-09-13 and the handle
-#: is retired, never reused. Renumbering L10 down would silently change the
-#: meaning of every citation already written.
-LAW_ORDER = ("L0", "L1", "L2", "L3", "L4", "L5", "L6", "L7", "L8", "L10", "L11")
+#: The live law handles, in the order the block renders them. L0 first because
+#: it is the law that governs the others; L11 last because it is the newest.
+#:
+#: ⚠ **TWO handles are absent and both gaps are deliberate.** The environment
+#: rule became SR-WORK-ENVIRONMENTS on 2026-09-13 (**L9**), and hashed display
+#: meta was deleted outright on 2026-09-20 (**L5**, W-194) — its record is kept
+#: at `status: superseded` with the argument and the reopen trigger intact.
+#: **Neither handle is ever reused**, and neither is renumbered: renumbering
+#: would silently change the meaning of every citation already written, which
+#: is the one failure a stable handle exists to prevent.
+#:
+#: **Ten live laws, twelve numbers.**
+LAW_ORDER = ("L0", "L1", "L2", "L3", "L4", "L6", "L7", "L8", "L10", "L11")
 
 BEGIN = "<!-- LAWS:BEGIN"
 END = "<!-- LAWS:END -->"
@@ -98,11 +104,40 @@ def _rewrite_links(text: str) -> str:
     return _LINK_RE.sub(lambda m: "](" + _rewrite_target(m.group(1)) + ")", text)
 
 
+#: A law record whose frontmatter says this is HISTORY and is not rendered.
+#:
+#: ⚠ **Added 2026-09-20 for W-194.** L5 was deleted outright, and its record is
+#: kept — at `status: superseded`, with the argument, the AOL-2006 citation and
+#: the reopen trigger intact, because **a reopen is cheaper than a
+#: rediscovery**. Keeping the file means keeping its `LAW-TEXT` block, and the
+#: block is how this generator finds a law, so without this check the retired
+#: law would keep rendering into `CLAUDE.md` as if it still bound.
+#:
+#: **Deleting the block instead was the alternative and it is worse**: the one
+#: artifact that says exactly what the rule used to be would no longer say it,
+#: and every citation of L5 in the history would point at a record that had
+#: quietly stopped stating it. The precedent is L9, which left the glob by
+#: being renamed; L5 stays a law record because it never stopped being one —
+#: it stopped being *in force*.
+RETIRED_STATUS = "superseded"
+
+
+def _status(text: str) -> str:
+    """The `status:` value from a record's frontmatter, or `""`."""
+    match = re.search(r"^status:\s*(\S+)\s*$", text, re.M)
+    return match.group(1) if match else ""
+
+
 def law_records() -> dict[str, Path]:
-    """`{handle: path}` for every `*_LAW-*.md` record, keyed by its marker."""
+    """`{handle: path}` for every LIVE `*_LAW-*.md` record, keyed by its marker.
+
+    A record at `status: superseded` is skipped — see `RETIRED_STATUS`.
+    """
     found: dict[str, Path] = {}
     for path in sorted(SR_DIR.glob("*_LAW-*.md")):
         text = path.read_text(encoding="utf-8")
+        if _status(text) == RETIRED_STATUS:
+            continue
         handles = re.findall(r"<!-- LAW-TEXT:BEGIN (L\d+) -->", text)
         if not handles:
             raise SystemExit(f"{path.name}: no <!-- LAW-TEXT:BEGIN Ln --> marker")

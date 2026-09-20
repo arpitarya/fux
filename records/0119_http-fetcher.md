@@ -10,7 +10,7 @@ feature: "`.fux/fetchers/http.py` — the fetcher a URL gets when its line says 
 owns: []
 laws: [L1, L4, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: fc929a63e1a8f5afe1fdbad1e2df79cc600f02d818a78e5590bf0c58078b5640
+content_sha: eedea8b59603ba043aa6aeefa34f5089e5fcd89ae4b836568796b8868afcf578
 ---
 
 # SR-HTTP-FETCHER — the default fetcher
@@ -143,10 +143,15 @@ that returns something useless returns something useless, and a human writes
 `fetch=cdp` on that line. [SR-FETCHER](0117_fetcher.md) decision 5 is the rule;
 this is the case that would otherwise have broken it.
 
-**4. Hashed meta still applies** — L5 is a property of the *source*, not of the
-transport, and a default fetcher does not make a URL public. Per-URL
-`meta=plain` remains the explicit opt-in
-([SR-URL-LIST](0116_url-list.md) decision 10).
+**4. ⚠ RETIRED 2026-09-20 (W-194), with L5.** This read: *Hashed meta still
+applies — L5 is a property of the source, not of the transport, and a default
+fetcher does not make a URL public.*
+
+🔴 **The separation it drew is what survives, and it is worth more than the
+rule was:** *what fetched a document* and *what may be committed about it* are
+different questions, and a transport must never decide a policy. That is why
+`fetch=` still records nothing on the record ([SR-URL-LIST](0116_url-list.md)),
+and it is the argument any future per-transport default has to get past.
 
 **5. Both shipped fetchers are consumer code from birth.** Committed, editable,
 never rewritten. Fux writing the first version does not make it fux's file — the

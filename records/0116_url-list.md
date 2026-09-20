@@ -7,10 +7,10 @@ description: "One URL per line in a committed file, deduped and sorted by the lo
 status: accepted
 date: 2026-08-19
 feature: "`.fux/sources/urls` — the file format itself, and the one grammar both committed source lists are parsed by"
-owns: [src/fux/ingest/sourcelist.py@a0a2c0f43077]
+owns: [src/fux/ingest/sourcelist.py@622d83561c10]
 laws: [L2, L3, L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: b42d7350f45dd2e8581743ec023b6a432de81087ccc569cdc7c215f5e32f8c31
+content_sha: 42443962ca34c95f96dcf97c505ca6ecc39977beaeb94d3ed90cda9771697009
 ---
 
 # SR-URL-LIST — the committed URL list
@@ -37,18 +37,24 @@ after the URL, `.gitattributes`-style. **There are two, and the set is closed.**
 | attribute | values | default | decides |
 |---|---|---|---|
 | **`fetch`** | **any module name** — `http`, `cdp`, or a `.py` the consumer put in the fetchers directory | `http` | who retrieves the document |
-| **`meta`** | `plain` · `hashed` | `hashed` | whether the index may hold readable display text |
 
 ⚠ **`fetch` was an enum of the two shipped fetchers until 2026-09-15**, when
 decision 15 made it typed. **Closed KEYS, open VALUES** — the two are different
 loosenings and only the second happened.
 
+🔴 **`meta` was the OTHER original attribute and it was deleted on 2026-09-20**
+(Arpit, W-194) — `plain` · `hashed`, defaulting to `hashed`, deciding whether
+the index could hold readable display text. **A line still carrying `meta=`
+fails to load with a named error**, because the key set is closed; that is the
+`fux update` precedent (W-177), not a deprecation. The leak it closed is an
+accepted exposure now — [SR-LAW-5](0007_LAW-5-hashed-meta.md), superseded.
+
 ```console
 $ cat .fux/sources/urls
 https://example.com/handbook/oncall                        # both defaults
-https://example.com/docs/api             meta=plain
+https://example.com/docs/api             ttl=7d
 https://wiki.corp/display/ENG/runbook    fetch=cdp
-https://app.corp/reports/q3              fetch=cdp meta=plain
+https://app.corp/reports/q3              fetch=cdp keep=false
 ```
 
 **A line with no attributes means every default applies**, so every list valid
@@ -96,16 +102,18 @@ Captured from the filed fixture,
 $ cat .fux/sources/urls
 # one URL per line. `#` is a comment at line start or after whitespace --
 # NOT inside a URL.
-https://example.invalid/handbook#oncall    fetch=http meta=hashed
-https://example.invalid/handbook#deploys   fetch=http meta=hashed
+https://example.invalid/handbook#oncall    fetch=http
+https://example.invalid/handbook#deploys   fetch=http
 https://example.invalid/handbook/oncall
-https://example.invalid/public/api          fetch=http meta=plain
+https://example.invalid/public/api          fetch=http ttl=7d
 https://example.invalid/gone
 ```
 
 **The two `#`-bearing lines are two documents**, which is decision 3's narrow
 comment rule doing the only job it exists for. The bare line takes every
-default; the `meta=plain` line loosens the L5 floor for one public page.
+default; the `ttl=7d` line relaxes freshness for one slow-moving page. (⚠ This
+example showed `meta=hashed` and `meta=plain` until W-194 deleted the
+attribute on 2026-09-20.)
 
 A URL that fails to fetch is a **skip**, not a deletion — the list is the
 statement of intent, and only removing a line removes a document:
@@ -150,7 +158,7 @@ shards the index.
 **3. `#` starts a comment at the start of a line or after whitespace**, and the
 rest of the line is discarded. **`#` anywhere else is part of the entry** — a
 URL fragment is not a comment. Under decision 7 this is forced rather than
-chosen: `https://x/a#frag meta=plain` cannot be parsed at all if `#` means a
+chosen: `https://x/a#frag keep=false` cannot be parsed at all if `#` means a
 comment everywhere.
 
 **4. The loader dedupes and sorts.** File order is presentation only. A
@@ -196,12 +204,16 @@ this record**, not a config addition — which is what makes decision 9's
 unknown-key error safe to be strict about: the error is never wrong, because
 there is nothing legitimate it can reject.
 
-⚠ **"Two" is the ORIGINAL set and it is now seven** — `fetch`, `meta`, `keep`,
-`ttl`, `enrich`, `archived` (2026-09-11, W-126,
+⚠ **"Two" is the ORIGINAL set; it grew to seven and is now SIX** — `fetch`,
+`keep`, `ttl`, `enrich`, `archived` (2026-09-11, W-126,
 [SR-ARCHIVED-CONTENT](0134_archived-content.md) decision 1a) and `update`
-(2026-09-11, W-113, decision 14 below). The sentence is left as written because
-**the closure is the decision and the count never was**; what this ⚠ records is
-that the rule has been exercised seven times and held each time. The count
+(2026-09-11, W-113, decision 14 below), with **`meta` removed on 2026-09-20**
+(W-194). The sentence is left as written because **the closure is the decision
+and the count never was**; what this ⚠ records is that the rule has been
+exercised eight times — seven additions and one removal — and held each time.
+🔴 **The removal is the harder case and it held too**: a closed key set is what
+makes deleting an attribute a *named load error* rather than a silent
+accept-and-ignore. The count
 lives in
 `tests/ingest/test_sourcelist.py::test_the_url_attribute_set_is_exactly_these_seven`,
 which is deliberately the one test in that file that does **not** derive from
@@ -224,11 +236,13 @@ more.** The reverse direction was deleted rather than re-pointed at a
 substitute, because a test rewritten to stay green is not a test.
 
 **12. A fux-written line carries every attribute, explicitly.** `fux add` emits
-the complete set — `fetch=… meta=…` — even where the value equals the default.
+the complete set — `fetch=… keep=… ttl=…` — even where the value equals the
+default.
 **A generated file holds no implicit state**: the line says what it means, and
 changing a policy is a one-word diff rather than the appearance or disappearance
 of a key. This is the property [SR-RECORD](0109_index-record.md) already gives
-`meta` inside a record, now given to the source list that produced it.
+`mode` inside a record, now given to the source list that produced it. (⚠ This
+named `meta` as the worked example until W-194 deleted it, 2026-09-20.)
 
 ⚠ **Narrowed 2026-09-01: an attribute whose default is the EMPTY STRING is
 omitted at that default.** ⚠ **Moot for `types` since 2026-09-11**: the types
@@ -243,8 +257,8 @@ not that a key is always present**, and an attribute with nothing to state has
 no policy to make visible.
 
 **Nothing existing is affected, and that is checkable, not asserted:** `fetch`,
-`meta`, `keep`, `ttl`, `archived`, `enrich` and `update` all have non-empty
-defaults, so all seven are still written at their default. The carve-out reaches exactly the
+`keep`, `ttl`, `archived`, `enrich` and `update` all have non-empty defaults, so
+all six are still written at their default. The carve-out reaches exactly the
 attributes a future record gives an empty default to — and giving one an empty
 default is now a decision with a visible consequence rather than a free choice.
 
@@ -337,7 +351,6 @@ a correctly generated file, never happens.
 | attribute | values | default when absent | defined by | changes committed bytes? |
 |---|---|---|---|---|
 | **`fetch`** | `http` · `cdp` | `http` | [SR-HTTP-FETCHER](0119_http-fetcher.md) · [SR-CDP-FETCHER](0118_cdp-fetcher.md) | **no** — it selects *who* retrieves the document, not what the record says. A record does not carry which fetcher produced it |
-| **`meta`** | `plain` · `hashed` | `hashed` (L5) | [SR-CONFIG](0113_config.md) · [SR-RECORD](0109_index-record.md) | **yes** — `plain` writes `title` + `phrases`, `hashed` writes `title_h` instead. The value is recorded per record, so a record read years later still says which rule wrote it |
 | **`update`** | `auto` · `never` | `auto` | this record, decision 14 | **no** — it decides whether fux goes out, not what a record says. ⚠ It changes committed bytes *over time* by preventing them from being refreshed, which is the opposite of the question this column asks |
 
 **`fetch` is a routing decision.** A name resolves to
@@ -348,30 +361,23 @@ Exactly one runs ([SR-FETCHER](0117_fetcher.md) decision 4), and nothing
 escalates from one to another ([SR-HTTP-FETCHER](0119_http-fetcher.md)
 decision 3) — so the value on the line is the whole story, every run.
 
-**Three layers, one order, for both attributes.** The built-in default, then the
-source-wide `[sources.url]` setting, then the line. A line beats both, for its
-own URL only.
+**Three layers, one order.** The built-in default, then the source-wide
+`[sources.url]` setting, then the line. A line beats both, for its own URL only.
 
-**`meta` is a privacy decision, and the line wins in BOTH directions.** A line
-may opt one document *out* of hashing because that document is public, and it
-may opt one *in* on a source whose default is `plain`.
+🔴 **`meta` was this decision's OTHER attribute and its whole worked example.**
+W-194 deleted it on 2026-09-20, and what it said is kept here because the
+correction it carried is about how records rot, not about hashing:
 
-⚠ **This read *"it only ever loosens"* and *"there is deliberately no way to
-make one URL stricter than the source"* until 2026-09-12** (W-140 row 10).
-`urlsrc.resolve_urls` is one line and it is symmetric — `entry.attrs["meta"] if
-"meta" in entry.declared else source.meta` — so `meta=hashed` on a line under a
-`plain` source has always won. **The claimed restriction was never
-implemented.**
+> It read *"it only ever loosens"* and *"there is deliberately no way to make
+> one URL stricter than the source"* until 2026-09-12 (W-140 row 10).
+> `urlsrc.resolve_urls` was one symmetric line, so `meta=hashed` on a line under
+> a `plain` source had always won. **The claimed restriction was never
+> implemented** — a record stating a property the code did not have, for months,
+> with nothing able to notice.
 
-- **Nothing leaks either way**, which is why this is a record correction and not
-  a code fix: the stricter direction only ever hashes *more*, and
-  [L5](../records/0007_LAW-5-hashed-meta.md) is a floor on what must be
-  hashed, not a ceiling.
-- **The argument the old sentence made is still worth keeping**, and it is about
-  the *source-wide* value: a source that needs hashing needs it for everything,
-  so set the floor there and treat a per-line `plain` as the exception someone
-  has to justify. That is guidance about how to use the file — it was written as
-  a statement about what the file can express, and those are different claims.
+**The lesson survives the attribute**: a sentence describing what a file *can
+express* is a claim about the parser, and it must be checked against the parser
+rather than inferred from what the feature is for.
 
 ### Considered for the set, and deliberately excluded
 
@@ -422,7 +428,7 @@ from the engine's built-in defaults, so `fux add` wrote `ttl=24h` onto every
 line in a repo whose `[sources.url]` said `7d`.
 
 - 🔴 **The middle layer of a three-layer resolution was dead for every
-  CLI-written line.** `[sources.url] ttl|keep|enrich|update|meta|fetcher` exists
+  CLI-written line.** `[sources.url] ttl|keep|enrich|update|fetcher` exists
   so a whole intranet is configured in one place; `fux add` silently overrode it
   on the way in, document by document.
 - **Decision 12 is unchanged and that is the point.** The line still states
@@ -486,10 +492,11 @@ by being transcribed, was repaired by being *derived*, and the derivation
 carried the wrong constant. `Attribute.placeholder` is the field, and there is
 no special case in `setup.py`.
 
-**15d. What this does NOT open.** `meta`, `keep`, `archived`, `enrich` and
-`update` stay enums — policy values with a genuinely closed set, and only
-`fetch` names a **file**. The attribute **key** set stays closed at seven
-(decision 11); an eighth is still a change to this record.
+**15d. What this does NOT open.** `keep`, `archived`, `enrich` and `update`
+stay enums — policy values with a genuinely closed set, and only `fetch` names a
+**file**. The attribute **key** set stays closed at **six** (decision 11);
+a seventh is still a change to this record. (⚠ `meta` was in this list and the
+count read seven until W-194, 2026-09-20.)
 
 **15e. What the grammar had been asserting, and for how long.** The closed
 tuple `("http", "cdp")` sat here while `urlsrc._fetcher_path()` resolved
@@ -541,8 +548,11 @@ row rather than the loosening shipping unguarded.
   exists to prevent, reached by a different route. Making the line
   whitespace-delimited made the narrow comment rule the only parseable one.
 - **An attribute that changes committed bytes needs a home in the record.**
-  `meta=plain` has one. A future attribute that changes bytes without one would
-  be an `_format` question.
+  ⚠ `meta=plain` was the one worked example and W-194 deleted it, so **no
+  current attribute changes committed bytes** — `fetch`, `keep`, `ttl`,
+  `archived`, `enrich` and `update` all decide *how* or *whether* fux goes out,
+  not what a record says. A future attribute that changed bytes without a home
+  in the record would still be an `_format` question.
 - **A duplicate is invisible.** Accepted under decision 4, at the cost that a
   reviewer cannot see from the diff that a line was already present.
 

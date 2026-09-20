@@ -67,14 +67,14 @@ def test_it_reads_the_list_without_a_sources_url_block(tmp_path):
 
 def test_resolve_urls_carries_the_flag():
     entries = parse("https://x.test/old archived=true\n", URLS, origin="t")
-    source = SimpleNamespace(fetcher=".fux/fetchers/http.py", meta="hashed", keep=True, ttl="24h")
+    source = SimpleNamespace(fetcher=".fux/fetchers/http.py", keep=True, ttl="24h")
     (resolved,) = resolve_urls(entries, source)
     assert resolved.archived is True
 
 
 def test_an_undeclared_line_resolves_to_not_archived():
     entries = parse("https://x.test/a\n", URLS, origin="t")
-    source = SimpleNamespace(fetcher=".fux/fetchers/http.py", meta="hashed", keep=True, ttl="24h")
+    source = SimpleNamespace(fetcher=".fux/fetchers/http.py", keep=True, ttl="24h")
     (resolved,) = resolve_urls(entries, source)
     assert resolved.archived is False
 

@@ -184,10 +184,14 @@ from the working tree under the new rules.
 - **Enrichment:** `fux enrich --check` refuses a file whose body matches a rule
   (`refused: … matches .fux/pii.toml rule(s): …`). Rewrite the sentence; do not
   paste a redaction into it.
-- **`meta` is not redaction.** Terms are stored hashed for every document, and
-  anyone who can guess a value can still search for it — only a rule removes
-  it. For URL sources `meta = "hashed"` (the default) keeps titles and headings
-  out of the record as readable text; `meta = "plain"` commits them readable.
+- **Hashed terms are not redaction, and only a rule removes a value.** Terms
+  are stored hashed for **every** document, and anyone who can guess a value can
+  still search for it. ⚠ **`meta` was a second, weaker thing that looked like
+  this one and it is gone** (fux 3.x): for URL sources `meta = "hashed"` used to
+  keep titles and headings out of the record as readable text. **It never
+  touched the terms, and it no longer exists** — every record now commits a
+  readable `title` and `phrases`, and `.fux/pii.toml` is the only thing that
+  keeps a value out of the committed index.
 
 **Leak check — plaintext values in the committed index:**
 

@@ -46,7 +46,6 @@ def _rec(doc_id, title, flen, terms, *, archived=False) -> dict:
         "src": "git",
         "loc": doc_id.removeprefix("file:"),
         "mode": "extracted",
-        "meta": "plain",
         "title": title,
         "phrases": [],
         "terms": terms,

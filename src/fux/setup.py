@@ -741,8 +741,8 @@ def _urls_header() -> str:
 # {len(URLS.attributes)} attributes, and the set is closed:
 {table}
 #
-#   https://example.com/handbook/oncall    fetch=http meta=hashed
-#   https://wiki.corp/display/ENG/runbook  fetch=cdp  meta=hashed ttl=7d
+#   https://example.com/handbook/oncall    fetch=http
+#   https://wiki.corp/display/ENG/runbook  fetch=cdp  ttl=7d
 #
 # `fux add <URL>` writes a line here with every attribute stated, and fetches
 # that one URL once. `fux ingest` re-fetches the lines known to be stale --

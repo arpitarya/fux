@@ -51,9 +51,10 @@ def test_enum_attributes_are_unchanged():
 
     ⚠ **`fetch` left this list on 2026-09-15** (W-178). It is not a policy value
     with a closed set — it names a **file** in a directory the consumer owns,
-    and `meta`, `keep`, `archived`, `enrich` and `update` still are.
+    and `keep`, `archived`, `enrich` and `update` still are. (⚠ `meta` was in
+    this list until W-194 deleted the attribute on 2026-09-20.)
     """
-    for name in ("meta", "keep", "archived", "enrich", "update"):
+    for name in ("keep", "archived", "enrich", "update"):
         attr = next(a for a in sourcelist.URLS.attributes if a.name == name)
         assert attr.values and attr.validate is None
 

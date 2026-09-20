@@ -40,7 +40,6 @@ here. Read that record before changing anything below it.
 
 - 🟢 **W-199** · `agent` — **agreed 2026-09-18, not built**: every URL source states up front how to download it and how to read what comes back, fixed once at `fux add`. **Breaking** by your ruling. [detail](open/W-199-fetcher-routing.md)
 - 🟢 **W-200** · `agent` — **agreed 2026-09-18, not built**: keep a local log of how each document got indexed — which downloader and reader made it, from which bytes, and whether it worked. [detail](open/W-200-ingest-provenance.md)
-- 🟢 **W-194** · `agent` — **agreed 2026-09-17, not built**: drop hashed metadata entirely — URL records keep plain titles, the display cache goes, the index format steps to v4 and law L5 retires. [detail](open/W-194-delete-hashed-meta.md)
 - 🔴 **W-161** · `agent`, waiting on W-191 — built 2026-09-15 and shipped switched on, but never measured: no document in the test corpus links to another, so both arms of the feature have nothing to work on. [detail](open/W-161-graph-composed-ask.md)
 - 🔴 **W-168** · `agent` — step 1 (link text) shipped. **Step 2 measured 2026-09-18: code search already works ~90 %, room for a fix is 3–4 of 33** — prompt 8 won't change that. Waits on his call. [detail](open/W-168-search-improvements.md)
 - 🔴 **W-201** · `arpit` — **front-matter values are never indexed**, so a `doc_id:` that lives only there is unreachable. 3 of 33 seed codes. Which keys, which field — his. [detail](open/W-201-frontmatter-scalars-not-indexed.md)

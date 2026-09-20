@@ -85,5 +85,5 @@ def test_golden_header_line():
     # _format bumped v1 -> v2 and tf_fields grew from [heading, body] to the
     # five-field, body-first order (W-76 Phase 1: see TF_FIELDS docstring).
     assert canonical_dumps(HEADER) == (
-        b'{"_format":"fux.index.v3","analyzer":"v2","tf_fields":["body","heading","title","path","ctx"]}\n'
+        b'{"_format":"fux.index.v4","analyzer":"v2","tf_fields":["body","heading","title","path","ctx"]}\n'
     )

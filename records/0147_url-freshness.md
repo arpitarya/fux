@@ -10,7 +10,7 @@ feature: the freshness verdict vocabulary and the per-URL check interval
 owns: [src/fux/refer/freshness.py@6757eeeba7c6]
 laws: [L2, L3, L4]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 744c2910b23af7a965e698efcf5fcd6932979969e10b906c5c5b0b184acca6cc
+content_sha: abb6b88c1f6228b9c40bb4484ada5d6fa0607ad005019ccbcf818cc4317a3749
 ---
 
 # SR-URL-FRESHNESS: what a citation may claim, and how often it has to earn it
@@ -206,7 +206,7 @@ docstring.
    already; reading the checkout is not a fetch and never was.
 
 9. **`ttl=` is a duration on the URL line, defaulting to `24h`, resolved through
-   the same three layers as `keep` and `meta`** — built-in default, then
+   the same three layers as `keep` and `fetch`** — built-in default, then
    `[sources.url] ttl`, then the line. The grammar is `0` or
    `<integer><s|m|h|d>`. It is stored **verbatim** as written: `1h` round-trips
    as `1h`, never as `3600`, because the value goes back into a committed file.

@@ -40,7 +40,7 @@ def _rec(doc_id: str, title: str, word: str, *, phrases=(), mtime=None) -> dict:
     flen[BODY] = 40
     record = {
         "id": doc_id, "src": "git", "loc": doc_id.removeprefix("file:"),
-        "mode": "extracted", "meta": "plain", "title": title,
+        "mode": "extracted", "title": title,
         "phrases": list(phrases), "terms": {term_hash(word): tf},
         "flen": flen, "sha": "a" * 40, "edges": [],
     }

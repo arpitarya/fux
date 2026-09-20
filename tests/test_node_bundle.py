@@ -224,7 +224,7 @@ def _repo_with_an_index(tmp_path: Path) -> Path:
         flen[TF_FIELDS.index("body")] = 40 + i
         records.append({
             "id": f"file:docs/{name}", "src": "git", "loc": f"docs/{name}",
-            "mode": "extracted", "meta": "plain", "title": title, "phrases": [],
+            "mode": "extracted", "title": title, "phrases": [],
             "terms": {term_hash(term): tf}, "flen": flen, "sha": "a" * 40, "edges": [],
         })
     write_index(tmp_path, records)

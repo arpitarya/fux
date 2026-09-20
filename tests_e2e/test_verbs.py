@@ -693,11 +693,11 @@ def test_add_records_a_url_line_and_no_fetch_keeps_it_offline(tmp_path):
     added = _run(
         tmp_path, "add", "https://example.invalid/handbook#oncall", "--cdp", "--no-fetch"
     )
-    assert "fetch=cdp meta=hashed" in added.stdout
+    assert "fetch=cdp keep=true" in added.stdout
     assert "fetching" not in added.stderr  # --no-fetch means no network, and says nothing
 
     listed = _run(tmp_path, "add")
-    assert "https://example.invalid/handbook#oncall fetch=cdp meta=hashed" in listed.stdout
+    assert "https://example.invalid/handbook#oncall fetch=cdp keep=true" in listed.stdout
 
     # The line is recorded; with no fetch there is nothing to index yet.
     found = _run(tmp_path, "find", "handbook", "--json")
@@ -1044,7 +1044,7 @@ def test_a_consumer_drops_a_fetcher_in_and_names_it_on_a_line(tmp_path):
     (fux / "sources").mkdir(parents=True, exist_ok=True)
     (fux / "sources" / "dirs").write_text("", encoding="utf-8")
     (fux / "sources" / "urls").write_text(
-        "https://wiki.test/rota fetch=glassbox meta=plain\n", encoding="utf-8"
+        "https://wiki.test/rota fetch=glassbox keep=true\n", encoding="utf-8"
     )
     (fux / "pii.toml").write_text("", encoding="utf-8")
     fetchers = fux / "fetchers"

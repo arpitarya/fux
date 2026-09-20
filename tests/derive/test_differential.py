@@ -19,7 +19,7 @@ import pytest
 
 from fux.derive import accel, build
 from fux.query import scan
-from fux.store import DisplayCache, content_sha, term_hash, title_hash, write_index
+from fux.store import content_sha, term_hash, write_index
 
 TOPS = (1, 5, 20, 50)
 
@@ -30,7 +30,6 @@ def _rec(doc_id, title, flen, terms) -> dict:
         "src": "git",
         "loc": doc_id.removeprefix("file:"),
         "mode": "extracted",
-        "meta": "plain",
         "title": title,
         "phrases": [],
         "terms": terms,
@@ -131,67 +130,81 @@ def test_document_without_flen(tmp_path):
     assert_identical(tmp_path, ["solo"], tops=(1, 5))
 
 
-def _hashed(doc_id, title, flen, terms) -> dict:
-    """A `meta: hashed` record, the shape `--refresh-urls` actually writes."""
+def _url(doc_id, title, flen, terms) -> dict:
+    """A `url:` record, the shape `--refresh-urls` actually writes.
+
+    ⚠ **REWRITTEN for W-194 (2026-09-20). This was `_hashed()`**, and the
+    difference matters to why the fixture exists. It used to delete `title` and
+    `phrases` and write `meta: "hashed"` plus a `title_h`, because L5 made that
+    the default for a non-git source. All three fields are deleted, so a url
+    record now differs from a git one **only** in `src`, `loc` and the id's
+    shape — which is exactly what SR-ACCELERATOR §683-687 warned would happen
+    if this fixture were left to go silently plain.
+
+    **It is kept, not deleted, and it still distinguishes something.** W-47's
+    finding was that this harness had never carried a `url:` record at all, and
+    that remains true of every other fixture here. The 40-hex `sha` below is
+    the part that still carries risk: a `term_hash()`-shaped (16-hex) value
+    there would itself trip `_assert_invariants`' stray-quoted-hash tripwire.
+    """
     record = _rec(doc_id, title, flen, terms)
-    del record["title"], record["phrases"]
     record["src"] = "url"
     record["loc"] = doc_id.removeprefix("url:")
-    record["meta"] = "hashed"
-    record["title_h"] = title_hash(title)
-    # A real `sha` is `content_sha()`-shaped (40-hex): a `term_hash()`-shaped
-    # (16-hex) value here would itself trip `_assert_invariants`' stray-quoted-
-    # hash tripwire, the exact bug this fixture module exists to catch.
     record["sha"] = content_sha(doc_id.encode("utf-8"))
     return record
 
 
-def _warm(root, record) -> dict:
-    """Pre-populate P5's display cache for a `_hashed()` record, the way
-    `ingest/run.py` does before `write_index` will accept it. Returns the
-    record unchanged, so a call can be inlined into a `records = [...]` list."""
-    DisplayCache(root).put(record["sha"], record["id"], record["title_h"])
-    return record
-
-
-def test_hashed_meta_titles(tmp_path):
-    """`title_h` records must resolve the same display title on both paths."""
-    write_index(tmp_path, [_warm(tmp_path, _hashed("url:https://x/a", "Page A", [10], {term_hash("solo"): [1, 1]}))])
+def test_url_record_titles(tmp_path):
+    """A url record resolves the same display title on both paths."""
+    write_index(tmp_path, [_url("url:https://x/a", "Page A", [10], {term_hash("solo"): [1, 1]})])
     build(tmp_path)
     assert_identical(tmp_path, ["solo"], tops=(1,))
-    # The prefix is storage. What a verb shows is the hash, opaque either way.
-    assert accel.ask(tmp_path, "solo", top=1)[0].title == term_hash("Page A")
+    assert accel.ask(tmp_path, "solo", top=1)[0].title == "Page A"
 
 
-def test_a_corpus_holding_a_hashed_record_builds_and_agrees(tmp_path):
-    """W-47: this harness had never seen a hashed record, so it never saw the bug.
+def test_a_corpus_holding_a_url_record_builds_and_agrees(tmp_path):
+    """W-47: this harness had never seen a url record, so it never saw the bug.
 
-    A bare 16-hex `title_h` is a quoted 16-hex token outside `terms`. The scan
-    counts it toward that term's df from the raw bytes; the accelerator counts
-    from the postings. The build refused the index rather than diverge — so the
-    L5 default shipped an index no `fux build` would accept, and the only thing
-    standing between the engine and a fast wrong answer was a stopped run.
+    ⚠ **The bug itself is gone with `title_h`** (W-194). It was this: a bare
+    16-hex `title_h` is a quoted 16-hex token outside `terms`; the scan counts
+    it toward that term's df from the raw bytes and the accelerator counts from
+    the postings, so the build refused the index rather than diverge — which
+    meant the L5 default shipped an index no `fux build` would accept, and the
+    only thing between the engine and a fast wrong answer was a stopped run.
+    **The tripwire that caught it is untouched** and is exercised directly by
+    `test_a_stray_quoted_hash_still_stops_the_build` below.
     """
     records = [
         _rec("file:a.md", "A", [12], {term_hash("oncall"): [2, 1], term_hash("rotation"): [1, 0]}),
         _rec("file:b.md", "B", [30], {term_hash("oncall"): [1, 0]}),
-        _warm(tmp_path, _hashed("url:https://x/handbook", "Oncall handbook", [11],
-                {term_hash("oncall"): [3, 1], term_hash("pager"): [2, 0]})),
-        _warm(tmp_path, _hashed("url:https://x/deploys", "Deploy runbook", [20], {term_hash("rotation"): [1, 0]})),
+        _url("url:https://x/handbook", "Oncall handbook", [11],
+             {term_hash("oncall"): [3, 1], term_hash("pager"): [2, 0]}),
+        _url("url:https://x/deploys", "Deploy runbook", [20], {term_hash("rotation"): [1, 0]}),
     ]
     write_index(tmp_path, records)
     build(tmp_path)  # must not raise: the invariant holds by field shape
     assert_identical(tmp_path, ["oncall", "rotation", "pager", "oncall rotation"])
 
 
-def test_a_pre_prefix_title_h_still_stops_the_build_and_names_the_migration(tmp_path):
-    """An index written before the prefix is old, not corrupt. Say which."""
+def test_a_stray_quoted_hash_still_stops_the_build(tmp_path):
+    """The W-47 tripwire, exercised without the field that used to trip it.
+
+    ⚠ **REPLACES `test_a_pre_prefix_title_h_still_stops_the_build_and_names_
+    the_migration`.** That test wrote a bare, pre-2026-08-19 `title_h` and
+    asserted the error named the migration; `title_h` is deleted, so the
+    scenario cannot occur and the migration hint was removed with it (W-194).
+
+    **What must NOT be lost is the tripwire.** Any quoted 16-hex token outside
+    `terms` makes `query/scan.py` count a df the accelerator does not, and the
+    two paths then score the corpus differently. A title that happens to be 16
+    hex characters is the shape that can still do it — rarer than the old
+    default, and not impossible.
+    """
     from fux.errors import FuxError
 
-    record = _hashed("url:https://x/a", "Page A", [10], {term_hash("solo"): [1, 1]})
-    record["title_h"] = term_hash("Page A")  # the bare, pre-2026-08-19 shape
-    write_index(tmp_path, [_warm(tmp_path, record)])
-    with pytest.raises(FuxError, match="predates the `h:` prefix"):
+    record = _url("url:https://x/a", term_hash("Page A"), [10], {term_hash("solo"): [1, 1]})
+    write_index(tmp_path, [record])
+    with pytest.raises(FuxError, match="appears outside `terms`"):
         build(tmp_path)
 
 

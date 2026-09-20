@@ -10,7 +10,7 @@ feature: the rationale, history and reopen-trigger of L2
 owns: []
 laws: [L2]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 5fadef1d413b4e1cd79720bbf4a972c427578d0a2e04e73bf61a9c92c0a809be
+content_sha: accfb84633f4da79f10019cb377f3cab6e481e15eedcb80278dd18808c10d71e
 ---
 
 # SR-LAW-2 — L2 — content is never durable outside its source system
@@ -131,7 +131,7 @@ on 2026-09-06 at Arpit's ruling.
 - **Easier:** the compliance conversation. Nothing left the tenant, so nothing needs a retention schedule, a deletion path, or a DPIA.
 - **Harder:** every answer costs a fetch. The refer plane exists entirely to pay this bill, and the fetch cache exists to make it bearable.
 - **Harder:** an answer is impossible when the source is gone. The acquired plane is the mitigation and it is opt-in, so the default really can fail to answer.
-- ⚠ **A hashed key is not anonymity.** Statistics about a document can still identify it. L5 exists because of exactly this, and it is not a configuration preference.
+- ⚠ **A hashed key is not anonymity.** Statistics about a document can still identify it. 🔴 **L5 existed because of exactly this, and it was RETIRED on 2026-09-20** (Arpit, W-194) — the ACL-mismatch leak it closed, where a title alone tells a reader that a document they cannot open exists, is now an **accepted, documented exposure**. **L2 is unchanged and is what still stands here**: statistics may be committed, content may not, and no amount of hashing turns content into a statistic. [SR-LAW-5](0007_LAW-5-hashed-meta.md), superseded, keeps the argument and the reopen trigger.
 
 ### Alternatives considered
 

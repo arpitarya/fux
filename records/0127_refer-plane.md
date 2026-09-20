@@ -10,7 +10,7 @@ feature: the refer plane — fetch, verify, chunk, re-score, assemble
 owns: [src/fux/refer@30eed86dbb60, tools/refer-bench@cfdb47b24af2, tools/refer-budget-sweep@db9ff8233332]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: b1c65ac4959371e65017e4f2f3b4f939680dc826d72a51142d3ad9d05736e0aa
+content_sha: ea64d0bdbaa909944fc131a87da80859edc2055ba97ba3178e3f524c12409913
 ---
 
 # SR-REFER — the refer plane
@@ -606,7 +606,7 @@ selector reads, to anyone auditing the plane, exactly like a branch in use.
   populated at **ingest** time (not query time), keyed on `sha` (not `loc`),
   holds only a title, and answers a narrower question — *what did this
   document's title say*, not *is this citation's content still current*. **A
-  hashed document's title in `ask` carries no freshness verdict and is not a
+  URL document's title in `ask` carries no freshness verdict and is not a
   citation.** Full rationale on [SR-RECORD](0109_index-record.md).
 
 ### Alternatives considered
@@ -764,7 +764,7 @@ evidence.*
 
 - [`src/fux/ingest/urlsrc.py`](../src/fux/ingest/urlsrc.py)
 - [`src/fux/refer/`](../src/fux/refer/)
-- [`src/fux/store/displaycache.py`](../src/fux/store/displaycache.py)
+- `src/fux/store/displaycache.py` — **DELETED 2026-09-20 (W-194)**, named rather than linked
 - [`tests/refer/`](../tests/refer/)
 - [`tools/refer-bench/`](../tools/refer-bench/)
 - [`tools/refer-budget-sweep/`](../tools/refer-budget-sweep/)

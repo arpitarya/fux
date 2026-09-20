@@ -227,9 +227,10 @@ def _search(root: Path, args: dict, *, top: int) -> dict:
                 # W-84 -- the document's headings that match this query, best
                 # first, at most three. **Free here**: the record is already in
                 # hand for `sha`, and `phrases` was committed at ingest. Always
-                # present, `[]` when nothing matches or the record is `hashed`
-                # (which carries no display text at all, L5) -- an absent key
-                # would be indistinguishable from an older server.
+                # present, `[]` when nothing matches -- an absent key would be
+                # indistinguishable from an older server. (It also read `[]`
+                # for a `hashed` record, which carried no display text at all;
+                # W-194 deleted that shape on 2026-09-20.)
                 "headings": headings_for(record, query),
             }
         )

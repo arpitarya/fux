@@ -23,7 +23,7 @@ import pytest
 from fux.query import cmd_ask, cmd_find
 from fux.query.headings import MAX_HEADINGS, headings_for
 from fux.query.tokenize import tokenize
-from fux.store import DisplayCache, content_sha, term_hash, title_hash, write_index
+from fux.store import content_sha, term_hash, write_index
 
 DOC_ID = "file:docs/mesh.md"
 TITLE = "The mesh"
@@ -48,7 +48,6 @@ def _record(**overrides) -> dict:
         "src": "git",
         "loc": "docs/mesh.md",
         "mode": "extracted",
-        "meta": "plain",
         "sha": content_sha(DOC_ID.encode("utf-8")),
         "title": TITLE,
         "phrases": list(PHRASES),
@@ -141,29 +140,33 @@ def test_a_non_string_phrase_is_skipped_not_raised():
     ]
 
 
-# -- the L5 case: a hashed record has no display text at all -------------
+# -- a record with no headings ------------------------------------------
 
 
-def test_a_hashed_record_yields_no_headings(tmp_path):
-    """`store/writer.py` refuses to write `phrases` on a `hashed` record — the
-    ACL-mismatch leak L5 closes. So this is empty by construction, and this
-    test exists to prove there is no path that re-introduces the text."""
+def test_a_record_with_no_phrases_yields_no_headings(tmp_path):
+    """⚠ **REWRITTEN for W-194 (2026-09-20).** This was the L5 case: a `hashed`
+    record carried no `phrases` at all, because `store/writer.py` refused to
+    write display text on one, and the test existed to prove no path
+    re-introduced that text. `meta` and `title_h` are deleted and L5 is
+    retired, so the fixture is now just a url record with no headings — which
+    is the path that was always the general one. **The specific guarantee that
+    went away is an ACL-mismatch leak now accepted, not closed**
+    (SR-LAW-5, superseded).
+    """
     sha = content_sha(b"url:https://x.test/handbook")
-    DisplayCache(tmp_path).put(sha, "url:https://x.test/handbook", "Oncall")
-    hashed = {
+    record = {
         "id": "url:https://x.test/handbook",
         "src": "url",
         "loc": "https://x.test/handbook",
         "mode": "extracted",
-        "meta": "hashed",
         "sha": sha,
-        "title_h": title_hash("Oncall"),
+        "title": "Oncall",
         "terms": {_h("rollback"): [2, 1]},
         "flen": [12],
         "edges": [],
     }
-    write_index(tmp_path, [hashed])
-    assert headings_for(hashed, "rollback") == []
+    write_index(tmp_path, [record])
+    assert headings_for(record, "rollback") == []
 
 
 # -- the rendered surfaces ------------------------------------------------

@@ -46,7 +46,6 @@ def _rec(doc_id, title, tf, *, superseded=False, mtime=None, edges=()) -> dict:
         "src": "git",
         "loc": doc_id.removeprefix("file:"),
         "mode": "extracted",
-        "meta": "plain",
         "title": title,
         "phrases": [],
         "terms": {term_hash("rollback"): body_tf},

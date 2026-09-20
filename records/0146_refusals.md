@@ -10,7 +10,7 @@ feature: refusal detection before decode
 owns: [src/fux/ingest/refusals.py@adf187806c43, src/fux/templates/refusals.toml.txt@bdf2356bc679, tools/refusal-probe@76b6f6b7f4aa]
 laws: [L1, L3]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 45f0620bd588a4b8d4053391a6eb0a9e6f600fa72898d376dcb1e8a0341d8102
+content_sha: 58787bb2e17e20a2f6c46fbe045e9dc8af4d55de0b03b33e3af37613aeff0357
 ---
 
 # SR-REFUSAL: a sign-in wall is not a document, and only the bytes may say so
@@ -396,6 +396,14 @@ and making it do so would mean a repo silently indexing a subset of its corpus �
 [the measured case](../work/regression/2026-09-15-consumer-fetchers/ANALYSIS.md).
 
 ### Consequences
+
+- ⚠ **W-194 (2026-09-20) moved a component this record describes, and changed
+  nothing it decides.** Hashed display meta was deleted outright: `meta` and
+  `title_h` left the record shape, `store/displaycache.py` and
+  `assert_meta_policy` were deleted, `fux.index` stepped to **v4**, and law L5
+  retired ([SR-LAW-5](0007_LAW-5-hashed-meta.md), superseded). Nothing in `ingest/refusals.py`, `refusals.toml.txt` or `tools/refusal-probe/` changed. A refusal is a judgement about the BYTES a server returned, taken before a record exists; `meta` only ever decided what a record could hold afterwards, so the two never met.
+  **This record's decisions are unaffected**, and the line is here because the
+  freshness gate asks a describer to say so rather than to be silent.
 
 - ✅ **A never-edited, superseded starter is REPORTED (2026-09-14, W-163).**
   `fux doctor`'s `refusal rules current` row fires when `.fux/refusals.toml` is

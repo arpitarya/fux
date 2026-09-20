@@ -23,8 +23,10 @@ a rendered shell, and a human writes `fetch=cdp` on that line.
 **Three layers, and the same order for every attribute** (SR-URL-LIST
 decision 10): the built-in default, then the source-wide `[sources.url]`
 setting, then the line. `[sources.url] fetcher` is the source-wide setting for
-`fetch` (its stem is the fetcher name); `[sources.url] meta` is the source-wide
-setting for `meta`. A line beats both, and only ever for its own URL.
+`fetch` (its stem is the fetcher name). A line beats both, and only ever for its
+own URL. ⚠ **`meta` was the other worked example here and it is gone** — W-194
+(Arpit, 2026-09-20) deleted hashed display meta outright, so `fetch` is the one
+attribute with all three layers.
 
 Contract (documented in each generated fetcher's docstring too):
   - required `fetch(url: str) -> tuple[bytes, str]` — the bytes the server
@@ -71,7 +73,6 @@ class UrlEntry:
 
     url: str
     fetch: str
-    meta: str
     fetcher_path: str
     #: SR-ACQUIRED: retain the bytes this URL returned. Opt-in per line.
     keep: bool = False
@@ -163,21 +164,18 @@ def resolve_urls(entries: list[sourcelist.Entry], source) -> list[UrlEntry]:
 
     `source` is the `UrlSource` config block. A line that *declared* an
     attribute wins; a line that did not takes the source-wide setting, which is
-    itself defaulted by `config.py`. `meta` only ever loosens per line, which is
-    why the source-wide value is the floor and not a blanket flip.
+    itself defaulted by `config.py`.
     """
     source_fetch = PurePosixPath(source.fetcher).stem
     resolved: list[UrlEntry] = []
     for entry in entries:
         fetch = entry.attrs["fetch"] if "fetch" in entry.declared else source_fetch
-        meta = entry.attrs["meta"] if "meta" in entry.declared else source.meta
         resolved.append(
             UrlEntry(
                 url=entry.value,
                 fetch=fetch,
-                meta=meta,
                 fetcher_path=fetcher_for(fetch, source.fetcher),
-                # Three layers, same order as `meta`: built-in default, then
+                # Three layers, same order as `fetch`: built-in default, then
                 # `[sources.url] keep`, then the line. A line that DECLARED
                 # `keep=` wins; one that said nothing takes the source-wide
                 # setting, which `config.py` itself defaults to true.

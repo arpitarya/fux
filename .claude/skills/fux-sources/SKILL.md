@@ -1,6 +1,6 @@
 ---
 name: fux-sources
-description: Manage what is in a Fux corpus with `fux add`, `fux remove` and `fux ingest` — the ONE verb for the first ingest and every re-ingest, since `fux update` was deleted in 3.0. Directories, files, file types and URLs, archived=, meta, keep, ttl, update=, and why a file is not indexed. Use ONLY when explicitly asked to change the corpus ("index this folder", "add this URL", "stop indexing X", "refresh the URLs"), or to answer "why isn't file X indexed". Edits committed files in .fux/.
+description: Manage what is in a Fux corpus with `fux add`, `fux remove` and `fux ingest` — the ONE verb for the first ingest and every re-ingest, since `fux update` was deleted in 3.0. Directories, files, file types and URLs, archived=, keep, ttl, update=, and why a file is not indexed. Use ONLY when explicitly asked to change the corpus ("index this folder", "add this URL", "stop indexing X", "refresh the URLs"), or to answer "why isn't file X indexed". Edits committed files in .fux/.
 ---
 
 # Managing a Fux corpus
@@ -44,7 +44,7 @@ attribute is another `fux add` on the same entry — it is an upsert.
 | file | holds | one line looks like |
 |---|---|---|
 | `.fux/sources/dirs` | directories and single files, repo-relative | `docs/runbooks archived=false enrich=false` · `!docs/drafts` |
-| `.fux/sources/urls` | `http(s)` URLs | `https://wiki.corp/x fetch=http meta=hashed keep=true ttl=24h enrich=false archived=false update=auto` |
+| `.fux/sources/urls` | `http(s)` URLs | `https://wiki.corp/x fetch=http keep=true ttl=24h enrich=false archived=false update=auto` |
 | `.fux/formats.toml` | which file types are documents | `include = ["*.md", …]` and `[decoders]` `csv = "csv"` |
 | `.fux/.fuxignore` | what is kept out | `.gitignore` grammar; `!` **re-includes** |
 
@@ -60,7 +60,7 @@ attribute is another `fux add` on the same entry — it is an upsert.
   `file:line`. Two lines for one entry with **different** attributes is an error.
 - File order is irrelevant: the loader dedupes and sorts.
 - `dirs` attributes: `archived`, `enrich` (`true`/`false`, default `false`).
-- `urls` attributes: `fetch` (**any fetcher name** — see below), `meta`
+- `urls` attributes: `fetch` (**any fetcher name** — see below)
   (`hashed`|`plain`), `keep`, `enrich`, `archived` (`true`/`false`), `ttl`
   (`0` or `<int>s|m|h|d`), `update` (`auto`|`never`).
 - 🔴 **`fetch=` is a NAME, not an enum** (3.0). It resolves to
@@ -80,7 +80,7 @@ one line and keeps every comment.
 
 **`fux add` writes EVERY attribute on a URL line**, defaults included, so a
 line says what it means and a policy change is a one-word diff. The values it
-writes are **your repo's** — `[sources.url]`'s `fetcher`, `meta`, `keep`,
+writes are **your repo's** — `[sources.url]`'s `fetcher`, `keep`,
 `ttl`, `enrich` and `update` are resolved first, and an explicit flag beats
 both. ⚠ **A stated attribute beats `[sources.url]` afterwards**: editing
 `fux.toml` later does not reach a line that already states the attribute, so
@@ -97,7 +97,6 @@ entry.
 |---|---|---|
 | `--archived` | `archived=true` | dirs, urls |
 | `--cdp` / `--http` | `fetch=cdp` / `fetch=http` — the two shipped fetchers. **There is no `--fetch <name>` flag**: for a custom one, `fux add <URL> --no-ingest`, edit the `fetch=` value, then `fux ingest <URL>` | urls |
-| `--plain` / `--hashed` | `meta=` | urls |
 | `--keep` / `--no-keep` | `keep=` | urls |
 | `--ttl D` | `ttl=D` (`0`, `30s`, `15m`, `1h`, `7d`) | urls |
 | `--no-update` | `update=never` | urls |
@@ -205,15 +204,19 @@ fux ingest --list-skipped        # read-only, offline: one `path: reason` per li
 - **A URL** is never in `.fuxignore`. Run `fux ingest <URL>` and read its `!`
   line; a sign-in or refusal reason means the `fux-fetcher` skill.
 
-## 7 · `archived`, `meta`, `keep` and PII
+## 7 · `archived`, `keep` and PII
 
 - **`archived` is declared, never inferred.** A directory named `archive/` is
   live until its line says `archived=true`. A nested line (`docs/old
   archived=true` under `docs`) applies to its subtree. Such results carry
   `archived: true` — follow the `fux-archived-results` policy.
-- **`meta` exists for URLs only.** `hashed` (default) commits a title *hash* and
-  no readable title or phrases; `plain` commits both as readable text, for
-  anyone who clones the repo. **The URL itself is committed either way.**
+- ⚠ **`meta` is GONE as of fux 3.x, and a list still carrying it will not
+  load.** It existed for URLs only: `hashed` (the default) committed a title
+  *hash* and no readable title or phrases. **Every URL record now commits a
+  readable `title` and `phrases`, exactly like a file record** — so a private
+  page's title is in the repo for anyone who clones it. Use `.fux/pii.toml` if a
+  value must not be committed, or do not index the page. **The URL itself was
+  always committed either way.** Fix: delete `meta=…` from the line.
 - **`keep=true` (default) retains the fetched bytes in `.fux/acquired/`** —
   gitignored, local, not redacted. It lets `fux answer` verify offline;
   `--no-keep` for pages that must not sit on disk.

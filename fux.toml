@@ -26,7 +26,6 @@ urls_file = ".fux/sources/urls"
 # only `fux add <URL>` lists one.
 [sources.url]
 fetcher         = ".fux/fetchers/http.py"
-meta            = "hashed"
 keep            = true
 enrich          = false
 update          = "auto"

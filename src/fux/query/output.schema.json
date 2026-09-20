@@ -63,7 +63,7 @@
       "route":    { "type": "any",  "required": "always",
                     "doc": "str | null -- W-161. Where the boost came from, as a reader can check it: `#7 -> #2 via graph`. `null` on every unboosted row, and here `null` IS an absence rather than a claim, because an unboosted row has no route and `boosted: false` already says why. Distinct from a `related` entry's `route`, which names the seed and the edge kind" },
       "headings": { "type": "any",  "required": "sections_requested",
-                    "doc": "list[str] -- the document's headings matching the query, best first, at most 3. PRESENT WHENEVER ASKED FOR, and then always: `[]` means nothing matched, or the record is `hashed` and carries no display text at all (L5) -- an absent key would otherwise be indistinguishable from an older fux (W-48). The one way to make it absent is to say so: `ask --no-sections`, or `[cli.ask] sections = false` (SR-OUTPUT decision 21). Unconditional on `find`, which has no such key" }
+                    "doc": "list[str] -- the document's headings matching the query, best first, at most 3. PRESENT WHENEVER ASKED FOR, and then always: `[]` means nothing matched -- an absent key would otherwise be indistinguishable from an older fux (W-48). Until W-194 (2026-09-20) `[]` also meant the record was `meta: hashed` and carried no display text; there is no such record now. The one way to make it absent is to say so: `ask --no-sections`, or `[cli.ask] sections = false` (SR-OUTPUT decision 21). Unconditional on `find`, which has no such key" }
     },
     "example": {
       "id": "file:docs/mesh.md",

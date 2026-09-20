@@ -13,7 +13,7 @@ feature: configurable output defaults
 owns: [src/fux/output_config.py@8e8e57fade21]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 3c3f571d255122101e435105ea8c9bd36fbfcb0b0868d1592f16355739eea4dd
+content_sha: 8d560ee1be91c8b6c9e919363cb485d643c9f6f872cf460ae9135b535d0978a8
 ---
 
 # SR-OUTPUT — output defaults are configurable, in a third file
@@ -771,6 +771,14 @@ express?* — and the answer would have to be yes for a specific signal, named,
 before a key is added for it.
 
 ### Consequences
+
+- ⚠ **W-194 (2026-09-20) moved a component this record describes, and changed
+  nothing it decides.** Hashed display meta was deleted outright: `meta` and
+  `title_h` left the record shape, `store/displaycache.py` and
+  `assert_meta_policy` were deleted, `fux.index` stepped to **v4**, and law L5
+  retired ([SR-LAW-5](0007_LAW-5-hashed-meta.md), superseded). Nothing in `output_config.py` changed, and no rendering key gained or lost a meaning. ⚠ **One rendered VALUE did change**: a `url:` result's `title` is the document's title rather than an opaque hash, on every surface — which is what the deletion was for, and is not a change to what `[cli.*]` decides.
+  **This record's decisions are unaffected**, and the line is here because the
+  freshness gate asks a describer to say so rather than to be silent.
 
 - **The observer record is not an output surface and has no key here**
   (W-170, 2026-09-15). It reaches no stream a consumer reads — not stdout, not

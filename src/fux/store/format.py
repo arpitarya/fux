@@ -22,7 +22,18 @@ INDEX_DIR = ".fux/index"
 # "this index predates anchor text" — the W-48 trap, on the edge.
 # `analyzer` is UNTOUCHED (decision 9.2): anchor terms go through the same
 # `query/tokenize.py` every other term does, so no hash changes meaning.
-SCHEMA_ID = "fux.index.v3"
+# v4 (W-194, 2026-09-20): `meta` and `title_h` are GONE from the record. Arpit
+# ruled hashed display meta deleted outright rather than deprecated, so a URL
+# record carries a plain `title` and `phrases` like every other record and law
+# L5 retires with the mechanism. **A property disappeared**, which bumps
+# `_format` for the same reason a property appearing does
+# (SR-INDEX-LIFECYCLE decision 9.1): a v3 index can hold records a v4 reader
+# has no rule for, and "this record has no title" would otherwise be
+# indistinguishable from "this index predates plain titles" — the W-48 trap.
+# `analyzer` is UNTOUCHED: no term changed meaning, only which display fields
+# a record may carry. **v3 indexes must be rebuilt** — `fux ingest` then
+# `fux build`.
+SCHEMA_ID = "fux.index.v4"
 # v2 (W-76 Phase 1, 2026-08-23): identifier splitting before lowercasing,
 # plus Porter stemming before hashing. A v1 shard is refused by
 # `store/reader.py` rather than silently mixed -- two analyzers in one
@@ -60,52 +71,24 @@ def term_hash(term: str) -> str:
     return hashlib.blake2b(term.encode("utf-8"), digest_size=8).hexdigest()
 
 
-#: `title_h`'s value is the term hash behind this prefix, never a bare one.
-#:
-#: `query/scan.py` finds a term's `df` by looking for `"<16 hex>"` in the raw
-#: bytes of a record, and the accelerator counts the same `df` from the parsed
-#: postings. A bare 16-hex `title_h` is a quoted 16-hex token outside `terms`,
-#: so the scan counts it and the accelerator does not, and the two paths score
-#: the corpus differently. The build refuses such an index rather than
-#: diverging (SR-INDEX-LIFECYCLE decision 6) — which meant the `hashed` meta
-#: default, an L5 default, produced an index no `fux build` would accept.
-#:
-#: **The field shape is the bug, not the check.** Prefixing puts a character
-#: between the opening quote and the hex, `"h:30aef0..."`, so the scan's
-#: pattern cannot match it and the two paths agree *by construction*. Relaxing
-#: the invariant instead would have traded a slow answer for a wrong one.
-TITLE_HASH_PREFIX = "h:"
+def display_title(record: dict) -> str:
+    """The title a verb shows.
 
+    ⚠ **W-194, 2026-09-20 — this used to be the interesting function here**,
+    and it is now a `.get`. It carried the three-way fallback a `hashed`
+    record needed: `title` when plain, the display cache's materialised title
+    when hashed and warm, else a labelled opaque hash. `meta`, `title_h` and
+    the cache are all deleted, so every record carries a readable `title` and
+    there is nothing to fall back to.
 
-def title_hash(title: str) -> str:
-    """`title_h`'s value for a `hashed` record — enough to identify, not to read."""
-    return TITLE_HASH_PREFIX + term_hash(title)
-
-
-def display_title(record: dict, cache=None) -> str:
-    """The title a verb shows: `title` when plain, else the P5 display cache's
-    materialised title when hashed and warm, else a labelled opaque hash.
-
-    One definition on purpose. Both candidate generators feed the same
-    `rank()`, so a display fallback implemented twice is a differential-law
-    failure waiting for the two copies to drift. `rank()`'s two call sites
-    pass no `cache` — ranking must stay a pure function of the record, so
-    that path always returns the bare hash, exactly as before P5. `cache`
-    (anything with `.get(sha) -> str | None`, i.e. `store.displaycache.
-    DisplayCache` — duck-typed so this module stays import-free of it) is
-    for a second, later call on the *same* record, purely for what a reader
-    sees, after the accelerator and scan paths have already agreed.
+    **It is kept as a function anyway**, for the reason it was one: both
+    candidate generators feed the same `rank()`, and a display rule
+    implemented at six call sites is a differential-law failure waiting for
+    two of them to drift. The `cache=` parameter is gone; every caller passed
+    `None` except the one display-only path in `query/__init__.py`, which is
+    deleted with it.
     """
-    title = record.get("title")
-    if title is not None:
-        return title
-    hexpart = record.get("title_h", "").removeprefix(TITLE_HASH_PREFIX)
-    if cache is None:
-        return hexpart
-    materialised = cache.get(record.get("sha", ""))
-    if materialised is not None:
-        return materialised
-    return f"{hexpart} (uncached — title unavailable)"
+    return record.get("title", "")
 
 
 def content_sha(content: bytes) -> str:

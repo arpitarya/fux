@@ -112,7 +112,7 @@
     "fields": {
       "id":         { "type": "str",  "doc": "the committed record's id" },
       "loc":        { "type": "str",  "doc": "path or URL" },
-      "title":      { "type": "str",  "doc": "display title, or the labelled hash for a hashed record" },
+      "title":      { "type": "str",  "doc": "display title. Before W-194 (2026-09-20) this could be a labelled opaque hash for a `meta: hashed` record; there is no such record now." },
       "flen":       { "type": "list", "of": "int", "doc": "per-field token counts, trailing zeros trimmed" },
       "archived":   { "type": "bool" },
       "superseded": { "type": "bool" },

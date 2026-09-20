@@ -1,7 +1,7 @@
 """`update = auto|never` — whether `fux update` goes out for a URL at all.
 
 W-113, from Arpit's ruling R-1 (2026-09-05). A URL line could already say
-`fetch=`, `meta=`, `keep=`, `ttl=`, `enrich=` and `archived=` and **could not
+`fetch=`, `keep=`, `ttl=`, `enrich=` and `archived=` and **could not
 say whether it should be re-fetched**.
 
 🔴 **The boundary these tests exist to hold.** `ttl=` is **ask-time** — it
@@ -28,7 +28,6 @@ def _source(**overrides):
     base = dict(
         fetcher=".fux/fetchers/http.py",
         urls_file=".fux/sources/urls",
-        meta="hashed",
         keep=True,
         ttl="24h",
         config={},

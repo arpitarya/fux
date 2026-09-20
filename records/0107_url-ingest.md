@@ -10,7 +10,7 @@ feature: the `url:` source and how ingestion behaves around the fetcher boundary
 owns: []
 laws: [L2, L4, L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: ceb59c514840d36ec821414ede3a8c5744ff35484abf62e848fc7ebb147b9b56
+content_sha: 3bdf66ce9b66339b3f29f5df2500853432b510836e2a52c95cc5ccd3db6fcec4
 ---
 
 # SR-URL-INGEST — URL ingestion through a consumer-owned fetcher
@@ -159,8 +159,15 @@ closed attribute set and `file:lineno` errors are
 U+2028/U+2029/U+0085 to spaces, NUL stripped. Those are legal in JSON and
 hostile to every line-oriented tool downstream.
 
-**7. Hashed meta is the default for URL sources**, and `plain` is an explicit
-per-source opt-in for public content (L5).
+**7. ⚠ DELETED 2026-09-20 (Arpit, W-194).** This read: *Hashed meta is the
+default for URL sources, and `plain` is an explicit per-source opt-in for public
+content (L5).* **`meta` is gone from `[sources.url]` and from the URL line
+grammar, `title_h` is gone from the record, `fux.index` is v4, and law L5
+retires with the mechanism.** A URL record carries a plain `title` and
+`phrases`, exactly as a git record does. 🔴 **The ACL-mismatch leak this closed
+is an accepted, documented exposure** —
+[SR-LAW-5](0007_LAW-5-hashed-meta.md), superseded, keeps the argument and the
+reopen trigger.
 
 ### What it looks like
 
@@ -192,9 +199,12 @@ ingested 4 docs (2 changed), 3 skipped, 2 shards written
 `configure` receives `[sources.url.config]` verbatim, `connect`/`close` bracket
 the batch, and the 404 becomes a skip while the other two documents land.
 
-**A URL record**, `meta = "hashed"` — no display text, `title_h` instead of
-`title`/`phrases`. The capture predates the `flen` field and is not edited; a
-record taken today carries `"flen": [...]` where this shows `"wlen": 11`:
+**A URL record, as captured on 2026-08-18** — `meta = "hashed"`, no display
+text, `title_h` instead of `title`/`phrases`. ⚠ **Two things in this capture are
+no longer what fux writes, and it is left unedited because a capture is
+evidence:** the `flen` field replaced `wlen`, and **W-194 deleted `meta` and
+`title_h` on 2026-09-20**, so a record taken today carries `"title"` and
+`"phrases"` and neither of the fields below:
 
 ```json
 {
@@ -272,18 +282,21 @@ written down.**
   cap rests on.
 - **The fetcher is not linted by default.** It lives in a dotdir and ruff skips
   those. Accepted: it is consumer code, not a CI target.
-- **Hashed results are unreadable by design** — `fux ask` prints a hash where a
-  title would be, unless the display cache can supply one
-  ([SR-RECORD](0109_index-record.md)). That is the mode working, and it is a
-  real usability cost worth stating rather than discovering.
-- ⚠ **`title_h` carries an `h:` prefix, and that shape is load-bearing.** A
+- ⚠ **"Hashed results are unreadable by design" is no longer true and was the
+  mode's real cost.** `fux ask` printed a hash where a title would be, unless
+  the display cache could supply one. W-194 deleted the mode; **a URL result now
+  reads like any other.** That usability cost is what the deletion bought, and
+  the leak it paid for is what the deletion gives up.
+- ⚠ **`title_h` carried an `h:` prefix, and that shape was load-bearing.** A
   bare 16-hex `title_h` tripped the invariant that keeps the scan and the
   accelerator in agreement, so a corpus with one hashed URL record wrote its
   committed index and then **failed every accelerator build** — stuck on the
   reference scan permanently, 27.2 ms against 4 248.8 ms at RFC scale, the
   whole accelerator result forfeited by following the documentation. **The fix
-  was the field's shape, not the check**, and the differential harness now
-  carries a hashed record, which it never had.
+  was the field's shape, not the check.** 🔴 **Kept although the field is
+  deleted**, because the failure mode is not: a quoted 16-hex token anywhere
+  outside `terms` still stops the build, and a `title` that happens to be 16 hex
+  characters can still be one.
 
 ### Alternatives considered
 
@@ -303,7 +316,9 @@ written down.**
 - **Relaxing the accelerator invariant instead of prefixing `title_h`.**
   Rejected: the check is what makes the differential law enforceable, and
   loosening a check to admit a badly shaped field is how a guarantee becomes a
-  suggestion.
+  suggestion. ⚠ **The field was later deleted outright** (W-194, 2026-09-20) —
+  which is the third option neither this row nor the one it rejected
+  considered, and it is the one that removed the question.
 
 ### Reference (required)
 

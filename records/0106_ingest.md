@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-15
 date: 2026-08-18
 feature: the `fux ingest` pipeline — sources to committed records
-owns: [src/fux/ingest@1a2e0e64e3f0, src/fux/ingest/priors.py@8ffcc632a4be]
+owns: [src/fux/ingest@c42b00b0fcdb, src/fux/ingest/priors.py@8ffcc632a4be]
 laws: [L2, L3, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: ac1b2040378fc57dd2de27be13f1711cde8dd2b8a7560b4af338735584531aa1
+content_sha: 8052ad228e3f29b48502a00f292f1c98ddb9bfc7447df9c96f1adcc3337b036c
 ---
 
 # SR-INGEST — how ingest works
@@ -153,9 +153,17 @@ that at this layer would leave the edge dangling forever, with no error and no
 way to notice.
 
 **1b. Carry an unchanged document's extraction forward** when its content `sha`
-matches the record already in the index, it is a `file:` record with
-`meta: plain`, and the shard header still equals `store.HEADER`. **`fux ingest
---full` re-extracts regardless.**
+matches the record already in the index, it is a `file:` record, and the shard
+header still equals `store.HEADER`. **`fux ingest --full` re-extracts
+regardless.**
+
+🔴 **This read `file:` AND `meta: plain` until 2026-09-20**, and deleting `meta`
+(W-194) made the second clause `False` for every record — **`reused_count` went
+to 0 and every ingest silently became a full ingest.** Nothing raised and the
+index stayed byte-identical, because a full re-extraction produces exactly what
+the carried fields held; the only symptom was the run taking longer.
+`tests/ingest/test_delta.py` caught it **because it asserts the count rather
+than the bytes**, which is the whole reason that test is worth its upkeep.
 
 **The carried set is declared, not written twice.**
 `run.py::EXTRACTED_FIELDS` reads
@@ -172,7 +180,7 @@ The gate is those three conditions together, and each is load-bearing:
 | condition | what it stops |
 |---|---|
 | the content `sha` matches | reusing fields derived from bytes that changed |
-| `file:` and `meta: plain` | a `url:` record, which only reappears on a fenced networked run, and a hashed record whose display fields were deliberately never stored reusably |
+| `file:` | a `url:` record, which only reappears on a fenced networked run, so its bytes are not in hand to carry anything forward from. ⚠ This condition also read `meta: plain` until W-194 (2026-09-20) — see 1b for what deleting the field cost |
 | the header equals `store.HEADER` | **two analyzers inside one index** — undetectable afterwards, and a silent differential-law break |
 
 The header pins `analyzer`, so a format change that moves the analyzer
@@ -522,8 +530,9 @@ find it.
 
 **17a. Terms, never the anchor string.** Link text is a verbatim fragment of
 the source document's prose, so committing it plainly would put content in the
-index ([L2](0004_LAW-2-content-never-durable.md)) and would need L5's
-hashed-meta branch on top. A term hash is a *statistic*, which is what the
+index ([L2](0004_LAW-2-content-never-durable.md)). (It would also have needed
+L5's hashed-meta branch on top — true when this was written; **L5 retired with
+W-194 on 2026-09-20 and L2 is what carries the argument**, untouched.) A term hash is a *statistic*, which is what the
 index holds — and it is the currency `terms` is already written in, so
 `query/scan.py`'s byte prefilter finds an anchor source by the substring check
 it already runs, at no extra cost.
@@ -841,14 +850,13 @@ nobody decided and a test could not name.
   re-resolved records before.
 - **An offline run reads one more committed file** — `.fux/sources/urls` — but
   only in a repo that actually holds `url:` records.
-- **A `hashed` URL record writes a second thing before it is eligible to
-  commit.** The fresh-fetch loop already holds the bytes this run, so it also
-  writes the extracted title to `.fux/runtime/display-cache/`, keyed by `sha` —
-  a write, not a fetch, so ingest's cost does not measurably change and L4 is
-  untouched by construction. A *carried-forward* `hashed` record whose cache has
-  gone cold is refused by `store/writer.py`, naming `fux ingest` as the fix,
-  rather than committing a record no reader can ever show a title for. Full
-  rationale on [SR-RECORD](0109_index-record.md).
+- ⚠ **RETIRED 2026-09-20 (W-194).** This consequence read: *a `hashed` URL
+  record writes a second thing before it is eligible to commit* — the
+  fresh-fetch loop held the bytes, so it also wrote the extracted title to
+  `.fux/runtime/display-cache/` keyed by `sha`, and a carried-forward hashed
+  record whose cache had gone cold was refused by `store/writer.py`. **The
+  cache, the refusal and the record shape are all deleted**, so ingest writes
+  one thing per document again.
 - **Two Unicode defects are fixed and stay fixed.** `parse.py` decodes with
   `"utf-8-sig"`, so a leading BOM is stripped rather than corrupting the
   frontmatter delimiter or the first term; and `gitdir.py`'s `walk_sources`
@@ -1013,7 +1021,7 @@ evidence.*
 - [`src/fux/ingest/run.py`](../src/fux/ingest/run.py)
 - [`src/fux/ingest/skipnotice.py`](../src/fux/ingest/skipnotice.py)
 - [`src/fux/store/recordschema.py`](../src/fux/store/recordschema.py)
-- [`src/fux/store/displaycache.py`](../src/fux/store/displaycache.py)
+- `src/fux/store/displaycache.py` — **DELETED 2026-09-20 (W-194)**, named rather than linked
 - [`tests/ingest/test_delta.py`](../tests/ingest/test_delta.py)
 - [`tests/ingest/test_skipnotice.py`](../tests/ingest/test_skipnotice.py)
 

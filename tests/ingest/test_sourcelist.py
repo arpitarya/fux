@@ -25,7 +25,7 @@ def _defaults(spec=sourcelist.URLS, **overrides):
     """The RESOLVED attribute map for a line that declared `overrides`.
 
     ⚠ **Derived from the spec, never spelled out.** Five tests here hard-coded
-    `{"fetch": ..., "meta": ...}` and went red the day `keep`, `ttl` and
+    `{"fetch": ..., "keep": ...}` and went red the day `keep`, `ttl` and
     `enrich` joined `URLS` (W-100) -- the attributes moved and the tests did
     not. A test written against the *spec* cannot rot that way, which is what
     this module's own docstring claims it does. The set itself is pinned once,
@@ -56,9 +56,9 @@ def test_hash_inside_an_entry_is_not_a_comment():
 
 
 def test_a_fragment_and_a_trailing_comment_coexist():
-    entries = _parse("https://x.test/p#frag  meta=plain  # public page")
+    entries = _parse("https://x.test/p#frag  keep=false  # public page")
     assert entries[0].value == "https://x.test/p#frag"
-    assert entries[0].attrs["meta"] == "plain"
+    assert entries[0].attrs["keep"] == "false"
 
 
 def test_the_loader_dedupes_and_sorts_so_file_order_is_presentation_only():
@@ -70,7 +70,7 @@ def test_the_loader_dedupes_and_sorts_so_file_order_is_presentation_only():
 # -- attributes ------------------------------------------------------------
 
 
-def test_the_url_attribute_set_is_exactly_these_seven():
+def test_the_url_attribute_set_is_exactly_these_six():
     """The one place the URL attribute set is written out, on purpose.
 
     Every other test here derives from the spec so it survives a new
@@ -86,11 +86,10 @@ def test_the_url_attribute_set_is_exactly_these_seven():
     existing clone the moment it upgrades.
     """
     assert [a.name for a in sourcelist.URLS.attributes] == [
-        "fetch", "meta", "keep", "ttl", "enrich", "archived", "update",
+        "fetch", "keep", "ttl", "enrich", "archived", "update",
     ]
     assert _defaults() == {
         "fetch": "http",
-        "meta": "hashed",
         "keep": "true",      # SR-ACQUIRED: retention is on, the store is bounded
         "ttl": "24h",        # SR-URL-FRESHNESS: not 0; see decision on the default
         "enrich": "false",   # SR-PII: enrichment is always opted into
@@ -150,14 +149,14 @@ def test_a_line_stating_every_attribute_is_complete():
     assert entry.is_complete()
 
     # ... and one short of the set is not, whichever one is missing.
-    (partial,) = _parse("https://x.test/a fetch=cdp meta=plain")
-    assert partial.declared == {"fetch", "meta"}
+    (partial,) = _parse("https://x.test/a fetch=cdp keep=false")
+    assert partial.declared == {"fetch", "keep"}
     assert not partial.is_complete()
 
 
 def test_attribute_order_on_a_line_does_not_matter():
-    one = _parse("https://x.test/a fetch=cdp meta=plain")[0]
-    two = _parse("https://x.test/a meta=plain fetch=cdp")[0]
+    one = _parse("https://x.test/a fetch=cdp keep=false")[0]
+    two = _parse("https://x.test/a keep=false fetch=cdp")[0]
     assert one.attrs == two.attrs
 
 
@@ -170,12 +169,14 @@ def test_an_unknown_value_is_a_loud_error_naming_file_and_line():
     """⚠ **This asserted on `fetch=` until W-178 made it typed** (2026-09-15).
 
     `fetch=playwright` is a **legal line** now — it names
-    `.fux/fetchers/playwright.py`, which is the consumer's to write. `meta` is
-    still a genuinely closed policy enum, so the *file:line* half of the
-    contract is asserted on that instead of being deleted with the old value.
+    `.fux/fetchers/playwright.py`, which is the consumer's to write. ⚠ **`meta`
+    carried this assertion from 2026-09-15 until W-194 deleted it** on
+    2026-09-20; `keep` is the closed two-valued enum it moves to, so the
+    *file:line* half of the contract stays asserted rather than deleted with
+    the attribute.
     """
-    with pytest.raises(FuxError, match=r"list:1: meta='raw' is not one of plain, hashed"):
-        _parse("https://x.test/a meta=raw")
+    with pytest.raises(FuxError, match=r"list:1: keep='raw' is not one of true, false"):
+        _parse("https://x.test/a keep=raw")
 
 
 def test_a_fetcher_name_nobody_shipped_parses(tmp_path):
@@ -208,20 +209,20 @@ def test_a_bare_flag_is_not_the_grammar():
 
 
 def test_a_repeated_key_on_one_line_is_an_error():
-    with pytest.raises(FuxError, match=r"list:1: attribute 'meta' is given twice"):
-        _parse("https://x.test/a meta=plain meta=hashed")
+    with pytest.raises(FuxError, match=r"list:1: attribute 'keep' is given twice"):
+        _parse("https://x.test/a keep=true keep=false")
 
 
 def test_a_duplicate_with_conflicting_attributes_names_both_lines():
     with pytest.raises(FuxError, match=r"list:1 and list:2"):
-        _parse("https://x.test/a meta=plain\nhttps://x.test/a meta=hashed")
+        _parse("https://x.test/a keep=true\nhttps://x.test/a keep=false")
 
 
 def test_a_duplicate_is_compared_on_resolved_attributes_not_on_the_text():
     """The reader is lenient: an absent attribute *is* its default."""
-    (entry,) = _parse("https://x.test/a\nhttps://x.test/a meta=hashed")
+    (entry,) = _parse("https://x.test/a\nhttps://x.test/a keep=true")
     assert entry.attrs == _defaults()
-    assert entry.declared == {"meta"}  # the more explicit of the two survives
+    assert entry.declared == {"keep"}  # the more explicit of the two survives
 
 
 # -- the per-file halves ---------------------------------------------------
@@ -239,8 +240,8 @@ def test_dirs_has_its_own_closed_attribute_set():
     # attribute in the spec is present with its default — so this grows
     # whenever the closed set does, which is the point of asserting it.
     assert entry.attrs == {"archived": "true", "enrich": "false"}
-    with pytest.raises(FuxError, match=r"unknown attribute 'meta'"):
-        _parse("docs meta=plain", sourcelist.DIRS)
+    with pytest.raises(FuxError, match=r"unknown attribute 'ttl'"):
+        _parse("docs ttl=7d", sourcelist.DIRS)
 
 
 def test_dirs_rejects_an_absolute_path_or_an_escape():

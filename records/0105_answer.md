@@ -10,7 +10,7 @@ feature: "`fux answer` — one answer, its footing stated, and the report of wha
 owns: []
 laws: [L1, L2, L3]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 912dffddffabfe34f971ef4183578c78d6fc7991ba45b7b088581c0fd05b5bda
+content_sha: 17292ee91ad7e5f44960b590c10b695b932e3ad3bfd0bdc090bdd69ba38b65d4
 ---
 
 # SR-ANSWER — the `answer` verb
@@ -445,6 +445,14 @@ code path by which it could, which is a stronger guarantee than a rule.
 
 
 ### Consequences
+
+- ⚠ **W-194 (2026-09-20) moved a component this record describes, and changed
+  nothing it decides.** Hashed display meta was deleted outright: `meta` and
+  `title_h` left the record shape, `store/displaycache.py` and
+  `assert_meta_policy` were deleted, `fux.index` stepped to **v4**, and law L5
+  retired ([SR-LAW-5](0007_LAW-5-hashed-meta.md), superseded). What moved under `query/__init__.py` is `_resolve_title` / `_title_from` — the P5 display-title lookup, now a no-op because every record carries a readable `title`. `cmd_answer`, the refer/index fork and `_freshness_of` are untouched.
+  **This record's decisions are unaffected**, and the line is here because the
+  freshness gate asks a describer to say so rather than to be silent.
 
 - **`refer_verdicts` reaches an observer as a COUNT PER VERDICT, never a
   citation** (W-170, 2026-09-15). `{"current": 2, "stale": 1}` says how the
