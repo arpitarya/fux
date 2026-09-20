@@ -10,6 +10,24 @@ filed: 2026-09-18
 **Graduated 2026-09-18 → [W-199](../open/W-199-fetcher-routing.md)** (Arpit).
 This file stays the pattern the item points at.
 
+🔴 **Reconciled 2026-09-20 (W-206 B3) — this file and W-199 are ONE spec, and
+they are the pipe PLUS routing.** Arpit ruled twice, two days apart, and the
+rulings **compose**:
+
+| ruling | what it fixed |
+|---|---|
+| **2026-09-18 — the pipe** (this file) | a fetcher emits bytes in a format a decoder reads; the URL line states **both** halves, `fetch=<stem> decoder=<stem>`, written once at `fux add` |
+| **2026-09-20 — routing** (W-199 D1–D4) | how the `fetch=` half gets its value: `[sources.url.routes]` then a module's `ROUTES` claim, **refusing** when nothing matches, and **no default fetcher at all** |
+
+⚠ **`ROUTES` was dropped by the first and revived by the second**, which is why
+**§3 edge case 14 now carries a supersession note** rather than still reading
+*"not built"*. What 2026-09-18 actually dropped was routing *as a substitute for
+stating the fetcher on the line* — and it is not: every line still states both.
+
+**Where each half stands:** routing **shipped 2026-09-20**
+([SR-FETCHER](../../records/0117_fetcher.md) decision 16); the **`decoder=` half
+is W-199 DoD line 10 and is NOT built.** That is why this file stays here.
+
 # The fetcher pipe
 
 ## §1 — For humans
@@ -164,8 +182,25 @@ is lenient*) gains its one exemption and says why.
     the entry with more declared attributes wins (`sourcelist.py:568`). Two
     lines with the same URL and *different* `decoder=` is a **hard error** —
     the two would ingest different bytes for one document id.
-14. **`ROUTES`, host tables, add-time routing.** Not built. Dropped by this
-    ruling; the earlier draft of this file is in git history only.
+14. 🔴 **SUPERSEDED 2026-09-20 — `ROUTES` and host tables are BACK, and built.**
+    This case read *"not built, dropped by this ruling"*, and that was true of
+    the **pipe** ruling of 2026-09-18. Arpit ruled again on **2026-09-20**
+    (W-199 D3): *"I agree with what is recommended. We can have a regex kind of
+    way where a default fetcher can be defined."*
+
+    **The two rulings compose; neither replaces the other.** This file is the
+    **pipe** — `decoder=<stem>` required on every URL line, written once at
+    `fux add`. W-199 is the pipe **plus routing** — `fetch=<stem>` mandatory and
+    **resolved** through `[sources.url.routes]` then a module's `ROUTES` claim,
+    refusing when nothing matches. What the 2026-09-18 ruling actually dropped
+    was *routing as a substitute for stating the fetcher on the line*; every line
+    still states both halves.
+
+    **Where each half lives now:** routing is
+    [SR-FETCHER](../../records/0117_fetcher.md) decision 16 and **shipped
+    2026-09-20**; the `decoder=` half is **W-199 DoD line 10 and is not built**.
+    ⚠ **The edge-case count is 16, not twenty** — W-199 cited *"the twenty edge
+    cases"* and there have only ever been sixteen here.
 15. **The bare-`str` fetcher return** (SR-FETCHER decision 2's transition ramp,
     "already Markdown"). It contradicts *"a fetcher emits a format a decoder
     reads"* — see W-199 §Open question. **Not removed by this item unless

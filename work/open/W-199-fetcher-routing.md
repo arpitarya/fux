@@ -169,9 +169,18 @@ into every URL list — do not start before it is ruled.**
 | default | — | `[sources.url] fetcher` | — |
 
 Key = the URL's **host**, in three pattern shapes: `host`, `*.host`,
-`host:port`. Most specific match wins; an identical pattern in two places is a
-hard error. Full grammar, normalisation and the twenty edge cases are in the
-proposal §2–§3 and are **part of this spec**, not background.
+`host:port` — **and a fourth, `re:<regex>`, added by D3**. Most specific match
+wins among the literals; a regex never competes and a collision is a hard error.
+
+⚠ **The pipe proposal's §2–§3 are part of this spec, and the citation was wrong
+in two ways** (corrected 2026-09-20, W-206 B3). It said *"the twenty edge
+cases"*; there are **sixteen**, under
+[`fetcher-routing`](../proposals/fetcher-routing.md) **§3 — Edge cases the
+builder must handle**, with the grammar in **§2 — The pattern** (its
+*"The line states both halves"*, *"How `fux add` fills the two attributes"* and
+*"Precedence, for the record"* subsections). 🔴 **And its edge case 14 says
+`ROUTES` was dropped** — true of the 2026-09-18 pipe ruling and superseded by
+D3 above; that case now carries the supersession note.
 
 ## 🔴 Decisions for Arpit
 
@@ -232,6 +241,19 @@ Two smaller calls, decided here unless he objects: **collisions are hard errors*
 8. A repo with no routes table and no `ROUTES` behaves byte-for-byte as before,
    **except** the D1 rendering change — and a test states that exception.
 9. Records, skills and docs below are amended in the same change.
+10. 🔴 **`decoder=` per the pipe ruling — NOT BUILT** (added 2026-09-20 by the
+    W-206 review; [`fetcher-routing`](../proposals/fetcher-routing.md) §2).
+    `fux add` fills `decoder=<stem>` from `--decoder` or the response's
+    `Content-Type` through the decoder registry, and **refuses when nothing
+    maps**; ingest decodes by the **declared** stem rather than re-deriving one;
+    `fux doctor` checks every `decoder=` resolves. **A URL line without
+    `decoder=` does not load** — the same break `fetch=` took in D2.
+
+    **This is the half of the pipe ruling that `fetch=`'s half already has**, and
+    the two were built five days apart because the routing ruling arrived in
+    between. ⚠ **W-200's second provenance finding waits on this line** — *"M
+    URL(s) whose declared `decoder=` disagrees with the last observed
+    `content_type`"* reads the field this item has not yet written.
 
 ## In scope / out of scope
 
