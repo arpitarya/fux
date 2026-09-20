@@ -18,7 +18,7 @@ delete its row from `work/compare/README.md`, and bump the DOC-REGISTRY. A doc
 moved without that sentence is indistinguishable from one filed by mistake.
 
 🔴 **There is a SECOND permitted form of that sentence, added 2026-09-20**
-(Arpit's default under [W-206](../../work/open/W-206-compare-and-proposals-sweep.md)):
+(Arpit's default under [W-206](../open/W-206-compare-and-proposals-sweep.md)):
 **"the trigger lives in `<record>` `<decision>`."** A fork whose verdict *and*
 reopen-trigger have both moved into the owning record has nothing left in the
 compare doc that a reader needs — the trigger is still checkable, it is simply

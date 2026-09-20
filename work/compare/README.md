@@ -25,7 +25,7 @@ debate, and the debate without archaeology. v0.26-era compare docs are archived
 at [`archive/v0.26-docs/compare/`](../../archive/v0.26-docs/compare/).
 
 🔴 **Eight live forks, down from 24 on 2026-09-20**
-([W-206](../open/W-206-compare-and-proposals-sweep.md)). **Sixteen left**, and
+([W-206](../../archive/open/W-206-compare-and-proposals-sweep.md)). **Sixteen left**, and
 the split is worth knowing before you go looking for one:
 
 - **Nine were MERGED into their owning record** — the verdict and the

@@ -87,7 +87,7 @@ the defect this ordering exists to make visible.*
   re-derived. §2 is the pattern, §3 the **sixteen** edge cases.
   ✅ **GRADUATED 2026-09-18 → [W-199](../open/W-199-fetcher-routing.md).**
   ⚠ **It had NO row here until 2026-09-20** — the defect this index's ordering
-  note exists to make visible, found by [W-206](../open/W-206-compare-and-proposals-sweep.md).
+  note exists to make visible, found by [W-206](../../archive/open/W-206-compare-and-proposals-sweep.md).
   🔴 **Reconciled in the same change: this file and W-199 are ONE spec.** Arpit
   ruled twice, two days apart, and the rulings compose — the **pipe** (this
   file) and **routing** (W-199 D1–D4, 2026-09-20). Its §3 edge case 14 said

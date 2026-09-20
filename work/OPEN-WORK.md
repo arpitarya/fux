@@ -38,7 +38,6 @@ here. Read that record before changing anything below it.
 
 ### testing
 
-- 🟢 **W-206** · `agent` — the compare/ and proposals/ sweep, ruled 2026-09-20: 24 forks → 8 live (9 merged into their records, 7 archived), 17 proposals → 10 parked (6 archived, fetcher-routing reconciled with W-199). [detail](open/W-206-compare-and-proposals-sweep.md)
 - 🟢 **W-204** · `agent` — phase A filed; next: Claude authors **set 3** (`RF-118`-shaped ids + links), ladder rebuilt, A re-run; then v1.0.0 · v2.0.1 · HEAD; Arpit opens the key; one pass writes the final score. [detail](open/W-204-golden-outputs-scoring-and-version-benchmark.md)
 
 ---
