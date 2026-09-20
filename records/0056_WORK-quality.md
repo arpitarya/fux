@@ -7,10 +7,10 @@ description: "Fux measured rigorously for months and never wrote down what it wa
 status: accepted
 date: 2026-08-27
 feature: the quality contract — what a fux quality number means
-owns: [tools/quality@2cd260debf27]
+owns: [tools/quality@4234bf34b787]
 laws: [L1, L2, L3, L4, L8]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 0a85aa58c6d079c2ec66ca05ac0dd684381ea92676ef23246a865ff31aa3ce30
+content_sha: 7c6412abd8a8db1bf91da561b855fb6f26828828ecf1b657ae1160e76787f192
 ---
 
 # SR-WORK-QUALITY — what "good" means

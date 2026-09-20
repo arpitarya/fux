@@ -7,10 +7,10 @@ description: "The prohibition is law L11 and this record states none of it; what
 status: accepted
 date: 2026-09-18
 feature: the golden benchmark — its two question sets, the key's custody, its guards, what Claude may read, and where the prohibition is stated
-owns: [.claude/hooks/guard-golden-answer.sh@c505d04c0628, .claude/hooks/guard-sealed-key.sh@0d4dd725e7aa, tests/test_golden_key_guards.py@ee33d84f9333, scripts/gen-golden.py@1b2a854c1f75, tests/test_claude_md_golden.py@49db9e6261d8, tools/golden-difficulty@1d500741adb2]
+owns: [.claude/hooks/guard-golden-answer.sh@c505d04c0628, .claude/hooks/guard-sealed-key.sh@0d4dd725e7aa, tests/test_golden_key_guards.py@ee33d84f9333, scripts/gen-golden.py@1b2a854c1f75, tests/test_claude_md_golden.py@49db9e6261d8, tools/golden-difficulty@94f4740b9c02]
 laws: [L0, L11]
 timestamp: 2026-09-15T00:00:00Z
-content_sha: ff643635f8d16c687302b5ef0bf89c7be7c4df9deec631e8db35f80c41cb931a
+content_sha: 34a6d65e4761abd3cdd406f422d74c2712bea796b2e0d9426f11bcb7cb4e901c
 ratifies: "Arpit, 2026-09-15 — W-146 row 17: the prohibition gets a record and CLAUDE.md keeps a generated view; the same day he ruled it into law L11 and then amended it — two question sets, one Claude-authored and one Codex-authored, with both answer halves in his custody and no key file at all"
 ---
 

@@ -7,10 +7,10 @@ description: "An R is a claim frozen before measurement; its threshold may never
 status: accepted
 date: 2026-08-22
 feature: the prediction system — the R ids, their register, the rules that make a frozen claim mean something, and the classification of the runs those claims are measured by
-owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@67d969467bcd, tools/vector-gate@0023bff0cdef]
+owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@a61aaab33755, tools/vector-gate@0023bff0cdef]
 laws: [L3]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 15795511e2ef5837fe4b30c95b0e369b89bb5ed234d3ca54a83e681bf26305b3
+content_sha: 6efa0763c9fe7cfee55feb77f0908eec2bfbd14e375887c21f204b119abf8dfb
 ---
 
 # SR-RS — the R predictions
@@ -516,6 +516,28 @@ until the control is rebuilt on a golden rung in `fux-lab`
 ([`work/golden/`](../work/golden/README.md)). A session that re-runs any of
 the three controls against the old corpus is breaking a law, not reproducing a
 number.
+
+**A reporting artifact landed 2026-09-20, and it is not a control at all**
+(W-204 phase A). [`rung_outputs.py`](../tools/quality-controls/rung_outputs.py)
+turns a golden rung's two hand-offs into one human-readable `RUNG-NNNNN.md`.
+
+- 🔴 **It exists so that a readable document and the machine evidence cannot
+  disagree.** The summary is what people actually read; when it is written by
+  hand beside the rows a scorer will use, the two drift and only the summary is
+  ever checked. It is generated from the hand-offs or it is not filed.
+- 🔴 **It files no correctness and a test asserts that no question section
+  does** — scoped to the sections, because the document's header *states* the
+  prohibition and a check that flagged that would be firing on correct content.
+  *Correct* belongs to a scoring pass over a key, and no Claude session has one
+  ([L11](0012_LAW-11-sealed-answer-key.md)).
+- **It refuses rather than renders** when the two sets share an id — one
+  ambiguous id scores the wrong set and nothing downstream can see it — and it
+  **shouts** when one rung's rows carry more than one `engine_commit`, which
+  means the rung was not produced at a frozen engine.
+- **The index version is read from the rung's shard header, never defaulted.**
+  A header asserting a format nobody checked is exactly the disagreement the
+  tool is built to prevent, and the rungs' format moved `v3` → `v4` on the day
+  it was written.
 
 **Two more `tools/quality-controls/` artifacts landed 2026-08-28, outside the
 three-control table above** — neither is a control on an enrichment arm; both

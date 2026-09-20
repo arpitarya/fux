@@ -59,7 +59,7 @@ def _cite(loc: str) -> dict:
     return {"doc": loc, "lines": ""}
 
 
-def one(tree: Path, rung: str, commit: str, row: dict) -> tuple[dict, dict]:
+def one(tree: Path, rung: str, commit: str, row: dict, repo_head: str = "") -> tuple[dict, dict]:
     """`(prediction, handoff)` for one question. Two calls, one question."""
     asked, ask_ms = call(tree, "ask", row["question"], "--json", "--band", "--top", "10")
     answered, ans_ms = call(tree, "answer", row["question"], "--json")
@@ -93,8 +93,21 @@ def one(tree: Path, rung: str, commit: str, row: dict) -> tuple[dict, dict]:
         "question": row["question"],
         "answer_text": answer_text,
         "citations": citations,
+        # ⚠ `freshness` and `source` are ADDITIVE to prompt 5's schema, added
+        # 2026-09-20 for W-204 phase A: the per-rung document it specifies has to
+        # print a freshness verdict, and deriving the `.md` from anything other
+        # than these rows is what lets a readable summary drift from the machine
+        # evidence. A scorer reads by key, so a superset costs it nothing.
+        "freshness": (citation or {}).get("freshness"),
+        "source": (answered or {}).get("source"),
         "rung": rung,
+        # 🔴 The FROZEN engine sha, not the repository's HEAD. A run that files
+        # one rung per commit moves HEAD between rungs while the engine does
+        # not, and a column that drifted rung to rung would read as eight
+        # engines. `repo_head` carries the commit the call actually ran at, so
+        # nothing is hidden and the two can be compared.
         "engine_commit": commit,
+        "repo_head": repo_head or commit,
         "ask_ms": round(ask_ms, 1),
         "answer_ms": round(ans_ms, 1),
     }
@@ -104,19 +117,29 @@ def one(tree: Path, rung: str, commit: str, row: dict) -> tuple[dict, dict]:
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--rung", required=True)
-    ap.add_argument("--dest", type=Path, required=True)
+    ap.add_argument("--dest", type=Path, default=None,
+                    help="a run directory; the files land in <dest>/evidence/")
+    ap.add_argument("--evidence", type=Path, default=None,
+                    help="the evidence directory itself — what a multi-rung run uses, "
+                         "so each rung gets evidence/<rung>/ rather than eight runs")
     ap.add_argument("--limit", type=int, default=0, help="0 = every question")
+    ap.add_argument("--engine-commit", default=None,
+                    help="the FROZEN engine sha to stamp on every row; defaults to git HEAD. "
+                         "Give it when the run spans several commits and the engine does not.")
     args = ap.parse_args(argv)
+    if bool(args.dest) == bool(args.evidence):
+        ap.error("give exactly one of --dest and --evidence")
 
     tree = CORPORA / args.rung
     if not (tree / ".fux" / "index").is_dir():
         print(f"no index at {tree}", file=sys.stderr)
         return 1
-    commit = subprocess.run(
+    repo_head = subprocess.run(
         ["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True
     ).stdout.strip()
+    commit = args.engine_commit or repo_head
 
-    evidence = args.dest / "evidence"
+    evidence = args.evidence or (args.dest / "evidence")
     evidence.mkdir(parents=True, exist_ok=True)
 
     for n in (1, 2):
@@ -128,7 +151,7 @@ def main(argv: list[str] | None = None) -> int:
 
         predictions, handoffs = [], []
         for i, row in enumerate(rows, 1):
-            p, h = one(tree, args.rung, commit, row)
+            p, h = one(tree, args.rung, commit, row, repo_head)
             predictions.append(p)
             handoffs.append(h)
             if i % 25 == 0:
