@@ -10,7 +10,7 @@ feature: the authority of records — where a rule lives, which record wins, and
 owns: [scripts/gen-laws.py@4cbb87ce8651, scripts/gen-components.py@f698b5c2305a, tests/test_claude_md_laws.py@0d11020f49f7, tests/test_record_components.py@44f91ccdd550]
 laws: [L0]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: 44b1655e0253bc9699b4d1edebabd0440804ce3a2231bf211ea4fb10ad17e5d5
+content_sha: 585b76d026cc49492ca911d75f1fec5b1f30b7eb16d529884fa65a88dca66ceb
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -274,8 +274,7 @@ permission is the test, not the generation.
 
 **5a. This record owns the generators and the binds that make the permission
 real** — **Arpit's ruling of 2026-09-21** (*review all the records and link
-files or folders into each and every SR*), dispositioned as
-[W-208](../work/open/W-208-every-record-names-its-files.md). ⚠ **The law text in
+files or folders into each and every SR*), dispositioned as **W-208**, now closed. ⚠ **The law text in
 §2 is untouched**; what this adds is which components this record answers for: [`scripts/gen-laws.py`](../scripts/gen-laws.py) with
 [`tests/test_claude_md_laws.py`](../tests/test_claude_md_laws.py), and
 [`scripts/gen-components.py`](../scripts/gen-components.py) with
