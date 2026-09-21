@@ -1,0 +1,104 @@
+{
+ "of": 6,
+ "reachable": 5,
+ "rows": [
+  {
+   "declared_by": [
+    "seed/01-sop-temperature-excursion.md",
+    "seed/archive/a01-sop-temperature-excursion-rev2.md"
+   ],
+   "identifier": "QCL-QA-SOP-17",
+   "n_results": 50,
+   "ranks": {
+    "seed/01-sop-temperature-excursion.md": 3,
+    "seed/archive/a01-sop-temperature-excursion-rev2.md": 13
+   },
+   "reachable": true,
+   "top3": [
+    "seed/14-customer-notification-matrix-2025.md",
+    "seed/15-customer-notification-matrix-2026.md",
+    "seed/01-sop-temperature-excursion.md"
+   ]
+  },
+  {
+   "declared_by": [
+    "seed/11-decision-telematics-vendor-2026.md"
+   ],
+   "identifier": "QCL-IT-ADR-08",
+   "n_results": 48,
+   "ranks": {
+    "seed/11-decision-telematics-vendor-2026.md": null
+   },
+   "reachable": false,
+   "top3": [
+    "seed/02-sensor-thresholds.yaml",
+    "seed/05-decision-telematics-vendor-2023.md",
+    "ext/archive/a19-norvell-telematics-decision-2022.md"
+   ]
+  },
+  {
+   "declared_by": [
+    "seed/13-dock-scheduling-rules-2026.md"
+   ],
+   "identifier": "QCL-OPS-DOCK-03",
+   "n_results": 50,
+   "ranks": {
+    "seed/13-dock-scheduling-rules-2026.md": 2
+   },
+   "reachable": true,
+   "top3": [
+    "seed/01-sop-temperature-excursion.md",
+    "seed/13-dock-scheduling-rules-2026.md",
+    "seed/03-postmortem-nagpur-vaccine-excursion.md"
+   ]
+  },
+  {
+   "declared_by": [
+    "seed/14-customer-notification-matrix-2025.md"
+   ],
+   "identifier": "QCL-CS-MTX-02",
+   "n_results": 46,
+   "ranks": {
+    "seed/14-customer-notification-matrix-2025.md": 3
+   },
+   "reachable": true,
+   "top3": [
+    "seed/02-sensor-thresholds.yaml",
+    "seed/01-sop-temperature-excursion.md",
+    "seed/14-customer-notification-matrix-2025.md"
+   ]
+  },
+  {
+   "declared_by": [
+    "seed/15-customer-notification-matrix-2026.md"
+   ],
+   "identifier": "QCL-CS-MTX-03",
+   "n_results": 42,
+   "ranks": {
+    "seed/15-customer-notification-matrix-2026.md": 3
+   },
+   "reachable": true,
+   "top3": [
+    "seed/01-sop-temperature-excursion.md",
+    "seed/14-customer-notification-matrix-2025.md",
+    "seed/15-customer-notification-matrix-2026.md"
+   ]
+  },
+  {
+   "declared_by": [
+    "seed/22-cold-chain-document-map.md"
+   ],
+   "identifier": "QCL-QA-MAP-01",
+   "n_results": 50,
+   "ranks": {
+    "seed/22-cold-chain-document-map.md": 2
+   },
+   "reachable": true,
+   "top3": [
+    "seed/02-sensor-thresholds.yaml",
+    "seed/22-cold-chain-document-map.md",
+    "seed/01-sop-temperature-excursion.md"
+   ]
+  }
+ ]
+}

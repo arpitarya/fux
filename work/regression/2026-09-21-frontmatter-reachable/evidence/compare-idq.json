@@ -1,0 +1,72 @@
+{
+ "by_family": {
+  "frontmatter-only": {
+   "broke": 0,
+   "fixed": 1,
+   "n": 1,
+   "net": 1
+  },
+  "pre-set-3": {
+   "broke": 0,
+   "fixed": 4,
+   "n": 33,
+   "net": 4
+  },
+  "sibling-proj": {
+   "broke": 0,
+   "fixed": 0,
+   "n": 3,
+   "net": 0
+  },
+  "sibling-rf": {
+   "broke": 0,
+   "fixed": 0,
+   "n": 3,
+   "net": 0
+  },
+  "sibling-tsl": {
+   "broke": 0,
+   "fixed": 0,
+   "n": 2,
+   "net": 0
+  },
+  "unique": {
+   "broke": 0,
+   "fixed": 0,
+   "n": 1,
+   "net": 0
+  }
+ },
+ "rank_primary_bare": {
+  "after_hits": 35,
+  "before_hits": 30,
+  "broke": [],
+  "discordant": 5,
+  "fixed": [
+   "idq-12",
+   "idq-13",
+   "idq-17",
+   "idq-18",
+   "idq-43"
+  ],
+  "n": 43,
+  "net": 5
+ },
+ "rank_primary_question": {
+  "after_hits": 39,
+  "before_hits": 33,
+  "broke": [],
+  "discordant": 6,
+  "fixed": [
+   "idq-12",
+   "idq-13",
+   "idq-15",
+   "idq-17",
+   "idq-18",
+   "idq-43"
+  ],
+  "n": 43,
+  "net": 6
+ },
+ "rung": "rung-01000"
+}

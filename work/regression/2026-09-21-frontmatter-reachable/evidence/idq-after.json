@@ -1,0 +1,733 @@
+{
+ "fux": "/Users/arpitarya/my_programs/fux/.venv/bin/fux",
+ "rows": [
+  {
+   "family": "pre-set-3",
+   "id": "idq-01",
+   "identifier": "BV-4437",
+   "n_results_bare": 1,
+   "n_results_question": 20,
+   "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md",
+   "rank_primary_bare": 1,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/03-postmortem-nagpur-vaccine-excursion.md"
+   ]
+  },
+  {
+   "family": "pre-set-3",
+   "id": "idq-02",
+   "identifier": "BV-QA-2025-0312",
+   "n_results_bare": 20,
+   "n_results_question": 20,
+   "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md",
+   "rank_primary_bare": 1,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/03-postmortem-nagpur-vaccine-excursion.md",
+    "seed/01-sop-temperature-excursion.md",
+    "seed/14-customer-notification-matrix-2025.md"
+   ]
+  },
+  {
+   "family": "pre-set-3",
+   "id": "idq-03",
+   "identifier": "CBE-FROZEN",
+   "n_results_bare": 20,
+   "n_results_question": 20,
+   "primary": "seed/02-sensor-thresholds.yaml",
+   "rank_primary_bare": 1,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/02-sensor-thresholds.yaml",
+    "seed/18-reefer-RF-120-asset-file.md",
+    "ext/sibling/00349-postmortem.md"
+   ]
+  },
+  {
+   "family": "pre-set-3",
+   "id": "idq-04",
+   "identifier": "CBE-PHARMA",
+   "n_results_bare": 20,
+   "n_results_question": 20,
+   "primary": "seed/02-sensor-thresholds.yaml",
+   "rank_primary_bare": 1,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/02-sensor-thresholds.yaml",
+    "seed/01-sop-temperature-excursion.md",
+    "seed/20-project-PROJ-124-red-sleeve-and-passive-shippers.md"
+   ]
+  },
+  {
+   "family": "pre-set-3",
+   "id": "idq-05",
+   "identifier": "G-COLD-1",
+   "n_results_bare": 20,
+   "n_results_question": 20,
+   "primary": "seed/02-sensor-thresholds.yaml",
+   "rank_primary_bare": 1,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/02-sensor-thresholds.yaml",
+    "ext/sibling/00759-sop.md",
+    "ext/sibling/00753-sop.md"
+   ]
+  },
+  {
+   "family": "pre-set-3",
+   "id": "idq-06",
+   "identifier": "G-DAIRY-2",
+   "n_results_bare": 20,
+   "n_results_question": 20,
+   "primary": "seed/02-sensor-thresholds.yaml",
+   "rank_primary_bare": 1,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/02-sensor-thresholds.yaml",
+    "seed/01-sop-temperature-excursion.md",
+    "seed/15-customer-notification-matrix-2026.md"
+   ]
+  },
+  {
+   "family": "pre-set-3",
+   "id": "idq-07",
+   "identifier": "GHY-7",
+   "n_results_bare": 20,
+   "n_results_question": 20,
+   "primary": "seed/04-night-shift-handover-log.txt",
+   "rank_primary_bare": 2,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/02-sensor-thresholds.yaml",
+    "seed/04-night-shift-handover-log.txt",
+    "seed/08-driver-hours-and-safety-policy.md"
+   ]
+  },
+  {
+   "family": "pre-set-3",
+   "id": "idq-08",
+   "identifier": "KFS-2014",
+   "n_results_bare": 6,
+   "n_results_question": 20,
+   "primary": "seed/02-sensor-thresholds.yaml",
+   "rank_primary_bare": 3,
+   "rank_primary_question": 3,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/archive/a02-kalpa-alert-routing-guide-2021.md",
+    "seed/archive/a06-reefer-RF-117-retired.md",
+    "seed/02-sensor-thresholds.yaml"
+   ]
+  },
+  {
+   "family": "pre-set-3",
+   "id": "idq-09",
+   "identifier": "KV-NGP-C2-07",
+   "n_results_bare": 20,
+   "n_results_question": 20,
+   "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md",
+   "rank_primary_bare": 1,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/03-postmortem-nagpur-vaccine-excursion.md",
+    "seed/02-sensor-thresholds.yaml",
+    "seed/06-re-fw-telematics-cutover.eml"
+   ]
+  },
+  {
+   "family": "pre-set-3",
+   "id": "idq-10",
+   "identifier": "NGP-MNT-552",
+   "n_results_bare": 11,
+   "n_results_question": 20,
+   "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md",
+   "rank_primary_bare": 1,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/03-postmortem-nagpur-vaccine-excursion.md",
+    "seed/16-reefer-RF-118-asset-file.md",
+    "seed/10-new-joiner-faq.md"
+   ]
+  },
+  {
+   "family": "pre-set-3",
+   "id": "idq-11",
+   "identifier": "NGP-PNR-18",
+   "n_results_bare": 20,
+   "n_results_question": 20,
+   "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md",
+   "rank_primary_bare": 1,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/03-postmortem-nagpur-vaccine-excursion.md",
+    "seed/02-sensor-thresholds.yaml",
+    "seed/09-dock-scheduling-wiki-export.html"
+   ]
+  },
+  {
+   "family": "pre-set-3",
+   "id": "idq-12",
+   "identifier": "QCL-CS-MTX-02",
+   "n_results_bare": 20,
+   "n_results_question": 20,
+   "primary": "seed/14-customer-notification-matrix-2025.md",
+   "rank_primary_bare": 1,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/14-customer-notification-matrix-2025.md",
+    "seed/15-customer-notification-matrix-2026.md",
+    "ext/sibling/a08-sundari-notification-matrix.md"
+   ]
+  },
+  {
+   "family": "pre-set-3",
+   "id": "idq-13",
+   "identifier": "QCL-CS-MTX-03",
+   "n_results_bare": 20,
+   "n_results_question": 20,
+   "primary": "seed/15-customer-notification-matrix-2026.md",
+   "rank_primary_bare": 1,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/15-customer-notification-matrix-2026.md",
+    "seed/14-customer-notification-matrix-2025.md",
+    "seed/22-cold-chain-document-map.md"
+   ]
+  },
+  {
+   "family": "pre-set-3",
+   "id": "idq-14",
+   "identifier": "QCL-F-09",
+   "n_results_bare": 20,
+   "n_results_question": 20,
+   "primary": "seed/01-sop-temperature-excursion.md",
+   "rank_primary_bare": 1,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/01-sop-temperature-excursion.md",
+    "seed/14-customer-notification-matrix-2025.md",
+    "seed/22-cold-chain-document-map.md"
+   ]
+  },
+  {
+   "family": "pre-set-3",
+   "id": "idq-15",
+   "identifier": "QCL-F-17",
+   "n_results_bare": 20,
+   "n_results_question": 20,
+   "primary": "seed/01-sop-temperature-excursion.md",
+   "rank_primary_bare": 3,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/14-customer-notification-matrix-2025.md",
+    "seed/15-customer-notification-matrix-2026.md",
+    "seed/01-sop-temperature-excursion.md"
+   ]
+  },
+  {
+   "family": "pre-set-3",
+   "id": "idq-16",
+   "identifier": "QCL-F-22",
+   "n_results_bare": 20,
+   "n_results_question": 20,
+   "primary": "seed/01-sop-temperature-excursion.md",
+   "rank_primary_bare": 1,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/01-sop-temperature-excursion.md",
+    "seed/14-customer-notification-matrix-2025.md",
+    "seed/22-cold-chain-document-map.md"
+   ]
+  },
+  {
+   "family": "pre-set-3",
+   "id": "idq-17",
+   "identifier": "QCL-IT-ADR-08",
+   "n_results_bare": 20,
+   "n_results_question": 20,
+   "primary": "seed/11-decision-telematics-vendor-2026.md",
+   "rank_primary_bare": 1,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/11-decision-telematics-vendor-2026.md",
+    "seed/13-dock-scheduling-rules-2026.md",
+    "seed/22-cold-chain-document-map.md"
+   ]
+  },
+  {
+   "family": "pre-set-3",
+   "id": "idq-18",
+   "identifier": "QCL-OPS-DOCK-03",
+   "n_results_bare": 20,
+   "n_results_question": 20,
+   "primary": "seed/13-dock-scheduling-rules-2026.md",
+   "rank_primary_bare": 1,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/13-dock-scheduling-rules-2026.md",
+    "seed/22-cold-chain-document-map.md",
+    "seed/15-customer-notification-matrix-2026.md"
+   ]
+  },
+  {
+   "family": "pre-set-3",
+   "id": "idq-19",
+   "identifier": "QCL-QA-SOP-17",
+   "n_results_bare": 20,
+   "n_results_question": 20,
+   "primary": "seed/01-sop-temperature-excursion.md",
+   "rank_primary_bare": 5,
+   "rank_primary_question": 5,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/15-customer-notification-matrix-2026.md",
+    "seed/14-customer-notification-matrix-2025.md",
+    "seed/22-cold-chain-document-map.md"
+   ]
+  },
+  {
+   "family": "pre-set-3",
+   "id": "idq-20",
+   "identifier": "QF-FY26-TSL-044",
+   "n_results_bare": 9,
+   "n_results_question": 20,
+   "primary": "seed/06-re-fw-telematics-cutover.eml",
+   "rank_primary_bare": 2,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/11-decision-telematics-vendor-2026.md",
+    "seed/06-re-fw-telematics-cutover.eml",
+    "seed/21-project-PROJ-125-kalpa-decommission.md"
+   ]
+  },
+  {
+   "family": "pre-set-3",
+   "id": "idq-21",
+   "identifier": "RF-118",
+   "n_results_bare": 12,
+   "n_results_question": 20,
+   "primary": "seed/16-reefer-RF-118-asset-file.md",
+   "rank_primary_bare": 1,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/16-reefer-RF-118-asset-file.md",
+    "seed/archive/a06-reefer-RF-117-retired.md",
+    "seed/22-cold-chain-document-map.md"
+   ]
+  },
+  {
+   "family": "pre-set-3",
+   "id": "idq-22",
+   "identifier": "RF-203",
+   "n_results_bare": 16,
+   "n_results_question": 20,
+   "primary": "seed/04-night-shift-handover-log.txt",
+   "rank_primary_bare": 1,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/04-night-shift-handover-log.txt",
+    "seed/16-reefer-RF-118-asset-file.md",
+    "seed/22-cold-chain-document-map.md"
+   ]
+  },
+  {
+   "family": "pre-set-3",
+   "id": "idq-23",
+   "identifier": "RF-221",
+   "n_results_bare": 13,
+   "n_results_question": 20,
+   "primary": "seed/04-night-shift-handover-log.txt",
+   "rank_primary_bare": 3,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/02-sensor-thresholds.yaml",
+    "seed/16-reefer-RF-118-asset-file.md",
+    "seed/04-night-shift-handover-log.txt"
+   ]
+  },
+  {
+   "family": "pre-set-3",
+   "id": "idq-24",
+   "identifier": "ROTA-9A",
+   "n_results_bare": 3,
+   "n_results_question": 20,
+   "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md",
+   "rank_primary_bare": 1,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/03-postmortem-nagpur-vaccine-excursion.md",
+    "seed/archive/a02-kalpa-alert-routing-guide-2021.md",
+    "seed/05-decision-telematics-vendor-2023.md"
+   ]
+  },
+  {
+   "family": "pre-set-3",
+   "id": "idq-25",
+   "identifier": "ROTA-9B",
+   "n_results_bare": 3,
+   "n_results_question": 20,
+   "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md",
+   "rank_primary_bare": 1,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/03-postmortem-nagpur-vaccine-excursion.md",
+    "seed/archive/a02-kalpa-alert-routing-guide-2021.md",
+    "seed/05-decision-telematics-vendor-2023.md"
+   ]
+  },
+  {
+   "family": "pre-set-3",
+   "id": "idq-26",
+   "identifier": "SANDHU-EXC",
+   "n_results_bare": 6,
+   "n_results_question": 20,
+   "primary": "seed/08-driver-hours-and-safety-policy.md",
+   "rank_primary_bare": 2,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/06-re-fw-telematics-cutover.eml",
+    "seed/08-driver-hours-and-safety-policy.md",
+    "seed/04-night-shift-handover-log.txt"
+   ]
+  },
+  {
+   "family": "pre-set-3",
+   "id": "idq-27",
+   "identifier": "TSL-NGP-C2-07",
+   "n_results_bare": 20,
+   "n_results_question": 20,
+   "primary": "seed/02-sensor-thresholds.yaml",
+   "rank_primary_bare": 1,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/02-sensor-thresholds.yaml",
+    "seed/06-re-fw-telematics-cutover.eml",
+    "seed/03-postmortem-nagpur-vaccine-excursion.md"
+   ]
+  },
+  {
+   "family": "pre-set-3",
+   "id": "idq-28",
+   "identifier": "TSL-NGP-C3-02",
+   "n_results_bare": 20,
+   "n_results_question": 20,
+   "primary": "seed/02-sensor-thresholds.yaml",
+   "rank_primary_bare": 1,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/02-sensor-thresholds.yaml",
+    "seed/04-night-shift-handover-log.txt",
+    "seed/16-reefer-RF-118-asset-file.md"
+   ]
+  },
+  {
+   "family": "pre-set-3",
+   "id": "idq-29",
+   "identifier": "TSL-NGP-F1-04",
+   "n_results_bare": 20,
+   "n_results_question": 20,
+   "primary": "seed/02-sensor-thresholds.yaml",
+   "rank_primary_bare": 1,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/02-sensor-thresholds.yaml",
+    "seed/04-night-shift-handover-log.txt",
+    "seed/06-re-fw-telematics-cutover.eml"
+   ]
+  },
+  {
+   "family": "pre-set-3",
+   "id": "idq-30",
+   "identifier": "TSL-RF-118-A",
+   "n_results_bare": 14,
+   "n_results_question": 20,
+   "primary": "seed/02-sensor-thresholds.yaml",
+   "rank_primary_bare": 3,
+   "rank_primary_question": 5,
+   "rank_relevant_question": 5,
+   "top3_bare": [
+    "seed/16-reefer-RF-118-asset-file.md",
+    "seed/17-reefer-RF-119-asset-file.md",
+    "seed/02-sensor-thresholds.yaml"
+   ]
+  },
+  {
+   "family": "pre-set-3",
+   "id": "idq-31",
+   "identifier": "TSL-RF-221-A",
+   "n_results_bare": 15,
+   "n_results_question": 20,
+   "primary": "seed/02-sensor-thresholds.yaml",
+   "rank_primary_bare": 1,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/02-sensor-thresholds.yaml",
+    "seed/18-reefer-RF-120-asset-file.md",
+    "seed/04-night-shift-handover-log.txt"
+   ]
+  },
+  {
+   "family": "pre-set-3",
+   "id": "idq-32",
+   "identifier": "WIKI-NGP-DOCK-12",
+   "n_results_bare": 20,
+   "n_results_question": 20,
+   "primary": "seed/archive/a03-dock-scheduling-wiki-2021.html",
+   "rank_primary_bare": 1,
+   "rank_primary_question": 2,
+   "rank_relevant_question": 2,
+   "top3_bare": [
+    "seed/archive/a03-dock-scheduling-wiki-2021.html",
+    "seed/09-dock-scheduling-wiki-export.html",
+    "seed/13-dock-scheduling-rules-2026.md"
+   ]
+  },
+  {
+   "family": "pre-set-3",
+   "id": "idq-33",
+   "identifier": "WIKI-NGP-DOCK-41",
+   "n_results_bare": 20,
+   "n_results_question": 20,
+   "primary": "seed/09-dock-scheduling-wiki-export.html",
+   "rank_primary_bare": 1,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/09-dock-scheduling-wiki-export.html",
+    "seed/archive/a03-dock-scheduling-wiki-2021.html",
+    "seed/13-dock-scheduling-rules-2026.md"
+   ]
+  },
+  {
+   "family": "sibling-rf",
+   "id": "idq-34",
+   "identifier": "RF-117",
+   "n_results_bare": 10,
+   "n_results_question": 20,
+   "primary": "seed/archive/a06-reefer-RF-117-retired.md",
+   "rank_primary_bare": 1,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/archive/a06-reefer-RF-117-retired.md",
+    "seed/22-cold-chain-document-map.md",
+    "seed/16-reefer-RF-118-asset-file.md"
+   ]
+  },
+  {
+   "family": "sibling-rf",
+   "id": "idq-35",
+   "identifier": "RF-119",
+   "n_results_bare": 10,
+   "n_results_question": 20,
+   "primary": "seed/17-reefer-RF-119-asset-file.md",
+   "rank_primary_bare": 1,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/17-reefer-RF-119-asset-file.md",
+    "seed/22-cold-chain-document-map.md",
+    "seed/18-reefer-RF-120-asset-file.md"
+   ]
+  },
+  {
+   "family": "sibling-rf",
+   "id": "idq-36",
+   "identifier": "RF-120",
+   "n_results_bare": 20,
+   "n_results_question": 20,
+   "primary": "seed/18-reefer-RF-120-asset-file.md",
+   "rank_primary_bare": 1,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/18-reefer-RF-120-asset-file.md",
+    "seed/22-cold-chain-document-map.md",
+    "seed/16-reefer-RF-118-asset-file.md"
+   ]
+  },
+  {
+   "family": "sibling-proj",
+   "id": "idq-37",
+   "identifier": "PROJ-123",
+   "n_results_bare": 5,
+   "n_results_question": 20,
+   "primary": "seed/19-project-PROJ-123-dockwise-rollout.md",
+   "rank_primary_bare": 1,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/19-project-PROJ-123-dockwise-rollout.md",
+    "seed/22-cold-chain-document-map.md",
+    "seed/21-project-PROJ-125-kalpa-decommission.md"
+   ]
+  },
+  {
+   "family": "sibling-proj",
+   "id": "idq-38",
+   "identifier": "PROJ-124",
+   "n_results_bare": 6,
+   "n_results_question": 20,
+   "primary": "seed/20-project-PROJ-124-red-sleeve-and-passive-shippers.md",
+   "rank_primary_bare": 1,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/20-project-PROJ-124-red-sleeve-and-passive-shippers.md",
+    "seed/22-cold-chain-document-map.md",
+    "seed/19-project-PROJ-123-dockwise-rollout.md"
+   ]
+  },
+  {
+   "family": "sibling-proj",
+   "id": "idq-39",
+   "identifier": "PROJ-125",
+   "n_results_bare": 6,
+   "n_results_question": 9,
+   "primary": "seed/21-project-PROJ-125-kalpa-decommission.md",
+   "rank_primary_bare": 1,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/21-project-PROJ-125-kalpa-decommission.md",
+    "seed/22-cold-chain-document-map.md",
+    "seed/19-project-PROJ-123-dockwise-rollout.md"
+   ]
+  },
+  {
+   "family": "sibling-tsl",
+   "id": "idq-40",
+   "identifier": "TSL-RF-119-A",
+   "n_results_bare": 12,
+   "n_results_question": 20,
+   "primary": "seed/17-reefer-RF-119-asset-file.md",
+   "rank_primary_bare": 1,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/17-reefer-RF-119-asset-file.md",
+    "seed/22-cold-chain-document-map.md",
+    "seed/18-reefer-RF-120-asset-file.md"
+   ]
+  },
+  {
+   "family": "sibling-tsl",
+   "id": "idq-41",
+   "identifier": "TSL-RF-120-A",
+   "n_results_bare": 20,
+   "n_results_question": 20,
+   "primary": "seed/18-reefer-RF-120-asset-file.md",
+   "rank_primary_bare": 1,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/18-reefer-RF-120-asset-file.md",
+    "seed/22-cold-chain-document-map.md",
+    "seed/16-reefer-RF-118-asset-file.md"
+   ]
+  },
+  {
+   "family": "unique",
+   "id": "idq-42",
+   "identifier": "NGP-MNT-731",
+   "n_results_bare": 10,
+   "n_results_question": 20,
+   "primary": "seed/16-reefer-RF-118-asset-file.md",
+   "rank_primary_bare": 1,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/16-reefer-RF-118-asset-file.md",
+    "seed/03-postmortem-nagpur-vaccine-excursion.md",
+    "seed/10-new-joiner-faq.md"
+   ]
+  },
+  {
+   "family": "frontmatter-only",
+   "id": "idq-43",
+   "identifier": "QCL-QA-MAP-01",
+   "n_results_bare": 20,
+   "n_results_question": 20,
+   "primary": "seed/22-cold-chain-document-map.md",
+   "rank_primary_bare": 1,
+   "rank_primary_question": 1,
+   "rank_relevant_question": 1,
+   "top3_bare": [
+    "seed/22-cold-chain-document-map.md",
+    "seed/02-sensor-thresholds.yaml",
+    "seed/01-sop-temperature-excursion.md"
+   ]
+  }
+ ],
+ "rung": "rung-01000",
+ "summary": {
+  "bare_hit_at_1": 35,
+  "bare_hit_at_3": 42,
+  "bare_miss": 0,
+  "by_family": {
+   "frontmatter-only": {
+    "bare_hit_at_1": 1,
+    "bare_miss": 0,
+    "n": 1
+   },
+   "pre-set-3": {
+    "bare_hit_at_1": 25,
+    "bare_miss": 0,
+    "n": 33
+   },
+   "sibling-proj": {
+    "bare_hit_at_1": 3,
+    "bare_miss": 0,
+    "n": 3
+   },
+   "sibling-rf": {
+    "bare_hit_at_1": 3,
+    "bare_miss": 0,
+    "n": 3
+   },
+   "sibling-tsl": {
+    "bare_hit_at_1": 2,
+    "bare_miss": 0,
+    "n": 2
+   },
+   "unique": {
+    "bare_hit_at_1": 1,
+    "bare_miss": 0,
+    "n": 1
+   }
+  },
+  "n": 43,
+  "question_hit_at_1": 39,
+  "question_hit_at_3": 41,
+  "question_miss": 0
+ }
+}

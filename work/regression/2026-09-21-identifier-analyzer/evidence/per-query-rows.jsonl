@@ -1,0 +1,378 @@
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "BV-4437", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "BV-QA-2025-0312", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "CBE-FROZEN", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "CBE-PHARMA", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "G-COLD-1", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "G-DAIRY-2", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "GHY-7", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "KFS-2014", "rank_primary_bare": 3, "rank_primary_question": 3, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "KV-NGP-C2-07", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "NGP-MNT-552", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "NGP-PNR-18", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-CS-MTX-02", "rank_primary_bare": 3, "rank_primary_question": 13, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-CS-MTX-03", "rank_primary_bare": 4, "rank_primary_question": 4, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-F-09", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-F-17", "rank_primary_bare": 3, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-F-22", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-IT-ADR-08", "rank_primary_bare": null, "rank_primary_question": null, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-OPS-DOCK-03", "rank_primary_bare": 5, "rank_primary_question": 4, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-QA-SOP-17", "rank_primary_bare": 3, "rank_primary_question": 3, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QF-FY26-TSL-044", "rank_primary_bare": 2, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "RF-118", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "RF-203", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "RF-221", "rank_primary_bare": 3, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "ROTA-9A", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "ROTA-9B", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "SANDHU-EXC", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "TSL-NGP-C2-07", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "TSL-NGP-C3-02", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "TSL-NGP-F1-04", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "TSL-RF-118-A", "rank_primary_bare": 2, "rank_primary_question": 5, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "TSL-RF-221-A", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "WIKI-NGP-DOCK-12", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "WIKI-NGP-DOCK-41", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "sibling-rf", "query": "RF-117", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "sibling-rf", "query": "RF-119", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "sibling-rf", "query": "RF-120", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "sibling-proj", "query": "PROJ-123", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "sibling-proj", "query": "PROJ-124", "rank_primary_bare": 1, "rank_primary_question": 2, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "sibling-proj", "query": "PROJ-125", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "sibling-tsl", "query": "TSL-RF-119-A", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "sibling-tsl", "query": "TSL-RF-120-A", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "unique", "query": "NGP-MNT-731", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "frontmatter-only", "query": "QCL-QA-MAP-01", "rank_primary_bare": 2, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "BV-4437", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "BV-QA-2025-0312", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "CBE-FROZEN", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "CBE-PHARMA", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "G-COLD-1", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "G-DAIRY-2", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "GHY-7", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "KFS-2014", "rank_primary_bare": 3, "rank_primary_question": 3, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "KV-NGP-C2-07", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "NGP-MNT-552", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "NGP-PNR-18", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-CS-MTX-02", "rank_primary_bare": 3, "rank_primary_question": 13, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-CS-MTX-03", "rank_primary_bare": 4, "rank_primary_question": 4, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-F-09", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-F-17", "rank_primary_bare": 3, "rank_primary_question": 3, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-F-22", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-IT-ADR-08", "rank_primary_bare": null, "rank_primary_question": null, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-OPS-DOCK-03", "rank_primary_bare": 5, "rank_primary_question": 4, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-QA-SOP-17", "rank_primary_bare": 5, "rank_primary_question": 5, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QF-FY26-TSL-044", "rank_primary_bare": 2, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "RF-118", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "RF-203", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "RF-221", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "ROTA-9A", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "ROTA-9B", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "SANDHU-EXC", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "TSL-NGP-C2-07", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "TSL-NGP-C3-02", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "TSL-NGP-F1-04", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "TSL-RF-118-A", "rank_primary_bare": 2, "rank_primary_question": 2, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "TSL-RF-221-A", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "WIKI-NGP-DOCK-12", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "WIKI-NGP-DOCK-41", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "sibling-rf", "query": "RF-117", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "sibling-rf", "query": "RF-119", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "sibling-rf", "query": "RF-120", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "sibling-proj", "query": "PROJ-123", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "sibling-proj", "query": "PROJ-124", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "sibling-proj", "query": "PROJ-125", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "sibling-tsl", "query": "TSL-RF-119-A", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "sibling-tsl", "query": "TSL-RF-120-A", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "unique", "query": "NGP-MNT-731", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "after", "endpoint": "identifier rank", "family": "frontmatter-only", "query": "QCL-QA-MAP-01", "rank_primary_bare": 2, "rank_primary_question": 1, "rung": "rung-00100"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "BV-4437", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "BV-QA-2025-0312", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "CBE-FROZEN", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "CBE-PHARMA", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "G-COLD-1", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "G-DAIRY-2", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "GHY-7", "rank_primary_bare": 2, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "KFS-2014", "rank_primary_bare": 3, "rank_primary_question": 3, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "KV-NGP-C2-07", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "NGP-MNT-552", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "NGP-PNR-18", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-CS-MTX-02", "rank_primary_bare": 3, "rank_primary_question": 11, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-CS-MTX-03", "rank_primary_bare": 4, "rank_primary_question": 4, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-F-09", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-F-17", "rank_primary_bare": 3, "rank_primary_question": 3, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-F-22", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-IT-ADR-08", "rank_primary_bare": null, "rank_primary_question": null, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-OPS-DOCK-03", "rank_primary_bare": 2, "rank_primary_question": 4, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-QA-SOP-17", "rank_primary_bare": 3, "rank_primary_question": 3, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QF-FY26-TSL-044", "rank_primary_bare": 2, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "RF-118", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "RF-203", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "RF-221", "rank_primary_bare": 3, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "ROTA-9A", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "ROTA-9B", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "SANDHU-EXC", "rank_primary_bare": 2, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "TSL-NGP-C2-07", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "TSL-NGP-C3-02", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "TSL-NGP-F1-04", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "TSL-RF-118-A", "rank_primary_bare": 3, "rank_primary_question": 5, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "TSL-RF-221-A", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "WIKI-NGP-DOCK-12", "rank_primary_bare": 1, "rank_primary_question": 2, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "WIKI-NGP-DOCK-41", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "sibling-rf", "query": "RF-117", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "sibling-rf", "query": "RF-119", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "sibling-rf", "query": "RF-120", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "sibling-proj", "query": "PROJ-123", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "sibling-proj", "query": "PROJ-124", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "sibling-proj", "query": "PROJ-125", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "sibling-tsl", "query": "TSL-RF-119-A", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "sibling-tsl", "query": "TSL-RF-120-A", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "unique", "query": "NGP-MNT-731", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "frontmatter-only", "query": "QCL-QA-MAP-01", "rank_primary_bare": 2, "rank_primary_question": 2, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "BV-4437", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "BV-QA-2025-0312", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "CBE-FROZEN", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "CBE-PHARMA", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "G-COLD-1", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "G-DAIRY-2", "rank_primary_bare": 1, "rank_primary_question": 4, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "GHY-7", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "KFS-2014", "rank_primary_bare": 3, "rank_primary_question": 3, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "KV-NGP-C2-07", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "NGP-MNT-552", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "NGP-PNR-18", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-CS-MTX-02", "rank_primary_bare": 3, "rank_primary_question": 10, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-CS-MTX-03", "rank_primary_bare": 4, "rank_primary_question": 4, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-F-09", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-F-17", "rank_primary_bare": 3, "rank_primary_question": 3, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-F-22", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-IT-ADR-08", "rank_primary_bare": null, "rank_primary_question": null, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-OPS-DOCK-03", "rank_primary_bare": 2, "rank_primary_question": 4, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-QA-SOP-17", "rank_primary_bare": 5, "rank_primary_question": 5, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QF-FY26-TSL-044", "rank_primary_bare": 2, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "RF-118", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "RF-203", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "RF-221", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "ROTA-9A", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "ROTA-9B", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "SANDHU-EXC", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "TSL-NGP-C2-07", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "TSL-NGP-C3-02", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "TSL-NGP-F1-04", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "TSL-RF-118-A", "rank_primary_bare": 2, "rank_primary_question": 2, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "TSL-RF-221-A", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "WIKI-NGP-DOCK-12", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "WIKI-NGP-DOCK-41", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "sibling-rf", "query": "RF-117", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "sibling-rf", "query": "RF-119", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "sibling-rf", "query": "RF-120", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "sibling-proj", "query": "PROJ-123", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "sibling-proj", "query": "PROJ-124", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "sibling-proj", "query": "PROJ-125", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "sibling-tsl", "query": "TSL-RF-119-A", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "sibling-tsl", "query": "TSL-RF-120-A", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "unique", "query": "NGP-MNT-731", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-01000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "frontmatter-only", "query": "QCL-QA-MAP-01", "rank_primary_bare": 2, "rank_primary_question": 2, "rung": "rung-01000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "BV-4437", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "BV-QA-2025-0312", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "CBE-FROZEN", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "CBE-PHARMA", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "G-COLD-1", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "G-DAIRY-2", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "GHY-7", "rank_primary_bare": 2, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "KFS-2014", "rank_primary_bare": 3, "rank_primary_question": 3, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "KV-NGP-C2-07", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "NGP-MNT-552", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "NGP-PNR-18", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-CS-MTX-02", "rank_primary_bare": 3, "rank_primary_question": 4, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-CS-MTX-03", "rank_primary_bare": 3, "rank_primary_question": 3, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-F-09", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-F-17", "rank_primary_bare": 3, "rank_primary_question": 3, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-F-22", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-IT-ADR-08", "rank_primary_bare": null, "rank_primary_question": null, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-OPS-DOCK-03", "rank_primary_bare": 3, "rank_primary_question": 3, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-QA-SOP-17", "rank_primary_bare": 3, "rank_primary_question": 3, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QF-FY26-TSL-044", "rank_primary_bare": 2, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "RF-118", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "RF-203", "rank_primary_bare": 1, "rank_primary_question": 6, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "RF-221", "rank_primary_bare": 3, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "ROTA-9A", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "ROTA-9B", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "SANDHU-EXC", "rank_primary_bare": 2, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "TSL-NGP-C2-07", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "TSL-NGP-C3-02", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "TSL-NGP-F1-04", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "TSL-RF-118-A", "rank_primary_bare": 3, "rank_primary_question": 5, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "TSL-RF-221-A", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "WIKI-NGP-DOCK-12", "rank_primary_bare": 2, "rank_primary_question": 2, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "pre-set-3", "query": "WIKI-NGP-DOCK-41", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "sibling-rf", "query": "RF-117", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "sibling-rf", "query": "RF-119", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "sibling-rf", "query": "RF-120", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "sibling-proj", "query": "PROJ-123", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "sibling-proj", "query": "PROJ-124", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "sibling-proj", "query": "PROJ-125", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "sibling-tsl", "query": "TSL-RF-119-A", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "sibling-tsl", "query": "TSL-RF-120-A", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "unique", "query": "NGP-MNT-731", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "identifier rank", "family": "frontmatter-only", "query": "QCL-QA-MAP-01", "rank_primary_bare": 3, "rank_primary_question": 2, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "BV-4437", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "BV-QA-2025-0312", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "CBE-FROZEN", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "CBE-PHARMA", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "G-COLD-1", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "G-DAIRY-2", "rank_primary_bare": 1, "rank_primary_question": 6, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "GHY-7", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "KFS-2014", "rank_primary_bare": 3, "rank_primary_question": 3, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "KV-NGP-C2-07", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "NGP-MNT-552", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "NGP-PNR-18", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-CS-MTX-02", "rank_primary_bare": 3, "rank_primary_question": 4, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-CS-MTX-03", "rank_primary_bare": 3, "rank_primary_question": 3, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-F-09", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-F-17", "rank_primary_bare": 3, "rank_primary_question": 3, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-F-22", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-IT-ADR-08", "rank_primary_bare": null, "rank_primary_question": null, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-OPS-DOCK-03", "rank_primary_bare": 3, "rank_primary_question": 3, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QCL-QA-SOP-17", "rank_primary_bare": 5, "rank_primary_question": 5, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "QF-FY26-TSL-044", "rank_primary_bare": 2, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "RF-118", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "RF-203", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "RF-221", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "ROTA-9A", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "ROTA-9B", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "SANDHU-EXC", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "TSL-NGP-C2-07", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "TSL-NGP-C3-02", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "TSL-NGP-F1-04", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "TSL-RF-118-A", "rank_primary_bare": 2, "rank_primary_question": 2, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "TSL-RF-221-A", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "WIKI-NGP-DOCK-12", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "pre-set-3", "query": "WIKI-NGP-DOCK-41", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "sibling-rf", "query": "RF-117", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "sibling-rf", "query": "RF-119", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "sibling-rf", "query": "RF-120", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "sibling-proj", "query": "PROJ-123", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "sibling-proj", "query": "PROJ-124", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "sibling-proj", "query": "PROJ-125", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "sibling-tsl", "query": "TSL-RF-119-A", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "sibling-tsl", "query": "TSL-RF-120-A", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "unique", "query": "NGP-MNT-731", "rank_primary_bare": 1, "rank_primary_question": 1, "rung": "rung-10000"}
+{"arm": "after", "endpoint": "identifier rank", "family": "frontmatter-only", "query": "QCL-QA-MAP-01", "rank_primary_bare": 3, "rank_primary_question": 2, "rung": "rung-10000"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-001", "rung": "rung-01000", "top1": "seed/01-sop-temperature-excursion.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-003", "rung": "rung-01000", "top1": "seed/15-customer-notification-matrix-2026.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-005", "rung": "rung-01000", "top1": "seed/01-sop-temperature-excursion.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-007", "rung": "rung-01000", "top1": "seed/05-decision-telematics-vendor-2023.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-009", "rung": "rung-01000", "top1": "ext/sibling/a01-marrowbeck-excursion-sop.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-011", "rung": "rung-01000", "top1": "seed/01-sop-temperature-excursion.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-013", "rung": "rung-01000", "top1": "seed/04-night-shift-handover-log.txt"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-015", "rung": "rung-01000", "top1": "seed/10-new-joiner-faq.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-017", "rung": "rung-01000", "top1": "seed/18-reefer-RF-120-asset-file.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-019", "rung": "rung-01000", "top1": "seed/12-rate-card-2026-h2.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-021", "rung": "rung-01000", "top1": "seed/01-sop-temperature-excursion.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-023", "rung": "rung-01000", "top1": "ext/sibling/00050-notification.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-025", "rung": "rung-01000", "top1": "seed/08-driver-hours-and-safety-policy.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-027", "rung": "rung-01000", "top1": "seed/12-rate-card-2026-h2.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-029", "rung": "rung-01000", "top1": "seed/17-reefer-RF-119-asset-file.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-031", "rung": "rung-01000", "top1": "seed/09-dock-scheduling-wiki-export.html"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-033", "rung": "rung-01000", "top1": "seed/02-sensor-thresholds.yaml"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-035", "rung": "rung-01000", "top1": "ext/sibling/a01-marrowbeck-excursion-sop.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-037", "rung": "rung-01000", "top1": "seed/01-sop-temperature-excursion.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-039", "rung": "rung-01000", "top1": "seed/05-decision-telematics-vendor-2023.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-041", "rung": "rung-01000", "top1": "seed/11-decision-telematics-vendor-2026.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-043", "rung": "rung-01000", "top1": "seed/14-customer-notification-matrix-2025.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-045", "rung": "rung-01000", "top1": "seed/08-driver-hours-and-safety-policy.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-047", "rung": "rung-01000", "top1": "seed/08-driver-hours-and-safety-policy.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-049", "rung": "rung-01000", "top1": "seed/19-project-PROJ-123-dockwise-rollout.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-051", "rung": "rung-01000", "top1": "seed/12-rate-card-2026-h2.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-053", "rung": "rung-01000", "top1": "seed/04-night-shift-handover-log.txt"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-055", "rung": "rung-01000", "top1": "seed/01-sop-temperature-excursion.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-057", "rung": "rung-01000", "top1": "seed/archive/a03-dock-scheduling-wiki-2021.html"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-059", "rung": "rung-01000", "top1": "seed/02-sensor-thresholds.yaml"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-061", "rung": "rung-01000", "top1": "seed/03-postmortem-nagpur-vaccine-excursion.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-063", "rung": "rung-01000", "top1": "seed/22-cold-chain-document-map.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-065", "rung": "rung-01000", "top1": "seed/15-customer-notification-matrix-2026.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-067", "rung": "rung-01000", "top1": "seed/06-re-fw-telematics-cutover.eml"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-069", "rung": "rung-01000", "top1": "seed/03-postmortem-nagpur-vaccine-excursion.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-071", "rung": "rung-01000", "top1": "ext/archive/a20-braidwood-rate-card-2023.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-073", "rung": "rung-01000", "top1": "seed/01-sop-temperature-excursion.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-075", "rung": "rung-01000", "top1": "seed/11-decision-telematics-vendor-2026.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-077", "rung": "rung-01000", "top1": "seed/16-reefer-RF-118-asset-file.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-079", "rung": "rung-01000", "top1": "seed/08-driver-hours-and-safety-policy.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-081", "rung": "rung-01000", "top1": "seed/11-decision-telematics-vendor-2026.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-083", "rung": "rung-01000", "top1": "seed/12-rate-card-2026-h2.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-085", "rung": "rung-01000", "top1": "seed/01-sop-temperature-excursion.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-087", "rung": "rung-01000", "top1": "seed/22-cold-chain-document-map.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-089", "rung": "rung-01000", "top1": "seed/06-re-fw-telematics-cutover.eml"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-091", "rung": "rung-01000", "top1": "seed/10-new-joiner-faq.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-093", "rung": "rung-01000", "top1": "seed/archive/a02-kalpa-alert-routing-guide-2021.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-095", "rung": "rung-01000", "top1": "seed/08-driver-hours-and-safety-policy.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-097", "rung": "rung-01000", "top1": "seed/08-driver-hours-and-safety-policy.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-099", "rung": "rung-01000", "top1": "seed/03-postmortem-nagpur-vaccine-excursion.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-101", "rung": "rung-01000", "top1": "seed/04-night-shift-handover-log.txt"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-103", "rung": "rung-01000", "top1": "seed/13-dock-scheduling-rules-2026.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-105", "rung": "rung-01000", "top1": "seed/archive/a03-dock-scheduling-wiki-2021.html"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-107", "rung": "rung-01000", "top1": "seed/01-sop-temperature-excursion.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-109", "rung": "rung-01000", "top1": "seed/12-rate-card-2026-h2.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-111", "rung": "rung-01000", "top1": "seed/10-new-joiner-faq.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-113", "rung": "rung-01000", "top1": "ext/archive/a20-braidwood-rate-card-2023.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-115", "rung": "rung-01000", "top1": "seed/10-new-joiner-faq.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-117", "rung": "rung-01000", "top1": "seed/22-cold-chain-document-map.md"}
+{"arm": "before", "endpoint": "set-1 control", "query": "s1-119", "rung": "rung-01000", "top1": "seed/22-cold-chain-document-map.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-001", "rung": "rung-01000", "top1": "seed/01-sop-temperature-excursion.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-003", "rung": "rung-01000", "top1": "seed/15-customer-notification-matrix-2026.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-005", "rung": "rung-01000", "top1": "seed/01-sop-temperature-excursion.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-007", "rung": "rung-01000", "top1": "seed/05-decision-telematics-vendor-2023.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-009", "rung": "rung-01000", "top1": "seed/01-sop-temperature-excursion.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-011", "rung": "rung-01000", "top1": "seed/01-sop-temperature-excursion.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-013", "rung": "rung-01000", "top1": "seed/04-night-shift-handover-log.txt"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-015", "rung": "rung-01000", "top1": "seed/10-new-joiner-faq.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-017", "rung": "rung-01000", "top1": "seed/18-reefer-RF-120-asset-file.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-019", "rung": "rung-01000", "top1": "seed/12-rate-card-2026-h2.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-021", "rung": "rung-01000", "top1": "seed/01-sop-temperature-excursion.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-023", "rung": "rung-01000", "top1": "ext/sibling/00050-notification.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-025", "rung": "rung-01000", "top1": "seed/08-driver-hours-and-safety-policy.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-027", "rung": "rung-01000", "top1": "seed/12-rate-card-2026-h2.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-029", "rung": "rung-01000", "top1": "seed/17-reefer-RF-119-asset-file.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-031", "rung": "rung-01000", "top1": "seed/09-dock-scheduling-wiki-export.html"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-033", "rung": "rung-01000", "top1": "seed/02-sensor-thresholds.yaml"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-035", "rung": "rung-01000", "top1": "ext/sibling/a01-marrowbeck-excursion-sop.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-037", "rung": "rung-01000", "top1": "seed/01-sop-temperature-excursion.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-039", "rung": "rung-01000", "top1": "seed/05-decision-telematics-vendor-2023.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-041", "rung": "rung-01000", "top1": "seed/11-decision-telematics-vendor-2026.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-043", "rung": "rung-01000", "top1": "seed/14-customer-notification-matrix-2025.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-045", "rung": "rung-01000", "top1": "seed/08-driver-hours-and-safety-policy.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-047", "rung": "rung-01000", "top1": "seed/08-driver-hours-and-safety-policy.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-049", "rung": "rung-01000", "top1": "seed/19-project-PROJ-123-dockwise-rollout.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-051", "rung": "rung-01000", "top1": "seed/12-rate-card-2026-h2.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-053", "rung": "rung-01000", "top1": "seed/04-night-shift-handover-log.txt"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-055", "rung": "rung-01000", "top1": "seed/01-sop-temperature-excursion.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-057", "rung": "rung-01000", "top1": "seed/archive/a03-dock-scheduling-wiki-2021.html"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-059", "rung": "rung-01000", "top1": "seed/02-sensor-thresholds.yaml"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-061", "rung": "rung-01000", "top1": "seed/03-postmortem-nagpur-vaccine-excursion.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-063", "rung": "rung-01000", "top1": "seed/22-cold-chain-document-map.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-065", "rung": "rung-01000", "top1": "seed/15-customer-notification-matrix-2026.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-067", "rung": "rung-01000", "top1": "seed/06-re-fw-telematics-cutover.eml"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-069", "rung": "rung-01000", "top1": "seed/03-postmortem-nagpur-vaccine-excursion.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-071", "rung": "rung-01000", "top1": "ext/archive/a20-braidwood-rate-card-2023.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-073", "rung": "rung-01000", "top1": "seed/01-sop-temperature-excursion.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-075", "rung": "rung-01000", "top1": "seed/11-decision-telematics-vendor-2026.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-077", "rung": "rung-01000", "top1": "seed/16-reefer-RF-118-asset-file.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-079", "rung": "rung-01000", "top1": "seed/08-driver-hours-and-safety-policy.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-081", "rung": "rung-01000", "top1": "seed/11-decision-telematics-vendor-2026.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-083", "rung": "rung-01000", "top1": "seed/12-rate-card-2026-h2.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-085", "rung": "rung-01000", "top1": "seed/01-sop-temperature-excursion.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-087", "rung": "rung-01000", "top1": "seed/22-cold-chain-document-map.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-089", "rung": "rung-01000", "top1": "seed/06-re-fw-telematics-cutover.eml"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-091", "rung": "rung-01000", "top1": "seed/10-new-joiner-faq.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-093", "rung": "rung-01000", "top1": "seed/archive/a02-kalpa-alert-routing-guide-2021.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-095", "rung": "rung-01000", "top1": "seed/08-driver-hours-and-safety-policy.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-097", "rung": "rung-01000", "top1": "seed/08-driver-hours-and-safety-policy.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-099", "rung": "rung-01000", "top1": "seed/03-postmortem-nagpur-vaccine-excursion.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-101", "rung": "rung-01000", "top1": "seed/04-night-shift-handover-log.txt"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-103", "rung": "rung-01000", "top1": "seed/13-dock-scheduling-rules-2026.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-105", "rung": "rung-01000", "top1": "seed/archive/a03-dock-scheduling-wiki-2021.html"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-107", "rung": "rung-01000", "top1": "seed/01-sop-temperature-excursion.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-109", "rung": "rung-01000", "top1": "seed/12-rate-card-2026-h2.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-111", "rung": "rung-01000", "top1": "seed/10-new-joiner-faq.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-113", "rung": "rung-01000", "top1": "ext/archive/a20-braidwood-rate-card-2023.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-115", "rung": "rung-01000", "top1": "seed/10-new-joiner-faq.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-117", "rung": "rung-01000", "top1": "seed/22-cold-chain-document-map.md"}
+{"arm": "after", "endpoint": "set-1 control", "query": "s1-119", "rung": "rung-01000", "top1": "seed/06-re-fw-telematics-cutover.eml"}
