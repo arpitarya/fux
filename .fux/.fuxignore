@@ -1,107 +1,174 @@
 # >>> fux: not indexed >>>
 # a committed list said not to index these. Rewritten by every `fux ingest`.
 # Delete a line and it comes back next run unless the list that rejected it changed.
-archive/handoff/v0.30.0-claude-md.diff                                                     # not an indexed file type
-archive/handoff/v0.30.0-m1-claude-md-build-test.diff                                       # not an indexed file type
-archive/handoff/v0.31.0-claude-md-layout.diff                                              # not an indexed file type
-archive/handoff/v0.32.0-adr-numbering.diff                                                 # not an indexed file type
-archive/v0.1/fux/assets/graph_boot.js                                                      # not an indexed file type
-archive/v0.1/justfile                                                                      # not an indexed file type
-archive/v0.1/uv.lock                                                                       # not an indexed file type
-archive/v0.26-docs/architecture-flow.mermaid                                               # not an indexed file type
-archive/v0.26/src/fux/embed/data/model.bin                                                 # not an indexed file type
-archive/v0.26/uv.lock                                                                      # not an indexed file type
-docs/paper/figures/src/fig-01-index-and-refer.mmd                                          # not an indexed file type
-docs/paper/figures/src/fig-02-dotfux.mmd                                                   # not an indexed file type
-docs/paper/figures/src/fig-03-ingest.mmd                                                   # not an indexed file type
-docs/paper/figures/src/fig-04-record.mmd                                                   # not an indexed file type
-docs/paper/figures/src/fig-05-ask.mmd                                                      # not an indexed file type
-docs/paper/figures/src/fig-06-expand.mmd                                                   # not an indexed file type
-docs/paper/figures/src/fig-07-graph.mmd                                                    # not an indexed file type
-docs/paper/figures/src/fig-08-answer.mmd                                                   # not an indexed file type
-docs/paper/figures/src/fig-09-confidence.mmd                                               # not an indexed file type
-docs/paper/figures/src/fig-10-two-readers.mmd                                              # not an indexed file type
-docs/paper/figures/src/fig-11-surfaces.mmd                                                 # not an indexed file type
-docs/paper/figures/src/fig-12-maintenance.mmd                                              # not an indexed file type
-docs/paper/figures/src/fig-13-evaluation.mmd                                               # not an indexed file type
-docs/paper/figures/src/fig-14-governance.mmd                                               # not an indexed file type
-docs/paper/figures/src/fig-15-latency.mmd                                                  # not an indexed file type
-docs/paper/figures/src/fig-16-roadmap.mmd                                                  # not an indexed file type
-docs/paper/figures/src/fig-17-designed-vs-built.mmd                                        # not an indexed file type
-docs/paper/figures/src/fig-18-enrich.mmd                                                   # not an indexed file type
-docs/paper/figures/src/fig-19-observers.mmd                                                # not an indexed file type
-docs/paper/figures/src/fig-20-verbs.mmd                                                    # not an indexed file type
-records/RULE-SINCE                                                                         # not an indexed file type
-tools/vector-gate/embed_node.mjs                                                           # not an indexed file type
-work/golden/README.md                                                                      # excluded by !work/golden
-work/golden/golden-answer/golden-answers-claude-provisional.jsonl                          # excluded by !work/golden
-work/golden/ladder/rung-00100.coverage                                                     # excluded by !work/golden
-work/golden/ladder/rung-00100.index                                                        # excluded by !work/golden
-work/golden/ladder/rung-00100.sha256                                                       # excluded by !work/golden
-work/golden/ladder/rung-00200.coverage                                                     # excluded by !work/golden
-work/golden/ladder/rung-00200.index                                                        # excluded by !work/golden
-work/golden/ladder/rung-00200.sha256                                                       # excluded by !work/golden
-work/golden/ladder/rung-00500.coverage                                                     # excluded by !work/golden
-work/golden/ladder/rung-00500.index                                                        # excluded by !work/golden
-work/golden/ladder/rung-00500.sha256                                                       # excluded by !work/golden
-work/golden/ladder/rung-01000.coverage                                                     # excluded by !work/golden
-work/golden/ladder/rung-01000.index                                                        # excluded by !work/golden
-work/golden/ladder/rung-01000.sha256                                                       # excluded by !work/golden
-work/golden/ladder/rung-02000.coverage                                                     # excluded by !work/golden
-work/golden/ladder/rung-02000.index                                                        # excluded by !work/golden
-work/golden/ladder/rung-02000.sha256                                                       # excluded by !work/golden
-work/golden/ladder/rung-05000.coverage                                                     # excluded by !work/golden
-work/golden/ladder/rung-05000.index                                                        # excluded by !work/golden
-work/golden/ladder/rung-05000.sha256                                                       # excluded by !work/golden
-work/golden/ladder/rung-10000.coverage                                                     # excluded by !work/golden
-work/golden/ladder/rung-10000.index                                                        # excluded by !work/golden
-work/golden/ladder/rung-10000.sha256                                                       # excluded by !work/golden
-work/golden/ladder/rung-seed.coverage                                                      # excluded by !work/golden
-work/golden/ladder/rung-seed.index                                                         # excluded by !work/golden
-work/golden/ladder/rung-seed.sha256                                                        # excluded by !work/golden
-work/golden/prompts/1-codex-seed.md                                                        # excluded by !work/golden
-work/golden/prompts/2-claude-extend.md                                                     # excluded by !work/golden
-work/golden/prompts/3-codex-release.md                                                     # excluded by !work/golden
-work/golden/prompts/4-claude-run.md                                                        # excluded by !work/golden
-work/golden/prompts/5-codex-score.md                                                       # excluded by !work/golden
-work/golden/questions/README.md                                                            # excluded by !work/golden
-work/golden/questions/questions.jsonl                                                      # excluded by !work/golden
-work/golden/seed-dates.tsv                                                                 # excluded by !work/golden
-work/golden/seed/01-sop-temperature-excursion.md                                           # excluded by !work/golden
-work/golden/seed/02-sensor-thresholds.yaml                                                 # excluded by !work/golden
-work/golden/seed/03-postmortem-nagpur-vaccine-excursion.md                                 # excluded by !work/golden
-work/golden/seed/04-night-shift-handover-log.txt                                           # excluded by !work/golden
-work/golden/seed/05-decision-telematics-vendor-2023.md                                     # excluded by !work/golden
-work/golden/seed/06-re-fw-telematics-cutover.eml                                           # excluded by !work/golden
-work/golden/seed/07-rate-card-and-surcharges.md                                            # excluded by !work/golden
-work/golden/seed/08-driver-hours-and-safety-policy.md                                      # excluded by !work/golden
-work/golden/seed/09-dock-scheduling-wiki-export.html                                       # excluded by !work/golden
-work/golden/seed/10-new-joiner-faq.md                                                      # excluded by !work/golden
-work/golden/seed/11-decision-telematics-vendor-2026.md                                     # excluded by !work/golden
-work/golden/seed/12-rate-card-2026-h2.md                                                   # excluded by !work/golden
-work/golden/seed/13-dock-scheduling-rules-2026.md                                          # excluded by !work/golden
-work/golden/seed/14-customer-notification-matrix-2025.md                                   # excluded by !work/golden
-work/golden/seed/15-customer-notification-matrix-2026.md                                   # excluded by !work/golden
-work/golden/seed/archive/a01-sop-temperature-excursion-rev2.md                             # excluded by !work/golden
-work/golden/seed/archive/a02-kalpa-alert-routing-guide-2021.md                             # excluded by !work/golden
-work/golden/seed/archive/a03-dock-scheduling-wiki-2021.html                                # excluded by !work/golden
-work/golden/seed/archive/a04-driver-hours-policy-2019.md                                   # excluded by !work/golden
-work/golden/seed/archive/a05-induction-checklist-2020.txt                                  # excluded by !work/golden
-work/regression/2026-08-20-r5-hook-latency/evidence/run.log                                # not an indexed file type
-work/regression/2026-08-20-r6-merge-driver/evidence/run.log                                # not an indexed file type
-work/regression/2026-08-20-refer-plane-r4/evidence/run.log                                 # not an indexed file type
-work/regression/2026-08-21-r7-preliminary-analysis/evidence/byte_breakdown.out             # not an indexed file type
-work/regression/2026-08-21-r7-preliminary-analysis/evidence/pack_compression.out           # not an indexed file type
-work/regression/2026-08-22-graph-acceptance/evidence/graph-json.sha256                     # not an indexed file type
-work/regression/2026-08-22-r6-rerun/evidence/run.out                                       # not an indexed file type
-work/regression/2026-08-23-fork3-per-field-bound/evidence/bench-run.log                    # not an indexed file type
-work/regression/2026-08-23-fork3-per-field-bound/evidence/diff10k.log                      # not an indexed file type
-work/regression/2026-08-23-fork3-per-field-bound/evidence/real-corpus-10k.log              # not an indexed file type
-work/regression/2026-08-23-r5-rerun-after-code-removal/evidence/scaling-after-phase7.log   # not an indexed file type
-work/regression/2026-08-23-r5-rerun-after-code-removal/evidence/scaling-run.log            # not an indexed file type
-work/regression/2026-09-05-node-log-divergence/evidence/idfdomain.mjs                      # not an indexed file type
-work/regression/2026-09-05-node-log-divergence/evidence/logprobe.mjs                       # not an indexed file type
-work/regression/2026-09-05-node-log-divergence/evidence/score.mjs                          # not an indexed file type
+archive/handoff/v0.30.0-claude-md.diff                                                                 # not an indexed file type
+archive/handoff/v0.30.0-m1-claude-md-build-test.diff                                                   # not an indexed file type
+archive/handoff/v0.31.0-claude-md-layout.diff                                                          # not an indexed file type
+archive/handoff/v0.32.0-adr-numbering.diff                                                             # not an indexed file type
+archive/v0.1/fux/assets/graph_boot.js                                                                  # not an indexed file type
+archive/v0.1/justfile                                                                                  # not an indexed file type
+archive/v0.1/uv.lock                                                                                   # not an indexed file type
+archive/v0.26-docs/architecture-flow.mermaid                                                           # not an indexed file type
+archive/v0.26/src/fux/embed/data/model.bin                                                             # not an indexed file type
+archive/v0.26/uv.lock                                                                                  # not an indexed file type
+docs/paper/figures/src/fig-01-index-and-refer.mmd                                                      # not an indexed file type
+docs/paper/figures/src/fig-02-dotfux.mmd                                                               # not an indexed file type
+docs/paper/figures/src/fig-03-ingest.mmd                                                               # not an indexed file type
+docs/paper/figures/src/fig-04-record.mmd                                                               # not an indexed file type
+docs/paper/figures/src/fig-05-ask.mmd                                                                  # not an indexed file type
+docs/paper/figures/src/fig-06-expand.mmd                                                               # not an indexed file type
+docs/paper/figures/src/fig-07-graph.mmd                                                                # not an indexed file type
+docs/paper/figures/src/fig-08-answer.mmd                                                               # not an indexed file type
+docs/paper/figures/src/fig-09-confidence.mmd                                                           # not an indexed file type
+docs/paper/figures/src/fig-10-two-readers.mmd                                                          # not an indexed file type
+docs/paper/figures/src/fig-11-surfaces.mmd                                                             # not an indexed file type
+docs/paper/figures/src/fig-12-maintenance.mmd                                                          # not an indexed file type
+docs/paper/figures/src/fig-13-evaluation.mmd                                                           # not an indexed file type
+docs/paper/figures/src/fig-14-governance.mmd                                                           # not an indexed file type
+docs/paper/figures/src/fig-15-latency.mmd                                                              # not an indexed file type
+docs/paper/figures/src/fig-16-roadmap.mmd                                                              # not an indexed file type
+docs/paper/figures/src/fig-17-designed-vs-built.mmd                                                    # not an indexed file type
+docs/paper/figures/src/fig-18-enrich.mmd                                                               # not an indexed file type
+docs/paper/figures/src/fig-19-observers.mmd                                                            # not an indexed file type
+docs/paper/figures/src/fig-20-verbs.mmd                                                                # not an indexed file type
+records/RULE-SINCE                                                                                     # not an indexed file type
+tools/vector-gate/embed_node.mjs                                                                       # not an indexed file type
+work/golden/README.md                                                                                  # excluded by !work/golden
+work/golden/golden-answers/set-1.jsonl                                                                 # excluded by !work/golden
+work/golden/golden-answers/set-2.jsonl                                                                 # excluded by !work/golden
+work/golden/golden-answers/set-3.jsonl                                                                 # excluded by !work/golden
+work/golden/ladder/rung-00100.coverage                                                                 # excluded by !work/golden
+work/golden/ladder/rung-00100.index                                                                    # excluded by !work/golden
+work/golden/ladder/rung-00100.sha256                                                                   # excluded by !work/golden
+work/golden/ladder/rung-00200.coverage                                                                 # excluded by !work/golden
+work/golden/ladder/rung-00200.index                                                                    # excluded by !work/golden
+work/golden/ladder/rung-00200.sha256                                                                   # excluded by !work/golden
+work/golden/ladder/rung-00500.coverage                                                                 # excluded by !work/golden
+work/golden/ladder/rung-00500.index                                                                    # excluded by !work/golden
+work/golden/ladder/rung-00500.sha256                                                                   # excluded by !work/golden
+work/golden/ladder/rung-01000.coverage                                                                 # excluded by !work/golden
+work/golden/ladder/rung-01000.index                                                                    # excluded by !work/golden
+work/golden/ladder/rung-01000.sha256                                                                   # excluded by !work/golden
+work/golden/ladder/rung-02000.coverage                                                                 # excluded by !work/golden
+work/golden/ladder/rung-02000.index                                                                    # excluded by !work/golden
+work/golden/ladder/rung-02000.sha256                                                                   # excluded by !work/golden
+work/golden/ladder/rung-05000.coverage                                                                 # excluded by !work/golden
+work/golden/ladder/rung-05000.index                                                                    # excluded by !work/golden
+work/golden/ladder/rung-05000.sha256                                                                   # excluded by !work/golden
+work/golden/ladder/rung-10000.coverage                                                                 # excluded by !work/golden
+work/golden/ladder/rung-10000.index                                                                    # excluded by !work/golden
+work/golden/ladder/rung-10000.sha256                                                                   # excluded by !work/golden
+work/golden/ladder/rung-seed.coverage                                                                  # excluded by !work/golden
+work/golden/ladder/rung-seed.index                                                                     # excluded by !work/golden
+work/golden/ladder/rung-seed.sha256                                                                    # excluded by !work/golden
+work/golden/prompts/1-codex-seed.md                                                                    # excluded by !work/golden
+work/golden/prompts/2-codex-questions.md                                                               # excluded by !work/golden
+work/golden/prompts/3-claude-questions.md                                                              # excluded by !work/golden
+work/golden/prompts/4-claude-corpus.md                                                                 # excluded by !work/golden
+work/golden/prompts/5-claude-run.md                                                                    # excluded by !work/golden
+work/golden/prompts/6-codex-score.md                                                                   # excluded by !work/golden
+work/golden/prompts/6E-codex-score-ephemeral.md                                                        # excluded by !work/golden
+work/golden/prompts/7-codex-link-bearing-seed.md                                                       # excluded by !work/golden
+work/golden/prompts/8-codex-identifier-questions.md                                                    # excluded by !work/golden
+work/golden/prompts/9-claude-code-open-the-key.md                                                      # excluded by !work/golden
+work/golden/prompts/RETIRED-codex-release.md                                                           # excluded by !work/golden
+work/golden/questions/README.md                                                                        # excluded by !work/golden
+work/golden/questions/set-1.jsonl                                                                      # excluded by !work/golden
+work/golden/questions/set-2.jsonl                                                                      # excluded by !work/golden
+work/golden/questions/set-3.jsonl                                                                      # excluded by !work/golden
+work/golden/seed-dates.tsv                                                                             # excluded by !work/golden
+work/golden/seed/01-sop-temperature-excursion.md                                                       # excluded by !work/golden
+work/golden/seed/02-sensor-thresholds.yaml                                                             # excluded by !work/golden
+work/golden/seed/03-postmortem-nagpur-vaccine-excursion.md                                             # excluded by !work/golden
+work/golden/seed/04-night-shift-handover-log.txt                                                       # excluded by !work/golden
+work/golden/seed/05-decision-telematics-vendor-2023.md                                                 # excluded by !work/golden
+work/golden/seed/06-re-fw-telematics-cutover.eml                                                       # excluded by !work/golden
+work/golden/seed/07-rate-card-and-surcharges.md                                                        # excluded by !work/golden
+work/golden/seed/08-driver-hours-and-safety-policy.md                                                  # excluded by !work/golden
+work/golden/seed/09-dock-scheduling-wiki-export.html                                                   # excluded by !work/golden
+work/golden/seed/10-new-joiner-faq.md                                                                  # excluded by !work/golden
+work/golden/seed/11-decision-telematics-vendor-2026.md                                                 # excluded by !work/golden
+work/golden/seed/12-rate-card-2026-h2.md                                                               # excluded by !work/golden
+work/golden/seed/13-dock-scheduling-rules-2026.md                                                      # excluded by !work/golden
+work/golden/seed/14-customer-notification-matrix-2025.md                                               # excluded by !work/golden
+work/golden/seed/15-customer-notification-matrix-2026.md                                               # excluded by !work/golden
+work/golden/seed/16-reefer-RF-118-asset-file.md                                                        # excluded by !work/golden
+work/golden/seed/17-reefer-RF-119-asset-file.md                                                        # excluded by !work/golden
+work/golden/seed/18-reefer-RF-120-asset-file.md                                                        # excluded by !work/golden
+work/golden/seed/19-project-PROJ-123-dockwise-rollout.md                                               # excluded by !work/golden
+work/golden/seed/20-project-PROJ-124-red-sleeve-and-passive-shippers.md                                # excluded by !work/golden
+work/golden/seed/21-project-PROJ-125-kalpa-decommission.md                                             # excluded by !work/golden
+work/golden/seed/22-cold-chain-document-map.md                                                         # excluded by !work/golden
+work/golden/seed/archive/a01-sop-temperature-excursion-rev2.md                                         # excluded by !work/golden
+work/golden/seed/archive/a02-kalpa-alert-routing-guide-2021.md                                         # excluded by !work/golden
+work/golden/seed/archive/a03-dock-scheduling-wiki-2021.html                                            # excluded by !work/golden
+work/golden/seed/archive/a04-driver-hours-policy-2019.md                                               # excluded by !work/golden
+work/golden/seed/archive/a05-induction-checklist-2020.txt                                              # excluded by !work/golden
+work/golden/seed/archive/a06-reefer-RF-117-retired.md                                                  # excluded by !work/golden
+work/regression/2026-08-20-r5-hook-latency/evidence/run.log                                            # not an indexed file type
+work/regression/2026-08-20-r6-merge-driver/evidence/run.log                                            # not an indexed file type
+work/regression/2026-08-20-refer-plane-r4/evidence/run.log                                             # not an indexed file type
+work/regression/2026-08-21-r7-preliminary-analysis/evidence/byte_breakdown.out                         # not an indexed file type
+work/regression/2026-08-21-r7-preliminary-analysis/evidence/pack_compression.out                       # not an indexed file type
+work/regression/2026-08-22-graph-acceptance/evidence/graph-json.sha256                                 # not an indexed file type
+work/regression/2026-08-22-r6-rerun/evidence/run.out                                                   # not an indexed file type
+work/regression/2026-08-23-fork3-per-field-bound/evidence/bench-run.log                                # not an indexed file type
+work/regression/2026-08-23-fork3-per-field-bound/evidence/diff10k.log                                  # not an indexed file type
+work/regression/2026-08-23-fork3-per-field-bound/evidence/real-corpus-10k.log                          # not an indexed file type
+work/regression/2026-08-23-r5-rerun-after-code-removal/evidence/scaling-after-phase7.log               # not an indexed file type
+work/regression/2026-08-23-r5-rerun-after-code-removal/evidence/scaling-run.log                        # not an indexed file type
+work/regression/2026-09-05-node-log-divergence/evidence/idfdomain.mjs                                  # not an indexed file type
+work/regression/2026-09-05-node-log-divergence/evidence/logprobe.mjs                                   # not an indexed file type
+work/regression/2026-09-05-node-log-divergence/evidence/score.mjs                                      # not an indexed file type
+work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-00100.coverage   # not an indexed file type
+work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-00100.index      # not an indexed file type
+work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-00100.sha256     # not an indexed file type
+work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-00200.coverage   # not an indexed file type
+work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-00200.index      # not an indexed file type
+work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-00200.sha256     # not an indexed file type
+work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-00500.coverage   # not an indexed file type
+work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-00500.index      # not an indexed file type
+work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-00500.sha256     # not an indexed file type
+work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-01000.coverage   # not an indexed file type
+work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-01000.index      # not an indexed file type
+work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-01000.sha256     # not an indexed file type
+work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-02000.coverage   # not an indexed file type
+work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-02000.index      # not an indexed file type
+work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-02000.sha256     # not an indexed file type
+work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-05000.coverage   # not an indexed file type
+work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-05000.index      # not an indexed file type
+work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-05000.sha256     # not an indexed file type
+work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-10000.coverage   # not an indexed file type
+work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-10000.index      # not an indexed file type
+work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-10000.sha256     # not an indexed file type
+work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-seed.coverage    # not an indexed file type
+work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-seed.index       # not an indexed file type
+work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-seed.sha256      # not an indexed file type
+work/regression/2026-09-21-identifier-analyzer/evidence/family-a.patch                                 # not an indexed file type
+work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-00100.coverage       # not an indexed file type
+work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-00100.index          # not an indexed file type
+work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-00100.sha256         # not an indexed file type
+work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-00200.coverage       # not an indexed file type
+work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-00200.index          # not an indexed file type
+work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-00200.sha256         # not an indexed file type
+work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-00500.coverage       # not an indexed file type
+work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-00500.index          # not an indexed file type
+work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-00500.sha256         # not an indexed file type
+work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-01000.coverage       # not an indexed file type
+work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-01000.index          # not an indexed file type
+work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-01000.sha256         # not an indexed file type
+work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-02000.coverage       # not an indexed file type
+work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-02000.index          # not an indexed file type
+work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-02000.sha256         # not an indexed file type
+work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-05000.coverage       # not an indexed file type
+work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-05000.index          # not an indexed file type
+work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-05000.sha256         # not an indexed file type
+work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-10000.coverage       # not an indexed file type
+work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-10000.index          # not an indexed file type
+work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-10000.sha256         # not an indexed file type
+work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-seed.coverage        # not an indexed file type
+work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-seed.index           # not an indexed file type
+work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-seed.sha256          # not an indexed file type
 # <<< fux: not indexed <<<
 
 # >>> fux: skipped >>>

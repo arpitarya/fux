@@ -33,6 +33,7 @@ second hook, ``guard-sealed-key.sh``, and this file proves both.
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 from pathlib import Path
 
@@ -57,8 +58,15 @@ LEGACY = "work/golden/golden-answer"
 
 def run_hook(hook: Path, payload: dict) -> int:
     """Feed one PreToolUse payload to a guard. Returns its exit code (2 = deny)."""
+    # 🔴 Through `bash`, never as a bare path. Each guard carries a
+    # `#!/usr/bin/env bash` shebang, which Windows does not honour: there a
+    # bare `[str(hook)]` raises `WinError 193` before the guard runs at all,
+    # and it took 32 of this file's assertions red on the Windows matrix while
+    # both posix runners stayed green. **A guard proven on two platforms and
+    # unproven on the third is the silent narrowing this file exists to
+    # catch**, so the invocation is made portable rather than the test skipped.
     proc = subprocess.run(
-        [str(hook)],
+        ["bash", str(hook)],
         input=json.dumps(payload),
         capture_output=True,
         text=True,
@@ -71,7 +79,21 @@ def run_hook(hook: Path, payload: dict) -> int:
 def test_the_hook_is_present_and_executable(hook):
     """A guard that cannot run is not a guard -- L11's own check 4."""
     assert hook.is_file(), f"{hook.name} is missing"
-    assert hook.stat().st_mode & 0o111, f"{hook.name} is not executable"
+    if os.name == "nt":
+        # Windows has no executable bit, so `st_mode & 0o111` answers a
+        # question the filesystem cannot hold. What decides whether the guard
+        # can run is the mode **git carries**, because that is the mode a posix
+        # checkout — the only place a Claude session ever invokes one — gets.
+        entry = subprocess.run(
+            ["git", "ls-files", "-s", "--", hook.relative_to(ROOT).as_posix()],
+            capture_output=True, text=True, cwd=ROOT, check=True,
+        ).stdout.split()
+        assert entry and entry[0] == "100755", (
+            f"{hook.name} is committed as {entry[0] if entry else 'untracked'}, "
+            "not 100755 — a posix checkout would not be able to run it"
+        )
+    else:
+        assert hook.stat().st_mode & 0o111, f"{hook.name} is not executable"
 
 
 # A tool call that TARGETS a location. Both hooks substring-match these, so both

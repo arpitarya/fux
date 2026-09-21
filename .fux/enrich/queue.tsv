@@ -15,8 +15,8 @@ file:docs/architecture-high-level.png	8137bc581d22b9ca476530f74abf2057373121fb	i
 file:docs/architecture-two-readers.png	4260809c29564195f5ad9656cf016876c91ea809	image: nothing readable in .png
 file:docs/paper/figures/fig-01-index-and-refer.svg	90cd993ca22230acbef98cb3bcd2440afa85e32c	svg: nothing readable in .svg
 file:docs/paper/figures/fig-02-dotfux.svg	405c82c12460c6f31a2a463127b04cafd0f0b025	svg: nothing readable in .svg
-file:docs/paper/figures/fig-03-ingest.svg	096d87b776678e13774e2642957c290fbfb14ba3	svg: nothing readable in .svg
-file:docs/paper/figures/fig-04-record.svg	9cec1caf3353357e2749eec3da9fa70c0c3bbe01	svg: nothing readable in .svg
+file:docs/paper/figures/fig-03-ingest.svg	eadcbc7eadd45c8b297cbd965bb41990014adaae	svg: nothing readable in .svg
+file:docs/paper/figures/fig-04-record.svg	83e8672a63e8f68a6e8d75c7f410b9d2d4ba9357	svg: nothing readable in .svg
 file:docs/paper/figures/fig-05-ask.svg	428a2b03c062c999e64e4b3650feac3bce6c3588	svg: nothing readable in .svg
 file:docs/paper/figures/fig-07-graph.svg	06cf97d2776c5b92de3ea80020da6a7d14b63bcf	svg: nothing readable in .svg
 file:docs/paper/figures/fig-08-answer.svg	939e8412c44b2c64b582f5d9747b57a4d99ea886	svg: nothing readable in .svg
@@ -37,3 +37,4 @@ file:work/regression/2026-08-27-p3-sha-stability/evidence/control-a.json	a7f947d
 file:work/regression/2026-08-27-p3-sha-stability/evidence/control-b.json	90830ff4a5ee349ae9baf09f06ccd4c0482d415f	json: nothing readable in .json
 file:work/regression/2026-08-27-p3-sha-stability/evidence/run1-url-shas.json	623b6ee39ed7ec2fa270f8073f1ab4b2cee5f455	json: nothing readable in .json
 file:work/regression/2026-08-27-p3-sha-stability/evidence/run2-url-shas.json	623b6ee39ed7ec2fa270f8073f1ab4b2cee5f455	json: nothing readable in .json
+file:work/regression/2026-09-18-correction-generalisation-informed/evidence/summary-ii.json	835a6831717c910bd0098028548b6ca994fbaca3	json: nothing readable in .json

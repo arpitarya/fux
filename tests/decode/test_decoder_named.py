@@ -12,6 +12,8 @@ all. Letting it re-route a declared line would undo the point of declaring one.
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 
 from fux import decode
@@ -59,7 +61,11 @@ def test_a_consumer_module_replaces_a_built_in_of_the_same_name(tmp_path):
         "EXTENSIONS = ('.html',)\ndef decode(raw, rel_path):\n    return 'consumer html'\n",
     )
     module = decode.decoder_named("html", tmp_path)
-    assert module is not None and "decoders/html.py" in module.origin
+    # `origin` is an OS path, so compare its COMPONENTS — a literal
+    # "decoders/html.py" is a substring on posix and never on Windows, where
+    # the separator is a backslash. This assertion was green on two platforms
+    # and red on the third for exactly that reason.
+    assert module is not None and Path(module.origin).parts[-2:] == ("decoders", "html.py")
     assert decode.decode_with(module, b"<p>x</p>", "fetched.html", tmp_path) == "consumer html"
 
 
