@@ -105,7 +105,16 @@ UNRECOVERABLE = {
 #: them.
 RENUMBER_WAKE_2026_09_14 = {167, 171, 172}
 
-EXEMPT = LEDGER_IDS | NEVER_ALLOCATED | UNRECOVERABLE | RENUMBER_WAKE_2026_09_14
+#: **W-207, withdrawn by Arpit on 2026-09-21 before a file existed.** A Claude
+#: Code session filed queue rows for an "L11 breach" and stopped on them without
+#: writing `work/open/W-207-*.md`. Arpit ruled the same day that the key in that
+#: session's context was his own paste, for a score -- no breach -- and that the
+#: item be deleted. The rows were removed; there was never a file to archive; the
+#: id is spent and never reused (rule 7). The ruling is recorded in W-204 and the
+#: WORKLOG. **This set may only ever shrink.**
+WITHDRAWN_BEFORE_A_FILE = {207}
+
+EXEMPT = LEDGER_IDS | NEVER_ALLOCATED | UNRECOVERABLE | RENUMBER_WAKE_2026_09_14 | WITHDRAWN_BEFORE_A_FILE
 
 #: W-70 was allocated TWICE on the same day -- the fux-playground sandbox item
 #: and the per-document budget cap out of W-59's sweep. Both files are archived;

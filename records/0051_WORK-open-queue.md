@@ -7,11 +7,11 @@ description: "The live queue's discipline has one home, and this is it. Fifty-ei
 status: accepted
 date: 2026-09-13
 feature: the discipline of the single live work queue — its rules, its markers, and the three tests that enforce them
-owns: [tests/test_open_work_rows_are_short.py@01fe412431ad, tests/test_open_work_is_not_stale.py@f117a1469989, tests/test_no_work_item_is_lost.py@c6a42118bf27]
+owns: [tests/test_open_work_rows_are_short.py@01fe412431ad, tests/test_open_work_is_not_stale.py@f117a1469989, tests/test_no_work_item_is_lost.py@9b0527556e40]
 laws: [L0]
 ratifies: W-146 ruling 1 · Arpit 2026-09-13 (archive, never delete)
 timestamp: 2026-09-13T00:00:00Z
-content_sha: 1a4e36a3d686f66cb75188c6861f7f43adc3466436d403d46071358842c732fd
+content_sha: 8ecc34cb7ee21540eb472d1a25841bb2463464482916160d035c25955f98c80e
 ---
 
 # SR-WORK-OPEN-QUEUE — how OPEN-WORK works
@@ -92,6 +92,17 @@ that is the only thing the file says.
 6. **An item with no file gets one, and an id, before it gets a row** — and the
    row gets its ball the day it is filed.
 7. **`W-nn` ids are never reused.**
+
+   ⚠ **Including an id WITHDRAWN before its file existed** (2026-09-21, W-207).
+   A session may file queue rows and stop on them before writing
+   `work/open/W-nn-*.md`; if the item is then withdrawn, **there is nothing to
+   archive and the rows are simply removed** — rule 8's *"the detail file moves
+   to `archive/open/`"* has no subject. **The id is still spent.** What keeps
+   that auditable is `tests/test_no_work_item_is_lost.py`'s
+   `WITHDRAWN_BEFORE_A_FILE`, whose comment carries the ruling, **and that set
+   may only ever shrink** — an exemption that can grow is a way to lose an item
+   rather than a record of one.
+
 8. **Completed items are removed, never ticked.** The row is deleted and the
    detail file moves to `archive/open/`.
 9. **Closing is legal only once** the outcome is recorded in

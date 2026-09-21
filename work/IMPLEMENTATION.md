@@ -197,6 +197,50 @@ identically and the symmetry is what the headroom run measured.
 definition of done says *"touches `tests/` only"*, and a gate that lives outside
 `pytest`'s collection is a gate CI never runs.
 
+## 2026-09-21 — **W-204 phases A and B on the set-3 ladder, W-205 part 2 measured and stopped, part 1 built**
+
+**Shipped:** the ladder rebuilt on set 3's seed (61 `ref` edges, from 0) ·
+`arm_corpus.py` · `identifier_probe.py` · `--sets`/`--fux`/`--arm`/`--no-band` on the
+golden harness · W-205 **part 1** (`[meta]`, `META_FIELDS`, `parse.meta_fields()`,
+a doctor row, 14 tests).
+**Evidence:** [`2026-09-21-ladder-set-3-rebuild`](regression/2026-09-21-ladder-set-3-rebuild/report.md) ·
+[`2026-09-21-golden-ladder-outputs-set-3`](regression/2026-09-21-golden-ladder-outputs-set-3/report.md) (5 984 calls) ·
+[`2026-09-21-identifier-analyzer`](regression/2026-09-21-identifier-analyzer/VERDICT.md) ·
+[`2026-09-21-golden-three-engines`](regression/2026-09-21-golden-three-engines/report.md) (8 976 rows).
+**Items:** W-204 phases A and B **done**; W-205 part 2 **measured and NOT shipped**, part 1 **built, not yet measured**.
+
+🔴 **Phase A: a third question set changed two of the baseline's three
+findings, and neither changed because the engine did.** `band: weak` ⇔
+`answerable: false` held (2 992 of 2 992). The *inert middle band* is **false** —
+set 3 moves `partial` twice where sets 1 and 2 are byte-identical — and the
+corrected form is stronger: **the middle DRAINS, losing members and gaining none,
+0 of 21 transitions.** And **the authorship gap REPLICATED**: set 3 lands within
+0.5 points of set 2 and 7.5 above set 1, so the difference tracks **who wrote the
+questions**, not which 124 they were. ⚠ **A property observed on two sets was a
+property of two sets.**
+
+🔴 **W-205 part 2 is INCONCLUSIVE and did not ship — and the finding is worth
+more than the verdict.** The mechanism works (**33 of 33 identifiers survive
+whole, from 0**, both readers); the ranking moved **+1 / +3 / +4 with zero
+regressions**, below the floor. **The failing shape did not fail**: all eight
+sibling identifiers set 3 was authored to supply ranked first **in both arms at
+every rung**. All four fixes came from the old 33, where the *segments* are
+individually common. ⚠ **The premise was never measured before the documents were
+written for it**, and closing that gap is SR-RS's rule to make, not a session's.
+
+✅ **Phase B ran and files no score.** Null control **first**: 374 rows, 0 moved.
+🔴 **`v2 → HEAD` moves 125 of 125 lists and the cause is ONE MEASURED KNOB** —
+`b` 0.75 → 0.15 (W-144). **A changed list is not a better list.** Both v1
+asymmetries were classified as *part of the arm* **before** the run: no
+`formats.toml` (4 of 28 seed documents invisible) and no `--band`. ⚠ **Phase D
+must decide before it computes: v1's `hit@k` is structurally depressed by those
+four documents, and that is not v1 ranking badly.**
+
+✅ **W-205 part 1 built to a spec that was already ratified** — SR-INGEST 23,
+SR-DECODE 20, SR-TYPES 13. Binding ▸ claim ▸ default; no person key by default;
+`RULES_VERSION` 1 → 2 corpus-wide, caught by a gate rather than by review. **No
+Node twin owed — Node does not ingest.**
+
 ## 2026-09-20 — **W-204 phase A: the whole ladder's outputs at one frozen engine, and two repairs the rungs needed before they would load**
 
 **Shipped:** [`tools/quality-controls/rung_outputs.py`](../tools/quality-controls/rung_outputs.py)
