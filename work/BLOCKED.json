@@ -1,10 +1,8 @@
 {
- "decision": "ASK",
- "reason": "L11 was AMENDED on Arpit's 2026-09-21 ruling and now carries decision 13, the scoring carve-out: tools/golden-score/score.py, started by Arpit from his own shell via `just golden-score`, may read a key from the one permitted directory, emits ids/ranks/counts and no answer, and every number it produces is `informed` permanently. No guard was relaxed -- all six stand byte-identical, because the guards bind a Claude tool call and a command Arpit types is not one. The scorer now refuses a Claude Code environment and refuses a key from outside the permitted directory. What is still blocked is ONE physical thing: the keys sit in a session scratchpad, which decision 3 makes a breach and which the scorer therefore refuses.",
- "questions": [
-  "Move the two key files into the one permitted directory (or delete them there and re-place them), then run `just golden-score work/regression/2026-09-21-golden-three-engines` and the same for the set-3 ladder run -- from a PLAIN terminal, not an agent's. Do you want me to draft the FINAL-SCORE.md skeleton that reads the scores once they exist?"
- ],
- "safe_alternative": "Everything that does not need a key is done: the amendment, the regenerated CLAUDE.md view, the scorer's hardening (the `answerable_key` leak removed, a redacted key-parse error, an agent-environment tripwire, a source-path check), tests/test_golden_score_output.py, and `just golden-score` / `just golden-guards`. FINAL-SCORE.md cannot be written until a score exists, because its numbers are the whole document.",
+ "decision": "PROCEED",
+ "reason": "RULED 2026-09-21 (Arpit, Cowork): the key opens by a switch — `just golden-unlock` removes the read guards, Claude Code scores phase D directly, `just golden-retire <set>` moves a scored set's questions and answers into committed reusable test data, `just golden-lock` restores the guards, and the next generation is authored sealed under `set-<gen>-<x|u>`. The paste route is retired. Every golden number is `informed` permanently. Detail: work/open/W-204-golden-outputs-scoring-and-version-benchmark.md.",
+ "questions": [],
+ "safe_alternative": "",
  "surfaced": true,
  "filed": "2026-09-21"
 }

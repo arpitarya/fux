@@ -2,7 +2,7 @@
 type: OpenItem
 id: W-204
 title: "W-204 — every rung's outputs on paper, the key opened once, one final score, and v1.0.0 · v2.0.1 · HEAD on the same ladder"
-description: "Arpit, 2026-09-20: one document per rung holding every question and what fux answered; then he lifts the golden-answer restriction and one scoring pass produces the final score; and a version benchmark of v1.0.0 vs v2.0.1 vs HEAD on the same rungs. Absorbs every item that was waiting on golden test data or a scored run — W-136, W-87, W-190, W-195, W-191, W-176 steps 4–10, W-161's measured arms, W-175."
+description: "RULED 2026-09-21 — the key opens by `just golden-unlock`, scored sets retire into open test data, `set-<gen>-<x|u>` naming. Arpit, 2026-09-20: one document per rung holding every question and what fux answered; then he lifts the golden-answer restriction and one scoring pass produces the final score; and a version benchmark of v1.0.0 vs v2.0.1 vs HEAD on the same rungs. Absorbs every item that was waiting on golden test data or a scored run — W-136, W-87, W-190, W-195, W-191, W-176 steps 4–10, W-161's measured arms, W-175."
 status: open
 lane: agent
 timestamp: 2026-09-20T00:00:00Z
@@ -31,6 +31,66 @@ key file** once L11 is amended; this session files the item and Claude Code
 does the archive mechanics.
 
 ---
+
+## ✅ RULED 2026-09-21 (Arpit, Cowork, second ruling) — the key opens by a SWITCH, scored sets retire into open test data, every set is named by generation and author
+
+*"Remove the checks through a just recipe and then you can access everything. Once
+the testing is done, move the questions somewhere they can be reused for regular
+testing, feature testing. Then lock it again and create new test data — set 1 X
+for Codex, set 1 U for Claude, set 2 X, set 2 U, and so on."*
+
+**What this closes.** Both inbox rows of 2026-09-21 — *move the scratchpad keys* and
+*paste the key* — and the ruling below it. Prompt 9's **permanent** retirement of
+L11 becomes a **switch**; the **paste route is retired** (it was the leak L11
+names, and it is no longer needed); L11 decision 13's hand-run scorer stays
+available and is **not** the route W-204 uses.
+
+**The lifecycle, per generation of test data**
+
+```
+sealed ──(just golden-unlock, Arpit's hand)──► OPEN: agents read the key; phase D scores
+   ▲                                                    │
+   │                              just golden-retire <set>: questions + answers move to
+   │                              a COMMITTED home and become ordinary regression data
+   └───(just golden-lock; author generation N+1 sealed)──┘
+```
+
+1. **`just golden-unlock`** — his hand, once per generation. Turns off the read
+   guards: the `settings.json` deny rules, the hook, the scorer's agent-environment
+   and source-path refusals. It commits nothing — `.gitignore` keeps a sealed key
+   off every ref, unlocked or not.
+2. **Scoring while unlocked** — Claude Code runs phase D over phases A and B,
+   reading the key directly. **Every number is `informed` permanently** — accepted
+   in the ruling; prompt 9 already said so. The scratchpad copies: he moves them
+   into L11 decision 3's directory, or names their location to the scoring
+   session once unlocked — either works after the unlock.
+3. **`just golden-retire <set>`** — the scored set's questions **and answers** move
+   to a committed home (proposed `work/golden/retired/<set>/`; Claude Code may pick
+   the final path) and become **reusable regression / feature-test data**: any
+   session may read them, and they never carry a golden claim again.
+4. **`just golden-lock`** — restores every guard byte-identical; the next
+   generation is authored sealed.
+
+**Naming — `set-<gen>-<x|u>`**, `x` = Codex-authored, `u` = Claude-authored.
+Filed as he wrote it: `set-1` → **`set-1-x`**, `set-2` → **`set-1-u`**,
+`set-3` → **`set-2-x`**. ⚠ **Set 3 was Claude-authored, so `set-2-u` was the
+expected label** — filed as spoken, and **Arpit confirms before the rename**.
+Ids inside the files (`s1-`, `s2-`, `s3-`) do not change.
+
+**Records this ruling touches (Claude Code, next change — Opus):** L11 — the
+prohibition becomes a *locked state* with a named switch, the retired tier, the
+naming, decision 13 retained; SR-WORK-GOLDEN decision 2 — the lifecycle and the
+retired home; prompt 9 rewritten as *build the switch*;
+`tests/test_golden_key_guards.py` learns both states; `gen-laws.py` and
+`gen-golden.py --write`. A Law changes only on Arpit's ruling — **this is it,
+named and dated.**
+
+**Build order:** phase C′ — build the three recipes and amend the records
+(🟢 agent) → his `just golden-unlock` → phase D → `FINAL-SCORE.md` →
+`golden-retire` for all three sets → `golden-lock`.
+
+⚠ **The ruling directly below is superseded where it says he pastes** — the paste
+route is retired by this one. Kept as history.
 
 ## ✅ RULED 2026-09-21 (Arpit, Cowork) — the 2026-09-21 exposure was his paste; there is no breach
 

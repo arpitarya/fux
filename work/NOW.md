@@ -3,6 +3,18 @@ type: Pointer
 description: "One line: the current state and the immediate next step. Overwritten every session."
 ---
 
+✅ 2026-09-21 Cowork: **the inbox is EMPTY — five rows ruled.** W-204: the paste route is retired and
+L11's prohibition becomes a **switch** — `just golden-unlock` (his hand) → Claude Code scores phase D
+directly → `just golden-retire <set>` moves a scored set's questions **and answers** into committed,
+reusable test data → `just golden-lock`; the next generation is sealed under **`set-<gen>-<x|u>`**
+(x Codex, u Claude). Every golden number is `informed` permanently. W-205 part 2 family (a) **ships on
+correctness** (0 regressions, `ANALYZER_VERSION` v3, cost filed, no threshold); **no SR-RS d23 clause**.
+New **W-209**: the L11 hook stays; prose spelling a key path goes through Write/Edit, never a shell
+command; one test pins it. ⚠ He labelled set 3 `set-2-x`; it is Claude-authored — **confirm `-u` vs
+`-x` before the rename.** → **Next: Claude Code (Opus) builds W-204 phase C′** — the three recipes,
+L11 + SR-WORK-GOLDEN amended on this ruling, prompt 9 → *build the switch*, guards test for both
+states — then his `just golden-unlock` and phase D. W-205 (a) merge and W-209 are 🟢 and independent.
+
 ✅ 2026-09-21 Claude Code: **W-199 CLOSED — a URL line declares its decoder, and ingest stops guessing.**
 DoD 10 shipped, so all ten are met. `decoder=<stem>` is **required** on every URL line beside `fetch=`;
 `fux add` observes the `Content-Type` on its one fetch and writes the stem, **refusing** when nothing

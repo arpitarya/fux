@@ -29,6 +29,12 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-21 — the inbox emptied: five rows ruled, the key becomes a switch, family (a) ships  ·  Cowork
+- **Asked:** review OPEN-WORK, explain every row blocked on him with an example and a recommendation, then ratify.
+- **Did:** filed four rulings. **W-204** — the paste route is retired; L11's prohibition becomes a locked state with `just golden-unlock` / `golden-retire <set>` / `golden-lock`; a scored set's questions + answers retire into committed reusable test data; sets are named `set-<gen>-<x|u>` (x Codex, u Claude); every golden number `informed` permanently. **W-205** — part 2 family (a) ships on correctness at 0 regressions, `ANALYZER_VERSION` v3, cost filed with no threshold; **SR-RS d23 gains no clause** (declined). **W-209** (new) — the L11 hook stays; prose naming a key path goes through Write/Edit, never a shell command; one test pins both behaviours. `BLOCKED.json` → `PROCEED`. W-168 → 🟡 waiting on W-204. Nothing implemented — Cowork ratifies, Claude Code builds.
+- **Decided / open:** ⚠ he labelled set 3 `set-2-x`; set 3 is Claude-authored so `set-2-u` was expected — filed as spoken, **he confirms before the rename**. ⚠ A non-recursive `ls work/golden/` in this session showed the sealed directory's *name* in the parent listing; nothing under it was opened, listed, or counted. Filed here so it is on the record.
+- **Next:** Claude Code (Opus) — W-204 phase C′: the three recipes, L11 + SR-WORK-GOLDEN amended on this ruling, prompt 9 rewritten as *build the switch*, `test_golden_key_guards.py` for both states; then his `just golden-unlock` and phase D.
+
 ## 2026-09-21 — W-199 CLOSED: a URL line declares its decoder, and ingest stops guessing  ·  Claude Code (Opus 5)
 - **Asked:** *"implement w-199"* — which, after the 2026-09-20 session, meant **DoD 10 only**: the `decoder=` half of Arpit's 2026-09-18 pipe ruling, the one item that kept the file open.
 - **Triaged first.** W-199 was the queue's only 🟢 row, so the session was allowed to start; the four inbox rows and a **fifth that landed mid-session** (the other session's L11 `BLOCKED.json`) are Arpit's and were named before anything was touched. ⚠ **That blocker is open and I did not route around it**: its `↳ blocks:` names W-204 phase D and W-168, and SR-WORK-BLOCKERS decision 9 makes the lock per **asset** — two sessions are expected, not tolerated.

@@ -2,13 +2,13 @@
 type: OpenItem
 id: W-205
 title: "W-205 — identifiers: reachable and whole. One item for the two defects that make `QCL-IT-ADR-08` unfindable or imprecise"
-description: "RULED 2026-09-20 — part 1 built as proposed (option A), part 2 measured on Claude-authored set 3. Arpit, 2026-09-20: W-201 (frontmatter values never reach the index) and W-203 (the analyzer chops a hyphenated id into fragments and stems the fragments) are one subject — identifier retrieval — and W-168 step 2 (an exact field) is its third layer. Merged here. Part 1 is a PROPOSAL awaiting his ruling; part 2 waits on the seed carrying the failing shape (W-168 ruling, via W-204's prompt 7)."
+description: "RULED 2026-09-21 — part 2 family (a) SHIPS on correctness, no d23 clause. RULED 2026-09-20 — part 1 built as proposed (option A), part 2 measured on Claude-authored set 3. Arpit, 2026-09-20: W-201 (frontmatter values never reach the index) and W-203 (the analyzer chops a hyphenated id into fragments and stems the fragments) are one subject — identifier retrieval — and W-168 step 2 (an exact field) is its third layer. Merged here. Part 1 is a PROPOSAL awaiting his ruling; part 2 waits on the seed carrying the failing shape (W-168 ruling, via W-204's prompt 7)."
 status: open
 lane: agent
 timestamp: 2026-09-20T00:00:00Z
 filed: 2026-09-20
 ball: agent
-ruled: 2026-09-20
+ruled: 2026-09-21
 ---
 
 # W-205 — identifiers: reachable, then whole
@@ -26,6 +26,23 @@ stays its own row: it is the *before* fixture (⚠ the two links above move to `
 against it.
 
 ---
+
+## ✅ RULED 2026-09-21 (Arpit, Cowork) — part 2 family (a) SHIPS on correctness; SR-RS d23 gains no clause
+
+- **Ship (a) as a correctness fix.** SR-RANKING decision 9 promises
+  whole-and-parts; `v2` keeps it for `_` alone. The ranking evidence is *no harm
+  at 0 regressions on three rungs* — never *a win*; the INCONCLUSIVE verdict
+  stands as filed and is not reworded. `ANALYZER_VERSION` → `v3`; the dictionary
+  cost (×2.1 terms at `rung-10000`, +4.6 % index bytes) is filed as a **known
+  cost with no threshold**. Merge `evidence/family-a.patch`; both readers; the
+  `_format` handling the pre-registration froze.
+- **(b) stays unbuilt, (c) stays out** unless headroom appears on a retired or
+  future set. Optional follow-up, not this item: restrict (a) to digit-bearing
+  tokens to shed the prose cost — its own fixture run.
+- **SR-RS decision 23 gains NO clause.** The two unmeasured premises of 2026-09-21
+  stay recorded in their two VERDICTs as lessons; no rule, no gate.
+- **Ball → 🟢 agent.** Closing: (a) merged, the W-202 fixture diff filed,
+  SR-RANKING / SR-INGEST / SR-INDEX-LIFECYCLE amended, both suites green.
 
 ## ✅ RULED 2026-09-20 (Arpit, Cowork) — both parts unblocked
 
