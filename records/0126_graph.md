@@ -10,8 +10,17 @@ feature: the graph lane — three relational verbs, a derived plane, and a lazy 
 owns: [src/fux/graph@568321939097, tools/graph-bench@9c330ea14b42]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 761cfbac8e36422310feb6cb5aa1f5e4754769f3bac083d251879e8851d83966
+content_sha: c547a26dfb846551afb1fcf9fd3b35705500b6093d347e34fc4c12938df2346f
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`src/fux/graph/`](../src/fux/graph) · dir
+- [`tools/graph-bench/`](../tools/graph-bench) · dir
+
+<!-- COMPONENTS-END -->
 
 # SR-GRAPH — the graph lane
 

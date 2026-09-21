@@ -10,8 +10,16 @@ feature: generation and update of the committed index, and the refusal that keep
 owns: [src/fux/store@8225b66efa55]
 laws: [L1, L2, L3, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 26a834f8eba406e6f986fc5e462c7f705921e67ed5b29d234700d4840d52744e
+content_sha: 2d0528d10743db901a820cd62c269d129932f4e8c8401635ad7408480c20041e
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`src/fux/store/`](../src/fux/store) · dir
+
+<!-- COMPONENTS-END -->
 
 # SR-INDEX-LIFECYCLE — how the index is generated and updated
 

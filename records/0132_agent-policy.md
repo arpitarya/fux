@@ -10,8 +10,16 @@ feature: the agent-facing policy and skill artifacts Fux ships, and their instal
 owns: [src/fux/templates/agents@17949617d8d4]
 laws: [L1, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 3256f11cfff378bbc644a071757025ee12ebc7eb1d9672c20b4025a0a4ca0ad1
+content_sha: 39a4b7eb6cfab51cdfc144c1f5bc08b54c9094d2b8ddbeb435cac7fbd151e7bb
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`src/fux/templates/agents/`](../src/fux/templates/agents) · dir
+
+<!-- COMPONENTS-END -->
 
 # SR-AGENT-POLICY — shipping the policy, not just the facts
 

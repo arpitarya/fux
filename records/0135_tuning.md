@@ -11,8 +11,20 @@ feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error 
 owns: [src/fux/tune.py@97814aaa4a31]
 laws: [L1, L3, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: d7986a7a3f485b38bd778603d1dd08d0d2a57ef8c1f7ba61a92379705e1a4265
+content_sha: cffc7df151483e6728e3692f7289bc7ffa5e7d86c7d851658b30be4653c61ca7
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`src/fux/tune.py`](../src/fux/tune.py) · file
+
+**Describes** — reaches into, does not own:
+
+- [`src/fux/query/rank.py`](../src/fux/query/rank.py) · owned by [SR-RANKING](0111_ranking.md)
+
+<!-- COMPONENTS-END -->
 
 # SR-TUNE — the tunables file, and per-source priority
 

@@ -11,8 +11,16 @@ feature: which sibling environment may do what — the playground, the lab and t
 owns: [tests/test_work_environments.py@3ed28dd3934f]
 laws: []
 timestamp: 2026-09-11T00:00:00Z
-content_sha: de9f9c6f9b3dcb1169ccaf273090c32efd444f556620b8d2fd9e83431bd79d03
+content_sha: a6946611e6fae9943cf8d9cc2d492f7bd637d2f18af46dc9dd7d761a255c22b0
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`tests/test_work_environments.py`](../tests/test_work_environments.py) · file
+
+<!-- COMPONENTS-END -->
 
 # SR-WORK-ENVIRONMENTS — each sibling environment has one job
 

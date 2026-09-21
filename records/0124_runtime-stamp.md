@@ -10,8 +10,14 @@ feature: "`.fux/runtime/stamp.json` — the cheap staleness pre-filter, and its 
 owns: []
 laws: [L3]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 240d5d02d1afd9b64821eb5033ec0fba06af4b2feff7dca0f8943e79014766ce
+content_sha: 10c1783c571b81f2858f39d6854e77bf289464656a28f5e4bb81952949e251f8
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns nothing** — [SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7, case (a|b); this record's own decisions say which.
+
+<!-- COMPONENTS-END -->
 
 # SR-RUNTIME-STAMP — stamp.json, the cheap pre-check ahead of the manifest
 

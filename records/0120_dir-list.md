@@ -10,8 +10,14 @@ feature: "`.fux/sources/dirs` — what the engine indexes, what is subtracted fr
 owns: []
 laws: [L3, L6]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: ed2e374c4a88ff21ea507bb6ae99d0e7d3497e1bc9d8abc582488fa81c886e36
+content_sha: c8edf8c284eec896e45008edf36f72fd63d5f62dd324f718feb5fdd50d2e27b4
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns nothing** — [SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7, case (a|b); this record's own decisions say which.
+
+<!-- COMPONENTS-END -->
 
 # SR-DIR-LIST — the committed directory list
 

@@ -10,8 +10,14 @@ feature: the committed record schema — `fux.index.v2`
 owns: []
 laws: [L2, L3, L5, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 8e00023a785b644124dcef91ee39d1ce200cdfa6807ade04814897b2ebf4a926
+content_sha: 7dcb4820a1f65d1eb0132a1353d13ee19abb44837db75dbb19c10e4e475a155e
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns nothing** — [SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7, case (a|b); this record's own decisions say which.
+
+<!-- COMPONENTS-END -->
 
 # SR-RECORD — one line of the committed index
 

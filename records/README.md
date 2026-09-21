@@ -567,6 +567,15 @@ its directory — **while the record whose subject *is* that file need never be
 opened.** A record that describes a component it does not own has no mechanical
 protection at all. **Open both.**
 
+**`tests/` as a DIRECTORY has no owner, and that is a decision rather than a
+gap** (2026-09-21, W-208). Each record owns the test that enforces *its* rule —
+which is what `kind: process` rests on — so a directory-level claim would hand
+every test in the tree to one record and make the per-file rule meaningless.
+`tests/` is therefore the one tree where an unclaimed file is correct;
+`src/fux/` and `tools/` still fail on one
+([`tests/test_sr_ownership.py`](../tests/test_sr_ownership.py) checks those two
+roots and no others).
+
 **A component that genuinely has no decision yet is claimed by an open work
 item** (`W-nn`) instead. The test resolves that id against
 [`work/OPEN-WORK.md`](../work/OPEN-WORK.md); a `W-nn` that has closed fails
@@ -688,6 +697,22 @@ table does not grant.
 | `tests/test_golden_key_guards.py` | SR-WORK-GOLDEN | the test that fails when any guard stops covering a spelling. It found two holes on its first run: a slash-terminated `.gitignore` pattern that matched only while the directory existed, and the Bash-branch gap the sixth guard closes. Works from `git check-ignore`, `git ls-files` and synthetic paths — it opens nothing |
 | `scripts/gen-golden.py` | SR-WORK-GOLDEN | renders `CLAUDE.md` §Golden answer key from the record's one normative block, rewriting link targets and doing nothing else. **A second generator rather than a flag on `gen-laws.py`**, whose contract is a validated *set* of ten handles; the link rewrite is imported from it, not copied |
 | `tests/test_claude_md_golden.py` | SR-WORK-GOLDEN | holds that block byte-equal to the record, refuses a verbatim third copy in any live document, and asserts `work/golden/README.md` links rather than restates. **Deleting this file makes the `CLAUDE.md` block an illegal restatement** — SR-LAW-0 decision 5, the same shape as the law block's bind |
+| `scripts/sr-guard.sh` | SR-WORK-OWNERSHIP | the `commit-msg` hook — the freshness gate at the moment it is cheapest to obey (decision 2a) |
+| `scripts/sr-hash.py` | SR-WORK-OWNERSHIP | the `content_sha` stamper (decision 12) |
+| `scripts/sr-owns.py` | SR-WORK-OWNERSHIP | the `owns:` hash stamper (decision 13) |
+| `tests/sr_lib.py` | SR-WORK-OWNERSHIP | the one parser both gates read this register through — `ownership_table`, `describes_table`, `describers_of`, `owner_of` |
+| `tests/test_sr_config_keys.py` | SR-WORK-OWNERSHIP | a record's declared `keys` block against the code, in both directions — record machinery, like the rest of the `test_sr_*` suite |
+| `tests/test_sr_content_hash.py` | SR-WORK-OWNERSHIP | decision 12's gate |
+| `tests/test_sr_freshness.py` | SR-WORK-OWNERSHIP | decisions 3 and 9's gate |
+| `tests/test_sr_frontmatter.py` | SR-WORK-OWNERSHIP | the record shape every other gate parses |
+| `tests/test_sr_ownership.py` | SR-WORK-OWNERSHIP | this table's twin |
+| `tests/test_sr_owns_consistency.py` | SR-WORK-OWNERSHIP | this table against every record's `owns:`, in both directions |
+| `tests/test_sr_owns_hash.py` | SR-WORK-OWNERSHIP | decision 13's gate |
+| `tests/test_sr_register_status.py` | SR-WORK-OWNERSHIP | the register's own rows against each record's `status:` |
+| `scripts/gen-laws.py` | SR-LAW-0 | `CLAUDE.md`'s law block — decision 5's first generated view |
+| `tests/test_claude_md_laws.py` | SR-LAW-0 | the bind that makes that view legal. **Owned here rather than by SR-LAWS**: what it enforces is decision 5, not any law's content |
+| `scripts/gen-components.py` | SR-LAW-0 | the records' `COMPONENTS` block — decision 5's second generated view, whose shape is [SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 16's |
+| `tests/test_record_components.py` | SR-LAW-0 | the bind that makes that view legal |
 <!-- OWNERSHIP-TABLE-END -->
 
 ---

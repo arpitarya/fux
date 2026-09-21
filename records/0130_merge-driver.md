@@ -10,8 +10,16 @@ feature: the merge driver for the committed index
 owns: [src/fux/maintain/mergedriver.py@f8b0c118dec2]
 laws: [L1, L3]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: e06884331ad43aa5b2eaf88f946dc22fbeb5f47aa13558f4d0bf0b348f466a71
+content_sha: 1787c01eeb8c7cea1cdae396cc59a81897ce640c1f4cfe524b82b1658453c731
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`src/fux/maintain/mergedriver.py`](../src/fux/maintain/mergedriver.py) · file
+
+<!-- COMPONENTS-END -->
 
 # SR-MERGE-DRIVER — a machine plane that never conflicts on adjacency
 

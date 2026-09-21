@@ -10,9 +10,17 @@ feature: the capture set every benchmark run files
 owns: [tests/test_benchmark_capture.py@f6af3d328537]
 laws: []
 timestamp: 2026-09-13T00:00:00Z
-content_sha: bbc57c063cc1e86f7d6d0e630a0d63ece302d0c62039e17f5b035179ef9ad196
+content_sha: 54bd0f4ba8face53e853c4c4716ade09ced8332cc0daf6295eef3cf46f364208
 ratifies: Arpit, 2026-09-13 — what a benchmark must always capture
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`tests/test_benchmark_capture.py`](../tests/test_benchmark_capture.py) · file
+
+<!-- COMPONENTS-END -->
 
 # SR-WORK-BENCHMARK — what every benchmark run captures
 

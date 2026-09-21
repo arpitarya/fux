@@ -10,8 +10,16 @@ feature: the postings — `terms` in the committed record, `postings/` in the de
 owns: [tools/pruning-eval@f132f4ab7e46]
 laws: [L2, L3]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: bf4edf62b87b76c96dd5fd906885cbb55c812064477186cfa21e9e4153bc683e
+content_sha: 722706c6b7c29d39315d7c1c48a289d6d9a09e3647f89aa16dc46e9dcbd85327
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`tools/pruning-eval/`](../tools/pruning-eval) · dir
+
+<!-- COMPONENTS-END -->
 
 # SR-POSTINGS — the postings, committed and derived
 

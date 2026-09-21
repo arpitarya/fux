@@ -10,8 +10,14 @@ feature: the index write lock and the files around it
 owns: []
 laws: [L1, L2, L3, L7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 8acf14638d1309b941aff54ccceeb7e64c2b18935f636075b90bee04f07ab6bd
+content_sha: fff9a2520d0dadab0a2707f6f6c616d34c7624e65ea91226793fb6f4b2ff3ce9
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns nothing** — [SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7, case (a|b); this record's own decisions say which.
+
+<!-- COMPONENTS-END -->
 
 # SR-LOCKS — the one lock fux owns
 

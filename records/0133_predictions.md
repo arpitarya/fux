@@ -10,8 +10,19 @@ feature: the prediction system — the R ids, their register, the rules that mak
 owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@08332faa052a, tools/vector-gate@0023bff0cdef]
 laws: [L3]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 0ba35b128a76321c7164471d35c9af020dd0da686637832c26603bbdb1819e14
+content_sha: 3379cf9fb88c09a84fcf0d8c8574d20098ffd7ecf866fa200e72d72b4c6cf399
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`tests/test_regression_runs.py`](../tests/test_regression_runs.py) · file
+- [`tools/quality-controls/`](../tools/quality-controls) · dir
+- [`tools/t2-eval/`](../tools/t2-eval) · dir
+- [`tools/vector-gate/`](../tools/vector-gate) · dir
+
+<!-- COMPONENTS-END -->
 
 # SR-RS — the R predictions
 

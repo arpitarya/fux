@@ -10,8 +10,20 @@ feature: proximity reranking over the refer plane's passages, and the refusal th
 owns: [src/fux/query/rerank.py@7176fbc41899]
 laws: [L1, L3, L4]
 timestamp: 2026-08-24T00:00:00Z
-content_sha: 27fc69f9577cfa0ad3e3af1dc97691257e47a48f2d2594e235f0b1dd8ecc47f1
+content_sha: 333bdad7146c249da8d1d6fb2e3a9588e97f88b50fe4a450ef34e4de1e827650
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`src/fux/query/rerank.py`](../src/fux/query/rerank.py) · file
+
+**Describes** — reaches into, does not own:
+
+- [`src/fux/refer/_rescore.py`](../src/fux/refer/_rescore.py) · owned by [SR-REFER](0127_refer-plane.md)
+
+<!-- COMPONENTS-END -->
 
 # SR-RERANK — proximity reranking
 

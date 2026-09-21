@@ -10,8 +10,17 @@ feature: the refer plane's two caches, and the wall between them
 owns: [src/fux/refer/arc.py@cdf032d55979, src/fux/refer/fetchcache.py@0236aed37e30]
 laws: [L1, L2, L3, L5]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 30696733df9a5b9bc8bce4eff2802cb9ce01624b7200319cd02bc7452035f274
+content_sha: 7806be78d9a30622278ec3e480779d8c84f539f99606248e08be58ab987477ad
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`src/fux/refer/arc.py`](../src/fux/refer/arc.py) · file
+- [`src/fux/refer/fetchcache.py`](../src/fux/refer/fetchcache.py) · file
+
+<!-- COMPONENTS-END -->
 
 # SR-CACHE — two caches, and the wall between them
 

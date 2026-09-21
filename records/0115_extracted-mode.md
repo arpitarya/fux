@@ -12,8 +12,16 @@ owns: [src/fux/ingest/extract.py@b141f1c213f1]
 laws: [L1, L2, L3, L4]
 ratifies: W-30
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 217ce7430796c2ac15f85a4d8b24df25d8219b2e85fe9eac85005145e4cb58c2
+content_sha: f572d0e8ab73c13b80357a68f1a0f9308f15dc0df86228a53dc43439e2a81d7c
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`src/fux/ingest/extract.py`](../src/fux/ingest/extract.py) · file
+
+<!-- COMPONENTS-END -->
 
 # SR-EXTRACTED — the deterministic ingest mode
 

@@ -11,8 +11,18 @@ feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants
 owns: [src/fux/store/fuxdir.py@c984699b459a, src/fux/setup.py@f60d5c17f43e, tests/test_verb_table_agreement.py@1e7999ffd28f]
 laws: [L2, L3, L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: ab44244aba69c81aa158e7f5619ae0f3d7a7d43eb3fdf8954ce17c68fd1faf38
+content_sha: 1eb4e6ae0e094b45912bad779b0fa4bab3f52d146f68cca795fc2c6978ccf654
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`src/fux/setup.py`](../src/fux/setup.py) · file
+- [`src/fux/store/fuxdir.py`](../src/fux/store/fuxdir.py) · file
+- [`tests/test_verb_table_agreement.py`](../tests/test_verb_table_agreement.py) · file
+
+<!-- COMPONENTS-END -->
 
 # SR-DOTFUX — the `.fux/` directory
 

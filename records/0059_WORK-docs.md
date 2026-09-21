@@ -10,8 +10,17 @@ feature: the documentation contract — form, editing authority, and the sync se
 owns: [tests/test_doc_registry.py@0cb5500b6b03, tests/test_doc_links.py@05b239446983]
 laws: [L0]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: ab086e155a13ae94aac797d131a4f643f421169af58795aa74d846c9edcc4d4c
+content_sha: 54c63147f65aa2a6346a676b06bd061fe1877c810916a8d5804667f1df14827b
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`tests/test_doc_links.py`](../tests/test_doc_links.py) · file
+- [`tests/test_doc_registry.py`](../tests/test_doc_registry.py) · file
+
+<!-- COMPONENTS-END -->
 
 # SR-WORK-DOCS — documentation style, discipline, and what every task owes the docs
 

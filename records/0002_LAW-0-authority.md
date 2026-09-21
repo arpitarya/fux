@@ -7,11 +7,22 @@ description: "The constitutional law. A rule is stated in exactly one SR and eve
 status: accepted
 date: 2026-09-06
 feature: the authority of records — where a rule lives, which record wins, and who may amend one
-owns: []
+owns: [scripts/gen-laws.py@4cbb87ce8651, scripts/gen-components.py@f698b5c2305a, tests/test_claude_md_laws.py@0d11020f49f7, tests/test_record_components.py@44f91ccdd550]
 laws: [L0]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: d825dd0e3183198b1dcbdd64c6252c9126e3b1f180823b7b84cb8ca75968dc9e
+content_sha: 03a18dccab4cdaf154d7c30178b75b1cced55419267476bbd14490942a2fc9e1
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- `scripts/gen-components.py` · file
+- [`scripts/gen-laws.py`](../scripts/gen-laws.py) · file
+- [`tests/test_claude_md_laws.py`](../tests/test_claude_md_laws.py) · file
+- `tests/test_record_components.py` · file
+
+<!-- COMPONENTS-END -->
 
 # SR-LAW-0 — L0 — SRs are the only source of truth
 
@@ -261,6 +272,23 @@ records between markers, because a test asserting equality makes disagreement
 impossible. ⚠ **Remove the test and the block violates decision 1** — the
 permission is the test, not the generation.
 
+**5a. This record owns the generators and the binds that make the permission
+real** — **Arpit's ruling of 2026-09-21** (*review all the records and link
+files or folders into each and every SR*), dispositioned as
+[W-208](../work/open/W-208-every-record-names-its-files.md). ⚠ **The law text in
+§2 is untouched**; what this adds is which components this record answers for: [`scripts/gen-laws.py`](../scripts/gen-laws.py) with
+[`tests/test_claude_md_laws.py`](../tests/test_claude_md_laws.py), and
+[`scripts/gen-components.py`](../scripts/gen-components.py) with
+[`tests/test_record_components.py`](../tests/test_record_components.py). They
+are not about laws or about ownership — **they are decision 5, executable**, and
+a change to how a view is rendered or to whether it is still bound is a change
+to this decision. They sat unowned until W-208, so nothing mechanical opened
+this record when either moved. ⚠ **[`scripts/gen-golden.py`](../scripts/gen-golden.py)
+and `tests/test_claude_md_golden.py` are the third such pair and stay with
+[SR-WORK-GOLDEN](0066_WORK-golden.md)**, which already owns them; W-208's table
+listed `gen-golden.py` among the unowned paths and it was not one, and moving an
+owner is not what that item authorised.
+
 **6. A key is real only if it is in its record's declared block.** Prose
 naming a key does not create it. `acquired_max_bytes` sat "documented but
 never parsed" precisely because its only mention was prose in a decision
@@ -339,6 +367,7 @@ duplication, not by inventing a check that cannot exist.
 - Arpit's ruling, 2026-09-06 — quoted verbatim in §2 Context.
 - [`work/IMPLEMENTATION.md`](../work/IMPLEMENTATION.md) §W-122 — the migration this record authorises, as it landed. Its item file was deleted with its queue row (OPEN-WORK rule 2). **W-146 carried the remainder and closed 2026-09-15** — its last row became [SR-WORK-GOLDEN](0066_WORK-golden.md), the second generated view decision 5 permits; the item file is [archived](../archive/open/W-146-the-rest-of-l0.md).
 - **The two strikes:** `acquired_max_bytes` — named in a record and the ownership table, never parsed, `NameError` on every retaining fetch (2026-09-01); `max_parallel` — two contradicting sentences in one accepted amendment, the code implementing the wrong one ([`archive/open/W-83-the-unconfigured-fetch-ceiling.md`](../archive/open/W-83-the-unconfigured-fetch-ceiling.md)).
+- [`scripts/gen-components.py`](../scripts/gen-components.py) and [`tests/test_record_components.py`](../tests/test_record_components.py) — decision 5's second view, the records' `COMPONENTS` block ([SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 16 decides its shape).
 - **Precedent for a generated view:** [SR-TUNE](0135_tuning.md) already names `tune.specimen()` in `src/fux/tune.py` as the authority for `.fux/tune.toml`.
 - US Constitution, Article VI, Clause 2 (the Supremacy Clause) and Article V (the amendment path) — the two-level shape and the reason entrenchment is part of it, not an addition to it.
 
@@ -349,10 +378,15 @@ duplication, not by inventing a check that cannot exist.
 1. A rule is found stated normatively in two artifacts and **neither is
    generated-and-test-bound** — decision 1 is not holding and the failure is
    its own evidence.
-2. The generated `CLAUDE.md` block exists **without** the test that binds it —
-   [`tests/test_claude_md_laws.py`](../tests/test_claude_md_laws.py), which is
-   the whole of decision 5's permission. Deleting that file reopens this record,
-   and `python scripts/gen-laws.py --check` is the same assertion as a command.
+2. **A generated view exists without the test that binds it.** Two are owed
+   here: [`tests/test_claude_md_laws.py`](../tests/test_claude_md_laws.py) for
+   `CLAUDE.md`'s law block, and
+   [`tests/test_record_components.py`](../tests/test_record_components.py) for
+   the records' `COMPONENTS` block. Either is the whole of decision 5's
+   permission for its view; deleting either reopens this record, and
+   `python scripts/gen-laws.py --check` and
+   `python scripts/gen-components.py --check` are the same assertions as
+   commands.
 3. A Law record is amended in a commit that does not name Arpit's ruling.
 4. An ordinary record is found contradicting a law and the conflict is
    resolved by **weighing** rather than by voiding the record's clause.

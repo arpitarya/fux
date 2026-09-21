@@ -11,8 +11,17 @@ owns: [src/fux/doctor.py@b898890bd495, tests/test_doctor_register_is_complete.py
 laws: [L4, L8]
 ratifies: "Arpit, 2026-09-11 — *create a new adr for doctor*"
 timestamp: 2026-09-11T00:00:00Z
-content_sha: 76e308f7d4258d44741a07f22af12d12922f16d605a3f3de0ef83ea30ce3997e
+content_sha: 08082beec6748803dfad2e465ca3c56465198964e045029d648199ecb6d3575c
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`src/fux/doctor.py`](../src/fux/doctor.py) · file
+- [`tests/test_doctor_register_is_complete.py`](../tests/test_doctor_register_is_complete.py) · file
+
+<!-- COMPONENTS-END -->
 
 # SR-DOCTOR — the health command, and who owns its rows
 

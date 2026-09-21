@@ -10,8 +10,16 @@ feature: the quality contract — what a fux quality number means
 owns: [tools/quality@4234bf34b787]
 laws: [L1, L2, L3, L4, L8]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 7c6412abd8a8db1bf91da561b855fb6f26828828ecf1b657ae1160e76787f192
+content_sha: 0cbabed7a0cfb3bca560edd3ba7869d26287cb0cce3b5e0aec4777840db2de33
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`tools/quality/`](../tools/quality) · dir
+
+<!-- COMPONENTS-END -->
 
 # SR-WORK-QUALITY — what "good" means
 

@@ -10,8 +10,16 @@ feature: the discipline of the backlog — the named-but-unclaimed, its five cla
 owns: [tests/test_backlog_rows_are_short.py@834b4f2dae7c]
 laws: [L0]
 timestamp: 2026-09-13T00:00:00Z
-content_sha: 108be96829d6e171b4bbf23c2192708ba66f9f7cc20351057317c2470df9a8bb
+content_sha: ee8c316e4177ccf697a2174aef263de5729b1b976701142e1352ce98ca157626
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`tests/test_backlog_rows_are_short.py`](../tests/test_backlog_rows_are_short.py) · file
+
+<!-- COMPONENTS-END -->
 
 # SR-WORK-BACKLOG — how BACKLOG.md works
 

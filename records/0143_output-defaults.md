@@ -13,8 +13,22 @@ feature: configurable output defaults
 owns: [src/fux/output_config.py@8e8e57fade21]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 8d560ee1be91c8b6c9e919363cb485d643c9f6f872cf460ae9135b535d0978a8
+content_sha: 0f06faac88ab8b0e349f11f8eecbd0f35de1f3a72af2b45420d8c4bc0e208fca
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`src/fux/output_config.py`](../src/fux/output_config.py) · file
+
+**Describes** — reaches into, does not own:
+
+- [`src/fux/cli.py`](../src/fux/cli.py) · owned by [SR-CLI](0101_cli-surface.md)
+- [`src/fux/mcp.py`](../src/fux/mcp.py) · owned by [SR-MCP](0136_mcp.md)
+- [`src/fux/query/__init__.py::_gated,_print_index_answer,_print_refer_answer,_show_band,cmd_answer,cmd_ask,cmd_find`](../src/fux/query/__init__.py) · owned by [SR-ASK](0103_ask.md)
+
+<!-- COMPONENTS-END -->
 
 # SR-OUTPUT — output defaults are configurable, in a third file
 

@@ -10,8 +10,17 @@ feature: "`fux answer` — one answer, its footing stated, and the report of wha
 owns: []
 laws: [L1, L2, L3]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: acca92c1fdede7f9ab3231ca350343be50a96bbf3c7846143e98b63d0daa76ad
+content_sha: 6686b4d70792ad06aa14bb24890089b3badbd275d64325a7b83ceca8de169c39
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Describes** — reaches into, does not own:
+
+- [`src/fux/query/__init__.py`](../src/fux/query/__init__.py) · owned by [SR-ASK](0103_ask.md)
+- [`src/fux/query/refer_answer.py`](../src/fux/query/refer_answer.py) · owned by [SR-ASK](0103_ask.md)
+
+<!-- COMPONENTS-END -->
 
 # SR-ANSWER — the `answer` verb
 

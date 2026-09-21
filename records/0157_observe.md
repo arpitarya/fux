@@ -10,9 +10,18 @@ feature: the observer hook — the extension point a consumer's analytics subscr
 owns: [src/fux/observe.py@4ea7874ba9c7, tools/observer-bench@e12d60cca125]
 laws: [L1, L2, L3, L4, L8, L10]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: a9b3cfe11e3346c59a1477e0265f7b7d93615d5e433d39bd0dc2ee4f89c34071
+content_sha: 9d587ec8f3b45e77cbab9e10125882f579c38e8ab4cde37da77d987ed4aa34fa
 ratifies: W-170
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`src/fux/observe.py`](../src/fux/observe.py) · file
+- [`tools/observer-bench/`](../tools/observer-bench) · dir
+
+<!-- COMPONENTS-END -->
 
 # SR-OBSERVE — `.fux/observers/`, the observe-only hook
 

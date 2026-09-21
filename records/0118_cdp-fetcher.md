@@ -10,8 +10,14 @@ feature: "`.fux/fetchers/cdp.py` — the reference fetcher for documents behind 
 owns: []
 laws: [L1, L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: b98d007b22d410fe2b1cc802de7e520f607d128c90c1357314e92b89698db9e8
+content_sha: e4b7cbdcf97ebb1064a382678fd728058fddbdb1a178a7e65d22284211b7b523
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns nothing** — [SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7, case (a|b); this record's own decisions say which.
+
+<!-- COMPONENTS-END -->
 
 # SR-CDP-FETCHER — the browser fetcher
 

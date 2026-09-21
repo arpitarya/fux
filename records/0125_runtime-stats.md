@@ -10,8 +10,14 @@ feature: "`.fux/runtime/stats.json` — the corpus-wide aggregates, and the rule
 owns: []
 laws: [L3]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 4a02a1e077096167e9e2d6cbd3f1f1c54bac8ca55ce2d706d7130bf049be1701
+content_sha: 8b20e43037c9fd6e05fde01db0474cc688da6a77fed9e662efd37c0ec61bf7ba
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns nothing** — [SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7, case (a|b); this record's own decisions say which.
+
+<!-- COMPONENTS-END -->
 
 # SR-RUNTIME-STATS — stats.json, the corpus-wide numbers BM25F needs
 

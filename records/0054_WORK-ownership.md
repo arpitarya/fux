@@ -9,12 +9,31 @@ amended: 2026-09-13
 date: 2026-08-27
 ratified: 2026-08-27
 feature: the record-to-component model, and the `describes` relation W-82 ruling 4 added to it
-owns: []
+owns: [scripts/sr-guard.sh@78168609634b, scripts/sr-hash.py@89a61ddfaa5c, scripts/sr-owns.py@e9f45f2361f1, tests/sr_lib.py@c93fbcc78ec3, tests/test_sr_config_keys.py@ccc95d7f5d03, tests/test_sr_content_hash.py@f11f818ed4e9, tests/test_sr_freshness.py@39e5349eef5f, tests/test_sr_frontmatter.py@5ba563cc5d37, tests/test_sr_ownership.py@fe7fd1f00b5c, tests/test_sr_owns_consistency.py@b3d92e0f7e55, tests/test_sr_owns_hash.py@118b38a56a62, tests/test_sr_register_status.py@acae7406d76c]
 laws: [0]
 ratifies: W-82 ruling 4
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 1696c383dd7671363dcd164c4e3d227ea70ce61768dd1979e87e62f7537b1fd1
+content_sha: 6cfbd193da53213da3f8f9098ca8d78b9d07d1c4855d4059a65e278c468c99b3
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`scripts/sr-guard.sh`](../scripts/sr-guard.sh) · file
+- [`scripts/sr-hash.py`](../scripts/sr-hash.py) · file
+- [`scripts/sr-owns.py`](../scripts/sr-owns.py) · file
+- [`tests/sr_lib.py`](../tests/sr_lib.py) · file
+- [`tests/test_sr_config_keys.py`](../tests/test_sr_config_keys.py) · file
+- [`tests/test_sr_content_hash.py`](../tests/test_sr_content_hash.py) · file
+- [`tests/test_sr_freshness.py`](../tests/test_sr_freshness.py) · file
+- [`tests/test_sr_frontmatter.py`](../tests/test_sr_frontmatter.py) · file
+- [`tests/test_sr_ownership.py`](../tests/test_sr_ownership.py) · file
+- [`tests/test_sr_owns_consistency.py`](../tests/test_sr_owns_consistency.py) · file
+- [`tests/test_sr_owns_hash.py`](../tests/test_sr_owns_hash.py) · file
+- [`tests/test_sr_register_status.py`](../tests/test_sr_register_status.py) · file
+
+<!-- COMPONENTS-END -->
 
 # SR-WORK-OWNERSHIP — `owns` and `describes`
 
@@ -167,11 +186,23 @@ src/fux/query/rank.py        SR-RANKING         SR-TUNE
    threshold would be arbitrary and a wrong one would push people to under-
    declare, which is worse than the smell. Named here so a reviewer can see it.
 
-7. **This record owns nothing**, and that is one of the two honest cases the
-   register already allows: it states a mechanism spread across components each
-   already claimed. ⚠ **The consequence is that the freshness gate cannot demand
-   it** — so if the ownership model changes, nothing mechanical opens this file.
-   It is the exact hole this record is about, and it is not closed for itself.
+7. **A record may own nothing, and the register states the two honest cases.**
+   Case (a): it specifies one file another record already generates — the
+   runtime-plane companions. Case (b): it states a mechanism spread across
+   components each already claimed by the record carrying its decisions. ⚠ **In
+   both, the freshness gate cannot demand that record**, so nothing mechanical
+   catches it going stale.
+
+   ⚠ **THIS record's own case-(b) claim is RETRACTED** (2026-09-21, W-208). It
+   read *"this record owns nothing … it is the exact hole this record is about,
+   and it is not closed for itself"*, and that was true only because nobody had
+   looked: `scripts/sr-guard.sh`, `scripts/sr-hash.py`, `scripts/sr-owns.py`,
+   `tests/sr_lib.py` and the `tests/test_sr_*.py` suite **are** the
+   record-to-component model, executable. They are components with a decision
+   behind them, not a mechanism spread across other records' files, so case (b)
+   never fitted. **The hole is closed for this record**: edit the register's
+   parser or any of its gates and the freshness check now demands this file.
+   Veto condition 6 loses its *"and it owns nothing"* clause with it.
 
 8. **It does NOT check coherence.** `describes` widens *which* records must be
    touched. Whether the edit made them agree is ruling 18's gap, still open.
@@ -389,6 +420,45 @@ top-level definitions.
       Every path it checks is a citation that should not have carried a number.
       It is the floor under that rule and never a substitute for it.
 
+16. **A record shows what it governs in ONE permitted body form: the generated
+    `COMPONENTS` block** (2026-09-21, W-208). Directly under the frontmatter,
+    between `<!-- COMPONENTS-START … -->` and `<!-- COMPONENTS-END -->`,
+    rendered from **both** tables by
+    [`scripts/gen-components.py`](../scripts/gen-components.py) and held
+    byte-equal by
+    [`tests/test_record_components.py`](../tests/test_record_components.py) —
+    owned paths as relative links with their kind, described paths as the
+    register writes them with the *owning* record linked, and for a record with
+    neither the one honest-case line pointing at decision 7. **A law with
+    neither carries no block**: a law governs conduct, not components.
+
+    - **Why a view at all.** Before this, a record did not name the files it
+      governs. `owns:` is frontmatter — a list of paths, no links, and
+      `describes` was not in the record at all, so the answer to *which code is
+      this about* lived only in `records/README.md`. Arpit, 2026-09-21: *link
+      files or folders into each and every SR, even the node ones.*
+    - 🔴 **Hand-written links were the option rejected, and L0 is why.**
+      Eighty-odd records restating two tables is the restatement
+      [SR-LAW-0](0002_LAW-0-authority.md) decision 1 forbids — body and table
+      could disagree while both still looked correct.
+      [SR-LAW-0](0002_LAW-0-authority.md) decision 5 permits a generated view
+      **for exactly as long as a test binds it**, which is the `gen-laws.py` /
+      `test_claude_md_laws.py` pattern and the only form permitted here.
+      ⚠ **Remove the test and every block becomes an illegal restatement.**
+    - **The generator renders a link only for a path `git ls-files` carries**,
+      on `sr-owns.py`'s rule that the component is what the commit carries. An
+      untracked path — `node/dist/fux.mjs`, the L10 build output — renders as a
+      bare code span, because a link to it would resolve on a machine that has
+      built the bundle and break in CI.
+    - ⚠ **The case letter is NOT rendered**, and that is the one thing the block
+      declines to say. Nothing machine-readable records whether a record claims
+      case (a) or (b); a generator that guessed would assert something nobody
+      checked, in the position a reader trusts most. The line names decision 7
+      and the record's own decisions say which.
+    - **It carries no row in [`work/DOC-REGISTRY.md`](../work/DOC-REGISTRY.md)** —
+      that file's rule 1 keeps generated views out of the registry, and the
+      block is recorded here instead.
+
 ### Consequences
 
 - **Every describes row is a row someone must maintain.** The relation is only
@@ -423,6 +493,8 @@ top-level definitions.
 ### Reference (required)
 
 - [`tests/sr_lib.py`](../tests/sr_lib.py) — `describes_table`, `describers_of`
+- [`scripts/gen-components.py`](../scripts/gen-components.py) — decision 16's generator
+- [`tests/test_record_components.py`](../tests/test_record_components.py) — the bind that makes decision 16's block legal
 - [`tests/test_sr_ownership.py`](../tests/test_sr_ownership.py) — the table's own checks
 - [`tests/test_sr_freshness.py`](../tests/test_sr_freshness.py) — `owning_records`, widened; `_register_at` and the three tests pinning decision 9
 - [`records/RULE-SINCE`](RULE-SINCE) — the three baseline moves decision 9 exists to stop needing
@@ -450,8 +522,10 @@ top-level definitions.
    `test_a_row_written_after_a_commit_does_not_convict_it`.
 6. **A `kind: process` record owns no test.** The kind's only enforcement is
    that its rule has one; a process record owning nothing is the drawer this
-   record warned about, open. ⚠ **Not gated today** — SR-WORK-OWNERSHIP and
-   SR-PORT-LIST are both in that state as written.
+   record warned about, open. ⚠ **Not gated today.** **This record left that
+   state on 2026-09-21** (decision 7's retraction, W-208); **SR-PORT-LIST,
+   SR-WORK-SCALE and SR-WORK-LIFECYCLE are still in it**, each by a stated
+   decision of its own rather than by omission.
 7. **`records/RULE-SINCE` gains a fourth entry.** Decision 9 was supposed to
    end the need to move the baseline for this cause; a new entry naming a
    reassignment, a renumber or a new record means it did not.
@@ -465,6 +539,11 @@ top-level definitions.
    nobody can tell which relations are real.
 5. **A record describes more than a handful of components while owning none.**
    Decision 6's smell, gone structural.
+8. **`tests/test_record_components.py` is deleted, or stops comparing every
+   record.** Decision 16's block is legal only while a test binds it
+   ([SR-LAW-0](0002_LAW-0-authority.md) decision 5); without one, eighty records
+   carry an authoritative-looking second copy of the tables that can drift from
+   them silently.
 
 ## References
 

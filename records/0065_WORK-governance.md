@@ -10,8 +10,14 @@ feature: the governance map — which file governs what, who reads it, and what 
 owns: []
 laws: [L0]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 77bacb67098799e039da6cc9a91e485855ded195b15003ba7c0a9d6c0f4baceb
+content_sha: 2fb13c923a8d458a30a24ebe7d2ba2647d512c5881d2ee3635cd4590bd0d1fb8
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns nothing** — [SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7, case (a|b); this record's own decisions say which.
+
+<!-- COMPONENTS-END -->
 
 # SR-WORK-GOVERNANCE — the governance map
 

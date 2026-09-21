@@ -11,8 +11,18 @@ feature: the `fux ingest` pipeline — sources to committed records
 owns: [src/fux/ingest/ingestlog.py@73e117c1e919, src/fux/ingest@618f5f74a04b, src/fux/ingest/priors.py@8ffcc632a4be]
 laws: [L2, L3, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 2b41c720a12292f011018084815cad1aa7be0c8e0a95f0375c7e40824d1b5cee
+content_sha: d30bce702f1001f6e45c1d8264ccca506048ee5d527f83233c3f5ce180c475b8
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`src/fux/ingest/`](../src/fux/ingest) · dir
+- [`src/fux/ingest/ingestlog.py`](../src/fux/ingest/ingestlog.py) · file
+- [`src/fux/ingest/priors.py`](../src/fux/ingest/priors.py) · file
+
+<!-- COMPONENTS-END -->
 
 # SR-INGEST — how ingest works
 

@@ -10,8 +10,14 @@ feature: the session contract — the three files, the running pointer, and how 
 owns: []
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: c4b8e7bdb0f08d401fa6dab320bf433cb2a7745a56bc050b71af8e53913c51db
+content_sha: 059debe0c6ea358ed52dabcaf145e692e282e12ac3990c1198905cb1468311ad
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns nothing** — [SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7, case (a|b); this record's own decisions say which.
+
+<!-- COMPONENTS-END -->
 
 # SR-WORK-SESSION — what a session owes before it ends
 

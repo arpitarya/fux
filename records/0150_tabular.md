@@ -11,8 +11,18 @@ feature: tabular documents — row granularity, the admitted-row limit, and what
 owns: [src/fux/decode/csv.py@3dcdf4365361, src/fux/decode/xlsx.py@a54a416685f2, src/fux/decode/_limits.py@5970a244258a]
 laws: [L1, L2, L3]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: c81d42a572a5f55ccac21430e22abf3aad67bef4cbf1eb976dc0e1a40f47acf8
+content_sha: e2ac1795dde0f3524e4f96b082bf867d4c19afff18d47ab7165c5a0cc664d26b
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`src/fux/decode/_limits.py`](../src/fux/decode/_limits.py) · file
+- [`src/fux/decode/csv.py`](../src/fux/decode/csv.py) · file
+- [`src/fux/decode/xlsx.py`](../src/fux/decode/xlsx.py) · file
+
+<!-- COMPONENTS-END -->
 
 # SR-TABULAR — a table is a list of rows, and a row is the unit of an answer
 

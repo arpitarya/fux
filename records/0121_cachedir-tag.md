@@ -10,8 +10,14 @@ feature: the `CACHEDIR.TAG` file written into every derived `.fux/` subdirectory
 owns: []
 laws: [L3]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: ec8a7150c5449a4febbfcfbb213ba67b8e49c1b97a089b014fa5f665cd559e11
+content_sha: b875cfa5dcdc2ab74cae8ccf823c02b9a7c27bfdc0c4200bfa41780c39fdbdda
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns nothing** — [SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7, case (a|b); this record's own decisions say which.
+
+<!-- COMPONENTS-END -->
 
 # SR-CACHEDIR-TAG — CACHEDIR.TAG marks a derived directory disposable
 

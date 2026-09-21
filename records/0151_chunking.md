@@ -11,8 +11,16 @@ feature: chunking — the strategy vocabulary, the boundary ladder, and the retr
 owns: [src/fux/refer/_chunk.py@5226408009de]
 laws: [L1, L2, L3]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: d6af3fc689ff06ab2e5f837f826982f0ddcfa2bace2ab92eeda5afd9dc6579d1
+content_sha: 869187ccb1271eb6de3fe421ca9783e6abe36f209d79b14d957fecf72a152a2e
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`src/fux/refer/_chunk.py`](../src/fux/refer/_chunk.py) · file
+
+<!-- COMPONENTS-END -->
 
 # SR-CHUNKING — a chunk does three jobs
 

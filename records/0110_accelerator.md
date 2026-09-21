@@ -10,8 +10,17 @@ feature: "`.fux/runtime/` — the derived index, `fux build`, and the block boun
 owns: [src/fux/derive@0ffb225704ee, tools/differential@1934e54fe0ca]
 laws: [L1, L3]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 0115837a49affdec9dc9670422ed63cd2520143c0869983a64181e29785aac99
+content_sha: 73e7dba48cbb3d486e5778946e9550d0ff18c4d3c0408f9ae567825db655b179
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`src/fux/derive/`](../src/fux/derive) · dir
+- [`tools/differential/`](../tools/differential) · dir
+
+<!-- COMPONENTS-END -->
 
 # SR-T1-ACCELERATOR — the derived T1 accelerator
 

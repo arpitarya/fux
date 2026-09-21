@@ -10,8 +10,17 @@ feature: the decoder plane — the protocol, the registry, the consumer seam and
 owns: [src/fux/decode@28eb64f5a77d, src/fux/templates/agents/DECODER-SKILL.md@474a416bcc42]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-26T00:00:00Z
-content_sha: 2a316414eb8733d7c60cafe3429d1e869c4054d39a14bbfd2f2ac27fa9841e60
+content_sha: c3b44524f9054cbc26704e26881730af37fb68f8edbe5da668693f7fbb1e070c
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`src/fux/decode/`](../src/fux/decode) · dir
+- [`src/fux/templates/agents/DECODER-SKILL.md`](../src/fux/templates/agents/DECODER-SKILL.md) · file
+
+<!-- COMPONENTS-END -->
 
 # SR-DECODE — bytes become Markdown in one place
 

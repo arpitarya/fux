@@ -10,8 +10,14 @@ feature: the agent-surface taxonomy, and the five acting surfaces
 owns: []
 laws: [L1, L3, L4]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: e3d1fff1067bd80431bb135f9fb4106103557cf1e7e2513149d25456a45cef76
+content_sha: 2c01f73872cd1c05fd1eda7ca7d401b5e461defab022eee0531a4ab04662b90b
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns nothing** — [SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7, case (a|b); this record's own decisions say which.
+
+<!-- COMPONENTS-END -->
 
 # SR-AGENT-SURFACES — what an agent surface is
 

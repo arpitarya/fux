@@ -10,8 +10,14 @@ feature: "`.fux/fetchers/http.py` — the fetcher a URL gets when its line says 
 owns: []
 laws: [L1, L4, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: eedea8b59603ba043aa6aeefa34f5089e5fcd89ae4b836568796b8868afcf578
+content_sha: 25bee2c06cb8cf5cb1106bfa420352616094b486c73479144d473d0f94d354ba
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns nothing** — [SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7, case (a|b); this record's own decisions say which.
+
+<!-- COMPONENTS-END -->
 
 # SR-HTTP-FETCHER — the default fetcher
 

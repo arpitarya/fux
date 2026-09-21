@@ -10,8 +10,16 @@ feature: the one archive, and the line between naming a retired document and gro
 owns: [tests/test_archive_law.py@0bcf319c1b1a]
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 6cffbd7dfd439516b9cf2475649f276cd385bb1ff146f54fc6cdde0d53cc1825
+content_sha: 96e4393973954b68ae618ca78417a3db58dedad635868e6ab4756d8688a36f10
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`tests/test_archive_law.py`](../tests/test_archive_law.py) · file
+
+<!-- COMPONENTS-END -->
 
 # SR-WORK-ARCHIVE — one archive, and archive is not evidence
 

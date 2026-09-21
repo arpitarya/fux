@@ -10,8 +10,16 @@ feature: conformance to the Open Knowledge Format, and the three declared bounda
 owns: [tests/test_okf_bundle.py@449982f576db]
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 851e8f0209387c0b6ec4afec31c83833970c3ffc66006cbec076da1ea7f292a7
+content_sha: ebef8e284b662660b4bf5f422ee7725fade3334ae62f992c425dc00c74063d61
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`tests/test_okf_bundle.py`](../tests/test_okf_bundle.py) · file
+
+<!-- COMPONENTS-END -->
 
 # SR-WORK-OKF — the repo is an OKF knowledge bundle
 

@@ -10,8 +10,14 @@ feature: the `url:` source and how ingestion behaves around the fetcher boundary
 owns: []
 laws: [L2, L4, L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 9d9c1fb1066ffd703c7777ca0b0ada903a8ed78d47a434a893e8eaf68caca52f
+content_sha: df0f88376b742f69ca51d47b99539b5725a4f415faed26ec824c62b2e3e376e4
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns nothing** — [SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7, case (a|b); this record's own decisions say which.
+
+<!-- COMPONENTS-END -->
 
 # SR-URL-INGEST — URL ingestion through a consumer-owned fetcher
 

@@ -11,8 +11,18 @@ owns: [tests/test_open_work_rows_are_short.py@01fe412431ad, tests/test_open_work
 laws: [L0]
 ratifies: W-146 ruling 1 · Arpit 2026-09-13 (archive, never delete)
 timestamp: 2026-09-13T00:00:00Z
-content_sha: 8ecc34cb7ee21540eb472d1a25841bb2463464482916160d035c25955f98c80e
+content_sha: c6058b82129c85598dd0376b6aaad40ef910fa7e327b4e16aee407878ea78d1e
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`tests/test_no_work_item_is_lost.py`](../tests/test_no_work_item_is_lost.py) · file
+- [`tests/test_open_work_is_not_stale.py`](../tests/test_open_work_is_not_stale.py) · file
+- [`tests/test_open_work_rows_are_short.py`](../tests/test_open_work_rows_are_short.py) · file
+
+<!-- COMPONENTS-END -->
 
 # SR-WORK-OPEN-QUEUE — how OPEN-WORK works
 

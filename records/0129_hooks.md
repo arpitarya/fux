@@ -10,8 +10,18 @@ feature: maintenance — the hooks, the deferring runner, the write lock, and th
 owns: [src/fux/maintain@6e92e762b4c4, tools/maintenance-bench@23a6ade137a5, tools/runner-race@98bd70ff092a]
 laws: [L3, L4, L5, L7]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 34967c2556b0a4d1bcd22f25f7d398cf6d744ce826be4907d76762493c3cdb62
+content_sha: e88cc88aabb97560d6a2fbb898e4d41eaaec488a12cfe39dd9d73fb2aaaaf29f
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`src/fux/maintain/`](../src/fux/maintain) · dir
+- [`tools/maintenance-bench/`](../tools/maintenance-bench) · dir
+- [`tools/runner-race/`](../tools/runner-race) · dir
+
+<!-- COMPONENTS-END -->
 
 # SR-MAINTENANCE — keeping the index in step
 

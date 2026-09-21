@@ -10,8 +10,23 @@ feature: the acquired plane
 owns: [src/fux/store/acquired.py@9897ee1fe4af]
 laws: []
 timestamp: 2026-09-01T00:00:00Z
-content_sha: eaee27b85079b083b04ee62c0663651686f2cd2b5a0607fa2f97e74019251503
+content_sha: 3e171dc33711a72b89b10daf88def8f43bf945a569c34bf4ccf587f975bb9541
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`src/fux/store/acquired.py`](../src/fux/store/acquired.py) · file
+
+**Describes** — reaches into, does not own:
+
+- [`src/fux/config.py`](../src/fux/config.py) · owned by [SR-CONFIG](0113_config.md)
+- [`src/fux/ingest/sourcelist.py`](../src/fux/ingest/sourcelist.py) · owned by [SR-URL-LIST](0116_url-list.md)
+- [`src/fux/ingest/urlsrc.py`](../src/fux/ingest/urlsrc.py) · owned by [SR-FETCHER](0117_fetcher.md)
+- [`src/fux/store/fuxdir.py`](../src/fux/store/fuxdir.py) · owned by [SR-DOTFUX](0102_fux-directory.md)
+
+<!-- COMPONENTS-END -->
 
 # SR-ACQUIRED: fetched bytes are kept, in a plane that is neither committed nor derived
 

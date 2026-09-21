@@ -10,9 +10,17 @@ feature: the index X-ray
 owns: [src/fux/inspect@d1930eef9504]
 laws: [L2, L3, L4, L6, L8]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: bc9e054e10e489221ca1d091246a1fa0e9dd2986a7bb7aa3a13f0a9615a06b20
+content_sha: 9badcf589138c756f51037936cf3b2bcb21bd797fdfc5f2b3bd1e07b16071be3
 ratifies: W-169
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`src/fux/inspect/`](../src/fux/inspect) · dir
+
+<!-- COMPONENTS-END -->
 
 # SR-INSPECT — what the index looks like, said out loud
 

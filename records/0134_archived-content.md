@@ -10,8 +10,22 @@ feature: what happens once a document is declared archived — the record proper
 owns: [tools/archived-signal-eval@30fb75fa7476]
 laws: [L3, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 8cf5c7558d1e4e5aa17a76c0b0848135d69d0c9300e0cb183d20d09abb50b4e8
+content_sha: 21a4f5da7ef3b60ab5a767d516387dcfd8d6541b49b5018337b03ad5f90d6ab5
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`tools/archived-signal-eval/`](../tools/archived-signal-eval) · dir
+
+**Describes** — reaches into, does not own:
+
+- [`src/fux/ingest/run.py`](../src/fux/ingest/run.py) · owned by [SR-INGEST](0106_ingest.md)
+- [`src/fux/ingest/sourcelist.py`](../src/fux/ingest/sourcelist.py) · owned by [SR-URL-LIST](0116_url-list.md)
+- [`src/fux/ingest/urlsrc.py`](../src/fux/ingest/urlsrc.py) · owned by [SR-FETCHER](0117_fetcher.md)
+
+<!-- COMPONENTS-END -->
 
 # SR-ARCHIVED-CONTENT — what "archived" does, once a document carries it
 

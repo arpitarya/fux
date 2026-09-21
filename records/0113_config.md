@@ -10,8 +10,16 @@ feature: "`fux.toml` — discovery, schema, validation, and the keys that are re
 owns: [src/fux/config.py@e7ab20d676db]
 laws: [L4, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 48ba0f4b31d27c91fce3421932c5d4dd36cf5dbf021c42044db6f93db91aabf3
+content_sha: b6793652f5b251cf4b9950cda643fae179e85870e90c19a553a0cab13a2e5633
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`src/fux/config.py`](../src/fux/config.py) · file
+
+<!-- COMPONENTS-END -->
 
 # SR-CONFIG — `fux.toml` and every property in it
 

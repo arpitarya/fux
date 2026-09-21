@@ -10,8 +10,14 @@ feature: the boundary between the archived engine and this one
 owns: []
 laws: [L1, L3]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: af355f3fdc221b5368f0d89b3517a2a241dd1d6e88881e23f7e8a05b0c43c2a1
+content_sha: 21bc087eb16e418fc922d31d6b40839672cb88dcb5d8b09dbe8d030bc86deabf
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns nothing** — [SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7, case (a|b); this record's own decisions say which.
+
+<!-- COMPONENTS-END -->
 
 # SR-PORT-LIST — port, don't rewrite, and this is the complete list
 

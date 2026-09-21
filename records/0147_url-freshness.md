@@ -10,8 +10,24 @@ feature: the freshness verdict vocabulary and the per-URL check interval
 owns: [src/fux/refer/freshness.py@c2205bbff313]
 laws: [L2, L3, L4]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: b82f6a89bdd7494523b48e0b91fe561f49c11184e5cb3cca6691edf06b36ee88
+content_sha: d22c06cceecc28c7ddef60704ca71006d89a4834f0af9821a1a579c736913a03
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`src/fux/refer/freshness.py`](../src/fux/refer/freshness.py) · file
+
+**Describes** — reaches into, does not own:
+
+- [`src/fux/config.py`](../src/fux/config.py) · owned by [SR-CONFIG](0113_config.md)
+- [`src/fux/ingest/sourcelist.py`](../src/fux/ingest/sourcelist.py) · owned by [SR-URL-LIST](0116_url-list.md)
+- [`src/fux/ingest/urlsrc.py`](../src/fux/ingest/urlsrc.py) · owned by [SR-FETCHER](0117_fetcher.md)
+- [`src/fux/refer/__init__.py`](../src/fux/refer/__init__.py) · owned by [SR-REFER](0127_refer-plane.md)
+- [`src/fux/refer/source.py`](../src/fux/refer/source.py) · owned by [SR-REFER](0127_refer-plane.md)
+
+<!-- COMPONENTS-END -->
 
 # SR-URL-FRESHNESS: what a citation may claim, and how often it has to earn it
 

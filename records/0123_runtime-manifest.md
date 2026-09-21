@@ -10,8 +10,14 @@ feature: "`.fux/runtime/manifest.json` — the derived plane's freshness contrac
 owns: []
 laws: [L3]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 6a6784c0e8f80e1045dbf84deb69c7afd350126d207f66dba69d69d9aed7557b
+content_sha: 4ff04e7f6bc8196b91738470396fb06e4ddb8881dc57acbc35d5140c04b53c18
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns nothing** — [SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7, case (a|b); this record's own decisions say which.
+
+<!-- COMPONENTS-END -->
 
 # SR-RUNTIME-MANIFEST — manifest.json, the accelerator's staleness fingerprint
 

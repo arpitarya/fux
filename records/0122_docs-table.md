@@ -10,8 +10,14 @@ feature: "`.fux/runtime/docs.jsonl` — the derived doc table and the join key i
 owns: []
 laws: [L3]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 9b679777a605584dc8c633eb470ede3c0927e4f7e233307076f68e1c03fdd34c
+content_sha: 767617cdc35f2c2dca79331016964d3263c65a329e1926f0c33fd3eab876f633
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns nothing** — [SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7, case (a|b); this record's own decisions say which.
+
+<!-- COMPONENTS-END -->
 
 # SR-DOCS-TABLE — docs.jsonl, the docidx-ordered doc table
 

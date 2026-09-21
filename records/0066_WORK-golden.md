@@ -10,9 +10,22 @@ feature: the golden benchmark — its two question sets, the key's custody, its 
 owns: [.claude/hooks/guard-golden-answer.sh@c505d04c0628, .claude/hooks/guard-sealed-key.sh@0d4dd725e7aa, tests/test_golden_key_guards.py@ee33d84f9333, scripts/gen-golden.py@1b2a854c1f75, tests/test_claude_md_golden.py@49db9e6261d8, tools/golden-difficulty@94f4740b9c02]
 laws: [L0, L11]
 timestamp: 2026-09-15T00:00:00Z
-content_sha: 52ba987ae1a8e2a25afabd5678b8d8e7e8da758e8834122d89bfb48b0eeeb030
+content_sha: b35b95041af4b933c81aecf0b87b1a2c4f79a541027fa09e44ac98eaebc89106
 ratifies: "Arpit, 2026-09-15 — W-146 row 17: the prohibition gets a record and CLAUDE.md keeps a generated view; the same day he ruled it into law L11 and then amended it — two question sets, one Claude-authored and one Codex-authored, with both answer halves in his custody and no key file at all"
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`.claude/hooks/guard-golden-answer.sh`](../.claude/hooks/guard-golden-answer.sh) · file
+- [`.claude/hooks/guard-sealed-key.sh`](../.claude/hooks/guard-sealed-key.sh) · file
+- [`scripts/gen-golden.py`](../scripts/gen-golden.py) · file
+- [`tests/test_claude_md_golden.py`](../tests/test_claude_md_golden.py) · file
+- [`tests/test_golden_key_guards.py`](../tests/test_golden_key_guards.py) · file
+- [`tools/golden-difficulty/`](../tools/golden-difficulty) · dir
+
+<!-- COMPONENTS-END -->
 
 # SR-WORK-GOLDEN — the sealed answer key
 

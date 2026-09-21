@@ -11,8 +11,22 @@ feature: the confidence plane
 owns: [src/fux/query/confidence.py@e0641ff2c3be, tests/test_confidence_floor_off.py@f8e18c079a6e]
 laws: [L1, L3, L4]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: ed24ec5ae7891739a2b992ef41dc27d63bc4b756ec7bde60900ff27c62117201
+content_sha: 7801fea9b9d699682b31443c1107e330f7bd9b869a29cde84961fd0c942328c3
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`src/fux/query/confidence.py`](../src/fux/query/confidence.py) · file
+- [`tests/test_confidence_floor_off.py`](../tests/test_confidence_floor_off.py) · file
+
+**Describes** — reaches into, does not own:
+
+- [`src/fux/derive/accel.py`](../src/fux/derive/accel.py) · owned by [SR-T1-ACCELERATOR](0110_accelerator.md)
+- [`src/fux/query/__init__.py`](../src/fux/query/__init__.py) · owned by [SR-ASK](0103_ask.md)
+
+<!-- COMPONENTS-END -->
 
 # SR-CONFIDENCE — how much the index believes its own answer
 

@@ -10,8 +10,18 @@ feature: how a session declares that it is blocked, and the three hooks that sto
 owns: [.claude/hooks/stop-if-blocked.sh@b242725e3898, .claude/hooks/inject-inbox.sh@4bd466676c80, .claude/hooks/session-lock.sh@cdfea2091cd8]
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: a621ac6e19dc34138fc8d4946bb9fc2cadc845f7fbfe6f6a4c9c286eb8d5feb3
+content_sha: f454777e5d4ce22f590b550818a0a21dfaade01eaa050ac54d213e1a4ad9d608
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`.claude/hooks/inject-inbox.sh`](../.claude/hooks/inject-inbox.sh) · file
+- [`.claude/hooks/session-lock.sh`](../.claude/hooks/session-lock.sh) · file
+- [`.claude/hooks/stop-if-blocked.sh`](../.claude/hooks/stop-if-blocked.sh) · file
+
+<!-- COMPONENTS-END -->
 
 # SR-WORK-BLOCKERS — a blocker is a file, not a remark
 

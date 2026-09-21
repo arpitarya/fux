@@ -10,8 +10,18 @@ feature: the refer plane — fetch, verify, chunk, re-score, assemble
 owns: [src/fux/refer@51ebc07f901d, tools/refer-bench@cfdb47b24af2, tools/refer-budget-sweep@db9ff8233332]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: f89f67803a2c8df517fe732c68bd1544bed71727b6314b5d8c1caf7c177f0c15
+content_sha: 3dca2dfb19b7279dda58da4799df2aa66213ca1bd66300fdbe0078a2c2e5e808
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`src/fux/refer/`](../src/fux/refer) · dir
+- [`tools/refer-bench/`](../tools/refer-bench) · dir
+- [`tools/refer-budget-sweep/`](../tools/refer-budget-sweep) · dir
+
+<!-- COMPONENTS-END -->
 
 # SR-REFER — the refer plane
 

@@ -10,8 +10,16 @@ feature: "`.fux/sources/urls` — the file format itself, and the one grammar bo
 owns: [src/fux/ingest/sourcelist.py@1fb64881a387]
 laws: [L2, L3, L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 42fb64856eb68443395b239f050387fe021212dee3a1937512c5e6c7be7c915d
+content_sha: 8256c60669e0a7fb1bbcef570ac4c674cf737011f8a2e2b3133e9d0394a60467
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`src/fux/ingest/sourcelist.py`](../src/fux/ingest/sourcelist.py) · file
+
+<!-- COMPONENTS-END -->
 
 # SR-URL-LIST — the committed URL list
 

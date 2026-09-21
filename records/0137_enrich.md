@@ -11,8 +11,18 @@ owns: [src/fux/correct.py@825b9f26220b, src/fux/enrich.py@156e7a9b9a69, src/fux/
 laws: [L1, L2, L3, L4]
 supersedes: SR-ENRICHED
 timestamp: 2026-08-23T00:00:00Z
-content_sha: e9eeb28487bbc8d3af6fbf860dc2de76189d0e7e41da2bcca17dfcaef90f2413
+content_sha: 42ed43c46fbf6fcbf77e9ebae8b1203fe53ce4871f3a20de3dd92acd3473cc8c
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`src/fux/correct.py`](../src/fux/correct.py) · file
+- [`src/fux/enrich.py`](../src/fux/enrich.py) · file
+- [`src/fux/templates/agents/ENRICH-SKILL.md`](../src/fux/templates/agents/ENRICH-SKILL.md) · file
+
+<!-- COMPONENTS-END -->
 
 # SR-ENRICH — enrichment as an agent skill
 

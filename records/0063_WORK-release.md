@@ -10,8 +10,17 @@ feature: how a release reaches two registries, how the version stays equal acros
 owns: [scripts/check-version-parity.py@2db5c69a9bcd, tests/test_version_parity.py@f45f30bf53ea]
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 5d2f43bf4640909cb86e653bdc000bfca6c8863bd088759809501c713b0a9da2
+content_sha: a9ea27b3e97d48d6f4acd02f589379c8a5715b29f47784dd21b881073f60ee64
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`scripts/check-version-parity.py`](../scripts/check-version-parity.py) · file
+- [`tests/test_version_parity.py`](../tests/test_version_parity.py) · file
+
+<!-- COMPONENTS-END -->
 
 # SR-WORK-RELEASE — one name in two registries, and what actually blocks a merge
 

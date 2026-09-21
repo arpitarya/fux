@@ -10,8 +10,14 @@ feature: the design point, and the ceiling it puts on what may be measured and w
 owns: []
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 74dc30b8a7b51974e76706b8362aef72080b513a4a705337dcb256fe4677b639
+content_sha: f5830d5336c7da4500cd3069321302704b29cc52720bfb0101844744bac885e0
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns nothing** — [SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7, case (a|b); this record's own decisions say which.
+
+<!-- COMPONENTS-END -->
 
 # SR-WORK-SCALE — the 10 000-document ceiling
 

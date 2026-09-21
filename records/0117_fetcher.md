@@ -10,8 +10,17 @@ feature: the fetch contract, what it is called, and the two shipped templates
 owns: [src/fux/ingest/urlsrc.py@280f5c230b11, src/fux/templates@982cd1d9e775]
 laws: [L1, L3, L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 7d4b1490c103bc70cc2524dec973069b6e8dbdd487dba0a3e32e3f2c0c6ac6df
+content_sha: 29df8d3f6a2ef7581a357136da9fba055bf6ea1096d45b9d588f8b75dac4b457
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`src/fux/ingest/urlsrc.py`](../src/fux/ingest/urlsrc.py) · file
+- [`src/fux/templates/`](../src/fux/templates) · dir
+
+<!-- COMPONENTS-END -->
 
 # SR-FETCHER — the consumer-owned fetcher
 

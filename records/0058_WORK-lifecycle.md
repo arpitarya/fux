@@ -10,8 +10,16 @@ feature: the order work happens in, and the artifact each stage owes
 owns: [tests/test_handoff_names_its_model.py@a0987372427e]
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 631b0b8fb8d26090c88a2687f0a540baf5e1abdea3febe6adee1d505dee361b7
+content_sha: d84554020201a6015e21c36ef9582af0621af24e3d352de9e294bd0d149ad3e6
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`tests/test_handoff_names_its_model.py`](../tests/test_handoff_names_its_model.py) · file
+
+<!-- COMPONENTS-END -->
 
 # SR-WORK-LIFECYCLE — how a feature travels from fork to record
 

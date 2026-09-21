@@ -11,8 +11,17 @@ owns: [src/fux/query/expand.py@19b697b80e8c, src/fux/query/fuse.py@749673d52166]
 laws: [3, 4, 8]
 ratifies: W-109
 timestamp: 2026-09-05T00:00:00Z
-content_sha: e1719f97846bbed19c9e92e4a0bca22dd503b7df42643669c102e19e59fb7edf
+content_sha: f20f7af8a6e47a7749c36b1e9ee70e309c401fa365c86faedbc18d4e80ed6a78
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`src/fux/query/expand.py`](../src/fux/query/expand.py) · file
+- [`src/fux/query/fuse.py`](../src/fux/query/fuse.py) · file
+
+<!-- COMPONENTS-END -->
 
 # SR-EXPAND: the caller supplies the vocabulary, and fuses its own phrasings
 

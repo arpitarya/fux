@@ -10,8 +10,19 @@ feature: the `fux` command-line interface — every verb, its flags, its exit co
 owns: [src/fux/cli.py@f9d609b1b3cc, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@002524c0ea96, src/fux/progress.py@925dccc045ce]
 laws: [L1, L4, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: ed22ae22b5d8bd640a8e69812cd6815c63328586d8d3bb6799e3343359e90b2f
+content_sha: bf6c6cc0d844841aedb1d844e6fed486c3c4b2103f28e9764b3efa3ebf45a40b
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`src/fux/__main__.py`](../src/fux/__main__.py) · file
+- [`src/fux/cli.py`](../src/fux/cli.py) · file
+- [`src/fux/progress.py`](../src/fux/progress.py) · file
+- [`src/fux/sources.py`](../src/fux/sources.py) · file
+
+<!-- COMPONENTS-END -->
 
 # SR-CLI — the command-line surface
 

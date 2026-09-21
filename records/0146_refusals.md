@@ -10,8 +10,23 @@ feature: refusal detection before decode
 owns: [src/fux/ingest/refusals.py@adf187806c43, src/fux/templates/refusals.toml.txt@bdf2356bc679, tools/refusal-probe@76b6f6b7f4aa]
 laws: [L1, L3]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: dc5c81dbd463ca0a675d5fa0be8a069a34bf5d8c7f1692b3b799624644688f10
+content_sha: 866ebfb27718e599701167d8482985888608fb7f0aa50f0fd0b70c18a69de03e
 ---
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`src/fux/ingest/refusals.py`](../src/fux/ingest/refusals.py) · file
+- [`src/fux/templates/refusals.toml.txt`](../src/fux/templates/refusals.toml.txt) · file
+- [`tools/refusal-probe/`](../tools/refusal-probe) · dir
+
+**Describes** — reaches into, does not own:
+
+- [`src/fux/ingest/urlsrc.py`](../src/fux/ingest/urlsrc.py) · owned by [SR-FETCHER](0117_fetcher.md)
+- [`src/fux/maintain/urlstate.py`](../src/fux/maintain/urlstate.py) · owned by [SR-MAINTENANCE](0129_hooks.md)
+
+<!-- COMPONENTS-END -->
 
 # SR-REFUSAL: a sign-in wall is not a document, and only the bytes may say so
 
