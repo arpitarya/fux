@@ -7,10 +7,10 @@ description: "An R is a claim frozen before measurement; its threshold may never
 status: accepted
 date: 2026-08-22
 feature: the prediction system — the R ids, their register, the rules that make a frozen claim mean something, and the classification of the runs those claims are measured by
-owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@75f67c99a34a, tools/vector-gate@0023bff0cdef]
+owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@52f5bc934c2b, tools/vector-gate@0023bff0cdef]
 laws: [L3]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 382768e1be692fe97f9eed1457dbdc493cebe5c770b8fdd5e526e59c750c4f66
+content_sha: a06aad7cc47987249ac937d782d94620cf8edfdca843b96dc96e31572402e2bb
 ---
 
 # SR-RS — the R predictions
@@ -1137,6 +1137,30 @@ but *input present and never asked for*.
 **This generalises past these two files.** A control that iterates over arms,
 sets or rungs **enumerates them from its input and refuses what it cannot find**;
 it never carries the list as a literal that a later addition leaves behind.
+
+**24b. [`arm_corpus.py`](../tools/quality-controls/arm_corpus.py) builds an arm's
+corpus, and an arm gets its OWN copy.** Two engines writing different index
+formats cannot share a `.fux/`, and two analyzers writing different terms must
+not; the comparison is **end to end** — same document bytes, ingested, indexed,
+ranked and answered by each arm separately.
+
+- 🔴 **It never writes into `fux-lab/corpora/golden/rung-*/`.** Those are the
+  frozen rungs, and **`corpora/` is kept, not scratch** (Arpit, 2026-09-12).
+  Copies go under `fux-lab/arms/runs/`, and it **deletes and recreates** rather
+  than re-using: a copy ingested twice by two engines is not an arm, it is a
+  mixture.
+- **Each arm's own `fux setup` writes its own config**, so every default in it is
+  that arm's. `[bm25f] b` differing between arms **is** the arm.
+- **The source declarations are held identical**, because *what is in the corpus*
+  is not the variable under test.
+- 🔴 **A seed document an arm SKIPS is reported and is never patched away.**
+  `fux-engine 1.0.0` has no `formats.toml` and indexes `.md`/`.txt` only, so it
+  cannot see 4 of the 28 golden seed documents. **That is the arm**; forcing it
+  would measure an engine nobody ships, and hiding it would attribute a
+  capability difference to ranking.
+- ⚠ **It commits every document at one stamp rather than at its own date.** An
+  arm comparison whose mechanism reads `mtime` must say so and use the rungs'
+  own history instead.
 
 **24a. [`identifier_probe.py`](../tools/quality-controls/identifier_probe.py) is a
 control, and it asks each identifier TWICE.** An id-query is
