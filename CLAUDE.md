@@ -427,11 +427,17 @@ is the surrounding process:
   any hand is a leak to declare, never a permission that arrived by another door.
   And **a Cowork session's mount**, which reaches the directory with a plain
   shell call that no deny rule and no hook sees — **accepted, not closed.**
-- **Both sets were reset on 2026-09-15 and neither exists yet.** Arpit deleted
-  the provisional Claude-authored key and the 124 released questions; the seed
-  corpus and the ladder survived. **Every id from the old set is orphaned and
+- **The 2026-09-15 reset, and what has been written since.** Arpit deleted the
+  provisional Claude-authored key and the 124 released questions; the seed corpus
+  and the ladder survived. **Every id from the old set (`g001…`) is orphaned and
   never reused**, so a filed number from it may not be compared with anything
-  scored on set 1 or set 2.
+  scored on set 1, set 2 or set 3. ⚠ **Between 2026-09-15 and 2026-09-21 this
+  bullet said both sets were unwritten. They were written on 2026-09-16** —
+  `set-1.jsonl` (125) and `set-2.jsonl` (124), commit `742e1aa9` — **and
+  `set-3.jsonl` (125) on 2026-09-21.** The questions are on disk; **the answers
+  are Arpit's and are not**, which is the half this record is actually about, and
+  a bullet that said *neither exists* let a reader take the wrong half of that
+  sentence for the current state for five days.
 
 <!-- GOLDEN:END -->
 

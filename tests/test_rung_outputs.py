@@ -163,13 +163,43 @@ def test_an_id_in_both_sets_is_refused() -> None:
     assert ro.collide({1: [ANSWERED], 2: [{**DECLINED, "id": "s1-q001"}]}) == ["s1-q001"]
 
 
+def test_a_collision_between_two_sets_that_are_not_1_and_2_is_refused() -> None:
+    """🔴 Every pair, not just 1 against 2.
+
+    Set 3 landed 2026-09-21 and `collide` compared exactly two sets. A duplicate
+    between set 2 and set 3 would have passed a check written for two, and the
+    document would print the row twice under two different authors.
+    """
+    assert ro.collide({1: [ANSWERED], 2: [DECLINED],
+                       3: [{**ANSWERED, "id": "s3-q001"}]}) == []
+    assert ro.collide({1: [ANSWERED], 2: [DECLINED],
+                       3: [{**ANSWERED, "id": "s2-q001"}]}) == ["s2-q001"]
+
+
 def test_main_refuses_a_colliding_pair(tmp_path: Path, capsys) -> None:
     import json
     for n, row in ((1, ANSWERED), (2, {**DECLINED, "id": "s1-q001"})):
         (tmp_path / f"handoff-set-{n}.jsonl").write_text(json.dumps(row) + "\n", encoding="utf-8")
-    assert ro.main(["--rung", "rung-seed", "--evidence", str(tmp_path)]) == 1
+    assert ro.main(["--rung", "rung-seed", "--evidence", str(tmp_path), "--sets", "1,2"]) == 1
     assert "refusing" in capsys.readouterr().err
     assert not list(tmp_path.glob("RUNG-*.md")), "nothing is written when the pair is refused"
+
+
+def test_a_set_with_no_recorded_author_is_refused(tmp_path: Path, capsys) -> None:
+    """A heading states who wrote the set; a set rendered without one reads as
+    if nobody had, and authorship is the whole point of having more than one."""
+    assert ro.main(["--rung", "rung-seed", "--evidence", str(tmp_path), "--sets", "9"]) == 1
+    assert "no author recorded" in capsys.readouterr().err
+
+
+def test_a_missing_handoff_is_refused_rather_than_skipped(tmp_path: Path, capsys) -> None:
+    """The difference between *this rung has no set-3 rows* and *set 3 was never
+    asked* is invisible in the evidence afterwards, so it is refused here."""
+    import json
+    for n, row in ((1, ANSWERED), (2, DECLINED)):
+        (tmp_path / f"handoff-set-{n}.jsonl").write_text(json.dumps(row) + "\n", encoding="utf-8")
+    assert ro.main(["--rung", "rung-seed", "--evidence", str(tmp_path), "--sets", "1,2,3"]) == 1
+    assert "missing" in capsys.readouterr().err
 
 
 # --- naming and the version it refuses to guess ------------------------------
@@ -201,7 +231,23 @@ def test_main_writes_the_document(tmp_path: Path) -> None:
     import json
     for n, row in ((1, ANSWERED), (2, DECLINED)):
         (tmp_path / f"handoff-set-{n}.jsonl").write_text(json.dumps(row) + "\n", encoding="utf-8")
-    assert ro.main(["--rung", "rung-seed", "--evidence", str(tmp_path),
+    assert ro.main(["--rung", "rung-seed", "--evidence", str(tmp_path), "--sets", "1,2",
                     "--index-version", "fux.index.v4"]) == 0
     text = (tmp_path / "RUNG-SEED.md").read_text(encoding="utf-8")
     assert "## Set 1 — Codex" in text and "## Set 2" in text
+
+
+def test_three_sets_render_in_order_and_each_names_its_author(tmp_path: Path) -> None:
+    """The default since 2026-09-21. Set 3 carries the failing identifier shape,
+    and a document that rendered 1 and 2 would show no sign it had been asked."""
+    import json
+    rows = {1: ANSWERED, 2: DECLINED, 3: {**ANSWERED, "id": "s3-q001"}}
+    for n, row in rows.items():
+        (tmp_path / f"handoff-set-{n}.jsonl").write_text(json.dumps(row) + "\n", encoding="utf-8")
+    assert ro.main(["--rung", "rung-seed", "--evidence", str(tmp_path),
+                    "--index-version", "fux.index.v4"]) == 0
+    text = (tmp_path / "RUNG-SEED.md").read_text(encoding="utf-8")
+    assert text.index("## Set 1") < text.index("## Set 2") < text.index("## Set 3")
+    assert "| set 3 |" in text
+    for n in (1, 2, 3):
+        assert ro.AUTHOR[n] in text

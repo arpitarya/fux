@@ -10,7 +10,7 @@ feature: the golden benchmark — its two question sets, the key's custody, its 
 owns: [.claude/hooks/guard-golden-answer.sh@c505d04c0628, .claude/hooks/guard-sealed-key.sh@0d4dd725e7aa, tests/test_golden_key_guards.py@ee33d84f9333, scripts/gen-golden.py@1b2a854c1f75, tests/test_claude_md_golden.py@49db9e6261d8, tools/golden-difficulty@94f4740b9c02]
 laws: [L0, L11]
 timestamp: 2026-09-15T00:00:00Z
-content_sha: d371b3d71b635f537fd86c263f2e376f1f2023c76de4784bef454fd64bd5720f
+content_sha: 52ba987ae1a8e2a25afabd5678b8d8e7e8da758e8834122d89bfb48b0eeeb030
 ratifies: "Arpit, 2026-09-15 — W-146 row 17: the prohibition gets a record and CLAUDE.md keeps a generated view; the same day he ruled it into law L11 and then amended it — two question sets, one Claude-authored and one Codex-authored, with both answer halves in his custody and no key file at all"
 ---
 
@@ -195,11 +195,17 @@ is the surrounding process:
   any hand is a leak to declare, never a permission that arrived by another door.
   And **a Cowork session's mount**, which reaches the directory with a plain
   shell call that no deny rule and no hook sees — **accepted, not closed.**
-- **Both sets were reset on 2026-09-15 and neither exists yet.** Arpit deleted
-  the provisional Claude-authored key and the 124 released questions; the seed
-  corpus and the ladder survived. **Every id from the old set is orphaned and
+- **The 2026-09-15 reset, and what has been written since.** Arpit deleted the
+  provisional Claude-authored key and the 124 released questions; the seed corpus
+  and the ladder survived. **Every id from the old set (`g001…`) is orphaned and
   never reused**, so a filed number from it may not be compared with anything
-  scored on set 1 or set 2.
+  scored on set 1, set 2 or set 3. ⚠ **Between 2026-09-15 and 2026-09-21 this
+  bullet said both sets were unwritten. They were written on 2026-09-16** —
+  `set-1.jsonl` (125) and `set-2.jsonl` (124), commit `742e1aa9` — **and
+  `set-3.jsonl` (125) on 2026-09-21.** The questions are on disk; **the answers
+  are Arpit's and are not**, which is the half this record is actually about, and
+  a bullet that said *neither exists* let a reader take the wrong half of that
+  sentence for the current state for five days.
 <!-- GOLDEN-TEXT:END -->
 
 3. **The generator and its bind.**

@@ -9,14 +9,21 @@ that guessed would train the next reader to trust a guess.**
 
 Two `fux` calls per question — `ask --json --band --top 10` and `answer --json` —
 and two files per set, **never merged**: the gap between a Codex-authored set 1
-and a Claude-authored set 2 is the measurement, and a mean across both erases it.
+and the Claude-authored sets is the measurement, and a mean across them erases it.
+
+⚠ **`--sets` defaults to `1,2,3` since 2026-09-21.** Set 3 landed that day
+(W-204 input I-2) and the loop was a hardcoded `(1, 2)`; a run that silently
+skipped the only set carrying the failing identifier shape would have produced a
+complete-looking hand-off with the measurement's whole input missing, which is
+SR-RS decision 23's failure with no symptom. Naming the sets on the command line
+is how a run says which ones it actually asked.
 
 ⚠ **Reads `id` and `question` from `work/golden/questions/` and nothing else**,
 which is what SR-WORK-GOLDEN decision 2 permits. It opens no other path under
 `work/golden/` except the rung's own manifest.
 
     python3 tools/quality-controls/golden_run.py --rung rung-00100 \
-        --dest work/regression/<date>-golden-rung-00100
+        --dest work/regression/<date>-golden-rung-00100 --sets 1,2,3
 """
 
 from __future__ import annotations
@@ -123,6 +130,9 @@ def main(argv: list[str] | None = None) -> int:
                     help="the evidence directory itself — what a multi-rung run uses, "
                          "so each rung gets evidence/<rung>/ rather than eight runs")
     ap.add_argument("--limit", type=int, default=0, help="0 = every question")
+    ap.add_argument("--sets", default="1,2,3",
+                    help="comma-separated question sets to run, e.g. 1,2,3 (the default). "
+                         "Each must exist as work/golden/questions/set-N.jsonl.")
     ap.add_argument("--engine-commit", default=None,
                     help="the FROZEN engine sha to stamp on every row; defaults to git HEAD. "
                          "Give it when the run spans several commits and the engine does not.")
@@ -142,7 +152,21 @@ def main(argv: list[str] | None = None) -> int:
     evidence = args.evidence or (args.dest / "evidence")
     evidence.mkdir(parents=True, exist_ok=True)
 
-    for n in (1, 2):
+    try:
+        wanted = [int(x) for x in args.sets.split(",") if x.strip()]
+    except ValueError:
+        ap.error(f"--sets must be integers separated by commas, got {args.sets!r}")
+    if not wanted:
+        ap.error("--sets named no set")
+    missing = [n for n in wanted if not (QUESTIONS / f"set-{n}.jsonl").is_file()]
+    if missing:
+        # 🔴 Refuse rather than skip. A missing set file is the difference between
+        # "this rung has no set-3 rows" and "set 3 was never asked", and only one
+        # of those is visible in the evidence afterwards.
+        print(f"no question file for set(s) {missing} — refusing", file=sys.stderr)
+        return 1
+
+    for n in wanted:
         path = QUESTIONS / f"set-{n}.jsonl"
         rows = [json.loads(l) for l in path.read_text(encoding="utf-8").splitlines() if l.strip()]
         if args.limit:

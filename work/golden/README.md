@@ -41,22 +41,36 @@ routes none of them covers**, all three prose in the law: a **paste**, a
 **Cowork session's mount** — it reaches the folder with a plain shell call no
 deny rule or hook sees — and a recursive `grep` that never names the folder.
 
-### 🔴 The 2026-09-15 reset — both sets are gone and neither is written yet
+### 🔴 The 2026-09-15 reset, and the three sets written after it
 
 **Arpit deleted the provisional Claude-authored key and the 124 released
-questions**, along with `golden-answer/`. **The seed corpus and the eight ladder
-rungs survived** — they are the golden data set and nothing about them changed.
+questions**, together with the singular-spelled key directory L11 decision 5
+closes. **The seed corpus and the eight ladder rungs survived** — they are the
+golden data set and nothing about them changed.
 
 ⚠ **The deletion stands as history; it is not undone by the 2026-09-18
-permission.** A key directory is allowed again, spelled `golden-answers/`, and
-nothing that was deleted came back — **both question sets are still unwritten**,
-which is what this section is about.
+permission.** A key directory is allowed again, at the one address L11 names, and
+nothing that was deleted came back.
+
+⚠ **This section said *both question sets are still unwritten* until 2026-09-21,
+and it was five days out of date.** Prompts 2 and 3 were run on **2026-09-16**
+(`742e1aa9`), and prompt 3 again for set 3 on **2026-09-21**:
+
+| | authored | released file | questions |
+|---|---|---|---:|
+| set 1 | Codex, 2026-09-16 | `questions/set-1.jsonl` | 125 |
+| set 2 | Claude, 2026-09-16 | `questions/set-2.jsonl` | 124 |
+| set 3 | Claude, 2026-09-21 | `questions/set-3.jsonl` | 125 |
+
+🔴 **What has NOT come back is a key**, and that is the part of the reset still in
+force: every answer half is Arpit's, in the chat, at his choice.
 
 - **Every id from the old set (`g001…`) is orphaned and never reused.** Filed
   predictions and regression rows keyed to them stay as history and **may not be
-  compared** with anything scored on set 1 or set 2.
-- **Start at [prompt 2](prompts/2-codex-questions.md).** Prompt 1 rebuilds the
-  corpus from nothing and is not needed.
+  compared** with anything scored on set 1, set 2 or set 3.
+- **Prompt 1 is not needed** — it rebuilds the corpus from nothing. The live
+  entry point is [prompt 4](prompts/4-claude-corpus.md) whenever `seed/` changes,
+  and [prompt 5](prompts/5-claude-run.md) to run the sets.
 
 
 ### Custody — Arpit holds both sets; one guarded directory, his alone (2026-09-18)
@@ -523,16 +537,28 @@ stream.
 [SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md) caps the lab at 10 000 documents.
 There is no rung above this one and none may be built.
 
-| rung | documents | archived | superseded | carrying `mtime` |
-|---|---:|---:|---:|---:|
-| `rung-seed` | 20 | 5 | 4 | 20 / 20 |
-| `rung-00100` | 100 | 13 | 12 | 100 / 100 |
-| `rung-00200` | 200 | 23 | 22 | 200 / 200 |
-| `rung-00500` | 500 | 53 | 52 | 500 / 500 |
-| `rung-01000` | 1 000 | 103 | 102 | 1 000 / 1 000 |
-| **`rung-02000`** | **2 000** | **203** | **202** | **2 000 / 2 000** |
-| **`rung-05000`** | **5 000** | **503** | **502** | **5 000 / 5 000** |
-| **`rung-10000`** | **10 000** | **1 003** | **1 002** | **10 000 / 10 000** |
+⚠ **Rebuilt 2026-09-21 on set 3's seed** — [the run](../regression/2026-09-21-ladder-set-3-rebuild/report.md).
+`seed/` grew from 20 documents to 28, so every rung **keeps its headline size**
+and carries eight fewer generated documents; `rung-seed` is the seed corpus and
+is therefore 28. `superseded` is one lower above the seed because one
+supersession pair fell past the rung boundary.
+
+| rung | documents | of which seed | archived | superseded | carrying `mtime` |
+|---|---:|---:|---:|---:|---:|
+| `rung-seed` | 28 | 28 | 6 | 4 | 28 / 28 |
+| `rung-00100` | 100 | 28 | 13 | 11 | 100 / 100 |
+| `rung-00200` | 200 | 28 | 23 | 21 | 200 / 200 |
+| `rung-00500` | 500 | 28 | 53 | 51 | 500 / 500 |
+| `rung-01000` | 1 000 | 28 | 103 | 101 | 1 000 / 1 000 |
+| `rung-02000` | 2 000 | 28 | 203 | 201 | 2 000 / 2 000 |
+| `rung-05000` | 5 000 | 28 | 503 | 501 | 5 000 / 5 000 |
+| `rung-10000` | 10 000 | 28 | 1 003 | 1 001 | 10 000 / 10 000 |
+
+🔴 **The ladder carries 61 `ref` edges on every rung, and carried 0 until
+2026-09-21.** Set 3's documents link to each other and to the older seed —
+`ref_edge_census.py` exits 0 for the first time. **That is an input arriving,
+never a result**: `[bm25f] anchor` is `0.0` on every rung and moves only on its
+own passing pre-registered run.
 
 ⚠ **The three new rungs were built AFTER `questions/` was opened**, which the
 first five were not. **That does not make them informed** — the generator, its

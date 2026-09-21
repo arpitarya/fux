@@ -7,10 +7,10 @@ description: "An R is a claim frozen before measurement; its threshold may never
 status: accepted
 date: 2026-08-22
 feature: the prediction system — the R ids, their register, the rules that make a frozen claim mean something, and the classification of the runs those claims are measured by
-owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@a61aaab33755, tools/vector-gate@0023bff0cdef]
+owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@75f67c99a34a, tools/vector-gate@0023bff0cdef]
 laws: [L3]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 6efa0763c9fe7cfee55feb77f0908eec2bfbd14e375887c21f204b119abf8dfb
+content_sha: 382768e1be692fe97f9eed1457dbdc493cebe5c770b8fdd5e526e59c750c4f66
 ---
 
 # SR-RS — the R predictions
@@ -1109,6 +1109,52 @@ is written by the key's author, never by a session that tests the engine
 committing documents at their stated dates) may be set up by the extending
 session.
 
+
+**24. A CONTROL THAT CAN SKIP AN ARM SILENTLY IS REFUSED INSTEAD** (2026-09-21).
+
+A third question set landed (`work/golden/questions/set-3.jsonl`, W-204 input
+I-2) and the two harnesses that run the golden sets —
+[`golden_run.py`](../tools/quality-controls/golden_run.py) and
+[`rung_outputs.py`](../tools/quality-controls/rung_outputs.py) — both looped over
+a hardcoded `(1, 2)`.
+
+🔴 **Neither would have failed.** A run would have produced a complete-looking
+hand-off for every rung, and a complete-looking per-rung document, with **no sign
+anywhere that a third set existed** — and set 3 is the only set carrying the
+identifier shape and the link-bearing documents that three blocked measurements
+need. That is decision 23's failure with the symptom removed: not *missing input*
+but *input present and never asked for*.
+
+- **Both take `--sets`, defaulting to `1,2,3`**, so a run states on its command
+  line which sets it asked.
+- 🔴 **A named set with no file is REFUSED, never skipped.** *"This rung has no
+  set-3 rows"* and *"set 3 was never asked"* are indistinguishable in the evidence
+  afterwards, and only one of them is a measurement.
+- **The id-collision check reads every PAIR of sets**, not 1 against 2. A
+  duplicate id between sets 2 and 3 would have passed a two-set check and printed
+  one question twice under two different authors.
+
+**This generalises past these two files.** A control that iterates over arms,
+sets or rungs **enumerates them from its input and refuses what it cannot find**;
+it never carries the list as a literal that a later addition leaves behind.
+
+**24a. [`identifier_probe.py`](../tools/quality-controls/identifier_probe.py) is a
+control, and it asks each identifier TWICE.** An id-query is
+`{identifier, question, primary, relevant}` derived from `work/golden/seed/` by
+grep — **it carries no answer and never enters `work/golden/`**, which is what
+lets an analyzer change be measured without going near a sealed key
+([L11](0012_LAW-11-sealed-answer-key.md)).
+
+🔴 **The bare identifier and the identifier-in-a-question fail differently, and
+reporting only the second is how the 2026-09-16 survival run reached a wrong
+conclusion.** Surrounding words rescue a mangled identifier, so the question form
+hides a precision defect that the bare form exposes. The probe records both ranks
+per row and **pools neither**, and it reports **per family** — sibling
+identifiers that differ by one digit are the population a change acts on, and an
+average over every row moves by a fraction of one flip when they are fixed.
+
+⚠ **It prints rows and applies no bar**, decision 10b: a floor lives in a frozen
+pre-registration, never in the instrument.
 
 ### Consequences
 

@@ -2,7 +2,7 @@ rung: rung-05000
 documents_indexed: 5000
 archived_declared: 503
 archived_in_index: 503
-superseded_declared: 502
-superseded_in_index: 502
+superseded_declared: 501
+superseded_in_index: 501
 carrying_mtime: 5000
-categories: {"adjacent": 1494, "filler": 996, "seed": 20, "sibling": 1992, "variant": 498}
+categories: {"adjacent": 1492, "filler": 994, "seed": 28, "sibling": 1989, "variant": 497}

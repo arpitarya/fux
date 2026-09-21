@@ -2984,8 +2984,6 @@ df0f19241011bfc07b0dedd074effc8c304b92f554f04e76881cbcb6ae26483c  ext/adjacent/0
 e2653e60b83bcab5233cf85901044e3670a4afaace20e3b7e70cbc5feb9043cb  ext/adjacent/09944-finance-close.md  adjacent  generated
 7a7d97995931503b6b8fd2c1ec0bf24232533c328dfe22c70752b6fa96f6f0f4  ext/adjacent/09947-finance-close.md  adjacent  generated
 2af2fc950775d53d41435c2c6a195c555d81cba156294a4d913bcd247d5f680f  ext/adjacent/09951-payroll.yaml  adjacent  generated
-36c6a7f937cc9cf6df36b1d6a0a06dc417e5d7fda94bc2cf9e81bec27db33a4c  ext/adjacent/09954-payroll.yaml  adjacent  generated
-7fa0cd5a13c7b3aab2a4fc6af8d514559dd73cf36f5cee33ed37b687c3895aae  ext/adjacent/09957-payroll.yaml  adjacent  generated
 c491bd13d978d00c16f944b0373944e41d87620235bd093ed218016bec919865  ext/adjacent/a09-marrowbeck-ammonia-facilities.md  adjacent  authored
 916a7680466271422dbce02114ec6348d6da483a89a45bcd30c0dc6c87541d36  ext/adjacent/a10-vantorix-it-access.md  adjacent  authored
 982595b922fc22371503a9a00dcf37eb4c02e1e906fb9939784a4abc35ae7c72  ext/adjacent/a11-petrichor-hr-leave.md  adjacent  authored
@@ -3987,7 +3985,6 @@ a5005de595ffed5e6e1cddcbfa1c9420f17cf183355f9158cef9876c94232ebf  ext/archive/09
 4f169ba1d86f2ceb3f60d28e2965534836f9843c39321c2788ca70ee59cb7b6f  ext/archive/09925-sop-retired.md  variant  generated
 bb6bfa3195fd915227be6d81c665d59c0dbfff9b24aca06eb6f1b5dec9033ea7  ext/archive/09935-postmortem-retired.md  variant  generated
 73f838ecc95fc347218b0418ffec39f314c09ad2bc6405279820f2220308e8d9  ext/archive/09945-decision-retired.md  variant  generated
-04fd331f70c738e98d658e5f4e488e59c390f6229a5b12957a9e113a6f848b5a  ext/archive/09955-ratecard-retired.md  variant  generated
 8054938e5a262221a85494fa0aae081d59e8140d4de0d5004f5d62a9f821b028  ext/archive/a19-norvell-telematics-decision-2022.md  variant  authored
 fc42e5862892751aa569bc0cf123b45ec6332dff7fccf88aac66148f27a48d3e  ext/archive/a20-braidwood-rate-card-2023.md  variant  authored
 eb05b3bec3e303ebbf873b7ec080163277b95b81e27803fd2a78bb1d103fd556  ext/filler/00002-syllabus.md  filler  generated
@@ -5980,8 +5977,6 @@ b3b46db81894ebfde72b841a95bccff625623dcdf39c27401389f31c9b32d326  ext/filler/099
 15f8507f17c250804a3b96ea1510151368c459116e141bf15b3d64dea63de064  ext/filler/09938-library.md  filler  generated
 1a47a15d8edae2550d70edcf6f405aca5711d02090532fcd14705d757ac9bc6a  ext/filler/09942-chess.md  filler  generated
 a4061936eefde6b7e2e2bdd9b05b2951a3afc4df5c167bf27f2548668becf5a7  ext/filler/09948-chess.md  filler  generated
-eaa52819c309ecb17b8c684a3ca982662f2e366085685eec7cf3e03d1b433624  ext/filler/09952-bicycle.txt  filler  generated
-f33fb448734636f24f51f4c8035d3946079ae604e6c862665af9c6986c1b0e93  ext/filler/09958-bicycle.txt  filler  generated
 6e936d5372b9586b6192deac7d1bc526d76578ec308418993e206f5cfe690074  ext/filler/a15-release-notes-tilecutter.md  filler  authored
 cab9d02e7d73eb6d72fae7ed92f4088443c3dc96b6b83b9e6d1b58b06557f497  ext/filler/a16-ward-notice.html  filler  authored
 9fee259034f95f155a463ae149376bc34f60448d7c75c6a5b37cc84a8368bfe8  ext/filler/a17-beekeeping-minutes.md  filler  authored
@@ -9967,9 +9962,6 @@ b6fa223f0ab7291b56b6b89c798a885fd6ce643a7df597d07b5f421da74a961d  ext/sibling/09
 0fa9114164f7898ef223a0f7c4a1d65e27ecbbd1700b337e4209044329e67377  ext/sibling/09946-decision.md  sibling  generated
 ca12916341a2544490597376b3181c53b57e633e747dd4169e489144c614476f  ext/sibling/09949-postmortem.md  sibling  generated
 101bc2d0c45aeccd7bf18f6ce6d08119f51cdbdf8657a02a2a73f0ab1e14561f  ext/sibling/09950-notification.md  sibling  generated
-0a54ee2dfb0979e903220ccad80b8715299adf4b39ddc3ac522b11a4174b4005  ext/sibling/09953-decision.md  sibling  generated
-cbe59d97c42a45fa5dae92c1a4bba2b480f979c6a0689c9320979cfc97b2b75b  ext/sibling/09956-ratecard.md  sibling  generated
-c044e4c575b38964bca33ef9c6aaaab13dd27bbb65de949a8c9d0a5b98b9567a  ext/sibling/09959-decision.md  sibling  generated
 ac5c898d1deccd886ec8d18cc85947ad6f97238f266e4b10616867e49da901f5  ext/sibling/a01-marrowbeck-excursion-sop.md  sibling  authored
 8813ef323aae4d3becb9616ccb20076bfe8af6e17574531c3e2bbffd00e7a533  ext/sibling/a02-vantorix-sensor-thresholds.yaml  sibling  authored
 e3a7839b39217d9ac43ba9202d9c89c248b878cb55f316994db102e0213ab028  ext/sibling/a03-petrichor-postmortem-insulin.md  sibling  authored
@@ -9993,8 +9985,16 @@ cc0c4bd1e82c73f68cfe263f4faf26e4e54a757187242ec816fc3cb1a93c8fda  seed/09-dock-s
 ac0012fd5315c0985206b8c523ec8440f5c739eb7b347a76c68efcca27e0717d  seed/13-dock-scheduling-rules-2026.md  seed  authored
 2cfa64bd85aec9646d1f9d35257835ee59c361e9dc866ab1f2c60355e949620e  seed/14-customer-notification-matrix-2025.md  seed  authored
 469311e58e202881af7f1b11aafcc683c413b0d988457abc258108eb37c6d4fd  seed/15-customer-notification-matrix-2026.md  seed  authored
+5973b613b99cf45c64ae982e835815b2de70ec18b9ef5ed0445dd0f42e1e83e0  seed/16-reefer-RF-118-asset-file.md  seed  authored
+64e8dcb2dd99fb118a3b6ad0b96f1ebca2a074503b6dae4b41993abcc592ca1f  seed/17-reefer-RF-119-asset-file.md  seed  authored
+2f5a18a3e23abdd68721de07b2a4bf8384c23a2ce9848b4a1eddf599d785a589  seed/18-reefer-RF-120-asset-file.md  seed  authored
+64e71c13f09262a004bffb48828e4130ae3b78a409cce87c430d8ad03cde984e  seed/19-project-PROJ-123-dockwise-rollout.md  seed  authored
+0f09c5cf2d414c5f284f9ee9436bf34a4b2600129d9cb65e48f087fbbe9db9af  seed/20-project-PROJ-124-red-sleeve-and-passive-shippers.md  seed  authored
+bf71375dbf25df899504dde530dd56dfe51cf7be16b25335d8c2cddfd2262ed6  seed/21-project-PROJ-125-kalpa-decommission.md  seed  authored
+f5bf84993027dbe0a493e50790bea3af823a52229895a17980edaca0b835c5d7  seed/22-cold-chain-document-map.md  seed  authored
 815b202666dc4c3f133b7d422b011f051a17eff1c024568ea4c0f707716ccb13  seed/archive/a01-sop-temperature-excursion-rev2.md  seed  authored
 1709cc9ac62c49438aa163a541c924a69f786d5c0c0984887b28aea5ef973f0a  seed/archive/a02-kalpa-alert-routing-guide-2021.md  seed  authored
 fb3a01cefa821686c7245ed01a64febf7ef9e834316dbaf2d05b0810d576c6c9  seed/archive/a03-dock-scheduling-wiki-2021.html  seed  authored
 870ea588743ccdf5c0a61165969dfe4da6b7e16c2eda4855c569c401d02d6f90  seed/archive/a04-driver-hours-policy-2019.md  seed  authored
 e863a8d3be50bf5e6c8f623a3afc3459d11d98f50ce5833635f38d71c4387095  seed/archive/a05-induction-checklist-2020.txt  seed  authored
+ebcc65200d28ca2d6acc02a6c5f43088a47f4fdc69833de87149bc728f587f8a  seed/archive/a06-reefer-RF-117-retired.md  seed  authored

@@ -1,0 +1,106 @@
+{
+  "rung-00100": {
+    "anchor_bearing": 61,
+    "anchor_terms": 245,
+    "docs": 100,
+    "edges": 72,
+    "kinds": {
+      "ref": 61,
+      "supersedes": 11
+    },
+    "link_sources": 8,
+    "link_targets": 25,
+    "ref": 61
+  },
+  "rung-00200": {
+    "anchor_bearing": 61,
+    "anchor_terms": 245,
+    "docs": 200,
+    "edges": 82,
+    "kinds": {
+      "ref": 61,
+      "supersedes": 21
+    },
+    "link_sources": 8,
+    "link_targets": 25,
+    "ref": 61
+  },
+  "rung-00500": {
+    "anchor_bearing": 61,
+    "anchor_terms": 245,
+    "docs": 500,
+    "edges": 112,
+    "kinds": {
+      "ref": 61,
+      "supersedes": 51
+    },
+    "link_sources": 8,
+    "link_targets": 25,
+    "ref": 61
+  },
+  "rung-01000": {
+    "anchor_bearing": 61,
+    "anchor_terms": 245,
+    "docs": 1000,
+    "edges": 162,
+    "kinds": {
+      "ref": 61,
+      "supersedes": 101
+    },
+    "link_sources": 8,
+    "link_targets": 25,
+    "ref": 61
+  },
+  "rung-02000": {
+    "anchor_bearing": 61,
+    "anchor_terms": 245,
+    "docs": 2000,
+    "edges": 262,
+    "kinds": {
+      "ref": 61,
+      "supersedes": 201
+    },
+    "link_sources": 8,
+    "link_targets": 25,
+    "ref": 61
+  },
+  "rung-05000": {
+    "anchor_bearing": 61,
+    "anchor_terms": 245,
+    "docs": 5000,
+    "edges": 562,
+    "kinds": {
+      "ref": 61,
+      "supersedes": 501
+    },
+    "link_sources": 8,
+    "link_targets": 25,
+    "ref": 61
+  },
+  "rung-10000": {
+    "anchor_bearing": 61,
+    "anchor_terms": 245,
+    "docs": 10000,
+    "edges": 1062,
+    "kinds": {
+      "ref": 61,
+      "supersedes": 1001
+    },
+    "link_sources": 8,
+    "link_targets": 25,
+    "ref": 61
+  },
+  "rung-seed": {
+    "anchor_bearing": 61,
+    "anchor_terms": 245,
+    "docs": 28,
+    "edges": 65,
+    "kinds": {
+      "ref": 61,
+      "supersedes": 4
+    },
+    "link_sources": 8,
+    "link_targets": 25,
+    "ref": 61
+  }
+}
