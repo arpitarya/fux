@@ -563,7 +563,7 @@ records/0062_WORK-archive.md	file	a9307493ef4389becb0268b15c04e76ea814c238	prose
 records/0063_WORK-release.md	file	59db6f94e37e665a67e7c4bfcbc2fcfb22600487	prose	-
 records/0064_WORK-blockers.md	file	8cc7fa229f31e57f18cb6b3c5564b9d31eb86599	prose	-
 records/0065_WORK-governance.md	file	da6985aa3a0569818d845e4a86036a21916ca351	prose	-
-records/0066_WORK-golden.md	file	1380f26fed0a17f34e6cfeefcc9366777bd2168c	prose	-
+records/0066_WORK-golden.md	file	354cde26b5a611428f3ed97ad0bc85fc2645a760	prose	-
 records/0101_cli-surface.md	file	4dc06b54636003bb40b8442e5192cb529860c812	prose	-
 records/0102_fux-directory.md	file	67759c484229456f086bba487d705190ef2bdb82	prose	-
 records/0103_ask.md	file	5abafd73fc95b77491fecca7a79d32fa64e96350	prose	-
@@ -650,14 +650,14 @@ tools/vector-gate/README.md	file	544da73b4409bef1e5dac598d9b8214d8abf4180	prose	
 work/BACKLOG.md	file	97b4214b6d0fe258ec2f19423a3279ba3e105e7c	prose	-
 work/BLOCKED.json	file	e3f1d655d39d93c4de4c0b32275b8fb6b6eb8713	json@sha:3c6c341cb1ac1f39	-
 work/DOC-REGISTRY.md	file	67cd22dd8032a9b47467c61a37e85f31a15cfb50	prose	-
-work/IMPLEMENTATION.md	file	cd91af90b5e0a69655fbe755b1e130a52273d329	prose	-
+work/IMPLEMENTATION.md	file	d5c8975ecc6b4161c28edbaa2c657bc54678a6f4	prose	-
 work/INTERVIEW.md	file	c6c50828853e0e55fd352f74edb3bf3ec062b5ee	prose	-
 work/LESSONS.md	file	b9d5ab2c8382af88b0d2547d77db475874b6af75	prose	-
 work/MACHINE.md	file	5ebb77f67b323d268823323b845a1755bdf48e4d	prose	-
-work/NOW.md	file	a5e54b6124e5335bb50af142f028b63ae5f95e03	prose	-
+work/NOW.md	file	c3028d216d3e05baa89e48ece4e88623896ea1dc	prose	-
 work/OPEN-WORK.md	file	af9aac55f98f677431af8c229409eec9a5fef625	prose	-
 work/README.md	file	35bb72c22304e1a0eada2832f48b01c2824f2859	prose	-
-work/WORKLOG.md	file	867edbdb65dfb607ccced9b8a798d54732c41437	prose	-
+work/WORKLOG.md	file	709938f7aa8f299d4d89ca9fe80fe28aa81c7482	prose	-
 work/architecture-answer.svg	file	6aaa11c3de66511e0323f0af0ab8b9290a064825	svg@sha:333fa25ff0db014a	-
 work/architecture-ask.svg	file	ecd904f9768c89f30d3b4c292d51942b79fb4a46	svg@sha:333fa25ff0db014a	-
 work/architecture-decoders.svg	file	56e939ab9134695b45ed9a04bd86f0ea9683edfe	svg@sha:333fa25ff0db014a	-
