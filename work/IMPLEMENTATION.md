@@ -30,6 +30,68 @@ Rules:
 
 
 
+## 2026-09-21 — **W-208: every record names the files it governs, and the naming is generated**
+
+**Shipped:** `scripts/gen-components.py`, `tests/test_record_components.py`, and
+a `COMPONENTS` block in 74 of 85 records. **Evidence:** none — nothing was
+measured; this is a governance change, and its proof is that the gates it feeds
+now fire where they could not.
+
+**The gap.** A record did not name its files. `owns:` is a list of bare paths in
+frontmatter; `describes` was not in the record at all. The answer to *which code
+is this record about* lived only in `records/README.md`, which is the file a
+reader of a record is not in. Arpit, 2026-09-21: *review all the records and
+link files or folders into each and every SR, even the node ones.*
+
+**The mechanism, and why it is not prose.** Writing the links by hand into 85
+records is the restatement [SR-LAW-0](../records/0002_LAW-0-authority.md)
+decision 1 forbids — the body and the table would disagree within a week and
+both would still look correct. Decision 5 permits a generated view **for exactly
+as long as a test binds it**, so the block is rendered from both tables by
+`gen-components.py` and held byte-equal by `tests/test_record_components.py`.
+That is [SR-WORK-OWNERSHIP](../records/0054_WORK-ownership.md) decision 16,
+and SR-LAW-0 decision 5a owns the two generator/bind pairs.
+
+**What the audit found and what closed:**
+
+| | before | after |
+|---|---|---|
+| paths with no owner (the audited set) | 35 | **0, by decision** — 36 rows landed, and `tests/` as a directory stays unowned on purpose |
+| `kind: component` records the gate could never demand | 13 | **0** — four gained the component they were always the record for, nine gained `describes` rows |
+| authored `node/*.mjs` a record names | 19 | **47** — SR-NODE-SEARCH's `node/` claim covers every one, and the register's count of them was **44** where `git ls-files` says 47 |
+| node files named INDIVIDUALLY, by the record whose subject they are | 0 | **12** — no describes row pointed at a node file before |
+| describes rows | 33 | **73** |
+
+**Three carve-outs, each for a different DECISION rather than a different
+concern:** the two fetcher templates out of SR-FETCHER's `templates/` claim;
+`query/refer_answer.py` out of SR-ASK's `query/` claim (it was a describes row,
+which left SR-ANSWER owning nothing); `store/index-record.schema.json` out of
+SR-INDEX-LIFECYCLE's `store/` claim.
+
+🔴 **`records/RULE-SINCE` gained an entry that does NOT move the baseline.** A
+reassignment convicting commits compliant under the table in force when they
+landed is the 2026-08-21 cause exactly, and SR-WORK-OWNERSHIP decision 9 already
+fixed it — the gate judges each commit against the register as it stood at that
+commit. Nothing was re-audited and no history was retired. **That is the second
+time the fix has paid for itself.**
+
+⚠ **Two things the item asked for were not done as written, and both are
+recorded rather than absorbed.** W-208 §2 listed `scripts/gen-golden.py` among
+the unowned paths — **it was not one**, SR-WORK-GOLDEN owns it, and the item's
+own scope forbids moving an existing owner, so it stayed. And the honest-case
+line the generator renders **does not name the case letter**: nothing
+machine-readable says whether a record claims case (a) or (b), and a generator
+that guessed would assert something nobody checked. The four runtime-plane
+records and SR-LOCKS now state their case in their own bodies instead.
+
+⚠ **Three counts in the register had gone stale and were corrected in the same
+change** — *thirteen ungated component records*, *30 of 80 records carry
+`owns: []`*, and the describes table's *four rows, seeded small*. Each was true
+when written. A count in a heading is the kind of authority a reader does not
+think to check.
+
+---
+
 ## 2026-09-20 — **W-206: the compare and proposals sweep — 24 forks to 8, 17 proposals to 10**
 
 **Shipped:** no code. **Evidence:** none — nothing was measured.
@@ -237,9 +299,25 @@ must decide before it computes: v1's `hit@k` is structurally depressed by those
 four documents, and that is not v1 ranking badly.**
 
 ✅ **W-205 part 1 built to a spec that was already ratified** — SR-INGEST 23,
-SR-DECODE 20, SR-TYPES 13. Binding ▸ claim ▸ default; no person key by default;
-`RULES_VERSION` 1 → 2 corpus-wide, caught by a gate rather than by review. **No
-Node twin owed — Node does not ingest.**
+SR-DECODE 20, SR-TYPES 13 — and **measured: PASS, shipped.** 6 of 6 reachable,
+**0 broke** on the 43 id-queries, **0 of 60** top-1 changes on the set-1 control.
+Binding ▸ claim ▸ default; no person key by default; `RULES_VERSION` 1 → 2
+corpus-wide, caught by a gate rather than by review. **No Node twin owed — Node
+does not ingest.**
+
+🔴 **The before-arm falsified part 1's own premise: 5 of the 6 identifiers were
+ALREADY reachable**, because the analyzer splits and the parts matched from body,
+headings and path. **One was fixed; five moved to rank 1.** 🔴 **That is the
+second unmeasured premise of the day** — part 2's was the first — and both
+generalised a correctly recorded single case. The candidate rule
+(*measure the defect on a handful of the population before freezing a
+data-shaped threshold*) **is SR-RS's and is put to Arpit, not taken.**
+
+🔴 **And part 1 gave the supersession-inversion class a new way to fire:** the
+archived revision now outranks the live document on a shared `doc_id`
+(3/13 → 5/4). A shared `doc_id` is exactly what a superseded pair has. **No arm
+could see it**, and a condition written after seeing it would be a moved
+threshold.
 
 ## 2026-09-20 — **W-204 phase A: the whole ladder's outputs at one frozen engine, and two repairs the rungs needed before they would load**
 

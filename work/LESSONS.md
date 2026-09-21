@@ -21,6 +21,41 @@ record is the rule and this file is the anecdote that motivated it.
 
 ---
 
+## 2026-09-21 — a data-shaped threshold can be frozen on a premise nobody measured
+
+**Twice in one day, in opposite directions.** W-205 part 2 was held — and a whole
+question set authored — on the premise that `RF-118`-shaped sibling identifiers
+fail at `hit@1`. **All eight ranked first in both arms.** W-205 part 1 was
+pre-registered on the premise that six front-matter-only identifiers were absent
+from the index. **Five were already reachable.**
+
+🔴 **Both premises were generalisations of a correctly recorded SINGLE case**, and
+both were wrong for the same mechanical reason: **the analyzer splits**, so a
+whole identifier can be absent while enough of its parts are present for the
+document to be found anyway. *"The whole identifier is absent"* and *"the document
+cannot be found by it"* are different statements.
+
+**What it cost:** a seed-authoring pass, a ladder rebuild and a 5 984-call re-run
+for part 2's headroom that was never needed; and a part-1 endpoint that reads as
+*six fixed* until you look at the before-arm.
+
+**What would have prevented it:** one probe run, minutes, before the freeze.
+[SR-RS](../records/0133_predictions.md) decision 23c already does exactly this for
+links — `ref_edge_census.py` **exits 2 when a corpus has none** — and there is no
+equivalent for *does this input exercise the defect*. **The rule is that record's
+to make and is in the inbox.**
+
+## 2026-09-21 — `sr-owns.py --write` before `git add` stamps a hash that excludes the new file
+
+The owns-hash enumerates a directory from **`git ls-files`**, deliberately, so an
+untracked file is not in it. Run `scripts/sr-owns.py --write` while your new
+module is still untracked and it stamps a hash of the directory **without** it;
+`git add` then makes the file tracked and the gate fires on the next run, naming
+a component you thought you had just stamped.
+
+**Order: `git add`, then `sr-owns.py --write && sr-hash.py --write`, then commit.**
+It cost two re-stamps in one session and looks exactly like a flaky gate.
+
 ## 2026-09-15 — "commit with explicit pathspecs" is not a rule you can follow mechanically
 
 **Second occurrence of a failure class, and a gate now exists** —
