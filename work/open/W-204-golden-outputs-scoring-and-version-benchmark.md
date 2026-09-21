@@ -32,6 +32,23 @@ does the archive mechanics.
 
 ---
 
+## ✅ RULED 2026-09-21 (Arpit, Cowork) — the 2026-09-21 exposure was his paste; there is no breach
+
+*"I copy-pasted it so that at least I can get a score. I thought all the test
+cases were run. Run them, then I'll paste it again. Ignore the breach. That was
+on me. Delete the work item."*
+
+- **W-207 is withdrawn.** It never had a detail file — only queue rows, written
+  by the session that stopped — so nothing is archived; the id is spent and not
+  reused. **No number carries a breach label from this date**; every golden
+  number is `informed`, as prompt 9 already says.
+- **The route is now settled by him, not by a guard:** he pastes the key into
+  the scoring session when the runs are done. That is phase C in practice; the
+  L11 amendment prompt 9 lands is the paperwork, and it may follow the score.
+- **Order stands:** finish phase B (the arms manifest is written), then he pastes
+  the key, then phase D scores A + B from the hand-offs. W-205 part 2's arms run
+  in whichever session is next; execution of frozen code is not authorship.
+
 ## ✅ RULED 2026-09-20 (Arpit, Cowork) — no feature waits on Codex; Claude authors **set 3**
 
 *"A feature should not be held hostage because Codex needs to run a change. When
