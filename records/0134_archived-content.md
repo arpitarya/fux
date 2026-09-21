@@ -10,7 +10,7 @@ feature: what happens once a document is declared archived — the record proper
 owns: [tools/archived-signal-eval@30fb75fa7476]
 laws: [L3, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 1d06ba8eccec64c2a0b931404c693b305af51230fd05b9e0deca2f96844c2bfa
+content_sha: 8cf5c7558d1e4e5aa17a76c0b0848135d69d0c9300e0cb183d20d09abb50b4e8
 ---
 
 # SR-ARCHIVED-CONTENT — what "archived" does, once a document carries it
@@ -135,6 +135,17 @@ improve a result, and **not to tell the reader what to conclude from it**
 (decision 7).
 
 ---
+
+**2026-09-21 — `src/fux/ingest/run.py` and `src/fux/doctor.py` changed under
+this record and NOTHING this record decides moved.** W-205 part 1 added a
+`root=` argument to the `extract_fields` call and a `meta fields` row to
+`doctor`. `_archived_url_ids` and `_with_archived` are untouched, and the
+`archived` declaration reaching a record — carried or fresh — is unchanged.
+
+⚠ **Said out loud because `doctor.py` gained a MODULE-LEVEL function**, which
+makes the freshness gate's symbol narrowing undecidable, so it demands every
+describer rather than guessing. That is the gate working as designed: *"a gate
+may only narrow on a fact, never on a guess."*
 
 ## §2 — For agents
 

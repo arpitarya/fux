@@ -72,7 +72,18 @@ from ..errors import FuxError
 from . import sourcelist
 
 #: The closed key set. Adding one is a change to SR-TYPES, not a config addition.
-KEYS: tuple[str, ...] = ("include", "decoders")
+#:
+#: ⚠ **Three keys since 2026-09-20, not two** ([SR-TYPES](../../../records/0128_types-list.md)
+#: decision 13). `[meta]` is the binding half of a decoder's `META_FIELDS`
+#: claim: it says which metadata keys reach the index and into which field.
+KEYS: tuple[str, ...] = ("include", "decoders", "meta")
+
+#: The index fields a `[meta]` value may name, plus the one word that silences a
+#: claim. **Kept as a literal rather than imported from `store.TF_FIELDS`**: this
+#: module is read by `fux setup` and by config validation, and importing the
+#: store to validate a config key would drag the query package into both.
+#: `tests/ingest/test_typesfile.py` asserts the two agree, so they cannot drift.
+META_TARGETS: tuple[str, ...] = ("body", "heading", "title", "path", "ctx", "none")
 
 #: An extension key: lowercase, no leading dot, dot-separated parts for a
 #: compound suffix (`"tar.gz"`, which TOML requires quoted).
@@ -85,6 +96,7 @@ _ARRAY_CLOSE = re.compile(r"^\s*\]\s*(?:#.*)?$")
 _ITEM = re.compile(rf"^\s*({_STRING})\s*,?\s*(?:#.*)?$")
 _TABLE = re.compile(r"^\s*\[")
 _DECODERS_HEADER = re.compile(r"^\s*\[\s*decoders\s*\]\s*(?:#.*)?$")
+_META_HEADER = re.compile(r"^\s*\[\s*meta\s*\]\s*(?:#.*)?$")
 _KV = re.compile(rf"^\s*({_STRING}|[A-Za-z0-9_\-]+)\s*=\s*({_STRING})\s*(?:#.*)?$")
 
 
@@ -95,6 +107,9 @@ class TypesList:
     include: tuple[str, ...]
     #: extension (no dot, lowercase) -> decoder module stem
     decoders: dict[str, str]
+    #: metadata key -> the index field its value reaches, or `"none"` to
+    #: silence a claim the decoder makes. Sorted. SR-TYPES decision 13.
+    meta: dict[str, str]
     origin: str
     text: str = field(default="", repr=False, compare=False)
 
@@ -108,6 +123,9 @@ class TypesList:
 
     def where_decoder(self, ext: str) -> str:
         return _where_decoder(self.text, self.origin, ext)
+
+    def where_meta(self, key: str) -> str:
+        return _where_meta(self.text, self.origin, key)
 
 
 def pattern_extension(glob: str) -> str | None:
@@ -181,7 +199,7 @@ def parse(text: str, *, origin: str) -> TypesList:
             )
         raise FuxError(
             f"{origin}: unknown key {unknown[0]!r} - the key set is closed and is "
-            f"`include` and `decoders` (SR-TYPES decision 12).{hint}"
+            f"`include`, `decoders` and `meta` (SR-TYPES decisions 12 and 13).{hint}"
         )
 
     include = data.get("include", [])
@@ -198,6 +216,12 @@ def parse(text: str, *, origin: str) -> TypesList:
     for ext, name in decoders.items():
         _check_binding(ext, name, text, origin)
 
+    meta = data.get("meta", {})
+    if not isinstance(meta, dict):
+        raise FuxError(f"{origin}: `meta` must be a table of `key = \"field\"`")
+    for key, target in meta.items():
+        _check_meta(key, target, text, origin)
+
     for glob in include:
         ext = pattern_extension(glob)
         # Exact case: `*.CSV` beside `csv = "csv"` admits upper-case files the
@@ -213,6 +237,7 @@ def parse(text: str, *, origin: str) -> TypesList:
     return TypesList(
         include=tuple(sorted(set(include))),
         decoders=dict(sorted(decoders.items())),
+        meta=dict(sorted(meta.items())),
         origin=origin,
         text=text,
     )
@@ -273,6 +298,43 @@ def _where_include(text: str, origin: str, glob: str) -> str:
     lineno = _line_of(text, re.compile(rf"(?:\"{esc}\"|'{esc}')")) if text else None
     loc = f"{origin}:{lineno}" if lineno else origin
     return f"{loc} (include {glob!r})"
+
+
+def _where_meta(text: str, origin: str, key: str) -> str:
+    """`.fux/formats.toml:12 (meta.doc_id)` — decision 12's F6 rule, which names
+    the KEY rather than the line, because TOML tables have no source position
+    and a reader needs the key to find the line themselves."""
+    esc = re.escape(key)
+    lineno = (
+        _line_of(text, re.compile(rf"^\s*(?:\"{esc}\"|'{esc}'|{esc})\s*=")) if text else None
+    )
+    loc = f"{origin}:{lineno}" if lineno else origin
+    return f"{loc} (meta.{key})"
+
+
+def _check_meta(key, target, text: str, origin: str) -> None:
+    """A `[meta]` entry: a metadata key, and the index field its value reaches.
+
+    🔴 **Validated at load, like every other key here** (SR-TYPES decision 13).
+    A value naming no real index field is a named error at the key — because the
+    alternative is a binding that silently indexes nothing, and *"I bound it and
+    it still is not searchable"* is the failure this whole mechanism exists to
+    end.
+    """
+    if not isinstance(key, str) or not key:
+        raise FuxError(f"{origin}: `meta` holds a non-string key {key!r}")
+    if not isinstance(target, str):
+        raise FuxError(
+            f"{_where_meta(text, origin, str(key))}: the value must be a field name "
+            f"as a string, not {target!r}"
+        )
+    if target not in META_TARGETS:
+        fields = ", ".join(t for t in META_TARGETS if t != "none")
+        raise FuxError(
+            f"{_where_meta(text, origin, key)}: {target!r} is not an index field. "
+            f"Use one of {fields}, or \"none\" to silence a claim the decoder makes "
+            f"(SR-TYPES decision 13)"
+        )
 
 
 def _where_decoder(text: str, origin: str, ext: str) -> str:

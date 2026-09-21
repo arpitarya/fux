@@ -8,11 +8,11 @@ status: accepted
 date: 2026-08-19
 amended: 2026-09-15
 feature: the `extracted` ingest mode — the value in every committed record's `mode` property, and the contract it asserts
-owns: [src/fux/ingest/extract.py@db4fc8f68ac0]
+owns: [src/fux/ingest/extract.py@b141f1c213f1]
 laws: [L1, L2, L3, L4]
 ratifies: W-30
 timestamp: 2026-08-19T00:00:00Z
-content_sha: a90ebdcf2f05698d84c9e6d8b57c358ed69caa98180aa3b0592ab453888ef75d
+content_sha: 217ce7430796c2ac15f85a4d8b24df25d8219b2e85fe9eac85005145e4cb58c2
 ---
 
 # SR-EXTRACTED — the deterministic ingest mode

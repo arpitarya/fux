@@ -68,6 +68,14 @@ NARROWED = {
     # symbol until 2026-09-13, when it was deleted with the knob it served
     # (W-152); `superseded_ids` is what is left on both sides.
     "ingest/priors.mjs": "superseded_ids",
+    # `decode/__init__.py` is the whole decoder plane — the registry, the
+    # consumer loader, `[decoders]` binding resolution and (since 2026-09-21,
+    # W-205 part 1) the `META_FIELDS` claim. **Node has no decoders and does not
+    # ingest**, and `registry.mjs`'s own header says so: what crosses is the one
+    # question the READER asks — *can Node read this document back as the index
+    # saw it*, which is `claims` inverted. Everything else in that module moves
+    # for ingest reasons `isAlreadyText` never sees.
+    "decode/registry.mjs": "claims",
     # `query/__init__.py` is a one-to-many twin and `run.mjs` is the narrow end
     # of it: its own header says "twin of the PURE half", and `verbs/ask.mjs`,
     # `verbs/find.mjs` and `verbs/answer.mjs` each declare the same Python file

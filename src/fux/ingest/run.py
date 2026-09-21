@@ -569,6 +569,10 @@ def run(
                 parsed[doc_id],
                 ctx,
                 max_phrases=limits.max_phrases,
+                # `root` so the `[meta]` binding and the decoder's claim are
+                # resolved from THIS repo's committed config rather than from
+                # the engine default alone (SR-INGEST decision 23a).
+                root=root,
             )
             p.update(1, detail=_loc_of(doc_id))
     # Re-resolved every run (M5): a new document can resolve a link that

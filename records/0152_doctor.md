@@ -7,11 +7,11 @@ description: "One record owns the health-check surface. Every check names a caus
 status: accepted
 date: 2026-09-11
 feature: "`fux doctor` — the read-only, offline health command and its check register"
-owns: [src/fux/doctor.py@45b4ca8305f4, tests/test_doctor_register_is_complete.py@6c3d2378d45f]
+owns: [src/fux/doctor.py@b898890bd495, tests/test_doctor_register_is_complete.py@6c3d2378d45f]
 laws: [L4, L8]
 ratifies: "Arpit, 2026-09-11 — *create a new adr for doctor*"
 timestamp: 2026-09-11T00:00:00Z
-content_sha: dbd7614b9a51248e4a7933137140faa54326490b00ade37c224f86fce7ff5815
+content_sha: 76e308f7d4258d44741a07f22af12d12922f16d605a3f3de0ef83ea30ce3997e
 ---
 
 # SR-DOCTOR — the health command, and who owns its rows
@@ -167,6 +167,7 @@ authoritative about the row.**
 | `correction pins` | warn | a `fux correct --pin` that is **silently not applying** — its document changed since the pin was made, or left the corpus. Named because a suspended pin is invisible at query time: the query just ranks normally | [SR-ENRICH](0137_enrich.md) decision 19 |
 | `refusal rules` | warn, **error** when the file will not parse | how many rules load, how many responses each has refused, and **the rules that have never fired** — what a typo'd condition looks like | [SR-REFUSAL](0146_refusals.md) decision 11 |
 | `decoder bindings` | warn, **error** when the registry will not build | the one binding fault no ingest can catch: a `[decoders]` binding on an extension **no indexed document has** | [SR-DECODE](0139_decode.md) |
+| `meta fields` | warn, **error** when the config will not load | **which front-matter keys reach the index, and the one disagreement nothing else can see.** Load-time validation already refuses a `[meta]` value naming no index field, so this row is not that. It reports the resolved key set, the keys a `none` binding **silenced** — a silenced key and a key nobody thought about look identical, and only the author can tell them apart — and 🔴 **a key where a `[meta]` binding overrides a decoder's `META_FIELDS` claim.** The binding wins by design ([SR-TYPES](0128_types-list.md) decision 13); it is a **finding, not an error**, because two committed files disagree and **the one that loses is otherwise invisible** | [SR-INGEST](0106_ingest.md) decision 23 |
 | `provenance` | **warn**, never error | the decoder fault `decoder bindings` and the reuse key both miss: a **record already in the index** that was produced by a decoder the tree no longer carries at that version. The reuse key catches a digest that *moved since the last run*; a record written before a binding existed agrees with nothing, and **no delta run will look at it again** — `fux ingest --full` is the fix and the row names it. ⚠ **No ledger is NOT a finding**: `.fux/runtime/ingest-log.jsonl` is advisory, derived and gitignored, and warning every consumer on upgrade about a file one `fux ingest` creates is how a row becomes one people skip. ⚠ **`prose` and `unknown` rows are never counted** — no binding claims Markdown, and `unknown` means the ledger predates the row, so counting either would report a number no command can bring down | [SR-INGEST](0106_ingest.md) (W-200) |
 | `recency prior` | warn | whether any document carries an `mtime` — a corpus copied out of its git repository loses every one | [SR-INGEST](0106_ingest.md) |
 | `freshness verdicts` | warn | `freshness_counts` and `AS_INGESTED_VETO_SHARE` — the veto instrument, shared verbatim with SR-ACQUIRED's identical one so the quarter has one home | [SR-URL-FRESHNESS](0147_url-freshness.md) |

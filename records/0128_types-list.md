@@ -7,10 +7,10 @@ description: "Prose plus every format a built-in decoder reads is compiled in as
 status: accepted
 date: 2026-08-20
 feature: the file-type allowlist and `.fux/formats.toml`
-owns: [src/fux/ingest/typesfile.py@127aed84458a]
+owns: [src/fux/ingest/typesfile.py@2ffca40af72c]
 laws: [L1, L3]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 1fc1406c03b49aa816cddb4246b057b666542d0f181842c6bf6e4199ccd18e1e
+content_sha: c418a7520304c9adbc5527995b8ac24598c023ce518619e7289c99faa54d3d99
 ---
 
 # SR-TYPES — which files are documents
@@ -415,6 +415,10 @@ no repo but this one ever held it, and this repo was renamed in the same change.
 `[decoders]`: a flat table, consumer-owned, committed, and **it outranks the
 claim**, exactly as `[decoders]` outranks a built-in's `EXTENSIONS` (decision 13
 of [SR-DECODE](0139_decode.md) is the claim; this is the binding).
+
+✅ **BUILT 2026-09-21** — `KEYS` is three, `TypesList.meta` carries the table,
+and `_check_meta()` validates each value against `META_TARGETS` at load, naming
+the key (`meta.doc_id`) on decision 12's F6 rule.
 
 - **Key = a metadata key a decoder emits. Value = the index field its value
   reaches**, or the literal **`none`** to silence a claim the decoder makes.

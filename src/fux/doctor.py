@@ -332,6 +332,7 @@ def _layout(root: Path) -> list[Check]:
     checks.append(_pii_health(root))
     checks.append(_refusal_health(root))
     checks.append(_decoder_bindings(root))
+    checks.append(_meta_fields(root))
     checks.append(_provenance(root))
     checks.append(_recency_prior(root))
     checks.append(_no_op_priors(root))
@@ -1274,6 +1275,60 @@ def _provenance(root: Path) -> Check:
         "provenance",
         True,
         f"{rows} record(s) match the decoders that produced them",
+    )
+
+
+def _meta_fields(root: Path) -> Check:
+    """`[meta]` and every decoder's `META_FIELDS` — does each bound key name a
+    real field, and does any binding silently override a claim?
+
+    **W-205 part 1**, SR-INGEST decision 23. Load-time validation already
+    refuses a `[meta]` value that names no index field, so this row is not about
+    that. It is about the two things only `doctor` can see:
+
+    - 🔴 **A claim and a binding on the SAME key is a FINDING, not an error.**
+      The binding wins (SR-TYPES decision 13) and that is correct — but a
+      consumer who bound `doc_id = "ctx"` and then installed a decoder claiming
+      `doc_id = "title"` has two committed files disagreeing, and the one that
+      loses is invisible. **Said aloud, never resolved silently.**
+    - ⚠ **`none` bindings are reported** because a silenced key looks exactly
+      like a key nobody thought about, and only the person who wrote the line
+      can tell them apart.
+    """
+    from .decode import meta_bindings, registry
+    from .ingest.parse import DEFAULT_META_FIELDS, meta_fields
+
+    try:
+        bindings = meta_bindings(root)
+        decoders = registry(root)
+    except FuxError as exc:
+        return Check("meta fields", False, str(exc))
+
+    resolved = meta_fields(None, root)
+    silenced = sorted(k for k, v in bindings.items() if v == "none")
+    collisions = sorted(
+        f"{key} (decoder {d.name} claims {d.meta_fields[key]}, binding says {bindings[key]})"
+        for d in dict.fromkeys(decoders.values())
+        for key in d.meta_fields
+        if key in bindings and bindings[key] != d.meta_fields[key]
+    )
+    detail = (
+        f"{len(resolved)} key(s) indexed: "
+        + ", ".join(f"{k}->{v}" for k, v in list(resolved.items())[:6])
+        + (f" (+{len(resolved) - 6} more)" if len(resolved) > 6 else "")
+    )
+    if silenced:
+        detail += f"; {len(silenced)} silenced by `none`: {', '.join(silenced)}"
+    if not collisions:
+        return Check("meta fields", True, detail)
+    return Check(
+        "meta fields",
+        False,
+        f"{detail}; {len(collisions)} key(s) where a `[meta]` binding overrides a "
+        f"decoder's claim: {'; '.join(collisions[:3])}. The binding wins by design - "
+        f"this is reported because two committed files disagree and the loser is "
+        f"otherwise invisible (SR-INGEST decision 23a)",
+        level="warn",
     )
 
 

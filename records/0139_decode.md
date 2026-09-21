@@ -7,10 +7,10 @@ description: "Decoding gets one home, one protocol, and a consumer seam where th
 status: accepted
 date: 2026-08-26
 feature: the decoder plane — the protocol, the registry, the consumer seam and the enrichment queue
-owns: [src/fux/decode@f1f696d64383, src/fux/templates/agents/DECODER-SKILL.md@474a416bcc42]
+owns: [src/fux/decode@28eb64f5a77d, src/fux/templates/agents/DECODER-SKILL.md@474a416bcc42]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-26T00:00:00Z
-content_sha: 9ff51db2a2871e8bcf3fa431fae007c0e384016a496951de0630848c83803230
+content_sha: 2a316414eb8733d7c60cafe3429d1e869c4054d39a14bbfd2f2ac27fa9841e60
 ---
 
 # SR-DECODE — bytes become Markdown in one place
@@ -574,6 +574,12 @@ and the pattern is `EXTENSIONS`' third instance.** Ruled by Arpit 2026-09-20
 (W-205 part 1), on his ask: *"The decoder should have some kind of pattern in
 how individual properties are going to be ingested. Or is there a generic way
 that can be implemented?"*
+
+✅ **BUILT 2026-09-21** — `Decoder.meta_fields`, read by `_meta_fields_of()` on
+the `EXTENSIONS` import path, validated against the index field list at load.
+⚠ **No built-in decoder declares one**, because a decoded document carries
+`meta={}`; the claim is for consumer decoders and the engine default is what
+serves prose front-matter today.
 
 **20a. The claim.** A decoder module may declare a module-level
 `META_FIELDS: dict[str, str]` mapping **one of its own metadata keys** to the

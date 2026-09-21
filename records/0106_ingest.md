@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-15
 date: 2026-08-18
 feature: the `fux ingest` pipeline — sources to committed records
-owns: [src/fux/ingest/ingestlog.py@73e117c1e919, src/fux/ingest@51f50c0e02cb, src/fux/ingest/priors.py@8ffcc632a4be]
+owns: [src/fux/ingest/ingestlog.py@73e117c1e919, src/fux/ingest@618f5f74a04b, src/fux/ingest/priors.py@8ffcc632a4be]
 laws: [L2, L3, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: ad175802ddb38eca90eba86d7610821c8e89522653e01cd1534b6d37b33e2582
+content_sha: 2b41c720a12292f011018084815cad1aa7be0c8e0a95f0375c7e40824d1b5cee
 ---
 
 # SR-INGEST — how ingest works
@@ -788,6 +788,24 @@ neither this record nor [SR-DECODE](0139_decode.md) said which front-matter keys
 were searchable, so *"a `doc_id:` you can read is not one you can search"* was
 true, undocumented, and measured: **3 of the golden seed's 33 identifiers are
 frontmatter-only, and `QCL-IT-ADR-08` was absent from the top 50 at every rung.**
+
+✅ **BUILT 2026-09-21** — `parse.meta_fields()`, `Decoder.meta_fields`,
+`.fux/formats.toml [meta]`, the `meta fields` doctor row, and
+`tests/ingest/test_meta_fields.py`. Measured in
+[`2026-09-21-frontmatter-reachable`](../work/regression/2026-09-21-frontmatter-reachable/PRE-REGISTRATION.md).
+
+⚠ **One thing the build found that this decision did not say: `RULES_VERSION`
+had to bump, corpus-wide.** Front-matter values now change the fields of **every
+document that has front-matter**, so carry-forward would otherwise reuse fields
+built under the old rules. It is the right cost here for the reason the constant
+itself gives — front-matter is not bound to an extension, so there is no smaller
+set to invalidate.
+
+⚠ **And one the decision implies without stating: a prose document has NO
+decoder.** `parse_document` returns `meta={}` for anything a decoder handled, so
+front-matter reaches the index only on the prose path, where layer 2 has no
+module to consult and **the engine default does all the work**. The claim layer
+is built for consumer decoders and is exercised by no built-in today.
 
 **23a. The resolver, and the order.** `parse.meta_fields(decoder)` returns a
 closed `dict[str, str]` — metadata key to index field — resolved in one order:

@@ -142,7 +142,7 @@ class Decoder:
     with libraries that will not accept a buffer, and nothing else.
     """
 
-    __slots__ = ("name", "extensions", "_fn", "wants_path", "origin")
+    __slots__ = ("name", "extensions", "_fn", "wants_path", "origin", "meta_fields")
 
     def __init__(
         self,
@@ -152,12 +152,17 @@ class Decoder:
         *,
         wants_path: bool,
         origin: str,
+        meta_fields: dict[str, str] | None = None,
     ) -> None:
         self.name = name
         self.extensions = extensions
         self._fn = fn
         self.wants_path = wants_path
         self.origin = origin
+        #: This decoder's `META_FIELDS` claim (SR-DECODE decision 20a). Empty
+        #: means it declares none, which is NOT the same as "nothing is
+        #: indexed" — the engine default still applies.
+        self.meta_fields = dict(meta_fields or {})
 
     def __call__(self, raw: bytes, rel_path: str) -> str | None:
         if not self.wants_path:
@@ -240,7 +245,49 @@ def _from_module(module, name: str, *, origin: str) -> Decoder | None:
         fn=fn,
         wants_path=bool(getattr(module, "WANTS_PATH", False)),
         origin=origin,
+        # 🔴 **Read on the same import path as `EXTENSIONS`, and that is a
+        # deliberate difference from a fetcher's `ROUTES`** (SR-DECODE decision
+        # 20b). A decoder is already imported in order to decode, so reading one
+        # more module attribute costs nothing and adds no new trust. A FETCHER is
+        # read with `ast` and never imported, because importing consumer code on
+        # the offline path breaks L4. **The two rules differ because the risk
+        # differs**, and copying one to the other copies the wrong half.
+        meta_fields=_meta_fields_of(module, name, origin),
     )
+
+
+def _meta_fields_of(module, name: str, origin: str) -> dict[str, str]:
+    """A decoder's `META_FIELDS` claim — metadata key -> index field.
+
+    Absent is the common case and means *this decoder declares none*, which is
+    not the same as *nothing is indexed*: the engine default in
+    `ingest/parse.meta_fields()` still applies. SR-DECODE decision 20a.
+    """
+    claimed = getattr(module, "META_FIELDS", None)
+    if claimed is None:
+        return {}
+    if not isinstance(claimed, dict):
+        raise FuxError(
+            f"decoder {origin} declares META_FIELDS that is not a dict of "
+            f"`metadata key -> index field` (SR-DECODE decision 20a)"
+        )
+    from ..ingest.typesfile import META_TARGETS
+
+    out: dict[str, str] = {}
+    for key, target in claimed.items():
+        if not isinstance(key, str) or not isinstance(target, str):
+            raise FuxError(
+                f"decoder {origin}: META_FIELDS holds {key!r} = {target!r}; both must be strings"
+            )
+        if target not in META_TARGETS:
+            fields = ", ".join(t for t in META_TARGETS if t != "none")
+            raise FuxError(
+                f"decoder {origin}: META_FIELDS maps {key!r} to {target!r}, which is not an "
+                f"index field. Use one of {fields}, or \"none\". A claim naming no field "
+                f"would index nothing and say nothing"
+            )
+        out[key] = target
+    return dict(sorted(out.items()))
 
 
 def registry(root: Path | None = None) -> dict[str, Decoder]:
@@ -414,6 +461,24 @@ def _declared_bindings(root: Path | None) -> dict[str, tuple[str, str]]:
             out[f".{ext}"] = (name, listed.where_decoder(ext))
     _BINDINGS[key] = out
     return out
+
+
+def meta_bindings(root: Path | None) -> dict[str, str]:
+    """`.fux/formats.toml [meta]` — metadata key -> index field, or `"none"`.
+
+    🔴 **It outranks the decoder's claim**, exactly as `[decoders]` outranks a
+    built-in's `EXTENSIONS` ([SR-TYPES](../../records/0128_types-list.md)
+    decision 13). **One table for the repo while the claim is per decoder** —
+    so binding `doc_id = "ctx"` moves it for every decoder that emits `doc_id`.
+    That is the intended trade: the claim is where per-format knowledge lives,
+    the binding is where a repo states one policy.
+    """
+    if root is None:
+        return {}
+    from ..ingest import typesfile
+
+    listed = typesfile.read(root, TYPES_FILE)
+    return dict(listed.meta) if listed is not None else {}
 
 
 def declared_bindings(root: Path | None) -> dict[str, str]:

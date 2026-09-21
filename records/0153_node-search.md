@@ -11,7 +11,7 @@ owns: [node@b6682b521fa1, src/fux/store/nodebundle.py@071a24a596dd]
 laws: [L1, L3, L4, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 2e5e6240dfd4025cee5b08d4045b01c9da1f5289f22fcced62e8434cf4ca95b4
+content_sha: c07f466043bb116d0655055919804b3847bffad89e495e835f68569272abc611
 ---
 
 # SR-NODE-SEARCH — the Node read plane
@@ -31,6 +31,24 @@ ways nobody minds; this one is held byte-equal to Python by a third arm of the
 differential law, and **every difference is a defect until
 [PRE-REGISTRATION-NODE](../work/benchmark/PRE-REGISTRATION-NODE.md) says
 otherwise.**
+
+**2026-09-21 — `src/fux/doctor.py` and `tests/test_node_twins.py` changed under
+this record and NOTHING this record decides moved.** W-205 part 1 added a `meta
+fields` doctor row; `_node_reader` and `_installed_reader` are untouched.
+
+🔴 **The twin test gained a NARROWED entry, and it is this record's business to
+say why it is legitimate.** `decode/registry.mjs` is now narrowed to `claims`.
+`src/fux/decode/__init__.py` is the whole decoder plane — registry, consumer
+loader, binding resolution, and now the `META_FIELDS` claim — while
+`registry.mjs` answers one question the READER asks: *can Node read this document
+back as the index saw it.* **Node has no decoders and does not ingest**, so the
+rest of that module moves for reasons `isAlreadyText` never sees. The twin must
+still exist, and it does; only the freshness half narrows.
+
+⚠ **The narrowing is a substring match on the diff, and it fired on PROSE.** The
+first draft of the `META_FIELDS` comments used the English word *claims*, which
+the gate read as the symbol. **The comments were reworded and no gate was
+weakened** — the same resolution the L11 hook's prose collisions take.
 
 ## §2 — For agents
 

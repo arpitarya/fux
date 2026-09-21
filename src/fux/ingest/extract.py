@@ -9,6 +9,8 @@ bundle, so this module has no dependency outside the analyzer.
 
 from __future__ import annotations
 
+
+
 #: **The reuse key's handle on THIS module** (W-166). Ingest reuses a document's
 #: extracted record when its source bytes are unchanged; the rules in this file
 #: are the other input, and they were not in the key. SR-INGEST's Consequences
@@ -30,16 +32,22 @@ from __future__ import annotations
 #:
 #: `tests/ingest/test_extract_rules_version.py` fails on a working tree that
 #: changed this module and did not bump this constant.
-RULES_VERSION = 1
+#:
+#: **2 (2026-09-21, W-205 part 1):** front-matter identity values now reach the
+#: field the resolver chooses, so **every document with front-matter produces
+#: different fields than it did at version 1** — and the corpus-wide bump is
+#: exactly right here, because front-matter is not bound to an extension.
+RULES_VERSION = 2
 
 import re
 from collections import Counter
 from dataclasses import dataclass
+from pathlib import Path
 
 from ..decode._markdown import headings as _md_headings
 from ..decode._markdown import strip_headings as _md_strip_headings
 from ..query.tokenize import tokenize
-from .parse import ParsedDoc
+from .parse import ParsedDoc, meta_fields
 
 #: The cap on `phrases` is `.fux/tune.toml [index] max_phrases` (default
 #: `tune.DEFAULT_MAX_PHRASES`, 32), passed in by `ingest/run.py`. It was a
@@ -148,6 +156,7 @@ def extract_fields(
     doc: ParsedDoc,
     enrichment: str = "",
     max_phrases: int | None = None,
+    root: Path | None = None,
 ) -> Extracted:
     # `None` is the default rather than the constant so this module does not
     # import `fux.tune` (and through it the query package) at import time.
@@ -187,6 +196,29 @@ def extract_fields(
     # and is not written at all.
     ctx_tokens = tokenize(enrichment) if enrichment else []
 
+    # 🔴 **Front-matter identity values, appended to the field the resolver
+    # chose** (SR-INGEST decision 23). Until 2026-09-21 `meta` was dropped
+    # entirely except for `title`, so a `doc_id:` a human could read was not one
+    # they could search — 7 of the golden seed's 14 declared identity keys are
+    # front-matter-only, and every one of them was absent from the index.
+    #
+    # 🔴 **They go in THROUGH the analyzer, not beside it** (decision 23d): the
+    # value is appended to the field's token stream and analyzed exactly as body
+    # text is. **Which is why this does not make an identifier WHOLE** — only
+    # reachable. `QCL-IT-ADR-08` enters and then loses its `IT` to the stopword
+    # list and its hyphens to `_WORD_RE`, precisely as it would in the body.
+    by_field = {
+        "body": body_tokens, "heading": heading_tokens, "title": title_tokens,
+        "path": path_tokens, "ctx": ctx_tokens,
+    }
+    # The decoder that owns this path, so its `META_FIELDS` claim is consulted.
+    # `None` for a prose document, which is every document that HAS front-matter
+    # today — `parse_document` returns `meta={}` for anything a decoder handled.
+    decoder = _decoder_for(rel_path, root) if doc.meta else None
+    for key, field_name in meta_fields(decoder, root).items():
+        for value in _meta_values(doc.meta.get(key)):
+            by_field[field_name].extend(tokenize(value))
+
     per_field = (body_tokens, heading_tokens, title_tokens, path_tokens, ctx_tokens)
     terms = _term_freqs(per_field)
     flen = tuple(len(tokens) for tokens in per_field)
@@ -204,6 +236,40 @@ def _title(meta: dict, headings: list[str], rel_path: str) -> str:
     if headings:
         return headings[0]
     return rel_path.rsplit("/", 1)[-1]
+
+
+def _decoder_for(rel_path: str, root: Path | None):
+    """The decoder registered for this path's extension, or `None`."""
+    from ..decode import registry
+
+    suffix = "." + rel_path.rsplit(".", 1)[-1].lower() if "." in rel_path else ""
+    return registry(root).get(suffix)
+
+
+def _meta_values(value) -> list[str]:
+    """The strings a metadata value contributes, or none.
+
+    **A scalar is one value; a list is its string members** — `aliases:` is the
+    key this exists for, and a YAML list is how a human writes more than one
+    name for a document.
+
+    ⚠ **A bool is NOT a string and is skipped, though `isinstance(True, int)`.**
+    `draft: true` contributes nothing; indexing the word `true` would put every
+    draft in the corpus on one posting list. Numbers ARE indexed: a `doc_id: 4471`
+    is an identifier a person types.
+    """
+    if isinstance(value, bool) or value is None:
+        return []
+    if isinstance(value, (int, float)):
+        return [str(value)]
+    if isinstance(value, str):
+        return [value] if value.strip() else []
+    if isinstance(value, (list, tuple)):
+        out: list[str] = []
+        for item in value:
+            out.extend(_meta_values(item))
+        return out
+    return []
 
 
 def _term_freqs(per_field: tuple[list[str], ...]) -> dict[str, tuple[int, ...]]:
