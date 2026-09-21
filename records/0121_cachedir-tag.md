@@ -10,12 +10,14 @@ feature: the `CACHEDIR.TAG` file written into every derived `.fux/` subdirectory
 owns: []
 laws: [L3]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: b875cfa5dcdc2ab74cae8ccf823c02b9a7c27bfdc0c4200bfa41780c39fdbdda
+content_sha: 48492a969c2dfa32159795d85508a1a59a39e357ea22070df83f7d574b5176d4
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
-**Owns nothing** — [SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7, case (a|b); this record's own decisions say which.
+**Describes** — reaches into, does not own:
+
+- [`src/fux/store/fuxdir.py::derived_dir`](../src/fux/store/fuxdir.py) · owned by [SR-DOTFUX](0102_fux-directory.md)
 
 <!-- COMPONENTS-END -->
 

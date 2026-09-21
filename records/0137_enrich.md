@@ -11,7 +11,7 @@ owns: [src/fux/correct.py@825b9f26220b, src/fux/enrich.py@156e7a9b9a69, src/fux/
 laws: [L1, L2, L3, L4]
 supersedes: SR-ENRICHED
 timestamp: 2026-08-23T00:00:00Z
-content_sha: 42ed43c46fbf6fcbf77e9ebae8b1203fe53ce4871f3a20de3dd92acd3473cc8c
+content_sha: 2f9632a073b9b32d1b477f8d0ed6937e551bd8b18773c6857f84ec9d4bd5938e
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -21,6 +21,11 @@ content_sha: 42ed43c46fbf6fcbf77e9ebae8b1203fe53ce4871f3a20de3dd92acd3473cc8c
 - [`src/fux/correct.py`](../src/fux/correct.py) · file
 - [`src/fux/enrich.py`](../src/fux/enrich.py) · file
 - [`src/fux/templates/agents/ENRICH-SKILL.md`](../src/fux/templates/agents/ENRICH-SKILL.md) · file
+
+**Describes** — reaches into, does not own:
+
+- [`node/src/correct.mjs`](../node/src/correct.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
+- [`node/test/pins.test.mjs`](../node/test/pins.test.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
 
 <!-- COMPONENTS-END -->
 

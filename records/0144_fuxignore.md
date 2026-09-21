@@ -10,7 +10,7 @@ feature: the `.fux/.fuxignore` exclusion file
 owns: [src/fux/ingest/fuxignore.py@a21305b84b0b]
 laws: [L1, L3]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 4a9b198ae27d2e8f7596f9c4944e3cbb502f0ff99d9369b324d5b83235f14fd5
+content_sha: a1ca9b7675f17dc8c4134eb86f4e5477c9310e466c848001425d1d2b1a036e7a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -18,6 +18,10 @@ content_sha: 4a9b198ae27d2e8f7596f9c4944e3cbb502f0ff99d9369b324d5b83235f14fd5
 **Owns** — the components this record decides:
 
 - [`src/fux/ingest/fuxignore.py`](../src/fux/ingest/fuxignore.py) · file
+
+**Describes** — reaches into, does not own:
+
+- [`src/fux/ingest/gitdir.py`](../src/fux/ingest/gitdir.py) · owned by [SR-INGEST](0106_ingest.md)
 
 <!-- COMPONENTS-END -->
 

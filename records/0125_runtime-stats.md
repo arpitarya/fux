@@ -10,12 +10,18 @@ feature: "`.fux/runtime/stats.json` — the corpus-wide aggregates, and the rule
 owns: []
 laws: [L3]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 8b20e43037c9fd6e05fde01db0474cc688da6a77fed9e662efd37c0ec61bf7ba
+content_sha: c9c4b38bd67455aa00a7c0c67351539599e87c5fbfd3ac8ca976a845e3fb33b9
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
-**Owns nothing** — [SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7, case (a|b); this record's own decisions say which.
+**Describes** — reaches into, does not own:
+
+- [`src/fux/derive/_build.py`](../src/fux/derive/_build.py) · owned by [SR-T1-ACCELERATOR](0110_accelerator.md)
+- [`src/fux/derive/accel.py`](../src/fux/derive/accel.py) · owned by [SR-T1-ACCELERATOR](0110_accelerator.md)
+- [`src/fux/derive/format.py`](../src/fux/derive/format.py) · owned by [SR-T1-ACCELERATOR](0110_accelerator.md)
+- [`src/fux/query/bm25f.py`](../src/fux/query/bm25f.py) · owned by [SR-RANKING](0111_ranking.md)
+- [`src/fux/query/scan.py`](../src/fux/query/scan.py) · owned by [SR-ASK](0103_ask.md)
 
 <!-- COMPONENTS-END -->
 
@@ -103,6 +109,19 @@ corpus-wide average — it has to be aggregated across every document, and doing
 that per query would scale with corpus size on the hot path.
 
 ### Decision
+
+**0. This record owns nothing, and the case is (a)** —
+[SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7: it specifies one file
+another record already generates. The stats plane is written by
+[`src/fux/derive/_build.py`](../src/fux/derive/_build.py) and encoded by
+[`derive/format.py`](../src/fux/derive/format.py), both of which
+[SR-T1-ACCELERATOR](0110_accelerator.md) owns as the build; **carving the file
+out would give one plane two owners for one pass.** ⚠ **Until 2026-09-21 that
+left nothing able to open this record** — the freshness gate demands owners and
+describers, and this record was neither. It now carries `describes` rows on both
+files, so a change to what is written or to how it is encoded opens it.
+**Reach is not ownership** — SR-WORK-OWNERSHIP decision 1 — and the case
+above is why owning nothing is the right answer here rather than a gap.
 
 **1. Fields: `n` and `total_flen`.** The membership bar is **corpus-wide,
 unsupplied by any single posting, needed on the hot path**, and both pass it.

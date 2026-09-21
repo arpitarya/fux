@@ -10,12 +10,15 @@ feature: "`.fux/runtime/stamp.json` — the cheap staleness pre-filter, and its 
 owns: []
 laws: [L3]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 10c1783c571b81f2858f39d6854e77bf289464656a28f5e4bb81952949e251f8
+content_sha: 23bde947a5a0b738ec29ed6e16a16e534c23863139949de60075a0029f6b6305
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
-**Owns nothing** — [SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7, case (a|b); this record's own decisions say which.
+**Describes** — reaches into, does not own:
+
+- [`src/fux/derive/_build.py`](../src/fux/derive/_build.py) · owned by [SR-T1-ACCELERATOR](0110_accelerator.md)
+- [`src/fux/derive/format.py`](../src/fux/derive/format.py) · owned by [SR-T1-ACCELERATOR](0110_accelerator.md)
 
 <!-- COMPONENTS-END -->
 
@@ -90,6 +93,19 @@ hash over every committed shard's bytes. On the overwhelmingly common case
 signal can rule out a change first.
 
 ### Decision
+
+**0. This record owns nothing, and the case is (a)** —
+[SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7: it specifies one file
+another record already generates. The stamp is written by
+[`src/fux/derive/_build.py`](../src/fux/derive/_build.py) and encoded by
+[`derive/format.py`](../src/fux/derive/format.py), both of which
+[SR-T1-ACCELERATOR](0110_accelerator.md) owns as the build; **carving the file
+out would give one plane two owners for one pass.** ⚠ **Until 2026-09-21 that
+left nothing able to open this record** — the freshness gate demands owners and
+describers, and this record was neither. It now carries `describes` rows on both
+files, so a change to what is written or to how it is encoded opens it.
+**Reach is not ownership** — SR-WORK-OWNERSHIP decision 1 — and the case
+above is why owning nothing is the right answer here rather than a gap.
 
 **1. Fields: per committed shard, `[size_bytes, mtime_ns]`.** Captured in the
 same pass `build()` already makes over `.fux/index/*.jsonl`, at no extra I/O.

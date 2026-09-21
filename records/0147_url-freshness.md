@@ -10,7 +10,7 @@ feature: the freshness verdict vocabulary and the per-URL check interval
 owns: [src/fux/refer/freshness.py@c2205bbff313]
 laws: [L2, L3, L4]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: d22c06cceecc28c7ddef60704ca71006d89a4834f0af9821a1a579c736913a03
+content_sha: 07278c9fe39c402fd4e43fe6a52a5ac9df894f3fed43155e56451a9a83d8b842
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -21,6 +21,8 @@ content_sha: d22c06cceecc28c7ddef60704ca71006d89a4834f0af9821a1a579c736913a03
 
 **Describes** — reaches into, does not own:
 
+- [`node/src/refer/freshness.mjs`](../node/src/refer/freshness.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
+- [`node/src/refer/source.mjs`](../node/src/refer/source.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
 - [`src/fux/config.py`](../src/fux/config.py) · owned by [SR-CONFIG](0113_config.md)
 - [`src/fux/ingest/sourcelist.py`](../src/fux/ingest/sourcelist.py) · owned by [SR-URL-LIST](0116_url-list.md)
 - [`src/fux/ingest/urlsrc.py`](../src/fux/ingest/urlsrc.py) · owned by [SR-FETCHER](0117_fetcher.md)

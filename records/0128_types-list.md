@@ -10,7 +10,7 @@ feature: the file-type allowlist and `.fux/formats.toml`
 owns: [src/fux/ingest/typesfile.py@2ffca40af72c, .fux/formats.toml@86e430d015d0]
 laws: [L1, L3]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 31aaf182a27d20c9ac813bf3496ffeff10c52d4727b398c63e67e58fd7711e43
+content_sha: f2418d62f8d423fc1af5624137cf48156a22f613f6e7b37179f1bd8025b8c167
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -19,6 +19,10 @@ content_sha: 31aaf182a27d20c9ac813bf3496ffeff10c52d4727b398c63e67e58fd7711e43
 
 - [`.fux/formats.toml`](../.fux/formats.toml) · file
 - [`src/fux/ingest/typesfile.py`](../src/fux/ingest/typesfile.py) · file
+
+**Describes** — reaches into, does not own:
+
+- [`src/fux/ingest/gitdir.py`](../src/fux/ingest/gitdir.py) · owned by [SR-INGEST](0106_ingest.md)
 
 <!-- COMPONENTS-END -->
 

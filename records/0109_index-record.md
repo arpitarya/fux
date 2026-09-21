@@ -10,7 +10,7 @@ feature: the committed record schema — `fux.index.v2`
 owns: [src/fux/store/index-record.schema.json@5c7001362815]
 laws: [L2, L3, L5, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: d87346f78919f69ce0db45d9128825d7c5104dcaa4291407f019e3e2e8d4b87e
+content_sha: b631cbd3c0e7d6546819dbaccaa0b774befa72201cc153967e7cb02278e6fb8c
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -18,6 +18,12 @@ content_sha: d87346f78919f69ce0db45d9128825d7c5104dcaa4291407f019e3e2e8d4b87e
 **Owns** — the components this record decides:
 
 - [`src/fux/store/index-record.schema.json`](../src/fux/store/index-record.schema.json) · file
+
+**Describes** — reaches into, does not own:
+
+- [`src/fux/store/canonical.py`](../src/fux/store/canonical.py) · owned by [SR-INDEX-LIFECYCLE](0108_index-lifecycle.md)
+- [`src/fux/store/format.py`](../src/fux/store/format.py) · owned by [SR-INDEX-LIFECYCLE](0108_index-lifecycle.md)
+- [`src/fux/store/writer.py`](../src/fux/store/writer.py) · owned by [SR-INDEX-LIFECYCLE](0108_index-lifecycle.md)
 
 <!-- COMPONENTS-END -->
 

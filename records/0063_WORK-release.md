@@ -10,7 +10,7 @@ feature: how a release reaches two registries, how the version stays equal acros
 owns: [scripts/check-version-parity.py@2db5c69a9bcd, tests/test_version_parity.py@f45f30bf53ea]
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: a9ea27b3e97d48d6f4acd02f589379c8a5715b29f47784dd21b881073f60ee64
+content_sha: 4d41acbb15ef168b074a0b5c086436ca4fb8f091ada75ede066d8b9dbb304257
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -19,6 +19,10 @@ content_sha: a9ea27b3e97d48d6f4acd02f589379c8a5715b29f47784dd21b881073f60ee64
 
 - [`scripts/check-version-parity.py`](../scripts/check-version-parity.py) · file
 - [`tests/test_version_parity.py`](../tests/test_version_parity.py) · file
+
+**Describes** — reaches into, does not own:
+
+- `node/dist/fux.mjs` · owned by [SR-NODE-SEARCH](0153_node-search.md)
 
 <!-- COMPONENTS-END -->
 

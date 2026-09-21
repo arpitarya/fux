@@ -10,12 +10,15 @@ feature: "`.fux/runtime/docs.jsonl` — the derived doc table and the join key i
 owns: []
 laws: [L3]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 767617cdc35f2c2dca79331016964d3263c65a329e1926f0c33fd3eab876f633
+content_sha: a0f00cb47f65745e3a2f2ed5687376d6768f8c7fe0ecdf36148c79a6e07a2e56
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
-**Owns nothing** — [SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7, case (a|b); this record's own decisions say which.
+**Describes** — reaches into, does not own:
+
+- [`src/fux/derive/_build.py`](../src/fux/derive/_build.py) · owned by [SR-T1-ACCELERATOR](0110_accelerator.md)
+- [`src/fux/derive/format.py`](../src/fux/derive/format.py) · owned by [SR-T1-ACCELERATOR](0110_accelerator.md)
 
 <!-- COMPONENTS-END -->
 
@@ -92,6 +95,19 @@ repeating it inside every postings entry would bloat both the block line and the
 ([SR-T1-ACCELERATOR](0110_accelerator.md)).
 
 ### Decision
+
+**0. This record owns nothing, and the case is (a)** —
+[SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7: it specifies one file
+another record already generates. The docs table is written by
+[`src/fux/derive/_build.py`](../src/fux/derive/_build.py) and encoded by
+[`derive/format.py`](../src/fux/derive/format.py), both of which
+[SR-T1-ACCELERATOR](0110_accelerator.md) owns as the build; **carving the file
+out would give one plane two owners for one pass.** ⚠ **Until 2026-09-21 that
+left nothing able to open this record** — the freshness gate demands owners and
+describers, and this record was neither. It now carries `describes` rows on both
+files, so a change to what is written or to how it is encoded opens it.
+**Reach is not ownership** — SR-WORK-OWNERSHIP decision 1 — and the case
+above is why owning nothing is the right answer here rather than a gap.
 
 **1. One JSON object per line: `archived`, `flen`, `id`, `loc`, `mtime`,
 `superseded`, `title`** — the set `derive/format.py::DOCS_FIELDS` names. It is

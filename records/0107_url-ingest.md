@@ -10,12 +10,16 @@ feature: the `url:` source and how ingestion behaves around the fetcher boundary
 owns: []
 laws: [L2, L4, L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: df0f88376b742f69ca51d47b99539b5725a4f415faed26ec824c62b2e3e376e4
+content_sha: 8594c75b83e01c205f00965e18f058fc07512ad14d14f428da3143bd8ef7a2ba
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
-**Owns nothing** — [SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7, case (a|b); this record's own decisions say which.
+**Describes** — reaches into, does not own:
+
+- [`src/fux/ingest/run.py::_listed_url_ids,_observe_url_health,_reacquire_urls,_report_dead_urls`](../src/fux/ingest/run.py) · owned by [SR-INGEST](0106_ingest.md)
+- [`src/fux/ingest/urlsrc.py::fetch_all`](../src/fux/ingest/urlsrc.py) · owned by [SR-FETCHER](0117_fetcher.md)
+- [`src/fux/maintain/dirty.py`](../src/fux/maintain/dirty.py) · owned by [SR-MAINTENANCE](0129_hooks.md)
 
 <!-- COMPONENTS-END -->
 

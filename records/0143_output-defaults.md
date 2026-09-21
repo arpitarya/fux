@@ -13,7 +13,7 @@ feature: configurable output defaults
 owns: [src/fux/output_config.py@8e8e57fade21, .fux/output.toml@3a5b84942f70]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 064f84c99adbd2d338096504472fe2a7b7a65ca02d3cb61bdc6a52e7e2d0d031
+content_sha: 7e924e585a53c13a6b0a247e05ea1f841789f0e9e6c7f4bcbeaf7364f387d95d
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -25,6 +25,7 @@ content_sha: 064f84c99adbd2d338096504472fe2a7b7a65ca02d3cb61bdc6a52e7e2d0d031
 
 **Describes** — reaches into, does not own:
 
+- [`node/src/config/output.mjs`](../node/src/config/output.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
 - [`src/fux/cli.py`](../src/fux/cli.py) · owned by [SR-CLI](0101_cli-surface.md)
 - [`src/fux/mcp.py`](../src/fux/mcp.py) · owned by [SR-MCP](0136_mcp.md)
 - [`src/fux/query/__init__.py::_gated,_print_index_answer,_print_refer_answer,_show_band,cmd_answer,cmd_ask,cmd_find`](../src/fux/query/__init__.py) · owned by [SR-ASK](0103_ask.md)

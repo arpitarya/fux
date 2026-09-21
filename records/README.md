@@ -97,41 +97,49 @@ SR-WORK-QUALITY owns `tools/quality` and is a process one** — identical shape,
 opposite kind. A derived field would have to guess, and a guess in this position
 reads as authority.
 
-### 🔴 What the kind made visible: thirteen ungated component records
+### 🔴 What the kind made visible: nine ungated component records
 
-**30 of 80 records carry `owns: []`.** Ten are law records, which is correct,
-and **seven are `process` records that name their own hole out loud** — each in
-its own decision, never by omission: [SR-WORK-OWNERSHIP](0054_WORK-ownership.md)
-decision 7, [SR-WORK-BACKLOG](0055_WORK-backlog.md) decision 7,
-[SR-PORT-LIST](0114_port-list.md), [SR-AGENT-SURFACES](0155_agent-surfaces.md),
-and the three the 2026-09-14 `CLAUDE.md` extraction added —
-[SR-WORK-SCALE](0057_WORK-scale.md) decision 15,
-[SR-WORK-LIFECYCLE](0058_WORK-lifecycle.md) decision 12 and
-[SR-WORK-SESSION](0060_WORK-session.md) decision 13, whose subjects are what a
-sentence may claim, the order work happens in, and whether a written handoff is
-true — none of which a checker can grade without grading it wrongly. **The
-other thirteen are `component` records that own no component**, so the freshness
-gate can never fire for them and nothing said so before this key existed:
+**21 of 85 records carry `owns: []`, and every one of them is now reachable by
+the freshness gate or stated as unreachable on purpose.** Ten are law records,
+which is correct — a law governs conduct, not components. **Two are `process`
+records that name their own hole out loud**, each in its own decision and never
+by omission: [SR-WORK-SCALE](0057_WORK-scale.md) decision 15 and
+[SR-PORT-LIST](0114_port-list.md), whose subjects are what a sentence may claim
+and where the boundary with the archived engine runs — neither of which a
+checker can grade without grading it wrongly.
 
-`SR-FIND` · `SR-ANSWER` · `SR-URL-INGEST` · `SR-RECORD` · `SR-CDP-FETCHER` ·
-`SR-HTTP-FETCHER` · `SR-DIR-LIST` · `SR-CACHEDIR-TAG` · `SR-DOCS-TABLE` ·
-`SR-RUNTIME-MANIFEST` · `SR-RUNTIME-STAMP` · `SR-RUNTIME-STATS` · `SR-LOCKS`
+**The other nine are `component` records that own no component**, and since
+2026-09-21 (W-208) **each one carries `describes` rows instead**, so a change to
+the code its subject lives in does open it:
 
-**This is named, not yet gated.** The rule that would close it — *a
-`kind: component` record must have a non-empty `owns`* — turns thirteen silent
-holes red on the day it lands, and each one is a real question: does the record
-gain an owner, get re-kinded, or earn a stated exemption? **That is Arpit's
-call, one record at a time**, and inventing an owner to satisfy a check would be
-the moving-threshold failure wearing a helpful face. [SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7 already names **two honest cases** for owning
-nothing — a record in the list above has to claim one of them, or stop being
-`component`. Two records were re-kinded
-rather than left in that list: **SR-WORK-OWNERSHIP** (the record-to-component model)
-and **SR-PORT-LIST** (the boundary with the archived engine) are `process`.
+`SR-FIND` · `SR-URL-INGEST` · `SR-DIR-LIST` · `SR-CACHEDIR-TAG` ·
+`SR-DOCS-TABLE` · `SR-RUNTIME-MANIFEST` · `SR-RUNTIME-STAMP` ·
+`SR-RUNTIME-STATS` · `SR-LOCKS`
+
+⚠ **Four left that list by gaining the component they were always the record
+for** — `SR-ANSWER`, `SR-RECORD`, `SR-CDP-FETCHER` and `SR-HTTP-FETCHER`, each
+by a carve-out from a directory claim rather than an invention. **`describes`
+never substitutes for `owns`**: the nine above are gate-*reachable*, not owners,
+and the question each still faces is whether it should own its component, be
+re-kinded, or earn a stated exemption. **That is Arpit's call, one record at a
+time**, and inventing an owner to satisfy a check would be the moving-threshold
+failure wearing a helpful face.
+
+**The rule that would close it — *a `kind: component` record must have a
+non-empty `owns`* — is still NOT in force**, and the nine would still turn red
+on the day it lands.
+
+⚠ **This section read *thirteen ungated component records* and *30 of 80* until
+2026-09-21.** Both numbers were true when written; neither survived the audit
+that produced them being acted on, and a count left stale in a heading is the
+kind of authority a reader does not think to check.
 
 ⚠ **`process` is the kind that can rot.** Every process record exists because a
 rule had no home, so the kind is one drawer away from becoming where
 unclassifiable rules go to be unenforced. **Owning its enforcing test is the
 only thing that stops that**, and it is load-bearing rather than decorative.
+**SR-WORK-OWNERSHIP and SR-AGENT-SURFACES left the owning-nothing list on
+2026-09-21**; SR-PORT-LIST and SR-WORK-SCALE remain, by their own decisions.
 
 ## The convention
 
@@ -681,7 +689,7 @@ table does not grant.
 | `tools/quality/` | SR-WORK-QUALITY | the frozen quality contract — the declared query mix and the published cost of an error — **and `goldens.py`, the schema that keeps the rank contract and the relevance set apart** (decision 12). The mix and the cost are a **frozen instrument, not a harness**; `goldens.py` is the one executable thing here, and it exists because decision 12's rules are mechanical: an undeclared relevance list, or a `doc` outside its own relevance set, is refused rather than trusted |
 | `tools/vector-gate/` | SR-RS | W-106's instrument — does a **contextual** embedder fused by RRF reach DENSE-CHUNK's frozen bar, and **do two implementations of one model produce the same vector**. ⚠ Held here by **decision 10's fallback**, the `tools/t2-eval/` precedent: the record it belongs to (`SR-VECTORS`) **does not exist** — W-112 is blocked on this instrument's own result, and a proposal is not a valid owner. It moves to `SR-VECTORS` if and when that record is accepted |
 | `tools/t2-eval/` | SR-RS | a harness whose feature record was retired, held here by SR-RS decision 10's fallback. **A retired record cannot own anything, and a proposal is not a valid owner** |
-| `node/` | SR-NODE-SEARCH | the Node read plane — 44 `.mjs` files as AUTHORED, shipped as ONE bundled file (L10, decision 13); no `dependencies` key, and no build step **for the consumer**. **The only owned component outside `src/` and `tools/`**, so `test_sr_ownership.py::components()` does not demand it; the row is what makes the freshness gate demand this record when a `.mjs` file changes. `compat/` and `hash/` have no Python twin and are exempt by decision |
+| `node/` | SR-NODE-SEARCH | the Node read plane — 47 `.mjs` files as AUTHORED, shipped as ONE bundled file (L10, decision 13); no `dependencies` key, and no build step **for the consumer**. **The only owned component outside `src/` and `tools/`**, so `test_sr_ownership.py::components()` does not demand it; the row is what makes the freshness gate demand this record when a `.mjs` file changes. `compat/` and `hash/` have no Python twin and are exempt by decision |
 
 | `tests/test_doc_registry.py` | SR-WORK-DOCS | the registry's own rules as code — live documents only, one row per document, no row pointing into `archive/`, every target existing. **A `kind: process` record owns its enforcement**; this test had **no owner at all** until 2026-09-14, so no change to it could ever demand the rule it enforces |
 | `tests/test_doc_links.py` | SR-WORK-DOCS | every relative link in a live document resolves, and the exemption list — the append-only worklog, filed runs, pre-registrations, the archive, the changelog, the template's placeholders. **Each exemption is a frozen-by-law document, not a convenience**, which is why the list belongs to the documentation record rather than to the archive one |
@@ -754,9 +762,17 @@ whatever describes it, and a record listed as describing something it also owns
 is a defect (veto 2). **Every row states its reason** — a bare pair is
 unauditable, and an unauditable table stops being trusted.
 
-⚠ **Seeded small and first-hand.** Four rows, each verified against a change
-actually made, rather than a sweep guessing at intent — a bulk fill would make
-the relation *look* enforced while asserting things nobody checked.
+⚠ **Seeded small and first-hand, and deliberately filled once.** It opened at
+**four** rows, each verified against a change actually made rather than a sweep
+guessing at intent, because a bulk fill would make the relation *look* enforced
+while asserting things nobody checked. It stands at **73** rows: the growth to
+about thirty was row-by-row with the change that needed it, and the rest landed
+together on **2026-09-21** (W-208), when the nine `component` records that could
+not be opened at all were given the reach their subjects already had. **That
+fill is the exception the warning above allows for and not a repeal of it** —
+every row names the symbols or the file it means and says why, and the ones that
+narrow themselves were read against the file. A row nobody can justify is still
+a row to delete.
 
 <!-- DESCRIBES-TABLE-START -->
 
@@ -810,5 +826,45 @@ rows narrowed so far were each verified by reading every mention in the file
 | `src/fux/doctor.py::_node_reader,_installed_reader` | SR-NODE-SEARCH | the `node reader` row — the version, the shape, a stale `src/` tree still in the consumer's repo, and a shape-C manifest with nothing installed to resolve it. Owned by SR-DOCTOR, which decides what a row IS |
 | `tools/differential/node_arm.py::bundle_entry,Arm` | SR-NODE-SEARCH | the sixth surface — the published bundle against the module tree it was built from (`bundle_entry` builds it per run; `Arm.compare_bundle`, `compare_bundle_api` and `compare_bundle_mcp` compare it). ⚠ **Narrowed to the top-level symbols the gate can resolve** — a method name here would switch the gate off silently, which `tests/test_sr_freshness.py::test_the_narrowing_is_recorded_where_the_gate_can_read_it` catches. Owned by SR-T1-ACCELERATOR, which owns the harness |
 | `src/fux/store/fuxdir.py::ensure_node_reader,node_version,node_shape,_node_source,_packaged_node_files,_prune_node_reader,_workspace_manifest` | SR-NODE-SEARCH | the vendoring half of R2 — which files are written into `.fux/node/` and the version comparison that decides whether to overwrite. **The `.fux/` SHAPE is still SR-DOTFUX's subject** (it is the fourth shape there); what this record decides is that the vendored thing is a reader and that a stale one is a wrong answer |
+| `src/fux/query/__init__.py::cmd_find` | SR-FIND | `cmd_find`, the folder and phrase filters, and the `find` half of the `--json` shape. Owned by SR-ASK for the scan and unification. ⚠ **Added 2026-09-21 because this record owned NOTHING and could therefore never be opened by the gate** — the SR-ANSWER precedent, which is the same defect one verb along |
+| `src/fux/ingest/urlsrc.py::fetch_all` | SR-URL-INGEST | decision 5's pipeline ends here, and decisions 3 and 6 are what `fetch_all` does with what comes back: a failed fetch is a skip, and the bytes are normalized. Owned by SR-FETCHER for the contract itself |
+| `src/fux/ingest/run.py::_reacquire_urls,_listed_url_ids,_report_dead_urls,_observe_url_health` | SR-URL-INGEST | the url branch of the walk — decision 4's reconciliation, which removes a document only when its URL left the list and does so networked or not. Owned by SR-INGEST for the walk |
+| `src/fux/maintain/dirty.py` | SR-URL-INGEST | which URLs a background pass considers stale enough to re-fetch — the fenced path decision 2 names, on the maintenance side. Owned by SR-MAINTENANCE |
+| `src/fux/store/format.py` | SR-RECORD | the field order and the encoder every record is written through — the declared shape, applied. Owned by SR-INDEX-LIFECYCLE for the store |
+| `src/fux/store/writer.py` | SR-RECORD | where a record is assembled and shard-addressed; a field added to the schema without a writer change is a field nothing emits |
+| `src/fux/store/canonical.py` | SR-RECORD | the canonical byte form the record's `content_sha` and the root hash are taken over — the determinism half of the shape (L3) |
+| `src/fux/ingest/gitdir.py` | SR-DIR-LIST | `read_dirs`, `source_dirs`, `source_excludes`, `archived_dirs` — where the `dirs` list becomes a walk. Owned by SR-INGEST. ⚠ **Added 2026-09-21; this record owned nothing** |
+| `src/fux/ingest/sourcelist.py::_dir_reason` | SR-DIR-LIST | the `dirs` grammar's own validator — the `!` subtraction and the trailing-slash rule are this record's, in a file SR-URL-LIST owns for the grammar machinery |
+| `src/fux/store/fuxdir.py::derived_dir` | SR-CACHEDIR-TAG | every derived directory is created here and tagged here — `CACHEDIR_TAG` written byte-exact per the spec. Owned by SR-DOTFUX for the layout. ⚠ **Added 2026-09-21; this record owned nothing** |
+| `src/fux/derive/_build.py` | SR-DOCS-TABLE | the runtime companion that writes the docs table — this record specifies one file `_build.py` already generates, which is decision 7's honest case (a). Owned by SR-T1-ACCELERATOR |
+| `src/fux/derive/format.py` | SR-DOCS-TABLE | the encoder that decides the table's bytes |
+| `src/fux/derive/_build.py` | SR-RUNTIME-MANIFEST | the manifest is written here; case (a), stated in this record's body |
+| `src/fux/derive/format.py` | SR-RUNTIME-MANIFEST | the encoder that decides the manifest's bytes — the nine keys are this record's and their serialization is here, so a field added in one place and not the other is a manifest `is_fresh()` cannot compare |
+| `src/fux/derive/_build.py` | SR-RUNTIME-STAMP | the stamp is written here; case (a), stated in this record's body |
+| `src/fux/derive/format.py` | SR-RUNTIME-STAMP | the encoder that decides the stamp's bytes — `[size_bytes, mtime_ns]` per shard, and the reason the stamp is excluded from `DETERMINISTIC_FILES` is a property of what is written here |
+| `src/fux/derive/_build.py` | SR-RUNTIME-STATS | the stats plane is written here; case (a), stated in this record's body |
+| `src/fux/derive/format.py` | SR-RUNTIME-STATS | the encoder that decides the stats plane's bytes — `n` and `total_flen` today, and the veto on that set growing is a veto on a change made here |
+| `src/fux/derive/accel.py` | SR-RUNTIME-STATS | the accelerator reads `df`/`n` from this plane, and the differential law is what makes that load-bearing: if only one path carried them, the two would disagree |
+| `src/fux/query/bm25f.py` | SR-RUNTIME-STATS | the scorer is the consumer — a statistic this plane stops carrying is a scorer that silently changes its answer |
+| `src/fux/store/fuxdir.py` | SR-LOCKS | where the lock paths live in the `.fux/` layout. Owned by SR-DOTFUX. ⚠ **Added 2026-09-21**: this record states case (b) — a mechanism spread across components each already claimed — and until now that left it with no way to be opened at all |
+| `src/fux/maintain/runner.py` | SR-LOCKS | the runner takes the lock and is where a stale one is broken. Owned by SR-MAINTENANCE |
+| `src/fux/maintain/daemon.py` | SR-LOCKS | the daemon's single-instance guarantee IS a lock, and its failure mode is two daemons rather than none |
+| `src/fux/query/scan.py` | SR-RUNTIME-STATS | the scan reads the plane's `df`/`n` on the non-accelerated path — the other half of the differential pair |
+| `src/fux/query/scan.py` | SR-PROVENANCE | what a receipt must be able to say about a hit is decided here, where the hit is produced. Owned by SR-ASK |
+| `src/fux/store/collisions.py` | SR-POSTINGS | the term-to-shard collision handling the postings layout rests on. Owned by SR-INDEX-LIFECYCLE |
+| `src/fux/ingest/gitdir.py` | SR-FUXIGNORE | `would_index`, `_generated_kind` and the verdicts a `.fuxignore` rule produces — the file where an ignore rule becomes a skip |
+| `src/fux/ingest/gitdir.py` | SR-TYPES | `read_types`, `TypeFilter`, `_default_types` — the types list applied to the walk. `ingest/typesfile.py` is the writer and is owned here; this is the reader |
+| `node/src/refer/freshness.mjs` | SR-URL-FRESHNESS | the Node twin of the freshness verdicts — the same five words, computed the same way, or the two readers disagree about whether an answer is current. Owned by SR-NODE-SEARCH |
+| `node/src/refer/source.mjs` | SR-URL-FRESHNESS | the Node twin of `from_acquired` and the `as-ingested` fallback |
+| `node/src/config/output.mjs` | SR-OUTPUT | the Node twin of the rendering defaults — `[output]`'s closed key set and the emission gate |
+| `node/src/query/rank.mjs` | SR-RANKING | the Node twin of the scorer. **The differential law is the whole point**: one scorer changing without the other is two engines answering differently from one index |
+| `node/src/verbs/mcp.mjs` | SR-MCP | the Node twin of the MCP server — the same three tools, advertised the same way |
+| `node/mcp-tools.json` | SR-MCP | the tool declarations both readers serve from |
+| `node/src/correct.mjs` | SR-ENRICH | the Node side of `fux correct` — the marker, the pin and its suspension |
+| `node/test/pins.test.mjs` | SR-ENRICH | the pin behaviour pinned. Named by no record until 2026-09-21 |
+| `node/src/decode/registry.mjs` | SR-DECODE | the Node decoder registry — which suffix resolves to which decoder, and the binding digest that invalidates a document when a decoder moves |
+| `node/src/index.mjs` | SR-API | the Node twin of `from fux import open`, method for method. The register's own note on `src/fux/api.py` already says the two are one shape |
+| `node/test/config.test.mjs` | SR-CONFIG | `fux.toml`'s schema as the Node reader loads it. Named by no record until 2026-09-21 |
+| `node/dist/fux.mjs` | SR-WORK-RELEASE | the ONE bundled file a consumer is served ([L10](0011_LAW-10-bundled-output.md)), built at publish. ⚠ **Named, never owned, and GITIGNORED** — it is build output, so the gate can never fire on it and the generated Components block renders it without a link. The row exists so the record that decides how a release reaches npm names the artefact that goes there |
 <!-- DESCRIBES-TABLE-END -->
 

@@ -9,11 +9,11 @@ amended: 2026-09-13
 date: 2026-08-27
 ratified: 2026-08-27
 feature: the record-to-component model, and the `describes` relation W-82 ruling 4 added to it
-owns: [scripts/sr-guard.sh@78168609634b, scripts/sr-hash.py@89a61ddfaa5c, scripts/sr-owns.py@e9f45f2361f1, tests/sr_lib.py@c93fbcc78ec3, tests/test_sr_config_keys.py@ccc95d7f5d03, tests/test_sr_content_hash.py@f11f818ed4e9, tests/test_sr_freshness.py@39e5349eef5f, tests/test_sr_frontmatter.py@5ba563cc5d37, tests/test_sr_ownership.py@e8dee1ae6bf6, tests/test_sr_owns_consistency.py@b3d92e0f7e55, tests/test_sr_owns_hash.py@118b38a56a62, tests/test_sr_register_status.py@acae7406d76c]
+owns: [scripts/sr-guard.sh@78168609634b, scripts/sr-hash.py@89a61ddfaa5c, scripts/sr-owns.py@e9f45f2361f1, tests/sr_lib.py@c93fbcc78ec3, tests/test_sr_config_keys.py@ccc95d7f5d03, tests/test_sr_content_hash.py@f11f818ed4e9, tests/test_sr_freshness.py@39e5349eef5f, tests/test_sr_frontmatter.py@5ba563cc5d37, tests/test_sr_ownership.py@b1ae782cc3ee, tests/test_sr_owns_consistency.py@b3d92e0f7e55, tests/test_sr_owns_hash.py@118b38a56a62, tests/test_sr_register_status.py@acae7406d76c]
 laws: [0]
 ratifies: W-82 ruling 4
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 88a6a18df0a9313670a87164da38f81e43523a4a14c2623cbf6e6e41640d6b49
+content_sha: 6da4229ff8b1eb3bff88c61d6d3cf2eb8f865736d5690ad9826c0b112b4ab69b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -310,12 +310,15 @@ top-level definitions.
     ⚠ **What it exposed, and what W-208 closed of it.** Thirteen `component`
     records carried `owns: []`, so the freshness gate could never demand them —
     the same hole decision 7 admitted for this record, counted rather than felt.
-    **Four left that state on 2026-09-21** on Arpit's ruling: SR-ANSWER,
-    SR-RECORD, SR-CDP-FETCHER and SR-HTTP-FETCHER each gained the component its
-    subject already was, by a carve-out rather than an invention. **Nine remain**,
-    and each is owed either the component it is the record for or a stated
-    honest case. **The rule that would gate it — a `component` record must own
-    something — is still proposed and NOT in force**, and inventing an owner to
+    On **2026-09-21**, on Arpit's ruling, **four gained the component their
+    subject already was** — SR-ANSWER, SR-RECORD, SR-CDP-FETCHER and
+    SR-HTTP-FETCHER, each by a carve-out from a directory claim rather than an
+    invention — and **the other nine gained `describes` rows**, so every one of
+    the thirteen can now be opened by a change to the code it is about.
+    🔴 **That is reach, not ownership, and the distinction is decision 1's:**
+    `describes` never substitutes for `owns`, so the nine are still records that
+    own nothing and **the rule that would gate it — a `component` record must
+    own something — is still proposed and NOT in force.** Inventing an owner to
     satisfy a check would still be worse than the hole.
 
 
@@ -479,10 +482,15 @@ top-level definitions.
 - **Carve-outs stay preferable where they fit.** If a record's subject IS a
   file, own it. `describes` is for a subject that *reaches into* a component
   another record legitimately owns.
-- ⚠ **The seed table is deliberately small and first-hand.** Four rows, each
+- ⚠ **The seed table was deliberately small and first-hand.** Four rows, each
   verified against a change made in the session that wrote this record, rather
   than a sweep guessing at intent. **An unaudited bulk fill would make the
-  relation look enforced while asserting things nobody checked.**
+  relation look enforced while asserting things nobody checked** — which is why
+  the one bulk fill it has had, W-208's on 2026-09-21, was **audited**: every
+  row names the file or the symbols it means and states why, and each narrowed
+  row was read against its file. The table is 73 rows. ⚠ **The warning stands
+  and the fill did not repeal it**: the next sweep is owed the same audit, and a
+  row nobody can justify is a row to delete.
 
 ### Alternatives considered
 

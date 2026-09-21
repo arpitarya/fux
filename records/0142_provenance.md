@@ -12,7 +12,7 @@ owns: [src/fux/query/provenance.py@f84f2a7aea74]
 laws: [L1, L3, L4, L8]
 ratifies: W-91
 timestamp: 2026-08-27T00:00:00Z
-content_sha: e915c9536ac1f0fb355d753c5a87c89988b5cc20e744d6d435fd7675bb5a7c53
+content_sha: 12f26bf5e67f47e776e9de71a58cdd6dc530695a907cd2516399bf26df174e0b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -20,6 +20,10 @@ content_sha: e915c9536ac1f0fb355d753c5a87c89988b5cc20e744d6d435fd7675bb5a7c53
 **Owns** — the components this record decides:
 
 - [`src/fux/query/provenance.py`](../src/fux/query/provenance.py) · file
+
+**Describes** — reaches into, does not own:
+
+- [`src/fux/query/scan.py`](../src/fux/query/scan.py) · owned by [SR-ASK](0103_ask.md)
 
 <!-- COMPONENTS-END -->
 

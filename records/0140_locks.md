@@ -10,12 +10,16 @@ feature: the index write lock and the files around it
 owns: []
 laws: [L1, L2, L3, L7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: fff9a2520d0dadab0a2707f6f6c616d34c7624e65ea91226793fb6f4b2ff3ce9
+content_sha: 00459e920d54fe25ed8a64d25fc402ebd3f357c1f7b1a923321fa109f7a9ff80
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
-**Owns nothing** — [SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7, case (a|b); this record's own decisions say which.
+**Describes** — reaches into, does not own:
+
+- [`src/fux/maintain/daemon.py`](../src/fux/maintain/daemon.py) · owned by [SR-MAINTENANCE](0129_hooks.md)
+- [`src/fux/maintain/runner.py`](../src/fux/maintain/runner.py) · owned by [SR-MAINTENANCE](0129_hooks.md)
+- [`src/fux/store/fuxdir.py`](../src/fux/store/fuxdir.py) · owned by [SR-DOTFUX](0102_fux-directory.md)
 
 <!-- COMPONENTS-END -->
 
@@ -97,6 +101,20 @@ below is ruled elsewhere, the owning record is named and its wording is not
 paraphrased.
 
 ### Decision
+
+**0. This record owns nothing, and the case is (b)** —
+[SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7: it states a mechanism
+spread across components each already claimed by the record carrying its own
+decisions. The lock lives in the `.fux/` layout
+([`store/fuxdir.py`](../src/fux/store/fuxdir.py), SR-DOTFUX's), is taken and
+broken by [`maintain/runner.py`](../src/fux/maintain/runner.py) and relied on by
+[`maintain/daemon.py`](../src/fux/maintain/daemon.py) (both SR-MAINTENANCE's).
+**Carving any of the three out would move a file away from the record whose
+subject it mostly is, to satisfy a check.** ⚠ **Until 2026-09-21 the
+consequence was that nothing could open this record at all** — decision 7 named
+that hole and left it open. It now carries `describes` rows on all three files,
+so the gate reaches it. **Reach is not ownership**, and this record still owns
+nothing on purpose.
 
 **1. One mutex per resource, and the committed index has exactly one.**
 `.fux/runtime/write.lock` is it. `ingest`, `build`, `add`, `remove` and
