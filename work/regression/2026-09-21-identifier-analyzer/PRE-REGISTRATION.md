@@ -128,10 +128,25 @@ a good anecdote. Both must hold for a PASS:
 1. **No `ref`-edge or coverage count on any rung may move.** The analyzer does not
    touch edge extraction, and a change here would mean it did.
 2. **The non-identifier control must not degrade.** A sample of **60 questions
-   drawn from set 1 alone** (the externally-authored set), fixed by taking every
-   fourth id in file order — frozen here, before the sample is drawn — is run on
-   `rung-01000` in both arms. **A net of ≥ 6 against on that sample is a FAIL of
-   the whole run**, whatever the identifier endpoint says.
+   drawn from set 1 alone** (the externally-authored set), fixed by a rule and
+   frozen before the sample is drawn, is run on `rung-01000` in both arms. **A
+   net of ≥ 6 against on that sample is a FAIL of the whole run**, whatever the
+   identifier endpoint says.
+
+   🔴 **CORRECTED 2026-09-21, before any arm ran and before the sample was
+   drawn.** This clause was drafted as *"every fourth id in file order"* and as
+   *"60 questions"*, and **set 1 has 125 questions, so every fourth is 32.** The
+   two halves of one sentence disagreed. The rule executed is **every OTHER id in
+   file order, capped at 60** — `s1-001` … `s1-119`.
+
+   ⚠ **The correction is recorded rather than quietly applied, and it is legal
+   only because of where it sits in time:** no arm had run, no number existed, and
+   **the reading taken is the stricter of the two** — 60 questions can detect a
+   degradation that 32 cannot, so the correction can only make a PASS harder to
+   reach, never easier. A threshold may never move
+   ([SR-RS](../../../records/0133_predictions.md) decision 10b); this is a
+   contradiction resolved in the direction that costs the arm more, stated in the
+   frozen document so the resolution is auditable rather than inferred.
 
 ⚠ **Why set 1 and not a mixture:** the control exists to catch collateral damage
 to ordinary prose queries, and set 1 is the only set this model family did not
