@@ -3,6 +3,19 @@ type: Pointer
 description: "One line: the current state and the immediate next step. Overwritten every session."
 ---
 
+✅ 2026-09-21 Claude Code: **`3.0.0-alpha.2` is live on PyPI and npm**, and the push that cut it found
+`main` **red on three failures nobody could see locally**. 47 commits had never left this machine. The
+repo's own `.fux/index/` was still `fux.index.v3` — W-194 stepped `SCHEMA_ID` to v4 and nothing
+re-ingested this tree — so `node-arm`'s `fux build` refused it on all six runners; **every other test
+builds its index in a `tmp_path`**, so the one index no test read was the one in this repository. Now
+gated by `tests/test_own_index_is_current_format.py` (two strikes: the same class cost sixty
+hand-re-ingested shards on 2026-09-11). Windows was red on 33 more: a `#!/usr/bin/env bash` hook
+invoked as a bare path, and then — once `bash` was named — the **WSL stub** that answers there, which
+exits **1** without running anything, so every guard assertion read as *ALLOWED*. ⚠ **Those tests now
+SKIP where there is no usable `bash` or `jq`**, loudly; 🔴 **no guard, hook or pattern changed.** Both
+suites green whole, both workflows green, `alpha` dist-tag moved, `latest` still `2.0.1`.
+→ **Next is unchanged: W-204 phase C′** — the three recipes and the L11 amendment Cowork ruled below.
+
 ✅ 2026-09-21 Cowork: **the inbox is EMPTY — five rows ruled.** W-204: the paste route is retired and
 L11's prohibition becomes a **switch** — `just golden-unlock` (his hand) → Claude Code scores phase D
 directly → `just golden-retire <set>` moves a scored set's questions **and answers** into committed,

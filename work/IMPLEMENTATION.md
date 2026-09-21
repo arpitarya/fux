@@ -30,6 +30,43 @@ Rules:
 
 
 
+## 2026-09-21 — **3.0.0-alpha.2 released**, and the push found three CI failures no local suite could see
+
+**Shipped** (`3.0.0-alpha.2`, PyPI **and** npm, `alpha` dist-tag moved; `latest`
+stays `2.0.1`, which is what a prerelease should do). **47 commits** since
+`v3.0.0-alpha.1` — the first alpha of the 3.0 line a consumer has a reason to
+move to, since alpha.0 and alpha.1 were byte-identical to each other. Two
+breaking changes carry it: `decoder=` mandatory on every URL line (W-199) and
+`meta = "hashed"` deleted with law L5 (W-194), which steps `fux.index` **v3 →
+v4**. Records touched: **SR-LAWS** and **SR-NODE-SEARCH**, re-stamped only.
+Evidence: [`CHANGELOG.md`](../CHANGELOG.md) §3.0.0-alpha.2 ·
+[SR-WORK-RELEASE](../records/0063_WORK-release.md) · the publish run, both jobs
+green with provenance.
+
+🔴 **The 47 commits had never left this machine, so CI had never seen any of
+them.** The push turned `main` red on three failures, every one of them older
+than the release:
+
+| what was red | why no local suite saw it |
+|---|---|
+| `node-arm`'s `fux build`, **all six runners** | the repo's own `.fux/index/` was still `fux.index.v3`. W-194 stepped `SCHEMA_ID` to v4 and nothing re-ingested this tree. ⚠ **Every other test builds its index in a `tmp_path`** — the one index no test read was the one in this repository |
+| **32 guard assertions, Windows only** | the hooks carry a `#!/usr/bin/env bash` shebang and were invoked as a bare path → `WinError 193`. Naming `bash` then exposed a worse one: the `bash` that answers on a Windows runner is the **WSL stub**, which exits **1** without running anything — and a guard denies with **2**, so every assertion read as *the guard ALLOWED it* |
+| one decoder assertion, Windows only | `"decoders/html.py" in origin` is true on posix and never where the separator is a backslash |
+
+**Two strikes, so a gate** ([SR-WORK-SESSION](../records/0060_WORK-session.md)
+decision 13). The stale-index class cost sixty hand-re-ingested shards on
+2026-09-11, recorded in the WORKLOG as *"the committed index had to move and
+nobody had said so"*. `tests/test_own_index_is_current_format.py` now compares
+the header shard's `_format` with `SCHEMA_ID` in the suite everybody runs.
+
+⚠ **The Windows guard tests now SKIP where there is no usable `bash` or `jq`**,
+loudly and with the reason. That is weaker than closing the hole: what is
+missing on such a platform is a shell to run a guard in, not coverage of the
+rule, and every posix leg still exercises all six. 🔴 **No guard, hook or
+pattern changed** at any point in this. **`fux build` is the only thing that
+caught the index** — a workflow nobody runs locally, on the one push that
+finally reached CI.
+
 ## 2026-09-21 — **W-199 DoD 10: a URL line declares its decoder, and ingest stops guessing**
 
 **Shipped:** `decoder=` as a **required** attribute on every URL line ·
