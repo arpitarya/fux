@@ -40,11 +40,16 @@ QUESTIONS = ROOT / "work" / "golden" / "questions"
 CORPORA = Path.home() / "my_programs" / "fux-lab" / "corpora" / "golden"
 
 
-def call(tree: Path, *args: str) -> tuple[dict | None, float]:
+def call(tree: Path, *args: str, fux: str | None = None) -> tuple[dict | None, float]:
+    """One `fux` call in `tree`, timed.
+
+    ⚠ **`fux` names the ENGINE BINARY, and it is a parameter because W-204
+    phase B runs three of them.** The default is this tree's own module, which
+    is what every single-arm run wants; an arm passes its own venv's `fux`.
+    """
+    cmd = [fux, *args] if fux else [sys.executable, "-m", "fux.cli", *args]
     t0 = time.perf_counter()
-    out = subprocess.run(
-        [sys.executable, "-m", "fux.cli", *args], cwd=tree, capture_output=True, text=True
-    )
+    out = subprocess.run(cmd, cwd=tree, capture_output=True, text=True)
     ms = (time.perf_counter() - t0) * 1000.0
     try:
         return json.loads(out.stdout), ms
@@ -66,10 +71,22 @@ def _cite(loc: str) -> dict:
     return {"doc": loc, "lines": ""}
 
 
-def one(tree: Path, rung: str, commit: str, row: dict, repo_head: str = "") -> tuple[dict, dict]:
-    """`(prediction, handoff)` for one question. Two calls, one question."""
-    asked, ask_ms = call(tree, "ask", row["question"], "--json", "--band", "--top", "10")
-    answered, ans_ms = call(tree, "answer", row["question"], "--json")
+def one(tree: Path, rung: str, commit: str, row: dict, repo_head: str = "",
+        *, fux: str | None = None, band: bool = True, arm: str = "") -> tuple[dict, dict]:
+    """`(prediction, handoff)` for one question. Two calls, one question.
+
+    🔴 **`band` is per arm, and hardcoding it would have been silent.**
+    `fux-engine 1.0.0`'s `ask` has no `--band`, and argparse exits **2** on an
+    unknown flag — so an arm run with it would record an empty result for every
+    question and the rows would read as a ranking collapse rather than a flag
+    error. On an arm without it, `band` and `answerable` are **null**, never
+    `weak`.
+    """
+    ask_args = ["ask", row["question"], "--json", "--top", "10"]
+    if band:
+        ask_args.insert(3, "--band")
+    asked, ask_ms = call(tree, *ask_args, fux=fux)
+    answered, ans_ms = call(tree, "answer", row["question"], "--json", fux=fux)
 
     results = (asked or {}).get("results") or []
     ranked = [r.get("loc") for r in results]
@@ -108,6 +125,9 @@ def one(tree: Path, rung: str, commit: str, row: dict, repo_head: str = "") -> t
         "freshness": (citation or {}).get("freshness"),
         "source": (answered or {}).get("source"),
         "rung": rung,
+        # Empty for a single-arm run; the arm's name for a version benchmark, so
+        # a row can never be read as belonging to the wrong engine.
+        "arm": arm,
         # 🔴 The FROZEN engine sha, not the repository's HEAD. A run that files
         # one rung per commit moves HEAD between rungs while the engine does
         # not, and a column that drifted rung to rung would read as eight
@@ -130,6 +150,15 @@ def main(argv: list[str] | None = None) -> int:
                     help="the evidence directory itself — what a multi-rung run uses, "
                          "so each rung gets evidence/<rung>/ rather than eight runs")
     ap.add_argument("--limit", type=int, default=0, help="0 = every question")
+    ap.add_argument("--fux", default=None,
+                    help="the engine binary for THIS arm; default is this tree's own module")
+    ap.add_argument("--tree", type=Path, default=None,
+                    help="the corpus directory; default is the rung under fux-lab/corpora/golden. "
+                         "An arm passes its own arm_corpus.py copy.")
+    ap.add_argument("--arm", default="",
+                    help="a label stamped on every row, so a row cannot be read as another engine's")
+    ap.add_argument("--no-band", action="store_true",
+                    help="omit --band: fux-engine 1.0.0's ask does not have it")
     ap.add_argument("--sets", default="1,2,3",
                     help="comma-separated question sets to run, e.g. 1,2,3 (the default). "
                          "Each must exist as work/golden/questions/set-N.jsonl.")
@@ -140,7 +169,7 @@ def main(argv: list[str] | None = None) -> int:
     if bool(args.dest) == bool(args.evidence):
         ap.error("give exactly one of --dest and --evidence")
 
-    tree = CORPORA / args.rung
+    tree = args.tree or (CORPORA / args.rung)
     if not (tree / ".fux" / "index").is_dir():
         print(f"no index at {tree}", file=sys.stderr)
         return 1
@@ -175,7 +204,8 @@ def main(argv: list[str] | None = None) -> int:
 
         predictions, handoffs = [], []
         for i, row in enumerate(rows, 1):
-            p, h = one(tree, args.rung, commit, row, repo_head)
+            p, h = one(tree, args.rung, commit, row, repo_head,
+                       fux=args.fux, band=not args.no_band, arm=args.arm)
             predictions.append(p)
             handoffs.append(h)
             if i % 25 == 0:

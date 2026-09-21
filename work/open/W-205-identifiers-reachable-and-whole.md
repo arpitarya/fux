@@ -184,6 +184,49 @@ decoder and an `.eml` header decoder name different keys (`doc_id` vs
 
 ---
 
+## ✅ PART 2 MEASURED 2026-09-21 — family (a) is INCONCLUSIVE and does NOT ship
+
+**[VERDICT](../regression/2026-09-21-identifier-analyzer/VERDICT.md)** ·
+[report](../regression/2026-09-21-identifier-analyzer/report.md) ·
+[frozen pre-registration](../regression/2026-09-21-identifier-analyzer/PRE-REGISTRATION.md)
+
+| rung | before | after | fixed | broke | net |
+|---|---:|---:|---:|---:|---:|
+| `rung-00100` | 32/43 | 33/43 | 1 | **0** | **+1** |
+| `rung-01000` | 30/43 | 33/43 | 3 | **0** | **+3** |
+| `rung-10000` | 29/43 | 33/43 | 4 | **0** | **+4** |
+
+**Nets of 1–5 cannot clear α at any discordant count.** `ANALYZER_VERSION` stays
+`v2`; the branch is not merged and the mechanism is filed as
+`evidence/family-a.patch`.
+
+🔴 **THE FINDING, and it is worth more than the verdict: the failing shape did
+not fail.** All eight sibling identifiers **set 3 was authored to supply** —
+`RF-117/119/120`, `PROJ-123/124/125`, `TSL-RF-119-A/120-A` — ranked their own
+document **first in BOTH arms at every rung**, contributing 0 fixed and 0 broke.
+Splitting is symmetric and `119` is already a rare term, so the prefix collision
+is real and **costs nothing**. **All four fixes came from the OLD 33**, where the
+segments are individually common.
+
+⚠ **The premise of this part was never measured before set 3's documents were
+written for it.** SR-RS decision 23c counts that an input is *present*; nothing
+asks whether it *exercises the defect*. A future data-shaped unblock should
+measure the defect on a handful of the proposed shape first — **that is a rule
+about measurement and therefore SR-RS's, not a session's.**
+
+✅ **The mechanism works:** 33 of 33 seed identifiers survive whole, from 0 of 33,
+on both readers, with every moving fixture row named — W-168's gate A, met.
+
+🔴 **Three ways forward and all three are Arpit's** (VERDICT §To Arpit): ship it
+on the **correctness** argument at 0 regressions; hold for a corpus whose
+identifier segments are individually common (`PROJ-1`…`PROJ-9`); or drop (a), and
+(c) with it, since (a) is its precondition.
+
+⚠ **Family (b) was NOT built or measured.** (a) was to run first and it did not
+clear, so (b) has no basis to run on, and the ordering in the table below stands.
+
+---
+
 ## Part 2 — whole: the analyzer keeps an identifier as one token (RULED — measured on set 3)
 
 ### The two lines

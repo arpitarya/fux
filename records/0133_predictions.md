@@ -7,10 +7,10 @@ description: "An R is a claim frozen before measurement; its threshold may never
 status: accepted
 date: 2026-08-22
 feature: the prediction system — the R ids, their register, the rules that make a frozen claim mean something, and the classification of the runs those claims are measured by
-owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@750e71f6164a, tools/vector-gate@0023bff0cdef]
+owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@08332faa052a, tools/vector-gate@0023bff0cdef]
 laws: [L3]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: f924053f8311e8df857b400fb9c43211cda1061708628bf83ad049a96cc4f93c
+content_sha: 0ba35b128a76321c7164471d35c9af020dd0da686637832c26603bbdb1819e14
 ---
 
 # SR-RS — the R predictions
@@ -1161,6 +1161,18 @@ ranked and answered by each arm separately.
 - ⚠ **It commits every document at one stamp rather than at its own date.** An
   arm comparison whose mechanism reads `mtime` must say so and use the rungs'
   own history instead.
+
+**24c. The golden harness takes its ENGINE as a parameter, and its band flag with
+it.** `golden_run.py` gained `--fux`, `--tree`, `--arm` and `--no-band` so that
+one harness serves a single-arm run and a version benchmark alike, with every row
+stamped with the arm that produced it.
+
+🔴 **`--band` had to become per arm, and hardcoding it would have failed
+silently in the worst available way.** `fux-engine 1.0.0`'s `ask` has no
+`--band`, and **argparse exits 2 on an unknown flag** — so an arm run with it
+hardcoded records an *empty result* for every question, thousands of them, and
+those rows read as a catastrophic ranking collapse rather than as a flag error.
+**On an arm without the flag, `band` and `answerable` are `null`, never `weak`.**
 
 **24a. [`identifier_probe.py`](../tools/quality-controls/identifier_probe.py) is a
 control, and it asks each identifier TWICE.** An id-query is
