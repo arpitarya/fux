@@ -8,6 +8,17 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+## [3.0.0-alpha.2] - 2026-09-21
+
+🔴 **Two breaking changes, and the second one stops every existing URL list
+from loading.** A `.fux/sources/urls` line now declares **both halves of the
+pipe** — `fetch=` and `decoder=` — and `meta = "hashed"` is gone along with law
+L5. `fux.index` steps **v3 → v4**; a v3 index is refused by name. Read both
+migration blocks below before upgrading; neither is automatic.
+
+⚠ **This is the first `3.0.0` alpha that carries engine changes.**
+`3.0.0-alpha.0` and `3.0.0-alpha.1` were byte-identical to each other.
+
 ### Removed — BREAKING
 
 - 🔴 **`decoder=` is now mandatory on every URL line, and every existing URL
