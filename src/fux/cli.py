@@ -484,6 +484,13 @@ def build_parser() -> argparse.ArgumentParser:
         p.add_argument("--fetch", metavar="STEM", help="URLs: record fetch=STEM - a file in .fux/fetchers/. Without it, the routes table and the modules' ROUTES claims decide, and nothing matching refuses")
         p.add_argument("--cdp", action="store_true", help="URLs: record fetch=cdp (alias for --fetch cdp)")
         p.add_argument("--http", action="store_true", help="URLs: record fetch=http (alias for --fetch http)")
+        # 🔴 **The other half of the pipe** (the pipe ruling, 2026-09-18). A URL
+        # line states `decoder=` as well as `fetch=`, and there is no default:
+        # without this flag `fux add <url>` OBSERVES the type on the one fetch it
+        # already performs and writes what it observed — and refuses when nothing
+        # maps, rather than writing a line it cannot ingest. Required with
+        # `--no-fetch`, which observes nothing.
+        p.add_argument("--decoder", metavar="STEM", help="URLs and types: record decoder=STEM - a built-in, `prose` for bytes that are already text, or a file in .fux/decoders/. For a URL, without it `fux add` writes the decoder it observed on its one fetch, and refuses if nothing maps")
         p.add_argument("--archived", action="store_true", help="dirs: record archived=true")
         p.add_argument("--keep", action="store_true", help="URLs: record keep=true - retain the fetched bytes in .fux/acquired/ (the default)")
         p.add_argument("--no-keep", action="store_true", help="URLs: record keep=false - do not retain the fetched bytes")

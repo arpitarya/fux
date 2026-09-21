@@ -2324,8 +2324,21 @@ def configure(config: dict) -&gt; None: # [sources.url.config], verbatim
       (scoped to that one URL) and <code>fux ingest</code>, whose bare form goes out for the URLs
       known to be stale. <code>fux ingest --no-fetch</code> never imports a fetcher, and it is what
       the git hooks run.</li>
-    <li><strong>Verify uses the ingest fetcher.</strong> A document fetched two ways is two
-      documents.</li>
+    <li><strong>The line names a decoder too, and that is the pipe.</strong> A fetcher
+      <em>retrieves</em>; it never converts. The same line says
+      <code>decoder=&lt;stem&gt;</code> — <code>prose</code> for a page that is already text,
+      otherwise a built-in or a file in <code>.fux/decoders/</code> — and it is
+      <strong>mandatory, with no default</strong>. A file's extension picks its decoder; a URL
+      has no trustworthy extension (<code>?download=1</code>, <code>/export</code>,
+      <code>application/octet-stream</code>), so fux used to guess from the
+      <code>Content-Type</code> on <em>every</em> ingest. <code>fux add</code> observes the type
+      <strong>once</strong>, writes the stem, and refuses rather than guessing; ingest then reads
+      the line. Where the two disagree about a format with a signature, the magic-byte floor
+      refuses the response — which is how a sign-in page served honestly as
+      <code>text/html</code> stops reaching the index.</li>
+    <li><strong>Verify uses the ingest fetcher <em>and</em> the ingest decoder.</strong> A document
+      fetched two ways is two documents; one decoded two ways is two shas, which reports as a
+      permanent staleness. Both come off the same committed line.</li>
     <li>A bare <code>str</code> return still works — read as already-prose, so older fetchers keep
       running.</li>
   </ul>

@@ -51,7 +51,7 @@ from pathlib import Path
 
 from .. import store as store_mod
 from ..errors import FuxError
-from ..ingest.urlsrc import _decode_fetched, _unpack, sanitize
+from ..ingest.urlsrc import _decode_fetched, _unpack, declared_decoder, sanitize
 
 __all__ = ["Fetched", "resolve", "fetch_document", "from_acquired", "GIT", "URL"]
 
@@ -115,7 +115,19 @@ def from_acquired(root: Path, doc_id: str, loc: str) -> Fetched | None:
         if blob is None or path is None:
             return None
         raw = path.read_bytes()
-        markdown, _why = _decode_fetched(raw, blob.content_type, loc, root)
+        # 🔴 **The LINE's decoder, not the blob's `content_type`** (the pipe
+        # ruling). The manifest still records the type the server declared, and
+        # ingest stopped routing on it — so decoding a retained blob by the
+        # header would re-introduce exactly the divergence this docstring is
+        # about, and it would do it only for the formats where the header and
+        # the line disagree, which are the ones somebody wrote a line for.
+        decoder = declared_decoder(root, loc)
+        if decoder is None:
+            # Retained bytes for a URL that is no longer listed. There is no
+            # line to say how to read them, and `prose` would be a guess that
+            # produces a sha and therefore a verdict.
+            return None
+        markdown, _why = _decode_fetched(raw, decoder, loc, root)
     except Exception:
         # Advisory to the last: a broken blob costs a verdict, never a query.
         return None
@@ -160,10 +172,18 @@ def _fetch_url(root: Path, doc_id: str, loc: str, fetcher) -> Fetched:
         result = fetcher(loc)
     except Exception as exc:  # consumer code: never let it crash the query
         raise FuxError(f"{loc}: fetcher raised {type(exc).__name__}: {exc}") from exc
-    raw, content_type = _unpack(result)
+    raw, _content_type = _unpack(result)
     if raw is None:
         raise FuxError(f"{loc}: fetcher returned no bytes")
-    markdown, why = _decode_fetched(raw, content_type, loc, root)
+    # The declared decoder, for `from_acquired`'s reason: this sha is compared
+    # against an ingest-time sha, and ingest decodes by the line.
+    decoder = declared_decoder(root, loc)
+    if decoder is None:
+        raise FuxError(
+            f"{loc}: no line in the URL list declares a `decoder=` for it, so the fetched "
+            "bytes cannot be read the way ingest read them"
+        )
+    markdown, why = _decode_fetched(raw, decoder, loc, root)
     if markdown is None:
         raise FuxError(f"{loc}: {why}")
     if not markdown.strip():

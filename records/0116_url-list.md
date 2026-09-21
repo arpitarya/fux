@@ -7,10 +7,10 @@ description: "One URL per line in a committed file, deduped and sorted by the lo
 status: accepted
 date: 2026-08-19
 feature: "`.fux/sources/urls` — the file format itself, and the one grammar both committed source lists are parsed by"
-owns: [src/fux/ingest/sourcelist.py@1fb64881a387]
+owns: [src/fux/ingest/sourcelist.py@019a49b17232]
 laws: [L2, L3, L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 8256c60669e0a7fb1bbcef570ac4c674cf737011f8a2e2b3133e9d0394a60467
+content_sha: 76bf76bca226b6a1f784cd4bb47aba90644c5ddb6a6e76b5a835b2c7aaf6b536
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -278,6 +278,15 @@ edited manually"* from a policy into an observation anyone can make. The check
 belongs to `fux doctor`; the rule is here because it is a property of the
 format.
 
+🔴 **Two exemptions, both on the `urls` grammar, both because there is nothing
+to be lenient WITH.** `fetch=` (decision 16, 2026-09-20) and `decoder=`
+(decision 17, 2026-09-21) are `required`: a line omitting either raises rather
+than defaulting. Leniency means *fall back to the layer below*, and neither has
+a layer below — no `[sources.url]` key, no engine default that could be right for
+somebody's host or somebody's format. **The leniency is intact for every other
+attribute and on the whole `dirs` grammar**, which is why this is two exemptions
+rather than a reversal.
+
 **14. `update = auto|never` — whether `fux ingest` goes out for a line at all**
 (Arpit, 2026-09-05, ruling R-1; built 2026-09-11). A line could say how to reach
 a document, how to store it and how long a citation could go unchecked, and
@@ -358,13 +367,14 @@ a correctly generated file, never happens.
 
 | attribute | values | default when absent | defined by | changes committed bytes? |
 |---|---|---|---|---|
-| **`fetch`** | `http` · `cdp` | `http` | [SR-HTTP-FETCHER](0119_http-fetcher.md) · [SR-CDP-FETCHER](0118_cdp-fetcher.md) | **no** — it selects *who* retrieves the document, not what the record says. A record does not carry which fetcher produced it |
+| **`fetch`** | any module stem in `.fux/fetchers/` | **none — REQUIRED** (decision 16) | [SR-FETCHER](0117_fetcher.md) decision 16 · [SR-HTTP-FETCHER](0119_http-fetcher.md) · [SR-CDP-FETCHER](0118_cdp-fetcher.md) | **no** — it selects *who* retrieves the document, not what the record says. A record does not carry which fetcher produced it |
+| **`decoder`** | any module stem in `.fux/decoders/` or a built-in, plus the reserved `prose` | **none — REQUIRED** (decision 17) | this record, decision 17 · [SR-DECODE](0139_decode.md) | 🔴 **YES, and it is the only attribute here that does.** It decides which decoder turns the fetched bytes into the Markdown that is parsed, so `decoder=html` and `decoder=prose` produce different records, a different `sha` and different statistics from one response |
 | **`update`** | `auto` · `never` | `auto` | this record, decision 14 | **no** — it decides whether fux goes out, not what a record says. ⚠ It changes committed bytes *over time* by preventing them from being refreshed, which is the opposite of the question this column asks |
 
 **`fetch` is a routing decision.** A name resolves to
-`<fetchers dir>/<name>.py`, the directory being the parent of
-`[sources.url] fetcher` ([SR-CONFIG](0113_config.md) decision 5) — so
-relocating a repo's fetchers is a one-key change and never a per-line edit.
+`.fux/fetchers/<name>.py`, a fixed directory since 2026-09-20 — the
+`[sources.url] fetcher` key that used to define it was deleted with W-199 D2
+([SR-CONFIG](0113_config.md), [SR-FETCHER](0117_fetcher.md) decision 16).
 Exactly one runs ([SR-FETCHER](0117_fetcher.md) decision 4), and nothing
 escalates from one to another ([SR-HTTP-FETCHER](0119_http-fetcher.md)
 decision 3) — so the value on the line is the whole story, every run.
@@ -525,12 +535,20 @@ load**, with an error naming the line and the one word that fixes it. There is n
 source-wide fallback to inherit from: `[sources.url] fetcher` is deleted
 ([SR-CONFIG](0113_config.md), [SR-FETCHER](0117_fetcher.md) decision 16a).
 
-🔴 **This is the one attribute the 2026-09-01 empty-default narrowing does NOT
-reach, and the difference is worth stating.** `decoder=` may be empty because *no
-binding declared* is a real, sayable policy — the extension resolves it. **There
-is no corresponding fact for `fetch=`**: a URL with no fetcher is not *"resolve
-it later"*, it is *"fux cannot retrieve this at all"*, and an empty value would
-encode a question rather than an answer.
+🔴 **The 2026-09-01 empty-default narrowing does NOT reach this attribute, and
+the difference is worth stating.** A `decoder=` on the **types** list may be
+empty because *no binding declared* is a real, sayable policy there — the file's
+extension resolves it. **There is no corresponding fact for `fetch=`**: a URL
+with no fetcher is not *"resolve it later"*, it is *"fux cannot retrieve this at
+all"*, and an empty value would encode a question rather than an answer.
+
+⚠ **Read this paragraph with decision 17, which is a day younger.** It named
+`decoder=` as the attribute that may be empty, and that is true of the **types**
+grammar and **false of the URL grammar since 2026-09-21** — a URL has no
+trustworthy extension either, so the same argument that makes `fetch=` mandatory
+makes `decoder=` mandatory on this list. The word `decoder=` appears in both
+grammars and means the same kind of thing; only one of them can resolve it
+later.
 
 ⚠ **The recommended alternative was the opposite and Arpit rejected it.** W-199's
 D1 proposed `fetch=""` meaning *routed* — the table consulted at every ingest, so
@@ -547,6 +565,57 @@ reading decision 16 alone would otherwise re-propose the empty form.**
 it break."* A line already saying `fetch=http` is a **valid pin** and keeps
 working; a hand-written line without one stops the load. No rewrite, no lenient
 read — the `fux update` precedent (W-177) and the `meta=` precedent (W-194).
+
+**17. `decoder=` is MANDATORY on every URL line too — the other half of the
+pipe** (Arpit, 2026-09-18; built 2026-09-21 as W-199 DoD 10).
+
+> *"Whenever we add a URL, after that, we have to define what kind of fetch it
+> is, what kind of decoder we want to use. And that is the one that gets saved
+> in the URLs file."*
+
+- **A fetcher retrieves bytes; a decoder turns them into Markdown; the line
+  names both.** A **file**'s extension picks its decoder. A **URL** has no
+  trustworthy extension — `?download=1`, `/export`, an
+  `application/octet-stream` — so fux guessed from the `Content-Type`, then the
+  URL, then fell back to prose, **on every ingest**. The line replaces the guess
+  with a declaration.
+- 🔴 **The value is a module STEM**, the same vocabulary
+  `.fux/formats.toml [decoders]` uses and the same key SR-DECODE decision 5
+  resolves an override on: a built-in, or a file in `.fux/decoders/`. **No
+  default**, for decision 16's reason — *"resolve it later"* is not a fact about
+  a URL.
+- **`prose` is the one reserved word**, for a page whose bytes are already text
+  (`text/markdown`, `text/plain`). It names a branch and no module, so
+  `.fux/decoders/prose.py` is refused at registry build
+  ([SR-DECODE](0139_decode.md) decision 21).
+- **Written once, at `fux add`, from what was OBSERVED.** The add's single
+  fenced fetch is where the type is seen; every run after it reads the line, and
+  the ingest path never consults a header for routing again
+  ([SR-URL-INGEST](0107_url-ingest.md) decision 6a). Nothing maps → `fux add`
+  **refuses** and asks for `--decoder` ([SR-CLI](0101_cli-surface.md)).
+- **The line wins over the header, silently, and that is stated so nobody
+  "fixes" it.** The line is the human's word; the header is the server's. Where
+  the two disagree about a format with a signature, the **magic floor refuses
+  the response** ([SR-REFUSAL](0146_refusals.md)) — which is the check getting
+  *stronger*: a sign-in shell served honestly as `text/html` on a line that says
+  `decoder=xlsx` could not be seen before.
+- **`fux doctor` reports the drift rather than resolving it** — `url decoders`
+  (a stem naming no module: a failure) and `observed types` (a declared stem
+  disagreeing with the last retained response: a finding)
+  ([SR-DOCTOR](0152_doctor.md)).
+- ⚠ **It breaks existing lists, by the same ruling, and more widely than
+  `fetch=` did.** *"Nothing needs to be done. It is a breaking change. That's
+  all."* **Every** line written before 2026-09-21 lacks `decoder=` — there was
+  no attribute to have written — so **every** existing URL list stops loading
+  until it is re-added or hand-edited, where `fetch=`'s break only reached
+  hand-written lines. No rewrite and no lenient read: decision 13's leniency
+  takes its **second** exemption here, for the first one's reason.
+- ⚠ **What it gives up, said aloud: `fux add <url>` opens the network twice** —
+  once to observe the type, once inside the ingest that follows, because the
+  line has to exist before `fux ingest` will fetch for it. `--decoder <stem>`
+  skips the observation, and so does re-adding a URL whose line already declares
+  one. The alternatives were a window in which the committed file does not load,
+  or a second way for bytes to enter the index.
 
 ### Consequences
 

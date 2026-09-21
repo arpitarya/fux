@@ -7,10 +7,10 @@ description: "Decoding gets one home, one protocol, and a consumer seam where th
 status: accepted
 date: 2026-08-26
 feature: the decoder plane — the protocol, the registry, the consumer seam and the enrichment queue
-owns: [src/fux/decode@28eb64f5a77d, src/fux/templates/agents/DECODER-SKILL.md@474a416bcc42, .fux/decoders@8bdc25ed8780]
+owns: [src/fux/decode@ed8784ea3bd4, src/fux/templates/agents/DECODER-SKILL.md@474a416bcc42, .fux/decoders@8bdc25ed8780]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-26T00:00:00Z
-content_sha: 474d6935d4907c3ccda041f9aaa972dcba43d60395561419670a14ca9ce36b2c
+content_sha: f276151834128bd3129627de862d3675036d9577cbbe0fc0fde43be746fdedfe
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -712,6 +712,45 @@ reuses this record's regex rather than growing a second one.
 the statement W-178 asked this record for, and it is the reason `fetch=`'s
 loosening needed no new mechanism: the precedent was here, shipped, with its
 own doctor row and its own split between shape and existence.
+
+**21. A decoder can be reached BY NAME, not only by extension** —
+`decoder_named(stem, root)` (the pipe ruling, 2026-09-18; built 2026-09-21 as
+W-199 DoD 10). A URL line declares `decoder=<stem>`
+([SR-URL-LIST](0116_url-list.md) decision 17) because a URL has no trustworthy
+extension, so the plane needs a lookup that answers the question the line asks.
+
+**21a. It is `registry()`'s first two steps and deliberately NOT its third.** A
+consumer module of that name replaces the built-in wholesale (decision 5), and
+**the `[decoders]` binding table is not consulted at all**. That table maps an
+**extension** to a module — it decides what a *file* gets and what `fux add`
+*proposes* — and letting it re-route a declared line would undo the point of
+declaring one. **The line is the most specific thing there is**, which is the
+same precedence argument decision 5 makes one layer down.
+
+**21b. `prose` is reserved, and `.fux/decoders/prose.py` is a hard error at
+registry build.** `decoder=prose` names the already-text branch and **no
+module**, so such a file would be loaded, registered, and then never called for
+the one name it answers to. Failing at build is the only place the consumer finds
+out; the error names the reservation and suggests a different stem.
+
+**21c. `Decoder.primary` is `EXTENSIONS[0]` as the module WROTE it**, beside the
+sorted `extensions`. Sorting is right for loading — two machines must agree — and
+answers a different question from *"what is this format called"*: it makes `xlsx`
+primary in `.xlsm` and `html` primary in `.htm`. Nothing cared while a decoder
+was only ever reached **by** an extension; reaching one by **name** means fux has
+to invent the path it decodes under and the name of the retained blob beside it
+([SR-ACQUIRED](0145_acquired-plane.md)). ⚠ **The URL's own suffix wins when the
+declared decoder claims it** — `decoder=csv` on a `.tsv` URL decodes
+tab-separated — because `csv` and `mail` are two built-ins that branch on the
+extension, and dropping that when the decoder stopped being chosen by path would
+have silently read one column where there were two.
+
+**21d. `decode_with(decoder, raw, rel_path, root)` is `decode()`'s body,
+factored.** `decode()` chooses by extension and calls it; the URL path chooses
+by name and calls it. Two copies of that body would diverge in the way that
+makes one plane's malformed document a crash and the other's a skip — the
+`DecodeFailed`/`FuxError` split of decision 7 is exactly what must not be
+reimplemented twice.
 
 ### Consequences
 

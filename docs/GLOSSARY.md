@@ -438,6 +438,9 @@ the system lives here, outside `src/fux/`, which is how the
 Tunables arrive through the opaque `[sources.url.config]` table, never as
 typed keys in fux's schema.
 
+**And the line names a decoder too** — see [the pipe](#the-pipe). A fetcher
+retrieves; it never converts.
+
 **The set is open.** `fetch=<name>` on a URL line resolves to
 `.fux/fetchers/<name>.py`, so a fetcher you write is a fetcher fux can use —
 no engine change and no release, exactly as `.fux/decoders/` already works
@@ -481,6 +484,47 @@ See [SR-FETCHER](../records/0117_fetcher.md) decision 16,
 [SR-URL-LIST](../records/0116_url-list.md) decision 16,
 [SR-CONFIG](../records/0113_config.md) decision 16,
 [SR-INGEST](../records/0106_ingest.md) decision 22.
+
+**The pipe** — The shape of URL ingestion after Arpit's 2026-09-18 ruling: **a
+fetcher retrieves bytes, a decoder turns them into Markdown, and the URL line
+names both**.
+
+```text
+URL line ──fetch=cdp──▶ .fux/fetchers/cdp.py ──bytes──▶ .fux/decoders/xlsx.py ──Markdown──▶ fux ingest
+           decoder=xlsx                                 (chosen by the LINE)
+```
+
+- **`decoder=<stem>` is mandatory on every URL line**, with no default and no
+  `[sources.url]` layer. A **file**'s extension picks its decoder; a **URL** has
+  no trustworthy extension — `?download=1`, `/export`, an
+  `application/octet-stream` — so fux used to guess from the `Content-Type`,
+  then the URL, then fall back to prose, **on every ingest**. The line replaces
+  the guess with a declaration.
+- **Observed once, declared forever.** `fux add`'s single fenced fetch is where
+  the type is seen; it writes the stem it resolved and **refuses** when nothing
+  claims that format, rather than writing a line it cannot ingest. Ingest never
+  reads a header for routing again — which moves a heuristic out of the
+  maintenance path and into a diffable line ([L3](#l3-deterministic)).
+- **`decoder=prose`** is the one reserved word, for bytes that are already text.
+  It names a branch and no module, so `.fux/decoders/prose.py` is refused.
+- **The line wins over the header, silently** — the line is the human's word and
+  the header is the server's. Where the two disagree about a format with a
+  signature, the **magic floor refuses the response**, which is the check
+  getting *stronger*: a sign-in shell served honestly as `text/html` on a line
+  saying `decoder=xlsx` could not be seen before.
+- ⚠ **It breaks every existing URL list.** No line written before 2026-09-21
+  carries `decoder=`, so every one stops loading until it is re-added or
+  hand-edited. Arpit's ruling: *"Nothing needs to be done. It is a breaking
+  change. That's all."*
+
+`fux doctor` reports what it cannot fix: `url decoders` (a stem naming no
+module) and `observed types` (a declared stem disagreeing with the last
+retained response).
+
+See [SR-URL-LIST](../records/0116_url-list.md) decision 17,
+[SR-FETCHER](../records/0117_fetcher.md) decision 17,
+[SR-DECODE](../records/0139_decode.md) decision 21,
+[SR-URL-INGEST](../records/0107_url-ingest.md) decision 6a.
 
 **`fetch_at_answer`** — The `fux.toml` boolean that decides whether
 `fux answer` may open a socket **at all**. `true` (the default) is the

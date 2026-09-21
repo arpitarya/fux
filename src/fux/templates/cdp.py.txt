@@ -393,6 +393,13 @@ class WebSocket:
 # fetchers converting differently would make the committed index depend on
 # WHICH ONE RAN, which is L3. Link extraction stays here: crawling is this
 # fetcher's job, not the decoder plane's.
+#
+# And WHICH decoder converts is the URL LINE's to say (2026-09-21): every
+# line states `decoder=<stem>` beside `fetch=<stem>`, `fux add` observes the
+# Content-Type once and writes it, and ingest never re-derives one from a
+# header. The Content-Type this file returns is informational from then on --
+# still worth returning accurately, because `fux add` proposes from it and
+# `fux doctor`'s `observed types` row compares it against the line.
 # ====================================================================
 
 

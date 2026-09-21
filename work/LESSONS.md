@@ -21,6 +21,69 @@ record is the rule and this file is the anecdote that motivated it.
 
 ---
 
+## 2026-09-21 — the restore is the hazard, not the commit; and an audit loop can lie
+
+**Two halves of one afternoon, and the second is worse than the first.**
+
+🔴 **A `git checkout` on a shared tree is as destructive as a bad commit, and
+nothing warns you.** The repo's concurrency discipline is written for *staging*:
+re-derive `git status`, commit with explicit pathspecs
+([SR-WORK-SESSION](../records/0060_WORK-session.md) decision 10). A session
+correctly noticing that a global stamper had touched eleven records it did not
+own restored them with `git checkout` — **the right instinct** — and one of those
+eleven had, by then, acquired two hundred lines of another session's amendment.
+It went, without a message, and the file's line count was identical to `HEAD`
+afterwards. **Restore needs the same explicit discipline staging does**: check
+the diff of each path you are about to discard, not the reason you believe it
+changed.
+
+🔴 **And the audit that should have caught it reported `ok` for every file.**
+The check was a shell loop:
+
+```sh
+n=$(grep -c "$needle" "$file" || echo 0)
+[ "$n" = "0" ] && echo LOST || echo ok
+```
+
+`grep -c` prints `0` **and** exits 1 when it finds nothing, so `|| echo 0` fires
+too and `$n` is `"0\n0"` — which never equals `"0"`. **Seventeen files, all
+reported present, one of them absent.** The remedy is `grep -qF` and a real
+`if`, and the lesson is the general one: **a verification step must be able to
+fail.** Before trusting an audit loop, feed it a case you know is broken and
+watch it say so. An audit that cannot produce a negative is not evidence of a
+positive — it is the same shape as a green test that asserts nothing, and it is
+harder to see because the output looks like work.
+
+⚠ **Both halves were found by reading `git diff --stat` and disbelieving it**:
+a record that should have grown by two hundred lines showed four. **The stat is
+the cheap check that catches this class**, and it caught it twice in one day.
+
+---
+
+## 2026-09-21 — a repo-wide stamper is a concurrency hazard, and it is silent
+
+**`scripts/sr-owns.py --write` and `scripts/sr-hash.py --write` take no path
+argument.** They walk every record. On a tree another session is editing, that
+means a change of yours re-stamps the `owns:` hashes of *their* records to match
+*their* in-progress code — **silently satisfying the freshness gate that exists
+to force them to touch the record.** It cost eleven records here; they were
+restored only because each happened to carry exactly four changed lines, all
+frontmatter, and nothing of theirs was mixed in yet. **An hour later the same
+records had real body edits and restoring them would have destroyed work.**
+
+**The sequence that works on a shared tree:** stage your paths → stamp → restore
+theirs → verify with `git diff --name-only records/`. **The window is small and
+it closes.** ⚠ Three earlier concurrency lessons here are all about *commits*;
+this is the first where the hazard was a **generator**, which is worse, because a
+commit is visible in `git log` and a stamp is four hex characters in a
+frontmatter line nobody re-reads.
+
+**The tell that caught it:** `git status` showed 3 untracked paths at session
+start and ~45 modified files an hour later. **Re-derive status before every
+stamp, not only before every commit.**
+
+---
+
 ## 2026-09-21 — a data-shaped threshold can be frozen on a premise nobody measured
 
 **Twice in one day, in opposite directions.** W-205 part 2 was held — and a whole

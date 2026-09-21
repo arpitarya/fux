@@ -23,6 +23,8 @@ here. Read that record before changing anything below it.
 
 | what he decides | filed | age |
 |---|---|---|
+| 🔴 **W-204** — **move the scratchpad keys into the permitted directory, or delete them.** Outside it they are a breach (L11 d3); nothing was read. The carve-out (d13) has landed, so **phase D runs the moment they are in place**. [detail](BLOCKED.json) | 2026-09-21 | 0d |
+| ↳ **blocks:** W-204 phase D, and through it W-168 | | |
 | 🔴 **W-204** — **paste the key.** Phases A and B are filed (5 984 + 8 976 rows, no score), both frozen before any key existed; phase D is all that is left. [detail](open/W-204-golden-outputs-scoring-and-version-benchmark.md) | 2026-09-21 | 0d |
 | ↳ **blocks:** W-168 | | |
 | 🔴 **W-205** — part 2: ship family (a) on correctness, hold for a better corpus, or drop it. INCONCLUSIVE at **+4 with 0 regressions**. [detail](regression/2026-09-21-identifier-analyzer/VERDICT.md) | 2026-09-21 | 0d |
@@ -38,7 +40,6 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🟢 **W-199** · `agent` — D1–D4 and the three doctor rows **BUILT 2026-09-20**; what is left is DoD 10, the `decoder=` half of the pipe ruling, added to this item mid-session. [detail](open/W-199-fetcher-routing.md)
 - 🔴 **W-168** · `agent`, waiting on W-204 — steps 3–10 of the ranking ideas; step 2 moved to W-205. Ruled 2026-09-20: Codex adds `RF-118`-shaped ids to the seed in the prompt-7 pass. [detail](open/W-168-search-improvements.md)
 - 🔴 **W-205** · `arpit` — **part 1 PASSED and shipped**; **part 2 INCONCLUSIVE and NOT shipped**. Three ways forward on part 2, and a candidate SR-RS rule after two unmeasured premises in one day. [detail](open/W-205-identifiers-reachable-and-whole.md)
 

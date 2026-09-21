@@ -6,6 +6,21 @@
  * document reads `.fux/acquired/` if the blob is retained, and otherwise the
  * caller falls back to `source: "index"`.
  *
+ * ⚠ **The pipe ruling does not reach here, and the reason is that Node does
+ * not decode at all.** Python's `from_acquired` and `_fetch_url` now take the
+ * `decoder=` stem the committed URL line declares (`urlsrc.declared_decoder`)
+ * instead of the response's `Content-Type`; `fromAcquired` below returns the
+ * retained **bytes** and never converts them, so there is no decoder for a
+ * line to name. Nothing to port — stated rather than left as a silent gap,
+ * because `tests/test_node_twins.py` asks the question and the answer is not
+ * obvious from the diff.
+ *
+ * ⚠ **The suffix candidates below are a pre-existing narrowness, unchanged by
+ * that ruling.** A retained blob is named by the format it holds, so a `.pdf`
+ * or `.xlsx` blob is not among the four tried here and reads as absent. It was
+ * equally absent when the name came from the `Content-Type`; the naming rule
+ * moved and the gap did not.
+ *
  * Owned, with its Python twin, by [SR-URL-FRESHNESS](../../../records/0147_url-freshness.md).
  */
 import { readFileSync, existsSync } from "node:fs";

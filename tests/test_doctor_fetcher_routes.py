@@ -40,7 +40,7 @@ def _row(root, name):
 # --- fetcher routes ---------------------------------------------------------
 
 def test_a_route_naming_no_file_is_a_FAILURE(tmp_path):
-    root = _repo(tmp_path, routes='"x.test" = "glassbox"\n', urls="https://x.test/a fetch=http\n")
+    root = _repo(tmp_path, routes='"x.test" = "glassbox"\n', urls="https://x.test/a fetch=http decoder=prose\n")
     row = _row(root, "fetcher routes")
     assert not row.ok and row.level == "error"
     assert "glassbox" in row.detail
@@ -59,7 +59,7 @@ def test_a_collision_on_a_listed_host_is_a_FAILURE_naming_both(tmp_path):
     root = _repo(
         tmp_path,
         routes='"x.test" = "http"\n"re:^x\\\\.test$" = "http"\n',
-        urls="https://x.test/a fetch=http\n",
+        urls="https://x.test/a fetch=http decoder=prose\n",
     )
     row = _row(root, "fetcher routes")
     assert not row.ok and row.level == "error"
@@ -67,13 +67,13 @@ def test_a_collision_on_a_listed_host_is_a_FAILURE_naming_both(tmp_path):
 
 
 def test_a_clean_table_says_how_many_routes_there_are(tmp_path):
-    root = _repo(tmp_path, routes='"x.test" = "http"\n', urls="https://x.test/a fetch=http\n")
+    root = _repo(tmp_path, routes='"x.test" = "http"\n', urls="https://x.test/a fetch=http decoder=prose\n")
     row = _row(root, "fetcher routes")
     assert row.ok and "1 route(s)" in row.detail
 
 
 def test_no_table_and_no_claim_says_every_line_is_a_pin(tmp_path):
-    root = _repo(tmp_path, urls="https://x.test/a fetch=http\n")
+    root = _repo(tmp_path, urls="https://x.test/a fetch=http decoder=prose\n")
     assert _row(root, "fetcher routes").ok
 
 
@@ -85,7 +85,7 @@ def test_the_routes_row_never_imports_a_fetcher(tmp_path, monkeypatch):
     **by path**, which is the only way a consumer's fetcher can be reached, so
     that is the one function patched.
     """
-    root = _repo(tmp_path, routes='"x.test" = "boom"\n', urls="https://x.test/a fetch=boom\n",
+    root = _repo(tmp_path, routes='"x.test" = "boom"\n', urls="https://x.test/a fetch=boom decoder=prose\n",
                  fetchers=("http", "boom"))
     (root / ".fux" / "fetchers" / "boom.py").write_text(
         'raise AssertionError("doctor imported a fetcher")\n'
@@ -107,7 +107,7 @@ def test_a_pin_the_table_would_resolve_differently_is_named(tmp_path):
     only thing that says the two have drifted apart."""
     root = _repo(
         tmp_path, routes='"x.test" = "cdp"\n',
-        urls="https://x.test/a fetch=http\n", fetchers=("http", "cdp"),
+        urls="https://x.test/a fetch=http decoder=prose\n", fetchers=("http", "cdp"),
     )
     row = _row(root, "pinned fetchers")
     assert not row.ok and row.level == "warn"
@@ -117,7 +117,7 @@ def test_a_pin_the_table_would_resolve_differently_is_named(tmp_path):
 def test_it_reports_and_never_rewrites(tmp_path):
     root = _repo(
         tmp_path, routes='"x.test" = "cdp"\n',
-        urls="https://x.test/a fetch=http\n", fetchers=("http", "cdp"),
+        urls="https://x.test/a fetch=http decoder=prose\n", fetchers=("http", "cdp"),
     )
     before = (root / ".fux" / "sources" / "urls").read_text(encoding="utf-8")
     _row(root, "pinned fetchers")
@@ -125,12 +125,12 @@ def test_it_reports_and_never_rewrites(tmp_path):
 
 
 def test_an_agreeing_pin_is_quiet(tmp_path):
-    root = _repo(tmp_path, routes='"x.test" = "http"\n', urls="https://x.test/a fetch=http\n")
+    root = _repo(tmp_path, routes='"x.test" = "http"\n', urls="https://x.test/a fetch=http decoder=prose\n")
     assert _row(root, "pinned fetchers").ok
 
 
 def test_no_table_means_nothing_for_a_pin_to_disagree_with(tmp_path):
-    root = _repo(tmp_path, urls="https://x.test/a fetch=http\n")
+    root = _repo(tmp_path, urls="https://x.test/a fetch=http decoder=prose\n")
     assert _row(root, "pinned fetchers").ok
 
 

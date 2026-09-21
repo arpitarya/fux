@@ -94,6 +94,51 @@ def test_magic_floor_cannot_be_overridden_by_rules():
     assert refusals.refused(rules(), "https://x/a.xlsx", XLSX, LOGIN_PAGE) is not None
 
 
+# -- the floor keyed on the LINE's declared decoder (the pipe ruling) -------
+
+
+def test_the_declared_decoder_catches_a_shell_served_under_an_HONEST_header():
+    """🔴 **The case the header-only floor could not see.**
+
+    The server said `text/html` and sent HTML — it told the truth. The lie is
+    that HTML is the document, and only the line says otherwise.
+    """
+    reason = refusals.magic_mismatch(HTML, LOGIN_PAGE, "xlsx")
+    assert reason is not None
+    assert "the line declares decoder=xlsx" in reason
+    assert "not the document the line says it is" in reason
+
+
+def test_the_declared_decoder_passes_a_real_workbook_whatever_the_header_said():
+    assert refusals.magic_mismatch("application/octet-stream", REAL_XLSX, "xlsx") is None
+
+
+def test_a_declared_decoder_with_no_signature_falls_through_to_the_header():
+    """§3 edge case 4: `html`, `json`, `csv` and `xml` have no magic, so the
+    decoder's own *nothing readable* path records the skip instead."""
+    assert refusals.magic_mismatch(HTML, LOGIN_PAGE, "html") is None
+    # ...and the header map still applies underneath it.
+    assert refusals.magic_mismatch(XLSX, LOGIN_PAGE, "html") is not None
+
+
+def test_a_caller_with_no_line_behaves_exactly_as_before():
+    """The add-time probe is observing a type in order to WRITE a line, so it
+    has none to pass — and every caller predating the ruling passes none."""
+    assert refusals.magic_mismatch(XLSX, LOGIN_PAGE) == refusals.magic_mismatch(
+        XLSX, LOGIN_PAGE, None
+    )
+
+
+def test_the_declared_map_covers_the_formats_that_have_a_signature_and_no_more():
+    """⚠ Only an unambiguous signature belongs here, exactly as with `MAGIC`."""
+    assert set(refusals.MAGIC_BY_DECODER) == {"xlsx", "docx", "pptx", "pdf"}
+
+
+def test_refused_threads_the_decoder_through():
+    assert refusals.refused((), "https://x/p", HTML, LOGIN_PAGE, "pdf") is not None
+    assert refusals.refused((), "https://x/p", HTML, b"%PDF-1.7\n", "pdf") is None
+
+
 # -- matching ---------------------------------------------------------------
 
 

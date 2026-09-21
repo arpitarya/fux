@@ -7,11 +7,11 @@ description: "`fux enrich` plans and validates; a coding agent generates. Fux ne
 status: accepted
 date: 2026-08-23
 feature: document enrichment — the deterministic halves fux owns, and the generation it refuses to own
-owns: [src/fux/correct.py@825b9f26220b, src/fux/enrich.py@156e7a9b9a69, src/fux/templates/agents/ENRICH-SKILL.md@5c384af659f2]
+owns: [src/fux/correct.py@825b9f26220b, src/fux/enrich.py@fffa68fe0f30, src/fux/templates/agents/ENRICH-SKILL.md@5c384af659f2]
 laws: [L1, L2, L3, L4]
 supersedes: SR-ENRICHED
 timestamp: 2026-08-23T00:00:00Z
-content_sha: 2f9632a073b9b32d1b477f8d0ed6937e551bd8b18773c6857f84ec9d4bd5938e
+content_sha: 3f987b7b005a481f22e2adf4eac2808e6bc7e89898cb4add97a55bb27a19f430
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -593,6 +593,26 @@ it. The answer comes from re-reading the enrichment file and analyzing its two
 halves — deterministic, offline, one file read per **shown** document. *"A model
 guessed you might ask this"* and *"a colleague said so"* are different answers,
 and `--why` exists to tell them apart.
+
+**2026-09-21 — `_document_text` reads a `url:` blob through the LINE's decoder**
+(the pipe ruling; [SR-URL-INGEST](0107_url-ingest.md) decision 6a).
+
+Planning for a `url:` document reads `.fux/acquired/` — which is what makes it
+possible at all under [L4](0006_LAW-4-offline-by-default.md) — and it now passes
+`urlsrc.declared_decoder(root, loc)` to `_decode_fetched` instead of the blob's
+`content_type`.
+
+**Why it matters to a count and not only to tidiness:** ingest decoded those
+bytes by the line, so a chunk count taken off a differently-decoded copy plans
+enrichment for text the index does not hold — and `fux enrich --check`'s whole
+value is the split between *partial coverage across the corpus* (intended) and
+*partial coverage inside a declared scope* (a defect).
+
+⚠ **A URL no longer listed counts as `None`**, the same *"we cannot count this"*
+a missing blob already is — never a crash inside a planning command.
+
+⚠ **This changes nothing about the boundary.** Enrichment still never runs inside
+`fux ingest`, and reading a retained blob is not a fetch.
 
 ### Consequences
 

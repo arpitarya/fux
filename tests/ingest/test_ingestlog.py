@@ -273,7 +273,7 @@ def test_the_ledger_is_not_the_answer_journal(tmp_path):
 
 
 def test_a_url_row_carries_its_fetcher_and_decoder(tmp_path):
-    root = _repo(tmp_path, urls=["https://x.test/a fetch=mw"])
+    root = _repo(tmp_path, urls=["https://x.test/a fetch=mw decoder=prose"])
     run(root, refresh_urls=True)
     row = _rows(root)["url:https://x.test/a"]
     assert row["kind"] == "url"
@@ -296,7 +296,7 @@ def test_a_skipped_url_gets_a_row_saying_why(tmp_path):
     one*, and no row is right for it. A URL is listed explicitly, so a fetch
     that fails is always a skip.
     """
-    root = _repo(tmp_path, urls=["https://x.test/gone fetch=mw"])
+    root = _repo(tmp_path, urls=["https://x.test/gone fetch=mw decoder=prose"])
     _write_fetcher(root, 
         "def fetch(url):\n    raise RuntimeError('404 not found')\n", encoding="utf-8"
     )

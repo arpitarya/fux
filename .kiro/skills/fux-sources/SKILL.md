@@ -1,6 +1,6 @@
 ---
 name: fux-sources
-description: Manage what is in a Fux corpus with `fux add`, `fux remove` and `fux ingest` — the ONE verb for the first ingest and every re-ingest, since `fux update` was deleted in 3.0. Directories, files, file types and URLs, archived=, keep, ttl, update=, and why a file is not indexed. Use ONLY when explicitly asked to change the corpus ("index this folder", "add this URL", "stop indexing X", "refresh the URLs"), or to answer "why isn't file X indexed". Edits committed files in .fux/.
+description: Manage what is in a Fux corpus with `fux add`, `fux remove` and `fux ingest` — the ONE verb for the first ingest and every re-ingest, since `fux update` was deleted in 3.0. Directories, file types and URLs, the mandatory fetch= and decoder= on a URL line, archived=, keep, ttl, and why a file is not indexed. Use ONLY when explicitly asked to change the corpus ("index this folder", "add this URL", "stop indexing X"), or to answer "why isn't file X indexed". Edits committed files in .fux/.
 ---
 
 # Managing a Fux corpus
@@ -44,7 +44,7 @@ attribute is another `fux add` on the same entry — it is an upsert.
 | file | holds | one line looks like |
 |---|---|---|
 | `.fux/sources/dirs` | directories and single files, repo-relative | `docs/runbooks archived=false enrich=false` · `!docs/drafts` |
-| `.fux/sources/urls` | `http(s)` URLs | `https://wiki.corp/x fetch=http keep=true ttl=24h enrich=false archived=false update=auto` |
+| `.fux/sources/urls` | `http(s)` URLs | `https://wiki.corp/x fetch=http decoder=prose keep=true ttl=24h enrich=false archived=false update=auto` |
 | `.fux/formats.toml` | which file types are documents | `include = ["*.md", …]` and `[decoders]` `csv = "csv"` |
 | `.fux/.fuxignore` | what is kept out | `.gitignore` grammar; `!` **re-includes** |
 
@@ -60,15 +60,22 @@ attribute is another `fux add` on the same entry — it is an upsert.
   `file:line`. Two lines for one entry with **different** attributes is an error.
 - File order is irrelevant: the loader dedupes and sorts.
 - `dirs` attributes: `archived`, `enrich` (`true`/`false`, default `false`).
-- `urls` attributes: `fetch` (**any fetcher name** — see below)
-  (`hashed`|`plain`), `keep`, `enrich`, `archived` (`true`/`false`), `ttl`
-  (`0` or `<int>s|m|h|d`), `update` (`auto`|`never`).
+- `urls` attributes: `fetch` and `decoder` (**both any module name**, both
+  **mandatory** — see below), `keep`, `enrich`, `archived` (`true`/`false`),
+  `ttl` (`0` or `<int>s|m|h|d`), `update` (`auto`|`never`).
 - 🔴 **`fetch=` is a NAME, not an enum** (3.0). It resolves to
-  `<fetchers dir>/<name>.py`, so `fetch=confluence` works the moment you write
-  `.fux/fetchers/confluence.py` — the same pattern `.fux/decoders/` already
-  uses. The grammar checks shape only; `fux doctor`'s `fetcher bindings` row
-  reports a name with no file, and a **typo now parses**. The `fux-fetcher`
-  skill covers writing one.
+  `.fux/fetchers/<name>.py`, so `fetch=confluence` works the moment you write
+  that file — the same pattern `.fux/decoders/` already uses. The grammar
+  checks shape only; `fux doctor`'s `fetcher bindings` row reports a name with
+  no file, and a **typo now parses**. The `fux-fetcher` skill covers writing one.
+- 🔴 **`decoder=` is a NAME too, and a URL line MUST state it** (the pipe,
+  2026-09-21). A fetcher retrieves bytes; the decoder named here turns them
+  into Markdown. `prose` is the reserved word for a page that is already text;
+  anything else is a built-in (`html`, `pdf`, `xlsx`, …) or a file in
+  `.fux/decoders/`. **No default and no `[sources.url]` layer** — a URL has no
+  trustworthy extension, so the line says it. `fux add` observes the
+  `Content-Type` once and writes what it saw; `fux doctor`'s `url decoders` row
+  reports a name with no module.
 - **The attribute KEYS stay closed at seven.** Open values, closed keys — an
   unknown key is still a loud error naming `file:line`.
 - `!<glob>` in `dirs` subtracts a path and everything under it. `*` does not
@@ -80,9 +87,11 @@ one line and keeps every comment.
 
 **`fux add` writes EVERY attribute on a URL line**, defaults included, so a
 line says what it means and a policy change is a one-word diff. The values it
-writes are **your repo's** — `[sources.url]`'s `fetcher`, `keep`,
-`ttl`, `enrich` and `update` are resolved first, and an explicit flag beats
-both. ⚠ **A stated attribute beats `[sources.url]` afterwards**: editing
+writes are **your repo's** — `[sources.url]`'s `keep`, `ttl`, `enrich` and
+`update` are resolved first, and an explicit flag beats both. `fetch=` is
+**resolved** from `[sources.url.routes]` and the fetchers' `ROUTES` claims, and
+`decoder=` is **observed** on the one fetch the add performs; neither has a
+source-wide key, and `fux add` refuses rather than guessing either. ⚠ **A stated attribute beats `[sources.url]` afterwards**: editing
 `fux.toml` later does not reach a line that already states the attribute, so
 change the lines too (or hand-write lines that omit it).
 
@@ -96,14 +105,16 @@ entry.
 | flag | records | valid for |
 |---|---|---|
 | `--archived` | `archived=true` | dirs, urls |
-| `--cdp` / `--http` | `fetch=cdp` / `fetch=http` — the two shipped fetchers. **There is no `--fetch <name>` flag**: for a custom one, `fux add <URL> --no-ingest`, edit the `fetch=` value, then `fux ingest <URL>` | urls |
+| `--fetch STEM` | `fetch=STEM` — a file in `.fux/fetchers/`. Without it the routes table and the modules' `ROUTES` claims decide, and nothing matching **refuses** | urls |
+| `--cdp` / `--http` | aliases of `--fetch cdp` / `--fetch http`, the two shipped fetchers | urls |
+| `--decoder STEM` | `decoder=STEM` — a built-in, `prose`, or a file in `.fux/decoders/`. Without it the add **observes** the `Content-Type` on its one fetch and writes what it saw, and **refuses** if nothing claims that format | urls, types |
 | `--keep` / `--no-keep` | `keep=` | urls |
 | `--ttl D` | `ttl=D` (`0`, `30s`, `15m`, `1h`, `7d`) | urls |
 | `--no-update` | `update=never` | urls |
 | `--types` | the entry is a file-type pattern | types |
 | `--dry-run` | prints `would add <line>` and the plan; writes nothing | all |
 | `--no-ingest` | writes the line only | all |
-| `--no-fetch` | writes the URL line and ingests offline | urls |
+| `--no-fetch` | writes the URL line and ingests offline. 🔴 **Requires `--decoder`** — it forbids the one fetch that would observe the type | urls |
 
 A flag for an attribute the list does not have (`--cdp` on a directory), or two
 flags for one attribute, is an error and writes nothing. There is no flag for

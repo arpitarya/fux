@@ -7,10 +7,10 @@ description: "Fux still does not fetch — the refer plane reuses the consumer-f
 status: accepted
 date: 2026-08-20
 feature: the refer plane — fetch, verify, chunk, re-score, assemble
-owns: [src/fux/refer@51ebc07f901d, tools/refer-bench@cfdb47b24af2, tools/refer-budget-sweep@db9ff8233332]
+owns: [src/fux/refer@4bde92ec28c5, tools/refer-bench@cfdb47b24af2, tools/refer-budget-sweep@db9ff8233332]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 3dca2dfb19b7279dda58da4799df2aa66213ca1bd66300fdbe0078a2c2e5e808
+content_sha: 2414779b171140e294b410154d4b63f71e7fd77c9f8516b493608e7de135f5f8
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -589,6 +589,29 @@ implemented. The key is stated once in
 
 ⚠ **Worth naming because it was invisible:** a branch with a test and no
 selector reads, to anyone auditing the plane, exactly like a branch in use.
+
+**2026-09-21 — a fetched page is decoded by the LINE, not by the response**
+(the pipe ruling; [SR-URL-INGEST](0107_url-ingest.md) decision 6a).
+
+`source._fetch_url` passes `urlsrc.declared_decoder(root, loc)` to
+`_decode_fetched` instead of the `Content-Type` the fetcher returned.
+
+🔴 **This closes the false-staleness hazard `source.py`'s own docstring names,
+structurally rather than by care.** An ask-time sha is compared against an
+ingest-time sha; ingest decodes by the committed line, so verify reading the
+**same line** makes the two decodes identical by construction. The previous form
+was identical only while the server said the same thing twice — and where it did
+not, every citation on that URL reported `drifted` against itself.
+
+⚠ **A URL the list no longer declares is `unverified`, and that is new.** There
+is nothing left saying how ingest read those bytes, and guessing `prose` would
+produce a sha, which produces a verdict — an answer invented at verify time
+about bytes nobody can say the shape of. `_fetch_url` raises (the per-document
+degradation this plane already has) and `from_acquired` returns `None`.
+
+⚠ **`_decode_fetched` and `sanitize` are still IMPORTED, never reimplemented.**
+The rule did not change; what changed is that the thing threaded alongside them
+is now a committed fact instead of a response header.
 
 ### Consequences
 

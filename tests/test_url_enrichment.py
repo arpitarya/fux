@@ -14,7 +14,10 @@ from fux import enrich as enrich_mod
 from fux.ingest import sourcelist
 from fux.store import acquired
 
-LOC = "https://wiki/runbook fetch=http"
+#: ⚠ **A bare URL, and it carried `fetch=http` until 2026-09-21.** A `loc` is
+#: an address, never a list LINE, so line attributes never belonged in it; the
+#: 2026-09-20 `fetch=` sweep put one there and the `decoder=` sweep doubled it.
+LOC = "https://wiki/runbook"
 HTML = "text/html; charset=utf-8"
 PAGE = (
     b"<!DOCTYPE html><html><head><title>Deploy runbook</title></head><body>"
@@ -33,9 +36,18 @@ def _repo(tmp_path, line, source_enrich=None):
     return tmp_path
 
 
-def _retain(root, loc=LOC, raw=PAGE, ctype=HTML):
+def _retain(root, loc=LOC, raw=PAGE, ctype=HTML, decoder="html"):
+    """Retain bytes, AND declare the line that says how the plane reads them.
+
+    🔴 **Since the pipe ruling `_document_text` decodes a blob by the line's
+    `decoder=`**, not by the `content_type` the manifest recorded — ingest
+    decoded it by the line, and a chunk count taken off a differently-decoded
+    copy would plan enrichment for text the index does not hold.
+    """
     blob = acquired.save(root, loc, raw, ctype, ".html", run_seq=1)
     acquired.write_manifest(root, {loc: blob})
+    if loc.startswith("http") and not (root / "fux.toml").is_file():
+        _repo(root, f"{loc} fetch=http decoder={decoder}")
     return blob
 
 
@@ -55,7 +67,7 @@ def test_it_is_off_by_default_like_the_dirs_list():
 
 
 def test_a_line_can_declare_it(tmp_path):
-    (tmp_path / "urls").write_text("https://x/a enrich=true fetch=http\n")
+    (tmp_path / "urls").write_text("https://x/a enrich=true fetch=http decoder=prose\n")
     entry = sourcelist.read(tmp_path, "urls", sourcelist.URLS, missing_hint="")[0]
     assert entry.attrs["enrich"] == "true"
     assert "enrich" in entry.declared
@@ -65,20 +77,20 @@ def test_a_line_can_declare_it(tmp_path):
 
 
 def test_an_undeclared_line_with_no_source_setting_is_off(tmp_path):
-    root = _repo(tmp_path, "https://x/a fetch=http")
+    root = _repo(tmp_path, "https://x/a fetch=http decoder=prose")
     assert enrich_mod._enrich_urls(root) == set()
 
 
 def test_the_source_wide_setting_turns_a_bare_line_on(tmp_path):
-    root = _repo(tmp_path, "https://x/a fetch=http", source_enrich=True)
+    root = _repo(tmp_path, "https://x/a fetch=http decoder=prose", source_enrich=True)
     assert enrich_mod._enrich_urls(root) == {"https://x/a"}
 
 
 def test_a_line_beats_the_source_wide_setting_in_both_directions(tmp_path):
-    root = _repo(tmp_path, "https://x/a enrich=false fetch=http", source_enrich=True)
+    root = _repo(tmp_path, "https://x/a enrich=false fetch=http decoder=prose", source_enrich=True)
     assert enrich_mod._enrich_urls(root) == set()
 
-    root2 = _repo(tmp_path / "b", "https://x/a enrich=true fetch=http", source_enrich=False)
+    root2 = _repo(tmp_path / "b", "https://x/a enrich=true fetch=http decoder=prose", source_enrich=False)
     assert enrich_mod._enrich_urls(root2) == {"https://x/a"}
 
 
@@ -103,6 +115,7 @@ def test_a_url_document_with_nothing_retained_reads_as_none(tmp_path):
 def test_a_url_with_keep_false_reports_zero_chunks_rather_than_crashing(tmp_path):
     # `keep=false` opted this line out, so there is nothing to count. `--plan`
     # names it; it must not raise inside a planning command.
+    _repo(tmp_path, f"{LOC} fetch=http decoder=html keep=false")
     assert enrich_mod._chunk_count(tmp_path, {"src": "url", "loc": LOC}) == 0
 
 
@@ -112,7 +125,9 @@ def test_a_retained_url_document_chunks(tmp_path):
 
 
 def test_a_corrupt_blob_counts_as_zero_never_raises(tmp_path):
-    _retain(tmp_path, raw=b"\x00\x01\x02", ctype="application/pdf")
+    # The LINE declares `pdf`; the bytes are not one, so the decoder gets
+    # nothing and the count is zero rather than an exception.
+    _retain(tmp_path, raw=b"\x00\x01\x02", ctype="application/pdf", decoder="pdf")
     assert enrich_mod._chunk_count(tmp_path, {"src": "url", "loc": LOC}) == 0
 
 

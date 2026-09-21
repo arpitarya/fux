@@ -466,15 +466,23 @@ def _document_text(root: Path, record: dict) -> str | None:
     """
     loc = record.get("loc", "")
     if record.get("src") == "url":
-        from .ingest.urlsrc import _decode_fetched
+        from .ingest.urlsrc import _decode_fetched, declared_decoder
         from .store import acquired
 
         blob = acquired.read_manifest(root).get(loc)
         path = acquired.stored(root, loc)
         if blob is None or path is None:
             return None
+        # The line's `decoder=`, not the blob's `content_type` (the pipe
+        # ruling): ingest decoded by the line, and a chunk count taken off a
+        # differently-decoded copy would plan enrichment for text the index
+        # does not hold. `None` means the URL is no longer listed, which is
+        # "we cannot count this" for the same reason a missing blob is.
+        decoder = declared_decoder(root, loc)
+        if decoder is None:
+            return None
         try:
-            markdown, _why = _decode_fetched(path.read_bytes(), blob.content_type, loc, root)
+            markdown, _why = _decode_fetched(path.read_bytes(), decoder, loc, root)
         except Exception:
             # A blob that no longer decodes is "we cannot count this", never a
             # crash inside a planning command.

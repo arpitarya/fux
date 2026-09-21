@@ -3,6 +3,28 @@ type: Pointer
 description: "One line: the current state and the immediate next step. Overwritten every session."
 ---
 
+✅ 2026-09-21 Claude Code: **W-199 CLOSED — a URL line declares its decoder, and ingest stops guessing.**
+DoD 10 shipped, so all ten are met. `decoder=<stem>` is **required** on every URL line beside `fetch=`;
+`fux add` observes the `Content-Type` on its one fetch and writes the stem, **refusing** when nothing
+claims that format; `_decode_fetched` takes the declared stem and the header is not consulted at ingest
+at all. The header→extension→prose ladder **moved** to `propose_decoder` (same ladder, one execution)
+rather than being deleted, so an existing corpus re-adds to the same answer.
+🔴 **BREAKING and wider than `fetch=`'s break** — no line written before today carries the attribute, so
+**every** existing `.fux/sources/urls` stops loading; `fux add <url>` again is the fix, `--decoder <stem>`
+the offline one. 🔴 **Two behaviour changes a consumer meets first:** `fux add <url>` now opens the
+network **twice** (observe, then ingest) unless `--decoder` is given, and `fux add` on a URL that is
+**down** writes **no line at all** where it used to write one and exit 1. Stronger for free: the magic
+floor refuses a body the **line** disagrees with; refer and enrich decode by the same committed line
+ingest did; a retained blob is named by what it is. **W-200's second provenance finding shipped with
+it** (`observed types`). 17 records amended — SR-URL-LIST 13 and **17**, SR-FETCHER **17**, SR-DECODE
+**21**, SR-URL-INGEST **6a**, two SR-DOCTOR rows. Suites: `tests` **5 282**, `tests_e2e` **145**,
+`node --test` **82**. ⚠ **One red is not mine** — `test_record_components` on `records/0012`, the other
+session's mid-flight L11 amendment. ⚠ **A `git checkout` on a shared tree reverted my SR-URL-LIST
+amendment** and my first audit loop said everything was fine because `$(grep -c … || echo 0)` never
+compares equal — re-applied, and the lesson is in the WORKLOG. → **Next: Arpit's inbox** — the L11
+blocker's key move, then the paste, then W-204 phase D. **W-168 is the only agent row left and it waits
+on W-204.**
+
 ✅ 2026-09-21 Claude Code: **W-208 BUILT and CLOSED — every record now names the files it governs, and the naming is GENERATED.**
 A `COMPONENTS` block sits under the frontmatter of **74 of 85** records, rendered from the register's
 OWNERSHIP and DESCRIBES tables by `scripts/gen-components.py` and held byte-equal by

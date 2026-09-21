@@ -10,7 +10,7 @@ feature: what happens once a document is declared archived — the record proper
 owns: [tools/archived-signal-eval@30fb75fa7476]
 laws: [L3, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 21a4f5da7ef3b60ab5a767d516387dcfd8d6541b49b5018337b03ad5f90d6ab5
+content_sha: 15673fda6a0d2bc3ec324168001d6df71836ac73fb845351632f6ff071310e4b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -437,6 +437,24 @@ names a **file** in a directory the consumer owns. `archived` names neither a
 file nor a module — it is a declaration about a document, `true` or `false` —
 so decision 1a's two-value set is untouched, and an unknown value is still the
 loud error it always was.
+
+**2026-09-21 — `UrlEntry` grew a field, and `archived`'s two layers are
+untouched.**
+
+`UrlEntry.decoder` was added with no default ([SR-URL-LIST](0116_url-list.md)
+decision 17), so every construction of the dataclass now states it. `archived`
+keeps **two** layers where `keep`/`ttl`/`enrich`/`update` take three, and that is
+still decision 1a's call rather than an omission: a source-wide *"everything I
+fetch is retired"* describes no corpus anybody has.
+
+⚠ **`decoder` has no source-wide layer either, for a different reason** — not
+*"nobody would set it"* but *"there is nothing to inherit"*: it is a fact about
+one document's format, and no default could be right for somebody's corpus.
+Two attributes with two layers, for two arguments; a reader should not collapse
+them into one.
+
+⚠ **Stated here because this record co-owns `UrlEntry` and the `archived`
+attribute, not because either moved.**
 
 ### Consequences
 

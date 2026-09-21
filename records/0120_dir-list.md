@@ -10,7 +10,7 @@ feature: "`.fux/sources/dirs` — what the engine indexes, what is subtracted fr
 owns: []
 laws: [L3, L6]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: d75d48850d29a88e0eaadbc19225e33671a7c7a5e5b606ca62663861b05d4056
+content_sha: 8c680d3b4dc8418d105e981438a429a3e90f83c6bab704d52a3c00dc83f1bcf1
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -243,6 +243,23 @@ explicitly ([SR-URL-LIST](0116_url-list.md) decision 12). This file is
 **human-written** — you add a directory because you decided to — so absence
 carries meaning here (decision 3) in a way it does not there. Same grammar,
 different authorship, and the reader is lenient for both.
+
+**2026-09-21 — one shared-grammar change, and no `dirs` attribute is affected.**
+
+`sourcelist.Attribute` gained `required_hint` — the fix text an absent required
+attribute names — because the `urls` grammar acquired a **second** required
+attribute (`decoder=`, [SR-URL-LIST](0116_url-list.md) decision 17) and the
+message `parse` raised was `fetch=`'s own: it named `.fux/fetchers/` and would
+have pointed a missing `decoder=` there.
+
+**No `dirs` attribute is `required`, and the set is still `archived` and
+`enrich`.** The `!` subtraction stays exempt by construction — an exclusion
+carries no attributes at all — and `_dir_reason` is untouched.
+
+⚠ **Stated here because this record co-owns the file, not because anything it
+decides moved.** The freshness gate proves an owning record was *touched*, never
+that it was read, so a co-owner is exactly where a reader needs to be told *"not
+yours"* in writing — the [SR-ACQUIRED](0145_acquired-plane.md) precedent.
 
 ### Consequences
 

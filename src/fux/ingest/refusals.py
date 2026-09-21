@@ -8,10 +8,16 @@ answer that survives until a human reads it.
 
 ## Two layers, and only one of them is yours
 
-**The magic-byte floor is fux's and is always on.** A declared content type
-that disagrees with the response's first bytes is a fact about *formats* —
-OOXML opens `PK\\x03\\x04`, PDF opens `%PDF-` — and formats are the engine's
-business. `refusals.toml` cannot switch it off.
+**The magic-byte floor is fux's and is always on.** A declared format that
+disagrees with the response's first bytes is a fact about *formats* — OOXML
+opens `PK\\x03\\x04`, PDF opens `%PDF-` — and formats are the engine's business.
+`refusals.toml` cannot switch it off.
+
+⚠ **Since the pipe ruling, "declared" means the URL LINE first and the header
+second** (`MAGIC_BY_DECODER`, then `MAGIC`). A line saying `decoder=xlsx` whose
+response opens `<html>` is refused whatever `Content-Type` came back, which is
+the case the header-only form could not see: the server was telling the truth
+about the sign-in shell it sent.
 
 **Everything else is the consumer's**, declared in `.fux/refusals.toml`, and
 fux ships no knowledge of any vendor. The rules table ADDS refusals; it can
@@ -80,6 +86,27 @@ MAGIC: dict[str, bytes] = {
     "application/vnd.openxmlformats-officedocument.presentationml.presentation": b"PK\x03\x04",
     "application/vnd.oasis.opendocument.text": b"PK\x03\x04",
     "application/pdf": b"%PDF-",
+}
+
+#: Decoder stem -> the bytes a real document of that format must begin with.
+#:
+#: 🔴 **The stronger half of the same floor, and it is stronger for free** (the
+#: pipe ruling, §2 *"What gets stronger"*). `MAGIC` above checks the response
+#: against the type the SERVER claimed; this checks it against the decoder the
+#: **line** declared. A login page served as `text/html` where the line says
+#: `decoder=xlsx` passes the first check trivially — the server told the truth
+#: about the shell — and is refused by this one. *"A login page can no longer
+#: sneak in under a wrong `Content-Type`."*
+#:
+#: Same restriction as `MAGIC`: only formats with a fixed, unambiguous
+#: signature. `html`, `json`, `csv` and `xml` have none, so a line declaring one
+#: of those is not checked here and the decoder's own *"nothing readable"* path
+#: records the skip (§3 edge case 4).
+MAGIC_BY_DECODER: dict[str, bytes] = {
+    "xlsx": b"PK\x03\x04",
+    "docx": b"PK\x03\x04",
+    "pptx": b"PK\x03\x04",
+    "pdf": b"%PDF-",
 }
 
 #: How much of a TEXTY body `body_contains` may search.
@@ -339,13 +366,30 @@ def _searchable_text(mime: str, raw: bytes) -> str | None:
     return None
 
 
-def magic_mismatch(content_type: str, raw: bytes) -> str | None:
-    """The always-on floor: does the body begin the way its type requires?
+def magic_mismatch(
+    content_type: str, raw: bytes, decoder: str | None = None
+) -> str | None:
+    """The always-on floor: does the body begin the way its format requires?
 
     Returns a reason, or `None` when there is nothing to say — an unknown
-    type, or bytes that start correctly. **Not configurable**, because this is
+    format, or bytes that start correctly. **Not configurable**, because this is
     a fact about the format rather than about anyone's identity provider.
+
+    `decoder` is the stem the URL **line** declared, and it **wins over the
+    header** when it has a signature of its own: the line is the human's word
+    and the header is the server's (the pipe ruling, §3 edge case 5). A line
+    with no declared decoder — every caller before the pipe ruling, and the
+    add-time probe, which is observing the type and has no line yet — falls
+    through to the header exactly as before.
     """
+    expected = MAGIC_BY_DECODER.get(decoder or "")
+    if expected is not None:
+        if raw.startswith(expected):
+            return None
+        return (
+            f"the line declares decoder={decoder} but the body does not start like one — "
+            "the response is not the document the line says it is"
+        )
     expected = MAGIC.get(_mime(content_type))
     if expected is None or raw.startswith(expected):
         return None
@@ -365,7 +409,11 @@ MAGIC_FLOOR = "magic-floor"
 
 
 def refusal(
-    rules: tuple[Rule, ...], url: str, content_type: str, raw: bytes
+    rules: tuple[Rule, ...],
+    url: str,
+    content_type: str,
+    raw: bytes,
+    decoder: str | None = None,
 ) -> tuple[str, str] | None:
     """`(rule name, reason)` for a refused response, or `None`.
 
@@ -379,7 +427,7 @@ def refusal(
     wrong, which is the defect `skipnotice`'s two blocks already refuse
     ("the class must not be parsed back out of the reason").
     """
-    floor = magic_mismatch(content_type, raw)
+    floor = magic_mismatch(content_type, raw, decoder)
     if floor is not None:
         return MAGIC_FLOOR, floor
     if not rules:
@@ -393,7 +441,13 @@ def refusal(
     return None
 
 
-def refused(rules: tuple[Rule, ...], url: str, content_type: str, raw: bytes) -> str | None:
+def refused(
+    rules: tuple[Rule, ...],
+    url: str,
+    content_type: str,
+    raw: bytes,
+    decoder: str | None = None,
+) -> str | None:
     """The reason this response is a refusal, or `None`.
 
     The returned string is recorded verbatim as the skip reason, so it is
@@ -401,7 +455,7 @@ def refused(rules: tuple[Rule, ...], url: str, content_type: str, raw: bytes) ->
     `refusal()`: this is its rendering half and nothing more, so a caller that
     wants the rule cannot get a different answer from one that wants the line.
     """
-    hit = refusal(rules, url, content_type, raw)
+    hit = refusal(rules, url, content_type, raw, decoder)
     if hit is None:
         return None
     name, reason = hit

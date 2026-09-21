@@ -71,7 +71,7 @@ def _init_url_repo(tmp_path, *, url="https://x.test/a", config_table=""):
     urls_path.parent.mkdir(parents=True, exist_ok=True)
     # 🔴 Every URL line states its fetcher since 2026-09-20 (W-199 D2). A case
     # that pins a different one passes it in `url` and this leaves it alone.
-    line = url if "fetch=" in url else f"{url} fetch=mw"
+    line = url if "fetch=" in url else f"{url} fetch=mw decoder=prose"
     urls_path.write_text(f"{line}\n", encoding="utf-8")
 
 
@@ -278,7 +278,7 @@ def test_two_urls_behind_different_fetchers_each_get_their_own(tmp_path):
         )
     urls = tmp_path / ".fux" / "sources" / "urls"
     urls.parent.mkdir(parents=True, exist_ok=True)
-    urls.write_text("https://x.test/a fetch=http\nhttps://x.test/b  fetch=cdp\n", encoding="utf-8")
+    urls.write_text("https://x.test/a fetch=http decoder=prose\nhttps://x.test/b  fetch=cdp decoder=prose\n", encoding="utf-8")
 
     fetch, close, _fa = _load_fetchers(
         tmp_path,
@@ -300,7 +300,7 @@ def test_two_urls_behind_different_fetchers_each_get_their_own(tmp_path):
 def test_two_urls_behind_one_fetcher_connect_once(tmp_path):
     _init_url_repo(tmp_path, url="https://x.test/a")
     (tmp_path / ".fux" / "sources" / "urls").write_text(
-        "https://x.test/a fetch=mw\nhttps://x.test/b fetch=mw\n", encoding="utf-8"
+        "https://x.test/a fetch=mw decoder=prose\nhttps://x.test/b fetch=mw decoder=prose\n", encoding="utf-8"
     )
     fetch, close, _fa = _load_fetchers(
         tmp_path,

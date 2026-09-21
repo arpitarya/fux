@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@b6682b521fa1, src/fux/store/nodebundle.py@071a24a596dd]
+owns: [node@0df809603d2e, src/fux/store/nodebundle.py@071a24a596dd]
 laws: [L1, L3, L4, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 11a17bf583c02d613b5afa9bdde3c91d4aa0469cfbbfe376f315733e9f56b71e
+content_sha: 9de5fbf989c85db28e97e67d723f76111fa30ed5392a6e3314938c5166a6eb43
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -809,6 +809,33 @@ returning different orders** — the defect the parity pair in
 [SR-WORK-BENCHMARK](0053_WORK-benchmark.md) decision 16 reports as a bug rather
 than a finding, and the one a differential arm on an unchanged corpus could not
 catch, because both readers would still agree with themselves.
+
+**2026-09-21 — the pipe ruling does NOT reach Node, and that is stated rather
+than left to the gate** ([SR-URL-LIST](0116_url-list.md) decision 17).
+
+Two Node modules sit beside Python halves that moved, and neither is ported:
+
+- **`refer/source.mjs`** — Python's `from_acquired` and `_fetch_url` now decode
+  by the line's `decoder=`. `fromAcquired` returns the retained **bytes** and
+  never converts them, because Node has no decoder plane (decision 3's *Node
+  never fetches*, and it does not decode either). **There is no decoder for a
+  line to name here.** ⚠ Its suffix candidates (`.md`, `.txt`, `.html`) do not
+  cover a `.pdf` or `.xlsx` blob, which reads as absent — a pre-existing
+  narrowness: the naming rule moved to the declared decoder
+  ([SR-ACQUIRED](0145_acquired-plane.md)) and the gap did not.
+- **`ingest/sourcelist.mjs`** — `DIRS_REQUIRED` stays empty and the dead
+  required-attribute branch stays ported. Python grew a **second** required
+  attribute and moved each one's fix text onto the attribute itself
+  (`Attribute.required_hint`), because `fetch=`'s message named
+  `.fux/fetchers/` and would have pointed a missing `decoder=` there too. The
+  Node branch stays generic: a `dirs` attribute made required would have no
+  directory to name.
+
+🔴 **Why the dead branch is still worth carrying:** if a `dirs` attribute is ever
+made required, Python would refuse a line this reader accepts, and
+`query/__init__.py` catches that refusal and degrades to *no archived
+directories* — two readers returning a different archived set from one committed
+file, with nothing to see.
 
 ### Consequences
 

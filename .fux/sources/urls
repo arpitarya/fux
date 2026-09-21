@@ -1,19 +1,30 @@
 # The URLs fux indexes. One per line. `#` starts a comment at the start of a
 # line or after whitespace -- NOT inside a URL, so a fragment survives.
 #
-# 6 attributes, and the set is closed:
-#   fetch=http|cdp       default http
+# 7 attributes, and the set is closed:
+#   fetch=<name>         REQUIRED - no default
+#   decoder=<name>       REQUIRED - no default
 #   keep=true|false      default true
 #   ttl=<duration>       default 24h
 #   enrich=true|false    default false
 #   archived=true|false  default false
 #   update=auto|never    default auto
 #
-#   https://example.com/handbook/oncall    fetch=http
-#   https://wiki.corp/display/ENG/runbook  fetch=cdp  ttl=7d
+#   https://example.com/handbook/oncall    fetch=http  decoder=prose
+#   https://wiki.corp/display/ENG/runbook  fetch=cdp   decoder=html  ttl=7d
+#   https://wiki.corp/hr/policy.xlsx       fetch=cdp   decoder=xlsx
+#
+# `fetch=` and `decoder=` are MANDATORY on every line -- there is no default
+# for either, and a line missing one fails to load (SR-URL-LIST decisions 16
+# and 17). A fetcher retrieves bytes; the decoder named here turns them into
+# Markdown. `decoder=prose` is for a page that is already text.
+#
+# Put a host map in `[sources.url.routes]` and `fux add` resolves the fetcher
+# for you; it observes the Content-Type on its one fetch and writes the
+# decoder, or refuses if nothing claims that format.
 #
 # `fux add <URL>` writes a line here with every attribute stated, and fetches
-# that one URL once. `fux update` re-fetches the lines known to be stale --
-# `--all` every line, `--failed` the ones whose last run failed, and never a
+# that one URL once. `fux ingest` re-fetches the lines known to be stale --
+# `--refetch-all` every line, `--failed` the ones whose last run failed, and never a
 # line that says `update=never`. Those are the engine's two networked paths;
 # every other command is offline. See SR-URL-LIST.

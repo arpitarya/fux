@@ -703,20 +703,47 @@ def test_add_records_a_url_line_and_no_fetch_keeps_it_offline(tmp_path):
     `fux url` recorded and never fetched. `fux add <URL>` records **and**
     fetches that one URL — so the offline half of the old assertion now needs
     `--no-fetch`, which is exactly the flag that exists to ask for it.
+
+    ⚠ **`--no-fetch` now requires `--decoder`** (the pipe ruling, 2026-09-21):
+    the add OBSERVES the response's type to write `decoder=`, and this flag
+    forbids the observation. The refusal is asserted on its own below.
     """
     _write_fixture(tmp_path)
     added = _run(
-        tmp_path, "add", "https://example.invalid/handbook#oncall", "--cdp", "--no-fetch"
+        tmp_path, "add", "https://example.invalid/handbook#oncall",
+        "--cdp", "--decoder", "prose", "--no-fetch",
     )
-    assert "fetch=cdp keep=true" in added.stdout
+    assert "fetch=cdp decoder=prose keep=true" in added.stdout
     assert "fetching" not in added.stderr  # --no-fetch means no network, and says nothing
 
     listed = _run(tmp_path, "add")
-    assert "https://example.invalid/handbook#oncall fetch=cdp keep=true" in listed.stdout
+    assert "https://example.invalid/handbook#oncall fetch=cdp decoder=prose keep=true" in listed.stdout
 
     # The line is recorded; with no fetch there is nothing to index yet.
     found = _run(tmp_path, "find", "handbook", "--json")
     assert "example.invalid" not in found.stdout
+
+
+def test_no_fetch_without_a_decoder_is_refused_and_writes_nothing(tmp_path):
+    """🔴 The pipe ruling's one hard interaction between two flags.
+
+    `--no-fetch` says *do not open the network*; observing the response's type is
+    the one thing that needs it, and there is no default `decoder=` to fall back
+    on. So the pair is refused — and **nothing is written**, because a line
+    without `decoder=` would not load on the next read.
+    """
+    _write_fixture(tmp_path)
+    refused = _run(
+        tmp_path, "add", "https://example.invalid/handbook", "--cdp", "--no-fetch",
+        check=False,
+    )
+    assert refused.returncode != 0
+    assert "--decoder" in refused.stderr
+    listing = tmp_path / ".fux" / "sources" / "urls"
+    # Absent is the strongest form of "no line": the refusal happens before the
+    # file is even created, so `fux add` left no trace at all.
+    urls = listing.read_text(encoding="utf-8") if listing.is_file() else ""
+    assert "example.invalid/handbook" not in urls, "a refused add must write no line"
 
 
 def test_url_is_gone(tmp_path):
@@ -980,7 +1007,7 @@ def _url_repo(tmp_path: Path, *, extra: str = "") -> None:
     fux = tmp_path / ".fux"
     (fux / "sources").mkdir(parents=True, exist_ok=True)
     (fux / "sources" / "dirs").write_text("", encoding="utf-8")
-    (fux / "sources" / "urls").write_text("https://x.test/runbook fetch=mw\n", encoding="utf-8")
+    (fux / "sources" / "urls").write_text("https://x.test/runbook fetch=mw decoder=prose\n", encoding="utf-8")
     (fux / "pii.toml").write_text("", encoding="utf-8")
 
 
@@ -1057,7 +1084,7 @@ def test_a_consumer_drops_a_fetcher_in_and_names_it_on_a_line(tmp_path):
     (fux / "sources").mkdir(parents=True, exist_ok=True)
     (fux / "sources" / "dirs").write_text("", encoding="utf-8")
     (fux / "sources" / "urls").write_text(
-        "https://wiki.test/rota fetch=glassbox keep=true\n", encoding="utf-8"
+        "https://wiki.test/rota fetch=glassbox decoder=prose keep=true\n", encoding="utf-8"
     )
     (fux / "pii.toml").write_text("", encoding="utf-8")
     fetchers = fux / "fetchers"
@@ -1092,7 +1119,7 @@ def test_a_fetcher_name_with_no_file_is_a_doctor_finding_not_a_parse_error(tmp_p
     fux = tmp_path / ".fux"
     (fux / "sources").mkdir(parents=True, exist_ok=True)
     (fux / "sources" / "dirs").write_text("", encoding="utf-8")
-    (fux / "sources" / "urls").write_text("https://wiki.test/rota fetch=glasbox\n", encoding="utf-8")
+    (fux / "sources" / "urls").write_text("https://wiki.test/rota fetch=glasbox decoder=prose\n", encoding="utf-8")
     (fux / "pii.toml").write_text("", encoding="utf-8")
     (fux / "fetchers").mkdir(parents=True, exist_ok=True)
     (fux / "fetchers" / "http.py").write_text("def fetch(url):\n    return ''\n", encoding="utf-8")

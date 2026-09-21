@@ -51,6 +51,7 @@ import sys
 import hashlib
 import importlib.util
 from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path, PurePosixPath
 
 from ..errors import FuxError
@@ -83,6 +84,14 @@ class UrlEntry:
     url: str
     fetch: str
     fetcher_path: str
+    #: 🔴 **The declared decoder stem, and it has NO DEFAULT on purpose** (the
+    #: pipe ruling). Every other field below carries one so a hand-built entry
+    #: in a test keeps working; this one does not, because a silent `"prose"`
+    #: here is the guess the whole ruling replaced — and it would be a guess
+    #: that decodes an xlsx workbook to mojibake and indexes it without a word.
+    #: `sourcelist.parse` refuses a line that omits it, so by the time an
+    #: `Entry` exists the value is always the line's own.
+    decoder: str
     #: SR-ACQUIRED: retain the bytes this URL returned. Opt-in per line.
     keep: bool = False
     #: SR-URL-FRESHNESS: how long a citation may go unchecked at ask time,
@@ -207,9 +216,13 @@ def resolve_urls(entries: list[sourcelist.Entry], source) -> list[UrlEntry]:
     attribute wins; a line that did not takes the source-wide setting, which is
     itself defaulted by `config.py`.
 
-    ⚠ **`fetch` no longer has a source-wide layer** — `sourcelist.parse` refuses
-    a URL line that does not state one, so by the time an `Entry` exists its
-    `fetch` is always the line's own (W-199 D1/D2).
+    ⚠ **Neither `fetch` nor `decoder` has a source-wide layer** —
+    `sourcelist.parse` refuses a URL line that does not state both, so by the
+    time an `Entry` exists each is always the line's own (W-199 D1/D2 for the
+    fetcher; the pipe ruling for the decoder). **There is deliberately no
+    `[sources.url] decoder`**: a fetcher is a policy about how to REACH a host,
+    which a whole intranet can share, and a decoder is a fact about one
+    document's format.
     """
     resolved: list[UrlEntry] = []
     for entry in entries:
@@ -219,6 +232,7 @@ def resolve_urls(entries: list[sourcelist.Entry], source) -> list[UrlEntry]:
                 url=entry.value,
                 fetch=fetch,
                 fetcher_path=fetcher_for(fetch),
+                decoder=entry.attrs["decoder"],
                 # Three layers, same order as `fetch`: built-in default, then
                 # `[sources.url] keep`, then the line. A line that DECLARED
                 # `keep=` wins; one that said nothing takes the source-wide
@@ -718,6 +732,13 @@ def fetch_all(
     # which URL it is holding bytes for -- `fetch_all` groups by fetcher and
     # loses the entry by the time the body arrives.
     keep_urls = {entry.url for entry in entries if entry.keep}
+    #: The pipe ruling, and the same shape `keep_urls` has for the same reason:
+    #: `fetch_all` groups by FETCHER and has lost the entry by the time the body
+    #: arrives, so the one thing the line declared about reading those bytes has
+    #: to be carried alongside. **Every listed URL is here** — `sourcelist.parse`
+    #: refuses a line that states no `decoder=`, so there is no `.get(url, ...)`
+    #: default anywhere below and a missing key would be a bug, not a fallback.
+    declared_decoders = {entry.url: entry.decoder for entry in entries}
     #: The eviction order's key. Read from the state file that already owns the
     #: counter rather than started here -- two run counters would drift, and
     #: the one that drifts is the one deciding what gets deleted.
@@ -800,7 +821,13 @@ def fetch_all(
                 # structurally; rendering the human line is `refused()`'s job
                 # and reading the name back out of it would be the defect
                 # `skipnotice`'s two blocks already refuse.
-                hit = refusals.refusal(refusal_rules, url, content_type, raw)
+                declared = declared_decoders[url]
+                # The floor checks the bytes against the DECLARED format now,
+                # falling back to the header for a format with no signature —
+                # so a sign-in shell served honestly as `text/html` where the
+                # line says `decoder=xlsx` is refused, which is the case the
+                # header-only form could not see.
+                hit = refusals.refusal(refusal_rules, url, content_type, raw, declared)
                 if hit is not None:
                     rule_name, reason = hit
                     denied[rule_name] = denied.get(rule_name, 0) + 1
@@ -820,13 +847,13 @@ def fetch_all(
                     try:
                         acquired_blobs[url] = acquired.save(
                             root, url, raw, content_type,
-                            _EXT_FOR.get(_mime_of(content_type), ""), run_seq=run_seq,
+                            acquired_ext(declared, root), run_seq=run_seq,
                         )
                     except OSError as exc:
                         # Retention is a convenience; losing it must never cost
                         # the document. Report and carry on.
                         print(f"note: could not retain {url}: {exc}", file=sys.stderr)
-                markdown, why = _decode_fetched(raw, content_type, url, root)
+                markdown, why = _decode_fetched(raw, declared, url, root)
                 if markdown is None:
                     skipped.append(Skipped(rel_path=url, reason=why))
                     continue
@@ -842,7 +869,7 @@ def fetch_all(
                     FetchedUrl(
                         url=url,
                         content=sanitize(markdown),
-                        decoder=_decoder_name_for(content_type, url, root),
+                        decoder=_decoder_name_for(declared, root),
                         fetcher=ingestlog.fetcher_digest(root / fetcher_path),
                     )
                 )
@@ -919,6 +946,13 @@ def fetch_all(
 #: content type -> the extension the decoder registry is keyed on. Only the
 #: types a shipped decoder handles; anything else is a recorded skip rather
 #: than a guess, because guessing here writes the wrong bytes into the index.
+#:
+#: 🔴 **`fux add`'s tool, not ingest's, since the pipe ruling.** This table and
+#: the URL-extension fallback below it ran on **every** ingest until 2026-09-21,
+#: which made which decoder read a document a function of what the server said
+#: that morning. They now run **once**, in `propose_decoder`, at the single
+#: fenced fetch `fux add` performs, and the answer is written onto the line.
+#: `_decode_fetched` never reaches either.
 _TYPE_EXT = {
     "text/html": ".html",
     "application/xhtml+xml": ".html",
@@ -937,12 +971,6 @@ _TYPE_EXT = {
     "application/rtf": ".rtf",
     "text/rtf": ".rtf",
 }
-
-
-#: content type -> file extension, for naming a retained blob. Derived from
-#: `_TYPE_EXT` so the two can never disagree; an unknown type simply gets no
-#: extension, which is a blob you can still read but not double-click.
-_EXT_FOR = {mime: ext for mime, ext in _TYPE_EXT.items() if ext}
 
 
 def _mime_of(content_type: str) -> str:
@@ -1027,14 +1055,24 @@ def _unpack(result) -> tuple[bytes | None, str]:
 
 
 def _decode_fetched(
-    raw: bytes, content_type: str, url: str, root: Path | None = None
+    raw: bytes, decoder: str, url: str, root: Path | None = None
 ) -> tuple[str | None, str]:
-    """Fetched bytes -> `(markdown, why-not)`, through the same decoders a file uses.
+    """Fetched bytes -> `(markdown, why-not)`, through the decoder the LINE declared.
 
-    Type resolution order is **declared first, path second**: the HTTP header
-    is authoritative, and a URL's extension is a hint that is often absent and
-    occasionally a lie. Neither sniffs the bytes — a heuristic on the ingest
-    path makes the committed index a function of how confident a guesser felt.
+    🔴 **The second argument used to be the `Content-Type` and is now the
+    `decoder=` stem** (the pipe ruling, 2026-09-18, built as W-199 DoD 10).
+    Type resolution used to run here on **every ingest** — declared header
+    first, the URL's extension second, prose as the floor — so which decoder
+    read a document was a function of what the server happened to say that
+    morning. It is now a function of a committed line, and `_TYPE_EXT` and the
+    extension fallback have left this path entirely: they are
+    `propose_decoder`'s, which `fux add` calls **once**.
+
+    ⚠ **The header is not consulted at all any more, and that is the ruling
+    rather than an optimisation** (§3 edge case 5: *the header loses,
+    silently*). The line is the human's word; the header is the server's. The
+    magic floor in `refusals` is where a disagreement is caught, and it is
+    caught against the line.
 
     **The second element is the skip reason, and it is why this returns a pair**
     (2026-08-27). The caller used to write `no decoder for {content_type}` for
@@ -1043,27 +1081,160 @@ def _decode_fetched(
     while `json` was built in, claimed `.json`, ran, and correctly dropped a
     bare UUID — leaving nothing. A reader goes looking for a decoder that is
     already there. `decode.reason()` draws exactly this distinction and its own
-    docstring says conflating the two *"would make the queue useless"*; the file
-    path has always used it, and this is the URL path catching up.
+    docstring says conflating the two *"would make the queue useless"*; that
+    distinction survives the ruling, keyed on the stem instead of the type.
 
-    ⚠ **`root` is passed to the decoder registry**, which it was not before, so
-    a **consumer-owned decoder in `.fux/decoders/` now applies to URL content**
-    as it always has to files. Without it, SR-DECODE's premise — *a consumer
-    may bring a dependency fux may not* — silently stopped at the network
-    boundary, which is the one place a strange content type is most likely.
+    ⚠ **`root` is what makes a consumer decoder reachable** — `.fux/decoders/`
+    applies to URL content as it always has to files. Without it, SR-DECODE's
+    premise — *a consumer may bring a dependency fux may not* — silently
+    stopped at the network boundary, which is the one place a strange format is
+    most likely.
     """
     from .. import decode as decode_mod
 
-    mime = content_type.split(";", 1)[0].strip().lower()
-    rel = _fetched_rel_path(mime, url, root)
-    if rel is _PROSE:
+    if decoder == decode_mod.PROSE_DECODER:
         return raw.decode("utf-8", errors="replace"), ""
-    if rel is None:
-        return None, f"no decoder for {content_type or 'unknown type'}"
-    decoded = decode_mod.decode(raw, rel, root)
+    module = decode_mod.decoder_named(decoder, root)
+    if module is None:
+        # The `_bind` message shape (§3 edge case 2). A hard fact about the
+        # repo rather than about this response, so it names both halves of the
+        # vocabulary — `fux doctor`'s `url decoders` row reports it first.
+        return None, (
+            f"no decoder module named {decoder!r} — built-ins are "
+            f"{', '.join(decode_mod.BUILTIN_MODULES)}, plus {decode_mod.PROSE_DECODER!r} for "
+            f"bytes that are already text; {decode_mod.CONSUMER_DIR}/ may add more. "
+            f"Fix the `decoder=` on this URL's line"
+        )
+    rel = decoder_rel_path(module, url)
+    decoded = decode_mod.decode_with(module, raw, rel, root)
     if decoded is None:
-        return None, decode_mod.reason(rel, root)
+        return None, f"{module.name}: nothing readable in the fetched bytes"
     return decoded, ""
+
+
+def decoder_rel_path(module, url: str) -> str:
+    """The pseudo path a **declared** decoder decodes a URL's bytes under.
+
+    A decoder is handed `(raw, rel_path)` and two of the shipped ones branch on
+    the extension — `csv` reads a `.tsv` tab-separated, `mail` reads a `.mbox`
+    as a mailbox — so *which* of a decoder's extensions this is cannot be
+    dropped once the decoder is chosen by name instead of by path.
+
+    **The URL's own suffix when the declared decoder claims it, its `primary`
+    otherwise.** `https://x/export.tsv decoder=csv` decodes as `.tsv`;
+    `https://x/api/export?f=1 decoder=csv` decodes as `.csv`. The stem stays
+    the fixed word `fetched`, as it has since the fetcher returned bytes: a
+    pseudo path that varied with the URL would put the address into a decoder's
+    output, and `csv` prints `rel_path`'s basename as a heading.
+
+    ⚠ **This differs from the header-driven resolution it replaces, and the
+    difference is one extension wide.** `_fetched_rel_path` mapped a MIME to
+    exactly one extension, so a `.tsv` URL served as `text/csv` decoded as
+    comma-separated and came back as one column. The declared form reads it as
+    the URL says it is. That is a better answer and it is still a *changed*
+    one for such a line, which is why it is stated here rather than discovered.
+    """
+    suffix = PurePosixPath(url.split("?", 1)[0].split("#", 1)[0]).suffix.lower()
+    return "fetched" + (suffix if suffix in module.extensions else module.primary)
+
+
+def acquired_ext(decoder: str, root: Path | None) -> str:
+    """The extension a retained blob is named with — from the DECODER, not the header.
+
+    *"The acquired blob's extension comes from the declared decoder, not the
+    header, so `.fux/acquired/` names files by what they are"* (the pipe ruling
+    §2). It was `_EXT_FOR[mime]` before, which named a workbook served as
+    `application/octet-stream` with no extension at all — a blob you could read
+    but not double-click, in the case where knowing the format matters most.
+
+    `""` for `prose` and for a stem that resolves to nothing: prose is text of
+    an unknown flavour (`.md`? `.txt`?) and inventing one would be the guess
+    this ruling removed, one layer down.
+    """
+    from .. import decode as decode_mod
+
+    if decoder == decode_mod.PROSE_DECODER:
+        return ""
+    module = decode_mod.decoder_named(decoder, root)
+    return module.primary if module is not None else ""
+
+
+def propose_decoder(content_type: str, url: str, root: Path | None) -> str | None:
+    """The `decoder=` stem `fux add` writes for an observed response, or `None`.
+
+    🔴 **This is the resolution that used to run on every ingest, moved to the
+    one place it may run: the single fenced fetch `fux add` already performs**
+    (the pipe ruling §2, *"How `fux add` fills the two attributes"*). Declared
+    type through `_TYPE_EXT`, then the URL's own extension, then prose for
+    anything texty — `_fetched_rel_path`, unchanged, which is deliberate: the
+    stem written onto a line must be the decoder the old ingest path would have
+    chosen for the same response, or every existing corpus changes its bytes
+    on the day it re-adds a URL.
+
+    `None` means **nothing maps** — an unknown type, an `application/octet-
+    stream` with no telling extension, a type no decoder claims — and the caller
+    **refuses** rather than writing a line it cannot ingest (§2 item 4).
+    """
+    from .. import decode as decode_mod
+
+    rel = _fetched_rel_path(_mime_of(content_type), url, root)
+    if rel is _PROSE:
+        return decode_mod.PROSE_DECODER
+    if rel is None:
+        return None
+    module = decode_mod.registry(root).get(PurePosixPath(rel).suffix.lower())
+    return None if module is None else module.name
+
+
+def declared_decoder(root: Path, loc: str) -> str | None:
+    """The `decoder=` the committed URL list states for `loc`, or `None`.
+
+    🔴 **The refer plane and `fux enrich` re-decode bytes that ingest already
+    decoded, and their sha is compared against ingest's.** Reading the same
+    committed line both did is what makes the two decodes identical *by
+    construction* rather than by two callers agreeing to pass the same string —
+    the false-staleness hazard `refer/source.py`'s docstring names, closed the
+    way `sanitize` was closed: one function, shared.
+
+    `None` when the URL is not listed (or nothing is configured), which is an
+    honest answer and not a fallback: a citation whose line has been removed is
+    `unverified`, and guessing `prose` for it would report a verdict on bytes
+    nobody can say how to read.
+
+    **Offline and cheap** — it reads two committed files, and memoises on the
+    list's path and stat so a multi-citation answer parses it once.
+    """
+    from ..config import load as load_config
+
+    try:
+        config = load_config(root)
+    except FuxError:
+        return None
+    if config.url is None:
+        return None
+    path = root / config.url.urls_file
+    try:
+        stat = path.stat()
+    except OSError:
+        return None
+    return _declared_decoders(str(path), stat.st_mtime_ns, stat.st_size).get(loc)
+
+
+@lru_cache(maxsize=8)
+def _declared_decoders(path: str, mtime_ns: int, size: int) -> dict[str, str]:
+    """`{url: decoder}` for one URL list, keyed on its identity AND its stat.
+
+    Same cache shape `decode._declared_bindings` uses, for the same reason: an
+    answer with three `url:` citations must not parse the list three times, and
+    an edit must be seen without restarting the process.
+    """
+    try:
+        entries = sourcelist.parse(
+            Path(path).read_text(encoding="utf-8"), sourcelist.URLS, origin=path
+        )
+    except (OSError, FuxError):
+        return {}
+    return {e.value: e.attrs["decoder"] for e in entries if not e.exclude}
 
 
 #: Sentinel: the bytes are already prose and no decoder is involved. Distinct
@@ -1072,32 +1243,27 @@ def _decode_fetched(
 _PROSE = "\x00prose"
 
 
-def _decoder_name_for(content_type: str, url: str, root: Path | None) -> str:
+def _decoder_name_for(decoder: str, root: Path | None) -> str:
     """The `decoderdigest` string for whatever read these fetched bytes (W-200).
 
-    **Resolved the same way `_decode_fetched` resolves it** — declared type
-    first, the URL's extension second — by calling `_fetched_rel_path`, so this
-    can never name a decoder other than the one that actually ran. Deriving it
-    later from the URL alone would have been wrong exactly where it matters: a
-    server declaring `application/pdf` on an extensionless URL.
+    **Resolved from the same declared stem `_decode_fetched` runs**, so this can
+    never name a decoder other than the one that actually ran. It used to
+    re-resolve the header and the URL extension for itself, which was correct
+    only for as long as both copies of that resolution agreed; the pipe ruling
+    removes the resolution rather than the duplication.
 
-    Returns `ingestlog.PROSE` when the bytes were already prose (the common
-    case) and when nothing claims the type, because in the second case nothing
-    reached the index either — a skipped URL writes a `skipped:` row and never
-    gets here.
+    Returns `ingestlog.PROSE` when the line declared `prose` (the common case)
+    and when the stem resolves to nothing, because in the second case nothing
+    reached the index either — the document is a skip and never gets here.
     """
     from .. import decode as decode_mod
 
-    mime = _mime_of(content_type)
-    rel = _fetched_rel_path(mime, url, root)
-    if rel is _PROSE or rel is None:
-        return ingestlog.PROSE
-    decoder = decode_mod.registry(root).get(PurePosixPath(rel).suffix.lower())
-    if decoder is None:
+    module = decode_mod.decoder_named(decoder, root)
+    if module is None:
         return ingestlog.PROSE
     from . import decoderdigest
 
-    return decoderdigest.of(decoder)
+    return decoderdigest.of(module)
 
 
 def _fetched_rel_path(mime: str, url: str, root: Path | None) -> str | None:

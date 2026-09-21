@@ -7,10 +7,10 @@ description: "A plain stdlib GET is the default fetcher, written write-if-missin
 status: accepted
 date: 2026-08-19
 feature: "`.fux/fetchers/http.py` — the fetcher a URL gets when its line says nothing"
-owns: [.fux/fetchers/http.py@240ceac80bc2, src/fux/templates/http.py.txt@240ceac80bc2]
+owns: [.fux/fetchers/http.py@62c4a3f8fe3e, src/fux/templates/http.py.txt@62c4a3f8fe3e]
 laws: [L1, L4, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 37ae92a0cfcb0064bcaee59b2a46865fc9d807ca46816381004b80d58c1f63e6
+content_sha: 1fa4ee926661cb8f4028c72bcfff52313fdc9f408691b0b8efc9712f86eb2a96
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -270,6 +270,20 @@ https://app.corp/handbook    fetch=cdp     # renders client-side
 Fux does not retry through Chrome on its own. That is decision 3, and the
 alternative — a classifier deciding what "too thin" means — is how a navigation
 bar gets indexed as a runbook.
+
+**2026-09-21 — the docstring gains the pipe; the GET does not move.**
+
+`http.py` and its template twin now say that a fetcher retrieving bytes is only
+half the sentence: the **line** names the decoder that converts them
+([SR-URL-LIST](0116_url-list.md) decision 17), `fux add` observes the type once,
+and *if you are editing this file to change how a page becomes Markdown you are
+in the wrong file* — which the docstring already said, and now says with the
+mechanism that enforces it.
+
+⚠ **Decision 3's no-escalation rule is untouched**, and the pipe strengthens the
+argument for it: a plain GET that returns a rendered shell on a line declaring
+`decoder=xlsx` is now **refused by the magic floor**
+([SR-REFUSAL](0146_refusals.md)) rather than silently indexed as thin prose.
 
 ### Consequences
 

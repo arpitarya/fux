@@ -125,6 +125,38 @@ naming a file nobody wrote — the price of an open set. `fux doctor` reports it
 (`fetcher bindings`); without that check it surfaces as the next person's
 ingest dying mid-run.
 
+## 3a · The other half of the line — `decoder=`
+
+🔴 **A fetcher retrieves; a decoder converts; the line names both** (the pipe,
+2026-09-21). Your `fetch(url)` returns `(bytes, content_type)` and **never
+converts** — that has been the contract since 2026-08-26. What changed is *which
+decoder reads those bytes*: it is the `decoder=<stem>` on the URL line, not
+anything derived from the `Content-Type`.
+
+```text
+https://wiki.corp/hr/policy.xlsx?download=1 fetch=cdp decoder=xlsx keep=true ttl=24h
+```
+
+- **`decoder=` is mandatory, with no default and no `[sources.url]` key.** A
+  URL has no trustworthy extension (`?download=1`, `/export`,
+  `application/octet-stream`), which is the whole reason the line states it.
+- **`prose` is the reserved word** for bytes that are already text. It names a
+  branch and no module, so `.fux/decoders/prose.py` is refused.
+- **`fux add` observes the type ONCE and writes the stem**; ingest never reads a
+  header for routing again. Nothing claims the format → `fux add` refuses and
+  asks for `--decoder <stem>`.
+- **Return the `Content-Type` accurately anyway.** It is what `fux add` proposes
+  from, what a refusal rule may match on, and what `fux doctor`'s
+  `observed types` row compares against the line.
+- 🔴 **Where line and response disagree about a format with a signature, the
+  response is REFUSED.** `decoder=xlsx` whose body does not start `PK\x03\x04`
+  is a refusal whatever the header said — which is how a sign-in page served
+  honestly as `text/html` stops reaching the index.
+
+⚠ **If you are editing a fetcher to change how a page becomes Markdown, you are
+in the wrong file** — write `.fux/decoders/<stem>.py` and name it on the line.
+The `fux-decoder` skill covers that.
+
 ⚠ **`[sources.url.config]` goes to every fetcher that has URLs in the run**, and
 both shipped `configure()`s raise on a key they do not know. Only
 `fetcher_max_parallel` is known to both. Give a fetcher-specific setting a module

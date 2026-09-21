@@ -236,7 +236,23 @@ def test_cached_carries_its_age():
 @pytest.fixture
 def repo(tmp_path):
     (tmp_path / "runbook.md").write_text("# R\n\nlocal content\n", encoding="utf-8", newline="\n")
+    _list_url(tmp_path, "https://x.test/p")
     return tmp_path
+
+
+def _list_url(root, url, decoder="prose"):
+    """Declare `url` in the committed list — the refer plane reads its `decoder=`.
+
+    Since the pipe ruling a `url:` citation is decoded by the line rather than
+    by the response header (`urlsrc.declared_decoder`), so a fixture that cites
+    a URL has to list it.
+    """
+    (root / "fux.toml").write_text(
+        "[sources]\n[sources.url]\nmax_parallel = 4\n", encoding="utf-8"
+    )
+    listing = root / ".fux" / "sources" / "urls"
+    listing.parent.mkdir(parents=True, exist_ok=True)
+    listing.write_text(f"{url} fetch=http decoder={decoder}\n", encoding="utf-8")
 
 
 def url_candidates():

@@ -7,10 +7,10 @@ description: "The browser fetcher, for documents a plain GET cannot read. Drives
 status: accepted
 date: 2026-08-19
 feature: "`.fux/fetchers/cdp.py` — the reference fetcher for documents behind a session a headless client does not have: it borrows your browser's and hands fux the bytes"
-owns: [.fux/fetchers/cdp.py@0625d307e770, src/fux/templates/cdp.py.txt@0625d307e770]
+owns: [.fux/fetchers/cdp.py@78da0fc7c304, src/fux/templates/cdp.py.txt@78da0fc7c304]
 laws: [L1, L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: d7ffa1bfbf2e6a21d57106a87170d983c8a044909fa4d5dbe9e9e10e0fb6ae1b
+content_sha: db63b4b5c54c4c89b5d96729bb396ce322b9b59354e0b57764e0b7526ad6112b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -587,6 +587,23 @@ a way that it can pick values from .env file also"*).
 - ⚠ **No determinism question.** None of these keys reaches a committed byte:
   they decide *how to reach* Chrome, never what a document says.
   [L3](0005_LAW-3-deterministic.md) is unaffected.
+
+**2026-09-21 — the docstring gains the pipe; the fetcher's code does not move.**
+
+`cdp.py` and its template twin say, beside *HTML → Markdown lives in
+`fux.decode.html`*, that **which decoder converts is the URL LINE's to say**
+([SR-URL-LIST](0116_url-list.md) decision 17): every line states
+`decoder=<stem>`, `fux add` observes the `Content-Type` once, and ingest never
+re-derives one.
+
+⚠ **Return the `Content-Type` accurately anyway**, and the docstring says why:
+`fux add` proposes from it, a refusal rule may match on it, and `fux doctor`'s
+`observed types` row compares it against the line. It is informational, not
+unused.
+
+⚠ **Stated here because this record owns the file, not because anything it
+decides moved** — decision 12's ETag argument, the WebSocket single-session
+constraint and `MAX_PARALLEL = 1` are all untouched.
 
 ### Consequences
 

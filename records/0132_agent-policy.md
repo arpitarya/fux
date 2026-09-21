@@ -7,10 +7,10 @@ description: "Fux's readers are AI agents, and an engine whose output is misread
 status: accepted
 date: 2026-08-22
 feature: the agent-facing policy and skill artifacts Fux ships, and their installer
-owns: [src/fux/templates/agents@17949617d8d4]
+owns: [src/fux/templates/agents@d4389290e79b]
 laws: [L1, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 39a4b7eb6cfab51cdfc144c1f5bc08b54c9094d2b8ddbeb435cac7fbd151e7bb
+content_sha: 91340fbbdeaa86be9b0647795ee6e7745f741c530a0a5db1242641fe208afde1
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -766,6 +766,21 @@ copies are rendered from them —
 `tests/test_setup_agents.py::test_this_repos_own_agent_files_still_match_the_templates_that_ship`
 is what stops the two drifting, and it is the check that caught both renders
 here.
+
+**2026-09-21 — two shipped guides gain the `decoder=` half, and one description
+was rewritten to fit the listing budget.**
+
+`SOURCES-SKILL.md` gains `decoder=` in the line syntax, the grammar list and the
+flag table (`--decoder`, and `--no-fetch` requiring it); its stale *"there is no
+`--fetch <name>` flag"* row is corrected at the same time. `FETCHER-SKILL.md`
+gains §3a — *the other half of the line*. `CONFIG-SKILL.md`'s `routes` row notes
+that there is **no `decoder` key and never was**. All three re-copied byte-for-
+byte into `.claude/`, `.agents/` and `.kiro/`.
+
+⚠ **Decision 15's 500-character description budget bit immediately**: naming the
+new attribute took `fux-sources` to 518, and the fix was to *compress the whole
+sentence* rather than to drop the new fact — `test_setup_agents_guides.py` is the
+gate, and it is the trap that decision warns about.
 
 ### Consequences
 

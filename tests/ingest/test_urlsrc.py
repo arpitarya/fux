@@ -56,7 +56,7 @@ def _urls(tmp_path, rel=URLS_FILE):
     return [e.value for e in read_urls(tmp_path, rel)]
 
 
-def _entries(urls, fetcher=".fux/fetchers/mw.py"):
+def _entries(urls, fetcher=".fux/fetchers/mw.py", decoder="prose"):
     """Hand-resolved entries, so `fetch_all` can be exercised without a config.
 
     ⚠ **`fetcher_path` is a PATH and `fetch` is a stem.** They were both `mw.py`
@@ -65,7 +65,9 @@ def _entries(urls, fetcher=".fux/fetchers/mw.py"):
     resolves against it, so the two are different strings and the default here
     is the path `fetcher_for("mw")` would produce.
     """
-    return [UrlEntry(url=u, fetch="mw", fetcher_path=fetcher) for u in urls]
+    return [
+        UrlEntry(url=u, fetch="mw", fetcher_path=fetcher, decoder=decoder) for u in urls
+    ]
 
 
 def _write_toml(tmp_path, text, dirs=("docs",)):
@@ -79,14 +81,16 @@ def _write_toml(tmp_path, text, dirs=("docs",)):
 
 
 def _write_urls(tmp_path, lines):
-    """Write a URL list, filling in `fetch=` where the case does not state one.
+    """Write a URL list, filling in the REQUIRED attributes the case does not state.
 
     🔴 **Every URL line must state its fetcher since 2026-09-20** (W-199 D2;
-    SR-URL-LIST decision 16) — there is no source-wide default left to inherit.
-    Most cases here are about something else entirely, so the helper supplies
-    the fixture's own `mw` fetcher rather than every call site repeating it.
-    **A case that is about the fetcher states its own `fetch=` and this leaves
-    it alone**, which is what keeps the grammar cases honest.
+    SR-URL-LIST decision 16) **and its decoder since 2026-09-21** (the pipe
+    ruling; SR-URL-LIST decision 17) — there is no source-wide default left to
+    inherit for either. Most cases here are about something else entirely, so
+    the helper supplies the fixture's own `mw` fetcher and `decoder=prose`
+    rather than every call site repeating both. **A case that is about either
+    one states it and this leaves it alone**, which is what keeps the grammar
+    cases honest.
     """
     path = tmp_path / URLS_FILE
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -97,14 +101,20 @@ def _write_urls(tmp_path, lines):
         # that STARTS with `#` is one. Splitting on the first `#` hid a
         # `fetch=` that sat after a fragment and double-appended one.
         is_comment = stripped.startswith("#") or not stripped
-        if not is_comment and not stripped.startswith("!") and "fetch=" not in stripped:
+        if not is_comment and not stripped.startswith("!"):
             # ⚠ **Before any TRAILING comment.** Appending at the end put
             # `fetch=mw` inside `# trailing note`, so the line still had no
             # fetcher and the helper silently did nothing. A `#` that starts
             # the line is a comment; one after a URL may be a fragment, so the
             # split is on ` #` with the space.
             head, sep, tail = line.partition(" #")
-            line = f"{head.rstrip()} fetch=mw{(' #' + tail) if sep else ''}"
+            missing = "".join(
+                f" {name}={value}"
+                for name, value in (("fetch", "mw"), ("decoder", "prose"))
+                if f"{name}=" not in stripped
+            )
+            if missing:
+                line = f"{head.rstrip()}{missing}{(' #' + tail) if sep else ''}"
         out.append(line)
     path.write_text("".join(f"{line}\n" for line in out), encoding="utf-8")
 
@@ -787,37 +797,47 @@ def test_no_surviving_record_points_at_an_id_this_run_does_not_hold(tmp_path):
 # the FILE path used it and the URL path did not.
 
 def test_a_decoder_that_ran_and_found_nothing_is_not_reported_as_missing():
-    from fux.ingest.urlsrc import _decode_fetched
+    """⚠ **The second argument is the DECLARED STEM since the pipe ruling.**
 
-    uuid_only = b'{\n  "uuid": "23f0c01c-4067-49f9-99cd-b19564aa930e"\n}\n'
-    markdown, why = _decode_fetched(uuid_only, "application/json", "https://httpbin.org/uuid")
-
-    assert markdown is None
-    assert "no decoder" not in why, (
-        "json is built in and claims .json — saying there is no decoder is false"
-    )
-    assert why == "json: nothing readable in .json"
-
-
-def test_a_type_nothing_claims_still_says_no_decoder():
-    """The other half. Narrowing the message must not remove the true case.
-
-    `image/png` stopped being an example of this on 2026-08-29 — `image`
-    is now built in and claims `.png`. `image/webp` has no fux decoder.
+    It was the `Content-Type`, and the distinction this case is about survives
+    the change unaltered — it is simply keyed on what the line said instead of
+    on what the server said.
     """
     from fux.ingest.urlsrc import _decode_fetched
 
-    markdown, why = _decode_fetched(b"RIFF....WEBP", "image/webp", "https://x.test/y.webp")
+    uuid_only = b'{\n  "uuid": "23f0c01c-4067-49f9-99cd-b19564aa930e"\n}\n'
+    markdown, why = _decode_fetched(uuid_only, "json", "https://httpbin.org/uuid")
+
     assert markdown is None
-    assert why == "no decoder for image/webp"
+    assert "no decoder" not in why, (
+        "json is built in and ran — saying there is no decoder is false"
+    )
+    assert why == "json: nothing readable in the fetched bytes"
+
+
+def test_a_stem_nothing_provides_still_says_no_decoder():
+    """The other half. Narrowing the message must not remove the true case.
+
+    🔴 **The true case MOVED with the ruling, and that is the whole shape of
+    it.** It used to be *a content type no decoder claims* (`image/webp`), which
+    a server could produce at any time; it is now *a `decoder=` naming no
+    module*, which only a committed line can say. The unreadable format is
+    caught one step earlier now — `fux add` refuses to write a line for it.
+    """
+    from fux.ingest.urlsrc import _decode_fetched
+
+    markdown, why = _decode_fetched(b"RIFF....WEBP", "webp", "https://x.test/y.webp")
+    assert markdown is None
+    assert "no decoder module named 'webp'" in why
+    assert "Fix the `decoder=` on this URL's line" in why
 
 
 def test_json_with_prose_in_it_decodes_rather_than_skipping():
-    """The control: the skip above is about the CONTENT, not the type."""
+    """The control: the skip above is about the CONTENT, not the stem."""
     from fux.ingest.urlsrc import _decode_fetched
 
     markdown, why = _decode_fetched(
-        b'{"note": "the paging rotation"}', "application/json", "https://x.test/y"
+        b'{"note": "the paging rotation"}', "json", "https://x.test/y"
     )
     assert why == ""
     assert markdown and "paging rotation" in markdown
@@ -830,6 +850,10 @@ def test_a_consumer_decoder_reaches_url_content_too(tmp_path):
     `registry(None)` returned built-ins only and a decoder the consumer wrote
     into `.fux/decoders/` never applied to a fetched document — at exactly the
     boundary where a strange content type is most likely to arrive.
+
+    ⚠ **The line now NAMES the consumer module** rather than arriving at it
+    through an extension the registry happened to resolve, which is
+    `decoder_named`'s job; `root` is still what makes it reachable at all.
     """
     from fux.ingest.urlsrc import _decode_fetched
 
@@ -843,10 +867,18 @@ def test_a_consumer_decoder_reaches_url_content_too(tmp_path):
     )
 
     markdown, why = _decode_fetched(
-        b"payload", "application/x-unknown", "https://x.test/doc.vndthing", tmp_path
+        b"payload", "vndthing", "https://x.test/doc.vndthing", tmp_path
     )
     assert why == "", why
     assert markdown == "consumer decoder ran: payload"
+
+
+def test_a_consumer_decoder_is_unreachable_without_the_root():
+    """The control for the case above, and it is why `root` is threaded."""
+    from fux.ingest.urlsrc import _decode_fetched
+
+    markdown, why = _decode_fetched(b"payload", "vndthing", "https://x.test/doc", None)
+    assert markdown is None and "no decoder module named 'vndthing'" in why
 
 
 # --- URLs reach the enrichment queue too (Arpit, 2026-08-28) ---------------

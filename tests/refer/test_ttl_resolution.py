@@ -47,15 +47,15 @@ def test_the_default_policy_can_never_be_widened_by_any_line():
     default = Policy()
     assert default.cache_ttl_seconds == 0
     for declared in (0, 900, 86400, 10**9):
-        assert eff("https://x/a", default, {"https://x/a fetch=http": declared}) == 0
+        assert eff("https://x/a", default, {"https://x/a fetch=http decoder=prose": declared}) == 0
 
 
 def test_ttl_zero_on_a_line_opts_that_url_out_entirely():
     # The case a per-URL attribute exists for: one runbook that must always be
     # checked, in a corpus the caller is otherwise happy to cache.
     p = Policy(cache_ttl_seconds=3600)
-    assert eff("https://x/runbook fetch=http", p, {"https://x/runbook fetch=http": 0}) == 0
-    assert eff("https://x/spec fetch=http", p, {"https://x/runbook fetch=http": 0}) == 3600
+    assert eff("https://x/runbook fetch=http decoder=prose", p, {"https://x/runbook fetch=http decoder=prose": 0}) == 0
+    assert eff("https://x/spec fetch=http decoder=prose", p, {"https://x/runbook fetch=http decoder=prose": 0}) == 3600
 
 
 # -- the three layers, read off the committed files -------------------------
@@ -73,24 +73,24 @@ def _repo(tmp_path, urls_line, source_ttl=None):
 
 
 def test_a_line_that_declares_nothing_takes_the_source_wide_value(tmp_path):
-    root = _repo(tmp_path, "https://x/a fetch=http", source_ttl="15m")
+    root = _repo(tmp_path, "https://x/a fetch=http decoder=prose", source_ttl="15m")
     assert refer_mod._declared_ttls(root) == {"https://x/a": 900}
 
 
 def test_a_line_that_declares_ttl_beats_the_source_wide_value(tmp_path):
-    root = _repo(tmp_path, "https://x/a ttl=30s fetch=http", source_ttl="15m")
+    root = _repo(tmp_path, "https://x/a ttl=30s fetch=http decoder=prose", source_ttl="15m")
     assert refer_mod._declared_ttls(root) == {"https://x/a": 30}
 
 
 def test_with_neither_declared_the_built_in_default_applies(tmp_path):
-    root = _repo(tmp_path, "https://x/a fetch=http")
+    root = _repo(tmp_path, "https://x/a fetch=http decoder=prose")
     assert refer_mod._declared_ttls(root) == {"https://x/a": 86400}
 
 
 def test_a_bad_source_wide_ttl_is_refused_by_the_SAME_grammar(tmp_path):
     from fux.errors import FuxError
 
-    root = _repo(tmp_path, "https://x/a fetch=http", source_ttl="1x")
+    root = _repo(tmp_path, "https://x/a fetch=http decoder=prose", source_ttl="1x")
     with pytest.raises(FuxError, match="ttl"):
         refer_mod._declared_ttls(root)
 

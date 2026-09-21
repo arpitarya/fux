@@ -7,8 +7,15 @@ timestamp: 2026-09-18T00:00:00Z
 filed: 2026-09-18
 ---
 
-**Graduated 2026-09-18 → [W-199](../open/W-199-fetcher-routing.md)** (Arpit).
-This file stays the pattern the item points at.
+**Graduated 2026-09-18 → W-199** (Arpit), which **closed 2026-09-21 with all ten
+DoD items met**; its detail file is in the archive and is not linked from here
+(SR-WORK-ARCHIVE). The live decisions are
+[SR-URL-LIST](../../records/0116_url-list.md) decisions 16 and 17,
+[SR-FETCHER](../../records/0117_fetcher.md) decisions 16 and 17, and
+[SR-DECODE](../../records/0139_decode.md) decision 21.
+
+⚠ **BOTH halves are now built, and this file's own status notes said otherwise
+until 2026-09-21.** It is kept as *the pattern*, not as the state.
 
 🔴 **Reconciled 2026-09-20 (W-206 B3) — this file and W-199 are ONE spec, and
 they are the pipe PLUS routing.** Arpit ruled twice, two days apart, and the
@@ -25,8 +32,12 @@ rulings **compose**:
 stating the fetcher on the line* — and it is not: every line still states both.
 
 **Where each half stands:** routing **shipped 2026-09-20**
-([SR-FETCHER](../../records/0117_fetcher.md) decision 16); the **`decoder=` half
-is W-199 DoD line 10 and is NOT built.** That is why this file stays here.
+([SR-FETCHER](../../records/0117_fetcher.md) decision 16) and the **`decoder=`
+half shipped 2026-09-21** ([SR-URL-LIST](../../records/0116_url-list.md)
+decision 17, [SR-DECODE](../../records/0139_decode.md) decision 21). ⚠ **Every
+sentence below that says a thing is "not built" is dated 2026-09-20 and is no
+longer the state** — read it as the specification it is, and the records as
+what shipped.
 
 # The fetcher pipe
 
@@ -198,7 +209,9 @@ is lenient*) gains its one exemption and says why.
 
     **Where each half lives now:** routing is
     [SR-FETCHER](../../records/0117_fetcher.md) decision 16 and **shipped
-    2026-09-20**; the `decoder=` half is **W-199 DoD line 10 and is not built**.
+    2026-09-20**; the `decoder=` half is
+    [SR-URL-LIST](../../records/0116_url-list.md) decision 17 and **shipped
+    2026-09-21**.
     ⚠ **The edge-case count is 16, not twenty** — W-199 cited *"the twenty edge
     cases"* and there have only ever been sixteen here.
 15. **The bare-`str` fetcher return** (SR-FETCHER decision 2's transition ramp,

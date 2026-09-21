@@ -142,7 +142,11 @@ Agents are fux's primary reader.
   `.fux/fetchers/`: `http.py` for a plain GET, or `cdp.py` (`--cdp`) to use the
   session your signed-in Chrome already holds. Both are yours to edit — and
   **`fetch=<name>` on a URL line resolves to any `.py` you put in that
-  directory**, the same way `.fux/decoders/` already works
+  directory**, the same way `.fux/decoders/` already works. A fetcher retrieves
+  bytes and never converts them: the same line says **`decoder=<name>`** for the
+  decoder that turns those bytes into Markdown, written once by `fux add` from
+  the type it observed, so which decoder read a page is a committed line rather
+  than whatever the server said that morning
   ([SR-FETCHER](records/0117_fetcher.md), [SR-URL-LIST](records/0116_url-list.md)).
 - **Offline unless you ask.** Only explicit, opt-in commands touch the network,
   and they say so on stderr ([L4](records/0006_LAW-4-offline-by-default.md)).

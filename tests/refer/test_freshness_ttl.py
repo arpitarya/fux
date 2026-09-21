@@ -59,19 +59,24 @@ def test_enum_attributes_are_unchanged():
         assert attr.values and attr.validate is None
 
 
-def test_ttl_and_fetch_are_the_two_typed_attributes_and_spell_differently():
+def test_the_typed_attributes_spell_differently_from_each_other():
     """🔴 **The header defect W-178 had to fix before flipping `fetch`.**
 
     `_urls_header()` hardcoded `<duration>` for every attribute with no
     `values` — true while `ttl` was alone, and it would have written
     `fetch=<duration>` into every repo `fux setup` touches. The placeholder is
-    the attribute's now, and this is what stops the two typed ones collapsing
-    back onto one constant.
+    the attribute's now, and this is what stops the typed ones collapsing back
+    onto one constant.
+
+    ⚠ **There are three of them since the pipe ruling**, which is the case the
+    derivation was fixed *for*: `decoder=` names a module, so it took
+    `<name>` on its own and nothing had to be remembered.
     """
     typed = {a.name: a for a in sourcelist.URLS.attributes if not a.values}
-    assert set(typed) == {"ttl", "fetch"}
+    assert set(typed) == {"ttl", "fetch", "decoder"}
     assert typed["ttl"].spelling() == "ttl=<duration>"
     assert typed["fetch"].spelling() == "fetch=<name>"
+    assert typed["decoder"].spelling() == "decoder=<name>"
 
 
 def test_ttl_defaults_to_a_day_not_to_zero():
@@ -84,14 +89,14 @@ def test_ttl_defaults_to_a_day_not_to_zero():
 
 def test_a_bad_ttl_on_a_line_is_refused_with_the_rule(tmp_path):
     urls = tmp_path / "urls"
-    urls.write_text("https://x/a ttl=1x fetch=http\n")
+    urls.write_text("https://x/a ttl=1x fetch=http decoder=prose\n")
     with pytest.raises(FuxError, match="ttl='1x'"):
         sourcelist.read(tmp_path, "urls", sourcelist.URLS, missing_hint="")
 
 
 def test_a_good_ttl_on_a_line_parses(tmp_path):
     urls = tmp_path / "urls"
-    urls.write_text("https://x/a ttl=15m keep=false fetch=http\n")
+    urls.write_text("https://x/a ttl=15m keep=false fetch=http decoder=prose\n")
     entries = sourcelist.read(tmp_path, "urls", sourcelist.URLS, missing_hint="")
     assert entries[0].attrs["ttl"] == "15m"
     assert entries[0].attrs["keep"] == "false"
@@ -100,14 +105,15 @@ def test_a_good_ttl_on_a_line_parses(tmp_path):
 
 def test_an_undeclared_line_takes_the_defaults(tmp_path):
     urls = tmp_path / "urls"
-    urls.write_text("https://x/a fetch=http\n")
+    urls.write_text("https://x/a fetch=http decoder=prose\n")
     entry = sourcelist.read(tmp_path, "urls", sourcelist.URLS, missing_hint="")[0]
     assert entry.attrs["ttl"] == "24h"
     assert entry.attrs["keep"] == "true"      # SR-ACQUIRED: keep is on by default
-    # ⚠ A URL line always declares `fetch` since 2026-09-20 (W-199 D2) — the
-    # fixture supplies it and the grammar requires it. The leniency this case
-    # is about is `ttl`: undeclared, so the source-wide layer still applies.
-    assert entry.declared == frozenset({"fetch"})
+    # ⚠ A URL line always declares `fetch` (W-199 D2, 2026-09-20) and `decoder`
+    # (the pipe ruling, 2026-09-21) — the fixture supplies both and the grammar
+    # requires both. The leniency this case is about is `ttl`: undeclared, so
+    # the source-wide layer still applies.
+    assert entry.declared == frozenset({"fetch", "decoder"})
 
 
 # -- the sixth verdict ------------------------------------------------------

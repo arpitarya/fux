@@ -23,10 +23,38 @@ PAGE = (
 )
 
 
-def _retain(root, raw=PAGE, ctype=HTML, loc=LOC):
+def _retain(root, raw=PAGE, ctype=HTML, loc=LOC, decoder="html"):
+    """Retain bytes for `loc`, AND declare the line that says how to read them.
+
+    🔴 **Both halves, since the pipe ruling.** `from_acquired` decodes a blob by
+    the `decoder=` on the committed line rather than by the `content_type` in
+    the manifest — the manifest still records what the server said, and ingest
+    stopped routing on it. A blob with no line has nothing saying how ingest
+    read it, which is `unverified` and is its own case below.
+    """
     blob = acquired.save(root, loc, raw, ctype, ".html", run_seq=1)
     acquired.write_manifest(root, {loc: blob})
+    if loc.startswith("http"):
+        (root / "fux.toml").write_text(
+            "[sources]\n[sources.url]\nmax_parallel = 4\n", encoding="utf-8"
+        )
+        listing = root / ".fux" / "sources" / "urls"
+        listing.parent.mkdir(parents=True, exist_ok=True)
+        listing.write_text(f"{loc} fetch=http decoder={decoder}\n", encoding="utf-8")
     return blob
+
+
+def test_retained_bytes_for_an_unlisted_url_read_as_nothing(tmp_path):
+    """The pipe ruling's new `unverified`: bytes with no line to read them by.
+
+    A blob survives `fux remove` only when somebody deleted the line by hand,
+    and at that point nothing records how ingest decoded it. Guessing `prose`
+    would produce a sha, and a sha produces a verdict about bytes nobody can
+    say the shape of.
+    """
+    blob = acquired.save(tmp_path, LOC, PAGE, HTML, ".html", run_seq=1)
+    acquired.write_manifest(tmp_path, {LOC: blob})
+    assert source_mod.from_acquired(tmp_path, DOC, LOC) is None
 
 
 # -- reading a retained document --------------------------------------------
@@ -56,7 +84,7 @@ def test_the_sha_matches_what_ingest_would_have_recorded(tmp_path):
     from fux import store as store_mod
 
     _retain(tmp_path)
-    markdown, _ = _decode_fetched(PAGE, HTML, LOC, tmp_path)
+    markdown, _ = _decode_fetched(PAGE, "html", LOC, tmp_path)
     expected = store_mod.content_sha(sanitize(markdown))
     assert source_mod.from_acquired(tmp_path, DOC, LOC).sha == expected
 
@@ -70,7 +98,12 @@ def test_a_deleted_blob_reads_as_nothing_not_as_a_verdict(tmp_path):
 
 
 def test_a_corrupt_blob_costs_a_verdict_never_the_query(tmp_path):
-    blob = _retain(tmp_path, raw=b"\x00\x01\x02 not html", ctype="application/pdf")
+    # ⚠ **The LINE declares `pdf` now**, not the manifest's `content_type` —
+    # which is the whole change. The blob is not a PDF, the `pdf` decoder gets
+    # nothing out of it, and that costs a verdict rather than the query.
+    blob = _retain(
+        tmp_path, raw=b"\x00\x01\x02 not html", ctype="application/pdf", decoder="pdf"
+    )
     assert source_mod.from_acquired(tmp_path, DOC, LOC) is None
 
 

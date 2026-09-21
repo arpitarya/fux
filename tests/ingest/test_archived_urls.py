@@ -31,14 +31,14 @@ def _repo(tmp_path, body):
 def test_only_the_lines_that_declare_it_are_archived(tmp_path):
     config = _repo(
         tmp_path,
-        "https://x.test/live fetch=mw\nhttps://x.test/old fetch=mw archived=true\n",
+        "https://x.test/live fetch=mw decoder=prose\nhttps://x.test/old fetch=mw decoder=prose archived=true\n",
     )
     assert _archived_url_ids(tmp_path, config) == {"url:https://x.test/old"}
 
 
 def test_archived_false_is_not_archived(tmp_path):
     """Stated-at-the-default is how every fux-written line looks."""
-    config = _repo(tmp_path, "https://x.test/a fetch=http archived=false\n")
+    config = _repo(tmp_path, "https://x.test/a fetch=http decoder=prose archived=false\n")
     assert _archived_url_ids(tmp_path, config) == set()
 
 
@@ -57,7 +57,7 @@ def test_it_reads_the_list_without_a_sources_url_block(tmp_path):
     the fetching one — a repo can retire a page and have it take effect on the
     next plain `fux ingest`, with no network.
     """
-    config = _repo(tmp_path, "https://x.test/old archived=true fetch=mw\n")
+    config = _repo(tmp_path, "https://x.test/old archived=true fetch=mw decoder=prose\n")
     assert config.url is None
     assert _archived_url_ids(tmp_path, config) == {"url:https://x.test/old"}
 
@@ -66,14 +66,14 @@ def test_it_reads_the_list_without_a_sources_url_block(tmp_path):
 
 
 def test_resolve_urls_carries_the_flag():
-    entries = parse("https://x.test/old archived=true fetch=mw\n", URLS, origin="t")
+    entries = parse("https://x.test/old archived=true fetch=mw decoder=prose\n", URLS, origin="t")
     source = SimpleNamespace(fetcher=".fux/fetchers/http.py", keep=True, ttl="24h")
     (resolved,) = resolve_urls(entries, source)
     assert resolved.archived is True
 
 
 def test_an_undeclared_line_resolves_to_not_archived():
-    entries = parse("https://x.test/a fetch=mw\n", URLS, origin="t")
+    entries = parse("https://x.test/a fetch=mw decoder=prose\n", URLS, origin="t")
     source = SimpleNamespace(fetcher=".fux/fetchers/http.py", keep=True, ttl="24h")
     (resolved,) = resolve_urls(entries, source)
     assert resolved.archived is False

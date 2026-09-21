@@ -10,7 +10,7 @@ feature: the freshness verdict vocabulary and the per-URL check interval
 owns: [src/fux/refer/freshness.py@c2205bbff313]
 laws: [L2, L3, L4]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 07278c9fe39c402fd4e43fe6a52a5ac9df894f3fed43155e56451a9a83d8b842
+content_sha: 5da26df442d8d39e2cdfac40258c1024003f45a3deb7bfcd3aba098599cc0dd7
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -525,6 +525,26 @@ so is decision 16's `fetch_at_answer`, which lives in `config.py` and
 owning record was *touched*, never that it was read (CLAUDE.md §Law zero), so a
 co-owner's file changing under this one is exactly the case where a reader needs
 to be told *"not yours"* in writing.
+**2026-09-21 — `from_acquired` decodes a blob by the LINE's `decoder=`**
+(the pipe ruling; [SR-URL-LIST](0116_url-list.md) decision 17).
+
+Decision 6's rule stands exactly as written — `from_acquired` **imports**
+`_decode_fetched` and `sanitize` rather than reimplementing them, because a
+verify-time sha is compared against an ingest-time sha. What moved is the second
+argument: it was `blob.content_type` from the manifest, and it is now
+`urlsrc.declared_decoder(root, loc)`.
+
+🔴 **The manifest still records the type the server declared, and ingest stopped
+routing on it.** Decoding a retained blob by the header while ingest decodes by
+the line is the divergence this decision exists to prevent, reintroduced through
+the one argument nobody would think to check — so the fix is the same shape as
+the original: read the *same source of truth*, not a parallel one.
+
+⚠ **A retained blob whose line has been deleted by hand reads as `None`** — *we
+have nothing to compare*, which is `unverified` and not a verdict
+([SR-REFER](0127_refer-plane.md)). ⚠ **`ttl=` is untouched**: it bounds how long
+a citation may go unchecked and says nothing about how the bytes are read.
+
 ### Consequences
 
 - ⚠ **W-200 (2026-09-20) added the ingest provenance ledger**,

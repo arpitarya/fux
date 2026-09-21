@@ -85,7 +85,11 @@ the defect this ordering exists to make visible.*
   reads, the decoder turns them into Markdown, and the URL line states **both**
   halves — `fetch=<stem> decoder=<stem>` — written once at `fux add` and never
   re-derived. §2 is the pattern, §3 the **sixteen** edge cases.
-  ✅ **GRADUATED 2026-09-18 → [W-199](../open/W-199-fetcher-routing.md).**
+  ✅ **GRADUATED 2026-09-18 → W-199, which CLOSED 2026-09-21 with both halves
+  built** — routing on 2026-09-20 and the `decoder=` half the day after. The
+  live decisions are [SR-URL-LIST](../../records/0116_url-list.md) 16 and 17,
+  [SR-FETCHER](../../records/0117_fetcher.md) 16 and 17, and
+  [SR-DECODE](../../records/0139_decode.md) 21.
   ⚠ **It had NO row here until 2026-09-20** — the defect this index's ordering
   note exists to make visible, found by [W-206](../../archive/open/W-206-compare-and-proposals-sweep.md).
   🔴 **Reconciled in the same change: this file and W-199 are ONE spec.** Arpit

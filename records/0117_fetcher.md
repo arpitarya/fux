@@ -7,10 +7,10 @@ description: "Fux never fetches; a consumer-owned fetcher file does. One fetcher
 status: accepted
 date: 2026-08-19
 feature: the fetch contract, what it is called, and the two shipped templates
-owns: [src/fux/ingest/urlsrc.py@280f5c230b11, src/fux/templates@982cd1d9e775]
+owns: [src/fux/ingest/urlsrc.py@dd3533b3dec9, src/fux/templates@2d641de5c574]
 laws: [L1, L3, L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 29df8d3f6a2ef7581a357136da9fba055bf6ea1096d45b9d588f8b75dac4b457
+content_sha: 4322da8cdf0bbeb1c967cbc24c2c1701a65f6fbb1c4b149434131700b0bc0d3d
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -595,6 +595,55 @@ declares no host it does not own.
 host map is **declared** — committed in `fux.toml` or written in a file the
 consumer owns — and read before a byte moves. Nothing here inspects a response,
 sniffs a payload, or escalates from one fetcher to another.
+
+**17. THE PIPE — a fetcher retrieves; a decoder converts; the LINE names both**
+(Arpit, 2026-09-18; built 2026-09-21 as W-199 DoD 10).
+
+> *"The fetchers … should [emit] CSV, docx, drawio, html, json or xml, xlsx or
+> any of those kind of files which can be read by [a] decoder, and then [the]
+> decoder can go ahead and create a markdown file which can be ingested by fux.
+> That is the pattern."*
+
+```text
+URL line ──fetch=cdp──▶ .fux/fetchers/cdp.py ──bytes──▶ .fux/decoders/xlsx.py ──Markdown──▶ fux ingest
+           decoder=xlsx                                 (chosen by the LINE,
+                                                          never by the header)
+```
+
+**17a. `fetch(url) -> tuple[bytes, str]` is UNCHANGED, and the `str` is now
+informational.** The contract keeps returning the declared `Content-Type`, and
+after this ruling it is read by exactly three things: `fux add`, to **propose** a
+decoder on the one fetch it performs; a refusal rule that matches on
+`content_type`; and the magic floor, **only** for a format the line's decoder has
+no signature for. **Nothing on the routing path reads it.** A fetcher still
+never converts — the asymmetry this record has always insisted on is now the
+whole reason the line needs two words instead of one.
+
+🔴 **17b. What this retires is decision 5a's content-type resolution AT INGEST,
+and only there.** The header-then-URL-extension-then-prose ladder ran on **every
+ingest**, which made *which decoder read a document* a function of what the
+server happened to say that morning — a heuristic in the maintenance path, with
+[L3](0005_LAW-3-deterministic.md) resting on the server being consistent. The
+ladder is not deleted; it **moves to `fux add`** (`urlsrc.propose_decoder`),
+where it runs once, against a response somebody is watching, and its answer is
+written into a committed line. **Same resolution, one execution, diffable
+result.**
+
+**17c. The declared decoder makes the magic floor stronger, for free.** It
+checked the body against the type the **server** claimed; it now checks it
+against the format the **line** declares, falling back to the header for a format
+with no signature ([SR-REFUSAL](0146_refusals.md)). *A login page can no longer
+sneak in under a wrong `Content-Type`* — the case the header-only form could not
+see, because the server was telling the truth about the shell it sent.
+
+⚠ **17d. Decision 2's bare-`str` transition ramp survives this, unmeasured, and
+is now in tension with the ruling.** *"A fetcher emits a format a decoder
+reads"* and *"a `str` is treated as already-prose"* cannot both be the whole
+truth: a fetcher returning markdown is doing the decoder's job, which is what
+the pipe exists to separate. **Not removed** — the ramp's cost was never
+measured, and removing it breaks every consumer fetcher written before
+2026-08-26 on a contract change they did not read. It is named here so the next
+session does not mistake the silence for agreement.
 
 ### Consequences
 

@@ -30,6 +30,100 @@ Rules:
 
 
 
+## 2026-09-21 — **W-199 DoD 10: a URL line declares its decoder, and ingest stops guessing**
+
+**Shipped:** `decoder=` as a **required** attribute on every URL line ·
+`decode.decoder_named` / `decode_with` / `Decoder.primary` ·
+`urlsrc.propose_decoder` / `decoder_rel_path` / `acquired_ext` /
+`declared_decoder` · `refusals.MAGIC_BY_DECODER` · `fux add --decoder` ·
+two `fux doctor` rows. **Evidence:** none — it is a build, not a measurement.
+**Items:** W-199, **CLOSED with all ten DoD items met** (D1–D4 and three doctor
+rows landed 2026-09-20; this is line 10).
+**Records touched:** SR-URL-LIST 13 and 17, SR-FETCHER 17, SR-DECODE 21,
+SR-URL-INGEST 6a, SR-REFUSAL, SR-ACQUIRED, SR-CLI, SR-DOCTOR (two rows),
+SR-REFER, SR-URL-FRESHNESS, SR-ENRICH, SR-NODE-SEARCH, SR-DOTFUX, SR-DIR-LIST,
+SR-ARCHIVED-CONTENT, SR-PII, SR-OUTPUT.
+
+**The gap.** A **file**'s extension picks its decoder. A **URL** has no
+trustworthy extension — `?download=1`, `/export`, an `application/octet-stream`
+— so fux guessed from the `Content-Type`, then the URL, then fell back to prose,
+**on every ingest**. Which decoder read a document was therefore a function of
+what the server said that morning: a heuristic sitting in the maintenance path,
+with [L3](../records/0005_LAW-3-deterministic.md) resting on a server being
+consistent. Arpit ruled it out on 2026-09-18: *"Whenever we add a URL, after
+that, we have to define what kind of fetch it is, what kind of decoder we want
+to use. And that is the one that gets saved in the URLs file."*
+
+**The shape.** The ladder is not deleted — it **moves to `fux add`**, runs once
+against a response somebody is watching, and its answer is written into a
+committed line. Same resolution, one execution, diffable result.
+
+🔴 **BREAKING, and wider than `fetch=`'s break.** No line written before today
+carries `decoder=`, because there was no attribute to write — so **every**
+existing `.fux/sources/urls` stops loading, where `fetch=`'s break only reached
+hand-written lines. `fux add <url>` again is the fix, or `--decoder <stem>` to
+write it offline. Arpit: *"Nothing needs to be done. It is a breaking change.
+That's all."*
+
+**Four things this change cost, each named rather than discovered:**
+
+1. 🔴 **`fux add <url>` opens the network TWICE** — once to observe the type,
+   once in the ingest that follows, because the line must exist before
+   `fux ingest` will fetch for it. `--decoder` skips the probe, and so does
+   re-adding a line that already declares one. The alternatives were a window
+   in which the committed file does not load, or a second way for bytes to
+   enter the index.
+2. 🔴 **`fux add` on a URL that is DOWN now writes no line at all** and exits 1.
+   It used to write the line and report *"the line is written; the fetch
+   failed"* — **recording and fetching are separate outcomes**
+   ([SR-CLI](../records/0101_cli-surface.md) decision 3), and that separation
+   cannot survive an attribute whose value comes from the fetch.
+3. ⚠ **One resolution changed answer by one extension.** `decoder_rel_path`
+   prefers the URL's own suffix when the declared decoder claims it — because
+   `csv` reads a `.tsv` tab-separated and `mail` reads a `.mbox` as a mailbox —
+   so a `.tsv` URL served as `text/csv` now decodes tab-separated where the
+   header ladder read it as one comma-separated column. Better, and *changed*.
+4. ⚠ **`Decoder.primary` had to exist.** `extensions` is sorted, which makes
+   `xlsx` primary in `.xlsm` and `html` primary in `.htm`. Nothing cared while a
+   decoder was only ever reached **by** an extension; reaching one by **name**
+   means fux invents the path it decodes under and the name of the retained blob
+   beside it.
+
+**Three things got stronger for free:**
+
+- **The magic-byte floor checks the LINE's format first.** `decoder=xlsx` whose
+  body does not start `PK\x03\x04` is refused whatever the header said — the
+  case the header-only form could not see, because a server sending a sign-in
+  shell as `text/html` is *telling the truth*.
+- **The refer plane and `fux enrich` read the same committed line ingest read**,
+  which closes `refer/source.py`'s false-staleness hazard structurally rather
+  than by care: the previous form agreed with ingest only while the server said
+  the same thing twice.
+- **A retained blob is named by what it is.** A workbook served as
+  `application/octet-stream` used to land in `.fux/acquired/` with no extension
+  at all.
+
+**W-200's second provenance finding shipped with it** — *"M URL(s) whose
+declared `decoder=` disagrees with the last observed `content_type`"* — having
+had no field to read until now. It is a **finding**, never an error: the line
+wins and the header loses silently by design, so this row is the only place
+anybody learns the two disagree.
+
+⚠ **What was NOT done, and is named rather than left silent:**
+[SR-FETCHER](../records/0117_fetcher.md) decision 2's bare-`str` transition ramp
+still contradicts *"a fetcher emits a format a decoder reads"* — a fetcher
+returning Markdown is doing the decoder's job, which is what the pipe exists to
+separate. Its cost was never measured and removing it breaks every consumer
+fetcher written before 2026-08-26, so it stays, recorded in SR-FETCHER 17d.
+
+**Fixture cost, stated:** ~80 URL-line fixtures across 16 test files were
+rewritten, not exempted, and three strings that were never list lines at all —
+a `loc`, a `urlstate` key and two refusal `url` arguments — were **reverted to
+bare URLs**: the 2026-09-20 `fetch=` sweep had put attributes in them and this
+one nearly doubled them.
+
+---
+
 ## 2026-09-21 — **W-208: every record names the files it governs, and the naming is generated**
 
 **Shipped:** `scripts/gen-components.py`, `tests/test_record_components.py`, and
@@ -161,7 +255,8 @@ targets — a path fix, never a grounding change
 [`src/fux/ingest/register.py`](../src/fux/ingest/register.py) · three `fux doctor`
 rows · `fux add --fetch` · `[sources.url.routes]`.
 **Evidence:** none — it is a build, not a measurement.
-**Items:** [W-199](open/W-199-fetcher-routing.md) — **DoD 1–9 met, item stays open on DoD 10.**
+**Items:** W-199 — **DoD 1–9 met that day; the item stayed open on DoD 10 and
+closed 2026-09-21** (see the entry below).
 **Records touched:** SR-FETCHER 16, SR-URL-LIST 16, SR-CONFIG 16, SR-INGEST 22,
 SR-DOCTOR (three rows), SR-CLI, SR-DOTFUX, SR-MERGE-DRIVER.
 
@@ -417,12 +512,14 @@ changed**: no record field, no schema, no `_format` bump.
 | **The URL decoder is captured at fetch time, not re-derived.** `FetchedUrl` carries two advisory fields set inside the fetch loop by the same `_fetched_rel_path` call that decided which decoder actually ran. Re-deriving from the URL afterwards would be wrong exactly where it matters — a server declaring `application/pdf` on an extensionless URL. **Nothing on the ingest path branches on either field**, and SR-FETCHER decision 5's *declared, never detected* is untouched | [SR-URL-INGEST](../records/0107_url-ingest.md) · [SR-FETCHER](../records/0117_fetcher.md) |
 | ⚠ **`runtime/` is documented as *"rebuildable from the committed index"* and three of its files are not.** `url-state.json` and `enrich-progress.tsv` are **observed during a run** and can only be re-observed; this ledger is the third. The category existed and was unnamed. SR-DOTFUX names it in **one sentence rather than a `DECLARED` row** — the file lives *inside* `runtime/`, so ADR-DOTFUX veto condition 1 was never in play, and a top-level row would say it is a different kind of thing from the two beside it. **If Arpit prefers a row, that is a one-line change** | [SR-DOTFUX](../records/0102_fux-directory.md) |
 | **Clock-free (L3), best-effort, and off the hot path — each asserted rather than intended.** `run_seq` never `time.time()`; `write` swallows its own `OSError` because a ledger that can fail a run is worse than no ledger; and an `ast` fence over `query/`, `refer/` and `derive/` proves nothing at query time reads it. ⚠ **`run_seq` never moves in a file-only corpus**, so every row there reads `0` — correct and slightly useless, and the alternative is a second counter to keep consistent for a field nothing branches on | [`tests/ingest/test_ingestlog.py`](../tests/ingest/test_ingestlog.py) |
-| 🔴 **W-199 was mis-balled 🟢 `agent` in the queue from the day it was filed**, while its own frontmatter said `ball: arpit` and its §Decisions hold three unruled calls. **The row was wrong and the file was right.** Corrected to 🔴 `arpit` and filed into the inbox; **nothing was built against the recommended defaults**, because D1 changes what every generated URL line says and building on the old one makes every route dead on every existing line **while the tests pass anyway** — the W-83 class | [W-199](../work/open/W-199-fetcher-routing.md) |
+| 🔴 **W-199 was mis-balled 🟢 `agent` in the queue from the day it was filed**, while its own frontmatter said `ball: arpit` and its §Decisions hold three unruled calls. **The row was wrong and the file was right.** Corrected to 🔴 `arpit` and filed into the inbox; **nothing was built against the recommended defaults**, because D1 changes what every generated URL line says and building on the old one makes every route dead on every existing line **while the tests pass anyway** — the W-83 class | W-199, closed 2026-09-21 |
 
 **Not done, and named:** `fux doctor`'s **second** provenance finding — *"M
 URL(s) whose declared `decoder=` disagrees with the last observed
 `content_type`"* — is **not built and not stubbed.** It is W-199's hook, and
-W-199 is blocked on three rulings. No `fux provenance` verb: `grep`, `jq` and
+W-199 is blocked on three rulings. ✅ **BUILT 2026-09-21** as the `observed
+types` row, once W-199 DoD 10 gave it a `decoder=` field to read
+([SR-DOCTOR](../records/0152_doctor.md)). No `fux provenance` verb: `grep`, `jq` and
 `doctor` cover it, and a verb waits for a third reader. No cap and no rotation
 on a 2 MB file that is one `rm` from gone.
 

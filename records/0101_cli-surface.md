@@ -7,10 +7,10 @@ description: Flat verbs in seven groups, one error boundary, three output modes.
 status: accepted
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@f9d609b1b3cc, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@002524c0ea96, src/fux/progress.py@925dccc045ce, tests_e2e@b91110d87b7a]
+owns: [src/fux/cli.py@b12b958fcd16, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@9876744812b5, src/fux/progress.py@925dccc045ce, tests_e2e@40f9827c79ab]
 laws: [L1, L4, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: f1bcc32511846d53e808d9cd6d45285e627dd3367ff6cda144adc82434e8d010
+content_sha: 537130f7534e92bc5f18e7804340b5655603c37ecf0daf49f1505fc841f2625a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1232,6 +1232,43 @@ it tried and the stems on disk. There is no default fetcher to fall back to
 ([SR-FETCHER](0117_fetcher.md) decision 16). ⚠ **An existing line's `fetch=` is
 left alone on a re-add** — the line is a pin a human meant, and re-adding a URL
 to change its `ttl` must not silently re-route it.
+
+**`fux add --decoder <stem>`** (the pipe ruling, 2026-09-18; built 2026-09-21).
+The other half of the line ([SR-URL-LIST](0116_url-list.md) decision 17), and
+valid on a `--types` entry too — the one list that already had the attribute and
+never had a flag for it. Without the flag, **`fux add <url>` OBSERVES the type on
+one fetch and writes what it saw**, and an existing line's `decoder=` is left
+alone on a re-add for `fetch=`'s reason.
+
+**Three refusals, and none of them writes a line** — *never write a line you
+cannot ingest*:
+
+- a **refusal** (a sign-in wall, a 403 shell) fires **before** the proposal, so
+  `fux add` never records `decoder=html` for a sign-in page;
+- **nothing maps** — an unknown type, an `application/octet-stream` with no
+  telling extension — names the type it saw and the decoder stems on disk;
+- 🔴 **the observing fetch FAILED, and this is a changed outcome.** `fux add`
+  against a URL that was down used to write the line and exit 1 (*"the line is
+  written; the fetch failed"* — recording and fetching are separate outcomes,
+  decision 3). There is now no line to write, because the attribute that makes
+  it loadable is the one the fetch was for. The message says `--decoder <stem>`
+  records it with no network at all.
+
+⚠ **`--no-fetch` makes `--decoder` MANDATORY** — the flag says *do not open the
+network*, observing the type is the one thing that needs it, and there is no
+default to fall back on.
+
+⚠ **`--dry-run` still opens nothing, and pays one placeholder for it.** `fetch=`
+resolves offline so the preview states it; `decoder=` is *observed*, so the
+preview prints `decoder=<observed>` — deliberately not a legal stem — plus a line
+saying what fills it. A dry run that fetched in order to print a line it then
+does not write is the one place *"write nothing"* and *"do nothing"* would come
+apart on an L4 surface.
+
+⚠ **Its `default` is `None`, like every other gated flag in this file**
+([SR-OUTPUT](0143_output-defaults.md) decision 10): *absent* and *given* have to
+be distinguishable, because a `--decoder` that arrived as `""` would be a pin
+nobody wrote.
 
 ### Consequences
 

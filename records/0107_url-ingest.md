@@ -10,7 +10,7 @@ feature: the `url:` source and how ingestion behaves around the fetcher boundary
 owns: []
 laws: [L2, L4, L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 8594c75b83e01c205f00965e18f058fc07512ad14d14f428da3143bd8ef7a2ba
+content_sha: d6848cd306592bc4b94a834a85aaed901015010871f5774b09fdb3d817242dec
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -168,6 +168,32 @@ closed attribute set and `file:lineno` errors are
 **6. Fux normalizes what comes back**, rather than trusting it: CRLF to LF,
 U+2028/U+2029/U+0085 to spaces, NUL stripped. Those are legal in JSON and
 hostile to every line-oriented tool downstream.
+
+**6a. It DECODES what comes back through the decoder the LINE declared, and no
+longer resolves one from the response** (the pipe ruling, 2026-09-18; built
+2026-09-21 as W-199 DoD 10). `_decode_fetched(raw, decoder, url, root)` takes
+the `decoder=` stem, `decoder_named` resolves it, and `prose` short-circuits to
+the already-text branch.
+
+- 🔴 **The header-then-extension-then-prose ladder has LEFT this path.**
+  `_TYPE_EXT` and the URL-suffix fallback are `fux add`'s tools now
+  (`propose_decoder`), where they run **once**. What was a heuristic executed on
+  every ingest is a committed line, which is the difference between
+  [L3](0005_LAW-3-deterministic.md) resting on a server being consistent and L3
+  resting on a file.
+- **A stem naming no module is a recorded skip, not a crash**, with the
+  `_bind` message shape — and `fux doctor`'s `url decoders` row reports it
+  before a run ([SR-DOCTOR](0152_doctor.md)).
+- **The two skip reasons stay distinguishable**, which is what 2026-08-27 bought
+  and this ruling must not spend: *no decoder module named X* (somebody could
+  write one, or fix the line) is not *X ran and found nothing readable* (only a
+  model will help). It is the same distinction `decode.reason()` draws for
+  files, keyed on the stem instead of the type.
+- **The refer plane and `fux enrich` read the same line** rather than being
+  handed a decoder by their caller ([SR-REFER](0127_refer-plane.md),
+  [SR-URL-FRESHNESS](0147_url-freshness.md)) — which is what makes an ask-time
+  decode identical to the ingest-time one *by construction* instead of by two
+  call sites agreeing.
 
 **7. ⚠ DELETED 2026-09-20 (Arpit, W-194).** This read: *Hashed meta is the
 default for URL sources, and `plain` is an explicit per-source opt-in for public

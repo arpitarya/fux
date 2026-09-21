@@ -13,7 +13,7 @@ feature: configurable output defaults
 owns: [src/fux/output_config.py@8e8e57fade21, .fux/output.toml@3a5b84942f70]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 7e924e585a53c13a6b0a247e05ea1f841789f0e9e6c7f4bcbeaf7364f387d95d
+content_sha: 577d5d2e63fea4e98d40c73d3dd0d653c267864731cc62f08df1627bf345c302
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -785,6 +785,20 @@ individually is reading `--json`, where they are all present and always were.
 the one to apply: *is there a state a reader could want that no current key can
 express?* — and the answer would have to be yes for a specific signal, named,
 before a key is added for it.
+
+**2026-09-21 — `fux add --decoder` lands at `default=None`, as decision 10
+requires.**
+
+The flag is added in `cli.py` with no `default=`, so argparse supplies `None`
+and `sources._overrides` can tell *absent* from *given*
+([SR-CLI](0101_cli-surface.md)). That distinction is load-bearing here and not
+merely tidy: a `--decoder` arriving as `""` would be written onto the line as a
+pin nobody typed, and on the `urls` grammar an empty `decoder=` is refused —
+so the failure would surface as a committed file that does not load.
+
+⚠ **Stated here because this record constrains every gated flag in that file,
+and the constraint failing silently is precisely how six flags shipped at
+`default=False`.**
 
 ### Consequences
 

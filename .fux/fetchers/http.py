@@ -67,7 +67,17 @@ tunables in `fux.toml` rather than editing this file, and merges stay clean.
 
 **This file does not convert anything (W-86 P8).** It returns the bytes the
 server sent plus the `Content-Type` it declared, and `fux.decode` turns those
-into markdown. Until 2026-08-26 the conversion lived here AND in `cdp.py`, as
+into markdown.
+
+**And WHICH decoder does that is the line's to say, not yours and not the
+server's** (2026-09-21). Every URL line states `decoder=<stem>` beside its
+`fetch=<stem>` — `prose` for a page that is already text, otherwise a built-in
+(`html`, `pdf`, `xlsx`, ...) or a file in `.fux/decoders/`. `fux add` observes
+the `Content-Type` on its one fetch, writes the stem it resolved, and **refuses
+rather than guessing** when nothing claims that format; from then on the
+`Content-Type` you return is informational. It is still worth returning
+accurately: `fux add` proposes from it, a refusal rule may match on it, and
+`fux doctor`'s `observed types` row compares it against the line. Until 2026-08-26 the conversion lived here AND in `cdp.py`, as
 two hand-maintained copies that a comment asked to stay identical and nothing
 checked — which made *which fetcher retrieved a document* a property of the
 committed index, and that is L3. `fetch=` is a routing decision, never a

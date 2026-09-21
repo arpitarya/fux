@@ -10,6 +10,55 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Removed — BREAKING
 
+- 🔴 **`decoder=` is now mandatory on every URL line, and every existing URL
+  list stops loading until it carries one** (W-199 DoD 10; the pipe ruling,
+  Arpit 2026-09-18: *"Whenever we add a URL, after that, we have to define what
+  kind of fetch it is, what kind of decoder we want to use. And that is the one
+  that gets saved in the URLs file."* On migration: *"Nothing needs to be done.
+  It is a breaking change. That's all."*).
+
+  **What breaks, and how it tells you.** A URL line with no `decoder=` **fails
+  to parse**, naming the line and the word to add. **This is wider than
+  `fetch=`'s break**: no line written before this release carries the attribute,
+  because there was none to write — so **every** `.fux/sources/urls` is
+  affected, not only hand-written lines. No rewrite, no lenient read.
+
+  ```text
+  # before
+  https://wiki.corp/hr/policy.xlsx?download=1 fetch=cdp keep=true ttl=24h
+
+  # after — the line names both halves of the pipe
+  https://wiki.corp/hr/policy.xlsx?download=1 fetch=cdp decoder=xlsx keep=true ttl=24h
+  ```
+
+  **The fix is one command per URL**: `fux add <url>` again, which observes the
+  response's `Content-Type` on its one fetch and writes the stem it resolved —
+  or `fux add <url> --decoder <stem>`, which writes it with no network at all.
+  `decoder=prose` is the reserved word for a page that is already text.
+
+  **Why:** a file's extension picks its decoder; a URL has no trustworthy
+  extension (`?download=1`, `/export`, `application/octet-stream`), so fux
+  guessed from the header, then the URL, then fell back to prose — **on every
+  ingest**. Which decoder read a document was therefore a function of what the
+  server said that morning. It is now a committed line.
+
+  **Two smaller behaviour changes ride along:**
+
+  - 🔴 **`fux add` on a URL that cannot be fetched now writes NO line** and
+    exits 1. It used to write the line and report *"the line is written; the
+    fetch failed"*; the attribute that makes the line loadable is the one the
+    fetch was for. `--decoder <stem>` records it offline.
+  - **`fux add <url>` opens the network twice** — once to observe the type, once
+    in the ingest that follows — unless `--decoder` is given or the line already
+    declares one.
+
+  **Stronger for free:** the always-on magic-byte floor now checks the body
+  against the **declared** format, so `decoder=xlsx` whose response does not
+  start `PK\x03\x04` is refused whatever the `Content-Type` said — a sign-in
+  page can no longer arrive under an honest header. `fux doctor` gains
+  `url decoders` (a stem naming no module) and `observed types` (a declared stem
+  disagreeing with the last retained response).
+
 - 🔴 **`[sources.url] fetcher` is deleted, and `fetch=` is now mandatory on
   every URL line** (W-199, Arpit 2026-09-20: *"There is no default fetch. It is
   a mandatory argument. About backward compatibility, let it break."*).

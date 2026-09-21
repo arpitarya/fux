@@ -16,6 +16,25 @@ import fux.refer.source  # for the registry lookup below
 source_mod = sys.modules["fux.refer.source"]
 
 
+def _listed(root, url, decoder="prose"):
+    """Declare `url` in the committed list, because the refer plane reads the line.
+
+    🔴 **Since the pipe ruling, `_decode_fetched` takes the DECLARED decoder**,
+    and this module gets it from the same committed line ingest read
+    (`urlsrc.declared_decoder`) rather than from the response header. That is
+    what makes a verify-time decode identical to an ingest-time one *by
+    construction* — the hazard this module's own docstring is about. A URL that
+    is not listed has no line to read, so every case below lists one.
+    """
+    (root / "fux.toml").write_text(
+        "[sources]\n[sources.url]\nmax_parallel = 4\n", encoding="utf-8"
+    )
+    listing = root / ".fux" / "sources" / "urls"
+    listing.parent.mkdir(parents=True, exist_ok=True)
+    listing.write_text(f"{url} fetch=http decoder={decoder}\n", encoding="utf-8")
+    return root
+
+
 def test_the_scheme_picks_the_strategy():
     assert resolve("file:docs/a.md") == GIT
     assert resolve("url:https://x.test/p") == URL
@@ -51,16 +70,35 @@ def test_a_fetcher_that_raises_becomes_a_fux_error_not_a_crash(tmp_path):
         fetch_document(tmp_path, "url:https://x.test/p", "https://x.test/p", fetcher=boom)
 
 
-def test_an_undecodable_type_is_refused_with_the_reason_not_a_type_complaint(tmp_path):
-    """Undecodable is a stated reason about the response, never about Python types.
+def test_an_undecodable_line_is_refused_with_the_reason_not_a_type_complaint(tmp_path):
+    """Undecodable is a stated reason about the LINE, never about Python types.
 
-    A content type nothing claims has no markdown to compare against, so the
-    caller is told which of the two it was — the same sentence ingest would
-    have recorded as a skip.
+    ⚠ **The undecodable case moved with the pipe ruling.** It used to be *a
+    content type nothing claims* (`application/octet-stream`), which a server
+    could produce on any run; it is now *a `decoder=` naming no module*, which
+    only a committed line can say — and `fux add` refuses to write one. Either
+    way the caller is told which of the two happened, in the same sentence
+    ingest would have recorded as a skip.
     """
+    _listed(tmp_path, "https://x.test/p", decoder="octets")
     response = (b"\x00\x01binary", "application/octet-stream")
-    with pytest.raises(FuxError, match="no decoder for application/octet-stream"):
+    with pytest.raises(FuxError, match="no decoder module named 'octets'"):
         fetch_document(tmp_path, "url:https://x.test/p", "https://x.test/p", fetcher=lambda u: response)
+
+
+def test_a_url_the_list_no_longer_declares_is_refused_rather_than_guessed(tmp_path):
+    """A citation whose line has been removed is `unverified`, never `prose`.
+
+    🔴 **Guessing here would produce a sha, and a sha produces a verdict.**
+    There is nothing left saying how ingest read those bytes, so reporting
+    `reproduced` or `drifted` about them would be an answer invented at verify
+    time.
+    """
+    with pytest.raises(FuxError, match="no line in the URL list declares a `decoder=`"):
+        fetch_document(
+            tmp_path, "url:https://x.test/gone", "https://x.test/gone",
+            fetcher=lambda u: (b"<html>x</html>", "text/html"),
+        )
 
 
 def test_a_pre_contract_fetcher_returning_markdown_still_verifies(tmp_path):
@@ -70,6 +108,7 @@ def test_a_pre_contract_fetcher_returning_markdown_still_verifies(tmp_path):
     one here would break verification in repos that upgraded fux and nothing
     else.
     """
+    _listed(tmp_path, "https://x.test/p")
     fetched = fetch_document(
         tmp_path, "url:https://x.test/p", "https://x.test/p", fetcher=lambda u: "# Heading\n"
     )
@@ -91,6 +130,7 @@ def test_a_tuple_returning_fetcher_is_decoded_exactly_as_ingest_decoded_it(tmp_p
     """
     from fux.ingest import urlsrc
 
+    _listed(tmp_path, "https://x.test/p", decoder="html")
     html = b"<html><body><h1>Title</h1><p>Body text here.</p></body></html>"
     response = (html, "text/html; charset=utf-8")
 
@@ -98,7 +138,7 @@ def test_a_tuple_returning_fetcher_is_decoded_exactly_as_ingest_decoded_it(tmp_p
         tmp_path, "url:https://x.test/p", "https://x.test/p", fetcher=lambda u: response
     )
 
-    markdown, why = urlsrc._decode_fetched(html, "text/html; charset=utf-8", "https://x.test/p", tmp_path)
+    markdown, why = urlsrc._decode_fetched(html, "html", "https://x.test/p", tmp_path)
     assert why == "" and markdown is not None
     assert fetched.content == urlsrc.sanitize(markdown)
     assert fetched.strategy == URL
@@ -128,6 +168,7 @@ def test_verify_time_normalization_is_the_same_function_ingest_uses(tmp_path):
 
     assert source_mod.sanitize is urlsrc.sanitize
 
+    _listed(tmp_path, "https://x.test/p")
     raw = "line\r\nnext after"
     fetched = fetch_document(tmp_path, "url:https://x.test/p", "https://x.test/p", fetcher=lambda u: raw)
     assert fetched.content == urlsrc.sanitize(raw)
@@ -178,6 +219,7 @@ def test_a_fetch_that_finishes_in_time_is_unaffected(tmp_path):
     """The bound is on waiting, not on the work — a normal fetch is untouched."""
     from fux.refer import _fetch_within
 
+    _listed(tmp_path, "https://x.test/p")
     fetched = _fetch_within(
         5, tmp_path, "url:https://x.test/p", "https://x.test/p", lambda u: "# quick\n"
     )

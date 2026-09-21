@@ -58,8 +58,22 @@ def items() -> list[Path]:
 
 
 def test_there_are_items_to_check() -> None:
-    """A collector that matches nothing is a test that always passes."""
-    assert len(items()) > 3, [p.name for p in items()]
+    """A collector that matches nothing is a test that always passes.
+
+    🔴 **The guard is that the collector agrees with the DIRECTORY, not that the
+    queue is a certain size.** It read `> 3` until 2026-09-21, when closing
+    W-199 took the queue to exactly three and turned a healthy, correctly
+    reconciled queue into a red test — a threshold on somebody else's backlog,
+    which is a gate that fires on the absence of work rather than on a defect.
+    Comparing against the glob catches the thing it was reaching for: a pattern
+    that stops matching, an exemption that grows, an empty directory.
+    """
+    on_disk = {p.name for p in OPEN.glob("*.md")} - _EXEMPT
+    assert on_disk, "work/open/ holds no items at all — the queue or the path moved"
+    assert {p.name for p in items()} == on_disk, (
+        "the collector and the directory disagree: "
+        f"{sorted(on_disk - {p.name for p in items()})} are not being checked"
+    )
 
 
 @pytest.mark.parametrize("path", items(), ids=lambda p: p.name)

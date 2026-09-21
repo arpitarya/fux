@@ -7,10 +7,10 @@ description: "A declarative refusal table, every condition pure over the respons
 status: accepted
 date: 2026-09-01
 feature: refusal detection before decode
-owns: [src/fux/ingest/refusals.py@adf187806c43, src/fux/templates/refusals.toml.txt@bdf2356bc679, tools/refusal-probe@76b6f6b7f4aa, .fux/refusals.toml@bdf2356bc679]
+owns: [src/fux/ingest/refusals.py@3396b44cc6a7, src/fux/templates/refusals.toml.txt@bdf2356bc679, tools/refusal-probe@76b6f6b7f4aa, .fux/refusals.toml@bdf2356bc679]
 laws: [L1, L3]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 513728b9be79214445bf26caa34868e70617a65b4dba8c129c7e44785f5bb489
+content_sha: c72a1aff276752c8eb8cc7de7d535fd3d187211dd36f49a44e44a88720c5432d
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -410,6 +410,32 @@ parse error at read time into a runtime failure, and a reader of this record
 could otherwise reasonably assume the refusal machinery covers it. It does not,
 and making it do so would mean a repo silently indexing a subset of its corpus —
 [the measured case](../work/regression/2026-09-15-consumer-fetchers/ANALYSIS.md).
+
+**2026-09-21 — the floor now checks the LINE's format before the server's**
+(the pipe ruling; [SR-FETCHER](0117_fetcher.md) decision 17c).
+
+`MAGIC_BY_DECODER` sits above `MAGIC`: a URL line declares `decoder=<stem>`
+([SR-URL-LIST](0116_url-list.md) decision 17), and where that stem has a fixed
+signature — `xlsx`, `docx`, `pptx` open `PK\x03\x04`; `pdf` opens `%PDF-` — the
+body is checked against **it**, whatever `Content-Type` came back. The header map
+is the fallback, for a caller with no line: the add-time probe, which is
+observing the type in order to write one, and every caller that predates the
+ruling.
+
+🔴 **This is the floor getting stronger, and it closes a case the header form
+could not see.** *"A declared content type that disagrees with the response's
+first bytes"* cannot catch a sign-in shell served **honestly** as `text/html`
+where the line says `decoder=xlsx` — the server told the truth about what it
+sent, and the lie is that it is the document. The line is what says otherwise.
+
+⚠ **Only formats with an unambiguous signature are in the map, exactly as with
+`MAGIC`.** `html`, `json`, `csv` and `xml` have none, so a line declaring one of
+those is not checked here and the decoder's own *nothing readable* path records
+the skip. Guessing a signature would turn an always-on floor into a source of
+false refusals, and a floor that cries wolf gets switched off.
+
+⚠ **Still not configurable, and still fux's.** A format signature is a fact;
+`refusals.toml` adds refusals and can never subtract one.
 
 ### Consequences
 

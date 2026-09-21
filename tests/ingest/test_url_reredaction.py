@@ -38,7 +38,7 @@ RULE = '[[rule]]\nname = "token"\npattern = "zarquon[0-9]{4}"\n'
 
 def _repo(tmp_path, *, keep=True):
     (tmp_path / ".fux" / "sources").mkdir(parents=True)
-    line = f"{LOC} fetch=http keep={'true' if keep else 'false'}\n"
+    line = f"{LOC} fetch=http decoder=html keep={'true' if keep else 'false'}\n"
     (tmp_path / ".fux" / "sources" / "urls").write_text(line, encoding="utf-8")
     (tmp_path / ".fux" / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
     (tmp_path / "docs").mkdir()
@@ -96,7 +96,12 @@ def _fake_fetch_all(root, entries, *a, **kw):
 
     out = []
     for entry in entries:
-        markdown, _why = _decode_fetched(PAGE, HTML, entry.url, root)
+        # ⚠ **The ENTRY's declared decoder**, since the pipe ruling — which is
+        # the whole point of the import: a fake that passed `HTML` here would
+        # be decoding by the header while ingest decodes by the line, and the
+        # re-derivation assertions would compare against a baseline nothing in
+        # production makes. That is this docstring's own defect, one ruling on.
+        markdown, _why = _decode_fetched(PAGE, entry.decoder, entry.url, root)
         out.append(urlsrc.FetchedUrl(url=entry.url, content=sanitize(markdown)))
     return out, []
 

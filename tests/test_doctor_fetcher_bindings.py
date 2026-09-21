@@ -34,7 +34,7 @@ def _repo(tmp_path, *, urls: str, fetchers=("http",)):
 
 
 def test_a_name_with_a_file_passes(tmp_path):
-    check = _fetcher_bindings(_repo(tmp_path, urls="https://x.test/a fetch=http\n"))
+    check = _fetcher_bindings(_repo(tmp_path, urls="https://x.test/a fetch=http decoder=prose\n"))
     assert check.ok
     assert "1 fetcher name(s) in use" in check.detail
 
@@ -42,14 +42,14 @@ def test_a_name_with_a_file_passes(tmp_path):
 def test_a_custom_name_with_a_file_passes(tmp_path):
     """The whole point of W-178, seen from `doctor`: a name fux never shipped."""
     repo = _repo(
-        tmp_path, urls="https://x.test/a fetch=glassbox\n", fetchers=("http", "glassbox")
+        tmp_path, urls="https://x.test/a fetch=glassbox decoder=prose\n", fetchers=("http", "glassbox")
     )
     assert _fetcher_bindings(repo).ok
 
 
 def test_a_name_with_no_file_fails_and_names_it(tmp_path):
     """The typo the enum used to catch, caught one layer later instead."""
-    repo = _repo(tmp_path, urls="https://x.test/a fetch=glasbox\n")
+    repo = _repo(tmp_path, urls="https://x.test/a fetch=glasbox decoder=prose\n")
     check = _fetcher_bindings(repo)
     assert not check.ok
     assert "glasbox" in check.detail
@@ -58,7 +58,7 @@ def test_a_name_with_no_file_fails_and_names_it(tmp_path):
 
 def test_it_reports_the_directory_contents_so_the_fix_is_visible(tmp_path):
     """A name with no file is usually a typo, and the fix is the list beside it."""
-    repo = _repo(tmp_path, urls="https://x.test/a fetch=glasbox\n", fetchers=("http", "cdp"))
+    repo = _repo(tmp_path, urls="https://x.test/a fetch=glasbox decoder=prose\n", fetchers=("http", "cdp"))
     detail = _fetcher_bindings(repo).detail
     assert "'cdp'" in detail and "'http'" in detail
 
@@ -72,7 +72,7 @@ def test_it_reads_the_list_not_the_index(tmp_path):
     matches no *file* — true the moment the line is written, which is the
     moment somebody can still fix it cheaply. There is no index here at all.
     """
-    repo = _repo(tmp_path, urls="https://x.test/a fetch=glasbox\n")
+    repo = _repo(tmp_path, urls="https://x.test/a fetch=glasbox decoder=prose\n")
     assert not (repo / ".fux" / "index").exists()
     assert not _fetcher_bindings(repo).ok
 
@@ -93,7 +93,7 @@ def test_it_never_imports_a_fetcher(tmp_path, monkeypatch):
     import importlib
 
     repo = _repo(
-        tmp_path, urls="https://x.test/a fetch=glassbox\n", fetchers=("http", "glassbox")
+        tmp_path, urls="https://x.test/a fetch=glassbox decoder=prose\n", fetchers=("http", "glassbox")
     )
     (repo / ".fux" / "fetchers" / "glassbox.py").write_text(
         'raise AssertionError("doctor imported a fetcher")\n', encoding="utf-8"

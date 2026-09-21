@@ -749,12 +749,18 @@ def _urls_header() -> str:
 # {len(URLS.attributes)} attributes, and the set is closed:
 {table}
 #
-#   https://example.com/handbook/oncall    fetch=http
-#   https://wiki.corp/display/ENG/runbook  fetch=cdp  ttl=7d
+#   https://example.com/handbook/oncall    fetch=http  decoder=prose
+#   https://wiki.corp/display/ENG/runbook  fetch=cdp   decoder=html  ttl=7d
+#   https://wiki.corp/hr/policy.xlsx       fetch=cdp   decoder=xlsx
 #
-# `fetch=` is MANDATORY on every line -- there is no default fetcher, and a
-# line without one fails to load (SR-URL-LIST decision 16, 2026-09-20). Put a
-# host map in `[sources.url.routes]` and `fux add` resolves it for you.
+# `fetch=` and `decoder=` are MANDATORY on every line -- there is no default
+# for either, and a line missing one fails to load (SR-URL-LIST decisions 16
+# and 17). A fetcher retrieves bytes; the decoder named here turns them into
+# Markdown. `decoder=prose` is for a page that is already text.
+#
+# Put a host map in `[sources.url.routes]` and `fux add` resolves the fetcher
+# for you; it observes the Content-Type on its one fetch and writes the
+# decoder, or refuses if nothing claims that format.
 #
 # `fux add <URL>` writes a line here with every attribute stated, and fetches
 # that one URL once. `fux ingest` re-fetches the lines known to be stale --

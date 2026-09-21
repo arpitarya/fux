@@ -539,6 +539,122 @@ def _resolved_fetch(root: Path, url: str) -> str:
     )
 
 
+#: What `--dry-run` prints where the observed decoder would go. Not a legal stem
+#: (`_url_decoder_reason` refuses it), so a copy-pasted preview fails loudly
+#: rather than loading as a decoder nobody has.
+_OBSERVED_AT_ADD = "<observed>"
+
+
+def _observed_decoder(root: Path, url: str, fetch: str) -> str:
+    """The `decoder=` stem `fux add` writes for `url`, observed once, or a refusal.
+
+    > **Arpit, 2026-09-18:** *"Whenever we add a URL, after that, we have to
+    > define what kind of fetch it is, what kind of decoder we want to use. And
+    > that is the one that gets saved in the URLs file."*
+
+    **`fux add` is where a URL's type is OBSERVED; every run after it is
+    DECLARED.** This performs one fenced fetch through the fetcher that was just
+    resolved, maps the response's `Content-Type` — then the URL's own extension,
+    then prose — through `urlsrc.propose_decoder`, and returns the stem. Ingest
+    never reads a header for routing again.
+
+    🔴 **The cost, said plainly: `fux add <url>` now opens the network TWICE** —
+    once here, and once inside the ingest that follows, because the line must
+    exist before `fux ingest` will fetch for it. It is one extra request, once
+    per newly added URL, and the alternatives were worse: writing the line first
+    and filling `decoder=` afterwards means a window where the committed file
+    does not load, and threading the probe's bytes into `ingest.run` means a
+    second way for bytes to enter the index. **`--decoder <stem>` skips the
+    probe entirely**, and so does re-adding a URL whose line already declares
+    one.
+
+    **Three refusals, and none of them writes a line:**
+
+    - a **refusal** (a sign-in wall, a 403 shell) — §3 edge case 6: the refusal
+      fires before the proposal, so `fux add` never records `decoder=html` for a
+      sign-in page;
+    - **nothing maps** — an unknown type, an `application/octet-stream` with no
+      telling extension — §2 item 4: it names the type it saw and the stems on
+      disk, and asks for `--decoder`;
+    - the **fetch itself failed**. ⚠ **This is a changed outcome and is the one
+      behaviour a consumer will notice.** `fux add` against a URL that was down
+      used to write the line and exit 1 (*"the line is written; the fetch
+      failed"*); there is no line to write now, because the attribute that would
+      make it loadable is the one the fetch was for. The message says
+      `--decoder <stem>` writes it without a network at all.
+    """
+    from .ingest import refusals, urlsrc
+
+    try:
+        source = load(root).url
+    except FuxError:
+        source = None
+    if source is None:
+        raise FuxError(
+            f"{url} needs a `decoder=`, and there is no [sources.url] in {CONFIG_NAME} to "
+            "observe one with. `fux setup` writes a fetcher, or pass `--decoder <stem>`"
+        )
+
+    fetcher_path = urlsrc.fetcher_for(fetch)
+    module = urlsrc.load_fetcher(root, fetcher_path)
+    urlsrc.configure_fetcher(module, source.config_for(fetcher_path))
+    connect = getattr(module, "connect", None)
+    close = getattr(module, "close", None)
+    try:
+        if callable(connect):
+            connect()
+        result = module.fetch(url)
+    except FuxError:
+        raise
+    except Exception as exc:  # consumer code, and a dead host is not a crash
+        raise FuxError(
+            f"{url}: the fetch that observes this URL's type failed "
+            f"({type(exc).__name__}: {exc}), so no `decoder=` could be resolved and "
+            f"nothing was written. Pass `--decoder <stem>` to record the line without "
+            f"fetching, or try again"
+        ) from exc
+    finally:
+        if callable(close):
+            try:
+                close()
+            except Exception:
+                pass  # teardown failure must not lose what we observed
+
+    raw, content_type = urlsrc._unpack(result)
+    if raw is None:
+        raise FuxError(
+            f"{url}: the fetcher returned no bytes, so no `decoder=` could be resolved and "
+            f"nothing was written. Pass `--decoder <stem>` to record the line anyway"
+        )
+    # ⚠ **Before the proposal, not after.** A sign-in shell is valid HTML and
+    # would propose `decoder=html` perfectly happily — a line that says the page
+    # fux could not read is the page it will read from now on.
+    denial = refusals.refused(refusals.load(root), url, content_type, raw)
+    if denial is not None:
+        raise FuxError(
+            f"{url}: {denial}. Nothing was written — a refusal is not a document, and "
+            f"recording the decoder for one would pin the sign-in page"
+        )
+    stem = urlsrc.propose_decoder(content_type, url, root)
+    if stem is not None:
+        return stem
+
+    from .decode import BUILTIN_MODULES, CONSUMER_DIR, PROSE_DECODER
+
+    try:
+        on_disk = sorted(p.stem for p in (root / CONSUMER_DIR).glob("*.py"))
+    except OSError:
+        on_disk = []
+    raise FuxError(
+        f"{url} came back as {content_type or 'an unknown type'} and no decoder claims it, "
+        f"so no `decoder=` could be resolved and nothing was written. "
+        f"Built-ins: {', '.join(BUILTIN_MODULES)}. "
+        f"{CONSUMER_DIR}/ has {', '.join(on_disk) if on_disk else 'nothing'}. "
+        f"Pass `--decoder <stem>` (`{PROSE_DECODER}` reads it as plain text), or write a "
+        f"decoder for that format"
+    )
+
+
 def _overrides(args, spec: sourcelist.ListSpec) -> dict[str, str]:
     """Flags -> the attributes to record. Two flags for one attribute is an error.
 
@@ -618,6 +734,30 @@ def _overrides(args, spec: sourcelist.ListSpec) -> dict[str, str]:
         if fault is not None:
             raise FuxError(f"--fetch {fetch!r} {fault}")
         overrides["fetch"] = fetch
+    # 🔴 **`--decoder <stem>` — the other pin, and it wins over what was
+    # observed** (the pipe ruling §3 edge case 8: *the line is written as asked,
+    # then the same ingest refuses it via the magic floor and says so — the human
+    # sees the disagreement on the first run*). Valid on `urls` AND on `types`,
+    # which is the one list that already had the attribute and never had a flag
+    # for it.
+    #
+    # ⚠ **Validated by the SPEC's own validator, so the two lists differ exactly
+    # where they should.** `types` accepts an empty `decoder=` (*resolve it
+    # through the modules' EXTENSIONS*); `urls` refuses one, because a URL has no
+    # trustworthy extension to resolve through. One flag, two rules, neither
+    # restated here.
+    decoder = getattr(args, "decoder", None)
+    if decoder is not None:
+        attribute = spec.attribute("decoder")
+        if attribute is None:
+            raise FuxError(
+                f"--decoder sets `decoder`, which `{spec.kind}` does not have. Its attribute "
+                f"set is closed and is {', '.join(spec.names) if spec.names else 'empty'}"
+            )
+        fault = attribute.reject(decoder)
+        if fault is not None:
+            raise FuxError(f"--decoder {decoder!r} {fault}")
+        overrides["decoder"] = decoder
     return overrides
 
 
@@ -712,15 +852,54 @@ def cmd_add(args) -> int:
     # by `test_an_unflagged_attribute_keeps_what_the_line_already_said` — a
     # second `fux add` with no fetch flag was overwriting the first one's
     # `fetch=cdp` with whatever the table now said.
-    if spec is sourcelist.URLS and "fetch" not in overrides:
-        existing = next(
+    if spec is sourcelist.URLS:
+        prior_line = next(
             (e for e in _read(list_path(root, spec), spec)
-             if e.value == entry and not e.exclude and "fetch" in e.declared),
+             if e.value == entry and not e.exclude),
             None,
         )
-        overrides["fetch"] = (
-            existing.attrs["fetch"] if existing is not None else _resolved_fetch(root, entry)
-        )
+        if "fetch" not in overrides:
+            pinned = (
+                prior_line.attrs["fetch"]
+                if prior_line is not None and "fetch" in prior_line.declared
+                else None
+            )
+            overrides["fetch"] = pinned or _resolved_fetch(root, entry)
+        # 🔴 **The `decoder=` half of the same rule** (the pipe ruling; W-199
+        # DoD 10). `--decoder` wins; an existing line's declaration is kept for
+        # `fetch=`'s reason — re-adding a URL to change its `ttl` must not
+        # silently re-read it as something else; otherwise `fux add` observes
+        # the type on one fetch and writes what it saw.
+        #
+        # ⚠ **`--no-fetch` makes `--decoder` mandatory** (§3 edge case 7). The
+        # flag says *do not open the network*, and observing the type is the one
+        # thing that needs it, so there is nothing to resolve from — and no
+        # default to fall back on.
+        if "decoder" not in overrides:
+            declared = (
+                prior_line.attrs["decoder"]
+                if prior_line is not None and "decoder" in prior_line.declared
+                else None
+            )
+            if declared is not None:
+                overrides["decoder"] = declared
+            elif getattr(args, "no_fetch", False):
+                raise FuxError(
+                    f"--no-fetch cannot observe what {entry} returns, and a URL line must "
+                    "state a `decoder=` — there is no default. Pass `--decoder <stem>` "
+                    "(`prose` for a page that is already text), or drop --no-fetch and let "
+                    "the one fetch resolve it"
+                )
+            elif getattr(args, "dry_run", False):
+                # 🔴 **A dry run opens no socket, and that is worth one
+                # placeholder.** `fetch=` resolves offline, so the preview can
+                # state it; `decoder=` is *observed*, and a `--dry-run` that
+                # fetched in order to print a line it then does not write would
+                # be the one L4 surface where "write nothing" and "do nothing"
+                # came apart. The word is deliberately not a legal stem.
+                overrides["decoder"] = _OBSERVED_AT_ADD
+            else:
+                overrides["decoder"] = _observed_decoder(root, entry, overrides["fetch"])
 
     entries = _read(path, spec)
     if any(e.value == entry and e.exclude for e in entries):
@@ -773,6 +952,12 @@ def cmd_add(args) -> int:
         preview = sourcelist.render_line(entry, spec.defaults() | overrides, spec)
         print(f"would add {preview}")
         print(f"  in {_rel(root, path)}")
+        if overrides.get("decoder") == _OBSERVED_AT_ADD:
+            print(
+                f"  decoder={_OBSERVED_AT_ADD} is not a stem - the add observes the "
+                "Content-Type on its one fetch and writes what it saw, or refuses. "
+                "`--decoder <stem>` fixes it here"
+            )
         print(f"  then: {_plan(spec, args)}")
         return 0
 

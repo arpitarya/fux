@@ -59,10 +59,13 @@ from . import _limits
 __all__ = [
     "BUILTIN_MODULES",
     "CONSUMER_DIR",
+    "PROSE_DECODER",
     "Decoder",
     "claims",
     "declared_bindings",
     "decode",
+    "decode_with",
+    "decoder_named",
     "reason",
     "registry",
 ]
@@ -70,6 +73,24 @@ __all__ = [
 #: Consumer decoders live here, one module per format, overriding a built-in of
 #: the same module name. Committed — it is consumer source, like `.fux/fetchers/`.
 CONSUMER_DIR = ".fux/decoders"
+
+#: The one reserved decoder name, and the one name a consumer file may not take.
+#:
+#: 🔴 **It names a BRANCH, not a module** — bytes that are already prose reach no
+#: decoder at all (`urlsrc._decode_fetched`'s `_PROSE` path, which predates this
+#: by a month). A URL line says `decoder=prose` for a `text/markdown` or
+#: `text/plain` page, so `.fux/decoders/prose.py` would be a file that looks like
+#: it is being used and never is. `_consumer_decoders` refuses the name — the
+#: pipe ruling, §3 edge case 1.
+#:
+#: ⚠ **Spelled in two modules and that is deliberate, not a restatement.**
+#: `ingest.sourcelist.PROSE_DECODER` is the GRAMMAR's reserved word (what a line
+#: may say) and `ingestlog.PROSE` is the LEDGER's name for *no decoder ran*.
+#: They cannot disagree while both look correct — a mismatch fails the parse or
+#: the registry build immediately — so by L0's own test these are
+#: implementations, not restatements. `tests/decode/test_decoder_named.py` holds
+#: the three equal anyway.
+PROSE_DECODER = "prose"
 
 #: Built-in decoder modules, by module name.
 #:
@@ -142,7 +163,9 @@ class Decoder:
     with libraries that will not accept a buffer, and nothing else.
     """
 
-    __slots__ = ("name", "extensions", "_fn", "wants_path", "origin", "meta_fields")
+    __slots__ = (
+        "name", "extensions", "primary", "_fn", "wants_path", "origin", "meta_fields",
+    )
 
     def __init__(
         self,
@@ -153,9 +176,22 @@ class Decoder:
         wants_path: bool,
         origin: str,
         meta_fields: dict[str, str] | None = None,
+        primary: str = "",
     ) -> None:
         self.name = name
         self.extensions = extensions
+        #: 🔴 **`EXTENSIONS[0]` as the module WROTE it, not `extensions[0]`.**
+        #: `extensions` is sorted — two machines must load one module the same
+        #: way — and sorting answers a different question from *"what is this
+        #: format called"*: it makes `xlsx` primary in `.xlsm` and `html`
+        #: primary in `.htm`. Nothing cared while a decoder was only ever
+        #: reached BY an extension; the pipe ruling reaches one by **name**
+        #: (`decoder=xlsx`) and then has to invent the path it decodes under,
+        #: and the name of the retained blob beside it. The author's first
+        #: extension is the format's own name; the sorted one is an accident
+        #: of the alphabet. Empty only for a module with no `EXTENSIONS`, which
+        #: `_from_module` already declines to build a decoder from.
+        self.primary = primary or (extensions[0] if extensions else "")
         self._fn = fn
         self.wants_path = wants_path
         self.origin = origin
@@ -242,6 +278,7 @@ def _from_module(module, name: str, *, origin: str) -> Decoder | None:
     return Decoder(
         name=name,
         extensions=tuple(sorted(str(e).lower() for e in extensions)),
+        primary=str(tuple(extensions)[0]).lower(),
         fn=fn,
         wants_path=bool(getattr(module, "WANTS_PATH", False)),
         origin=origin,
@@ -507,8 +544,50 @@ def _consumer_decoders(root: Path | None) -> dict[str, Decoder]:
     for path in sorted(directory.glob("*.py")):
         if path.name.startswith("_"):
             continue  # a shared helper the consumer imports, not a decoder
+        if path.stem == PROSE_DECODER:
+            # 🔴 **Refused, not shadowed.** `decoder=prose` on a URL line names
+            # the already-text branch and never reaches a module, so this file
+            # would be loaded, registered, and then never called for the one
+            # name it answers to. Failing at registry build is the only place
+            # the consumer finds out.
+            raise FuxError(
+                f"{CONSUMER_DIR}/{path.name} takes the reserved name {PROSE_DECODER!r}. "
+                f"`decoder={PROSE_DECODER}` names the already-text path and no module, so "
+                f"this file would never be called. Rename it (`{PROSE_DECODER}text.py`, "
+                "`plain.py`) and bind the extensions you want it to read in "
+                f"{TYPES_FILE} [decoders]"
+            )
         out[path.stem] = _load_consumer(path, path.stem)
     return out
+
+
+def decoder_named(name: str, root: Path | None = None) -> Decoder | None:
+    """The decoder module called `name`, or `None` — the pipe ruling's lookup.
+
+    **A URL line names a decoder by STEM** (`decoder=xlsx`), which is the same
+    vocabulary `.fux/formats.toml [decoders]` uses and the same key SR-DECODE
+    decision 5 resolves an override on.
+
+    Precedence is `registry()`'s first two steps and **deliberately not its
+    third**: a consumer module of that name replaces the built-in wholesale, and
+    the `[decoders]` binding table is **not consulted at all**. That table maps
+    an **extension** to a module — it decides what a *file* gets and what
+    `fux add` *proposes* — and letting it re-route a line would undo the whole
+    point of declaring one: the line is the most specific thing there is
+    ("Precedence, for the record", `work/proposals/fetcher-routing.md` §2).
+
+    ⚠ **`prose` returns `None`, and the caller must check for it first.** It
+    names a branch rather than a module (`PROSE_DECODER`), so *"no module"* and
+    *"no decoder runs"* are the same answer here and opposite outcomes upstream.
+    """
+    if name == PROSE_DECODER:
+        return None
+    consumer = _consumer_decoders(root)
+    if name in consumer:
+        return consumer[name]
+    if name in BUILTIN_MODULES:
+        return _load_builtin(name)
+    return None
 
 
 def builtin_extensions() -> tuple[str, ...]:
@@ -587,6 +666,22 @@ def decode(raw: bytes, rel_path: str, root: Path | None = None) -> str | None:
     decoder = registry(root).get(_suffix(rel_path))
     if decoder is None:
         return None
+    return decode_with(decoder, raw, rel_path, root)
+
+
+def decode_with(
+    decoder: Decoder, raw: bytes, rel_path: str, root: Path | None = None
+) -> str | None:
+    """Run one decoder that has **already been chosen**. Bytes -> Markdown, or `None`.
+
+    🔴 **Factored out of `decode()` for the pipe ruling and for nothing else.**
+    `decode()` chooses by extension, which is the right question about a file;
+    a URL line declares its decoder by name (`decoder_named`) and then needs the
+    identical call, the identical `bound_root`, and the identical
+    `DecodeFailed` — so the two paths share the body rather than each having
+    one. Two copies of this would diverge in exactly the way that makes one
+    plane's failure a crash and the other's a skip.
+    """
     try:
         # The root is bound, not passed: a decoder is still two names
         # (decision 1) and one that ignores configuration never notices.

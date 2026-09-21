@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-15
 date: 2026-08-18
 feature: the `fux ingest` pipeline — sources to committed records
-owns: [src/fux/ingest/ingestlog.py@73e117c1e919, src/fux/ingest@618f5f74a04b, src/fux/ingest/priors.py@8ffcc632a4be]
+owns: [src/fux/ingest/ingestlog.py@73e117c1e919, src/fux/ingest@50423856e72d, src/fux/ingest/priors.py@8ffcc632a4be]
 laws: [L2, L3, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: d30bce702f1001f6e45c1d8264ccca506048ee5d527f83233c3f5ce180c475b8
+content_sha: 175979deeb3afbb5e0dfaf34d57d06150645f0747b1fcccc1b86e27cb88d4f5a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -906,6 +906,22 @@ the index with no register line, or a register line naming a document the index
 does not hold, means **the register was committed from a different ingest than
 the index beside it** — the one thing a committed derived file can get wrong, and
 the one thing nobody reads closely enough to catch by eye.
+
+**2026-09-21 — `src/fux/ingest/` moved under this record and nothing it decides
+did.**
+
+The `decoder=` half of the pipe touched `sourcelist.py`, `urlsrc.py` and
+`refusals.py`, each owned more specifically by
+[SR-URL-LIST](0116_url-list.md), [SR-FETCHER](0117_fetcher.md) and
+[SR-REFUSAL](0146_refusals.md). **Decision 22's register is untouched**: its
+`decoder` column already carried the `decoderdigest` string for whatever read a
+document's bytes, and it now carries the digest of the **declared** decoder
+instead of one re-derived from the response — the same column, resolved from a
+committed line, which is if anything more L3-stable than before.
+
+⚠ **Stated here because this record owns the directory, not because a decision
+moved** — the [SR-ACQUIRED](0145_acquired-plane.md) precedent: the freshness gate
+proves an owning record was *touched*, never that it was read.
 
 ### Consequences
 

@@ -44,7 +44,7 @@ The grammar, in one place:
   accepting it silently would be the kind of no-op configuration this grammar's
   strictness exists to prevent.
 
-The attribute sets are closed and per file: `fetch` for `urls`,
+The attribute sets are closed and per file: `fetch` and `decoder` for `urls`,
 `archived` for `dirs`. (`types` was the third file until 2026-09-11; it is
 `.fux/formats.toml` now, read by `typesfile` — see `TYPES` below.) Adding one is a change
 to the owning record, which is what makes the unknown-key error safe to be
@@ -106,14 +106,26 @@ class Attribute:
     #: by being transcribed**; it was fixed by being *derived*, and this is the
     #: derivation itself being wrong. Ignored when `values` is non-empty.
     placeholder: str = "<value>"
-    #: 🔴 **A line that does not STATE this attribute fails to parse.** Only
-    #: `fetch` is required (W-199 D1/D2; SR-URL-LIST decision 16): there is no
-    #: source-wide fallback to inherit from any more, and an unstated fetcher is
-    #: not a policy fux can resolve later — it is *fux cannot retrieve this at
-    #: all*. ⚠ **`default` is still read**, by `defaults()` and `render_line`,
-    #: so a required attribute keeps a sane value for a line being CONSTRUCTED;
-    #: what is refused is a line on disk that omits it.
+    #: 🔴 **A line that does not STATE this attribute fails to parse.** Two
+    #: attributes are required, both on `urls` and both for the same reason:
+    #: `fetch` (W-199 D1/D2; SR-URL-LIST decision 16) and `decoder` (the pipe
+    #: ruling of 2026-09-18, built as W-199 DoD 10). Neither has a source-wide
+    #: fallback to inherit from, and neither is a policy fux can resolve later —
+    #: an unstated fetcher is *fux cannot retrieve this at all*, and an unstated
+    #: decoder is *fux cannot read what it retrieved*. ⚠ **`default` is still
+    #: read**, by `defaults()` and `render_line`, so a required attribute keeps a
+    #: sane value for a line being CONSTRUCTED; what is refused is a line on disk
+    #: that omits it.
     required: bool = False
+    #: The fix an absence names, appended to the *"does not state"* error.
+    #:
+    #: 🔴 **A field rather than one sentence in `parse`, because the second
+    #: required attribute arrived a day after the first.** The message `parse`
+    #: raised was `fetch`'s own — it named `.fux/fetchers/` and SR-URL-LIST
+    #: decision 16 — so a missing `decoder=` would have been reported by
+    #: pointing the reader at the fetchers directory. That is the W-140 row 18
+    #: shape again: a message transcribed where the fact lives one layer away.
+    required_hint: str = ""
 
     def spelling(self) -> str:
         """`name=a|b|c` for an enum, `name=<placeholder>` for a typed one.
@@ -324,6 +336,39 @@ def _decoder_reason(raw: str) -> str | None:
     return None if _DECODER_NAME_RE.fullmatch(raw) else _DECODER_HELP
 
 
+#: The one reserved decoder name: bytes that are ALREADY prose (`text/markdown`,
+#: `text/plain`) and reach no module at all. It names the `_PROSE` branch
+#: `urlsrc._decode_fetched` has always had, and it is reserved so a consumer file
+#: `.fux/decoders/prose.py` cannot shadow the branch — `decode._consumer_decoders`
+#: refuses that name (the pipe ruling, §3 edge case 1).
+PROSE_DECODER = "prose"
+
+
+def _url_decoder_reason(raw: str) -> str | None:
+    """Why `raw` is not a decoder name **on a URL line**, or `None`.
+
+    🔴 **The one difference from `_decoder_reason`: empty is not legal here.**
+    On the `types` list an empty `decoder=` means *no declared binding* and the
+    extension resolves through the modules' own `EXTENSIONS`. A URL has no
+    trustworthy extension — `?download=1`, `/export`, an
+    `application/octet-stream` — which is the whole reason the pipe ruling made
+    the line state it, so *"resolve it later"* is the one answer this attribute
+    may not carry.
+
+    Existence is still not checked here, for `_decoder_reason`'s reason: the
+    parser cannot reach the registry, and reaching for it would make reading a
+    committed file depend on importing every decoder. `fux doctor`'s
+    `url decoders` row reports a name with no module, and ingest raises on one.
+    """
+    if raw == "":
+        return (
+            "is empty, and a URL line may not leave its decoder to be resolved later — "
+            f"a URL has no trustworthy extension. Write `decoder={PROSE_DECODER}` for a page "
+            "that is already text, or a decoder module name (`html`, `pdf`, `xlsx`, ...)"
+        )
+    return None if _DECODER_NAME_RE.fullmatch(raw) else _DECODER_HELP
+
+
 URLS = ListSpec(
     kind="urls",
     attributes=(
@@ -351,6 +396,38 @@ URLS = ListSpec(
         Attribute(
             "fetch", (), "http", validate=_fetcher_reason,
             placeholder="<name>", required=True,
+            required_hint=(
+                " naming a file in .fux/fetchers/, or let `fux add` resolve it for you. "
+                "([sources.url] fetcher was deleted on 2026-09-20; SR-URL-LIST decision 16)"
+            ),
+        ),
+        # 🔴 **REQUIRED, and the second half of the pipe** (Arpit, 2026-09-18;
+        # built as W-199 DoD 10). *"Whenever we add a URL, after that, we have to
+        # define what kind of fetch it is, what kind of decoder we want to use.
+        # And that is the one that gets saved in the URLs file."*
+        #
+        # A **file**'s extension picks its decoder. A URL has no trustworthy
+        # extension — `?download=1`, `/export`, an `application/octet-stream` —
+        # so fux used to guess from the header, then the URL, then fall back to
+        # prose, **on every ingest**. The line replaces the guess with a
+        # declaration: `decoder=xlsx` is the decoder, run after run, and the
+        # header is informational from then on.
+        #
+        # ⚠ **The default is `prose`, NOT `""`.** `render_line`'s empty-default
+        # exception would otherwise fire and a generated URL line would stop
+        # stating `decoder=`, which is the one thing this attribute exists to
+        # make impossible. As with `fetch`, the default is what `render_line`
+        # uses while CONSTRUCTING a line and `fux add` always overwrites it with
+        # the stem it observed — it is never a fallback for a line on disk.
+        Attribute(
+            "decoder", (), PROSE_DECODER, validate=_url_decoder_reason,
+            placeholder="<name>", required=True,
+            required_hint=(
+                f" naming a decoder module — `{PROSE_DECODER}` for a page that is already "
+                "text, a built-in (`html`, `pdf`, `xlsx`, ...) or a file in .fux/decoders/. "
+                "`fux add <URL>` observes the type once and writes it for you "
+                "(the pipe ruling, 2026-09-18)"
+            ),
         ),
         # SR-ACQUIRED. Retain the bytes this URL returned.
         #
@@ -571,10 +648,7 @@ def parse(text: str, spec: ListSpec, *, origin: str) -> list[Entry]:
                     raise FuxError(
                         f"{origin}:{lineno}: {value!r} does not state "
                         f"`{attribute.name}=` and there is no default for it — write "
-                        f"`{value} {attribute.name}=<name>` naming a file in "
-                        f".fux/fetchers/, or let `fux add` resolve it for you. "
-                        f"([sources.url] fetcher was deleted on 2026-09-20; "
-                        f"SR-URL-LIST decision 16)"
+                        f"`{value} {attribute.name}=<name>`{attribute.required_hint}"
                     )
 
         entry = Entry(

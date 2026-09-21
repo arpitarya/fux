@@ -28,7 +28,8 @@ def _fill_fetch(text, spec):
     ⚠ **A `#` inside a URL is a FRAGMENT** — only ` #` (with the space) or a
     line that starts with `#` is a comment, which is the file grammar's own rule.
 
-    ⚠ **The value filled in is `http`, which is the ATTRIBUTE's own `default`.**
+    ⚠ **The values filled in are each ATTRIBUTE's own `default`** (`http`,
+    `prose`).
     That keeps `_defaults()` comparable: a case asserting *an absent attribute
     is its default* would otherwise fail on the one attribute the helper
     supplied, which is the helper distorting the thing under test.
@@ -41,11 +42,16 @@ def _fill_fetch(text, spec):
         if not stripped or stripped.startswith("#") or stripped.startswith("!"):
             out.append(line)
             continue
-        if "fetch=" in stripped or not stripped.lower().startswith(("http://", "https://")):
+        if not stripped.lower().startswith(("http://", "https://")):
             out.append(line)
             continue
         head, sep, tail = line.partition(" #")
-        out.append(f"{head.rstrip()} fetch=http{(' #' + tail) if sep else ''}")
+        missing = "".join(
+            f" {name}={value}"
+            for name, value in (("fetch", "http"), ("decoder", "prose"))
+            if f"{name}=" not in stripped
+        )
+        out.append(f"{head.rstrip()}{missing}{(' #' + tail) if sep else ''}" if missing else line)
     return "\n".join(out)
 
 
@@ -106,7 +112,7 @@ def test_the_loader_dedupes_and_sorts_so_file_order_is_presentation_only():
 # -- attributes ------------------------------------------------------------
 
 
-def test_the_url_attribute_set_is_exactly_these_six():
+def test_the_url_attribute_set_is_exactly_these_seven():
     """The one place the URL attribute set is written out, on purpose.
 
     Every other test here derives from the spec so it survives a new
@@ -114,24 +120,36 @@ def test_the_url_attribute_set_is_exactly_these_six():
     as one failing assertion naming what appeared, rather than as five
     unrelated ones (W-100) or as nothing at all.
 
-    It has now done its job twice on 2026-09-11: `archived` joined, and then
-    `update` did, and each time this was the single failure that named it.
+    It has now done its job three times: `archived` joined on 2026-09-11,
+    `update` did the same day, and `decoder` did on 2026-09-21 — each time this
+    was the single failure that named it.
+
+    🔴 **`decoder` is the one whose default is NOT the status quo, and that is
+    the ruling** (Arpit, 2026-09-18, on migration: *"Nothing needs to be done.
+    It is a breaking change. That's all."*). Like `fetch`, it is `required`, so
+    the `default` below is never what a line on disk resolves to — it is what
+    `render_line` uses while constructing one, and a line that omits the
+    attribute raises.
 
     🔴 **Every default here must be today's behaviour.** The URL list is
     committed, so a default that is not the status quo silently moves every
     existing clone the moment it upgrades.
     """
     assert [a.name for a in sourcelist.URLS.attributes] == [
-        "fetch", "keep", "ttl", "enrich", "archived", "update",
+        "fetch", "decoder", "keep", "ttl", "enrich", "archived", "update",
     ]
     assert _defaults() == {
         "fetch": "http",
+        "decoder": "prose",  # the pipe ruling: required, so never a fallback
         "keep": "true",      # SR-ACQUIRED: retention is on, the store is bounded
         "ttl": "24h",        # SR-URL-FRESHNESS: not 0; see decision on the default
         "enrich": "false",   # SR-PII: enrichment is always opted into
         "archived": "false", # SR-ARCHIVED-CONTENT: declared, never inferred
         "update": "auto",    # SR-URL-LIST: today's behaviour, byte for byte
     }
+    assert [a.name for a in sourcelist.URLS.attributes if a.required] == [
+        "fetch", "decoder",
+    ], "a URL line states both halves of the pipe, and nothing else is mandatory"
 
 
 def test_update_is_two_words_and_never_a_duration():
@@ -172,17 +190,18 @@ def test_archived_has_no_source_wide_layer():
 
 
 def test_absent_attributes_take_their_defaults_and_are_not_declared():
-    """⚠ **A URL line always declares `fetch` now** (W-199 D2, 2026-09-20).
+    """⚠ **A URL line always declares `fetch` and `decoder` now** (W-199 D2,
+    2026-09-20; the pipe ruling, 2026-09-21).
 
     The leniency being asserted is about every OTHER attribute: an absent one
     is its default and is not `declared`, so a later reader can tell a stated
-    policy from an inherited one. `fetch` left that set because it has no
-    source-wide layer to inherit from any more — the line states it or fails to
-    parse — so `declared` can never be empty on a URL line again.
+    policy from an inherited one. Both halves of the pipe left that set because
+    neither has a source-wide layer to inherit from — the line states them or
+    fails to parse — so `declared` can never be empty on a URL line again.
     """
     (entry,) = _parse("https://x.test/a")
     assert entry.attrs == _defaults()
-    assert entry.declared == frozenset({"fetch"})
+    assert entry.declared == frozenset({"fetch", "decoder"})
     assert not entry.is_complete()
 
     # The `dirs` grammar has no required attribute, so the empty case lives here.
@@ -197,8 +216,8 @@ def test_a_line_stating_every_attribute_is_complete():
     assert entry.is_complete()
 
     # ... and one short of the set is not, whichever one is missing.
-    (partial,) = _parse("https://x.test/a fetch=cdp keep=false")
-    assert partial.declared == {"fetch", "keep"}
+    (partial,) = _parse("https://x.test/a fetch=cdp decoder=html keep=false")
+    assert partial.declared == {"fetch", "decoder", "keep"}
     assert not partial.is_complete()
 
 
@@ -270,10 +289,10 @@ def test_a_duplicate_is_compared_on_resolved_attributes_not_on_the_text():
     """The reader is lenient: an absent attribute *is* its default."""
     (entry,) = _parse("https://x.test/a\nhttps://x.test/a keep=true")
     assert entry.attrs == _defaults()
-    # ⚠ `fetch` rides along on both lines now — the helper supplies it, and the
-    # grammar requires it. What this case is about is `keep`: the more explicit
-    # of the two duplicate lines survives.
-    assert entry.declared == {"keep", "fetch"}
+    # ⚠ `fetch` and `decoder` ride along on both lines now — the helper
+    # supplies them, and the grammar requires them. What this case is about is
+    # `keep`: the more explicit of the two duplicate lines survives.
+    assert entry.declared == {"keep", "fetch", "decoder"}
 
 
 # -- the per-file halves ---------------------------------------------------

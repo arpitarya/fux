@@ -326,6 +326,8 @@ def _layout(root: Path) -> list[Check]:
     checks.append(_fetcher_bindings(root))
     checks.append(_fetcher_routes(root))
     checks.append(_pinned_fetchers(root))
+    checks.append(_url_decoders(root))
+    checks.append(_observed_types(root))
     checks.append(_register(root))
     checks.append(_suspended_pins(root))
     checks.append(_observers(root))
@@ -757,6 +759,159 @@ def _pinned_fetchers(root: Path) -> Check:
         f"{'; '.join(drifted[:5])}"
         f"{'' if len(drifted) <= 5 else f', and {len(drifted) - 5} more'}. "
         f"Every line is a pin by design - edit the line, or leave it",
+        level="warn",
+    )
+
+
+def _url_decoders(root: Path) -> Check:
+    """`decoder=` on a URL line that names no decoder module.
+
+    **The pipe ruling's doctor row** (W-199 DoD 10), and the exact mirror of
+    `_fetcher_bindings` one screen up: the grammar checks the SHAPE of a stem
+    and cannot check that a module of that name exists, because reaching the
+    registry from the parser would make reading a committed file depend on
+    importing every decoder. So `decoder=xlxs` is a perfectly legal line naming
+    a module nobody wrote, and without this row it is discovered by the next
+    person's ingest skipping that document with `no decoder module named
+    'xlxs'`.
+
+    ⚠ **It reads the LIST, not the index**, for `_fetcher_bindings`' reason: a
+    `decoder=` is wrong the moment the line is written, which is the moment it
+    is cheap to fix.
+
+    ⚠ **A CONSUMER module is checked by name on disk, never imported.** A
+    decoder whose dependency is missing is SR-DECODE decision 7's loud ingest
+    failure and deliberately not this row's business (the pipe ruling, §3 edge
+    case 3): `doctor` is what somebody runs when the repo is already broken, and
+    it reports that a stem is absent, not that a library is.
+    """
+    from .config import load as load_config
+    from .decode import BUILTIN_MODULES, CONSUMER_DIR, PROSE_DECODER
+    from .ingest import sourcelist
+
+    name = "url decoders"
+    try:
+        config = load_config(root)
+    except FuxError:
+        return Check(name, True, "skipped (fux.toml does not load - see that row)", level="warn")
+    if config.url is None:
+        return Check(name, True, "no [sources.url] - no URL lines to resolve")
+
+    path = root / config.url.urls_file
+    if not path.is_file():
+        return Check(name, True, f"no {config.url.urls_file} yet")
+    try:
+        entries = sourcelist.parse(
+            path.read_text(encoding="utf-8"), sourcelist.URLS, origin=config.url.urls_file
+        )
+    except (FuxError, OSError):
+        return Check(
+            name, True,
+            f"skipped ({config.url.urls_file} does not parse - the fetcher bindings row "
+            "reports that)",
+            level="warn",
+        )
+    lines = [e for e in entries if not e.exclude]
+    if not lines:
+        return Check(name, True, "no URL lines listed")
+
+    try:
+        on_disk = {p.stem for p in (root / CONSUMER_DIR).glob("*.py")}
+    except OSError:
+        on_disk = set()
+    known = set(BUILTIN_MODULES) | on_disk | {PROSE_DECODER}
+
+    missing = sorted({e.attrs["decoder"] for e in lines} - known)
+    if not missing:
+        return Check(
+            name, True,
+            f"{len(lines)} URL line(s), every `decoder=` naming a module that exists",
+        )
+    shown = ", ".join(missing[:3])
+    more = f" (+{len(missing) - 3} more)" if len(missing) > 3 else ""
+    return Check(
+        name, False,
+        f"{len(missing)} `decoder=` name(s) resolve to nothing: {shown}{more}. "
+        f"Built-ins are {', '.join(sorted(BUILTIN_MODULES))}, plus {PROSE_DECODER} for bytes "
+        f"that are already text; {CONSUMER_DIR}/ has {sorted(on_disk) or 'nothing'}. "
+        "Every URL on one of these lines is skipped at ingest - fix the `decoder=`",
+    )
+
+
+def _observed_types(root: Path) -> Check:
+    """A line's declared `decoder=` against the type its last response carried.
+
+    🔴 **W-200's second provenance finding, which waited on the `decoder=` half
+    of the pipe ruling to have a field to read.** The manifest in
+    `.fux/acquired/` records the `Content-Type` of the bytes fux actually
+    retained; the line records how fux reads them. The pipe ruling says **the
+    line wins and the header loses, silently** (§3 edge case 5) — so a
+    disagreement is never an error, and this row is the only place anybody finds
+    out it exists.
+
+    ⚠ **Both directions of it are one finding, deliberately.** A page that moved
+    from HTML to a PDF export and a line typed wrong on the day it was added
+    look identical from here, and only the person who wrote the line can tell
+    them apart. It names the pair and stops.
+
+    Offline: it reads the committed list and a JSON manifest, and imports no
+    decoder.
+    """
+    from .config import load as load_config
+    from .ingest import sourcelist, urlsrc
+    from .store import acquired
+
+    name = "observed types"
+    try:
+        config = load_config(root)
+    except FuxError:
+        return Check(name, True, "skipped (fux.toml does not load - see that row)", level="warn")
+    if config.url is None:
+        return Check(name, True, "no [sources.url] - nothing is fetched")
+    try:
+        entries = sourcelist.parse(
+            (root / config.url.urls_file).read_text(encoding="utf-8"),
+            sourcelist.URLS, origin=config.url.urls_file,
+        )
+    except (FuxError, OSError):
+        return Check(name, True, "skipped (the URL list does not read)", level="warn")
+    blobs = acquired.read_manifest(root)
+    if not blobs:
+        return Check(
+            name, True,
+            "nothing retained yet - a line's declared type is compared against the bytes "
+            "`keep=true` kept, and there are none",
+            level="warn",
+        )
+
+    drifted = []
+    checked = 0
+    for entry in entries:
+        if entry.exclude:
+            continue
+        blob = blobs.get(entry.value)
+        if blob is None:
+            continue
+        checked += 1
+        declared = entry.attrs["decoder"]
+        observed = urlsrc.propose_decoder(blob.content_type, entry.value, root)
+        if observed is not None and observed != declared:
+            drifted.append(f"{entry.value} declares {declared}, last came back as {observed}")
+    if not checked:
+        return Check(
+            name, True, "no listed URL has retained bytes to compare against", level="warn"
+        )
+    if not drifted:
+        return Check(
+            name, True, f"{checked} retained URL(s), each declaring the type it came back as"
+        )
+    return Check(
+        name, False,
+        f"{len(drifted)} URL(s) whose declared `decoder=` disagrees with the last observed "
+        f"content type: {'; '.join(drifted[:5])}"
+        f"{'' if len(drifted) <= 5 else f', and {len(drifted) - 5} more'}. "
+        "The line wins by design and the header loses silently - so this is a finding, not "
+        "an error. Re-add the URL to re-observe it, or leave it",
         level="warn",
     )
 

@@ -28,9 +28,26 @@ from fux.ingest import sourcelist
 def _args(entry=None, **flags):
     base = {
         "cdp": False, "http": False, "plain": False, "hashed": False,
-        "archived": False, "types": False, "dry_run": False,
+        "archived": False, "types": False, "dry_run": False, "decoder": None,
         "no_ingest": True, "no_fetch": True, "no_accelerator": True,
     }
+    #: 🔴 **A URL entry gets `--decoder prose`, and `no_fetch=True` is why.**
+    #: Since the pipe ruling a URL line states its decoder, and `fux add`
+    #: OBSERVES it on the one fetch it performs — which `--no-fetch` forbids, so
+    #: the flag makes `--decoder` mandatory. Nearly every case here is about
+    #: something else and stays offline, so the pin is supplied for them.
+    #: `test_no_fetch_without_a_decoder_is_refused` is the case that is not.
+    #:
+    #: ⚠ **Keyed on the ENTRY's shape, never put in `base`.** `--decoder` on a
+    #: `dirs` entry is a refusal by design (the attribute set is closed), and on
+    #: a `--types` entry it would override the decoder `fux add` resolves from
+    #: the live registry — which is what half the types cases here assert.
+    if (
+        "decoder" not in flags
+        and not flags.get("types")
+        and str(entry or "").lower().startswith(("http://", "https://"))
+    ):
+        base["decoder"] = "prose"
     return SimpleNamespace(entry=entry, **(base | flags))
 
 
@@ -173,7 +190,7 @@ def test_a_trailing_slash_is_the_same_directory(repo, monkeypatch, capsys):
 
 def test_a_written_line_carries_every_attribute_even_at_its_default(repo, monkeypatch):
     _add(repo, monkeypatch, _args("https://x.test/a"))
-    assert "https://x.test/a fetch=http" in _urls(repo)
+    assert "https://x.test/a fetch=http decoder=prose" in _urls(repo)
 
 
 def test_a_dirs_line_carries_its_attribute_too(repo, monkeypatch):
@@ -251,13 +268,13 @@ def test_a_leftover_line_grammar_types_file_stops_the_verb(repo, monkeypatch):
 
 def test_flags_decide_what_is_recorded(repo, monkeypatch):
     _add(repo, monkeypatch, _args("https://x.test/a", cdp=True, plain=True))
-    assert "https://x.test/a fetch=cdp" in _urls(repo)
+    assert "https://x.test/a fetch=cdp decoder=prose" in _urls(repo)
 
 
 def test_an_unflagged_attribute_keeps_what_the_line_already_said(repo, monkeypatch):
     _add(repo, monkeypatch, _args("https://x.test/a", cdp=True, plain=True))
     _add(repo, monkeypatch, _args("https://x.test/a", hashed=True))
-    assert "https://x.test/a fetch=cdp" in _urls(repo)
+    assert "https://x.test/a fetch=cdp decoder=prose" in _urls(repo)
 
 
 def test_two_flags_for_one_attribute_is_an_error(repo, monkeypatch):
@@ -284,7 +301,7 @@ def test_archived_is_now_legal_on_a_url_too(repo, monkeypatch):
     order the two lists were built in.
     """
     _add(repo, monkeypatch, _args("https://x.test/a", archived=True))
-    assert "https://x.test/a fetch=http keep=true ttl=24h enrich=false archived=true" in _urls(repo)
+    assert "https://x.test/a fetch=http decoder=prose keep=true ttl=24h enrich=false archived=true" in _urls(repo)
 
 
 def test_a_non_http_url_is_refused_before_anything_is_written(repo, monkeypatch):
@@ -335,7 +352,7 @@ def test_adding_something_a_hand_written_ignore_covers_is_an_error(repo, monkeyp
 
 def test_a_grouping_comment_survives_an_edit(repo, monkeypatch):
     path = repo / ".fux" / "sources" / "urls"
-    path.write_text("# team A\nhttps://x.test/a fetch=http\n\n# team B\n", encoding="utf-8")
+    path.write_text("# team A\nhttps://x.test/a fetch=http decoder=prose\n\n# team B\n", encoding="utf-8")
     _add(repo, monkeypatch, _args("https://x.test/a", plain=True))
     text = _urls(repo)
     assert "# team A" in text and "# team B" in text
@@ -343,7 +360,7 @@ def test_a_grouping_comment_survives_an_edit(repo, monkeypatch):
 
 def test_a_trailing_comment_survives_an_edit(repo, monkeypatch):
     path = repo / ".fux" / "sources" / "urls"
-    path.write_text("https://x.test/a fetch=http  # the runbook\n", encoding="utf-8")
+    path.write_text("https://x.test/a fetch=http decoder=prose  # the runbook\n", encoding="utf-8")
     _add(repo, monkeypatch, _args("https://x.test/a", cdp=True))
     assert "# the runbook" in _urls(repo)
 
@@ -370,7 +387,7 @@ def test_the_file_is_written_lf_only_regardless_of_host_os(repo, monkeypatch):
 
 def test_a_fragment_bearing_url_round_trips_through_the_command(repo, monkeypatch):
     _add(repo, monkeypatch, _args("https://x.test/page#section"))
-    assert "https://x.test/page#section fetch=http" in _urls(repo)
+    assert "https://x.test/page#section fetch=http decoder=prose" in _urls(repo)
 
 
 def test_two_urls_differing_only_by_fragment_get_two_lines(repo, monkeypatch):
@@ -427,7 +444,7 @@ def test_removing_a_url_always_deletes_the_line(repo, monkeypatch, capsys):
     """`urls` has no exclusions, so there is only ever one branch to take."""
     _add(repo, monkeypatch, _args("https://x.test/a"))
     _remove(repo, monkeypatch, _args("https://x.test/a"))
-    assert "https://x.test/a fetch=http" not in _urls(repo)
+    assert "https://x.test/a fetch=http decoder=prose" not in _urls(repo)
     assert "removed" in capsys.readouterr().out
 
 
@@ -441,8 +458,8 @@ def test_removing_a_url_deletes_its_line_and_nothing_else(repo, monkeypatch):
     _add(repo, monkeypatch, _args("https://x.test/b"))
     _remove(repo, monkeypatch, _args("https://x.test/a"))
     text = _urls(repo)
-    assert "https://x.test/a fetch=http" not in text
-    assert "https://x.test/b fetch=http" in text
+    assert "https://x.test/a fetch=http decoder=prose" not in text
+    assert "https://x.test/b fetch=http decoder=prose" in text
     assert "# my list" in text
 
 
@@ -481,7 +498,7 @@ def test_dry_run_add_writes_no_bytes(repo, monkeypatch, capsys):
     _add(repo, monkeypatch, _args("https://x.test/a", dry_run=True))
     assert (repo / ".fux" / "sources" / "urls").read_bytes() == before
     out = capsys.readouterr().out
-    assert "would add" in out and "fetch=http" in out
+    assert "would add" in out and "fetch=http decoder=prose" in out
 
 
 def test_dry_run_remove_writes_no_bytes_and_names_the_branch(repo, monkeypatch, capsys):
@@ -599,7 +616,7 @@ def test_the_module_imports_no_network_library():
 
 def test_add_with_no_fetch_opens_nothing(repo, monkeypatch, capsys):
     _add(repo, monkeypatch, _args("https://x.test/a", no_fetch=True))
-    assert "https://x.test/a fetch=http" in _urls(repo)
+    assert "https://x.test/a fetch=http decoder=prose" in _urls(repo)
     assert "fetching" not in capsys.readouterr().err
 
 
@@ -616,7 +633,7 @@ def _url_repo(repo):
         encoding="utf-8",
     )
     (repo / ".fux" / "sources" / "urls").write_text(
-        "https://x.test/a fetch=http keep=true ttl=24h "
+        "https://x.test/a fetch=http decoder=prose keep=true ttl=24h "
         "enrich=false archived=false update=auto\n",
         encoding="utf-8",
     )
@@ -716,11 +733,11 @@ def test_bare_add_lists_every_list(repo, monkeypatch, capsys):
     _add(repo, monkeypatch, _args(None))
     out = capsys.readouterr().out
     assert "sources/dirs" in out and "sources/urls" in out and ".fux/formats.toml" in out
-    assert "https://x.test/a fetch=http" in out
+    assert "https://x.test/a fetch=http decoder=prose" in out
 
 
 def test_listing_marks_a_line_fux_did_not_write(repo, monkeypatch, capsys):
-    (repo / ".fux" / "sources" / "urls").write_text("https://x.test/a fetch=http\n", encoding="utf-8")
+    (repo / ".fux" / "sources" / "urls").write_text("https://x.test/a fetch=http decoder=prose\n", encoding="utf-8")
     _add(repo, monkeypatch, _args(None))
     out = capsys.readouterr().out
     assert "* https://x.test/a" in out
@@ -771,7 +788,7 @@ def test_a_cli_written_line_states_the_repo_policy_not_the_engine_default(tmp_pa
     # reached a CLI-written line; that key is deleted, and `fux add` resolves a
     # stem per URL instead. The three attributes above still carry the layer
     # W-140 row 5 was about, and `fetch` arrives as a resolved override.
-    assert "fetch=cdp" in line
+    assert "fetch=cdp decoder=prose" in line
     assert "fetch" not in defaults, (
         "`fetch` must not come back as a source-wide default - there is no default "
         "fetcher, and a silent one is what W-199 D2 deleted"
@@ -791,7 +808,7 @@ def test_an_explicit_flag_still_beats_the_repo_policy(tmp_path):
     listing.write_text("", encoding="utf-8")
 
     defaults = _source_defaults(tmp_path, sourcelist.URLS)
-    _, line, _ = add(listing, "https://wiki.test/p fetch=http", {"ttl": "30s"}, sourcelist.URLS, defaults)
+    _, line, _ = add(listing, "https://wiki.test/p fetch=http decoder=prose", {"ttl": "30s"}, sourcelist.URLS, defaults)
     assert "ttl=30s" in line, "the flag beats the repo policy, which beats the built-in"
 
 

@@ -51,6 +51,13 @@ max_parallel = {default}
 #
 # There is NO default fetcher (2026-09-20): every URL line states its own
 # `fetch=`, and `fux add` refuses a URL nothing resolves for.
+#
+# There is no `decoder` key here either, and there never was (2026-09-21). A
+# URL line states `decoder=<stem>` beside its `fetch=`, also mandatory: a
+# fetcher retrieves bytes and the decoder named on the line turns them into
+# Markdown. `fux add` observes the response's Content-Type once and writes the
+# stem. A decoder is a fact about one document's FORMAT, not a policy about
+# reaching a host, so there is nothing source-wide to configure.
 
 {url_config}
 [index]

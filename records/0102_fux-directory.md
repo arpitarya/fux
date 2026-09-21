@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@c984699b459a, src/fux/setup.py@f60d5c17f43e, tests/test_verb_table_agreement.py@1e7999ffd28f]
+owns: [src/fux/store/fuxdir.py@c984699b459a, src/fux/setup.py@9b3c541124bc, tests/test_verb_table_agreement.py@1e7999ffd28f]
 laws: [L2, L3, L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 1eb4e6ae0e094b45912bad779b0fa4bab3f52d146f68cca795fc2c6978ccf654
+content_sha: 00182a41ebc6785eb3bc5b9b6e65eed23bc5f2486003ac5621f6e1e73c859fd6
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -874,6 +874,22 @@ header prints `fetch=<name>` as **REQUIRED - no default** rather than naming a
 default it no longer has. ⚠ **That line is DERIVED from the attribute**, which
 is what stops it going stale the way W-140 row 18's transcribed table did — the
 derivation now reads `Attribute.required` as well as `Attribute.default`.
+
+**2026-09-21 — the `.fux/sources/urls` header gains the second required
+attribute** ([SR-URL-LIST](0116_url-list.md) decision 17).
+
+`setup._urls_header()` **derives** the attribute table from `URLS.attributes`, so
+`decoder=<name>  REQUIRED - no default` appeared with no edit — which is the
+point of deriving it (W-140 row 18: the header went stale by being transcribed,
+and was repaired by being derived). What is hand-written and therefore had to
+change: the worked examples, and the paragraph naming which attributes are
+mandatory.
+
+⚠ **Write-if-missing means an existing repo's header does NOT move**, and its
+list stops loading until every line carries `decoder=` — the break decision 17
+ruled. A repo that re-runs `fux setup` keeps its stale header beside a file that
+no longer parses, which is the worst pairing available and is why the error a
+line raises names the fix itself rather than pointing at the header.
 
 ### Consequences
 

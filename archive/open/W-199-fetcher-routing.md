@@ -2,14 +2,73 @@
 type: OpenItem
 id: W-199
 title: "W-199 — fetcher routing: a URL resolves to a fetcher the way a file resolves to a decoder"
-description: "Arpit's ask 2026-09-18 — build fetchers the way decoders are built: a module claim (`ROUTES`), a committed binding (`[sources.url.routes]`), a per-line pin (`fetch=`), one resolver, `fux doctor` findings. Key is the URL host. Pattern in work/proposals/fetcher-routing.md. Three decisions are Arpit's before it is buildable. RATIFIED IN SHAPE, NOT BUILT."
-status: open
+description: "Arpit's ask 2026-09-18 — build fetchers the way decoders are built: a module claim (`ROUTES`), a committed binding (`[sources.url.routes]`), a per-line pin (`fetch=`), one resolver, `fux doctor` findings. Key is the URL host. Pattern in work/proposals/fetcher-routing.md. Ruled 2026-09-20 (D1-D4); D1-D4 and three doctor rows built the same day, and DoD 10 -- the `decoder=` half of the pipe -- built 2026-09-21. CLOSED, all ten met."
+status: closed
 ruled: 2026-09-20
+closed: 2026-09-21
 lane: agent
 timestamp: 2026-09-18T00:00:00Z
 filed: 2026-09-18
 ball: agent
 ---
+
+## ✅ CLOSED 2026-09-21 — DoD 10 SHIPPED, so all ten are met
+
+**The `decoder=` half of the pipe is built.** Every URL line now states
+`decoder=<stem>` beside its `fetch=<stem>`; `fux add` observes the response's
+`Content-Type` on its one fetch and writes the stem, refusing rather than
+guessing; ingest decodes by the **declared** stem and never reads a header for
+routing again.
+
+| | what landed |
+|---|---|
+| **grammar** | `Attribute("decoder", …, required=True)` on `URLS`, validated by `_url_decoder_reason` — which refuses an **empty** value, the one difference from the `types` grammar. `Attribute.required_hint` so each required attribute names its own fix. |
+| **the plane** | `decode.decoder_named(stem, root)` (consumer, then built-in; **never** the `[decoders]` table), `decode.decode_with`, `Decoder.primary`, and `prose` reserved — `.fux/decoders/prose.py` is refused at registry build. |
+| **ingest** | `_decode_fetched(raw, decoder, url, root)`; `propose_decoder` carries the old header-then-extension ladder to `fux add`; `decoder_rel_path` keeps the URL's suffix when the decoder claims it (`csv`/`mail` branch on it); `acquired_ext` names a retained blob by the declared decoder. |
+| **the floor** | `refusals.MAGIC_BY_DECODER` — the body is checked against the **line's** format first, the header second. |
+| **ask time** | `urlsrc.declared_decoder(root, loc)`, read by `refer/source.py` and `enrich.py`, so an ask-time decode is identical to the ingest-time one **by construction**. |
+| **CLI** | `fux add --decoder <stem>`, mandatory with `--no-fetch`, and `decoder=<observed>` in a `--dry-run` preview so the dry run still opens nothing. |
+| **doctor** | `url decoders` (error) and `observed types` (warn) — **the second is W-200's second provenance finding**, which had no field to read until now. |
+
+**Records:** SR-URL-LIST 13/17 + the attribute table, SR-FETCHER 17, SR-DECODE 21,
+SR-URL-INGEST 6a, SR-REFUSAL, SR-ACQUIRED, SR-CLI, SR-DOCTOR (two rows),
+SR-REFER, SR-URL-FRESHNESS, SR-ENRICH, SR-NODE-SEARCH, SR-DOTFUX, SR-DIR-LIST,
+SR-ARCHIVED-CONTENT, SR-PII, SR-OUTPUT. GLOSSARY gains *the pipe*.
+
+**Tests:** `tests/ingest/test_url_decoders.py` (29),
+`tests/decode/test_decoder_named.py` (12),
+`tests/test_doctor_url_decoders.py` (11),
+`tests/test_add_observes_the_decoder.py` (16), plus the declared-decoder half of
+`tests/ingest/test_refusals.py` and one e2e refusal case. ~80 URL-line fixtures
+across 16 files were rewritten, not exempted.
+
+🔴 **Four things this half cost, each named rather than discovered:**
+
+1. 🔴 **`fux add <url>` opens the network TWICE** — once to observe the type,
+   once in the ingest that follows, because the line must exist before
+   `fux ingest` will fetch for it. `--decoder` skips the probe, and so does
+   re-adding a line that already declares one. The alternatives were a window
+   in which the committed file does not load, or a second way for bytes to
+   enter the index.
+2. 🔴 **`fux add` on a URL that is DOWN now writes no line at all** and exits 1.
+   It used to write the line and report *"the line is written; the fetch
+   failed"* — recording and fetching are separate outcomes (SR-CLI decision 3),
+   and that separation cannot survive an attribute whose value comes from the
+   fetch. The message names `--decoder <stem>` as the offline route.
+3. ⚠ **The break is wider than `fetch=`'s.** No line written before today
+   carries `decoder=`, because there was no attribute to write — so **every**
+   existing `.fux/sources/urls` stops loading, where `fetch=`'s break only
+   reached hand-written lines.
+4. ⚠ **One resolution changed answer by one extension.** `decoder_rel_path`
+   prefers the URL's own suffix when the declared decoder claims it, so a
+   `.tsv` URL served as `text/csv` now decodes tab-separated where the header
+   ladder read it as one comma-separated column. Better, and still *changed*.
+
+⚠ **What was NOT done, and is not owed by this item:** SR-FETCHER decision 2's
+bare-`str` transition ramp still contradicts *"a fetcher emits a format a
+decoder reads"*. Its cost was never measured and removing it breaks every
+consumer fetcher written before 2026-08-26, so it stays — named in SR-FETCHER
+17d rather than left as silence (this item's §Open question).
 
 **Addendum 2026-09-20 (W-206 review) — one spec, two rulings that compose.**
 [`proposals/fetcher-routing.md`](../proposals/fetcher-routing.md) is the **pipe**
@@ -26,9 +85,10 @@ nothing maps; ingest decodes by the declared stem; `fux doctor` checks every
 ## ✅ D1–D4 AND THE DOCTOR ROWS ARE BUILT — 2026-09-20 (Claude Code)
 
 **Shipped, in the ruled order D2 → D1 → D3 → D4 → doctor.** DoD items **1–9 are
-met**; ⚠ **item 10 — the `decoder=` half of the pipe ruling — is NOT built** and
-is why this item stays open. It arrived in the addendum above during the same
-session and was outside the prompt that built this.
+met**; ⚠ **item 10 — the `decoder=` half of the pipe ruling — was NOT built that
+day** and is why this item stayed open. It arrived in the addendum above during
+the same session and was outside the prompt that built this. **It shipped
+2026-09-21** — see the closing block at the top.
 
 | | what landed |
 |---|---|
@@ -241,7 +301,7 @@ Two smaller calls, decided here unless he objects: **collisions are hard errors*
 8. A repo with no routes table and no `ROUTES` behaves byte-for-byte as before,
    **except** the D1 rendering change — and a test states that exception.
 9. Records, skills and docs below are amended in the same change.
-10. 🔴 **`decoder=` per the pipe ruling — NOT BUILT** (added 2026-09-20 by the
+10. ✅ **`decoder=` per the pipe ruling — BUILT 2026-09-21** (added 2026-09-20 by the
     W-206 review; [`fetcher-routing`](../proposals/fetcher-routing.md) §2).
     `fux add` fills `decoder=<stem>` from `--decoder` or the response's
     `Content-Type` through the decoder registry, and **refuses when nothing

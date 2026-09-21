@@ -7,10 +7,10 @@ description: "The five stages every non-trivial feature moves through — compar
 status: accepted
 date: 2026-09-14
 feature: the order work happens in, and the artifact each stage owes
-owns: [tests/test_handoff_names_its_model.py@a0987372427e]
+owns: [tests/test_handoff_names_its_model.py@4e208c2b58ad]
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: d84554020201a6015e21c36ef9582af0621af24e3d352de9e294bd0d149ad3e6
+content_sha: 6b30516b7ee04faa6a9a5574f90dfe8d4e4ecda07d5e5d039685a4c4e08851c6
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -173,6 +173,17 @@ work that passes review because it reads well.
     reproduce the contamination it exists to remove. *What should execute this*
     still has an answer there; **a blank line is the only wrong response**, and
     letting one pass is what the earlier absence of a check did.
+
+    🔴 **Its collector guard compares against the DIRECTORY, not against a
+    queue size** (2026-09-21). It asserted `len(items()) > 3` — a guard against
+    *a collector that matches nothing is a test that always passes*, which is the
+    right worry and was the wrong instrument. Closing W-199 took the queue to
+    exactly three items and turned a healthy, correctly reconciled queue red:
+    **a threshold on the backlog's size is a gate that fires on the absence of
+    work rather than on a defect.** It now asserts the collector and
+    `work/open/*.md` name the same set, which catches the thing it was reaching
+    for — a pattern that stops matching, an exemption that grows, an empty
+    directory — and cannot go stale when an item closes.
 
     **Everything else this record says is unenforced and has to be.** The
     record owns no `src/` component under the terms

@@ -10,7 +10,7 @@ feature: the acquired plane
 owns: [src/fux/store/acquired.py@9897ee1fe4af]
 laws: []
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 3e171dc33711a72b89b10daf88def8f43bf945a569c34bf4ccf587f975bb9541
+content_sha: cb13598cbfcd9361c0c0c89dd15ab5596d68aa342dff7e77810b3200a9368d76
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -256,6 +256,30 @@ decision 15 made `fetch=` typed and validated by name shape; `keep` is a policy
 value with a genuinely closed set — `true` or `false`, and no third answer is
 coherent — so it is untouched. **Only `fetch` names a file**, which is the whole
 basis of that loosening.
+
+**2026-09-21 — a blob is named by the DECLARED decoder, not by the header**
+(the pipe ruling; [SR-URL-LIST](0116_url-list.md) decision 17).
+
+`acquired.save`'s extension argument used to be `_EXT_FOR[mime]` — the
+`Content-Type` mapped through the ingest-time table. It is now the declared
+decoder's own primary extension (`Decoder.primary`,
+[SR-DECODE](0139_decode.md) decision 21c), and `""` for `prose`.
+
+**What it fixes:** a workbook served as `application/octet-stream` was retained
+with **no extension at all** — a blob you can read and not double-click, in
+precisely the case where knowing the format matters most. *The plane names files
+by what they are.*
+
+⚠ **`prose` stays extensionless, deliberately.** Prose is text of an unknown
+flavour — `.md`? `.txt`? — and inventing one would be the guess this ruling
+removed, one layer down. It is also what `text/markdown` already produced, so
+the common case is byte-identical.
+
+⚠ **The manifest still records `content_type`, and it is now the only place the
+server's claim survives.** Nothing routes on it; `fux doctor`'s `observed types`
+row is what reads it, comparing it against the line
+([SR-DOCTOR](0152_doctor.md)). **Ordering is untouched** — `_unpack` → refusal →
+persist → decode (decision 6) — so a refusal is still never retained.
 
 ### Consequences
 
