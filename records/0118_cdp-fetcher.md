@@ -7,15 +7,18 @@ description: "The browser fetcher, for documents a plain GET cannot read. Drives
 status: accepted
 date: 2026-08-19
 feature: "`.fux/fetchers/cdp.py` — the reference fetcher for documents behind a session a headless client does not have: it borrows your browser's and hands fux the bytes"
-owns: []
+owns: [.fux/fetchers/cdp.py@0625d307e770, src/fux/templates/cdp.py.txt@0625d307e770]
 laws: [L1, L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: e4b7cbdcf97ebb1064a382678fd728058fddbdb1a178a7e65d22284211b7b523
+content_sha: d7ffa1bfbf2e6a21d57106a87170d983c8a044909fa4d5dbe9e9e10e0fb6ae1b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
-**Owns nothing** — [SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7, case (a|b); this record's own decisions say which.
+**Owns** — the components this record decides:
+
+- [`.fux/fetchers/cdp.py`](../.fux/fetchers/cdp.py) · file
+- [`src/fux/templates/cdp.py.txt`](../src/fux/templates/cdp.py.txt) · file
 
 <!-- COMPONENTS-END -->
 

@@ -7,16 +7,17 @@ description: "A declarative refusal table, every condition pure over the respons
 status: accepted
 date: 2026-09-01
 feature: refusal detection before decode
-owns: [src/fux/ingest/refusals.py@adf187806c43, src/fux/templates/refusals.toml.txt@bdf2356bc679, tools/refusal-probe@76b6f6b7f4aa]
+owns: [src/fux/ingest/refusals.py@adf187806c43, src/fux/templates/refusals.toml.txt@bdf2356bc679, tools/refusal-probe@76b6f6b7f4aa, .fux/refusals.toml@bdf2356bc679]
 laws: [L1, L3]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 866ebfb27718e599701167d8482985888608fb7f0aa50f0fd0b70c18a69de03e
+content_sha: 513728b9be79214445bf26caa34868e70617a65b4dba8c129c7e44785f5bb489
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Owns** — the components this record decides:
 
+- [`.fux/refusals.toml`](../.fux/refusals.toml) · file
 - [`src/fux/ingest/refusals.py`](../src/fux/ingest/refusals.py) · file
 - [`src/fux/templates/refusals.toml.txt`](../src/fux/templates/refusals.toml.txt) · file
 - [`tools/refusal-probe/`](../tools/refusal-probe) · dir

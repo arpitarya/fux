@@ -7,15 +7,18 @@ description: "One map of every file that governs how this repo is worked on — 
 status: accepted
 date: 2026-09-14
 feature: the governance map — which file governs what, who reads it, and what enforces it
-owns: []
+owns: [tests/test_record_paths_resolve.py@7e6f2e8e9ad4, tests/test_work_queue_rules_have_one_home.py@dd985c4ea564]
 laws: [L0]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 2fb13c923a8d458a30a24ebe7d2ba2647d512c5881d2ee3635cd4590bd0d1fb8
+content_sha: c48269784cc16ee1b0808f666e324df0336a41a87a7b4a169b69f252d9fa7bdc
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
-**Owns nothing** — [SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7, case (a|b); this record's own decisions say which.
+**Owns** — the components this record decides:
+
+- [`tests/test_record_paths_resolve.py`](../tests/test_record_paths_resolve.py) · file
+- [`tests/test_work_queue_rules_have_one_home.py`](../tests/test_work_queue_rules_have_one_home.py) · file
 
 <!-- COMPONENTS-END -->
 

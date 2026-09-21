@@ -91,6 +91,36 @@
 # buys one red commit, not the defect. SR-WORK-OWNERSHIP veto condition 6 has
 # FIRED, by ruling, and that record says so.
 #
+# 2026-09-21 — THE BASELINE DID NOT MOVE, AND THAT IS THE ENTRY (W-208).
+#
+# Three carve-outs reassigned components that had existed for weeks:
+#   src/fux/templates/http.py.txt     SR-FETCHER          -> SR-HTTP-FETCHER
+#   src/fux/templates/cdp.py.txt      SR-FETCHER          -> SR-CDP-FETCHER
+#   src/fux/query/refer_answer.py     SR-ASK              -> SR-ANSWER
+#   src/fux/store/index-record.schema.json
+#                                     SR-INDEX-LIFECYCLE  -> SR-RECORD
+# and thirty-odd previously unowned paths gained an owner for the first time.
+#
+# THIS IS THE 2026-08-21 CAUSE EXACTLY — a reassignment convicting commits that
+# were compliant under the table in force when they landed — and it is the
+# cause SR-WORK-OWNERSHIP decision 9 fixed. The gate reads
+# `git show <sha>:records/README.md` and judges every commit against the
+# register AS IT STOOD AT THAT COMMIT, so a row written on 2026-09-21 judges
+# nothing before it. NOTHING WAS RE-AUDITED AND NOTHING WAS RETIRED.
+#
+# Recorded here because the reassignment happened, not because the baseline
+# needed to move. Under the pre-decision-9 precedents this would have been a
+# sixth sha and the whole of the history before it would have stopped being
+# auditable. It is the second time the fix has paid for itself (the first is
+# SR-WORK-OWNERSHIP decision 14's renumber), and it is worth writing down
+# because nothing else would have noticed that it did.
+#
+# ONE SCOPE MOVE IS NOT A REASSIGNMENT AND IS NOTED SEPARATELY: SR-ANSWER's
+# `src/fux/query/refer_answer.py` row left the DESCRIBES table on the same day
+# it entered the ownership table. A record may not describe what it owns
+# (SR-WORK-OWNERSHIP veto condition 2), and the describes relation is read from
+# the historical register too, so the removal is not retroactive either.
+#
 # Previous baselines:
 #   1fc51a7257efeb943c512809bc531c7817dbc753
 #   301c65af310424d266ad40a4e22961722a586d97

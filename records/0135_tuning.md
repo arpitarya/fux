@@ -8,16 +8,17 @@ status: accepted
 date: 2026-08-22
 amended: 2026-09-15
 feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error contract, and per-source preference weights
-owns: [src/fux/tune.py@97814aaa4a31]
+owns: [src/fux/tune.py@97814aaa4a31, .fux/tune.toml@ba9885423d69]
 laws: [L1, L3, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: cffc7df151483e6728e3692f7289bc7ffa5e7d86c7d851658b30be4653c61ca7
+content_sha: e70ffc0f4a615b7af87ca3c1a6849d556a76c1ca590024255f55fe6cd15fe220
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Owns** — the components this record decides:
 
+- [`.fux/tune.toml`](../.fux/tune.toml) · file
 - [`src/fux/tune.py`](../src/fux/tune.py) · file
 
 **Describes** — reaches into, does not own:

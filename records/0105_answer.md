@@ -7,18 +7,21 @@ description: The single best answer the index can give — a fetched, re-scored 
 status: accepted
 date: 2026-08-18
 feature: "`fux answer` — one answer, its footing stated, and the report of what changed since the question was last asked"
-owns: []
+owns: [src/fux/query/refer_answer.py@defdd3c5c0f5]
 laws: [L1, L2, L3]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 6686b4d70792ad06aa14bb24890089b3badbd275d64325a7b83ceca8de169c39
+content_sha: c536ec75764d12f11e02f8344f1c479c0374f162f97aff108927daa26bf02616
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
+**Owns** — the components this record decides:
+
+- [`src/fux/query/refer_answer.py`](../src/fux/query/refer_answer.py) · file
+
 **Describes** — reaches into, does not own:
 
 - [`src/fux/query/__init__.py`](../src/fux/query/__init__.py) · owned by [SR-ASK](0103_ask.md)
-- [`src/fux/query/refer_answer.py`](../src/fux/query/refer_answer.py) · owned by [SR-ASK](0103_ask.md)
 
 <!-- COMPONENTS-END -->
 

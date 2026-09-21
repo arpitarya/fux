@@ -7,15 +7,18 @@ description: "A plain stdlib GET is the default fetcher, written write-if-missin
 status: accepted
 date: 2026-08-19
 feature: "`.fux/fetchers/http.py` — the fetcher a URL gets when its line says nothing"
-owns: []
+owns: [.fux/fetchers/http.py@240ceac80bc2, src/fux/templates/http.py.txt@240ceac80bc2]
 laws: [L1, L4, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 25bee2c06cb8cf5cb1106bfa420352616094b486c73479144d473d0f94d354ba
+content_sha: 37ae92a0cfcb0064bcaee59b2a46865fc9d807ca46816381004b80d58c1f63e6
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
-**Owns nothing** — [SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7, case (a|b); this record's own decisions say which.
+**Owns** — the components this record decides:
+
+- [`.fux/fetchers/http.py`](../.fux/fetchers/http.py) · file
+- [`src/fux/templates/http.py.txt`](../src/fux/templates/http.py.txt) · file
 
 <!-- COMPONENTS-END -->
 

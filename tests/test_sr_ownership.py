@@ -435,12 +435,18 @@ _UNREACHABLE_BY_THE_GATE = {
     # component, one owner. A change to that file opens SR-AGENT-POLICY, which
     # is correct -- the roster is policy; the word for it is this record.
     "SR-AGENT-SURFACES",
-    "SR-CACHEDIR-TAG", "SR-CDP-FETCHER", "SR-DIR-LIST", "SR-DOCS-TABLE",
-    "SR-FIND", "SR-HTTP-FETCHER", "SR-LAW-0", "SR-LAW-1", "SR-LAW-2",
+    # ⚠ **SR-CDP-FETCHER, SR-HTTP-FETCHER and SR-RECORD left this set on
+    # 2026-09-21** (W-208). Each gained a `src/` component it had always been
+    # the record for -- the two fetcher templates, carved out of SR-FETCHER's
+    # `templates/` claim, and `store/index-record.schema.json`, carved out of
+    # SR-INDEX-LIFECYCLE's `store/` claim. **Newly reachable is good news**, and
+    # deleting a name from here is how it is recorded.
+    "SR-CACHEDIR-TAG", "SR-DIR-LIST", "SR-DOCS-TABLE",
+    "SR-FIND", "SR-LAW-0", "SR-LAW-1", "SR-LAW-2",
     "SR-LAW-3", "SR-LAW-4", "SR-LAW-5", "SR-LAW-6", "SR-LAW-7",
     "SR-LAW-8", "SR-WORK-ENVIRONMENTS", "SR-LAW-10", "SR-LOCKS", "SR-WORK-OWNERSHIP",
     "SR-PORT-LIST",
-    "SR-POSTINGS", "SR-WORK-QUALITY", "SR-RECORD", "SR-RS",
+    "SR-POSTINGS", "SR-WORK-QUALITY", "SR-RS",
     "SR-RUNTIME-MANIFEST", "SR-RUNTIME-STAMP", "SR-RUNTIME-STATS",
     "SR-URL-INGEST", "SR-WORK-BENCHMARK", "SR-WORK-OPEN-QUEUE",
     # SR-WORK-BACKLOG (2026-09-13) owns no `src/` component and never will:

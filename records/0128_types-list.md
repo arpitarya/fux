@@ -7,16 +7,17 @@ description: "Prose plus every format a built-in decoder reads is compiled in as
 status: accepted
 date: 2026-08-20
 feature: the file-type allowlist and `.fux/formats.toml`
-owns: [src/fux/ingest/typesfile.py@2ffca40af72c]
+owns: [src/fux/ingest/typesfile.py@2ffca40af72c, .fux/formats.toml@86e430d015d0]
 laws: [L1, L3]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: ea5d8d09ef349cc3da135924ec30a312d78390242cee78a163c6a39d8e92cd29
+content_sha: 31aaf182a27d20c9ac813bf3496ffeff10c52d4727b398c63e67e58fd7711e43
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Owns** — the components this record decides:
 
+- [`.fux/formats.toml`](../.fux/formats.toml) · file
 - [`src/fux/ingest/typesfile.py`](../src/fux/ingest/typesfile.py) · file
 
 <!-- COMPONENTS-END -->

@@ -10,16 +10,17 @@ amended: 2026-08-28
 date: 2026-08-27
 ratified: 2026-08-27
 feature: configurable output defaults
-owns: [src/fux/output_config.py@8e8e57fade21]
+owns: [src/fux/output_config.py@8e8e57fade21, .fux/output.toml@3a5b84942f70]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 0f06faac88ab8b0e349f11f8eecbd0f35de1f3a72af2b45420d8c4bc0e208fca
+content_sha: 064f84c99adbd2d338096504472fe2a7b7a65ca02d3cb61bdc6a52e7e2d0d031
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Owns** — the components this record decides:
 
+- [`.fux/output.toml`](../.fux/output.toml) · file
 - [`src/fux/output_config.py`](../src/fux/output_config.py) · file
 
 **Describes** — reaches into, does not own:

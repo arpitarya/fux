@@ -649,7 +649,7 @@ table does not grant.
 | `src/fux/refer/freshness.py` | SR-URL-FRESHNESS | the six verdicts and the policy object — the **claim-strength vocabulary**, which now reaches past `refer/` into the output schema and `fux verify`. Carved out of SR-REFER's directory claim on `arc.py`'s precedent |
 | `src/fux/refer/arc.py` | SR-CACHE | the content cache, keyed `(loc, sha)` so a hit cannot change an answer |
 | `src/fux/refer/fetchcache.py` | SR-CACHE | the TTL fetch store — the only place in the engine that reads a wall clock |
-| `src/fux/templates/` | SR-FETCHER | the two shipped fetchers as package data; **bytes, never imported** |
+| `src/fux/templates/` | SR-FETCHER | shipped package data — **bytes, never imported**. ⚠ **The two fetcher templates are CARVED OUT** (2026-09-21, W-208): `http.py.txt` is SR-HTTP-FETCHER's and `cdp.py.txt` is SR-CDP-FETCHER's, each beside the `.fux/fetchers/` file it is the template for. What stays here is the directory and everything not carved out of it |
 | `src/fux/templates/pii.toml.txt` | SR-PII | the shipped starter rules, written into every repo by `fux setup` — the safe ones enabled (credentials, email, PAN, US SSN/ITIN/MBI, Canadian SIN), the risky ones commented out with what each still over-matches (decisions 12 and 12a) |
 | `src/fux/templates/refusals.toml.txt` | SR-REFUSAL | the six shipped starter rules. Carved out of SR-FETCHER's `templates/` claim on `ENRICH-SKILL.md`'s precedent — it is data a consumer edits, not a fetcher |
 | `src/fux/templates/agents/` | SR-AGENT-POLICY | the canonical agent policy and its per-vendor renderings, shipped as wheel package data (`setup.py` itself stays with SR-DOTFUX — one component, one owner) |
@@ -713,6 +713,26 @@ table does not grant.
 | `tests/test_claude_md_laws.py` | SR-LAW-0 | the bind that makes that view legal. **Owned here rather than by SR-LAWS**: what it enforces is decision 5, not any law's content |
 | `scripts/gen-components.py` | SR-LAW-0 | the records' `COMPONENTS` block — decision 5's second generated view, whose shape is [SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 16's |
 | `tests/test_record_components.py` | SR-LAW-0 | the bind that makes that view legal |
+| `tests_e2e/` | SR-CLI | the package as a user — real `fux` through `subprocess`, so what it pins is the verb surface, its exit codes and its `--json` shape. **The one test directory that IS owned**, and for the reason `tests/` is not: these tests have one subject rather than one per record |
+| `src/fux/store/index-record.schema.json` | SR-RECORD | the declared record shape itself, carved out of SR-INDEX-LIFECYCLE's `store/` claim. It is the register's own rule that a schema FILE lives beside the code it describes — and the record that DECIDES the shape is its owner. **This record owned nothing until 2026-09-21** and could therefore never be opened by the freshness gate |
+| `src/fux/query/refer_answer.py` | SR-ANSWER | the seam between `cmd_answer` and `refer()` — the candidate list, and `_load_fetchers`' per-URL dispatch. **Carved out of SR-ASK's `src/fux/query/` claim for a different DECISION**: everything else under `query/` scores the index; this file is where the `answer` verb hands off to the refer plane. It was a describes row until 2026-09-21, which left this record owning nothing |
+| `.fux/decoders/` | SR-DECODE | the eighteen twins of the built-in decoders, written into a consumer's repo by `fux setup` — **readable source IS the contract** ([L10](0011_LAW-10-bundled-output.md)). A twin that moves without the `src/fux/decode/` original fires the freshness gate, which is the point of owning the copy as well |
+| `.fux/fetchers/cdp.py` | SR-CDP-FETCHER | the signed-in-Chrome fetcher as it ships in this repo. Paired with the template below so the two cannot drift |
+| `src/fux/templates/cdp.py.txt` | SR-CDP-FETCHER | the same fetcher as package data. **Carved out of SR-FETCHER's `templates/` claim** on `refusals.toml.txt`'s precedent: the fetch CONTRACT is SR-FETCHER's, this one implementation of it is this record's |
+| `.fux/fetchers/http.py` | SR-HTTP-FETCHER | the stdlib fetcher as it ships in this repo — the pair of the template below |
+| `src/fux/templates/http.py.txt` | SR-HTTP-FETCHER | the same fetcher as package data, carved out of SR-FETCHER's `templates/` claim for the reason `cdp.py.txt` is |
+| `.fux/tune.toml` | SR-TUNE | this repo's own ranking levers. `src/fux/tune.py` is the loader and the closed key set, already owned here; **the committed file is the other half**, and a value changing in it changes what fux ranks |
+| `.fux/output.toml` | SR-OUTPUT | this repo's own rendering defaults — the file whose shape is this record's whole subject |
+| `.fux/pii.toml` | SR-PII | this repo's own redaction ruleset. Decision 1 is that the ruleset is COMMITTED, so the committed file is the record's subject and not merely its output |
+| `.fux/refusals.toml` | SR-REFUSAL | this repo's own sign-in and refusal rules — the pair of `src/fux/templates/refusals.toml.txt`, already owned here |
+| `.fux/formats.toml` | SR-TYPES | this repo's own types list. `ingest/typesfile.py` is the writer, already owned here; this is what it writes |
+| `scripts/check-open-work-inbox.py` | SR-WORK-OPEN-QUEUE | the Blocked-on-Arpit inbox check — rules 39–45, executable |
+| `.claude/hooks/guard-open-work-inbox.sh` | SR-WORK-OPEN-QUEUE | the same check at session start, which is where the first-output rule bites |
+| `scripts/commit-paths.py` | SR-WORK-SESSION | explicit pathspecs when the index carries another session's work — decision 10, executable. **This record named no code path at all until 2026-09-21** |
+| `.claude/hooks/require-progress.sh` | SR-WORK-SESSION | what a session owes before it ends (decisions 1–5), enforced at the moment it would otherwise be skipped |
+| `.claude/hooks/fux-index-hint.sh` | SR-AGENT-SURFACES | the acting surface that puts the index in front of an agent before it reaches for `grep` |
+| `tests/test_record_paths_resolve.py` | SR-WORK-GOVERNANCE | the renumber gate — a numbered record path in a live file must resolve |
+| `tests/test_work_queue_rules_have_one_home.py` | SR-WORK-GOVERNANCE | the one-home rule, over the records that carry the queue's discipline |
 <!-- OWNERSHIP-TABLE-END -->
 
 ---
@@ -780,7 +800,6 @@ rows narrowed so far were each verified by reading every mention in the file
 | `src/fux/mcp.py` | SR-OUTPUT | decisions 11, 16 and 17 reach in directly: `[mcp]`'s closed key set (`top` only, `band` refused by name), `tools/list` advertising the RESOLVED `top` rather than a literal (the W-83-class defect this decision exists to prevent), and `[mcp]` being loaded once at `serve()` start rather than per search. Owned by SR-MCP for the protocol itself; this is a rendering decision reaching into the module that serves it |
 
 | `src/fux/query/__init__.py` | SR-ANSWER | `cmd_answer` and both printers live here — `ANSWER_TOP`, the refer/index fork, `_freshness_of`. ⚠ **Added 2026-09-05 because this record owned NOTHING and therefore could never be opened by the gate**: W-108 rewrote the `answer` verb and the freshness check demanded SR-ASK, SR-CONFIDENCE, SR-OUTPUT, SR-REFER and SR-URL-FRESHNESS — every record except the one whose entire subject is the verb. Owned by SR-ASK for the scan and unification |
-| `src/fux/query/refer_answer.py` | SR-ANSWER | the seam between `cmd_answer` and `refer()` — the candidate list, and `_load_fetchers`' per-URL dispatch. Owned by SR-ASK under its `src/fux/query/` claim |
 | `src/fux/refer/_rescore.py` | SR-RERANK | `passage_boost` and the bounded multiplicative uplift reach in here (decision 9) — the same constant that reorders documents scores their passages. Owned by SR-REFER under its `src/fux/refer/` claim |
 | `src/fux/maintain/urlstate.py` | SR-REFUSAL | `refused` and `record_refusals` — the counter's storage, in the file SR-MAINTENANCE owns, on `rate_limited`'s shape with the key turned from host to rule |
 | `src/fux/ingest/urlsrc.py` | SR-URL-FRESHNESS | `_record_refusals` in `fetch_all()` — see SR-REFUSAL decision 11; the counting sits beside the refusal check the row above places |

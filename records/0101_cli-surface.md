@@ -7,10 +7,10 @@ description: Flat verbs in seven groups, one error boundary, three output modes.
 status: accepted
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@f9d609b1b3cc, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@002524c0ea96, src/fux/progress.py@925dccc045ce]
+owns: [src/fux/cli.py@f9d609b1b3cc, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@002524c0ea96, src/fux/progress.py@925dccc045ce, tests_e2e@b91110d87b7a]
 laws: [L1, L4, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: bf6c6cc0d844841aedb1d844e6fed486c3c4b2103f28e9764b3efa3ebf45a40b
+content_sha: f1bcc32511846d53e808d9cd6d45285e627dd3367ff6cda144adc82434e8d010
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -21,6 +21,7 @@ content_sha: bf6c6cc0d844841aedb1d844e6fed486c3c4b2103f28e9764b3efa3ebf45a40b
 - [`src/fux/cli.py`](../src/fux/cli.py) · file
 - [`src/fux/progress.py`](../src/fux/progress.py) · file
 - [`src/fux/sources.py`](../src/fux/sources.py) · file
+- [`tests_e2e/`](../tests_e2e) · dir
 
 <!-- COMPONENTS-END -->
 

@@ -7,15 +7,17 @@ description: "The repo shipped agent-facing files in five document kinds — ski
 status: accepted
 date: 2026-09-14
 feature: the agent-surface taxonomy, and the five acting surfaces
-owns: []
+owns: [.claude/hooks/fux-index-hint.sh@cf448bb5774a]
 laws: [L1, L3, L4]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 2c01f73872cd1c05fd1eda7ca7d401b5e461defab022eee0531a4ab04662b90b
+content_sha: c2fd2b2e78774c1070f205b7549ff8e05b959506d948f2c84788a42a385fce88
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
-**Owns nothing** — [SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7, case (a|b); this record's own decisions say which.
+**Owns** — the components this record decides:
+
+- [`.claude/hooks/fux-index-hint.sh`](../.claude/hooks/fux-index-hint.sh) · file
 
 <!-- COMPONENTS-END -->
 

@@ -7,17 +7,19 @@ description: "The live queue's discipline has one home, and this is it. Fifty-ei
 status: accepted
 date: 2026-09-13
 feature: the discipline of the single live work queue — its rules, its markers, and the three tests that enforce them
-owns: [tests/test_open_work_rows_are_short.py@01fe412431ad, tests/test_open_work_is_not_stale.py@f117a1469989, tests/test_no_work_item_is_lost.py@9b0527556e40]
+owns: [tests/test_open_work_rows_are_short.py@01fe412431ad, tests/test_open_work_is_not_stale.py@f117a1469989, tests/test_no_work_item_is_lost.py@9b0527556e40, scripts/check-open-work-inbox.py@0eee6f43e26c, .claude/hooks/guard-open-work-inbox.sh@1b479b74cb33]
 laws: [L0]
 ratifies: W-146 ruling 1 · Arpit 2026-09-13 (archive, never delete)
 timestamp: 2026-09-13T00:00:00Z
-content_sha: c6058b82129c85598dd0376b6aaad40ef910fa7e327b4e16aee407878ea78d1e
+content_sha: 9f653c114316e7f7cb96667d215b2e7e0daac03be162a901a648d7615de10129
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Owns** — the components this record decides:
 
+- [`.claude/hooks/guard-open-work-inbox.sh`](../.claude/hooks/guard-open-work-inbox.sh) · file
+- [`scripts/check-open-work-inbox.py`](../scripts/check-open-work-inbox.py) · file
 - [`tests/test_no_work_item_is_lost.py`](../tests/test_no_work_item_is_lost.py) · file
 - [`tests/test_open_work_is_not_stale.py`](../tests/test_open_work_is_not_stale.py) · file
 - [`tests/test_open_work_rows_are_short.py`](../tests/test_open_work_rows_are_short.py) · file

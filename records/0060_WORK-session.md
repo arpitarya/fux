@@ -7,15 +7,18 @@ description: "Three files every session touches — the append-only worklog, the
 status: accepted
 date: 2026-09-14
 feature: the session contract — the three files, the running pointer, and how an agent narrates and answers
-owns: []
+owns: [scripts/commit-paths.py@aba59e8951c7, .claude/hooks/require-progress.sh@840ebec2e7b7]
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 059debe0c6ea358ed52dabcaf145e692e282e12ac3990c1198905cb1468311ad
+content_sha: 599c531a6ef684c45561b8234309b3835e2639da281353a2d61b053b6a6f5085
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
-**Owns nothing** — [SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7, case (a|b); this record's own decisions say which.
+**Owns** — the components this record decides:
+
+- [`.claude/hooks/require-progress.sh`](../.claude/hooks/require-progress.sh) · file
+- [`scripts/commit-paths.py`](../scripts/commit-paths.py) · file
 
 <!-- COMPONENTS-END -->
 

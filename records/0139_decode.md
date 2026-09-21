@@ -7,16 +7,17 @@ description: "Decoding gets one home, one protocol, and a consumer seam where th
 status: accepted
 date: 2026-08-26
 feature: the decoder plane — the protocol, the registry, the consumer seam and the enrichment queue
-owns: [src/fux/decode@28eb64f5a77d, src/fux/templates/agents/DECODER-SKILL.md@474a416bcc42]
+owns: [src/fux/decode@28eb64f5a77d, src/fux/templates/agents/DECODER-SKILL.md@474a416bcc42, .fux/decoders@8bdc25ed8780]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-26T00:00:00Z
-content_sha: c3b44524f9054cbc26704e26881730af37fb68f8edbe5da668693f7fbb1e070c
+content_sha: 523cc391aeccf75b2d46bda9a5e9061a16f750424d658bad0abfccfd7a74e6f9
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Owns** — the components this record decides:
 
+- [`.fux/decoders/`](../.fux/decoders) · dir
 - [`src/fux/decode/`](../src/fux/decode) · dir
 - [`src/fux/templates/agents/DECODER-SKILL.md`](../src/fux/templates/agents/DECODER-SKILL.md) · file
 
