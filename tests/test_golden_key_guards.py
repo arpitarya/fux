@@ -34,12 +34,66 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import subprocess
 from pathlib import Path
 
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def _usable_bash() -> str | None:
+    """The first `bash` that can actually RUN a script, or None.
+
+    ⚠ **On a GitHub Windows runner, `bash` on PATH is the WSL stub in
+    `System32`**, which exits 1 without running anything. Every guard
+    invocation then came back 1, and because a guard denies with 2, all 32
+    assertions in this file read as *the guard allowed it* — the exact
+    sentence this file exists to make impossible to say by accident. A shell
+    that never started is the most misleading result it can produce, so the
+    shell is probed rather than assumed.
+    """
+    candidates: list[str] = []
+    if os.name == "nt":
+        # Git for Windows, which is what a shebang-carrying hook needs.
+        candidates += [
+            r"C:\Program Files\Git\bin\bash.exe",
+            r"C:\Program Files\Git\usr\bin\bash.exe",
+        ]
+    found = shutil.which("bash")
+    if found:
+        candidates.append(found)
+    for candidate in candidates:
+        try:
+            probe = subprocess.run([candidate, "-c", "exit 7"], capture_output=True, timeout=60)
+        except OSError:
+            continue
+        if probe.returncode == 7:
+            return candidate
+    return None
+
+
+BASH = _usable_bash()
+
+# 🔴 `jq` is not optional here, and a missing one is a SKIP rather than a pass.
+# Both guards fail closed when they cannot parse their input — they fall back
+# to grepping the raw payload — so without `jq` this file would be asserting
+# the fallback path's behaviour while claiming to assert the normal one. Two
+# green results that mean different things is worse than one honest skip.
+HAVE_JQ = bool(BASH) and subprocess.run(
+    [BASH, "-c", "command -v jq"], capture_output=True
+).returncode == 0
+
+if not BASH or not HAVE_JQ:
+    pytest.skip(
+        "the guards need a working bash and jq; this platform has "
+        f"bash={BASH!r} jq={HAVE_JQ}. The guards themselves are unchanged and "
+        "are exercised on every posix leg of the matrix — what is missing here "
+        "is a shell to run them in, not coverage of the rule.",
+        allow_module_level=True,
+    )
+
 
 SETTINGS = ROOT / ".claude" / "settings.json"
 GITIGNORE = ROOT / ".gitignore"
@@ -58,15 +112,14 @@ LEGACY = "work/golden/golden-answer"
 
 def run_hook(hook: Path, payload: dict) -> int:
     """Feed one PreToolUse payload to a guard. Returns its exit code (2 = deny)."""
-    # 🔴 Through `bash`, never as a bare path. Each guard carries a
+    # 🔴 Through a PROBED `bash`, never as a bare path. Each guard carries a
     # `#!/usr/bin/env bash` shebang, which Windows does not honour: there a
-    # bare `[str(hook)]` raises `WinError 193` before the guard runs at all,
-    # and it took 32 of this file's assertions red on the Windows matrix while
-    # both posix runners stayed green. **A guard proven on two platforms and
-    # unproven on the third is the silent narrowing this file exists to
-    # catch**, so the invocation is made portable rather than the test skipped.
+    # bare `[str(hook)]` raises `WinError 193` before the guard runs at all.
+    # Naming `bash` was the first fix and was not enough — see `_usable_bash`,
+    # where the shell that answers on a Windows runner exits 1 without running
+    # anything, which every assertion here then reads as an ALLOW.
     proc = subprocess.run(
-        ["bash", str(hook)],
+        [BASH, str(hook)],
         input=json.dumps(payload),
         capture_output=True,
         text=True,
