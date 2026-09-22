@@ -19,6 +19,14 @@ the key Arpit pastes there.
 ⚠ **Two `fux` calls per question**, so a full rung is ~250 questions × 2. Run one
 rung at a time and say which one.
 
+🔴 **`ask` carries `--why` since 2026-09-22 (W-212), and that is not cosmetic.**
+[SR-WORK-QUALITY](../../../records/0056_WORK-quality.md) decision 13: the four
+gates of the funnel are computed per query and **thrown away** unless the caller
+asks for them, and [W-204 phase D](../../regression/2026-09-22-golden-final-score/FINAL-SCORE.md)
+scored 11 716 rows without them and **could not compute the headline funnel at
+all**. A run that skips the flag produces a complete-looking hand-off with the
+headline metric's input missing.
+
 ```
 Execute work/golden/README.md "Phase 5 — Run" for rung <RUNG> (e.g. rung-00100).
 Read CLAUDE.md Non-negotiable constraints (law L11) and Conformance runs first.
@@ -40,22 +48,30 @@ at every step.
    from work/golden/ladder/<RUNG>.index; then re-ingest once, update the record,
    and state it in the report.
 3. From inside the rung directory, for every question in each set:
-     fux ask "<q>" --json --band --top 10
+     fux ask "<q>" --json --band --why --top 10
      fux answer "<q>" --json
+   --why is REQUIRED (SR-WORK-QUALITY decision 13). Its derivation.gates are the
+   only place reachable and in_window exist, they are discarded when the query
+   returns, and a filed run cannot get them back. On an arm whose ask has no
+   --why (fux-engine 1.0.0), pass --no-why; that arm's gates are null, not zeros.
    Write evidence/predictions-set-1.jsonl and evidence/predictions-set-2.jsonl,
    one line per question, one file per set, never merged:
      {"id","ranked":[paths],"answerable":bool,"band":"..."}
 4. Write the HAND-OFF, one file per set, evidence/handoff-set-N.jsonl, one line
    per question and self-contained — this is what Arpit gives Codex:
      {"id","question","answer_text","citations":[{"doc","lines"}],
-      "ranked":[paths],"answerable":bool,"band":"...","rung":"<RUNG>",
-      "engine_commit":"..."}
-   answer_text and citations are what FUX produced. There is no golden answer in
-   this file and there never will be.
+      "ranked":[paths],"answerable":bool,"band":"...",
+      "gates":{"reachable":int,"in_window":int,"placed":int,"answered":int,
+               "cut_score":float},
+      "rung":"<RUNG>","engine_commit":"..."}
+   gates is the five integers from --why and NOTHING else from the derivation;
+   it is null as a whole when the arm was not asked. answer_text and citations
+   are what FUX produced. There is no golden answer in this file and there never
+   will be.
 5. Write report.md: the rung, the engine sha and commit, the counts per set, the
-   band distribution, how many questions fux declined, the slowest and the
-   emptiest results, and anything that looked wrong. Name the two handoff files
-   as the thing to give Codex.
+   band distribution, how many questions fux declined, HOW MANY ROWS CARRY
+   FUNNEL GATES, the slowest and the emptiest results, and anything that looked
+   wrong. Name the two handoff files as the thing to give Codex.
 6. Stop. Scoring is Codex's (prompt 6). Commit only your own paths; do not push.
 ```
 

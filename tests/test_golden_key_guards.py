@@ -98,6 +98,70 @@ if not BASH or not HAVE_JQ:
 SETTINGS = ROOT / ".claude" / "settings.json"
 GITIGNORE = ROOT / ".gitignore"
 DIRS = ROOT / ".fux" / "sources" / "dirs"
+
+# 🔴 **The switch, and this file now has TWO states to describe.**
+# [L11](../records/0012_LAW-11-sealed-answer-key.md) decision 14 (Arpit,
+# 2026-09-21) made the prohibition a **locked state** with a named way out:
+# `just golden-unlock` removes the deny rules and both hook registrations, and
+# `just golden-lock` restores them byte-identically.
+#
+# ⚠ **So "the deny rules are gone" stopped being unambiguously a narrowing.**
+# While the tree is unlocked it is the switch working; while it is locked it is
+# a guard that has silently stopped covering, which is the whole subject of this
+# file. Telling the two apart is one file read under `.claude/`, and getting it
+# wrong in either direction is bad: assert the locked shape on an unlocked tree
+# and the suite screams at a correct state until somebody learns to ignore it;
+# skip on an unlocked tree without checking anything and a narrowing hides
+# behind a switch nobody flipped.
+#
+# **The resting state is LOCKED**, so that is what the assertions below describe;
+# the unlocked arm asserts the switch's own invariant instead — the stash exists,
+# so a byte-identical restore is still possible.
+STATE_FILE = ROOT / ".claude" / ".golden-lock" / "STATE"
+STASH = ROOT / ".claude" / ".golden-lock" / "settings.json"
+
+
+def unlocked() -> bool:
+    """Is this tree open? **Opens no key path** — one file under `.claude/`."""
+    try:
+        return STATE_FILE.read_text(encoding="utf-8").strip() == "unlocked"
+    except OSError:
+        return False
+
+
+#: Applied to every assertion that describes the LOCKED shape.
+locked_only = pytest.mark.skipif(
+    unlocked(),
+    reason=(
+        "this tree is UNLOCKED (L11 decision 14) — the deny rules and the hook "
+        "registrations are down by design. `test_the_unlocked_state_can_still_be_"
+        "reversed` is what holds while it is open; run `just golden-lock` and these "
+        "describe the tree again."
+    ),
+)
+
+
+def test_the_unlocked_state_can_still_be_reversed():
+    """🔴 The one guarantee that has to hold in BOTH states.
+
+    Locked: there is no stash, and nothing to reverse. Unlocked: the stash must
+    be there, because `just golden-lock`'s whole promise is putting the exact
+    bytes back — and a switch that can open a law's enforcement but not close it
+    again is a one-way door wearing a switch's name.
+    """
+    if unlocked():
+        assert STASH.is_file(), (
+            "the tree is unlocked and the stashed settings.json is GONE. "
+            "`just golden-lock` cannot restore byte-identically. Declare it, and "
+            "restore .claude/settings.json from git by hand."
+        )
+    else:
+        assert not STASH.exists(), (
+            "a stash is present on a LOCKED tree — either a lock half-finished or "
+            "something wrote into the state directory. Declare it."
+        )
+
+
 HOOK_1 = ROOT / ".claude" / "hooks" / "guard-golden-answer.sh"
 HOOK_2 = ROOT / ".claude" / "hooks" / "guard-sealed-key.sh"
 
@@ -287,6 +351,7 @@ def deny_rules() -> list[str]:
     return json.loads(SETTINGS.read_text(encoding="utf-8"))["permissions"]["deny"]
 
 
+@locked_only
 @pytest.mark.parametrize(
     "tool", ["Read", "Edit", "Write", "MultiEdit", "NotebookEdit", "Glob", "Grep"]
 )
@@ -300,6 +365,7 @@ def test_every_file_tool_is_denied_on_both_spellings(tool):
     )
 
 
+@locked_only
 @pytest.mark.parametrize(
     "cmd",
     ["cat", "ls", "head", "tail", "grep", "rg", "find", "wc", "shasum", "md5", "cp", "mv", "rm", "open"],
@@ -310,6 +376,7 @@ def test_every_named_shell_command_is_denied(cmd):
     assert f"Bash({cmd}:*golden-answer*)" in deny_rules()
 
 
+@locked_only
 def test_both_hooks_are_registered_as_pretooluse_guards():
     settings = json.loads(SETTINGS.read_text(encoding="utf-8"))
     commands = [

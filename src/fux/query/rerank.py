@@ -256,7 +256,16 @@ def boost(query_terms: list[str], text: str) -> float:
     return best
 
 
-def rerank(root: Path, query: str, results, *, depth: int = DEPTH, weight: float = WEIGHT, read=None):
+def rerank(
+    root: Path,
+    query: str,
+    results,
+    *,
+    depth: int = DEPTH,
+    weight: float = WEIGHT,
+    read=None,
+    uplift_out: dict | None = None,
+):
     """Reorder the top `depth` results by proximity. Never adds or drops one.
 
     `read` is **injected, never imported** -- the same rule `refer/source.py`
@@ -264,6 +273,17 @@ def rerank(root: Path, query: str, results, *, depth: int = DEPTH, weight: float
     `None` when the document cannot be read; the default reads local files and
     declines `url:` documents, because reranking one offline would mean
     fetching, and `ask` is not a networked verb.
+
+    `uplift_out`, when a caller supplies a dict, receives `doc_id -> uplift` for
+    every document this pass looked at. **W-210 and
+    [SR-PROVENANCE](../../../records/0142_provenance.md) decision 14**: a printed
+    score is `BM25F x uplift x archived multiplier`, so without this number a
+    consumer shown a per-term BM25F attribution beside the printed score sees a
+    gap it can only explain by dividing -- and a ratio inferred from two rounded
+    numbers is exactly the *plausible number that disagrees with the real one*
+    this module's neighbours refuse. **It is an out-parameter for the reason
+    `rank`'s `stats_out` is one**: every existing caller is unchanged, and
+    nothing read back out of it reaches a score or an ordering.
     """
     if weight <= 0 or depth <= 0 or len(results) < 2:
         return list(results)
@@ -283,8 +303,16 @@ def rerank(root: Path, query: str, results, *, depth: int = DEPTH, weight: float
         text = reader(root, result.id, result.loc)
         if text is None:
             rescored.append((result.score, result))
+            if uplift_out is not None:
+                # 🔴 **1.0, not absent.** *"Nothing was added"* and *"nobody
+                # looked"* are different statements, and a document this pass
+                # could not read is the second one only for the reader --
+                # its score genuinely passed through unchanged.
+                uplift_out[result.id] = 1.0
             continue
         uplift = 1.0 + weight * boost(query_terms, text)
+        if uplift_out is not None:
+            uplift_out[result.id] = uplift
         rescored.append((result.score * uplift, result))
 
     rescored.sort(key=lambda pair: (-round(pair[0], 9), pair[1].id))

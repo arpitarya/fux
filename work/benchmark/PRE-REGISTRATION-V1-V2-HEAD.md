@@ -11,7 +11,7 @@ status: frozen
 
 **Asked by Arpit, 2026-09-20 (Cowork):** *"a benchmark between version one,
 version two and the latest head."* This is
-[W-204](../open/W-204-golden-outputs-scoring-and-version-benchmark.md) phase B.
+[W-204](../regression/2026-09-22-golden-final-score/FINAL-SCORE.md) phase B.
 
 **It cites [PRE-REG-BENCH-V1-VS-HEAD](PRE-REGISTRATION-V1-VS-HEAD.md) (2026-08-28)
 and does not edit it.** That document froze one sha and two arms against a

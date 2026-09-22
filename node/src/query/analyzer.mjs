@@ -1,4 +1,4 @@
-/** Analyzer v2 — the pipeline both ingest and query run, in this order:
+/** Analyzer v3 — the pipeline both ingest and query run, in this order:
  *
  *     split identifiers  ->  lower  ->  stopwords  ->  stem  ->  (caller hashes)
  *
@@ -15,16 +15,27 @@
 
 import { stem } from "./stem.mjs";
 
-/** Matched against the ORIGINAL text, not a lowercased copy. Hyphen is absent
- *  from the class, so `kebab-case` splits here for free. */
-const WORD_RE = /[A-Za-z0-9_]+/g;
+/** Matched against the ORIGINAL text, not a lowercased copy.
+ *
+ *  🔴 **v3 (W-205 part 2, family (a)): `-`, `.` and `/` join `_` inside a
+ *  token.** Under v2 the class was `[A-Za-z0-9_]+`, so `RF-118` arrived as two
+ *  raw tokens and the module's own promise — whole AND parts are both emitted —
+ *  held for `snake_case` and silently failed for every other separator.
+ *
+ *  The trailing-run requirement is what stops sentence punctuation being glued
+ *  on: in `finished. Next` the `.` is not followed by an alphanumeric run. */
+const WORD_RE = /[A-Za-z0-9_]+(?:[-./][A-Za-z0-9_]+)*/g;
 
 /** The three places a real identifier boundary can sit:
- *    `_`                      snake_case
+ *    `_` `-` `.` `/`          snake_case, kebab-case, dotted, pathlike
  *    lower/digit -> upper     getUser, bm25F
  *    upper -> upper+lower     HTTPServer
- *  A token with none of these is left whole — `sha256`, `utf8`, `k1`. */
-const BOUNDARY_RE = /_+|(?<=[a-z0-9])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])/;
+ *  A token with none of these is left whole — `sha256`, `utf8`, `k1`.
+ *
+ *  🔴 v3 adds `-`, `.` and `/` to the `_` alternative. The PARTS were already
+ *  emitted for those separators (WORD_RE split on them); what was missing was
+ *  the WHOLE, and that is the whole of family (a). */
+const BOUNDARY_RE = /[_\-./]+|(?<=[a-z0-9])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])/;
 
 const STOPWORDS = new Set(
   `a an and are as at be but by for from has have how i if in into is it its

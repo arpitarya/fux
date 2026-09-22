@@ -10,7 +10,7 @@ feature: the acquired plane
 owns: [src/fux/store/acquired.py@9897ee1fe4af]
 laws: []
 timestamp: 2026-09-01T00:00:00Z
-content_sha: cb13598cbfcd9361c0c0c89dd15ab5596d68aa342dff7e77810b3200a9368d76
+content_sha: fe6348916c3bb768e53882b256f61c653653c8f492581f58fbb9aec05adffc52
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -280,6 +280,15 @@ server's claim survives.** Nothing routes on it; `fux doctor`'s `observed types`
 row is what reads it, comparing it against the line
 ([SR-DOCTOR](0152_doctor.md)). **Ordering is untouched** — `_unpack` → refusal →
 persist → decode (decision 6) — so a refusal is still never retained.
+
+⚠ **Unchanged by W-210 (2026-09-22), and touched here only because the register
+says so.** That change edited two things in `src/fux/store/fuxdir.py`: the
+`runtime` kind's description string, which gained `runtime/trace/`
+([SR-DOTFUX](0102_fux-directory.md); [SR-SERVE](0158_serve.md)), and the verb
+table `_readme()` writes, which gained `fux serve`
+([SR-CLI](0101_cli-surface.md)). **Neither reaches this record's claim on that
+file**, and saying so is the point of the freshness gate — the prompt is *re-read
+the record*, and the honest outcome of re-reading it can be *nothing moved*.
 
 ### Consequences
 

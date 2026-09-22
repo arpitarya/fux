@@ -78,6 +78,28 @@ export function deriveWlen(flen, scoring = DEFAULT_SCORING, anchorLen = 0) {
   return total;
 }
 
+/** One term's summand — **the only place this arithmetic is written.**
+ *
+ *  Extracted from `scoreRecord`'s loop so the per-term attribution `--why`
+ *  prints (W-210) is the *same* expression the score was built from rather
+ *  than a second copy of it. Same operations in the same order, so the double
+ *  result is bit-identical and the differential law against Python cannot pick
+ *  up a difference from the extraction.
+ *
+ *  ⚠ **`wtf` arrives already weighted**, not as a `tf` list, because the anchor
+ *  fold adds to it before saturation — BM25F is weight-then-saturate ONCE — and
+ *  a signature taking `tf` would invite a caller to saturate twice.
+ *
+ *  ⚠ **Nothing in `node/` calls this yet.** The Node reader has no `--why`
+ *  surface, so the attribution itself is Python-only today; the seam is
+ *  transcribed with the formula so that a future port has one place to reach
+ *  for, rather than re-deriving the expression from the Python.
+ */
+export function termContribution(wtf, wlen, dfH, n, avgWlen, scoring = DEFAULT_SCORING) {
+  const denom = wtf + scoring.k1 * (1 - scoring.b + scoring.b * wlen / avgWlen);
+  return idf(dfH, n) * wtf * (scoring.k1 + 1) / denom;
+}
+
 /** Sum of each matched query term's weight-then-saturate contribution.
  *
  * ⚠ `termWeights === null` performs **no multiply at all** — not a multiply by
@@ -93,7 +115,6 @@ export function scoreRecord(
   let wlen;
   if (typeof flen === "number") wlen = flen;
   else wlen = anchorTf !== null ? deriveWlen(flen, scoring, anchorLen) : deriveWlen(flen, scoring);
-  const k1 = scoring.k1, b = scoring.b;
   const anchorWeight = scoring.anchor;
   let total = 0.0;
   for (const h of queryHashes) {
@@ -113,8 +134,7 @@ export function scoreRecord(
       if (count) wtf += anchorWeight * count;
     }
     if (wtf === 0) continue;
-    const denom = wtf + k1 * (1 - b + b * wlen / avgWlen);
-    let contribution = idf(df[h] ?? 0, n) * wtf * (k1 + 1) / denom;
+    let contribution = termContribution(wtf, wlen, df[h] ?? 0, n, avgWlen, scoring);
     if (termWeights !== null) contribution *= (termWeights[h] ?? 1.0);
     total += contribution;
   }

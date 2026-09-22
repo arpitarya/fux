@@ -74,8 +74,8 @@ a mirror with a wedged shell, so **every finding is to verify, not to act on**.
    addressed more cheaply, so the case for the bigger change is now weaker
    and needs re-making rather than assuming.
 3. **Unicode analyzer** (A.14) — it's a quality item as much as a bug.
-   ✅ **Cross-reference added 2026-09-20 (W-206 B1): this is now
-   [W-205](../open/W-205-identifiers-reachable-and-whole.md).** The analyzer's
+   ✅ **Cross-reference added 2026-09-20 (W-206 B1): this became W-205, closed
+   2026-09-22 into [SR-RANKING](../../records/0111_ranking.md) decision 9.** The analyzer's
    identifier handling was measured in 2026-09 and is **two defects, not one**
    — `_WORD_RE`'s class holds `_` but not `-`/`.`/`/`, and `should_stem`
    protects digits but not all-letter fragments — plus a **third** W-202

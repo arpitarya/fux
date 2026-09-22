@@ -587,9 +587,9 @@ flowchart TB
   W{"separation &lt; separation_floor (0.10)?"}
   B0["none — answerable: false"]
   B1["partial"]
-  B2["weak"]
+  B2["weak — a SIGNAL, answerable: true"]
   B3["grounded"]
-  G["W-176 (open): nine gates in a weakest-link chain"]
+  G["W-176: nine gates; gate 1 shipped 2026-09-14, reversed 2026-09-22"]
   S --> N
   N -- yes --> B0
   N -- no --> P
@@ -613,17 +613,37 @@ starting value with no standing"), else `grounded` (SR-CONFIDENCE d3, d6,
 d12–d13). The band is always emitted over MCP; on the CLI it prints under
 `--band` or `[cli] band = true` in `output.toml` (d11).
 
-**The honest state of abstention.** On a blind set of 20 unanswerable
-questions fux answered 20 of 20, twice, fourteen days apart
-(`2026-08-28-blind-unanswerable`, `2026-09-11-…-rerun`); on the golden ladder,
-0 abstentions of 124 on every rung while the key holds 12 unanswerables
+**Only `none` refuses, and the other candidate was tried and withdrawn.**
+`answerable` is `band != none`. It covered `weak` as well for eight days —
+W-176 gate 1, ruled 2026-09-14 — and was reversed on 2026-09-22 (SR-CONFIDENCE
+d3a) after `2026-09-22-band-operating-point` swept seven floors from `0.00` to
+`0.30` over 2 992 questions, eight rungs and three independently authored
+retired sets: **the questions the band withheld were more likely to be right
+than the ones it answered, in every set**, risk rose as coverage fell in all
+three, and it suppressed fewer wrong answers than a coin withholding at its own
+rate. No floor cleared the paired bar, including `0.00`. The finding is about
+the **signal**, not the threshold: `separation` measures whether the ranking
+could choose, the band read that as whether the choice was right, and on this
+corpus the two come apart. `weak` is still computed, banded and named in
+`failed`, so a consumer that wants the abstention implements it from the
+payload — **what fux stopped doing is making that choice on the consumer's
+behalf.** ⚠ One assumption carries the result and is unmeasured: the
+`evidence_quoted` proxy must under-detect correctness equally on both sides of
+the gate.
+
+**The honest state of abstention, and the reversal restores it.** On a blind
+set of 20 unanswerable questions fux answered 20 of 20, twice, fourteen days
+apart (`2026-08-28-blind-unanswerable`, `2026-09-11-…-rerun`); on the golden
+ladder, 0 abstentions of 124 on every rung while the key holds 12 unanswerables
 (`2026-09-12-golden-ladder`); in the benchmark, 10 of 10 planted unanswerables
-answered by both versions. The engine can abstain only when nothing matches at
-all. The nine gates that address this were ruled on 2026-09-14 and are W-176
-([§10](#10-open-work)): the verdict stays a weakest-link chain — one failed
-gate makes the answer unanswerable and names the gate — never a blended score,
-because a single `0.73` averages independent failure modes and an agent handed
-`0.73` hedges in prose where an agent handed `answerable: false` stops.
+answered by both versions. **The engine can abstain only when nothing matches
+at all** — true before gate 1, briefly untrue, and true again. The remaining
+eight gates are W-176 ([§10](#10-open-work)): the verdict stays a weakest-link
+chain — one failed gate makes the answer unanswerable and names the gate —
+never a blended score, because a single `0.73` averages independent failure
+modes and an agent handed `0.73` hedges in prose where an agent handed
+`answerable: false` stops. ⚠ **A filed number that counted abstentions
+describes the pre-2026-09-22 semantics.**
 
 ---
 
@@ -836,6 +856,7 @@ not.
 | `answer` top-3 | 13 fixed / 0 broken; recall 0.4341 → 0.8256; 8/43 `grounded` → `weak` | `2026-09-05-answer-top3` | informed |
 | Playground recall (43 complete goldens) | recall@1 0.5969 · @3 0.8566 · @5 0.9535 · @10 0.9884; annotator κ = 0.960 | `2026-08-28-first-recall` · `-annotator-agreement` | informed |
 | Abstention | 0 of 20 blind unanswerables, twice; 0 of 124 on every golden rung; 10/10 planted answered | `2026-08-28-blind-unanswerable` · `2026-09-12-golden-ladder` · `2026-09-13-benchmark-captures` | blind set / informed |
+| Abstention gate (W-213) | **no floor wins, including `0.00`**: what the band withheld was more likely RIGHT than what it answered, in all 3 sets; risk rose as coverage fell in all 3; fewer wrong answers suppressed than a rate-matched coin in all 3 → gate 1 reversed | `2026-09-22-band-operating-point` | informed |
 | Rerank cost | +18.9 / +18.0 ms p50 at rung 100 (ask / answer); +15.3 / +14.8 at rung 1 000; a constant | `2026-09-13-rerank-cost` | surface capture |
 | Rerank benefit | 28 → 32 on the playground, net 4 — cannot clear the floor | `2026-08-24-rerank-and-goldens` | marked |
 | Hook latency (R5) | inline: 44.4 s @100k · 3.52 s @10k · 0.651 s @1k vs 1 s → **FAIL**, hence deferral; one-doc re-ingest 0.84 s @10k after | `2026-08-20-r5-hook-latency` · `2026-08-23-r5-rerun` | — |
@@ -1062,9 +1083,13 @@ flowchart LR
 ### 10.2 Knowing when not to answer
 
 - 🟢/🟣 **W-176 — the nine abstention gates.** Ruled (a): all nine, in order,
-  each behind its own flag, kept or removed on its own row. Gate 1 (`weak` ⇒
-  `answerable: false`) and gate 9 (consumer steering) and the output surface
-  land now; answer-type check, passage co-occurrence, IDF-weighted coverage,
+  each behind its own flag, kept or removed on its own row. 🔴 **Gate 1 (`weak`
+  ⇒ `answerable: false`) shipped 2026-09-14 and was REVERSED on 2026-09-22**
+  (W-213 → W-214): the gate was measured and withheld answers that were more
+  likely right than the ones it let through, so `weak` is a published signal
+  and only `none` refuses. **It is the first gate of this programme to be
+  measured, and it was removed** — which is the programme working. Gate 9
+  (consumer steering) and the output surface land now; answer-type check, passage co-occurrence, IDF-weighted coverage,
   identifier hard-fail, verification floor and QPP (NQC, Clarity) are measured
   behind flags once the golden key carries enough unanswerable questions
   (Codex, 2026-09-30); graph coherence after W-161. The verdict stays a

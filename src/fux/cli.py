@@ -95,6 +95,12 @@ def _cmd_enrich(args) -> int:
     return cmd_enrich(args)
 
 
+def _cmd_serve(args) -> int:
+    from .serve import cmd_serve
+
+    return cmd_serve(args)
+
+
 def _cmd_mcp(args) -> int:
     from .mcp import cmd_mcp
 
@@ -819,6 +825,21 @@ def build_parser() -> argparse.ArgumentParser:
         help="ignore .fux/output.toml and use the engine defaults",
     )
     p_mcp.set_defaults(func=_cmd_mcp)
+
+    # W-210 — the ask explorer. A LOCAL page over the real `ask`, and the verb
+    # carries no `--host`: `serve.HOST` is the contract, not a default, and a
+    # flag would turn a refusal into a preference. See `serve/__init__.py`.
+    p_serve = sub.add_parser(
+        "serve", help="a local page that shows why each document ranked, over the real `ask`"
+    )
+    p_serve.add_argument(
+        "--port", type=int, default=None, metavar="N",
+        help="port on 127.0.0.1 (default 7337; 0 asks the OS for a free one)",
+    )
+    p_serve.add_argument(
+        "--open", action="store_true", help="open the page in a browser once the server is up"
+    )
+    p_serve.set_defaults(func=_cmd_serve)
 
     p_hooks = sub.add_parser("hooks", help="install the git hooks and the index merge driver")
     p_hooks.add_argument("--install", action="store_true", help="write them (the default)")

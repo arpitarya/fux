@@ -49,7 +49,7 @@ advantage is a warm process with no per-call start-up, and a client with no shel
 |---|---|
 | `grounded` | use the results and cite them |
 | `partial` | answer, but **name every term in `missing`** — or retry with `expand` (below) |
-| `weak` | the top hits are not separable — **`answerable: false`, so abstain**: say *the documents don't say*, then report the candidates. Never a conclusion |
+| `weak` | the top hits are not separable — **`answerable` stays `true` since 2026-09-22**, a signal rather than a refusal. Read the near-tied candidates and judge; if neither answers, say the documents don't say |
 | `none` (`answerable: false`) | **do not answer from these results.** Say what was searched and stop |
 
 - **`k`** defaults to the server's resolved `[mcp] top` (§3), and the tool schema
@@ -218,7 +218,7 @@ workspace one. Check the MCP server panel.
 
 ## Don't
 
-- **Don't answer from `fux_search` when `answerable` is `false`**, or skip `missing` on `partial`.
+- **Don't answer from `fux_search` when `answerable` is `false`**, or skip `missing` on `partial`. ⚠ `answerable: false` is `band: none` only — **`weak` is a signal you judge, not a refusal**.
 - **Don't pass a bare URL to `fux_related`** — prefix `url:`.
 - **Don't expect `fux_passage` to fetch** — it reads local files; URL documents need `fux answer`.
 - **Don't write a bare `fux` into a GUI client's config** without testing that the client can launch it.

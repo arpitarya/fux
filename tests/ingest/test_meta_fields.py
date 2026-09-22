@@ -157,11 +157,27 @@ def test_a_claim_naming_no_index_field_is_refused() -> None:
         _meta_fields_of(Mod, "mod", "<mod>")
 
 
-def test_values_go_in_through_the_analyzer_so_part_1_does_not_make_an_id_whole() -> None:
-    """🔴 Decision 23d, made executable. `QCL-IT-ADR-08` enters the index and
-    STILL loses its `IT` to the stopword list — part 1 buys reachability, and
-    wholeness is a separate change that did not clear its bar."""
+def test_values_go_in_through_the_analyzer_so_part_2_reaches_them_too() -> None:
+    """🔴 Decision 23d, made executable — and the reason part 1 routes values
+    **through** the analyzer rather than appending them raw.
+
+    ⚠ **This assertion inverted on 2026-09-22, and the inversion is the point.**
+    When part 1 shipped, the analyzer was `v2`: `QCL-IT-ADR-08` reached the index
+    and arrived in pieces, so this test pinned *reachable but not whole* and said
+    so in its name. W-205 part 2 family (a) made `-` an identifier separator like
+    `_`, and because part 1 feeds the analyzer instead of bypassing it, **the
+    whole form appeared here with no change to `parse.py` at all**. That is the
+    composition the two parts were ordered for; a part 1 that appended raw values
+    would have been untouched by part 2 and would still be wrong.
+
+    `IT` still goes to the stopword list, and that is correct: the stopword pass
+    runs on the *parts*, never on the whole token, so `qcl-it-adr-08` survives
+    beside `qcl`, `adr` and `08`."""
     fields = extract_fields("a.md", doc(doc_id="QCL-IT-ADR-08"))
     title = terms_in("title", fields)
-    assert "it" not in title
-    assert "qcl-it-adr-08" not in title, "the analyzer is v2; the whole form does not exist"
+    assert "it" not in title, "the stopword pass still runs over the parts"
+    assert "qcl-it-adr-08" in title, (
+        "the analyzer is v3 and the whole form must exist beside its parts — "
+        "if this is missing, part 1 has stopped routing values through analyze()"
+    )
+    assert {"qcl", "adr", "08"} <= title, "the parts must survive alongside the whole"

@@ -80,6 +80,37 @@ Codex task is **corpus authorship first** — questions alone cannot satisfy it.
 opens the sealed answer key, so no Claude session can author the questions
 this run needs or score them.
 
+⚠ **ADDENDUM 2026-09-22 (W-168) — the edges arrived and the INPUT did not.
+Clause 5 is still in force, for a different reason, and NO THRESHOLD BELOW
+MOVES.** [The census](../2026-09-22-anchor-input-census/report.md) re-counted
+the ladder after set-3's link-bearing documents landed:
+
+| | 2026-09-15 | 2026-09-22 |
+|---|---:|---:|
+| `ref` edges per rung | 0 | **61** |
+| anchor-bearing edges | 0 | **61** |
+| anchor terms | 0 | **266** |
+| **anchor-DISTINCTIVE terms / targets** | 0 / 0 | **1 / 1** |
+
+🔴 **Every word a linker uses is already in the document it points at.** The one
+exception is a bare-path link whose "distinctive vocabulary" is the target's own
+filename. §*What the data must contain* **row 1 is measured absent**, and row 3
+is absent as a consequence: **0 of 373 retired questions** contain a term a
+linker supplies and the target lacks, which no rewording could change while the
+corpus stays as it is.
+
+⚠ **set-3's `link_dependent: 14` is NOT this input.** Those questions are
+link-dependent in the **multi-hop** sense and exercise the refer plane.
+
+⚠ **Two clauses of this file are overtaken by later rulings, and NEITHER is a
+number.** *"Codex's hands, not an agent's"* and *"no Claude session can author
+the questions this run needs or score them"* were written under the L11 regime
+of 2026-09-15. Arpit ruled *"no feature waits on Codex"* on 2026-09-20, and L11
+decision 14 (2026-09-21) retired the sets into open regression data. **So a
+Claude session may run and score these arms when the corpus can support them**
+— `informed` permanently. **The arms, the order, the four clauses of the
+decision rule and the hub control are untouched.**
+
 ## The decision rule, frozen
 
 **Default the FIRST value, in ascending order `0.5 → 1.0 → 2.0 → 3.0`, that:**

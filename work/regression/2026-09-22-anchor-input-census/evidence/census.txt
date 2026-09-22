@@ -1,0 +1,11 @@
+corpus            docs   edges    ref  anchored   terms  DIST t/d  srcs  tgts   kinds
+rung-00100         100      72     61        61     266       1/1     8    25   {'ref': 61, 'supersedes': 11}
+rung-00200         200      82     61        61     266       1/1     8    25   {'ref': 61, 'supersedes': 21}
+rung-00500         500     112     61        61     266       1/1     8    25   {'ref': 61, 'supersedes': 51}
+rung-01000        1000     162     61        61     266       1/1     8    25   {'ref': 61, 'supersedes': 101}
+rung-02000        2000     262     61        61     266       1/1     8    25   {'ref': 61, 'supersedes': 201}
+rung-05000        5000     562     61        61     266       1/1     8    25   {'ref': 61, 'supersedes': 501}
+rung-10000       10000    1062     61        61     266       1/1     8    25   {'ref': 61, 'supersedes': 1001}
+rung-seed           28      65     61        61     266       1/1     8    25   {'ref': 61, 'supersedes': 4}
+corpus            docs   edges    ref  anchored   terms  DIST t/d  srcs  tgts   kinds
+this-repo         1672    7550   4768      4768   30038  1050/594   599   793   {'code': 2689, 'ref': 4768, 'supersedes': 1, 'tag': 92}

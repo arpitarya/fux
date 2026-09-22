@@ -11,7 +11,7 @@ owns: [tests/test_open_work_rows_are_short.py@01fe412431ad, tests/test_open_work
 laws: [L0]
 ratifies: W-146 ruling 1 · Arpit 2026-09-13 (archive, never delete)
 timestamp: 2026-09-13T00:00:00Z
-content_sha: 9f653c114316e7f7cb96667d215b2e7e0daac03be162a901a648d7615de10129
+content_sha: 5edd95523d47310d7d94bd1da535b8b1f9afe7002e061e422a6b44fcfe9c3ab5
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -272,7 +272,7 @@ that is the only thing the file says.
     status.
 48. **A WORKLOG entry per substantive exchange** — a chat-only session counts.
 49. **This file and the item's detail file on any status change**, a
-    DOC-REGISTRY row bump for any doc touched, and INTERVIEW kept current
+    registry row bump (SR-WORK-REGISTRY §3) for any doc touched, and INTERVIEW kept current
     *during* the session.
 50. **Reconcile before you report.**
 51. **Records are cited by name**, never by number.
@@ -401,7 +401,7 @@ both `↳ blocks:` checks validating a single row for two days, green throughout
 
    - **rule 10's *"leaves the file entirely"***, read out of context, reads as
      deletion — it is about the queue, and now says so; and
-   - **`work/DOC-REGISTRY.md`'s trigger for `work/open/`**, which literally
+   - **the registry's trigger for `work/open/`** ([SR-WORK-REGISTRY](0067_WORK-registry.md) §3), which literally
      read *"its file is created with its index row and **deleted with it**"*.
      A freshness trigger is not where anyone looks for the lifecycle rule,
      which is exactly why it went uncorrected for three weeks.

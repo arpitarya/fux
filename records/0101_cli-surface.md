@@ -7,10 +7,10 @@ description: Flat verbs in seven groups, one error boundary, three output modes.
 status: accepted
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@b12b958fcd16, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@9876744812b5, src/fux/progress.py@925dccc045ce, tests_e2e@40f9827c79ab]
+owns: [src/fux/cli.py@3e9d9763b182, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@9876744812b5, src/fux/progress.py@925dccc045ce, tests_e2e@09050be78ad5]
 laws: [L1, L4, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 537130f7534e92bc5f18e7804340b5655603c37ecf0daf49f1505fc841f2625a
+content_sha: c5507406066f26e61eeaf7480fba31d6d9fb690412b594e98de0ca6403adabfd
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -38,7 +38,7 @@ content_sha: 537130f7534e92bc5f18e7804340b5655603c37ecf0daf49f1505fc841f2625a
 | **sources** | `add` · `remove` · `enrich` · `correct` | maintain what is indexed — `add` and `remove` write lines and end in an ingest, `enrich` plans and validates a MODEL's text, and `correct` writes one question a PERSON typed ([SR-ENRICH](0137_enrich.md) decision 19). ⚠ **`update` was a fourth verb here and decision 16 deleted it** |
 | **read** | `ask` · `find` · `answer` · `lexical` | differ only in how much they commit to. `lexical` is the words alone, **frozen** — decision 12 |
 | **graph** | `explain` · `graph` · `path` | answer with **relationships**, never with a ranking |
-| **serve** | `mcp` · `daemon` | long-running processes; the only verbs that do not return |
+| **serve** | `serve` · `mcp` · `daemon` | long-running processes; the only verbs that do not return. `serve` (W-210, 2026-09-22) is a **local page over the real `ask`**, bound to `127.0.0.1` with no `--host`; `mcp` is the same index over the Model Context Protocol; `daemon` watches for staleness |
 | **maintenance** | `hooks` · `tune` · `output` · `verify` | wire the repository to keep its own index in step, print the tunables and the output defaults, and re-run a provenance receipt against this tree |
 
 ⚠ **`output` was missing from this table until 2026-09-14 (W-164 gate 2).**
@@ -410,7 +410,7 @@ is FROZEN.** (W-160.)
 - **A future component added to the lexical core is a NEW VERB or a TUNABLE,
   never a change to this one.** That sentence is the whole decision; everything
   else here is what makes it hold.
-- **It exists because [W-161 → W-204](../work/open/W-204-golden-outputs-scoring-and-version-benchmark.md) gives
+- **It exists because [W-161 → W-204](../work/regression/2026-09-22-golden-final-score/FINAL-SCORE.md) gives
   `ask` a graph tier.** After that, `ask --scan` is no longer *the words alone*
   — and nothing would have said so. Every ranking verdict needs a baseline arm
   that cannot quietly acquire a stage.

@@ -28,9 +28,11 @@ Never activate a virtualenv, and never install anything.
 - `fux answer "<question>"` — the single best passage, fetched when reachable.
 
 Add `--band` for a confidence block, or set `band = true` in
-`.fux/output.toml` so every run carries one. `answerable: false` means **do not
-answer from these results** — say what was searched and stop. `band: partial`
-means answer, but name every term in `confidence.missing`.
+`.fux/output.toml` so every run carries one. `answerable: false` — band `none`,
+the only band that refuses — means **do not answer from these results**: say
+what was searched and stop. `band: partial` means answer, but name every term
+in `confidence.missing`. `band: weak` means the top two are near-tied — a
+signal to read both, not a refusal.
 
 ## Archived documents are not evidence
 

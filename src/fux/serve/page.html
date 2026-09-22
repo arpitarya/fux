@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<!--
+  fux serve — the ask explorer.
+
+  🔴 THIS PAGE COMPUTES NO SCORE, NO BAND AND NO RANK. Every number it shows is
+  a field of `fux ask --json --why`. The only arithmetic below is presentation:
+  a percentage of #1 for a bar width, and the difference of two printed numbers
+  for a delta. `tests/serve/test_page_computes_nothing.py` asserts that, because
+  a second ranker in here would be a restatement in the L0 sense — two rankers
+  that can disagree while both look correct.
+
+  One file, inline, no external host: it must render with the network unplugged.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>fux — ask explorer</title>
+<style>
+  :root{
+    --bg:#0a0c12; --card:rgba(255,255,255,.035); --line:rgba(255,255,255,.08);
+    --fg:#e8ecf5; --dim:#9aa4bd; --faint:#6b7590;
+    --a1:#7c5cff; --a2:#3ec6ff; --ok:#22d3a6; --warn:#f5a524; --bad:#ff5c7a; --gold:#ffd166;
+    --r:18px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--fg); min-height:100vh;
+    font-family:Inter,-apple-system,"SF Pro Text","Segoe UI",system-ui,sans-serif;
+    font-size:15px; line-height:1.55; padding:0 16px 64px;
+  }
+  .mono,.num{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums}
+  .wrap{max-width:980px;margin:0 auto}
+  header{padding:40px 0 20px}
+  h1{font-size:19px;margin:0;letter-spacing:-.01em}
+  h1 span{background:linear-gradient(90deg,var(--a1),var(--a2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:var(--dim);font-size:13px;margin-top:6px}
+
+  /* command bar */
+  .bar{position:relative;border-radius:var(--r);padding:1px;background:linear-gradient(90deg,var(--a1),var(--a2),var(--a1));background-size:200% 100%;animation:sweep 6s linear infinite}
+  @keyframes sweep{to{background-position:200% 0}}
+  @media (prefers-reduced-motion:reduce){.bar{animation:none}}
+  .bar input{
+    width:100%;border:0;outline:0;border-radius:calc(var(--r) - 1px);
+    background:#0d1018;color:var(--fg);padding:16px 18px;font-size:16px;font-family:inherit;
+  }
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .chip{background:var(--card);border:1px solid var(--line);color:var(--dim);border-radius:999px;padding:5px 12px;font-size:12.5px;cursor:pointer}
+  .chip:hover{color:var(--fg);border-color:rgba(255,255,255,.18)}
+
+  /* stepper */
+  .stepper{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:22px 0 4px;color:var(--faint);font-size:12.5px}
+  .step{display:flex;align-items:center;gap:7px;padding:5px 11px;border:1px solid var(--line);border-radius:999px;background:var(--card);transition:color .25s,border-color .25s}
+  .step .dot{width:7px;height:7px;border-radius:50%;background:var(--faint);transition:background .25s}
+  .step.on{color:var(--fg);border-color:rgba(124,92,255,.45)}
+  .step.on .dot{background:var(--a1)}
+  .step.skip{opacity:.42}
+  .arrow{color:var(--faint)}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-top:14px;backdrop-filter:blur(8px)}
+  .card h2{font-size:13px;margin:0 0 12px;color:var(--dim);font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+
+  .pills{display:flex;flex-wrap:wrap;gap:7px}
+  .pill{border:1px solid var(--line);border-radius:999px;padding:4px 11px;font-size:12.5px}
+  .pill.kept{color:var(--fg);border-color:rgba(62,198,255,.4)}
+  .pill.stop{color:var(--faint);text-decoration:line-through}
+  .pill.unknown{color:var(--bad);border-color:rgba(255,92,122,.45)}
+
+  /* confidence ring */
+  .band{display:flex;align-items:center;gap:16px}
+  .ring{width:96px;height:96px;flex:0 0 auto}
+  .ring circle{fill:none;stroke-width:9;stroke-linecap:round}
+  .ring .bg{stroke:rgba(255,255,255,.07)}
+  .bandtxt b{font-size:17px}
+  .bandtxt div{color:var(--dim);font-size:12.5px}
+
+  /* results */
+  .row{border:1px solid var(--line);border-radius:14px;padding:13px 15px;margin-top:9px;background:rgba(255,255,255,.02);cursor:pointer}
+  .row:hover{border-color:rgba(255,255,255,.18)}
+  .row .top{display:flex;gap:11px;align-items:baseline}
+  .rank{color:var(--faint);font-size:12px;min-width:26px}
+  .title{font-weight:600;flex:1;min-width:0;overflow-wrap:anywhere}
+  .loc{color:var(--faint);font-size:12px;overflow-wrap:anywhere}
+  .sc{color:var(--a2);font-size:13px}
+  .track{height:4px;border-radius:3px;background:rgba(255,255,255,.07);margin-top:9px;overflow:hidden}
+  .fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--a1),var(--a2));width:0;transition:width .6s ease}
+  .badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+  .badge{font-size:11.5px;border-radius:999px;padding:3px 9px;border:1px solid var(--line);color:var(--dim)}
+  .badge.boost{color:var(--a2);border-color:rgba(62,198,255,.38)}
+  .badge.arch{color:var(--warn);border-color:rgba(245,165,36,.38)}
+  .badge.title{color:var(--gold);border-color:rgba(255,209,102,.38)}
+  .badge.pin{color:var(--ok);border-color:rgba(34,211,166,.38)}
+
+  .detail{display:none;margin-top:13px;padding-top:13px;border-top:1px dashed var(--line)}
+  .detail.open{display:block}
+  .seg{display:flex;height:22px;border-radius:6px;overflow:hidden;background:rgba(255,255,255,.05)}
+  .seg i{display:block;height:100%}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;font-size:12px;color:var(--dim)}
+  .legend b{color:var(--fg);font-weight:600}
+  .sw{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:baseline}
+  .miss{color:var(--bad);border:1px dashed rgba(255,92,122,.5);border-radius:999px;padding:2px 9px;font-size:12px}
+  .maths{color:var(--faint);font-size:12px;margin-top:9px}
+  .lever{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:8px;background:rgba(255,255,255,.02)}
+  .lever .what{font-size:13.5px}
+  .lever .tag{display:inline-block;margin-top:5px;font-size:11.5px;color:var(--a2);border:1px solid rgba(62,198,255,.3);border-radius:6px;padding:2px 7px}
+  .snippet{color:var(--dim);font-size:13px;margin-top:9px;border-left:2px solid var(--line);padding-left:11px}
+
+  .empty{text-align:center;padding:26px 14px}
+  .empty .big{font-size:16px;font-weight:600}
+  .empty .why{color:var(--dim);font-size:13.5px;margin-top:7px}
+
+  footer{color:var(--faint);font-size:12px;margin-top:28px;line-height:1.7}
+  .err{color:var(--bad)}
+  @media (max-width:560px){ .band{flex-direction:column;align-items:flex-start} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>fux <span>ask explorer</span></h1>
+    <div class="sub">Type a question. See the ten documents an agent would be handed &mdash; and why each one is there.</div>
+  </header>
+
+  <div class="bar"><input id="q" autocomplete="off" spellcheck="false" placeholder="Ask the corpus a question…  (press / to focus)"></div>
+  <div class="chips" id="chips"></div>
+
+  <div class="stepper" id="stepper"></div>
+  <div id="out"></div>
+
+  <footer id="foot"></footer>
+</div>
+
+<script>
+"use strict";
+/* Every number rendered below is read from the JSON. The only arithmetic is
+   a percentage of #1 for a bar width and the difference of two printed
+   numbers. See the comment at the top of this file. */
+
+const STAGES = ["lexical", "graph", "split", "confidence", "refer"];
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const TERM_COLORS = ["#7c5cff", "#3ec6ff", "#22d3a6", "#f5a524", "#ff5c7a", "#ffd166"];
+
+function stepper(active) {
+  $("stepper").innerHTML = STAGES.map((s, i) => {
+    const skip = s === "refer";
+    const on = !skip && active > i;
+    return `<div class="step ${on ? "on" : ""} ${skip ? "skip" : ""}"><span class="dot"></span>${s}</div>` +
+           (i < STAGES.length - 1 ? '<span class="arrow">&rarr;</span>' : "");
+  }).join("");
+}
+
+/* ---- the lever rule table. One rule per condition, over the JSON. ---------
+   Each rule reads fields and emits a card; none of them computes a score. The
+   two thresholds marked provisional are not tuned to any corpus, and the page
+   says so rather than implying they are measured. */
+const NEAR_TIE = 0.15;      /* provisional */
+const BOILERPLATE = 0.35;   /* provisional: df/N above this reads as boilerplate */
+
+function levers(doc, conf, top, related) {
+  const out = [];
+  const n = conf && conf.support ? null : null;
+  const sep = conf ? conf.separation : null, floor = conf ? conf.separation_floor : null;
+  if (doc.rank === 0 && sep != null && floor != null && sep < floor)
+    out.push(["Coin flip with #2 — separation " + sep + " is under the floor " + floor + ". Pin the intended answer.", "fux correct --pin"]);
+  (doc.missing || []).forEach((m) =>
+    out.push(["Never says “" + m + "” — the document is here on its other words. Teach it the phrasing.", "fux enrich · fux correct"]));
+  (doc.matched || []).forEach((m) => {
+    if (m.df != null && doc._n && m.df / doc._n > BOILERPLATE && (m.contribution || 0) > 0)
+      out.push(["“" + m.term + "” is in " + Math.round(100 * m.df / doc._n) + "% of the corpus and still carries score — stopword candidate.", "[index] stopwords"]);
+    if ((m.fields || [])[2]) out.push(["“" + m.term + "” matches in the TITLE — the cheapest, strongest lever there is.", "title"]);
+  });
+  if (doc._boosted && doc._route && !/#(\d+) -> \1 /.test(doc._route))
+    out.push(["The walk lifted this past the words (" + doc._route + ") — the knob is the graph, not the text.", "[graph] ask_boost · ask_kinds"]);
+  if (doc.rank > 0 && top && (top.score - doc.score) / top.score < NEAR_TIE && !(doc.missing || []).length)
+    out.push(["Near-tie with #1 on the same words — a duplication smell worth looking at.", "supersedes · archived="]);
+  if (doc._archived)
+    out.push(["This is an ARCHIVED document. It records what was true when it was retired — right for a history question, misleading for a build task.", "archived="]);
+  if (doc.rank === 0 && related && related.length)
+    out.push(["Documents were reached by LINK, not by words — a vocabulary gap in them, not in this one.", "fux correct"]);
+  if (!out.length) out.push(["Clear winner on its own words — nothing to do.", null]);
+  return out;
+}
+
+function ring(conf) {
+  /* Coloured by BAND, never by `answerable`. Since W-214 (2026-09-22)
+     `answerable` is true on `weak` too, and reading it here would paint a
+     near-tie the same green as a clear winner — the one thing the ring is for. */
+  const colour = !conf ? "var(--faint)"
+    : conf.band === "grounded" ? "var(--ok)"
+    : conf.band === "none" ? "var(--bad)"
+    : "var(--warn)";
+  const label = conf ? conf.band : "—";
+  const sep = conf && conf.separation != null ? conf.separation : null;
+  const floor = conf && conf.separation_floor != null ? conf.separation_floor : null;
+  /* The arc is a picture of `separation` against its floor. It is capped at a
+     full circle so a large separation cannot draw past itself; the NUMBERS
+     beside it are the claim, and they are fux's, not the page's. */
+  const frac = sep != null && floor ? Math.max(0, Math.min(1, sep / floor)) : 0;
+  const C = 2 * Math.PI * 40;
+  return `<div class="card"><h2>confidence</h2><div class="band">
+    <svg class="ring" viewBox="0 0 100 100"><circle class="bg" cx="50" cy="50" r="40"></circle>
+      <circle cx="50" cy="50" r="40" stroke="${colour}" stroke-dasharray="${C}" stroke-dashoffset="${C - C * frac}" transform="rotate(-90 50 50)"></circle></svg>
+    <div class="bandtxt"><b style="color:${colour}">${esc(label)}</b>
+      <div>answerable: <span class="num">${conf ? conf.answerable : "—"}</span></div>
+      <div>separation <span class="num">${sep == null ? "—" : sep}</span> against floor <span class="num">${floor == null ? "—" : floor}</span></div>
+      <div>coverage <span class="num">${conf && conf.coverage != null ? conf.coverage : "—"}</span>${conf && conf.missing && conf.missing.length ? " · missing: " + conf.missing.map(esc).join(", ") : ""}</div>
+    </div></div></div>`;
+}
+
+function tokenPills(docs, conf) {
+  const seen = new Map();
+  docs.forEach((d) => (d.matched || []).forEach((m) => seen.set(m.term, m.analyzed)));
+  const missing = new Set();
+  docs.forEach((d) => (d.missing || []).forEach((m) => missing.add(m)));
+  (conf && conf.missing ? conf.missing : []).forEach((m) => missing.add(m));
+  const kept = [...seen.entries()].map(([t, a]) => `<span class="pill kept">${esc(t)}<span class="mono" style="color:var(--faint)"> → ${esc(a)}</span></span>`);
+  const gone = [...missing].map((t) => `<span class="pill unknown">${esc(t)}</span>`);
+  if (!kept.length && !gone.length) return "";
+  return `<div class="card"><h2>what the analyzer heard</h2><div class="pills">${kept.join("")}${gone.join("")}</div>
+    <div class="maths">Kept terms show the stem they were indexed under. Red is a word no shown document carries.</div></div>`;
+}
+
+function resultRow(doc, i, top, conf, related) {
+  const pct = top && top.score ? Math.max(4, Math.round(100 * doc.score / top.score)) : 100;
+  const badges = [];
+  if (doc._boosted) badges.push(`<span class="badge boost">${esc(doc._route || "boosted")}</span>`);
+  if (doc._archived) badges.push('<span class="badge arch">archived</span>');
+  if (doc.pinned) badges.push('<span class="badge pin">pinned</span>');
+  if ((doc.matched || []).some((m) => (m.fields || [])[2])) badges.push('<span class="badge title">title match</span>');
+
+  const contribs = (doc.matched || []).filter((m) => m.contribution != null);
+  const sum = contribs.reduce((a, m) => a + m.contribution, 0);
+  const segs = contribs.map((m, k) => `<i style="width:${sum ? (100 * m.contribution / sum) : 0}%;background:${TERM_COLORS[k % TERM_COLORS.length]}"></i>`).join("");
+  const legend = contribs.map((m, k) =>
+    `<span><span class="sw" style="background:${TERM_COLORS[k % TERM_COLORS.length]}"></span><b>${esc(m.term)}</b> <span class="num">${m.contribution.toFixed(3)}</span> · df <span class="num">${m.df}</span></span>`).join("");
+  const missPills = (doc.missing || []).map((m) => `<span class="miss">${esc(m)}</span>`).join(" ");
+
+  /* The decomposition is printed as fux states it — sum x uplift x multiplier —
+     and every factor is a field. The page does not divide to find one. */
+  const uplift = doc.rerank_uplift, mult = doc.multiplier;
+  const maths = contribs.length
+    ? `BM25F by word = <span class="num">${sum.toFixed(3)}</span>` +
+      (uplift != null ? ` &times; proximity <span class="num">${uplift}</span>` : "") +
+      (mult != null && mult !== 1 ? ` &times; archived <span class="num">${mult}</span>` : "") +
+      ` = printed <span class="num">${doc.score.toFixed(3)}</span>`
+    : "no per-term attribution on this run";
+
+  const cards = levers(doc, conf, top, related).map(([what, tag]) =>
+    `<div class="lever"><div class="what">${esc(what)}</div>${tag ? `<span class="tag mono">${esc(tag)}</span>` : ""}</div>`).join("");
+
+  return `<div class="row" data-i="${i}" style="animation:none">
+    <div class="top"><span class="rank mono">#${i + 1}</span>
+      <span class="title">${esc(doc._title || doc.loc)}</span>
+      <span class="sc num">${doc.score.toFixed(3)}</span></div>
+    <div class="loc mono">${esc(doc.loc)}</div>
+    <div class="track"><span class="fill" style="width:${pct}%"></span></div>
+    <div class="badges">${badges.join("")}</div>
+    <div class="detail" id="d${i}">
+      ${contribs.length ? `<div class="seg">${segs}</div><div class="legend">${legend}</div>` : ""}
+      ${missPills ? `<div class="legend">missing: ${missPills}</div>` : ""}
+      <div class="maths">${maths}</div>
+      ${doc._headings && doc._headings.length ? `<div class="snippet">${doc._headings.map(esc).join(" · ")}</div>` : ""}
+      ${cards}
+    </div></div>`;
+}
+
+function emptyState(conf, docs) {
+  const unknown = (conf && conf.missing ? conf.missing : []).map(esc).join(", ");
+  return `<div class="card empty">
+    <div class="big">fux declined — and that is a correct outcome.</div>
+    <div class="why">The band says <b>${esc(conf ? conf.band : "none")}</b>: nothing in the index scored for this question, so there was no list to hand over.
+      An agent given ten wrong links answers confidently and wrongly; declining is the alternative to that.</div>
+    ${unknown ? `<div class="why">No document uses: <b>${unknown}</b></div>` : ""}
+    <div class="lever" style="text-align:left"><div class="what">Teach the corpus this phrasing, or pin the document that should have won.</div>
+      <span class="tag mono">fux correct --pin · fux enrich</span></div></div>`;
+}
+
+async function ask(q) {
+  if (!q.trim()) return;
+  history.replaceState(null, "", "?q=" + encodeURIComponent(q));
+  stepper(1);
+  $("out").innerHTML = '<div class="card"><h2>asking</h2><div class="sub">running <span class="mono">fux ask --json --why --band</span>…</div></div>';
+  let data;
+  try {
+    const r = await fetch("/ask?q=" + encodeURIComponent(q));
+    data = await r.json();
+    if (data.error) throw new Error(data.error);
+  } catch (e) {
+    stepper(0);
+    $("out").innerHTML = `<div class="card err">${esc(e.message || e)}</div>`;
+    return;
+  }
+  stepper(5);
+  render(data);
+}
+
+function render(data) {
+  const conf = data.confidence || null;
+  const results = data.results || [];
+  const der = (data.derivation && data.derivation.documents) || [];
+  const related = data.related || [];
+  const gates = (data.derivation && data.derivation.gates) || null;
+
+  /* Join the two blocks fux printed. `results` carries what was SHOWN
+     (title, badges); `derivation.documents` carries WHY. One id, one row —
+     no recomputation, just a join. */
+  const byId = new Map(results.map((r) => [r.id, r]));
+  const n = gates ? gates.reachable : null;
+  const docs = der.map((d) => {
+    const r = byId.get(d.id) || {};
+    return Object.assign({}, d, {
+      _title: r.title, _boosted: r.boosted, _route: r.route,
+      _archived: d.archived || r.archived, _headings: r.headings, _n: n,
+    });
+  });
+
+  let html = tokenPills(docs, conf) + ring(conf);
+  if (!docs.length) {
+    html += emptyState(conf, docs);
+  } else {
+    const top = docs[0];
+    html += `<div class="card"><h2>ranked — what an agent would be handed</h2>` +
+      docs.map((d, i) => resultRow(d, i, top, conf, related)).join("") + `</div>`;
+    /* W-214: `answerable: false` now means `band: none`, which has no results
+       and renders the empty state above — so the note that survives is the
+       near-tie, and it asks the reader to look rather than to stop. */
+    if (conf && conf.band === "weak")
+      html += `<div class="card"><h2>note</h2><div class="sub">fux marked this <b>weak</b>: separation <b>${esc(String(conf.separation))}</b> is under the floor <b>${esc(String(conf.separation_floor))}</b>, so the ranking could not tell #1 from #2. <b>A signal, not a refusal</b> — open both and judge.</div></div>`;
+  }
+  if (related.length) {
+    html += `<div class="card"><h2>reached by link, not by words</h2>` + related.map((r) =>
+      `<div class="lever"><div class="what">${esc(r.title || r.loc || r.id)}</div>
+        <span class="tag mono">${esc(r.route || "related")}${r.mass != null ? " · mass " + r.mass : ""}</span></div>`).join("") +
+      `<div class="maths">These carry none of your words. If one of them is the answer, the gap is vocabulary.</div></div>`;
+  }
+  if (gates) {
+    html += `<div class="card"><h2>the funnel</h2><div class="legend">
+      <span><b>reachable</b> <span class="num">${gates.reachable}</span></span>
+      <span><b>in window</b> <span class="num">${gates.in_window}</span></span>
+      <span><b>placed</b> <span class="num">${gates.placed}</span></span>
+      <span><b>answered</b> <span class="num">${gates.answered}</span></span>
+      ${gates.cut_score != null ? `<span><b>cut</b> <span class="num">${gates.cut_score.toFixed(3)}</span></span>` : ""}
+    </div></div>`;
+  }
+  $("out").innerHTML = html;
+  $("out").querySelectorAll(".row").forEach((row) =>
+    row.addEventListener("click", () => $("d" + row.dataset.i).classList.toggle("open")));
+}
+
+/* Example chips come from the page's own health call and the URL, never from a
+   hard-coded list of questions about somebody else's corpus. */
+async function boot() {
+  stepper(0);
+  let health = {};
+  try { health = await (await fetch("/health")).json(); } catch (e) { /* offline is fine */ }
+  $("foot").innerHTML =
+    `fux <span class="mono">${esc(health.version || "?")}</span> · index <span class="mono">${esc(health.schema || "?")}</span> · analyzer <span class="mono">${esc(health.analyzer || "?")}</span> · bound to <span class="mono">${esc(health.host || "127.0.0.1")}</span><br>` +
+    `This page renders <span class="mono">fux ask --json --why</span> and computes nothing. Two thresholds it uses to phrase a lever — the boilerplate line and the near-tie width — are <b>provisional</b> and tuned to no corpus.<br>` +
+    `It writes nothing, anywhere. Levers are proposals; every change is a committed edit made by a person.`;
+  const chips = ["what does this project do", "how do I set it up", "why was that decided"];
+  $("chips").innerHTML = chips.map((c) => `<span class="chip">${esc(c)}</span>`).join("");
+  $("chips").querySelectorAll(".chip").forEach((c) =>
+    c.addEventListener("click", () => { $("q").value = c.textContent; ask(c.textContent); }));
+  const initial = new URLSearchParams(location.search).get("q");
+  if (initial) { $("q").value = initial; ask(initial); }
+}
+
+$("q").addEventListener("keydown", (e) => { if (e.key === "Enter") ask($("q").value); });
+document.addEventListener("keydown", (e) => {
+  if (e.key === "/" && document.activeElement !== $("q")) { e.preventDefault(); $("q").focus(); }
+});
+boot();
+</script>
+</body>
+</html>

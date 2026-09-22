@@ -489,6 +489,20 @@ _UNREACHABLE_BY_THE_GATE = {
     # which is why it is decision 8's obligation and the record's veto
     # condition instead.
     "SR-WORK-GOVERNANCE",
+    # SR-WORK-REGISTRY (2026-09-22, W-211) owns `tests/test_doc_registry.py`
+    # and no code, exactly like SR-WORK-DOCS above. Its subject is **what a
+    # registry row owes** — a trigger, a last-verified date, a live target —
+    # which is a claim about documents, so no change under `src/` can make a
+    # row of it true or false. ⚠ It is also the record that ATE the file it
+    # governs: `work/DOC-REGISTRY.md` was retired into its own §3 (Arpit,
+    # 2026-09-22), so the rules and the data are now one document and the test
+    # reads a section of a record rather than a file of its own.
+    "SR-WORK-REGISTRY",
+    # SR-WORK-TESTDATA (2026-09-22) owns `tests/test_test_data_prompts.py` and
+    # no code. Its subject is **what test data must contain**, which is a claim
+    # about seed documents and question sets, so no change under `src/` can
+    # make it true or false -- the same reason as SR-WORK-REGISTRY above.
+    "SR-WORK-TESTDATA",
     # SR-WORK-GOLDEN (2026-09-15) owns three components and not one of them
     # is under `src/`: the PreToolUse hook that guards the sealed answer key,
     # the generator behind `CLAUDE.md`'s view of the prohibition, and the test

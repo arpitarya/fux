@@ -505,8 +505,14 @@ def test_every_operating_guide_reaches_every_skill_surface_and_no_ambient_one():
     writes committed files and records a claim under somebody's name, and its
     own first section is *propose the command, do not run it* — because the
     moment an agent notices a bad result is exactly when it would be tempted.
+
+    **Thirteen since 2026-09-22** — `fux-serve` ([SR-SERVE](../records/0158_serve.md)),
+    at `inspect`'s end of the spectrum: the verb writes nothing, and the skill
+    carries the same *propose the lever, never apply it* rule, because its page
+    prints a lever beside every single result and applying one changes what the
+    index holds for everybody on the repository.
     """
-    assert len(setup_mod.GUIDE_SKILLS) == 12
+    assert len(setup_mod.GUIDE_SKILLS) == 13
     for name, template in setup_mod.GUIDE_SKILLS:
         assert _surfaces(template) == SKILL_SURFACES, template
         for files in setup_mod.AGENT_FILES.values():

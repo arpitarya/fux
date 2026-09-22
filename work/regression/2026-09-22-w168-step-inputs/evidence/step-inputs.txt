@@ -1,0 +1,34 @@
+seed documents: 28
+step 4 — `Term (ABBR)` pairs      : 0
+step 4 — glossary `term — def`    : 1
+step 4 — `aliases:` declarations  : 3
+
+d23c coverage tags across the three retired sets:
+    30  recency:older_correct
+    30  superseded:current_seeking
+    29  archived
+    25  vocabulary_gap
+    24  abstention
+    20  superseded_pair:current
+    15  recency
+    14  link_dependent
+    12  superseded_weight
+    12  negation
+    11  superseded:history_seeking
+     9  archived_weight
+     9  recency:newer_correct
+     9  front_matter_doc_id
+     8  superseded_pair:both
+     6  superseded_pair:history
+     5  identifier:RF-120
+     5  identifier:RF-117
+     5  identifier:RF-118
+     5  identifier:RF-119
+     4  identifier:PROJ-125
+     4  identifier:PROJ-123
+     4  identifier:PROJ-124
+     3  identifier_near_neighbour:RF
+     2  identifier:QCL-QA-MAP-01
+     1  identifier_near_neighbour:PROJ
+     1  front_matter_only
+     1  identifier_near_neighbour:QCL-F

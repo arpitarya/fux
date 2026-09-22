@@ -22,7 +22,7 @@ skeleton is [`reports/TEMPLATE.html`](reports/TEMPLATE.html).**
 Every executed run still files under
 [`../regression/<date>-<run>/`](../regression/README.md) under the per-run
 contract — report, `ANALYSIS.md`, `evidence/`, `VERDICT.md` where a threshold
-is ruled on, a row in that README, a `DOC-REGISTRY` bump. That contract is a
+is ruled on, a row in that README, a registry bump (SR-WORK-REGISTRY §3). That contract is a
 repo law and this directory does not fork it. What is *new* here is only that a
 benchmark's pre-registration is written once and cited by many dated runs,
 rather than being buried in one run's `evidence/`.

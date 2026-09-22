@@ -8,9 +8,9 @@ flowchart TB
   W{"separation &lt; separation_floor (0.10)?"}:::q
   B0["none — answerable: false"]:::b
   B1["partial"]:::b
-  B2["weak"]:::b
+  B2["weak — a SIGNAL, answerable: true"]:::b
   B3["grounded"]:::b
-  G["W-176 (open): nine gates in a weakest-link chain<br/>weak ⇒ not answerable · answer-type · passage co-occurrence<br/>IDF coverage · identifier hard-fail · verification floor · QPP · graph coherence · steering"]:::fut
+  G["W-176: nine gates in a weakest-link chain<br/>gate 1 (weak ⇒ not answerable) SHIPPED 2026-09-14 and was REVERSED 2026-09-22 — W-213 measured no benefit<br/>still open: answer-type · passage co-occurrence · IDF coverage<br/>identifier hard-fail · verification floor · QPP · graph coherence · steering"]:::fut
   S --> N
   N -- yes --> B0
   N -- no --> P

@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from fux.errors import FuxError
-from fux.store.format import HEADER, shard_for, shard_path
+from fux.store.format import ANALYZER_VERSION, HEADER, shard_for, shard_path
 from fux.store.reader import iter_shard_paths, read_index, read_shard
 from fux.store.writer import write_index
 
@@ -151,8 +151,16 @@ def test_read_shard_rejects_reversed_tf_fields(tmp_path):
     bad = directory / "00.jsonl"
     # _format and analyzer must be correct here so this shard clears those
     # checks and actually exercises the tf_fields check under test.
+    #
+    # ⚠ **Derived, not spelled out** -- unlike `test_golden_header_line`, where
+    # the literal IS the assertion. Here the analyzer version is a *precondition*
+    # of the check under test, so an analyzer bump used to turn this into a green
+    # test asserting the wrong refusal: W-205's v2 -> v3 made the reader reject
+    # the shard on `analyzer` and never reach `tf_fields` at all.
     bad.write_bytes(
-        b'{"_format":"fux.index.v4","analyzer":"v2","tf_fields":["ctx","path","title","heading","body"]}\n'
+        b'{"_format":"fux.index.v4","analyzer":"'
+        + ANALYZER_VERSION.encode()
+        + b'","tf_fields":["ctx","path","title","heading","body"]}\n'
     )
     with pytest.raises(FuxError, match="tf_fields"):
         read_shard(bad)

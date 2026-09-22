@@ -8,8 +8,8 @@ matter are the four below the fold:**
 - `--fast` and `--scan` produce the *same* block, or the differential law has a
   hole in it that says "confident" on one path and "weak" on the other;
 - `missing` carries the word the user typed, not the stem the index is keyed by;
-- `answerable` is `False` on the empty branch, which is the one an agent most
-  needs to be stopped by.
+- `answerable` is `False` on the empty branch — **and, since W-214, on that
+  branch alone.** `weak` is a published signal, not a refusal.
 
 Three of the four band boundaries are structural facts and are tested as such.
 The fourth — `grounded` vs `weak` — rests on `SEPARATION_FLOOR`, which is
@@ -175,8 +175,9 @@ def test_the_band_is_checked_in_order_and_absence_beats_ambiguity():
     """A query that is BOTH missing a term and unseparated reads `partial`.
 
     Order matters because the two bands ask for different behaviour: `partial`
-    says *answer and name the gap*, `weak` says *do not answer*. Reporting the
-    nameable defect is more useful than reporting the unnameable one.
+    says *answer and name the gap*, `weak` says *the ranking could not choose —
+    judge for yourself*. Reporting the nameable defect is more useful than
+    reporting the unnameable one.
     """
     block = _q("rollback pgbouncer", {"rollback": 40, "pgbouncer": 0}, [1.0, 0.999])
     assert block.separation < SEPARATION_FLOOR
@@ -564,22 +565,63 @@ def test_no_tune_recomputes_the_band_at_the_ENGINE_defaults():
 
 
 # ---------------------------------------------------------------------------
-# W-176 gate 1 — `weak` implies `answerable: false`
+# W-214 — `weak` is a SIGNAL, and `answerable` is `band != none`
+#
+# 🔴 **This section REVERSES W-176 gate 1** (Arpit, 2026-09-22), whose tests
+# stood here between 2026-09-14 and 2026-09-22 asserting the opposite. What
+# reversed it is W-213: across 2 992 questions, eight rungs and three
+# independently authored sets, the questions the band withheld were MORE likely
+# to be right than the ones it answered, and no floor fixed it — including
+# `0.00`. **`separation` does not carry correctness, so the threshold was never
+# the thing to move.**
+#
+# ⚠ **The tests below pin the half of the ruling that is easy to lose.** *Stop
+# refusing* is one line; *keep emitting the signal* is the line a later cleanup
+# deletes as dead code, and deleting it completes the wrong half.
 # ---------------------------------------------------------------------------
 
 
-def test_weak_is_a_refusal_not_a_low_score():
-    """🔴 **The gate, and the defect it closes.**
+def test_weak_is_a_signal_not_a_refusal():
+    """🔴 **The ruling, asserted on the payload rather than the property.**
 
-    Until 2026-09-14 `answerable` was `band != none`, so a `weak` block came
-    back `answerable: true` — while SR-CONFIDENCE decision 3's own table said
-    **do not answer** on the same row. Two fields on one payload disagreeing,
-    and the one an agent branches on was the permissive one.
+    Between 2026-09-14 and 2026-09-22 this file asserted `answerable is False`
+    here. It is `True` now, and the band, the floor it was judged under and
+    `failed: ["separation"]` all still say precisely what they said — **a
+    consumer that wants the old abstention has every byte it needs to implement
+    it, and fux no longer makes that choice on its behalf.**
     """
     block = _q("rollback procedure", {"rollback": 40, "procedure": 12}, [1.0, 0.98])
     assert block.band == WEAK
-    assert block.answerable is False
-    assert block.as_dict()["answerable"] is False, "the payload, not just the property"
+    assert block.answerable is True
+    payload = block.as_dict()
+    assert payload["answerable"] is True, "the payload, not just the property"
+    assert payload["band"] == WEAK, "the SIGNAL survives the refusal"
+    assert payload["failed"] == ["separation"]
+
+
+def test_weak_is_still_emitted_because_the_signal_is_the_whole_point():
+    """🔴 **The half of W-214 a later cleanup would silently undo.**
+
+    Once nothing refuses on `separation`, the `WEAK` branch of `band` and the
+    `separation` branch of `failed` both look like dead code to anyone reading
+    the expression alone. **They are the ruling.** *Keep the signal, drop the
+    refusal* is not *drop both*, and this test is what fails if somebody tidies
+    the second half away.
+
+    Asserted across the floor, not at one value, so a sweep that removed the
+    label everywhere but the default would also fail here.
+    """
+    for floor, separation in ((0.10, 0.05), (0.50, 0.30), (0.99, 0.98)):
+        block = _q(
+            "rollback procedure", {"rollback": 40, "procedure": 12},
+            [1.0, 1.0 - separation], separation_floor=floor,
+        )
+        assert block.band == WEAK, floor
+        assert block.failed == ["separation"], floor
+        assert block.separation_floor == floor, "the floor it was judged under"
+        assert block.answerable is True, "a signal, and never again a refusal"
+        # And the human-readable line still says the ranking could not choose.
+        assert "weak" in block.line() and "separation" in block.line()
 
 
 def test_partial_stays_answerable_and_that_is_the_distinction():
@@ -596,15 +638,23 @@ def test_partial_stays_answerable_and_that_is_the_distinction():
 
 
 def test_the_band_table_and_answerable_cannot_disagree():
-    """**The gate proper.** Walks the whole band table and asserts `answerable`
-    is the exact complement of the two bands decision 3 tells a consumer not to
-    answer from.
+    """**The gate proper, and the reason W-214 is honest rather than a second
+    silent disagreement.** Walks the whole band table and asserts `answerable`
+    is the exact complement of the bands SR-CONFIDENCE decision 3 tells a
+    consumer not to answer from.
+
+    ⚠ **The expectation moved on 2026-09-22; the test did not weaken.** It read
+    `{NONE, WEAK}` while decision 3's `weak` row said *do not answer*. That row
+    now says *a signal — decide for yourself*, and this line moved with it **in
+    the same change**. The property being enforced is unchanged and is the
+    whole point: the table and the boolean are one statement, so they can never
+    again be edited apart.
 
     A future band added to the table with no line here is the failure this
     catches: it would arrive answerable by default, which is the direction that
     loses silently.
     """
-    refuse = {NONE, WEAK}
+    refuse = {NONE}
     for band, block in (
         (NONE, Confidence(0.0, 0.0, 0, "unverified", ())),
         (WEAK, _q("rollback procedure", {"rollback": 40, "procedure": 12}, [1.0, 0.98])),
@@ -615,22 +665,38 @@ def test_the_band_table_and_answerable_cannot_disagree():
         assert block.answerable is (band not in refuse), band
 
 
-def test_a_zero_floor_makes_every_answer_answerable_and_that_is_the_cost():
-    """⚠ The knob that turns the gate off, stated rather than clamped.
+def test_a_zero_floor_silences_the_SIGNAL_and_that_is_now_the_whole_cost():
+    """⚠ The knob that turns the clause off, stated rather than clamped —
+    **rewritten for W-214 rather than deleted, because its subject changed.**
 
-    `separation_floor = 0.0` means no answer is ever `weak` — and now that
-    `weak` is the refusal, it also means **fux never abstains on separation at
-    all**. That was already a legal and loud setting; the gate makes it louder,
-    and a consumer who sets it should find this sentence.
+    Between 2026-09-14 and 2026-09-22 this test's claim was that
+    `separation_floor = 0.0` stopped fux abstaining on separation. **That
+    sentence says nothing now**: nothing abstains on separation at any floor.
+
+    What a zero floor still costs is real and is now the only thing it costs:
+    **no block is ever labelled `weak`, so `failed` never names `separation`,
+    and a consumer that implemented the old abstention for itself gets silence
+    instead of a signal.** That is the sentence a consumer who sets this should
+    find — the same shape of cost as before, one layer further out.
     """
-    block = _q("rollback procedure", {"rollback": 40, "procedure": 12},
-               [1.0, 1.0], separation_floor=0.0)
-    assert block.band == GROUNDED
-    assert block.answerable is True
+    tied = _q("rollback procedure", {"rollback": 40, "procedure": 12},
+              [1.0, 1.0], separation_floor=0.0)
+    assert tied.separation == 0.0, "the SIGNAL is computed; only the label is gone"
+    assert tied.band == GROUNDED
+    assert tied.failed == [], "nothing to branch on — that is what was bought"
+    assert tied.line() == "", "and nothing said on stderr either"
+
+    # The control: at the engine default the same query is labelled, so the
+    # cost above is attributable to the floor and to nothing else.
+    at_default = _q("rollback procedure", {"rollback": 40, "procedure": 12}, [1.0, 1.0])
+    assert at_default.band == WEAK
+    assert at_default.failed == ["separation"]
+    assert at_default.answerable is True, "answerable either way — W-214"
 
 
-def test_failed_names_which_gate_refused():
-    """`answerable: false` says stop; `failed` says what stopped it.
+def test_failed_names_which_gate_fired():
+    """`failed` names the gate. ⚠ **Since W-214 that is not the same as naming
+    a refusal** — `separation` fires and fux answers anyway.
 
     ⚠ **The shape lands with gate 1, before the gates that fill it.** W-176's
     eight measured gates each append a name here and change nothing else, so a
@@ -638,7 +704,7 @@ def test_failed_names_which_gate_refused():
     reason this key exists now rather than with the gate that first needs it.
     """
     weak = _q("rollback procedure", {"rollback": 40, "procedure": 12}, [1.0, 0.98])
-    assert weak.band == WEAK and weak.answerable is False
+    assert weak.band == WEAK and weak.answerable is True
     assert weak.failed == ["separation"]
 
     nothing = signals([], [], {}, 0, [])
@@ -662,6 +728,13 @@ def test_every_refusal_names_at_least_one_failed_gate():
 
     A ninth gate added without a `failed` name would land in exactly that state
     and pass every other test in this file.
+
+    ⚠ **This was an EQUIVALENCE until 2026-09-22 and is an implication now.**
+    W-214 made `separation` a gate that fires without refusing, so
+    *`failed` is non-empty* no longer implies *`answerable` is false* — and
+    asserting the converse would have forced the ruling to delete the signal.
+    `test_a_named_gate_may_fire_without_refusing` below is the other half, so
+    the weakening is stated rather than left as a gap.
     """
     for block in (
         signals([], [], {}, 0, []),
@@ -669,4 +742,20 @@ def test_every_refusal_names_at_least_one_failed_gate():
         _q("rollback mtls", {"rollback": 40}, [10.0, 1.0]),
         _q("rollback", {"rollback": 40}, [10.0, 1.0]),
     ):
-        assert bool(block.failed) is (block.answerable is False), block.band
+        if block.answerable is False:
+            assert block.failed, f"{block.band} refuses and says nothing"
+
+
+def test_a_named_gate_may_fire_without_refusing():
+    """The other half of W-214, stated so the asymmetry is deliberate.
+
+    **`no_candidates` refuses; `separation` does not.** A consumer branching on
+    `failed` being non-empty is implementing the PRE-W-214 behaviour — which is
+    legal, is the thing the ruling left it the bytes to do, and is not what
+    `answerable` means.
+    """
+    nothing = signals([], [], {}, 0, [])
+    assert nothing.failed == ["no_candidates"] and nothing.answerable is False
+
+    weak = _q("rollback procedure", {"rollback": 40, "procedure": 12}, [1.0, 0.98])
+    assert weak.failed == ["separation"] and weak.answerable is True

@@ -8,11 +8,11 @@ status: accepted
 date: 2026-08-27
 ratified: 2026-08-27
 feature: answer provenance — the derivation, the receipt, the journal and verification
-owns: [src/fux/query/provenance.py@f84f2a7aea74]
+owns: [src/fux/query/provenance.py@b4fdb00960db]
 laws: [L1, L3, L4, L8]
 ratifies: W-91
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 12f26bf5e67f47e776e9de71a58cdd6dc530695a907cd2516399bf26df174e0b
+content_sha: f88fbb2263b8c7abb653f7aa8ce01a1de8e946d058d7507614767e701bfcbb68
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -149,14 +149,19 @@ make the strongest of the three reachable by accident.
 
 **2. `--why` is a SECOND QUERY, never instrumentation of the first.** The
 scorer is untouched, no per-term contribution is threaded through the candidate
-paths, and neither `scan` nor the accelerator changed. This is Lucene's own
+paths, and neither `scan` nor the accelerator changed. ⚠ **Read with decision
+17** (2026-09-22), which attributes a score per term **in the derivation pass,
+over the documents that were shown** — that is the second query this decision
+describes, not an exception to it. The candidate paths are still untouched. This is Lucene's own
 discipline — `explain` is a second, narrower query against one document — and
 it is what keeps the differential law and the pruning bound out of this
 record's blast radius entirely. The untuned comparison is literally a second
 `run_query` with `use_tune=False`, paid only when `--why` is passed and only
 when a tune file exists.
 
-**3. A derivation QUOTES the score and never reconstructs it.**
+**3. A derivation QUOTES the score and never reconstructs it.** (Still true
+after decision 17: the per-term summands are *attribution*, the total is quoted,
+and the identity between them is printed rather than left to be inferred.)
 [SR-RANKING](0111_ranking.md)'s own module warns that re-deriving a score
 term-by-term yields different low-order bits than the sum that produced it. A
 recomputed total printed beside the real one would be a plausible number that
@@ -458,6 +463,57 @@ unboosted row has no route because no walk reached it, and `boosted: false`
 already says so; a second key claiming the same absence would be the
 restatement L0 forbids inside one payload.
 
+**17. `--why` ATTRIBUTES a score per term, and the total is still QUOTED.**
+W-210, 2026-09-22. Each `matched` row gains `contribution` — its BM25F summand
+for that document — and each document gains `rerank_uplift`, the proximity
+reranker's multiplier.
+
+🔴 **The attribution is the same expression the score was built from.**
+`score_record`'s loop body was extracted to
+[`bm25f.term_contribution`](../src/fux/query/bm25f.py) and both call it. Two
+copies of a scoring formula is the defect this record spent three decisions
+refusing in other shapes: they can disagree while both look correct, and the
+disagreement surfaces as a plausible number beside a real one. Same operations,
+same order, so the float result is unchanged and the differential law between
+the scan and the accelerator cannot pick up a last-bit difference from the
+extraction.
+
+**The identity, and it is printed rather than inferred:**
+
+```
+score  =  sum(contribution)  x  rerank_uplift  x  multiplier
+```
+
+up to float summation order. 🔴 **`rerank_uplift` exists BECAUSE of that
+identity, not beside it.** Without it a consumer shown per-term contributions
+next to the printed score sees a gap of tens of percent — on this repository the
+proximity uplift is routinely `1.3` — and can close it only by **dividing two
+rounded numbers**, which is exactly the *plausible number that disagrees with
+the real one* this module refuses to emit. **Stating a factor is the honest
+alternative to making somebody infer it.**
+
+⚠ **A consumer must never print `sum(contribution)` as the score**, and does not
+have to: every factor on the right is a field.
+
+⚠ **The anchor fold is the one term not covered.** `[bm25f] anchor` (default
+`0.0`, off) is assembled per query by the candidate generator from *other*
+documents' edges, so it is not on the committed record this pass re-reads. With
+it on, the identity loses the anchor share. **Named, not hidden**, and the fix
+when somebody needs it is to hand the fold through the same seam rather than to
+recompute it here.
+
+🔴 **This is not the instrumentation §*What the derivation may claim* refuses,
+and the distinction is the whole permission.** That paragraph forbids threading
+per-term contributions **through the hot path** — every candidate, every term,
+on every query. This runs over the documents that were *shown*, at most `--top`
+of them, after the sort, in a pass that already re-reads each record for
+`ctx_via`. It is Lucene's `explain` discipline as this module's own docstring
+cites it: *a second query against one document, never a tax on the first.*
+
+**Why it was owed.** [SR-SERVE](0158_serve.md)'s page draws a score-by-word bar,
+and the only two ways to get one are this field or a BM25F implementation in the
+browser. The second is a second ranker. **That is the shape every future panel
+takes: add the field to the engine's own output, or do not show the number.**
 
 ### Consequences
 

@@ -10,7 +10,7 @@ feature: the capture set every benchmark run files
 owns: [tests/test_benchmark_capture.py@f6af3d328537]
 laws: []
 timestamp: 2026-09-13T00:00:00Z
-content_sha: 54bd0f4ba8face53e853c4c4716ade09ced8332cc0daf6295eef3cf46f364208
+content_sha: 4703eb2027bb05addb387c6fa166d22b045682222ecce9badcf2154d6952ab52
 ratifies: Arpit, 2026-09-13 — what a benchmark must always capture
 ---
 
@@ -371,7 +371,7 @@ documents and by **36×** at 10 000. ⚠ **N4 is
 not RULED**: decision 6 says a benchmark rules no threshold, and this run rules
 none.
 
-🔴 **The load-bearing number belongs to [W-161 → W-204](../work/open/W-204-golden-outputs-scoring-and-version-benchmark.md)
+🔴 **The load-bearing number belongs to [W-161 → W-204](../work/regression/2026-09-22-golden-final-score/FINAL-SCORE.md)
 rather than to W-179.** Its queue row says both tiers *"ship on and unmeasured"*;
 one of them is now priced on one reader. **The tier's price on PYTHON is a
 different run** — it reads a derived file instead of rebuilding — **and the
@@ -587,7 +587,7 @@ stopped `B-node` 269.5 ms against `B` 231.2 ms being read as *"the Node reader
 is slower"*. **That run stands as filed history**; it does not become a standing
 column.
 
-🔴 **What the tier is WORTH is still unmeasured, and it is [W-161 → W-204](../work/open/W-204-golden-outputs-scoring-and-version-benchmark.md)'s,
+🔴 **What the tier is WORTH is still unmeasured, and it is [W-161 → W-204](../work/regression/2026-09-22-golden-final-score/FINAL-SCORE.md)'s,
 not a benchmark's.** Reproduce the probe with `[graph] ask_boost = false` in a
 work dir's `tune.toml` when that question is taken up. **Nothing in this record
 now measures it, and no document may say otherwise.**

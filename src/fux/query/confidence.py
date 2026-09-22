@@ -71,6 +71,13 @@ invented number wearing a decimal point.
   prediction **R10** and must not be cited as calibrated until that verdict is
   filed.
 
+⚠ **`weak` is a SIGNAL, not a refusal** (Arpit, 2026-09-22, W-214), because
+[W-213](../../../work/regression/2026-09-22-band-operating-point/VERDICT.md)
+measured that `separation` does not carry correctness. The band, the floor and
+`failed: ["separation"]` are all still published; `answerable` is
+`band != none`. See `Confidence.answerable` for what that buys and what it
+costs.
+
 ## What this can never do
 
 **It cannot reach a score or an ordering.** The band is computed from `rank()`'s
@@ -106,7 +113,8 @@ GROUNDED = "grounded"
 PARTIAL = "partial"
 
 #: Everything matched, and the ranking still cannot separate first place from
-#: second. Do not answer from this; report what was searched.
+#: second. **A signal, not a refusal** — decide for yourself whether the top
+#: hits answer the question (W-214, Arpit 2026-09-22; reverses W-176 gate 1).
 WEAK = "weak"
 
 #: Nothing scored. `answerable` is `False` and no consumer should proceed.
@@ -263,53 +271,73 @@ class Confidence:
 
     @property
     def answerable(self) -> bool:
-        """**A refusal, not a low number.**
+        """**A refusal, not a low number** — and since W-214 it refuses on one
+        thing only: **nothing scored at all.**
 
         An agent handed `0.3` will use it anyway and hedge in prose; an agent
         handed `answerable: false` has nothing to hedge with. That asymmetry is
-        the reason this is a boolean and not the bottom of a scale
-        (SR-CONFIDENCE decision 5).
+        why this is a boolean and not the bottom of a scale (SR-CONFIDENCE
+        decision 5), and it is unchanged.
 
-        🔴 **`weak` IS a refusal** (W-176 gate 1, ruled by Arpit 2026-09-14).
-        Until then this read `band != NONE`, so `weak` — *the ranking could not
-        separate the top hits* — came back `answerable: true`, and decision 3's
-        own table said **do not answer** beside it. **Two fields on one payload
-        disagreeing, and the one an agent branches on was the permissive one.**
+        🔴 **`weak` STOPPED being a refusal on 2026-09-22 (Arpit, W-214),
+        reversing his own W-176 gate 1 ruling of 2026-09-14.** Between those
+        dates this read `band not in (NONE, WEAK)`. What reversed it is
+        [W-213](../../../work/regression/2026-09-22-band-operating-point/VERDICT.md):
+        across 2 992 questions, eight rungs and three independently authored
+        sets, **the questions the band withheld were MORE likely to be right
+        than the ones it answered**, risk rose as coverage fell in all three
+        sets, and the band suppressed fewer wrong answers than a rate-matched
+        coin in all three. **No floor fixed it, including `0.00`** — the
+        quantity being thresholded does not carry correctness, so the
+        threshold was never the thing to move.
 
-        That gap is what four recorded runs measured, none of which could name
-        it: 20 of 20 blind-authored unanswerable questions answered, twice; 0
+        **`weak` is still computed, still banded and still named in `failed`.**
+        Nothing is hidden: a consumer that wants the old behaviour reads
+        `band == "weak"` or `"separation" in failed` and refuses on it itself.
+        **What changed is that fux stopped making that choice on the consumer's
+        behalf.**
+
+        ⚠ **What this knowingly buys back, and it is a real cost.**
+        `band != none` is structurally almost never false — BM25F scores
+        something for very nearly any query — so `answerable: false` now fires
+        essentially only on an empty result set. **The W-48/W-176 gap is open
+        again**, and four recorded runs already measured what that looks like:
+        20 of 20 blind-authored unanswerable questions answered, twice; 0
         abstentions of 124 on five golden rungs; 10 of 10 planted unanswerables
-        answered by both versions, one at `coverage: 0.0009`. **`answerable`
-        was structurally incapable of being false unless nothing scored at
-        all** — and *nothing scored at all* is the one case no corpus produces,
-        because BM25F returns something for almost any query.
+        answered by both versions. The difference from the pre-W-176 state is
+        that the disagreement is no longer **silent**: decision 3's band table
+        now says *signal*, not *do not answer*, so two fields on one payload
+        never again contradict each other.
 
-        ⚠ **`partial` stays answerable, and that is the whole distinction.**
-        `partial` is a **nameable** defect — a term nothing contains, or bytes
-        that are stale — so a consumer can answer and say what is missing.
-        `weak` has nothing identifiably wrong; the ranking simply could not
-        choose, and there is nothing to name in a hedge.
+        ⚠ **`partial` stays answerable for the reason it always did.** It is a
+        **nameable** defect — a term nothing contains, or bytes that are stale
+        — so a consumer answers it and says what is missing.
         """
-        return self.band not in (NONE, WEAK)
+        return self.band != NONE
 
     @property
     def failed(self) -> list[str]:
-        """**Which gate refused, by name** — W-176's output surface, step 3.
+        """**Which gate fired, by name** — W-176's output surface, step 3.
 
-        `answerable: false` tells a consumer to stop; this tells it *what
-        stopped it*, which is the difference between an agent that says
-        nothing and one that says why. The two the engine can refuse on today:
+        | name | when | does fux refuse on it? |
+        |---|---|---|
+        | `no_candidates` | nothing in the index scored above zero | **yes** — `answerable: false` |
+        | `separation` | `separation < separation_floor` — the ranking could not choose | **no, since W-214** |
 
-        | name | when |
-        |---|---|
-        | `no_candidates` | nothing in the index scored above zero |
-        | `separation` | `separation < separation_floor` — the ranking could not choose |
+        🔴 **`separation` is still emitted and still means exactly what it
+        meant; what stopped is fux refusing on it** (Arpit 2026-09-22 — see
+        `answerable`). **That is deliberate and it is the whole ruling:** a
+        consumer that wants the old behaviour reads this key and abstains on
+        it, and fux stops making the choice on its behalf. **A later cleanup
+        that drops this branch because "nothing refuses on it any more" would
+        complete the wrong half of the ruling**, which is why
+        `test_weak_is_still_emitted_because_the_signal_is_the_whole_point`
+        exists.
 
-        ⚠ **It is empty on `partial`, deliberately.** `partial` is not a
-        refusal — nothing gated it — and its defect is already named, in
-        `missing` or in `verified: stale`. Putting `partial` here would make
-        `failed` mean *something is imperfect* instead of *this is why you may
-        not answer*, and the second is the only reading a consumer can act on.
+        ⚠ **It is empty on `partial`, deliberately.** `partial`'s defect is
+        already named, in `missing` or in `verified: stale`. Putting it here
+        would make `failed` mean *something is imperfect* rather than *a named
+        gate fired*, and only the second is a thing a consumer can branch on.
 
         **The shape exists before the gates that fill it**, which is the point
         of landing it with gate 1: the eight measured gates of W-176 append a
@@ -350,7 +378,7 @@ class Confidence:
         return {
             "band": self.band,
             "answerable": self.answerable,
-            # W-176 step 3. **Always present, `[]` when nothing refused** — an
+            # W-176 step 3. **Always present, `[]` when no gate fired** — an
             # absent key could not be told from a fux too old to have gates
             # (W-48), which is the one reading that would make a consumer
             # answer where it should abstain.
@@ -389,8 +417,7 @@ class Confidence:
         return (
             "confidence: weak - the ranking cannot separate the top results"
             f" (separation {self.separation:.2f}, floor {self.separation_floor:.2f})."
-            " Do not answer: say the documents do not say, and report what was"
-            " searched."
+            " A signal, not a refusal: judge the top hits yourself."
         )
 
 

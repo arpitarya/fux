@@ -85,9 +85,10 @@ def _tools(top: int) -> list[dict]:
             "all -- say what was searched and stop. If `confidence.band` is "
             "'partial', answer but name every term in `confidence.missing`: those "
             "are words from the question that appear in no document here. If it is "
-            "'weak', the ranking could not separate the top hits -- `answerable` is "
-            "false there too, so abstain: say that the documents do not say, name "
-            "what was searched, and report the candidates rather than a conclusion. "
+            "'weak', the ranking could not separate the top hits -- that is a "
+            "SIGNAL and not a refusal (`answerable` stays true): read the near-tied "
+            "candidates and judge, and if neither answers, say the documents do not "
+            "say and report what was searched rather than a conclusion. "
             "The payload also carries "
             "`related`: documents that NO query word matched, returned because "
             "the ranked results above LINK to them, each with the `route` it was "
@@ -270,7 +271,10 @@ def _search(root: Path, args: dict, *, top: int) -> dict:
         # an agent invents an answer and cites a real file while doing it.
         #
         # `band` is what to branch on and `answerable: false` is a REFUSAL, not
-        # a low score. `missing` names the query's own words the corpus does not
+        # a low score -- and since W-214 (2026-09-22) it is `band: none` alone.
+        # `weak` is published and refuses nothing: fux measured that withholding
+        # on it suppressed no more wrong answers than a coin, so the call is the
+        # consumer's. `missing` names the query's own words the corpus does not
         # contain, which is what turns a vague hedge into "nothing here mentions
         # mTLS". `verified` is always `unverified` here: `fux_search` ranks from
         # the committed index and fetches nothing, and saying so is the point.

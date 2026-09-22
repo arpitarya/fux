@@ -9,9 +9,9 @@ Search the committed fux index for: **$ARGUMENTS**
 1. Resolve the command once — `fux` → `uv run fux` → `./.venv/bin/fux` → `python -m fux`.
 2. Run `fux ask "$ARGUMENTS" --json --band --top 5`.
 3. Read `confidence.band` and branch on it, never on the prose:
-   - `none` or `answerable: false` → **abstain.** Say the index has nothing and name `confidence.missing`.
+   - `none` (= `answerable: false`, the only band that refuses) → **abstain.** Say the index has nothing and name `confidence.missing`.
    - `partial` → answer, and name every term in `confidence.missing`.
-   - `weak` → report the top 2–3 as candidates, not a conclusion.
+   - `weak` → **a signal, not a refusal**: the top two are near-tied, so read them and report candidates rather than a conclusion.
    - `grounded` → answer, citing each document's `loc`.
 4. If the band is `none` or `partial`, the cause is a **vocabulary gap**. Retry
    **once** with `--expand` and a passage **you write** — 2–3 sentences

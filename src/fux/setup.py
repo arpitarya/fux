@@ -169,6 +169,13 @@ GUIDE_SKILLS: tuple[tuple[str, str], ...] = (
     # when somebody asks about the shape of a corpus, and an agent that read it
     # on every request would start volunteering index critiques.
     ("fux-inspect", "INSPECT-SKILL.md"),
+    # `fux-serve` writes nothing either, and it is the second read-only guide
+    # here (SR-SERVE decision 10). It ships as a SKILL for the same reason
+    # `fux-inspect` does -- an agent that read it ambiently would start
+    # volunteering ranking critiques -- and its own section 5 is *propose the
+    # lever, never apply it*, because the page prints a lever next to every
+    # result and applying one changes what the index holds for everybody.
+    ("fux-serve", "SERVE-SKILL.md"),
     # `fux-correct` writes COMMITTED files and changes what the index holds, so
     # it is a skill and never ambient (decision 9a) -- and its own first
     # section is *propose the command, do not run it*, because the moment an

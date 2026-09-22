@@ -10,7 +10,7 @@ feature: the committed record schema — `fux.index.v2`
 owns: [src/fux/store/index-record.schema.json@5c7001362815]
 laws: [L2, L3, L5, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: b631cbd3c0e7d6546819dbaccaa0b774befa72201cc153967e7cb02278e6fb8c
+content_sha: d5f5bc79a524f6f44201ac3dd635c6544b14810e14156a987dc0de7a1a004a7e
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -32,7 +32,12 @@ content_sha: b631cbd3c0e7d6546819dbaccaa0b774befa72201cc153967e7cb02278e6fb8c
 ## §1 — For humans
 
 A shard file is JSONL. Its **first line is a header** pinning the schema and
-the analyzer; **every line after it is one document**.
+the analyzer; **every line after it is one document**. ⚠ **The two version
+strings in this record were stale until 2026-09-22** — `_format` read `v2`
+while the engine wrote `v4` — because a bump moves a constant in
+[`store/format.py`](../src/fux/store/format.py) and nothing asks a table
+cell. **Read the module for the current values; this record is the shape,
+not the stamp.**
 
 The test every property has to pass to be here is not "is it useful?" It is
 **"is it a statistic, and is it worth a line-diff every time it changes?"** The
@@ -109,7 +114,7 @@ The header line, then one document — captured from this repo's live
 
 ```console
 $ head -1 .fux/index/d8.jsonl
-{"_format":"fux.index.v2","analyzer":"v2","tf_fields":["body","heading","title","path","ctx"]}
+{"_format":"fux.index.v4","analyzer":"v3","tf_fields":["body","heading","title","path","ctx"]}
 
 $ sed -n '5p' .fux/index/d8.jsonl | head -c 200
 {"archived":true,"edges":[],"flen":[4,0,2,9],"id":"file:archive/v0.26/tests_e2e/site/robots.txt","loc":"archive/v0.26/tests_e2e/site/robots.txt","meta":"plain","mode":"extracted","mtime":1786270142,"p
@@ -194,8 +199,8 @@ meaning from position:
 
 | property | value | purpose |
 |---|---|---|
-| `_format` | `"fux.index.v2"` | the schema id. A reader that does not know it must refuse, not guess — `store/reader.py` refuses a foreign shard outright rather than mixing it in |
-| `analyzer` | `"v2"` | the tokenizer version — identifier splitting before lowercasing, then Porter stemming before hashing. Term hashes are only comparable within one analyzer version, and two analyzers in one index are undetectable at query time and corrupt every `df`; this is what makes that checkable |
+| `_format` | `"fux.index.v4"` | the schema id. A reader that does not know it must refuse, not guess — `store/reader.py` refuses a foreign shard outright rather than mixing it in |
+| `analyzer` | `"v3"` | the tokenizer version — identifier splitting before lowercasing, then Porter stemming before hashing. Term hashes are only comparable within one analyzer version, and two analyzers in one index are undetectable at query time and corrupt every `df`; this is what makes that checkable. **`v3` (2026-09-22, W-205 part 2 family (a)) put `-`, `.` and `/` on the same footing as `_`**, so a token now yields its whole form beside its parts whatever separator it uses; `_format` did **not** move with it, because no property appeared — [SR-INDEX-LIFECYCLE](0108_index-lifecycle.md) decision 10 |
 | `tf_fields` | `["body","heading","title","path","ctx"]` | **the order of the `terms` and `flen` arrays**, and the reason **trailing zeros may be omitted**: `[1]` is body-only, unambiguously. Without it, `[0,1]` is ambiguous |
 
 ⚠ **`body` leads the tuple, and that is an encoding decision rather than a

@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@376fb46beaa1, src/fux/store/nodebundle.py@071a24a596dd]
+owns: [node@3542a628b139, src/fux/store/nodebundle.py@071a24a596dd]
 laws: [L1, L3, L4, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 551059d7c26d01e03fca70982072056e59ddf4f1dee9251223d261b53468a935
+content_sha: 2876d215485f4eabc0eeebd926584b4c4ee08e04976448fc4cf41e37eacfb4c0
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -184,6 +184,18 @@ run it and a one-step divergence is a **silent no-match with no error to see**:
 the Node reader hashes a string the Python-built index never wrote. ⚠ **Two
 copies of that fixture would defeat it** — one gets updated, the other
 forgotten — which is why there is one file and both suites read it.
+
+✅ **The bind was collected on 2026-09-22, the first time the analyzer moved
+after it existed.** W-205 part 2 family (a) stepped the analyzer to `v3` — `-`,
+`.` and `/` became identifier separators alongside `_` — and the change is **two
+regexes in `analyze()` transcribed twice**, once in
+[`query/analyzer.py`](../src/fux/query/analyzer.py) and once in
+`node/src/query/analyzer.mjs`. The shared fixture moved with it in one file, both
+suites read the new rows, and `ANALYZER_VERSION` in `node/src/store/format.mjs`
+was bumped in the same change, so a Node reader cannot be handed a v3 index while
+still tokenising as v2. **A Python-only merge here would not have failed any
+test** — `--fast` and the scan would simply have ranked differently — which is
+the drift this decision exists to make impossible to ship.
 
 **The exemption list is short and visible, and that is the point** — it is
 exactly where the divergence risk concentrates:
@@ -837,7 +849,32 @@ made required, Python would refuse a line this reader accepts, and
 directories* — two readers returning a different archived set from one committed
 file, with nothing to see.
 
+**W-210 — `termContribution` is transcribed, and nothing in `node/` calls it.**
+The Python side extracted BM25F's summand into one function so `--why`'s per-term
+attribution is the same expression the score came from
+([SR-RANKING](0111_ranking.md); [SR-PROVENANCE](0142_provenance.md) decision 17).
+**The Node reader has no `--why` surface**, so the attribution itself is
+Python-only today.
+
+⚠ **The seam was transcribed anyway, deliberately.** The alternative is a future
+port re-deriving the expression from the Python — which is how the two readers
+acquire two slightly different saturation denominators, on a branch no corpus in
+the test set exercises. `node --test` covers it through `scoreRecord`, which now
+calls it, so the transcription is not dead code even though the attribution is
+unported. ⚠ **`fux serve` is Python-only for the same reason `fux observe` is**
+([SR-SERVE](0158_serve.md)): it is a surface, not a reader, and the differential
+law reaches readers.
+
 ### Consequences
+
+- ⚠ **W-214 (2026-09-22) moved both planes in one commit.**
+  `node/src/query/confidence.mjs`'s `answerable` is `this.band !== NONE`,
+  matching `confidence.py` exactly ([SR-CONFIDENCE](0141_confidence.md)
+  decision 3a, Arpit's ruling). `node/mcp-tools.json` carries the rewritten
+  `fux_search` description. **`failed` and the `WEAK` branch of `band` are
+  untouched on both sides** — the ruling keeps the signal and drops only the
+  refusal, so a twin that dropped the branch would have diverged from Python
+  while still passing every differential corpus that misses a near-tie.
 
 - ⚠ **W-200 (2026-09-20) added the ingest provenance ledger**,
   `.fux/runtime/ingest-log.jsonl` — one runtime line per consumed document
@@ -864,7 +901,7 @@ file, with nothing to see.
   a verb rather than to bytes. Python has two entry points over one body, held
   equal by `tests_e2e/test_relational.py::test_lexical_is_byte_identical_to_ask`.
 
-  ⚠ **When [W-161 → W-204](../work/open/W-204-golden-outputs-scoring-and-version-benchmark.md) gives Python's
+  ⚠ **When [W-161 → W-204](../work/regression/2026-09-22-golden-final-score/FINAL-SCORE.md) gives Python's
   `ask` a graph tier, this is the case that splits**, and the differential law
   will then compare a Python `ask` that has one against a Node `ask` that does
   not. **That divergence is W-161's to declare**, in this record, before it

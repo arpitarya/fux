@@ -25,7 +25,7 @@ are all mid-rewrite, and a doc being rewritten is work.
 | [`INTERVIEW.md`](INTERVIEW.md) | the state-of-play doc a cold successor reads | **during** the session, not at the end |
 | [`IMPLEMENTATION.md`](IMPLEMENTATION.md) | milestone log — what shipped, when, and how it turned out | a milestone or release lands |
 | [`MACHINE.md`](MACHINE.md) | environment and tooling quirks of wherever this runs | a surface breaks in a way the code did not cause |
-| [`DOC-REGISTRY.md`](DOC-REGISTRY.md) | per-doc freshness table, **live documents only** | any doc in it is touched; an archived doc's row is deleted, not annotated |
+| the doc registry — [SR-WORK-REGISTRY §3](../records/0067_WORK-registry.md) | per-doc freshness table, **live documents only**; rules and table in one record, `work/DOC-REGISTRY.md` retired 2026-09-22 | any doc in it is touched, a doc is added or archived — the record says what the row owes |
 | [`open/`](open/README.md) | one detail file per open `W-nn` | opened with the item, **deleted with it** |
 | [`regression/`](regression/README.md) | dated, measured evidence other docs cite | every measurement run |
 | [`golden/`](golden/README.md) | the sealed benchmark — seed docs, ladder manifests, prompts. 🔴 `golden-answers/` is Arpit's, gitignored, and **never opened by any agent** — on either spelling ([L11](../records/0012_LAW-11-sealed-answer-key.md)) | a phase of W-136 runs; the process changes |

@@ -59,19 +59,35 @@ for (const row of FIXTURE.contrast) {
   });
 }
 
-test("not one seed identifier survives whole, on this reader either", () => {
-  const whole = FIXTURE.seed.filter((r) => {
-    const out = analyze(r.identifier);
-    return out.length === 1 && out[0] === r.identifier.toLowerCase();
-  });
-  assert.deepEqual(whole, []);
+test("every seed identifier survives whole, on this reader too", () => {
+  // 🔴 **33 of 33, and it was 0 of 33 until 2026-09-21** (W-205 part 2, family
+  // (a) — analyzer v3). `-`, `.` and `/` are now identifier separators exactly
+  // as `_` always was.
+  //
+  // ⚠ **The v2 form of this test would now pass while checking NOTHING.** It
+  // asked `out.length === 1 && out[0] === id`, i.e. *the whole token and
+  // nothing else* — a spelling that was only adequate while the answer was no
+  // for every row. Under v3 the whole form arrives BESIDE its parts, so
+  // `length === 1` is never true, the filter is always empty and the assertion
+  // is vacuous. Membership is the question now, on both readers.
+  const missing = FIXTURE.seed.filter(
+    (r) => !analyze(r.identifier).includes(r.identifier.toLowerCase()),
+  );
+  assert.deepEqual(missing, []);
+  assert.equal(FIXTURE.seed.length, 33);
 });
 
 test("the three segments Python loses to the stopword list are lost here too", () => {
-  // `QCL-IT-ADR-08` loses `IT`; `TSL-RF-118-A` and `TSL-RF-221-A` lose `A`.
-  // A stopword list that drifted between the readers would show up here and
-  // nowhere else — the two lists are separate literals in separate files.
-  assert.deepEqual(analyze("QCL-IT-ADR-08"), ["qcl", "adr", "08"]);
-  assert.deepEqual(analyze("TSL-RF-118-A"), ["tsl", "rf", "118"]);
-  assert.deepEqual(analyze("TSL-RF-221-A"), ["tsl", "rf", "221"]);
+  // `QCL-IT-ADR-08` still loses `IT`; `TSL-RF-118-A` and `TSL-RF-221-A` still
+  // lose `A`. A stopword list that drifted between the readers would show up
+  // here and nowhere else — the two lists are separate literals in separate
+  // files.
+  //
+  // 🔴 v3 did not change the stopword class; it changed what it costs. The
+  // whole form now carries the dropped segment, so `TSL-RF-118-A` is no longer
+  // indistinguishable from `TSL-RF-118` — which is what the v2 rows below
+  // showed, byte for byte, and no longer do.
+  assert.deepEqual(analyze("QCL-IT-ADR-08"), ["qcl-it-adr-08", "qcl", "adr", "08"]);
+  assert.deepEqual(analyze("TSL-RF-118-A"), ["tsl-rf-118-a", "tsl", "rf", "118"]);
+  assert.deepEqual(analyze("TSL-RF-221-A"), ["tsl-rf-221-a", "tsl", "rf", "221"]);
 });

@@ -10,7 +10,7 @@ feature: the `CACHEDIR.TAG` file written into every derived `.fux/` subdirectory
 owns: []
 laws: [L3]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 48492a969c2dfa32159795d85508a1a59a39e357ea22070df83f7d574b5176d4
+content_sha: c281c3200d7b0c8f2fc6a671c5685feb5227558632d4ae0c0f6941307a8a1817
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -112,6 +112,15 @@ to mark the *specific* directory that is safe to skip. ⚠ **`.fux/index/` is
 committed and must never carry one** — a tag there would make backup tools
 silently skip the product, which is exactly the failure
 [SR-DOTFUX](0102_fux-directory.md)'s committed/derived split exists to prevent.
+
+⚠ **Unchanged by W-210 (2026-09-22), and touched here only because the register
+says so.** That change edited two things in `src/fux/store/fuxdir.py`: the
+`runtime` kind's description string, which gained `runtime/trace/`
+([SR-DOTFUX](0102_fux-directory.md); [SR-SERVE](0158_serve.md)), and the verb
+table `_readme()` writes, which gained `fux serve`
+([SR-CLI](0101_cli-surface.md)). **Neither reaches this record's claim on that
+file**, and saying so is the point of the freshness gate — the prompt is *re-read
+the record*, and the honest outcome of re-reading it can be *nothing moved*.
 
 ### Consequences
 

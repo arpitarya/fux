@@ -218,7 +218,8 @@ def run_query(
                 scoring=scoring, stats_out=stats, expansion=expansion,
             )
             final = _compose(
-                root, query, results, rerank_weight, top, depth, tune, stats, related_out
+                root, query, results, rerank_weight, top, depth, tune, stats, related_out,
+                trace_out,
             )
             _fill_trace(trace_out, results, rerank_weight)
             _fill_confidence(confidence_out, stats, query, final, tune)
@@ -228,14 +229,14 @@ def run_query(
         scoring=scoring, stats_out=stats, expansion=expansion,
     )
     final = _compose(
-        root, query, results, rerank_weight, top, depth, tune, stats, related_out
+        root, query, results, rerank_weight, top, depth, tune, stats, related_out, trace_out
     )
     _fill_trace(trace_out, results, rerank_weight)
     _fill_confidence(confidence_out, stats, query, final, tune)
     return final, "scan"
 
 
-def _compose(root, query, window, rerank_weight, top, depth, tune, stats, related_out):
+def _compose(root, query, window, rerank_weight, top, depth, tune, stats, related_out, trace_out=None):
     """The lexical core, then W-161's graph stage. Returns the final list.
 
     **The lexical core is `rerank` → `pin`, and it runs over the WINDOW, not
@@ -255,7 +256,23 @@ def _compose(root, query, window, rerank_weight, top, depth, tune, stats, relate
     inserts a document the ranking never returned, that document is in the
     window the walk seeds from, which is what a person pinning it meant.
     """
-    ordered = _apply_pin(root, query, _maybe_rerank(root, query, window, rerank_weight, depth), depth)
+    # W-210 — the proximity uplift per document, for `--why`'s attribution.
+    # `trace` is the diagnostic channel that already carries `window` and
+    # `pre_rerank`; the uplift belongs beside them and never anywhere a score
+    # can read it.
+    uplift: dict = {}
+    ordered = _apply_pin(
+        root, query, _maybe_rerank(root, query, window, rerank_weight, depth, uplift), depth
+    )
+    if trace_out is not None and uplift:
+        # ⚠ **Into the caller's dict, never a module global.** `rank()`'s
+        # `stats_out` docstring says why in one line: fux runs threads, and a
+        # diagnostic parked on the module would be read by whichever query
+        # finished last.
+        try:
+            trace_out["rerank_uplift"] = dict(uplift)
+        except Exception:  # pragma: no cover - a diagnostic must not break an answer
+            pass
     if not (tune.ask_boost or tune.ask_related):
         return ordered[:top]
 
@@ -471,7 +488,7 @@ def _fill_trace(out: dict | None, window, rerank_weight: float) -> None:
         pass
 
 
-def _maybe_rerank(root: Path, query: str, results, weight: float, top: int):
+def _maybe_rerank(root: Path, query: str, results, weight: float, top: int, uplift_out=None):
     """Proximity rerank, then truncate to what the caller asked for.
 
     **It used to run after dense fusion, and the ordering mattered**: fusion
@@ -481,7 +498,7 @@ def _maybe_rerank(root: Path, query: str, results, weight: float, top: int):
     """
     if weight <= 0:
         return results[:top]
-    return rerank.rerank(root, query, results, weight=weight)[:top]
+    return rerank.rerank(root, query, results, weight=weight, uplift_out=uplift_out)[:top]
 
 
 # -- the output contract -------------------------------------------------------
@@ -1160,6 +1177,7 @@ def _derivation_for(root: Path, args, results, path, signals, trace, tune):
             pre_rerank=(trace or {}).get("pre_rerank"),
             untuned=untuned,
             expand=_expand_of(args),
+            rerank_uplift=(trace or {}).get("rerank_uplift"),
         )
     except Exception:  # pragma: no cover - a diagnostic must not break an answer
         return None

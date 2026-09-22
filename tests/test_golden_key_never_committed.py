@@ -73,6 +73,31 @@ KEY_ROW = re.compile(f"(?:{ID}.*{KEY_ONLY})|(?:{KEY_ONLY}.*{ID})")
 # detector that cannot be demonstrated firing is not a gate.
 SELF = "tests/test_golden_key_never_committed.py"
 
+#: 🔴 **The one exception, and it exists because Arpit ruled it — not because
+#: this file was inconvenient.**
+#:
+#: [L11](../records/0012_LAW-11-sealed-answer-key.md) decision 14 (2026-09-21)
+#: makes `just golden-retire <set>` move a scored set's questions **and answers**
+#: into a committed home, where they become ordinary reusable regression data.
+#: The law's own words are that a retired set *"retires OUT OF this law"* — so
+#: those bytes stop being *a key*, and the never-committed clause, which is about
+#: a key, stops reaching them.
+#:
+#: ⚠ **This fired for real on 2026-09-22**, on the first retirement, after the
+#: commit rather than before it — this gate reads **tracked** files, so it can
+#: only bite once something is committed. The declaration is in that session's
+#: WORKLOG entry, as decision 10 requires.
+#:
+#: 🔴 **THE HOLE THIS LEAVES, STATED RATHER THAN DISCOVERED LATER: a key-shaped
+#: row is now committable by putting it under this prefix.** Nothing here checks
+#: that a retirement was real — that the set was scored, that `golden-retire`
+#: was what moved it, or that Arpit ran it. **A key copied into
+#: `work/golden/retired/` by hand passes this gate**, and the only thing standing
+#: in that path is the law. That is the same shape as L11's other three named
+#: routes, and it is narrower than all of them: one prefix, and a `git log` shows
+#: who added a file to it.
+RETIRED_PREFIX = "work/golden/retired/"
+
 
 def tracked() -> list[str]:
     out = subprocess.run(
@@ -111,10 +136,15 @@ def test_no_committed_file_carries_a_key_shaped_row():
     key. The committed hand-offs carry a golden id beside `answerable` and
     `answer_text` on every one of their 249 rows and must not trip it -- that
     near-miss is the case this pattern is shaped around.
+
+    🔴 **`work/golden/retired/` is exempt, by L11 decision 14 and by nothing
+    else.** See `RETIRED_PREFIX` above for what that costs. The exemption is a
+    path prefix, so this gate still reads every other committed file in the
+    repository, including every hand-off, every record and every report.
     """
     offenders: list[str] = []
     for rel in tracked():
-        if is_sealed_path(rel) or rel == SELF:
+        if is_sealed_path(rel) or rel == SELF or rel.startswith(RETIRED_PREFIX):
             continue
         path = ROOT / rel
         if not path.is_file():

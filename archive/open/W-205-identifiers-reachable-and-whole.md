@@ -27,6 +27,49 @@ against it.
 
 ---
 
+## ✅ CLOSED 2026-09-22 — part 1 shipped, part 2 family (a) merged, both readers
+
+**What landed.** `evidence/family-a.patch` merged as filed: `_WORD_RE` and
+`BOUNDARY_RE` in [`query/analyzer.py`](../../src/fux/query/analyzer.py) and their
+transcription in `node/src/query/analyzer.mjs`; `ANALYZER_VERSION` **v2 → v3** in
+both `store/format.py` and `node/src/store/format.mjs`; the shared W-202 fixture
+and its two readers. **`_format` stayed `fux.index.v4`** — no property appeared
+([SR-INDEX-LIFECYCLE](../../records/0108_index-lifecycle.md) decision 10).
+
+**Every moving row is named** in
+[`evidence/w202-diff.md`](../regression/2026-09-21-identifier-analyzer/evidence/w202-diff.md):
+**33 of 33** seed identifiers gain their whole form (from **0 of 33**), 3 of 10
+contrast tokens move, and the three mangled ids (`DAIRY-2`, `KFS-2014`,
+`QCL-OPS-DOCK-03`) keep their mangled *parts* while gaining a correct whole — D2
+was not in family (a) and is untouched.
+
+🔴 **The INCONCLUSIVE verdict stands as filed and is not reworded.** It ships on
+**correctness**, on Arpit's ruling; no document may cite the +1/+3/+4 nets as a
+ranking win. The cost is filed with **no threshold**: ×2.1 dictionary terms at
+`rung-10000`, +4.6 % index bytes.
+
+**Two things this close found that the item did not predict:**
+
+1. **Part 1's test inverted, and that is the composition working.**
+   `test_values_go_in_through_the_analyzer_so_part_1_does_not_make_an_id_whole`
+   pinned *reachable but not whole*; because part 1 feeds `analyze()` rather than
+   appending raw values, part 2 made `QCL-IT-ADR-08` whole **with no change to
+   `parse.py` at all**. The test is renamed and now asserts the composed state.
+2. 🔴 **`tests/test_own_index_is_current_format.py` did not catch the bump.**
+   Built on 2026-09-21 for exactly this class, it checked `_format` **only** — so
+   it stayed green while `fux ask` on this repository refused its own index on
+   `analyzer`. Widened to parametrise over every field of `HEADER` in this change
+   (two strikes → a gate), and this repository re-ingested at v3.
+
+**Records amended:** SR-RANKING 9 · SR-INGEST 23d · SR-INDEX-LIFECYCLE 3 and 10 ·
+SR-RECORD (its `_format`/`analyzer` table cells were **stale at v2**) ·
+SR-NODE-SEARCH (the analyzer bind, collected for the first time). **Not built and
+named so silence is not read as a decision:** family (b), family (c) — now
+unblocked by (a) and still unjustified — and restricting (a) to digit-bearing
+tokens to shed the prose cost. All three are in SR-RANKING decision 9.
+
+---
+
 ## ✅ RULED 2026-09-21 (Arpit, Cowork) — part 2 family (a) SHIPS on correctness; SR-RS d23 gains no clause
 
 - **Ship (a) as a correctness fix.** SR-RANKING decision 9 promises

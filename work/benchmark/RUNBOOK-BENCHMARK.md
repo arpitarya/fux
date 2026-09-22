@@ -308,7 +308,7 @@ tables.
 - [ ] **Deviations from the pre-registration, listed in the report**, numbered,
       never absorbed.
 - [ ] A row in [`../regression/README.md`](../regression/README.md).
-- [ ] The `benchmark/` row in `../DOC-REGISTRY.md` bumped.
+- [ ] The `benchmark/` row in the registry (`records/0067_WORK-registry.md` §3) bumped.
 - [ ] The presentation (`README.md` rule 4) beside the plan, linked from the
       README table — **no number the filed run does not carry**.
 - [ ] `work/OPEN-WORK.md`: the item's row deleted if closed, its file moved to

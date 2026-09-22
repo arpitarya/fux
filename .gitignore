@@ -71,4 +71,10 @@ work/golden/golden-answer/
 **/golden-answer*
 **/golden-answer/
 **/golden-answers*
+
+# The sealed-key switch's state — LAW L11 decision 14. It holds a copy of
+# `.claude/settings.json`, never a key, and it is gitignored anyway: a committed
+# lock-state would put *"this tree was open"* into history, and the state of a
+# switch is a property of one machine at one moment. `tools/golden-switch/`.
+.claude/.golden-lock/
 **/answers.jsonl

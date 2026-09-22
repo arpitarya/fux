@@ -132,7 +132,14 @@ def test_seed_identifier_analyzes_exactly_as_frozen(
         "row AND name it in the item that changed the analyzer — a fixture edited "
         "without a named reason is the failure this file exists to prevent."
     )
-    assert (produced == [identifier.lower()]) is survives_whole
+    # 🔴 **`survives_whole` changed MEANING at v3, and the change is the point.**
+    # Under v2 it was written as `produced == [identifier.lower()]` — *the whole
+    # token and nothing else* — which was an adequate spelling only because the
+    # answer was **no** for all 33: a hyphenated identifier produced no whole
+    # form at all, so there was never a whole form sitting beside its parts to
+    # distinguish the two readings. v3 emits whole AND parts, exactly as `_`
+    # always did, so the question is now *is the whole form among the terms*.
+    assert (identifier.lower() in produced) is survives_whole
     assert _mangled(identifier, produced) is mangled
     assert _dropped(identifier) == dropped
 
@@ -150,11 +157,22 @@ def test_the_population_is_the_thirty_three_that_were_measured() -> None:
     assert len({row[0] for row in SEED_IDENTIFIERS}) == 33
 
 
-def test_not_one_seed_identifier_survives_whole() -> None:
-    """🔴 Zero of 33. The seed is entirely hyphenated, and no hyphenated
-    identifier produces a whole form — `_WORD_RE` has already split it before
-    `split_identifier` is reached, so there is nothing to re-emit."""
-    assert [row[0] for row in SEED_IDENTIFIERS if row[2]] == []
+def test_every_seed_identifier_now_survives_whole() -> None:
+    """🔴 **33 of 33, and it was 0 of 33 until 2026-09-21.**
+
+    This assertion is the whole of W-205 part 2 family (a), and it is the gate
+    [W-168](../../work/open/W-168-search-improvements.md) named: *"before is
+    measured (0 of 33), after must be 33 of 33"*. Under v2 `_WORD_RE` had
+    already split a hyphenated identifier before `split_identifier` was reached,
+    so there was nothing to re-emit; v3 treats `-`, `.` and `/` as `_` was
+    always treated.
+
+    ⚠ **It is a MECHANISM probe and not a ranking verdict.** That 33 whole forms
+    now exist says nothing about whether anything ranks better — the arm that
+    answers that is pre-registered separately, and this file applies no bar.
+    """
+    assert [row[0] for row in SEED_IDENTIFIERS if not row[2]] == []
+    assert len([row for row in SEED_IDENTIFIERS if row[2]]) == 33
 
 
 def test_exactly_three_are_mangled_and_they_are_these() -> None:
@@ -175,9 +193,17 @@ def test_three_identifiers_lose_a_whole_segment_to_the_stopword_list() -> None:
       about, so it carries **two independent defects**: it is frontmatter-only
       and therefore absent from the index, *and* its `IT` would be dropped even
       once it gets there.
-    - `TSL-RF-118-A` and `TSL-RF-221-A` lose their trailing `A`, which makes
-      them **indistinguishable from `TSL-RF-118` and `TSL-RF-221`** — a
-      precision loss with no token left to tell them apart.
+    - `TSL-RF-118-A` and `TSL-RF-221-A` lose their trailing `A`.
+
+    🔴 **What v3 changed here is the CONSEQUENCE, not the class.** The segments
+    are still dropped — `_dropped` asks what a segment produces on its own, and
+    `it` and `a` are still stopwords. But the whole forms `tsl-rf-118-a` and
+    `qcl-it-adr-08` now exist, so `TSL-RF-118-A` is no longer
+    indistinguishable from `TSL-RF-118`: the v2 wording of this docstring said
+    there was *"no token left to tell them apart"*, and now there is one.
+    ⚠ **`QCL-IT-ADR-08` still carries its OTHER defect** — it is
+    frontmatter-only, so it is absent from the index entirely until W-205
+    part 1 ships, and no analyzer change reaches a document that was never read.
 
     Recorded, not ruled: no stopword is changed here and none may be
     (`## Out of scope`).
@@ -206,7 +232,13 @@ def test_the_fixture_is_not_regenerated_from_the_code_it_tests() -> None:
     If someone replaces the expected column with `analyze(identifier)` the suite
     still passes and proves nothing, so this asserts a value that is true of the
     frozen data and **false of anything the analyzer would emit** — `KFS-2014`
-    is frozen as `['kf', '2014']` while its own segments are `KFS` and `2014`.
+    is frozen as `['kfs-2014', 'kf', '2014']`, and `kf` is a Porter stem that
+    no segment of the identifier spells.
+
+    ⚠ **v3 did NOT fix the mangling**, and this row is where that is visible:
+    the whole form arrived, the stemmed fragment stayed. Family (b) is the one
+    that would address it, and it is measured separately.
     """
     frozen = dict((row[0], row[1]) for row in SEED_IDENTIFIERS)
-    assert frozen["KFS-2014"] == ["kf", "2014"] != [s.lower() for s in _segments("KFS-2014")]
+    assert frozen["KFS-2014"] == ["kfs-2014", "kf", "2014"]
+    assert frozen["KFS-2014"] != [s.lower() for s in _segments("KFS-2014")]

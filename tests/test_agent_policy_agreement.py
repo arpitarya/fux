@@ -113,6 +113,14 @@ OPERATING_GUIDES = frozenset(
         # document at all — *`supersedes` / `archived=` is the fix* is in its
         # own Don't list, which is a stronger statement than the block's.
         "CORRECT",
+        # SR-SERVE's guide. An operating guide like the ten above, and it hands
+        # a reader documents — so the exemption is NOT "there is nothing to
+        # misread here". It is the same one SEARCH and ANSWER get: the guide
+        # POINTS at `fux-archived-results`, and the surface it describes carries
+        # the stance itself — the served page badges an archived row and links
+        # that rule rather than paraphrasing it. A block copied in here would be
+        # a third copy of a rule the page already renders.
+        "SERVE",
     )}
     | {f"steering-fux-{t}-files.md" for t in (
         "sources", "decoder", "enrich", "fetcher", "pii", "config", "index",
@@ -189,7 +197,7 @@ def test_the_operating_guides_are_deliberate():
     exempt a file that does not exist yet from a check it should face."""
     from fux import setup as setup_mod
 
-    assert len(OPERATING_GUIDES) == 38
+    assert len(OPERATING_GUIDES) == 39
     assert not OPERATING_GUIDES & NOT_A_POLICY_RENDERING
     shipped = {tpl for files in setup_mod.AGENT_FILES.values() for _rel, tpl in files}
     assert OPERATING_GUIDES <= shipped, sorted(OPERATING_GUIDES - shipped)

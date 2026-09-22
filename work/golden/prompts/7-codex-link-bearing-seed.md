@@ -7,6 +7,8 @@ timestamp: 2026-09-16T00:00:00Z
 
 # Prompt 7 — Codex: give the seed corpus links
 
+**Test-data checklist:** [SR-WORK-TESTDATA](../../../records/0068_WORK-test-data.md) — this prompt carries **T7, T12**. Check the whole list before running it; any item this data does not carry is named as *not carried*, never skipped.
+
 ⚠ **OPTIONAL, and on no critical path since 2026-09-20.** Arpit ruled that day
 that **no feature waits on Codex**: the link-bearing documents this prompt asks
 for are now carried by **set 3**, authored by Claude under
@@ -26,7 +28,7 @@ separate measurements mean anything, and a corpus written by the session that
 will measure it is a corpus whose shape that session already knows.
 
 🔴 **Why Codex and not Claude.** Same rule as prompts 1 and 2:
-[W-191 → W-204](../../open/W-204-golden-outputs-scoring-and-version-benchmark.md) **specifies and
+[W-191 → W-204](../../regression/2026-09-22-golden-final-score/FINAL-SCORE.md) **specifies and
 requests**; it does not write seed content. A link-ranking feature measured on
 links the measurer authored is measuring its own handwriting.
 

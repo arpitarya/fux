@@ -32,6 +32,213 @@ does the archive mechanics.
 
 ---
 
+## ✅ CLOSED 2026-09-22 — the generation is scored, retired and re-sealed
+
+**Arpit ran the whole cycle in one sitting**, and the item's last obligation is
+met:
+
+```console
+$ just golden-unlock          # 11:41 — 29 deny rules and 2 hooks down
+   ... phase D scores 11 716 rows ...
+$ just golden-retire set-1 && just golden-retire set-2 && just golden-retire set-3
+$ just golden-lock            # settings.json restored byte-identically
+```
+
+**All three sets are now open regression data** at `work/golden/retired/<set>/`
+— `questions.jsonl` + `expected.jsonl` + a README saying they carry no golden
+claim. `work/golden/questions/` holds only its README; the key directory is
+Arpit's and closed again.
+
+✅ **The switch is proven end to end, and the proof is not a claim.** The restore
+is **byte-identical** (`git diff` on `.claude/settings.json` empty),
+`just golden-guards` passes all eight checks, and the suite went **5 354 passed /
+42 skipped** open → **5 398 passed / 2 skipped** shut, the 42 being exactly the
+locked-shape arm returning. 🔴 **The guards proved themselves on the session that
+built them**: the first `ls` of the key directory after the lock was refused by
+the hook.
+
+🔴 **The real retirement found two defects the synthetic tests could not.**
+Both were in the *destination*, which no `tmp_path` fixture exercises:
+
+1. **The committed home could not be committed.** `.gitignore` carries
+   `**/answers.jsonl` — a guard, so a key is uncommittable at any depth — and the
+   switch moved the answers to exactly that name. Three sets retired
+   **successfully and invisibly uncommittably**. ⚠ **Fixed by renaming the
+   destination to `expected.jsonl`, not by negating the guard**: a hole in a
+   pattern that catches a key anywhere is a worse trade than a filename, and the
+   new name is the truer one. Gated by
+   `test_a_retired_set_can_actually_be_committed`, which asks **git**.
+2. **The retired README carried no OKF `type`**, so three undeclarable documents
+   entered a declared bundle. Fixed in the generator and in the three files.
+
+⚠ **Set 3 retired under its own name and no rename happened.** The
+`set-<gen>-<x|u>` convention (L11 decision 14) therefore begins with the **next**
+generation; these three are `set-1`, `set-2`, `set-3` permanently, and the
+`set-2-x` / `set-2-u` question is moot for them. **It is not moot for the next
+one** — whoever authors generation 2 names it, and the author letter has to be
+right at that point rather than afterwards.
+
+**What this item delivered:** phase A (eight rungs, filed), phase B (three
+engines, filed), phase C′ (the switch, and L11 rewritten around it), phase D (the
+score). **Phase E's items are opened from D's rows and are not this item's** —
+[W-212](W-212-prompt-5-captures-the-gates.md),
+[W-213](W-213-confidence-band-operating-point.md), and W-168 unblocked.
+
+---
+
+## ✅ PHASE D IS DONE — 2026-09-22. **THE SCORE EXISTS.**
+
+**[`FINAL-SCORE.md`](../regression/2026-09-22-golden-final-score/FINAL-SCORE.md)**
+— 11 716 per-query rows, 94 arm × rung × set buckets, **0 join errors**,
+`classification: informed` permanently.
+
+**The headline, per set, hit@5 over eight rungs:**
+
+| set | v1.0.0 | v2.0.1 | HEAD |
+|---|---:|---:|---:|
+| set-1 (Codex) | 699 | 723 | **833** |
+| set-2 (Claude) | 608 | 634 | **744** |
+| set-3 (Claude) | 625 | 672 | **771** |
+
+🔴 **All NINE paired comparisons clear SR-RS d19's floor of 6, same direction,
+three independently authored sets.** Weakest is +24; largest +146.
+
+🔴 **What improved is RESISTANCE TO DISTRACTION, and it is the first time this
+project has measured it.** From `rung-00100` to `rung-10000`, v1 loses **30**
+hit@5 and v2 loses **43**; **HEAD loses 10**. The arms are closest on the
+smallest corpus and furthest apart on the largest — the index-and-refer thesis
+with a number on it.
+
+🔴 **And the abstention layer is the engine's weakest part.** HEAD withholds on
+**818 of 2 992**; the key says **747 of those were answerable**. Per set it
+catches **20.8–32.3 %** of the genuinely unanswerable and withholds
+**22.7–30.2 %** of the answerable — on sets 2 and 3, **fourteen answerable
+questions sacrificed per unanswerable one caught**. ⚠ Stable across a 357×
+corpus range, so it is where the threshold sits. ⚠ It measures what abstention
+**costs** and not what it **saves**, because no answer-text verdict was made.
+
+**Controls:** 0 join errors; the null control **exact** (`null-a` ≡ `null-b`);
+the emitted field set carries **none** of L11's four answer-shaped fields;
+headroom disclosed in both directions per d22b.
+
+**Three steps were not done and each says why:** difficulty banding (so no band
+is frozen), the per-band breakdown (depends on it), and pooling (writes a key
+byte — Arpit's).
+
+🔴 **Step 4, the funnel, COULD NOT BE COMPUTED, and that is the finding to act
+on.** SR-WORK-QUALITY's `reachable → in window → placed → answered` needs
+`--why`'s `derivation.gates`, and **prompt 5 never captured them**. Same class as
+measuring a feature on a corpus that lacks its input. **No document may state
+fux's funnel until phases A and B re-run with the gates recorded** — filed as
+**W-212**.
+
+**Also filed: W-213**, the confidence band's operating point, from finding 1.
+
+---
+
+### What is left of this item
+
+**Nothing an agent can close.** 🔴 **Arpit's hand, to close the generation:**
+
+```console
+$ just golden-retire set-1 && just golden-retire set-2 && just golden-retire set-3
+$ just golden-lock
+```
+
+That moves each set's questions **and answers** into `work/golden/retired/`,
+where they become ordinary reusable regression data that never carries a golden
+claim again, and re-seals the tree so the next generation is authored blind.
+⚠ **Set 3's label is still unconfirmed** — he said `set-2-x`, it is
+Claude-authored, `set-2-u` was expected — and nothing is renamed until he says.
+
+---
+
+## ✅ PHASE C′ IS BUILT — 2026-09-22 (Claude Code, Opus). **The switch exists; the unlock is Arpit's.**
+
+**Everything the 2026-09-21 ruling asked for, except the hand on the switch.**
+
+| what | where |
+|---|---|
+| the law | [L11](../../records/0012_LAW-11-sealed-answer-key.md) **decision 14** — the prohibition is now a LOCKED STATE with one named way out; the whole normative block was rewritten around it and `CLAUDE.md`'s generated view regenerated |
+| the mechanics | [SR-WORK-GOLDEN](../../records/0066_WORK-golden.md) **decision 15** |
+| the program | [`tools/golden-switch/switch.py`](../../tools/golden-switch/switch.py) — `unlock` · `lock` · `retire <set>` · `state` |
+| the recipes | `just golden-unlock` · `golden-lock` · `golden-retire <set>` · `golden-state`, and `golden-guards` is state-aware |
+| the gate | [`tests/test_golden_switch.py`](../../tests/test_golden_switch.py) — 22 assertions, all against a COPY in `tmp_path` |
+| both states | `test_golden_key_guards.py` skips the locked-shape assertions when open and asserts the stash instead; `test_golden_hook_prose.py` skips whole |
+| prompt 9 | **retired** — it would have demolished the law permanently; it now points at the switch |
+
+**Design decisions worth knowing before phase D:**
+
+- 🔴 **Exactly one file is mutated: `.claude/settings.json`.** The deny rules go
+  and the two hooks are **deregistered**; the hook *files* are never edited or
+  moved, which is what makes `lock`'s byte-identical promise cheap rather than a
+  claim. `unlock` stashes the bytes **and their digest**, and `lock` refuses
+  rather than guessing if they do not match.
+- ⚠ **Restoring from the stash, not from git.** `git checkout --
+  .claude/settings.json` would also revert any unrelated edit made while the tree
+  was open, silently.
+- 🔴 **`.gitignore` and `!work/golden` are untouched in both states** — *never
+  committed* is the clause no state relaxes — and the switch's own test fails if
+  the program so much as *reaches* those two files. It may print their names;
+  naming a thing is not reaching it.
+- **`unlock` matches on the marker, never a list**, and **refuses when it
+  recognises no guard at all**: that means either the tree is open by some other
+  route (a breach) or `settings.json` has been restructured and the program no
+  longer understands it.
+- **`retire` refuses half a set.** Questions without answers is how the retired
+  tier becomes a second place where half a benchmark lives.
+
+🔴 **The gap this opens, named rather than papered over.** `just golden-unlock`
+contains none of the strings the `Bash` deny patterns match, so **nothing
+mechanical stops an agent running it**; the environment check inside the program
+is a tripwire an agent defeats in one line. **L11 decision 14's sentence is the
+whole defence** — the same standing as the recursive-`grep` route. It is the
+fourth door in that class and the first this project built deliberately.
+
+⚠ **Set 3's label is still unconfirmed.** Arpit called it `set-2-x`; it is
+Claude-authored, so `set-2-u` was expected. **Filed as spoken, and no rename
+happens before he confirms.**
+
+---
+
+### ✅ HE RAN IT — 2026-09-22 11:41. The tree is UNLOCKED and phase D may score.
+
+```console
+$ just golden-unlock
+UNLOCKED.
+  removed 29 deny rule(s) and 2 hook registration(s)
+```
+
+`just golden-state` reads `unlocked`; `just golden-guards` confirms the stash is
+intact, so a byte-identical `just golden-lock` is still possible. **Every number
+from this moment on is `informed` permanently** — accepted in the ruling.
+
+🔴 **`.claude/settings.json` is now MODIFIED in the working tree and must never
+be committed in that state.** It is the one file an unlock mutates. A commit
+carrying it would put *"the guards are down"* into history and into every clone.
+
+🔴 **The unlock immediately found a real defect, in the switch's own test.** Its
+fixture copied `.claude/settings.json` **off disk** — with a docstring arguing
+that the real file was the honest input, which it is until `just golden-unlock`
+runs, and that is a thing *the program under test does*. Seven tests failed with
+*"found no guard to remove"*: the fixture had been handed an already-open file.
+**A fixture that reads state its own subject can mutate is a fixture whose
+meaning changes underneath it.** It now reads the **committed** bytes via
+`git show HEAD:`, which cannot be unlocked. ⚠ And
+`test_the_real_tree_is_untouched` was demanding a locked tree — a test that fails
+on a correct state is how a suite teaches people to ignore it; it now asserts the
+two halves **agree** (unlocked ⇒ stash present and no live rules; locked ⇒ rules
+present and no state directory).
+
+**Measured in both states:** locked **5 383 passed**; unlocked **5 343 passed, 42
+skipped** — and the 42 are exactly the locked-shape arm.
+
+**What phase D still owes** is unchanged and is §Phase D below: the join, the
+difficulty pass, per-query verdicts, the funnel, the per-band breakdown, pooling,
+and `FINAL-SCORE.md`. Then `just golden-retire <set>` · `just golden-lock`.
+
+---
+
 ## ✅ RULED 2026-09-21 (Arpit, Cowork, second ruling) — the key opens by a SWITCH, scored sets retire into open test data, every set is named by generation and author
 
 *"Remove the checks through a just recipe and then you can access everything. Once

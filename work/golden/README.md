@@ -10,7 +10,7 @@ Codex, THREE question sets over them — one Codex-authored, two Claude-authored
 whose answers no agent ever reads, and a corpus ladder Claude grows from 10 to
 10 000 documents without ever seeing a question.**
 
-Ruled by Arpit, 2026-09-11. Tracked as [W-136 → W-204](../open/W-204-golden-outputs-scoring-and-version-benchmark.md).
+Ruled by Arpit, 2026-09-11. Tracked as [W-136 → W-204](../regression/2026-09-22-golden-final-score/FINAL-SCORE.md).
 
 ---
 
@@ -31,6 +31,7 @@ neither, and says only what each guard stops:
 | `.claude/hooks/guard-golden-answer.sh` | any Claude Code tool call — Bash included — that **targets** the folder by path. ⚠ Its Bash branch misses a bare `golden-answers/…`, and it refuses every edit to itself, which is why there is a sixth guard rather than a one-line fix |
 | `.claude/hooks/guard-sealed-key.sh` | the same, with the plural spelling closed on the shell surface too |
 | `tests/test_golden_key_guards.py` · `tests/test_golden_key_never_committed.py` | a guard quietly narrowing, and a key — or a fragment of one — reaching a **committed** byte |
+| `tests/test_golden_hook_prose.py` | the hooks being narrowed *or* widened on the prose question — see the convention below |
 | `CLAUDE.md` §Non-negotiable constraints — L11's generated view | everything above cannot reach: **Cowork**, and a recursive `grep` that never names the folder |
 
 🔴 **A key may be on this machine, and the guards are the defence again.** L11
@@ -40,6 +41,30 @@ paragraph said the guards defended an empty room. **They do not.** 🔴 **Three
 routes none of them covers**, all three prose in the law: a **paste**, a
 **Cowork session's mount** — it reaches the folder with a plain shell call no
 deny rule or hook sees — and a recursive `grep` that never names the folder.
+
+⚠ **Writing about this directory has one convention, and it is not stated here:**
+[SR-WORK-GOLDEN](../../records/0066_WORK-golden.md) decision 7 (Arpit,
+2026-09-21). Read it before writing any document that has to spell a key path —
+including this one.
+
+🔴 **LOCKED is a STATE now, and the switch is Arpit's hand.** Since 2026-09-22
+the guards above come down by one command and go back by another:
+
+```console
+$ just golden-state         # locked | unlocked — safe for anyone, opens nothing
+$ just golden-unlock        # ARPIT ONLY: the read guards come down
+$ just golden-retire set-1  # questions AND answers -> retired/, open test data
+$ just golden-lock          # every guard back, byte-identically
+```
+
+**The rule is [L11](../../records/0012_LAW-11-sealed-answer-key.md) decision 14
+and this file states none of it**; the mechanics are
+[SR-WORK-GOLDEN](../../records/0066_WORK-golden.md) decision 15. What matters
+here is the *process* shape: the lift is **per generation of test data**, not
+once and for ever — a scored set retires into ordinary reusable data and the
+next generation is authored sealed as `set-<gen>-<x|u>`. ⚠ **The paste route is
+retired**, and **every golden number is `informed` permanently from the first
+unlock.**
 
 ### 🔴 The 2026-09-15 reset, and the three sets written after it
 
@@ -96,12 +121,35 @@ similar restriction to both."*
 - ⚠ **No Claude session creates, empties or removes either directory** —
   deleting a thing is a tool call that reaches into it. **Arpit does it
   himself**, and a directory's existence authorizes nothing about opening it.
-- **Scoring is a chat Arpit is present for.** He pastes the rows a run needs into
-  a Codex chat; Codex returns per-query results with no answer text and no
-  relevant-document names. **An item waiting on phase 6 waits on his
-  availability**, not on an agent.
+- ⚠ **RETIRED 2026-09-21: *"scoring is a chat Arpit is present for"*.** That
+  bullet described the paste route — he pasted a run's rows into a Codex chat and
+  Codex returned per-query results. **It is gone.** Scoring now happens inside the
+  repository while the tree is unlocked (L11 decision 14), which is what removed
+  *waiting on his availability* from every item that needed a score. The one thing
+  that still needs his hand is the **switch**, and that is one command rather than
+  a session he has to sit through.
 
-### The three question sets (2026-09-15; set 3 added 2026-09-20)
+### 🔴 All three sets RETIRED on 2026-09-22 — this section is history
+
+**Generation 1 is scored, retired and re-sealed.** Arpit ran the full cycle in
+one sitting: `just golden-unlock` → phase D scored **11 716 rows** → `just
+golden-retire` on all three → `just golden-lock`.
+
+**Their questions and expected values now live at
+[`retired/`](retired/)** — `set-1`, `set-2`, `set-3`, each with
+`questions.jsonl`, `expected.jsonl` and a README. 🔴 **They are open data any
+session may read in any state, and they carry no golden claim**: the model family
+that reads them also tunes against them, so a number measured on them says a
+behaviour has not regressed and nothing about the engine's quality. The score
+itself is [`FINAL-SCORE.md`](../regression/2026-09-22-golden-final-score/FINAL-SCORE.md).
+
+⚠ **`work/golden/questions/` is empty of sets now**, and the key directory is
+closed again. **The next generation is authored SEALED** and named
+`set-<gen>-<x|u>` (`x` Codex, `u` Claude) — L11 decision 14. ⚠ **These three kept
+their original names**, because they retired before any rename, so the
+convention begins with generation 2.
+
+**What follows is the generation-1 description, kept as history.**
 
 **Same seed corpus, same ladder, two authors, reported apart — never pooled.**
 
@@ -227,6 +275,9 @@ are both in his hands.
 | **4** | Claude Code | `seed/` **only** | verifies the eight rungs; builds or repairs the corpus in fux-lab + `ladder/*.sha256` | [`4-claude-corpus.md`](prompts/4-claude-corpus.md) |
 | **5** | Claude Code | the ladder + every released `questions/set-N.jsonl` | `predictions-set-N.jsonl`, **`handoff-set-N.jsonl`** and `report.md`, **one pair per set** | [`5-claude-run.md`](prompts/5-claude-run.md) |
 | **6** | Codex | the hand-off files + **the keys, pasted by Arpit** | per-query results **without answers**, per set | [`6-codex-score.md`](prompts/6-codex-score.md) |
+| **10** | Claude, **an isolated claude.ai chat, one per set** | the seed corpus, **attached — nothing else** | **seed additions** that carry the inputs four ranking features act on (T4, T5, T6) + `set-3-u` → **four blocks in the chat**, no file | [`10-claude-feature-input-seed.md`](prompts/10-claude-feature-input-seed.md) |
+
+🔴 **Every prompt that creates test data is authored against [SR-WORK-TESTDATA](../../records/0068_WORK-test-data.md)** — the fourteen-item checklist — and names the items it carries in its first lines. `tests/test_test_data_prompts.py` fails when one does not, and when a new prompt file is not classified.
 
 **Between 2/3 and 4, Arpit commits block 1 of each handoff** as
 `questions/set-N.jsonl`, and keeps block 2 — the key — himself. **Prompt 3 is run
@@ -386,7 +437,7 @@ abstains by arithmetic, and the abstention slice then measures nothing.
 
 ⚠ **Neither key exists yet**, so nothing carries a difficulty label today. The
 scorer runs for the first time once set 1 and set 2 are written —
-[W-190 → W-204](../open/W-204-golden-outputs-scoring-and-version-benchmark.md).
+[W-190 → W-204](../regression/2026-09-22-golden-final-score/FINAL-SCORE.md).
 
 ---
 
@@ -412,7 +463,7 @@ yet** — say so in the pre-registration instead of running.
 
 **Every edge in this corpus is a `supersedes` edge.** There is no link syntax
 anywhere in `seed/`, so three features measure nothing
-([W-191 → W-204](../open/W-204-golden-outputs-scoring-and-version-benchmark.md)):
+([W-191 → W-204](../regression/2026-09-22-golden-final-score/FINAL-SCORE.md)):
 
 | rung | docs | edges | **`ref`** | `supersedes` |
 |---|---:|---:|---:|---:|
@@ -623,17 +674,31 @@ point of custody. A changed key is still a new `key_version`, never an edit.
 - **Rungs are independent**, so they can run in parallel. A lab environment points
   at the rung directory with one pinned engine version.
 - For every question, from inside the rung directory, **two calls**:
-  `fux ask "<question>" --json --band --top 10` and `fux answer "<question>" --json`.
+  `fux ask "<question>" --json --band --why --top 10` and
+  `fux answer "<question>" --json`.
+- 🔴 **`--why` is not optional and it is not for debugging** —
+  [SR-WORK-QUALITY](../../records/0056_WORK-quality.md) decision 13. Its
+  `derivation.gates` are the only place `reachable` and `in window` exist, they
+  are discarded the moment the query returns, and **a filed run cannot get them
+  back**. W-204 phase D scored 11 716 rows and could not compute the funnel at
+  all. The hand-off records those five integers and **nothing else from the
+  derivation** — the per-term rows are large and the metric reads five numbers.
+  ⚠ **An old arm may not have the flag** (`fux-engine 1.0.0` has neither `--band`
+  nor `--why`, and argparse exits `2` on an unknown one): pass `--no-why` for
+  that arm, and its `gates` are **null**, never zeros.
 - **`predictions-set-1.jsonl` and `predictions-set-2.jsonl`**, one line per
   question: `{"id", "ranked": [paths…], "answerable": bool, "band": "…"}`. **One
   file per set**, never one for both — the ids are what phase 6 joins on, and a
   merged file makes a mis-join silent.
 - 🔴 **`handoff-set-N.jsonl` is the artifact Arpit carries to Codex** — per
   question: the question, **what fux answered and cited**, the ranked paths, the
-  band, the rung and the engine commit. **It contains no golden answer**, because
-  no Claude session has one.
+  band, **the funnel gates**, the rung and the engine commit. **It contains no
+  golden answer**, because no Claude session has one.
 - **`report.md`** says what happened: counts, band distribution, how many
-  questions fux declined, what looked wrong. 🔴 **It never says whether an answer
+  questions fux declined, **how many rows carry funnel gates**, what looked
+  wrong. 🔴 **A run whose gates are missing says so in the report**, because the
+  alternative is a scoring pass discovering it days later with the rows already
+  frozen. 🔴 **It never says whether an answer
   is right** — that word first appears in phase 6, from Codex.
 
 ---

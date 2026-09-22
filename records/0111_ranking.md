@@ -7,10 +7,10 @@ description: BM25F over five fields, weight-then-saturate once, with one scorer 
 status: accepted
 date: 2026-08-18
 feature: scoring, ordering, and the analyzer they share with ingest
-owns: [src/fux/query/rank.py@aeee6408bcf8, src/fux/query/bm25f.py@f325494f6ba8, src/fux/query/tokenize.py@1d8ff4a42048, src/fux/query/analyzer.py@4a6a03793628, src/fux/query/stem.py@728155482c94]
+owns: [src/fux/query/rank.py@63a9c36a1894, src/fux/query/bm25f.py@239de1ead880, src/fux/query/tokenize.py@1d8ff4a42048, src/fux/query/analyzer.py@38936c39de2a, src/fux/query/stem.py@728155482c94]
 laws: [L1, L3]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: a4243f87becf31c4685dc685e1927bafdf1d30a8a3b5478be0a6bcf4204f8497
+content_sha: d2f2cfbfbfaf59e14d848612c1a538ce996b3f32485fd7ef5f1de0fb14b0bbcd
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -342,6 +342,31 @@ and two of the positions are easy to get backwards:
   as one opaque `getusername` — `get`, `user`, `name` are *gone*, not merely
   unused. Whole **and** parts are emitted, which keeps an exact-identifier query
   precise while `user name` finds the identifier at all.
+
+  ⚠ **That promise held for `snake_case` alone until 2026-09-22, and the
+  exception was silent.** `_` was inside the token class and `-` `.` `/` were
+  not, so `ERR_2031` arrived as one token and produced whole **and** parts, while
+  `RF-118` arrived as *two* tokens and **no whole form ever existed**. Coverage
+  was an accident of punctuation: a reader of this decision could not tell which
+  separator they had. **Analyzer `v3` (W-205 part 2, family (a)) puts `-`, `.`
+  and `/` on the same footing as `_`**, so the sentence above is now true of
+  every separator it appears to describe.
+
+  🔴 **It shipped on correctness, not on a ranking win** (Arpit, 2026-09-21). The
+  [measured arms](../work/regression/2026-09-21-identifier-analyzer/VERDICT.md)
+  returned **INCONCLUSIVE** — nets of +1 / +3 / +4 with **0 regressions** on three
+  rungs, below [SR-RS](0133_predictions.md) decision 19's floor of 6 flips — and
+  that verdict **stands as filed and is not reworded**. What carried the merge is
+  this decision's own promise, plus the mechanism probe: **33 of 33 seed
+  identifiers survive whole, from 0 of 33**, on both readers. **No claim of a
+  ranking improvement may cite it.** The cost is filed with **no threshold**:
+  ×2.1 dictionary terms at `rung-10000`, **+4.6 % index bytes**. Most of that is
+  ordinary hyphenated prose, not identifiers, so **restricting the whole form to
+  digit-bearing tokens would shed it** — named here, unmeasured, and needing its
+  own fixture run before anyone builds it. ⚠ **Families (b) unstemmed-and-stemmed
+  and (c) a separate exact field are NOT built**, and (c) is blocked on nothing
+  but headroom: (a) is its precondition, so it is now unblocked and still
+  unjustified.
 - **Stemming happens before hashing**, so the hash is always taken of the final
   analyzed token. The Porter implementation is checked against the published
   test vectors and passes **75 of 75**.
@@ -528,6 +553,24 @@ a PASS on a frozen pre-registration. That pre-registration is
 and the data it needs — documents findable only through a linker's wording —
 does not exist yet. **No claim about ranking quality is made or may be made
 until it has a `VERDICT.md`.**
+
+**W-210 — the BM25F summand has ONE home, and `rank()` hands out two more
+statistics.** `score_record`'s loop body is extracted to
+[`bm25f.term_contribution`](../src/fux/query/bm25f.py), so the per-term
+attribution `--why` prints ([SR-PROVENANCE](0142_provenance.md) decision 17) is
+the **same expression** the score was built from rather than a second copy of it.
+🔴 **Two copies of a scoring formula is the defect this record's own decision 9
+names one level up** — they can disagree while both look correct, and here the
+disagreement would surface as a plausible number printed beside the real one.
+**Same operations, same order, so the float result is unchanged** and the
+differential law between the scan and the accelerator cannot pick up a last-bit
+difference from the extraction; `node/src/query/bm25f.mjs` carries the same
+extraction.
+
+`rank()`'s `stats_out` gains `avg_wlen` and `scoring` — the two remaining inputs
+of the summand, through the seam `df` and `n` already use. Written after the
+sort, like everything else in that dict, and **nothing read back out of it
+reaches a score or an ordering**.
 
 ### Consequences
 

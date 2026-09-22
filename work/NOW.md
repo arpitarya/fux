@@ -3,82 +3,36 @@ type: Pointer
 description: "One line: the current state and the immediate next step. Overwritten every session."
 ---
 
-✅ 2026-09-21 Claude Code: **`3.0.0-alpha.2` is live on PyPI and npm**, and the push that cut it found
-`main` **red on three failures nobody could see locally**. 47 commits had never left this machine. The
-repo's own `.fux/index/` was still `fux.index.v3` — W-194 stepped `SCHEMA_ID` to v4 and nothing
-re-ingested this tree — so `node-arm`'s `fux build` refused it on all six runners; **every other test
-builds its index in a `tmp_path`**, so the one index no test read was the one in this repository. Now
-gated by `tests/test_own_index_is_current_format.py` (two strikes: the same class cost sixty
-hand-re-ingested shards on 2026-09-11). Windows was red on 33 more: a `#!/usr/bin/env bash` hook
-invoked as a bare path, and then — once `bash` was named — the **WSL stub** that answers there, which
-exits **1** without running anything, so every guard assertion read as *ALLOWED*. ⚠ **Those tests now
-SKIP where there is no usable `bash` or `jq`**, loudly; 🔴 **no guard, hook or pattern changed.** Both
-suites green whole, both workflows green, `alpha` dist-tag moved, `latest` still `2.0.1`.
-→ **Next is unchanged: W-204 phase C′** — the three recipes and the L11 amendment Cowork ruled below.
+🔴 2026-09-22 Cowork (Opus): **NEW RECORD SR-WORK-TESTDATA (0068) — the test-data checklist, T1–T14 — and PROMPT 10 for the inputs four features lack. W-215 still waits on Arpit.**
 
-✅ 2026-09-21 Cowork: **the inbox is EMPTY — five rows ruled.** W-204: the paste route is retired and
-L11's prohibition becomes a **switch** — `just golden-unlock` (his hand) → Claude Code scores phase D
-directly → `just golden-retire <set>` moves a scored set's questions **and answers** into committed,
-reusable test data → `just golden-lock`; the next generation is sealed under **`set-<gen>-<x|u>`**
-(x Codex, u Claude). Every golden number is `informed` permanently. W-205 part 2 family (a) **ships on
-correctness** (0 regressions, `ANALYZER_VERSION` v3, cost filed, no threshold); **no SR-RS d23 clause**.
-New **W-209**: the L11 hook stays; prose spelling a key path goes through Write/Edit, never a shell
-command; one test pins it. ⚠ He labelled set 3 `set-2-x`; it is Claude-authored — **confirm `-u` vs
-`-x` before the rename.** → **Next: Claude Code (Opus) builds W-204 phase C′** — the three recipes,
-L11 + SR-WORK-GOLDEN amended on this ruling, prompt 9 → *build the switch*, guards test for both
-states — then his `just golden-unlock` and phase D. W-205 (a) merge and W-209 are 🟢 and independent.
+- **[SR-WORK-TESTDATA](../records/0068_WORK-test-data.md)** — fourteen one-line items, each pointing to its rule's home; **T4 anchor-only vocabulary**, **T5 abbreviation pairs** and **T11 git history** stated there because nothing owned them. **Every test-data prompt links it**, gated by `tests/test_test_data_prompts.py`.
+- **[Prompt 10](golden/prompts/10-claude-feature-input-seed.md)** — an isolated claude.ai chat writes the seed additions and **`set-3-u`**. **Not run; his, after `set-2-u` is scored.** Running it rebuilds the ladder.
+- ⚠ Commit, then re-run `gen-components` + `sr-hash`; run `test_sr_freshness.py` from Claude Code (the bridge cannot).
 
-✅ 2026-09-21 Claude Code: **W-199 CLOSED — a URL line declares its decoder, and ingest stops guessing.**
-DoD 10 shipped, so all ten are met. `decoder=<stem>` is **required** on every URL line beside `fetch=`;
-`fux add` observes the `Content-Type` on its one fetch and writes the stem, **refusing** when nothing
-claims that format; `_decode_fetched` takes the declared stem and the header is not consulted at ingest
-at all. The header→extension→prose ladder **moved** to `propose_decoder` (same ladder, one execution)
-rather than being deleted, so an existing corpus re-adds to the same answer.
-🔴 **BREAKING and wider than `fetch=`'s break** — no line written before today carries the attribute, so
-**every** existing `.fux/sources/urls` stops loading; `fux add <url>` again is the fix, `--decoder <stem>`
-the offline one. 🔴 **Two behaviour changes a consumer meets first:** `fux add <url>` now opens the
-network **twice** (observe, then ingest) unless `--decoder` is given, and `fux add` on a URL that is
-**down** writes **no line at all** where it used to write one and exit 1. Stronger for free: the magic
-floor refuses a body the **line** disagrees with; refer and enrich decode by the same committed line
-ingest did; a retained blob is named by what it is. **W-200's second provenance finding shipped with
-it** (`observed types`). 17 records amended — SR-URL-LIST 13 and **17**, SR-FETCHER **17**, SR-DECODE
-**21**, SR-URL-INGEST **6a**, two SR-DOCTOR rows. Suites: `tests` **5 282**, `tests_e2e` **145**,
-`node --test` **82**. ⚠ **One red is not mine** — `test_record_components` on `records/0012`, the other
-session's mid-flight L11 amendment. ⚠ **A `git checkout` on a shared tree reverted my SR-URL-LIST
-amendment** and my first audit loop said everything was fine because `$(grep -c … || echo 0)` never
-compares equal — re-applied, and the lesson is in the WORKLOG. → **Next: Arpit's inbox** — the L11
-blocker's key move, then the paste, then W-204 phase D. **W-168 is the only agent row left and it waits
-on W-204.**
+**Earlier the same session:**
 
-✅ 2026-09-21 Claude Code: **W-208 BUILT and CLOSED — every record now names the files it governs, and the naming is GENERATED.**
-A `COMPONENTS` block sits under the frontmatter of **74 of 85** records, rendered from the register's
-OWNERSHIP and DESCRIBES tables by `scripts/gen-components.py` and held byte-equal by
-`tests/test_record_components.py` — SR-WORK-OWNERSHIP decision 16, on SR-LAW-0 decision 5's
-permission. ⚠ **Do not hand-edit a block**: change the table, then
-`python scripts/gen-components.py --write && python scripts/sr-hash.py --write`.
-Unowned (audited set) **35 → 0 by decision** · ungated `component` records **13 → 0** (four by owning,
-nine by describing — reach is not ownership) · node files a record names **19 → 47** · describes rows
-**33 → 73**. `tests/` as a directory stays unowned, stated in the register. `RULE-SINCE` gained an
-entry that does **not** move the baseline. → **Next: W-204 — Arpit pastes the key, then phase D scores
-A and B in one pass.** 🟢 **W-199 DoD 10 is unblocked** — the multi-record build it was waiting on is
-committed. Inbox: **empty**.
+🔴 2026-09-22 Cowork (Opus): **W-216 AND W-217 ARE WITHDRAWN — NOTHING WAITS ON AN UNLOCK. ONE ITEM WAITS ON ARPIT: W-215.**
 
-🔴 2026-09-21 Claude Code: **Phases A and B are FILED. The next move is Arpit's paste.**
-Prompt 4 rebuilt the ladder on set 3's seed — **61 `ref` edges on every rung, from 0**, so a link
-feature is measurable here for the first time. **Phase A re-run: 5 984 calls, three sets, no score**;
-it **falsified** the baseline's *inert middle band* (the middle DRAINS — 0 of 21 transitions gains a
-member) and **replicated the authorship gap** on an independently authored third set. **Phase B: the
-null control passed 374/0, then 8 976 rows across v1.0.0 · v2.0.1 · HEAD**; captures 1, 2, 5, 6 filed
-and 3, 4, 7 left empty because each needs the key. 🔴 **`v2 → HEAD` moves 125 of 125 lists and the
-cause is ONE MEASURED KNOB** (`b` 0.75 → 0.15) — a changed list is not a better list.
-**W-205 part 1 PASSED and shipped; part 2 INCONCLUSIVE and did NOT ship.**
-🔴 **Two unmeasured premises in one day** — set 3's failing shape did not fail, and 5 of part 1's 6
-"unreachable" identifiers were already reachable; the candidate SR-RS rule is in the inbox, not taken.
-🔴 **FOUND: part 1 makes supersession pairs MORE likely to invert** — the archived revision now
-outranks the live document on a shared `doc_id`. → **Next: Arpit pastes the key, then phase D scores
-A and B in one pass.** ⚠ **W-199 DoD 10 was NOT started**: it must amend `0101_cli-surface.md` and
-`0139_decode.md`, and a concurrent session was mid-flight on **W-208** with 18 records uncommitted —
-**that session has since committed and closed W-208**, so the reason to hold is gone.
-Inbox: **four rows, all his**.
+**His review:** *"is any item block on golden unblock ?? if no then no need for work item."* **The answer was no**,
+and the two items saying yes were wrong about why.
 
-✅ 2026-09-21 Cowork: **W-207 withdrawn — the key in yesterday's session was Arpit's own paste, to get a score; no breach, no label.** Inbox empty. Phase A re-ran on the set-3 ladder (5 984 calls, three sets). → **Next, one Claude Code session: commit the untracked run files, phase B (three engines), W-205 part 2 arms, W-205 part 1, W-199 DoD 10 — then Arpit pastes the key and phase D scores.** ⚠ A stale `.git/index.lock` from the stopped session may need removing first.
+🔴 **Scoring needs no unlock.** [L11](../records/0012_LAW-11-sealed-answer-key.md) decision 13's scoring carve-out
+attaches to **his hand**: `tools/golden-score/score.py`, started from his own shell, reads the key **while the tree
+stays LOCKED** — *"an unlock does NOT replace it."* The lock binds a Claude tool call; it has never bound him. W-216
+claimed scoring `set-2-u` needed the unlock. It did not, so nothing in the queue waited on W-216 or W-217.
+
+**Filed:** [SR-WORK-GOLDEN](../records/0066_WORK-golden.md) decision 16 **amended** — a switch item exists **only when
+an open item actually waits on the switch**; when one does, it still gets its own 🔴 row naming the verb, and the lock
+item is still filed with its unlock item. The generated `CLAUDE.md` bullet follows it (`gen-golden.py`, `sr-hash.py`
+re-run). **W-216 and W-217 archived unchanged** to `archive/open/`, with map rows naming the false premise — they are
+decision 16's worked counter-example.
+
+**The inbox:** 🔴 **[W-215](open/W-215-generation-2-corpus.md)** — **score `set-2-u` from your own shell, no unlock**,
+then rule whether item 1 is enough or items 2–4 and 6 (new seed documents, a ladder rebuild) go ahead. **W-168** waits
+on it.
+
+⚠ **Housekeeping, stated:** this session's `git status` left an empty `.git/index.lock` it could not unlink, which
+would have blocked the next commit on this machine. Removed after Arpit granted delete permission; nothing else was
+deleted.
+
+🔴 **The golden tree is LOCKED and this session went nowhere near the key.**

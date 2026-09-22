@@ -10,7 +10,7 @@ feature: the index write lock and the files around it
 owns: []
 laws: [L1, L2, L3, L7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 00459e920d54fe25ed8a64d25fc402ebd3f357c1f7b1a923321fa109f7a9ff80
+content_sha: a650ff636dea923047b97a63044858e54c70af41bbad4409c9372fb37cf30c5a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -180,6 +180,15 @@ stranded one.
 something is stuck without saying *where* is not a status
 (SR-MAINTENANCE decision 1c), so `lock_path()` is public and `fux doctor`,
 the takeover reporter and the `required=True` refusal all print it.
+
+⚠ **Unchanged by W-210 (2026-09-22), and touched here only because the register
+says so.** That change edited two things in `src/fux/store/fuxdir.py`: the
+`runtime` kind's description string, which gained `runtime/trace/`
+([SR-DOTFUX](0102_fux-directory.md); [SR-SERVE](0158_serve.md)), and the verb
+table `_readme()` writes, which gained `fux serve`
+([SR-CLI](0101_cli-surface.md)). **Neither reaches this record's claim on that
+file**, and saying so is the point of the freshness gate — the prompt is *re-read
+the record*, and the honest outcome of re-reading it can be *nothing moved*.
 
 ### Consequences
 

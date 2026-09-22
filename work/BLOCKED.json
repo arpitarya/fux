@@ -1,8 +1,10 @@
 {
- "decision": "PROCEED",
- "reason": "RULED 2026-09-21 (Arpit, Cowork): the key opens by a switch — `just golden-unlock` removes the read guards, Claude Code scores phase D directly, `just golden-retire <set>` moves a scored set's questions and answers into committed reusable test data, `just golden-lock` restores the guards, and the next generation is authored sealed under `set-<gen>-<x|u>`. The paste route is retired. Every golden number is `informed` permanently. Detail: work/open/W-204-golden-outputs-scoring-and-version-benchmark.md.",
- "questions": [],
- "safe_alternative": "",
+ "decision": "ASK",
+ "reason": "One item waits on Arpit: W-215. Its item 1 has already landed — set-2-u, 125 questions authored in an isolated claude.ai chat from the seed alone, with a baseline on rung-01000 — and it is UNSCORED. Scoring needs NO unlock: L11 decision 13's carve-out attaches to his hand, so tools/golden-score/score.py started from his own shell reads the key while the tree stays LOCKED. The unlock/lock items W-216 and W-217 were filed on the opposite premise, withdrawn on his review the same day (SR-WORK-GOLDEN decision 16, amended: a switch item exists only when an open item actually waits on the switch), and archived unchanged. W-168 waits on W-215.",
+ "questions": [
+  "W-215: score set-2-u yourself with tools/golden-score/score.py (no unlock needed), then rule — is item 1 enough, or do items 2-4 and 6 (new seed documents, a ladder rebuild) go ahead?"
+ ],
+ "safe_alternative": "Nothing agent-side is open. W-214 shipped; W-168 waits on W-215's score.",
  "surfaced": true,
- "filed": "2026-09-21"
+ "filed": "2026-09-22"
 }

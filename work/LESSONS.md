@@ -21,6 +21,81 @@ record is the rule and this file is the anecdote that motivated it.
 
 ---
 
+## 2026-09-22 — `sr-owns.py` reads `git ls-files`, so stamping BEFORE `git add` leaves a red test on the committed tree
+
+**The sequence, and it looks correct at every step.** Add a new file to an
+SR-owned directory → amend the owning record → run
+`scripts/sr-owns.py --write && scripts/sr-hash.py --write` → run the suite green
+→ `git add -A` → commit. **Then the suite goes red on a clean tree**, because
+`sr-owns.py` computes a directory's hash from **`git ls-files`, deliberately**
+(so an untracked build artifact cannot move it) — and an **untracked new source
+file is invisible to it for exactly the same reason.** The stamp was taken
+before the file existed as far as the hasher was concerned.
+
+🔴 **The red test appears AFTER the commit**, which is the worst available
+timing: the tree is clean, the suite was green when it was run, and nothing in
+the commit looks wrong. **Run the stamp after staging, not before** — or run the
+suite once more on the committed tree, which is the only thing that catches it.
+
+⚠ **It is the same shape as the lesson below it:** a git command whose input is
+*the index* rather than *the working tree*, used as if the two were the same
+thing. `sr-owns.py`'s docstring says so in terms; I did not read it until the
+test failed.
+
+⚠ **Not gated, and it is a judgement lesson rather than a rule** — the hasher's
+behaviour is correct and the fix is an ordering habit. If it happens a second
+time, [SR-WORK-SESSION](../records/0060_WORK-session.md) decision 13 turns it
+into a check.
+
+---
+
+## 2026-09-22 — BOTH git forms are traps on a shared tree, and I hit each of them
+
+**Three commits, one class: *the commit took something other than what I
+staged*.** Twice in one direction, once in the other, on a tree a second session
+was editing.
+
+| | what happened |
+|---|---|
+| `a0140874` | `git commit -- <pathspec>` **discarded** a partial stage built specifically to keep another session's rows out. That form commits the **working tree** for those paths and **ignores the index** |
+| `f425a79a` | a bare `git commit` **took the whole index**, including a concurrent session's staged SR-WORK-REGISTRY work, under a message describing only half of it |
+| `163313a1` | the same again, sweeping 67 re-ingested index shards into a commit about the sealed-key switch |
+
+🔴 **The repo's own rule made me confident in the wrong direction.**
+[SR-WORK-SESSION](../records/0060_WORK-session.md) decision 10 says *"commit with
+explicit pathspecs — `git commit -- <paths>` — when the index carries another
+session's work"*, and that is exactly the form that threw my partial stage away.
+The sentence is not wrong about the *goal*; it names the one git form that
+cannot achieve it.
+
+**The safe pair, and it is two steps that must both hold:**
+
+```console
+$ git add <the paths you mean>     # the index is now what you mean
+$ git commit                       # no pathspec — commits the index
+```
+
+…**and the second step is only safe while nobody else has staged anything.** On
+a shared tree, `git diff --cached --name-only` immediately before committing is
+the check, every time. Neither form is safe on its own; the index is shared
+state and git has no notion of *"my part of it"*.
+
+⚠ **Nothing was lost in any of the three** — a swept file is still a committed
+file — but two commit messages described half their contents, which is its own
+defect in a repo where the message is the durable record. Both were rewritten to
+say what they actually carry.
+
+🔴 **The general case has no mechanical check**, because nothing can know which
+staged paths the author meant. **One specific case does, and it is the one that
+matters:** an unlocked `.claude/settings.json` must never reach a ref, because it
+is the file `just golden-unlock` mutates and a committed copy would put *"the
+guards are down"* into every clone.
+[`tests/test_settings_never_committed_unlocked.py`](../tests/test_settings_never_committed_unlocked.py)
+is that gate — two strikes, so a gate — and it reads `git show HEAD:`, never the
+working tree, which is *expected* to be unlocked while somebody is scoring.
+
+---
+
 ## 2026-09-21 — the restore is the hazard, not the commit; and an audit loop can lie
 
 **Two halves of one afternoon, and the second is worse than the first.**

@@ -22,7 +22,7 @@ or neither.
 2026-09-12**: it was a repo convention the OKF spec does not have, so a
 conformance claim and the tree disagreed. `OPEN-WORK.md`, `INTERVIEW.md`,
 `IMPLEMENTATION.md`, `WORKLOG.md`, `MACHINE.md`, `NOW.md`, `GLOSSARY.md`,
-`DOC-REGISTRY.md`, `governance.md`, the SR register and every directory
+the doc registry (SR-WORK-REGISTRY §3), the governance map (SR-WORK-GOVERNANCE), the SR register and every directory
 `README.md` now declare a `type`.
 
 **This file is the bundle root** (`okf_version: "0.1"`) and is the one reserved
@@ -75,7 +75,6 @@ work/               THE SHARED MEMORY between sessions — start at work/README.
   NOW.md            the one-line running pointer
   LESSONS.md        dated build lessons — a log, because a record carries no history
   MACHINE.md        environment/tooling quirks per surface (local · bridge · cloud · CI)
-  DOC-REGISTRY.md   doc freshness tracker (triggers + last-verified)
   BLOCKED.json      the blocker file; its presence stops the session
   paper/            the architecture of record + figures + predictions
   architecture-{high-level,detailed,decoders,ask,answer,two-readers}.svg   the six
@@ -135,7 +134,7 @@ gating rule stands for every milestone after it**
 * [Model handoff interview](../work/INTERVIEW.md) - the state of play; read before substantive changes.
 * [Worklog](../work/WORKLOG.md) - per-exchange session trail, newest first.
 * [Machine notes](../work/MACHINE.md) - what breaks on which surface, and why.
-* [Doc registry](../work/DOC-REGISTRY.md) - maintained docs, update triggers, last-verified dates.
+* [Doc registry](../records/0067_WORK-registry.md) - maintained docs, update triggers, last-verified dates.
 * [Glossary](GLOSSARY.md) - recurring terms, defined once.
 
 # Decisions

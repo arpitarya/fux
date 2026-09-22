@@ -1,4 +1,4 @@
-"""Analyzer v2 — the pipeline both `ingest/` and `query/` run, in that order.
+"""Analyzer v3 — the pipeline both `ingest/` and `query/` run, in that order.
 
     split identifiers  ->  lower  ->  stopwords  ->  stem  ->  (caller hashes)
 
@@ -27,6 +27,23 @@ variant adds only ~0.2 % on top of it.
 token count from 546 142 to 563 296 (x1.03) and distinct-per-document postings
 from 190 512 to 193 884 (x1.02). Small *because this corpus is prose markdown*;
 a codebase will differ, and that is not measured here.
+
+## v3 — one separator rule instead of two (W-205 part 2, family (a))
+
+**v2 kept the whole-and-parts promise for `_` and broke it for `-`, `.` and
+`/`.** `ERR_2031` reached the index as `err_2031`, `err`, `2031`; `RF-118`
+reached it as `rf`, `118` and **no whole form existed anywhere**, so
+`RF-118`, `RF-119` and `RF-120` shared their only distinguishing term. Coverage
+was an accident of punctuation.
+
+**v3 makes the four separators one rule.** `RF-118` now yields `rf-118`, `rf`,
+`118`. The parts are unchanged, so every query that worked under v2 still
+matches; what is added is a term that belongs to exactly one document.
+
+⚠ **It costs one position and one `flen` slot per hyphenated identifier** —
+precisely what `snake_case` has always cost — so it adds no new *kind* of
+effect, only the same one, uniformly. The measured size of that cost is in the
+run that adopted v3, never asserted here.
 """
 
 from __future__ import annotations
@@ -36,23 +53,39 @@ import re
 from .stem import stem as _stem
 
 #: Matched against the ORIGINAL text, not a lowercased copy — see the module
-#: docstring. Hyphen is absent from the class, so `kebab-case` splits here for
-#: free, exactly as it did under v1.
-_WORD_RE = re.compile(r"[A-Za-z0-9_]+")
+#: docstring.
+#:
+#: 🔴 **v3 (W-205 part 2, family (a)): `-`, `.` and `/` join `_` inside a
+#: token.** Under v2 the class was `[A-Za-z0-9_]+`, so `RF-118` arrived as
+#: **two** raw tokens and the module's own promise — *whole AND parts are both
+#: emitted* — was kept for `snake_case` and silently broken for every other
+#: separator. `ERR_2031` survived whole; `RF-118` had no whole form at all, and
+#: **the separator, not the identifier, decided the outcome.**
+#:
+#: The trailing-run requirement (`(?:[-./][A-Za-z0-9_]+)*`) is what stops a
+#: sentence's punctuation being glued on: in `finished. Next`, the `.` is not
+#: followed by an alphanumeric run, so it is not part of the token. A separator
+#: only joins when there is something on both sides of it.
+_WORD_RE = re.compile(r"[A-Za-z0-9_]+(?:[-./][A-Za-z0-9_]+)*")
 
 #: The three places a real identifier boundary can sit. Splitting on
 #: BOUNDARIES rather than matching runs is what stops an acronym-plus-digit
 #: token being shattered: an earlier run-matching version turned `BM25F` into
 #: `bm`, `25`, `f`, which is three junk terms and a lost one.
 #:
-#:   `_`                         snake_case
+#:   `_` `-` `.` `/`            snake_case, kebab-case, dotted, pathlike
 #:   lower/digit -> upper        getUser, bm25F
 #:   upper -> upper+lower        HTTPServer
 #:
 #: A token with none of these has no boundary in it and is left whole:
 #: `sha256`, `utf8`, `k1`, `v0` are single terms, and stripping them into
 #: pieces loses the only thing that made them identifying.
-_BOUNDARY_RE = re.compile(r"_+|(?<=[a-z0-9])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])")
+#:
+#: 🔴 **v3 adds `-`, `.` and `/` to the `_` alternative**, which is the whole of
+#: family (a): the *parts* were already being emitted for these separators
+#: (because `_WORD_RE` split on them), and what was missing was the *whole*.
+#: Now `RF-118` behaves exactly as `ERR_2031` always did.
+_BOUNDARY_RE = re.compile(r"[_\-./]+|(?<=[a-z0-9])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])")
 
 _STOPWORDS = frozenset(
     """a an and are as at be but by for from has have how i if in into is it its

@@ -8,6 +8,54 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Added
+
+- **`fux serve` — the ask explorer.** A local page that takes a question and
+  shows the ten documents an agent would be handed, with the hood open: which
+  word earned which part of each score, which links moved a result, the
+  confidence band against its floor, and one lever per finding. Stdlib server,
+  no dependency, one self-contained HTML file that renders with the network
+  unplugged.
+
+  ```console
+  $ fux serve            # http://127.0.0.1:7337
+  $ fux serve --open
+  ```
+
+  🔴 **It binds `127.0.0.1` and there is no `--host`.** That is a contract, not
+  a default: the page shows your corpus's vocabulary, its passages and the
+  questions somebody typed.
+
+  🔴 **The page computes no score, no band and no rank.** `GET /ask` returns the
+  byte-identical stdout of `fux ask --json --why --band`, because the route runs
+  that command. Routes: `/`, `/ask?q=…&top=N`, `/graph?seed=…`, `/health`.
+  **None of them writes anything**, and `POST` is a `405` with a reason.
+
+  Every action card is a *proposal* naming a command or a config key; the page
+  applies nothing. Two of the thresholds behind those cards — the boilerplate
+  line and the near-tie width — are **provisional**, tuned to no corpus, and
+  the page says so where a reader can see it. (W-210,
+  [SR-SERVE](records/0158_serve.md).)
+
+- **`fux ask --why` attributes the score per term.** Each matched row gains
+  `contribution`, its BM25F summand for that document, and each document gains
+  `rerank_uplift`, the proximity reranker's multiplier — so
+
+  ```text
+  score  =  sum(contribution)  x  rerank_uplift  x  multiplier
+  ```
+
+  up to float summation order. ⚠ **Do not print `sum(contribution)` as the
+  score**; every factor on the right is a field, so nothing has to be inferred
+  by dividing. The attribution is the **same expression** the score was built
+  from — `score_record`'s loop body was extracted so both call it — and it runs
+  over the shown documents only, never in the ranking hot path.
+  ([SR-PROVENANCE](records/0142_provenance.md) decision 17.)
+
+- **A `fux-serve` skill** ships to all four agent surfaces, with the same
+  *propose the lever, never apply it* rule `fux-inspect` carries.
+
+
 ## [3.0.0-alpha.2] - 2026-09-21
 
 🔴 **Two breaking changes, and the second one stops every existing URL list
@@ -331,6 +379,41 @@ Added since `2.0.1`: anchor text as a sixth BM25F field, link-following on
     set-up repo now rank differently unless you do.
 
 ### Changed — read this before upgrading a consumer
+
+- 🔴 **`confidence.answerable` is `band != "none"` again. `weak` no longer
+  refuses.** If your code branches on `answerable`, **its behaviour changes
+  with no change on your side**: a near-tie that used to arrive
+  `answerable: false` now arrives `true`, and fux returns the ranked list with
+  it.
+
+  **Nothing was removed from the payload.** `band: "weak"`, `separation`,
+  `separation_floor` and `failed: ["separation"]` are all still emitted, so the
+  old behaviour is three characters of your own code:
+
+  ```python
+  # the pre-3.0 abstention, implemented by the consumer
+  if block["band"] in ("none", "weak"):
+      abstain()
+  ```
+
+  **Why it changed.** Fux shipped that refusal on 2026-09-14 and measured it on
+  2026-09-22: seven floors from `0.00` to `0.30`, 2 992 questions, eight index
+  sizes, three independently authored question sets. **The answers the band
+  withheld were more likely to be RIGHT than the ones it let through, in every
+  set**; risk rose as coverage fell in all three; and it suppressed fewer wrong
+  answers than a coin withholding at its own rate. No floor cleared the bar,
+  including turning the clause off. `separation` measures whether the ranking
+  could *choose*, not whether the choice was *right*, and on this evidence the
+  two come apart — so **fux publishes the signal and stops making the call on
+  your behalf.**
+
+  ⚠ **What you get back for it:** `band != "none"` is almost never false — a
+  lexical ranker scores something for nearly any query — so `answerable: false`
+  now fires essentially only on an empty result set. **Read `band`, not
+  `answerable`, if you want the engine's opinion of an answer's quality.**
+
+  ⚠ **A number you measured against an older fux and called an *abstention
+  rate* is about the old semantics.**
 
 - 🔴 **The committed index format is `fux.index.v3`, and an existing index must
   be rewritten: `fux ingest --full`.** There is no in-place migration and

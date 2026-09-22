@@ -57,7 +57,7 @@ ACQUIRED: dict[str, str] = {
 }
 
 DERIVED: dict[str, str] = {
-    "runtime": "M2 accelerator segments, M4's fetch cache at `runtime/fetch-cache/`, the write lock, and `enrich-progress.tsv` (W-86 P6: which queued documents THIS machine has handled - local by design, so two people's progress cannot conflict on a pull)",
+    "runtime": "M2 accelerator segments, M4's fetch cache at `runtime/fetch-cache/`, the write lock, `enrich-progress.tsv` (W-86 P6: which queued documents THIS machine has handled - local by design, so two people's progress cannot conflict on a pull), and `runtime/trace/` (SR-SERVE: an inspection page for one question or one document - it quotes passages, so it is never committed, and it is regenerable by re-running the verb)",
 }
 
 #: Files fux generates at the top level of `.fux/` (write-if-missing).
@@ -236,7 +236,9 @@ def _readme() -> str:
         "| sources | `add` `remove` `enrich` `correct` | maintain what is indexed. `add`/`remove` write lines and end in an ingest; `enrich` plans and validates a model's text; `correct` writes one question a PERSON typed onto the document that answers it |",
         "| read | `ask` `find` `answer` `lexical` | the same question, differing only in how much each commits to. `lexical` is BM25F alone, frozen - the baseline `ask` is measured against |",
         "| graph | `explain` `graph` `path` | answer with relationships the documents stated, never with a ranking |",
-        "| serve | `mcp` `daemon` | the only verbs that do not return |",
+        "| serve | `serve` `mcp` `daemon` | the only verbs that do not return. `serve` is a local"
+        " page over `ask`; `mcp` is the same index over the Model Context Protocol;"
+        " `daemon` watches for staleness |",
         "| maintenance | `hooks` `tune` `output` `verify` | wire git to keep the index in step; print or set the tunables; re-run a receipt |",
         "",
         "**The three read verbs differ in how much they commit to.** `find`",

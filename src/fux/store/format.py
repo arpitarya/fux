@@ -38,7 +38,19 @@ SCHEMA_ID = "fux.index.v4"
 # plus Porter stemming before hashing. A v1 shard is refused by
 # `store/reader.py` rather than silently mixed -- two analyzers in one
 # index is undetectable at query time and corrupts every df.
-ANALYZER_VERSION = "v2"
+#
+# v3 (W-205 part 2, family (a), 2026-09-21): `-`, `.` and `/` are identifier
+# separators exactly as `_` already was, so `RF-118` yields the whole token
+# `rf-118` beside its parts instead of only `rf` and `118`.
+#
+# 🔴 **This is an ANALYZER bump and NOT a `_format` bump, deliberately.** No
+# property appeared and no field changed meaning -- every record has the same
+# shape it had, and what moved is which terms are in it. The header carries
+# `analyzer` as its own field precisely so that case has its own refusal, and
+# `store/reader.py` already refuses a shard written by another analyzer. Bumping
+# `_format` as well would claim a schema change that did not happen and would
+# force consumers through a migration path for a re-ingest they need anyway.
+ANALYZER_VERSION = "v3"
 #: **Order is load-bearing, and body comes first on purpose.**
 #:
 #: A tf vector is written with trailing zeros omitted, so the cheapest shape to

@@ -207,6 +207,36 @@ def derive_wlen(
     return total
 
 
+def term_contribution(
+    wtf: float,
+    wlen: float,
+    df_h: int,
+    n: int,
+    avg_wlen: float,
+    scoring: Scoring = DEFAULT_SCORING,
+) -> float:
+    """One term's summand — **the only place this arithmetic is written.**
+
+    Extracted from `score_record`'s loop so that `--why`'s per-term attribution
+    (W-210, [SR-PROVENANCE](../../../records/0142_provenance.md) decision 14) is
+    the *same* expression the score was built from rather than a second copy of
+    it. Two copies of a scoring formula is the defect this module's own
+    docstring names one level up: they can disagree while both look correct, and
+    the disagreement shows up as a plausible number beside the real one.
+
+    🔴 **Same operations, same order, so the float result is identical** — the
+    differential law between the scan and the accelerator cannot pick up a
+    last-bit difference from the extraction. `score_record` calls it in the loop
+    it used to inline.
+
+    ⚠ **It takes `wtf` already weighted**, not a `tf` list, because the anchor
+    fold adds to `wtf` before saturation (BM25F is weight-then-saturate **once**)
+    and a signature taking `tf` would invite a caller to saturate twice.
+    """
+    denom = wtf + scoring.k1 * (1 - scoring.b + scoring.b * wlen / avg_wlen)
+    return idf(df_h, n) * wtf * (scoring.k1 + 1) / denom
+
+
 def score_record(
     terms: dict[str, list[int]],
     flen: list[int] | int,
@@ -266,7 +296,6 @@ def score_record(
         wlen = float(flen)
     else:
         wlen = derive_wlen(flen, scoring, anchor_len) if anchor_tf is not None else derive_wlen(flen, scoring)
-    k1, b = scoring.k1, scoring.b
     anchor_weight = scoring.anchor
     total = 0.0
     for h in query_hashes:
@@ -282,8 +311,7 @@ def score_record(
                 wtf += anchor_weight * count
         if wtf == 0:
             continue
-        denom = wtf + k1 * (1 - b + b * wlen / avg_wlen)
-        contribution = idf(df.get(h, 0), n) * wtf * (k1 + 1) / denom
+        contribution = term_contribution(wtf, wlen, df.get(h, 0), n, avg_wlen, scoring)
         if term_weights is not None:
             contribution *= term_weights.get(h, 1.0)
         total += contribution

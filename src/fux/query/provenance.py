@@ -71,23 +71,43 @@ rule is to state the cost rather than clamp the knob.
 ## What the derivation may claim, and what it may not
 
 **Everything here is recomputed from what ranking already produced.** The
-scorer is not instrumented, no per-term contribution is threaded through the
-hot path, and no candidate path changed. That is deliberate and it is Lucene's
+scorer is not instrumented, **no per-term contribution is threaded through the
+hot path**, and no candidate path changed. That is deliberate and it is Lucene's
 own discipline: `explain` is a *second query against one document*, never a tax
 on the first. Concretely, a derivation reads:
 
-- the committed record's `terms` map (per-field counts, already on disk),
-- the `df`/`n` corpus statistics `stats_out` already hands back for
-  [SR-CONFIDENCE](../../../records/0141_confidence.md),
+- the committed record's `terms` map and `flen` (per-field counts, on disk),
+- the `df`/`n`/`avg_wlen` corpus statistics and the `Scoring` in force, which
+  `stats_out` hands back for
+  [SR-CONFIDENCE](../../../records/0141_confidence.md) and for this,
+- the proximity uplift `rerank()` hands back through `uplift_out`,
 - the ordering the caller was actually shown.
 
-⚠ **It therefore reports *observed* quantities, never a reconstructed score.**
-`rank.py`'s own docstring warns that re-deriving a score term-by-term produces
-different low-order bits than the sum that produced it. A derivation that
-printed a recomputed total would be a plausible number that disagreed with the
-one beside it, which is worse than no number. So the score is quoted from the
-result, and the attribution explains *which terms and fields were available to
-it* — a claim that is exactly true.
+⚠ **The score is still QUOTED, never reconstructed.** `rank.py`'s own docstring
+warns that re-deriving a total term-by-term produces different low-order bits
+than the sum that produced it, and a printed total that disagreed with the one
+beside it would be worse than no number.
+
+🔴 **What changed on 2026-09-22 (W-210, decision 14) is ATTRIBUTION, not the
+total.** Each `matched` row now carries its own summand, and the summand is
+computed by [`bm25f.term_contribution`](bm25f.py) — **the same expression
+`score_record` runs**, extracted so there is one copy rather than two. The
+guarantee is therefore exact where it can be and explicit where it cannot:
+
+    score  =  sum(contribution)  x  rerank_uplift  x  multiplier
+
+up to float summation order. **A consumer must never print `sum(contribution)`
+as the score**, and it does not have to: every factor on the right is a field.
+⚠ **The anchor fold is the one term not on the committed record** — it is
+assembled per query by the candidate generator from *other* documents' edges —
+so with `[bm25f] anchor` on (default `0.0`, off) the identity above loses the
+anchor share. Named, not hidden.
+
+**Why this is not the instrumentation the paragraph above refuses.** It runs
+over the documents that were *shown*, at most `--top` of them, after the sort,
+in a pass that already re-reads each record for `ctx_via`. The hot path — every
+candidate, every term — is untouched, which is the whole of what *"never a tax
+on the first query"* means.
 
 ## The four gates
 
@@ -325,6 +345,26 @@ class TermHit:
     #: different answers, and `--why` exists to tell them apart. `None` means
     #: *not via `ctx`*, never *unknown*.
     ctx_via: str | None = None
+    #: W-210 — **this term's BM25F summand for this document**, or `None` when
+    #: it could not be computed (the corpus statistics were not handed through,
+    #: or the record carries no `flen`).
+    #:
+    #: 🔴 **It is the SAME expression the score was built from**, not a second
+    #: one: `score_record`'s loop body was extracted to
+    #: [`bm25f.term_contribution`](bm25f.py) and both call it. Two copies of a
+    #: scoring formula can disagree while both look correct.
+    #:
+    #: ⚠ **The contributions do NOT necessarily sum to `score`, and a consumer
+    #: must never print their sum.** Three reasons, all real: floating-point
+    #: summation order differs from the ranking loop's; an archived
+    #: `multiplier` is applied to the total afterwards; and the anchor fold
+    #: ([SR-RANKING](../../../records/0111_ranking.md) — `[bm25f] anchor`, default
+    #: `0.0`) is assembled by the candidate generator and is not on the
+    #: committed record this pass re-reads. **`score` is quoted; this is
+    #: attribution.** That distinction is
+    #: [SR-PROVENANCE](../../../records/0142_provenance.md) decision 14's whole
+    #: subject, and it is why this is a *share of* rather than a *part of*.
+    contribution: float | None = None
 
     def as_dict(self) -> dict:
         return {
@@ -334,6 +374,7 @@ class TermHit:
             "fields": list(self.fields),
             "expanded": self.expanded,
             "ctx_via": self.ctx_via,
+            "contribution": self.contribution,
         }
 
 
@@ -355,6 +396,22 @@ class DocDerivation:
     #: **`--why` must say so first**, because every other number in this block
     #: describes a ranking that did not decide where this document went.
     pinned: bool = False
+    #: W-210 — the **proximity reranker's** multiplier on this document's BM25F
+    #: score ([`rerank.py`](rerank.py), `[ranking] rerank_weight`). `1.0` means
+    #: it ran and added nothing; `None` means it did not run.
+    #:
+    #: 🔴 **This field is what makes `matched[].contribution` legible.** A
+    #: printed score is
+    #:
+    #:     score  =  sum(contribution)  x  rerank_uplift  x  multiplier
+    #:
+    #: up to float summation order, so a consumer shown only the per-term
+    #: contributions beside the score sees a gap of tens of percent and can
+    #: explain it only by dividing — and a ratio inferred from two rounded
+    #: numbers is precisely the *plausible number that disagrees with the real
+    #: one* this module refuses to emit. **Stating the factor is the honest
+    #: alternative to making a consumer infer it.**
+    rerank_uplift: float | None = None
 
     def as_dict(self) -> dict:
         out = {
@@ -367,6 +424,7 @@ class DocDerivation:
             "archived": self.archived,
             "multiplier": self.multiplier,
             "pinned": self.pinned,
+            "rerank_uplift": self.rerank_uplift,
         }
         # Additive and honest: absent means *not computed on this run*, which
         # is a different statement from "unchanged". Present-but-equal is the
@@ -423,6 +481,59 @@ def _record_terms(record: dict | None) -> dict:
     return terms if isinstance(terms, dict) else {}
 
 
+def _wlen_of(record: dict | None, scoring) -> float | None:
+    """This document's length normaliser, from its committed `flen`.
+
+    ⚠ **Derived here rather than read**, because `wlen` is a function of the
+    field weights *in force* and has not been a committed field since
+    2026-08-23 ([`bm25f.derive_wlen`](bm25f.py)). `None` when the record is not
+    available — a derivation reports what it can see and says nothing when it
+    cannot see it.
+    """
+    if not isinstance(record, dict):
+        return None
+    flen = record.get("flen")
+    if not isinstance(flen, list):
+        return None
+    from .bm25f import derive_wlen
+
+    return derive_wlen(flen, scoring)
+
+
+def _contribution(
+    fields: tuple[int, ...],
+    wlen: float | None,
+    df_h: int,
+    n: int,
+    avg_wlen: float,
+    scoring,
+) -> float | None:
+    """One term's summand, or `None` when it is not computable. **Never raises.**
+
+    🔴 **This is a SECOND QUERY AGAINST ONE DOCUMENT, and it is the Lucene
+    `explain` discipline this module's docstring already cites** — not
+    instrumentation of the hot path, which
+    [SR-PROVENANCE](../../../records/0142_provenance.md) decision 14 still
+    refuses. The ranking loop is untouched; this runs over the documents that
+    were *shown*, at most `--top` of them.
+
+    `None` rather than `0.0` when an input is missing, because *"this term
+    contributed nothing"* and *"nobody computed it"* are different statements
+    and the first one is a lie when the second is true.
+    """
+    if wlen is None or not fields or n <= 0 or avg_wlen <= 0 or scoring is None:
+        return None
+    try:
+        from .bm25f import term_contribution, weighted_tf
+
+        wtf = weighted_tf(list(fields), scoring)
+        if wtf == 0:
+            return 0.0
+        return term_contribution(wtf, wlen, df_h, n, avg_wlen, scoring)
+    except Exception:
+        return None
+
+
 def derive(
     root: Path,
     query: str,
@@ -436,6 +547,7 @@ def derive(
     untuned=None,
     multiplier: float = 1.0,
     expand: str = "",
+    rerank_uplift: dict | None = None,
 ) -> Derivation:
     """Build the derivation for a result list. **Never raises.**
 
@@ -453,6 +565,15 @@ def derive(
     stats = stats or {}
     df_map = stats.get("df") or {}
     n = int(stats.get("n", 0) or 0)
+    # W-210 — the two remaining inputs of the BM25F summand, handed through the
+    # same `stats_out` seam `df` and `n` already use. Absent on a caller that
+    # predates them, and every per-term `contribution` is then `None`, which is
+    # the honest answer rather than a zero.
+    try:
+        avg_wlen = float(stats.get("avg_wlen", 0.0) or 0.0)
+    except (TypeError, ValueError):
+        avg_wlen = 0.0
+    scoring = stats.get("scoring")
 
     try:
         pairs = list(analyze_pairs(query))
@@ -500,6 +621,7 @@ def derive(
 
     aligned = [((first.get(h, h), analyzed_of.get(h, "")), h) for h in hashes]
 
+    uplift_map = rerank_uplift or {}
     before = {r.id: i for i, r in enumerate(pre_rerank or [])}
     untuned_rank = {r.id: i for i, r in enumerate(untuned or [])}
 
@@ -513,6 +635,7 @@ def derive(
                 record = None
         carried = _record_terms(record)
         authorship = _ctx_authorship(root, record)
+        wlen = _wlen_of(record, scoring) if scoring is not None else None
         hits: list[TermHit] = []
         absent: list[str] = []
         for (surface, analyzed), term_hash in [*aligned, *extra]:
@@ -523,14 +646,23 @@ def derive(
                 if term_hash not in supplied:
                     absent.append(surface)
                 continue
+            fields = tuple(int(c) for c in counts) if isinstance(counts, list) else ()
             hits.append(
                 TermHit(
                     term=surface,
                     analyzed=analyzed,
                     df=int(df_map.get(term_hash, 0) or 0),
-                    fields=tuple(int(c) for c in counts) if isinstance(counts, list) else (),
+                    fields=fields,
                     expanded=term_hash in supplied,
                     ctx_via=_ctx_via(counts, term_hash, authorship),
+                    contribution=_contribution(
+                        fields,
+                        wlen,
+                        int(df_map.get(term_hash, 0) or 0),
+                        n,
+                        avg_wlen,
+                        scoring,
+                    ),
                 )
             )
         docs.append(
@@ -546,6 +678,7 @@ def derive(
                 pinned=bool(getattr(result, "pinned", False)),
                 rank_before_rerank=before.get(result.id),
                 rank_untuned=untuned_rank.get(result.id),
+                rerank_uplift=uplift_map.get(result.id),
             )
         )
 

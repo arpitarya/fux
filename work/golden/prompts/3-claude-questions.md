@@ -7,6 +7,8 @@ timestamp: 2026-09-15T00:00:00Z
 
 # Prompt 3 — Claude authors **set N** from the seed corpus
 
+**Test-data checklist:** [SR-WORK-TESTDATA](../../../records/0068_WORK-test-data.md) — this prompt carries **T2, T3, T8, T9, T13 — and, in part B, T6, T7, T12**. Check the whole list before running it; any item this data does not carry is named as *not carried*, never skipped.
+
 **Model: Claude, highest reasoning setting.** The questions ARE the benchmark; a
 vague or leaky question set cannot be repaired later without a new key.
 
@@ -136,8 +138,9 @@ rebuilds the eight rungs and the ladder is re-verified.
    neighbours*.
 2. 🔴 **The same identifiers in BOTH places: in the body AND as a front-matter
    `doc_id:`.** They are two different defects —
-   [W-205](../../open/W-205-identifiers-reachable-and-whole.md) part 1 is about
-   a value never reaching the index, part 2 about it arriving in pieces — and a
+   [SR-INGEST](../../../records/0106_ingest.md) decision 23d is about a value
+   never reaching the index, [SR-RANKING](../../../records/0111_ranking.md)
+   decision 9 about it arriving in pieces (W-205, closed 2026-09-22) — and a
    document carrying the id in only one place can only measure one of them.
 3. 🔴 **Link-bearing documents.** The ladder has **0 `ref` edges on all eight
    rungs** and no link syntax anywhere in `seed/`, which makes the graph tier and

@@ -13,7 +13,7 @@ feature: configurable output defaults
 owns: [src/fux/output_config.py@8e8e57fade21, .fux/output.toml@3a5b84942f70]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 577d5d2e63fea4e98d40c73d3dd0d653c267864731cc62f08df1627bf345c302
+content_sha: 9d0ced065d377e92f29ac638b0bf7029da709768aa6a02a19dc37d0f754f8616
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -800,7 +800,24 @@ so the failure would surface as a committed file that does not load.
 and the constraint failing silently is precisely how six flags shipped at
 `default=False`.**
 
+⚠ **Unchanged by W-210 (2026-09-22).** That change edited `_compose`,
+`_maybe_rerank` and `_derivation_for` in `src/fux/query/__init__.py` to hand the
+proximity reranker's per-document uplift through the caller's **trace** dict for
+`--why` ([SR-RERANK](0138_rerank.md) decision 10;
+[SR-PROVENANCE](0142_provenance.md) decision 17). No emitted shape, no printer
+and no gate moved. Recorded because the freshness rule asked, and *nothing moved*
+is a legitimate answer to it.
+
 ### Consequences
+
+- ⚠ **W-214 (2026-09-22) changed what a `--band` block MEANS, not whether one
+  is printed.** `answerable` is `band != none`
+  ([SR-CONFIDENCE](0141_confidence.md) decision 3a, Arpit's ruling), so a
+  `weak` block now reads `answerable: true`. **Nothing about this record's
+  gating moved**: `band = true` in `.fux/output.toml` still decides emission,
+  and absent still means *not asked for*. The `_doc` block of
+  `output.schema.json#confidence` was rewritten in the same change, because a
+  consumer reads the rule there rather than in a record.
 
 - ⚠ **W-194 (2026-09-20) moved a component this record describes, and changed
   nothing it decides.** Hashed display meta was deleted outright: `meta` and

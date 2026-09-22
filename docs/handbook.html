@@ -1423,8 +1423,8 @@ fux doctor</code></pre>
 
         <rect x="772" y="282" width="308" height="72" rx="9" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.8"/>
         <text x="790" y="308" font-size="13" fill="var(--d-ink)" font-weight="700">weak</text>
-        <text x="790" y="329" font-size="10.5" fill="var(--d-body)">nothing is identifiably wrong and the</text>
-        <text x="790" y="345" font-size="10.5" fill="var(--d-body)">ranking cannot choose. Report the search.</text>
+        <text x="790" y="329" font-size="10.5" fill="var(--d-body)">nothing is identifiably wrong and the ranking</text>
+        <text x="790" y="345" font-size="10.5" fill="var(--d-body)">cannot choose. A signal, not a refusal.</text>
 
         <rect x="772" y="374" width="308" height="72" rx="9" fill="var(--d-panel)" stroke="var(--d-ok)" stroke-width="1.8"/>
         <text x="790" y="400" font-size="13" fill="var(--d-ok)" font-weight="700">grounded</text>
@@ -1545,7 +1545,7 @@ verified    = current | stale | cached | unverified        # from the refer plan
 <pre><code>support == 0                            → none        abstain; answerable = false
 missing ≠ ∅  or  verified == "stale"    → partial     answer, and name what is missing
 doc_coverage &lt; doc_coverage_floor       → partial     ⚠ floor is 0.0 by default: OFF
-separation   &lt; separation_floor         → weak        do not answer; say what was searched
+separation   &lt; separation_floor         → weak        a SIGNAL: the ranking could not choose — judge the top hits
 otherwise                               → grounded    use it and cite it
 
 answerable = (band ≠ none)</code></pre>
@@ -1631,7 +1631,11 @@ confidence: none - nothing in the
       is a contract. ASCII only — a Windows console's default codepage crashes on a fancy dash rather
       than degrading.</li>
     <li><code>answerable</code> is a <strong>boolean</strong>: an agent handed <code>0.3</code> uses
-      it anyway and hedges in prose; an agent handed <code>false</code> has nothing to hedge with.</li>
+      it anyway and hedges in prose; an agent handed <code>false</code> has nothing to hedge with.
+      <strong>It is <code>band ≠ none</code>.</strong> It covered <code>weak</code> too between
+      2026-09-14 and 2026-09-22, and was reversed when a 2 992-question sweep found the answers the
+      band withheld were <em>more</em> likely right than the ones it let through — so <code>weak</code>
+      is published and refuses nothing.</li>
   </ul>
 </section>
 

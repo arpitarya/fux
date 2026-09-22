@@ -49,6 +49,7 @@ have never been separable in any number this project has filed.**
 | **the body control** | [`body_control.py`](body_control.py) | 🔴 **retired with it** — and it is the one that found *why*: it **prints its endpoint's corpus base rate before it runs an arm** |
 | **table `flen`** | [`table_flen.py`](table_flen.py) | whether table cells inflate a document's length, and whether removing them moves a ranked list |
 | **the graded table set** | [`w144_graded.py`](w144_graded.py) | *is the new order **better***, truth from prose density, with an `inverse` positive control and a `placebo` |
+| **the band sweep** | [`band_sweep.py`](band_sweep.py) | where the **abstention threshold** sits, as a REPLAY: `capture` runs the ladder once storing the whole confidence block, and `sweep` re-evaluates the band at each candidate `separation_floor` by constructing **the engine's own `Confidence`**. It adjudicates through `verdict.py` and prices the trade at SR-WORK-QUALITY decision 6's frozen `c = 2`, with `evidence_quoted` **named as the proxy it is** |
 | **the fence/depth arms** | [`w115_instrument.py`](w115_instrument.py) | W-115's heading grammar and key-depth cap, two arms patched at one seam each, with a `selftest` that is 22c(b)'s headroom proof |
 
 ## 🔴 The endpoint is the thing that fails, not the field

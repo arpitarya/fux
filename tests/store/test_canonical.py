@@ -84,6 +84,14 @@ def test_golden_header_line():
 
     # _format bumped v1 -> v2 and tf_fields grew from [heading, body] to the
     # five-field, body-first order (W-76 Phase 1: see TF_FIELDS docstring).
+    #
+    # 🔴 **The literal is the point here, so it is spelled out and never derived
+    # from `HEADER`.** This is the one assertion that a header byte cannot change
+    # without somebody saying so out loud -- deriving it would make the test
+    # agree with whatever the code does, which is the opposite of a golden. Every
+    # bump edits this line by hand: `analyzer` moved v2 -> **v3** with W-205 part
+    # 2 family (a) on 2026-09-22, and `_format` stayed v4 because no property
+    # appeared and no field changed meaning.
     assert canonical_dumps(HEADER) == (
-        b'{"_format":"fux.index.v4","analyzer":"v2","tf_fields":["body","heading","title","path","ctx"]}\n'
+        b'{"_format":"fux.index.v4","analyzer":"v3","tf_fields":["body","heading","title","path","ctx"]}\n'
     )

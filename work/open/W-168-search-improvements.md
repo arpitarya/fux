@@ -16,11 +16,92 @@ once. Later the same day: Claude authors both as set 3** — W-204 input **I-2**
 and no step here waits on Codex.
 
 **Step 2 (the exact identifier field) is no longer here** — it is part 2 of
-[W-205](W-205-identifiers-reachable-and-whole.md), merged with the frontmatter
+[SR-RANKING](../../records/0111_ranking.md) decision 9 (W-205, **closed
+2026-09-22** — family (a) shipped, (b) and (c) unbuilt), merged with the frontmatter
 and analyzer defects on Arpit's ruling that they are one subject. Steps 3–10
-stay. **Ball → 🟡, waiting on W-204** (every remaining step needs a golden
-question or document that only that item's inputs produce).
+stay.
 
+⚠ **That ball is SUPERSEDED — corrected 2026-09-22.** This header read *"Ball →
+🟡, waiting on W-204"* from 2026-09-20; **W-204 closed on 2026-09-22** and the
+queue row went 🟢, leaving the file and the row disagreeing for two days (spotted
+by the Cowork session that ruled W-214, and left for this one). **The ball is now
+🔴, waiting on [W-215](W-215-generation-2-corpus.md)** — and the sentence that
+followed it was right about the shape and wrong about the item: every remaining
+step does need a golden question or document it does not have, but the inputs
+come from **generation 2**, not from W-204.
+
+
+## 🔴 MEASURED 2026-09-22 — the blocker is the CORPUS, and it is one deliverable, not eight
+
+[The step-input run](../regression/2026-09-22-w168-step-inputs/report.md) ·
+[the anchor census](../regression/2026-09-22-anchor-input-census/report.md).
+**No feature was built, and none should be until the corpus moves.**
+
+🔴 **The pool ANY ranking change can win is 7–23 answerable questions per set
+per rung**, and [SR-RS](../../records/0133_predictions.md) d19's required net at
+those counts puts `min_fix` at **7–11**. **One step must fix 58–78 % of every
+remaining failure, with ZERO regressions, in all three sets, to produce a
+verdict at all.** W-205 part 2 family (a) came closest ever measured here —
+`+1 / +3 / +4`, 0 regressions — and returned INCONCLUSIVE.
+
+| step | state as of 2026-09-22 |
+|---|---|
+| **1** anchor text | 🔴 **blocked, new reason.** W-191 was fixed: the ladder now has **61 anchor-bearing `ref` edges per rung**. Anchor-**distinctive** terms: **1, and it is a filename.** Every word a linker uses is already in its target, so the fold can add tf and cannot make anything findable. The pre-registration's clause 5 still forbids the arms |
+| **2** identifier field | 🔴 stopped 2026-09-18, unchanged — headroom 3–4 of 33 |
+| **3** supersession | 🔴 **FORECLOSED — see below.** Not unbuilt; un-built by a ruling |
+| **4** corpus-mined expansion | 🔴 **blocked.** Across 28 seed documents: **0** `Term (ABBR)` pairs, **1** glossary line (it matches *"copy"*), **3** `aliases:` on one document. Three alias pairs cannot produce seven flips |
+| **5** RM3 · **6** SDM · **7** MMR | ⚠ **no `23c` tag exists for any of their inputs**, so none can state its headroom |
+| **8** git authority prior | 🔴 blocked by the proposal's own words — needs a corpus with history; the ladder is synthetic and rebuilt at one stamp |
+| **9** intent → doc-type | 🟢 **the intent half of its input is present and abundant** — 50 current-seeking and 17 history-seeking tags across sets 2 and 3, plus `priors-probes.jsonl`. 🟡 the **doc-type** half is undeclared in the golden corpus |
+| **10** section units | ⚠ a plane change; owes its own compare doc first |
+
+⚠ **Two `23c` tags read as a step's input and are NOT it.** `link_dependent: 14`
+is **multi-hop** (the refer plane and the graph), not the anchor field;
+`vocabulary_gap: 25` is colloquial **paraphrase**, which no `Term (ABBR)` miner
+reaches. **Both tags are accurate about the question and wrong about which
+feature it exercises**, and that is the more expensive kind of wrong.
+
+**What generation 2 owes this item** is the report's §5 — six items, measured
+rather than guessed, headed by *questions today's engine fails*, because
+`hit@5` at 81–94 % is what leaves only 7–23 winnable.
+
+**Instruments shipped with the finding** (second strike, so gates —
+[SR-WORK-SESSION](../../records/0060_WORK-session.md) decision 13):
+`ref_edge_census.py` now counts **anchor-distinctive** terms and exits **3**
+when a corpus has links whose words its targets already have;
+`ranking_headroom.py` moves SR-RS d22's arithmetic **in front of** the build.
+
+## 🔴 STEP 3 IS FORECLOSED (2026-09-22) — by a measurement and a ruling, not by data
+
+The corpus **has** superseded/successor pairs. **The mechanism is gone.**
+
+[VERDICT-W143](../regression/2026-09-12-priors-and-tables/VERDICT-W143.md)
+answered Arpit's own pre-registered question — *does ANY single global value
+clear a `0 broken` bar?* — with **NO**:
+
+| | current-seeking | history-seeking |
+|---|---:|---:|
+| shipped default | 11–12 / 13 | 8–9 / 13 |
+| **any value that demotes** | **13 / 13** | **5 / 13, down to 0 / 13** |
+
+> **Arpit, 2026-09-11:** *"every broken query had the superseded document as its
+> correct answer. **Supersession belongs to the query's intent, not to the
+> document.**"*
+
+`superseded_weight` was **removed** on 2026-09-13 (W-151); `superseded` is a
+tie-break now, read only where rounded scores are equal. **Re-introducing a
+global demotion under a new name walks back a ruling on a measurement, and no
+session does that.** Step 3's other two halves are out of reach for their own
+reasons: the **walk** is W-161's graph-composed `ask`, which this item lists as
+out of scope, and the **anchor inheritance** reads step 1's fold, which has
+nothing to inherit.
+
+🟡 **Where the ruling points instead is step 9's neighbourhood**, and the intent
+labels for it exist — but step 9 as written is *intent → **doc-type***, a
+different mechanism. **Whether they become one step is a scoping decision and
+Arpit's**, exactly as the identifier work became one subject on his ruling.
+
+---
 
 # W-168 — the ten search improvements, one program
 
@@ -57,7 +138,7 @@ over the seed, no key) and ran the baseline on rung-00100, 01000 and 10000:
   the failing shape (a shared prefix + short number, `PROJ-123`) in the seed.
 - 🔴 **The absolute misses are frontmatter-only identifiers**, unindexed by
   `parse.py`'s meta/body split — a different defect, filed as
-  [W-201 → W-205](W-205-identifiers-reachable-and-whole.md).
+  [W-201 → W-205 → SR-INGEST](../../records/0106_ingest.md) decision 23d, shipped.
 
 **Step 2 stays stopped, for the corrected reason.** Prompt 8 is withdrawn as
 the unblock; the unblock is a seed with the failing shape, which is a Codex
@@ -81,7 +162,7 @@ verdict is theatre."*** Measured:
 this set can return a result**, whatever the field does. A **data defect
 (d23b), fixed in the data, never a null.**
 
-🔴 **This is [W-191 → W-204](W-204-golden-outputs-scoring-and-version-benchmark.md)'s lesson applied one
+🔴 **This is [W-191 → W-204](../regression/2026-09-22-golden-final-score/FINAL-SCORE.md)'s lesson applied one
 step earlier.** There, a link feature was built and measured on a corpus with 0
 `ref` edges, and `0 of 124 flips` was filed as a number before anybody counted
 the input. Here the counting came first, at the cost of a few seconds.
@@ -117,7 +198,7 @@ nothing for them.
 
 ### ✅ Research filed 2026-09-18, GRADUATED 2026-09-20 — [`proposals/identifier-exact-match.md`](../proposals/identifier-exact-match.md)
 
-🔴 **It is now two items, and neither is step 2.** [W-203 → W-205](W-205-identifiers-reachable-and-whole.md)
+🔴 **It is now two items, and neither is step 2.** [W-203 → W-205 → SR-RANKING](../../records/0111_ranking.md) decision 9
 carries the two analyzer defects and the four families, **waiting on this item** — not on a
 design question, on a seed corpus of the failing shape. [W-202](../../archive/open/W-202-identifier-analyzer-gate.md)
 is 🟢 and waits on nothing: freeze what the analyzer does to the 33 ids as a test, so any

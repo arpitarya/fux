@@ -1,0 +1,27 @@
+rung        set         n   hit@5  POOL  need  min_fix  verdict possible?
+rung-00100  set-1     113     102    11     9        9  yes
+rung-00100  set-2     112      97    15     9        9  yes
+rung-00100  set-3     113      96    17     9        9  yes
+rung-00200  set-1     113     103    10     8        8  yes
+rung-00200  set-2     112      96    16    10       10  yes
+rung-00200  set-3     113      99    14    10       10  yes
+rung-00500  set-1     113     103    10     8        8  yes
+rung-00500  set-2     112      92    20    10       10  yes
+rung-00500  set-3     113      96    17     9        9  yes
+rung-01000  set-1     113     104     9     7        7  yes
+rung-01000  set-2     112      91    21    11       11  yes
+rung-01000  set-3     113      96    17     9        9  yes
+rung-02000  set-1     113     102    11     9        9  yes
+rung-02000  set-2     112      89    23    11       11  yes
+rung-02000  set-3     113      95    18    10       10  yes
+rung-05000  set-1     113     101    12     8        8  yes
+rung-05000  set-2     112      89    23    11       11  yes
+rung-05000  set-3     113      95    18    10       10  yes
+rung-10000  set-1     113     101    12     8        8  yes
+rung-10000  set-2     112      89    23    11       11  yes
+rung-10000  set-3     113      95    18    10       10  yes
+rung-seed   set-1     113     106     7     7        7  yes
+rung-seed   set-2     112      98    14    10       10  yes
+rung-seed   set-3     113     101    12     8        8  yes
+
+smallest pool anywhere: 7

@@ -7,10 +7,10 @@ description: One canonical encoder, sharded doc-major JSONL, write-if-different;
 status: accepted
 date: 2026-08-18
 feature: generation and update of the committed index, and the refusal that keeps its derived accelerator from diverging
-owns: [src/fux/store@8225b66efa55]
+owns: [src/fux/store@dc3f310eba56]
 laws: [L1, L2, L3, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 2d0528d10743db901a820cd62c269d129932f4e8c8401635ad7408480c20041e
+content_sha: b5e904448cd1760dc4c3c9d07313771dcc05fcd27af226dff3c73eab6eb32f3b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -99,7 +99,7 @@ The committed side — a header line, then one document per line:
 
 ```console
 $ head -1 .fux/index/2e.jsonl
-{"_format":"fux.index.v2","analyzer":"v2","tf_fields":["body","heading","title","path","ctx"]}
+{"_format":"fux.index.v4","analyzer":"v3","tf_fields":["body","heading","title","path","ctx"]}
 ```
 
 The derived side refuses rather than diverging, and says so when it is stale:
@@ -144,9 +144,14 @@ bytes.
 
 **3. Every shard file opens with a `_format` header line**, carrying the schema
 id, the analyzer version and the tf-field list, so a reader knows the schema and
-analyzer without a side channel. Today: `fux.index.v2` / `v2` /
+analyzer without a side channel. Today: `fux.index.v4` / `v3` /
 `["body","heading","title","path","ctx"]`, from
-[`store/format.py`](../src/fux/store/format.py).
+[`store/format.py`](../src/fux/store/format.py). ⚠ **Both version strings above
+were stale in this record before 2026-09-22** — it read `v2` / `v2` while the
+engine wrote `v4`, because a bump moves the constant and nothing asks this
+sentence. The gate that answers for the *repository's own index* is
+[`tests/test_own_index_is_current_format.py`](../tests/test_own_index_is_current_format.py);
+nothing gates the prose, so read the module, not this line.
 
 **4. Write-if-different.** A shard whose bytes come out identical is left
 untouched, so `git status` stays clean and re-ingest is free to run on a hook.
@@ -200,6 +205,21 @@ text produces, so **every `terms` key in the index changes** — and yet the
 property set is unchanged: a record still has `terms`, still maps a 16-hex hash
 to a per-field tf. **The function that produces the key changed**, and that is
 precisely what the `analyzer` field pins.
+
+**Applied a second time on 2026-09-22 — `v2 → v3`** (W-205 part 2, family (a)):
+`-`, `.` and `/` became identifier separators alongside `_`, so a token gains its
+whole form beside its parts. `_format` **stayed v4**, and the restraint is the
+decision working: no property appeared, no field changed meaning, and every
+record has the shape it had. The terms inside it are different, which is exactly
+and only what `analyzer` is for. It costs a `--full` re-ingest (decision 10a) and
+**+4.6 % index bytes** from the extra dictionary entries; a `_format` bump would
+have claimed a schema change that did not happen.
+
+🔴 **A gate built for one field of this header is a gate against one bug.**
+`tests/test_own_index_is_current_format.py` was written on 2026-09-21 for exactly
+this class and checked `_format` **only** — so on 2026-09-22 it stayed green
+while `fux ask` on this repository answered *"written by analyzer 'v2', this
+reader is 'v3'"*. It now parametrises over every field of `HEADER`.
 
 **Nothing tries to migrate, and nothing tries to mix.** `store/reader.py`
 refuses a shard whose header names another analyzer, and ingest's carry-forward

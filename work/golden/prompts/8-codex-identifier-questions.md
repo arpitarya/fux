@@ -7,6 +7,8 @@ timestamp: 2026-09-16T00:00:00Z
 
 # Prompt 8 — Codex: write id-queries over the identifiers already in the seed
 
+**Test-data checklist:** [SR-WORK-TESTDATA](../../../records/0068_WORK-test-data.md) — this prompt carries **T2, T6**. Check the whole list before running it; any item this data does not carry is named as *not carried*, never skipped.
+
 **Model: Codex, highest reasoning setting.**
 
 🔴 **Why Codex.** Same rule as prompts 1–3: a question set written by the session

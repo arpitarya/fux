@@ -7,10 +7,10 @@ description: "Fux's readers are AI agents, and an engine whose output is misread
 status: accepted
 date: 2026-08-22
 feature: the agent-facing policy and skill artifacts Fux ships, and their installer
-owns: [src/fux/templates/agents@d4389290e79b]
+owns: [src/fux/templates/agents@e4e4c4506a0e]
 laws: [L1, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 91340fbbdeaa86be9b0647795ee6e7745f741c530a0a5db1242641fe208afde1
+content_sha: 5c171223c9445ba4114ca295a1b2d39f0db2e476d8c497a6d974652a07db7119
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -530,7 +530,7 @@ the drift test) and the hook is **executable or inert**.
 
 | kind | count | destinations | loads |
 |---|---|---|---|
-| **guide skills** — `fux-search`, `fux-answer`, `fux-graph`, `fux-index`, `fux-maintain`, `fux-mcp`, `fux-sources`, `fux-config`, `fux-fetcher`, `fux-pii`, `fux-inspect` | 11 templates | every vendor's skill surface, byte-identical (decision 10) — three directories since decision 16 | on a description match, or when invoked |
+| **guide skills** — `fux-search`, `fux-answer`, `fux-graph`, `fux-index`, `fux-maintain`, `fux-mcp`, `fux-sources`, `fux-config`, `fux-fetcher`, `fux-pii`, `fux-inspect`, `fux-correct`, `fux-serve` | 13 templates | every vendor's skill surface, byte-identical (decision 10) — three directories since decision 16 | on a description match, or when invoked |
 | **path-scoped pointers** — `sources`, `decoder`, `enrich`, `fetcher`, `pii`, `config`, `index` | 7 topics × 3 templates | `.kiro/steering/fux-<t>-files.md` (`fileMatch`), `.claude/rules/fux-<t>-files.md` (`paths:`), `.github/instructions/fux-<t>-files.instructions.md` (`applyTo:` explicit globs) | when the agent works on that plane's own files under `.fux/` or `fux.toml` |
 | **Kiro auto guides** — `usage`, `search`, `answer`, `graph`, `mcp` | 5 templates | `.kiro/steering/fux-<t>-guide.md` (`inclusion: auto`) | on a description match |
 
@@ -538,6 +538,17 @@ the drift test) and the hook is **executable or inert**.
 `setup.GUIDE_SKILLS`, `PATH_SCOPED_TOPICS` and `AUTO_GUIDE_TOPICS` are the
 roster; `AGENT_FILES` expands them, so the table is still the whole of the
 routing.
+
+⚠ **`fux-serve` joined on 2026-09-22 ([SR-SERVE](0158_serve.md)), the SECOND
+guide whose verb writes nothing at all**, and it takes `fux-inspect`'s
+treatment for `fux-inspect`'s reasons: **no path-scoped pointer and no Kiro auto
+guide.** There is no committed file it governs for a pointer to match on, and a
+description-triggered load would have an agent volunteering ranking critiques
+unasked — which is the failure mode a read-only inspection guide is closest to.
+⚠ **Its skill carries the same *propose the lever, never apply it* rule
+`fux-inspect` and `fux-correct` carry**, and it needs it more than either: the
+served page prints a lever beside **every single result**, and each one changes
+what the index holds for everybody on the repository.
 
 ⚠ **`fux-inspect` joined on 2026-09-14 ([SR-INSPECT](0156_inspect.md)), and it
 is the first guide whose verb writes nothing at all** — not a committed file,
@@ -783,6 +794,19 @@ sentence* rather than to drop the new fact — `test_setup_agents_guides.py` is 
 gate, and it is the trap that decision warns about.
 
 ### Consequences
+
+- ⚠ **W-214 (2026-09-22) rewrote twelve renderings and changed no decision
+  here.** `weak` stopped being a refusal ([SR-CONFIDENCE](0141_confidence.md)
+  decision 3a, Arpit's ruling), so every surface that told an agent to abstain
+  on it had to say something else: `SEARCH-SKILL`, `ANSWER-SKILL`, `MCP-SKILL`,
+  `SERVE-SKILL`, both `fux-search` and `fux-answer` commands, both Copilot
+  prompts, both Kiro steering guides, the output style and the ambient
+  `AGENTS.md`. **Decision 2's verbatim policy block was not touched** — the
+  archived-results policy has nothing to do with the band — so the
+  agreement test is unaffected, and the ambient bound still holds.
+  🔴 **This is the risk decision 3 names, realised:** one engine change, twelve
+  files, four vendors, and the only thing that kept them in step was that they
+  are rendered from one template each rather than written per vendor.
 
 - ✅ **The retired skill folders are REPORTED (2026-09-14, W-163).**
   `fux doctor`'s `retired agent folders` row names `.codex/skills/` and

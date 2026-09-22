@@ -318,6 +318,14 @@ def rank(
     if stats_out is not None:
         stats_out["df"] = dict(df)
         stats_out["n"] = corpus.n
+        # W-210 — the two remaining inputs of the BM25F summand, so that
+        # `--why` can attribute a score per term with the SAME expression that
+        # produced it (`bm25f.term_contribution`) instead of a second copy.
+        # `corpus.avg_wlen` is a property and `scoring` is a frozen dataclass;
+        # both are written after the sort, like everything else here, and
+        # nothing read back out of this dict reaches a score or an ordering.
+        stats_out["avg_wlen"] = corpus.avg_wlen
+        stats_out["scoring"] = scoring
     if corpus.n == 0:
         return []
     if expansion is None:

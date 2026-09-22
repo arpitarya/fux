@@ -7,6 +7,8 @@ timestamp: 2026-09-12T00:00:00Z
 
 # Prompt 1 — Codex: write the seed corpus
 
+**Test-data checklist:** [SR-WORK-TESTDATA](../../../records/0068_WORK-test-data.md) — this prompt carries **T1, T6, T7, T8, T12**. Check the whole list before running it; any item this data does not carry is named as *not carried*, never skipped.
+
 **Model: Codex, highest reasoning setting** — the corpus decides what every
 question can possibly be about, and a tidy or self-consistent corpus measures a
 world nobody has.

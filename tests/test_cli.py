@@ -124,6 +124,12 @@ def test_parser_has_the_verb_surface():
         # are a positional ARGUMENT, not a subparser — `fux daemon start` must
         # not become the first subcommand tree on this surface.
         "daemon",
+        # SR-SERVE (W-210, 2026-09-22). A verb, not a flag on `ask`: it does
+        # not return, which is the whole of what the `serve` GROUP means, and
+        # it answers a different question -- `ask` hands an agent ten links,
+        # `serve` shows a person WHY those ten. It carries no `--host`: the
+        # bind address is a contract, and a flag would make it a preference.
+        "serve",
         # SR-PROVENANCE (2026-08-27). A verb, not a flag on `answer`: it takes
         # a receipt FILE rather than a query, so every flag on the query parser
         # -- `--top`, `--fast`, `--no-tune` -- would be meaningless on it.

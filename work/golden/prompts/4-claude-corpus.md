@@ -7,6 +7,8 @@ timestamp: 2026-09-11T00:00:00Z
 
 # Prompt 4 — Claude Code: create or update the benchmark corpus, blind
 
+**Test-data checklist:** [SR-WORK-TESTDATA](../../../records/0068_WORK-test-data.md) — this prompt carries **T10, T12, T14**. Check the whole list before running it; any item this data does not carry is named as *not carried*, never skipped.
+
 **Model: Opus** — the hard negatives decide whether the benchmark is hard, and
 "no fact about a seed entity" is a judgment no test fully catches.
 

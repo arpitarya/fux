@@ -23,8 +23,9 @@ here. Read that record before changing anything below it.
 
 | what he decides | filed | age |
 |---|---|---|
-
-*Empty since 2026-09-21 — five rows ruled in Cowork on 2026-09-21; the rulings are filed in W-204, W-205 and W-209.*
+| 🔴 **W-215** — authorise generation 2 of the golden data. Measured: one ranking step must fix **58–78 % of every remaining failure with zero regressions** to produce any verdict. Six items; item 1 alone unblocks five steps. [detail](open/W-215-generation-2-corpus.md) | 2026-09-22 | 0d |
+| ↳ **blocks:** W-168, and through it steps 3–10 | | |
+| ↳ **item 1 has landed and is waiting on his read:** `set-2-u` (125 questions) exists and has a baseline on `rung-01000` — [the run](regression/2026-09-22-golden-set-2u-rung-01000/report.md). It is unscored; `tools/golden-score/score.py` is his hand. | | |
 
 ---
 
@@ -32,12 +33,12 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🟡 **W-168** · `agent`, waiting on W-204 — steps 3–10 of the ranking ideas; step 2 moved to W-205. Ruled 2026-09-20: `RF-118`-shaped ids come from set 3. [detail](open/W-168-search-improvements.md)
-- 🟢 **W-205** · `agent` — part 1 shipped; **part 2 family (a) ruled 2026-09-21: SHIP on correctness**, `ANALYZER_VERSION` v3, no SR-RS d23 clause. Merge on both readers, amend records. [detail](open/W-205-identifiers-reachable-and-whole.md)
+- 🔴 **W-215** · `arpit` — generation 2 of the golden data, six items. **Item 1 is built and captured** — `set-2-u`, unscored; the other five and the score are his. [detail](open/W-215-generation-2-corpus.md)
+
+- 🔴 **W-168** · `agent` — steps 3–10 of the ranking ideas, waiting on W-215. **Measured 2026-09-22: the blocker is the corpus, not engineering** — 7–23 winnable questions per set, `min_fix` 7–11; step 3 foreclosed by VERDICT-W143. [detail](open/W-168-search-improvements.md)
+
 
 ### testing
 
-- 🟢 **W-204** · `agent` — phases A and B filed. **Ruled 2026-09-21: the key opens by `just golden-unlock`**, scored sets retire into open test data, `set-<gen>-<x|u>` naming. Build the switch, then phase D. [detail](open/W-204-golden-outputs-scoring-and-version-benchmark.md)
-- 🟢 **W-209** · `agent` — the L11 hook stays as is; prose that spells a key path goes through Write/Edit, never a shell command; one test pins both behaviours. [detail](open/W-209-l11-hook-prose-convention.md)
 
 ---

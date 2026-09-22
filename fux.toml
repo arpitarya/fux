@@ -39,28 +39,39 @@ max_parallel = 4
 # below, which it passes through untouched.
 #
 # Four pattern shapes. A wildcard does NOT match the apex, and two patterns
-# matching one host is a hard error naming both (there is no non-arbitrary
+# matching one host is a hard error naming both: there is no non-arbitrary
 # order between two regexes, and guessing one builds a plausible index with
-# the wrong fetcher).
+# the wrong fetcher.
 #
 #   [sources.url.routes]
-#   "example.com"                     = "http"
-#   "*.wiki.example.com"              = "cdp"      # not example.com itself
-#   "intranet.example.com:8443"       = "cdp"
-#   "re:^.*\\.sharepoint\\.com$"        = "cdp"      # compiled + anchored at load
+#   "example.com"               = "http"
+#   "*.wiki.example.com"        = "cdp"     # not example.com itself
+#   "intranet.example.com:8443" = "cdp"
+#   "re:^.*\\.sharepoint\\.com$"  = "cdp"     # compiled + anchored at load
 #
 # There is NO default fetcher (2026-09-20): every URL line states its own
 # `fetch=`, and `fux add` refuses a URL nothing resolves for.
+#
+# There is no `decoder` key here either, and there never was (2026-09-21). A
+# URL line states `decoder=<stem>` beside its `fetch=`, also mandatory: a
+# fetcher retrieves bytes and the decoder named on the line turns them into
+# Markdown. `fux add` observes the response's Content-Type once and writes the
+# stem. A decoder is a fact about one document's FORMAT, not a policy about
+# reaching a host, so there is nothing source-wide to configure.
 
 # Handed to your fetcher's configure() verbatim; fux reads no key inside.
 # A key at THIS level goes to every fetcher -- only put one here that all
 # of yours know, because each configure() refuses a key it does not.
+#
+# One sub-table per fetcher, named after its file without `.py`. The two
+# below ship with fux; add a table for any fetcher you drop into
+# .fux/fetchers/ and name on a URL line with `fetch=<name>`.
 [sources.url.config]
 
 # Only .fux/fetchers/cdp.py receives these.
 [sources.url.config.cdp]
 cdp_host             = "127.0.0.1"
-cdp_port             = 9222
+cdp_port             = 9299
 chrome_binaries      = ["google-chrome", "chromium", "chromium-browser", "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", "/Applications/Chromium.app/Contents/MacOS/Chromium"]
 fetcher_max_parallel = 1
 launch_chrome        = false

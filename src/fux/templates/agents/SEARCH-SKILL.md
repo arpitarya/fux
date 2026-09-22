@@ -137,15 +137,21 @@ Checked top to bottom; the first true row wins.
 |---|---|---|
 | `none` | nothing scored (`answerable: false`) | **abstain.** Say the index has nothing on it |
 | `partial` | a query term appears nowhere in the corpus (`missing` non-empty), or `doc_coverage` is below a non-zero `doc_coverage_floor` | answer, and **name the missing terms** — or retry (section 6) |
-| `weak` | `separation < separation_floor` — top two are near-tied (**`answerable: false`**) | **abstain.** Say *the documents don't say*, then name what was searched and the top candidates |
+| `weak` | `separation < separation_floor` — top two are near-tied (**`answerable` stays `true`**) | **read the top candidates and judge.** Cite what actually answers; if none does, say the documents don't say |
 | `grounded` | otherwise | use it and cite it |
 
-🔴 **`answerable: false` covers BOTH `none` and `weak`.** Branch on
-`answerable` and you are right for both; branch on `band == "none"` and you
-will answer every `weak` — which is what fux itself did until 2026-09-14, and
-four separate measured runs caught the symptom (20 of 20 unanswerable
-questions answered, twice; 0 abstentions of 124 on five golden rungs) without
-naming the cause.
+🔴 **`answerable: false` means `none` and nothing else** — an empty result set.
+Since 2026-09-22 `weak` is a **signal, not a refusal**: fux publishes the band,
+the floor it was judged under and `failed: ["separation"]`, and leaves the call
+to you.
+
+⚠ **It refused on `weak` between 2026-09-14 and 2026-09-22, and stopped because
+of a measurement.** Across 2 992 questions on three independently authored
+question sets, **the answers the band withheld were more likely to be RIGHT
+than the ones it let through**, and risk rose as coverage fell. Abstaining on a
+near-tie is not supported by anything fux has measured — **so read the two
+near-tied documents and decide, which is the one thing the number cannot do for
+you.** If you want the old behaviour, branch on `band == "weak"` yourself.
 
 **What abstaining sounds like.** Not a hedge — a hedge is what you write when
 you have something to name, and `weak` means there is nothing:
@@ -315,9 +321,12 @@ If a result carries `"archived": true`, follow the `fux-archived-results` policy
 - **Don't compare fused scores with single-query scores**, or any scores across queries or repos.
 - **Don't expect `--under`, `--phrase` or `--all` to surface more** — raise `--top`.
 - **Don't parse stderr.** The no-match line lives there now, with every other note.
-- **Don't answer from `weak` or `none`** and cite the returned files as if they
-  said it. Both carry `answerable: false`, and it is a **refusal, not a low
-  score** — there is nothing to hedge with, so say *the documents don't say*.
+- **Don't answer from `none`** and cite the returned files as if they said it.
+  `answerable: false` is a **refusal, not a low score** — there is nothing to
+  hedge with, so say *the documents don't say*.
+- **Don't treat `weak` as a refusal, and don't treat it as nothing either.** It
+  says the ranking could not separate the top two — so open them and check,
+  rather than either abstaining by reflex or citing #1 because it was #1.
 - **Don't re-run an identical query** hoping for a different ranking.
 
 Related skills: fux-usage, fux-correct, fux-answer, fux-graph, fux-sources, fux-index, fux-maintain, fux-config, fux-mcp, fux-fetcher, fux-pii, fux-decoder, fux-enrich, fux-archived-results.

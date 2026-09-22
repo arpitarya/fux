@@ -11,8 +11,9 @@ Answer from the committed fux index, with citations: **$ARGUMENTS**
 2. **Quote the cited spans. Do not paraphrase them into a claim they do not make.**
 3. Report each citation's freshness verdict — `current`, `stale`, `as-ingested`,
    `cached`, `unverified`. A `stale` citation is still evidence, but say so.
-4. If `answerable` is false, **abstain and say why**. A confident wrong answer
-   is the expensive failure this verb exists to avoid.
+4. If `answerable` is false — `band: none`, nothing scored — **abstain and say
+   why**. A confident wrong answer is the expensive failure this verb exists to
+   avoid. ⚠ `band: weak` is **not** false: it is a near-tie you judge yourself.
 5. `--expand "<a passage you write>"` applies here exactly as on `ask` —
    expanding a question is not asking a second one.
 

@@ -10,7 +10,7 @@ feature: the governance map — which file governs what, who reads it, and what 
 owns: [tests/test_record_paths_resolve.py@7e6f2e8e9ad4, tests/test_work_queue_rules_have_one_home.py@dd985c4ea564]
 laws: [L0]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: c48269784cc16ee1b0808f666e324df0336a41a87a7b4a169b69f252d9fa7bdc
+content_sha: 40cba985ef40e540412dbe67f354651598c967806a2baac4b4f7cc67a830b646
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -139,7 +139,7 @@ still listed `DOGFOOD.md`, which no longer exists, and named neither
    | [`LESSONS.md`](../work/LESSONS.md) | dated build lessons — a log, because the date is the lesson | both | none | a failure teaches something durable |
    | [`NOW.md`](../work/NOW.md) | the one-line current-state pointer | both | read by a hook on every prompt | every session transition |
    | [`MACHINE.md`](../work/MACHINE.md) | environment and surface quirks | agent | none | a surface breaks in a new way |
-   | [`DOC-REGISTRY.md`](../work/DOC-REGISTRY.md) | per-doc freshness for **live** docs, one row each | both | [`test_doc_registry.py`](../tests/test_doc_registry.py) | any registered doc is touched |
+   | [SR-WORK-REGISTRY §3](0067_WORK-registry.md) | per-doc freshness for **live** docs — the table lives in the record with its rules; `work/DOC-REGISTRY.md` is retired | both | [`test_doc_registry.py`](../tests/test_doc_registry.py) | any registered doc is touched |
    | [`compare/`](../work/compare/README.md) | live forks — verdict and reopen-trigger | both | none | a fork opens, closes, or its trigger fires |
    | [`proposals/`](../work/proposals/README.md) | parked, undecided ideas | both | none | filed, graduates, or rejected |
    | [`regression/`](../work/regression/README.md) | measured evidence other docs cite | both | [`test_regression_runs.py`](../tests/test_regression_runs.py) | every measurement run |
@@ -282,6 +282,6 @@ evidence.*
 **Project docs**
 
 - [`CLAUDE.md`](../CLAUDE.md) · [`AGENTS.md`](../AGENTS.md) · [`README.md`](../README.md) · [`CHANGELOG.md`](../CHANGELOG.md)
-- [`work/OPEN-WORK.md`](../work/OPEN-WORK.md) · [`work/BACKLOG.md`](../work/BACKLOG.md) · [`work/BLOCKED.json`](../work/BLOCKED.json) · [`work/INTERVIEW.md`](../work/INTERVIEW.md) · [`work/IMPLEMENTATION.md`](../work/IMPLEMENTATION.md) · [`work/WORKLOG.md`](../work/WORKLOG.md) · [`work/LESSONS.md`](../work/LESSONS.md) · [`work/NOW.md`](../work/NOW.md) · [`work/MACHINE.md`](../work/MACHINE.md) · [`work/DOC-REGISTRY.md`](../work/DOC-REGISTRY.md)
+- [`work/OPEN-WORK.md`](../work/OPEN-WORK.md) · [`work/BACKLOG.md`](../work/BACKLOG.md) · [`work/BLOCKED.json`](../work/BLOCKED.json) · [`work/INTERVIEW.md`](../work/INTERVIEW.md) · [`work/IMPLEMENTATION.md`](../work/IMPLEMENTATION.md) · [`work/WORKLOG.md`](../work/WORKLOG.md) · [`work/LESSONS.md`](../work/LESSONS.md) · [`work/NOW.md`](../work/NOW.md) · [`work/MACHINE.md`](../work/MACHINE.md) · [`work/DOC-REGISTRY.md`](0067_WORK-registry.md)
 - [`work/compare/README.md`](../work/compare/README.md) · [`work/proposals/README.md`](../work/proposals/README.md) · [`work/regression/README.md`](../work/regression/README.md) · [`work/setup/README.md`](../work/setup/README.md) · [`work/golden/README.md`](../work/golden/README.md) · [`docs/paper/the-fux-index-paper.md`](../docs/paper/the-fux-index-paper.md)
 - [`docs/index.md`](../docs/index.md) · [`docs/GLOSSARY.md`](../docs/GLOSSARY.md)

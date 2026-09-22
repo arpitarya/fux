@@ -7,9 +7,10 @@ description: Searching the Fux index with fux ask or fux find - flags, the confi
 # Searching with fux ask / fux find
 
 - **Run `fux ask "<q>" --json --band`** when you will act on the result.
-- **`answerable: false` or band `none`: abstain.** `partial`: answer and name
-  every term in `confidence.missing`, or retry with the corpus's own word or
-  `--expand`. `weak`: report candidates, not a conclusion.
+- **Band `none` (= `answerable: false`, the only refusing band): abstain.**
+  `partial`: answer and name every term in `confidence.missing`, or retry with
+  the corpus's own word or `--expand`. `weak`: a **signal, not a refusal** —
+  the top two are near-tied, so read them and report candidates.
 - **`--expand` text is YOURS to write, never fux's.** 2-3 sentences in the
   document's likely words, not synonyms. `-q` is separate: real phrasings, RRF.
 - **Scores compare only within one result list**; a fused (`-q`) score is a

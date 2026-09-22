@@ -30,7 +30,7 @@ of THREE kinds:
 | `pii.toml` | committed | REQUIRED - every command refuses without it. What is REDACTED from the committed index - and ONLY from it. The acquired bytes, the refer plane and every answer quote still see the document as it is (SR-PII) |
 | `refusals.toml` | committed | what a REFUSAL looks like here - the sign-in walls, paywalls and error shells a server returns INSTEAD of the document. Consumer-owned; fux ships no vendor knowledge (SR-REFUSAL) |
 | `fux` | committed | the shim: `.fux/fux find rollback` in a clone with nothing installed. Resolves the reader in three rungs -- the vendored bundle, this member's `node_modules/.bin`, then every ancestor's -- because npm and yarn hoist that bin and pnpm and bun do not (SR-NODE-SEARCH) |
-| `runtime/` | derived | M2 accelerator segments, M4's fetch cache at `runtime/fetch-cache/`, the write lock, and `enrich-progress.tsv` (W-86 P6: which queued documents THIS machine has handled - local by design, so two people's progress cannot conflict on a pull); carries `CACHEDIR.TAG` |
+| `runtime/` | derived | M2 accelerator segments, M4's fetch cache at `runtime/fetch-cache/`, the write lock, `enrich-progress.tsv` (W-86 P6: which queued documents THIS machine has handled - local by design, so two people's progress cannot conflict on a pull), and `runtime/trace/` (SR-SERVE: an inspection page for one question or one document - it quotes passages, so it is never committed, and it is regenerable by re-running the verb); carries `CACHEDIR.TAG` |
 | `acquired/` | acquired | the bytes a fetch actually returned, for URLs whose line says keep=true. Gitignored and NOT rebuildable - re-acquirable only, and only while the source is still reachable; carries CACHEDIR.TAG |
 
 ## The fetchers are yours
@@ -89,7 +89,7 @@ Flat verbs, no subcommand tree. `fux <verb> --help` for any of them.
 | sources | `add` `remove` `enrich` `correct` | maintain what is indexed. `add`/`remove` write lines and end in an ingest; `enrich` plans and validates a model's text; `correct` writes one question a PERSON typed onto the document that answers it |
 | read | `ask` `find` `answer` `lexical` | the same question, differing only in how much each commits to. `lexical` is BM25F alone, frozen - the baseline `ask` is measured against |
 | graph | `explain` `graph` `path` | answer with relationships the documents stated, never with a ranking |
-| serve | `mcp` `daemon` | the only verbs that do not return |
+| serve | `serve` `mcp` `daemon` | the only verbs that do not return. `serve` is a local page over `ask`; `mcp` is the same index over the Model Context Protocol; `daemon` watches for staleness |
 | maintenance | `hooks` `tune` `output` `verify` | wire git to keep the index in step; print or set the tunables; re-run a receipt |
 
 **The three read verbs differ in how much they commit to.** `find`
@@ -120,7 +120,7 @@ there is no binding to install, version, or wait for.
 **Three things are the whole contract:**
 
 1. **`--json` on every read verb.** `ask`, `find`, `answer`, `explain`,
-   `graph`, `path`, `doctor`, `ingest --check`. Never parse the prose output -
+   `graph`, `path`, `doctor`, `update`. Never parse the prose output -
    it is for humans and it is allowed to change.
 2. **Exit codes.** `0` ok - `1` error - `2` blocking (strict mode) -
    `130` interrupted. Errors go to stderr as `error: <message>`.

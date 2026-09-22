@@ -1,0 +1,20 @@
+{
+  "this-repo": {
+    "anchor_bearing": 4768,
+    "anchor_distinctive_edges": 1368,
+    "anchor_distinctive_targets": 594,
+    "anchor_distinctive_terms": 1050,
+    "anchor_terms": 30038,
+    "docs": 1672,
+    "edges": 7550,
+    "kinds": {
+      "code": 2689,
+      "ref": 4768,
+      "supersedes": 1,
+      "tag": 92
+    },
+    "link_sources": 599,
+    "link_targets": 793,
+    "ref": 4768
+  }
+}

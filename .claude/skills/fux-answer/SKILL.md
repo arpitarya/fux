@@ -159,7 +159,7 @@ per document in `audit.documents[]` (`freshness`, `indexed_sha`, `fetched_sha`,
 | `--band` says | do |
 |---|---|
 | `none` (`answerable: false`) | abstain: "the index has nothing on this" |
-| `weak` | **abstain** (`answerable: false`) — *the documents don't say*; show the passages as candidates and name what was searched, never a conclusion |
+| `weak` | **read the passages and judge** (`answerable` stays `true` since 2026-09-22 — a signal, not a refusal). The top two are near-tied: cite the one that answers, or say the documents don't say and show both as candidates |
 | `partial` | answer, and name `missing` terms or the `stale` source |
 | `grounded` | answer, citing each passage's `loc` and its verdict |
 

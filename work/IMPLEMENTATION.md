@@ -26,6 +26,546 @@ Rules:
 
 ---
 
+## 2026-09-22 — **W-214 CLOSED: the band stops refusing, and keeps saying why**
+
+**The first abstention gate this project measured, and it was removed.** Arpit
+ruled option B on the day W-213 filed: *"I'll go with option B, that is demote
+weak to a signal and stop it refusing."* **`answerable` is `band != none`
+again**, reversing his own W-176 gate 1 ruling of 2026-09-14 — the only thing
+that could reverse it.
+
+Evidence: [W-213's VERDICT](regression/2026-09-22-band-operating-point/VERDICT.md)
+— 2 992 questions, 8 rungs, 3 independently authored retired sets,
+`classification: informed` permanently. **No re-measurement was owed to land
+this**: the change is a ruling, not a prediction.
+
+| # | obligation | state |
+|---|---|---|
+| 1 | both planes in one commit | ✅ `src/fux/query/confidence.py` and `node/src/query/confidence.mjs`; bundle regenerated ([L10](../records/0011_LAW-10-bundled-output.md)) |
+| 2 | the band table stops saying *do not answer* | ✅ **SR-CONFIDENCE decision 3's `weak` row**, and **3a rewritten as the reversal it is** — dated, quoting the ruling, keeping the four-run table, naming the gap it re-opens, deleting nothing |
+| 3 | the stale docstrings, not just the expression | ✅ both planes' `answerable` and `failed` docstrings argued FOR the removed behaviour; rewritten, and the `WEAK` constant with them |
+| 4 | the agent-facing surfaces | ✅ twelve templates re-stated and twenty vendor renderings synced — four vendors, `SEARCH`/`ANSWER`/`MCP`/`SERVE` skills, both commands, both Copilot prompts, both Kiro guides, the output style and the ambient `AGENTS.md` |
+| 5 | the paper and `fig-09-confidence` | ✅ §4 prose, the roadmap row, a new results row, the `.mmd` **and** the re-rendered `.svg` |
+| 6 | records | ✅ **SR-CONFIDENCE 3, 3a, 17** · consequence lines in **SR-ASK · SR-MCP · SR-NODE-SEARCH · SR-OUTPUT · SR-AGENT-POLICY · SR-RS · SR-SERVE** |
+| 7 | tests | ✅ see below |
+
+**What the tests hold, and the one that would have lost silently.**
+`test_the_band_table_and_answerable_cannot_disagree` **still passes and was not
+weakened** — its expectation moved from `{NONE, WEAK}` to `{NONE}` in the same
+change as decision 3's row, which is the property that makes this a reversal
+rather than a second silent disagreement.
+`test_a_zero_floor_…` was **rewritten, not deleted**: its old claim — that a
+zero floor stopped fux abstaining on separation — says nothing now, and what a
+zero floor still costs is the **signal**.
+🔴 **`test_weak_is_still_emitted_because_the_signal_is_the_whole_point` is the
+new one that matters**: once nothing branches on `weak`, the band arm and the
+`failed` arm look like dead code, and deleting them would complete the wrong
+half of the ruling.
+
+**Two things moved that the handoff did not name, and both would have been
+silent regressions.** `fux serve`'s ring was coloured by `answerable`, so a
+near-tie would have rendered the same green as a clear winner; it is coloured
+by **band** now, and the note beside a rendered list fires on `weak` and says
+*open both and judge*. And `tools/quality-controls/band_sweep.py` — W-213's own
+instrument — read `conf.answerable` to decide whether the band withheld, which
+after this ruling would have reported every row as answered and the whole sweep
+as a no-op; the pre-W-214 rule now lives in one dated, named function so
+**W-213's filed numbers stay reproducible from the captures that produced
+them.**
+
+⚠ **`node/test/confidence.test.mjs` is new because there was none.** Nothing
+under `node/test/` touched the confidence twin before today — the only thing
+holding the two planes together was a differential arm that needs a corpus
+containing a near-tie, which is exactly the branch a small corpus misses.
+
+🔴 **What this knowingly buys back, and Arpit bought it knowingly.**
+`band != none` is structurally almost never false, so `answerable: false` now
+fires essentially only on an empty result set. **The W-48/W-176 gap is open
+again** — the difference from the pre-W-176 state is that the band table now
+says *signal*, so two fields on one payload never again contradict each other.
+⚠ **Any filed number that counted abstentions describes the OLD semantics.**
+
+**Out of scope and untouched:** `separation_floor` stays `0.10` (W-213's
+verdict is not reopened); option C (`doc_coverage` as the gated quantity) is
+neither chosen nor killed and still owes its own pre-registration; option D's
+judged arm is not commissioned.
+
+---
+
+## 2026-09-22 — **W-213 CLOSED: the band's threshold stays, because the threshold was never the problem**
+
+**Measured, ruled, and nothing in the engine changed — which is the outcome the
+pre-registration named in advance.**
+[VERDICT](regression/2026-09-22-band-operating-point/VERDICT.md) ·
+[report](regression/2026-09-22-band-operating-point/report.md) ·
+[frozen bar](regression/2026-09-22-band-operating-point/PRE-REGISTRATION.md).
+`classification: informed`, permanently, three ways over.
+
+| # | obligation | state |
+|---|---|---|
+| 1 | a frozen pre-registration first, both directions, the d19 paired floor | ✅ committed at `4cdf0dfd` **before any number**; the `prediction:` id added at `c2f92638`, an identifier and not a threshold |
+| 2 | an answer-quality arm, **or an explicit statement it ships without one** | ✅ a **named proxy** (`evidence_quoted`) with **its bias direction declared in advance** — it under-detects correctness, so it favours abstention |
+| 3 | measured on a RETIRED set | ✅ all three, 373 questions × 8 rungs = **2 992 rows**, and no sealed key is opened on any path |
+| 4 | records | ✅ **SR-CONFIDENCE decision 17** (the operating point) · **SR-RS 24d** (the instrument) · the register row |
+
+**The ruling: `separation_floor` stays `0.10`.** Eighteen primary-rung
+comparisons, **none clears in the improving direction**; the three that clear all
+say the incumbent is better. ⚠ **Not for want of power** — improvement headroom
+was **49 / 64 / 65** against a floor of 6 flips.
+
+🔴 **THE FINDING IS LARGER THAN THE ITEM.** `separation = (top1 − top2) / top1`
+measures whether the ranking could **choose**; the band treats that as a stand-in
+for whether the chosen document is **right**, and the two come apart:
+
+| at `0.10` | set-1 | set-2 | set-3 |
+|---|---:|---:|---:|
+| risk among what it **answered** | 0.335 | 0.516 | 0.489 |
+| risk among what it **withheld** | **0.325** | **0.469** | **0.385** |
+| wrong answers suppressed | 62 | 135 | 104 |
+| a rate-matched coin would suppress | 63.6 | 144.6 | 124.5 |
+
+**Risk RISES as coverage falls on all three sets** (set-3 `0.461 → 0.600`) where
+a working abstention gate makes it fall, and **removing the unanswerable class —
+which can only flatter the gate — widens every gap.** 🔴 **`0.00`, the clause
+off, did not clear either**, so *turn it off* has no more support than *lower
+it*: there is **no agent-closable move**, and what the band becomes reverses
+Arpit's W-176 gate 1 ruling. **Filed as W-214, in the inbox.**
+
+⚠ **What is NOT claimed: that the band is worse than random.** Three sets
+agreeing in direction is `p = 0.25` on a sign test; only set-3 is individually
+distinguishable. The supported claim is *no evidence it beats chance, point
+estimate on the wrong side everywhere*. **One unmeasured assumption carries all
+of it** — the proxy must under-detect correctness equally on both sides of the
+gate.
+
+### The instrument, and two corrections it needed
+
+🔴 **The sweep is a REPLAY.** `Confidence.band` is a pure function of fields
+`as_dict()` already emits, so **one** ladder capture serves seven floors: the
+tool reconstructs **the engine's own `Confidence`** with a different floor rather
+than reimplementing the rule. **Self-check: the reconstruction reproduced the
+engine's verdict on 2 992 of 2 992 rows.**
+
+- 🔴 **The first draft hard-coded `net >= 6` — the third instrument to try it.**
+  `tools/quality-controls/README.md` says in terms that `verdict.py` is *the one
+  place a paired result is adjudicated, so no control can hard-code a bar again*,
+  and d19's real bar **rises with the flips**. A test now fails if any line of
+  code in `band_sweep.py` applies the floor itself.
+- ⚠ **A label naming a DIRECTION is a bug when the grid runs both ways.** The
+  outcome was first `lower-floor-better`, which reads backwards on every
+  candidate above the incumbent. It names the **arm** now, held by a test.
+
+⚠ **Disclosed rather than discovered:** the instrument was smoke-tested on
+`rung-seed` and those numbers were seen before the full capture finished.
+`rung-seed` adjudicates nothing and the rule was committed before it.
+
+**Suites:** `tests` · `tests_e2e` — see the session's worklog entry.
+
+---
+
+## 2026-09-22 — **W-212 CLOSED: the golden harness captures the funnel it could not compute**
+
+**Shipped — the instrument, not the measurement.** W-204 phase D scored 11 716
+rows with zero join errors and could not produce
+[SR-WORK-QUALITY](../records/0056_WORK-quality.md) decision 1's funnel at all:
+`reachable` and `in window` live in `fux ask --json --why`'s `derivation.gates`,
+prompt 5 never passed the flag, and **the cut line was computed and discarded
+11 716 times**. It is not recoverable from a filed run.
+
+| # | obligation | state |
+|---|---|---|
+| 1 | prompt 5 passes `--why`; the writer records the five gate integers | ✅ `golden_run.py`, as `gates` — **and nothing else from the derivation** |
+| 2 | `rung_outputs.py` and the hand-off schema move with it | ✅ the funnel prints per question; a rung with none is **bannered** |
+| 3 | a test that the hand-off carries the five fields | ✅ [`tests/test_golden_handoff_gates.py`](../tests/test_golden_handoff_gates.py), 12 cases |
+| 4 | `phase_d.py` computes the funnel, and **says so when it cannot** | ✅ `computed: false` with a reason, never four zeros |
+| 5 | records | ✅ **SR-WORK-QUALITY decision 13** (the rule) · SR-RS 24c + the W-212 paragraph (the harness) · `work/golden/README.md` phase 5 · prompt 5 |
+
+🔴 **The rule is that an absent gate is NOT a zero**, and that is the whole
+item. `reachable: 0` is a claim — *this query reached no document* — so a funnel
+filled in by an instrument nobody armed is indistinguishable from a total
+retrieval collapse, and it would have been filed as one.
+
+🔴 **`fux-engine 1.0.0`'s `ask` has no `--why`, measured against the arm venv
+phase B actually ran** (`~/my_programs/fux-lab/arms/v1`); `2.0.1` has it. argparse
+exits `2` on an unknown flag, so a three-engine re-run that hardcoded the flag
+would collapse the v1 arm to 2 992 empty rows — the `--band` trap of SR-RS 24c,
+one flag later. The harness carries `--no-why`, and that arm's `gates` are
+**null**.
+
+⚠ **Two strikes → a gate.** This is the second filed golden run to lack an input
+one of its own metrics acts on (W-191 measured a link feature on a corpus with
+**0 `ref` edges**), so the check is mechanical —
+[SR-WORK-SESSION](../records/0060_WORK-session.md) decision 13.
+
+⚠ **The funnel is still UNMEASURED and this change does not measure it.** The
+three generation-1 sets retired on 2026-09-22 and no arm re-ran; W-212 always
+said the re-run belongs to the next generation. **No document may state a funnel
+until one exists.**
+
+**Suites:** `tests` **5 402 passed, 6 skipped** · `tests_e2e` **149 passed, 1
+skipped**.
+
+---
+
+## 2026-09-22 — **W-204 CLOSED: the generation is scored, retired and re-sealed**
+
+**Arpit ran the whole cycle in one sitting** — `just golden-unlock` → phase D →
+`golden-retire` ×3 → `golden-lock` — and W-204 closes with all four phases
+delivered.
+
+✅ **The switch is proven end to end, and the proof is measurement, not
+assertion.** The restore is **byte-identical** (`git diff` on
+`.claude/settings.json` empty), `just golden-guards` passes all eight checks, and
+the unit suite went **5 354 passed / 42 skipped** while open → **5 392 / 6**
+shut, the 42 being exactly the locked-shape arm returning. 🔴 **The guards proved
+themselves on the session that wrote them**: the first `ls` of the key directory
+after the lock was refused by the hook.
+
+**All three sets are now open regression data** at `work/golden/retired/<set>/` —
+`questions.jsonl`, `expected.jsonl`, and a README saying they carry no golden
+claim.
+
+🔴 **The real retirement found two defects no `tmp_path` fixture could, both in
+the destination:**
+
+1. **The committed home could not be committed.** `.gitignore` carries
+   `**/answers.jsonl` — a guard, so a key is uncommittable at any depth — and the
+   switch moved the answers onto exactly that name. Three sets retired
+   **successfully and invisibly uncommittably**; `git check-ignore` claimed every
+   file and the switch printed success. ⚠ **Fixed by renaming the destination to
+   `expected.jsonl`, NOT by negating the guard** — a hole in a pattern that
+   catches a key anywhere is a worse trade than a filename, and the new name says
+   the truer thing. Gated by `test_a_retired_set_can_actually_be_committed`,
+   which asks **git** rather than the filesystem.
+2. **The retired README carried no OKF `type`**, so three undeclarable documents
+   entered a declared bundle.
+
+**The lesson under both:** a synthetic fixture exercises the *program*; only a
+real run exercises the *destination*. Both defects were in what the switch wrote
+into a real tree, and both were invisible to 22 passing tests.
+
+⚠ **Set 3 retired under its own name**, so no rename happened and the
+`set-<gen>-<x|u>` convention begins with generation 2. The `set-2-x` / `set-2-u`
+question is moot for these three and live for the next author.
+
+**Live successors:** [FINAL-SCORE.md](regression/2026-09-22-golden-final-score/FINAL-SCORE.md) ·
+[L11](../records/0012_LAW-11-sealed-answer-key.md) 14 ·
+[SR-WORK-GOLDEN](../records/0066_WORK-golden.md) 15 ·
+[SR-RS](../records/0133_predictions.md) 24 · `tools/golden-switch/`.
+**39 citations of W-204 repointed** at the score across 25 live documents.
+
+---
+
+## 2026-09-22 — **W-204 phase D: THE SCORE EXISTS**
+
+**Shipped — the benchmark this project has been building toward since M1 has a
+number.** Arpit ran `just golden-unlock` at 11:41; a session scored from the key;
+**11 716 per-query rows, 94 arm × rung × set buckets, zero join errors.**
+Evidence: [`2026-09-22-golden-final-score`](regression/2026-09-22-golden-final-score/FINAL-SCORE.md).
+🔴 **`classification: informed`, permanently**, for three independent reasons.
+
+**hit@5 per set, eight rungs, never pooled:**
+
+| set | v1.0.0 | v2.0.1 | HEAD |
+|---|---:|---:|---:|
+| set-1 (Codex) | 699 | 723 | **833** |
+| set-2 (Claude) | 608 | 634 | **744** |
+| set-3 (Claude) | 625 | 672 | **771** |
+
+🔴 **All nine paired comparisons clear [SR-RS](../records/0133_predictions.md)
+d19's floor of 6, in the same direction, on three independently authored sets.**
+Weakest +24, largest +146. Headroom disclosed both ways per d22b — smallest
+improvement headroom 281 questions, smallest regression headroom 684, so nothing
+is saturated and no net is called on a zero.
+
+🔴 **What improved is RESISTANCE TO DISTRACTION, measured for the first time.**
+`rung-00100` → `rung-10000`: v1 loses **30** hit@5, v2 loses **43**, **HEAD loses
+10**. The arms are closest on the smallest corpus and furthest apart on the
+largest. **That is the index-and-refer thesis with a number on it** — and the
+`v2 → HEAD` comparison on set-1 had 837 questions it could have broken and broke
+**four**.
+
+🔴 **And the abstention layer is the engine's weakest part.** HEAD withholds on
+**818 of 2 992**; the key says **747 were answerable**. It catches 20.8–32.3 % of
+the genuinely unanswerable and withholds 22.7–30.2 % of the answerable — **on
+sets 2 and 3, fourteen answerable questions sacrificed per unanswerable one
+caught**. ⚠ Stable across a 357× corpus range, so it is *where the threshold
+sits*. ⚠ **It prices what abstention COSTS and not what it SAVES**, because no
+answer-text verdict was made; half the picture, and the missing half is named
+rather than assumed away.
+
+🔴 **The funnel could not be computed, and that is a finding about the
+instrument.** SR-WORK-QUALITY's `reachable → in window → placed → answered` needs
+`--why`'s `derivation.gates`; **prompt 5 never captured them.** Decision 23's
+class from the other end — not *the corpus lacks the input the feature acts on*
+but *the instrument lacks the field its own headline metric needs*. **No document
+may state fux's funnel** until phases A and B re-run with it.
+
+**Controls held, all three:** zero join errors in 11 716 rows; the null control
+**exact** (`null-a` ≡ `null-b`, 140/235/257/236); and the emitted field set
+carries **none** of L11's four answer-shaped fields — checked against the law's
+own definition, not assumed.
+
+**Opened from the findings:** [W-212](../archive/open/W-212-prompt-5-captures-the-gates.md) (closed the same day, below)
+and [W-213](../archive/open/W-213-confidence-band-operating-point.md) (both closed the same day, below). **W-168 is
+unblocked** — phase D's rows are what it was waiting for. SR-RS gains decision 24
+(the driver imports the scorer; importing is not invoking).
+
+---
+
+## 2026-09-22 — **W-204 phase C′: L11's prohibition becomes a SWITCH, and W-211 closes with it**
+
+**Shipped — the first thing in this repository that can turn a law's enforcement
+off, and the paperwork that makes that legal.** Arpit ruled it on 2026-09-21:
+*"Remove the checks through a just recipe … then lock it again and create new
+test data."*
+
+| what | where |
+|---|---|
+| the law | [L11](../records/0012_LAW-11-sealed-answer-key.md) **decision 14** — the whole normative block rewritten around a LOCKED state; `CLAUDE.md`'s generated view regenerated |
+| the mechanics | [SR-WORK-GOLDEN](../records/0066_WORK-golden.md) **decision 15** |
+| the program | [`tools/golden-switch/switch.py`](../tools/golden-switch/switch.py) — `unlock` · `lock` · `retire <set>` · `state` |
+| the recipes | `just golden-unlock` · `golden-lock` · `golden-retire <set>` · `golden-state`; `golden-guards` is state-aware |
+| the gate | [`tests/test_golden_switch.py`](../tests/test_golden_switch.py) — 22 assertions, every one against a COPY in `tmp_path` |
+
+🔴 **Exactly one file is mutated: `.claude/settings.json`.** The deny rules go,
+the two hooks are **deregistered**, and the hook *files* are never edited or
+moved — which is what makes `lock`'s byte-identical promise cheap rather than a
+claim. `unlock` stashes the bytes **and their digest**; `lock` verifies and
+**refuses rather than guessing**, because a stash that no longer matches is a
+breach to declare, not a thing to overwrite. ⚠ **Restoring from the stash rather
+than from git is deliberate**: `git checkout --` would also revert any unrelated
+edit made while the tree was open, silently.
+
+🔴 **`.gitignore` and `!work/golden` are untouched in both states** — *never
+committed* is the clause no state relaxes — and the switch's own test fails if
+the program so much as **reaches** those two files. ⚠ **That test's first draft
+forbade the substring and went red on the switch doing the right thing**, because
+`unlock` *prints* ".gitignore … are UNTOUCHED" for the operator. **Naming a thing
+is not reaching it**; the rule now checks the shape of the line. Second time this
+class bit in one session — `test_page_computes_nothing.py` made the identical
+mistake about the word *stopword*.
+
+🔴 **The gap the switch opens, named rather than papered over.** `just
+golden-unlock` contains none of the strings the `Bash` deny patterns match, so
+**nothing mechanical stops an agent running it**; the environment check inside
+the program is a tripwire an agent defeats in one line. **L11 decision 14's
+sentence is the whole defence** — the same standing as the recursive-`grep`
+route. It is the fourth door in that class and **the first this project built on
+purpose.**
+
+**Three surfaces learned both states**, each the way that keeps it honest:
+`test_golden_key_guards.py` skips the locked-shape assertions when open and
+asserts **the stash exists** instead — a switch that cannot close again is a
+one-way door; `test_golden_hook_prose.py` skips whole, because the convention it
+gates has nothing to enforce while the hooks are down; and `just golden-guards`
+**says which state it found** rather than reporting a correct unlocked tree as
+FAIL, which would train whoever runs it to ignore a red line.
+
+**[Prompt 9](golden/prompts/9-claude-code-open-the-key.md) is RETIRED**, and the
+contrast is the point: it would have deleted the deny rules, the hook
+registration, the hook file and three decisions — one paste, one direction, no
+way back. What replaced it is reversible and per generation.
+
+⚠ **Set 3's label is unconfirmed and nothing was renamed.** He said `set-2-x`; it
+is Claude-authored, so `set-2-u` was expected.
+
+---
+
+## 2026-09-22 — **W-211 CLOSED: the registry's tests follow it into the record**
+
+`work/DOC-REGISTRY.md` was retired into
+[SR-WORK-REGISTRY](../records/0067_WORK-registry.md) §3, and its tests followed:
+`tests/test_doc_registry.py` reads that section (targets resolve against
+`records/`, and the section is bounded by the next `## ` so §1's and §2's tables
+are never read as rows), and `test_sr_ownership.py`'s gate-unreachable pin gained
+the record. Six red tests to zero.
+
+🔴 **The part the item did not predict, and it needed a sixth test.** A missing
+*file* fails loudly; a renamed *section* fails **silently** — `rows()` returns
+`[]` and every remaining check passes against an empty list. The old test was
+safe from this by accident, because its input was a path.
+`test_the_table_was_actually_found` is now the **first** test in the file.
+**Moving a test's input from a file to a section of a file is exactly the change
+that introduces a vacuous pass**, and it is worth knowing the next time a
+document is folded into a record. Measured rather than assumed: 57 rows parse and
+all 9 live `work/*.md` resolve into them.
+
+---
+
+## 2026-09-22 — **W-210 rung 1 SHIPPED: `fux serve`, a page that renders the ranking and computes none of it**
+
+**Shipped.** A twentieth verb. `fux serve [--port N] [--open]` starts a stdlib
+server on **`127.0.0.1`** — **there is no `--host`**, and that is a contract
+rather than a default — serves one self-contained `page.html`, and answers
+`GET /ask` with the **byte-identical stdout of `fux ask --json --why --band`**.
+Routes: `/`, `/ask`, `/graph`, `/health`. **None writes anything**; `POST` is a
+405 with a reason. Evidence: [SR-SERVE](../records/0158_serve.md) ·
+`tests/serve/` (45) · `tests_e2e/test_serve_verb.py` (4).
+
+🔴 **The route runs the command; it does not rebuild the payload.** That is the
+whole design. A browser cannot hold a corpus's postings and stay honest — the
+sample pages this was designed from embedded 96 KB of stems for *three*
+documents — and a JS BM25F, walk and band would be **two rankers that can
+disagree while both look correct**. So the byte-equality is not a property
+somebody maintains; it is the implementation, and
+`test_ask_is_byte_identical_to_the_cli` exists to catch the "optimisation" that
+would end it.
+
+🔴 **`--why` did not carry what the page needed, and the reason was a DECISION,
+not a gap.** [SR-PROVENANCE](../records/0142_provenance.md) said in terms: *"the
+scorer is not instrumented, no per-term contribution is threaded through the hot
+path."* The item had filed this as *"`--why` may not yet carry per-term
+contributions"* — a missing field. It was a standing refusal, and the difference
+decided the fix. Decision 17 attributes in the **derivation pass**, over the
+documents that were *shown*, which is the Lucene `explain` discipline that record
+already cites: **a second query against one document, never a tax on the first.**
+`score_record`'s loop body was extracted to `bm25f.term_contribution` so the
+attribution is the *same expression* the score came from, not a second copy.
+
+🔴 **A second field had to come with it, and nothing predicted this one.** The
+printed score is `BM25F × proximity uplift × archived multiplier`, and on this
+repository the uplift is routinely **1.3** — so per-term contributions next to
+the printed score leave a **23 % gap**. A page could close it only by dividing
+two rounded numbers, which is precisely the *plausible number that disagrees with
+the real one* `provenance.py` is written around. `rerank_uplift` is now a field
+on every derived document; `tests_e2e` asserts the identity reconciles to 1e-9.
+
+⚠ **Two definition-of-done items were met in a different shape than written, and
+both are stated rather than quietly adjusted:**
+
+1. **DoD 6 asked for *"the stepper reads `ms` from the JSON"*.** `ask --json`
+   carries no `ms` fields, and [L3](../records/0005_LAW-3-deterministic.md)
+   forbids wall-clock output in what fux writes — so the stepper shows stage
+   **completion**, not duration, and the page reads no clock at all. Inventing
+   durations to satisfy the sentence would have printed a number no verb
+   produced.
+2. **DoD 10 asked for a `docs/` page.** `docs/` is the OKF bundle root and has no
+   per-verb page for any of the other nineteen verbs; a new one would restate
+   SR-SERVE. Met by the record, the `fux-serve` skill on all four surfaces, the
+   verb table in all three of its copies, and a glossary entry.
+
+**Also landed:** `.fux/runtime/trace/` reserved in
+[SR-DOTFUX](../records/0102_fux-directory.md) for rungs 2–3, with the reason it
+is `runtime/` and not `acquired/` — a trace page quotes passages, so it is
+content under L2 and never committed, **and** it is regenerable by re-running the
+verb, which is what `runtime/` means.
+
+**Not built:** rungs 2–4 — `fux ask --html`, `fux trace <doc> --html`, `/docs`.
+⚠ **Two findings from the design samples are recorded in SR-SERVE §Context** and
+are about *this repository's corpus*, not the tool: a law record at **#4 behind
+an archived proposal** on its own question, and **58 of 150 top-10 slots taken by
+archived documents** across 15 probes. Archived crowding is this repository's
+largest ranking lever, ahead of any analyzer change.
+
+---
+
+## 2026-09-22 — **W-205 CLOSED: an identifier is reachable AND whole, on both readers**
+
+**Shipped.** Analyzer **`v2 → v3`**: `-`, `.` and `/` are identifier separators
+exactly as `_` already was, so `RF-118` yields the whole token `rf-118` beside
+`rf` and `118`. Merged from `evidence/family-a.patch` as filed — two regexes in
+[`query/analyzer.py`](../src/fux/query/analyzer.py), their transcription in
+`node/src/query/analyzer.mjs`, `ANALYZER_VERSION` in both `store/format` modules,
+and the one shared W-202 fixture both suites read. **`_format` stayed
+`fux.index.v4`**: no property appeared, which is
+[SR-INDEX-LIFECYCLE](../records/0108_index-lifecycle.md) decision 10 doing its
+job. This repository was re-ingested at v3 (1 672 docs, 256 shards) and the
+published Node bundle rebuilt.
+
+**With part 1 (shipped 2026-09-20) that closes both halves of the item:** a
+`doc_id` that lives only in front-matter now reaches the index *and* arrives
+whole. 🔴 **Part 2 needed no change to `parse.py`** — because part 1 routes
+resolved values **through** `analyze()` rather than appending them raw, the whole
+form appeared for free. A part 1 built the other way would have been untouched by
+part 2 and would still be wrong; the test that pinned *reachable but not whole*
+inverted, and is renamed to assert the composed state.
+
+🔴 **It shipped on CORRECTNESS, and the evidence must never be read as a win.**
+The [VERDICT](regression/2026-09-21-identifier-analyzer/VERDICT.md) is
+**INCONCLUSIVE** — nets of **+1 / +3 / +4** with **0 regressions** across
+`rung-00100 / 01000 / 10000`, against [SR-RS](../records/0133_predictions.md)
+decision 19's floor of **6 flips** — and Arpit ruled on 2026-09-21 that it
+**stands as filed and is not reworded**. What carried the merge is SR-RANKING
+decision 9's own promise plus the mechanism probe: **33 of 33 seed identifiers
+survive whole, from 0 of 33**, every moving row named in
+[`evidence/w202-diff.md`](regression/2026-09-21-identifier-analyzer/evidence/w202-diff.md).
+Cost filed with **no threshold**: ×2.1 dictionary terms at `rung-10000`,
+**+4.6 % index bytes**.
+
+⚠ **The finding is worth more than the verdict, and it is a lesson about
+measurement.** The eight sibling identifiers **set 3 was authored to supply** —
+`RF-117/119/120`, `PROJ-123/124/125`, `TSL-RF-119-A/120-A` — ranked their own
+document **first in both arms at every rung**. The failing shape did not fail;
+all four fixes came from the old 33, where the segments are individually common.
+SR-RS decision 23c counts that an input is *present* and never asks whether it
+*exercises the defect*.
+
+🔴 **A gate built against one field of a header is a gate against one bug.**
+`tests/test_own_index_is_current_format.py` was written on **2026-09-21** for
+exactly this class and checked `_format` **only** — so it stayed green while
+`fux ask` on this repository answered *"written by analyzer 'v2', this reader is
+'v3'"*. **Third occurrence.** It now parametrises over every field of `HEADER`,
+so a fourth header field is covered the day it is added.
+
+**Records amended:** [SR-RANKING](../records/0111_ranking.md) 9 ·
+[SR-INGEST](../records/0106_ingest.md) 23d ·
+[SR-INDEX-LIFECYCLE](../records/0108_index-lifecycle.md) 3 and 10 ·
+[SR-RECORD](../records/0109_index-record.md) ·
+[SR-NODE-SEARCH](../records/0153_node-search.md). ⚠ **Two of them carried stale
+version strings** — SR-INDEX-LIFECYCLE decision 3 and SR-RECORD's property table
+both still read `fux.index.v2` / `v2` while the engine wrote v4, because a bump
+moves a constant and nothing asks a table cell. Both now say to read the module.
+
+**Not built, and named so silence is not read as a decision:** family (b)
+(unstemmed beside stemmed), family (c) (a separate exact field — **now unblocked
+by (a), still unjustified**), and restricting (a) to digit-bearing tokens to shed
+the prose share of the +4.6 %. All three are in SR-RANKING decision 9.
+
+---
+
+## 2026-09-22 — **W-209 CLOSED: the L11 hooks fire on prose, and that is now ruled, stated and gated**
+
+**Shipped.** A convention and a test; **no guard, hook, pattern or deny rule
+moved**, which is the entire shape of Arpit's 2026-09-21 ruling. Both L11 guards
+match a `Bash` command on its **whole text**, so a heredoc, an `echo`, a
+`python -c` or a commit message that merely *writes a sentence* naming a key path
+is refused — while the same sentence in a Write/Edit `content` field passes,
+because those calls are checked by `file_path` alone. Five recorded occurrences
+before it was closed; the fifth was the release session's own commit message on
+2026-09-21, reworded rather than bypassed.
+
+| what | where |
+|---|---|
+| the convention — *prose that must spell a key path is written with Write/Edit, never through a shell command* | [SR-WORK-GOLDEN](../records/0066_WORK-golden.md) decision 7, stated once |
+| the gate, 18 assertions, both directions | [`tests/test_golden_hook_prose.py`](../tests/test_golden_hook_prose.py) |
+| the link, restating nothing | [`work/golden/README.md`](golden/README.md) §The one rule |
+
+🔴 **Decision 7 was also wrong, and that is the part worth reading.** It said
+*"writing prose about the rule is not blocked"* — true of the **target** check and
+false of the **Bash** branch, which is the half a session actually meets. A
+record that is right about the mechanism and wrong about the experience is the
+shape that survives five occurrences: every session that hit it read the record,
+believed the sentence, and concluded its own command must have been the problem.
+
+**The gate pins both directions on purpose.** A denial asserted so a later
+"usability" narrowing cannot land silently; an allowance asserted so a later
+widening cannot make L11 undocumentable — every record, README, work item and
+test in this repository names the path. It asserts the **committed** guard bytes
+and opens nothing, and it imports the Windows `bash` probe from
+`test_golden_key_guards.py` rather than copying it (two copies of that workaround
+could disagree while both looking correct — the same argument that gave the sixth
+guard its own file).
+
+**Declined the same day and named so silence is not read as deferral:**
+narrowing the hook to path-shaped tokens, and a docs lint forbidding the
+spelling. Evidence: the ruling in
+[`archive/open/W-209-l11-hook-prose-convention.md`](../archive/open/W-209-l11-hook-prose-convention.md);
+the fourth occurrence in
+[`2026-09-21-ladder-set-3-rebuild/ANALYSIS.md`](regression/2026-09-21-ladder-set-3-rebuild/ANALYSIS.md) §6.
+
+---
+
 
 
 
@@ -457,7 +997,7 @@ threshold.
 (+ 20 tests) · three additive changes to [`golden_run.py`](../tools/quality-controls/golden_run.py).
 **Evidence:** [`2026-09-20-golden-ladder-outputs`](regression/2026-09-20-golden-ladder-outputs/report.md)
 — 3 984 calls, eight rungs, both sets, `classification: informed`.
-**Items:** [W-204](open/W-204-golden-outputs-scoring-and-version-benchmark.md) phase A **done**; its row stays 🟢 for phase B.
+**Items:** [W-204](regression/2026-09-22-golden-final-score/FINAL-SCORE.md) phase A **done**; its row stays 🟢 for phase B.
 Eight absorbed items archived: W-136, W-87, W-190, W-195, W-191, W-176, W-161, W-175.
 **Records touched:** [SR-RS](../records/0133_predictions.md) (a paragraph for the new reporting artifact, `owns:` re-stamped);
 SR-WORK-QUALITY and SR-WORK-GOLDEN re-stamped; ten records repointed off the archived items.
@@ -601,7 +1141,7 @@ half-removed.
 — 19 tests, green. **Evidence:** [`2026-09-16-golden-rung-00100`](regression/2026-09-16-golden-rung-00100/ANALYSIS.md)
 (scored overlay). **Items:** [W-196](../archive/open/W-196-l11-breach-2026-09-17.md),
 [W-197](../archive/open/W-197-stray-key-directory.md),
-[W-195 → W-204](open/W-204-golden-outputs-scoring-and-version-benchmark.md) — all three filed open, none closed.
+[W-195 → W-204](regression/2026-09-22-golden-final-score/FINAL-SCORE.md) — all three filed open, none closed.
 **Records touched: none.** The change SR-WORK-GOLDEN may need is **proposed to
 Arpit, not written** — a law-adjacent decision is his
 ([SR-LAW-0](../records/0002_LAW-0-authority.md) decision 3).
@@ -853,7 +1393,7 @@ The directory is legally half-empty under §Per-run contract.
 | **W-145 closed as OVERTAKEN** | the contaminated key it would regenerate was already deleted, and **set 1 is Codex-authored questions *and* answers** — the need it named | [`archive/README.md`](../archive/README.md) §`open/` |
 | **the queue re-balled** | inbox row cleared; **W-136 🟢** (prompt 4 next), **W-190 🟡 on W-136**, **W-87 🟡 on W-136** — it had been 🔴 through W-145 | [OPEN-WORK](OPEN-WORK.md) |
 | **25 dead links repointed** | across 8 live documents, at live successors rather than into `archive/` (rule 58); one **pre-existing** break from the renumbering fixed with them | `tests/test_doc_links.py` green |
-| **what it does NOT buy** | ⚠ **no rung ran and no number moved.** The instrument exists; **prompt 4 has not been run**, and 🔴 **the session that runs it must never have read `questions/`** — this one read the ids | [W-136 → W-204](open/W-204-golden-outputs-scoring-and-version-benchmark.md) |
+| **what it does NOT buy** | ⚠ **no rung ran and no number moved.** The instrument exists; **prompt 4 has not been run**, and 🔴 **the session that runs it must never have read `questions/`** — this one read the ids | [W-136 → W-204](regression/2026-09-22-golden-final-score/FINAL-SCORE.md) |
 | **owed to Arpit** | ⚠ a **LAW record was amended** (SR-LAW-11 decision 11 — its factual premise, not its normative sentence) and needs his ratification; ⚠ **W-136's 🟣 2026-09-30 gate rests on a premise Codex disproved today**, and only he lifts a date gate | [WORKLOG](WORKLOG.md) |
 
 ## 2026-09-15 — **the golden reset: six numbered prompts, two numbered sets**
@@ -875,7 +1415,7 @@ The directory is legally half-empty under §Per-run contract.
 | **the authoring carve-out** | 🔴 exactly one handoff wide — the session that authors set A writes no file, hands the answers over in the chat, and **never runs a rung or returns**. Authorship buys no access | SR-LAW-11 decision 6 |
 | **two sets** | A (Claude, ids `a001…`) and B (Codex, ids `g001…`), same seed corpus and ladder, **run and reported apart**; 🔴 **never pooled** | [SR-WORK-GOLDEN](../records/0066_WORK-golden.md) decisions 8–11 |
 | **the per-run key question deleted** | *"(1) the file, or (2) the chat?"* removed from prompts 1, 3 and 5 — it had one answer left. Prompt 4 writes two prediction files; [`prompts/3-claude-questions.md`](golden/prompts/3-claude-questions.md) is new (**renumbered from `1a-claude-set-a.md`** later the same day) | SR-WORK-GOLDEN decision 10 |
-| **difficulty, built** | [`tools/golden-difficulty/`](../tools/golden-difficulty/) — a **count of the discriminations a question forces** (`d ≤ 1` easy / `2` medium / `≥ 3` hard, unanswerable **floored at hard**) plus a per-rung distractor count. 🔴 Never derived from fux's own results; 🔴 **refuses a key path inside the repository**. `--selftest` green on six synthetic fixtures | SR-WORK-GOLDEN decision 13 · [W-190 → W-204](open/W-204-golden-outputs-scoring-and-version-benchmark.md) |
+| **difficulty, built** | [`tools/golden-difficulty/`](../tools/golden-difficulty/) — a **count of the discriminations a question forces** (`d ≤ 1` easy / `2` medium / `≥ 3` hard, unanswerable **floored at hard**) plus a per-rung distractor count. 🔴 Never derived from fux's own results; 🔴 **refuses a key path inside the repository**. `--selftest` green on six synthetic fixtures | SR-WORK-GOLDEN decision 13 · [W-190 → W-204](regression/2026-09-22-golden-final-score/FINAL-SCORE.md) |
 | **what it does NOT buy** | ⚠ **no number moved and no engine ran.** Set A is unwritten, both keys are still Arpit's to regenerate, and **every set A number will be `informed` permanently** — an assumption recorded in SR-LAW-11 decision 7, not Arpit's ruling | [`questions/README.md`](golden/questions/README.md) · W-189 (closed 2026-09-15) |
 
 ## 2026-09-15 — **the benchmark's arms settle at `A` · `B` · `B-node`**
@@ -883,7 +1423,7 @@ The directory is legally half-empty under §Per-run contract.
 | item | what landed | evidence |
 |---|---|---|
 | **decision 16a** | 🔴 the tier-off arm is **not a benchmark arm** — a benchmark measures what ships, and `[graph] ask_boost`/`ask_related` default to `true`. `NODE_ARMS` is one entry; `RANK_PAIRS` is two | [SR-WORK-BENCHMARK](../records/0053_WORK-benchmark.md) decision 16a |
-| **what it costs** | 🔴 **the graph tier's VALUE stays unmeasured on both readers** and returns to [W-161 → W-204](open/W-204-golden-outputs-scoring-and-version-benchmark.md). Decision 12a's attribution run stands as filed history, not as a standing column | decision 16a |
+| **what it costs** | 🔴 **the graph tier's VALUE stays unmeasured on both readers** and returns to [W-161 → W-204](regression/2026-09-22-golden-final-score/FINAL-SCORE.md). Decision 12a's attribution run stands as filed history, not as a standing column | decision 16a |
 | **what it buys** | every run's tables carry only configurations a user is actually served, and one fewer pass per capture | decision 16a |
 
 ## 2026-09-15 — **the Node column wired into every capture (code), and a banned filename found**
@@ -1372,7 +1912,7 @@ SR-PII (decision 17's *a new verb is gated without anyone remembering*,
 exercised twice and unmoved) · SR-OUTPUT via `output_config`.
 **Tests:** +11 unit (walk inertness) +2 CLI gates +9 e2e.
 **Out of scope and untouched:** anything that changes what `ask` returns —
-that is [W-161 → W-204](open/W-204-golden-outputs-scoring-and-version-benchmark.md), which waits on W-156.
+that is [W-161 → W-204](regression/2026-09-22-golden-final-score/FINAL-SCORE.md), which waits on W-156.
 
 ---
 
@@ -1627,7 +2167,7 @@ recovery, and gated so it cannot fail a third time.
 
 | | |
 |---|---|
-| **the root cause** | [`work/DOC-REGISTRY.md`](DOC-REGISTRY.md)'s trigger for `work/open/` read *"its file is created with its index row and **deleted with it**"*. The archive-on-close rule had been ruled on **2026-08-19** and held for 76 items; it failed for 40 because that sentence, and rule 10's *"leaves the file entirely"* (about the queue), said the opposite without looking like rules. **When a rule keeps being broken, look for the passing sentence elsewhere that says so** |
+| **the root cause** | [`work/DOC-REGISTRY.md`](../records/0067_WORK-registry.md)'s trigger for `work/open/` read *"its file is created with its index row and **deleted with it**"*. The archive-on-close rule had been ruled on **2026-08-19** and held for 76 items; it failed for 40 because that sentence, and rule 10's *"leaves the file entirely"* (about the queue), said the opposite without looking like rules. **When a rule keeps being broken, look for the passing sentence elsewhere that says so** |
 | **recovered — 20 files, 19 ids** | `W-22` `W-42` `W-43` `W-70` ×2 `W-71` `W-102`–`W-105` `W-114` `W-115` `W-141` `W-142` `W-149`–`W-153` `W-155`. **Nine from committed history**; **eleven from `git fsck --unreachable`** — 3 769 orphaned loose objects matched on `type: OpenItem` frontmatter and the `id:` field. ⚠ Those eleven were **staged and never committed**, and a `git gc` would have taken them |
 | **lost for good — 20 ids** | `W-68` `W-94`–`W-96` `W-99`–`W-101` `W-116` `W-117` `W-119`–`W-121` `W-123`–`W-129` `W-131`. Each is demonstrably real (`W-101` is named 40× in the live tree) and **none of their bytes exists in any commit or loose object** — created and deleted inside one working tree, never staged. **They get no file:** one rebuilt from `WORKLOG.md` would be a session's prose wearing the original's name. What is lost is the argument, not the decision |
 | **never files — 12 ids** | `W-15`–`W-19` `W-28` `W-29` `W-34`–`W-37` `W-39` appear in no live document, no archived one and no git object. **They cannot be shown to have existed** |
@@ -2411,10 +2951,10 @@ green.
 | **Supersession** | 🔴 Retired above successor in **74 of 145** co-ranked pairs at `rung-seed`. ⚠ **`fux answer` recovers what `fux ask` inverts** — the endpoint decides whether the defect is visible | [analysis §2](regression/2026-09-12-golden-ladder/ANALYSIS.md) |
 | **Recall ceiling** | 30 of 124 have no `seed/` path in the top 5 at rung 1 000 → **`hit@5` ≤ 94/124 by structure**. Cannot be separated from the `heading` control working, and says so | [report §5](regression/2026-09-12-golden-ladder/report.md) |
 | **W-143's corpus** | ✅ **Exists.** 145 co-ranked pairs, 102 declared `superseded` records, 103 archived, every document dated. The inversion count is a **key-free** endpoint | [W-143](../archive/open/W-143-four-no-op-priors.md) |
-| **Not done** | Rungs **2 000 / 5 000 / 10 000 are not built** — Arpit capped the session at 1 000. Scoring is Codex's, phase 5 | [W-136 → W-204](open/W-204-golden-outputs-scoring-and-version-benchmark.md) |
+| **Not done** | Rungs **2 000 / 5 000 / 10 000 are not built** — Arpit capped the session at 1 000. Scoring is Codex's, phase 5 | [W-136 → W-204](regression/2026-09-22-golden-final-score/FINAL-SCORE.md) |
 
 ⚠ **`informed`, and no delta is stated in any direction** — the key is the
-Claude-authored stopgap (W-145, closed 2026-09-15 — [W-136 → W-204](open/W-204-golden-outputs-scoring-and-version-benchmark.md) phase 5). No
+Claude-authored stopgap (W-145, closed 2026-09-15 — [W-136 → W-204](regression/2026-09-22-golden-final-score/FINAL-SCORE.md) phase 5). No
 verdict, no threshold, no prediction closed.
 
 ---
@@ -3676,7 +4216,7 @@ running it surfaced three unrelated defects, all now closed:
   its first run's "0 asserted" report vacuous rather than a finding. Fixed and
   re-run: all 50 goldens assert exactly one `doc`; `recall@k` over this set
   **is** `hit@k`. What remains is a one-line completeness declaration,
-  `arpit` lane, tracked in [W-87 → W-204](open/W-204-golden-outputs-scoring-and-version-benchmark.md) P2.
+  `arpit` lane, tracked in [W-87 → W-204](regression/2026-09-22-golden-final-score/FINAL-SCORE.md) P2.
 - **Three SR-owned files from Wave 5's uncommitted diff had no owning-record
   touch** (`test_working_tree_is_not_mid_violation`): `output.schema.json`'s
   two new required fields under SR-ASK, `query/__init__.py`'s shared file
@@ -4834,6 +5374,7 @@ it closed by ratification, not by landing; see the W-27 row above.
 |---|---|---|
 | W-205 part 1 front-matter identity keys | ✅ **PASS** (2026-09-21) — front-matter `doc_id`/`id`/`aliases` reach `title` and `tags` reaches `ctx`, against the frozen rule *all six reachable, and neither no-harm arm degrades*. **6 of 6 reachable on both rungs, 0 broke on the 43 id-queries, 0 of 60 top-1 changes on the set-1 control.** **Shipped.** 🔴 **The before-arm falsified the pre-registration's premise: 5 of the 6 were ALREADY reachable** — the analyzer splits, so the parts matched from body, headings and path while the whole identifier appeared nowhere. **One identifier was fixed; five moved to rank 1.** 🔴 **Second unmeasured premise of the session** (part 2's was the first), both generalising a correctly recorded single case; the candidate rule is SR-RS's and is put to Arpit. ⚠ **The id-query arm nets +6 in the direction it was NOT registered to test and the run does not claim it.** 🔴 **FOUND: the archived revision outranks the live document** on a shared `doc_id` (3/13 → 5/4) — a shared `doc_id` is what a superseded pair has, so this makes inversion MORE likely, and no arm here could see it | [W-205-PART-1-META-FIELDS](regression/2026-09-21-frontmatter-reachable/VERDICT.md) |
 | W-205 part 2 family (a) | 🔴 **INCONCLUSIVE** (2026-09-21) — `-`, `.` and `/` as identifier separators, against the frozen rule *net ≥ 6 on at least one rung, no rung ≥ 6 against*. **Measured +1 / +3 / +4** at 100 / 1 000 / 10 000 documents with **0 regressions at every rung**, and nets of 1–5 cannot clear α at any discordant count. **The change does NOT ship** by the pre-registration's own words; `ANALYZER_VERSION` stays `v2` and the branch is not merged (the mechanism is filed as `evidence/family-a.patch`). ✅ **The mechanism works — 33 of 33 seed identifiers survive whole, from 0 of 33**, on both readers, W-168's gate A met. 🔴 **THE FINDING: the failing shape did not fail.** All eight sibling identifiers set 3 was authored to supply ranked their own document **first in BOTH arms at every rung** — 0 fixed, 0 broke — because splitting is symmetric and the number is already a rare term. **All four fixes came from the OLD 33**, where the SEGMENTS are individually common (`GHY-7`, `RF-221`, `SANDHU-EXC`, `WIKI-NGP-DOCK-12`). ⚠ **The premise was never measured before the documents were written for it**; SR-RS d23c counts that an input is present, never that it exercises the defect. ⚠ **Improvement headroom was 14 of 43 against a floor of 6** — the run could have produced a result and did not. ⚠ **Monotone in corpus size and 10 000 is the ceiling**, so a trend is not a result. 🔴 **Cost: the dictionary ×2.101 at `rung-10000`** while postings move ×1.054 — mostly hyphenated PROSE. Both absolute conditions hold. **Three ways forward are Arpit's** | [W-205-PART-2-FAMILY-A](regression/2026-09-21-identifier-analyzer/VERDICT.md) |
+| W-213-BAND-OPERATING-POINT | ✅ **PASS** (2026-09-22) — the confidence band's operating point, against the frozen rule *one candidate floor clears the d19 paired bar in all three sets, in the same direction, at `rung-01000`*. **Nothing clears in the improving direction in any set**, so outcome 2 fires: **`separation_floor` stays `0.10`**, and a recorded negative that stops a threshold moving is a PASS, not a failure to find something. ⚠ **Not underpowered** — improvement headroom 49/64/65 against a floor of 6. 🔴 **THE FINDING IS BIGGER THAN THE GATE: the threshold is not misplaced — `separation` does not carry correctness.** Risk RISES as coverage falls on all three sets; the band withheld fewer wrong answers than a rate-matched coin in all three; **what it withheld was more likely RIGHT than what it answered**, and dropping the unanswerable class widens every gap. 🔴 **`0.00` — the clause OFF — did not clear either**, so *turn it off* has no more support than *lower it*. 🔴 **Not supported: that the band is worse than random** (three sets one way is p = 0.25 on a sign test; only set-3 is individually distinguishable). The one assumption it rests on is named: the proxy must under-detect correctness **equally on both sides of the gate**. W-176 gate 1 is Arpit's ruling and is **not** reversed here — **W-214** | [W-213-BAND-OPERATING-POINT](regression/2026-09-22-band-operating-point/VERDICT.md) |
 | B1 | **INCONCLUSIVE** (2026-08-28) — `hit@5`, A vs B-core, tier 1 000, `N = 240`. Discordant count **0**, `p = 1.0` — but `hit@5` is **240/240 in BOTH arms at every tier** and MRR@10 is `1.0000`, so `pb` and `pc` are structurally zero and the null was determined by the corpus. **A power table says how many queries, never whether they are hard** | [B1-RETRIEVAL](regression/2026-08-28-benchmark-v1-vs-head/VERDICT.md) |
 | B2 | **FAIL** (2026-08-28) — supersession inversions, predicted PASS with B better; measured **0 discordant**. Both arms invert identically (21/40 at tier 1 000) because `superseded_weight` **ships at `1.0`**. ⚠ **Unlike B1 this endpoint HAD power** — both halves visible for every query, a coin-flip inversion rate. Post-hoc at `0.5`: 21/40 → 0/40. 🔴 **Not an argument for changing the default** — [P-SUPERSEDE](regression/2026-08-25-supersession-and-reranker-default/VERDICT.md) failed exactly that, and this corpus cannot see the case that broke it | [B2-SUPERSESSION](regression/2026-08-28-benchmark-v1-vs-head/VERDICT-B2.md) |
 | B3 | **PASS** (2026-08-28) — committed bytes **1.002 ×** at 1 000 docs and **0.998 ×** at 10 000 against a **1.25 ×** bar; published wheel **7.11 MB → 259 KB**. **`HEAD` commits no per-chunk `int8` vectors** — the one thing B3 named to check, read from a record in each arm's index | [B3-BYTES](regression/2026-08-28-benchmark-v1-vs-head/VERDICT-B3.md) |

@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@c984699b459a, src/fux/setup.py@9b3c541124bc, tests/test_verb_table_agreement.py@1e7999ffd28f]
+owns: [src/fux/store/fuxdir.py@4047fd4694dc, src/fux/setup.py@697f58087b6b, tests/test_verb_table_agreement.py@1e7999ffd28f]
 laws: [L2, L3, L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 00182a41ebc6785eb3bc5b9b6e65eed23bc5f2486003ac5621f6e1e73c859fd6
+content_sha: 17ab145f4e17557e30bf45181162abfb00f1b6e76927fa4d11058eb0cc27e6da
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -232,7 +232,7 @@ table is the reasoning.
 | `fux` | committed | a small `/bin/sh` shim — `.fux/fux find rollback` in a clone with nothing installed, mode `0755`. **It RESOLVES the reader in three rungs** since 2026-09-12 ([SR-NODE-SEARCH](0153_node-search.md) decision 16): the vendored bundle (`node .fux/node/fux.mjs`), then this member's `node_modules/.bin/fux`, then every ancestor's — because npm, yarn 1 and Berry-with-`node-modules` hoist that bin to the workspace root and **pnpm and bun do not** ([measured](../work/regression/2026-09-12-workspace-dotpath-probe/report.md), [Berry](../work/regression/2026-09-12-yarn-berry-probe/report.md)). **It is the one entry point correct in every shape, and the only one a README may name** |
 | `refusals.toml` | committed | what a **refusal** looks like in this organisation — the sign-in walls, paywalls and viewer shells a server returns instead of the document ([SR-REFUSAL](0146_refusals.md)). Consumer-owned and additive; the engine ships no vendor knowledge, and the always-on magic-byte floor is not configurable from it. Committed because *"what does a login page look like here"* is a team fact, exactly like `.fuxignore` |
 | `pii.toml` | committed | what is **redacted** from the committed index and nowhere else ([SR-PII](0148_pii.md)). Written by `fux setup` from the starter, never rewritten — and **the one consumer file that is required**: every command refuses in a repo without it (SR-PII decision 17) |
-| `runtime/` | **derived** | accelerator segments, the fetch cache at `runtime/fetch-cache/`, the write lock, the URL counters, the skip ledger, and `enrich-progress.tsv` — which machine has handled which queued document, **local by design** so two people's progress cannot conflict on a pull |
+| `runtime/` | **derived** | accelerator segments, the fetch cache at `runtime/fetch-cache/`, the write lock, the URL counters, the skip ledger, `enrich-progress.tsv` — which machine has handled which queued document, **local by design** so two people's progress cannot conflict on a pull — and **`runtime/trace/`**, where [SR-SERVE](0158_serve.md)'s later rungs write an inspection page for one question or one document. 🔴 **`trace/` is here and not in `acquired/` for a reason that is worth stating**: a trace page quotes passages and names words, so it is content by [L2](0004_LAW-2-content-never-durable.md) and may never be committed — and it is also, unlike an acquired blob, **regenerable from the committed index by re-running the verb**, which is what `runtime/` means. `fux serve` itself writes nothing at all; only the rungs that emit a file do |
 | `acquired/` | **acquired** | the bytes a fetch returned, for URLs whose line says `keep=true` — `objects/<sha[:2]>/<sha><ext>` plus an advisory `manifest.json`. Ignored and `CACHEDIR.TAG`-tagged like derived, and **not rebuildable**: `fux build` cannot produce it, only a re-fetch against a source that still exists. It is what lets an offline citation say `as-ingested` instead of `unverified` ([SR-URL-FRESHNESS](0147_url-freshness.md)), and it is bounded and evicted rather than unbounded |
 
 ⚠ **`COMMITTED_FILES` exists because its absence was a live defect.** `DECLARED`

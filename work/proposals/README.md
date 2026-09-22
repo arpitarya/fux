@@ -76,9 +76,11 @@ the defect this ordering exists to make visible.*
   2 as written · trigram/sparse-gram planes, out of scope) and argues **(a) is a
   precondition of (c), not an alternative**. Proposes **gate A**, an
   analyzer-survival before/after that needs no Codex output.
-  ✅ **GRADUATED 2026-09-20 → [W-203 → W-205](../open/W-205-identifiers-reachable-and-whole.md)**
-  (the defects and the families) **and [W-202](../../archive/open/W-202-identifier-analyzer-gate.md)**
-  (the frozen fixture). Kept here as the argument the two items cite.
+  ✅ **GRADUATED 2026-09-20 → W-203 → W-205, CLOSED 2026-09-22 into
+  [SR-RANKING](../../records/0111_ranking.md) decision 9 and
+  [SR-INGEST](../../records/0106_ingest.md) decision 23d** — family (a) shipped,
+  (b) and (c) named and unbuilt; the frozen fixture is W-202's
+  `tests/query/identifier-fixture.json`. Kept here as the argument they cite.
 
 * [The fetcher pipe — a URL line declares its fetcher AND its decoder](fetcher-routing.md)
   — Arpit's ruling of **2026-09-18**: a fetcher emits bytes in a format a decoder
@@ -170,7 +172,7 @@ re-derives its claims first.
   2026-09-20): **W-97 is archived** and **W-136 merged into W-204**. The
   condition itself is unchanged — *50 judgments on a fux corpus and a ranking
   decision waiting* — and both halves now sit in one place:
-  [W-204](../open/W-204-golden-outputs-scoring-and-version-benchmark.md)'s
+  [W-204](../regression/2026-09-22-golden-final-score/FINAL-SCORE.md)'s
   scoring pass is where judgments arrive, and phase D's per-query rows are what
   the next ranking decision waits on.
   [SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md) voided the

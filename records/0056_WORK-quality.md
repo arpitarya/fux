@@ -10,7 +10,7 @@ feature: the quality contract — what a fux quality number means
 owns: [tools/quality@4234bf34b787]
 laws: [L1, L2, L3, L4, L8]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 0cbabed7a0cfb3bca560edd3ba7869d26287cb0cce3b5e0aec4777840db2de33
+content_sha: 402c17de6cfb6a9b9d1fcce74202902d659667c68da88b58e4189551be7e4d6e
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -23,7 +23,7 @@ content_sha: 0cbabed7a0cfb3bca560edd3ba7869d26287cb0cce3b5e0aec4777840db2de33
 
 # SR-WORK-QUALITY — what "good" means
 
-**This record ratifies [W-87 → W-204](../work/open/W-204-golden-outputs-scoring-and-version-benchmark.md) Phase 0**
+**This record ratifies [W-87 → W-204](../work/regression/2026-09-22-golden-final-score/FINAL-SCORE.md) Phase 0**
 — all six forks, ruled by Arpit on 2026-08-27.
 
 ## §1 — For humans
@@ -283,6 +283,39 @@ problem, which is the reason decision 5 is not negotiable.
     blind spot. The declaration is the strongest claim available, and it is a
     claim rather than a fact.
 
+13. **The funnel's four counts are CAPTURED BY THE RUN THAT PRODUCES THEM, and
+    a run that did not capture them reports the funnel as NOT COMPUTED — never
+    as zero.** Ruled on the evidence, 2026-09-22 (W-212).
+
+    🔴 **The counts are perishable.** `reachable` and `in window` are computed
+    for every query and discarded unless the caller asks — in fux they are
+    [`fux ask --json --why`](0103_ask.md)'s `derivation.gates`. **They cannot be
+    recovered from a filed run**: the corpus, the engine sha and the tune are all
+    pinned and re-deriving them would be a different measurement at a later
+    engine. [W-204 phase D](../work/regression/2026-09-22-golden-final-score/FINAL-SCORE.md)
+    scored **11 716 rows with zero join errors** and could not produce decision
+    1's funnel at all, because the cut line had been computed and thrown away
+    11 716 times.
+
+    ⚠ **This is a measurement-DESIGN defect, and it is the same class as
+    [SR-RS](0133_predictions.md) decision 23's** — *the data does not contain the
+    input the metric acts on* — one step earlier: there the corpus lacked the
+    feature's input, here the instrument lacked the headline's. **A scoring pass
+    can be complete on what it was given and still produce nothing**, which is
+    why the obligation sits on the run and not on the scorer.
+
+    🔴 **An absent gate is not a zero, and the distinction is the whole rule.**
+    `reachable: 0` is a claim — *this query reached no document* — so a funnel
+    filled with zeros by an instrument nobody armed is **indistinguishable from a
+    total retrieval collapse**, and it would be filed as one. A report says
+    `computed: false` and why, or it says nothing.
+
+    ⚠ **The flag is per arm, and hardcoding it is the mirror failure.**
+    `fux-engine 1.0.0`'s `ask` has neither `--band` nor `--why` and argparse
+    exits `2` on an unknown flag, so an old arm asked for gates records an empty
+    result for **every** question — a flag error wearing the shape of a ranking
+    collapse. Measured 2026-09-22 against the arm venv W-204 phase B ran.
+
 > **The output block was withheld until there was one, and now there is.**
 > This record previously read: *"Nothing has been measured under this contract
 > yet — `recall@k` is not computed, the `unanswerable` class does not exist, and
@@ -383,7 +416,7 @@ future session can be held to.
   2026-08-20 lab wipe along with their generator, so the measurement half of
   W-87 remains blocked on inputs this record cannot supply.
 
-**The debt is filed**, in [W-87 → W-204](../work/open/W-204-golden-outputs-scoring-and-version-benchmark.md)
+**The debt is filed**, in [W-87 → W-204](../work/regression/2026-09-22-golden-final-score/FINAL-SCORE.md)
 (phases P1–P5). The law question decision 11 declined to settle was W-89, and it
 is **closed**: [SR-LAWS](0001_LAWS.md) decision 8 ruled it as a new law, `L8`,
 on 2026-08-27.

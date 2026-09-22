@@ -7,10 +7,10 @@ description: "An R is a claim frozen before measurement; its threshold may never
 status: accepted
 date: 2026-08-22
 feature: the prediction system — the R ids, their register, the rules that make a frozen claim mean something, and the classification of the runs those claims are measured by
-owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@08332faa052a, tools/vector-gate@0023bff0cdef]
+owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@11c8f09c6d55, tools/vector-gate@0023bff0cdef]
 laws: [L3]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 3379cf9fb88c09a84fcf0d8c8574d20098ffd7ecf866fa200e72d72b4c6cf399
+content_sha: 4a8c2fbc369bab982bb92488dd663f6c88826cf7149d0fece43efe553feab16a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -404,7 +404,7 @@ would have closed it cannot: the fault is the endpoint, and there is no third
 field to aim it at. A replacement would have to ask a different *question* —
 *does the correct seed document rank above every sibling* — which is a `hit@1`
 question against a key, and therefore
-[W-136 → W-204](../work/open/W-204-golden-outputs-scoring-and-version-benchmark.md) phase 5's job rather than a
+[W-136 → W-204](../work/regression/2026-09-22-golden-final-score/FINAL-SCORE.md) phase 5's job rather than a
 control's.
 
 ⚠ **The mechanical half of the lesson IS shipped**, so this cannot recur
@@ -572,7 +572,7 @@ close the P2 `recall@k` question W-87 filed:
   `fux-playground/check.py` — and re-run: all 50 goldens assert exactly one
   `doc`. `recall@k` over this set **is** `hit@k`; what remains is a
   completeness declaration (is the asserted `doc` the only relevant one?),
-  `arpit` lane, tracked in [W-87 → W-204](../work/open/W-204-golden-outputs-scoring-and-version-benchmark.md) P2.
+  `arpit` lane, tracked in [W-87 → W-204](../work/regression/2026-09-22-golden-final-score/FINAL-SCORE.md) P2.
 
 **15a. A CIRCULARITY SCREEN is a control, and it is the one that was missing**
 (2026-09-15, W-183). Decision 15's three controls ask *did the arm move something
@@ -1074,7 +1074,7 @@ the first is the one that fails loudly.
 
 | | what was missing | what fixes it |
 |---|---|---|
-| [W-191 → W-204](../work/open/W-204-golden-outputs-scoring-and-version-benchmark.md) | **the input** — 0 `ref` edges on all eight rungs | link-bearing **documents** |
+| [W-191 → W-204](../work/regression/2026-09-22-golden-final-score/FINAL-SCORE.md) | **the input** — 0 `ref` edges on all eight rungs | link-bearing **documents** |
 | [W-168 step 2](../work/regression/2026-09-16-identifier-survival/report.md) | **the questions** — 51 identifier tokens across all 20 seed documents, and **4 of 249 questions ask by one** | **id-queries** |
 
 🔴 **The second is harder to see and cheaper to fix.** A corpus census comes back
@@ -1136,8 +1136,19 @@ identifier shape and the link-bearing documents that three blocked measurements
 need. That is decision 23's failure with the symptom removed: not *missing input*
 but *input present and never asked for*.
 
-- **Both take `--sets`, defaulting to `1,2,3`**, so a run states on its command
-  line which sets it asked.
+- **Both take `--sets`, so a run states on its command line which sets it
+  asked.** 🔴 **Amended 2026-09-22 (W-215): the values are SET NAMES and
+  `golden_run.py` REQUIRES the flag.** They were integers with a `1,2,3`
+  default until generation 1 retired — and the moment those three files moved
+  to `retired/`, that default named nothing that exists.
+  [L11](0012_LAW-11-sealed-answer-key.md) decision 14 names the next generation
+  `set-<gen>-<x|u>`, which is not an integer, so the value is now whatever sits
+  between `set-` and `.jsonl`, restricted to `[A-Za-z0-9-]` because it becomes
+  both a path segment under the golden tree and a file name in the evidence.
+  ⚠ **A default is a guess about which generation is current**, and the guess
+  is wrong exactly once per generation — which is the same failure this decision
+  was written about, arriving from the other side. `rung_outputs.py` still takes
+  integers and is not part of that run's evidence.
 - 🔴 **A named set with no file is REFUSED, never skipped.** *"This rung has no
   set-3 rows"* and *"set 3 was never asked"* are indistinguishable in the evidence
   afterwards, and only one of them is a measurement.
@@ -1185,6 +1196,107 @@ hardcoded records an *empty result* for every question, thousands of them, and
 those rows read as a catastrophic ranking collapse rather than as a flag error.
 **On an arm without the flag, `band` and `answerable` are `null`, never `weak`.**
 
+⚠ **Amended 2026-09-22 (W-212): `--why` is the same flag with the same trap, and
+the trap is not hypothetical.** The harness now passes `ask --band --why` and
+records `derivation.gates` on every hand-off row, because
+[SR-WORK-QUALITY](0056_WORK-quality.md) decision 13 requires the run that
+produces the funnel's counts to capture them — **that rule is stated there and
+not here**. `fux-engine 1.0.0`'s `ask` has **no `--why` either**, measured
+against the arm venv phase B actually ran, so the harness carries `--no-why`
+beside `--no-band` and that arm's `gates` are **`null`, never zeros**. 🔴 **Zeros
+would be the worse failure of the two**: an unknown-flag collapse at least looks
+like a collapse, whereas `reachable: 0` on every row is a *plausible* funnel and
+would be read as one.
+
+**24d. [`band_sweep.py`](../tools/quality-controls/band_sweep.py) sweeps a
+threshold by REPLAY, and adjudicates through `verdict.py`** (W-213, 2026-09-22).
+
+`Confidence.band` is a **pure function** of fields `as_dict()` already emits, so
+the ladder is run **once** storing the whole confidence block and each candidate
+`separation_floor` is evaluated by **constructing the engine's own `Confidence`**
+with a different floor. Seven arms, one capture, and the reconstruction
+reproduced the engine's verdict on **2 992 of 2 992 rows** — a self-check the
+tool runs on every row, because a replay that silently disagreed with the engine
+would produce the instrument's numbers under the engine's name.
+
+- 🔴 **It does not re-implement the band rule, and it does not re-implement the
+  bar.** The first would be the restatement [SR-LAW-0](0002_LAW-0-authority.md)
+  decision 1 forbids by its own test; the second is what
+  [`verdict.py`](../tools/quality-controls/verdict.py) exists to stop, *"so no
+  control can hard-code a bar again"*. ⚠ **The first draft of this tool did
+  hard-code `net >= 6`**, which is the third instrument to try it, and a test
+  now fails if any line of code in the file applies the floor itself.
+- ⚠ **A label naming a DIRECTION is a bug when the grid runs both ways.** The
+  outcome was first labelled `lower-floor-better`, which reads backwards on
+  every candidate above the incumbent. It labels the **arm** —
+  `candidate-better` — and a test holds it there.
+- **It reads `work/golden/retired/` and no sealed key, in any state**, which is
+  what [L11](0012_LAW-11-sealed-answer-key.md) decision 14 makes retired data
+  for. Every number it produces is `informed` permanently, and the tool says so.
+
+**24e. HEADROOM IS COMPUTED BEFORE THE BUILD, NOT DISCLOSED AFTER THE RUN**
+(W-168, 2026-09-22). [`ranking_headroom.py`](../tools/quality-controls/ranking_headroom.py).
+
+Decision 22 already required a paired run to disclose, per endpoint and per
+direction, **how many queries could have changed**. It is computed *"from the
+per-query rows decision 15 already requires"* — which means it arrives from a
+run that has already happened, and that is precisely too late to decide not to
+run it.
+
+🔴 **Three filed runs returned a null their CORPUS determined, and in each the
+arithmetic was available beforehand.** B1: `hit@5` **240/240 in both arms at
+every tier**, so *"`pb` and `pc` are structurally zero"*. W-168 step 2:
+headroom **3–4 of 33** against a floor of 6, so *"step 2 cannot be given a
+verdict on this corpus whatever questions are written"*. W-191: a link feature
+on a corpus with **0 `ref` edges**.
+
+- **What it reports** per `rung × set`, over **answerable questions only**: the
+  pool a ranking change could win, the net decision 19 requires **if every
+  question in the pool flipped**, and whether a verdict is arithmetically
+  possible at all. ⚠ **An unanswerable question is not headroom for a ranking
+  change** — the right outcome there is an abstention, which no field weight
+  produces, and counting it would inflate the pool and so RAISE the bar.
+- ⚠ **`min_fix` assumes ZERO regressions** and is a ceiling on optimism, never a
+  prediction: with `b` wins and `c` losses the discordant count is `b + c` and
+  the net is `b − c`.
+- 🔴 **It applies no bar and takes decision 19's from
+  `resolution.smallest_detectable`**, never from a literal of its own —
+  decision 10b, and the same rule that put `verdict.py` between every control
+  and its verdict.
+
+**Measured on the golden ladder the day it shipped: a pool of 7–23 per set per
+rung, `min_fix` 7–11.** One ranking step must fix **58–78 % of every remaining
+failure with zero regressions, in all three sets**, to produce any verdict —
+which is why W-168's remaining steps are blocked on the corpus rather than on
+engineering.
+
+**24f. `ref_edge_census.py` counts anchor-DISTINCTIVE terms, because
+anchor-bearing is not the input** (W-168, 2026-09-22).
+
+The census was built for W-191 — *does this corpus have `ref` edges at all* —
+and on 2026-09-22 the golden ladder answered **61 anchor-bearing edges on every
+rung** while carrying **one** anchor-distinctive term, which was a filename.
+**Every word a linker used was already in the document it pointed at**, so the
+anchor field could add term frequency and could not make anything findable.
+`anchored=61` reads as *the input is present*; it is not.
+
+- **The subtraction is hashes against hashes** — an edge's `at` keys and the
+  target record's `terms` keys are the same hashed vocabulary — so the census
+  still opens no document and reads no word
+  ([L2](0004_LAW-2-content-never-durable.md)).
+- **Exit `3`**, distinct from `2`'s *no links at all*, because the two zeros are
+  different problems and a corpus with the second passes every check the tool
+  made before this date.
+- ⚠ **The exit code does not judge how MUCH is enough.** One distinctive term
+  exits `0`, and on 2026-09-22 that one term was a filename. **Picking the count
+  at which a corpus becomes adequate is a threshold, and a threshold lives in a
+  frozen pre-registration** (decision 10b). The tool prints `terms/targets`; the
+  reader judges.
+
+🔴 **Both are gates, not conveniences** —
+[SR-WORK-SESSION](0060_WORK-session.md) decision 13, second strike: W-191 was
+the first and the instrument built for it would not have caught this.
+
 **24a. [`identifier_probe.py`](../tools/quality-controls/identifier_probe.py) is a
 control, and it asks each identifier TWICE.** An id-query is
 `{identifier, question, primary, relevant}` derived from `work/golden/seed/` by
@@ -1203,7 +1315,69 @@ average over every row moves by a fraction of one flip when they are fixed.
 ⚠ **It prints rows and applies no bar**, decision 10b: a floor lives in a frozen
 pre-registration, never in the instrument.
 
+**24. The golden scoring driver lives under `tools/quality-controls/` and
+imports the scorer rather than repeating it.** W-204 phase D, 2026-09-22.
+[`phase_d.py`](../tools/quality-controls/phase_d.py) joins every filed hand-off
+to its key, scores each question through
+[`tools/golden-score/score.py`](../tools/golden-score/score.py)'s `score_one`,
+and rolls the rows up per `arm × rung × set`.
+
+🔴 **Imported, never reimplemented.** A second copy of `hit@k`, `primary_rank`
+and the abstention counts is two scorers that can disagree while both look
+correct — [SR-LAW-0](0002_LAW-0-authority.md) decision 1 by its own test, and
+the defect this record spends decision 19 guarding against in another costume.
+
+⚠ **Importing is not invoking, and the distinction is load-bearing.**
+[L11](0012_LAW-11-sealed-answer-key.md) decision 13 reserves *running* `score.py`
+— the program, via `just golden-score` — to Arpit's own hand in either state.
+What permits the driver to read a key is **decision 14**, which opens the key to
+a session while the tree is unlocked. **The driver refuses to run on a locked
+tree**, so the two permissions stay apart mechanically rather than by assertion.
+
+**What it does not do, and each has a reason that is not effort:** no
+answer-text verdict (a judgement, and `answer_text_verdict` stays `null`), no
+difficulty banding (decision 10b's thresholds freeze the moment a number is
+filed by band, so not starting means not freezing), and no pooling (it writes a
+key byte, which no agent does in any state).
+
+🔴 **The first run through it produced a measurement-design finding worth more
+than a metric:** SR-WORK-QUALITY's funnel **could not be computed**, because
+`reachable` and `in window` live in `--why`'s `derivation.gates` and prompt 5
+never captured them. That is **decision 23's class from the other end** — not
+*the corpus lacks the input the feature acts on*, but *the instrument lacks the
+field its own headline metric needs*. Filed as W-212. **A metric specified
+without checking that its inputs are recorded is a metric that cannot be
+computed**, and the cost is a re-run of every arm.
+
+✅ **CLOSED 2026-09-22 (W-212), in the instrument and not in prose.** The rule is
+[SR-WORK-QUALITY](0056_WORK-quality.md) decision 13; what changed here is the
+harness — `golden_run.py` passes `--why` and files the five gate integers,
+`rung_outputs.py` prints the funnel per question and **banners a rung that has
+none**, and `phase_d.py` computes the funnel per `arm × rung × set` and reports
+`computed: false` with a reason rather than four zeros.
+[`tests/test_golden_handoff_gates.py`](../tests/test_golden_handoff_gates.py) is
+the gate, under [SR-WORK-SESSION](0060_WORK-session.md) decision 13 — **this was
+the second filed run to lack an input one of its own metrics acts on.**
+
+⚠ **The funnel is still UNMEASURED, and the fix does not change that.** These
+three generation-1 sets retired on 2026-09-22 and no arm re-ran; the first funnel
+is the next generation's, and **no document may state one before it exists.**
+
 ### Consequences
+
+- ⚠ **W-214 (2026-09-22) retired the behaviour `band_sweep.py` measures, and
+  the tool now says so in one named function.** Arpit ruled `weak` a signal
+  ([SR-CONFIDENCE](0141_confidence.md) decision 3a) on the strength of W-213's
+  own result, so `Confidence.answerable` no longer tracks the band the sweep
+  varies — reading it would have reported every row as answered and every
+  sweep as a no-op. `withheld_under_the_separation_gate` holds the pre-W-214
+  rule, is dated in its own docstring, and is pinned by
+  `test_the_withholding_rule_is_the_PRE_W214_one_and_says_so`. **The self-check
+  now compares the BAND**, which means the same thing on both sides of the
+  ruling, so a capture taken after it cannot fail for a reason that is not an
+  instrument fault. 🔴 **Every number W-213 filed describes the old semantics**
+  — decision 11's classification rules are untouched, but a reader comparing an
+  abstention count across 2026-09-22 is comparing two different quantities.
 
 - **The prediction system is guardable.** A change to the discipline updates
   this record; before it, it updated nothing.

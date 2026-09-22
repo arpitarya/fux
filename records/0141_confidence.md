@@ -3,15 +3,15 @@ type: Standing Record
 kind: component
 name: SR-CONFIDENCE
 title: SR-CONFIDENCE (0141) — how much the index believes its own answer
-description: "Four deterministic signals and one band, emitted with every answer, so a consuming agent can tell a grounded result from the closest thing in a corpus that never discusses the question."
+description: "Four deterministic signals and one band, emitted with every answer, so a consuming agent can tell a grounded result from the closest thing in a corpus that never discusses the question. Since 2026-09-22 the band REPORTS and only `none` refuses."
 status: accepted
 date: 2026-08-27
-amended: 2026-09-15
+amended: 2026-09-22
 feature: the confidence plane
-owns: [src/fux/query/confidence.py@e0641ff2c3be, tests/test_confidence_floor_off.py@f8e18c079a6e]
+owns: [src/fux/query/confidence.py@2cd8be58107d, tests/test_confidence_floor_off.py@f8e18c079a6e]
 laws: [L1, L3, L4]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 7801fea9b9d699682b31443c1107e330f7bd9b869a29cde84961fd0c942328c3
+content_sha: 79c07fad7a49c7ef9ca0c945acef463f238a5bbe064b25e417245117275b7b29
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -74,7 +74,7 @@ flowchart TD
     B --> G{band}
     G -->|grounded| U1[use it and cite it]
     G -->|partial| U2[answer, name what is missing]
-    G -->|weak| U3[do not answer from this]
+    G -->|weak| U3[signal: ranking could not choose - judge it yourself]
     G -->|none| U4[abstain: answerable is false]
 ```
 
@@ -101,7 +101,7 @@ flowchart TD
               +---------------------------+
    grounded -> use it and cite it
    partial  -> answer, but name what is missing
-   weak     -> do not answer from this; say what was searched
+   weak     -> signal: the ranking could not choose; judge the hits yourself
    none     -> abstain. answerable is false
 ```
 
@@ -149,11 +149,12 @@ separation can.
 ```console
 $ fux ask "kubernetes helm chart rollout" --top 3 >/dev/null
 confidence: weak - the ranking cannot separate the top results
-            (separation 0.01, floor 0.10). Report what was searched
-            rather than a conclusion.
+            (separation 0.01, floor 0.10). A signal, not a refusal:
+            judge the top hits yourself.
 ```
 
-*Captured 2026-08-27 against this repository's own committed index.*
+*Captured 2026-08-27 against this repository's own committed index; the `weak`
+line's wording is as of 2026-09-22, when decision 3a stopped it refusing.*
 
 ---
 
@@ -211,24 +212,78 @@ should have declined, and this is the surface on which it declines.
    |---|---|---|
    | `none` | nothing scored above zero | abstain; `answerable` is `false` |
    | `partial` | a query term matches no document anywhere, **or** the cited bytes are `stale` | answer, and name what is missing |
-   | `weak` | `separation < SEPARATION_FLOOR` | do not answer; report what was searched — **`answerable` is `false`** |
+   | `weak` | `separation < SEPARATION_FLOOR` | **a signal: the ranking could not choose between the top hits — decide for yourself.** `answerable` stays `true` (3a) |
    | `grounded` | otherwise | use it and cite it |
 
    `stale` lands in `partial` rather than `weak` because it is a **nameable**
    defect, which is what `partial` means; a `weak` result has nothing
    identifiably wrong and the ranking simply cannot choose.
 
-   **3a. 🔴 `weak` IMPLIES `answerable: false`** (W-176 gate 1; Arpit,
-   2026-09-14). Until that ruling `answerable` was `band != none`, so this
-   table said *do not answer* on the `weak` row while the payload beside it
-   said `answerable: true`. **Two fields on one payload disagreeing, and the
-   one an agent branches on was the permissive one.**
+   **3a. 🔴 `weak` IS A SIGNAL, AND `answerable` IS `band != none`** (Arpit,
+   2026-09-22, on W-214 — built the same day,
+   [IMPLEMENTATION](../work/IMPLEMENTATION.md)):
+
+   > *"I'll go with option B, that is demote weak to a signal and stop it
+   > refusing."*
+
+   🔴 **This REVERSES his own W-176 gate 1 ruling of 2026-09-14, and only his
+   ruling could.** Between those two dates 3a read *`weak` implies
+   `answerable: false`*, and the paragraphs below are kept as they stood,
+   marked, because the reversal is not legible without the thing reversed.
+
+   **What is true now:** `weak` is computed, banded, published and named in
+   `failed: ["separation"]`, and **nothing abstains on it.** A consumer that
+   wants the old behaviour reads `band` or `failed` and refuses on it itself —
+   it has every byte it needs. **Fux stopped making that choice on the
+   consumer's behalf**, because decision 17 measured that the quantity being
+   thresholded does not carry correctness: across 2 992 questions, eight rungs
+   and three independently authored sets, **what the band withheld was more
+   likely to be RIGHT than what it answered**, in every set; risk rose as
+   coverage fell in all three; it suppressed fewer wrong answers than a
+   rate-matched coin in all three; and **no floor fixed it, including `0.00`.**
+
+   🔴 **What this knowingly buys back, named rather than discovered later.**
+   `band != none` is structurally almost never false, so `answerable: false`
+   now fires essentially only on an empty result set. **The W-48/W-176 gap is
+   open again.** The one thing that is different from the pre-W-176 state is
+   that the disagreement is no longer *silent*: the table above says **signal**,
+   not *do not answer*, so two fields on one payload never again contradict
+   each other. `test_the_band_table_and_answerable_cannot_disagree` walks the
+   table and is what holds that true — **its expectation moved in the same
+   change as this row, and it was not weakened.**
+
+   🔴 **The `weak` label must never be removed as dead code.** *Keep the
+   signal, drop the refusal* is the whole ruling, and a later cleanup that
+   notices nothing branches on the `WEAK` arm any more would complete the wrong
+   half of it. `test_weak_is_still_emitted_because_the_signal_is_the_whole_point`
+   exists for that and for nothing else.
+
+   ⚠ **Any filed number that counted abstentions describes the OLD semantics
+   and must say so** — including every number in decision 17 and in W-213's
+   verdict. `tools/quality-controls/band_sweep.py` keeps the pre-W-214 rule in
+   one named function, `withheld_under_the_separation_gate`, so those numbers
+   stay reproducible from the captures that produced them; it is the one place
+   in that tool that deliberately does not defer to the engine.
+
+   ---
+
+   ⚠ **KEPT AS IT STOOD, 2026-09-14 to 2026-09-22 — this is the ruling 3a now
+   reverses, not current behaviour.** Nothing below is deleted, because the
+   argument it makes is what made the reversal a decision rather than a tidy-up.
+
+   > **`weak` IMPLIES `answerable: false`** (W-176 gate 1; Arpit, 2026-09-14).
+   > Until that ruling `answerable` was `band != none`, so this table said *do
+   > not answer* on the `weak` row while the payload beside it said
+   > `answerable: true`. **Two fields on one payload disagreeing, and the one
+   > an agent branches on was the permissive one.**
 
    ⚠ **`band != none` could almost never be false**, which is why the defect
    survived four measured runs. *Nothing scored above zero* is the one state no
    real corpus produces: BM25F returns something for very nearly any query. So
    `answerable` was structurally incapable of being `false` in the field, and
-   every run that looked for an abstention found none:
+   every run that looked for an abstention found none. 🔴 **The table below is
+   what W-176 was ruled on, and it is equally the table that describes fux as
+   of 2026-09-22 again** — which is exactly the cost the reversal accepts:
 
    | run | result |
    |---|---|
@@ -238,24 +293,33 @@ should have declined, and this is the surface on which it declines.
    | [2026-09-13 benchmark captures](../work/regression/2026-09-13-benchmark-captures/report.md) | **10 of 10** planted unanswerables answered by both versions, one at `coverage: 0.0009` |
 
    **None of those runs could name the cause**, because each measured the
-   symptom. The cause is one expression, and it is this one.
+   symptom. The cause was one expression — and W-213 then measured that fixing
+   the expression bought nothing, which is how the same four rows come to
+   describe fux both before 2026-09-14 and after 2026-09-22.
 
-   ⚠ **`partial` stays answerable, and the asymmetry is the whole point.**
-   `partial` is a nameable defect — a term no document contains, or stale bytes
-   — so a consumer answers it *and says what is missing*. `weak` has nothing
-   identifiably wrong to name, so there is no honest hedge to attach and the
-   only correct move is to report what was searched.
+   ⚠ **`partial` stays answerable, and it always did — for a reason the
+   reversal does not touch.** `partial` is a nameable defect — a term no
+   document contains, or stale bytes — so a consumer answers it *and says what
+   is missing*. `weak` has nothing identifiably wrong to name; **what changed
+   in 2026-09-22 is that having nothing to name stopped being treated as a
+   reason to say nothing.**
 
-   ⚠ **`separation_floor = 0.0` now turns abstention-on-separation off
-   entirely**, not merely the `weak` label. It was already a legal and loud
-   setting; the gate makes it louder, and
-   `tests/query/test_confidence.py::test_a_zero_floor_makes_every_answer_answerable_and_that_is_the_cost`
-   is where a consumer who sets it will find that sentence.
+   ⚠ **`separation_floor = 0.0` silences the SIGNAL**, which since W-214 is the
+   whole of what it costs: no block is ever labelled `weak`, so `failed` never
+   names `separation` and a consumer that implemented the old abstention for
+   itself gets silence instead.
+   `tests/query/test_confidence.py::test_a_zero_floor_silences_the_SIGNAL_and_that_is_now_the_whole_cost`
+   is where a consumer who sets it will find that sentence. ⚠ **It said
+   something different between 2026-09-14 and 2026-09-22** — that a zero floor
+   stopped fux abstaining on separation — and that sentence is now true at
+   every floor.
 
    ⚠ **The band table and `answerable` are held in agreement by a test**, not
    by these two paragraphs — `test_the_band_table_and_answerable_cannot_disagree`
    walks every band. A band added later with no line there arrives *answerable
-   by default*, which is the direction that loses silently.
+   by default*, which is the direction that loses silently. **It is also what
+   made W-214 a one-line change rather than a second silent disagreement:** the
+   row and the boolean cannot be edited apart.
 
 4. **The text-mode declaration goes to stderr, never stdout**, and prints only
    under `--band`. Same contract as `_declare_archived` and `_declare_pending`,
@@ -697,6 +761,77 @@ with the same record dicts, so decision 8's guarantee — `--fast` and `--scan`
 cannot disagree about how confident fux is — holds with the field on. Asserted
 at `anchor = 2.0` by the 2026-09-15 differential run.
 
+⚠ **Unchanged by W-210 (2026-09-22).** That change edited `_compose`,
+`_maybe_rerank` and `_derivation_for` in `src/fux/query/__init__.py` to hand the
+proximity reranker's per-document uplift through the caller's **trace** dict for
+`--why` ([SR-RERANK](0138_rerank.md) decision 10;
+[SR-PROVENANCE](0142_provenance.md) decision 17). No emitted shape, no printer
+and no gate moved. Recorded because the freshness rule asked, and *nothing moved*
+is a legitimate answer to it.
+
+**17. THE OPERATING POINT IS MEASURED, AND `separation_floor` STAYS `0.10` —
+but what the run found is about the SIGNAL, not the threshold** (W-213,
+2026-09-22, [VERDICT](../work/regression/2026-09-22-band-operating-point/VERDICT.md)).
+
+Seven floors from `0.00` to `0.30`, 2 992 questions, eight rungs, three
+independently authored **retired** sets, priced at
+[SR-WORK-QUALITY](0056_WORK-quality.md) decision 6's frozen `c = 2` with
+`evidence_quoted` as a **named proxy** for *correct*.
+
+- **No candidate clears** the [SR-RS](0133_predictions.md) d19 paired bar in the
+  improving direction, in any set, at the primary rung. `SEPARATION_FLOOR` stays
+  `0.10` by the pre-registration's own outcome 2. ⚠ **Not for want of power** —
+  improvement headroom was 49 / 64 / 65 against a floor of 6 flips.
+
+🔴 **The reason no floor wins is that `separation` does not carry correctness on
+this corpus.** `separation = (top1 − top2) / top1` measures **whether the
+ranking could choose**; the band has always treated that as a stand-in for
+**whether the chosen document is right**, and the two come apart:
+
+- **Risk RISES as coverage falls, on all three sets** — set-1 `0.333 → 0.394`,
+  set-2 `0.502 → 0.534`, set-3 `0.461 → 0.600`. **A working abstention gate
+  makes risk fall.**
+- **At `0.10` the band withheld fewer wrong answers than a coin withholding at
+  the band's own rate would have, in all three sets** (62 vs 63.6, 135 vs 144.6,
+  104 vs 124.5).
+- **What it withheld was more likely to be RIGHT than what it answered**, and
+  removing the unanswerable class — which can only flatter the gate — widens
+  every gap.
+
+🔴 **`0.00`, the clause OFF, did not clear either.** *Turn it off* has exactly as
+much support from this run as *lower it*, which is none. **This decision changes
+no default and no test.**
+
+⚠ **What is NOT established, and the boundary is the point:** that the band is
+*worse* than random. Three sets agreeing in direction is `p = 0.25` on a sign
+test and only set-3 is individually distinguishable. **The supported claim is:
+no evidence the abstention beats chance, with the point estimate on the wrong
+side of it everywhere.**
+
+⚠ **One assumption carries all of it, and it is unmeasured:** the proxy must
+under-detect correctness **equally on both sides of the gate**. A uniform
+under-detection cancels in a between-group comparison; a `separation`-correlated
+one does not.
+
+🔴 **Decision 3's premise — *ten wrong links produce a confident wrong answer* —
+now has a number against it, and this record did not act on that.** *"`weak` IS
+a refusal"* was **Arpit's ruling** (W-176 gate 1, 2026-09-14) and a measurement
+is not a licence to undo one. **Filed as W-214, his.**
+
+✅ **RULED the same day (Arpit, 2026-09-22): option B — `weak` becomes a signal
+and stops refusing.** `answerable` is `band != none` again; the band, the floor
+and `failed: ["separation"]` are all still published. **Decision 3a is where
+that lives**, including the W-48/W-176 gap it knowingly re-opens. ⚠ **Every
+number in this decision was measured under the OLD semantics** and counts
+abstentions fux no longer makes; `band_sweep.py` keeps the pre-W-214 rule in a
+named function so they stay reproducible.
+
+⚠ **`doc_coverage_floor` is untouched and is the obvious next lever** — it ships
+at `0.0` (the clause off), it asks *does the TOP DOCUMENT cover the question*,
+which is much nearer to correctness than separation is, and **it was not in
+W-213's grid**. That is a lead and a new pre-registration, never an extension of
+this one.
+
 ### Consequences
 
 - ⚠ **W-194 (2026-09-20) moved a component this record describes, and changed
@@ -731,7 +866,7 @@ at `anchor = 2.0` by the 2026-09-15 differential run.
   the final result list. Asserted rather than assumed: the freeze test compares
   `--band` output among the flag combinations it walks.
 
-  ⚠ **After [W-161 → W-204](../work/open/W-204-golden-outputs-scoring-and-version-benchmark.md) the two will
+  ⚠ **After [W-161 → W-204](../work/regression/2026-09-22-golden-final-score/FINAL-SCORE.md) the two will
   legitimately differ**, and the difference will be informative rather than a
   defect: the band describes *the answer the reader was shown*, so a graph-lifted
   document has to be able to move it. **What must not happen is a document

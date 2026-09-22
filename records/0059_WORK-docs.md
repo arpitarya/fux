@@ -7,10 +7,10 @@ description: "Three rules with one home: how a doc is written (short points, tak
 status: accepted
 date: 2026-09-14
 feature: the documentation contract — form, editing authority, and the sync set every task owes
-owns: [tests/test_doc_registry.py@0cb5500b6b03, tests/test_doc_links.py@05b239446983]
+owns: [tests/test_doc_links.py@05b239446983]
 laws: [L0]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 54c63147f65aa2a6346a676b06bd061fe1877c810916a8d5804667f1df14827b
+content_sha: e9cfd726e39076a490f6c5a7666bed3e8ada5d5e1f58a6e59761dbe6a80264df
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -18,7 +18,6 @@ content_sha: 54c63147f65aa2a6346a676b06bd061fe1877c810916a8d5804667f1df14827b
 **Owns** — the components this record decides:
 
 - [`tests/test_doc_links.py`](../tests/test_doc_links.py) · file
-- [`tests/test_doc_registry.py`](../tests/test_doc_registry.py) · file
 
 <!-- COMPONENTS-END -->
 
@@ -51,7 +50,7 @@ flowchart TD
     Q -->|yes| S
     S --> L["the seven:<br/>queue · register · worklog · interview<br/>registry · README · the record + glossary + tests"]
     L --> D{"is it a doc you touched?"}
-    D -->|yes| R["bump its DOC-REGISTRY row<br/>in the same change"]
+    D -->|yes| R["bump its registry row<br/>(SR-WORK-REGISTRY §3) in the same change"]
     D -->|"newly archived"| X["DELETE its row<br/>never strike it through"]
 ```
 
@@ -68,7 +67,7 @@ flowchart TD
         the seven: queue . register . worklog . interview . registry . README .
                    the record + glossary + tests
                              v
-          touched a doc?      -> bump its DOC-REGISTRY row, same change
+          touched a doc?      -> bump its registry row (SR-WORK-REGISTRY §3), same change
           archived a doc?     -> DELETE its row (never strike through)
 ```
 
@@ -146,16 +145,15 @@ package on `main` yet"* while `fux-engine` was on PyPI, because nobody would
     | 2 | [the register](README.md) | the design of record: milestone and record status stay truthful when behaviour or scope changes |
     | 3 | [`work/WORKLOG.md`](../work/WORKLOG.md) | an entry per substantive exchange — [SR-WORK-SESSION](0060_WORK-session.md) |
     | 4 | [`work/INTERVIEW.md`](../work/INTERVIEW.md) | the agent-succession handoff: read before your first substantive change, updated when direction, strategy or a major decision changes, and you add yourself to its maintainer line when you do |
-    | 5 | [`work/DOC-REGISTRY.md`](../work/DOC-REGISTRY.md) | a bumped row for any doc you touched; a new maintained doc gets a new row in the same change |
+    | 5 | [SR-WORK-REGISTRY §3](0067_WORK-registry.md) — the registry | a bumped row for any doc you touched — decisions 2 and 8 of that record |
     | 6 | [`README.md`](../README.md) · [`CHANGELOG.md`](../CHANGELOG.md) | the public front door — status, guarantees, reading order; the changelog on any released change |
     | 7 | the relevant record, [`docs/GLOSSARY.md`](../docs/GLOSSARY.md) for any new recurring term, and every test the behaviour change needs | |
 
-11. **The registry lists LIVE documents only.** An archived doc's row is
-    **deleted** in the change that archives it — not struck through, not
-    annotated "retired" — the same discipline the queue applies to closed items.
-    **No row may point into `archive/`, every row's target must exist, and one
-    document gets exactly one row.** Enforced by
-    [`tests/test_doc_registry.py`](../tests/test_doc_registry.py).
+11. **The registry's own rules are [SR-WORK-REGISTRY](0067_WORK-registry.md)'s**
+    — live documents only, the three mechanical consequences, the same-change
+    bump, and what `tests/test_doc_registry.py` enforces. This record states
+    none of them; row 5 above is the task's obligation, and that record is the
+    rule.
 
 12. **Every relative link in a live document resolves.** Enforced by
     [`tests/test_doc_links.py`](../tests/test_doc_links.py), whose exemptions are
@@ -202,11 +200,11 @@ package on `main` yet"* while `fux-engine` was on PyPI, because nobody would
 
 ### Reference (required)
 
-- [`tests/test_doc_registry.py`](../tests/test_doc_registry.py) and
-  [`tests/test_doc_links.py`](../tests/test_doc_links.py) — this record's
-  enforcement, and the executable statement of decisions 11 and 12.
+- [`tests/test_doc_links.py`](../tests/test_doc_links.py) — this record's
+  enforcement, and the executable statement of decision 12. The registry's
+  test is [SR-WORK-REGISTRY](0067_WORK-registry.md)'s since 2026-09-22.
 - [`work/README.md`](../work/README.md) — the map decision 9 names.
-- [`work/DOC-REGISTRY.md`](../work/DOC-REGISTRY.md) — the freshness tracker
+- [SR-WORK-REGISTRY](0067_WORK-registry.md) — the registry: rules and the freshness table
   itself, and the trigger column that says when each row is owed.
 - [SR-LAW-0](0002_LAW-0-authority.md) — why a steering file links and never
   restates, which is what made this record necessary.
@@ -230,15 +228,14 @@ is the occurrence this veto counts.
 document is never listed here — the body may name one, but archive is not
 evidence.*
 
-**Records** — [SR-LAW-0](0002_LAW-0-authority.md) · [SR-WORK-SESSION](0060_WORK-session.md) · [SR-WORK-OKF](0061_WORK-okf.md) · [SR-WORK-OPEN-QUEUE](0051_WORK-open-queue.md) · [SR-WORK-ARCHIVE](0062_WORK-archive.md)
+**Records** — [SR-LAW-0](0002_LAW-0-authority.md) · [SR-WORK-SESSION](0060_WORK-session.md) · [SR-WORK-OKF](0061_WORK-okf.md) · [SR-WORK-OPEN-QUEUE](0051_WORK-open-queue.md) · [SR-WORK-ARCHIVE](0062_WORK-archive.md) · [SR-WORK-REGISTRY](0067_WORK-registry.md)
 
 **Code**
 
-- [`tests/test_doc_registry.py`](../tests/test_doc_registry.py)
 - [`tests/test_doc_links.py`](../tests/test_doc_links.py)
 
 **Project docs**
 
-- [`work/README.md`](../work/README.md) · [`work/DOC-REGISTRY.md`](../work/DOC-REGISTRY.md)
+- [`work/README.md`](../work/README.md) 
 - [`work/INTERVIEW.md`](../work/INTERVIEW.md) · [`work/WORKLOG.md`](../work/WORKLOG.md)
 - [`docs/GLOSSARY.md`](../docs/GLOSSARY.md)

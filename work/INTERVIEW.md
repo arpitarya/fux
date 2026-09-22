@@ -32,8 +32,96 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-09-20** (Claude Code, the three green rows).* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-09-22** (Claude Code, Opus — the benchmark has a score).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
+
+### ✅ 2026-09-22 — THE GOLDEN BENCHMARK HAS A NUMBER, and the queue is three 🟢 rows
+
+**What a session arriving cold needs first:**
+
+1. 🔴 **The score exists and every number in it is `informed`, permanently.**
+   [`FINAL-SCORE.md`](regression/2026-09-22-golden-final-score/FINAL-SCORE.md) —
+   11 716 rows, 0 join errors, v1.0.0 · v2.0.1 · HEAD on eight rungs and three
+   question sets. **Do not compare any of it with a pre-unlock number as if the
+   labels matched**; there is no blind arm in this generation and there will not
+   be one.
+2. ✅ **The headline: resistance to distraction.** HEAD loses **10** hit@5 across
+   the ladder where v1 loses 30 and v2 loses 43. All nine paired comparisons
+   clear the floor. **This is the first measured support the index-and-refer
+   thesis has**, and it is worth knowing before anyone proposes changing the
+   retrieval path.
+3. 🔴 **The abstention band is the weak layer, not the ranker — and as of
+   2026-09-22 the benefit half is measured too, with a worse answer than
+   expected.** W-213 swept seven floors over 2 992 questions on three
+   independently authored sets: **nothing clears in the improving direction**,
+   so `separation_floor` stays `0.10` — and the reason is that **the threshold
+   is not misplaced, the quantity it thresholds does not carry correctness.**
+   Risk RISES as coverage falls on all three sets, and **the questions the band
+   withheld were more likely to be RIGHT than the ones it answered**.
+   ⚠ **`0.00` — the clause off — did not clear either**, so there was no
+   agent-closable move: what the band becomes reversed Arpit's W-176 gate 1
+   ruling and was his.
+   ✅ **He ruled it the same day and it is BUILT (W-214, 2026-09-22):** `weak`
+   is a **published signal, not a refusal**, `answerable` is `band != none`
+   again, and the band, the floor and `failed: ["separation"]` are all still
+   emitted so a consumer can implement the old abstention itself.
+   🔴 **So fux abstains only when nothing scored at all — the W-48/W-176 gap is
+   open again, knowingly**, and **any filed number that counted abstentions
+   describes the pre-2026-09-22 semantics.** If you are looking for where to
+   improve the engine it is still here and not in BM25F, and the nearest
+   untested lever is **`doc_coverage_floor`**, which ships at `0.0` and asks
+   something much closer to correctness. ⚠ **It needs its own
+   pre-registration** — option C was neither chosen nor killed.
+   ⚠ **One assumption carries the finding**: the `evidence_quoted` proxy must
+   under-detect correctness equally on both sides of the gate.
+   [VERDICT](regression/2026-09-22-band-operating-point/VERDICT.md).
+4. 🔴 **L11 is a LOCKED STATE with a switch** (decision 14) — `just golden-unlock`
+   / `golden-lock` / `golden-retire <set>`, program at `tools/golden-switch/`.
+   **No agent runs those three or touches the state file.** `just golden-state`
+   is safe for anyone. ⚠ **The tree may be unlocked when you arrive**: check, and
+   if it is, `.claude/settings.json` is modified and **must not be committed**.
+5. ⚠ **`fux serve` exists** — a local page that renders `ask --json --why` and
+   computes nothing ([SR-SERVE](../records/0158_serve.md)). And **`--why` now
+   carries per-term `contribution` and `rerank_uplift`**, so
+   `score = Σcontribution × uplift × multiplier` is printed rather than inferred.
+6. 🔴 **Three traps this session paid for, all of them cheap to repeat:** both git
+   commit forms take something other than your stage on a shared tree; **naming a
+   thing is not reaching it** (three new gates forbade a substring and went red on
+   correct code); and **a fixture that reads state its own subject can mutate**
+   changes meaning underneath you.
+
+### ✅ 2026-09-22 — W-209 and W-205 are CLOSED; the queue is W-204, W-210, W-168
+
+**What a session arriving cold needs first, in order:**
+
+1. 🔴 **The analyzer is `v3` and this repository was re-ingested for it.**
+   W-205 part 2 family (a) merged on Arpit's 2026-09-21 ruling: `-`, `.` and `/`
+   are identifier separators exactly as `_` was, so a token carries its whole
+   form beside its parts. **Any index written before today is refused by name**
+   — `fux ingest --full` is the migration. It shipped on **correctness**, not on
+   a number: the [VERDICT](regression/2026-09-21-identifier-analyzer/VERDICT.md)
+   is INCONCLUSIVE and stays so, and **no document may cite its nets as a
+   ranking win**. [SR-RANKING](../records/0111_ranking.md) decision 9 carries the
+   promise, the cost (+4.6 % index bytes, no threshold) and the three things
+   deliberately **not** built — families (b) and (c), and restricting (a) to
+   digit-bearing tokens.
+2. 🔴 **A gate built against one field of a header is a gate against one bug.**
+   `test_own_index_is_current_format.py` was written on 2026-09-21 for exactly
+   the class *"the engine moved and the committed index did not"*, checked
+   `_format` **only**, and stayed green on 2026-09-22 while `fux ask` on this
+   repository refused its own index on `analyzer`. It now parametrises over every
+   field of `HEADER`. **Third occurrence of that class.**
+3. ⚠ **Writing prose that names the sealed-key directory goes through
+   Write/Edit, never a shell command** — the guards match a `Bash` command on its
+   whole text and will refuse a heredoc, an `echo` or a commit message.
+   [SR-WORK-GOLDEN](../records/0066_WORK-golden.md) decision 7, gated by
+   `tests/test_golden_hook_prose.py`. **No guard changed**; the record's old
+   claim that prose was never blocked was the thing that was wrong.
+4. 🔴 **`git commit -- <pathspec>` commits the WORKING TREE, not your index.**
+   On a tree shared with a live session that silently swept another session's
+   uncommitted register rows into `07192925`; backed out in `a0140874`. Rule 10's
+   *"commit with explicit pathspecs"* means **`git add <paths>` then a bare
+   `git commit`**.
 
 ### 📁 `work/compare/` AND `work/proposals/` WERE SWEPT (2026-09-20, Claude Code, last)
 
@@ -104,7 +192,10 @@ moved.** W-206: **compare 24 → 8, proposals 17 → 10**. Sixteen and six went 
    rule, `fux add` re-routing an existing pin, and a doctor detail that crashes a
    Windows console. **Read a definition of done as a hypothesis.**
 
-**Immediate next step: 🟢 [W-205](open/W-205-identifiers-reachable-and-whole.md)
+⚠ **Superseded 2026-09-22 — W-205 is CLOSED**, both parts; see §1's head. The
+paragraph below is kept as the state of play on 2026-09-20.
+
+**Immediate next step (2026-09-20): 🟢 W-205
 part 1** — **not started**. Its records are already written
 ([SR-DECODE](../records/0139_decode.md) decision 20,
 [SR-TYPES](../records/0128_types-list.md) decision 13, SR-INGEST decision 23), so
@@ -115,7 +206,7 @@ measured run on `rung-00100` and `rung-10000` with a `VERDICT`. Also open:
 ### ✅ W-204 IS THE GREEN ROW, AND PHASE A IS DONE (2026-09-20, Claude Code)
 
 ⚠ **This supersedes the block below, which was true for part of the same day.**
-Arpit merged the whole golden/test-data chain into **[W-204](open/W-204-golden-outputs-scoring-and-version-benchmark.md)**,
+Arpit merged the whole golden/test-data chain into **[W-204](regression/2026-09-22-golden-final-score/FINAL-SCORE.md)**,
 which is 🟢 and has four phases. **Phase A ran and is filed** —
 [`2026-09-20-golden-ladder-outputs`](regression/2026-09-20-golden-ladder-outputs/report.md):
 3 984 calls, all eight rungs, both sets, both verbs, frozen engine `538f3497`,
@@ -227,7 +318,7 @@ number.**
   reaching a committed byte and NOT a paste**, and its docstring leads with that
   — a hook matches what a tool call targets, and a paste is not a tool call.
 - ⚠ **`key_version 1` carries no difficulty band**, so prompt 6E step 7 is
-  unsatisfiable — [W-195 → W-204](open/W-204-golden-outputs-scoring-and-version-benchmark.md). **The band is
+  unsatisfiable — [W-195 → W-204](regression/2026-09-22-golden-final-score/FINAL-SCORE.md). **The band is
   computed from the key by Arpit or Codex, never by a Claude session**, and never
   from `type` or from fux's own results.
 
@@ -2658,7 +2749,7 @@ step is **W-205 part 1**; W-204 phase B is still real and still unstarted, and i
 now also waits on **set 3** being authored and the ladder rebuilt, which changes
 what phase A's frozen sha is worth.
 
-**Was: 🟢 [W-204](open/W-204-golden-outputs-scoring-and-version-benchmark.md) phase B**
+**Was: 🟢 [W-204](regression/2026-09-22-golden-final-score/FINAL-SCORE.md) phase B**
 — `v1.0.0` · `v2.0.1` · `HEAD` on the same eight rungs, HEAD's rows being phase
 A's. **Its pre-registration can now name the sha phase A froze**
 (`538f34978141a54b28b78b7ea76d36969cf63aa0`), which is what it was waiting on.
@@ -2714,7 +2805,7 @@ session would remember is gone:
   (Claude, 124) are in the tree — **staged, his to commit** — questions-only, and
   both keys are his. The golden
   lane is agent-closable again — next is **prompt 4**, and 🔴 **it needs a session
-  that has never read `questions/`** — [W-136 → W-204](open/W-204-golden-outputs-scoring-and-version-benchmark.md).
+  that has never read `questions/`** — [W-136 → W-204](regression/2026-09-22-golden-final-score/FINAL-SCORE.md).
 
 ### In flight: the 3.0.0-alpha.0 branch is open and empty of code (2026-09-13, Cowork)
 

@@ -7,10 +7,10 @@ description: "BM25F is a bag of words and cannot see where terms are. The rerank
 status: accepted
 date: 2026-08-24
 feature: proximity reranking over the refer plane's passages, and the refusal that bounds it
-owns: [src/fux/query/rerank.py@7176fbc41899]
+owns: [src/fux/query/rerank.py@8b1cb07cd968]
 laws: [L1, L3, L4]
 timestamp: 2026-08-24T00:00:00Z
-content_sha: 333bdad7146c249da8d1d6fb2e3a9588e97f88b50fe4a450ef34e4de1e827650
+content_sha: 4aab8cec2391cc05541ca9ca7737b94a6e940e736957d501eaf21d7103573e16
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -236,6 +236,27 @@ returning nothing would be a surprising answer to a reasonable request.
 filter rather than to a score: offline there is no text to test, and dropping
 it would report *"this page does not contain the phrase"* on the strength of
 not having looked.
+
+**10. The uplift is handed OUT, through an out-parameter, and never inferred.**
+W-210. `rerank()` takes `uplift_out`, a caller-owned dict receiving
+`doc_id -> uplift` for every document the pass looked at — `1.0` where it ran and
+added nothing, because *"nothing was added"* and *"nobody looked"* are different
+statements and only one of them is true of a document this pass could not read.
+
+🔴 **Why it had to exist.** A printed score is
+`BM25F x uplift x archived multiplier`, and on this repository the uplift is
+routinely **1.3**. Before this, a consumer shown a per-term BM25F attribution
+beside the printed score — which is exactly what
+[SR-SERVE](0158_serve.md)'s page shows — saw a **23 % gap** it could close only
+by **dividing two rounded numbers**. A ratio inferred that way is the *plausible
+number that disagrees with the real one* that
+[SR-PROVENANCE](0142_provenance.md) is written around. **Stating a factor is the
+honest alternative to making somebody infer it.**
+
+**An out-parameter for the reason `rank()`'s `stats_out` is one**: every existing
+caller is unchanged, the differential law's two paths keep one signature, the
+dict is the caller's rather than this module's (fux runs threads), and nothing
+read back out of it can reach a score or an ordering.
 
 ### Consequences — the measurement
 

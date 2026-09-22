@@ -11,7 +11,7 @@ feature: the `fux ingest` pipeline — sources to committed records
 owns: [src/fux/ingest/ingestlog.py@73e117c1e919, src/fux/ingest@50423856e72d, src/fux/ingest/priors.py@8ffcc632a4be]
 laws: [L2, L3, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 175979deeb3afbb5e0dfaf34d57d06150645f0747b1fcccc1b86e27cb88d4f5a
+content_sha: 2dcd66d83e2542031f4c93f16f3e9cd213386b6d01eb961cb6ced60fd19411e5
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -845,14 +845,24 @@ but a consumer whose `tags` hold people has made a different file, and the
 
 **23d. 🔴 The values go in THROUGH the analyzer, not beside it.** A resolved
 value is appended to its field's token stream and analyzed exactly as body text
-is — same `analyze()`, same splitting, same stemming. **Which is why this
-decision does not make an identifier whole**, only reachable: `QCL-IT-ADR-08`
-enters the index and then loses its `IT` segment to the stopword list and its
-hyphens to `_WORD_RE`, precisely as it would in the body
-([`tests/query/test_identifier_analyzer_fixture.py`](../tests/query/test_identifier_analyzer_fixture.py),
-W-202). **Part 1 buys reachability; wholeness is a separate change**, and a
-pre-registration that expects an exact-match win from this decision alone has
-mis-stated its endpoint.
+is — same `analyze()`, same splitting, same stemming. **Part 1 buys
+reachability; wholeness is a separate change**, and a pre-registration that
+expects an exact-match win from this decision alone has mis-stated its endpoint.
+
+✅ **And on 2026-09-22 that separate change landed, which is what this clause was
+ordered for.** Under analyzer `v2` a reachable `QCL-IT-ADR-08` still lost its
+`IT` to the stopword list and its hyphens to `_WORD_RE`, precisely as it would in
+the body. Analyzer `v3` ([SR-RANKING](0111_ranking.md) decision 9) made `-` a
+separator like `_`, and **the whole form appeared here with no change to
+`parse.py` at all** — because this clause feeds `analyze()` instead of bypassing
+it. A part 1 that had appended raw values would have been untouched by part 2 and
+would still be wrong today. `IT` is still dropped, correctly: the stopword pass
+runs over the *parts* and never over the whole token, so `qcl-it-adr-08` survives
+beside `qcl`, `adr` and `08`. Both states are executable —
+[`tests/ingest/test_meta_fields.py`](../tests/ingest/test_meta_fields.py) and the
+shared fixture in
+[`tests/query/test_identifier_analyzer_fixture.py`](../tests/query/test_identifier_analyzer_fixture.py)
+(W-202).
 
 ⚠ **Option D — index every scalar — was refused.** `status: rushed-review` is in
 the golden seed today, and *"everything in `meta` is searchable"* puts names and

@@ -10,7 +10,7 @@ feature: "`fux answer` — one answer, its footing stated, and the report of wha
 owns: [src/fux/query/refer_answer.py@defdd3c5c0f5]
 laws: [L1, L2, L3]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: c536ec75764d12f11e02f8344f1c479c0374f162f97aff108927daa26bf02616
+content_sha: af1c57b120f64a910b432e46b4ddabb3a85dca98ed469dcaf8676d17219f62a4
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -456,6 +456,14 @@ linked document cannot raise how much the index believes itself** — there is n
 code path by which it could, which is a stronger guarantee than a rule.
 
 
+⚠ **Unchanged by W-210 (2026-09-22).** That change edited `_compose`,
+`_maybe_rerank` and `_derivation_for` in `src/fux/query/__init__.py` to hand the
+proximity reranker's per-document uplift through the caller's **trace** dict for
+`--why` ([SR-RERANK](0138_rerank.md) decision 10;
+[SR-PROVENANCE](0142_provenance.md) decision 17). No emitted shape, no printer
+and no gate moved. Recorded because the freshness rule asked, and *nothing moved*
+is a legitimate answer to it.
+
 ### Consequences
 
 - ⚠ **W-194 (2026-09-20) moved a component this record describes, and changed
@@ -499,7 +507,7 @@ code path by which it could, which is a stronger guarantee than a rule.
   [SR-CLI](0101_cli-surface.md) decision 12's freeze does not reach it — the
   freeze is on a *verb's output shape*, not on the ranking function both share.
   **`answer` reading `ask` is
-  [W-161 → W-204](../work/open/W-204-golden-outputs-scoring-and-version-benchmark.md)'s change**, and it is a
+  [W-161 → W-204](../work/regression/2026-09-22-golden-final-score/FINAL-SCORE.md)'s change**, and it is a
   ranking change: today `answer` ranks lexically whatever `ask` does, and after
   W-161 it would inherit `ask`'s graph tier. Named here so the two items' scopes
   cannot be confused for each other.

@@ -62,6 +62,50 @@ golden-score run key_dir=sealed_key_dir:
     [ "$n" -gt 0 ] || { echo "no handoff-set-*.jsonl under $run/evidence/" >&2; exit 1; }
     echo "scored $n hand-off(s) into $run/scores/"
 
+# ─────────────────────────────────────────────────────────────────────────────
+# The switch — LAW L11 decision 14 (Arpit, 2026-09-21)
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# 🔴 ARPIT'S HAND ONLY. No agent runs `golden-unlock`, `golden-lock` or
+#    `golden-retire`, by any route, and no agent creates, edits, moves or
+#    deletes the state file they use. That is the same breach as opening the
+#    key, because it IS opening the key — and it is the one route the guards
+#    cannot see, since `just golden-unlock` contains none of the strings the
+#    Bash deny patterns match. The LAW covers it; nothing else does.
+#
+# The lifecycle, per generation of test data:
+#
+#   LOCKED --(just golden-unlock)--> a session may read the key; phase D scores
+#      ^                                        |
+#      |            just golden-retire <set>: questions + answers become
+#      |            committed, reusable, non-golden regression data
+#      +--(just golden-lock; author generation N+1 sealed)-------------+
+#
+# 🔴 Every number measured or scored from the first unlock is `informed`
+#    PERMANENTLY, in every set. That price was accepted in the ruling.
+
+# 🔴 ARPIT ONLY — take down the read guards so a session can score the key.
+golden-unlock:
+    {{py}} tools/golden-switch/switch.py unlock
+
+# 🔴 ARPIT ONLY — put every guard back, byte-identically.
+golden-lock:
+    {{py}} tools/golden-switch/switch.py lock
+
+# 🔴 ARPIT ONLY — move a scored set's questions AND answers into open test data.
+#
+#   just golden-retire set-1
+#
+golden-retire set:
+    {{py}} tools/golden-switch/switch.py retire "{{set}}"
+
+# Safe for anyone, including an agent: it reads one file under .claude/ and
+# nothing under the key directory.
+#
+# Print `locked` or `unlocked`.
+golden-state:
+    @{{py}} tools/golden-switch/switch.py state
+
 # Safe for anyone, including an agent: it names the path and reads nothing in it.
 #
 # Check every guard around the sealed key is still standing. Opens nothing.
@@ -78,9 +122,21 @@ golden-guards:
     git check-ignore -q "{{sealed_key_dir}}" \
         && ok "the key directory is gitignored" \
         || bad "the key directory is NOT gitignored"
-    [ "$(grep -c 'golden-answer' .claude/settings.json)" -ge 14 ] \
+    # ⚠ **State-aware since L11 decision 14.** While the tree is UNLOCKED the deny
+    # rules are gone on purpose, and reporting that as FAIL would train whoever
+    # runs this to ignore a red line — the one thing a guard check must never do.
+    # What is checked instead is that a byte-identical restore is still possible.
+    if [ "$({{py}} tools/golden-switch/switch.py state)" = "unlocked" ]; then
+      printf '  UNLOCKED — the read guards are down BY DESIGN (L11 decision 14).\n'
+      { [ -f .claude/.golden-lock/settings.json ] && [ -f .claude/.golden-lock/settings.sha256 ]; } \
+        && ok "the stash is intact, so golden-lock can restore byte-identically" \
+        || bad "THE STASH IS GONE — golden-lock cannot promise a byte-identical restore"
+      printf '  Every number measured from the unlock is informed, permanently.\n'
+    else
+      [ "$(grep -c 'golden-answer' .claude/settings.json)" -ge 14 ] \
         && ok "permissions.deny still names the path (>=14 rules)" \
         || bad "permissions.deny has fewer rules than expected"
+    fi
     [ -x .claude/hooks/guard-golden-answer.sh ] \
         && ok "guard-golden-answer.sh is executable" \
         || bad "guard-golden-answer.sh missing or not executable"

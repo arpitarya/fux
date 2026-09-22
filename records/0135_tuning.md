@@ -11,7 +11,7 @@ feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error 
 owns: [src/fux/tune.py@97814aaa4a31, .fux/tune.toml@ba9885423d69]
 laws: [L1, L3, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: e70ffc0f4a615b7af87ca3c1a6849d556a76c1ca590024255f55fe6cd15fe220
+content_sha: 0905430e6ebb00e17a5aa5b94672481e548686dbd695b10c2b1d80ccef7f6df0
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -930,6 +930,15 @@ decision 19; the frozen bar is
 unless their `tune.toml` pins it — and `fux setup` writes every value out in
 full, so a repo that has run setup keeps `0.0` and a fresh clone would get the
 new one. That divergence belongs in the CHANGELOG on the day it happens.
+
+⚠ **Unchanged by W-210 (2026-09-22), and touched here only because the register
+says so.** That change edited two things in `src/fux/store/fuxdir.py`: the
+`runtime` kind's description string, which gained `runtime/trace/`
+([SR-DOTFUX](0102_fux-directory.md); [SR-SERVE](0158_serve.md)), and the verb
+table `_readme()` writes, which gained `fux serve`
+([SR-CLI](0101_cli-surface.md)). **Neither reaches this record's claim on that
+file**, and saying so is the point of the freshness gate — the prompt is *re-read
+the record*, and the honest outcome of re-reading it can be *nothing moved*.
 
 ### Consequences
 

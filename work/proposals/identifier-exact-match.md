@@ -8,11 +8,16 @@ timestamp: 2026-09-18T00:00:00Z
 
 # Exact identifier match — what actually breaks, and what everyone else does about it
 
-✅ **GRADUATED 2026-09-20 into [`W-203` → `W-205`](../open/W-205-identifiers-reachable-and-whole.md)
-(the two defects and the four families) and [`W-202`](../../archive/open/W-202-identifier-analyzer-gate.md)
-(gate A, the frozen fixture).** This file stays because it is the reasoning the
-two items cite rather than repeat — the option set, the prior art and the
-correction. **The items are the state; this is the argument.**
+✅ **GRADUATED 2026-09-20 into `W-203` → `W-205`, and W-205 CLOSED 2026-09-22.**
+The two defects are now decisions rather than items:
+[SR-INGEST](../../records/0106_ingest.md) decision 23d (a value never reaching
+the index) and [SR-RANKING](../../records/0111_ranking.md) decision 9 (it
+arriving in pieces — **family (a) shipped on correctness; (b), (c) and the
+digit-bearing restriction are named there, unbuilt**). Gate A, the frozen
+fixture, is `tests/query/identifier-fixture.json` (W-202). This file stays
+because it is the reasoning those decisions cite rather than repeat — the
+option set, the prior art and the correction. **The records are the state;
+this is the argument.**
 
 ⚠ **One thing in it was overtaken the same week.** §5's gate B said prompt 8
 would unblock the ranking verdict. The
@@ -171,7 +176,7 @@ for, and it **falsifies a broken fix in seconds** without spending a benchmark.
 
 ⚠ **Gate A is not a ranking verdict and must never be reported as one.** It proves
 the term exists; only gate B can say the corpus is better. The two are filed
-separately for the same reason [W-191 → W-204](../open/W-204-golden-outputs-scoring-and-version-benchmark.md)
+separately for the same reason [W-191 → W-204](../regression/2026-09-22-golden-final-score/FINAL-SCORE.md)
 is a lesson: a mechanism probe is not an arm.
 
 ## 6 · References

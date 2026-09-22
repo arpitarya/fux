@@ -7,6 +7,8 @@ timestamp: 2026-09-15T00:00:00Z
 
 # Prompt 2 — Codex: write set 1 from the seed corpus
 
+**Test-data checklist:** [SR-WORK-TESTDATA](../../../records/0068_WORK-test-data.md) — this prompt carries **T2, T3, T8, T9, T13**. Check the whole list before running it; any item this data does not carry is named as *not carried*, never skipped.
+
 **Model: Codex, highest reasoning setting** — the questions ARE the benchmark; a
 vague or leaky question set cannot be repaired later without a new key.
 

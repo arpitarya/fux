@@ -10,7 +10,7 @@ feature: "`.fux/runtime/stats.json` — the corpus-wide aggregates, and the rule
 owns: []
 laws: [L3]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: c9c4b38bd67455aa00a7c0c67351539599e87c5fbfd3ac8ca976a845e3fb33b9
+content_sha: ba999a290d5ad21f945b0986692dcce1e5614122aedd52b3a31658a0f48acb5a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -184,6 +184,15 @@ silently and corpus-wide.
 
 **6. One of `DETERMINISTIC_FILES`.** `sort_keys` JSON, byte-identical for the
 same committed input.
+
+⚠ **Unchanged by W-210 (2026-09-22), and touched here only because the register
+says so.** That change edited two things in `src/fux/store/fuxdir.py`: the
+`runtime` kind's description string, which gained `runtime/trace/`
+([SR-DOTFUX](0102_fux-directory.md); [SR-SERVE](0158_serve.md)), and the verb
+table `_readme()` writes, which gained `fux serve`
+([SR-CLI](0101_cli-surface.md)). **Neither reaches this record's claim on that
+file**, and saying so is the point of the freshness gate — the prompt is *re-read
+the record*, and the honest outcome of re-reading it can be *nothing moved*.
 
 ### Consequences
 
