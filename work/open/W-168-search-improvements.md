@@ -7,6 +7,53 @@ filed: 2026-09-14
 ball: agent
 ---
 
+## ✅ STEP 5 PRE-REGISTERED 2026-09-23 (Claude Code) — pool 39, no stop; the build is next
+
+[The frozen bar](../regression/2026-09-23-rm3/PRE-REGISTRATION.md). **Nothing
+is built and no treatment number exists.**
+
+- **Endpoint as ruled:** `hit@1` gates, `primary@1` is reported beside it.
+  `[ranking] rm3_weight ∈ {0.1, 0.2, 0.3, 0.5}`, first that clears, ascending,
+  against `0.0`. Top-10 feedback documents, 10 terms, RM1, scored through
+  `expand.build`. All fixed before the build.
+- **Drift bound = clause 2:** one baseline rank-1 hit lost **anywhere in the
+  set** fails that value.
+- **Tag `rm3_underspecified`:** a question that *names nothing* (no digit, no
+  identifier, no mid-sentence capital, no quote). Mechanical, from question text
+  alone. **92 of 125.**
+- **Pool** (tagged, in the returned 10, missing rank 1): **39 ≥ 6 → no stop.**
+  It is 39 of the ruling's 51 reorderable misses.
+- 🔴 **Correction to the rationale, not to the ruling.** *"8 reorderable < `min_fix`
+  ≈ 9"* compared the reorderable 8 with the bar for all 18 misses. With zero
+  losses, 8 wins give a discordant count of 8, and the bar at 8 is 8, so that
+  clears. **Any pool ≥ 6 admits a verdict**, and 6 wins with zero losses is the
+  real minimum. The rank-1 ruling stands on the 51 versus 8. Filed as
+  [W-219](W-219-min-fix-mislabel.md).
+- **Next:** build step 5 (**Opus**). Then capture both arms at one engine commit
+  with `golden_run.py`. Then Arpit runs `score.py` on each.
+
+## ✅ RULED 2026-09-23 (Arpit, Cowork) — each remaining step is judged on its OWN measure; steps 5 and 9 at rank 1
+
+*"Go with the recommendation. That is judge step five and nine at rank one. Six, seven, ten have their own measurements, so use that."*
+
+**Why he was asked.** `set-2-u`, scored 2026-09-23 on `rung-01000`: of 112 answerable questions, `hit@5` misses 18 and **10 of those are never retrieved at all**, so only **8** are reorderable — below `min_fix` ≈ 9. **At `hit@5` no reranking step can produce a verdict on this data.** At rank 1, **51** misses are already in the top 50.
+
+| step | judged on | primary endpoint | note |
+|---|---|---|---|
+| **5 · RM3** | **rank 1** | **`hit@1`**, `primary@1` reported beside it | its keep-rule already carries the drift bound: *no answerable question loses its top-1* |
+| **9 · intent → doc-type prior** | **rank 1** | **`hit@1`**, `primary@1` reported beside it | the doc-type half must be declared per source first |
+| **6 · SDM proximity** | its own | **passage-level** gain in refer | it scores the fetched bytes, not the document order |
+| **7 · MMR** | its own | **coverage** in the top k, **with `precision@1` unchanged** | it must not move rank 1 by design; waits on the graph plane in `ask` |
+| **10 · section units** | its own | **its own compare doc decides**, before any test | a plane change, its own major |
+
+- ⚠ **`hit@1` is the primary endpoint and `primary@1` the secondary, on my reading of *rank one*.** A pre-registration names one; this is the one it names unless he says otherwise.
+- 🔴 **The pool of 51 is across ALL answerable questions.** Each step acts only on its own kind — under-specified questions for 5, intent-labelled ones for 9 — so **each pre-registration first counts its own pool among the questions it tags**, and stops if that pool is below `min_fix`. **51 is the ceiling, not the promise.**
+- 🔴 **The tags are set from the released question TEXT alone**, never from the key — [SR-WORK-TESTDATA](../../records/0068_WORK-test-data.md) T2, and `informed` whatever the result.
+- **Not a moved threshold.** No step had been pre-registered; each one's endpoint is being chosen before its first number, which is what [SR-RS](../../records/0133_predictions.md) d10b requires.
+- **Steps 1, 2 and 4** still need inputs the seed lacks — prompt 10 (W-215 items 2–4). **Step 3** is foreclosed; **step 8** needs a corpus with history (T11).
+
+**So this item is 🟢 again: steps 5 and 9 can be pre-registered now.** Cheapest first: **step 5**, since RM3 needs no declaration.
+
 ## ✅ RULED 2026-09-20 (Arpit, Cowork) — step 2 leaves this item
 
 *"W-168 — I agree, let's go with the recommended approach."* So: **Codex adds

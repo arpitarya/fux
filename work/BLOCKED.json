@@ -1,10 +1,10 @@
 {
  "decision": "ASK",
- "reason": "One item waits on Arpit: W-215. Its item 1 has already landed — set-2-u, 125 questions authored in an isolated claude.ai chat from the seed alone, with a baseline on rung-01000 — and it is UNSCORED. Scoring needs NO unlock: L11 decision 13's carve-out attaches to his hand, so tools/golden-score/score.py started from his own shell reads the key while the tree stays LOCKED. The unlock/lock items W-216 and W-217 were filed on the opposite premise, withdrawn on his review the same day (SR-WORK-GOLDEN decision 16, amended: a switch item exists only when an open item actually waits on the switch), and archived unchanged. W-168 waits on W-215.",
+ "reason": "W-215 decision 1 is RULED (2026-09-23): W-168 steps 5 and 9 are judged at rank 1 (hit@1, primary@1 beside it), steps 6, 7 and 10 on their own measures — so W-168 is 🟢 and steps 5 and 9 can be pre-registered now. One call remains his: whether to run prompt 10, which authors the seed documents and set-3-u that W-168 steps 1, 2 and 4 need. set-2-u scored 84% at hit@5 with 10 of 18 misses never retrieved — the class those steps exist for.",
  "questions": [
-  "W-215: score set-2-u yourself with tools/golden-score/score.py (no unlock needed), then rule — is item 1 enough, or do items 2-4 and 6 (new seed documents, a ladder rebuild) go ahead?"
+  "W-215: run prompt 10 now (new seed documents + set-3-u, then a ladder rebuild), or hold it?"
  ],
- "safe_alternative": "Nothing agent-side is open. W-214 shipped; W-168 waits on W-215's score.",
+ "safe_alternative": "W-168 steps 5 (RM3) and 9 (intent prior) are 🟢: pre-register each at hit@1 on set-2-u, rung-01000, counting its own pool first. W-218 is 🟢 too.",
  "surfaced": true,
  "filed": "2026-09-22"
 }

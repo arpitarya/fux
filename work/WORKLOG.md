@@ -29,6 +29,33 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-23 — W-168 step 5 (RM3) PRE-REGISTERED at `hit@1`: pool 39, no stop  ·  Claude Code
+- **Asked:** pre-register step 5 per the 2026-09-23 ruling: `hit@1` primary, `primary@1` beside it, `set-2-u` at `rung-01000`; tag under-specified questions from text only, count the pool first, stop below `min_fix`. Don't run the scorer.
+- **Did:** [`2026-09-23-rm3/PRE-REGISTRATION.md`](regression/2026-09-23-rm3/PRE-REGISTRATION.md). Mechanism, arms `{0.1, 0.2, 0.3, 0.5}` and drift bound all fixed before the build. Tagger `evidence/tag_underspecified.py` (*names nothing*) → **92 of 125** tagged, hashes frozen **before** the pool count. `evidence/pool.py` → **pool 39 ≥ 6, no stop**. W-168 status block, queue row, regression index row. Filed **[W-219](open/W-219-min-fix-mislabel.md)**. Scorer not run; no key touched; tree LOCKED.
+- **Decided / open:** 🔴 **`min_fix` is mislabelled.** `ranking_headroom.py` prints the net needed if the whole pool flips; the fewest wins that clear, zero losses, is **6** at any pool ≥ 6. So *"8 reorderable < `min_fix` ≈ 9"* was wrong: 8-for-8 clears. The rank-1 ruling stands (51 vs 8); one sentence of its *why* does not. ⚠ Declared in the pre-reg: two score rows (`s2u-001`, `s2u-002`) were seen before tagging.
+- **Next:** build step 5 behind `[ranking] rm3_weight = 0.0` (Opus).
+
+## 2026-09-23 — RULED: W-168 steps 5 and 9 are judged at rank 1; 6, 7 and 10 on their own measures  ·  Cowork
+- **Asked:** *"Go with the recommendation. That is judge step five and nine at rank one. Six, seven, ten have their own measurements, so use that."*
+- **Did:** ruling block at the top of [W-168](open/W-168-search-improvements.md) with a per-step endpoint table — **5 RM3 and 9 intent: `hit@1`**, `primary@1` beside it; **6 SDM: passage-level gain; 7 MMR: coverage with `precision@1` unchanged; 10: its own compare doc.** Note under the proposal's §3b table, including that **it numbers the ideas differently from W-168** (RM3 is `#4` there, step 5 here). W-215 decision 1 marked ruled. **W-168 🔴 → 🟢**; W-215's sub-row now names no waiter. `BLOCKED.json` narrowed to the one open call — prompt 10.
+- ⚠ **My correction, said in the exchange before he ruled:** I had lumped steps 5, 6, 7, 9 and 10 under *"judge at rank 1"*. Wrong for three of them — SDM scores passages, MMR must not move rank 1 by design, section units need a compare doc first. **Read each step's own keep-rule before proposing an endpoint for a group.**
+- ⚠ **51 is a ceiling, not a promise:** it counts every answerable rank-1 miss; each step's own pool, among the questions it tags from question text alone, is counted first in its pre-registration.
+- **Next:** Claude Code — pre-register W-168 step 5 at `hit@1`. Arpit — prompt 10, yes or hold.
+
+## 2026-09-23 — set-2-u SCORED: item 1 added no room at the top 5; the room is at rank 1  ·  Cowork
+- **Asked:** Arpit ran `score.py` and pasted the line: `n=125 hit@1=51 hit@5=94 primary@1=36 abstain_ok=5 abstain_wrong=19 evidence_quoted=60`.
+- **Read (totals only, from the emitted scores file):** 13 unanswerable (`answered_unanswerable`, since `answer` always returns text), so **112 answerable**. `hit@5` 94 = **84 %**; `hit@10 = @20 = @50` = 102 → **10 answerable questions are never retrieved at all**. `hit@1` 51, `primary@1` 36.
+- **Decided / open:** 🔴 **Item 1 failed its purpose at `hit@5`**: pool 18, of which only **8** are reorderable — below `min_fix` ≈ 9, so **no reranking step can win at `hit@5` here, by arithmetic**. 🟢 **51 reorderable misses at rank 1.** ⚠ The 10 unreachable are a **recall** problem — prompt 10's target. ⚠ `abstain_*` are pre-W-214 history. **Two calls to Arpit** — the reranking endpoint, and prompt 10 — in W-215, the queue sub-row and `BLOCKED.json`.
+- **Next:** Arpit's two calls.
+
+## 2026-09-23 — what Arpit runs next, and W-218: the scorer does not know generation-2 set names  ·  Cowork
+- **Asked:** *"Review the open work document. Tell me what do I need to do. Give me the command if I need to execute that."*
+- **Found:** one item waits on him, W-215 — **score `set-2-u`, then rule on items 2–4 and 6.** Writing him the command surfaced two tooling defects: `score.py --set` is `type=int`, so `2-u` is refused; and `just golden-score` globs only `evidence/*/rung-*/` and `evidence/rung-*/`, while the `set-2-u` hand-off is filed flat at `evidence/handoff-set-2-u.jsonl`. **The recipe cannot score the one run that needs scoring.**
+- **Did:** filed **[W-218](open/W-218-scorer-takes-generation-set-names.md)** 🟢 `build` (Sonnet) with a four-point DoD, and gave Arpit the direct `score.py` call with `--set 2` as the workaround. ⚠ **That workaround writes `"set": 2` into a file named `set-2-u.json`** — 2 is also a retired generation-1 set — so W-218 carries a reader's note: read that file as `set-2-u` whatever its field says.
+- **Not done:** nothing checked whether the key file exists at `work/golden/golden-answers/set-2-u.jsonl` — **that is his to confirm**, and no agent may look.
+- **Suites (bridge):** the OPEN-WORK gates, `test_doc_links`, `test_okf_bundle`, `test_no_work_item_is_lost` — **410 passed, 1 skipped.**
+- **Next:** Arpit — the score, in a plain terminal. Claude Code — W-218.
+
 ## 2026-09-22 — SR-WORK-TESTDATA (0068): the test-data checklist, and prompt 10 for the missing feature inputs  ·  Cowork
 - **Asked:** *"give me a prompt to prepare a set of test data specifically for this use case. And note it down that this is also one of the cases that need to be tested … create a work document which will just have pointers what all things test data creation should have … keep everything precise … I was talking about SR work document implement it."*
 - **Interpreted:** *this use case* = the inputs W-168 steps 1, 2 and 4 act on and the seed lacks — anchor-only vocabulary first, because that was the worked example. Stated in the record and the prompt.

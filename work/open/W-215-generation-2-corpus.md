@@ -37,6 +37,29 @@ ever measured in this repository — W-205 part 2 family (a), `+1 / +3 / +4` wit
 | 4 corpus-mined expansion | `Term (ABBR)`, glossary lines, `aliases:` | **0** / 1 (a false positive) / 3 on one document |
 | 8 git authority prior | a corpus with history | the ladder is synthetic, rebuilt at one stamp |
 
+## 🔴 SCORED 2026-09-23 (Arpit's hand) — item 1 did NOT create headroom at `hit@5`
+
+`score.py`, `rung-01000`, pinned engine `3f824de0` (pre-W-214), **`informed`**.
+Scores: `work/regression/2026-09-22-golden-set-2u-rung-01000/scores/single/rung-01000/set-2-u.json`
+— ⚠ its `"set"` field reads `2` (the W-218 workaround); **read it as `set-2-u`**.
+
+| of 112 answerable (13 unanswerable) | count | share |
+|---|---:|---:|
+| `hit@1` | 51 | 46 % |
+| `primary@1` | 36 | 32 % |
+| `hit@5` | 94 | **84 %** |
+| `hit@10` = `@20` = `@50` | 102 | 91 % |
+
+- 🔴 **`hit@5` is 84 % — the same band as generation 1** (81–92 % at this rung). The failing pool is **18**.
+- 🔴 **10 of those 18 never appear in the top 50 at all.** A ranking step only reorders what was retrieved, so **only 8 are winnable by reordering** — below `min_fix` ≈ 9. **At `hit@5`, no reranking step can produce a verdict on this set, by arithmetic.**
+- 🟢 **The headroom is at rank 1:** 61 answerable questions miss `hit@1`, and **51 of them are already in the top 50** — reorderable.
+- ⚠ **The 10 unreachable questions are a recall problem, not a ranking one** — the class anchor text (T4) and expansion (T5) exist for. That is prompt 10's target.
+- ⚠ `abstain_wrong = 19`, `abstain_ok = 5` describe the **pre-W-214** engine, where `weak` still refused. W-214 removed that behaviour; these two numbers are history.
+
+**Two decisions followed, both his.** ✅ **Decision 1 RULED 2026-09-23** — steps 5 and 9 at rank 1; 6, 7 and 10 on their own measures ([W-168](W-168-search-improvements.md)). 🔴 **Decision 2 is open.**
+1. **The endpoint for the reranking steps (5, 6, 7, 9, 10).** `hit@5` is closed on this data. `hit@1` / `primary@1` has a pool of 51. Choosing it is a new pre-registration per step, never a moved threshold — but it changes what *good* means from *in the top 5* to *first*.
+2. **Run prompt 10** for the reachability features (steps 1, 2, 4), which the 10 unreachable questions point at.
+
 ## ✅ 2026-09-22 (Cowork) — the list became a record, and items 2–5 have a prompt
 
 - **The six items below are now [SR-WORK-TESTDATA](../../records/0068_WORK-test-data.md)'s checklist**, T1–T14, and every future test-data prompt is bound to it by a test. **Anchor-only vocabulary is T4** — Arpit, *"note it down that this is also one of the cases that need to be tested."*

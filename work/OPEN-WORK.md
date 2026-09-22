@@ -23,9 +23,9 @@ here. Read that record before changing anything below it.
 
 | what he decides | filed | age |
 |---|---|---|
-| 🔴 **W-215** — authorise generation 2 of the golden data. Measured: one ranking step must fix **58–78 % of every remaining failure with zero regressions** to produce any verdict. Six items; item 1 alone unblocks five steps. [detail](open/W-215-generation-2-corpus.md) | 2026-09-22 | 0d |
-| ↳ **blocks:** W-168, and through it steps 3–10 | | |
-| ↳ **item 1 has landed and is waiting on his read:** `set-2-u` (125 questions) exists and has a baseline on `rung-01000` — [the run](regression/2026-09-22-golden-set-2u-rung-01000/report.md). It is unscored; `tools/golden-score/score.py` is his hand. | | |
+| 🔴 **W-215** — run prompt 10 or hold it? It writes the documents fux cannot find today (nicknames, short forms, look-alike IDs) plus a question set, and rebuilds the ladder. [detail](open/W-215-generation-2-corpus.md) | 2026-09-22 | 1d |
+| ↳ **blocks:** nothing else in the queue — the ranking steps prompt 10 would feed are tracked inside the ranking programme's own file. | | |
+| ↳ **item 1 scored 2026-09-23:** no room at the top 5, room at rank 1. **The rank question is ruled.** Still yours: run prompt 10, which adds the documents fux can't find today? | | |
 
 ---
 
@@ -33,9 +33,13 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🔴 **W-215** · `arpit` — generation 2 of the golden data, six items. **Item 1 is built and captured** — `set-2-u`, unscored; the other five and the score are his. [detail](open/W-215-generation-2-corpus.md)
+- 🔴 **W-215** · `arpit` — generation 2 of the golden data, six items. **Item 1 scored 2026-09-23**; one call left — run prompt 10? [detail](open/W-215-generation-2-corpus.md)
 
-- 🔴 **W-168** · `agent` — steps 3–10 of the ranking ideas, waiting on W-215. **Measured 2026-09-22: the blocker is the corpus, not engineering** — 7–23 winnable questions per set, `min_fix` 7–11; step 3 foreclosed by VERDICT-W143. [detail](open/W-168-search-improvements.md)
+- 🟢 **W-218** · `build` — the scorer can't score a generation-2 set by name (`--set 2-u` is refused, and `just golden-score` misses the flat hand-off). A workaround exists; it mislabels the output. [detail](open/W-218-scorer-takes-generation-set-names.md)
+
+- 🟢 **W-168** · `agent` — the ranking ideas. **Step 5 (RM3) pre-registered 2026-09-23** at `hit@1`: 39 winnable questions, enough for a verdict. **Next: build it (Opus)**; step 9 can be pre-registered alongside. [detail](open/W-168-search-improvements.md)
+
+- 🟢 **W-219** · `build` — the headroom tool's `min_fix` is the bar if every miss flips, not the fewest wins that clear (that is 6), and three documents read it the second way. No verdict changes. [detail](open/W-219-min-fix-mislabel.md)
 
 
 ### testing

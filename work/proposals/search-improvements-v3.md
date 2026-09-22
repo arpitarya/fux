@@ -104,6 +104,8 @@ the gain on the target questions **and** zero new misses elsewhere.
 | 9 intent prior | declared, not inferred; an undeclared repo is byte-identical | intent-labelled questions | gain clears the floor | fails → the declaration key stays, weight 0 |
 | 10 section units | a plane change — its own compare doc before any test | long-document questions | its own pre-registration | its own doc decides |
 
+⚠ **Endpoints, ruled 2026-09-23 (Arpit, [W-168](../open/W-168-search-improvements.md)):** RM3 and the intent prior are judged at **rank 1** (`hit@1`, with `primary@1` beside it); SDM, MMR and section units keep the measures in this table. ⚠ **This table numbers the ideas differently from W-168's steps** — RM3 is `#4` here and step 5 there; W-168's numbering is the one the queue uses.
+
 - **"Remove" means the default is off and the record says why**, not that
   the code is deleted in the same change — a measured negative is evidence
   worth keeping reachable for one release; the following release deletes what

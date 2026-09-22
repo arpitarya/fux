@@ -1,0 +1,18 @@
+{
+ "net_needed_if_whole_pool_flips": 15,
+ "pool": 39,
+ "smallest_clearing_wins_zero_losses": 6,
+ "stop": false,
+ "tagged": {
+  "hit@1": 39,
+  "n": 92,
+  "never_retrieved": 14,
+  "reorderable_miss": 39
+ },
+ "untagged": {
+  "hit@1": 12,
+  "n": 33,
+  "never_retrieved": 9,
+  "reorderable_miss": 12
+ }
+}
