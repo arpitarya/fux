@@ -7,6 +7,21 @@ filed: 2026-09-14
 ball: agent
 ---
 
+## 🟢 STEP 5 ARMS CAPTURED AND SCORED 2026-09-23 — the verdict is a different session's
+
+[Report](../regression/2026-09-23-rm3/report.md) · [analysis](../regression/2026-09-23-rm3/ANALYSIS.md).
+Five arms at engine `36c913c7`, index root `17fe414e…` on every copy, and a
+re-ingest check that writes 0 shards. **Rank 1 changes on 17 / 28 / 37 / 48 of
+125** as the weight rises (7–15 untagged). The capturing session did not read
+the scores and does not adjudicate them.
+
+- ✅ **Scored by Arpit, 01:03**: five files under `scores/rm3-<w>/rung-01000/`, 125 rows each, none partial, `"set": "2-u"`.
+- **Then a session that did NOT capture the arms:** `evidence/decide.py` →
+  `VERDICT.md`. INCONCLUSIVE goes to Arpit.
+- ⚠ **One reading for him to confirm or overturn:** the feedback set is the
+  lexical first pass, not the graph-boosted list `ask` prints (ANALYSIS §1). If
+  he reads the pre-registration the other way, the arms are re-run.
+
 ## ✅ STEP 5 BUILT 2026-09-23 (Claude Code) — off by default, arms not yet captured
 
 **No treatment number exists.** The mechanism is the frozen one, in both readers.

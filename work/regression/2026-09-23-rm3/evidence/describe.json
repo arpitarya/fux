@@ -1,0 +1,97 @@
+{
+ "rm3-0.0": {
+  "ask_ms_median": 156.3,
+  "bands": {
+   "grounded": 42,
+   "partial": 59,
+   "weak": 24
+  },
+  "engine_commits": [
+   "36c913c7c40214ad411bb094387cde6813ecb8db"
+  ],
+  "gates_captured": 125,
+  "membership_changed_vs_baseline": 0,
+  "n": 125,
+  "order_changed_vs_baseline": 0,
+  "top1_changed_vs_baseline": {
+   "all": 0,
+   "tagged": 0
+  }
+ },
+ "rm3-0.1": {
+  "ask_ms_median": 183.6,
+  "bands": {
+   "grounded": 44,
+   "partial": 59,
+   "weak": 22
+  },
+  "engine_commits": [
+   "36c913c7c40214ad411bb094387cde6813ecb8db"
+  ],
+  "gates_captured": 125,
+  "membership_changed_vs_baseline": 102,
+  "n": 125,
+  "order_changed_vs_baseline": 121,
+  "top1_changed_vs_baseline": {
+   "all": 17,
+   "tagged": 10
+  }
+ },
+ "rm3-0.2": {
+  "ask_ms_median": 211.9,
+  "bands": {
+   "grounded": 44,
+   "partial": 59,
+   "weak": 22
+  },
+  "engine_commits": [
+   "36c913c7c40214ad411bb094387cde6813ecb8db"
+  ],
+  "gates_captured": 125,
+  "membership_changed_vs_baseline": 115,
+  "n": 125,
+  "order_changed_vs_baseline": 125,
+  "top1_changed_vs_baseline": {
+   "all": 28,
+   "tagged": 18
+  }
+ },
+ "rm3-0.3": {
+  "ask_ms_median": 227.7,
+  "bands": {
+   "grounded": 38,
+   "partial": 59,
+   "weak": 28
+  },
+  "engine_commits": [
+   "36c913c7c40214ad411bb094387cde6813ecb8db"
+  ],
+  "gates_captured": 125,
+  "membership_changed_vs_baseline": 119,
+  "n": 125,
+  "order_changed_vs_baseline": 125,
+  "top1_changed_vs_baseline": {
+   "all": 37,
+   "tagged": 25
+  }
+ },
+ "rm3-0.5": {
+  "ask_ms_median": 218.8,
+  "bands": {
+   "grounded": 30,
+   "partial": 59,
+   "weak": 36
+  },
+  "engine_commits": [
+   "36c913c7c40214ad411bb094387cde6813ecb8db"
+  ],
+  "gates_captured": 125,
+  "membership_changed_vs_baseline": 122,
+  "n": 125,
+  "order_changed_vs_baseline": 125,
+  "top1_changed_vs_baseline": {
+   "all": 48,
+   "tagged": 33
+  }
+ }
+}
