@@ -11,7 +11,7 @@ feature: the `fux ingest` pipeline — sources to committed records
 owns: [src/fux/ingest/ingestlog.py@73e117c1e919, src/fux/ingest@50423856e72d, src/fux/ingest/priors.py@8ffcc632a4be]
 laws: [L2, L3, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 2dcd66d83e2542031f4c93f16f3e9cd213386b6d01eb961cb6ced60fd19411e5
+content_sha: a72f14a2440e8a2eafe3f61d270c26531dddda36143272d4e64f13df5da94f3b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -21,6 +21,11 @@ content_sha: 2dcd66d83e2542031f4c93f16f3e9cd213386b6d01eb961cb6ced60fd19411e5
 - [`src/fux/ingest/`](../src/fux/ingest) · dir
 - [`src/fux/ingest/ingestlog.py`](../src/fux/ingest/ingestlog.py) · file
 - [`src/fux/ingest/priors.py`](../src/fux/ingest/priors.py) · file
+
+**Describes** — reaches into, does not own:
+
+- [`node/src/ingest/gitdir.mjs`](../node/src/ingest/gitdir.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
+- [`node/src/ingest/priors.mjs`](../node/src/ingest/priors.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
 
 <!-- COMPONENTS-END -->
 

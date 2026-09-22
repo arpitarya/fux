@@ -10,6 +10,16 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Added
 
+- **`[ranking] rm3_weight` — RM3 pseudo-relevance feedback, default `0.0`
+  (off).** When set, `ask`, `find` and `answer` run a first pass, borrow the ten
+  terms most typical of the top ten documents, and re-query once with them at
+  that weight. A document matching only borrowed terms is never returned. It
+  does not run beside `--expand` and never runs in `fux lexical`. **Unmeasured,
+  and the default is not a recommendation** — it turns on only on a passing run
+  against [the frozen bar](work/regression/2026-09-23-rm3/PRE-REGISTRATION.md).
+  ⚠ `fux setup` writes the key out, so a later default change will not reach a
+  `tune.toml` that pins `0.0`.
+
 - **`fux serve` — the ask explorer.** A local page that takes a question and
   shows the ten documents an agent would be handed, with the hood open: which
   word earned which part of each score, which links moved a result, the

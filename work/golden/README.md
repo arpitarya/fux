@@ -705,6 +705,14 @@ point of custody. A changed key is still a new `key_version`, never an edit.
 
 ## Phase 6 — Score (Codex)
 
+> **Since 2026-09-21 the scorer is `just golden-score <run>`, in Arpit's shell**
+> ([L11](../../records/0012_LAW-11-sealed-answer-key.md) decision 13). It finds
+> hand-offs in **three layouts** — `evidence/<arm>/rung-*/`, `evidence/rung-*/`
+> and **flat**, `evidence/handoff-set-*.jsonl` — and takes a flat hand-off's rung
+> from the run's `PRE-REGISTRATION.md` (a `rung:` frontmatter line, or the one
+> rung it names), or from a third argument. A set is named as filed: `1` for
+> generation 1, `2-u` for `set-2-u` (W-218, 2026-09-23).
+
 - Compare the hand-off with the key **Arpit pastes**. **Return no answer text and no relevant
   document names.**
 - **Per-query rows** (non-sealed ids): `id, set, rung, difficulty_band,

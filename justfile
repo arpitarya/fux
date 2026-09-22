@@ -32,33 +32,32 @@ _default:
 #    terminal is a refusal rather than a loophole.
 #
 #   just golden-score work/regression/2026-09-21-golden-three-engines
+#   just golden-score work/regression/2026-09-22-golden-set-2u-rung-01000
 #
-# Scores land in <run>/scores/<arm>/<rung>/set-<n>.json. Every number produced is
-# `informed` permanently — decision 13, and decision 7's reasoning behind it.
+# Scores land in <run>/scores/<arm>/<rung>/set-<name>.json, where <name> is `1`
+# for a generation-1 set or `2-u` for generation 2's `set-2-u`. Every number
+# produced is `informed` permanently — decision 13, and decision 7's reasoning.
+#
+# A flat hand-off (<run>/evidence/handoff-set-*.jsonl) takes its rung from the
+# run's PRE-REGISTRATION.md; pass it as the third argument if that names two.
 #
 # 🔴 ARPIT ONLY — score a filed hand-off run against the sealed answer key.
-golden-score run key_dir=sealed_key_dir:
+golden-score run key_dir=sealed_key_dir rung="":
     #!/usr/bin/env bash
     set -euo pipefail
-    shopt -s nullglob
     run="{{run}}"
-    [ -d "$run/evidence" ] || { echo "no $run/evidence/ — is that a filed run?" >&2; exit 1; }
+    # Three layouts are in use; tools/golden-score/handoffs.py finds them, reads
+    # no key, and refuses a flat hand-off whose rung it would have to guess.
+    listing="$({{py}} tools/golden-score/handoffs.py "$run" "{{rung}}")"
     n=0
-    # Two layouts are in use: <run>/evidence/<arm>/rung-*/ (the multi-arm runs)
-    # and <run>/evidence/rung-*/ (a single-arm ladder). Both are globbed; the
-    # single-arm case is labelled `single` so an output path never collides.
-    for handoff in "$run"/evidence/*/rung-*/handoff-set-*.jsonl "$run"/evidence/rung-*/handoff-set-*.jsonl; do
-        rung="$(basename "$(dirname "$handoff")")"
-        arm="$(basename "$(dirname "$(dirname "$handoff")")")"
-        [ "$arm" = "evidence" ] && arm="single"
-        s="$(basename "$handoff")"; s="${s#handoff-set-}"; s="${s%.jsonl}"
+    while IFS=$'\t' read -r handoff arm rung s; do
         {{py}} tools/golden-score/score.py \
             --handoff "$handoff" \
             --key "{{key_dir}}/set-${s}.jsonl" \
             --out "$run/scores/$arm/$rung/set-${s}.json" \
             --rung "$rung" --arm "$arm" --set "$s"
         n=$((n + 1))
-    done
+    done <<< "$listing"
     [ "$n" -gt 0 ] || { echo "no handoff-set-*.jsonl under $run/evidence/" >&2; exit 1; }
     echo "scored $n hand-off(s) into $run/scores/"
 

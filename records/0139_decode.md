@@ -10,7 +10,7 @@ feature: the decoder plane — the protocol, the registry, the consumer seam and
 owns: [src/fux/decode@ed8784ea3bd4, src/fux/templates/agents/DECODER-SKILL.md@474a416bcc42, .fux/decoders@8bdc25ed8780]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-26T00:00:00Z
-content_sha: f276151834128bd3129627de862d3675036d9577cbbe0fc0fde43be746fdedfe
+content_sha: c8b53253dc21d511bfbdf6272681200dddf9874b50bc978f895ee99e28b681b4
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -23,6 +23,7 @@ content_sha: f276151834128bd3129627de862d3675036d9577cbbe0fc0fde43be746fdedfe
 
 **Describes** — reaches into, does not own:
 
+- [`node/src/decode/markdown.mjs`](../node/src/decode/markdown.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
 - [`node/src/decode/registry.mjs`](../node/src/decode/registry.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
 
 <!-- COMPONENTS-END -->

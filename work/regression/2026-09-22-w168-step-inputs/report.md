@@ -16,6 +16,15 @@ each discovered one step's missing input the expensive way, one step at a time.
 
 ## 1 · The pool any ranking change can win
 
+> ⚠ **Correction, 2026-09-23 ([W-219](../../IMPLEMENTATION.md)) —
+> the numbers below stand; one reading of them does not.** The `min_fix`
+> column is the net [SR-RS](../../../records/0133_predictions.md) d19 needs **if
+> every question in the pool flipped**, not the fewest wins that clear. With
+> zero losses the discordant count is the wins themselves, so **6 wins clear in
+> every bucket in this table**, and the headline *"58 % to 78 % of every
+> remaining failure"* should read **26–86 %** (6 of 7–23). The instrument now
+> prints both as `net_if_all_flip` and `min_wins`.
+
 Computed from W-213's 2 992 captured rows, **answerable questions only**, with
 the required net taken from `resolution.smallest_detectable` rather than copied:
 

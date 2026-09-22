@@ -96,7 +96,7 @@ def test_the_needed_net_is_resolutions_and_not_a_literal(pool):
     # and it is the one that actually happened (B1).
     rows = _rows([False] * pool)
     out = rh.headroom(rows, _key([r["id"] for r in rows]))
-    assert out[0]["net_needed"] == smallest_detectable(pool, rh.ALPHA)
+    assert out[0]["net_if_all_flip"] == smallest_detectable(pool, rh.ALPHA)
 
 
 def test_a_pool_too_small_for_any_net_cannot_produce_a_verdict():
@@ -107,23 +107,38 @@ def test_a_pool_too_small_for_any_net_cannot_produce_a_verdict():
         rows = _rows([False] * pool)
         out = rh.headroom(rows, _key([r["id"] for r in rows]))
         assert out[0]["verdict_possible"] is False
-        assert out[0]["min_fix"] is None
+        assert out[0]["min_wins"] is None
 
 
 def test_a_total_sweep_of_six_is_the_smallest_pool_that_can_ever_decide():
     rows = _rows([False] * 6)
     out = rh.headroom(rows, _key([r["id"] for r in rows]))
     assert out[0]["verdict_possible"] is True
-    assert out[0]["min_fix"] == 6, "every one of the six, and no regressions"
+    assert out[0]["min_wins"] == 6, "every one of the six, and no regressions"
 
 
-def test_min_fix_assumes_zero_regressions_and_says_so():
-    """⚠ With b wins and c losses, discordant = b + c and net = b - c, so the
-    quoted `min_fix` is only reachable when c == 0. It is a ceiling on optimism
-    — the docstring says so, and this pins the arithmetic behind it."""
-    rows = _rows([False] * 12)
+@pytest.mark.parametrize("pool,all_flip", [(8, 8), (18, 10), (23, 11)])
+def test_the_fewest_clean_wins_is_six_at_every_pool_that_holds_six(pool, all_flip):
+    """🔴 W-219. The column once called `min_fix` was the net needed if the
+    WHOLE pool flipped, and three documents read it as the fewest wins that
+    clear. With zero losses, `w` wins are a discordant count of `w`, so the bar
+    is read at the wins: 6 clear (p = 0.031) at a pool of 8, 18 or 23 alike.
+    These are the item's own rows."""
+    rows = _rows([False] * pool)
     out = rh.headroom(rows, _key([r["id"] for r in rows]))
-    assert out[0]["min_fix"] == smallest_detectable(12, rh.ALPHA) == 8
+    assert out[0]["net_if_all_flip"] == all_flip
+    assert out[0]["min_wins"] == 6
+
+
+def test_min_wins_assumes_zero_losses_and_six_wins_really_clear():
+    """⚠ With b wins and c losses, discordant = b + c and net = b - c, so
+    `min_wins` is reachable only when c == 0. Pinned against resolution rather
+    than a literal: six wins with no losses clear, five do not, and one loss
+    beside six wins does not."""
+    from resolution import two_sided_p
+    assert two_sided_p(6, 6) <= rh.ALPHA < two_sided_p(5, 5)
+    assert two_sided_p(6, 7) > rh.ALPHA
+    assert "min_fix" not in rh.headroom(_rows([False] * 12), _key([f"q{i:03d}" for i in range(12)]))[0]
 
 
 def test_a_saturated_bucket_reports_an_empty_pool():
@@ -133,7 +148,7 @@ def test_a_saturated_bucket_reports_an_empty_pool():
     out = rh.headroom(rows, _key([r["id"] for r in rows]))
     assert out[0]["pool"] == 0
     assert out[0]["verdict_possible"] is False
-    assert out[0]["net_needed"] is None
+    assert out[0]["net_if_all_flip"] is None
 
 
 def test_it_applies_no_bar_of_its_own():

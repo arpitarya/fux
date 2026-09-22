@@ -157,6 +157,47 @@ def score_one(row: dict, key: dict) -> dict:
     }
 
 
+def build_payload(rows: dict[str, dict], key: dict[str, dict], *,
+                  rung: str, arm: str, set_name: str) -> dict:
+    """The score file. `set_name` is carried verbatim — `"2-u"`, or `"1"`."""
+    missing_key = sorted(set(rows) - set(key))
+    missing_row = sorted(set(key) - set(rows))
+    scored = [score_one(rows[i], key[i]) for i in sorted(rows.keys() & key.keys())]
+    return {
+        "rung": rung,
+        "arm": arm,
+        "set": set_name,
+        "n": len(scored),
+        "partial": bool(missing_key or missing_row),
+        "missing_key_lines": missing_key,
+        "missing_handoff_rows": missing_row,
+        "totals": {
+            **{f"hit@{k}": sum(1 for s in scored if s[f"hit@{k}"]) for k in KS},
+            "primary_at_1": sum(1 for s in scored if s["primary_rank"] == 1),
+            "abstain_correct": sum(1 for s in scored if s["abstain_correct"]),
+            "abstain_wrong": sum(1 for s in scored if s["abstain_wrong"]),
+            "answered_unanswerable": sum(1 for s in scored if s["answered_unanswerable"]),
+            "evidence_quoted": sum(1 for s in scored if s["evidence_quoted"]),
+        },
+        "rows": scored,
+    }
+
+
+def set_label(value: str) -> str:
+    """`--set`: a generation-1 integer (`1`) or a generation-2 name (`2-u`),
+    carried verbatim into the output's `"set"` field.
+
+    ⚠ **It was `type=int` until 2026-09-23 (W-218)**, so `--set 2-u` exited in
+    argparse, and the workaround — `--set 2` — wrote `"set": 2` into a file named
+    `set-2-u.json`, which is also the name of a RETIRED generation-1 set. **Read
+    any score from `2026-09-22-golden-set-2u-rung-01000` as `set-2-u` whatever
+    its `"set"` field says.**
+    """
+    if not re.fullmatch(r"\d+(-[xu])?", value):
+        raise argparse.ArgumentTypeError(f"{value!r} is not a set name: expected `1` or `2-u`")
+    return value
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--handoff", type=Path, required=True)
@@ -164,7 +205,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--rung", required=True)
     ap.add_argument("--arm", required=True)
-    ap.add_argument("--set", dest="set_n", type=int, required=True)
+    ap.add_argument("--set", dest="set_n", type=set_label, required=True,
+                    help="the set's name: `1` for generation 1, `2-u` for set-2-u (L11 d14)")
     ap.add_argument("--allow-partial", action="store_true")
     args = ap.parse_args(argv)
 
@@ -218,25 +260,7 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 1
 
-    scored = [score_one(rows[i], key[i]) for i in sorted(rows.keys() & key.keys())]
-    payload = {
-        "rung": args.rung,
-        "arm": args.arm,
-        "set": args.set_n,
-        "n": len(scored),
-        "partial": bool(missing_key or missing_row),
-        "missing_key_lines": missing_key,
-        "missing_handoff_rows": missing_row,
-        "totals": {
-            **{f"hit@{k}": sum(1 for s in scored if s[f"hit@{k}"]) for k in KS},
-            "primary_at_1": sum(1 for s in scored if s["primary_rank"] == 1),
-            "abstain_correct": sum(1 for s in scored if s["abstain_correct"]),
-            "abstain_wrong": sum(1 for s in scored if s["abstain_wrong"]),
-            "answered_unanswerable": sum(1 for s in scored if s["answered_unanswerable"]),
-            "evidence_quoted": sum(1 for s in scored if s["evidence_quoted"]),
-        },
-        "rows": scored,
-    }
+    payload = build_payload(rows, key, rung=args.rung, arm=args.arm, set_name=args.set_n)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(payload, indent=1, sort_keys=True), encoding="utf-8")
     t = payload["totals"]

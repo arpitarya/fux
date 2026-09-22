@@ -10,7 +10,7 @@ feature: "`.fux/sources/urls` — the file format itself, and the one grammar bo
 owns: [src/fux/ingest/sourcelist.py@019a49b17232]
 laws: [L2, L3, L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 76bf76bca226b6a1f784cd4bb47aba90644c5ddb6a6e76b5a835b2c7aaf6b536
+content_sha: 546de7ba9aced1d4501eebf537d3691182de6bf5719b3f29a0feaa2fa35a856b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -18,6 +18,10 @@ content_sha: 76bf76bca226b6a1f784cd4bb47aba90644c5ddb6a6e76b5a835b2c7aaf6b536
 **Owns** — the components this record decides:
 
 - [`src/fux/ingest/sourcelist.py`](../src/fux/ingest/sourcelist.py) · file
+
+**Describes** — reaches into, does not own:
+
+- [`node/src/ingest/sourcelist.mjs`](../node/src/ingest/sourcelist.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
 
 <!-- COMPONENTS-END -->
 

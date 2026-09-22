@@ -7,10 +7,10 @@ description: "An R is a claim frozen before measurement; its threshold may never
 status: accepted
 date: 2026-08-22
 feature: the prediction system — the R ids, their register, the rules that make a frozen claim mean something, and the classification of the runs those claims are measured by
-owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@11c8f09c6d55, tools/vector-gate@0023bff0cdef]
+owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@4ee7d58a8286, tools/vector-gate@0023bff0cdef]
 laws: [L3]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 4a8c2fbc369bab982bb92488dd663f6c88826cf7149d0fece43efe553feab16a
+content_sha: 9b0bd89f81cdf2b9c689bd04a6dccefa8e850c4b179576723e42c1e685e3bc92
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1256,7 +1256,14 @@ on a corpus with **0 `ref` edges**.
   possible at all. ⚠ **An unanswerable question is not headroom for a ranking
   change** — the right outcome there is an abstention, which no field weight
   produces, and counting it would inflate the pool and so RAISE the bar.
-- ⚠ **`min_fix` assumes ZERO regressions** and is a ceiling on optimism, never a
+- **Two different numbers, and they are not interchangeable.**
+  `net_if_all_flip` is the net decision 19 needs when the discordant count is
+  the whole pool. `min_wins` is the fewest wins that clear **with zero
+  losses**, where the discordant count is the wins themselves — so it is read
+  at the wins, not the pool, and is **6 for every pool that can hold 6**.
+  🔴 **The instrument shipped with the first labelled as the second** (`min_fix`,
+  corrected 2026-09-23, W-219), and the paragraph below read it that way.
+- ⚠ **`min_wins` assumes ZERO losses** and is a ceiling on optimism, never a
   prediction: with `b` wins and `c` losses the discordant count is `b + c` and
   the net is `b − c`.
 - 🔴 **It applies no bar and takes decision 19's from
@@ -1265,10 +1272,15 @@ on a corpus with **0 `ref` edges**.
   and its verdict.
 
 **Measured on the golden ladder the day it shipped: a pool of 7–23 per set per
-rung, `min_fix` 7–11.** One ranking step must fix **58–78 % of every remaining
-failure with zero regressions, in all three sets**, to produce any verdict —
-which is why W-168's remaining steps are blocked on the corpus rather than on
-engineering.
+rung at `hit@5`.** With zero losses, **6 wins clear in every one of those
+buckets**, so one step must fix 6 of 7 to 23 remaining failures — **26–86 %** —
+without breaking anything, in each set it is judged on. ⚠ **Corrected
+2026-09-23 (W-219):** this paragraph said *"`min_fix` 7–11 … 58–78 % of every
+remaining failure"*, which is the bar if **every** failure flipped, read as the
+fewest that clear. The blocker it described is still real, since no measured
+ranking change here has fixed 6 with 0 regressions, but it is looser than
+stated, and **W-168's steps 5 and 9 moved to `hit@1`** (Arpit, 2026-09-23),
+where the pool is 51.
 
 **24f. `ref_edge_census.py` counts anchor-DISTINCTIVE terms, because
 anchor-bearing is not the input** (W-168, 2026-09-22).

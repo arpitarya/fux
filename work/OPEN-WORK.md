@@ -35,11 +35,7 @@ here. Read that record before changing anything below it.
 
 - 🔴 **W-215** · `arpit` — generation 2 of the golden data, six items. **Item 1 scored 2026-09-23**; one call left — run prompt 10? [detail](open/W-215-generation-2-corpus.md)
 
-- 🟢 **W-218** · `build` — the scorer can't score a generation-2 set by name (`--set 2-u` is refused, and `just golden-score` misses the flat hand-off). A workaround exists; it mislabels the output. [detail](open/W-218-scorer-takes-generation-set-names.md)
-
-- 🟢 **W-168** · `agent` — the ranking ideas. **Step 5 (RM3) pre-registered 2026-09-23** at `hit@1`: 39 winnable questions, enough for a verdict. **Next: build it (Opus)**; step 9 can be pre-registered alongside. [detail](open/W-168-search-improvements.md)
-
-- 🟢 **W-219** · `build` — the headroom tool's `min_fix` is the bar if every miss flips, not the fewest wins that clear (that is 6), and three documents read it the second way. No verdict changes. [detail](open/W-219-min-fix-mislabel.md)
+- 🟢 **W-168** · `agent` — the ranking ideas. **Step 5 (RM3) built 2026-09-23**, off by default. **Next: capture its five arms**, then Arpit scores them. [detail](open/W-168-search-improvements.md)
 
 
 ### testing

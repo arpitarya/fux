@@ -26,6 +26,44 @@ Rules:
 
 ---
 
+## 2026-09-23 — **W-219 CLOSED: `min_fix` was the all-flip bar, and 6 clean wins clear any pool ≥ 6**
+
+**A mislabel, not a wrong verdict.** `ranking_headroom.py` printed
+`smallest_detectable(pool)` as *"the fewest wins that clear"*. It is the net
+[SR-RS](../records/0133_predictions.md) d19 needs **if the whole pool flips**.
+With zero losses the discordant count is the wins, so **6 wins clear at every
+pool ≥ 6** (p = 0.031).
+
+- **Instrument:** the column is now `net_if_all_flip`, beside a new `min_wins`
+  read from `resolution.two_sided_p`, never a literal.
+  `tests/test_ranking_headroom.py` pins the item's rows (pool 8 → 8/6, 18 →
+  10/6, 23 → 11/6).
+- **Record:** SR-RS d24e amended first; *"58–78 % of every remaining failure"*
+  reads **26–86 %**.
+- **Dated correction notes, numbers untouched:** the
+  [step-inputs report](regression/2026-09-22-w168-step-inputs/report.md), its
+  ANALYSIS row, its `regression/README.md` row, W-215 and W-168.
+- ⚠ **No ruling reopened.** The 2026-09-23 rank-1 ruling stands on 51
+  reorderable misses against 8. What changed is that a `hit@5` verdict was
+  **very unlikely**, not impossible.
+
+## 2026-09-23 — **W-218 CLOSED: the scorer takes `2-u`, and the recipe finds a flat hand-off**
+
+- **`score.py --set`** accepts `^\d+(-[xu])?$` and writes it verbatim into
+  `"set"`. `"1"` is now a string for generation 1 too.
+- **`just golden-score <run> [key_dir] [rung]`** finds hand-offs through
+  [`tools/golden-score/handoffs.py`](../tools/golden-score/handoffs.py), which
+  **reads no key** and covers three layouts. A flat hand-off takes its rung from
+  the argument, else the pre-registration's `rung:` line or the one rung it
+  names, **else it is refused**.
+- **Tests:** `tests/test_golden_score_layouts.py`, synthetic data under
+  `tmp_path`. It never runs `score.main` past its guards.
+- ⚠ **The 2026-09-22 `set-2-u` score file still reads `"set": 2`.** It is
+  Arpit's output from the workaround. Read it as `set-2-u`.
+- **Docs:** golden README §Phase 6 and prompt 5 name the flat layout.
+  SR-LAW-11's `owns:` hash for `tools/golden-score` was restamped; its text did
+  not change.
+
 ## 2026-09-22 — **W-214 CLOSED: the band stops refusing, and keeps saying why**
 
 **The first abstention gate this project measured, and it was removed.** Arpit

@@ -22,7 +22,7 @@ has now hit the **same** wall, and the wall is not per-step:
 | 2026-09-16 → 09-18 | 2 | headroom 3–4 of 33, below the floor | two runs |
 | **2026-09-22** | **1 again** | 61 edges, **1 anchor-distinctive term** | a census |
 | **2026-09-22** | **4** | 0 `Term (ABBR)`, 3 aliases on one document | a pattern count |
-| **2026-09-22** | **all** | **7–23 winnable questions, `min_fix` 7–11** | one join over filed rows |
+| **2026-09-22** | **all** | **7–23 winnable questions, `min_fix` 7–11** ⚠ *the all-flip bar, not the fewest wins — 6 clear with zero losses (W-219, 2026-09-23)* | one join over filed rows |
 
 🔴 **Each was discovered by the step that tripped over it.** The arithmetic in
 the last row was computable the day W-213's rows were filed, and it governs

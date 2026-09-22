@@ -10,7 +10,7 @@ feature: the refer plane — fetch, verify, chunk, re-score, assemble
 owns: [src/fux/refer@4bde92ec28c5, tools/refer-bench@cfdb47b24af2, tools/refer-budget-sweep@db9ff8233332]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 2414779b171140e294b410154d4b63f71e7fd77c9f8516b493608e7de135f5f8
+content_sha: 8a8b599d7685c5ca4cf47c6662ea0701c2307d4f48b3d1f728861220526c33f5
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -20,6 +20,12 @@ content_sha: 2414779b171140e294b410154d4b63f71e7fd77c9f8516b493608e7de135f5f8
 - [`src/fux/refer/`](../src/fux/refer) · dir
 - [`tools/refer-bench/`](../tools/refer-bench) · dir
 - [`tools/refer-budget-sweep/`](../tools/refer-budget-sweep) · dir
+
+**Describes** — reaches into, does not own:
+
+- [`node/src/refer/assemble.mjs`](../node/src/refer/assemble.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
+- [`node/src/refer/rescore.mjs`](../node/src/refer/rescore.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
+- [`node/src/refer/source.mjs`](../node/src/refer/source.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
 
 <!-- COMPONENTS-END -->
 

@@ -134,7 +134,7 @@ INDEX_TABLE = "index"
 #: SR-TUNE, not a convenience (decision 5).
 _SCHEMA: dict[str, tuple[str, ...]] = {
     "bm25f": ("k1", "b", *_FIELD_KEYS, "anchor"),
-    "ranking": ("rerank_weight", "expand_weight"),
+    "ranking": ("rerank_weight", "expand_weight", "rm3_weight"),
     "graph": (
         "damping",
         "iterations",
@@ -258,6 +258,16 @@ class Tune:
     #: does pass one, which is the off-switch a consumer needs when they
     #: distrust the agent writing the expansions.
     expand_weight: float = 0.2
+    #: W-168 step 5 — RM3 pseudo-relevance feedback: the weight of the ten
+    #: terms the engine borrows from its own top ten documents
+    #: ([`query/rm3.py`](query/rm3.py)). **Default `0.0`: OFF**, and off runs
+    #: no first pass at all, so the default is byte-identical to the engine
+    #: before the key existed. It turns on only on a PASS against the frozen
+    #: bar, `work/regression/2026-09-23-rm3/PRE-REGISTRATION.md`.
+    #:
+    #: ⚠ **A caller's `--expand` wins**: RM3 does not run when one is passed,
+    #: and `fux lexical`, the frozen baseline verb, never runs it.
+    rm3_weight: float = 0.0
 
 
     # [graph]
@@ -634,6 +644,11 @@ def load(root: Path, *, enabled: bool = True) -> Tune:
         if "expand_weight" in ranking
         else 0.2
     )
+    rm3_weight = (
+        _non_negative(c, "ranking", "rm3_weight", ranking["rm3_weight"], 0.0)
+        if "rm3_weight" in ranking
+        else 0.0
+    )
 
     graph = data.get("graph", {})
     damping = _fraction(c, "graph", "damping", graph["damping"], 0.85) if "damping" in graph else 0.85
@@ -759,6 +774,7 @@ def load(root: Path, *, enabled: bool = True) -> Tune:
         field_weights=tuple(weights),
         rerank_weight=rerank_weight,
         expand_weight=expand_weight,
+        rm3_weight=rm3_weight,
         damping=damping,
         iterations=iterations,
         laziness=laziness,
@@ -851,6 +867,10 @@ rerank_weight           = {d.rerank_weight}   # 0 = off; the proximity reranker'
 # What an agent-supplied `--expand` term is worth against a term you typed.
 # A NO-OP unless a caller passes `--expand`; 0 turns expansion off entirely.
 expand_weight           = {d.expand_weight}   # Query2doc's 1:5; unmeasured on your corpus
+# RM3: the weight of ten terms fux borrows from its own top ten documents and
+# re-queries with once. 0 = OFF, the default: it turns on only on a passing
+# pre-registered run. Never runs when a caller passes `--expand`.
+rm3_weight              = {d.rm3_weight}
 
 [graph]                         # explain / graph / path
 damping      = {d.damping}

@@ -81,6 +81,7 @@ def test_the_node_tune_schema_is_the_python_one():
         ("k1 = K1", "k1"),
         ("rerankWeight = 0.0", "rerank_weight"),
         ("expandWeight = 0.2", "expand_weight"),
+        ("rm3Weight = 0.0", "rm3_weight"),
         ("damping = 0.85", "damping"),
         ("iterations = 3", "iterations"),
         ("laziness = 0.5", "laziness"),

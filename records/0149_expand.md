@@ -7,11 +7,11 @@ description: "`--expand` scores agent-supplied terms at a lower weight beside th
 status: accepted
 date: 2026-09-05
 feature: agent-side query expansion and multi-query fusion
-owns: [src/fux/query/expand.py@19b697b80e8c, src/fux/query/fuse.py@749673d52166]
+owns: [src/fux/query/expand.py@19b697b80e8c, src/fux/query/fuse.py@749673d52166, src/fux/query/rm3.py@dd68a14c26a1]
 laws: [3, 4, 8]
 ratifies: W-109
 timestamp: 2026-09-05T00:00:00Z
-content_sha: f20f7af8a6e47a7749c36b1e9ee70e309c401fa365c86faedbc18d4e80ed6a78
+content_sha: 5489920e29fd946016ac6420f326753237f6f9e063a42cad2fb8965bdce88395
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -20,6 +20,13 @@ content_sha: f20f7af8a6e47a7749c36b1e9ee70e309c401fa365c86faedbc18d4e80ed6a78
 
 - [`src/fux/query/expand.py`](../src/fux/query/expand.py) · file
 - [`src/fux/query/fuse.py`](../src/fux/query/fuse.py) · file
+- `src/fux/query/rm3.py` · file
+
+**Describes** — reaches into, does not own:
+
+- [`node/src/query/expand.mjs`](../node/src/query/expand.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
+- [`node/src/query/fuse.mjs`](../node/src/query/fuse.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
+- `node/src/query/rm3.mjs` · owned by [SR-NODE-SEARCH](0153_node-search.md)
 
 <!-- COMPONENTS-END -->
 
@@ -279,6 +286,34 @@ term is a word a **human linker** wrote, extracted deterministically from a
 committed document, pointing at this one. `required` is still the user's own
 hashes in both cases — what changed is where a match may be found, not what
 counts as one.
+
+**16. RM3 is an expansion the ENGINE writes, scored through this record's
+object and refused by this record's guard** (W-168 step 5, 2026-09-23).
+[`query/rm3.py`](../src/fux/query/rm3.py) takes the top 10 documents of an
+un-expanded first pass, reads their **committed** records, and picks the 10
+term hashes with the highest RM1 weight — `Σ_d P(t|d) · P(q|d)`, `P(t|d)` the
+weighted tf over `wlen`, `P(q|d)` the first-pass score normalised over the ten,
+the query's own terms excluded, ties by ascending hash. Those ten go through
+`expand.build` at `[ranking] rm3_weight`, with `required` = the original query.
+
+- 🔴 **Decision 3 holds unchanged.** A document matching only feedback terms is
+  dropped in `rank()` exactly as one matching only `--expand` terms is. RM3
+  adds no scoring arithmetic of its own.
+- **`rm3_weight = 0.0` is the default and runs no first pass**, so an
+  unconfigured corpus is byte-identical to the engine before the key existed.
+- **A caller's `--expand` wins**: RM3 does not run beside one. Both are the same
+  act, and stacking them would score words neither party chose.
+- **`fux lexical` never runs it** ([SR-CLI](0101_cli-surface.md) decision 12):
+  the baseline is the words the user typed.
+- **The first pass writes no statistics.** The band and `--why` describe the
+  final pass only, and the band is built on the original query as decision 10's
+  neighbours already require.
+- ⚠ **The first pass is the LEXICAL ranking**, before the reranker, a pin or the
+  graph tier. On a corpus whose tune turns those on, the feedback set is not
+  the list `ask` prints.
+- ⚠ **Unmeasured, and off until a PASS.** The frozen bar is
+  [`2026-09-23-rm3`](../work/regression/2026-09-23-rm3/PRE-REGISTRATION.md);
+  its drift bound is that no baseline rank-1 hit may be lost anywhere in the set.
 
 ### Consequences
 

@@ -11,7 +11,7 @@ feature: the confidence plane
 owns: [src/fux/query/confidence.py@2cd8be58107d, tests/test_confidence_floor_off.py@f8e18c079a6e]
 laws: [L1, L3, L4]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 79c07fad7a49c7ef9ca0c945acef463f238a5bbe064b25e417245117275b7b29
+content_sha: 58537bfe4cd2e17f06eae14cbde1bbacfb17fb3156e7f5a4778bdcc0dd870f32
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -23,6 +23,8 @@ content_sha: 79c07fad7a49c7ef9ca0c945acef463f238a5bbe064b25e417245117275b7b29
 
 **Describes** — reaches into, does not own:
 
+- [`node/src/query/confidence.mjs`](../node/src/query/confidence.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
+- [`node/test/confidence.test.mjs`](../node/test/confidence.test.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
 - [`src/fux/derive/accel.py`](../src/fux/derive/accel.py) · owned by [SR-T1-ACCELERATOR](0110_accelerator.md)
 - [`src/fux/query/__init__.py`](../src/fux/query/__init__.py) · owned by [SR-ASK](0103_ask.md)
 
@@ -831,6 +833,12 @@ at `0.0` (the clause off), it asks *does the TOP DOCUMENT cover the question*,
 which is much nearer to correctness than separation is, and **it was not in
 W-213's grid**. That is a lead and a new pre-registration, never an extension of
 this one.
+
+**18. RM3's first pass writes nothing into the band** (W-168 step 5,
+2026-09-23). `run_query` runs it with no `stats_out`, so `df`, `n` and
+`top_doc_hashes` all come from the final pass, and the block is still built on
+the **original** query. A document lifted by feedback terms cannot raise its own
+band, for the reason decision 16's neighbour gives for `--expand`.
 
 ### Consequences
 

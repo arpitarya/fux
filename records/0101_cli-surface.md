@@ -10,7 +10,7 @@ feature: the `fux` command-line interface — every verb, its flags, its exit co
 owns: [src/fux/cli.py@3e9d9763b182, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@9876744812b5, src/fux/progress.py@925dccc045ce, tests_e2e@09050be78ad5]
 laws: [L1, L4, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: c5507406066f26e61eeaf7480fba31d6d9fb690412b594e98de0ca6403adabfd
+content_sha: 7e418e01151203310469cae4a4dadf0bb792234d785c5b80b4a75f49d89f87db
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -22,6 +22,10 @@ content_sha: c5507406066f26e61eeaf7480fba31d6d9fb690412b594e98de0ca6403adabfd
 - [`src/fux/progress.py`](../src/fux/progress.py) · file
 - [`src/fux/sources.py`](../src/fux/sources.py) · file
 - [`tests_e2e/`](../tests_e2e) · dir
+
+**Describes** — reaches into, does not own:
+
+- [`node/fux.mjs`](../node/fux.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
 
 <!-- COMPONENTS-END -->
 
@@ -407,6 +411,9 @@ is FROZEN.** (W-160.)
 `ask --scan` already computed BM25F alone. What this adds is a **contract**:
 
 - **`lexical` is BM25F → rerank → RRF over `-q`. No graph stage, ever.**
+- **And no RM3, ever** (W-168 step 5, 2026-09-23). `rm3_weight` is forced to
+  `0.0` beside the graph tier's two booleans, in both readers: feedback terms
+  are words the engine chose ([SR-EXPAND](0149_expand.md) decision 16).
 - **A future component added to the lexical core is a NEW VERB or a TUNABLE,
   never a change to this one.** That sentence is the whole decision; everything
   else here is what makes it hold.

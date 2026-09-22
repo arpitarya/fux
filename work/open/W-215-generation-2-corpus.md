@@ -24,7 +24,10 @@ Both `informed`; neither measures a feature.
 🔴 **The pool any ranking change can win is 7–23 answerable questions per set
 per rung**, and [SR-RS](../../records/0133_predictions.md) d19's required net at
 those counts puts `min_fix` at **7–11**. **One step must fix 58–78 % of every
-remaining failure with ZERO regressions, in all three sets.** The best result
+remaining failure with ZERO regressions, in all three sets.** ⚠ *Corrected
+2026-09-23 ([W-219](../IMPLEMENTATION.md)): `min_fix` was the bar if every
+failure flipped. With zero losses **6 wins clear** in every bucket, so the
+figure is **26–86 %**. Looser, and still never achieved here.* The best result
 ever measured in this repository — W-205 part 2 family (a), `+1 / +3 / +4` with
 0 regressions — returned INCONCLUSIVE.
 
@@ -51,7 +54,7 @@ Scores: `work/regression/2026-09-22-golden-set-2u-rung-01000/scores/single/rung-
 | `hit@10` = `@20` = `@50` | 102 | 91 % |
 
 - 🔴 **`hit@5` is 84 % — the same band as generation 1** (81–92 % at this rung). The failing pool is **18**.
-- 🔴 **10 of those 18 never appear in the top 50 at all.** A ranking step only reorders what was retrieved, so **only 8 are winnable by reordering** — below `min_fix` ≈ 9. **At `hit@5`, no reranking step can produce a verdict on this set, by arithmetic.**
+- 🔴 **10 of those 18 never appear in the top 50 at all.** A ranking step only reorders what was retrieved, so **only 8 are winnable by reordering**. ⚠ *Corrected 2026-09-23 ([W-219](../IMPLEMENTATION.md)): this said "below `min_fix` ≈ 9 … no reranking step can produce a verdict, by arithmetic". 8 wins with zero losses do clear (6 is the minimum), so a `hit@5` verdict was **very unlikely** (6 of 8 with nothing broken), not impossible. The rank-1 ruling stands on 51 reorderable against 8.*
 - 🟢 **The headroom is at rank 1:** 61 answerable questions miss `hit@1`, and **51 of them are already in the top 50** — reorderable.
 - ⚠ **The 10 unreachable questions are a recall problem, not a ranking one** — the class anchor text (T4) and expansion (T5) exist for. That is prompt 10's target.
 - ⚠ `abstain_wrong = 19`, `abstain_ok = 5` describe the **pre-W-214** engine, where `weak` still refused. W-214 removed that behaviour; these two numbers are history.

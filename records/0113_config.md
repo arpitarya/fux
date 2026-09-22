@@ -10,7 +10,7 @@ feature: "`fux.toml` — discovery, schema, validation, and the keys that are re
 owns: [src/fux/config.py@e7ab20d676db]
 laws: [L4, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 8932772db6ce7309e8ee7c5aedfce1d123f06c67be356690cd925603fa30f2f8
+content_sha: 044f80f2cb55d0e31435be50ca8b7f01653c1584adbc9e5c03de9abdf5e79def
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -21,6 +21,7 @@ content_sha: 8932772db6ce7309e8ee7c5aedfce1d123f06c67be356690cd925603fa30f2f8
 
 **Describes** — reaches into, does not own:
 
+- [`node/src/config/root.mjs`](../node/src/config/root.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
 - [`node/test/config.test.mjs`](../node/test/config.test.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
 
 <!-- COMPONENTS-END -->

@@ -209,21 +209,48 @@ def run_query(
         query_hashes, query_term_hashes(expand) if expand else [], tune.expand_weight
     )
 
+    use_accel = False
     if not force_scan:
         from ..derive import accel, format as derive_fmt
 
-        if (derive_fmt.runtime_dir(root) / derive_fmt.STATS_NAME).exists() and accel.is_fresh(root):
-            results = accel.ask(
-                root, query, top=depth, weighting=weighting, archived_dirs=dirs,
-                scoring=scoring, stats_out=stats, expansion=expansion,
+        use_accel = (derive_fmt.runtime_dir(root) / derive_fmt.STATS_NAME).exists() and accel.is_fresh(root)
+
+    # W-168 step 5 — RM3. **Off at `0.0`, and off means no first pass runs.**
+    # A caller's own `--expand` wins: it is the explicit form of the same act,
+    # and stacking an engine expansion on an agent's would score words neither
+    # chose. The first pass is the lexical ranking on the SAME path the answer
+    # will use, un-expanded, with no stats written — the confidence block and
+    # `--why` describe the final pass only.
+    if tune.rm3_weight > 0 and not expand and query_hashes:
+        from .rm3 import FB_DOCS, feedback_terms
+
+        first_top = max(depth, FB_DOCS)
+        if use_accel:
+            first = accel.ask(
+                root, query, top=first_top, weighting=weighting, archived_dirs=dirs,
+                scoring=scoring,
             )
-            final = _compose(
-                root, query, results, rerank_weight, top, depth, tune, stats, related_out,
-                trace_out,
+        else:
+            first = scan_ask(
+                root, query, top=first_top, weighting=weighting, archived_dirs=dirs,
+                scoring=scoring,
             )
-            _fill_trace(trace_out, results, rerank_weight)
-            _fill_confidence(confidence_out, stats, query, final, tune)
-            return final, "accelerator"
+        expansion = build_expansion(
+            query_hashes, feedback_terms(root, first, query_hashes, scoring), tune.rm3_weight
+        )
+
+    if use_accel:
+        results = accel.ask(
+            root, query, top=depth, weighting=weighting, archived_dirs=dirs,
+            scoring=scoring, stats_out=stats, expansion=expansion,
+        )
+        final = _compose(
+            root, query, results, rerank_weight, top, depth, tune, stats, related_out,
+            trace_out,
+        )
+        _fill_trace(trace_out, results, rerank_weight)
+        _fill_confidence(confidence_out, stats, query, final, tune)
+        return final, "accelerator"
     results = scan_ask(
         root, query, top=depth, weighting=weighting, archived_dirs=dirs,
         scoring=scoring, stats_out=stats, expansion=expansion,
@@ -996,7 +1023,9 @@ def _ask_shaped(args, *, compose: bool) -> int:
     if not compose:
         import dataclasses
 
-        tune = dataclasses.replace(tune, ask_boost=False, ask_related=False)
+        # W-168 step 5: RM3 is off here too. The baseline is the words the user
+        # typed; feedback terms are words the engine chose (SR-EXPAND 17).
+        tune = dataclasses.replace(tune, ask_boost=False, ask_related=False, rm3_weight=0.0)
     elif getattr(args, "related", None) is False:
         import dataclasses
 

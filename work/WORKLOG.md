@@ -29,6 +29,12 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-23 — W-218 and W-219 CLOSED; W-168 step 5 (RM3) BUILT, off by default  ·  Claude Code
+- **Asked:** *"implement W-218, W-168, W-219 and keep implementing till closure."*
+- **Did:** **W-219** — `ranking_headroom.py` now prints `net_if_all_flip` and `min_wins`; SR-RS d24e amended first; dated correction notes elsewhere, numbers untouched. **W-218** — `score.py --set 2-u`; new key-free `tools/golden-score/handoffs.py` finds the flat layout; tests on synthetic data. **W-168 step 5** — `query/rm3.py` + `rm3.mjs` behind `[ranking] rm3_weight = 0.0`; `0.0` runs no first pass; scan == accelerator == Node; six records amended; `decide.py` frozen before any score. Committed the previous session's staged pre-registration first (`d9bd57a6`) so the bar precedes the build.
+- **Decided / open:** four build decisions declared in SR-EXPAND 16. ⚠ **The first pass is the lexical ranking**, and on `rung-01000` (`ask_boost = true`) that is not always the list `ask` prints; flagged, not assumed. **Step 9 not pre-registered:** the proposal says it starts as a compare doc, and its doc-type declaration would change a frozen rung. W-215 is still Arpit's.
+- **Next:** capture `rm3-0.0 … 0.5` on `set-2-u` at the build commit; then Arpit scores.
+
 ## 2026-09-23 — W-168 step 5 (RM3) PRE-REGISTERED at `hit@1`: pool 39, no stop  ·  Claude Code
 - **Asked:** pre-register step 5 per the 2026-09-23 ruling: `hit@1` primary, `primary@1` beside it, `set-2-u` at `rung-01000`; tag under-specified questions from text only, count the pool first, stop below `min_fix`. Don't run the scorer.
 - **Did:** [`2026-09-23-rm3/PRE-REGISTRATION.md`](regression/2026-09-23-rm3/PRE-REGISTRATION.md). Mechanism, arms `{0.1, 0.2, 0.3, 0.5}` and drift bound all fixed before the build. Tagger `evidence/tag_underspecified.py` (*names nothing*) → **92 of 125** tagged, hashes frozen **before** the pool count. `evidence/pool.py` → **pool 39 ≥ 6, no stop**. W-168 status block, queue row, regression index row. Filed **[W-219](open/W-219-min-fix-mislabel.md)**. Scorer not run; no key touched; tree LOCKED.

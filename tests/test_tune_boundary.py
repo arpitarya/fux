@@ -53,6 +53,9 @@ MUTATIONS: dict[str, dict[str, str]] = {
         # reason on top of every other key's: nothing reads it unless a caller
         # passes `--expand`, and `fux ingest` never does.
         "expand_weight": "0.75",
+        # W-168 step 5. Read only at query time, after a first pass over the
+        # committed index, so it cannot move a committed byte either.
+        "rm3_weight": "0.3",
     },
     "graph": {
         "damping": "0.25",

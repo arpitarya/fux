@@ -656,6 +656,14 @@ architecture is named for it. Contrast [snapshot](#snapshot-mode).
 the entire corpus state, so "is this the same index?", drift detection, and
 audit are all one hash compare.
 
+**RM3 (pseudo-relevance feedback)** — An expansion the engine writes itself:
+the top 10 documents of a first pass give up the 10 terms most typical of them
+(RM1-weighted, the query's own terms excluded), and the query runs once more
+with those at `[ranking] rm3_weight`. Scored through `--expand`'s object and
+refused by its guard, so a document matching only borrowed terms is never
+returned. **Off by default and unmeasured** (W-168 step 5). See
+[SR-EXPAND](../records/0149_expand.md) decision 16.
+
 **RRF (Reciprocal Rank Fusion)** — How lexical, dense and graph rankings
 combine: each contributes `1/(k + rank)`, k=60, summed — ranks, not scores, so
 there is no calibration problem. *This is Fux's reranking layer*; a

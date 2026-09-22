@@ -24,13 +24,20 @@ Per `rung × set`, over the **answerable** questions only:
 | column | meaning |
 |---|---|
 | `pool` | answerable questions whose primary is **not** already in the top `k` — every question a ranking change could win |
-| `net_needed` | the net [SR-RS](../../records/0133_predictions.md) decision 19 requires **if every question in the pool flipped** — the most favourable case there is |
+| `net_if_all_flip` | the net [SR-RS](../../records/0133_predictions.md) decision 19 requires **if every question in the pool flipped** — the discordant count is then the whole pool |
 | `verdict_possible` | whether a perfect feature could clear the bar |
-| `min_fix` | the smallest number of wins that clears, **assuming zero regressions** |
+| `min_wins` | the fewest wins that clear **with zero losses** — the discordant count is then the wins themselves, so it is the same number for every pool large enough to hold it |
 
-⚠ **`min_fix` is a CEILING on optimism, never a prediction.** It assumes a
+🔴 **`net_if_all_flip` is NOT the fewest wins that clear, and it was once
+labelled as if it were** (`min_fix`, W-219, 2026-09-23). Decision 19's net rises
+with the discordant count; a feature that wins `w` and loses nothing has a
+discordant count of `w`, not of the pool. So 6 wins with zero losses clear at a
+pool of 8, 18 or 23 alike, while `net_if_all_flip` there reads 8, 10 and 11.
+
+⚠ **`min_wins` is a CEILING on optimism, never a prediction.** It assumes a
 feature breaks nothing, which no measured ranking change in this repository has
-ever managed. Read it as *"below this, do not bother measuring"*.
+ever managed. Each loss adds one to the discordant count and subtracts one from
+the net.
 
 🔴 **It applies no bar and rules on nothing** ([SR-RS](../../records/0133_predictions.md)
 decision 10b): a floor lives in a frozen pre-registration, never in an
@@ -52,7 +59,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from verdict import ALPHA  # noqa: E402
-from resolution import smallest_detectable  # noqa: E402
+from resolution import smallest_detectable, two_sided_p  # noqa: E402
 
 RETIRED = ROOT / "work" / "golden" / "retired"
 
@@ -72,6 +79,17 @@ def expectations() -> dict[str, dict]:
             for row in read_jsonl(path):
                 out[row["id"]] = row
     return out
+
+
+def fewest_clean_wins(pool: int, alpha: float = ALPHA) -> int | None:
+    """The fewest wins that clear decision 19 **with zero losses**, if the pool
+    can hold that many. With no losses, `w` wins are a discordant count of `w`
+    all going one way, so this is the smallest `w` whose one-sided sweep clears
+    — read from `resolution`, never written down here."""
+    for w in range(1, pool + 1):
+        if two_sided_p(w, w) <= alpha:
+            return w
+    return None
 
 
 def headroom(rows: list[dict], key: dict[str, dict], hit_field: str = "hit@5") -> list[dict]:
@@ -98,11 +116,11 @@ def headroom(rows: list[dict], key: dict[str, dict], hit_field: str = "hit@5") -
         out.append({
             "rung": rung, "set": set_name, "n": len(group),
             hit_field: len(group) - pool, "pool": pool,
-            "net_needed": needed,
+            "net_if_all_flip": needed,
             "verdict_possible": bool(possible),
-            # With zero regressions, discordant == wins == net, so the smallest
-            # clearing net IS the smallest number of fixes.
-            "min_fix": needed if possible else None,
+            # With zero losses, discordant == wins == net, so the bar is read
+            # at the WINS, not at the pool (W-219).
+            "min_wins": fewest_clean_wins(pool),
         })
     return out
 
@@ -119,13 +137,13 @@ def main(argv: list[str] | None = None) -> int:
     if not stats:
         sys.exit("refusing: no answerable rows joined. Check --rows and the retired sets.")
 
-    print(f"{'rung':<12}{'set':<8}{'n':>5}{args.hit:>8}{'POOL':>6}{'need':>6}{'min_fix':>9}  verdict possible?")
+    print(f"{'rung':<12}{'set':<8}{'n':>5}{args.hit:>8}{'POOL':>6}{'all-flip':>9}{'min_wins':>9}  verdict possible?")
     for s in stats:
-        need = s["net_needed"] if s["net_needed"] is not None else "-"
-        mf = s["min_fix"] if s["min_fix"] is not None else "-"
+        need = s["net_if_all_flip"] if s["net_if_all_flip"] is not None else "-"
+        mf = s["min_wins"] if s["min_wins"] is not None else "-"
         mark = "yes" if s["verdict_possible"] else "🔴 NO — no net clears alpha at this pool"
         print(f"{s['rung']:<12}{s['set']:<8}{s['n']:>5}{s[args.hit]:>8}"
-              f"{s['pool']:>6}{need:>6}{mf:>9}  {mark}")
+              f"{s['pool']:>6}{need:>9}{mf:>9}  {mark}")
 
     worst = min(s["pool"] for s in stats)
     print(f"\nsmallest pool anywhere: {worst}")

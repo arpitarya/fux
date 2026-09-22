@@ -10,7 +10,7 @@ feature: generation and update of the committed index, and the refusal that keep
 owns: [src/fux/store@dc3f310eba56]
 laws: [L1, L2, L3, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: b5e904448cd1760dc4c3c9d07313771dcc05fcd27af226dff3c73eab6eb32f3b
+content_sha: 5bba7e8d137691c176be1dfa991f6a04e6204a21e042e30337bf257fa53117f8
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -18,6 +18,11 @@ content_sha: b5e904448cd1760dc4c3c9d07313771dcc05fcd27af226dff3c73eab6eb32f3b
 **Owns** — the components this record decides:
 
 - [`src/fux/store/`](../src/fux/store) · dir
+
+**Describes** — reaches into, does not own:
+
+- [`node/src/store/format.mjs`](../node/src/store/format.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
+- [`node/src/store/reader.mjs`](../node/src/store/reader.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
 
 <!-- COMPONENTS-END -->
 

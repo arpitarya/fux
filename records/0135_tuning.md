@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-22
 amended: 2026-09-15
 feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error contract, and per-source preference weights
-owns: [src/fux/tune.py@97814aaa4a31, .fux/tune.toml@ba9885423d69]
+owns: [src/fux/tune.py@748f0a01ebbc, .fux/tune.toml@ba9885423d69]
 laws: [L1, L3, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 0905430e6ebb00e17a5aa5b94672481e548686dbd695b10c2b1d80ccef7f6df0
+content_sha: b6593d803360abab90b8974d4b2c1d93ed9d76c20881548ba75e294e99db8f38
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -23,6 +23,8 @@ content_sha: 0905430e6ebb00e17a5aa5b94672481e548686dbd695b10c2b1d80ccef7f6df0
 
 **Describes** — reaches into, does not own:
 
+- [`node/src/config/tune.mjs`](../node/src/config/tune.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
+- [`node/test/config.test.mjs`](../node/test/config.test.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
 - [`src/fux/query/rank.py`](../src/fux/query/rank.py) · owned by [SR-RANKING](0111_ranking.md)
 
 <!-- COMPONENTS-END -->
@@ -744,6 +746,7 @@ reads · `*` an **open** table whose keys are the consumer's own.
 + bm25f.anchor
 + ranking.rerank_weight
 + ranking.expand_weight
++ ranking.rm3_weight
 + graph.damping
 + graph.iterations
 + graph.laziness
@@ -939,6 +942,23 @@ table `_readme()` writes, which gained `fux serve`
 ([SR-CLI](0101_cli-surface.md)). **Neither reaches this record's claim on that
 file**, and saying so is the point of the freshness gate — the prompt is *re-read
 the record*, and the honest outcome of re-reading it can be *nothing moved*.
+
+**18. `[ranking] rm3_weight`, default `0.0`** (W-168 step 5, 2026-09-23) —
+the weight of RM3's ten feedback terms ([SR-EXPAND](0149_expand.md) decision
+16).
+
+- **In `[ranking]`, beside `expand_weight`**, because it is the same multiplier
+  applied to terms the engine chose rather than terms a caller supplied.
+- **`0.0` is off, and off runs no first pass at all**, so `--no-tune` and an
+  absent key are both byte-identical to the engine before the key existed.
+- **The feedback counts (10 documents, 10 terms) are constants, not keys.** A
+  second RM3 lever would be one the frozen bar forbids sweeping.
+- 🔴 **Needs no re-ingest.** Nothing stored is a function of it (decision 6a).
+
+⚠ **UNMEASURED, and the default is not a recommendation.** The frozen bar is
+[`2026-09-23-rm3`](../work/regression/2026-09-23-rm3/PRE-REGISTRATION.md).
+⚠ **Defaulting it on later changes every consumer's ranking on upgrade** unless
+their `tune.toml` pins it, and `fux setup` writes every value out in full.
 
 ### Consequences
 

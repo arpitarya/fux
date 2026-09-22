@@ -643,6 +643,7 @@ table does not grant.
 | `src/fux/query/rerank.py` | SR-RERANK | proximity reranking — carved out because it is the one thing under `query/` that reads the **working tree** rather than the committed index, and because the decision it carries is a *refusal* |
 | `src/fux/query/confidence.py` | SR-CONFIDENCE | the four signals and the band, computed from what ranking already produced |
 | `src/fux/query/expand.py` | SR-EXPAND | the `Expansion` object — what to score, what the user actually asked, and at what weight. Carved out of `query/` because the decision it carries is a **refusal**: a document matching no original term is not ranked low, it is not returned |
+| `src/fux/query/rm3.py` | SR-EXPAND | RM3 pseudo-relevance feedback (W-168 step 5) — an expansion the ENGINE writes from its own top ten documents, scored through `Expansion` at `[ranking] rm3_weight` and refused by the same guard. Carved out of `query/` for the same reason `expand.py` is |
 | `src/fux/query/fuse.py` | SR-EXPAND | reciprocal rank fusion for `-q`. **A revival, not a restoration** — the deleted module fused SCORES; this one fuses ranks, which is why it comes back under a record rather than off the port list |
 | `src/fux/query/provenance.py` | SR-PROVENANCE | the derivation, the receipt, the journal and `verify`'s four-state verdict. **Carved out of `query/` for a different DECISION, not a different concern**: everything else under `query/` answers a question, and this answers *how the answer was reached* — and it is the one module in the tree that may write a plaintext use record (L8, as reverted) |
 | `src/fux/output_config.py` | SR-OUTPUT | `.fux/output.toml` — three roots (`[cli]`, `[cli.json]`, `[mcp]`), the two closed key sets (`CLI_VERBS`, `MCP_KEYS`), and the precedence chain (flag -> `[cli.json.<verb>]` -> `[cli.json]` -> `[cli.<verb>]` -> `[cli]` -> bypass -> `FuxError`). **Since 2026-08-28 the file, once in effect, is the sole source of truth** — an unset key errors rather than falling back to `BUILT_IN`. **Top-level, beside `tune.py`, because it is a peer of it**: same shape, different boundary — `tune.py` changes which documents come back, this changes how they are shown |
@@ -775,7 +776,7 @@ unauditable, and an unauditable table stops being trusted.
 ⚠ **Seeded small and first-hand, and deliberately filled once.** It opened at
 **four** rows, each verified against a change actually made rather than a sweep
 guessing at intent, because a bulk fill would make the relation *look* enforced
-while asserting things nobody checked. It stands at **73** rows: the growth to
+while asserting things nobody checked. It stands at **113** rows: the growth to
 about thirty was row-by-row with the change that needed it, and the rest landed
 together on **2026-09-21** (W-208), when the nine `component` records that could
 not be opened at all were given the reach their subjects already had. **That
@@ -876,5 +877,44 @@ rows narrowed so far were each verified by reading every mention in the file
 | `node/src/index.mjs` | SR-API | the Node twin of `from fux import open`, method for method. The register's own note on `src/fux/api.py` already says the two are one shape |
 | `node/test/config.test.mjs` | SR-CONFIG | `fux.toml`'s schema as the Node reader loads it. Named by no record until 2026-09-21 |
 | `node/dist/fux.mjs` | SR-WORK-RELEASE | the ONE bundled file a consumer is served ([L10](0011_LAW-10-bundled-output.md)), built at publish. ⚠ **Named, never owned, and GITIGNORED** — it is build output, so the gate can never fire on it and the generated Components block renders it without a link. The row exists so the record that decides how a release reaches npm names the artefact that goes there |
+| `node/fux.mjs` | SR-CLI | the Node CLI boundary — argument parsing, `--no-tune`, and the one place `FuxError` is rendered. Twin of `src/fux/cli.py` |
+| `node/src/config/root.mjs` | SR-CONFIG | the Node twin of `find_root` in `src/fux/config.py` — the same two tells, in the same order |
+| `node/src/config/tune.mjs` | SR-TUNE | the reader half of `src/fux/tune.py` — defaults, the closed key set, the validators and the error collection. A key set that drifts here is a repository one reader refuses and the other accepts |
+| `node/src/decode/markdown.mjs` | SR-DECODE | the Node twin of `src/fux/decode/_markdown.py` — the one heading grammar ingest and the chunker share |
+| `node/src/errors.mjs` | SR-LAWS | the Node twin of `src/fux/errors.py` — the single flat `FuxError`, no subclass hierarchy |
+| `node/src/graph/community.mjs` | SR-GRAPH | the Node twin of `src/fux/graph/community.py` |
+| `node/src/graph/model.mjs` | SR-GRAPH | the Node twin of `src/fux/graph/model.py` |
+| `node/src/graph/plane.mjs` | SR-GRAPH | the Node twin of `src/fux/graph/plane.py` — rebuilt in memory rather than read from `graph.json` (SR-NODE-SEARCH decision 9) |
+| `node/src/graph/walk.mjs` | SR-GRAPH | the Node twin of `src/fux/graph/walk.py` |
+| `node/src/verbs/graph.mjs` | SR-GRAPH | `explain` · `graph` · `path` on the Node reader. Twin of `src/fux/graph/__init__.py` |
+| `node/src/ingest/gitdir.mjs` | SR-INGEST | the Node twin of `src/fux/ingest/gitdir.py` — the live `archived=true` read |
+| `node/src/ingest/priors.mjs` | SR-INGEST | the Node twin of `src/fux/ingest/priors.py` |
+| `node/src/ingest/sourcelist.mjs` | SR-URL-LIST | the Node twin of `src/fux/ingest/sourcelist.py` — `.fux/sources/dirs` read live |
+| `node/src/query/analyzer.mjs` | SR-RANKING | the Node twin of `src/fux/query/analyzer.py`. An identifier analyzed differently is a term one reader indexes and the other never finds |
+| `node/src/query/bm25f.mjs` | SR-RANKING | the Node twin of `src/fux/query/bm25f.py` — the scorer's field weighting |
+| `node/src/query/stem.mjs` | SR-RANKING | the Node twin of `src/fux/query/stem.py` |
+| `node/src/query/tokenize.mjs` | SR-RANKING | the Node twin of `src/fux/query/tokenize.py` |
+| `node/test/analyzer.test.mjs` | SR-RANKING | the analyzer pinned to Python's output, identifier by identifier (W-202) |
+| `node/src/query/compose.mjs` | SR-ASK | the graph stage of `ask`. Twin of `src/fux/query/compose.py` |
+| `node/src/query/headings.mjs` | SR-ASK | the Node twin of `src/fux/query/headings.py` — display only, never a score |
+| `node/src/query/run.mjs` | SR-ASK | the shared spine of `ask`, `find` and `answer`. Twin of the pure half of `src/fux/query/__init__.py` |
+| `node/src/query/scan.mjs` | SR-ASK | the Node twin of `src/fux/query/scan.py` — the only candidate path Node has |
+| `node/src/verbs/answer.mjs` | SR-ASK | `fux answer` on the Node reader. Twin of `src/fux/query/__init__.py`'s `answer` half |
+| `node/src/verbs/ask.mjs` | SR-ASK | `fux ask` (and `fux lexical`) on the Node reader. Twin of `src/fux/query/__init__.py`'s `ask` half |
+| `node/src/verbs/find.mjs` | SR-ASK | `fux find` on the Node reader. Twin of `src/fux/query/__init__.py`'s `find` half |
+| `node/src/query/confidence.mjs` | SR-CONFIDENCE | the Node twin of `src/fux/query/confidence.py` — the band and `answerable` |
+| `node/test/confidence.test.mjs` | SR-CONFIDENCE | the band and `answerable` pinned on the Node side, so the two readers cannot disagree about when to refuse |
+| `node/src/query/expand.mjs` | SR-EXPAND | the Node twin of `src/fux/query/expand.py` |
+| `node/src/query/fuse.mjs` | SR-EXPAND | the Node twin of `src/fux/query/fuse.py` |
+| `node/src/query/rm3.mjs` | SR-EXPAND | the Node twin of `src/fux/query/rm3.py` — RM3's feedback terms, which must match Python's term for term |
+| `node/src/query/rerank.mjs` | SR-RERANK | the Node twin of `src/fux/query/rerank.py` — the proximity reranker |
+| `node/src/refer/assemble.mjs` | SR-REFER | the Node twin of `src/fux/refer/_assemble.py` — the byte budget filled by score per byte |
+| `node/src/refer/rescore.mjs` | SR-REFER | the Node twin of `src/fux/refer/_rescore.py` — fetched passages re-scored with the same BM25F |
+| `node/src/refer/source.mjs` | SR-REFER | where a document's bytes come from. Twin of `src/fux/refer/source.py`, which SR-REFER owns; SR-URL-FRESHNESS's row covers only the `as-ingested` fallback |
+| `node/src/refer/chunk.mjs` | SR-CHUNKING | the Node twin of `src/fux/refer/_chunk.py` — passages from the document's own heading depth |
+| `node/src/store/format.mjs` | SR-INDEX-LIFECYCLE | the Node twin of `src/fux/store/format.py` — the wire format, decoded |
+| `node/src/store/reader.mjs` | SR-INDEX-LIFECYCLE | the Node twin of `src/fux/store/reader.py` |
+| `node/test/config.test.mjs` | SR-TUNE | `.fux/tune.toml` as the Node reader loads it — the header names it first |
+| `node/test/config.test.mjs` | SR-OUTPUT | `.fux/output.toml` as the Node reader loads it |
 <!-- DESCRIBES-TABLE-END -->
 

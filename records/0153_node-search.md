@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@3542a628b139, src/fux/store/nodebundle.py@071a24a596dd]
+owns: [node@e4d3e9e7818e, src/fux/store/nodebundle.py@071a24a596dd]
 laws: [L1, L3, L4, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 2876d215485f4eabc0eeebd926584b4c4ee08e04976448fc4cf41e37eacfb4c0
+content_sha: 14f035abbdda98ed000227457ab5ace4c982cdf22e16c85e5ae1ca200eb6e1bc
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -864,6 +864,16 @@ calls it, so the transcription is not dead code even though the attribution is
 unported. ⚠ **`fux serve` is Python-only for the same reason `fux observe` is**
 ([SR-SERVE](0158_serve.md)): it is a surface, not a reader, and the differential
 law reaches readers.
+
+**20. RM3 is transcribed, not diverged** (W-168 step 5, 2026-09-23).
+[`query/rm3.mjs`](../node/src/query/rm3.mjs) is `rm3.py`'s twin and
+`runQuery` runs it where `run_query` does: after the expansion is built, only
+when `rm3Weight > 0` and no `expand` was passed, with `lexical` forcing it off.
+🔴 **The RM1 sum runs in the Python twin's order** — documents in rank order,
+terms in ascending hash order — because the ten terms are picked by comparing
+floats, and a different summation order can pick a different tenth term.
+`tests/query/test_rm3.py` holds the two readers byte-equal through each one's
+own `tune.toml` loader.
 
 ### Consequences
 

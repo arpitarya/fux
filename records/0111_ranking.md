@@ -10,7 +10,7 @@ feature: scoring, ordering, and the analyzer they share with ingest
 owns: [src/fux/query/rank.py@63a9c36a1894, src/fux/query/bm25f.py@239de1ead880, src/fux/query/tokenize.py@1d8ff4a42048, src/fux/query/analyzer.py@38936c39de2a, src/fux/query/stem.py@728155482c94]
 laws: [L1, L3]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: d2f2cfbfbfaf59e14d848612c1a538ce996b3f32485fd7ef5f1de0fb14b0bbcd
+content_sha: f16b11823944f7fa5603ecd750844857f6c0bcbc74ec69abe8bedc1972207f61
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -25,7 +25,12 @@ content_sha: d2f2cfbfbfaf59e14d848612c1a538ce996b3f32485fd7ef5f1de0fb14b0bbcd
 
 **Describes** — reaches into, does not own:
 
+- [`node/src/query/analyzer.mjs`](../node/src/query/analyzer.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
+- [`node/src/query/bm25f.mjs`](../node/src/query/bm25f.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
 - [`node/src/query/rank.mjs`](../node/src/query/rank.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
+- [`node/src/query/stem.mjs`](../node/src/query/stem.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
+- [`node/src/query/tokenize.mjs`](../node/src/query/tokenize.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
+- [`node/test/analyzer.test.mjs`](../node/test/analyzer.test.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
 
 <!-- COMPONENTS-END -->
 

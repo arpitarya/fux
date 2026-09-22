@@ -64,6 +64,10 @@ at every step.
       "gates":{"reachable":int,"in_window":int,"placed":int,"answered":int,
                "cut_score":float},
       "rung":"<RUNG>","engine_commit":"..."}
+   This is the FLAT layout: evidence/handoff-set-N.jsonl, no rung directory.
+   `just golden-score` takes the rung from the run's PRE-REGISTRATION.md, so
+   put `rung: rung-NNNNN` in its frontmatter (W-218). A generation-2 set is
+   named by its full name — evidence/handoff-set-2-u.jsonl.
    gates is the five integers from --why and NOTHING else from the derivation;
    it is null as a whole when the arm was not asked. answer_text and citations
    are what FUX produced. There is no golden answer in this file and there never

@@ -7,6 +7,37 @@ filed: 2026-09-14
 ball: agent
 ---
 
+## ✅ STEP 5 BUILT 2026-09-23 (Claude Code) — off by default, arms not yet captured
+
+**No treatment number exists.** The mechanism is the frozen one, in both readers.
+
+- **Built:** [`query/rm3.py`](../../src/fux/query/rm3.py) and its twin
+  [`rm3.mjs`](../../node/src/query/rm3.mjs). Top 10 documents from an
+  un-expanded first pass, their committed records, 10 RM1 terms, scored through
+  `expand.build` at `[ranking] rm3_weight` (default **`0.0`**: no first pass).
+- **Decided in the build, declared** in [SR-EXPAND](../../records/0149_expand.md) decision 16:
+  1. a caller's `--expand` switches RM3 off;
+  2. `fux lexical` never runs it;
+  3. the first pass writes no stats;
+  4. ⚠ **the first pass is the LEXICAL ranking.** On `rung-01000` the tune has
+     `ask_boost = true`, so the feedback set is not always the list `ask`
+     prints. The pre-registration's *"exactly the `--top 10` list the harness
+     captures"* is its reason for `fbDocs = 10`, not a mechanism, and this
+     reading is flagged rather than assumed.
+- **Held:** `0.0` byte-identical (no first pass is asserted); scan == accelerator
+  at every arm value; Python == Node through each reader's own `tune.toml`
+  loader. `tests/query/test_rm3.py`.
+- **Records:** SR-EXPAND 16 (owns `rm3.py`) · SR-TUNE 18 · SR-CLI 12 ·
+  SR-NODE-SEARCH 20 · SR-ANSWER 15 · SR-CONFIDENCE 18.
+- **Next:** capture `rm3-0.0` and `rm3-0.1 … 0.5` at the build's commit, then
+  Arpit runs `just golden-score work/regression/2026-09-23-rm3`. Then a session
+  that did **not** run the arms runs
+  [`evidence/decide.py`](../regression/2026-09-23-rm3/evidence/decide.py), which
+  was frozen before any score existed.
+- **Step 9 cannot be pre-registered yet, for two reasons.** The proposal says
+  `#9` *"starts as a compare doc"*. And its doc-type half is a declaration per
+  source that the frozen ladder does not carry, so adding one changes a rung.
+
 ## ✅ STEP 5 PRE-REGISTERED 2026-09-23 (Claude Code) — pool 39, no stop; the build is next
 
 [The frozen bar](../regression/2026-09-23-rm3/PRE-REGISTRATION.md). **Nothing
@@ -28,7 +59,7 @@ is built and no treatment number exists.**
   losses, 8 wins give a discordant count of 8, and the bar at 8 is 8, so that
   clears. **Any pool ≥ 6 admits a verdict**, and 6 wins with zero losses is the
   real minimum. The rank-1 ruling stands on the 51 versus 8. Filed as
-  [W-219](W-219-min-fix-mislabel.md).
+  [W-219](../IMPLEMENTATION.md).
 - **Next:** build step 5 (**Opus**). Then capture both arms at one engine commit
   with `golden_run.py`. Then Arpit runs `score.py` on each.
 
@@ -36,7 +67,7 @@ is built and no treatment number exists.**
 
 *"Go with the recommendation. That is judge step five and nine at rank one. Six, seven, ten have their own measurements, so use that."*
 
-**Why he was asked.** `set-2-u`, scored 2026-09-23 on `rung-01000`: of 112 answerable questions, `hit@5` misses 18 and **10 of those are never retrieved at all**, so only **8** are reorderable — below `min_fix` ≈ 9. **At `hit@5` no reranking step can produce a verdict on this data.** At rank 1, **51** misses are already in the top 50.
+**Why he was asked.** `set-2-u`, scored 2026-09-23 on `rung-01000`: of 112 answerable questions, `hit@5` misses 18 and **10 of those are never retrieved at all**, so only **8** are reorderable. At rank 1, **51** misses are already in the top 50. ⚠ *Corrected 2026-09-23 ([W-219](../IMPLEMENTATION.md)): this said the 8 were "below `min_fix` ≈ 9", so no `hit@5` verdict was possible. That compared the 8 with the bar for all 18. With zero losses **6 wins clear**, so a `hit@5` verdict was very unlikely, not impossible. The ruling stands on 51 against 8.*
 
 | step | judged on | primary endpoint | note |
 |---|---|---|---|
@@ -47,7 +78,7 @@ is built and no treatment number exists.**
 | **10 · section units** | its own | **its own compare doc decides**, before any test | a plane change, its own major |
 
 - ⚠ **`hit@1` is the primary endpoint and `primary@1` the secondary, on my reading of *rank one*.** A pre-registration names one; this is the one it names unless he says otherwise.
-- 🔴 **The pool of 51 is across ALL answerable questions.** Each step acts only on its own kind — under-specified questions for 5, intent-labelled ones for 9 — so **each pre-registration first counts its own pool among the questions it tags**, and stops if that pool is below `min_fix`. **51 is the ceiling, not the promise.**
+- 🔴 **The pool of 51 is across ALL answerable questions.** Each step acts only on its own kind — under-specified questions for 5, intent-labelled ones for 9 — so **each pre-registration first counts its own pool among the questions it tags**, and stops if that pool is below `min_fix` (⚠ read: below 6, W-219). **51 is the ceiling, not the promise.**
 - 🔴 **The tags are set from the released question TEXT alone**, never from the key — [SR-WORK-TESTDATA](../../records/0068_WORK-test-data.md) T2, and `informed` whatever the result.
 - **Not a moved threshold.** No step had been pre-registered; each one's endpoint is being chosen before its first number, which is what [SR-RS](../../records/0133_predictions.md) d10b requires.
 - **Steps 1, 2 and 4** still need inputs the seed lacks — prompt 10 (W-215 items 2–4). **Step 3** is foreclosed; **step 8** needs a corpus with history (T11).
@@ -88,7 +119,8 @@ come from **generation 2**, not from W-204.
 per rung**, and [SR-RS](../../records/0133_predictions.md) d19's required net at
 those counts puts `min_fix` at **7–11**. **One step must fix 58–78 % of every
 remaining failure, with ZERO regressions, in all three sets, to produce a
-verdict at all.** W-205 part 2 family (a) came closest ever measured here —
+verdict at all.** ⚠ *Corrected 2026-09-23 (W-219): **26–86 %**. 6 wins with zero
+losses clear in every bucket; `min_fix` was the all-flip bar.* W-205 part 2 family (a) came closest ever measured here —
 `+1 / +3 / +4`, 0 regressions — and returned INCONCLUSIVE.
 
 | step | state as of 2026-09-22 |
