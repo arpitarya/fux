@@ -10,7 +10,7 @@ feature: the test-data checklist — what a seed document, a question set or a r
 owns: [tests/test_test_data_prompts.py@bd8b66eef82e]
 laws: [L0, L11]
 timestamp: 2026-09-22T00:00:00Z
-content_sha: d1d0494498f478ead1aff79df1f6607a2f3f398ae844d88aca2864f51ad629cb
+content_sha: a5c1d02f781839e0badbe8501d92b663bb36a3cd398beedc867db2dc624bec7e
 ratifies: "Arpit, 2026-09-22 — 'note it down that this is also one of the cases that need to be tested. So in future, the prompt or test data creation should account for this use case … create a work document which will just have pointers what all things test data creation should have … keep everything precise … I was talking about SR work document'"
 ---
 
@@ -18,7 +18,7 @@ ratifies: "Arpit, 2026-09-22 — 'note it down that this is also one of the case
 
 **Owns** — the components this record decides:
 
-- `tests/test_test_data_prompts.py` · file
+- [`tests/test_test_data_prompts.py`](../tests/test_test_data_prompts.py) · file
 
 <!-- COMPONENTS-END -->
 
