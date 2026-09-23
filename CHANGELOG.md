@@ -8,6 +8,29 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+## [3.0.0-alpha.4] - 2026-09-23
+
+**A CI release: nothing in the engine changed.** `3.0.0-alpha.3` shipped while
+`main`'s CI was red. This alpha is the first build in the 3.0 line whose push is
+green on every job.
+
+### Fixed
+
+- **CI is green on every matrix cell again.** The golden benchmark ladder
+  predated the 14 seed documents committed with alpha.3, so
+  `test_golden_ladder_seed` failed 8/8 on every OS and Python, and the node-arm
+  "golden ladder manifests" job failed too. All eight rungs are now rebuilt in
+  place on the 42-document seed and re-frozen
+  ([run](work/regression/2026-09-23-ladder-seed-36-rebuild/report.md)).
+
+### Changed
+
+- **Every GitHub action now runs on Node 24.** The actions were upgraded to their
+  first Node 24 major versions: `checkout` v5, `setup-python` v6, `setup-node`
+  v5, `upload-artifact` v6 and `download-artifact` v7. This silences the
+  Node 20 deprecation warning on every job. Artifacts are still downloaded by
+  name, and no npm cache is turned on.
+
 ## [3.0.0-alpha.3] - 2026-09-23
 
 ### Added
