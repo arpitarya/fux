@@ -1,8 +1,8 @@
 rung: rung-00200
 documents_indexed: 200
-archived_declared: 23
-archived_in_index: 23
-superseded_declared: 21
-superseded_in_index: 21
+archived_declared: 22
+archived_in_index: 22
+superseded_declared: 22
+superseded_in_index: 22
 carrying_mtime: 200
-categories: {"adjacent": 52, "filler": 34, "seed": 28, "sibling": 69, "variant": 17}
+categories: {"adjacent": 48, "filler": 31, "seed": 42, "sibling": 63, "variant": 16}

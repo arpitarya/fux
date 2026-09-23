@@ -1,8 +1,8 @@
 rung: rung-10000
 documents_indexed: 10000
-archived_declared: 1003
-archived_in_index: 1003
-superseded_declared: 1001
-superseded_in_index: 1001
+archived_declared: 1002
+archived_in_index: 1002
+superseded_declared: 1002
+superseded_in_index: 1002
 carrying_mtime: 10000
-categories: {"adjacent": 2992, "filler": 1994, "seed": 28, "sibling": 3989, "variant": 997}
+categories: {"adjacent": 2988, "filler": 1991, "seed": 42, "sibling": 3983, "variant": 996}
