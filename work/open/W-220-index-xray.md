@@ -1,0 +1,196 @@
+---
+type: OpenItem
+id: W-220
+title: "W-220 — the index X-ray: one engine, four zoom levels, judged by what a person types"
+description: "Arpit asked (2026-09-23) to see how one document is ingested and indexed, and then how that works for the whole index. Two design samples were built from real runs. They found that inspect's findable share reads 100 % while 21 of 120 title probes miss their own top 10, and that 526 of 1 672 documents share a title. The design extends SR-INSPECT and W-210's rungs 3–4. Partly ruled 2026-09-23: it lives in fux inspect, and data files are held to both bars. Two calls are still his. Not built."
+status: open
+lane: arpit
+timestamp: 2026-09-23T00:00:00Z
+filed: 2026-09-23
+ball: arpit
+---
+
+# W-220 — the index X-ray
+
+**Model: Opus** for the rulings' follow-through and SR-INSPECT's amendment (a new
+headline metric and a new cache); **Sonnet** for rungs 1, 3 and 4 once ruled.
+
+🔴 **Partly ruled 2026-09-23 — NOT built.** Nothing in `src/`, `node/` or `tests/`
+moved. Two calls are still Arpit's (§Still owed).
+
+## The ask
+
+- *"I want a view of a sample document, how that gets ingested, what all things
+  get indexed, how it gets indexed … how it would be useful for debugging and how
+  it can be used to improve the decoders as well as chunking."* (2026-09-23)
+- *"create a design how it is going to work for the whole index"* (2026-09-23)
+- Standing frame: the Google-style top-10 test (2026-09-22). A per-token dump was
+  rejected **as a front page** on W-210, so the top-10 view leads and the token
+  view is the drill-down.
+
+## What exists already, and what this adds
+
+| piece | state | this item |
+|---|---|---|
+| [SR-INSPECT](../../records/0156_inspect.md) — six lenses, three checks, a local dictionary | built | adds a facts pass, three lenses and a probe lens; reuses the dictionary |
+| W-210 rung 3 — `fux trace <doc> --html` | filed inside the closed W-210, not built, no open item | picked up here as the L3 drill-down |
+| W-210 rung 4 — `fux serve /docs` | same | picked up here as the L0–L2 view |
+| `inspect --diff` | nothing | new: corpus diff for any decoder, rules or analyzer bump |
+
+## The design, in one screen
+
+- **Three passes, each cached on its own key**
+  - **A · per-document facts:** decode → fields → analyze → chunk, using the
+    engine's own helpers (SR-INSPECT d5). Key = sha + decoder digest +
+    `RULES_VERSION` + analyzer + `[refer]` bounds. An unchanged document is never
+    recomputed.
+  - **B · corpus fold, at read time:** shared titles, segments by
+    decoder × folder × archived, plus inspect's six lenses. Nothing corpus-wide is
+    stored per document (the edges.py invariant).
+  - **C · probes:** one real `ask` per probe (the title by default). An evenly
+    spaced sample, labelled an estimate (SR-INSPECT d7), with `--all` to exhaust.
+    Key = index root hash + probe text.
+- **Four zoom levels:** L0 corpus (top-10 headline by class, no single score) →
+  L1 segments (decoder × folder report card) → L2 triage queue (one row per
+  document, worst first) → L3 document (the per-doc X-ray).
+- **Diff mode:** two `report.json` files → terms, edges, flen, passages,
+  identity and probe ranks per document. **Edge loss is always an alert.**
+- **Contract:** nothing committed (L2, L8) · no timestamp (L3, SR-INSPECT d14) ·
+  full counts beside capped lists (d13) · levers named, none applied (d12) · never
+  fetches (L4) · the walk honours `.fux/sources/dirs`, and any recursive walk
+  skips `work/golden/` (L11) · probe numbers are never claims about engine quality
+  (SR-RS, SR-WORK-ENVIRONMENTS) · nothing promised above 10 000 documents
+  (SR-WORK-SCALE).
+
+## What the samples found
+
+Descriptive only, not `blind` and not a golden run. Per-doc = one invented HTML
+runbook in a 6-doc scratch repo. Corpus = this repository's index, 1 672
+documents, `work/golden/` excluded.
+
+| # | finding | evidence | lever (a later item, measured on golden first) | record |
+|---|---|---|---|---|
+| 1 | **Self-retrieval can't see misses** | inspect `findable share` = 100 %. Title probes: 99/120 in own top 10, **21 miss** | probe lens replaces it as the headline (its floor is already dropped, d9a) | SR-INSPECT |
+| 2 | **Identity collisions** | **526 documents share 99 titles** (`predictions-set-1.jsonl` ×35 …). The json decoder titles 124 documents by their **first key** (`rows` ×22). json: 9 of 13 sampled miss | data decoders claim a path-derived title via META_FIELDS | SR-DECODE, SR-INGEST |
+| 3 | **jsonl cut mid-word** | 15 884 of 76 683 jsonl passages (21 %) cut between words; prose has 0 | jsonl emits one record per paragraph (the table-row rule) | SR-DECODE, SR-REFER |
+| 4 | **Page chrome indexed** | sample: 24/222 body tokens, and boilerplate queries return it (band `weak`). This repo: 3 documents | add `nav header aside footer` to html `_SKIP` | SR-DECODE |
+| 5 | **Link targets tokenised** | 2.7 % of prose body tokens. `md` on 1 429/1 672 docs | strip in `extract.py`, **not** the decoder: a decoder strip deleted all 3 edges | SR-EXTRACTED |
+| 6 | **Plural-acronym junk terms** | 4 020 tokens in 357 docs: `DCs`→`cs` ×2 040, `URLs`→`ur`/`ls` | analyzer v4 | own record |
+| 7 | **Section mislabel and chrome passages** | the sample's warning cited under §Thresholds. A nav-only passage is cited 3rd | decoder honours `<section>` depth; #4 fixes the rest | SR-REFER, SR-DECODE |
+| 8 | **Owner outranked via the graph** | "drain the retry queue": lexical #2 → #1 via graph over the owner | not a decoder lever | W-168 |
+
+Also from `fux inspect` on this repo: near-duplicate share 23.7 % (flagged
+*attention*), 638 of 1 071 graph nodes orphaned, json/jsonl/csv carry 0 edges.
+
+Cost, measured once on the bridge VM with another session active (orders of
+magnitude, not a benchmark):
+
+- pass A: 162 s cold for 1 672 documents
+- inspect: 35 s with a warm dictionary
+- pass C: ≈2.5 s per probe
+
+## Rulings
+
+**Ruled by Arpit, 2026-09-23:**
+
+- **Data files are held to BOTH bars.** *"both of them if it is about
+  inspecting it i want both the options."* Every data document (json, jsonl,
+  csv, toml, yaml) is reported against:
+  - **identifiable:** no other document shares its title.
+  - **reachable:** it's in the top 10 for its own probe, the same bar as prose.
+
+  The two are reported side by side and never averaged into one number.
+- **It lives inside `fux inspect`.** *"should all this live inside fux inspect
+  yes it should."* No new verb. SR-INSPECT d1 stands, and rungs 1, 2 and 4 are
+  inspect's.
+
+## 🔴 Still owed
+
+0. **Direction for the views:** build W-210 rungs 3–4 (`fux serve /docs`,
+   `fux trace <doc> --html`) on inspect's report? The data half is ruled by the
+   home ruling. The view half isn't.
+1. **Probe source by default:** title only, or title + headings? Headings cost
+   ≈7.8× per prose document. *Suggested: title, with `--headings` opt-in.*
+
+## Definition of done — per rung, after the rulings
+
+- **R1 · facts pass + decoder / chunk / identity lenses in `fux inspect`.**
+  - `report.json` gains the per-document rows and segment tables.
+  - The facts cache sits under `.fux/runtime/inspect/`.
+  - SR-INSPECT amended first.
+- **R2 · probe lens.**
+  - Sampled title probes, classed as question-bearing vs data.
+  - Data documents are reported on both bars: identifiable and reachable (ruled 2026-09-23).
+  - Replaces self-retrieval as the findability headline.
+  - SR-INSPECT amended.
+- **R3 · `fux serve /docs` + `fux trace <doc> --html`.**
+  - L0–L3 views that read the report and compute nothing.
+  - SR-SERVE decisions for rungs 3 and 4.
+- **R4 · `fux inspect --diff A B`.**
+  - Descriptive, with edge loss always an alert.
+  - The review artifact for any decoder `VERSION`, `RULES_VERSION` or analyzer
+    bump.
+- **Every rung:**
+  - both suites green
+  - WORKLOG, IMPLEMENTATION, OPEN-WORK and registry updated in the same change
+
+## In / out of scope
+
+- **In:** the four rungs above.
+- **Out:**
+  - Applying any lever. Findings 2–7 each become their own item, measured on
+    golden data first.
+  - W-210 rung 2 (`ask --html`).
+  - The Node reader (SR-INSPECT d16).
+  - A single index score (d11).
+
+## Key files
+
+- `src/fux/inspect/` — `__init__.py`, `_scan.py`, `lenses.py`, `checks.py`,
+  `dictionary.py`
+- `src/fux/serve/`
+- imported, not copied: `ingest/extract.py`, `ingest/parse.py`,
+  `refer/_chunk.py`, `decode/__init__.py`
+
+## Records to amend
+
+- **SR-INSPECT:** lenses, probe lens, facts cache, `--diff`
+- **SR-SERVE:** the `/docs` route and rung 3
+- **SR-CLI:** new flags
+- **SR-DOTFUX:** the runtime cache path. `.fux/runtime/trace/` is already
+  reserved.
+
+## Tests
+
+- Report byte-identical on an unchanged index.
+- No timestamp.
+- Full count beside every capped list.
+- A recursive walk never enters `work/golden/` (plant a file there and assert
+  it's absent).
+- The facts cache invalidates on a decoder `VERSION` or `RULES_VERSION` bump,
+  and only for the bound documents.
+- `--diff` flags edge loss: fixture = an html decoder that strips hrefs.
+- The probe sample is evenly spaced and labelled an estimate.
+- `git status` is clean after a run.
+
+## Hazards
+
+- **Probe cost:** full probing is an overnight job at 10 000 documents. The
+  sample is the default for that reason.
+- **Probe numbers are this corpus describing itself.** A quality claim still
+  needs fux-lab and the golden sets.
+- **Words on disk:** everything names words and titles, so it stays in
+  `.fux/runtime/`.
+- **Title probes favour documents whose title is also in their body.** Say so
+  on the page.
+
+## Evidence — runtime only, gitignored, never committed
+
+`.fux/runtime/trace/` on Arpit's machine:
+
+- `payment-retry.ingest-xray.html` — the per-doc design
+- `index-xray.design.html` — the whole-index design
+- the JSON captures beside them
+
+Like W-210's samples, **they are a design reference, not part of the repo**. The
+builder regenerates them from this spec.

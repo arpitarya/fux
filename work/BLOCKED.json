@@ -1,10 +1,10 @@
 {
  "decision": "ASK",
- "reason": "W-215 decision 1 is RULED (2026-09-23): W-168 steps 5 and 9 are judged at rank 1 (hit@1, primary@1 beside it), steps 6, 7 and 10 on their own measures — so W-168 is 🟢 and steps 5 and 9 can be pre-registered now. One call remains his: whether to run prompt 10, which authors the seed documents and set-3-u that W-168 steps 1, 2 and 4 need. set-2-u scored 84% at hit@5 with 10 of 18 misses never retrieved — the class those steps exist for.",
+ "reason": "W-215 decision 2 is answered: prompt 10 ran on 2026-09-23 (14 seed documents, set-3-u with 80 questions, the key kept by Arpit). The ladder rebuild is green, for a fresh Opus session. W-168 step 5 (RM3) was adjudicated from the frozen decide.py and came back INCONCLUSIVE: no weight clears the gain bar, and every weight breaks the drift bound (6-11 rank-1 hits lost). The table has no row for that, so the filing is his.",
  "questions": [
-  "W-215: run prompt 10 now (new seed documents + set-3-u, then a ladder rebuild), or hold it?"
+  "W-168 step 5: file RM3 as FAIL (drift broken at every weight, rm3_weight stays 0.0), or keep it INCONCLUSIVE?"
  ],
- "safe_alternative": "W-168 steps 5 (RM3) and 9 (intent prior) are 🟢: pre-register each at hit@1 on set-2-u, rung-01000, counting its own pool first. W-218 is 🟢 too.",
+ "safe_alternative": "W-215: a fresh Opus session runs prompt 4 (the ladder rebuild with the 14 new seeds). It must not be the session that wrote set-3-u.",
  "surfaced": true,
- "filed": "2026-09-22"
+ "filed": "2026-09-23"
 }

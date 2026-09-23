@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-22
 amended: 2026-09-15
 feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error contract, and per-source preference weights
-owns: [src/fux/tune.py@748f0a01ebbc, .fux/tune.toml@ba9885423d69]
+owns: [src/fux/tune.py@748f0a01ebbc, .fux/tune.toml@ba9885423d69, node/src/config/tune.mjs@6f600f26165e]
 laws: [L1, L3, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: b6593d803360abab90b8974d4b2c1d93ed9d76c20881548ba75e294e99db8f38
+content_sha: f8d84d8366bcc3d380a13457da06f0a7a4bc0240a857549b63fc87b7b4a798b9
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -19,12 +19,12 @@ content_sha: b6593d803360abab90b8974d4b2c1d93ed9d76c20881548ba75e294e99db8f38
 **Owns** — the components this record decides:
 
 - [`.fux/tune.toml`](../.fux/tune.toml) · file
+- [`node/src/config/tune.mjs`](../node/src/config/tune.mjs) · file
 - [`src/fux/tune.py`](../src/fux/tune.py) · file
 
 **Describes** — reaches into, does not own:
 
-- [`node/src/config/tune.mjs`](../node/src/config/tune.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
-- [`node/test/config.test.mjs`](../node/test/config.test.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
+- [`node/test/config.test.mjs`](../node/test/config.test.mjs) · owned by [SR-CONFIG](0113_config.md)
 - [`src/fux/query/rank.py`](../src/fux/query/rank.py) · owned by [SR-RANKING](0111_ranking.md)
 
 <!-- COMPONENTS-END -->

@@ -7,22 +7,19 @@ description: "A deliberately tiny config: what each key does, why the surface is
 status: accepted
 date: 2026-08-18
 feature: "`fux.toml` — discovery, schema, validation, and the keys that are refused rather than ignored"
-owns: [src/fux/config.py@e7ab20d676db]
+owns: [src/fux/config.py@e7ab20d676db, node/src/config/root.mjs@f33e16d005f7, node/test/config.test.mjs@5c1efeb0a8e8]
 laws: [L4, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 044f80f2cb55d0e31435be50ca8b7f01653c1584adbc9e5c03de9abdf5e79def
+content_sha: c5fc42375b49a2887810cd06abbfb7802cb0d3dc6576ccc0615ecb1726b9ef4f
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Owns** — the components this record decides:
 
+- [`node/src/config/root.mjs`](../node/src/config/root.mjs) · file
+- [`node/test/config.test.mjs`](../node/test/config.test.mjs) · file
 - [`src/fux/config.py`](../src/fux/config.py) · file
-
-**Describes** — reaches into, does not own:
-
-- [`node/src/config/root.mjs`](../node/src/config/root.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
-- [`node/test/config.test.mjs`](../node/test/config.test.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
 
 <!-- COMPONENTS-END -->
 

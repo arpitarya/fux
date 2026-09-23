@@ -7,10 +7,10 @@ description: "Decoding gets one home, one protocol, and a consumer seam where th
 status: accepted
 date: 2026-08-26
 feature: the decoder plane — the protocol, the registry, the consumer seam and the enrichment queue
-owns: [src/fux/decode@ed8784ea3bd4, src/fux/templates/agents/DECODER-SKILL.md@474a416bcc42, .fux/decoders@8bdc25ed8780]
+owns: [src/fux/decode@ed8784ea3bd4, src/fux/templates/agents/DECODER-SKILL.md@474a416bcc42, .fux/decoders@8bdc25ed8780, node/src/decode/markdown.mjs@cf8853e196d1, node/src/decode/registry.mjs@72645207f665]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-26T00:00:00Z
-content_sha: c8b53253dc21d511bfbdf6272681200dddf9874b50bc978f895ee99e28b681b4
+content_sha: 31a66148f0cd704e866a4411fc3321d10dea56a9fc787a497bcf4a990eb55d9b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -18,13 +18,10 @@ content_sha: c8b53253dc21d511bfbdf6272681200dddf9874b50bc978f895ee99e28b681b4
 **Owns** — the components this record decides:
 
 - [`.fux/decoders/`](../.fux/decoders) · dir
+- [`node/src/decode/markdown.mjs`](../node/src/decode/markdown.mjs) · file
+- [`node/src/decode/registry.mjs`](../node/src/decode/registry.mjs) · file
 - [`src/fux/decode/`](../src/fux/decode) · dir
 - [`src/fux/templates/agents/DECODER-SKILL.md`](../src/fux/templates/agents/DECODER-SKILL.md) · file
-
-**Describes** — reaches into, does not own:
-
-- [`node/src/decode/markdown.mjs`](../node/src/decode/markdown.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
-- [`node/src/decode/registry.mjs`](../node/src/decode/registry.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
 
 <!-- COMPONENTS-END -->
 

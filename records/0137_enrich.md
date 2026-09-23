@@ -7,25 +7,22 @@ description: "`fux enrich` plans and validates; a coding agent generates. Fux ne
 status: accepted
 date: 2026-08-23
 feature: document enrichment — the deterministic halves fux owns, and the generation it refuses to own
-owns: [src/fux/correct.py@825b9f26220b, src/fux/enrich.py@fffa68fe0f30, src/fux/templates/agents/ENRICH-SKILL.md@5c384af659f2]
+owns: [src/fux/correct.py@825b9f26220b, src/fux/enrich.py@fffa68fe0f30, src/fux/templates/agents/ENRICH-SKILL.md@5c384af659f2, node/src/correct.mjs@b7a9d36b309e, node/test/pins.test.mjs@daebcdb98aac]
 laws: [L1, L2, L3, L4]
 supersedes: SR-ENRICHED
 timestamp: 2026-08-23T00:00:00Z
-content_sha: 3f987b7b005a481f22e2adf4eac2808e6bc7e89898cb4add97a55bb27a19f430
+content_sha: 3a23f5ce65bf207258430e06532c4a5893f7e03351e0b81a566f6be30faf5466
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Owns** — the components this record decides:
 
+- [`node/src/correct.mjs`](../node/src/correct.mjs) · file
+- [`node/test/pins.test.mjs`](../node/test/pins.test.mjs) · file
 - [`src/fux/correct.py`](../src/fux/correct.py) · file
 - [`src/fux/enrich.py`](../src/fux/enrich.py) · file
 - [`src/fux/templates/agents/ENRICH-SKILL.md`](../src/fux/templates/agents/ENRICH-SKILL.md) · file
-
-**Describes** — reaches into, does not own:
-
-- [`node/src/correct.mjs`](../node/src/correct.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
-- [`node/test/pins.test.mjs`](../node/test/pins.test.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
 
 <!-- COMPONENTS-END -->
 

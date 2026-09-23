@@ -697,7 +697,53 @@ table does not grant.
 | `tools/quality/` | SR-WORK-QUALITY | the frozen quality contract — the declared query mix and the published cost of an error — **and `goldens.py`, the schema that keeps the rank contract and the relevance set apart** (decision 12). The mix and the cost are a **frozen instrument, not a harness**; `goldens.py` is the one executable thing here, and it exists because decision 12's rules are mechanical: an undeclared relevance list, or a `doc` outside its own relevance set, is refused rather than trusted |
 | `tools/vector-gate/` | SR-RS | W-106's instrument — does a **contextual** embedder fused by RRF reach DENSE-CHUNK's frozen bar, and **do two implementations of one model produce the same vector**. ⚠ Held here by **decision 10's fallback**, the `tools/t2-eval/` precedent: the record it belongs to (`SR-VECTORS`) **does not exist** — W-112 is blocked on this instrument's own result, and a proposal is not a valid owner. It moves to `SR-VECTORS` if and when that record is accepted |
 | `tools/t2-eval/` | SR-RS | a harness whose feature record was retired, held here by SR-RS decision 10's fallback. **A retired record cannot own anything, and a proposal is not a valid owner** |
-| `node/` | SR-NODE-SEARCH | the Node read plane — 47 `.mjs` files as AUTHORED, shipped as ONE bundled file (L10, decision 13); no `dependencies` key, and no build step **for the consumer**. **The only owned component outside `src/` and `tools/`**, so `test_sr_ownership.py::components()` does not demand it; the row is what makes the freshness gate demand this record when a `.mjs` file changes. `compat/` and `hash/` have no Python twin and are exempt by decision |
+| `node/` | SR-NODE-SEARCH | the Node read plane — 47 `.mjs` files as AUTHORED, shipped as ONE bundled file (L10, decision 13); no `dependencies` key, and no build step **for the consumer**. **The only owned component outside `src/` and `tools/`**, so `test_sr_ownership.py::components()` does not demand it; 🔴 **Since 2026-09-23 (Arpit) this row owns only what no other record does.** Every `.mjs` file with a Python twin is OWNED by the record that owns the twin, in the rows below — longest prefix wins — so a change to `config/tune.mjs` opens SR-TUNE, not this record. What stays here: `compat/`, `hash/` and `config/toml.mjs` (no Python twin, exempt by decision), `package.json` and the rest of the tree. This record is still re-read on every Node change, because the `node` hash in its `owns:` moves with any tracked file under it |
+| `node/fux.mjs` | SR-CLI | the Node CLI boundary — argument parsing, `--no-tune`, and the one place `FuxError` is rendered. Twin of `src/fux/cli.py` |
+| `node/src/config/output.mjs` | SR-OUTPUT | the Node twin of the rendering defaults — `[output]`'s closed key set and the emission gate |
+| `node/src/config/root.mjs` | SR-CONFIG | the Node twin of `find_root` in `src/fux/config.py` — the same two tells, in the same order |
+| `node/src/config/tune.mjs` | SR-TUNE | the reader half of `src/fux/tune.py` — defaults, the closed key set, the validators and the error collection. A key set that drifts here is a repository one reader refuses and the other accepts |
+| `node/src/correct.mjs` | SR-ENRICH | the Node side of `fux correct` — the marker, the pin and its suspension |
+| `node/src/decode/markdown.mjs` | SR-DECODE | the Node twin of `src/fux/decode/_markdown.py` — the one heading grammar ingest and the chunker share |
+| `node/src/decode/registry.mjs` | SR-DECODE | the Node decoder registry — which suffix resolves to which decoder, and the binding digest that invalidates a document when a decoder moves |
+| `node/src/errors.mjs` | SR-LAWS | the Node twin of `src/fux/errors.py` — the single flat `FuxError`, no subclass hierarchy |
+| `node/src/graph/community.mjs` | SR-GRAPH | the Node twin of `src/fux/graph/community.py` |
+| `node/src/graph/model.mjs` | SR-GRAPH | the Node twin of `src/fux/graph/model.py` |
+| `node/src/graph/plane.mjs` | SR-GRAPH | the Node twin of `src/fux/graph/plane.py` — rebuilt in memory rather than read from `graph.json` (SR-NODE-SEARCH decision 9) |
+| `node/src/graph/walk.mjs` | SR-GRAPH | the Node twin of `src/fux/graph/walk.py` |
+| `node/src/index.mjs` | SR-API | the Node twin of `from fux import open`, method for method. The register's own note on `src/fux/api.py` already says the two are one shape |
+| `node/src/ingest/gitdir.mjs` | SR-INGEST | the Node twin of `src/fux/ingest/gitdir.py` — the live `archived=true` read |
+| `node/src/ingest/priors.mjs` | SR-INGEST | the Node twin of `src/fux/ingest/priors.py` |
+| `node/src/ingest/sourcelist.mjs` | SR-URL-LIST | the Node twin of `src/fux/ingest/sourcelist.py` — `.fux/sources/dirs` read live |
+| `node/src/query/analyzer.mjs` | SR-RANKING | the Node twin of `src/fux/query/analyzer.py`. An identifier analyzed differently is a term one reader indexes and the other never finds |
+| `node/src/query/bm25f.mjs` | SR-RANKING | the Node twin of `src/fux/query/bm25f.py` — the scorer's field weighting |
+| `node/src/query/compose.mjs` | SR-ASK | the graph stage of `ask`. Twin of `src/fux/query/compose.py` |
+| `node/src/query/confidence.mjs` | SR-CONFIDENCE | the Node twin of `src/fux/query/confidence.py` — the band and `answerable` |
+| `node/src/query/expand.mjs` | SR-EXPAND | the Node twin of `src/fux/query/expand.py` |
+| `node/src/query/fuse.mjs` | SR-EXPAND | the Node twin of `src/fux/query/fuse.py` |
+| `node/src/query/headings.mjs` | SR-ASK | the Node twin of `src/fux/query/headings.py` — display only, never a score |
+| `node/src/query/rank.mjs` | SR-RANKING | the Node twin of the scorer. **The differential law is the whole point**: one scorer changing without the other is two engines answering differently from one index |
+| `node/src/query/rerank.mjs` | SR-RERANK | the Node twin of `src/fux/query/rerank.py` — the proximity reranker |
+| `node/src/query/rm3.mjs` | SR-EXPAND | the Node twin of `src/fux/query/rm3.py` — RM3's feedback terms, which must match Python's term for term |
+| `node/src/query/run.mjs` | SR-ASK | the shared spine of `ask`, `find` and `answer`. Twin of the pure half of `src/fux/query/__init__.py` |
+| `node/src/query/scan.mjs` | SR-ASK | the Node twin of `src/fux/query/scan.py` — the only candidate path Node has |
+| `node/src/query/stem.mjs` | SR-RANKING | the Node twin of `src/fux/query/stem.py` |
+| `node/src/query/tokenize.mjs` | SR-RANKING | the Node twin of `src/fux/query/tokenize.py` |
+| `node/src/refer/assemble.mjs` | SR-REFER | the Node twin of `src/fux/refer/_assemble.py` — the byte budget filled by score per byte |
+| `node/src/refer/chunk.mjs` | SR-CHUNKING | the Node twin of `src/fux/refer/_chunk.py` — passages from the document's own heading depth |
+| `node/src/refer/freshness.mjs` | SR-URL-FRESHNESS | the Node twin of the freshness verdicts — the same five words, computed the same way, or the two readers disagree about whether an answer is current. Owned by SR-NODE-SEARCH |
+| `node/src/refer/rescore.mjs` | SR-REFER | the Node twin of `src/fux/refer/_rescore.py` — fetched passages re-scored with the same BM25F |
+| `node/src/refer/source.mjs` | SR-REFER | where a document's bytes come from. Twin of `src/fux/refer/source.py`, which SR-REFER owns; SR-URL-FRESHNESS's row covers only the `as-ingested` fallback |
+| `node/src/store/format.mjs` | SR-INDEX-LIFECYCLE | the Node twin of `src/fux/store/format.py` — the wire format, decoded |
+| `node/src/store/reader.mjs` | SR-INDEX-LIFECYCLE | the Node twin of `src/fux/store/reader.py` |
+| `node/src/verbs/answer.mjs` | SR-ASK | `fux answer` on the Node reader. Twin of `src/fux/query/__init__.py`'s `answer` half |
+| `node/src/verbs/ask.mjs` | SR-ASK | `fux ask` (and `fux lexical`) on the Node reader. Twin of `src/fux/query/__init__.py`'s `ask` half |
+| `node/src/verbs/find.mjs` | SR-ASK | `fux find` on the Node reader. Twin of `src/fux/query/__init__.py`'s `find` half |
+| `node/src/verbs/graph.mjs` | SR-GRAPH | `explain` · `graph` · `path` on the Node reader. Twin of `src/fux/graph/__init__.py` |
+| `node/src/verbs/mcp.mjs` | SR-MCP | the Node twin of the MCP server — the same three tools, advertised the same way |
+| `node/test/analyzer.test.mjs` | SR-RANKING | the analyzer pinned to Python's output, identifier by identifier (W-202) |
+| `node/test/confidence.test.mjs` | SR-CONFIDENCE | the band and `answerable` pinned on the Node side, so the two readers cannot disagree about when to refuse |
+| `node/test/config.test.mjs` | SR-CONFIG | `fux.toml`'s schema as the Node reader loads it. Named by no record until 2026-09-21 |
+| `node/test/pins.test.mjs` | SR-ENRICH | the pin behaviour pinned. Named by no record until 2026-09-21 |
 
 | `tests/test_test_data_prompts.py` | SR-WORK-TESTDATA | the checklist's binding to the prompts — every prompt under `work/golden/prompts/` that creates test data links the record, every prompt file is classified authoring or not, and the `T`-items stay numbered without a gap. **A `kind: process` record owns its enforcement.** ⚠ It binds the **prompts**, never the data they produce — that is each run's own census |
 | `tests/test_doc_registry.py` | SR-WORK-REGISTRY | the registry's own rules as code — live documents only, one row per document, no row pointing into `archive/`, every target existing. **A `kind: process` record owns its enforcement**; this test had **no owner at all** until 2026-09-14, so no change to it could ever demand the rule it enforces. SR-WORK-DOCS held it 2026-09-14 → 2026-09-22; it moved to the record that states the rules the day those rules got one home |
@@ -776,7 +822,7 @@ unauditable, and an unauditable table stops being trusted.
 ⚠ **Seeded small and first-hand, and deliberately filled once.** It opened at
 **four** rows, each verified against a change actually made rather than a sweep
 guessing at intent, because a bulk fill would make the relation *look* enforced
-while asserting things nobody checked. It stands at **113** rows: the growth to
+while asserting things nobody checked. It stands at **67** rows: the growth to
 about thirty was row-by-row with the change that needed it, and the rest landed
 together on **2026-09-21** (W-208), when the nine `component` records that could
 not be opened at all were given the reach their subjects already had. **That
@@ -865,55 +911,9 @@ rows narrowed so far were each verified by reading every mention in the file
 | `src/fux/store/collisions.py` | SR-POSTINGS | the term-to-shard collision handling the postings layout rests on. Owned by SR-INDEX-LIFECYCLE |
 | `src/fux/ingest/gitdir.py` | SR-FUXIGNORE | `would_index`, `_generated_kind` and the verdicts a `.fuxignore` rule produces — the file where an ignore rule becomes a skip |
 | `src/fux/ingest/gitdir.py` | SR-TYPES | `read_types`, `TypeFilter`, `_default_types` — the types list applied to the walk. `ingest/typesfile.py` is the writer and is owned here; this is the reader |
-| `node/src/refer/freshness.mjs` | SR-URL-FRESHNESS | the Node twin of the freshness verdicts — the same five words, computed the same way, or the two readers disagree about whether an answer is current. Owned by SR-NODE-SEARCH |
 | `node/src/refer/source.mjs` | SR-URL-FRESHNESS | the Node twin of `from_acquired` and the `as-ingested` fallback |
-| `node/src/config/output.mjs` | SR-OUTPUT | the Node twin of the rendering defaults — `[output]`'s closed key set and the emission gate |
-| `node/src/query/rank.mjs` | SR-RANKING | the Node twin of the scorer. **The differential law is the whole point**: one scorer changing without the other is two engines answering differently from one index |
-| `node/src/verbs/mcp.mjs` | SR-MCP | the Node twin of the MCP server — the same three tools, advertised the same way |
 | `node/mcp-tools.json` | SR-MCP | the tool declarations both readers serve from |
-| `node/src/correct.mjs` | SR-ENRICH | the Node side of `fux correct` — the marker, the pin and its suspension |
-| `node/test/pins.test.mjs` | SR-ENRICH | the pin behaviour pinned. Named by no record until 2026-09-21 |
-| `node/src/decode/registry.mjs` | SR-DECODE | the Node decoder registry — which suffix resolves to which decoder, and the binding digest that invalidates a document when a decoder moves |
-| `node/src/index.mjs` | SR-API | the Node twin of `from fux import open`, method for method. The register's own note on `src/fux/api.py` already says the two are one shape |
-| `node/test/config.test.mjs` | SR-CONFIG | `fux.toml`'s schema as the Node reader loads it. Named by no record until 2026-09-21 |
 | `node/dist/fux.mjs` | SR-WORK-RELEASE | the ONE bundled file a consumer is served ([L10](0011_LAW-10-bundled-output.md)), built at publish. ⚠ **Named, never owned, and GITIGNORED** — it is build output, so the gate can never fire on it and the generated Components block renders it without a link. The row exists so the record that decides how a release reaches npm names the artefact that goes there |
-| `node/fux.mjs` | SR-CLI | the Node CLI boundary — argument parsing, `--no-tune`, and the one place `FuxError` is rendered. Twin of `src/fux/cli.py` |
-| `node/src/config/root.mjs` | SR-CONFIG | the Node twin of `find_root` in `src/fux/config.py` — the same two tells, in the same order |
-| `node/src/config/tune.mjs` | SR-TUNE | the reader half of `src/fux/tune.py` — defaults, the closed key set, the validators and the error collection. A key set that drifts here is a repository one reader refuses and the other accepts |
-| `node/src/decode/markdown.mjs` | SR-DECODE | the Node twin of `src/fux/decode/_markdown.py` — the one heading grammar ingest and the chunker share |
-| `node/src/errors.mjs` | SR-LAWS | the Node twin of `src/fux/errors.py` — the single flat `FuxError`, no subclass hierarchy |
-| `node/src/graph/community.mjs` | SR-GRAPH | the Node twin of `src/fux/graph/community.py` |
-| `node/src/graph/model.mjs` | SR-GRAPH | the Node twin of `src/fux/graph/model.py` |
-| `node/src/graph/plane.mjs` | SR-GRAPH | the Node twin of `src/fux/graph/plane.py` — rebuilt in memory rather than read from `graph.json` (SR-NODE-SEARCH decision 9) |
-| `node/src/graph/walk.mjs` | SR-GRAPH | the Node twin of `src/fux/graph/walk.py` |
-| `node/src/verbs/graph.mjs` | SR-GRAPH | `explain` · `graph` · `path` on the Node reader. Twin of `src/fux/graph/__init__.py` |
-| `node/src/ingest/gitdir.mjs` | SR-INGEST | the Node twin of `src/fux/ingest/gitdir.py` — the live `archived=true` read |
-| `node/src/ingest/priors.mjs` | SR-INGEST | the Node twin of `src/fux/ingest/priors.py` |
-| `node/src/ingest/sourcelist.mjs` | SR-URL-LIST | the Node twin of `src/fux/ingest/sourcelist.py` — `.fux/sources/dirs` read live |
-| `node/src/query/analyzer.mjs` | SR-RANKING | the Node twin of `src/fux/query/analyzer.py`. An identifier analyzed differently is a term one reader indexes and the other never finds |
-| `node/src/query/bm25f.mjs` | SR-RANKING | the Node twin of `src/fux/query/bm25f.py` — the scorer's field weighting |
-| `node/src/query/stem.mjs` | SR-RANKING | the Node twin of `src/fux/query/stem.py` |
-| `node/src/query/tokenize.mjs` | SR-RANKING | the Node twin of `src/fux/query/tokenize.py` |
-| `node/test/analyzer.test.mjs` | SR-RANKING | the analyzer pinned to Python's output, identifier by identifier (W-202) |
-| `node/src/query/compose.mjs` | SR-ASK | the graph stage of `ask`. Twin of `src/fux/query/compose.py` |
-| `node/src/query/headings.mjs` | SR-ASK | the Node twin of `src/fux/query/headings.py` — display only, never a score |
-| `node/src/query/run.mjs` | SR-ASK | the shared spine of `ask`, `find` and `answer`. Twin of the pure half of `src/fux/query/__init__.py` |
-| `node/src/query/scan.mjs` | SR-ASK | the Node twin of `src/fux/query/scan.py` — the only candidate path Node has |
-| `node/src/verbs/answer.mjs` | SR-ASK | `fux answer` on the Node reader. Twin of `src/fux/query/__init__.py`'s `answer` half |
-| `node/src/verbs/ask.mjs` | SR-ASK | `fux ask` (and `fux lexical`) on the Node reader. Twin of `src/fux/query/__init__.py`'s `ask` half |
-| `node/src/verbs/find.mjs` | SR-ASK | `fux find` on the Node reader. Twin of `src/fux/query/__init__.py`'s `find` half |
-| `node/src/query/confidence.mjs` | SR-CONFIDENCE | the Node twin of `src/fux/query/confidence.py` — the band and `answerable` |
-| `node/test/confidence.test.mjs` | SR-CONFIDENCE | the band and `answerable` pinned on the Node side, so the two readers cannot disagree about when to refuse |
-| `node/src/query/expand.mjs` | SR-EXPAND | the Node twin of `src/fux/query/expand.py` |
-| `node/src/query/fuse.mjs` | SR-EXPAND | the Node twin of `src/fux/query/fuse.py` |
-| `node/src/query/rm3.mjs` | SR-EXPAND | the Node twin of `src/fux/query/rm3.py` — RM3's feedback terms, which must match Python's term for term |
-| `node/src/query/rerank.mjs` | SR-RERANK | the Node twin of `src/fux/query/rerank.py` — the proximity reranker |
-| `node/src/refer/assemble.mjs` | SR-REFER | the Node twin of `src/fux/refer/_assemble.py` — the byte budget filled by score per byte |
-| `node/src/refer/rescore.mjs` | SR-REFER | the Node twin of `src/fux/refer/_rescore.py` — fetched passages re-scored with the same BM25F |
-| `node/src/refer/source.mjs` | SR-REFER | where a document's bytes come from. Twin of `src/fux/refer/source.py`, which SR-REFER owns; SR-URL-FRESHNESS's row covers only the `as-ingested` fallback |
-| `node/src/refer/chunk.mjs` | SR-CHUNKING | the Node twin of `src/fux/refer/_chunk.py` — passages from the document's own heading depth |
-| `node/src/store/format.mjs` | SR-INDEX-LIFECYCLE | the Node twin of `src/fux/store/format.py` — the wire format, decoded |
-| `node/src/store/reader.mjs` | SR-INDEX-LIFECYCLE | the Node twin of `src/fux/store/reader.py` |
 | `node/test/config.test.mjs` | SR-TUNE | `.fux/tune.toml` as the Node reader loads it — the header names it first |
 | `node/test/config.test.mjs` | SR-OUTPUT | `.fux/output.toml` as the Node reader loads it |
 <!-- DESCRIBES-TABLE-END -->

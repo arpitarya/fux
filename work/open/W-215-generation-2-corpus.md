@@ -4,13 +4,34 @@ id: W-215
 title: "W-215 — generation 2 of the golden data, authored against a measured specification, because it is the single blocker standing in front of eight W-168 steps"
 description: "Measured 2026-09-22: the pool any ranking change can win is 7-23 answerable questions per set per rung, so SR-RS d19 requires one step to fix 58-78% of every remaining failure with zero regressions. Four W-168 steps are additionally blocked on inputs the seed does not contain. Extending the seed rebuilds the frozen ladder that every filed run references, and authoring a sealed generation is L11's carve-out — both are Arpit's."
 status: open
-lane: arpit
+lane: agent
 timestamp: 2026-09-22T00:00:00Z
 filed: 2026-09-22
-ball: arpit
+ball: agent
 ---
 
 # W-215 — one corpus deliverable in front of eight engineering steps
+
+## ✅ DECISION 2 RULED BY RUNNING IT, 2026-09-23 — prompt 10 ran; the ladder rebuild is next
+
+Arpit ran [prompt 10](../golden/prompts/10-claude-feature-input-seed.md) in its
+designated chat and handed blocks 1–3 to a Claude Code session, which wrote them
+verbatim:
+
+- **14 seed documents**, `work/golden/seed/23-…` to `36-…` (mapping studies
+  TMS-41…44, lane records LQ-51…53, the pink card, green binder, Sunday sheet,
+  glossary, training plan, July bulletin, Q1 drill report).
+- **14 `seed-dates.tsv` rows.**
+- **`work/golden/questions/set-3-u.jsonl`** — 80 rows, `s3u-001…080`, `id` and
+  `question` only. **Block 4, the key, is Arpit's** and reached no session.
+
+🟢 **Next: rebuild the ladder — [prompt 4](../golden/prompts/4-claude-corpus.md),
+Opus, in a FRESH session.** ⚠ Not the session that wrote the files: it read
+every `set-3-u` question, and prompt 4 makes a rung built by such a session
+`informed` for good — which would cost set 1, the only clean arm. The rebuild
+appends the new seeds to every rung's git history (corpora are kept, never
+wiped), so the old index roots stay reachable at their commits. Then W-168
+steps 1, 2 and 4 get their inputs.
 
 **Model: Opus** for the specification; the seed documents themselves are
 ordinary authorship. **Nothing starts before he rules** — see §Why this is his.

@@ -8,24 +8,21 @@ status: accepted
 amended: 2026-09-15
 date: 2026-08-18
 feature: the `fux ingest` pipeline — sources to committed records
-owns: [src/fux/ingest/ingestlog.py@73e117c1e919, src/fux/ingest@50423856e72d, src/fux/ingest/priors.py@8ffcc632a4be]
+owns: [src/fux/ingest/ingestlog.py@73e117c1e919, src/fux/ingest@50423856e72d, src/fux/ingest/priors.py@8ffcc632a4be, node/src/ingest/gitdir.mjs@eb45c1672eac, node/src/ingest/priors.mjs@11df69775da1]
 laws: [L2, L3, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: a72f14a2440e8a2eafe3f61d270c26531dddda36143272d4e64f13df5da94f3b
+content_sha: ee4ef5dfe4d2a0546af587088c30c1c636898cb429fbc39c3d01d84918a0e39a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Owns** — the components this record decides:
 
+- [`node/src/ingest/gitdir.mjs`](../node/src/ingest/gitdir.mjs) · file
+- [`node/src/ingest/priors.mjs`](../node/src/ingest/priors.mjs) · file
 - [`src/fux/ingest/`](../src/fux/ingest) · dir
 - [`src/fux/ingest/ingestlog.py`](../src/fux/ingest/ingestlog.py) · file
 - [`src/fux/ingest/priors.py`](../src/fux/ingest/priors.py) · file
-
-**Describes** — reaches into, does not own:
-
-- [`node/src/ingest/gitdir.mjs`](../node/src/ingest/gitdir.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
-- [`node/src/ingest/priors.mjs`](../node/src/ingest/priors.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
 
 <!-- COMPONENTS-END -->
 

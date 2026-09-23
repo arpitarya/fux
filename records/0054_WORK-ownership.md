@@ -13,7 +13,7 @@ owns: [scripts/sr-guard.sh@78168609634b, scripts/sr-hash.py@89a61ddfaa5c, script
 laws: [0]
 ratifies: W-82 ruling 4
 timestamp: 2026-08-27T00:00:00Z
-content_sha: e6f3c09a6245efc0e865050cec82aecda5381a92205b1286dd6d63c3805e6f7b
+content_sha: 20a1350eace2da02c056c6a49f5b4c337727c5e8b14070824a0cf36d8fc43d83
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -488,7 +488,7 @@ top-level definitions.
   relation look enforced while asserting things nobody checked** — which is why
   the one bulk fill it has had, W-208's on 2026-09-21, was **audited**: every
   row names the file or the symbols it means and states why, and each narrowed
-  row was read against its file. The table is 113 rows. ⚠ **The warning stands
+  row was read against its file. The table is 67 rows — 46 Node rows moved to ownership on 2026-09-23 (Arpit). ⚠ **The warning stands
   and the fill did not repeal it**: the next sweep is owed the same audit, and a
   row nobody can justify is a row to delete.
 

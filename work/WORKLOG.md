@@ -29,11 +29,30 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-23 — prompt 10's output filed; RM3 adjudicated INCONCLUSIVE; queue reconciled  ·  Claude Code
+- **Asked:** put prompt 10's pasted blocks 1–3 into their files; review OPEN-WORK against the commands Arpit had run; fix it and implement what is green.
+- **Did:** wrote 14 seed documents (`seed/23…36`), 14 `seed-dates.tsv` rows and `questions/set-3-u.jsonl` (80 rows, id + question only). No key was in the paste. Ran the frozen `evidence/decide.py` for W-168 step 5, as a session that did not capture the arms, and filed `VERDICT.md`, `decision.json` and `per-query.jsonl`. Reconciled OPEN-WORK, the W-168 and W-215 detail files, BLOCKED.json and NOW. Another session edited the queue concurrently until 01:07 and had already moved W-168 to green. This change builds on its edit.
+- **Decided / open:** RM3 is **INCONCLUSIVE by the table**: nets −1/−1/+3/+2 against 7–10 needed, drift losses 6/8/8/11, `hit@10` 102 → 89–94. 🔴 Arpit decides between FAIL and INCONCLUSIVE. W-215 is 🟢. The ladder rebuild was **deliberately not run here**, because this session read `set-3-u`, and prompt 4 would make the rung `informed`, costing set 1's clean arm.
+- **Next:** a fresh Opus session runs prompt 4 (the W-215 ladder rebuild).
+
+## 2026-09-23 — W-220 PARTLY RULED: it lives in `fux inspect`; data files get both bars  ·  Cowork
+- **Asked:** what probes are, and two rulings: *"i want both the options"* for data files, and *"should all this live inside fux inspect yes it should."*
+- **Did:** W-220 gained §Rulings (quoted, dated), and the R2 definition of done now names both bars. The OPEN-WORK inbox row and list row were updated.
+- **Decided / open:** **ruled:** data documents are reported on identifiable AND reachable, side by side, never averaged; the home is `fux inspect`, no new verb. **Open:** whether the serve/trace views build on it, and titles-only vs titles + headings probes.
+- **Next:** Arpit's two remaining calls on W-220.
+
+## 2026-09-23 — W-220 FILED: the index X-ray, per document and whole index — proposed, not built  ·  Cowork
+- **Asked:** a view of how one sample HTML document is ingested and indexed, useful for debugging decoders and chunking; then *"create a design how it is going to work for the whole index"*; then *"create a work document"*.
+- **Did:** two design samples built from real runs, under `.fux/runtime/trace/`, gitignored and never committed. (1) One invented runbook in a 6-doc scratch repo: its recomputed record matched the committed one exactly. (2) This repo's 1 672-doc index: a per-doc facts pass, `fux inspect --json` and 120 title probes, read-only, with `work/golden/` excluded. Filed **W-220** with its inbox row. No `src/`, `node/` or `tests/` change.
+- **Decided / open:** inspect's `findable share` reads 100 % while **21 of 120** title probes miss their own top 10. **526 documents share 99 titles.** jsonl passages are 21 % word-cut. A decoder-level href strip deleted all 3 edges, so diff mode must alert on edge loss. Four rulings are owed: the direction, the probe source, the bar for data files, and the home.
+- **Next:** Arpit rules on W-220's four questions; then rung 1 is a Sonnet build, with SR-INSPECT amended first.
+
 ## 2026-09-23 — W-218 and W-219 CLOSED; W-168 step 5 (RM3) BUILT, off by default  ·  Claude Code
 - **Asked:** *"implement W-218, W-168, W-219 and keep implementing till closure."*
 - **Did:** **W-219** — `ranking_headroom.py` now prints `net_if_all_flip` and `min_wins`; SR-RS d24e amended first; dated correction notes elsewhere, numbers untouched. **W-218** — `score.py --set 2-u`; new key-free `tools/golden-score/handoffs.py` finds the flat layout; tests on synthetic data. **W-168 step 5** — `query/rm3.py` + `rm3.mjs` behind `[ranking] rm3_weight = 0.0`; `0.0` runs no first pass; scan == accelerator == Node; six records amended; `decide.py` frozen before any score. Committed the previous session's staged pre-registration first (`d9bd57a6`) so the bar precedes the build.
 - **Decided / open:** four build decisions declared in SR-EXPAND 16. ⚠ **The first pass is the lexical ranking**, and on `rung-01000` (`ask_boost = true`) that is not always the list `ask` prints; flagged, not assumed. **Step 9 not pre-registered:** the proposal says it starts as a compare doc, and its doc-type declaration would change a frozen rung. W-215 is still Arpit's.
-- **Next:** capture `rm3-0.0 … 0.5` on `set-2-u` at the build commit; then Arpit scores.
+- **Then:** captured all five arms at `36c913c7` ([report](regression/2026-09-23-rm3/report.md)). Every copy has index root `17fe414e…`; a re-ingest wrote 0 shards. Rank 1 changes on 17/28/37/48 of 125. Not scored, not decided.
+- **Next:** Arpit scored the arms at 01:03 (five complete files). A session that did not run the arms runs `decide.py`. ⚠ This session's `36c913c7` stamped three `owns:` hashes before `handoffs.py`, `rm3.py` and `rm3.mjs` were tracked; SR-LAW-11 is restamped here, and SR-ASK and SR-NODE-SEARCH are left to the concurrent session that has both staged.
 
 ## 2026-09-23 — W-168 step 5 (RM3) PRE-REGISTERED at `hit@1`: pool 39, no stop  ·  Claude Code
 - **Asked:** pre-register step 5 per the 2026-09-23 ruling: `hit@1` primary, `primary@1` beside it, `set-2-u` at `rung-01000`; tag under-specified questions from text only, count the pool first, stop below `min_fix`. Don't run the scorer.

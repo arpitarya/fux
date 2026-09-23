@@ -7,22 +7,19 @@ description: One canonical encoder, sharded doc-major JSONL, write-if-different;
 status: accepted
 date: 2026-08-18
 feature: generation and update of the committed index, and the refusal that keeps its derived accelerator from diverging
-owns: [src/fux/store@dc3f310eba56]
+owns: [src/fux/store@dc3f310eba56, node/src/store/format.mjs@e3c48e545e1e, node/src/store/reader.mjs@f47fa69ecb2c]
 laws: [L1, L2, L3, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 5bba7e8d137691c176be1dfa991f6a04e6204a21e042e30337bf257fa53117f8
+content_sha: 0a7ddfbf428519dd6da13afa86b61de77b564d8ec92e338bf59af815c4915637
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Owns** — the components this record decides:
 
+- [`node/src/store/format.mjs`](../node/src/store/format.mjs) · file
+- [`node/src/store/reader.mjs`](../node/src/store/reader.mjs) · file
 - [`src/fux/store/`](../src/fux/store) · dir
-
-**Describes** — reaches into, does not own:
-
-- [`node/src/store/format.mjs`](../node/src/store/format.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
-- [`node/src/store/reader.mjs`](../node/src/store/reader.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
 
 <!-- COMPONENTS-END -->
 

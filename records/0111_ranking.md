@@ -7,30 +7,27 @@ description: BM25F over five fields, weight-then-saturate once, with one scorer 
 status: accepted
 date: 2026-08-18
 feature: scoring, ordering, and the analyzer they share with ingest
-owns: [src/fux/query/rank.py@63a9c36a1894, src/fux/query/bm25f.py@239de1ead880, src/fux/query/tokenize.py@1d8ff4a42048, src/fux/query/analyzer.py@38936c39de2a, src/fux/query/stem.py@728155482c94]
+owns: [src/fux/query/rank.py@63a9c36a1894, src/fux/query/bm25f.py@239de1ead880, src/fux/query/tokenize.py@1d8ff4a42048, src/fux/query/analyzer.py@38936c39de2a, src/fux/query/stem.py@728155482c94, node/src/query/analyzer.mjs@cee5e31828b2, node/src/query/bm25f.mjs@7db7ba31c7be, node/src/query/rank.mjs@ba0f2173a355, node/src/query/stem.mjs@85a3f29571a6, node/src/query/tokenize.mjs@38c8b15c5197, node/test/analyzer.test.mjs@2d0342e628a6]
 laws: [L1, L3]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: f16b11823944f7fa5603ecd750844857f6c0bcbc74ec69abe8bedc1972207f61
+content_sha: c31d68d97d84fe9939664f41b1c698e2e208c24704a310da63dd4f941837c3a5
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Owns** — the components this record decides:
 
+- [`node/src/query/analyzer.mjs`](../node/src/query/analyzer.mjs) · file
+- [`node/src/query/bm25f.mjs`](../node/src/query/bm25f.mjs) · file
+- [`node/src/query/rank.mjs`](../node/src/query/rank.mjs) · file
+- [`node/src/query/stem.mjs`](../node/src/query/stem.mjs) · file
+- [`node/src/query/tokenize.mjs`](../node/src/query/tokenize.mjs) · file
+- [`node/test/analyzer.test.mjs`](../node/test/analyzer.test.mjs) · file
 - [`src/fux/query/analyzer.py`](../src/fux/query/analyzer.py) · file
 - [`src/fux/query/bm25f.py`](../src/fux/query/bm25f.py) · file
 - [`src/fux/query/rank.py`](../src/fux/query/rank.py) · file
 - [`src/fux/query/stem.py`](../src/fux/query/stem.py) · file
 - [`src/fux/query/tokenize.py`](../src/fux/query/tokenize.py) · file
-
-**Describes** — reaches into, does not own:
-
-- [`node/src/query/analyzer.mjs`](../node/src/query/analyzer.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
-- [`node/src/query/bm25f.mjs`](../node/src/query/bm25f.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
-- [`node/src/query/rank.mjs`](../node/src/query/rank.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
-- [`node/src/query/stem.mjs`](../node/src/query/stem.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
-- [`node/src/query/tokenize.mjs`](../node/src/query/tokenize.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
-- [`node/test/analyzer.test.mjs`](../node/test/analyzer.test.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
 
 <!-- COMPONENTS-END -->
 

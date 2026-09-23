@@ -7,25 +7,22 @@ description: Flat verbs in seven groups, one error boundary, three output modes.
 status: accepted
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@3e9d9763b182, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@9876744812b5, src/fux/progress.py@925dccc045ce, tests_e2e@09050be78ad5]
+owns: [src/fux/cli.py@3e9d9763b182, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@9876744812b5, src/fux/progress.py@925dccc045ce, tests_e2e@09050be78ad5, node/fux.mjs@7b51a78ae216]
 laws: [L1, L4, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 7e418e01151203310469cae4a4dadf0bb792234d785c5b80b4a75f49d89f87db
+content_sha: 6b48b3bf15c4c29ba7544c3b0f3dae4e55b977628e589c11fb2f1da7a90502d9
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Owns** — the components this record decides:
 
+- [`node/fux.mjs`](../node/fux.mjs) · file
 - [`src/fux/__main__.py`](../src/fux/__main__.py) · file
 - [`src/fux/cli.py`](../src/fux/cli.py) · file
 - [`src/fux/progress.py`](../src/fux/progress.py) · file
 - [`src/fux/sources.py`](../src/fux/sources.py) · file
 - [`tests_e2e/`](../tests_e2e) · dir
-
-**Describes** — reaches into, does not own:
-
-- [`node/fux.mjs`](../node/fux.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
 
 <!-- COMPONENTS-END -->
 

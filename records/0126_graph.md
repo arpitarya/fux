@@ -7,26 +7,23 @@ description: "The ref/tag/code edges ingest already extracts become a queryable 
 status: accepted
 date: 2026-08-20
 feature: the graph lane — three relational verbs, a derived plane, and a lazy walk
-owns: [src/fux/graph@568321939097, tools/graph-bench@9c330ea14b42]
+owns: [src/fux/graph@568321939097, tools/graph-bench@9c330ea14b42, node/src/graph/community.mjs@f3ef6baa4855, node/src/graph/model.mjs@4f3e9b2f42c0, node/src/graph/plane.mjs@b3f9bf5bddd8, node/src/graph/walk.mjs@cc685c136223, node/src/verbs/graph.mjs@5c5960f9bc9a]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: b806dec5bd7e176640584c2c379accdad86ef56e8b6fc9e8655d588de5746f97
+content_sha: 389cad225f25da043c6fb557af81bcf7f5ebf9a29e4905dac51f3523a609a5f0
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Owns** — the components this record decides:
 
+- [`node/src/graph/community.mjs`](../node/src/graph/community.mjs) · file
+- [`node/src/graph/model.mjs`](../node/src/graph/model.mjs) · file
+- [`node/src/graph/plane.mjs`](../node/src/graph/plane.mjs) · file
+- [`node/src/graph/walk.mjs`](../node/src/graph/walk.mjs) · file
+- [`node/src/verbs/graph.mjs`](../node/src/verbs/graph.mjs) · file
 - [`src/fux/graph/`](../src/fux/graph) · dir
 - [`tools/graph-bench/`](../tools/graph-bench) · dir
-
-**Describes** — reaches into, does not own:
-
-- [`node/src/graph/community.mjs`](../node/src/graph/community.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
-- [`node/src/graph/model.mjs`](../node/src/graph/model.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
-- [`node/src/graph/plane.mjs`](../node/src/graph/plane.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
-- [`node/src/graph/walk.mjs`](../node/src/graph/walk.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
-- [`node/src/verbs/graph.mjs`](../node/src/verbs/graph.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
 
 <!-- COMPONENTS-END -->
 

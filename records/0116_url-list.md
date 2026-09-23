@@ -7,21 +7,18 @@ description: "One URL per line in a committed file, deduped and sorted by the lo
 status: accepted
 date: 2026-08-19
 feature: "`.fux/sources/urls` — the file format itself, and the one grammar both committed source lists are parsed by"
-owns: [src/fux/ingest/sourcelist.py@019a49b17232]
+owns: [src/fux/ingest/sourcelist.py@019a49b17232, node/src/ingest/sourcelist.mjs@96fa88451bf5]
 laws: [L2, L3, L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 546de7ba9aced1d4501eebf537d3691182de6bf5719b3f29a0feaa2fa35a856b
+content_sha: fe798daa7599916dfed8b829c5ab5512edb4901253fcf64bb8be3eee03091cbc
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Owns** — the components this record decides:
 
+- [`node/src/ingest/sourcelist.mjs`](../node/src/ingest/sourcelist.mjs) · file
 - [`src/fux/ingest/sourcelist.py`](../src/fux/ingest/sourcelist.py) · file
-
-**Describes** — reaches into, does not own:
-
-- [`node/src/ingest/sourcelist.mjs`](../node/src/ingest/sourcelist.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
 
 <!-- COMPONENTS-END -->
 

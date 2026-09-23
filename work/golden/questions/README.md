@@ -7,13 +7,14 @@ timestamp: 2026-09-15T00:00:00Z
 
 # `work/golden/questions/` — what a run is allowed to read
 
-**Two files, one per set.** Each is a run's input: one JSON object per line,
-`{"id", "question"}` and nothing else.
+**One file per live set.** Each is a run's input: one JSON object per line,
+`{"id", "question"}` and nothing else. The generation-1 sets retired to
+[`../retired/`](../retired/).
 
 | file | set | author | ids |
 |---|---|---|---|
-| `set-1.jsonl` | set 1 | Codex, [prompt 2](../prompts/2-codex-questions.md) | `s1-001…` |
-| `set-2.jsonl` | set 2 | Claude, [prompt 3](../prompts/3-claude-questions.md) | `s2-001…` |
+| `set-2-u.jsonl` | set 2-u | Claude | `s2u-001…` |
+| `set-3-u.jsonl` | set 3-u, 80 questions, against seeds 23–36 | Claude, [prompt 10](../prompts/10-claude-feature-input-seed.md) | `s3u-001…` |
 
 **Arpit commits these himself**, from block 1 of each authoring prompt's
 two-block handoff. Block 2 — the key — he keeps; **no agent writes either file's

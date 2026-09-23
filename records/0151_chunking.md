@@ -8,21 +8,18 @@ status: accepted
 amended: 2026-09-11
 date: 2026-09-06
 feature: chunking — the strategy vocabulary, the boundary ladder, and the retrieval/citation split
-owns: [src/fux/refer/_chunk.py@5226408009de]
+owns: [src/fux/refer/_chunk.py@5226408009de, node/src/refer/chunk.mjs@2161c942b35a]
 laws: [L1, L2, L3]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: 883525a36e8de560576cf8842442349482adf0ae35b338a60eba254e7136dd8b
+content_sha: 3b748a9a923746b5528ab91923b3348c6d1b00522b63d1d7d513028c8ad69d1b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Owns** — the components this record decides:
 
+- [`node/src/refer/chunk.mjs`](../node/src/refer/chunk.mjs) · file
 - [`src/fux/refer/_chunk.py`](../src/fux/refer/_chunk.py) · file
-
-**Describes** — reaches into, does not own:
-
-- [`node/src/refer/chunk.mjs`](../node/src/refer/chunk.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
 
 <!-- COMPONENTS-END -->
 

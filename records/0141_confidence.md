@@ -8,23 +8,23 @@ status: accepted
 date: 2026-08-27
 amended: 2026-09-22
 feature: the confidence plane
-owns: [src/fux/query/confidence.py@2cd8be58107d, tests/test_confidence_floor_off.py@f8e18c079a6e]
+owns: [src/fux/query/confidence.py@2cd8be58107d, tests/test_confidence_floor_off.py@f8e18c079a6e, node/src/query/confidence.mjs@9b42bd23035b, node/test/confidence.test.mjs@7977e76407e2]
 laws: [L1, L3, L4]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 58537bfe4cd2e17f06eae14cbde1bbacfb17fb3156e7f5a4778bdcc0dd870f32
+content_sha: cdf703e536d31b1ef0422296aa32afc5d0b5ab1b1999cc5e18e31e7d550a8f76
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Owns** — the components this record decides:
 
+- [`node/src/query/confidence.mjs`](../node/src/query/confidence.mjs) · file
+- [`node/test/confidence.test.mjs`](../node/test/confidence.test.mjs) · file
 - [`src/fux/query/confidence.py`](../src/fux/query/confidence.py) · file
 - [`tests/test_confidence_floor_off.py`](../tests/test_confidence_floor_off.py) · file
 
 **Describes** — reaches into, does not own:
 
-- [`node/src/query/confidence.mjs`](../node/src/query/confidence.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
-- [`node/test/confidence.test.mjs`](../node/test/confidence.test.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
 - [`src/fux/derive/accel.py`](../src/fux/derive/accel.py) · owned by [SR-T1-ACCELERATOR](0110_accelerator.md)
 - [`src/fux/query/__init__.py`](../src/fux/query/__init__.py) · owned by [SR-ASK](0103_ask.md)
 

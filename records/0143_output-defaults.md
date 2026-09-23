@@ -10,10 +10,10 @@ amended: 2026-08-28
 date: 2026-08-27
 ratified: 2026-08-27
 feature: configurable output defaults
-owns: [src/fux/output_config.py@8e8e57fade21, .fux/output.toml@3a5b84942f70]
+owns: [src/fux/output_config.py@8e8e57fade21, .fux/output.toml@3a5b84942f70, node/src/config/output.mjs@4f299752c596]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 522535bf5a178cc84be5c88f1a27f1553d5ce3d58e58dd6de73e15c2f6df15a6
+content_sha: a396a4dab20560ad327600f1ade366498518ee7b1ebef15e6d6ee15004388549
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -21,12 +21,12 @@ content_sha: 522535bf5a178cc84be5c88f1a27f1553d5ce3d58e58dd6de73e15c2f6df15a6
 **Owns** — the components this record decides:
 
 - [`.fux/output.toml`](../.fux/output.toml) · file
+- [`node/src/config/output.mjs`](../node/src/config/output.mjs) · file
 - [`src/fux/output_config.py`](../src/fux/output_config.py) · file
 
 **Describes** — reaches into, does not own:
 
-- [`node/src/config/output.mjs`](../node/src/config/output.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
-- [`node/test/config.test.mjs`](../node/test/config.test.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
+- [`node/test/config.test.mjs`](../node/test/config.test.mjs) · owned by [SR-CONFIG](0113_config.md)
 - [`src/fux/cli.py`](../src/fux/cli.py) · owned by [SR-CLI](0101_cli-surface.md)
 - [`src/fux/mcp.py`](../src/fux/mcp.py) · owned by [SR-MCP](0136_mcp.md)
 - [`src/fux/query/__init__.py::_gated,_print_index_answer,_print_refer_answer,_show_band,cmd_answer,cmd_ask,cmd_find`](../src/fux/query/__init__.py) · owned by [SR-ASK](0103_ask.md)

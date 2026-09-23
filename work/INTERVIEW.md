@@ -35,6 +35,13 @@ valuable judgement, but not the state of play.
 *Updated **2026-09-22** (Claude Code, Opus — the benchmark has a score).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
+### 🔴 W-220 — the index X-ray: home and data-file bars ruled, two calls left (2026-09-23, Cowork)
+
+- **What:** a per-document ingest X-ray and a whole-index design built on SR-INSPECT and W-210 rungs 3–4. The samples live in `.fux/runtime/trace/` and are never committed.
+- **Why it matters:** `fux inspect`'s findable share reads 100 % while title probes miss 21 of 120. The headline metric can't see misses.
+- **Ruled 2026-09-23:** it lives in `fux inspect`, and data files are held to both bars (identifiable and reachable).
+- **Next:** two calls are still Arpit's: whether the serve/trace views build on it, and the probe source. [W-220](open/W-220-index-xray.md)
+
 ### ✅ 2026-09-22 — THE GOLDEN BENCHMARK HAS A NUMBER, and the queue is three 🟢 rows
 
 **What a session arriving cold needs first:**

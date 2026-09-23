@@ -7,26 +7,23 @@ description: "`--expand` scores agent-supplied terms at a lower weight beside th
 status: accepted
 date: 2026-09-05
 feature: agent-side query expansion and multi-query fusion
-owns: [src/fux/query/expand.py@19b697b80e8c, src/fux/query/fuse.py@749673d52166, src/fux/query/rm3.py@dd68a14c26a1]
+owns: [src/fux/query/expand.py@19b697b80e8c, src/fux/query/fuse.py@749673d52166, src/fux/query/rm3.py@dd68a14c26a1, node/src/query/expand.mjs@403a0aa73adc, node/src/query/fuse.mjs@de8c87e1d265, node/src/query/rm3.mjs@4137e3b63203]
 laws: [3, 4, 8]
 ratifies: W-109
 timestamp: 2026-09-05T00:00:00Z
-content_sha: 5489920e29fd946016ac6420f326753237f6f9e063a42cad2fb8965bdce88395
+content_sha: 66211a65666f5a5b964ae9f5426ef35d0c062332e1ce9bd5875c279b2385a629
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Owns** — the components this record decides:
 
+- [`node/src/query/expand.mjs`](../node/src/query/expand.mjs) · file
+- [`node/src/query/fuse.mjs`](../node/src/query/fuse.mjs) · file
+- [`node/src/query/rm3.mjs`](../node/src/query/rm3.mjs) · file
 - [`src/fux/query/expand.py`](../src/fux/query/expand.py) · file
 - [`src/fux/query/fuse.py`](../src/fux/query/fuse.py) · file
-- `src/fux/query/rm3.py` · file
-
-**Describes** — reaches into, does not own:
-
-- [`node/src/query/expand.mjs`](../node/src/query/expand.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
-- [`node/src/query/fuse.mjs`](../node/src/query/fuse.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
-- `node/src/query/rm3.mjs` · owned by [SR-NODE-SEARCH](0153_node-search.md)
+- [`src/fux/query/rm3.py`](../src/fux/query/rm3.py) · file
 
 <!-- COMPONENTS-END -->
 

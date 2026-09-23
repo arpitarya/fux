@@ -7,21 +7,21 @@ description: "BM25F is a bag of words and cannot see where terms are. The rerank
 status: accepted
 date: 2026-08-24
 feature: proximity reranking over the refer plane's passages, and the refusal that bounds it
-owns: [src/fux/query/rerank.py@8b1cb07cd968]
+owns: [src/fux/query/rerank.py@8b1cb07cd968, node/src/query/rerank.mjs@02ad7272e078]
 laws: [L1, L3, L4]
 timestamp: 2026-08-24T00:00:00Z
-content_sha: c248de9d783a15826dad7e17cf33cb0c51d90a984abb9845ee79c57a97dd3f6e
+content_sha: f804a08f634c0df86c803b41c836c0309531bbc4b11412bb703ba49ed56ca0c6
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Owns** — the components this record decides:
 
+- [`node/src/query/rerank.mjs`](../node/src/query/rerank.mjs) · file
 - [`src/fux/query/rerank.py`](../src/fux/query/rerank.py) · file
 
 **Describes** — reaches into, does not own:
 
-- [`node/src/query/rerank.mjs`](../node/src/query/rerank.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
 - [`src/fux/refer/_rescore.py`](../src/fux/refer/_rescore.py) · owned by [SR-REFER](0127_refer-plane.md)
 
 <!-- COMPONENTS-END -->

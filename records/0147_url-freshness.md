@@ -7,22 +7,22 @@ description: "How fresh a url: citation is, said in six positions that never col
 status: accepted
 date: 2026-09-01
 feature: the freshness verdict vocabulary and the per-URL check interval
-owns: [src/fux/refer/freshness.py@c2205bbff313]
+owns: [src/fux/refer/freshness.py@c2205bbff313, node/src/refer/freshness.mjs@f44c2c09f8f9]
 laws: [L2, L3, L4]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 5da26df442d8d39e2cdfac40258c1024003f45a3deb7bfcd3aba098599cc0dd7
+content_sha: 0da55721420ba9e03b7ee7c14bb302e317a356453c4f682338a1c31951ec0625
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Owns** — the components this record decides:
 
+- [`node/src/refer/freshness.mjs`](../node/src/refer/freshness.mjs) · file
 - [`src/fux/refer/freshness.py`](../src/fux/refer/freshness.py) · file
 
 **Describes** — reaches into, does not own:
 
-- [`node/src/refer/freshness.mjs`](../node/src/refer/freshness.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
-- [`node/src/refer/source.mjs`](../node/src/refer/source.mjs) · owned by [SR-NODE-SEARCH](0153_node-search.md)
+- [`node/src/refer/source.mjs`](../node/src/refer/source.mjs) · owned by [SR-REFER](0127_refer-plane.md)
 - [`src/fux/config.py`](../src/fux/config.py) · owned by [SR-CONFIG](0113_config.md)
 - [`src/fux/ingest/sourcelist.py`](../src/fux/ingest/sourcelist.py) · owned by [SR-URL-LIST](0116_url-list.md)
 - [`src/fux/ingest/urlsrc.py`](../src/fux/ingest/urlsrc.py) · owned by [SR-FETCHER](0117_fetcher.md)

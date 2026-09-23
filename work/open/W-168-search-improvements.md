@@ -4,10 +4,26 @@ name: W-168
 description: "The ten ranking improvements of proposals/search-improvements-v3.md, promoted as one program with ten gated steps: anchor text, corpus-mined expansion, unstemmed identifier field, RM3, supersession-aware ranking, SDM proximity, MMR diversification, git authority prior, intent → doc-type prior, section-level units. Each step is its own golden question → pre-registration → build → measure → keep/remove; never two in one arm."
 item: W-168
 filed: 2026-09-14
-ball: agent
+ball: arpit
 ---
 
-## 🟢 STEP 5 ARMS CAPTURED AND SCORED 2026-09-23 — the verdict is a different session's
+## 🔴 STEP 5 ADJUDICATED 2026-09-23 — INCONCLUSIVE by the table; the filing is Arpit's
+
+[VERDICT](../regression/2026-09-23-rm3/VERDICT.md), written by a session that did
+not capture the arms, from the frozen `decide.py`.
+
+- **No arm clears the gain bar** on the 92 tagged questions (nets −1, −1, +3, +2
+  against 7–10 needed), and **every arm breaks the drift bound**: 6 / 8 / 8 / 11
+  baseline rank-1 hits lost. `hit@10` also falls 102 → 89–94.
+- The table names no row for *positive sub-floor net with drift broken*, so it
+  lands in INCONCLUSIVE → Arpit.
+- 🔴 **His call, minimal:** file RM3 as FAIL (drift at every weight) or keep it
+  INCONCLUSIVE. **Nothing in the engine changes either way** — `rm3_weight`
+  already defaults to `0.0`.
+- ⚠ ANALYSIS §1's reading (feedback = lexical first pass, not the graph-boosted
+  list) is still his to confirm; overturning it re-runs the arms.
+
+## ✅ STEP 5 ARMS CAPTURED AND SCORED 2026-09-23 — the verdict is a different session's
 
 [Report](../regression/2026-09-23-rm3/report.md) · [analysis](../regression/2026-09-23-rm3/ANALYSIS.md).
 Five arms at engine `36c913c7`, index root `17fe414e…` on every copy, and a

@@ -23,9 +23,10 @@ here. Read that record before changing anything below it.
 
 | what he decides | filed | age |
 |---|---|---|
-| 🔴 **W-215** — run prompt 10 or hold it? It writes the documents fux cannot find today (nicknames, short forms, look-alike IDs) plus a question set, and rebuilds the ladder. [detail](open/W-215-generation-2-corpus.md) | 2026-09-22 | 1d |
-| ↳ **blocks:** nothing else in the queue — the ranking steps prompt 10 would feed are tracked inside the ranking programme's own file. | | |
-| ↳ **item 1 scored 2026-09-23:** no room at the top 5, room at rank 1. **The rank question is ruled.** Still yours: run prompt 10, which adds the documents fux can't find today? | | |
+| 🔴 **W-168** — RM3 (step 5) came back INCONCLUSIVE by the frozen table: no weight wins, and every weight loses 6–11 rank-1 hits. File it as FAIL, or keep it INCONCLUSIVE? Nothing in the engine changes either way. [verdict](regression/2026-09-23-rm3/VERDICT.md) | 2026-09-23 | 0d |
+| ↳ **blocks:** nothing else in the queue — only closing step 5. | | |
+| 🔴 **W-220** — the index X-ray. **Ruled:** it lives in `fux inspect`; data files get both bars. Still yours: build the serve/trace views on it? Probe titles only, or titles + headings? [detail](open/W-220-index-xray.md) | 2026-09-23 | 0d |
+| ↳ **blocks:** nothing else in the queue — its four rungs and the findings' levers are tracked inside its own file. | | |
 
 ---
 
@@ -33,9 +34,11 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🔴 **W-215** · `arpit` — generation 2 of the golden data, six items. **Item 1 scored 2026-09-23**; one call left — run prompt 10? [detail](open/W-215-generation-2-corpus.md)
+- 🟢 **W-215** · `agent` — golden data gen 2. **Prompt 10 ran 2026-09-23** (14 seeds, `set-3-u`). Next: rebuild the ladder, prompt 4, Opus, **in a fresh session**. [detail](open/W-215-generation-2-corpus.md)
 
-- 🟢 **W-168** · `agent` — the ranking ideas. **Step 5 (RM3) built 2026-09-23**, off by default. **Next: capture its five arms**, then Arpit scores them. [detail](open/W-168-search-improvements.md)
+- 🔴 **W-168** · `arpit` — the ranking ideas. **Step 5 (RM3): INCONCLUSIVE 2026-09-23**; the filing is his (inbox). [detail](open/W-168-search-improvements.md)
+
+- 🔴 **W-220** · `arpit` — the index X-ray, per document and whole index. Home and data-file bars **ruled 2026-09-23**; not built. Waiting on two rulings. [detail](open/W-220-index-xray.md)
 
 
 ### testing
