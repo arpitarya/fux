@@ -29,6 +29,21 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-23 — CI fixed on every OS; 3.0.0-alpha.4 released  ·  Claude Code (Opus 5.5)
+
+- **Arpit asked me to fix CI/CD and keep releasing alphas.** alpha.3 had shipped
+  over a red `main`. That was my miss: I read older green runs as current.
+- **The ladder:** rebuilt in place by a fresh Opus subagent (`26c7e854`) and
+  filed as a surface capture.
+- **Two bugs the red ladder had hidden**, plus a third behind the first fix:
+  - macOS: `fux serve` stalled on `getfqdn` before it listened;
+  - Windows unit: a bare `D:\` ESM import;
+  - Windows e2e: the unflushed URL line.
+  All are fixed, and `ac238a64` is green on every cell.
+- **Actions moved to Node 24.** 🔴 **Two strikes became a gate:** `publish.yml`
+  now refuses to publish over red (SR-WORK-RELEASE d11a, and a LESSONS entry).
+- **Released `3.0.0-alpha.4`.** Its publish run was green, and so was the gate.
+
 ## 2026-09-23 — 3.0.0-alpha.3 released  ·  Claude Code (Opus 5.5)
 
 - **Arpit asked: commit, push, release.** Committed the prior session's staged work (prompt 10 seeds + `set-3-u`, RM3 verdict, W-220) as `53137262`; bumped four sites to `3.0.0-alpha.3`, re-stamped six records whose owns/content hashes had moved, pushed, cut the GitHub pre-release. PyPI, npm (`alpha`) and CI all green.

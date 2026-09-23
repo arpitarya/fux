@@ -26,6 +26,27 @@ Rules:
 
 ---
 
+## 2026-09-23 — **3.0.0-alpha.4 released: CI green on every OS, and publishing is now gated on it**
+
+**Shipped** (`3.0.0-alpha.4`, PyPI `3.0.0a4` and npm under `alpha`; `latest`
+stays `2.0.1`). Four fixes:
+- the golden ladder, rebuilt in place on the 42-document seed
+  ([run](regression/2026-09-23-ladder-seed-36-rebuild/report.md));
+- `fux serve` no longer does a reverse-DNS lookup between bind and listen, which
+  was the macOS e2e failure;
+- `fux serve` flushes its URL line, which was the Windows e2e failure;
+- the RM3 Node-parity test imports by `file://` URL, which was the Windows unit
+  failure.
+
+Every action moved to its first Node 24 major. 🔴 **New gate:** `publish.yml`
+refuses unless `ci.yml` and `node-arm.yml` completed green on the released
+commit ([SR-WORK-RELEASE](../records/0063_WORK-release.md) d11a). It passed on
+its first real run. Records touched: SR-WORK-RELEASE (d11a), SR-SERVE, SR-CLI,
+SR-LAWS, SR-MCP and SR-NODE-SEARCH. Every one except SR-WORK-RELEASE was
+re-stamped only.
+
+---
+
 ## 2026-09-23 — **3.0.0-alpha.3 released**
 
 **Shipped** (`3.0.0-alpha.3`, PyPI `3.0.0a3` **and** npm under `alpha`, with
