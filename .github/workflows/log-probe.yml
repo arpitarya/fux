@@ -42,13 +42,13 @@ jobs:
         node: ["20", "22"]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.11"
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: ${{ matrix.node }}
 
@@ -81,7 +81,7 @@ jobs:
           python "$E/compare.py" /tmp/self-scored.json /tmp/per-query.csv | tee -a /tmp/glibc-probe.txt
 
       - name: Upload — the artifact IS the evidence
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: log-probe-glibc-node${{ matrix.node }}
           path: |

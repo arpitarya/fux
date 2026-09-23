@@ -12,9 +12,9 @@ jobs:
       contents: read
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: pip
@@ -52,7 +52,7 @@ jobs:
         # a fifth copy (W-149 §3.7).
         run: python scripts/check-version-parity.py --with-bundle node/dist/fux.mjs
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: node-bundle
           path: node/dist/
@@ -66,7 +66,7 @@ jobs:
       - name: Validate distribution metadata
         run: twine check --strict dist/*
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: dist
           path: dist/
@@ -82,7 +82,7 @@ jobs:
       url: https://pypi.org/project/fux-engine/
 
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           name: dist
           path: dist/
@@ -106,15 +106,15 @@ jobs:
     # that npm's config does not name. Add both together or neither.
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: "22"
           registry-url: https://registry.npmjs.org
 
       - name: Take the bundle the build job made — never rebuild it here
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: node-bundle
           path: node/dist/
