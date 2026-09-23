@@ -292,8 +292,10 @@ def cmd_serve(args) -> int:
     """Start the explorer and block until Ctrl-C."""
     server = make_server(port=getattr(args, "port", DEFAULT_PORT) or DEFAULT_PORT)
     url = f"http://{HOST}:{server.server_address[1]}/"
-    print(f"fux serve — {url}")
-    print("the page renders `fux ask --json --why`; it computes nothing. Ctrl-C to stop.")
+    # Flushed: stdout is block-buffered when piped, and a process ended by
+    # TerminateProcess (Windows' SIGTERM) never flushes, so the URL was lost.
+    print(f"fux serve — {url}", flush=True)
+    print("the page renders `fux ask --json --why`; it computes nothing. Ctrl-C to stop.", flush=True)
     if getattr(args, "open", False):
         # In a thread, because a browser launcher can block for seconds and the
         # server should already be answering when the tab arrives.

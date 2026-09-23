@@ -28,6 +28,8 @@ ladder hid two real bugs, because the jobs stopped before reaching them: one in
   GitHub's macOS runners it stalled for more than 30 s, and `fux serve` never
   came up in the e2e suite. The server now names itself `127.0.0.1`, the only
   address it ever binds. The same stall could hit a laptop on a slow network.
+- **`fux serve` flushes its URL line.** When stdout was a pipe, the line sat in
+  the buffer, and on Windows a terminated server never printed it at all.
 - **The RM3 Node-parity test now runs on Windows.** It imported `run.mjs` by
   bare path, which Node's ESM loader rejects as `d:`. It now imports by
   `file://` URL, the form `test_node_bundle.py` already used.

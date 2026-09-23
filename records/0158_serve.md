@@ -7,10 +7,10 @@ description: "Arpit's framing, 2026-09-22 — fux is like Google: if the ten doc
 status: accepted
 date: 2026-09-22
 feature: the ask explorer — a local page over the real ask
-owns: [src/fux/serve@4d0996bb027e]
+owns: [src/fux/serve@6220760ee828]
 laws: [L1, L2, L4, L6, L8, L10]
 timestamp: 2026-09-22T00:00:00Z
-content_sha: 0af476193a352e3c99959ba87c1eb5785576008fa6fe812bd07010b7e7650625
+content_sha: a53133dc58fe26f9fc24ac1b7fa3d304595f44c61b49bd8ecaa398b356b68192
 ratifies: "Arpit, 2026-09-22 (Cowork, W-210) — three sample pages built on his machine, the per-token ingest X-ray REJECTED as a front page ('do you believe people will go through this big document?') and the question-first explorer ratified in its modern-dark form: 'the way I'm thinking about fux is something like Google. If a question gets asked, if you have the best 10 documents, the answer the agent gives is going to be mostly correct.'"
 ---
 
