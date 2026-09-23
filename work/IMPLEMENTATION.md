@@ -26,6 +26,22 @@ Rules:
 
 ---
 
+## 2026-09-23 — **3.0.0-alpha.3 released**
+
+**Shipped** (`3.0.0-alpha.3`, PyPI `3.0.0a3` **and** npm under `alpha`, with
+provenance; `latest` stays `2.0.1`). Carries `fux serve`, per-term `--why`,
+the `fux-serve` skill, and `[ranking] rm3_weight` at `0.0` — the CHANGELOG entry
+now says RM3 was measured INCONCLUSIVE rather than "unmeasured". No breaking
+change. Records touched: SR-LAWS, SR-CLI, SR-ASK, SR-MCP, SR-NODE-SEARCH,
+SR-WORK-REGISTRY — re-stamped only. ⚠ **Shipped with 8 red
+`test_golden_ladder_seed` rows**: the rungs predate prompt 10's 14 seeds, and
+the rebuild is W-215 prompt 4 for a fresh session; no shipped code is involved.
+Evidence: [`CHANGELOG.md`](../CHANGELOG.md) §3.0.0-alpha.3 ·
+[SR-WORK-RELEASE](../records/0063_WORK-release.md) · the publish run, three jobs
+green.
+
+---
+
 ## 2026-09-23 — **W-219 CLOSED: `min_fix` was the all-flip bar, and 6 clean wins clear any pool ≥ 6**
 
 **A mislabel, not a wrong verdict.** `ranking_headroom.py` printed

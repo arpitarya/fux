@@ -29,6 +29,12 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-23 — 3.0.0-alpha.3 released  ·  Claude Code (Opus 5.5)
+
+- **Arpit asked: commit, push, release.** Committed the prior session's staged work (prompt 10 seeds + `set-3-u`, RM3 verdict, W-220) as `53137262`; bumped four sites to `3.0.0-alpha.3`, re-stamped six records whose owns/content hashes had moved, pushed, cut the GitHub pre-release. PyPI, npm (`alpha`) and CI all green.
+- 🔴 **Released over 8 red `test_golden_ladder_seed` rows** — stale rungs vs the 14 new seeds; W-215 prompt 4 fixes them and must be a fresh session. Named in the commit and in IMPLEMENTATION.
+- Corrected the CHANGELOG's RM3 line from "unmeasured" to INCONCLUSIVE before it shipped. W-168 FAIL-vs-INCONCLUSIVE and W-220's two calls remain Arpit's.
+
 ## 2026-09-23 — prompt 10's output filed; RM3 adjudicated INCONCLUSIVE; queue reconciled  ·  Claude Code
 - **Asked:** put prompt 10's pasted blocks 1–3 into their files; review OPEN-WORK against the commands Arpit had run; fix it and implement what is green.
 - **Did:** wrote 14 seed documents (`seed/23…36`), 14 `seed-dates.tsv` rows and `questions/set-3-u.jsonl` (80 rows, id + question only). No key was in the paste. Ran the frozen `evidence/decide.py` for W-168 step 5, as a session that did not capture the arms, and filed `VERDICT.md`, `decision.json` and `per-query.jsonl`. Reconciled OPEN-WORK, the W-168 and W-215 detail files, BLOCKED.json and NOW. Another session edited the queue concurrently until 01:07 and had already moved W-168 to green. This change builds on its edit.
