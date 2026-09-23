@@ -21,6 +21,19 @@ record is the rule and this file is the anecdote that motivated it.
 
 ---
 
+## 2026-09-23 — a red job hides every failure behind it, so "known red" is never safe to release over
+
+`3.0.0-alpha.3` shipped while the only red on `main` was a stale golden ladder,
+named as "known red" in the release commit and treated as harmless. Rebuilding
+the ladder let the jobs run further, and that exposed **two real bugs that had
+been red all along**. On macOS, `fux serve` never came up: the stdlib's
+`server_bind` does a reverse-DNS lookup before it listens. On Windows, a test
+imported an ES module by bare `D:\` path. Neither shows on a Mac laptop. **A
+failing step ends its job, so everything after it is unmeasured, not green.**
+It was the second release published over red (after `3.0.0-alpha.2`), so
+`publish.yml` now refuses unless CI is green on the released commit
+([SR-WORK-RELEASE](../records/0063_WORK-release.md) d11a).
+
 ## 2026-09-22 — `sr-owns.py` reads `git ls-files`, so stamping BEFORE `git add` leaves a red test on the committed tree
 
 **The sequence, and it looks correct at every step.** Add a new file to an

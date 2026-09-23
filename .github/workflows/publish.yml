@@ -10,9 +10,31 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      actions: read   # to read CI's verdict on the commit being released
 
     steps:
       - uses: actions/checkout@v5
+
+      - name: CI must be green on the exact commit being released
+        # Two strikes, so a gate (SR-WORK-SESSION d13). 3.0.0-alpha.2 and
+        # 3.0.0-alpha.3 were both published while main's CI was red, because
+        # `main` has no required checks (SR-WORK-RELEASE d10). Nothing blocked
+        # it. Create the release AFTER both workflows finish green on the commit;
+        # while they are still running, this step refuses, and so does red.
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          fail=0
+          for wf in ci.yml node-arm.yml; do
+            got="$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/$wf/runs?head_sha=$GITHUB_SHA&event=push&branch=main&per_page=1" \
+                   -q '.workflow_runs[0] | "\(.status) \(.conclusion)"')"
+            echo "$wf on ${GITHUB_SHA::8}: ${got:-no run}"
+            [ "$got" = "completed success" ] || fail=1
+          done
+          if [ "$fail" = 1 ]; then
+            echo "✗ refusing to publish: CI is not green on ${GITHUB_SHA::8}. Wait for it, fix it, or re-run this job." >&2
+            exit 1
+          fi
 
       - uses: actions/setup-python@v6
         with:

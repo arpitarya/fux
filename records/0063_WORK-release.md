@@ -10,7 +10,7 @@ feature: how a release reaches two registries, how the version stays equal acros
 owns: [scripts/check-version-parity.py@2db5c69a9bcd, tests/test_version_parity.py@f45f30bf53ea]
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 4d41acbb15ef168b074a0b5c086436ca4fb8f091ada75ede066d8b9dbb304257
+content_sha: b2bfb7c7f3d0a1c41075103106d322078189b229b53ce9f6ef1ddfdf7767f5f5
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -189,6 +189,18 @@ rather than a string somebody might forget to edit.
 11. **So CI green is yours to check.** Read `gh pr checks <n>` yourself and **do
     not merge on red.** Nothing mechanical will stop you, which is the point of
     stating it.
+
+11a. **A release, unlike a merge, IS gated on CI** (2026-09-23). The publish
+    workflow's first step refuses unless `ci.yml` and `node-arm.yml` both
+    completed green on the exact commit being released, as a push to `main`.
+    **So create the GitHub release only after both finish.** Created earlier,
+    the gate fails, and re-running the job once CI is green publishes it. This
+    is two strikes made into a gate
+    ([SR-WORK-SESSION](0060_WORK-session.md) d13): `3.0.0-alpha.2` and
+    `3.0.0-alpha.3` were both published over a red `main`. The second time, the
+    red ladder hid a macOS `fux serve` bug and a Windows test bug until the
+    next push. ⚠ **The gate is `publish.yml`, and this sentence only names
+    it.** Decision 10 is unchanged: merges stay ungated.
 
 12. **A `kind: process` record owns its enforcement**, and this one owns the
     parity script and its test — **neither of which had an owner** until this

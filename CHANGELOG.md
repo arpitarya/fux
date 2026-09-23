@@ -10,9 +10,9 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [3.0.0-alpha.4] - 2026-09-23
 
-**A CI release: nothing in the engine changed.** `3.0.0-alpha.3` shipped while
-`main`'s CI was red. This alpha is the first build in the 3.0 line whose push is
-green on every job.
+**A fix release.** `3.0.0-alpha.3` shipped while `main`'s CI was red. The red
+ladder hid two real bugs, because the jobs stopped before reaching them: one in
+`fux serve` on macOS, and one in a test on Windows. This alpha fixes all three.
 
 ### Fixed
 
@@ -22,6 +22,15 @@ green on every job.
   "golden ladder manifests" job failed too. All eight rungs are now rebuilt in
   place on the 42-document seed and re-frozen
   ([run](work/regression/2026-09-23-ladder-seed-36-rebuild/report.md)).
+- **`fux serve` no longer waits on a reverse-DNS lookup before it listens.** The
+  stdlib's `HTTPServer.server_bind` calls `socket.getfqdn()` between binding and
+  listening, so while that lookup stalls, the port refuses every connection. On
+  GitHub's macOS runners it stalled for more than 30 s, and `fux serve` never
+  came up in the e2e suite. The server now names itself `127.0.0.1`, the only
+  address it ever binds. The same stall could hit a laptop on a slow network.
+- **The RM3 Node-parity test now runs on Windows.** It imported `run.mjs` by
+  bare path, which Node's ESM loader rejects as `d:`. It now imports by
+  `file://` URL, the form `test_node_bundle.py` already used.
 
 ### Changed
 

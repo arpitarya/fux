@@ -260,13 +260,32 @@ class _Handler(BaseHTTPRequestHandler):
         self._send(HTTPStatus.OK, json.dumps(payload).encode("utf-8") + b"\n", _JSON)
 
 
+class _Server(ThreadingHTTPServer):
+    """`ThreadingHTTPServer` without the reverse-DNS lookup in `server_bind`.
+
+    ⚠ The stdlib sets `server_name = socket.getfqdn(host)` **between bind and
+    listen**, so while that lookup stalls the port refuses every connection. On
+    GitHub's macOS runners it stalled past the e2e suite's 30 s start-up budget
+    (2026-09-23, `3.0.0-alpha.4`'s CI). The address is always `HOST`, so the name
+    is known without asking a resolver.
+    """
+
+    def server_bind(self) -> None:
+        import socketserver
+
+        socketserver.TCPServer.server_bind(self)
+        host, port = self.server_address[:2]
+        self.server_name = host
+        self.server_port = port
+
+
 def make_server(port: int = DEFAULT_PORT, host: str | None = None) -> ThreadingHTTPServer:
     """A bound server, not yet serving. Separated so a test can take the port.
 
     `port=0` asks the OS for a free one, which is what `tests/serve/` uses —
     a fixed port in a test suite is a flake waiting for a busy machine.
     """
-    return ThreadingHTTPServer((_bind_address(host), port), _Handler)
+    return _Server((_bind_address(host), port), _Handler)
 
 
 def cmd_serve(args) -> int:

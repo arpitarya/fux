@@ -85,7 +85,8 @@ def served(corpus):
             time.sleep(0.05)
     else:  # pragma: no cover - only on a machine that never came up
         proc.kill()
-        pytest.fail("fux serve never answered /health")
+        out, err = proc.communicate()
+        pytest.fail(f"fux serve never answered /health\nstdout: {out}\nstderr: {err}")
     try:
         yield base, proc
     finally:

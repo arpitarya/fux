@@ -167,7 +167,7 @@ def test_node_reader_ranks_byte_identically(built, weight):
     (built / ".fux" / "tune.toml").write_text(f"[ranking]\nrm3_weight = {weight}\n", encoding="utf-8")
     py = [[r.id, r.score] for r in run_query(built, "alpha", 10)[0]]
     script = (
-        f'import {{ runQuery }} from {json.dumps(str(ENGINE / "node/src/query/run.mjs"))};'
+        f'import {{ runQuery }} from {json.dumps((ENGINE / "node/src/query/run.mjs").as_uri())};'
         f'const out = runQuery({json.dumps(str(built))}, "alpha", 10);'
         'console.log(JSON.stringify(out.results.map((r) => [r.id, r.score])));'
     )
