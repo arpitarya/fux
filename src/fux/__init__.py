@@ -8,7 +8,7 @@ bind this — cost, determinism, network, content — are stated once each in
 `from fux import open` is the read API (SR-API); the CLI is `fux`.
 """
 
-__version__ = "3.0.0-alpha.2"
+__version__ = "3.0.0-alpha.3"
 
 from .api import open  # noqa: A004,E402  (SR-API — the frozen read surface)
 

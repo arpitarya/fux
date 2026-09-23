@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@e4d3e9e7818e, src/fux/store/nodebundle.py@071a24a596dd]
+owns: [node@ec8ef34150a6, src/fux/store/nodebundle.py@071a24a596dd]
 laws: [L1, L3, L4, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 14f035abbdda98ed000227457ab5ace4c982cdf22e16c85e5ae1ca200eb6e1bc
+content_sha: 1bfe28045a6f74a1d2a937977cfc117c7059050b37bd6482ebcbc659bffc6dac
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

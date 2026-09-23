@@ -257,7 +257,7 @@ export function handle(root, message, top) {
     return ok(id, {
       protocolVersion: PROTOCOL_VERSION,
       capabilities: { tools: {} },
-      serverInfo: { name: "fux", version: "3.0.0-alpha.2" },
+      serverInfo: { name: "fux", version: "3.0.0-alpha.3" },
     });
   }
   if (method === "tools/list") return ok(id, { tools: tools(top) });
