@@ -29,6 +29,12 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-24 — W-168 step 1 decided by the table: INCONCLUSIVE, to Arpit  ·  Claude Code (Opus)
+- **Asked:** run step 1's frozen `decide.py` on the filed scores and file `VERDICT.md`. This session captured no arm.
+- **Did:** confirmed `decide.py`, `verdict.py` and the tag file are unchanged since `cfca651a`, then ran it. It wrote `evidence/decision.json` and `evidence/per-query.jsonl`. Filed `VERDICT.md`, the inbox row, `BLOCKED.json` (ASK), the W-168 block, the regression index row (it still said *not measured*), NOW, INTERVIEW and the registry.
+- **Decided / open:** by the table, **INCONCLUSIVE**. `anchor-1.0` is first to clear 1, 2 and 4 (tagged +7/−0, p = 0.016, floor 7) and holds 3 at rank 1. The hub climbs 8→6 on `s3u-009` and 5→4 on `s3u-043`, both misses. Zero baseline hits lost at any weight. The call is Arpit's.
+- **Next:** Arpit rules. Agent lane: pre-register step 4.
+
 ## 2026-09-24 — W-168 step 1 SCORED (Arpit's hand); filed, not decided  ·  Claude Code (Opus)
 - **Asked:** Arpit pasted `just golden-score work/regression/2026-09-15-anchor-text`.
 - **Did:** checked the five files (80 rows each, none partial, nothing missing); filed the printed totals in report §4, the W-168 block, the queue (inbox emptied, W-168 → 🟢) and NOW.

@@ -1,0 +1,156 @@
+{
+ "arms": {
+  "anchor-0.5": {
+   "clears_gain": false,
+   "gain": {
+    "alpha": 0.05,
+    "b": 2,
+    "c": 0,
+    "discordant": 2,
+    "net": 2,
+    "net_needed": null,
+    "outcome": "no detected change",
+    "p": 0.5
+   },
+   "gain_line": "b=2 c=0 discordant=2 net=2 p=0.5000 (no net difference can clear alpha at this count, alpha=0.05) -> NO DETECTED CHANGE",
+   "hit@10_total": {
+    "baseline": 70,
+    "treatment": 70
+   },
+   "holds_hub": true,
+   "holds_rest": true,
+   "hub_climbed_2_to_10_on_a_miss": [
+    "s3u-043"
+   ],
+   "hub_took_rank_1_on_a_miss": [],
+   "primary@1_rest": [
+    0,
+    0
+   ],
+   "primary@1_tagged": [
+    7,
+    0
+   ],
+   "rest_hit@1": [
+    0,
+    0
+   ]
+  },
+  "anchor-1.0": {
+   "clears_gain": true,
+   "gain": {
+    "alpha": 0.05,
+    "b": 7,
+    "c": 0,
+    "discordant": 7,
+    "net": 7,
+    "net_needed": 7,
+    "outcome": "treatment",
+    "p": 0.015625
+   },
+   "gain_line": "b=7 c=0 discordant=7 net=7 p=0.0156 (net needed 7, alpha=0.05) -> TREATMENT",
+   "hit@10_total": {
+    "baseline": 70,
+    "treatment": 71
+   },
+   "holds_hub": true,
+   "holds_rest": true,
+   "hub_climbed_2_to_10_on_a_miss": [
+    "s3u-009",
+    "s3u-043"
+   ],
+   "hub_took_rank_1_on_a_miss": [],
+   "primary@1_rest": [
+    0,
+    0
+   ],
+   "primary@1_tagged": [
+    12,
+    0
+   ],
+   "rest_hit@1": [
+    0,
+    0
+   ]
+  },
+  "anchor-2.0": {
+   "clears_gain": true,
+   "gain": {
+    "alpha": 0.05,
+    "b": 9,
+    "c": 0,
+    "discordant": 9,
+    "net": 9,
+    "net_needed": 7,
+    "outcome": "treatment",
+    "p": 0.003906
+   },
+   "gain_line": "b=9 c=0 discordant=9 net=9 p=0.0039 (net needed 7, alpha=0.05) -> TREATMENT",
+   "hit@10_total": {
+    "baseline": 70,
+    "treatment": 71
+   },
+   "holds_hub": true,
+   "holds_rest": true,
+   "hub_climbed_2_to_10_on_a_miss": [
+    "s3u-009",
+    "s3u-043"
+   ],
+   "hub_took_rank_1_on_a_miss": [],
+   "primary@1_rest": [
+    0,
+    0
+   ],
+   "primary@1_tagged": [
+    15,
+    0
+   ],
+   "rest_hit@1": [
+    0,
+    0
+   ]
+  },
+  "anchor-3.0": {
+   "clears_gain": true,
+   "gain": {
+    "alpha": 0.05,
+    "b": 9,
+    "c": 0,
+    "discordant": 9,
+    "net": 9,
+    "net_needed": 7,
+    "outcome": "treatment",
+    "p": 0.003906
+   },
+   "gain_line": "b=9 c=0 discordant=9 net=9 p=0.0039 (net needed 7, alpha=0.05) -> TREATMENT",
+   "hit@10_total": {
+    "baseline": 70,
+    "treatment": 71
+   },
+   "holds_hub": true,
+   "holds_rest": true,
+   "hub_climbed_2_to_10_on_a_miss": [
+    "s3u-009",
+    "s3u-043"
+   ],
+   "hub_took_rank_1_on_a_miss": [],
+   "primary@1_rest": [
+    0,
+    0
+   ],
+   "primary@1_tagged": [
+    15,
+    0
+   ],
+   "rest_hit@1": [
+    0,
+    0
+   ]
+  }
+ },
+ "headroom": {
+  "improvement_pool": 13,
+  "regression_exposed": 41
+ },
+ "outcome_by_the_table": "INCONCLUSIVE \u2014 anchor-1.0 clears 1\u20134 but the hub half-moves; to Arpit"
+}

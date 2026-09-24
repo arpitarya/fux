@@ -7,6 +7,20 @@ filed: 2026-09-14
 ball: arpit
 ---
 
+## 🔴 STEP 1 DECIDED BY THE TABLE 2026-09-24 — INCONCLUSIVE; the ruling is Arpit's
+
+A session that did not capture the arms ran the frozen
+[`decide.py`](../regression/2026-09-15-anchor-text/evidence/decide.py). It and
+`verdict.py` are unchanged since `cfca651a`. → [VERDICT](../regression/2026-09-15-anchor-text/VERDICT.md).
+
+- Tagged `hit@1`: `0.5` +2/−0 (cannot clear), `1.0` **+7/−0, p = 0.016, clears
+  the floor of 7**, `2.0` and `3.0` +9/−0. Untagged 0/0 everywhere. **No baseline
+  rank-1 hit lost at any weight.**
+- Clause 3 holds at rank 1. **The hub half-moves**: `s3u-009` 8→6 and `s3u-043`
+  5→4, both misses in every arm. The table sends that to Arpit.
+- **Question (inbox):** PASS at `anchor = 1.0`, FAIL (clause 3), or keep
+  INCONCLUSIVE? `anchor` stays `0.0` until he rules.
+
 ## 🔴 STEP 1 SCORED 2026-09-24, 11:45 (Arpit's hand) — the verdict is a NON-capturing session's
 
 Five complete score files; set-wide `hit@1` 41 → 43 / 48 / 50 / 50 and

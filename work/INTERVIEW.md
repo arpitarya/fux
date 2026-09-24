@@ -32,8 +32,17 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-09-24** (Claude Code, Opus — W-168 step 1's arms captured; the score is Arpit's).* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-09-24** (Claude Code, Opus — W-168 step 1 decided by the table: INCONCLUSIVE, to Arpit).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
+
+### 🔴 2026-09-24 (later) — W-168 STEP 1 INCONCLUSIVE BY THE TABLE; the ruling is Arpit's
+
+- A non-capturing session ran the frozen `decide.py`. **`anchor-1.0` clears
+  gain, rest and floor** (tagged `hit@1` +7/−0) and holds the hub at rank 1,
+  **but the hub half-moves on two misses** (`s3u-009` 8→6, `s3u-043` 5→4). The
+  pre-registration routes that to Arpit. No weight loses a baseline hit.
+- **His call:** PASS at `1.0` (then §If it passes, in one change), FAIL (clause
+  3), or keep INCONCLUSIVE. [VERDICT](regression/2026-09-15-anchor-text/VERDICT.md).
 
 ### 🔴 2026-09-24 (11:45) — W-168 STEP 1 SCORED; the verdict waits on a session that did not capture the arms
 

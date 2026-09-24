@@ -23,8 +23,8 @@ here. Read that record before changing anything below it.
 
 | what he decides | filed | age |
 |---|---|---|
-
-*Empty since 2026-09-24 — step 1's anchor arms scored.*
+| 🔴 **W-168** — step 1 (anchor) is **INCONCLUSIVE by the table**: `1.0` clears the gain, but the hub climbs within 2–10 on two misses. **PASS at `1.0`, FAIL, or keep INCONCLUSIVE?** [verdict](regression/2026-09-15-anchor-text/VERDICT.md) | 2026-09-24 | 0d |
+| ↳ **blocks:** nothing else in the queue — only step 1's filing and, on PASS, the `anchor` default. Step 4's pre-registration does not wait on it. | | |
 
 ---
 
@@ -32,7 +32,7 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🟢 **W-168** · `agent` — the ranking ideas, judged at rank 1. **Step 1 scored 2026-09-24; next `decide.py` → VERDICT, by a session that did NOT capture the arms.** Then pre-register step 4. [detail](open/W-168-search-improvements.md)
+- 🔴 **W-168** · `arpit` — the ranking ideas, judged at rank 1. **Step 1: `decide.py` → INCONCLUSIVE (the hub half-moves at `1.0`); Arpit rules (inbox).** Agent-side meanwhile: pre-register step 4. [detail](open/W-168-search-improvements.md)
 
 
 ### testing
