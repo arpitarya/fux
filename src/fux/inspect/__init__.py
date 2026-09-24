@@ -35,7 +35,10 @@ from pathlib import Path
 from ..errors import FuxError
 from . import checks as checks_mod
 from . import dictionary as dictionary_mod
+from . import facts as facts_mod
 from . import lenses as lenses_mod
+from . import probes as probes_mod
+from . import xray as xray_mod
 from ._scan import read_index_view
 
 __all__ = ["Report", "cmd_inspect", "inspect_index", "render_markdown", "as_dict"]
@@ -55,18 +58,32 @@ class Report:
     coverage: object
     graph: object
     checks: list
+    #: W-220 — pass A, pass C and the fold. `probes` is `None` when no document
+    #: was probed (`probe_sample=None`), which the headline check reports `n/a`.
+    facts: object = None
+    probes: object = None
+    fold: object = None
 
 
 def inspect_index(
     root: Path,
     *,
-    retrieval_sample: int = lenses_mod.DEFAULT_RETRIEVAL_SAMPLE,
+    retrieval_sample: int | None = lenses_mod.DEFAULT_RETRIEVAL_SAMPLE,
+    probe_sample: int | None = probes_mod.DEFAULT_PROBE_SAMPLE,
     top: int = 20,
     rebuild_dictionary: bool = False,
     progress=None,
+    view=None,
 ) -> Report:
-    """Run every lens over the committed index and return the whole report."""
-    view = read_index_view(root, progress=progress)
+    """Run every lens over the committed index and return the whole report.
+
+    `retrieval_sample=None` skips self-retrieval and `probe_sample=None` skips
+    the probe lens — what `fux serve`'s Index tab does so the fast lenses render
+    first, before `probes_mod.run` streams in behind
+    them (W-220). `0` probes every document. `view` lets a long-lived caller
+    (the server) pass an `IndexView` it already read.
+    """
+    view = view if view is not None else read_index_view(root, progress=progress)
     if view.n == 0:
         raise FuxError(
             "there is no committed index to inspect. Run `fux ingest` first; "
@@ -76,13 +93,28 @@ def inspect_index(
         root, view, rebuild=rebuild_dictionary, progress=progress
     )
     boilerplate = lenses_mod.boilerplate(view, dictionary, top=top)
+    # One query cache for both sampled halves — self-retrieval and the probes —
+    # keyed on the shards and the tune, so a second look asks nothing.
+    cache_key, query_cache = probes_mod.open_cache(root, view)
+    cached_before = len(query_cache)
     findability = lenses_mod.findability(
-        root, view, dictionary, sample=retrieval_sample, top_lists=top, progress=progress
+        root, view, dictionary, sample=retrieval_sample, top_lists=top, progress=progress,
+        cache=query_cache,
     )
     lengths = lenses_mod.lengths(view, top_lists=min(top, 10))
     duplication = lenses_mod.duplication(view, top_lists=top)
     coverage = lenses_mod.coverage(root, view, dictionary)
     graph = lenses_mod.graph_shape(view, top_lists=top)
+    facts = facts_mod.load_or_compute(root, view, progress=progress)
+    probes = (
+        None if probe_sample is None
+        else probes_mod.run(
+            root, view, facts, sample=probe_sample, progress=progress,
+            cache=(cache_key, query_cache),
+        )
+    )
+    probes_mod.save_cache(root, cache_key, query_cache, before=cached_before)
+    fold = xray_mod.fold(view, facts, findability, probes, top=top)
     return Report(
         view=view,
         dictionary=dictionary,
@@ -92,7 +124,12 @@ def inspect_index(
         duplication=duplication,
         coverage=coverage,
         graph=graph,
-        checks=checks_mod.run_checks(boilerplate, findability, duplication, documents=view.n),
+        checks=checks_mod.run_checks(
+            boilerplate, findability, duplication, documents=view.n, probes=fold.probes
+        ),
+        facts=facts,
+        probes=probes,
+        fold=fold,
     )
 
 
@@ -165,10 +202,15 @@ def render_markdown(report: Report) -> str:
         f"- **{len(find.unfindable)} document(s) carry no distinctive term at all** "
         f"(every term they hold is on more than {view.distinctive_df:.0f} documents). "
         f"This half is EXHAUSTIVE — no retrieval run is needed to know it.\n"
-        f"- Retrieval: {find.retrieved} of {find.sampled} document(s) come back in the top "
-        f"{lenses_mod.FINDABLE_RANK} for their own {lenses_mod.FINGERPRINT_TERMS} most distinctive "
-        f"words"
-        + ("." if find.sample_is_whole_corpus else " — an evenly spaced SAMPLE, so the share is an estimate.")
+        + (
+            "- Retrieval: not run (`fux serve`'s Index tab runs it behind the fast lenses)."
+            if not find.sampled
+            else
+            f"- Retrieval: {find.retrieved} of {find.sampled} document(s) come back in the top "
+            f"{lenses_mod.FINDABLE_RANK} for their own {lenses_mod.FINGERPRINT_TERMS} most distinctive "
+            f"words"
+            + ("." if find.sample_is_whole_corpus else " — an evenly spaced SAMPLE, so the share is an estimate.")
+        )
     )
     add(f"\nLever: {_lever('unfindable document')}\n")
     if find.unfindable:
@@ -258,6 +300,8 @@ def render_markdown(report: Report) -> str:
     if graph.communities:
         add("\n**Community sizes:** " + " · ".join(f"`{label}` {size}" for label, size in graph.communities))
 
+    _render_xray(report, add)
+
     add("\n---\n")
     add(
         "Provenance: the committed shards this report was built from — "
@@ -265,6 +309,94 @@ def render_markdown(report: Report) -> str:
         + (f" · … {len(view.shards) - 4} more shard(s)" if len(view.shards) > 4 else "")
     )
     return "\n".join(out) + "\n"
+
+
+def _render_xray(report: Report, add) -> None:
+    """W-220's sections: probes, identity, segments, chunks, triage."""
+    fold = report.fold
+    if fold is None:
+        return
+    probes = fold.probes
+    add("\n## 7 · Probes — does a document come back for its own title?\n")
+    if not probes:
+        add("Not run. `fux inspect` probes by default; this report was asked not to.")
+    else:
+        prose, data = probes["prose"], probes["data"]
+        add(
+            f"- {probes['sampled']} of {probes['documents']} document(s) probed, {probes['queries']} "
+            f"`ask` call(s) — "
+            + ("every document." if not probes["estimate"] else "an evenly spaced SAMPLE, so every share here is an ESTIMATE.")
+            + "\n"
+            f"- **Prose:** {prose['title_in_top10']} of {prose['documents']} in the top 10 for their own title; "
+            f"{prose['headings_in_top10']} of {prose['headings']} heading probe(s) find their document.\n"
+            f"- **Data** — two bars, side by side, never averaged: **identifiable** (no other document "
+            f"shares its title) {data['identifiable']} of {data['documents']} · **reachable** (top 10 for "
+            f"its own title) {data['reachable']} of {data['documents']} · both {data['both']}.\n"
+            "- ⚠ Title probes favour documents whose title is also in their body, and a probe number is "
+            "this corpus describing itself — never a claim about engine quality."
+        )
+        add(f"\nLever: {_lever('title probe miss')}\n")
+        for miss in probes["title_misses"]:
+            add(f"- `{miss['id']}` — *{miss['title']}* ({miss['kind']})")
+        if probes["title_miss_count"] > len(probes["title_misses"]):
+            add(f"- … {probes['title_miss_count'] - len(probes['title_misses'])} more")
+
+    ident = fold.identity
+    add("\n## 8 · Identity — titles more than one document carries\n")
+    add(
+        f"- **{ident['documents_sharing']} of {ident['documents']} document(s) share a title** with "
+        f"another, in {ident['groups']} group(s).\n"
+        f"- Data documents: {ident['data_identifiable']} of {ident['data_documents']} identifiable by title."
+    )
+    add(f"\nLever: {_lever('shared title')}\n")
+    if ident["top"]:
+        add("| documents | title | e.g. |")
+        add("|---|---|---|")
+        for row in ident["top"]:
+            add(f"| {row['count']} | {row['title']} | `{row['members'][0]}` |")
+        if ident["groups"] > len(ident["top"]):
+            add(f"\n… {ident['groups'] - len(ident['top'])} more group(s)")
+
+    add("\n## 9 · Segments — decoder × folder × archived\n")
+    add("| decoder | folder | archived | docs | unreadable | passages | word-cut | chrome tokens | link-target tokens | shared title | title in top 10 |")
+    add("|---|---|---|---|---|---|---|---|---|---|---|")
+    for card in fold.segments:
+        reach = f"{card['title_in_top10']} / {card['probed']}" if card["probed"] else "—"
+        add(
+            f"| {card['decoder']} | `{card['folder']}` | {'yes' if card['archived'] else 'no'} | "
+            f"{card['documents']} | {card['unreadable']} | {card['passages']} | {card['word_cut_passages']} | "
+            f"{card['chrome_tokens']} | {card['link_target_tokens']} | {card['shared_title']} | {reach} |"
+        )
+
+    chunks = fold.chunks
+    add("\n## 10 · Chunks — where refer cuts a passage\n")
+    cuts = chunks["cuts"]
+    add(
+        f"- {chunks['passages']} passage(s): {cuts.get('author', 0)} end where the author wrote a boundary, "
+        f"{cuts.get('line', 0)} at a line, **{cuts.get('word', 0)} between two words**."
+    )
+    add(f"\nLever: {_lever('word-cut passage')}\n")
+    add("| decoder | docs | passages | cut between words | share |")
+    add("|---|---|---|---|---|")
+    for name, row in chunks["by_decoder"].items():
+        add(f"| {name} | {row['documents']} | {row['passages']} | {row['word']} | {_share(row['word_share'])} |")
+    add(
+        f"\nPage chrome: {_lever('page chrome')}. Link targets in body tokens: {_lever('link-target tokens')} "
+        f"(flagged at {xray_mod.LINK_TARGET_SHARE:.2f} of body tokens, *provisional*)."
+    )
+
+    add("\n## 11 · Triage — documents with findings, most findings first\n")
+    add(
+        f"**{fold.triage_count} of {len(fold.documents)} document(s) carry at least one finding.** Ordered by how "
+        "many, then by id — a count, not a score."
+    )
+    if fold.triage:
+        add("\n| findings | document | what |")
+        add("|---|---|---|")
+        for row in fold.triage:
+            add(f"| {len(row['findings'])} | `{row['id']}` | {' · '.join(row['findings'])} |")
+        if fold.triage_count > len(fold.triage):
+            add(f"\n… {fold.triage_count - len(fold.triage)} more")
 
 
 def _number(value: float | None, digits: int = 3) -> str:
@@ -391,10 +523,30 @@ def as_dict(report: Report) -> dict:
             "lever": _lever("orphan"),
         },
         "levers": dict(sorted(lenses_mod.LEVERS.items())),
+        **_xray_dict(report),
+    }
+
+
+def _xray_dict(report: Report) -> dict:
+    fold = report.fold
+    if fold is None:
+        return {}
+    return {
+        "probes": fold.probes,
+        "identity": {**fold.identity, "lever": _lever("shared title")},
+        "segments": fold.segments,
+        "chunks": {**fold.chunks, "lever": _lever("word-cut passage")},
+        "triage": fold.triage,
+        "triage_count": fold.triage_count,
+        "documents": fold.documents,
     }
 
 
 def cmd_inspect(args) -> int:
+    diff_paths = getattr(args, "diff", None)
+    if diff_paths:
+        return _cmd_diff(args, diff_paths)
+
     from ..config import find_root
 
     root = find_root()
@@ -408,9 +560,17 @@ def cmd_inspect(args) -> int:
     sample = getattr(args, "retrieval_sample", None)
     if sample is None:
         sample = lenses_mod.DEFAULT_RETRIEVAL_SAMPLE
+    # `--all` probes every document; `--probe-sample 0` says the same, and an
+    # absent flag is the sampled default (SR-INSPECT decision 7's rule).
+    probe_sample = getattr(args, "probe_sample", None)
+    if getattr(args, "all", False):
+        probe_sample = 0
+    elif probe_sample is None:
+        probe_sample = probes_mod.DEFAULT_PROBE_SAMPLE
     report = inspect_index(
         root,
         retrieval_sample=sample,
+        probe_sample=probe_sample,
         top=getattr(args, "top", 20) or 20,
         rebuild_dictionary=bool(getattr(args, "rebuild_dictionary", False)),
         progress=progress,
@@ -426,4 +586,17 @@ def cmd_inspect(args) -> int:
         print(markdown, end="")
         rel = (directory / REPORT_NAME).relative_to(root).as_posix()
         print(f"\nWritten to {rel} (gitignored, with its `--json` twin).")
+    return 0
+
+
+def _cmd_diff(args, paths) -> int:
+    """`--diff A B`: two reports in, one descriptive diff out. Writes nothing."""
+    from . import diff as diff_mod
+
+    a_path, b_path = paths
+    diff = diff_mod.compare(diff_mod.load_report(Path(a_path)), diff_mod.load_report(Path(b_path)))
+    if getattr(args, "json", False):
+        print(json_mod.dumps(diff, indent=2, sort_keys=True))
+    else:
+        print(diff_mod.render_markdown(diff, a=a_path, b=b_path, top=getattr(args, "top", 20) or 20), end="")
     return 0

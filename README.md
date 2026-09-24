@@ -112,7 +112,9 @@ keeps the derived and fetched parts out of git ([SR-DOTFUX](records/0102_fux-dir
 | Re-index automatically on commit and merge | `fux hooks` |
 | A re-runnable answer receipt | `fux answer --receipt "…"`, later `fux verify <receipt>` |
 | Check the setup | `fux doctor` (read-only, offline) |
-| See what the index looks like | `fux inspect` — boilerplate words, documents no query can reach, duplicates, orphans |
+| See what the index looks like | `fux inspect` — boilerplate words, documents no query can reach, duplicates, orphans, title probes, a worst-first triage |
+| Did a decoder or analyzer change break anything? | `fux inspect --diff before.json after.json` — edge loss is always an alert |
+| See it all in a browser | `fux serve` — Ask, Documents and Index tabs, computed on the fly |
 
 Full surface: `fux --help` and [SR-CLI](records/0101_cli-surface.md).
 

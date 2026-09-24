@@ -26,6 +26,39 @@ Rules:
 
 ---
 
+## 2026-09-24 — **W-220 shipped: the index X-ray in `fux inspect` and `fux serve`**
+
+**Landed, unreleased** (on `main`, in `CHANGELOG.md` §Unreleased). All four
+rungs:
+- per-document facts, cached per document (R1);
+- title and heading probes as the findability headline, with data files on two
+  bars (R2);
+- `fux serve`'s Ask · Documents · Index tabs, computed in-process on demand (R3);
+- `fux inspect --diff`, where edge loss is always an alert (R4).
+
+Plus the identity / segments / chunks / triage fold. Evidence:
+[`archive/open/W-220-index-xray.md`](../archive/open/W-220-index-xray.md)
+§Closed, with the live numbers from this repository — 526 documents sharing 99
+titles, and 16 202 word-cut passages.
+
+**Tests:** units 5 616 passed, e2e 151 passed, Node green.
+
+**Records touched:**
+- SR-INSPECT decisions 17–22 and five levers;
+- SR-SERVE decisions 4 and 5 amended, 15 new;
+- SR-CLI decision 11;
+- SR-DOTFUX `runtime/inspect/`;
+- SR-ACQUIRED, SR-CACHEDIR-TAG, SR-LOCKS, SR-NODE-SEARCH, SR-OUTPUT and SR-PII
+  re-read: `fuxdir.py` moved, and their claim on it did not.
+
+**Also 2026-09-24, and not a milestone:**
+- the [generation-2 baseline capture](regression/2026-09-24-golden-gen2-rung-01000/report.md),
+  which waits on Arpit's score;
+- the W-168 step 9 [compare doc](compare/intent-doctype-prior.compare.md), which
+  waits on his rulings.
+
+---
+
 ## 2026-09-23 — **3.0.0-alpha.4 released: CI green on every OS, and publishing is now gated on it**
 
 **Shipped** (`3.0.0-alpha.4`, PyPI `3.0.0a4` and npm under `alpha`; `latest`

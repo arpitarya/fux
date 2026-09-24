@@ -7,10 +7,37 @@ status: open
 lane: agent
 timestamp: 2026-09-22T00:00:00Z
 filed: 2026-09-22
-ball: agent
+ball: arpit
 ---
 
 # W-215 — one corpus deliverable in front of eight engineering steps
+
+## 🔴 2026-09-24 (Claude Code, Opus) — the inputs are on the ladder; the score is Arpit's
+
+⚠ **Correction to the block below:** *"Next: rebuild the ladder"* went stale on
+2026-09-23. A fresh subagent ran prompt 4 that day
+([run](../regression/2026-09-23-ladder-seed-36-rebuild/report.md), `26c7e854`),
+and it was never reflected here.
+
+**Measured on the rebuilt ladder:**
+- The ref-edge census exits 0 with **17 anchor-distinctive terms on 5 targets**.
+  It was 1, and that one was a filename.
+- From `seed/` alone: **9 `Term (ABBR)` pairs** (was 0) and a **21-line
+  glossary** (was 1 false positive).
+
+So items 2 and 3 have reached the corpus.
+
+**Captured:** [both gen-2 sets on `rung-01000`](../regression/2026-09-24-golden-gen2-rung-01000/report.md),
+using the rung's own engine and no re-ingest.
+
+🔴 **Waiting on Arpit: `just golden-score work/regression/2026-09-24-golden-gen2-rung-01000`.**
+That score answers **item 1**: does generation 2 carry questions today's engine
+fails? It is the condition this item was filed to meet.
+- **If it does:** this item closes, and W-168's steps have pools.
+- **If it does not:** the next ask is harder questions, not more documents.
+
+**Item 6 (a corpus with git history) is not delivered.** Step 8 stays a
+proposal, which is the proposal's own rule.
 
 ## ✅ DECISION 2 RULED BY RUNNING IT, 2026-09-23 — prompt 10 ran; the ladder rebuild is next
 

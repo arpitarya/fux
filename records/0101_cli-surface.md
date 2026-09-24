@@ -7,10 +7,10 @@ description: Flat verbs in seven groups, one error boundary, three output modes.
 status: accepted
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@3e9d9763b182, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@9876744812b5, src/fux/progress.py@925dccc045ce, tests_e2e@4a9daa5e8d1c, node/fux.mjs@2921c84717d7]
+owns: [src/fux/cli.py@6dae403f7070, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@9876744812b5, src/fux/progress.py@925dccc045ce, tests_e2e@4a9daa5e8d1c, node/fux.mjs@2921c84717d7]
 laws: [L1, L4, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 5d03b358852515ee9dfbb20bc5257b6cc58e21b22968f96b55b7f0bf3b645d98
+content_sha: f5a468b83d7ff17d91c0a419ce10a68f86cdf182d76cad09328ce1e6a4fcb70f
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -401,6 +401,13 @@ to switch off.
 [SR-INSPECT](0156_inspect.md) decision 1; the boundary is the remedy, not the
 subject — `doctor`'s finding is fixed by a command or a config edit and
 `inspect`'s by a change to the corpus.
+
+⚠ **Three flags since W-220 (2026-09-23), and none is a new verb:**
+`--probe-sample N` (how many documents to probe by their own title and
+headings; `0` is every one), `--all` (the same as `--probe-sample 0`), and
+`--diff A B` (compare two `report.json` files per document; it writes
+nothing and needs no index). What each one computes is
+[SR-INSPECT](0156_inspect.md) decisions 19 and 21.
 
 **12. 🔴 `fux lexical` and `fux ask` are TWO VERBS OVER ONE BODY, and `lexical`
 is FROZEN.** (W-160.)

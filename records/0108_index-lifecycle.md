@@ -7,10 +7,10 @@ description: One canonical encoder, sharded doc-major JSONL, write-if-different;
 status: accepted
 date: 2026-08-18
 feature: generation and update of the committed index, and the refusal that keeps its derived accelerator from diverging
-owns: [src/fux/store@dc3f310eba56, node/src/store/format.mjs@e3c48e545e1e, node/src/store/reader.mjs@f47fa69ecb2c]
+owns: [src/fux/store@f56c0ee58043, node/src/store/format.mjs@e3c48e545e1e, node/src/store/reader.mjs@f47fa69ecb2c]
 laws: [L1, L2, L3, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 0a7ddfbf428519dd6da13afa86b61de77b564d8ec92e338bf59af815c4915637
+content_sha: b6a7adac9521e60d8b613e4d4fc6ac430b7ebf36e5d6bb4a46fee1ccda157c17
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

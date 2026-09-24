@@ -688,8 +688,11 @@ result, the [confidence band](#confidence-band), and one lever per finding.
 ranker in a browser is the restatement [L0](../records/0002_LAW-0-authority.md)
 forbids. Distinct from [`fux inspect`](#lever), which reports the shape of a
 whole corpus rather than the story of one question, and from `fux mcp`, which
-hands results to a *machine*. No route writes anything and every lever is a
-proposal. See [SR-SERVE](../records/0158_serve.md).
+hands results to a *machine*. No route writes a committed byte and every lever
+is a proposal. **Three tabs since W-220** — Ask, Documents (one document's
+X-ray, computed on the click) and Index (the whole corpus, worst first, with
+[title probes](#title-probe) streamed in behind) — and the server calls
+`fux inspect`'s library for the last two. See [SR-SERVE](../records/0158_serve.md).
 
 **Snapshot (mode)** — The explicit per-source opt-out from
 [content-never-durable](#content-never-durable-the-law): Fux additionally
@@ -705,6 +708,17 @@ sets* overlap at Jaccard ≥ 0.80: a family shares its shape and differs in its
 content, and reporting them as one finding would hide the difference that
 decides the remedy. `fux inspect`'s fourth lens names both. See
 [SR-INSPECT](../records/0156_inspect.md) decision 6.
+
+**Title probe** — A document's own title, and each of its headings, asked as a
+real `ask`. The bar is *does the document come back in the top ten?* — the
+question a person typing that title is asking. It replaced self-retrieval as
+`fux inspect`'s findability headline, because self-retrieval asks for a
+document's rarest terms and a path is unique by construction, so it read 100 %
+on every corpus. A data file is held to two bars side by side: **identifiable**
+(no other document shares its title) and **reachable** (its title probe finds
+it). Sampled by default and labelled an estimate. ⚠ Title probes favour
+documents whose title also appears in their body. See
+[SR-INSPECT](../records/0156_inspect.md) decision 19.
 
 **Seed (graph)** — A node the PPR walk starts from. Either the top-k of a
 query's ranking (`fux graph "<q>"`) or documents named by hand

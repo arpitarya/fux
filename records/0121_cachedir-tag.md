@@ -10,7 +10,7 @@ feature: the `CACHEDIR.TAG` file written into every derived `.fux/` subdirectory
 owns: []
 laws: [L3]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: c281c3200d7b0c8f2fc6a671c5685feb5227558632d4ae0c0f6941307a8a1817
+content_sha: 76dd886d1148c1c57639f3fa0135d7509a0987347b7df89d08af33a639dd60c5
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -121,6 +121,12 @@ table `_readme()` writes, which gained `fux serve`
 ([SR-CLI](0101_cli-surface.md)). **Neither reaches this record's claim on that
 file**, and saying so is the point of the freshness gate — the prompt is *re-read
 the record*, and the honest outcome of re-reading it can be *nothing moved*.
+
+⚠ **Unchanged by W-220 (2026-09-23), and touched here only because the register
+says so.** That change edited one thing in `src/fux/store/fuxdir.py`: the
+`runtime` kind's description string, which gained `runtime/inspect/`
+([SR-DOTFUX](0102_fux-directory.md); [SR-INSPECT](0156_inspect.md)).
+**It does not reach this record's claim on that file.**
 
 ### Consequences
 

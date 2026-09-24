@@ -2,15 +2,15 @@
 type: Standing Record
 kind: component
 name: SR-INSPECT
-title: "SR-INSPECT (0156) — `fux inspect`, the index X-ray: six lenses, three flagged checks, and a local dictionary that names the hashes"
-description: "Arpit asked whether a consumed index is a good index or a bad one. `fux inspect` answers it descriptively: six lenses over the committed shards — boilerplate, findability, length and fields, duplication and templates, analyzer coverage, graph — each printing distributions and named lists, each naming the lever that would change what it found and applying none. Exactly three numbers carry a pass/attention flag and their floors are provisional, measured on the golden ladder and dropped to descriptive if one ever flags a healthy rung. The committed index holds term hashes, so the words come from a gitignored dictionary built by re-tokenising the sources locally; nothing new is committed and nothing is fetched."
+title: "SR-INSPECT (0156) — `fux inspect`, the index X-ray: six lenses, three flagged checks, a local dictionary that names the hashes, and per-document facts, probes and a diff"
+description: "Arpit asked whether a consumed index is a good index or a bad one. `fux inspect` answers it descriptively: six lenses over the committed shards — boilerplate, findability, length and fields, duplication and templates, analyzer coverage, graph — each printing distributions and named lists, each naming the lever that would change what it found and applying none. Exactly three numbers carry a pass/attention flag and their floors are provisional, measured on the golden ladder and dropped to descriptive if one ever flags a healthy rung. The committed index holds term hashes, so the words come from a gitignored dictionary built by re-tokenising the sources locally; nothing new is committed and nothing is fetched. Since W-220 (2026-09-23) it also computes cached per-document facts, probes each document by its own title and headings (the new findability headline), folds identity, segments, chunks and a worst-first triage, and diffs two reports with edge loss always an alert; fux serve calls the same library."
 status: accepted
 date: 2026-09-14
 feature: the index X-ray
-owns: [src/fux/inspect@d1930eef9504]
+owns: [src/fux/inspect@9b3884e6dbad]
 laws: [L2, L3, L4, L6, L8]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 9badcf589138c756f51037936cf3b2bcb21bd797fdfc5f2b3bd1e07b16071be3
+content_sha: a60ab02d039aa508e9cf6e7bcfffa884022389d5d30ced2a1d76e36f80621aef
 ratifies: W-169
 ---
 
@@ -232,6 +232,11 @@ discoverable from the index the whole time and nobody could see it.
     | hub | link-IDF and the graph-composed `ask` (W-161) — until then, nothing: a hub is a fact about the corpus |
     | file-name-only document | a decoder (`fux-decoder`), or leave it in `.fux/enrich/queue.tsv` for a model to describe |
     | unreadable document | re-ingest, or `keep = true` on the url line so the bytes are retained |
+    | shared title | a `title:` in front-matter, or a data decoder's `META_FIELDS` title claim (`fux-decoder`) |
+    | title probe miss | `fux enrich`, `fux correct`, or a title the document's own body also uses |
+    | word-cut passage | a decoder that emits one record per paragraph (`fux-decoder`) |
+    | page chrome | a consumer html decoder in `.fux/decoders/` that skips `nav`, `header`, `aside` and `footer` (`fux-decoder`) |
+    | link-target tokens | none a consumer can turn — an extraction-rule change under SR-EXTRACTED, its own item, measured first |
 
 13. **Every truncated list ships its full count beside it.** A capped top-20
     read as a total is how *"20 near-duplicate pairs"* comes to mean *exactly
@@ -246,7 +251,9 @@ discoverable from the index the whole time and nobody could see it.
     which are a fact about the input rather than about when somebody looked.
 
 15. **Two artifacts, both under `.fux/runtime/inspect/`**: `report.md` and
-    `report.json`. `git status` is clean on a clean clone after a run.
+    `report.json` — beside three caches in the same directory,
+    `dictionary.json` (decision 3), `facts.json` (17) and `probes.json` (19).
+    `git status` is clean on a clean clone after a run.
 
 16. **Python only, for now.** The dictionary build re-tokenises sources, which
     is an ingest-side job the Node reader has no home for
@@ -255,6 +262,90 @@ discoverable from the index the whole time and nobody could see it.
     all the same: that table is not a verb list, it is what `.fux/output.toml`
     may legally say, and a repo whose file carries `[cli.json] inspect = true`
     must validate on both readers.
+
+### The X-ray — W-220, ruled by Arpit 2026-09-23
+
+*"I want a view of a sample document, how that gets ingested, what all things
+get indexed, how it gets indexed"* — and then *"how it is going to work for the
+whole index"*. Two design samples on this repository found what decisions 7 and
+9a could not see: `findable share` read 100 % while **21 of 120 title probes
+missed their own top ten**, and **526 of 1 672 documents shared a title**. The
+design and the rulings are [W-220](../archive/open/W-220-index-xray.md)'s; what
+they decide is stated here.
+
+17. **Pass A — per-document facts, cached.** `inspect/facts.py` computes, per
+    document, with the engine's own helpers (decision 5 extended): the decoder,
+    source and text bytes, whether a decoder produced the text, where the title
+    came from, heading count, body tokens, **link-target tokens**, **page-chrome
+    tokens** (an html document decoded twice by its own decoder, with and without
+    `nav`/`header`/`aside`/`footer` — the difference is what the index kept), and
+    the passages `refer` would cut, with **how many were cut between two words**.
+    The summary holds **counts, never text**. The cache is
+    `.fux/runtime/inspect/facts.json`, keyed per document on **source sha ·
+    decoder digest · `extract.RULES_VERSION` · `ANALYZER_VERSION` · the `[refer]`
+    passage bounds**: an unchanged document is never recomputed, and a decoder
+    bump recomputes only the documents that decoder reads.
+
+18. **Pass B — the corpus fold, at read time; nothing corpus-wide is stored per
+    document.** Four views, all in `report.json`:
+    - **identity** — titles more than one document carries, with the count of
+      documents sharing and of data documents identifiable by title;
+    - **segments** (L1) — decoder × top folder × archived, one report card each;
+    - **chunks** — passages by cut rung, and the word-cut share per decoder;
+    - **triage** (L2) — one row per document that carries a finding, ordered by
+      **how many** findings and then by id. A count a reader can check, never a
+      weighted score (decision 11). The findings are `unreadable`, `no text`,
+      `no distinctive term`, `shared title`, `title probe miss`, `word-cut
+      passages`, `page chrome indexed`, `link targets indexed` (at ≥ 0.10 of
+      body tokens, **provisional**), and `orphan`.
+
+    **`report.json` carries one row per document** — distinct terms, field
+    tokens, passages, word cuts, title peers, edges, probe ranks and findings —
+    which is what decision 21 compares. Byte-identical over an unchanged index,
+    like everything else here (decision 14).
+
+19. **Pass C — probes replace self-retrieval as the findability headline.** A
+    probe is the document's **own title and each of its headings**, asked as a
+    real `ask` (`query.run_query`), and the bar is **the top ten**. A data
+    document (`.json`, `.jsonl`, `.csv`, `.toml`, `.yaml`) is probed by its title
+    alone and reported on **both bars, side by side and never averaged** —
+    **identifiable** (no other document shares its title) and **reachable** (in
+    its own probe's top ten) (Arpit, 2026-09-23: *"both of them"*). The checks
+    table's descriptive row is now **`title-probe reach`**; self-retrieval still
+    prints under the findability lens, and `findable share` stays a dropped floor
+    (decision 9a). The rules decision 7 set for self-retrieval hold here: an
+    **evenly spaced sample, labelled an estimate** (`--probe-sample`, default
+    50), and `--all` (or `0`) to probe every document. The cache is
+    `.fux/runtime/inspect/probes.json`, `probe text → ten ids`, keyed on the
+    committed shards' content shas **and the `tune.toml` bytes** — W-220 named
+    the index root alone; the tune is added because a probe cached under one
+    `[bm25f]` and read under another reports a ranking nobody ran.
+    ⚠ **Title probes favour documents whose title is also in their body**, and
+    the report says so. **A probe number is this corpus describing itself** —
+    never a claim about engine quality ([SR-RS](0133_predictions.md)).
+
+20. **L3 — one document's X-ray, on demand** (`xray.document`): what was
+    ingested (pass A's facts, refreshed for that document alone), what was
+    indexed (tokens per field, and each field's rarest words named by
+    re-tokenising **its own** fields with `pii.toml` applied first, `df` from the
+    index), every passage with its line range and cut rung, links out and in,
+    and the documents that share its title. **Never computed for every document
+    up front** (ruled 2026-09-23).
+
+21. **`fux inspect --diff A B`** compares two `report.json` files per
+    document — distinct terms, field tokens, passages, word cuts, title and its
+    peers, decoder, edges and title-probe rank. 🔴 **An edge that disappears is
+    ALWAYS an alert**: W-220's sample found a decoder change that deleted every
+    `ref` edge while looking like a tidy-up. It reads two files, writes nothing,
+    needs no index and applies no lever. It is the review artifact for a decoder
+    `VERSION`, `RULES_VERSION` or analyzer bump.
+
+22. **Two callers, one engine.** `fux inspect` is the CLI — for CI, scripts and
+    `--diff` — and **`fux serve` is the second caller**: its Documents and Index
+    tabs import this package and call `inspect_index`, `xray.document` and
+    `probes.run` in-process, never through a subprocess
+    ([SR-SERVE](0158_serve.md) decision 15). No separate command runs first;
+    what either caller writes is the same gitignored cache.
 
 ### Consequences
 
@@ -271,6 +362,12 @@ discoverable from the index the whole time and nobody could see it.
 - **The three floors are the debt.** They are measured on the ladder and marked
   provisional, and nothing yet re-measures them when the ladder grows a rung.
   Filed with the run that set them rather than left implicit.
+
+- **Probing is the new cost, and the sample is the default because of it.**
+  A prose document is ≈ 8 probes (a title and its headings); at 10 000 documents
+  `--all` is an overnight job. Measured once while designing (bridge VM, another
+  session active — orders of magnitude, not a benchmark): pass A 162 s cold for
+  1 672 documents, ≈ 2.5 s per probe cold. The caches make the second look free.
 
 - **`inspect` is slow on a large corpus and says so with a progress bar.** The
   dictionary half re-tokenises every document and the retrieval half is one
@@ -316,6 +413,9 @@ discoverable from the index the whole time and nobody could see it.
   the live record of what landed and of the three things the item did not
   predict.
 - The floors: [`work/regression/2026-09-14-inspect-floors/`](../work/regression/2026-09-14-inspect-floors/report.md).
+- The X-ray (decisions 17–22): [W-220](../archive/open/W-220-index-xray.md) —
+  the design, the samples' eight findings and the rulings; code in
+  `inspect/facts.py`, `inspect/probes.py`, `inspect/xray.py`, `inspect/diff.py`.
 - Zipf, *Human Behavior and the Principle of Least Effort*, 1949 · Heaps,
   *Information Retrieval: Computational and Theoretical Aspects*, 1978 ·
   Broder, *On the resemblance and containment of documents*, 1997 (minhash) ·
@@ -340,6 +440,11 @@ discoverable from the index the whole time and nobody could see it.
 5. **A lens cannot find its plant** on the planted corpus in
    `tests_e2e/`. That lens is removed from the report rather than left printing
    a number nobody can trust — the keep/remove call the item pre-registered.
-6. **`inspect` gains a write.** It would then be a maintenance verb with a
-   model-free promise to keep, and the boundary in decision 1 would no longer
-   be the boundary.
+6. **`inspect` gains a write** outside `.fux/runtime/inspect/`. It would then
+   be a maintenance verb with a model-free promise to keep, and the boundary in
+   decision 1 would no longer be the boundary.
+7. **`--diff` misses a lost edge**, which `tests/test_inspect_xray.py` plants.
+   Decision 21's alert is the reason the command exists.
+8. **A facts entry survives a key change**, or a decoder bump recomputes a
+   document that decoder does not read. Both are asserted in
+   `tests/test_inspect_xray.py`.

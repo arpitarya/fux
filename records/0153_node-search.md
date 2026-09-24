@@ -11,7 +11,7 @@ owns: [node@72eb18a39ab8, src/fux/store/nodebundle.py@071a24a596dd]
 laws: [L1, L3, L4, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 9a36528c7b1f464accdf70e53cf5dabdd454c73beaa97614af23e49374606f5c
+content_sha: aa96f008b6c788d33ffb5b3b1257391ccb64b1beb311aedc0a5f05b5a4f8b4d1
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1087,6 +1087,12 @@ own `tune.toml` loader.
   transcription, at the price of a build step, a toolchain and a binary in the
   repo. A build step is a dependency (L1), and the differential law is what
   makes two implementations safe.
+
+⚠ **Unchanged by W-220 (2026-09-23), and touched here only because the register
+says so.** That change edited one thing in `src/fux/store/fuxdir.py`: the
+`runtime` kind's description string, which gained `runtime/inspect/`
+([SR-DOTFUX](0102_fux-directory.md); [SR-INSPECT](0156_inspect.md)).
+**It does not reach this record's claim on that file.**
 
 ## References
 

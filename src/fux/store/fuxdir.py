@@ -57,7 +57,7 @@ ACQUIRED: dict[str, str] = {
 }
 
 DERIVED: dict[str, str] = {
-    "runtime": "M2 accelerator segments, M4's fetch cache at `runtime/fetch-cache/`, the write lock, `enrich-progress.tsv` (W-86 P6: which queued documents THIS machine has handled - local by design, so two people's progress cannot conflict on a pull), and `runtime/trace/` (SR-SERVE: an inspection page for one question or one document - it quotes passages, so it is never committed, and it is regenerable by re-running the verb)",
+    "runtime": "M2 accelerator segments, M4's fetch cache at `runtime/fetch-cache/`, the write lock, `enrich-progress.tsv` (W-86 P6: which queued documents THIS machine has handled - local by design, so two people's progress cannot conflict on a pull), and `runtime/trace/` (SR-SERVE: an inspection page for one question or one document - it quotes passages, so it is never committed, and it is regenerable by re-running the verb), and `runtime/inspect/` (SR-INSPECT: `fux inspect`'s and `fux serve`'s reports and caches - the hash-to-word dictionary, per-document facts and probe results - regenerable from the committed index and the sources on this disk)",
 }
 
 #: Files fux generates at the top level of `.fux/` (write-if-missing).

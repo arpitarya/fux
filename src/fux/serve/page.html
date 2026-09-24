@@ -110,6 +110,29 @@
   .empty .big{font-size:16px;font-weight:600}
   .empty .why{color:var(--dim);font-size:13.5px;margin-top:7px}
 
+  /* tabs (W-220): one page, three views — no route to remember */
+  .tabs{display:flex;gap:6px;margin:0 0 18px;border-bottom:1px solid var(--line)}
+  .tab{background:none;border:0;border-bottom:2px solid transparent;color:var(--dim);padding:9px 14px;font:inherit;font-size:14px;cursor:pointer}
+  .tab.on{color:var(--fg);border-bottom-color:var(--a1)}
+  .tab:focus-visible{outline:2px solid var(--a2);outline-offset:2px}
+  section[hidden]{display:none}
+  table.t{width:100%;border-collapse:collapse;font-size:13px}
+  table.t th{color:var(--dim);font-weight:600;text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+  table.t td{padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:top;overflow-wrap:anywhere}
+  table.t td.n{text-align:right;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums}
+  .scroll{overflow-x:auto}
+  .doclist{max-height:60vh;overflow:auto;margin-top:10px}
+  .docrow{padding:7px 10px;border-radius:9px;cursor:pointer;display:flex;gap:10px;align-items:baseline}
+  .docrow:hover,.docrow.on{background:rgba(255,255,255,.05)}
+  .docrow .k{color:var(--faint);font-size:11.5px;min-width:64px}
+  .filter{width:100%;border:1px solid var(--line);background:#0d1018;color:var(--fg);border-radius:10px;padding:10px 12px;font:inherit}
+  .progress{color:var(--dim);font-size:13px}
+  .flag{display:inline-block;font-size:11.5px;border-radius:999px;padding:2px 8px;margin:1px 3px 1px 0;border:1px solid rgba(245,165,36,.38);color:var(--warn)}
+  .btn{background:var(--card);border:1px solid var(--line);color:var(--fg);border-radius:10px;padding:7px 12px;font:inherit;font-size:13px;cursor:pointer}
+  .btn:hover{border-color:rgba(255,255,255,.2)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media (max-width:760px){ .grid2{grid-template-columns:1fr} }
+
   footer{color:var(--faint);font-size:12px;margin-top:28px;line-height:1.7}
   .err{color:var(--bad)}
   @media (max-width:560px){ .band{flex-direction:column;align-items:flex-start} }
@@ -122,11 +145,33 @@
     <div class="sub">Type a question. See the ten documents an agent would be handed &mdash; and why each one is there.</div>
   </header>
 
-  <div class="bar"><input id="q" autocomplete="off" spellcheck="false" placeholder="Ask the corpus a question…  (press / to focus)"></div>
-  <div class="chips" id="chips"></div>
+  <nav class="tabs" role="tablist">
+    <button class="tab on" role="tab" data-tab="ask">Ask</button>
+    <button class="tab" role="tab" data-tab="docs">Documents</button>
+    <button class="tab" role="tab" data-tab="index">Index</button>
+  </nav>
 
-  <div class="stepper" id="stepper"></div>
-  <div id="out"></div>
+  <section id="tab-ask">
+    <div class="bar"><input id="q" autocomplete="off" spellcheck="false" placeholder="Ask the corpus a question…  (press / to focus)"></div>
+    <div class="chips" id="chips"></div>
+
+    <div class="stepper" id="stepper"></div>
+    <div id="out"></div>
+  </section>
+
+  <section id="tab-docs" hidden>
+    <div class="grid2">
+      <div class="card"><h2>documents — from the register</h2>
+        <input class="filter" id="docfilter" placeholder="filter by path…" autocomplete="off" spellcheck="false">
+        <div class="sub" id="doccount"></div>
+        <div class="doclist" id="doclist"></div></div>
+      <div id="docxray"><div class="card"><h2>x-ray</h2><div class="sub">Click a document. Its X-ray is computed for that document alone, then cached.</div></div></div>
+    </div>
+  </section>
+
+  <section id="tab-index" hidden>
+    <div id="idxout"><div class="card"><h2>index</h2><div class="sub">Open this tab to read the whole index.</div></div></div>
+  </section>
 
   <footer id="foot"></footer>
 </div>
@@ -349,6 +394,167 @@ function render(data) {
     row.addEventListener("click", () => $("d" + row.dataset.i).classList.toggle("open")));
 }
 
+/* ---- tabs (W-220). One page; switching computes nothing in the browser. -- */
+const opened = {};
+function showTab(name) {
+  document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("on", t.dataset.tab === name));
+  ["ask", "docs", "index"].forEach((n) => { $("tab-" + n).hidden = n !== name; });
+  if (!opened[name]) {
+    opened[name] = true;
+    if (name === "docs") loadDocuments();
+    if (name === "index") loadIndex();
+  }
+}
+document.querySelectorAll(".tab").forEach((t) => t.addEventListener("click", () => showTab(t.dataset.tab)));
+
+const pct = (v) => v == null ? "—" : (100 * v).toFixed(1) + " %";   /* a printed share, formatted */
+const cell = (v) => `<td class="n">${esc(v == null ? "—" : v)}</td>`;
+function table(head, rows) {
+  return `<div class="scroll"><table class="t"><tr>${head.map((h) => `<th>${esc(h)}</th>`).join("")}</tr>${rows.join("")}</table></div>`;
+}
+const later = (fn) => new Promise((r) => setTimeout(() => r(fn()), 700));   /* a poll interval, not a measurement */
+
+/* ---- Documents: the REGISTER list, then one X-ray per click. ------------- */
+let allDocs = [];
+async function loadDocuments() {
+  $("doclist").innerHTML = '<div class="progress">reading the register…</div>';
+  try {
+    const data = await (await fetch("/inspect/documents")).json();
+    if (data.error) throw new Error(data.error);
+    allDocs = data.documents;
+    renderDocList();
+  } catch (e) { $("doclist").innerHTML = `<div class="err">${esc(e.message || e)}</div>`; }
+}
+function renderDocList() {
+  const f = $("docfilter").value.trim().toLowerCase();
+  const shown = allDocs.filter((d) => !f || d.loc.toLowerCase().includes(f));
+  $("doccount").textContent = `${shown.length} of ${allDocs.length} document(s)`;
+  $("doclist").innerHTML = shown.slice(0, 500).map((d) =>
+    `<div class="docrow" data-loc="${esc(d.loc)}"><span class="k mono">${esc(d.decoder)}</span><span class="mono">${esc(d.loc)}</span></div>`).join("") +
+    (shown.length > 500 ? `<div class="sub">… ${shown.length - 500} more — narrow the filter</div>` : "");
+  $("doclist").querySelectorAll(".docrow").forEach((r) => r.addEventListener("click", () => {
+    $("doclist").querySelectorAll(".docrow").forEach((x) => x.classList.toggle("on", x === r));
+    openDocument(r.dataset.loc);
+  }));
+}
+$("docfilter").addEventListener("input", renderDocList);
+
+async function openDocument(loc) {
+  $("docxray").innerHTML = `<div class="card"><h2>x-ray</h2><div class="progress">computing <span class="mono">${esc(loc)}</span>…</div></div>`;
+  let x;
+  try {
+    x = await (await fetch("/inspect/document?loc=" + encodeURIComponent(loc))).json();
+    if (x.error) throw new Error(x.error);
+  } catch (e) { $("docxray").innerHTML = `<div class="card err">${esc(e.message || e)}</div>`; return; }
+  const ing = x.ingested || {}, idx = x.indexed || {};
+  const facts = [["decoder", ing.decoder], ["kind", ing.kind], ["source bytes", ing.source_bytes],
+    ["decoded by a decoder", ing.decoded], ["text bytes", ing.text_bytes], ["title from", ing.title_source],
+    ["headings", ing.headings], ["body tokens", ing.body_tokens], ["link-target tokens", ing.link_target_tokens],
+    ["page-chrome tokens", ing.chrome_tokens], ["passages", ing.passages],
+    ["cut between words", (ing.cuts || {}).word]];
+  let html = `<div class="card"><h2>${esc(x.title)}</h2><div class="loc mono">${esc(x.id)}</div>
+    <div class="badges">${x.archived ? '<span class="badge arch">archived</span>' : ""}${x.superseded ? '<span class="badge">superseded</span>' : ""}
+    ${x.identity.shares_title_count ? `<span class="flag">title shared with ${x.identity.shares_title_count}</span>` : ""}</div></div>`;
+  html += `<div class="card"><h2>ingested — what came out of the bytes</h2>${table(["", ""], facts.map(([k, v]) => `<tr><td>${esc(k)}</td>${cell(v)}</tr>`))}</div>`;
+  html += `<div class="card"><h2>indexed — tokens per field</h2>${table(["field", "tokens"], Object.entries(idx.fields || {}).map(([k, v]) => `<tr><td>${esc(k)}</td>${cell(v)}</tr>`))}
+    <div class="maths">${esc(idx.distinct_terms)} distinct terms. Words below are the rarest in each field — <b>df</b> is how many documents carry the term.</div></div>`;
+  Object.entries(idx.words || {}).forEach(([field, rows]) => {
+    if (!rows.length) return;
+    html += `<div class="card"><h2>${esc(field)} — rarest words</h2>${table(["word", "indexed as", "tf", "df"], rows.map((r) =>
+      `<tr><td>${esc(r.word)}</td><td class="mono">${esc(r.term)}</td>${cell(r.tf)}${cell(r.df)}</tr>`))}</div>`;
+  });
+  html += `<div class="card"><h2>passages refer would cite — ${esc(x.passage_count)}</h2>${table(["#", "heading", "lines", "bytes", "cut"], x.passages.map((p) =>
+    `<tr>${cell(p.ordinal)}<td>${esc(p.heading)}</td><td class="mono">${esc(p.lines[0])}–${esc(p.lines[1])}</td>${cell(p.bytes)}<td>${p.cut === "word" ? '<span class="flag">word</span>' : esc(p.cut)}</td></tr>`))}
+    ${x.passage_count > x.passages.length ? `<div class="sub">… ${x.passage_count - x.passages.length} more</div>` : ""}</div>`;
+  const links = (rows) => rows.length ? table(["kind", "document"], rows.map((l) => `<tr><td>${esc(l.kind)}</td><td>${esc(l.title || "")}<div class="loc mono">${esc(l.id)}</div></td></tr>`)) : '<div class="sub">none</div>';
+  html += `<div class="grid2"><div class="card"><h2>links out</h2>${links(x.links.out)}</div><div class="card"><h2>links in</h2>${links(x.links.in)}</div></div>`;
+  html += `<div class="card" id="docprobes"><h2>probes — its title and headings, asked for real</h2><div class="progress">asking…</div></div>`;
+  $("docxray").innerHTML = html;
+  try {
+    const pr = await (await fetch("/inspect/document/probes?loc=" + encodeURIComponent(loc))).json();
+    if (pr.error) throw new Error(pr.error);
+    const p = pr.probe || { title: null, headings: [] };
+    const rows = [[x.title + " (title)", p.title]].concat(p.headings);
+    $("docprobes").innerHTML = `<h2>probes — its title and headings, asked for real</h2>` + table(["probe", "rank in top 10"], rows.map(([t, r]) =>
+      `<tr><td>${esc(t)}</td>${r == null ? '<td class="n"><span class="flag">missed</span></td>' : cell("#" + r)}</tr>`)) +
+      `<div class="maths">One real <span class="mono">ask</span> per probe. Title probes favour documents whose title is also in their body.</div>`;
+  } catch (e) { $("docprobes").innerHTML = `<div class="err">${esc(e.message || e)}</div>`; }
+}
+
+/* ---- Index: fast lenses first, probes streamed in behind them. ----------- */
+async function poll(url, onProgress) {
+  for (;;) {
+    const data = await (await fetch(url)).json();
+    if (data.error && !data.state) throw new Error(data.error);
+    if (data.state === "done") return data.report;
+    if (data.state === "error") throw new Error(data.error);
+    onProgress(data);
+    await later(() => null);
+  }
+}
+const progressLine = (d) => `<span class="progress">${esc(d.phase || "starting")} — <span class="num">${esc(d.done)}</span> of <span class="num">${esc(d.total)}</span></span>`;
+
+async function loadIndex() {
+  $("idxout").innerHTML = '<div class="card"><h2>index</h2><div class="progress" id="idxprog">reading the index…</div></div>';
+  let report;
+  try {
+    report = await poll("/inspect/index", (d) => { const el = $("idxprog"); if (el) el.innerHTML = progressLine(d); });
+  } catch (e) { $("idxout").innerHTML = `<div class="card err">${esc(e.message || e)}</div>`; return; }
+  renderIndex(report, null);
+  loadProbes(report, false);
+}
+
+async function loadProbes(base, every) {
+  const slot = $("probeslot");
+  if (slot) slot.innerHTML = `<div class="progress" id="probeprog">probing ${every ? "every document" : "an evenly spaced sample"}…</div>`;
+  try {
+    const report = await poll("/inspect/probes" + (every ? "?all=1" : ""), (d) => { const el = $("probeprog"); if (el) el.innerHTML = progressLine(d); });
+    renderIndex(report, every);
+  } catch (e) { const el = $("probeslot"); if (el) el.innerHTML = `<div class="err">${esc(e.message || e)}</div>`; }
+}
+
+function renderIndex(r, every) {
+  const c = r.corpus || {};
+  let html = `<div class="card"><h2>L0 — the index at a glance</h2>
+    <div class="sub"><span class="num">${esc(c.documents)}</span> documents · <span class="num">${esc(c.terms)}</span> terms · <span class="num">${esc(c.edges)}</span> edges. No single score, by design.</div>
+    ${table(["check", "value", "status", "what it means"], (r.checks || []).map((k) =>
+      `<tr><td>${esc(k.name)}</td>${cell(pct(k.value))}<td>${k.flagged ? '<span class="flag">attention</span>' : esc(k.status)}</td><td>${esc(k.detail)}</td></tr>`))}
+    <div class="maths">Every floor is <b>provisional</b>; a flag is attention, never a failure.</div></div>`;
+  const p = r.probes;
+  html += `<div class="card"><h2>probes — does a document come back for its own title?</h2><div id="probeslot">`;
+  if (p) {
+    html += `<div class="sub">${esc(p.sampled)} of ${esc(p.documents)} probed, ${esc(p.queries)} asks — ${p.estimate ? "<b>a sample: every share is an estimate</b>" : "every document"}.</div>
+      ${table(["", "in top 10", "of"], [
+        `<tr><td>prose — title</td>${cell(p.prose.title_in_top10)}${cell(p.prose.documents)}</tr>`,
+        `<tr><td>prose — headings</td>${cell(p.prose.headings_in_top10)}${cell(p.prose.headings)}</tr>`,
+        `<tr><td>data — identifiable (title unique)</td>${cell(p.data.identifiable)}${cell(p.data.documents)}</tr>`,
+        `<tr><td>data — reachable (title in top 10)</td>${cell(p.data.reachable)}${cell(p.data.documents)}</tr>`])}
+      <div class="maths">Data documents are held to both bars, side by side, never averaged. Title probes favour documents whose title is also in their body.</div>
+      ${p.estimate ? '<button class="btn" id="probeall">probe every document</button>' : ""}`;
+  } else {
+    html += `<div class="progress">waiting to probe…</div>`;
+  }
+  html += `</div></div>`;
+  html += `<div class="card"><h2>L1 — segments: decoder × folder × archived</h2>${table(
+    ["decoder", "folder", "archived", "docs", "unreadable", "passages", "word-cut", "chrome tok.", "link-target tok.", "shared title", "title in top 10"],
+    (r.segments || []).map((s) => `<tr><td>${esc(s.decoder)}</td><td class="mono">${esc(s.folder)}</td><td>${s.archived ? "yes" : "no"}</td>${cell(s.documents)}${cell(s.unreadable)}${cell(s.passages)}${cell(s.word_cut_passages)}${cell(s.chrome_tokens)}${cell(s.link_target_tokens)}${cell(s.shared_title)}${cell(s.probed ? s.title_in_top10 + " / " + s.probed : "—")}</tr>`))}</div>`;
+  html += `<div class="card"><h2>L2 — triage: documents with findings, most first</h2>
+    <div class="sub"><span class="num">${esc(r.triage_count)}</span> of <span class="num">${esc((r.documents || []).length)}</span> documents carry a finding; fux ordered them by how many — a count, not a score.${(r.triage || []).length < r.triage_count ? ` The first <span class="num">${esc(r.triage.length)}</span> are shown.` : ""}</div>
+    ${table(["findings", "document"], (r.triage || []).map((d) =>
+      `<tr>${cell(d.findings.length)}<td><a href="#" class="opendoc mono" data-loc="${esc(d.loc)}">${esc(d.loc)}</a><div>${d.findings.map((f) => `<span class="flag">${esc(f)}</span>`).join("")}</div></td></tr>`))}</div>`;
+  const id = r.identity || {};
+  html += `<div class="card"><h2>identity — titles more than one document carries</h2>
+    <div class="sub"><span class="num">${esc(id.documents_sharing)}</span> documents share a title, in <span class="num">${esc(id.groups)}</span> groups.</div>
+    ${table(["documents", "title"], (id.top || []).map((g) => `<tr>${cell(g.count)}<td>${esc(g.title)}</td></tr>`))}
+    <div class="maths">Lever: ${esc(id.lever || "")}</div></div>`;
+  $("idxout").innerHTML = html;
+  $("idxout").querySelectorAll(".opendoc").forEach((a) => a.addEventListener("click", (e) => {
+    e.preventDefault(); showTab("docs"); openDocument(a.dataset.loc);
+  }));
+  const btn = $("probeall");
+  if (btn) btn.addEventListener("click", () => loadProbes(r, true));
+}
+
 /* Example chips come from the page's own health call and the URL, never from a
    hard-coded list of questions about somebody else's corpus. */
 async function boot() {
@@ -358,7 +564,7 @@ async function boot() {
   $("foot").innerHTML =
     `fux <span class="mono">${esc(health.version || "?")}</span> · index <span class="mono">${esc(health.schema || "?")}</span> · analyzer <span class="mono">${esc(health.analyzer || "?")}</span> · bound to <span class="mono">${esc(health.host || "127.0.0.1")}</span><br>` +
     `This page renders <span class="mono">fux ask --json --why</span> and computes nothing. Two thresholds it uses to phrase a lever — the boilerplate line and the near-tie width — are <b>provisional</b> and tuned to no corpus.<br>` +
-    `It writes nothing, anywhere. Levers are proposals; every change is a committed edit made by a person.`;
+    `It writes nothing but its own gitignored cache under <span class="mono">.fux/runtime/inspect/</span>. Levers are proposals; every change is a committed edit made by a person.`;
   const chips = ["what does this project do", "how do I set it up", "why was that decided"];
   $("chips").innerHTML = chips.map((c) => `<span class="chip">${esc(c)}</span>`).join("");
   $("chips").querySelectorAll(".chip").forEach((c) =>

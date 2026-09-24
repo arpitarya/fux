@@ -118,8 +118,14 @@ def test_the_page_is_one_file_with_its_css_and_js_inline():
 
 
 def test_the_page_only_asks_routes_this_server_serves():
-    """A fetch to a path `serve/` does not answer is a 404 nobody sees but the user."""
-    served = {"/ask", "/graph", "/health", "/"}
+    """A fetch to a path `serve/` does not answer is a 404 nobody sees but the user.
+
+    The X-ray tabs' routes are read off the server's own table (W-220), so a
+    route added there is served here without a second list to keep in step.
+    """
+    from fux.serve import _INSPECT_ROUTES
+
+    served = {"/ask", "/graph", "/health", "/"} | set(_INSPECT_ROUTES)
     for path in re.findall(r'fetch\("([^"?]+)', SCRIPT):
         assert path in served, f"the page fetches {path!r}, which `serve/` does not route"
 

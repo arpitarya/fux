@@ -33,7 +33,9 @@ microseconds and sells the one property the page exists to have.
   offline-by-default and a page served on `0.0.0.0` is a corpus's vocabulary
   offered to the network. `_bind_address` is a function so the refusal has a
   name and a test.
-- 🔴 **No route writes anything.** `GET` only; every other method is 405. The
+- 🔴 **No route writes a committed byte.** `GET` only; every other method is 405.
+  The X-ray routes (W-220) fill `.fux/runtime/inspect/` — the gitignored cache
+  `fux inspect` fills for the same index — and nothing else. The
   server keeps no log of its own — [L8](../../../records/0001_LAWS.md) decision 8
   puts every durable trace of use on a gitignored path, and the one that exists
   is the provenance journal, which is opt-in and is not this.
@@ -132,7 +134,8 @@ def _first(params: dict, key: str) -> str:
 
 
 class _Handler(BaseHTTPRequestHandler):
-    """Four GET routes and no verbs. Every other method is 405.
+    """GET routes only — `/`, `/ask`, `/graph`, `/health` and the X-ray tabs'
+    `/inspect/*` (SR-SERVE decision 4). Every other method is 405.
 
     ⚠ **`log_message` is silenced deliberately.** `BaseHTTPRequestHandler`
     writes an access line per request naming the full query string — which is
@@ -179,6 +182,8 @@ class _Handler(BaseHTTPRequestHandler):
                 self._graph(params)
             elif route == "/health":
                 self._health()
+            elif route in _INSPECT_ROUTES:
+                getattr(self, _INSPECT_ROUTES[route])(params)
             else:
                 self._json_error(HTTPStatus.NOT_FOUND, f"no route {route}")
         except FuxError as exc:
@@ -260,6 +265,201 @@ class _Handler(BaseHTTPRequestHandler):
         self._send(HTTPStatus.OK, json.dumps(payload).encode("utf-8") + b"\n", _JSON)
 
 
+    # -- the X-ray tabs (W-220) --------------------------------------------
+    #
+    # 🔴 **The server calls `fux.inspect` in-process; the browser computes
+    # nothing** — SR-SERVE decision 5 as amended. Every number the Documents and
+    # Index tabs show is a field of what these handlers return, which is what
+    # `fux inspect --json` would print for the same index.
+
+    def _send_json(self, payload) -> None:
+        body = json.dumps(payload, sort_keys=True).encode("utf-8") + b"\n"
+        self._send(HTTPStatus.OK, body, _JSON)
+
+    def _documents(self, params: dict) -> None:
+        """Every document in `.fux/index/REGISTER` — the list, no X-ray."""
+        from ..ingest import register
+
+        root = self.server.state.root()
+        rows = [
+            {"loc": r.loc, "kind": r.kind, "sha": r.sha, "decoder": r.decoder.split("@", 1)[0]}
+            for r in sorted(register.read(root).values(), key=lambda r: r.loc)
+        ]
+        self._send_json({"documents": rows, "count": len(rows)})
+
+    def _document(self, params: dict) -> None:
+        """ONE document's X-ray, computed on the click and cached (pass A)."""
+        from ..inspect import xray
+
+        loc = _first(params, "loc").strip()
+        if not loc:
+            self._json_error(HTTPStatus.BAD_REQUEST, "give me a document: /inspect/document?loc=…")
+            return
+        self._send_json(xray.document(self.server.state.root(), self.server.state.view(), loc))
+
+    def _document_probes(self, params: dict) -> None:
+        """This document's own probes — its title and each heading, one `ask` each."""
+        from ..inspect import facts as facts_mod, probes as probes_mod
+
+        loc = _first(params, "loc").strip()
+        view = self.server.state.view()
+        index = next((i for i, d in enumerate(view.docs) if d.loc == loc or d.id == loc), None)
+        if index is None:
+            self._json_error(HTTPStatus.NOT_FOUND, f"no indexed document at {loc!r}")
+            return
+        root = self.server.state.root()
+        facts = facts_mod.Facts(by_id={view.docs[index].id: facts_mod.load_or_compute_one(root, view, view.docs[index])})
+        result = probes_mod.run(root, view, facts, only=[index])
+        self._send_json({"probe": result.by_id.get(view.docs[index].id), "queries": result.queries})
+
+    def _index(self, params: dict) -> None:
+        """The corpus report WITHOUT probes — the fast lenses, computed on open."""
+        # Both sampled halves are skipped here, so the tab's first render is the
+        # exhaustive lenses alone; `/inspect/probes` runs self-retrieval and the
+        # probes behind it, through one query cache.
+        self._send_json(self.server.state.job("index", probe_sample=None, retrieval_sample=None))
+
+    def _probes(self, params: dict) -> None:
+        """The corpus report WITH probes: a sample by default, every document on `all=1`."""
+        from ..inspect import probes as probes_mod
+
+        every = _first(params, "all") in ("1", "true", "yes")
+        sample = 0 if every else probes_mod.DEFAULT_PROBE_SAMPLE
+        self._send_json(self.server.state.job("probes-all" if every else "probes", probe_sample=sample))
+
+
+#: route -> handler method. GET only, like every other route.
+_INSPECT_ROUTES = {
+    "/inspect/documents": "_documents",
+    "/inspect/document": "_document",
+    "/inspect/document/probes": "_document_probes",
+    "/inspect/index": "_index",
+    "/inspect/probes": "_probes",
+}
+
+
+#: How many rows each capped list carries on the Index tab. The CLI's default is
+#: 20; a page can scroll, and the full count still travels beside every list.
+TRIAGE_ROWS = 200
+
+
+#: "Whatever `fux inspect` would use" — distinct from `None`, which skips.
+_LIBRARY_DEFAULT = object()
+
+
+class _JobProgress:
+    """`fux.progress`'s phase protocol, recorded instead of painted.
+
+    The page shows the slow part as a progress line — *the slow part is visible,
+    never silent* (W-220) — and a phase name, a count and a total are all it
+    needs. No clock is read: a count is a fact, a duration would be a guess.
+    """
+
+    def __init__(self) -> None:
+        self.phase_name = ""
+        self.done = 0
+        self.total = 0
+
+    def phase(self, name: str, total: int, unit: str = ""):
+        progress = self
+
+        class _Phase:
+            def __enter__(self_inner):
+                progress.phase_name, progress.done, progress.total = name, 0, total
+                return self_inner
+
+            def update(self_inner, n: int = 1, detail: str = "") -> None:
+                progress.done += n
+
+            def __exit__(self_inner, *exc) -> bool:
+                return False
+
+        return _Phase()
+
+
+class _State:
+    """What the server keeps between requests: the root, one `IndexView`, the jobs.
+
+    The view is re-read when the committed shards change, so a re-ingest while
+    the page is open is picked up on the next click rather than served stale.
+    Jobs are keyed by kind and by the shards they read, so reopening a tab on an
+    unchanged index returns the finished report and recomputes nothing.
+    """
+
+    def __init__(self, root=None) -> None:
+        self._lock = threading.Lock()
+        self._root = root
+        self._view = None
+        self._view_key = None
+        self._jobs: dict = {}
+
+    def root(self):
+        if self._root is None:
+            from ..config import find_root
+
+            root = find_root()
+            if root is None:
+                raise FuxError("not inside a fux repository (no .fux/ found up the tree)")
+            self._root = root
+        return self._root
+
+    def _shard_key(self):
+        from .. import store as store_mod
+
+        return tuple(
+            (p.name, p.stat().st_size, p.stat().st_mtime_ns) for p in store_mod.iter_shard_paths(self.root())
+        )
+
+    def view(self):
+        from ..inspect._scan import read_index_view
+
+        key = self._shard_key()
+        with self._lock:
+            if self._view is None or key != self._view_key:
+                self._view = read_index_view(self.root())
+                self._view_key = key
+            return self._view
+
+    def job(self, kind: str, *, probe_sample, retrieval_sample=_LIBRARY_DEFAULT):
+        view = self.view()
+        key = (kind, self._view_key)
+        with self._lock:
+            job = self._jobs.get(key)
+            if job is None:
+                job = {"state": "running", "progress": _JobProgress(), "result": None, "error": None}
+                self._jobs[key] = job
+                threading.Thread(
+                    target=self._run, args=(job, view, probe_sample, retrieval_sample), daemon=True
+                ).start()
+        if job["state"] == "done":
+            return {"state": "done", "report": job["result"]}
+        if job["state"] == "error":
+            return {"state": "error", "error": job["error"]}
+        p = job["progress"]
+        return {"state": "running", "phase": p.phase_name, "done": p.done, "total": p.total}
+
+    def _run(self, job, view, probe_sample, retrieval_sample) -> None:
+        from ..inspect import as_dict, inspect_index
+        from ..inspect.lenses import DEFAULT_RETRIEVAL_SAMPLE
+
+        if retrieval_sample is _LIBRARY_DEFAULT:
+            retrieval_sample = DEFAULT_RETRIEVAL_SAMPLE
+
+        try:
+            # `top=TRIAGE_ROWS`: the page shows the triage fux ordered, and never
+            # re-sorts rows itself — an order is the engine's to state.
+            report = inspect_index(
+                self.root(), probe_sample=probe_sample, retrieval_sample=retrieval_sample,
+                progress=job["progress"], view=view, top=TRIAGE_ROWS,
+            )
+            job["result"] = as_dict(report)
+            job["state"] = "done"
+        except Exception as exc:  # a tab must say what failed, not hang
+            job["error"] = f"{type(exc).__name__}: {exc}"
+            job["state"] = "error"
+
+
+
 class _Server(ThreadingHTTPServer):
     """`ThreadingHTTPServer` without the reverse-DNS lookup in `server_bind`.
 
@@ -279,13 +479,17 @@ class _Server(ThreadingHTTPServer):
         self.server_port = port
 
 
-def make_server(port: int = DEFAULT_PORT, host: str | None = None) -> ThreadingHTTPServer:
+def make_server(port: int = DEFAULT_PORT, host: str | None = None, root=None) -> ThreadingHTTPServer:
     """A bound server, not yet serving. Separated so a test can take the port.
 
     `port=0` asks the OS for a free one, which is what `tests/serve/` uses —
-    a fixed port in a test suite is a flake waiting for a busy machine.
+    a fixed port in a test suite is a flake waiting for a busy machine. `root`
+    pins the repository the X-ray tabs read; by default it is found from the
+    working directory on first use, as every other verb finds it.
     """
-    return _Server((_bind_address(host), port), _Handler)
+    server = _Server((_bind_address(host), port), _Handler)
+    server.state = _State(root)
+    return server
 
 
 def cmd_serve(args) -> int:

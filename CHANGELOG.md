@@ -8,6 +8,33 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Added
+
+- **The index X-ray (W-220).** `fux inspect` now reads each document on its
+  own as well as the corpus as a whole:
+  - **Per-document facts:** decoder, text bytes, title source, link-target and
+    page-chrome tokens, and the passages `refer` would cut, including how many
+    were cut between two words. Cached under `.fux/runtime/inspect/`, keyed so
+    that a decoder bump recomputes only that decoder's documents.
+  - **Title probes:** each document's own title and headings, asked as a real
+    `ask`. They are the new findability headline (`title-probe reach`), sampled
+    by default (`--probe-sample`, `--all`). Data files are held to two bars:
+    *identifiable* and *reachable*.
+  - **Folded views:** shared titles, decoder × folder × archived segments,
+    chunk cuts per decoder, and a triage ordered by how many findings each
+    document carries.
+  - **`fux inspect --diff A B`:** compares two reports per document. A lost
+    edge is always an alert.
+- **`fux serve` has three tabs: Ask, Documents and Index.** Documents lists the
+  register and X-rays the one you click. Index shows the whole corpus, with the
+  probes streamed in behind. Both are computed on the fly, in-process, with no
+  separate command first; the browser still computes nothing.
+
+### Changed
+
+- `fux inspect`'s descriptive headline row is `title-probe reach`, not
+  `findable share`. Self-retrieval still prints under the findability lens.
+
 ## [3.0.0-alpha.4] - 2026-09-23
 
 **A fix release.** `3.0.0-alpha.3` shipped while `main`'s CI was red. The red

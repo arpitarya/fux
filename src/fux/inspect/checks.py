@@ -146,20 +146,29 @@ class Check:
         return "attention" if self.flagged else "ok"
 
 
-def run_checks(boilerplate, findability, duplication, *, documents: int) -> list[Check]:
-    """The four numbers the report leads with — three floored, one descriptive."""
-    share = findability.findable_share
-    if share is None:
-        findable_detail = "no documents were sampled for retrieval"
+def run_checks(boilerplate, findability, duplication, *, documents: int, probes=None) -> list[Check]:
+    """The four numbers the report leads with — three floored, one descriptive.
+
+    🔴 **The descriptive headline is TITLE-PROBE REACH since W-220 (2026-09-23),
+    not self-retrieval.** Self-retrieval reads 1.000 on every golden rung and on
+    planted-bad (the module docstring); a title is what a person types, and on
+    this repository 21 of 120 title probes missed their own top ten while
+    self-retrieval read 100 %. Self-retrieval still prints, under the
+    findability lens. `probes` is the probe lens's dict (`xray._probe_lens`), or
+    `None` when no document was probed — and then the row is `n/a`, never a pass.
+    """
+    if not probes or not probes.get("sampled"):
+        reach, reach_detail = None, "no document was probed"
     else:
-        findable_detail = (
-            f"{findability.retrieved} of {findability.sampled} documents are returned in the top 3 "
-            f"for their own most distinctive words"
-            + (
-                " (every document)"
-                if findability.sample_is_whole_corpus
-                else " (an evenly spaced SAMPLE - the share is an estimate)"
-            )
+        prose, data = probes["prose"], probes["data"]
+        probed = prose["documents"] + data["documents"]
+        hits = prose["title_in_top10"] + data["reachable"]
+        reach = hits / probed if probed else None
+        reach_detail = (
+            f"{hits} of {probed} probed documents come back in the top 10 for their own title"
+            + (" (every document)" if not probes["estimate"]
+               else " (an evenly spaced SAMPLE - the share is an estimate)")
+            + ". Title probes favour documents whose title is also in their body"
         )
     unreachable = len(findability.unfindable) / documents if documents else None
     return [
@@ -190,13 +199,13 @@ def run_checks(boilerplate, findability, duplication, *, documents: int) -> list
                 f"near-duplicate pair (Jaccard >= 0.80); {duplication.pair_count} pair(s)"
             ),
         ),
-        # ⚠ **Descriptive, deliberately — `floor=None` is the measured verdict**
-        # and not an omission. See the module docstring: 1.000 on every golden
-        # rung and 1.000 on planted-bad.
+        # ⚠ **Descriptive, deliberately.** A probe number is this corpus
+        # describing itself; no floor has been measured for it, and the rule in
+        # the module docstring says a floor is measured before it flags anything.
         Check(
-            name="findable share",
-            value=share,
+            name="title-probe reach",
+            value=reach,
             floor=None,
-            detail=findable_detail,
+            detail=reach_detail,
         ),
     ]

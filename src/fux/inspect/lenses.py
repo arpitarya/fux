@@ -50,6 +50,11 @@ LEVERS: dict[str, str] = {
     "hub": "link-IDF and the graph-composed `ask` (W-161) — until then, nothing: a hub is a fact about the corpus",
     "file-name-only document": "a decoder (`fux-decoder`), or leave it in `.fux/enrich/queue.tsv` for a model to describe",
     "unreadable document": "re-ingest, or `keep = true` on the url line so the bytes are retained",
+    "shared title": "a `title:` in front-matter, or a data decoder's `META_FIELDS` title claim (`fux-decoder`)",
+    "title probe miss": "`fux enrich`, `fux correct`, or a title the document's own body also uses",
+    "word-cut passage": "a decoder that emits one record per paragraph (`fux-decoder`)",
+    "page chrome": "a consumer html decoder in `.fux/decoders/` that skips `nav`, `header`, `aside` and `footer` (`fux-decoder`)",
+    "link-target tokens": "none a consumer can turn — an extraction-rule change under SR-EXTRACTED, its own item, measured first",
 }
 
 #: 64 permutations in 16 bands of 4 rows. The banding threshold — the Jaccard
@@ -320,10 +325,17 @@ def findability(
     view,
     dictionary,
     *,
-    sample: int = DEFAULT_RETRIEVAL_SAMPLE,
+    sample: int | None = DEFAULT_RETRIEVAL_SAMPLE,
     top_lists: int = 20,
     progress=None,
+    cache: dict | None = None,
 ) -> Findability:
+    """`sample=None` skips the retrieval half (the exhaustive half always runs).
+
+    `cache`, when given, maps a query to the ids it returned under the current
+    ranking key (`probes.ranking_key`) — the same cache the probe lens fills, so
+    a second look at an unchanged index asks nothing (W-220).
+    """
     from ..progress import NULL as _NULL_PROGRESS
 
     progress = progress or _NULL_PROGRESS
@@ -339,14 +351,14 @@ def findability(
         ((view.docs[i].id, c) for i, c in enumerate(counts)), key=lambda pair: (pair[1], pair[0])
     )[:top_lists]
 
-    indices = _sample_indices(view.n, sample)
-    out.sample_is_whole_corpus = len(indices) == view.n
+    indices = [] if sample is None else _sample_indices(view.n, sample)
+    out.sample_is_whole_corpus = sample is not None and len(indices) == view.n
     out.sampled = len(indices)
     with progress.phase("retrieval", len(indices), "queries") as p:
         for index in indices:
             p.update(1)
             query = _fingerprint(view, dictionary, index)
-            rank = _self_rank(root, view.docs[index].id, query) if query else None
+            rank = _self_rank(root, view.docs[index].id, query, cache) if query else None
             if rank is not None and rank <= FINDABLE_RANK:
                 out.retrieved += 1
             else:
@@ -402,7 +414,7 @@ def term_hash_in(analyzed: list[str], wanted: str, hasher) -> bool:
     return any(hasher(a) == wanted for a in analyzed)
 
 
-def _self_rank(root, doc_id: str, query: str) -> int | None:
+def _self_rank(root, doc_id: str, query: str, cache: dict | None = None) -> int | None:
     """1-based rank of `doc_id` in `query`'s results, or `None` if absent.
 
     ⚠ **Never raises.** `inspect` is a report; a query that cannot run is a
@@ -412,12 +424,18 @@ def _self_rank(root, doc_id: str, query: str) -> int | None:
     """
     from ..query import run_query
 
-    try:
-        results, _ = run_query(root, query, FINDABLE_RANK, force_scan=False)
-    except Exception:  # pragma: no cover - a report must not fail a command
-        return None
-    for position, result in enumerate(results, start=1):
-        if result.id == doc_id:
+    key = f"self@{FINDABLE_RANK}:{query}"
+    ids = cache.get(key) if cache is not None else None
+    if ids is None:
+        try:
+            results, _ = run_query(root, query, FINDABLE_RANK, force_scan=False)
+        except Exception:  # pragma: no cover - a report must not fail a command
+            return None
+        ids = [result.id for result in results]
+        if cache is not None:
+            cache[key] = ids
+    for position, other in enumerate(ids, start=1):
+        if other == doc_id:
             return position
     return None
 

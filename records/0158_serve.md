@@ -3,14 +3,14 @@ type: Standing Record
 kind: component
 name: SR-SERVE
 title: "SR-SERVE (0158) — `fux serve`, the ask explorer: a local page that renders `ask --json --why` and computes nothing"
-description: "Arpit's framing, 2026-09-22 — fux is like Google: if the ten documents an agent is handed are the right ten, the answer is mostly right. So the inspection surface is question-first. `fux serve` starts a stdlib server bound to 127.0.0.1 with no --host, serves one self-contained page, and answers GET /ask with the byte-identical stdout of `fux ask --json --why --band`. The page is a RENDERER: it computes no score, no band and no rank, because a second ranker in a browser is a restatement in the L0 sense. Every lever it prints is a proposal; no route writes anything."
+description: "Arpit's framing, 2026-09-22 — fux is like Google: if the ten documents an agent is handed are the right ten, the answer is mostly right. So the inspection surface is question-first. `fux serve` starts a stdlib server bound to 127.0.0.1 with no --host, serves one self-contained page, and answers GET /ask with the byte-identical stdout of `fux ask --json --why --band`. The page is a RENDERER: it computes no score, no band and no rank, because a second ranker in a browser is a restatement in the L0 sense. Every lever it prints is a proposal; no route writes a committed byte. Since W-220 (2026-09-23) the page has three tabs — Ask, Documents, Index — and the server calls fux.inspect in-process for the last two, on demand and cached under .fux/runtime/inspect/; the browser still computes nothing."
 status: accepted
 date: 2026-09-22
 feature: the ask explorer — a local page over the real ask
-owns: [src/fux/serve@6220760ee828]
+owns: [src/fux/serve@045449d1c10f]
 laws: [L1, L2, L4, L6, L8, L10]
 timestamp: 2026-09-22T00:00:00Z
-content_sha: a53133dc58fe26f9fc24ac1b7fa3d304595f44c61b49bd8ecaa398b356b68192
+content_sha: 8062288b5facbc5cfaed864d306916b85e016a660d2f81a66ee1823b1d26afa0
 ratifies: "Arpit, 2026-09-22 (Cowork, W-210) — three sample pages built on his machine, the per-token ingest X-ray REJECTED as a front page ('do you believe people will go through this big document?') and the question-first explorer ratified in its modern-dark form: 'the way I'm thinking about fux is something like Google. If a question gets asked, if you have the best 10 documents, the answer the agent gives is going to be mostly correct.'"
 ---
 
@@ -113,7 +113,7 @@ the one property the page exists to have.
 including on a query that matches nothing — the shape a page is likeliest to
 special-case.
 
-**4. Four routes, all `GET`, and none of them writes.**
+**4. Every route is `GET`, and none of them writes a committed byte.**
 
 | route | answers with |
 |---|---|
@@ -121,13 +121,32 @@ special-case.
 | `/ask?q=…&top=N` | `fux ask --json --why --band` |
 | `/graph?seed=…` | `fux graph --seed … --json` |
 | `/health` | version, index schema id, analyzer version, bind address |
+| `/inspect/documents` | the rows of `.fux/index/REGISTER` (decision 15) |
+| `/inspect/document?loc=…` | one document's X-ray — [SR-INSPECT](0156_inspect.md) decision 20 |
+| `/inspect/document/probes?loc=…` | that document's own probes — SR-INSPECT decision 19 |
+| `/inspect/index` | the corpus report **without** probes, as a job with progress |
+| `/inspect/probes[?all=1]` | the corpus report **with** probes, sampled or every document |
+
+⚠ **Amended 2026-09-23 (W-220): the five `/inspect/` routes write the
+GITIGNORED runtime cache** — `.fux/runtime/inspect/`'s facts, probes and
+dictionary, exactly what `fux inspect` writes for the same index. Nothing else,
+and never a committed byte ([L2](0004_LAW-2-content-never-durable.md),
+[L8](0001_LAWS.md)). A GET that fills a cache is a read that remembers; a route
+that changed what is indexed would be an apply button, which decision 10
+refuses.
 
 🔴 **`POST`, `PUT`, `PATCH` and `DELETE` are 405 with a sentence**, not a
 missing handler. The refusal is what tells the next person that read-only is a
 decision rather than an omission somebody should helpfully fill in.
 
 **5. 🔴 The page computes no score, no band and no rank**, and a source gate
-holds it: `tests/serve/test_page_computes_nothing.py`. The arithmetic it may do
+holds it: `tests/serve/test_page_computes_nothing.py`. ⚠ **Amended 2026-09-23
+(W-220), and narrowed rather than deleted:** the *browser* still computes
+nothing — no score, no band, no rank, no order — but the **server** now calls
+`fux.inspect`'s library for the Documents and Index tabs, exactly as it already
+runs `ask` for the Ask tab. Every number those tabs show is a field of what
+`fux inspect --json` would print; the triage order is the one the engine
+returned, and the page never re-sorts it. The arithmetic it may do
 is presentation only — a percentage of #1 for a bar width, a difference of two
 **printed** numbers, a share of the printed per-term contributions for a stacked
 segment. **If a number cannot be pointed at in `ask --json --why`, it does not
@@ -207,12 +226,35 @@ JSON"*, and the honest version of that requirement is this one** — if `--why`
 ever gains `ms`, the stepper reads it. `tests/serve/test_page_computes_nothing.py`
 holds that no clock is read either way.
 
-**14. Rungs 2–4 are NOT this record's yet.** `fux ask --html <file>` (the same
+**14. Rungs 2–4 were not this record's when it was written.** Rungs 3 and 4 are
+now decision 15's tabs; **rung 2 (`fux ask --html`) is still unbuilt and out of
+W-220's scope.** `fux ask --html <file>` (the same
 renderer, one question inlined), `fux trace <doc> --html` (the per-document
 findability card) and `/docs` (corpus reachability) are filed in W-210 and land
 with their own decisions. What is reserved for them here is
 **`.fux/runtime/trace/`** — gitignored, runtime-only, because anything those
 rungs write names words and quotes passages.
+
+**15. One page, three tabs — Ask · Documents · Index — and no `/docs` route**
+(Arpit, 2026-09-23, W-220). Switching is a tab in the page, never a URL to
+remember.
+
+- **Documents** lists every row of `.fux/index/REGISTER`. **Clicking one**
+  computes that document's X-ray and nothing else, then asks for its probes.
+- **Index** computes the corpus report **when the tab is opened** — the
+  exhaustive lenses first, with **both sampled halves skipped** (self-retrieval
+  and the probes each cost one real `ask` per query) — and then streams them in
+  behind, through one shared query cache, with a progress
+  line (a phase, a count and a total; no clock is read). It probes an **evenly
+  spaced sample labelled an estimate**, with a *probe every document* button.
+- 🔴 **Everything is computed ON THE FLY by `fux serve`** — *"I just want to do
+  fux serve and the application itself should run the commands"*. Nobody runs
+  `fux inspect` first. The server imports `fux.inspect` and calls it
+  **in-process, never through a subprocess**; one engine, two front doors
+  ([SR-INSPECT](0156_inspect.md) decision 22).
+- **Lazy and cached.** Nothing is computed at start-up. The server keeps one
+  `IndexView`, re-read when the committed shards change, and one job per
+  (tab, shards) — reopening a tab on an unchanged index recomputes nothing.
 
 ### Consequences
 

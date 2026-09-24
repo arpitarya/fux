@@ -23,8 +23,10 @@ here. Read that record before changing anything below it.
 
 | what he decides | filed | age |
 |---|---|---|
-
-*Empty since 2026-09-23 — W-168's RM3 filed FAIL and W-220 fully ruled the same day.*
+| 🔴 **W-215** — type `just golden-score work/regression/2026-09-24-golden-gen2-rung-01000`: both gen-2 sets on the rebuilt ladder. It says whether gen 2 holds questions today's engine misses. [report](regression/2026-09-24-golden-gen2-rung-01000/report.md) | 2026-09-24 | 0d |
+| ↳ **blocks:** W-168 — every step's pool needs this score. | | |
+| 🔴 **W-168** — step 9: take D2 (a `[doctype]` glob table), I1 (a fixed cue lexicon) and S1 (step 3's intent stays out)? [compare doc](compare/intent-doctype-prior.compare.md) | 2026-09-24 | 0d |
+| ↳ **blocks:** nothing else in the queue — only step 9. | | |
 
 ---
 
@@ -32,11 +34,9 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🟢 **W-215** · `agent` — golden data gen 2. **Prompt 10 ran 2026-09-23** (14 seeds, `set-3-u`). Next: rebuild the ladder, prompt 4, Opus, **in a fresh session**. [detail](open/W-215-generation-2-corpus.md)
+- 🔴 **W-215** · `arpit` — golden data gen 2. Ladder rebuilt, inputs measured (17 anchor terms, 9 `Term (ABBR)`), baseline captured 2026-09-24. Waits on Arpit's score. [detail](open/W-215-generation-2-corpus.md)
 
-- 🟢 **W-168** · `agent` — the ranking ideas. **Step 5 (RM3) filed FAIL 2026-09-23** — it made rank 1 worse at every setting. Next: step 9, judged on whether the right document comes first. [detail](open/W-168-search-improvements.md)
-
-- 🟢 **W-220** · `build` — the index X-ray. **Fully ruled 2026-09-23:** `fux serve` alone — tabs for Ask, Documents and Index, each report built when you open it. Not built. [detail](open/W-220-index-xray.md)
+- 🔴 **W-168** · `arpit` — the ranking ideas. Step 9 is a compare doc (2026-09-24) awaiting three rulings, and its pool awaits the gen-2 score. [detail](open/W-168-search-improvements.md)
 
 
 ### testing

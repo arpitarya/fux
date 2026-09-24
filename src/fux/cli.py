@@ -360,6 +360,25 @@ def build_parser() -> argparse.ArgumentParser:
         help="documents to test by retrieval; 0 means every one of them (one full query each)",
     )
     p_inspect.add_argument(
+        "--probe-sample",
+        type=int,
+        default=None,
+        metavar="N",
+        help="documents to probe by their own title and headings (one `ask` each); 0 means every one",
+    )
+    p_inspect.add_argument(
+        "--all",
+        action="store_true",
+        help="probe every document, not an evenly spaced sample (same as --probe-sample 0)",
+    )
+    p_inspect.add_argument(
+        "--diff",
+        nargs=2,
+        metavar=("A", "B"),
+        default=None,
+        help="compare two report.json files per document; edge loss is always an alert. Writes nothing",
+    )
+    p_inspect.add_argument(
         "--rebuild-dictionary",
         action="store_true",
         help="re-tokenise the sources even when the cached hash-to-word dictionary is current",

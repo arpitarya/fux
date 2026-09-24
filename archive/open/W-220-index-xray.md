@@ -3,14 +3,70 @@ type: OpenItem
 id: W-220
 title: "W-220 — the index X-ray: one engine, four zoom levels, judged by what a person types"
 description: "Arpit asked (2026-09-23) to see how one document is ingested and indexed, and then how that works for the whole index. Two design samples were built from real runs. They found that inspect's findable share reads 100 % while 21 of 120 title probes miss their own top 10, and that 526 of 1 672 documents share a title. The design extends SR-INSPECT and W-210's rungs 3–4. Fully ruled 2026-09-23: inspect computes it, and fux serve computes it on demand when a tab is opened — no separate command. Not built."
-status: open
+status: closed
+closed: 2026-09-24
 lane: build
 timestamp: 2026-09-23T00:00:00Z
 filed: 2026-09-23
-ball: agent
+ball: none
 ---
 
 # W-220 — the index X-ray
+
+## ✅ CLOSED 2026-09-24 (Claude Code, Opus) — all four rungs built
+
+**Built:**
+- **R1** · `inspect/facts.py`: pass A, cached in `.fux/runtime/inspect/facts.json`
+  per document.
+- **R2** · `inspect/probes.py`: titles and headings; data files on both bars.
+  `title-probe reach` is now the headline row.
+- **R3** · `fux serve` has Ask · Documents · Index tabs. It calls `fux.inspect`
+  in-process, lazily and cached, with probes streamed behind the fast lenses.
+- **R4** · `inspect/diff.py`: `--diff A B`. A lost edge is always an alert.
+
+The fold (identity, segments, chunks, triage) and the one-document X-ray are in
+`inspect/xray.py`.
+
+**Records:**
+- SR-INSPECT decisions 17–22, plus five levers;
+- SR-SERVE decisions 4 and 5 amended, 15 new;
+- SR-CLI decision 11;
+- SR-DOTFUX `runtime/inspect/`;
+- six co-owners of `fuxdir.py`, re-read and noted.
+
+**Tests:** both suites green. The new ones are
+`tests/test_inspect_xray.py` (19), `tests/serve/test_xray_routes.py` (10) and
+`tests_e2e/test_inspect_xray_verb.py` (2). The e2e test plants an html decoder
+that strips hrefs.
+
+**What it found on this repository, live via `fux serve`** (descriptive, 1 672
+documents, a 50-document probe sample):
+
+| finding | value |
+|---|---|
+| documents sharing a title | **526 in 99 groups** — the same figure the design sample filed |
+| data files identifiable by title | 141 of 559 |
+| passages cut between two words | **16 202** of 144 500 |
+| title-probe reach (sample) | 82 % |
+| data files in the sample | 4 of 13 identifiable, 7 of 13 reachable |
+| heading probes in the top 10 | 129 of 246 |
+
+**Cost, on a loaded machine** (orders of magnitude, not a benchmark):
+- Index tab: 278 s cold, 6 s warm;
+- probe job: ≈ 1.3 s per query;
+- a reopened tab: instant.
+
+⚠ **One design change the spec did not name.** The probe cache key is the shards
+**plus the `tune.toml` bytes**, not the index root alone, because a probe cached
+under one `[bm25f]` and read under another would report a ranking nobody ran
+(SR-INSPECT decision 19).
+
+⚠ **Self-retrieval moved off the Index tab's fast path.** It is one real query
+per document too, so the tab's first render skips both sampled halves and the
+probe job runs them through one shared cache (SR-SERVE decision 15).
+
+**Out of scope, still:** every lever, since findings 2–7 each become their own
+item measured on golden data first; `ask --html`; the Node reader.
 
 **Model: Opus** for the rulings' follow-through and SR-INSPECT's amendment (a new
 headline metric and a new cache); **Sonnet** for rungs 1, 3 and 4 once ruled.

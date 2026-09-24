@@ -1,8 +1,11 @@
 {
- "decision": "PROCEED",
- "reason": "Nothing waits on Arpit. W-168 step 5 was filed FAIL and W-220 was fully ruled on 2026-09-23 — fux serve computes the X-ray on demand behind Ask / Documents / Index tabs. Every open item is 🟢.",
- "questions": [],
+ "decision": "ASK",
+ "reason": "W-220 is built and closed (2026-09-24). W-215's ladder is rebuilt, the step inputs are measured on it, and both generation-2 sets are captured on rung-01000; scoring that capture is Arpit's hand under L11. W-168 step 9 is written up as a compare doc whose three forks are his. No open item is agent-closable until one of the two lands.",
+ "questions": [
+  "Type `just golden-score work/regression/2026-09-24-golden-gen2-rung-01000` — it settles W-215 item 1 and gives every W-168 step its pool.",
+  "W-168 step 9: take D2 (a [doctype] glob table in tune.toml), I1 (a fixed cue lexicon) and S1 (step 3's history/current intent stays out) — or name another fork?"
+ ],
  "safe_alternative": "",
  "surfaced": true,
- "filed": "2026-09-23"
+ "filed": "2026-09-24"
 }

@@ -29,6 +29,35 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-24 — W-220 SHIPPED; W-215 captured; W-168 step 9 written up — the queue now waits on Arpit  ·  Claude Code
+- **Asked:** *"implement w-215, w-168, w-220 keep implementing till closure"*.
+- **Did — W-220, closed:** all four rungs built.
+  - `inspect/facts.py`, `probes.py`, `xray.py` and `diff.py`;
+  - `fux inspect --probe-sample/--all/--diff`;
+  - `fux serve` Documents and Index tabs, in-process, lazy and cached.
+  - SR-INSPECT 17–22 · SR-SERVE 4/5/15 · SR-CLI 11 · SR-DOTFUX; six `fuxdir.py`
+    co-owners re-read; skills and templates synced.
+  - Live on this repo, it reproduces the design samples: 526 documents share 99
+    titles, 16 202 passages are cut between words.
+  - Units 5 616 passed, e2e 151, Node green. Archived to `archive/open/`.
+- **Did — W-215:**
+  - Found the item's *"next: rebuild the ladder"* stale: `26c7e854` had done it.
+  - Measured the step inputs on the new ladder: 17 anchor-distinctive terms,
+    9 `Term (ABBR)`, a 21-line glossary.
+  - Pre-registered (`ca1accf9`) and captured both gen-2 sets on `rung-01000` at
+    the rung's own engine, with no re-ingest.
+- **Did — W-168:** step 9's [compare doc](compare/intent-doctype-prior.compare.md).
+  The seed declares no document type, so only a query-time glob table is
+  testable on the frozen ladder.
+- **Also:** committed the 2026-09-23 Cowork rulings the previous session left
+  uncommitted (`3dbb8c4e`).
+- **Decided / open:** two inbox rows, both Arpit's:
+  - `just golden-score` on the capture;
+  - step 9's three forks.
+
+  `BLOCKED.json` → `ASK`.
+- **Next:** the first of those two to land.
+
 ## 2026-09-23 — W-220 FULLY RULED: `fux serve` builds the X-ray on the fly, behind three tabs  ·  Cowork
 - **Asked:** *"can we generate a report on the fly? … I just want to do fux serve and the application itself should run the commands, get whatever details need to be fetched so it can be displayed on the UI."*
 - **Did:** W-220's §Still owed replaced by a rulings block carrying **four** rulings — three said earlier the same day and **never filed because the bridge dropped** (one page with Ask/Documents/Index tabs and no `/docs` route; Documents from the REGISTER, opened one at a time, no up-front trace; probes on titles AND headings), plus today's: **computed on demand by `fux serve`, never a separate command**. R3 rewritten around it: in-process calls to `fux.inspect`, lazy per tab, cached under `.fux/runtime/inspect/`, fast lenses first, probes streamed and sampled with a probe-everything button. W-220 🔴 → 🟢; inbox empty; `BLOCKED.json` → `PROCEED`.

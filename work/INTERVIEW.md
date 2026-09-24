@@ -32,15 +32,32 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-09-22** (Claude Code, Opus — the benchmark has a score).* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-09-24** (Claude Code, Opus — W-220 shipped; the queue waits on two rulings).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🔴 W-220 — the index X-ray: home and data-file bars ruled, two calls left (2026-09-23, Cowork)
+### 🔴 2026-09-24 — W-220 SHIPPED; W-215 and W-168 now wait on Arpit (Claude Code, Opus)
 
-- **What:** a per-document ingest X-ray and a whole-index design built on SR-INSPECT and W-210 rungs 3–4. The samples live in `.fux/runtime/trace/` and are never committed.
-- **Why it matters:** `fux inspect`'s findable share reads 100 % while title probes miss 21 of 120. The headline metric can't see misses.
-- **Ruled 2026-09-23:** it lives in `fux inspect`, and data files are held to both bars (identifiable and reachable).
-- **Next:** two calls are still Arpit's: whether the serve/trace views build on it, and the probe source. [W-220](open/W-220-index-xray.md)
+- ✅ **W-220 is built and closed** ([archive](../archive/open/W-220-index-xray.md)):
+  - `fux inspect` gained per-document facts, title probes (the new headline),
+    identity / segments / chunks / triage, and `--diff`;
+  - `fux serve` has Ask · Documents · Index tabs, computed on the fly.
+  - Records: SR-INSPECT decisions 17–22 and SR-SERVE decision 15.
+  - ⚠ **No lever it found is applied.** Shared titles (526 docs here), word-cut
+    passages (16 202) and page chrome are each a future item, measured on golden
+    data first.
+- 🔴 **W-215 — the ladder is rebuilt, the inputs are measured, and the baseline
+  is captured.** The inputs, counted from the seed:
+  - 17 anchor-distinctive terms (was 1);
+  - 9 `Term (ABBR)` pairs (was 0);
+  - a 21-line glossary.
+
+  [The capture](regression/2026-09-24-golden-gen2-rung-01000/report.md) waits
+  on **Arpit's `just golden-score`**. No agent runs it.
+- 🔴 **W-168 step 9 is a compare doc** ([intent-doctype-prior](compare/intent-doctype-prior.compare.md)).
+  Its three forks are Arpit's, and its pool needs that same score.
+  - **Measured:** the seed declares no document type anywhere. Only a
+    query-time glob table (D2) can be tested on the frozen ladder.
+- **Next:** nothing agent-closable until one of those rulings lands.
 
 ### ✅ 2026-09-22 — THE GOLDEN BENCHMARK HAS A NUMBER, and the queue is three 🟢 rows
 
@@ -2750,6 +2767,7 @@ the reason is that the measuring environments are gone.**
 *Updated **2026-09-17** (Claude Code, Opus 5) — maintainer line: this session.*
 
 *Updated **2026-09-20** (Claude Code, Opus 5) — maintainer line: this session.*
+*Updated **2026-09-24** (Claude Code, Opus 5.5) — maintainer line: this session. The live next step is §1's newest block: two rulings for Arpit, and his `just golden-score`.*
 
 ⚠ **Superseded later the same day — see §1's newest block.** The immediate next
 step is **W-205 part 1**; W-204 phase B is still real and still unstarted, and it

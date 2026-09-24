@@ -10,7 +10,7 @@ feature: the acquired plane
 owns: [src/fux/store/acquired.py@9897ee1fe4af]
 laws: []
 timestamp: 2026-09-01T00:00:00Z
-content_sha: fe6348916c3bb768e53882b256f61c653653c8f492581f58fbb9aec05adffc52
+content_sha: d83edbf222d3475de3a16f25a76b4aba991d18731405e4cf004de56368268646
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -289,6 +289,12 @@ table `_readme()` writes, which gained `fux serve`
 ([SR-CLI](0101_cli-surface.md)). **Neither reaches this record's claim on that
 file**, and saying so is the point of the freshness gate — the prompt is *re-read
 the record*, and the honest outcome of re-reading it can be *nothing moved*.
+
+⚠ **Unchanged by W-220 (2026-09-23), and touched here only because the register
+says so.** That change edited one thing in `src/fux/store/fuxdir.py`: the
+`runtime` kind's description string, which gained `runtime/inspect/`
+([SR-DOTFUX](0102_fux-directory.md); [SR-INSPECT](0156_inspect.md)).
+**It does not reach this record's claim on that file.**
 
 ### Consequences
 

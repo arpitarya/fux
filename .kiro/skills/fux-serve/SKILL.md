@@ -1,6 +1,6 @@
 ---
 name: fux-serve
-description: Open the Fux ask explorer with `fux serve` — a local page that takes a question and shows the ranked documents, which word earned which part of each score, which links moved a result, the confidence band, and one lever per finding. Use for "why did this document rank first", "show me why fux returned these", "open the fux UI", "which word is carrying this result", or when somebody wants to SEE a ranking rather than read JSON. Read-only, localhost only; it proposes levers and applies none.
+description: Open the Fux explorer with `fux serve` — a local page with three tabs — Ask (the ranked documents, which word earned each score, the band, one lever per finding), Documents (one document's X-ray — ingested, indexed, passages, links, probes) and Index (the whole index, worst first). Use for "why did this rank first", "open the fux UI", "show me how this document was indexed", or to SEE a ranking rather than read JSON. Read-only, localhost only; it applies no lever.
 ---
 
 # The ask explorer — `fux serve`
@@ -19,6 +19,8 @@ Resolve the `fux` command first — see the `fux-usage` skill (`fux` → `uv run
 | "show me the search, don't tell me" | `fux serve`, hand over the URL |
 | "which word is carrying this result?" | the score-by-word bar in the row detail |
 | "why is this document here at all — it has none of my words?" | the **reached by link, not by words** panel |
+| "show me how this document was ingested and indexed" | the **Documents** tab — click the document; its X-ray is computed on the click |
+| "what is wrong with the index, worst first?" | the **Index** tab — the headline, segments and triage, then probes streamed in behind |
 | "is the index any good?" | not this verb — `fux inspect` (`fux-inspect`) |
 | "is the repo set up?" | not this verb — `fux doctor` (`fux-index`) |
 | "give me the answer with line numbers" | not this verb — `fux answer` (`fux-answer`) |
@@ -95,9 +97,12 @@ finding.
 
 ## 6 · What it writes
 
-**Nothing.** `fux serve` keeps no log of its own, and no route writes a file.
-The later rungs that emit a page to disk put it under `.fux/runtime/trace/`,
-which is gitignored and regenerable — those pages quote passages, so they are
-never committed.
+**No committed byte, and no log.** The Documents and Index tabs call
+`fux inspect`'s library in-process and fill its gitignored cache under
+`.fux/runtime/inspect/` — the same cache `fux inspect` fills — so nobody has to
+run `fux inspect` first, and reopening a tab on an unchanged index recomputes
+nothing. ⚠ **The Index tab's probes are one real `ask` each** (a document's
+title and headings), sampled by default and labelled an estimate; *probe every
+document* is a long run on a large corpus.
 
 Related skills: fux-usage, fux-search, fux-answer, fux-inspect, fux-graph, fux-correct, fux-archived-results.

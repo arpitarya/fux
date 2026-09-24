@@ -13,7 +13,7 @@ feature: configurable output defaults
 owns: [src/fux/output_config.py@8e8e57fade21, .fux/output.toml@3a5b84942f70, node/src/config/output.mjs@4f299752c596]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: a396a4dab20560ad327600f1ade366498518ee7b1ebef15e6d6ee15004388549
+content_sha: f274164448c9de9ed44b1b2b7583087a605f02255829cf68a805cfcf17f5a3cc
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -808,6 +808,12 @@ proximity reranker's per-document uplift through the caller's **trace** dict for
 [SR-PROVENANCE](0142_provenance.md) decision 17). No emitted shape, no printer
 and no gate moved. Recorded because the freshness rule asked, and *nothing moved*
 is a legitimate answer to it.
+
+⚠ **Unchanged by W-220 (2026-09-23), and touched here only because the register
+says so.** That change edited one thing in `src/fux/store/fuxdir.py`: the
+`runtime` kind's description string, which gained `runtime/inspect/`
+([SR-DOTFUX](0102_fux-directory.md); [SR-INSPECT](0156_inspect.md)).
+**It does not reach this record's claim on that file.**
 
 ### Consequences
 

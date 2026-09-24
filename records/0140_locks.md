@@ -10,7 +10,7 @@ feature: the index write lock and the files around it
 owns: []
 laws: [L1, L2, L3, L7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: a650ff636dea923047b97a63044858e54c70af41bbad4409c9372fb37cf30c5a
+content_sha: 7ce87414b892ef58d85d6a06a406ed0099bb7e63167db2dc86ded1a5365f9ff9
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -189,6 +189,12 @@ table `_readme()` writes, which gained `fux serve`
 ([SR-CLI](0101_cli-surface.md)). **Neither reaches this record's claim on that
 file**, and saying so is the point of the freshness gate — the prompt is *re-read
 the record*, and the honest outcome of re-reading it can be *nothing moved*.
+
+⚠ **Unchanged by W-220 (2026-09-23), and touched here only because the register
+says so.** That change edited one thing in `src/fux/store/fuxdir.py`: the
+`runtime` kind's description string, which gained `runtime/inspect/`
+([SR-DOTFUX](0102_fux-directory.md); [SR-INSPECT](0156_inspect.md)).
+**It does not reach this record's claim on that file.**
 
 ### Consequences
 

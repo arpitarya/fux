@@ -7,6 +7,26 @@ filed: 2026-09-14
 ball: arpit
 ---
 
+## 🔴 STEP 9 IS A COMPARE DOC — 2026-09-24 (Claude Code, Opus); three forks are Arpit's
+
+[`compare/intent-doctype-prior`](../compare/intent-doctype-prior.compare.md) —
+the proposal's *"starts as a compare doc"*, done.
+
+- **Measured first:** 0 of 32 seed front-matters declare a type, and every seed
+  is in one source directory. So a per-source (D1) or front-matter (D3)
+  declaration means building a new ladder. **Only D2 can be tested on the
+  frozen one**: a `[doctype]` glob → type table in `tune.toml`, read at query
+  time and written into the arm's copy from file names alone.
+- **Recommended:** D2, then I1 (a fixed cue lexicon, which is also the pool's
+  tag), then M1 (`[ranking] intent_weight`, at `0.0`), then **S1: step 3's
+  history/current intent stays out**. One mechanism per arm.
+- 🔴 **Two things wait on Arpit:**
+  1. the three forks;
+  2. `just golden-score` on the [gen-2 capture](../regression/2026-09-24-golden-gen2-rung-01000/report.md).
+     A pool is *tagged ∩ in the top 10 ∩ missing rank 1*, and only the score
+     supplies the last two terms.
+- **Pool below 6 → stop before any build** (W-219).
+
 ## 🔴 STEP 5 ADJUDICATED 2026-09-23 — INCONCLUSIVE by the table; the filing is Arpit's
 
 [VERDICT](../regression/2026-09-23-rm3/VERDICT.md), written by a session that did
