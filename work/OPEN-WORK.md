@@ -23,8 +23,8 @@ here. Read that record before changing anything below it.
 
 | what he decides | filed | age |
 |---|---|---|
-| 🔴 **W-168** — score step 1's five anchor arms: `just golden-score work/regression/2026-09-15-anchor-text`, in your shell (no unlock). [report](regression/2026-09-15-anchor-text/report.md) | 2026-09-24 | 0d |
-| ↳ **blocks:** nothing else in the queue — only step 1's verdict. Step 4's pre-registration does not wait on it. | | |
+
+*Empty since 2026-09-24 — step 1's anchor arms scored.*
 
 ---
 
@@ -32,7 +32,7 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🔴 **W-168** · `arpit` — the ranking ideas, judged on whether the right document comes first. **Step 1 (nicknames): arms captured 2026-09-24, the score is Arpit's (inbox).** Agent-side meanwhile: pre-register step 4 (abbreviations). [detail](open/W-168-search-improvements.md)
+- 🟢 **W-168** · `agent` — the ranking ideas, judged at rank 1. **Step 1 scored 2026-09-24; next `decide.py` → VERDICT, by a session that did NOT capture the arms.** Then pre-register step 4. [detail](open/W-168-search-improvements.md)
 
 
 ### testing

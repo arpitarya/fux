@@ -35,6 +35,13 @@ valuable judgement, but not the state of play.
 *Updated **2026-09-24** (Claude Code, Opus — W-168 step 1's arms captured; the score is Arpit's).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
+### 🔴 2026-09-24 (11:45) — W-168 STEP 1 SCORED; the verdict waits on a session that did not capture the arms
+
+- Arpit scored all five arms. The files are complete and the baseline equals the
+  gen-2 score (41 / 18).
+- **Next is `decide.py`, run by a different session.** The capturing session
+  filed the totals only. Then pre-register step 4.
+
 ### 🔴 2026-09-24 (later) — W-168 STEP 1's ARMS CAPTURED; the score is Arpit's (Claude Code, Opus)
 
 - **Ruled (Cowork):** steps 1 and 4 are judged by `hit@1` (`primary@1` beside

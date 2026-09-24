@@ -29,6 +29,12 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-24 — W-168 step 1 SCORED (Arpit's hand); filed, not decided  ·  Claude Code (Opus)
+- **Asked:** Arpit pasted `just golden-score work/regression/2026-09-15-anchor-text`.
+- **Did:** checked the five files (80 rows each, none partial, nothing missing); filed the printed totals in report §4, the W-168 block, the queue (inbox emptied, W-168 → 🟢) and NOW.
+- **Not done, deliberately:** `decide.py`. This is the session that captured the arms, and the pre-registration's item 4 forbids it. No per-clause net was computed.
+- **Next:** a fresh session (Opus) runs `decide.py` → `VERDICT.md`.
+
 ## 2026-09-24 — W-168 step 1: pre-registration amended, five anchor arms captured  ·  Claude Code (Opus)
 - **Asked:** step 1 per the 2026-09-24 ruling — amend the pre-registration (`hit@1` + `primary@1`, set-3-u, `rung-01000`, the informed line), build off by default, capture the arms. Do not run the scorer.
 - **Did:**

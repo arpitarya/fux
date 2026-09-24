@@ -1,6 +1,6 @@
 {
  "decision": "PROCEED",
- "reason": "Nothing blocks the agent lane. W-168 step 1's arms are captured and its score is Arpit's (inbox row); step 4's pre-registration is agent work and does not wait on it.",
+ "reason": "Nothing waits on Arpit. W-168 step 1 is scored; its decide.py must be run by a session that did not capture the arms. Step 4's pre-registration is agent work.",
  "questions": [],
  "safe_alternative": "",
  "surfaced": true,

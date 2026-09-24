@@ -65,17 +65,27 @@ are the baseline's:
 | **improvement** headroom | **14** tagged (13 in the returned ten) | tagged, answerable, missing rank 1: the pool the ruling was made on |
 | **regression** headroom | **41** (11 of them tagged) | every baseline rank-1 hit, which a treatment could lose |
 
-## 4 · What Arpit picks up
+## 4 · What Arpit picked up — 🔴 SCORED 2026-09-24, 11:45 (his hand)
 
-```bash
-just golden-score work/regression/2026-09-15-anchor-text
-```
+Five files under `scores/anchor-<w>/rung-01000/set-3-u.json`: 80 rows each,
+`partial: false`, no missing hand-off rows or key lines. **The totals, as his
+shell printed them**, are set-wide and gate nothing. The decision rule reads
+per-query flips on the tagged 27 and the other 53, not these:
 
-In his own shell. It finds five hand-offs (`evidence/anchor-<w>/rung-01000/`,
-checked with `handoffs.py`) and writes
-`scores/anchor-<w>/rung-01000/set-3-u.json`. **No unlock is needed**: the
-scoring carve-out reads the key in the LOCKED state. Then a session that did
-**not** capture these arms runs `decide.py`.
+| arm | `hit@1` | `hit@5` | `primary@1` | evidence quoted |
+|---|---:|---:|---:|---:|
+| `anchor-0.0` | 41 | 68 | 18 | 32 |
+| `anchor-0.5` | 43 | 69 | 25 | 43 |
+| `anchor-1.0` | 48 | 70 | 30 | 45 |
+| `anchor-2.0` | 50 | 70 | 33 | 46 |
+| `anchor-3.0` | 50 | 70 | 33 | 46 |
+
+- The baseline's 41 / 18 equal the generation-2 score, as the stop check predicts.
+- ⚠ **A rising total is not a verdict.** Clause 4 wants a net that clears SR-RS
+  d19 at the observed discordant count on the tagged questions. Clause 3 is
+  per-question. **This session captured the arms and may not compute either.**
+- 🔴 **Next:** a session that did **not** capture these arms runs
+  `evidence/decide.py` and files `VERDICT.md`.
 
 ## Authorship
 

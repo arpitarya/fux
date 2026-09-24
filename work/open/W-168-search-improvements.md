@@ -7,6 +7,16 @@ filed: 2026-09-14
 ball: arpit
 ---
 
+## 🔴 STEP 1 SCORED 2026-09-24, 11:45 (Arpit's hand) — the verdict is a NON-capturing session's
+
+Five complete score files; set-wide `hit@1` 41 → 43 / 48 / 50 / 50 and
+`primary@1` 18 → 25 / 30 / 33 / 33 ([report §4](../regression/2026-09-15-anchor-text/report.md)).
+**These totals are not the rule.** Clauses 1–4 read tagged per-query flips, the
+SR-RS d19 floor and the hub.
+**Next:** a session that did not capture the arms runs
+[`decide.py`](../regression/2026-09-15-anchor-text/evidence/decide.py) (frozen
+at `cfca651a`) and files `VERDICT.md`. INCONCLUSIVE → Arpit.
+
 ## ✅ STEP 1 ARMS CAPTURED 2026-09-24 (Claude Code, Opus) — the score is Arpit's, the verdict another session's
 
 [Report](../regression/2026-09-15-anchor-text/report.md) · [amended pre-registration](../regression/2026-09-15-anchor-text/PRE-REGISTRATION.md) §AMENDMENT 2026-09-24.
