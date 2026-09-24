@@ -32,8 +32,22 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-09-24** (Claude Code, Opus — W-220 shipped; the queue waits on two rulings).* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-09-24** (Claude Code, Opus — W-168 step 1's arms captured; the score is Arpit's).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
+
+### 🔴 2026-09-24 (later) — W-168 STEP 1's ARMS CAPTURED; the score is Arpit's (Claude Code, Opus)
+
+- **Ruled (Cowork):** steps 1 and 4 are judged by `hit@1` (`primary@1` beside
+  it) on set-3-u at `rung-01000`. The ruling came after the pools were seen, so
+  it is **informed**. Step 9's forks are ruled and parked by its pool.
+- **Step 1:** the pre-registration was amended and frozen before the first call
+  (`cfca651a`): the tag, clause 3's hub read at rank 1, and `decide.py`. The five
+  arms are captured. The baseline equals the gen-2 capture, and rank 1 moves only
+  on tagged questions (9–18).
+- 🔴 **The next two steps are other hands':**
+  1. Arpit's `just golden-score work/regression/2026-09-15-anchor-text`;
+  2. then `decide.py`, run by a session that **did not** capture the arms.
+- **Agent lane:** pre-register step 4 (expansion, pool 10), the same shape.
 
 ### 🔴 2026-09-24 — W-220 SHIPPED, W-215 CLOSED; W-168 waits on one endpoint ruling (Claude Code, Opus)
 

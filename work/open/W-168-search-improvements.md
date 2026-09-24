@@ -7,6 +7,29 @@ filed: 2026-09-14
 ball: arpit
 ---
 
+## ✅ STEP 1 ARMS CAPTURED 2026-09-24 (Claude Code, Opus) — the score is Arpit's, the verdict another session's
+
+[Report](../regression/2026-09-15-anchor-text/report.md) · [amended pre-registration](../regression/2026-09-15-anchor-text/PRE-REGISTRATION.md) §AMENDMENT 2026-09-24.
+
+- **Amended first, committed at `cfca651a` before any call.** It names `hit@1`
+  (`primary@1` beside it) on set-3-u at `rung-01000`, and carries the ruling's
+  *"ruled after the pools were seen — informed"* line. Also frozen there: the tag
+  `anchor_dependent` (27 of 80, the gen-2 pool rule, imported) and
+  `evidence/decide.py`. Clause 3 is read at rank 1, on the hub
+  `01-sop-temperature-excursion`.
+- **Built already:** `[bm25f] anchor` has shipped at `0.0` since 2026-09-15.
+  Nothing in the engine changed.
+- **Five arms** `0.0 / 0.5 / 1.0 / 2.0 / 3.0` ran on the rung's own engine
+  `2dbe870f`, with no re-ingest. **`anchor-0.0` equals the gen-2 capture on 80 of
+  80 rows.**
+- **Rank 1 moves on 9 / 14 / 17 / 18 questions, all of them tagged.** The hub is
+  first on 5 → 4 questions. These are changes, not improvements.
+- 🔴 **Next, in order:**
+  1. Arpit runs `just golden-score work/regression/2026-09-15-anchor-text`.
+  2. A session that did **not** capture the arms runs `evidence/decide.py`.
+  3. An INCONCLUSIVE goes back to Arpit.
+- **Agent-side, meanwhile:** step 4's pre-registration.
+
 ## ✅ RULED 2026-09-24 (Arpit, Cowork) — steps 1 and 4 are judged at RANK 1, on set-3-u
 
 *"yes"* — to *judge steps 1 (anchor) and 4 (expansion) at rank 1 on set-3-u,

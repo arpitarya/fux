@@ -29,6 +29,17 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-24 — W-168 step 1: pre-registration amended, five anchor arms captured  ·  Claude Code (Opus)
+- **Asked:** step 1 per the 2026-09-24 ruling — amend the pre-registration (`hit@1` + `primary@1`, set-3-u, `rung-01000`, the informed line), build off by default, capture the arms. Do not run the scorer.
+- **Did:**
+  - committed Cowork's two rulings (`a3f5836a`);
+  - amended the pre-registration and froze the tag (27 / 80), clause 3's rank-1 reading and `decide.py`, all before any call (`cfca651a`);
+  - captured `anchor ∈ {0.0, 0.5, 1.0, 2.0, 3.0}` at `2dbe870f` (pinned worktree, no re-ingest). The baseline equals the gen-2 capture 80 / 80.
+  - Rank 1 moves on 9–18 questions, every one tagged.
+- **Build:** none needed. `[bm25f] anchor` has shipped at `0.0` since 2026-09-15.
+- **Machine:** five sequential `golden_run.py` arms, about a minute each, 11:07–11:10 IST. No benchmark timing is claimed.
+- **Next:** Arpit — `just golden-score work/regression/2026-09-15-anchor-text`. Then a *different* session runs `decide.py`. Agent lane: step 4's pre-registration.
+
 ## 2026-09-24 — RULED: W-168 steps 1 and 4 judged at rank 1 on set-3-u  ·  Cowork
 - **Asked:** *"yes"* — to steps 1 (anchor) and 4 (expansion) at rank 1 on set-3-u.
 - **Did:** ruling block on W-168 (endpoint `hit@1` + `primary@1`, pools 14 and 10, **ruled after the pools were seen — informed, said in the block**, step 1 first). Inbox emptied; W-168 🔴 → 🟢; `BLOCKED.json` → `PROCEED`.
