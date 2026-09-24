@@ -7,6 +7,35 @@ filed: 2026-09-14
 ball: arpit
 ---
 
+## 🔴 SCORED 2026-09-24 — each step's pool on generation 2; steps 1 and 4 have one, at rank 1 only
+
+[Score and pools](../regression/2026-09-24-golden-gen2-rung-01000/report.md).
+The tags come from question text and `seed/` alone
+([`step_pools.py`](../regression/2026-09-24-golden-gen2-rung-01000/evidence/step_pools.py)).
+**Winnable** means a tagged, answerable question that misses the endpoint.
+
+| step | set-2-u · rank 1 / rank 5 | set-3-u · rank 1 / rank 5 | state |
+|---|---|---|---|
+| **1** anchor | 5 / 2 | **14** / 2 | 🔴 **the endpoint is Arpit's.** The frozen pre-registration names a floor of 6 and no `k` |
+| **4** expansion | 0 / 0 | **10** / 0 | 🔴 not pre-registered; the endpoint is Arpit's |
+| **9** intent | 2 / 0 | 1 / 0 | ⏸ **stops before build**: the pool is below 6 at every `k` (the compare doc's rule) |
+| 2 identifier | 0 / 0 | 1 / 0 | left for W-205 on 2026-09-20 — confirms its stop |
+
+- 🔴 **One question, the same shape as the 2026-09-23 ruling on steps 5 and 9:**
+  judge steps 1 and 4 at **rank 1** (`hit@1`, with `primary@1` beside it), on
+  set-3-u?
+  - At rank 5 neither can produce a verdict: the pools are 2 and 0.
+  - ⚠ **This is asked after the pools were seen.** It is still not a moved
+    threshold, because neither step has a number, and step 1's frozen file
+    names no `k`. But it is **informed**, and the ruling should say so.
+- **Step 1's clause 5 is now satisfied on the data:**
+  - 17 anchor-distinctive terms on 5 targets;
+  - 25 answerable questions use linker-only words;
+  - a hub, `01-sop-…`, with 8 inbound `ref` edges, is available as clause 3's
+    control.
+- **Step 9's compare-doc forks are deferred, not refused.** The trigger to
+  reopen is a question set whose intent-tagged pool is ≥ 6.
+
 ## 🔴 STEP 9 IS A COMPARE DOC — 2026-09-24 (Claude Code, Opus); three forks are Arpit's
 
 [`compare/intent-doctype-prior`](../compare/intent-doctype-prior.compare.md) —
@@ -162,7 +191,7 @@ stay.
 🟡, waiting on W-204"* from 2026-09-20; **W-204 closed on 2026-09-22** and the
 queue row went 🟢, leaving the file and the row disagreeing for two days (spotted
 by the Cowork session that ruled W-214, and left for this one). **The ball is now
-🔴, waiting on [W-215](W-215-generation-2-corpus.md)** — and the sentence that
+🔴, waiting on [W-215](../../archive/open/W-215-generation-2-corpus.md)** — and the sentence that
 followed it was right about the shape and wrong about the item: every remaining
 step does need a golden question or document it does not have, but the inputs
 come from **generation 2**, not from W-204.

@@ -26,6 +26,32 @@ Rules:
 
 ---
 
+## 2026-09-24 — **W-215 closed: generation 2 is on the ladder, and Arpit's score shows misses at rank 1**
+
+**Delivered:**
+- 14 seed documents, `set-2-u` and `set-3-u`;
+- the ladder rebuilt on 42 seeds;
+- the step inputs measured: 17 anchor-distinctive terms, 9 `Term (ABBR)` pairs,
+  a 21-line glossary.
+
+**Scored** (Arpit, `just golden-score`, `informed`), on the answerable questions:
+
+| | set-2-u | set-3-u |
+|---|---:|---:|
+| `hit@1` | 50 of 112 | 41 of 72 |
+| `hit@5` | 91 | 68 |
+| misses at rank 1 that are already in the top 10 | 51 | 29 |
+
+**Per-step pools**, from question text: only W-168 steps 1 and 4, on set-3-u
+and at rank 1, reach 6 (14 and 10). Step 9 stops at 2 and 1.
+
+**Not delivered:** item 6, a corpus with git history.
+
+Evidence: [the scored run](regression/2026-09-24-golden-gen2-rung-01000/report.md) ·
+[`archive/open/W-215-generation-2-corpus.md`](../archive/open/W-215-generation-2-corpus.md).
+
+---
+
 ## 2026-09-24 — **W-220 shipped: the index X-ray in `fux inspect` and `fux serve`**
 
 **Landed, unreleased** (on `main`, in `CHANGELOG.md` §Unreleased). All four

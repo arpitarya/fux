@@ -10,7 +10,7 @@ feature: the test-data checklist — what a seed document, a question set or a r
 owns: [tests/test_test_data_prompts.py@bd8b66eef82e]
 laws: [L0, L11]
 timestamp: 2026-09-22T00:00:00Z
-content_sha: a5c1d02f781839e0badbe8501d92b663bb36a3cd398beedc867db2dc624bec7e
+content_sha: 7e097297f321067ed5d7e1e1e4ce84741a10ff4caa6ccd7c665044f719952baf
 ratifies: "Arpit, 2026-09-22 — 'note it down that this is also one of the cases that need to be tested. So in future, the prompt or test data creation should account for this use case … create a work document which will just have pointers what all things test data creation should have … keep everything precise … I was talking about SR work document'"
 ---
 
@@ -146,7 +146,7 @@ could check against them.
 - [the step-input run](../work/regression/2026-09-22-w168-step-inputs/report.md)
   and [the anchor census](../work/regression/2026-09-22-anchor-input-census/report.md)
   — the measured counts behind T4, T5 and T11.
-- [W-215](../work/open/W-215-generation-2-corpus.md) — the six-item
+- [W-215](../archive/open/W-215-generation-2-corpus.md) — the six-item
   generation-2 specification these items were first listed in.
 
 ### Veto condition
@@ -163,6 +163,6 @@ report; every input it names must appear in decision 2's table.
 
 **Records** — [SR-LAW-0](0002_LAW-0-authority.md) · [L11](0012_LAW-11-sealed-answer-key.md) · [SR-WORK-SCALE](0057_WORK-scale.md) · [SR-WORK-GOLDEN](0066_WORK-golden.md) · [SR-INGEST](0106_ingest.md) · [SR-RANKING](0111_ranking.md) · [SR-RS](0133_predictions.md)
 
-**Work** — [`work/golden/README.md`](../work/golden/README.md) · [`work/golden/prompts/`](../work/golden/prompts/) · [W-215](../work/open/W-215-generation-2-corpus.md)
+**Work** — [`work/golden/README.md`](../work/golden/README.md) · [`work/golden/prompts/`](../work/golden/prompts/) · [W-215](../archive/open/W-215-generation-2-corpus.md)
 
 **Code** — [`tests/test_test_data_prompts.py`](../tests/test_test_data_prompts.py)

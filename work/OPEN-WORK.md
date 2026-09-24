@@ -23,10 +23,8 @@ here. Read that record before changing anything below it.
 
 | what he decides | filed | age |
 |---|---|---|
-| 🔴 **W-215** — type `just golden-score work/regression/2026-09-24-golden-gen2-rung-01000`: both gen-2 sets on the rebuilt ladder. It says whether gen 2 holds questions today's engine misses. [report](regression/2026-09-24-golden-gen2-rung-01000/report.md) | 2026-09-24 | 0d |
-| ↳ **blocks:** W-168 — every step's pool needs this score. | | |
-| 🔴 **W-168** — step 9: take D2 (a `[doctype]` glob table), I1 (a fixed cue lexicon) and S1 (step 3's intent stays out)? [compare doc](compare/intent-doctype-prior.compare.md) | 2026-09-24 | 0d |
-| ↳ **blocks:** nothing else in the queue — only step 9. | | |
+| 🔴 **W-168** — judge steps 1 (anchor) and 4 (expansion) at rank 1 on set-3-u? The pools are 14 and 10 at rank 1, and 2 and 0 at rank 5. Step 9 stops (pool 2 and 1). [pools](regression/2026-09-24-golden-gen2-rung-01000/report.md) | 2026-09-24 | 0d |
+| ↳ **blocks:** nothing else in the queue — only steps 1 and 4. | | |
 
 ---
 
@@ -34,9 +32,7 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🔴 **W-215** · `arpit` — golden data gen 2. Ladder rebuilt, inputs measured (17 anchor terms, 9 `Term (ABBR)`), baseline captured 2026-09-24. Waits on Arpit's score. [detail](open/W-215-generation-2-corpus.md)
-
-- 🔴 **W-168** · `arpit` — the ranking ideas. Step 9 is a compare doc (2026-09-24) awaiting three rulings, and its pool awaits the gen-2 score. [detail](open/W-168-search-improvements.md)
+- 🔴 **W-168** · `arpit` — the ranking ideas. Gen 2 scored 2026-09-24: steps 1 and 4 have a pool at rank 1 only (endpoint is Arpit's); step 9 stops, pool below 6. [detail](open/W-168-search-improvements.md)
 
 
 ### testing

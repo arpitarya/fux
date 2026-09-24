@@ -29,6 +29,25 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-24 — Gen 2 SCORED: W-215 closed; W-168 steps 1 and 4 have a pool, step 9 stops  ·  Claude Code
+- **Asked:** Arpit pasted his `just golden-score` output for the gen-2 capture.
+- **Did:**
+  - Read the scorer's own output (ids, ranks and flags), then filed a SCORED
+    section in the run report.
+  - Wrote `evidence/step_pools.py`. It tags each W-168 step from question text
+    and `seed/`; its 17 anchor words match the census.
+  - **Closed W-215** and archived it.
+  - Parked step 9's compare doc: its pool is 2 and 1, below 6.
+  - Moved the inbox to one question.
+- **Decided / open:**
+  - Generation 2 misses at rank 1: 51 and 29 are reorderable. At rank 5 it
+    misses 21 and 4.
+  - Only steps 1 (14) and 4 (10), on set-3-u and at rank 1, can produce a
+    verdict. **The endpoint is Arpit's**, and it is asked after the pools were
+    seen, which the question says.
+- **Next:** on his ruling, step 1's arms, since it is already pre-registered and
+  built.
+
 ## 2026-09-24 — W-220 SHIPPED; W-215 captured; W-168 step 9 written up — the queue now waits on Arpit  ·  Claude Code
 - **Asked:** *"implement w-215, w-168, w-220 keep implementing till closure"*.
 - **Did — W-220, closed:** all four rungs built.

@@ -7,10 +7,10 @@ description: "Arpit asked whether a consumed index is a good index or a bad one.
 status: accepted
 date: 2026-09-14
 feature: the index X-ray
-owns: [src/fux/inspect@9b3884e6dbad]
+owns: [src/fux/inspect@b1e9f124fd34]
 laws: [L2, L3, L4, L6, L8]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: a60ab02d039aa508e9cf6e7bcfffa884022389d5d30ced2a1d76e36f80621aef
+content_sha: e085b24326f9bfedb056affd446fbec48fdde28761837f520292d0643663166f
 ratifies: W-169
 ---
 

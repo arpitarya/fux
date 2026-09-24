@@ -35,7 +35,7 @@ valuable judgement, but not the state of play.
 *Updated **2026-09-24** (Claude Code, Opus — W-220 shipped; the queue waits on two rulings).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🔴 2026-09-24 — W-220 SHIPPED; W-215 and W-168 now wait on Arpit (Claude Code, Opus)
+### 🔴 2026-09-24 — W-220 SHIPPED, W-215 CLOSED; W-168 waits on one endpoint ruling (Claude Code, Opus)
 
 - ✅ **W-220 is built and closed** ([archive](../archive/open/W-220-index-xray.md)):
   - `fux inspect` gained per-document facts, title probes (the new headline),
@@ -45,19 +45,16 @@ valuable judgement, but not the state of play.
   - ⚠ **No lever it found is applied.** Shared titles (526 docs here), word-cut
     passages (16 202) and page chrome are each a future item, measured on golden
     data first.
-- 🔴 **W-215 — the ladder is rebuilt, the inputs are measured, and the baseline
-  is captured.** The inputs, counted from the seed:
-  - 17 anchor-distinctive terms (was 1);
-  - 9 `Term (ABBR)` pairs (was 0);
-  - a 21-line glossary.
-
-  [The capture](regression/2026-09-24-golden-gen2-rung-01000/report.md) waits
-  on **Arpit's `just golden-score`**. No agent runs it.
-- 🔴 **W-168 step 9 is a compare doc** ([intent-doctype-prior](compare/intent-doctype-prior.compare.md)).
-  Its three forks are Arpit's, and its pool needs that same score.
-  - **Measured:** the seed declares no document type anywhere. Only a
-    query-time glob table (D2) can be tested on the frozen ladder.
-- **Next:** nothing agent-closable until one of those rulings lands.
+- ✅ **W-215 is closed, and the score is in** ([run](regression/2026-09-24-golden-gen2-rung-01000/report.md)).
+  Generation 2 misses at rank 1: 51 and 29 are reorderable. At rank 5 it
+  misses only 21 and 4.
+- 🔴 **W-168:** only steps 1 (anchor, 14) and 4 (expansion, 10), on set-3-u
+  and at rank 1, have a pool of 6 or more. **Their endpoint is Arpit's.**
+  - Step 9 stops (pool 2 and 1); its compare doc is parked.
+  - Step 2 is W-205's.
+  - Step 8 has no corpus.
+- **Next:** on his ruling, step 1's arms. It is pre-registered (2026-09-15) and
+  built, and clause 5 is now met.
 
 ### ✅ 2026-09-22 — THE GOLDEN BENCHMARK HAS A NUMBER, and the queue is three 🟢 rows
 

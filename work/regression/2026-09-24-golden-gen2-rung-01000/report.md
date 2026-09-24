@@ -24,8 +24,42 @@ just golden-score work/regression/2026-09-24-golden-gen2-rung-01000
 - The rung comes from the pre-registration's `rung: rung-01000` line (W-218).
 - **No agent runs it** ([L11](../../../records/0012_LAW-11-sealed-answer-key.md)).
 - **What the score settles:**
-  - [W-215](../../open/W-215-generation-2-corpus.md) item 1: does generation 2 hold questions today's engine fails?
+  - [W-215](../../../archive/open/W-215-generation-2-corpus.md) item 1: does generation 2 hold questions today's engine fails?
   - every W-168 pool count on the ladder as it now is.
+
+## 🔴 SCORED 2026-09-24 (Arpit's hand, `just golden-score`) — `informed`
+
+Scores: `scores/single/rung-01000/set-2-u.json` · `set-3-u.json`. Both are
+complete (`partial: false`), with no missing hand-off rows and no missing key
+lines. Per set, never pooled:
+
+| of the answerable questions | `set-2-u` (112 of 125) | `set-3-u` (72 of 80) |
+|---|---:|---:|
+| `hit@1` | 50 | 41 |
+| `primary@1` | 36 | 18 |
+| `hit@5` | 91 | 68 |
+| `hit@10` | 101 | 70 |
+| **miss rank 1, target in the top 10** (a reranker can reorder these) | **51** | **29** |
+| miss rank 1, target not in the top 10 | 11 | 2 |
+| miss `hit@5` | 21 | 4 |
+
+⚠ **`hit@10` is the deepest rank known**, because the capture asked
+`--top 10`, so the scorer's `hit@20` and `hit@50` equal it by construction.
+**13 and 8 questions are unanswerable**, and fux answered every one of them.
+Under W-214 that is by design (band `none` never fired), so abstention is not
+measured here.
+
+**Each W-168 step's own pool.** The tags are computed from question text and
+`seed/` alone ([`evidence/step_pools.py`](evidence/step_pools.py) →
+[`evidence/step-pools.txt`](evidence/step-pools.txt)). *Winnable* means a miss
+that is in the top 10, or absent from it.
+
+| step | `set-2-u` winnable at rank 1 · at rank 5 | `set-3-u` winnable at rank 1 · at rank 5 | vs the floor of 6 |
+|---|---|---|---|
+| 1 · anchor text | 5 · 2 | **14** · 2 | only set-3-u, at rank 1 |
+| 2 · identifier (now W-205) | 0 · 0 | 1 · 0 | never |
+| 4 · corpus-mined expansion | 0 · 0 | **10** · 0 | only set-3-u, at rank 1 |
+| 9 · intent (draft I1 lexicon) | 2 · 0 | 1 · 0 | **never — stops before build** |
 
 ## The run
 

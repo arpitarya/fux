@@ -12,7 +12,7 @@ The 2026-09-23 rebuild made every earlier golden number describe a ladder that
 no longer exists. That includes the 2026-09-22 `set-2-u` capture and the RM3
 arms. Two open decisions need a score on the ladder as it now stands:
 
-- **[W-215](../../open/W-215-generation-2-corpus.md) item 1:** does generation 2
+- **[W-215](../../../archive/open/W-215-generation-2-corpus.md) item 1:** does generation 2
   carry questions today's engine fails? That was the whole point of writing it.
 - **[W-168](../../open/W-168-search-improvements.md) steps 1, 2, 4 and 9:** each
   one's pool is *tagged ∩ in the top 10 ∩ missing rank 1*. The last two terms

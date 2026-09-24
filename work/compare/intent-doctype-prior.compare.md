@@ -2,7 +2,7 @@
 type: Compare Doc
 title: "W-168 step 9 — the intent → doc-type prior: where a document's type is declared, how a question's intent is read, and whether step 3's intent joins it"
 description: "Step 9 starts as a compare doc (proposal §2). Three forks decide whether it can be measured at all: where the doc-type is declared (per source, front-matter, or a query-time glob table), how intent is read from a question (a fixed engine cue lexicon or consumer cues), and whether the history/current intent that foreclosed step 3 becomes part of this step. Measured first: the golden seed declares no type anywhere — 0 of 32 front-matters carry one, and every seed sits in one source directory — so only a query-time table can be tested without changing the frozen ladder. Proposed, not ruled."
-status: proposed — three forks for Arpit
+status: parked — the measured pool is below 6 (2026-09-24); forks deferred
 timestamp: 2026-09-24T00:00:00Z
 filed: 2026-09-24
 ---
@@ -26,7 +26,7 @@ declared per source"*, which says it *"starts as a compare doc"*.
 
 | | |
 |---|---|
-| **status** | **proposed** — three forks below are Arpit's |
+| **status** | ⏸ **parked 2026-09-24** — the I1-tagged pool on generation 2 is **2 (set-2-u) and 1 (set-3-u)**, below 6 at every `k` ([pools](../regression/2026-09-24-golden-gen2-rung-01000/report.md)). By this doc's own stop rule the step stops before any build, so the three forks are **deferred, not refused** |
 | **the call, recommended** | **D2 · I1 · M1, and step 3's intent stays OUT (S1).** A committed glob → type table read at query time, a fixed engine cue lexicon for three intents, one multiplicative weight at `0.0` by default |
 | **confidence** | medium on D2 (it is the only option testable on the frozen ladder); low that step 9 clears the floor — see *What the pool can be* |
 | **endpoint (already ruled)** | `hit@1`, `primary@1` beside it (Arpit, 2026-09-23) |

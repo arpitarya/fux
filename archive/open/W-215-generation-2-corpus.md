@@ -3,14 +3,48 @@ type: OpenItem
 id: W-215
 title: "W-215 — generation 2 of the golden data, authored against a measured specification, because it is the single blocker standing in front of eight W-168 steps"
 description: "Measured 2026-09-22: the pool any ranking change can win is 7-23 answerable questions per set per rung, so SR-RS d19 requires one step to fix 58-78% of every remaining failure with zero regressions. Four W-168 steps are additionally blocked on inputs the seed does not contain. Extending the seed rebuilds the frozen ladder that every filed run references, and authoring a sealed generation is L11's carve-out — both are Arpit's."
-status: open
+status: closed
+closed: 2026-09-24
 lane: agent
 timestamp: 2026-09-22T00:00:00Z
 filed: 2026-09-22
-ball: arpit
+ball: none
 ---
 
 # W-215 — one corpus deliverable in front of eight engineering steps
+
+## ✅ CLOSED 2026-09-24 — generation 2 is on the ladder, scored, and it has misses at rank 1
+
+[The score](../../work/regression/2026-09-24-golden-gen2-rung-01000/report.md)
+(Arpit's `just golden-score`, `informed`) answers **item 1**, the condition this
+item was filed to meet.
+
+- **At rank 1: yes.** set-2-u misses 62 of 112 answerable questions and set-3-u
+  misses 31 of 72. Of those, **51 and 29 are in the top 10**, so they can be
+  reordered.
+- **At rank 5: barely.** Misses are 21 and 4.
+- **Per step**, from question text and `seed/` alone:
+
+  | step | winnable at rank 1 |
+  |---|---|
+  | step 1 (anchor) | **14** on set-3-u |
+  | step 4 (expansion) | **10** on set-3-u |
+  | step 9 (intent) | 2 and 1 |
+  | step 2 (identifier) | 1 and 0 |
+
+  Only set-3-u, and only at rank 1, clears the floor of 6.
+
+**By item:**
+1. Delivered, at rank 1.
+2. Delivered: 17 anchor-distinctive terms.
+3. Delivered: 9 `Term (ABBR)` pairs and a 21-line glossary.
+4. Delivered: set 3's identifiers (step 2 left for W-205).
+5. Done by text tagging rather than by the key's `23c` rows.
+6. **Not delivered:** there is no corpus with git history, so W-168 step 8 stays
+   a proposal by its own rule.
+
+**What moves to W-168:** the endpoint for steps 1 and 4. At rank 5 neither has
+a pool, so that is a ruling for Arpit, like steps 5 and 9.
 
 ## 🔴 2026-09-24 (Claude Code, Opus) — the inputs are on the ladder; the score is Arpit's
 

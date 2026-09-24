@@ -1,0 +1,13 @@
+anchor-distinctive words 17 · expansion forms 34
+set-2-u
+  step           tagged answerable miss@1 reorderable@1 miss@5 reorderable@5 not-in-top10
+  1 anchor            8          8      5             3      2             0            2
+  2 identifier        3          1      0             0      0             0            0
+  4 expansion         0          0      0             0      0             0            0
+  9 intent            4          3      2             2      0             0            0
+set-3-u
+  step           tagged answerable miss@1 reorderable@1 miss@5 reorderable@5 not-in-top10
+  1 anchor           27         25     14            13      2             1            1
+  2 identifier       20         19      1             1      0             0            0
+  4 expansion        22         19     10            10      0             0            0
+  9 intent            5          3      1             1      0             0            0
