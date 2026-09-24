@@ -29,6 +29,17 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-24 — RULED: W-168 steps 1 and 4 judged at rank 1 on set-3-u  ·  Cowork
+- **Asked:** *"yes"* — to steps 1 (anchor) and 4 (expansion) at rank 1 on set-3-u.
+- **Did:** ruling block on W-168 (endpoint `hit@1` + `primary@1`, pools 14 and 10, **ruled after the pools were seen — informed, said in the block**, step 1 first). Inbox emptied; W-168 🔴 → 🟢; `BLOCKED.json` → `PROCEED`.
+- **Next:** Claude Code — step 1: amend its frozen pre-registration with the `k` and the informed note, build off by default, run the arms. Then step 4's pre-registration.
+
+## 2026-09-24 — RULED: step 9's forks D2 · I1 · M1 · S1 — and parked, because the pool is 2 and 1  ·  Cowork
+- **Asked:** *"agree implement all"*, on *take D2, I1, S1, score first, stop below 6*.
+- **Did:** compare doc's verdict block and W-168 record the ruling. **No build:** the score (already run by then) gave step 9 a pool of 2 (set-2-u) and 1 (set-3-u) — the stop rule he agreed to in the same breath fires. The forks are now RULED, so a future set with pool ≥ 6 needs no new call.
+- **Not assumed:** *"implement all"* was said before he had seen the next question — steps 1 and 4 at rank 1 on set-3-u. Left in the inbox and put to him.
+- **Next:** Arpit — steps 1 and 4 endpoint.
+
 ## 2026-09-24 — Gen 2 SCORED: W-215 closed; W-168 steps 1 and 4 have a pool, step 9 stops  ·  Claude Code
 - **Asked:** Arpit pasted his `just golden-score` output for the gen-2 capture.
 - **Did:**

@@ -7,6 +7,27 @@ filed: 2026-09-14
 ball: arpit
 ---
 
+## ✅ RULED 2026-09-24 (Arpit, Cowork) — steps 1 and 4 are judged at RANK 1, on set-3-u
+
+*"yes"* — to *judge steps 1 (anchor) and 4 (expansion) at rank 1 on set-3-u,
+as steps 5 and 9 were ruled on 2026-09-23?*
+
+- **Primary endpoint `hit@1`, `primary@1` beside it**, on **set-3-u** at `rung-01000`.
+- **Pools:** step 1 = **14**, step 4 = **10** winnable at rank 1 (2 and 0 at rank 5).
+- ⚠ **Ruled AFTER the pools were seen — `informed`, and said so.** Not a moved
+  threshold: neither step has a number, and step 1's frozen pre-registration names
+  no `k`. Each step's pre-registration records this sentence.
+- **Order:** step 1 first (pre-registration exists, pool larger; clause 3's hub
+  control is `01-sop-…` with 8 inbound `ref` edges), then step 4 (not yet
+  pre-registered). One mechanism per arm; each built off by default.
+
+## ✅ STEP 9 FORKS RULED 2026-09-24 (Arpit, Cowork) — D2 · I1 · M1 · S1; still parked by the pool
+
+*"agree implement all"* — on the recommendation *take D2, I1, S1; score first; stop below 6*. The score
+came back with step 9's pool at **2 and 1**, so **the stop rule he agreed to fires:
+nothing is built.** The forks are ruled, not deferred — a future set with an
+intent-tagged pool ≥ 6 starts the build straight from them.
+
 ## 🔴 SCORED 2026-09-24 — each step's pool on generation 2; steps 1 and 4 have one, at rank 1 only
 
 [Score and pools](../regression/2026-09-24-golden-gen2-rung-01000/report.md).

@@ -1,9 +1,7 @@
 {
- "decision": "ASK",
- "reason": "W-220 and W-215 are closed (2026-09-24). Gen 2 is scored: only W-168 steps 1 (anchor) and 4 (expansion), on set-3-u and at rank 1, have a pool of 6 or more (14 and 10); at rank 5 they have 2 and 0. Step 1's frozen pre-registration names no k, so the endpoint is Arpit's, and it is being asked after the pools were seen. Step 9 stops: its pool is below 6.",
- "questions": [
-  "W-168: judge steps 1 and 4 at rank 1 (hit@1, primary@1 beside it) on set-3-u, as steps 5 and 9 were ruled on 2026-09-23?"
- ],
+ "decision": "PROCEED",
+ "reason": "Nothing waits on Arpit. W-168 steps 1 and 4 were ruled on 2026-09-24 to be judged at rank 1 on set-3-u; step 9 is parked by its pool. Every open item is 🟢.",
+ "questions": [],
  "safe_alternative": "",
  "surfaced": true,
  "filed": "2026-09-24"

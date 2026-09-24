@@ -23,8 +23,8 @@ here. Read that record before changing anything below it.
 
 | what he decides | filed | age |
 |---|---|---|
-| 🔴 **W-168** — judge steps 1 (anchor) and 4 (expansion) at rank 1 on set-3-u? The pools are 14 and 10 at rank 1, and 2 and 0 at rank 5. Step 9 stops (pool 2 and 1). [pools](regression/2026-09-24-golden-gen2-rung-01000/report.md) | 2026-09-24 | 0d |
-| ↳ **blocks:** nothing else in the queue — only steps 1 and 4. | | |
+
+*Empty since 2026-09-24 — steps 1 and 4 ruled to be judged at rank 1.*
 
 ---
 
@@ -32,7 +32,7 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🔴 **W-168** · `arpit` — the ranking ideas. Gen 2 scored 2026-09-24: steps 1 and 4 have a pool at rank 1 only (endpoint is Arpit's); step 9 stops, pool below 6. [detail](open/W-168-search-improvements.md)
+- 🟢 **W-168** · `agent` — the ranking ideas. **Ruled 2026-09-24:** steps 1 (nicknames) and 4 (abbreviations) are judged on whether the right document comes first. Step 1 next. [detail](open/W-168-search-improvements.md)
 
 
 ### testing

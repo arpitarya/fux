@@ -27,7 +27,7 @@ declared per source"*, which says it *"starts as a compare doc"*.
 | | |
 |---|---|
 | **status** | ⏸ **parked 2026-09-24** — the I1-tagged pool on generation 2 is **2 (set-2-u) and 1 (set-3-u)**, below 6 at every `k` ([pools](../regression/2026-09-24-golden-gen2-rung-01000/report.md)). By this doc's own stop rule the step stops before any build, so the three forks are **deferred, not refused** |
-| **the call, recommended** | **D2 · I1 · M1, and step 3's intent stays OUT (S1).** A committed glob → type table read at query time, a fixed engine cue lexicon for three intents, one multiplicative weight at `0.0` by default |
+| **the call — ✅ RULED 2026-09-24 (Arpit)** | *"agree implement all"* — **D2 · I1 · M1, and step 3's intent stays OUT (S1).** ⚠ **Not built:** the pool rule above fires first, so the ruling waits for a set whose intent-tagged pool is ≥ 6. When that set exists, the build starts from these forks with no new ruling needed. A committed glob → type table read at query time, a fixed engine cue lexicon for three intents, one multiplicative weight at `0.0` by default |
 | **confidence** | medium on D2 (it is the only option testable on the frozen ladder); low that step 9 clears the floor — see *What the pool can be* |
 | **endpoint (already ruled)** | `hit@1`, `primary@1` beside it (Arpit, 2026-09-23) |
 | **reopen-trigger** | at the foot |
