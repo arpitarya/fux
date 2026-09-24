@@ -11,7 +11,7 @@ owns: [src/fux/query/expand.py@19b697b80e8c, src/fux/query/fuse.py@749673d52166,
 laws: [3, 4, 8]
 ratifies: W-109
 timestamp: 2026-09-05T00:00:00Z
-content_sha: 66211a65666f5a5b964ae9f5426ef35d0c062332e1ce9bd5875c279b2385a629
+content_sha: dc2304309a488f6c83ca84bdb27a9911d18dfc1e4672080f3e87327b0b071176
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -308,9 +308,13 @@ the query's own terms excluded, ties by ascending hash. Those ten go through
 - ⚠ **The first pass is the LEXICAL ranking**, before the reranker, a pin or the
   graph tier. On a corpus whose tune turns those on, the feedback set is not
   the list `ask` prints.
-- ⚠ **Unmeasured, and off until a PASS.** The frozen bar is
-  [`2026-09-23-rm3`](../work/regression/2026-09-23-rm3/PRE-REGISTRATION.md);
-  its drift bound is that no baseline rank-1 hit may be lost anywhere in the set.
+- 🔴 **Measured and FAILED — drift** (Arpit, 2026-09-23;
+  [verdict](../work/regression/2026-09-23-rm3/VERDICT.md)). Against the frozen
+  bar in [`2026-09-23-rm3`](../work/regression/2026-09-23-rm3/PRE-REGISTRATION.md),
+  every weight lost baseline rank-1 hits (6 → 11) and none cleared the gain bar.
+  **`rm3_weight` stays `0.0`**; RM3 is reachable only through a caller's own
+  `--expand`. Reopened only by a new run, and only if feeding RM3 the list `ask`
+  prints, rather than the lexical first pass, is ruled the intended design.
 
 ### Consequences
 

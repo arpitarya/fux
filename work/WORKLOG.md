@@ -29,6 +29,18 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-23 — W-220 FULLY RULED: `fux serve` builds the X-ray on the fly, behind three tabs  ·  Cowork
+- **Asked:** *"can we generate a report on the fly? … I just want to do fux serve and the application itself should run the commands, get whatever details need to be fetched so it can be displayed on the UI."*
+- **Did:** W-220's §Still owed replaced by a rulings block carrying **four** rulings — three said earlier the same day and **never filed because the bridge dropped** (one page with Ask/Documents/Index tabs and no `/docs` route; Documents from the REGISTER, opened one at a time, no up-front trace; probes on titles AND headings), plus today's: **computed on demand by `fux serve`, never a separate command**. R3 rewritten around it: in-process calls to `fux.inspect`, lazy per tab, cached under `.fux/runtime/inspect/`, fast lenses first, probes streamed and sampled with a probe-everything button. W-220 🔴 → 🟢; inbox empty; `BLOCKED.json` → `PROCEED`.
+- ⚠ **SR-SERVE decision 5 ("the page computes nothing") needs an amendment, not a violation**: the browser still computes nothing; the server calls inspect's library as it already calls `ask`. Named in R3.
+- **Next:** Claude Code — W-220 R1 → R2 → R3 (Opus for the SR-INSPECT/SR-SERVE amendments). W-168 step 9. W-215's ladder rebuild.
+
+## 2026-09-23 — RULED: W-168 step 5 (RM3) is FAIL — drift  ·  Cowork
+- **Asked:** *"W168 mark it as fail."*
+- **Did:** the verdict's front matter → `verdict: FAIL`, `verdict_by_table: INCONCLUSIVE`, `ruled_by`, with a ruling block on top; the table's output below it is unchanged. **SR-EXPAND decision 16** — *unmeasured, off until a PASS* → *measured and FAILED*, `rm3_weight` stays `0.0`, reopen only by a new run on the printed-list design. IMPLEMENTATION's prediction row → FAIL. W-168 detail gains the closure; its inbox row is gone and the item is 🟢 (next: step 9). `BLOCKED.json` narrowed to W-220's two calls.
+- ⚠ **CHANGELOG for `3.0.0-alpha.3` still says INCONCLUSIVE** — released text, left as it was published; the next release's entry carries the ruling.
+- **Next:** Arpit — W-220's two calls. Claude Code — W-168 step 9 pre-registration, or W-215's ladder rebuild.
+
 ## 2026-09-23 — CI fixed on every OS; 3.0.0-alpha.4 released  ·  Claude Code (Opus 5.5)
 
 - **Arpit asked me to fix CI/CD and keep releasing alphas.** alpha.3 had shipped

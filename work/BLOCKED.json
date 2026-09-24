@@ -1,10 +1,8 @@
 {
- "decision": "ASK",
- "reason": "W-215 decision 2 is answered: prompt 10 ran on 2026-09-23 (14 seed documents, set-3-u with 80 questions, the key kept by Arpit). The ladder rebuild is green, for a fresh Opus session. W-168 step 5 (RM3) was adjudicated from the frozen decide.py and came back INCONCLUSIVE: no weight clears the gain bar, and every weight breaks the drift bound (6-11 rank-1 hits lost). The table has no row for that, so the filing is his.",
- "questions": [
-  "W-168 step 5: file RM3 as FAIL (drift broken at every weight, rm3_weight stays 0.0), or keep it INCONCLUSIVE?"
- ],
- "safe_alternative": "W-215: a fresh Opus session runs prompt 4 (the ladder rebuild with the 14 new seeds). It must not be the session that wrote set-3-u.",
+ "decision": "PROCEED",
+ "reason": "Nothing waits on Arpit. W-168 step 5 was filed FAIL and W-220 was fully ruled on 2026-09-23 — fux serve computes the X-ray on demand behind Ask / Documents / Index tabs. Every open item is 🟢.",
+ "questions": [],
+ "safe_alternative": "",
  "surfaced": true,
  "filed": "2026-09-23"
 }

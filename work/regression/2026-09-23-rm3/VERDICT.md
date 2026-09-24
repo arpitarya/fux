@@ -2,7 +2,9 @@
 type: Verdict
 name: W-168-STEP-5-RM3
 description: "W-168 step 5 (RM3) — INCONCLUSIVE by the frozen table, and handed to Arpit. No arm clears the SR-RS d19 gain bar on the 92 tagged questions, and every arm breaks the drift bound (6 to 11 baseline rank-1 hits lost). Two arms carry a positive but sub-floor net with the drift bound broken, a combination the table does not name. `rm3_weight` stays 0.0 meanwhile, as it already is."
-verdict: INCONCLUSIVE
+verdict: FAIL
+verdict_by_table: INCONCLUSIVE
+ruled_by: "Arpit, 2026-09-23"
 prediction: W-168-STEP-5-RM3
 pre_registration: work/regression/2026-09-23-rm3/PRE-REGISTRATION.md
 run: 2026-09-23-rm3
@@ -12,6 +14,20 @@ classification: informed
 ---
 
 # VERDICT — RM3 is INCONCLUSIVE by the table; the call is Arpit's
+
+## ✅ RULED 2026-09-23 (Arpit, Cowork) — **FAIL — drift**
+
+*"W168 mark it as fail."* The table routed this outcome to him because it names no row for a
+positive sub-floor net with the drift bound broken; he filed it as **FAIL**.
+**Why it is FAIL in substance:** clause 2 — *no baseline rank-1 hit lost* — is
+broken at **every** weight (6 → 11 lost), and `hit@10` falls 102 → 89–94.
+**Consequence:** `rm3_weight` stays `0.0`; RM3 is reachable only as an agent's
+manual `--expand`, exactly as the proposal's *remove if* column says. Nothing in
+the engine changes. ⚠ **Reopen only if** [ANALYSIS](ANALYSIS.md) §1 is
+overturned — RM3 fed the lexical first pass, not the list `ask` prints — and
+then by a **new run**, never by re-reading this one. The sections below are the
+table's output as filed, unchanged.
+
 
 **Ruled against** [`PRE-REGISTRATION.md`](PRE-REGISTRATION.md), frozen before the
 build. **Evidence:** [`report.md`](report.md), the five score files under

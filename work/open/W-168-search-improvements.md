@@ -94,6 +94,14 @@ is built and no treatment number exists.**
 - **Next:** build step 5 (**Opus**). Then capture both arms at one engine commit
   with `golden_run.py`. Then Arpit runs `score.py` on each.
 
+## ❌ STEP 5 (RM3) FILED FAIL — 2026-09-23 (Arpit, Cowork)
+
+*"W168 mark it as fail."* Drift broken at every weight (6 → 11 rank-1 hits lost), no gain cleared;
+`rm3_weight` stays `0.0`. [Verdict](../regression/2026-09-23-rm3/VERDICT.md) ·
+SR-EXPAND decision 16. **Step 5 is closed.** Next here: **step 9** (intent prior,
+judged at rank 1), then steps 1, 2 and 4 on the rebuilt ladder once W-215's
+prompt-4 rebuild lands.
+
 ## ✅ RULED 2026-09-23 (Arpit, Cowork) — each remaining step is judged on its OWN measure; steps 5 and 9 at rank 1
 
 *"Go with the recommendation. That is judge step five and nine at rank one. Six, seven, ten have their own measurements, so use that."*

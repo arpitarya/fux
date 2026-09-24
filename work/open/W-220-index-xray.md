@@ -2,12 +2,12 @@
 type: OpenItem
 id: W-220
 title: "W-220 — the index X-ray: one engine, four zoom levels, judged by what a person types"
-description: "Arpit asked (2026-09-23) to see how one document is ingested and indexed, and then how that works for the whole index. Two design samples were built from real runs. They found that inspect's findable share reads 100 % while 21 of 120 title probes miss their own top 10, and that 526 of 1 672 documents share a title. The design extends SR-INSPECT and W-210's rungs 3–4. Partly ruled 2026-09-23: it lives in fux inspect, and data files are held to both bars. Two calls are still his. Not built."
+description: "Arpit asked (2026-09-23) to see how one document is ingested and indexed, and then how that works for the whole index. Two design samples were built from real runs. They found that inspect's findable share reads 100 % while 21 of 120 title probes miss their own top 10, and that 526 of 1 672 documents share a title. The design extends SR-INSPECT and W-210's rungs 3–4. Fully ruled 2026-09-23: inspect computes it, and fux serve computes it on demand when a tab is opened — no separate command. Not built."
 status: open
-lane: arpit
+lane: build
 timestamp: 2026-09-23T00:00:00Z
 filed: 2026-09-23
-ball: arpit
+ball: agent
 ---
 
 # W-220 — the index X-ray
@@ -15,8 +15,8 @@ ball: arpit
 **Model: Opus** for the rulings' follow-through and SR-INSPECT's amendment (a new
 headline metric and a new cache); **Sonnet** for rungs 1, 3 and 4 once ruled.
 
-🔴 **Partly ruled 2026-09-23 — NOT built.** Nothing in `src/`, `node/` or `tests/`
-moved. Two calls are still Arpit's (§Still owed).
+✅ **Fully ruled 2026-09-23 — NOT built.** Nothing in `src/`, `node/` or `tests/`
+moved.
 
 ## The ask
 
@@ -104,13 +104,49 @@ magnitude, not a benchmark):
   yes it should."* No new verb. SR-INSPECT d1 stands, and rungs 1, 2 and 4 are
   inspect's.
 
-## 🔴 Still owed
+**Also ruled by Arpit, 2026-09-23** (the first three said in chat earlier the
+same day and not filed until now, because the bridge dropped mid-session):
 
-0. **Direction for the views:** build W-210 rungs 3–4 (`fux serve /docs`,
-   `fux trace <doc> --html`) on inspect's report? The data half is ruled by the
-   home ruling. The view half isn't.
-1. **Probe source by default:** title only, or title + headings? Headings cost
-   ≈7.8× per prose document. *Suggested: title, with `--headings` opt-in.*
+- **One page, with tabs — no `/docs` route.** `fux serve` opens one page:
+  **Ask** (the explorer as today), **Documents**, **Index**. Switching is a tab
+  in the page, not a new URL to remember.
+- **Documents come from the REGISTER, and open one at a time.** The tab lists
+  every document from `.fux/index/REGISTER`. **Clicking one** shows that
+  document's X-ray — what was ingested, what was indexed, and how it links to
+  other documents. ⚠ **No trace runs for every document up front.**
+- **Probes use titles AND headings.** Accepted cost: ≈7.8× the probes per prose
+  document.
+- 🔴 **Everything is computed ON THE FLY by `fux serve` — never a separate
+  command first.** *"I don't want to … run some command and then … do a serve
+  … I just want to do fux serve and the application itself should run the
+  commands, get whatever details need to be fetched so it can be displayed on
+  the UI for analysis."*
+
+**What that ruling means for the build, stated so it cannot be misread:**
+
+- **One command:** `fux serve`. Nobody runs `fux inspect` first. `fux inspect`
+  stays as the CLI for CI, scripts and `--diff`, and both call **the same
+  library functions** — one engine, two front doors.
+- **In-process, never a subprocess.** The server imports `fux.inspect` and calls
+  it; it does not shell out to the CLI.
+- **Lazy, per tab:** nothing is computed at start-up. Opening **Index** runs the
+  corpus pass; clicking a document runs **that document's** facts pass only.
+- **Cached, so the second look is instant.** Pass A is keyed on sha + decoder
+  digest + `RULES_VERSION` + analyzer + refer bounds; probes on index root hash
+  + probe text; the cache lives under gitignored `.fux/runtime/inspect/`.
+  Re-opening a tab on an unchanged index recomputes nothing.
+- **The slow part is visible, never silent.** The fast lenses render first. The
+  probe lens (real `ask` calls, titles and headings) runs behind them with a
+  progress line. **By default it probes an evenly spaced sample, labelled an
+  estimate** (SR-INSPECT d7, a rule already in force), with a **"probe every
+  document"** button.
+- ⚠ **SR-SERVE decision 5 must be amended, not broken.** It says the page
+  computes nothing. After this, **the browser still computes nothing** — no
+  score, no band, no rank in JavaScript — but **the server calls inspect's
+  library**, exactly as it already calls `ask` for the Ask tab. The amendment
+  states that line; it does not delete the rule.
+- **Read-only still.** No route writes a committed byte; the only writes are
+  the runtime cache (L2, L8). No fetch (L4).
 
 ## Definition of done — per rung, after the rulings
 
@@ -123,9 +159,16 @@ magnitude, not a benchmark):
   - Data documents are reported on both bars: identifiable and reachable (ruled 2026-09-23).
   - Replaces self-retrieval as the findability headline.
   - SR-INSPECT amended.
-- **R3 · `fux serve /docs` + `fux trace <doc> --html`.**
-  - L0–L3 views that read the report and compute nothing.
-  - SR-SERVE decisions for rungs 3 and 4.
+- **R3 · the tabs in `fux serve`, computed on the fly.**
+  - One page: **Ask · Documents · Index**. No `/docs` route.
+  - **Documents:** the REGISTER list; click one → its X-ray (ingested, indexed,
+    links in and out), computed for that document on the click and cached.
+  - **Index:** L0 headline → L1 segments → L2 worst-first triage, computed when
+    the tab opens; probes stream in behind the fast lenses, sampled by default,
+    with a button to probe every document.
+  - Server calls `fux.inspect` in-process; the browser computes nothing.
+  - SR-SERVE amended (decision 5's line, the two new tabs); SR-INSPECT names
+    serve as its second caller.
 - **R4 · `fux inspect --diff A B`.**
   - Descriptive, with edge loss always an alert.
   - The review artifact for any decoder `VERSION`, `RULES_VERSION` or analyzer
