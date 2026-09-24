@@ -5,6 +5,7 @@ run: 2026-09-15-anchor-text
 item: W-168
 filed: 2026-09-15
 measured: "not yet"
+classification: informed
 ---
 
 # Pre-registration — the anchor field
@@ -110,6 +111,103 @@ decision 14 (2026-09-21) retired the sets into open regression data. **So a
 Claude session may run and score these arms when the corpus can support them**
 — `informed` permanently. **The arms, the order, the four clauses of the
 decision rule and the hub control are untouched.**
+
+## AMENDMENT 2026-09-24 (W-168) — the endpoint, the set and the tag, as ruled
+
+⚠ **Written and committed before any anchor arm was captured.** It names what
+this file left open: a `k`, a question set, and a mechanical reading of each
+clause. **No arm, no order, no clause and no number above or below moves.**
+
+**The ruling** — Arpit, 2026-09-24, Cowork
+([W-168](../../open/W-168-search-improvements.md) §RULED 2026-09-24), *"yes"* to
+*judge steps 1 and 4 at rank 1 on set-3-u*:
+
+| | measure | gates? |
+|---|---|---|
+| **primary** | **`hit@1`**: a document the key lists as relevant is ranked first | ✅ |
+| secondary | **`primary@1`**: the key's primary document is ranked first | ❌ reported beside it, every arm, both directions |
+
+🔴 **Ruled AFTER the pools were seen, so it is `informed`, and this file says
+so.** The generation-2 score gave step 1 a pool of **14** on set-3-u at rank 1
+and **2** at rank 5 ([pools](../2026-09-24-golden-gen2-rung-01000/report.md)),
+and the rank was chosen knowing that. **It is not a moved threshold:** no anchor
+arm has a number, and this file named no `k` until now.
+
+### The data, fixed
+
+| | |
+|---|---|
+| question set | **`set-3-u`**, 80 questions, `work/golden/questions/set-3-u.jsonl`, sha256 `851b3550…8745fba9` |
+| rung | **`rung-01000`** (the 42-seed ladder), verified against `ladder/rung-01000.sha256` by the harness |
+| engine | **`2dbe870f66a87ec65a6483078fc64899ee10b72c`**, the rung's own stamp, so no re-ingest. The ranking path is unchanged between it and `3e92f008` (only `inspect/`, `serve/`, `cli.py` and the version moved) |
+| harness | `tools/quality-controls/golden_run.py --sets 3-u`, `ask --json --band --why --top 10` + `answer --json`, one `--tree` copy per arm |
+| scoring | `just golden-score work/regression/2026-09-15-anchor-text`, **Arpit's hand** ([L11](../../../records/0012_LAW-11-sealed-answer-key.md)) |
+
+**Arm copies** are `cp -a` of the frozen rung, and each `.fux/tune.toml` differs
+from the rung's **only** on the `anchor` line. `anchor-0.0` is captured fresh as
+well: its ranked lists must equal the
+[generation-2 capture's](../2026-09-24-golden-gen2-rung-01000/evidence/handoff-set-3-u.jsonl)
+row for row, or the run stops.
+
+### §*What the data must contain* is satisfied, on the data
+
+The census's clause-5 block is lifted by generation 2 and **not by argument**
+([pools](../2026-09-24-golden-gen2-rung-01000/evidence/step-pools.txt)):
+
+| row | 2026-09-22 | 2026-09-24 |
+|---|---|---|
+| 1 · anchor-distinctive vocabulary | 1 term, 1 target | **17 words, 5 targets** |
+| 2 · a hub linked with unrelated words | none named | **`seed/01-sop-temperature-excursion.md`**, 8 inbound `ref` edges |
+| 3 · questions phrased in the linker's words | 0 | **27 tagged on set-3-u** (below) |
+
+### The coverage tag — `anchor_dependent`
+
+**A question is `anchor_dependent` iff one of its tokens is anchor-distinctive:**
+a word that some seed document uses in the text of a markdown link to another
+seed document, and that the target does not itself contain. This is the rule the
+pool was counted with (`step_pools.py`), **imported, not re-implemented**, by
+[`evidence/tag_anchor.py`](evidence/tag_anchor.py) (sha256 `39b0f142…b267472bf`).
+It reads question text and `seed/` only: no key, no score, no engine output.
+
+| | |
+|---|---|
+| tagged `anchor_dependent` | **27 of 80** |
+| the rest (clause 2's regression arm) | 53 |
+| tags file | [`evidence/tags-set-3-u.jsonl`](evidence/tags-set-3-u.jsonl), sha256 `98a07895…cb199f98f` |
+| pool, from the generation-2 score (d22) | 25 answerable, **14 miss `hit@1`**: 13 in the returned ten, 1 not |
+
+⚠ **The tag is a proxy.** The words are the ones the link text carries, and
+most are nicknames: *pink card*, *green binder*, *Sunday sheet*. It does not
+claim the engine's edge carries exactly these tokens.
+
+### Each clause, read mechanically
+
+All four are computed by
+[`evidence/decide.py`](evidence/decide.py) (sha256 `05124131…3a0af325`), which
+is frozen here and refuses to run on a partial score.
+
+| clause | read as |
+|---|---|
+| **1 + 4** | on the 27 tagged, `hit@1` wins against losses through `verdict.rule` at the observed discordant count. The outcome must be `treatment`: a positive net that clears SR-RS d19 |
+| **2** | on the other 53, `hit@1` wins minus losses **≥ 0** |
+| **3** | **the hub is ranked first in the treatment, was not first in the baseline, and the treatment misses `hit@1` → fails**, on any single question. A miss at rank 1 means the hub does not answer it, which is the one place the key tells us that without being read |
+| **3, half-moving** | the hub climbs within ranks 2–10 on a `hit@1` miss. **Reported.** A value that clears 1–4 with it goes to Arpit as INCONCLUSIVE, per item 4 below |
+
+⚠ **Clause 3 is read at rank 1 because that is where the endpoint is.** Below
+rank 1 the scorer does not say whether the hub answers the question. At
+baseline the hub is ranked first on **5** of 80 questions and appears in the top
+ten on **44**, so this clause is exposed.
+
+**Outcome order** (the table, as `decide.py` applies it): the first value,
+ascending, clearing 1–4 → **PASS**; that value half-moving → **INCONCLUSIVE**;
+every gaining value breaking 2 → **FAIL (regression)**; every gaining value that
+holds 2 breaking 3 → **FAIL (hub)**; no positive net anywhere → **FAIL (no
+gain)**; anything else → **INCONCLUSIVE**, to Arpit.
+
+🔴 **Who runs what.** The session that captures the arms files hand-offs and a
+descriptive report, and nothing else. Arpit scores. **A session that did not
+capture the arms runs `decide.py`**, and item 4 below still sends any ambiguity
+to Arpit.
 
 ## The decision rule, frozen
 
