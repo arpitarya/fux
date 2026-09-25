@@ -8,6 +8,12 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+## [3.0.0-alpha.5] - 2026-09-25
+
+**The anchor field turns on, and `fux inspect` X-rays each document.** Anchor
+ranking changes what `ask` returns on any corpus with links between documents;
+set `[bm25f] anchor = 0` in `.fux/tune.toml` to get alpha.4's ranking back.
+
 ### Added
 
 - **The index X-ray (W-220).** `fux inspect` now reads each document on its
