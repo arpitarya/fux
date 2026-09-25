@@ -1,0 +1,97 @@
+{
+ "rm3b-0.0": {
+  "ask_ms_median": 139.3,
+  "bands": {
+   "grounded": 42,
+   "partial": 59,
+   "weak": 24
+  },
+  "engine_commits": [
+   "0ff3078c"
+  ],
+  "gates_captured": 125,
+  "membership_changed_vs_baseline": 0,
+  "n": 125,
+  "order_changed_vs_baseline": 0,
+  "top1_changed_vs_baseline": {
+   "all": 0,
+   "tagged": 0
+  }
+ },
+ "rm3b-0.1": {
+  "ask_ms_median": 180.7,
+  "bands": {
+   "grounded": 45,
+   "partial": 59,
+   "weak": 21
+  },
+  "engine_commits": [
+   "0ff3078c"
+  ],
+  "gates_captured": 125,
+  "membership_changed_vs_baseline": 105,
+  "n": 125,
+  "order_changed_vs_baseline": 122,
+  "top1_changed_vs_baseline": {
+   "all": 18,
+   "tagged": 12
+  }
+ },
+ "rm3b-0.2": {
+  "ask_ms_median": 182.2,
+  "bands": {
+   "grounded": 42,
+   "partial": 59,
+   "weak": 24
+  },
+  "engine_commits": [
+   "0ff3078c"
+  ],
+  "gates_captured": 125,
+  "membership_changed_vs_baseline": 117,
+  "n": 125,
+  "order_changed_vs_baseline": 125,
+  "top1_changed_vs_baseline": {
+   "all": 29,
+   "tagged": 20
+  }
+ },
+ "rm3b-0.3": {
+  "ask_ms_median": 181.7,
+  "bands": {
+   "grounded": 38,
+   "partial": 59,
+   "weak": 28
+  },
+  "engine_commits": [
+   "0ff3078c"
+  ],
+  "gates_captured": 125,
+  "membership_changed_vs_baseline": 120,
+  "n": 125,
+  "order_changed_vs_baseline": 125,
+  "top1_changed_vs_baseline": {
+   "all": 38,
+   "tagged": 26
+  }
+ },
+ "rm3b-0.5": {
+  "ask_ms_median": 182.9,
+  "bands": {
+   "grounded": 33,
+   "partial": 59,
+   "weak": 33
+  },
+  "engine_commits": [
+   "0ff3078c"
+  ],
+  "gates_captured": 125,
+  "membership_changed_vs_baseline": 123,
+  "n": 125,
+  "order_changed_vs_baseline": 125,
+  "top1_changed_vs_baseline": {
+   "all": 53,
+   "tagged": 38
+  }
+ }
+}
