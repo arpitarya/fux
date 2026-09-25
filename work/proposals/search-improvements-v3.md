@@ -33,7 +33,7 @@ pre-registration exist.**
   pair with a question that the old one answers wrongly.
 - **All ten are `$0`, offline, deterministic, and put no model on the
   maintenance path.** Where one could drift toward a law, the row says so.
-- **Independent of [ask-graph-expansion](../compare/ask-graph-expansion.compare.md).**
+- **Independent of [ask-graph-expansion](../../archive/compare/ask-graph-expansion.compare.md).**
   None requires it; #1, #5, #7 interact with it, favourably.
 
 ---

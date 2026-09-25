@@ -10,7 +10,7 @@ feature: what happens once a document is declared archived — the record proper
 owns: [tools/archived-signal-eval@30fb75fa7476]
 laws: [L3, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 15673fda6a0d2bc3ec324168001d6df71836ac73fb845351632f6ff071310e4b
+content_sha: 037a8221b2f5e13efc33899ceaeae5e4894eee0189dda78de105cbb811d53eff
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -199,7 +199,7 @@ it.** Absent when false, so no existing record changes shape.
 - ⚠ **"Both source lists" now means EVERY committed source list** (2026-09-11).
   When decision 1a was written the line grammar parsed three files — `dirs`,
   `urls` and `types`. `types` moved to `.fux/formats.toml` that day
-  ([the comparison](../work/compare/types-toml.compare.md), SR-TYPES
+  ([SR-TYPES](0128_types-list.md)
   decision 12), so the two lists carrying `archived` are now **all** of them.
   The sentence did not change; what it covers did, and it covers more.
   ⚠ **`types` never carried `archived` and could not have** — a type pattern
@@ -245,7 +245,7 @@ divergence between the live and archived `df` shapes is **0.1514** on a 0–1
 scale — **the condition does not fire.** Elasticsearch ships global-statistics
 merging as a discouraged opt-in and tells small corpora to use one statistical
 universe; temporal IR puts recency at re-ranking time. Full argument:
-[`df-over-the-union.compare.md`](../work/compare/df-over-the-union.compare.md).
+[`df-over-the-union.compare.md`](../archive/compare/df-over-the-union.compare.md).
 
 > **The distinction this rests on:** a demotion weight states a currency
 > judgment openly; changing `df` would perform the same reordering while
@@ -577,7 +577,7 @@ $ fux ask "what commands does the fux command line have" --top 8   # shipped beh
   — and its verdict,
   [W44-SIGNAL](../work/regression/2026-08-22-archived-signal/VERDICT.md).
 - The `df` argument and its references —
-  [`work/compare/df-over-the-union.compare.md`](../work/compare/df-over-the-union.compare.md).
+  [`archive/compare/df-over-the-union.compare.md`](../archive/compare/df-over-the-union.compare.md).
 
 
 ⚠ **2026-09-13:** every `subprocess` pipe under this record's components now names
@@ -626,6 +626,19 @@ $ diff /tmp/a.json <(fux ask "what is the ingest cache" --top 5 --json)
                                           # 2 - empty; byte-identical at the default
 ```
 
+
+**Also reopen decision 4 (`df` over the union) if — ported 2026-09-24 from the archived
+[`df-over-the-union.compare.md`](../archive/compare/df-over-the-union.compare.md):**
+- **The divergence check comes back divergent** — the live and archived `df`
+  shapes differ materially (today's Jensen-Shannon divergence is **0.1514**).
+  Then a two-corpus gate has a real motivation.
+- **fux gains a second statistical universe for another reason** — per-team
+  ACL-scoped indexes or multi-tenant corpora — so a split `df`'s cost is already
+  paid.
+- ⚠ The doc's third condition — *a majority-archived corpus crowding out live
+  documents "with `archived_weight` already in use"* — **cannot be evaluated**:
+  the weight was deleted (W-152). Rewording it would be a new decision.
+
 ---
 
 ## References
@@ -655,4 +668,4 @@ evidence.*
 
 **Project docs**
 
-- [`work/compare/df-over-the-union.compare.md`](../work/compare/df-over-the-union.compare.md)
+- [`archive/compare/df-over-the-union.compare.md`](../archive/compare/df-over-the-union.compare.md)

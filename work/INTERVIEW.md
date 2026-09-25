@@ -32,8 +32,18 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-09-24** (Claude Code, Opus — W-168 step 1 decided by the table: INCONCLUSIVE, to Arpit).* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-09-24** (Claude Code, Opus — W-168 step 1 shipped: `anchor` defaults to `1.0`).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
+
+### 🟢 2026-09-24 (latest) — W-168 STEP 1 SHIPPED: `[bm25f] anchor` defaults to `1.0`
+
+- **Arpit ruled PASS at `1.0`** (Cowork): the hub never takes rank 1 on a miss.
+  Shipped per §If it passes, in one change: the default on both engines, SR-TUNE
+  17/17a, SR-RANKING 12c–12d, SR-INGEST 17e, L3 byte-identity, four surfaces,
+  and the CHANGELOG.
+- ⚠ **Upgrade divergence:** a repo that ran `fux setup` keeps `0.0`, and that
+  includes this one. `--no-tune` no longer turns anchor off.
+- **Next:** step 4's pre-registration (abbreviations).
 
 ### 🔴 2026-09-24 (later) — W-168 STEP 1 INCONCLUSIVE BY THE TABLE; the ruling is Arpit's
 
@@ -528,11 +538,11 @@ is still true; what it says about the live state is not.
 - **Branch `release/3.0.0-alpha.0`** off `main`. **The version is NOT bumped** —
   `src/fux/__init__.py` and the three Node sites move together under
   `check-version-parity.py`, and that is Claude Code's first commit on the branch.
-- **Ratified by Arpit, filed as accepted:** [ask-graph-expansion](compare/ask-graph-expansion.compare.md)
+- **Ratified by Arpit, filed as accepted:** [ask-graph-expansion](../archive/compare/ask-graph-expansion.compare.md)
   — `fux lexical` and `fux graph --seed` are atoms, `ask` = their composition,
   a *boosted* tier and a labelled *related* tier, `answer` reads `ask`, Node
   gains the graph plane → **W-160** (atoms, 🟢) and **W-161** (the composed
-  `ask`, 🔴 blocked on W-156). [fux-correct](compare/fux-correct.compare.md) —
+  `ask`, 🔴 blocked on W-156). [fux-correct](../archive/compare/fux-correct.compare.md) —
   a human question line on the enrichment file, rare `--pin`, eval row, guide
   skill + agent steering → **W-162** (🟢).
 - **Proposed, not ruled:** [abstention-gates](compare/abstention-gates.compare.md)
@@ -2546,7 +2556,7 @@ touching the whole corpus costs, and the attribution says why: git is
 misses the bound by 4.5×** — which rules out "just optimise it" arithmetically
 rather than by opinion. Only removing the work from the commit path reaches 1 s,
 and that is an architectural call, so it went to a compare doc —
-[`hook-at-scale.compare.md`](compare/hook-at-scale.compare.md), **ruled by Arpit
+[`hook-at-scale.compare.md`](../archive/compare/hook-at-scale.compare.md), **ruled by Arpit
 on 2026-08-22: B, the hook defers**, in a **detached-runner** variant.
 `post-commit` writes a **dirty list** of the changed documents, spawns a
 one-shot re-index that exits, and returns.
@@ -3197,7 +3207,7 @@ tell the two apart. Both readings are written out in W-77.
   is about to add a third tier to. Measure a tier's rebuild cost before choosing
   its default.
 - **Both of R5's calls were ruled on 2026-08-22 and the inbox is empty.** The
-  fork went to **B** ([`hook-at-scale.compare.md`](compare/hook-at-scale.compare.md),
+  fork went to **B** ([`hook-at-scale.compare.md`](../archive/compare/hook-at-scale.compare.md),
   now `accepted`) and R6 to **PASS under §3.1**. They left two agent-lane items:
   **W-66** builds the deferring hook (Phase 1, the dirty list, lands alone and is
   Sonnet-executable; Phase 2's detached spawn and single-writer lock are

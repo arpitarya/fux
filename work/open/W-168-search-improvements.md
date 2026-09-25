@@ -54,6 +54,31 @@ at `cfca651a`) and files `VERDICT.md`. INCONCLUSIVE → Arpit.
   3. An INCONCLUSIVE goes back to Arpit.
 - **Agent-side, meanwhile:** step 4's pre-registration.
 
+## ✅ STEP 1 (ANCHOR) FILED PASS at `anchor = 1.0` — 2026-09-24 (Arpit, Cowork)
+
+*"It is a pass. Ratify."* [Verdict](../regression/2026-09-15-anchor-text/VERDICT.md).
+**Reopen-trigger:** the hub taking rank 1 on a miss, in any later run.
+
+**✅ SHIPPED 2026-09-24 (Claude Code), in one change — PRE-REGISTRATION §If it passes:**
+- **Default:** `ANCHOR = 1.0` in `query/bm25f.py` and `query/bm25f.mjs`, read by
+  `Scoring`, `Tune` and the loader on both sides; the setup template's comment
+  now says the value is measured.
+- **Records:** SR-TUNE 17 + new 17a (the default, the upgrade divergence, and
+  `--no-tune` no longer switching anchor off) · SR-RANKING 12c–12d · SR-INGEST new 17e.
+- **L3:** this repo ingested from empty under `0.0` and under `1.0` gives
+  byte-identical `.fux/index/` (1 792 documents, one hash).
+- **Four surfaces:** scan = accelerator (`tools/differential/run.py`), Node =
+  bundle = Python (`node_arm.py`, both arms), at `anchor = 1.0` — see WORKLOG.
+- **Tests:** a new test holds `ANCHOR`, `K1` and `B` equal across the two
+  engines (only their spelling was checked before); the anchor tests now cover
+  the default, off, and 2.0.
+- **CHANGELOG:** Unreleased/Changed — a repo that ran `fux setup` keeps `0.0`;
+  a fresh clone gets `1.0`.
+- ⚠ **This repo's own `.fux/tune.toml` still pins `0.0`** — the divergence,
+  exactly as stated. Changing it is a separate choice for Arpit.
+
+**Next:** step 4's pre-registration.
+
 ## ✅ RULED 2026-09-24 (Arpit, Cowork) — steps 1 and 4 are judged at RANK 1, on set-3-u
 
 *"yes"* — to *judge steps 1 (anchor) and 4 (expansion) at rank 1 on set-3-u,
@@ -431,7 +456,7 @@ nothing for them.
    **Whether it rides 3.0's existing unreleased bump belongs in the build's own
    pre-registration.**
 
-### ✅ Research filed 2026-09-18, GRADUATED 2026-09-20 — [`proposals/identifier-exact-match.md`](../proposals/identifier-exact-match.md)
+### ✅ Research filed 2026-09-18, GRADUATED 2026-09-20 — [`proposals/identifier-exact-match.md`](../../archive/proposals/identifier-exact-match.md) *(archived 2026-09-24)*
 
 🔴 **It is now two items, and neither is step 2.** [W-203 → W-205 → SR-RANKING](../../records/0111_ranking.md) decision 9
 carries the two analyzer defects and the four families, **waiting on this item** — not on a

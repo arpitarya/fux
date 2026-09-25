@@ -7,11 +7,11 @@ description: "`fux enrich` plans and validates; a coding agent generates. Fux ne
 status: accepted
 date: 2026-08-23
 feature: document enrichment — the deterministic halves fux owns, and the generation it refuses to own
-owns: [src/fux/correct.py@825b9f26220b, src/fux/enrich.py@fffa68fe0f30, src/fux/templates/agents/ENRICH-SKILL.md@5c384af659f2, node/src/correct.mjs@b7a9d36b309e, node/test/pins.test.mjs@daebcdb98aac]
+owns: [src/fux/correct.py@1c9f9130bcb2, src/fux/enrich.py@fffa68fe0f30, src/fux/templates/agents/ENRICH-SKILL.md@5c384af659f2, node/src/correct.mjs@b7a9d36b309e, node/test/pins.test.mjs@daebcdb98aac]
 laws: [L1, L2, L3, L4]
 supersedes: SR-ENRICHED
 timestamp: 2026-08-23T00:00:00Z
-content_sha: 3a23f5ce65bf207258430e06532c4a5893f7e03351e0b81a566f6be30faf5466
+content_sha: 71d780a11cc8b11dfa2255532c982fed29aa569983abd9afc494da6f78f081c7
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -504,7 +504,7 @@ There is nothing URL-specific about that boundary and this section states none.
 
 **19. 🔴 `fux correct` writes a HUMAN question onto the same file, in the same
 field, with different rules.** (W-162, accepted by Arpit 2026-09-13 —
-[the compare doc](../work/compare/fux-correct.compare.md).)
+[the compare doc](../archive/compare/fux-correct.compare.md).)
 
 A correction is **the eleventh line, in a human's handwriting** — the question
 that actually failed, which is the highest-value question the file can hold. It
@@ -683,6 +683,24 @@ grep -n 'ENRICH-SKILL' src/fux/setup.py
 # 2, 4 — the flag that must not exist, and the two ignore paths
 pytest -q tests/test_enrich.py
 ```
+
+
+**Also reopen decision 19 (`fux correct`) if — ported 2026-09-24 from the archived
+[`fux-correct.compare.md`](../archive/compare/fux-correct.compare.md):**
+- **Human lines fail to generalise** — a correction fixes only its own exact
+  phrasing. Then the pin is the honest mechanism: human lines stop being indexed
+  into `ctx` (there is no per-author weight to turn down), stay as eval rows,
+  and exact-question `--pin` becomes the default effect.
+- **`ctx`'s weight has to rise for corrections to bite** — that is a ranking
+  change, and it goes through W-156's evidence rule, not this record.
+
+🔴 **Still owed, and unmeasured:** the generalisation claim — the reason human
+lines beat the pin. The plan, frozen with the decision: N corrections, M
+held-out paraphrases each, written by someone other than the measurer; top-3
+retrieval of the corrected document before vs after; **keep** if the gain
+clears [SR-RS](0133_predictions.md) d19's floor **and** no answerable golden
+question loses its top-1; otherwise the removal above. Corrections come from
+real failures, never from the sealed key or the blind unanswerables.
 
 ---
 

@@ -6,11 +6,12 @@ title: SR-RANKING (0111) — how documents are scored and ordered
 description: BM25F over five fields, weight-then-saturate once, with one scorer and one sort shared by both query paths, and a rounded, id-tie-broken order.
 status: accepted
 date: 2026-08-18
+amended: 2026-09-24
 feature: scoring, ordering, and the analyzer they share with ingest
-owns: [src/fux/query/rank.py@63a9c36a1894, src/fux/query/bm25f.py@239de1ead880, src/fux/query/tokenize.py@1d8ff4a42048, src/fux/query/analyzer.py@38936c39de2a, src/fux/query/stem.py@728155482c94, node/src/query/analyzer.mjs@cee5e31828b2, node/src/query/bm25f.mjs@7db7ba31c7be, node/src/query/rank.mjs@ba0f2173a355, node/src/query/stem.mjs@85a3f29571a6, node/src/query/tokenize.mjs@38c8b15c5197, node/test/analyzer.test.mjs@2d0342e628a6]
+owns: [src/fux/query/rank.py@63a9c36a1894, src/fux/query/bm25f.py@aa37960fcdf7, src/fux/query/tokenize.py@1d8ff4a42048, src/fux/query/analyzer.py@38936c39de2a, src/fux/query/stem.py@728155482c94, node/src/query/analyzer.mjs@cee5e31828b2, node/src/query/bm25f.mjs@d7e52fcf5f89, node/src/query/rank.mjs@ba0f2173a355, node/src/query/stem.mjs@85a3f29571a6, node/src/query/tokenize.mjs@38c8b15c5197, node/test/analyzer.test.mjs@2d0342e628a6]
 laws: [L1, L3]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: c31d68d97d84fe9939664f41b1c698e2e208c24704a310da63dd4f941837c3a5
+content_sha: 64d0c9501089e8a409f1430e0347f1b361a5c7f48e2b06efa62296f13170d8cc
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -539,8 +540,8 @@ would drop that length out of `wlen` on one path and not the other, silently
 and only on linked documents.
 
 **12c. `0.0` is OFF, not "weight zero".** Every anchor branch in the engine
-tests it and is skipped entirely, so an unconfigured corpus does the float
-arithmetic it did before the field existed. Same rule, and the same reason, as
+tests it and is skipped entirely, so a corpus that pins `anchor = 0` does the
+float arithmetic it did before the field existed. Same rule, and the same reason, as
 `--expand`'s `term_weights`: the differential law must not pick up a last-bit
 difference from a feature merely being present, and the evidence gathered at
 the default stands unmodified. **Measured 2026-09-15**: 692 queries × 4 `top`
@@ -548,13 +549,19 @@ values × 2 skipping modes over this repository's 1 237 documents — **5 536
 byte-identical comparisons at the default and 5 536 at `anchor = 2.0`, zero
 mismatches.**
 
-**12d. It ships off and is UNMEASURED.** [SR-RS](0133_predictions.md) decision
-19: a ranking change ships behind a tunable at zero and is defaulted on only by
-a PASS on a frozen pre-registration. That pre-registration is
+**12d. It shipped off, and is ON at `1.0` since its PASS** (Arpit,
+2026-09-24). [SR-RS](0133_predictions.md) decision 19: a ranking change ships
+behind a tunable at zero and is defaulted on only by a PASS on a frozen
+pre-registration. That pre-registration is
 [`2026-09-15-anchor-text`](../work/regression/2026-09-15-anchor-text/PRE-REGISTRATION.md),
-and the data it needs — documents findable only through a linker's wording —
-does not exist yet. **No claim about ranking quality is made or may be made
-until it has a `VERDICT.md`.**
+and its [`VERDICT.md`](../work/regression/2026-09-15-anchor-text/VERDICT.md)
+is PASS at `anchor = 1.0` — `informed`, set-3-u only, one 1 000-document rung,
+and **that is the whole of the ranking-quality claim**. The value is `ANCHOR`
+in `query/bm25f.py` and its Node twin, held equal by
+`tests/test_node_config_parity.py`. 🔴 **The differential law now holds at the
+default with the fold live**: scan, accelerator, Node reader and published
+bundle are compared byte-for-byte at `anchor = 1.0` —
+`tests/query/test_anchor_field.py` and `tests/query/test_anchor_node_twin.py`.
 
 **W-210 — the BM25F summand has ONE home, and `rank()` hands out two more
 statistics.** `score_record`'s loop body is extracted to

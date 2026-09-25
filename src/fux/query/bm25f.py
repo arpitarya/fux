@@ -101,6 +101,15 @@ K1 = 1.2
 #: the same constant and `tests/test_node_config_parity.py` holds the two equal.
 B = 0.15
 
+#: 🔴 **The anchor field's weight — `1.0`, and that is MEASURED.** W-168 step
+#: 1's verdict, ruled PASS by Arpit on 2026-09-24: the first value, ascending,
+#: to clear the frozen table (tagged hit@1 7 wins, 0 losses, p = 0.016; none of
+#: the 41 baseline rank-1 hits lost). ⚠ `informed`, set-3-u only, one
+#: 1 000-document rung — [the verdict](../../../work/regression/2026-09-15-anchor-text/VERDICT.md).
+#: Twin of `query/bm25f.mjs`'s `ANCHOR`; `tests/test_node_config_parity.py`
+#: holds the two equal.
+ANCHOR = 1.0
+
 
 @dataclass(frozen=True)
 class Scoring:
@@ -126,13 +135,13 @@ class Scoring:
     k1: float = K1
     b: float = B
     weights: tuple[float, ...] = FIELD_WEIGHTS
-    #: W-168 step 1 — the anchor field's weight. **Default `0.0`: off**, per
-    #: SR-RS decision 19 (a ranking change ships behind a tunable, default off,
-    #: and turns on only on a PASS). `0.0` is not "weight zero": every anchor
-    #: branch in the engine tests this and is skipped entirely, so a corpus
-    #: that configures nothing pays no cost on either candidate path and
-    #: scores byte-identically to the build before anchor text existed.
-    anchor: float = 0.0
+    #: W-168 step 1 — the anchor field's weight. **Default `ANCHOR` (`1.0`):
+    #: on**, since its PASS on 2026-09-24 (SR-RS decision 19). `0.0` is still
+    #: OFF and is not "weight zero": every anchor branch in the engine tests
+    #: `anchor_on` and is skipped entirely, so a corpus that sets `anchor = 0`
+    #: pays no cost on either candidate path and scores byte-identically to the
+    #: build before anchor text existed.
+    anchor: float = ANCHOR
 
     @property
     def trivial(self) -> bool:
@@ -141,7 +150,7 @@ class Scoring:
             self.k1 == K1
             and self.b == B
             and self.weights == FIELD_WEIGHTS
-            and self.anchor == 0.0
+            and self.anchor == ANCHOR
         )
 
     @property

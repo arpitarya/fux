@@ -12,7 +12,7 @@ the server said that morning, which is a heuristic in the maintenance path
 (L3). The line replaces the guess with a declaration.
 
 The edge cases numbered below are
-[`work/proposals/fetcher-routing.md`](../../work/proposals/fetcher-routing.md)
+[`archive/proposals/fetcher-routing.md`](../../archive/proposals/fetcher-routing.md)
 §3's.
 """
 

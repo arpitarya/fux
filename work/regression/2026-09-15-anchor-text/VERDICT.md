@@ -2,7 +2,10 @@
 type: Verdict
 name: W-168-STEP-1-ANCHOR
 description: "W-168 step 1 (the anchor field) — INCONCLUSIVE by the frozen table, and handed to Arpit. `anchor-1.0` is the first value, ascending, to clear clauses 1, 2 and 4 (tagged hit@1 7 wins, 0 losses, p = 0.016 against a floor of 7) and to hold clause 3 at rank 1 — but the hub climbs within ranks 2–10 on two hit@1 misses, the half-moving case the table sends to him. No arm loses a single baseline rank-1 hit. `[bm25f] anchor` stays 0.0 meanwhile, as it already is."
-verdict: INCONCLUSIVE
+verdict: PASS
+verdict_by_table: INCONCLUSIVE
+ruled_by: "Arpit, 2026-09-24"
+passing_value: "[bm25f] anchor = 1.0"
 prediction: W-168-STEP-1-ANCHOR
 pre_registration: work/regression/2026-09-15-anchor-text/PRE-REGISTRATION.md
 run: 2026-09-15-anchor-text
@@ -12,6 +15,29 @@ classification: informed
 ---
 
 # VERDICT — the anchor field is INCONCLUSIVE by the table; the call is Arpit's
+
+## ✅ RULED 2026-09-24 (Arpit, Cowork) — **PASS at `anchor = 1.0`**
+
+*"It is a pass. Ratify."* The table routed the half-moving hub to him; he ruled it **not** the failure
+clause 3 guards against. **Why, on the rows below:** the hub never takes rank 1
+on a miss, and in both half-moving rows the right document stays **ahead** of
+the hub (`s3u-043`: primary —→2, hub 5→4; `s3u-009`: primary 5→5, hub 8→6).
+Seven wins, zero losses, and none of the 41 baseline rank-1 hits lost anywhere.
+
+- **Value:** `1.0` — first-that-clears, as frozen. `2.0`/`3.0` are not candidates.
+- **Consequence:** [PRE-REGISTRATION §If it passes](PRE-REGISTRATION.md) applies
+  **in one change** — the `tune.toml [bm25f] anchor` default, SR-TUNE,
+  SR-RANKING and SR-INGEST amended together, the L3 byte-identity check, byte
+  equality on all four surfaces, and a CHANGELOG line on the upgrade divergence
+  (a repo that ran `fux setup` keeps `0.0`; a fresh clone gets `1.0`).
+- 🔴 **Reopen-trigger:** any later run in which the hub **takes rank 1 on a
+  question it misses** reopens step 1. That is the failure clause 3 exists for;
+  a climb within 2–10 below the right document is not.
+- ⚠ **Scope of the claim:** `informed`, set-3-u only, one 1 000-document rung,
+  endpoint ruled after the pools were seen; it supports anchor *under the
+  shipped graph tier* (ANALYSIS §4). The sections below are the table's output
+  as filed, unchanged.
+
 
 **Ruled against** [`PRE-REGISTRATION.md`](PRE-REGISTRATION.md) §"The decision
 rule, frozen" and §"AMENDMENT 2026-09-24", committed at `cfca651a` before any arm

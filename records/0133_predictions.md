@@ -10,7 +10,7 @@ feature: the prediction system — the R ids, their register, the rules that mak
 owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@4ee7d58a8286, tools/vector-gate@0023bff0cdef]
 laws: [L3]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 9b0bd89f81cdf2b9c689bd04a6dccefa8e850c4b179576723e42c1e685e3bc92
+content_sha: f65043210b339cdfbc12e446f76febfac81511dbddba2d0a39815c25c2ec59c3
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1453,7 +1453,7 @@ is the next generation's, and **no document may state one before it exists.**
   filed at the judged size, with `src/` last touched *before* the
   pre-registration, so nothing could have been tuned to pass.
 - **The ruling behind decisions 11–15** —
-  [`work/compare/blind-authorship-rule.compare.md`](../work/compare/blind-authorship-rule.compare.md);
+  [`archive/compare/blind-authorship-rule.compare.md`](../archive/compare/blind-authorship-rule.compare.md);
   **the measurement that motivated them** — the
   [blind re-grade](../work/regression/2026-08-24-blind-enrichment-regrade/report.md)
   and the
@@ -1544,6 +1544,19 @@ grep -rn "100 000\|50 000" tools/*/PRE-REGISTRATION*.md
 grep -rn "no detected change\|resolution floor" work/ docs/ --include=*.md
 ```
 
+
+**Also reopen decisions 11–14 (blind / informed) if — ported 2026-09-24 from the
+archived [`blind-authorship-rule.compare.md`](../archive/compare/blind-authorship-rule.compare.md):**
+- **A run is filed that is neither `blind` nor `informed`** — a genuine third
+  category exists and the binary is wrong.
+- **Every run is classified for six consecutive runs while a contaminated
+  artifact still reaches a delta** — the label is decorative, and the sealed set
+  is the only remaining control.
+- **A run needs to state a delta and cannot**, because every eligible author is
+  exposed — the case a ban would have created and this wording avoids.
+- *(The doc's fourth condition — author-to-author variance measured — **fired
+  2026-08-28** and is spent: decision 19's measured floor.)*
+
 ---
 
 ## References
@@ -1575,7 +1588,7 @@ evidence.*
 
 - [`CLAUDE.md`](../CLAUDE.md)
 - [`work/IMPLEMENTATION.md`](../work/IMPLEMENTATION.md)
-- [`work/compare/blind-authorship-rule.compare.md`](../work/compare/blind-authorship-rule.compare.md)
+- [`archive/compare/blind-authorship-rule.compare.md`](../archive/compare/blind-authorship-rule.compare.md)
 
 **Papers and specifications**
 

@@ -6,12 +6,12 @@ title: "SR-TUNE (0135) — the tunables file, and per-source priority"
 description: "`.fux/tune.toml` — a committed, setup-written, never-rewritten file holding every knob that changes ordering, plus one declared exception (`[index]`: `max_phrases`, `max_table_rows`) that changes the index; plus a per-source preference weight in either direction, where fux states the cost and refuses only what is broken."
 status: accepted
 date: 2026-08-22
-amended: 2026-09-15
+amended: 2026-09-24
 feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error contract, and per-source preference weights
-owns: [src/fux/tune.py@748f0a01ebbc, .fux/tune.toml@ba9885423d69, node/src/config/tune.mjs@6f600f26165e]
+owns: [src/fux/tune.py@899e0a49a560, .fux/tune.toml@ba9885423d69, node/src/config/tune.mjs@8dfb935782b5]
 laws: [L1, L3, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: f8d84d8366bcc3d380a13457da06f0a7a4bc0240a857549b63fc87b7b4a798b9
+content_sha: 6ee9aa881418050c207a8439beb8dc9956277e20b8f433917a5609487201973f
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -904,7 +904,8 @@ under the boost, and the row that causes it carries `boosted` and its route so
 the exception is annotated where it happens.
 
 
-**17. `[bm25f] anchor`, default `0.0`** (W-168 step 1, 2026-09-15) — the
+**17. `[bm25f] anchor`, default `1.0`** (W-168 step 1, 2026-09-15; defaulted
+on 2026-09-24 — decision 17a) — the
 anchor field's weight, and the sixth key in a table whose other five are the
 committed fields.
 
@@ -922,17 +923,29 @@ committed fields.
   `alen` are raw counts, weighted at query time on both paths, exactly as
   `total_flen` is.
 - **`0.0` is off, and off is arithmetic-free.** Every anchor branch tests it and
-  is skipped, so an unconfigured corpus scores byte-identically to the engine
-  before the field existed — the `expand_weight` precedent, and the reason
-  `--no-tune` remains a real off-switch here.
+  is skipped, so a corpus that pins `anchor = 0` scores byte-identically to the
+  engine before the field existed — the `expand_weight` precedent.
+  ⚠ **`--no-tune` is no longer an anchor off-switch**: it restores the engine
+  defaults, and since decision 17a the default is on. `anchor = 0` is the
+  off-switch.
 
-⚠ **UNMEASURED, and the default is not a recommendation.** [SR-RS](0133_predictions.md)
-decision 19; the frozen bar is
-[`2026-09-15-anchor-text`](../work/regression/2026-09-15-anchor-text/PRE-REGISTRATION.md).
-⚠ **Defaulting it on later would change every consumer's ranking on upgrade**
-unless their `tune.toml` pins it — and `fux setup` writes every value out in
-full, so a repo that has run setup keeps `0.0` and a fresh clone would get the
-new one. That divergence belongs in the CHANGELOG on the day it happens.
+**17a. The default is `1.0`, and it is MEASURED** (Arpit, 2026-09-24). W-168
+step 1 was ruled **PASS at `anchor = 1.0`** — the first value, ascending, to
+clear the frozen table
+([`VERDICT.md`](../work/regression/2026-09-15-anchor-text/VERDICT.md): tagged
+hit@1 7 wins, 0 losses, p = 0.016; none of the 41 baseline rank-1 hits lost).
+The table itself returned INCONCLUSIVE on the hub's climb within ranks 2–10;
+Arpit ruled that climb not the failure its clause 3 guards against. SR-RS
+decision 19 is what turned it on, and nothing else may.
+- ⚠ **`informed`, set-3-u only, one 1 000-document rung** — the claim is
+  exactly the verdict's, no wider.
+- 🔴 **The upgrade divergence, stated in the [CHANGELOG](../CHANGELOG.md):**
+  `fux setup` writes every value out in full, so **a repo that ran setup before
+  2026-09-24 keeps `anchor = 0.0`** and ranks as it did, while **a fresh clone,
+  or a repo with no `tune.toml`, gets `1.0`**. Neither is wrong; a consumer who
+  wants the measured value edits one line.
+- **Reopen-trigger** (the verdict's): any later run in which the hub takes rank
+  1 on a question it misses reopens step 1.
 
 ⚠ **Unchanged by W-210 (2026-09-22), and touched here only because the register
 says so.** That change edited two things in `src/fux/store/fuxdir.py`: the

@@ -485,6 +485,24 @@ it shipped and dogfooded for two releases and its defect is instructive.
 |---|---|---|
 | [`paper/the-fux-index-paper-v0.2.md`](paper/the-fux-index-paper-v0.2.md) + `paper/fig1`–`fig4` | 2026-09-14 | **[`docs/paper/the-fux-index-paper.md`](../docs/paper/the-fux-index-paper.md) v1.0**, rewritten from the records and `work/regression/` on Arpit's instruction. v0.2 (2026-08-09) is kept byte-for-byte because its §9 counterpart in v1.0 is a *mapping* of what it proposed to what shipped, and a mapping needs its source. Its four charts are 10⁶-document projections for a design that was not built (MST keyspace, BIC postings, dense codes) and are history, not evidence |
 
+## Archived 2026-09-24 — two proposals whose work had closed
+
+**Arpit, 2026-09-24:** *"Review all the proposals and compare documents. Whatever
+has been built out or is not needed anymore, archive it."* Every compare doc and
+proposal was re-read; **two proposals qualified, no compare doc did** — the
+reasons for each one kept are in the WORKLOG entry of the same day. **The two 2026-08-28 reviews followed the same day, on Arpit's own ruling.**
+
+**Archive is not evidence.** Either may be *named*; neither may be cited as
+backing a live claim ([SR-WORK-ARCHIVE](../records/0062_WORK-archive.md)
+decisions 4–5).
+
+| archived | date | why, and the live successor |
+|---|---|---|
+| [`adr-review-2026-08-28.md`](proposals/adr-review-2026-08-28.md) | 2026-09-24 | **Overtaken, on Arpit's ruling** (*"Archive ADR review and architecture review."*). A record-vs-record review of 47 records that nobody reconciled against what landed after it — the ownership, freshness and `describes` gates it asked for shipped since. No live successor; its findings are not re-verified, and a session wanting one re-derives it on the current tree |
+| [`architecture-review-2026-08-28.md`](proposals/architecture-review-2026-08-28.md) | 2026-09-24 | **Overtaken, on Arpit's ruling.** Ran on a cloud mirror with a wedged shell — no git, no test run — so every P0/P1 was *to reproduce*, and none was reconciled in the month since. No live successor; same caveat |
+| [`fetcher-routing.md`](proposals/fetcher-routing.md) | 2026-09-24 | **Built in full.** Its keep-reason — *the `decoder=` half is W-199 DoD line 10 and is not built* — went stale on 2026-09-21, when that half shipped and W-199 closed. Live successors: [SR-URL-LIST](../records/0116_url-list.md) 16–17, [SR-FETCHER](../records/0117_fetcher.md) 16–17, [SR-DECODE](../records/0139_decode.md) 21 |
+| [`identifier-exact-match.md`](proposals/identifier-exact-match.md) | 2026-09-24 | **Graduated → W-203 → W-205, closed 2026-09-22.** Kept *"as the argument they cite"*, but no record cites it — only [`BIBLIOGRAPHY.md`](../records/BIBLIOGRAPHY.md), which may name an archived document. Live successors: [SR-RANKING](../records/0111_ranking.md) decision 9 and [SR-INGEST](../records/0106_ingest.md) decision 23d |
+
 ## Archived 2026-09-20 — six proposals, and one compare sweep beside them
 
 **The review Arpit asked for on 2026-09-20:** every compare doc and every

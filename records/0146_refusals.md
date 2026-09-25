@@ -10,7 +10,7 @@ feature: refusal detection before decode
 owns: [src/fux/ingest/refusals.py@3396b44cc6a7, src/fux/templates/refusals.toml.txt@bdf2356bc679, tools/refusal-probe@76b6f6b7f4aa, .fux/refusals.toml@bdf2356bc679]
 laws: [L1, L3]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: c72a1aff276752c8eb8cc7de7d535fd3d187211dd36f49a44e44a88720c5432d
+content_sha: 465fac43f477da404b317dd99df1a78e62027be68bb916803a3dc6c715de2b7c
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -341,7 +341,7 @@ carries the flag). Neither fact suppresses the other, and a reader who assumed
 "refused" implied "unknown" would get that backwards.
 
 ⚠ **`.fux/refusals.toml` was cited by name as precedent on 2026-09-11.** The
-[types-as-TOML comparison](../work/compare/types-toml.compare.md) §1 listed
+[types-as-TOML comparison](../archive/compare/types-toml.compare.md) §1 (archived 2026-09-24; its argument is in SR-TYPES decision 12) listed
 it among the four hand-edited `.fux/` policy files already in TOML, and that
 list was part of why `.fux/sources/types` became `.fux/formats.toml`.
 

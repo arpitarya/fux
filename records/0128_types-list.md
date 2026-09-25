@@ -10,7 +10,7 @@ feature: the file-type allowlist and `.fux/formats.toml`
 owns: [src/fux/ingest/typesfile.py@2ffca40af72c, .fux/formats.toml@86e430d015d0]
 laws: [L1, L3]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: f2418d62f8d423fc1af5624137cf48156a22f613f6e7b37179f1bd8025b8c167
+content_sha: 4437cacf3d1fe4167e795ad6ea7b3b446c3287db0ec8e46b2ba5be7445b56a78
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -381,7 +381,7 @@ binding outright, because `md = ""` binds nothing.)
 refused, never read.** Asked by Arpit 2026-09-11 (*"convert it to .toml … and put
 it in .fux dir rather than .fux/sources"*); the fork and all six sub-forks ruled
 as proposed the same day in
-[`work/compare/types-toml.compare.md`](../work/compare/types-toml.compare.md).
+the compare doc [`types-toml.compare.md`](../archive/compare/types-toml.compare.md) (archived 2026-09-24; its options, reason-by-reason table and triggers are now in §Alternatives and veto condition 6 of this record).
 
 ```toml
 include = [          # already text: no decoder in the path
@@ -577,8 +577,19 @@ the short version:
   forever**; it is exactly the reopen trigger below.
 - **A `[sources] types` TOML array.** Rejected: the shape
   [SR-DIR-LIST](0120_dir-list.md) had just moved away from. ⚠ **Reversed in
-  part by decision 12**, which put the list in TOML in a file of its own —
-  the argument, reason by reason, is in decision 12 and the compare doc.
+  part by decision 12**, which put the list in TOML in a file of its own. The
+  three reasons TOML had been refused, and whether each held against
+  decision 12's shape (ported 2026-09-24 from the archived compare doc):
+
+  | why TOML had been refused | where | does it hold against decision 12? |
+  |---|---|---|
+  | a large inline array is one diff hunk, one merge conflict | [SR-URL-LIST](0116_url-list.md) decisions 1–2 | **No** — TOML arrays span lines with trailing commas and comments; one entry per line merges line by line, and the writer keeps that layout |
+  | it buries a corpus decision in config (`fux.toml`) | SR-URL-LIST and SR-DIR-LIST §Alternatives | **No** — its own file, beside `tune.toml`, not a key in `fux.toml` |
+  | one grammar, one parser for the three lists | [SR-DIR-LIST](0120_dir-list.md) decision 2 | 🔴 **Yes — the cost is real and decision 12 pays it**: `types` left the shared grammar and `sources.py` grew a second writer |
+- **Leave `.fux/sources/types` as it was, or move it to `.fux/types` in the same
+  line grammar** (options A and B under decision 12). Rejected: neither answers
+  the ask — Arpit asked for TOML in `.fux/`, and B moves the file without
+  changing what makes it awkward.
 - **An array of tables, one per pattern** (`[[type]] pattern = … decoder = …`).
   Rejected under decision 12: two to three lines per entry, it suggests an
   order the loader discards, and it keeps every runtime check `[decoders]`
@@ -616,8 +627,6 @@ the short version:
   extension, that every binding fux writes survives the check fux applies, and
   that a converted file admits exactly what the old one did
   (`tests/test_setup.py`).
-- Decision 12: the fork and its matrix —
-  [`work/compare/types-toml.compare.md`](../work/compare/types-toml.compare.md).
 - **TOML v1.0.0** — *"Defining a key multiple times is invalid"*; arrays span
   lines with trailing commas and comments — <https://toml.io/en/v1.0.0>
 - **Python `tomllib`** — added in 3.11 (L7), and *"This module does not support

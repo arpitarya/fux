@@ -1,8 +1,8 @@
 {
- "decision": "ASK",
- "reason": "W-168 step 1's verdict is INCONCLUSIVE by the frozen table: anchor-1.0 clears clauses 1, 2 and 4 and holds 3 at rank 1, but the hub climbs within ranks 2-10 on two hit@1 misses (the half-moving case, reserved for Arpit).",
- "questions": ["Is the hub's climb on s3u-009 (8->6) and s3u-043 (5->4) acceptable, so that step 1 is filed PASS at anchor = 1.0, or is it FAIL (clause 3) or kept INCONCLUSIVE?"],
- "safe_alternative": "Pre-register W-168 step 4 (abbreviations). It does not wait on this ruling.",
+ "decision": "PROCEED",
+ "reason": "Nothing waits on Arpit. W-168 step 1 (anchor) was filed PASS at anchor = 1.0 on 2026-09-24; shipping the default (PRE-REGISTRATION §If it passes) and step 4's pre-registration are agent work.",
+ "questions": [],
+ "safe_alternative": "",
  "surfaced": true,
  "filed": "2026-09-24"
 }

@@ -10,7 +10,7 @@ feature: maintenance — the hooks, the deferring runner, the write lock, and th
 owns: [src/fux/maintain@6e92e762b4c4, tools/maintenance-bench@23a6ade137a5, tools/runner-race@98bd70ff092a]
 laws: [L3, L4, L5, L7]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: e88cc88aabb97560d6a2fbb898e4d41eaaec488a12cfe39dd9d73fb2aaaaf29f
+content_sha: a5dd3544e6ba4e001a520fe08301c2ed9ca49f255df620c005cda597146c5117
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -647,6 +647,14 @@ reach: the handoff window's surviving ordering needs a delay injected **inside**
 
 ### Alternatives considered
 
+- **Accept a documented ceiling on the synchronous hook** (hook-at-scale
+  option A). Rejected: it makes the flagship maintenance feature unavailable at
+  the corpus size the plan is designed for.
+- **Move the work to `pre-push`** (option C). Rejected: it does not change the
+  cost, only how often it is paid, and it makes the *push* the thing that hangs.
+- **Make the corpus-wide passes incremental** (option D). **Not rejected —
+  deferred to its own item**; decision 1a's dirty list is the input it needs.
+  *(Options ported 2026-09-24 from the archived compare doc.)*
 - **`pre-commit` with `git stash --keep-index`.** Rejected: decision 1.
 - **A `pre-commit` hook that only *warns* when the index is stale.** Genuinely
   attractive, and the reason it is not here is that it adds a second mechanism
@@ -687,7 +695,7 @@ places. **An offline run never touches it**, exactly like `observe`.
 - The accepted verdicts this record implements:
   [`maintenance-trigger.compare.md`](../archive/compare/maintenance-trigger.compare.md)
   (hooks are the mechanism) and
-  [`hook-at-scale.compare.md`](../work/compare/hook-at-scale.compare.md)
+  [`hook-at-scale.compare.md`](../archive/compare/hook-at-scale.compare.md)
   (**B — the hook defers**, and its §5 on why a one-shot runner is not the
   daemon that verdict rejected).
 - **The measurement that forced the deferral:**
@@ -866,6 +874,15 @@ uv run pytest -q tests_e2e/test_maintenance.py -k stop
 uv run pytest -q tests/maintain/test_daemon.py tests/maintain/test_hooks.py
 ```
 
+
+**Ported 2026-09-24 from the archived [`hook-at-scale.compare.md`](../archive/compare/hook-at-scale.compare.md)**
+— its two reopen conditions, and where each now lives:
+- *"The deferred re-index is observed answering a query from an index the
+  checked-out commit does not match"* — **this record's veto 1**, already.
+- *"A re-run of R5 passes at 100 000 documents under this option"* — **cannot
+  fire**: 100 000 is above [SR-WORK-SCALE](0057_WORK-scale.md)'s measurement
+  ceiling, so no such run may be registered.
+
 ---
 
 ## References
@@ -897,7 +914,7 @@ evidence.*
 
 **Project docs**
 
-- [`work/compare/hook-at-scale.compare.md`](../work/compare/hook-at-scale.compare.md)
+- [`archive/compare/hook-at-scale.compare.md`](../archive/compare/hook-at-scale.compare.md)
 - [`work/compare/maintenance-trigger.compare.md`](../archive/compare/maintenance-trigger.compare.md)
 
 **Papers and specifications**

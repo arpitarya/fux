@@ -10,7 +10,7 @@ feature: the freshness verdict vocabulary and the per-URL check interval
 owns: [src/fux/refer/freshness.py@c2205bbff313, node/src/refer/freshness.mjs@f44c2c09f8f9]
 laws: [L2, L3, L4]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 0da55721420ba9e03b7ee7c14bb302e317a356453c4f682338a1c31951ec0625
+content_sha: 4b156116c49fc77d1df5baf2252da22f78f6295045f32d1efa16c50c24250f19
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -360,8 +360,8 @@ optional `validate` callable because a duration cannot be a closed enum — and
 `decoder` on the types list was the only other user.
 
 **`decoder`'s spec did not disappear, it went vestigial.** `.fux/sources/types`
-became `.fux/formats.toml` ([the comparison](../work/compare/types-toml.compare.md),
-SR-TYPES decision 12), and `sourcelist.TYPES` survives only as the `fux add
+became `.fux/formats.toml` ([SR-TYPES](0128_types-list.md)
+decision 12), and `sourcelist.TYPES` survives only as the `fux add
 --types` dispatch token and as the grammar `fux setup` reads when converting a
 legacy file. **So the typed-attribute machinery has exactly one live user, and
 it is this one** — if `ttl` ever leaves the line grammar, `Attribute.validate`

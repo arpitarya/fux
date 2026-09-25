@@ -58,50 +58,6 @@ moved to the archive on 2026-09-14.
 *Newest first. Every `.md` in this directory has a row; a file with no row is
 the defect this ordering exists to make visible.*
 
-## Filed 2026-09-18
-
-* [Exact identifier match — the two analyzer defects, and the four ways it is
-  solved elsewhere](identifier-exact-match.md) — research for **W-168 step 2**,
-  written after the [survival run](../regression/2026-09-16-identifier-survival/report.md)
-  measured 0 of 33 identifiers surviving. Names the cause at line level: **D1**
-  `_WORD_RE`'s class holds `_` but not `-`, `.` or `/`, so the docstring's
-  *"whole AND parts"* promise is kept for `snake_case` and quietly broken for
-  every other separator; **D2** `should_stem` protects digits and underscores
-  but not all-letter acronyms, so Porter turns `KFS` into `kf`. ⚠ **Corrects the
-  run's claim that a mangled id is unreachable** — ingest and query import the
-  same `analyze()`, so it matches; what is lost is **precision**, one rare term
-  becoming two common ones. Sets out four shipped solutions cheapest-first
-  (`WordDelimiterGraphFilter`'s preserve-original · `KeywordRepeatFilter`'s
-  stemmed-and-unstemmed-in-one-field · Elasticsearch multi-fields, which is step
-  2 as written · trigram/sparse-gram planes, out of scope) and argues **(a) is a
-  precondition of (c), not an alternative**. Proposes **gate A**, an
-  analyzer-survival before/after that needs no Codex output.
-  ✅ **GRADUATED 2026-09-20 → W-203 → W-205, CLOSED 2026-09-22 into
-  [SR-RANKING](../../records/0111_ranking.md) decision 9 and
-  [SR-INGEST](../../records/0106_ingest.md) decision 23d** — family (a) shipped,
-  (b) and (c) named and unbuilt; the frozen fixture is W-202's
-  `tests/query/identifier-fixture.json`. Kept here as the argument they cite.
-
-* [The fetcher pipe — a URL line declares its fetcher AND its decoder](fetcher-routing.md)
-  — Arpit's ruling of **2026-09-18**: a fetcher emits bytes in a format a decoder
-  reads, the decoder turns them into Markdown, and the URL line states **both**
-  halves — `fetch=<stem> decoder=<stem>` — written once at `fux add` and never
-  re-derived. §2 is the pattern, §3 the **sixteen** edge cases.
-  ✅ **GRADUATED 2026-09-18 → W-199, which CLOSED 2026-09-21 with both halves
-  built** — routing on 2026-09-20 and the `decoder=` half the day after. The
-  live decisions are [SR-URL-LIST](../../records/0116_url-list.md) 16 and 17,
-  [SR-FETCHER](../../records/0117_fetcher.md) 16 and 17, and
-  [SR-DECODE](../../records/0139_decode.md) 21.
-  ⚠ **It had NO row here until 2026-09-20** — the defect this index's ordering
-  note exists to make visible, found by [W-206](../../archive/open/W-206-compare-and-proposals-sweep.md).
-  🔴 **Reconciled in the same change: this file and W-199 are ONE spec.** Arpit
-  ruled twice, two days apart, and the rulings compose — the **pipe** (this
-  file) and **routing** (W-199 D1–D4, 2026-09-20). Its §3 edge case 14 said
-  `ROUTES` was *"dropped by this ruling"*; true of the pipe ruling and
-  **superseded** by the routing one, so it now carries the note.
-  **Kept here, not archived:** the `decoder=` half is **W-199 DoD line 10 and is
-  not built**. Routing shipped 2026-09-20.
-
 ## Filed 2026-09-15
 
 * [Glassbox sessions — event streams as a fux corpus](glassbox-sessions.md) —
@@ -129,26 +85,6 @@ the defect this ordering exists to make visible.*
   field, RM3, supersession-aware ranking, SDM proximity, MMR diversification, a
   git-derived authority prior, an intent → doc-type prior, section-level units. Each
   graduates alone, behind W-156, with its own golden question and pre-registration.
-
-## Filed 2026-08-28 — two reviews
-
-⚠ **Both are findings to verify, not landed facts, and each says so.** Neither
-has been audited against what has since shipped; a session acting on one
-re-derives its claims first.
-
-* [SR review — 2026-08-28](adr-review-2026-08-28.md) — all 47 live records
-  read against the register's own rules. *"The rule set is excellent; the
-  records don't follow it, and nothing mechanical notices."* Five rules each
-  broken in 20–45 of 47. **Record-vs-record only** — no claim in it was checked
-  against `src/` or `tests/`. **Graduates into lint tests plus one bulk pass**;
-  some of that has since landed (`test_sr_ownership`, `test_sr_freshness`,
-  the `describes` relation), **which nobody has reconciled against this list.**
-* [Code + architecture review — 2026-08-28](architecture-review-2026-08-28.md)
-  — *"Nothing here says rebuild again."* The risk has moved from design to
-  **drift**: records describing behaviour the code does not have (the W-83
-  class). ⚠ **Ran on a cloud mirror with a wedged shell — no git, no test
-  run**, so every P0/P1 is to reproduce. **Graduates item by item as each is
-  verified on the real tree.**
 
 ## Filed 2026-08-22
 
@@ -221,6 +157,10 @@ backing a live claim.
 
 | left | when | why, and the live successor |
 |---|---|---|
+| [`adr-review-2026-08-28.md`](../../archive/proposals/adr-review-2026-08-28.md) | 2026-09-24 | **Overtaken, on Arpit's ruling** (*"Archive ADR review and architecture review."*). A record-vs-record review of 47 records that nobody reconciled against what landed after it — the ownership, freshness and `describes` gates it asked for shipped since. No live successor; its findings are not re-verified, and a session wanting one re-derives it on the current tree |
+| [`architecture-review-2026-08-28.md`](../../archive/proposals/architecture-review-2026-08-28.md) | 2026-09-24 | **Overtaken, on Arpit's ruling.** Ran on a cloud mirror with a wedged shell — no git, no test run — so every P0/P1 was *to reproduce*, and none was reconciled in the month since. No live successor; same caveat |
+| [`fetcher-routing.md`](../../archive/proposals/fetcher-routing.md) | 2026-09-24 | **Built in full.** Its keep-reason — *the `decoder=` half is W-199 DoD line 10 and is not built* — went stale on 2026-09-21, when that half shipped and W-199 closed. Live successors: [SR-URL-LIST](../../records/0116_url-list.md) 16–17, [SR-FETCHER](../../records/0117_fetcher.md) 16–17, [SR-DECODE](../../records/0139_decode.md) 21 |
+| [`identifier-exact-match.md`](../../archive/proposals/identifier-exact-match.md) | 2026-09-24 | **Graduated → W-203 → W-205, closed 2026-09-22.** Kept *"as the argument they cite"*, but no record cites it — only [`BIBLIOGRAPHY.md`](../../records/BIBLIOGRAPHY.md), which may name an archived document. Live successors: [SR-RANKING](../../records/0111_ranking.md) decision 9 and [SR-INGEST](../../records/0106_ingest.md) decision 23d |
 | [`quality-endpoint-for-reranking.md`](../../archive/proposals/quality-endpoint-for-reranking.md) | 2026-09-20 | **Its trigger fired, then its successor closed FAIL.** The [screen](../regression/2026-09-15-quality-endpoint-screen/VERDICT.md) returned `agreement` **0.4141** against a chance rate of 0.0748, inside a band frozen one commit earlier; it graduated into **W-154**, and W-154 closed **FAIL** 2026-09-16 — proximity reranking does not earn its latency on `ask`. ⚠ **`archive/README.md` called it a *live successor* of W-183 until the day it archived.** Live successors: [W-154's FAIL](../regression/2026-09-16-rerank-quality-b2/VERDICT.md) · the screen's verdict |
 | [`structure-aware-extraction.md`](../../archive/proposals/structure-aware-extraction.md) | 2026-09-20 | **Graduated → W-144, closed 2026-09-16.** Its suspicion — table cells inflating `flen` — was measured and answered, but **not by the fields it proposed**: by lowering `b` to `0.15`, the first measured default in [SR-RANKING](../../records/0111_ranking.md) decision 3. 🔴 Its load-bearing half, the argument that **consumer decoders owning ranking policy is a worse defect than a missing field**, lives in [SR-DECODE](../../records/0139_decode.md) §Alternatives — which is where that record's Reference block was repointed, since an archived doc may not back a live claim |
 | [`agent-search-landscape.md`](../../archive/proposals/agent-search-landscape.md) | 2026-09-20 | ⚠ **Its keep-reason was false.** It was held because *"two live records ground on it"*; only [`BIBLIOGRAPHY.md`](../../records/BIBLIOGRAPHY.md) §11 names it, and a bibliography naming an archived document is exactly what SR-WORK-ARCHIVE decision 4 permits. The research stands: four agent search APIs independently arrived at three index-and-refer decisions. Live successors: `BIBLIOGRAPHY.md` §11 · [SR-REFER](../../records/0127_refer-plane.md) |

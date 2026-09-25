@@ -7,10 +7,10 @@ description: "Fux measured rigorously for months and never wrote down what it wa
 status: accepted
 date: 2026-08-27
 feature: the quality contract — what a fux quality number means
-owns: [tools/quality@4234bf34b787]
+owns: [tools/quality@97e3d196df53]
 laws: [L1, L2, L3, L4, L8]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 402c17de6cfb6a9b9d1fcce74202902d659667c68da88b58e4189551be7e4d6e
+content_sha: a8788918a6a542dd64fa96b54a93b02edb896901a184a902c1a8340bdd300062
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -448,7 +448,7 @@ on 2026-08-27.
 
 ### Reference (required)
 
-- [`work/compare/what-good-means.compare.md`](../work/compare/what-good-means.compare.md)
+- [`archive/compare/what-good-means.compare.md`](../archive/compare/what-good-means.compare.md)
   — the research pass and the fork-by-fork argument this record ratifies
 - *Evaluating large language models for accuracy incentivizes hallucinations*,
   *Nature* (2026) — the finding that makes decision 5 non-negotiable
@@ -481,8 +481,16 @@ check today, not an event to wait for.
    then be replaced by evidence, and the replacement must be a visible version
    bump rather than a silent edit.
    **Check:** `git grep -l "query_log" -- src tools` returns nothing today.
-5. **The ±2-query resolution floor is measured** rather than assumed. Every
-   "no detected change" ruling rests on it, including rulings under this record.
+5. 🔴 **SPENT — fired 2026-08-28.** *"The ±2-query resolution floor is measured
+   rather than assumed."* It was: [SR-RS](0133_predictions.md) decision 19's
+   measured paired floor (a net of 6 flips) replaced it. **This condition cannot
+   fire again.**
+6. **The weight on `unanswerable` questions is changed after a score has been
+   seen** — veto 3's moving-threshold failure applied to the class weight rather
+   than to `cost.t`; it voids decision 5.
+   *(Veto 6, and veto 5's spent marking, ported 2026-09-24 from the archived
+   [`what-good-means.compare.md`](../archive/compare/what-good-means.compare.md),
+   whose other live triggers were already vetoes 1, 2 and 4.)*
 
 ---
 
@@ -507,7 +515,7 @@ evidence.*
 
 **Project docs**
 
-- [`work/compare/what-good-means.compare.md`](../work/compare/what-good-means.compare.md)
+- [`archive/compare/what-good-means.compare.md`](../archive/compare/what-good-means.compare.md)
 - [`work/open/W-87-what-good-means.md`](../archive/open/W-87-what-good-means.md)
 - [`work/open/W-89-does-l2-reach-a-query-log.md`](../archive/open/W-89-does-l2-reach-a-query-log.md)
 

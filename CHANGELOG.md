@@ -34,6 +34,21 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 - `fux inspect`'s descriptive headline row is `title-probe reach`, not
   `findable share`. Self-retrieval still prints under the findability lens.
+- **The anchor field is on by default: `[bm25f] anchor` is now `1.0`, up from
+  `0.0` (W-168 step 1).** A document can now be found by the words other
+  documents use when they link to it. The value was measured before it was
+  turned on: 7 wins, 0 losses, and no baseline rank-1 hit lost, on one
+  1 000-document test set
+  ([verdict](work/regression/2026-09-15-anchor-text/VERDICT.md)). The index
+  is unchanged, so there is nothing to re-ingest.
+  ⚠ **Whether an upgrade changes your ranking depends on whether you ran
+  `fux setup`.** `fux setup` writes every value into `.fux/tune.toml`, so
+  **a repo that ran it before this release still has `anchor = 0.0` and ranks
+  exactly as before.** **A fresh clone, or a repo with no `tune.toml`, gets
+  `1.0`.** To use the measured value, change that one line to
+  `anchor = 1.0`; to keep the old ranking anywhere, set `anchor = 0.0`.
+  `--no-tune` now leaves the anchor field on, because it restores the
+  defaults.
 
 ## [3.0.0-alpha.4] - 2026-09-23
 

@@ -71,7 +71,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from .errors import FuxError
-from .query.bm25f import B, FIELD_WEIGHTS, K1, Scoring
+from .query.bm25f import ANCHOR, B, FIELD_WEIGHTS, K1, Scoring
 from .query.confidence import DOC_COVERAGE_FLOOR, SEPARATION_FLOOR
 from .store import TF_FIELDS
 
@@ -226,16 +226,17 @@ class Tune:
     b: float = B
     field_weights: tuple[float, ...] = FIELD_WEIGHTS
     #: W-168 step 1 — the anchor field: what other documents call this one when
-    #: they link to it. **`0.0` is OFF and is the default**, per SR-RS decision
-    #: 19: a ranking change ships behind a tunable at zero and is defaulted on
-    #: only by a PASS on a frozen pre-registration. Unmeasured today.
+    #: they link to it. **Default `ANCHOR` (`1.0`), ON since its PASS on
+    #: 2026-09-24** — SR-RS decision 19: a ranking change ships behind a tunable
+    #: at zero and is defaulted on only by a PASS on a frozen pre-registration.
+    #: `0.0` turns it off.
     #:
     #: ⚠ **Not in `field_weights`, deliberately.** That tuple is aligned
     #: index-for-index with `TF_FIELDS`, the five fields a record COMMITS an
     #: `flen` for; anchor is folded at read time out of other documents' edges
     #: and has no committed slot. Padding it in would claim a sixth committed
     #: field and leave every `flen` one short — see `query/bm25f.py`.
-    anchor_weight: float = 0.0
+    anchor_weight: float = ANCHOR
 
     # [ranking]
     #: ⚠ **Three document priors stood here and all three are GONE**, ruled by
@@ -628,9 +629,9 @@ def load(root: Path, *, enabled: bool = True) -> Tune:
             # ranking choice, not the source exclusion decision 9a refuses.
             weights[i] = _non_negative(c, "bm25f", key, bm25f[key], FIELD_WEIGHTS[i])
     anchor_weight = (
-        _non_negative(c, "bm25f", "anchor", bm25f["anchor"], 0.0)
+        _non_negative(c, "bm25f", "anchor", bm25f["anchor"], ANCHOR)
         if "anchor" in bm25f
-        else 0.0
+        else ANCHOR
     )
 
     ranking = data.get("ranking", {})
@@ -858,8 +859,8 @@ b                       = {B}     # length normalisation, 0 = off, 1 = full
 {fields}
 # The sixth field is ANCHOR: what OTHER documents call this one when they link
 # to it (W-168 step 1). Folded in at read time from their edges -- it is in no
-# committed posting, so moving this needs no re-ingest. 0 = OFF, and off is the
-# default: UNMEASURED, and it turns on only on a passing pre-registered run.
+# committed posting, so moving this needs no re-ingest. 0 = OFF. The default
+# 1.0 is MEASURED: it passed its pre-registered run on 2026-09-24.
 anchor                  = {d.anchor_weight}
 
 [ranking]

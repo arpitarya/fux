@@ -29,6 +29,59 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-24 — W-168 step 1 shipped: `[bm25f] anchor` defaults to `1.0`  ·  Claude Code
+- **Asked:** ship step 1 per the anchor PRE-REGISTRATION §If it passes (Arpit ruled PASS at `1.0`).
+- **Did:**
+  - **Default:** `ANCHOR = 1.0` in both engines, read by `Scoring`, `Tune` and the loaders.
+  - **Records:** SR-TUNE 17/17a · SR-RANKING 12c–12d · SR-INGEST 17e · SR-RUNTIME-STATS (a note only). `owns` and `content_sha` stamps redone.
+  - **CHANGELOG:** Unreleased/Changed, with the upgrade divergence.
+  - **Tests:** a new parity test holds `K1`/`B`/`ANCHOR` equal across the engines; the anchor tests now cover the default, `0.0` and `2.0`.
+- **Checked:**
+  - **L3:** from-empty ingests under `0.0` and under `1.0` gave byte-identical `.fux/index/`.
+  - **Node and bundle:** `node_arm.py`, both arms, 0 of 225 discordant.
+  - **Scan vs accelerator:** `run.py --skipping both` on a scratch copy (tune set to `anchor = 1.0`), result below.
+  - **Suites:** e2e 152/152 and Node units 88/88 green. Units: 5 623 passed; the 1 failure is another session's `correct.py` twin-gate edit.
+- ⚠ **Not committed:** the index is shared with a Cowork session's staged archive work, so committing is Arpit's call.
+- ⚠ **Noticed, not caused here:** an incremental ingest and a from-empty ingest differ only in `ver` (an edit counter), by design.
+- **Next:** step 4's pre-registration.
+
+## 2026-09-24 — six more compare docs archived, each after its triggers moved into its record  ·  Cowork
+- **Asked:** *"There are seven compare docs which are referenced if they are implemented. See if those can be added to an SR so that these documents can be archived."*
+- **All six are built** (hook deferral W-66; the quality definition SR-WORK-QUALITY; `df` over the union; blind/informed SR-RS; `fux correct` W-162; `ask` composition W-160/161). **Ported, then moved:**
+  - `hook-at-scale` → SR-MAINTENANCE: a veto note (trigger 1 = veto 1; the 100k trigger cannot fire under SR-WORK-SCALE) + options A/C/D in §Alternatives.
+  - `what-good-means` → SR-WORK-QUALITY: new veto 6 (unanswerable weighting changed after a score); veto 5 marked spent.
+  - `df-over-the-union` → SR-ARCHIVED-CONTENT: the divergence and second-universe triggers; the third recorded as unevaluable.
+  - `blind-authorship-rule` → SR-RS: the three live triggers; the fourth recorded as spent.
+  - `fux-correct` → SR-ENRICH: both triggers **and the still-owed generalisation measurement with its keep/remove rule**.
+  - `ask-graph-expansion` → SR-ASK: the three triggers and the one-arm-per-tier withdrawal.
+- **Repointed** every live link to `archive/compare/` (records, BIBLIOGRAPHY, IMPLEMENTATION, INTERVIEW, `tools/quality/README.md`, `search-improvements-v3`, and a docstring in `src/fux/correct.py`). ⚠ **The `src/` edit is a comment** — the owning record is amended in the same change, so the commit-msg hook is satisfied. **`work/compare/` 8 → 2** (`abstention-gates`, `intent-doctype-prior` — both live forks).
+- ⚠ **Shared tree:** `sr-owns --write` also re-stamped SR-RANKING, SR-TUNE and SR-NODE-SEARCH's `owns` hashes — code a concurrent Claude Code session is changing (the anchor default). **Reverted** to that session's staged copies so its own freshness gate still sees them; only SR-ENRICH's stamp (for `correct.py`) is this change's.
+
+## 2026-09-24 — `types-toml` archived: built, and its details now live in SR-TYPES  ·  Cowork
+- **Asked:** *"types.toml is that implemented if yes can the details be added to an SR so that this document can be archived"*
+- **Checked:** implemented — `.fux/formats.toml` exists, `src/fux/ingest/typesfile.py` reads it, SR-TYPES decision 12 carries the F1–F6 table, the paid cost and the byte-identical re-ingest. **All three reopen-triggers were already SR-TYPES veto condition 6.**
+- **Ported:** the only content left only in the compare doc — the reason-by-reason table of why TOML had been refused, and options A/B — into SR-TYPES §Alternatives. Decision 12's Reference line to the doc removed (an archived doc may not ground a record).
+- **Moved:** `work/compare/types-toml.compare.md` → `archive/compare/`, row in the second form (*"the trigger lives in SR-TYPES veto condition 6"*); its row dropped from `work/compare/README.md` (9 → 8). Grounding links in SR-ARCHIVED-CONTENT, SR-ACQUIRED-PLANE and SR-URL-FRESHNESS repointed to SR-TYPES; the two that *name* the doc's §1 (SR-REFUSALS, SR-PII) now name the archived path. Registry; `sr-hash` over 7 records.
+- **Suites (bridge):** doc links, content hash, registry, frontmatter, components, paths, register, ownership — green.
+
+## 2026-09-24 — the two 2026-08-28 reviews archived as overtaken  ·  Cowork
+- **Asked:** *"Archive ADR review and architecture review."*
+- **Did:** `adr-review-2026-08-28.md` and `architecture-review-2026-08-28.md` moved unchanged to `archive/proposals/`; rows in `proposals/README.md` and `archive/README.md` (today's section); their `BACKLOG` rows **B-178** and **B-179** deleted in the same change (SR-WORK-BACKLOG); BIBLIOGRAPHY repointed; registry row bumped. **Proposals 9 → 7.**
+- ⚠ **Neither review's findings were re-verified.** They leave as *overtaken*, not *answered*: a session that wants one re-derives it on the current tree.
+
+## 2026-09-24 — archive sweep: 2 proposals archived, every compare doc kept  ·  Cowork
+- **Asked:** *"Review all the proposals and compare documents. Whatever has been built out or is not needed anymore, archive it."*
+- **Archived (moved unchanged, rows in `archive/README.md` and `proposals/README.md`):** `fetcher-routing.md` — built in full; its keep-reason (*decoder= half unbuilt*) went stale 2026-09-21. `identifier-exact-match.md` — closed via W-205 2026-09-22; kept "as the argument they cite", but only BIBLIOGRAPHY cites it, which may name an archive. Links repointed: W-168, BIBLIOGRAPHY, a docstring in `tests/ingest/test_url_decoders.py` (a comment, no assertion). Registry rows bumped; `sr-hash` re-run. **Proposals 11 → 9. Compare stays 9.**
+- **Kept, and why — compare:** `intent-doctype-prior` (parked, ruled, trigger live) and `abstention-gates` (proposed; gates unmeasured) are live forks. The seven decided ones — `types-toml`, `hook-at-scale`, `what-good-means`, `df-over-the-union`, `blind-authorship-rule`, `fux-correct`, `ask-graph-expansion` — are **still cited in the Reference blocks of accepted records** (SR-TYPES, SR-MAINTENANCE, SR-WORK-QUALITY, SR-ARCHIVED-CONTENT, SR-RS, SR-ENRICH, and others), and W-206 kept exactly these eight live four days ago. Archiving one means porting its trigger and repointing its records first (W-206's port-then-move rule) — a record change per doc, not a move; not done here.
+- **Kept, and why — proposals:** `search-improvements-v3` (W-168 live); `ranking-tuning` (SR-LAWS and SR-TUNE ground on it); `t2-segments`, `wavelet-self-index`, `mcp-adapters`, `knowledge-ci`, `glassbox-sessions` (not built, triggers alive). ⚠ **`adr-review-2026-08-28` and `architecture-review-2026-08-28`** are unreconciled review findings, neither built nor clearly unneeded — **Arpit's call**, offered in the chat.
+- **Suites (bridge):** doc links, OKF, registry, no-item-lost, content hash, row shape — **424 passed.**
+
+## 2026-09-24 — RULED: W-168 step 1 (anchor) is PASS at `anchor = 1.0`  ·  Cowork
+- **Asked:** *"It is a pass. Ratify."*
+- **Did:** VERDICT front matter → `verdict: PASS`, `verdict_by_table: INCONCLUSIVE`, `ruled_by`, `passing_value`; ruling block on top with the reason (hub never takes rank 1 on a miss; the right document stays ahead of it in both half-moving rows), the one-change consequence, the reopen-trigger and the scope. IMPLEMENTATION row → PASS, **not yet shipped**. W-168 ruling block; inbox emptied; W-168 🟢; `BLOCKED.json` → `PROCEED`.
+- ⚠ **Ratified, not shipped:** `tune.toml`'s `anchor` is still `0.0`. §If it passes — default, three records, L3 check, four surfaces, CHANGELOG — is Claude Code's, in one change.
+- **Next:** Claude Code — ship step 1's default; then pre-register step 4.
+
 ## 2026-09-24 — W-168 step 1 decided by the table: INCONCLUSIVE, to Arpit  ·  Claude Code (Opus)
 - **Asked:** run step 1's frozen `decide.py` on the filed scores and file `VERDICT.md`. This session captured no arm.
 - **Did:** confirmed `decide.py`, `verdict.py` and the tag file are unchanged since `cfca651a`, then ran it. It wrote `evidence/decision.json` and `evidence/per-query.jsonl`. Filed `VERDICT.md`, the inbox row, `BLOCKED.json` (ASK), the W-168 block, the regression index row (it still said *not measured*), NOW, INTERVIEW and the registry.

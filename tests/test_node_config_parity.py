@@ -79,6 +79,7 @@ def test_the_node_tune_schema_is_the_python_one():
     "js, py",
     [
         ("k1 = K1", "k1"),
+        ("anchorWeight = ANCHOR", "anchor_weight"),
         ("rerankWeight = 0.0", "rerank_weight"),
         ("expandWeight = 0.2", "expand_weight"),
         ("rm3Weight = 0.0", "rm3_weight"),
@@ -107,6 +108,19 @@ def test_every_tune_default_is_spelled_the_same_on_both_sides(js, py):
     assert float(written) == float(getattr(DEFAULT_TUNE, py)), (
         f"`{py}` defaults to {getattr(DEFAULT_TUNE, py)!r} in tune.py and {written} in Node"
     )
+
+
+@pytest.mark.parametrize("name", ["K1", "B", "ANCHOR"])
+def test_the_bm25f_constants_are_the_same_number_on_both_sides(name):
+    """`k1 = K1` above returns early because it is an identifier — so the
+    constant itself is compared here, or the Node default could drift while the
+    spelling test passed. `ANCHOR` is W-168 step 1's measured `1.0`."""
+    from fux.query import bm25f
+
+    source = _source("query/bm25f.mjs")
+    found = re.search(rf"^export const {name} = ([0-9.]+);", source, re.M)
+    assert found, f"no `export const {name}` in query/bm25f.mjs"
+    assert float(found.group(1)) == float(getattr(bm25f, name))
 
 
 # -- .fux/output.toml --------------------------------------------------------

@@ -5,13 +5,13 @@ name: SR-INGEST
 title: SR-INGEST (0106) — how ingest works
 description: "Re-resolve every edge every run; carry unchanged documents' extraction forward. Write only shards whose bytes changed. Skips are reported once, counted by class, and recorded in the committed `.fux/.fuxignore`; deletions honoured, output byte-identical."
 status: accepted
-amended: 2026-09-15
+amended: 2026-09-24
 date: 2026-08-18
 feature: the `fux ingest` pipeline — sources to committed records
 owns: [src/fux/ingest/ingestlog.py@73e117c1e919, src/fux/ingest@50423856e72d, src/fux/ingest/priors.py@8ffcc632a4be, node/src/ingest/gitdir.mjs@eb45c1672eac, node/src/ingest/priors.mjs@11df69775da1]
 laws: [L2, L3, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: ee4ef5dfe4d2a0546af587088c30c1c636898cb429fbc39c3d01d84918a0e39a
+content_sha: 755c6914bf84a1898e54d6e055010b8c6b5d98a01eaf495dd3fe44feaaacc876
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -570,6 +570,15 @@ without a parse. Redundancy nothing checks is redundancy that drifts, and this
 one would drift into `avg_wlen` — a corpus-wide denominator — on the scan path
 alone. `derive/_build.py::_assert_invariants` refuses to build an index where
 they disagree, or where one is present without the other.
+
+**17e. Defaulting the field on changed no committed byte** (2026-09-24). W-168
+step 1's PASS moved `[bm25f] anchor` from `0.0` to `1.0` ([SR-TUNE](0135_tuning.md)
+decision 17a) — a read-time weight. `at` and `al` were already written whenever
+a link had text, at every weight, so **the committed index is byte-identical
+before and after**, and a re-ingest is owed by no one. Checked in the same
+change ([L3](0005_LAW-3-deterministic.md)): a from-empty `fux ingest --no-fetch`
+of this repository under the old default and under the new one produced
+byte-identical `.fux/index/` trees, 1 792 documents, one hash.
 
 ### What it looks like
 

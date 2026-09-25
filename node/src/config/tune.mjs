@@ -39,7 +39,7 @@ import { readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { FuxError } from "../errors.mjs";
 import { parseToml, wasFloat } from "./toml.mjs";
-import { B, FIELD_WEIGHTS, K1, Scoring } from "../query/bm25f.mjs";
+import { ANCHOR, B, FIELD_WEIGHTS, K1, Scoring } from "../query/bm25f.mjs";
 import { DOC_COVERAGE_FLOOR, SEPARATION_FLOOR } from "../query/confidence.mjs";
 import { TF_FIELDS } from "../store/format.mjs";
 import { cmpCodePoints } from "../compat/pyfloat.mjs";
@@ -139,9 +139,9 @@ export class Tune {
     this.fieldWeights = FIELD_WEIGHTS;
     // W-168 step 1 — the anchor field, folded at read time from other
     // documents' edges. NOT in `fieldWeights`: that array is aligned with
-    // TF_FIELDS, the five fields a record commits an `flen` for. 0 = off, and
-    // off is the default until a pre-registered run says otherwise.
-    this.anchorWeight = 0.0;
+    // TF_FIELDS, the five fields a record commits an `flen` for. 0 = off; the
+    // default ANCHOR (1.0) is ON since its pre-registered PASS on 2026-09-24.
+    this.anchorWeight = ANCHOR;
     // [ranking]
     // The three DOCUMENT priors were removed on 2026-09-13 (W-151, W-152).
     this.rerankWeight = 0.0;
@@ -418,8 +418,8 @@ export function loadTune(root, { enabled = true } = {}) {
   });
 
   const anchorWeight = has(bm25f, "anchor")
-    ? nonNegative(c, "bm25f", "anchor", bm25f.anchor, 0.0)
-    : 0.0;
+    ? nonNegative(c, "bm25f", "anchor", bm25f.anchor, ANCHOR)
+    : ANCHOR;
 
   const ranking = data.ranking ?? {};
   const pick = (table, name, key, dflt, fn = nonNegative) =>

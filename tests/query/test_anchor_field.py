@@ -22,10 +22,14 @@ from fux import store
 from fux.derive import accel, build
 from fux.ingest.run import run
 from fux.query import scan
-from fux.query.bm25f import DEFAULT_SCORING, Scoring
+from fux.query.bm25f import ANCHOR, DEFAULT_SCORING, Scoring
 
-#: Non-zero, because `0.0` is the shipped default and would exercise nothing.
+#: Not the default, so a test using it proves the value is carried and not
+#: silently replaced by `ANCHOR`.
 ON = Scoring(anchor=2.0)
+#: OFF — the pre-2026-09-24 default, and still what `anchor = 0` in a repo's
+#: `tune.toml` selects (every `fux setup` run before the PASS wrote exactly that).
+OFF = Scoring(anchor=0.0)
 
 TOPS = (1, 5, 20)
 
@@ -71,8 +75,9 @@ def _ids(results):
 # -- trap 1: retrieval ------------------------------------------------------
 
 
-def test_off_by_default_the_TARGET_is_unreachable(corpus):
-    """The baseline this feature is measured against, and the shipped default.
+def test_off_the_TARGET_is_unreachable(corpus):
+    """The baseline this feature was measured against, and the default until
+    its PASS on 2026-09-24.
 
     ⚠ **The linkers still match, and that is not a broken fixture.** Link text
     is part of the sentence it sits in, so a document that writes
@@ -82,9 +87,18 @@ def test_off_by_default_the_TARGET_is_unreachable(corpus):
     about `target.md` and not about the result list being empty.
     """
     for ask in (scan.ask, accel.ask):
-        ids = _ids(ask(corpus, "zarquon", top=5))
+        ids = _ids(ask(corpus, "zarquon", top=5, scoring=OFF))
         assert "file:docs/target.md" not in ids, ids
         assert "file:docs/linker-one.md" in ids
+
+
+def test_ON_by_default_since_its_pass(corpus):
+    """W-168 step 1 shipped: an untuned repo reaches a document by what its
+    linkers call it, on both candidate paths."""
+    assert DEFAULT_SCORING.anchor == ANCHOR == 1.0
+    assert DEFAULT_SCORING.anchor_on
+    assert _ids(scan.ask(corpus, "zarquon", top=5))[0] == "file:docs/target.md"
+    assert accel.ask(corpus, "zarquon", top=5)[0].id == "file:docs/target.md"
 
 
 def test_a_document_is_reachable_by_what_its_LINKERS_call_it(corpus):
@@ -172,18 +186,25 @@ def test_the_two_paths_agree_on_avg_wlen(corpus):
     assert scan_corpus.total_wlen == accel_corpus.total_wlen
 
 
-# -- the default path is untouched -----------------------------------------
+# -- the OFF path is untouched ---------------------------------------------
 
 
 @pytest.mark.parametrize("query", ["widget", "machinery details", "filler body text"])
-def test_the_default_scores_byte_identically_to_no_anchor_field(corpus, query):
+def test_OFF_scores_byte_identically_to_no_anchor_field(corpus, query):
     """`0.0` is not "weight zero" — every anchor branch is skipped entirely, so
-    an unconfigured corpus does the float arithmetic it did before the field
-    existed. That is the `term_weights` precedent, and it is what keeps the
-    differential evidence gathered at the default standing unmodified."""
-    assert DEFAULT_SCORING.anchor == 0.0
-    assert not DEFAULT_SCORING.anchor_on
+    a repo that pins `anchor = 0` does the float arithmetic it did before the
+    field existed. That is the `term_weights` precedent, and it is what keeps
+    every repo that ran `fux setup` before the PASS scoring as it did."""
+    assert not OFF.anchor_on
+    assert not OFF.trivial
     assert DEFAULT_SCORING.trivial
+    expected = _payload(scan.ask(corpus, query, top=20, scoring=OFF))
+    assert _payload(accel.ask(corpus, query, top=20, scoring=OFF)) == expected
+
+
+@pytest.mark.parametrize("query", ["widget", "zarquon", "machinery details"])
+def test_the_default_is_the_same_on_both_candidate_paths(corpus, query):
+    """Anchor ON is now the default, so the differential law holds at it."""
     expected = _payload(scan.ask(corpus, query, top=20))
     assert _payload(scan.ask(corpus, query, top=20, scoring=DEFAULT_SCORING)) == expected
     assert _payload(accel.ask(corpus, query, top=20)) == expected

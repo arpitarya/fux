@@ -19,11 +19,17 @@ export const K1 = 1.2;
 //: ⚠ One synthetic corpus, `informed`. Twin of `query/bm25f.py`'s `B`, and
 //: `tests/test_node_config_parity.py` holds the two equal.
 export const B = 0.15;
+//: 🔴 **The anchor field's weight — `1.0`, and that is MEASURED.** W-168 step
+//: 1's verdict, ruled PASS by Arpit on 2026-09-24 (7 wins, 0 losses). ⚠
+//: `informed`, set-3-u only, one 1 000-document rung. Twin of
+//: `query/bm25f.py`'s `ANCHOR`; `tests/test_node_config_parity.py` holds the
+//: two equal.
+export const ANCHOR = 1.0;
 
 export class Scoring {
-  constructor(k1 = K1, b = B, weights = FIELD_WEIGHTS, anchor = 0.0) {
+  constructor(k1 = K1, b = B, weights = FIELD_WEIGHTS, anchor = ANCHOR) {
     this.k1 = k1; this.b = b; this.weights = weights;
-    /** W-168 step 1 — the anchor field's weight, default 0 (OFF). Kept out of
+    /** W-168 step 1 — the anchor field's weight, default ANCHOR (ON; 0 = OFF). Kept out of
      *  `weights` because that array is aligned index-for-index with TF_FIELDS,
      *  the five fields a record commits an `flen` for; anchor has no committed
      *  slot and is folded at read time from other documents' edges. */
@@ -32,7 +38,7 @@ export class Scoring {
   }
   /** True when this is the engine default, so callers can skip work. */
   get trivial() {
-    return this.k1 === K1 && this.b === B && this.anchor === 0.0
+    return this.k1 === K1 && this.b === B && this.anchor === ANCHOR
       && this.weights.length === FIELD_WEIGHTS.length
       && this.weights.every((w, i) => w === FIELD_WEIGHTS[i]);
   }

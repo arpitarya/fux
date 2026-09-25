@@ -229,8 +229,6 @@ with its proposal.
 
 | id | what is outstanding | named in | what closes it |
 |---|---|---|---|
-| B-178 | SR review 2026-08-28 — five rules each broken in 20–45 of 47 records, record-vs-record only, and some of the lint has since landed "which nobody has reconciled against this list" | [`adr-review-2026-08-28.md`](proposals/adr-review-2026-08-28.md) | Reconcile the list against what shipped, then bulk-pass |
-| B-179 | Code + architecture review 2026-08-28 — ran on a cloud mirror with a wedged shell, "so every P0/P1 is to reproduce" | [`architecture-review-2026-08-28.md`](proposals/architecture-review-2026-08-28.md) | Verify item by item on the real tree |
 | B-180 | Ranking tuning — the instrument, not the optimiser. ⚠ Its trigger named **W-97** (archived) and **W-136** (merged); both halves are [W-204](regression/2026-09-22-golden-final-score/FINAL-SCORE.md) now | [`ranking-tuning.md`](proposals/ranking-tuning.md) | 50 judgments from W-204 phase D |
 | B-181 | T2 segments — nothing was ever built; the old veto is now a trigger, and the difference matters: "a veto is checked, a trigger is remembered" | [`t2-segments.md`](proposals/t2-segments.md) | A measured warm p95 above 150 ms |
 | B-182 | MCP as the adapter endgame — one protocol instead of per-app adapters, on the org's own auth | [`mcp-adapters.md`](proposals/mcp-adapters.md) | The first MCP-gateway design partner, or a fourth adapter request |

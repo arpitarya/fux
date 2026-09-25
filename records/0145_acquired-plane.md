@@ -10,7 +10,7 @@ feature: the acquired plane
 owns: [src/fux/store/acquired.py@9897ee1fe4af]
 laws: []
 timestamp: 2026-09-01T00:00:00Z
-content_sha: d83edbf222d3475de3a16f25a76b4aba991d18731405e4cf004de56368268646
+content_sha: e8ffc74a98634440a5458a9632e5aa10472c768003f51dd6e1d629bf1a30a7ea
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -159,7 +159,7 @@ asserts `config.UrlSource` never grows the key.
 
 ⚠ **`keep` is still resolved from a LINE, and 2026-09-11 is when that stopped
 being the only option.** `.fux/sources/types` became `.fux/formats.toml` that day
-([the comparison](../work/compare/types-toml.compare.md), SR-TYPES decision
+([SR-TYPES](0128_types-list.md) decision
 12), so the shared line grammar in `sourcelist.py` now parses **two** committed
 lists rather than three.
 

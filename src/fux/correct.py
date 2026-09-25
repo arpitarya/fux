@@ -8,7 +8,7 @@ fix is **the words people actually ask with, on the document that answers**:
 existing enrichment file, where it is indexed as `ctx` exactly like the
 model-written questions beside it. Same file, same field, **different author**.
 Accepted by Arpit on 2026-09-13 —
-[the compare doc](../../work/compare/fux-correct.compare.md).
+[the compare doc](../../archive/compare/fux-correct.compare.md).
 
 **It is the deterministic cousin of doc2query** (Nogueira, Yang, Lin and Cho,
 *Document expansion by query prediction*, 2019), which is what `fux enrich`

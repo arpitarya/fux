@@ -6,11 +6,12 @@ title: SR-RUNTIME-STATS (0125) — stats.json, the corpus-wide numbers BM25F nee
 description: n and the RAW per-field token-count totals — computed once at build time so length normalisation is an O(1) lookup, and stored unweighted so a field weight cannot bake into the plane. newest_mtime was the third field and left with the recency prior on 2026-09-13.
 status: accepted
 date: 2026-08-19
+amended: 2026-09-24
 feature: "`.fux/runtime/stats.json` — the corpus-wide aggregates, and the rule that they are stored raw"
 owns: []
 laws: [L3]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: ba999a290d5ad21f945b0986692dcce1e5614122aedd52b3a31658a0f48acb5a
+content_sha: ad759692978d9f06bc3c833345ca999e364f48b67718813a5f8c694b569b6eb0
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -193,6 +194,13 @@ table `_readme()` writes, which gained `fux serve`
 ([SR-CLI](0101_cli-surface.md)). **Neither reaches this record's claim on that
 file**, and saying so is the point of the freshness gate — the prompt is *re-read
 the record*, and the honest outcome of re-reading it can be *nothing moved*.
+
+⚠ **Unchanged by W-168 step 1's default (2026-09-24), and touched here only
+because the register says so.** `src/fux/query/bm25f.py` gained `ANCHOR = 1.0`,
+the anchor field's default weight ([SR-TUNE](0135_tuning.md) decision 17a). This
+record's rule is what makes that safe: `total_anchor_len` is stored **raw**,
+exactly as `total_flen` is, and weighted at query time. So moving the default
+changed no byte of `stats.json`.
 
 ### Consequences
 

@@ -38,12 +38,18 @@ pytestmark = pytest.mark.skipif(
     shutil.which("node") is None, reason="node is not on PATH on this machine"
 )
 
-#: Non-zero, and written to the file rather than passed in: the point of this
-#: test is that BOTH readers resolve the key out of `.fux/tune.toml`.
-TUNE = "[bm25f]\nanchor = 2.0\n"
+#: Written to the file rather than passed in: the point of this test is that
+#: BOTH readers resolve the key out of `.fux/tune.toml`. `None` writes no file,
+#: which is the default (`ANCHOR`, on since 2026-09-24) — the case every fresh
+#: clone is in; `0.0` is what every repo that ran `fux setup` before then pins.
+TUNES = {
+    "default": None,
+    "off": "[bm25f]\nanchor = 0.0\n",
+    "two": "[bm25f]\nanchor = 2.0\n",
+}
 
 
-def _corpus(tmp_path: Path) -> Path:
+def _corpus(tmp_path: Path, tune: str | None = TUNES["two"]) -> Path:
     listing = tmp_path / ".fux" / "sources" / "dirs"
     listing.parent.mkdir(parents=True, exist_ok=True)
     listing.write_text("docs\n", encoding="utf-8")
@@ -63,7 +69,8 @@ def _corpus(tmp_path: Path) -> Path:
         path.write_text(text, encoding="utf-8")
     run(tmp_path)
     build(tmp_path)
-    (tmp_path / ".fux" / "tune.toml").write_text(TUNE, encoding="utf-8")
+    if tune is not None:
+        (tmp_path / ".fux" / "tune.toml").write_text(tune, encoding="utf-8")
     return tmp_path
 
 
@@ -86,9 +93,10 @@ def _python(root: Path, query: str, top: int) -> list[dict]:
     return json.loads(proc.stdout)["results"]
 
 
+@pytest.mark.parametrize("tune", sorted(TUNES))
 @pytest.mark.parametrize("query", ["zarquon", "zarquon protocol", "widget machinery"])
-def test_the_node_reader_folds_anchors_identically(tmp_path, query):
-    root = _corpus(tmp_path)
+def test_the_node_reader_folds_anchors_identically(tmp_path, query, tune):
+    root = _corpus(tmp_path, TUNES[tune])
     py = _python(root, query, 10)
     nd = _node(root, query, 10)
     assert [r["id"] for r in nd] == [r["id"] for r in py], f"order differs on {query!r}"
@@ -98,9 +106,11 @@ def test_the_node_reader_folds_anchors_identically(tmp_path, query):
         assert round(a["score"], 9) == round(b["score"], 9), f"{a['id']}: score differs"
 
 
-def test_both_readers_reach_the_target_through_its_linkers_words(tmp_path):
+@pytest.mark.parametrize("tune", ["default", "two"])
+def test_both_readers_reach_the_target_through_its_linkers_words(tmp_path, tune):
     """The fixture has to contain the input the feature acts on, or the
-    comparison above is two readers agreeing about nothing (SR-RS d23)."""
-    root = _corpus(tmp_path)
+    comparison above is two readers agreeing about nothing (SR-RS d23). With
+    no `tune.toml` at all, that is W-168 step 1's shipped default."""
+    root = _corpus(tmp_path, TUNES[tune])
     assert [r["id"] for r in _python(root, "zarquon", 5)][0] == "file:docs/target.md"
     assert [r["id"] for r in _node(root, "zarquon", 5)][0] == "file:docs/target.md"
