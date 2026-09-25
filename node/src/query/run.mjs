@@ -177,10 +177,17 @@ export function runQuery(root, query, top, {
   // W-168 step 5 — RM3. Off at 0.0, and off runs no first pass. A caller's own
   // `expand` wins. The first pass is un-expanded and writes no stats: the band
   // and `--why` describe the final pass only. Twin of `run_query`'s block.
+  // W-221 (2026-09-25): the feedback set is the list this function would
+  // return at rm3 0.0 — rerank, pin, Tier A — never the bare lexical window.
   if (resolved.rm3Weight > 0 && !expand && queryHashes.length) {
-    const first = scanAsk(root, query, Math.max(depth, FB_DOCS), { weighting, scoring });
+    const firstTop = Math.max(depth, FB_DOCS);
+    const first = scanAsk(root, query, firstTop, { weighting, scoring });
+    const firstOrdered = applyPin(root, query, maybeRerank(root, query, first, rerankWeight, firstTop), firstTop);
+    const shown = resolved.askBoost
+      ? tiers(root, query, firstOrdered, FB_DOCS, resolved, { wantRelated: false }).results
+      : firstOrdered.slice(0, FB_DOCS);
     expansion = expandMod.build(
-      queryHashes, feedbackTerms(root, first, queryHashes, scoring), resolved.rm3Weight,
+      queryHashes, feedbackTerms(root, shown, queryHashes, scoring), resolved.rm3Weight,
     );
   }
 

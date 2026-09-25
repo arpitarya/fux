@@ -11,7 +11,7 @@ owns: [src/fux/query/expand.py@19b697b80e8c, src/fux/query/fuse.py@749673d52166,
 laws: [3, 4, 8]
 ratifies: W-109
 timestamp: 2026-09-05T00:00:00Z
-content_sha: dc2304309a488f6c83ca84bdb27a9911d18dfc1e4672080f3e87327b0b071176
+content_sha: b395a2bc358674dedf7361ab8af501abaec9a386b5e466ed9ffd9ed4219bb6b9
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -305,16 +305,24 @@ the query's own terms excluded, ties by ascending hash. Those ten go through
 - **The first pass writes no statistics.** The band and `--why` describe the
   final pass only, and the band is built on the original query as decision 10's
   neighbours already require.
-- ⚠ **The first pass is the LEXICAL ranking**, before the reranker, a pin or the
-  graph tier. On a corpus whose tune turns those on, the feedback set is not
-  the list `ask` prints.
+- **The first pass is the list `ask` would show without RM3** (W-221,
+  Arpit, 2026-09-25): the un-expanded window, then the reranker, the pin and
+  the graph tier's reorder (Tier A), and its top 10. `P(q|d)` is unchanged
+  because the tier reorders without rescoring, so each document keeps the
+  lexical score `rank()` gave it. With the tier and the reranker off, this is
+  the lexical top 10 exactly. ⚠ **Until 2026-09-25 it was the LEXICAL
+  ranking**, before all three stages, so on a boosted corpus the feedback set
+  was not the list `ask` prints. The 2026-09-23 FAIL below measured that
+  version.
 - 🔴 **Measured and FAILED — drift** (Arpit, 2026-09-23;
   [verdict](../work/regression/2026-09-23-rm3/VERDICT.md)). Against the frozen
   bar in [`2026-09-23-rm3`](../work/regression/2026-09-23-rm3/PRE-REGISTRATION.md),
   every weight lost baseline rank-1 hits (6 → 11) and none cleared the gain bar.
   **`rm3_weight` stays `0.0`**; RM3 is reachable only through a caller's own
-  `--expand`. Reopened only by a new run, and only if feeding RM3 the list `ask`
-  prints, rather than the lexical first pass, is ruled the intended design.
+  `--expand`. **Reopened 2026-09-25** by that route: Arpit ruled the re-run on
+  W-221, and the new run is
+  [`2026-09-25-rm3-boosted`](../work/regression/2026-09-25-rm3-boosted/PRE-REGISTRATION.md),
+  against the same frozen bar. `rm3_weight` stays `0.0` until that run's verdict.
 
 ### Consequences
 

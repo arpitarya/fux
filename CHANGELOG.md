@@ -8,6 +8,13 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Changed
+
+- **RM3 learns from the documents `ask` shows (W-221).** With `[ranking]
+  rm3_weight` above `0`, the ten feedback documents are now the top 10 after
+  the reranker, a pin and the graph tier, not the bare lexical ten. The default
+  `rm3_weight = 0.0` runs no RM3, so nothing changes unless you set it.
+
 ## [3.0.0-alpha.5] - 2026-09-25
 
 **The anchor field turns on, and `fux inspect` X-rays each document.** Anchor

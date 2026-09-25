@@ -10,7 +10,7 @@ feature: "`fux answer` — one answer, its footing stated, and the report of wha
 owns: [src/fux/query/refer_answer.py@defdd3c5c0f5]
 laws: [L1, L2, L3]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: e5b983b597f0f117687c5b9888d2faaaaea0cd2d8e962ed6ceabccf5e1c98ef6
+content_sha: 419baed7ac352a5524fa02a360f7a0cc2578332fc667356bfe730448f2c7782c
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -468,7 +468,10 @@ is a legitimate answer to it.
 2026-09-23). Both reach `run_query`, so `[ranking] rm3_weight` moves the
 document `answer` cites as it moves `ask`'s #1, and a caller's `--expand`
 switches RM3 off on both ([SR-EXPAND](0149_expand.md) decision 16). At the
-default `0.0` nothing runs, and `answer` is byte-identical.
+default `0.0` nothing runs, and `answer` is byte-identical. **Since W-221
+(2026-09-25) both learn from the same ten documents**: the list `ask` would
+show, which is decision 16's feedback set, never a list that `answer` alone
+sees.
 
 ### Consequences
 

@@ -13,7 +13,7 @@ feature: configurable output defaults
 owns: [src/fux/output_config.py@8e8e57fade21, .fux/output.toml@3a5b84942f70, node/src/config/output.mjs@4f299752c596]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: f274164448c9de9ed44b1b2b7583087a605f02255829cf68a805cfcf17f5a3cc
+content_sha: fa85f29a5b8817b295b0721929d31e0539057fdd32f78dd87add974753fd0fec
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -817,6 +817,11 @@ says so.** That change edited one thing in `src/fux/store/fuxdir.py`: the
 
 ### Consequences
 
+- ⚠ **W-221 (2026-09-25) moved a component this record describes, and changed
+  nothing it decides.** RM3's first pass in `run_query` now runs the graph
+  tier ([SR-EXPAND](0149_expand.md) decision 16) and **prints no tier note**:
+  the stderr note is still printed once per query, by the final pass. **This
+  record's decisions are unaffected.**
 - ⚠ **W-214 (2026-09-22) changed what a `--band` block MEANS, not whether one
   is printed.** `answerable` is `band != none`
   ([SR-CONFIDENCE](0141_confidence.md) decision 3a, Arpit's ruling), so a

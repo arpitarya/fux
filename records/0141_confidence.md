@@ -11,7 +11,7 @@ feature: the confidence plane
 owns: [src/fux/query/confidence.py@2cd8be58107d, tests/test_confidence_floor_off.py@f8e18c079a6e, node/src/query/confidence.mjs@9b42bd23035b, node/test/confidence.test.mjs@7977e76407e2]
 laws: [L1, L3, L4]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: cdf703e536d31b1ef0422296aa32afc5d0b5ab1b1999cc5e18e31e7d550a8f76
+content_sha: e8607bdf8f8d6972d1936928a2ca6530d5fcbe096ca9e9951956afde482e7835
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -838,7 +838,11 @@ this one.
 2026-09-23). `run_query` runs it with no `stats_out`, so `df`, `n` and
 `top_doc_hashes` all come from the final pass, and the block is still built on
 the **original** query. A document lifted by feedback terms cannot raise its own
-band, for the reason decision 16's neighbour gives for `--expand`.
+band, for the reason decision 16's neighbour gives for `--expand`. **Since
+W-221 (2026-09-25) the first pass also runs the rerank, the pin and the graph
+tier** ([SR-EXPAND](0149_expand.md) decision 16), still with no `stats_out` and
+**no band guard**. The guard runs once, on the final list, which is the list
+the band describes.
 
 ### Consequences
 

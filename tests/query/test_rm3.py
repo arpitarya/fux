@@ -173,3 +173,106 @@ def test_node_reader_ranks_byte_identically(built, weight):
     )
     js = json.loads(subprocess.check_output(["node", "--input-type=module", "-e", script], text=True))
     assert js == py
+
+
+# -- 7. the feedback set is the list `ask` shows (W-221) ------------------------
+
+DELTA = term_hash("delta")
+
+
+def _linked_corpus() -> list[dict]:
+    """Twelve `alpha` documents in falling order. `linked.md` sits at lexical
+    rank 13, outside the ten, and every leader links to it, so the graph tier
+    lifts it into the ten `ask` shows. It carries `delta` heavily, which the
+    lexical ten do not, so the two first passes teach different words."""
+    target = "file:linked.md"
+    ref = [{"kind": "ref", "dst": target, "grade": 10}]
+    docs = [
+        _rec(f"file:rank{i:02d}.md", [60], {ALPHA: [14 - i], BETA: [3]}) | {"edges": ref if i < 5 else []}
+        for i in range(12)
+    ]
+    docs.append(_rec(target, [60], {ALPHA: [1], DELTA: [15]}))
+    docs += [_rec(f"file:pad{i}.md", [80], {FILLER: [2]}) for i in range(30)]
+    return docs
+
+
+@pytest.fixture
+def linked(tmp_path):
+    write_index(tmp_path, _linked_corpus())
+    build(tmp_path)
+    return tmp_path
+
+
+def _spy(monkeypatch):
+    seen: list[list[str]] = []
+    real = rm3.feedback_terms
+
+    def spy(root, first, *a, **k):
+        seen.append([r.id for r in first])
+        return real(root, first, *a, **k)
+
+    monkeypatch.setattr(rm3, "feedback_terms", spy)
+    return seen
+
+
+def test_the_fixture_is_not_vacuous(linked):
+    trace: dict = {}
+    shown, _ = run_query(linked, "alpha", 10, tune=_tune(0.0), trace_out=trace)
+    lexical = [r.id for r in trace["window"][:10]]
+    assert "file:linked.md" not in lexical
+    assert "file:linked.md" in [r.id for r in shown]
+
+
+@pytest.mark.parametrize("weight", ARMS)
+def test_feedback_reads_the_list_ask_shows(linked, monkeypatch, weight):
+    shown = [r.id for r in run_query(linked, "alpha", 10, tune=_tune(0.0))[0]]
+    seen = _spy(monkeypatch)
+    run_query(linked, "alpha", 3, tune=_tune(weight))
+    assert seen == [shown]
+
+
+def test_with_the_tier_off_feedback_reads_the_lexical_ten(linked, monkeypatch):
+    off = dataclasses.replace(_tune(0.3), ask_boost=False, ask_related=False)
+    trace: dict = {}
+    run_query(linked, "alpha", 10, tune=dataclasses.replace(off, rm3_weight=0.0), trace_out=trace)
+    seen = _spy(monkeypatch)
+    run_query(linked, "alpha", 10, tune=off)
+    assert seen == [[r.id for r in trace["window"][:10]]]
+
+
+def test_the_boosted_first_pass_teaches_different_words(linked):
+    tune = _tune(0.3)
+    trace: dict = {}
+    shown, _ = run_query(linked, "alpha", 10, tune=_tune(0.0), trace_out=trace)
+    assert DELTA in rm3.feedback_terms(linked, shown, [ALPHA], tune.scoring)
+    assert DELTA not in rm3.feedback_terms(linked, trace["window"][:10], [ALPHA], tune.scoring)
+
+
+@pytest.mark.parametrize("weight", (0.0, *ARMS))
+def test_accelerator_equals_scan_on_a_linked_corpus(linked, weight):
+    scan = _payload(run_query(linked, "alpha", 10, tune=_tune(weight), force_scan=True)[0])
+    fast, path = run_query(linked, "alpha", 10, tune=_tune(weight), force_scan=False)
+    assert path == "accelerator"
+    assert _payload(fast) == scan
+
+
+@pytest.mark.skipif(shutil.which("node") is None, reason="node is not on PATH")
+@pytest.mark.parametrize("weight", (
+    0.0,
+    # W-222: an EXPANDED score differs in the last bit between the readers on
+    # this corpus, with RM3 off and a manual `--expand` alone. Both readers
+    # feed back the same ten documents and pick the same terms; the gap is in
+    # the scoring after. Strict, so a fix turns this red until it is removed.
+    pytest.param(0.3, marks=pytest.mark.xfail(strict=True, reason="W-222: last-bit expanded-score gap")),
+))
+def test_node_reader_feeds_back_the_same_list(linked, weight):
+    (linked / ".fux").mkdir(exist_ok=True)
+    (linked / ".fux" / "tune.toml").write_text(f"[ranking]\nrm3_weight = {weight}\n", encoding="utf-8")
+    py = [[r.id, r.score] for r in run_query(linked, "alpha", 10)[0]]
+    script = (
+        f'import {{ runQuery }} from {json.dumps((ENGINE / "node/src/query/run.mjs").as_uri())};'
+        f'const out = runQuery({json.dumps(str(linked))}, "alpha", 10);'
+        'console.log(JSON.stringify(out.results.map((r) => [r.id, r.score])));'
+    )
+    js = json.loads(subprocess.check_output(["node", "--input-type=module", "-e", script], text=True))
+    assert js == py
