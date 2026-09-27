@@ -3,15 +3,15 @@ type: Standing Record
 kind: component
 name: SR-SERVE
 title: "SR-SERVE (0158) — `fux serve`, the explorer: a local page that renders `ask --json --why` and computes nothing"
-description: "Arpit's framing, 2026-09-22 — fux is like Google: if the ten documents an agent is handed are the right ten, the answer is mostly right. So the inspection surface is question-first. `fux serve` starts a stdlib server bound to 127.0.0.1 with no --host, serves one self-contained page, and answers GET /ask with the byte-identical stdout of `fux ask --json --why --band`. The page is a RENDERER: it computes no score, no band and no rank, because a second ranker in a browser is a restatement in the L0 sense. Every lever it prints is a proposal; no route writes a committed byte. Since W-220 (2026-09-23) the page has tabs — Ask, Answer (2026-09-27: the one passage `fux answer --json --band` would cite, byte-identical too), Documents, Index — and the server calls fux.inspect in-process for the last two, on demand and cached under .fux/runtime/inspect/; the browser still computes nothing."
+description: "Arpit's framing, 2026-09-22 — fux is like Google: if the ten documents an agent is handed are the right ten, the answer is mostly right. So the inspection surface is question-first. `fux serve` starts a stdlib server bound to 127.0.0.1 with no --host, serves one self-contained page, and answers GET /ask with the byte-identical stdout of `fux ask --json --why --band`. The page is a RENDERER: it computes no score, no band and no rank, because a second ranker in a browser is a restatement in the L0 sense. Every lever it prints is a proposal; no route writes a committed byte. Since W-220 (2026-09-23) the page has tabs — Ask, Answer (2026-09-27: the one passage `fux answer --json --band` would cite, byte-identical too), Documents, Words (2026-09-27: the vocabulary, a question as the analyzer reads it, where a term lives), Index — and the server calls fux.inspect in-process for the last two, on demand and cached under .fux/runtime/inspect/; the browser still computes nothing."
 status: accepted
 date: 2026-09-22
 amended: 2026-09-27
 feature: the explorer — a local page over the real ask
-owns: [src/fux/serve@60deed757c91]
+owns: [src/fux/serve@3158785e3f60]
 laws: [L1, L2, L4, L6, L8, L10]
 timestamp: 2026-09-22T00:00:00Z
-content_sha: 64825e350bfeec104fcb64d4b4f0fc85898bbc902e617e6b5eae31c9e3a27064
+content_sha: fc5b48ebf40aeebba94a16a30b55408a1fbbc1aa3d683ae68cb03b2b5a503388
 ratifies: "Arpit, 2026-09-22 (Cowork, W-210) — three sample pages built on his machine, the per-token ingest X-ray REJECTED as a front page ('do you believe people will go through this big document?') and the question-first explorer ratified in its modern-dark form: 'the way I'm thinking about fux is something like Google. If a question gets asked, if you have the best 10 documents, the answer the agent gives is going to be mostly correct.'"
 ---
 
@@ -128,6 +128,9 @@ special-case.
 | `/inspect/document/probes?loc=…` | that document's own probes — SR-INSPECT decision 19 |
 | `/inspect/index` | the corpus report **without** probes, as a job with progress |
 | `/inspect/probes[?all=1]` | the corpus report **with** probes, sampled or every document |
+| `/inspect/words?sort=&order=&q=&class=&limit=&offset=` | the vocabulary — every term with its `df`, `cf`, `idf` and class, **sorted and paged on the server** — `inspect.words.vocabulary` (2026-09-27) |
+| `/inspect/analyze?q=…` | a question as the analyzer reads it: kept terms with their index statistics, dropped stopwords — `inspect.words.analyze` |
+| `/inspect/word?term=…` | the documents carrying one term, by hash, analyzed form or printed word — `inspect.words.term_documents` |
 
 ⚠ **Amended 2026-09-27 (Arpit: *"create a tab for answer as well"*): `/answer`
 carries decision 3's promise unchanged — it runs `fux answer --json --band` in
@@ -140,6 +143,18 @@ browser — a searchable, decoder-faceted register list grouped by folder on the
 left, one document on the right with its counts up front, probes first and the
 long tables folded — because the first cut *"was not at all user friendly"*.
 The browser still computes nothing.
+
+⚠ **Amended 2026-09-27, later (Arpit: *"every index what are the words being
+picked scored etc create a view of that as well dynamic"*): a fifth tab,
+**Words**.** Three more `/inspect/` routes, all reading `inspect.words` in
+process: the vocabulary is **sorted, filtered and paged on the server**, so the
+page never orders fux's rows; a typed question comes back token by token as the
+analyzer reads it — what it kept, what it stemmed each word to, what it dropped
+as a stopword, and each kept term's `df` and `idf` on this index; and one term
+opens the documents that carry it. The local hash-to-word dictionary is built
+once per index and cached beside the view (the same `dictionary.json` `fux
+inspect` writes). The classes — boilerplate, common, distinctive, hapax — are
+the lenses' own thresholds, printed as provisional.
 
 ⚠ **Amended 2026-09-23 (W-220): the five `/inspect/` routes write the
 GITIGNORED runtime cache** — `.fux/runtime/inspect/`'s facts, probes and

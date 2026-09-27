@@ -180,6 +180,31 @@
   .skeleton{height:12px;border-radius:6px;background:linear-gradient(90deg,rgba(255,255,255,.05),rgba(255,255,255,.1),rgba(255,255,255,.05));background-size:200% 100%;animation:sweep 1.4s linear infinite;margin:10px 0}
   @media (max-width:820px){ .docs{grid-template-columns:1fr} .docpane{position:static;max-height:none} .doclist{max-height:40vh} }
 
+  /* Words tab (2026-09-27): the vocabulary, as fux holds it */
+  .tok{display:inline-flex;flex-direction:column;gap:2px;border:1px solid var(--line);border-radius:12px;padding:7px 11px;margin:4px 6px 0 0;min-width:90px;vertical-align:top}
+  .tok b{font-size:14px}
+  .tok .arr{color:var(--faint);font-size:11.5px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .tok .st{font-size:11px;color:var(--dim);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums}
+  .tok.drop{opacity:.5}.tok.drop b{text-decoration:line-through}
+  .tok.boilerplate{border-color:rgba(245,165,36,.45)}.tok.boilerplate b{color:var(--warn)}
+  .tok.distinctive{border-color:rgba(34,211,166,.45)}.tok.distinctive b{color:var(--ok)}
+  .tok.missing{border-color:rgba(255,92,122,.5)}.tok.missing b{color:var(--bad)}
+  .wordsgrid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(300px,1fr);gap:16px;align-items:start;margin-top:14px}
+  @media (max-width:900px){ .wordsgrid{grid-template-columns:1fr} }
+  .wrow{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(60px,1fr) 64px 72px 56px;gap:10px;align-items:center;padding:7px 8px;border-radius:9px;cursor:pointer;font-size:13px;border-left:3px solid transparent}
+  .wrow:hover{background:rgba(255,255,255,.04)}
+  .wrow.on{background:rgba(124,92,255,.12);border-left-color:var(--a1)}
+  .wrow.head{cursor:default;color:var(--dim);font-size:11.5px;text-transform:uppercase;letter-spacing:.04em}
+  .wrow.head:hover{background:none}
+  .wrow .w{font-weight:600;overflow-wrap:anywhere}
+  .wrow .w small{display:block;font-weight:400;color:var(--faint);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px}
+  .wrow .bar{height:6px;border-radius:3px;background:rgba(255,255,255,.07);overflow:hidden}
+  .wrow .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--a1),var(--a2))}
+  .wrow .bar.boilerplate i{background:var(--warn)}
+  .wrow .bar.distinctive i{background:var(--ok)}
+  .wrow .num{text-align:right}
+  @media (max-width:560px){ .wrow{grid-template-columns:minmax(0,1fr) 60px 60px} .wrow .bar,.wrow .cfc{display:none} }
+
   /* Answer tab (2026-09-27): the ONE passage fux would cite */
   .passage{border:1px solid rgba(34,211,166,.35);border-radius:14px;padding:14px 16px;margin-top:10px;background:rgba(34,211,166,.05)}
   .passage .h{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:baseline;font-size:12.5px;color:var(--dim)}
@@ -208,13 +233,14 @@
 <div class="wrap">
   <header>
     <h1>fux <span>explorer</span></h1>
-    <div class="sub">Ask: the ten documents an agent would be handed, and why. Answer: the one passage it would cite. Documents and Index: what the index is made of.</div>
+    <div class="sub">Ask: the ten documents an agent would be handed, and why. Answer: the one passage it would cite. Documents, Words and Index: what the index is made of.</div>
   </header>
 
   <nav class="tabs" role="tablist">
     <button class="tab on" role="tab" data-tab="ask">Ask</button>
     <button class="tab" role="tab" data-tab="answer">Answer</button>
     <button class="tab" role="tab" data-tab="docs">Documents</button>
+    <button class="tab" role="tab" data-tab="words">Words</button>
     <button class="tab" role="tab" data-tab="index">Index</button>
   </nav>
 
@@ -242,6 +268,25 @@
         <div class="hint">↑ ↓ to move, Enter to open. Every document in <span class="mono">.fux/index/REGISTER</span>.</div>
       </div>
       <div id="docxray"><div class="card empty"><div class="big">Pick a document</div><div class="why">Its X-ray — what came out of the bytes, what was indexed, how it links, and whether it comes back for its own title — is computed for that document alone, then cached.</div></div></div>
+    </div>
+  </section>
+
+  <section id="tab-words" hidden>
+    <div class="card"><h2>how the analyzer reads a question</h2>
+      <input class="filter" id="analyzeq" placeholder="Type a question — see which words survive, what they become, and what each is worth on this index…" autocomplete="off" spellcheck="false">
+      <div id="analyzeout" class="hint" style="margin-top:8px">Every kept word shows its analyzed form, how many documents carry it (<b>df</b>) and its <b>idf</b> — the weight the scorer gives a match on it. Dropped words are stopwords the analyzer never indexes.</div></div>
+    <div id="wordstats"></div>
+    <div class="wordsgrid">
+      <div>
+        <div class="card" style="margin-top:0"><h2>vocabulary — every term the index holds</h2>
+          <input class="filter" id="wordfilter" placeholder="Search words…" autocomplete="off" spellcheck="false">
+          <div class="facets" id="wordclasses" style="margin-top:8px"></div>
+          <div class="facets" id="wordsorts" style="margin-top:8px"></div>
+          <div class="sub" id="wordcount"></div>
+          <div id="wordtable"></div>
+          <div class="actions"><button class="btn" id="wordmore" hidden>show more</button></div></div>
+      </div>
+      <div id="wordside"><div class="card empty" style="margin-top:0"><div class="big">Pick a word</div><div class="why">See every document that carries it.</div></div></div>
     </div>
   </section>
 
@@ -474,13 +519,14 @@ function render(data) {
 const opened = {};
 function showTab(name) {
   document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("on", t.dataset.tab === name));
-  ["ask", "answer", "docs", "index"].forEach((n) => { $("tab-" + n).hidden = n !== name; });
+  ["ask", "answer", "docs", "words", "index"].forEach((n) => { $("tab-" + n).hidden = n !== name; });
   const params = new URLSearchParams(location.search);
   if (name === "ask") params.delete("tab"); else params.set("tab", name);
   history.replaceState(null, "", params.toString() ? "?" + params.toString() : location.pathname);
   if (!opened[name]) {
     opened[name] = true;
     if (name === "docs") loadDocuments();
+    if (name === "words") loadWords();
     if (name === "index") loadIndex();
   }
 }
@@ -674,6 +720,84 @@ async function openDocument(loc) {
   } catch (e) { const el = $("docprobes"); if (el) el.innerHTML = `<div class="err">${esc(e.message || e)}</div>`; const st = $("probestat"); if (st) st.outerHTML = stat("—", "probes in top 10"); }
 }
 
+/* ---- Words: the vocabulary, how a question is read, where a word lives. -- */
+const W = { sort: "df", asc: false, klass: "", q: "", offset: 0, limit: 150, rows: [], on: null };
+const CLASSES = [["", "all"], ["boilerplate", "boilerplate — on half the corpus or more"], ["common", "common"], ["distinctive", "distinctive — on a tenth or less"], ["hapax", "hapax — on one document"]];
+const SORTS = [["df", "documents"], ["cf", "occurrences"], ["idf", "idf"], ["word", "a–z"]];
+function wordsUrl() {
+  return "/inspect/words" + "?sort=" + W.sort + "&order=" + (W.asc ? "asc" : "desc") + "&limit=" + W.limit + "&offset=" + W.offset +
+    (W.q ? "&q=" + encodeURIComponent(W.q) : "") + (W.klass ? "&class=" + encodeURIComponent(W.klass) : "");
+}
+async function loadWords(more) {
+  if (!more) { W.offset = 0; W.rows = []; $("wordtable").innerHTML = '<div class="skeleton"></div><div class="skeleton" style="width:70%"></div>'; }
+  $("wordmore").hidden = true;
+  let d;
+  try { d = await (await fetch(wordsUrl())).json(); if (d.error) throw new Error(d.error); }
+  catch (e) { $("wordtable").innerHTML = `<div class="err">${esc(e.message || e)}</div>`; return; }
+  W.rows = more ? W.rows.concat(d.rows) : d.rows;
+  if (!more || !$("wordstats").innerHTML) $("wordstats").innerHTML = `<div class="card"><h2>the vocabulary at a glance</h2><div class="stats" style="margin-top:0">
+    ${stat(d.terms, "distinct terms")}${stat(d.documents, "documents")}${stat(d.postings, "postings — term × document")}
+    ${stat(d.hapax, "hapax — terms on one document")}${stat(d.boilerplate_terms, "boilerplate terms — on ≥ " + Math.ceil(d.boilerplate_df) + " docs", d.boilerplate_terms ? "warn" : "")}
+    ${stat(pct(d.postings ? d.boilerplate_postings / d.postings : null), "of postings are boilerplate")}${stat(d.named + " / " + d.terms, "terms named by the local dictionary")}</div>
+    <div class="maths">A boilerplate term is on half the corpus or more, so a match on it is worth almost nothing — <span class="mono">idf</span> near zero. Lever: <span class="mono">[index] stopwords</span>. The thresholds are the lenses' own, <b>provisional</b> and tuned to no corpus.</div></div>`;
+  renderWordTable(d);
+}
+function renderWordTable(d) {
+  $("wordcount").textContent = `${d.matched} term${d.matched === 1 ? "" : "s"} match · showing ${W.rows.length}`;
+  const head = `<div class="wrow head"><span>word</span><span>share of docs</span><span class="num" title="documents carrying it">df</span><span class="num cfc" title="occurrences in all">cf</span><span class="num">idf</span></div>`;
+  $("wordtable").innerHTML = head + W.rows.map((r) =>
+    `<div class="wrow ${r.hash === W.on ? "on" : ""}" data-term="${esc(r.hash)}" title="${esc(r.class)}${r.hapax ? " · hapax" : ""}">
+      <span class="w">${esc(r.word)}${r.analyzed && r.analyzed !== r.word ? `<small>${esc(r.analyzed)}</small>` : ""}${r.named ? "" : `<small>unnamed — source unreadable</small>`}</span>
+      <span class="bar ${esc(r.class)}"><i style="width:${(100 * r.df_share).toFixed(1)}%"></i></span>
+      <span class="num">${esc(r.df)}</span><span class="num cfc">${esc(r.cf)}</span><span class="num">${r.idf.toFixed(2)}</span></div>`).join("");
+  $("wordtable").querySelectorAll(".wrow[data-term]").forEach((row) => row.addEventListener("click", () => openWord(row.dataset.term)));
+  $("wordmore").hidden = W.rows.length >= d.matched;
+  $("wordclasses").innerHTML = CLASSES.map(([k, l]) => `<button class="facet ${W.klass === k ? "on" : ""}" data-k="${k}">${esc(l)}</button>`).join("");
+  $("wordclasses").querySelectorAll(".facet").forEach((b) => b.addEventListener("click", () => { W.klass = b.dataset.k; loadWords(); }));
+  $("wordsorts").innerHTML = `<span class="hint" style="align-self:center">sort</span>` + SORTS.map(([k, l]) => `<button class="facet ${W.sort === k ? "on" : ""}" data-k="${k}">${esc(l)}${W.sort === k ? (W.asc ? " ↑" : " ↓") : ""}</button>`).join("");
+  $("wordsorts").querySelectorAll(".facet").forEach((b) => b.addEventListener("click", () => {
+    if (W.sort === b.dataset.k) W.asc = !W.asc; else { W.sort = b.dataset.k; W.asc = b.dataset.k === "word"; }
+    loadWords();
+  }));
+}
+$("wordmore").addEventListener("click", () => { W.offset += W.limit; loadWords(true); });
+let wordTimer = null;
+$("wordfilter").addEventListener("input", () => { clearTimeout(wordTimer); wordTimer = setTimeout(() => { W.q = $("wordfilter").value.trim(); loadWords(); }, 250); });
+
+async function openWord(term) {
+  W.on = term;
+  $("wordtable").querySelectorAll(".wrow[data-term]").forEach((x) => x.classList.toggle("on", x.dataset.term === term));
+  $("wordside").innerHTML = `<div class="card" style="margin-top:0"><h2>where it lives</h2><div class="skeleton"></div></div>`;
+  let d;
+  try { d = await (await fetch("/inspect/word?term=" + encodeURIComponent(term))).json(); if (d.error) throw new Error(d.error); }
+  catch (e) { $("wordside").innerHTML = `<div class="card err" style="margin-top:0">${esc(e.message || e)}</div>`; return; }
+  const r = d.term;
+  $("wordside").innerHTML = `<div class="card dochead" style="margin-top:0"><h2>${esc(r.word)}</h2>
+    <div class="loc mono">analyzed as <b>${esc(r.analyzed || "?")}</b> · hash ${esc(r.hash)}</div>
+    <div class="badges"><span class="badge ${r.class === "boilerplate" ? "arch" : r.class === "distinctive" ? "pin" : ""}">${esc(r.class)}</span>${r.hapax ? '<span class="badge">hapax</span>' : ""}</div>
+    <div class="stats">${stat(r.df, "documents carry it")}${stat(pct(r.df_share), "of the corpus")}${stat(r.cf, "occurrences in all")}${stat(r.idf.toFixed(3), "idf — weight of a match", r.class === "boilerplate" ? "warn" : r.class === "distinctive" ? "ok" : "")}</div>
+    <div class="actions"><button class="btn" id="askword">Ask “${esc(r.word)}”</button></div></div>
+    <div class="card"><h2>documents — ${esc(d.count)}${d.count > d.documents.length ? `, first ${d.documents.length}` : ""}</h2>
+      ${d.documents.map((x) => `<div class="linkrow opendoc" data-loc="${esc(x.loc)}"><span class="kind">${x.archived ? "archived" : x.superseded ? "superseded" : "doc"}</span><span class="t">${esc(x.title || x.loc)}</span><span class="loc mono">${esc(x.loc)}</span></div>`).join("") || '<div class="hint">none</div>'}</div>`;
+  $("wordside").querySelectorAll(".opendoc").forEach((a) => a.addEventListener("click", () => { showTab("docs"); openDocument(a.dataset.loc); }));
+  $("askword").addEventListener("click", () => { $("q").value = r.word; showTab("ask"); ask(r.word); });
+}
+
+let analyzeTimer = null;
+$("analyzeq").addEventListener("input", () => { clearTimeout(analyzeTimer); analyzeTimer = setTimeout(() => analyzeText($("analyzeq").value), 250); });
+async function analyzeText(text) {
+  if (!text.trim()) { $("analyzeout").innerHTML = ""; return; }
+  let d;
+  try { d = await (await fetch("/inspect/analyze?q=" + encodeURIComponent(text))).json(); if (d.error) throw new Error(d.error); }
+  catch (e) { $("analyzeout").innerHTML = `<span class="err">${esc(e.message || e)}</span>`; return; }
+  const kept = d.kept.map((k) => `<span class="tok ${k.in_index ? esc(k.class) : "missing"}" data-term="${esc(k.hash)}" title="click: where it lives"><b>${esc(k.surface)}</b><span class="arr">→ ${esc(k.analyzed)}</span>
+    <span class="st">${k.in_index ? `df ${esc(k.df)} · idf ${k.idf.toFixed(2)}` : "not in the index"}</span></span>`).join("");
+  const dropped = d.dropped.map((k) => `<span class="tok drop"><b>${esc(k.surface)}</b><span class="st">${esc(k.dropped)}</span></span>`).join("");
+  const missing = d.kept.filter((k) => !k.in_index).length, boiler = d.kept.filter((k) => k.class === "boilerplate").length;
+  $("analyzeout").innerHTML = `<div>${kept}${dropped}</div><div class="maths">${d.kept.length} term${d.kept.length === 1 ? "" : "s"} kept, ${d.dropped.length} dropped${missing ? ` · <b style="color:var(--bad)">${missing} in no document</b>` : ""}${boiler ? ` · <b style="color:var(--warn)">${boiler} boilerplate</b> — a match there separates nothing` : ""}. Green is distinctive: a query carrying it asks for a small part of the corpus.</div>`;
+  $("analyzeout").querySelectorAll(".tok[data-term]").forEach((el) => el.addEventListener("click", () => openWord(el.dataset.term)));
+}
+
 /* ---- Index: fast lenses first, probes streamed in behind them. ----------- */
 async function poll(url, onProgress) {
   for (;;) {
@@ -766,7 +890,7 @@ async function boot() {
   const initial = params.get("q");
   if (initial) { $("q").value = initial; ask(initial); }
   const tab = params.get("tab");
-  if (tab && ["answer", "docs", "index"].includes(tab)) showTab(tab);
+  if (tab && ["answer", "docs", "words", "index"].includes(tab)) showTab(tab);
   const aq = params.get("aq");
   if (aq) { $("aq").value = aq; answer(aq); }
 }

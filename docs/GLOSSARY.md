@@ -696,10 +696,11 @@ ranker in a browser is the restatement [L0](../records/0002_LAW-0-authority.md)
 forbids. Distinct from [`fux inspect`](#lever), which reports the shape of a
 whole corpus rather than the story of one question, and from `fux mcp`, which
 hands results to a *machine*. No route writes a committed byte and every lever
-is a proposal. **Four tabs** — Ask, Answer (since 2026-09-27: the one passage
+is a proposal. **Five tabs** — Ask, Answer (since 2026-09-27: the one passage
 `fux answer --json --band` would cite, byte-identical too), Documents (one
 document's X-ray, computed on the click, browsed from a searchable register
-list) and Index (the whole corpus, worst first, with
+list), Words (since 2026-09-27: every term with its `df` and `idf`, a question
+as the analyzer reads it, where a term lives — sorted on the server) and Index (the whole corpus, worst first, with
 [title probes](#title-probe) streamed in behind) — and the server calls
 `fux inspect`'s library for the last two. See [SR-SERVE](../records/0158_serve.md).
 

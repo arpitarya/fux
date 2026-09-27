@@ -1,6 +1,6 @@
 ---
 name: fux-serve
-description: Open the Fux explorer with `fux serve` — a local page with four tabs — Ask (the ranked documents, which word earned each score, the band, one lever per finding), Answer (the passage `fux answer` would cite, with citation and freshness), Documents (one document's X-ray) and Index (the whole index, worst first). Use for "why did this rank first", "open the fux UI", "show me how this document was indexed", or to SEE a ranking rather than read JSON. Read-only, localhost only; it applies no lever.
+description: Open the Fux explorer with `fux serve` — a local page with five tabs — Ask (ranked documents, which word earned each score, the band, one lever per finding), Answer (the passage `fux answer` would cite), Words (every term with its df and idf, a question as the analyzer reads it), Documents (one document's X-ray) and Index (worst first). Use for "why did this rank first", "open the fux UI", or to SEE a ranking rather than read JSON. Read-only, localhost only; applies no lever.
 ---
 
 # The explorer — `fux serve`

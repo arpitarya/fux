@@ -4,13 +4,14 @@ kind: component
 name: SR-INSPECT
 title: "SR-INSPECT (0156) — `fux inspect`, the index X-ray: six lenses, three flagged checks, a local dictionary that names the hashes, and per-document facts, probes and a diff"
 description: "Arpit asked whether a consumed index is a good index or a bad one. `fux inspect` answers it descriptively: six lenses over the committed shards — boilerplate, findability, length and fields, duplication and templates, analyzer coverage, graph — each printing distributions and named lists, each naming the lever that would change what it found and applying none. Exactly three numbers carry a pass/attention flag and their floors are provisional, measured on the golden ladder and dropped to descriptive if one ever flags a healthy rung. The committed index holds term hashes, so the words come from a gitignored dictionary built by re-tokenising the sources locally; nothing new is committed and nothing is fetched. Since W-220 (2026-09-23) it also computes cached per-document facts, probes each document by its own title and headings (the new findability headline), folds identity, segments, chunks and a worst-first triage, and diffs two reports with edge loss always an alert; fux serve calls the same library."
+amended: 2026-09-27
 status: accepted
 date: 2026-09-14
 feature: the index X-ray
 owns: [src/fux/inspect@b865ff821f61]
 laws: [L2, L3, L4, L6, L8]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 805092f93ddfe4a8341f9dcec1e82a8180392bee9f3b87c404f1acdea96659b8
+content_sha: d7321dcb1dcb9bad6cce12a243ac2d79226a7b44cd978d0d65784e54bf67f1eb
 ratifies: W-169
 ---
 
@@ -371,6 +372,14 @@ they decide is stated here.
     `probes.run` in-process, never through a subprocess
     ([SR-SERVE](0158_serve.md) decision 15). No separate command runs first;
     what either caller writes is the same gitignored cache.
+
+⚠ **Amended 2026-09-27 (Arpit, the explorer's Words tab): `words.py` is a
+seventh, read-only lens over the same view and dictionary** — the vocabulary
+sorted and paged for a caller, a question as the analyzer reads it (kept terms
+with their `df`/`idf`, dropped stopwords), and the documents one term is on.
+It states no new threshold: its classes are `BOILERPLATE_DF_SHARE` and
+`DISTINCTIVE_DF_SHARE`, the lenses' own. `fux serve` is its only caller today
+([SR-SERVE](0158_serve.md) decision 4); `fux inspect` prints none of it.
 
 ### Consequences
 

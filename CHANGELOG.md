@@ -18,6 +18,12 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   document at a time with its counts up front, probes first, the long tables
   folded, links that open the linked document, and `?tab=docs&doc=…` deep links.
   The page still computes nothing (SR-SERVE decision 3, amended 2026-09-27).
+- **`fux serve` gains a Words tab** — every term the index holds with its `df`,
+  `cf`, `idf` and class (boilerplate · common · distinctive · hapax), sorted,
+  searched and paged on the server; a box that shows a question exactly as the
+  analyzer reads it — kept, stemmed, dropped, and what each kept word is worth
+  on this index; and, per word, the documents that carry it. Three read-only
+  `/inspect/` routes over a new `inspect/words.py` lens.
 - **Corpus-mined expansion, on by default (W-168 step 4).** When a document
   writes *"Mean Kinetic Temperature (MKT)"*, a query that says *MKT* also
   scores the long form, and the reverse, at `[ranking] mined_weight`, default

@@ -351,8 +351,58 @@ class _Handler(BaseHTTPRequestHandler):
         self._send_json(self.server.state.job("probes-all" if every else "probes", probe_sample=sample))
 
 
+    # -- the Words tab (2026-09-27) ----------------------------------------
+    #
+    # The vocabulary, sorted and paged on the SERVER, so the page never orders
+    # fux's rows; a question as the analyzer reads it; and where one term
+    # lives. All three read `inspect.words`, in-process.
+
+    def _words(self, params: dict) -> None:
+        from ..inspect import words as words_mod
+
+        sort = _first(params, "sort").strip() or "df"
+        if sort not in words_mod.SORTS:
+            self._json_error(HTTPStatus.BAD_REQUEST, f"sort must be one of {', '.join(words_mod.SORTS)}, not {sort!r}")
+            return
+        limit, offset = _first(params, "limit").strip() or "200", _first(params, "offset").strip() or "0"
+        if not (limit.isdigit() and offset.isdigit()) or int(limit) < 1:
+            self._json_error(HTTPStatus.BAD_REQUEST, "limit must be a positive integer and offset a non-negative one")
+            return
+        view = self.server.state.view()
+        self._send_json(words_mod.vocabulary(
+            view, self.server.state.dictionary(), sort=sort, ascending=_first(params, "order") == "asc",
+            query=_first(params, "q"), klass=_first(params, "class").strip(),
+            limit=min(int(limit), 1000), offset=int(offset),
+        ))
+
+    def _analyze(self, params: dict) -> None:
+        from ..inspect import words as words_mod
+
+        text = _first(params, "q").strip()
+        if not text:
+            self._json_error(HTTPStatus.BAD_REQUEST, "give me some text: /inspect/analyze?q=…")
+            return
+        self._send_json(words_mod.analyze(self.server.state.view(), self.server.state.dictionary(), text))
+
+    def _word(self, params: dict) -> None:
+        from ..inspect import words as words_mod
+
+        term = _first(params, "term").strip()
+        if not term:
+            self._json_error(HTTPStatus.BAD_REQUEST, "give me a term: /inspect/word?term=…")
+            return
+        found = words_mod.term_documents(self.server.state.view(), self.server.state.dictionary(), term)
+        if found is None:
+            self._json_error(HTTPStatus.NOT_FOUND, f"no term {term!r} in the index")
+            return
+        self._send_json(found)
+
+
 #: route -> handler method. GET only, like every other route.
 _INSPECT_ROUTES = {
+    "/inspect/words": "_words",
+    "/inspect/analyze": "_analyze",
+    "/inspect/word": "_word",
     "/inspect/documents": "_documents",
     "/inspect/document": "_document",
     "/inspect/document/probes": "_document_probes",
@@ -414,6 +464,8 @@ class _State:
         self._root = root
         self._view = None
         self._view_key = None
+        self._dictionary = None
+        self._dictionary_key = None
         self._jobs: dict = {}
 
     def root(self):
@@ -442,6 +494,23 @@ class _State:
                 self._view = read_index_view(self.root())
                 self._view_key = key
             return self._view
+
+    def dictionary(self):
+        """The local hash-to-word dictionary for the current view — built once
+        per index (it re-tokenises every readable source), then read from
+        `.fux/runtime/inspect/dictionary.json`, the same file `fux inspect`
+        writes. Cached beside the view it names."""
+        from ..inspect import dictionary as dictionary_mod
+
+        view = self.view()
+        with self._lock:
+            cached = getattr(self, "_dictionary", None)
+            if cached is not None and self._dictionary_key == self._view_key:
+                return cached
+        built = dictionary_mod.load_or_build(self.root(), view)
+        with self._lock:
+            self._dictionary, self._dictionary_key = built, self._view_key
+        return built
 
     def job(self, kind: str, *, probe_sample, retrieval_sample=_LIBRARY_DEFAULT):
         view = self.view()

@@ -141,6 +141,35 @@ def _outside_runtime(root: Path) -> dict:
     return out
 
 
+def test_words_lists_the_vocabulary_sorted_on_the_server(server):
+    """The Words tab (2026-09-27): every term, sorted and paged here so the
+    page never re-orders fux's rows."""
+    status, d = get(server, "/inspect/words?limit=3")
+    assert status == 200
+    assert d["terms"] >= 3 and len(d["rows"]) == 3 and d["matched"] == d["terms"]
+    dfs = [r["df"] for r in d["rows"]]
+    assert dfs == sorted(dfs, reverse=True)
+    assert {"word", "analyzed", "df", "cf", "idf", "class", "df_share"} <= set(d["rows"][0])
+    status, d = get(server, "/inspect/words?sort=nope")
+    assert status == 400 and "sort" in d["error"]
+
+
+def test_analyze_shows_what_the_analyzer_kept_and_dropped(server):
+    status, d = get(server, "/inspect/analyze?q=the%20saturation%20length")
+    assert status == 200
+    assert [k["surface"] for k in d["dropped"]] == ["the"]
+    assert [k["surface"] for k in d["kept"]] == ["saturation", "length"]
+    assert all(k["in_index"] for k in d["kept"]), "both words are in the planted corpus"
+    assert get(server, "/inspect/analyze?q=")[0] == 400
+
+
+def test_a_word_names_the_documents_that_carry_it(server):
+    status, d = get(server, "/inspect/word?term=saturation")
+    assert status == 200
+    assert d["count"] == len(d["documents"]) >= 1 and d["term"]["word"].lower() == "saturation"
+    assert get(server, "/inspect/word?term=zzzznotaword")[0] == 404
+
+
 def test_no_route_writes_outside_the_runtime_cache(server, corpus):
     """Decision 4 as amended: the X-ray routes fill `.fux/runtime/inspect/`
     and touch no other byte — not the index, not a source, not the config."""

@@ -7,10 +7,10 @@ description: "Fux's readers are AI agents, and an engine whose output is misread
 status: accepted
 date: 2026-08-22
 feature: the agent-facing policy and skill artifacts Fux ships, and their installer
-owns: [src/fux/templates/agents@9efc62747afc]
+owns: [src/fux/templates/agents@6bdc15332a6c]
 laws: [L1, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: dbf4d2d450fa4c24550a7f660484b1711a3a17210d90fbb21542a2781e876767
+content_sha: 8b919e8cf5d945b6168524e3a4035638beea2cafdc1da44f6298a4b9f262c0de
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -792,6 +792,8 @@ byte into `.claude/`, `.agents/` and `.kiro/`.
 new attribute took `fux-sources` to 518, and the fix was to *compress the whole
 sentence* rather than to drop the new fact — `test_setup_agents_guides.py` is the
 gate, and it is the trap that decision warns about.
+
+**`fux-serve`'s description names five tabs** (2026-09-27): the explorer gained a Words tab ([SR-SERVE](0158_serve.md)), and the description was re-trimmed to the 500-character listing budget in all four copies; no policy rendering changed.
 
 ### Consequences
 
