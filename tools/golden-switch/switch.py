@@ -32,7 +32,7 @@ Claude tool call and the key.
 |---|---|
 | `.gitignore` | **never committed is the one clause no state relaxes** (L11). A key must stay off every ref whether the tree is open or shut |
 | `!work/golden` in `.fux/sources/dirs` | the benchmark's vocabulary must not enter fux's own committed index either way |
-| the two hook **files** | they are only *deregistered*, never edited or moved — which is what makes `lock` able to promise a byte-identical restore of something it never changed |
+| the three hook **files** | they are only *deregistered*, never edited or moved — which is what makes `lock` able to promise a byte-identical restore of something it never changed |
 | `tools/golden-score/score.py`'s own refusals | decision 13's carve-out is a **different permission** and an unlock does not widen it |
 
 **So exactly one file is mutated: `.claude/settings.json`.** `unlock` copies its
@@ -85,7 +85,7 @@ STASHED_SHA = STATE_DIR / "settings.sha256"
 #: keep in step with `settings.json`.
 MARKER = "golden-answer"
 
-HOOK_NAMES = ("guard-golden-answer.sh", "guard-sealed-key.sh")
+HOOK_NAMES = ("guard-golden-answer.sh", "guard-sealed-key.sh", "guard-golden-traversal.sh")
 
 
 def _sha(data: bytes) -> str:

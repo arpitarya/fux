@@ -497,7 +497,10 @@ is the surrounding process:
   The room is not empty.**
 - **The three routes no guard sees.** A recursive `grep`, `rg`, `find` or `ls`
   over `work/` that never names the folder — L11 makes excluding `work/golden/`
-  part of the rule. **A paste**: an answer put into a Claude session's context by
+  part of the rule. ⚠ **Partly guarded since 2026-09-27** (W-223):
+  `guard-golden-traversal.sh` refuses a shell walk whose root can reach the tree
+  and that has no golden exclusion; a program that walks on its own is still
+  prose. **A paste**: an answer put into a Claude session's context by
   any hand is a leak to declare, never a permission that arrived by another door.
   And **a Cowork session's mount**, which reaches the directory with a plain
   shell call that no deny rule and no hook sees — **accepted, not closed.**

@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@7362c4192986, src/fux/store/nodebundle.py@071a24a596dd]
+owns: [node@95e1b29a4354, src/fux/store/nodebundle.py@071a24a596dd]
 laws: [L1, L3, L4, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 67e74524110106da5e96353789074639c08f605ba81ac03cee8e26d789e983d1
+content_sha: 8afc5661f25c6c324c45f8a5daed429a6c102e06862e4e8a63a22023b038586f
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -865,15 +865,12 @@ unported. ⚠ **`fux serve` is Python-only for the same reason `fux observe` is*
 ([SR-SERVE](0158_serve.md)): it is a surface, not a reader, and the differential
 law reaches readers.
 
-**20. RM3 is transcribed, not diverged** (W-168 step 5, 2026-09-23).
-[`query/rm3.mjs`](../node/src/query/rm3.mjs) is `rm3.py`'s twin and
-`runQuery` runs it where `run_query` does: after the expansion is built, only
-when `rm3Weight > 0` and no `expand` was passed, with `lexical` forcing it off.
-🔴 **The RM1 sum runs in the Python twin's order** — documents in rank order,
-terms in ascending hash order — because the ten terms are picked by comparing
-floats, and a different summation order can pick a different tenth term.
-`tests/query/test_rm3.py` holds the two readers byte-equal through each one's
-own `tune.toml` loader.
+**20. ~~RM3 is transcribed, not diverged~~ — SUPERSEDED 2026-09-27.**
+`query/rm3.mjs` and `rm3.py` were deleted in one change
+([SR-EXPAND](0149_expand.md) decision 17), and `runQuery` and `run_query`
+lost the RM3 block together, so the differential law is held by the deletion
+itself. The loader refuses `rm3_weight` by name in both readers, with the same
+sentence.
 
 ### Consequences
 

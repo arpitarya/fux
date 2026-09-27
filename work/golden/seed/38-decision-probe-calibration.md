@@ -1,0 +1,42 @@
+---
+title: "Probe calibration: why the ice-point bench"
+doc_id: QCL-QA-CAL-02
+owner: Revathi Iyer
+contributors:
+  - Anjali Deshmukh
+department: QA and Compliance
+status: in_force
+effective_date: 2025-08-12
+---
+
+# Probe calibration: why the ice-point bench
+
+## What we had
+
+Until July 2025 every hand-held probe went to Metrosure Labs, Pune, once a
+quarter. Each lab round took the probes away for 9 working days, at Rs. 1,450 per probe per visit.
+With 64 probes across three DCs that came to Rs. 3.71 lakh a year, and the
+probes were away exactly when the night shifts needed them.
+
+## What pushed the change
+
+The March 2025 investigation at Nagpur found a hand-held probe reading 1.1 C
+high three weeks after its lab certificate. A quarterly lab visit does not catch
+drift that fast.
+
+## What was chosen
+
+A monthly ice-point check at the Nagpur QA bench, with one external lab
+calibration a year kept for traceability. The BharatVac annex QF-Pharma-04 asks
+for a traceable certificate on every instrument used as evidence, and quotes
+±0.5 C for hand-held instruments; the bench pass band was set to match. USB
+loggers are held tighter, at 0.3 C, because in a dispute the logger file is the
+evidence and the probe is only the first look.
+
+## What was turned down
+
+A boiling-point check was rejected: at Nagpur's height water boils below 100 C, and a kettle on a night bench is a scald waiting to happen.
+Self-checking probes at Rs. 18,000 each were rejected on cost. Sending probes to
+the lab every month was rejected because it doubled the time probes spent away.
+
+Agreed by Revathi Iyer and Anjali Deshmukh on 3 August 2025.

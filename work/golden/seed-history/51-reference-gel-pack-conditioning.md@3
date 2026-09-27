@@ -1,0 +1,30 @@
+---
+title: "Gel packs and passive shippers: terms and figures"
+doc_id: QCL-QA-GEL-03
+owner: Revathi Iyer
+department: QA and Compliance
+status: in_force
+effective_date: 2026-04-08
+---
+
+# Gel packs and passive shippers: terms and figures
+
+## Packs
+
+- **blue-cap pack** — conditioned at +5.0 C; the only pack used for pharma.
+- **white-cap pack** — conditioned at -20 C; frozen goods only, never in a shipper with blue-cap packs.
+- **cycle** — one conditioning and one use. A pack is retired after 60 cycles; the count is kept by punching the tab on the pack.
+
+## Shippers
+
+- **shipper conditioning time** — 18 hours at +5.0 C, for every pack in the shipper.
+- **packs per shipper** — 22 blue-cap packs.
+- **shipper fleet** — PS-01 to PS-12, at Nagpur.
+
+## Cabinet
+
+| item | figure |
+|---|---|
+| cabinet | CC-1, Nagpur QA room |
+| set point | +5.0 C |
+| alarm band | +3.0 C to +7.0 C |

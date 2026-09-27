@@ -6,11 +6,12 @@ title: "SR-WORK-TESTDATA (0068) — what test data creation must carry: one chec
 description: "The checklist every piece of golden test data is authored against — seed documents, question sets, rungs. Each item is one line and points to the record that states it; the items with no other home are stated here. Every prompt that creates test data links this record and names the items it carries, and a test fails when one does not."
 status: accepted
 date: 2026-09-22
+amended: 2026-09-25
 feature: the test-data checklist — what a seed document, a question set or a rung must contain before any measurement on it can mean anything
-owns: [tests/test_test_data_prompts.py@bd8b66eef82e]
+owns: [tests/test_test_data_prompts.py@bc9f0c0c3959, tools/golden-history@c5dad1092faa, tests/test_golden_history.py@ffae3050d744]
 laws: [L0, L11]
 timestamp: 2026-09-22T00:00:00Z
-content_sha: 7e097297f321067ed5d7e1e1e4ce84741a10ff4caa6ccd7c665044f719952baf
+content_sha: eb899d54614fdb79457ea5491bf6cd16ad1bc3b9fc95894c88acf58411700077
 ratifies: "Arpit, 2026-09-22 — 'note it down that this is also one of the cases that need to be tested. So in future, the prompt or test data creation should account for this use case … create a work document which will just have pointers what all things test data creation should have … keep everything precise … I was talking about SR work document'"
 ---
 
@@ -18,7 +19,9 @@ ratifies: "Arpit, 2026-09-22 — 'note it down that this is also one of the case
 
 **Owns** — the components this record decides:
 
+- [`tests/test_golden_history.py`](../tests/test_golden_history.py) · file
 - [`tests/test_test_data_prompts.py`](../tests/test_test_data_prompts.py) · file
+- [`tools/golden-history/`](../tools/golden-history) · dir
 
 <!-- COMPONENTS-END -->
 
@@ -102,6 +105,14 @@ could check against them.
      a corpus that **has** history — several authors and commits over time —
      never on a synthetic ladder rebuilt at one stamp. *Why:* the git
      authority prior (step 8) otherwise stays a proposal by its own terms.
+     **How it is carried (Arpit, 2026-09-25: *extend the seed, rebuild the
+     ladder*):** earlier revisions of a seed document are rows in
+     `work/golden/seed-history.tsv`, their full text in
+     `work/golden/seed-history/`, and the rung builder replays them through
+     [`tools/golden-history/replay.py`](../tools/golden-history/replay.py),
+     which states the format. The document's **last** commit stays on its
+     `seed-dates.tsv` date, so `mtime` and the recency prior do not move; a rung's
+     `.coverage` gains the history census only when there is history.
 
 4. 🔴 **A new failure class becomes a new item here, in the same change that
    finds it.** A measurement that comes back empty because the data lacked an

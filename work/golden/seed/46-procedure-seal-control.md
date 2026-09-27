@@ -1,0 +1,23 @@
+---
+title: "Seals: fitting and recording them at the gate"
+doc_id: QCL-FL-SEAL-01
+owner: Col. (retd.) H. S. Sandhu
+department: Fleet
+status: in_force
+effective_date: 2026-03-05
+---
+
+# Seals: fitting and recording them at the gate
+
+## Fitting
+
+1. Take the next seal in number order from the open seal book; never skip a number.
+2. Owned reefers get a bolt seal on the rear door hasp; hired trucks get a cable seal.
+3. Write the seal number on the dispatch note and in seal register QCL-F-35 before the vehicle moves.
+4. Photograph the seal with the dock clock in frame.
+5. A seal spoiled while fitting is cut, bagged with its stub, written VOID in QCL-F-35 and returned to Stores within 24 hours.
+
+## At the destination
+
+6. The receiver reads the number before cutting; a mismatch or a broken seal is photographed and Fleet Control is called on extension 301 before the doors open.
+7. Cut seals from a completed trip are kept in the trip bag for 30 days.

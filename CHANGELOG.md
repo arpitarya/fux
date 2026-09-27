@@ -8,12 +8,15 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
-### Changed
+### Removed
 
-- **RM3 learns from the documents `ask` shows (W-221).** With `[ranking]
-  rm3_weight` above `0`, the ten feedback documents are now the top 10 after
-  the reranker, a pin and the graph tier, not the bare lexical ten. The default
-  `rm3_weight = 0.0` runs no RM3, so nothing changes unless you set it.
+- **RM3 and `[ranking] rm3_weight` are gone (W-224).** RM3 failed its
+  pre-registered run twice, on drift: every weight lost 6 to 13 questions that
+  were right at rank 1. It shipped at `0.0`, which ran nothing, so **no ranking
+  changes**. ⚠ **A `.fux/tune.toml` that still sets `rm3_weight` is now
+  refused**, with an error that names the removal. `fux setup` wrote the line
+  from 3.0.0-alpha.3 on, so delete it. `--expand` and `expand_weight` are
+  untouched.
 
 ## [3.0.0-alpha.5] - 2026-09-25
 

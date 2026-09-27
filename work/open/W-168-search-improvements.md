@@ -4,8 +4,87 @@ name: W-168
 description: "The ten ranking improvements of proposals/search-improvements-v3.md, promoted as one program with ten gated steps: anchor text, corpus-mined expansion, unstemmed identifier field, RM3, supersession-aware ranking, SDM proximity, MMR diversification, git authority prior, intent → doc-type prior, section-level units. Each step is its own golden question → pre-registration → build → measure → keep/remove; never two in one arm."
 item: W-168
 filed: 2026-09-14
-ball: arpit
+ball: agent
 ---
+
+## ✅ STEP 4 PRE-REGISTERED — 2026-09-27 (Claude Code, Opus); the build is next
+
+[The frozen bar](../regression/2026-09-27-mined-expansion/PRE-REGISTRATION.md).
+**Nothing is built and no treatment number exists.**
+
+- **One family:** `Long Form (ABBR)` pairs, mined per document at ingest, stored
+  as hashes on the declaring document's own record, folded at read time. It is
+  scored through `expand.build` at a new `[ranking] mined_weight` (default
+  `0.0`); the arms are `{0.1, 0.2, 0.3, 0.5}`, first that clears.
+- **Glossary lines and `aliases:` are NOT in the arm.** All 22 tagged questions
+  already carry a `Term (ABBR)` form. A glossary line gives a definition, not a
+  synonym. `aliases:` has no tagged question.
+- **Tag `expansion_form`:** step_pools' rule, restricted to rung-01000's
+  manifest seed, checked by hash. 22 of 80, the ruled count.
+- **Pool 10 ≥ 6: no stop.** Drift exposure 41 rank-1 hits; one loss fails a value.
+- ⚠ **A `_format` bump**, so the arms run on a re-ingested COPY of rung-01000
+  (`9cdde333`), never the rung itself.
+- **Next:** build step 4 (**Opus**: a record-shape change in both readers and
+  the accelerator). Then capture both arms at one commit. Then Arpit scores.
+- ⚠ **The prompt-4 rebuild needs a DIFFERENT session.** This one opened
+  `work/golden/questions/` (for W-224's byte-identity replay and for the tag),
+  which prompt 4 forbids.
+
+## ✅ PROMPT 11 RUN — 2026-09-27 (Arpit's hand); generation 3 is in the tree
+
+- A designated claude.ai chat authored generation 3. Blocks 1–4 are in the tree:
+  - 26 new seed documents;
+  - `seed-dates.tsv` rows;
+  - `seed-history.tsv` (34 lines) and `seed-history/` revisions;
+  - `questions/set-4-u.jsonl`, 125 rows of `{id, question}`.
+- Block 5, the key, is Arpit's alone. This session did not look for it.
+- **Next, in order:**
+  1. A **prompt-4** session rebuilds the eight rungs, which replays the history through `replay.py`.
+  2. **Prompt 5** runs `set-4-u`.
+  3. 🔴 Arpit scores it.
+  4. Each step 6–10 counts its own pool; below 6 stops that step.
+- Step 4 does not wait on any of this.
+
+## ✅ RULED 2026-09-27 (Arpit, Cowork) — step 10's forks U0 · B2 · E1; step 5 FAIL again, and RM3 is removed
+
+- **Step 10:** *"W168 go with the recommendation"* →
+  [`section-units`](../compare/section-units.compare.md) **U0 · B2 · E1**:
+  - a best-section term inside the existing rerank stage, with no index change;
+  - `[ranking] section_weight`, default `0.0`;
+  - judged on `hit@1` over the `step10_section` pool, with `section@1` beside it.
+
+  Its pre-registration still waits on generation-3 data (prompt 11, then the
+  rebuild and a scored `set-4-u`). A pool below 6 stops it.
+- **Step 5:** the W-221 re-run on the boosted first pass is filed **FAIL
+  (drift)**, the same as 2026-09-23. *"remove all the RM3 related code"* →
+  W-224 (built 2026-09-27: [SR-EXPAND](../../records/0149_expand.md) decision 17). Step 5 stays in this
+  list as a failed step.
+
+## 🔴 STEPS 6–10 UNBLOCKED AS FAR AS AN AGENT CAN — 2026-09-25 (Claude Code, Opus); the rest is Arpit's hand
+
+**Ruled by Arpit, 2026-09-25:**
+- **A fresh, designated Claude session authors the next set.** It is not this
+  session, which has read set-3-u's ids and rank movements in step 1's verdict
+  (prompt 3's freshness rule).
+- **Step 8's history goes into the seed, and the ladder is rebuilt** — a new
+  baseline.
+
+**Done, agent side:**
+
+| step | blocker | what was done |
+|---|---|---|
+| 6 SDM | no tagged input | [prompt 11](../golden/prompts/11-claude-gen3-feature-input-seed.md) Input 2 — two passages with the same words, one answering |
+| 7 MMR | no tagged input; *graph in `ask`* | Input 3 — facet clusters with a crowded facet, `facets` in the key. ✅ **The graph dependency is already met**: `ask` runs `lexical → graph → split` today (SR-ASK) |
+| 8 authority | no corpus with history | Input 4 — authority pairs with a recency trap. **The instrument:** [`tools/golden-history/replay.py`](../../tools/golden-history/replay.py) + `seed-history.tsv`, wired into the rung builder. With no history file the builder reproduces the old ladder: same authors, dates, messages and trees on a scratch `rung-seed` |
+| 9 intent | pool below 6 | Input 1 — topic triples of `-procedure-` / `-decision-` / `-reference-` files, ≥ 25 cue questions (D2 · I1, as ruled) |
+| 10 section units | owes a compare doc | [`compare/section-units`](../compare/section-units.compare.md) — **U0 · B2 · E1 recommended**; Input 5 — long documents with one-section answers |
+
+**Next, in order:**
+1. ✅ ~~**Arpit:** run prompt 11 in a new claude.ai chat, and commit blocks 1–4~~, done 2026-09-27.
+2. A **prompt-4** session rebuilds the eight rungs, which replays the history.
+3. **Prompt 5** runs `set-4-u`. 🔴 Arpit scores it. Each step then counts its
+   own pool: **below 6 stops that step**, as before.
+4. ✅ ~~**Arpit:** step 10's forks~~, ruled U0 · B2 · E1 on 2026-09-27.
 
 ## 🔴 STEP 1 DECIDED BY THE TABLE 2026-09-24 — INCONCLUSIVE; the ruling is Arpit's
 
@@ -67,8 +146,9 @@ at `cfca651a`) and files `VERDICT.md`. INCONCLUSIVE → Arpit.
   `--no-tune` no longer switching anchor off) · SR-RANKING 12c–12d · SR-INGEST new 17e.
 - **L3:** this repo ingested from empty under `0.0` and under `1.0` gives
   byte-identical `.fux/index/` (1 792 documents, one hash).
-- **Four surfaces:** scan = accelerator (`tools/differential/run.py`), Node =
-  bundle = Python (`node_arm.py`, both arms), at `anchor = 1.0` — see WORKLOG.
+- **Four surfaces, at `anchor = 1.0`:** scan = accelerator, **22 144
+  comparisons byte-identical** (`tools/differential/run.py --skipping both`);
+  Node = bundle = Python, **0 of 225 discordant** (`node_arm.py`, both arms).
 - **Tests:** a new test holds `ANCHOR`, `K1` and `B` equal across the two
   engines (only their spelling was checked before); the anchor tests now cover
   the default, off, and 2.0.
@@ -184,8 +264,8 @@ the scores and does not adjudicate them.
 
 **No treatment number exists.** The mechanism is the frozen one, in both readers.
 
-- **Built:** [`query/rm3.py`](../../src/fux/query/rm3.py) and its twin
-  [`rm3.mjs`](../../node/src/query/rm3.mjs). Top 10 documents from an
+- **Built:** `query/rm3.py` and its twin `rm3.mjs` — both deleted 2026-09-27
+  by W-224 ([SR-EXPAND](../../records/0149_expand.md) decision 17). Top 10 documents from an
   un-expanded first pass, their committed records, 10 RM1 terms, scored through
   `expand.build` at `[ranking] rm3_weight` (default **`0.0`**: no first pass).
 - **Decided in the build, declared** in [SR-EXPAND](../../records/0149_expand.md) decision 16:

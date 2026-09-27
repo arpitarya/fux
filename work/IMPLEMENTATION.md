@@ -26,12 +26,53 @@ Rules:
 
 ---
 
+## 2026-09-27 — **W-224: RM3 removed; W-168 step 4 pre-registered**
+
+**Outcome: RM3 is gone from both readers, and no ranking moved.**
+- **Removed:** `src/fux/query/rm3.py`, `node/src/query/rm3.mjs`, the RM3 block
+  and `_first_pass` in `run_query`, the RM3 block in `runQuery`, and
+  `rm3_weight` from both `Tune`s and the setup template. `query/__init__.py` and
+  `run.mjs` are byte-identical to `36c913c7^`, their form before RM3.
+- **Refused by name:** `rm3_weight` joined `_REMOVED_KEYS` and its Node twin
+  (SR-TUNE decision 15). This departs from the handoff's *"as an unknown key"*:
+  `fux setup` wrote the line from alpha.3 on, and decision 15 exists for exactly
+  that case. It is still refused, with no alias and no silent ignore.
+- **Byte identity:** 144 `ask`/`find --json` outputs (36 queries × 2 verbs ×
+  `rung-01000` and this repo), captured before the removal, replayed after:
+  **0 differ.**
+- **Tests:** `tests/query/test_rm3.py` deleted; the RM3 rows are out of the
+  parity and boundary tests; `test_rm3_weight_is_refused_by_both_readers` added.
+  Unit suite: green except 12 failures that are not this change's. Eight are
+  the ladder-seed check, waiting on the generation-3 rebuild. Four are the
+  LAW-11 / WORK-golden hashes and amendment block, which sit in another
+  session's uncommitted edit. e2e 151 passed; Node 88 passed.
+- **Records:** SR-EXPAND 17 (supersedes 16), SR-TUNE 18, SR-CLI 12, SR-ANSWER 15,
+  SR-CONFIDENCE 18, SR-NODE-SEARCH 20, SR-ASK / SR-FIND / SR-OUTPUT consequence
+  lines, BIBLIOGRAPHY, GLOSSARY, the paper, CHANGELOG (Unreleased/Removed).
+- **Vendored bundle** `.fux/node/fux.mjs` rebuilt; its only diff is the removal.
+- **W-168 step 4:** [pre-registration](regression/2026-09-27-mined-expansion/PRE-REGISTRATION.md),
+  tag 22 of 80, pool 10, no stop. Nothing built.
+
+## 2026-09-25 — **W-222 withdrawn: the reader gap is the ruled `Math.log` ulp**
+
+**Outcome: no engine change.** The last-bit difference in `file:rank01.md`'s
+expanded score (`…099` in Python, `…0997` in Node) comes from `idf(12, 43)`:
+`math.log` gives `1.2584609896100056`, `Math.log` gives `1.2584609896100059`.
+[SR-NODE-SEARCH](../records/0153_node-search.md) decision 1 already rules that
+tolerance: ordering byte-equal, scores equal after `round(9)`. The test had
+asserted bit-equality, which is stricter than the record.
+- **Test:** `tests/query/test_rm3.py::test_node_reader_feeds_back_the_same_list`
+  now asserts the decision-1 contract at both `0.0` and `0.3`; the strict xfail
+  is gone.
+- **Evidence:** the two `log` values above, reproduced on this machine; both
+  suites whole (WORKLOG 2026-09-25).
+
 ## 2026-09-24 — **W-168 step 1 shipped: `[bm25f] anchor` defaults to `1.0`**
 
 **Why:** Arpit ruled the anchor run PASS at `1.0` (the table said
 INCONCLUSIVE; [verdict](regression/2026-09-15-anchor-text/VERDICT.md)).
-Shipped per PRE-REGISTRATION §If it passes, in one change, **uncommitted** on
-the shared tree:
+Shipped per PRE-REGISTRATION §If it passes, in one change — committed as
+`93b685d3`, together with a concurrent session's archive work:
 - **Default:** `ANCHOR = 1.0` in `query/bm25f.py` and `query/bm25f.mjs`.
 - **Records:** SR-TUNE 17/17a · SR-RANKING 12c–12d · SR-INGEST 17e ·
   SR-RUNTIME-STATS (a no-change note, required by the freshness gate).
@@ -39,7 +80,8 @@ the shared tree:
   byte-identical `.fux/index/` (1 792 documents, one hash).
 - **Four surfaces:** Python = Node = bundle, **0 of 225 discordant** in both
   `node_arm.py` arms (with this repo's tune file, and with `--no-tune`).
-  Scan = accelerator: `tools/differential/run.py` — see the WORKLOG.
+  Scan = accelerator: `tools/differential/run.py --skipping both`, **22 144
+  comparisons byte-identical** at `anchor = 1.0`.
 - **Suites:** e2e 152/152; units 5 623 passed, and the 1 failure is another
   session's `correct.py` edit, which this change does not touch.
 - ⚠ **Upgrade divergence** (in the CHANGELOG): a repo that ran `fux setup`,

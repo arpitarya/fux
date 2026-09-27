@@ -66,7 +66,7 @@ export const INDEX_TABLE = "index";
 //: The closed key set. Table -> keys. Adding one here is a change to SR-TUNE.
 const SCHEMA = {
   bm25f: ["k1", "b", ...FIELD_KEYS, "anchor"],
-  ranking: ["rerank_weight", "expand_weight", "rm3_weight"],
+  ranking: ["rerank_weight", "expand_weight"],
   // The six `ask_*` keys are W-161's graph tier. They are parsed and carried
   // here so a consumer's committed `tune.toml` is accepted identically by both
   // readers; whether the Node reader COMPOSES the tier is
@@ -128,6 +128,14 @@ const REMOVED_KEYS = new Map([
     "untouched: `supersedes:` in frontmatter, the `superseded` record property, " +
     "the graph edge, `fux explain`, and the declared tie-break that puts a live " +
     "document above a retired one at an equal score"],
+  ["ranking.rm3_weight",
+    "was REMOVED on 2026-09-27 (W-224). RM3 -- ten feedback terms borrowed " +
+    "from fux's own top ten -- FAILED its pre-registered run twice, on drift: " +
+    "every weight lost 6 to 13 questions that were right at rank 1 " +
+    "(work/regression/2026-09-23-rm3/VERDICT.md, " +
+    "work/regression/2026-09-25-rm3-boosted/VERDICT.md). Delete the key; " +
+    "ranking is unchanged, because it shipped at 0.0 (off). Supplying the " +
+    "words yourself is untouched: `--expand`, weighted by `expand_weight`."],
 ]);
 
 /** Every tunable, resolved. Build it with `loadTune`; the defaults are the engine's. */
@@ -146,9 +154,6 @@ export class Tune {
     // The three DOCUMENT priors were removed on 2026-09-13 (W-151, W-152).
     this.rerankWeight = 0.0;
     this.expandWeight = 0.2;
-    // W-168 step 5 — RM3 feedback terms' weight. 0 = off, and off runs no first
-    // pass at all; it turns on only on a pre-registered PASS.
-    this.rm3Weight = 0.0;
     // [graph]
     this.damping = 0.85;
     this.iterations = 3;
@@ -427,7 +432,6 @@ export function loadTune(root, { enabled = true } = {}) {
 
   const rerankWeight = pick(ranking, "ranking", "rerank_weight", 0.0);
   const expandWeight = pick(ranking, "ranking", "expand_weight", 0.2);
-  const rm3Weight = pick(ranking, "ranking", "rm3_weight", 0.0);
 
   const graph = data.graph ?? {};
   const damping = pick(graph, "graph", "damping", 0.85, fraction);
@@ -507,7 +511,7 @@ export function loadTune(root, { enabled = true } = {}) {
 
   return new Tune({
     k1, b, fieldWeights: weights, anchorWeight,
-    rerankWeight, expandWeight, rm3Weight,
+    rerankWeight, expandWeight,
     damping, iterations, laziness, hopDecay, expandLimit, seedDepth,
     askBoost, askRelated, askKinds, askLinkIdf, askMaxHops, askRelatedLimit,
     separationFloor, docCoverageFloor,

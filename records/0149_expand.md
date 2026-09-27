@@ -7,11 +7,11 @@ description: "`--expand` scores agent-supplied terms at a lower weight beside th
 status: accepted
 date: 2026-09-05
 feature: agent-side query expansion and multi-query fusion
-owns: [src/fux/query/expand.py@19b697b80e8c, src/fux/query/fuse.py@749673d52166, src/fux/query/rm3.py@dd68a14c26a1, node/src/query/expand.mjs@403a0aa73adc, node/src/query/fuse.mjs@de8c87e1d265, node/src/query/rm3.mjs@4137e3b63203]
+owns: [src/fux/query/expand.py@19b697b80e8c, src/fux/query/fuse.py@749673d52166, node/src/query/expand.mjs@403a0aa73adc, node/src/query/fuse.mjs@de8c87e1d265]
 laws: [3, 4, 8]
 ratifies: W-109
 timestamp: 2026-09-05T00:00:00Z
-content_sha: b395a2bc358674dedf7361ab8af501abaec9a386b5e466ed9ffd9ed4219bb6b9
+content_sha: 85369c2ac1e2fdc3ca44d88f35ef4157bdb681ac0e1248c84b699c0115a34ef4
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -20,10 +20,8 @@ content_sha: b395a2bc358674dedf7361ab8af501abaec9a386b5e466ed9ffd9ed4219bb6b9
 
 - [`node/src/query/expand.mjs`](../node/src/query/expand.mjs) · file
 - [`node/src/query/fuse.mjs`](../node/src/query/fuse.mjs) · file
-- [`node/src/query/rm3.mjs`](../node/src/query/rm3.mjs) · file
 - [`src/fux/query/expand.py`](../src/fux/query/expand.py) · file
 - [`src/fux/query/fuse.py`](../src/fux/query/fuse.py) · file
-- [`src/fux/query/rm3.py`](../src/fux/query/rm3.py) · file
 
 <!-- COMPONENTS-END -->
 
@@ -284,45 +282,35 @@ committed document, pointing at this one. `required` is still the user's own
 hashes in both cases — what changed is where a match may be found, not what
 counts as one.
 
-**16. RM3 is an expansion the ENGINE writes, scored through this record's
-object and refused by this record's guard** (W-168 step 5, 2026-09-23).
-[`query/rm3.py`](../src/fux/query/rm3.py) takes the top 10 documents of an
-un-expanded first pass, reads their **committed** records, and picks the 10
-term hashes with the highest RM1 weight — `Σ_d P(t|d) · P(q|d)`, `P(t|d)` the
-weighted tf over `wlen`, `P(q|d)` the first-pass score normalised over the ten,
-the query's own terms excluded, ties by ascending hash. Those ten go through
-`expand.build` at `[ranking] rm3_weight`, with `required` = the original query.
+**16. ~~RM3 is an expansion the ENGINE writes~~ — SUPERSEDED 2026-09-27 by
+decision 17.** It was built on 2026-09-23 (W-168 step 5) and removed on the
+ruling decision 17 records.
 
-- 🔴 **Decision 3 holds unchanged.** A document matching only feedback terms is
-  dropped in `rank()` exactly as one matching only `--expand` terms is. RM3
-  adds no scoring arithmetic of its own.
-- **`rm3_weight = 0.0` is the default and runs no first pass**, so an
-  unconfigured corpus is byte-identical to the engine before the key existed.
-- **A caller's `--expand` wins**: RM3 does not run beside one. Both are the same
-  act, and stacking them would score words neither party chose.
-- **`fux lexical` never runs it** ([SR-CLI](0101_cli-surface.md) decision 12):
-  the baseline is the words the user typed.
-- **The first pass writes no statistics.** The band and `--why` describe the
-  final pass only, and the band is built on the original query as decision 10's
-  neighbours already require.
-- **The first pass is the list `ask` would show without RM3** (W-221,
-  Arpit, 2026-09-25): the un-expanded window, then the reranker, the pin and
-  the graph tier's reorder (Tier A), and its top 10. `P(q|d)` is unchanged
-  because the tier reorders without rescoring, so each document keeps the
-  lexical score `rank()` gave it. With the tier and the reranker off, this is
-  the lexical top 10 exactly. ⚠ **Until 2026-09-25 it was the LEXICAL
-  ranking**, before all three stages, so on a boosted corpus the feedback set
-  was not the list `ask` prints. The 2026-09-23 FAIL below measured that
-  version.
-- 🔴 **Measured and FAILED — drift** (Arpit, 2026-09-23;
-  [verdict](../work/regression/2026-09-23-rm3/VERDICT.md)). Against the frozen
-  bar in [`2026-09-23-rm3`](../work/regression/2026-09-23-rm3/PRE-REGISTRATION.md),
-  every weight lost baseline rank-1 hits (6 → 11) and none cleared the gain bar.
-  **`rm3_weight` stays `0.0`**; RM3 is reachable only through a caller's own
-  `--expand`. **Reopened 2026-09-25** by that route: Arpit ruled the re-run on
-  W-221, and the new run is
+**17. 🔴 RM3 is REMOVED, and `rm3_weight` is refused by name** (Arpit,
+2026-09-27, W-224: *"mark RM3 as fail. and remove all the RM3 related code"*).
+Decision 1 holds again without exception: **fux writes no expansion.** The only
+expansion is the caller's own `--expand`, at `expand_weight`.
+
+- **Two runs, two first passes, one failure: drift.** Against the frozen bar in
+  [`2026-09-23-rm3`](../work/regression/2026-09-23-rm3/PRE-REGISTRATION.md),
+  feedback from the lexical first pass lost 6 → 11 baseline rank-1 hits and no
+  weight cleared the gain bar
+  ([verdict](../work/regression/2026-09-23-rm3/VERDICT.md)). The W-221 re-run,
+  with feedback from the list `ask` shows,
   [`2026-09-25-rm3-boosted`](../work/regression/2026-09-25-rm3-boosted/PRE-REGISTRATION.md),
-  against the same frozen bar. `rm3_weight` stays `0.0` until that run's verdict.
+  lost 6 → 13 and cleared nothing
+  ([verdict](../work/regression/2026-09-25-rm3-boosted/VERDICT.md)).
+- **It does not come back as a tunable.** Both first passes are gone, so the
+  ruling settles the boosted-versus-lexical question too.
+- **Removing it moves no ranking.** The key shipped at `0.0`, and `0.0` ran no
+  first pass, so every `ask`, `find` and `answer` on a config without the key is
+  byte-identical to the engine before it existed.
+- **A `tune.toml` that still sets `rm3_weight` is refused**, and the error
+  names the removal ([SR-TUNE](0135_tuning.md) decision 15's table), because
+  `fux setup` wrote the key into every file it created from 3.0.0-alpha.3 on.
+  There is no alias and no silent ignore.
+- **The evidence stays.** Both regression directories, and their frozen
+  `decide.py`, are history and are not engine code.
 
 ### Consequences
 
@@ -367,10 +355,9 @@ the query's own terms excluded, ties by ascending hash. Those ten go through
 
 ### Alternatives considered
 
-- **Fux writes the expansion** (PRF/RM3, or a model). PRF is deterministic and
-  buildable and is **out of scope by W-109**, never shipped by default; a model
-  is refused by L3 outright. Neither is refused on quality grounds, and PRF may
-  be measured as an arm.
+- **Fux writes the expansion** (PRF/RM3, or a model). A model is refused by L3
+  outright. PRF was measured as an arm, twice, and **refused on the
+  measurement** (decision 17): it drifted at every weight.
 - **Score-space fusion**, as the deleted dense lane did. Refused: decision 8.
 - **An `[expand]` table with its own weight, boost and depth keys.** Refused —
   one knob, on the table the ranking already reads. A second table is how

@@ -209,55 +209,21 @@ def run_query(
         query_hashes, query_term_hashes(expand) if expand else [], tune.expand_weight
     )
 
-    use_accel = False
     if not force_scan:
         from ..derive import accel, format as derive_fmt
 
-        use_accel = (derive_fmt.runtime_dir(root) / derive_fmt.STATS_NAME).exists() and accel.is_fresh(root)
-
-    # W-168 step 5 — RM3. **Off at `0.0`, and off means no first pass runs.**
-    # A caller's own `--expand` wins: it is the explicit form of the same act,
-    # and stacking an engine expansion on an agent's would score words neither
-    # chose. The first pass is un-expanded, on the SAME path the answer will
-    # use, with no stats written — the confidence block and `--why` describe
-    # the final pass only.
-    #
-    # W-221 (Arpit, 2026-09-25): **the feedback set is the list `ask` would
-    # show without RM3** — rerank, pin and the graph tier's reorder, then its
-    # top `FB_DOCS`. Until then it was the lexical window, which on a boosted
-    # corpus is not the list anyone sees. The tier keeps each document's
-    # lexical score, so `P(q|d)` means what it always meant.
-    if tune.rm3_weight > 0 and not expand and query_hashes:
-        from .rm3 import FB_DOCS, feedback_terms
-
-        first_top = max(depth, FB_DOCS)
-        if use_accel:
-            first = accel.ask(
-                root, query, top=first_top, weighting=weighting, archived_dirs=dirs,
-                scoring=scoring,
+        if (derive_fmt.runtime_dir(root) / derive_fmt.STATS_NAME).exists() and accel.is_fresh(root):
+            results = accel.ask(
+                root, query, top=depth, weighting=weighting, archived_dirs=dirs,
+                scoring=scoring, stats_out=stats, expansion=expansion,
             )
-        else:
-            first = scan_ask(
-                root, query, top=first_top, weighting=weighting, archived_dirs=dirs,
-                scoring=scoring,
+            final = _compose(
+                root, query, results, rerank_weight, top, depth, tune, stats, related_out,
+                trace_out,
             )
-        shown = _first_pass(root, query, first, rerank_weight, first_top, tune)
-        expansion = build_expansion(
-            query_hashes, feedback_terms(root, shown, query_hashes, scoring), tune.rm3_weight
-        )
-
-    if use_accel:
-        results = accel.ask(
-            root, query, top=depth, weighting=weighting, archived_dirs=dirs,
-            scoring=scoring, stats_out=stats, expansion=expansion,
-        )
-        final = _compose(
-            root, query, results, rerank_weight, top, depth, tune, stats, related_out,
-            trace_out,
-        )
-        _fill_trace(trace_out, results, rerank_weight)
-        _fill_confidence(confidence_out, stats, query, final, tune)
-        return final, "accelerator"
+            _fill_trace(trace_out, results, rerank_weight)
+            _fill_confidence(confidence_out, stats, query, final, tune)
+            return final, "accelerator"
     results = scan_ask(
         root, query, top=depth, weighting=weighting, archived_dirs=dirs,
         scoring=scoring, stats_out=stats, expansion=expansion,
@@ -328,24 +294,6 @@ def _compose(root, query, window, rerank_weight, top, depth, tune, stats, relate
         related_out.extend(split.related)
     _band_guard(root, query, stats, split.results)
     return split.results
-
-
-def _first_pass(root, query, window, rerank_weight, depth, tune):
-    """RM3's feedback set: `_compose`'s ordering, silently, top `FB_DOCS`.
-
-    The same three stages in the same order — rerank, pin, Tier A — so the ten
-    documents are the ten `ask` would print at `rm3_weight = 0.0` (W-221). It
-    prints no tier note, builds no Tier B, fills no trace and guards no band:
-    all four describe the answer, and this is not the answer.
-    """
-    from .rm3 import FB_DOCS
-
-    ordered = _apply_pin(root, query, _maybe_rerank(root, query, window, rerank_weight, depth), depth)
-    if not tune.ask_boost:
-        return ordered[:FB_DOCS]
-    from .compose import tiers
-
-    return tiers(root, query, ordered, FB_DOCS, tune, want_related=False).results
 
 
 def _band_guard(root: Path, query: str, stats: dict | None, results: list) -> None:
@@ -1048,9 +996,7 @@ def _ask_shaped(args, *, compose: bool) -> int:
     if not compose:
         import dataclasses
 
-        # W-168 step 5: RM3 is off here too. The baseline is the words the user
-        # typed; feedback terms are words the engine chose (SR-EXPAND 17).
-        tune = dataclasses.replace(tune, ask_boost=False, ask_related=False, rm3_weight=0.0)
+        tune = dataclasses.replace(tune, ask_boost=False, ask_related=False)
     elif getattr(args, "related", None) is False:
         import dataclasses
 

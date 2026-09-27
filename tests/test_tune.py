@@ -8,13 +8,19 @@ and these do not.
 
 from __future__ import annotations
 
+import json
 import re
+import shutil
+import subprocess
+from pathlib import Path
 
 import pytest
 
 from fux.errors import FuxError
 from fux.query.bm25f import B, FIELD_WEIGHTS, K1
 from fux.tune import DEFAULT_TUNE, TUNE_NAME, Tune, load, specimen
+
+ENGINE = Path(__file__).resolve().parents[1]
 
 
 def _write(root, text: str):
@@ -313,6 +319,31 @@ def test_a_removed_key_is_named_even_beside_a_genuine_typo(tmp_path):
     _write(tmp_path, "[ranking]\nsuperseded_weight = 0.5\nnot_a_key = 1\n")
     with pytest.raises(FuxError, match="REMOVED on 2026-09-13"):
         load(tmp_path)
+
+
+def test_rm3_weight_is_refused_by_both_readers(tmp_path):
+    """🔴 W-224: RM3 FAILED twice on drift and was removed on 2026-09-27.
+
+    `fux setup` wrote `rm3_weight` into every `.fux/tune.toml` from 3.0.0-alpha.3
+    on, so the refusal names the removal (SR-TUNE decision 15) — never a silent
+    ignore, never an alias. Both readers refuse the same file, or one of them
+    shrugs at a line the other stops on.
+    """
+    _write(tmp_path, "[ranking]\nrm3_weight = 0.0\n")
+    with pytest.raises(FuxError, match=r"`rm3_weight` was REMOVED on 2026-09-27 \(W-224\)"):
+        load(tmp_path)
+    assert not hasattr(DEFAULT_TUNE, "rm3_weight")
+    assert "rm3_weight" not in specimen()
+
+    if shutil.which("node") is None:
+        pytest.skip("node is not on PATH")
+    script = (
+        f"import {{ loadTune }} from {json.dumps((ENGINE / 'node/src/config/tune.mjs').as_uri())};"
+        f"try {{ loadTune({json.dumps(str(tmp_path))}); console.log('LOADED'); }}"
+        "catch (e) { console.log(e.message); }"
+    )
+    out = subprocess.run(["node", "--input-type=module", "-e", script], capture_output=True, text=True)
+    assert "`rm3_weight` was REMOVED on 2026-09-27 (W-224)" in out.stdout, out.stdout + out.stderr
 
 
 def test_a_removed_key_is_gone_from_the_closed_key_set(tmp_path):

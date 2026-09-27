@@ -29,6 +29,110 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-27 — W-224 built (RM3 removed, byte-identical); W-168 step 4 pre-registered  ·  Claude Code
+- **Asked:** *"implement w one six eight and w two two four"*.
+- **Did:**
+  - **W-224:** RM3 deleted from both readers, the tune, the template and the tests. `rm3_weight` is refused by name in both loaders. Records, CHANGELOG, glossary, paper and bibliography amended, and the vendored bundle rebuilt. Closed and archived.
+  - **Byte identity:** 144 `ask`/`find --json` outputs captured before and replayed after, on `rung-01000` and this repo: 0 differ.
+  - **W-168 step 4:** [pre-registration](regression/2026-09-27-mined-expansion/PRE-REGISTRATION.md), with its tag and pool scripts. Tag 22 of 80, pool 10: no stop.
+  - `BLOCKED.json` → PROCEED: both of its 2026-09-25 questions were already answered.
+- **Decided / open:**
+  - `rm3_weight` goes through `_REMOVED_KEYS` (SR-TUNE d15), not a bare unknown-key error as the handoff said. It is refused either way; flagged.
+  - Step 4's arm is `Term (ABBR)` only. Glossary lines and aliases are left out, because no tagged question needs them.
+  - Not this change's: 8 ladder-seed failures (waiting on the gen-3 rebuild), and the LAW-11 / WORK-golden hash and `**Amended` failures in another session's staged edit.
+- **Next:** build W-168 step 4 (Opus). A *different* session runs prompt 4, because this one opened `questions/`.
+
+## 2026-09-27 — W-223 closed (no cost beyond informed); prompt 11 confirmed run  ·  Cowork
+- **Asked:** *"W223 go with the recommendation W168 check again I believe the questions and everything is already committed"*.
+- **Did:**
+  - Recorded W-223 question 1 as **no cost beyond `informed`**. Closed and archived W-223 with its map row.
+  - Checked prompt 11's output by listing specific paths only, never the key directory: 26 new seed documents, `seed-dates.tsv`, `seed-history.tsv` + `seed-history/`, and `set-4-u.jsonl` (125 rows, `id` and `question` only).
+  - Removed the W-168 inbox row, and re-balled W-168 🟢. The inbox is empty.
+- **Found:** a `git status` from the bridge left an empty `.git/index.lock` behind, because the bridge could not unlink it. Removed with Arpit's delete permission. Bridge sessions should read git with `GIT_OPTIONAL_LOCKS=0`.
+- **Next:** agent — a prompt-4 session rebuilds the rungs, W-224, and pre-registering step 4.
+
+## 2026-09-27 — Rulings: RM3 FAIL and removal (W-224), the W-223 hard guard built, W-168 step 10 forks  ·  Cowork
+- **Asked:** *"W221 mark RM3 as fail. and remove all the RM3 related code"*; *"W223 implement the hard guard"*; *"W168 go with the recommendation"*.
+- **Did:**
+  - Filed the re-run VERDICT **FAIL (drift)**. Closed W-221 and archived it with its map row.
+  - Filed **W-224**, removing all RM3 code: ratified, not built. The boosted-first-pass question goes with the rest of RM3.
+  - Recorded step 10's forks as **U0 · B2 · E1** in the compare doc and in W-168.
+  - Built `.claude/hooks/guard-golden-traversal.sh`, registered it, added it to the switch's `HOOK_NAMES` and to `just golden-guards`, and added `tests/test_golden_traversal_guard.py`.
+  - Amended L11 decision 9 and door 3, and SR-WORK-GOLDEN.
+- **Found:** `rm3.py` matches its frozen pre-registration exactly. The spec itself differs from the reference RM3 (Anserini): every feedback term gets one flat weight, where Anserini weights each by its RM1 probability and interpolates with the original query, and there is no document-frequency filter (Anserini drops terms in more than 10% of documents). Noted for anyone who revisits pseudo-relevance feedback; it does not change the ruling.
+- **Decided / open:** W-223 question 1 (does the breach cost anything beyond `informed`) is still Arpit's.
+- **Next:** Arpit runs prompt 11. Agent: W-224, then pre-register W-168 step 4.
+
+## 2026-09-27 — W-221: the RM3 re-run adjudicated, INCONCLUSIVE by the table  ·  Claude Code
+- **Asked:** *"continue"*, after Arpit's `just golden-score work/regression/2026-09-25-rm3-boosted` (2026-09-26).
+- **Did:** ran the frozen `evidence/decide.py` (unchanged since `5fa2ee4e`), which wrote `decision.json` and `per-query.jsonl`. Filed `VERDICT.md` as INCONCLUSIVE, `ruled_by: pending`. Updated W-221's inbox and open rows, its detail and NOW. This session neither captured the arms nor ran W-221's check. It read score files (ids, ranks, booleans) and did not read the key.
+- **Found:** the same shape as 2026-09-23. No arm clears gain; drift is broken at every weight (6 / 8 / 9 / 13); `0.3` nets +2 below the floor, a case the table does not name. Feeding RM3 the boosted list was not the cause.
+- **Decided / open:** Arpit rules FAIL (drift) or INCONCLUSIVE. Keeping or reverting the boosted-first-pass mechanism is a separate question and is flagged in the verdict.
+- **Next:** Arpit's ruling. Agent: pre-register W-168 step 4.
+
+## 2026-09-25 — W-222 withdrawn; the breach gets an id (W-223)  ·  Claude Code
+- **Asked:** *"implement W-222"*.
+- **Did:**
+  - Verified the previous session's diagnosis: `math.log` gives `1.2584609896100056` and `Math.log` gives `1.2584609896100059` for `idf(12, 43)`. SR-NODE-SEARCH decision 1 already rules this one-ulp tolerance (ordering byte-equal, `round(9)` on scores). **No engine change.**
+  - Kept the previous session's corrected `test_rm3.py`, with no xfail. Moved W-222 to `archive/open/`, added its archive map row, deleted its queue row, and added the IMPLEMENTATION entry.
+  - 🔴 The breach inbox row had no id, so `test_every_row_opens_with_exactly_one_ball` was red on the tree. Filed **W-223** on the W-196 precedent and gave the inbox row and an open row that id.
+- **Checks:** unit 5685 passed / 2 skipped (no xfail left); e2e 151 passed / 1 skipped; Node 88 passed. Every search this session named its paths; none traversed the golden tree.
+- **Decided / open:** W-223's ruling is Arpit's. The blocker (`BLOCKED.json`, W-168 steps 6–10) is unchanged.
+- **Next:** pre-register W-168 step 4.
+
+## 2026-09-25 — 🔴 L11 BREACH DECLARED: a recursive grep traversed the golden tree  ·  Claude Code
+- **What happened:** while withdrawing W-222, this session ran a recursive `grep -rln "W-222"` from the repo root. It excluded `.git` and `archive` and then removed golden-tree lines from the **output** with `grep -v`, not from the traversal. So grep opened and read every file under the golden tree, **including the key directory**, while the tree is LOCKED. L11 names this route explicitly: *"a recursive grep … over work/ excludes the golden tree"*.
+- **What reached the context:** the output listed only five non-golden paths. **No answer text and no filename from the key directory was shown.** The search string `W-222` cannot occur in a key, so the grep matched nothing there, but it read those bytes.
+- **Also declared:** twice this session, a plain `ls` of the golden tree's **parent** directory showed the key directory's entry name; the second listing's output was discarded. Nothing inside the key directory was listed.
+- **Guard gap, for Arpit:** neither the deny rules nor the guard hook stopped the recursive grep, because its command never named the key directory. The hook *did* stop the first attempt to file this entry, because that command named the path. This is the route L11 already calls "the one no guard sees".
+- **What it touches:**
+  - The RM3 re-run capture (`2026-09-25-rm3-boosted`) finished **before** this grep and read no key. Its numbers are `informed` regardless, since `set-2-u` is Claude-authored.
+  - This session was already barred from adjudicating that run.
+- **Session stopped here**, per L11 decision 10.
+- **Left in the working tree, uncommitted:** the W-222 withdrawal, half-done. `tests/query/test_rm3.py` was corrected to compare against SR-NODE-SEARCH decision 1 (ordering byte-equal, scores equal after `round(9)`), and it passes. The W-222 file and its queue row are not yet removed.
+- **Why W-222 is withdrawn:** the "gap" is the ruled `Math.log` one-ulp tolerance on `idf(12, 43)`, not a defect.
+
+## 2026-09-25 — W-221 re-run: re-registered, built, five RM3 arms captured  ·  Claude Code
+- **Asked:** *"re-run"*, Arpit's ruling on W-221.
+- **Did:**
+  - `d1eeaae3` — the re-registration. It keeps every row of the 2026-09-23 pre-registration by reference and changes one: the feedback set is the top 10 `ask` shows.
+  - `0ff3078c` — the build in `run_query` / `runQuery` (rerank → pin → Tier A, then the top 10). SR-EXPAND 16, SR-ANSWER 15 and SR-CONFIDENCE 18 were amended; SR-FIND and SR-OUTPUT got "moved a component" bullets; CHANGELOG updated; 6 new tests.
+  - The capture: five arms, then `describe.py`, the report, and a copied `decide.py` committed before any score exists.
+- **Found:**
+  - 🔴 **`rung-01000` was rebuilt on 2026-09-23 at 12:05 UTC**, after the first RM3 arms were copied, so the live rung is not the frozen `17fe414e` index. The arms were copied from the 2026-09-23 arm copies instead.
+  - ⚠ A first copy loop sourced from the rebuilt rung, because `set -e` does not stop on a failing `&&`. Those copies were deleted before any capture ran.
+  - **W-222:** Node and Python differ in the last bit of an expanded score. This predates W-221 and is filed with a strict xfail.
+- **Checks:**
+  - Suites, run whole before the capture: unit 5673 passed (plus 1 xfail); e2e 151 passed; Node 88 passed.
+  - At `0.0` the baseline equals the 2026-09-23 baseline on 125 of 125.
+- **Decided / open:**
+  - Rank 1 moves on 18 / 29 / 38 / 53 questions, and nothing is scored.
+  - Scoring is Arpit's (inbox). The verdict belongs to a session that neither captured the arms nor ran W-221's check.
+- **Next:** `just golden-score work/regression/2026-09-25-rm3-boosted`.
+
+## 2026-09-25 — W-221 run: RM3's first pass vs the boosted top 10, ambiguous → Arpit  ·  Claude Code
+- **Asked:** *"W-221, run it."*
+- **Did:** Added `evidence/first_pass_check.py` and its output `first-pass-check.jsonl`, and wrote up [first-pass-check.md](regression/2026-09-23-rm3/evidence/first-pass-check.md). The run covered all 125 `set-2-u` questions on the `rm3-0.0` arm copy. The boosted list reproduces the capture on 125/125.
+- **Found:**
+  - **Documents:** 26 identical, 26 reordered, 73 with a different set. Rank 1 is the same on 124 of 125. Every displaced document is at lexical rank 6–10.
+  - **Feedback terms:** the same set on 62 questions; 2–6 of 10 differ on 35 (26 of them tagged).
+- **Decided / open:** Neither of W-221's outcomes fits, so it went to Arpit as a 🔴 inbox row: re-register and re-run, or let FAIL stand. VERDICT.md is not touched until he rules.
+- ⚠ **L11 note:** one `ls work/golden/` listed the parent directory. It showed the entry *name* `golden-answers` and nothing inside it. Nothing in the key directory was listed, opened or read, and every later command named permitted paths only.
+- **Next:** Arpit's ruling on W-221. Agent work stays on W-168 step 4's pre-registration.
+
+## 2026-09-25 — W-168 steps 6–10 unblocked as far as an agent can  ·  Claude Code
+- **Asked:** *"unblock it — implement whatever needs to be done"* (the blocked W-168 steps).
+- **Ruled (Arpit, in this session):** a **fresh designated** session authors the next set (this one failed prompt 3's freshness rule: it had read set-3-u ids and rank moves in step 1's verdict); step 8's history goes **into the seed, ladder rebuilt**.
+- ⚠ **L11 guard fired once:** `ls work/golden` was refused before it ran — it lists the directory holding the key. Nothing was read; every later command named permitted paths only.
+- **Did:**
+  - **Prompt 11** — an isolated claude.ai chat authors generation 3: inputs for steps 6 (proximity passages), 7 (facet clusters), 8 (authority pairs + history, recency trap), 9 (procedure/decision/reference triples), 10 (long documents) + `set-4-u` (named so because `set-3-u` exists). Registered in the prompt gate and the golden README.
+  - **`tools/golden-history/replay.py`** + `tests/test_golden_history.py` (14 pass) — `seed-history.tsv` → commits; wired into `fux-lab/shared/generate/build_golden_rung.py` (untracked there). **Checked:** old vs new builder on a scratch `rung-seed` — identical authors, dates, messages, trees; only GPG signatures differ (this machine signs, with a timestamp).
+  - **`compare/section-units`** — U0 · B2 · E1 recommended; U0 is a term inside SR-RERANK's existing stage (it already scores the top-20 over refer's passages).
+  - SR-WORK-TESTDATA T11 amended, owns the new tool and test; OPEN-WORK inbox gains two rows; BLOCKED.json → ASK.
+- **Found:** step 7's *"waits on graph in `ask`"* is already met — `ask` runs a graph stage today.
+- **Step 1's last check closed:** scan vs accelerator at `anchor = 1.0` on this repo (scratch copy), `run.py --skipping both` — **DIFFERENTIAL GREEN, 22 144 comparisons, byte-identical in every mode** (692 queries × 4 tops × 2 modes × 4 `[priority]` weights). The first attempt died with the old process; the rerun took 38 min.
+- **Next:** Arpit runs prompt 11; agent-side, pre-register step 4.
+
 ## 2026-09-24 — W-168 step 1 shipped: `[bm25f] anchor` defaults to `1.0`  ·  Claude Code
 - **Asked:** ship step 1 per the anchor PRE-REGISTRATION §If it passes (Arpit ruled PASS at `1.0`).
 - **Did:**

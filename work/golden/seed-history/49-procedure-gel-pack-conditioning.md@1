@@ -1,0 +1,27 @@
+---
+title: "Gel packs: making up a passive shipper for a pharma run"
+doc_id: QCL-QA-GEL-01
+owner: Revathi Iyer
+department: QA and Compliance
+status: in_force
+effective_date: 2026-06-10
+applies_to:
+  - Nagpur DC
+---
+
+# Gel packs: making up a passive shipper for a pharma run
+
+## Before you start
+
+1. Open the shipper register and confirm the shipper conditioning time (SCT) entry shows 18 hours at +5.0 C completed for every pack batch in the shipper.
+2. Take blue-cap packs only, from conditioning cabinet CC-1 in the Nagpur QA room.
+
+## Making it up
+
+3. Load the packs in the pattern printed inside the shipper lid, then put the product box in the middle with a USB logger taped to its side.
+4. Close the lid and fix a tamper label across the lid seam.
+5. Write the shipper number (PS-01 to PS-12) and the pack batch in the shipper register.
+
+## Never
+
+6. Never mix white-cap packs with blue-cap packs in one shipper.

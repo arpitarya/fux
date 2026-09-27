@@ -142,6 +142,9 @@ golden-guards:
     [ -x .claude/hooks/guard-sealed-key.sh ] \
         && ok "guard-sealed-key.sh is executable" \
         || bad "guard-sealed-key.sh missing or not executable"
+    [ -x .claude/hooks/guard-golden-traversal.sh ] \
+        && ok "guard-golden-traversal.sh is executable (W-223)" \
+        || bad "guard-golden-traversal.sh missing or not executable"
     grep -q '!work/golden' .fux/sources/dirs \
         && ok "excluded from fux's own index" \
         || bad "not excluded from .fux/sources/dirs"

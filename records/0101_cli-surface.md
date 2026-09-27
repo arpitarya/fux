@@ -10,7 +10,7 @@ feature: the `fux` command-line interface — every verb, its flags, its exit co
 owns: [src/fux/cli.py@6dae403f7070, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@9876744812b5, src/fux/progress.py@925dccc045ce, tests_e2e@99091e19262e, node/fux.mjs@b3c33c3898dc]
 laws: [L1, L4, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: f440b1d70ab8a6a55c8e0e9175b6153e8e9c0f964a17fba91d76535e552f0784
+content_sha: 0609d9e849092daf7ce6071eb74c780344e2dd5d4ced22195400e562266cc75d
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -415,9 +415,9 @@ is FROZEN.** (W-160.)
 `ask --scan` already computed BM25F alone. What this adds is a **contract**:
 
 - **`lexical` is BM25F → rerank → RRF over `-q`. No graph stage, ever.**
-- **And no RM3, ever** (W-168 step 5, 2026-09-23). `rm3_weight` is forced to
-  `0.0` beside the graph tier's two booleans, in both readers: feedback terms
-  are words the engine chose ([SR-EXPAND](0149_expand.md) decision 16).
+- **And no engine-written expansion, ever.** RM3 was forced off here while it
+  existed; it was removed on 2026-09-27 ([SR-EXPAND](0149_expand.md) decision
+  17), so there is nothing left to force.
 - **A future component added to the lexical core is a NEW VERB or a TUNABLE,
   never a change to this one.** That sentence is the whole decision; everything
   else here is what makes it hold.

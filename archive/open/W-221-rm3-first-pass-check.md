@@ -59,17 +59,23 @@ two outcomes below fits cleanly, so per §Hazards this is Arpit's call: re-regis
 ## RULED 2026-09-25 (Arpit): *"re-run"*. Done as far as an agent may go
 
 1. **Re-registered first**, as [`2026-09-25-rm3-boosted`](../regression/2026-09-25-rm3-boosted/PRE-REGISTRATION.md) (`d1eeaae3`). It changes one row: the feedback set.
-2. **Built** at `0ff3078c`. SR-EXPAND 16 and both readers were changed, and W-222 was filed for a separate Node last-bit gap.
+2. **Built** at `0ff3078c`. SR-EXPAND 16 and both readers were changed, and W-222 was filed for a separate Node last-bit gap (withdrawn the same day: the ruled `Math.log` ulp).
 3. **Captured**: five arms on the frozen `17fe414e…` index, as described in the [report](../regression/2026-09-25-rm3-boosted/report.md).
    ⚠ The live `rung-01000` was rebuilt on 2026-09-23, so the arms were copied from the 2026-09-23 arm copies instead.
-4. **Next, and not this session's:**
-   - Arpit types `just golden-score work/regression/2026-09-25-rm3-boosted`.
-   - Then a session that did **not** capture the arms runs `evidence/decide.py` and writes `VERDICT.md`.
-   - INCONCLUSIVE goes to Arpit.
+4. **Scored** by Arpit (`just golden-score`, 2026-09-26).
+5. **Adjudicated 2026-09-27** by a session that neither captured the arms nor ran the check: `decide.py` gives **INCONCLUSIVE by the table** ([VERDICT](../regression/2026-09-25-rm3-boosted/VERDICT.md)). No arm clears the gain bar, every arm breaks the drift bound (6 / 8 / 9 / 13 lost), and `0.3` nets +2 below the floor. This is the same shape as 2026-09-23.
+6. **Next:** Arpit rules FAIL (drift) or INCONCLUSIVE. Then this item closes, because the question it asked, whether the first pass was the cause, is answered: it was not.
+
+## ❌ RULED 2026-09-27 (Arpit, Cowork) — FAIL (drift); remove all RM3 code. CLOSED.
+
+*"W221 mark RM3 as fail. and remove all the RM3 related code."* The
+[VERDICT](../regression/2026-09-25-rm3-boosted/VERDICT.md) is filed FAIL. The
+question this item asked, whether the first pass caused the drift, is answered:
+it did not. The removal is its own item, [W-224](W-224-remove-rm3.md).
 
 ## Blockers
 
-🔴 Arpit's score (inbox). Earlier: his ruling, given 2026-09-25. Before the run: none. Agent-executable: no code change, no build, reads only the released
+🔴 Arpit's ruling on the verdict (inbox). Score: done 2026-09-26. Earlier: his ruling, given 2026-09-25. Before the run: none. Agent-executable: no code change, no build, reads only the released
 question ids/text and produces ranked lists — nothing this touches is a golden
 answer.
 

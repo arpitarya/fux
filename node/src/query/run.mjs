@@ -25,7 +25,6 @@
  * precisely to change which document is first.
  */
 import { ask as scanAsk, queryTermHashes } from "./scan.mjs";
-import { FB_DOCS, feedbackTerms } from "./rm3.mjs";
 import { rank, Weighting } from "./rank.mjs";
 import { signals } from "./confidence.mjs";
 import { headingsFor } from "./headings.mjs";
@@ -147,9 +146,7 @@ export function runQuery(root, query, top, {
   // the own properties and silently drops it — `resolved.scoring` two lines
   // below would then be `undefined` and every score would be computed at
   // default weights, on the frozen baseline verb, with nothing failing.
-  // W-168 step 5: RM3 is off on the frozen baseline too — feedback terms are
-  // words the engine chose, and `lexical` is the words the user typed.
-  if (!compose) resolved = withTier(resolved, { askBoost: false, askRelated: false, rm3Weight: 0.0 });
+  if (!compose) resolved = withTier(resolved, { askBoost: false, askRelated: false });
   else if (wantRelated === false) resolved = withTier(resolved, { askRelated: false });
   // After the two lines above, `wantRelated` and `resolved.askRelated` agree, so
   // the tier reads one of them and the verb reads the other without either
@@ -171,25 +168,9 @@ export function runQuery(root, query, top, {
   const depth = (rerankWeight > 0 || graphOn) ? Math.max(top, RERANK_DEPTH) : top;
 
   const queryHashes = queryTermHashes(query);
-  let expansion = expandMod.build(
+  const expansion = expandMod.build(
     queryHashes, expand ? queryTermHashes(expand) : [], resolved.expandWeight,
   );
-  // W-168 step 5 — RM3. Off at 0.0, and off runs no first pass. A caller's own
-  // `expand` wins. The first pass is un-expanded and writes no stats: the band
-  // and `--why` describe the final pass only. Twin of `run_query`'s block.
-  // W-221 (2026-09-25): the feedback set is the list this function would
-  // return at rm3 0.0 — rerank, pin, Tier A — never the bare lexical window.
-  if (resolved.rm3Weight > 0 && !expand && queryHashes.length) {
-    const firstTop = Math.max(depth, FB_DOCS);
-    const first = scanAsk(root, query, firstTop, { weighting, scoring });
-    const firstOrdered = applyPin(root, query, maybeRerank(root, query, first, rerankWeight, firstTop), firstTop);
-    const shown = resolved.askBoost
-      ? tiers(root, query, firstOrdered, FB_DOCS, resolved, { wantRelated: false }).results
-      : firstOrdered.slice(0, FB_DOCS);
-    expansion = expandMod.build(
-      queryHashes, feedbackTerms(root, shown, queryHashes, scoring), resolved.rm3Weight,
-    );
-  }
 
   const statsOut = {};
   const window = scanAsk(root, query, depth, { weighting, scoring, statsOut, expansion });

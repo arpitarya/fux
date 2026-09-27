@@ -38,6 +38,7 @@ AUTHORING = {
     "7-codex-link-bearing-seed.md",
     "8-codex-identifier-questions.md",
     "10-claude-feature-input-seed.md",
+    "11-claude-gen3-feature-input-seed.md",
 }
 
 #: Prompts that RUN, SCORE or OPEN against data somebody else made. They create

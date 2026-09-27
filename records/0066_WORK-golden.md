@@ -10,7 +10,7 @@ feature: the golden benchmark — its two question sets, the key's custody, its 
 owns: [.claude/hooks/guard-golden-answer.sh@c505d04c0628, .claude/hooks/guard-sealed-key.sh@0d4dd725e7aa, tests/test_golden_key_guards.py@fb4cf92458d6, tests/test_settings_never_committed_unlocked.py@55e95884f883, tests/test_golden_hook_prose.py@40d1405ecad6, scripts/gen-golden.py@1b2a854c1f75, tests/test_claude_md_golden.py@49db9e6261d8, tools/golden-difficulty@18c50227ff2f]
 laws: [L0, L11]
 timestamp: 2026-09-15T00:00:00Z
-content_sha: c0efb4226a36e2e9ea74ba1f54761fc50347cf663aa2b731368129089369bc61
+content_sha: 5a9d17611dde4ca5f4c046a7db4dded8723b935892f878a5ffcdb68c5f1242ca
 ratifies: "Arpit, 2026-09-15 — W-146 row 17: the prohibition gets a record and CLAUDE.md keeps a generated view; the same day he ruled it into law L11 and then amended it — two question sets, one Claude-authored and one Codex-authored, with both answer halves in his custody and no key file at all"
 ---
 
@@ -90,6 +90,7 @@ flowchart TD
         G3["permissions.deny"]
         G4["guard-golden-answer.sh"]
         G4b["guard-sealed-key.sh<br/>(the plural, on the shell surface)"]
+        G4c["guard-golden-traversal.sh<br/>(a recursive walk with no exclusion, W-223)"]
         G5["the CLAUDE.md law block"]
         G6["test_golden_key_guards.py<br/>+ test_golden_key_never_committed.py"]
     end
@@ -121,6 +122,7 @@ flowchart TD
                                   permissions.deny in .claude/settings.json
                                   .claude/hooks/guard-golden-answer.sh
                                   .claude/hooks/guard-sealed-key.sh
+                                  .claude/hooks/guard-golden-traversal.sh (W-223)
                                   the CLAUDE.md law block itself
                                   (+ test_golden_key_guards.py, which fails
                                    when any of them stops covering a spelling)
@@ -235,7 +237,10 @@ is the surrounding process:
   The room is not empty.**
 - **The three routes no guard sees.** A recursive `grep`, `rg`, `find` or `ls`
   over `work/` that never names the folder — L11 makes excluding `work/golden/`
-  part of the rule. **A paste**: an answer put into a Claude session's context by
+  part of the rule. ⚠ **Partly guarded since 2026-09-27** (W-223):
+  `guard-golden-traversal.sh` refuses a shell walk whose root can reach the tree
+  and that has no golden exclusion; a program that walks on its own is still
+  prose. **A paste**: an answer put into a Claude session's context by
   any hand is a leak to declare, never a permission that arrived by another door.
   And **a Cowork session's mount**, which reaches the directory with a plain
   shell call that no deny rule and no hook sees — **accepted, not closed.**
@@ -581,7 +586,7 @@ is the surrounding process:
 | Fold it into [SR-WORK-BENCHMARK](0053_WORK-benchmark.md) | that record's subject is **what a run captures**, and its decision already says *"planted ≠ sealed — the golden answer key belongs to the lab and never moves into a benchmark"*. Merging them re-makes the conflation it exists to prevent |
 | Fold it into [SR-WORK-ENVIRONMENTS](0052_WORK-environments.md) | that record decides **which machine** runs what. The key's readership is not an environment question, and a leak on any machine is the same leak |
 | Rely on the hook alone and drop the prose | the hook binds one surface. Cowork is not that surface, and the hook's own header says what it cannot see |
-| Harden the hook to catch a recursive grep | it would have to block every `grep` over `work/`, which is most of a session's reading. A gate that fires wrongly is worse than one that does not fire — SR-LAW-0 decision 4's fourth warning |
+| Harden the hook to catch a recursive grep | it would have to block every `grep` over `work/`, which is most of a session's reading. A gate that fires wrongly is worse than one that does not fire — SR-LAW-0 decision 4's fourth warning. ⚠ **Overruled 2026-09-27 (Arpit, W-223), in a narrower form:** the hook refuses only a walk whose root can reach `work/golden/` (the repo root, `work/`, `work/golden/`, `..`, `~`) with no golden exclusion. `grep -r x work/open` and `rg x src` pass. `tests/test_golden_traversal_guard.py` pins both directions |
 
 ### Reference (required)
 

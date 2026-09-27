@@ -276,6 +276,7 @@ are both in his hands.
 | **5** | Claude Code | the ladder + every released `questions/set-N.jsonl` | `predictions-set-N.jsonl`, **`handoff-set-N.jsonl`** and `report.md`, **one pair per set** | [`5-claude-run.md`](prompts/5-claude-run.md) |
 | **6** | Codex | the hand-off files + **the keys, pasted by Arpit** | per-query results **without answers**, per set | [`6-codex-score.md`](prompts/6-codex-score.md) |
 | **10** | Claude, **an isolated claude.ai chat, one per set** | the seed corpus, **attached — nothing else** | **seed additions** that carry the inputs four ranking features act on (T4, T5, T6) + `set-3-u` → **four blocks in the chat**, no file | [`10-claude-feature-input-seed.md`](prompts/10-claude-feature-input-seed.md) |
+| **11** | Claude, **an isolated claude.ai chat — the one designated `set-4-u` author** (Arpit, 2026-09-25) | the seed corpus, **attached — nothing else** | generation 3: **seed additions + seed history** carrying W-168 steps 6–10's inputs (T1, T11) + `set-4-u` → **five blocks in the chat**, no file; block 3 feeds `seed-history.tsv`, replayed by [`tools/golden-history/`](../../tools/golden-history/README.md) | [`11-claude-gen3-feature-input-seed.md`](prompts/11-claude-gen3-feature-input-seed.md) |
 
 🔴 **Every prompt that creates test data is authored against [SR-WORK-TESTDATA](../../records/0068_WORK-test-data.md)** — the fourteen-item checklist — and names the items it carries in its first lines. `tests/test_test_data_prompts.py` fails when one does not, and when a new prompt file is not classified.
 

@@ -32,8 +32,33 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-09-24** (Claude Code, Opus — W-168 step 1 shipped: `anchor` defaults to `1.0`).* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-09-27** (Claude Code, Opus — W-224 built; W-168 step 4 pre-registered).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
+
+### 🟢 2026-09-27 — RM3 IS GONE (W-224); W-168 STEP 4 IS PRE-REGISTERED
+
+- **RM3 removed from both readers.** Nothing moved: 144 of 144 outputs were
+  byte-identical before and after. A `tune.toml` with `rm3_weight` is refused
+  by name ([SR-EXPAND](../records/0149_expand.md) decision 17).
+- **Step 4** ([bar](regression/2026-09-27-mined-expansion/PRE-REGISTRATION.md)):
+  `Term (ABBR)` pairs on the declaring record, a read-time fold, and
+  `[ranking] mined_weight`. Pool 10. ⚠ A `_format` bump, so the arms run on a
+  re-ingested **copy** of rung-01000.
+- **Generation 3 is in** (prompt 11), and step 10's forks were ruled U0 · B2 · E1.
+- **Next:** build step 4 (Opus). A **fresh** session runs the prompt-4 rebuild;
+  any session that has opened `work/golden/questions/` may not.
+
+### 🔴 2026-09-25 — W-168 STEPS 6–10: THE AGENT HALF OF UNBLOCKING IS DONE; the data is Arpit's hand
+
+- **Every remaining step was blocked on DATA**, and step 10 also on a compare
+  doc. Generation 3 is specified as [prompt 11](golden/prompts/11-claude-gen3-feature-input-seed.md):
+  a fresh claude.ai chat, the seed attached, five blocks back.
+- **Step 8's instrument exists**: `seed-history.tsv` → `tools/golden-history/`
+  → the rung builder. No history = the old ladder, checked.
+- **Step 10**: [`compare/section-units`](compare/section-units.compare.md), U0 ·
+  B2 · E1 recommended, Arpit's call.
+- **Next:** Arpit runs prompt 11 → prompt 4 rebuild → prompt 5 run → his score →
+  each step counts its pool (< 6 stops). Agent meanwhile: step 4's pre-registration.
 
 ### 🟢 2026-09-24 (latest) — W-168 STEP 1 SHIPPED: `[bm25f] anchor` defaults to `1.0`
 
