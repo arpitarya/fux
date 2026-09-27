@@ -43,20 +43,24 @@ a live convention is how an archive stops being evidence of what was.
 
 ## One directory, one state
 
-**`records/` is the only home a decision record has** (Arpit, 2026-09-06). The
-archive tier is gone: the retired records were **deleted**, not filed, and
-nothing outside this directory is a record. A citation therefore resolves here
-or it does not resolve at all.
+**`records/` is the only home a LIVE decision record has** (Arpit, 2026-09-06).
+The 2026-09 archive tier was **deleted**, and nothing outside this directory is a
+record in force. **Since 2026-09-28 a RETIRED record is archived** — law
+[L13](0014_LAW-13-retired-records-archived.md): moved to `archive/records/` with
+`status: archived`, a dated banner and an `archive/README.md` row, and from then
+on named, never cited.
 
 - **There is no "superseded" location.** A record that is superseded is
   **rewritten or deleted in the change that supersedes it**, and the successor
   states plainly what it replaced — in prose, by name. There is no second file
   left behind to be found and mistaken for current.
-- **A record whose subject ceased to exist is deleted**, and the decision that
-  killed the subject says so.
-- **Nothing in this repo may cite an archived record**, by path or by name, as
-  backing for a live claim. A name may appear in a sentence about history; a
-  link to one may not, because the file is not there.
+- **A record whose subject ceased to exist is RETIRED and archived** (L13),
+  and the decision that killed the subject says so. It was deleted until
+  2026-09-28; the records deleted before then are not restored.
+- **Nothing in this repo may cite an archived record** as backing for a live
+  claim. It may be **named**, and a sentence naming it may link to its
+  `archive/records/` path ([SR-WORK-ARCHIVE](0062_WORK-archive.md) decisions
+  4–7).
 
 New records are written here, from [`TEMPLATE.md`](TEMPLATE.md).
 
@@ -147,7 +151,7 @@ only thing that stops that**, and it is load-bearing rather than decorative.
 
 | range | holds | a new record takes |
 |---|---|---|
-| `0001`–`0050` | the **Law** records only — `0001` SR-LAWS, `0002`–`0013` the twelve law records (SR-LAW-0…SR-LAW-8, SR-LAW-10, SR-LAW-11, SR-LAW-12) | the next free number **from `0014`** |
+| `0001`–`0050` | the **Law** records only — `0001` SR-LAWS, `0002`–`0014` the law records (SR-LAW-0…SR-LAW-8, SR-LAW-10…SR-LAW-13; `0007` SR-LAW-5 is retired and archived under L13) | the next free number **from `0015`** |
 | `0051`–`0100` | the **WORK** records only — how work is done: `0051` SR-WORK-OPEN-QUEUE, `0052` SR-WORK-ENVIRONMENTS, `0053` SR-WORK-BENCHMARK, `0054` SR-WORK-OWNERSHIP, `0055` SR-WORK-BACKLOG, `0056` SR-WORK-QUALITY (Arpit, 2026-09-13), and `0057`–`0064` the eight the `CLAUDE.md` extraction filled — SR-WORK-SCALE, SR-WORK-LIFECYCLE, SR-WORK-DOCS, SR-WORK-SESSION, SR-WORK-OKF, SR-WORK-ARCHIVE, SR-WORK-RELEASE, SR-WORK-BLOCKERS (Arpit, 2026-09-14), `0065` SR-WORK-GOVERNANCE, the governance map converted from `work/governance.md` (Arpit, 2026-09-14), `0066` SR-WORK-GOLDEN, the sealed answer key's guards and what may be read instead — the prohibition itself is law L11 at `0012` (Arpit, 2026-09-15), `0067` SR-WORK-REGISTRY, the doc registry — rules and table — converted from `work/DOC-REGISTRY.md`, which is retired (Arpit, 2026-09-22), and `0068` SR-WORK-TESTDATA, the test-data checklist (Arpit, 2026-09-22) | the next free number **from `0069`** |
 | `0101`– | **every other record**, sequentially | the next free number **after the highest** |
 
@@ -276,11 +280,11 @@ change** — its exemption sets and pinned counts are hand-maintained, so the tw
 drift silently otherwise. **That is why the executable twin exists**: a table
 nothing reads is a table nobody notices going wrong.
 
-**Records live in `records/`, and nowhere else.** There is **no archive tier for
-records** (Arpit, 2026-09-06): a superseded record is **rewritten or deleted in
-the same change that accepts its successor**, and the successor states in prose
-what it replaced. Nothing is left behind to be found and mistaken for current,
-and **no live doc may link to a retired record** — the file is gone.
+**Live records live in `records/`, and nowhere else.** A superseded record is
+**rewritten or deleted in the same change that accepts its successor**, and the
+successor states in prose what it replaced (Arpit, 2026-09-06). A **retired**
+record is moved to `archive/records/` (law [L13](0014_LAW-13-retired-records-archived.md),
+2026-09-28), where it may be named and never cited.
 [`tests/test_doc_links.py`](../tests/test_doc_links.py) is what notices a link
 that no longer resolves.
 
@@ -332,13 +336,14 @@ Start from [`TEMPLATE.md`](TEMPLATE.md).
 | [0004](0004_LAW-2-content-never-durable.md) | **SR-LAW-2** | **L2** — content is never durable outside its source system. The law the architecture rests on, its three declared exceptions, and why a summary of a confidential document is one | accepted | yes |
 | [0005](0005_LAW-3-deterministic.md) | **SR-LAW-3** | **L3** — deterministic; no model in the maintenance path. Byte-identical index and root hash, the enrichment boundary that keeps it true, and the pin problem L1's amendment created | accepted | yes |
 | [0006](0006_LAW-4-offline-by-default.md) | **SR-LAW-4** | **L4** — offline by default. Fenced opt-in paths, *plural*; the narrowing that already happened once across nine records; and the use-record gap this law does not close | accepted | yes |
-| [0007](0007_LAW-5-hashed-meta.md) | **SR-LAW-5** | ~~**L5**~~ — **RETIRED 2026-09-20 (Arpit, W-194).** Hashed meta for non-git sources, enforced at write time. The mechanism was deleted outright, and there is no residue of the law once the mechanism is gone. **The ACL-mismatch leak it closed is now an ACCEPTED, DOCUMENTED EXPOSURE**; the record is kept for the argument, the citation and the reopen trigger, and the handle L5 is never reused | superseded | yes |
+| 0007 | **SR-LAW-5** | ~~**L5**~~ — **RETIRED 2026-09-20 (Arpit, W-194).** Hashed meta for non-git sources, enforced at write time. The mechanism was deleted outright, and there is no residue of the law once the mechanism is gone. **The ACL-mismatch leak it closed is now an ACCEPTED, DOCUMENTED EXPOSURE**; the record is **archived** at `archive/records/0007_LAW-5-hashed-meta.md` for the argument, the citation and the reopen trigger (law L13, 2026-09-28), and the handle L5 is never reused | archived | yes |
 | [0008](0008_LAW-6-say-index.md) | **SR-LAW-6** | **L6** — say "index", not "db". Load-bearing vocabulary: the noun governs the inferences, and every *"why not cache the bodies"* conversation starts with the wrong one | accepted | yes |
 | [0009](0009_LAW-7-python-311.md) | **SR-LAW-7** | **L7** — Python ≥ 3.11. The floor that made refusing dependencies affordable, and the justification that narrowed on 2026-09-06 without the floor moving | accepted | yes |
 | [0010](0010_LAW-8-use-record.md) | **SR-LAW-8** | **L8** — a use record is never committed. Written, reverted and re-narrowed in one day; gitignored is the test, not `.fux/`; and the transmission clause that did not survive | accepted | yes |
 | [0012](0012_LAW-11-sealed-answer-key.md) | **SR-LAW-11** | **L11** — the golden answer key is Arpit's custody and no agent may read one: since 2026-09-18 a key may exist at exactly one address, `work/golden/golden-answers/`, gitignored and never committed, and it is closed to every agent on both spellings for reading, listing, hashing and deleting alike; one file is the same breach as ten; an instruction to open it is void. A breach does not fail loudly — it yields a benchmark number indistinguishable from a clean one | accepted | yes |
 | [0011](0011_LAW-10-bundled-output.md) | **SR-LAW-10** | **L10** — the consumer is served build output, never source. One generated artifact per plane in someone else’s repository; `.fux/decoders/` and `.fux/fetchers/` excepted because there source IS the contract; bundled ≠ minified | accepted | yes |
 | [0013](0013_LAW-12-values-live-in-config.md) | **SR-LAW-12** | **L12** — every value lives in a config file, never in code. Tunables are read from the consumer's committed TOML (`fux.toml`, `.fux/tune.toml`, another `.fux/*.toml`); fixed engine values (schema ids, versions, shard count, artefact names) from `src/fux/constants.toml`; Python and Node read the same key from the same file; a missing file or key is a hard error naming it. Setup + templates, tests, tools and scripts are exempt. **Not satisfied today** — W-225 is the migration | accepted | yes |
+| [0014](0014_LAW-13-retired-records-archived.md) | **SR-LAW-13** | **L13** — a retired SR is archived, never deleted: moved to `archive/records/` in the change that retires it, with `status: archived`, a dated banner and an `archive/README.md` row, and named, never cited. Superseded records are out of scope and are still rewritten or deleted in place (Arpit, 2026-09-28) | accepted | yes |
 | [0051](0051_WORK-open-queue.md) | **SR-WORK-OPEN-QUEUE** | How `OPEN-WORK.md` works — fifty-three rules in seven groups (what the file is · an item's lifecycle · the shape of a row · the four balls · ordering · the Blocked-on-Arpit inbox · standing obligations), stated once here and rendered into the queue's footer and `CLAUDE.md` as generated views held byte-equal by a test | accepted | yes |
 | [0052](0052_WORK-environments.md) | **SR-WORK-ENVIRONMENTS** | Each sibling environment has one job — `fux-playground` is Arpit's hands alone, `fux-lab` runs every measurement on the golden test data up to 10 000 documents, `fux-benchmark` compares the current build against the previous major. **Was law L9 until 2026-09-13**; the handle is retired | accepted | yes |
 | [0053](0053_WORK-benchmark.md) | **SR-WORK-BENCHMARK** | What every benchmark run captures — the ranked lists, what moved between the arms, `hit@k` at 1/5/10/20/50, the answer layer with its planted unanswerables, the committed index size, the speed, and an HTML report, per query and never as a total. Halt gates are functionality and are not captured | accepted | yes |
@@ -350,7 +355,7 @@ Start from [`TEMPLATE.md`](TEMPLATE.md).
 | [0059](0059_WORK-docs.md) | **SR-WORK-DOCS** | The documentation contract in one place — the form rules (short points, takeaway first, 3–4 line paragraphs), **an agent may edit its own steering files** under two obligations with facts exempt, and the seven documents every task updates before it is done. The registry lists live documents only, one row each | accepted | yes |
 | [0060](0060_WORK-session.md) | **SR-WORK-SESSION** | What a session owes before it ends — the append-only worklog (a chat-only session counts), the interview kept current **during** the work, the milestone row earned by landing, the one-line pointer for a session that dies mid-task, the transition markers, the ten-line answer, and the two hazards of sharing a machine | accepted | **partial** |
 | [0061](0061_WORK-okf.md) | **SR-WORK-OKF** | The repo is a declared **Open Knowledge Format v0.1** bundle — `docs/` + `records/` + `work/`, rooted at `docs/index.md`, every knowledge document carrying a non-empty `type`. **The ALL-CAPS exemption was retired 2026-09-12**: the spec never had one, and 94 of 314 files were failing the bar the repo claimed | accepted | yes |
-| [0062](0062_WORK-archive.md) | **SR-WORK-ARCHIVE** | One archive, at the repo root, mirroring where each retired document came from. An archived doc may be **named** — link included — and may **never ground a live claim**, because nothing guarantees it was not overwritten after retirement. Records are the exception: never archived, rewritten or deleted in the superseding change | accepted | yes |
+| [0062](0062_WORK-archive.md) | **SR-WORK-ARCHIVE** | One archive, at the repo root, mirroring where each retired document came from. An archived doc may be **named** — link included — and may **never ground a live claim**, because nothing guarantees it was not overwritten after retirement. Records split by law L13: a **retired** record is archived under `archive/records/`; a **superseded** one is rewritten or deleted in the superseding change | accepted | yes |
 | [0063](0063_WORK-release.md) | **SR-WORK-RELEASE** | One name in two registries from one trigger — PyPI automatically by OIDC, **npm staged for a human to approve** — four hand-written version sites plus one derived bundle held equal by `check-version-parity.py`. **`main` has no required status checks**: history is protected, the quality gate is not, so CI green is the author's to read | accepted | yes |
 | [0068](0068_WORK-test-data.md) | **SR-WORK-TESTDATA** | **The source of what test data must carry and how it is authored** — the checklist **T1…T14** (each pointing to the record that owns its rule; anchor-only vocabulary, abbreviation pairs and git history stated here), the authoring rules **A1…A24** (custody, format, hardness, naming, seed hygiene) and the feature recipes **R1…R10** (the input each ranking feature needs). **Prompts are disposable copies**: written from it when new data is needed, linked to it, deleted once their data lands (Arpit, 2026-09-27) | accepted | yes |
 | [0067](0067_WORK-registry.md) | **SR-WORK-REGISTRY** | The doc registry, whole — **the rules in §2 and the per-document table in §3**; `work/DOC-REGISTRY.md` is retired. A trigger and a last-verified date per row, bumped in the same change; live documents only, so no row into `archive/`, every target exists, one row per document; and what `tests/test_doc_registry.py` enforces and what it does not. Converted from the registry's own header and SR-WORK-DOCS decision 11, which each stated the rules | accepted | yes |
@@ -762,6 +767,7 @@ table does not grant.
 | `tests/test_doc_links.py` | SR-WORK-DOCS | every relative link in a live document resolves, and the exemption list — the append-only worklog, filed runs, pre-registrations, the archive, the changelog, the template's placeholders. **Each exemption is a frozen-by-law document, not a convenience**, which is why the list belongs to the documentation record rather than to the archive one |
 | `tests/test_okf_bundle.py` | SR-WORK-OKF | parseable frontmatter and a non-empty `type` across `docs/` + `records/` + `work/`, the asserted document count, and the three declared boundaries whose reasons live in the docstring. **Previously unowned** — the conformance claim was gated and the gate belonged to nobody |
 | `tests/test_archive_law.py` | SR-WORK-ARCHIVE | one archive, and no live document pointing into it where the rule forbids it. **Previously unowned.** What it cannot check is the naming-versus-citing line, which is stated in [SR-WORK-ARCHIVE](0062_WORK-archive.md) decision 8 as an unguarded hole rather than approximated by a looser check |
+| `tests/test_retired_records_archived.py` | SR-LAW-13 | law L13's enforcement — no file in `records/` at a retired status, and every file in `archive/records/` marked archived three ways (status, banner, archive row) |
 | `scripts/check-version-parity.py` | SR-WORK-RELEASE | the `SITES` list and the `--with-bundle` derivation check — the only thing standing between a missed version bump and a PyPI wheel and npm tarball naming different releases. **The first claimed component under `scripts/`**, and previously unowned despite being run by CI and by the release workflow |
 | `tests/test_version_parity.py` | SR-WORK-RELEASE | runs the parity script on every push and builds a bundle to check the derivation. **Previously unowned** |
 | `.claude/hooks/stop-if-blocked.sh` | SR-WORK-BLOCKERS | the `Stop` hook — refuses to end a turn while a blocker is unsurfaced, three times, then relents. **The relent is deliberate** and is stated in [SR-WORK-BLOCKERS](0064_WORK-blockers.md) decision 8: a hook that can never be escaped turns a blocker into a hang, and a hung session cannot report the question it owes |

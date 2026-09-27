@@ -11,6 +11,13 @@ ball: agent
 
 **Model: Opus** (a new law, two record amendments, a generated block, an enforcement test).
 
+## ✅ BUILT and CLOSED 2026-09-28 (Claude Code, Opus)
+
+Every step below landed in one change: SR-LAW-13, L13 in SR-LAWS and the
+register, SR-WORK-ARCHIVE decision 9 split, SR-LAW-5 moved to `archive/records/`
+with its banner and map row, the enforcement test, and the regenerated
+`CLAUDE.md` laws block. Both suites green.
+
 ## ✅ RULED 2026-09-28 (Arpit, Cowork)
 
 *"create a new law if an sr is retired archive it"*, then *"no need for

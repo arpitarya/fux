@@ -10,7 +10,7 @@ feature: the rationale, history and reopen-trigger of L2
 owns: []
 laws: [L2]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 5e496cff33e2961be930cd1a38324bb8f05d0869bd32eff9036db51d8b3a42f0
+content_sha: 4ce008efacf7baa8253b75b0ca38ce2b97b65b3f8329ae99384f424ec7f30cd6
 ---
 
 # SR-LAW-2 — L2 — content is never durable outside its source system
@@ -131,7 +131,7 @@ on 2026-09-06 at Arpit's ruling.
 - **Easier:** the compliance conversation. Nothing left the tenant, so nothing needs a retention schedule, a deletion path, or a DPIA.
 - **Harder:** every answer costs a fetch. The refer plane exists entirely to pay this bill, and the fetch cache exists to make it bearable.
 - **Harder:** an answer is impossible when the source is gone. The acquired plane is the mitigation and it is opt-in, so the default really can fail to answer.
-- ⚠ **A hashed key is not anonymity.** Statistics about a document can still identify it. 🔴 **L5 existed because of exactly this, and it was RETIRED on 2026-09-20** (Arpit, W-194) — the ACL-mismatch leak it closed, where a title alone tells a reader that a document they cannot open exists, is now an **accepted, documented exposure**. **L2 is unchanged and is what still stands here**: statistics may be committed, content may not, and no amount of hashing turns content into a statistic. [SR-LAW-5](0007_LAW-5-hashed-meta.md), superseded, keeps the argument and the reopen trigger.
+- ⚠ **A hashed key is not anonymity.** Statistics about a document can still identify it. 🔴 **L5 existed because of exactly this, and it was RETIRED on 2026-09-20** (Arpit, W-194) — the ACL-mismatch leak it closed, where a title alone tells a reader that a document they cannot open exists, is now an **accepted, documented exposure**. **L2 is unchanged and is what still stands here**: statistics may be committed, content may not, and no amount of hashing turns content into a statistic. [SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md), superseded, keeps the argument and the reopen trigger.
 
 ### Alternatives considered
 

@@ -11,7 +11,7 @@ feature: the confidence plane
 owns: [src/fux/query/confidence.py@20897950b94e, tests/test_confidence_floor_off.py@ee4823ba1f03, node/src/query/confidence.mjs@620ad647947d, node/test/confidence.test.mjs@77f997d159dc]
 laws: [L1, L3, L4]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: bc6c46a2a25393642159e989fe9e27396fba6511c09349a7b0bd53f4db0562cc
+content_sha: 8d776e3bf319c994e5b0bdf5a91b47c350cfabdb189ae516478306d34cb7b1b0
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -863,7 +863,7 @@ block is built on the ORIGINAL query, as decision 16's neighbour says of
   nothing it decides.** Hashed display meta was deleted outright: `meta` and
   `title_h` left the record shape, `store/displaycache.py` and
   `assert_meta_policy` were deleted, `fux.index` stepped to **v4**, and law L5
-  retired ([SR-LAW-5](0007_LAW-5-hashed-meta.md), superseded). Nothing in `query/confidence.py` changed. The four signals and the band are computed from `terms`, `flen` and the query — none of which W-194 touched — and a `url:` result now carries a readable title where it used to carry a hash, which is a display fact and not a confidence one.
+  retired ([SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md), superseded). Nothing in `query/confidence.py` changed. The four signals and the band are computed from `terms`, `flen` and the query — none of which W-194 touched — and a `url:` result now carries a readable title where it used to carry a hash, which is a display fact and not a confidence one.
   **This record's decisions are unaffected**, and the line is here because the
   freshness gate asks a describer to say so rather than to be silent.
 

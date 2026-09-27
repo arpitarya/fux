@@ -7,10 +7,10 @@ description: One canonical encoder, sharded doc-major JSONL, write-if-different;
 status: accepted
 date: 2026-08-18
 feature: generation and update of the committed index, and the refusal that keeps its derived accelerator from diverging
-owns: [src/fux/store@95799d18167e, node/src/store/format.mjs@ec3056937006, node/src/store/reader.mjs@f47fa69ecb2c]
+owns: [src/fux/store@63c3999c7211, node/src/store/format.mjs@ec3056937006, node/src/store/reader.mjs@f47fa69ecb2c]
 laws: [L1, L2, L3, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: bc07c40b4ccc93dc9aa71daab31e5497cd0788a17977bcd4ec3d5d9214202825
+content_sha: b469f136048d02a08f2ee30b792c99fee4431ec4a4696cc14d9087f761c08929
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -369,7 +369,7 @@ placement argument is what survives and it is worth more than the rule was**:
 *a check that lives in one caller is a convention, not a property of the
 index* — which is why a future write-path rule belongs in `write_index` and
 nowhere else. The leak L5 closed is an accepted exposure
-([SR-LAW-5](0007_LAW-5-hashed-meta.md), superseded).
+([SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md), superseded).
 
 
 **14. `_format` bumped to `fux.index.v3` on 2026-09-15** (W-168 step 1), and

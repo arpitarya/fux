@@ -10,7 +10,7 @@ feature: "`fux.toml` — discovery, schema, validation, and the keys that are re
 owns: [src/fux/config.py@81db9b20a917, node/src/config/root.mjs@aab1cfcd6c25, node/test/config.test.mjs@2a75560cd349]
 laws: [L4, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 743fc113a48e134709f307a161d90f1f2775f36228bca5258a9202c103cc6b8b
+content_sha: a49a9f12a4ac74efd8d226d7b240700aa4006ba3a14af3238d4e5354cb0ef3df
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -244,7 +244,7 @@ believes is in force.
 🔴 **What the deletion gives up is real:** the ACL-mismatch leak L5 closed is
 now an **accepted, documented exposure**. The reasoning above was right about
 the leak and lost on cost —
-[SR-LAW-5](0007_LAW-5-hashed-meta.md) keeps the argument, the citation and the
+[SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md) keeps the argument, the citation and the
 reopen trigger.
 
 **7. `max_parallel` is REQUIRED whenever `[sources.url]` is present.** It was

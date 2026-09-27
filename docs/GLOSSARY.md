@@ -375,7 +375,7 @@ enforced at write time. **Every record now commits readable display text**, and
 that leak is an **accepted, documented exposure** — use `.fux/pii.toml` to keep
 a value out of the committed index, or do not index the page.
 `meta=` in a URL line or in `[sources.url]` is now a **named load error**, not
-an ignored key. See [SR-LAW-5](../records/0007_LAW-5-hashed-meta.md)
+an ignored key. See [SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md)
 (superseded) and [meta-privacy](../archive/compare/meta-privacy.compare.md).
 
 **Link-IDF** — An inbound edge's discount in the graph walk:

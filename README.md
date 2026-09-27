@@ -183,7 +183,7 @@ Fux is built under eleven laws, each with its own record in the
 [L2 content never durable](records/0004_LAW-2-content-never-durable.md) ·
 [L3 deterministic](records/0005_LAW-3-deterministic.md) ·
 [L4 offline by default](records/0006_LAW-4-offline-by-default.md) ·
-[L5 hashed meta](records/0007_LAW-5-hashed-meta.md) ·
+[L5 hashed meta](archive/records/0007_LAW-5-hashed-meta.md) ·
 [L6 say "index"](records/0008_LAW-6-say-index.md) ·
 [L7 Python ≥ 3.11](records/0009_LAW-7-python-311.md) ·
 [L8 use record never committed](records/0010_LAW-8-use-record.md) ·

@@ -10,7 +10,7 @@ feature: the `url:` source and how ingestion behaves around the fetcher boundary
 owns: []
 laws: [L2, L4, L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 41b505f60ed883d4f70ea37c23b60c3be5207132ae0c06112197356635b28fe3
+content_sha: 9b679f5578e8cad8302d71f64f287d5c12861a736bc47e84a15b0f1f3143dd9a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -202,7 +202,7 @@ grammar, `title_h` is gone from the record, `fux.index` is v4, and law L5
 retires with the mechanism.** A URL record carries a plain `title` and
 `phrases`, exactly as a git record does. 🔴 **The ACL-mismatch leak this closed
 is an accepted, documented exposure** —
-[SR-LAW-5](0007_LAW-5-hashed-meta.md), superseded, keeps the argument and the
+[SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md), superseded, keeps the argument and the
 reopen trigger.
 
 <!-- L12-VALUES-START -->

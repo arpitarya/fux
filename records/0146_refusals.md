@@ -10,7 +10,7 @@ feature: refusal detection before decode
 owns: [src/fux/ingest/refusals.py@c2842b4b4bb0, src/fux/templates/refusals.toml.txt@ffa8d8df1f1a, tools/refusal-probe@76b6f6b7f4aa, .fux/refusals.toml@5fdc90fab388]
 laws: [L1, L3]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 25521894035db6bebd5487fa46dfa5f63df2522c2b7f3724f1e1422e355ee206
+content_sha: c2e7c4e6e381e83071dfb8353e6012a5b863d1d8f1000232c4dee421423831d0
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -479,7 +479,7 @@ the rules carrying the two bounds — so every caller that iterates is unchanged
   nothing it decides.** Hashed display meta was deleted outright: `meta` and
   `title_h` left the record shape, `store/displaycache.py` and
   `assert_meta_policy` were deleted, `fux.index` stepped to **v4**, and law L5
-  retired ([SR-LAW-5](0007_LAW-5-hashed-meta.md), superseded). Nothing in `ingest/refusals.py`, `refusals.toml.txt` or `tools/refusal-probe/` changed. A refusal is a judgement about the BYTES a server returned, taken before a record exists; `meta` only ever decided what a record could hold afterwards, so the two never met.
+  retired ([SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md), superseded). Nothing in `ingest/refusals.py`, `refusals.toml.txt` or `tools/refusal-probe/` changed. A refusal is a judgement about the BYTES a server returned, taken before a record exists; `meta` only ever decided what a record could hold afterwards, so the two never met.
   **This record's decisions are unaffected**, and the line is here because the
   freshness gate asks a describer to say so rather than to be silent.
 

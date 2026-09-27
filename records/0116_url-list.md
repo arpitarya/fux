@@ -10,7 +10,7 @@ feature: "`.fux/sources/urls` — the file format itself, and the one grammar bo
 owns: [src/fux/ingest/sourcelist.py@019a49b17232, node/src/ingest/sourcelist.mjs@96fa88451bf5]
 laws: [L2, L3, L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: fe798daa7599916dfed8b829c5ab5512edb4901253fcf64bb8be3eee03091cbc
+content_sha: 34c989bc16ac5bb62d887aeb8804f0de5d0b28e3a49369968c3f12a1ba504538
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -56,7 +56,7 @@ loosenings and only the second happened.
 the index could hold readable display text. **A line still carrying `meta=`
 fails to load with a named error**, because the key set is closed; that is the
 `fux update` precedent (W-177), not a deprecation. The leak it closed is an
-accepted exposure now — [SR-LAW-5](0007_LAW-5-hashed-meta.md), superseded.
+accepted exposure now — [SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md), superseded.
 
 ```console
 $ cat .fux/sources/urls

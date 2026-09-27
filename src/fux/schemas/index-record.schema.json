@@ -80,7 +80,7 @@
     "plain `title` and `phrases` exactly as a git record does.",
     "",
     "The leak L5 closed is ACCEPTED, not solved: a title alone tells a reader",
-    "that a document they cannot open exists. records/0007_LAW-5-hashed-meta.md",
+    "that a document they cannot open exists. archive/records/0007_LAW-5-hashed-meta.md",
     "keeps the argument and the reopen trigger.",
     "",
     "Both are shown as the DICT, not the committed line. The committed line is",

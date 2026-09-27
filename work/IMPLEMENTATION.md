@@ -65,6 +65,25 @@ Rules:
 
 ---
 
+## 2026-09-28 — **W-231: law L13 — a retired SR is archived, never deleted**
+
+**Outcome: built and closed.**
+- **What:** SR-LAW-13 at `0014` (the law, stated once, in its LAW-TEXT block);
+  L13 in SR-LAWS's table, the register, the range table and `docs/index.md`;
+  `scripts/gen-laws.py` renders L13 and now REFUSES a retired law record left in
+  `records/` (it used to skip one). SR-WORK-ARCHIVE decision 9 split: superseded
+  records are still rewritten in place, retired ones are archived; its diagrams,
+  Consequences and archive-tier alternative amended. **Backfill:** SR-LAW-5 moved
+  to `archive/records/` with `status: archived`, the banner and a new
+  `archive/README.md` §`records/` row; every live link repointed to its archive
+  path, and its register row and SR-LAWS's L5 row now name it without a link.
+  `CLAUDE.md`'s handle line corrected (it also listed retired L5).
+- **Evidence:** `tests/test_retired_records_archived.py` (three checks); unit
+  5 796 passed (the one failure is `999c1976`'s), e2e 151, Node 92;
+  `gen-laws.py --check` in sync.
+
+---
+
 ## 2026-09-28 — **W-228: the `families` lens (DoD 1–10; DoD 11 open)**
 
 **Outcome: built; the flag's floor stays PROVISIONAL until DoD 11 is measured.**
@@ -1540,8 +1559,8 @@ archived. **5 012 unit tests, 144 e2e, 36 node — all green.**
 | 🔴 **Two guard holes the spec did not predict, both found by the test written for it.** (1) `**/golden-answer/` ends in a slash, so it matched a **directory** and only while one existed — after the 2026-09-15 deletion that exact path was **not gitignored**, and a key written back to it would have been trackable. (2) The hook's Bash branch never matched a bare plural path, so an arbitrary shell command could reach the canonical spelling; `permissions.deny` covers the thirteen *named* commands only | `.gitignore` · [`guard-sealed-key.sh`](../.claude/hooks/guard-sealed-key.sh) |
 | **A SIXTH guard rather than a one-line fix**, because `guard-golden-answer.sh` **refuses every edit to itself** — its TARGET check is a bare substring and its own filename contains it — and routing around a guard that is working was the wrong trade. The new hook anchors its TARGET check to a **path component**, the fix `test_golden_key_never_committed.py` already made after flagging one of the guards on its first run | [SR-WORK-GOLDEN](../records/0066_WORK-golden.md) · [`records/README.md`](../records/README.md) §Ownership |
 | ⚠ **The same false positive makes `W-198-golden-answers-canonical.md` unmaintainable by any Claude session** — the work item that manages the directory. Its closing note went in through the shell, which both guards inspect and permit, and the fact is **declared rather than left silent**; both false positives are asserted as measured facts in the guard test so the sixth guard's reason to exist cannot quietly stop being true. **The one-line fix is an edit to a file no agent can touch, so it is Arpit's** | [`tests/test_golden_key_guards.py`](../tests/test_golden_key_guards.py) |
-| **`meta = "hashed"` is deleted outright and law L5 RETIRES with the mechanism.** The `[sources.url] meta` key, the `meta=` line attribute, `--plain`/`--hashed`, the `title_h` field, `store/displaycache.py`, `assert_meta_policy` — all gone; `SCHEMA_ID` steps to `fux.index.v4` and a v3 index is refused **by name** with a rebuild instruction. A repo still carrying `meta=` **fails to load**, at that file and line — the `fux update` precedent (W-177), no deprecation window and no accept-and-ignore | [SR-LAW-5](../records/0007_LAW-5-hashed-meta.md) (`superseded`) · [SR-RECORD](../records/0109_index-record.md) · [SR-URL-LIST](../records/0116_url-list.md) · `CHANGELOG.md` |
-| 🔴 **What L5 bought is now an ACCEPTED, DOCUMENTED EXPOSURE.** It closed a real ACL-mismatch leak — a title alone tells a reader that a document they cannot open exists — and **every URL record now commits a readable `title` and `phrases`.** The record is kept at `status: superseded` with the argument, the AOL-2006 citation and the reopen trigger intact, because **a reopen is cheaper than a rediscovery**. The handle is never reused: **ten live laws, twelve numbers** | [SR-LAW-5](../records/0007_LAW-5-hashed-meta.md) · [SR-LAWS](../records/0001_LAWS.md) · [SR-LAW-2](../records/0004_LAW-2-content-never-durable.md) §134 |
+| **`meta = "hashed"` is deleted outright and law L5 RETIRES with the mechanism.** The `[sources.url] meta` key, the `meta=` line attribute, `--plain`/`--hashed`, the `title_h` field, `store/displaycache.py`, `assert_meta_policy` — all gone; `SCHEMA_ID` steps to `fux.index.v4` and a v3 index is refused **by name** with a rebuild instruction. A repo still carrying `meta=` **fails to load**, at that file and line — the `fux update` precedent (W-177), no deprecation window and no accept-and-ignore | [SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md) (`superseded`) · [SR-RECORD](../records/0109_index-record.md) · [SR-URL-LIST](../records/0116_url-list.md) · `CHANGELOG.md` |
+| 🔴 **What L5 bought is now an ACCEPTED, DOCUMENTED EXPOSURE.** It closed a real ACL-mismatch leak — a title alone tells a reader that a document they cannot open exists — and **every URL record now commits a readable `title` and `phrases`.** The record is kept at `status: superseded` with the argument, the AOL-2006 citation and the reopen trigger intact, because **a reopen is cheaper than a rediscovery**. The handle is never reused: **ten live laws, twelve numbers** | [SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md) · [SR-LAWS](../records/0001_LAWS.md) · [SR-LAW-2](../records/0004_LAW-2-content-never-durable.md) §134 |
 | 🔴 **The one defect the deletion introduced was SILENT, and it is the finding worth keeping.** `ingest/run.py::_reusable` gated carry-forward on `src == "git" **and** meta == "plain"`; deleting the field made the second clause `False` for every record, so **`reused_count` went to 0 and every `fux ingest` became a full re-extract** — with a **byte-identical index** and no error, because a full re-extraction produces exactly what the carried fields held. **Caught by `tests/ingest/test_delta.py`, which asserts the COUNT and not the bytes.** A test written against the output would have passed | [SR-INGEST](../records/0106_ingest.md) decision 1b |
 | **The law generator needed a RULE, not a list edit.** `gen-laws.py` finds a law by its `LAW-TEXT` marker, and the spec keeps SR-LAW-5 on disk — so the retired law kept rendering into `CLAUDE.md` as if it still bound. It now **skips a record at `status: superseded`**. Deleting the block instead would have left the one artifact that says what the rule *was* no longer saying it. **L9's precedent did not apply**: that record left the glob by being renamed | [`scripts/gen-laws.py`](../scripts/gen-laws.py) |
 | ⚠ **Three items in W-194's spec were wrong about the tree, and are recorded rather than quietly satisfied:** the display cache had **no `DECLARED` row** to remove (it lived under `runtime/`, so ADR-DOTFUX veto condition 1 was never in play); `fux doctor` had **no `hashed_meta` row**; and the generated law block shows **ten** live laws where the spec said eleven | [W-194](../archive/open/W-194-delete-hashed-meta.md) §Built |

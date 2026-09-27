@@ -10,7 +10,7 @@ feature: "`fux answer` — one answer, its footing stated, and the report of wha
 owns: [src/fux/query/refer_answer.py@79014cc86dfd]
 laws: [L1, L2, L3]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 1b36029db016dbc40863c44c13b8276f23c79857b073ea0fbba41d133c29232f
+content_sha: da858da05d17e6099819a4eccfa5b88f7bc1e15525bacb380cb8d7d07a57c8ea
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -503,7 +503,7 @@ read and `answer` is byte-identical.
   nothing it decides.** Hashed display meta was deleted outright: `meta` and
   `title_h` left the record shape, `store/displaycache.py` and
   `assert_meta_policy` were deleted, `fux.index` stepped to **v4**, and law L5
-  retired ([SR-LAW-5](0007_LAW-5-hashed-meta.md), superseded). What moved under `query/__init__.py` is `_resolve_title` / `_title_from` — the P5 display-title lookup, now a no-op because every record carries a readable `title`. `cmd_answer`, the refer/index fork and `_freshness_of` are untouched.
+  retired ([SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md), superseded). What moved under `query/__init__.py` is `_resolve_title` / `_title_from` — the P5 display-title lookup, now a no-op because every record carries a readable `title`. `cmd_answer`, the refer/index fork and `_freshness_of` are untouched.
   **This record's decisions are unaffected**, and the line is here because the
   freshness gate asks a describer to say so rather than to be silent.
 

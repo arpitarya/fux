@@ -37,7 +37,6 @@ here. Read that record before changing anything below it.
 - 🟢 **W-168** · `agent` — the ranking ideas. `set-4-claude` scored by Arpit 2026-09-28 (`hit@1` 66/125, `informed`). Next: each step 6–10 counts its pool from the score; below 6 stops it. [detail](open/W-168-search-improvements.md)
 - 🟢 **W-225** · `agent` — L12 migration, building. Stages 1–4 landed (`constants.toml`; `tune`/`output`/`fux.toml` strict; `formats.toml` caps; `refusals.toml [scan]`; `inspect.toml`). Next: stage 5, R7 numerals. [detail](open/W-225-values-live-in-config.md)
 - 🟡 **W-228** · `agent` — document families: DoD 1–10 built 2026-09-28. Open: DoD 11, golden seed families + a rung before the misfit floor leaves PROVISIONAL; waits on W-230's live probe. [detail](open/W-228-document-families.md)
-- 🟢 **W-231** · `agent` — new law **L13**: a RETIRED SR moves to `archive/records/`, never deleted (superseded records out of scope). SR-LAW-13, amend SR-WORK-ARCHIVE d9, move SR-LAW-5, add a test. **Opus.** [detail](open/W-231-retired-sr-is-archived.md)
 
 
 ### testing

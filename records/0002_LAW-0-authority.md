@@ -7,10 +7,10 @@ description: "The constitutional law. A rule is stated in exactly one SR and eve
 status: accepted
 date: 2026-09-06
 feature: the authority of records — where a rule lives, which record wins, and who may amend one
-owns: [scripts/gen-laws.py@cb86b063f88a, scripts/gen-components.py@f698b5c2305a, tests/test_claude_md_laws.py@0d11020f49f7, tests/test_record_components.py@44f91ccdd550]
+owns: [scripts/gen-laws.py@54958fef9e4d, scripts/gen-components.py@f698b5c2305a, tests/test_claude_md_laws.py@0d11020f49f7, tests/test_record_components.py@44f91ccdd550]
 laws: [L0]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: d5370258ece2b070aece50b9ca405385be0e5cfb3b53cb0a39c87d21aa10c199
+content_sha: c73311dab9a4e916506af8644c5f0c25e1f280ed8c0c7f70a32f6dab5a935aa8
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -309,6 +309,8 @@ enumeration simply lagged — **L9 was retired on 2026-09-13** and is now
 [SR-WORK-ENVIRONMENTS](0052_WORK-environments.md), a WORK record), and it named `this file` where it meant `CLAUDE.md`,
 which stopped being true the moment the text moved. Neither changes what any law
 permits or forbids.
+
+**`scripts/gen-laws.py` renders L13 and refuses a retired law left in `records/`** (2026-09-28, law [L13](0014_LAW-13-retired-records-archived.md)): it used to skip one at `status: superseded`, which let a dead law sit in the live set. The generated block's mechanics — decision 5's view, bound by `tests/test_claude_md_laws.py` — are unchanged.
 
 ### Consequences
 

@@ -13,7 +13,7 @@ feature: configurable output defaults
 owns: [src/fux/output_config.py@988bd2d3cdfb, src/fux/templates/output.toml.txt@7251f3203770, .fux/output.toml@7251f3203770, node/src/config/output.mjs@23ce57d18a76]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: ac0c3464e800791abc946932bdff29c2216551d3862a64806444d96588936cb1
+content_sha: d3ed19b5536408aa6d328cf74af19b8726db1f14ce5691e6a164df74ded35f18
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -814,7 +814,7 @@ this moved where they are written, not what they are.
   nothing it decides.** Hashed display meta was deleted outright: `meta` and
   `title_h` left the record shape, `store/displaycache.py` and
   `assert_meta_policy` were deleted, `fux.index` stepped to **v4**, and law L5
-  retired ([SR-LAW-5](0007_LAW-5-hashed-meta.md), superseded). Nothing in `output_config.py` changed, and no rendering key gained or lost a meaning. ⚠ **One rendered VALUE did change**: a `url:` result's `title` is the document's title rather than an opaque hash, on every surface — which is what the deletion was for, and is not a change to what `[cli.*]` decides.
+  retired ([SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md), superseded). Nothing in `output_config.py` changed, and no rendering key gained or lost a meaning. ⚠ **One rendered VALUE did change**: a `url:` result's `title` is the document's title rather than an opaque hash, on every surface — which is what the deletion was for, and is not a change to what `[cli.*]` decides.
   **This record's decisions are unaffected**, and the line is here because the
   freshness gate asks a describer to say so rather than to be silent.
 

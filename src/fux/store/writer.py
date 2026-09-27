@@ -22,7 +22,7 @@ longer exists.
 
 🔴 **The leak L5 closed is now an ACCEPTED, DOCUMENTED EXPOSURE, not a solved
 problem** — a title alone tells a reader that a document they cannot open
-exists. [SR-LAW-5](../../../records/0007_LAW-5-hashed-meta.md) is kept at
+exists. [SR-LAW-5](../../../archive/records/0007_LAW-5-hashed-meta.md) is kept at
 `status: superseded` with its reopen trigger and its citation, because a reopen
 is cheaper than a rediscovery.
 

@@ -61,6 +61,7 @@ archive/
   benchmark-reports/     benchmark HTML superseded by a dated report under work/benchmark/reports/
   handoff/               executed handoff + prompt pairs of the current build
   open/                  closed work items — the detail file, once its row left the queue
+  records/               RETIRED standing records, moved here under law L13 (2026-09-28)
   templates/             retired shipped-fetcher code, lifted out of src/fux/templates/
   v0.1/                  build: the first one, pre-reset #1
   v0.26/                 build: the v0.19-0.26 substrate engine, runnable
@@ -100,6 +101,19 @@ successor **name**. Numbers survive only here; live prose cites names.
 one change, on Arpit's instruction. `work/adr/` no longer exists; the live
 records are in [`docs/adr/`](../docs/adr/README.md) and the archive's map names
 a successor for every one.
+
+## `records/` — retired standing records (law L13)
+
+A record whose law, rule or subject was **retired** is moved here in the change
+that retires it — [SR-LAW-13](../records/0014_LAW-13-retired-records-archived.md),
+Arpit 2026-09-28. Each carries `status: archived` and an `ARCHIVED <date> —
+retired by <ruling>` banner; it may be **named, never cited**. A *superseded*
+record is not archived — it is rewritten or deleted in place. The records deleted
+on 2026-09-06 are not restored; git holds them.
+
+| record | archived | retired by, and what it keeps |
+|---|---|---|
+| [`records/0007_LAW-5-hashed-meta.md`](records/0007_LAW-5-hashed-meta.md) | 2026-09-28 | **SR-LAW-5 — law L5, retired 2026-09-20** (Arpit, W-194): hashed display meta was deleted outright. It keeps the ACL-mismatch argument, the AOL-2006 citation and the reopen trigger — the leak L5 closed is an accepted, documented exposure. **The handle L5 is never reused.** No successor |
 
 ## `handoff/` — the retired handoff directory
 
@@ -148,6 +162,7 @@ they are worth keeping.
 
 | item | closed | outcome and live successor |
 |---|---|---|
+| [`W-231-retired-sr-is-archived.md`](open/W-231-retired-sr-is-archived.md) | 2026-09-28 | **Built as ruled.** Law L13: a retired SR is moved to `archive/records/`, never deleted; superseded records are still rewritten in place. SR-LAW-5 was the backfill. Live successors: [SR-LAW-13](../records/0014_LAW-13-retired-records-archived.md) and `tests/test_retired_records_archived.py` |
 | [`W-229-inspect-explorer-parity.md`](open/W-229-inspect-explorer-parity.md) | 2026-09-28 | **Built as ruled.** Every lens `fux inspect` reports has a card on the explorer's Index tab, and `--diff` has `/inspect/diff`. Live successors: [SR-SERVE](../records/0158_serve.md) decision 16 and `tests/test_serve_renders_every_lens.py` |
 | [`W-226-schemas-directory.md`](open/W-226-schemas-directory.md) | 2026-09-27 | **Built as ruled; committed in `acfe8ab6`.** The five `*.schema.json` files live in `src/fux/schemas/`, loaded through `fux.schema` by the names in `constants.toml [schema_files]`; no shape or id changed. Live successors: [SR-LAWS](../records/0001_LAWS.md) decision 6 (amended: ownership by per-file carve-out) and the OWNERSHIP rows in [`records/README.md`](../records/README.md) |
 | [`W-224-remove-rm3.md`](open/W-224-remove-rm3.md) | 2026-09-27 | **Built as ruled.** `rm3.py`, `rm3.mjs`, the RM3 block in both readers, `_first_pass` and `rm3_weight` are gone; the key is refused by name in both loaders. 144 of 144 `ask`/`find` outputs byte-identical before and after. Live successor: [SR-EXPAND](../records/0149_expand.md) decision 17 |

@@ -141,7 +141,7 @@ It is reproduced at all because this is the file every session reads first, and
 **for exactly as long as a test binds it** — remove the test and this block
 violates decision 1.
 
-[SR-LAWS](records/0001_LAWS.md) assigns the handles `L0`–`L8`, `L10`, `L11` and `L12` and routes
+[SR-LAWS](records/0001_LAWS.md) assigns the handles `L0`–`L4`, `L6`–`L8` and `L10`–`L13` and routes
 each to its record; that is all it does now.
 
 <!-- LAWS:BEGIN — GENERATED from records/*_LAW-*.md by scripts/gen-laws.py. Do not edit by hand: amend the record, then run `python scripts/gen-laws.py --write`. -->
@@ -303,6 +303,16 @@ each to its record; that is all it does now.
   the sets, the guards, the switch's mechanics and the benchmark process are
   [SR-WORK-GOLDEN](records/0066_WORK-golden.md)'s.
 - **L12** · **Every value lives in a config file, never in code.** A *tunable* value — a weight, threshold, limit, timeout, TTL or sample size — is read from a committed TOML file: `fux.toml`, `.fux/tune.toml`, or another `.fux/*.toml`. A *fixed* engine value — a schema id, a format or rules version, the shard count, an artefact file name — is read from the engine's internal constants file, `src/fux/constants.toml`, shipped inside both distributions. Python and Node read the same key from the same file. **A missing file or key is a hard error that names it; no module constant, function body or parameter default supplies a fallback.** The only places a literal value may sit are `setup.py` and `src/fux/templates/`, which write the config files, and `tests/`, `tests_e2e/`, `tools/` and `scripts/`.
+- **L13** · **A retired SR is archived, never deleted.** When a standing record's
+  law, rule or subject is retired, the record is **moved** to `archive/records/`,
+  mirroring its path, **in the same change that retires it** — with a row in
+  `archive/README.md`, `status: archived`, and a top banner `ARCHIVED <date> —
+  retired by <ruling>` (no *superseded by* line). An archived record may be
+  **named, never cited** as grounding for a live claim
+  ([SR-WORK-ARCHIVE](records/0062_WORK-archive.md) decisions 4–7). **Superseded records
+  are out of scope**: they are still rewritten or deleted in the change that
+  supersedes them (SR-WORK-ARCHIVE decision 9). A retired law handle is never
+  reused.
 
 <!-- LAWS:END -->
 

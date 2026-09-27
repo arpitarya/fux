@@ -376,7 +376,7 @@ require.
    longer exist; a URL record carries a plain `title` and `phrases` like any
    other. **A v3 index is refused by name** — `fux ingest` then `fux build`.
    The ACL-mismatch leak L5 closed is an **accepted, documented exposure**
-   ([SR-LAW-5](../records/0007_LAW-5-hashed-meta.md), superseded). **Ten live
+   ([SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md), superseded). **Ten live
    laws, twelve numbers.**
 2. 🔴 **A key directory is permitted again, at exactly one address** —
    `work/golden/golden-answers/`, gitignored, and **closed to every agent on

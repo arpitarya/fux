@@ -4,7 +4,7 @@ kind: law
 name: SR-LAW-5
 title: "SR-LAW-5 (0007) — L5 — hashed meta was the default for non-git sources (RETIRED 2026-09-20)"
 description: "RETIRED 2026-09-20 (Arpit, W-194) — hashed display meta was deleted outright, and the law retired with the mechanism. The ACL-mismatch leak it closed, where a title alone tells a reader that a document they cannot open exists, is now an ACCEPTED, DOCUMENTED EXPOSURE. Kept for the argument, the citation and the reopen trigger; the handle L5 is never reused."
-status: superseded
+status: archived
 date: 2026-09-20
 feature: the rationale, history and reopen-trigger of L5
 owns: []
@@ -12,6 +12,8 @@ laws: []
 timestamp: 2026-09-20T00:00:00Z
 content_sha: 60cc3c369dbd40d787f31893247d47e1505b19d7f062b4ee3318b11646702a7d
 ---
+
+> **ARCHIVED 2026-09-28 — retired by Arpit, 2026-09-20 (W-194); moved here under law L13 (W-231)**
 
 # SR-LAW-5 — L5 — hashed meta was the default for non-git sources
 

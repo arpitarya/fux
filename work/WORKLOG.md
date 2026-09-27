@@ -22,6 +22,17 @@ play: the worklog is the granular, per-exchange trail.
 **Entry format:**
 
 ```
+## 2026-09-28 — W-231 built and closed: law L13, SR-LAW-5 archived  ·  Claude Code
+- **Asked:** *"review all the work items on open work implement all of them"*.
+- **Did:**
+  - Wrote SR-LAW-13 (`0014`) and added L13 to SR-LAWS, the register and range table, and `docs/index.md`.
+  - `gen-laws.py` now renders L13 and refuses a retired law left in `records/`.
+  - Split SR-WORK-ARCHIVE decision 9: retired records are archived; superseded ones are still rewritten in place.
+  - Moved SR-LAW-5 to `archive/records/` with its status, banner and map row. Repointed about 20 live links. Added `tests/test_retired_records_archived.py`.
+  - 🔴 **`CLAUDE.md` edited** (SR-WORK-DOCS 7a): the handle line now reads `L0`–`L4`, `L6`–`L8`, `L10`–`L13`; it had listed retired L5 inside "L0–L8". The generated law block also regenerated with L13.
+- **Decided / open:** Rows naming LAW-5 carry no link, per the ruling. CHANGELOG and past IMPLEMENTATION prose keep the old path as history.
+- **Next:** W-225 stage 5.
+
 ## 2026-09-28 — W-228 built (DoD 1–10): the `families` lens; Cowork's queue committed  ·  Claude Code
 - **Asked:** *"review all the work items on open work implement all of them"*.
 - **Did:**

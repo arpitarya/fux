@@ -16,7 +16,7 @@ passes trivially.
 looks next.** L5 closed an **ACL-mismatch leak**: a document readable by fifty
 people inside Confluence became a title readable by everyone with the repo.
 That leak is now an **accepted, documented exposure**, not a solved problem —
-[SR-LAW-5](../../records/0007_LAW-5-hashed-meta.md) keeps the argument, the
+[SR-LAW-5](../../archive/records/0007_LAW-5-hashed-meta.md) keeps the argument, the
 AOL-2006 citation and the reopen trigger. **L5 was right about the leak and
 lost on cost.**
 

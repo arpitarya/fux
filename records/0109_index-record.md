@@ -7,10 +7,10 @@ description: What every property of a committed JSONL record is for, why it is i
 status: accepted
 date: 2026-08-18
 feature: the committed record schema — `fux.index.v2`
-owns: [src/fux/schemas/index-record.schema.json@b5ee4b1179eb]
+owns: [src/fux/schemas/index-record.schema.json@3ebe0a7ebc9a]
 laws: [L2, L3, L5, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: bb35ad15ff903799e1025da85e65deac86d2fd18cb85547a5848e17eabac3c48
+content_sha: 9d6cb8c809d18531f342c97fbb56ce9d87fa0ed8b16943fb9cf223aa109b59df
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -57,7 +57,7 @@ source ever lands in git.* **`meta` and `title_h` are deleted**, `fux.index` is
 **v4**, and a url record is shaped exactly like a git one. ⚠ **The leak that
 fork closed — a title alone telling a reader that a document they cannot open
 exists — is an ACCEPTED, DOCUMENTED EXPOSURE**, and
-[SR-LAW-5](0007_LAW-5-hashed-meta.md) (superseded) keeps the argument and the
+[SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md) (superseded) keeps the argument and the
 reopen trigger. One reason a property is conditional is left:
 
 - **Three are written only when they say something.** `archived` and

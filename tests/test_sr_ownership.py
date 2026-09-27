@@ -459,7 +459,7 @@ _UNREACHABLE_BY_THE_GATE = {
     # nothing, and the four runtime-plane records and SR-LOCKS now say in their
     # own bodies which of decision 7's two honest cases that is.
     "SR-LAW-0", "SR-LAW-1", "SR-LAW-2",
-    "SR-LAW-3", "SR-LAW-4", "SR-LAW-5", "SR-LAW-6", "SR-LAW-7",
+    "SR-LAW-3", "SR-LAW-4", "SR-LAW-6", "SR-LAW-7",
     "SR-LAW-8", "SR-WORK-ENVIRONMENTS", "SR-LAW-10", "SR-WORK-OWNERSHIP",
     "SR-PORT-LIST",
     "SR-WORK-QUALITY", "SR-RS",
@@ -531,6 +531,10 @@ _UNREACHABLE_BY_THE_GATE = {
     # not exist until W-225 lands, and the law binds every module rather than
     # one, so no single `src/` change can demand it.
     "SR-LAW-12",
+    # SR-LAW-13 (2026-09-28) owns only its enforcement test: a retired record is
+    # archived, and no change under `src/` can make that true or false.
+    # (SR-LAW-5 left this set the same day — it moved to `archive/records/`.)
+    "SR-LAW-13",
 }
 
 
