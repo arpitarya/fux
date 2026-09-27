@@ -21,6 +21,7 @@ Resolve the `fux` command first — see the `fux-usage` skill (`fux` → `uv run
 | "why is this document here at all — it has none of my words?" | the **reached by link, not by words** panel |
 | "show me how this document was ingested and indexed" | the **Documents** tab — click the document; its X-ray is computed on the click |
 | "what is wrong with the index, worst first?" | the **Index** tab — **every lens `fux inspect` reports**, one card each in the report's order (boilerplate, findability, lengths, duplication, coverage, graph, probes, identity, segments, chunks, triage), then probes streamed in behind |
+| "what kinds of documents are in here, and which break their pattern?" | the Index tab's **families** card — open a family to list its members; its misfits name the heading each one lacks |
 | "what changed since the last `fux inspect`?" | the Index tab's **compare** card — the last report on disk against this one, edge loss flagged |
 | "is the index any good?" | not this verb — `fux inspect` (`fux-inspect`) |
 | "is the repo set up?" | not this verb — `fux doctor` (`fux-index`) |

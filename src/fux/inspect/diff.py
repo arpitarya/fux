@@ -89,6 +89,7 @@ def compare(a: dict, b: dict) -> dict:
         corpus[key] = [va, vb]
     return {
         "corpus": corpus,
+        "families": _families_moved(a, b),
         "added": added,
         "removed": removed,
         "changed": changed,
@@ -96,6 +97,28 @@ def compare(a: dict, b: dict) -> dict:
         "alerts": alerts,
         "edge_loss": sum(len(x["lost_edges"]) for x in alerts),
     }
+
+
+def _families_moved(a: dict, b: dict) -> dict:
+    """W-228: families gained, lost and renamed between two reports.
+
+    ⚠ **Over the families each report LISTS**, which `[report] top` caps — the
+    counts beside them are not capped, and a family below the cut in one report
+    and above it in the other reads as gained or lost. Renamed means the SAME
+    member list under a different name; everything is sorted (L3)."""
+    def listed(report: dict) -> dict:
+        return {f["name"]: tuple(f["members"]) for f in (report.get("families") or {}).get("families", [])}
+
+    fa, fb = listed(a), listed(b)
+    name_of_a = {members: name for name, members in fa.items()}
+    members_b = set(fb.values())
+    renamed = sorted(
+        [name_of_a[members], name] for name, members in fb.items()
+        if members in name_of_a and name_of_a[members] != name
+    )
+    gained = sorted(name for name, members in fb.items() if name not in fa and members not in name_of_a)
+    lost = sorted(name for name, members in fa.items() if name not in fb and members not in members_b)
+    return {"gained": gained, "lost": lost, "renamed": renamed}
 
 
 def _fmt(value) -> str:
@@ -133,6 +156,16 @@ def render_markdown(diff: dict, *, a: str, b: str, top: int) -> str:
         f"\n{len(diff['added'])} document(s) added · {len(diff['removed'])} removed · "
         f"**{diff['changed_count']} changed**.\n"
     )
+    fam = diff.get("families") or {}
+    if fam.get("gained") or fam.get("lost") or fam.get("renamed"):
+        add("## Families\n")
+        for name in fam.get("gained", [])[:top]:
+            add(f"- gained — {name}")
+        for name in fam.get("lost", [])[:top]:
+            add(f"- lost — {name}")
+        for old, new in fam.get("renamed", [])[:top]:
+            add(f"- renamed — {old} → {new}")
+        add("")
     if diff["changed"]:
         add("## Changed documents\n")
         add("| document | what moved |")

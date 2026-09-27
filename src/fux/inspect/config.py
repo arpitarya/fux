@@ -51,10 +51,19 @@ class InspectConfig:
     triage_rows: int
     words_page: int
     words_page_max: int
+    skeleton_jaccard: float
+    core_share: float
+    misfit_floor: float
+    length_edges: tuple[int, ...]
 
 
-#: `field -> (table, kind)`. `share` is a number in (0, 1]; `count` a whole number >= 1.
+#: `field -> (table, kind)`. `share` is a number in (0, 1]; `count` a whole number
+#: >= 1; `edges` a non-empty, strictly increasing list of whole numbers >= 1.
 _SCHEMA: dict[str, tuple[str, str]] = {
+    "skeleton_jaccard": ("families", "share"),
+    "core_share": ("families", "share"),
+    "misfit_floor": ("families", "share"),
+    "length_edges": ("families", "edges"),
     "boilerplate_df_share": ("thresholds", "share"),
     "distinctive_df_share": ("thresholds", "share"),
     "near_duplicate_jaccard": ("thresholds", "share"),
@@ -115,7 +124,17 @@ def _parse(text: str, label: str) -> InspectConfig:
             missing = True
             continue
         value = node[name]
-        if kind == "count":
+        if kind == "edges":
+            ok = (
+                isinstance(value, list) and value
+                and all(isinstance(v, int) and not isinstance(v, bool) and v >= 1 for v in value)
+                and all(a < b for a, b in zip(value, value[1:]))
+            )
+            if not ok:
+                errors.append(f"[{table}] {name} must be a strictly increasing list of whole numbers >= 1 (got {value!r})")
+            else:
+                value = tuple(value)
+        elif kind == "count":
             if isinstance(value, bool) or not isinstance(value, int) or value < 1:
                 errors.append(f"[{table}] {name} must be a whole number >= 1 (got {value!r})")
         elif isinstance(value, bool) or not isinstance(value, (int, float)) or not 0 < value <= 1:

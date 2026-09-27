@@ -47,3 +47,9 @@ words        = 25
 triage_rows    = 200
 words_page     = 200
 words_page_max = 1000
+
+[families]
+skeleton_jaccard = 0.60
+core_share       = 0.80
+misfit_floor     = 0.20
+length_edges     = [200, 1000, 5000]

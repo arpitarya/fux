@@ -24,6 +24,7 @@ Resolve the `fux` command first — see the `fux-usage` skill (`fux` → `uv run
 | "does a doc come back for its own title?" | `probes` — `prose.title_in_top10`, and for data files **both** `data.identifiable` and `data.reachable` |
 | "which documents need attention first?" | `triage` (with `triage_count`), then one row of `documents` |
 | "which decoder or folder is the problem?" | `segments` — one card per decoder × folder × archived |
+| "what kinds of documents does this corpus hold?" | `families` — groups by heading skeleton + front-matter keys, each named by its shared headings; `families.misfits` names members missing a heading their family carries |
 | "did this decoder / analyzer change break anything?" | `fux inspect --diff before.json after.json` — **edge loss is always an alert** |
 | "show me ONE document's X-ray" | `fux serve` → the Documents tab (`fux-serve`) |
 | "show me all of this in a browser" | `fux serve` → the Index tab: every section of this report has a card there, and `--diff` a compare card (`fux-serve`) |

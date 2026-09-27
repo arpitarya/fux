@@ -838,7 +838,7 @@ function renderIndex(r, every) {
       `<tr><td>${esc(k.name)}</td>${cell(pct(k.value))}<td>${k.flagged ? '<span class="flag">attention</span>' : esc(k.status)}</td><td>${esc(k.detail)}</td></tr>`))}
     <div class="maths">Every floor is <b>provisional</b>; a flag is attention, never a failure.</div></div>`;
   html += renderBoilerplate(r.boilerplate) + renderFindability(r.findability) + renderLengths(r.lengths)
-    + renderDuplication(r.duplication) + renderCoverage(r.coverage) + renderGraph(r.graph);
+    + renderDuplication(r.duplication) + renderFamilies(r.families) + renderCoverage(r.coverage) + renderGraph(r.graph);
   const p = r.probes;
   html += `<div class="card"><h2>probes — does a document come back for its own title?</h2><div id="probeslot">`;
   if (p) {
@@ -938,6 +938,23 @@ function renderDuplication(d) {
     ${leverLine(d.lever)}</div>`;
 }
 
+/* W-228: documents grouped by SHAPE — heading skeleton + front-matter keys.
+   A family opens to its members; a member opens in the Documents tab. */
+function renderFamilies(f) {
+  f = f || {};
+  const floor = f.misfit_floor || {};
+  const lv = f.levers || {};
+  return `<div class="card"><h2>4b · families — documents grouped by shape</h2>
+    <div class="sub"><span class="num">${esc(f.family_count)}</span> families of two or more cover <span class="num">${esc(f.documents_in_a_family)}</span> documents (${pct(f.families_share)}) · <span class="num">${esc(f.misfit_count)}</span> misfit(s), ${pct(f.misfit_share)} of family members${f.misfit_flagged ? ' <span class="flag">attention</span>' : ""} (floor ${pct(floor.bound)}, <b>provisional</b>) · <span class="num">${esc(f.singleton_count)}</span> singletons · <span class="num">${esc(f.no_headings_count)}</span> with no headings</div>
+    ${(f.families || []).map((fam) => `<details class="family"><summary><span class="num">${esc(fam.size)}</span> · ${esc(fam.name)}</summary>
+      <div class="sub">folders: ${(fam.folders || []).map((x) => `<span class="mono">${esc(x)}</span>`).join(", ")} · front-matter keys: ${esc((fam.shared_meta_keys || []).join(", ") || "—")} · length: ${esc((fam.length_bands || []).join(", "))}</div>
+      ${docList(fam.members)}</details>`).join("")}
+    <h3>misfits — a member missing its family's core headings</h3>${table(["document", "family", "missing"], (f.misfits || []).map((m) => `<tr><td>${lensDoc(m.id)}</td><td>${esc(m.family)}</td><td>${(m.missing || []).map((h) => `<span class="flag">${esc(h)}</span>`).join("")}</td></tr>`))}
+    <h3>singletons</h3>${docList(f.singletons)}
+    <h3>no headings — no shape to compare</h3>${docList(f.no_headings)}
+    ${leverLine(lv.misfit)}${leverLine(lv["shared headings"])}${leverLine(lv["split across folders"])}</div>`;
+}
+
 function renderCoverage(c) {
   c = c || {};
   return `<div class="card"><h2>5 · analyzer coverage — what the index never saw</h2>
@@ -981,6 +998,7 @@ async function loadDiff() {
   slot.innerHTML = `<div class="sub">${corpus}</div>
     <div class="sub"><span class="num">${esc((d.added || []).length)}</span> added · <span class="num">${esc((d.removed || []).length)}</span> removed · <span class="num">${esc(d.changed_count)}</span> changed · <span class="num">${esc(d.edge_loss)}</span> edge(s) lost${d.edge_loss ? ' <span class="flag">attention</span>' : ""}</div>
     <h3>edge loss — always an alert</h3>${table(["document", "lost edges"], (d.alerts || []).map((a) => `<tr><td>${lensDoc(a.id)}</td>${cell((a.lost_edges || []).length)}</tr>`))}
+    <h3>families</h3><div class="sub">${["gained", "lost"].map((k) => `${k}: ${((d.families || {})[k] || []).map((n) => esc(n)).join(" · ") || "none"}`).join("<br>")}<br>renamed: ${((d.families || {}).renamed || []).map((p) => `${esc(p[0])} → ${esc(p[1])}`).join(" · ") || "none"}</div>
     <h3>added</h3>${docList(d.added)}<h3>removed</h3>${docList(d.removed)}
     <h3>changed</h3>${table(["document", "what moved"], (d.changed || []).map((c) => `<tr><td>${lensDoc(c.id)}</td><td>${Object.keys(c.moves || {}).map((m) => `<span class="flag">${esc(m)}</span>`).join("")}</td></tr>`))}`;
   wireIndexLinks(slot);

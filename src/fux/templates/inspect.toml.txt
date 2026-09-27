@@ -26,6 +26,18 @@ fingerprint_terms = 6
 findable_rank     = 3
 retrieval_sample  = 100
 
+# Document families (W-228): two documents share a family when the Jaccard of
+# their heading-and-front-matter-key sets is at least `skeleton_jaccard` against
+# EVERY member (complete linkage). A member missing a heading that at least
+# `core_share` of its family carries is a misfit; `misfit_floor` is the share
+# of family members that flags the lens, PROVISIONAL until measured on golden.
+# `length_edges` cut body tokens into the bands a family reports.
+[families]
+skeleton_jaccard = 0.60
+core_share       = 0.80
+misfit_floor     = 0.20
+length_edges     = [200, 1000, 5000]
+
 # Title probes: a title is a probe that finds its document in the top
 # `probe_rank`. `probe_sample` documents are probed; `--all` probes every one.
 [probes]

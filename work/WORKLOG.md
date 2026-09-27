@@ -22,6 +22,21 @@ play: the worklog is the granular, per-exchange trail.
 **Entry format:**
 
 ```
+## 2026-09-28 — W-228 built (DoD 1–10): the `families` lens; Cowork's queue committed  ·  Claude Code
+- **Asked:** *"review all the work items on open work implement all of them"*.
+- **Did:**
+  - Built `lenses.families()`. A document's shape is its masked heading skeleton plus its front-matter key names (pass A's new `meta_keys`, facts `v2`), grouped by complete linkage in doc-id order.
+  - Misfits, singletons and documents with no headings are listed separately, with a PROVISIONAL flag.
+  - Wired it into `--json`, prose §4b, `--diff` (gained/lost/renamed) and the explorer card. Added `[families]` to `inspect.toml`.
+  - SR-INSPECT decision 24. My stage-4c decision "14" collided with an existing 14, so it is renumbered 23 and its references repointed.
+  - Tests caught an order-dependent family name, now fixed.
+  - Committed Cowork's rulings (`996b5830`) after 90 idle minutes; I only reformatted the queue.
+- **Decided / open:**
+  - W-228 DoD 11 (golden seed families + a rung) is golden-adjacent and waits on W-230. W-230/W-227 are for a fresh session.
+  - Cowork's git left a stale `index.lock` twice (23:56, 00:33). No git process held either; both removed.
+  - A double-quoted `python -c` had its backticks run by zsh; it was harmless, but this session now edits only through Edit, Write or scratch files.
+- **Next:** W-231 (L13), then W-225 stage 5.
+
 ## 2026-09-28 — W-231 filed: law L13, a retired SR is archived  ·  Cowork (Opus)
 
 Arpit: *"create a new law if an sr is retired archive it"*, then *"no need for

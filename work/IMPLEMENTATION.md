@@ -65,6 +65,28 @@ Rules:
 
 ---
 
+## 2026-09-28 — **W-228: the `families` lens (DoD 1–10; DoD 11 open)**
+
+**Outcome: built; the flag's floor stays PROVISIONAL until DoD 11 is measured.**
+- **What:** `lenses.families()` — shape = masked heading skeleton + front-matter
+  key names (pass A's new `meta_keys`, facts schema `v2`); complete linkage over
+  set Jaccard at `[families] skeleton_jaccard`, doc-id order; misfits at
+  `core_share`; singletons and no-heading documents listed apart; `misfit_share`
+  flagged at `misfit_floor` (provisional). `--json`, prose §4b, `--diff`
+  (gained / lost / renamed), the explorer's families card. Four `[families]`
+  keys in `.fux/inspect.toml`. SR-INSPECT decision 24 (and the stage-4c decision
+  renumbered 14 → 23: 14 already existed).
+- **Evidence:** `tests/test_inspect_families.py` — three planted families of five
+  with one misfit each, a singleton, a no-heading document, the exact-set families
+  byte-unchanged, shuffled order byte-equal (it caught an order-dependent family
+  name), the diff. On this repo: 144 families covering 846 documents; SR records
+  are one family of 84 whose first misfit is `0007_LAW-5-hashed-meta.md` (missing
+  §1 and References — a retired Law record).
+- **Open (DoD 11):** the golden seed must carry families and planted misfits and a
+  rung must report the lens before the floor is anything but provisional.
+
+---
+
 ## 2026-09-28 — **W-229: inspect ⇄ explorer parity**
 
 **Outcome: built and closed; no lens changed.**
@@ -83,7 +105,7 @@ Rules:
   by `inspect/config.py` (strict in a repo, the template outside one) and
   attached to the `IndexView`. Every lens parameter default went; callers pass
   the configured value. `fux setup` / `--fix` write the file; SR-INSPECT
-  decision 14, SR-DOTFUX's layout row, an OWNERSHIP row. The probe cache key
+  decision 23, SR-DOTFUX's layout row, an OWNERSHIP row. The probe cache key
   now carries the rank.
 - **Evidence:** unit 5 779 passed (the rest are the record-stamp gates this
   commit settles and `999c1976`'s); e2e 151; `fux inspect` on this repo renders.

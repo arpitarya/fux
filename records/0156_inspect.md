@@ -8,10 +8,10 @@ amended: 2026-09-27
 status: accepted
 date: 2026-09-14
 feature: the index X-ray
-owns: [src/fux/inspect@27ce8b99b5da, .fux/inspect.toml@165ab7dcc9b6]
+owns: [src/fux/inspect@68d47f57511d, .fux/inspect.toml@28f3b6494463]
 laws: [L2, L3, L4, L6, L8]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 717ff6552dc340d3ebbedfe044d90606a1810db12644034c7fba8245d9789b76
+content_sha: d8a792d396dd2549c606ef65e3d72e1a78af3465672e2442a754358e411f02ea
 ratifies: W-169
 ---
 
@@ -382,7 +382,7 @@ It states no new threshold: its classes are `BOILERPLATE_DF_SHARE` and
 `DISTINCTIVE_DF_SHARE`, the lenses' own. `fux serve` is its only caller today
 ([SR-SERVE](0158_serve.md) decision 4); `fux inspect` prints none of it.
 
-**14. `.fux/inspect.toml` — every threshold, sample and row count the report uses** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 4c, 2026-09-28).
+**23. `.fux/inspect.toml` — every threshold, sample and row count the report uses** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 4c, 2026-09-28).
 The first new consumer file L12 created (R6). Nineteen values left the lens
 modules and their parameter defaults — the boilerplate / distinctive df shares,
 the near-duplicate Jaccard, the link-target share, the minhash signature and
@@ -404,6 +404,36 @@ Words-tab page sizes — for seven tables: `[thresholds]`, `[minhash]`,
   changed `[probes] probe_rank` is never served a list cut at the old one; an
   existing cache is re-asked once.
 - It is not `tune.toml`: nothing here moves the index or a ranking.
+
+**24. `families` — documents grouped by SHAPE** (Arpit, 2026-09-27, W-228: *"pattern
+recognition … how one document looks like, or how a bunch of documents look like"*;
+placed inside `inspect` by the W-220 ruling — a lens, never a verb).
+
+- **A shape** is a document's heading skeleton — its committed `phrases`, digits
+  masked and case folded, so a dated or numbered template is one shape — plus its
+  front-matter key NAMES, which pass A (decision 17) now records as `meta_keys`
+  (facts schema `v2`). Values are never read. Body terms are deliberately out:
+  that is topic clustering, which is `graph`'s communities.
+- **A family** is complete-linkage over the set Jaccard of those features at
+  `[families] skeleton_jaccard`, one pass in doc-id order, ties to the older
+  family. No k, no seed, no restart — a function of the corpus (L3). It is named
+  by its first four core headings, and carries its members, folders, shared
+  front-matter keys and the length bands (`[families] length_edges`) they span.
+- **A misfit** is a member missing a heading at least `[families] core_share` of
+  its family carries, named with what it lacks, worst first. A document in no
+  family of two is a **singleton**; one with no headings has **no shape**, and is
+  listed as such rather than as unique.
+- **`misfit_share` carries the one flag, at `[families] misfit_floor`, PROVISIONAL**
+  — the `SEPARATION_FLOOR` discipline: it stays provisional until the golden seed
+  corpus carries families and planted misfits and a filed rung reports the lens on
+  it (W-228 DoD 11, open).
+- **Levers from `LEVERS` only**: a misfit — *unfindable document*'s (fix the
+  source); a family's shared headings — *boilerplate term*'s; a family split across
+  folders — *template family*'s.
+- `--json` carries it as `families`; the prose report as §4b; `--diff` names
+  families gained, lost and renamed (same members, new name) among those each
+  report lists; the explorer renders it as the *families* card (SR-SERVE decision
+  16). `duplication()`'s exact heading-SET families are unchanged, name and shape.
 
 ### Consequences
 
@@ -479,6 +509,14 @@ Words-tab page sizes — for seven tables: `[thresholds]`, `[minhash]`,
   Broder, *On the resemblance and containment of documents*, 1997 (minhash) ·
   Azzopardi, de Rijke and Balog, *Building simulated queries for known-item
   topics*, SIGIR 2007 (retrievability).
+- The families lens (decision 24): Broder 1997 again (the resemblance it
+  generalises) · Manku, Jain and Das Sarma, *Detecting near-duplicates for web
+  crawling*, WWW 2007 (SimHash — considered, not taken) ·
+  [*Collection-wide similarities for unsupervised document structure extraction*](https://arxiv.org/html/2402.13906v2),
+  2024 (headers → similarity graph → the corpus's typical structure; its
+  embeddings and Louvain replaced by set Jaccard and complete linkage) ·
+  [*Unsupervised document and template clustering using multimodal embeddings*](https://arxiv.org/html/2506.12116v2),
+  2025 (template clustering with no non-neural baseline — the gap this measures into).
 
 ### Veto condition
 

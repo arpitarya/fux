@@ -19,6 +19,7 @@ from __future__ import annotations
 from functools import lru_cache
 
 import math
+import re
 from dataclasses import dataclass, field
 
 __all__ = [
@@ -35,6 +36,8 @@ __all__ = [
     "duplication",
     "coverage",
     "graph_shape",
+    "families",
+    "Families",
 ]
 
 #: finding -> the lever that already exists for it. **The report prints the
@@ -669,3 +672,165 @@ def graph_shape(view, *, top_lists: int) -> GraphShape:
     out.community_count = len(sizes)
     out.communities = sorted(sizes.items(), key=lambda pair: (-pair[1], pair[0]))[:top_lists]
     return out
+
+
+# --------------------------------------------------------------------------
+# 7 · families — documents grouped by shape (W-228)
+# --------------------------------------------------------------------------
+
+#: What masks a heading before two are compared: a run of digits. `2026-09-28`,
+#: `Step 3` and `v0.26` become `#-#-#`, `step #` and `v#.#`, so a dated or
+#: numbered template still reads as one shape.
+_DIGITS = re.compile(r"\d+")
+
+
+def _mask(heading: str) -> str:
+    return " ".join(_DIGITS.sub("#", heading).lower().split())
+
+
+@dataclass
+class Families:
+    """⚠ **`families`, `misfits`, `singletons` and `no_headings` are TRUNCATED;
+    the counts are not** — the `Duplication` rule, for the same reason.
+
+    A document's SHAPE is its heading skeleton (the committed `phrases`, masked,
+    so a dated or numbered template is one shape) and its front-matter key
+    names (pass A's `meta_keys`). Two documents share a family when the Jaccard
+    of those feature sets is at least `[families] skeleton_jaccard` against
+    EVERY member — complete linkage, one pass in doc-id order, ties to the
+    older family. A function of the corpus and nothing else (L3): no k, no seed.
+    """
+
+    families: list[dict] = field(default_factory=list)
+    family_count: int = 0
+    documents_in_a_family: int = 0
+    misfits: list[dict] = field(default_factory=list)
+    misfit_count: int = 0
+    singletons: list[str] = field(default_factory=list)
+    singleton_count: int = 0
+    no_headings: list[str] = field(default_factory=list)
+    no_headings_count: int = 0
+    docs: int = 0
+    misfit_floor: float = 0.0
+
+    @property
+    def families_share(self) -> float:
+        return self.documents_in_a_family / self.docs if self.docs else 0.0
+
+    @property
+    def misfit_share(self) -> float:
+        return self.misfit_count / self.documents_in_a_family if self.documents_in_a_family else 0.0
+
+    @property
+    def misfit_flagged(self) -> bool:
+        return self.misfit_share > self.misfit_floor
+
+
+def _band(tokens: int, edges: tuple[int, ...]) -> str:
+    """The length band a body-token count falls in — `edges` from inspect.toml."""
+    if tokens < edges[0]:
+        return f"<{edges[0]}"
+    for lo, hi in zip(edges, edges[1:]):
+        if tokens < hi:
+            return f"{lo}–{hi - 1}"
+    return f"≥{edges[-1]}"
+
+
+def _jaccard_sets(a: frozenset, b: frozenset) -> float:
+    union = len(a | b)
+    return len(a & b) / union if union else 0.0
+
+
+def families(view, facts, *, top_lists: int) -> Families:
+    """Group documents by shape; name each family, its misfits and its singletons."""
+    config = view.config
+    by_id = getattr(facts, "by_id", {}) or {}
+    out = Families(docs=view.n, misfit_floor=config.misfit_floor)
+    shaped: list[tuple[int, frozenset, list[str]]] = []
+    originals: dict[str, str] = {}
+    # Doc-id order, so the spelling a masked heading is shown with — the first
+    # document's — is a function of the corpus and never of read order (L3).
+    for index, doc in sorted(enumerate(view.docs), key=lambda pair: pair[1].id):
+        masked = [_mask(p) for p in doc.phrases if p and p.strip()]
+        for p, m in zip((p for p in doc.phrases if p and p.strip()), masked):
+            originals.setdefault(m, p.strip())
+        meta = (by_id.get(doc.id) or {}).get("meta_keys") or []
+        features = frozenset({"h:" + m for m in masked} | {"m:" + str(k) for k in meta})
+        if not masked:
+            # No headings at all — a spreadsheet row set, a chat log. Named as
+            # *no headings*, never as a unique shape (W-228 §6).
+            out.no_headings.append(doc.id)
+            continue
+        shaped.append((index, features, masked))
+    shaped.sort(key=lambda row: view.docs[row[0]].id)
+
+    groups: list[list[int]] = []          # indices into `shaped`
+    postings: dict[str, set[int]] = {}    # feature -> the groups holding it
+    cut = config.skeleton_jaccard
+    for position, (_index, features, _masked) in enumerate(shaped):
+        best, best_score = None, -1.0
+        for group in sorted({g for f in features for g in postings.get(f, ())}):
+            worst = 1.0
+            for member in groups[group]:
+                worst = min(worst, _jaccard_sets(features, shaped[member][1]))
+                if worst < cut:
+                    break
+            if worst >= cut and worst > best_score:
+                best, best_score = group, worst
+        if best is None:
+            best = len(groups)
+            groups.append([])
+        groups[best].append(position)
+        for f in features:
+            postings.setdefault(f, set()).add(best)
+
+    edges = config.length_edges
+    named: list[dict] = []
+    misfits: list[dict] = []
+    for members in groups:
+        docs = [view.docs[shaped[m][0]] for m in members]
+        if len(members) < 2:
+            out.singletons.append(docs[0].id)
+            continue
+        out.documents_in_a_family += len(members)
+        counts: dict[str, int] = {}
+        for m in members:
+            for h in set(shaped[m][2]):
+                counts[h] = counts.get(h, 0) + 1
+        core = {h for h, c in counts.items() if c / len(members) >= config.core_share}
+        order = [h for h in shaped[members[0]][2] if h in core]
+        # Named by its shared skeleton — the first four core headings, in the
+        # first member's order, as the exact-set families are named.
+        name = " · ".join(originals[h] for h in list(dict.fromkeys(order))[:4])
+        metas = [set((by_id.get(d.id) or {}).get("meta_keys") or []) for d in docs]
+        shared_meta = sorted(set.intersection(*metas)) if metas else []
+        folders = sorted({d.loc.rsplit("/", 1)[0] + "/" if "/" in d.loc else "./" for d in docs})
+        bands = sorted({_band(d.flen[0] if d.flen else 0, edges) for d in docs}, key=lambda b: _band_order(b, edges))
+        ids = sorted(d.id for d in docs)
+        named.append({
+            "name": name or "(no shared heading)",
+            "size": len(members),
+            "members": ids,
+            "folders": folders,
+            "shared_meta_keys": shared_meta,
+            "length_bands": bands,
+        })
+        for m, d in zip(members, docs):
+            missing = sorted(core - set(shaped[m][2]), key=lambda h: order.index(h) if h in order else len(order))
+            if missing:
+                misfits.append({"id": d.id, "family": name or "(no shared heading)",
+                                "missing": [originals[h] for h in missing]})
+    out.family_count = len(named)
+    out.misfit_count = len(misfits)
+    out.singleton_count = len(out.singletons)
+    out.no_headings_count = len(out.no_headings)
+    out.families = sorted(named, key=lambda row: (-row["size"], row["name"], row["members"][0]))[:top_lists]
+    out.misfits = sorted(misfits, key=lambda row: (-len(row["missing"]), row["id"]))[:top_lists]
+    out.singletons = sorted(out.singletons)[:top_lists]
+    out.no_headings = sorted(out.no_headings)[:top_lists]
+    return out
+
+
+def _band_order(band: str, edges: tuple[int, ...]) -> int:
+    labels = [_band(0, edges)] + [_band(e, edges) for e in edges]
+    return labels.index(band) if band in labels else len(labels)

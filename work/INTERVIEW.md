@@ -37,7 +37,7 @@ valuable judgement, but not the state of play.
 
 ### 🟢 2026-09-28 (latest) — W-225 STAGE 4c: `.fux/inspect.toml`; STAGES 1–4 DONE
 
-- Nineteen inspect/explorer values now in `.fux/inspect.toml` ([SR-INSPECT](../records/0156_inspect.md) decision 14); no value moved.
+- Nineteen inspect/explorer values now in `.fux/inspect.toml` ([SR-INSPECT](../records/0156_inspect.md) decision 23); no value moved.
 - **Next:** W-227 hardening (ruled 2026-09-27), then W-225 stage 5 (R7 numerals → `constants.toml`).
 
 ### 🟢 2026-09-27 — W-225 STAGE 4a: DECODER CAPS IN `formats.toml`; THE FILE IS REQUIRED

@@ -159,6 +159,9 @@ def compute(root: Path, doc, *, decoder: str, bounds: dict[str, int]) -> dict:
         "decoded": False,
         "title_source": "",
         "headings": 0,
+        #: the front-matter key NAMES, sorted — never a value (W-228's
+        #: `families` lens reads them as half of a document's shape).
+        "meta_keys": [],
         "body_tokens": 0,
         "link_target_tokens": 0,
         "chrome_tokens": 0,
@@ -184,6 +187,7 @@ def compute(root: Path, doc, *, decoder: str, bounds: dict[str, int]) -> dict:
             else "file name"
         )
         out["headings"] = len(headings)
+        out["meta_keys"] = sorted(str(key) for key in parsed.meta)
         out["body_tokens"] = len(tokenize(stripped))
         out["link_target_tokens"] = sum(
             len(tokenize(m.group(1).replace("/", " ").replace(".", " ")))

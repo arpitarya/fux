@@ -9,7 +9,7 @@ ball: agent
 
 # W-228 — document families: pattern recognition over the corpus, inside `inspect`
 
-**Status: filed 2026-09-27, not started.** 🟡 waits on **W-229** — the explorer must render every lens before a new one lands. `.fux/inspect.toml` exists (W-225 stage 4c, 2026-09-28); every threshold this lens introduces lives there under [L12](../../records/0013_LAW-12-values-live-in-config.md).
+**Status: DoD 1–10 BUILT 2026-09-28 (Claude Code, Opus); DoD 11 open.** The lens, the report section, `--json`, `--diff`, the explorer card, four `[families]` keys in `.fux/inspect.toml` under [L12](../../records/0013_LAW-12-values-live-in-config.md), the tests and SR-INSPECT decision 24 have landed. **Open: DoD 11** — the golden seed needs families and planted misfits, and a filed rung must report the lens, before `misfit_floor` is anything but PROVISIONAL. That is golden-adjacent work and waits until W-230's live probe shows the traversal guard firing.
 
 **Model:** Claude Code, Sonnet for the lens and its tests; Opus only if the
 skeleton-distance design in §3 turns out to need a compare doc.

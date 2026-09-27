@@ -203,7 +203,7 @@ report_json       = "report.json"
 dictionary        = "dictionary.json"
 dictionary_schema = "fux.inspect.dictionary.v1"
 facts             = "facts.json"
-facts_schema      = "fux.inspect.facts.v1"
+facts_schema      = "fux.inspect.facts.v2"
 probes            = "probes.json"
 probes_schema     = "fux.inspect.probes.v1"
 # Inspect's definition of a DATA file -- fixed (R4), not a knob.

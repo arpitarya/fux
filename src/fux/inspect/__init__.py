@@ -62,6 +62,8 @@ class Report:
     #: W-220 — pass A, pass C and the fold. `probes` is `None` when no document
     #: was probed (`probe_sample=None`), which the headline check reports `n/a`.
     facts: object = None
+    #: W-228 — documents grouped by shape; needs pass A's `meta_keys`.
+    families: object = None
     probes: object = None
     fold: object = None
 
@@ -116,6 +118,7 @@ def inspect_index(
     )
     probes_mod.save_cache(root, cache_key, query_cache, before=cached_before)
     fold = xray_mod.fold(view, facts, findability, probes, top=top)
+    families = lenses_mod.families(view, facts, top_lists=top)
     return Report(
         view=view,
         dictionary=dictionary,
@@ -131,11 +134,39 @@ def inspect_index(
         facts=facts,
         probes=probes,
         fold=fold,
+        families=families,
     )
 
 
 def _share(value: float | None) -> str:
     return "n/a" if value is None else f"{value * 100:.1f} %"
+
+
+def _families_dict(fam) -> dict:
+    """`families` for `--json` (W-228). Every threshold it was cut at is named
+    beside the numbers, so a reader never has to guess which floor flagged it."""
+    if fam is None:
+        return {}
+    return {
+        "family_count": fam.family_count,
+        "documents_in_a_family": fam.documents_in_a_family,
+        "families_share": fam.families_share,
+        "families": fam.families,
+        "misfit_count": fam.misfit_count,
+        "misfit_share": fam.misfit_share,
+        "misfit_flagged": fam.misfit_flagged,
+        "misfit_floor": {"bound": fam.misfit_floor, "direction": "above", "provisional": True},
+        "misfits": fam.misfits,
+        "singleton_count": fam.singleton_count,
+        "singletons": fam.singletons,
+        "no_headings_count": fam.no_headings_count,
+        "no_headings": fam.no_headings,
+        "levers": {
+            "misfit": _lever("unfindable document"),
+            "shared headings": _lever("boilerplate term"),
+            "split across folders": _lever("template family"),
+        },
+    }
 
 
 def _lever(finding: str) -> str:
@@ -265,6 +296,34 @@ def render_markdown(report: Report) -> str:
         add("\n**Template families:**\n")
         for headings, members in dup.families:
             add(f"- {len(members)} document(s) share `{headings}` — e.g. `{members[0]}`")
+
+    fam = report.families
+    if fam is not None:
+        cfg = report.view.config
+        add("\n## 4b · Families — documents grouped by shape\n")
+        add(
+            f"- {fam.family_count} family(ies) of two or more, covering {fam.documents_in_a_family} of "
+            f"{fam.docs} document(s) (**{_share(fam.families_share)}**), at a heading-and-front-matter "
+            f"Jaccard >= {cfg.skeleton_jaccard:.2f} against every member.\n"
+            f"- {fam.misfit_count} misfit(s) — a member missing a heading >= {_share(cfg.core_share)} of its "
+            f"family carries — **{_share(fam.misfit_share)}** of family members"
+            + (" — **flagged**" if fam.misfit_flagged else "")
+            + f" (floor {_share(cfg.misfit_floor)}, *provisional*).\n"
+            f"- {fam.singleton_count} singleton(s); {fam.no_headings_count} document(s) with no headings, "
+            f"which have no shape to compare."
+        )
+        add(f"\nLevers: a misfit — {_lever('unfindable document')}; a family's shared headings — "
+            f"{_lever('boilerplate term')}; a family split across folders — {_lever('template family')}\n")
+        if fam.families:
+            add("| members | family | folders | front-matter keys | length |")
+            add("|---|---|---|---|---|")
+            for row in fam.families:
+                add(f"| {row['size']} | {row['name']} | {', '.join(row['folders'])} | "
+                    f"{', '.join(row['shared_meta_keys']) or '—'} | {', '.join(row['length_bands'])} |")
+        if fam.misfits:
+            add("\n**Misfits, worst first:**\n")
+            for row in fam.misfits:
+                add(f"- `{row['id']}` — in *{row['family']}*, missing {', '.join(row['missing'])}")
 
     cov = report.coverage
     add("\n## 5 · Analyzer coverage — what the index never saw\n")
@@ -499,6 +558,7 @@ def as_dict(report: Report) -> dict:
             "families": [{"headings": headings, "members": members} for headings, members in dup.families],
             "lever": _lever("near-duplicate pair"),
         },
+        "families": _families_dict(report.families),
         "coverage": {
             "raw_runs": cov.raw_runs,
             "kept": cov.kept,

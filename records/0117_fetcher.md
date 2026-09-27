@@ -7,10 +7,10 @@ description: "Fux never fetches; a consumer-owned fetcher file does. One fetcher
 status: accepted
 date: 2026-08-19
 feature: the fetch contract, what it is called, and the two shipped templates
-owns: [src/fux/ingest/urlsrc.py@0238d03fd2d9, src/fux/templates@f4b82987c6de]
+owns: [src/fux/ingest/urlsrc.py@0238d03fd2d9, src/fux/templates@5a5dec761ecf]
 laws: [L1, L3, L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: e384318d893b390d9b52dc37767338e6580e1533d68016dd25c187b06c3cea32
+content_sha: d0589e4085445a741f2cf54058ea8d71843abf5edc4470cddc36b391e6c2ae3d
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -662,7 +662,7 @@ copied out, never imported.
 
 **`templates/refusals.toml.txt` gained `[scan]`** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 4b, 2026-09-27) — owned in substance by [SR-REFUSAL](0146_refusals.md) decision 9a.
 
-**`src/fux/templates/` gained `inspect.toml.txt`** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 4c, 2026-09-28) — owned in substance by [SR-INSPECT](0156_inspect.md) decision 14.
+**`src/fux/templates/` gained `inspect.toml.txt`** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 4c, 2026-09-28) — owned in substance by [SR-INSPECT](0156_inspect.md) decision 23.
 
 ### Consequences
 

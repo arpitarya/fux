@@ -11,7 +11,7 @@ owns: [src/fux/doctor.py@37fb7feb889a, tests/test_doctor_register_is_complete.py
 laws: [L4, L8]
 ratifies: "Arpit, 2026-09-11 — *create a new adr for doctor*"
 timestamp: 2026-09-11T00:00:00Z
-content_sha: f5fb7807b811657203addf1fc675329bc88740b1edd8024ae83a89ac6df6f2ff
+content_sha: 555e9d7aacf22a4f5f10f7ffb91afc70f4a005f0566236384ac2df90e216a458
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -448,7 +448,7 @@ this moved where they are written, not what they are.
 
 **`refusals.toml current` joins the frozen-keys rows for `[scan]`** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 4b, 2026-09-27); an absent `refusals.toml` is not reported there, because absent means *no rules* ([SR-REFUSAL](0146_refusals.md) decision 9a).
 
-**`inspect.toml current` joins the frozen-keys rows** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 4c, 2026-09-28); the file is required and written from its template ([SR-INSPECT](0156_inspect.md) decision 14).
+**`inspect.toml current` joins the frozen-keys rows** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 4c, 2026-09-28); the file is required and written from its template ([SR-INSPECT](0156_inspect.md) decision 23).
 
 ### Consequences
 
