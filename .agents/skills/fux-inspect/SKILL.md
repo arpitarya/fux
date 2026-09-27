@@ -26,6 +26,7 @@ Resolve the `fux` command first — see the `fux-usage` skill (`fux` → `uv run
 | "which decoder or folder is the problem?" | `segments` — one card per decoder × folder × archived |
 | "did this decoder / analyzer change break anything?" | `fux inspect --diff before.json after.json` — **edge loss is always an alert** |
 | "show me ONE document's X-ray" | `fux serve` → the Documents tab (`fux-serve`) |
+| "show me all of this in a browser" | `fux serve` → the Index tab: every section of this report has a card there, and `--diff` a compare card (`fux-serve`) |
 | "why did THIS document rank here?" | not this verb — `fux ask --why` (`fux-search`) |
 | "is the repo set up correctly?" | not this verb — `fux doctor` (`fux-index`) |
 

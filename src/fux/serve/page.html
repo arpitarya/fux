@@ -837,6 +837,8 @@ function renderIndex(r, every) {
     ${table(["check", "value", "status", "what it means"], (r.checks || []).map((k) =>
       `<tr><td>${esc(k.name)}</td>${cell(pct(k.value))}<td>${k.flagged ? '<span class="flag">attention</span>' : esc(k.status)}</td><td>${esc(k.detail)}</td></tr>`))}
     <div class="maths">Every floor is <b>provisional</b>; a flag is attention, never a failure.</div></div>`;
+  html += renderBoilerplate(r.boilerplate) + renderFindability(r.findability) + renderLengths(r.lengths)
+    + renderDuplication(r.duplication) + renderCoverage(r.coverage) + renderGraph(r.graph);
   const p = r.probes;
   html += `<div class="card"><h2>probes — does a document come back for its own title?</h2><div id="probeslot">`;
   if (p) {
@@ -852,24 +854,136 @@ function renderIndex(r, every) {
     html += `<div class="progress">waiting to probe…</div>`;
   }
   html += `</div></div>`;
-  html += `<div class="card"><h2>L1 — segments: decoder × folder × archived</h2>${table(
-    ["decoder", "folder", "archived", "docs", "unreadable", "passages", "word-cut", "chrome tok.", "link-target tok.", "shared title", "title in top 10"],
-    (r.segments || []).map((s) => `<tr><td>${esc(s.decoder)}</td><td class="mono">${esc(s.folder)}</td><td>${s.archived ? "yes" : "no"}</td>${cell(s.documents)}${cell(s.unreadable)}${cell(s.passages)}${cell(s.word_cut_passages)}${cell(s.chrome_tokens)}${cell(s.link_target_tokens)}${cell(s.shared_title)}${cell(s.probed ? s.title_in_top10 + " / " + s.probed : "—")}</tr>`))}</div>`;
-  html += `<div class="card"><h2>L2 — triage: documents with findings, most first</h2>
-    <div class="sub"><span class="num">${esc(r.triage_count)}</span> of <span class="num">${esc((r.documents || []).length)}</span> documents carry a finding; fux ordered them by how many — a count, not a score.${(r.triage || []).length < r.triage_count ? ` The first <span class="num">${esc(r.triage.length)}</span> are shown.` : ""}</div>
-    ${table(["findings", "document"], (r.triage || []).map((d) =>
-      `<tr>${cell(d.findings.length)}<td><a href="#" class="opendoc mono" data-loc="${esc(d.loc)}">${esc(d.loc)}</a><div>${d.findings.map((f) => `<span class="flag">${esc(f)}</span>`).join("")}</div></td></tr>`))}</div>`;
   const id = r.identity || {};
   html += `<div class="card"><h2>identity — titles more than one document carries</h2>
     <div class="sub"><span class="num">${esc(id.documents_sharing)}</span> documents share a title, in <span class="num">${esc(id.groups)}</span> groups.</div>
     ${table(["documents", "title"], (id.top || []).map((g) => `<tr>${cell(g.count)}<td>${esc(g.title)}</td></tr>`))}
-    <div class="maths">Lever: ${esc(id.lever || "")}</div></div>`;
+    ${leverLine(id.lever)}</div>`;
+  html += `<div class="card"><h2>L1 — segments: decoder × folder × archived</h2>${table(
+    ["decoder", "folder", "archived", "docs", "unreadable", "passages", "word-cut", "chrome tok.", "link-target tok.", "shared title", "title in top 10"],
+    (r.segments || []).map((s) => `<tr><td>${esc(s.decoder)}</td><td class="mono">${esc(s.folder)}</td><td>${s.archived ? "yes" : "no"}</td>${cell(s.documents)}${cell(s.unreadable)}${cell(s.passages)}${cell(s.word_cut_passages)}${cell(s.chrome_tokens)}${cell(s.link_target_tokens)}${cell(s.shared_title)}${cell(s.probed ? s.title_in_top10 + " / " + s.probed : "—")}</tr>`))}</div>`;
+  html += renderChunks(r.chunks);
+  html += `<div class="card"><h2>L2 — triage: documents with findings, most first</h2>
+    <div class="sub"><span class="num">${esc(r.triage_count)}</span> of <span class="num">${esc((r.documents || []).length)}</span> documents carry a finding; fux ordered them by how many — a count, not a score.${(r.triage || []).length < r.triage_count ? ` The first <span class="num">${esc(r.triage.length)}</span> are shown.` : ""}</div>
+    ${table(["findings", "document"], (r.triage || []).map((d) =>
+      `<tr>${cell(d.findings.length)}<td><a href="#" class="opendoc mono" data-loc="${esc(d.loc)}">${esc(d.loc)}</a><div>${d.findings.map((f) => `<span class="flag">${esc(f)}</span>`).join("")}</div></td></tr>`))}</div>`;
+  html += `<div class="card"><h2>compare — this index against the last <span class="mono">fux inspect</span> report</h2>
+    <div id="diffslot"><button class="btn" id="diffbtn">compare with the previous report</button></div></div>`;
   $("idxout").innerHTML = html;
-  $("idxout").querySelectorAll(".opendoc").forEach((a) => a.addEventListener("click", (e) => {
-    e.preventDefault(); showTab("docs"); openDocument(a.dataset.loc);
-  }));
+  wireIndexLinks($("idxout"));
   const btn = $("probeall");
   if (btn) btn.addEventListener("click", () => loadProbes(r, true));
+  const dbtn = $("diffbtn");
+  if (dbtn) dbtn.addEventListener("click", loadDiff);
+}
+
+/* ---- W-229: every lens `fux inspect` reports has a card here. -------------
+   Each renderer reads its section of the report as the server sent it — the
+   numbers, the named offenders as the report capped them, and the lens's own
+   lever from LEVERS. Nothing here counts, sorts or scores (SR-SERVE d5).
+   `tests/test_serve_renders_every_lens.py` fails a lens with no renderer. */
+const locOf = (id) => String(id || "").replace(/^(file|url):/, "");
+const lensDoc = (id) => `<a href="#" class="opendoc mono" data-loc="${esc(locOf(id))}">${esc(locOf(id))}</a>`;
+const termLink = (hash, word) => `<a href="#" class="openword" data-term="${esc(hash)}">${esc(word || hash)}</a>`;
+const leverLine = (lever) => lever ? `<div class="maths">Lever: ${esc(lever)}</div>` : "";
+const docList = (ids) => (ids || []).length ? `<div>${ids.map((i) => `<div>${lensDoc(i)}</div>`).join("")}</div>` : `<div class="sub">none</div>`;
+const percentiles = (p) => ["min", "p10", "p50", "p90", "max"].map((k) => `${k} <span class="num">${esc((p || {})[k])}</span>`).join(" · ");
+
+function wireIndexLinks(root) {
+  root.querySelectorAll(".opendoc").forEach((a) => a.addEventListener("click", (e) => {
+    e.preventDefault(); showTab("docs"); openDocument(a.dataset.loc);
+  }));
+  root.querySelectorAll(".openword").forEach((a) => a.addEventListener("click", (e) => {
+    e.preventDefault(); showTab("words"); openWord(a.dataset.term);
+  }));
+}
+
+function renderBoilerplate(b) {
+  b = b || {};
+  return `<div class="card"><h2>1 · boilerplate — what is on everything</h2>
+    <div class="sub"><span class="num">${esc(b.boilerplate_terms)}</span> of <span class="num">${esc(b.terms)}</span> terms are boilerplate, carrying ${pct(b.boilerplate_share)} of postings · hapax ${pct(b.hapax_share)} · Zipf slope <span class="num">${esc(b.zipf_slope)}</span> · Heaps β <span class="num">${esc(b.heaps_beta)}</span>, k <span class="num">${esc(b.heaps_k)}</span></div>
+    ${table(["word", "df", "share", "idf"], (b.top || []).map((t) => `<tr><td>${termLink(t.hash, t.word)}</td>${cell(t.df)}${cell(pct(t.share))}${cell(t.idf)}</tr>`))}
+    <div class="maths">Each word opens in the Words tab, where its class is shown per term.</div>${leverLine(b.lever)}</div>`;
+}
+
+function renderFindability(f) {
+  f = f || {};
+  return `<div class="card"><h2>2 · findability — what no query can reach</h2>
+    <div class="sub"><span class="num">${esc(f.unfindable_count)}</span> document(s) carry no distinctive term. Retrieval: <span class="num">${esc(f.retrieved)}</span> of <span class="num">${esc(f.sampled)}</span> come back for their own fingerprint (${pct(f.findable_share)})${f.sample_is_whole_corpus ? "" : " — <b>a sample: the share is an estimate</b>"}.</div>
+    <h3>unfindable</h3>${docList(f.unfindable)}
+    <h3>fingerprint misses</h3>${table(["document", "rank"], (f.misses || []).map((m) => `<tr><td>${lensDoc(m.id)}</td>${cell(m.rank)}</tr>`))}
+    <h3>fewest distinctive terms</h3>${table(["document", "distinctive"], (f.fewest_distinctive || []).map((m) => `<tr><td>${lensDoc(m.id)}</td>${cell(m.distinctive)}</tr>`))}
+    ${leverLine(f.lever)}</div>`;
+}
+
+function renderLengths(l) {
+  l = l || {};
+  return `<div class="card"><h2>3 · length and fields</h2>
+    ${table(["field", "tokens"], Object.entries(l.fields || {}).map(([k, v]) => `<tr><td>${esc(k)}</td>${cell(v)}</tr>`))}
+    <div class="sub">body tokens: ${percentiles(l.body_tokens)}</div>
+    <div class="sub">distinct terms: ${percentiles(l.distinct_terms)}</div>
+    <h3>empty title (<span class="num">${esc((l.empty_title || []).length)}</span>)</h3>${docList(l.empty_title)}
+    <h3>no headings (<span class="num">${esc((l.no_headings || []).length)}</span>)</h3>${docList(l.no_headings)}
+    <h3>ctx longer than body</h3>${table(["document", "ctx", "body"], (l.ctx_over_body || []).map((x) => `<tr><td>${lensDoc(x.id)}</td>${cell(x.ctx)}${cell(x.body)}</tr>`))}
+    <h3>shortest</h3>${table(["document", "body tokens"], (l.shortest || []).map((x) => `<tr><td>${lensDoc(x.id)}</td>${cell(x.body_tokens)}</tr>`))}
+    <h3>longest</h3>${table(["document", "body tokens"], (l.longest || []).map((x) => `<tr><td>${lensDoc(x.id)}</td>${cell(x.body_tokens)}</tr>`))}</div>`;
+}
+
+function renderDuplication(d) {
+  d = d || {};
+  return `<div class="card"><h2>4 · duplication and templates</h2>
+    <div class="sub"><span class="num">${esc(d.pair_count)}</span> near-duplicate pair(s), covering <span class="num">${esc(d.documents_in_a_pair)}</span> documents (${pct(d.near_duplicate_share)}) · <span class="num">${esc(d.family_count)}</span> template families covering <span class="num">${esc(d.documents_in_a_family)}</span>.</div>
+    <h3>near-duplicate pairs (exact Jaccard)</h3>${table(["a", "b", "Jaccard"], (d.near_duplicates || []).map((p) => `<tr><td>${lensDoc(p.a)}</td><td>${lensDoc(p.b)}</td>${cell(p.jaccard)}</tr>`))}
+    <h3>template families — an identical heading set</h3>${table(["headings", "members"], (d.families || []).map((fam) => `<tr><td>${esc(fam.headings)}</td><td>${docList(fam.members)}</td></tr>`))}
+    ${leverLine(d.lever)}</div>`;
+}
+
+function renderCoverage(c) {
+  c = c || {};
+  return `<div class="card"><h2>5 · analyzer coverage — what the index never saw</h2>
+    <div class="sub">kept <span class="num">${esc(c.kept)}</span> of <span class="num">${esc(c.raw_runs)}</span> raw runs (${pct(c.kept_share)}) · dictionary names <span class="num">${esc(c.named_terms)}</span> of <span class="num">${esc(c.total_terms)}</span> terms (${pct(c.dictionary_coverage)})</div>
+    <h3>no content</h3>${docList(c.no_content)}
+    <h3>undecodable</h3>${docList(c.undecodable)}
+    <h3>unreadable</h3>${docList(c.unreadable)}
+    <h3>queued for enrichment (<span class="num">${esc((c.queued || []).length)}</span>)</h3>${table(["document", "why"], (c.queued || []).map((q) => `<tr><td>${lensDoc(q.loc)}</td><td class="mono">${esc(q.why)}</td></tr>`))}
+    ${leverLine(c.lever)}</div>`;
+}
+
+function renderGraph(g) {
+  g = g || {};
+  return `<div class="card"><h2>6 · graph — orphans, hubs, communities</h2>
+    <div class="sub"><span class="num">${esc(g.nodes)}</span> nodes · <span class="num">${esc(g.edges)}</span> edges · <span class="num">${esc(g.orphan_count)}</span> orphans · <span class="num">${esc(g.community_count)}</span> communities (${esc(g.singleton_communities)} singleton)</div>
+    <h3>hubs, by inbound links</h3>${table(["document", "inbound"], (g.hubs || []).map((h) => `<tr><td>${lensDoc(h.id)}</td>${cell(h.inbound)}</tr>`))}
+    <h3>communities</h3>${table(["label", "size"], (g.communities || []).map((x) => `<tr><td class="mono">${esc(x.label)}</td>${cell(x.size)}</tr>`))}
+    <h3>orphans</h3>${docList(g.orphans)}
+    ${leverLine(g.lever)}</div>`;
+}
+
+function renderChunks(k) {
+  k = k || {};
+  const cuts = k.cuts || {};
+  return `<div class="card"><h2>10 · chunks — where refer cuts a passage</h2>
+    <div class="sub"><span class="num">${esc(k.passages)}</span> passages · cut at an author boundary <span class="num">${esc(cuts.author)}</span> · a line <span class="num">${esc(cuts.line)}</span> · mid-word <span class="num">${esc(cuts.word)}</span></div>
+    ${table(["decoder", "documents", "passages", "word-cut", "word-cut share"], Object.entries(k.by_decoder || {}).map(([name, row]) => `<tr><td>${esc(name)}</td>${cell(row.documents)}${cell(row.passages)}${cell(row.word)}${cell(pct(row.word_share))}</tr>`))}
+    ${leverLine(k.lever)}</div>`;
+}
+
+/* `--diff` in the explorer: the last `fux inspect` report on disk against the
+   report this page is showing, compared by the server's `diff.compare`. */
+async function loadDiff() {
+  const slot = $("diffslot");
+  slot.innerHTML = `<div class="progress">comparing…</div>`;
+  let d;
+  try {
+    d = await poll("/inspect/diff", (p) => { slot.innerHTML = progressLine(p); });
+  } catch (e) { slot.innerHTML = `<div class="err">${esc(e.message || e)}</div>`; return; }
+  const corpus = Object.entries(d.corpus || {}).map(([k, v]) => `${esc(k)} <span class="num">${esc(v[0])}</span> → <span class="num">${esc(v[1])}</span>`).join(" · ");
+  slot.innerHTML = `<div class="sub">${corpus}</div>
+    <div class="sub"><span class="num">${esc((d.added || []).length)}</span> added · <span class="num">${esc((d.removed || []).length)}</span> removed · <span class="num">${esc(d.changed_count)}</span> changed · <span class="num">${esc(d.edge_loss)}</span> edge(s) lost${d.edge_loss ? ' <span class="flag">attention</span>' : ""}</div>
+    <h3>edge loss — always an alert</h3>${table(["document", "lost edges"], (d.alerts || []).map((a) => `<tr><td>${lensDoc(a.id)}</td>${cell((a.lost_edges || []).length)}</tr>`))}
+    <h3>added</h3>${docList(d.added)}<h3>removed</h3>${docList(d.removed)}
+    <h3>changed</h3>${table(["document", "what moved"], (d.changed || []).map((c) => `<tr><td>${lensDoc(c.id)}</td><td>${Object.keys(c.moves || {}).map((m) => `<span class="flag">${esc(m)}</span>`).join("")}</td></tr>`))}`;
+  wireIndexLinks(slot);
 }
 
 /* Example chips come from the page's own health call and the URL, never from a

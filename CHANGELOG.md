@@ -18,6 +18,7 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   document at a time with its counts up front, probes first, the long tables
   folded, links that open the linked document, and `?tab=docs&doc=…` deep links.
   The page still computes nothing (SR-SERVE decision 3, amended 2026-09-27).
+- **The explorer's Index tab shows every lens `fux inspect` reports** (W-229) — boilerplate, findability, lengths and fields, duplication and templates, analyzer coverage, graph and chunks join the cards it had, in the report's own order, each with its lever; document names open the Documents tab and words the Words tab. A **compare** card runs `fux inspect --diff` against the last report on disk (`GET /inspect/diff`). A test fails any future lens the page does not render.
 - **`fux serve` gains a Words tab** — every term the index holds with its `df`,
   `cf`, `idf` and class (boilerplate · common · distinctive · hapax), sorted,
   searched and paged on the server; a box that shows a question exactly as the

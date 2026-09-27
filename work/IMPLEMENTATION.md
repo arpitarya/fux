@@ -65,6 +65,14 @@ Rules:
 
 ---
 
+## 2026-09-28 — **W-229: inspect ⇄ explorer parity**
+
+**Outcome: built and closed; no lens changed.**
+- **What:** seven new Index-tab cards (boilerplate, findability, lengths, duplication, coverage, graph, chunks) beside the existing ones, ordered as `fux inspect`'s prose report; every card prints its lens's own `lever`; document ids open the Documents tab, terms the Words tab. `GET /inspect/diff` returns `inspect.diff.compare(last report on disk, the Index tab's report)`, writing nothing. `tests/test_serve_renders_every_lens.py` fails any `as_dict()` key with no `r.<key>` renderer. SR-SERVE decision 16; `fux-serve` and `fux-inspect` skills.
+- **Evidence:** serve tests 64 + parity 3 green; the Index tab rendered in Node from this repo's real report — 13 cards, no `undefined`/`NaN`; `node --check` on the page script.
+
+---
+
 ## 2026-09-28 — **W-225 stage 4c: `.fux/inspect.toml`, the first new consumer file**
 
 **Outcome: landed; no value changed, no report number moved.**

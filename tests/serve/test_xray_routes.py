@@ -182,6 +182,26 @@ def test_no_route_writes_outside_the_runtime_cache(server, corpus):
     assert (corpus / ".fux" / "runtime" / "inspect" / "facts.json").is_file()
 
 
+def test_the_diff_route_compares_the_last_cli_report_with_the_index_tab(server, corpus):
+    """W-229: `/inspect/diff` is `fux inspect --diff` in the explorer — the report
+    `fux inspect` last wrote against the Index tab's, by the CLI's own `compare`.
+    With no previous report it says what to run, as a 4xx with a sentence."""
+    from fux.inspect import JSON_NAME, diff as diff_mod
+    from fux.inspect.dictionary import inspect_dir
+
+    previous = inspect_dir(corpus) / JSON_NAME
+    if previous.exists():
+        previous.unlink()
+    status, payload = get(server, "/inspect/diff")
+    assert status == 404 and "fux inspect" in payload["error"]
+
+    report = as_dict(inspect_index(corpus, probe_sample=None, retrieval_sample=None, top=inspect_template().triage_rows))
+    previous.write_text(json.dumps(report), encoding="utf-8")
+    diff = wait(server, "/inspect/diff")
+    assert diff == diff_mod.compare(report, wait(server, "/inspect/index"))
+    assert diff["added"] == [] and diff["removed"] == [] and diff["edge_loss"] == 0
+
+
 def test_writes_are_still_refused(server):
     request = urllib.request.Request(server + "/inspect/index", method="POST", data=b"")
     with pytest.raises(urllib.error.HTTPError) as excinfo:

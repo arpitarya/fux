@@ -8,10 +8,10 @@ status: accepted
 date: 2026-09-22
 amended: 2026-09-27
 feature: the explorer — a local page over the real ask
-owns: [src/fux/serve@e1d7d6d2059d]
+owns: [src/fux/serve@52e16a7f17bc]
 laws: [L1, L2, L4, L6, L8, L10]
 timestamp: 2026-09-22T00:00:00Z
-content_sha: c6c7ba943bf55d817b80f04b585e0080d2afcd109028cd59947a9d7240abe574
+content_sha: b4a74a89ef5b7f7a8721873f2f57f6b219735711c1f2564921995eb224ff1ae2
 ratifies: "Arpit, 2026-09-22 (Cowork, W-210) — three sample pages built on his machine, the per-token ingest X-ray REJECTED as a front page ('do you believe people will go through this big document?') and the question-first explorer ratified in its modern-dark form: 'the way I'm thinking about fux is something like Google. If a question gets asked, if you have the best 10 documents, the answer the agent gives is going to be mostly correct.'"
 ---
 
@@ -306,6 +306,8 @@ this moved where they are written, not what they are.
 <!-- L12-VALUES-END -->
 
 **The explorer's sizes come from `.fux/inspect.toml [serve]`** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 4c, 2026-09-28): `triage_rows` (was `TRIAGE_ROWS = 200`), and the Words tab's `words_page` / `words_page_max` (were `200` / `1000` in the route); a document's probe route passes `[probes] probe_sample` explicitly ([SR-INSPECT](0156_inspect.md) decision 14).
+
+**16. Parity: a lens `fux inspect` reports and the explorer does not show is a defect** (Arpit, 2026-09-28, W-229: *"everything in inspect should be present in `serve` so that we can see visually"*). Every top-level section of `inspect.as_dict()` has a card on the Index tab, in the prose report's order, carrying the lens's numbers, its named offenders as the report capped them, and its own lever from `LEVERS`; document names open the Documents tab and terms the Words tab. `/inspect/diff` is `fux inspect --diff` in the explorer: the last report `fux inspect` wrote against the Index tab's, by `inspect.diff.compare`, writing nothing. **Enforced by `tests/test_serve_renders_every_lens.py`**, which fails a report key with no `r.<key>` renderer — so W-228's `families` lens cannot ship invisible. The cards read the server's report and compute nothing (decision 5).
 
 ### Consequences
 

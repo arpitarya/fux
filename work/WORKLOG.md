@@ -22,6 +22,24 @@ play: the worklog is the granular, per-exchange trail.
 **Entry format:**
 
 ```
+## 2026-09-28 — W-229 built and closed: every inspect lens on the explorer's Index tab  ·  Claude Code
+- **Asked:** *"review all the work items on open work implement all of them"*.
+- **Did:**
+  - Added seven Index-tab cards, in the prose report's order, each carrying its own lever.
+  - Wired the links: document names open the Documents tab, words open the Words tab.
+  - Added `GET /inspect/diff`: the last `fux inspect` report compared with the Index tab's report.
+  - Added `tests/test_serve_renders_every_lens.py` and SR-SERVE decision 16. Updated both skills.
+  - Checked the result by rendering the tab in Node from this repo's real report: 13 cards, no `undefined`.
+- **Decided / open:** W-230 and W-227 are left to a fresh session, per Arpit's ruling; my uncommitted hook hardening is theirs to commit with the chmod. W-168 steps 6–10 are also left: golden work waits until the guard is live. W-228 is now 🟢.
+- **Next:** W-228 (the `families` lens), then W-225 stage 5.
+
+## 2026-09-28 — 🔴 L11 BREACH DECLARED (W-230) while hardening W-227  ·  Claude Code
+- **Asked:** *"commit it then implement all"*. The Words tab was committed (`5fb0b548`), then W-225 stage 4c (`16934227`), then W-227's ruled hardening.
+- **Did:** I hardened `guard-golden-traversal.sh` (uncommitted). Any non-zero parser exit now denies, an unparseable payload is denied, and heredoc bodies are sorted by what they feed. The 39 existing tests stay green. An exact offline replay of the 2026-09-27 command is DENIED, so the cause could not be reproduced there.
+- **The breach:** I appended the regression tests with `cat >> … <<'EOF'`. The test text contained a line reading `EOF`, which ended the heredoc early, and the 2026-09-27 grep over `work` then ran live. It walked `work/golden/`. Two lines from `work/open/W-227…` were printed; nothing from the key directory. The partial append was reverted.
+- **Decided / open:** 🔴 The hardened hook was on disk and did not fire, so PreToolUse hooks most likely do not run for this session's Bash calls. That likely explains W-227 too. W-230 is filed to the inbox, and W-227 is 🔴 behind it. **This session stopped shell work in the repo.**
+- **Next:** Arpit rules W-230: the cost, and how to verify that hooks run.
+
 ## 2026-09-28 — Words tab committed; W-225 stage 4c: `.fux/inspect.toml`  ·  Claude Code
 - **Asked:** *"commit it then implement all"*.
 - **Did:**

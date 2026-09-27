@@ -349,6 +349,29 @@ class _Handler(BaseHTTPRequestHandler):
         sample = 0 if every else self.server.state.view().config.probe_sample
         self._send_json(self.server.state.job("probes-all" if every else "probes", probe_sample=sample))
 
+    def _diff(self, params: dict) -> None:
+        """`fux inspect --diff`, in the explorer (W-229): the last report `fux inspect`
+        wrote to `.fux/runtime/inspect/` against the Index tab's current report,
+        compared by `inspect.diff.compare` — the CLI's own function. Reads two
+        reports and writes nothing."""
+        from ..inspect import JSON_NAME
+        from ..inspect import diff as diff_mod
+        from ..inspect.dictionary import inspect_dir
+
+        previous = inspect_dir(self.server.state.root()) / JSON_NAME
+        if not previous.is_file():
+            self._json_error(
+                HTTPStatus.NOT_FOUND,
+                "no previous report — run `fux inspect` once, and this compares against it",
+            )
+            return
+        current = self.server.state.job("index", probe_sample=None, retrieval_sample=None)
+        if current.get("state") != "done":
+            self._send_json(current)                   # the page polls, as for /inspect/index
+            return
+        diff = diff_mod.compare(diff_mod.load_report(previous), current["report"])
+        self._send_json({"state": "done", "report": diff})
+
 
     # -- the Words tab (2026-09-27) ----------------------------------------
     #
@@ -409,6 +432,7 @@ _INSPECT_ROUTES = {
     "/inspect/document/probes": "_document_probes",
     "/inspect/index": "_index",
     "/inspect/probes": "_probes",
+    "/inspect/diff": "_diff",
 }
 
 
