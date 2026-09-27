@@ -22,6 +22,12 @@ play: the worklog is the granular, per-exchange trail.
 **Entry format:**
 
 ```
+## 2026-09-27 — W-225 stages 2 and 3a: `tune.toml` and `output.toml` required key by key  ·  Claude Code
+- **Asked:** *"implement W-225"*, the L12 migration. Arpit ruled R7–R10 in-session: structural numerals are FIXED; every bool default goes; the release is 3.0 and breaking; `__version__` stays.
+- **Did:** Stage 2 (`0cbbc44b`): `tune.toml` is strict in both readers, `fux doctor --fix` and `setup.fill_missing` are the writers, and the template is the one home; 704/704 outputs byte-identical. Stage 3a (`999c1976`): the same for `.fux/output.toml`, plus 5 new keys, `[answer] candidates` fixed, and API `graph()` taking `hops` required. Records amended, compare-doc departures listed for Arpit.
+- **Decided / open:** Arpit has not reviewed eight departures (compare doc §"Where the build departed"). ⚠ A private-index commit briefly reverted fux-ee's `2c0ae752` because HEAD moved under it; it was replaced before any push. Lesson: build a private index from the commit you will parent, and compare-and-swap HEAD.
+- **Next:** stage 3b, `fux.toml` strict.
+
 ## YYYY-MM-DD — <one-line title>  ·  <Cowork | Claude Code>
 - **Asked:** what the human requested.
 - **Did:** what actually changed (files, decisions).
