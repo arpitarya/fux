@@ -103,6 +103,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from .errors import FuxError
+from .constants import fixed
 
 __all__ = [
     "OUTPUT_NAME",
@@ -117,7 +118,7 @@ __all__ = [
 ]
 
 #: Committed, and written once by `fux setup`, exactly as `tune.toml` is.
-OUTPUT_NAME = ".fux/output.toml"
+OUTPUT_NAME = fixed("files", "output")
 
 #: At most this many semantic errors are reported together.
 _MAX_REPORTED = 10

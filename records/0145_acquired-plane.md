@@ -7,10 +7,10 @@ description: "Fetched source bytes are retained in .fux/acquired/, a third categ
 status: accepted
 date: 2026-09-01
 feature: the acquired plane
-owns: [src/fux/store/acquired.py@9897ee1fe4af]
+owns: [src/fux/store/acquired.py@62fee04a0972]
 laws: []
 timestamp: 2026-09-01T00:00:00Z
-content_sha: e8ffc74a98634440a5458a9632e5aa10472c768003f51dd6e1d629bf1a30a7ea
+content_sha: 667b6e60f64b501f880037a255a7cbd0361484965884cc07da1c52628301f092
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -295,6 +295,20 @@ says so.** That change edited one thing in `src/fux/store/fuxdir.py`: the
 `runtime` kind's description string, which gained `runtime/inspect/`
 ([SR-DOTFUX](0102_fux-directory.md); [SR-INSPECT](0156_inspect.md)).
 **It does not reach this record's claim on that file.**
+
+<!-- L12-VALUES-START -->
+
+**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+Each name below keeps its spelling in code and holds no literal: it is read from
+[`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
+process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
+this moved where they are written, not what they are.
+
+- `src/fux/config.py` — `CONFIG_NAME` ← `[files] config`, `FETCHERS_DIR` ← `[files] fetchers_dir`, `DEFAULT_TYPES_FILE` ← `[files] formats`, `LEGACY_TYPES_FILE` ← `[files] formats_legacy`
+- `src/fux/store/acquired.py` — `DIR_NAME` ← `[acquired] dir`, `MANIFEST_NAME` ← `[acquired] manifest`, `OBJECTS_DIR` ← `[acquired] objects_dir`, `SCHEMA` ← `[acquired] schema`
+- `src/fux/store/fuxdir.py` — `FUX_DIR` ← `[fuxdir] dir`, `GENERATED_FILES` ← `[fuxdir] generated`, `CACHEDIR_SIGNATURE` ← `[fuxdir] cachedir_signature`, `NODE_DIR` ← `[bundle] dir`, `NODE_ENTRY` ← `[bundle] entry`, `NODE_SHIM` ← `[bundle] shim`
+
+<!-- L12-VALUES-END -->
 
 ### Consequences
 

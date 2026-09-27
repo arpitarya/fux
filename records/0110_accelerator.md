@@ -7,10 +7,10 @@ description: A disposable term-major index under .fux/runtime/ that makes warm q
 status: accepted
 date: 2026-08-18
 feature: "`.fux/runtime/` — the derived index, `fux build`, and the block bound that makes skipping provable"
-owns: [src/fux/derive@3f8a15a9d941, tools/differential@bd6cd7fb02de]
+owns: [src/fux/derive@c9feb60edf5e, tools/differential@bd6cd7fb02de]
 laws: [L1, L3]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 01aa6a179f9f9565edf1a035ede330cf40eaea30a0dc31d02b954f3ec57c627f
+content_sha: 1532baf441bfe3ebb797cc578b59327f8d63938490e6c496dccf8fe0af6ef9ba
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -255,6 +255,18 @@ offset entry's is packed through `pack_entry` and round-tripped through
 `unpack_entry`; the doc-table and stats examples are asserted to carry exactly
 the declared field sets; the postings example is checked for ascending docidx
 and trimmed per-field tf.
+
+<!-- L12-VALUES-START -->
+
+**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+Each name below keeps its spelling in code and holds no literal: it is read from
+[`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
+process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
+this moved where they are written, not what they are.
+
+- `src/fux/derive/format.py` — `RUNTIME_DIR` ← `[runtime] dir`, `BLOCK_SIZE` ← `[runtime] block_size`, `RUNTIME_SCHEMA` ← `[runtime] schema`, `DOCS_FIELDS` ← `[runtime] docs_fields`, `DOCS_NAME` ← `[runtime] docs`, `ANCHORS_DIR` ← `[runtime] anchors_dir`, `STATS_NAME` ← `[runtime] stats`, `MINED_NAME` ← `[runtime] mined`, `MANIFEST_NAME` ← `[runtime] manifest`, `STAMP_NAME` ← `[runtime] stamp`, `POSTINGS_DIR` ← `[runtime] postings_dir`, `DETERMINISTIC_FILES` ← `[graph] file`
+
+<!-- L12-VALUES-END -->
 
 ### The weighted bound
 

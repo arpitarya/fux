@@ -29,8 +29,9 @@ from __future__ import annotations
 from pathlib import Path
 
 from ..store import fuxdir
+from ..constants import fixed
 
-DIRTY_NAME = "dirty"
+DIRTY_NAME = fixed("maintain", "dirty")
 
 
 def _path(root: Path) -> Path:

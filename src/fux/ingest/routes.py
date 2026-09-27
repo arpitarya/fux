@@ -28,13 +28,14 @@ import re
 from pathlib import Path
 
 from ..errors import FuxError
+from ..constants import fixed
 
 #: `host` · `*.host` · `host:port` — the three literal shapes. Lowercase
 #: letters, digits, dots and hyphens, which is what a normalised host holds.
 _LITERAL = re.compile(r"^(?:\*\.)?[a-z0-9]([a-z0-9.-]*[a-z0-9])?(?::\d{1,5})?$")
 
 #: The prefix that makes a pattern a regex (SR-FETCHER decision 16c).
-REGEX_PREFIX = "re:"
+REGEX_PREFIX = fixed("routes", "regex_prefix")
 
 #: Specificity among the LITERAL shapes only, most specific first. A regex never
 #: competes on specificity — it collides (see `resolve`).

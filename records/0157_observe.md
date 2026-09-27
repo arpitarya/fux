@@ -7,10 +7,10 @@ description: "After a verb has fully rendered, fux hands every file in `.fux/obs
 status: accepted
 date: 2026-09-14
 feature: the observer hook — the extension point a consumer's analytics subscribe to
-owns: [src/fux/observe.py@4ea7874ba9c7, tools/observer-bench@e12d60cca125]
+owns: [src/fux/observe.py@640ad5b17802, tools/observer-bench@e12d60cca125]
 laws: [L1, L2, L3, L4, L8, L10]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 9d587ec8f3b45e77cbab9e10125882f579c38e8ab4cde37da77d987ed4aa34fa
+content_sha: 06d3e7ce23bf7ba6563cd6c205dab098bedf3cdffa9d85466c176c710f79e1f8
 ratifies: W-170
 ---
 
@@ -237,6 +237,18 @@ the Node reader has no equivalent of `cli.main`'s single post-render dispatch
 point for every verb, and inventing one to host a hook nobody subscribes to on
 that reader yet would be building the seam twice before the first subscriber
 exists on either.
+
+<!-- L12-VALUES-START -->
+
+**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+Each name below keeps its spelling in code and holds no literal: it is read from
+[`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
+process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
+this moved where they are written, not what they are.
+
+- `src/fux/observe.py` — `CONSUMER_DIR` ← `[files] observers_dir`, `LIVENESS_NAME` ← `[runtime] observers`
+
+<!-- L12-VALUES-END -->
 
 ### Consequences
 

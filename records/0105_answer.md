@@ -10,7 +10,7 @@ feature: "`fux answer` — one answer, its footing stated, and the report of wha
 owns: [src/fux/query/refer_answer.py@defdd3c5c0f5]
 laws: [L1, L2, L3]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: a580ba2abc977ddf3774fa81d8168e0f0761c34214220777c3ab4ce9a2b1ac51
+content_sha: 833b7bf83dc279d662932111df9038147cfcede011f15e01deed56d73a399c03
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -286,6 +286,18 @@ invariant and it holds
 (`tests/query/test_refer_answer.py::test_the_assembled_answer_never_exceeds_the_budget`);
 the spend is a cost, and it is reported rather than asserted away. A caller who
 wants the old cost sets `[refer] budget` to what it used to spend.
+
+<!-- L12-VALUES-START -->
+
+**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+Each name below keeps its spelling in code and holds no literal: it is read from
+[`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
+process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
+this moved where they are written, not what they are.
+
+- `src/fux/query/__init__.py` — `OUTPUT_SCHEMA` ← `[schema_files] output`
+
+<!-- L12-VALUES-END -->
 
 ### The surface
 

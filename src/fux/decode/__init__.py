@@ -55,6 +55,7 @@ from typing import Callable
 from ..config import DEFAULT_TYPES_FILE as TYPES_FILE
 from ..errors import FuxError
 from . import _limits
+from ..constants import fixed
 
 __all__ = [
     "BUILTIN_MODULES",
@@ -72,7 +73,7 @@ __all__ = [
 
 #: Consumer decoders live here, one module per format, overriding a built-in of
 #: the same module name. Committed — it is consumer source, like `.fux/fetchers/`.
-CONSUMER_DIR = ".fux/decoders"
+CONSUMER_DIR = fixed("decoders", "consumer_dir")
 
 #: The one reserved decoder name, and the one name a consumer file may not take.
 #:
@@ -132,25 +133,7 @@ PROSE_DECODER = "prose"
 #: `DEFAULT_TYPES`, which decision 9 derives from this tuple, so a corpus
 #: containing them stops being walked unless `.fux/formats.toml` opts them
 #: back in — and nothing can, because no built-in claims them any more.
-BUILTIN_MODULES: tuple[str, ...] = (
-    "csv",
-    "docx",
-    "drawio",
-    "html",
-    "image",
-    "ini",
-    "json",
-    "jsonl",
-    "mail",
-    "pdf",
-    "pptx",
-    "rtf",
-    "svg",
-    "toml",
-    "xlsx",
-    "xml",
-    "yaml",
-)
+BUILTIN_MODULES: tuple[str, ...] = tuple(fixed("decoders", "builtin"))
 
 
 class Decoder:

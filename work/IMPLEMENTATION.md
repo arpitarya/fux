@@ -26,6 +26,21 @@ Rules:
 
 ---
 
+## 2026-09-27 — **W-225 stage 1: the engine's fixed values move to `src/fux/constants.toml`**
+
+**Outcome: landed; no value changed.**
+- **What:** one TOML file of fixed engine values (schema ids, artefact names,
+  decoder versions and extensions, receipt format, `.fux/` layout), read by
+  `fux/constants.py` and `node/src/config/constants.mjs` through
+  `fixed(table, key)`; the Node bundle carries it inlined (`@fux-inline`).
+  The 149 `fixed` rows of the classification move; the shard count waits for
+  stage 3 (R4).
+- **Evidence:** unit 5 727 pass (the 8 golden-rung failures pre-date this, W-168),
+  e2e 151, Node 88; the rebuilt `.fux/node/fux.mjs` answers from the inlined
+  file. Owner: [SR-CONSTANTS](../records/0159_constants.md).
+
+---
+
 ## 2026-09-27 — **W-168 step 4 built: corpus-mined expansion, off at `0.0`**
 
 **Outcome: built to the frozen bar, unmeasured, and ranking unchanged at the default.**

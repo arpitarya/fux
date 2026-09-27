@@ -56,16 +56,17 @@ from pathlib import PurePosixPath
 
 from ..query.tokenize import tokenize
 from .parse import ParsedDoc
+from ..constants import fixed
 
 #: The namespace a tag node lives in. Minted here because this is the only
 #: place a tag edge is created; `graph/model.py` imports it rather than
 #: keeping a second copy, because two spellings of `"tag:"` that drift apart
 #: would silently split the graph into documents and orphaned labels.
-TAG_PREFIX = "tag:"
+TAG_PREFIX = fixed("graph", "tag_prefix")
 
-EXTRACTED_GRADE = 10
-AMBIG_GRADE = 8
-INFERRED_GRADE = 6
+EXTRACTED_GRADE = fixed("graph", "grade_extracted")
+AMBIG_GRADE = fixed("graph", "grade_ambiguous")
+INFERRED_GRADE = fixed("graph", "grade_inferred")
 
 #: ⚠ **Group 1 is the ANCHOR TEXT and it used to be discarded.** It sat in a
 #: non-capturing class until W-168 step 1, so the proposal's *"edges are

@@ -10,7 +10,7 @@ feature: "`.fux/runtime/docs.jsonl` — the derived doc table and the join key i
 owns: []
 laws: [L3]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 2f8af6c86eef59de930c1931de651b68e2f2ccd14e1376785210c3b2edf77884
+content_sha: ccf9d74a57d79804dd6fd22e8ced69d29cd67cb155b16576448b2a271a046cd9
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -156,6 +156,18 @@ the same committed input, verified the same way as `manifest.json` and
 
 **6. Unchanged by W-168 step 4 (2026-09-27).** `mined.json` joined
 `DETERMINISTIC_FILES` beside this table; the table's own fields did not move.
+
+<!-- L12-VALUES-START -->
+
+**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+Each name below keeps its spelling in code and holds no literal: it is read from
+[`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
+process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
+this moved where they are written, not what they are.
+
+- `src/fux/derive/format.py` — `RUNTIME_DIR` ← `[runtime] dir`, `BLOCK_SIZE` ← `[runtime] block_size`, `RUNTIME_SCHEMA` ← `[runtime] schema`, `DOCS_FIELDS` ← `[runtime] docs_fields`, `DOCS_NAME` ← `[runtime] docs`, `ANCHORS_DIR` ← `[runtime] anchors_dir`, `STATS_NAME` ← `[runtime] stats`, `MINED_NAME` ← `[runtime] mined`, `MANIFEST_NAME` ← `[runtime] manifest`, `STAMP_NAME` ← `[runtime] stamp`, `POSTINGS_DIR` ← `[runtime] postings_dir`, `DETERMINISTIC_FILES` ← `[graph] file`
+
+<!-- L12-VALUES-END -->
 
 ### Consequences
 

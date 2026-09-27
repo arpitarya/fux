@@ -26,6 +26,7 @@
  * accumulation order is stable. Both are L3, not tidiness.
  */
 import { cmpCodePoints } from "../compat/pyfloat.mjs";
+import { fixed } from "../config/constants.mjs";
 
 //: Restart probability is `1 - DAMPING`. PageRank's published default.
 export const DAMPING = 0.85;
@@ -42,7 +43,7 @@ export const HOP_DECAY = 0.5;
 //: `ingest/edges.py`'s `EXTRACTED_GRADE`. Node does not ingest, so the constant
 //: is carried rather than the module: a grade arrives on the committed record
 //: and this is only the denominator that normalises a direct link to 1.0.
-export const EXTRACTED_GRADE = 10;
+export const EXTRACTED_GRADE = fixed("graph", "grade_extracted");
 
 /** Personalized PageRank, lite — power iteration over the seed neighbourhood.
  *
@@ -64,7 +65,7 @@ export const EXTRACTED_GRADE = 10;
 export const ALL_KINDS = null;
 
 //: The edge kinds `ingest/edges.py` mints.
-export const EDGE_KINDS = ["ref", "tag", "code", "supersedes"];
+export const EDGE_KINDS = fixed("graph", "edge_kinds");
 
 /** `graph.neighbours(node)`, optionally narrowed to some edge kinds.
  *

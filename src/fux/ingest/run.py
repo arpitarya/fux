@@ -99,6 +99,7 @@ from .. import decode as decode_mod
 from . import pii as pii_mod
 from . import queue as queue_mod
 from .parse import parse, parse_document
+from ..constants import fixed
 
 
 @dataclass
@@ -1000,25 +1001,25 @@ def _existing_index(root: Path, *, full: bool) -> dict[str, dict]:
 #: a missing file reads as "moved", which costs one full extraction and then
 #: settles. That is the right failure direction -- the opposite (reading as
 #: "unchanged") would silently keep terms built under retired rules.
-PII_DIGEST_FILE = "pii-digest"
+PII_DIGEST_FILE = fixed("index", "pii_digest")
 
 #: The committed inputs to extraction beyond a document's own bytes, from the
 #: last completed run — `.fux/tune.toml [index] max_phrases` and
 #: `max_table_rows`. Derived, gitignored,
 #: and rebuilt by being wrong once, exactly like `pii-digest`: a missing file
 #: reads as "moved" and costs one full extraction.
-EXTRACT_CONFIG_DIGEST_FILE = "extract-config-digest"
+EXTRACT_CONFIG_DIGEST_FILE = fixed("index", "extract_config_digest")
 
 #: W-110. `doc_id -> sha of that document's enrichment file`, from the last
 #: run. **Derived and gitignored**, and rebuilt by being wrong once — the
 #: `pii-digest` precedent, per document because enrichment is per document.
-ENRICH_DIGEST_FILE = "enrich-digests.json"
+ENRICH_DIGEST_FILE = fixed("index", "enrich_digests")
 
 #: `{extension: digest}` as of the last COMPLETED run (W-166). Per extension for
 #: the reason `binding_digests` gives: a corpus-wide decoder digest would
 #: re-extract every document on any decoder change, which makes a routine engine
 #: release a full re-ingest of every consumer's repo.
-DECODER_DIGEST_FILE = "decoder-digests.json"
+DECODER_DIGEST_FILE = fixed("index", "decoder_digests")
 
 
 def _extract_config_digest(limits) -> str:
@@ -1211,7 +1212,7 @@ def _reacquire_urls(
 #: `url:` documents a policy change could not reach, as of the last run. Derived
 #: and gitignored — it is a report, and a report that could fail an ingest would
 #: be worse than no report (SR-MAINTENANCE decision 3's reasoning).
-STALE_REDACTION_FILE = "stale-redaction.json"
+STALE_REDACTION_FILE = fixed("runtime", "stale_redaction")
 
 
 

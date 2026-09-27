@@ -36,6 +36,7 @@ import json
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
+from ..constants import fixed
 
 __all__ = [
     "DATA_SUFFIXES",
@@ -48,12 +49,12 @@ __all__ = [
     "readable_text",
 ]
 
-FACTS_NAME = "facts.json"
-SCHEMA = "fux.inspect.facts.v1"
+FACTS_NAME = fixed("inspect", "facts")
+SCHEMA = fixed("inspect", "facts_schema")
 
 #: The data formats Arpit ruled are held to BOTH bars — identifiable and
 #: reachable (W-220, 2026-09-23). Everything else is prose.
-DATA_SUFFIXES = (".json", ".jsonl", ".csv", ".toml", ".yaml", ".yml")
+DATA_SUFFIXES = tuple(fixed("inspect", "data_suffixes"))
 
 #: HTML elements that are page furniture rather than the page. Counting what
 #: the engine's OWN decoder keeps of them is the finding; this list only names

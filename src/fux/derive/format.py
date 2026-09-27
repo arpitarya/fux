@@ -63,11 +63,12 @@ from __future__ import annotations
 
 import struct
 from pathlib import Path
+from ..constants import fixed
 
-RUNTIME_DIR = "runtime"
+RUNTIME_DIR = fixed("runtime", "dir")
 
 #: Postings per block line. B5 measured this split; 128 is the measured shape.
-BLOCK_SIZE = 128
+BLOCK_SIZE = fixed("runtime", "block_size")
 
 #: Bumped whenever the derived layout changes shape. A mismatch rebuilds
 #: rather than misreads — the derived plane is disposable by definition.
@@ -101,7 +102,7 @@ BLOCK_SIZE = 128
 #: sorted. Derived for step 1's reason: the table is corpus-wide, so committing
 #: it would make one document's bytes a function of every other's. A v6 plane
 #: has no such file and is refused and rebuilt rather than read as "no pairs".
-RUNTIME_SCHEMA = "fux.runtime.v7"
+RUNTIME_SCHEMA = fixed("runtime", "schema")
 
 #: v3 (W-76 Phase 1 record half): `mx` and `mnw` become PER-FIELD arrays.
 #:
@@ -139,9 +140,9 @@ ENTRY_SIZE = ENTRY_STRUCT.size  # 62
 #: is a longer document, so its `wlen` carries the length whether or not a
 #: single anchor word matches the query. Reading it from anywhere else would
 #: mean one more file open per candidate.
-DOCS_FIELDS = ("id", "loc", "title", "flen", "archived", "superseded", "mtime", "alen")
+DOCS_FIELDS = tuple(fixed("runtime", "docs_fields"))
 
-DOCS_NAME = "docs.jsonl"
+DOCS_NAME = fixed("runtime", "docs")
 #: W-168 step 1. Sharded by the term hash's first byte, mirroring `postings/`
 #: and the committed store, for the same reason: a query reads one small file
 #: per term instead of a corpus-wide map. Whole-file JSON rather than the
@@ -149,13 +150,13 @@ DOCS_NAME = "docs.jsonl"
 #: fraction of body postings (link text is a handful of words, bodies are
 #: thousands), so a bisectable fixed-width table would buy nothing and add a
 #: second binary layout to keep in step.
-ANCHORS_DIR = "anchors"
-STATS_NAME = "stats.json"
+ANCHORS_DIR = fixed("runtime", "anchors_dir")
+STATS_NAME = fixed("runtime", "stats")
 #: W-168 step 4 — `{"pairs": [[short_hashes, long_hashes], ...]}`, sorted.
-MINED_NAME = "mined.json"
-MANIFEST_NAME = "manifest.json"
-STAMP_NAME = "stamp.json"
-POSTINGS_DIR = "postings"
+MINED_NAME = fixed("runtime", "mined")
+MANIFEST_NAME = fixed("runtime", "manifest")
+STAMP_NAME = fixed("runtime", "stamp")
+POSTINGS_DIR = fixed("runtime", "postings_dir")
 
 #: Files whose bytes must be identical across two builds of the same index.
 #: `stamp.json` is deliberately excluded — it carries filesystem mtimes, which
@@ -164,7 +165,7 @@ POSTINGS_DIR = "postings"
 #: `codes.jsonl` left this tuple on 2026-08-25 with the dense lane. A `v4`
 #: plane still has the file on disk; `RUNTIME_SCHEMA` moved to `v5` in the same
 #: change so such a plane is refused and rebuilt rather than read past.
-DETERMINISTIC_FILES = (DOCS_NAME, STATS_NAME, MINED_NAME, MANIFEST_NAME, "graph.json")
+DETERMINISTIC_FILES = (DOCS_NAME, STATS_NAME, MINED_NAME, MANIFEST_NAME, fixed("graph", "file"))
 
 
 def runtime_dir(root: Path) -> Path:

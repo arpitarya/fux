@@ -10,8 +10,8 @@ feature: the rationale, scope, exceptions and reopen-trigger of L12
 owns: []
 laws: [L12]
 timestamp: 2026-09-27T00:00:00Z
-content_sha: 1ac949db4e5684039eeb0ff19464e21e9aa0e86854f07ac150f2c312b95cce87
-ratifies: "Arpit, 2026-09-27 — 'every const or default value will only and only be defined in tune.toml or fux.toml or in one of the other config files, or maybe create a new config file; if the value is missing throw an error, but there shouldn't be any default value within the functions … be it node or python it should always be read from one of the toml files; exception is the files used for setup.' Asked the scope the same day, he ruled: tunable values only in the TOML config, and 'another internal-to-code file for the rest of the values like SCHEMA, RULES_VERSION'; a missing file or key is a hard error naming the key; setup.py and templates/, tests/ and tests_e2e/, tools/ and scripts/ are exempt. Ratified by Arpit the same day on the W-225 step 1 classification (work/compare/l12-classify.compare.md), 'I accept the recommendation': enum tags, closed vocabularies and presentation counts are not values; the six two-home conflicts resolve to one home each, keeping today's behaviour; the veto check becomes one AST-based test because the greps reach about 60 % of what the law forbids; inspect thresholds get a new .fux/inspect.toml; and every decoder cap enters the extract-config digest"
+content_sha: 78da171779cc3ebc959a8d6bf9510023b821490a0a3421c3d453d95288d9d478
+ratifies: "Arpit, 2026-09-27 — 'every const or default value will only and only be defined in tune.toml or fux.toml or in one of the other config files, or maybe create a new config file; if the value is missing throw an error, but there shouldn't be any default value within the functions … be it node or python it should always be read from one of the toml files; exception is the files used for setup.' Asked the scope the same day, he ruled: tunable values only in the TOML config, and 'another internal-to-code file for the rest of the values like SCHEMA, RULES_VERSION'; a missing file or key is a hard error naming the key; setup.py and templates/, tests/ and tests_e2e/, tools/ and scripts/ are exempt. Ratified by Arpit the same day on the W-225 step 1 classification (work/compare/l12-classify.compare.md), 'I accept the recommendation': enum tags, closed vocabularies and presentation counts are not values; the six two-home conflicts resolve to one home each, keeping today's behaviour; the veto check becomes one AST-based test because the greps reach about 60 % of what the law forbids; inspect thresholds get a new .fux/inspect.toml; and every decoder cap enters the extract-config digest. On the R5 scan the same day he ruled R7–R10: a number fixed by a format, protocol or algorithm is a fixed value for constants.toml; every boolean parameter default is a value and goes; the release is 3.0, breaking, with no automatic --fix; __version__ stays in src/fux/__init__.py"
 ---
 
 # SR-LAW-12 — L12 — every value lives in a config file, never in code
@@ -197,9 +197,35 @@ W-225 classification (R1–R3):
 - **Closed vocabularies** — `KNOWN_AGENTS`, the set `fux.toml [agents] install`
   selects from.
 - **Presentation counts** — how many config errors print at once
-  (`MAX_REPORTED`), display rounding digits. Message formatting, not behaviour. ⚠ **A regex a consumer might
+  (`MAX_REPORTED`), display rounding digits, and the *"first N, then (+M
+  more)"* cut inside a message. Message formatting, not behaviour. ⚠ **A regex a consumer might
 reasonably want to change is a value** — that is why PII patterns already live
 in `.fux/pii.toml`.
+
+**6a. What decision 6 does NOT cover — ruled by Arpit, 2026-09-27, on the R5
+scan (R7–R10 of [the classification](../work/compare/l12-classify.compare.md)).**
+The recommendation for both of the first two was *not-a-value*; he ruled the
+stricter reading, and the list above is therefore **closed** rather than an
+example set:
+
+- **R7 · A number fixed by a file format, a protocol or the algorithm is a
+  `fixed` value** — a PNG chunk offset, a GIF marker byte, a hex radix, a bit
+  mask, a hash IV, a JSON-RPC error code, an index into a fixed-shape record,
+  `indent=2`, Markdown's six heading levels, an exit code. Each goes to
+  `src/fux/constants.toml`, named. Only `0`, `1` and `-1` *as identity or
+  index* stay code. A refactor that removes the literal outright (tuple
+  unpacking, `len(signature)`) is as good as a key.
+- **R8 · A boolean parameter default is a value.** Every one goes; the caller
+  passes the flag. Where the CLI reads the flag's default from
+  `output.toml`, the API reads it there too (decision 9a's `path` hops, made
+  general).
+- **R9 · The release vehicle is 3.0, breaking** — the missing-key stop ships
+  with a CHANGELOG migration line (`fux doctor --fix` once), and **no automatic
+  `--fix`**: a write the consumer did not ask for is the silent default this
+  law removes.
+- **R10 · `__version__` stays in `src/fux/__init__.py`.** It is packaging's
+  attribute, [SR-WORK-RELEASE](0063_WORK-release.md) is its one home, and the
+  version-parity test already binds its copies. Allow-listed by name.
 
 **7. `--no-tune` reads the packaged template, not code.** The "is it me or the
 config?" switch survives: it swaps the consumer's `.fux/tune.toml` for the one

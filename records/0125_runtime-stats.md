@@ -11,7 +11,7 @@ feature: "`.fux/runtime/stats.json` — the corpus-wide aggregates, and the rule
 owns: []
 laws: [L3]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: d689610fca83cb7b257d966f97ff99f1bfff493f52b9ff6ca0fddc215827709d
+content_sha: 07889f92b8655e77d1d0d451c8643134ce0ca4579c838d173769c9d5a1de4a30
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -205,6 +205,18 @@ changed no byte of `stats.json`.
 **7. Unchanged by W-168 step 4 (2026-09-27).** The mined table is its own file,
 `mined.json` ([SR-T1-ACCELERATOR](0110_accelerator.md) decision 16), and adds
 nothing to `stats.json`.
+
+<!-- L12-VALUES-START -->
+
+**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+Each name below keeps its spelling in code and holds no literal: it is read from
+[`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
+process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
+this moved where they are written, not what they are.
+
+- `src/fux/derive/format.py` — `RUNTIME_DIR` ← `[runtime] dir`, `BLOCK_SIZE` ← `[runtime] block_size`, `RUNTIME_SCHEMA` ← `[runtime] schema`, `DOCS_FIELDS` ← `[runtime] docs_fields`, `DOCS_NAME` ← `[runtime] docs`, `ANCHORS_DIR` ← `[runtime] anchors_dir`, `STATS_NAME` ← `[runtime] stats`, `MINED_NAME` ← `[runtime] mined`, `MANIFEST_NAME` ← `[runtime] manifest`, `STAMP_NAME` ← `[runtime] stamp`, `POSTINGS_DIR` ← `[runtime] postings_dir`, `DETERMINISTIC_FILES` ← `[graph] file`
+
+<!-- L12-VALUES-END -->
 
 ### Consequences
 

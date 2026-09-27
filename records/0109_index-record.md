@@ -10,7 +10,7 @@ feature: the committed record schema — `fux.index.v2`
 owns: [src/fux/store/index-record.schema.json@b5ee4b1179eb]
 laws: [L2, L3, L5, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: d2977029f9e48925f9632a99d9eb63a2f87b0d5e14bfbe6372eb26ef2cc9c7e1
+content_sha: c5fc7af19cc698bef9618b846600a545c5f014ac55bf932639739f20fd4cafaf
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -308,6 +308,18 @@ This record says what each field is *for*; the schema says what the field set,
 the defaults and the omit rules **are**, and the code is checked against it
 ([SR-INDEX-LIFECYCLE](0108_index-lifecycle.md) decision 11). Neither is a
 paraphrase of the other.
+
+<!-- L12-VALUES-START -->
+
+**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+Each name below keeps its spelling in code and holds no literal: it is read from
+[`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
+process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
+this moved where they are written, not what they are.
+
+- `src/fux/store/format.py` — `INDEX_DIR` ← `[index] dir`, `SCHEMA_ID` ← `[index] schema`, `ANALYZER_VERSION` ← `[index] analyzer`, `TF_FIELDS` ← `[index] tf_fields`, `_TERM_HASH_BYTES` ← `[index] term_hash_bytes`, `_CONTENT_SHA_BYTES` ← `[index] content_sha_bytes`
+
+<!-- L12-VALUES-END -->
 
 ### Consequences
 

@@ -21,7 +21,9 @@ W-107 R5 / SR-NODE-SEARCH decision 8.
 
 from __future__ import annotations
 
+import json
 import re
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -32,6 +34,19 @@ NODE_SRC = ROOT / "node" / "src"
 
 def _source(rel: str) -> str:
     return (NODE_SRC / rel).read_text(encoding="utf-8")
+
+
+def _node_export(rel: str, name: str):
+    """What `node/src/<rel>` exports as `name`, evaluated by Node itself.
+
+    Since L12 (W-225) a shared value is READ from one TOML file by both planes
+    rather than spelled twice, so the Node source no longer carries the literal
+    a regex could find. The value it actually holds is what parity means.
+    """
+    url = (NODE_SRC / rel).as_uri()
+    script = f"import({json.dumps(url)}).then(m => process.stdout.write(JSON.stringify(m[{json.dumps(name)}])))"
+    out = subprocess.run(["node", "-e", script], capture_output=True, text=True, check=True)
+    return json.loads(out.stdout)
 
 
 def _js_string_list(source: str, name: str) -> list[str]:
@@ -208,8 +223,7 @@ def test_the_node_prose_types_are_the_python_ones():
     """
     from fux.ingest.gitdir import _PROSE_TYPES
 
-    source = _source("decode/registry.mjs")
-    assert sorted(_js_string_list(source, "export const PROSE_TYPES")) == sorted(_PROSE_TYPES)
+    assert sorted(_node_export("decode/registry.mjs", "PROSE_TYPES")) == sorted(_PROSE_TYPES)
 
 
 def test_the_node_pii_gate_path_is_the_python_one():

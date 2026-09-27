@@ -7,10 +7,10 @@ description: "The refer plane's caching, carved out of SR-REFER. ARC is keyed by
 status: accepted
 date: 2026-08-21
 feature: the refer plane's two caches, and the wall between them
-owns: [src/fux/refer/arc.py@cdf032d55979, src/fux/refer/fetchcache.py@0236aed37e30]
+owns: [src/fux/refer/arc.py@cdf032d55979, src/fux/refer/fetchcache.py@53d2fe4d0919]
 laws: [L1, L2, L3, L5]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 7806be78d9a30622278ec3e480779d8c84f539f99606248e08be58ab987477ad
+content_sha: ce5e608661a34433a980343cf06052e1f4613ac35fcf552d456107ebce773bf5
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -238,6 +238,18 @@ entirely. This mirrors SR-REFER decision 7.
 on a real fetch both stores are written. The TTL store is asked first because
 it answers the cheaper question: a hit there means no network call *and* no sha
 comparison against a live source.
+
+<!-- L12-VALUES-START -->
+
+**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+Each name below keeps its spelling in code and holds no literal: it is read from
+[`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
+process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
+this moved where they are written, not what they are.
+
+- `src/fux/refer/fetchcache.py` — `CACHE_DIR` ← `[runtime] fetch_cache_dir`
+
+<!-- L12-VALUES-END -->
 
 ### Consequences
 

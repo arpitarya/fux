@@ -7,10 +7,10 @@ description: "Fux still does not fetch — the refer plane reuses the consumer-f
 status: accepted
 date: 2026-08-20
 feature: the refer plane — fetch, verify, chunk, re-score, assemble
-owns: [src/fux/refer@4bde92ec28c5, tools/refer-bench@cfdb47b24af2, tools/refer-budget-sweep@db9ff8233332, node/src/refer/assemble.mjs@606b563b99c8, node/src/refer/rescore.mjs@e866f6514afb, node/src/refer/source.mjs@aa249e93737f]
+owns: [src/fux/refer@b51fd9948c4a, tools/refer-bench@cfdb47b24af2, tools/refer-budget-sweep@db9ff8233332, node/src/refer/assemble.mjs@606b563b99c8, node/src/refer/rescore.mjs@e866f6514afb, node/src/refer/source.mjs@aa249e93737f]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 7d3cc35e3464e92b28bd3e4d28b4834e8af5ec517c762d7cd8952bd9cd03a8ff
+content_sha: ab09cc214288a037ed1d5a922a93317035d729b2036051f4589a93ca0949f1ad
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

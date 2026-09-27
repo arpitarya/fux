@@ -40,6 +40,7 @@ from email.parser import BytesParser
 # package` — the copy would be dead on arrival. Absolute imports mean the file
 # fux ships and the file you edit are byte-identical (SR-DECODE decision 11).
 from fux.decode.html import decode as decode_html
+from fux.constants import fixed
 
 #: **The reuse key's handle on this decoder** (W-166). Bump it by hand in the
 #: same change as any edit that can change what `decode()` returns, and the next
@@ -47,9 +48,9 @@ from fux.decode.html import decode as decode_html
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = 1
+VERSION = fixed("decoders.mail", "version")
 
-EXTENSIONS = (".eml", ".mbox")
+EXTENSIONS = tuple(fixed("decoders.mail", "extensions"))
 
 #: A message is a complete unit. Its BODY may carry headings of its own
 #: (see `_demote`), which used to shatter one email into four passages.

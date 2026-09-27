@@ -7,10 +7,10 @@ description: "Decoding gets one home, one protocol, and a consumer seam where th
 status: accepted
 date: 2026-08-26
 feature: the decoder plane — the protocol, the registry, the consumer seam and the enrichment queue
-owns: [src/fux/decode@ed8784ea3bd4, src/fux/templates/agents/DECODER-SKILL.md@474a416bcc42, .fux/decoders@8bdc25ed8780, node/src/decode/markdown.mjs@cf8853e196d1, node/src/decode/registry.mjs@72645207f665]
+owns: [src/fux/decode@92bf9fd3b1ac, src/fux/templates/agents/DECODER-SKILL.md@474a416bcc42, .fux/decoders@059c8ecd1cca, node/src/decode/markdown.mjs@cf8853e196d1, node/src/decode/registry.mjs@90604ed07b71]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-26T00:00:00Z
-content_sha: 31a66148f0cd704e866a4411fc3321d10dea56a9fc787a497bcf4a990eb55d9b
+content_sha: 49441268874276d3751d71eae3a5d6043b706ecd650cf9a169b164b39bd7fd2f
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -749,6 +749,34 @@ by name and calls it. Two copies of that body would diverge in the way that
 makes one plane's malformed document a crash and the other's a skip — the
 `DecodeFailed`/`FuxError` split of decision 7 is exactly what must not be
 reimplemented twice.
+
+<!-- L12-VALUES-START -->
+
+**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+Each name below keeps its spelling in code and holds no literal: it is read from
+[`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
+process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
+this moved where they are written, not what they are.
+
+- `node/src/decode/registry.mjs` — `PROSE_TYPES` ← `[decoders] prose_types`
+- `src/fux/decode/__init__.py` — `CONSUMER_DIR` ← `[decoders] consumer_dir`, `BUILTIN_MODULES` ← `[decoders] builtin`
+- `src/fux/decode/docx.py` — `VERSION` ← `[decoders.docx] version`, `EXTENSIONS` ← `[decoders.docx] extensions`
+- `src/fux/decode/drawio.py` — `VERSION` ← `[decoders.drawio] version`, `EXTENSIONS` ← `[decoders.drawio] extensions`
+- `src/fux/decode/html.py` — `VERSION` ← `[decoders.html] version`, `EXTENSIONS` ← `[decoders.html] extensions`
+- `src/fux/decode/image.py` — `VERSION` ← `[decoders.image] version`, `EXTENSIONS` ← `[decoders.image] extensions`
+- `src/fux/decode/ini.py` — `VERSION` ← `[decoders.ini] version`, `EXTENSIONS` ← `[decoders.ini] extensions`
+- `src/fux/decode/json.py` — `VERSION` ← `[decoders.json] version`, `EXTENSIONS` ← `[decoders.json] extensions`
+- `src/fux/decode/jsonl.py` — `VERSION` ← `[decoders.jsonl] version`, `EXTENSIONS` ← `[decoders.jsonl] extensions`
+- `src/fux/decode/mail.py` — `VERSION` ← `[decoders.mail] version`, `EXTENSIONS` ← `[decoders.mail] extensions`
+- `src/fux/decode/pdf.py` — `VERSION` ← `[decoders.pdf] version`, `EXTENSIONS` ← `[decoders.pdf] extensions`
+- `src/fux/decode/pptx.py` — `VERSION` ← `[decoders.pptx] version`, `EXTENSIONS` ← `[decoders.pptx] extensions`
+- `src/fux/decode/rtf.py` — `VERSION` ← `[decoders.rtf] version`, `EXTENSIONS` ← `[decoders.rtf] extensions`
+- `src/fux/decode/svg.py` — `documentation` ← `[decoders.svg] version`, `EXTENSIONS` ← `[decoders.svg] extensions`
+- `src/fux/decode/toml.py` — `VERSION` ← `[decoders.toml] version`, `EXTENSIONS` ← `[decoders.toml] extensions`
+- `src/fux/decode/xml.py` — `VERSION` ← `[decoders.xml] version`, `EXTENSIONS` ← `[decoders.xml] extensions`
+- `src/fux/decode/yaml.py` — `VERSION` ← `[decoders.yaml] version`, `EXTENSIONS` ← `[decoders.yaml] extensions`
+
+<!-- L12-VALUES-END -->
 
 ### Consequences
 

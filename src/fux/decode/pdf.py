@@ -56,6 +56,7 @@ from __future__ import annotations
 
 import re
 import zlib
+from fux.constants import fixed
 
 #: **The reuse key's handle on this decoder** (W-166). Bump it by hand in the
 #: same change as any edit that can change what `decode()` returns, and the next
@@ -63,9 +64,9 @@ import zlib
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = 1
+VERSION = fixed("decoders.pdf", "version")
 
-EXTENSIONS = (".pdf",)
+EXTENSIONS = tuple(fixed("decoders.pdf", "extensions"))
 
 MAX_STREAMS = 5000
 MAX_INFLATED = 64 * 1024 * 1024

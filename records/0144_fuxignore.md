@@ -7,10 +7,10 @@ description: "Exclusion moves out of the source lists into one .gitignore-shaped
 status: accepted
 date: 2026-08-27
 feature: the `.fux/.fuxignore` exclusion file
-owns: [src/fux/ingest/fuxignore.py@a21305b84b0b]
+owns: [src/fux/ingest/fuxignore.py@6c2b8b6481a4]
 laws: [L1, L3]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: a1ca9b7675f17dc8c4134eb86f4e5477c9310e466c848001425d1d2b1a036e7a
+content_sha: bf238c88dfac24f83652e6a7959d7023d211686582687c6f688bc1450fa4c623
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -375,6 +375,19 @@ would ignore the wrong file.
 **11e. `.fux/runtime/skipped` is deleted on every run.** A repo carrying one
 from an older fux loses it rather than keeping a second, stale answer to the
 same question.
+
+<!-- L12-VALUES-START -->
+
+**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+Each name below keeps its spelling in code and holds no literal: it is read from
+[`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
+process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
+this moved where they are written, not what they are.
+
+- `src/fux/ingest/fuxignore.py` — `buried` ← `[files] fuxignore`
+- `src/fux/ingest/gitdir.py` — `_PROSE_TYPES` ← `[decoders] prose_types`
+
+<!-- L12-VALUES-END -->
 
 ### Consequences
 

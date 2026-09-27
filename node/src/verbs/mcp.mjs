@@ -29,8 +29,9 @@ import { cmpCodePoints, pyRound } from "../compat/pyfloat.mjs";
 import { loadOutput } from "../config/output.mjs";
 import { Graph, edgesFromRecords } from "../graph/model.mjs";
 import { FuxError } from "../errors.mjs";
+import { fixed } from "../config/constants.mjs";
 
-export const PROTOCOL_VERSION = "2024-11-05";
+export const PROTOCOL_VERSION = fixed("mcp", "protocol_version");
 const HERE = dirname(fileURLToPath(import.meta.url));
 
 /** `mcp-tools.json`, found from whichever shape this code is running in.

@@ -30,6 +30,7 @@ from __future__ import annotations
 # import would make this file dead on arrival when loaded from
 # `.fux/decoders/` by path rather than as a package module.
 from fux.decode import _xml
+from fux.constants import fixed
 
 #: **The reuse key's handle on this decoder** (W-166). Bump it by hand in the
 #: same change as any edit that can change what `decode()` returns, and the next
@@ -37,9 +38,9 @@ from fux.decode import _xml
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = 1
+VERSION = fixed("decoders.svg", "version")
 
-EXTENSIONS = (".svg",)
+EXTENSIONS = tuple(fixed("decoders.svg", "extensions"))
 
 #: `_xml.parse` refuses any DOCTYPE (billion-laughs/XXE, SR-DECODE). Legacy
 #: SVG exports sometimes declare `<!DOCTYPE svg PUBLIC ...>`; such a file

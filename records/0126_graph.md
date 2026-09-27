@@ -7,10 +7,10 @@ description: "The ref/tag/code edges ingest already extracts become a queryable 
 status: accepted
 date: 2026-08-20
 feature: the graph lane — three relational verbs, a derived plane, and a lazy walk
-owns: [src/fux/graph@568321939097, tools/graph-bench@9c330ea14b42, node/src/graph/community.mjs@f3ef6baa4855, node/src/graph/model.mjs@4f3e9b2f42c0, node/src/graph/plane.mjs@b3f9bf5bddd8, node/src/graph/walk.mjs@cc685c136223, node/src/verbs/graph.mjs@5c5960f9bc9a]
+owns: [src/fux/graph@59025a5651b1, tools/graph-bench@9c330ea14b42, node/src/graph/community.mjs@f3ef6baa4855, node/src/graph/model.mjs@62fe3c17c961, node/src/graph/plane.mjs@9b8da04fc9d7, node/src/graph/walk.mjs@e82f1a61be81, node/src/verbs/graph.mjs@5c5960f9bc9a]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 389cad225f25da043c6fb557af81bcf7f5ebf9a29e4905dac51f3523a609a5f0
+content_sha: c6cf4f4ccc09f5b306d0e6a6246a6a861ac9ad12d0477446224e3efa74b0a057
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -462,6 +462,22 @@ supersession-aware ranking — reads this same in-edge map.** *"The successor
 inherits the target's anchor text"* is a second read-time fold over one
 structure, not a second cross-document committed byte. Nothing about it is built
 yet.
+
+<!-- L12-VALUES-START -->
+
+**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+Each name below keeps its spelling in code and holds no literal: it is read from
+[`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
+process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
+this moved where they are written, not what they are.
+
+- `node/src/graph/model.mjs` — `TAG_PREFIX` ← `[graph] tag_prefix`
+- `node/src/graph/plane.mjs` — `SCHEMA` ← `[graph] schema`, `GRAPH_NAME` ← `[graph] file`
+- `node/src/graph/walk.mjs` — `EXTRACTED_GRADE` ← `[graph] grade_extracted`, `EDGE_KINDS` ← `[graph] edge_kinds`
+- `src/fux/graph/plane.py` — `GRAPH_NAME` ← `[graph] file`, `SCHEMA` ← `[graph] schema`
+- `src/fux/graph/walk.py` — `EDGE_KINDS` ← `[graph] edge_kinds`
+
+<!-- L12-VALUES-END -->
 
 ### Consequences
 

@@ -10,7 +10,7 @@ feature: what happens once a document is declared archived — the record proper
 owns: [tools/archived-signal-eval@30fb75fa7476]
 laws: [L3, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: b946874cc37e17deb2b4fee6cec94270a82e731947cf03ccaaf209f92327c951
+content_sha: 564560e468f33a0f9f09ca6705201651bf493992d39b89f0fcc0f73818c55648
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -460,6 +460,18 @@ attribute, not because either moved.**
 2026-09-27). The table is the union over every record, archived included, as
 decision 9 says of anchor terms: what an archived document declares is still
 what the words mean. What it demotes is the document, not the vocabulary.
+
+<!-- L12-VALUES-START -->
+
+**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+Each name below keeps its spelling in code and holds no literal: it is read from
+[`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
+process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
+this moved where they are written, not what they are.
+
+- `src/fux/ingest/run.py` — `PII_DIGEST_FILE` ← `[index] pii_digest`, `EXTRACT_CONFIG_DIGEST_FILE` ← `[index] extract_config_digest`, `ENRICH_DIGEST_FILE` ← `[index] enrich_digests`, `DECODER_DIGEST_FILE` ← `[index] decoder_digests`, `STALE_REDACTION_FILE` ← `[runtime] stale_redaction`
+
+<!-- L12-VALUES-END -->
 
 ### Consequences
 

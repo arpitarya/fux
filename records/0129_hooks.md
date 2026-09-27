@@ -7,10 +7,10 @@ description: "post-commit DEFERS — it writes a dirty list and spawns a detache
 status: accepted
 date: 2026-08-20
 feature: maintenance — the hooks, the deferring runner, the write lock, and the URL freshness daemon
-owns: [src/fux/maintain@6e92e762b4c4, tools/maintenance-bench@23a6ade137a5, tools/runner-race@98bd70ff092a]
+owns: [src/fux/maintain@60bd50d53789, tools/maintenance-bench@23a6ade137a5, tools/runner-race@98bd70ff092a]
 laws: [L3, L4, L5, L7]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: a5dd3544e6ba4e001a520fe08301c2ed9ca49f255df620c005cda597146c5117
+content_sha: 1d52b2c6efeb485426085922119fae99d73037eeb7b573d8681b8ffb018046a5
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -594,6 +594,23 @@ runner**, which the eleven re-runs could never demonstrate they had reached.
 ⚠ **It changes nothing under `src/`, by design**, and that bounds what it can
 reach: the handoff window's surviving ordering needs a delay injected **inside**
 `run_once`, so **0 of 104 stranded is "unreproduced", never "closed"**.
+
+<!-- L12-VALUES-START -->
+
+**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+Each name below keeps its spelling in code and holds no literal: it is read from
+[`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
+process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
+this moved where they are written, not what they are.
+
+- `src/fux/maintain/daemon.py` — `PID_NAME` ← `[maintain] daemon_pid`, `STOP_NAME` ← `[maintain] daemon_stop`, `STATUS_NAME` ← `[maintain] daemon_status`
+- `src/fux/maintain/dirty.py` — `DIRTY_NAME` ← `[maintain] dirty`
+- `src/fux/maintain/hooks.py` — `MERGE_DRIVER_NAME` ← `[hooks] merge_driver`, `MARKER` ← `[hooks] marker`
+- `src/fux/maintain/lastcited.py` — `short` ← `[maintain] last_cited`
+- `src/fux/maintain/runner.py` — `LOCK_NAME` ← `[maintain] write_lock`, `STOP_NAME` ← `[maintain] runner_stop`, `STATUS_NAME` ← `[maintain] runner_status`, `HANDOFF_ENV` ← `[env] runner_handoff`, `NO_SPAWN_ENV` ← `[env] no_spawn`
+- `src/fux/maintain/urlstate.py` — `STATE_NAME` ← `[maintain] url_state`, `SCHEMA_NAME` ← `[maintain] url_state_schema`
+
+<!-- L12-VALUES-END -->
 
 ### Consequences
 

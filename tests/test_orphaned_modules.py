@@ -134,18 +134,16 @@ def _console_scripts() -> set[str]:
 
 
 def _builtin_decoders() -> set[str]:
-    """Read `BUILTIN_MODULES` from source rather than importing it.
+    """Read `[decoders] builtin` from `src/fux/constants.toml` rather than importing it.
 
     Importing would be simpler and would also mean the check's own answer
-    depended on import side effects. The tuple is a literal; parse the literal.
+    depended on import side effects. Since L12 (W-225) the list lives in the
+    constants file `decode.BUILTIN_MODULES` reads; parse the file.
     """
-    tree = ast.parse((SRC / "decode" / "__init__.py").read_text(encoding="utf-8"))
-    for node in ast.walk(tree):
-        target = getattr(node, "target", None)
-        named = getattr(target, "id", None) if target is not None else None
-        if named == "BUILTIN_MODULES" and isinstance(node.value, ast.Tuple):
-            return {f"fux.decode.{e.value}" for e in node.value.elts}
-    raise AssertionError("decode.BUILTIN_MODULES is no longer a literal tuple")
+    data = tomllib.loads((SRC / "constants.toml").read_text(encoding="utf-8"))
+    names = data.get("decoders", {}).get("builtin")
+    assert isinstance(names, list) and names, "constants.toml carries no [decoders] builtin list"
+    return {f"fux.decode.{name}" for name in names}
 
 
 def _roots() -> set[str]:

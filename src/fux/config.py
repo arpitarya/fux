@@ -13,6 +13,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from .errors import FuxError
+from .constants import fixed
 
 #: The daemon's sweep cadence when `fux.toml` is silent (W-82 ruling 10).
 #: Sixty minutes is conservative on purpose: the daemon covers the **tail**,
@@ -21,7 +22,7 @@ from .errors import FuxError
 #: config never drags the maintenance plane in.
 DEFAULT_SWEEP_MINUTES = 60
 
-CONFIG_NAME = "fux.toml"
+CONFIG_NAME = fixed("files", "config")
 
 FIXED_SHARDS = 256  # not yet configurable — shard = blake2b(id, digest_size=1); see SR-RECORD
 
@@ -99,18 +100,18 @@ def find_root(start: Path | None = None) -> Path | None:
 #: `[sources.url] fetcher` at another directory loses that**, and the refusal
 #: message says so. It was never documented as a relocation mechanism; it
 #: worked as one.
-FETCHERS_DIR = ".fux/fetchers"
+FETCHERS_DIR = fixed("files", "fetchers_dir")
 DEFAULT_URLS_FILE = ".fux/sources/urls"
 DEFAULT_DIRS_FILE = ".fux/sources/dirs"
 #: Optional. Absent means the built-in allowlist in `gitdir.DEFAULT_TYPES`.
 #: TOML, beside the other `.fux/*.toml` policy files -- read and written by
 #: `ingest/typesfile.py` (SR-TYPES decision 12).
-DEFAULT_TYPES_FILE = ".fux/formats.toml"
+DEFAULT_TYPES_FILE = fixed("files", "formats")
 #: Where the types list lived until 2026-09-11, in the line grammar `dirs` and
 #: `urls` still use. **Refused, never read**: a file fux silently ignored would
 #: put the built-in default in its place and change the index with nothing
 #: saying so (SR-TYPES decision 12). `fux setup` converts it.
-LEGACY_TYPES_FILE = ".fux/sources/types"
+LEGACY_TYPES_FILE = fixed("files", "formats_legacy")
 
 
 #: The vendors `[agents] install` may name. Closed, and validated, because a

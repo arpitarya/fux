@@ -28,8 +28,9 @@ import { readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { FuxError } from "../errors.mjs";
 import { parseToml, wasFloat } from "./toml.mjs";
+import { fixed } from "./constants.mjs";
 
-export const OUTPUT_NAME = ".fux/output.toml";
+export const OUTPUT_NAME = fixed("files", "output");
 
 const MAX_REPORTED = 10;
 const ROOTS = ["cli", "mcp"];

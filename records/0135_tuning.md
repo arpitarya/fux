@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-22
 amended: 2026-09-24
 feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error contract, and per-source preference weights
-owns: [src/fux/tune.py@8e3edc455b48, .fux/tune.toml@ba9885423d69, node/src/config/tune.mjs@0cb0f3cce061]
+owns: [src/fux/tune.py@18bd4318319f, .fux/tune.toml@0c7511a65a32, node/src/config/tune.mjs@c785d72450bb]
 laws: [L1, L3, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 7632c0eab380cf6c7a59a0d49d4f5346e5688c44a6f9d6ab4d4d2c5da0252ec2
+content_sha: d32630b9b806ab011897ad907f5670363adf342cc94b44d3cc1efb41fdae11fe
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1001,6 +1001,19 @@ may.
   way back.
 - **Reopen-trigger** (the verdict's): any later run in which a mined spelling
   costs a baseline rank-1 hit reopens step 4.
+
+<!-- L12-VALUES-START -->
+
+**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+Each name below keeps its spelling in code and holds no literal: it is read from
+[`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
+process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
+this moved where they are written, not what they are.
+
+- `node/src/config/tune.mjs` — `TUNE_NAME` ← `[files] tune`
+- `src/fux/tune.py` — `TUNE_NAME` ← `[files] tune`
+
+<!-- L12-VALUES-END -->
 
 ### Consequences
 

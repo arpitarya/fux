@@ -10,7 +10,7 @@ feature: the `CACHEDIR.TAG` file written into every derived `.fux/` subdirectory
 owns: []
 laws: [L3]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 76dd886d1148c1c57639f3fa0135d7509a0987347b7df89d08af33a639dd60c5
+content_sha: e7f86efb3307fe25b8976675e13bd8d4f7b82c1f1928cd561dff9a44b0cbeb62
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -127,6 +127,18 @@ says so.** That change edited one thing in `src/fux/store/fuxdir.py`: the
 `runtime` kind's description string, which gained `runtime/inspect/`
 ([SR-DOTFUX](0102_fux-directory.md); [SR-INSPECT](0156_inspect.md)).
 **It does not reach this record's claim on that file.**
+
+<!-- L12-VALUES-START -->
+
+**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+Each name below keeps its spelling in code and holds no literal: it is read from
+[`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
+process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
+this moved where they are written, not what they are.
+
+- `src/fux/store/fuxdir.py` — `FUX_DIR` ← `[fuxdir] dir`, `GENERATED_FILES` ← `[fuxdir] generated`, `CACHEDIR_SIGNATURE` ← `[fuxdir] cachedir_signature`, `NODE_DIR` ← `[bundle] dir`, `NODE_ENTRY` ← `[bundle] entry`, `NODE_SHIM` ← `[bundle] shim`
+
+<!-- L12-VALUES-END -->
 
 ### Consequences
 

@@ -10,7 +10,7 @@ feature: "`.fux/runtime/manifest.json` — the derived plane's freshness contrac
 owns: []
 laws: [L3]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 3fe440a80f74f2d6c1c69ef088e79e2cb71248815a55203feb6515e115862f2a
+content_sha: 3039e7e66c2db0b925e53b27236c6fa616801c773ae9607395f549589db5c8b2
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -157,6 +157,18 @@ to know, not guess.**
 
 **5. `schema` is `fux.runtime.v7` since 2026-09-27** (W-168 step 4): the plane
 gained `mined.json`. A v6 plane is refused and rebuilt, not read as "no pairs".
+
+<!-- L12-VALUES-START -->
+
+**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+Each name below keeps its spelling in code and holds no literal: it is read from
+[`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
+process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
+this moved where they are written, not what they are.
+
+- `src/fux/derive/format.py` — `RUNTIME_DIR` ← `[runtime] dir`, `BLOCK_SIZE` ← `[runtime] block_size`, `RUNTIME_SCHEMA` ← `[runtime] schema`, `DOCS_FIELDS` ← `[runtime] docs_fields`, `DOCS_NAME` ← `[runtime] docs`, `ANCHORS_DIR` ← `[runtime] anchors_dir`, `STATS_NAME` ← `[runtime] stats`, `MINED_NAME` ← `[runtime] mined`, `MANIFEST_NAME` ← `[runtime] manifest`, `STAMP_NAME` ← `[runtime] stamp`, `POSTINGS_DIR` ← `[runtime] postings_dir`, `DETERMINISTIC_FILES` ← `[graph] file`
+
+<!-- L12-VALUES-END -->
 
 ### Consequences
 

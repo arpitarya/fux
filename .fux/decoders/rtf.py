@@ -31,6 +31,7 @@ pending level, which is what stops one heading marking every paragraph after it.
 from __future__ import annotations
 
 import re
+from fux.constants import fixed
 
 #: **The reuse key's handle on this decoder** (W-166). Bump it by hand in the
 #: same change as any edit that can change what `decode()` returns, and the next
@@ -38,9 +39,9 @@ import re
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = 1
+VERSION = fixed("decoders.rtf", "version")
 
-EXTENSIONS = (".rtf",)
+EXTENSIONS = tuple(fixed("decoders.rtf", "extensions"))
 
 #: Control words that end a paragraph. Everything else that is not text is
 #: formatting, and formatting is not a term.

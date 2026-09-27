@@ -6,8 +6,9 @@
  * corpus produce different bytes on different runs.
  */
 import { cmpCodePoints } from "../compat/pyfloat.mjs";
+import { fixed } from "../config/constants.mjs";
 
-export const TAG_PREFIX = "tag:";
+export const TAG_PREFIX = fixed("graph", "tag_prefix");
 
 /** Python sorts an `Edge` dataclass field-by-field in declaration order:
  *  `(src, kind, dst, grade)`. Strings by code point, ints numerically. */

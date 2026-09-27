@@ -9,7 +9,9 @@ from __future__ import annotations
 import hashlib
 from pathlib import Path
 
-INDEX_DIR = ".fux/index"
+from ..constants import fixed
+
+INDEX_DIR = fixed("index", "dir")
 
 # v2 (W-76 Phase 1 record half, 2026-08-23): five tf fields instead of two,
 # trailing zeros omitted, and `wlen` replaced by `flen` (per-field token
@@ -39,7 +41,7 @@ INDEX_DIR = ".fux/index"
 # reader could not tell "this corpus declares no abbreviations" from "this
 # index predates the miner". `analyzer` is UNTOUCHED: the pairs go through the
 # same analyzer and the same hash as `terms`. **v4 indexes must be rebuilt.**
-SCHEMA_ID = "fux.index.v5"
+SCHEMA_ID = fixed("index", "schema")
 # v2 (W-76 Phase 1, 2026-08-23): identifier splitting before lowercasing,
 # plus Porter stemming before hashing. A v1 shard is refused by
 # `store/reader.py` rather than silently mixed -- two analyzers in one
@@ -56,7 +58,7 @@ SCHEMA_ID = "fux.index.v5"
 # `store/reader.py` already refuses a shard written by another analyzer. Bumping
 # `_format` as well would claim a schema change that did not happen and would
 # force consumers through a migration path for a re-ingest they need anyway.
-ANALYZER_VERSION = "v3"
+ANALYZER_VERSION = fixed("index", "analyzer")
 #: **Order is load-bearing, and body comes first on purpose.**
 #:
 #: A tf vector is written with trailing zeros omitted, so the cheapest shape to
@@ -73,7 +75,10 @@ ANALYZER_VERSION = "v3"
 #:
 #: Reordering this tuple changes every record and is an SR-recorded format
 #: bump, not a refactor.
-TF_FIELDS = ("body", "heading", "title", "path", "ctx")
+TF_FIELDS = tuple(fixed("index", "tf_fields"))
+
+_TERM_HASH_BYTES = fixed("index", "term_hash_bytes")
+_CONTENT_SHA_BYTES = fixed("index", "content_sha_bytes")
 
 # The first line of every shard — pins schema, analyzer, and tf-array order
 # so a reader never has to guess field meaning from position alone.
@@ -86,7 +91,7 @@ HEADER: dict = {
 
 def term_hash(term: str) -> str:
     """16-hex (8-byte) blake2b digest of a term — the postings key."""
-    return hashlib.blake2b(term.encode("utf-8"), digest_size=8).hexdigest()
+    return hashlib.blake2b(term.encode("utf-8"), digest_size=_TERM_HASH_BYTES).hexdigest()
 
 
 def display_title(record: dict) -> str:
@@ -115,7 +120,7 @@ def content_sha(content: bytes) -> str:
     Same hash family as `term_hash`/`shard_for`, deliberately not a literal
     git blob sha1 (decided during M1 build; see SR-RECORD).
     """
-    return hashlib.blake2b(content, digest_size=20).hexdigest()
+    return hashlib.blake2b(content, digest_size=_CONTENT_SHA_BYTES).hexdigest()
 
 
 def shard_for(doc_id: str) -> str:

@@ -10,7 +10,7 @@ feature: the `url:` source and how ingestion behaves around the fetcher boundary
 owns: []
 laws: [L2, L4, L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: c843b89a498240e7b661edf7fd7b4c15f1846058e39ca74eb5dd1bd5b7cc6d3a
+content_sha: 5b02a73a14485232c819730d0a736c5d34129cad11884ec81be35899ed323d95
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -204,6 +204,19 @@ retires with the mechanism.** A URL record carries a plain `title` and
 is an accepted, documented exposure** —
 [SR-LAW-5](0007_LAW-5-hashed-meta.md), superseded, keeps the argument and the
 reopen trigger.
+
+<!-- L12-VALUES-START -->
+
+**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+Each name below keeps its spelling in code and holds no literal: it is read from
+[`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
+process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
+this moved where they are written, not what they are.
+
+- `src/fux/ingest/run.py` — `PII_DIGEST_FILE` ← `[index] pii_digest`, `EXTRACT_CONFIG_DIGEST_FILE` ← `[index] extract_config_digest`, `ENRICH_DIGEST_FILE` ← `[index] enrich_digests`, `DECODER_DIGEST_FILE` ← `[index] decoder_digests`, `STALE_REDACTION_FILE` ← `[runtime] stale_redaction`
+- `src/fux/maintain/dirty.py` — `DIRTY_NAME` ← `[maintain] dirty`
+
+<!-- L12-VALUES-END -->
 
 ### What it looks like
 

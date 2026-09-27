@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import re
 from html.parser import HTMLParser
+from fux.constants import fixed
 
 #: **The reuse key's handle on this decoder** (W-166). Bump it by hand in the
 #: same change as any edit that can change what `decode()` returns, and the next
@@ -29,9 +30,9 @@ from html.parser import HTMLParser
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = 1
+VERSION = fixed("decoders.html", "version")
 
-EXTENSIONS = (".html", ".htm", ".xhtml")
+EXTENSIONS = tuple(fixed("decoders.html", "extensions"))
 
 _SKIP = {"script", "style", "head", "noscript", "template", "svg", "iframe"}
 _BLOCK_BREAK = {"p", "div", "section", "article", "main", "header", "footer", "figure"}

@@ -53,18 +53,19 @@ import os
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
+from ..constants import fixed
 
 #: The plane's directory name under `.fux/`.
-DIR_NAME = "acquired"
+DIR_NAME = fixed("acquired", "dir")
 
 #: Where the url -> sha map lives. **Inside the plane**, so that removing the
 #: directory removes the feature whole.
-MANIFEST_NAME = "manifest.json"
+MANIFEST_NAME = fixed("acquired", "manifest")
 
-OBJECTS_DIR = "objects"
+OBJECTS_DIR = fixed("acquired", "objects_dir")
 
 #: The manifest's declared shape, versioned like every other file fux writes.
-SCHEMA = "fux.acquired.v1"
+SCHEMA = fixed("acquired", "schema")
 
 
 @dataclass(frozen=True)

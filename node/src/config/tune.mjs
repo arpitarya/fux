@@ -47,8 +47,9 @@ import { cmpCodePoints } from "../compat/pyfloat.mjs";
 // `ask_kinds` is validated against the kinds the index mints, at load — the
 // same list `graph --kinds` refuses against at the CLI boundary.
 import { EDGE_KINDS } from "../graph/walk.mjs";
+import { fixed } from "./constants.mjs";
 
-export const TUNE_NAME = ".fux/tune.toml";
+export const TUNE_NAME = fixed("files", "tune");
 
 //: At most this many semantic errors are reported together.
 const MAX_REPORTED = 10;

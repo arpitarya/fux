@@ -7,10 +7,10 @@ description: "Arpit asked whether a consumed index is a good index or a bad one.
 status: accepted
 date: 2026-09-14
 feature: the index X-ray
-owns: [src/fux/inspect@b1e9f124fd34]
+owns: [src/fux/inspect@ebf611b8e0bd]
 laws: [L2, L3, L4, L6, L8]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: e085b24326f9bfedb056affd446fbec48fdde28761837f520292d0643663166f
+content_sha: 032486422540c4fe17858c9b565b7e36907a63295dae7a5a8b7c217cc7b8214e
 ratifies: W-169
 ---
 
@@ -262,6 +262,21 @@ discoverable from the index the whole time and nobody could see it.
     all the same: that table is not a verb list, it is what `.fux/output.toml`
     may legally say, and a repo whose file carries `[cli.json] inspect = true`
     must validate on both readers.
+
+<!-- L12-VALUES-START -->
+
+**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+Each name below keeps its spelling in code and holds no literal: it is read from
+[`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
+process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
+this moved where they are written, not what they are.
+
+- `src/fux/inspect/__init__.py` — `REPORT_NAME` ← `[inspect] report_md`, `JSON_NAME` ← `[inspect] report_json`
+- `src/fux/inspect/dictionary.py` — `INSPECT_DIR` ← `[inspect] dir`, `DICTIONARY_NAME` ← `[inspect] dictionary`, `SCHEMA` ← `[inspect] dictionary_schema`
+- `src/fux/inspect/facts.py` — `FACTS_NAME` ← `[inspect] facts`, `SCHEMA` ← `[inspect] facts_schema`, `DATA_SUFFIXES` ← `[inspect] data_suffixes`
+- `src/fux/inspect/probes.py` — `PROBES_NAME` ← `[inspect] probes`, `SCHEMA` ← `[inspect] probes_schema`
+
+<!-- L12-VALUES-END -->
 
 ### The X-ray — W-220, ruled by Arpit 2026-09-23
 

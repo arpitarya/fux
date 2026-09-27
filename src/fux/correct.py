@@ -65,6 +65,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from .errors import FuxError
+from .constants import fixed
 
 __all__ = [
     "Correction",
@@ -80,7 +81,7 @@ __all__ = [
 #: Committed — **it is the human's own claim, not a record of use** (L8). A
 #: correction says *this question should reach this document*; nothing here
 #: says anybody ran a query.
-CORRECTIONS_FILE = ".fux/eval/corrections.tsv"
+CORRECTIONS_FILE = fixed("files", "corrections")
 
 #: The frontmatter key that says how many trailing body lines are human.
 CORRECTIONS_KEY = "corrections"

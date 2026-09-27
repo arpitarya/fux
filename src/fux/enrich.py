@@ -56,6 +56,7 @@ from pathlib import Path
 from .errors import FuxError
 from .query.bm25f import FIELD_WEIGHTS
 from .store import TF_FIELDS
+from .constants import fixed
 
 #: W-110. How far down its own ranking a question must place its document.
 #: **3**, ratified by Arpit 2026-09-05 and recorded in SR-ENRICH. A question
@@ -63,7 +64,7 @@ from .store import TF_FIELDS
 #: corpus it was written for is not one.
 SELF_RETRIEVAL_K = 3
 
-ENRICH_DIR = ".fux/enrich"
+ENRICH_DIR = fixed("files", "enrich_dir")
 
 #: Keys fux VERIFIES versus keys it merely RECORDS.
 #:
@@ -450,7 +451,7 @@ def _chunk_count(root: Path, record: dict) -> int:
 #: URL list has no such structure -- the lines share nothing but being URLs --
 #: so inventing per-host scopes would report coverage against a grouping
 #: nobody declared. One scope, named after the file the declaration lives in.
-URL_SCOPE = ".fux/sources/urls"
+URL_SCOPE = fixed("files", "urls")
 
 
 def _document_text(root: Path, record: dict) -> str | None:

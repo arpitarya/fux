@@ -40,11 +40,12 @@ from . import lenses as lenses_mod
 from . import probes as probes_mod
 from . import xray as xray_mod
 from ._scan import read_index_view
+from ..constants import fixed
 
 __all__ = ["Report", "cmd_inspect", "inspect_index", "render_markdown", "as_dict"]
 
-REPORT_NAME = "report.md"
-JSON_NAME = "report.json"
+REPORT_NAME = fixed("inspect", "report_md")
+JSON_NAME = fixed("inspect", "report_json")
 
 
 @dataclass

@@ -46,6 +46,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from ..errors import FuxError
+from ..constants import fixed
 
 __all__ = ["install", "status", "uninstall", "HOOKS", "MERGE_DRIVER_NAME", "REFS_NOTE"]
 
@@ -74,11 +75,11 @@ __all__ = ["install", "status", "uninstall", "HOOKS", "MERGE_DRIVER_NAME", "REFS
 #: Recorded here so a later session finds the reasoning rather than the idea.
 REFS_NOTE = "refs/fux/<tree> — see the module note; not built, and not a correctness path"
 
-MERGE_DRIVER_NAME = "fux-index"
+MERGE_DRIVER_NAME = fixed("hooks", "merge_driver")
 
 #: The marker that says fux wrote this file. Its absence on an existing hook is
 #: what makes installation refuse rather than clobber.
-MARKER = "# installed by `fux hooks --install`"
+MARKER = fixed("hooks", "marker")
 
 _PREAMBLE = f"""#!/bin/sh
 {MARKER} — safe to delete, or run `fux hooks --uninstall`

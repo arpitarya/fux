@@ -7,11 +7,11 @@ description: "One record owns the health-check surface. Every check names a caus
 status: accepted
 date: 2026-09-11
 feature: "`fux doctor` — the read-only, offline health command and its check register"
-owns: [src/fux/doctor.py@1d5c79db3570, tests/test_doctor_register_is_complete.py@6c3d2378d45f]
+owns: [src/fux/doctor.py@7ea6252db31e, tests/test_doctor_register_is_complete.py@6c3d2378d45f]
 laws: [L4, L8]
 ratifies: "Arpit, 2026-09-11 — *create a new adr for doctor*"
 timestamp: 2026-09-11T00:00:00Z
-content_sha: 83f67a5773cfc7b28a0c89b3cbdd0f685eb1aed97a8fdee1fdfcfb78f85090c4
+content_sha: 56f6df2979f1aab8f592bb0a2e37cd2b4353583e0dec6b53b10c6a7b9cddc136
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -417,6 +417,17 @@ non-zero in CI over a consumer's own file.
 is not a finding.** The liveness file describes the last run; treating its
 absence as a failure would make every fresh clone look broken.
 
+<!-- L12-VALUES-START -->
+
+**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+Each name below keeps its spelling in code and holds no literal: it is read from
+[`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
+process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
+this moved where they are written, not what they are.
+
+- `src/fux/doctor.py` — `PY_MIN` ← `[python] min`
+
+<!-- L12-VALUES-END -->
 
 ### Consequences
 

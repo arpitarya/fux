@@ -8,10 +8,10 @@ status: accepted
 date: 2026-09-06
 amended: 2026-09-11
 feature: tabular documents — row granularity, the admitted-row limit, and what a table citation is
-owns: [src/fux/decode/csv.py@3dcdf4365361, src/fux/decode/xlsx.py@a54a416685f2, src/fux/decode/_limits.py@5970a244258a]
+owns: [src/fux/decode/csv.py@6da838857256, src/fux/decode/xlsx.py@b19095e458e8, src/fux/decode/_limits.py@5970a244258a]
 laws: [L1, L2, L3]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: e2ac1795dde0f3524e4f96b082bf867d4c19afff18d47ab7165c5a0cc664d26b
+content_sha: d5215373117a4d5694926beb2abefbf55d0e53d3dccbc7c77a1b7f4a41d31b00
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -153,6 +153,19 @@ The column notice carries a number where the row notice does not. That is not
 an inconsistency: a sheet's **width** is a property of the sheet, so the text is
 stable, while a row count moves every time the file grows and would make the
 indexed text a moving target for no benefit.
+
+<!-- L12-VALUES-START -->
+
+**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+Each name below keeps its spelling in code and holds no literal: it is read from
+[`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
+process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
+this moved where they are written, not what they are.
+
+- `src/fux/decode/csv.py` — `VERSION` ← `[decoders.csv] version`, `EXTENSIONS` ← `[decoders.csv] extensions`
+- `src/fux/decode/xlsx.py` — `VERSION` ← `[decoders.xlsx] version`, `EXTENSIONS` ← `[decoders.xlsx] extensions`
+
+<!-- L12-VALUES-END -->
 
 ### The measurement
 

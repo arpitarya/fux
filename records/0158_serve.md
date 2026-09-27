@@ -7,10 +7,10 @@ description: "Arpit's framing, 2026-09-22 — fux is like Google: if the ten doc
 status: accepted
 date: 2026-09-22
 feature: the ask explorer — a local page over the real ask
-owns: [src/fux/serve@045449d1c10f]
+owns: [src/fux/serve@5c02146cde3f]
 laws: [L1, L2, L4, L6, L8, L10]
 timestamp: 2026-09-22T00:00:00Z
-content_sha: 8062288b5facbc5cfaed864d306916b85e016a660d2f81a66ee1823b1d26afa0
+content_sha: 1a5e48d88e82923c33d9a8ad741d6739f12b484a5712e65a0dc32363ab659ac0
 ratifies: "Arpit, 2026-09-22 (Cowork, W-210) — three sample pages built on his machine, the per-token ingest X-ray REJECTED as a front page ('do you believe people will go through this big document?') and the question-first explorer ratified in its modern-dark form: 'the way I'm thinking about fux is something like Google. If a question gets asked, if you have the best 10 documents, the answer the agent gives is going to be mostly correct.'"
 ---
 
@@ -255,6 +255,18 @@ remember.
 - **Lazy and cached.** Nothing is computed at start-up. The server keeps one
   `IndexView`, re-read when the committed shards change, and one job per
   (tab, shards) — reopening a tab on an unchanged index recomputes nothing.
+
+<!-- L12-VALUES-START -->
+
+**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+Each name below keeps its spelling in code and holds no literal: it is read from
+[`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
+process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
+this moved where they are written, not what they are.
+
+- `src/fux/serve/__init__.py` — `HOST` ← `[serve] host`
+
+<!-- L12-VALUES-END -->
 
 ### Consequences
 

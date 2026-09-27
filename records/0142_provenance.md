@@ -8,11 +8,11 @@ status: accepted
 date: 2026-08-27
 ratified: 2026-08-27
 feature: answer provenance — the derivation, the receipt, the journal and verification
-owns: [src/fux/query/provenance.py@b4fdb00960db]
+owns: [src/fux/query/provenance.py@e6a6a65d7048]
 laws: [L1, L3, L4, L8]
 ratifies: W-91
 timestamp: 2026-08-27T00:00:00Z
-content_sha: f88fbb2263b8c7abb653f7aa8ce01a1de8e946d058d7507614767e701bfcbb68
+content_sha: 39ba160bfe7ccfb61a6ed31ae096da2d66c74159cdce340454a36fdf9f2dab1d
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -514,6 +514,18 @@ cites it: *a second query against one document, never a tax on the first.*
 and the only two ways to get one are this field or a BM25F implementation in the
 browser. The second is a second ranker. **That is the shape every future panel
 takes: add the field to the engine's own output, or do not show the number.**
+
+<!-- L12-VALUES-START -->
+
+**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+Each name below keeps its spelling in code and holds no literal: it is read from
+[`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
+process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
+this moved where they are written, not what they are.
+
+- `src/fux/query/provenance.py` — `Reference` ← `[receipt] statement_type`, `PREDICATE_TYPE` ← `[receipt] predicate_type`, `LEGACY_SCHEMA` ← `[receipt] legacy_schema`, `JOURNAL_NAME` ← `[receipt] journal`, `DIGEST_ALG` ← `[receipt] digest_alg`
+
+<!-- L12-VALUES-END -->
 
 ### Consequences
 

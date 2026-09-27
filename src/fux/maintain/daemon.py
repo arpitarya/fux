@@ -89,13 +89,14 @@ from pathlib import Path
 from ..errors import FuxError
 from ..store import fuxdir
 from . import runner
+from ..constants import fixed
 
 #: All three live in the gitignored runtime plane. Nothing the daemon writes is
 #: ever committed — that is L2 and L3 both, and it is why there is no
 #: `daemon.toml` or committed state file anywhere in this module.
-PID_NAME = "daemon.pid"
-STOP_NAME = "daemon.stop"
-STATUS_NAME = "daemon.status"
+PID_NAME = fixed("maintain", "daemon_pid")
+STOP_NAME = fixed("maintain", "daemon_stop")
+STATUS_NAME = fixed("maintain", "daemon_status")
 
 #: How long `stop` waits for a cooperative exit before reporting that the
 #: daemon did not let go. Matches `runner.STOP_TIMEOUT_S` deliberately: a

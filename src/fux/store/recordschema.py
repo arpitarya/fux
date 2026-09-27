@@ -45,6 +45,7 @@ from functools import lru_cache
 from importlib import resources
 
 from ..errors import FuxError
+from ..constants import fixed
 
 __all__ = [
     "Field",
@@ -63,7 +64,7 @@ __all__ = [
 #: `src/fux/store/` is SR-INDEX-LIFECYCLE's, which is exactly right -- so the
 #: ownership is correct BY CONSTRUCTION instead of by a carve-out somebody has
 #: to remember. The SR guard caught this on the first commit attempt.
-SCHEMA_NAME = "index-record.schema.json"
+SCHEMA_NAME = fixed("schema_files", "index_record")
 
 _PY_TYPES = {"str": str, "int": int, "bool": bool, "list": list, "dict": dict}
 

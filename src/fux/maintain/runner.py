@@ -76,6 +76,7 @@ from pathlib import Path
 
 from ..errors import FuxError
 from ..store import fuxdir
+from ..constants import fixed
 
 __all__ = [
     "LOCK_NAME",
@@ -103,9 +104,9 @@ __all__ = [
 #:
 #: **Not `index.lock`** — git keeps one of those feet away in the same repo,
 #: and MACHINE.md already records an incident with a stranded one.
-LOCK_NAME = "write.lock"
-STOP_NAME = "runner.stop"
-STATUS_NAME = "runner.status"
+LOCK_NAME = fixed("maintain", "write_lock")
+STOP_NAME = fixed("maintain", "runner_stop")
+STATUS_NAME = fixed("maintain", "runner_status")
 
 #: How long `request_stop` waits for a cooperative runner to reach a safe point.
 #: Generous on purpose: the longest unit of work between stop checks is one
@@ -474,7 +475,7 @@ def record_head(root: Path) -> int:
 #: gap between the parent releasing the lock and the successor claiming it, and
 #: the successor would then clear the very stop that was meant for the pair of
 #: them and keep writing. A handoff runner therefore clears nothing and exits.
-HANDOFF_ENV = "FUX_RUNNER_HANDOFF"
+HANDOFF_ENV = fixed("env", "runner_handoff")
 
 #: Set to `1` to make every spawn a no-op: hooks still run, the dirty list is
 #: still recorded, and nothing detaches.
@@ -490,7 +491,7 @@ HANDOFF_ENV = "FUX_RUNNER_HANDOFF"
 #: **It is a switch for a harness, not a mode.** Nothing about ingest, the
 #: index or the hooks changes; the work simply waits for the next foreground
 #: verb, which is where the dirty list has always sent leftovers.
-NO_SPAWN_ENV = "FUX_NO_SPAWN"
+NO_SPAWN_ENV = fixed("env", "no_spawn")
 
 
 def spawn(root: Path, *, handoff: bool = False) -> bool:

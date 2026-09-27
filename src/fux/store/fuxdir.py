@@ -28,8 +28,9 @@ See SR-DOTFUX.
 from __future__ import annotations
 
 from pathlib import Path
+from ..constants import fixed
 
-FUX_DIR = ".fux"
+FUX_DIR = fixed("fuxdir", "dir")
 
 #: Declared children of `.fux/` — name -> one-line description for the README.
 COMMITTED: dict[str, str] = {
@@ -61,7 +62,7 @@ DERIVED: dict[str, str] = {
 }
 
 #: Files fux generates at the top level of `.fux/` (write-if-missing).
-GENERATED_FILES = ("README.md", ".gitignore")
+GENERATED_FILES = tuple(fixed("fuxdir", "generated"))
 
 #: Committed FILES at the top level, as opposed to committed directories.
 #:
@@ -91,7 +92,7 @@ COMMITTED_FILES: dict[str, str] = {
 DECLARED = (*COMMITTED, *COMMITTED_FILES, *DERIVED, *ACQUIRED, *GENERATED_FILES)
 
 # CACHEDIR.TAG's first line is a fixed signature — byte-exact, per the spec.
-CACHEDIR_SIGNATURE = "Signature: 8a477f597d28d172789f06886806bc55"
+CACHEDIR_SIGNATURE = fixed("fuxdir", "cachedir_signature")
 CACHEDIR_TAG = (
     f"{CACHEDIR_SIGNATURE}\n"
     "# This file is a cache directory tag created by fux.\n"
@@ -438,9 +439,9 @@ def ensure_layout(root: Path, *, node_shape: "str | None" = None) -> list[Path]:
 #: The vendored Node reader. Committed (a clone with no Python still answers)
 #: and rewritten whenever the engine version differs, so a `_format` mismatch
 #: cannot happen: the copy is always written by the Python that wrote the index.
-NODE_DIR = "node"
-NODE_ENTRY = "fux.mjs"
-NODE_SHIM = "fux"
+NODE_DIR = fixed("bundle", "dir")
+NODE_ENTRY = fixed("bundle", "entry")
+NODE_SHIM = fixed("bundle", "shim")
 
 #: The two shapes of `.fux/node/`. Spelled "A" and "C" because those are the
 #: labels the ruling used and the record carries (SR-NODE-SEARCH decision 13);

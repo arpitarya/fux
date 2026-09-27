@@ -7,10 +7,10 @@ description: "A declarative refusal table, every condition pure over the respons
 status: accepted
 date: 2026-09-01
 feature: refusal detection before decode
-owns: [src/fux/ingest/refusals.py@3396b44cc6a7, src/fux/templates/refusals.toml.txt@bdf2356bc679, tools/refusal-probe@76b6f6b7f4aa, .fux/refusals.toml@bdf2356bc679]
+owns: [src/fux/ingest/refusals.py@3517c1b5cbd3, src/fux/templates/refusals.toml.txt@bdf2356bc679, tools/refusal-probe@76b6f6b7f4aa, .fux/refusals.toml@bdf2356bc679]
 laws: [L1, L3]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 465fac43f477da404b317dd99df1a78e62027be68bb916803a3dc6c715de2b7c
+content_sha: e164f87774af524a2d1cb4db5815a2e43d105ff6cc00373e3487e6b348e6b940
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -436,6 +436,19 @@ false refusals, and a floor that cries wolf gets switched off.
 
 ⚠ **Still not configurable, and still fux's.** A format signature is a fact;
 `refusals.toml` adds refusals and can never subtract one.
+
+<!-- L12-VALUES-START -->
+
+**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+Each name below keeps its spelling in code and holds no literal: it is read from
+[`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
+process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
+this moved where they are written, not what they are.
+
+- `src/fux/ingest/refusals.py` — `RULES_NAME` ← `[files] refusals_name`
+- `src/fux/maintain/urlstate.py` — `STATE_NAME` ← `[maintain] url_state`, `SCHEMA_NAME` ← `[maintain] url_state_schema`
+
+<!-- L12-VALUES-END -->
 
 ### Consequences
 

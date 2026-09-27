@@ -77,6 +77,7 @@ from .. import decode as decode_mod
 from ..config import DEFAULT_TYPES_FILE as TYPES_FILE
 from ..errors import FuxError
 from . import fuxignore, sourcelist
+from ..constants import fixed
 
 
 @dataclass(frozen=True)
@@ -256,7 +257,7 @@ def is_archived_loc(loc: str, archived_dirs) -> bool:
 #: `Dockerfile` far more often than they are documents.
 #: Prose formats that need no decoder — already text, walked since the
 #: allowlist shipped.
-_PROSE_TYPES: tuple[str, ...] = ("*.md", "*.markdown", "*.txt", "*.rst", "*.adoc", "*.org")
+_PROSE_TYPES: tuple[str, ...] = tuple(fixed("decoders", "prose_types"))
 
 
 def _default_types() -> tuple[str, ...]:

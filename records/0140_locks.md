@@ -10,7 +10,7 @@ feature: the index write lock and the files around it
 owns: []
 laws: [L1, L2, L3, L7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 7ce87414b892ef58d85d6a06a406ed0099bb7e63167db2dc86ded1a5365f9ff9
+content_sha: df36a704b4bc830b1404aaa8b5e574186da8eaa1b7c332a9bcd2c06ff2eaaa3a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -195,6 +195,20 @@ says so.** That change edited one thing in `src/fux/store/fuxdir.py`: the
 `runtime` kind's description string, which gained `runtime/inspect/`
 ([SR-DOTFUX](0102_fux-directory.md); [SR-INSPECT](0156_inspect.md)).
 **It does not reach this record's claim on that file.**
+
+<!-- L12-VALUES-START -->
+
+**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+Each name below keeps its spelling in code and holds no literal: it is read from
+[`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
+process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
+this moved where they are written, not what they are.
+
+- `src/fux/maintain/daemon.py` — `PID_NAME` ← `[maintain] daemon_pid`, `STOP_NAME` ← `[maintain] daemon_stop`, `STATUS_NAME` ← `[maintain] daemon_status`
+- `src/fux/maintain/runner.py` — `LOCK_NAME` ← `[maintain] write_lock`, `STOP_NAME` ← `[maintain] runner_stop`, `STATUS_NAME` ← `[maintain] runner_status`, `HANDOFF_ENV` ← `[env] runner_handoff`, `NO_SPAWN_ENV` ← `[env] no_spawn`
+- `src/fux/store/fuxdir.py` — `FUX_DIR` ← `[fuxdir] dir`, `GENERATED_FILES` ← `[fuxdir] generated`, `CACHEDIR_SIGNATURE` ← `[fuxdir] cachedir_signature`, `NODE_DIR` ← `[bundle] dir`, `NODE_ENTRY` ← `[bundle] entry`, `NODE_SHIM` ← `[bundle] shim`
+
+<!-- L12-VALUES-END -->
 
 ### Consequences
 

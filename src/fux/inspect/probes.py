@@ -40,14 +40,15 @@ import hashlib
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
+from ..constants import fixed
 
 __all__ = [
     "PROBE_RANK", "DEFAULT_PROBE_SAMPLE", "Probes", "run", "probe_texts", "ranking_key",
     "open_cache", "save_cache",
 ]
 
-PROBES_NAME = "probes.json"
-SCHEMA = "fux.inspect.probes.v1"
+PROBES_NAME = fixed("inspect", "probes")
+SCHEMA = fixed("inspect", "probes_schema")
 
 #: The bar: in the top ten, the list an agent is handed.
 PROBE_RANK = 10

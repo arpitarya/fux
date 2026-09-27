@@ -7,10 +7,10 @@ description: "A deliberately tiny config: what each key does, why the surface is
 status: accepted
 date: 2026-08-18
 feature: "`fux.toml` — discovery, schema, validation, and the keys that are refused rather than ignored"
-owns: [src/fux/config.py@e7ab20d676db, node/src/config/root.mjs@f33e16d005f7, node/test/config.test.mjs@5c1efeb0a8e8]
+owns: [src/fux/config.py@a4bff466df04, node/src/config/root.mjs@aab1cfcd6c25, node/test/config.test.mjs@5c1efeb0a8e8]
 laws: [L4, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: c5fc42375b49a2887810cd06abbfb7802cb0d3dc6576ccc0615ecb1726b9ef4f
+content_sha: 618612cab8cec45198320adc8f24ec5b08ce171e1f82d7bc894e541ceaceb699
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -585,6 +585,18 @@ changes an answer.
 10b. Past the cap fux stops waiting; the observer may run until the process
 exits, because Python cannot safely interrupt arbitrary consumer code.
 
+<!-- L12-VALUES-START -->
+
+**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+Each name below keeps its spelling in code and holds no literal: it is read from
+[`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
+process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
+this moved where they are written, not what they are.
+
+- `node/src/config/root.mjs` — `CONFIG_NAME` ← `[files] config`
+- `src/fux/config.py` — `CONFIG_NAME` ← `[files] config`, `FETCHERS_DIR` ← `[files] fetchers_dir`, `DEFAULT_TYPES_FILE` ← `[files] formats`, `LEGACY_TYPES_FILE` ← `[files] formats_legacy`
+
+<!-- L12-VALUES-END -->
 
 ### Consequences
 

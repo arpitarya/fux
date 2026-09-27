@@ -48,8 +48,9 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from ..store import fuxdir
+from ..constants import fixed
 
-LOG_NAME = "last-cited.json"
+LOG_NAME = fixed("maintain", "last_cited")
 
 #: Bound on remembered questions. A local diagnostic must not grow without
 #: limit; the oldest entries are dropped by insertion order, which is enough

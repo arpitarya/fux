@@ -51,9 +51,10 @@ from __future__ import annotations
 import hashlib
 import importlib
 from pathlib import Path
+from ..constants import fixed
 
 #: `Decoder.origin` for a built-in, as `decode._load_builtin` spells it.
-BUILTIN_PREFIX = "built-in:"
+BUILTIN_PREFIX = fixed("decoders", "builtin_prefix")
 
 
 def _module_version(name: str) -> int:

@@ -123,9 +123,10 @@ from pathlib import Path
 
 from ..errors import FuxError
 from .sourcelist import strip_comment
+from ..constants import fixed
 
 #: The one path. Not configurable, and not nested — see the module docstring.
-IGNORE_FILE = ".fux/.fuxignore"
+IGNORE_FILE = fixed("files", "fuxignore")
 
 #: The two fux-written blocks. **Which block a line sits in IS its class** —
 #: structural, never parsed out of the reason text, which is the property

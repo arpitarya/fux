@@ -52,13 +52,14 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+from ..constants import fixed
 
 #: The file, under the committed index plane it describes.
-NAME = "REGISTER"
+NAME = fixed("register", "file")
 
 #: One tab-separated header line, so a reader knows the columns without this
 #: module. ⚠ **Part of the bytes**, therefore part of the L3 claim.
-HEADER = "# loc\tkind\tsha\tdecoder\tfetcher"
+HEADER = fixed("register", "header")
 
 #: What a URL row carries when no fetcher was recorded for it — a carried
 #: record from before the field existed. **Absent and unknown are different**,

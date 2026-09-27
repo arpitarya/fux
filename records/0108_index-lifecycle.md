@@ -7,10 +7,10 @@ description: One canonical encoder, sharded doc-major JSONL, write-if-different;
 status: accepted
 date: 2026-08-18
 feature: generation and update of the committed index, and the refusal that keeps its derived accelerator from diverging
-owns: [src/fux/store@88b1982d1a60, node/src/store/format.mjs@affceafdd3a0, node/src/store/reader.mjs@f47fa69ecb2c]
+owns: [src/fux/store@20632c62be16, node/src/store/format.mjs@ec3056937006, node/src/store/reader.mjs@f47fa69ecb2c]
 laws: [L1, L2, L3, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: ec611c0c15fd4f55764d921f2a6670bd05f728a139989fd09a565d703ae94444
+content_sha: 352cee9e7da41ddf1f731a38b3fe5910dc13d27c847558d7e972102df02c1053
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -427,6 +427,20 @@ abbreviations or predates the miner.
 `at`'s. A long form's token need not be in the document's own `terms` (a
 stopword never is), so they are allowed as the field's contents, not by
 membership in `terms`.
+
+<!-- L12-VALUES-START -->
+
+**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+Each name below keeps its spelling in code and holds no literal: it is read from
+[`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
+process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
+this moved where they are written, not what they are.
+
+- `node/src/store/format.mjs` — `INDEX_DIR` ← `[index] dir`, `SCHEMA_ID` ← `[index] schema`, `ANALYZER_VERSION` ← `[index] analyzer`, `TF_FIELDS` ← `[index] tf_fields`, `TERM_HASH_BYTES` ← `[index] term_hash_bytes`, `CONTENT_SHA_BYTES` ← `[index] content_sha_bytes`
+- `src/fux/store/format.py` — `INDEX_DIR` ← `[index] dir`, `SCHEMA_ID` ← `[index] schema`, `ANALYZER_VERSION` ← `[index] analyzer`, `TF_FIELDS` ← `[index] tf_fields`, `_TERM_HASH_BYTES` ← `[index] term_hash_bytes`, `_CONTENT_SHA_BYTES` ← `[index] content_sha_bytes`
+- `src/fux/store/recordschema.py` — `SCHEMA_NAME` ← `[schema_files] index_record`
+
+<!-- L12-VALUES-END -->
 
 ### What it looks like
 

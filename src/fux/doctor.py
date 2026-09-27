@@ -24,8 +24,9 @@ from .config import DEFAULT_DIRS_FILE, DEFAULT_TYPES_FILE, FETCHERS_DIR, find_ro
 from .errors import FuxError
 from . import output_config
 from .store import fuxdir
+from .constants import fixed
 
-PY_MIN = (3, 11)
+PY_MIN = tuple(fixed("python", "min"))
 
 
 @dataclass

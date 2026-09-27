@@ -28,6 +28,7 @@ from urllib.parse import unquote
 # fux ships and the file you edit are byte-identical (SR-DECODE decision 11).
 from fux.decode import _xml
 from fux.decode.html import html_to_markdown
+from fux.constants import fixed
 
 #: **The reuse key's handle on this decoder** (W-166). Bump it by hand in the
 #: same change as any edit that can change what `decode()` returns, and the next
@@ -35,9 +36,9 @@ from fux.decode.html import html_to_markdown
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = 1
+VERSION = fixed("decoders.drawio", "version")
 
-EXTENSIONS = (".drawio", ".dio")
+EXTENSIONS = tuple(fixed("decoders.drawio", "extensions"))
 
 #: A diagram page is a complete unit — a short page was being absorbed by
 #: the next one and cited under the wrong name.

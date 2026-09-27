@@ -33,7 +33,7 @@ here. Read that record before changing anything below it.
 ### fux build
 
 - 🟢 **W-168** · `agent` — the ranking ideas. **Step 4 (abbreviations) ratified PASS 2026-09-27**: ship `mined_weight = 0.5` as the default. Then a fresh prompt-4 session rebuilds the eight rungs for generation 3. [detail](open/W-168-search-improvements.md)
-- 🟢 **W-225** · `agent` — L12 migration, not built. Step 1 ruled (R1–R6 accepted); ~580 sites to move to TOML or `constants.toml`. [detail](open/W-225-values-live-in-config.md)
+- 🟢 **W-225** · `agent` — L12 migration, building. Stage 1 landed (`constants.toml`, fixed names); R7–R10 ruled strict. Next: `tune.toml` without fallback. [detail](open/W-225-values-live-in-config.md)
 
 
 ### testing

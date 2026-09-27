@@ -15,8 +15,9 @@ import { readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { tokenize } from "./query/tokenize.mjs";
 import { iterShardPaths, rawRecordLines } from "./store/reader.mjs";
+import { fixed } from "./config/constants.mjs";
 
-export const CORRECTIONS_FILE = ".fux/eval/corrections.tsv";
+export const CORRECTIONS_FILE = fixed("files", "corrections");
 
 /** The analyzed form of a question — what a pin matches on.
  *

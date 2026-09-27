@@ -67,8 +67,9 @@ from pathlib import Path, PurePosixPath
 from urllib.parse import urlsplit
 
 from ..errors import FuxError
+from ..constants import fixed
 
-RULES_NAME = "refusals.toml"
+RULES_NAME = fixed("files", "refusals_name")
 
 #: Content type -> the bytes a real document of that type must begin with.
 #:

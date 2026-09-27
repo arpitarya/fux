@@ -28,6 +28,7 @@ from __future__ import annotations
 
 import csv
 import io
+from fux.constants import fixed
 
 #: **The reuse key's handle on this decoder** (W-166). Bump it by hand in the
 #: same change as any edit that can change what `decode()` returns, and the next
@@ -35,9 +36,9 @@ import io
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = 1
+VERSION = fixed("decoders.csv", "version")
 
-EXTENSIONS = (".csv", ".tsv")
+EXTENSIONS = tuple(fixed("decoders.csv", "extensions"))
 
 #: Rows past this are dropped. **Was a hard-coded 500 until 2026-09-06**, and
 #: that number was a quiet data loss: a 754-row file decoded to 500 rows, so a

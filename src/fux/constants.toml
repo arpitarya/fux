@@ -1,0 +1,262 @@
+# src/fux/constants.toml -- the engine's FIXED values.
+#
+# SR-LAW-12 decision 2 (records/0013_LAW-12-values-live-in-config.md) and
+# SR-CONSTANTS (records/0159_constants.md). A value is FIXED when changing it
+# changes what a committed byte means -- a schema id, a format or rules version,
+# an artefact name, a byte offset a file format defines (decision 6a, R7).
+#
+# NOT a consumer knob. It never appears in a consumer's tree: it ships inside the
+# wheel beside `fux/constants.py` and, inlined, inside the Node bundle, and both
+# planes read the same key from this one file (decision 4). A missing key is a
+# hard error naming it; nothing in code supplies a fallback.
+#
+# Tunable values live in the consumer's TOML instead -- fux.toml, .fux/*.toml --
+# and their shipped values in src/fux/templates/.
+
+# -- The committed index -----------------------------------------------------
+
+[index]
+dir              = ".fux/index"
+# Bump history and why each bump was a _format bump: store/format.py.
+schema           = "fux.index.v5"
+# An ANALYZER bump, not a _format bump -- see store/format.py.
+analyzer         = "v3"
+# ORDER IS LOAD-BEARING: body first, trailing zeros omitted on the wire.
+tf_fields        = ["body", "heading", "title", "path", "ctx"]
+# blake2b digest sizes, in bytes: the postings key, the ledger sha.
+term_hash_bytes  = 8
+content_sha_bytes = 20
+# Digests and ledgers committed beside the shards.
+pii_digest            = "pii-digest"
+extract_config_digest = "extract-config-digest"
+enrich_digests        = "enrich-digests.json"
+decoder_digests       = "decoder-digests.json"
+
+# -- The graph plane (graph/plane.py, ingest/edges.py, graph/walk.*) ---------
+
+[graph]
+file   = "graph.json"
+schema = "fux.graph.v1"
+# The namespace a tag node lives in. Two spellings would split the graph.
+tag_prefix = "tag:"
+# The edge kinds ingest mints, and the grade a minted edge carries (E/).
+edge_kinds      = ["ref", "tag", "code", "supersedes"]
+grade_extracted = 10
+grade_ambiguous = 8
+grade_inferred  = 6
+
+# -- Configuration files the engine reads ------------------------------------
+# The NAMES of the consumer's files. Their contents are the consumer's; where
+# they live is the engine's, and moving one orphans every repo that has it.
+
+[files]
+config          = "fux.toml"
+tune            = ".fux/tune.toml"
+output          = ".fux/output.toml"
+formats         = ".fux/formats.toml"
+formats_legacy  = ".fux/sources/types"
+fetchers_dir    = ".fux/fetchers"
+corrections     = ".fux/eval/corrections.tsv"
+urls            = ".fux/sources/urls"
+fuxignore       = ".fux/.fuxignore"
+enrich_dir      = ".fux/enrich"
+enrich_queue    = ".fux/enrich/queue.tsv"
+enrich_progress = ".fux/runtime/enrich-progress.tsv"
+# Names, not paths: each is joined under .fux/ by its module.
+pii_name        = "pii.toml"
+refusals_name   = "refusals.toml"
+observers_dir   = ".fux/observers"
+
+[routes]
+# A `.fux/sources/routes` host pattern that is a regex, not a literal.
+regex_prefix = "re:"
+
+# -- Decoders (decode/*.py, decode/registry.mjs) ------------------------------
+# A built-in decoder's VERSION enters the decoder digest; its EXTENSIONS are its
+# default claim. The built-ins are COPIED into a consumer's .fux/decoders/ and
+# the copy reads these keys through `fux.constants`, absolutely.
+
+[decoders]
+builtin_prefix = "built-in:"
+consumer_dir   = ".fux/decoders"
+# Sorted and explicit, never discovered: dispatch must not depend on
+# filesystem order (L3).
+builtin        = ["csv", "docx", "drawio", "html", "image", "ini", "json", "jsonl", "mail", "pdf", "pptx", "rtf", "svg", "toml", "xlsx", "xml", "yaml"]
+# Already-text formats that reach no decoder -- the prose half of the default
+# `include` that `fux setup` writes into .fux/formats.toml.
+prose_types    = ["*.md", "*.markdown", "*.txt", "*.rst", "*.adoc", "*.org"]
+
+[decoders.csv]
+version    = 1
+extensions = [".csv", ".tsv"]
+
+[decoders.docx]
+version    = 1
+extensions = [".docx", ".docm"]
+
+[decoders.drawio]
+version    = 1
+extensions = [".drawio", ".dio"]
+
+[decoders.html]
+version    = 1
+extensions = [".html", ".htm", ".xhtml"]
+
+[decoders.image]
+version    = 1
+extensions = [".png", ".jpg", ".jpeg", ".gif"]
+
+[decoders.ini]
+version    = 1
+extensions = [".ini", ".cfg", ".properties"]
+
+[decoders.json]
+version    = 1
+extensions = [".json"]
+
+[decoders.jsonl]
+version    = 1
+extensions = [".jsonl"]
+
+[decoders.mail]
+version    = 1
+extensions = [".eml", ".mbox"]
+
+[decoders.pdf]
+version    = 1
+extensions = [".pdf"]
+
+[decoders.pptx]
+version    = 1
+extensions = [".pptx", ".pptm"]
+
+[decoders.rtf]
+version    = 1
+extensions = [".rtf"]
+
+[decoders.svg]
+version    = 1
+extensions = [".svg"]
+
+[decoders.toml]
+version    = 1
+extensions = [".toml"]
+
+[decoders.xlsx]
+version    = 2  # 2026-09-14: phantom rows no longer spend the row budget; truncation and column notices added
+extensions = [".xlsx", ".xlsm"]
+
+[decoders.xml]
+version    = 1
+extensions = [".xml"]
+
+[decoders.yaml]
+version    = 1
+extensions = [".yaml", ".yml"]
+
+[register]
+file   = "REGISTER"
+header = "# loc\tkind\tsha\tdecoder\tfetcher"
+
+# -- Runtime segments: gitignored, derived, mmap'd (derive/format.py) --------
+
+[runtime]
+dir          = "runtime"
+schema       = "fux.runtime.v7"
+block_size   = 128
+docs_fields  = ["id", "loc", "title", "flen", "archived", "superseded", "mtime", "alen"]
+docs         = "docs.jsonl"
+anchors_dir  = "anchors"
+stats        = "stats.json"
+mined        = "mined.json"
+manifest     = "manifest.json"
+stamp        = "stamp.json"
+postings_dir = "postings"
+ingest_log      = "ingest-log.jsonl"
+pii_counts      = "pii-counts.json"
+stale_redaction = "stale-redaction.json"
+observers       = "observers.json"
+fetch_cache_dir = "fetch-cache"
+
+[python]
+# L7 -- records/0009_LAW-7-python-311.md.
+min = [3, 11]
+
+# -- fux inspect's committed-nowhere report files ----------------------------
+
+[inspect]
+dir               = "inspect"
+report_md         = "report.md"
+report_json       = "report.json"
+dictionary        = "dictionary.json"
+dictionary_schema = "fux.inspect.dictionary.v1"
+facts             = "facts.json"
+facts_schema      = "fux.inspect.facts.v1"
+probes            = "probes.json"
+probes_schema     = "fux.inspect.probes.v1"
+# Inspect's definition of a DATA file -- fixed (R4), not a knob.
+data_suffixes     = [".json", ".jsonl", ".csv", ".toml", ".yaml", ".yml"]
+
+# -- The .fux/ directory and what fux setup vendors into it ------------------
+
+[fuxdir]
+dir       = ".fux"
+generated = ["README.md", ".gitignore"]
+# The CACHEDIR.TAG signature -- a spec'd byte string (bford.info/cachedir).
+cachedir_signature = "Signature: 8a477f597d28d172789f06886806bc55"
+
+[bundle]
+# .fux/node/ -- the one generated Node artefact and its sidecars (L10).
+dir      = "node"
+entry    = "fux.mjs"
+shim     = "fux"
+sidecars = ["package.json", "mcp-tools.json", "README.md"]
+
+[acquired]
+dir         = "acquired"
+manifest    = "manifest.json"
+objects_dir = "objects"
+schema      = "fux.acquired.v1"
+
+[schema_files]
+output       = "output.schema.json"
+index_record = "index-record.schema.json"
+
+# -- The maintenance plane (maintain/*) ---------------------------------------
+
+[maintain]
+daemon_pid       = "daemon.pid"
+daemon_stop      = "daemon.stop"
+daemon_status    = "daemon.status"
+dirty            = "dirty"
+last_cited       = "last-cited.json"
+write_lock       = "write.lock"
+runner_stop      = "runner.stop"
+runner_status    = "runner.status"
+url_state        = "url-state.json"
+url_state_schema = "state.schema.json"
+
+[hooks]
+# Written into .git -- how fux recognises its own hooks and merge driver.
+merge_driver = "fux-index"
+marker       = "# installed by `fux hooks --install`"
+
+[env]
+runner_handoff = "FUX_RUNNER_HANDOFF"
+no_spawn       = "FUX_NO_SPAWN"
+
+# -- Wire formats fux speaks --------------------------------------------------
+
+[mcp]
+protocol_version = "2024-11-05"
+
+[receipt]
+statement_type = "https://in-toto.io/Statement/v1"
+predicate_type = "https://fux.dev/receipt/v1"
+legacy_schema  = "fux.receipt.v1"
+journal        = "provenance.jsonl"
+digest_alg     = "blake2b-160"
+
+[serve]
+# Localhost only is a law-level choice (SR-SERVE), not a knob.
+host = "127.0.0.1"

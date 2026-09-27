@@ -10,10 +10,10 @@ amended: 2026-08-28
 date: 2026-08-27
 ratified: 2026-08-27
 feature: configurable output defaults
-owns: [src/fux/output_config.py@8e8e57fade21, .fux/output.toml@3a5b84942f70, node/src/config/output.mjs@4f299752c596]
+owns: [src/fux/output_config.py@9b9323869956, .fux/output.toml@3a5b84942f70, node/src/config/output.mjs@b7f85782dc29]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 4c2258f879eb96a707bfce9d3728f98407ca331973d59afff7bd34e1f769d9bf
+content_sha: c565ccc455c35648a6d4381bc1f88d3443ed36fd330bec31e7da913d42a7dc1f
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -814,6 +814,21 @@ says so.** That change edited one thing in `src/fux/store/fuxdir.py`: the
 `runtime` kind's description string, which gained `runtime/inspect/`
 ([SR-DOTFUX](0102_fux-directory.md); [SR-INSPECT](0156_inspect.md)).
 **It does not reach this record's claim on that file.**
+
+<!-- L12-VALUES-START -->
+
+**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+Each name below keeps its spelling in code and holds no literal: it is read from
+[`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
+process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
+this moved where they are written, not what they are.
+
+- `node/src/config/output.mjs` — `OUTPUT_NAME` ← `[files] output`
+- `src/fux/mcp.py` — `exposed` ← `[mcp] protocol_version`
+- `src/fux/output_config.py` — `OUTPUT_NAME` ← `[files] output`
+- `src/fux/query/__init__.py` — `OUTPUT_SCHEMA` ← `[schema_files] output`
+
+<!-- L12-VALUES-END -->
 
 ### Consequences
 

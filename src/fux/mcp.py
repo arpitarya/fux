@@ -28,8 +28,9 @@ import sys
 from pathlib import Path
 
 from .errors import FuxError
+from .constants import fixed
 
-PROTOCOL_VERSION = "2024-11-05"
+PROTOCOL_VERSION = fixed("mcp", "protocol_version")
 
 def _k_property(top: int) -> dict:
     """`k`'s advertised default — the RESOLVED `[mcp] top`, not a literal.

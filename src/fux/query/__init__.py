@@ -58,6 +58,7 @@ from typing import TYPE_CHECKING
 
 from .rank import AskResult, Weighting
 from .scan import ask as scan_ask
+from ..constants import fixed
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from ..tune import Tune
@@ -523,7 +524,7 @@ def _maybe_rerank(root: Path, query: str, results, weight: float, top: int, upli
 #: (`query/output.schema.json`). **The only PUBLIC shape fux has**: everything
 #: else declared in this repo is internal, and this one is parsed by other
 #: people's agents.
-OUTPUT_SCHEMA = "output.schema.json"
+OUTPUT_SCHEMA = fixed("schema_files", "output")
 
 
 def _emit(payload: dict, shape: str, *, band_requested: bool = False) -> None:

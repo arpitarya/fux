@@ -51,10 +51,11 @@ import json
 import time
 from dataclasses import dataclass
 from pathlib import Path
+from ..constants import fixed
 
 __all__ = ["FetchCache", "CacheEntry", "CACHE_DIR", "DEFAULT_TTL_SECONDS", "DEFAULT_MAX_BYTES"]
 
-CACHE_DIR = "fetch-cache"
+CACHE_DIR = fixed("runtime", "fetch_cache_dir")
 
 #: Arpit's number, 2026-08-20. Only in force when a caller opts in — the
 #: `Policy` default is 0, which disables the cache entirely.

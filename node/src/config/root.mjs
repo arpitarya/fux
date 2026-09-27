@@ -2,8 +2,9 @@
  *  Walk up for `fux.toml` or `.git` — the same two tells, in the same order. */
 import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
+import { fixed } from "./constants.mjs";
 
-export const CONFIG_NAME = "fux.toml";
+export const CONFIG_NAME = fixed("files", "config");
 
 export function findRoot(start = process.cwd()) {
   let here = resolve(start);

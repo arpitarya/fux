@@ -44,6 +44,7 @@ What it supports, because it is all this tree uses (asserted by
 | `import { readFileSync } from "node:fs"` | hoisted to the bundle's real top |
 | `export function f()` / `const` / `class` | the `export` keyword stripped |
 | `export { a, b as c }` | folded into the module's returned object |
+| `/* @fux-inline <repo path> */ readFileSync(...)` | the file's text, as a string literal |
 
 Anything else — `export default`, `export … from`, a bare side-effect
 `import "x"` — raises. When one lands in `node/`, teach this file about it in
@@ -58,18 +59,19 @@ import re
 from pathlib import Path
 
 from ..errors import FuxError
+from ..constants import fixed
 
 #: The one entry point. `fux.mjs` is both the CLI and — since the bundle is the
 #: npm package's `exports` target too — the library surface, which it
 #: re-exports from `src/index.mjs`. One entry, one artefact (L10 decision 1).
-ENTRY = "fux.mjs"
+ENTRY = fixed("bundle", "entry")
 
 #: What ships beside the bundle. The manifest and the tool descriptions are
 #: DATA, not code, so L10 does not reach them: `mcp-tools.json` is the file
 #: both runtimes read so two hand-maintained copies cannot drift
 #: (SR-MCP decision 11), and a `package.json` is what makes the directory a
 #: package at all.
-SIDECARS = ("package.json", "mcp-tools.json", "README.md")
+SIDECARS = tuple(fixed("bundle", "sidecars"))
 
 _IMPORT_NAMED = re.compile(r'^import\s*\{(?P<names>[^}]*)\}\s*from\s*"(?P<spec>[^"]+)"\s*;?\s*$', re.S)
 _IMPORT_STAR = re.compile(r'^import\s*\*\s*as\s+(?P<ns>\w+)\s*from\s*"(?P<spec>[^"]+)"\s*;?\s*$', re.S)
@@ -77,6 +79,28 @@ _EXPORT_LIST = re.compile(r"^export\s*\{(?P<names>[^}]*)\}\s*;?\s*$", re.S)
 _EXPORT_DECL = re.compile(
     r"^export\s+(?:async\s+)?(?:function\s*\*?|const|let|var|class)\s+(?P<name>\w+)"
 )
+
+
+#: `/* @fux-inline <repo path> */ readFileSync(...)` — a file a module reads at
+#: load time in a checkout, replaced in the bundle by that file's text as a
+#: string literal. The one artefact a consumer runs must not read a path that
+#: exists only in fux's repository (L10); this is how `constants.toml` and the
+#: packaged templates travel inside it (SR-LAW-12 decision 2).
+_INLINE = re.compile(
+    r"/\*\s*@fux-inline\s+(?P<path>[^\s*]+)\s*\*/\s*readFileSync\((?:[^()]|\([^()]*\))*\)"
+)
+
+
+def _inline(text: str, rel: str, node_dir: Path) -> str:
+    """Replace every `@fux-inline` read with the file's text. A missing file raises."""
+
+    def sub(match: "re.Match[str]") -> str:
+        path = node_dir.parent / match.group("path")
+        if not path.is_file():
+            raise FuxError(f"{rel}: @fux-inline names {match.group('path')}, which does not exist")
+        return json.dumps(path.read_text(encoding="utf-8"), ensure_ascii=False)
+
+    return _INLINE.sub(sub, text)
 
 
 def _module_var(rel: str) -> str:
@@ -139,7 +163,7 @@ class _Module:
         #: line 1 of the BUNDLE — `bin` points at that file, and a shebang
         #: anywhere else is a syntax error rather than a comment.
         self.shebang: str | None = None
-        self._parse(text)
+        self._parse(_inline(text, rel, node_dir))
 
     # -- parsing -----------------------------------------------------------
 

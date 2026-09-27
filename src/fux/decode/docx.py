@@ -17,6 +17,7 @@ from __future__ import annotations
 # fux ships and the file you edit are byte-identical (SR-DECODE decision 11).
 from fux.decode import _ooxml, _xml
 from fux.decode._zip import SafeZip, ZipTooBig
+from fux.constants import fixed
 
 #: **The reuse key's handle on this decoder** (W-166). Bump it by hand in the
 #: same change as any edit that can change what `decode()` returns, and the next
@@ -24,9 +25,9 @@ from fux.decode._zip import SafeZip, ZipTooBig
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = 1
+VERSION = fixed("decoders.docx", "version")
 
-EXTENSIONS = (".docx", ".docm")
+EXTENSIONS = tuple(fixed("decoders.docx", "extensions"))
 
 _DOCUMENT = "word/document.xml"
 

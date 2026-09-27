@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-24
 date: 2026-08-18
 feature: the `fux ingest` pipeline — sources to committed records
-owns: [src/fux/ingest/ingestlog.py@73e117c1e919, src/fux/ingest@04fe7d0c14cb, src/fux/ingest/priors.py@8ffcc632a4be, node/src/ingest/gitdir.mjs@eb45c1672eac, node/src/ingest/priors.mjs@11df69775da1]
+owns: [src/fux/ingest/ingestlog.py@f7628e166356, src/fux/ingest@b6fb7a26e6a3, src/fux/ingest/priors.py@8ffcc632a4be, node/src/ingest/gitdir.mjs@eb45c1672eac, node/src/ingest/priors.mjs@11df69775da1]
 laws: [L2, L3, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 0cf72dce9823c893018a2fbb7b38370673be1423c3927a7f057514b95e79c120
+content_sha: 9ca9bef9e1c450e64102e6addea301d8b0f382de7a904d1cc78579362e2ad87c
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -579,6 +579,25 @@ before and after**, and a re-ingest is owed by no one. Checked in the same
 change ([L3](0005_LAW-3-deterministic.md)): a from-empty `fux ingest --no-fetch`
 of this repository under the old default and under the new one produced
 byte-identical `.fux/index/` trees, 1 792 documents, one hash.
+
+<!-- L12-VALUES-START -->
+
+**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+Each name below keeps its spelling in code and holds no literal: it is read from
+[`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
+process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
+this moved where they are written, not what they are.
+
+- `src/fux/ingest/decoderdigest.py` — `BUILTIN_PREFIX` ← `[decoders] builtin_prefix`
+- `src/fux/ingest/edges.py` — `TAG_PREFIX` ← `[graph] tag_prefix`, `EXTRACTED_GRADE` ← `[graph] grade_extracted`, `AMBIG_GRADE` ← `[graph] grade_ambiguous`, `INFERRED_GRADE` ← `[graph] grade_inferred`
+- `src/fux/ingest/gitdir.py` — `_PROSE_TYPES` ← `[decoders] prose_types`
+- `src/fux/ingest/ingestlog.py` — `INGEST_LOG_FILE` ← `[runtime] ingest_log`
+- `src/fux/ingest/queue.py` — `QUEUE_REL` ← `[files] enrich_queue`, `PROGRESS_REL` ← `[files] enrich_progress`
+- `src/fux/ingest/register.py` — `NAME` ← `[register] file`, `HEADER` ← `[register] header`
+- `src/fux/ingest/routes.py` — `REGEX_PREFIX` ← `[routes] regex_prefix`
+- `src/fux/ingest/run.py` — `PII_DIGEST_FILE` ← `[index] pii_digest`, `EXTRACT_CONFIG_DIGEST_FILE` ← `[index] extract_config_digest`, `ENRICH_DIGEST_FILE` ← `[index] enrich_digests`, `DECODER_DIGEST_FILE` ← `[index] decoder_digests`, `STALE_REDACTION_FILE` ← `[runtime] stale_redaction`
+
+<!-- L12-VALUES-END -->
 
 ### What it looks like
 

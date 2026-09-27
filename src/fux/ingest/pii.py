@@ -89,8 +89,9 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from ..errors import FuxError
+from ..constants import fixed
 
-RULES_NAME = "pii.toml"
+RULES_NAME = fixed("files", "pii_name")
 
 #: Regex flags a rule may name. A closed set, like every other attribute
 #: vocabulary in the source lists: an unknown flag is a typo that would
@@ -514,7 +515,7 @@ def digest(rules: tuple[Rule, ...]) -> str:
 # finding — `tools/pii-probe/` is the instrument, and a big count on a big
 # corpus is exactly what a correct rule looks like too.
 
-COUNTS_NAME = "pii-counts.json"
+COUNTS_NAME = fixed("runtime", "pii_counts")
 
 
 @dataclass(frozen=True)

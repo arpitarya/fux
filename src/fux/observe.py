@@ -65,18 +65,19 @@ import sys
 import threading
 from dataclasses import dataclass, field
 from pathlib import Path
+from .constants import fixed
 
 __all__ = ["CONSUMER_DIR", "Record", "args_hash", "dispatch", "observers_in"]
 
 #: Where a consumer's observers live. Committed, readable source by contract —
 #: `.fux/runtime/` is the only derived directory under `.fux/`.
-CONSUMER_DIR = ".fux/observers"
+CONSUMER_DIR = fixed("files", "observers_dir")
 
 #: The one place a run records that an observer fired, for `fux doctor`'s
 #: liveness row. **Gitignored, under `.fux/runtime/`** — it is a trace of use
 #: and [L8](../../records/0010_LAW-8-use-record.md) keeps every one of those off
 #: a committed byte.
-LIVENESS_NAME = "observers.json"
+LIVENESS_NAME = fixed("runtime", "observers")
 
 
 @dataclass(frozen=True)

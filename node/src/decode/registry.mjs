@@ -38,13 +38,14 @@
 import { readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { parseToml } from "../config/toml.mjs";
+import { fixed } from "../config/constants.mjs";
 
 //: The built-in `include` default, for a repo with no `.fux/formats.toml` —
 //: `ingest/gitdir.py::_PROSE_TYPES`. **Held equal to Python's by
 //: `tests/test_node_decode_boundary.py`**: a format that becomes prose on one
 //: side and not the other is a silent citation defect, which is the whole
 //: reason this module exists.
-export const PROSE_TYPES = ["*.md", "*.markdown", "*.txt", "*.rst", "*.adoc", "*.org"];
+export const PROSE_TYPES = fixed("decoders", "prose_types");
 
 /** Does `path` match `pattern`, with `*` **not** crossing a `/`?
  *

@@ -44,6 +44,7 @@ from dataclasses import dataclass
 
 from .model import Edge, Graph
 from ..ingest.edges import EXTRACTED_GRADE
+from ..constants import fixed
 
 __all__ = [
     "ppr", "expand", "routes", "Route", "link_idf",
@@ -88,7 +89,7 @@ ALL_KINDS = None
 
 #: The edge kinds `ingest/edges.py` mints. Re-exported for a caller that wants
 #: to name a subset (`{"ref"}`) without importing two modules.
-EDGE_KINDS = ("ref", "tag", "code", "supersedes")
+EDGE_KINDS = tuple(fixed("graph", "edge_kinds"))
 
 
 def ppr(

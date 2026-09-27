@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@381226d07c53, src/fux/setup.py@697f58087b6b, tests/test_verb_table_agreement.py@1e7999ffd28f]
+owns: [src/fux/store/fuxdir.py@02783a764363, src/fux/setup.py@697f58087b6b, tests/test_verb_table_agreement.py@1e7999ffd28f]
 laws: [L2, L3, L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 4d420a088a524d9705df26fc75991e613a14c0a02dfcdef8ae644d4a44a16144
+content_sha: 25155407bc7c1d22ac5a7de9d51b662fd4a631cbb37359a7fc70d98078716d1e
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -747,6 +747,18 @@ written, which already says what the note says is missing. The policy marker
 decides it now — the same marker `tests/test_agent_policy_agreement.py`
 compares on, so the two cannot disagree about what *fux's policy is in this
 file* means.
+
+<!-- L12-VALUES-START -->
+
+**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+Each name below keeps its spelling in code and holds no literal: it is read from
+[`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
+process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
+this moved where they are written, not what they are.
+
+- `src/fux/store/fuxdir.py` — `FUX_DIR` ← `[fuxdir] dir`, `GENERATED_FILES` ← `[fuxdir] generated`, `CACHEDIR_SIGNATURE` ← `[fuxdir] cachedir_signature`, `NODE_DIR` ← `[bundle] dir`, `NODE_ENTRY` ← `[bundle] entry`, `NODE_SHIM` ← `[bundle] shim`
+
+<!-- L12-VALUES-END -->
 
 ### Amendment 2026-09-12 — the code for two decisions landed two commits late
 

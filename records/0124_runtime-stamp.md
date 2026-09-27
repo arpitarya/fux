@@ -10,7 +10,7 @@ feature: "`.fux/runtime/stamp.json` — the cheap staleness pre-filter, and its 
 owns: []
 laws: [L3]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: b186d468b385ca4d83acbee5500ff4716f18dc3f3ea7a09ead7370364c57d5f5
+content_sha: 5cff368807478f2f2a21437069f209f805c434e8fac2ca10c027bed06b369a87
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -123,6 +123,18 @@ truth for actual staleness.
 
 **4. Unchanged by W-168 step 4 (2026-09-27).** `mined.json` is derived in the
 same build and is covered by the same staleness check.
+
+<!-- L12-VALUES-START -->
+
+**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+Each name below keeps its spelling in code and holds no literal: it is read from
+[`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
+process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
+this moved where they are written, not what they are.
+
+- `src/fux/derive/format.py` — `RUNTIME_DIR` ← `[runtime] dir`, `BLOCK_SIZE` ← `[runtime] block_size`, `RUNTIME_SCHEMA` ← `[runtime] schema`, `DOCS_FIELDS` ← `[runtime] docs_fields`, `DOCS_NAME` ← `[runtime] docs`, `ANCHORS_DIR` ← `[runtime] anchors_dir`, `STATS_NAME` ← `[runtime] stats`, `MINED_NAME` ← `[runtime] mined`, `MANIFEST_NAME` ← `[runtime] manifest`, `STAMP_NAME` ← `[runtime] stamp`, `POSTINGS_DIR` ← `[runtime] postings_dir`, `DETERMINISTIC_FILES` ← `[graph] file`
+
+<!-- L12-VALUES-END -->
 
 ### Consequences
 

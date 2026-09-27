@@ -7,11 +7,11 @@ description: "`fux enrich` plans and validates; a coding agent generates. Fux ne
 status: accepted
 date: 2026-08-23
 feature: document enrichment — the deterministic halves fux owns, and the generation it refuses to own
-owns: [src/fux/correct.py@1c9f9130bcb2, src/fux/enrich.py@fffa68fe0f30, src/fux/templates/agents/ENRICH-SKILL.md@5c384af659f2, node/src/correct.mjs@b7a9d36b309e, node/test/pins.test.mjs@daebcdb98aac]
+owns: [src/fux/correct.py@3a28c4061074, src/fux/enrich.py@350b51a69c21, src/fux/templates/agents/ENRICH-SKILL.md@5c384af659f2, node/src/correct.mjs@859349cb0ace, node/test/pins.test.mjs@daebcdb98aac]
 laws: [L1, L2, L3, L4]
 supersedes: SR-ENRICHED
 timestamp: 2026-08-23T00:00:00Z
-content_sha: 71d780a11cc8b11dfa2255532c982fed29aa569983abd9afc494da6f78f081c7
+content_sha: dfc0bda5b00e6371b6bcc0eac9cfd9359d9a2379d18e870bad7ed54ebd40fcdf
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -286,6 +286,20 @@ documents turns a one-document request into a bulk run.
   the gap** — no second hash, no `doc_hash` field, no sidecar digest. Decision
   3's sha-keying is the staleness mechanism, and a second one could only drift
   against it.
+
+<!-- L12-VALUES-START -->
+
+**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+Each name below keeps its spelling in code and holds no literal: it is read from
+[`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
+process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
+this moved where they are written, not what they are.
+
+- `node/src/correct.mjs` — `CORRECTIONS_FILE` ← `[files] corrections`
+- `src/fux/correct.py` — `CORRECTIONS_FILE` ← `[files] corrections`
+- `src/fux/enrich.py` — `ENRICH_DIR` ← `[files] enrich_dir`, `URL_SCOPE` ← `[files] urls`
+
+<!-- L12-VALUES-END -->
 
 ### The `enriched` mode — folded verbatim from SR-ENRICHED, 2026-08-27
 

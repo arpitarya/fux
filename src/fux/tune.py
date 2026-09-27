@@ -75,6 +75,7 @@ from .query.bm25f import ANCHOR, B, FIELD_WEIGHTS, K1, Scoring
 from .query.mined import MINED_WEIGHT
 from .query.confidence import DOC_COVERAGE_FLOOR, SEPARATION_FLOOR
 from .store import TF_FIELDS
+from .constants import fixed
 
 __all__ = [
     "TUNE_NAME",
@@ -90,7 +91,7 @@ __all__ = [
 ]
 
 #: Committed, and written once by `fux setup` (decision 2 and 3).
-TUNE_NAME = ".fux/tune.toml"
+TUNE_NAME = fixed("files", "tune")
 
 #: At most this many semantic errors are reported together. One at a time
 #: turns a hand-edited file into a guessing game; an unbounded list buries the

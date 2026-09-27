@@ -100,9 +100,10 @@ import json
 import os
 from dataclasses import asdict, dataclass
 from pathlib import Path
+from ..constants import fixed
 
 #: Under `.fux/runtime/`, which `.gitignore` already covers.
-INGEST_LOG_FILE = "ingest-log.jsonl"
+INGEST_LOG_FILE = fixed("runtime", "ingest_log")
 
 #: The decoder string for a document no decoder claims — Markdown and plain
 #: text, read by `extract.py` rather than by a `decode/` module. `decoderdigest`

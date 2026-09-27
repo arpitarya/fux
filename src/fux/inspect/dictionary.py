@@ -55,12 +55,13 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from ..store import fuxdir
+from ..constants import fixed
 
 __all__ = ["Dictionary", "INSPECT_DIR", "DICTIONARY_NAME", "build", "load_or_build", "inspect_dir"]
 
-INSPECT_DIR = "inspect"
-DICTIONARY_NAME = "dictionary.json"
-SCHEMA = "fux.inspect.dictionary.v1"
+INSPECT_DIR = fixed("inspect", "dir")
+DICTIONARY_NAME = fixed("inspect", "dictionary")
+SCHEMA = fixed("inspect", "dictionary_schema")
 
 
 @dataclass

@@ -12,9 +12,10 @@ import { createHash } from "node:crypto";
 import { Graph, edgesFromRecords } from "./model.mjs";
 import { assign } from "./community.mjs";
 import { cmpCodePoints } from "../compat/pyfloat.mjs";
+import { fixed } from "../config/constants.mjs";
 
-export const SCHEMA = "fux.graph.v1";
-export const GRAPH_NAME = "graph.json";
+export const SCHEMA = fixed("graph", "schema");
+export const GRAPH_NAME = fixed("graph", "file");
 
 export class GraphPlane {
   constructor(graph, communities) { this.graph = graph; this.communities = communities; }

@@ -9,7 +9,7 @@ ball: agent
 
 # W-225 — every value lives in a config file (the L12 migration)
 
-**Status: ratified, not built.** The law is [SR-LAW-12](../../records/0013_LAW-12-values-live-in-config.md);
+**Status: building — stage 1 of 8 landed 2026-09-27.** Stages, in order: 1 `constants.toml` + the fixed names · 2 `tune.toml`, no fallback · 3 `fux.toml` + `output.toml` · 4 the other `.fux/*.toml` (formats limits + digest, refusals, `inspect.toml`) · 5 R7 structural numerals · 6 R8 bool and every parameter default · 7 `doctor --fix`/`setup` + the AST test · 8 records, CHANGELOG, byte-equality run. The law is [SR-LAW-12](../../records/0013_LAW-12-values-live-in-config.md);
 this item makes it true.
 
 **Model:** Claude Code, Opus — a cross-plane refactor with byte-equality gates.
@@ -120,6 +120,9 @@ recommended; now SR-LAW-12 decisions 1, 6, 9a, 9b and the veto condition:
 
 ## §8 — Open questions for Arpit
 
-- ⚠ **Release vehicle:** 3.0 (breaking) or a minor with an auto-`--fix` on first run?
-- ⚠ **Regexes:** the law treats parsing regexes as code, not values. Any you
-  want in TOML (tokenizer, identifier split)? *(Not covered by the R1–R6 ruling.)*
+- ✅ **Release vehicle — ruled 2026-09-27 (R9): 3.0, breaking**, no auto-`--fix`.
+- ✅ **R5's scan, ruled the same day (R7, R8, R10):** structural numerals are
+  `fixed` → `constants.toml`; every boolean parameter default goes;
+  `__version__` stays. SR-LAW-12 decision 6a.
+- ⚠ **Regexes:** the law treats parsing regexes as code, not values. Nobody
+  has asked for one in TOML; they stay code until someone does.

@@ -30,6 +30,7 @@ from __future__ import annotations
 
 import json
 import re
+from fux.constants import fixed
 
 #: **The reuse key's handle on this decoder** (W-166). Bump it by hand in the
 #: same change as any edit that can change what `decode()` returns, and the next
@@ -37,9 +38,9 @@ import re
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = 1
+VERSION = fixed("decoders.json", "version")
 
-EXTENSIONS = (".json",)
+EXTENSIONS = tuple(fixed("decoders.json", "extensions"))
 
 #: Depth past which nesting stops being structure and starts being noise. Six
 #: levels covers every config and API payload worth indexing; deeper is usually

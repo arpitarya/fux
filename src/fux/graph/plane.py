@@ -29,11 +29,12 @@ from pathlib import Path
 from ..errors import FuxError
 from . import community as community_mod
 from .model import Edge, Graph, edges_from_records
+from ..constants import fixed
 
 __all__ = ["GRAPH_NAME", "SCHEMA", "build_plane", "load", "GraphPlane"]
 
-GRAPH_NAME = "graph.json"
-SCHEMA = "fux.graph.v1"
+GRAPH_NAME = fixed("graph", "file")
+SCHEMA = fixed("graph", "schema")
 
 
 class GraphPlane:

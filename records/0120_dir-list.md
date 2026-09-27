@@ -10,7 +10,7 @@ feature: "`.fux/sources/dirs` — what the engine indexes, what is subtracted fr
 owns: []
 laws: [L3, L6]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 8c680d3b4dc8418d105e981438a429a3e90f83c6bab704d52a3c00dc83f1bcf1
+content_sha: 65ffb7a836b791b98207096604f11666bd269c3480952baf10cf09f9afe48dbd
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -260,6 +260,18 @@ carries no attributes at all — and `_dir_reason` is untouched.
 decides moved.** The freshness gate proves an owning record was *touched*, never
 that it was read, so a co-owner is exactly where a reader needs to be told *"not
 yours"* in writing — the [SR-ACQUIRED](0145_acquired-plane.md) precedent.
+
+<!-- L12-VALUES-START -->
+
+**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+Each name below keeps its spelling in code and holds no literal: it is read from
+[`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
+process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
+this moved where they are written, not what they are.
+
+- `src/fux/ingest/gitdir.py` — `_PROSE_TYPES` ← `[decoders] prose_types`
+
+<!-- L12-VALUES-END -->
 
 ### Consequences
 

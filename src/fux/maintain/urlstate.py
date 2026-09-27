@@ -63,11 +63,12 @@ from pathlib import Path
 
 from ..schema import load as load_schema
 from ..store import fuxdir
+from ..constants import fixed
 
-STATE_NAME = "url-state.json"
+STATE_NAME = fixed("maintain", "url_state")
 
 #: The declared shapes, beside this module (`maintain/state.schema.json`).
-SCHEMA_NAME = "state.schema.json"
+SCHEMA_NAME = fixed("maintain", "url_state_schema")
 
 
 def _shape(name: str):

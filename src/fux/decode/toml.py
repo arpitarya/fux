@@ -18,6 +18,7 @@ import tomllib
 # package` — the copy would be dead on arrival. Absolute imports mean the file
 # fux ships and the file you edit are byte-identical (SR-DECODE decision 11).
 from fux.decode.json import MAX_DEPTH, _prose
+from fux.constants import fixed
 
 #: **The reuse key's handle on this decoder** (W-166). Bump it by hand in the
 #: same change as any edit that can change what `decode()` returns, and the next
@@ -25,9 +26,9 @@ from fux.decode.json import MAX_DEPTH, _prose
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = 1
+VERSION = fixed("decoders.toml", "version")
 
-EXTENSIONS = (".toml",)
+EXTENSIONS = tuple(fixed("decoders.toml", "extensions"))
 
 
 def decode(raw: bytes, rel_path: str) -> str | None:

@@ -10,7 +10,7 @@ feature: the file-type allowlist and `.fux/formats.toml`
 owns: [src/fux/ingest/typesfile.py@2ffca40af72c, .fux/formats.toml@86e430d015d0]
 laws: [L1, L3]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 4437cacf3d1fe4167e795ad6ea7b3b446c3287db0ec8e46b2ba5be7445b56a78
+content_sha: 1fc135667ebaedffe21f9d4cbf0bb47450401ad3f3d6d1ad35529d38b255bd80
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -503,6 +503,18 @@ a `csv` binding admits `*.csv`, so either silent answer would move the allowlist
 **`[sources] types_file` in `fux.toml` is refused by name** ([SR-CONFIG](0113_config.md)).
 `config.schema.json` advertised it with a default of `.fux/sources/types`, and
 nothing had ever read it.
+
+<!-- L12-VALUES-START -->
+
+**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+Each name below keeps its spelling in code and holds no literal: it is read from
+[`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
+process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
+this moved where they are written, not what they are.
+
+- `src/fux/ingest/gitdir.py` — `_PROSE_TYPES` ← `[decoders] prose_types`
+
+<!-- L12-VALUES-END -->
 
 ### Consequences
 

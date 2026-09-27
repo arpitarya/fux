@@ -69,9 +69,10 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
 from ..errors import FuxError
+from ..constants import fixed
 
 #: The only address this server binds. **Not a flag.** See the module docstring.
-HOST = "127.0.0.1"
+HOST = fixed("serve", "host")
 
 #: Default port. Arbitrary and high, chosen so it collides with nothing common;
 #: `--port` moves it.

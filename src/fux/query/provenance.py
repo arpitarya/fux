@@ -130,6 +130,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from ..store import fuxdir
+from ..constants import fixed
 
 #: The declared shape. Bumped only when a key changes meaning — a consumer
 #: that stored receipts under v1 must be able to tell.
@@ -153,20 +154,20 @@ from ..store import fuxdir
 #: shifts the trust anchor from key management to identity management, and needs
 #: a network (L4), an OIDC identity, a transparency-log service (`$0`) and
 #: non-stdlib dependencies (L1) — four constraints at once.
-STATEMENT_TYPE = "https://in-toto.io/Statement/v1"
+STATEMENT_TYPE = fixed("receipt", "statement_type")
 
 #: What kind of claim the `predicate` carries. A TypeURI, versioned separately
 #: from the Statement schema so fux's payload can change without pretending the
 #: envelope did.
-PREDICATE_TYPE = "https://fux.dev/receipt/v1"
+PREDICATE_TYPE = fixed("receipt", "predicate_type")
 
 #: ⚠ **Retained ONLY to reject a v1 receipt with a useful message.** Nothing
 #: writes it. A `fux.receipt.v1` payload predates the in-toto reshape and cannot
 #: be verified against the current shape, and *"not a fux receipt"* would send a
 #: reader hunting for corruption in a file that is merely old.
-LEGACY_SCHEMA = "fux.receipt.v1"
+LEGACY_SCHEMA = fixed("receipt", "legacy_schema")
 
-JOURNAL_NAME = "provenance.jsonl"
+JOURNAL_NAME = fixed("receipt", "journal")
 
 #: Bound on journalled receipts. A *design* default, not a law: L8 as reverted
 #: requires confinement, not a size. The oldest entries are dropped, because
@@ -762,7 +763,7 @@ def receipt(
 #: bytes with SHA-256, get 64 hex characters, and report a mismatch on a
 #: receipt that is perfectly good. The failure lands on the reader, off this
 #: machine, with no way back to the cause.
-DIGEST_ALG = "blake2b-160"
+DIGEST_ALG = fixed("receipt", "digest_alg")
 
 
 def _resource(cited: dict) -> dict:

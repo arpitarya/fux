@@ -89,8 +89,25 @@ change to one is released together with a hand-bumped decoder `VERSION` (see
 extract-config digest**. Otherwise a changed cap leaves an index that
 `fux ingest --check` still calls current.
 
-⚠ **Still open from W-225 §8:** the release vehicle, either 3.0 or a minor with
-an automatic `--fix`.
+⚠ ~~**Still open from W-225 §8:** the release vehicle~~ — ruled, R9 below.
+
+## R7–R10 — the R5 scan's new calls, ruled 2026-09-27
+
+The AST scanner (`tests/l12_lib.py`) found **~1 200 distinct sites** in the two
+trees. The ratified categories settle most of them — message text, key names,
+enum tags, `0`/`1`/`-1`, presentation counts. Four classes were calls nobody
+had made. Arpit, the same day:
+
+| # | the class | recommended | **ruled** |
+|---|---|---|---|
+| R7 | ~450 numbers fixed by a file format, protocol or algorithm (byte offsets, radix, masks, hash IVs, JSON-RPC codes, tuple indices, `indent=2`, heading cap 6, exit codes) | not-a-value | **`fixed` → `constants.toml`** |
+| R8 | 45 Python + Node boolean parameter defaults (`refer=True`, `json=False`, `enabled=True`) | not-a-value | **a value — every default removed** |
+| R9 | the release vehicle (W-225 §8) | 3.0, breaking | **3.0, breaking** — no auto-`--fix` |
+| R10 | `__version__` in `src/fux/__init__.py` | leave it | **leave it** — SR-WORK-RELEASE's |
+
+R7 and R8 went stricter than recommended. Recorded in SR-LAW-12 decision 6a;
+decision 6's list is now **closed**. The *"first N, then (+M more)"* cut in a
+message is R3's presentation count, not R7.
 
 ## How the table was built
 
