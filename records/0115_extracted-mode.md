@@ -8,11 +8,11 @@ status: accepted
 date: 2026-08-19
 amended: 2026-09-15
 feature: the `extracted` ingest mode — the value in every committed record's `mode` property, and the contract it asserts
-owns: [src/fux/ingest/extract.py@b141f1c213f1]
+owns: [src/fux/ingest/extract.py@b3531c00cfdb]
 laws: [L1, L2, L3, L4]
 ratifies: W-30
 timestamp: 2026-08-19T00:00:00Z
-content_sha: f572d0e8ab73c13b80357a68f1a0f9308f15dc0df86228a53dc43439e2a81d7c
+content_sha: a1068c9d2687da907b64685b2d62a5b7662797024328a5559abe7d9b1c9ba390
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -311,6 +311,12 @@ secret as readily as a heading can.
 are re-resolved every run because the rest of the corpus can change what a link
 resolves to — so `RULES_VERSION` in `extract.py` does not gate them, and no
 re-extraction is owed for an edit to how they are taken.
+
+**11. The same-sources-same-bytes guarantee covers `abbr`** (W-168 step 4,
+2026-09-27). The pairs are a fixed regular expression over the document's own
+body, analyzed by the shared analyzer and sorted on their hashes. No model and
+no corpus-wide input touches them; on this repo, full, delta and a second full
+ingest produced one index hash.
 
 ### Consequences
 

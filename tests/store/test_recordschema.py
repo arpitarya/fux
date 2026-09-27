@@ -100,7 +100,7 @@ def test_every_field_ingest_writes_is_declared():
     not declare is exactly the drift this file exists to stop."""
     written = {
         "id", "src", "loc", "sha", "ver", "mode",
-        "title", "phrases", "terms", "flen", "edges",
+        "title", "phrases", "terms", "flen", "abbr", "edges",
         "archived", "superseded", "mtime",
     }
     assert written == set(recordschema.shape().fields)

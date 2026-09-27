@@ -209,21 +209,37 @@ def run_query(
         query_hashes, query_term_hashes(expand) if expand else [], tune.expand_weight
     )
 
+    use_accel = False
     if not force_scan:
         from ..derive import accel, format as derive_fmt
 
-        if (derive_fmt.runtime_dir(root) / derive_fmt.STATS_NAME).exists() and accel.is_fresh(root):
-            results = accel.ask(
-                root, query, top=depth, weighting=weighting, archived_dirs=dirs,
-                scoring=scoring, stats_out=stats, expansion=expansion,
-            )
-            final = _compose(
-                root, query, results, rerank_weight, top, depth, tune, stats, related_out,
-                trace_out,
-            )
-            _fill_trace(trace_out, results, rerank_weight)
-            _fill_confidence(confidence_out, stats, query, final, tune)
-            return final, "accelerator"
+        use_accel = (derive_fmt.runtime_dir(root) / derive_fmt.STATS_NAME).exists() and accel.is_fresh(root)
+
+    # W-168 step 4 — corpus-mined expansion. **Off at `0.0`, and off reads no
+    # pair at all**, so the default is the engine before the key existed. The
+    # fold is over the USER's words only, never a caller's `--expand`; it
+    # stacks on that expansion, and a hash in both keeps the caller's weight.
+    # The table comes from the path that will answer, so `--fast` and `--scan`
+    # fold identically (`query/mined.py`).
+    if tune.mined_weight > 0 and query_hashes:
+        from . import mined as mined_mod
+        from .expand import stack
+
+        table = accel.mined_table(root) if use_accel else mined_mod.table_from_shards(root)
+        expansion = stack(expansion, mined_mod.fold(table, query_hashes), tune.mined_weight)
+
+    if use_accel:
+        results = accel.ask(
+            root, query, top=depth, weighting=weighting, archived_dirs=dirs,
+            scoring=scoring, stats_out=stats, expansion=expansion,
+        )
+        final = _compose(
+            root, query, results, rerank_weight, top, depth, tune, stats, related_out,
+            trace_out,
+        )
+        _fill_trace(trace_out, results, rerank_weight)
+        _fill_confidence(confidence_out, stats, query, final, tune)
+        return final, "accelerator"
     results = scan_ask(
         root, query, top=depth, weighting=weighting, archived_dirs=dirs,
         scoring=scoring, stats_out=stats, expansion=expansion,
@@ -996,7 +1012,9 @@ def _ask_shaped(args, *, compose: bool) -> int:
     if not compose:
         import dataclasses
 
-        tune = dataclasses.replace(tune, ask_boost=False, ask_related=False)
+        # W-168 step 4: the frozen baseline never folds mined pairs — it is the
+        # words the user typed (SR-CLI decision 12).
+        tune = dataclasses.replace(tune, ask_boost=False, ask_related=False, mined_weight=0.0)
     elif getattr(args, "related", None) is False:
         import dataclasses
 

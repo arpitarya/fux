@@ -11,7 +11,7 @@ feature: the confidence plane
 owns: [src/fux/query/confidence.py@2cd8be58107d, tests/test_confidence_floor_off.py@f8e18c079a6e, node/src/query/confidence.mjs@9b42bd23035b, node/test/confidence.test.mjs@7977e76407e2]
 laws: [L1, L3, L4]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 5801259dc35b392ab010599567a7e1d01da6d21c47441cbb5430ae8f5d21362a
+content_sha: 63ede61d480fa2e46eaf45850742d3ae0ab82bff4c705dbfb0bf0f799a8b6458
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -838,6 +838,11 @@ this one.
 2026-09-27.** RM3 and its first pass were removed ([SR-EXPAND](0149_expand.md)
 decision 17). The band is built from the one pass there is, as it was before
 2026-09-23.
+
+**19. A mined spelling cannot raise a band** (W-168 step 4, 2026-09-27). The
+block is built on the ORIGINAL query, as decision 16's neighbour says of
+`--expand`: `_fill_confidence` never sees the fold, so `coverage`, `missing` and
+`doc_coverage` describe what the user typed.
 
 ### Consequences
 

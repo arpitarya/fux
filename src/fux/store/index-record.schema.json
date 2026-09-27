@@ -12,7 +12,7 @@
     "order in this file cannot reach a committed byte. What CAN reach one is the",
     "field set, the defaults and omit_when -- which is why `schema` below must",
     "match store/format.py's SCHEMA_ID: two fux versions with different shapes",
-    "must never both call their output fux.index.v4.",
+    "must never both call their output fux.index.v5.",
     "",
     "omit_when: a field equal to this value is LEFT OUT of the record rather",
     "than written as false. That is SR-ARCHIVED-CONTENT decision 1 -- a live",
@@ -39,10 +39,17 @@
     "bytes while the dirty list marked only B, and a full ingest and an",
     "incremental re-index would produce different indexes from the same",
     "sources. Terms, not text: link text is content, and L2 keeps content out",
-    "of the index."
+    "of the index.",
+    "",
+    "ABBR, W-168 step 4 (2026-09-27, _format v5). A sorted, de-duplicated list",
+    "of [short_hashes, long_hashes]: every `Long Form (ABBR)` this document",
+    "declares in its own text, analyzed and hashed like `terms`. Absent when",
+    "there is none (omit_when). It is a function of THIS document's bytes, so",
+    "it is carried; the corpus-wide table is a read-time fold of every record's",
+    "pairs (query/mined.py) and is committed nowhere. Hashes, not text (L2)."
   ],
 
-  "schema": "fux.index.v4",
+  "schema": "fux.index.v5",
 
   "fields": {
     "id":         { "type": "str",  "required": "always" },
@@ -58,6 +65,7 @@
 
     "terms":      { "type": "dict", "required": "never", "carried": true },
     "flen":       { "type": "list", "required": "never", "carried": true },
+    "abbr":       { "type": "list", "required": "never", "carried": true, "omit_when": [] },
     "edges":      { "type": "list", "required": "never" },
 
     "archived":   { "type": "bool", "required": "never", "omit_when": false },

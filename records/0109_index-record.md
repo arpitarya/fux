@@ -7,10 +7,10 @@ description: What every property of a committed JSONL record is for, why it is i
 status: accepted
 date: 2026-08-18
 feature: the committed record schema — `fux.index.v2`
-owns: [src/fux/store/index-record.schema.json@5c7001362815]
+owns: [src/fux/store/index-record.schema.json@b5ee4b1179eb]
 laws: [L2, L3, L5, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: d5f5bc79a524f6f44201ac3dd635c6544b14810e14156a987dc0de7a1a004a7e
+content_sha: d2977029f9e48925f9632a99d9eb63a2f87b0d5e14bfbe6372eb26ef2cc9c7e1
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -277,6 +277,12 @@ accelerator's pruning bound.
 | `edges` | resolved links to other `id`s. Re-resolved corpus-wide on every ingest, because a new document can resolve a previously dangling link |
 | `mode` | how the record was built — `"extracted"` (deterministic, offline) or `"enriched"` (model-assisted). Records which contract produced these bytes |
 
+**Declared by the document itself** (W-168 step 4, `_format` v5):
+
+| property | purpose |
+|---|---|
+| `abbr` | every `Long Form (ABBR)` the document's own body declares, as `[short_hashes, long_hashes]`, sorted and de-duplicated on the hashes. **Written only when non-empty.** A function of this document's bytes alone, so it is carried forward like `terms`; the corpus-wide table is folded at read time ([SR-EXPAND](0149_expand.md) decision 18) and committed nowhere. Hashes, not text ([L2](0004_LAW-2-content-never-durable.md)) |
+
 **Two rules over the whole line:**
 
 1. **Written through one canonical encoder** — sorted keys, `(",",":")`
@@ -290,6 +296,11 @@ accelerator's pruning bound.
    agreed by construction rather than by check. **The field is deleted (W-194)
    and the rule is not**: a `title` that happens to be 16 hex characters still
    trips it, and `tests/derive/test_differential.py` exercises that directly.
+   **Two fields are admitted by name, because their hashes ARE term hashes**:
+   an edge's `at` keys and `abbr`'s pairs
+   ([SR-INDEX-LIFECYCLE](0108_index-lifecycle.md) decisions 14a and 15a). A
+   line is then parsed by the scan's prefilter on such a hash, and `rank()`
+   drops it at score 0 unless the field is switched on.
 
 **The shape is declared once, in
 [`store/index-record.schema.json`](../src/fux/store/index-record.schema.json).**

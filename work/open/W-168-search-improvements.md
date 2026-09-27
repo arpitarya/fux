@@ -7,7 +7,35 @@ filed: 2026-09-14
 ball: agent
 ---
 
-## ✅ STEP 4 PRE-REGISTERED — 2026-09-27 (Claude Code, Opus); the build is next
+## ✅ STEP 4 BUILT — 2026-09-27 (Claude Code, Opus); the arms are next
+
+The mechanism exactly as [the bar](../regression/2026-09-27-mined-expansion/PRE-REGISTRATION.md)
+fixes it, **off at `mined_weight = 0.0`**. No treatment number exists.
+
+- **Mine:** `query/mined.py::mine`, the tag's regex (held equal by a test),
+  over the redacted parsed body. On rung-01000's seed it finds the same 9 pairs
+  whole-file mining finds.
+- **Commit:** `abbr` on the declaring record, hashes, sorted, omitted when
+  empty, carried → **`fux.index.v5`**. This repo re-ingested: full = delta =
+  full, one hash.
+- **Fold:** at read time, over the user's hashes, both directions; the table
+  from the shards on the scan, from `mined.json` (`fux.runtime.v7`) on the
+  accelerator. Stacks on `--expand` (`expand.stack`); `lexical` never folds.
+- **Both readers:** Node twin in `mined.mjs`, `expand.stack`, `tune.minedWeight`.
+- **Proved:** `0.0` never opens the table; scan = accelerator at 0.1/0.2/0.3/0.5
+  (fixture) and at 0.3 on this repo (8 folding queries, 0 differ); Node = Python
+  on `ask` and `lexical` at `0.0` and `0.3`. Both suites green except the 8
+  ladder-seed failures, which wait on the gen-3 rebuild.
+- **Records:** SR-EXPAND 18 (and d1 narrowed), SR-TUNE 19, SR-INDEX-LIFECYCLE
+  15/15a, SR-RECORD, SR-INGEST 23, SR-T1-ACCELERATOR 16, and the rest the gate
+  named.
+- ⚠ **This engine refuses the v4 ladder rungs.** They were already stale for
+  gen 3; the prompt-4 rebuild will write v5.
+- **Next:** capture the five arms on a re-ingested COPY of rung-01000 at
+  `9cdde333`, at one engine commit. Then 🔴 Arpit scores; a session that did
+  not capture decides.
+
+## ✅ STEP 4 PRE-REGISTERED — 2026-09-27 (Claude Code, Opus)
 
 [The frozen bar](../regression/2026-09-27-mined-expansion/PRE-REGISTRATION.md).
 **Nothing is built and no treatment number exists.**

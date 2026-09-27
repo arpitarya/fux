@@ -43,7 +43,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-__all__ = ["Expansion", "build"]
+__all__ = ["Expansion", "build", "stack"]
 
 
 @dataclass(frozen=True)
@@ -138,4 +138,31 @@ def build(query_hashes: list[str], expansion_hashes: list[str], weight: float) -
         hashes=tuple(original + extra),
         required=required,
         weights={h: weight for h in extra},
+    )
+
+
+def stack(expansion: Expansion, more_hashes: list[str], weight: float) -> Expansion:
+    """Add a second layer of hashes, at its own `weight`, on top of `expansion`.
+
+    W-168 step 4: the corpus-mined fold rides on whatever the caller passed
+    with `--expand`. **A hash already in `expansion` keeps the weight it has**
+    — the user's own word keeps `1.0`, and a caller's `--expand` word keeps
+    `expand_weight`, because the caller's choice is the more deliberate act.
+    New hashes go after every existing one, so the order the scorer sums in is
+    original, then caller, then mined.
+
+    `required` never changes: a document that matches only added words is
+    still an answer to a question nobody asked, whichever layer added them.
+    `weight <= 0` or nothing new returns `expansion` itself, unchanged.
+    """
+    if weight <= 0 or not more_hashes:
+        return expansion
+    present = set(expansion.hashes)
+    extra = [h for h in dict.fromkeys(more_hashes) if h not in present]
+    if not extra:
+        return expansion
+    return Expansion(
+        hashes=expansion.hashes + tuple(extra),
+        required=expansion.required,
+        weights={**expansion.weights, **{h: weight for h in extra}},
     )

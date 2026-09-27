@@ -66,7 +66,7 @@ export const INDEX_TABLE = "index";
 //: The closed key set. Table -> keys. Adding one here is a change to SR-TUNE.
 const SCHEMA = {
   bm25f: ["k1", "b", ...FIELD_KEYS, "anchor"],
-  ranking: ["rerank_weight", "expand_weight"],
+  ranking: ["rerank_weight", "expand_weight", "mined_weight"],
   // The six `ask_*` keys are W-161's graph tier. They are parsed and carried
   // here so a consumer's committed `tune.toml` is accepted identically by both
   // readers; whether the Node reader COMPOSES the tier is
@@ -154,6 +154,9 @@ export class Tune {
     // The three DOCUMENT priors were removed on 2026-09-13 (W-151, W-152).
     this.rerankWeight = 0.0;
     this.expandWeight = 0.2;
+    // W-168 step 4 — a spelling the corpus supplies (`query/mined.mjs`). 0 =
+    // off, and off reads no pair; it turns on only on a pre-registered PASS.
+    this.minedWeight = 0.0;
     // [graph]
     this.damping = 0.85;
     this.iterations = 3;
@@ -432,6 +435,7 @@ export function loadTune(root, { enabled = true } = {}) {
 
   const rerankWeight = pick(ranking, "ranking", "rerank_weight", 0.0);
   const expandWeight = pick(ranking, "ranking", "expand_weight", 0.2);
+  const minedWeight = pick(ranking, "ranking", "mined_weight", 0.0);
 
   const graph = data.graph ?? {};
   const damping = pick(graph, "graph", "damping", 0.85, fraction);
@@ -511,7 +515,7 @@ export function loadTune(root, { enabled = true } = {}) {
 
   return new Tune({
     k1, b, fieldWeights: weights, anchorWeight,
-    rerankWeight, expandWeight,
+    rerankWeight, expandWeight, minedWeight,
     damping, iterations, laziness, hopDecay, expandLimit, seedDepth,
     askBoost, askRelated, askKinds, askLinkIdf, askMaxHops, askRelatedLimit,
     separationFloor, docCoverageFloor,

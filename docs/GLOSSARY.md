@@ -535,6 +535,14 @@ one of them to `.fux/acquired/` — no fetcher is loaded, no
 off entirely, and **not `update=never`**, which is the update-time clock. See
 [SR-URL-FRESHNESS](../records/0147_url-freshness.md) decision 16.
 
+**Mined expansion** — The other spelling of a term, supplied by the corpus
+itself: when a document writes *"Mean Kinetic Temperature (MKT)"* and a query
+carries one side, the other side is added at `[ranking] mined_weight`. Ingest
+commits each document's pairs as hashes on its own record (`abbr`); the table
+is folded at read time. **Built 2026-09-27 (W-168 step 4), off at `0.0`,
+unmeasured.** Unlike [RM3](#rm3-pseudo-relevance-feedback), nothing is borrowed
+from fux's own ranking. See [SR-EXPAND](../records/0149_expand.md) decision 18.
+
 **MPH (minimal perfect hash)** — A collision-free term→slot map at ~2–3
 bits/key, the planned `D/` dictionary upgrade (~15 MB saving at 10⁶ docs — **deferred-target arithmetic**; the design point is 10 000 since 2026-08-21).
 **Deferred to [M8](../archive/open/W-38-m8-deferred.md)** as a pure-win optimization; M3 ships a sorted

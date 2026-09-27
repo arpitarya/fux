@@ -10,7 +10,7 @@ feature: the `url:` source and how ingestion behaves around the fetcher boundary
 owns: []
 laws: [L2, L4, L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: d6848cd306592bc4b94a834a85aaed901015010871f5774b09fdb3d817242dec
+content_sha: c843b89a498240e7b661edf7fd7b4c15f1846058e39ca74eb5dd1bd5b7cc6d3a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -329,6 +329,10 @@ URL alone would be wrong exactly where it matters: a server declaring
 gitignored** ([SR-INGEST](0106_ingest.md) decision 19); nothing about the
 committed record changed, and which fetcher retrieved a document is still
 **not** on it ([SR-ACQUIRED](0145_acquired-plane.md)).
+
+**10. A `url:` record carries `abbr` exactly as a git one does** (W-168 step 4,
+2026-09-27). Same extraction, same tracker, omitted when empty. The URL plane
+added nothing of its own.
 
 ### Consequences
 

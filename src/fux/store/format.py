@@ -33,7 +33,13 @@ INDEX_DIR = ".fux/index"
 # `analyzer` is UNTOUCHED: no term changed meaning, only which display fields
 # a record may carry. **v3 indexes must be rebuilt** — `fux ingest` then
 # `fux build`.
-SCHEMA_ID = "fux.index.v4"
+# v5 (W-168 step 4, 2026-09-27): a record may carry `abbr`, the hashed
+# `Long Form (ABBR)` pairs its own text declares. **A property appeared**
+# (SR-INDEX-LIFECYCLE decision 9.1): a v4 index has no `abbr` anywhere, and a
+# reader could not tell "this corpus declares no abbreviations" from "this
+# index predates the miner". `analyzer` is UNTOUCHED: the pairs go through the
+# same analyzer and the same hash as `terms`. **v4 indexes must be rebuilt.**
+SCHEMA_ID = "fux.index.v5"
 # v2 (W-76 Phase 1, 2026-08-23): identifier splitting before lowercasing,
 # plus Porter stemming before hashing. A v1 shard is refused by
 # `store/reader.py` rather than silently mixed -- two analyzers in one

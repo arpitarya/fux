@@ -91,7 +91,8 @@ def test_golden_header_line():
     # agree with whatever the code does, which is the opposite of a golden. Every
     # bump edits this line by hand: `analyzer` moved v2 -> **v3** with W-205 part
     # 2 family (a) on 2026-09-22, and `_format` stayed v4 because no property
-    # appeared and no field changed meaning.
+    # appeared and no field changed meaning. `_format` moved v4 -> **v5** with
+    # W-168 step 4 on 2026-09-27, because `abbr` appeared.
     assert canonical_dumps(HEADER) == (
-        b'{"_format":"fux.index.v4","analyzer":"v3","tf_fields":["body","heading","title","path","ctx"]}\n'
+        b'{"_format":"fux.index.v5","analyzer":"v3","tf_fields":["body","heading","title","path","ctx"]}\n'
     )

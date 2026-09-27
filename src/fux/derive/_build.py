@@ -38,6 +38,7 @@ from ..errors import FuxError
 from ..progress import NULL as _NULL_PROGRESS
 from ..store import fuxdir
 from ..graph import plane as graph_plane
+from ..query import mined as mined_mod
 from ..store import TF_FIELDS
 from . import format as fmt
 from .format import _FIELD_COUNT
@@ -77,6 +78,12 @@ def build(root: Path, *, progress=None) -> BuildReport:
     written = 0
     written += _write_docs(directory, docs)
     written += _write_json(directory / fmt.STATS_NAME, stats)
+    # W-168 step 4 — the mined table, folded from the same records the scan
+    # reads it from (`query/mined.py::table_from_shards`), by the same sort.
+    written += _write_json(
+        directory / fmt.MINED_NAME,
+        {"pairs": [[list(s), list(l)] for s, l in mined_mod.table_from_records(records)]},
+    )
     # `graph_plane.build_plane` offers no per-item hook, so this is a bookend
     # around the call rather than a live count — the same honesty tradeoff as
     # the `write` phase in ingest.run.
@@ -286,6 +293,13 @@ def _assert_invariants(path: Path, lineno: int, line: bytes, record: dict) -> No
     # smuggled into the postings, which is (a) shipped under (c)'s name.
     for edge in record.get("edges", ()):
         for term in edge.get("at", ()):  # noqa: PERF401 - clarity over a comprehension
+            term_keys.add(term.encode("ascii"))
+    # W-168 step 4: `abbr`'s hashes are quoted 16-hex outside `terms` for the
+    # same reason `at`'s are — they are term hashes in the postings' currency.
+    # A long form's token need not be in this document's `terms` (a stopword
+    # never is), so they are allowed by name, not by membership.
+    for short, long in record.get("abbr", ()):
+        for term in (*short, *long):
             term_keys.add(term.encode("ascii"))
     stray = quoted - term_keys
     if stray:

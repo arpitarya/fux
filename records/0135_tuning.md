@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-22
 amended: 2026-09-24
 feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error contract, and per-source preference weights
-owns: [src/fux/tune.py@f44c79f51b14, .fux/tune.toml@ba9885423d69, node/src/config/tune.mjs@2893e38e33ba]
+owns: [src/fux/tune.py@ce78a68a40ba, .fux/tune.toml@ba9885423d69, node/src/config/tune.mjs@109e81d92206]
 laws: [L1, L3, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 4d42fcfaa0159f8202fa4061e127da6fd93cae45ae788d6bb0c4ccf10e80a6a7
+content_sha: 5754e9a1d7dc83070fbf341ed890745c706937c0a1877c48b0f36c0816cb46bf
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -746,6 +746,7 @@ reads · `*` an **open** table whose keys are the consumer's own.
 + bm25f.anchor
 + ranking.rerank_weight
 + ranking.expand_weight
++ ranking.mined_weight
 + graph.damping
 + graph.iterations
 + graph.laziness
@@ -962,7 +963,24 @@ and its Node twin in the same change**, as decision 15 requires: `fux setup`
 wrote it into every `.fux/tune.toml` from 3.0.0-alpha.3 on, so a file that still
 sets it is refused with an error that names the removal, never a bare *"unknown
 key"*. Ranking is unchanged, because it shipped at `0.0` and `0.0` ran nothing.
-**`[ranking]` is `rerank_weight` and `expand_weight` again.**
+
+**19. `[ranking] mined_weight`, default `0.0`** (W-168 step 4, 2026-09-27;
+[SR-EXPAND](0149_expand.md) decision 18) — the weight of a spelling the CORPUS
+supplies: the other side of a `Long Form (ABBR)` pair some document declares,
+added when a query carries one side and not the other.
+
+- **Its own key, not `expand_weight`.** The pre-registered arms sweep it, and a
+  sweep of `expand_weight` would move every caller's `--expand` with it.
+- **`0.0` is off, and off reads no pair**: `run_query` never opens the table,
+  so the default is byte-identical to the engine before the key existed.
+- **Inside decision 1's boundary.** It changes no committed byte: the pairs are
+  committed by ingest whatever the weight, and the table is folded at read
+  time. Moving it needs no re-ingest and no rebuild.
+- **`fux lexical` forces it to `0.0`**, in both readers, for the reason it
+  forces the graph tier off: the frozen baseline is the words the user typed.
+- ⚠ **Unmeasured.** It turns on only on a PASS against
+  [the frozen bar](../work/regression/2026-09-27-mined-expansion/PRE-REGISTRATION.md),
+  and nothing else may turn it on.
 
 ### Consequences
 

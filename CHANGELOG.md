@@ -8,6 +8,21 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Added
+
+- **Corpus-mined expansion, off by default (W-168 step 4).** When a document
+  writes *"Mean Kinetic Temperature (MKT)"*, a query that says *MKT* can also
+  score the long form, and the reverse, at `[ranking] mined_weight`. The
+  default `0.0` reads nothing and ranks exactly as before. It is unmeasured;
+  a pre-registered run decides whether it turns on.
+
+### Changed
+
+- ⚠ **The index format is `fux.index.v5`, so re-ingest.** Records may carry
+  `abbr`, the hashed `Long Form (ABBR)` pairs a document declares. A v4 index is
+  refused with the way out: run `fux ingest --full`, then `fux build`. The
+  accelerator's plane is `fux.runtime.v7` and rebuilds itself.
+
 ### Removed
 
 - **RM3 and `[ranking] rm3_weight` are gone (W-224).** RM3 failed its

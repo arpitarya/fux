@@ -7,10 +7,10 @@ description: A disposable term-major index under .fux/runtime/ that makes warm q
 status: accepted
 date: 2026-08-18
 feature: "`.fux/runtime/` — the derived index, `fux build`, and the block bound that makes skipping provable"
-owns: [src/fux/derive@0ffb225704ee, tools/differential@1934e54fe0ca]
+owns: [src/fux/derive@3f8a15a9d941, tools/differential@1934e54fe0ca]
 laws: [L1, L3]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 73e7dba48cbb3d486e5778946e9550d0ff18c4d3c0408f9ae567825db655b179
+content_sha: 5ac420a3c911bf9ece70b4a4a02c5c7661b6395c5a290df6b1e04a621f795af5
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -622,6 +622,16 @@ the decode assumption and the shape of the weight sweep. It does **not** run the
 harness over a real corpus, because that is a fifteen-minute job and the unit
 suite is not where it belongs. **The real-corpus arm is still something a person
 has to run**, and the two days this one spent dead are what that costs.
+
+**16. The plane carries `mined.json`, the corpus pair table** (W-168 step 4,
+2026-09-27; `RUNTIME_SCHEMA` v7). It is the union of every record's `abbr`,
+sorted, built from the same records the doc table is, and one of
+`DETERMINISTIC_FILES`. `accel.mined_table` reads it only when
+`mined_weight > 0`. **The scan builds the identical table from the raw shards**
+(`query/mined.py::table_from_shards`), and the two are asserted equal; the
+accelerator's candidate and bound code needed no change, because the fold
+arrives as an ordinary `Expansion`. Scan and accelerator returned identical
+payloads at every arm weight in `tests/query/test_mined.py`.
 
 ### Consequences
 

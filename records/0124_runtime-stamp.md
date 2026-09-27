@@ -10,7 +10,7 @@ feature: "`.fux/runtime/stamp.json` — the cheap staleness pre-filter, and its 
 owns: []
 laws: [L3]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 23bde947a5a0b738ec29ed6e16a16e534c23863139949de60075a0029f6b6305
+content_sha: b186d468b385ca4d83acbee5500ff4716f18dc3f3ea7a09ead7370364c57d5f5
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -120,6 +120,9 @@ set says so explicitly rather than leaving it to be discovered.
 hint that nothing changed; it is not proof. Only
 [`manifest.json`](0123_runtime-manifest.md)'s content-sha map is the record of
 truth for actual staleness.
+
+**4. Unchanged by W-168 step 4 (2026-09-27).** `mined.json` is derived in the
+same build and is covered by the same staleness check.
 
 ### Consequences
 

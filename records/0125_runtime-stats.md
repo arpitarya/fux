@@ -11,7 +11,7 @@ feature: "`.fux/runtime/stats.json` — the corpus-wide aggregates, and the rule
 owns: []
 laws: [L3]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: ad759692978d9f06bc3c833345ca999e364f48b67718813a5f8c694b569b6eb0
+content_sha: d689610fca83cb7b257d966f97ff99f1bfff493f52b9ff6ca0fddc215827709d
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -201,6 +201,10 @@ the anchor field's default weight ([SR-TUNE](0135_tuning.md) decision 17a). This
 record's rule is what makes that safe: `total_anchor_len` is stored **raw**,
 exactly as `total_flen` is, and weighted at query time. So moving the default
 changed no byte of `stats.json`.
+
+**7. Unchanged by W-168 step 4 (2026-09-27).** The mined table is its own file,
+`mined.json` ([SR-T1-ACCELERATOR](0110_accelerator.md) decision 16), and adds
+nothing to `stats.json`.
 
 ### Consequences
 

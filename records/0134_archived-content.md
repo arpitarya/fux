@@ -10,7 +10,7 @@ feature: what happens once a document is declared archived — the record proper
 owns: [tools/archived-signal-eval@30fb75fa7476]
 laws: [L3, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 037a8221b2f5e13efc33899ceaeae5e4894eee0189dda78de105cbb811d53eff
+content_sha: b946874cc37e17deb2b4fee6cec94270a82e731947cf03ccaaf209f92327c951
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -455,6 +455,11 @@ them into one.
 
 ⚠ **Stated here because this record co-owns `UrlEntry` and the `archived`
 attribute, not because either moved.**
+
+**10. An archived document's `abbr` is folded like any other** (W-168 step 4,
+2026-09-27). The table is the union over every record, archived included, as
+decision 9 says of anchor terms: what an archived document declares is still
+what the words mean. What it demotes is the document, not the vocabulary.
 
 ### Consequences
 

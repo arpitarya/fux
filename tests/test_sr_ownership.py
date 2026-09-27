@@ -369,15 +369,23 @@ def test_the_describes_table_is_parsed_not_hard_coded() -> None:
     assert "<!-- DESCRIBES-TABLE-END -->" in text
 
 
-def test_the_freshness_gate_actually_consults_describers() -> None:
+def test_the_freshness_gate_actually_consults_describers(monkeypatch) -> None:
     """⚠ Veto condition 3, made mechanical.
 
     The widening is one line in `owning_records`. Deleting it leaves every
     other test in this suite green while the gate silently narrows back to
     owner-only — so assert the behaviour, not the line.
+
+    ⚠ **Pinned to an undecidable diff** (2026-09-27). `owning_records` reads the
+    WORKING TREE's diff, and SR-OUTPUT's row is narrowed to seven symbols, so
+    this test went red whenever `query/__init__.py` carried an uncommitted edit
+    outside them (W-168 step 4 touched only `run_query`) and green again on
+    commit. `changed_symbols -> None` is the case "every describer" is the rule
+    for; narrowing has its own tests.
     """
     import test_sr_freshness as freshness
 
+    monkeypatch.setattr(freshness, "changed_symbols", lambda *_a, **_k: None)
     table = ownership_table()
     touched = freshness.owning_records(["src/fux/query/__init__.py"], table)
     assert "SR-ASK" in touched, "the owner must still be demanded"

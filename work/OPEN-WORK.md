@@ -32,7 +32,7 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🟢 **W-168** · `agent` — the ranking ideas. Step 4 is pre-registered (pool 10); next, build it (Opus). Separately, a fresh prompt-4 session rebuilds the eight rungs for generation 3. [detail](open/W-168-search-improvements.md)
+- 🟢 **W-168** · `agent` — the ranking ideas. Step 4 is built, off at `0.0`; next, capture its five arms on a re-ingested rung-01000 copy. Separately, a fresh prompt-4 session rebuilds the eight rungs for generation 3. [detail](open/W-168-search-improvements.md)
 
 
 ### testing

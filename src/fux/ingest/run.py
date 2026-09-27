@@ -661,6 +661,9 @@ def run(
                     "flen": store_mod.trim(fields.flen),
                 }
             )
+            abbr = _hash_abbr(fields.abbr, tracker)
+            if abbr:
+                record["abbr"] = abbr
         # Edges last, and never reused: they are the one field the rest of the
         # corpus can change without this document changing.
         #
@@ -685,6 +688,7 @@ def run(
             mode="extracted",
             terms=store_mod.hash_terms(fields.terms, tracker),
             flen=store_mod.trim(fields.flen),
+            abbr=_hash_abbr(fields.abbr, tracker),
             edges=edges_mod.resolve(
                 doc_id, scans[doc_id], known_ids, by_basename, tracker.hash_of
             ),
@@ -930,6 +934,22 @@ _STOP_EVERY = 64
 #: changing, so carrying it forward would freeze a link that a newly added
 #: document should have resolved.
 EXTRACTED_FIELDS = store_mod.recordschema.carried_fields()
+
+
+def _hash_abbr(pairs, tracker) -> list[list[list[str]]]:
+    """W-168 step 4 — mined `(short, long)` token pairs, as committed hashes.
+
+    Through `tracker.hash_of`, the run's collision tracker, so a pair is
+    written in exactly the currency `terms` uses and a collision between a
+    pair token and a body token is refused like any other. **Sorted and
+    de-duplicated on the HASHES**, because the read-time fold visits pairs in
+    that order and a token-order sort would let two readers disagree.
+    """
+    hashed = {
+        (tuple(tracker.hash_of(t) for t in short), tuple(tracker.hash_of(t) for t in long))
+        for short, long in pairs
+    }
+    return [[list(short), list(long)] for short, long in sorted(hashed)]
 
 
 

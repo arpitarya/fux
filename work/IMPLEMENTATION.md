@@ -26,6 +26,22 @@ Rules:
 
 ---
 
+## 2026-09-27 — **W-168 step 4 built: corpus-mined expansion, off at `0.0`**
+
+**Outcome: built to the frozen bar, unmeasured, and ranking unchanged at the default.**
+- **What:** `Long Form (ABBR)` pairs mined at ingest onto the declaring record
+  (`abbr`, `fux.index.v5`), folded at read time at `[ranking] mined_weight`
+  (default `0.0`) through `Expansion`, in both readers. Accelerator plane
+  `fux.runtime.v7` gains `mined.json`.
+- **Evidence:** `tests/query/test_mined.py` (30): the table is never read at
+  `0.0`; scan = accelerator at every arm weight; Node = Python on `ask` and
+  `lexical`. This repo: full = delta = full ingest, one hash; scan =
+  accelerator on 8 folding queries at 0.3. Bar:
+  [PRE-REGISTRATION](regression/2026-09-27-mined-expansion/PRE-REGISTRATION.md).
+- **Records:** [SR-EXPAND](../records/0149_expand.md) d18, [SR-TUNE](../records/0135_tuning.md) d19,
+  [SR-INDEX-LIFECYCLE](../records/0108_index-lifecycle.md) d15.
+- ⚠ **The v4 ladder rungs are now refused by this engine**; the gen-3 rebuild writes v5.
+
 ## 2026-09-27 — **W-224: RM3 removed; W-168 step 4 pre-registered**
 
 **Outcome: RM3 is gone from both readers, and no ranking moved.**

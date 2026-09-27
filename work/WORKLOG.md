@@ -29,6 +29,17 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-27 — W-168 step 4 built (mined expansion, off at 0.0); prior sessions' work committed  ·  Claude Code
+- **Asked:** *"implement w168"*; then chose *commit first, then build*.
+- **Did:**
+  - Committed the three finished items left uncommitted (W-223, gen-3 seed, W-224) as `363a8b8c`, after fixing their four red gates: LAW-11's amendment block rewritten in place, two record hashes. Then the step-4 bar alone as `02d6db94`, before any build.
+  - Built step 4 to the bar: `query/mined.py`, `abbr` on the record (`fux.index.v5`), `mined.json` (`fux.runtime.v7`), `expand.stack`, `[ranking] mined_weight = 0.0`, the Node twin, 30 tests. Re-ingested this repo `--full`; rebuilt the bundle.
+  - Pinned `test_the_freshness_gate_actually_consults_describers` to an undecidable diff. It went red whenever `query/__init__.py` carried an uncommitted edit outside SR-OUTPUT's seven symbols.
+- **Decided / open:**
+  - SR-EXPAND decision 1 narrowed in place. The corpus's own declarations are decision 15's human-written words, not an invented expansion.
+  - Mining reads the parsed body, not the front-matter. On rung-01000's seed that gives the same 9 pairs as the tagger's whole-file read.
+- **Next:** capture the five arms on a re-ingested copy of rung-01000 at one commit. Then Arpit scores.
+
 ## 2026-09-27 — W-224 built (RM3 removed, byte-identical); W-168 step 4 pre-registered  ·  Claude Code
 - **Asked:** *"implement w one six eight and w two two four"*.
 - **Did:**

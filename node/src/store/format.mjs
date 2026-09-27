@@ -5,7 +5,7 @@
 import { blake2bHex } from "../hash/blake2b.mjs";
 
 export const INDEX_DIR = ".fux/index";
-export const SCHEMA_ID = "fux.index.v4";
+export const SCHEMA_ID = "fux.index.v5";
 export const ANALYZER_VERSION = "v3";
 
 /** **Order is load-bearing** — body first, trailing zeros omitted on the wire.
@@ -28,7 +28,7 @@ export function shardFor(docId) { return blake2bHex(enc.encode(docId), 1); }
  * ⚠ **W-194, 2026-09-20 — this used to be the interesting function here.** It
  * carried the fallback a `meta: hashed` record needed: the title when plain,
  * else the display cache's materialised title, else a labelled opaque hash.
- * `meta`, `title_h` and the cache are deleted and `_format` is `v4`, so every
+ * `meta`, `title_h` and the cache are deleted (since `_format` `v4`), so every
  * record carries a readable `title`. Kept as a function, with its Python twin,
  * because both candidate generators feed the same `rank()` and a display rule
  * implemented at each call site is a differential-law failure waiting to

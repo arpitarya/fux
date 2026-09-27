@@ -7,11 +7,11 @@ description: "`--expand` scores agent-supplied terms at a lower weight beside th
 status: accepted
 date: 2026-09-05
 feature: agent-side query expansion and multi-query fusion
-owns: [src/fux/query/expand.py@19b697b80e8c, src/fux/query/fuse.py@749673d52166, node/src/query/expand.mjs@403a0aa73adc, node/src/query/fuse.mjs@de8c87e1d265]
+owns: [src/fux/query/expand.py@3eb9647e4be9, src/fux/query/fuse.py@749673d52166, node/src/query/expand.mjs@fd39cfaf8fa1, node/src/query/fuse.mjs@de8c87e1d265]
 laws: [3, 4, 8]
 ratifies: W-109
 timestamp: 2026-09-05T00:00:00Z
-content_sha: 85369c2ac1e2fdc3ca44d88f35ef4157bdb681ac0e1248c84b699c0115a34ef4
+content_sha: f0295e386b293118db659d7b2f66f2357ed771f36293f2742c07f0e63e1113dc
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -146,7 +146,10 @@ are the measured form of that idea; RRF is Cormack, Clarke & Buettcher 2009.
 is a *term slot*. The text arrives from the caller, is analyzed by
 `query/analyzer.py` — the analyzer the index was built with — and is hashed.
 Nothing in `src/fux/` generates, rewrites or suggests one. L3 is why, and the
-slot is what makes the law survivable rather than merely obeyed.
+slot is what makes the law survivable rather than merely obeyed. **The one
+addition fux makes is not a written expansion in this sense**: decision 18's
+fold adds a spelling the corpus itself DECLARED, deterministically, and is off
+by default.
 
 **2. Supplied terms are scored, never trusted.** Each expansion hash's BM25F
 contribution is multiplied by `[ranking] expand_weight` inside
@@ -288,8 +291,9 @@ ruling decision 17 records.
 
 **17. 🔴 RM3 is REMOVED, and `rm3_weight` is refused by name** (Arpit,
 2026-09-27, W-224: *"mark RM3 as fail. and remove all the RM3 related code"*).
-Decision 1 holds again without exception: **fux writes no expansion.** The only
-expansion is the caller's own `--expand`, at `expand_weight`.
+**Fux borrows no words from its own ranking.** What remains is the caller's own
+`--expand`, at `expand_weight`, and, off by default, the spellings the corpus
+declares (decision 18).
 
 - **Two runs, two first passes, one failure: drift.** Against the frozen bar in
   [`2026-09-23-rm3`](../work/regression/2026-09-23-rm3/PRE-REGISTRATION.md),
@@ -311,6 +315,40 @@ expansion is the caller's own `--expand`, at `expand_weight`.
   There is no alias and no silent ignore.
 - **The evidence stays.** Both regression directories, and their frozen
   `decide.py`, are history and are not engine code.
+
+**18. The corpus may supply the other spelling of a term it DECLARED** (W-168
+step 4, built 2026-09-27; [the frozen bar](../work/regression/2026-09-27-mined-expansion/PRE-REGISTRATION.md)).
+A document that writes *"Mean Kinetic Temperature (MKT)"* has said the two
+spellings are one thing. When a query carries one side of such a pair and not
+the other, [`query/mined.py`](../src/fux/query/mined.py) adds the other side,
+scored through `Expansion` at `[ranking] mined_weight`
+([SR-TUNE](0135_tuning.md) decision 19), **default `0.0`, which reads no pair**.
+
+- **Why this is not decision 1's forbidden act, and not RM3.** Decision 15's
+  distinction, applied again: the words are ones a **person wrote** in a
+  committed document, found by a fixed regular expression and the one shared
+  analyzer. Nothing is generated, and nothing is borrowed from fux's own
+  ranking, which is what RM3 did and what decision 17 removed.
+- **One family.** `Long Form (ABBR)`, by the tag's own pattern
+  (`mined.PATTERN`, held equal by a test). Glossary lines and `aliases:` are
+  not built: a glossary line pairs a term with a definition, and expanding by a
+  definition is the drift decision 17 records.
+- **The fold** is set containment both ways over the USER's hashes only: `A ⊆ Q`
+  and `B ⊄ Q` adds `B \ Q`, and the reverse. Pairs are visited in sorted hash
+  order; added hashes are de-duplicated first-seen.
+- **Decision 3 holds unchanged.** `required` is the user's own hashes, so a
+  document matching only a mined spelling is dropped. On a question whose every
+  relevant document is already retrieved, this can only reorder.
+- **It stacks on `--expand`** ([`expand.stack`](../src/fux/query/expand.py)): a
+  hash both supply keeps the caller's weight, and mined hashes are summed after
+  the caller's.
+- **`fux lexical` never folds**, in either reader ([SR-CLI](0101_cli-surface.md)
+  decision 12). The frozen baseline is the words the user typed.
+- **Where each half lives**: the pairs on the declaring document's own record
+  ([SR-RECORD](0109_index-record.md), `abbr`), the table folded at read time
+  from the shards by the scan and from `mined.json` by the accelerator
+  ([SR-T1-ACCELERATOR](0110_accelerator.md)). Nothing corpus-wide is committed.
+- ⚠ **Unmeasured.** It turns on only on a PASS against the frozen bar.
 
 ### Consequences
 

@@ -7,10 +7,10 @@ description: One canonical encoder, sharded doc-major JSONL, write-if-different;
 status: accepted
 date: 2026-08-18
 feature: generation and update of the committed index, and the refusal that keeps its derived accelerator from diverging
-owns: [src/fux/store@f56c0ee58043, node/src/store/format.mjs@e3c48e545e1e, node/src/store/reader.mjs@f47fa69ecb2c]
+owns: [src/fux/store@88b1982d1a60, node/src/store/format.mjs@affceafdd3a0, node/src/store/reader.mjs@f47fa69ecb2c]
 laws: [L1, L2, L3, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: b6a7adac9521e60d8b613e4d4fc6ac430b7ebf36e5d6bb4a46fee1ccda157c17
+content_sha: 5a89c8ee83adf440d3ea889b427fe1f88b12f278def1dcbdbe225fc23b03c3a9
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -404,6 +404,26 @@ the substring match, so a stray hash costs a wasted parse and cannot inflate a
 `df`. It is kept as a tripwire on a record shape nobody meant to write — and it
 is what would catch anchor terms being smuggled into the postings, which is
 option (a) shipped under (c)'s name.
+
+**15. `_format` bumped to `fux.index.v5` on 2026-09-27** (W-168 step 4), by
+decision 9.1 again: a record may now carry `abbr`, the hashed `Long Form (ABBR)`
+pairs its own text declares ([SR-RECORD](0109_index-record.md)). **A property
+appeared**, and a v4 index could not say whether a corpus declares no
+abbreviations or predates the miner.
+
+- **`analyzer` and `tf_fields` are untouched.** The pairs go through the one
+  analyzer and the one term hash; they enter no posting and no `flen`.
+- **The migration is decision 10a's**: `fux ingest --full`. This repo's own
+  index was re-ingested in the same change; full, delta and a second full run
+  gave one hash.
+- ⚠ **The ladder rungs are v4 and this engine refuses them.** They were stale
+  for generation 3 already; the prompt-4 rebuild writes v5. Step 4's arms run on
+  a re-ingested copy, never on a rung ([the bar](../work/regression/2026-09-27-mined-expansion/PRE-REGISTRATION.md)).
+
+**15a. The stray-hash tripwire admits `abbr`'s hashes by name**, as 14a admits
+`at`'s. A long form's token need not be in the document's own `terms` (a
+stopword never is), so they are allowed as the field's contents, not by
+membership in `terms`.
 
 ### What it looks like
 

@@ -96,7 +96,12 @@ BLOCK_SIZE = 128
 #: committed shards alone and gitignored — which is the whole of Arpit's
 #: 2026-09-15 ruling: the words are committed on the SOURCE's edge, and the
 #: per-target fold that ranking needs is rebuilt, never committed.
-RUNTIME_SCHEMA = "fux.runtime.v6"
+#: v7 (2026-09-27, W-168 step 4): `mined.json`, the corpus table of
+#: `Long Form (ABBR)` pairs — the union of every record's committed `abbr`,
+#: sorted. Derived for step 1's reason: the table is corpus-wide, so committing
+#: it would make one document's bytes a function of every other's. A v6 plane
+#: has no such file and is refused and rebuilt rather than read as "no pairs".
+RUNTIME_SCHEMA = "fux.runtime.v7"
 
 #: v3 (W-76 Phase 1 record half): `mx` and `mnw` become PER-FIELD arrays.
 #:
@@ -146,6 +151,8 @@ DOCS_NAME = "docs.jsonl"
 #: second binary layout to keep in step.
 ANCHORS_DIR = "anchors"
 STATS_NAME = "stats.json"
+#: W-168 step 4 — `{"pairs": [[short_hashes, long_hashes], ...]}`, sorted.
+MINED_NAME = "mined.json"
 MANIFEST_NAME = "manifest.json"
 STAMP_NAME = "stamp.json"
 POSTINGS_DIR = "postings"
@@ -157,7 +164,7 @@ POSTINGS_DIR = "postings"
 #: `codes.jsonl` left this tuple on 2026-08-25 with the dense lane. A `v4`
 #: plane still has the file on disk; `RUNTIME_SCHEMA` moved to `v5` in the same
 #: change so such a plane is refused and rebuilt rather than read past.
-DETERMINISTIC_FILES = (DOCS_NAME, STATS_NAME, MANIFEST_NAME, "graph.json")
+DETERMINISTIC_FILES = (DOCS_NAME, STATS_NAME, MINED_NAME, MANIFEST_NAME, "graph.json")
 
 
 def runtime_dir(root: Path) -> Path:

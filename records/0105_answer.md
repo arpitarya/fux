@@ -10,7 +10,7 @@ feature: "`fux answer` — one answer, its footing stated, and the report of wha
 owns: [src/fux/query/refer_answer.py@defdd3c5c0f5]
 laws: [L1, L2, L3]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 0b32ad94245c62c3ee30e152557335c2a7d568687576329afdb370cd7dfb49df
+content_sha: a580ba2abc977ddf3774fa81d8168e0f0761c34214220777c3ab4ce9a2b1ac51
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -467,6 +467,11 @@ is a legitimate answer to it.
 **15. ~~`answer` ranks with RM3 exactly when `ask` does~~ — SUPERSEDED
 2026-09-27.** RM3 was removed ([SR-EXPAND](0149_expand.md) decision 17). It
 shipped at `0.0`, so `answer` cites what it cited before the key existed.
+
+**16. `answer` folds mined spellings exactly when `ask` does** (W-168 step 4,
+2026-09-27). Both reach `run_query`, so `[ranking] mined_weight` moves the
+document `answer` cites as it moves `ask`'s #1. At the default `0.0` nothing is
+read and `answer` is byte-identical.
 
 ### Consequences
 

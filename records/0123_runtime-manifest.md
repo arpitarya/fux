@@ -10,7 +10,7 @@ feature: "`.fux/runtime/manifest.json` — the derived plane's freshness contrac
 owns: []
 laws: [L3]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 3402f0b4c40742cc90aa7b5753c595fcd8196ddd113bc6ebae8b9e2bde44b9d8
+content_sha: 3fe440a80f74f2d6c1c69ef088e79e2cb71248815a55203feb6515e115862f2a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -154,6 +154,9 @@ accelerator directly comparable to a local one.
 `stamp.json` ([SR-RUNTIME-STAMP](0124_runtime-stamp.md)) is a cheap pre-filter
 only; **`manifest.json`'s content hashes are what a reader trusts when it needs
 to know, not guess.**
+
+**5. `schema` is `fux.runtime.v7` since 2026-09-27** (W-168 step 4): the plane
+gained `mined.json`. A v6 plane is refused and rebuilt, not read as "no pairs".
 
 ### Consequences
 

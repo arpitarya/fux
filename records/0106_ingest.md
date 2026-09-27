@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-24
 date: 2026-08-18
 feature: the `fux ingest` pipeline — sources to committed records
-owns: [src/fux/ingest/ingestlog.py@73e117c1e919, src/fux/ingest@50423856e72d, src/fux/ingest/priors.py@8ffcc632a4be, node/src/ingest/gitdir.mjs@eb45c1672eac, node/src/ingest/priors.mjs@11df69775da1]
+owns: [src/fux/ingest/ingestlog.py@73e117c1e919, src/fux/ingest@04fe7d0c14cb, src/fux/ingest/priors.py@8ffcc632a4be, node/src/ingest/gitdir.mjs@eb45c1672eac, node/src/ingest/priors.mjs@11df69775da1]
 laws: [L2, L3, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 755c6914bf84a1898e54d6e055010b8c6b5d98a01eaf495dd3fe44feaaacc876
+content_sha: be4a7202f974ae02b571a36961736a38bb73b18ca049f53923fa9f4396f940f2
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -943,6 +943,15 @@ committed line, which is if anything more L3-stable than before.
 ⚠ **Stated here because this record owns the directory, not because a decision
 moved** — the [SR-ACQUIRED](0145_acquired-plane.md) precedent: the freshness gate
 proves an owning record was *touched*, never that it was read.
+
+**23. Ingest mines each document's `Long Form (ABBR)` declarations** (W-168
+step 4, 2026-09-27). `extract_fields` returns them as analyzed tokens; the run
+hashes them through its collision tracker, the object `terms` and anchor terms
+go through, and writes `abbr` on the declaring record ([SR-RECORD](0109_index-record.md)).
+Mined from the **redacted** parsed body, headings included, front-matter not.
+It is extraction, so it is carried on an unchanged sha, and `RULES_VERSION`
+moved to 3. **No weight reaches ingest**: `mined_weight` is read at query time
+only, so the committed bytes are the same at every arm.
 
 ### Consequences
 

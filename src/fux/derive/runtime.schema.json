@@ -23,7 +23,7 @@
     "above, in a new costume."
   ],
 
-  "schema": "fux.runtime.v6",
+  "schema": "fux.runtime.v7",
 
   "postings_block_line": {
     "_doc": [
@@ -152,6 +152,21 @@
     ],
     "shape": { "type": "dict", "key": "term hash (16 hex)", "value": "list of [docidx, count]" },
     "example": { "000219ac0fa26dbb": [[0, 2], [17, 1]] }
+  },
+
+  "mined_table": {
+    "_doc": [
+      "The whole of .fux/runtime/mined.json -- W-168 step 4's corpus table of",
+      "`Long Form (ABBR)` pairs: the union of every committed record's `abbr`,",
+      "de-duplicated and sorted. Each pair is [short_hashes, long_hashes].",
+      "",
+      "Derived, never committed, for step 1's reason: the table is corpus-wide.",
+      "The scan builds the identical table from the shards' raw bytes",
+      "(query/mined.py::table_from_shards); the fold reads pairs in this order,",
+      "so the sort is part of the differential law, not presentation."
+    ],
+    "shape": { "type": "dict", "key": "pairs", "value": "list of [list of hash, list of hash]" },
+    "example": { "pairs": [[["1c2d3e4f5a6b7c8d"], ["0a1b2c3d4e5f6071", "8f1c2d3e4a5b6071"]]] }
   },
 
   "stats": {

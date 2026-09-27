@@ -28,7 +28,7 @@ narrower than it reads.
 `canonical_dumps` sorts keys, so the order in the schema is presentation and
 cannot reach the index. The field set, the defaults and `omit_when` *can*, which
 is why `schema` in the schema must equal `format.SCHEMA_ID` — two fux versions
-with different shapes must never both call their output `fux.index.v4`.
+with different shapes must never both call their output `fux.index.v5`.
 
 **It is not a validator that runs on every write.** `canonical_dumps` already refuses
 floats, nulls and hostile text. ⚠ **`write_index` used to enforce L5's meta

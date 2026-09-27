@@ -37,7 +37,12 @@ from __future__ import annotations
 #: field the resolver chooses, so **every document with front-matter produces
 #: different fields than it did at version 1** — and the corpus-wide bump is
 #: exactly right here, because front-matter is not bound to an extension.
-RULES_VERSION = 2
+#:
+#: **3 (2026-09-27, W-168 step 4):** extraction also returns `abbr`, the
+#: document's `Long Form (ABBR)` pairs. Redundant with the `_format` bump to
+#: v5, which already forces re-extraction; bumped anyway because the rule this
+#: constant enforces is about what this module returns, and it now returns more.
+RULES_VERSION = 3
 
 import re
 from collections import Counter
@@ -149,6 +154,11 @@ class Extracted:
     #: made a committed field a function of a tunable — SR-TUNE decision 6.
     #: These are facts; the weighting happens at query time.
     flen: tuple[int, ...]
+    #: W-168 step 4 — this document's `Long Form (ABBR)` declarations, as
+    #: ANALYZED tokens `(short, long)`. Hashed by ingest through the run's
+    #: collision tracker, like `terms`. Empty for most documents, and then the
+    #: record carries no `abbr` at all.
+    abbr: tuple = ()
 
 
 def extract_fields(
@@ -226,7 +236,14 @@ def extract_fields(
     # `code` went in W-76 Phase 1, `vectors` on 2026-08-25 with the model.
     # Both were the dense lane's input, and the lane never earned its cost:
     # DENSE-CHUNK measured 0 fixed / 2 broken at every setting that fires.
-    return Extracted(title=title, phrases=phrases, terms=terms, flen=flen)
+    # W-168 step 4: mined from the body the other fields were built from — the
+    # redacted text, headings included, front-matter not. A declaration is the
+    # document's own words, so this is extraction and is carried forward on an
+    # unchanged sha exactly like `terms`.
+    from ..query.mined import mine
+
+    abbr = tuple(mine(doc.body))
+    return Extracted(title=title, phrases=phrases, terms=terms, flen=flen, abbr=abbr)
 
 
 def _title(meta: dict, headings: list[str], rel_path: str) -> str:

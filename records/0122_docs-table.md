@@ -10,7 +10,7 @@ feature: "`.fux/runtime/docs.jsonl` — the derived doc table and the join key i
 owns: []
 laws: [L3]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: a0f00cb47f65745e3a2f2ed5687376d6768f8c7fe0ecdf36148c79a6e07a2e56
+content_sha: 2f8af6c86eef59de930c1931de651b68e2f2ccd14e1376785210c3b2edf77884
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -153,6 +153,9 @@ offset-table entry possible; a string `id` would do neither.
 **5. `docs.jsonl` is one of `DETERMINISTIC_FILES`.** Byte-identical output for
 the same committed input, verified the same way as `manifest.json` and
 `stats.json`.
+
+**6. Unchanged by W-168 step 4 (2026-09-27).** `mined.json` joined
+`DETERMINISTIC_FILES` beside this table; the table's own fields did not move.
 
 ### Consequences
 

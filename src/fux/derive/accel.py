@@ -209,6 +209,18 @@ def block_bound(
     return idf(df, n) * wtf * (k1 + 1) / denom
 
 
+def mined_table(root: Path) -> tuple:
+    """W-168 step 4 — the corpus `(short, long)` pair table, off `mined.json`.
+
+    The same tuple `query/mined.py::table_from_shards` builds from the raw
+    shards, sorted the same way, so the fold is identical on both paths. Read
+    only when `mined_weight > 0`; `is_fresh` has already refused a plane built
+    before the file existed (`RUNTIME_SCHEMA` v7).
+    """
+    raw = json.loads((fmt.runtime_dir(root) / fmt.MINED_NAME).read_bytes())
+    return tuple((tuple(s), tuple(l)) for s, l in raw["pairs"])
+
+
 def is_fresh(root: Path) -> bool:
     """Cheap staleness check: shard sizes and mtimes against the build stamp.
 

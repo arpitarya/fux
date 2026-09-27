@@ -134,7 +134,7 @@ INDEX_TABLE = "index"
 #: SR-TUNE, not a convenience (decision 5).
 _SCHEMA: dict[str, tuple[str, ...]] = {
     "bm25f": ("k1", "b", *_FIELD_KEYS, "anchor"),
-    "ranking": ("rerank_weight", "expand_weight"),
+    "ranking": ("rerank_weight", "expand_weight", "mined_weight"),
     "graph": (
         "damping",
         "iterations",
@@ -268,6 +268,19 @@ class Tune:
     #: does pass one, which is the off-switch a consumer needs when they
     #: distrust the agent writing the expansions.
     expand_weight: float = 0.2
+    #: W-168 step 4 — the weight of a spelling the CORPUS supplies: the other
+    #: side of a `Long Form (ABBR)` pair some document declares, added when the
+    #: query carries one side and not the other ([`query/mined.py`](query/mined.py)).
+    #: **Default `0.0`: OFF**, and off reads no pair at all, so the default is
+    #: byte-identical to the engine before the key existed. It turns on only on
+    #: a PASS against the frozen bar,
+    #: `work/regression/2026-09-27-mined-expansion/PRE-REGISTRATION.md`.
+    #:
+    #: Its own key and not `expand_weight`, because the arms sweep it and a
+    #: sweep of `expand_weight` would move every caller's `--expand` too. It
+    #: stacks on `--expand`; a hash both supply keeps the caller's weight.
+    #: `fux lexical`, the frozen baseline verb, never folds.
+    mined_weight: float = 0.0
 
 
     # [graph]
@@ -644,6 +657,11 @@ def load(root: Path, *, enabled: bool = True) -> Tune:
         if "expand_weight" in ranking
         else 0.2
     )
+    mined_weight = (
+        _non_negative(c, "ranking", "mined_weight", ranking["mined_weight"], 0.0)
+        if "mined_weight" in ranking
+        else 0.0
+    )
 
     graph = data.get("graph", {})
     damping = _fraction(c, "graph", "damping", graph["damping"], 0.85) if "damping" in graph else 0.85
@@ -769,6 +787,7 @@ def load(root: Path, *, enabled: bool = True) -> Tune:
         field_weights=tuple(weights),
         rerank_weight=rerank_weight,
         expand_weight=expand_weight,
+        mined_weight=mined_weight,
         damping=damping,
         iterations=iterations,
         laziness=laziness,
@@ -861,6 +880,10 @@ rerank_weight           = {d.rerank_weight}   # 0 = off; the proximity reranker'
 # What an agent-supplied `--expand` term is worth against a term you typed.
 # A NO-OP unless a caller passes `--expand`; 0 turns expansion off entirely.
 expand_weight           = {d.expand_weight}   # Query2doc's 1:5; unmeasured on your corpus
+# A spelling the corpus supplies: when a query says MKT and some document
+# declares "Mean Kinetic Temperature (MKT)", the other side is added at this
+# weight. 0 = OFF, the default: it turns on only on a passing pre-registered run.
+mined_weight            = {d.mined_weight}
 
 [graph]                         # explain / graph / path
 damping      = {d.damping}

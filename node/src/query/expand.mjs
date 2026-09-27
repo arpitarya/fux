@@ -61,3 +61,19 @@ export function build(queryHashes, expansionHashes, weight) {
   for (const h of extra) weights[h] = weight;
   return new Expansion([...original, ...extra], required, weights);
 }
+
+/** Add a second layer of hashes at its own `weight`. Twin of `expand.stack`.
+ *
+ * W-168 step 4: the corpus-mined fold rides on whatever the caller passed with
+ * `--expand`. A hash already present keeps the weight it has (the user's own
+ * word keeps 1.0, a caller's `--expand` word keeps `expand_weight`); new
+ * hashes go after every existing one. `required` never changes. */
+export function stack(expansion, moreHashes, weight) {
+  if (weight <= 0 || !moreHashes || !moreHashes.length) return expansion;
+  const present = new Set(expansion.hashes);
+  const extra = [...new Set(moreHashes)].filter((h) => !present.has(h));
+  if (!extra.length) return expansion;
+  const weights = { ...expansion.weights };
+  for (const h of extra) weights[h] = weight;
+  return new Expansion([...expansion.hashes, ...extra], expansion.required, weights);
+}

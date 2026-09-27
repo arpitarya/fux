@@ -53,6 +53,8 @@ MUTATIONS: dict[str, dict[str, str]] = {
         # reason on top of every other key's: nothing reads it unless a caller
         # passes `--expand`, and `fux ingest` never does.
         "expand_weight": "0.75",
+        # W-168 step 4: off by default, and nothing ingest does reads it.
+        "mined_weight": "0.3",
     },
     "graph": {
         "damping": "0.25",

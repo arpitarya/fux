@@ -25,6 +25,7 @@
  * precisely to change which document is first.
  */
 import { ask as scanAsk, queryTermHashes } from "./scan.mjs";
+import { fold as minedFold, tableFromShards } from "./mined.mjs";
 import { rank, Weighting } from "./rank.mjs";
 import { signals } from "./confidence.mjs";
 import { headingsFor } from "./headings.mjs";
@@ -146,7 +147,8 @@ export function runQuery(root, query, top, {
   // the own properties and silently drops it — `resolved.scoring` two lines
   // below would then be `undefined` and every score would be computed at
   // default weights, on the frozen baseline verb, with nothing failing.
-  if (!compose) resolved = withTier(resolved, { askBoost: false, askRelated: false });
+  // W-168 step 4: the frozen baseline never folds mined pairs either.
+  if (!compose) resolved = withTier(resolved, { askBoost: false, askRelated: false, minedWeight: 0.0 });
   else if (wantRelated === false) resolved = withTier(resolved, { askRelated: false });
   // After the two lines above, `wantRelated` and `resolved.askRelated` agree, so
   // the tier reads one of them and the verb reads the other without either
@@ -168,9 +170,17 @@ export function runQuery(root, query, top, {
   const depth = (rerankWeight > 0 || graphOn) ? Math.max(top, RERANK_DEPTH) : top;
 
   const queryHashes = queryTermHashes(query);
-  const expansion = expandMod.build(
+  let expansion = expandMod.build(
     queryHashes, expand ? queryTermHashes(expand) : [], resolved.expandWeight,
   );
+  // W-168 step 4 — corpus-mined expansion. Off at 0.0, and off reads no pair.
+  // Folded over the user's words only; stacks on `--expand`, whose hashes keep
+  // the caller's weight. Twin of `run_query`'s block.
+  if (resolved.minedWeight > 0 && queryHashes.length) {
+    expansion = expandMod.stack(
+      expansion, minedFold(tableFromShards(root), queryHashes), resolved.minedWeight,
+    );
+  }
 
   const statsOut = {};
   const window = scanAsk(root, query, depth, { weighting, scoring, statsOut, expansion });
