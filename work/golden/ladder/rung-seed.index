@@ -1,6 +1,6 @@
-engine: fux 3.0.0-alpha.3
-engine_commit: 2dbe870f66a87ec65a6483078fc64899ee10b72c
+engine: fux 3.0.0-alpha.5
+engine_commit: 80495b449f063ba69c42a7a82f3a9f0880043892
 rung: rung-seed
-documents: 42
-index_root_sha256: 2175d52e92b4b177ee61f4fcfbda4dca31f4b61f197b3c896c9707e92b2c8a91
-rung_head_commit: ac7a75a9892422f2f5886c69cec338c947f617a4
+documents: 68
+index_root_sha256: 1469d963080534e60f8488d901ee9d624ff99f722b2eccaa5dd5e65ca537661f
+rung_head_commit: e26d155d3f17ea74c4275ce9b8802af33ee5f751

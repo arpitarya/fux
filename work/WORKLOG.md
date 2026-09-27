@@ -29,6 +29,12 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-27 — W-168: the golden ladder rebuilt for generation 3  ·  Claude Code
+- **Asked:** *"implement W-168"*. The next step was the rung rebuild, which a session that never read a question could do.
+- **Did:** All 8 rungs were stale, so all 8 were rebuilt from scratch by the unmodified builder, with the seed history replayed. The build ran from a clean worktree at `80495b44`, because other sessions' W-225/W-226 changes were uncommitted in the main tree. 8/8 froze: 68 seeds, 12 documents with history, 82 `ref` edges. Generation-2 rungs moved to `fux-lab/corpora/golden-gen2/`, not deleted. Filed [`2026-09-27-ladder-gen3-rebuild`](regression/2026-09-27-ladder-gen3-rebuild/report.md).
+- **Decided / open:** HEAD's W-225 stage 2 refuses the rungs until `fux doctor --fix` writes seven `tune.toml` keys; the index root is unchanged at `0cbbc44b`. The generator's banned-name list is still behind the seed (no leak found; `Sheikh` shared as a surname). Two unit failures at `80495b44` are W-225 stage 1's (`0159_constants.md` block + owns-hash), untouched.
+- **Next:** a phase-5 run of `set-4-claude` on the new ladder, pre-registered first.
+
 ## 2026-09-27 — W-168 step 4 shipped: mined_weight defaults to 0.5  ·  Claude Code
 - **Asked:** *"yes"*, confirming the ratification in chat after the classifier refused to act on it from edited files alone.
 - **Did:** Set `MINED_WEIGHT = 0.5` on both engines, with a parity test, the default tests, six records, the owns/sha restamp and the CHANGELOG. A concurrent session (W-225 / L12) emptied and rebuilt `.fux/` mid-run and then committed these files in `8d401423`. I verified the identical diff on a clean worktree instead: 22 144 scan = accelerator, and 0/225 Node = bundle = Python.

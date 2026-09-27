@@ -1,8 +1,12 @@
 rung: rung-seed
-documents_indexed: 42
+documents_indexed: 68
 archived_declared: 6
 archived_in_index: 6
 superseded_declared: 6
 superseded_in_index: 6
-carrying_mtime: 42
-categories: {"seed": 42}
+carrying_mtime: 68
+categories: {"seed": 68}
+documents_with_history: 12
+history_commits: 34
+history_authors: 9
+max_authors_per_document: 4

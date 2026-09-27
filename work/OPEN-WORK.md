@@ -24,7 +24,7 @@ here. Read that record before changing anything below it.
 | what he decides | filed | age |
 |---|---|---|
 
-*Empty since 2026-09-27 — step 4 ratified PASS at `0.5`. Next decision: scoring `set-4-claude` after the rung rebuild (W-168).*
+*Empty since 2026-09-27 — step 4 ratified PASS at `0.5`. Next decision: scoring `set-4-claude` after its phase-5 run (W-168; the ladder was rebuilt 2026-09-27).*
 
 ---
 
@@ -32,7 +32,7 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🟢 **W-168** · `agent` — the ranking ideas. **Step 4 (abbreviations) SHIPPED 2026-09-27** at `mined_weight = 0.5` (`8d401423`). Next: a fresh prompt-4 session rebuilds the eight rungs for generation 3. [detail](open/W-168-search-improvements.md)
+- 🟢 **W-168** · `agent` — the ranking ideas. Step 4 (abbreviations) SHIPPED at `mined_weight = 0.5` (`8d401423`). **Generation-3 ladder REBUILT 2026-09-27** — 68 seeds + history, 8/8 frozen at `80495b44`. Next: a phase-5 run of `set-4-claude` (`fux doctor --fix` on the rung first — W-225 stage 2). [detail](open/W-168-search-improvements.md)
 - 🟢 **W-225** · `agent` — L12 migration, building. Stages 1–2 landed (`constants.toml`; `tune.toml` strict + `doctor --fix`). Next: `fux.toml` + `output.toml`. [detail](open/W-225-values-live-in-config.md)
 
 

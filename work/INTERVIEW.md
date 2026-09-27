@@ -2836,6 +2836,7 @@ the reason is that the measuring environments are gone.**
 
 *Updated **2026-09-20** (Claude Code, Opus 5) — maintainer line: this session.*
 *Updated **2026-09-24** (Claude Code, Opus 5.5) — maintainer line: this session. The live next step is §1's newest block: two rulings for Arpit, and his `just golden-score`.*
+*Updated **2026-09-27** (Claude Code, Opus 5.5) — maintainer line: this session. **W-168's generation-3 ladder is rebuilt** — 8/8 frozen at `80495b44` ([report](regression/2026-09-27-ladder-gen3-rebuild/report.md)). Next: a phase-5 run of `set-4-claude`; run `fux doctor --fix` on the rung first, because W-225 stage 2 requires every `tune.toml` key.*
 
 ⚠ **Superseded later the same day — see §1's newest block.** The immediate next
 step is **W-205 part 1**; W-204 phase B is still real and still unstarted, and it

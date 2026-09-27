@@ -26,6 +26,18 @@ Rules:
 
 ---
 
+## 2026-09-27 — **W-168: the golden ladder, generation 3**
+
+**Outcome: landed; all eight rungs frozen at `80495b44`.**
+- **What:** Phase 4 on the 68-document seed. This was the first rebuild with a
+  replayed git history (T11: 12 documents, 34 commits, 9 authors). Built from
+  scratch by the unmodified builder, and the generation-2 rungs were kept.
+- **Evidence:** [`2026-09-27-ladder-gen3-rebuild`](regression/2026-09-27-ladder-gen3-rebuild/report.md). Every coverage
+  count equals its declaration on 8/8. `ladder_check` exits 0. The ladder-seed
+  test passes 10/10. e2e 151.
+
+---
+
 ## 2026-09-27 — **W-225 stage 2: `.fux/tune.toml` is mandatory, key by key**
 
 **Outcome: landed; no value changed, no ranking moved.**

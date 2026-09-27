@@ -7,6 +7,31 @@ filed: 2026-09-14
 ball: agent
 ---
 
+## ✅ GENERATION-3 LADDER REBUILT — 2026-09-27 (Claude Code, Opus)
+
+[Report](../regression/2026-09-27-ladder-gen3-rebuild/report.md) · [ANALYSIS](../regression/2026-09-27-ladder-gen3-rebuild/ANALYSIS.md).
+This session had never read a question (A23), so it could do the rebuild.
+
+- **All eight rungs were stale** (8/8 on `test_golden_ladder_seed`). All eight
+  were rebuilt **from scratch** by the unmodified builder, because the seed
+  history cannot be put under an existing rung. The history was replayed through
+  `replay.py`. The build ran from a clean worktree at `80495b44`.
+- **All 8/8 froze**: 68 seeds, headline sizes held, and every coverage count
+  equals its declaration. History is on every rung: 12 documents, 34 commits,
+  9 authors. `ref` edges stay at 82.
+- **The generation-2 rungs are kept** at `fux-lab/corpora/golden-gen2/`, not
+  deleted.
+- ⚠ **HEAD's W-225 stage 2 refuses these rungs** until `fux doctor --fix` writes
+  seven `tune.toml` keys. At `0cbbc44b` the index root is byte-identical, so the
+  records stand.
+- ⚠ The generator's banned-name list is still behind the seed. A hand search
+  found no leak, only the shared surname `Sheikh` (821 `Imran Sheikh` decoys).
+- **Next, in order:**
+  1. A phase-5 run of `set-4-claude` on the new ladder: pre-register first, run
+     `fux doctor --fix` on the rung, then capture `ask --why` + `answer`.
+  2. 🔴 Arpit scores it.
+  3. Each step 6–10 counts its own pool.
+
 ## ✅ STEP 4 SHIPPED at `mined_weight = 0.5` — 2026-09-27 (Claude Code, Opus), in `8d401423`
 
 Shipped per §If it passes, in one change. A concurrent session committed the files as part of `8d401423`, byte-identical to the diff verified below.

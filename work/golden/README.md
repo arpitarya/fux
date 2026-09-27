@@ -570,6 +570,14 @@ stream.
 [SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md) caps the lab at 10 000 documents.
 There is no rung above this one and none may be built.
 
+🔴 **Rebuilt 2026-09-27 on generation 3's seed, with its history** — [the run](../regression/2026-09-27-ladder-gen3-rebuild/report.md).
+The seed has 68 documents, and 12 of them replay a git history of 34 commits by
+9 authors. Every rung above the seed holds its headline size, with fewer ext
+documents. Archived and superseded are **6 + (headline/10 − 7)** (99 at
+`rung-01000`, 999 at `rung-10000`). `ref` edges stay at 82. The generation-2
+rungs are kept in `fux-lab/corpora/golden-gen2/`. **The table below is
+2026-09-21's and is history.**
+
 ⚠ **Rebuilt 2026-09-21 on set 3's seed** — [the run](../regression/2026-09-21-ladder-set-3-rebuild/report.md).
 `seed/` grew from 20 documents to 28, so every rung **keeps its headline size**
 and carries eight fewer generated documents; `rung-seed` is the seed corpus and

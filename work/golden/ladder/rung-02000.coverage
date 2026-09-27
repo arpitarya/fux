@@ -1,8 +1,12 @@
 rung: rung-02000
 documents_indexed: 2000
-archived_declared: 202
-archived_in_index: 202
-superseded_declared: 202
-superseded_in_index: 202
+archived_declared: 199
+archived_in_index: 199
+superseded_declared: 199
+superseded_in_index: 199
 carrying_mtime: 2000
-categories: {"adjacent": 588, "filler": 391, "seed": 42, "sibling": 783, "variant": 196}
+categories: {"adjacent": 580, "filler": 386, "seed": 68, "sibling": 773, "variant": 193}
+documents_with_history: 12
+history_commits: 34
+history_authors: 9
+max_authors_per_document: 4
