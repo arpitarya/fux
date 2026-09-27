@@ -141,7 +141,7 @@ It is reproduced at all because this is the file every session reads first, and
 **for exactly as long as a test binds it** — remove the test and this block
 violates decision 1.
 
-[SR-LAWS](records/0001_LAWS.md) assigns the handles `L0`–`L8`, `L10` and `L11` and routes
+[SR-LAWS](records/0001_LAWS.md) assigns the handles `L0`–`L8`, `L10`, `L11` and `L12` and routes
 each to its record; that is all it does now.
 
 <!-- LAWS:BEGIN — GENERATED from records/*_LAW-*.md by scripts/gen-laws.py. Do not edit by hand: amend the record, then run `python scripts/gen-laws.py --write`. -->
@@ -264,7 +264,7 @@ each to its record; that is all it does now.
   in any state. **A retired set never carries a golden claim again** — no number
   measured on it is evidence about the engine's quality, because the family that
   reads it also tunes against it. The next generation is authored sealed, named
-  **`set-<gen>-<x|u>`** (`x` Codex-authored, `u` Claude-authored).
+  **`set-<gen>-<claude|codex>`**, by author (Arpit, 2026-09-27; `u` / `x` before).
   🔴 **The authoring carve-out survives, and it applies PER SET:** for each
   agent-authored set — set 2, set 3, and any later one — **one designated
   session** writes that set's
@@ -302,6 +302,7 @@ each to its record; that is all it does now.
   the session, and file it** before anything else. What Claude MAY read instead,
   the sets, the guards, the switch's mechanics and the benchmark process are
   [SR-WORK-GOLDEN](records/0066_WORK-golden.md)'s.
+- **L12** · **Every value lives in a config file, never in code.** A *tunable* value — a weight, threshold, limit, timeout, TTL or sample size — is read from a committed TOML file: `fux.toml`, `.fux/tune.toml`, or another `.fux/*.toml`. A *fixed* engine value — a schema id, a format or rules version, the shard count, an artefact file name — is read from the engine's internal constants file, `src/fux/constants.toml`, shipped inside both distributions. Python and Node read the same key from the same file. **A missing file or key is a hard error that names it; no module constant, function body or parameter default supplies a fallback.** The only places a literal value may sit are `setup.py` and `src/fux/templates/`, which write the config files, and `tests/`, `tests_e2e/`, `tools/` and `scripts/`.
 
 <!-- LAWS:END -->
 
@@ -466,7 +467,7 @@ is the surrounding process:
   questions *and* answers into `work/golden/retired/`, where they become
   ordinary reusable test data that **never carries a golden claim again**; `just
   golden-lock` puts every guard back byte-identically and the next generation is
-  authored sealed as `set-<gen>-<x|u>`. 🔴 **No agent runs any of those three, or
+  authored sealed as `set-<gen>-<claude|codex>`. 🔴 **No agent runs any of those three, or
   touches the file that holds the state** — that is the same breach as opening
   the key. A session that needs the key says it is blocked and stops.
   ⚠ **The paste route is RETIRED**, and **every golden number is `informed`

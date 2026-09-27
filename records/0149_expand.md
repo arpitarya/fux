@@ -11,7 +11,7 @@ owns: [src/fux/query/expand.py@3eb9647e4be9, src/fux/query/fuse.py@749673d52166,
 laws: [3, 4, 8]
 ratifies: W-109
 timestamp: 2026-09-05T00:00:00Z
-content_sha: f0295e386b293118db659d7b2f66f2357ed771f36293f2742c07f0e63e1113dc
+content_sha: eeed44f1de016c33bcfe4a13a18a40e09e61db49093af73b5326e73e394e2f90
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -322,7 +322,8 @@ A document that writes *"Mean Kinetic Temperature (MKT)"* has said the two
 spellings are one thing. When a query carries one side of such a pair and not
 the other, [`query/mined.py`](../src/fux/query/mined.py) adds the other side,
 scored through `Expansion` at `[ranking] mined_weight`
-([SR-TUNE](0135_tuning.md) decision 19), **default `0.0`, which reads no pair**.
+([SR-TUNE](0135_tuning.md) decision 19), **default `0.5` since its PASS on
+2026-09-27** (SR-TUNE decision 19a). `0.0` reads no pair.
 
 - **Why this is not decision 1's forbidden act, and not RM3.** Decision 15's
   distinction, applied again: the words are ones a **person wrote** in a
@@ -348,7 +349,10 @@ scored through `Expansion` at `[ranking] mined_weight`
   ([SR-RECORD](0109_index-record.md), `abbr`), the table folded at read time
   from the shards by the scan and from `mined.json` by the accelerator
   ([SR-T1-ACCELERATOR](0110_accelerator.md)). Nothing corpus-wide is committed.
-- ⚠ **Unmeasured.** It turns on only on a PASS against the frozen bar.
+- **Measured, and on.** PASS at `0.5` against the frozen bar, ratified by Arpit
+  on 2026-09-27 ([`VERDICT.md`](../work/regression/2026-09-27-mined-expansion/VERDICT.md)).
+  ⚠ 5 of its 6 wins lift a relevant document that is not the primary one: the
+  document that declares a pair carries both spellings, as the bar predicted.
 
 ### Consequences
 

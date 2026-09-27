@@ -57,7 +57,7 @@ valuable judgement, but not the state of play.
 ### 🔴 2026-09-25 — W-168 STEPS 6–10: THE AGENT HALF OF UNBLOCKING IS DONE; the data is Arpit's hand
 
 - **Every remaining step was blocked on DATA**, and step 10 also on a compare
-  doc. Generation 3 is specified as [prompt 11](golden/prompts/11-claude-gen3-feature-input-seed.md):
+  doc. Generation 3 is specified as prompt 11:
   a fresh claude.ai chat, the seed attached, five blocks back.
 - **Step 8's instrument exists**: `seed-history.tsv` → `tools/golden-history/`
   → the rung builder. No history = the old ladder, checked.
@@ -95,7 +95,7 @@ valuable judgement, but not the state of play.
 ### 🔴 2026-09-24 (later) — W-168 STEP 1's ARMS CAPTURED; the score is Arpit's (Claude Code, Opus)
 
 - **Ruled (Cowork):** steps 1 and 4 are judged by `hit@1` (`primary@1` beside
-  it) on set-3-u at `rung-01000`. The ruling came after the pools were seen, so
+  it) on set-3-claude at `rung-01000`. The ruling came after the pools were seen, so
   it is **informed**. Step 9's forks are ruled and parked by its pool.
 - **Step 1:** the pre-registration was amended and frozen before the first call
   (`cfca651a`): the tag, clause 3's hub read at rank 1, and `decide.py`. The five
@@ -119,7 +119,7 @@ valuable judgement, but not the state of play.
 - ✅ **W-215 is closed, and the score is in** ([run](regression/2026-09-24-golden-gen2-rung-01000/report.md)).
   Generation 2 misses at rank 1: 51 and 29 are reorderable. At rank 5 it
   misses only 21 and 4.
-- 🔴 **W-168:** only steps 1 (anchor, 14) and 4 (expansion, 10), on set-3-u
+- 🔴 **W-168:** only steps 1 (anchor, 14) and 4 (expansion, 10), on set-3-claude
   and at rank 1, have a pool of 6 or more. **Their endpoint is Arpit's.**
   - Step 9 stops (pool 2 and 1); its compare doc is parked.
   - Step 2 is W-205's.
@@ -390,7 +390,7 @@ number.**
   cheap option is not obviously the right one** — relabelling keeps the
   instrument and retires the property it existed for.
 - 🔴 **Nothing scored in that session may be cited**, for two independent
-  reasons: [prompt 6E](golden/prompts/6E-codex-score-ephemeral.md)'s own rule,
+  reasons: prompt 6E's own rule,
   and the breach. **It is filed and fenced** —
   [the run](regression/2026-09-16-golden-rung-00100/ANALYSIS.md) — and **no
   engine change may be made off it.** **No count in that run is labelled `blind`.**

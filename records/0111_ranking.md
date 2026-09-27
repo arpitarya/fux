@@ -11,7 +11,7 @@ feature: scoring, ordering, and the analyzer they share with ingest
 owns: [src/fux/query/rank.py@63a9c36a1894, src/fux/query/bm25f.py@aa37960fcdf7, src/fux/query/tokenize.py@1d8ff4a42048, src/fux/query/analyzer.py@38936c39de2a, src/fux/query/stem.py@728155482c94, node/src/query/analyzer.mjs@cee5e31828b2, node/src/query/bm25f.mjs@d7e52fcf5f89, node/src/query/rank.mjs@ba0f2173a355, node/src/query/stem.mjs@85a3f29571a6, node/src/query/tokenize.mjs@38c8b15c5197, node/test/analyzer.test.mjs@2d0342e628a6]
 laws: [L1, L3]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 64d0c9501089e8a409f1430e0347f1b361a5c7f48e2b06efa62296f13170d8cc
+content_sha: 1efd0faea903ac7ef3ee99009dd099341097b073efe591f6339220b02eb629dd
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -555,7 +555,7 @@ behind a tunable at zero and is defaulted on only by a PASS on a frozen
 pre-registration. That pre-registration is
 [`2026-09-15-anchor-text`](../work/regression/2026-09-15-anchor-text/PRE-REGISTRATION.md),
 and its [`VERDICT.md`](../work/regression/2026-09-15-anchor-text/VERDICT.md)
-is PASS at `anchor = 1.0` — `informed`, set-3-u only, one 1 000-document rung,
+is PASS at `anchor = 1.0` — `informed`, set-3-claude only, one 1 000-document rung,
 and **that is the whole of the ranking-quality claim**. The value is `ANCHOR`
 in `query/bm25f.py` and its Node twin, held equal by
 `tests/test_node_config_parity.py`. 🔴 **The differential law now holds at the

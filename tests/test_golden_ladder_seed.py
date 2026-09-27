@@ -51,6 +51,6 @@ def test_no_rung_carries_a_stale_seed_document(name):
     problems = rungs.seed_drift(name)
     assert not problems, (
         f"{name} was frozen against a different work/golden/seed/ than this repo "
-        f"now has. Rebuild it — work/golden/prompts/4-claude-corpus.md:\n  "
+        f"now has. Rebuild it — work/golden/README.md phase 4:\n  "
         + "\n  ".join(problems)
     )

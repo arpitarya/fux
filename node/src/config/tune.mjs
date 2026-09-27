@@ -41,6 +41,7 @@ import { FuxError } from "../errors.mjs";
 import { parseToml, wasFloat } from "./toml.mjs";
 import { ANCHOR, B, FIELD_WEIGHTS, K1, Scoring } from "../query/bm25f.mjs";
 import { DOC_COVERAGE_FLOOR, SEPARATION_FLOOR } from "../query/confidence.mjs";
+import { MINED_WEIGHT } from "../query/mined.mjs";
 import { TF_FIELDS } from "../store/format.mjs";
 import { cmpCodePoints } from "../compat/pyfloat.mjs";
 // `ask_kinds` is validated against the kinds the index mints, at load — the
@@ -155,8 +156,9 @@ export class Tune {
     this.rerankWeight = 0.0;
     this.expandWeight = 0.2;
     // W-168 step 4 — a spelling the corpus supplies (`query/mined.mjs`). 0 =
-    // off, and off reads no pair; it turns on only on a pre-registered PASS.
-    this.minedWeight = 0.0;
+    // off, and off reads no pair; the default MINED_WEIGHT (0.5) is ON since
+    // its pre-registered PASS on 2026-09-27.
+    this.minedWeight = MINED_WEIGHT;
     // [graph]
     this.damping = 0.85;
     this.iterations = 3;
@@ -435,7 +437,7 @@ export function loadTune(root, { enabled = true } = {}) {
 
   const rerankWeight = pick(ranking, "ranking", "rerank_weight", 0.0);
   const expandWeight = pick(ranking, "ranking", "expand_weight", 0.2);
-  const minedWeight = pick(ranking, "ranking", "mined_weight", 0.0);
+  const minedWeight = pick(ranking, "ranking", "mined_weight", MINED_WEIGHT);
 
   const graph = data.graph ?? {};
   const damping = pick(graph, "graph", "damping", 0.85, fraction);

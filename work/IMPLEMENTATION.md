@@ -108,20 +108,20 @@ Shipped per PRE-REGISTRATION §If it passes, in one change — committed as
 ## 2026-09-24 — **W-215 closed: generation 2 is on the ladder, and Arpit's score shows misses at rank 1**
 
 **Delivered:**
-- 14 seed documents, `set-2-u` and `set-3-u`;
+- 14 seed documents, `set-2-claude` and `set-3-claude`;
 - the ladder rebuilt on 42 seeds;
 - the step inputs measured: 17 anchor-distinctive terms, 9 `Term (ABBR)` pairs,
   a 21-line glossary.
 
 **Scored** (Arpit, `just golden-score`, `informed`), on the answerable questions:
 
-| | set-2-u | set-3-u |
+| | set-2-claude | set-3-claude |
 |---|---:|---:|
 | `hit@1` | 50 of 112 | 41 of 72 |
 | `hit@5` | 91 | 68 |
 | misses at rank 1 that are already in the top 10 | 51 | 29 |
 
-**Per-step pools**, from question text: only W-168 steps 1 and 4, on set-3-u
+**Per-step pools**, from question text: only W-168 steps 1 and 4, on set-3-claude
 and at rank 1, reach 6 (14 and 10). Step 9 stops at 2 and 1.
 
 **Not delivered:** item 6, a corpus with git history.
@@ -233,8 +233,8 @@ pool ≥ 6** (p = 0.031).
   names, **else it is refused**.
 - **Tests:** `tests/test_golden_score_layouts.py`, synthetic data under
   `tmp_path`. It never runs `score.main` past its guards.
-- ⚠ **The 2026-09-22 `set-2-u` score file still reads `"set": 2`.** It is
-  Arpit's output from the workaround. Read it as `set-2-u`.
+- ⚠ **The 2026-09-22 `set-2-claude` score file still reads `"set": 2`.** It is
+  Arpit's output from the workaround. Read it as `set-2-claude`.
 - **Docs:** golden README §Phase 6 and prompt 5 name the flat layout.
   SR-LAW-11's `owns:` hash for `tools/golden-score` was restamped; its text did
   not change.
@@ -575,13 +575,13 @@ gates has nothing to enforce while the hooks are down; and `just golden-guards`
 **says which state it found** rather than reporting a correct unlocked tree as
 FAIL, which would train whoever runs it to ignore a red line.
 
-**[Prompt 9](golden/prompts/9-claude-code-open-the-key.md) is RETIRED**, and the
+**Prompt 9 is RETIRED**, and the
 contrast is the point: it would have deleted the deny rules, the hook
 registration, the hook file and three decisions — one paste, one direction, no
 way back. What replaced it is reversible and per generation.
 
 ⚠ **Set 3's label is unconfirmed and nothing was renamed.** He said `set-2-x`; it
-is Claude-authored, so `set-2-u` was expected.
+is Claude-authored, so `set-2-u` was expected (renamed `-claude` / `-codex` on 2026-09-27).
 
 ---
 
@@ -1342,7 +1342,7 @@ archived. **5 012 unit tests, 144 e2e, 36 node — all green.**
 condition stays fired** — what the benchmark *is* after a key has reached a
 Claude context is still Arpit's ruling. Whether Codex may read the directory
 directly is a ruling he has not made; prompt 6 now says so instead of leaving
-the silence. [Prompt 9](golden/prompts/9-claude-code-open-the-key.md), which
+the silence. Prompt 9, which
 would **retire** L11, is unrun and untouched — L11 decision 8 makes a prompt in
 the repository no authorization at all — and gained a dated header naming the
 three things W-198 added that its steps 5 and 6 would otherwise leave
@@ -1373,7 +1373,7 @@ spent.**
 |---|---|
 | **the run** | filed with a breach banner, a provenance block, a scored overlay, and the `## Authorship` table the per-run contract row 7 had required since 2026-08-25 and the report **had never carried** |
 | **the labels** | set 1 `informed (L11 breach 2026-09-17)` · set 2 `informed` permanently · **no count in the run is labelled `blind`** |
-| **the numbers** | 🔴 **non-citable, for two independent reasons** — [prompt 6E](golden/prompts/6E-codex-score-ephemeral.md)'s own rule, and the breach. **Never pooled across sets** |
+| **the numbers** | 🔴 **non-citable, for two independent reasons** — prompt 6E's own rule, and the breach. **Never pooled across sets** |
 | **the gate** | refuses a committed path under a sealed-key directory **on both spellings**, answered from `git ls-files` so nothing is opened; and refuses any committed file carrying a golden id beside a key-only field |
 | **not shipped** | 🔴 **no engine change, no proposal, no tuning move** was made off these numbers, and none may be |
 | **not edited** | 🔴 **`PRE-REGISTRATION.md`** — a frozen pre-registration is never edited (SR-RS decisions 1, 10b) |
@@ -1532,7 +1532,7 @@ e2e, 36 Node; version parity across all 4 sites and the built bundle.
 | **SR-RS gains 22e and 22f** | a **control** is held to 22d too — a saturated one reports nothing, and an arm set needs one **shown** to spend its headroom; and regression headroom is measured **in the baseline arm**, because *right in both* reports what survived rather than what was at risk | [SR-RS](../records/0133_predictions.md) |
 | ✅ **W-144's control is built and proven** | `verbose` holds 30/30 across the ruled range and **breaks to 0/30 at `b = 0`**. Without it, `b = 0` and `b = 0.15` are **indistinguishable on every other instrument** — the blind spot was one value wide | [probe](regression/2026-09-16-b-sweep-2-control/report.md) |
 | 🔴 **W-144 → Arpit** | the ruled rule is **unsatisfiable**: `dump` is saturated at baseline and can never *net positive*. Strict → nothing ever clears; non-negative-where-saturated → `b = 0.15`. **Not chosen by the runner** | [W-144](../archive/open/W-144-structure-aware-extraction.md) |
-| ✅ **W-191 specified** | [prompt 7](golden/prompts/7-codex-link-bearing-seed.md) — 12 links, **3 documents findable ONLY by their anchor text**, one dense cluster; documents are **Codex's**. The per-rung `ref` census is **generated and exits 2 on zero**, so a link run gates rather than rediscovers | [census](../tools/quality-controls/ref_edge_census.py) |
+| ✅ **W-191 specified** | prompt 7 — 12 links, **3 documents findable ONLY by their anchor text**, one dense cluster; documents are **Codex's**. The per-rung `ref` census is **generated and exits 2 on zero**, so a link run gates rather than rediscovers | [census](../tools/quality-controls/ref_edge_census.py) |
 
 **Both suites green, whole.**
 
@@ -1613,10 +1613,10 @@ The directory is legally half-empty under §Per-run contract.
 
 | item | what landed | evidence |
 |---|---|---|
-| **the pipeline** | six prompts in the order Arpit runs them — 1 seed (documents only) · 2 Codex set 1 · 3 Claude set 2 · 4 corpus, blind · 5 run + hand-off · 6 score. **Prompt 1 no longer writes questions**, which is what let one prompt be re-run without disturbing the other | [`work/golden/prompts/`](golden/prompts/) |
+| **the pipeline** | six prompts in the order Arpit runs them — 1 seed (documents only) · 2 Codex set 1 · 3 Claude set 2 · 4 corpus, blind · 5 run + hand-off · 6 score. **Prompt 1 no longer writes questions**, which is what let one prompt be re-run without disturbing the other | `work/golden/prompts/` |
 | **sets are numbered** | set 1 (Codex, `s1-001…`), set 2 (Claude, `s2-001…`) — the author is a fact about a set, not its identity | [SR-WORK-GOLDEN](../records/0066_WORK-golden.md) decision 8 |
-| **release → two blocks** | each authoring prompt ends with block 1 (ids + text, Arpit commits) and block 2 (the key, Arpit keeps). The freeze-and-release prompt is **retired, not deleted** | [`RETIRED-codex-release.md`](golden/prompts/RETIRED-codex-release.md) |
-| **the hand-off** | 🔴 prompt 5 records what fux **answered and cited**, not only what it ranked. **The only place a golden answer and a fux answer meet is a chat Arpit attends** | [`5-claude-run.md`](golden/prompts/5-claude-run.md) |
+| **release → two blocks** | each authoring prompt ends with block 1 (ids + text, Arpit commits) and block 2 (the key, Arpit keeps). The freeze-and-release prompt is **retired, not deleted** | `RETIRED-codex-release.md` |
+| **the hand-off** | 🔴 prompt 5 records what fux **answered and cited**, not only what it ranked. **The only place a golden answer and a fux answer meet is a chat Arpit attends** | `5-claude-run.md` |
 | **the reset, stated** | the old key, `golden-answer/` and the 124 questions are deleted; **the seed corpus and eight rungs survive**; every old id is orphaned and **may not be compared** with anything scored from here | [`questions/README.md`](golden/questions/README.md) · W-189 (closed 2026-09-15) |
 | **what it does NOT buy** | ⚠ **no set exists yet and no number moved.** W-189 is in the Blocked-on-Arpit inbox and gates W-190, W-145, W-136 and W-87's recall half | [OPEN-WORK](OPEN-WORK.md) |
 
@@ -1627,7 +1627,7 @@ The directory is legally half-empty under §Per-run contract.
 | **L11 amended** | the law's subject moves from *the key directory is closed to Claude* to **the key is Arpit's custody and no agent may read one** — both sets one subject, **no key file anywhere an agent can reach**, the one route a paste and **Codex's alone**, Claude closed on every route | [SR-LAW-11](../records/0012_LAW-11-sealed-answer-key.md) decisions 2–4 |
 | **the authoring carve-out** | 🔴 exactly one handoff wide — the session that authors set A writes no file, hands the answers over in the chat, and **never runs a rung or returns**. Authorship buys no access | SR-LAW-11 decision 6 |
 | **two sets** | A (Claude, ids `a001…`) and B (Codex, ids `g001…`), same seed corpus and ladder, **run and reported apart**; 🔴 **never pooled** | [SR-WORK-GOLDEN](../records/0066_WORK-golden.md) decisions 8–11 |
-| **the per-run key question deleted** | *"(1) the file, or (2) the chat?"* removed from prompts 1, 3 and 5 — it had one answer left. Prompt 4 writes two prediction files; [`prompts/3-claude-questions.md`](golden/prompts/3-claude-questions.md) is new (**renumbered from `1a-claude-set-a.md`** later the same day) | SR-WORK-GOLDEN decision 10 |
+| **the per-run key question deleted** | *"(1) the file, or (2) the chat?"* removed from prompts 1, 3 and 5 — it had one answer left. Prompt 4 writes two prediction files; `prompts/3-claude-questions.md` is new (**renumbered from `1a-claude-set-a.md`** later the same day) | SR-WORK-GOLDEN decision 10 |
 | **difficulty, built** | [`tools/golden-difficulty/`](../tools/golden-difficulty/) — a **count of the discriminations a question forces** (`d ≤ 1` easy / `2` medium / `≥ 3` hard, unanswerable **floored at hard**) plus a per-rung distractor count. 🔴 Never derived from fux's own results; 🔴 **refuses a key path inside the repository**. `--selftest` green on six synthetic fixtures | SR-WORK-GOLDEN decision 13 · [W-190 → W-204](regression/2026-09-22-golden-final-score/FINAL-SCORE.md) |
 | **what it does NOT buy** | ⚠ **no number moved and no engine ran.** Set A is unwritten, both keys are still Arpit's to regenerate, and **every set A number will be `informed` permanently** — an assumption recorded in SR-LAW-11 decision 7, not Arpit's ruling | [`questions/README.md`](golden/questions/README.md) · W-189 (closed 2026-09-15) |
 
@@ -5588,9 +5588,9 @@ it closed by ratification, not by landing; see the W-27 row above.
 | W-205 part 1 front-matter identity keys | ✅ **PASS** (2026-09-21) — front-matter `doc_id`/`id`/`aliases` reach `title` and `tags` reaches `ctx`, against the frozen rule *all six reachable, and neither no-harm arm degrades*. **6 of 6 reachable on both rungs, 0 broke on the 43 id-queries, 0 of 60 top-1 changes on the set-1 control.** **Shipped.** 🔴 **The before-arm falsified the pre-registration's premise: 5 of the 6 were ALREADY reachable** — the analyzer splits, so the parts matched from body, headings and path while the whole identifier appeared nowhere. **One identifier was fixed; five moved to rank 1.** 🔴 **Second unmeasured premise of the session** (part 2's was the first), both generalising a correctly recorded single case; the candidate rule is SR-RS's and is put to Arpit. ⚠ **The id-query arm nets +6 in the direction it was NOT registered to test and the run does not claim it.** 🔴 **FOUND: the archived revision outranks the live document** on a shared `doc_id` (3/13 → 5/4) — a shared `doc_id` is what a superseded pair has, so this makes inversion MORE likely, and no arm here could see it | [W-205-PART-1-META-FIELDS](regression/2026-09-21-frontmatter-reachable/VERDICT.md) |
 | W-205 part 2 family (a) | 🔴 **INCONCLUSIVE** (2026-09-21) — `-`, `.` and `/` as identifier separators, against the frozen rule *net ≥ 6 on at least one rung, no rung ≥ 6 against*. **Measured +1 / +3 / +4** at 100 / 1 000 / 10 000 documents with **0 regressions at every rung**, and nets of 1–5 cannot clear α at any discordant count. **The change does NOT ship** by the pre-registration's own words; `ANALYZER_VERSION` stays `v2` and the branch is not merged (the mechanism is filed as `evidence/family-a.patch`). ✅ **The mechanism works — 33 of 33 seed identifiers survive whole, from 0 of 33**, on both readers, W-168's gate A met. 🔴 **THE FINDING: the failing shape did not fail.** All eight sibling identifiers set 3 was authored to supply ranked their own document **first in BOTH arms at every rung** — 0 fixed, 0 broke — because splitting is symmetric and the number is already a rare term. **All four fixes came from the OLD 33**, where the SEGMENTS are individually common (`GHY-7`, `RF-221`, `SANDHU-EXC`, `WIKI-NGP-DOCK-12`). ⚠ **The premise was never measured before the documents were written for it**; SR-RS d23c counts that an input is present, never that it exercises the defect. ⚠ **Improvement headroom was 14 of 43 against a floor of 6** — the run could have produced a result and did not. ⚠ **Monotone in corpus size and 10 000 is the ceiling**, so a trend is not a result. 🔴 **Cost: the dictionary ×2.101 at `rung-10000`** while postings move ×1.054 — mostly hyphenated PROSE. Both absolute conditions hold. **Three ways forward are Arpit's** | [W-205-PART-2-FAMILY-A](regression/2026-09-21-identifier-analyzer/VERDICT.md) |
 | W-213-BAND-OPERATING-POINT | ✅ **PASS** (2026-09-22) — the confidence band's operating point, against the frozen rule *one candidate floor clears the d19 paired bar in all three sets, in the same direction, at `rung-01000`*. **Nothing clears in the improving direction in any set**, so outcome 2 fires: **`separation_floor` stays `0.10`**, and a recorded negative that stops a threshold moving is a PASS, not a failure to find something. ⚠ **Not underpowered** — improvement headroom 49/64/65 against a floor of 6. 🔴 **THE FINDING IS BIGGER THAN THE GATE: the threshold is not misplaced — `separation` does not carry correctness.** Risk RISES as coverage falls on all three sets; the band withheld fewer wrong answers than a rate-matched coin in all three; **what it withheld was more likely RIGHT than what it answered**, and dropping the unanswerable class widens every gap. 🔴 **`0.00` — the clause OFF — did not clear either**, so *turn it off* has no more support than *lower it*. 🔴 **Not supported: that the band is worse than random** (three sets one way is p = 0.25 on a sign test; only set-3 is individually distinguishable). The one assumption it rests on is named: the proxy must under-detect correctness **equally on both sides of the gate**. W-176 gate 1 is Arpit's ruling and is **not** reversed here — **W-214** | [W-213-BAND-OPERATING-POINT](regression/2026-09-22-band-operating-point/VERDICT.md) |
-| W-168-STEP-1-ANCHOR | ✅ **PASS at `anchor = 1.0`** (ruled by Arpit 2026-09-24; the table said INCONCLUSIVE) — the anchor field, `[bm25f] anchor ∈ {0.5, 1.0, 2.0, 3.0}` vs `0.0`, `hit@1` on the 27 tagged questions of `set-3-u` at `rung-01000`. **`1.0` is first to clear the gain bar** (+7/−0, p = 0.016, floor 7; `2.0`/`3.0` +9/−0), untagged 0/0, **no baseline rank-1 hit lost at any weight**, and the hub never takes rank 1 on a miss, **but it climbs within 2–10 on two misses** (`s3u-009` 8→6, `s3u-043` 5→4), the half-moving case the pre-registration routes to Arpit — **ruled not a hub failure**: the right document stays ahead of the hub in both. **The default is not yet shipped** — §If it passes is Claude Code's, in one change. Reopen if the hub ever takes rank 1 on a miss. `informed`. | [VERDICT](regression/2026-09-15-anchor-text/VERDICT.md) |
-| W-168-STEP-4-MINED-EXPANSION | ✅ **PASS at `mined_weight = 0.5`** (the table said PASS; Arpit ratified 2026-09-27) — corpus-mined `Term (ABBR)` pairs folded into the query, `mined_weight ∈ {0.1, 0.2, 0.3, 0.5}` vs `0.0`, `hit@1` on the 22 tagged questions of `set-3-u` at a re-ingested copy of `rung-01000`. Wins/losses **2/0 · 4/0 · 5/0 · 6/0**; `0.5` is the first to clear, at exactly the floor of 6 (p = 0.031). **No baseline rank-1 hit lost at any weight**, untagged 0/0, `hit@10` 70 → 70. ⚠ 5 of 6 wins are non-primary relevant documents; the arms ran at `anchor = 0.0`, so the shipped `anchor = 1.0` combination is unmeasured. Reopen if a mined spelling costs a baseline rank-1 hit. `informed`. | [VERDICT](regression/2026-09-27-mined-expansion/VERDICT.md) |
-| W-168-STEP-5-RM3 | ❌ **FAIL — drift** (ruled by Arpit 2026-09-23; the table said INCONCLUSIVE) — RM3 pseudo-relevance feedback, `rm3_weight ∈ {0.1, 0.2, 0.3, 0.5}` vs `0.0`, `hit@1` on the 92 tagged questions of `set-2-u` at `rung-01000`. **No arm clears the gain bar** (nets −1/−1/+3/+2 against 7–10 needed) and **every arm breaks the drift bound** (6/8/8/11 baseline rank-1 hits lost); `hit@10` falls 102 → 89–94. The frozen table has no row for a positive sub-floor net with drift broken, and he filed it **FAIL**. **`rm3_weight` stays `0.0`** | [W-168-STEP-5-RM3](regression/2026-09-23-rm3/VERDICT.md) |
+| W-168-STEP-1-ANCHOR | ✅ **PASS at `anchor = 1.0`** (ruled by Arpit 2026-09-24; the table said INCONCLUSIVE) — the anchor field, `[bm25f] anchor ∈ {0.5, 1.0, 2.0, 3.0}` vs `0.0`, `hit@1` on the 27 tagged questions of `set-3-claude` at `rung-01000`. **`1.0` is first to clear the gain bar** (+7/−0, p = 0.016, floor 7; `2.0`/`3.0` +9/−0), untagged 0/0, **no baseline rank-1 hit lost at any weight**, and the hub never takes rank 1 on a miss, **but it climbs within 2–10 on two misses** (`s3u-009` 8→6, `s3u-043` 5→4), the half-moving case the pre-registration routes to Arpit — **ruled not a hub failure**: the right document stays ahead of the hub in both. **The default is not yet shipped** — §If it passes is Claude Code's, in one change. Reopen if the hub ever takes rank 1 on a miss. `informed`. | [VERDICT](regression/2026-09-15-anchor-text/VERDICT.md) |
+| W-168-STEP-4-MINED-EXPANSION | ✅ **PASS at `mined_weight = 0.5`** (the table said PASS; Arpit ratified 2026-09-27) — corpus-mined `Term (ABBR)` pairs folded into the query, `mined_weight ∈ {0.1, 0.2, 0.3, 0.5}` vs `0.0`, `hit@1` on the 22 tagged questions of `set-3-claude` at a re-ingested copy of `rung-01000`. Wins/losses **2/0 · 4/0 · 5/0 · 6/0**; `0.5` is the first to clear, at exactly the floor of 6 (p = 0.031). **No baseline rank-1 hit lost at any weight**, untagged 0/0, `hit@10` 70 → 70. ⚠ 5 of 6 wins are non-primary relevant documents; the arms ran at `anchor = 0.0`, so the shipped `anchor = 1.0` combination is unmeasured. Reopen if a mined spelling costs a baseline rank-1 hit. `informed`. | [VERDICT](regression/2026-09-27-mined-expansion/VERDICT.md) |
+| W-168-STEP-5-RM3 | ❌ **FAIL — drift** (ruled by Arpit 2026-09-23; the table said INCONCLUSIVE) — RM3 pseudo-relevance feedback, `rm3_weight ∈ {0.1, 0.2, 0.3, 0.5}` vs `0.0`, `hit@1` on the 92 tagged questions of `set-2-claude` at `rung-01000`. **No arm clears the gain bar** (nets −1/−1/+3/+2 against 7–10 needed) and **every arm breaks the drift bound** (6/8/8/11 baseline rank-1 hits lost); `hit@10` falls 102 → 89–94. The frozen table has no row for a positive sub-floor net with drift broken, and he filed it **FAIL**. **`rm3_weight` stays `0.0`** | [W-168-STEP-5-RM3](regression/2026-09-23-rm3/VERDICT.md) |
 | B1 | **INCONCLUSIVE** (2026-08-28) — `hit@5`, A vs B-core, tier 1 000, `N = 240`. Discordant count **0**, `p = 1.0` — but `hit@5` is **240/240 in BOTH arms at every tier** and MRR@10 is `1.0000`, so `pb` and `pc` are structurally zero and the null was determined by the corpus. **A power table says how many queries, never whether they are hard** | [B1-RETRIEVAL](regression/2026-08-28-benchmark-v1-vs-head/VERDICT.md) |
 | B2 | **FAIL** (2026-08-28) — supersession inversions, predicted PASS with B better; measured **0 discordant**. Both arms invert identically (21/40 at tier 1 000) because `superseded_weight` **ships at `1.0`**. ⚠ **Unlike B1 this endpoint HAD power** — both halves visible for every query, a coin-flip inversion rate. Post-hoc at `0.5`: 21/40 → 0/40. 🔴 **Not an argument for changing the default** — [P-SUPERSEDE](regression/2026-08-25-supersession-and-reranker-default/VERDICT.md) failed exactly that, and this corpus cannot see the case that broke it | [B2-SUPERSESSION](regression/2026-08-28-benchmark-v1-vs-head/VERDICT-B2.md) |
 | B3 | **PASS** (2026-08-28) — committed bytes **1.002 ×** at 1 000 docs and **0.998 ×** at 10 000 against a **1.25 ×** bar; published wheel **7.11 MB → 259 KB**. **`HEAD` commits no per-chunk `int8` vectors** — the one thing B3 named to check, read from a record in each arm's index | [B3-BYTES](regression/2026-08-28-benchmark-v1-vs-head/VERDICT-B3.md) |

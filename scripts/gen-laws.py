@@ -56,7 +56,7 @@ CLAUDE_MD = ROOT / "CLAUDE.md"
 #: is the one failure a stable handle exists to prevent.
 #:
 #: **Ten live laws, twelve numbers.**
-LAW_ORDER = ("L0", "L1", "L2", "L3", "L4", "L6", "L7", "L8", "L10", "L11")
+LAW_ORDER = ("L0", "L1", "L2", "L3", "L4", "L6", "L7", "L8", "L10", "L11", "L12")
 
 BEGIN = "<!-- LAWS:BEGIN"
 END = "<!-- LAWS:END -->"

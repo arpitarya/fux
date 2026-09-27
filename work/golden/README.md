@@ -62,7 +62,7 @@ and this file states none of it**; the mechanics are
 [SR-WORK-GOLDEN](../../records/0066_WORK-golden.md) decision 15. What matters
 here is the *process* shape: the lift is **per generation of test data**, not
 once and for ever — a scored set retires into ordinary reusable data and the
-next generation is authored sealed as `set-<gen>-<x|u>`. ⚠ **The paste route is
+next generation is authored sealed as `set-<gen>-<claude|codex>`. ⚠ **The paste route is
 retired**, and **every golden number is `informed` permanently from the first
 unlock.**
 
@@ -93,9 +93,9 @@ force: every answer half is Arpit's, in the chat, at his choice.
 - **Every id from the old set (`g001…`) is orphaned and never reused.** Filed
   predictions and regression rows keyed to them stay as history and **may not be
   compared** with anything scored on set 1, set 2 or set 3.
-- **Prompt 1 is not needed** — it rebuilds the corpus from nothing. The live
-  entry point is [prompt 4](prompts/4-claude-corpus.md) whenever `seed/` changes,
-  and [prompt 5](prompts/5-claude-run.md) to run the sets.
+- **The corpus is never rebuilt from nothing.** Whenever `seed/` changes the
+  ladder is rebuilt (phase 4), and the sets are run by phase 5. New data is
+  authored under [SR-WORK-TESTDATA](../../records/0068_WORK-test-data.md).
 
 
 ### Custody — Arpit holds both sets; one guarded directory, his alone (2026-09-18)
@@ -145,7 +145,7 @@ itself is [`FINAL-SCORE.md`](../regression/2026-09-22-golden-final-score/FINAL-S
 
 ⚠ **`work/golden/questions/` is empty of sets now**, and the key directory is
 closed again. **The next generation is authored SEALED** and named
-`set-<gen>-<x|u>` (`x` Codex, `u` Claude) — L11 decision 14. ⚠ **These three kept
+`set-<gen>-<claude|codex>` by author (`u` / `x` before 2026-09-27) — L11 decision 14. ⚠ **These three kept
 their original names**, because they retired before any rename, so the
 convention begins with generation 2.
 
@@ -155,7 +155,7 @@ convention begins with generation 2.
 
 | | **set 1** | **set 2** | **set 3** |
 |---|---|---|---|
-| questions **and** answers written by | **Codex** — [prompt 2](prompts/2-codex-questions.md) | **Claude**, from `seed/` only — [prompt 3](prompts/3-claude-questions.md) | **Claude**, from `seed/` only — [prompt 3](prompts/3-claude-questions.md) |
+| questions **and** answers written by | **Codex** — prompt 2 | **Claude**, from `seed/` only — prompt 3 | **Claude**, from `seed/` only — prompt 3 |
 | ids | `s1-001…` | `s2-001…` | `s3-001…` |
 | released file | `questions/set-1.jsonl` | `questions/set-2.jsonl` | `questions/set-3.jsonl` |
 | predictions / hand-off | `predictions-set-1.jsonl` · `handoff-set-1.jsonl` | `predictions-set-2.jsonl` · `handoff-set-2.jsonl` | `predictions-set-3.jsonl` · `handoff-set-3.jsonl` |
@@ -215,7 +215,6 @@ work/golden/
   questions/README.md           what they omit, and the cost of them existing before the corpus
   ladder/rung-NNNNN.sha256      frozen manifests: which files make each rung, by hash
   ladder/rung-NNNNN.index       the engine version AND COMMIT, and the index root hash, each rung was built with
-  prompts/                  the SIX paste-ready prompts, in the order Arpit runs them
 ```
 
 **The ladder corpus itself lives in `~/my_programs/fux-lab/corpora/golden/`**,
@@ -261,62 +260,43 @@ waits on 10 000.
 
 ---
 
-## The prompts, in the order Arpit runs them
+## Prompts — written when needed, from SR-WORK-TESTDATA, then deleted (Arpit, 2026-09-27)
 
-**One prompt per step, and he runs them himself** — the pipeline is deliberately
-not a pipeline an agent can drive end to end, because the two places answers exist
-are both in his hands.
+🔴 **There are no standing prompts.** The thirteen that authored generations 1–3
+(seed, question sets, rungs, run, score) were deleted on 2026-09-27 — their data
+exists, and git history holds the text (`git log --diff-filter=D --
+work/golden/prompts/`).
 
-| # | who | reads | writes | prompt |
-|---|---|---|---|---|
-| **1** | Codex | nothing from fux | `seed/`, `seed/archive/`, `seed-dates.tsv` — **documents only** | [`1-codex-seed.md`](prompts/1-codex-seed.md) |
-| **2** | Codex | `seed/` | **set 1** questions + answers → **two blocks in the chat** | [`2-codex-questions.md`](prompts/2-codex-questions.md) |
-| **3** | Claude, **one session per set, that then leaves** | `seed/` **only** | **set N** questions + answers → **two blocks in the chat**, no file; a third block of **seed additions** when that set carries a missing input (set 3 does) | [`3-claude-questions.md`](prompts/3-claude-questions.md) |
-| **4** | Claude Code | `seed/` **only** | verifies the eight rungs; builds or repairs the corpus in fux-lab + `ladder/*.sha256` | [`4-claude-corpus.md`](prompts/4-claude-corpus.md) |
-| **5** | Claude Code | the ladder + every released `questions/set-N.jsonl` | `predictions-set-N.jsonl`, **`handoff-set-N.jsonl`** and `report.md`, **one pair per set** | [`5-claude-run.md`](prompts/5-claude-run.md) |
-| **6** | Codex | the hand-off files + **the keys, pasted by Arpit** | per-query results **without answers**, per set | [`6-codex-score.md`](prompts/6-codex-score.md) |
-| **10** | Claude, **an isolated claude.ai chat, one per set** | the seed corpus, **attached — nothing else** | **seed additions** that carry the inputs four ranking features act on (T4, T5, T6) + `set-3-u` → **four blocks in the chat**, no file | [`10-claude-feature-input-seed.md`](prompts/10-claude-feature-input-seed.md) |
-| **11** | Claude, **an isolated claude.ai chat — the one designated `set-4-u` author** (Arpit, 2026-09-25) | the seed corpus, **attached — nothing else** | generation 3: **seed additions + seed history** carrying W-168 steps 6–10's inputs (T1, T11) + `set-4-u` → **five blocks in the chat**, no file; block 3 feeds `seed-history.tsv`, replayed by [`tools/golden-history/`](../../tools/golden-history/README.md) | [`11-claude-gen3-feature-input-seed.md`](prompts/11-claude-gen3-feature-input-seed.md) |
+**When new test data is needed, a new prompt is written from
+[SR-WORK-TESTDATA](../../records/0068_WORK-test-data.md)** — the one maintained
+source of what test data must carry (`T1…T14`), how it is authored (`A1…A24`)
+and the input each ranking feature needs (`R1…R10`). The prompt copies the rows
+it needs, links the record, names what it does **not** carry, and is **deleted
+in the change that commits its data**. On any disagreement the record wins, and
+a rule a prompt needs that the record lacks is added to the record first.
+`tests/test_test_data_prompts.py` fails on a prompt that does not link it.
 
-🔴 **Every prompt that creates test data is authored against [SR-WORK-TESTDATA](../../records/0068_WORK-test-data.md)** — the fourteen-item checklist — and names the items it carries in its first lines. `tests/test_test_data_prompts.py` fails when one does not, and when a new prompt file is not classified.
+**The steps a generation still goes through, and who does each:**
 
-**Between 2/3 and 4, Arpit commits block 1 of each handoff** as
-`questions/set-N.jsonl`, and keeps block 2 — the key — himself. **Prompt 3 is run
-once per agent-authored set**, in its own session; when that set carries seed
-additions (block 3) he commits them into `seed/` and **prompt 4 rebuilds the
-ladder** before anything is run.
+| step | who | reads | produces |
+|---|---|---|---|
+| seed additions + a question set | **one designated session per set** (A1) | `seed/` only (A2) | fenced blocks in the chat, no file (A3): documents, dates, history, released questions, **the key** |
+| commit | **Arpit** | the blocks | documents → `seed/`, rows → `seed-dates.tsv` / `seed-history.tsv`, questions → `questions/set-<gen>-<claude\|codex>.jsonl`; **the key he keeps** |
+| rebuild the ladder | Claude Code | `seed/` only (A23) | phase 4 below |
+| run | Claude Code | the ladder + released questions | phase 5 below |
+| score | per [L11](../../records/0012_LAW-11-sealed-answer-key.md) decision 14 | the hand-offs + the key | phase 6 below |
 
-⚠ **[`prompts/7-codex-link-bearing-seed.md`](prompts/7-codex-link-bearing-seed.md)
-and [`prompts/8-codex-identifier-questions.md`](prompts/8-codex-identifier-questions.md)
-are OPTIONAL and on no critical path** (Arpit, 2026-09-20: *"no feature waits on
-Codex"*). What they were blocking is carried by set 3. **Prompt 7 is still worth
-running whenever Codex is free** — its links would be `blind` where set 3's are
-`informed` permanently — and prompt 8 was **withdrawn** as an unblock by the
-2026-09-18 headroom run, which measured the headroom below the floor whatever
-questions are written.
-
-**Between 5 and 6, he carries the two `handoff-set-N.jsonl` files to Codex** and
-pastes the keys there. 🔴 **That hop is the whole design**: it is the only point
-where a question's answer and fux's answer are ever in the same place, and the
-party holding both is a person, not an agent.
-
-⚠ **[`prompts/RETIRED-codex-release.md`](prompts/RETIRED-codex-release.md) is kept
-and must not be run.** Its three jobs moved on 2026-09-15 — the file says where.
-
-⚠ **[`prompts/6E-codex-score-ephemeral.md`](prompts/6E-codex-score-ephemeral.md)
-is prompt 6 by subtraction** (Arpit, 2026-09-17): it writes no file, stores no
-key, and does not pool — so **its numbers are lower bounds and are NOT a filed
-run** under [SR-RS](../../records/0133_predictions.md) decision 10a, and may be
-cited nowhere. It answers *"where does the engine stand"* in a chat that is then
-closed. **Prompt 6 is still the one that produces evidence.**
+🔴 **The hop between run and score is the whole design**: it is the only point
+where a question's answer and fux's answer meet, and the party holding both is a
+person, not an agent.
 
 ### Order is load-bearing, and one part of it is only honour
 
-**Prompt 4 should run before 2 and 3.** A rung built by a session that could have
-read a question is `informed` for good, and `questions/` is on disk from the
-moment Arpit commits block 1.
+**The rung build should run before a set is committed.** A rung built by a
+session that could have read a question is `informed` for good, and
+`questions/` is on disk from the moment Arpit commits the released block.
 
-⚠ **Where the order cannot be kept, prompt 4 is on its honour** — the session
+⚠ **Where the order cannot be kept, the rung build is on its honour** (A23) — the session
 building the corpus reads `seed/` and nothing else and says so in its report.
 **Nothing mechanical enforces this**, which is why it is written here in full
 rather than assumed.
@@ -325,10 +305,10 @@ rather than assumed.
 
 ## Phase 1 — the seed corpus (Codex)
 
-- **The company and the ten documents are specified in
-  [`prompts/1-codex-seed.md`](prompts/1-codex-seed.md)** — *Quillfern Cold
-  Logistics*, a fictional Indian cold-chain company, and a roster of ten documents
-  that deliberately disagree in format, size, quality and authorship.
+- **The company and the rules for its documents are
+  [SR-WORK-TESTDATA](../../records/0068_WORK-test-data.md) A17–A22** — *Quillfern
+  Cold Logistics*, a fictional Indian cold-chain company, whose documents
+  deliberately disagree in format, size, quality and authorship.
 - **Why messy on purpose (Arpit, 2026-09-11):** real organisational knowledge is
   legacy YAML, emails, wiki exports, shift logs and half-updated policies written
   by professionals and amateurs and edited by several people. A benchmark of tidy
@@ -336,11 +316,12 @@ rather than assumed.
 - ⚠ **Claude wrote the brief — the company, the cast and the document roster —
   but no facts.** Every number, date, threshold, incident and decision is Codex's
   invention, so the answer-bearing details were never authored by Claude.
-- **Feature coverage is part of prompt 1:** superseding pairs with `supersedes:`
+- **Feature coverage was part of the seed from the start** (recipe R5): superseding pairs with `supersedes:`
   in frontmatter, archived documents under `seed/archive/`, and a date per seed in
   `seed-dates.tsv` — see *Feature coverage* below.
-- ⚠ **Prompt 1 writes documents only since 2026-09-15.** The questions that used
-  to be its part B are now prompts 2 and 3, one per set.
+- ⚠ **Documents and questions have been authored separately since 2026-09-15**
+  — generation 1's base seed by Codex, later additions by one designated session
+  per set (A1).
 
 ---
 
@@ -369,7 +350,7 @@ Each produces **~120–125 questions**, roughly:
 
 - `relevant` = **every** document that helps answer it; `primary` = the best one.
 - `unanswerable` → `answerable: false`, `relevant: []`, `answer: ""`.
-- `sealed` is marked by the author, in its own key block — prompts 2 and 3.
+- `sealed` is marked by the author, in its own key block — SR-WORK-TESTDATA A12.
 - 🔴 **`difficulty` is not hand-written.** It is the object
   [`tools/golden-difficulty/`](../../tools/golden-difficulty/) computes — see
   *Difficulty* below — and an author who types `"difficulty": "medium"` has
@@ -450,12 +431,12 @@ on data that contains the input it acts on.** This table is that declaration.
 
 | feature | input fux reads | set up by | documents that exercise it | questions |
 |---|---|---|---|---:|
-| `superseded_weight` | `supersedes:` in the newer doc's frontmatter | Codex, [prompt 1](prompts/1-codex-seed.md) part A §3 | 4 pairs: `11-decision-telematics-vendor-2026.md` → `05-…-2023.md` · `12-rate-card-2026-h2.md` → `07-rate-card-and-surcharges.md` · `13-dock-scheduling-rules-2026.md` → `09-dock-scheduling-wiki-export.html` · `15-customer-notification-matrix-2026.md` → `14-…-2025.md` | 12 |
+| `superseded_weight` | `supersedes:` in the newer doc's frontmatter | Codex, prompt 1 part A §3 | 4 pairs: `11-decision-telematics-vendor-2026.md` → `05-…-2023.md` · `12-rate-card-2026-h2.md` → `07-rate-card-and-surcharges.md` · `13-dock-scheduling-rules-2026.md` → `09-dock-scheduling-wiki-export.html` · `15-customer-notification-matrix-2026.md` → `14-…-2025.md` | 12 |
 | `archived_weight` | a directory declared `archived=true` | Codex places files in `seed/archive/`; each rung declares it (phase 4) | 5 docs in `seed/archive/`: `a01-sop-temperature-excursion-rev2.md` · `a02-kalpa-alert-routing-guide-2021.md` · `a03-dock-scheduling-wiki-2021.html` · `a04-driver-hours-policy-2019.md` · `a05-induction-checklist-2020.txt` | 9 |
 | `recency` | commit time per file | Codex writes `seed-dates.tsv`; each rung commits at those dates (phase 4) | all 20 seed documents, dated 2019-08-12 → 2026-07-01 | 7 |
 | abstention | unanswerable questions | Codex, prompt 2 | — | 12 |
 | `heading` negative control | heading-matched distractors | Claude, phase 4 `sibling` documents | 32 at rung 100, rising to 392 at rung 1 000 — `ext/sibling/` documents reusing the seed documents' **headings and document types** (Temperature Excursion Response SOP, Rate card and surcharges, Customer notification matrix, Dock scheduling rules, …) with a different company, people, facilities and every number changed | — |
-| **anchor text · graph walk · graph coherence** | a `ref` edge — an inline markdown link in a body whose target resolves to another ingested document | 🔴 **NOBODY. `ref` edges: 0 on every rung** — requested as [prompt 7](prompts/7-codex-link-bearing-seed.md), not yet written | **0 measurable** |
+| **anchor text · graph walk · graph coherence** | a `ref` edge — an inline markdown link in a body whose target resolves to another ingested document | 🔴 **NOBODY. `ref` edges: 0 on every rung** — requested as prompt 7, not yet written | **0 measurable** |
 
 A feature with no row, or a row still showing *(filled by …)*, **is not measurable
 yet** — say so in the pre-registration instead of running.
@@ -643,19 +624,19 @@ seed documents are in `rung-10000`. Re-verified after the 2026-09-15 rebuild.
 
 ---
 
-## Between the prompts — what Arpit commits, and what he keeps
+## Between authoring and running — what Arpit commits, and what he keeps
 
-**This replaced the freeze-and-release step on 2026-09-15.** Each authoring
-prompt ends with two fenced blocks and he splits them:
+**This replaced the freeze-and-release step on 2026-09-15.** Each author ends
+with fenced blocks (SR-WORK-TESTDATA A3) and he splits them:
 
 1. **Block 1 → the repository.** `{"id", "question"}` only, committed as
-   `questions/set-1.jsonl` / `set-2.jsonl`. No `type`, no `answerable`, no
+   `questions/set-<gen>-<claude|codex>.jsonl`. No `type`, no `answerable`, no
    `difficulty`, no `sealed`. 🔴 **Ids carry no type signal** — each author
    permutes its rows before numbering, or the `unanswerable` slice can be
    abstained on by arithmetic.
 2. **Block 2 → Arpit.** The full key, all fields, **including the 20 % sealed
-   holdout the author marked**. It never touches disk; he pastes it into prompt 6
-   when a run needs scoring.
+   holdout the author marked**. It never touches disk; he brings it to
+   scoring (phase 6) when a run needs it.
 
 ⚠ **`ladder/KEY.sha256` is not written any more.** It pinned a key file, and
 there is no key file — the pin now lives with whoever holds the key, which is the
@@ -712,7 +693,7 @@ point of custody. A changed key is still a new `key_version`, never an edit.
 > and **flat**, `evidence/handoff-set-*.jsonl` — and takes a flat hand-off's rung
 > from the run's `PRE-REGISTRATION.md` (a `rung:` frontmatter line, or the one
 > rung it names), or from a third argument. A set is named as filed: `1` for
-> generation 1, `2-u` for `set-2-u` (W-218, 2026-09-23).
+> generation 1, `2-u` for `set-2-claude` (W-218, 2026-09-23).
 
 - Compare the hand-off with the key **Arpit pastes**. **Return no answer text and no relevant
   document names.**

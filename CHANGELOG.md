@@ -10,11 +10,17 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Added
 
-- **Corpus-mined expansion, off by default (W-168 step 4).** When a document
-  writes *"Mean Kinetic Temperature (MKT)"*, a query that says *MKT* can also
-  score the long form, and the reverse, at `[ranking] mined_weight`. The
-  default `0.0` reads nothing and ranks exactly as before. It is unmeasured;
-  a pre-registered run decides whether it turns on.
+- **Corpus-mined expansion, on by default (W-168 step 4).** When a document
+  writes *"Mean Kinetic Temperature (MKT)"*, a query that says *MKT* also
+  scores the long form, and the reverse, at `[ranking] mined_weight`, default
+  **`0.5`**. The value was measured before it was turned on: 6 wins, 0 losses,
+  and no baseline rank-1 hit lost, on one 1 000-document test set
+  ([verdict](work/regression/2026-09-27-mined-expansion/VERDICT.md)).
+  ⚠ **This changes ranking on upgrade**, because no released `tune.toml`
+  carries the key. Set `mined_weight = 0.0` to keep the old ranking. It was
+  measured with the anchor field off, so its combination with the default
+  `anchor = 1.0` is unmeasured. `--no-tune` leaves it on, because it restores
+  the defaults. `fux lexical` never uses it.
 
 ### Changed
 

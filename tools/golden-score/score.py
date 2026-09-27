@@ -193,8 +193,9 @@ def set_label(value: str) -> str:
     any score from `2026-09-22-golden-set-2u-rung-01000` as `set-2-u` whatever
     its `"set"` field says.**
     """
-    if not re.fullmatch(r"\d+(-[xu])?", value):
-        raise argparse.ArgumentTypeError(f"{value!r} is not a set name: expected `1` or `2-u`")
+    if not re.fullmatch(r"\d+(-(claude|codex|[xu]))?", value):
+        raise argparse.ArgumentTypeError(
+            f"{value!r} is not a set name: expected `1`, `4-claude` / `4-codex`, or legacy `2-u`")
     return value
 
 
@@ -206,7 +207,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--rung", required=True)
     ap.add_argument("--arm", required=True)
     ap.add_argument("--set", dest="set_n", type=set_label, required=True,
-                    help="the set's name: `1` for generation 1, `2-u` for set-2-u (L11 d14)")
+                    help="the set's name: `1` for generation 1, `4-claude` for set-4-claude, legacy `2-u` for runs filed before 2026-09-27 (L11 d14)")
     ap.add_argument("--allow-partial", action="store_true")
     args = ap.parse_args(argv)
 

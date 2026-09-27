@@ -214,7 +214,7 @@ def cmd_lock(_args) -> int:
     shutil.rmtree(STATE_DIR)
     print("LOCKED. settings.json restored byte-identically; the guards are back.")
     print("  verify with:  just golden-guards")
-    print("  the next generation of test data is authored SEALED — `set-<gen>-<x|u>`.")
+    print("  the next generation of test data is authored SEALED — `set-<gen>-<claude|codex>`.")
     return 0
 
 
@@ -291,7 +291,7 @@ def cmd_retire(args) -> int:
         "retired tier is named around that guard rather than through it.\n\n"
         "Retired under [L11](../../../../records/0012_LAW-11-sealed-answer-key.md)\n"
         "decision 14 by `just golden-retire`. The sealed successor is the next\n"
-        "generation, named `set-<gen>-<x|u>`.\n",
+        "generation, named `set-<gen>-<claude|codex>`.\n",
         encoding="utf-8",
     )
     print(f"RETIRED {name} -> {dest.relative_to(ROOT)}")

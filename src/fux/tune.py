@@ -72,6 +72,7 @@ from pathlib import Path
 
 from .errors import FuxError
 from .query.bm25f import ANCHOR, B, FIELD_WEIGHTS, K1, Scoring
+from .query.mined import MINED_WEIGHT
 from .query.confidence import DOC_COVERAGE_FLOOR, SEPARATION_FLOOR
 from .store import TF_FIELDS
 
@@ -271,16 +272,17 @@ class Tune:
     #: W-168 step 4 — the weight of a spelling the CORPUS supplies: the other
     #: side of a `Long Form (ABBR)` pair some document declares, added when the
     #: query carries one side and not the other ([`query/mined.py`](query/mined.py)).
-    #: **Default `0.0`: OFF**, and off reads no pair at all, so the default is
-    #: byte-identical to the engine before the key existed. It turns on only on
-    #: a PASS against the frozen bar,
+    #: **Default `MINED_WEIGHT` (`0.5`), ON since its PASS on 2026-09-27**
+    #: against the frozen bar,
     #: `work/regression/2026-09-27-mined-expansion/PRE-REGISTRATION.md`.
+    #: `0.0` turns it off, and off reads no pair at all, so `0.0` is
+    #: byte-identical to the engine before the key existed.
     #:
     #: Its own key and not `expand_weight`, because the arms sweep it and a
     #: sweep of `expand_weight` would move every caller's `--expand` too. It
     #: stacks on `--expand`; a hash both supply keeps the caller's weight.
     #: `fux lexical`, the frozen baseline verb, never folds.
-    mined_weight: float = 0.0
+    mined_weight: float = MINED_WEIGHT
 
 
     # [graph]
@@ -658,9 +660,9 @@ def load(root: Path, *, enabled: bool = True) -> Tune:
         else 0.2
     )
     mined_weight = (
-        _non_negative(c, "ranking", "mined_weight", ranking["mined_weight"], 0.0)
+        _non_negative(c, "ranking", "mined_weight", ranking["mined_weight"], MINED_WEIGHT)
         if "mined_weight" in ranking
-        else 0.0
+        else MINED_WEIGHT
     )
 
     graph = data.get("graph", {})
@@ -882,7 +884,8 @@ rerank_weight           = {d.rerank_weight}   # 0 = off; the proximity reranker'
 expand_weight           = {d.expand_weight}   # Query2doc's 1:5; unmeasured on your corpus
 # A spelling the corpus supplies: when a query says MKT and some document
 # declares "Mean Kinetic Temperature (MKT)", the other side is added at this
-# weight. 0 = OFF, the default: it turns on only on a passing pre-registered run.
+# weight. 0 = OFF. The default 0.5 is MEASURED: it passed its pre-registered run
+# on 2026-09-27.
 mined_weight            = {d.mined_weight}
 
 [graph]                         # explain / graph / path

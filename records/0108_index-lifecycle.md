@@ -10,7 +10,7 @@ feature: generation and update of the committed index, and the refusal that keep
 owns: [src/fux/store@88b1982d1a60, node/src/store/format.mjs@affceafdd3a0, node/src/store/reader.mjs@f47fa69ecb2c]
 laws: [L1, L2, L3, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 5a89c8ee83adf440d3ea889b427fe1f88b12f278def1dcbdbe225fc23b03c3a9
+content_sha: ec611c0c15fd4f55764d921f2a6670bd05f728a139989fd09a565d703ae94444
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -419,6 +419,9 @@ abbreviations or predates the miner.
 - ⚠ **The ladder rungs are v4 and this engine refuses them.** They were stale
   for generation 3 already; the prompt-4 rebuild writes v5. Step 4's arms run on
   a re-ingested copy, never on a rung ([the bar](../work/regression/2026-09-27-mined-expansion/PRE-REGISTRATION.md)).
+- **The weight's default moving to `0.5`** (2026-09-27, [SR-TUNE](0135_tuning.md)
+  decision 19a) **does not touch `_format`.** Nothing committed is a function
+  of the weight, so v5 serves both.
 
 **15a. The stray-hash tripwire admits `abbr`'s hashes by name**, as 14a admits
 `at`'s. A long form's token need not be in the document's own `terms` (a

@@ -24,7 +24,7 @@ here. Read that record before changing anything below it.
 | what he decides | filed | age |
 |---|---|---|
 
-*Empty since 2026-09-27 — step 4 ratified PASS at `0.5`. Next decision: scoring `set-4-u` after the rung rebuild (W-168).*
+*Empty since 2026-09-27 — step 4 ratified PASS at `0.5`. Next decision: scoring `set-4-claude` after the rung rebuild (W-168).*
 
 ---
 
@@ -33,6 +33,7 @@ here. Read that record before changing anything below it.
 ### fux build
 
 - 🟢 **W-168** · `agent` — the ranking ideas. **Step 4 (abbreviations) ratified PASS 2026-09-27**: ship `mined_weight = 0.5` as the default. Then a fresh prompt-4 session rebuilds the eight rungs for generation 3. [detail](open/W-168-search-improvements.md)
+- 🟢 **W-225** · `agent` — L12 migration, not built. Step 1 ruled (R1–R6 accepted); ~580 sites to move to TOML or `constants.toml`. [detail](open/W-225-values-live-in-config.md)
 
 
 ### testing

@@ -35,7 +35,8 @@ _default:
 #   just golden-score work/regression/2026-09-22-golden-set-2u-rung-01000
 #
 # Scores land in <run>/scores/<arm>/<rung>/set-<name>.json, where <name> is `1`
-# for a generation-1 set or `2-u` for generation 2's `set-2-u`. Every number
+# for a generation-1 set, `4-claude` for `set-4-claude`, or legacy `2-u` for a run
+# filed before the 2026-09-27 rename. Every number
 # produced is `informed` permanently — decision 13, and decision 7's reasoning.
 #
 # A flat hand-off (<run>/evidence/handoff-set-*.jsonl) takes its rung from the

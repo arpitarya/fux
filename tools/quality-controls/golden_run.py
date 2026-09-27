@@ -25,7 +25,7 @@ are large and the funnel needs five numbers.
 🔴 **`--sets` takes NAMES and is REQUIRED (2026-09-22, W-215).** It was a list of
 integers with a `1,2,3` default until generation 1 retired — and the moment those
 three files moved to `retired/`, that default named nothing that exists. L11
-decision 14 names the next generation `set-<gen>-<x|u>` (`set-2-u`, `set-3-x`),
+decision 14 names sets `set-<gen>-<claude|codex>` (`set-4-claude`, `set-5-codex`; legacy `set-2-claude`),
 which is not an integer, so the token is now whatever sits between `set-` and
 `.jsonl` and it is written out in the file names this run produces.
 
@@ -33,7 +33,7 @@ which is not an integer, so the token is now whatever sits between `set-` and
 which generation is current, and a run that guesses wrong files a complete-looking
 hand-off for the wrong set. Naming the sets on the command line is how a run says
 which ones it actually asked — and a named set with no file is **refused**, never
-skipped, because *this rung has no set-2-u rows* and *set-2-u was never asked* are
+skipped, because *this rung has no set-2-claude rows* and *set-2-claude was never asked* are
 indistinguishable in the evidence afterwards.
 
 ⚠ **Reads `id` and `question` from `work/golden/questions/` and nothing else**,
@@ -41,7 +41,7 @@ which is what SR-WORK-GOLDEN decision 2 permits. It opens no other path under
 `work/golden/` except the rung's own manifest.
 
     python3 tools/quality-controls/golden_run.py --rung rung-00100 \
-        --dest work/regression/<date>-golden-rung-00100 --sets 2-u
+        --dest work/regression/<date>-golden-rung-00100 --sets 4-claude
 """
 
 from __future__ import annotations
@@ -224,7 +224,7 @@ def main(argv: list[str] | None = None) -> int:
                     help="omit --why: fux-engine 1.0.0's ask does not have it either, and "
                          "argparse exits 2 on an unknown flag. The row's `gates` are then null")
     ap.add_argument("--sets", required=True,
-                    help="comma-separated question SET NAMES, e.g. 2-u or 2-u,3-x. Each is the "
+                    help="comma-separated question SET NAMES, e.g. 4-claude or 4-claude,5-codex. Each is the "
                          "token between `set-` and `.jsonl` in work/golden/questions/, and it is "
                          "written into this run's file names. No default: generation 1 retired, "
                          "and a default would be a guess about which generation is current.")

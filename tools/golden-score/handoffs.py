@@ -29,9 +29,10 @@ import re
 import sys
 from pathlib import Path
 
-# L11 decision 14: generation 2 names sets `set-<gen>-<x|u>`; generation 1 used a
-# bare integer. The scorer accepts the same spellings.
-SET_NAME = re.compile(r"^\d+(-[xu])?$")
+# L11 decision 14: sets are `set-<gen>-<claude|codex>` since 2026-09-27; runs filed
+# before that use the legacy `set-<gen>-<u|x>`; generation 1 used a bare integer.
+# The scorer accepts the same spellings.
+SET_NAME = re.compile(r"^\d+(-(claude|codex|[xu]))?$")
 _RUNG = re.compile(r"\brung-\d+\b")
 _FRONT_RUNG = re.compile(r"^rung:\s*[\"']?(rung-\d+)[\"']?\s*$", re.M)
 
@@ -39,7 +40,7 @@ _FRONT_RUNG = re.compile(r"^rung:\s*[\"']?(rung-\d+)[\"']?\s*$", re.M)
 def set_name(handoff: Path) -> str:
     name = handoff.name.removeprefix("handoff-set-").removesuffix(".jsonl")
     if not SET_NAME.match(name):
-        raise SystemExit(f"refusing: {handoff.name} does not name a set as set-<n> or set-<gen>-<x|u>")
+        raise SystemExit(f"refusing: {handoff.name} does not name a set as set-<n> or set-<gen>-<claude|codex> (legacy <u|x>)")
     return name
 
 

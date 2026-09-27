@@ -9,6 +9,7 @@ What the frozen bar requires of the build
 - the pairs ride the declaring document's OWN record, sorted, absent when none;
 - the fold is set containment in both directions, over pairs in sorted order;
 - `mined_weight = 0.0` reads no pair, so it is the engine before the key;
+- the default is the measured `0.5` (ratified 2026-09-27), with no `tune.toml`;
 - the scan and the accelerator fold identically;
 - a caller's `--expand` stacks, and keeps its own weight on a shared hash;
 - `fux lexical` never folds;
@@ -193,7 +194,7 @@ def test_off_reads_no_pair_and_is_the_engine_before_the_key(corpus, monkeypatch)
     monkeypatch.setattr(accel, "mined_table", boom)
     for q in ("mkt excursion", "mean kinetic temperature", "excursion"):
         for force_scan in (True, False):
-            results, _ = run_query(corpus, q, 10, force_scan=force_scan, tune=Tune())
+            results, _ = run_query(corpus, q, 10, force_scan=force_scan, tune=Tune(mined_weight=0.0))
             expected = _payload(results)
             from fux.query.scan import ask as scan_ask
 
@@ -210,9 +211,19 @@ def test_the_scan_and_the_accelerator_fold_identically(corpus, q, weight):
     assert _payload(fast_results) == _payload(scan_results)
 
 
+def test_the_default_is_the_measured_value_and_is_on(corpus):
+    """W-168 step 4 ratified PASS at `0.5` (2026-09-27): with no `tune.toml`,
+    and under `--no-tune`, the weight is `0.5`, not off."""
+    from fux.tune import load
+
+    assert Tune().mined_weight == mined.MINED_WEIGHT == 0.5
+    assert load(corpus).mined_weight == 0.5
+    assert load(corpus, enabled=False).mined_weight == 0.5
+
+
 def test_on_lifts_the_document_that_spells_it_the_other_way(corpus):
-    off, _ = run_query(corpus, "mkt excursion", 10, tune=Tune())
-    on, _ = run_query(corpus, "mkt excursion", 10, tune=Tune(mined_weight=0.5))
+    off, _ = run_query(corpus, "mkt excursion", 10, tune=Tune(mined_weight=0.0))
+    on, _ = run_query(corpus, "mkt excursion", 10, tune=Tune())
     score = lambda rs, loc: next(r.score for r in rs if r.loc == loc)  # noqa: E731
     assert score(on, "docs/long.md") > score(off, "docs/long.md")
     # The guard: nothing matching none of the user's own words is returned.
@@ -251,7 +262,7 @@ def _node(root: Path, verb: str, query: str) -> list[dict]:
 
 
 @pytest.mark.skipif(shutil.which("node") is None, reason="node is not on PATH on this machine")
-@pytest.mark.parametrize("tune", [None, "[ranking]\nmined_weight = 0.3\n"])
+@pytest.mark.parametrize("tune", [None, "[ranking]\nmined_weight = 0.0\n", "[ranking]\nmined_weight = 0.3\n"])
 @pytest.mark.parametrize("q", ["mkt excursion", "mean kinetic temperature excursion", "sop"])
 def test_the_node_reader_folds_identically(tmp_path, q, tune):
     root = _corpus(tmp_path, tune)

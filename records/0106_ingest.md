@@ -11,7 +11,7 @@ feature: the `fux ingest` pipeline — sources to committed records
 owns: [src/fux/ingest/ingestlog.py@73e117c1e919, src/fux/ingest@04fe7d0c14cb, src/fux/ingest/priors.py@8ffcc632a4be, node/src/ingest/gitdir.mjs@eb45c1672eac, node/src/ingest/priors.mjs@11df69775da1]
 laws: [L2, L3, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: be4a7202f974ae02b571a36961736a38bb73b18ca049f53923fa9f4396f940f2
+content_sha: 0cf72dce9823c893018a2fbb7b38370673be1423c3927a7f057514b95e79c120
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -951,7 +951,9 @@ go through, and writes `abbr` on the declaring record ([SR-RECORD](0109_index-re
 Mined from the **redacted** parsed body, headings included, front-matter not.
 It is extraction, so it is carried on an unchanged sha, and `RULES_VERSION`
 moved to 3. **No weight reaches ingest**: `mined_weight` is read at query time
-only, so the committed bytes are the same at every arm.
+only, so the committed bytes are the same at every arm. That is why its default
+moving to `0.5` on 2026-09-27 ([SR-TUNE](0135_tuning.md) decision 19a) needs no
+re-ingest, and why this decision did not move with it.
 
 ### Consequences
 

@@ -188,7 +188,8 @@ Fux is built under eleven laws, each with its own record in the
 [L7 Python ≥ 3.11](records/0009_LAW-7-python-311.md) ·
 [L8 use record never committed](records/0010_LAW-8-use-record.md) ·
 [L10 build output, never source](records/0011_LAW-10-bundled-output.md) ·
-[L11 the sealed answer key is closed to Claude](records/0012_LAW-11-sealed-answer-key.md).
+[L11 the sealed answer key is closed to Claude](records/0012_LAW-11-sealed-answer-key.md) ·
+[L12 every value lives in a config file](records/0013_LAW-12-values-live-in-config.md).
 
 ## Reading order
 

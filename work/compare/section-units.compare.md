@@ -36,8 +36,8 @@ description: "W-168 step 10 starts as a compare doc (proposal §2). Three forks:
   documents lose at ranking through length normalisation. W-144 measured `b`
   down from `0.75` to **`0.15`** (SR-RANKING), which already takes most of that
   penalty away. So step 10's claim needs **new** evidence, not the literature's.
-- **The data:** there are no tagged long-document questions yet. [Prompt
-  11](../golden/prompts/11-claude-gen3-feature-input-seed.md) Input 5 authors
+- **The data:** there are no tagged long-document questions yet. Prompt
+  11 Input 5 authors
   them (`step10_section`), with the other generation-3 inputs.
 
 ## Fork 1 — what unit the ranking sees

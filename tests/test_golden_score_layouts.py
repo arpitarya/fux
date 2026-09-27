@@ -52,12 +52,12 @@ SYNTHETIC_ROWS = {"q001": {"id": "q001", "ranked": ["docs/a.md"], "band": "stron
 
 # --- 1. the set name ----------------------------------------------------------
 
-@pytest.mark.parametrize("name", ["2-u", "3-x", "1", "12"])
+@pytest.mark.parametrize("name", ["4-claude", "5-codex", "2-u", "3-x", "1", "12"])
 def test_set_label_accepts_both_generations_verbatim(scorer, name):
     assert scorer.set_label(name) == name
 
 
-@pytest.mark.parametrize("name", ["2u", "2-z", "set-2-u", "", "u", "2-u-1"])
+@pytest.mark.parametrize("name", ["2u", "2-z", "set-2-u", "", "u", "2-u-1", "4-Claude", "4-gpt", "set-4-claude", "4-claude-1"])
 def test_set_label_refuses_anything_else(scorer, name):
     with pytest.raises(argparse.ArgumentTypeError):
         scorer.set_label(name)
@@ -101,6 +101,13 @@ def test_a_flat_handoff_takes_its_rung_from_the_argument(handoffs, tmp_path):
     (tmp_path / "evidence" / "predictions-set-2-u.jsonl").write_text("{}\n", encoding="utf-8")
     got = handoffs.discover(tmp_path, "rung-01000")
     assert [(a, r, s) for _, a, r, s in got] == [("single", "rung-01000", "2-u")]
+
+
+def test_a_flat_handoff_named_by_author_is_found(handoffs, tmp_path):
+    """L11 decision 14 since 2026-09-27: `set-<gen>-<claude|codex>`."""
+    _handoff(tmp_path / "evidence" / "handoff-set-4-claude.jsonl")
+    got = handoffs.discover(tmp_path, "rung-01000")
+    assert [s for *_, s in got] == ["4-claude"]
 
 
 def test_a_flat_handoff_takes_its_rung_from_the_preregistration(handoffs, tmp_path):

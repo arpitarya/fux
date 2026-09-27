@@ -45,7 +45,7 @@ combination is unmeasured.
   1. Arpit runs `just golden-score work/regression/2026-09-27-mined-expansion`.
   2. A session that did **not** capture the arms runs `evidence/decide.py`.
   3. An INCONCLUSIVE goes back to Arpit.
-- ⚠ **This session also read `questions/set-3-u.jsonl`** through the harness,
+- ⚠ **This session also read `questions/set-3-claude.jsonl`** through the harness,
   so the prompt-4 rebuild still needs a different session.
 
 ## ✅ STEP 4 BUILT — 2026-09-27 (Claude Code, Opus)
@@ -95,9 +95,9 @@ fixes it, **off at `mined_weight = 0.0`**. No treatment number exists.
   (`9cdde333`), never the rung itself.
 - **Next:** build step 4 (**Opus**: a record-shape change in both readers and
   the accelerator). Then capture both arms at one commit. Then Arpit scores.
-- ⚠ **The prompt-4 rebuild needs a DIFFERENT session.** This one opened
+- ⚠ **The rung rebuild needs a DIFFERENT session.** This one opened
   `work/golden/questions/` (for W-224's byte-identity replay and for the tag),
-  which prompt 4 forbids.
+  which SR-WORK-TESTDATA A23 forbids.
 
 ## ✅ PROMPT 11 RUN — 2026-09-27 (Arpit's hand); generation 3 is in the tree
 
@@ -105,11 +105,11 @@ fixes it, **off at `mined_weight = 0.0`**. No treatment number exists.
   - 26 new seed documents;
   - `seed-dates.tsv` rows;
   - `seed-history.tsv` (34 lines) and `seed-history/` revisions;
-  - `questions/set-4-u.jsonl`, 125 rows of `{id, question}`.
+  - `questions/set-4-claude.jsonl`, 125 rows of `{id, question}`.
 - Block 5, the key, is Arpit's alone. This session did not look for it.
 - **Next, in order:**
-  1. A **prompt-4** session rebuilds the eight rungs, which replays the history through `replay.py`.
-  2. **Prompt 5** runs `set-4-u`.
+  1. A **rung-rebuild** session ([golden README](../golden/README.md) phase 4) rebuilds the eight rungs, which replays the history through `replay.py`.
+  2. **A phase-5 run** (golden README) runs `set-4-claude`.
   3. 🔴 Arpit scores it.
   4. Each step 6–10 counts its own pool; below 6 stops that step.
 - Step 4 does not wait on any of this.
@@ -123,7 +123,7 @@ fixes it, **off at `mined_weight = 0.0`**. No treatment number exists.
   - judged on `hit@1` over the `step10_section` pool, with `section@1` beside it.
 
   Its pre-registration still waits on generation-3 data (prompt 11, then the
-  rebuild and a scored `set-4-u`). A pool below 6 stops it.
+  rebuild and a scored `set-4-claude`). A pool below 6 stops it.
 - **Step 5:** the W-221 re-run on the boosted first pass is filed **FAIL
   (drift)**, the same as 2026-09-23. *"remove all the RM3 related code"* →
   W-224 (built 2026-09-27: [SR-EXPAND](../../records/0149_expand.md) decision 17). Step 5 stays in this
@@ -133,7 +133,7 @@ fixes it, **off at `mined_weight = 0.0`**. No treatment number exists.
 
 **Ruled by Arpit, 2026-09-25:**
 - **A fresh, designated Claude session authors the next set.** It is not this
-  session, which has read set-3-u's ids and rank movements in step 1's verdict
+  session, which has read set-3-claude's ids and rank movements in step 1's verdict
   (prompt 3's freshness rule).
 - **Step 8's history goes into the seed, and the ladder is rebuilt** — a new
   baseline.
@@ -142,7 +142,7 @@ fixes it, **off at `mined_weight = 0.0`**. No treatment number exists.
 
 | step | blocker | what was done |
 |---|---|---|
-| 6 SDM | no tagged input | [prompt 11](../golden/prompts/11-claude-gen3-feature-input-seed.md) Input 2 — two passages with the same words, one answering |
+| 6 SDM | no tagged input | prompt 11 Input 2 — two passages with the same words, one answering |
 | 7 MMR | no tagged input; *graph in `ask`* | Input 3 — facet clusters with a crowded facet, `facets` in the key. ✅ **The graph dependency is already met**: `ask` runs `lexical → graph → split` today (SR-ASK) |
 | 8 authority | no corpus with history | Input 4 — authority pairs with a recency trap. **The instrument:** [`tools/golden-history/replay.py`](../../tools/golden-history/replay.py) + `seed-history.tsv`, wired into the rung builder. With no history file the builder reproduces the old ladder: same authors, dates, messages and trees on a scratch `rung-seed` |
 | 9 intent | pool below 6 | Input 1 — topic triples of `-procedure-` / `-decision-` / `-reference-` files, ≥ 25 cue questions (D2 · I1, as ruled) |
@@ -150,8 +150,8 @@ fixes it, **off at `mined_weight = 0.0`**. No treatment number exists.
 
 **Next, in order:**
 1. ✅ ~~**Arpit:** run prompt 11 in a new claude.ai chat, and commit blocks 1–4~~, done 2026-09-27.
-2. A **prompt-4** session rebuilds the eight rungs, which replays the history.
-3. **Prompt 5** runs `set-4-u`. 🔴 Arpit scores it. Each step then counts its
+2. A **rung-rebuild** session ([golden README](../golden/README.md) phase 4) rebuilds the eight rungs, which replays the history.
+3. **A phase-5 run** (golden README) runs `set-4-claude`. 🔴 Arpit scores it. Each step then counts its
    own pool: **below 6 stops that step**, as before.
 4. ✅ ~~**Arpit:** step 10's forks~~, ruled U0 · B2 · E1 on 2026-09-27.
 
@@ -184,7 +184,7 @@ at `cfca651a`) and files `VERDICT.md`. INCONCLUSIVE → Arpit.
 [Report](../regression/2026-09-15-anchor-text/report.md) · [amended pre-registration](../regression/2026-09-15-anchor-text/PRE-REGISTRATION.md) §AMENDMENT 2026-09-24.
 
 - **Amended first, committed at `cfca651a` before any call.** It names `hit@1`
-  (`primary@1` beside it) on set-3-u at `rung-01000`, and carries the ruling's
+  (`primary@1` beside it) on set-3-claude at `rung-01000`, and carries the ruling's
   *"ruled after the pools were seen — informed"* line. Also frozen there: the tag
   `anchor_dependent` (27 of 80, the gen-2 pool rule, imported) and
   `evidence/decide.py`. Clause 3 is read at rank 1, on the hub
@@ -228,12 +228,12 @@ at `cfca651a`) and files `VERDICT.md`. INCONCLUSIVE → Arpit.
 
 **Next:** step 4's pre-registration.
 
-## ✅ RULED 2026-09-24 (Arpit, Cowork) — steps 1 and 4 are judged at RANK 1, on set-3-u
+## ✅ RULED 2026-09-24 (Arpit, Cowork) — steps 1 and 4 are judged at RANK 1, on set-3-claude
 
-*"yes"* — to *judge steps 1 (anchor) and 4 (expansion) at rank 1 on set-3-u,
+*"yes"* — to *judge steps 1 (anchor) and 4 (expansion) at rank 1 on set-3-claude,
 as steps 5 and 9 were ruled on 2026-09-23?*
 
-- **Primary endpoint `hit@1`, `primary@1` beside it**, on **set-3-u** at `rung-01000`.
+- **Primary endpoint `hit@1`, `primary@1` beside it**, on **set-3-claude** at `rung-01000`.
 - **Pools:** step 1 = **14**, step 4 = **10** winnable at rank 1 (2 and 0 at rank 5).
 - ⚠ **Ruled AFTER the pools were seen — `informed`, and said so.** Not a moved
   threshold: neither step has a number, and step 1's frozen pre-registration names
@@ -256,7 +256,7 @@ The tags come from question text and `seed/` alone
 ([`step_pools.py`](../regression/2026-09-24-golden-gen2-rung-01000/evidence/step_pools.py)).
 **Winnable** means a tagged, answerable question that misses the endpoint.
 
-| step | set-2-u · rank 1 / rank 5 | set-3-u · rank 1 / rank 5 | state |
+| step | set-2-claude · rank 1 / rank 5 | set-3-claude · rank 1 / rank 5 | state |
 |---|---|---|---|
 | **1** anchor | 5 / 2 | **14** / 2 | 🔴 **the endpoint is Arpit's.** The frozen pre-registration names a floor of 6 and no `k` |
 | **4** expansion | 0 / 0 | **10** / 0 | 🔴 not pre-registered; the endpoint is Arpit's |
@@ -265,7 +265,7 @@ The tags come from question text and `seed/` alone
 
 - 🔴 **One question, the same shape as the 2026-09-23 ruling on steps 5 and 9:**
   judge steps 1 and 4 at **rank 1** (`hit@1`, with `primary@1` beside it), on
-  set-3-u?
+  set-3-claude?
   - At rank 5 neither can produce a verdict: the pools are 2 and 0.
   - ⚠ **This is asked after the pools were seen.** It is still not a moved
     threshold, because neither step has a number, and step 1's frozen file
@@ -397,7 +397,7 @@ prompt-4 rebuild lands.
 
 *"Go with the recommendation. That is judge step five and nine at rank one. Six, seven, ten have their own measurements, so use that."*
 
-**Why he was asked.** `set-2-u`, scored 2026-09-23 on `rung-01000`: of 112 answerable questions, `hit@5` misses 18 and **10 of those are never retrieved at all**, so only **8** are reorderable. At rank 1, **51** misses are already in the top 50. ⚠ *Corrected 2026-09-23 ([W-219](../IMPLEMENTATION.md)): this said the 8 were "below `min_fix` ≈ 9", so no `hit@5` verdict was possible. That compared the 8 with the bar for all 18. With zero losses **6 wins clear**, so a `hit@5` verdict was very unlikely, not impossible. The ruling stands on 51 against 8.*
+**Why he was asked.** `set-2-claude`, scored 2026-09-23 on `rung-01000`: of 112 answerable questions, `hit@5` misses 18 and **10 of those are never retrieved at all**, so only **8** are reorderable. At rank 1, **51** misses are already in the top 50. ⚠ *Corrected 2026-09-23 ([W-219](../IMPLEMENTATION.md)): this said the 8 were "below `min_fix` ≈ 9", so no `hit@5` verdict was possible. That compared the 8 with the bar for all 18. With zero losses **6 wins clear**, so a `hit@5` verdict was very unlikely, not impossible. The ruling stands on 51 against 8.*
 
 | step | judged on | primary endpoint | note |
 |---|---|---|---|
@@ -595,7 +595,7 @@ nothing for them.
 
 ### What step 2 needs before it may start
 
-1. 🔴 **Id-queries — [prompt 8](../golden/prompts/8-codex-identifier-questions.md),
+1. 🔴 **Id-queries — prompt 8,
    Codex's.** ⚠ **Unlike W-191, the documents are fine** (51 tokens across all
    20); only the questions are missing, which is a smaller ask.
 2. ⚠ **A design decision, named and NOT taken:** an unstemmed field needs

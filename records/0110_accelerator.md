@@ -7,10 +7,10 @@ description: A disposable term-major index under .fux/runtime/ that makes warm q
 status: accepted
 date: 2026-08-18
 feature: "`.fux/runtime/` — the derived index, `fux build`, and the block bound that makes skipping provable"
-owns: [src/fux/derive@3f8a15a9d941, tools/differential@1934e54fe0ca]
+owns: [src/fux/derive@3f8a15a9d941, tools/differential@bd6cd7fb02de]
 laws: [L1, L3]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 5ac420a3c911bf9ece70b4a4a02c5c7661b6395c5a290df6b1e04a621f795af5
+content_sha: 01aa6a179f9f9565edf1a035ede330cf40eaea30a0dc31d02b954f3ec57c627f
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

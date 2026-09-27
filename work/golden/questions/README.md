@@ -13,10 +13,16 @@ timestamp: 2026-09-15T00:00:00Z
 
 | file | set | author | ids |
 |---|---|---|---|
-| `set-2-u.jsonl` | set 2-u | Claude | `s2u-001…` |
-| `set-3-u.jsonl` | set 3-u, 80 questions, against seeds 23–36 | Claude, [prompt 10](../prompts/10-claude-feature-input-seed.md) | `s3u-001…` |
+| `set-2-claude.jsonl` | set 2 (generation 2) | Claude | `s2u-001…` |
+| `set-3-claude.jsonl` | set 3, 80 questions, against seeds 23–36 | Claude | `s3u-001…` |
+| `set-4-claude.jsonl` | set 4 (generation 3), 125 questions, against seeds 37+ and the seed history | Claude | `s4u-001…` |
 
-**Arpit commits these himself**, from block 1 of each authoring prompt's
+**Named by author** — `set-<gen>-<claude|codex>` (Arpit, 2026-09-27; these three
+were `set-N-u` before). **Ids were not renamed**: the `u` in `s4u-` is the old
+suffix, kept because the keys Arpit holds join on it. A new set's rules are
+[SR-WORK-TESTDATA](../../../records/0068_WORK-test-data.md) A1–A16.
+
+**Arpit commits these himself**, from the released block of each author's
 two-block handoff. Block 2 — the key — he keeps; **no agent writes either file's
 answers anywhere**.
 
@@ -35,7 +41,7 @@ arithmetic and the abstention slice measures nothing.
 ## ⚠ These files exist before the ladder is rebuilt, and it costs something
 
 A rung built by a session that could have read a question is `informed`
-permanently. **So [prompt 4](../prompts/4-claude-corpus.md) is on its honour**:
+permanently. **So the rung build is on its honour** ([SR-WORK-TESTDATA](../../../records/0068_WORK-test-data.md) A23):
 it reads `../seed/` and nothing else, and says so in its report. Nothing
 mechanical enforces it.
 

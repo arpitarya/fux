@@ -82,6 +82,7 @@ def test_the_node_tune_schema_is_the_python_one():
         ("anchorWeight = ANCHOR", "anchor_weight"),
         ("rerankWeight = 0.0", "rerank_weight"),
         ("expandWeight = 0.2", "expand_weight"),
+        ("minedWeight = MINED_WEIGHT", "mined_weight"),
         ("damping = 0.85", "damping"),
         ("iterations = 3", "iterations"),
         ("laziness = 0.5", "laziness"),
@@ -120,6 +121,17 @@ def test_the_bm25f_constants_are_the_same_number_on_both_sides(name):
     found = re.search(rf"^export const {name} = ([0-9.]+);", source, re.M)
     assert found, f"no `export const {name}` in query/bm25f.mjs"
     assert float(found.group(1)) == float(getattr(bm25f, name))
+
+
+def test_the_mined_weight_default_is_the_same_number_on_both_sides():
+    """`minedWeight = MINED_WEIGHT` above returns early because it is an
+    identifier, so the constant is compared here. W-168 step 4's measured `0.5`."""
+    from fux.query import mined
+
+    source = _source("query/mined.mjs")
+    found = re.search(r"^export const MINED_WEIGHT = ([0-9.]+);", source, re.M)
+    assert found, "no `export const MINED_WEIGHT` in query/mined.mjs"
+    assert float(found.group(1)) == float(mined.MINED_WEIGHT) == 0.5
 
 
 # -- .fux/output.toml --------------------------------------------------------

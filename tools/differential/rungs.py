@@ -144,7 +144,7 @@ def seed_drift(name: str) -> list[str]:
     if drifted:
         problems.append(
             f"{name}: {len(drifted)} seed document(s) changed since the rung was frozen "
-            f"— rebuild it (prompt 4) or the rung answers against stale text: {drifted[:3]}"
+            f"— rebuild it (work/golden/README.md phase 4) or the rung answers against stale text: {drifted[:3]}"
         )
     return problems
 

@@ -24,15 +24,20 @@ path                    = 1.5
 ctx                     = 1.0
 # The sixth field is ANCHOR: what OTHER documents call this one when they link
 # to it (W-168 step 1). Folded in at read time from their edges -- it is in no
-# committed posting, so moving this needs no re-ingest. 0 = OFF, and off is the
-# default: UNMEASURED, and it turns on only on a passing pre-registered run.
-anchor                  = 0.0
+# committed posting, so moving this needs no re-ingest. 0 = OFF. The default
+# 1.0 is MEASURED: it passed its pre-registered run on 2026-09-24.
+anchor                  = 1.0
 
 [ranking]
-rerank_weight           = 0.3   # 0 = off; the proximity reranker's uplift
+rerank_weight           = 0.0   # 0 = off; the proximity reranker's uplift
 # What an agent-supplied `--expand` term is worth against a term you typed.
 # A NO-OP unless a caller passes `--expand`; 0 turns expansion off entirely.
 expand_weight           = 0.2   # Query2doc's 1:5; unmeasured on your corpus
+# A spelling the corpus supplies: when a query says MKT and some document
+# declares "Mean Kinetic Temperature (MKT)", the other side is added at this
+# weight. 0 = OFF. The default 0.5 is MEASURED: it passed its pre-registered run
+# on 2026-09-27.
+mined_weight            = 0.5
 
 [graph]                         # explain / graph / path
 damping      = 0.85

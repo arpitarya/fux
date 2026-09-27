@@ -21,8 +21,10 @@ currency as `terms` ([L3](../../records/0005_LAW-3-deterministic.md)).
 | **commit** | the record's own `abbr` property, hashes only | 🔴 *a committed per-document byte is a function of that document alone* (W-168 §RULED 2026-09-15); hashes are statistics, not content ([L2](../../records/0004_LAW-2-content-never-durable.md)) |
 | **fold** | `fold()`, over the union of every record's pairs | the table is corpus-wide, so it is rebuilt at read time — by `table_from_shards` on the scan, by the accelerator's derived `mined.json` on `--fast` — and **committed nowhere** |
 
-## `mined_weight = 0.0` is the engine before this module
+## The default is `MINED_WEIGHT` (`0.5`), MEASURED; `0.0` is the engine before this module
 
+`0.5` is the first weight, ascending, that cleared the frozen bar; Arpit
+ratified it on 2026-09-27 ([`VERDICT.md`](../../work/regression/2026-09-27-mined-expansion/VERDICT.md)).
 `run_query` does not read a single pair when the weight is `0.0`, so no
 arithmetic changes and no shard is re-read. The only trace of the feature on
 the default path is that a line whose `abbr` carries a query hash is parsed by
@@ -38,7 +40,13 @@ from pathlib import Path
 from .. import store as store_mod
 from .tokenize import tokenize
 
-__all__ = ["PATTERN", "Pair", "fold", "mine", "pairs_from_line", "table_from_records", "table_from_shards"]
+__all__ = ["MINED_WEIGHT", "PATTERN", "Pair", "fold", "mine", "pairs_from_line", "table_from_records", "table_from_shards"]
+
+#: The `[ranking] mined_weight` default: W-168 step 4's measured value, the first
+#: to clear [the frozen bar](../../work/regression/2026-09-27-mined-expansion/PRE-REGISTRATION.md)
+#: (6 wins, 0 losses, no baseline rank-1 hit lost), ratified PASS 2026-09-27.
+#: Its Node twin is `node/src/query/mined.mjs`, held equal by a test.
+MINED_WEIGHT = 0.5
 
 #: The frozen pattern — [the pre-registration](../../work/regression/2026-09-27-mined-expansion/PRE-REGISTRATION.md)
 #: §The mechanism. It is the regex the `expansion_form` tag and the ruled pool

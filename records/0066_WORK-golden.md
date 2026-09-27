@@ -10,7 +10,7 @@ feature: the golden benchmark — its two question sets, the key's custody, its 
 owns: [.claude/hooks/guard-golden-answer.sh@c505d04c0628, .claude/hooks/guard-sealed-key.sh@0d4dd725e7aa, tests/test_golden_key_guards.py@fb4cf92458d6, tests/test_settings_never_committed_unlocked.py@55e95884f883, tests/test_golden_hook_prose.py@40d1405ecad6, scripts/gen-golden.py@1b2a854c1f75, tests/test_claude_md_golden.py@49db9e6261d8, tools/golden-difficulty@18c50227ff2f]
 laws: [L0, L11]
 timestamp: 2026-09-15T00:00:00Z
-content_sha: 5a9d17611dde4ca5f4c046a7db4dded8723b935892f878a5ffcdb68c5f1242ca
+content_sha: 7a299905f455dc9b33d26ded1aac2174600e286f16cc26f079c8fb758e06e8af
 ratifies: "Arpit, 2026-09-15 — W-146 row 17: the prohibition gets a record and CLAUDE.md keeps a generated view; the same day he ruled it into law L11 and then amended it — two question sets, one Claude-authored and one Codex-authored, with both answer halves in his custody and no key file at all"
 ---
 
@@ -206,7 +206,7 @@ is the surrounding process:
   questions *and* answers into `work/golden/retired/`, where they become
   ordinary reusable test data that **never carries a golden claim again**; `just
   golden-lock` puts every guard back byte-identically and the next generation is
-  authored sealed as `set-<gen>-<x|u>`. 🔴 **No agent runs any of those three, or
+  authored sealed as `set-<gen>-<claude|codex>`. 🔴 **No agent runs any of those three, or
   touches the file that holds the state** — that is the same breach as opening
   the key. A session that needs the key says it is blocked and stops.
   ⚠ **The paste route is RETIRED**, and **every golden number is `informed`
@@ -325,12 +325,10 @@ is the surrounding process:
 
 8. **Three question sets, and they are separate instruments** (Arpit,
    2026-09-15 for the first two; 2026-09-20 for the third). **Set 1** — ids
-   `s1-001…` — is authored by **Codex**, per
-   [`prompts/2-codex-questions.md`](../work/golden/prompts/2-codex-questions.md).
+   `s1-001…` — is authored by **Codex**.
    **Set 2** — ids `s2-001…` — and **set 3** — ids `s3-001…` — are authored by
-   **Claude** from `work/golden/seed/` and nothing else, per
-   [`prompts/3-claude-questions.md`](../work/golden/prompts/3-claude-questions.md),
-   which is written for **set N** rather than for one set; each is written in its
+   **Claude** from `work/golden/seed/` and nothing else. Every later set is
+   authored under [SR-WORK-TESTDATA](0068_WORK-test-data.md) A1–A5, each in its
    own designated session that hands questions *and* answers to Arpit in the
    chat, writes no file, and never runs a rung. ⚠ **The id namespaces must not
    collide**: a prediction file names ids and nothing else, and one ambiguous id
@@ -346,8 +344,8 @@ is the surrounding process:
    number across both sets is meaningless** and is never written.
 
 10. **Custody replaces the per-run key question.** The old *"(1) the file
-    `golden-answer/answers.jsonl`, or (2) the chat?"* question is **removed from
-    prompts 1, 3 and 5**, because [L11](0012_LAW-11-sealed-answer-key.md) gives
+    `golden-answer/answers.jsonl`, or (2) the chat?"* question is **removed** (the
+    prompts that asked it were deleted on 2026-09-27), because [L11](0012_LAW-11-sealed-answer-key.md) gives
     it one permanent answer. A prompt that still asks it is stale and is fixed,
     not answered.
 
@@ -546,7 +544,7 @@ is the surrounding process:
       a window in which a Claude tool call can reach the key.
 
     🔴 **Scoring alone never needs an unlock, and that is what the first two items
-    got wrong.** W-216 said scoring `set-2-u` *needs the key and the key is behind
+    got wrong.** W-216 said scoring `set-2-claude` *needs the key and the key is behind
     the lock*. It is not: L11 decision 13's scoring carve-out attaches to **his
     hand**, so `tools/golden-score/score.py` started from his own shell reads
     the key **while LOCKED** — *"an unlock does NOT replace it."* **The lock binds
@@ -621,7 +619,7 @@ evidence about the rule's sufficiency, and the rule is not here.
 
 ```console
 $ python scripts/gen-golden.py --check && test -f tests/test_claude_md_golden.py
-$ grep -rl 'or (2) the chat' work/golden/prompts/ ; echo "expect: no output"
+$ grep -rl 'or (2) the chat' work/golden/prompts/ 2>/dev/null ; echo "expect: no output"
 $ python3 tools/golden-difficulty/difficulty.py --selftest
 ```
 

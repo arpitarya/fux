@@ -527,6 +527,10 @@ _UNREACHABLE_BY_THE_GATE = {
     # false, so the freshness gate cannot reach it — the SR-WORK-OPEN-QUEUE
     # case, not the SR-ANSWER one.
     "SR-LAW-11",
+    # SR-LAW-12 (2026-09-27) owns nothing yet: `src/fux/constants.toml` does
+    # not exist until W-225 lands, and the law binds every module rather than
+    # one, so no single `src/` change can demand it.
+    "SR-LAW-12",
 }
 
 
