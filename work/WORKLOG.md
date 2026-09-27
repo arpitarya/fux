@@ -22,6 +22,17 @@ play: the worklog is the granular, per-exchange trail.
 **Entry format:**
 
 ```
+## 2026-09-28 — W-231 filed: law L13, a retired SR is archived  ·  Cowork (Opus)
+
+Arpit: *"create a new law if an sr is retired archive it"*, then *"no need for
+superseded part"*. This reverses SR-WORK-ARCHIVE decision 9's "records are
+never archived" for **retired** records only. Superseded records still get
+rewritten or deleted. The banner carries no "superseded by" line. The build
+writes SR-LAW-13, amends SR-WORK-ARCHIVE and records/README, moves SR-LAW-5 (retired
+2026-09-20 and still in `records/`) to `archive/records/`, adds a check, and
+regenerates the CLAUDE.md laws block. It does not restore the records deleted
+on 2026-09-06. Filed 🟢 for Opus. No code moved.
+
 ## 2026-09-28 — W-229 built and closed: every inspect lens on the explorer's Index tab  ·  Claude Code
 - **Asked:** *"review all the work items on open work implement all of them"*.
 - **Did:**
@@ -32,6 +43,18 @@ play: the worklog is the granular, per-exchange trail.
   - Checked the result by rendering the tab in Node from this repo's real report: 13 cards, no `undefined`.
 - **Decided / open:** W-230 and W-227 are left to a fresh session, per Arpit's ruling; my uncommitted hook hardening is theirs to commit with the chmod. W-168 steps 6–10 are also left: golden work waits until the guard is live. W-228 is now 🟢.
 - **Next:** W-228 (the `families` lens), then W-225 stage 5.
+
+## 2026-09-28 — W-230 ruled; the traversal hook was never executable  ·  Cowork (Opus)
+
+Blocker review. W-168 was already scored (66/125 `hit@1`, `informed`), so the
+only inbox item was W-230. A read-only look at `.claude/` found the cause of
+W-227 and W-230: `guard-golden-traversal.sh` is `100644` in git since
+`363a8b8c`, and every other hook is `100755`, so Claude Code could not launch it
+and the command went ahead. Arpit took the recommendation: **no cost**; a fresh Opus
+session fixes the exec bit, adds a gate that every registered hook is
+executable and tested by path, and proves it live with
+`false && grep -rn probe work`, which must be denied. W-230 → 🟢 `agent`, W-227 → 🟡 waiting on
+it. No code moved, and nothing under `work/golden/` was touched.
 
 ## 2026-09-28 — 🔴 L11 BREACH DECLARED (W-230) while hardening W-227  ·  Claude Code
 - **Asked:** *"commit it then implement all"*. The Words tab was committed (`5fb0b548`), then W-225 stage 4c (`16934227`), then W-227's ruled hardening.
@@ -49,6 +72,31 @@ play: the worklog is the granular, per-exchange trail.
   - Unit 5 779, e2e 151.
 - **Decided / open:** No `diff_top` key: `--diff` never reached its `50`. The probe cache key now carries the rank. Cowork's W-227/W-168/W-228 edits are theirs and were left uncommitted.
 - **Next:** W-227 guard hardening (ruled); then W-225 stage 5.
+
+## 2026-09-27 — W-227 ruled: no cost; harden the traversal guard, fail closed  ·  Cowork (Opus)
+
+Arpit asked for the blockers to ratify one by one. Two were in the inbox: W-227
+and W-168 (the `set-4-claude` score, his hand only). On W-227 he took the
+recommendation: **no cost beyond `informed`**, and **hardening is authorised**,
+not accepted as a gap in L11 d9. Replays run on synthetic commands through the
+hook's stdin only. The guard checks each line and segment, strips heredocs,
+and fails closed. The build goes to Claude Code (Opus), per the detail file. W-227 has left
+the inbox and is now 🟢 `agent`. No code moved. This session did not read
+anything under `work/golden/`.
+
+## 2026-09-27 — W-228 filed; code-pattern-recognition proposal parked  ·  Cowork (Fable)
+
+Arpit asked whether a pattern-recognition tool over the ingested documents —
+grouping, "how one document / a bunch of documents / code looks" — belongs in
+fux or beside it, and asked for the research. Ruled by placement, not by new
+law: the document half is a **lens in `fux inspect`** (his 2026-09-23 W-220
+ruling, no new verb), filed as **W-228** 🟡 behind W-225 4c because its
+thresholds need `.fux/inspect.toml` (L12). The code half is a
+**proposal**, `work/proposals/code-pattern-recognition.md` (B-250): the field
+already ships the query (ast-grep, semgrep) and structure (tree-sitter graphs
+over MCP) halves; the one fux-shaped gap is a committed clone-and-shape map,
+and it graduates on a second committed-at-a-sha ask. No code moved. Research
+cited in both files' Reference blocks.
 
 ## 2026-09-27 — W-168: phase-5 capture of `set-4-claude` on the gen-3 ladder  ·  Claude Code
 - **Asked:** *"implement w-168"*. The next step was the phase-5 run, which had to be done by a session other than W-227's.
@@ -99,6 +147,19 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+
+## 2026-09-28 — W-168: `set-4-claude` scored by Arpit; the inbox row is closed  ·  Claude Code (Opus)
+
+His first `just golden-score` failed with a `FileNotFoundError`: the key file
+the recipe names was not in the sealed directory. This session opened nothing
+there. It read only the recipe and `score.py`, and told him the likely cause:
+the key had not been saved under the post-rename name. He fixed it in his own
+shell and re-ran it. **n = 125 · `hit@1` 66 · `hit@5` 104 · `hit@10` 110 ·
+`primary@1` 62 · 0 abstentions · 11 unanswerable questions answered · 95
+evidence quoted**, all `informed`. Filed in the run's report. The W-168 inbox
+row is removed and the item is back on the agent: steps 6–10 count their pools.
+⚠ An offered fix is not built: `score.py` should refuse, naming the file,
+instead of throwing a traceback on a missing key.
 ## 2026-09-27 — W-168: the golden ladder rebuilt for generation 3  ·  Claude Code
 - **Asked:** *"implement W-168"*. The next step was the rung rebuild, which a session that never read a question could do.
 - **Did:** All 8 rungs were stale, so all 8 were rebuilt from scratch by the unmodified builder, with the seed history replayed. The build ran from a clean worktree at `80495b44`, because other sessions' W-225/W-226 changes were uncommitted in the main tree. 8/8 froze: 68 seeds, 12 documents with history, 82 `ref` edges. Generation-2 rungs moved to `fux-lab/corpora/golden-gen2/`, not deleted. Filed [`2026-09-27-ladder-gen3-rebuild`](regression/2026-09-27-ladder-gen3-rebuild/report.md).

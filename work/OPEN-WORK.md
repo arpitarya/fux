@@ -23,10 +23,8 @@ here. Read that record before changing anything below it.
 
 | what he decides | filed | age |
 |---|---|---|
-| 🔴 **W-227** — L11 breach: my recursive grep walked `work/golden/` (nothing printed); the traversal guard did not fire on a multi-line command. Does it cost anything, and may a session harden the guard? [detail](open/W-227-l11-breach-2026-09-27.md) | 2026-09-27 | 0d |
-| ↳ **blocks:** nothing else in the queue. | | |
-| 🔴 **W-168** — score `set-4-claude`: type `just golden-score work/regression/2026-09-27-golden-set-4-rung-01000`. Steps 6–10 count their pools from it. [report](regression/2026-09-27-golden-set-4-rung-01000/report.md) | 2026-09-27 | 0d |
-| ↳ **blocks:** nothing else in the queue. | | |
+
+*Empty since 2026-09-28 — W-227, W-168's score and W-230 all ruled or taken. Next decision: none filed.*
 
 ---
 
@@ -34,10 +32,12 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🔴 **W-227** · `arpit` — L11 breach, 2026-09-27: the recursive grep and the guard gap. [detail](open/W-227-l11-breach-2026-09-27.md)
-- 🔴 **W-168** · `arpit` — the ranking ideas. Step 4 shipped at `mined_weight = 0.5`; `set-4-claude` captured on the gen-3 `rung-01000` 2026-09-27. Next: Arpit scores it; then each step 6–10 counts its pool. [detail](open/W-168-search-improvements.md)
+- 🟢 **W-230** · `agent` — L11 breach, 2026-09-28. RULED: no cost; the traversal hook is `100644`. A FRESH session (**Opus**): `chmod +x`, a `100755` gate, then the live probe must be denied. [detail](open/W-230-l11-breach-2026-09-28.md)
+- 🟡 **W-227** · `agent` — L11 breach, 2026-09-27; hardening written, uncommitted, green offline. Waits on W-230: the live probe must be denied before it closes. [detail](open/W-227-l11-breach-2026-09-27.md)
+- 🟢 **W-168** · `agent` — the ranking ideas. `set-4-claude` scored by Arpit 2026-09-28 (`hit@1` 66/125, `informed`). Next: each step 6–10 counts its pool from the score; below 6 stops it. [detail](open/W-168-search-improvements.md)
 - 🟢 **W-225** · `agent` — L12 migration, building. Stages 1–4 landed (`constants.toml`; `tune`/`output`/`fux.toml` strict; `formats.toml` caps; `refusals.toml [scan]`; `inspect.toml`). Next: stage 5, R7 numerals. [detail](open/W-225-values-live-in-config.md)
 - 🟢 **W-228** · `agent` — document families: a `families` lens in `inspect` (shape = heading skeleton + frontmatter keys), misfits, `--json`, an Index-tab card. W-229's parity test and `inspect.toml` both exist. [detail](open/W-228-document-families.md)
+- 🟢 **W-231** · `agent` — new law **L13**: a RETIRED SR moves to `archive/records/`, never deleted (superseded records out of scope). SR-LAW-13, amend SR-WORK-ARCHIVE d9, move SR-LAW-5, add a test. **Opus.** [detail](open/W-231-retired-sr-is-archived.md)
 
 
 ### testing

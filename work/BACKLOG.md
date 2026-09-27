@@ -237,6 +237,7 @@ with its proposal.
 | B-246 | `WORKLOG.md` archive-and-truncate — append-only and growing forever; a yearly or v-major cut into `archive/worklog/YYYY.md` would cap the live file under the one-archive law. Parked since 2026-08-21, never litigated | [SR-WORK-GOVERNANCE](../records/0065_WORK-governance.md) Consequences | Arpit rules on the cut, or rules it never happens |
 | B-247 | `DOC-REGISTRY.md` scoped to untested prose — its unique value is the docs nothing else checks (`WORKLOG`, `MACHINE`, `GLOSSARY`, the paper); SRs and `setup/` have dedicated tests. Parked since 2026-08-21, never litigated | [SR-WORK-GOVERNANCE](../records/0065_WORK-governance.md) Consequences | Arpit rules on the scope, or rules it stays whole |
 | B-248 | Glassbox sessions — counts and cross-session joins, which fux does not do; the sketch is materialise-then-index. ⚠ The `fetch=` closed-tuple blocker is **struck** (W-178, then W-199) | [`glassbox-sessions.md`](proposals/glassbox-sessions.md) | A second event-stream source is asked for |
+| B-250 | Code pattern recognition — a committed, deterministic clone-and-shape map for code, as a separate distribution; the query and call-graph halves are a buy (ast-grep, tree-sitter graph servers) | [`code-pattern-recognition.md`](proposals/code-pattern-recognition.md) | A second ask for a code-shape answer that must be committed at a sha |
 
 ---
 

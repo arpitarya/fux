@@ -58,6 +58,20 @@ moved to the archive on 2026-09-14.
 *Newest first. Every `.md` in this directory has a row; a file with no row is
 the defect this ordering exists to make visible.*
 
+## Filed 2026-09-27
+
+* [Code pattern recognition — beside fux, not inside it](code-pattern-recognition.md)
+  — the code half of Arpit's 2026-09-27 ask (*"how a code looks like … a CLI
+  Claude Code can ingest"*); the document half is **W-228**. Decomposes "how
+  code looks" into three questions and finds two already answered — ast-grep /
+  semgrep for shape queries, tree-sitter knowledge graphs over MCP
+  (Codebase-Memory et al.) for structure — leaving one **narrow** fux-shaped
+  gap: a *committed*, deterministic clone-and-shape map, verified at a sha.
+  Argues it is a separate distribution, never a `fux` verb or an `inspect`
+  lens (§4). **Graduates on the second ask for a code-shape answer that must be
+  committed** — a review, CI gate or audit needing the clone map at a sha;
+  until then the recommendation is a skill wrapping the existing tools.
+
 ## Filed 2026-09-15
 
 * [Glassbox sessions — event streams as a fux corpus](glassbox-sessions.md) —

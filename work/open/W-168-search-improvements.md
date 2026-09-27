@@ -7,7 +7,7 @@ filed: 2026-09-14
 ball: agent
 ---
 
-## 🔴 SET-4-CLAUDE CAPTURED — 2026-09-27 (Claude Code, Opus); the score is Arpit's
+## ✅ SET-4-CLAUDE CAPTURED 2026-09-27 AND SCORED 2026-09-28 (Arpit's hand); the pools are next
 
 [Pre-registration](../regression/2026-09-27-golden-set-4-rung-01000/PRE-REGISTRATION.md) (`0ce0b845`, before any row) · [report](../regression/2026-09-27-golden-set-4-rung-01000/report.md).
 This session is not W-227's, and it built no rung.
@@ -23,7 +23,10 @@ This session is not W-227's, and it built no rung.
   `current` citation. None were declined. Bands: 69 `grounded` · 24 `partial` ·
   32 `weak` · 0 `none`.
 - 🔴 **Next, in order:**
-  1. Arpit types `just golden-score work/regression/2026-09-27-golden-set-4-rung-01000`.
+  1. ✅ ~~Arpit types `just golden-score …`~~, done 2026-09-28: n = 125, `hit@1` 66,
+     `hit@5` 104, `hit@10` 110, `primary@1` 62, 0 abstentions, 11 answered that
+     the key marks unanswerable, 95 evidence quoted. **`informed`.**
+     [scores](../regression/2026-09-27-golden-set-4-rung-01000/scores/single/rung-01000/set-4-claude.json)
   2. Each step 6–10 counts its own pool from the score. **Below 6 stops that
      step.** Step 10 then pre-registers per U0 · B2 · E1.
 

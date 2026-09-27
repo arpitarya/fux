@@ -31,6 +31,21 @@ just golden-score work/regression/2026-09-27-golden-set-4-rung-01000
   that step.** Counting the pools needs the key's `relevant` / `primary` / facet
   fields joined against these rows, so it follows the score and is not done here.
 
+## 🔴 Scored — 2026-09-28, Arpit's hand · `informed`
+
+`just golden-score` → [`scores/single/rung-01000/set-4-claude.json`](scores/single/rung-01000/set-4-claude.json),
+a complete join (0 missing on either side, not partial).
+
+| n | hit@1 | hit@5 | hit@10 | primary@1 | abstain ok / wrong | answered unanswerable | evidence quoted |
+|---:|---:|---:|---:|---:|---:|---:|---:|
+| 125 | 66 | 104 | 110 | 62 | 0 / 0 | 11 | 95 |
+
+- `hit@20` and `hit@50` equal `hit@10` by construction: the capture asked `--top 10`.
+- **No question was abstained on.** The band said `none` 0 times, so all 11
+  unanswerable questions were answered. That is the abstention gap, counted.
+- **A baseline, not a comparison.** It is generation 3's first number and is
+  comparable with nothing from generation 2.
+
 ## The run
 
 | | |
