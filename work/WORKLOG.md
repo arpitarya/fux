@@ -38,7 +38,9 @@ play: the worklog is the granular, per-exchange trail.
 - **Decided / open:**
   - SR-EXPAND decision 1 narrowed in place. The corpus's own declarations are decision 15's human-written words, not an invented expansion.
   - Mining reads the parsed body, not the front-matter. On rung-01000's seed that gives the same 9 pairs as the tagger's whole-file read.
-- **Next:** capture the five arms on a re-ingested copy of rung-01000 at one commit. Then Arpit scores.
+- **Then captured the arms:** five on one re-ingested copy of rung-01000 at `f8b21bd5`. The re-ingest changed only `abbr` (8 records, 9 pairs). `mx-0.0` equals the 2026-09-24 capture on 80 of 80 rows. Rank 1 moved on 2 / 5 / 6 / 7 questions, all tagged. `decide.py` and `describe.py` were written before any score. [report](regression/2026-09-27-mined-expansion/report.md)
+- ⚠ **`f8b21bd5` shipped two stale `owns:` hashes** (SR-ASK, SR-NODE-SEARCH). `sr-owns.py` enumerates directories with `git ls-files`, and `mined.py` / `mined.mjs` were untracked when it ran, so the hashes left them out. They were restamped in the next commit. **Lesson: `git add` new files before `sr-owns.py --write`.** First recorded occurrence.
+- **Next:** 🔴 Arpit runs `just golden-score work/regression/2026-09-27-mined-expansion`; a non-capturing session then runs `decide.py`. A different session runs prompt 4.
 
 ## 2026-09-27 — W-224 built (RM3 removed, byte-identical); W-168 step 4 pre-registered  ·  Claude Code
 - **Asked:** *"implement w one six eight and w two two four"*.

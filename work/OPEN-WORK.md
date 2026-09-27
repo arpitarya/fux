@@ -23,8 +23,8 @@ here. Read that record before changing anything below it.
 
 | what he decides | filed | age |
 |---|---|---|
-
-*Empty since 2026-09-27 — W-223 ruled and closed; prompt 11's generation 3 is in. Next decision: scoring `set-4-u` after the rung rebuild (W-168).*
+| 🔴 **W-168** — score step 4's five mined-expansion arms: `just golden-score work/regression/2026-09-27-mined-expansion`, in your shell (no unlock). [report](regression/2026-09-27-mined-expansion/report.md) | 2026-09-27 | 0d |
+| ↳ **blocks:** nothing else in the queue — only step 4's verdict. The prompt-4 rung rebuild does not wait on it. | | |
 
 ---
 
@@ -32,7 +32,7 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🟢 **W-168** · `agent` — the ranking ideas. Step 4 is built, off at `0.0`; next, capture its five arms on a re-ingested rung-01000 copy. Separately, a fresh prompt-4 session rebuilds the eight rungs for generation 3. [detail](open/W-168-search-improvements.md)
+- 🔴 **W-168** · `arpit` — the ranking ideas. **Step 4 (abbreviations): built, off at `0.0`; arms captured 2026-09-27; Arpit scores (inbox).** Agent-side meanwhile: a fresh prompt-4 session rebuilds the eight rungs for generation 3. [detail](open/W-168-search-improvements.md)
 
 
 ### testing

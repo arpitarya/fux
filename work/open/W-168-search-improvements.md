@@ -7,7 +7,25 @@ filed: 2026-09-14
 ball: agent
 ---
 
-## ✅ STEP 4 BUILT — 2026-09-27 (Claude Code, Opus); the arms are next
+## 🔴 STEP 4 ARMS CAPTURED — 2026-09-27 (Claude Code, Opus); the score is Arpit's, the verdict another session's
+
+[Report](../regression/2026-09-27-mined-expansion/report.md).
+
+- **Five arms** `0.0 / 0.1 / 0.2 / 0.3 / 0.5`, on one re-ingested copy of
+  `rung-01000` at `9cdde333`, at engine `f8b21bd5`. The re-ingest changed only
+  `abbr`, on 8 records (9 pairs, as the bar predicted).
+- **`mx-0.0` equals the 2026-09-24 capture on 80 of 80 rows**, so the pool of 10 applies.
+- **Rank 1 moves on 2 / 5 / 6 / 7 questions, all tagged.** These are changes, not improvements.
+- **Written before any score:** [`evidence/decide.py`](../regression/2026-09-27-mined-expansion/evidence/decide.py)
+  (the W-221 decider, with only the arm names, set and tags changed) and `describe.py`.
+- 🔴 **Next, in order:**
+  1. Arpit runs `just golden-score work/regression/2026-09-27-mined-expansion`.
+  2. A session that did **not** capture the arms runs `evidence/decide.py`.
+  3. An INCONCLUSIVE goes back to Arpit.
+- ⚠ **This session also read `questions/set-3-u.jsonl`** through the harness,
+  so the prompt-4 rebuild still needs a different session.
+
+## ✅ STEP 4 BUILT — 2026-09-27 (Claude Code, Opus)
 
 The mechanism exactly as [the bar](../regression/2026-09-27-mined-expansion/PRE-REGISTRATION.md)
 fixes it, **off at `mined_weight = 0.0`**. No treatment number exists.
