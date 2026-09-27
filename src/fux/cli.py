@@ -871,7 +871,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p_mcp.set_defaults(func=_cmd_mcp)
 
-    # W-210 — the ask explorer. A LOCAL page over the real `ask`, and the verb
+    # W-210 — the explorer. A LOCAL page over the real `ask`, and the verb
     # carries no `--host`: `serve.HOST` is the contract, not a default, and a
     # flag would turn a refusal into a preference. See `serve/__init__.py`.
     p_serve = sub.add_parser(

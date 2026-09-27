@@ -108,7 +108,7 @@ def _get(base: str, path: str) -> str:
 def test_the_verb_starts_and_serves_its_page(served):
     base, _ = served
     page = _get(base, "/")
-    assert "<title>fux — ask explorer</title>" in page
+    assert "<title>fux — explorer</title>" in page
     assert "<script>" in page and "src=" not in page.split("<script>")[0][-200:]
 
 
