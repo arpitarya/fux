@@ -851,12 +851,16 @@ class Mandatory(NamedTuple):
       adding it would switch URL ingestion on behind the consumer's back.
     - `never` — a table that is the consumer's own map (`[sources.url.config]`,
       handed to their fetchers unread). Its keys are never required or written.
+    - `whole_file` — `False` for a file whose ABSENCE is a setting
+      (`.fux/refusals.toml`: no file, no refusal rules). Such a file gains
+      missing keys when present and is never written when absent.
     """
 
     rel: str
     template: str
     present_only: tuple[str, ...] = ()
     never: tuple[str, ...] = ()
+    whole_file: bool = True
 
 
 def _mandatory_config() -> "tuple[Mandatory, ...]":
@@ -874,6 +878,13 @@ def _mandatory_config() -> "tuple[Mandatory, ...]":
         # counts as a document stays a line a human wrote (SR-TYPES decision 1a),
         # so only an ABSENT file is written whole; a present one gains `[limits]`.
         Mandatory(DEFAULT_TYPES_FILE, _seed_types().decode("utf-8"), (), ("decoders", "meta")),
+        # Deleting it is how a consumer says "no refusal rules" (SR-REFUSAL), so
+        # it is never written whole here; a present one gains `[scan]`.
+        Mandatory(
+            refusals.rules_path(Path()).as_posix(),
+            template_bytes(REFUSALS_TEMPLATE).decode("utf-8"),
+            whole_file=False,
+        ),
         Mandatory(tune_mod.TUNE_NAME, tune_mod.template_text()),
         Mandatory(output_mod.OUTPUT_NAME, output_mod.template_text()),
     )
@@ -1030,9 +1041,11 @@ def fill_missing(root: Path) -> "list[str]":
     import tomllib
 
     changed: list[str] = []
-    for rel, template, present_only, never in _mandatory_config():
+    for rel, template, present_only, never, whole_file in _mandatory_config():
         path = root / rel
         if not path.is_file():
+            if not whole_file:
+                continue
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(template, encoding="utf-8")
             changed.append(f"{rel}: written")

@@ -237,3 +237,10 @@ body_contains = [
 # reason = "this document is behind a paywall on the current plan"
 # content_type  = ["text/html"]
 # body_contains = ["upgrade-your-plan", "subscription-required"]
+
+# How much of a response the rules above may search (SR-LAW-12, W-225 stage 4b).
+# Required whenever this file exists; `fux doctor --fix` writes a missing key.
+# Decided in SR-REFUSAL: https://github.com/arpitarya/fux/blob/main/records/0146_refusals.md
+[scan]
+body_scan_bytes   = 1048576
+always_scan_under = 8192

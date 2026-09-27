@@ -6,7 +6,7 @@ import subprocess
 import pytest
 
 from fux import doctor
-from l12_fixtures import write_config
+from l12_fixtures import refusals_scan, write_config
 
 
 def _git_repo(tmp_path):
@@ -759,9 +759,11 @@ def _refusals_toml(tmp_path, *names):
     body = "".join(
         f'[[rule]]\nname = "{n}"\nreason = "no"\nbody_contains = ["{n}"]\n\n' for n in names
     )
+    from l12_fixtures import refusals_scan_text
+
     path = refusals.rules_path(tmp_path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(body, encoding="utf-8")
+    path.write_text(body + refusals_scan_text(), encoding="utf-8")
 
 
 def test_no_refusals_file_says_only_the_floor_applies(tmp_path):
@@ -846,7 +848,10 @@ def test_magic_floor_is_a_reserved_rule_name(tmp_path):
 
     with pytest.raises(FuxError, match="reserved"):
         refusals.parse(
-            {"rule": [{"name": refusals.MAGIC_FLOOR, "reason": "x", "max_bytes": 10}]},
+            {
+                "rule": [{"name": refusals.MAGIC_FLOOR, "reason": "x", "max_bytes": 10}],
+                "scan": refusals_scan(),
+            },
             origin="t",
         )
 
@@ -856,7 +861,10 @@ def test_refusal_returns_the_rule_name_structurally(tmp_path):
     from fux.ingest import refusals
 
     rules = refusals.parse(
-        {"rule": [{"name": "sso", "reason": "sign in", "body_contains": ["Sign in"]}]},
+        {
+            "rule": [{"name": "sso", "reason": "sign in", "body_contains": ["Sign in"]}],
+            "scan": refusals_scan(),
+        },
         origin="t",
     )
     body = b"<html>Sign in</html>"

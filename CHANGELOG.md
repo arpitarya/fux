@@ -84,6 +84,12 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   corpus at the next `fux ingest`. Custom copies in `.fux/decoders/` keep working:
   `fux.decode.json.MAX_DEPTH` is still importable. On this repo, 1 059 of 1 059
   decoded documents are byte-identical across the change.
+- ⚠ **`.fux/refusals.toml` gains a required `[scan]` table (law L12, W-225) —
+  `fux doctor --fix` adds it.** `body_scan_bytes = 1048576` and
+  `always_scan_under = 8192` bound how much of a fetched response the refusal
+  rules search; they were constants in code at the same values. The file itself
+  stays optional: deleting it still means *no refusal rules*, and `--fix` never
+  recreates it.
 - **The engine's fixed values live in one file, `src/fux/constants.toml`
   (W-225).** Schema ids, artefact names, decoder versions and extensions: read by
   both the Python and the Node reader. Nothing a consumer sees changes.

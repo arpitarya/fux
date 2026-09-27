@@ -65,6 +65,21 @@ Rules:
 
 ---
 
+## 2026-09-27 — **W-225 stage 4b: the refusal scan's bounds live in `.fux/refusals.toml [scan]`**
+
+**Outcome: landed; no value changed.**
+- **What:** `BODY_SCAN_BYTES` and `ALWAYS_SCAN_UNDER` left `refusals.py` for
+  `[scan] body_scan_bytes` / `always_scan_under` (template: 1 MiB, 8 KiB).
+  `load()` returns a `RuleSet` (a tuple carrying the bounds). A present file
+  must carry `[scan]`; an absent file still means *no rules* and is never
+  recreated — `setup.Mandatory` gained `whole_file=False` for it
+  ([SR-REFUSAL](../records/0146_refusals.md) decision 9a). This repo's
+  `refusals.toml` gained `[scan]` via `fux doctor --fix`.
+- **Evidence:** every refusal test passes against the template's bounds, the
+  past-64-KiB marker test included. TEST_COUNTS
+
+---
+
 ## 2026-09-27 — **W-225 stage 4a: the decoders' caps live in `.fux/formats.toml`**
 
 **Outcome: landed; no cap changed value, no decoded byte moved.**

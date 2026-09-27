@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@02783a764363, src/fux/setup.py@342330dc2d7c, tests/test_verb_table_agreement.py@1e7999ffd28f]
+owns: [src/fux/store/fuxdir.py@02783a764363, src/fux/setup.py@a248763de208, tests/test_verb_table_agreement.py@1e7999ffd28f]
 laws: [L2, L3, L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: b38b77de123f3fe9101349b9c5d868a4eb865fba86c5fdd3107707b20dae53ec
+content_sha: d18f3b177708bbf56b76317f882d9403a51647dd3a8441fa62dadbd54397de24
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -920,6 +920,8 @@ no longer parses, which is the worst pairing available and is why the error a
 line raises names the fix itself rather than pointing at the header.
 
 **`fux setup` seeds `formats.toml` with the caps template appended, and `fill_missing` covers the file** ([L12](0013_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27): absent is written whole, a present file gains only missing `[limits]` keys ([SR-TYPES](0128_types-list.md) decision 14).
+
+**`setup.Mandatory` gained `whole_file`** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 4b, 2026-09-27): `.fux/refusals.toml` gains missing `[scan]` keys when present and is never written when absent, because its absence means *no rules* ([SR-REFUSAL](0146_refusals.md) decision 9a).
 
 ### Consequences
 

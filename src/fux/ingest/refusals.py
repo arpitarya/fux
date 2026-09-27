@@ -124,12 +124,38 @@ MAGIC_BY_DECODER: dict[str, bytes] = {
 #: this path is HTML, which is being decoded anyway; a megabyte of it is
 #: microseconds. The cap stays only so a pathological response cannot make
 #: matching unbounded.
-BODY_SCAN_BYTES = 1024 * 1024
+#:
+#: ⚠ **`BODY_SCAN_BYTES` is `[scan] body_scan_bytes` in `.fux/refusals.toml`** since
+#: W-225 stage 4b (SR-LAW-12); the template writes 1 MiB.
 
 #: Below this, a response is searched for text markers whatever its declared
 #: type — an error shell served as `application/octet-stream` is still an
 #: error shell, and at this size the scan is free.
-ALWAYS_SCAN_UNDER = 8 * 1024
+#: ⚠ **`ALWAYS_SCAN_UNDER` is `[scan] always_scan_under`** since W-225 stage 4b;
+#: the template writes 8 KiB.
+SCAN_KEYS: tuple[str, ...] = ("body_scan_bytes", "always_scan_under")
+
+#: What a missing key's error tells the reader to do — `tune.py`'s sentence.
+_FIX_HINT = "`fux doctor --fix` writes every missing key from the template `fux setup` uses"
+
+
+class RuleSet(tuple):
+    """The parsed rules, in file order, plus `[scan]`'s two bounds.
+
+    A `tuple` so every caller that iterates or tests truthiness is unchanged;
+    the bounds ride on it because they only mean anything beside the rules they
+    bound. An absent file is an empty set with no bounds — there is nothing to
+    scan for, so nothing is read (W-225 stage 4b).
+    """
+
+    body_scan_bytes: int | None
+    always_scan_under: int | None
+
+    def __new__(cls, rules=(), *, body_scan_bytes=None, always_scan_under=None):
+        out = super().__new__(cls, rules)
+        out.body_scan_bytes = body_scan_bytes
+        out.always_scan_under = always_scan_under
+        return out
 
 _TEXTY_PREFIXES = ("text/", "application/xhtml", "application/xml", "application/json")
 
@@ -190,11 +216,16 @@ def rules_path(root: Path) -> Path:
     return root / ".fux" / RULES_NAME
 
 
-def load(root: Path) -> tuple[Rule, ...]:
-    """Parse `.fux/refusals.toml`. Absent is `()`; malformed raises."""
+def load(root: Path) -> RuleSet:
+    """Parse `.fux/refusals.toml`. Absent is an empty `RuleSet`; malformed raises.
+
+    ⚠ **Absent stays legal** (W-225 stage 4b): deleting the file is how a
+    consumer says *no refusal rules*, so `fux doctor --fix` never recreates it.
+    A present file must carry `[scan]`.
+    """
     path = rules_path(root)
     if not path.is_file():
-        return ()
+        return RuleSet()
     try:
         data = tomllib.loads(path.read_text(encoding="utf-8"))
     except tomllib.TOMLDecodeError as exc:
@@ -204,25 +235,38 @@ def load(root: Path) -> tuple[Rule, ...]:
     return parse(data, origin=str(path))
 
 
-def parse(data: dict, *, origin: str) -> tuple[Rule, ...]:
+def parse(data: dict, *, origin: str) -> RuleSet:
     """Declared table -> rules, in file order. Every fault names the rule."""
     if not isinstance(data, dict):
         raise FuxError(f"{origin}: expected a table of [[rule]] entries")
     raw_rules = data.get("rule", [])
     if not isinstance(raw_rules, list):
         raise FuxError(f"{origin}: [[rule]] must be an array of tables")
-    unknown_top = sorted(k for k in data if k != "rule")
+    unknown_top = sorted(k for k in data if k not in ("rule", "scan"))
     if unknown_top:
         raise FuxError(
             f"{origin}: unknown top-level key(s): {', '.join(unknown_top)} — "
-            "this file holds [[rule]] entries and nothing else"
+            "this file holds [[rule]] entries and one [scan] table, and nothing else"
         )
+    scan = data.get("scan", {})
+    if not isinstance(scan, dict):
+        raise FuxError(f"{origin}: [scan] must be a table")
+    missing = [f"[scan] {key} is missing" for key in SCAN_KEYS if key not in scan]
+    if missing:
+        raise FuxError(f"{origin}:\n  " + "\n  ".join(missing) + f"\n  {_FIX_HINT}")
+    unknown_scan = sorted(k for k in scan if k not in SCAN_KEYS)
+    if unknown_scan:
+        raise FuxError(f"{origin}: [scan] {unknown_scan[0]} is not a key - known: {', '.join(SCAN_KEYS)}")
+    for key in SCAN_KEYS:
+        value = scan[key]
+        if isinstance(value, bool) or not isinstance(value, int) or value < 1:
+            raise FuxError(f"{origin}: [scan] {key} must be a whole number of bytes >= 1 (got {value!r})")
 
     out: list[Rule] = []
     seen: set[str] = set()
     for index, entry in enumerate(raw_rules, start=1):
         out.append(_rule(entry, origin=origin, index=index, seen=seen))
-    return tuple(out)
+    return RuleSet(out, body_scan_bytes=scan["body_scan_bytes"], always_scan_under=scan["always_scan_under"])
 
 
 def _rule(entry, *, origin: str, index: int, seen: set[str]) -> Rule:
@@ -352,8 +396,8 @@ def _mime(content_type: str) -> str:
     return (content_type or "").split(";", 1)[0].strip().lower()
 
 
-def _searchable_text(mime: str, raw: bytes) -> str | None:
-    """The first `BODY_SCAN_BYTES` as text, or `None` when not worth searching.
+def _searchable_text(mime: str, raw: bytes, rules: RuleSet) -> str | None:
+    """The first `[scan] body_scan_bytes` as text, or `None` when not worth searching.
 
     `errors="replace"` rather than a strict decode: a refusal page with one
     mis-encoded byte is still a refusal page, and a decode that raised here
@@ -362,8 +406,8 @@ def _searchable_text(mime: str, raw: bytes) -> str | None:
     """
     if not raw:
         return ""
-    if mime.startswith(_TEXTY_PREFIXES) or len(raw) <= ALWAYS_SCAN_UNDER:
-        return raw[:BODY_SCAN_BYTES].decode("utf-8", errors="replace")
+    if mime.startswith(_TEXTY_PREFIXES) or len(raw) <= rules.always_scan_under:
+        return raw[: rules.body_scan_bytes].decode("utf-8", errors="replace")
     return None
 
 
@@ -410,7 +454,7 @@ MAGIC_FLOOR = "magic-floor"
 
 
 def refusal(
-    rules: tuple[Rule, ...],
+    rules: RuleSet,
     url: str,
     content_type: str,
     raw: bytes,
@@ -435,7 +479,7 @@ def refusal(
         return None
     mime = _mime(content_type)
     suffix = suffix_of(url)
-    text = _searchable_text(mime, raw)
+    text = _searchable_text(mime, raw, rules)
     for rule in rules:
         if rule.matches(suffix=suffix, mime=mime, raw=raw, text=text):
             return rule.name, rule.reason
@@ -443,7 +487,7 @@ def refusal(
 
 
 def refused(
-    rules: tuple[Rule, ...],
+    rules: RuleSet,
     url: str,
     content_type: str,
     raw: bytes,

@@ -2222,7 +2222,7 @@ def _frozen_keys(root: Path) -> list[Check]:
     from . import setup as setup_mod
 
     checks: list[Check] = []
-    for rel, template, present_only, never in setup_mod._mandatory_config():
+    for rel, template, present_only, never, _whole in setup_mod._mandatory_config():
         name = f"{Path(rel).name} current"
         path = root / rel
         if not path.is_file():

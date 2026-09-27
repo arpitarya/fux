@@ -39,7 +39,8 @@ valuable judgement, but not the state of play.
 
 - Twenty decoder caps are now `[limits.<decoder>]`, read via `decode._limits.limit()`, in the extract-config digest; `formats.toml` absent is a named error ([SR-TYPES](../records/0128_types-list.md) decision 14). 1 059/1 059 decodes byte-identical.
 - Three departures for Arpit in [the compare doc](compare/l12-classify.compare.md), incl. `ingest --check` not seeing a changed cap.
-- **Next:** 4b `refusals.toml [scan]`; 4c `inspect.toml` waits on the Words session.
+- **4b landed too:** `refusals.toml [scan]` holds the two scan bounds; the file stays optional ([SR-REFUSAL](../records/0146_refusals.md) decision 9a).
+- **Next:** 4c `inspect.toml` waits on the Words session.
 
 ### 🟢 2026-09-27 — W-225 STAGE 3b: `fux.toml` IS STRICT; W-226 CLOSED; 🔴 W-227 DECLARED
 

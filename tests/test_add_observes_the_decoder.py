@@ -18,7 +18,7 @@ import pytest
 
 from fux import sources
 from fux.errors import FuxError
-from l12_fixtures import write_config
+from l12_fixtures import refusals_scan_text, write_config
 
 
 def _args(entry, **flags):
@@ -131,7 +131,8 @@ def test_a_refusal_fires_BEFORE_the_proposal(repo):
     `decoder=html` perfectly happily — pinning the page fux could not read as
     the page it reads from now on."""
     (repo / ".fux" / "refusals.toml").write_text(
-        '[[rule]]\nname = "sso"\nreason = "sign in wall"\nbody_contains = ["loginfmt"]\n',
+        '[[rule]]\nname = "sso"\nreason = "sign in wall"\nbody_contains = ["loginfmt"]\n'
+        + refusals_scan_text(),
         encoding="utf-8",
     )
     _fetcher(repo, '(b\'<html><input name="loginfmt"></html>\', "text/html")')

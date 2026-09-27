@@ -165,3 +165,17 @@ def url_limits() -> dict:
 
     url = setup_mod.template_config()["sources"]["url"]
     return {"max_parallel": url["max_parallel"], "acquired_max_bytes": url["acquired_max_bytes"]}
+
+
+def refusals_scan() -> dict:
+    """`.fux/refusals.toml [scan]` as the template ships it (W-225 stage 4b)."""
+    import tomllib
+
+    from fux import setup as setup_mod
+
+    return tomllib.loads(setup_mod.template_bytes(setup_mod.REFUSALS_TEMPLATE).decode("utf-8"))["scan"]
+
+
+def refusals_scan_text() -> str:
+    """The `[scan]` table as TOML, to append after a test's hand-written rules."""
+    return "\n[scan]\n" + "".join(f"{k} = {v}\n" for k, v in refusals_scan().items())

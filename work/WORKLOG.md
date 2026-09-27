@@ -28,6 +28,12 @@ play: the worklog is the granular, per-exchange trail.
 - **Decided / open:** I did **not** run `fux doctor --fix` on the rung, as the queue line said: that was written for HEAD, and it would edit a frozen rung. The pin needs no fix and already carries step 4. This session read `set-4-claude`'s question text, so it may not build a rung (A23).
 - **Next:** 🔴 Arpit types `just golden-score work/regression/2026-09-27-golden-set-4-rung-01000`; then each step 6–10 counts its pool.
 
+## 2026-09-27 — W-225 stage 4b: `refusals.toml [scan]`  ·  Claude Code
+- **Asked:** *"implement"*, continued.
+- **Did:** The two refusal-scan bounds moved to `[scan]`, and `refusals.load` now returns a `RuleSet`. A present file needs `[scan]`; an absent one still means *no rules* and is never recreated (`Mandatory.whole_file`). Test fixtures read `[scan]` from the template. SR-REFUSAL gained decision 9a; SR-DOCTOR, SR-INGEST, SR-FETCHER and SR-DOTFUX got notes.
+- **Decided / open:** 4c (`inspect.toml`) waits for the Words session, which has `src/fux/inspect/` and SR-INSPECT uncommitted.
+- **Next:** stage 4c once `src/fux/inspect/` is clear; otherwise stage 5 (R7 structural numerals).
+
 ## 2026-09-27 — W-225 stage 4a: decoder caps in `.fux/formats.toml`, and the file is required  ·  Claude Code
 - **Asked:** *"implement"* (continue the green queue; W-168 was not this session's to run).
 - **Did:**

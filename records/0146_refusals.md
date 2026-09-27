@@ -7,10 +7,10 @@ description: "A declarative refusal table, every condition pure over the respons
 status: accepted
 date: 2026-09-01
 feature: refusal detection before decode
-owns: [src/fux/ingest/refusals.py@3517c1b5cbd3, src/fux/templates/refusals.toml.txt@bdf2356bc679, tools/refusal-probe@76b6f6b7f4aa, .fux/refusals.toml@bdf2356bc679]
+owns: [src/fux/ingest/refusals.py@c2842b4b4bb0, src/fux/templates/refusals.toml.txt@ffa8d8df1f1a, tools/refusal-probe@76b6f6b7f4aa, .fux/refusals.toml@5fdc90fab388]
 laws: [L1, L3]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 0a755799d9e5690eefbe8f57451b6630a1f23d06d56c5ccd41230c209cd22713
+content_sha: 25521894035db6bebd5487fa46dfa5f63df2522c2b7f3724f1e1422e355ee206
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -214,7 +214,8 @@ was written. The document in the index is the viewer's chrome.
    later by a human reading an answer. A typo'd condition that quietly does
    nothing is a rule that reads as protection and is not.
 
-9. **`BODY_SCAN_BYTES` is 1 MiB, and the number is measured.** The first value
+9. **The body scan is bounded at 1 MiB, and the number is measured** — `[scan]
+   body_scan_bytes` in `.fux/refusals.toml` since W-225 stage 4b (decision 9a). The first value
    was 64 KiB, reasoning about the wrong risk: the cost it feared was scanning
    a 40 MB workbook for a login string, but a workbook is binary and
    `_searchable_text` already declines to decode it. What reaches this path is
@@ -451,6 +452,19 @@ this moved where they are written, not what they are.
 <!-- L12-VALUES-END -->
 
 **No refusal rule changed** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27). `urlsrc.fetch_all` now takes `config`, `max_parallel` and `acquired_max_bytes` as required arguments; the refusal pass it runs is untouched ([SR-INGEST](0106_ingest.md)).
+
+**9a. `[scan]` — the two bounds live in the file, and the file stays optional** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 4b, 2026-09-27).
+`BODY_SCAN_BYTES` and `ALWAYS_SCAN_UNDER` left `refusals.py` for `[scan]
+body_scan_bytes` and `[scan] always_scan_under`, whole numbers of bytes `>= 1`;
+the template writes 1 MiB and 8 KiB. `load()` returns a `RuleSet` — a tuple of
+the rules carrying the two bounds — so every caller that iterates is unchanged.
+
+- **A present file must carry `[scan]`**, named in one error with the `fux
+  doctor --fix` sentence; `--fix` adds the table.
+- **An ABSENT file is still legal and still means *no rules***: deleting it is
+  how a consumer opts out of the starter rules, so `--fix` never recreates it
+  (`setup.Mandatory(whole_file=False)`). With no rules nothing is scanned, so no
+  bound is needed — only the magic floor applies.
 
 ### Consequences
 

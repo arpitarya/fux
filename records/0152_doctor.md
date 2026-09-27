@@ -7,11 +7,11 @@ description: "One record owns the health-check surface. Every check names a caus
 status: accepted
 date: 2026-09-11
 feature: "`fux doctor` — the read-only, offline health command and its check register"
-owns: [src/fux/doctor.py@c27595e53c5e, tests/test_doctor_register_is_complete.py@6c3d2378d45f]
+owns: [src/fux/doctor.py@37fb7feb889a, tests/test_doctor_register_is_complete.py@6c3d2378d45f]
 laws: [L4, L8]
 ratifies: "Arpit, 2026-09-11 — *create a new adr for doctor*"
 timestamp: 2026-09-11T00:00:00Z
-content_sha: 669633a418c5e383eb07d7d2256c497c2a46ac93df6adeb71bed6cdaebeb4fe0
+content_sha: e1ae21d5eee8e64740c30a7270201af55635a5ea9f2eec95ec4963116a01dcea
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -190,7 +190,7 @@ authoritative about the row.**
 | `retired agent folders` | warn | `.codex/skills/` or `.github/skills/` left behind by an older `setup`. **The DUPLICATE is the defect**: Copilot reads `.agents/skills/` *and* `.github/skills/`, so every skill appears twice and the older copy is free to disagree while both look correct. Delete is the whole remedy, and `fux setup` will not, because the folder may hold files fux did not write | [SR-AGENT-POLICY](0132_agent-policy.md) decision 16 |
 | `README.md current` | warn | the file's SECTION SET against the current template's. ⚠ **Sections, not bytes**: the file is write-if-missing so a consumer's notes survive, and a byte comparison would fire on every repo where somebody added a line. An EXTRA heading is the feature, never drift | [SR-DOTFUX](0102_fux-directory.md) decision 6 |
 | `refusal rules current` | warn | `.fux/refusals.toml` byte-equal to a starter fux has **REPLACED** — never edited, and refusing by rules fux stopped shipping. ⚠ **Matching the CURRENT starter is not a finding**; a repo set up yesterday looks exactly like that. Fires only on a digest in `doctor.RETIRED_REFUSAL_STARTERS`, **which is appended to by hand in the change that edits the starter** — fux ships one starter, so "equal to a previous one" is otherwise unanswerable from the tree | [SR-REFUSAL](0146_refusals.md) |
-| `fux.toml current` · `formats.toml current` · `tune.toml current` · `output.toml current` | warn | a key the engine has gained that the consumer's file does not mention. Write-if-missing means it never gains it on its own, and since L12 the verb that reads it stops — so this row names the keys and the remedy, `fux doctor --fix`, which writes exactly those keys from the template. ⚠ **Absent is the file's own `loads`/`present` row's to report**, not this one's | [SR-CONFIG](0113_config.md) decision 17 · [SR-TUNE](0135_tuning.md) decision 4 · [SR-OUTPUT](0143_output-defaults.md) decision 14 |
+| `fux.toml current` · `formats.toml current` · `refusals.toml current` · `tune.toml current` · `output.toml current` | warn | a key the engine has gained that the consumer's file does not mention. Write-if-missing means it never gains it on its own, and since L12 the verb that reads it stops — so this row names the keys and the remedy, `fux doctor --fix`, which writes exactly those keys from the template. ⚠ **Absent is the file's own `loads`/`present` row's to report**, not this one's | [SR-CONFIG](0113_config.md) decision 17 · [SR-TUNE](0135_tuning.md) decision 4 · [SR-OUTPUT](0143_output-defaults.md) decision 14 |
 | `declared types are readable` | warn | an include glob in `.fux/formats.toml` naming an extension no built-in and no `.fux/decoders/` decoder claims. ⚠ **Not the `decoder bindings` row**, which fires on a binding no indexed document matches; this one fires on a declared type nothing can READ — the documents are walked and then indexed as raw bytes or skipped, while a committed file says they are documents. **Prose suffixes are exempt**: `extract.py` reads them, so having no decoder is their normal state | [SR-TYPES](0128_types-list.md) |
 | `listed directories exist` | warn | a non-exclusion line in `.fux/sources/dirs` naming a path not on disk. 🔴 **`walk_sources` RAISES on this**, so the next `fux ingest` exits 1 — `fux add` refuses such a path, and a line that arrived another way had nothing checking it. Still `warn`: ingest is where it stops, and a directory not checked out on this branch is a legitimate state for an afternoon | [SR-DIR-LIST](0120_dir-list.md) |
 | `url extraction depth` | warn | a `url:` record whose extracted text is under `THIN_URL_SHARE` of its retained bytes — the `http` fetcher runs no JavaScript, so a single-page app returns a full-size shell and decodes to its nav bar. Read from the committed index and `.fux/acquired/`, never a fetch. ⚠ **Advisory and deliberately loose**: it surfaces the obvious case and adjudicates no extraction quality; `--cdp` is the remedy and whether a page needs one is the consumer's call | [SR-HTTP-FETCHER](0119_http-fetcher.md) |
@@ -445,6 +445,8 @@ this moved where they are written, not what they are.
 <!-- L12-VALUES-END -->
 
 **`types list usable` no longer passes an absent `formats.toml`** ([L12](0013_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27) — the file is required ([SR-TYPES](0128_types-list.md) decision 14) — and `formats.toml current` joins the frozen-keys rows for its `[limits]` keys.
+
+**`refusals.toml current` joins the frozen-keys rows for `[scan]`** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 4b, 2026-09-27); an absent `refusals.toml` is not reported there, because absent means *no rules* ([SR-REFUSAL](0146_refusals.md) decision 9a).
 
 ### Consequences
 

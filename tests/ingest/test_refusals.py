@@ -61,7 +61,11 @@ body_contains = ["WOPISrc=", "_wopiContextJson", "viewerinternal.aspx", "WacFram
 
 
 def rules(text: str = STARTER):
-    return refusals.parse(__import__("tomllib").loads(text), origin="test")
+    """Parse hand-written rules, with the template's `[scan]` bounds appended —
+    a present `refusals.toml` must carry them (W-225 stage 4b)."""
+    from l12_fixtures import refusals_scan_text
+
+    return refusals.parse(__import__("tomllib").loads(text + refusals_scan_text()), origin="test")
 
 
 # -- the always-on floor ----------------------------------------------------
@@ -316,7 +320,12 @@ def test_body_contains_finds_a_marker_past_64_kib():
 
 def test_body_scan_is_still_bounded():
     # Not unbounded: a pathological response must not make matching unbounded.
-    assert refusals.BODY_SCAN_BYTES <= 4 * 1024 * 1024
+    # The bound is `[scan] body_scan_bytes` since W-225 stage 4b; the template's
+    # value is what a fresh repo scans with.
+    from l12_fixtures import refusals_scan
+
+    assert not hasattr(refusals, "BODY_SCAN_BYTES")
+    assert refusals_scan()["body_scan_bytes"] <= 4 * 1024 * 1024
 
 
 def test_wopi_viewer_host_page_is_refused():

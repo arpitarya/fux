@@ -7,10 +7,10 @@ description: "Fux never fetches; a consumer-owned fetcher file does. One fetcher
 status: accepted
 date: 2026-08-19
 feature: the fetch contract, what it is called, and the two shipped templates
-owns: [src/fux/ingest/urlsrc.py@0238d03fd2d9, src/fux/templates@69c1bd84e86b]
+owns: [src/fux/ingest/urlsrc.py@0238d03fd2d9, src/fux/templates@642f8a879eac]
 laws: [L1, L3, L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 8162f536df2deaaede0dbe18d2a6ef6ab31a28a397e72a33a3b0520e13199c6e
+content_sha: b550e66c2636b255325f1f86595634e600a2f374339388dda16deefbadc96add
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -659,6 +659,8 @@ copied out, never imported.
 <!-- L12-NOTE-END -->
 
 **`src/fux/templates/` gained `formats-limits.toml.txt`** ([L12](0013_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27) — the decoders' caps, owned in substance by [SR-DECODE](0139_decode.md); no fetcher template changed.
+
+**`templates/refusals.toml.txt` gained `[scan]`** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 4b, 2026-09-27) — owned in substance by [SR-REFUSAL](0146_refusals.md) decision 9a.
 
 ### Consequences
 

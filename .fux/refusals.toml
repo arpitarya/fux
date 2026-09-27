@@ -237,3 +237,7 @@ body_contains = [
 # reason = "this document is behind a paywall on the current plan"
 # content_type  = ["text/html"]
 # body_contains = ["upgrade-your-plan", "subscription-required"]
+
+[scan]
+body_scan_bytes   = 1048576
+always_scan_under = 8192
