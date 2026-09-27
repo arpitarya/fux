@@ -22,6 +22,16 @@ play: the worklog is the granular, per-exchange trail.
 **Entry format:**
 
 ```
+## 2026-09-28 — Words tab committed; W-225 stage 4c: `.fux/inspect.toml`  ·  Claude Code
+- **Asked:** *"commit it then implement all"*.
+- **Did:**
+  - Committed the Words tab (`5fb0b548`) after fixing its skill description: under 500 characters, with no `: `.
+  - Stage 4c: nineteen inspect and explorer values moved to the new `.fux/inspect.toml`, loaded by `inspect/config.py` and attached to `IndexView`. Every lens default went.
+  - Added SR-INSPECT decision 14, an SR-DOTFUX row and an OWNERSHIP row.
+  - Unit 5 779, e2e 151.
+- **Decided / open:** No `diff_top` key: `--diff` never reached its `50`. The probe cache key now carries the rank. Cowork's W-227/W-168/W-228 edits are theirs and were left uncommitted.
+- **Next:** W-227 guard hardening (ruled); then W-225 stage 5.
+
 ## 2026-09-27 — W-168: phase-5 capture of `set-4-claude` on the gen-3 ladder  ·  Claude Code
 - **Asked:** *"implement w-168"*. The next step was the phase-5 run, which had to be done by a session other than W-227's.
 - **Did:** Pre-registered first (`0ce0b845`). Captured 125 questions × `ask --why` + `answer` on `rung-01000` with the rung's own engine `80495b44` (pinned worktree, no re-ingest) at the shipped `anchor 1.0` + `mined 0.5`. 125/125 rows carry gates; there were 0 declines; bands were 69/24/32/0. Filed [`2026-09-27-golden-set-4-rung-01000`](regression/2026-09-27-golden-set-4-rung-01000/report.md). The W-168 row and ball moved to Arpit, with an inbox row.

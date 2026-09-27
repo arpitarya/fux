@@ -36,7 +36,7 @@ here. Read that record before changing anything below it.
 
 - 🔴 **W-227** · `arpit` — L11 breach, 2026-09-27: the recursive grep and the guard gap. [detail](open/W-227-l11-breach-2026-09-27.md)
 - 🔴 **W-168** · `arpit` — the ranking ideas. Step 4 shipped at `mined_weight = 0.5`; `set-4-claude` captured on the gen-3 `rung-01000` 2026-09-27. Next: Arpit scores it; then each step 6–10 counts its pool. [detail](open/W-168-search-improvements.md)
-- 🟢 **W-225** · `agent` — L12 migration, building. Stages 1–4b landed (`constants.toml`; `tune`/`output`/`fux.toml` strict; `formats.toml` caps; `refusals.toml [scan]`). Next: 4c `inspect.toml`. [detail](open/W-225-values-live-in-config.md)
+- 🟢 **W-225** · `agent` — L12 migration, building. Stages 1–4 landed (`constants.toml`; `tune`/`output`/`fux.toml` strict; `formats.toml` caps; `refusals.toml [scan]`; `inspect.toml`). Next: stage 5, R7 numerals. [detail](open/W-225-values-live-in-config.md)
 
 
 ### testing

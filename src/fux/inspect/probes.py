@@ -43,7 +43,7 @@ from pathlib import Path
 from ..constants import fixed
 
 __all__ = [
-    "PROBE_RANK", "DEFAULT_PROBE_SAMPLE", "Probes", "run", "probe_texts", "ranking_key",
+    "Probes", "run", "probe_texts", "ranking_key",
     "open_cache", "save_cache",
 ]
 
@@ -51,11 +51,11 @@ PROBES_NAME = fixed("inspect", "probes")
 SCHEMA = fixed("inspect", "probes_schema")
 
 #: The bar: in the top ten, the list an agent is handed.
-PROBE_RANK = 10
+#: ⚠ **`[probes] probe_rank`** in `.fux/inspect.toml` since W-225 stage 4c (SR-LAW-12).
 
 #: Documents probed when no size is given. Each prose document is ~8 queries, so
 #: 50 is ~400 queries — minutes cold, instant from the cache.
-DEFAULT_PROBE_SAMPLE = 50
+#: ⚠ **`[probes] probe_sample`** since W-225 stage 4c; callers pass it.
 
 
 @dataclass
@@ -125,12 +125,12 @@ def _save(root: Path, key: str, results: dict[str, list[str]]) -> None:
         pass
 
 
-def _ask(root: Path, text: str) -> list[str]:
-    """The ten ids `ask` returns for `text`. **Never raises** — a failed query is a miss."""
+def _ask(root: Path, text: str, rank: int) -> list[str]:
+    """The top `rank` ids `ask` returns for `text`. **Never raises** — a failed query is a miss."""
     from ..query import run_query
 
     try:
-        results, _ = run_query(root, text, PROBE_RANK, force_scan=False)
+        results, _ = run_query(root, text, rank, force_scan=False)
     except Exception:  # pragma: no cover - a report must not fail a command
         return []
     return [r.id for r in results]
@@ -154,7 +154,7 @@ def save_cache(root: Path, key: str, cache: dict[str, list[str]], *, before: int
         _save(root, key, cache)
 
 
-def run(root: Path, view, facts, *, sample: int = DEFAULT_PROBE_SAMPLE, progress=None,
+def run(root: Path, view, facts, *, sample: int, progress=None,
         only: list[int] | None = None, cache: tuple[str, dict] | None = None) -> Probes:
     """Probe the sampled documents (or `only` those indices) and return outcomes.
 
@@ -181,10 +181,13 @@ def run(root: Path, view, facts, *, sample: int = DEFAULT_PROBE_SAMPLE, progress
             row: dict = {"title": None, "headings": []}
             for i, text in enumerate(texts):
                 p.update(1)
-                ids = cache.get(text)
+                # The rank is in the key (W-225 stage 4c): a changed
+                # `[probes] probe_rank` must not be served a list cut at the old one.
+                cache_key = f"probe@{view.config.probe_rank}:{text}"
+                ids = cache.get(cache_key)
                 if ids is None:
-                    ids = _ask(root, text)
-                    cache[text] = ids
+                    ids = _ask(root, text, view.config.probe_rank)
+                    cache[cache_key] = ids
                 out.queries += 1
                 rank = _rank(ids, doc.id)
                 if i == 0 and text == (doc.title or "").strip():

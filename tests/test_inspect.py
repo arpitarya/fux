@@ -13,6 +13,7 @@ import json
 from pathlib import Path
 
 import pytest
+from l12_fixtures import inspect_args, inspect_template, write_config
 
 from fux.inspect import _scan, checks as checks_mod, dictionary as dictionary_mod, lenses
 
@@ -73,7 +74,7 @@ def _fake_view(term_sets: list[list[int]]):
     """An `IndexView` carrying only what the duplication lens reads."""
     from array import array
 
-    view = _scan.IndexView()
+    view = _scan.IndexView(config=inspect_template())
     for i, terms in enumerate(term_sets):
         view.docs.append(
             _scan.Doc(
@@ -102,7 +103,7 @@ def _fake_view(term_sets: list[list[int]]):
 
 def test_two_identical_documents_are_a_pair_at_jaccard_one() -> None:
     view = _fake_view([list(range(50)), list(range(50)), list(range(100, 150))])
-    out = lenses.duplication(view)
+    out = lenses.duplication(view, top_lists=inspect_template().top)
     assert out.pair_count == 1
     left, right, score = out.near_duplicates[0]
     assert {left, right} == {"file:d0.md", "file:d1.md"}
@@ -112,7 +113,7 @@ def test_two_identical_documents_are_a_pair_at_jaccard_one() -> None:
 
 def test_two_disjoint_documents_are_not_a_pair() -> None:
     view = _fake_view([list(range(50)), list(range(100, 150))])
-    assert lenses.duplication(view).pair_count == 0
+    assert lenses.duplication(view, top_lists=inspect_template().top).pair_count == 0
 
 
 def test_the_reported_number_is_the_exact_jaccard_not_the_estimate() -> None:
@@ -123,7 +124,7 @@ def test_the_reported_number_is_the_exact_jaccard_not_the_estimate() -> None:
     value. This pair's exact Jaccard is 90/110, which is not.
     """
     view = _fake_view([list(range(100)), list(range(10, 110))])
-    out = lenses.duplication(view)
+    out = lenses.duplication(view, top_lists=inspect_template().top)
     assert out.pair_count == 1
     assert out.near_duplicates[0][2] == pytest.approx(90 / 110)
 
@@ -133,7 +134,7 @@ def test_a_document_with_no_terms_has_no_signature_and_no_pair() -> None:
     two empty sets is undefined, and reporting 1.0 would pair every stub in a
     corpus with every other."""
     view = _fake_view([[], [], list(range(20))])
-    assert lenses.duplication(view).pair_count == 0
+    assert lenses.duplication(view, top_lists=inspect_template().top).pair_count == 0
 
 
 # --------------------------------------------------------------------------
@@ -218,7 +219,8 @@ def test_a_repository_with_no_index_says_so_rather_than_tracing_back(tmp_path) -
 
     (tmp_path / ".fux").mkdir()
     with pytest.raises(FuxError) as excinfo:
-        inspect_index(tmp_path)
+        write_config(tmp_path)
+        inspect_index(tmp_path, **inspect_args())
     assert "fux ingest" in str(excinfo.value)
 
 
@@ -228,7 +230,7 @@ def test_a_dictionary_from_another_index_is_refused_rather_than_joined(tmp_path)
     An mtime reports a `git checkout` as fresh, and the dictionary would then
     name a vocabulary the index no longer has — words for hashes that moved.
     """
-    view = _scan.IndexView()
+    view = _scan.IndexView(config=inspect_template())
     view.shards = {"00.jsonl": "a" * 40}
     directory = dictionary_mod.inspect_dir(tmp_path)
     (directory / dictionary_mod.DICTIONARY_NAME).write_text(

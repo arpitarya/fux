@@ -179,3 +179,17 @@ def refusals_scan() -> dict:
 def refusals_scan_text() -> str:
     """The `[scan]` table as TOML, to append after a test's hand-written rules."""
     return "\n[scan]\n" + "".join(f"{k} = {v}\n" for k, v in refusals_scan().items())
+
+
+def inspect_template():
+    """`.fux/inspect.toml` as the template ships it — an `InspectConfig` (W-225 4c)."""
+    from fux.inspect import config as inspect_config
+
+    return inspect_config.load(None)
+
+
+def inspect_args(**given) -> dict:
+    """`inspect_index`'s three required values as `fux inspect` resolves them with no
+    flags: the template's samples and `[report] top`, unless the test names one."""
+    t = inspect_template()
+    return {"retrieval_sample": t.retrieval_sample, "probe_sample": t.probe_sample, "top": t.top, **given}

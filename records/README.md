@@ -801,6 +801,7 @@ table does not grant.
 | `.fux/output.toml` | SR-OUTPUT | this repo's own rendering defaults — the file whose shape is this record's whole subject |
 | `.fux/pii.toml` | SR-PII | this repo's own redaction ruleset. Decision 1 is that the ruleset is COMMITTED, so the committed file is the record's subject and not merely its output |
 | `.fux/refusals.toml` | SR-REFUSAL | this repo's own sign-in and refusal rules — the pair of `src/fux/templates/refusals.toml.txt`, already owned here |
+| `.fux/inspect.toml` | SR-INSPECT | this repo's own `fux inspect` / explorer thresholds, samples and row counts — the pair of `src/fux/templates/inspect.toml.txt` and `inspect/config.py`, already owned here. Changes what the report SAYS, never the index or a ranking |
 | `.fux/formats.toml` | SR-TYPES | this repo's own types list. `ingest/typesfile.py` is the writer, already owned here; this is what it writes |
 | `scripts/check-open-work-inbox.py` | SR-WORK-OPEN-QUEUE | the Blocked-on-Arpit inbox check — rules 39–45, executable |
 | `.claude/hooks/guard-open-work-inbox.sh` | SR-WORK-OPEN-QUEUE | the same check at session start, which is where the first-output rule bites |

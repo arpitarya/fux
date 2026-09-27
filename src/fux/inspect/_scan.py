@@ -22,6 +22,8 @@ of the index would be the worst kind of wrong: plausible.
 
 from __future__ import annotations
 
+from ..errors import FuxError
+
 from array import array
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -33,8 +35,6 @@ __all__ = [
     "Doc",
     "IndexView",
     "read_index_view",
-    "BOILERPLATE_DF_SHARE",
-    "DISTINCTIVE_DF_SHARE",
 ]
 
 #: A term at or above this document-frequency share is **boilerplate**: it is
@@ -43,13 +43,14 @@ __all__ = [
 #: on purpose — an absolute IDF floor moves with `n`, so the same term would be
 #: boilerplate on one rung of a corpus and not on the next, and the report's
 #: own vocabulary would stop meaning one thing.
-BOILERPLATE_DF_SHARE = 0.50
+#: ⚠ **`[thresholds] boilerplate_df_share` in `.fux/inspect.toml`** since W-225
+#: stage 4c (SR-LAW-12); read through `IndexView.config`.
 
 #: A term at or below this share is **distinctive** — rare enough that a query
 #: carrying it is asking for a small part of the corpus. Same reasoning as
 #: above: a share, not an IDF number. `max(1, …)` keeps it meaningful on a
 #: corpus small enough that 10 % rounds below one document.
-DISTINCTIVE_DF_SHARE = 0.10
+#: ⚠ **`[thresholds] distinctive_df_share`** since W-225 stage 4c.
 
 
 @dataclass(frozen=True)
@@ -108,6 +109,9 @@ class IndexView:
     edges: list[tuple[str, str, str, int]] = field(default_factory=list)
     #: shards read, and the content sha of each — the dictionary's cache key
     shards: dict[str, str] = field(default_factory=dict)
+    #: `.fux/inspect.toml`, set by `read_index_view` (W-225 stage 4c). `None` is
+    #: *not configured*, never a value: a threshold read then raises, naming it.
+    config: object = None
 
     @property
     def n(self) -> int:
@@ -119,12 +123,20 @@ class IndexView:
     @property
     def boilerplate_df(self) -> float:
         """The `df` at which a term becomes boilerplate on THIS corpus."""
-        return self.n * BOILERPLATE_DF_SHARE
+        return self.n * self._config().boilerplate_df_share
 
     @property
     def distinctive_df(self) -> float:
         """The `df` at or below which a term counts as distinctive here."""
-        return max(1.0, self.n * DISTINCTIVE_DF_SHARE)
+        return max(1.0, self.n * self._config().distinctive_df_share)
+
+    def _config(self):
+        if self.config is None:
+            raise FuxError(
+                "an IndexView with no .fux/inspect.toml attached - `read_index_view` "
+                "attaches it; fux holds no copy of the thresholds in code"
+            )
+        return self.config
 
 
 def read_index_view(root: Path, *, progress=None) -> IndexView:
@@ -136,8 +148,10 @@ def read_index_view(root: Path, *, progress=None) -> IndexView:
     """
     from ..progress import NULL as _NULL_PROGRESS
 
+    from .config import load as load_inspect_config
+
     progress = progress or _NULL_PROGRESS
-    view = IndexView()
+    view = IndexView(config=load_inspect_config(root))
     term_ids: dict[str, int] = {}
     raw: list[tuple[dict, array]] = []
     total_flen = [0] * len(store_mod.TF_FIELDS)

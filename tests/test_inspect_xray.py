@@ -26,7 +26,7 @@ import pytest
 from fux.inspect import as_dict, diff as diff_mod, facts as facts_mod, inspect_index, render_markdown
 from fux.inspect import xray as xray_mod
 from fux.inspect._scan import read_index_view
-from l12_fixtures import write_config
+from l12_fixtures import inspect_template, write_config
 
 DOCS = {
     "docs/runbook.md": "# Drain the retry queue\n\nStop the consumer, then drain the retry "
@@ -73,7 +73,7 @@ def corpus(tmp_path_factory) -> Path:
 
 @pytest.fixture(scope="module")
 def report(corpus):
-    return inspect_index(corpus, probe_sample=0, retrieval_sample=0)
+    return inspect_index(corpus, probe_sample=0, retrieval_sample=0, top=inspect_template().top)
 
 
 # --------------------------------------------------------------------------
@@ -81,7 +81,7 @@ def report(corpus):
 
 
 def test_the_report_is_byte_identical_on_an_unchanged_index(corpus, report) -> None:
-    again = inspect_index(corpus, probe_sample=0, retrieval_sample=0)
+    again = inspect_index(corpus, probe_sample=0, retrieval_sample=0, top=inspect_template().top)
     assert render_markdown(again) == render_markdown(report)
     assert json.dumps(as_dict(again), sort_keys=True) == json.dumps(as_dict(report), sort_keys=True)
 
@@ -153,7 +153,7 @@ def test_the_headline_row_is_title_probe_reach_and_is_descriptive(report) -> Non
 
 
 def test_the_probe_sample_is_evenly_spaced_and_labelled_an_estimate(corpus) -> None:
-    sampled = inspect_index(corpus, probe_sample=2, retrieval_sample=0)
+    sampled = inspect_index(corpus, probe_sample=2, retrieval_sample=0, top=inspect_template().top)
     probes = as_dict(sampled)["probes"]
     assert probes["sampled"] == 2 and probes["estimate"] is True
     assert "ESTIMATE" in render_markdown(sampled)
@@ -165,7 +165,7 @@ def test_the_probe_sample_is_evenly_spaced_and_labelled_an_estimate(corpus) -> N
 
 
 def test_skipping_probes_reports_n_a_never_a_pass(corpus) -> None:
-    skipped = as_dict(inspect_index(corpus, probe_sample=None, retrieval_sample=0))
+    skipped = as_dict(inspect_index(corpus, probe_sample=None, retrieval_sample=0, top=inspect_template().top))
     row = next(c for c in skipped["checks"] if c["name"] == "title-probe reach")
     assert row["status"] == "n/a" and skipped["probes"] is None
 
@@ -245,7 +245,7 @@ def test_diff_names_a_lost_edge_as_an_alert() -> None:
     out = diff_mod.compare(a, b)
     assert out["edge_loss"] == 1
     assert out["alerts"] == [{"id": "file:a.md", "lost_edges": [["ref", "file:b.md"]]}]
-    assert "Edge loss — 1 edge(s)" in diff_mod.render_markdown(out, a="A", b="B")
+    assert "Edge loss — 1 edge(s)" in diff_mod.render_markdown(out, a="A", b="B", top=inspect_template().top)
 
 
 def test_diff_of_a_report_against_itself_is_empty(report) -> None:

@@ -8,10 +8,10 @@ amended: 2026-09-27
 status: accepted
 date: 2026-09-14
 feature: the index X-ray
-owns: [src/fux/inspect@b865ff821f61]
+owns: [src/fux/inspect@27ce8b99b5da, .fux/inspect.toml@165ab7dcc9b6]
 laws: [L2, L3, L4, L6, L8]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: d7321dcb1dcb9bad6cce12a243ac2d79226a7b44cd978d0d65784e54bf67f1eb
+content_sha: 717ff6552dc340d3ebbedfe044d90606a1810db12644034c7fba8245d9789b76
 ratifies: W-169
 ---
 
@@ -19,6 +19,7 @@ ratifies: W-169
 
 **Owns** — the components this record decides:
 
+- [`.fux/inspect.toml`](../.fux/inspect.toml) · file
 - [`src/fux/inspect/`](../src/fux/inspect) · dir
 
 <!-- COMPONENTS-END -->
@@ -380,6 +381,29 @@ with their `df`/`idf`, dropped stopwords), and the documents one term is on.
 It states no new threshold: its classes are `BOILERPLATE_DF_SHARE` and
 `DISTINCTIVE_DF_SHARE`, the lenses' own. `fux serve` is its only caller today
 ([SR-SERVE](0158_serve.md) decision 4); `fux inspect` prints none of it.
+
+**14. `.fux/inspect.toml` — every threshold, sample and row count the report uses** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 4c, 2026-09-28).
+The first new consumer file L12 created (R6). Nineteen values left the lens
+modules and their parameter defaults — the boilerplate / distinctive df shares,
+the near-duplicate Jaccard, the link-target share, the minhash signature and
+band, the fingerprint length and findable rank, both sample sizes, the probe
+rank, the report's row counts, the X-ray's caps, and the explorer's triage and
+Words-tab page sizes — for seven tables: `[thresholds]`, `[minhash]`,
+`[findability]`, `[probes]`, `[report]`, `[xray]`, `[serve]`.
+
+- **One loader, `inspect/config.py`**, strict inside a repository (a missing
+  file or key is a named error with the `fux doctor --fix` remedy), and the
+  packaged template outside one — `fux inspect --diff A B` needs no repository.
+- **`read_index_view` attaches it to the view**, so every lens already had it;
+  `boilerplate_df` / `distinctive_df` read it, and `words._class` now asks the
+  view instead of repeating the arithmetic.
+- **No value changed.** `render_markdown`'s `top=50` for `--diff` was never
+  reached — the CLI always passed `--top` or 20 — so the diff uses `[report]
+  top` and no 50 was invented.
+- **The probe cache key now carries the rank** (`probe@<rank>:<text>`), so a
+  changed `[probes] probe_rank` is never served a list cut at the old one; an
+  existing cache is re-asked once.
+- It is not `tune.toml`: nothing here moves the index or a ranking.
 
 ### Consequences
 

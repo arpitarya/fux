@@ -65,6 +65,23 @@ Rules:
 
 ---
 
+## 2026-09-28 — **W-225 stage 4c: `.fux/inspect.toml`, the first new consumer file**
+
+**Outcome: landed; no value changed, no report number moved.**
+- **What:** nineteen `fux inspect` / explorer values — df shares, Jaccard,
+  link-target share, minhash size and bands, fingerprint length, findable and
+  probe ranks, both samples, report and X-ray row caps, the explorer's triage
+  and Words-tab page sizes — moved to `.fux/inspect.toml` (seven tables), loaded
+  by `inspect/config.py` (strict in a repo, the template outside one) and
+  attached to the `IndexView`. Every lens parameter default went; callers pass
+  the configured value. `fux setup` / `--fix` write the file; SR-INSPECT
+  decision 14, SR-DOTFUX's layout row, an OWNERSHIP row. The probe cache key
+  now carries the rank.
+- **Evidence:** unit 5 779 passed (the rest are the record-stamp gates this
+  commit settles and `999c1976`'s); e2e 151; `fux inspect` on this repo renders.
+
+---
+
 ## 2026-09-27 — **W-225 stage 4b: the refusal scan's bounds live in `.fux/refusals.toml [scan]`**
 
 **Outcome: landed; no value changed.**

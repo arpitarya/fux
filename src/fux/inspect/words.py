@@ -24,7 +24,6 @@ from __future__ import annotations
 
 from bisect import bisect_left
 
-from ._scan import BOILERPLATE_DF_SHARE, DISTINCTIVE_DF_SHARE
 
 __all__ = ["vocabulary", "analyze", "term_documents", "SORTS"]
 
@@ -33,11 +32,12 @@ __all__ = ["vocabulary", "analyze", "term_documents", "SORTS"]
 SORTS = ("df", "cf", "idf", "word")
 
 
-def _class(df: int, n: int) -> str:
-    """boilerplate · distinctive · common — the same thresholds the lenses use."""
-    if n and df >= n * BOILERPLATE_DF_SHARE:
+def _class(df: int, view) -> str:
+    """boilerplate · distinctive · common — the view's own thresholds, which are
+    the lenses' (`.fux/inspect.toml [thresholds]`), so there is one copy."""
+    if view.n and df >= view.boilerplate_df:
         return "boilerplate"
-    if df <= max(1.0, n * DISTINCTIVE_DF_SHARE):
+    if df <= view.distinctive_df:
         return "distinctive"
     return "common"
 
@@ -54,7 +54,7 @@ def _row(view, dictionary, term_id: int) -> dict:
         "df_share": df / view.n if view.n else 0.0,
         "cf": int(view.cf[term_id]),
         "idf": view.idf(term_id),
-        "class": _class(df, view.n),
+        "class": _class(df, view),
         "hapax": df == 1,
     }
 
@@ -98,7 +98,7 @@ def vocabulary(
                 if klass == "hapax":
                     if df != 1:
                         continue
-                elif _class(df, view.n) != klass:
+                elif _class(df, view) != klass:
                     continue
             kept.append(i)
         ids = kept
@@ -159,7 +159,7 @@ def analyze(view, dictionary, text: str) -> dict:
     return {"text": text, "kept": kept, "dropped": tokens, "documents": view.n}
 
 
-def term_documents(view, dictionary, term: str, *, limit: int = 200) -> dict | None:
+def term_documents(view, dictionary, term: str, *, limit: int) -> dict | None:
     """The documents carrying one term, named by its hash, its analyzed form or
     its printed word. `None` when no such term is in the index."""
     from ..store.format import term_hash

@@ -871,6 +871,7 @@ def _mandatory_config() -> "tuple[Mandatory, ...]":
     """
     from . import output_config as output_mod
     from . import tune as tune_mod
+    from .inspect import config as inspect_config
 
     return (
         Mandatory(CONFIG_NAME, config_text(), ("sources.url",), ("sources.url.config", "sources.url.routes")),
@@ -886,6 +887,7 @@ def _mandatory_config() -> "tuple[Mandatory, ...]":
             whole_file=False,
         ),
         Mandatory(tune_mod.TUNE_NAME, tune_mod.template_text()),
+        Mandatory(inspect_config.INSPECT_NAME, inspect_config.template_text()),
         Mandatory(output_mod.OUTPUT_NAME, output_mod.template_text()),
     )
 

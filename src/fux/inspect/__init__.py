@@ -69,9 +69,9 @@ class Report:
 def inspect_index(
     root: Path,
     *,
-    retrieval_sample: int | None = lenses_mod.DEFAULT_RETRIEVAL_SAMPLE,
-    probe_sample: int | None = probes_mod.DEFAULT_PROBE_SAMPLE,
-    top: int = 20,
+    retrieval_sample: int | None,
+    probe_sample: int | None,
+    top: int,
     rebuild_dictionary: bool = False,
     progress=None,
     view=None,
@@ -102,7 +102,7 @@ def inspect_index(
         root, view, dictionary, sample=retrieval_sample, top_lists=top, progress=progress,
         cache=query_cache,
     )
-    lengths = lenses_mod.lengths(view, top_lists=min(top, 10))
+    lengths = lenses_mod.lengths(view, top_lists=min(top, view.config.lengths_top))
     duplication = lenses_mod.duplication(view, top_lists=top)
     coverage = lenses_mod.coverage(root, view, dictionary)
     graph = lenses_mod.graph_shape(view, top_lists=top)
@@ -208,7 +208,7 @@ def render_markdown(report: Report) -> str:
             if not find.sampled
             else
             f"- Retrieval: {find.retrieved} of {find.sampled} document(s) come back in the top "
-            f"{lenses_mod.FINDABLE_RANK} for their own {lenses_mod.FINGERPRINT_TERMS} most distinctive "
+            f"{report.view.config.findable_rank} for their own {report.view.config.fingerprint_terms} most distinctive "
             f"words"
             + ("." if find.sample_is_whole_corpus else " — an evenly spaced SAMPLE, so the share is an estimate.")
         )
@@ -250,7 +250,7 @@ def render_markdown(report: Report) -> str:
     add("\n## 4 · Duplication and templates\n")
     add(
         f"- {dup.pair_count} near-duplicate pair(s) at Jaccard >= "
-        f"{lenses_mod.NEAR_DUPLICATE_JACCARD:.2f}, covering {dup.documents_in_a_pair} of {dup.docs} "
+        f"{report.view.config.near_duplicate_jaccard:.2f}, covering {dup.documents_in_a_pair} of {dup.docs} "
         f"document(s) (**{_share(dup.near_duplicate_share)}**).\n"
         f"- {dup.family_count} template family(ies) — documents with an identical heading SET — "
         f"covering {dup.documents_in_a_family} document(s)."
@@ -383,7 +383,7 @@ def _render_xray(report: Report, add) -> None:
         add(f"| {name} | {row['documents']} | {row['passages']} | {row['word']} | {_share(row['word_share'])} |")
     add(
         f"\nPage chrome: {_lever('page chrome')}. Link targets in body tokens: {_lever('link-target tokens')} "
-        f"(flagged at {xray_mod.LINK_TARGET_SHARE:.2f} of body tokens, *provisional*)."
+        f"(flagged at {report.view.config.link_target_share:.2f} of body tokens, *provisional*)."
     )
 
     add("\n## 11 · Triage — documents with findings, most findings first\n")
@@ -558,21 +558,24 @@ def cmd_inspect(args) -> int:
     # distinguishable from an explicit `0` (which means *every document*) --
     # the same reason every output-gated flag on this surface defaults to
     # `None`. `0 or default` would silently turn "all of them" into 100.
+    from .config import load as load_inspect_config
+
+    config = load_inspect_config(root)
     sample = getattr(args, "retrieval_sample", None)
     if sample is None:
-        sample = lenses_mod.DEFAULT_RETRIEVAL_SAMPLE
+        sample = config.retrieval_sample
     # `--all` probes every document; `--probe-sample 0` says the same, and an
     # absent flag is the sampled default (SR-INSPECT decision 7's rule).
     probe_sample = getattr(args, "probe_sample", None)
     if getattr(args, "all", False):
         probe_sample = 0
     elif probe_sample is None:
-        probe_sample = probes_mod.DEFAULT_PROBE_SAMPLE
+        probe_sample = config.probe_sample
     report = inspect_index(
         root,
         retrieval_sample=sample,
         probe_sample=probe_sample,
-        top=getattr(args, "top", 20) or 20,
+        top=getattr(args, "top", None) or config.top,
         rebuild_dictionary=bool(getattr(args, "rebuild_dictionary", False)),
         progress=progress,
     )
@@ -590,6 +593,15 @@ def cmd_inspect(args) -> int:
     return 0
 
 
+def _diff_top(args) -> int:
+    """`--top`, else `[report] top` — the repo's when inside one, the template's
+    when not (`--diff` compares two files and needs no repository)."""
+    from ..config import find_root
+    from .config import load as load_inspect_config
+
+    return getattr(args, "top", None) or load_inspect_config(find_root()).top
+
+
 def _cmd_diff(args, paths) -> int:
     """`--diff A B`: two reports in, one descriptive diff out. Writes nothing."""
     from . import diff as diff_mod
@@ -599,5 +611,5 @@ def _cmd_diff(args, paths) -> int:
     if getattr(args, "json", False):
         print(json_mod.dumps(diff, indent=2, sort_keys=True))
     else:
-        print(diff_mod.render_markdown(diff, a=a_path, b=b_path, top=getattr(args, "top", 20) or 20), end="")
+        print(diff_mod.render_markdown(diff, a=a_path, b=b_path, top=_diff_top(args)), end="")
     return 0

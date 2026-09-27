@@ -77,6 +77,7 @@ enrich_progress = ".fux/runtime/enrich-progress.tsv"
 pii_name        = "pii.toml"
 refusals_name   = "refusals.toml"
 observers_dir   = ".fux/observers"
+inspect         = ".fux/inspect.toml"
 
 [routes]
 # A `.fux/sources/routes` host pattern that is a regex, not a literal.
@@ -283,6 +284,7 @@ tune = "tune.toml.txt"
 output = "output.toml.txt"
 # The built-in decoders' caps, appended to the seeded .fux/formats.toml.
 formats_limits = "formats-limits.toml.txt"
+inspect = "inspect.toml.txt"
 
 [fuse]
 # Reciprocal-rank fusion's k (Cormack et al. 2009) -- a published constant,

@@ -332,7 +332,8 @@ class _Handler(BaseHTTPRequestHandler):
             return
         root = self.server.state.root()
         facts = facts_mod.Facts(by_id={view.docs[index].id: facts_mod.load_or_compute_one(root, view, view.docs[index])})
-        result = probes_mod.run(root, view, facts, only=[index])
+        # `sample` is required and unused with `only` — the configured one is passed.
+        result = probes_mod.run(root, view, facts, sample=view.config.probe_sample, only=[index])
         self._send_json({"probe": result.by_id.get(view.docs[index].id), "queries": result.queries})
 
     def _index(self, params: dict) -> None:
@@ -344,10 +345,8 @@ class _Handler(BaseHTTPRequestHandler):
 
     def _probes(self, params: dict) -> None:
         """The corpus report WITH probes: a sample by default, every document on `all=1`."""
-        from ..inspect import probes as probes_mod
-
         every = _first(params, "all") in ("1", "true", "yes")
-        sample = 0 if every else probes_mod.DEFAULT_PROBE_SAMPLE
+        sample = 0 if every else self.server.state.view().config.probe_sample
         self._send_json(self.server.state.job("probes-all" if every else "probes", probe_sample=sample))
 
 
@@ -364,7 +363,8 @@ class _Handler(BaseHTTPRequestHandler):
         if sort not in words_mod.SORTS:
             self._json_error(HTTPStatus.BAD_REQUEST, f"sort must be one of {', '.join(words_mod.SORTS)}, not {sort!r}")
             return
-        limit, offset = _first(params, "limit").strip() or "200", _first(params, "offset").strip() or "0"
+        config = self.server.state.view().config
+        limit, offset = _first(params, "limit").strip() or str(config.words_page), _first(params, "offset").strip() or "0"
         if not (limit.isdigit() and offset.isdigit()) or int(limit) < 1:
             self._json_error(HTTPStatus.BAD_REQUEST, "limit must be a positive integer and offset a non-negative one")
             return
@@ -372,7 +372,7 @@ class _Handler(BaseHTTPRequestHandler):
         self._send_json(words_mod.vocabulary(
             view, self.server.state.dictionary(), sort=sort, ascending=_first(params, "order") == "asc",
             query=_first(params, "q"), klass=_first(params, "class").strip(),
-            limit=min(int(limit), 1000), offset=int(offset),
+            limit=min(int(limit), config.words_page_max), offset=int(offset),
         ))
 
     def _analyze(self, params: dict) -> None:
@@ -391,7 +391,8 @@ class _Handler(BaseHTTPRequestHandler):
         if not term:
             self._json_error(HTTPStatus.BAD_REQUEST, "give me a term: /inspect/word?term=…")
             return
-        found = words_mod.term_documents(self.server.state.view(), self.server.state.dictionary(), term)
+        view = self.server.state.view()
+        found = words_mod.term_documents(view, self.server.state.dictionary(), term, limit=view.config.words_page)
         if found is None:
             self._json_error(HTTPStatus.NOT_FOUND, f"no term {term!r} in the index")
             return
@@ -411,10 +412,9 @@ _INSPECT_ROUTES = {
 }
 
 
-#: How many rows each capped list carries on the Index tab. The CLI's default is
-#: 20; a page can scroll, and the full count still travels beside every list.
-TRIAGE_ROWS = 200
-
+#: How many rows each capped list carries on the Index tab is `.fux/inspect.toml
+#: [serve] triage_rows` (W-225 stage 4c): a page can scroll, and the full count
+#: still travels beside every list.
 
 #: "Whatever `fux inspect` would use" — distinct from `None`, which skips.
 _LIBRARY_DEFAULT = object()
@@ -532,17 +532,16 @@ class _State:
 
     def _run(self, job, view, probe_sample, retrieval_sample) -> None:
         from ..inspect import as_dict, inspect_index
-        from ..inspect.lenses import DEFAULT_RETRIEVAL_SAMPLE
 
         if retrieval_sample is _LIBRARY_DEFAULT:
-            retrieval_sample = DEFAULT_RETRIEVAL_SAMPLE
+            retrieval_sample = view.config.retrieval_sample
 
         try:
-            # `top=TRIAGE_ROWS`: the page shows the triage fux ordered, and never
-            # re-sorts rows itself — an order is the engine's to state.
+            # `top=[serve] triage_rows`: the page shows the triage fux ordered,
+            # and never re-sorts rows itself — an order is the engine's to state.
             report = inspect_index(
                 self.root(), probe_sample=probe_sample, retrieval_sample=retrieval_sample,
-                progress=job["progress"], view=view, top=TRIAGE_ROWS,
+                progress=job["progress"], view=view, top=view.config.triage_rows,
             )
             job["result"] = as_dict(report)
             job["state"] = "done"

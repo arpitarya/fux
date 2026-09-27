@@ -16,6 +16,8 @@ records do not describe.
 
 from __future__ import annotations
 
+from functools import lru_cache
+
 import math
 from dataclasses import dataclass, field
 
@@ -33,9 +35,6 @@ __all__ = [
     "duplication",
     "coverage",
     "graph_shape",
-    "SIGNATURE_SIZE",
-    "BAND_ROWS",
-    "NEAR_DUPLICATE_JACCARD",
 ]
 
 #: finding -> the lever that already exists for it. **The report prints the
@@ -62,22 +61,25 @@ LEVERS: dict[str, str] = {
 #: `(1/bands) ** (1/rows)` = `(1/16) ** (1/4)` ≈ **0.5**, so every pair at or
 #: above `NEAR_DUPLICATE_JACCARD` is found with high probability and the
 #: candidate set stays far smaller than all pairs. Broder 1997.
-SIGNATURE_SIZE = 64
-BAND_ROWS = 4
+#:
+#: ⚠ **`[minhash] signature_size` and `band_rows` in `.fux/inspect.toml`** since
+#: W-225 stage 4c (SR-LAW-12), read through `view.config`; the template writes
+#: 64 and 4, and the arithmetic above assumes those.
 
 #: The estimated Jaccard at which two documents are reported as near
 #: duplicates. **0.8, not 0.9**: the failure this lens exists to name is a
 #: template filled in twice, which shares its headings and most of its
 #: vocabulary while differing in the part that matters.
-NEAR_DUPLICATE_JACCARD = 0.80
+#: ⚠ **`[thresholds] near_duplicate_jaccard`** since W-225 stage 4c.
 
 #: Fixed permutation seeds — `min(x ^ seed)` over a document's term hashes.
 #: XOR with a constant is a bijection on the 64-bit space, so each seed is a
 #: genuine permutation and the minimum under it is a genuine minhash. Fixed
 #: constants, never `random`: L3.
-_SEEDS: tuple[int, ...] = tuple(
-    (0x9E3779B97F4A7C15 * (i + 1)) & 0xFFFFFFFFFFFFFFFF for i in range(SIGNATURE_SIZE)
-)
+@lru_cache(maxsize=4)
+def _seeds(size: int) -> tuple[int, ...]:
+    """`size` permutation seeds — a pure function of the configured length."""
+    return tuple((0x9E3779B97F4A7C15 * (i + 1)) & 0xFFFFFFFFFFFFFFFF for i in range(size))
 
 
 @dataclass
@@ -223,7 +225,7 @@ class GraphShape:
 # --------------------------------------------------------------------------
 
 
-def boilerplate(view, dictionary, *, top: int = 20) -> Boilerplate:
+def boilerplate(view, dictionary, *, top: int) -> Boilerplate:
     out = Boilerplate(terms=len(view.term_of), postings=view.postings)
     threshold = view.boilerplate_df
     for term_id, df in enumerate(view.df):
@@ -308,16 +310,16 @@ def _slope(xs: list[float], ys: list[float]) -> float | None:
 #: query. **Six**, which is about the length of a real question once stopwords
 #: are gone — a fingerprint of thirty terms would retrieve the document by
 #: sheer overlap and would measure nothing.
-FINGERPRINT_TERMS = 6
+#: ⚠ **`[findability] fingerprint_terms`** in `.fux/inspect.toml` since W-225 stage 4c.
 
 #: The rank the document must reach in its own fingerprint's results. Three,
 #: as `fux enrich --check`'s self-retrieval filter uses.
-FINDABLE_RANK = 3
+#: ⚠ **`[findability] findable_rank`** since W-225 stage 4c.
 
 #: The default sample for the retrieval half. One full query per document, so
 #: the whole corpus is only affordable on a small one; `--retrieval-sample 0`
 #: asks for every document and says how long that will take.
-DEFAULT_RETRIEVAL_SAMPLE = 100
+#: ⚠ **`[findability] retrieval_sample`** since W-225 stage 4c; callers pass it.
 
 
 def findability(
@@ -325,8 +327,8 @@ def findability(
     view,
     dictionary,
     *,
-    sample: int | None = DEFAULT_RETRIEVAL_SAMPLE,
-    top_lists: int = 20,
+    sample: int | None,
+    top_lists: int,
     progress=None,
     cache: dict | None = None,
 ) -> Findability:
@@ -358,8 +360,9 @@ def findability(
         for index in indices:
             p.update(1)
             query = _fingerprint(view, dictionary, index)
-            rank = _self_rank(root, view.docs[index].id, query, cache) if query else None
-            if rank is not None and rank <= FINDABLE_RANK:
+            findable = view.config.findable_rank
+            rank = _self_rank(root, view.docs[index].id, query, findable, cache) if query else None
+            if rank is not None and rank <= findable:
                 out.retrieved += 1
             else:
                 out.misses.append((view.docs[index].id, rank))
@@ -405,7 +408,7 @@ def _fingerprint(view, dictionary, index: int) -> str:
             continue
         if term_hash_in(tokenize(surface), h, term_hash):
             words.append(surface)
-        if len(words) >= FINGERPRINT_TERMS:
+        if len(words) >= view.config.fingerprint_terms:
             break
     return " ".join(words)
 
@@ -414,7 +417,7 @@ def term_hash_in(analyzed: list[str], wanted: str, hasher) -> bool:
     return any(hasher(a) == wanted for a in analyzed)
 
 
-def _self_rank(root, doc_id: str, query: str, cache: dict | None = None) -> int | None:
+def _self_rank(root, doc_id: str, query: str, findable_rank: int, cache: dict | None) -> int | None:
     """1-based rank of `doc_id` in `query`'s results, or `None` if absent.
 
     ⚠ **Never raises.** `inspect` is a report; a query that cannot run is a
@@ -424,11 +427,11 @@ def _self_rank(root, doc_id: str, query: str, cache: dict | None = None) -> int 
     """
     from ..query import run_query
 
-    key = f"self@{FINDABLE_RANK}:{query}"
+    key = f"self@{findable_rank}:{query}"
     ids = cache.get(key) if cache is not None else None
     if ids is None:
         try:
-            results, _ = run_query(root, query, FINDABLE_RANK, force_scan=False)
+            results, _ = run_query(root, query, findable_rank, force_scan=False)
         except Exception:  # pragma: no cover - a report must not fail a command
             return None
         ids = [result.id for result in results]
@@ -445,7 +448,7 @@ def _self_rank(root, doc_id: str, query: str, cache: dict | None = None) -> int 
 # --------------------------------------------------------------------------
 
 
-def lengths(view, *, top_lists: int = 10) -> Lengths:
+def lengths(view, *, top_lists: int) -> Lengths:
     from ..store import TF_FIELDS
 
     out = Lengths(total_flen=view.total_flen, field_names=TF_FIELDS)
@@ -498,18 +501,21 @@ def _percentiles(values: list[int]) -> dict[str, int]:
 # --------------------------------------------------------------------------
 
 
-def duplication(view, *, top_lists: int = 20) -> Duplication:
+def duplication(view, *, top_lists: int) -> Duplication:
     out = Duplication(docs=view.n)
-    signatures = [_signature(view, i) for i in range(view.n)]
+    config = view.config
+    seeds = _seeds(config.signature_size)
+    rows = config.band_rows
+    signatures = [_signature(view, i, seeds) for i in range(view.n)]
     candidates: set[tuple[int, int]] = set()
-    bands = SIGNATURE_SIZE // BAND_ROWS
+    bands = config.signature_size // rows
     for band in range(bands):
         buckets: dict[tuple, list[int]] = {}
-        lo = band * BAND_ROWS
+        lo = band * rows
         for index, signature in enumerate(signatures):
             if signature is None:
                 continue
-            buckets.setdefault(tuple(signature[lo : lo + BAND_ROWS]), []).append(index)
+            buckets.setdefault(tuple(signature[lo : lo + rows]), []).append(index)
         for members in buckets.values():
             if len(members) < 2:
                 continue
@@ -529,7 +535,7 @@ def duplication(view, *, top_lists: int = 20) -> Duplication:
         # which planted exactly that pair and got an empty list. Banding
         # narrows the candidate set; the exact set intersection decides.
         exact = _jaccard(view.doc_terms[a], view.doc_terms[b])
-        if exact < NEAR_DUPLICATE_JACCARD:
+        if exact < config.near_duplicate_jaccard:
             continue
         in_a_pair.update((a, b))
         pairs.append((view.docs[a].id, view.docs[b].id, exact))
@@ -561,13 +567,13 @@ def duplication(view, *, top_lists: int = 20) -> Duplication:
     return out
 
 
-def _signature(view, index: int) -> list[int] | None:
+def _signature(view, index: int, seeds: tuple[int, ...]) -> list[int] | None:
     """The document's minhash signature, or `None` when it has no terms."""
     terms = view.doc_terms[index]
     if not len(terms):
         return None
     values = [view.term_value[t] for t in terms]
-    return [min(value ^ seed for value in values) for seed in _SEEDS]
+    return [min(value ^ seed for value in values) for seed in seeds]
 
 
 def _jaccard(a, b) -> float:
@@ -635,7 +641,7 @@ def _queue(root) -> list[tuple[str, str]]:
 # --------------------------------------------------------------------------
 
 
-def graph_shape(view, *, top_lists: int = 20) -> GraphShape:
+def graph_shape(view, *, top_lists: int) -> GraphShape:
     from ..graph.community import assign
     from ..graph.model import TAG_PREFIX, Edge, Graph
 

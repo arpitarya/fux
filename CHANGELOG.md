@@ -96,6 +96,13 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   rules search; they were constants in code at the same values. The file itself
   stays optional: deleting it still means *no refusal rules*, and `--fix` never
   recreates it.
+- ⚠ **New required file: `.fux/inspect.toml` (law L12, W-225) — `fux doctor
+  --fix` writes it.** Every threshold, sample size and row count `fux inspect`
+  and the `fux serve` explorer use — what counts as boilerplate or a
+  near-duplicate, how many documents are probed, how many rows a list shows —
+  moved out of the code, at the same values. It changes what the report says,
+  never the index or a ranking. `fux inspect --top` now defaults to its
+  `[report] top`; `fux inspect --diff` outside a repo reads the packaged values.
 - **The engine's fixed values live in one file, `src/fux/constants.toml`
   (W-225).** Schema ids, artefact names, decoder versions and extensions: read by
   both the Python and the Node reader. Nothing a consumer sees changes.

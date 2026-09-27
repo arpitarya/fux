@@ -35,7 +35,12 @@ valuable judgement, but not the state of play.
 *Updated **2026-09-27** (Claude Code, Opus — W-225 stage 3b landed; W-227 declared).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🟢 2026-09-27 (latest) — W-225 STAGE 4a: DECODER CAPS IN `formats.toml`; THE FILE IS REQUIRED
+### 🟢 2026-09-28 (latest) — W-225 STAGE 4c: `.fux/inspect.toml`; STAGES 1–4 DONE
+
+- Nineteen inspect/explorer values now in `.fux/inspect.toml` ([SR-INSPECT](../records/0156_inspect.md) decision 14); no value moved.
+- **Next:** W-227 hardening (ruled 2026-09-27), then W-225 stage 5 (R7 numerals → `constants.toml`).
+
+### 🟢 2026-09-27 — W-225 STAGE 4a: DECODER CAPS IN `formats.toml`; THE FILE IS REQUIRED
 
 - Twenty decoder caps are now `[limits.<decoder>]`, read via `decode._limits.limit()`, in the extract-config digest; `formats.toml` absent is a named error ([SR-TYPES](../records/0128_types-list.md) decision 14). 1 059/1 059 decodes byte-identical.
 - Three departures for Arpit in [the compare doc](compare/l12-classify.compare.md), incl. `ingest --check` not seeing a changed cap.

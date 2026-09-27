@@ -26,7 +26,6 @@ from pathlib import Path
 
 __all__ = [
     "Fold",
-    "LINK_TARGET_SHARE",
     "fold",
     "document",
 ]
@@ -34,7 +33,7 @@ __all__ = [
 #: A document whose inline link targets are at least this share of its body
 #: tokens is flagged. **Provisional**, in SR-INSPECT's sense: tuned to no
 #: corpus, printed with that word, and a flag is *attention*, never a failure.
-LINK_TARGET_SHARE = 0.10
+#: ⚠ **`[thresholds] link_target_share`** in `.fux/inspect.toml` since W-225 stage 4c.
 
 #: The findings a triage row can carry, in the order the report names them.
 FINDINGS = (
@@ -74,7 +73,7 @@ def _title_groups(view) -> dict[str, list[str]]:
     return groups
 
 
-def fold(view, facts, findability, probes=None, *, top: int = 20) -> Fold:
+def fold(view, facts, findability, probes, *, top: int) -> Fold:
     out = Fold()
     groups = _title_groups(view)
     shared = {title: sorted(ids) for title, ids in groups.items() if len(ids) > 1}
@@ -164,7 +163,7 @@ def fold(view, facts, findability, probes=None, *, top: int = 20) -> Fold:
         if f.get("chrome_tokens", 0):
             flags.append("page chrome indexed")
         body = f.get("body_tokens", 0)
-        if body and f.get("link_target_tokens", 0) / body >= LINK_TARGET_SHARE:
+        if body and f.get("link_target_tokens", 0) / body >= view.config.link_target_share:
             flags.append("link targets indexed")
         if doc.id not in linked:
             flags.append("orphan")
@@ -239,7 +238,7 @@ def _probe_lens(view, facts, probes, peers, *, top: int) -> dict:
 # --------------------------------------------------------------------------
 
 
-def document(root: Path, view, loc: str, *, passages_cap: int = 200, words: int = 25) -> dict:
+def document(root: Path, view, loc: str) -> dict:
     """The X-ray of one document: what was ingested, what was indexed, how it links.
 
     Computed for this document alone — its facts entry is refreshed through the
@@ -247,6 +246,7 @@ def document(root: Path, view, loc: str, *, passages_cap: int = 200, words: int 
     fields, redacted, exactly as the dictionary does for the corpus. Nothing here
     walks any other document's bytes.
     """
+    passages_cap, words = view.config.passages_cap, view.config.words
     from ..errors import FuxError
     from ..ingest import register
     from ..refer._chunk import chunk

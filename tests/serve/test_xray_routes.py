@@ -20,7 +20,7 @@ import pytest
 
 from fux.inspect import as_dict, inspect_index
 from fux.serve import HOST, make_server
-from l12_fixtures import write_config
+from l12_fixtures import inspect_template, write_config
 
 DOCS = {
     "ranking.md": "# Ranking\n\nSaturation and length normalisation decide how a long "
@@ -114,7 +114,7 @@ def test_the_index_tab_is_the_library_report_without_probes(server, corpus):
     """The same numbers `fux inspect --json` prints — one engine, two front doors."""
     report = wait(server, "/inspect/index")
     assert report["probes"] is None
-    direct = as_dict(inspect_index(corpus, probe_sample=None, retrieval_sample=None, top=200))
+    direct = as_dict(inspect_index(corpus, probe_sample=None, retrieval_sample=None, top=inspect_template().triage_rows))
     assert report["checks"] == direct["checks"]
     assert report["documents"] == direct["documents"]
 

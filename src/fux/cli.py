@@ -369,9 +369,10 @@ def build_parser() -> argparse.ArgumentParser:
     p_inspect.add_argument(
         "--top",
         type=int,
-        default=20,
+        default=None,
         metavar="N",
-        help="how many rows each named list shows (the counts beside them are never truncated)",
+        help="how many rows each named list shows (the counts beside them are never truncated); "
+        "default: .fux/inspect.toml [report] top",
     )
     p_inspect.add_argument(
         "--retrieval-sample",

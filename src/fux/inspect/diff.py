@@ -104,7 +104,7 @@ def _fmt(value) -> str:
     return "—" if value is None else str(value)
 
 
-def render_markdown(diff: dict, *, a: str, b: str, top: int = 50) -> str:
+def render_markdown(diff: dict, *, a: str, b: str, top: int) -> str:
     out: list[str] = []
     add = out.append
     add("# `fux inspect --diff` — what moved between two reports\n")

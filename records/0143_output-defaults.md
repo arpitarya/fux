@@ -13,7 +13,7 @@ feature: configurable output defaults
 owns: [src/fux/output_config.py@988bd2d3cdfb, src/fux/templates/output.toml.txt@7251f3203770, .fux/output.toml@7251f3203770, node/src/config/output.mjs@23ce57d18a76]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 4700bdcc761c26dd1dc1c1c398b3cc4e9bed7a937b79c9d80aa161658df1860e
+content_sha: ac0c3464e800791abc946932bdff29c2216551d3862a64806444d96588936cb1
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -792,6 +792,8 @@ this moved where they are written, not what they are.
 <!-- L12-VALUES-END -->
 
 **No output key changed** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27). `cli.py`'s observer hook no longer runs observers on a `50` ms bound held in code when `fux.toml` does not load ([SR-OBSERVE](0157_observe.md)); `node/test/config.test.mjs` gained the `dirs_file` cases.
+
+**`fux inspect --top` reads `.fux/inspect.toml [report] top`, not `output.toml`** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 4c, 2026-09-28): it sizes a report's lists, which is SR-INSPECT's, and no output key changed.
 
 ### Consequences
 

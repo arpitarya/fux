@@ -8,10 +8,10 @@ status: accepted
 date: 2026-09-22
 amended: 2026-09-27
 feature: the explorer — a local page over the real ask
-owns: [src/fux/serve@3158785e3f60]
+owns: [src/fux/serve@e1d7d6d2059d]
 laws: [L1, L2, L4, L6, L8, L10]
 timestamp: 2026-09-22T00:00:00Z
-content_sha: fc5b48ebf40aeebba94a16a30b55408a1fbbc1aa3d683ae68cb03b2b5a503388
+content_sha: c6c7ba943bf55d817b80f04b585e0080d2afcd109028cd59947a9d7240abe574
 ratifies: "Arpit, 2026-09-22 (Cowork, W-210) — three sample pages built on his machine, the per-token ingest X-ray REJECTED as a front page ('do you believe people will go through this big document?') and the question-first explorer ratified in its modern-dark form: 'the way I'm thinking about fux is something like Google. If a question gets asked, if you have the best 10 documents, the answer the agent gives is going to be mostly correct.'"
 ---
 
@@ -304,6 +304,8 @@ this moved where they are written, not what they are.
 - `src/fux/serve/__init__.py` — `HOST` ← `[serve] host`
 
 <!-- L12-VALUES-END -->
+
+**The explorer's sizes come from `.fux/inspect.toml [serve]`** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 4c, 2026-09-28): `triage_rows` (was `TRIAGE_ROWS = 200`), and the Words tab's `words_page` / `words_page_max` (were `200` / `1000` in the route); a document's probe route passes `[probes] probe_sample` explicitly ([SR-INSPECT](0156_inspect.md) decision 14).
 
 ### Consequences
 
