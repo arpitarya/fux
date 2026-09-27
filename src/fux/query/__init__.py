@@ -518,8 +518,8 @@ def _maybe_rerank(root: Path, query: str, results, tune: "Tune", top: int, uplif
 
 # -- the output contract -------------------------------------------------------
 
-#: The declared shape of what `--json` prints, beside this module
-#: (`query/output.schema.json`). **The only PUBLIC shape fux has**: everything
+#: The declared shape of what `--json` prints
+#: (`schemas/output.schema.json`). **The only PUBLIC shape fux has**: everything
 #: else declared in this repo is internal, and this one is parsed by other
 #: people's agents.
 OUTPUT_SCHEMA = fixed("schema_files", "output")
@@ -553,7 +553,7 @@ def _emit(payload: dict, shape: str, *, band_requested: bool = False) -> None:
     # fire — and the guard worth having is exactly the one it would lose: with
     # `--band` passed, an `answer` branch that forgot the key now FAILS instead
     # of quietly emitting one shape where its siblings emit another.
-    load_schema("fux.query", OUTPUT_SCHEMA).shape(shape).validate(
+    load_schema(OUTPUT_SCHEMA).shape(shape).validate(
         payload,
         label=f"--json {shape}",
         conditions={"band_requested": lambda _payload: band_requested},

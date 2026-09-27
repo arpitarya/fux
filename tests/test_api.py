@@ -15,7 +15,7 @@ Four things are asserted here and each is a promise the record makes:
    against 2.6 ms after. `cli.py` spells the path inline for exactly this
    reason and `tests/test_cli.py` holds the copies equal.
 4. **`as_dict()` is the `--json` payload**, validated against
-   `query/output.schema.json` — the one public shape fux has, and now the
+   `schemas/output.schema.json` — the one public shape fux has, and now the
    contract for three readers rather than one.
 """
 
@@ -150,7 +150,7 @@ def test_the_warm_gate_does_not_import_the_decoders(repo, monkeypatch):
 
 
 def _validate(payload: dict, shape: str) -> None:
-    load_schema("fux.query", "output.schema.json").shape(shape).validate(
+    load_schema("output.schema.json").shape(shape).validate(
         payload, label=f"api {shape}",
         conditions={"band_requested": lambda _p: "confidence" in payload},
     )

@@ -9,11 +9,11 @@ amended: 2026-09-13
 date: 2026-08-27
 ratified: 2026-08-27
 feature: the record-to-component model, and the `describes` relation W-82 ruling 4 added to it
-owns: [scripts/sr-guard.sh@78168609634b, scripts/sr-hash.py@89a61ddfaa5c, scripts/sr-owns.py@e9f45f2361f1, tests/sr_lib.py@c93fbcc78ec3, tests/test_sr_config_keys.py@ccc95d7f5d03, tests/test_sr_content_hash.py@f11f818ed4e9, tests/test_sr_freshness.py@39e5349eef5f, tests/test_sr_frontmatter.py@5ba563cc5d37, tests/test_sr_ownership.py@bcbcb08dc339, tests/test_sr_owns_consistency.py@b3d92e0f7e55, tests/test_sr_owns_hash.py@118b38a56a62, tests/test_sr_register_status.py@acae7406d76c]
+owns: [scripts/sr-guard.sh@78168609634b, scripts/sr-hash.py@6437d5e21713, scripts/sr-owns.py@eca3c3cfd2b3, tests/sr_lib.py@c93fbcc78ec3, tests/test_sr_config_keys.py@ccc95d7f5d03, tests/test_sr_content_hash.py@f11f818ed4e9, tests/test_sr_freshness.py@39e5349eef5f, tests/test_sr_frontmatter.py@5ba563cc5d37, tests/test_sr_ownership.py@1d335d33543b, tests/test_sr_owns_consistency.py@b3d92e0f7e55, tests/test_sr_owns_hash.py@660b91e77f7f, tests/test_sr_register_status.py@acae7406d76c]
 laws: [0]
 ratifies: W-82 ruling 4
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 956af5456d582e0536d9ab7b96bafd1fd880e86d2c445a78453bad8e8a06c6a9
+content_sha: 2dc76fabe6c249474fc52d0533adf46e7108e2abe4e9c9dce4d109287b933adf
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -371,6 +371,25 @@ top-level definitions.
     describe. **If it starts being obeyed without reading, narrow what is owned
     — never loosen the check**, which is the moving-threshold failure this repo
     has already refused twice.
+
+13a. **Both stampers refuse a repo-wide `--write`** (2026-09-27, W-226;
+    [SR-WORK-SESSION](0060_WORK-session.md) decision 13's two-strikes rule, on
+    the third occurrence). `sr-owns.py --write` and `sr-hash.py --write` stamp
+    **only the records they are named** (`0109`, a file name or a path);
+    stamping every record takes an explicit `--all`, for a tree no other session
+    is editing, and a bare `--write` exits `2` naming this decision. A check with
+    no `--write` still reads every record.
+    **Why:** on a shared tree a repo-wide stamp re-stamps another session's
+    records to match *their* in-progress code, which **silently satisfies**
+    decision 13's prompt to re-read the record. That happened on 2026-09-21
+    (eleven records, [`work/LESSONS.md`](../work/LESSONS.md)) and twice on
+    2026-09-27, each time found by reading `git diff` and reverted by hand.
+    **Enforced by** `tests/test_sr_owns_hash.py::test_a_bare_write_is_refused`,
+    which runs each script from a copy so that a regression can never stamp the
+    real records.
+    ⚠ **What it does not stop:** `--all` on a shared tree, or naming another
+    session's record. The flag moves the choice to the moment of typing; it does
+    not make the choice for you.
 
 
 14. **This is a WORK record** (Arpit, 2026-09-13). Who owns which component, and

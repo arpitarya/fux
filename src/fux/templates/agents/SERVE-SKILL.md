@@ -1,9 +1,9 @@
 ---
 name: fux-serve
-description: Open the Fux explorer with `fux serve` — a local page with three tabs — Ask (the ranked documents, which word earned each score, the band, one lever per finding), Documents (one document's X-ray — ingested, indexed, passages, links, probes) and Index (the whole index, worst first). Use for "why did this rank first", "open the fux UI", "show me how this document was indexed", or to SEE a ranking rather than read JSON. Read-only, localhost only; it applies no lever.
+description: Open the Fux explorer with `fux serve` — a local page with four tabs — Ask (the ranked documents, which word earned each score, the band, one lever per finding), Answer (the passage `fux answer` would cite, with citation and freshness), Documents (one document's X-ray) and Index (the whole index, worst first). Use for "why did this rank first", "open the fux UI", "show me how this document was indexed", or to SEE a ranking rather than read JSON. Read-only, localhost only; it applies no lever.
 ---
 
-# The ask explorer — `fux serve`
+# The explorer — `fux serve`
 
 `fux doctor` says whether the machine is set up. `fux inspect` says whether the
 index is any good. **`fux serve` says why *this question* got *those ten
@@ -55,6 +55,7 @@ a score, a band or a rank.** So:
   disagree while both look correct.
 
 The routes, if you need them directly: `/` (the page), `/ask?q=…&top=N`,
+`/answer?q=…[&no_refer=1]` (byte-identical `fux answer --json --band`),
 `/graph?seed=…`, `/health`. **No route writes anything**, and `POST` is a 405.
 
 ## 4 · Reading a row

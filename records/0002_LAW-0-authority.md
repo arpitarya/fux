@@ -10,7 +10,7 @@ feature: the authority of records — where a rule lives, which record wins, and
 owns: [scripts/gen-laws.py@cb86b063f88a, scripts/gen-components.py@f698b5c2305a, tests/test_claude_md_laws.py@0d11020f49f7, tests/test_record_components.py@44f91ccdd550]
 laws: [L0]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: 806e3ba581f58002d7755115be7f17ffcabe29d3fc9ca27638e131b10888c0fa
+content_sha: d5370258ece2b070aece50b9ca405385be0e5cfb3b53cb0a39c87d21aa10c199
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -323,7 +323,7 @@ permits or forbids.
 - **One documentation-only schema file is deleted** — `config.schema.json`,
   every field of which was a `doc:` string describing a key.
   ⚠ **This consequence said TWO until 2026-09-12 and was wrong about the
-  second.** `derive/runtime.schema.json` is not documentation:
+  second.** `schemas/runtime.schema.json` is not documentation:
   [`tests/derive/test_runtime_schema.py`](../tests/derive/test_runtime_schema.py)
   asserts its struct string, its field codes, its doc-table field set and its
   runtime version against `derive/format.py` in both directions. **A declaration a

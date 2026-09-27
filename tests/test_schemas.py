@@ -23,19 +23,21 @@ from fux import schema as schema_mod
 from fux.errors import FuxError
 
 SRC = Path(__file__).resolve().parents[1] / "src" / "fux"
+SCHEMA_DIR = SRC / "schemas"
 
 
-def _discovered() -> list[tuple[str, Path]]:
-    """Every `*.schema.json` shipped in the package, as `(dotted package, path)`."""
-    found = []
-    for path in sorted(SRC.rglob("*.schema.json")):
-        package = "fux" + "".join(f".{p}" for p in path.relative_to(SRC).parent.parts)
-        found.append((package, path))
-    return found
+def _discovered() -> list[Path]:
+    """Every `*.schema.json` shipped in the package, wherever it sits.
+
+    ⚠ **Discovery walks the whole package, not `schemas/`**, so a schema
+    written anywhere else is still found — and then refused by the placement
+    test below rather than silently skipped.
+    """
+    return sorted(SRC.rglob("*.schema.json"))
 
 
 SCHEMAS = _discovered()
-IDS = [str(p.relative_to(SRC)) for _pkg, p in SCHEMAS]
+IDS = [str(p.relative_to(SRC)) for p in SCHEMAS]
 
 
 def test_schemas_are_actually_discovered():
@@ -46,32 +48,47 @@ def test_schemas_are_actually_discovered():
     assert len(SCHEMAS) >= 5, f"expected the five declared planes, found {IDS}"
 
 
-@pytest.mark.parametrize("package,path", SCHEMAS, ids=IDS)
-def test_every_schema_is_valid_json_and_loadable(package, path):
+@pytest.mark.parametrize("path", SCHEMAS, ids=IDS)
+def test_every_schema_is_valid_json_and_loadable(path):
     json.loads(path.read_text(encoding="utf-8"))
-    schema_mod.load(package, path.name)
+    schema_mod.load(path.name)
 
 
-@pytest.mark.parametrize("package,path", SCHEMAS, ids=IDS)
-def test_every_schema_lives_beside_the_code_it_describes(package, path):
-    """**Ownership by construction, and it is not a style rule.**
+@pytest.mark.parametrize("path", SCHEMAS, ids=IDS)
+def test_every_schema_lives_in_the_schemas_directory(path):
+    """**One directory, one loader** (Arpit, 2026-09-27, W-226; SR-LAWS
+    decision 6). `fux.schema.load` resolves every name from `fux.schemas`, so a
+    schema written anywhere else is one no production path can load."""
+    assert path.parent == SCHEMA_DIR, f"{path.relative_to(SRC)} is outside src/fux/schemas/"
 
-    This repo assigns every component to exactly one decision record BY
-    DIRECTORY. A shared `schemas/` directory would put one record in charge of
-    shapes belonging to five — and that is not hypothetical: the record schema
-    was first written into `src/fux/templates/`, and the SR guard refused the
-    commit because that directory belongs to SR-FETCHER, a record with nothing
-    to say about the record shape.
+
+@pytest.mark.parametrize("path", SCHEMAS, ids=IDS)
+def test_every_schema_has_its_own_ownership_row(path):
+    """**What construction used to guarantee, now a gate.**
+
+    Until W-226 each schema sat beside the code it describes and inherited that
+    directory's owner — correct by construction. In one shared directory the
+    directory's owner (SR-LAWS, the mechanism's) would otherwise own all five
+    shapes, which is how the record shape was once briefly the fetcher record's.
+    So every file needs its OWN file-level OWNERSHIP row naming the record that
+    decides the shape; the directory row alone is not enough.
     """
-    assert path.parent.name != "schemas", "a shared schemas/ directory breaks SR ownership"
-    siblings = list(path.parent.glob("*.py"))
-    assert siblings, f"{path} sits beside no code"
+    from sr_lib import ownership_table
+
+    table = ownership_table()
+    component = str(path.relative_to(SRC.parents[1]))
+    assert component in table, (
+        f"{component} has no file-level row in records/README.md §OWNERSHIP — it "
+        "would fall to SR-LAWS, the directory's owner. Add a row naming the record "
+        "that decides this shape"
+    )
+    assert table[component] != "SR-LAWS", f"{component} is owned by the mechanism, not a shape's record"
 
 
-@pytest.mark.parametrize("package,path", SCHEMAS, ids=IDS)
-def test_every_schema_declares_a_version_id(package, path):
+@pytest.mark.parametrize("path", SCHEMAS, ids=IDS)
+def test_every_schema_declares_a_version_id(path):
     """So two fux versions with different shapes can never both claim one id."""
-    assert schema_mod.load(package, path.name).id, "no `schema` id declared"
+    assert schema_mod.load(path.name).id, "no `schema` id declared"
 
 
 #: Documentation keys a schema file may carry INSIDE an example. Stripped before
@@ -89,8 +106,8 @@ _DOC_KEYS = frozenset({"_doc", "_comment", "_note"})
 def _strip_doc(example: dict) -> dict:
     return {k: v for k, v in example.items() if k not in _DOC_KEYS}
 
-@pytest.mark.parametrize("package,path", SCHEMAS, ids=IDS)
-def test_every_declared_shape_carries_an_example(package, path):
+@pytest.mark.parametrize("path", SCHEMAS, ids=IDS)
+def test_every_declared_shape_carries_an_example(path):
     """**A shape without an example is a shape somebody will guess at**, and the
     guess will be wrong in exactly the way the declaration was trying to fix."""
     raw = json.loads(path.read_text(encoding="utf-8"))
@@ -108,8 +125,8 @@ def test_every_declared_shape_carries_an_example(package, path):
         assert "example" in body or "examples" in body, f"{path.name}#{name} has no example"
 
 
-@pytest.mark.parametrize("package,path", SCHEMAS, ids=IDS)
-def test_every_example_validates_against_its_own_declaration(package, path):
+@pytest.mark.parametrize("path", SCHEMAS, ids=IDS)
+def test_every_example_validates_against_its_own_declaration(path):
     """The one that would actually catch a rotted schema.
 
     An example is the part people copy, so an example that no longer matches
@@ -129,7 +146,7 @@ def test_every_example_validates_against_its_own_declaration(package, path):
             # list and is checked by the shape's own test, which knows what the
             # positions mean.
             continue
-        shape = schema_mod.load(package, path.name).shape(name)
+        shape = schema_mod.load(path.name).shape(name)
         for example in _examples(body):
             if not isinstance(example, dict):
                 continue
@@ -137,7 +154,7 @@ def test_every_example_validates_against_its_own_declaration(package, path):
             shape.validate(clean, label=f"{path.name}#{name}")
             checked += 1
     if "fields" in raw:
-        shape = schema_mod.load(package, path.name)
+        shape = schema_mod.load(path.name)
         for example in _examples(raw):
             clean = _strip_doc(example)
             shape.validate(clean, label=path.name, conditions=_CONDITIONS)
@@ -168,14 +185,14 @@ _CONDITIONS = {
 
 def test_a_missing_schema_is_a_broken_install_not_a_config_error():
     with pytest.raises(FuxError, match="broken install"):
-        schema_mod.load("fux", "no-such.schema.json")
+        schema_mod.load("no-such.schema.json")
 
 
 def test_coerce_never_raises_on_hostile_input():
     """`coerce` is the READING path, and a file on disk may have been truncated
     by a killed process, hand-edited during a debug session, or written by an
     older fux. A reporting plane must degrade rather than take down `doctor`."""
-    shape = schema_mod.load("fux.maintain", "state.schema.json").shape("url_health")
+    shape = schema_mod.load("state.schema.json").shape("url_health")
     for hostile in (None, [], "text", 42, {"fail_streak": "many"}, {"unknown": 1}):
         assert isinstance(shape.coerce(hostile), dict)
 
@@ -183,7 +200,7 @@ def test_coerce_never_raises_on_hostile_input():
 def test_validate_raises_where_coerce_would_shrug():
     """The asymmetry is the design. A shape fux is about to WRITE should be
     right; a shape fux READS may be anything."""
-    shape = schema_mod.load("fux.maintain", "state.schema.json").shape("url_health")
+    shape = schema_mod.load("state.schema.json").shape("url_health")
     assert shape.coerce({"fail_streak": "many"}) == {}
     with pytest.raises(FuxError, match="fail_streak"):
         shape.validate({"fail_streak": "many"})
@@ -192,11 +209,11 @@ def test_validate_raises_where_coerce_would_shrug():
 def test_a_bool_is_refused_where_an_int_is_declared():
     """`bool` is an `int` subclass, so a naive isinstance check writes `true`
     into a numeric field and nobody notices until a consumer parses it."""
-    shape = schema_mod.load("fux.maintain", "state.schema.json").shape("url_health")
+    shape = schema_mod.load("state.schema.json").shape("url_health")
     with pytest.raises(FuxError, match="fail_streak"):
         shape.validate({"fail_streak": True})
 
 
 def test_asking_for_a_shape_that_is_not_declared_says_so():
     with pytest.raises(FuxError, match="declares no shape"):
-        schema_mod.load("fux.query", "output.schema.json").shape("nope")
+        schema_mod.load("output.schema.json").shape("nope")

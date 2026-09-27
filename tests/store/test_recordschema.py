@@ -1,4 +1,4 @@
-"""The committed record's shape, declared once in `store/index-record.schema.json`.
+"""The committed record's shape, declared once in `schemas/index-record.schema.json`.
 
 The shape used to live in four places — assembled inline twice in
 `ingest/run.py`, policed by `DISPLAY_FIELDS` in `store/writer.py`, carried by
@@ -206,7 +206,7 @@ def test_validate_is_not_called_on_the_write_path(tmp_path):
 def test_the_template_ships_in_the_package():
     """Not just present in the source tree — reachable through
     `importlib.resources`, which is how an installed wheel finds it."""
-    raw = (resources.files("fux.store") / recordschema.SCHEMA_NAME).read_text("utf-8")
+    raw = (resources.files("fux.schemas") / recordschema.SCHEMA_NAME).read_text("utf-8")
     parsed = json.loads(raw)
     assert parsed["schema"] and parsed["fields"]
 
@@ -223,7 +223,7 @@ def test_both_examples_validate_against_the_schema():
     from importlib import resources
 
     raw = json.loads(
-        (resources.files("fux.store") / recordschema.SCHEMA_NAME).read_text("utf-8")
+        (resources.files("fux.schemas") / recordschema.SCHEMA_NAME).read_text("utf-8")
     )
     for name, example in raw["examples"].items():
         record = {k: v for k, v in example.items() if not k.startswith("_")}
@@ -238,7 +238,7 @@ def test_the_examples_encode_to_real_committed_lines():
     from importlib import resources
 
     raw = json.loads(
-        (resources.files("fux.store") / recordschema.SCHEMA_NAME).read_text("utf-8")
+        (resources.files("fux.schemas") / recordschema.SCHEMA_NAME).read_text("utf-8")
     )
     for example in raw["examples"].values():
         record = {k: v for k, v in example.items() if not k.startswith("_")}
@@ -257,7 +257,7 @@ def test_the_url_example_is_shaped_like_the_git_one():
     from importlib import resources
 
     raw = json.loads(
-        (resources.files("fux.store") / recordschema.SCHEMA_NAME).read_text("utf-8")
+        (resources.files("fux.schemas") / recordschema.SCHEMA_NAME).read_text("utf-8")
     )
     url = {k: v for k, v in raw["examples"]["url"].items() if not k.startswith("_")}
     git = {k: v for k, v in raw["examples"]["git"].items() if not k.startswith("_")}
@@ -274,7 +274,7 @@ def test_the_git_example_omits_archived_rather_than_writing_false():
     from importlib import resources
 
     raw = json.loads(
-        (resources.files("fux.store") / recordschema.SCHEMA_NAME).read_text("utf-8")
+        (resources.files("fux.schemas") / recordschema.SCHEMA_NAME).read_text("utf-8")
     )
     assert "archived" not in raw["examples"]["git"]
     assert "superseded" not in raw["examples"]["git"]

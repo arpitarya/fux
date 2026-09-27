@@ -7,10 +7,10 @@ description: "The ref/tag/code edges ingest already extracts become a queryable 
 status: accepted
 date: 2026-08-20
 feature: the graph lane — three relational verbs, a derived plane, and a lazy walk
-owns: [src/fux/graph@681f6b668ede, tools/graph-bench@9c330ea14b42, node/src/graph/community.mjs@94709cb9eeae, node/src/graph/model.mjs@62fe3c17c961, node/src/graph/plane.mjs@9b8da04fc9d7, node/src/graph/walk.mjs@2c157d951ec3, node/src/verbs/graph.mjs@adf3d141af2d]
+owns: [src/fux/graph@bd584327969d, tools/graph-bench@9c330ea14b42, node/src/graph/community.mjs@94709cb9eeae, node/src/graph/model.mjs@62fe3c17c961, node/src/graph/plane.mjs@9b8da04fc9d7, node/src/graph/walk.mjs@2c157d951ec3, node/src/verbs/graph.mjs@adf3d141af2d, src/fux/schemas/graph.schema.json@19bd4c486035]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 53d98c7c694d55065973fea1beadb5ef409b1d8dc9648d2201f15029b326a7f2
+content_sha: a9a9078a3a7e05ab1ec9b21e0aa3af71c0280836d65e56e2967088aca07a2d89
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -23,6 +23,7 @@ content_sha: 53d98c7c694d55065973fea1beadb5ef409b1d8dc9648d2201f15029b326a7f2
 - [`node/src/graph/walk.mjs`](../node/src/graph/walk.mjs) · file
 - [`node/src/verbs/graph.mjs`](../node/src/verbs/graph.mjs) · file
 - [`src/fux/graph/`](../src/fux/graph) · dir
+- [`src/fux/schemas/graph.schema.json`](../src/fux/schemas/graph.schema.json) · file
 - [`tools/graph-bench/`](../tools/graph-bench) · dir
 
 <!-- COMPONENTS-END -->
@@ -203,7 +204,7 @@ than a separate companion record — it is named here, by the feature that
 generates and reads it.
 
 **8a. It has a declared shape, checked on load.**
-`graph/graph.schema.json` declares `schema` · `edges` · the `communities` map,
+`schemas/graph.schema.json` declares `schema` · `edges` · the `communities` map,
 plus the 4-tuple `[src, kind, dst, grade]` an edge is, and `plane.load`
 validates the payload before trusting it.
 
@@ -594,7 +595,7 @@ this moved where they are written, not what they are.
 ### Reference (required)
 
 - The lane itself: [`src/fux/graph/`](../src/fux/graph/); the declared plane
-  shape: `graph/graph.schema.json`; the profiler:
+  shape: `schemas/graph.schema.json`; the profiler:
   [`tools/graph-bench/`](../tools/graph-bench/).
 - The edge vocabulary and grades this lane consumes:
   [`src/fux/ingest/edges.py`](../src/fux/ingest/edges.py).

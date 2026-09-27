@@ -17,7 +17,7 @@ exit code. It cannot be called from Python without faking a Namespace and
 capturing stdout, which is why `.fux/README.md` had to say *"the CLI is the
 contract; the modules are not"*. Three things change once the seam exists:
 
-1. **[`query/output.schema.json`](query/output.schema.json) becomes the
+1. **[`schemas/output.schema.json`](schemas/output.schema.json) becomes the
    contract for THREE surfaces** — CLI JSON, Python objects, Node objects —
    rather than one. Every result type here round-trips through `as_dict()` in
    exactly the shape `--json` emits, and the same schema validates all three.

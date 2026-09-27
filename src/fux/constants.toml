@@ -226,8 +226,12 @@ objects_dir = "objects"
 schema      = "fux.acquired.v1"
 
 [schema_files]
+# Every declared shape ships in ONE package, `src/fux/schemas/` (SR-LAWS
+# decision 6, W-226); `fux.schema.load` resolves every name below from it.
+package      = "fux.schemas"
 output       = "output.schema.json"
 index_record = "index-record.schema.json"
+graph        = "graph.schema.json"
 
 # -- The maintenance plane (maintain/*) ---------------------------------------
 

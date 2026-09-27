@@ -10,7 +10,7 @@ feature: "`fux answer` — one answer, its footing stated, and the report of wha
 owns: [src/fux/query/refer_answer.py@79014cc86dfd]
 laws: [L1, L2, L3]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: e6921d352981ee70cf47701cdb4bb085a99b8960e40c6aafedd3f9f2cf02079f
+content_sha: 71b64528c8e1a3e2ddcce2044b5d698a1fb374e96982eda39f26f02d52b2423c
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -563,7 +563,7 @@ read and `answer` is byte-identical.
   without parsing prose.
 - **`answer` is not a summariser and will never become one.** A future request
   for "just make it write a sentence" is refused by this record, not by taste.
-- **`--json` is validated against `query/output.schema.json` before it is
+- **`--json` is validated against `schemas/output.schema.json` before it is
   printed** ([SR-ASK](0103_ask.md) decision 11), so a key cannot be quietly
   renamed out from under a consumer.
 - 🔴 **`--band` reports a real `separation` on this verb for the first time,

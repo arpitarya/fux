@@ -38,6 +38,33 @@ Rules:
 
 ---
 
+## 2026-09-27 — **W-226: every schema in `src/fux/schemas/`**
+
+**Outcome: built, not committed. No shape, id or public output changed.**
+- **What:** the five `*.schema.json` files were moved with `git mv` into
+  `src/fux/schemas/`, a package. `fux.schema.load(name)` resolves every name
+  from `constants.toml [schema_files] package`, and callers no longer pass a
+  package. `recordschema.py` reads from the same place, and `graph.schema.json`
+  gained a `[schema_files]` key. [SR-LAWS](../records/0001_LAWS.md) decision 6
+  is amended on Arpit's ruling: ownership is now by per-file carve-out, and the
+  cost is named. OWNERSHIP has a `schemas/` row (SR-LAWS) plus one row per file
+  for its shape's record. 20 records were repointed.
+- **Gates:** `test_every_schema_lives_beside_the_code_it_describes` became two
+  tests: *lives in `schemas/`* and *has its own OWNERSHIP row*. The
+  orphan-module check reads `fux.schemas` as a declared root from the same key.
+- **Evidence:** the wheel carries `fux/schemas/*.schema.json`. From an installed
+  wheel, `fux setup`, `ingest` and `ask --json` all exit 0, and `ask --json`
+  validates against the moved `output.schema.json`. Node reads none of the files.
+  Node 89/89. Unit and e2e are green for W-226's scope. The remaining unit
+  failures belong to the concurrent W-225 stage-3 tree (`max_headings`, journal,
+  mcp, gen-3 ladder) plus the shared-file stamps.
+- **Also landed (two-strikes gate):** `sr-owns.py` and `sr-hash.py` refuse a
+  bare `--write`. You name the records to stamp, or pass `--all`.
+  [SR-WORK-OWNERSHIP](../records/0054_WORK-ownership.md) decision 13a, enforced
+  by `test_a_bare_write_is_refused`.
+
+---
+
 ## 2026-09-27 — **W-225 stage 3a: `.fux/output.toml` is mandatory, key by key**
 
 **Outcome: landed; no rendering default changed.**

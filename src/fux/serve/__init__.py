@@ -135,8 +135,8 @@ def _first(params: dict, key: str) -> str:
 
 
 class _Handler(BaseHTTPRequestHandler):
-    """GET routes only — `/`, `/ask`, `/graph`, `/health` and the X-ray tabs'
-    `/inspect/*` (SR-SERVE decision 4). Every other method is 405.
+    """GET routes only — `/`, `/ask`, `/answer`, `/graph`, `/health` and the
+    X-ray tabs' `/inspect/*` (SR-SERVE decision 4). Every other method is 405.
 
     ⚠ **`log_message` is silenced deliberately.** `BaseHTTPRequestHandler`
     writes an access line per request naming the full query string — which is
@@ -179,6 +179,8 @@ class _Handler(BaseHTTPRequestHandler):
                 self._page()
             elif route == "/ask":
                 self._ask(params)
+            elif route == "/answer":
+                self._answer(params)
             elif route == "/graph":
                 self._graph(params)
             elif route == "/health":
@@ -230,6 +232,26 @@ class _Handler(BaseHTTPRequestHandler):
         code, out = _run_cli(argv)
         if not out.strip():
             self._json_error(HTTPStatus.BAD_REQUEST, f"fux ask exited {code} and printed nothing")
+            return
+        self._send(HTTPStatus.OK, out.encode("utf-8"), _JSON)
+
+    def _answer(self, params: dict) -> None:
+        """The Answer tab — `fux answer --json --band`, byte for byte (Arpit,
+        2026-09-27). Same promise as `/ask`: the route runs the command, so the
+        page renders the passage fux cited and not a second idea of it.
+
+        `no_refer=1` passes `--no-refer` — the index's own structure, no fetch.
+        """
+        query = _first(params, "q").strip()
+        if not query:
+            self._json_error(HTTPStatus.BAD_REQUEST, "give me a question: /answer?q=…")
+            return
+        argv = ["answer", query, "--json", "--band"]
+        if _first(params, "no_refer") in ("1", "true", "yes"):
+            argv.append("--no-refer")
+        code, out = _run_cli(argv)
+        if not out.strip():
+            self._json_error(HTTPStatus.BAD_REQUEST, f"fux answer exited {code} and printed nothing")
             return
         self._send(HTTPStatus.OK, out.encode("utf-8"), _JSON)
 

@@ -10,7 +10,7 @@ feature: the rationale, history and reopen-trigger of L2
 owns: []
 laws: [L2]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: accfb84633f4da79f10019cb377f3cab6e481e15eedcb80278dd18808c10d71e
+content_sha: 5e496cff33e2961be930cd1a38324bb8f05d0869bd32eff9036db51d8b3a42f0
 ---
 
 # SR-LAW-2 — L2 — content is never durable outside its source system
@@ -156,7 +156,7 @@ on 2026-09-06 at Arpit's ruling.
 
 ```bash
 # no record property carries prose from a document body
-grep -rn '"body"\|"text"\|"excerpt"\|"snippet"' src/fux/store/index-record.schema.json
+grep -rn '"body"\|"text"\|"excerpt"\|"snippet"' src/fux/schemas/index-record.schema.json
 # expect: no output
 git check-ignore -q .fux/acquired && echo IGNORED
 # expect: IGNORED

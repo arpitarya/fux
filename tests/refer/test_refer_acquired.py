@@ -134,7 +134,7 @@ def test_the_output_schema_carries_the_sixth_verdict():
     import importlib.resources as resources
 
     raw = json.loads(
-        (resources.files("fux.query") / "output.schema.json").read_text(encoding="utf-8")
+        (resources.files("fux.schemas") / "output.schema.json").read_text(encoding="utf-8")
     )
     text = json.dumps(raw)
     assert "as-ingested" in text

@@ -67,7 +67,7 @@ from ..constants import fixed
 
 STATE_NAME = fixed("maintain", "url_state")
 
-#: The declared shapes, beside this module (`maintain/state.schema.json`).
+#: The declared shapes (`schemas/state.schema.json`).
 SCHEMA_NAME = fixed("maintain", "url_state_schema")
 
 
@@ -78,7 +78,7 @@ def _shape(name: str):
     because they are written and read by the same two modules and versioned by
     one string — the same argument the derived plane's schema makes.
     """
-    return load_schema("fux.maintain", SCHEMA_NAME).shape(name)
+    return load_schema(SCHEMA_NAME).shape(name)
 
 
 def _file_schema():

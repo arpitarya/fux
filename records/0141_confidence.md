@@ -11,7 +11,7 @@ feature: the confidence plane
 owns: [src/fux/query/confidence.py@20897950b94e, tests/test_confidence_floor_off.py@ee4823ba1f03, node/src/query/confidence.mjs@620ad647947d, node/test/confidence.test.mjs@77f997d159dc]
 laws: [L1, L3, L4]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: e5dd59168314ad28fec4b0f33a66a650e5256cdba40d2ffd2c8ddf00ebd17616
+content_sha: fe0530aec1586c27e1fc8ecf469a4c7dd7dc58a449e202d34dde7ea03938bb3b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1047,7 +1047,7 @@ evidence.*
 - [`src/fux/query/confidence.py`](../src/fux/query/confidence.py)
 - [`src/fux/query/analyzer.py`](../src/fux/query/analyzer.py)
 - [`src/fux/query/bm25f.py`](../src/fux/query/bm25f.py)
-- [`src/fux/query/output.schema.json`](../src/fux/query/output.schema.json)
+- [`src/fux/schemas/output.schema.json`](../src/fux/schemas/output.schema.json)
 - [`tools/quality/mix.toml`](../tools/quality/mix.toml)
 - [`tests/query/test_confidence.py`](../tests/query/test_confidence.py)
 - [`tests/query/test_analyzer.py`](../tests/query/test_analyzer.py)

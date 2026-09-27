@@ -1,7 +1,7 @@
 """One schema mechanism, used by every plane that has a declared shape.
 
-A **schema** here is a JSON file that sits beside the code that reads or writes
-a shape, declares that shape's fields, and carries a worked example. It is
+A **schema** here is a JSON file in `src/fux/schemas/` that declares one
+shape's fields, and carries a worked example. It is
 **not** a template: nothing copies it. It is loaded, and the code is checked
 against it.
 
@@ -13,18 +13,22 @@ parses. Writing five small validators would have produced five subtly different
 ideas of what "required" means, which is the drift this whole exercise exists
 to stop. **One mechanism, five declarations.**
 
-## Where a schema file lives, and why it is not negotiable
+## Where a schema file lives
 
-**Beside the code that owns the shape** — `store/index-record.schema.json`,
-`derive/runtime.schema.json`, and so on. Never in a shared `schemas/` directory.
+**In one directory, `src/fux/schemas/`**, beside `templates/` — every
+declared shape in one place (Arpit, 2026-09-27, W-226, amending SR-LAWS
+decision 6). `load` resolves every name from that one package, whose name is
+`[schema_files] package` in `constants.toml`; no caller names a package.
 
-The reason is ownership, not tidiness. This repo assigns every component to
-exactly one decision record **by directory**, so a shared directory would have
-one record owning shapes that belong to five. That is not hypothetical: the
-first version of the record schema was written into `src/fux/templates/`, and
-the SR guard refused the commit because `templates/` belongs to SR-FETCHER —
-a record with nothing to say about the record shape. **Beside the code, the
-ownership is correct by construction.**
+**Ownership stays per shape, by carve-out rather than by construction.** This
+repo assigns every component to exactly one decision record, and a shared
+directory would otherwise hand five shapes to one record — the first record
+schema, written into `templates/`, was briefly owned by SR-FETCHER that way. So
+each file carries its **own** file-level OWNERSHIP row naming the record that
+decides the shape, and `tests/test_schemas.py` refuses a schema file without
+one. ⚠ **The cost, named:** before the move a schema was owned correctly the
+moment it existed; now a schema added without its row falls to SR-LAWS, the
+directory's owner, until the test catches it.
 
 ## What a declaration looks like
 
@@ -65,6 +69,7 @@ from dataclasses import dataclass
 from functools import lru_cache
 from importlib import resources
 
+from .constants import fixed
 from .errors import FuxError
 
 __all__ = ["Field", "Schema", "load", "TYPES"]
@@ -282,14 +287,15 @@ class Schema:
 
 
 @lru_cache(maxsize=None)
-def load(package: str, name: str) -> Schema:
-    """Load a schema shipped as package data. Cached — schemas cannot change
-    under a running process.
+def load(name: str) -> Schema:
+    """Load one schema from `src/fux/schemas/`, shipped as package data.
+    Cached — schemas cannot change under a running process.
 
     A missing or malformed schema is a **broken installation**, not a user
     error, and says so. The alternative is a default shape silently taking over
     and reading or writing something nobody declared.
     """
+    package = fixed("schema_files", "package")
     try:
         raw = json.loads((resources.files(package) / name).read_text("utf-8"))
     except (OSError, ValueError, ModuleNotFoundError) as exc:

@@ -42,8 +42,14 @@ leaves coherence.
 
 Usage::
 
-    python scripts/sr-owns.py            # check: exit 1 and name every stale claim
-    python scripts/sr-owns.py --write    # recompute and stamp every `owns:` entry
+    python scripts/sr-owns.py                     # check every record: exit 1 and name every stale claim
+    python scripts/sr-owns.py --write 0109 0126   # stamp only the records you changed
+    python scripts/sr-owns.py --write --all       # stamp every record — only on a tree nobody else is editing
+
+🔴 **A bare `--write` is refused** (2026-09-27, W-226, the third occurrence). A
+repo-wide stamp on a shared tree re-stamps another session's in-progress
+records and silently satisfies the gate that exists to make them re-read those
+records. [SR-WORK-OWNERSHIP](../records/0054_WORK-ownership.md) decision 13a.
 
 ⚠ **Run `scripts/sr-hash.py --write` after this one** — stamping `owns` changes
 the record, which moves its own `content_sha`.
@@ -154,13 +160,42 @@ def records() -> list[Path]:
     return sorted(RECORDS.glob("[0-9][0-9][0-9][0-9]_*.md"))
 
 
+#: Why a bare `--write` is refused. Stated here, printed on refusal.
+_REFUSAL = (
+    "refusing a repo-wide --write: name the records you changed "
+    "(e.g. `0109` or records/0109_index-record.md), or pass --all when no other "
+    "session shares this tree. A repo-wide stamp re-stamps ANOTHER session's "
+    "in-progress records and silently satisfies the gate meant to make them "
+    "re-read them (SR-WORK-OWNERSHIP decision 13a; work/LESSONS.md 2026-09-21)."
+)
+
+
+def select(every: list[Path], names: list[str]) -> list[Path]:
+    """The records `names` picks out of `every` — a 4-digit number, a file
+    name, or a path. An unknown name is an error, never a silent no-op."""
+    picked = []
+    for name in names:
+        stem = Path(name).name
+        hits = [p for p in every if p.name == stem or p.name.startswith(f"{stem}_")]
+        if len(hits) != 1:
+            raise SystemExit(f"{name!r} names {len(hits)} records; name exactly one")
+        picked.append(hits[0])
+    return sorted(set(picked))
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--write", action="store_true", help="recompute and stamp every claim")
+    ap.add_argument("--write", action="store_true", help="recompute and stamp the named records' claims")
+    ap.add_argument("--all", action="store_true", help="with --write: every record (a tree nobody else is editing)")
+    ap.add_argument("records", nargs="*", help="record numbers, names or paths to act on")
     args = ap.parse_args()
+    if args.write and not args.records and not args.all:
+        print(_REFUSAL, file=sys.stderr)
+        return 2
+    chosen = select(records(), args.records) if args.records else records()
 
     stale: list[str] = []
-    for path in records():
+    for path in chosen:
         text = path.read_text(encoding="utf-8")
         new, moved = restamp(text)
         if not moved:
@@ -176,7 +211,7 @@ def main() -> int:
             print(f"  {s}")
         print("\nRead the record before re-stamping: a hash moves on a typo and on a")
         print("redesign alike, and only one of those means the record is now wrong.")
-        print("Then: python scripts/sr-owns.py --write && python scripts/sr-hash.py --write")
+        print("Then: python scripts/sr-owns.py --write <record…> && python scripts/sr-hash.py --write <record…>")
         return 1
     if not args.write:
         print(f"{len(records())} records: every owns hash is current")

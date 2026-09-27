@@ -7,10 +7,10 @@ description: "post-commit DEFERS — it writes a dirty list and spawns a detache
 status: accepted
 date: 2026-08-20
 feature: maintenance — the hooks, the deferring runner, the write lock, and the URL freshness daemon
-owns: [src/fux/maintain@60bd50d53789, tools/maintenance-bench@23a6ade137a5, tools/runner-race@98bd70ff092a]
+owns: [src/fux/maintain@9a50e177ca3b, tools/maintenance-bench@23a6ade137a5, tools/runner-race@98bd70ff092a, src/fux/schemas/state.schema.json@a448d8e2f6f5]
 laws: [L3, L4, L5, L7]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 1d52b2c6efeb485426085922119fae99d73037eeb7b573d8681b8ffb018046a5
+content_sha: 1de12f7faf6cf66845bfd012f350eb7635e5465654a00c93a2dc7aaee8d57629
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -18,6 +18,7 @@ content_sha: 1d52b2c6efeb485426085922119fae99d73037eeb7b573d8681b8ffb018046a5
 **Owns** — the components this record decides:
 
 - [`src/fux/maintain/`](../src/fux/maintain) · dir
+- [`src/fux/schemas/state.schema.json`](../src/fux/schemas/state.schema.json) · file
 - [`tools/maintenance-bench/`](../tools/maintenance-bench) · dir
 - [`tools/runner-race/`](../tools/runner-race) · dir
 
@@ -460,7 +461,7 @@ hook latency. That was an offline filesystem walk that is already cheap; this is
 a networked path that is not, and **the economics invert.**
 
 **11. The package's local state files have a declared shape, and the readers use
-it.** `maintain/state.schema.json` declares `url-state.json`, its per-URL health
+it.** `schemas/state.schema.json` declares `url-state.json`, its per-URL health
 entry, `url-shas.json` and `last-cited.json`, and the readers call
 `schema.coerce` rather than hand-rolling per-field suspicion.
 
@@ -501,7 +502,7 @@ Ruled by Arpit 2026-08-28.
 - **The exception TYPE is carried with the message**: a `FuxError` is the repo's
   own refusal (fix your config), anything else is a surprise (fix fux).
 - ⚠ **`daemon.status` shipped UNDECLARED.** It is now in
-  [`state.schema.json`](../src/fux/maintain/state.schema.json), which is the
+  [`state.schema.json`](../src/fux/schemas/state.schema.json), which is the
   gap that file exists to close — two readers were hand-rolling their own
   tolerance for what might be in it.
 - **`fux doctor` surfaces it**, because `fux daemon status` is what a person runs

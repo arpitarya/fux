@@ -22,6 +22,12 @@ play: the worklog is the granular, per-exchange trail.
 **Entry format:**
 
 ```
+## 2026-09-27 — W-226 and the serve Answer tab committed  ·  Claude Code
+- **Asked:** *"commit everything"*.
+- **Did:** Committed W-226 (schemas → `src/fux/schemas/`), the `fux serve` Answer tab, and the rebuilt `.fux/index`. The gates were owed first. I trimmed the serve skill description to 500 characters in all four copies. I shortened the W-168 and W-226 OPEN-WORK rows. I added `schemas/output.schema.json` to SR-FIND's and SR-OUTPUT's References: both describe `query/__init__.py`, and both decide part of the `--json` shape it declares. I re-stamped `owns:` for 0103, 0117, 0132, 0142, 0154 and 0159 after reading each diff; each was a path move, skill text, or W-225's committed Node change. I also re-stamped `content_sha` on the records named. Unit tests were 5754 passed and 3 failed before the commit; e2e 151/151 and Node 89/89 passed.
+- **Decided / open:** ⚠ `test_no_behaviour_change_landed_without_its_adr` stays red on `999c1976` (W-225 stage 3a): it touched an SR-TUNE component without `records/0135_tuning.md`. It is unpushed, but fixing it would rewrite another session's commit. That is W-225's to answer.
+- **Next:** reconcile W-226 against IMPLEMENTATION and close it.
+
 ## 2026-09-27 — W-225 stages 2 and 3a: `tune.toml` and `output.toml` required key by key  ·  Claude Code
 - **Asked:** *"implement W-225"*, the L12 migration. Arpit ruled R7–R10 in-session: structural numerals are FIXED; every bool default goes; the release is 3.0 and breaking; `__version__` stays.
 - **Did:** Stage 2 (`0cbbc44b`): `tune.toml` is strict in both readers, `fux doctor --fix` and `setup.fill_missing` are the writers, and the template is the one home; 704/704 outputs byte-identical. Stage 3a (`999c1976`): the same for `.fux/output.toml`, plus 5 new keys, `[answer] candidates` fixed, and API `graph()` taking `hops` required. Records amended, compare-doc departures listed for Arpit.
@@ -40,6 +46,12 @@ play: the worklog is the granular, per-exchange trail.
 - **Did:** All 8 rungs were stale, so all 8 were rebuilt from scratch by the unmodified builder, with the seed history replayed. The build ran from a clean worktree at `80495b44`, because other sessions' W-225/W-226 changes were uncommitted in the main tree. 8/8 froze: 68 seeds, 12 documents with history, 82 `ref` edges. Generation-2 rungs moved to `fux-lab/corpora/golden-gen2/`, not deleted. Filed [`2026-09-27-ladder-gen3-rebuild`](regression/2026-09-27-ladder-gen3-rebuild/report.md).
 - **Decided / open:** HEAD's W-225 stage 2 refuses the rungs until `fux doctor --fix` writes seven `tune.toml` keys; the index root is unchanged at `0cbbc44b`. The generator's banned-name list is still behind the seed (no leak found; `Sheikh` shared as a surname). Two unit failures at `80495b44` are W-225 stage 1's (`0159_constants.md` block + owns-hash), untouched.
 - **Next:** a phase-5 run of `set-4-claude` on the new ladder, pre-registered first.
+
+## 2026-09-27 — W-226 built: every schema in `src/fux/schemas/`  ·  Claude Code
+- **Asked:** *"implement W-226"*.
+- **Did:** Moved the five schemas with `git mv` into `src/fux/schemas/`. There is now one loader keyed by `[schema_files] package`. Amended SR-LAWS decision 6, OWNERSHIP (a directory row plus five file rows) and 20 records. The placement test became two, including a per-file ownership-row gate, and `fux.schemas` is now a declared orphan-check root. Verified from an installed wheel.
+- **Decided / open:** **Not committed.** A concurrent W-225 stage-3 session edits `constants.toml`, `query/__init__.py` and `api.py` too. My repo-wide `sr-owns --write` stamped their in-progress components, and I reverted those entries. This is the **third** occurrence (LESSONS 2026-09-21, the next entry, and this one). The gate landed in the same change as SR-WORK-OWNERSHIP decision 13a: both stampers refuse a bare `--write`, you name records or pass `--all`, and `test_a_bare_write_is_refused` enforces it.
+- **Next:** Commit W-226's pathspecs after W-225 stage 3 lands, and stamp the three shared files then.
 
 ## 2026-09-27 — W-168 step 4 shipped: mined_weight defaults to 0.5  ·  Claude Code
 - **Asked:** *"yes"*, confirming the ratification in chat after the classifier refused to act on it from edited files alone.

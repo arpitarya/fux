@@ -1,7 +1,7 @@
 """The derived plane's declared shapes, checked against the code that writes them.
 
 **A schema nothing compares against is a comment.** These tests are what make
-`derive/runtime.schema.json` load-bearing: the struct string, the doc table's
+`schemas/runtime.schema.json` load-bearing: the struct string, the doc table's
 field set and the runtime version are each asserted equal to the module that
 actually produces them.
 
@@ -27,7 +27,7 @@ SCHEMA_NAME = "runtime.schema.json"
 
 @pytest.fixture(scope="module")
 def schema() -> dict:
-    return json.loads((resources.files("fux.derive") / SCHEMA_NAME).read_text("utf-8"))
+    return json.loads((resources.files("fux.schemas") / SCHEMA_NAME).read_text("utf-8"))
 
 
 # -- the schema and the code agree -------------------------------------------

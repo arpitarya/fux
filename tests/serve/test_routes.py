@@ -159,6 +159,20 @@ def test_a_nonsense_top_is_refused_rather_than_silently_ignored(server, bad):
     assert "positive integer" in json.loads(body)["error"]
 
 
+def test_answer_returns_the_cited_passage_with_its_band(server):
+    status, body, content_type = get(server, "/answer?q=saturation%20length")
+    assert status == 200
+    assert "application/json" in content_type
+    payload = json.loads(body)
+    assert "answer" in payload and "source" in payload and "confidence" in payload
+
+
+def test_answer_with_no_question_is_a_named_refusal(server):
+    status, body, _ = get(server, "/answer?q=")
+    assert status == 400
+    assert "question" in json.loads(body)["error"]
+
+
 def test_graph_walks_from_a_named_seed(server):
     status, body, _ = get(server, "/graph?seed=docs/ranking.md")
     assert status == 200
@@ -195,6 +209,17 @@ def test_every_writing_method_is_refused_with_a_reason(server, method):
 
 
 # --- the promise the whole design rests on ----------------------------------
+
+
+@pytest.mark.parametrize("query", ["saturation length", "zzz nothing matches this"])
+@pytest.mark.parametrize("no_refer", [False, True])
+def test_answer_is_byte_identical_to_the_cli(server, corpus, query, no_refer):
+    """🔴 **`/answer` IS `fux answer --json --band`'s stdout** — the Answer tab's
+    promise is `/ask`'s, for the same reason: the route runs the command."""
+    _, served, _ = get(server, "/answer?q=" + urllib.parse.quote(query) + ("&no_refer=1" if no_refer else ""))
+    argv = [sys.executable, "-m", "fux.cli", "answer", query, "--json", "--band"] + (["--no-refer"] if no_refer else [])
+    cli = subprocess.run(argv, cwd=corpus, capture_output=True, text=True, encoding="utf-8")
+    assert served == cli.stdout
 
 
 @pytest.mark.parametrize("query", ["saturation length", "the walk", "zzz nothing matches this"])

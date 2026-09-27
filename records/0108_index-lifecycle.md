@@ -7,10 +7,10 @@ description: One canonical encoder, sharded doc-major JSONL, write-if-different;
 status: accepted
 date: 2026-08-18
 feature: generation and update of the committed index, and the refusal that keeps its derived accelerator from diverging
-owns: [src/fux/store@20632c62be16, node/src/store/format.mjs@ec3056937006, node/src/store/reader.mjs@f47fa69ecb2c]
+owns: [src/fux/store@b77ece805775, node/src/store/format.mjs@ec3056937006, node/src/store/reader.mjs@f47fa69ecb2c]
 laws: [L1, L2, L3, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 352cee9e7da41ddf1f731a38b3fe5910dc13d27c847558d7e972102df02c1053
+content_sha: 8a04cf587d60845f338e8c9c2aa4b3601c149a2079301703592db35470734da3
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -278,7 +278,7 @@ directory by hand and never being told what went with it. Pinned by
 including that `read_index` and delta ingest both still refuse.
 
 **11. The record's shape is declared in one schema file, not four places.**
-[`store/index-record.schema.json`](../src/fux/store/index-record.schema.json)
+[`schemas/index-record.schema.json`](../src/fux/schemas/index-record.schema.json)
 declares every field — its type, when it is required, its default, whether it
 carries display text, whether a delta ingest may carry it forward, and whether
 it is omitted rather than written false. `store/recordschema.py` loads it;
@@ -323,14 +323,16 @@ something you copy and fill in, which is what `templates/http.py.txt` is. This
 file is not copied anywhere — it declares a shape and is checked against the
 code.
 
-⚠ **It lives in `src/fux/store/`, not `src/fux/templates/`, and the SR guard
-is why.** The first commit attempt was refused: `templates/` is claimed by
-[SR-FETCHER](0117_fetcher.md), so a record-shape file put there would have been
-owned by a record with nothing to say about the record shape. Beside the code
-that owns it, the ownership is correct **by construction**.
+⚠ **It lives in `src/fux/schemas/`, not `src/fux/templates/`, and it is owned
+by SR-RECORD through its own file-level row.** The first commit attempt, into
+`templates/`, was refused: that directory is claimed by
+[SR-FETCHER](0117_fetcher.md), a record with nothing to say about the record
+shape. It then lived beside the code in `store/`; since 2026-09-27 (W-226) every
+schema shares `schemas/`, and the per-file carve-out
+[SR-LAWS](0001_LAWS.md) decision 6 requires is what keeps the owner right.
 
 **12. The derived plane has a schema too, and it covers all four shapes.**
-[`derive/runtime.schema.json`](../src/fux/derive/runtime.schema.json)
+[`schemas/runtime.schema.json`](../src/fux/schemas/runtime.schema.json)
 declares the postings block line, the 62-byte offset-table entry, the doc table
 and `stats.json` — deliberately together, because they are written by one build,
 read by one query path, and versioned by **one string** (`RUNTIME_SCHEMA`, today
@@ -438,7 +440,7 @@ this moved where they are written, not what they are.
 
 - `node/src/store/format.mjs` — `INDEX_DIR` ← `[index] dir`, `SCHEMA_ID` ← `[index] schema`, `ANALYZER_VERSION` ← `[index] analyzer`, `TF_FIELDS` ← `[index] tf_fields`, `TERM_HASH_BYTES` ← `[index] term_hash_bytes`, `CONTENT_SHA_BYTES` ← `[index] content_sha_bytes`
 - `src/fux/store/format.py` — `INDEX_DIR` ← `[index] dir`, `SCHEMA_ID` ← `[index] schema`, `ANALYZER_VERSION` ← `[index] analyzer`, `TF_FIELDS` ← `[index] tf_fields`, `_TERM_HASH_BYTES` ← `[index] term_hash_bytes`, `_CONTENT_SHA_BYTES` ← `[index] content_sha_bytes`
-- `src/fux/store/recordschema.py` — `SCHEMA_NAME` ← `[schema_files] index_record`
+- `src/fux/store/recordschema.py` — `SCHEMA_NAME` ← `[schema_files] index_record`, `try` ← `[schema_files] package`
 
 <!-- L12-VALUES-END -->
 
@@ -620,13 +622,13 @@ the three to be merged, did not.
   — [`writer.py`](../src/fux/store/writer.py); collisions —
   [`collisions.py`](../src/fux/store/collisions.py); the declared record
   shape —
-  [`index-record.schema.json`](../src/fux/store/index-record.schema.json)
+  [`index-record.schema.json`](../src/fux/schemas/index-record.schema.json)
   and [`recordschema.py`](../src/fux/store/recordschema.py).
 - The build and its invariants —
   [`src/fux/derive/_build.py`](../src/fux/derive/_build.py) (the module
   docstring states why raw-byte and parsed statistics must agree); the derived
   plane's declared shapes —
-  [`derive/runtime.schema.json`](../src/fux/derive/runtime.schema.json).
+  [`schemas/runtime.schema.json`](../src/fux/schemas/runtime.schema.json).
 - The write-time refusals — `assert_meta_policy` in
   [`store/writer.py`](../src/fux/store/writer.py); the cache it checks —
   `store/displaycache.py` (deleted 2026-09-20, W-194).
@@ -664,7 +666,7 @@ grep -n '_assert_invariants' src/fux/derive/_build.py
 
 # 4. the schema string still matches the code that writes it
 grep -n 'SCHEMA_ID' src/fux/store/format.py
-python3 -c "import json;print(json.load(open('src/fux/store/index-record.schema.json'))['schema'])"
+python3 -c "import json;print(json.load(open('src/fux/schemas/index-record.schema.json'))['schema'])"
 # expect: the same string — two shapes must never both be called fux.index.v2
 ```
 
@@ -685,12 +687,12 @@ evidence.*
 **Code**
 
 - [`src/fux/derive/_build.py`](../src/fux/derive/_build.py)
-- [`src/fux/derive/runtime.schema.json`](../src/fux/derive/runtime.schema.json)
+- [`src/fux/schemas/runtime.schema.json`](../src/fux/schemas/runtime.schema.json)
 - [`src/fux/store/canonical.py`](../src/fux/store/canonical.py)
 - [`src/fux/store/collisions.py`](../src/fux/store/collisions.py)
 - `src/fux/store/displaycache.py` — **DELETED 2026-09-20 (W-194)**, named rather than linked
 - [`src/fux/store/format.py`](../src/fux/store/format.py)
-- [`src/fux/store/index-record.schema.json`](../src/fux/store/index-record.schema.json)
+- [`src/fux/schemas/index-record.schema.json`](../src/fux/schemas/index-record.schema.json)
 - [`src/fux/store/recordschema.py`](../src/fux/store/recordschema.py)
 - [`src/fux/store/writer.py`](../src/fux/store/writer.py)
 - [`tests/store/test_foreign_index.py`](../tests/store/test_foreign_index.py)

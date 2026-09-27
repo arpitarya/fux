@@ -11,7 +11,7 @@ feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error 
 owns: [src/fux/tune.py@51540f8551a4, .fux/tune.toml@1f2f7240794e, node/src/config/tune.mjs@1adf99bbe934]
 laws: [L1, L3, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 15ff5ae1f18a194a88375982130ccfe16d708ae1bef03f8fadc86895319beb00
+content_sha: a1dab3418d3bd661f0f0b68d27dd4d734ac87b8f31fbc43229ee4241c2550118
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -856,7 +856,7 @@ and *"what did we do before?"* want opposite orderings out of one corpus.
 
 - ⚠ **This one DOES remove a capability**, and it is named rather than buried:
   `mtime` is on every record and appeared **nowhere** in
-  `query/output.schema.json`, so after the close **no date reached a caller at
+  `schemas/output.schema.json`, so after the close **no date reached a caller at
   all.** W-153 closes that gap and was filed beside this ruling, not after it.
 - **Two derived things go with it**, because their only reader was this knob:
   `ingest.priors.recency_multiplier` (and its Node twin) and

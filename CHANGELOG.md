@@ -10,6 +10,14 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Added
 
+- **`fux serve` is the fux explorer now (was "ask explorer") and gains an Answer tab**, and a `GET /answer?q=…[&no_refer=1]`
+  route that is the byte-identical stdout of `fux answer --json --band` — the
+  one passage fux would cite, its citation and freshness verdict, the band, and
+  the other passages it assembled folded away. The Documents tab was rebuilt as
+  a browser: a searchable, decoder-faceted register list grouped by folder, one
+  document at a time with its counts up front, probes first, the long tables
+  folded, links that open the linked document, and `?tab=docs&doc=…` deep links.
+  The page still computes nothing (SR-SERVE decision 3, amended 2026-09-27).
 - **Corpus-mined expansion, on by default (W-168 step 4).** When a document
   writes *"Mean Kinetic Temperature (MKT)"*, a query that says *MKT* also
   scores the long form, and the reverse, at `[ranking] mined_weight`, default
@@ -24,6 +32,7 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Changed
 
+- The five declared-shape schemas moved to `fux/schemas/` inside the package (W-226). No shape changed.
 - ⚠ **Every `.fux/tune.toml` key is now required (law L12, W-225) — run
   `fux doctor --fix` once.** fux no longer keeps a copy of any ranking value in
   code: a missing `.fux/tune.toml`, table or key stops `ask`, `find`, `answer`,

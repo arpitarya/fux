@@ -150,7 +150,11 @@ the cheap check that catches this class**, and it caught it twice in one day.
 
 ## 2026-09-21 — a repo-wide stamper is a concurrency hazard, and it is silent
 
-**`scripts/sr-owns.py --write` and `scripts/sr-hash.py --write` take no path
+⚠ **Gated since 2026-09-27** (W-226, SR-WORK-OWNERSHIP decision 13a): both
+stampers now refuse a bare `--write`. Name your records, or pass `--all` on an
+unshared tree. What follows is why.
+
+**`scripts/sr-owns.py --write` and `scripts/sr-hash.py --write` took no path
 argument.** They walk every record. On a tree another session is editing, that
 means a change of yours re-stamps the `owns:` hashes of *their* records to match
 *their* in-progress code — **silently satisfying the freshness gate that exists

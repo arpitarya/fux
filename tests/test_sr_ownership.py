@@ -446,7 +446,7 @@ _UNREACHABLE_BY_THE_GATE = {
     # ⚠ **SR-CDP-FETCHER, SR-HTTP-FETCHER and SR-RECORD left this set on
     # 2026-09-21** (W-208). Each gained a `src/` component it had always been
     # the record for -- the two fetcher templates, carved out of SR-FETCHER's
-    # `templates/` claim, and `store/index-record.schema.json`, carved out of
+    # `templates/` claim, and `store/index-record.schema.json` (now `schemas/`, W-226), carved out of
     # SR-INDEX-LIFECYCLE's `store/` claim. **Newly reachable is good news**, and
     # deleting a name from here is how it is recorded.
     # ⚠ **Nine more left this set on 2026-09-21** (W-208): SR-CACHEDIR-TAG,

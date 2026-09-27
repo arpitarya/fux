@@ -12,7 +12,7 @@ owns: [src/fux/query/provenance.py@59ef7c6eea8f]
 laws: [L1, L3, L4, L8]
 ratifies: W-91
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 4be1113eef2a59a033bdacbf27fa1e3b1f23ab64299a3d97eb6b45e0981de256
+content_sha: 450c24767c0ec0f88db91800633f4c71d579389f25859946ed23c98806d357bb
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -261,7 +261,7 @@ happen, and it is a knob rather than a refusal per Arpit's standing rule —
 state the cost, do not clamp it. `journal_max = 0` is *off*, never *unbounded*.
 
 **12. Every `fux answer --json` branch now validates.**
-`query/output.schema.json`'s own comment claims *"`fux answer --json` is
+`schemas/output.schema.json`'s own comment claims *"`fux answer --json` is
 validated against this before it is printed"*. Only the no-match branch went
 through `_emit`; the `refer` and `index` branches printed unvalidated. Both are
 routed through `_emit` here, so the declaration is true. ⚠ **This was a promise
@@ -672,7 +672,7 @@ grep -c "_emit(" src/fux/query/__init__.py
 
 - [`src/fux/query/provenance.py`](../src/fux/query/provenance.py)
 - [`src/fux/query/__init__.py`](../src/fux/query/__init__.py) — the three surfaces and `cmd_verify`
-- [`src/fux/query/output.schema.json`](../src/fux/query/output.schema.json) — `audit_record`, `derivation`, `receipt`
+- [`src/fux/schemas/output.schema.json`](../src/fux/schemas/output.schema.json) — `audit_record`, `derivation`, `receipt`
 - [`src/fux/refer/__init__.py`](../src/fux/refer/__init__.py) — `Bundle.as_record()`
 - [`src/fux/cli.py`](../src/fux/cli.py) — the flags and the `verify` verb
 - [`tests/query/test_provenance.py`](../tests/query/test_provenance.py)

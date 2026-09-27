@@ -686,7 +686,7 @@ the [wire format](#wire-format). See
 — argued in [`storage-architecture`](../archive/compare/storage-architecture.compare.md),
 **archived 2026-09-20**.
 
-**Serve (the ask explorer)** — `fux serve`: a **local** page, on `127.0.0.1`
+**Serve (the fux explorer)** — `fux serve`: a **local** page, on `127.0.0.1`
 and nowhere else, that takes a question and shows the ranked documents with the
 hood open — which word earned which part of each score, which links moved a
 result, the [confidence band](#confidence-band), and one lever per finding.
@@ -696,8 +696,10 @@ ranker in a browser is the restatement [L0](../records/0002_LAW-0-authority.md)
 forbids. Distinct from [`fux inspect`](#lever), which reports the shape of a
 whole corpus rather than the story of one question, and from `fux mcp`, which
 hands results to a *machine*. No route writes a committed byte and every lever
-is a proposal. **Three tabs since W-220** — Ask, Documents (one document's
-X-ray, computed on the click) and Index (the whole corpus, worst first, with
+is a proposal. **Four tabs** — Ask, Answer (since 2026-09-27: the one passage
+`fux answer --json --band` would cite, byte-identical too), Documents (one
+document's X-ray, computed on the click, browsed from a searchable register
+list) and Index (the whole corpus, worst first, with
 [title probes](#title-probe) streamed in behind) — and the server calls
 `fux inspect`'s library for the last two. See [SR-SERVE](../records/0158_serve.md).
 

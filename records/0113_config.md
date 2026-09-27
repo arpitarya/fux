@@ -10,7 +10,7 @@ feature: "`fux.toml` — discovery, schema, validation, and the keys that are re
 owns: [src/fux/config.py@a4bff466df04, node/src/config/root.mjs@aab1cfcd6c25, node/test/config.test.mjs@fb1b77bd6771]
 laws: [L4, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 9ecd12826f9c848ee2db9d55f5b74fe352fa477f35720ed643724567a853680b
+content_sha: a02ee7317552826564171a1347a834660ada884e3e2698a064ad6cdbe883f15c
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -549,7 +549,7 @@ SR-LAW-0 decision 4 puts on the forbidden row. Nothing loaded it, and nothing
 compared it to `config.py`, which is exactly how it came to advertise a
 `types_file` key that did not exist.
 
-⚠ **`derive/runtime.schema.json` is NOT deleted, and W-122's plan was wrong
+⚠ **`schemas/runtime.schema.json` is NOT deleted, and W-122's plan was wrong
 about it.** The plan called both files documentation-only; that is true of this
 one and false of that one —
 [`tests/derive/test_runtime_schema.py`](../tests/derive/test_runtime_schema.py)

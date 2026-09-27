@@ -125,7 +125,7 @@ def test_the_page_only_asks_routes_this_server_serves():
     """
     from fux.serve import _INSPECT_ROUTES
 
-    served = {"/ask", "/graph", "/health", "/"} | set(_INSPECT_ROUTES)
+    served = {"/ask", "/answer", "/graph", "/health", "/"} | set(_INSPECT_ROUTES)
     for path in re.findall(r'fetch\("([^"?]+)', SCRIPT):
         assert path in served, f"the page fetches {path!r}, which `serve/` does not route"
 

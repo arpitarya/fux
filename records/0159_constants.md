@@ -7,10 +7,10 @@ description: "src/fux/constants.toml holds every fixed engine value — schema i
 status: accepted
 date: 2026-09-27
 feature: "`src/fux/constants.toml` and its two loaders"
-owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@660979af88ee, src/fux/constants.toml@589979f4f3eb]
+owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@660979af88ee, src/fux/constants.toml@ba949d8e2626]
 laws: [L10, L12]
 timestamp: 2026-09-27T00:00:00Z
-content_sha: 19d068fe080d28ce7325dcd4be4dc51a21256c46db104fe29af1bcbe159f31bf
+content_sha: dc0ec2821e669f9d58d805b423777c4b63f814ec862e9281fbf6c13d748bbb31
 ratifies: "W-225 — Arpit, 2026-09-27: fixed values go to 'another internal-to-code file for the rest of the values like SCHEMA, RULES_VERSION'; on the R5 scan the same day, a number fixed by a file format, protocol or algorithm is a fixed value too (R7)"
 ---
 
@@ -91,7 +91,10 @@ algorithm defines.
 1. **One file, `src/fux/constants.toml`, holds every fixed engine value.** It is
    organised in tables by subject — `[index]`, `[graph]`, `[files]`,
    `[runtime]`, `[decoders.<name>]`, `[receipt]`, `[fuse]`, `[versions]`,
-   `[templates]`, … — and each key carries the comment that explains it. Three
+   `[templates]`, `[schema_files]`, … — and each key carries the comment that
+   explains it. `[schema_files] package` names the one package every declared
+   shape ships in, `fux.schemas` ([SR-LAWS](0001_LAWS.md) decision 6, W-226).
+   Three
    of its values are algorithm bounds a record already ruled NOT tunable, which
    is what makes them fixed rather than a `tune.toml` key: `fux path`'s work
    budget (`[graph] path_expansion_budget`), the community sweep cap that runs

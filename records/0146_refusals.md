@@ -10,7 +10,7 @@ feature: refusal detection before decode
 owns: [src/fux/ingest/refusals.py@3517c1b5cbd3, src/fux/templates/refusals.toml.txt@bdf2356bc679, tools/refusal-probe@76b6f6b7f4aa, .fux/refusals.toml@bdf2356bc679]
 laws: [L1, L3]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: e164f87774af524a2d1cb4db5815a2e43d105ff6cc00373e3487e6b348e6b940
+content_sha: f08acad245952e284dea84736b3ebd12cee59f0e17f141ded63fe0e996f49aae
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -535,7 +535,7 @@ away from firing on real short documents. It warns and never refuses, because
 - [`src/fux/templates/refusals.toml.txt`](../src/fux/templates/refusals.toml.txt) — the six shipped rules
 - [`tests/ingest/test_refusals.py`](../tests/ingest/test_refusals.py) — 37 tests over the matcher, including the `""`-suffix case and the two fixtures that were wrong before the code was
 - [`tools/refusal-probe/`](../tools/refusal-probe/README.md) — the shipped rules against real captured responses; [`tests/ingest/test_refusal_probe.py`](../tests/ingest/test_refusal_probe.py) runs its cases in CI
-- [`src/fux/maintain/state.schema.json`](../src/fux/maintain/state.schema.json) — `refused`, declared beside `rate_limited` (decision 11)
+- [`src/fux/schemas/state.schema.json`](../src/fux/schemas/state.schema.json) — `refused`, declared beside `rate_limited` (decision 11)
 - [`src/fux/doctor.py`](../src/fux/doctor.py) — `_refusal_health`, where decision 11's counts surface
 - [SR-FETCHER](0117_fetcher.md) decision 13 — the boundary this record holds, and whose veto check named this module's caller
 

@@ -29,8 +29,9 @@ until it is the answer.
 | `fux.cli`, `fux.maintain.mergedriver` | `[project.scripts]` in `pyproject.toml` | console scripts; git invokes the merge driver as a bare command |
 | `fux.__main__` | `python -m fux` | rung 4 of the invocation ladder in `AGENTS.md` |
 | every `fux.decode.*doc` | `decode.BUILTIN_MODULES` | loaded by `importlib.import_module` from that tuple |
+| `fux.schemas` | `constants.toml` `[schema_files] package` | a data package: `schema.load` resolves it by name through `importlib.resources` (W-226) |
 
-**All three are read from the repository**, so adding a decoder or an entry
+**All four are read from the repository**, so adding a decoder or an entry
 point keeps the check honest with no edit here. The decoders are the case that
 would otherwise have needed fourteen exception rows.
 
@@ -146,8 +147,17 @@ def _builtin_decoders() -> set[str]:
     return {f"fux.decode.{name}" for name in names}
 
 
+def _schema_package() -> set[str]:
+    """`[schema_files] package` — the one data package `schema.load` resolves
+    by name (W-226). Read, not imported, for the reason the decoders are."""
+    data = tomllib.loads((SRC / "constants.toml").read_text(encoding="utf-8"))
+    name = data.get("schema_files", {}).get("package")
+    assert isinstance(name, str) and name, "constants.toml carries no [schema_files] package"
+    return {name}
+
+
 def _roots() -> set[str]:
-    return _console_scripts() | {"fux.__main__"} | _builtin_decoders()
+    return _console_scripts() | {"fux.__main__"} | _builtin_decoders() | _schema_package()
 
 
 def _reachable(modules: dict[str, Path]) -> set[str]:

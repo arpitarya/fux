@@ -11,7 +11,7 @@ feature: the `fux ingest` pipeline — sources to committed records
 owns: [src/fux/ingest/ingestlog.py@f7628e166356, src/fux/ingest@75aedb778510, src/fux/ingest/priors.py@8ffcc632a4be, node/src/ingest/gitdir.mjs@eb45c1672eac, node/src/ingest/priors.mjs@11df69775da1]
 laws: [L2, L3, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: dae006077893425b3963c2f4c494b27c983fd6cff358645eebf28b8ec3f2882a
+content_sha: 9099c48042861b1465b838cfca42b9ecd60b08c67a8db487193f00ecd4b359e5
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -180,7 +180,7 @@ than the bytes**, which is the whole reason that test is worth its upkeep.
 **The carried set is declared, not written twice.**
 `run.py::EXTRACTED_FIELDS` reads
 `store.recordschema.carried_fields()`, which reads the `carried: true` flags in
-`store/index-record.schema.json`. Today: `title`, `phrases`, `terms`, `flen`.
+`schemas/index-record.schema.json`. Today: `title`, `phrases`, `terms`, `flen`.
 
 ⚠ **`edges` is deliberately not carried, and the schema says why where the
 exclusion lives**: it is the one field the rest of the corpus can change without
@@ -324,7 +324,7 @@ which was always permitted.
 **12. Both record kinds are assembled through the schema.** The `git` and `url`
 records were two inline dicts a few dozen lines apart, and the carried set was a
 tuple with no connection to either. All three come from
-`store/index-record.schema.json` via `store/recordschema.py`. The file
+`schemas/index-record.schema.json` via `store/recordschema.py`. The file
 **declares a shape and is checked against the module**, rather than being copied
 and filled in.
 
@@ -1150,7 +1150,7 @@ policy input to what gets indexed.
   (its module docstring states the incremental rule); the walk —
   [`gitdir.py`](../src/fux/ingest/gitdir.py); edges —
   [`edges.py`](../src/fux/ingest/edges.py); the declared record shape —
-  [`store/index-record.schema.json`](../src/fux/store/index-record.schema.json).
+  [`schemas/index-record.schema.json`](../src/fux/schemas/index-record.schema.json).
 - Determinism, change and deletion, captured —
   [`work/regression/2026-08-18-ingest-and-index/`](../work/regression/2026-08-18-ingest-and-index/report.md) §4.
 - The write-if-identical guarantee —

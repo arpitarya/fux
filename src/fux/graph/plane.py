@@ -112,7 +112,7 @@ def load(root: Path) -> GraphPlane:
             "Run `fux build` to rebuild the derived plane"
         )
 
-    # Checked against `graph/graph.schema.json` before it is trusted. This is
+    # Checked against `schemas/graph.schema.json` before it is trusted. This is
     # the largest derived structure fux writes and it had NO guard of the
     # DOCS_FIELDS kind -- and unlike the others it is one of
     # DETERMINISTIC_FILES, so a drifted shape breaks a byte-identity assertion
@@ -123,7 +123,8 @@ def load(root: Path) -> GraphPlane:
 
 
 def _schema():
-    """The declared shape of `graph.json`, beside this module."""
+    """The declared shape of `graph.json`, in `schemas/graph.schema.json`."""
+    from ..constants import fixed
     from ..schema import load as load_schema
 
-    return load_schema("fux.graph", "graph.schema.json").shape("graph_plane")
+    return load_schema(fixed("schema_files", "graph")).shape("graph_plane")

@@ -13,7 +13,7 @@ feature: configurable output defaults
 owns: [src/fux/output_config.py@988bd2d3cdfb, src/fux/templates/output.toml.txt@7251f3203770, .fux/output.toml@7251f3203770, node/src/config/output.mjs@23ce57d18a76]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: d016aa5123237b4b3b8b2bd8c5b020300055bad3c36c380173f8daf4de503aba
+content_sha: 762552398e8043c8b9fb64eb650d03d97b098c5a7fc2ba055231987c1be00714
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -996,3 +996,5 @@ choice rather than the console's. Nothing about the guard itself changed;
 - [SR-LAWS](0001_LAWS.md) — L1 (stdlib only: `tomllib`), L3 (no maintenance
   path reads this), L4 (nothing here reaches the network), L7 (`tomllib`
   requires 3.11+)
+- [`src/fux/schemas/output.schema.json`](../src/fux/schemas/output.schema.json)
+  — where the conditional `confidence` block and `sections` are declared

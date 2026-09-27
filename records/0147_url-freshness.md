@@ -10,7 +10,7 @@ feature: the freshness verdict vocabulary and the per-URL check interval
 owns: [src/fux/refer/freshness.py@c2205bbff313, node/src/refer/freshness.mjs@f44c2c09f8f9]
 laws: [L2, L3, L4]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 6a5569c0249e8858eac280ceb5c8a6cd38ef6cda0a4e25e8491954ad0c703e74
+content_sha: df3fe3008e9e8bdb502ed93846da0191d4c3ab91a1767317a92b20b9569e4538
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -703,7 +703,7 @@ evidence.*
 - [`src/fux/ingest/sourcelist.py`](../src/fux/ingest/sourcelist.py)
 - [`src/fux/ingest/urlsrc.py`](../src/fux/ingest/urlsrc.py)
 - [`src/fux/config.py`](../src/fux/config.py)
-- [`src/fux/query/output.schema.json`](../src/fux/query/output.schema.json)
+- [`src/fux/schemas/output.schema.json`](../src/fux/schemas/output.schema.json)
 
 **Tests**
 

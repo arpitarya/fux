@@ -41,6 +41,9 @@ check.
 from __future__ import annotations
 
 import importlib.util
+import shutil
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -76,7 +79,7 @@ def test_every_claim_carries_a_hash(owns) -> None:
                 bare.append(f"{path.name}: {component}")
     assert not bare, (
         "these claims carry no content hash: " + ", ".join(bare) + "\n\n"
-        "Run `python scripts/sr-owns.py --write && python scripts/sr-hash.py --write`."
+        "Run `python scripts/sr-owns.py --write <record…> && python scripts/sr-hash.py --write <record…>`."
     )
 
 
@@ -90,7 +93,7 @@ def test_every_claim_matches_what_it_owns(owns) -> None:
         + "\n  ".join(moved)
         + "\n\nRE-READ THE RECORD FIRST. A hash moves on a typo and on a redesign alike, "
         "and only one of those means the record is now wrong. Then:\n"
-        "  python scripts/sr-owns.py --write && python scripts/sr-hash.py --write"
+        "  python scripts/sr-owns.py --write <record…> && python scripts/sr-hash.py --write <record…>"
     )
 
 
@@ -114,3 +117,27 @@ def test_a_directory_hash_moves_when_a_file_under_it_changes(owns, tmp_path) -> 
     assert owns.component_digest("src/fux/query") == before
     assert owns.component_digest("src/fux/does-not-exist") is None
     assert hashlib.sha256(b"").hexdigest()[:12] != before
+
+
+@pytest.mark.parametrize("script", ["sr-owns.py", "sr-hash.py"])
+def test_a_bare_write_is_refused(tmp_path, script):
+    """**Decision 13a's gate — two strikes, the third was this one.**
+
+    A repo-wide `--write` on a shared tree re-stamps ANOTHER session's records to
+    match their in-progress code and silently satisfies the gate meant to make
+    them re-read those records (work/LESSONS.md 2026-09-21; again twice on
+    2026-09-27). The script runs from a COPY, so a regression here stamps a
+    throwaway tree and never the real records.
+    """
+    (tmp_path / "scripts").mkdir()
+    shutil.copy(ROOT / "scripts" / script, tmp_path / "scripts" / script)
+    shutil.copytree(ROOT / "records", tmp_path / "records",
+                    ignore=shutil.ignore_patterns("[!0-9]*"))
+    before = {p.name: p.read_bytes() for p in (tmp_path / "records").glob("*.md")}
+    run = subprocess.run(
+        [sys.executable, str(tmp_path / "scripts" / script), "--write"],
+        cwd=tmp_path, capture_output=True, text=True,
+    )
+    assert run.returncode == 2, run.stdout + run.stderr
+    assert "refusing a repo-wide --write" in run.stderr
+    assert {p.name: p.read_bytes() for p in (tmp_path / "records").glob("*.md")} == before

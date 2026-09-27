@@ -2,15 +2,16 @@
 type: Standing Record
 kind: component
 name: SR-SERVE
-title: "SR-SERVE (0158) — `fux serve`, the ask explorer: a local page that renders `ask --json --why` and computes nothing"
-description: "Arpit's framing, 2026-09-22 — fux is like Google: if the ten documents an agent is handed are the right ten, the answer is mostly right. So the inspection surface is question-first. `fux serve` starts a stdlib server bound to 127.0.0.1 with no --host, serves one self-contained page, and answers GET /ask with the byte-identical stdout of `fux ask --json --why --band`. The page is a RENDERER: it computes no score, no band and no rank, because a second ranker in a browser is a restatement in the L0 sense. Every lever it prints is a proposal; no route writes a committed byte. Since W-220 (2026-09-23) the page has three tabs — Ask, Documents, Index — and the server calls fux.inspect in-process for the last two, on demand and cached under .fux/runtime/inspect/; the browser still computes nothing."
+title: "SR-SERVE (0158) — `fux serve`, the explorer: a local page that renders `ask --json --why` and computes nothing"
+description: "Arpit's framing, 2026-09-22 — fux is like Google: if the ten documents an agent is handed are the right ten, the answer is mostly right. So the inspection surface is question-first. `fux serve` starts a stdlib server bound to 127.0.0.1 with no --host, serves one self-contained page, and answers GET /ask with the byte-identical stdout of `fux ask --json --why --band`. The page is a RENDERER: it computes no score, no band and no rank, because a second ranker in a browser is a restatement in the L0 sense. Every lever it prints is a proposal; no route writes a committed byte. Since W-220 (2026-09-23) the page has tabs — Ask, Answer (2026-09-27: the one passage `fux answer --json --band` would cite, byte-identical too), Documents, Index — and the server calls fux.inspect in-process for the last two, on demand and cached under .fux/runtime/inspect/; the browser still computes nothing."
 status: accepted
 date: 2026-09-22
-feature: the ask explorer — a local page over the real ask
-owns: [src/fux/serve@47ec6c90b477]
+amended: 2026-09-27
+feature: the explorer — a local page over the real ask
+owns: [src/fux/serve@ffe4b8a2fa7c]
 laws: [L1, L2, L4, L6, L8, L10]
 timestamp: 2026-09-22T00:00:00Z
-content_sha: 6e58a0dbcec2ba50be75184f9caca0fd3f8eab9816abb49a82bdf876c81dd762
+content_sha: b438146bb0e989239d4fde3bc250536f3dc0d3403e952aedb858fe05645ec5e4
 ratifies: "Arpit, 2026-09-22 (Cowork, W-210) — three sample pages built on his machine, the per-token ingest X-ray REJECTED as a front page ('do you believe people will go through this big document?') and the question-first explorer ratified in its modern-dark form: 'the way I'm thinking about fux is something like Google. If a question gets asked, if you have the best 10 documents, the answer the agent gives is going to be mostly correct.'"
 ---
 
@@ -119,6 +120,7 @@ special-case.
 |---|---|
 | `/` | the one bundled page |
 | `/ask?q=…&top=N` | `fux ask --json --why --band` |
+| `/answer?q=…[&no_refer=1]` | `fux answer --json --band [--no-refer]` — the Answer tab (2026-09-27) |
 | `/graph?seed=…` | `fux graph --seed … --json` |
 | `/health` | version, index schema id, analyzer version, bind address |
 | `/inspect/documents` | the rows of `.fux/index/REGISTER` (decision 15) |
@@ -126,6 +128,18 @@ special-case.
 | `/inspect/document/probes?loc=…` | that document's own probes — SR-INSPECT decision 19 |
 | `/inspect/index` | the corpus report **without** probes, as a job with progress |
 | `/inspect/probes[?all=1]` | the corpus report **with** probes, sampled or every document |
+
+⚠ **Amended 2026-09-27 (Arpit: *"create a tab for answer as well"*): `/answer`
+carries decision 3's promise unchanged — it runs `fux answer --json --band` in
+this process and returns its stdout byte for byte
+(`tests/serve/test_routes.py::test_answer_is_byte_identical_to_the_cli`). The
+page's fourth tab renders the ONE passage `answer` would cite, its citation and
+freshness verdict, and the confidence block; the other passages `answer`
+assembled fold away under it. The same day the Documents tab was rebuilt as a
+browser — a searchable, decoder-faceted register list grouped by folder on the
+left, one document on the right with its counts up front, probes first and the
+long tables folded — because the first cut *"was not at all user friendly"*.
+The browser still computes nothing.
 
 ⚠ **Amended 2026-09-23 (W-220): the five `/inspect/` routes write the
 GITIGNORED runtime cache** — `.fux/runtime/inspect/`'s facts, probes and

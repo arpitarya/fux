@@ -7,10 +7,10 @@ description: A disposable term-major index under .fux/runtime/ that makes warm q
 status: accepted
 date: 2026-08-18
 feature: "`.fux/runtime/` — the derived index, `fux build`, and the block bound that makes skipping provable"
-owns: [src/fux/derive@480cac557ebd, tools/differential@68b74242b9a8]
+owns: [src/fux/derive@8118fc4bcf5d, tools/differential@68b74242b9a8, src/fux/schemas/runtime.schema.json@f83e87676ef8]
 laws: [L1, L3]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 882df81730f11e041183da98f3933be9ad48dbaba28cc60f92d0ed29c85510a4
+content_sha: ea12cdb1b3b4237ba5e7ee072d40e4eba3ced79854ff17507596632fe25e651f
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -18,6 +18,7 @@ content_sha: 882df81730f11e041183da98f3933be9ad48dbaba28cc60f92d0ed29c85510a4
 **Owns** — the components this record decides:
 
 - [`src/fux/derive/`](../src/fux/derive) · dir
+- [`src/fux/schemas/runtime.schema.json`](../src/fux/schemas/runtime.schema.json) · file
 - [`tools/differential/`](../tools/differential) · dir
 
 <!-- COMPONENTS-END -->
@@ -228,7 +229,7 @@ filesystem mtimes, which are the cheap staleness pre-check and are not
 reproducible by construction.
 
 **10. The plane's four shapes are declared in one schema.**
-[`derive/runtime.schema.json`](../src/fux/derive/runtime.schema.json)
+[`schemas/runtime.schema.json`](../src/fux/schemas/runtime.schema.json)
 declares the postings block line, the 62-byte offset entry, the doc table and
 `stats.json`. **One file for all four, deliberately** — they are written by one
 build, read by one query path, and versioned by **one string**, so four files
@@ -799,7 +800,7 @@ payloads at every arm weight in `tests/query/test_mined.py`.
   [`accel.py`](../src/fux/derive/accel.py) (its module docstring is the
   normative statement of the argument); the on-disk shapes —
   [`format.py`](../src/fux/derive/format.py) and
-  [`runtime.schema.json`](../src/fux/derive/runtime.schema.json).
+  [`runtime.schema.json`](../src/fux/schemas/runtime.schema.json).
 - The bound, exhaustively tested against every posting —
   [`tests/derive/test_bounds.py`](../tests/derive/test_bounds.py); the
   mutation-verified weighted case —
@@ -873,7 +874,7 @@ evidence.*
 - [`src/fux/derive/accel.py`](../src/fux/derive/accel.py)
 - [`src/fux/derive/_build.py`](../src/fux/derive/_build.py)
 - [`src/fux/derive/format.py`](../src/fux/derive/format.py)
-- [`src/fux/derive/runtime.schema.json`](../src/fux/derive/runtime.schema.json)
+- [`src/fux/schemas/runtime.schema.json`](../src/fux/schemas/runtime.schema.json)
 - [`tests/derive/test_bounds.py`](../tests/derive/test_bounds.py)
 - [`tests/test_tune_boundary.py`](../tests/test_tune_boundary.py)
 - [`tools/differential/run.py`](../tools/differential/run.py)

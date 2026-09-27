@@ -1,6 +1,6 @@
 """The committed record's shape, loaded from one schema instead of four places.
 
-`store/index-record.schema.json` declares every field of a committed record: its
+`schemas/index-record.schema.json` declares every field of a committed record: its
 type, when it is required, its default, whether it carries display text, whether
 a delta ingest may carry it forward, and whether it is omitted rather than
 written false.
@@ -57,13 +57,9 @@ __all__ = [
     "validate",
 ]
 
-#: Beside the code that owns it, NOT under `templates/`, and the reason is
-#: ownership rather than tidiness: `src/fux/templates/` is claimed by
-#: SR-FETCHER (the fetcher files live there), so a record-shape template in it
-#: would be owned by a record with nothing to say about the record shape.
-#: `src/fux/store/` is SR-INDEX-LIFECYCLE's, which is exactly right -- so the
-#: ownership is correct BY CONSTRUCTION instead of by a carve-out somebody has
-#: to remember. The SR guard caught this on the first commit attempt.
+#: In `src/fux/schemas/` with every other declared shape (W-226), and owned by
+#: SR-RECORD through its own file-level OWNERSHIP row -- NOT by the directory,
+#: which is SR-LAWS'. SR-LAWS decision 6 is why that row is required.
 SCHEMA_NAME = fixed("schema_files", "index_record")
 
 _PY_TYPES = {"str": str, "int": int, "bool": bool, "list": list, "dict": dict}
@@ -123,7 +119,7 @@ def shape() -> RecordShape:
     and writing an index nobody declared.
     """
     try:
-        raw = json.loads((resources.files("fux.store") / SCHEMA_NAME).read_text("utf-8"))
+        raw = json.loads((resources.files(fixed("schema_files", "package")) / SCHEMA_NAME).read_text("utf-8"))
     except (OSError, ValueError) as exc:
         raise FuxError(
             f"the index-record schema is missing or unreadable ({exc}). "

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <!--
-  fux serve — the ask explorer.
+  fux serve — the explorer.
 
   🔴 THIS PAGE COMPUTES NO SCORE, NO BAND AND NO RANK. Every number it shows is
-  a field of `fux ask --json --why`. The only arithmetic below is presentation:
+  a field of `fux ask --json --why`, `fux answer --json --band` or `fux inspect`. The only arithmetic below is presentation:
   a percentage of #1 for a bar width, and the difference of two printed numbers
   for a delta. `tests/serve/test_page_computes_nothing.py` asserts that, because
   a second ranker in here would be a restatement in the L0 sense — two rankers
@@ -15,7 +15,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>fux — ask explorer</title>
+<title>fux — explorer</title>
 <style>
   :root{
     --bg:#0a0c12; --card:rgba(255,255,255,.035); --line:rgba(255,255,255,.08);
@@ -121,11 +121,77 @@
   table.t td{padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:top;overflow-wrap:anywhere}
   table.t td.n{text-align:right;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums}
   .scroll{overflow-x:auto}
-  .doclist{max-height:60vh;overflow:auto;margin-top:10px}
-  .docrow{padding:7px 10px;border-radius:9px;cursor:pointer;display:flex;gap:10px;align-items:baseline}
-  .docrow:hover,.docrow.on{background:rgba(255,255,255,.05)}
-  .docrow .k{color:var(--faint);font-size:11.5px;min-width:64px}
   .filter{width:100%;border:1px solid var(--line);background:#0d1018;color:var(--fg);border-radius:10px;padding:10px 12px;font:inherit}
+  .filter:focus{outline:0;border-color:rgba(124,92,255,.55)}
+
+  /* Documents (W-220, redesigned 2026-09-27): a browser — list on the left, one document on the right */
+  .docs{display:grid;grid-template-columns:minmax(260px,340px) minmax(0,1fr);gap:16px;align-items:start}
+  .docpane{position:sticky;top:12px;max-height:calc(100vh - 24px);display:flex;flex-direction:column;gap:10px}
+  .facets{display:flex;flex-wrap:wrap;gap:6px}
+  .facet{border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:12px;color:var(--dim);cursor:pointer;background:none;font-family:inherit}
+  .facet.on{color:var(--fg);border-color:rgba(124,92,255,.55);background:rgba(124,92,255,.12)}
+  .facet .c{color:var(--faint);margin-left:4px}
+  .doclist{overflow:auto;flex:1 1 auto;min-height:200px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.02)}
+  .folder{position:sticky;top:0;background:#0f121a;color:var(--faint);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:8px 12px 4px;border-bottom:1px solid var(--line)}
+  .docrow{padding:8px 12px;cursor:pointer;display:grid;grid-template-columns:1fr auto;gap:2px 8px;border-left:3px solid transparent}
+  .docrow:hover{background:rgba(255,255,255,.04)}
+  .docrow.on{background:rgba(124,92,255,.12);border-left-color:var(--a1)}
+  .docrow .name{font-weight:600;font-size:13.5px;overflow-wrap:anywhere}
+  .docrow .meta{grid-column:1/-1;color:var(--faint);font-size:11.5px;display:flex;gap:8px;flex-wrap:wrap}
+  .docrow .kind{font-size:10.5px;border:1px solid var(--line);border-radius:6px;padding:1px 6px;color:var(--dim);align-self:start}
+  .docrow .kind.data{color:var(--a2);border-color:rgba(62,198,255,.35)}
+  .docrow .kind.arch{color:var(--warn);border-color:rgba(245,165,36,.35)}
+  .dochead h2{font-size:20px;margin:0;color:var(--fg);text-transform:none;letter-spacing:-.01em;font-weight:700}
+  .dochead .loc{margin-top:4px}
+  .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:8px;margin-top:14px}
+  .stat{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:rgba(255,255,255,.02)}
+  .stat b{display:block;font-size:19px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums}
+  .stat span{color:var(--faint);font-size:11.5px}
+  .stat.warn b{color:var(--warn)}
+  .stat.ok b{color:var(--ok)}
+  details.sec{border:1px solid var(--line);border-radius:var(--r);background:var(--card);margin-top:12px}
+  details.sec summary{cursor:pointer;list-style:none;padding:13px 18px;display:flex;align-items:baseline;gap:10px;color:var(--dim);font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+  details.sec summary::-webkit-details-marker{display:none}
+  details.sec summary::before{content:"▸";color:var(--faint);font-size:11px;transition:transform .15s}
+  details.sec[open] summary::before{transform:rotate(90deg)}
+  details.sec summary .sum{margin-left:auto;text-transform:none;letter-spacing:0;font-weight:400;color:var(--faint);font-size:12.5px}
+  details.sec .body{padding:0 18px 16px}
+  .kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:6px 18px;font-size:13px}
+  .kv div{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+  .kv div span:first-child{color:var(--dim)}
+  .kv div span:last-child{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums}
+  .words{display:flex;flex-wrap:wrap;gap:6px}
+  .word{border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:12.5px;display:inline-flex;gap:6px;align-items:baseline}
+  .word .n{color:var(--faint);font-size:11px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .linkrow{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 10px;align-items:baseline;padding:7px 10px;border-radius:9px;cursor:pointer}
+  .linkrow:hover{background:rgba(255,255,255,.05)}
+  .linkrow .kind{font-size:10.5px;border:1px solid var(--line);border-radius:6px;padding:1px 6px;color:var(--dim);white-space:nowrap;grid-row:span 2;align-self:start;margin-top:3px}
+  .linkrow .t{font-weight:600;min-width:0;overflow-wrap:anywhere;font-size:13.5px}
+  .linkrow .loc{grid-column:2}
+  a{color:var(--a2)}
+  a.opendoc{text-decoration:none;border-bottom:1px dotted rgba(62,198,255,.5)}
+  .probe{display:grid;grid-template-columns:1fr auto;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:13px;align-items:center}
+  .probe .rk{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;border-radius:999px;padding:2px 9px;border:1px solid var(--line)}
+  .probe .rk.hit{color:var(--ok);border-color:rgba(34,211,166,.38)}
+  .probe .rk.top{color:var(--ok);background:rgba(34,211,166,.12);border-color:rgba(34,211,166,.5)}
+  .probe .rk.miss{color:var(--bad);border-color:rgba(255,92,122,.45)}
+  .hint{color:var(--faint);font-size:12.5px;margin-top:4px}
+  .skeleton{height:12px;border-radius:6px;background:linear-gradient(90deg,rgba(255,255,255,.05),rgba(255,255,255,.1),rgba(255,255,255,.05));background-size:200% 100%;animation:sweep 1.4s linear infinite;margin:10px 0}
+  @media (max-width:820px){ .docs{grid-template-columns:1fr} .docpane{position:static;max-height:none} .doclist{max-height:40vh} }
+
+  /* Answer tab (2026-09-27): the ONE passage fux would cite */
+  .passage{border:1px solid rgba(34,211,166,.35);border-radius:14px;padding:14px 16px;margin-top:10px;background:rgba(34,211,166,.05)}
+  .passage .h{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:baseline;font-size:12.5px;color:var(--dim)}
+  .passage .h b{color:var(--fg);font-size:14px}
+  .passage pre{white-space:pre-wrap;overflow-wrap:anywhere;margin:10px 0 0;font-family:inherit;font-size:14.5px;line-height:1.6;color:var(--fg)}
+  .cite{display:flex;flex-wrap:wrap;gap:8px 14px;font-size:12.5px;color:var(--dim);margin-top:10px}
+  .fresh{border-radius:999px;padding:2px 9px;border:1px solid var(--line);font-size:11.5px}
+  .fresh.current,.fresh.reproduced{color:var(--ok);border-color:rgba(34,211,166,.38)}
+  .fresh.stale,.fresh.drifted{color:var(--warn);border-color:rgba(245,165,36,.38)}
+  .fresh.unverified,.fresh.unreachable,.fresh.cached{color:var(--dim)}
+  .toggle{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--dim);margin-top:10px}
+  .toggle input{accent-color:var(--a1)}
   .progress{color:var(--dim);font-size:13px}
   .flag{display:inline-block;font-size:11.5px;border-radius:999px;padding:2px 8px;margin:1px 3px 1px 0;border:1px solid rgba(245,165,36,.38);color:var(--warn)}
   .btn{background:var(--card);border:1px solid var(--line);color:var(--fg);border-radius:10px;padding:7px 12px;font:inherit;font-size:13px;cursor:pointer}
@@ -141,12 +207,13 @@
 <body>
 <div class="wrap">
   <header>
-    <h1>fux <span>ask explorer</span></h1>
-    <div class="sub">Type a question. See the ten documents an agent would be handed &mdash; and why each one is there.</div>
+    <h1>fux <span>explorer</span></h1>
+    <div class="sub">Ask: the ten documents an agent would be handed, and why. Answer: the one passage it would cite. Documents and Index: what the index is made of.</div>
   </header>
 
   <nav class="tabs" role="tablist">
     <button class="tab on" role="tab" data-tab="ask">Ask</button>
+    <button class="tab" role="tab" data-tab="answer">Answer</button>
     <button class="tab" role="tab" data-tab="docs">Documents</button>
     <button class="tab" role="tab" data-tab="index">Index</button>
   </nav>
@@ -159,13 +226,22 @@
     <div id="out"></div>
   </section>
 
+  <section id="tab-answer" hidden>
+    <div class="bar"><input id="aq" autocomplete="off" spellcheck="false" placeholder="Ask for the one passage fux would cite…"></div>
+    <label class="toggle"><input type="checkbox" id="norefer"> answer from the index alone (<span class="mono">--no-refer</span>: no fetch, no re-score)</label>
+    <div id="aout"><div class="card"><h2>answer</h2><div class="sub">Where <b>Ask</b> shows the ten documents an agent is handed, this shows the <b>one passage</b> <span class="mono">fux answer</span> would cite — fetched from the source and re-scored when it is reachable, with its lines, its sha and whether the bytes are still current.</div></div></div>
+  </section>
+
   <section id="tab-docs" hidden>
-    <div class="grid2">
-      <div class="card"><h2>documents — from the register</h2>
-        <input class="filter" id="docfilter" placeholder="filter by path…" autocomplete="off" spellcheck="false">
+    <div class="docs">
+      <div class="docpane">
+        <input class="filter" id="docfilter" placeholder="Search documents — name, folder, title…" autocomplete="off" spellcheck="false">
+        <div class="facets" id="facets"></div>
         <div class="sub" id="doccount"></div>
-        <div class="doclist" id="doclist"></div></div>
-      <div id="docxray"><div class="card"><h2>x-ray</h2><div class="sub">Click a document. Its X-ray is computed for that document alone, then cached.</div></div></div>
+        <div class="doclist" id="doclist"></div>
+        <div class="hint">↑ ↓ to move, Enter to open. Every document in <span class="mono">.fux/index/REGISTER</span>.</div>
+      </div>
+      <div id="docxray"><div class="card empty"><div class="big">Pick a document</div><div class="why">Its X-ray — what came out of the bytes, what was indexed, how it links, and whether it comes back for its own title — is computed for that document alone, then cached.</div></div></div>
     </div>
   </section>
 
@@ -398,7 +474,10 @@ function render(data) {
 const opened = {};
 function showTab(name) {
   document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("on", t.dataset.tab === name));
-  ["ask", "docs", "index"].forEach((n) => { $("tab-" + n).hidden = n !== name; });
+  ["ask", "answer", "docs", "index"].forEach((n) => { $("tab-" + n).hidden = n !== name; });
+  const params = new URLSearchParams(location.search);
+  if (name === "ask") params.delete("tab"); else params.set("tab", name);
+  history.replaceState(null, "", params.toString() ? "?" + params.toString() : location.pathname);
   if (!opened[name]) {
     opened[name] = true;
     if (name === "docs") loadDocuments();
@@ -414,71 +493,185 @@ function table(head, rows) {
 }
 const later = (fn) => new Promise((r) => setTimeout(() => r(fn()), 700));   /* a poll interval, not a measurement */
 
+/* ---- Answer: the one passage `fux answer` would cite. ------------------- */
+function freshPill(f) { return f ? `<span class="fresh ${esc(f)}">${esc(f)}</span>` : ""; }
+function passageCard(p, i) {
+  return `<div class="passage">
+    <div class="h"><span class="rank mono">#${i + 1}</span><b>${esc(p.heading || "(no heading)")}</b>
+      <span class="mono">${esc(p.loc)}</span>${p.score != null ? `<span class="num">score ${esc(p.score)}</span>` : ""}${p.ordinal != null ? `<span>passage <span class="num">${esc(p.ordinal)}</span></span>` : ""}</div>
+    <pre>${esc(p.text)}</pre>
+    <div class="cite"><span>document <a href="#" class="opendoc mono" data-loc="${esc(p.id)}">${esc(p.id)}</a></span><span>sha <span class="mono">${esc((p.sha || "").slice(0, 12))}</span></span></div>
+  </div>`;
+}
+async function answer(q) {
+  if (!q.trim()) return;
+  const params = new URLSearchParams(location.search);
+  params.set("tab", "answer"); params.set("aq", q);
+  history.replaceState(null, "", "?" + params.toString());
+  const noRefer = $("norefer").checked;
+  $("aout").innerHTML = `<div class="card"><h2>answering</h2><div class="sub">running <span class="mono">fux answer --json --band${noRefer ? " --no-refer" : ""}</span>…</div></div>`;
+  let data;
+  try {
+    const r = await fetch("/answer?q=" + encodeURIComponent(q) + (noRefer ? "&no_refer=1" : ""));
+    data = await r.json();
+    if (data.error) throw new Error(data.error);
+  } catch (e) { $("aout").innerHTML = `<div class="card err">${esc(e.message || e)}</div>`; return; }
+  renderAnswer(data, q);
+}
+function renderAnswer(data, q) {
+  const conf = data.confidence || null;
+  const passages = (data.answer && data.answer.passages) || [];
+  const cite = data.citation || null;
+  let html = "";
+  if (!passages.length) {
+    html += `<div class="card empty"><div class="big">No passage to cite.</div>
+      <div class="why">fux would rather hand back nothing than a passage it cannot stand behind. The band says <b>${esc(conf ? conf.band : "none")}</b>.</div>
+      <div class="lever" style="text-align:left"><div class="what">See what <b>Ask</b> ranked for the same question, or teach the corpus this phrasing.</div><span class="tag mono">fux correct --pin · fux enrich</span></div></div>`;
+  } else {
+    const rest = passages.slice(1);
+    html += `<div class="card"><h2>the answer — source: ${esc(data.source)}</h2>
+      <div class="sub">${data.source === "refer" ? "Fetched from the source and re-scored: these are the bytes on disk now, not the bytes that were indexed." : "From the index's own structure — no fetch, no re-score."} The first passage is the one cited.</div>
+      ${passageCard(passages[0], 0)}
+      ${cite ? `<div class="cite" style="margin-top:14px"><b>citation</b><span class="mono">${esc(cite.loc)}</span>${freshPill(cite.freshness)}<span>sha <span class="mono">${esc((cite.sha || "").slice(0, 12))}</span></span>
+        <a href="#" class="opendoc mono" data-loc="${esc(cite.id)}">open document</a></div>
+        <div class="maths">freshness is fux's verdict on the cited bytes: <b>current</b> means the file on disk still carries them.</div>` : ""}</div>`;
+    if (rest.length) html += sec(`${rest.length} more passage${rest.length === 1 ? "" : "s"} fux assembled`, rest.map((p, i) => passageCard(p, i + 1)).join(""),
+      "in the order fux ranked them — more than one document may be cited", false);
+  }
+  html += ring(conf);
+  html += `<div class="card"><h2>compare</h2><div class="actions"><button class="btn" id="toask">See the ten documents Ask ranks for this</button></div></div>`;
+  $("aout").innerHTML = html;
+  $("aout").querySelectorAll(".opendoc").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); showTab("docs"); openDocument(a.dataset.loc); }));
+  const b = $("toask"); if (b) b.addEventListener("click", () => { $("q").value = q; showTab("ask"); ask(q); });
+}
+$("aq").addEventListener("keydown", (e) => { if (e.key === "Enter") answer($("aq").value); });
+$("norefer").addEventListener("change", () => { if ($("aq").value.trim()) answer($("aq").value); });
+
 /* ---- Documents: the REGISTER list, then one X-ray per click. ------------- */
-let allDocs = [];
+let allDocs = [], shownDocs = [], facetOn = null, currentLoc = null;
+const baseName = (loc) => loc.split("/").pop();
+const folderOf = (loc) => loc.includes("/") ? loc.slice(0, loc.lastIndexOf("/")) : "";
 async function loadDocuments() {
-  $("doclist").innerHTML = '<div class="progress">reading the register…</div>';
+  $("doclist").innerHTML = '<div class="skeleton"></div><div class="skeleton" style="width:70%"></div><div class="skeleton" style="width:85%"></div>';
   try {
     const data = await (await fetch("/inspect/documents")).json();
     if (data.error) throw new Error(data.error);
     allDocs = data.documents;
-    renderDocList();
-  } catch (e) { $("doclist").innerHTML = `<div class="err">${esc(e.message || e)}</div>`; }
+    renderFacets(); renderDocList();
+    const wanted = new URLSearchParams(location.search).get("doc");
+    if (wanted) openDocument(wanted);
+  } catch (e) { $("doclist").innerHTML = `<div class="err" style="padding:12px">${esc(e.message || e)}</div>`; }
+}
+function renderFacets() {
+  const counts = new Map();
+  allDocs.forEach((d) => counts.set(d.decoder, (counts.get(d.decoder) || 0) + 1));
+  const facets = [...counts.entries()].sort((a, b) => b[1] - a[1]);
+  $("facets").innerHTML = `<button class="facet ${facetOn == null ? "on" : ""}" data-f="">all<span class="c num">${allDocs.length}</span></button>` +
+    facets.map(([k, n]) => `<button class="facet ${facetOn === k ? "on" : ""}" data-f="${esc(k)}">${esc(k)}<span class="c num">${n}</span></button>`).join("");
+  $("facets").querySelectorAll(".facet").forEach((b) => b.addEventListener("click", () => { facetOn = b.dataset.f || null; renderFacets(); renderDocList(); }));
 }
 function renderDocList() {
   const f = $("docfilter").value.trim().toLowerCase();
-  const shown = allDocs.filter((d) => !f || d.loc.toLowerCase().includes(f));
-  $("doccount").textContent = `${shown.length} of ${allDocs.length} document(s)`;
-  $("doclist").innerHTML = shown.slice(0, 500).map((d) =>
-    `<div class="docrow" data-loc="${esc(d.loc)}"><span class="k mono">${esc(d.decoder)}</span><span class="mono">${esc(d.loc)}</span></div>`).join("") +
-    (shown.length > 500 ? `<div class="sub">… ${shown.length - 500} more — narrow the filter</div>` : "");
-  $("doclist").querySelectorAll(".docrow").forEach((r) => r.addEventListener("click", () => {
-    $("doclist").querySelectorAll(".docrow").forEach((x) => x.classList.toggle("on", x === r));
-    openDocument(r.dataset.loc);
-  }));
+  shownDocs = allDocs.filter((d) => (!facetOn || d.decoder === facetOn) && (!f || d.loc.toLowerCase().includes(f)));
+  $("doccount").textContent = `${shownDocs.length} of ${allDocs.length} document${allDocs.length === 1 ? "" : "s"}`;
+  const cap = 600;
+  let html = "", lastFolder = null;
+  shownDocs.slice(0, cap).forEach((d) => {
+    const folder = folderOf(d.loc);
+    if (folder !== lastFolder) { html += `<div class="folder">${esc(folder || "(root)")}</div>`; lastFolder = folder; }
+    html += `<div class="docrow ${d.loc === currentLoc ? "on" : ""}" data-loc="${esc(d.loc)}" tabindex="0">
+      <span class="name">${esc(baseName(d.loc))}</span><span class="kind ${d.kind === "url" ? "data" : ""}">${esc(d.decoder)}</span>
+      <span class="meta">${d.kind === "url" ? "<span>url</span>" : ""}<span class="mono">${esc((d.sha || "").slice(0, 8))}</span></span></div>`;
+  });
+  if (shownDocs.length > cap) html += `<div class="sub" style="padding:10px 12px">… ${shownDocs.length - cap} more — narrow the search</div>`;
+  if (!shownDocs.length) html += `<div class="sub" style="padding:14px 12px">Nothing matches.</div>`;
+  $("doclist").innerHTML = html;
+  $("doclist").querySelectorAll(".docrow").forEach((r) => {
+    r.addEventListener("click", () => openDocument(r.dataset.loc));
+    r.addEventListener("keydown", (e) => { if (e.key === "Enter") openDocument(r.dataset.loc); });
+  });
 }
 $("docfilter").addEventListener("input", renderDocList);
+$("docfilter").addEventListener("keydown", (e) => {
+  if (e.key === "ArrowDown") { e.preventDefault(); const first = $("doclist").querySelector(".docrow"); if (first) first.focus(); }
+});
+$("doclist").addEventListener("keydown", (e) => {
+  if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+  const rows = [...$("doclist").querySelectorAll(".docrow")];
+  const i = rows.indexOf(document.activeElement);
+  if (i < 0) return;
+  e.preventDefault();
+  const next = rows[i + (e.key === "ArrowDown" ? 1 : -1)];
+  if (next) next.focus(); else if (e.key === "ArrowUp") $("docfilter").focus();
+});
+function markCurrent(loc) {
+  currentLoc = loc;
+  $("doclist").querySelectorAll(".docrow").forEach((x) => x.classList.toggle("on", x.dataset.loc === loc));
+  const on = $("doclist").querySelector(".docrow.on"); if (on) on.scrollIntoView({ block: "nearest" });
+}
+const sec = (title, body, sum, open) => `<details class="sec" ${open ? "open" : ""}><summary>${esc(title)}${sum != null ? `<span class="sum">${sum}</span>` : ""}</summary><div class="body">${body}</div></details>`;
+const kv = (pairs) => `<div class="kv">${pairs.map(([k, v]) => `<div><span>${esc(k)}</span><span>${esc(v == null ? "—" : v)}</span></div>`).join("")}</div>`;
+const stat = (val, label, cls) => `<div class="stat ${cls || ""}"><b>${esc(val == null ? "—" : val)}</b><span>${esc(label)}</span></div>`;
+const docLink = (l) => `<div class="linkrow opendoc" data-loc="${esc(l.id)}"><span class="kind">${esc(l.kind)}</span><span class="t">${esc(l.title || l.id)}</span><span class="loc mono">${esc(l.id)}</span></div>`;
 
 async function openDocument(loc) {
-  $("docxray").innerHTML = `<div class="card"><h2>x-ray</h2><div class="progress">computing <span class="mono">${esc(loc)}</span>…</div></div>`;
+  markCurrent(loc);
+  const params = new URLSearchParams(location.search); params.set("tab", "docs"); params.set("doc", loc);
+  history.replaceState(null, "", "?" + params.toString());
+  $("docxray").innerHTML = `<div class="card dochead"><h2>${esc(baseName(loc))}</h2><div class="loc mono">${esc(loc)}</div><div class="skeleton" style="margin-top:16px"></div><div class="skeleton" style="width:60%"></div><div class="progress">computing the X-ray for this document alone…</div></div>`;
   let x;
   try {
     x = await (await fetch("/inspect/document?loc=" + encodeURIComponent(loc))).json();
     if (x.error) throw new Error(x.error);
   } catch (e) { $("docxray").innerHTML = `<div class="card err">${esc(e.message || e)}</div>`; return; }
-  const ing = x.ingested || {}, idx = x.indexed || {};
+  if (x.loc && x.loc !== currentLoc) markCurrent(x.loc);
+  const ing = x.ingested || {}, idx = x.indexed || {}, links = x.links || { out: [], in: [] };
+  const wordCut = (ing.cuts || {}).word;
+  let html = `<div class="card dochead"><h2>${esc(x.title || baseName(loc))}</h2><div class="loc mono">${esc(x.loc || loc)} · <span style="color:var(--faint)">${esc(x.id)}</span></div>
+    <div class="badges">${ing.kind ? `<span class="badge">${esc(ing.kind)}</span>` : ""}${ing.decoder && ing.decoder !== ing.kind ? `<span class="badge">decoder ${esc(ing.decoder)}</span>` : ""}${x.register && x.register.kind === "url" ? '<span class="badge boost">url</span>' : ""}${x.archived ? '<span class="badge arch">archived</span>' : ""}${x.superseded ? '<span class="badge arch">superseded</span>' : ""}
+      ${x.identity && x.identity.shares_title_count ? `<span class="flag">title shared with ${esc(x.identity.shares_title_count)} other${x.identity.shares_title_count === 1 ? "" : "s"}</span>` : ""}</div>
+    <div class="actions"><button class="btn" id="askTitle">Ask its title</button><button class="btn" id="answerTitle">Answer its title</button></div>
+    <div class="stats">
+      ${stat(ing.text_bytes, "text bytes")}${stat(ing.headings, "headings")}${stat(ing.passages != null ? ing.passages : x.passage_count, "passages refer can cite")}${stat(ing.body_tokens, "body tokens")}${stat(idx.distinct_terms, "distinct terms")}
+      ${stat(links.out.length, "links out")}${stat(links.in.length, "links in", links.in.length ? "ok" : "")}${wordCut ? stat(wordCut, "passages cut mid-word", "warn") : ""}
+      <div class="stat" id="probestat"><b>…</b><span>probes in top 10</span></div>
+    </div></div>`;
   const facts = [["decoder", ing.decoder], ["kind", ing.kind], ["source bytes", ing.source_bytes],
     ["decoded by a decoder", ing.decoded], ["text bytes", ing.text_bytes], ["title from", ing.title_source],
     ["headings", ing.headings], ["body tokens", ing.body_tokens], ["link-target tokens", ing.link_target_tokens],
-    ["page-chrome tokens", ing.chrome_tokens], ["passages", ing.passages],
-    ["cut between words", (ing.cuts || {}).word]];
-  let html = `<div class="card"><h2>${esc(x.title)}</h2><div class="loc mono">${esc(x.id)}</div>
-    <div class="badges">${x.archived ? '<span class="badge arch">archived</span>' : ""}${x.superseded ? '<span class="badge">superseded</span>' : ""}
-    ${x.identity.shares_title_count ? `<span class="flag">title shared with ${x.identity.shares_title_count}</span>` : ""}</div></div>`;
-  html += `<div class="card"><h2>ingested — what came out of the bytes</h2>${table(["", ""], facts.map(([k, v]) => `<tr><td>${esc(k)}</td>${cell(v)}</tr>`))}</div>`;
-  html += `<div class="card"><h2>indexed — tokens per field</h2>${table(["field", "tokens"], Object.entries(idx.fields || {}).map(([k, v]) => `<tr><td>${esc(k)}</td>${cell(v)}</tr>`))}
-    <div class="maths">${esc(idx.distinct_terms)} distinct terms. Words below are the rarest in each field — <b>df</b> is how many documents carry the term.</div></div>`;
-  Object.entries(idx.words || {}).forEach(([field, rows]) => {
-    if (!rows.length) return;
-    html += `<div class="card"><h2>${esc(field)} — rarest words</h2>${table(["word", "indexed as", "tf", "df"], rows.map((r) =>
-      `<tr><td>${esc(r.word)}</td><td class="mono">${esc(r.term)}</td>${cell(r.tf)}${cell(r.df)}</tr>`))}</div>`;
-  });
-  html += `<div class="card"><h2>passages refer would cite — ${esc(x.passage_count)}</h2>${table(["#", "heading", "lines", "bytes", "cut"], x.passages.map((p) =>
-    `<tr>${cell(p.ordinal)}<td>${esc(p.heading)}</td><td class="mono">${esc(p.lines[0])}–${esc(p.lines[1])}</td>${cell(p.bytes)}<td>${p.cut === "word" ? '<span class="flag">word</span>' : esc(p.cut)}</td></tr>`))}
-    ${x.passage_count > x.passages.length ? `<div class="sub">… ${x.passage_count - x.passages.length} more</div>` : ""}</div>`;
-  const links = (rows) => rows.length ? table(["kind", "document"], rows.map((l) => `<tr><td>${esc(l.kind)}</td><td>${esc(l.title || "")}<div class="loc mono">${esc(l.id)}</div></td></tr>`)) : '<div class="sub">none</div>';
-  html += `<div class="grid2"><div class="card"><h2>links out</h2>${links(x.links.out)}</div><div class="card"><h2>links in</h2>${links(x.links.in)}</div></div>`;
-  html += `<div class="card" id="docprobes"><h2>probes — its title and headings, asked for real</h2><div class="progress">asking…</div></div>`;
+    ["page-chrome tokens", ing.chrome_tokens], ["passages", ing.passages], ["cut between words", wordCut]];
+  html += `<div class="card" id="docprobes"><h2>probes — does it come back for its own title and headings?</h2><div class="progress">asking, one real <span class="mono">ask</span> per probe…</div></div>`;
+  html += sec("links — how it connects", `<div class="grid2"><div><div class="sub" style="margin-bottom:6px">out of this document</div>${links.out.length ? links.out.map(docLink).join("") : '<div class="hint">none</div>'}</div>
+    <div><div class="sub" style="margin-bottom:6px">into this document</div>${links.in.length ? links.in.map(docLink).join("") : '<div class="hint">none — nothing links here, so anchor text cannot help it</div>'}</div></div>`,
+    `${links.out.length} out · ${links.in.length} in`, true);
+  html += sec("passages — what refer would cite", table(["#", "heading", "lines", "bytes", "cut"], (x.passages || []).map((p) =>
+    `<tr>${cell(p.ordinal)}<td>${esc(p.heading)}</td><td class="mono">${esc(p.lines[0])}–${esc(p.lines[1])}</td>${cell(p.bytes)}<td>${p.cut === "word" ? '<span class="flag">mid-word</span>' : esc(p.cut)}</td></tr>`)) +
+    (x.passage_count > (x.passages || []).length ? `<div class="hint">… ${x.passage_count - x.passages.length} more</div>` : ""), `${esc(x.passage_count)}`, false);
+  const wordBlocks = Object.entries(idx.words || {}).filter(([, rows]) => rows.length).map(([field, rows]) =>
+    `<div class="sub" style="margin:10px 0 6px">${esc(field)}</div><div class="words">${rows.map((r) => `<span class="word">${esc(r.word)}<span class="n">${esc(r.term)} · tf ${esc(r.tf)} · df ${esc(r.df)}</span></span>`).join("")}</div>`).join("");
+  html += sec("indexed — tokens per field, and its rarest words", kv(Object.entries(idx.fields || {}).map(([k, v]) => [k + " tokens", v])) +
+    `<div class="hint" style="margin-top:10px">Rarest words per field — the ones a question is likeliest to find this document by. <b>df</b> is how many documents carry the term.</div>${wordBlocks}`,
+    `${esc(idx.distinct_terms)} distinct terms`, false);
+  html += sec("ingested — what came out of the bytes", kv(facts), `${esc(ing.decoder || "")}${ing.kind ? " · " + esc(ing.kind) : ""}`, false);
   $("docxray").innerHTML = html;
+  $("docxray").querySelectorAll(".opendoc").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); openDocument(a.dataset.loc); }));
+  const title = x.title || baseName(loc);
+  $("askTitle").addEventListener("click", () => { $("q").value = title; showTab("ask"); ask(title); });
+  $("answerTitle").addEventListener("click", () => { $("aq").value = title; showTab("answer"); answer(title); });
   try {
     const pr = await (await fetch("/inspect/document/probes?loc=" + encodeURIComponent(loc))).json();
     if (pr.error) throw new Error(pr.error);
     const p = pr.probe || { title: null, headings: [] };
-    const rows = [[x.title + " (title)", p.title]].concat(p.headings);
-    $("docprobes").innerHTML = `<h2>probes — its title and headings, asked for real</h2>` + table(["probe", "rank in top 10"], rows.map(([t, r]) =>
-      `<tr><td>${esc(t)}</td>${r == null ? '<td class="n"><span class="flag">missed</span></td>' : cell("#" + r)}</tr>`)) +
-      `<div class="maths">One real <span class="mono">ask</span> per probe. Title probes favour documents whose title is also in their body.</div>`;
-  } catch (e) { $("docprobes").innerHTML = `<div class="err">${esc(e.message || e)}</div>`; }
+    const rows = [[title + " (title)", p.title]].concat(p.headings);
+    const hits = rows.filter(([, r]) => r != null).length;
+    const rk = (r) => r == null ? '<span class="rk miss">missed</span>' : `<span class="rk ${r === 1 ? "top" : "hit"}">#${esc(r)}</span>`;
+    const el = $("docprobes");
+    if (el) el.innerHTML = `<h2>probes — does it come back for its own title and headings?</h2>
+      <div class="sub">${hits} of ${rows.length} probes put this document in the top 10. Each probe is one real <span class="mono">ask</span>; the rank is fux's.</div>
+      ${rows.map(([t, r]) => `<div class="probe"><span>${esc(t)}</span>${rk(r)}</div>`).join("")}
+      <div class="maths">A miss is a lever: the document does not say what its own heading says, or another document says it louder. Title probes favour documents whose title is also in their body.</div>`;
+    const st = $("probestat"); if (st) st.outerHTML = stat(`${hits}/${rows.length}`, "probes in top 10", hits === rows.length ? "ok" : hits === 0 ? "warn" : "");
+  } catch (e) { const el = $("docprobes"); if (el) el.innerHTML = `<div class="err">${esc(e.message || e)}</div>`; const st = $("probestat"); if (st) st.outerHTML = stat("—", "probes in top 10"); }
 }
 
 /* ---- Index: fast lenses first, probes streamed in behind them. ----------- */
@@ -569,13 +762,21 @@ async function boot() {
   $("chips").innerHTML = chips.map((c) => `<span class="chip">${esc(c)}</span>`).join("");
   $("chips").querySelectorAll(".chip").forEach((c) =>
     c.addEventListener("click", () => { $("q").value = c.textContent; ask(c.textContent); }));
-  const initial = new URLSearchParams(location.search).get("q");
+  const params = new URLSearchParams(location.search);
+  const initial = params.get("q");
   if (initial) { $("q").value = initial; ask(initial); }
+  const tab = params.get("tab");
+  if (tab && ["answer", "docs", "index"].includes(tab)) showTab(tab);
+  const aq = params.get("aq");
+  if (aq) { $("aq").value = aq; answer(aq); }
 }
 
 $("q").addEventListener("keydown", (e) => { if (e.key === "Enter") ask($("q").value); });
 document.addEventListener("keydown", (e) => {
-  if (e.key === "/" && document.activeElement !== $("q")) { e.preventDefault(); $("q").focus(); }
+  if (e.key !== "/" || /INPUT|TEXTAREA/.test((document.activeElement || {}).tagName)) return;
+  e.preventDefault();
+  const box = $("tab-answer").hidden ? ($("tab-docs").hidden ? $("q") : $("docfilter")) : $("aq");
+  box.focus();
 });
 boot();
 </script>

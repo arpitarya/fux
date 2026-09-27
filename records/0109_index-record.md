@@ -7,17 +7,17 @@ description: What every property of a committed JSONL record is for, why it is i
 status: accepted
 date: 2026-08-18
 feature: the committed record schema — `fux.index.v2`
-owns: [src/fux/store/index-record.schema.json@b5ee4b1179eb]
+owns: [src/fux/schemas/index-record.schema.json@b5ee4b1179eb]
 laws: [L2, L3, L5, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: c5fc7af19cc698bef9618b846600a545c5f014ac55bf932639739f20fd4cafaf
+content_sha: bb35ad15ff903799e1025da85e65deac86d2fd18cb85547a5848e17eabac3c48
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Owns** — the components this record decides:
 
-- [`src/fux/store/index-record.schema.json`](../src/fux/store/index-record.schema.json) · file
+- [`src/fux/schemas/index-record.schema.json`](../src/fux/schemas/index-record.schema.json) · file
 
 **Describes** — reaches into, does not own:
 
@@ -303,7 +303,7 @@ accelerator's pruning bound.
    drops it at score 0 unless the field is switched on.
 
 **The shape is declared once, in
-[`store/index-record.schema.json`](../src/fux/store/index-record.schema.json).**
+[`schemas/index-record.schema.json`](../src/fux/schemas/index-record.schema.json).**
 This record says what each field is *for*; the schema says what the field set,
 the defaults and the omit rules **are**, and the code is checked against it
 ([SR-INDEX-LIFECYCLE](0108_index-lifecycle.md) decision 11). Neither is a
@@ -389,7 +389,7 @@ this moved where they are written, not what they are.
 - The schema constants and the header —
   [`src/fux/store/format.py`](../src/fux/store/format.py); the declared
   shape —
-  [`index-record.schema.json`](../src/fux/store/index-record.schema.json);
+  [`index-record.schema.json`](../src/fux/schemas/index-record.schema.json);
   the encoder — [`canonical.py`](../src/fux/store/canonical.py); record
   construction — [`src/fux/ingest/run.py`](../src/fux/ingest/run.py).
 - ⚠ **The display cache (`store/displaycache.py`) and the write-time refusal
@@ -421,7 +421,7 @@ ls .fux/index/*.jsonl | wc -l          # the two numbers must match
 # 2. no property has appeared that the schema does not declare
 python3 -c "
 import json,glob
-known = set(json.load(open('src/fux/store/index-record.schema.json'))['fields'])
+known = set(json.load(open('src/fux/schemas/index-record.schema.json'))['fields'])
 known |= {'_format','analyzer','tf_fields'}
 seen=set()
 for f in glob.glob('.fux/index/*.jsonl'):
@@ -455,7 +455,7 @@ evidence.*
 - [`src/fux/store/canonical.py`](../src/fux/store/canonical.py)
 - `src/fux/store/displaycache.py` — **DELETED 2026-09-20 (W-194)**, named rather than linked
 - [`src/fux/store/format.py`](../src/fux/store/format.py)
-- [`src/fux/store/index-record.schema.json`](../src/fux/store/index-record.schema.json)
+- [`src/fux/schemas/index-record.schema.json`](../src/fux/schemas/index-record.schema.json)
 - [`src/fux/store/writer.py`](../src/fux/store/writer.py)
 
 **Measured evidence**
