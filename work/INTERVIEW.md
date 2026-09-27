@@ -35,7 +35,15 @@ valuable judgement, but not the state of play.
 *Updated **2026-09-27** (Claude Code, Opus — W-225 stage 3b landed; W-227 declared).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🟢 2026-09-28 (latest) — W-225 STAGE 4c: `.fux/inspect.toml`; STAGES 1–4 DONE
+### 🟢 2026-09-28 (latest) — W-229, W-228 AND W-231 LANDED; W-230 IS A FRESH SESSION'S
+
+- **W-229** (`9a4d3d3f`): every `fux inspect` lens has an Index-tab card; `/inspect/diff`; a parity test.
+- **W-228** (`79e564bb`): the `families` lens. DoD 11 (golden seed families + a rung) waits on W-230.
+- **W-231** (`cc1aef52`): law **L13** — a retired SR is archived; SR-LAW-5 moved to `archive/records/`.
+- **W-230 / W-227:** Arpit ruled the traversal hook is `100644` (never fired live since W-223); a FRESH session commits the exec bit, a `100755` gate, the uncommitted hardening, and runs the live probe. **Until then no session runs a recursive walk that can reach `work/`.**
+- **W-225 stage 5** is next for agents: 1 206 scanner sites (inline 524, module 427, param 88, class 75, path 53, get 39) across 150 files — a multi-session refactor with byte-equality gates.
+
+### 🟢 2026-09-28 — W-225 STAGE 4c: `.fux/inspect.toml`; STAGES 1–4 DONE
 
 - Nineteen inspect/explorer values now in `.fux/inspect.toml` ([SR-INSPECT](../records/0156_inspect.md) decision 23); no value moved.
 - **Next:** W-227 hardening (ruled 2026-09-27), then W-225 stage 5 (R7 numerals → `constants.toml`).
